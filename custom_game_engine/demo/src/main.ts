@@ -1,13 +1,13 @@
-import { GameLoop, AISystem, MovementSystem } from '@ai-village/core';
+import { GameLoop, AISystem, MovementSystem, NeedsSystem } from '@ai-village/core';
 import { Renderer, InputHandler } from '@ai-village/renderer';
 
 /**
- * Phase 2 Demo
- * Tests AI agents with wandering behavior.
+ * Phase 3 Demo
+ * Tests needs system and resource gathering.
  */
 
 function main() {
-  console.log('AI Village - Phase 2 Demo');
+  console.log('AI Village - Phase 3 Demo');
 
   const statusEl = document.getElementById('status');
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -19,8 +19,9 @@ function main() {
   // Create game loop
   const gameLoop = new GameLoop();
 
-  // Register AI and Movement systems
+  // Register systems (order matters: AI -> Needs -> Movement)
   gameLoop.systemRegistry.register(new AISystem());
+  gameLoop.systemRegistry.register(new NeedsSystem());
   gameLoop.systemRegistry.register(new MovementSystem());
 
   // Create renderer
@@ -54,7 +55,7 @@ function main() {
   console.log('Starting render loop...');
   renderLoop();
 
-  console.log('Phase 2 initialized successfully!');
+  console.log('Phase 3 initialized successfully!');
   console.log('Game loop:', gameLoop);
   console.log('Systems:', gameLoop.systemRegistry.getSorted());
 

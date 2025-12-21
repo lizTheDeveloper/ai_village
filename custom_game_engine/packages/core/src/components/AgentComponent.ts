@@ -1,6 +1,6 @@
 import type { Component } from '../ecs/Component.js';
 
-export type AgentBehavior = 'wander' | 'idle' | 'follow' | 'flee';
+export type AgentBehavior = 'wander' | 'idle' | 'follow' | 'flee' | 'seek_food';
 
 export interface AgentComponent extends Component {
   type: 'agent';

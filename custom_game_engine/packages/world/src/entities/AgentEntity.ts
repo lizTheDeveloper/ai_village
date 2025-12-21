@@ -8,6 +8,7 @@ import {
   createTagsComponent,
   createAgentComponent,
   createMovementComponent,
+  createNeedsComponent,
 } from '@ai-village/core';
 
 export function createWanderingAgent(
@@ -35,6 +36,9 @@ export function createWanderingAgent(
 
   // Movement
   entity.addComponent(createMovementComponent(speed, 0, 0));
+
+  // Needs - hunger and energy
+  entity.addComponent(createNeedsComponent(100, 100, 2.0, 1.0));
 
   // Add to world
   (world as any)._addEntity(entity);
