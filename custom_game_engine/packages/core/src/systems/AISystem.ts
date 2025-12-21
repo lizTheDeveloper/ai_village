@@ -12,6 +12,10 @@ import type { ResourceComponent } from '../components/ResourceComponent.js';
 import type { MemoryComponent } from '../components/MemoryComponent.js';
 import { addMemory, getMemoriesByType } from '../components/MemoryComponent.js';
 import type { VisionComponent } from '../components/VisionComponent.js';
+import type { ConversationComponent } from '../components/ConversationComponent.js';
+import { startConversation, addMessage, isInConversation } from '../components/ConversationComponent.js';
+import type { RelationshipComponent } from '../components/RelationshipComponent.js';
+import { updateRelationship, shareMemory } from '../components/RelationshipComponent.js';
 
 interface BehaviorHandler {
   (entity: EntityImpl, world: World): void;
@@ -33,6 +37,7 @@ export class AISystem implements System {
     this.registerBehavior('idle', this.idleBehavior.bind(this));
     this.registerBehavior('seek_food', this.seekFoodBehavior.bind(this));
     this.registerBehavior('follow_agent', this.followAgentBehavior.bind(this));
+    this.registerBehavior('talk', this.talkBehavior.bind(this));
   }
 
   registerBehavior(name: string, handler: BehaviorHandler): void {
@@ -95,6 +100,85 @@ export class AISystem implements System {
           behavior: 'wander',
           behaviorState: {},
         }));
+      } else if (currentBehavior === 'wander' && Math.random() < 0.08) {
+        // 8% chance to initiate conversation with nearby agent
+        const conversation = impl.getComponent<ConversationComponent>('conversation');
+        if (conversation && !isInConversation(conversation)) {
+          const nearbyAgents = this.getNearbyAgents(impl, world, 3); // Must be close (3 tiles)
+          if (nearbyAgents.length > 0) {
+            const targetAgent = nearbyAgents[Math.floor(Math.random() * nearbyAgents.length)];
+            if (!targetAgent) continue;
+
+            const targetImpl = targetAgent as EntityImpl;
+            const targetConversation = targetImpl.getComponent<ConversationComponent>('conversation');
+
+            // Only start conversation if target is not already talking
+            if (targetConversation && !isInConversation(targetConversation)) {
+              // Start conversation for both agents
+              impl.updateComponent<ConversationComponent>('conversation', (current) =>
+                startConversation(current, targetAgent.id, world.tick)
+              );
+              targetImpl.updateComponent<ConversationComponent>('conversation', (current) =>
+                startConversation(current, entity.id, world.tick)
+              );
+
+              // Switch both to talk behavior
+              impl.updateComponent<AgentComponent>('agent', (current) => ({
+                ...current,
+                behavior: 'talk',
+                behaviorState: { partnerId: targetAgent.id },
+              }));
+              targetImpl.updateComponent<AgentComponent>('agent', (current) => ({
+                ...current,
+                behavior: 'talk',
+                behaviorState: { partnerId: entity.id },
+              }));
+
+              // Emit conversation started event
+              world.eventBus.emit({
+                type: 'conversation:started',
+                source: entity.id,
+                data: {
+                  agent1: entity.id,
+                  agent2: targetAgent.id,
+                },
+              });
+            }
+          }
+        }
+      } else if (currentBehavior === 'talk' && Math.random() < 0.03) {
+        // 3% chance per think to end conversation
+        const conversation = impl.getComponent<ConversationComponent>('conversation');
+        if (conversation && conversation.partnerId) {
+          const partner = world.getEntity(conversation.partnerId);
+          if (partner) {
+            const partnerImpl = partner as EntityImpl;
+
+            // End conversation for both
+            impl.updateComponent<ConversationComponent>('conversation', (current) => ({
+              ...current,
+              isActive: false,
+              partnerId: null,
+            }));
+            partnerImpl.updateComponent<ConversationComponent>('conversation', (current) => ({
+              ...current,
+              isActive: false,
+              partnerId: null,
+            }));
+
+            // Switch both back to wandering
+            impl.updateComponent<AgentComponent>('agent', (current) => ({
+              ...current,
+              behavior: 'wander',
+              behaviorState: {},
+            }));
+            partnerImpl.updateComponent<AgentComponent>('agent', (current) => ({
+              ...current,
+              behavior: 'wander',
+              behaviorState: {},
+            }));
+          }
+        }
       }
 
       // Execute current behavior
@@ -437,6 +521,127 @@ export class AISystem implements System {
         velocityX,
         velocityY,
       }));
+    }
+  }
+
+  private talkBehavior(entity: EntityImpl, world: World): void {
+    const conversation = entity.getComponent<ConversationComponent>('conversation');
+    const relationship = entity.getComponent<RelationshipComponent>('relationship');
+    const memory = entity.getComponent<MemoryComponent>('memory');
+
+    if (!conversation || !isInConversation(conversation)) {
+      // Not in conversation, switch to wandering
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        behavior: 'wander',
+        behaviorState: {},
+      }));
+      return;
+    }
+
+    const partnerId = conversation.partnerId;
+    if (!partnerId) return;
+
+    const partner = world.getEntity(partnerId);
+    if (!partner) {
+      // Partner no longer exists, end conversation
+      entity.updateComponent<ConversationComponent>('conversation', (current) => ({
+        ...current,
+        isActive: false,
+        partnerId: null,
+      }));
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        behavior: 'wander',
+        behaviorState: {},
+      }));
+      return;
+    }
+
+    // Stop moving while talking
+    entity.updateComponent<MovementComponent>('movement', (current) => ({
+      ...current,
+      velocityX: 0,
+      velocityY: 0,
+    }));
+
+    // Update relationship (get to know each other better)
+    if (relationship) {
+      entity.updateComponent<RelationshipComponent>('relationship', (current) =>
+        updateRelationship(current, partnerId, world.tick, 2)
+      );
+    }
+
+    // 30% chance to add a message to conversation
+    if (Math.random() < 0.3) {
+      const messages = [
+        'Hello!',
+        'How are you?',
+        'Nice weather today.',
+        'Have you seen any food around?',
+        'I was just wandering.',
+      ];
+      const message = messages[Math.floor(Math.random() * messages.length)] || 'Hello!';
+
+      entity.updateComponent<ConversationComponent>('conversation', (current) =>
+        addMessage(current, entity.id, message, world.tick)
+      );
+
+      // Partner also adds conversation to their component
+      const partnerImpl = partner as EntityImpl;
+      partnerImpl.updateComponent<ConversationComponent>('conversation', (current) =>
+        addMessage(current, entity.id, message, world.tick)
+      );
+    }
+
+    // 15% chance to share a memory about food location
+    if (Math.random() < 0.15 && memory && relationship) {
+      const foodMemories = getMemoriesByType(memory, 'resource_location').filter(
+        (m) => m.metadata?.resourceType === 'food' && m.strength > 50
+      );
+
+      if (foodMemories.length > 0) {
+        const sharedMemory = foodMemories[0];
+        if (!sharedMemory) return;
+
+        // Add this memory to partner's memory
+        const partnerImpl = partner as EntityImpl;
+        const partnerMemory = partnerImpl.getComponent<MemoryComponent>('memory');
+
+        if (partnerMemory) {
+          partnerImpl.updateComponent<MemoryComponent>('memory', (current) =>
+            addMemory(
+              current,
+              {
+                type: 'resource_location',
+                x: sharedMemory.x,
+                y: sharedMemory.y,
+                entityId: sharedMemory.entityId,
+                metadata: sharedMemory.metadata,
+              },
+              world.tick,
+              70 // Shared memories start with less strength
+            )
+          );
+
+          // Track that information was shared
+          entity.updateComponent<RelationshipComponent>('relationship', (current) =>
+            shareMemory(current, partnerId)
+          );
+
+          // Emit information shared event
+          world.eventBus.emit({
+            type: 'information:shared',
+            source: entity.id,
+            data: {
+              from: entity.id,
+              to: partnerId,
+              memoryType: 'resource_location',
+              location: { x: sharedMemory.x, y: sharedMemory.y },
+            },
+          });
+        }
+      }
     }
   }
 }

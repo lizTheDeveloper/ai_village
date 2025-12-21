@@ -12,3 +12,5 @@ export * from './NeedsComponent.js';
 export * from './ResourceComponent.js';
 export * from './MemoryComponent.js';
 export * from './VisionComponent.js';
+export * from './ConversationComponent.js';
+export * from './RelationshipComponent.js';

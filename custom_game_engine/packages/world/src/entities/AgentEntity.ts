@@ -11,6 +11,8 @@ import {
   createNeedsComponent,
   createMemoryComponent,
   createVisionComponent,
+  createConversationComponent,
+  createRelationshipComponent,
 } from '@ai-village/core';
 
 export function createWanderingAgent(
@@ -47,6 +49,12 @@ export function createWanderingAgent(
 
   // Vision - see 10 tiles around, can see both agents and resources
   entity.addComponent(createVisionComponent(10, 360, true, true));
+
+  // Conversation - can talk to other agents, remember last 10 messages
+  entity.addComponent(createConversationComponent(10));
+
+  // Relationships - track familiarity with other agents
+  entity.addComponent(createRelationshipComponent());
 
   // Add to world
   (world as any)._addEntity(entity);

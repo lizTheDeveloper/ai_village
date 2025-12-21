@@ -4,16 +4,17 @@ import {
   MovementSystem,
   NeedsSystem,
   MemorySystem,
+  CommunicationSystem,
 } from '@ai-village/core';
 import { Renderer, InputHandler } from '@ai-village/renderer';
 
 /**
- * Phase 4 Demo
- * Tests memory system and social awareness.
+ * Phase 5 Demo
+ * Tests communication and relationship systems.
  */
 
 function main() {
-  console.log('AI Village - Phase 4 Demo');
+  console.log('AI Village - Phase 5 Demo');
 
   const statusEl = document.getElementById('status');
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -25,8 +26,9 @@ function main() {
   // Create game loop
   const gameLoop = new GameLoop();
 
-  // Register systems (order: AI -> Needs -> Movement -> Memory)
+  // Register systems (order: AI -> Communication -> Needs -> Movement -> Memory)
   gameLoop.systemRegistry.register(new AISystem());
+  gameLoop.systemRegistry.register(new CommunicationSystem());
   gameLoop.systemRegistry.register(new NeedsSystem());
   gameLoop.systemRegistry.register(new MovementSystem());
   gameLoop.systemRegistry.register(new MemorySystem());
@@ -62,7 +64,7 @@ function main() {
   console.log('Starting render loop...');
   renderLoop();
 
-  console.log('Phase 4 initialized successfully!');
+  console.log('Phase 5 initialized successfully!');
   console.log('Game loop:', gameLoop);
   console.log('Systems:', gameLoop.systemRegistry.getSorted());
 
