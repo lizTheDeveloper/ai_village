@@ -14,19 +14,63 @@ export class OllamaProvider implements LLMProvider {
 
   async generate(request: LLMRequest): Promise<LLMResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/generate`, {
+      // Define action tools - simple, no parameters
+      const tools = [
+        {
+          type: 'function',
+          function: {
+            name: 'wander',
+            description: 'Explore the area, move around randomly',
+            parameters: { type: 'object', properties: {} }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'idle',
+            description: 'Do nothing, rest and recover energy',
+            parameters: { type: 'object', properties: {} }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'seek_food',
+            description: 'Find and eat food to satisfy hunger',
+            parameters: { type: 'object', properties: {} }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'follow_agent',
+            description: 'Follow another agent you see nearby',
+            parameters: { type: 'object', properties: {} }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'talk',
+            description: 'Start a conversation with a nearby agent',
+            parameters: { type: 'object', properties: {} }
+          }
+        }
+      ];
+
+      const response = await fetch(`${this.baseUrl}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           model: this.model,
-          prompt: request.prompt,
+          messages: [{ role: 'user', content: request.prompt }],
           stream: false,
+          tools: tools,
           options: {
             temperature: request.temperature ?? 0.7,
-            num_predict: request.maxTokens ?? 100,
-            stop: request.stopSequences, // Let caller control stop sequences
+            num_predict: request.maxTokens ?? 2000,
           },
         }),
       });
@@ -37,24 +81,48 @@ export class OllamaProvider implements LLMProvider {
 
       const data = await response.json();
 
-      // qwen3 models use 'thinking' field for chain-of-thought reasoning
-      // Extract actual response from either 'response' or 'thinking' field
-      const responseText = data.response || data.thinking || '';
+      // Extract components from response
+      const message = data.message || {};
+      const thinking = message.thinking || '';  // Qwen3 thinking field
+      const speaking = message.content || '';   // Assistant message
+      const toolCalls = message.tool_calls || [];
+
+      // Extract action from tool call
+      const action = toolCalls.length > 0 ? toolCalls[0].function.name : '';
+
+      // Format as JSON string for the parser
+      const responseText = JSON.stringify({
+        thinking: thinking,
+        speaking: speaking,
+        action: action
+      });
 
       console.log('[OllamaProvider] Response:', {
         model: this.model,
-        hasResponse: !!data.response,
-        hasThinking: !!data.thinking,
-        responseLength: responseText.length,
-        text: responseText.slice(0, 100) + (responseText.length > 100 ? '...' : ''),
-        doneReason: data.done_reason,
-        evalCount: data.eval_count,
+        action: action || '(no action)',
+        thinking: thinking ? thinking.slice(0, 60) + '...' : '(no thoughts)',
+        speaking: speaking || '(silent)',
+        tokensUsed: data.eval_count,
       });
 
-      if (!responseText) {
-        console.error('[OllamaProvider] Empty response from Ollama:', data);
+      // If no action was called, fall back to text parsing
+      if (!action) {
+        const fallbackText = speaking || thinking || '';
+
+        console.log('[OllamaProvider] No tool call, using text fallback');
+
+        if (!fallbackText) {
+          console.error('[OllamaProvider] Empty response from Ollama:', data);
+        }
+
+        return {
+          text: fallbackText,
+          stopReason: data.done_reason,
+          tokensUsed: data.eval_count,
+        };
       }
 
+      // Return structured response
       return {
         text: responseText,
         stopReason: data.done_reason,

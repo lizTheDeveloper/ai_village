@@ -97,6 +97,8 @@ THEN the engine SHALL:
 
 ### REQ-ENG-003: Multi-Timescale Simulation
 
+> **Implementation Note:** Multi-timescale simulation is limited by feasibility. See `consciousness-implementation-phases.md` for details. Phase 5 adds dual timescale (standard + slow). Millisecond and geological timescales are deferred indefinitely due to LLM call constraints and perception mismatches.
+
 The engine SHALL support entities operating on different temporal scales:
 
 ```typescript
@@ -469,3 +471,7 @@ type GameEvent =
 - `animal-system/spec.md` - Animal simulation
 - `economy-system/inter-village-trade.md` - Trade between villages
 - `agent-system/chroniclers.md` - Content generation by writers
+
+**Feasibility:**
+- `consciousness-implementation-phases.md` - Multi-timescale implementation phasing
+- `FEASIBILITY_REVIEW.md` - Technical constraints and recommendations

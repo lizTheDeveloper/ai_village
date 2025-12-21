@@ -147,6 +147,8 @@ type SpecialBiology =
 
 Different species have fundamentally different consciousness structures. This affects how they're simulated, how they interact, and how they form societies.
 
+> **Implementation Note:** Not all consciousness types are equally feasible for implementation. See `consciousness-implementation-phases.md` for which types are included in each development phase and specific technical constraints (e.g., pack minds limited to 4-6 bodies, symbionts limited to 5 accessible past hosts).
+
 ### Consciousness Architecture
 
 ```typescript
@@ -2136,3 +2138,7 @@ const geologicalHumanRelation: TemporalRelationship = {
 **World Systems:**
 - `universe-system/spec.md` - Universe type determines available species
 - `world-system/abstraction-layers.md` - Species at civilizational scale
+
+**Feasibility:**
+- `consciousness-implementation-phases.md` - Which consciousness types ship when
+- `FEASIBILITY_REVIEW.md` - Technical analysis of alien features

@@ -128,39 +128,47 @@ Be concise. Focus on survival and progress."""
         if self.system_prompt:
             payload["system"] = self.system_prompt
 
-        try:
-            response = requests.post(url, json=payload, timeout=self.timeout)
-            response.raise_for_status()
-            data = response.json()
+        # No fallback - if Ollama fails, crash
+        response = requests.post(url, json=payload, timeout=self.timeout)
+        response.raise_for_status()
+        data = response.json()
 
-            # Handle Qwen3 thinking mode
-            result = data.get("response", "")
-            if not result.strip() and "thinking" in data:
+        # Require response field
+        if "response" not in data:
+            raise KeyError(f"Ollama response missing 'response' field: {data.keys()}")
+
+        result = data["response"]
+        if not result.strip():
+            if "thinking" in data:
                 result = data["thinking"]
+            else:
+                raise ValueError("Ollama returned empty response with no thinking")
 
-            return result
-
-        except Exception as e:
-            print(f"Ollama error: {e}")
-            return "noop"
+        return result
 
     def _parse_action(self, response: str) -> Action:
         """Extract action from LLM response."""
+        if not response or not response.strip():
+            raise ValueError("Cannot parse action from empty LLM response")
+
         response = response.strip()
 
         # Try JSON parse first
-        try:
-            # Find JSON in response
-            json_match = re.search(r'\{[^}]+\}', response)
-            if json_match:
+        json_match = re.search(r'\{[^}]+\}', response)
+        if json_match:
+            try:
                 data = json.loads(json_match.group())
-                action_name = data.get("action", "noop")
+                action_name = data.get("action")
+                if action_name is None:
+                    raise KeyError("JSON response missing 'action' field")
                 params = data.get("params", {})
                 reasoning = data.get("reasoning")
                 if action_name in self.action_names:
                     return Action(action_name, params, reasoning)
-        except json.JSONDecodeError:
-            pass
+                else:
+                    raise ValueError(f"Unknown action in JSON: {action_name}")
+            except json.JSONDecodeError as e:
+                raise ValueError(f"Invalid JSON in response: {e}")
 
         # Try plain text match
         response_lower = response.lower()
@@ -174,8 +182,8 @@ Be concise. Focus on survival and progress."""
             if name in response_lower:
                 return Action(name)
 
-        # Default
-        return Action("noop", reasoning="Could not parse action")
+        # No fallback - crash if we can't parse
+        raise ValueError(f"Could not parse valid action from LLM response: {response[:200]}")
 
 
 class MemoryAgent(OllamaAgent):

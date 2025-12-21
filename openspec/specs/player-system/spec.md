@@ -670,6 +670,8 @@ type TutorialStage =
 
 ## Alien Embodiment Modes
 
+> **Implementation Note:** Not all embodiment types are available at launch. See `consciousness-implementation-phases.md` for the phased rollout. Phase 1 includes only individual embodiment; pack mind and hive worker are Phase 2; symbiont is Phase 4; geological/AI Mind timescales are deferred indefinitely as playable options.
+
 ### REQ-PLY-015: Non-Standard Player Embodiments
 
 Players SHALL embody alien consciousnesses:
@@ -1238,3 +1240,7 @@ THEN:
 - `agent-system/needs.md` - Player-agent needs management
 - `economy-system/spec.md` - Player trading
 - `construction-system/spec.md` - Player building placement
+
+**Feasibility:**
+- `consciousness-implementation-phases.md` - Which embodiment modes ship when
+- `FEASIBILITY_REVIEW.md` - Technical analysis of alien features

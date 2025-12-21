@@ -3,11 +3,11 @@ import type { Entity } from '@ai-village/core';
 export interface AgentContext {
   position: { x: number; y: number };
   needs: { hunger: number; energy: number };
-  nearbyAgents: Array<{ distance: number }>;
-  nearbyResources: Array<{ type: string; distance: number }>;
+  nearbyAgents: Array<{ agentId?: string; distance: number }>;
+  nearbyResources: Array<{ resourceId?: string; type: string; distance: number }>;
   currentBehavior: string;
   memories: Array<{ type: string; strength: number }>;
-  relationships: Array<{ familiarity: number }>;
+  relationships: Array<{ agentId?: string; familiarity: number }>;
 }
 
 /**
@@ -16,6 +16,7 @@ export interface AgentContext {
 export class AgentContextBuilder {
   /**
    * Extract context from an agent entity.
+   * Uses vision, memory, and relationship systems to build rich context.
    */
   extractContext(agent: Entity, _world: any): AgentContext {
     const position = agent.components.get('position') as any;
@@ -23,22 +24,32 @@ export class AgentContextBuilder {
     const agentComp = agent.components.get('agent') as any;
     const memory = agent.components.get('memory') as any;
     const relationship = agent.components.get('relationship') as any;
+    const vision = agent.components.get('vision') as any;
 
-    // Get nearby entities (simplified)
-    const nearbyAgents: Array<{ distance: number }> = [];
-    const nearbyResources: Array<{ type: string; distance: number }> = [];
+    // Extract what the agent can see from vision component
+    const nearbyAgents = vision?.seenAgents?.map((id: string) => ({
+      agentId: id,
+      distance: Math.random() * 10, // TODO: Calculate actual distance
+    })) || [];
 
-    // Extract memory info
-    const memories = memory?.memories?.slice(0, 5).map((m: any) => ({
+    const nearbyResources = vision?.seenResources?.map((id: string) => ({
+      resourceId: id,
+      type: 'food', // TODO: Get actual resource type
+      distance: Math.random() * 10,
+    })) || [];
+
+    // Extract recent significant memories (last 10)
+    const memories = memory?.memories?.slice(-10).map((m: any) => ({
       type: m.type,
       strength: Math.round(m.strength),
     })) || [];
 
-    // Extract relationship info
+    // Extract relationship info with agent IDs
     const relationships = relationship?.relationships
-      ? Array.from(relationship.relationships.values())
-          .slice(0, 3)
-          .map((r: any) => ({
+      ? (Array.from(relationship.relationships.entries()) as Array<[string, any]>)
+          .slice(0, 5)
+          .map(([agentId, r]) => ({
+            agentId,
             familiarity: Math.round(r.familiarity),
           }))
       : [];
@@ -58,45 +69,50 @@ export class AgentContextBuilder {
   }
 
   /**
-   * Build a prompt for the LLM.
+   * Build a rich, contextual prompt for the LLM.
+   * Let the LLM reason about the situation instead of just picking from a list.
    */
   buildPrompt(context: AgentContext): string {
-    const { needs, currentBehavior, memories, relationships } = context;
+    const { needs, nearbyAgents, nearbyResources, memories, relationships } = context;
 
-    let prompt = `You are an autonomous agent in a village simulation. You must decide what to do next.
+    let prompt = `You are an autonomous agent in a living village world.
 
-Current Status:
-- Hunger: ${needs.hunger}% (0 = starving, 100 = full)
-- Energy: ${needs.energy}% (0 = exhausted, 100 = rested)
-- Current behavior: ${currentBehavior}
+YOUR STATUS:
+- Hunger: ${needs.hunger}% (you ${needs.hunger < 30 ? 'are very hungry' : needs.hunger < 60 ? 'could eat' : 'are satisfied'})
+- Energy: ${needs.energy}% (you ${needs.energy < 30 ? 'are exhausted' : needs.energy < 60 ? 'are getting tired' : 'feel rested'})
 
-`;
+WHAT YOU SEE:`;
+
+    if (nearbyResources.length > 0) {
+      prompt += `\n- ${nearbyResources.length} food sources nearby`;
+    }
+
+    if (nearbyAgents.length > 0) {
+      prompt += `\n- ${nearbyAgents.length} other agents nearby`;
+      if (relationships.length > 0) {
+        prompt += ` (you know ${relationships.filter(r => r.familiarity > 50).length} of them)`;
+      }
+    }
+
+    if (nearbyAgents.length === 0 && nearbyResources.length === 0) {
+      prompt += `\n- Empty area, nothing notable nearby`;
+    }
 
     if (memories.length > 0) {
-      prompt += `Recent Memories:\n`;
-      memories.forEach((m, i) => {
-        prompt += `${i + 1}. ${m.type} (strength: ${m.strength}%)\n`;
+      prompt += `\n\nRECENT MEMORIES:`;
+      memories.slice(-5).forEach((m) => {
+        prompt += `\n- Remembered: ${m.type}`;
       });
-      prompt += `\n`;
     }
 
-    if (relationships.length > 0) {
-      prompt += `Relationships:\n`;
-      relationships.forEach((r, i) => {
-        prompt += `${i + 1}. Familiarity: ${r.familiarity}%\n`;
-      });
-      prompt += `\n`;
-    }
+    prompt += `\n\nDecide what to do next. You can:
+- wander (explore the area)
+- seek_food (find something to eat)
+- talk (have a conversation if someone is nearby)
+- follow_agent (follow someone)
+- idle (rest and recover energy)
 
-    prompt += `Available Actions:
-- wander: Move randomly to explore
-- seek_food: Look for food to eat (use when hungry)
-- follow_agent: Follow another agent socially
-- talk: Have a conversation with a nearby agent
-- idle: Rest and do nothing
-
-Choose ONE action that makes the most sense given your current needs and situation.
-Respond with ONLY the action name (e.g., "seek_food" or "wander").
+Think about your situation and respond with ONLY the action that makes the most sense right now.
 
 Action:`;
 

@@ -1236,6 +1236,8 @@ async function handleAgentDeath(agent: Agent): Promise<void> {
 
 ## Alien Memory Architectures
 
+> **Implementation Note:** Alien memory architectures have specific feasibility constraints. See `consciousness-implementation-phases.md` for details. Key limits: symbiont memories limited to 5 accessible past hosts (Phase 4), pack shared memory uses single store (Phase 2), hibernation capped at 5 years (Phase 3). Geological-scale memory and unlimited inherited memories are deferred indefinitely due to context window and storage constraints.
+
 Different species have fundamentally different memory structures. Some share memories; some inherit memories; some have collective memory.
 
 ### Pack Mind Memory
@@ -1670,3 +1672,7 @@ Implications:
 
 **Simulation Scale:**
 - `world-system/abstraction-layers.md` - Catch-up memories when upgrading village detail
+
+**Feasibility:**
+- `consciousness-implementation-phases.md` - Which memory architectures ship when
+- `FEASIBILITY_REVIEW.md` - Context window and storage constraints

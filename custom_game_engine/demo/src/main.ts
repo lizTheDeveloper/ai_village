@@ -80,10 +80,10 @@ function main() {
 
   // Log agent count
   setInterval(() => {
-    const agents = gameLoop.world.query(['agent']);
+    const agents = gameLoop.world.query().with('agent').executeEntities();
     const movingAgents = agents.filter((e) => {
-      const movement = e.getComponent('movement') as any;
-      return movement && (movement.velocityX !== 0 || movement.velocityY !== 0);
+      const movement = e.getComponent('movement');
+      return movement && ((movement as any).velocityX !== 0 || (movement as any).velocityY !== 0);
     });
     console.log(
       `Agents: ${agents.length} total, ${movingAgents.length} moving`

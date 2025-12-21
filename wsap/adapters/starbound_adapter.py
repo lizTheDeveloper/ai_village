@@ -9,10 +9,13 @@ Architecture:
 """
 
 import json
+import logging
 import time
 from typing import Any
 
 import requests
+
+logger = logging.getLogger(__name__)
 
 from ..adapter import GameAdapter
 from ..core import (
@@ -198,41 +201,44 @@ EXPLORATION:
         """Check if bridge is responding."""
         try:
             result = self._request("status")
-            self._connected = result.get("connected", False)
+            if "connected" not in result:
+                raise KeyError("Bridge status response missing 'connected' field")
+            self._connected = result["connected"]
             return self._connected
-        except:
+        except (ConnectionError, RuntimeError) as e:
+            logger.error(f"Connection check failed: {e}")
             self._connected = False
-            return False
+            raise
 
     def observe(self) -> Observation:
         """Get current game state from bridge."""
-        try:
-            data = self._request("observe", {"player_id": self.player_id})
-        except ConnectionError:
-            # Return last known observation if bridge unavailable
-            if self._last_observation:
-                return self._last_observation
-            # Return empty observation
-            return self._empty_observation()
+        # No fallback - if bridge is unavailable, crash
+        data = self._request("observe", {"player_id": self.player_id})
+
+        # Require critical fields - don't silently default
+        required_fields = ["health", "max_health", "energy", "max_energy", "position"]
+        missing = [f for f in required_fields if f not in data]
+        if missing:
+            raise KeyError(f"Bridge observe response missing required fields: {missing}")
 
         # Parse response into Observation
         obs = Observation(
             status={
-                "health": data.get("health", 100),
-                "max_health": data.get("max_health", 100),
-                "energy": data.get("energy", 100),
-                "max_energy": data.get("max_energy", 100),
+                "health": data["health"],
+                "max_health": data["max_health"],
+                "energy": data["energy"],
+                "max_energy": data["max_energy"],
             },
             inventory=data.get("inventory", {}),
             location=Location(
-                coordinates=tuple(data.get("position", [0, 0])),
+                coordinates=tuple(data["position"]),
                 region=data.get("world_name", "unknown"),
                 description=data.get("location_description", ""),
             ),
             nearby_entities=[
                 Entity(
-                    type=e.get("type", "unknown"),
-                    distance=e.get("distance", 0),
+                    type=e["type"],
+                    distance=e["distance"],
                     direction=e.get("direction", "nearby"),
                     name=e.get("name"),
                     state=e.get("state"),
@@ -242,7 +248,7 @@ EXPLORATION:
             ],
             nearby_terrain=[
                 Terrain(
-                    type=t.get("type", "unknown"),
+                    type=t["type"],
                     direction=t.get("direction", "here"),
                     passable=t.get("passable", True),
                 )
@@ -250,7 +256,7 @@ EXPLORATION:
             ],
             active_effects=[
                 Effect(
-                    name=e.get("name", "unknown"),
+                    name=e["name"],
                     description=e.get("description", ""),
                     duration=e.get("duration"),
                 )
@@ -258,8 +264,8 @@ EXPLORATION:
             ],
             current_goals=[
                 Goal(
-                    id=g.get("id", ""),
-                    description=g.get("description", ""),
+                    id=g["id"],
+                    description=g["description"],
                     type=g.get("type", "quest"),
                     progress=g.get("progress"),
                 )
@@ -287,21 +293,19 @@ EXPLORATION:
                 observation=self.observe(),
             )
 
-        try:
-            result = self._request("act", {
-                "action": action.name,
-                "parameters": action.parameters,
-                "player_id": self.player_id,
-            })
-        except ConnectionError as e:
-            return ActionResult(
-                success=False,
-                message=str(e),
-                observation=self._last_observation or self._empty_observation(),
-            )
+        # No fallback - if bridge fails, crash
+        result = self._request("act", {
+            "action": action.name,
+            "parameters": action.parameters,
+            "player_id": self.player_id,
+        })
 
-        # Parse result
-        success = result.get("success", False)
+        # Require success field - don't assume failure
+        if "success" not in result:
+            raise KeyError("Bridge act response missing 'success' field")
+
+        # Parse result - require critical fields
+        success = result["success"]
         message = result.get("message", action.name)
         reward = result.get("reward", 0.0)
         achievements = result.get("achievements", [])
@@ -328,10 +332,8 @@ EXPLORATION:
         self._step = 0
         self._recent_events = []
 
-        try:
-            self._request("reset", {"player_id": self.player_id})
-        except ConnectionError:
-            pass
+        # No fallback - if bridge fails, crash
+        self._request("reset", {"player_id": self.player_id})
 
         return self.observe()
 
@@ -339,37 +341,25 @@ EXPLORATION:
         """Cleanup."""
         self._connected = False
 
-    def _empty_observation(self) -> Observation:
-        """Return empty observation when bridge unavailable."""
-        return Observation(
-            status={"health": 0, "energy": 0},
-            inventory={},
-            location=Location((0, 0), "disconnected", "Not connected to game"),
-            step=self._step,
-        )
-
     # Additional Starbound-specific methods
 
     def get_inventory_details(self) -> dict:
         """Get detailed inventory information."""
-        try:
-            return self._request("inventory", {"player_id": self.player_id})
-        except:
-            return {}
+        # No fallback - if bridge fails, crash
+        return self._request("inventory", {"player_id": self.player_id})
 
     def get_quests(self) -> list[dict]:
         """Get all active quests with details."""
-        try:
-            return self._request("quests", {"player_id": self.player_id}).get("quests", [])
-        except:
-            return []
+        # No fallback - if bridge fails, crash
+        result = self._request("quests", {"player_id": self.player_id})
+        if "quests" not in result:
+            raise KeyError("Bridge quests response missing 'quests' field")
+        return result["quests"]
 
     def get_world_info(self) -> dict:
         """Get information about current world."""
-        try:
-            return self._request("world", {"player_id": self.player_id})
-        except:
-            return {}
+        # No fallback - if bridge fails, crash
+        return self._request("world", {"player_id": self.player_id})
 
 
 class MockStarboundAdapter(StarboundAdapter):

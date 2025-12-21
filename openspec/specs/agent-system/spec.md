@@ -742,6 +742,10 @@ THEN the prompt SHALL include:
 - `items-system/spec.md` - Agent config items
 - `economy-system/spec.md` - Trading behavior
 
+**Embodiment & Transit:**
+- `avatar-system/spec.md` - Physical embodiment, jack-in/jack-out
+- `nexus-system/spec.md` - Multi-game transit, skill transfer, meta-goals
+
 **Agent Sub-Systems:**
 - `agent-system/needs.md` - Full needs hierarchy (replaces energy/mood)
 - `agent-system/memory-system.md` - Episodic memory, reflection, journaling

@@ -591,6 +591,8 @@ THEN the system SHALL:
 
 ## Alien Communication Modes
 
+> **Implementation Note:** Not all communication modes are equally feasible. See `consciousness-implementation-phases.md` for phasing. Polyphonic (synchronized dual-voice) communication is deferred indefinitely as designed - will require redesign to sequential or templated. Pheromone and chromatic modes are experimental (post-launch). Telepathy is limited to "surface impressions" - true thought sharing would expose internal LLM state.
+
 ### REQ-CONV-015: Non-Verbal Communication
 
 Agents with non-verbal primary communication SHALL converse differently:
@@ -1239,3 +1241,7 @@ Cultural learning:
 **Social Systems:**
 - `agent-system/relationship-system.md` - Relationship effects
 - `economy-system/spec.md` - Trade negotiations
+
+**Feasibility:**
+- `consciousness-implementation-phases.md` - Which communication modes ship when
+- `FEASIBILITY_REVIEW.md` - Polyphonic, pheromone, telepathic constraints

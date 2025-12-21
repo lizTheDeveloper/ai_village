@@ -38,8 +38,8 @@ export class StructuredPromptBuilder {
     // Available Actions
     const actions = this.getAvailableActions(vision);
 
-    // Instruction
-    const instruction = 'Decide what to do next based on your personality and situation.';
+    // Instruction - simple and direct for function calling
+    const instruction = `What should you do? Don't overthink - give your gut reaction and choose an action.`;
 
     // Combine into single prompt
     return this.formatPrompt({
@@ -85,11 +85,6 @@ export class StructuredPromptBuilder {
     } else if (personality.workEthic < 30) {
       prompt += '- You prefer to take life easy\n';
     }
-
-    prompt += '\nRules:\n';
-    prompt += '- Respond with a single action name or JSON action\n';
-    prompt += '- Consider your energy and hunger before choosing intensive tasks\n';
-    prompt += '- Let your personality influence your choices\n';
 
     return prompt;
   }
@@ -150,23 +145,22 @@ export class StructuredPromptBuilder {
 
   /**
    * Get available actions based on context.
+   * These MUST match the valid behaviors in ResponseParser.
    */
   private getAvailableActions(vision: any): string[] {
     const actions = [
       'wander - Explore the area',
-      'rest - Recover energy',
-      'idle - Do nothing for now',
+      'idle - Do nothing, rest and recover',
     ];
 
-    // Add contextual actions
+    // Add contextual actions - use exact behavior names from ResponseParser
     if (vision?.seenResources && vision.seenResources.length > 0) {
-      actions.push('eat - Find and eat food');
-      actions.push('forage - Gather resources');
+      actions.push('seek_food - Find and eat food');
     }
 
     if (vision?.seenAgents && vision.seenAgents.length > 0) {
       actions.push('talk - Have a conversation');
-      actions.push('follow - Follow someone');
+      actions.push('follow_agent - Follow someone');
     }
 
     return actions;
@@ -174,19 +168,26 @@ export class StructuredPromptBuilder {
 
   /**
    * Format the structured prompt into a single string.
+   * Intelligently collapses empty sections.
    */
   private formatPrompt(prompt: AgentPrompt): string {
-    return `${prompt.systemPrompt}
+    const sections: string[] = [prompt.systemPrompt];
 
-${prompt.worldContext}
+    // Only add non-empty sections
+    if (prompt.worldContext && prompt.worldContext.trim()) {
+      sections.push(prompt.worldContext);
+    }
 
-${prompt.memories}
+    if (prompt.memories && !prompt.memories.includes('no significant recent memories')) {
+      sections.push(prompt.memories);
+    }
 
-Available Actions:
-${prompt.availableActions.map(a => `- ${a}`).join('\n')}
+    if (prompt.availableActions && prompt.availableActions.length > 0) {
+      sections.push('Available Actions:\n' + prompt.availableActions.map(a => `- ${a}`).join('\n'));
+    }
 
-${prompt.instruction}
+    sections.push(prompt.instruction);
 
-Your action:`;
+    return sections.join('\n\n') + '\n\nYour response:';
   }
 }

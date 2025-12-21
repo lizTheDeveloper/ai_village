@@ -394,6 +394,382 @@ class Tool:
 
 ---
 
+## Avatar System
+
+Agents are disembodied decision-makers. Avatars are their physical embodiments within games.
+
+### Core Concepts
+
+```
+AGENT (eternal)              AVATAR (mortal)
+├── Identity                 ├── Position
+├── Skills                   ├── Health
+├── Memory                   ├── Inventory
+├── Goals                    ├── Appearance
+└── Achievements             └── Equipment
+         │
+         │ jack_in() / jack_out()
+         ▼
+    [BINDING]
+```
+
+### Avatar States
+
+```python
+class AvatarState(Enum):
+    UNBOUND = "unbound"       # No agent controlling
+    BOUND = "bound"           # Agent actively controlling
+    DORMANT = "dormant"       # Agent away, avatar persists (sleeping)
+    SUSPENDED = "suspended"   # Avatar frozen in time
+    DESTROYED = "destroyed"   # Avatar died/despawned
+```
+
+### Avatar Definition
+
+```python
+@dataclass
+class Avatar:
+    """Physical embodiment within a game"""
+
+    avatar_id: str
+    game_id: str
+
+    # Binding state
+    bound_agent: str | None
+    state: AvatarState
+
+    # Physical properties
+    name: str
+    position: tuple[float, ...]
+    appearance: dict[str, Any]
+
+    # Game state
+    health: float
+    max_health: float
+    inventory: dict[str, int]
+    equipment: dict[str, str]   # slot -> item_id
+
+    # Persistence
+    created_at: str
+    last_active: str
+    total_playtime: int         # seconds
+    death_count: int
+    respawn_point: tuple | None
+```
+
+### Avatar Specification (for creation)
+
+```python
+@dataclass
+class AvatarSpec:
+    """Preferences for creating a new avatar"""
+
+    name: str | None = None
+    appearance: dict = None
+    spawn_location: str = "safe"    # safe, random, challenging
+    starting_loadout: str = "default"
+    skill_bonuses: dict[str, float] = None  # From agent skills
+```
+
+### Jack-In Protocol
+
+Games with avatar support extend the adapter:
+
+```python
+class AvatarGameAdapter(GameAdapter):
+    """Extended adapter with avatar support"""
+
+    def list_avatars(self, agent_id: str) -> list[Avatar]:
+        """Get all avatars this agent has in this game"""
+        ...
+
+    def create_avatar(self, agent_id: str, spec: AvatarSpec) -> Avatar:
+        """Create a new avatar for the agent"""
+        ...
+
+    def jack_in(self, agent_id: str, avatar_id: str) -> JackInResult:
+        """Bind agent to avatar, begin embodied control"""
+        ...
+
+    def jack_out(self, agent_id: str, mode: str = "dormant") -> JackOutResult:
+        """Release control of current avatar
+
+        Modes:
+        - dormant: Avatar stays in world, sleeping/AFK
+        - suspend: Avatar frozen, invisible to world
+        - despawn: Avatar removed from world entirely
+        """
+        ...
+
+    def respawn(self, avatar_id: str, option: RespawnOption) -> JackInResult:
+        """Respawn a destroyed avatar"""
+        ...
+
+@dataclass
+class JackInResult:
+    success: bool
+    avatar: Avatar | None
+    message: str
+    bonuses_applied: dict[str, Any]
+    initial_observation: Observation | None
+
+@dataclass
+class JackOutResult:
+    success: bool
+    avatar_state: AvatarState
+    message: str
+    session_stats: dict[str, Any]  # playtime, achievements, etc.
+```
+
+### Jack-In Flow
+
+```
+Agent calls enter_game("starbound")
+         │
+         ▼
+┌─────────────────────────────────┐
+│ 1. Check existing avatars       │
+│    └─► Found dormant? Offer it  │
+│    └─► None? Create new         │
+│                                 │
+│ 2. Apply skill bonuses          │
+│    exploration 0.4 → +scanner   │
+│    combat 0.3 → +damage         │
+│                                 │
+│ 3. Spawn/wake avatar            │
+│                                 │
+│ 4. Return JackInResult          │
+└─────────────────────────────────┘
+         │
+         ▼
+Agent is EMBODIED, receives observations
+         │
+         ▼
+   [gameplay loop]
+         │
+         ▼
+Agent calls jack_out(mode="dormant")
+         │
+         ▼
+┌─────────────────────────────────┐
+│ 1. Save avatar state            │
+│ 2. Set avatar to DORMANT        │
+│ 3. Calculate session stats      │
+│ 4. Return to disembodied state  │
+└─────────────────────────────────┘
+```
+
+### Avatar Actions
+
+```python
+AVATAR_ACTIONS = ActionSpace(actions=[
+    ActionDef(
+        name="jack_out",
+        description="Leave this avatar and return to menu/nexus",
+        parameters=[
+            ParamDef("mode", "dormant|suspend|despawn", optional=True)
+        ],
+        preconditions=["Not in combat", "Not falling", "Safe location"],
+        category="meta"
+    ),
+    ActionDef(
+        name="look",
+        description="Turn avatar to face direction or entity",
+        parameters=[ParamDef("target", "direction or entity_id")],
+        preconditions=[],
+        category="avatar"
+    ),
+    ActionDef(
+        name="emote",
+        description="Express emotion through avatar body",
+        parameters=[ParamDef("emote", "wave|sit|dance|sleep|point")],
+        preconditions=[],
+        category="avatar"
+    ),
+    ActionDef(
+        name="inspect_self",
+        description="Check avatar's body, equipment, status",
+        parameters=[],
+        preconditions=[],
+        category="avatar"
+    ),
+])
+```
+
+### Embodied Observation
+
+When jacked in, observations include avatar state:
+
+```python
+@dataclass
+class EmbodiedObservation(Observation):
+    """Observation with avatar body awareness"""
+
+    avatar: Avatar
+
+    # Body state
+    facing: str                   # "north", "east", etc.
+    stance: str                   # "standing", "crouching", "prone", "swimming"
+    velocity: tuple[float, ...]   # Movement vector
+
+    # Sensory limits
+    vision_range: float
+    vision_cone: float            # degrees
+    hearing_range: float
+
+    def to_text(self) -> str:
+        avatar_text = f"""
+=== AVATAR: {self.avatar.name} ===
+Health: {self.avatar.health}/{self.avatar.max_health}
+Position: {self.avatar.position}
+Facing: {self.facing} | Stance: {self.stance}
+"""
+        return avatar_text + super().to_text()
+```
+
+### Death and Respawn
+
+```python
+@dataclass
+class DeathEvent:
+    """Triggered when avatar dies"""
+
+    avatar_id: str
+    cause: str                    # "combat", "fall", "drowning", "starvation"
+    killer: str | None            # Entity that killed, if any
+    location: tuple
+    timestamp: str
+
+    # Consequences
+    items_dropped: dict[str, int]
+    xp_lost: float
+
+    # Options
+    respawn_options: list[RespawnOption]
+
+@dataclass
+class RespawnOption:
+    id: str
+    type: str                     # "checkpoint", "bed", "spawn_point", "random"
+    location: tuple | str
+    cost: dict | None             # Resources/currency to respawn
+    penalties: list[str]          # "lose_inventory", "lose_xp", "debuff"
+    description: str
+
+# In adapter
+def handle_death(self, avatar_id: str) -> DeathEvent:
+    """Process avatar death, return options"""
+    ...
+
+def respawn(self, avatar_id: str, option_id: str) -> JackInResult:
+    """Respawn at chosen location, re-jack-in"""
+    ...
+```
+
+### Multi-Avatar Support (optional)
+
+Some games allow multiple avatars per agent:
+
+```python
+@dataclass
+class AvatarRoster:
+    """Agent's avatars in a game"""
+
+    agent_id: str
+    game_id: str
+    avatars: list[Avatar]
+    active_avatar_id: str | None
+    max_avatars: int = 3          # Game-specific limit
+
+    def get_active(self) -> Avatar | None:
+        """Currently controlled avatar"""
+        ...
+
+    def get_dormant(self) -> list[Avatar]:
+        """Avatars sleeping in the world"""
+        ...
+
+    def can_create_new(self) -> bool:
+        """Room for another avatar?"""
+        alive = [a for a in self.avatars if a.state != AvatarState.DESTROYED]
+        return len(alive) < self.max_avatars
+```
+
+---
+
+## Multi-Game Protocol (Nexus)
+
+For agents that can transit between games, see `MULTI_GAME_PROTOCOL.md`.
+
+Key concepts:
+- **Nexus**: Hub where disembodied agents exist between games
+- **Transit**: Moving from one game to another
+- **Skill Transfer**: Learning in one game benefits others
+- **Meta-Goals**: Objectives spanning multiple games
+
+---
+
+## LLM Backend: Ollama + Qwen3
+
+Reference implementation uses local inference via Ollama.
+
+### Setup
+
+```bash
+# Install Ollama
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Pull Qwen3 8B
+ollama pull qwen3:8b
+```
+
+### Agent LLM Interface
+
+```python
+import ollama
+
+class OllamaAgent(Agent):
+    """Agent using Ollama for decisions"""
+
+    def __init__(self, model: str = "qwen3:8b"):
+        self.model = model
+
+    def decide(self, observation: Observation) -> Action:
+        prompt = observation.to_text()
+
+        response = ollama.chat(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": self.system_prompt},
+                {"role": "user", "content": prompt}
+            ],
+            options={"num_predict": 300, "temperature": 0.7}
+        )
+
+        content = response["message"]["content"]
+
+        # Handle Qwen3 thinking mode
+        if "<think>" in content:
+            content = content.split("</think>")[-1].strip()
+
+        return self.parse_action(content)
+```
+
+### Recommended Options
+
+```python
+OLLAMA_OPTIONS = {
+    "num_predict": 300,       # Tokens for action + reasoning
+    "temperature": 0.7,       # Balance explore/exploit
+    "top_p": 0.9,
+    "repeat_penalty": 1.1,    # Avoid repetitive actions
+    "num_ctx": 4096,          # Context window
+}
+```
+
+---
+
 ## Version History
 
 - v0.1: Initial draft - Core protocols for Crafter + Starbound
+- v0.2: Added Avatar system, Ollama/Qwen3 backend, Multi-game reference

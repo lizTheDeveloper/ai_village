@@ -2,8 +2,11 @@
 WSAP Adapter for Crafter game.
 """
 
+import logging
 import sys
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # Add crafter to path if needed
 crafter_path = Path(__file__).parent.parent.parent / "crafter"
@@ -102,14 +105,24 @@ TIPS:
     def observe(self) -> Observation:
         """Convert Crafter state to WSAP Observation."""
         info = self._last_info
-        inv = info.get("inventory", {})
+
+        # Require inventory - no silent defaults
+        if "inventory" not in info:
+            raise KeyError("Crafter info missing 'inventory' - game state corrupted")
+        inv = info["inventory"]
+
+        # Require critical stats - crash if missing
+        required_stats = ["health", "food", "drink", "energy"]
+        missing = [s for s in required_stats if s not in inv]
+        if missing:
+            raise KeyError(f"Crafter inventory missing required stats: {missing}")
 
         # Status - core survival stats
         status = {
-            "health": inv.get("health", 9),
-            "food": inv.get("food", 9),
-            "drink": inv.get("drink", 9),
-            "energy": inv.get("energy", 9),
+            "health": inv["health"],
+            "food": inv["food"],
+            "drink": inv["drink"],
+            "energy": inv["energy"],
         }
 
         # Inventory - resources and tools
@@ -118,8 +131,10 @@ TIPS:
             if k not in ["health", "food", "drink", "energy"] and v > 0
         }
 
-        # Location
-        pos = info.get("player_pos", (32, 32))
+        # Location - require position
+        if "player_pos" not in info:
+            raise KeyError("Crafter info missing 'player_pos' - game state corrupted")
+        pos = info["player_pos"]
         location = Location(
             coordinates=tuple(pos),
             region="surface",
@@ -162,16 +177,20 @@ TIPS:
         # Track events
         self._recent_events = []
 
-        # Check for new achievements
+        # Check for new achievements - require achievements field
+        if "achievements" not in info:
+            raise KeyError("Crafter info missing 'achievements' - game state corrupted")
         achievements = []
-        for name, count in info.get("achievements", {}).items():
+        for name, count in info["achievements"].items():
             if count > 0 and name not in self._unlocked:
                 self._unlocked.add(name)
                 achievements.append(name)
                 self._recent_events.append(Event(f"Achievement unlocked: {name}", "reward"))
 
-        # Health changes
-        old_health = self._last_info.get("inventory", {}).get("health", 9)
+        # Health changes - require inventory in last_info too
+        if "inventory" not in self._last_info or "health" not in self._last_info["inventory"]:
+            raise KeyError("Previous game state missing inventory/health - state corrupted")
+        old_health = self._last_info["inventory"]["health"]
         new_health = info["inventory"]["health"]
         if new_health < old_health:
             self._recent_events.append(Event(f"Took damage! Health: {new_health}", "danger"))
@@ -234,13 +253,13 @@ TIPS:
         """Generate goals based on current progress."""
         goals = []
 
-        # Survival goals
-        if inv.get("drink", 9) <= 3:
-            goals.append(Goal("drink", "Find water and drink!", "urgent", f"drink: {inv.get('drink', 0)}/9"))
-        if inv.get("food", 9) <= 3:
-            goals.append(Goal("food", "Find food (plants or cows)", "urgent", f"food: {inv.get('food', 0)}/9"))
-        if inv.get("energy", 9) <= 2:
-            goals.append(Goal("energy", "Sleep to restore energy", "urgent", f"energy: {inv.get('energy', 0)}/9"))
+        # Survival goals - inv already validated to have these fields
+        if inv["drink"] <= 3:
+            goals.append(Goal("drink", "Find water and drink!", "urgent", f"drink: {inv['drink']}/9"))
+        if inv["food"] <= 3:
+            goals.append(Goal("food", "Find food (plants or cows)", "urgent", f"food: {inv['food']}/9"))
+        if inv["energy"] <= 2:
+            goals.append(Goal("energy", "Sleep to restore energy", "urgent", f"energy: {inv['energy']}/9"))
 
         # Progression goals
         if not achievements.get("collect_wood"):
