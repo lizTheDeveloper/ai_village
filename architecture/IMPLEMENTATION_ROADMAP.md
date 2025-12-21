@@ -2,6 +2,15 @@
 
 > **Goal**: Reach playable MVP as fast as possible while building on stable interfaces that support all future features.
 
+## Current Status
+
+**✅ Completed: Phases 0-6** (MVP reached!)
+- LLM-controlled agents with dual-layer cognitive architecture
+- Survival mechanics, memory, relationships, and social interaction
+- Ready for feature expansion
+
+**🚧 Next Up: Phase 7** - Building & Shelter
+
 ## Philosophy
 
 Each phase delivers a **playable milestone**. Every feature is implemented using the patterns from CORE_ARCHITECTURE.md, ensuring:
@@ -11,7 +20,7 @@ Each phase delivers a **playable milestone**. Every feature is implemented using
 
 ---
 
-## Phase 0: Foundation (Must Complete First)
+## ✅ Phase 0: Foundation (COMPLETED)
 
 **Deliverable**: Empty world you can observe. Core infrastructure working.
 
@@ -72,7 +81,7 @@ Each phase delivers a **playable milestone**. Every feature is implemented using
 
 ---
 
-## Phase 1: A World Exists
+## ✅ Phase 1: A World Exists (COMPLETED)
 
 **Deliverable**: Generated terrain you can explore. First entities rendered.
 
@@ -120,7 +129,7 @@ Each phase delivers a **playable milestone**. Every feature is implemented using
 
 ---
 
-## Phase 2: First Agent
+## ✅ Phase 2: First Agent (COMPLETED)
 
 **Deliverable**: One agent that moves randomly. Foundation for all agent behavior.
 
@@ -164,7 +173,7 @@ Each phase delivers a **playable milestone**. Every feature is implemented using
 
 ---
 
-## Phase 3: Agent Needs
+## ✅ Phase 3: Agent Needs (COMPLETED)
 
 **Deliverable**: Agent has needs that decay. Must find food to survive.
 
@@ -217,9 +226,14 @@ Each phase delivers a **playable milestone**. Every feature is implemented using
 
 ---
 
-## Phase 4: LLM Integration
+## ✅ Phase 4: Memory & Social Awareness (COMPLETED)
 
-**Deliverable**: Real LLM makes decisions instead of scripted logic.
+**Deliverable**: Agents remember interactions and track what they've seen.
+
+**Note**: Roadmap originally listed "LLM Integration" here, but actual implementation order was:
+- Phase 4: Memory & Social (vision, memory tracking)
+- Phase 5: Communication & Relationships (talking, relationships)
+- Phase 6: LLM Integration with dual-layer cognitive architecture
 
 ### 4.1 LLM Interface
 ```
@@ -252,27 +266,30 @@ Each phase delivers a **playable milestone**. Every feature is implemented using
 □ Fallback if invalid
 ```
 
-### 4.5 Decision Caching
+### 4.5 Decision Scheduling Foundation
 ```
-□ Similar situation detection
-□ Cache recent decisions
-□ Reduce LLM calls for repeated scenarios
+□ DecisionScheduler interface
+□ Decision request queue
+□ Budget-based scheduling (max decisions per tick)
+□ Priority ordering
 ```
 
-### 4.6 Batch Processing
+### 4.6 Fidelity Component (Foundation)
 ```
-□ Collect decision requests
-□ Batch 5+ per frame
-□ Distribute across ticks
+□ FidelityComponent (tier, lastDecision, nextScheduledDecision)
+□ Single-agent always Tier 0 (full fidelity)
+□ Decision interval tracking
+□ Prepares infrastructure for multi-agent scaling
 ```
+> See SIMULATION_FIDELITY.md for full specification
 
 **Milestone Check**: Agent is now LLM-controlled. Makes interesting, somewhat sensible decisions.
 
 ---
 
-## Phase 5: Multiple Agents & Social Basics
+## ✅ Phase 5: Communication & Relationships (COMPLETED)
 
-**Deliverable**: Several agents, they can see and talk to each other.
+**Deliverable**: Multiple agents can talk to each other and build relationships.
 
 ### 5.1 Multiple Agents
 ```
@@ -281,40 +298,117 @@ Each phase delivers a **playable milestone**. Every feature is implemented using
 □ Distinct names and placeholder personalities
 ```
 
-### 5.2 Agent Perception
+### 5.2 Fidelity System (Full Implementation)
+```
+□ FidelitySystem (priority 50, runs before decisions)
+□ Tier evaluation logic (0-3 based on relevance)
+□ Tier transition events (fidelity_changed)
+□ Decision budget enforcement
+□ Context compression by tier (full → reduced → minimal)
+```
+
+### 5.3 Tiered Decision Scheduling
+```
+□ Tier 0: Every decision cycle (1-5s game time)
+□ Tier 1: Periodic (30-60s game time)
+□ Tier 2: Rare (5-15 min game time)
+□ Decision queue with priority ordering
+□ Budget overflow handling (queue to next tick)
+```
+
+### 5.4 Tiered Needs Simulation
+```
+□ Tier 0: Per-tick decay
+□ Tier 1-2: Batch decay updates
+□ Critical needs bump agent to higher tier
+□ Needs thresholds trigger fidelity re-evaluation
+```
+
+### 5.5 Agent Perception
 ```
 □ PerceptionComponent (view range)
 □ Get visible entities
 □ Include in LLM context
+□ Proximity triggers Tier 1 for nearby agents
 ```
 
-### 5.3 Conversation System
+### 5.6 Conversation System
 ```
 □ TalkAction
 □ ConversationComponent (active conversation)
 □ Turn-based dialogue (both agents use LLM)
 □ Conversation events
+□ Both conversation participants → Tier 0
 ```
 
-### 5.4 Information Exchange
+### 5.7 Information Exchange
 ```
 □ Agents can share knowledge
 □ "I saw berries at X" type exchanges
 □ Add to memory (placeholder)
+□ Recent interaction keeps agents at Tier 1
 ```
 
-### 5.5 Relationship Component (Stub)
+### 5.8 Relationship Component (Stub)
 ```
 □ RelationshipComponent with simple familiarity score
 □ Increases from conversations
 □ Include in LLM context
+□ Pending obligations keep agents at Tier 1
 ```
 
-**Milestone Check**: Agents notice each other, have conversations, share info. Social seeds planted.
+> See SIMULATION_FIDELITY.md for full fidelity specification
+
+**Milestone Check**: Agents notice each other, have conversations, share info. Fidelity system scales LLM costs sub-linearly.
 
 ---
 
-## Phase 6: Building & Shelter
+## ✅ Phase 6: LLM Integration & Dual-Layer Cognition (COMPLETED)
+
+**Deliverable**: LLM-controlled agents with biologically-inspired dual-layer architecture.
+
+### 6.1 LLM Package ✅
+```
+✅ LLMProvider interface
+✅ OllamaProvider implementation (qwen3:4b)
+✅ LLMDecisionQueue with async/sync bridge
+✅ AgentContextBuilder (converts state to prompts)
+✅ ResponseParser (extracts behaviors from LLM)
+```
+
+### 6.2 Dual-Layer Cognitive Architecture ✅
+```
+✅ Autonomic Layer (fast survival reflexes)
+  - Hunger < 20 → seek_food override
+  - Energy < 10 → idle/rest override
+  - Based on needs.md tier system
+✅ Executive Layer (slow LLM planning)
+  - 1-minute cooldown (1200 ticks @ 20 TPS)
+  - Strategic decision making
+  - Only runs when survival needs met
+```
+
+### 6.3 Agent Updates ✅
+```
+✅ AgentComponent v1: useLLM, llmCooldown fields
+✅ 100% LLM agents (removed scripted behavior)
+✅ createLLMAgent factory function
+✅ Rate limiting (2 concurrent LLM requests)
+```
+
+### 6.4 Testing ✅
+```
+✅ Phase 6 Playwright integration test
+✅ Validates LLM spawning and decisions
+✅ Tests behavior diversity
+✅ Screenshot capture
+```
+
+**Milestone Check**: ✅ LLM agents make autonomous decisions with survival reflexes. MVP REACHED!
+
+---
+
+## Phase 7: Building & Shelter
 
 **Deliverable**: Agents can build simple structures.
 
@@ -404,7 +498,7 @@ Each phase delivers a **playable milestone**. Every feature is implemented using
 
 ## Phase 8: Memory & Personality
 
-**Deliverable**: Agents remember things and have distinct personalities.
+**Deliverable**: Agents remember things and have distinct personalities. Full fidelity system with statistical simulation.
 
 ### 8.1 Memory Component
 ```
@@ -419,6 +513,7 @@ Each phase delivers a **playable milestone**. Every feature is implemented using
 □ Record significant events
 □ Daily consolidation
 □ Pruning old memories
+□ Tiered memory recording (detailed → significant → sparse → outcomes only)
 ```
 
 ### 8.3 Memory Retrieval
@@ -442,7 +537,27 @@ Each phase delivers a **playable milestone**. Every feature is implemented using
 □ Consistent behavior over time
 ```
 
-**Milestone Check**: Agents have memories, distinct personalities. Behavior feels individual.
+### 8.6 Tier 3: Statistical Simulation
+```
+□ DailySummary calculation (no LLM)
+□ Probabilistic needs satisfaction
+□ Work/social outcome rolls based on skills
+□ Notable event generation (injury, discovery - rare)
+□ Location prediction
+```
+
+### 8.7 Catch-Up Protocol
+```
+□ CatchUpData structure (daily summaries)
+□ Single LLM "journaling" call when returning from Tier 3
+□ Parse journal → episodic memories
+□ Relationship adjustment from interaction counts
+□ Seamless re-integration to higher tier
+```
+
+> See SIMULATION_FIDELITY.md for catch-up specification
+
+**Milestone Check**: Agents have memories, distinct personalities. Tier 3 agents simulate statistically and catch up seamlessly.
 
 ---
 
