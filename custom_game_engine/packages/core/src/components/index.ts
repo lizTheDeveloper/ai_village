@@ -14,3 +14,4 @@ export * from './MemoryComponent.js';
 export * from './VisionComponent.js';
 export * from './ConversationComponent.js';
 export * from './RelationshipComponent.js';
+export * from './PersonalityComponent.js';
