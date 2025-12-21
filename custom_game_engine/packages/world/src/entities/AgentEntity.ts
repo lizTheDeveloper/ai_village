@@ -13,6 +13,9 @@ import {
   createVisionComponent,
   createConversationComponent,
   createRelationshipComponent,
+  generateRandomPersonality,
+  generateRandomName,
+  createIdentityComponent,
 } from '@ai-village/core';
 
 export function createWanderingAgent(
@@ -34,6 +37,12 @@ export function createWanderingAgent(
 
   // Tags
   entity.addComponent(createTagsComponent('agent', 'wanderer'));
+
+  // Identity - give agent a name
+  entity.addComponent(createIdentityComponent(generateRandomName()));
+
+  // Personality - random personality traits
+  entity.addComponent(generateRandomPersonality());
 
   // Agent behavior
   entity.addComponent(createAgentComponent('wander', 20)); // Think every second
@@ -84,6 +93,12 @@ export function createLLMAgent(
 
   // Tags
   entity.addComponent(createTagsComponent('agent', 'llm_agent'));
+
+  // Identity - give agent a name
+  entity.addComponent(createIdentityComponent(generateRandomName()));
+
+  // Personality - random personality traits
+  entity.addComponent(generateRandomPersonality());
 
   // Agent behavior - LLM-controlled
   entity.addComponent(createAgentComponent('wander', 20, true)); // useLLM = true

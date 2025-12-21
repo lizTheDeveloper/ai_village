@@ -16,6 +16,7 @@ import type { ConversationComponent } from '../components/ConversationComponent.
 import { startConversation, addMessage, isInConversation } from '../components/ConversationComponent.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
 import { updateRelationship, shareMemory } from '../components/RelationshipComponent.js';
+import { parseAction, actionToBehavior } from '../actions/AgentAction.js';
 
 interface BehaviorHandler {
   (entity: EntityImpl, world: World): void;
@@ -32,9 +33,9 @@ export class AISystem implements System {
 
   private behaviors: Map<string, BehaviorHandler> = new Map();
   private llmDecisionQueue: any | null = null; // LLM decision queue (optional)
-  private llmContextBuilder: any | null = null; // Context builder (optional)
+  private promptBuilder: any | null = null; // Structured prompt builder (optional)
 
-  constructor(llmDecisionQueue?: any, llmContextBuilder?: any) {
+  constructor(llmDecisionQueue?: any, promptBuilder?: any) {
     this.registerBehavior('wander', this.wanderBehavior.bind(this));
     this.registerBehavior('idle', this.idleBehavior.bind(this));
     this.registerBehavior('seek_food', this.seekFoodBehavior.bind(this));
@@ -42,7 +43,7 @@ export class AISystem implements System {
     this.registerBehavior('talk', this.talkBehavior.bind(this));
 
     this.llmDecisionQueue = llmDecisionQueue || null;
-    this.llmContextBuilder = llmContextBuilder || null;
+    this.promptBuilder = promptBuilder || null;
   }
 
   registerBehavior(name: string, handler: BehaviorHandler): void {
@@ -92,7 +93,7 @@ export class AISystem implements System {
 
       // LAYER 2: EXECUTIVE SYSTEM (Slow, LLM-based planning)
       // LLM-based decision making (if enabled)
-      if (agent.useLLM && this.llmDecisionQueue && this.llmContextBuilder) {
+      if (agent.useLLM && this.llmDecisionQueue && this.promptBuilder) {
         // Decrement cooldown
         if (agent.llmCooldown > 0) {
           impl.updateComponent<AgentComponent>('agent', (current) => ({
@@ -104,22 +105,35 @@ export class AISystem implements System {
         // Check if we have a ready decision
         const decision = this.llmDecisionQueue.getDecision(entity.id);
         if (decision) {
-          impl.updateComponent<AgentComponent>('agent', (current) => ({
-            ...current,
-            behavior: decision,
-            behaviorState: {},
-            llmCooldown: 1200, // 1 minute cooldown at 20 TPS
-          }));
+          // Parse the LLM response into a structured action
+          const action = parseAction(decision);
+          if (action) {
+            // Convert action to behavior (temporary bridge to old system)
+            const behavior = actionToBehavior(action);
+
+            console.log('[AISystem] Parsed LLM decision:', {
+              entityId: entity.id,
+              rawResponse: decision,
+              parsedAction: action,
+              behavior,
+            });
+
+            impl.updateComponent<AgentComponent>('agent', (current) => ({
+              ...current,
+              behavior,
+              behaviorState: {},
+              llmCooldown: 1200, // 1 minute cooldown at 20 TPS
+            }));
+          }
         } else if (agent.llmCooldown === 0) {
-          // Request new decision
-          const context = this.llmContextBuilder.extractContext(entity, world);
-          const prompt = this.llmContextBuilder.buildPrompt(context);
+          // Request new decision using structured prompt
+          const prompt = this.promptBuilder.buildPrompt(entity, world);
           this.llmDecisionQueue.requestDecision(entity.id, prompt).catch((err: Error) => {
-            console.error(`LLM decision failed for ${entity.id}:`, err);
+            console.error(`[AISystem] LLM decision failed for ${entity.id}:`, err);
           });
         }
 
-        // Skip scripted behavior for LLM agents
+        // Execute current behavior
         const handler = this.behaviors.get(agent.behavior);
         if (handler) {
           handler(impl, world);

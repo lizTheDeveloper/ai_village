@@ -4,6 +4,7 @@
  */
 
 import type { Position } from '../types.js';
+import type { AgentBehavior } from '../components/AgentComponent.js';
 
 export type AgentAction =
   // Movement
@@ -94,7 +95,7 @@ export function isValidAction(action: unknown): boolean {
 /**
  * Convert action to behavior string (temporary bridge to old system).
  */
-export function actionToBehavior(action: AgentAction): string {
+export function actionToBehavior(action: AgentAction): AgentBehavior {
   switch (action.type) {
     case 'wander':
       return 'wander';

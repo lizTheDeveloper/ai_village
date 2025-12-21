@@ -10,7 +10,7 @@ import { Renderer, InputHandler } from '@ai-village/renderer';
 import {
   OllamaProvider,
   LLMDecisionQueue,
-  AgentContextBuilder,
+  StructuredPromptBuilder,
 } from '@ai-village/llm';
 
 /**
@@ -34,10 +34,10 @@ function main() {
   // Create LLM components
   const llmProvider = new OllamaProvider('qwen3:4b');
   const llmQueue = new LLMDecisionQueue(llmProvider, 2);
-  const contextBuilder = new AgentContextBuilder();
+  const promptBuilder = new StructuredPromptBuilder();
 
   // Register systems (order: AI -> Communication -> Needs -> Movement -> Memory)
-  gameLoop.systemRegistry.register(new AISystem(llmQueue, contextBuilder));
+  gameLoop.systemRegistry.register(new AISystem(llmQueue, promptBuilder));
   gameLoop.systemRegistry.register(new CommunicationSystem());
   gameLoop.systemRegistry.register(new NeedsSystem());
   gameLoop.systemRegistry.register(new MovementSystem());
