@@ -1,0 +1,47 @@
+abstract_agent_team/
+
+# Environment files with secrets
+.env
+.nats_config
+.nats_vm_config
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+
+# Agent memories (may contain sensitive data)
+agents/memories/*.json
+!agents/memories/README.md
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak

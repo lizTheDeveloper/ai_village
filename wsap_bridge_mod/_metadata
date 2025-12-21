@@ -1,0 +1,10 @@
+{
+  "name": "WSAP Bridge",
+  "friendlyName": "Wild Spaces Agent Protocol Bridge",
+  "description": "HTTP bridge for LLM agent control via WSAP protocol",
+  "author": "ai_village",
+  "version": "0.1.0",
+  "requires": [],
+  "includes": [],
+  "priority": 9999
+}
