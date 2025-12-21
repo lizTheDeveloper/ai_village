@@ -3,7 +3,7 @@ import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
-import type { AgentComponent } from '../components/AgentComponent.js';
+import type { AgentComponent, AgentBehavior } from '../components/AgentComponent.js';
 import type { MovementComponent } from '../components/MovementComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
@@ -31,13 +31,18 @@ export class AISystem implements System {
   ];
 
   private behaviors: Map<string, BehaviorHandler> = new Map();
+  private llmDecisionQueue: any | null = null; // LLM decision queue (optional)
+  private llmContextBuilder: any | null = null; // Context builder (optional)
 
-  constructor() {
+  constructor(llmDecisionQueue?: any, llmContextBuilder?: any) {
     this.registerBehavior('wander', this.wanderBehavior.bind(this));
     this.registerBehavior('idle', this.idleBehavior.bind(this));
     this.registerBehavior('seek_food', this.seekFoodBehavior.bind(this));
     this.registerBehavior('follow_agent', this.followAgentBehavior.bind(this));
     this.registerBehavior('talk', this.talkBehavior.bind(this));
+
+    this.llmDecisionQueue = llmDecisionQueue || null;
+    this.llmContextBuilder = llmContextBuilder || null;
   }
 
   registerBehavior(name: string, handler: BehaviorHandler): void {
@@ -64,7 +69,65 @@ export class AISystem implements System {
       // Detect nearby agents and resources (if has vision)
       this.processVision(impl, world);
 
-      // Decide behavior based on needs
+      // LAYER 1: AUTONOMIC SYSTEM (Fast, survival reflexes)
+      // Check critical needs that override executive decisions
+      const agentNeeds = impl.getComponent<NeedsComponent>('needs');
+      const autonomicOverride = agentNeeds ? this.checkAutonomicSystem(agentNeeds) : null;
+
+      if (autonomicOverride) {
+        // Autonomic system takes control - skip executive layer
+        impl.updateComponent<AgentComponent>('agent', (current) => ({
+          ...current,
+          behavior: autonomicOverride,
+          behaviorState: {},
+        }));
+
+        // Execute autonomic behavior
+        const handler = this.behaviors.get(autonomicOverride);
+        if (handler) {
+          handler(impl, world);
+        }
+        continue;
+      }
+
+      // LAYER 2: EXECUTIVE SYSTEM (Slow, LLM-based planning)
+      // LLM-based decision making (if enabled)
+      if (agent.useLLM && this.llmDecisionQueue && this.llmContextBuilder) {
+        // Decrement cooldown
+        if (agent.llmCooldown > 0) {
+          impl.updateComponent<AgentComponent>('agent', (current) => ({
+            ...current,
+            llmCooldown: Math.max(0, current.llmCooldown - 1),
+          }));
+        }
+
+        // Check if we have a ready decision
+        const decision = this.llmDecisionQueue.getDecision(entity.id);
+        if (decision) {
+          impl.updateComponent<AgentComponent>('agent', (current) => ({
+            ...current,
+            behavior: decision,
+            behaviorState: {},
+            llmCooldown: 1200, // 1 minute cooldown at 20 TPS
+          }));
+        } else if (agent.llmCooldown === 0) {
+          // Request new decision
+          const context = this.llmContextBuilder.extractContext(entity, world);
+          const prompt = this.llmContextBuilder.buildPrompt(context);
+          this.llmDecisionQueue.requestDecision(entity.id, prompt).catch((err: Error) => {
+            console.error(`LLM decision failed for ${entity.id}:`, err);
+          });
+        }
+
+        // Skip scripted behavior for LLM agents
+        const handler = this.behaviors.get(agent.behavior);
+        if (handler) {
+          handler(impl, world);
+        }
+        continue;
+      }
+
+      // Decide behavior based on needs (scripted agents only)
       const needs = impl.getComponent<NeedsComponent>('needs');
       const currentBehavior = agent.behavior;
 
@@ -187,6 +250,27 @@ export class AISystem implements System {
         handler(impl, world);
       }
     }
+  }
+
+  /**
+   * AUTONOMIC SYSTEM: Fast survival reflexes that override executive (LLM) decisions
+   * Based on needs.md spec - Tier 1 (survival) needs can interrupt almost anything
+   */
+  private checkAutonomicSystem(needs: NeedsComponent): AgentBehavior | null {
+    // Critical physical needs interrupt with high priority (spec: interruptPriority 0.85-0.95)
+
+    // Hunger critical threshold: 20 (spec says 15, but we use 20 for earlier intervention)
+    if (needs.hunger < 20) {
+      return 'seek_food';
+    }
+
+    // Energy critical threshold: 10 (spec: baseMortalityRate increases, will_sleep_anywhere)
+    if (needs.energy < 10) {
+      return 'idle'; // Rest to recover energy
+    }
+
+    // No autonomic override needed - executive system can decide
+    return null;
   }
 
   private processVision(entity: EntityImpl, world: World): void {

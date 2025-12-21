@@ -7,14 +7,19 @@ import {
   CommunicationSystem,
 } from '@ai-village/core';
 import { Renderer, InputHandler } from '@ai-village/renderer';
+import {
+  OllamaProvider,
+  LLMDecisionQueue,
+  AgentContextBuilder,
+} from '@ai-village/llm';
 
 /**
- * Phase 5 Demo
- * Tests communication and relationship systems.
+ * Phase 6 Demo (LLM Integration)
+ * Tests LLM-driven agent decision making.
  */
 
 function main() {
-  console.log('AI Village - Phase 5 Demo');
+  console.log('AI Village - Phase 6 Demo (LLM Integration)');
 
   const statusEl = document.getElementById('status');
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -26,8 +31,13 @@ function main() {
   // Create game loop
   const gameLoop = new GameLoop();
 
+  // Create LLM components
+  const llmProvider = new OllamaProvider('qwen3:4b');
+  const llmQueue = new LLMDecisionQueue(llmProvider, 2);
+  const contextBuilder = new AgentContextBuilder();
+
   // Register systems (order: AI -> Communication -> Needs -> Movement -> Memory)
-  gameLoop.systemRegistry.register(new AISystem());
+  gameLoop.systemRegistry.register(new AISystem(llmQueue, contextBuilder));
   gameLoop.systemRegistry.register(new CommunicationSystem());
   gameLoop.systemRegistry.register(new NeedsSystem());
   gameLoop.systemRegistry.register(new MovementSystem());

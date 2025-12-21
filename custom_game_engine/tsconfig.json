@@ -25,6 +25,7 @@
   "references": [
     { "path": "./packages/core" },
     { "path": "./packages/world" },
-    { "path": "./packages/renderer" }
+    { "path": "./packages/renderer" },
+    { "path": "./packages/llm" }
   ]
 }

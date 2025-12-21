@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "@ai-village/core": "*",
-    "@ai-village/renderer": "*"
+    "@ai-village/renderer": "*",
+    "@ai-village/llm": "*"
   },
   "devDependencies": {
     "vite": "^5.0.0"
