@@ -9,6 +9,8 @@ import {
   createAgentComponent,
   createMovementComponent,
   createNeedsComponent,
+  createMemoryComponent,
+  createVisionComponent,
 } from '@ai-village/core';
 
 export function createWanderingAgent(
@@ -39,6 +41,12 @@ export function createWanderingAgent(
 
   // Needs - hunger and energy
   entity.addComponent(createNeedsComponent(100, 100, 2.0, 1.0));
+
+  // Memory - remember up to 20 things, decay 1 point/sec
+  entity.addComponent(createMemoryComponent(20, 1.0));
+
+  // Vision - see 10 tiles around, can see both agents and resources
+  entity.addComponent(createVisionComponent(10, 360, true, true));
 
   // Add to world
   (world as any)._addEntity(entity);
