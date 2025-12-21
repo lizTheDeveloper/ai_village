@@ -55,6 +55,62 @@ export class OllamaProvider implements LLMProvider {
             description: 'Start a conversation with a nearby agent',
             parameters: { type: 'object', properties: {} }
           }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'gather',
+            description: 'Gather resources from the environment (forage, collect items)',
+            parameters: { type: 'object', properties: {} }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'explore',
+            description: 'Explore with purpose, looking for something specific',
+            parameters: { type: 'object', properties: {} }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'approach',
+            description: 'Move toward a nearby agent or location',
+            parameters: { type: 'object', properties: {} }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'observe',
+            description: 'Watch and pay attention to surroundings or someone nearby',
+            parameters: { type: 'object', properties: {} }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'rest',
+            description: 'Sit down and rest to recover energy',
+            parameters: { type: 'object', properties: {} }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'work',
+            description: 'Do productive work (farm, craft, build)',
+            parameters: { type: 'object', properties: {} }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'help',
+            description: 'Help a nearby agent with their task',
+            parameters: { type: 'object', properties: {} }
+          }
         }
       ];
 

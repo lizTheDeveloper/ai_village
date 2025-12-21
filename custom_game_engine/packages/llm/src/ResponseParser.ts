@@ -32,6 +32,13 @@ export class ResponseParser {
     'seek_food',
     'follow_agent',
     'talk',
+    'gather',
+    'explore',
+    'approach',
+    'observe',
+    'rest',
+    'work',
+    'help',
   ]);
 
   /**

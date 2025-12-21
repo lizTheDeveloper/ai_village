@@ -120,6 +120,14 @@ export class StructuredPromptBuilder {
       if (agentCount === 0 && resourceCount === 0) {
         context += '- The area around you is empty\n';
       }
+
+      // Hearing - what nearby agents are saying
+      if (vision.heardSpeech && vision.heardSpeech.length > 0) {
+        context += '\nWhat you hear:\n';
+        vision.heardSpeech.forEach((speech: { speaker: string, text: string }) => {
+          context += `- ${speech.speaker} says: "${speech.text}"\n`;
+        });
+      }
     }
 
     return context;

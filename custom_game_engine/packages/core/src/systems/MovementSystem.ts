@@ -6,6 +6,7 @@ import { EntityImpl } from '../ecs/Entity.js';
 import type { MovementComponent } from '../components/MovementComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { PhysicsComponent } from '../components/PhysicsComponent.js';
+import type { BuildingComponent } from '../components/BuildingComponent.js';
 
 export class MovementSystem implements System {
   public readonly id: SystemId = 'movement';
@@ -62,11 +63,11 @@ export class MovementSystem implements System {
     x: number,
     y: number
   ): boolean {
-    // Get all entities with physics
-    const query = world.query().with('position').with('physics');
-    const entities = query.executeEntities();
+    // Check collision with physics entities
+    const physicsQuery = world.query().with('position').with('physics');
+    const physicsEntities = physicsQuery.executeEntities();
 
-    for (const entity of entities) {
+    for (const entity of physicsEntities) {
       // Skip self
       if (entity.id === entityId) {
         continue;
@@ -83,6 +84,32 @@ export class MovementSystem implements System {
 
       // Simple AABB collision check (treating entities as points for now)
       // In the future, we'd use physics.width and physics.height
+      const distance = Math.sqrt(
+        Math.pow(pos.x - x, 2) + Math.pow(pos.y - y, 2)
+      );
+
+      // Collision if within 0.5 tiles
+      if (distance < 0.5) {
+        return false;
+      }
+    }
+
+    // Check collision with buildings that block movement
+    const buildingQuery = world.query().with('position').with('building');
+    const buildings = buildingQuery.executeEntities();
+
+    for (const building of buildings) {
+      const impl = building as EntityImpl;
+      const buildingComp = impl.getComponent<BuildingComponent>('building')!;
+
+      // Skip buildings that don't block movement (e.g., campfires)
+      if (!buildingComp.blocksMovement) {
+        continue;
+      }
+
+      const pos = impl.getComponent<PositionComponent>('position')!;
+
+      // Check distance to building
       const distance = Math.sqrt(
         Math.pow(pos.x - x, 2) + Math.pow(pos.y - y, 2)
       );

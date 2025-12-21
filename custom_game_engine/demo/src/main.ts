@@ -5,6 +5,7 @@ import {
   NeedsSystem,
   MemorySystem,
   CommunicationSystem,
+  BuildingSystem,
 } from '@ai-village/core';
 import { Renderer, InputHandler } from '@ai-village/renderer';
 import {
@@ -14,12 +15,12 @@ import {
 } from '@ai-village/llm';
 
 /**
- * Phase 6 Demo (LLM Integration)
- * Tests LLM-driven agent decision making.
+ * Phase 7 Demo (Building & Shelter)
+ * Tests building mechanics and shelter needs.
  */
 
 function main() {
-  console.log('AI Village - Phase 6 Demo (LLM Integration)');
+  console.log('AI Village - Phase 7 Demo (Building & Shelter)');
 
   const statusEl = document.getElementById('status');
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -36,10 +37,11 @@ function main() {
   const llmQueue = new LLMDecisionQueue(llmProvider, 2);
   const promptBuilder = new StructuredPromptBuilder();
 
-  // Register systems (order: AI -> Communication -> Needs -> Movement -> Memory)
+  // Register systems (order: AI -> Communication -> Needs -> Building -> Movement -> Memory)
   gameLoop.systemRegistry.register(new AISystem(llmQueue, promptBuilder));
   gameLoop.systemRegistry.register(new CommunicationSystem());
   gameLoop.systemRegistry.register(new NeedsSystem());
+  gameLoop.systemRegistry.register(new BuildingSystem());
   gameLoop.systemRegistry.register(new MovementSystem());
   gameLoop.systemRegistry.register(new MemorySystem());
 
@@ -74,7 +76,7 @@ function main() {
   console.log('Starting render loop...');
   renderLoop();
 
-  console.log('Phase 5 initialized successfully!');
+  console.log('Phase 7 initialized successfully!');
   console.log('Game loop:', gameLoop);
   console.log('Systems:', gameLoop.systemRegistry.getSorted());
 

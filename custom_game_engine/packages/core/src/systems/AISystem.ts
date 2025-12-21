@@ -70,6 +70,9 @@ export class AISystem implements System {
       // Detect nearby agents and resources (if has vision)
       this.processVision(impl, world);
 
+      // Collect nearby speech (hearing)
+      this.processHearing(impl, world);
+
       // LAYER 1: AUTONOMIC SYSTEM (Fast, survival reflexes)
       // Check critical needs that override executive decisions
       const agentNeeds = impl.getComponent<NeedsComponent>('needs');
@@ -105,24 +108,49 @@ export class AISystem implements System {
         // Check if we have a ready decision
         const decision = this.llmDecisionQueue.getDecision(entity.id);
         if (decision) {
-          // Parse the LLM response into a structured action
-          const action = parseAction(decision);
-          if (action) {
-            // Convert action to behavior (temporary bridge to old system)
-            const behavior = actionToBehavior(action);
+          // Try to parse as JSON first (structured response with thinking/speaking/action)
+          let parsedResponse: any = null;
+          try {
+            parsedResponse = JSON.parse(decision);
+          } catch {
+            // Not JSON, use legacy parsing
+          }
 
-            console.log('[AISystem] Parsed LLM decision:', {
+          let behavior: any;
+          let speaking: string | undefined;
+
+          if (parsedResponse && parsedResponse.action) {
+            // Structured response
+            behavior = parsedResponse.action;
+            speaking = parsedResponse.speaking || undefined;
+
+            console.log('[AISystem] Parsed structured LLM decision:', {
               entityId: entity.id,
-              rawResponse: decision,
-              parsedAction: action,
-              behavior,
+              thinking: parsedResponse.thinking?.slice(0, 60) + '...',
+              speaking: speaking || '(silent)',
+              action: behavior,
             });
+          } else {
+            // Legacy text parsing
+            const action = parseAction(decision);
+            if (action) {
+              behavior = actionToBehavior(action);
+              console.log('[AISystem] Parsed legacy LLM decision:', {
+                entityId: entity.id,
+                rawResponse: decision,
+                parsedAction: action,
+                behavior,
+              });
+            }
+          }
 
+          if (behavior) {
             impl.updateComponent<AgentComponent>('agent', (current) => ({
               ...current,
               behavior,
               behaviorState: {},
               llmCooldown: 1200, // 1 minute cooldown at 20 TPS
+              recentSpeech: speaking, // Store speech for nearby agents to hear
             }));
           }
         } else if (agent.llmCooldown === 0) {
@@ -357,6 +385,46 @@ export class AISystem implements System {
           entity.updateComponent<MemoryComponent>('memory', () => updatedMemory);
         }
       }
+    }
+  }
+
+  private processHearing(entity: EntityImpl, world: World): void {
+    const vision = entity.getComponent<VisionComponent>('vision');
+    if (!vision) return;
+
+    const position = entity.getComponent<PositionComponent>('position')!;
+    const agents = world.query().with('agent').with('position').executeEntities();
+
+    // Collect speech from nearby agents
+    const heardSpeech: Array<{ speaker: string, text: string }> = [];
+
+    for (const otherAgent of agents) {
+      if (otherAgent.id === entity.id) continue;
+
+      const otherImpl = otherAgent as EntityImpl;
+      const otherPos = otherImpl.getComponent<PositionComponent>('position')!;
+      const otherAgentComp = otherImpl.getComponent<AgentComponent>('agent');
+
+      const distance = Math.sqrt(
+        Math.pow(otherPos.x - position.x, 2) +
+        Math.pow(otherPos.y - position.y, 2)
+      );
+
+      // Within hearing range (same as vision range)
+      if (distance <= vision.range && otherAgentComp?.recentSpeech) {
+        const identity = otherImpl.getComponent('identity') as any;
+        const speakerName = identity?.name || 'Someone';
+
+        heardSpeech.push({
+          speaker: speakerName,
+          text: otherAgentComp.recentSpeech
+        });
+      }
+    }
+
+    // Attach heard speech to vision component (dynamically)
+    if (heardSpeech.length > 0) {
+      (vision as any).heardSpeech = heardSpeech;
     }
   }
 

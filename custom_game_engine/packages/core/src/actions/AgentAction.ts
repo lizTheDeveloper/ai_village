@@ -5,6 +5,7 @@
 
 import type { Position } from '../types.js';
 import type { AgentBehavior } from '../components/AgentComponent.js';
+import type { BuildingType } from '../components/BuildingComponent.js';
 
 export type AgentAction =
   // Movement
@@ -20,6 +21,12 @@ export type AgentAction =
   | { type: 'forage'; area?: Position }
   | { type: 'pickup'; itemId: string }
   | { type: 'eat'; itemId?: string }
+  | { type: 'chop'; targetId: string } // Chop tree for wood
+  | { type: 'mine'; targetId: string } // Mine rock for stone
+
+  // Building
+  | { type: 'build'; buildingType: BuildingType; position: Position }
+  | { type: 'construct'; buildingId: string } // Continue construction
 
   // Rest
   | { type: 'idle' }
@@ -73,6 +80,19 @@ export function parseAction(response: string): AgentAction | null {
     return { type: 'follow', targetId: 'nearest' };
   }
 
+  if (cleaned.includes('chop') || cleaned.includes('wood')) {
+    return { type: 'chop', targetId: 'nearest' };
+  }
+
+  if (cleaned.includes('mine') || cleaned.includes('stone')) {
+    return { type: 'mine', targetId: 'nearest' };
+  }
+
+  if (cleaned.includes('build') || cleaned.includes('construct')) {
+    // Default to building a lean-to for shelter
+    return { type: 'build', buildingType: 'lean-to', position: { x: 0, y: 0 } };
+  }
+
   // Default fallback
   return { type: 'wander' };
 }
@@ -87,7 +107,11 @@ export function isValidAction(action: unknown): boolean {
 
   if (typeof a.type !== 'string') return false;
 
-  const validTypes = ['move', 'wander', 'follow', 'talk', 'help', 'forage', 'pickup', 'eat', 'idle', 'rest'];
+  const validTypes = [
+    'move', 'wander', 'follow', 'talk', 'help',
+    'forage', 'pickup', 'eat', 'chop', 'mine',
+    'build', 'construct', 'idle', 'rest'
+  ];
 
   return validTypes.includes(a.type);
 }
@@ -107,6 +131,11 @@ export function actionToBehavior(action: AgentAction): AgentBehavior {
     case 'forage':
     case 'pickup':
       return 'seek_food';
+    case 'chop':
+    case 'mine':
+    case 'build':
+    case 'construct':
+      return 'idle'; // For now, treat building actions as idle
     case 'idle':
     case 'rest':
       return 'idle';

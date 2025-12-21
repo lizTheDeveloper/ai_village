@@ -1,6 +1,20 @@
 import type { Component } from '../ecs/Component.js';
 
-export type AgentBehavior = 'wander' | 'idle' | 'follow' | 'flee' | 'seek_food' | 'follow_agent' | 'talk';
+export type AgentBehavior =
+  | 'wander'
+  | 'idle'
+  | 'follow'
+  | 'flee'
+  | 'seek_food'
+  | 'follow_agent'
+  | 'talk'
+  | 'gather'
+  | 'explore'
+  | 'approach'
+  | 'observe'
+  | 'rest'
+  | 'work'
+  | 'help';
 
 export interface AgentComponent extends Component {
   type: 'agent';
@@ -10,6 +24,7 @@ export interface AgentComponent extends Component {
   lastThinkTick: number;
   useLLM: boolean; // Whether to use LLM for decision making
   llmCooldown: number; // Ticks remaining before next LLM call
+  recentSpeech?: string; // What the agent recently said (for nearby agents to hear)
 }
 
 export function createAgentComponent(

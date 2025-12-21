@@ -16,3 +16,4 @@ export * from './ConversationComponent.js';
 export * from './RelationshipComponent.js';
 export * from './PersonalityComponent.js';
 export * from './IdentityComponent.js';
+export * from './BuildingComponent.js';
