@@ -1,36 +1,34 @@
 import type { LLMProvider, LLMRequest } from './LLMProvider.js';
-import type { AgentBehavior } from '@ai-village/core';
-import { ResponseParser } from './ResponseParser.js';
 
 interface DecisionRequest {
   agentId: string;
   prompt: string;
-  resolve: (behavior: AgentBehavior) => void;
+  resolve: (response: string) => void;
   reject: (error: Error) => void;
 }
 
 /**
  * Manages async LLM decision requests with rate limiting.
+ * Returns raw LLM responses for parsing by AISystem.
  */
 export class LLMDecisionQueue {
   private provider: LLMProvider;
-  private parser: ResponseParser;
   private queue: DecisionRequest[] = [];
   private processing = false;
   private maxConcurrent: number;
   private activeRequests = 0;
-  private decisions: Map<string, AgentBehavior> = new Map();
+  private decisions: Map<string, string> = new Map();
 
   constructor(provider: LLMProvider, maxConcurrent: number = 2) {
     this.provider = provider;
-    this.parser = new ResponseParser();
     this.maxConcurrent = maxConcurrent;
   }
 
   /**
    * Request a decision for an agent (non-blocking).
+   * Returns raw LLM response text for parsing by AISystem.
    */
-  requestDecision(agentId: string, prompt: string): Promise<AgentBehavior> {
+  requestDecision(agentId: string, prompt: string): Promise<string> {
     return new Promise((resolve, reject) => {
       this.queue.push({ agentId, prompt, resolve, reject });
       this.processQueue();
@@ -39,8 +37,9 @@ export class LLMDecisionQueue {
 
   /**
    * Get a decision if ready (synchronous check).
+   * Returns raw LLM response text.
    */
-  getDecision(agentId: string): AgentBehavior | null {
+  getDecision(agentId: string): string | null {
     const decision = this.decisions.get(agentId);
     if (decision) {
       this.decisions.delete(agentId);
@@ -78,18 +77,17 @@ export class LLMDecisionQueue {
       const llmRequest: LLMRequest = {
         prompt: request.prompt,
         temperature: 0.7,
-        maxTokens: 50,
-        stopSequences: ['\n', 'Action:', 'Choose:'],
+        maxTokens: 100, // Increased for structured responses
+        // Let OllamaProvider handle stop sequences
       };
 
       const response = await this.provider.generate(llmRequest);
-      const behavior = this.parser.parseBehavior(response.text);
 
-      // Store decision for synchronous retrieval
-      this.decisions.set(request.agentId, behavior);
-      request.resolve(behavior);
+      // Store raw response for synchronous retrieval
+      this.decisions.set(request.agentId, response.text);
+      request.resolve(response.text);
     } catch (error) {
-      console.error(`LLM decision error for agent ${request.agentId}:`, error);
+      console.error(`[LLMDecisionQueue] Decision error for agent ${request.agentId}:`, error);
       request.reject(error as Error);
     }
   }

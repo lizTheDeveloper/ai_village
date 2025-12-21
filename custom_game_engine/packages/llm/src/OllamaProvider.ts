@@ -25,8 +25,8 @@ export class OllamaProvider implements LLMProvider {
           stream: false,
           options: {
             temperature: request.temperature ?? 0.7,
-            num_predict: request.maxTokens ?? 50, // Short response - just the action
-            stop: request.stopSequences || ['\n', '.'], // Stop after action
+            num_predict: request.maxTokens ?? 100,
+            stop: request.stopSequences, // Let caller control stop sequences
           },
         }),
       });
