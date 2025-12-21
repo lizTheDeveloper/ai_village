@@ -5,3 +5,4 @@
 export * from './Camera.js';
 export * from './Renderer.js';
 export * from './InputHandler.js';
+export * from './SpriteRenderer.js';

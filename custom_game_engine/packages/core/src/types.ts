@@ -58,4 +58,4 @@ export const CURRENT_SAVE_VERSION = 1;
 export const GAME_VERSION = '0.1.0';
 export const TICKS_PER_SECOND = 20;
 export const MS_PER_TICK = 50;
-export const CHUNK_SIZE = 32;
+export const CHUNK_SIZE = 32; // Re-exported from world package

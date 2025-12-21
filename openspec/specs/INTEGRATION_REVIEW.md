@@ -1069,5 +1069,74 @@ All core agent systems now support alien species as optional configurations for 
 - **Alien psychology**: Man'chi (no friendship), dominance-only, hive loyalty
 - **Temporal variation**: Millisecond AI to geological Stone Eaters
 
-Each spec includes detailed TypeScript interfaces for implementation and examples demonstrating gameplay implications
+Each spec includes detailed TypeScript interfaces for implementation and examples demonstrating gameplay implications.
+
+---
+
+## Round 9 Review (2025-12-20)
+
+Conflict system creation to handle hunting, combat, and dominance.
+
+### New Spec Created
+
+**`conflict-system/spec.md`** - Combat, hunting, and dominance mechanics
+
+| Feature | Description |
+|---------|-------------|
+| **Hunting System** | REQ-CON-001: Tracking, ambush, trapping wild animals |
+| **Predator Attacks** | REQ-CON-002: Wild predators attacking agents |
+| **Agent Combat** | REQ-CON-003: Agent-vs-agent fighting with injuries |
+| **Dominance Challenges** | REQ-CON-004: Kif-style formal challenges for rank |
+| **Pack Mind Combat** | REQ-CON-005: Multi-body coordination, coherence targeting |
+| **Hive Warfare** | REQ-CON-006: Queen-focused, worker-expendable warfare |
+| **Man'chi Combat** | REQ-CON-007: Loyalty-modified combat psychology |
+| **Injury System** | REQ-CON-008: Body locations, healing, skill penalties |
+| **Death** | REQ-CON-009: Permanent death with consequences |
+| **Guard Duty** | REQ-CON-010: Location/person protection |
+| **Village Defense** | REQ-CON-011: Collective defense structures |
+| **Combat Narration** | REQ-CON-012-013: LLM generates fight narratives |
+
+---
+
+### Agent System Updates
+
+**File:** `agent-system/spec.md`
+
+| Feature Added | Description |
+|--------------|-------------|
+| **Conflict Skills** | hunting, combat, intimidation, stealth |
+| **Hunter Archetype** | Low neuroticism, Hunting/Stealth/Combat focus |
+| **Guard Archetype** | High conscientiousness, Combat/Intimidation focus |
+
+---
+
+### Validation Checklist (Round 9)
+
+Conflict features:
+- [x] Hunting skill and mechanics
+- [x] Predator attack resolution
+- [x] Agent-vs-agent combat with injuries
+- [x] Dominance challenge system for Kif-style species
+- [x] Pack mind multi-body combat
+- [x] Hive warfare (queen assassination = hive death)
+- [x] Man'chi combat bonuses (lord nearby, lord threatened)
+- [x] Injury system with body locations and healing
+- [x] Permanent death with knowledge loss
+- [x] Guard duty and village defense
+- [x] LLM combat/hunting narration
+
+---
+
+### Notes on Emergence
+
+Some systems are deliberately left minimal to see what emerges:
+
+| System | Approach |
+|--------|----------|
+| **Goals** | Basic structure exists; let agents develop their own motivations |
+| **Economics (aliens)** | Post-scarcity/hive/dominance defined; let trade patterns emerge |
+| **Inter-species diplomacy** | Mechanics exist; actual diplomacy will emerge from play |
+| **Culture evolution** | Starting cultures defined; evolution through memory/chronicle |
+
+The spec framework is complete. Time to run simulations and see what happens
 

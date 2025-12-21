@@ -1,5 +1,5 @@
 {
-  "name": "@ai-village/renderer",
+  "name": "@ai-village/world",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -15,7 +15,9 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "@ai-village/core": "*",
-    "@ai-village/world": "*"
+    "@ai-village/core": "*"
+  },
+  "devDependencies": {
+    "@ai-village/core": "*"
   }
 }
