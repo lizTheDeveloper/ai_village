@@ -33,6 +33,24 @@ export function renderSprite(
       ctx.fill();
       break;
 
+    case 'agent':
+      // Draw a simple character - circle for head, body
+      // Head
+      ctx.fillStyle = '#ffd4a3'; // Skin tone
+      ctx.beginPath();
+      ctx.arc(x + size / 2, y + size / 3, size / 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Body
+      ctx.fillStyle = '#4a90e2'; // Blue shirt
+      ctx.fillRect(
+        x + size / 2 - size / 6,
+        y + size / 2,
+        size / 3,
+        size / 2.5
+      );
+      break;
+
     default:
       // Default circle
       ctx.fillStyle = '#ff6b6b';

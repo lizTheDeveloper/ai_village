@@ -47,7 +47,6 @@ describe('ChunkManager', () => {
   it('should unload distant chunks', () => {
     // Load chunks around origin
     manager.updateLoadedChunks(0, 0);
-    const initialCount = manager.getChunkCount();
 
     // Move far away (need to move beyond load radius + unload buffer)
     const loadRadius = (manager as any).loadRadius;

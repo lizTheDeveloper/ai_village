@@ -5,6 +5,7 @@ import type { Tile, TerrainType, BiomeType } from '../chunks/Tile.js';
 import { PerlinNoise } from './PerlinNoise.js';
 import { createTree } from '../entities/TreeEntity.js';
 import { createRock } from '../entities/RockEntity.js';
+import { createWanderingAgent } from '../entities/AgentEntity.js';
 
 /**
  * Generates terrain using Perlin noise.
@@ -89,6 +90,14 @@ export class TerrainGenerator {
           if (Math.random() > 0.8) {
             // 20% chance
             createRock(world, worldX, worldY);
+          }
+        }
+
+        // Place wandering agents in plains and grassy areas (very sparse)
+        if ((tile.terrain === 'grass' || tile.terrain === 'dirt') && tile.biome === 'plains') {
+          if (Math.random() > 0.998) {
+            // 0.2% chance - very rare
+            createWanderingAgent(world, worldX + 0.5, worldY + 0.5, 2.0);
           }
         }
       }
