@@ -65,10 +65,12 @@ export class Renderer {
     // Update camera
     this.camera.update();
 
-    // Update loaded chunks based on camera position
+    // Update loaded chunks based on camera position (convert pixels to tiles)
+    const cameraTileX = this.camera.x / this.tileSize;
+    const cameraTileY = this.camera.y / this.tileSize;
     const { loaded } = this.chunkManager.updateLoadedChunks(
-      this.camera.x,
-      this.camera.y
+      cameraTileX,
+      cameraTileY
     );
 
     // Generate newly loaded chunks
