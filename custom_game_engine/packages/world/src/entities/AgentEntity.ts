@@ -13,6 +13,8 @@ import {
   createVisionComponent,
   createConversationComponent,
   createRelationshipComponent,
+  createInventoryComponent,
+  createTemperatureComponent,
   generateRandomPersonality,
   generateRandomName,
   createIdentityComponent,
@@ -50,8 +52,8 @@ export function createWanderingAgent(
   // Movement
   entity.addComponent(createMovementComponent(speed, 0, 0));
 
-  // Needs - hunger and energy
-  entity.addComponent(createNeedsComponent(100, 100, 2.0, 1.0));
+  // Needs - hunger, energy, health, decay rates
+  entity.addComponent(createNeedsComponent(100, 100, 100, 2.0, 1.0));
 
   // Memory - remember up to 20 things, decay 1 point/sec
   entity.addComponent(createMemoryComponent(20, 1.0));
@@ -64,6 +66,20 @@ export function createWanderingAgent(
 
   // Relationships - track familiarity with other agents
   entity.addComponent(createRelationshipComponent());
+
+  // Inventory - carry resources (10 slots, 100 weight capacity)
+  entity.addComponent(createInventoryComponent(10, 100));
+
+  // Temperature - comfort range 18-24°C, tolerance 0-35°C
+  entity.addComponent(
+    createTemperatureComponent(
+      20, // currentTemp (start at comfortable room temp)
+      18, // comfortMin
+      24, // comfortMax
+      0,  // toleranceMin
+      35  // toleranceMax
+    )
+  );
 
   // Add to world
   (world as any)._addEntity(entity);
@@ -106,8 +122,8 @@ export function createLLMAgent(
   // Movement
   entity.addComponent(createMovementComponent(speed, 0, 0));
 
-  // Needs - hunger and energy
-  entity.addComponent(createNeedsComponent(100, 100, 2.0, 1.0));
+  // Needs - hunger, energy, health, decay rates
+  entity.addComponent(createNeedsComponent(100, 100, 100, 2.0, 1.0));
 
   // Memory - remember up to 20 things, decay 1 point/sec
   entity.addComponent(createMemoryComponent(20, 1.0));
@@ -120,6 +136,20 @@ export function createLLMAgent(
 
   // Relationships - track familiarity with other agents
   entity.addComponent(createRelationshipComponent());
+
+  // Inventory - carry resources (10 slots, 100 weight capacity)
+  entity.addComponent(createInventoryComponent(10, 100));
+
+  // Temperature - comfort range 18-24°C, tolerance 0-35°C
+  entity.addComponent(
+    createTemperatureComponent(
+      20, // currentTemp (start at comfortable room temp)
+      18, // comfortMin
+      24, // comfortMax
+      0,  // toleranceMin
+      35  // toleranceMax
+    )
+  );
 
   // Add to world
   (world as any)._addEntity(entity);

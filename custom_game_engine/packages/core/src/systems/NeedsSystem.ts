@@ -15,21 +15,18 @@ export class NeedsSystem implements System {
       const impl = entity as EntityImpl;
       const needs = impl.getComponent<NeedsComponent>('needs')!;
 
-      // Decay hunger, energy, and shelter
+      // Decay hunger and energy (shelter removed in Phase 8)
       const hungerDecay = needs.hungerDecayRate * deltaTime;
       const energyDecay = needs.energyDecayRate * deltaTime;
-      const shelterDecay = needs.shelterDecayRate * deltaTime;
 
       const newHunger = Math.max(0, needs.hunger - hungerDecay);
       const newEnergy = Math.max(0, needs.energy - energyDecay);
-      const newShelter = Math.max(0, needs.shelter - shelterDecay);
 
       // Update needs
       impl.updateComponent<NeedsComponent>('needs', (current) => ({
         ...current,
         hunger: newHunger,
         energy: newEnergy,
-        shelter: newShelter,
       }));
 
       // Check for death (starving for too long)

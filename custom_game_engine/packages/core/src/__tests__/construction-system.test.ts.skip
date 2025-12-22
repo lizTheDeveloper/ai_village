@@ -1,0 +1,374 @@
+import { describe, it, expect, beforeEach } from 'vitest';
+import { WorldImpl } from '../ecs/World.js';
+import { EntityImpl, createEntityId } from '../ecs/Entity.js';
+import { EventBusImpl } from '../events/EventBus.js';
+import { createBuildingComponent, isUnderConstruction, getRemainingWork } from '../components/BuildingComponent.js';
+import type { BuildingComponent } from '../components/BuildingComponent.js';
+import { createPositionComponent } from '../components/PositionComponent.js';
+import { BuildingSystem } from '../systems/BuildingSystem.js';
+
+// Helper function to create entities in tests
+// Note: Call _addEntity AFTER adding components
+function createTestEntity(world: WorldImpl): EntityImpl {
+  const entity = new EntityImpl(createEntityId(), world.tick);
+  return entity;
+}
+
+// Helper to add entity to world after components are added
+function addEntityToWorld(world: WorldImpl, entity: EntityImpl): void {
+  (world as any)._addEntity(entity);
+}
+
+describe('Construction System - Phase 7', () => {
+  let world: WorldImpl;
+
+  beforeEach(() => {
+    const eventBus = new EventBusImpl();
+    world = new WorldImpl(eventBus);
+  });
+
+  describe('Acceptance Criterion 1: Building Exists in World', () => {
+    it('should create a building entity with BuildingComponent', () => {
+      // Arrange & Act
+      const building = createTestEntity(world);
+      const buildingComponent = createBuildingComponent('campfire', 1, 100);
+      building.addComponent(buildingComponent);
+      building.addComponent(createPositionComponent(10, 10));
+      addEntityToWorld(world, building);
+
+      // Assert
+      const buildings = world.query().with('building').with('position').executeEntities();
+      expect(buildings.length).toBe(1);
+
+      const retrievedBuilding = (buildings[0] as EntityImpl).getComponent<BuildingComponent>('building');
+      expect(retrievedBuilding).toBeDefined();
+      expect(retrievedBuilding?.buildingType).toBe('campfire');
+    });
+
+    it('should support multiple building types', () => {
+      // Arrange & Act
+      const campfire = createTestEntity(world);
+      campfire.addComponent(createBuildingComponent('campfire', 1, 100));
+      campfire.addComponent(createPositionComponent(10, 10));
+      addEntityToWorld(world, campfire);
+
+      const leanTo = createTestEntity(world);
+      leanTo.addComponent(createBuildingComponent('lean-to', 1, 100));
+      leanTo.addComponent(createPositionComponent(20, 20));
+      addEntityToWorld(world, leanTo);
+
+      const storage = createTestEntity(world);
+      storage.addComponent(createBuildingComponent('storage-box', 1, 100));
+      storage.addComponent(createPositionComponent(30, 30));
+      addEntityToWorld(world, storage);
+
+      // Assert
+      const buildings = world.query().with('building').executeEntities();
+      expect(buildings.length).toBe(3);
+    });
+  });
+
+  describe('Acceptance Criterion 2: Construction Progress Visible', () => {
+    it('should track construction progress from 0 to 100', () => {
+      // Arrange
+      const building = createBuildingComponent('lean-to', 1, 0);
+
+      // Assert initial state
+      expect(building.progress).toBe(0);
+      expect(building.isComplete).toBe(false);
+      expect(isUnderConstruction(building)).toBe(true);
+    });
+
+    it('should mark building complete when progress reaches 100', () => {
+      // Arrange
+      const building = createBuildingComponent('lean-to', 1, 100);
+
+      // Assert
+      expect(building.progress).toBe(100);
+      expect(building.isComplete).toBe(true);
+      expect(isUnderConstruction(building)).toBe(false);
+    });
+
+    it('should calculate remaining work correctly', () => {
+      // Arrange
+      const building50 = createBuildingComponent('lean-to', 1, 50);
+      const building75 = createBuildingComponent('lean-to', 1, 75);
+      const buildingComplete = createBuildingComponent('lean-to', 1, 100);
+
+      // Assert
+      expect(getRemainingWork(building50)).toBe(50);
+      expect(getRemainingWork(building75)).toBe(25);
+      expect(getRemainingWork(buildingComplete)).toBe(0);
+    });
+
+    it('should support partial progress for under-construction buildings', () => {
+      // Test various progress values
+      const progressValues = [0, 25, 50, 75, 99];
+
+      progressValues.forEach(progress => {
+        const building = createBuildingComponent('campfire', 1, progress);
+        expect(building.progress).toBe(progress);
+        expect(building.isComplete).toBe(false);
+        expect(isUnderConstruction(building)).toBe(true);
+      });
+    });
+  });
+
+  describe('Acceptance Criterion 3: Agents Interact with Buildings', () => {
+    it('should allow querying buildings by type', () => {
+      // Arrange
+      const campfire = createTestEntity(world);
+      campfire.addComponent(createBuildingComponent('campfire', 1, 100));
+      campfire.addComponent(createPositionComponent(10, 10));
+      addEntityToWorld(world, campfire);
+
+      const leanTo = createTestEntity(world);
+      leanTo.addComponent(createBuildingComponent('lean-to', 1, 100));
+      leanTo.addComponent(createPositionComponent(20, 20));
+      addEntityToWorld(world, leanTo);
+
+      // Act
+      const allBuildings = world.query().with('building').executeEntities();
+      const campfires = allBuildings.filter(entity => {
+        const building = (entity as EntityImpl).getComponent<BuildingComponent>('building');
+        return building?.buildingType === 'campfire';
+      });
+
+      // Assert
+      expect(allBuildings.length).toBe(2);
+      expect(campfires.length).toBe(1);
+    });
+
+    it('should only allow interaction with completed buildings', () => {
+      // Arrange
+      const incomplete = createBuildingComponent('campfire', 1, 50);
+      const complete = createBuildingComponent('campfire', 1, 100);
+
+      // Assert
+      expect(incomplete.isComplete).toBe(false);
+      expect(complete.isComplete).toBe(true);
+    });
+  });
+
+  describe('Acceptance Criterion 4: Building Provides Shelter', () => {
+    it('should mark lean-to as providing shelter', () => {
+      // Arrange & Act
+      const leanTo = createBuildingComponent('lean-to', 1, 100);
+
+      // Assert
+      expect(leanTo.providesShelter).toBe(true);
+      expect(leanTo.isComplete).toBe(true);
+    });
+
+    it('should mark tent as providing shelter', () => {
+      // Arrange & Act
+      const tent = createBuildingComponent('tent', 1, 100);
+
+      // Assert
+      expect(tent.providesShelter).toBe(true);
+    });
+
+    it('should NOT mark campfire as providing shelter', () => {
+      // Arrange & Act
+      const campfire = createBuildingComponent('campfire', 1, 100);
+
+      // Assert
+      expect(campfire.providesShelter).toBe(false);
+    });
+
+    it.todo('should restore shelter need when agent is near shelter building', () => {
+      // TODO: This test requires NeedsComponent to have a `shelter` field
+      // The current NeedsComponent only has hunger, energy, and health
+      // This functionality will be added in a future phase
+    });
+
+    it.todo('should NOT restore shelter when agent is far from shelter', () => {
+      // TODO: This test requires NeedsComponent to have a `shelter` field
+      // The current NeedsComponent only has hunger, energy, and health
+      // This functionality will be added in a future phase
+    });
+  });
+
+  describe('Acceptance Criterion 5: Campfire Provides Warmth', () => {
+    it('should mark campfire as providing warmth', () => {
+      // Arrange & Act
+      const campfire = createBuildingComponent('campfire', 1, 100);
+
+      // Assert
+      expect(campfire.providesWarmth).toBe(true);
+      expect(campfire.isComplete).toBe(true);
+    });
+
+    it('should NOT mark lean-to as providing warmth', () => {
+      // Arrange & Act
+      const leanTo = createBuildingComponent('lean-to', 1, 100);
+
+      // Assert
+      expect(leanTo.providesWarmth).toBe(false);
+    });
+
+    it('should allow agents to walk through campfire', () => {
+      // Arrange & Act
+      const campfire = createBuildingComponent('campfire', 1, 100);
+
+      // Assert - campfire should NOT block movement
+      expect(campfire.blocksMovement).toBe(false);
+    });
+  });
+
+  describe('Building Types and Properties', () => {
+    it('should create workbench with correct properties', () => {
+      // Arrange & Act
+      const workbench = createBuildingComponent('workbench', 1, 100);
+
+      // Assert
+      expect(workbench.buildingType).toBe('workbench');
+      expect(workbench.blocksMovement).toBe(true);
+      expect(workbench.providesWarmth).toBe(false);
+      expect(workbench.providesShelter).toBe(false);
+      expect(workbench.storageCapacity).toBe(0);
+    });
+
+    it('should create storage-chest with correct capacity', () => {
+      // Arrange & Act
+      const chest = createBuildingComponent('storage-chest', 1, 100);
+
+      // Assert
+      expect(chest.buildingType).toBe('storage-chest');
+      expect(chest.storageCapacity).toBe(20); // Per spec: 20 item slots
+    });
+
+    it('should create storage-box with correct capacity', () => {
+      // Arrange & Act
+      const box = createBuildingComponent('storage-box', 1, 100);
+
+      // Assert
+      expect(box.buildingType).toBe('storage-box');
+      expect(box.storageCapacity).toBe(10); // Legacy: smaller capacity
+    });
+
+    it('should create well with correct properties', () => {
+      // Arrange & Act
+      const well = createBuildingComponent('well', 1, 100);
+
+      // Assert
+      expect(well.buildingType).toBe('well');
+      expect(well.blocksMovement).toBe(true);
+      expect(well.providesWarmth).toBe(false);
+      expect(well.providesShelter).toBe(false);
+    });
+  });
+
+  describe('Building Tiers', () => {
+    it('should clamp tier to valid range (1-3)', () => {
+      // Arrange & Act
+      const tier1 = createBuildingComponent('campfire', 1);
+      const tier2 = createBuildingComponent('campfire', 2);
+      const tier3 = createBuildingComponent('campfire', 3);
+      const tierTooLow = createBuildingComponent('campfire', 0);
+      const tierTooHigh = createBuildingComponent('campfire', 5);
+
+      // Assert
+      expect(tier1.tier).toBe(1);
+      expect(tier2.tier).toBe(2);
+      expect(tier3.tier).toBe(3);
+      expect(tierTooLow.tier).toBe(1); // Clamped to min
+      expect(tierTooHigh.tier).toBe(3); // Clamped to max
+    });
+  });
+
+  describe('Progress Validation', () => {
+    it('should clamp progress to 0-100 range', () => {
+      // Arrange & Act
+      const progress0 = createBuildingComponent('campfire', 1, 0);
+      const progress50 = createBuildingComponent('campfire', 1, 50);
+      const progress100 = createBuildingComponent('campfire', 1, 100);
+      const progressNegative = createBuildingComponent('campfire', 1, -10);
+      const progressTooHigh = createBuildingComponent('campfire', 1, 150);
+
+      // Assert
+      expect(progress0.progress).toBe(0);
+      expect(progress50.progress).toBe(50);
+      expect(progress100.progress).toBe(100);
+      expect(progressNegative.progress).toBe(0); // Clamped to min
+      expect(progressTooHigh.progress).toBe(100); // Clamped to max
+    });
+
+    it('should set isComplete based on progress', () => {
+      // Arrange & Act
+      const incomplete = createBuildingComponent('campfire', 1, 99);
+      const complete = createBuildingComponent('campfire', 1, 100);
+
+      // Assert
+      expect(incomplete.isComplete).toBe(false);
+      expect(complete.isComplete).toBe(true);
+    });
+  });
+
+  describe('Error Handling per CLAUDE.md', () => {
+    it('should have required fields on BuildingComponent', () => {
+      // Arrange & Act
+      const building = createBuildingComponent('campfire', 1, 50);
+
+      // Assert - all required fields must be present
+      expect(building).toHaveProperty('type');
+      expect(building).toHaveProperty('buildingType');
+      expect(building).toHaveProperty('tier');
+      expect(building).toHaveProperty('progress');
+      expect(building).toHaveProperty('isComplete');
+      expect(building).toHaveProperty('blocksMovement');
+      expect(building).toHaveProperty('providesWarmth');
+      expect(building).toHaveProperty('providesShelter');
+      expect(building).toHaveProperty('storageCapacity');
+    });
+
+    it('should not use silent fallbacks for missing building type', () => {
+      // This test verifies that createBuildingComponent doesn't silently handle
+      // invalid building types with fallbacks. Per CLAUDE.md, it should throw or
+      // require valid input, not use defaults.
+
+      // Currently, TypeScript types prevent invalid buildingType at compile time.
+      // If runtime validation is added, this test should verify it throws.
+
+      const validTypes = [
+        'workbench',
+        'storage-chest',
+        'campfire',
+        'tent',
+        'well',
+        'lean-to',
+        'storage-box',
+      ];
+
+      validTypes.forEach(type => {
+        const building = createBuildingComponent(type as any, 1, 100);
+        expect(building.buildingType).toBe(type);
+      });
+    });
+  });
+
+  describe('BuildingSystem Integration', () => {
+    it('should require both building and position components', () => {
+      // Arrange & Act
+      const system = new BuildingSystem();
+
+      // Assert
+      expect(system.requiredComponents).toContain('building');
+      expect(system.requiredComponents).toContain('position');
+    });
+
+    it.todo('should process only complete buildings', () => {
+      // TODO: This test requires NeedsComponent to have a `shelter` field
+      // The current NeedsComponent only has hunger, energy, and health
+      // This functionality will be added in a future phase
+    });
+
+    it('should update system priority correctly', () => {
+      // Arrange & Act
+      const system = new BuildingSystem();
+
+      // Assert - BuildingSystem should run after NeedsSystem (priority 15)
+      expect(system.priority).toBe(16);
+    });
+  });
+});

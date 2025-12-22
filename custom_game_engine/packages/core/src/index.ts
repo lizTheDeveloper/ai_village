@@ -16,3 +16,5 @@ export * from './serialization/index.js';
 export * from './loop/index.js';
 export * from './components/index.js';
 export * from './systems/index.js';
+export * from './buildings/index.js';
+export * from './archetypes/index.js';

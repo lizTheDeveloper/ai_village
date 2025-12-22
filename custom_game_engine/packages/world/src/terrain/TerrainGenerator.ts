@@ -74,21 +74,29 @@ export class TerrainGenerator {
 
         // Place trees in forests and grassy areas
         if (tile.terrain === 'forest' && placementValue > 0.3) {
-          if (Math.random() > 0.7) {
-            // 30% chance
+          if (Math.random() > 0.4) {
+            // 60% chance (increased from 30% for better resource availability)
             createTree(world, worldX, worldY);
           }
-        } else if (tile.terrain === 'grass' && placementValue > 0.6) {
-          if (Math.random() > 0.95) {
-            // 5% chance
+        } else if (tile.terrain === 'grass' && placementValue > 0.4) {
+          if (Math.random() > 0.85) {
+            // 15% chance (increased from 5% for better resource availability)
             createTree(world, worldX, worldY);
           }
         }
 
         // Place rocks in mountains and stone areas
         if (tile.terrain === 'stone' && placementValue < -0.2) {
-          if (Math.random() > 0.8) {
-            // 20% chance
+          if (Math.random() > 0.5) {
+            // 50% chance (increased from 20% for better resource availability)
+            createRock(world, worldX, worldY);
+          }
+        }
+
+        // Also place rocks in sand/beach areas (new - for better resource distribution)
+        if (tile.terrain === 'sand' && placementValue < 0) {
+          if (Math.random() > 0.9) {
+            // 10% chance for rocks on beaches
             createRock(world, worldX, worldY);
           }
         }
@@ -150,8 +158,19 @@ export class TerrainGenerator {
     return {
       terrain,
       biome,
-      moisture: Math.max(0, Math.min(1, normalizedMoisture)),
-      fertility: Math.max(0, Math.min(1, fertility)),
+      moisture: Math.max(0, Math.min(100, normalizedMoisture * 100)),
+      fertility: Math.max(0, Math.min(100, fertility * 100)),
+      tilled: false,
+      plantability: 0,
+      nutrients: {
+        nitrogen: Math.max(0, Math.min(100, fertility * 100)),
+        phosphorus: Math.max(0, Math.min(100, fertility * 80)),
+        potassium: Math.max(0, Math.min(100, fertility * 90)),
+      },
+      fertilized: false,
+      fertilizerDuration: 0,
+      lastWatered: 0,
+      composted: false,
     };
   }
 

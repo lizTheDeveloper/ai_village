@@ -17,3 +17,9 @@ export * from './RelationshipComponent.js';
 export * from './PersonalityComponent.js';
 export * from './IdentityComponent.js';
 export * from './BuildingComponent.js';
+export * from './InventoryComponent.js';
+export * from './TemperatureComponent.js';
+export * from './WeatherComponent.js';
+
+// Re-export types explicitly (export * doesn't re-export types)
+export type { AgentBehavior } from './AgentComponent.js';

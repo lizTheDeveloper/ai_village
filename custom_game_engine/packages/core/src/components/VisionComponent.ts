@@ -6,6 +6,9 @@ export interface VisionComponent extends Component {
   fieldOfView: number;    // Degrees (360 = full circle)
   canSeeAgents: boolean;  // Can detect other agents
   canSeeResources: boolean; // Can detect resources
+  seenAgents: string[];   // Entity IDs of agents currently in vision range
+  seenResources: string[]; // Entity IDs of resources currently in vision range
+  heardSpeech: Array<{ speaker: string, text: string }>; // Speech heard from nearby agents
 }
 
 export function createVisionComponent(
@@ -21,5 +24,8 @@ export function createVisionComponent(
     fieldOfView,
     canSeeAgents,
     canSeeResources,
+    seenAgents: [],
+    seenResources: [],
+    heardSpeech: [],
   };
 }

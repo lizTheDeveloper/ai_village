@@ -29,8 +29,17 @@ const activePipelines = new Map();
 // SSE clients for real-time updates
 const sseClients = new Set();
 
+// Game server process
+let gameServerProcess = null;
+const GAME_SERVER_PORT = 3000;
+
+// Parallel workers process
+let parallelWorkersProcess = null;
+const PARALLEL_WORKERS_STATE_FILE = path.join(__dirname, '.parallel-workers.json');
+
 // Persistence file for pipeline state
 const PIPELINES_STATE_FILE = path.join(__dirname, '.pipelines.json');
+const GAME_SERVER_STATE_FILE = path.join(__dirname, '.game-server.json');
 
 // Load persisted pipelines on startup
 function loadPersistedPipelines() {
@@ -71,6 +80,122 @@ function loadPersistedPipelines() {
     }
 }
 
+// Watch for external pipeline changes (pipelines launched directly via CLI)
+let pipelinesFileWatcher = null;
+let lastPipelinesFileSize = 0;
+const externalPipelineLogPositions = new Map(); // Track read positions for log files
+
+function watchPipelinesFile() {
+    if (pipelinesFileWatcher) return; // Already watching
+
+    // Poll the file every 2 seconds for changes
+    pipelinesFileWatcher = setInterval(() => {
+        if (!fs.existsSync(PIPELINES_STATE_FILE)) return;
+
+        try {
+            const stat = fs.statSync(PIPELINES_STATE_FILE);
+            const fileChanged = stat.size !== lastPipelinesFileSize;
+
+            if (fileChanged) {
+                lastPipelinesFileSize = stat.size;
+            }
+
+            const data = JSON.parse(fs.readFileSync(PIPELINES_STATE_FILE, 'utf-8'));
+
+            // Check for new pipelines we don't know about
+            for (const pipeline of data) {
+                if (activePipelines.has(pipeline.id)) continue; // Already tracking by ID
+
+                // Also check if we're already tracking this PID (different ID but same process)
+                let alreadyTracking = false;
+                for (const [existingId, existing] of activePipelines) {
+                    if (existing.pid === pipeline.pid) {
+                        alreadyTracking = true;
+                        break;
+                    }
+                }
+                if (alreadyTracking) continue;
+
+                // Check if process is still running
+                try {
+                    process.kill(pipeline.pid, 0);
+
+                    // New external pipeline detected!
+                    activePipelines.set(pipeline.id, {
+                        ...pipeline,
+                        process: null,
+                        logs: pipeline.logs || [],
+                        reconnected: true,
+                        external: true
+                    });
+
+                    console.log(`  📥 Detected external pipeline: ${pipeline.featureName} (PID: ${pipeline.pid})`);
+                    broadcast({ type: 'pipeline-started', id: pipeline.id, featureName: pipeline.featureName, external: true });
+                } catch (err) {
+                    // Process doesn't exist
+                }
+            }
+
+            // Update status and read logs for external pipelines
+            for (const [id, pipeline] of activePipelines) {
+                if (!pipeline.external) continue;
+
+                let processRunning = false;
+                try {
+                    process.kill(pipeline.pid, 0);
+                    processRunning = true;
+                } catch (err) {
+                    // Process ended
+                }
+
+                // Find the most recent log file for this pipeline
+                const logFiles = fs.readdirSync(LOGS_DIR)
+                    .filter(f => f.includes(pipeline.featureName) && f.endsWith('.log'))
+                    .sort()
+                    .reverse();
+
+                if (logFiles.length > 0) {
+                    const logPath = path.join(LOGS_DIR, logFiles[0]);
+                    const logKey = `${id}:${logFiles[0]}`;
+                    const lastPos = externalPipelineLogPositions.get(logKey) || 0;
+
+                    try {
+                        const logStat = fs.statSync(logPath);
+                        if (logStat.size > lastPos) {
+                            // Read new content
+                            const fd = fs.openSync(logPath, 'r');
+                            const buffer = Buffer.alloc(logStat.size - lastPos);
+                            fs.readSync(fd, buffer, 0, buffer.length, lastPos);
+                            fs.closeSync(fd);
+
+                            const newContent = buffer.toString('utf-8');
+                            if (newContent.trim()) {
+                                const logEntry = { type: 'stdout', text: newContent, time: new Date().toISOString() };
+                                pipeline.logs.push(logEntry);
+                                broadcast({ type: 'pipeline-log', id, log: newContent, stream: 'stdout' });
+                            }
+
+                            externalPipelineLogPositions.set(logKey, logStat.size);
+                        }
+                    } catch (err) {
+                        // Ignore read errors
+                    }
+                }
+
+                // Check if process ended
+                if (!processRunning && pipeline.status === 'running') {
+                    pipeline.status = 'complete';
+                    pipeline.endTime = new Date().toISOString();
+                    broadcast({ type: 'pipeline-complete', id, status: 'complete' });
+                    console.log(`  ✅ External pipeline completed: ${pipeline.featureName}`);
+                }
+            }
+        } catch (err) {
+            // Ignore parse errors (file might be mid-write)
+        }
+    }, 2000);
+}
+
 // Persist pipelines to disk
 function persistPipelines() {
     const data = Array.from(activePipelines.values()).map(p => ({
@@ -88,6 +213,54 @@ function persistPipelines() {
         fs.writeFileSync(PIPELINES_STATE_FILE, JSON.stringify(data, null, 2));
     } catch (err) {
         console.error('Failed to persist pipelines:', err.message);
+    }
+}
+
+// Persist game server state
+function persistGameServer() {
+    if (!gameServerProcess) {
+        // Remove state file if server is not running
+        if (fs.existsSync(GAME_SERVER_STATE_FILE)) {
+            fs.unlinkSync(GAME_SERVER_STATE_FILE);
+        }
+        return;
+    }
+
+    const data = {
+        pid: gameServerProcess.pid,
+        startTime: new Date().toISOString()
+    };
+
+    try {
+        fs.writeFileSync(GAME_SERVER_STATE_FILE, JSON.stringify(data, null, 2));
+    } catch (err) {
+        console.error('Failed to persist game server state:', err.message);
+    }
+}
+
+// Load persisted game server on startup
+function loadPersistedGameServer() {
+    if (!fs.existsSync(GAME_SERVER_STATE_FILE)) {
+        return;
+    }
+
+    try {
+        const data = JSON.parse(fs.readFileSync(GAME_SERVER_STATE_FILE, 'utf-8'));
+
+        // Check if process is still running
+        try {
+            process.kill(data.pid, 0); // Signal 0 checks if process exists
+
+            // Process exists, mark it as reconnected (but we can't get the actual process handle)
+            gameServerProcess = { pid: data.pid, reconnected: true };
+            console.log(`  ↻ Reconnected to game server (PID: ${data.pid})`);
+        } catch (err) {
+            // Process doesn't exist anymore, clean up the state file
+            fs.unlinkSync(GAME_SERVER_STATE_FILE);
+            console.log(`  🧹 Cleaned up stale game server state`);
+        }
+    } catch (err) {
+        console.error('Failed to load persisted game server:', err.message);
     }
 }
 
@@ -213,6 +386,7 @@ function getWorkOrders() {
 
     const orders = [];
     const dirs = fs.readdirSync(WORK_ORDERS_DIR).filter(d => {
+        if (d === 'archive') return false; // Exclude archive folder
         const stat = fs.statSync(path.join(WORK_ORDERS_DIR, d));
         return stat.isDirectory();
     });
@@ -283,7 +457,6 @@ function getScreenshots(name) {
 // =============================================================================
 
 function launchPipeline(featureName, options = {}) {
-    const id = `pipeline-${Date.now()}`;
     const scriptPath = path.join(SCRIPTS_DIR, 'orchestrator.sh');
 
     const args = [];
@@ -296,22 +469,24 @@ function launchPipeline(featureName, options = {}) {
     }
     // Auto mode: no arguments (picks next from roadmap)
 
+    const proc = spawn('bash', [scriptPath, ...args], {
+        cwd: PROJECT_ROOT,
+        env: { ...process.env, MAX_IMPL_RETRIES: '3', MAX_PLAYTEST_RETRIES: '5' },
+        stdio: ['ignore', 'pipe', 'pipe']
+    });
+
+    // Use same ID format as orchestrator: pipeline-{featureName}-{pid}
+    const id = `pipeline-${featureName || 'auto'}-${proc.pid}`;
+
     const pipeline = {
         id,
         featureName: featureName || 'auto',
         startTime: new Date().toISOString(),
         status: 'running',
         logs: [],
-        process: null
+        process: proc,
+        pid: proc.pid
     };
-
-    const proc = spawn('bash', [scriptPath, ...args], {
-        cwd: PROJECT_ROOT,
-        env: { ...process.env, MAX_IMPL_RETRIES: '3', MAX_PLAYTEST_RETRIES: '5' }
-    });
-
-    pipeline.process = proc;
-    pipeline.pid = proc.pid;
 
     proc.stdout.on('data', (data) => {
         const log = data.toString();
@@ -377,12 +552,31 @@ function getAllPipelines() {
 
 function stopPipeline(id) {
     const pipeline = activePipelines.get(id);
-    if (!pipeline || !pipeline.process) return false;
+    if (!pipeline) return false;
 
-    pipeline.process.kill('SIGTERM');
-    pipeline.status = 'stopped';
-    persistPipelines(); // Save state when pipeline stops
-    return true;
+    try {
+        // Kill the entire process tree (orchestrator + all child processes)
+        if (pipeline.pid) {
+            // Kill all child processes first
+            exec(`pkill -TERM -P ${pipeline.pid}`, (err) => {
+                // Then kill the main process
+                try {
+                    process.kill(pipeline.pid, 'SIGTERM');
+                } catch (killErr) {
+                    console.error('Failed to kill main process:', killErr.message);
+                }
+            });
+        } else if (pipeline.process) {
+            pipeline.process.kill('SIGTERM');
+        }
+
+        pipeline.status = 'stopped';
+        persistPipelines(); // Save state when pipeline stops
+        return true;
+    } catch (err) {
+        console.error('Failed to stop pipeline:', err.message);
+        return false;
+    }
 }
 
 // =============================================================================
@@ -413,6 +607,252 @@ function getLogContent(name) {
         return fs.readFileSync(logPath, 'utf-8');
     }
     return null;
+}
+
+// =============================================================================
+// Game Server Management
+// =============================================================================
+
+function startGameServer() {
+    if (gameServerProcess && !gameServerProcess.reconnected) {
+        throw new Error('Game server is already running');
+    }
+
+    const GAME_DIR = path.join(PROJECT_ROOT, 'custom_game_engine/demo');
+
+    const proc = spawn('npm', ['run', 'dev'], {
+        cwd: GAME_DIR,
+        env: { ...process.env },
+        stdio: ['ignore', 'pipe', 'pipe']
+    });
+
+    gameServerProcess = proc;
+
+    proc.stdout.on('data', (data) => {
+        console.log(`[Game Server] ${data.toString().trim()}`);
+    });
+
+    proc.stderr.on('data', (data) => {
+        console.error(`[Game Server] ${data.toString().trim()}`);
+    });
+
+    proc.on('close', (code) => {
+        console.log(`Game server exited with code ${code}`);
+        gameServerProcess = null;
+        persistGameServer(); // Clear persisted state when server stops
+    });
+
+    persistGameServer(); // Save state when server starts
+
+    return {
+        status: 'starting',
+        pid: proc.pid,
+        url: `http://localhost:${GAME_SERVER_PORT}`
+    };
+}
+
+function stopGameServer() {
+    if (!gameServerProcess) {
+        throw new Error('Game server is not running');
+    }
+
+    // If it's a reconnected process (we don't have the handle), try to kill by PID
+    if (gameServerProcess.reconnected) {
+        try {
+            process.kill(gameServerProcess.pid, 'SIGTERM');
+        } catch (err) {
+            console.error('Failed to kill reconnected process:', err.message);
+        }
+    } else {
+        gameServerProcess.kill('SIGTERM');
+    }
+
+    gameServerProcess = null;
+    persistGameServer(); // Clear persisted state when server stops
+    return { status: 'stopped' };
+}
+
+function getGameServerStatus() {
+    return {
+        running: gameServerProcess !== null,
+        pid: gameServerProcess ? gameServerProcess.pid : null,
+        url: `http://localhost:${GAME_SERVER_PORT}`
+    };
+}
+
+// =============================================================================
+// Parallel Workers Management
+// =============================================================================
+
+function startParallelWorkers(options = {}) {
+    if (parallelWorkersProcess && !parallelWorkersProcess.reconnected) {
+        throw new Error('Parallel workers are already running');
+    }
+
+    const scriptPath = path.join(SCRIPTS_DIR, 'parallel-workers.sh');
+    const args = [];
+
+    if (options.numWorkers) {
+        args.push('-n', options.numWorkers.toString());
+    }
+
+    if (options.features && Array.isArray(options.features)) {
+        args.push('--features', options.features.join(','));
+    }
+
+    const proc = spawn('bash', [scriptPath, ...args], {
+        cwd: PROJECT_ROOT,
+        env: { ...process.env },
+        stdio: ['ignore', 'pipe', 'pipe']
+    });
+
+    parallelWorkersProcess = {
+        pid: proc.pid,
+        startTime: new Date().toISOString(),
+        numWorkers: options.numWorkers || 3,
+        features: options.features || [],
+        logs: []
+    };
+
+    proc.stdout.on('data', (data) => {
+        const log = data.toString();
+        parallelWorkersProcess.logs.push({ type: 'stdout', text: log, time: new Date().toISOString() });
+        // Keep only last 500 log entries
+        if (parallelWorkersProcess.logs.length > 500) {
+            parallelWorkersProcess.logs = parallelWorkersProcess.logs.slice(-500);
+        }
+        broadcast({ type: 'parallel-workers-log', log, stream: 'stdout' });
+    });
+
+    proc.stderr.on('data', (data) => {
+        const log = data.toString();
+        parallelWorkersProcess.logs.push({ type: 'stderr', text: log, time: new Date().toISOString() });
+        if (parallelWorkersProcess.logs.length > 500) {
+            parallelWorkersProcess.logs = parallelWorkersProcess.logs.slice(-500);
+        }
+        broadcast({ type: 'parallel-workers-log', log, stream: 'stderr' });
+    });
+
+    proc.on('close', (code) => {
+        console.log(`Parallel workers exited with code ${code}`);
+        parallelWorkersProcess = null;
+        persistParallelWorkers();
+        broadcast({ type: 'parallel-workers-stopped', exitCode: code });
+    });
+
+    persistParallelWorkers();
+    broadcast({ type: 'parallel-workers-started', pid: proc.pid, numWorkers: options.numWorkers || 3 });
+
+    return {
+        status: 'starting',
+        pid: proc.pid,
+        numWorkers: options.numWorkers || 3
+    };
+}
+
+function stopParallelWorkers() {
+    if (!parallelWorkersProcess) {
+        throw new Error('Parallel workers are not running');
+    }
+
+    const pid = parallelWorkersProcess.pid;
+
+    // Kill the process tree
+    exec(`pkill -TERM -P ${pid}`, (err) => {
+        try {
+            process.kill(pid, 'SIGTERM');
+        } catch (killErr) {
+            console.error('Failed to kill parallel workers:', killErr.message);
+        }
+    });
+
+    parallelWorkersProcess = null;
+    persistParallelWorkers();
+
+    return { status: 'stopped' };
+}
+
+function getParallelWorkersStatus() {
+    if (!parallelWorkersProcess) {
+        return { running: false };
+    }
+
+    // Check if process is still alive
+    try {
+        process.kill(parallelWorkersProcess.pid, 0);
+    } catch (err) {
+        // Process is dead
+        parallelWorkersProcess = null;
+        persistParallelWorkers();
+        return { running: false };
+    }
+
+    return {
+        running: true,
+        pid: parallelWorkersProcess.pid,
+        startTime: parallelWorkersProcess.startTime,
+        numWorkers: parallelWorkersProcess.numWorkers,
+        features: parallelWorkersProcess.features,
+        logCount: parallelWorkersProcess.logs ? parallelWorkersProcess.logs.length : 0
+    };
+}
+
+function getParallelWorkersLogs() {
+    if (!parallelWorkersProcess || !parallelWorkersProcess.logs) {
+        return [];
+    }
+    return parallelWorkersProcess.logs;
+}
+
+function persistParallelWorkers() {
+    if (!parallelWorkersProcess) {
+        if (fs.existsSync(PARALLEL_WORKERS_STATE_FILE)) {
+            fs.unlinkSync(PARALLEL_WORKERS_STATE_FILE);
+        }
+        return;
+    }
+
+    const data = {
+        pid: parallelWorkersProcess.pid,
+        startTime: parallelWorkersProcess.startTime,
+        numWorkers: parallelWorkersProcess.numWorkers,
+        features: parallelWorkersProcess.features
+    };
+
+    try {
+        fs.writeFileSync(PARALLEL_WORKERS_STATE_FILE, JSON.stringify(data, null, 2));
+    } catch (err) {
+        console.error('Failed to persist parallel workers state:', err.message);
+    }
+}
+
+function loadPersistedParallelWorkers() {
+    if (!fs.existsSync(PARALLEL_WORKERS_STATE_FILE)) {
+        return;
+    }
+
+    try {
+        const data = JSON.parse(fs.readFileSync(PARALLEL_WORKERS_STATE_FILE, 'utf-8'));
+
+        // Check if process is still running
+        try {
+            process.kill(data.pid, 0);
+
+            // Process exists, reconnect
+            parallelWorkersProcess = {
+                ...data,
+                reconnected: true,
+                logs: []
+            };
+            console.log(`  ↻ Reconnected to parallel workers (PID: ${data.pid})`);
+        } catch (err) {
+            // Process doesn't exist anymore
+            fs.unlinkSync(PARALLEL_WORKERS_STATE_FILE);
+            console.log(`  🧹 Cleaned up stale parallel workers state`);
+        }
+    } catch (err) {
+        console.error('Failed to load persisted parallel workers:', err.message);
+    }
 }
 
 // =============================================================================
@@ -563,6 +1003,26 @@ app.post('/api/pipelines/:id/stop', (req, res) => {
     }
 });
 
+app.delete('/api/pipelines/:id', (req, res) => {
+    try {
+        const pipeline = activePipelines.get(req.params.id);
+        if (!pipeline) {
+            return res.status(404).json({ error: 'Pipeline not found' });
+        }
+
+        // Only allow deletion of non-running pipelines
+        if (pipeline.status === 'running') {
+            return res.status(400).json({ error: 'Cannot delete running pipeline. Stop it first.' });
+        }
+
+        activePipelines.delete(req.params.id);
+        persistPipelines(); // Update persisted state
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Logs
 app.get('/api/logs', (req, res) => {
     try {
@@ -576,10 +1036,10 @@ app.get('/api/logs', (req, res) => {
 app.get('/api/logs/:name', (req, res) => {
     try {
         const content = getLogContent(req.params.name);
-        if (!content) {
+        if (content === null) {
             return res.status(404).json({ error: 'Log not found' });
         }
-        res.type('text/plain').send(content);
+        res.type('text/plain').send(content || '(empty log file)');
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -646,6 +1106,84 @@ app.get('/api/test-status', (req, res) => {
     });
 });
 
+// Game server control
+app.post('/api/game-server/start', (req, res) => {
+    try {
+        const result = startGameServer();
+        res.json(result);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.post('/api/game-server/stop', (req, res) => {
+    try {
+        const result = stopGameServer();
+        res.json(result);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.post('/api/game-server/restart', (req, res) => {
+    try {
+        if (gameServerProcess) {
+            stopGameServer();
+        }
+        // Wait a moment before restarting
+        setTimeout(() => {
+            const result = startGameServer();
+            res.json(result);
+        }, 1000);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/game-server/status', (req, res) => {
+    try {
+        res.json(getGameServerStatus());
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Parallel Workers control
+app.post('/api/parallel-workers/start', (req, res) => {
+    try {
+        const { numWorkers, features } = req.body || {};
+        const result = startParallelWorkers({ numWorkers, features });
+        res.json(result);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.post('/api/parallel-workers/stop', (req, res) => {
+    try {
+        const result = stopParallelWorkers();
+        res.json(result);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.get('/api/parallel-workers/status', (req, res) => {
+    try {
+        res.json(getParallelWorkersStatus());
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/parallel-workers/logs', (req, res) => {
+    try {
+        res.json(getParallelWorkersLogs());
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // =============================================================================
 // Start Server
 // =============================================================================
@@ -661,6 +1199,12 @@ app.listen(PORT, () => {
 ╚══════════════════════════════════════════════════════════════╝
     `);
 
-    // Load any persisted pipelines from previous runs
+    // Load any persisted state from previous runs
     loadPersistedPipelines();
+    loadPersistedGameServer();
+    loadPersistedParallelWorkers();
+
+    // Watch for externally-launched pipelines
+    watchPipelinesFile();
+    console.log('  👁️  Watching for external pipelines');
 });

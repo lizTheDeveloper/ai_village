@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { StructuredPromptBuilder } from '../StructuredPromptBuilder';
-import { EntityImpl } from '@ai-village/core';
 
 describe('StructuredPromptBuilder', () => {
   const builder = new StructuredPromptBuilder();
@@ -179,6 +178,65 @@ describe('StructuredPromptBuilder', () => {
       const prompt = builder.buildPrompt(entity, {});
 
       expect(prompt).toMatch(/Your response:\s*$/);
+    });
+  });
+
+  describe('resource type descriptions', () => {
+    it('should describe trees when wood resources are visible', () => {
+      const entity = createMockEntity({
+        vision: { seenResources: ['tree1', 'tree2'] }
+      });
+
+      const mockWorld = {
+        getEntity: (_id: string) => ({
+          getComponent: () => ({ resourceType: 'wood' })
+        })
+      };
+
+      const prompt = builder.buildPrompt(entity, mockWorld);
+
+      expect(prompt).toContain('2 trees');
+      expect(prompt).not.toContain('food source');
+    });
+
+    it('should describe rocks when stone resources are visible', () => {
+      const entity = createMockEntity({
+        vision: { seenResources: ['rock1'] }
+      });
+
+      const mockWorld = {
+        getEntity: (_id: string) => ({
+          getComponent: () => ({ resourceType: 'stone' })
+        })
+      };
+
+      const prompt = builder.buildPrompt(entity, mockWorld);
+
+      expect(prompt).toContain('1 rock');
+      expect(prompt).not.toContain('food source');
+    });
+
+    it('should describe mixed resources correctly', () => {
+      const entity = createMockEntity({
+        vision: { seenResources: ['tree1', 'rock1', 'food1'] }
+      });
+
+      let callCount = 0;
+      const mockWorld = {
+        getEntity: (_id: string) => {
+          callCount++;
+          const types = ['wood', 'stone', 'food'];
+          return {
+            getComponent: () => ({ resourceType: types[(callCount - 1) % 3] })
+          };
+        }
+      };
+
+      const prompt = builder.buildPrompt(entity, mockWorld);
+
+      expect(prompt).toContain('1 tree');
+      expect(prompt).toContain('1 rock');
+      expect(prompt).toContain('1 food source');
     });
   });
 });

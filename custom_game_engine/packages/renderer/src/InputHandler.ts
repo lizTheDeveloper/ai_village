@@ -1,5 +1,11 @@
 import { Camera } from './Camera.js';
 
+export interface InputHandlerCallbacks {
+  onKeyDown?: (key: string, shiftKey: boolean, ctrlKey: boolean) => boolean;
+  onMouseClick?: (screenX: number, screenY: number, button: number) => boolean;
+  onMouseMove?: (screenX: number, screenY: number) => void;
+}
+
 /**
  * Handle keyboard and mouse input for camera control.
  */
@@ -8,6 +14,9 @@ export class InputHandler {
   private mouseDown = false;
   private lastMouseX = 0;
   private lastMouseY = 0;
+  private callbacks: InputHandlerCallbacks = {};
+  private mouseMoveX = 0;
+  private mouseMoveY = 0;
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -16,9 +25,29 @@ export class InputHandler {
     this.setupEventListeners();
   }
 
+  /**
+   * Set callbacks for input events.
+   * Callbacks return true if the event was handled and should not propagate.
+   */
+  setCallbacks(callbacks: InputHandlerCallbacks): void {
+    this.callbacks = callbacks;
+  }
+
+  /**
+   * Get current mouse position on canvas.
+   */
+  getMousePosition(): { x: number; y: number } {
+    return { x: this.mouseMoveX, y: this.mouseMoveY };
+  }
+
   private setupEventListeners(): void {
     // Keyboard
     window.addEventListener('keydown', (e) => {
+      // Check if callback handles this key
+      if (this.callbacks.onKeyDown?.(e.key, e.shiftKey, e.ctrlKey)) {
+        e.preventDefault();
+        return;
+      }
       this.keys.add(e.key);
     });
 
@@ -26,11 +55,32 @@ export class InputHandler {
       this.keys.delete(e.key);
     });
 
-    // Mouse drag
+    // Mouse drag and click
     this.canvas.addEventListener('mousedown', (e) => {
+      // Check if callback handles this click
+      const rect = this.canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      console.log(`[InputHandler] mousedown: clientX=${e.clientX}, clientY=${e.clientY}, rect.left=${rect.left}, rect.top=${rect.top}, x=${x}, y=${y}, button=${e.button}`);
+      console.log(`[InputHandler] Canvas dimensions: rect.width=${rect.width}, rect.height=${rect.height}, canvas.width=${this.canvas.width}, canvas.height=${this.canvas.height}`);
+      console.log(`[InputHandler] DPR: ${window.devicePixelRatio || 1}`);
+
+      if (this.callbacks.onMouseClick?.(x, y, e.button)) {
+        console.log(`[InputHandler] Click was handled by callback`);
+        e.preventDefault();
+        return;
+      }
+
+      console.log(`[InputHandler] Click not handled, enabling drag mode`);
       this.mouseDown = true;
       this.lastMouseX = e.clientX;
       this.lastMouseY = e.clientY;
+    });
+
+    // Prevent context menu on right click
+    this.canvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
     });
 
     window.addEventListener('mouseup', () => {
@@ -38,6 +88,13 @@ export class InputHandler {
     });
 
     window.addEventListener('mousemove', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      this.mouseMoveX = e.clientX - rect.left;
+      this.mouseMoveY = e.clientY - rect.top;
+
+      // Notify callback of mouse move
+      this.callbacks.onMouseMove?.(this.mouseMoveX, this.mouseMoveY);
+
       if (this.mouseDown) {
         const dx = e.clientX - this.lastMouseX;
         const dy = e.clientY - this.lastMouseY;

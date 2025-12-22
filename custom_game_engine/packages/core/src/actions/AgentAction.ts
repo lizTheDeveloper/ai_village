@@ -28,6 +28,13 @@ export type AgentAction =
   | { type: 'build'; buildingType: BuildingType; position: Position }
   | { type: 'construct'; buildingId: string } // Continue construction
 
+  // Farming (Phase 9)
+  | { type: 'till'; position: Position } // Till grass to make plantable
+  | { type: 'water'; position: Position } // Water a tile
+  | { type: 'fertilize'; position: Position; fertilizerType: string } // Apply fertilizer
+  | { type: 'plant'; position: Position; seedType: string } // Plant a seed
+  | { type: 'harvest'; position: Position } // Harvest a crop
+
   // Rest
   | { type: 'idle' }
   | { type: 'rest' };
@@ -72,20 +79,28 @@ export function parseAction(response: string): AgentAction | null {
     return { type: 'eat' };
   }
 
-  if (cleaned.includes('forage') || cleaned.includes('gather') || cleaned.includes('search')) {
+  // IMPORTANT: Check chop/mine BEFORE generic 'gather' to avoid conflicts
+  // 'chop' and 'mine' are specific gather actions that should take priority
+  if (cleaned.includes('chop') || cleaned.includes('chopping') || cleaned.includes('wood')) {
+    return { type: 'chop', targetId: 'nearest' };
+  }
+
+  if (cleaned.includes('mine') || cleaned.includes('mining') || cleaned.includes('stone')) {
+    return { type: 'mine', targetId: 'nearest' };
+  }
+
+  // Generic gather - only matches if chop/mine didn't match above
+  if (cleaned.includes('gather')) {
+    // If LLM says "gather" without specifying chop/mine, default to chop
+    return { type: 'chop', targetId: 'nearest' };
+  }
+
+  if (cleaned.includes('forage') || cleaned.includes('search')) {
     return { type: 'forage' };
   }
 
   if (cleaned.includes('follow')) {
     return { type: 'follow', targetId: 'nearest' };
-  }
-
-  if (cleaned.includes('chop') || cleaned.includes('wood')) {
-    return { type: 'chop', targetId: 'nearest' };
-  }
-
-  if (cleaned.includes('mine') || cleaned.includes('stone')) {
-    return { type: 'mine', targetId: 'nearest' };
   }
 
   if (cleaned.includes('build') || cleaned.includes('construct')) {
@@ -110,7 +125,8 @@ export function isValidAction(action: unknown): boolean {
   const validTypes = [
     'move', 'wander', 'follow', 'talk', 'help',
     'forage', 'pickup', 'eat', 'chop', 'mine',
-    'build', 'construct', 'idle', 'rest'
+    'build', 'construct', 'idle', 'rest',
+    'till', 'water', 'fertilize', 'plant', 'harvest'
   ];
 
   return validTypes.includes(a.type);
@@ -133,9 +149,10 @@ export function actionToBehavior(action: AgentAction): AgentBehavior {
       return 'seek_food';
     case 'chop':
     case 'mine':
+      return 'gather';
     case 'build':
     case 'construct':
-      return 'idle'; // For now, treat building actions as idle
+      return 'build';
     case 'idle':
     case 'rest':
       return 'idle';

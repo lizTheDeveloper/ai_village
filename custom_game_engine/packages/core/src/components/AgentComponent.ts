@@ -14,7 +14,8 @@ export type AgentBehavior =
   | 'observe'
   | 'rest'
   | 'work'
-  | 'help';
+  | 'help'
+  | 'build';
 
 export interface AgentComponent extends Component {
   type: 'agent';

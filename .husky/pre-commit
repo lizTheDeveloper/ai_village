@@ -1,0 +1,39 @@
+#!/bin/sh
+
+# AI Village Pre-Commit Hook
+# Runs lint and type-check on staged TypeScript files
+
+echo "Running pre-commit checks..."
+
+# Change to game engine directory
+cd custom_game_engine
+
+# Run lint-staged
+npx lint-staged
+
+# Check for anti-patterns in staged files
+echo "Checking for anti-patterns..."
+
+# Get staged .ts files
+STAGED_TS=$(git diff --cached --name-only --diff-filter=ACM | grep "\.ts$" | grep "^custom_game_engine/packages/")
+
+if [ -n "$STAGED_TS" ]; then
+    # Check for 'any' types
+    if echo "$STAGED_TS" | xargs grep -l ": any\|as any" 2>/dev/null; then
+        echo "ERROR: Found 'any' types in staged files. Please add proper type annotations."
+        echo "Files with 'any' types:"
+        echo "$STAGED_TS" | xargs grep -l ": any\|as any" 2>/dev/null
+        exit 1
+    fi
+
+    # Check for skipped tests
+    STAGED_TESTS=$(echo "$STAGED_TS" | grep -E "\.test\.ts$|\.spec\.ts$")
+    if [ -n "$STAGED_TESTS" ]; then
+        if echo "$STAGED_TESTS" | xargs grep -l "\.skip\|\.only" 2>/dev/null; then
+            echo "ERROR: Found skipped or focused tests in staged files."
+            exit 1
+        fi
+    fi
+fi
+
+echo "Pre-commit checks passed!"

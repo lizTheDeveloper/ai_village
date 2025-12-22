@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "ai-village-proxy": {
+      "command": "/path/to/your/.venv/bin/python",
+      "args": ["-m", "mcp_proxy_system.servers.proxy_server"],
+      "cwd": "/path/to/ai_village",
+      "env": {
+        "PYTHONPATH": "/path/to/ai_village"
+      }
+    },
+    "ai-village-chatroom": {
+      "command": "/path/to/your/.venv/bin/python",
+      "args": ["-m", "mcp_proxy_system.servers.chatroom_server"],
+      "cwd": "/path/to/ai_village",
+      "env": {
+        "PYTHONPATH": "/path/to/ai_village",
+        "NATS_URL": "nats://your-nats-server:4222",
+        "NATS_USER": "your-username",
+        "NATS_PASSWORD": "your-password",
+        "NATS_NAMESPACE": "ai_village"
+      }
+    }
+  }
+}

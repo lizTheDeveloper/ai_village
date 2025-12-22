@@ -11,6 +11,11 @@ import type { Entity } from './Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { IQueryBuilder } from './QueryBuilder.js';
 import { QueryBuilder } from './QueryBuilder.js';
+import { EntityImpl, createEntityId } from './Entity.js';
+import { createBuildingComponent } from '../components/BuildingComponent.js';
+import { createPositionComponent } from '../components/PositionComponent.js';
+import { BuildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistry.js';
+import { PlacementValidator } from '../buildings/PlacementValidator.js';
 
 /**
  * Read-only view of the world state.
@@ -28,6 +33,9 @@ export interface World {
 
   /** Event bus for communication */
   readonly eventBus: EventBus;
+
+  /** Get event bus (for backward compatibility) */
+  getEventBus(): EventBus;
 
   /** Query entities */
   query(): IQueryBuilder;
@@ -60,6 +68,20 @@ export interface World {
 
   /** Check if feature is enabled */
   isFeatureEnabled(feature: string): boolean;
+
+  /** Create entity from raw components (for testing) */
+  createEntity(archetype?: string): Entity;
+
+  /**
+   * Initiate construction of a building.
+   * Validates placement, deducts resources, creates construction site.
+   * @throws Error if validation fails or insufficient resources
+   */
+  initiateConstruction(
+    position: { x: number; y: number },
+    buildingType: string,
+    inventory: Record<string, number>
+  ): Entity;
 }
 
 /**
@@ -68,7 +90,7 @@ export interface World {
  */
 export interface WorldMutator extends World {
   /** Create a new entity */
-  createEntity(archetype: string): EntityId;
+  createEntity(archetype?: string): Entity;
 
   /** Destroy an entity */
   destroyEntity(id: EntityId, reason: string): void;
@@ -135,6 +157,10 @@ export class WorldImpl implements WorldMutator {
     return this._eventBus;
   }
 
+  getEventBus(): EventBus {
+    return this._eventBus;
+  }
+
   get features(): FeatureFlags {
     const flags: Record<string, boolean> = {};
     for (const [key, value] of this._features) {
@@ -185,8 +211,13 @@ export class WorldImpl implements WorldMutator {
 
   // Mutator methods
 
-  createEntity(_archetype: string): EntityId {
-    throw new Error('createEntity not yet implemented - need archetype system');
+  createEntity(_archetype?: string): Entity {
+    // Note: archetype parameter is currently unused but kept for future compatibility
+    // TODO: Implement archetype-based entity creation
+    const id = createEntityId();
+    const entity = new EntityImpl(id, this._tick);
+    this._entities.set(id, entity);
+    return entity;
   }
 
   destroyEntity(id: EntityId, reason: string): void {
@@ -322,5 +353,84 @@ export class WorldImpl implements WorldMutator {
   // For testing/debugging
   _addEntity(entity: Entity): void {
     this._entities.set(entity.id, entity);
+  }
+
+  /**
+   * Initiate construction of a building.
+   * Creates a construction site entity with progress=0.
+   * Per CLAUDE.md: No silent fallbacks - throws on validation failure.
+   */
+  initiateConstruction(
+    position: { x: number; y: number },
+    buildingType: string,
+    inventory: Record<string, number>
+  ): Entity {
+    // Validate inputs
+    if (!buildingType || buildingType.trim() === '') {
+      throw new Error('Building type is required');
+    }
+    if (!Number.isFinite(position.x) || !Number.isFinite(position.y)) {
+      throw new Error('Position must have valid x and y coordinates');
+    }
+    if (!inventory) {
+      throw new Error('Inventory is required');
+    }
+
+    // Get blueprint
+    const registry = new BuildingBlueprintRegistry();
+    registry.registerDefaults();
+    const blueprint = registry.get(buildingType);
+
+    // Validate placement
+    const validator = new PlacementValidator();
+    const validation = validator.validate(position, blueprint, this, inventory, 0);
+
+    if (!validation.valid) {
+      const errorMessages = validation.errors.map(e => e.message).join('; ');
+      throw new Error(`Construction validation failed: ${errorMessages}`);
+    }
+
+    // Deduct resources from inventory (mutate the passed-in object)
+    const consumedResources: Array<{ resourceId: string; amount: number }> = [];
+    for (const cost of blueprint.resourceCost) {
+      const available = inventory[cost.resourceId];
+      if (available === undefined || available < cost.amountRequired) {
+        throw new Error(
+          `Not enough ${cost.resourceId}. Need ${cost.amountRequired}, have ${available ?? 0}.`
+        );
+      }
+      inventory[cost.resourceId] = available - cost.amountRequired;
+      consumedResources.push({ resourceId: cost.resourceId, amount: cost.amountRequired });
+    }
+
+    // Log resource consumption for visibility
+    if (consumedResources.length > 0) {
+      const resourceList = consumedResources.map(r => `${r.amount} ${r.resourceId}`).join(', ');
+      console.log(`[World.initiateConstruction] Consumed resources for ${buildingType}: ${resourceList}`);
+    }
+
+    // Create construction site entity
+    const entity = this.createEntity();
+
+    // Add building component with progress=0 (under construction)
+    const buildingComponent = createBuildingComponent(buildingType as any, 1, 0);
+    (entity as EntityImpl).addComponent(buildingComponent);
+
+    // Add position component using the helper function
+    const positionComponent = createPositionComponent(position.x, position.y);
+    (entity as EntityImpl).addComponent(positionComponent);
+
+    // Emit construction started event
+    this._eventBus.emit({
+      type: 'construction:started',
+      source: 'world',
+      data: {
+        entityId: entity.id,
+        buildingType,
+        position,
+      },
+    });
+
+    return entity;
   }
 }

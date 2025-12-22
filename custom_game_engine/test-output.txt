@@ -1,0 +1,847 @@
+
+> @ai-village/game-engine@0.1.0 test
+> vitest run
+
+
+ RUN  v1.6.1 /Users/annhoward/src/ai_village/custom_game_engine
+
+ ✓ packages/core/src/components/__tests__/InventoryComponent.test.ts  (16 tests) 4ms
+ ✓ packages/world/src/terrain/__tests__/PerlinNoise.test.ts  (10 tests) 7ms
+ ✓ packages/core/src/buildings/__tests__/PlacementValidator.test.ts  (22 tests) 9ms
+ ✓ packages/llm/src/__tests__/StructuredPromptBuilder.test.ts  (12 tests) 5ms
+ ✓ packages/core/src/buildings/__tests__/BuildingBlueprintRegistry.test.ts  (16 tests) 8ms
+ ✓ packages/core/src/components/__tests__/BuildingComponent.test.ts  (35 tests) 6ms
+ ✓ packages/world/src/chunks/__tests__/Chunk.test.ts  (16 tests) 7ms
+ ✓ packages/core/src/buildings/__tests__/BuildingPlacement.integration.test.ts  (14 tests) 11ms
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Tool Definition > should define all 12 action tools
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: 'wander',
+  thinking: 'test...',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Tool Definition > should define tools with no parameters
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: '(no action)',
+  thinking: '(no thoughts)',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+[OllamaProvider] No tool call, using text fallback
+
+stderr | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Tool Definition > should define tools with no parameters
+[OllamaProvider] Empty response from Ollama: { message: { content: '', tool_calls: [] } }
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Response Parsing > should parse structured response with tool call
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: 'explore',
+  thinking: 'I should explore...',
+  speaking: 'Let me look around!',
+  tokensUsed: 150
+}
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Response Parsing > should handle empty thinking field
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: 'rest',
+  thinking: '(no thoughts)',
+  speaking: 'Time to rest',
+  tokensUsed: undefined
+}
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Response Parsing > should handle empty speaking (silent action)
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: 'wander',
+  thinking: 'Just going to wander...',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Response Parsing > should fall back to text when no tool call
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: '(no action)',
+  thinking: '(no thoughts)',
+  speaking: 'I will explore the area',
+  tokensUsed: undefined
+}
+[OllamaProvider] No tool call, using text fallback
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > API Configuration > should use /api/chat endpoint
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: '(no action)',
+  thinking: '(no thoughts)',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+[OllamaProvider] No tool call, using text fallback
+
+stderr | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > API Configuration > should use /api/chat endpoint
+[OllamaProvider] Empty response from Ollama: { message: { content: '', tool_calls: [] } }
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > API Configuration > should send correct request format
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: '(no action)',
+  thinking: '(no thoughts)',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+[OllamaProvider] No tool call, using text fallback
+
+stderr | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > API Configuration > should send correct request format
+[OllamaProvider] Empty response from Ollama: { message: { content: '', tool_calls: [] } }
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > API Configuration > should use default values when not specified
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: '(no action)',
+  thinking: '(no thoughts)',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+[OllamaProvider] No tool call, using text fallback
+
+stderr | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > API Configuration > should use default values when not specified
+[OllamaProvider] Empty response from Ollama: { message: { content: '', tool_calls: [] } }
+
+stderr | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Error Handling > should throw on HTTP error
+[OllamaProvider] Ollama generate error: Error: Ollama API error: 500 Internal Server Error
+    at OllamaProvider.generate (/Users/annhoward/src/ai_village/custom_game_engine/packages/llm/src/OllamaProvider.ts:135:15)
+    at /Users/annhoward/src/ai_village/custom_game_engine/packages/llm/src/__tests__/OllamaProvider.test.ts:255:7
+    at runTest (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:781:11)
+    at runSuite (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runFiles (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:958:5)
+    at startTests (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:967:3)
+    at file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:116:7
+    at withEnv (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:83:5)
+[OllamaProvider] Error details: {
+  message: 'Ollama API error: 500 Internal Server Error',
+  model: 'qwen3:4b',
+  url: 'http://localhost:11434/api/generate'
+}
+
+stderr | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Error Handling > should throw on network error
+[OllamaProvider] Ollama generate error: Error: Network error
+    at /Users/annhoward/src/ai_village/custom_game_engine/packages/llm/src/__tests__/OllamaProvider.test.ts:260:51
+    at file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:135:14
+    at file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:60:26
+    at runTest (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:781:17)
+    at runSuite (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runFiles (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:958:5)
+    at startTests (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:967:3)
+    at file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:116:7
+[OllamaProvider] Error details: {
+  message: 'Network error',
+  model: 'qwen3:4b',
+  url: 'http://localhost:11434/api/generate'
+}
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Error Handling > should log empty responses
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: '(no action)',
+  thinking: '(no thoughts)',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+[OllamaProvider] No tool call, using text fallback
+
+ ✓ packages/llm/src/__tests__/OllamaProvider.test.ts  (15 tests) 17ms
+ ✓ packages/core/src/buildings/__tests__/BuildingDefinitions.test.ts  (42 tests) 18ms
+ ✓ packages/renderer/src/__tests__/GhostPreview.test.ts  (19 tests) 9ms
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseResponse - Structured JSON > should parse valid structured response
+[ResponseParser] Structured response: {
+  action: 'explore',
+  thinking: 'I should explore to find food',
+  speaking: 'Time to look around!'
+}
+
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseResponse - Structured JSON > should handle response with no speaking
+[ResponseParser] Structured response: {
+  action: 'wander',
+  thinking: 'Just going to wander',
+  speaking: '(silent)'
+}
+
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseResponse - Structured JSON > should parse all 12 valid actions
+[ResponseParser] Structured response: { action: 'wander', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'idle', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'seek_food', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'follow_agent', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'talk', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'gather', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'explore', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'approach', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'observe', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'rest', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'work', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'help', thinking: 'test', speaking: '(silent)' }
+
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseResponse - Text Fallback > should parse plain text with action name
+[ResponseParser] Text-based match: explore
+
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseResponse - Text Fallback > should find action anywhere in text
+[ResponseParser] Text-based match: seek_food
+
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseBehavior - Legacy API > should extract just the action from structured response
+[ResponseParser] Structured response: { action: 'talk', thinking: 'test', speaking: 'hello' }
+
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseBehavior - Legacy API > should work with text response
+[ResponseParser] Text-based match: idle
+
+ ✓ packages/llm/src/__tests__/ResponseParser.test.ts  (12 tests) 9ms
+ ✓ packages/core/src/ecs/__tests__/ComponentRegistry.test.ts  (9 tests) 4ms
+ ↓ packages/renderer/src/__tests__/BuildingPlacementUI.test.ts  (1 test | 1 skipped)
+ ✓ packages/core/src/events/__tests__/EventBus.test.ts  (10 tests) 6ms
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Progress Advancement > should clamp progress to 100% maximum
+[BuildingSystem] Construction complete! tent at (0, 0)
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Completion > should mark building as complete when progress reaches 100%
+[BuildingSystem] Construction complete! tent at (0, 0)
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Completion > should emit "building:complete" event on completion
+[BuildingSystem] Construction complete! tent at (16, 32)
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Completion > should emit event with correct entity ID and building type
+[BuildingSystem] Construction complete! campfire at (0, 0)
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Completion > should only emit event once when crossing 100% threshold
+[BuildingSystem] Construction complete! tent at (0, 0)
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Edge Cases > should handle progress from 99% to 101% (clamped to 100%)
+[BuildingSystem] Construction complete! tent at (0, 0)
+
+ ✓ packages/core/src/systems/__tests__/ConstructionProgress.test.ts  (27 tests) 11ms
+ ✓ packages/core/src/systems/__tests__/ResourceGathering.test.ts  (37 tests) 19ms
+ ✓ packages/core/src/systems/__tests__/Phase8-WeatherTemperature.test.ts  (19 tests) 27ms
+stdout | packages/core/src/systems/__tests__/Phase8-WeatherTemperature.test.ts > Phase 8: Weather & Temperature Systems > TemperatureSystem > should apply health damage when in dangerous temperature
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 100.0 → 100.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 100.0 → 100.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 100.0 → 100.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 100.0 → 100.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 100.0 → 100.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 100.0 → 100.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 100.0 → 99.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.9 → 99.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.9 → 99.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.9 → 99.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.9 → 99.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.9 → 99.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.9 → 99.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.9 → 99.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.9 → 99.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.9 → 99.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.9 → 99.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.9 → 99.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.9 → 99.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.8 → 99.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.8 → 99.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.8 → 99.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.8 → 99.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.8 → 99.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.8 → 99.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.8 → 99.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.8 → 99.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.8 → 99.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.8 → 99.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.8 → 99.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.8 → 99.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.8 → 99.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.7 → 99.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.7 → 99.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.7 → 99.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.7 → 99.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.7 → 99.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.7 → 99.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.7 → 99.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.7 → 99.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.7 → 99.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.7 → 99.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.7 → 99.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.7 → 99.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.6 → 99.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.6 → 99.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.6 → 99.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.6 → 99.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.6 → 99.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.6 → 99.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.6 → 99.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.6 → 99.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.6 → 99.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.6 → 99.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.6 → 99.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.6 → 99.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.6 → 99.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.5 → 99.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.5 → 99.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.5 → 99.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.5 → 99.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.5 → 99.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.5 → 99.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.5 → 99.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.5 → 99.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.5 → 99.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.5 → 99.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.5 → 99.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.5 → 99.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.4 → 99.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.4 → 99.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.4 → 99.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.4 → 99.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.4 → 99.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.4 → 99.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.4 → 99.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.4 → 99.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.4 → 99.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.4 → 99.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.4 → 99.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.4 → 99.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.4 → 99.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.3 → 99.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.3 → 99.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.3 → 99.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.3 → 99.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.3 → 99.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.3 → 99.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.3 → 99.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.3 → 99.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.3 → 99.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.3 → 99.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.3 → 99.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.3 → 99.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.2 → 99.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.2 → 99.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.2 → 99.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.2 → 99.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.2 → 99.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.2 → 99.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.2 → 99.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.2 → 99.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.2 → 99.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.2 → 99.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.2 → 99.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.2 → 99.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.2 → 99.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.1 → 99.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.1 → 99.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.1 → 99.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.1 → 99.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.1 → 99.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.1 → 99.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.1 → 99.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.1 → 99.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.1 → 99.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.1 → 99.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.1 → 99.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.1 → 99.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.0 → 99.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.0 → 99.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.0 → 99.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.0 → 99.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.0 → 99.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.0 → 99.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.0 → 99.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.0 → 99.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.0 → 99.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.0 → 99.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.0 → 99.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.0 → 99.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 99.0 → 98.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.9 → 98.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.9 → 98.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.9 → 98.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.9 → 98.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.9 → 98.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.9 → 98.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.9 → 98.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.9 → 98.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.9 → 98.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.9 → 98.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.9 → 98.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.9 → 98.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.8 → 98.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.8 → 98.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.8 → 98.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.8 → 98.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.8 → 98.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.8 → 98.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.8 → 98.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.8 → 98.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.8 → 98.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.8 → 98.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.8 → 98.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.8 → 98.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.8 → 98.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.7 → 98.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.7 → 98.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.7 → 98.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.7 → 98.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.7 → 98.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.7 → 98.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.7 → 98.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.7 → 98.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.7 → 98.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.7 → 98.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.7 → 98.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.7 → 98.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.6 → 98.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.6 → 98.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.6 → 98.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.6 → 98.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.6 → 98.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.6 → 98.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.6 → 98.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.6 → 98.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.6 → 98.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.6 → 98.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.6 → 98.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.6 → 98.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.6 → 98.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.5 → 98.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.5 → 98.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.5 → 98.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.5 → 98.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.5 → 98.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.5 → 98.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.5 → 98.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.5 → 98.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.5 → 98.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.5 → 98.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.5 → 98.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.5 → 98.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.4 → 98.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.4 → 98.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.4 → 98.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.4 → 98.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.4 → 98.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.4 → 98.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.4 → 98.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.4 → 98.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.4 → 98.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.4 → 98.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.4 → 98.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.4 → 98.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.4 → 98.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.3 → 98.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.3 → 98.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.3 → 98.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.3 → 98.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.3 → 98.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.3 → 98.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.3 → 98.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.3 → 98.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.3 → 98.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.3 → 98.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.3 → 98.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.3 → 98.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.2 → 98.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.2 → 98.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.2 → 98.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.2 → 98.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.2 → 98.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.2 → 98.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.2 → 98.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.2 → 98.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.2 → 98.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.2 → 98.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.2 → 98.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.2 → 98.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.2 → 98.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.1 → 98.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.1 → 98.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.1 → 98.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.1 → 98.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.1 → 98.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.1 → 98.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.1 → 98.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.1 → 98.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.1 → 98.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.1 → 98.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.1 → 98.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.1 → 98.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.0 → 98.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.0 → 98.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.0 → 98.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.0 → 98.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.0 → 98.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.0 → 98.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.0 → 98.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.0 → 98.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.0 → 98.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.0 → 98.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.0 → 98.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.0 → 98.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 98.0 → 97.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.9 → 97.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.9 → 97.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.9 → 97.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.9 → 97.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.9 → 97.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.9 → 97.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.9 → 97.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.9 → 97.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.9 → 97.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.9 → 97.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.9 → 97.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.9 → 97.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.8 → 97.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.8 → 97.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.8 → 97.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.8 → 97.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.8 → 97.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.8 → 97.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.8 → 97.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.8 → 97.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.8 → 97.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.8 → 97.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.8 → 97.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.8 → 97.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.8 → 97.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.7 → 97.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.7 → 97.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.7 → 97.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.7 → 97.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.7 → 97.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.7 → 97.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.7 → 97.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.7 → 97.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.7 → 97.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.7 → 97.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.7 → 97.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.7 → 97.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.6 → 97.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.6 → 97.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.6 → 97.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.6 → 97.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.6 → 97.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.6 → 97.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.6 → 97.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.6 → 97.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.6 → 97.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.6 → 97.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.6 → 97.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.6 → 97.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.6 → 97.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.5 → 97.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.5 → 97.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.5 → 97.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.5 → 97.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.5 → 97.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.5 → 97.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.5 → 97.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.5 → 97.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.5 → 97.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.5 → 97.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.5 → 97.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.5 → 97.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.4 → 97.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.4 → 97.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.4 → 97.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.4 → 97.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.4 → 97.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.4 → 97.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.4 → 97.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.4 → 97.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.4 → 97.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.4 → 97.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.4 → 97.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.4 → 97.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.4 → 97.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.3 → 97.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.3 → 97.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.3 → 97.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.3 → 97.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.3 → 97.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.3 → 97.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.3 → 97.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.3 → 97.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.3 → 97.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.3 → 97.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.3 → 97.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.3 → 97.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.2 → 97.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.2 → 97.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.2 → 97.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.2 → 97.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.2 → 97.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.2 → 97.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.2 → 97.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.2 → 97.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.2 → 97.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.2 → 97.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.2 → 97.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.2 → 97.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.2 → 97.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.1 → 97.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.1 → 97.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.1 → 97.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.1 → 97.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.1 → 97.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.1 → 97.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.1 → 97.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.1 → 97.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.1 → 97.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.1 → 97.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.1 → 97.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.1 → 97.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.0 → 97.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.0 → 97.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.0 → 97.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.0 → 97.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.0 → 97.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.0 → 97.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.0 → 97.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.0 → 97.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.0 → 97.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.0 → 97.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.0 → 97.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.0 → 97.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 97.0 → 96.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.9 → 96.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.9 → 96.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.9 → 96.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.9 → 96.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.9 → 96.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.9 → 96.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.9 → 96.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.9 → 96.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.9 → 96.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.9 → 96.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.9 → 96.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.9 → 96.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.8 → 96.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.8 → 96.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.8 → 96.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.8 → 96.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.8 → 96.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.8 → 96.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.8 → 96.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.8 → 96.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.8 → 96.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.8 → 96.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.8 → 96.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.8 → 96.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.8 → 96.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.7 → 96.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.7 → 96.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.7 → 96.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.7 → 96.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.7 → 96.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.7 → 96.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.7 → 96.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.7 → 96.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.7 → 96.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.7 → 96.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.7 → 96.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.7 → 96.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.6 → 96.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.6 → 96.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.6 → 96.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.6 → 96.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.6 → 96.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.6 → 96.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.6 → 96.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.6 → 96.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.6 → 96.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.6 → 96.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.6 → 96.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.6 → 96.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.6 → 96.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.5 → 96.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.5 → 96.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.5 → 96.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.5 → 96.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.5 → 96.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.5 → 96.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.5 → 96.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.5 → 96.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.5 → 96.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.5 → 96.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.5 → 96.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.5 → 96.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.4 → 96.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.4 → 96.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.4 → 96.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.4 → 96.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.4 → 96.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.4 → 96.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.4 → 96.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.4 → 96.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.4 → 96.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.4 → 96.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.4 → 96.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.4 → 96.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.4 → 96.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.3 → 96.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.3 → 96.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.3 → 96.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.3 → 96.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.3 → 96.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.3 → 96.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.3 → 96.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.3 → 96.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.3 → 96.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.3 → 96.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.3 → 96.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.3 → 96.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.2 → 96.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.2 → 96.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.2 → 96.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.2 → 96.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.2 → 96.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.2 → 96.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.2 → 96.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.2 → 96.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.2 → 96.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.2 → 96.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.2 → 96.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.2 → 96.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.2 → 96.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.1 → 96.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.1 → 96.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.1 → 96.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.1 → 96.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.1 → 96.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.1 → 96.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.1 → 96.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.1 → 96.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.1 → 96.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.1 → 96.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.1 → 96.1
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.1 → 96.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.0 → 96.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.0 → 96.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.0 → 96.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.0 → 96.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.0 → 96.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.0 → 96.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.0 → 96.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.0 → 96.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.0 → 96.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.0 → 96.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.0 → 96.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.0 → 96.0
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 96.0 → 95.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.9 → 95.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.9 → 95.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.9 → 95.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.9 → 95.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.9 → 95.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.9 → 95.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.9 → 95.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.9 → 95.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.9 → 95.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.9 → 95.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.9 → 95.9
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.9 → 95.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.8 → 95.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.8 → 95.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.8 → 95.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.8 → 95.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.8 → 95.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.8 → 95.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.8 → 95.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.8 → 95.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.8 → 95.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.8 → 95.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.8 → 95.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.8 → 95.8
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.8 → 95.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.7 → 95.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.7 → 95.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.7 → 95.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.7 → 95.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.7 → 95.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.7 → 95.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.7 → 95.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.7 → 95.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.7 → 95.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.7 → 95.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.7 → 95.7
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.7 → 95.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.6 → 95.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.6 → 95.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.6 → 95.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.6 → 95.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.6 → 95.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.6 → 95.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.6 → 95.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.6 → 95.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.6 → 95.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.6 → 95.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.6 → 95.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.6 → 95.6
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.6 → 95.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.5 → 95.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.5 → 95.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.5 → 95.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.5 → 95.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.5 → 95.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.5 → 95.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.5 → 95.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.5 → 95.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.5 → 95.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.5 → 95.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.5 → 95.5
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.5 → 95.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.4 → 95.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.4 → 95.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.4 → 95.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.4 → 95.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.4 → 95.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.4 → 95.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.4 → 95.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.4 → 95.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.4 → 95.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.4 → 95.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.4 → 95.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.4 → 95.4
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.4 → 95.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.3 → 95.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.3 → 95.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.3 → 95.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.3 → 95.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.3 → 95.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.3 → 95.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.3 → 95.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.3 → 95.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.3 → 95.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.3 → 95.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.3 → 95.3
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.3 → 95.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.2 → 95.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.2 → 95.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.2 → 95.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.2 → 95.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.2 → 95.2
+[TemperatureSystem] e8e526fd-8af1-4e27-8c2a-1cacf28068aa: Taking 0.01 damage from dangerously_cold (-16.5°C). Health: 95.2 → 95.2
+
+stdout | packages/core/src/systems/__tests__/Phase8-WeatherTemperature.test.ts > Phase 8: Weather & Temperature Systems > TemperatureSystem > should apply heat bonus from campfire
+[TemperatureSystem] 52b9a638-0dd5-4c5e-858a-af30c561ff69: Near heat source - bonus +3.3°C. Temp: 13.5°C → 16.8°C
+
+stdout | packages/core/src/systems/__tests__/Phase8-WeatherTemperature.test.ts > Phase 8: Weather & Temperature Systems > TemperatureSystem > should apply building insulation effect
+[TemperatureSystem] 6938b32e-040d-4457-a06a-d8eb2dd0e64b: Inside building - insulation 50%, baseTemp +8°C. Temp: 13.5°C → 14.8°C
+
+stdout | packages/core/src/systems/__tests__/Phase8-WeatherTemperature.test.ts > Phase 8: Weather & Temperature Systems > WeatherSystem > should update weather duration over time
+[WeatherSystem] Weather changed: clear → rain (intensity: 44%). Temp modifier: -1.3°C, Movement modifier: 91%
+
+ ✓ packages/world/src/chunks/__tests__/ChunkManager.test.ts  (9 tests) 21ms
+ ✓ packages/core/src/ecs/__tests__/Entity.test.ts  (10 tests) 5ms
+ ✓ packages/core/src/systems/__tests__/HearingSystem.test.ts  (5 tests) 10ms
+
+ Test Files  20 passed | 1 skipped (21)
+      Tests  355 passed | 1 skipped (356)
+   Start at  00:15:36
+   Duration  870ms (transform 2.22s, setup 0ms, collect 4.22s, tests 213ms, environment 3ms, prepare 2.22s)
+

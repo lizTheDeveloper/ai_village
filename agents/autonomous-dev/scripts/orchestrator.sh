@@ -8,7 +8,7 @@
 # 3. Implementation Agent - Builds feature
 # 4. Test Agent - Verifies tests pass
 # 5. Playtest Agent - UI testing
-# 6. Loop until approved or max retries
+# 6. Loop until approved
 #
 # Usage:
 #   ./orchestrator.sh                    # Process next available feature
@@ -32,8 +32,7 @@ WORK_ORDER_DIR="$AGENT_DIR/work-orders"
 PROMPT_DIR="$AGENT_DIR/prompts"
 
 # Limits
-MAX_IMPL_RETRIES=${MAX_IMPL_RETRIES:-3}
-# No playtest retry limit - keep iterating until APPROVED (like Sonnet, it gets there eventually)
+# No retry limits - keep iterating until tests pass / feature approved (it gets there eventually)
 
 # NATS Config
 source "$PROJECT_ROOT/.nats_config" 2>/dev/null || true
@@ -60,22 +59,34 @@ header() { echo -e "\n${CYAN}═════════════════
 register_pid() {
     local feature_name="$1"
     local pipelines_file="$AGENT_DIR/dashboard/.pipelines.json"
+    local lock_file="$pipelines_file.lock"
     local pid=$$
     local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
 
     # Create dashboard directory if it doesn't exist
     mkdir -p "$(dirname "$pipelines_file")"
 
+    # Use lockfile to prevent race conditions between multiple orchestrators
+    local max_attempts=10
+    local attempt=0
+    while [ -f "$lock_file" ] && [ $attempt -lt $max_attempts ]; do
+        sleep 0.2
+        ((attempt++))
+    done
+
+    # Create lock
+    echo $pid > "$lock_file"
+
     # Read existing pipelines or create empty array
     local existing="[]"
     if [ -f "$pipelines_file" ]; then
-        existing=$(cat "$pipelines_file")
+        existing=$(cat "$pipelines_file" 2>/dev/null || echo "[]")
     fi
 
-    # Create new pipeline entry
+    # Create new pipeline entry with unique ID using PID
     local new_entry=$(cat <<EOF
 {
-  "id": "pipeline-$(date +%s)000",
+  "id": "pipeline-${feature_name}-${pid}",
   "featureName": "$feature_name",
   "pid": $pid,
   "startTime": "$timestamp",
@@ -85,16 +96,29 @@ register_pid() {
 EOF
 )
 
-    # Append to array (simple approach - just add to existing array)
-    if [ "$existing" = "[]" ]; then
-        echo "[$new_entry]" > "$pipelines_file"
+    # Append to array using jq if available, otherwise use simple approach
+    if command -v jq &> /dev/null; then
+        local result
+        result=$(echo "$existing" | jq --argjson entry "$new_entry" '. + [$entry]' 2>/dev/null)
+        if [ $? -eq 0 ] && [ -n "$result" ]; then
+            echo "$result" > "$pipelines_file"
+        else
+            # Fallback if jq fails - just write the new entry as a single-item array
+            echo "[$new_entry]" > "$pipelines_file"
+        fi
     else
-        # Remove trailing ] and add new entry
-        echo "$existing" | sed '$ s/]//' | sed "$ s/$/,/" > "$pipelines_file.tmp"
-        echo "$new_entry" >> "$pipelines_file.tmp"
-        echo "]" >> "$pipelines_file.tmp"
-        mv "$pipelines_file.tmp" "$pipelines_file"
+        # Fallback without jq - just write directly
+        if [ "$existing" = "[]" ] || [ -z "$existing" ]; then
+            echo "[$new_entry]" > "$pipelines_file"
+        else
+            # Simple append: remove trailing ], add comma, add new entry, close array
+            local without_bracket="${existing%]}"
+            echo "${without_bracket},${new_entry}]" > "$pipelines_file"
+        fi
     fi
+
+    # Release lock
+    rm -f "$lock_file"
 
     log "Registered PID $pid for feature: $feature_name"
 }
@@ -141,10 +165,10 @@ run_agent() {
 $extra_context"
     fi
 
-    # Run Claude Code
+    # Run Claude Code (streams output in real-time)
     cd "$PROJECT_ROOT"
 
-    if claude --dangerously-skip-permissions --print -p "$prompt" 2>&1 | tee "$log_file"; then
+    if claude --dangerously-skip-permissions --model sonnet --mcp-config "$PROJECT_ROOT/.mcp.json" -p "$prompt" < /dev/null 2>&1 | tee "$log_file"; then
         success "${agent_name} completed successfully"
         return 0
     else
@@ -411,14 +435,9 @@ run_pipeline() {
 
         # Phase 3: Implementation
         if [[ "$state" == "IMPL" ]]; then
-            ((impl_retries++))
-            if [[ $impl_retries -gt $MAX_IMPL_RETRIES ]]; then
-                set_feature_state "BLOCKED"
-                error "Max implementation retries ($MAX_IMPL_RETRIES) exceeded"
-                return 1
-            fi
+            ((impl_retries++)) || true
 
-            log "Implementation attempt $impl_retries/$MAX_IMPL_RETRIES"
+            log "Implementation attempt $impl_retries"
 
             if ! run_impl_agent; then
                 warn "Implementation failed, will retry..."
@@ -484,7 +503,7 @@ run_pipeline() {
         # Phase 5: Playtest
         state=$(get_feature_state)
         if [[ "$state" == "PLAYTEST" ]]; then
-            ((playtest_retries++))
+            ((playtest_retries++)) || true
             # No retry limit - keep iterating until APPROVED
             log "Playtest attempt $playtest_retries"
 

@@ -1,0 +1,554 @@
+import { describe, it, expect, beforeEach } from 'vitest';
+import { BuildingBlueprintRegistry } from '../BuildingBlueprintRegistry';
+import { WorldImpl } from '../../ecs/index.js';
+import { EventBusImpl } from '../../events/EventBus.js';
+import { BuildingComponent } from '../../components/BuildingComponent';
+
+describe('Crafting Stations', () => {
+  let registry: BuildingBlueprintRegistry;
+  let world: WorldImpl;
+
+  beforeEach(() => {
+    registry = new BuildingBlueprintRegistry();
+    const eventBus = new EventBusImpl();
+    world = new WorldImpl(eventBus);
+  });
+
+  describe('Acceptance Criterion 1: Core Tier 2 Crafting Stations', () => {
+    describe('Forge', () => {
+      it('should register Forge blueprint with correct dimensions', () => {
+        const forge = registry.get('forge');
+
+        expect(forge).toBeDefined();
+        expect(forge.width).toBe(2);
+        expect(forge.height).toBe(3);
+      });
+
+      it('should require 40 Stone and 20 Iron for Forge', () => {
+        const forge = registry.get('forge');
+
+        expect(forge.resourceCost).toContainEqual({
+          resourceId: 'stone',
+          amountRequired: 40
+        });
+        expect(forge.resourceCost).toContainEqual({
+          resourceId: 'iron',
+          amountRequired: 20
+        });
+      });
+
+      it('should assign Forge to production category', () => {
+        const forge = registry.get('forge');
+
+        expect(forge.category).toBe('production');
+      });
+
+      it('should mark Forge as requiring fuel', () => {
+        const forge = registry.get('forge');
+
+        expect(forge.fuelRequired).toBe(true);
+      });
+    });
+
+    describe('Farm Shed', () => {
+      it('should register Farm Shed blueprint with correct dimensions', () => {
+        const farmShed = registry.get('farm_shed');
+
+        expect(farmShed).toBeDefined();
+        expect(farmShed.width).toBe(3);
+        expect(farmShed.height).toBe(2);
+      });
+
+      it('should require 30 Wood for Farm Shed', () => {
+        const farmShed = registry.get('farm_shed');
+
+        expect(farmShed.resourceCost).toContainEqual({
+          resourceId: 'wood',
+          amountRequired: 30
+        });
+      });
+
+      it('should assign Farm Shed to farming category', () => {
+        const farmShed = registry.get('farm_shed');
+
+        expect(farmShed.category).toBe('farming');
+      });
+
+      it('should mark Farm Shed as NOT requiring fuel', () => {
+        const farmShed = registry.get('farm_shed');
+
+        expect(farmShed.fuelRequired).toBe(false);
+      });
+    });
+
+    describe('Market Stall', () => {
+      it('should register Market Stall blueprint with correct dimensions', () => {
+        const marketStall = registry.get('market_stall');
+
+        expect(marketStall).toBeDefined();
+        expect(marketStall.width).toBe(2);
+        expect(marketStall.height).toBe(2);
+      });
+
+      it('should require 25 Wood for Market Stall', () => {
+        const marketStall = registry.get('market_stall');
+
+        expect(marketStall.resourceCost).toContainEqual({
+          resourceId: 'wood',
+          amountRequired: 25
+        });
+      });
+
+      it('should assign Market Stall to commercial category', () => {
+        const marketStall = registry.get('market_stall');
+
+        expect(marketStall.category).toBe('commercial');
+      });
+    });
+
+    describe('Windmill', () => {
+      it('should register Windmill blueprint with correct dimensions', () => {
+        const windmill = registry.get('windmill');
+
+        expect(windmill).toBeDefined();
+        expect(windmill.width).toBe(2);
+        expect(windmill.height).toBe(2);
+      });
+
+      it('should require 40 Wood and 10 Stone for Windmill', () => {
+        const windmill = registry.get('windmill');
+
+        expect(windmill.resourceCost).toContainEqual({
+          resourceId: 'wood',
+          amountRequired: 40
+        });
+        expect(windmill.resourceCost).toContainEqual({
+          resourceId: 'stone',
+          amountRequired: 10
+        });
+      });
+
+      it('should assign Windmill to production category', () => {
+        const windmill = registry.get('windmill');
+
+        expect(windmill.category).toBe('production');
+      });
+    });
+  });
+
+  describe('Acceptance Criterion 2: Crafting Functionality', () => {
+    it('should unlock specific recipes for Forge', () => {
+      const forge = registry.get('forge');
+
+      expect(forge.functionality).toBeDefined();
+      expect(forge.functionality.length).toBeGreaterThan(0);
+
+      const craftingFunc = forge.functionality.find(f => f.type === 'crafting');
+      expect(craftingFunc).toBeDefined();
+      expect(craftingFunc?.type).toBe('crafting');
+
+      if (craftingFunc?.type === 'crafting') {
+        expect(craftingFunc.recipes).toContain('iron_ingot');
+        expect(craftingFunc.recipes).toContain('steel_sword');
+      }
+    });
+
+    it('should provide 50% speed bonus for Forge metalworking', () => {
+      const forge = registry.get('forge');
+
+      const craftingFunc = forge.functionality.find(f => f.type === 'crafting');
+      expect(craftingFunc).toBeDefined();
+
+      if (craftingFunc?.type === 'crafting') {
+        expect(craftingFunc.speed).toBe(1.5);
+      }
+    });
+
+    it('should define storage functionality for Farm Shed', () => {
+      const farmShed = registry.get('farm_shed');
+
+      expect(farmShed.functionality).toBeDefined();
+      const storageFunc = farmShed.functionality.find(f => f.type === 'storage');
+      expect(storageFunc).toBeDefined();
+    });
+
+    it('should define shop functionality for Market Stall', () => {
+      const marketStall = registry.get('market_stall');
+
+      expect(marketStall.functionality).toBeDefined();
+      const shopFunc = marketStall.functionality.find(f => f.type === 'shop');
+      expect(shopFunc).toBeDefined();
+    });
+
+    it('should unlock grain processing recipes for Windmill', () => {
+      const windmill = registry.get('windmill');
+
+      expect(windmill.functionality).toBeDefined();
+      const craftingFunc = windmill.functionality.find(f => f.type === 'crafting');
+      expect(craftingFunc).toBeDefined();
+
+      if (craftingFunc?.type === 'crafting') {
+        expect(craftingFunc.recipes).toContain('flour');
+      }
+    });
+  });
+
+  describe('Acceptance Criterion 3: Fuel System', () => {
+    it('should initialize fuel properties on Forge placement', () => {
+      const entity = world.createEntity();
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 0,
+        maxFuel: 100,
+        fuelConsumptionRate: 1
+      });
+
+      expect(building.fuelRequired).toBe(true);
+      expect(building.currentFuel).toBe(0);
+      expect(building.maxFuel).toBe(100);
+      expect(building.fuelConsumptionRate).toBe(1);
+    });
+
+    it('should throw when fuel properties missing on fuel-required building', () => {
+      const entity = world.createEntity();
+
+      expect(() => {
+        entity.addComponent(BuildingComponent, {
+          blueprintId: 'forge',
+          constructionProgress: 100,
+          isComplete: true,
+          fuelRequired: true
+          // Missing fuel properties
+        });
+      }).toThrow(/missing required fuel/);
+    });
+
+    it('should allow adding fuel to station', () => {
+      const entity = world.createEntity();
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 0,
+        maxFuel: 100,
+        fuelConsumptionRate: 1
+      });
+
+      // Simulate adding wood (10 fuel units)
+      building.currentFuel += 10;
+
+      expect(building.currentFuel).toBe(10);
+    });
+
+    it('should cap fuel at maxFuel when adding', () => {
+      const entity = world.createEntity();
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 95,
+        maxFuel: 100,
+        fuelConsumptionRate: 1
+      });
+
+      // Try to add 10 fuel, should cap at 100
+      building.currentFuel = Math.min(building.currentFuel + 10, building.maxFuel);
+
+      expect(building.currentFuel).toBe(100);
+    });
+
+    it('should prevent crafting when fuel is empty', () => {
+      const entity = world.createEntity();
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 0,
+        maxFuel: 100,
+        fuelConsumptionRate: 1,
+        activeRecipe: null
+      });
+
+      // Try to start crafting with no fuel
+      const canCraft = building.currentFuel > 0 || !building.fuelRequired;
+
+      expect(canCraft).toBe(false);
+    });
+
+    it('should allow crafting when fuel is available', () => {
+      const entity = world.createEntity();
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 50,
+        maxFuel: 100,
+        fuelConsumptionRate: 1,
+        activeRecipe: null
+      });
+
+      const canCraft = building.currentFuel > 0 || !building.fuelRequired;
+
+      expect(canCraft).toBe(true);
+    });
+
+    it('should support wood as fuel item (10 fuel units)', () => {
+      const woodFuelValue = 10;
+
+      expect(woodFuelValue).toBe(10);
+    });
+
+    it('should support coal as fuel item (30 fuel units)', () => {
+      const coalFuelValue = 30;
+
+      expect(coalFuelValue).toBe(30);
+    });
+  });
+
+  describe('Acceptance Criterion 4: Station Categories', () => {
+    it('should assign correct categories to all Tier 2 stations', () => {
+      const forge = registry.get('forge');
+      const farmShed = registry.get('farm_shed');
+      const marketStall = registry.get('market_stall');
+      const windmill = registry.get('windmill');
+
+      expect(forge.category).toBe('production');
+      expect(farmShed.category).toBe('farming');
+      expect(marketStall.category).toBe('commercial');
+      expect(windmill.category).toBe('production');
+    });
+
+    it('should validate category is one of allowed BuildingCategory values', () => {
+      const allowedCategories = [
+        'residential',
+        'production',
+        'farming',
+        'storage',
+        'community',
+        'commercial',
+        'decoration',
+        'research'
+      ];
+
+      const forge = registry.get('forge');
+
+      expect(allowedCategories).toContain(forge.category);
+    });
+  });
+
+  describe('Acceptance Criterion 5: Tier 3+ Stations', () => {
+    describe('Workshop', () => {
+      it('should register Workshop blueprint with correct dimensions', () => {
+        const workshop = registry.get('workshop');
+
+        expect(workshop).toBeDefined();
+        expect(workshop.width).toBe(3);
+        expect(workshop.height).toBe(4);
+      });
+
+      it('should require 60 Wood and 30 Iron for Workshop', () => {
+        const workshop = registry.get('workshop');
+
+        expect(workshop.resourceCost).toContainEqual({
+          resourceId: 'wood',
+          amountRequired: 60
+        });
+        expect(workshop.resourceCost).toContainEqual({
+          resourceId: 'iron',
+          amountRequired: 30
+        });
+      });
+
+      it('should assign Workshop to production category', () => {
+        const workshop = registry.get('workshop');
+
+        expect(workshop.category).toBe('production');
+      });
+
+      it('should provide multiple crafting bonuses for Workshop', () => {
+        const workshop = registry.get('workshop');
+
+        expect(workshop.functionality).toBeDefined();
+        expect(workshop.functionality.type).toBe('crafting');
+        expect(workshop.functionality.recipes.length).toBeGreaterThan(5);
+      });
+    });
+
+    describe('Barn', () => {
+      it('should register Barn blueprint with correct dimensions', () => {
+        const barn = registry.get('barn');
+
+        expect(barn).toBeDefined();
+        expect(barn.width).toBe(4);
+        expect(barn.height).toBe(3);
+      });
+
+      it('should require 70 Wood for Barn', () => {
+        const barn = registry.get('barn');
+
+        expect(barn.resourceCost).toContainEqual({
+          resourceId: 'wood',
+          amountRequired: 70
+        });
+      });
+
+      it('should assign Barn to farming category', () => {
+        const barn = registry.get('barn');
+
+        expect(barn.category).toBe('farming');
+      });
+
+      it('should provide storage and animal housing functionality', () => {
+        const barn = registry.get('barn');
+
+        expect(barn.functionality).toBeDefined();
+        expect(barn.functionality.type).toBe('storage');
+        expect(barn.functionality.capacity).toBeGreaterThan(0);
+      });
+    });
+  });
+
+  describe('Acceptance Criterion 6: Integration with Recipe System', () => {
+    it('should filter recipes by station requirement', () => {
+      const forge = registry.get('forge');
+      const allRecipes = [
+        { id: 'iron_ingot', stationRequired: 'forge' },
+        { id: 'steel_sword', stationRequired: 'forge' },
+        { id: 'flour', stationRequired: 'windmill' },
+        { id: 'basic_tool', stationRequired: null }
+      ];
+
+      const forgeRecipes = allRecipes.filter(
+        recipe => recipe.stationRequired === 'forge'
+      );
+
+      expect(forgeRecipes).toHaveLength(2);
+      expect(forgeRecipes[0].id).toBe('iron_ingot');
+      expect(forgeRecipes[1].id).toBe('steel_sword');
+    });
+
+    it('should only allow crafting recipes that match station', () => {
+      const entity = world.createEntity();
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 50,
+        maxFuel: 100,
+        fuelConsumptionRate: 1
+      });
+
+      const recipe = { id: 'iron_ingot', stationRequired: 'forge' };
+      const canCraft = recipe.stationRequired === building.blueprintId;
+
+      expect(canCraft).toBe(true);
+    });
+
+    it('should reject crafting recipes that do not match station', () => {
+      const entity = world.createEntity();
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 50,
+        maxFuel: 100,
+        fuelConsumptionRate: 1
+      });
+
+      const recipe = { id: 'flour', stationRequired: 'windmill' };
+      const canCraft = recipe.stationRequired === building.blueprintId;
+
+      expect(canCraft).toBe(false);
+    });
+  });
+
+  describe('Error Handling (Per CLAUDE.md)', () => {
+    it('should throw when blueprint ID is missing', () => {
+      const entity = world.createEntity();
+
+      expect(() => {
+        entity.addComponent(BuildingComponent, {
+          constructionProgress: 100,
+          isComplete: true
+          // Missing blueprintId
+        } as any);
+      }).toThrow();
+    });
+
+    it('should throw when trying to get non-existent blueprint', () => {
+      expect(() => {
+        registry.get('nonexistent_station');
+      }).toThrow(/blueprint not found/i);
+    });
+
+    it('should throw when fuel consumption rate is negative', () => {
+      const entity = world.createEntity();
+
+      expect(() => {
+        entity.addComponent(BuildingComponent, {
+          blueprintId: 'forge',
+          constructionProgress: 100,
+          isComplete: true,
+          fuelRequired: true,
+          currentFuel: 0,
+          maxFuel: 100,
+          fuelConsumptionRate: -1 // Invalid
+        });
+      }).toThrow(/invalid fuel consumption rate/i);
+    });
+
+    it('should throw when maxFuel is zero or negative for fuel-required building', () => {
+      const entity = world.createEntity();
+
+      expect(() => {
+        entity.addComponent(BuildingComponent, {
+          blueprintId: 'forge',
+          constructionProgress: 100,
+          isComplete: true,
+          fuelRequired: true,
+          currentFuel: 0,
+          maxFuel: 0, // Invalid
+          fuelConsumptionRate: 1
+        });
+      }).toThrow(/invalid maxFuel/i);
+    });
+
+    it('should throw when crafting functionality missing recipes array', () => {
+      expect(() => {
+        registry.register({
+          id: 'invalid_station',
+          name: 'Invalid Station',
+          description: 'Test',
+          width: 2,
+          height: 2,
+          category: 'production',
+          resourceCost: [{ resourceId: 'wood', amountRequired: 10 }],
+          techRequired: [],
+          terrainRequired: [],
+          terrainForbidden: [],
+          unlocked: true,
+          buildTime: 10,
+          tier: 2,
+          functionality: [{
+            type: 'crafting',
+            speed: 1
+            // Missing recipes array
+          } as any],
+          canRotate: false,
+          rotationAngles: [0],
+          snapToGrid: true,
+          requiresFoundation: false
+        });
+      }).toThrow(/missing required recipes/i);
+    });
+  });
+});

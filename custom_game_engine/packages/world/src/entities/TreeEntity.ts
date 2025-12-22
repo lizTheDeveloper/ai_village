@@ -27,8 +27,8 @@ export function createTree(world: WorldMutator, x: number, y: number): string {
   // Tags
   entity.addComponent(createTagsComponent('tree', 'obstacle', 'harvestable'));
 
-  // Resource - trees provide food (berries, fruit)
-  entity.addComponent(createResourceComponent('food', 100, 0.5)); // 100 food, regenerates 0.5/sec
+  // Resource - trees provide wood
+  entity.addComponent(createResourceComponent('wood', 100, 0.5)); // 100 wood, regenerates 0.5/sec
 
   // Add to world
   (world as any)._addEntity(entity);

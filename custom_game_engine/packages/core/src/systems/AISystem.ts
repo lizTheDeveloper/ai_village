@@ -17,6 +17,9 @@ import { startConversation, addMessage, isInConversation } from '../components/C
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
 import { updateRelationship, shareMemory } from '../components/RelationshipComponent.js';
 import { parseAction, actionToBehavior } from '../actions/AgentAction.js';
+import type { InventoryComponent } from '../components/InventoryComponent.js';
+import { addToInventory } from '../components/InventoryComponent.js';
+import { type BuildingType } from '../components/BuildingComponent.js';
 
 interface BehaviorHandler {
   (entity: EntityImpl, world: World): void;
@@ -41,6 +44,8 @@ export class AISystem implements System {
     this.registerBehavior('seek_food', this.seekFoodBehavior.bind(this));
     this.registerBehavior('follow_agent', this.followAgentBehavior.bind(this));
     this.registerBehavior('talk', this.talkBehavior.bind(this));
+    this.registerBehavior('gather', this.gatherBehavior.bind(this));
+    this.registerBehavior('build', this.buildBehavior.bind(this));
 
     this.llmDecisionQueue = llmDecisionQueue || null;
     this.promptBuilder = promptBuilder || null;
@@ -135,29 +140,64 @@ export class AISystem implements System {
             const action = parseAction(decision);
             if (action) {
               behavior = actionToBehavior(action);
+
+              // Build behaviorState based on action type
+              let behaviorState: Record<string, any> = {};
+
+              if (action.type === 'chop') {
+                behaviorState.resourceType = 'wood';
+              } else if (action.type === 'mine') {
+                behaviorState.resourceType = 'stone';
+              } else if (action.type === 'build' && 'buildingType' in action) {
+                behaviorState.buildingType = action.buildingType;
+              } else if (action.type === 'follow' && 'targetId' in action) {
+                behaviorState.targetId = action.targetId;
+              }
+
               console.log('[AISystem] Parsed legacy LLM decision:', {
                 entityId: entity.id,
                 rawResponse: decision,
                 parsedAction: action,
                 behavior,
+                behaviorState,
               });
+
+              // Store for later use
+              (impl as any).__pendingBehaviorState = behaviorState;
             }
           }
 
           if (behavior) {
+            // Log behavior changes for debugging
+            console.log(`[AISystem] Agent ${entity.id} changing behavior to: ${behavior}`, {
+              previousBehavior: agent.behavior,
+              speaking: speaking || '(silent)',
+              behaviorState: (impl as any).__pendingBehaviorState,
+            });
+
             impl.updateComponent<AgentComponent>('agent', (current) => ({
               ...current,
               behavior,
-              behaviorState: {},
+              behaviorState: (impl as any).__pendingBehaviorState || {},
               llmCooldown: 1200, // 1 minute cooldown at 20 TPS
               recentSpeech: speaking, // Store speech for nearby agents to hear
             }));
+
+            // Clear pending state
+            delete (impl as any).__pendingBehaviorState;
           }
         } else if (agent.llmCooldown === 0) {
           // Request new decision using structured prompt
           const prompt = this.promptBuilder.buildPrompt(entity, world);
           this.llmDecisionQueue.requestDecision(entity.id, prompt).catch((err: Error) => {
             console.error(`[AISystem] LLM decision failed for ${entity.id}:`, err);
+
+            // On LLM failure, temporarily fall back to scripted behavior
+            // Set cooldown to prevent spam and let scripted logic take over briefly
+            impl.updateComponent<AgentComponent>('agent', (current) => ({
+              ...current,
+              llmCooldown: 60, // 3 second cooldown before retry (at 20 TPS)
+            }));
           });
         }
 
@@ -166,12 +206,35 @@ export class AISystem implements System {
         if (handler) {
           handler(impl, world);
         }
+
+        // If LLM agent is stuck in wander/idle due to LLM failures, apply basic scripted logic
+        if (agent.llmCooldown > 0 && (agent.behavior === 'wander' || agent.behavior === 'idle')) {
+          const inventory = impl.getComponent<InventoryComponent>('inventory');
+
+          // Check if agent should gather resources
+          if (inventory && Math.random() < 0.2) {
+            const hasWood = inventory.slots.some(s => s.itemId === 'wood' && s.quantity >= 10);
+            const hasStone = inventory.slots.some(s => s.itemId === 'stone' && s.quantity >= 10);
+
+            if (!hasWood || !hasStone) {
+              const preferredType = !hasWood ? 'wood' : 'stone';
+              impl.updateComponent<AgentComponent>('agent', (current) => ({
+                ...current,
+                behavior: 'gather',
+                behaviorState: { resourceType: preferredType },
+              }));
+              console.log(`[AISystem] LLM agent ${entity.id} falling back to scripted gather behavior (${preferredType})`);
+            }
+          }
+        }
+
         continue;
       }
 
       // Decide behavior based on needs (scripted agents only)
       const needs = impl.getComponent<NeedsComponent>('needs');
       const currentBehavior = agent.behavior;
+      const inventory = impl.getComponent<InventoryComponent>('inventory');
 
       if (needs && isHungry(needs) && currentBehavior !== 'seek_food') {
         // Switch to seeking food when hungry
@@ -187,6 +250,33 @@ export class AISystem implements System {
           behavior: 'wander',
           behaviorState: {},
         }));
+      } else if (currentBehavior === 'wander' && inventory && Math.random() < 0.15) {
+        // 15% chance to gather resources when wandering (if inventory is light)
+        const hasWood = inventory.slots.some(s => s.itemId === 'wood' && s.quantity >= 10);
+        const hasStone = inventory.slots.some(s => s.itemId === 'stone' && s.quantity >= 10);
+
+        if (!hasWood || !hasStone) {
+          // Switch to gathering
+          const preferredType = !hasWood ? 'wood' : 'stone';
+          impl.updateComponent<AgentComponent>('agent', (current) => ({
+            ...current,
+            behavior: 'gather',
+            behaviorState: { resourceType: preferredType },
+          }));
+        }
+      } else if (currentBehavior === 'gather' && inventory && Math.random() < 0.05) {
+        // 5% chance to stop gathering if we have enough materials
+        const hasWood = inventory.slots.some(s => s.itemId === 'wood' && s.quantity >= 10);
+        const hasStone = inventory.slots.some(s => s.itemId === 'stone' && s.quantity >= 10);
+
+        if (hasWood && hasStone) {
+          // We have enough, switch to wandering
+          impl.updateComponent<AgentComponent>('agent', (current) => ({
+            ...current,
+            behavior: 'wander',
+            behaviorState: {},
+          }));
+        }
       } else if (currentBehavior === 'wander' && Math.random() < 0.1) {
         // 10% chance to switch to following another agent (social behavior)
         const nearbyAgents = this.getNearbyAgents(impl, world, 15);
@@ -322,6 +412,9 @@ export class AISystem implements System {
 
     const position = entity.getComponent<PositionComponent>('position')!;
 
+    const seenResourceIds: string[] = [];
+    const seenAgentIds: string[] = [];
+
     // Detect nearby resources
     if (vision.canSeeResources) {
       const resources = world.query().with('resource').with('position').executeEntities();
@@ -337,6 +430,9 @@ export class AISystem implements System {
         );
 
         if (distance <= vision.range && resourceComp.amount > 0) {
+          // Track this resource in vision
+          seenResourceIds.push(resource.id);
+
           // Remember this resource location
           const updatedMemory = addMemory(
             memory,
@@ -370,6 +466,9 @@ export class AISystem implements System {
         );
 
         if (distance <= vision.range) {
+          // Track this agent in vision
+          seenAgentIds.push(otherAgent.id);
+
           const updatedMemory = addMemory(
             memory,
             {
@@ -386,6 +485,13 @@ export class AISystem implements System {
         }
       }
     }
+
+    // Update vision component with currently seen entities
+    entity.updateComponent<VisionComponent>('vision', (current) => ({
+      ...current,
+      seenAgents: seenAgentIds,
+      seenResources: seenResourceIds,
+    }));
   }
 
   private processHearing(entity: EntityImpl, world: World): void {
@@ -422,10 +528,11 @@ export class AISystem implements System {
       }
     }
 
-    // Attach heard speech to vision component (dynamically)
-    if (heardSpeech.length > 0) {
-      (vision as any).heardSpeech = heardSpeech;
-    }
+    // Update vision component with heard speech
+    entity.updateComponent<VisionComponent>('vision', (current) => ({
+      ...current,
+      heardSpeech,
+    }));
   }
 
   private getNearbyAgents(entity: EntityImpl, world: World, range: number): Entity[] {
@@ -808,6 +915,351 @@ export class AISystem implements System {
           });
         }
       }
+    }
+  }
+
+  /**
+   * Gather behavior: Find and harvest wood or stone resources.
+   * Similar to seek_food but stores in inventory instead of consuming.
+   */
+  private gatherBehavior(entity: EntityImpl, world: World): void {
+    const position = entity.getComponent<PositionComponent>('position')!;
+    const movement = entity.getComponent<MovementComponent>('movement')!;
+    const memory = entity.getComponent<MemoryComponent>('memory');
+    const inventory = entity.getComponent<InventoryComponent>('inventory');
+    const agent = entity.getComponent<AgentComponent>('agent')!;
+
+    if (!inventory) {
+      // No inventory component, can't gather
+      this.wanderBehavior(entity);
+      return;
+    }
+
+    // Determine preferred resource type from behaviorState
+    const preferredType = agent.behaviorState?.resourceType as string | undefined;
+
+    let targetResource: Entity | null = null;
+    let targetPos: { x: number; y: number } | null = null;
+    let nearestDistance = Infinity;
+
+    // First, check memories for known resource locations
+    if (memory) {
+      const resourceMemories = getMemoriesByType(memory, 'resource_location');
+      for (const mem of resourceMemories) {
+        const memResourceType = mem.metadata?.resourceType as string;
+
+        // If preferred type specified, only consider that type
+        if (preferredType && memResourceType !== preferredType) continue;
+
+        // Skip food (that's for seek_food behavior)
+        if (memResourceType === 'food') continue;
+
+        const distance = Math.sqrt(
+          Math.pow(mem.x - position.x, 2) +
+          Math.pow(mem.y - position.y, 2)
+        );
+
+        if (distance < nearestDistance) {
+          // Try to get the actual entity
+          if (mem.entityId) {
+            const resource = world.getEntity(mem.entityId);
+            if (resource) {
+              const resourceImpl = resource as EntityImpl;
+              const resourceComp = resourceImpl.getComponent<ResourceComponent>('resource');
+              if (resourceComp && resourceComp.amount > 0 && resourceComp.harvestable) {
+                targetResource = resource;
+                nearestDistance = distance;
+              }
+            }
+          } else {
+            // Just use memory position
+            targetPos = { x: mem.x, y: mem.y };
+            nearestDistance = distance;
+          }
+        }
+      }
+    }
+
+    // If no memory or memory is stale, search for resources
+    if (!targetResource && !targetPos) {
+      const resources = world
+        .query()
+        .with('resource')
+        .with('position')
+        .executeEntities();
+
+      for (const resource of resources) {
+        const resourceImpl = resource as EntityImpl;
+        const resourceComp = resourceImpl.getComponent<ResourceComponent>('resource')!;
+        const resourcePos = resourceImpl.getComponent<PositionComponent>('position')!;
+
+        // Skip food and non-harvestable resources
+        if (resourceComp.resourceType === 'food' || !resourceComp.harvestable) continue;
+        if (resourceComp.amount <= 0) continue;
+
+        // If preferred type specified, only consider that type
+        if (preferredType && resourceComp.resourceType !== preferredType) continue;
+
+        const distance = Math.sqrt(
+          Math.pow(resourcePos.x - position.x, 2) +
+          Math.pow(resourcePos.y - position.y, 2)
+        );
+
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          targetResource = resource;
+        }
+      }
+    }
+
+    if (!targetResource && !targetPos) {
+      // No resources found, wander
+      this.wanderBehavior(entity);
+      return;
+    }
+
+    // Get target position
+    if (targetResource) {
+      const targetResourceImpl = targetResource as EntityImpl;
+      const pos = targetResourceImpl.getComponent<PositionComponent>('position')!;
+      targetPos = { x: pos.x, y: pos.y };
+    }
+
+    if (!targetPos) return;
+
+    // Check if adjacent (within 1.5 tiles)
+    if (nearestDistance < 1.5 && targetResource) {
+      // Harvest the resource
+      const targetResourceImpl = targetResource as EntityImpl;
+      const resourceComp = targetResourceImpl.getComponent<ResourceComponent>('resource')!;
+      const harvestAmount = Math.min(10, resourceComp.amount);
+
+      console.log(`[AISystem.gatherBehavior] Agent ${entity.id} harvesting ${harvestAmount} ${resourceComp.resourceType} from ${targetResource.id}`);
+
+      // Update resource
+      targetResourceImpl.updateComponent<ResourceComponent>('resource', (current) => ({
+        ...current,
+        amount: Math.max(0, current.amount - harvestAmount),
+      }));
+
+      // Add to inventory
+      try {
+        const result = addToInventory(inventory, resourceComp.resourceType, harvestAmount);
+        entity.updateComponent<InventoryComponent>('inventory', () => result.inventory);
+
+        // Emit resource gathered event
+        world.eventBus.emit({
+          type: 'resource:gathered',
+          source: entity.id,
+          data: {
+            agentId: entity.id,
+            resourceType: resourceComp.resourceType,
+            amount: result.amountAdded,
+            sourceEntityId: targetResource.id,
+          },
+        });
+
+        // Reinforce memory of this resource location
+        if (memory) {
+          const updatedMemory = addMemory(
+            memory,
+            {
+              type: 'resource_location',
+              x: targetPos.x,
+              y: targetPos.y,
+              entityId: targetResource.id,
+              metadata: { resourceType: resourceComp.resourceType },
+            },
+            world.tick,
+            100
+          );
+          entity.updateComponent<MemoryComponent>('memory', () => updatedMemory);
+        }
+
+        // Check if resource depleted
+        if (resourceComp.amount - harvestAmount <= 0) {
+          world.eventBus.emit({
+            type: 'resource:depleted',
+            source: targetResource.id,
+            data: {
+              resourceType: resourceComp.resourceType,
+              position: targetPos,
+            },
+          });
+        }
+      } catch (error) {
+        // Inventory full or weight limit exceeded
+        world.eventBus.emit({
+          type: 'inventory:full',
+          source: entity.id,
+          data: {
+            agentId: entity.id,
+            reason: (error as Error).message,
+          },
+        });
+
+        // Switch to idle behavior
+        entity.updateComponent<AgentComponent>('agent', (current) => ({
+          ...current,
+          behavior: 'idle',
+          behaviorState: {},
+        }));
+      }
+
+      // Stop moving while harvesting
+      entity.updateComponent<MovementComponent>('movement', (current) => ({
+        ...current,
+        velocityX: 0,
+        velocityY: 0,
+      }));
+    } else {
+      // Move towards the target
+      const dx = targetPos.x - position.x;
+      const dy = targetPos.y - position.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      const velocityX = (dx / distance) * movement.speed;
+      const velocityY = (dy / distance) * movement.speed;
+
+      entity.updateComponent<MovementComponent>('movement', (current) => ({
+        ...current,
+        velocityX,
+        velocityY,
+      }));
+    }
+  }
+
+  /**
+   * Build behavior: Create a building at the agent's current location.
+   * Checks inventory for required resources and deducts them.
+   * Per CLAUDE.md: No silent fallbacks - emits construction:failed event if insufficient resources.
+   */
+  private buildBehavior(entity: EntityImpl, world: World): void {
+    const position = entity.getComponent<PositionComponent>('position')!;
+    const agent = entity.getComponent<AgentComponent>('agent')!;
+    const inventory = entity.getComponent<InventoryComponent>('inventory');
+
+    // Stop moving while building
+    entity.updateComponent<MovementComponent>('movement', (current) => ({
+      ...current,
+      velocityX: 0,
+      velocityY: 0,
+    }));
+
+    // Get building type from behavior state (from LLM decision)
+    let buildingType: BuildingType = agent.behaviorState?.buildingType as BuildingType || 'lean-to';
+
+    // Validate building type
+    const validTypes: BuildingType[] = ['workbench', 'storage-chest', 'campfire', 'tent', 'well', 'lean-to', 'storage-box'];
+    if (!validTypes.includes(buildingType)) {
+      buildingType = 'lean-to'; // Default to lean-to for shelter
+    }
+
+    // Build position (round to tile coordinates)
+    const buildX = Math.floor(position.x);
+    const buildY = Math.floor(position.y);
+
+    if (!inventory) {
+      // No inventory - cannot build
+      world.eventBus.emit({
+        type: 'construction:failed',
+        source: entity.id,
+        data: {
+          builderId: entity.id,
+          buildingType,
+          position: { x: buildX, y: buildY },
+          reason: 'Agent missing InventoryComponent',
+        },
+      });
+
+      console.log(`[AISystem] Agent ${entity.id} cannot build - no inventory`);
+
+      // Switch back to wandering
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        behavior: 'wander',
+        behaviorState: {},
+      }));
+      return;
+    }
+
+    // Convert inventory to resource record format
+    const inventoryRecord: Record<string, number> = {};
+    for (const slot of inventory.slots) {
+      if (slot.itemId) {
+        inventoryRecord[slot.itemId] = (inventoryRecord[slot.itemId] || 0) + slot.quantity;
+      }
+    }
+
+    // Try to initiate construction (this will validate resources)
+    try {
+      world.initiateConstruction(
+        { x: buildX, y: buildY },
+        buildingType,
+        inventoryRecord
+      );
+
+      // Update agent's inventory with deducted resources
+      const updatedSlots = inventory.slots.map(slot => {
+        if (slot.itemId && inventoryRecord[slot.itemId] !== undefined) {
+          const newQuantity = inventoryRecord[slot.itemId]!;
+          if (newQuantity === 0) {
+            return { itemId: null, quantity: 0 };
+          }
+          const amountToDeduct = slot.quantity - newQuantity;
+          return {
+            ...slot,
+            quantity: Math.max(0, slot.quantity - amountToDeduct)
+          };
+        }
+        return slot;
+      }).filter(slot => slot.quantity > 0 || slot.itemId === null);
+
+      // Recalculate weight
+      let newWeight = 0;
+      const resourceWeights: Record<string, number> = { wood: 2, stone: 3, food: 1, water: 1, leaves: 0.5 };
+      for (const slot of updatedSlots) {
+        if (slot.itemId) {
+          const weight = resourceWeights[slot.itemId] || 1;
+          newWeight += slot.quantity * weight;
+        }
+      }
+
+      entity.updateComponent<InventoryComponent>('inventory', () => ({
+        ...inventory,
+        slots: updatedSlots,
+        currentWeight: newWeight,
+      }));
+
+      console.log(`[AISystem] Agent ${entity.id} started construction of ${buildingType} at (${buildX}, ${buildY})`);
+
+      // Switch back to wandering after initiating construction
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        behavior: 'wander',
+        behaviorState: {},
+      }));
+    } catch (error) {
+      // Construction failed (insufficient resources or validation error)
+      world.eventBus.emit({
+        type: 'construction:failed',
+        source: entity.id,
+        data: {
+          builderId: entity.id,
+          buildingType,
+          position: { x: buildX, y: buildY },
+          reason: (error as Error).message,
+        },
+      });
+
+      console.log(`[AISystem] Agent ${entity.id} construction failed: ${(error as Error).message}`);
+
+      // Switch back to wandering
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        behavior: 'wander',
+        behaviorState: {},
+      }));
     }
   }
 }

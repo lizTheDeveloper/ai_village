@@ -6,6 +6,7 @@ import {
   createPhysicsComponent,
   createRenderableComponent,
   createTagsComponent,
+  createResourceComponent,
 } from '@ai-village/core';
 
 /**
@@ -25,6 +26,9 @@ export function createRock(world: WorldMutator, x: number, y: number): string {
 
   // Tags
   entity.addComponent(createTagsComponent('rock', 'obstacle', 'minable'));
+
+  // Resource - rocks provide stone
+  entity.addComponent(createResourceComponent('stone', 100, 0.1)); // 100 stone, regenerates 0.1/sec
 
   // Add to world
   (world as any)._addEntity(entity);

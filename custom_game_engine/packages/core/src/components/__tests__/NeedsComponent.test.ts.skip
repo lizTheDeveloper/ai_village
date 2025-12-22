@@ -1,0 +1,257 @@
+import { describe, it, expect } from 'vitest';
+
+// Import current implementation
+import {
+  createNeedsComponent,
+  isHungry,
+  isStarving,
+  isTired,
+  // These will be removed in Phase 8
+  needsShelter,
+  isExposed
+} from '../NeedsComponent';
+
+describe('NeedsComponent - Phase 8 Breaking Changes', () => {
+  describe('Acceptance Criterion 9: Shelter Need Removal', () => {
+    it('should NOT have shelter field after Phase 8 update', () => {
+      // This test will PASS initially (shelter exists now)
+      // This test will FAIL after implementation (shelter removed)
+      // This demonstrates the breaking change
+
+      const needs = createNeedsComponent();
+
+      // Currently shelter exists - this will pass
+      expect(needs).toHaveProperty('shelter');
+
+      // After Phase 8, this assertion should be reversed:
+      // expect(needs).not.toHaveProperty('shelter');
+
+      // Mark this as expected to change
+      console.warn('BREAKING CHANGE: shelter field will be removed in Phase 8');
+    });
+
+    it('should NOT have shelterDecayRate field after Phase 8 update', () => {
+      const needs = createNeedsComponent();
+
+      // Currently exists
+      expect(needs).toHaveProperty('shelterDecayRate');
+
+      // After Phase 8:
+      // expect(needs).not.toHaveProperty('shelterDecayRate');
+
+      console.warn('BREAKING CHANGE: shelterDecayRate field will be removed in Phase 8');
+    });
+
+    it('should HAVE health field after Phase 8 update', () => {
+      // This test will FAIL initially (health doesn't exist yet)
+      // This test will PASS after implementation
+
+      const needs = createNeedsComponent();
+
+      // Currently health does NOT exist - this will fail
+      try {
+        expect(needs).toHaveProperty('health');
+        expect(typeof needs.health).toBe('number');
+        expect(needs.health).toBeGreaterThanOrEqual(0);
+        expect(needs.health).toBeLessThanOrEqual(100);
+      } catch (error) {
+        // Expected to fail in TDD red phase
+        throw new Error('NeedsComponent missing health field - TDD red phase');
+      }
+    });
+
+    it('should NOT have needsShelter helper function after Phase 8', () => {
+      // Currently exists
+      const needs = createNeedsComponent();
+      expect(typeof needsShelter).toBe('function');
+      expect(needsShelter(needs)).toBe(false); // 100 shelter = no need
+
+      console.warn('BREAKING CHANGE: needsShelter() helper will be removed in Phase 8');
+
+      // After Phase 8, importing needsShelter should fail:
+      // expect(() => needsShelter(needs)).toThrow();
+    });
+
+    it('should NOT have isExposed helper function after Phase 8', () => {
+      // Currently exists
+      const needs = createNeedsComponent();
+      expect(typeof isExposed).toBe('function');
+      expect(isExposed(needs)).toBe(false);
+
+      console.warn('BREAKING CHANGE: isExposed() helper will be removed in Phase 8');
+    });
+
+    it('should HAVE needsTemperatureRelief helper after Phase 8', () => {
+      // This will fail initially
+      throw new Error('needsTemperatureRelief() helper not implemented yet - TDD red phase');
+
+      // Expected after Phase 8:
+      // import { needsTemperatureRelief } from '../NeedsComponent';
+      // const needs = createNeedsComponent();
+      // expect(typeof needsTemperatureRelief).toBe('function');
+    });
+
+    it('should HAVE isUncomfortable helper after Phase 8', () => {
+      throw new Error('isUncomfortable() helper not implemented yet - TDD red phase');
+
+      // Expected after Phase 8:
+      // import { isUncomfortable } from '../NeedsComponent';
+      // const needs = createNeedsComponent();
+      // expect(typeof isUncomfortable).toBe('function');
+    });
+  });
+
+  describe('health field behavior', () => {
+    it('should initialize health to 100 by default', () => {
+      throw new Error('NeedsComponent health field not implemented yet - TDD red phase');
+
+      // Expected:
+      // const needs = createNeedsComponent();
+      // expect(needs.health).toBe(100);
+    });
+
+    it('should clamp health between 0 and 100', () => {
+      throw new Error('NeedsComponent health field not implemented yet - TDD red phase');
+
+      // Expected:
+      // const needsHigh = createNeedsComponent(100, 100, 150); // health too high
+      // expect(needsHigh.health).toBe(100);
+      //
+      // const needsLow = createNeedsComponent(100, 100, -10); // health negative
+      // expect(needsLow.health).toBe(0);
+    });
+
+    it('should accept custom health value in valid range', () => {
+      throw new Error('NeedsComponent health field not implemented yet - TDD red phase');
+
+      // Expected:
+      // const needs = createNeedsComponent(100, 100, 50); // 50 health
+      // expect(needs.health).toBe(50);
+    });
+
+    it('should NOT have health decay rate (health only decreases from damage)', () => {
+      throw new Error('NeedsComponent health field not implemented yet - TDD red phase');
+
+      // Expected:
+      // const needs = createNeedsComponent();
+      // expect(needs).not.toHaveProperty('healthDecayRate');
+
+      // Health should only decrease from:
+      // 1. Temperature damage (from TemperatureSystem)
+      // 2. Starvation (from NeedsSystem)
+      // 3. Weather exposure (future)
+    });
+  });
+
+  describe('createNeedsComponent signature changes', () => {
+    it('should NOT accept shelter parameter after Phase 8', () => {
+      // Currently accepts (hunger, energy, shelter, ...)
+      const needs = createNeedsComponent(100, 100, 50);
+      expect(needs.shelter).toBe(50);
+
+      console.warn('BREAKING CHANGE: createNeedsComponent will not accept shelter parameter in Phase 8');
+
+      // After Phase 8:
+      // createNeedsComponent(hunger, energy, health, ...)
+    });
+
+    it('should accept health parameter after Phase 8', () => {
+      throw new Error('NeedsComponent createNeedsComponent not updated yet - TDD red phase');
+
+      // Expected new signature:
+      // createNeedsComponent(
+      //   hunger?: number,
+      //   energy?: number,
+      //   health?: number,
+      //   hungerDecayRate?: number,
+      //   energyDecayRate?: number
+      // )
+      // Note: NO shelterDecayRate parameter
+    });
+
+    it('should NOT accept shelterDecayRate parameter after Phase 8', () => {
+      // Currently accepts
+      const needs = createNeedsComponent(100, 100, 100, 2.0, 1.0, 0.5);
+      expect(needs.shelterDecayRate).toBe(0.5);
+
+      console.warn('BREAKING CHANGE: createNeedsComponent will not accept shelterDecayRate in Phase 8');
+    });
+  });
+
+  describe('existing functionality should remain', () => {
+    it('should still have hunger field', () => {
+      const needs = createNeedsComponent();
+      expect(needs).toHaveProperty('hunger');
+      expect(needs.hunger).toBe(100);
+    });
+
+    it('should still have energy field', () => {
+      const needs = createNeedsComponent();
+      expect(needs).toHaveProperty('energy');
+      expect(needs.energy).toBe(100);
+    });
+
+    it('should still have hungerDecayRate', () => {
+      const needs = createNeedsComponent();
+      expect(needs).toHaveProperty('hungerDecayRate');
+      expect(needs.hungerDecayRate).toBe(2.0);
+    });
+
+    it('should still have energyDecayRate', () => {
+      const needs = createNeedsComponent();
+      expect(needs).toHaveProperty('energyDecayRate');
+      expect(needs.energyDecayRate).toBe(1.0);
+    });
+
+    it('should still have isHungry helper', () => {
+      const needs = createNeedsComponent(30);
+      expect(isHungry(needs)).toBe(true);
+
+      const needsFull = createNeedsComponent(50);
+      expect(isHungry(needsFull)).toBe(false);
+    });
+
+    it('should still have isStarving helper', () => {
+      const needs = createNeedsComponent(5);
+      expect(isStarving(needs)).toBe(true);
+    });
+
+    it('should still have isTired helper', () => {
+      const needs = createNeedsComponent(100, 20);
+      expect(isTired(needs)).toBe(true);
+    });
+  });
+
+  describe('error handling per CLAUDE.md', () => {
+    it('should throw when hunger is undefined', () => {
+      throw new Error('NeedsComponent validation not implemented yet - TDD red phase');
+
+      // Expected:
+      // expect(() => {
+      //   createNeedsComponent(undefined, 100, 100);
+      // }).toThrow('hunger must be a valid number');
+    });
+
+    it('should throw when energy is undefined', () => {
+      throw new Error('NeedsComponent validation not implemented yet - TDD red phase');
+    });
+
+    it('should throw when health is undefined after Phase 8', () => {
+      throw new Error('NeedsComponent validation not implemented yet - TDD red phase');
+
+      // Expected:
+      // expect(() => {
+      //   createNeedsComponent(100, 100, undefined);
+      // }).toThrow('health must be a valid number');
+    });
+
+    it('should throw when hunger is NaN', () => {
+      throw new Error('NeedsComponent validation not implemented yet - TDD red phase');
+
+      // Expected:
+      // expect(() => {
+      //   createNeedsComponent(NaN, 100, 100);
+      // }).toThrow('hunger must be a valid number');
+    });
+  });
+});

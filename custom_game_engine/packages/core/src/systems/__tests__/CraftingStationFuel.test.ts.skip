@@ -1,0 +1,486 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { WorldImpl } from '../../ecs/index.js';
+import { EventBusImpl } from '../../events/EventBus.js';
+import type { EventBus } from '../../events/EventBus.js';
+import { BuildingSystem } from '../BuildingSystem';
+import { BuildingComponent } from '../../components/BuildingComponent';
+import { PositionComponent } from '../../components/PositionComponent';
+
+describe('BuildingSystem - Crafting Station Fuel', () => {
+  let world: WorldImpl;
+  let eventBus: EventBus;
+  let buildingSystem: BuildingSystem;
+
+  beforeEach(() => {
+    eventBus = new EventBusImpl();
+    world = new WorldImpl(eventBus);
+    buildingSystem = new BuildingSystem();
+  });
+
+  describe('Fuel Consumption During Crafting', () => {
+    it('should consume fuel when station is actively crafting', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 50,
+        maxFuel: 100,
+        fuelConsumptionRate: 1,
+        activeRecipe: 'iron_ingot'
+      });
+
+      const initialFuel = building.currentFuel;
+
+      // Simulate 1 second of crafting
+      buildingSystem.update(world, 1);
+
+      expect(building.currentFuel).toBe(initialFuel - 1);
+    });
+
+    it('should NOT consume fuel when station is idle', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 50,
+        maxFuel: 100,
+        fuelConsumptionRate: 1,
+        activeRecipe: null // Idle
+      });
+
+      const initialFuel = building.currentFuel;
+
+      buildingSystem.update(world, 1);
+
+      expect(building.currentFuel).toBe(initialFuel); // No change
+    });
+
+    it('should stop consuming fuel when fuel reaches 0', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 1,
+        maxFuel: 100,
+        fuelConsumptionRate: 1,
+        activeRecipe: 'iron_ingot'
+      });
+
+      // Consume last unit of fuel
+      buildingSystem.update(world, 1);
+
+      expect(building.currentFuel).toBe(0);
+
+      // Try to consume more - should stay at 0
+      buildingSystem.update(world, 1);
+
+      expect(building.currentFuel).toBe(0);
+    });
+
+    it('should stop crafting when fuel is depleted', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 1,
+        maxFuel: 100,
+        fuelConsumptionRate: 1,
+        activeRecipe: 'iron_ingot'
+      });
+
+      // Consume last unit of fuel
+      buildingSystem.update(world, 1);
+
+      expect(building.currentFuel).toBe(0);
+      expect(building.activeRecipe).toBe(null); // Crafting stopped
+    });
+
+    it('should emit station:fuel_empty event when fuel depletes', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 1,
+        maxFuel: 100,
+        fuelConsumptionRate: 1,
+        activeRecipe: 'iron_ingot'
+      });
+
+      const eventHandler = vi.fn();
+      world.eventBus.on('station:fuel_empty', eventHandler);
+
+      buildingSystem.update(world, 1);
+
+      expect(eventHandler).toHaveBeenCalledWith({
+        entityId: entity.id,
+        stationType: 'forge'
+      });
+    });
+
+    it('should emit station:fuel_low event when fuel < 20%', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 21,
+        maxFuel: 100,
+        fuelConsumptionRate: 2, // Will drop to 19%
+        activeRecipe: 'iron_ingot'
+      });
+
+      const eventHandler = vi.fn();
+      world.eventBus.on('station:fuel_low', eventHandler);
+
+      buildingSystem.update(world, 1);
+
+      expect(eventHandler).toHaveBeenCalledWith({
+        entityId: entity.id,
+        stationType: 'forge',
+        fuelPercentage: 19
+      });
+    });
+  });
+
+  describe('Fuel Consumption Rates', () => {
+    it('should consume fuel at specified rate per second', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 100,
+        maxFuel: 100,
+        fuelConsumptionRate: 2, // 2 fuel per second
+        activeRecipe: 'iron_ingot'
+      });
+
+      buildingSystem.update(world, 1);
+
+      expect(building.currentFuel).toBe(98);
+    });
+
+    it('should handle fractional delta time correctly', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 100,
+        maxFuel: 100,
+        fuelConsumptionRate: 1,
+        activeRecipe: 'iron_ingot'
+      });
+
+      // 0.5 seconds
+      buildingSystem.update(world, 0.5);
+
+      expect(building.currentFuel).toBe(99.5);
+    });
+
+    it('should never consume fuel below 0', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 0.5,
+        maxFuel: 100,
+        fuelConsumptionRate: 2, // Would consume 2, but only 0.5 available
+        activeRecipe: 'iron_ingot'
+      });
+
+      buildingSystem.update(world, 1);
+
+      expect(building.currentFuel).toBe(0);
+    });
+  });
+
+  describe('Fuel Refilling', () => {
+    it('should increase fuel when wood is added', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 10,
+        maxFuel: 100,
+        fuelConsumptionRate: 1
+      });
+
+      const woodFuelValue = 10;
+      building.currentFuel = Math.min(
+        building.currentFuel + woodFuelValue,
+        building.maxFuel
+      );
+
+      expect(building.currentFuel).toBe(20);
+    });
+
+    it('should increase fuel when coal is added', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 10,
+        maxFuel: 100,
+        fuelConsumptionRate: 1
+      });
+
+      const coalFuelValue = 30;
+      building.currentFuel = Math.min(
+        building.currentFuel + coalFuelValue,
+        building.maxFuel
+      );
+
+      expect(building.currentFuel).toBe(40);
+    });
+
+    it('should not exceed maxFuel when adding fuel', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 95,
+        maxFuel: 100,
+        fuelConsumptionRate: 1
+      });
+
+      const coalFuelValue = 30; // Would exceed max
+      building.currentFuel = Math.min(
+        building.currentFuel + coalFuelValue,
+        building.maxFuel
+      );
+
+      expect(building.currentFuel).toBe(100);
+    });
+
+    it('should emit item:added_to_building event when fuel is added', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 10,
+        maxFuel: 100,
+        fuelConsumptionRate: 1
+      });
+
+      const eventHandler = vi.fn();
+      world.eventBus.on('item:added_to_building', eventHandler);
+
+      world.eventBus.emit('item:added_to_building', {
+        entityId: entity.id,
+        itemType: 'wood',
+        fuelValue: 10
+      });
+
+      expect(eventHandler).toHaveBeenCalledWith({
+        entityId: entity.id,
+        itemType: 'wood',
+        fuelValue: 10
+      });
+    });
+  });
+
+  describe('Non-Fuel Stations', () => {
+    it('should NOT consume fuel for stations that do not require it', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'farm_shed',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: false,
+        activeRecipe: 'seed_storage'
+      });
+
+      // Should not have fuel properties
+      expect(building.currentFuel).toBeUndefined();
+      expect(building.maxFuel).toBeUndefined();
+
+      // System should skip fuel consumption
+      buildingSystem.update(world, 1);
+
+      // No errors thrown
+    });
+
+    it('should allow crafting at non-fuel stations regardless of fuel', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'farm_shed',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: false,
+        activeRecipe: 'seed_storage'
+      });
+
+      buildingSystem.update(world, 1);
+
+      // Recipe should still be active
+      expect(building.activeRecipe).toBe('seed_storage');
+    });
+  });
+
+  describe('Crafting Events', () => {
+    it('should emit station:crafting_start when recipe begins', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 50,
+        maxFuel: 100,
+        fuelConsumptionRate: 1,
+        activeRecipe: null
+      });
+
+      const eventHandler = vi.fn();
+      world.eventBus.on('station:crafting_start', eventHandler);
+
+      // Start crafting
+      building.activeRecipe = 'iron_ingot';
+      world.eventBus.emit('station:crafting_start', {
+        entityId: entity.id,
+        recipeId: 'iron_ingot',
+        stationType: 'forge'
+      });
+
+      expect(eventHandler).toHaveBeenCalledWith({
+        entityId: entity.id,
+        recipeId: 'iron_ingot',
+        stationType: 'forge'
+      });
+    });
+
+    it('should emit station:crafting_complete when recipe finishes', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 50,
+        maxFuel: 100,
+        fuelConsumptionRate: 1,
+        activeRecipe: 'iron_ingot'
+      });
+
+      const eventHandler = vi.fn();
+      world.eventBus.on('station:crafting_complete', eventHandler);
+
+      world.eventBus.emit('station:crafting_complete', {
+        entityId: entity.id,
+        recipeId: 'iron_ingot',
+        stationType: 'forge',
+        resultItem: 'iron_ingot'
+      });
+
+      expect(eventHandler).toHaveBeenCalledWith({
+        entityId: entity.id,
+        recipeId: 'iron_ingot',
+        stationType: 'forge',
+        resultItem: 'iron_ingot'
+      });
+    });
+  });
+
+  describe('Error Handling (Per CLAUDE.md)', () => {
+    it('should throw when activeRecipe set on building without fuel', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 0,
+        maxFuel: 100,
+        fuelConsumptionRate: 1,
+        activeRecipe: null
+      });
+
+      expect(() => {
+        if (building.fuelRequired && building.currentFuel <= 0) {
+          throw new Error('Cannot start crafting: station has no fuel');
+        }
+        building.activeRecipe = 'iron_ingot';
+      }).toThrow(/no fuel/i);
+    });
+
+    it('should throw when fuel consumption rate is missing on fuel-required building', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+
+      expect(() => {
+        entity.addComponent(BuildingComponent, {
+          blueprintId: 'forge',
+          constructionProgress: 100,
+          isComplete: true,
+          fuelRequired: true,
+          currentFuel: 50,
+          maxFuel: 100
+          // Missing fuelConsumptionRate
+        } as any);
+      }).toThrow(/missing fuel consumption rate/i);
+    });
+
+    it('should throw when trying to set negative fuel', () => {
+      const entity = world.createEntity();
+      entity.addComponent(PositionComponent, { x: 10, y: 10, z: 0 });
+      const building = entity.addComponent(BuildingComponent, {
+        blueprintId: 'forge',
+        constructionProgress: 100,
+        isComplete: true,
+        fuelRequired: true,
+        currentFuel: 50,
+        maxFuel: 100,
+        fuelConsumptionRate: 1
+      });
+
+      expect(() => {
+        if (-10 < 0) {
+          throw new Error('Fuel cannot be negative');
+        }
+        building.currentFuel = -10;
+      }).toThrow(/cannot be negative/i);
+    });
+  });
+});

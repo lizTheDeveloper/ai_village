@@ -10,6 +10,7 @@ import {
   CHUNK_SIZE,
 } from '../Chunk.js';
 import type { Tile } from '../Tile.js';
+import { createDefaultTile } from '../Tile.js';
 
 describe('Chunk', () => {
   describe('createChunk', () => {
@@ -56,6 +57,7 @@ describe('Chunk', () => {
     it('should set tile at valid position', () => {
       const chunk = createChunk(0, 0);
       const newTile: Tile = {
+        ...createDefaultTile(),
         terrain: 'water',
         moisture: 1,
         fertility: 0,
@@ -71,6 +73,7 @@ describe('Chunk', () => {
     it('should return false for out of bounds', () => {
       const chunk = createChunk(0, 0);
       const newTile: Tile = {
+        ...createDefaultTile(),
         terrain: 'water',
         moisture: 1,
         fertility: 0,

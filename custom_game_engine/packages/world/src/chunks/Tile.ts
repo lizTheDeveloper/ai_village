@@ -8,14 +8,40 @@ export interface Tile {
   /** Floor/path type (optional) */
   floor?: string;
 
-  /** Moisture level (0-1) - affects plant growth */
+  /** Moisture level (0-100) - affects plant growth */
   moisture: number;
 
-  /** Fertility level (0-1) - affects farming */
+  /** Fertility level (0-100) - affects farming */
   fertility: number;
 
   /** Biome this tile belongs to */
   biome?: BiomeType;
+
+  // Soil management properties (Phase 9)
+  /** Whether the tile has been tilled and can be planted */
+  tilled: boolean;
+
+  /** Number of plantings remaining before re-tilling needed (0-3) */
+  plantability: number;
+
+  /** Soil nutrients (NPK values 0-100) */
+  nutrients: {
+    nitrogen: number;
+    phosphorus: number;
+    potassium: number;
+  };
+
+  /** Whether fertilizer is currently active */
+  fertilized: boolean;
+
+  /** Ticks remaining for fertilizer effect */
+  fertilizerDuration: number;
+
+  /** Game tick when tile was last watered */
+  lastWatered: number;
+
+  /** Whether compost has been applied */
+  composted: boolean;
 }
 
 export type TerrainType =
@@ -40,8 +66,19 @@ export type BiomeType =
 export function createDefaultTile(): Tile {
   return {
     terrain: 'grass',
-    moisture: 0.5,
-    fertility: 0.5,
+    moisture: 50,
+    fertility: 50,
+    tilled: false,
+    plantability: 0,
+    nutrients: {
+      nitrogen: 50,
+      phosphorus: 50,
+      potassium: 50,
+    },
+    fertilized: false,
+    fertilizerDuration: 0,
+    lastWatered: 0,
+    composted: false,
   };
 }
 

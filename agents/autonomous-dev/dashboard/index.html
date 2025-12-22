@@ -332,6 +332,32 @@
             background: var(--bg-tertiary);
             border-radius: 6px;
             padding: 12px;
+            position: relative;
+        }
+
+        .pipeline-remove {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1;
+            transition: all 0.2s;
+        }
+
+        .pipeline-remove:hover {
+            background: var(--accent-red);
+            color: white;
+            border-color: var(--accent-red);
         }
 
         .pipeline-header {
@@ -578,13 +604,22 @@
         <div>
             <h1>AI Village Orchestration Dashboard</h1>
             <div id="server-info" style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
+                <span style="color: var(--text-secondary);">Dashboard:</span>
                 <a id="dashboard-url" href="" target="_blank" style="color: var(--accent-blue); text-decoration: none;">Loading...</a>
                 <span style="margin-left: 12px;" id="session-count">0 sessions</span>
+                <span style="margin-left: 16px; color: var(--text-secondary);">Game Server:</span>
+                <a id="game-server-url" href="http://localhost:3000" target="_blank" style="color: var(--accent-blue); text-decoration: none;">http://localhost:3000</a>
+                <span style="margin-left: 8px;" id="game-server-status">●</span>
+                <span style="margin-left: 16px; color: var(--text-secondary);">Parallel Workers:</span>
+                <span style="margin-left: 8px;" id="parallel-workers-status">● Stopped</span>
             </div>
         </div>
         <div class="header-actions">
-            <button class="btn btn-sm" onclick="restartServer()" title="Restart dashboard server">
-                Restart Server
+            <button class="btn btn-sm" id="game-server-btn" onclick="toggleGameServer()" title="Start/Stop game server">
+                Start Game
+            </button>
+            <button class="btn btn-sm" id="parallel-workers-btn" onclick="openParallelWorkersModal()" title="Start/Stop parallel workers">
+                Start Workers
             </button>
             <button class="btn" onclick="refreshRoadmap()">
                 <span>Refresh from Markdown</span>
@@ -716,6 +751,77 @@
         </div>
     </div>
 
+    <!-- Pipeline Logs Modal -->
+    <div class="modal-overlay" id="pipeline-logs-modal" style="display: none;">
+        <div class="modal" style="max-width: 1200px; max-height: 90vh;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="pipeline-logs-title">Pipeline Logs</h3>
+                <button class="modal-close" onclick="closePipelineLogsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="log-container" id="pipeline-logs-content" style="max-height: 70vh; font-size: 12px;">
+                    <div class="empty-state">Loading logs...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Parallel Workers Modal -->
+    <div class="modal-overlay" id="parallel-workers-modal" style="display: none;">
+        <div class="modal" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Parallel Workers Manager</h3>
+                <button class="modal-close" onclick="closeParallelWorkersModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="parallel-workers-config" style="margin-bottom: 20px;">
+                    <p style="color: var(--text-secondary); margin-bottom: 16px;">
+                        Run multiple orchestrator workers in parallel, each in its own git worktree.
+                        Workers automatically pick up the next available task from the roadmap.
+                    </p>
+                    <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px;">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <span>Number of Workers:</span>
+                            <input type="number" id="num-workers-input" value="3" min="1" max="10"
+                                   style="width: 60px; padding: 6px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary);">
+                        </label>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px;">Features (optional, comma-separated):</label>
+                        <input type="text" id="features-input" placeholder="e.g., soil-system,farming-ui,crop-growth"
+                               style="width: 100%; padding: 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary);">
+                        <small style="color: var(--text-secondary);">Leave empty to auto-pick from roadmap</small>
+                    </div>
+                </div>
+                <div id="parallel-workers-controls" style="display: flex; gap: 12px; margin-bottom: 20px;">
+                    <button class="btn btn-success" id="pw-start-btn" onclick="startParallelWorkers()">Start Workers</button>
+                    <button class="btn btn-danger" id="pw-stop-btn" onclick="stopParallelWorkers()" style="display: none;">Stop Workers</button>
+                    <button class="btn" onclick="refreshParallelWorkersStatus()">Refresh Status</button>
+                </div>
+                <div id="parallel-workers-info" style="background: var(--bg-tertiary); border-radius: 6px; padding: 12px; margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span><strong>Status:</strong> <span id="pw-status-text">Not running</span></span>
+                        <span id="pw-uptime"></span>
+                    </div>
+                    <div id="pw-details" style="margin-top: 8px; display: none;">
+                        <div><strong>PID:</strong> <span id="pw-pid"></span></div>
+                        <div><strong>Workers:</strong> <span id="pw-num-workers"></span></div>
+                        <div><strong>Started:</strong> <span id="pw-start-time"></span></div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong>Worker Logs</strong>
+                        <span class="timestamp" id="pw-log-count">0 entries</span>
+                    </div>
+                    <div class="log-container" id="parallel-workers-logs" style="max-height: 300px;">
+                        <div class="empty-state">Logs will appear here when workers run</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Work Order Modal -->
     <div class="modal-overlay" id="work-order-modal" style="display: none;">
         <div class="modal" style="max-width: 1000px;">
@@ -766,15 +872,49 @@
             }
         }
 
-        async function restartServer() {
-            if (!confirm('Restart the dashboard server? This will disconnect all sessions.')) {
-                return;
-            }
+        async function loadGameServerStatus() {
             try {
-                await fetch('/api/server/restart', { method: 'POST' });
-                alert('Server restarting... Refresh this page in a few seconds.');
+                const response = await fetch('/api/game-server/status');
+                const status = await response.json();
+
+                const statusIndicator = document.getElementById('game-server-status');
+                const btn = document.getElementById('game-server-btn');
+
+                if (status.running) {
+                    statusIndicator.textContent = '● Running';
+                    statusIndicator.style.color = 'var(--accent-green)';
+                    btn.textContent = 'Stop Game';
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-danger');
+                } else {
+                    statusIndicator.textContent = '● Stopped';
+                    statusIndicator.style.color = 'var(--accent-red)';
+                    btn.textContent = 'Start Game';
+                    btn.classList.remove('btn-danger');
+                    btn.classList.add('btn-success');
+                }
             } catch (err) {
-                // Expected to fail since server is restarting
+                console.error('Failed to load game server status:', err);
+            }
+        }
+
+        async function toggleGameServer() {
+            const btn = document.getElementById('game-server-btn');
+            const isRunning = btn.textContent === 'Stop Game';
+
+            try {
+                btn.disabled = true;
+                if (isRunning) {
+                    await fetch('/api/game-server/stop', { method: 'POST' });
+                } else {
+                    await fetch('/api/game-server/start', { method: 'POST' });
+                }
+                // Wait a moment then refresh status
+                setTimeout(loadGameServerStatus, 1000);
+            } catch (err) {
+                alert('Failed to toggle game server: ' + err.message);
+            } finally {
+                btn.disabled = false;
             }
         }
 
@@ -787,11 +927,17 @@
             loadPipelines();
             loadRecentLogs();
             loadServerStats();
+            loadGameServerStatus();
+            loadParallelWorkersStatus();
 
             // Auto-refresh logs every 5 seconds
             setInterval(loadRecentLogs, 5000);
             // Auto-refresh server stats every 10 seconds
             setInterval(loadServerStats, 10000);
+            // Auto-refresh game server status every 5 seconds
+            setInterval(loadGameServerStatus, 5000);
+            // Auto-refresh parallel workers status every 10 seconds
+            setInterval(loadParallelWorkersStatus, 10000);
         });
 
         // Tabs
@@ -831,6 +977,7 @@
             switch (data.type) {
                 case 'pipeline-started':
                     loadPipelines();
+                    loadWorkOrders(); // Refresh work orders to update running status
                     addLog(`Pipeline started: ${data.featureName || 'auto'}`, 'stdout');
                     break;
                 case 'pipeline-log':
@@ -838,8 +985,14 @@
                     break;
                 case 'pipeline-complete':
                     loadPipelines();
+                    loadWorkOrders(); // Refresh work orders to update running status
                     loadRecentLogs(); // Refresh logs list when pipeline completes
                     addLog(`Pipeline ${data.id} ${data.status}`, data.status === 'complete' ? 'stdout' : 'stderr');
+                    break;
+                case 'parallel-workers-started':
+                case 'parallel-workers-stopped':
+                case 'parallel-workers-log':
+                    handleParallelWorkersSSE(data);
                     break;
             }
         }
@@ -969,25 +1122,39 @@
                     return;
                 }
 
-                container.innerHTML = workOrdersData.map(wo => `
-                    <div class="work-order-item">
-                        <div onclick="openWorkOrder('${wo.name}')" style="flex: 1; cursor: pointer;">
-                            <div class="work-order-header">
-                                <span class="work-order-name">${wo.name}</span>
-                                <span class="status-badge status-${wo.state === 'READY_FOR_REVIEW' ? 'ready' : wo.state === 'BLOCKED' ? 'blocked' : 'in_progress'}">
-                                    ${wo.state}
+                // Check which work orders are currently running
+                const runningPipelines = pipelinesData.filter(p => p.status === 'running');
+                const runningWorkOrders = new Set(runningPipelines.map(p => p.featureName));
+
+                container.innerHTML = workOrdersData.map(wo => {
+                    const isRunning = runningWorkOrders.has(wo.name);
+                    return `
+                        <div class="work-order-item">
+                            <div onclick="openWorkOrder('${wo.name}')" style="flex: 1; cursor: pointer;">
+                                <div class="work-order-header">
+                                    <span class="work-order-name">${wo.name}</span>
+                                    <span class="status-badge status-${wo.state === 'READY_FOR_REVIEW' ? 'ready' : wo.state === 'BLOCKED' ? 'blocked' : 'in_progress'}">
+                                        ${wo.state}
+                                    </span>
+                                </div>
+                                <div class="work-order-meta">
+                                    ${wo.verdict ? `<span>Verdict: ${wo.verdict}</span>` : ''}
+                                    <span>${wo.screenshotCount} screenshots</span>
+                                </div>
+                            </div>
+                            ${isRunning ? `
+                                <span class="status-badge status-in_progress" style="padding: 8px 12px;">
+                                    <div class="spinner" style="width: 12px; height: 12px;"></div>
+                                    Running
                                 </span>
-                            </div>
-                            <div class="work-order-meta">
-                                ${wo.verdict ? `<span>Verdict: ${wo.verdict}</span>` : ''}
-                                <span>${wo.screenshotCount} screenshots</span>
-                            </div>
+                            ` : `
+                                <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); resumeWorkOrder('${wo.name}')" title="Resume this work order">
+                                    Resume
+                                </button>
+                            `}
                         </div>
-                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); resumeWorkOrder('${wo.name}')" title="Resume this work order">
-                            Resume
-                        </button>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             } catch (err) {
                 container.innerHTML = `<div class="empty-state">Error: ${err.message}</div>`;
             }
@@ -1066,7 +1233,10 @@
                 }
 
                 container.innerHTML = pipelinesData.map(p => `
-                    <div class="pipeline-item">
+                    <div class="pipeline-item" style="cursor: pointer;" onclick="openPipelineLogs('${p.id}', '${p.featureName || 'Auto'}')">
+                        ${p.status !== 'running' ? `
+                            <div class="pipeline-remove" onclick="event.stopPropagation(); removePipeline('${p.id}', '${p.featureName || 'this task'}')" title="Remove from list">×</div>
+                        ` : ''}
                         <div class="pipeline-header">
                             <span class="pipeline-name">${p.featureName || 'Auto'}</span>
                             <span class="pipeline-status ${p.status}">
@@ -1077,13 +1247,18 @@
                         <div style="font-size: 11px; color: var(--text-secondary); margin-top: 6px;">
                             Started: ${new Date(p.startTime).toLocaleTimeString()}
                             ${p.status === 'running' ? `
-                                <button class="btn btn-danger" style="padding: 2px 6px; font-size: 11px; margin-left: 8px;" onclick="stopPipeline('${p.id}', '${p.featureName || 'this task'}')">Stop</button>
+                                <button class="btn btn-danger" style="padding: 2px 6px; font-size: 11px; margin-left: 8px;" onclick="event.stopPropagation(); stopPipeline('${p.id}', '${p.featureName || 'this task'}')">Stop</button>
                             ` : p.status === 'stopped' || p.status === 'failed' ? `
-                                <button class="btn btn-primary" style="padding: 2px 6px; font-size: 11px; margin-left: 8px;" onclick="restartPipeline('${p.featureName}')">Restart</button>
+                                <button class="btn btn-primary" style="padding: 2px 6px; font-size: 11px; margin-left: 8px;" onclick="event.stopPropagation(); restartPipeline('${p.featureName}')">Restart</button>
                             ` : ''}
                         </div>
                     </div>
                 `).join('');
+
+                // Refresh work orders to update their running status
+                if (workOrdersData.length > 0) {
+                    loadWorkOrders();
+                }
             } catch (err) {
                 container.innerHTML = `<div class="empty-state">Error: ${err.message}</div>`;
             }
@@ -1112,6 +1287,62 @@
                 loadPipelines();
             } catch (err) {
                 alert('Failed to restart pipeline: ' + err.message);
+            }
+        }
+
+        async function removePipeline(id, featureName) {
+            try {
+                const response = await fetch(`/api/pipelines/${id}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                if (data.success) {
+                    loadPipelines();
+                } else {
+                    alert('Failed to remove pipeline: ' + (data.error || 'Unknown error'));
+                }
+            } catch (err) {
+                alert('Failed to remove pipeline: ' + err.message);
+            }
+        }
+
+        let pipelineLogsInterval = null;
+
+        async function openPipelineLogs(id, name) {
+            const modal = document.getElementById('pipeline-logs-modal');
+            document.getElementById('pipeline-logs-title').textContent = `Pipeline Logs: ${name}`;
+            modal.style.display = 'flex';
+
+            async function updateLogs() {
+                try {
+                    const response = await fetch(`/api/pipelines/${id}/logs`);
+                    const logs = await response.json();
+                    const container = document.getElementById('pipeline-logs-content');
+
+                    if (logs.length === 0) {
+                        container.innerHTML = '<div class="empty-state">No logs yet...</div>';
+                        return;
+                    }
+
+                    container.innerHTML = logs.map(log => `
+                        <div class="log-line ${log.type}">${log.text}</div>
+                    `).join('');
+                    container.scrollTop = container.scrollHeight;
+                } catch (err) {
+                    console.error('Failed to load pipeline logs:', err);
+                }
+            }
+
+            updateLogs();
+            // Auto-refresh logs every 2 seconds while modal is open
+            pipelineLogsInterval = setInterval(updateLogs, 2000);
+        }
+
+        function closePipelineLogsModal() {
+            document.getElementById('pipeline-logs-modal').style.display = 'none';
+            if (pipelineLogsInterval) {
+                clearInterval(pipelineLogsInterval);
+                pipelineLogsInterval = null;
             }
         }
 
@@ -1363,9 +1594,206 @@
             overlay.addEventListener('click', (e) => {
                 if (e.target === overlay) {
                     overlay.style.display = 'none';
+                    // Stop log refresh if closing parallel workers modal
+                    if (overlay.id === 'parallel-workers-modal' && parallelWorkersLogsInterval) {
+                        clearInterval(parallelWorkersLogsInterval);
+                        parallelWorkersLogsInterval = null;
+                    }
                 }
             });
         });
+
+        // =============================================================================
+        // Parallel Workers
+        // =============================================================================
+
+        let parallelWorkersLogsInterval = null;
+
+        async function loadParallelWorkersStatus() {
+            try {
+                const response = await fetch('/api/parallel-workers/status');
+                const status = await response.json();
+
+                const statusIndicator = document.getElementById('parallel-workers-status');
+                const btn = document.getElementById('parallel-workers-btn');
+                const startBtn = document.getElementById('pw-start-btn');
+                const stopBtn = document.getElementById('pw-stop-btn');
+                const statusText = document.getElementById('pw-status-text');
+                const details = document.getElementById('pw-details');
+                const config = document.getElementById('parallel-workers-config');
+
+                if (status.running) {
+                    statusIndicator.textContent = `● Running (${status.numWorkers} workers)`;
+                    statusIndicator.style.color = 'var(--accent-green)';
+                    btn.textContent = 'Workers Running';
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-primary');
+
+                    startBtn.style.display = 'none';
+                    stopBtn.style.display = 'inline-flex';
+                    config.style.opacity = '0.5';
+                    config.style.pointerEvents = 'none';
+
+                    statusText.textContent = 'Running';
+                    statusText.style.color = 'var(--accent-green)';
+                    details.style.display = 'block';
+                    document.getElementById('pw-pid').textContent = status.pid;
+                    document.getElementById('pw-num-workers').textContent = status.numWorkers;
+                    document.getElementById('pw-start-time').textContent = new Date(status.startTime).toLocaleString();
+
+                    // Calculate uptime
+                    const uptime = Math.floor((Date.now() - new Date(status.startTime).getTime()) / 1000);
+                    const hours = Math.floor(uptime / 3600);
+                    const minutes = Math.floor((uptime % 3600) / 60);
+                    const seconds = uptime % 60;
+                    document.getElementById('pw-uptime').textContent = `Uptime: ${hours}h ${minutes}m ${seconds}s`;
+                } else {
+                    statusIndicator.textContent = '● Stopped';
+                    statusIndicator.style.color = 'var(--text-secondary)';
+                    btn.textContent = 'Start Workers';
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-success');
+
+                    startBtn.style.display = 'inline-flex';
+                    stopBtn.style.display = 'none';
+                    config.style.opacity = '1';
+                    config.style.pointerEvents = 'auto';
+
+                    statusText.textContent = 'Not running';
+                    statusText.style.color = 'var(--text-secondary)';
+                    details.style.display = 'none';
+                    document.getElementById('pw-uptime').textContent = '';
+                }
+            } catch (err) {
+                console.error('Failed to load parallel workers status:', err);
+            }
+        }
+
+        async function refreshParallelWorkersStatus() {
+            await loadParallelWorkersStatus();
+            await loadParallelWorkersLogs();
+        }
+
+        async function loadParallelWorkersLogs() {
+            try {
+                const response = await fetch('/api/parallel-workers/logs');
+                const logs = await response.json();
+                const container = document.getElementById('parallel-workers-logs');
+
+                document.getElementById('pw-log-count').textContent = `${logs.length} entries`;
+
+                if (logs.length === 0) {
+                    container.innerHTML = '<div class="empty-state">Logs will appear here when workers run</div>';
+                    return;
+                }
+
+                container.innerHTML = logs.map(log => `
+                    <div class="log-line ${log.type}">${log.text}</div>
+                `).join('');
+                container.scrollTop = container.scrollHeight;
+            } catch (err) {
+                console.error('Failed to load parallel workers logs:', err);
+            }
+        }
+
+        function openParallelWorkersModal() {
+            const modal = document.getElementById('parallel-workers-modal');
+            modal.style.display = 'flex';
+            refreshParallelWorkersStatus();
+
+            // Auto-refresh logs every 2 seconds while modal is open
+            parallelWorkersLogsInterval = setInterval(() => {
+                loadParallelWorkersStatus();
+                loadParallelWorkersLogs();
+            }, 2000);
+        }
+
+        function closeParallelWorkersModal() {
+            document.getElementById('parallel-workers-modal').style.display = 'none';
+            if (parallelWorkersLogsInterval) {
+                clearInterval(parallelWorkersLogsInterval);
+                parallelWorkersLogsInterval = null;
+            }
+        }
+
+        async function startParallelWorkers() {
+            const numWorkers = parseInt(document.getElementById('num-workers-input').value) || 3;
+            const featuresInput = document.getElementById('features-input').value.trim();
+            const features = featuresInput ? featuresInput.split(',').map(f => f.trim()).filter(f => f) : [];
+
+            try {
+                const response = await fetch('/api/parallel-workers/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ numWorkers, features: features.length > 0 ? features : undefined })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to start workers');
+                }
+
+                const result = await response.json();
+                console.log('Parallel workers started:', result);
+                refreshParallelWorkersStatus();
+            } catch (err) {
+                alert('Failed to start parallel workers: ' + err.message);
+            }
+        }
+
+        async function stopParallelWorkers() {
+            if (!confirm('Are you sure you want to stop all parallel workers?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/parallel-workers/stop', {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to stop workers');
+                }
+
+                const result = await response.json();
+                console.log('Parallel workers stopped:', result);
+                refreshParallelWorkersStatus();
+            } catch (err) {
+                alert('Failed to stop parallel workers: ' + err.message);
+            }
+        }
+
+        // Handle SSE events for parallel workers
+        function handleParallelWorkersSSE(data) {
+            switch (data.type) {
+                case 'parallel-workers-started':
+                    loadParallelWorkersStatus();
+                    break;
+                case 'parallel-workers-stopped':
+                    loadParallelWorkersStatus();
+                    break;
+                case 'parallel-workers-log':
+                    // Append log if modal is open
+                    if (document.getElementById('parallel-workers-modal').style.display === 'flex') {
+                        const container = document.getElementById('parallel-workers-logs');
+                        if (container.querySelector('.empty-state')) {
+                            container.innerHTML = '';
+                        }
+                        const line = document.createElement('div');
+                        line.className = `log-line ${data.stream}`;
+                        line.textContent = data.log;
+                        container.appendChild(line);
+                        container.scrollTop = container.scrollHeight;
+
+                        // Update count
+                        const countEl = document.getElementById('pw-log-count');
+                        const currentCount = parseInt(countEl.textContent) || 0;
+                        countEl.textContent = `${currentCount + 1} entries`;
+                    }
+                    break;
+            }
+        }
     </script>
 </body>
 </html>
