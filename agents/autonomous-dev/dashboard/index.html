@@ -586,6 +586,17 @@
 
     <main class="main">
         <div class="left-panel">
+            <section class="section" id="parallel-work-section" style="display: none;">
+                <div class="launch-section">
+                    <h3 class="launch-title">
+                        <span>Available Parallel Work</span>
+                        <span class="status-badge" style="background: rgba(163, 113, 247, 0.2); color: var(--accent-purple);">Ready to launch</span>
+                    </h3>
+                    <div class="parallel-tasks" id="parallel-tasks-container"></div>
+                    <button class="btn btn-success" onclick="launchSelected()">Launch Selected Tasks</button>
+                </div>
+            </section>
+
             <section class="section">
                 <div class="section-header">
                     <h2 class="section-title">Roadmap Phases</h2>
@@ -593,17 +604,6 @@
                 </div>
                 <div class="phases-grid" id="phases-container">
                     <div class="loading"><div class="spinner"></div></div>
-                </div>
-            </section>
-
-            <section class="section" id="parallel-work-section" style="display: none;">
-                <div class="launch-section">
-                    <h3 class="launch-title">
-                        <span>Available Parallel Work</span>
-                        <span class="status-badge" style="background: rgba(163, 113, 247, 0.2); color: var(--accent-purple);">Can run together</span>
-                    </h3>
-                    <div class="parallel-tasks" id="parallel-tasks-container"></div>
-                    <button class="btn btn-success" onclick="launchSelected()">Launch Selected Tasks</button>
                 </div>
             </section>
         </div>
@@ -873,7 +873,8 @@
             for (const phase of phases) {
                 if (phase.status === 'ready' || phase.status === 'in_progress') {
                     for (const task of phase.tasks) {
-                        if (task.parallel && (task.status === 'ready' || task.status === 'in_progress')) {
+                        // Only show READY tasks (not in_progress - those are already running)
+                        if (task.parallel && task.status === 'ready') {
                             parallelTasks.push({
                                 phaseName: phase.name,
                                 phaseNumber: phase.number,
@@ -1021,7 +1022,9 @@
                         <div style="font-size: 11px; color: var(--text-secondary); margin-top: 6px;">
                             Started: ${new Date(p.startTime).toLocaleTimeString()}
                             ${p.status === 'running' ? `
-                                <button class="btn btn-danger" style="padding: 2px 6px; font-size: 11px; margin-left: 8px;" onclick="stopPipeline('${p.id}')">Stop</button>
+                                <button class="btn btn-danger" style="padding: 2px 6px; font-size: 11px; margin-left: 8px;" onclick="stopPipeline('${p.id}', '${p.featureName || 'this task'}')">Stop</button>
+                            ` : p.status === 'stopped' || p.status === 'failed' ? `
+                                <button class="btn btn-primary" style="padding: 2px 6px; font-size: 11px; margin-left: 8px;" onclick="restartPipeline('${p.featureName}')">Restart</button>
                             ` : ''}
                         </div>
                     </div>
@@ -1031,7 +1034,10 @@
             }
         }
 
-        async function stopPipeline(id) {
+        async function stopPipeline(id, featureName) {
+            if (!confirm(`Are you sure you want to stop the pipeline for "${featureName}"?`)) {
+                return;
+            }
             try {
                 await fetch(`/api/pipelines/${id}/stop`, { method: 'POST' });
                 loadPipelines();
@@ -1040,17 +1046,31 @@
             }
         }
 
+        async function restartPipeline(featureName) {
+            try {
+                const response = await fetch('/api/pipelines', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ featureName, options: { resume: true } })
+                });
+                const data = await response.json();
+                loadPipelines();
+            } catch (err) {
+                alert('Failed to restart pipeline: ' + err.message);
+            }
+        }
+
         // Launch Modal
         function openLaunchModal() {
             const modal = document.getElementById('launch-modal');
             const container = document.getElementById('launch-modal-tasks');
 
-            // Get all ready/in-progress tasks that can be parallelized
+            // Get all ready tasks (not in-progress, those are already running)
             const tasks = [];
             if (roadmapData) {
                 for (const phase of roadmapData.phases) {
                     for (const task of phase.tasks) {
-                        if (task.status === 'ready' || task.status === 'in_progress') {
+                        if (task.status === 'ready') {
                             tasks.push({
                                 phaseName: phase.name,
                                 phaseNumber: phase.number,
