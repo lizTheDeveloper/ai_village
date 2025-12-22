@@ -225,16 +225,18 @@ function launchPipeline(featureName, options = {}) {
     const scriptPath = path.join(SCRIPTS_DIR, 'orchestrator.sh');
 
     const args = [];
-    if (featureName) {
+    if (options.resume && featureName) {
+        // Resume mode: --resume NAME
+        args.push('--resume', featureName);
+    } else if (featureName) {
+        // Feature mode: --feature NAME
         args.push('--feature', featureName);
     }
-    if (options.resume) {
-        args.push('--resume', featureName);
-    }
+    // Auto mode: no arguments (picks next from roadmap)
 
     const pipeline = {
         id,
-        featureName,
+        featureName: featureName || 'auto',
         startTime: new Date().toISOString(),
         status: 'running',
         logs: [],

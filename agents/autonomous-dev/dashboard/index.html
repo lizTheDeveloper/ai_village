@@ -578,6 +578,9 @@
             <button class="btn" onclick="refreshRoadmap()">
                 <span>Refresh from Markdown</span>
             </button>
+            <button class="btn btn-success" onclick="launchAutoMode()" title="Let orchestrator pick next task from roadmap">
+                Auto Launch Next
+            </button>
             <button class="btn btn-primary" onclick="openLaunchModal()">
                 Launch Agent Teams
             </button>
@@ -1169,6 +1172,25 @@
                 alert(`Launched ${data.pipelines.length} pipeline(s) in parallel`);
             } catch (err) {
                 alert('Failed to launch pipelines: ' + err.message);
+            }
+        }
+
+        async function launchAutoMode() {
+            if (!confirm('Launch orchestrator in auto mode? It will pick the next task from the roadmap.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/pipelines', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ featureName: null, options: {} })
+                });
+                const data = await response.json();
+                loadPipelines();
+                alert(`Auto mode pipeline launched (${data.id})`);
+            } catch (err) {
+                alert('Failed to launch auto mode: ' + err.message);
             }
         }
 
