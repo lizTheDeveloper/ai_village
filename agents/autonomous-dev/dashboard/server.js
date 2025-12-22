@@ -520,6 +520,26 @@ app.get('/api/logs/:name', (req, res) => {
     }
 });
 
+// Server stats
+const serverStartTime = Date.now();
+
+app.get('/api/server/stats', (req, res) => {
+    const uptime = Date.now() - serverStartTime;
+    res.json({
+        connectedSessions: sseClients.size,
+        uptime: Math.floor(uptime / 1000), // seconds
+        port: PORT,
+        url: `http://localhost:${PORT}`
+    });
+});
+
+app.post('/api/server/restart', (req, res) => {
+    res.json({ message: 'Server restarting...' });
+    setTimeout(() => {
+        process.exit(0); // Exit cleanly, assuming something restarts it
+    }, 100);
+});
+
 // SSE endpoint
 app.get('/api/events', (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');

@@ -293,8 +293,10 @@
             background: var(--bg-tertiary);
             border-radius: 6px;
             padding: 12px;
-            cursor: pointer;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .work-order-item:hover {
@@ -573,8 +575,17 @@
 </head>
 <body>
     <header class="header">
-        <h1>AI Village Orchestration Dashboard</h1>
+        <div>
+            <h1>AI Village Orchestration Dashboard</h1>
+            <div id="server-info" style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
+                <a id="dashboard-url" href="" target="_blank" style="color: var(--accent-blue); text-decoration: none;">Loading...</a>
+                <span style="margin-left: 12px;" id="session-count">0 sessions</span>
+            </div>
+        </div>
         <div class="header-actions">
+            <button class="btn btn-sm" onclick="restartServer()" title="Restart dashboard server">
+                Restart Server
+            </button>
             <button class="btn" onclick="refreshRoadmap()">
                 <span>Refresh from Markdown</span>
             </button>
@@ -738,6 +749,35 @@
         let pipelinesData = [];
         let eventSource = null;
 
+        // Server stats
+        async function loadServerStats() {
+            try {
+                const response = await fetch('/api/server/stats');
+                const stats = await response.json();
+
+                const urlLink = document.getElementById('dashboard-url');
+                urlLink.href = stats.url;
+                urlLink.textContent = stats.url;
+
+                const sessionCount = document.getElementById('session-count');
+                sessionCount.textContent = `${stats.connectedSessions} session${stats.connectedSessions !== 1 ? 's' : ''}`;
+            } catch (err) {
+                console.error('Failed to load server stats:', err);
+            }
+        }
+
+        async function restartServer() {
+            if (!confirm('Restart the dashboard server? This will disconnect all sessions.')) {
+                return;
+            }
+            try {
+                await fetch('/api/server/restart', { method: 'POST' });
+                alert('Server restarting... Refresh this page in a few seconds.');
+            } catch (err) {
+                // Expected to fail since server is restarting
+            }
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             initTabs();
@@ -746,9 +786,12 @@
             loadWorkOrders();
             loadPipelines();
             loadRecentLogs();
+            loadServerStats();
 
             // Auto-refresh logs every 5 seconds
             setInterval(loadRecentLogs, 5000);
+            // Auto-refresh server stats every 10 seconds
+            setInterval(loadServerStats, 10000);
         });
 
         // Tabs
@@ -927,17 +970,22 @@
                 }
 
                 container.innerHTML = workOrdersData.map(wo => `
-                    <div class="work-order-item" onclick="openWorkOrder('${wo.name}')">
-                        <div class="work-order-header">
-                            <span class="work-order-name">${wo.name}</span>
-                            <span class="status-badge status-${wo.state === 'READY_FOR_REVIEW' ? 'ready' : wo.state === 'BLOCKED' ? 'blocked' : 'in_progress'}">
-                                ${wo.state}
-                            </span>
+                    <div class="work-order-item">
+                        <div onclick="openWorkOrder('${wo.name}')" style="flex: 1; cursor: pointer;">
+                            <div class="work-order-header">
+                                <span class="work-order-name">${wo.name}</span>
+                                <span class="status-badge status-${wo.state === 'READY_FOR_REVIEW' ? 'ready' : wo.state === 'BLOCKED' ? 'blocked' : 'in_progress'}">
+                                    ${wo.state}
+                                </span>
+                            </div>
+                            <div class="work-order-meta">
+                                ${wo.verdict ? `<span>Verdict: ${wo.verdict}</span>` : ''}
+                                <span>${wo.screenshotCount} screenshots</span>
+                            </div>
                         </div>
-                        <div class="work-order-meta">
-                            ${wo.verdict ? `<span>Verdict: ${wo.verdict}</span>` : ''}
-                            <span>${wo.screenshotCount} screenshots</span>
-                        </div>
+                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); resumeWorkOrder('${wo.name}')" title="Resume this work order">
+                            Resume
+                        </button>
                     </div>
                 `).join('');
             } catch (err) {
@@ -1064,6 +1112,24 @@
                 loadPipelines();
             } catch (err) {
                 alert('Failed to restart pipeline: ' + err.message);
+            }
+        }
+
+        async function resumeWorkOrder(name) {
+            if (!confirm(`Resume work order "${name}"?`)) {
+                return;
+            }
+            try {
+                const response = await fetch('/api/pipelines', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ featureName: name, options: { resume: true } })
+                });
+                const data = await response.json();
+                loadPipelines();
+                alert(`Resumed work order: ${name} (${data.id})`);
+            } catch (err) {
+                alert('Failed to resume work order: ' + err.message);
             }
         }
 
