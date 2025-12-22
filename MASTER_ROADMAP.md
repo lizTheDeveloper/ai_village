@@ -29,10 +29,14 @@
 | Phase 7 | 🚧 In Progress | Building & Shelter |
 | Phase 8 | ✅ Complete | Temperature & Weather |
 | Phase 9-11 | ⏳ Ready | Farming, Crafting, Animals now unblocked |
+| Phase 22-26 | ⏳ Ready | Sociological Metrics System (can run parallel) |
+| Phase 27-28 | ⏳ Ready | Divine Communication & Angel Systems (can run parallel) |
 
 **Next Available Work:**
 1. Phase 7 remaining tasks (Building Definitions, Resource Gathering, Construction Progress, Building Placement UI, Agent Inventory Display)
 2. **Phases 9-11 (Farming, Crafting, Animals) - NOW READY!**
+3. **Phase 22 (Sociological Metrics Foundation) - CAN START NOW!** (Runs parallel with other phases)
+4. **Phase 27 (Divine Communication - Prayer/Visions) - CAN START NOW!** (Runs parallel, integrates with Phase 4-6, 8)
 
 ---
 
@@ -279,7 +283,9 @@ Farming                Crafting              Animals
 | Soil/Tile System | 🚧 | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | - |
 
 **Work Order:** [agents/autonomous-dev/work-orders/soil-tile-system/work-order.md](agents/autonomous-dev/work-orders/soil-tile-system/work-order.md)
-| Plant Lifecycle | ⏳ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | - |
+| Plant Lifecycle | 🚧 | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | - |
+
+**Work Order:** [agents/autonomous-dev/work-orders/plant-lifecycle/work-order.md](agents/autonomous-dev/work-orders/plant-lifecycle/work-order.md)
 | Seed System | ⏳ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | 🔀 |
 | Tilling Action | ⏳ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | 🔀 |
 | Planting Action | ⏳ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | - |
@@ -470,6 +476,239 @@ These phases extend beyond the core game:
 | Universe Types | [universe-system/spec.md](openspec/specs/universe-system/spec.md) |
 | Cross-Game Progression | [nexus-system/spec.md](openspec/specs/nexus-system/spec.md) |
 
+### Phase 22: Sociological Metrics - Foundation ⏳ READY
+
+**Status:** ⏳ Ready (foundational systems complete)
+**Dependencies:** Phase 3 (Agent Needs), Phase 4 (Memory & Social), Phase 5 (Communication)
+**Parallel Work:** 🔀 Can run parallel with Phase 7-11
+**Estimated LOC:** ~1,500
+**Spec:** [sociological-metrics-system.md](custom_game_engine/specs/sociological-metrics-system.md)
+
+| Task | Status | Spec | Parallel? |
+|------|--------|------|-----------|
+| MetricsCollectionSystem (ECS) | ⏳ Ready | [Section 2.1](custom_game_engine/specs/sociological-metrics-system.md#21-metricscollectionsystem-ecs-system) | - |
+| Event schemas (Interaction, Behavior, Spatial, Resource) | ⏳ Ready | [Section 2.2](custom_game_engine/specs/sociological-metrics-system.md#22-event-schemas) | 🔀 |
+| RingBuffer implementation | ⏳ Ready | [Section 3.1](custom_game_engine/specs/sociological-metrics-system.md#31-in-memory-buffers-during-simulation) | 🔀 |
+| Event emitters in AISystem/World | ⏳ Ready | [Section 2.1](custom_game_engine/specs/sociological-metrics-system.md#21-metricscollectionsystem-ecs-system) | - |
+| Metrics configuration | ⏳ Ready | [Section 8.1](custom_game_engine/specs/sociological-metrics-system.md#81-metrics-configuration) | 🔀 |
+
+**Implementation:**
+- `packages/core/src/systems/MetricsCollectionSystem.ts`
+- `packages/core/src/metrics/events/`
+- `packages/core/src/metrics/buffers/`
+- `config/metrics.config.ts`
+
+**Tests:** `packages/core/src/metrics/__tests__/`
+
+---
+
+### Phase 23: Sociological Metrics - Storage & API 🔒 BLOCKED
+
+**Status:** 🔒 Blocked on Phase 22
+**Dependencies:** Phase 22 (Foundation)
+**Parallel Work:** Tasks within phase can be parallelized
+**Estimated LOC:** ~1,000
+**Spec:** [sociological-metrics-system.md](custom_game_engine/specs/sociological-metrics-system.md)
+
+| Task | Status | Spec | Parallel? |
+|------|--------|------|-----------|
+| SQLite database schema | 🔒 Blocked | [Section 3.2](custom_game_engine/specs/sociological-metrics-system.md#32-persistent-storage-sqlite) | - |
+| Periodic flush mechanism | 🔒 Blocked | [Section 6.1](custom_game_engine/specs/sociological-metrics-system.md#61-optimization-strategies) | - |
+| REST API endpoints | 🔒 Blocked | [Section 5.1](custom_game_engine/specs/sociological-metrics-system.md#51-rest-api) | 🔀 |
+| WebSocket server for live updates | 🔒 Blocked | [Section 5.2](custom_game_engine/specs/sociological-metrics-system.md#52-websocket-api) | 🔀 |
+| CSV/JSON export functionality | 🔒 Blocked | [Section 3.3](custom_game_engine/specs/sociological-metrics-system.md#33-export-formats) | 🔀 |
+
+**Implementation:**
+- `packages/core/src/metrics/storage/MetricsDatabase.ts`
+- `packages/core/src/metrics/api/MetricsAPI.ts`
+- `packages/core/src/metrics/api/MetricsWebSocket.ts`
+- `packages/core/src/metrics/exporters/`
+
+**Database:** `custom_game_engine/data/metrics.db`
+
+---
+
+### Phase 24: Sociological Metrics - Analysis Modules 🔒 BLOCKED
+
+**Status:** 🔒 Blocked on Phase 22
+**Dependencies:** Phase 22 (Foundation)
+**Parallel Work:** 🔀 All analyzers can be developed in parallel
+**Estimated LOC:** ~2,000
+**Spec:** [sociological-metrics-system.md](custom_game_engine/specs/sociological-metrics-system.md)
+
+| Task | Status | Spec | Parallel? |
+|------|--------|------|-----------|
+| NetworkAnalyzer (graph metrics) | 🔒 Blocked | [Section 4.1](custom_game_engine/specs/sociological-metrics-system.md#41-networkanalyzer) | 🔀 |
+| SpatialAnalyzer (territory, heatmaps) | 🔒 Blocked | [Section 4.3](custom_game_engine/specs/sociological-metrics-system.md#43-spatialanalyzer) | 🔀 |
+| InequalityAnalyzer (Gini, stratification) | 🔒 Blocked | [Section 4.4](custom_game_engine/specs/sociological-metrics-system.md#44-inequalityanalyzer) | 🔀 |
+| CulturalDiffusionAnalyzer | 🔒 Blocked | [Section 4.2](custom_game_engine/specs/sociological-metrics-system.md#42-culturaldiffusionanalyzer) | 🔀 |
+
+**Implementation:**
+- `packages/core/src/metrics/analyzers/NetworkAnalyzer.ts`
+- `packages/core/src/metrics/analyzers/SpatialAnalyzer.ts`
+- `packages/core/src/metrics/analyzers/InequalityAnalyzer.ts`
+- `packages/core/src/metrics/analyzers/CulturalDiffusionAnalyzer.ts`
+
+**Key Metrics:**
+- **Network**: Density, clustering, centrality, communities, diameter
+- **Spatial**: Territory formation, hotspots, heatmaps, segregation indices
+- **Inequality**: Gini coefficient, wealth mobility, social stratification
+- **Cultural**: Behavior diffusion cascades, adoption rates, innovation tracking
+
+---
+
+### Phase 25: Sociological Metrics - Visualization Dashboard 🔒 BLOCKED
+
+**Status:** 🔒 Blocked on Phase 23, 24
+**Dependencies:** Phase 23 (Storage & API), Phase 24 (Analysis)
+**Parallel Work:** 🔀 All visualization components can be built in parallel
+**Estimated LOC:** ~2,500
+**Spec:** [sociological-metrics-system.md](custom_game_engine/specs/sociological-metrics-system.md)
+
+| Task | Status | Spec | Parallel? |
+|------|--------|------|-----------|
+| Dashboard React app setup | 🔒 Blocked | [Section 7.1, 7.2](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | - |
+| Network visualization (force-directed graph) | 🔒 Blocked | [Section 7.1](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | 🔀 |
+| Behavior timeline view | 🔒 Blocked | [Section 7.1](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | 🔀 |
+| Spatial heatmap overlay | 🔒 Blocked | [Section 7.1](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | 🔀 |
+| Inequality dashboard (Lorenz curves) | 🔒 Blocked | [Section 7.1](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | 🔀 |
+| Cultural diffusion view (Sankey diagrams) | 🔒 Blocked | [Section 7.1](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | 🔀 |
+| Time series explorer | 🔒 Blocked | [Section 7.1](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | 🔀 |
+
+**Implementation:**
+- `packages/metrics-dashboard/` (new package)
+- `packages/metrics-dashboard/src/components/`
+- `packages/metrics-dashboard/src/views/`
+
+**Tech Stack:** React, TypeScript, D3.js, Cytoscape.js, Recharts, Zustand
+
+**Visualizations:**
+- **Network View**: Interactive force-directed graph with community detection
+- **Behavior Timeline**: Stacked area charts, innovation/adoption events
+- **Spatial Heatmap**: Density overlay, movement trails, territory boundaries
+- **Inequality Dashboard**: Lorenz curves, Gini trends, quartile analysis
+- **Cultural Diffusion**: Sankey diagrams, cascade trees, adoption curves
+- **Time Series**: Multi-metric line charts, correlation matrices
+
+---
+
+### Phase 26: Sociological Metrics - Advanced Analysis 🔒 BLOCKED
+
+**Status:** 🔒 Blocked on Phase 24, 25
+**Dependencies:** Phase 24 (Analysis Modules), Phase 25 (Visualization)
+**Parallel Work:** 🔀 Can develop features in parallel
+**Estimated LOC:** ~1,000
+**Spec:** [sociological-metrics-system.md](custom_game_engine/specs/sociological-metrics-system.md)
+
+| Task | Status | Spec | Parallel? |
+|------|--------|------|-----------|
+| Automated insight generation | 🔒 Blocked | [Section 4](custom_game_engine/specs/sociological-metrics-system.md#4-analysis-modules) | 🔀 |
+| Anomaly detection algorithms | 🔒 Blocked | [Section 4](custom_game_engine/specs/sociological-metrics-system.md#4-analysis-modules) | 🔀 |
+| Pattern recognition (emergent behaviors) | 🔒 Blocked | [Section 4](custom_game_engine/specs/sociological-metrics-system.md#4-analysis-modules) | 🔀 |
+| Predictive modeling (social change forecasting) | 🔒 Blocked | [Section 4](custom_game_engine/specs/sociological-metrics-system.md#4-analysis-modules) | 🔀 |
+| Historical playback mode | 🔒 Blocked | [Section 10](custom_game_engine/specs/sociological-metrics-system.md#10-implementation-plan) | - |
+| Custom query language | 🔒 Blocked | [Section 5.1](custom_game_engine/specs/sociological-metrics-system.md#51-rest-api) | - |
+
+**Implementation:**
+- `packages/core/src/metrics/insights/`
+- `packages/core/src/metrics/anomalies/`
+- `packages/core/src/metrics/patterns/`
+
+**Features:**
+- Detect network fragmentation events
+- Identify super-spreaders of cultural behaviors
+- Alert on resource inequality spikes
+- Predict community split events
+- Track long-term evolutionary social dynamics
+
+---
+
+### Phase 27: Divine Communication System ⏳ READY
+
+**Status:** ⏳ Ready (foundational systems complete)
+**Dependencies:** Phase 3 (Agent Needs), Phase 4 (Memory & Social), Phase 5 (Communication), Phase 8 (Circadian/Sleep)
+**Parallel Work:** 🔀 Can run parallel with Phase 7-11, 22-26
+**Estimated LOC:** ~3,000
+**Spec:** [divine-communication-system.md](custom_game_engine/specs/divine-communication-system.md)
+
+| Task | Status | Spec | Parallel? |
+|------|--------|------|-----------|
+| PrayerComponent & System | ⏳ Ready | [Section 2](custom_game_engine/specs/divine-communication-system.md#2-prayer-system) | - |
+| Prayer triggers and generation | ⏳ Ready | [Section 2.2-2.3](custom_game_engine/specs/divine-communication-system.md#22-prayer-behavior) | 🔀 |
+| SpiritualComponent | ⏳ Ready | [Section 3.1](custom_game_engine/specs/divine-communication-system.md#31-spiritual-component) | 🔀 |
+| MeditateAction behavior | ⏳ Ready | [Section 3.2](custom_game_engine/specs/divine-communication-system.md#32-meditation-behavior) | - |
+| Vision generation with LLM | ⏳ Ready | [Section 4.2](custom_game_engine/specs/divine-communication-system.md#42-vision-generation) | - |
+| Player vision sending UI | ⏳ Ready | [UI Spec](custom_game_engine/specs/divine-systems-ui.md) | 🔀 |
+| Sacred site discovery | ⏳ Ready | [Section 5](custom_game_engine/specs/divine-communication-system.md#5-sacred-locations) | 🔀 |
+| Faith system | ⏳ Ready | [Section 7](custom_game_engine/specs/divine-communication-system.md#7-faith--doubt-mechanics) | - |
+| Group prayer & rituals | ⏳ Ready | [Section 6](custom_game_engine/specs/divine-communication-system.md#6-group-prayer--rituals) | 🔀 |
+| Integration with Dreams | ⏳ Ready | [Section 9.1](custom_game_engine/specs/divine-communication-system.md#91-with-circadiandreams-system) | - |
+
+**Implementation:**
+- `packages/core/src/components/PrayerComponent.ts`
+- `packages/core/src/components/SpiritualComponent.ts`
+- `packages/core/src/systems/PrayerSystem.ts`
+- `packages/core/src/systems/VisionSystem.ts`
+- `packages/core/src/systems/FaithSystem.ts`
+- `packages/core/src/systems/SacredSiteSystem.ts`
+- `packages/core/src/actions/PrayAction.ts`
+- `packages/core/src/actions/MeditateAction.ts`
+
+**Key Features:**
+- **Prayer**: Agents actively communicate with player/god
+- **Meditation**: Receptive state for divine guidance
+- **Visions**: Divine messages delivered to agents
+- **Faith**: Dynamic belief system affecting behavior
+- **Sacred Sites**: Locations of spiritual significance
+- **Rituals**: Emergent prayer practices
+
+**Player Role:** You are God - agents pray to you, you respond with visions
+
+---
+
+### Phase 28: Angel Delegation System 🔒 BLOCKED
+
+**Status:** 🔒 Blocked on Phase 27
+**Dependencies:** Phase 27 (Divine Communication)
+**Parallel Work:** Tasks within phase can be parallelized
+**Estimated LOC:** ~4,000
+**Spec:** [angel-delegation-system.md](custom_game_engine/specs/angel-delegation-system.md)
+
+| Task | Status | Spec | Parallel? |
+|------|--------|------|-----------|
+| AngelComponent & types | 🔒 Blocked | [Section 2](custom_game_engine/specs/angel-delegation-system.md#2-angel-types--components) | - |
+| Angel AI system (prayer assignment) | 🔒 Blocked | [Section 3.1](custom_game_engine/specs/angel-delegation-system.md#31-prayer-assignment) | - |
+| Angel response generation (LLM) | 🔒 Blocked | [Section 3.2](custom_game_engine/specs/angel-delegation-system.md#32-prayer-response-generation) | - |
+| Angel creation system | 🔒 Blocked | [Section 4.1](custom_game_engine/specs/angel-delegation-system.md#41-angel-creation) | 🔀 |
+| Divine resource management | 🔒 Blocked | [Section 8](custom_game_engine/specs/angel-delegation-system.md#8-divine-resources) | - |
+| Angel management UI | 🔒 Blocked | [UI Spec](custom_game_engine/specs/divine-systems-ui.md) | 🔀 |
+| Angel progression & leveling | 🔒 Blocked | [Section 6.1](custom_game_engine/specs/angel-delegation-system.md#61-leveling-system) | - |
+| Archangel hierarchy | 🔒 Blocked | [Section 5](custom_game_engine/specs/angel-delegation-system.md#5-angel-hierarchy) | 🔀 |
+| Angel failure & corruption | 🔒 Blocked | [Section 7](custom_game_engine/specs/angel-delegation-system.md#7-angel-failure--corruption) | 🔀 |
+| Outcome tracking | 🔒 Blocked | [Section 7.1](custom_game_engine/specs/angel-delegation-system.md#71-tracking-outcomes) | - |
+
+**Implementation:**
+- `packages/core/src/components/AngelComponent.ts`
+- `packages/core/src/systems/AngelAISystem.ts`
+- `packages/core/src/systems/AngelCreationSystem.ts`
+- `packages/core/src/systems/AngelProgressionSystem.ts`
+- `packages/core/src/systems/ArchangelSystem.ts`
+- `packages/core/src/systems/AngelFailureSystem.ts`
+- `packages/core/src/systems/DivineResourceSystem.ts`
+
+**Key Features:**
+- **Automation**: Angels handle prayers as village grows
+- **Specialization**: Different angel types (Guardian, Specialist, Messenger)
+- **Personalities**: Each angel has unique traits
+- **Progression**: Angels level up, gain abilities
+- **Hierarchy**: Archangels manage other angels
+- **Failure States**: Angels can make mistakes, become corrupted
+
+**Gameplay Progression:**
+- Early game: You answer all prayers personally (5 agents)
+- Mid game: Create angels to delegate (15+ agents)
+- Late game: Angel hierarchy, you manage strategy (50+ agents)
+
 ---
 
 ## Dependency Graph
@@ -617,6 +856,18 @@ All specifications linked for easy access:
 | Consciousness Phases | [openspec/specs/consciousness-implementation-phases.md](openspec/specs/consciousness-implementation-phases.md) | 17 |
 | Feasibility Review | [openspec/specs/FEASIBILITY_REVIEW.md](openspec/specs/FEASIBILITY_REVIEW.md) | - |
 
+### Metrics & Analytics
+| Spec | Path | Phase |
+|------|------|-------|
+| Sociological Metrics System | [custom_game_engine/specs/sociological-metrics-system.md](custom_game_engine/specs/sociological-metrics-system.md) | 22-26 |
+
+### Divine Systems
+| Spec | Path | Phase |
+|------|------|-------|
+| Divine Communication System | [custom_game_engine/specs/divine-communication-system.md](custom_game_engine/specs/divine-communication-system.md) | 27 |
+| Angel Delegation System | [custom_game_engine/specs/angel-delegation-system.md](custom_game_engine/specs/angel-delegation-system.md) | 28 |
+| Divine Systems Integration | [custom_game_engine/specs/divine-systems-integration.md](custom_game_engine/specs/divine-systems-integration.md) | 27-28 |
+
 ### UI Specs
 | Spec | Path | Phase |
 |------|------|-------|
@@ -636,6 +887,7 @@ All specifications linked for easy access:
 | Time Controls | [openspec/specs/ui-system/time-controls.md](openspec/specs/ui-system/time-controls.md) | 16 |
 | Notifications | [openspec/specs/ui-system/notifications.md](openspec/specs/ui-system/notifications.md) | 16 |
 | Context Menu | [openspec/specs/ui-system/context-menu.md](openspec/specs/ui-system/context-menu.md) | 16 |
+| Divine Systems UI | [custom_game_engine/specs/divine-systems-ui.md](custom_game_engine/specs/divine-systems-ui.md) | 27-28 |
 | Hover Info | [openspec/specs/ui-system/hover-info.md](openspec/specs/ui-system/hover-info.md) | 16 |
 | Objectives | [openspec/specs/ui-system/objectives.md](openspec/specs/ui-system/objectives.md) | 16 |
 | Conflict | [openspec/specs/ui-system/conflict.md](openspec/specs/ui-system/conflict.md) | 16 |

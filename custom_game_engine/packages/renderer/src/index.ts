@@ -12,3 +12,4 @@ export * from './BuildingPlacementUI.js';
 export * from './GhostRenderer.js';
 export * from './AgentInfoPanel.js';
 export * from './TileInspectorPanel.js';
+export * from './PlantInfoPanel.js';

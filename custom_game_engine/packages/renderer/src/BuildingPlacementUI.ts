@@ -195,14 +195,76 @@ export class BuildingPlacementUI {
     const snapped = this.validator.snapToGrid(worldPos.x, worldPos.y, this.tileSize);
     this.state.ghostPosition = snapped;
 
-    // Validate placement
+    // Find nearest agent with inventory to check resource requirements
+    const nearestAgentInventory = this.findNearestAgentInventory(world, worldPos);
+
+    // Validate placement (with inventory if found)
     this.state.validationResult = this.validator.validate(
       snapped,
       this.state.selectedBlueprint,
       world,
-      undefined, // No inventory check for now
+      nearestAgentInventory,
       this.state.ghostRotation
     );
+  }
+
+  /**
+   * Find the nearest agent with inventory to the placement position.
+   * Returns the agent's inventory as a resource map (resourceId -> quantity).
+   */
+  private findNearestAgentInventory(world: World, position: { x: number; y: number }): Record<string, number> | undefined {
+    // Query all agents with inventory
+    const agents = world.query().with('agent').with('inventory').with('position').executeEntities();
+
+    if (agents.length === 0) {
+      return undefined;
+    }
+
+    // Find nearest agent
+    let nearestAgent = null;
+    let nearestDistance = Infinity;
+
+    for (const agent of agents) {
+      const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
+      if (!agentPos) continue;
+
+      const dx = agentPos.x - position.x;
+      const dy = agentPos.y - position.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestAgent = agent;
+      }
+    }
+
+    if (!nearestAgent) {
+      return undefined;
+    }
+
+    // Get the agent's inventory component
+    const inventory = nearestAgent.components.get('inventory') as {
+      slots: Array<{ itemId: string | null; quantity: number }>;
+    } | undefined;
+
+    if (!inventory) {
+      return undefined;
+    }
+
+    // Convert inventory to resource map
+    const resourceMap: Record<string, number> = {};
+    for (const slot of inventory.slots) {
+      if (slot.itemId && slot.quantity > 0) {
+        const currentAmount = resourceMap[slot.itemId];
+        if (currentAmount !== undefined) {
+          resourceMap[slot.itemId] = currentAmount + slot.quantity;
+        } else {
+          resourceMap[slot.itemId] = slot.quantity;
+        }
+      }
+    }
+
+    return resourceMap;
   }
 
   /**
@@ -720,6 +782,7 @@ export class BuildingPlacementUI {
 
   /**
    * Render resource requirements panel.
+   * Shows resource requirements with color coding based on availability.
    */
   private renderResourcePanel(
     ctx: CanvasRenderingContext2D,
@@ -729,7 +792,7 @@ export class BuildingPlacementUI {
       return;
     }
 
-    const panelWidth = 150;
+    const panelWidth = 180;
     const panelHeight = 20 + blueprint.resourceCost.length * 18;
     const panelX = ctx.canvas.width / 2 - panelWidth / 2;
     const panelY = ctx.canvas.height - panelHeight - 20;
@@ -738,9 +801,10 @@ export class BuildingPlacementUI {
     ctx.fillStyle = 'rgba(30, 30, 30, 0.9)';
     ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
 
-    // Border
-    ctx.strokeStyle = '#555555';
-    ctx.lineWidth = 1;
+    // Border color based on resource availability
+    const hasResourceError = this.state.validationResult?.errors.some(e => e.type === 'resource_missing') ?? false;
+    ctx.strokeStyle = hasResourceError ? '#cc0000' : '#555555';
+    ctx.lineWidth = 2;
     ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
 
     // Title
@@ -748,18 +812,37 @@ export class BuildingPlacementUI {
     ctx.font = '10px monospace';
     ctx.fillText('Resources Required:', panelX + 5, panelY + 12);
 
+    // Get resource availability from validation errors
+    const resourceErrors = this.state.validationResult?.errors.filter(e => e.type === 'resource_missing') ?? [];
+
     // Resource list
     blueprint.resourceCost.forEach((cost, i) => {
       const y = panelY + 25 + i * 16;
 
-      // For Phase 7 MVP, show requirements without checking inventory
-      // All shown as available (green) since we're not tracking inventory yet
-      ctx.fillStyle = '#00ff00';
-      ctx.fillText(
-        `${cost.resourceId}: ${cost.amountRequired}`,
-        panelX + 10,
-        y
-      );
+      // Check if this resource has an error
+      const error = resourceErrors.find(e => e.message.includes(cost.resourceId));
+
+      if (error) {
+        // Parse the "have X" from the error message
+        const match = error.message.match(/have (\d+)/);
+        const available = match && match[1] ? parseInt(match[1], 10) : 0;
+
+        // Red for insufficient
+        ctx.fillStyle = '#ff6666';
+        ctx.fillText(
+          `${cost.resourceId}: ${available}/${cost.amountRequired}`,
+          panelX + 10,
+          y
+        );
+      } else {
+        // Green for sufficient (or unknown if no validation)
+        ctx.fillStyle = '#00ff00';
+        ctx.fillText(
+          `${cost.resourceId}: ${cost.amountRequired} ✓`,
+          panelX + 10,
+          y
+        );
+      }
     });
   }
 

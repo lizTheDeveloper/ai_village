@@ -5,9 +5,9 @@ import type { Entity } from '@ai-village/core';
  * Shows agent status, needs, behavior, and interactions.
  */
 export class AgentInfoPanel {
-  private selectedEntity: Entity | null = null;
+  private selectedEntityId: string | null = null;
   private panelWidth = 300;
-  private panelHeight = 400;
+  private panelHeight = 850;
   private padding = 10;
   private lineHeight = 18;
 
@@ -16,15 +16,23 @@ export class AgentInfoPanel {
    * @param entity Agent entity to display, or null to clear selection
    */
   setSelectedEntity(entity: Entity | null): void {
-    console.log('[AgentInfoPanel] setSelectedEntity called with:', entity ? `Entity ${entity.id}` : 'null');
-    this.selectedEntity = entity;
+    console.log('[AgentInfoPanel] setSelectedEntity called with:', entity ? entity.id : 'null');
+    this.selectedEntityId = entity ? entity.id : null;
   }
 
   /**
-   * Get the currently selected entity.
+   * Get the currently selected entity ID.
    */
-  getSelectedEntity(): Entity | null {
-    return this.selectedEntity;
+  getSelectedEntityId(): string | null {
+    return this.selectedEntityId;
+  }
+
+  /**
+   * Get the currently selected entity (deprecated, use getSelectedEntityId).
+   * Returns null (for backwards compatibility with renderer highlighting).
+   */
+  getSelectedEntity(): { id: string } | null {
+    return this.selectedEntityId ? { id: this.selectedEntityId } : null;
   }
 
   /**
@@ -32,11 +40,25 @@ export class AgentInfoPanel {
    * @param ctx Canvas rendering context
    * @param canvasWidth Width of the canvas
    * @param canvasHeight Height of the canvas
+   * @param world World instance to look up the selected entity
    */
-  render(ctx: CanvasRenderingContext2D, canvasWidth: number, _canvasHeight: number): void {
-    console.log('[AgentInfoPanel] render called, selectedEntity:', this.selectedEntity ? `Entity ${this.selectedEntity.id.substring(0, 8)}...` : 'null');
-    if (!this.selectedEntity) {
+  render(ctx: CanvasRenderingContext2D, canvasWidth: number, _canvasHeight: number, world: any): void {
+    if (!this.selectedEntityId) {
       return; // Nothing to render
+    }
+
+    // Guard against undefined world (can happen during initialization or hot reload)
+    if (!world || typeof world.getEntity !== 'function') {
+      console.warn('[AgentInfoPanel] World not available or missing getEntity method');
+      return;
+    }
+
+    // Look up the entity from the world
+    const selectedEntity = world.getEntity(this.selectedEntityId);
+    if (!selectedEntity) {
+      console.warn('[AgentInfoPanel] Selected entity not found in world:', this.selectedEntityId);
+      this.selectedEntityId = null; // Clear invalid selection
+      return;
     }
 
     // Position panel in top-right corner
@@ -53,35 +75,52 @@ export class AgentInfoPanel {
     ctx.strokeRect(x, y, this.panelWidth, this.panelHeight);
 
     // Get components
-    const agent = this.selectedEntity.components.get('agent') as
-      | { behavior: string; useLLM: boolean; recentSpeech?: string }
+    const identity = selectedEntity.components.get('identity') as
+      | { name: string }
       | undefined;
-    const needs = this.selectedEntity.components.get('needs') as
+    const agent = selectedEntity.components.get('agent') as
+      | {
+          behavior: string;
+          useLLM: boolean;
+          recentSpeech?: string;
+          lastThought?: string;
+          speechHistory?: Array<{ text: string; tick: number }>;
+        }
+      | undefined;
+    const needs = selectedEntity.components.get('needs') as
       | { hunger: number; energy: number; health: number }
       | undefined;
-    const position = this.selectedEntity.components.get('position') as
+    const position = selectedEntity.components.get('position') as
       | { x: number; y: number }
       | undefined;
-    const temperature = this.selectedEntity.components.get('temperature') as
+    const temperature = selectedEntity.components.get('temperature') as
       | { currentTemp: number; state: string }
       | undefined;
-    const movement = this.selectedEntity.components.get('movement') as
+    const movement = selectedEntity.components.get('movement') as
       | { velocityX: number; velocityY: number; speed: number }
       | undefined;
 
     // Render content
     let currentY = y + this.padding;
 
-    // Title
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 16px monospace';
-    ctx.fillText('Agent Info', x + this.padding, currentY + 12);
-    currentY += 30;
+    // Agent name (if available)
+    if (identity?.name) {
+      ctx.fillStyle = '#FFD700'; // Gold color for name
+      ctx.font = 'bold 18px monospace';
+      ctx.fillText(identity.name, x + this.padding, currentY + 14);
+      currentY += 26;
+    } else {
+      // Fallback title if no name
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 16px monospace';
+      ctx.fillText('Agent Info', x + this.padding, currentY + 12);
+      currentY += 30;
+    }
 
     // Entity ID (shortened)
     ctx.font = '11px monospace';
     ctx.fillStyle = '#888';
-    const shortId = this.selectedEntity.id.substring(0, 8);
+    const shortId = selectedEntity.id.substring(0, 8);
     ctx.fillText(`ID: ${shortId}...`, x + this.padding, currentY);
     currentY += this.lineHeight + 5;
 
@@ -183,8 +222,50 @@ export class AgentInfoPanel {
       currentY += this.lineHeight + 5;
     }
 
+    // Circadian/Sleep section
+    const circadian = selectedEntity.components.get('circadian') as
+      | {
+          sleepDrive: number;
+          isSleeping: boolean;
+          preferredSleepTime: number;
+        }
+      | undefined;
+
+    if (circadian) {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.beginPath();
+      ctx.moveTo(x + this.padding, currentY);
+      ctx.lineTo(x + this.panelWidth - this.padding, currentY);
+      ctx.stroke();
+      currentY += 10;
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 14px monospace';
+      ctx.fillText('Sleep', x + this.padding, currentY);
+      currentY += this.lineHeight + 5;
+
+      // Sleep drive bar (with moon emoji)
+      ctx.font = '12px monospace';
+      currentY = this.renderNeedBar(ctx, x, currentY, '🌙 Sleepy', circadian.sleepDrive);
+
+      // Sleep status
+      if (circadian.isSleeping) {
+        ctx.fillStyle = '#87CEEB'; // Sky blue for sleeping
+        ctx.fillText('Status: SLEEPING Zzz', x + this.padding, currentY);
+        currentY += this.lineHeight;
+      } else {
+        const sleepTime = Math.floor(circadian.preferredSleepTime);
+        const sleepMinutes = Math.floor((circadian.preferredSleepTime - sleepTime) * 60);
+        ctx.fillStyle = '#888';
+        ctx.fillText(`Prefers: ${sleepTime.toString().padStart(2, '0')}:${sleepMinutes.toString().padStart(2, '0')}`, x + this.padding, currentY);
+        currentY += this.lineHeight;
+      }
+
+      currentY += 5;
+    }
+
     // Inventory section
-    const inventory = this.selectedEntity.components.get('inventory') as
+    const inventory = selectedEntity.components.get('inventory') as
       | {
           slots: Array<{ itemId: string | null; quantity: number }>;
           maxSlots: number;
@@ -197,8 +278,8 @@ export class AgentInfoPanel {
       currentY = this.renderInventory(ctx, x, currentY, inventory);
     }
 
-    // Recent speech
-    if (agent?.recentSpeech) {
+    // Last Thought section
+    if (agent?.lastThought) {
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
       ctx.beginPath();
       ctx.moveTo(x + this.padding, currentY);
@@ -208,29 +289,35 @@ export class AgentInfoPanel {
 
       ctx.fillStyle = '#FFFFFF';
       ctx.font = 'bold 14px monospace';
-      ctx.fillText('Recent Speech', x + this.padding, currentY);
+      ctx.fillText('Last Thought', x + this.padding, currentY);
       currentY += this.lineHeight + 5;
 
-      ctx.fillStyle = '#AAAAFF';
+      ctx.fillStyle = '#FFCC66'; // Amber color for thoughts
       ctx.font = '11px monospace';
-      const words = agent.recentSpeech.split(' ');
-      let line = '';
-      const maxWidth = this.panelWidth - this.padding * 2;
+      currentY = this.renderWrappedText(ctx, agent.lastThought, x, currentY, 3); // Max 3 lines
+    }
 
-      for (const word of words) {
-        const testLine = line + word + ' ';
-        const metrics = ctx.measureText(testLine);
-        if (metrics.width > maxWidth && line.length > 0) {
-          ctx.fillText(line, x + this.padding, currentY);
-          currentY += this.lineHeight;
-          line = word + ' ';
-        } else {
-          line = testLine;
-        }
-      }
-      if (line.length > 0) {
-        ctx.fillText(line, x + this.padding, currentY);
-        currentY += this.lineHeight;
+    // Speech History section
+    if (agent?.speechHistory && agent.speechHistory.length > 0) {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.beginPath();
+      ctx.moveTo(x + this.padding, currentY);
+      ctx.lineTo(x + this.panelWidth - this.padding, currentY);
+      ctx.stroke();
+      currentY += 10;
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 14px monospace';
+      ctx.fillText('Speech History', x + this.padding, currentY);
+      currentY += this.lineHeight + 5;
+
+      // Show last 5 speech entries (most recent first)
+      const recentSpeech = agent.speechHistory.slice(-5).reverse();
+      ctx.font = '11px monospace';
+
+      for (const entry of recentSpeech) {
+        ctx.fillStyle = '#AAAAFF';
+        currentY = this.renderWrappedText(ctx, `"${entry.text}"`, x, currentY, 2); // Max 2 lines per entry
       }
     }
   }
@@ -469,6 +556,62 @@ export class AgentInfoPanel {
     const capacityText = `Weight: ${inventory.currentWeight}/${inventory.maxWeight}  Slots: ${usedSlots}/${inventory.maxSlots}`;
     ctx.fillText(capacityText, panelX + this.padding, y);
     y += this.lineHeight + 5;
+
+    return y;
+  }
+
+  /**
+   * Render text with word wrapping, limiting to a maximum number of lines.
+   * @param ctx Canvas rendering context
+   * @param text Text to render
+   * @param panelX Panel X position
+   * @param y Current Y position
+   * @param maxLines Maximum number of lines to render
+   * @returns Updated Y position
+   */
+  private renderWrappedText(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    panelX: number,
+    y: number,
+    maxLines: number
+  ): number {
+    const maxWidth = this.panelWidth - this.padding * 2;
+    const words = text.split(' ');
+    let line = '';
+    let linesRendered = 0;
+
+    for (const word of words) {
+      const testLine = line + word + ' ';
+      const metrics = ctx.measureText(testLine);
+
+      if (metrics.width > maxWidth && line.length > 0) {
+        // Check if we've hit the line limit
+        if (linesRendered >= maxLines - 1) {
+          // Truncate with ellipsis on last allowed line
+          let truncatedLine = line.trim();
+          while (ctx.measureText(truncatedLine + '...').width > maxWidth && truncatedLine.length > 0) {
+            truncatedLine = truncatedLine.slice(0, -1);
+          }
+          ctx.fillText(truncatedLine + '...', panelX + this.padding, y);
+          y += this.lineHeight;
+          return y;
+        }
+
+        ctx.fillText(line.trim(), panelX + this.padding, y);
+        y += this.lineHeight;
+        linesRendered++;
+        line = word + ' ';
+      } else {
+        line = testLine;
+      }
+    }
+
+    // Render remaining text
+    if (line.length > 0 && linesRendered < maxLines) {
+      ctx.fillText(line.trim(), panelX + this.padding, y);
+      y += this.lineHeight;
+    }
 
     return y;
   }

@@ -113,8 +113,8 @@ describe('Resource Gathering System', () => {
       //   quantity: 10,
       // };
 
-      // Initially empty
-      expect(inventory.slots.length).toBe(0);
+      // Initially empty - check that no slots contain resources
+      expect(inventory.slots.filter(s => s.itemId !== null && s.quantity > 0).length).toBe(0);
     });
 
     it('should decrease tree ResourceComponent amount when harvested', () => {
@@ -246,8 +246,8 @@ describe('Resource Gathering System', () => {
       //   quantity: 5,
       // };
 
-      // Initially empty
-      expect(inventory.slots.length).toBe(0);
+      // Initially empty - check that no slots contain resources
+      expect(inventory.slots.filter(s => s.itemId !== null && s.quantity > 0).length).toBe(0);
     });
 
     it('should decrease rock ResourceComponent amount when mined', () => {
@@ -556,8 +556,8 @@ describe('Resource Gathering System', () => {
         throw new Error('Agent missing InventoryComponent');
       }
 
-      // Initially empty inventory
-      expect(inventory.slots.length).toBe(0);
+      // Initially empty inventory - check that no slots contain resources
+      expect(inventory.slots.filter(s => s.itemId !== null && s.quantity > 0).length).toBe(0);
 
       // Construction should not proceed without resources
     });
@@ -624,8 +624,8 @@ describe('Resource Gathering System', () => {
       //   stone: 5,
       // };
 
-      // Empty inventory
-      expect(inventory.slots.length).toBe(0);
+      // Empty inventory - check that no slots contain resources
+      expect(inventory.slots.filter(s => s.itemId !== null && s.quantity > 0).length).toBe(0);
 
       // Check should fail
       const hasEnoughResources = false; // Will be calculated by system

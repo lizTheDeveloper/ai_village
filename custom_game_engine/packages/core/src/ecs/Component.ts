@@ -48,3 +48,11 @@ export type FieldType =
   | 'numberArray'
   | 'object'
   | 'map';
+
+/**
+ * Base class for class-based components (used in tests and some implementations)
+ */
+export abstract class ComponentBase {
+  public readonly version: number = 1;
+  public abstract readonly type: string;
+}

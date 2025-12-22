@@ -1,149 +1,181 @@
 # Test Results: Agent Inventory Display
 
-**Date:** 2025-12-22
-**Implementation Agent:** implementation-agent-001
-**Status:** TESTS_NEED_FIX
+**Feature:** agent-inventory-display
+**Test Date:** 2025-12-22
+**Test Phase:** Post-Implementation Unit Testing
+**Status:** ❌ BUILD FAILED
 
 ---
+
+## Verdict: FAIL
 
 ## Summary
 
-Implementation is complete and functional. The AgentInfoPanel now correctly renders inventory information including:
-- ✅ Resource counts with icons (wood, stone, food, water)
-- ✅ Empty state handling
-- ✅ Capacity display (weight and slots)
-- ✅ Warning colors (yellow at 80%, red at 100%)
-- ✅ Proper TypeScript types and error handling
-
-However, there is a minor TypeScript error in the test file that needs fixing.
+The test suite **cannot run** because the build is failing with multiple TypeScript compilation errors. The codebase has compilation errors that must be fixed before any tests can execute.
 
 ---
 
-## Build Status
+## Build Errors
 
-**Result:** ❌ FAILING (due to test file TypeScript error only)
-
-### Errors
-
-```
-packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts(512,7): error TS2532: Object is possibly 'undefined'.
+### Command Executed
+```bash
+cd custom_game_engine && npm run clean
+cd custom_game_engine && npm run build
 ```
 
-**Note:** All other build errors are pre-existing and unrelated to this feature:
-- FertilizerAction.test.ts: unused _world variable
-- Phase9-SoilWeatherIntegration.test.ts: unused _world variable
-- SoilDepletion.test.ts: unused _world variable
-- SoilSystem.test.ts: unused imports
-- TillingAction.test.ts: unused _world variable
-- WateringAction.test.ts: unused _world variable
-- Renderer.ts: missing @ai-village/world module (pre-existing)
-- StructuredPromptBuilder.test.ts: unused id variables
+### Build Output
+```
+> @ai-village/game-engine@0.1.0 build
+> tsc --build
 
----
+❌ Build failed with 60+ TypeScript errors
+```
 
-## Tests Requiring Fixes
+### Critical Errors by File
 
-### File: `packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts`
+#### 1. PlantSystem.ts (packages/core/src/systems/PlantSystem.ts)
 
-#### Line 512: Object is possibly 'undefined'
-
-**Issue:**
+**Line 28:** Cannot extend an interface 'System'. Did you mean 'implements'?
 ```typescript
-// Simulate gathering more wood
-const inventory = entity.components.get('inventory') as InventoryComponent;
-inventory.slots[0].quantity = 10;  // ← TypeScript error: Object is possibly 'undefined'
-inventory.currentWeight = 20;
+// ERROR: class PlantSystem extends System
+// SHOULD BE: class PlantSystem implements System
 ```
 
-**Root Cause:**
-TypeScript doesn't know that `entity.components.get('inventory')` will definitely return a value, even though the test setup guarantees it exists.
+**Line 90:** Property 'getEntitiesWithComponents' does not exist on type 'World'
+**Line 135:** Property 'removeEntity' does not exist on type 'World'
+**Line 555, 603:** Property 'addComponent' does not exist on type 'Entity'
 
-**Fix Required:**
-Add a non-null assertion or existence check:
+**Unused variables:**
+- Line 89: 'deltaTime' is declared but never read
+- Line 187: 'position' and 'world' declared but never read
+- Line 195: 'world' declared but never read
+- Line 343: 'plant' declared but never read
+- Line 363: 'plant' declared but never read
+- Line 512: 'entityId' declared but never read
+- Line 575: 'world' declared but never read
+- Line 619: 'position' and 'speciesId' declared but never read
+- Line 647, 654: 'getSpecies' and 'getTemperatureAt' declared but never read
 
-**Option 1 (Non-null assertion):**
+#### 2. Plant Species Files (packages/world/src/plant-species/*.ts)
+
+**All plant-species files:** Cannot find module '@ai-village/core'
+- base-crops.ts
+- wild-plants.ts
+- index.ts
+
+**Root cause:** These files are in packages/world but trying to import from @ai-village/core which may not be built yet or properly referenced.
+
+#### 3. BuildingPlacementUI.ts (packages/renderer/src/BuildingPlacementUI.ts)
+
+**Lines 618-619:** Argument of type 'string | undefined' is not assignable to parameter of type 'string'
 ```typescript
-const inventory = entity.components.get('inventory') as InventoryComponent;
-expect(inventory).toBeDefined();
-inventory!.slots[0]!.quantity = 10;
-inventory!.currentWeight = 20;
+// Need null checks before passing to functions expecting string
 ```
 
-**Option 2 (Existence check):**
-```typescript
-const inventory = entity.components.get('inventory') as InventoryComponent;
-if (!inventory || !inventory.slots[0]) {
-  throw new Error('Test setup failed: inventory or slots not found');
-}
-inventory.slots[0].quantity = 10;
-inventory.currentWeight = 20;
-```
+**Multiple lines:** Parameters implicitly have 'any' type
+- Line 631: Parameter 'building' implicitly has an 'any' type
+- Line 689: Parameter 'e' implicitly has an 'any' type
+- Line 709: Parameters 'error', 'i' implicitly have 'any' type
+- Line 752: Parameters 'cost', 'i' implicitly have 'any' type
+- Line 836: Parameter 'cost' implicitly has an 'any' type
+- Line 855: Parameter 'func' implicitly has an 'any' type
 
-**Recommended:** Option 1 (non-null assertion) since the test helper `createInventory()` guarantees the inventory and slots exist.
+#### 4. Package Import Errors
 
----
+Multiple files cannot import from:
+- `@ai-village/core` (in world, renderer, llm packages)
+- `@ai-village/world` (in renderer package)
 
-## Implementation Details
-
-### Files Modified
-- `packages/renderer/src/AgentInfoPanel.ts` - Added inventory rendering section
-
-### New Methods Added
-
-1. **`countResourcesByType(inventory)`** - Counts resources by type from inventory slots
-2. **`getResourceIcon(resourceType)`** - Returns emoji icon for resource type
-3. **`renderInventory(ctx, panelX, y, inventory)`** - Renders the inventory section
-
-### Key Features Implemented
-
-✅ **Inventory Section Rendering**
-- Added divider and "INVENTORY" header
-- Positioned below Temperature section (or Needs if no Temperature)
-- Follows existing panel styling
-
-✅ **Resource Display**
-- Shows wood (🪵), stone (🪨), food (🍎), water (💧) with counts
-- Only displays resources with quantity > 0
-- Empty state shows "(empty)" text
-
-✅ **Capacity Display**
-- Shows "Weight: X/Y  Slots: A/B"
-- Calculates used slots dynamically
-- Color-coded warnings:
-  - White: 0-79% capacity
-  - Yellow (#FFFF00): 80-99% capacity
-  - Red (#FF0000): 100% capacity
-
-✅ **Error Handling**
-- Validates required fields (maxWeight, maxSlots, currentWeight)
-- Throws clear errors if fields missing (per CLAUDE.md)
-- Validates slots is an array
-
-✅ **Type Safety**
-- Full TypeScript type annotations
-- No silent fallbacks or defaults for critical fields
-- Proper undefined checks
+**Affected files:**
+- packages/world/src/chunks/Chunk.ts
+- packages/world/src/entities/*.ts
+- packages/world/src/terrain/TerrainGenerator.ts
+- packages/renderer/src/*.ts
+- packages/llm/src/*.ts
 
 ---
 
-## Testing Notes
+## Impact Analysis
 
-Once the test file TypeScript error is fixed, all tests should pass. The implementation correctly:
+### Blocking Issue
+The agent-inventory-display feature **cannot be tested** because:
+1. TypeScript build must pass before tests can run
+2. The compilation errors are in unrelated code (PlantSystem, plant-species)
+3. Package dependency resolution is broken
 
-1. Renders inventory section below Needs/Temperature
-2. Displays resource counts with icons
-3. Shows empty state when no resources
-4. Displays capacity with correct values
-5. Shows warning colors at 80%+ capacity
-6. Updates in real-time (component state is read each frame)
+### Feature Status
+The inventory display feature itself appears to be correctly implemented in:
+- `packages/renderer/src/AgentInfoPanel.ts`
 
-The implementation follows all patterns from existing AgentInfoPanel code and adheres to CLAUDE.md guidelines (no silent fallbacks, explicit error handling, type safety).
+However, we cannot verify this through unit tests until the build succeeds.
 
 ---
 
-## Next Steps for Test Agent
+## Required Fixes (for Implementation Agent)
 
-1. Fix the TypeScript error in `AgentInfoPanel-inventory.test.ts:512`
-2. Run tests to verify all acceptance criteria pass
-3. Verify no runtime errors in browser console
-4. Mark work order as complete if all tests pass
+### High Priority - Build Blockers
+
+1. **Fix PlantSystem.ts:**
+   ```typescript
+   // Line 28: Change from extends to implements
+   class PlantSystem implements System {
+
+   // Fix World API calls - check World class for correct method names
+   // Fix Entity API calls - check Entity class for correct method names
+   ```
+
+2. **Fix package imports in plant-species:**
+   - Ensure packages/core is built before packages/world
+   - Check tsconfig.json references in packages/world/tsconfig.json
+   - Verify @ai-village/core is in dependencies
+
+3. **Fix BuildingPlacementUI.ts:**
+   - Add null checks for string | undefined types
+   - Add explicit type annotations for callback parameters
+
+4. **Remove unused variables:**
+   - Prefix with underscore if needed for signature: `_deltaTime`
+   - Or remove if truly unused
+
+### Build Order Issue
+
+The monorepo build may have dependency ordering issues:
+- packages/core must build first
+- packages/world depends on core
+- packages/renderer depends on core and world
+- packages/llm depends on core
+
+Check tsconfig.json references array.
+
+---
+
+## Test Coverage Status
+
+### Tests That Should Exist (Cannot Verify)
+
+Per the work order, these tests should exist:
+1. **Unit tests:** `packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts`
+2. **Integration tests:** If needed
+
+### Tests Cannot Run Until Build Passes
+
+---
+
+## Next Steps
+
+1. **Implementation Agent:** Fix all compilation errors listed above
+2. **Verify build:** Run `npm run build` - must complete with 0 errors
+3. **Re-run tests:** Run `npm test`
+4. **Test Agent:** Update this file with test results
+
+---
+
+## Previous Status (Reference)
+
+The previous version of this file indicated that agent selection was fixed and working in the browser. That browser-level functionality appears correct, but the **build and unit tests** are what's being evaluated now, and those are currently failing.
+
+---
+
+**Test Agent Report Date:** 2025-12-22
+**Status:** Build must be fixed before tests can run
+**Assigned To:** Implementation Agent for compilation error fixes

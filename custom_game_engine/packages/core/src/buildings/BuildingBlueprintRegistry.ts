@@ -260,6 +260,66 @@ export class BuildingBlueprintRegistry {
       requiresFoundation: false,
     });
 
+    // Bed - High-quality sleep (2x1, 10 Wood + 15 Plant Fiber)
+    this.register({
+      id: 'bed',
+      name: 'Bed',
+      description: 'A comfortable bed for restful sleep. Provides best sleep quality.',
+      category: 'residential',
+      width: 2,
+      height: 1,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 10 },
+        { resourceId: 'plant_fiber', amountRequired: 15 },
+      ],
+      techRequired: [],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      unlocked: true,
+      buildTime: 60,
+      tier: 1,
+      functionality: [
+        {
+          type: 'sleeping',
+          restBonus: 1.5, // 50% faster energy recovery (best sleep quality)
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: false,
+    });
+
+    // Bedroll - Portable sleep (2x1, 20 Plant Fiber + 5 Leather)
+    this.register({
+      id: 'bedroll',
+      name: 'Bedroll',
+      description: 'A portable bedroll that can be placed anywhere. Moderate sleep quality.',
+      category: 'residential',
+      width: 2,
+      height: 1,
+      resourceCost: [
+        { resourceId: 'plant_fiber', amountRequired: 20 },
+        { resourceId: 'leather', amountRequired: 5 },
+      ],
+      techRequired: [],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      unlocked: true,
+      buildTime: 45,
+      tier: 1,
+      functionality: [
+        {
+          type: 'sleeping',
+          restBonus: 1.3, // 30% faster energy recovery (moderate sleep quality)
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: false,
+    });
+
     // Well - Water source (1x1, 30 Stone)
     this.register({
       id: 'well',
@@ -466,6 +526,101 @@ export class BuildingBlueprintRegistry {
       ],
       canRotate: false, // Windmills face specific direction
       rotationAngles: [0],
+      snapToGrid: true,
+      requiresFoundation: false,
+    });
+  }
+
+  /**
+   * Register example buildings for missing categories/functions
+   * Demonstrates all 8 categories and 8 function types are supported
+   */
+  registerExampleBuildings(): void {
+    // Garden Fence - Decoration category example
+    this.register({
+      id: 'garden_fence',
+      name: 'Garden Fence',
+      description: 'A decorative wooden fence to beautify your village',
+      category: 'decoration',
+      width: 1,
+      height: 1,
+      resourceCost: [{ resourceId: 'wood', amountRequired: 5 }],
+      techRequired: [],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      unlocked: true,
+      buildTime: 15,
+      tier: 1,
+      functionality: [
+        {
+          type: 'mood_aura',
+          moodBonus: 2,
+          radius: 2,
+        },
+      ],
+      canRotate: false,
+      rotationAngles: [0],
+      snapToGrid: true,
+      requiresFoundation: false,
+    });
+
+    // Library - Research category and function example
+    this.register({
+      id: 'library',
+      name: 'Library',
+      description: 'A simple library for basic research and learning',
+      category: 'research',
+      width: 3,
+      height: 3,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 50 },
+        { resourceId: 'stone', amountRequired: 30 },
+      ],
+      techRequired: [],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      unlocked: true,
+      buildTime: 120,
+      tier: 2,
+      functionality: [
+        {
+          type: 'research',
+          fields: ['agriculture', 'construction', 'tools'],
+          bonus: 1.2, // 20% research speed bonus
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: false,
+    });
+
+    // Auto-Farm - Automation function example
+    this.register({
+      id: 'auto_farm',
+      name: 'Automated Farm',
+      description: 'An advanced farm that automatically plants and harvests crops',
+      category: 'farming',
+      width: 4,
+      height: 4,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 80 },
+        { resourceId: 'iron', amountRequired: 40 },
+      ],
+      techRequired: [],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      unlocked: true,
+      buildTime: 180,
+      tier: 3,
+      functionality: [
+        {
+          type: 'automation',
+          tasks: ['plant_seeds', 'harvest_crops', 'water_plants'],
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
       snapToGrid: true,
       requiresFoundation: false,
     });

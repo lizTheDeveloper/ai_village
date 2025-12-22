@@ -57,10 +57,16 @@ export function createInventoryComponent(
   maxSlots: number = 10,
   maxWeight: number = 100
 ): InventoryComponent {
+  // Initialize with empty slots so addToInventory can fill them
+  const slots: InventorySlot[] = [];
+  for (let i = 0; i < maxSlots; i++) {
+    slots.push({ itemId: null, quantity: 0 });
+  }
+
   return {
     type: 'inventory',
     version: 1,
-    slots: [], // Start with empty array, slots added dynamically
+    slots,
     maxSlots,
     maxWeight,
     currentWeight: 0,

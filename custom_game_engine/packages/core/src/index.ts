@@ -18,3 +18,5 @@ export * from './components/index.js';
 export * from './systems/index.js';
 export * from './buildings/index.js';
 export * from './archetypes/index.js';
+export * from './types/PlantSpecies.js';
+export * from './genetics/PlantGenetics.js';

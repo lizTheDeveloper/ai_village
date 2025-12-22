@@ -15,7 +15,18 @@ export type AgentBehavior =
   | 'rest'
   | 'work'
   | 'help'
-  | 'build';
+  | 'build'
+  | 'eat'
+  | 'seek_sleep'
+  | 'forced_sleep'
+  | 'flee_danger'
+  | 'seek_water'
+  | 'seek_shelter';
+
+export interface SpeechHistoryEntry {
+  text: string;
+  tick: number;
+}
 
 export interface AgentComponent extends Component {
   type: 'agent';
@@ -26,6 +37,8 @@ export interface AgentComponent extends Component {
   useLLM: boolean; // Whether to use LLM for decision making
   llmCooldown: number; // Ticks remaining before next LLM call
   recentSpeech?: string; // What the agent recently said (for nearby agents to hear)
+  lastThought?: string; // The agent's most recent internal thought/reasoning
+  speechHistory?: SpeechHistoryEntry[]; // History of what the agent has said
 }
 
 export function createAgentComponent(

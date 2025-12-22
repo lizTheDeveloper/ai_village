@@ -62,17 +62,11 @@ export class InputHandler {
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
-      console.log(`[InputHandler] mousedown: clientX=${e.clientX}, clientY=${e.clientY}, rect.left=${rect.left}, rect.top=${rect.top}, x=${x}, y=${y}, button=${e.button}`);
-      console.log(`[InputHandler] Canvas dimensions: rect.width=${rect.width}, rect.height=${rect.height}, canvas.width=${this.canvas.width}, canvas.height=${this.canvas.height}`);
-      console.log(`[InputHandler] DPR: ${window.devicePixelRatio || 1}`);
-
       if (this.callbacks.onMouseClick?.(x, y, e.button)) {
-        console.log(`[InputHandler] Click was handled by callback`);
         e.preventDefault();
         return;
       }
 
-      console.log(`[InputHandler] Click not handled, enabling drag mode`);
       this.mouseDown = true;
       this.lastMouseX = e.clientX;
       this.lastMouseY = e.clientY;

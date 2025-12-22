@@ -42,6 +42,9 @@ export interface Tile {
 
   /** Whether compost has been applied */
   composted: boolean;
+
+  /** Entity ID of plant growing on this tile (if any) */
+  plantId: string | null;
 }
 
 export type TerrainType =
@@ -79,6 +82,7 @@ export function createDefaultTile(): Tile {
     fertilizerDuration: 0,
     lastWatered: 0,
     composted: false,
+    plantId: null,
   };
 }
 

@@ -20,6 +20,7 @@ const PORT = process.env.PORT || 3030;
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 const ROADMAP_PATH = path.join(PROJECT_ROOT, 'MASTER_ROADMAP.md');
 const WORK_ORDERS_DIR = path.join(__dirname, '../work-orders');
+const BUGS_DIR = path.join(__dirname, '../bugs');
 const SCRIPTS_DIR = path.join(__dirname, '../scripts');
 const LOGS_DIR = path.join(PROJECT_ROOT, 'logs');
 
@@ -37,9 +38,14 @@ const GAME_SERVER_PORT = 3000;
 let parallelWorkersProcess = null;
 const PARALLEL_WORKERS_STATE_FILE = path.join(__dirname, '.parallel-workers.json');
 
+// Bug queue processor
+let bugQueueProcessorProcess = null;
+const BUG_QUEUE_PROCESSOR_STATE_FILE = path.join(__dirname, '.bug-queue-processor.json');
+
 // Persistence file for pipeline state
 const PIPELINES_STATE_FILE = path.join(__dirname, '.pipelines.json');
 const GAME_SERVER_STATE_FILE = path.join(__dirname, '.game-server.json');
+const BUGS_INDEX_FILE = path.join(BUGS_DIR, '.bugs-index.json');
 
 // Load persisted pipelines on startup
 function loadPersistedPipelines() {
@@ -453,6 +459,259 @@ function getScreenshots(name) {
 }
 
 // =============================================================================
+// Bug Queue Management
+// =============================================================================
+
+// Ensure bugs directory exists
+function ensureBugsDir() {
+    if (!fs.existsSync(BUGS_DIR)) {
+        fs.mkdirSync(BUGS_DIR, { recursive: true });
+    }
+}
+
+// Load bugs index
+function loadBugsIndex() {
+    ensureBugsDir();
+    if (!fs.existsSync(BUGS_INDEX_FILE)) {
+        return [];
+    }
+
+    const data = fs.readFileSync(BUGS_INDEX_FILE, 'utf-8');
+    if (!data.trim()) {
+        return [];
+    }
+    return JSON.parse(data);
+}
+
+// Save bugs index
+function saveBugsIndex(bugs) {
+    ensureBugsDir();
+    fs.writeFileSync(BUGS_INDEX_FILE, JSON.stringify(bugs, null, 2));
+}
+
+// Generate unique bug ID
+function generateBugId() {
+    const timestamp = Date.now();
+    const shortId = Math.random().toString(36).substring(2, 8);
+    return `bug-${timestamp}-${shortId}`;
+}
+
+// Create a new bug
+function createBug(bugData) {
+    const bugs = loadBugsIndex();
+
+    if (!bugData.title) {
+        throw new Error('Bug title is required');
+    }
+
+    const bug = {
+        id: generateBugId(),
+        title: bugData.title,
+        description: bugData.description || '',
+        status: 'NEW',
+        priority: bugData.priority || 'MEDIUM',
+        source: bugData.source || 'manual',
+        sourceRef: bugData.sourceRef || null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        assignedTo: null,
+        reproduceSteps: bugData.reproduceSteps || '',
+        errorLog: bugData.errorLog || '',
+        fixPipelineId: null
+    };
+
+    // Create bug directory
+    const bugDir = path.join(BUGS_DIR, bug.id);
+    fs.mkdirSync(bugDir, { recursive: true });
+
+    // Write bug details
+    const bugReportPath = path.join(bugDir, 'bug-report.md');
+    const bugReport = `# ${bug.title}
+
+**ID:** ${bug.id}
+**Status:** ${bug.status}
+**Priority:** ${bug.priority}
+**Source:** ${bug.source}${bug.sourceRef ? ` (${bug.sourceRef})` : ''}
+**Created:** ${bug.createdAt}
+
+## Description
+
+${bug.description}
+
+${bug.reproduceSteps ? `## Steps to Reproduce\n\n${bug.reproduceSteps}\n` : ''}
+${bug.errorLog ? `## Error Log\n\n\`\`\`\n${bug.errorLog}\n\`\`\`\n` : ''}
+`;
+
+    fs.writeFileSync(bugReportPath, bugReport);
+
+    // Write state file
+    const statePath = path.join(bugDir, '.state');
+    fs.writeFileSync(statePath, bug.status);
+
+    // Add to index
+    bugs.push(bug);
+    saveBugsIndex(bugs);
+
+    broadcast({ type: 'bug-created', bug });
+
+    return bug;
+}
+
+// Get all bugs
+function getAllBugs() {
+    return loadBugsIndex();
+}
+
+// Get bug by ID
+function getBugById(id) {
+    const bugs = loadBugsIndex();
+    const bug = bugs.find(b => b.id === id);
+    if (!bug) {
+        throw new Error(`Bug not found: ${id}`);
+    }
+    return bug;
+}
+
+// Update bug status
+function updateBugStatus(id, status) {
+    const validStatuses = ['NEW', 'IN_PROGRESS', 'READY_FOR_TEST', 'VERIFIED', 'CLOSED'];
+    if (!validStatuses.includes(status)) {
+        throw new Error(`Invalid status: ${status}`);
+    }
+
+    const bugs = loadBugsIndex();
+    const bug = bugs.find(b => b.id === id);
+    if (!bug) {
+        throw new Error(`Bug not found: ${id}`);
+    }
+
+    bug.status = status;
+    bug.updatedAt = new Date().toISOString();
+
+    // Update state file
+    const statePath = path.join(BUGS_DIR, id, '.state');
+    fs.writeFileSync(statePath, status);
+
+    // Update index
+    saveBugsIndex(bugs);
+
+    broadcast({ type: 'bug-updated', bug });
+
+    return bug;
+}
+
+// Update bug assignment
+function assignBug(id, assignee) {
+    const bugs = loadBugsIndex();
+    const bug = bugs.find(b => b.id === id);
+    if (!bug) {
+        throw new Error(`Bug not found: ${id}`);
+    }
+
+    bug.assignedTo = assignee;
+    bug.updatedAt = new Date().toISOString();
+
+    saveBugsIndex(bugs);
+    broadcast({ type: 'bug-updated', bug });
+
+    return bug;
+}
+
+// Link bug to fix pipeline
+function linkBugToPipeline(id, pipelineId) {
+    const bugs = loadBugsIndex();
+    const bug = bugs.find(b => b.id === id);
+    if (!bug) {
+        throw new Error(`Bug not found: ${id}`);
+    }
+
+    bug.fixPipelineId = pipelineId;
+    bug.updatedAt = new Date().toISOString();
+
+    if (bug.status === 'NEW') {
+        bug.status = 'IN_PROGRESS';
+    }
+
+    saveBugsIndex(bugs);
+    broadcast({ type: 'bug-updated', bug });
+
+    return bug;
+}
+
+// Delete bug
+function deleteBug(id) {
+    const bugs = loadBugsIndex();
+    const bugIndex = bugs.findIndex(b => b.id === id);
+    if (bugIndex === -1) {
+        throw new Error(`Bug not found: ${id}`);
+    }
+
+    bugs.splice(bugIndex, 1);
+    saveBugsIndex(bugs);
+
+    // Remove bug directory
+    const bugDir = path.join(BUGS_DIR, id);
+    if (fs.existsSync(bugDir)) {
+        fs.rmSync(bugDir, { recursive: true });
+    }
+
+    broadcast({ type: 'bug-deleted', id });
+
+    return { success: true };
+}
+
+// Auto-detect bugs from pipeline failures
+function detectBugFromPipeline(pipelineId) {
+    const pipeline = activePipelines.get(pipelineId);
+    if (!pipeline) {
+        throw new Error(`Pipeline not found: ${pipelineId}`);
+    }
+
+    if (pipeline.status !== 'failed') {
+        return null; // Only create bugs for failed pipelines
+    }
+
+    // Extract error from logs
+    const errorLogs = pipeline.logs
+        .filter(log => log.type === 'stderr')
+        .map(log => log.text)
+        .join('\n');
+
+    const bug = createBug({
+        title: `Pipeline failure: ${pipeline.featureName}`,
+        description: `Automated bug created from failed pipeline ${pipelineId}`,
+        priority: 'HIGH',
+        source: 'pipeline-failure',
+        sourceRef: pipelineId,
+        errorLog: errorLogs.substring(0, 5000) // Limit to 5000 chars
+    });
+
+    return bug;
+}
+
+// Get next bug from queue (for autonomous processing)
+function getNextBugFromQueue() {
+    const bugs = loadBugsIndex();
+
+    // Priority order: CRITICAL > HIGH > MEDIUM > LOW
+    const priorityOrder = { 'CRITICAL': 0, 'HIGH': 1, 'MEDIUM': 2, 'LOW': 3 };
+
+    // Filter to unassigned NEW bugs
+    const availableBugs = bugs
+        .filter(b => b.status === 'NEW' && !b.assignedTo)
+        .sort((a, b) => {
+            // Sort by priority first
+            const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority];
+            if (priorityDiff !== 0) return priorityDiff;
+
+            // Then by creation time (older first)
+            return new Date(a.createdAt) - new Date(b.createdAt);
+        });
+
+    return availableBugs.length > 0 ? availableBugs[0] : null;
+}
+
+// =============================================================================
 // Pipeline Management
 // =============================================================================
 
@@ -856,6 +1115,158 @@ function loadPersistedParallelWorkers() {
 }
 
 // =============================================================================
+// Bug Queue Processor Management
+// =============================================================================
+
+function startBugQueueProcessor() {
+    if (bugQueueProcessorProcess && !bugQueueProcessorProcess.reconnected) {
+        throw new Error('Bug queue processor is already running');
+    }
+
+    const scriptPath = path.join(SCRIPTS_DIR, 'bug-queue-processor.sh');
+
+    const proc = spawn('bash', [scriptPath], {
+        cwd: PROJECT_ROOT,
+        env: { ...process.env },
+        stdio: ['ignore', 'pipe', 'pipe']
+    });
+
+    bugQueueProcessorProcess = {
+        pid: proc.pid,
+        startTime: new Date().toISOString(),
+        logs: []
+    };
+
+    proc.stdout.on('data', (data) => {
+        const log = data.toString();
+        bugQueueProcessorProcess.logs.push({ type: 'stdout', text: log, time: new Date().toISOString() });
+        if (bugQueueProcessorProcess.logs.length > 500) {
+            bugQueueProcessorProcess.logs = bugQueueProcessorProcess.logs.slice(-500);
+        }
+        broadcast({ type: 'bug-queue-processor-log', log, stream: 'stdout' });
+    });
+
+    proc.stderr.on('data', (data) => {
+        const log = data.toString();
+        bugQueueProcessorProcess.logs.push({ type: 'stderr', text: log, time: new Date().toISOString() });
+        if (bugQueueProcessorProcess.logs.length > 500) {
+            bugQueueProcessorProcess.logs = bugQueueProcessorProcess.logs.slice(-500);
+        }
+        broadcast({ type: 'bug-queue-processor-log', log, stream: 'stderr' });
+    });
+
+    proc.on('close', (code) => {
+        console.log(`Bug queue processor exited with code ${code}`);
+        bugQueueProcessorProcess = null;
+        persistBugQueueProcessor();
+        broadcast({ type: 'bug-queue-processor-stopped', exitCode: code });
+    });
+
+    persistBugQueueProcessor();
+    broadcast({ type: 'bug-queue-processor-started', pid: proc.pid });
+
+    return {
+        status: 'starting',
+        pid: proc.pid
+    };
+}
+
+function stopBugQueueProcessor() {
+    if (!bugQueueProcessorProcess) {
+        throw new Error('Bug queue processor is not running');
+    }
+
+    const pid = bugQueueProcessorProcess.pid;
+
+    exec(`pkill -TERM -P ${pid}`, (err) => {
+        try {
+            process.kill(pid, 'SIGTERM');
+        } catch (killErr) {
+            console.error('Failed to kill bug queue processor:', killErr.message);
+        }
+    });
+
+    bugQueueProcessorProcess = null;
+    persistBugQueueProcessor();
+
+    return { status: 'stopped' };
+}
+
+function getBugQueueProcessorStatus() {
+    if (!bugQueueProcessorProcess) {
+        return { running: false };
+    }
+
+    try {
+        process.kill(bugQueueProcessorProcess.pid, 0);
+    } catch (err) {
+        bugQueueProcessorProcess = null;
+        persistBugQueueProcessor();
+        return { running: false };
+    }
+
+    return {
+        running: true,
+        pid: bugQueueProcessorProcess.pid,
+        startTime: bugQueueProcessorProcess.startTime,
+        logCount: bugQueueProcessorProcess.logs ? bugQueueProcessorProcess.logs.length : 0
+    };
+}
+
+function getBugQueueProcessorLogs() {
+    if (!bugQueueProcessorProcess || !bugQueueProcessorProcess.logs) {
+        return [];
+    }
+    return bugQueueProcessorProcess.logs;
+}
+
+function persistBugQueueProcessor() {
+    if (!bugQueueProcessorProcess) {
+        if (fs.existsSync(BUG_QUEUE_PROCESSOR_STATE_FILE)) {
+            fs.unlinkSync(BUG_QUEUE_PROCESSOR_STATE_FILE);
+        }
+        return;
+    }
+
+    const data = {
+        pid: bugQueueProcessorProcess.pid,
+        startTime: bugQueueProcessorProcess.startTime
+    };
+
+    try {
+        fs.writeFileSync(BUG_QUEUE_PROCESSOR_STATE_FILE, JSON.stringify(data, null, 2));
+    } catch (err) {
+        console.error('Failed to persist bug queue processor state:', err.message);
+    }
+}
+
+function loadPersistedBugQueueProcessor() {
+    if (!fs.existsSync(BUG_QUEUE_PROCESSOR_STATE_FILE)) {
+        return;
+    }
+
+    try {
+        const data = JSON.parse(fs.readFileSync(BUG_QUEUE_PROCESSOR_STATE_FILE, 'utf-8'));
+
+        try {
+            process.kill(data.pid, 0);
+
+            bugQueueProcessorProcess = {
+                ...data,
+                reconnected: true,
+                logs: []
+            };
+            console.log(`  ↻ Reconnected to bug queue processor (PID: ${data.pid})`);
+        } catch (err) {
+            fs.unlinkSync(BUG_QUEUE_PROCESSOR_STATE_FILE);
+            console.log(`  🧹 Cleaned up stale bug queue processor state`);
+        }
+    } catch (err) {
+        console.error('Failed to load persisted bug queue processor:', err.message);
+    }
+}
+
+// =============================================================================
 // SSE for Real-Time Updates
 // =============================================================================
 
@@ -1184,6 +1595,137 @@ app.get('/api/parallel-workers/logs', (req, res) => {
     }
 });
 
+// Bug Queue
+app.get('/api/bugs', (req, res) => {
+    try {
+        res.json(getAllBugs());
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/bugs/next', (req, res) => {
+    try {
+        const bug = getNextBugFromQueue();
+        if (!bug) {
+            return res.status(404).json({ error: 'No bugs in queue' });
+        }
+        res.json(bug);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/bugs/:id', (req, res) => {
+    try {
+        const bug = getBugById(req.params.id);
+        res.json(bug);
+    } catch (err) {
+        res.status(404).json({ error: err.message });
+    }
+});
+
+app.post('/api/bugs', (req, res) => {
+    try {
+        const bug = createBug(req.body);
+        res.json(bug);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.patch('/api/bugs/:id/status', (req, res) => {
+    try {
+        const { status } = req.body;
+        if (!status) {
+            return res.status(400).json({ error: 'status is required' });
+        }
+        const bug = updateBugStatus(req.params.id, status);
+        res.json(bug);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.patch('/api/bugs/:id/assign', (req, res) => {
+    try {
+        const { assignee } = req.body;
+        const bug = assignBug(req.params.id, assignee);
+        res.json(bug);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.post('/api/bugs/:id/link-pipeline', (req, res) => {
+    try {
+        const { pipelineId } = req.body;
+        if (!pipelineId) {
+            return res.status(400).json({ error: 'pipelineId is required' });
+        }
+        const bug = linkBugToPipeline(req.params.id, pipelineId);
+        res.json(bug);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.delete('/api/bugs/:id', (req, res) => {
+    try {
+        const result = deleteBug(req.params.id);
+        res.json(result);
+    } catch (err) {
+        res.status(404).json({ error: err.message });
+    }
+});
+
+app.post('/api/bugs/detect-from-pipeline/:pipelineId', (req, res) => {
+    try {
+        const bug = detectBugFromPipeline(req.params.pipelineId);
+        if (!bug) {
+            return res.json({ message: 'No bug detected (pipeline did not fail)' });
+        }
+        res.json(bug);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+// Bug Queue Processor control
+app.post('/api/bug-queue-processor/start', (req, res) => {
+    try {
+        const result = startBugQueueProcessor();
+        res.json(result);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.post('/api/bug-queue-processor/stop', (req, res) => {
+    try {
+        const result = stopBugQueueProcessor();
+        res.json(result);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.get('/api/bug-queue-processor/status', (req, res) => {
+    try {
+        res.json(getBugQueueProcessorStatus());
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/bug-queue-processor/logs', (req, res) => {
+    try {
+        res.json(getBugQueueProcessorLogs());
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // =============================================================================
 // Start Server
 // =============================================================================
@@ -1203,6 +1745,7 @@ app.listen(PORT, () => {
     loadPersistedPipelines();
     loadPersistedGameServer();
     loadPersistedParallelWorkers();
+    loadPersistedBugQueueProcessor();
 
     // Watch for externally-launched pipelines
     watchPipelinesFile();

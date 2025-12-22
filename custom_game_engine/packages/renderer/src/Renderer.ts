@@ -81,38 +81,169 @@ export class Renderer {
   findEntityAtScreenPosition(screenX: number, screenY: number, world: World): any | null {
     const entities = world.query().with('position', 'renderable').executeEntities();
 
+    console.log(`[Renderer] findEntityAtScreenPosition: screenX=${screenX}, screenY=${screenY}`);
+    console.log(`[Renderer] Camera: x=${this.camera.x}, y=${this.camera.y}, zoom=${this.camera.zoom}`);
+    console.log(`[Renderer] Viewport: width=${this.camera.viewportWidth}, height=${this.camera.viewportHeight}`);
+    console.log(`[Renderer] TileSize: ${this.tileSize}`);
+    console.log(`[Renderer] Found ${entities.length} entities with position+renderable`);
+
+    // Validate camera state
+    if (!isFinite(this.camera.x) || !isFinite(this.camera.y) || !isFinite(this.camera.zoom)) {
+      console.error(`[Renderer] Invalid camera state: x=${this.camera.x}, y=${this.camera.y}, zoom=${this.camera.zoom}`);
+      return null;
+    }
+    if (!isFinite(this.camera.viewportWidth) || !isFinite(this.camera.viewportHeight)) {
+      console.error(`[Renderer] Invalid viewport size: width=${this.camera.viewportWidth}, height=${this.camera.viewportHeight}`);
+      return null;
+    }
+    if (this.camera.viewportWidth === 0 || this.camera.viewportHeight === 0) {
+      console.error(`[Renderer] Zero viewport size: width=${this.camera.viewportWidth}, height=${this.camera.viewportHeight}`);
+      return null;
+    }
+
     let closestEntity: any | null = null;
     let closestDistance = Infinity;
+    let closestAgent: any | null = null;
+    let closestAgentDistance = Infinity;
 
     // Check all entities and find the closest one to the click point
+    // Prioritize agents over other entities for better UX
+    let agentCount = 0;
     for (const entity of entities) {
-      if (!entity) continue;
+      if (!entity || !entity.components) {
+        console.warn('[Renderer] Entity or entity.components is null/undefined');
+        continue;
+      }
       const pos = entity.components.get('position') as { x: number; y: number } | undefined;
       const renderable = entity.components.get('renderable') as { visible: boolean } | undefined;
 
       if (!pos || !renderable || !renderable.visible) continue;
 
+      const hasAgent = entity.components.has('agent');
+      const hasPlant = entity.components.has('plant');
+
+      // Calculate world pixel coordinates
       const worldX = pos.x * this.tileSize;
       const worldY = pos.y * this.tileSize;
+
+      // Convert to screen coordinates
       const screen = this.camera.worldToScreen(worldX, worldY);
+
+      // Validate screen coordinates
+      if (!isFinite(screen.x) || !isFinite(screen.y)) {
+        if (hasAgent) {
+          console.warn(`[Renderer] Agent ${agentCount + 1} has invalid screen coords: screen=(${screen.x}, ${screen.y}), world=(${worldX}, ${worldY}), pos=(${pos.x}, ${pos.y})`);
+        }
+        continue;
+      }
 
       const tilePixelSize = this.tileSize * this.camera.zoom;
 
-      // Check distance from click to entity center (more forgiving than exact bounds)
+      // Calculate entity center on screen
       const centerX = screen.x + tilePixelSize / 2;
       const centerY = screen.y + tilePixelSize / 2;
+
+      // Calculate distance from click to entity center
       const distance = Math.sqrt((screenX - centerX) ** 2 + (screenY - centerY) ** 2);
 
-      // Click is within entity if distance to center is less than half the tile size
-      const clickRadius = tilePixelSize / 2;
+      // Determine click radius based on entity type
+      // Agents need a VERY large radius to be easily clickable (16 tiles = 256 pixels at zoom 1.0)
+      // Plants need a moderate radius to be clickable (3 tiles)
+      // Other entities use default (0.5 tiles)
+      let clickRadius = tilePixelSize / 2;
+      if (hasAgent) {
+        clickRadius = tilePixelSize * 16; // Increased from 8 to 16 for more forgiving clicks
+      } else if (hasPlant) {
+        clickRadius = tilePixelSize * 3;
+      }
 
-      if (distance <= clickRadius && distance < closestDistance) {
+      if (hasAgent) {
+        agentCount++;
+        console.log(`[Renderer]   Agent ${agentCount}: worldPixels=(${worldX.toFixed(1)}, ${worldY.toFixed(1)}), worldPos=(${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}), screen=(${screen.x.toFixed(1)}, ${screen.y.toFixed(1)}), center=(${centerX.toFixed(1)}, ${centerY.toFixed(1)}), distance=${distance.toFixed(1)}, clickRadius=${clickRadius.toFixed(1)}, tilePixelSize=${tilePixelSize.toFixed(1)}, passes=${distance <= clickRadius}`);
+      }
+
+      // Check if click is within radius
+      const passesDistanceCheck = distance <= clickRadius;
+      const passesClosestCheck = distance < closestDistance;
+      if (hasAgent) {
+        console.log(`[Renderer]   Agent distance check: passesDistanceCheck=${passesDistanceCheck}, passesClosestCheck=${passesClosestCheck}, closestDistance=${closestDistance}`);
+      }
+
+      // Track closest agent separately (for prioritization)
+      if (hasAgent && passesDistanceCheck && distance < closestAgentDistance) {
+        closestAgent = entity;
+        closestAgentDistance = distance;
+        console.log(`[Renderer]   ✓ Setting this agent as closest agent (distance=${distance.toFixed(1)})`);
+      }
+
+      // Track closest entity overall
+      if (passesDistanceCheck && passesClosestCheck) {
         closestEntity = entity;
         closestDistance = distance;
       }
     }
 
-    return closestEntity;
+    console.log(`[Renderer] Checked ${agentCount} agents, closestEntity: ${closestEntity ? closestEntity.id : 'null'}, closestDistance: ${closestDistance === Infinity ? 'Infinity' : closestDistance.toFixed(1)}, closestAgent: ${closestAgent ? closestAgent.id : 'null'}, closestAgentDistance: ${closestAgentDistance === Infinity ? 'Infinity' : closestAgentDistance.toFixed(1)}`);
+
+    // PRIORITIZE AGENTS: If we found an agent within click radius, return it instead of other entities
+    // This ensures agents are always selectable even if plants/buildings are closer
+    if (closestAgent) {
+      console.log(`[Renderer] Returning closest agent (prioritized over other entities)`);
+      return closestAgent;
+    }
+
+    // If we found a non-agent entity, return it
+    if (closestEntity) {
+      return closestEntity;
+    }
+
+    // If no entity found within radius, select the closest agent if it's reasonably close (within full viewport)
+    // FIXED: Increased max search distance to full viewport since clicks can be anywhere on screen
+    if (agentCount > 0) {
+      console.log('[Renderer] No entity within click radius, searching for nearest agent...');
+      let nearestAgent: any | null = null;
+      let nearestDistance = Infinity;
+      // Use full viewport diagonal distance as maximum
+      const maxSearchDistance = Math.sqrt(this.camera.viewportWidth ** 2 + this.camera.viewportHeight ** 2);
+
+      for (const entity of entities) {
+        if (!entity || !entity.components) continue;
+        if (!entity.components.has('agent')) continue;
+
+        const pos = entity.components.get('position') as { x: number; y: number } | undefined;
+        const renderable = entity.components.get('renderable') as { visible: boolean } | undefined;
+
+        if (!pos || !renderable || !renderable.visible) continue;
+
+        const worldX = pos.x * this.tileSize;
+        const worldY = pos.y * this.tileSize;
+        const screen = this.camera.worldToScreen(worldX, worldY);
+
+        if (!isFinite(screen.x) || !isFinite(screen.y)) continue;
+
+        const tilePixelSize = this.tileSize * this.camera.zoom;
+        const centerX = screen.x + tilePixelSize / 2;
+        const centerY = screen.y + tilePixelSize / 2;
+        const distance = Math.sqrt((screenX - centerX) ** 2 + (screenY - centerY) ** 2);
+
+        console.log(`[Renderer]   Fallback: Agent at screen=(${screen.x.toFixed(1)}, ${screen.y.toFixed(1)}), center=(${centerX.toFixed(1)}, ${centerY.toFixed(1)}), distance=${distance.toFixed(1)}`);
+
+        if (distance < nearestDistance && distance < maxSearchDistance) {
+          nearestAgent = entity;
+          nearestDistance = distance;
+          console.log(`[Renderer]   Fallback: New nearest agent found, distance=${nearestDistance.toFixed(1)}`);
+        }
+      }
+
+      if (nearestAgent) {
+        console.log(`[Renderer] Found nearest agent at distance ${nearestDistance.toFixed(1)} (within max ${maxSearchDistance.toFixed(1)})`);
+        return nearestAgent;
+      } else {
+        console.log(`[Renderer] No agents found within viewport distance`);
+      }
+    }
+
+    return null;
   }
 
   /**
@@ -187,12 +318,17 @@ export class Renderer {
         this.ctx.globalAlpha = 0.5;
       }
 
+      // Get plant component for stage-based rendering
+      const plant = entity.components.get('plant') as { stage: string } | undefined;
+      const metadata = plant ? { stage: plant.stage } : undefined;
+
       renderSprite(
         this.ctx,
         renderable.spriteId,
         screen.x,
         screen.y,
-        this.tileSize * this.camera.zoom
+        this.tileSize * this.camera.zoom,
+        metadata
       );
 
       this.ctx.globalAlpha = 1.0;
@@ -234,8 +370,16 @@ export class Renderer {
       const agent = entity.components.get('agent') as
         | { behavior: string; behaviorState?: Record<string, any> }
         | undefined;
+      const circadian = entity.components.get('circadian') as
+        | { isSleeping: boolean }
+        | undefined;
       if (agent && agent.behavior) {
-        this.drawAgentBehavior(screen.x, screen.y, agent.behavior, agent.behaviorState);
+        this.drawAgentBehavior(screen.x, screen.y, agent.behavior, agent.behaviorState, circadian);
+      }
+
+      // Draw Z's above sleeping agents
+      if (circadian?.isSleeping) {
+        this.drawSleepingIndicator(screen.x, screen.y);
       }
 
       // Highlight selected entity
@@ -424,6 +568,7 @@ export class Renderer {
   /**
    * Draw resource amount bar for harvestable resources (trees, rocks).
    * Shows current amount / max amount with color-coded bar.
+   * Bar is always visible; text appears when zoomed in enough.
    */
   private drawResourceAmount(
     screenX: number,
@@ -433,15 +578,15 @@ export class Renderer {
     resourceType: string
   ): void {
     const barWidth = this.tileSize * this.camera.zoom;
-    const barHeight = 3 * this.camera.zoom;
+    const barHeight = Math.max(3, 4 * this.camera.zoom); // Minimum 3px height for visibility
     const barX = screenX;
     const barY = screenY + this.tileSize * this.camera.zoom + 2; // Below sprite
 
     // Calculate percentage
     const percentage = (amount / maxAmount) * 100;
 
-    // Background (dark gray)
-    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+    // Background (dark gray with higher opacity for better visibility)
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
     this.ctx.fillRect(barX, barY, barWidth, barHeight);
 
     // Resource fill (color based on resource type and percentage)
@@ -454,33 +599,33 @@ export class Renderer {
 
     let fillColor = resourceColors[resourceType] || '#FFFFFF';
 
-    // Dim color if depleted
+    // Override color based on depletion level for better feedback
     if (percentage < 25) {
-      fillColor = 'rgba(255, 0, 0, 0.7)'; // Red if low
+      fillColor = '#FF3333'; // Bright red if low
     } else if (percentage < 50) {
-      fillColor = 'rgba(255, 165, 0, 0.7)'; // Orange if medium
+      fillColor = '#FF8800'; // Orange if medium
     }
 
     const fillWidth = (barWidth * amount) / maxAmount;
     this.ctx.fillStyle = fillColor;
     this.ctx.fillRect(barX, barY, fillWidth, barHeight);
 
-    // Border (white, thin)
-    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-    this.ctx.lineWidth = 0.5;
+    // Border (white, more visible)
+    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+    this.ctx.lineWidth = 1;
     this.ctx.strokeRect(barX, barY, barWidth, barHeight);
 
-    // Resource amount text (if zoom is large enough)
-    if (this.camera.zoom >= 0.7) {
+    // Resource amount text (show at lower zoom threshold for better UX)
+    if (this.camera.zoom >= 0.5) {
       this.ctx.fillStyle = '#fff';
-      this.ctx.font = `bold ${8 * this.camera.zoom}px monospace`;
+      this.ctx.font = `bold ${Math.max(8, 9 * this.camera.zoom)}px monospace`;
       this.ctx.textAlign = 'center';
-      this.ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-      this.ctx.shadowBlur = 2;
+      this.ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+      this.ctx.shadowBlur = 3;
       this.ctx.fillText(
         `${amount.toFixed(0)}/${maxAmount}`,
         barX + barWidth / 2,
-        barY + barHeight + 10 * this.camera.zoom
+        barY + barHeight + Math.max(10, 11 * this.camera.zoom)
       );
       this.ctx.shadowBlur = 0;
       this.ctx.textAlign = 'left'; // Reset
@@ -491,20 +636,61 @@ export class Renderer {
    * Draw agent behavior label above the agent.
    * Shows what the agent is currently doing.
    */
+  /**
+   * Draw floating Z's above sleeping agents
+   */
+  private drawSleepingIndicator(screenX: number, screenY: number): void {
+    // Only show if zoom is reasonable
+    if (this.camera.zoom < 0.5) return;
+
+    const centerX = screenX + (this.tileSize * this.camera.zoom) / 2;
+    const baseY = screenY - 30 * this.camera.zoom;
+
+    // Animate Z's with floating effect
+    const time = Date.now() / 1000;
+    const offset1 = Math.sin(time * 2) * 3 * this.camera.zoom;
+    const offset2 = Math.sin(time * 2 + 0.5) * 3 * this.camera.zoom;
+    const offset3 = Math.sin(time * 2 + 1.0) * 3 * this.camera.zoom;
+
+    // Draw three Z's of increasing size
+    this.ctx.font = `${10 * this.camera.zoom}px Arial`;
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    this.ctx.textAlign = 'center';
+
+    this.ctx.fillText('Z', centerX - 5 * this.camera.zoom, baseY + offset1);
+
+    this.ctx.font = `${12 * this.camera.zoom}px Arial`;
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    this.ctx.fillText('z', centerX + 2 * this.camera.zoom, baseY - 8 * this.camera.zoom + offset2);
+
+    this.ctx.font = `${14 * this.camera.zoom}px Arial`;
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    this.ctx.fillText('z', centerX + 10 * this.camera.zoom, baseY - 16 * this.camera.zoom + offset3);
+
+    // Reset
+    this.ctx.textAlign = 'left';
+  }
+
   private drawAgentBehavior(
     screenX: number,
     screenY: number,
     behavior: string,
-    behaviorState?: Record<string, any>
+    behaviorState?: Record<string, any>,
+    circadian?: { isSleeping: boolean }
   ): void {
     // Only show if zoom is reasonable
     if (this.camera.zoom < 0.5) return;
 
+    // Check if actually sleeping (from circadian component)
+    const isActuallySleeping = circadian?.isSleeping || false;
+
     // Format behavior for display
     let displayText = behavior.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
-    // Add resource type if gathering
-    if (behavior === 'gather' && behaviorState?.resourceType) {
+    // Override display if actually sleeping (regardless of behavior state)
+    if (isActuallySleeping) {
+      displayText = 'Sleeping 💤💤💤';
+    } else if (behavior === 'gather' && behaviorState?.resourceType) {
       const resourceType = behaviorState.resourceType;
       displayText = `Gathering ${resourceType.charAt(0).toUpperCase() + resourceType.slice(1)}`;
     } else if (behavior === 'build' && behaviorState?.buildingType) {
@@ -519,6 +705,10 @@ export class Renderer {
       displayText = 'Talking';
     } else if (behavior === 'follow_agent') {
       displayText = 'Following';
+    } else if (behavior === 'seek_sleep') {
+      displayText = 'Seeking Sleep 😴';
+    } else if (behavior === 'forced_sleep') {
+      displayText = 'Sleeping 💤💤💤';
     }
 
     // Position above sprite
@@ -680,9 +870,30 @@ export class Renderer {
     this.ctx.fillStyle = '#fff';
     this.ctx.font = '12px monospace';
 
+    // Get time component to display day/night cycle
+    const timeEntities = world.query().with('time').executeEntities();
+    let timeOfDayStr = 'N/A';
+    let phaseStr = 'N/A';
+    let lightLevelStr = 'N/A';
+
+    if (timeEntities.length > 0) {
+      const timeEntity = timeEntities[0];
+      if (!timeEntity) {
+        throw new Error('Time entity is undefined');
+      }
+      const timeComp = timeEntity.components.get('time') as any;
+      if (timeComp) {
+        const hours = Math.floor(timeComp.timeOfDay);
+        const minutes = Math.floor((timeComp.timeOfDay - hours) * 60);
+        timeOfDayStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        phaseStr = timeComp.phase;
+        lightLevelStr = (timeComp.lightLevel * 100).toFixed(0) + '%';
+      }
+    }
+
     const lines = [
       `Tick: ${world.tick}`,
-      `Time: ${world.gameTime.hour}:00 Day ${world.gameTime.day} ${world.gameTime.season} Year ${world.gameTime.year}`,
+      `Time: ${timeOfDayStr} (${phaseStr}) Light: ${lightLevelStr}`,
       `Camera: (${this.camera.x.toFixed(1)}, ${this.camera.y.toFixed(1)}) zoom: ${this.camera.zoom.toFixed(2)}`,
       `Chunks: ${this.chunkManager.getChunkCount()}`,
       `Entities: ${world.entities.size}`,

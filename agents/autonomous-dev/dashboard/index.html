@@ -661,6 +661,7 @@
             <div class="tabs">
                 <div class="tab active" data-tab="pipelines">Pipelines</div>
                 <div class="tab" data-tab="work-orders">Work Orders</div>
+                <div class="tab" data-tab="bugs">Bugs</div>
                 <div class="tab" data-tab="quality">Quality</div>
                 <div class="tab" data-tab="logs">Logs</div>
             </div>
@@ -691,6 +692,18 @@
                         <button class="btn" onclick="loadWorkOrders()" style="padding: 4px 8px;">Refresh</button>
                     </div>
                     <div class="work-order-list" id="work-orders-container">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-bugs">
+                <div class="panel-section">
+                    <div class="panel-section-title">
+                        <span>Bug Queue</span>
+                        <button class="btn btn-success" onclick="openNewBugModal()" style="padding: 4px 8px;">+ New Bug</button>
+                    </div>
+                    <div class="work-order-list" id="bugs-container">
                         <div class="loading"><div class="spinner"></div></div>
                     </div>
                 </div>
@@ -848,12 +861,123 @@
         </div>
     </div>
 
+    <!-- New Bug Modal -->
+    <div class="modal-overlay" id="new-bug-modal" style="display: none;">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Create New Bug</h3>
+                <button class="modal-close" onclick="closeNewBugModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">Title *</label>
+                    <input type="text" id="bug-title" placeholder="Brief description of the bug"
+                           style="width: 100%; padding: 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary);">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">Priority</label>
+                    <select id="bug-priority"
+                            style="width: 100%; padding: 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary);">
+                        <option value="LOW">Low</option>
+                        <option value="MEDIUM" selected>Medium</option>
+                        <option value="HIGH">High</option>
+                        <option value="CRITICAL">Critical</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">Description</label>
+                    <textarea id="bug-description" rows="4" placeholder="Detailed description of the bug"
+                              style="width: 100%; padding: 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); resize: vertical; font-family: inherit;"></textarea>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">Steps to Reproduce</label>
+                    <textarea id="bug-reproduce" rows="3" placeholder="1. Go to...\n2. Click on...\n3. See error"
+                              style="width: 100%; padding: 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); resize: vertical; font-family: inherit;"></textarea>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">Error Log (optional)</label>
+                    <textarea id="bug-error-log" rows="4" placeholder="Paste any error messages or stack traces here"
+                              style="width: 100%; padding: 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); resize: vertical; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px;"></textarea>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn btn-success" onclick="createBug()">Create Bug</button>
+                    <button class="btn" onclick="closeNewBugModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bug Detail Modal -->
+    <div class="modal-overlay" id="bug-detail-modal" style="display: none;">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="bug-detail-title">Bug Details</h3>
+                <button class="modal-close" onclick="closeBugDetailModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                        <div>
+                            <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;" id="bug-detail-title-text"></div>
+                            <div style="color: var(--text-secondary); font-size: 12px;" id="bug-detail-id"></div>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span id="bug-detail-priority-badge"></span>
+                            <span id="bug-detail-status-badge"></span>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; font-size: 13px;">
+                        <div>
+                            <strong>Source:</strong> <span id="bug-detail-source"></span>
+                        </div>
+                        <div>
+                            <strong>Created:</strong> <span id="bug-detail-created"></span>
+                        </div>
+                        <div>
+                            <strong>Assigned:</strong> <span id="bug-detail-assigned"></span>
+                        </div>
+                        <div>
+                            <strong>Updated:</strong> <span id="bug-detail-updated"></span>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <strong style="display: block; margin-bottom: 8px;">Description</strong>
+                        <div id="bug-detail-description" style="padding: 12px; background: var(--bg-tertiary); border-radius: 6px; white-space: pre-wrap;"></div>
+                    </div>
+                    <div id="bug-detail-reproduce-section" style="margin-bottom: 16px; display: none;">
+                        <strong style="display: block; margin-bottom: 8px;">Steps to Reproduce</strong>
+                        <div id="bug-detail-reproduce" style="padding: 12px; background: var(--bg-tertiary); border-radius: 6px; white-space: pre-wrap;"></div>
+                    </div>
+                    <div id="bug-detail-error-section" style="margin-bottom: 16px; display: none;">
+                        <strong style="display: block; margin-bottom: 8px;">Error Log</strong>
+                        <div id="bug-detail-error" style="padding: 12px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Monaco', 'Menlo', monospace; font-size: 11px; white-space: pre-wrap; max-height: 200px; overflow-y: auto;"></div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <strong style="display: block; margin-bottom: 8px;">Update Status</strong>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="btn" onclick="updateBugStatusTo('IN_PROGRESS')">In Progress</button>
+                            <button class="btn" onclick="updateBugStatusTo('READY_FOR_TEST')">Ready for Test</button>
+                            <button class="btn" onclick="updateBugStatusTo('VERIFIED')">Verified</button>
+                            <button class="btn" onclick="updateBugStatusTo('CLOSED')">Close</button>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color); display: flex; gap: 12px;">
+                        <button class="btn btn-danger" onclick="deleteBugFromModal()">Delete Bug</button>
+                        <button class="btn" onclick="closeBugDetailModal()">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // State
         let roadmapData = null;
         let workOrdersData = [];
+        let bugsData = [];
         let pipelinesData = [];
         let eventSource = null;
+        let currentBugId = null;
 
         // Server stats
         async function loadServerStats() {
@@ -953,6 +1077,11 @@
 
                         container.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                         container.querySelector(`#tab-${tabId}`)?.classList.add('active');
+
+                        // Load bugs when bugs tab is clicked
+                        if (tabId === 'bugs') {
+                            loadBugs();
+                        }
                     });
                 });
             });
@@ -993,6 +1122,17 @@
                 case 'parallel-workers-stopped':
                 case 'parallel-workers-log':
                     handleParallelWorkersSSE(data);
+                    break;
+                case 'bug-created':
+                    loadBugs();
+                    addLog(`Bug created: ${data.bug.title}`, 'stdout');
+                    break;
+                case 'bug-updated':
+                    loadBugs();
+                    break;
+                case 'bug-deleted':
+                    loadBugs();
+                    addLog(`Bug deleted: ${data.id}`, 'stdout');
                     break;
             }
         }
@@ -1214,6 +1354,227 @@
 
         function closeWorkOrderModal() {
             document.getElementById('work-order-modal').style.display = 'none';
+        }
+
+        // Bugs
+        async function loadBugs() {
+            const container = document.getElementById('bugs-container');
+
+            try {
+                const response = await fetch('/api/bugs');
+                bugsData = await response.json();
+
+                if (!bugsData || bugsData.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No bugs in queue</div>';
+                    return;
+                }
+
+                container.innerHTML = bugsData.map(bug => {
+                    const priorityColors = {
+                        'CRITICAL': 'var(--accent-red)',
+                        'HIGH': 'var(--accent-yellow)',
+                        'MEDIUM': 'var(--accent-blue)',
+                        'LOW': 'var(--text-secondary)'
+                    };
+
+                    const statusLabels = {
+                        'NEW': '🆕 New',
+                        'IN_PROGRESS': '🚧 In Progress',
+                        'READY_FOR_TEST': '⏳ Ready for Test',
+                        'VERIFIED': '✅ Verified',
+                        'CLOSED': '✓ Closed'
+                    };
+
+                    return `
+                        <div class="work-order-item" onclick="openBugDetail('${bug.id}')" style="cursor: pointer;">
+                            <div class="work-order-header">
+                                <div class="work-order-name">${bug.title}</div>
+                                <span class="badge" style="background: ${priorityColors[bug.priority]}; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; color: white;">${bug.priority}</span>
+                            </div>
+                            <div class="work-order-meta">
+                                <span class="badge badge-${bug.status.toLowerCase().replace('_', '-')}">${statusLabels[bug.status]}</span>
+                                <span>Source: ${bug.source}</span>
+                                ${bug.assignedTo ? `<span>Assigned: ${bug.assignedTo}</span>` : ''}
+                                <span>${new Date(bug.createdAt).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                container.innerHTML = '<div class="empty-state">Failed to load bugs</div>';
+                console.error('Failed to load bugs:', err);
+            }
+        }
+
+        function openNewBugModal() {
+            const modal = document.getElementById('new-bug-modal');
+            document.getElementById('bug-title').value = '';
+            document.getElementById('bug-description').value = '';
+            document.getElementById('bug-reproduce').value = '';
+            document.getElementById('bug-error-log').value = '';
+            document.getElementById('bug-priority').value = 'MEDIUM';
+            modal.style.display = 'flex';
+        }
+
+        function closeNewBugModal() {
+            document.getElementById('new-bug-modal').style.display = 'none';
+        }
+
+        async function createBug() {
+            const title = document.getElementById('bug-title').value.trim();
+            const description = document.getElementById('bug-description').value.trim();
+            const reproduceSteps = document.getElementById('bug-reproduce').value.trim();
+            const errorLog = document.getElementById('bug-error-log').value.trim();
+            const priority = document.getElementById('bug-priority').value;
+
+            if (!title) {
+                alert('Title is required');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/bugs', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title,
+                        description,
+                        reproduceSteps,
+                        errorLog,
+                        priority
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to create bug');
+                }
+
+                closeNewBugModal();
+                await loadBugs();
+            } catch (err) {
+                alert('Failed to create bug: ' + err.message);
+                console.error('Failed to create bug:', err);
+            }
+        }
+
+        async function openBugDetail(bugId) {
+            currentBugId = bugId;
+            const modal = document.getElementById('bug-detail-modal');
+
+            try {
+                const response = await fetch(`/api/bugs/${bugId}`);
+                if (!response.ok) {
+                    throw new Error('Bug not found');
+                }
+                const bug = await response.json();
+
+                // Set title and ID
+                document.getElementById('bug-detail-title-text').textContent = bug.title;
+                document.getElementById('bug-detail-id').textContent = `ID: ${bug.id}`;
+
+                // Priority badge
+                const priorityColors = {
+                    'CRITICAL': 'var(--accent-red)',
+                    'HIGH': 'var(--accent-yellow)',
+                    'MEDIUM': 'var(--accent-blue)',
+                    'LOW': 'var(--text-secondary)'
+                };
+                document.getElementById('bug-detail-priority-badge').innerHTML =
+                    `<span class="badge" style="background: ${priorityColors[bug.priority]}; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; color: white;">${bug.priority}</span>`;
+
+                // Status badge
+                const statusLabels = {
+                    'NEW': '🆕 New',
+                    'IN_PROGRESS': '🚧 In Progress',
+                    'READY_FOR_TEST': '⏳ Ready for Test',
+                    'VERIFIED': '✅ Verified',
+                    'CLOSED': '✓ Closed'
+                };
+                document.getElementById('bug-detail-status-badge').innerHTML =
+                    `<span class="badge badge-${bug.status.toLowerCase().replace('_', '-')}">${statusLabels[bug.status]}</span>`;
+
+                // Details
+                document.getElementById('bug-detail-source').textContent = bug.source + (bug.sourceRef ? ` (${bug.sourceRef})` : '');
+                document.getElementById('bug-detail-created').textContent = new Date(bug.createdAt).toLocaleString();
+                document.getElementById('bug-detail-assigned').textContent = bug.assignedTo || 'Unassigned';
+                document.getElementById('bug-detail-updated').textContent = new Date(bug.updatedAt).toLocaleString();
+                document.getElementById('bug-detail-description').textContent = bug.description || 'No description';
+
+                // Optional fields
+                if (bug.reproduceSteps) {
+                    document.getElementById('bug-detail-reproduce-section').style.display = 'block';
+                    document.getElementById('bug-detail-reproduce').textContent = bug.reproduceSteps;
+                } else {
+                    document.getElementById('bug-detail-reproduce-section').style.display = 'none';
+                }
+
+                if (bug.errorLog) {
+                    document.getElementById('bug-detail-error-section').style.display = 'block';
+                    document.getElementById('bug-detail-error').textContent = bug.errorLog;
+                } else {
+                    document.getElementById('bug-detail-error-section').style.display = 'none';
+                }
+
+                modal.style.display = 'flex';
+            } catch (err) {
+                alert('Failed to load bug: ' + err.message);
+                console.error('Failed to load bug:', err);
+            }
+        }
+
+        function closeBugDetailModal() {
+            document.getElementById('bug-detail-modal').style.display = 'none';
+            currentBugId = null;
+        }
+
+        async function updateBugStatusTo(status) {
+            if (!currentBugId) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/bugs/${currentBugId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update status');
+                }
+
+                closeBugDetailModal();
+                await loadBugs();
+            } catch (err) {
+                alert('Failed to update bug status: ' + err.message);
+                console.error('Failed to update bug status:', err);
+            }
+        }
+
+        async function deleteBugFromModal() {
+            if (!currentBugId) {
+                return;
+            }
+
+            if (!confirm('Are you sure you want to delete this bug?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/bugs/${currentBugId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete bug');
+                }
+
+                closeBugDetailModal();
+                await loadBugs();
+            } catch (err) {
+                alert('Failed to delete bug: ' + err.message);
+                console.error('Failed to delete bug:', err);
+            }
         }
 
         // Pipelines

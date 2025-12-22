@@ -1,0 +1,526 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { World } from '../ecs/World';
+import { PlantSystem } from '../systems/PlantSystem';
+import { WeatherSystem } from '../systems/WeatherSystem';
+import { SoilSystem } from '../systems/SoilSystem';
+import { PlantComponent } from '../components/PlantComponent';
+import { EventBus } from '../events/EventBus';
+
+describe('Plant System Integration Tests', () => {
+  let world: World;
+  let plantSystem: PlantSystem;
+  let weatherSystem: WeatherSystem;
+  let soilSystem: SoilSystem;
+  let eventBus: EventBus;
+
+  beforeEach(() => {
+    world = new World();
+    eventBus = new EventBus();
+
+    // Register systems in priority order
+    weatherSystem = new WeatherSystem(eventBus);
+    soilSystem = new SoilSystem(eventBus);
+    plantSystem = new PlantSystem(eventBus);
+
+    world.registerSystem(weatherSystem);
+    world.registerSystem(soilSystem);
+    world.registerSystem(plantSystem);
+  });
+
+  describe('Weather System Integration', () => {
+    it('should update plant hydration when weather system emits rain', () => {
+      const entity = world.createEntity();
+      const plant = new PlantComponent({
+        speciesId: 'wheat',
+        position: { x: 10, y: 20 },
+        stage: 'vegetative'
+      });
+      entity.addComponent(PlantComponent, plant);
+
+      plant.hydration = 50;
+
+      // Weather system emits rain
+      eventBus.emit('weather:rain', {
+        intensity: 'heavy',
+        duration: 3,
+        coverage: 'widespread'
+      });
+
+      // Update plant system
+      plantSystem.update(world, 1);
+
+      expect(plant.hydration).toBeGreaterThan(50);
+    });
+
+    it('should handle light rain differently than heavy rain', () => {
+      const entity1 = world.createEntity();
+      const plant1 = new PlantComponent({
+        speciesId: 'wheat',
+        position: { x: 10, y: 20 },
+        stage: 'vegetative'
+      });
+      entity1.addComponent(PlantComponent, plant1);
+      plant1.hydration = 50;
+
+      const entity2 = world.createEntity();
+      const plant2 = new PlantComponent({
+        speciesId: 'wheat',
+        position: { x: 11, y: 20 },
+        stage: 'vegetative'
+      });
+      entity2.addComponent(PlantComponent, plant2);
+      plant2.hydration = 50;
+
+      // Light rain
+      eventBus.emit('weather:rain', { intensity: 'light' });
+      plantSystem.update(world, 1);
+      const lightRainHydration = plant1.hydration;
+
+      // Reset and heavy rain
+      plant2.hydration = 50;
+      eventBus.emit('weather:rain', { intensity: 'heavy' });
+      plantSystem.update(world, 1);
+      const heavyRainHydration = plant2.hydration;
+
+      expect(heavyRainHydration).toBeGreaterThan(lightRainHydration);
+    });
+
+    it('should damage plants during frost based on cold tolerance', () => {
+      // Cold-sensitive plant
+      const entity1 = world.createEntity();
+      const tomatoPlant = new PlantComponent({
+        speciesId: 'tomato',
+        position: { x: 10, y: 20 },
+        stage: 'vegetative',
+        genetics: {
+          growthRate: 1.0,
+          yieldAmount: 1.0,
+          diseaseResistance: 50,
+          droughtTolerance: 50,
+          coldTolerance: 20, // Low
+          flavorProfile: 50,
+          mutations: []
+        }
+      });
+      entity1.addComponent(PlantComponent, tomatoPlant);
+      const tomatoInitialHealth = tomatoPlant.health;
+
+      // Cold-tolerant plant
+      const entity2 = world.createEntity();
+      const wheatPlant = new PlantComponent({
+        speciesId: 'wheat',
+        position: { x: 11, y: 20 },
+        stage: 'vegetative',
+        genetics: {
+          growthRate: 1.0,
+          yieldAmount: 1.0,
+          diseaseResistance: 50,
+          droughtTolerance: 50,
+          coldTolerance: 90, // High
+          flavorProfile: 50,
+          mutations: []
+        }
+      });
+      entity2.addComponent(PlantComponent, wheatPlant);
+      const wheatInitialHealth = wheatPlant.health;
+
+      // Frost event
+      eventBus.emit('weather:frost', { temperature: -3 });
+      plantSystem.update(world, 1);
+
+      expect(tomatoPlant.health).toBeLessThan(tomatoInitialHealth);
+      expect(wheatPlant.health).toBe(wheatInitialHealth); // No damage
+    });
+
+    it('should increase hydration decay during hot weather', () => {
+      const entity = world.createEntity();
+      const plant = new PlantComponent({
+        speciesId: 'wheat',
+        position: { x: 10, y: 20 },
+        stage: 'vegetative'
+      });
+      entity.addComponent(PlantComponent, plant);
+
+      plant.hydration = 100;
+
+      // Hot weather
+      eventBus.emit('weather:changed', {
+        temperature: 38,
+        conditions: 'clear'
+      });
+
+      plantSystem.update(world, 1);
+
+      // Should lose more hydration than normal
+      expect(plant.hydration).toBeLessThan(90);
+    });
+
+    it('should NOT increase indoor plant hydration during rain', () => {
+      const entity = world.createEntity();
+      const plant = new PlantComponent({
+        speciesId: 'wheat',
+        position: { x: 10, y: 20 },
+        stage: 'vegetative',
+        isIndoors: true
+      });
+      entity.addComponent(PlantComponent, plant);
+
+      plant.hydration = 50;
+      const initialHydration = plant.hydration;
+
+      eventBus.emit('weather:rain', { intensity: 'heavy' });
+      plantSystem.update(world, 1);
+
+      // Indoor plants don't get rain
+      expect(plant.hydration).toBe(initialHydration);
+    });
+  });
+
+  describe('Soil System Integration', () => {
+    it('should update plant nutrition when soil nutrients change', () => {
+      const entity = world.createEntity();
+      const plant = new PlantComponent({
+        speciesId: 'wheat',
+        position: { x: 10, y: 20 },
+        stage: 'vegetative'
+      });
+      entity.addComponent(PlantComponent, plant);
+
+      plant.nutrition = 80;
+
+      // Soil depleted
+      eventBus.emit('soil:depleted', {
+        position: { x: 10, y: 20 },
+        nutrients: 20
+      });
+
+      plantSystem.update(world, 1);
+
+      expect(plant.nutrition).toBeLessThan(80);
+    });
+
+    it('should update plant hydration when soil moisture changes', () => {
+      const entity = world.createEntity();
+      const plant = new PlantComponent({
+        speciesId: 'wheat',
+        position: { x: 10, y: 20 },
+        stage: 'vegetative'
+      });
+      entity.addComponent(PlantComponent, plant);
+
+      plant.hydration = 50;
+
+      // Soil moisture increased
+      eventBus.emit('soil:moistureChanged', {
+        position: { x: 10, y: 20 },
+        moisture: 90
+      });
+
+      plantSystem.update(world, 1);
+
+      expect(plant.hydration).toBeGreaterThan(50);
+    });
+
+    it('should consume soil nutrients as plant grows', () => {
+      const entity = world.createEntity();
+      const plant = new PlantComponent({
+        speciesId: 'wheat',
+        position: { x: 10, y: 20 },
+        stage: 'vegetative'
+      });
+      entity.addComponent(PlantComponent, plant);
+
+      const nutrientConsumptionHandler = vi.fn();
+      eventBus.on('plant:nutrientConsumption', nutrientConsumptionHandler);
+
+      // Day passes
+      eventBus.emit('time:dayStart', { day: 1 });
+      plantSystem.update(world, 1);
+
+      expect(nutrientConsumptionHandler).toHaveBeenCalledWith({
+        position: { x: 10, y: 20 },
+        amount: expect.any(Number)
+      });
+    });
+
+    it('should return nutrients to soil when plant decays', () => {
+      const entity = world.createEntity();
+      const plant = new PlantComponent({
+        speciesId: 'wheat',
+        position: { x: 10, y: 20 },
+        stage: 'senescence'
+      });
+      entity.addComponent(PlantComponent, plant);
+
+      plant.stageProgress = 1.0;
+
+      const nutrientReturnHandler = vi.fn();
+      eventBus.on('plant:nutrientReturn', nutrientReturnHandler);
+
+      plantSystem.update(world, 1);
+
+      expect(plant.stage).toBe('decay');
+      expect(nutrientReturnHandler).toHaveBeenCalledWith({
+        position: { x: 10, y: 20 },
+        amount: expect.any(Number)
+      });
+    });
+
+    it('should prevent planting on tiles with depleted soil', () => {
+      // Mock soil state
+      const soilState = {
+        moisture: 80,
+        nutrients: 5, // Very depleted
+        ph: 6.5
+      };
+
+      const canPlant = plantSystem.canPlantAt({ x: 10, y: 20 }, 'wheat', soilState);
+
+      expect(canPlant).toBe(false);
+    });
+  });
+
+  describe('Temperature System Integration', () => {
+    it('should check temperature from TemperatureSystem for each plant', () => {
+      const entity = world.createEntity();
+      const plant = new PlantComponent({
+        speciesId: 'wheat',
+        position: { x: 10, y: 20 },
+        stage: 'vegetative'
+      });
+      entity.addComponent(PlantComponent, plant);
+
+      const getTemperatureSpy = vi.spyOn(plantSystem as any, 'getTemperatureAt');
+
+      plantSystem.update(world, 1);
+
+      expect(getTemperatureSpy).toHaveBeenCalledWith({ x: 10, y: 20 }, world);
+    });
+
+    it('should slow growth when temperature outside optimal range', () => {
+      const entity1 = world.createEntity();
+      const optimalTempPlant = new PlantComponent({
+        speciesId: 'wheat',
+        position: { x: 10, y: 20 },
+        stage: 'vegetative'
+      });
+      entity1.addComponent(PlantComponent, optimalTempPlant);
+
+      const entity2 = world.createEntity();
+      const coldTempPlant = new PlantComponent({
+        speciesId: 'wheat',
+        position: { x: 11, y: 20 },
+        stage: 'vegetative'
+      });
+      entity2.addComponent(PlantComponent, coldTempPlant);
+
+      // Mock optimal temperature for first plant
+      vi.spyOn(plantSystem as any, 'getTemperatureAt')
+        .mockImplementation((pos: any) => {
+          if (pos.x === 10) return 20; // Optimal for wheat
+          return 5; // Too cold
+        });
+
+      plantSystem.update(world, 1);
+
+      expect(optimalTempPlant.stageProgress).toBeGreaterThan(coldTempPlant.stageProgress);
+    });
+
+    it('should damage plants when temperature is extreme', () => {
+      const entity = world.createEntity();
+      const plant = new PlantComponent({
+        speciesId: 'wheat',
+        position: { x: 10, y: 20 },
+        stage: 'vegetative'
+      });
+      entity.addComponent(PlantComponent, plant);
+
+      const initialHealth = plant.health;
+
+      // Mock extreme temperature
+      vi.spyOn(plantSystem as any, 'getTemperatureAt').mockReturnValue(45); // Too hot
+
+      plantSystem.update(world, 1);
+
+      expect(plant.health).toBeLessThan(initialHealth);
+    });
+  });
+
+  describe('Multi-system interactions', () => {
+    it('should handle rain + temperature affecting plant simultaneously', () => {
+      const entity = world.createEntity();
+      const plant = new PlantComponent({
+        speciesId: 'wheat',
+        position: { x: 10, y: 20 },
+        stage: 'vegetative'
+      });
+      entity.addComponent(PlantComponent, plant);
+
+      plant.hydration = 50;
+      const initialHealth = plant.health;
+
+      // Cold rain
+      vi.spyOn(plantSystem as any, 'getTemperatureAt').mockReturnValue(2); // Cold
+      eventBus.emit('weather:rain', { intensity: 'heavy' });
+
+      plantSystem.update(world, 1);
+
+      // Should gain hydration from rain
+      expect(plant.hydration).toBeGreaterThan(50);
+      // But may lose health from cold
+      expect(plant.health).toBeLessThanOrEqual(initialHealth);
+    });
+
+    it('should handle drought (no rain + hot temp + depleted soil)', () => {
+      const entity = world.createEntity();
+      const plant = new PlantComponent({
+        speciesId: 'wheat',
+        position: { x: 10, y: 20 },
+        stage: 'vegetative'
+      });
+      entity.addComponent(PlantComponent, plant);
+
+      plant.hydration = 40;
+      plant.nutrition = 30;
+
+      // Hot and dry
+      vi.spyOn(plantSystem as any, 'getTemperatureAt').mockReturnValue(35);
+      eventBus.emit('soil:moistureChanged', { position: { x: 10, y: 20 }, moisture: 10 });
+
+      plantSystem.update(world, 1);
+
+      // Severe stress
+      expect(plant.health).toBeLessThan(100);
+      expect(plant.hydration).toBeLessThan(40);
+      expect(plant.stageProgress).toBeLessThan(0.05); // Minimal growth
+    });
+
+    it('should handle ideal growing conditions (rain + good temp + rich soil)', () => {
+      const entity = world.createEntity();
+      const plant = new PlantComponent({
+        speciesId: 'wheat',
+        position: { x: 10, y: 20 },
+        stage: 'vegetative'
+      });
+      entity.addComponent(PlantComponent, plant);
+
+      plant.hydration = 80;
+      plant.nutrition = 90;
+
+      // Ideal conditions
+      vi.spyOn(plantSystem as any, 'getTemperatureAt').mockReturnValue(20);
+      eventBus.emit('weather:rain', { intensity: 'light' });
+      eventBus.emit('soil:moistureChanged', { position: { x: 10, y: 20 }, moisture: 85 });
+
+      plantSystem.update(world, 1);
+
+      // Optimal growth
+      expect(plant.health).toBe(100);
+      expect(plant.hydration).toBeGreaterThan(80);
+      expect(plant.stageProgress).toBeGreaterThan(0.05);
+    });
+  });
+
+  describe('Event propagation order', () => {
+    it('should process systems in correct priority order', () => {
+      const executionOrder: string[] = [];
+
+      // Mock update methods to track order
+      const originalWeatherUpdate = weatherSystem.update.bind(weatherSystem);
+      const originalSoilUpdate = soilSystem.update.bind(soilSystem);
+      const originalPlantUpdate = plantSystem.update.bind(plantSystem);
+
+      weatherSystem.update = (world: World, deltaTime: number) => {
+        executionOrder.push('weather');
+        return originalWeatherUpdate(world, deltaTime);
+      };
+
+      soilSystem.update = (world: World, deltaTime: number) => {
+        executionOrder.push('soil');
+        return originalSoilUpdate(world, deltaTime);
+      };
+
+      plantSystem.update = (world: World, deltaTime: number) => {
+        executionOrder.push('plant');
+        return originalPlantUpdate(world, deltaTime);
+      };
+
+      world.update(1);
+
+      // PlantSystem should run after WeatherSystem and SoilSystem
+      const plantIndex = executionOrder.indexOf('plant');
+      const weatherIndex = executionOrder.indexOf('weather');
+      const soilIndex = executionOrder.indexOf('soil');
+
+      expect(plantIndex).toBeGreaterThan(weatherIndex);
+      expect(plantIndex).toBeGreaterThan(soilIndex);
+    });
+
+    it('should allow plants to respond to same-frame weather changes', () => {
+      const entity = world.createEntity();
+      const plant = new PlantComponent({
+        speciesId: 'wheat',
+        position: { x: 10, y: 20 },
+        stage: 'vegetative'
+      });
+      entity.addComponent(PlantComponent, plant);
+
+      plant.hydration = 50;
+
+      // Weather changes
+      weatherSystem.setWeather('rain', 'heavy');
+
+      // Single update tick
+      world.update(1);
+
+      // Plant should have responded in same frame
+      expect(plant.hydration).toBeGreaterThan(50);
+    });
+  });
+
+  describe('Performance with multiple plants', () => {
+    it('should efficiently update 100 plants', () => {
+      const plants: any[] = [];
+
+      for (let i = 0; i < 100; i++) {
+        const entity = world.createEntity();
+        const plant = new PlantComponent({
+          speciesId: 'wheat',
+          position: { x: i % 10, y: Math.floor(i / 10) },
+          stage: 'vegetative'
+        });
+        entity.addComponent(PlantComponent, plant);
+        plants.push(plant);
+      }
+
+      const startTime = performance.now();
+      plantSystem.update(world, 1);
+      const endTime = performance.now();
+
+      const updateTime = endTime - startTime;
+
+      // Should complete in under 100ms for 100 plants
+      expect(updateTime).toBeLessThan(100);
+    });
+
+    it('should batch soil queries for plants in same chunk', () => {
+      // Create multiple plants in same chunk
+      for (let i = 0; i < 10; i++) {
+        const entity = world.createEntity();
+        const plant = new PlantComponent({
+          speciesId: 'wheat',
+          position: { x: 5, y: 5 + i }, // Same chunk
+          stage: 'vegetative'
+        });
+        entity.addComponent(PlantComponent, plant);
+      }
+
+      const soilQuerySpy = vi.spyOn(soilSystem, 'getSoilAt');
+
+      plantSystem.update(world, 1);
+
+      // Should query soil efficiently (ideally once per chunk, not per plant)
+      expect(soilQuerySpy.mock.calls.length).toBeLessThan(10);
+    });
+  });
+});

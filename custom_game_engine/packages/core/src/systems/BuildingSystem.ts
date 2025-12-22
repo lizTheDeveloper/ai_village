@@ -132,6 +132,7 @@ export class BuildingSystem implements System {
   /**
    * Handle building placement event from BuildingPlacementUI.
    * Creates a new building entity at the specified position.
+   * Deducts resources from the nearest agent's inventory.
    */
   private handleBuildingPlacement(
     world: World,
@@ -148,7 +149,31 @@ export class BuildingSystem implements System {
         .map(([type, amount]) => `${amount} ${type}`)
         .join(', ');
       console.log(`[BuildingSystem] Building "${blueprintId}" requires: ${resourceList}`);
-      console.log(`[BuildingSystem] TODO: Verify and deduct resources from agent inventory`);
+
+      // Find nearest agent with inventory
+      const nearestAgent = this.findNearestAgentWithInventory(world, position);
+      if (nearestAgent) {
+        // Deduct resources from agent's inventory
+        const success = this.deductResourcesFromAgent(nearestAgent, resourceCost);
+        if (success) {
+          console.log(`[BuildingSystem] Deducted resources from agent ${nearestAgent.id}`);
+        } else {
+          console.error(`[BuildingSystem] Failed to deduct resources from agent ${nearestAgent.id}`);
+          // Per CLAUDE.md: Don't silently continue - emit error event
+          world.eventBus.emit({
+            type: 'building:placement:failed',
+            source: 'building-system',
+            data: {
+              blueprintId,
+              position,
+              reason: 'Failed to deduct resources from agent inventory',
+            },
+          });
+          return;
+        }
+      } else {
+        console.warn(`[BuildingSystem] No agent with inventory found near placement position`);
+      }
     } else {
       console.log(`[BuildingSystem] Building "${blueprintId}" has no resource cost`);
     }
@@ -314,6 +339,104 @@ export class BuildingSystem implements System {
         },
       });
     }
+  }
+
+  /**
+   * Find the nearest agent with inventory to a given position.
+   * Returns the agent entity or null if none found.
+   */
+  private findNearestAgentWithInventory(
+    world: World,
+    position: { x: number; y: number }
+  ): Entity | null {
+    // Query all agents with inventory
+    const agents = world.query().with('agent').with('inventory').with('position').executeEntities();
+
+    if (agents.length === 0) {
+      return null;
+    }
+
+    // Find nearest agent
+    let nearestAgent: Entity | null = null;
+    let nearestDistance = Infinity;
+
+    for (const agent of agents) {
+      const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
+      if (!agentPos) continue;
+
+      const dx = agentPos.x - position.x;
+      const dy = agentPos.y - position.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestAgent = agent;
+      }
+    }
+
+    return nearestAgent;
+  }
+
+  /**
+   * Deduct resources from an agent's inventory.
+   * Returns true if successful, false if insufficient resources.
+   * Per CLAUDE.md: Crashes on missing required fields, returns false for insufficient resources.
+   */
+  private deductResourcesFromAgent(
+    agent: Entity,
+    resourceCost: Record<string, number>
+  ): boolean {
+    const inventory = agent.components.get('inventory') as {
+      slots: Array<{ itemId: string | null; quantity: number }>;
+      maxSlots: number;
+      maxWeight: number;
+      currentWeight: number;
+    } | undefined;
+
+    if (!inventory) {
+      throw new Error(`Agent ${agent.id} missing InventoryComponent`);
+    }
+
+    // First check if agent has enough of all resources
+    for (const [resourceType, amountNeeded] of Object.entries(resourceCost)) {
+      let totalAvailable = 0;
+      for (const slot of inventory.slots) {
+        if (slot.itemId === resourceType) {
+          totalAvailable += slot.quantity;
+        }
+      }
+
+      if (totalAvailable < amountNeeded) {
+        console.log(`[BuildingSystem] Agent ${agent.id} has ${totalAvailable} ${resourceType}, needs ${amountNeeded}`);
+        return false;
+      }
+    }
+
+    // Deduct resources from inventory
+    for (const [resourceType, amountNeeded] of Object.entries(resourceCost)) {
+      let remainingToRemove = amountNeeded;
+
+      for (const slot of inventory.slots) {
+        if (slot.itemId === resourceType && remainingToRemove > 0) {
+          const amountFromSlot = Math.min(slot.quantity, remainingToRemove);
+          slot.quantity -= amountFromSlot;
+          remainingToRemove -= amountFromSlot;
+
+          // Clear slot if empty
+          if (slot.quantity === 0) {
+            slot.itemId = null;
+          }
+        }
+      }
+    }
+
+    // Update the agent's inventory component (this triggers re-render)
+    (agent as EntityImpl).updateComponent('inventory', (comp) => ({
+      ...comp,
+      slots: [...inventory.slots],
+    }));
+
+    return true;
   }
 
   /**

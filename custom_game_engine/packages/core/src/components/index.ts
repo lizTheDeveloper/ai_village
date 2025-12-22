@@ -20,6 +20,10 @@ export * from './BuildingComponent.js';
 export * from './InventoryComponent.js';
 export * from './TemperatureComponent.js';
 export * from './WeatherComponent.js';
+export * from './CircadianComponent.js';
+export * from './PlantComponent.js';
+export * from './SeedComponent.js';
 
 // Re-export types explicitly (export * doesn't re-export types)
 export type { AgentBehavior } from './AgentComponent.js';
+export type { PlantStage, PlantGenetics, GeneticMutation } from './PlantComponent.js';

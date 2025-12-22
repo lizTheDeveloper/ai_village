@@ -46,6 +46,8 @@ export class AISystem implements System {
     this.registerBehavior('talk', this.talkBehavior.bind(this));
     this.registerBehavior('gather', this.gatherBehavior.bind(this));
     this.registerBehavior('build', this.buildBehavior.bind(this));
+    this.registerBehavior('seek_sleep', this._seekSleepBehavior.bind(this));
+    this.registerBehavior('forced_sleep', this._forcedSleepBehavior.bind(this));
 
     this.llmDecisionQueue = llmDecisionQueue || null;
     this.promptBuilder = promptBuilder || null;
@@ -81,7 +83,8 @@ export class AISystem implements System {
       // LAYER 1: AUTONOMIC SYSTEM (Fast, survival reflexes)
       // Check critical needs that override executive decisions
       const agentNeeds = impl.getComponent<NeedsComponent>('needs');
-      const autonomicOverride = agentNeeds ? this.checkAutonomicSystem(agentNeeds) : null;
+      const circadian = impl.getComponent('circadian') as any;
+      const autonomicOverride = agentNeeds ? this.checkAutonomicSystem(agentNeeds, circadian) : null;
 
       if (autonomicOverride) {
         // Autonomic system takes control - skip executive layer
@@ -388,7 +391,7 @@ export class AISystem implements System {
    * AUTONOMIC SYSTEM: Fast survival reflexes that override executive (LLM) decisions
    * Based on needs.md spec - Tier 1 (survival) needs can interrupt almost anything
    */
-  private checkAutonomicSystem(needs: NeedsComponent): AgentBehavior | null {
+  private checkAutonomicSystem(needs: NeedsComponent, circadian?: any): AgentBehavior | null {
     // Critical physical needs interrupt with high priority (spec: interruptPriority 0.85-0.95)
 
     // Hunger critical threshold: 20 (spec says 15, but we use 20 for earlier intervention)
@@ -396,9 +399,24 @@ export class AISystem implements System {
       return 'seek_food';
     }
 
-    // Energy critical threshold: 10 (spec: baseMortalityRate increases, will_sleep_anywhere)
+    // Critical exhaustion threshold: 10 energy = forced sleep
+    // Per work order: "energy < 10: will sleep anywhere"
     if (needs.energy < 10) {
-      return 'idle'; // Rest to recover energy
+      console.log('[AISystem] Autonomic override: FORCED_SLEEP (energy < 10:', needs.energy, ')');
+      return 'forced_sleep'; // Collapse and sleep immediately
+    }
+
+    // Critical sleep drive: > 95 = forced micro-sleep (can fall asleep mid-action)
+    if (circadian && circadian.sleepDrive > 95) {
+      console.log('[AISystem] Autonomic override: FORCED_SLEEP (sleepDrive > 95:', circadian.sleepDrive, ')');
+      return 'forced_sleep';
+    }
+
+    // High sleep drive + low energy: strongly prioritize sleep
+    // Per work order: "sleepDrive > 80: will sleep anywhere"
+    if (circadian && (circadian.sleepDrive > 80 || (circadian.sleepDrive > 60 && needs.energy < 30))) {
+      console.log('[AISystem] Autonomic override: SEEK_SLEEP (sleepDrive:', circadian.sleepDrive, ', energy:', needs.energy, ')');
+      return 'seek_sleep';
     }
 
     // No autonomic override needed - executive system can decide
@@ -1029,12 +1047,58 @@ export class AISystem implements System {
 
     // Check if adjacent (within 1.5 tiles)
     if (nearestDistance < 1.5 && targetResource) {
+      // Calculate work speed penalty based on energy
+      const needs = entity.getComponent<NeedsComponent>('needs');
+      let workSpeedMultiplier = 1.0;
+
+      if (needs) {
+        const energy = needs.energy;
+
+        // Per work order:
+        // Energy 100-70: No penalty
+        // Energy 70-50: -10% work speed
+        // Energy 50-30: -25% work speed
+        // Energy 30-10: -50% work speed
+        // Energy 10-0: Cannot work (return early)
+
+        if (energy < 10) {
+          // Too exhausted to work - just stand there
+          entity.updateComponent<MovementComponent>('movement', (current: MovementComponent) => ({
+            ...current,
+            velocityX: 0,
+            velocityY: 0,
+          }));
+          return; // Cannot gather resources
+        } else if (energy < 30) {
+          workSpeedMultiplier = 0.5; // -50% work speed
+        } else if (energy < 50) {
+          workSpeedMultiplier = 0.75; // -25% work speed
+        } else if (energy < 70) {
+          workSpeedMultiplier = 0.9; // -10% work speed
+        }
+        // else: no penalty (100%)
+      }
+
       // Harvest the resource
       const targetResourceImpl = targetResource as EntityImpl;
       const resourceComp = targetResourceImpl.getComponent<ResourceComponent>('resource')!;
-      const harvestAmount = Math.min(10, resourceComp.amount);
+      const baseHarvestAmount = 10;
+      const harvestAmount = Math.min(
+        Math.floor(baseHarvestAmount * workSpeedMultiplier),
+        resourceComp.amount
+      );
 
-      console.log(`[AISystem.gatherBehavior] Agent ${entity.id} harvesting ${harvestAmount} ${resourceComp.resourceType} from ${targetResource.id}`);
+      // If work speed penalty reduces harvest to 0, agent is too tired
+      if (harvestAmount === 0) {
+        entity.updateComponent<MovementComponent>('movement', (current: MovementComponent) => ({
+          ...current,
+          velocityX: 0,
+          velocityY: 0,
+        }));
+        return;
+      }
+
+      console.log(`[AISystem.gatherBehavior] Agent ${entity.id} harvesting ${harvestAmount} ${resourceComp.resourceType} from ${targetResource.id} (work speed: ${(workSpeedMultiplier * 100).toFixed(0)}%)`);
 
       // Update resource
       targetResourceImpl.updateComponent<ResourceComponent>('resource', (current) => ({
@@ -1261,5 +1325,210 @@ export class AISystem implements System {
         behaviorState: {},
       }));
     }
+  }
+
+  /**
+   * Seek sleep behavior: Find a bed/bedroll or good sleeping location
+   */
+  private _seekSleepBehavior(entity: EntityImpl, world: World): void {
+    const position = entity.getComponent<PositionComponent>('position')!;
+    const movement = entity.getComponent<MovementComponent>('movement')!;
+    const circadian = entity.getComponent('circadian') as any;
+
+    if (!circadian) {
+      // No circadian component, just idle
+      this.idleBehavior(entity);
+      return;
+    }
+
+    // If already sleeping, do nothing (SleepSystem handles wake conditions)
+    if (circadian.isSleeping) {
+      this.idleBehavior(entity);
+      return;
+    }
+
+    // Search for a bed or bedroll
+    const beds = world.query().with('building').with('position').executeEntities();
+    let bestSleepLocation: Entity | null = null;
+    let nearestDistance = Infinity;
+
+    for (const bed of beds) {
+      const bedImpl = bed as EntityImpl;
+      const building = bedImpl.getComponent('building') as any;
+      const bedPos = bedImpl.getComponent<PositionComponent>('position');
+
+      if (!building || !bedPos) continue;
+
+      // Check if it's a bed or bedroll
+      if (building.buildingType === 'bed' || building.buildingType === 'bedroll') {
+        const distance = Math.sqrt(
+          Math.pow(bedPos.x - position.x, 2) +
+          Math.pow(bedPos.y - position.y, 2)
+        );
+
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          bestSleepLocation = bed;
+        }
+      }
+    }
+
+    // If we found a bed and are close enough, start sleeping
+    if (bestSleepLocation && nearestDistance < 1.5) {
+      const quality = this._calculateSleepQuality(entity, bestSleepLocation);
+
+      // Start sleeping - update circadian component directly
+      entity.updateComponent('circadian', (current: any) => ({
+        ...current,
+        isSleeping: true,
+        sleepStartTime: world.tick,
+        sleepLocation: bestSleepLocation,
+        sleepQuality: quality,
+        sleepDurationHours: 0, // Reset sleep duration counter
+      }));
+
+      // Emit sleep event
+      world.eventBus.emit({
+        type: 'agent:sleeping',
+        source: entity.id,
+        data: {
+          entityId: entity.id,
+          location: 'bed',
+          quality: quality,
+        },
+      });
+
+      console.log(`[AISystem] Agent ${entity.id} is sleeping in a bed (quality: ${quality.toFixed(2)})`);
+
+      // Stop moving
+      entity.updateComponent<MovementComponent>('movement', (current) => ({
+        ...current,
+        velocityX: 0,
+        velocityY: 0,
+      }));
+    } else if (bestSleepLocation) {
+      // Move towards the bed
+      const bedImpl = bestSleepLocation as EntityImpl;
+      const bedPos = bedImpl.getComponent<PositionComponent>('position')!;
+
+      const dx = bedPos.x - position.x;
+      const dy = bedPos.y - position.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      const velocityX = (dx / distance) * movement.speed;
+      const velocityY = (dy / distance) * movement.speed;
+
+      entity.updateComponent<MovementComponent>('movement', (current) => ({
+        ...current,
+        velocityX,
+        velocityY,
+      }));
+    } else {
+      // No bed found, sleep on ground
+      const quality = this._calculateSleepQuality(entity, null);
+
+      entity.updateComponent('circadian', (current: any) => ({
+        ...current,
+        isSleeping: true,
+        sleepStartTime: world.tick,
+        sleepLocation: null,
+        sleepQuality: quality,
+        sleepDurationHours: 0, // Reset sleep duration counter
+      }));
+
+      world.eventBus.emit({
+        type: 'agent:sleeping',
+        source: entity.id,
+        data: {
+          entityId: entity.id,
+          location: 'ground',
+          quality: quality,
+        },
+      });
+
+      console.log(`[AISystem] Agent ${entity.id} is sleeping on the ground (quality: ${quality.toFixed(2)})`);
+
+      // Stop moving
+      entity.updateComponent<MovementComponent>('movement', (current) => ({
+        ...current,
+        velocityX: 0,
+        velocityY: 0,
+      }));
+    }
+  }
+
+  /**
+   * Forced sleep behavior: Collapse and sleep immediately (critical exhaustion)
+   */
+  private _forcedSleepBehavior(entity: EntityImpl, world: World): void {
+    const circadian = entity.getComponent('circadian') as any;
+
+    if (!circadian) {
+      // No circadian component, just idle
+      this.idleBehavior(entity);
+      return;
+    }
+
+    // If not already sleeping, start now (collapse where standing)
+    if (!circadian.isSleeping) {
+      const quality = 0.5; // Poor sleep quality when collapsed on ground
+
+      // Update circadian component directly
+      entity.updateComponent('circadian', (current: any) => ({
+        ...current,
+        isSleeping: true,
+        sleepStartTime: world.tick,
+        sleepLocation: null,
+        sleepQuality: quality,
+        sleepDurationHours: 0, // Reset sleep duration counter
+      }));
+
+      world.eventBus.emit({
+        type: 'agent:collapsed',
+        source: entity.id,
+        data: {
+          entityId: entity.id,
+          reason: 'exhaustion',
+        },
+      });
+
+      console.log(`[AISystem] Agent ${entity.id} collapsed from exhaustion`);
+    }
+
+    // Stop moving
+    entity.updateComponent<MovementComponent>('movement', (current) => ({
+      ...current,
+      velocityX: 0,
+      velocityY: 0,
+    }));
+  }
+
+  /**
+   * Calculate sleep quality based on location and environmental conditions
+   */
+  private _calculateSleepQuality(_entity: EntityImpl, location: Entity | null): number {
+    let quality = 0.5; // Base quality (ground)
+
+    // Location bonuses
+    if (location) {
+      const locationImpl = location as EntityImpl;
+      const building = locationImpl.getComponent('building') as any;
+
+      if (building) {
+        if (building.buildingType === 'bed') {
+          quality += 0.4; // Bed: 0.9 total
+        } else if (building.buildingType === 'bedroll') {
+          quality += 0.2; // Bedroll: 0.7 total
+        } else {
+          quality += 0.1; // Other building: 0.6 total
+        }
+      }
+    }
+
+    // Environmental penalties (temperature, if available)
+    // TODO: Integrate with TemperatureSystem when temperature component is available
+
+    // Clamp to valid range (0.1 to 1.0)
+    return Math.max(0.1, Math.min(1.0, quality));
   }
 }

@@ -1,0 +1,10 @@
+NEEDS_WORK: resource-gathering
+
+Failed criteria:
+1. Inventory UI: No inventory display visible in agent info panel
+2. Resource Costs: Build menu doesn't show material requirements
+3. Visual Feedback: No indication when gathering occurs
+
+Report: agents/autonomous-dev/work-orders/resource-gathering/playtest-report.md
+
+Returning to Implementation Agent.

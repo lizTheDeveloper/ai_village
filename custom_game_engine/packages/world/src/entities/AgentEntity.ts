@@ -15,6 +15,7 @@ import {
   createRelationshipComponent,
   createInventoryComponent,
   createTemperatureComponent,
+  createCircadianComponent,
   generateRandomPersonality,
   generateRandomName,
   createIdentityComponent,
@@ -53,7 +54,15 @@ export function createWanderingAgent(
   entity.addComponent(createMovementComponent(speed, 0, 0));
 
   // Needs - hunger, energy, health, decay rates
-  entity.addComponent(createNeedsComponent(100, 100, 100, 2.0, 1.0));
+  // Note: Energy depletion is now handled by NeedsSystem based on activity level and game time
+  // Hunger decay rate: points per real second (unchanged)
+  entity.addComponent(createNeedsComponent(
+    100,    // hunger (start full)
+    80,     // energy (start at 80 - well-rested but not max)
+    100,    // health (start healthy)
+    2.0,    // hungerDecayRate (points per second)
+    0.5     // energyDecayRate (deprecated, kept for compatibility)
+  ));
 
   // Memory - remember up to 20 things, decay 1 point/sec
   entity.addComponent(createMemoryComponent(20, 1.0));
@@ -80,6 +89,9 @@ export function createWanderingAgent(
       35  // toleranceMax
     )
   );
+
+  // Circadian rhythm - sleep drive and preferred sleep time
+  entity.addComponent(createCircadianComponent());
 
   // Add to world
   (world as any)._addEntity(entity);
@@ -123,7 +135,15 @@ export function createLLMAgent(
   entity.addComponent(createMovementComponent(speed, 0, 0));
 
   // Needs - hunger, energy, health, decay rates
-  entity.addComponent(createNeedsComponent(100, 100, 100, 2.0, 1.0));
+  // Note: Energy depletion is now handled by NeedsSystem based on activity level and game time
+  // Hunger decay rate: points per real second (unchanged)
+  entity.addComponent(createNeedsComponent(
+    100,    // hunger (start full)
+    80,     // energy (start at 80 - well-rested but not max)
+    100,    // health (start healthy)
+    2.0,    // hungerDecayRate (points per second)
+    0.5     // energyDecayRate (deprecated, kept for compatibility)
+  ));
 
   // Memory - remember up to 20 things, decay 1 point/sec
   entity.addComponent(createMemoryComponent(20, 1.0));
@@ -150,6 +170,9 @@ export function createLLMAgent(
       35  // toleranceMax
     )
   );
+
+  // Circadian rhythm - sleep drive and preferred sleep time
+  entity.addComponent(createCircadianComponent());
 
   // Add to world
   (world as any)._addEntity(entity);

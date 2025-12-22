@@ -20,6 +20,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
   let panel: AgentInfoPanel;
   let mockCanvas: HTMLCanvasElement;
   let mockCtx: CanvasRenderingContext2D;
+  let mockWorld: any;
+  let testEntities: Map<string, Entity>;
 
   beforeEach(() => {
     panel = new AgentInfoPanel();
@@ -38,6 +40,12 @@ describe('AgentInfoPanel - Inventory Display', () => {
     vi.spyOn(mockCtx, 'moveTo');
     vi.spyOn(mockCtx, 'lineTo');
     vi.spyOn(mockCtx, 'stroke');
+
+    // Create mock world with entity storage
+    testEntities = new Map<string, Entity>();
+    mockWorld = {
+      getEntity: vi.fn((id: string) => testEntities.get(id)),
+    };
   });
 
   /**
@@ -53,6 +61,14 @@ describe('AgentInfoPanel - Inventory Display', () => {
       hasComponent: vi.fn((type: string) => type in components),
     } as any;
     return entity;
+  }
+
+  /**
+   * Helper to register an entity with the mock world and panel.
+   */
+  function registerEntity(entity: Entity): void {
+    testEntities.set(entity.id, entity);
+    panel.setSelectedEntity(entity);
   }
 
   /**
@@ -105,8 +121,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({ wood: 5, stone: 3 }),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Verify "INVENTORY" header is rendered
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
@@ -124,8 +140,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({ wood: 5 }),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Verify divider lines are drawn (should have multiple dividers)
       const strokeCalls = (mockCtx.stroke as any).mock.calls;
@@ -138,8 +154,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         needs: { hunger: 50, energy: 60, health: 100 },
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Verify "INVENTORY" header is NOT rendered
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
@@ -158,8 +174,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({ wood: 12 }),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
       const woodLineCall = fillTextCalls.find(
@@ -175,8 +191,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({ stone: 5 }),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
       const stoneLineCall = fillTextCalls.find(
@@ -192,8 +208,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({ food: 3 }),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
       const foodLineCall = fillTextCalls.find(
@@ -209,8 +225,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({ water: 7 }),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
       const waterLineCall = fillTextCalls.find(
@@ -231,8 +247,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         }),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
 
@@ -257,8 +273,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({ wood: 5, stone: 0 }),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
 
@@ -282,8 +298,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({}),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
       const emptyStateCall = fillTextCalls.find(
@@ -299,8 +315,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({}, 100, 8),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
       const capacityCall = fillTextCalls.find(
@@ -321,8 +337,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({ wood: 10, stone: 5 }, 100, 8),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
 
@@ -341,8 +357,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({ wood: 5, stone: 3, food: 2 }, 100, 8),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
 
@@ -363,8 +379,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({ wood: 12, stone: 5, food: 3, water: 2 }, 100, 8),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
       const capacityCall = fillTextCalls.find(
@@ -384,8 +400,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({ wood: 30 }, 100, 8),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Check that fillStyle was set to white (#FFFFFF) before rendering capacity
       const fillStyleChanges = mockCtx.fillStyle;
@@ -399,8 +415,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({ wood: 42 }, 100, 8),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       // After rendering, check if yellow was used
       // We need to check the sequence of fillStyle changes
@@ -421,8 +437,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({ wood: 50 }, 100, 8),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
       const capacityIndex = fillTextCalls.findIndex(
@@ -451,8 +467,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
       inventory.slots[6] = { itemId: 'wood', quantity: 1 };
       inventory.currentWeight = 10; // 7 items * ~1.4 avg weight
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
       const capacityIndex = fillTextCalls.findIndex(
@@ -481,8 +497,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
       inventory.slots[7] = { itemId: 'wood', quantity: 1 };
       inventory.currentWeight = 16; // 8 wood * 2
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
       const capacityIndex = fillTextCalls.findIndex(
@@ -500,8 +516,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({ wood: 5 }),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Verify initial wood count
       let fillTextCalls = (mockCtx.fillText as any).mock.calls;
@@ -520,7 +536,7 @@ describe('AgentInfoPanel - Inventory Display', () => {
 
       // Clear previous calls and re-render
       vi.clearAllMocks();
-      panel.render(mockCtx, 1024, 768);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Verify updated wood count
       fillTextCalls = (mockCtx.fillText as any).mock.calls;
@@ -536,8 +552,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({ wood: 10 }, 100, 8),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Verify initial capacity
       let fillTextCalls = (mockCtx.fillText as any).mock.calls;
@@ -553,7 +569,7 @@ describe('AgentInfoPanel - Inventory Display', () => {
 
       // Clear and re-render
       vi.clearAllMocks();
-      panel.render(mockCtx, 1024, 768);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Verify updated capacity
       fillTextCalls = (mockCtx.fillText as any).mock.calls;
@@ -569,8 +585,8 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({ wood: 5, stone: 3 }),
       });
 
-      panel.setSelectedEntity(entity);
-      panel.render(mockCtx, 1024, 768);
+      registerEntity(entity);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Simulate consuming all resources
       const inventory = entity.components.get('inventory') as InventoryComponent;
@@ -580,7 +596,7 @@ describe('AgentInfoPanel - Inventory Display', () => {
 
       // Clear and re-render
       vi.clearAllMocks();
-      panel.render(mockCtx, 1024, 768);
+      panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Verify empty state
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
@@ -603,10 +619,10 @@ describe('AgentInfoPanel - Inventory Display', () => {
         },
       });
 
-      panel.setSelectedEntity(entity);
+      registerEntity(entity);
 
       expect(() => {
-        panel.render(mockCtx, 1024, 768);
+        panel.render(mockCtx, 1024, 768, mockWorld);
       }).toThrow("InventoryComponent missing required 'maxWeight' field");
     });
 
@@ -623,10 +639,10 @@ describe('AgentInfoPanel - Inventory Display', () => {
         },
       });
 
-      panel.setSelectedEntity(entity);
+      registerEntity(entity);
 
       expect(() => {
-        panel.render(mockCtx, 1024, 768);
+        panel.render(mockCtx, 1024, 768, mockWorld);
       }).toThrow("InventoryComponent missing required 'maxWeight' field");
     });
 
@@ -643,10 +659,10 @@ describe('AgentInfoPanel - Inventory Display', () => {
         },
       });
 
-      panel.setSelectedEntity(entity);
+      registerEntity(entity);
 
       expect(() => {
-        panel.render(mockCtx, 1024, 768);
+        panel.render(mockCtx, 1024, 768, mockWorld);
       }).toThrow("InventoryComponent 'slots' must be an array");
     });
 
@@ -663,10 +679,10 @@ describe('AgentInfoPanel - Inventory Display', () => {
         },
       });
 
-      panel.setSelectedEntity(entity);
+      registerEntity(entity);
 
       expect(() => {
-        panel.render(mockCtx, 1024, 768);
+        panel.render(mockCtx, 1024, 768, mockWorld);
       }).toThrow("InventoryComponent 'slots' must be an array");
     });
 
@@ -683,10 +699,10 @@ describe('AgentInfoPanel - Inventory Display', () => {
         },
       });
 
-      panel.setSelectedEntity(entity);
+      registerEntity(entity);
 
       expect(() => {
-        panel.render(mockCtx, 1024, 768);
+        panel.render(mockCtx, 1024, 768, mockWorld);
       }).toThrow("InventoryComponent missing required 'currentWeight' field");
     });
 
@@ -703,10 +719,10 @@ describe('AgentInfoPanel - Inventory Display', () => {
         },
       });
 
-      panel.setSelectedEntity(entity);
+      registerEntity(entity);
 
       expect(() => {
-        panel.render(mockCtx, 1024, 768);
+        panel.render(mockCtx, 1024, 768, mockWorld);
       }).toThrow("InventoryComponent missing required 'maxSlots' field");
     });
   });
@@ -729,10 +745,10 @@ describe('AgentInfoPanel - Inventory Display', () => {
         },
       });
 
-      panel.setSelectedEntity(entity);
+      registerEntity(entity);
 
       expect(() => {
-        panel.render(mockCtx, 1024, 768);
+        panel.render(mockCtx, 1024, 768, mockWorld);
       }).not.toThrow();
 
       // Should show empty state
@@ -759,10 +775,10 @@ describe('AgentInfoPanel - Inventory Display', () => {
         },
       });
 
-      panel.setSelectedEntity(entity);
+      registerEntity(entity);
 
       expect(() => {
-        panel.render(mockCtx, 1024, 768);
+        panel.render(mockCtx, 1024, 768, mockWorld);
       }).not.toThrow();
 
       // Should show 2 slots used
@@ -779,10 +795,10 @@ describe('AgentInfoPanel - Inventory Display', () => {
         inventory: createInventory({ wood: 999, stone: 500 }),
       });
 
-      panel.setSelectedEntity(entity);
+      registerEntity(entity);
 
       expect(() => {
-        panel.render(mockCtx, 1024, 768);
+        panel.render(mockCtx, 1024, 768, mockWorld);
       }).not.toThrow();
 
       // Verify large numbers are displayed

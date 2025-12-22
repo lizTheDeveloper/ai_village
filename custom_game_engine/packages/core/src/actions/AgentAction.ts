@@ -144,9 +144,10 @@ export function actionToBehavior(action: AgentAction): AgentBehavior {
     case 'follow':
       return 'follow_agent';
     case 'eat':
+      return 'eat'; // Eat from inventory or storage
     case 'forage':
     case 'pickup':
-      return 'seek_food';
+      return 'seek_food'; // Forage from environment
     case 'chop':
     case 'mine':
       return 'gather';

@@ -183,6 +183,30 @@ describe('BuildingCategory Types', () => {
         expect(buildings[0]!.category).toBe(category);
       });
     });
+
+    it('should have actual buildings for all 8 categories including research and decoration', () => {
+      const registry = new BuildingBlueprintRegistry();
+      registry.registerDefaults();
+      registry.registerTier2Stations();
+      registry.registerTier3Stations();
+      registry.registerExampleBuildings(); // Includes decoration, research examples
+
+      // Verify ALL 8 categories have at least one building
+      expectedCategories.forEach((category) => {
+        const buildings = registry.getByCategory(category);
+        expect(buildings.length).toBeGreaterThan(0);
+        expect(buildings[0]!.category).toBe(category);
+      });
+
+      // Specifically verify the missing categories from playtest
+      const decorationBuildings = registry.getByCategory('decoration');
+      expect(decorationBuildings.length).toBeGreaterThan(0);
+      expect(decorationBuildings.some((b) => b.id === 'garden_fence')).toBe(true);
+
+      const researchBuildings = registry.getByCategory('research');
+      expect(researchBuildings.length).toBeGreaterThan(0);
+      expect(researchBuildings.some((b) => b.id === 'library')).toBe(true);
+    });
   });
 });
 
@@ -456,6 +480,42 @@ describe('Building Functionality Tracking', () => {
       );
       expect(gatheringFunc).toBeDefined();
       expect(gatheringFunc.resourceTypes).toContain('water');
+    });
+
+    it('should have actual buildings for all 8 function types including research and automation', () => {
+      // Register all building types
+      registry.registerTier2Stations();
+      registry.registerTier3Stations();
+      registry.registerExampleBuildings();
+
+      const allBuildings = registry.getAll();
+      const allFunctions = allBuildings.flatMap((b) => b.functionality);
+
+      // Verify all 8 function types are present
+      const expectedFunctionTypes = [
+        'crafting',
+        'storage',
+        'sleeping',
+        'shop',
+        'research',
+        'gathering_boost',
+        'mood_aura',
+        'automation',
+      ];
+
+      expectedFunctionTypes.forEach((functionType) => {
+        const hasFunction = allFunctions.some((f) => f.type === functionType);
+        expect(hasFunction).toBe(true);
+      });
+
+      // Specifically verify the missing functions from playtest
+      const researchFunction = allFunctions.find((f) => f.type === 'research');
+      expect(researchFunction).toBeDefined();
+      expect((researchFunction as any).fields).toBeDefined();
+
+      const automationFunction = allFunctions.find((f) => f.type === 'automation');
+      expect(automationFunction).toBeDefined();
+      expect((automationFunction as any).tasks).toBeDefined();
     });
   });
 });

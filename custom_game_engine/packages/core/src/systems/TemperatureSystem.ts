@@ -42,21 +42,12 @@ export class TemperatureSystem implements System {
       // Apply building effects (insulation + base temp)
       const buildingEffect = this.calculateBuildingEffect(world, posComp);
       if (buildingEffect !== null) {
-        const tempBeforeBuilding = effectiveTemp;
         // Formula: effectiveTemp = ambientTemp * (1 - insulation) + baseTemp
         effectiveTemp = effectiveTemp * (1 - buildingEffect.insulation) + buildingEffect.baseTemp;
-        console.log(
-          `[TemperatureSystem] ${entity.id}: Inside building - insulation ${(buildingEffect.insulation * 100).toFixed(0)}%, baseTemp +${buildingEffect.baseTemp}°C. Temp: ${tempBeforeBuilding.toFixed(1)}°C → ${effectiveTemp.toFixed(1)}°C`
-        );
       }
 
       // Apply heat source effects
       const heatBonus = this.calculateHeatSourceBonus(world, posComp);
-      if (heatBonus > 0) {
-        console.log(
-          `[TemperatureSystem] ${entity.id}: Near heat source - bonus +${heatBonus.toFixed(1)}°C. Temp: ${effectiveTemp.toFixed(1)}°C → ${(effectiveTemp + heatBonus).toFixed(1)}°C`
-        );
-      }
       effectiveTemp += heatBonus;
 
       // Update agent temperature

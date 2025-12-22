@@ -1,0 +1,323 @@
+import { describe, it, expect, beforeEach } from 'vitest';
+import { WorldImpl } from '../../ecs/World.js';
+import { EventBusImpl } from '../../events/EventBus.js';
+import { AISystem } from '../AISystem.js';
+import { createAgentComponent } from '../../components/AgentComponent.js';
+import { createPositionComponent } from '../../components/PositionComponent.js';
+import { createMovementComponent } from '../../components/MovementComponent.js';
+import { createNeedsComponent } from '../../components/NeedsComponent.js';
+import { createInventoryComponent, addToInventory } from '../../components/InventoryComponent.js';
+import { createBuildingComponent } from '../../components/BuildingComponent.js';
+import { createResourceComponent } from '../../components/ResourceComponent.js';
+
+describe('AISystem - Eat Behavior', () => {
+  let world: WorldImpl;
+  let aiSystem: AISystem;
+
+  beforeEach(() => {
+    const eventBus = new EventBusImpl();
+    world = new WorldImpl(eventBus);
+    aiSystem = new AISystem();
+    world.registerSystem(aiSystem);
+  });
+
+  describe('Priority 1: Eating from own inventory', () => {
+    it('should consume food from inventory and restore hunger', () => {
+      // Create agent with food in inventory
+      const agentId = world.createEntity();
+      const agent = world.getEntity(agentId);
+      if (!agent) throw new Error('Agent not created');
+
+      // Add components
+      world.addComponent(agentId, createAgentComponent('eat'));
+      world.addComponent(agentId, createPositionComponent(10, 10));
+      world.addComponent(agentId, createMovementComponent(1.0));
+      world.addComponent(agentId, createNeedsComponent(30, 100, 100)); // Low hunger
+
+      // Create inventory with food
+      const inventory = createInventoryComponent(10, 100);
+      const inventoryWithFood = addToInventory(inventory, 'food', 15);
+      world.addComponent(agentId, inventoryWithFood.inventory);
+
+      // Get initial state
+      const needsBefore = agent.components.get('needs') as any;
+      const inventoryBefore = agent.components.get('inventory') as any;
+
+      expect(needsBefore.hunger).toBe(30);
+
+      // Run AI system (eat behavior should execute)
+      world.update(1000); // 1 second
+
+      // Get updated state
+      const needsAfter = agent.components.get('needs') as any;
+      const inventoryAfter = agent.components.get('inventory') as any;
+
+      // Verify hunger increased
+      expect(needsAfter.hunger).toBe(50); // 30 + 15 food consumed (capped at 20)
+
+      // Verify food was removed from inventory
+      const foodSlot = inventoryAfter.slots.find((s: any) => s.itemId === 'food');
+      expect(foodSlot?.quantity).toBe(0); // 15 food consumed
+    });
+
+    it('should consume maximum 20 food at a time', () => {
+      const agentId = world.createEntity();
+      world.addComponent(agentId, createAgentComponent('eat'));
+      world.addComponent(agentId, createPositionComponent(10, 10));
+      world.addComponent(agentId, createMovementComponent(1.0));
+      world.addComponent(agentId, createNeedsComponent(10, 100, 100));
+
+      // Add 50 food to inventory
+      const inventory = createInventoryComponent(10, 100);
+      const inventoryWithFood = addToInventory(inventory, 'food', 50);
+      world.addComponent(agentId, inventoryWithFood.inventory);
+
+      world.update(1000);
+
+      const agent = world.getEntity(agentId);
+      const needsAfter = agent!.components.get('needs') as any;
+      const inventoryAfter = agent!.components.get('inventory') as any;
+
+      // Should only eat 20 food
+      expect(needsAfter.hunger).toBe(30); // 10 + 20
+
+      // Should have 30 food left
+      const foodSlot = inventoryAfter.slots.find((s: any) => s.itemId === 'food');
+      expect(foodSlot?.quantity).toBe(30);
+    });
+
+    it('should not exceed 100 hunger', () => {
+      const agentId = world.createEntity();
+      world.addComponent(agentId, createAgentComponent('eat'));
+      world.addComponent(agentId, createPositionComponent(10, 10));
+      world.addComponent(agentId, createMovementComponent(1.0));
+      world.addComponent(agentId, createNeedsComponent(95, 100, 100));
+
+      const inventory = createInventoryComponent(10, 100);
+      const inventoryWithFood = addToInventory(inventory, 'food', 20);
+      world.addComponent(agentId, inventoryWithFood.inventory);
+
+      world.update(1000);
+
+      const agent = world.getEntity(agentId);
+      const needsAfter = agent!.components.get('needs') as any;
+
+      // Hunger should be capped at 100
+      expect(needsAfter.hunger).toBe(100);
+    });
+  });
+
+  describe('Priority 2: Eating from storage containers', () => {
+    it('should take food from nearby storage chest when inventory is empty', () => {
+      // Create agent with empty inventory
+      const agentId = world.createEntity();
+      world.addComponent(agentId, createAgentComponent('eat'));
+      world.addComponent(agentId, createPositionComponent(10, 10));
+      world.addComponent(agentId, createMovementComponent(1.0));
+      world.addComponent(agentId, createNeedsComponent(30, 100, 100));
+      world.addComponent(agentId, createInventoryComponent(10, 100));
+
+      // Create storage chest with food nearby
+      const storageId = world.createEntity();
+      world.addComponent(storageId, createBuildingComponent('storage-chest', 1, 100, true));
+      world.addComponent(storageId, createPositionComponent(11, 10)); // Adjacent
+
+      // Add food to storage inventory
+      const storageInventory = createInventoryComponent(20, 1000);
+      const storageWithFood = addToInventory(storageInventory, 'food', 30);
+      world.addComponent(storageId, storageWithFood.inventory);
+
+      world.update(1000);
+
+      const agent = world.getEntity(agentId);
+      const storage = world.getEntity(storageId);
+
+      const needsAfter = agent!.components.get('needs') as any;
+      const agentInventoryAfter = agent!.components.get('inventory') as any;
+      const storageInventoryAfter = storage!.components.get('inventory') as any;
+
+      // Agent should have taken food from storage
+      const agentFoodSlot = agentInventoryAfter.slots.find((s: any) => s.itemId === 'food');
+      expect(agentFoodSlot?.quantity).toBe(20); // Took 20 food
+
+      // Storage should have less food
+      const storageFoodSlot = storageInventoryAfter.slots.find((s: any) => s.itemId === 'food');
+      expect(storageFoodSlot?.quantity).toBe(10); // 30 - 20
+    });
+
+    it('should move towards distant storage with food', () => {
+      // Create agent far from storage
+      const agentId = world.createEntity();
+      world.addComponent(agentId, createAgentComponent('eat'));
+      world.addComponent(agentId, createPositionComponent(10, 10));
+      world.addComponent(agentId, createMovementComponent(1.0));
+      world.addComponent(agentId, createNeedsComponent(30, 100, 100));
+      world.addComponent(agentId, createInventoryComponent(10, 100));
+
+      // Create storage chest with food far away
+      const storageId = world.createEntity();
+      world.addComponent(storageId, createBuildingComponent('storage-chest', 1, 100, true));
+      world.addComponent(storageId, createPositionComponent(20, 20)); // 14 tiles away
+
+      const storageInventory = createInventoryComponent(20, 1000);
+      const storageWithFood = addToInventory(storageInventory, 'food', 30);
+      world.addComponent(storageId, storageWithFood.inventory);
+
+      world.update(1000);
+
+      const agent = world.getEntity(agentId);
+      const movement = agent!.components.get('movement') as any;
+
+      // Agent should be moving towards storage
+      expect(movement.velocityX).toBeGreaterThan(0);
+      expect(movement.velocityY).toBeGreaterThan(0);
+    });
+
+    it('should eat directly from storage when inventory is full', () => {
+      // Create agent with full inventory
+      const agentId = world.createEntity();
+      world.addComponent(agentId, createAgentComponent('eat'));
+      world.addComponent(agentId, createPositionComponent(10, 10));
+      world.addComponent(agentId, createMovementComponent(1.0));
+      world.addComponent(agentId, createNeedsComponent(30, 100, 100));
+
+      // Create full inventory (no food)
+      const inventory = createInventoryComponent(1, 10); // Very limited
+      const fullInventory = addToInventory(inventory, 'wood', 5); // Fill with wood
+      world.addComponent(agentId, fullInventory.inventory);
+
+      // Create storage with food
+      const storageId = world.createEntity();
+      world.addComponent(storageId, createBuildingComponent('storage-chest', 1, 100, true));
+      world.addComponent(storageId, createPositionComponent(11, 10));
+
+      const storageInventory = createInventoryComponent(20, 1000);
+      const storageWithFood = addToInventory(storageInventory, 'food', 30);
+      world.addComponent(storageId, storageWithFood.inventory);
+
+      world.update(1000);
+
+      const agent = world.getEntity(agentId);
+      const needsAfter = agent!.components.get('needs') as any;
+
+      // Hunger should increase (ate directly from storage)
+      expect(needsAfter.hunger).toBe(50); // 30 + 20
+    });
+
+    it('should ignore incomplete storage buildings', () => {
+      const agentId = world.createEntity();
+      world.addComponent(agentId, createAgentComponent('eat'));
+      world.addComponent(agentId, createPositionComponent(10, 10));
+      world.addComponent(agentId, createMovementComponent(1.0));
+      world.addComponent(agentId, createNeedsComponent(30, 100, 100));
+      world.addComponent(agentId, createInventoryComponent(10, 100));
+
+      // Create incomplete storage (under construction)
+      const storageId = world.createEntity();
+      world.addComponent(storageId, createBuildingComponent('storage-chest', 1, 50, false)); // Not complete
+      world.addComponent(storageId, createPositionComponent(11, 10));
+
+      const storageInventory = createInventoryComponent(20, 1000);
+      const storageWithFood = addToInventory(storageInventory, 'food', 30);
+      world.addComponent(storageId, storageWithFood.inventory);
+
+      // Add a food resource nearby for fallback
+      const foodId = world.createEntity();
+      world.addComponent(foodId, createResourceComponent('food', 50, 100));
+      world.addComponent(foodId, createPositionComponent(12, 10));
+
+      world.update(1000);
+
+      const agent = world.getEntity(agentId);
+      const movement = agent!.components.get('movement') as any;
+
+      // Should be moving towards food resource, not incomplete storage
+      // (seek_food fallback behavior)
+      expect(movement.velocityX !== 0 || movement.velocityY !== 0).toBe(true);
+    });
+  });
+
+  describe('Priority 3: Fallback to seek_food', () => {
+    it('should seek food from environment when no food in inventory or storage', () => {
+      // Create agent with no food
+      const agentId = world.createEntity();
+      world.addComponent(agentId, createAgentComponent('eat'));
+      world.addComponent(agentId, createPositionComponent(10, 10));
+      world.addComponent(agentId, createMovementComponent(1.0));
+      world.addComponent(agentId, createNeedsComponent(30, 100, 100));
+      world.addComponent(agentId, createInventoryComponent(10, 100));
+
+      // Create food resource in environment
+      const foodId = world.createEntity();
+      world.addComponent(foodId, createResourceComponent('food', 50, 100));
+      world.addComponent(foodId, createPositionComponent(15, 15));
+
+      world.update(1000);
+
+      const agent = world.getEntity(agentId);
+      const movement = agent!.components.get('movement') as any;
+
+      // Should be moving towards food resource
+      expect(movement.velocityX).toBeGreaterThan(0);
+      expect(movement.velocityY).toBeGreaterThan(0);
+    });
+
+    it('should harvest and eat food from trees when adjacent', () => {
+      const agentId = world.createEntity();
+      world.addComponent(agentId, createAgentComponent('eat'));
+      world.addComponent(agentId, createPositionComponent(10, 10));
+      world.addComponent(agentId, createMovementComponent(1.0));
+      world.addComponent(agentId, createNeedsComponent(30, 100, 100));
+      world.addComponent(agentId, createInventoryComponent(10, 100));
+
+      // Create food resource adjacent
+      const foodId = world.createEntity();
+      world.addComponent(foodId, createResourceComponent('food', 50, 100));
+      world.addComponent(foodId, createPositionComponent(11, 10)); // Adjacent
+
+      world.update(1000);
+
+      const agent = world.getEntity(agentId);
+      const resource = world.getEntity(foodId);
+
+      const needsAfter = agent!.components.get('needs') as any;
+      const resourceAfter = resource!.components.get('resource') as any;
+
+      // Hunger should increase
+      expect(needsAfter.hunger).toBe(50); // 30 + 20
+
+      // Resource amount should decrease
+      expect(resourceAfter.amount).toBe(30); // 50 - 20
+    });
+  });
+
+  describe('Edge cases', () => {
+    it('should handle agent without inventory component', () => {
+      const agentId = world.createEntity();
+      world.addComponent(agentId, createAgentComponent('eat'));
+      world.addComponent(agentId, createPositionComponent(10, 10));
+      world.addComponent(agentId, createMovementComponent(1.0));
+      world.addComponent(agentId, createNeedsComponent(30, 100, 100));
+      // No inventory component
+
+      // Create food resource
+      const foodId = world.createEntity();
+      world.addComponent(foodId, createResourceComponent('food', 50, 100));
+      world.addComponent(foodId, createPositionComponent(11, 10));
+
+      // Should not crash, should fall back to seek_food
+      expect(() => world.update(1000)).not.toThrow();
+    });
+
+    it('should handle agent without needs component', () => {
+      const agentId = world.createEntity();
+      world.addComponent(agentId, createAgentComponent('eat'));
+      world.addComponent(agentId, createPositionComponent(10, 10));
+      world.addComponent(agentId, createMovementComponent(1.0));
+      // No needs component
+
+      // Should not crash, should fall back to wander
+      expect(() => world.update(1000)).not.toThrow();
+    });
+  });
+});

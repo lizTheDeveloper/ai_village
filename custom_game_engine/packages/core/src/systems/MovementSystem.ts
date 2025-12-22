@@ -27,9 +27,32 @@ export class MovementSystem implements System {
         continue;
       }
 
+      // Apply fatigue penalty based on energy level
+      let speedMultiplier = 1.0;
+      const needs = impl.getComponent('needs') as any;
+      if (needs && needs.energy !== undefined) {
+        const energy = needs.energy;
+
+        // Per work order:
+        // Energy 100-70: No penalty
+        // Energy 70-50: -10% movement for work, no movement penalty
+        // Energy 50-30: -20% movement speed
+        // Energy 30-10: -40% movement speed
+        // Energy 10-0: -60% movement speed
+
+        if (energy < 10) {
+          speedMultiplier = 0.4; // -60% speed
+        } else if (energy < 30) {
+          speedMultiplier = 0.6; // -40% speed
+        } else if (energy < 50) {
+          speedMultiplier = 0.8; // -20% speed
+        }
+        // else: no penalty (100%)
+      }
+
       // Calculate new position (velocity is in tiles per second, tick is 1/20th second)
-      const deltaX = movement.velocityX / 20;
-      const deltaY = movement.velocityY / 20;
+      const deltaX = (movement.velocityX * speedMultiplier) / 20;
+      const deltaY = (movement.velocityY * speedMultiplier) / 20;
       const newX = position.x + deltaX;
       const newY = position.y + deltaY;
 

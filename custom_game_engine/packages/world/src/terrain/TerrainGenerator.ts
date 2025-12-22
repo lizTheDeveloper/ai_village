@@ -5,7 +5,6 @@ import type { Tile, TerrainType, BiomeType } from '../chunks/Tile.js';
 import { PerlinNoise } from './PerlinNoise.js';
 import { createTree } from '../entities/TreeEntity.js';
 import { createRock } from '../entities/RockEntity.js';
-import { createLLMAgent } from '../entities/AgentEntity.js';
 
 /**
  * Generates terrain using Perlin noise.
@@ -101,14 +100,8 @@ export class TerrainGenerator {
           }
         }
 
-        // Place LLM agents in plains and grassy areas (very sparse)
-        if ((tile.terrain === 'grass' || tile.terrain === 'dirt') && tile.biome === 'plains') {
-          if (Math.random() > 0.998) {
-            // 0.2% chance - very rare
-            // All agents are now LLM-controlled
-            createLLMAgent(world, worldX + 0.5, worldY + 0.5, 2.0);
-          }
-        }
+        // Agent spawning disabled - agents are now created explicitly in main.ts
+        // This allows precise control over agent count and starting positions
       }
     }
   }
@@ -171,6 +164,7 @@ export class TerrainGenerator {
       fertilizerDuration: 0,
       lastWatered: 0,
       composted: false,
+      plantId: null,
     };
   }
 

@@ -60,9 +60,9 @@ describe('AgentAction', () => {
       expect(behavior).toBe('seek_food');
     });
 
-    it('should map eat action to seek_food behavior', () => {
+    it('should map eat action to eat behavior', () => {
       const behavior = actionToBehavior({ type: 'eat' });
-      expect(behavior).toBe('seek_food');
+      expect(behavior).toBe('eat');
     });
   });
 });
