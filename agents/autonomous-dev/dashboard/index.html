@@ -743,6 +743,9 @@
             loadWorkOrders();
             loadPipelines();
             loadRecentLogs();
+
+            // Auto-refresh logs every 5 seconds
+            setInterval(loadRecentLogs, 5000);
         });
 
         // Tabs
@@ -789,6 +792,7 @@
                     break;
                 case 'pipeline-complete':
                     loadPipelines();
+                    loadRecentLogs(); // Refresh logs list when pipeline completes
                     addLog(`Pipeline ${data.id} ${data.status}`, data.status === 'complete' ? 'stdout' : 'stderr');
                     break;
             }
