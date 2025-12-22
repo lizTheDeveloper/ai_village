@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Village Orchestration Dashboard</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --border-color: #30363d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-yellow: #d29922;
+            --accent-red: #f85149;
+            --accent-purple: #a371f7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--border-color);
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4090e0;
+        }
+
+        .btn-success {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            color: white;
+        }
+
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 0;
+            height: calc(100vh - 60px);
+        }
+
+        .left-panel {
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .right-panel {
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+        }
+
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Phase Cards */
+        .phases-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .phase-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .phase-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .phase-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .phase-number {
+            background: var(--bg-tertiary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-complete { background: rgba(63, 185, 80, 0.2); color: var(--accent-green); }
+        .status-in_progress { background: rgba(210, 153, 34, 0.2); color: var(--accent-yellow); }
+        .status-ready { background: rgba(88, 166, 255, 0.2); color: var(--accent-blue); }
+        .status-blocked { background: rgba(248, 81, 73, 0.2); color: var(--accent-red); }
+
+        .task-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .task-chip {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .task-chip.parallel {
+            border-color: var(--accent-purple);
+        }
+
+        .task-chip .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .task-chip .status-dot.complete { background: var(--accent-green); }
+        .task-chip .status-dot.in_progress { background: var(--accent-yellow); }
+        .task-chip .status-dot.ready { background: var(--accent-blue); }
+        .task-chip .status-dot.blocked { background: var(--accent-red); }
+
+        .parallel-indicator {
+            color: var(--accent-purple);
+            font-size: 10px;
+        }
+
+        /* Dependencies */
+        .phase-deps {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        /* Parallel Launch Section */
+        .launch-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .launch-title {
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .parallel-tasks {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .parallel-task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+        }
+
+        .parallel-task-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        .parallel-task-info {
+            flex: 1;
+        }
+
+        .parallel-task-name {
+            font-weight: 500;
+        }
+
+        .parallel-task-phase {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Right Panel Sections */
+        .panel-section {
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px;
+        }
+
+        .panel-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Work Orders List */
+        .work-order-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .work-order-item {
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .work-order-item:hover {
+            border-color: var(--accent-blue);
+        }
+
+        .work-order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .work-order-name {
+            font-weight: 500;
+        }
+
+        .work-order-meta {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Pipelines */
+        .pipeline-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .pipeline-item {
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .pipeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pipeline-name {
+            font-weight: 500;
+        }
+
+        .pipeline-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        .pipeline-status.running {
+            color: var(--accent-yellow);
+        }
+
+        .pipeline-status.complete {
+            color: var(--accent-green);
+        }
+
+        .pipeline-status.failed {
+            color: var(--accent-red);
+        }
+
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--accent-yellow);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Logs */
+        .log-container {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 11px;
+            padding: 8px;
+        }
+
+        .log-line {
+            padding: 2px 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .log-line.stdout { color: var(--text-primary); }
+        .log-line.stderr { color: var(--accent-red); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            max-width: 800px;
+            max-height: 80vh;
+            width: 90%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            background: var(--bg-primary);
+            padding: 16px;
+            border-radius: 6px;
+        }
+
+        /* Quality Gates */
+        .quality-gates {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .quality-gate {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+        }
+
+        .gate-name {
+            font-weight: 500;
+        }
+
+        .gate-status {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .gate-pass { color: var(--accent-green); }
+        .gate-fail { color: var(--accent-red); }
+        .gate-pending { color: var(--text-secondary); }
+
+        /* Last update timestamp */
+        .timestamp {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 32px;
+            color: var(--text-secondary);
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+        }
+
+        /* Dependency Graph */
+        .dep-graph {
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            padding: 16px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 11px;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            color: var(--text-secondary);
+        }
+
+        .tab.active {
+            color: var(--accent-blue);
+            border-bottom-color: var(--accent-blue);
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Screenshots gallery */
+        .screenshots-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .screenshot-thumb {
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .screenshot-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>AI Village Orchestration Dashboard</h1>
+        <div class="header-actions">
+            <button class="btn" onclick="refreshRoadmap()">
+                <span>Refresh from Markdown</span>
+            </button>
+            <button class="btn btn-primary" onclick="openLaunchModal()">
+                Launch Agent Teams
+            </button>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="left-panel">
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Roadmap Phases</h2>
+                    <span class="timestamp" id="roadmap-timestamp"></span>
+                </div>
+                <div class="phases-grid" id="phases-container">
+                    <div class="loading"><div class="spinner"></div></div>
+                </div>
+            </section>
+
+            <section class="section" id="parallel-work-section" style="display: none;">
+                <div class="launch-section">
+                    <h3 class="launch-title">
+                        <span>Available Parallel Work</span>
+                        <span class="status-badge" style="background: rgba(163, 113, 247, 0.2); color: var(--accent-purple);">Can run together</span>
+                    </h3>
+                    <div class="parallel-tasks" id="parallel-tasks-container"></div>
+                    <button class="btn btn-success" onclick="launchSelected()">Launch Selected Tasks</button>
+                </div>
+            </section>
+        </div>
+
+        <div class="right-panel">
+            <div class="tabs">
+                <div class="tab active" data-tab="pipelines">Pipelines</div>
+                <div class="tab" data-tab="work-orders">Work Orders</div>
+                <div class="tab" data-tab="quality">Quality</div>
+                <div class="tab" data-tab="logs">Logs</div>
+            </div>
+
+            <div class="tab-content active" id="tab-pipelines">
+                <div class="panel-section">
+                    <div class="panel-section-title">
+                        <span>Active Pipelines</span>
+                        <span class="timestamp" id="pipelines-count">0 running</span>
+                    </div>
+                    <div class="pipeline-list" id="pipelines-container">
+                        <div class="empty-state">No active pipelines</div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <div class="panel-section-title">Live Logs</div>
+                    <div class="log-container" id="live-logs">
+                        <div class="empty-state">Logs will appear here when pipelines run</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-work-orders">
+                <div class="panel-section">
+                    <div class="panel-section-title">
+                        <span>Work Orders</span>
+                        <button class="btn" onclick="loadWorkOrders()" style="padding: 4px 8px;">Refresh</button>
+                    </div>
+                    <div class="work-order-list" id="work-orders-container">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-quality">
+                <div class="panel-section">
+                    <div class="panel-section-title">Quality Gates</div>
+                    <div class="quality-gates" id="quality-gates-container">
+                        <div class="quality-gate">
+                            <span class="gate-name">Build Status</span>
+                            <span class="gate-status gate-pending" id="gate-build">
+                                <span>Not checked</span>
+                            </span>
+                        </div>
+                        <div class="quality-gate">
+                            <span class="gate-name">Test Suite</span>
+                            <span class="gate-status gate-pending" id="gate-tests">
+                                <span>Not checked</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 12px;">
+                        <button class="btn" onclick="runBuildCheck()">Check Build</button>
+                        <button class="btn" onclick="runTestCheck()">Run Tests</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-logs">
+                <div class="panel-section">
+                    <div class="panel-section-title">Recent Logs</div>
+                    <div id="logs-list-container">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Launch Modal -->
+    <div class="modal-overlay" id="launch-modal" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Launch Agent Teams</h3>
+                <button class="modal-close" onclick="closeLaunchModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 16px; color: var(--text-secondary);">
+                    Select tasks to run in parallel. Tasks marked with a purple border can be safely run together.
+                </p>
+                <div id="launch-modal-tasks"></div>
+                <div style="margin-top: 20px; display: flex; gap: 12px;">
+                    <button class="btn btn-success" onclick="launchFromModal()">Launch Selected</button>
+                    <button class="btn" onclick="closeLaunchModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Work Order Modal -->
+    <div class="modal-overlay" id="work-order-modal" style="display: none;">
+        <div class="modal" style="max-width: 1000px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="wo-modal-title">Work Order</h3>
+                <button class="modal-close" onclick="closeWorkOrderModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="tabs" id="wo-tabs">
+                    <div class="tab active" data-tab="wo-content">Work Order</div>
+                    <div class="tab" data-tab="wo-playtest">Playtest Report</div>
+                    <div class="tab" data-tab="wo-screenshots">Screenshots</div>
+                </div>
+                <div class="tab-content active" id="tab-wo-content">
+                    <div class="modal-content" id="wo-content"></div>
+                </div>
+                <div class="tab-content" id="tab-wo-playtest">
+                    <div class="modal-content" id="wo-playtest"></div>
+                </div>
+                <div class="tab-content" id="tab-wo-screenshots">
+                    <div class="screenshots-gallery" id="wo-screenshots"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let roadmapData = null;
+        let workOrdersData = [];
+        let pipelinesData = [];
+        let eventSource = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initTabs();
+            initSSE();
+            refreshRoadmap();
+            loadWorkOrders();
+            loadPipelines();
+            loadRecentLogs();
+        });
+
+        // Tabs
+        function initTabs() {
+            document.querySelectorAll('.tabs').forEach(tabContainer => {
+                tabContainer.querySelectorAll('.tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        const tabId = tab.dataset.tab;
+                        const container = tab.closest('.tabs').parentElement;
+
+                        tabContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+
+                        container.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                        container.querySelector(`#tab-${tabId}`)?.classList.add('active');
+                    });
+                });
+            });
+        }
+
+        // SSE for real-time updates
+        function initSSE() {
+            eventSource = new EventSource('/api/events');
+
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleSSEEvent(data);
+            };
+
+            eventSource.onerror = () => {
+                console.log('SSE connection lost, reconnecting...');
+                setTimeout(initSSE, 5000);
+            };
+        }
+
+        function handleSSEEvent(data) {
+            switch (data.type) {
+                case 'pipeline-started':
+                    loadPipelines();
+                    addLog(`Pipeline started: ${data.featureName || 'auto'}`, 'stdout');
+                    break;
+                case 'pipeline-log':
+                    addLog(data.log, data.stream);
+                    break;
+                case 'pipeline-complete':
+                    loadPipelines();
+                    addLog(`Pipeline ${data.id} ${data.status}`, data.status === 'complete' ? 'stdout' : 'stderr');
+                    break;
+            }
+        }
+
+        function addLog(text, stream) {
+            const container = document.getElementById('live-logs');
+            if (container.querySelector('.empty-state')) {
+                container.innerHTML = '';
+            }
+
+            const line = document.createElement('div');
+            line.className = `log-line ${stream}`;
+            line.textContent = text;
+            container.appendChild(line);
+            container.scrollTop = container.scrollHeight;
+
+            // Limit log lines
+            while (container.children.length > 500) {
+                container.removeChild(container.firstChild);
+            }
+        }
+
+        // Roadmap
+        async function refreshRoadmap() {
+            const container = document.getElementById('phases-container');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+            try {
+                const response = await fetch('/api/roadmap');
+                roadmapData = await response.json();
+                renderPhases(roadmapData.phases);
+                document.getElementById('roadmap-timestamp').textContent = `Updated: ${new Date(roadmapData.timestamp).toLocaleTimeString()}`;
+                findParallelWork(roadmapData.phases);
+            } catch (err) {
+                container.innerHTML = `<div class="empty-state">Error loading roadmap: ${err.message}</div>`;
+            }
+        }
+
+        function renderPhases(phases) {
+            const container = document.getElementById('phases-container');
+            container.innerHTML = phases.map(phase => `
+                <div class="phase-card">
+                    <div class="phase-header">
+                        <div class="phase-title">
+                            <span class="phase-number">Phase ${phase.number}</span>
+                            <span>${phase.name}</span>
+                        </div>
+                        <span class="status-badge status-${phase.status}">${formatStatus(phase.status)}</span>
+                    </div>
+                    ${phase.tasks.length > 0 ? `
+                        <div class="task-list">
+                            ${phase.tasks.map(task => `
+                                <span class="task-chip ${task.parallel ? 'parallel' : ''}">
+                                    <span class="status-dot ${task.status}"></span>
+                                    <span>${task.name}</span>
+                                    ${task.parallel ? '<span class="parallel-indicator">||</span>' : ''}
+                                </span>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    ${phase.dependencies.length > 0 ? `
+                        <div class="phase-deps">Depends on: ${phase.dependencies.map(d => `Phase ${d}`).join(', ')}</div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function formatStatus(status) {
+            const map = {
+                'complete': 'Complete',
+                'in_progress': 'In Progress',
+                'ready': 'Ready',
+                'blocked': 'Blocked'
+            };
+            return map[status] || status;
+        }
+
+        function findParallelWork(phases) {
+            const parallelTasks = [];
+
+            for (const phase of phases) {
+                if (phase.status === 'ready' || phase.status === 'in_progress') {
+                    for (const task of phase.tasks) {
+                        if (task.parallel && (task.status === 'ready' || task.status === 'in_progress')) {
+                            parallelTasks.push({
+                                phaseName: phase.name,
+                                phaseNumber: phase.number,
+                                taskName: task.name,
+                                taskStatus: task.status
+                            });
+                        }
+                    }
+                }
+            }
+
+            const section = document.getElementById('parallel-work-section');
+            const container = document.getElementById('parallel-tasks-container');
+
+            if (parallelTasks.length > 0) {
+                section.style.display = 'block';
+                container.innerHTML = parallelTasks.map((t, i) => `
+                    <div class="parallel-task-item">
+                        <input type="checkbox" id="parallel-task-${i}" data-task='${JSON.stringify(t)}'>
+                        <div class="parallel-task-info">
+                            <div class="parallel-task-name">${t.taskName}</div>
+                            <div class="parallel-task-phase">Phase ${t.phaseNumber}: ${t.phaseName}</div>
+                        </div>
+                        <span class="status-badge status-${t.taskStatus}">${formatStatus(t.taskStatus)}</span>
+                    </div>
+                `).join('');
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        // Work Orders
+        async function loadWorkOrders() {
+            const container = document.getElementById('work-orders-container');
+
+            try {
+                const response = await fetch('/api/work-orders');
+                workOrdersData = await response.json();
+
+                if (workOrdersData.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No work orders yet</div>';
+                    return;
+                }
+
+                container.innerHTML = workOrdersData.map(wo => `
+                    <div class="work-order-item" onclick="openWorkOrder('${wo.name}')">
+                        <div class="work-order-header">
+                            <span class="work-order-name">${wo.name}</span>
+                            <span class="status-badge status-${wo.state === 'READY_FOR_REVIEW' ? 'ready' : wo.state === 'BLOCKED' ? 'blocked' : 'in_progress'}">
+                                ${wo.state}
+                            </span>
+                        </div>
+                        <div class="work-order-meta">
+                            ${wo.verdict ? `<span>Verdict: ${wo.verdict}</span>` : ''}
+                            <span>${wo.screenshotCount} screenshots</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                container.innerHTML = `<div class="empty-state">Error: ${err.message}</div>`;
+            }
+        }
+
+        async function openWorkOrder(name) {
+            const modal = document.getElementById('work-order-modal');
+            document.getElementById('wo-modal-title').textContent = name;
+
+            // Load work order content
+            try {
+                const woResponse = await fetch(`/api/work-orders/${name}`);
+                const woData = await woResponse.json();
+                document.getElementById('wo-content').textContent = woData.content;
+            } catch {
+                document.getElementById('wo-content').textContent = 'Failed to load work order';
+            }
+
+            // Load playtest report
+            try {
+                const ptResponse = await fetch(`/api/work-orders/${name}/playtest-report`);
+                const ptData = await ptResponse.json();
+                document.getElementById('wo-playtest').textContent = ptData.report;
+            } catch {
+                document.getElementById('wo-playtest').textContent = 'No playtest report available';
+            }
+
+            // Load screenshots
+            try {
+                const ssResponse = await fetch(`/api/work-orders/${name}/screenshots`);
+                const ssData = await ssResponse.json();
+                const ssContainer = document.getElementById('wo-screenshots');
+
+                if (ssData.length === 0) {
+                    ssContainer.innerHTML = '<div class="empty-state">No screenshots</div>';
+                } else {
+                    ssContainer.innerHTML = ssData.map(ss => `
+                        <div class="screenshot-thumb" onclick="window.open('${ss.path}', '_blank')">
+                            <img src="${ss.path}" alt="${ss.name}">
+                        </div>
+                    `).join('');
+                }
+            } catch {
+                document.getElementById('wo-screenshots').innerHTML = '<div class="empty-state">Failed to load screenshots</div>';
+            }
+
+            // Reset tabs
+            document.querySelectorAll('#wo-tabs .tab').forEach((t, i) => {
+                t.classList.toggle('active', i === 0);
+            });
+            document.querySelectorAll('#work-order-modal .tab-content').forEach((c, i) => {
+                c.classList.toggle('active', i === 0);
+            });
+
+            modal.style.display = 'flex';
+        }
+
+        function closeWorkOrderModal() {
+            document.getElementById('work-order-modal').style.display = 'none';
+        }
+
+        // Pipelines
+        async function loadPipelines() {
+            const container = document.getElementById('pipelines-container');
+
+            try {
+                const response = await fetch('/api/pipelines');
+                pipelinesData = await response.json();
+
+                const running = pipelinesData.filter(p => p.status === 'running').length;
+                document.getElementById('pipelines-count').textContent = `${running} running`;
+
+                if (pipelinesData.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No active pipelines</div>';
+                    return;
+                }
+
+                container.innerHTML = pipelinesData.map(p => `
+                    <div class="pipeline-item">
+                        <div class="pipeline-header">
+                            <span class="pipeline-name">${p.featureName || 'Auto'}</span>
+                            <span class="pipeline-status ${p.status}">
+                                ${p.status === 'running' ? '<div class="spinner"></div>' : ''}
+                                <span>${p.status}</span>
+                            </span>
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 6px;">
+                            Started: ${new Date(p.startTime).toLocaleTimeString()}
+                            ${p.status === 'running' ? `
+                                <button class="btn btn-danger" style="padding: 2px 6px; font-size: 11px; margin-left: 8px;" onclick="stopPipeline('${p.id}')">Stop</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                container.innerHTML = `<div class="empty-state">Error: ${err.message}</div>`;
+            }
+        }
+
+        async function stopPipeline(id) {
+            try {
+                await fetch(`/api/pipelines/${id}/stop`, { method: 'POST' });
+                loadPipelines();
+            } catch (err) {
+                alert('Failed to stop pipeline: ' + err.message);
+            }
+        }
+
+        // Launch Modal
+        function openLaunchModal() {
+            const modal = document.getElementById('launch-modal');
+            const container = document.getElementById('launch-modal-tasks');
+
+            // Get all ready/in-progress tasks that can be parallelized
+            const tasks = [];
+            if (roadmapData) {
+                for (const phase of roadmapData.phases) {
+                    for (const task of phase.tasks) {
+                        if (task.status === 'ready' || task.status === 'in_progress') {
+                            tasks.push({
+                                phaseName: phase.name,
+                                phaseNumber: phase.number,
+                                taskName: task.name,
+                                parallel: task.parallel
+                            });
+                        }
+                    }
+                }
+            }
+
+            if (tasks.length === 0) {
+                container.innerHTML = '<div class="empty-state">No tasks available to launch</div>';
+            } else {
+                container.innerHTML = `
+                    <div class="parallel-tasks">
+                        ${tasks.map((t, i) => `
+                            <div class="parallel-task-item" style="${t.parallel ? 'border: 1px solid var(--accent-purple);' : ''}">
+                                <input type="checkbox" id="modal-task-${i}" data-task='${JSON.stringify(t)}'>
+                                <div class="parallel-task-info">
+                                    <div class="parallel-task-name">${t.taskName}</div>
+                                    <div class="parallel-task-phase">Phase ${t.phaseNumber}: ${t.phaseName}</div>
+                                </div>
+                                ${t.parallel ? '<span class="parallel-indicator" style="color: var(--accent-purple);">Can Parallelize</span>' : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function closeLaunchModal() {
+            document.getElementById('launch-modal').style.display = 'none';
+        }
+
+        async function launchFromModal() {
+            const checkboxes = document.querySelectorAll('#launch-modal-tasks input[type="checkbox"]:checked');
+            const features = [];
+
+            checkboxes.forEach(cb => {
+                const task = JSON.parse(cb.dataset.task);
+                // Convert task name to feature name format
+                const featureName = task.taskName.toLowerCase().replace(/\s+/g, '-');
+                features.push({ name: featureName });
+            });
+
+            if (features.length === 0) {
+                alert('Please select at least one task');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/pipelines/batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ features })
+                });
+                const data = await response.json();
+                closeLaunchModal();
+                loadPipelines();
+                alert(`Launched ${data.pipelines.length} pipeline(s)`);
+            } catch (err) {
+                alert('Failed to launch pipelines: ' + err.message);
+            }
+        }
+
+        async function launchSelected() {
+            const checkboxes = document.querySelectorAll('#parallel-tasks-container input[type="checkbox"]:checked');
+            const features = [];
+
+            checkboxes.forEach(cb => {
+                const task = JSON.parse(cb.dataset.task);
+                const featureName = task.taskName.toLowerCase().replace(/\s+/g, '-');
+                features.push({ name: featureName });
+            });
+
+            if (features.length === 0) {
+                alert('Please select at least one task');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/pipelines/batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ features })
+                });
+                const data = await response.json();
+                loadPipelines();
+                alert(`Launched ${data.pipelines.length} pipeline(s) in parallel`);
+            } catch (err) {
+                alert('Failed to launch pipelines: ' + err.message);
+            }
+        }
+
+        // Quality Gates
+        async function runBuildCheck() {
+            const gate = document.getElementById('gate-build');
+            gate.className = 'gate-status gate-pending';
+            gate.innerHTML = '<div class="spinner"></div> Running...';
+
+            try {
+                const response = await fetch('/api/build-status');
+                const data = await response.json();
+
+                if (data.success) {
+                    gate.className = 'gate-status gate-pass';
+                    gate.textContent = 'Passed';
+                } else {
+                    gate.className = 'gate-status gate-fail';
+                    gate.textContent = 'Failed';
+                }
+            } catch (err) {
+                gate.className = 'gate-status gate-fail';
+                gate.textContent = 'Error';
+            }
+        }
+
+        async function runTestCheck() {
+            const gate = document.getElementById('gate-tests');
+            gate.className = 'gate-status gate-pending';
+            gate.innerHTML = '<div class="spinner"></div> Running...';
+
+            try {
+                const response = await fetch('/api/test-status');
+                const data = await response.json();
+
+                if (data.success) {
+                    gate.className = 'gate-status gate-pass';
+                    gate.textContent = 'Passed';
+                } else {
+                    gate.className = 'gate-status gate-fail';
+                    gate.textContent = 'Failed';
+                }
+            } catch (err) {
+                gate.className = 'gate-status gate-fail';
+                gate.textContent = 'Error';
+            }
+        }
+
+        // Logs
+        async function loadRecentLogs() {
+            const container = document.getElementById('logs-list-container');
+
+            try {
+                const response = await fetch('/api/logs?limit=10');
+                const logs = await response.json();
+
+                if (logs.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No logs yet</div>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <div class="work-order-list">
+                        ${logs.map(log => `
+                            <div class="work-order-item" onclick="openLogFile('${log.name}')">
+                                <div class="work-order-name">${log.name}</div>
+                                <div class="work-order-meta">${(log.size / 1024).toFixed(1)} KB</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (err) {
+                container.innerHTML = `<div class="empty-state">Error: ${err.message}</div>`;
+            }
+        }
+
+        async function openLogFile(name) {
+            try {
+                const response = await fetch(`/api/logs/${name}`);
+                const content = await response.text();
+
+                // Simple modal for log content
+                const modal = document.getElementById('work-order-modal');
+                document.getElementById('wo-modal-title').textContent = name;
+                document.getElementById('wo-content').textContent = content;
+
+                // Hide other tabs
+                document.querySelectorAll('#wo-tabs .tab').forEach((t, i) => {
+                    t.style.display = i === 0 ? 'block' : 'none';
+                    t.classList.toggle('active', i === 0);
+                });
+                document.querySelectorAll('#work-order-modal .tab-content').forEach((c, i) => {
+                    c.classList.toggle('active', i === 0);
+                });
+
+                modal.style.display = 'flex';
+            } catch (err) {
+                alert('Failed to load log: ' + err.message);
+            }
+        }
+
+        // Click outside modal to close
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

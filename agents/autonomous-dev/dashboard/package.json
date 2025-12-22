@@ -1,0 +1,13 @@
+{
+  "name": "ai-village-dashboard",
+  "version": "1.0.0",
+  "description": "Orchestration dashboard for AI Village development",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
