@@ -48,7 +48,7 @@ function parseRoadmap() {
         const line = lines[i];
 
         // Match phase headers like "### Phase 0: Foundation ✅ COMPLETE"
-        const phaseMatch = line.match(/^### Phase (\d+): ([^✅🚧⏳🔒]+)(✅|🚧|⏳|🔒)?/);
+        const phaseMatch = line.match(/^### Phase (\d+): ([^✅🚧⏳🔒🔀]+)(✅|🚧|⏳|🔒|🔀)?/);
         if (phaseMatch) {
             if (currentPhase) {
                 phases.push(currentPhase);
@@ -71,6 +71,14 @@ function parseRoadmap() {
             };
             inTaskTable = false;
             continue;
+        }
+
+        // Check for explicit **Status:** line (overrides header emoji)
+        if (currentPhase && line.match(/^\*\*Status:\*\*/)) {
+            if (line.includes('✅') || line.includes('Complete')) currentPhase.status = 'complete';
+            else if (line.includes('🚧') || line.includes('In Progress')) currentPhase.status = 'in_progress';
+            else if (line.includes('⏳') || line.includes('Ready')) currentPhase.status = 'ready';
+            else if (line.includes('🔒') || line.includes('Blocked')) currentPhase.status = 'blocked';
         }
 
         // Extract dependencies
