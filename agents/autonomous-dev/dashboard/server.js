@@ -29,6 +29,68 @@ const activePipelines = new Map();
 // SSE clients for real-time updates
 const sseClients = new Set();
 
+// Persistence file for pipeline state
+const PIPELINES_STATE_FILE = path.join(__dirname, '.pipelines.json');
+
+// Load persisted pipelines on startup
+function loadPersistedPipelines() {
+    if (!fs.existsSync(PIPELINES_STATE_FILE)) {
+        return;
+    }
+
+    try {
+        const data = JSON.parse(fs.readFileSync(PIPELINES_STATE_FILE, 'utf-8'));
+        let reconnected = 0;
+        let cleaned = 0;
+
+        for (const pipeline of data) {
+            // Check if process is still running
+            try {
+                process.kill(pipeline.pid, 0); // Signal 0 checks if process exists
+
+                // Process exists, reconnect to it (but we can't get stdout/stderr)
+                activePipelines.set(pipeline.id, {
+                    ...pipeline,
+                    process: null, // Can't reconnect to the process streams
+                    logs: pipeline.logs || [],
+                    reconnected: true
+                });
+                reconnected++;
+                console.log(`  ↻ Reconnected to pipeline: ${pipeline.featureName} (PID: ${pipeline.pid})`);
+            } catch (err) {
+                // Process doesn't exist anymore
+                cleaned++;
+            }
+        }
+
+        if (reconnected > 0 || cleaned > 0) {
+            console.log(`  📊 Loaded ${reconnected} active pipelines, cleaned ${cleaned} dead ones`);
+        }
+    } catch (err) {
+        console.error('Failed to load persisted pipelines:', err.message);
+    }
+}
+
+// Persist pipelines to disk
+function persistPipelines() {
+    const data = Array.from(activePipelines.values()).map(p => ({
+        id: p.id,
+        featureName: p.featureName,
+        pid: p.pid,
+        startTime: p.startTime,
+        status: p.status,
+        endTime: p.endTime,
+        exitCode: p.exitCode,
+        logs: p.logs.slice(-100) // Keep last 100 log entries
+    }));
+
+    try {
+        fs.writeFileSync(PIPELINES_STATE_FILE, JSON.stringify(data, null, 2));
+    } catch (err) {
+        console.error('Failed to persist pipelines:', err.message);
+    }
+}
+
 app.use(express.json());
 app.use(express.static(__dirname));
 
@@ -268,10 +330,12 @@ function launchPipeline(featureName, options = {}) {
         pipeline.endTime = new Date().toISOString();
         pipeline.exitCode = code;
         broadcast({ type: 'pipeline-complete', id, status: pipeline.status, exitCode: code });
+        persistPipelines(); // Save state when pipeline completes
     });
 
     activePipelines.set(id, pipeline);
     broadcast({ type: 'pipeline-started', id, featureName });
+    persistPipelines(); // Save state when pipeline starts
 
     return { id, pid: proc.pid, featureName };
 }
@@ -317,6 +381,7 @@ function stopPipeline(id) {
 
     pipeline.process.kill('SIGTERM');
     pipeline.status = 'stopped';
+    persistPipelines(); // Save state when pipeline stops
     return true;
 }
 
@@ -595,4 +660,7 @@ app.listen(PORT, () => {
 ║  Roadmap: ${ROADMAP_PATH}
 ╚══════════════════════════════════════════════════════════════╝
     `);
+
+    // Load any persisted pipelines from previous runs
+    loadPersistedPipelines();
 });
