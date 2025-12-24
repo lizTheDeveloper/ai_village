@@ -43,6 +43,9 @@ export interface AgentComponent extends Component {
   recentSpeech?: string; // What the agent recently said (for nearby agents to hear)
   lastThought?: string; // The agent's most recent internal thought/reasoning
   speechHistory?: SpeechHistoryEntry[]; // History of what the agent has said
+  personalGoal?: string; // Short-term personal goal
+  mediumTermGoal?: string; // Medium-term personal goal
+  groupGoal?: string; // Agent's view of the group goal (future: shared in hive minds)
 }
 
 export function createAgentComponent(

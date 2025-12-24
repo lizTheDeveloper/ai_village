@@ -181,6 +181,29 @@ export class AISystem implements System {
             speaking = parsedResponse.speaking || undefined;
             thinking = parsedResponse.thinking || undefined;
 
+            // Handle goal-setting actions (don't change behavior, just update goals)
+            if (typeof behavior === 'object' && behavior !== null && 'type' in behavior) {
+              if (behavior.type === 'set_personal_goal' && 'goal' in behavior) {
+                impl.updateComponent<AgentComponent>('agent', (current) => ({
+                  ...current,
+                  personalGoal: behavior.goal as string,
+                }));
+                behavior = null; // Don't change actual behavior
+              } else if (behavior.type === 'set_medium_term_goal' && 'goal' in behavior) {
+                impl.updateComponent<AgentComponent>('agent', (current) => ({
+                  ...current,
+                  mediumTermGoal: behavior.goal as string,
+                }));
+                behavior = null; // Don't change actual behavior
+              } else if (behavior.type === 'set_group_goal' && 'goal' in behavior) {
+                impl.updateComponent<AgentComponent>('agent', (current) => ({
+                  ...current,
+                  groupGoal: behavior.goal as string,
+                }));
+                behavior = null; // Don't change actual behavior
+              }
+            }
+
             // console.log('[AISystem] Parsed structured LLM decision:', {
             //   entityId: entity.id.substring(0, 8),
             //   thinking: thinking?.slice(0, 60) + '...',

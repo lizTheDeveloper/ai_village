@@ -35,6 +35,11 @@ export type AgentAction =
   | { type: 'plant'; position: Position; seedType: string } // Plant a seed
   | { type: 'harvest'; position: Position } // Harvest a crop
 
+  // Goal setting
+  | { type: 'set_personal_goal'; goal: string } // Set short-term personal goal
+  | { type: 'set_medium_term_goal'; goal: string } // Set medium-term personal goal
+  | { type: 'set_group_goal'; goal: string } // Set agent's view of group goal
+
   // Rest
   | { type: 'idle' }
   | { type: 'rest' };
@@ -104,8 +109,26 @@ export function parseAction(response: string): AgentAction | null {
   }
 
   if (cleaned.includes('build') || cleaned.includes('construct')) {
-    // Default to building a lean-to for shelter
-    return { type: 'build', buildingType: 'lean-to', position: { x: 0, y: 0 } };
+    // Try to extract building type from response
+    let buildingType: BuildingType = 'lean-to'; // fallback
+
+    // Check for specific building types (ordered by specificity)
+    if (cleaned.includes('campfire') || cleaned.includes('fire')) {
+      buildingType = 'campfire';
+    } else if (cleaned.includes('storage') || cleaned.includes('chest')) {
+      buildingType = 'storage-chest';
+    } else if (cleaned.includes('bedroll') || cleaned.includes('bed') || cleaned.includes('tent')) {
+      // Map bed/bedroll/tent to tent building type
+      buildingType = 'tent';
+    } else if (cleaned.includes('workbench') || cleaned.includes('work bench')) {
+      buildingType = 'workbench';
+    } else if (cleaned.includes('well')) {
+      buildingType = 'well';
+    } else if (cleaned.includes('lean-to') || cleaned.includes('leanto') || cleaned.includes('shelter')) {
+      buildingType = 'lean-to';
+    }
+
+    return { type: 'build', buildingType, position: { x: 0, y: 0 } };
   }
 
   // Default fallback

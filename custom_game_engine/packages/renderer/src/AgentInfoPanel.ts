@@ -7,9 +7,9 @@ import type { Entity } from '@ai-village/core';
 export class AgentInfoPanel {
   private selectedEntityId: string | null = null;
   private panelWidth = 300;
-  private panelHeight = 850;
-  private padding = 10;
-  private lineHeight = 18;
+  private panelHeight = 500; // Increased from 400 to show inventory section
+  private padding = 8;
+  private lineHeight = 16;
 
   /**
    * Set the currently selected agent entity.
@@ -85,6 +85,9 @@ export class AgentInfoPanel {
           recentSpeech?: string;
           lastThought?: string;
           speechHistory?: Array<{ text: string; tick: number }>;
+          personalGoal?: string;
+          mediumTermGoal?: string;
+          groupGoal?: string;
         }
       | undefined;
     const needs = selectedEntity.components.get('needs') as
@@ -145,6 +148,55 @@ export class AgentInfoPanel {
       ctx.fillText(`Uses LLM: ${llmStatus}`, x + this.padding, currentY);
       currentY += this.lineHeight + 5;
       ctx.font = '12px monospace';
+
+      // Goals section
+      if (agent.personalGoal || agent.mediumTermGoal || agent.groupGoal) {
+        currentY += 5; // Extra spacing before goals
+
+        if (agent.personalGoal) {
+          ctx.fillStyle = '#FFD700'; // Gold
+          ctx.fillText(`🎯 Goal:`, x + this.padding, currentY);
+          currentY += this.lineHeight;
+          ctx.fillStyle = '#FFEE99';
+          ctx.font = '11px monospace';
+          const wrappedGoal = this.wrapText(agent.personalGoal, this.panelWidth - this.padding * 2);
+          for (const line of wrappedGoal) {
+            ctx.fillText(line, x + this.padding + 10, currentY);
+            currentY += 14;
+          }
+          ctx.font = '12px monospace';
+        }
+
+        if (agent.mediumTermGoal) {
+          ctx.fillStyle = '#88CCFF'; // Light blue
+          ctx.fillText(`📅 Plan:`, x + this.padding, currentY);
+          currentY += this.lineHeight;
+          ctx.fillStyle = '#AADDFF';
+          ctx.font = '11px monospace';
+          const wrappedPlan = this.wrapText(agent.mediumTermGoal, this.panelWidth - this.padding * 2);
+          for (const line of wrappedPlan) {
+            ctx.fillText(line, x + this.padding + 10, currentY);
+            currentY += 14;
+          }
+          ctx.font = '12px monospace';
+        }
+
+        if (agent.groupGoal) {
+          ctx.fillStyle = '#FF88FF'; // Pink/purple
+          ctx.fillText(`👥 Team:`, x + this.padding, currentY);
+          currentY += this.lineHeight;
+          ctx.fillStyle = '#FFAAFF';
+          ctx.font = '11px monospace';
+          const wrappedTeam = this.wrapText(agent.groupGoal, this.panelWidth - this.padding * 2);
+          for (const line of wrappedTeam) {
+            ctx.fillText(line, x + this.padding + 10, currentY);
+            currentY += 14;
+          }
+          ctx.font = '12px monospace';
+        }
+
+        currentY += 5; // Extra spacing after goals
+      }
     }
 
     // Movement status
@@ -222,16 +274,8 @@ export class AgentInfoPanel {
       currentY += this.lineHeight + 5;
     }
 
-    // Circadian/Sleep section
-    const circadian = selectedEntity.components.get('circadian') as
-      | {
-          sleepDrive: number;
-          isSleeping: boolean;
-          preferredSleepTime: number;
-        }
-      | undefined;
-
-    if (circadian) {
+    // Recent Thought section
+    if (agent?.lastThought) {
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
       ctx.beginPath();
       ctx.moveTo(x + this.padding, currentY);
@@ -241,27 +285,31 @@ export class AgentInfoPanel {
 
       ctx.fillStyle = '#FFFFFF';
       ctx.font = 'bold 14px monospace';
-      ctx.fillText('Sleep', x + this.padding, currentY);
+      ctx.fillText('💭 Thinking', x + this.padding, currentY);
       currentY += this.lineHeight + 5;
 
-      // Sleep drive bar (with moon emoji)
-      ctx.font = '12px monospace';
-      currentY = this.renderNeedBar(ctx, x, currentY, '🌙 Sleepy', circadian.sleepDrive);
+      ctx.fillStyle = '#FFCC66'; // Amber color for thoughts
+      ctx.font = '11px monospace';
+      currentY = this.renderWrappedText(ctx, agent.lastThought, x, currentY, 3); // Max 3 lines
+    }
 
-      // Sleep status
-      if (circadian.isSleeping) {
-        ctx.fillStyle = '#87CEEB'; // Sky blue for sleeping
-        ctx.fillText('Status: SLEEPING Zzz', x + this.padding, currentY);
-        currentY += this.lineHeight;
-      } else {
-        const sleepTime = Math.floor(circadian.preferredSleepTime);
-        const sleepMinutes = Math.floor((circadian.preferredSleepTime - sleepTime) * 60);
-        ctx.fillStyle = '#888';
-        ctx.fillText(`Prefers: ${sleepTime.toString().padStart(2, '0')}:${sleepMinutes.toString().padStart(2, '0')}`, x + this.padding, currentY);
-        currentY += this.lineHeight;
-      }
+    // Recent Speech section
+    if (agent?.recentSpeech) {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.beginPath();
+      ctx.moveTo(x + this.padding, currentY);
+      ctx.lineTo(x + this.panelWidth - this.padding, currentY);
+      ctx.stroke();
+      currentY += 10;
 
-      currentY += 5;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 14px monospace';
+      ctx.fillText('💬 Said', x + this.padding, currentY);
+      currentY += this.lineHeight + 5;
+
+      ctx.fillStyle = '#AADDFF'; // Light blue for speech
+      ctx.font = '11px monospace';
+      currentY = this.renderWrappedText(ctx, `"${agent.recentSpeech}"`, x, currentY, 2); // Max 2 lines
     }
 
     // Inventory section
@@ -278,48 +326,48 @@ export class AgentInfoPanel {
       currentY = this.renderInventory(ctx, x, currentY, inventory);
     }
 
-    // Last Thought section
-    if (agent?.lastThought) {
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-      ctx.beginPath();
-      ctx.moveTo(x + this.padding, currentY);
-      ctx.lineTo(x + this.panelWidth - this.padding, currentY);
-      ctx.stroke();
-      currentY += 10;
+    // Last Thought section - Disabled to make room for inventory
+    // if (agent?.lastThought) {
+    //   ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+    //   ctx.beginPath();
+    //   ctx.moveTo(x + this.padding, currentY);
+    //   ctx.lineTo(x + this.panelWidth - this.padding, currentY);
+    //   ctx.stroke();
+    //   currentY += 10;
 
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = 'bold 14px monospace';
-      ctx.fillText('Last Thought', x + this.padding, currentY);
-      currentY += this.lineHeight + 5;
+    //   ctx.fillStyle = '#FFFFFF';
+    //   ctx.font = 'bold 14px monospace';
+    //   ctx.fillText('Last Thought', x + this.padding, currentY);
+    //   currentY += this.lineHeight + 5;
 
-      ctx.fillStyle = '#FFCC66'; // Amber color for thoughts
-      ctx.font = '11px monospace';
-      currentY = this.renderWrappedText(ctx, agent.lastThought, x, currentY, 3); // Max 3 lines
-    }
+    //   ctx.fillStyle = '#FFCC66'; // Amber color for thoughts
+    //   ctx.font = '11px monospace';
+    //   currentY = this.renderWrappedText(ctx, agent.lastThought, x, currentY, 3); // Max 3 lines
+    // }
 
-    // Speech History section
-    if (agent?.speechHistory && agent.speechHistory.length > 0) {
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-      ctx.beginPath();
-      ctx.moveTo(x + this.padding, currentY);
-      ctx.lineTo(x + this.panelWidth - this.padding, currentY);
-      ctx.stroke();
-      currentY += 10;
+    // Speech History section - Disabled to make room for inventory
+    // if (agent?.speechHistory && agent.speechHistory.length > 0) {
+    //   ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+    //   ctx.beginPath();
+    //   ctx.moveTo(x + this.padding, currentY);
+    //   ctx.lineTo(x + this.panelWidth - this.padding, currentY);
+    //   ctx.stroke();
+    //   currentY += 10;
 
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = 'bold 14px monospace';
-      ctx.fillText('Speech History', x + this.padding, currentY);
-      currentY += this.lineHeight + 5;
+    //   ctx.fillStyle = '#FFFFFF';
+    //   ctx.font = 'bold 14px monospace';
+    //   ctx.fillText('Speech History', x + this.padding, currentY);
+    //   currentY += this.lineHeight + 5;
 
-      // Show last 5 speech entries (most recent first)
-      const recentSpeech = agent.speechHistory.slice(-5).reverse();
-      ctx.font = '11px monospace';
+    //   // Show last 5 speech entries (most recent first)
+    //   const recentSpeech = agent.speechHistory.slice(-5).reverse();
+    //   ctx.font = '11px monospace';
 
-      for (const entry of recentSpeech) {
-        ctx.fillStyle = '#AAAAFF';
-        currentY = this.renderWrappedText(ctx, `"${entry.text}"`, x, currentY, 2); // Max 2 lines per entry
-      }
-    }
+    //   for (const entry of recentSpeech) {
+    //     ctx.fillStyle = '#AAAAFF';
+    //     currentY = this.renderWrappedText(ctx, `"${entry.text}"`, x, currentY, 2); // Max 2 lines per entry
+    //   }
+    // }
   }
 
   /**
@@ -374,9 +422,34 @@ export class AgentInfoPanel {
   }
 
   /**
-   * Get color for need bar based on value.
+   * Get color for need bar based on value and type.
+   * Energy uses blue (high) → red (low) per work order spec.
+   * Other needs use traditional traffic light colors.
    */
-  private getNeedBarColor(_needType: string, value: number): string {
+  private getNeedBarColor(needType: string, value: number): string {
+    // Energy uses blue (high) → red (low) gradient per sleep work order
+    if (needType === 'Energy') {
+      // Blue when high (70-100)
+      if (value >= 70) {
+        return '#00AAFF'; // Bright blue
+      }
+      // Cyan transitioning (50-70)
+      if (value >= 50) {
+        return '#00DDFF';
+      }
+      // Purple transition (30-50)
+      if (value >= 30) {
+        return '#AA66FF';
+      }
+      // Orange/Red when low (0-30)
+      if (value >= 15) {
+        return '#FF8800'; // Orange
+      }
+      // Red when critical (0-15)
+      return '#FF0000';
+    }
+
+    // Traditional traffic light colors for hunger, health, etc.
     // Critical (0-20): Red
     if (value < 20) {
       return '#FF0000';
@@ -527,7 +600,7 @@ export class AgentInfoPanel {
           const icon = this.getResourceIcon(resourceType);
           const label = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
           ctx.fillStyle = '#FFFFFF';
-          ctx.fillText(`${icon} ${label}: ${count}`, panelX + this.padding, y);
+          ctx.fillText(`${icon} ${label}: ${Math.round(count)}`, panelX + this.padding, y);
           y += this.lineHeight;
         }
       }
@@ -553,7 +626,7 @@ export class AgentInfoPanel {
     // Display capacity
     ctx.font = '11px monospace';
     ctx.fillStyle = capacityColor;
-    const capacityText = `Weight: ${inventory.currentWeight}/${inventory.maxWeight}  Slots: ${usedSlots}/${inventory.maxSlots}`;
+    const capacityText = `Weight: ${Math.round(inventory.currentWeight)}/${inventory.maxWeight}  Slots: ${usedSlots}/${inventory.maxSlots}`;
     ctx.fillText(capacityText, panelX + this.padding, y);
     y += this.lineHeight + 5;
 
@@ -614,5 +687,32 @@ export class AgentInfoPanel {
     }
 
     return y;
+  }
+
+  /**
+   * Wrap text to fit within maxWidth, returning array of lines
+   */
+  private wrapText(text: string, maxWidth: number): string[] {
+    const words = text.split(' ');
+    const lines: string[] = [];
+    let currentLine = '';
+
+    for (const word of words) {
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+
+      // Simple character-based approximation (each char ~7px in 11px monospace)
+      if (testLine.length * 7 > maxWidth && currentLine) {
+        lines.push(currentLine);
+        currentLine = word;
+      } else {
+        currentLine = testLine;
+      }
+    }
+
+    if (currentLine) {
+      lines.push(currentLine);
+    }
+
+    return lines;
   }
 }

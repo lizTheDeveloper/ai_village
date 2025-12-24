@@ -1360,6 +1360,84 @@ Queen/cerebrate memory:
   - Must have succession planning for knowledge transfer
 ```
 
+#### Hive Mind Goal Coordination
+
+> **Implementation Status:** Goal system foundation implemented (December 2025). Per-agent views of group goals ready. Hive mind shared goals and hierarchical goal propagation deferred to future phases.
+
+Hive minds and hierarchical structures have special interactions with the goal system:
+
+```typescript
+interface AgentGoals {
+  personalGoal?: string;      // Individual agent's short-term goal
+  mediumTermGoal?: string;    // Individual agent's medium-term plan
+  groupGoal?: string;          // Agent's view of team objective
+}
+
+// Future: Hive Mind Goal Sharing
+interface HiveGoals {
+  hiveId: string;
+  strategicGoal: string;       // Hive-level objective set by queen/cerebrate
+
+  // All workers share the same group goal (synchronized)
+  sharedGroupGoal: string;
+
+  // Workers can still have individual task goals
+  workerGoals: Map<string, {
+    personalGoal: string;      // Current task
+    mediumTermGoal?: never;    // Workers don't plan ahead
+  }>;
+}
+
+// Future: Hierarchical Goal Propagation
+interface HierarchicalGoals {
+  // Leaders can set group goals for subordinates
+  leaderSetsGroupGoal(leaderId: string, goal: string): void;
+
+  // Subordinates inherit group goal from their leader
+  inheritGroupGoal(subordinateId: string, leaderId: string): void;
+
+  // Goal authority based on leadership hierarchy
+  canSetGroupGoal(agentId: string, targetId: string): boolean;
+}
+```
+
+**Current Implementation (Phase 1):**
+- Each agent has independent personal, medium-term, and group goals
+- Group goals are per-agent *views* (not synchronized)
+- Agents can set their own group goal via `set_group_goal` action
+- Goals visible in agent HUD with color coding:
+  - 🎯 Personal Goal (gold)
+  - 📅 Medium-term Plan (blue)
+  - 👥 Group/Team Goal (pink/purple)
+
+**Future Hive Mind Integration:**
+```
+WHEN queen/cerebrate sets strategic goal
+THEN:
+  1. Strategic goal propagates to all workers' groupGoal field
+  2. Workers automatically align personal goals toward group objective
+  3. Workers cannot override group goal (read-only for them)
+  4. Only queen/cerebrate can modify hive's group goal
+
+WHEN pack member sets group goal
+THEN:
+  1. ALL pack bodies receive the same group goal (shared consciousness)
+  2. Any pack body can update it (they're all one mind)
+  3. Pack split = both new packs inherit goal but can diverge
+
+WHEN hierarchical leader sets group goal
+THEN:
+  1. Direct subordinates inherit leader's group goal
+  2. Subordinates can have different personal/medium goals
+  3. Leadership trait determines who can set group goals for others
+```
+
+**Goal Visibility & Coordination:**
+- Goals displayed in agent info panel (always visible)
+- LLM context includes current goals for decision-making
+- Future: Goals visible to nearby agents for coordination
+- Future: Meeting system can synchronize group goals across participants
+
 ### Symbiont Inherited Memory
 
 Symbionts carry memories across hosts:
