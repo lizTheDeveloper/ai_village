@@ -8,7 +8,8 @@
 # 3. Implementation Agent - Builds feature
 # 4. Test Agent - Verifies tests pass
 # 5. Playtest Agent - UI testing
-# 6. Loop until approved
+# 6. Commit Agent - Creates git commit and documentation
+# 7. Loop until approved
 #
 # Usage:
 #   ./orchestrator.sh                    # Process next available feature
@@ -347,6 +348,46 @@ REMEMBER: You cannot read code files. Only test via the browser."
     run_agent "playtest-agent" "$PROMPT_DIR/playtest-agent.md" "$context"
 }
 
+run_commit_agent() {
+    header "PHASE 6: COMMIT AGENT"
+
+    local work_order="$WORK_ORDER_DIR/$FEATURE_NAME/work-order.md"
+    local playtest_report="$WORK_ORDER_DIR/$FEATURE_NAME/playtest-report.md"
+
+    if [[ ! -f "$work_order" ]]; then
+        error "Work order not found: $work_order"
+        return 1
+    fi
+
+    if [[ ! -f "$playtest_report" ]]; then
+        error "Playtest report not found: $playtest_report"
+        return 1
+    fi
+
+    local context="Work Order:
+
+$(cat "$work_order")
+
+---
+
+Playtest Report:
+
+$(cat "$playtest_report")
+
+---
+
+Your task: Create a git commit for this feature.
+- Review all changes with git status and git diff
+- Create a comprehensive commit message
+- Include test results summary
+- Document the completion
+- Verify the commit was successful
+
+Feature name: $FEATURE_NAME"
+
+    run_agent "commit-agent" "$PROMPT_DIR/commit-agent.md" "$context"
+}
+
 # =============================================================================
 # State Management
 # =============================================================================
@@ -518,8 +559,7 @@ run_pipeline() {
 
             case "$verdict" in
                 "APPROVED")
-                    set_feature_state "READY_FOR_REVIEW"
-                    break
+                    set_feature_state "COMMIT"
                     ;;
                 "NEEDS_WORK")
                     set_feature_state "IMPL"
@@ -532,6 +572,21 @@ run_pipeline() {
                     continue
                     ;;
             esac
+        fi
+
+        # Phase 6: Commit Agent
+        state=$(get_feature_state)
+        if [[ "$state" == "COMMIT" ]]; then
+            log "Running commit agent..."
+
+            if ! run_commit_agent; then
+                warn "Commit agent failed, will retry..."
+                continue
+            fi
+
+            # Mark as ready for review after successful commit
+            set_feature_state "READY_FOR_REVIEW"
+            break
         fi
 
         # Check for completion
