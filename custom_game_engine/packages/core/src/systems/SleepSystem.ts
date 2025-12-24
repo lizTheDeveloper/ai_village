@@ -3,10 +3,42 @@ import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
-import { CircadianComponent } from '../components/CircadianComponent.js';
+import { CircadianComponent, type DreamContent } from '../components/CircadianComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { TimeComponent } from './TimeSystem.js';
+import type { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
+
+/**
+ * Weird/surreal elements that can appear in dreams
+ */
+const WEIRD_DREAM_ELEMENTS = [
+  'everything was made of water',
+  'the sky was underground',
+  'trees were walking and talking',
+  'time was flowing backwards',
+  'gravity kept reversing',
+  'everyone had multiple faces',
+  'the ground was transparent like glass',
+  'colors were sounds and sounds were colors',
+  'buildings were breathing',
+  'the moon was following you',
+  'your hands kept multiplying',
+  'words were floating in the air like butterflies',
+  'everything was upside down but felt normal',
+  'you could see through walls',
+  'the sun was cold and ice was hot',
+  'shadows moved independently',
+  'you were simultaneously in multiple places',
+  'objects kept transforming into other things',
+  'you could taste emotions',
+  'the world was in black and white except for one color',
+  'you were tiny like an ant',
+  'you were giant and everything else was tiny',
+  'you were swimming through the air',
+  'everyone was speaking in reverse',
+  'you had wings but couldn\'t fly',
+];
 
 /**
  * SleepSystem manages agent sleep behavior, energy recovery, and circadian rhythms
@@ -49,20 +81,24 @@ export class SleepSystem implements System {
       let newSleepDrive = circadian.sleepDrive;
 
       if (circadian.isSleeping) {
-        // Decrease while sleeping (-10 per hour, reduced from -15 to allow longer sleep)
-        newSleepDrive = Math.max(0, circadian.sleepDrive - 10 * hoursElapsed);
+        // Decrease while sleeping - targeting 6 hours to deplete from 100 to 0
+        // Rate: -17/hour (100 / 17 = ~5.9 hours)
+        newSleepDrive = Math.max(0, circadian.sleepDrive - 17 * hoursElapsed);
       } else {
-        // Increase while awake
-        let increment = 2 * hoursElapsed; // Base rate (+2 per hour)
+        // Increase while awake - targeting 18 hours to reach 95% threshold
+        // Base rate: 5.5/hour (95 / 5.5 = ~17.3 hours)
+        let increment = 5.5 * hoursElapsed;
 
-        // Increase faster at night (after preferred sleep time)
+        // Faster accumulation at night (biological circadian pressure)
         if (timeOfDay >= circadian.preferredSleepTime || timeOfDay < 5) {
-          increment = 5 * hoursElapsed; // +5 per hour at night
+          increment *= 1.2; // 20% faster at night (6.6/hour)
         }
 
         // Modified by energy level (low energy = higher sleep drive)
         if (needs.energy < 30) {
-          increment *= 1.5; // 50% faster when tired
+          increment *= 1.5; // 50% faster when tired (8.25/hour base, 9.9/hour at night)
+        } else if (needs.energy < 50) {
+          increment *= 1.25; // 25% faster when moderately tired
         }
 
         newSleepDrive = Math.min(100, circadian.sleepDrive + increment);
@@ -119,6 +155,12 @@ export class SleepSystem implements System {
         ...current,
         sleepQuality: updatedQuality,
       }));
+    }
+
+    // Generate dream during REM sleep (after 2+ hours, once per sleep)
+    const sleepDurationHours = (circadian as any).sleepDurationHours || 0;
+    if (!circadian.hasDreamedThisSleep && sleepDurationHours >= 2) {
+      this.generateDream(entity, circadian, world);
     }
 
     // Check wake conditions
@@ -241,13 +283,109 @@ export class SleepSystem implements System {
       }));
     }
 
-    // Emit wake event
+    // Emit wake event with dream if present
+    const dreamData: any = {
+      entityId: entity.id,
+      sleepDuration: hoursAsleep,
+    };
+
+    if (circadian.lastDream) {
+      dreamData.dream = circadian.lastDream;
+    }
+
     world.eventBus.emit({
       type: 'agent:woke',
       source: entity.id,
+      data: dreamData,
+    });
+  }
+
+  /**
+   * Generate a dream based on memories and emotions
+   */
+  private generateDream(
+    entity: EntityImpl,
+    _circadian: CircadianComponent,
+    world: World
+  ): void {
+    const memComp = entity.getComponent<EpisodicMemoryComponent>('episodic_memory');
+    const memoryElements: string[] = [];
+
+    if (memComp && memComp.episodicMemories.length > 0) {
+      // Get recent and emotional memories (last 10, sorted by recency and emotion)
+      const memories = [...memComp.episodicMemories]
+        .sort((a: any, b: any) => {
+          const aScore = (world.tick - a.timestamp) / 1000 + a.emotionalIntensity * 500;
+          const bScore = (world.tick - b.timestamp) / 1000 + b.emotionalIntensity * 500;
+          return bScore - aScore; // Higher score = more recent or emotional
+        })
+        .slice(0, 10);
+
+      // Extract 2-4 memory elements from summaries
+      const numElements = Math.min(memories.length, 2 + Math.floor(Math.random() * 3));
+      for (let i = 0; i < numElements; i++) {
+        const memory = memories[i];
+        if (memory && memory.summary) {
+          memoryElements.push(memory.summary);
+        }
+      }
+    }
+
+    // Pick a random weird element
+    const weirdElementIndex = Math.floor(Math.random() * WEIRD_DREAM_ELEMENTS.length);
+    const weirdElement = WEIRD_DREAM_ELEMENTS[weirdElementIndex];
+    if (!weirdElement) {
+      throw new Error('Failed to select weird dream element');
+    }
+
+    // Construct dream narrative
+    let dreamNarrative = 'You had a strange dream. ';
+
+    if (memoryElements.length > 0) {
+      dreamNarrative += memoryElements.join(', and then ');
+      dreamNarrative += ', but ' + weirdElement + '.';
+    } else {
+      dreamNarrative += 'You were wandering around, but ' + weirdElement + '.';
+    }
+
+    // Generate simple interpretation
+    const interpretations = [
+      'I wonder what that dream meant...',
+      'That was a weird dream. Maybe it means something?',
+      'Strange dream. I should think about what it could mean.',
+      'What an odd dream. I\'m not sure what to make of it.',
+      'That dream felt significant somehow.',
+      'I had the strangest dream last night.',
+      'I keep thinking about that bizarre dream.',
+    ];
+
+    const interpretationIndex = Math.floor(Math.random() * interpretations.length);
+    const interpretation = interpretations[interpretationIndex];
+    if (!interpretation) {
+      throw new Error('Failed to generate dream interpretation');
+    }
+
+    const dream: DreamContent = {
+      memoryElements,
+      weirdElement,
+      dreamNarrative,
+      interpretation: interpretation,
+    };
+
+    // Update circadian with dream
+    entity.updateComponent('circadian', (current: any) => ({
+      ...current,
+      lastDream: dream,
+      hasDreamedThisSleep: true,
+    }));
+
+    // Emit dream event
+    world.eventBus.emit({
+      type: 'agent:dreamed',
+      source: entity.id,
       data: {
         entityId: entity.id,
-        sleepDuration: hoursAsleep,
+        dream,
       },
     });
   }
