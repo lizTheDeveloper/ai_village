@@ -15,49 +15,70 @@ export const GRASS: PlantSpecies = {
     {
       from: 'seed',
       to: 'germinating',
-      baseDuration: 1,
+      baseDuration: 0.25, // 6 hours for testing
       conditions: { minHydration: 20, minTemperature: 5 },
       onTransition: [{ type: 'become_visible' }]
     },
     {
       from: 'germinating',
       to: 'sprout',
-      baseDuration: 2,
+      baseDuration: 0.5, // 12 hours
       conditions: { minHydration: 15 },
       onTransition: []
     },
     {
       from: 'sprout',
       to: 'vegetative',
-      baseDuration: 3,
+      baseDuration: 0.75, // 18 hours
       conditions: { minHydration: 15 },
       onTransition: []
     },
     {
       from: 'vegetative',
-      to: 'mature',
-      baseDuration: 5,
+      to: 'flowering',
+      baseDuration: 0.5, // 12 hours
       conditions: { minHydration: 15 },
-      onTransition: [{ type: 'produce_seeds' }]
+      onTransition: [{ type: 'spawn_flowers', params: { count: '2-4' } }]
+    },
+    {
+      from: 'flowering',
+      to: 'fruiting',
+      baseDuration: 0.25, // 6 hours (grass doesn't really fruit, but keep lifecycle complete)
+      conditions: {},
+      onTransition: [{ type: 'flowers_become_fruit' }]
+    },
+    {
+      from: 'fruiting',
+      to: 'mature',
+      baseDuration: 0.5, // 12 hours
+      conditions: {},
+      onTransition: [{ type: 'fruit_ripens' }, { type: 'produce_seeds' }]
     },
     {
       from: 'mature',
       to: 'seeding',
-      baseDuration: 3,
+      baseDuration: 0.5, // 12 hours
       conditions: {},
       onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 3 } }]
     },
     {
       from: 'seeding',
+      to: 'senescence',
+      baseDuration: 0.5, // 12 hours
+      conditions: {},
+      onTransition: []
+    },
+    {
+      from: 'senescence',
       to: 'decay',
-      baseDuration: 2,
+      baseDuration: 0.25, // 6 hours
       conditions: {},
       onTransition: [{ type: 'return_nutrients_to_soil' }]
     },
     {
       from: 'decay',
       to: 'dead',
-      baseDuration: 1,
+      baseDuration: 0.25, // 6 hours
       conditions: {},
       onTransition: [{ type: 'remove_plant' }]
     }
@@ -106,70 +127,70 @@ export const WILDFLOWER: PlantSpecies = {
     {
       from: 'seed',
       to: 'germinating',
-      baseDuration: 2,
+      baseDuration: 0.5, // 12 hours for testing
       conditions: { minHydration: 25, minTemperature: 8, minNutrition: 15 },
       onTransition: [{ type: 'become_visible' }]
     },
     {
       from: 'germinating',
       to: 'sprout',
-      baseDuration: 3,
+      baseDuration: 0.75, // 18 hours
       conditions: { minHydration: 20 },
       onTransition: []
     },
     {
       from: 'sprout',
       to: 'vegetative',
-      baseDuration: 5,
+      baseDuration: 1, // 1 day
       conditions: { minHydration: 20, minNutrition: 20 },
       onTransition: []
     },
     {
       from: 'vegetative',
       to: 'flowering',
-      baseDuration: 7,
+      baseDuration: 1.5, // 1.5 days
       conditions: { minHydration: 25, minNutrition: 25 },
       onTransition: [{ type: 'spawn_flowers', params: { count: '3-6' } }]
     },
     {
       from: 'flowering',
       to: 'fruiting',
-      baseDuration: 4,
+      baseDuration: 1, // 1 day
       conditions: { minHydration: 20 },
       onTransition: [{ type: 'flowers_become_fruit' }]
     },
     {
       from: 'fruiting',
       to: 'mature',
-      baseDuration: 5,
+      baseDuration: 1, // 1 day
       conditions: {},
       onTransition: [{ type: 'fruit_ripens' }, { type: 'produce_seeds' }]
     },
     {
       from: 'mature',
       to: 'seeding',
-      baseDuration: 4,
+      baseDuration: 1, // 1 day
       conditions: {},
       onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 2 } }]
     },
     {
       from: 'seeding',
       to: 'senescence',
-      baseDuration: 3,
+      baseDuration: 0.75, // 18 hours
       conditions: {},
       onTransition: []
     },
     {
       from: 'senescence',
       to: 'decay',
-      baseDuration: 2,
+      baseDuration: 0.5, // 12 hours
       conditions: {},
       onTransition: [{ type: 'return_nutrients_to_soil' }]
     },
     {
       from: 'decay',
       to: 'dead',
-      baseDuration: 1,
+      baseDuration: 0.25, // 6 hours
       conditions: {},
       onTransition: [{ type: 'remove_plant' }]
     }
@@ -220,51 +241,79 @@ export const BERRY_BUSH: PlantSpecies = {
     {
       from: 'seed',
       to: 'germinating',
-      baseDuration: 3,
+      baseDuration: 0.75, // 18 hours for testing
       conditions: { minHydration: 30, minTemperature: 10, minNutrition: 25 },
       onTransition: [{ type: 'become_visible' }]
     },
     {
       from: 'germinating',
       to: 'sprout',
-      baseDuration: 5,
+      baseDuration: 1, // 1 day
       conditions: { minHydration: 25 },
       onTransition: []
     },
     {
       from: 'sprout',
       to: 'vegetative',
-      baseDuration: 14,
+      baseDuration: 2, // 2 days
       conditions: { minHydration: 25, minNutrition: 30 },
       onTransition: []
     },
     {
       from: 'vegetative',
       to: 'flowering',
-      baseDuration: 10,
+      baseDuration: 2, // 2 days
       conditions: { minHydration: 30, minNutrition: 35 },
       onTransition: [{ type: 'spawn_flowers', params: { count: '6-12' } }]
     },
     {
       from: 'flowering',
       to: 'fruiting',
-      baseDuration: 7,
+      baseDuration: 1.5, // 1.5 days
       conditions: { minHydration: 25 },
       onTransition: [{ type: 'flowers_become_fruit' }]
     },
     {
       from: 'fruiting',
       to: 'mature',
-      baseDuration: 10,
+      baseDuration: 2, // 2 days
       conditions: { minHydration: 25 },
       onTransition: [{ type: 'fruit_ripens' }, { type: 'produce_seeds' }]
     },
     {
       from: 'mature',
+      to: 'seeding',
+      baseDuration: 1, // 1 day
+      conditions: {},
+      onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 2 } }]
+    },
+    {
+      from: 'seeding',
       to: 'vegetative',
-      baseDuration: 7,
+      baseDuration: 1.5, // 1.5 days (perennial cycle back)
+      conditions: { minHealth: 50 }, // Only if healthy enough
+      onTransition: []
+    },
+    {
+      from: 'seeding',
+      to: 'senescence',
+      baseDuration: 2, // 2 days (if health < 50, plant starts dying)
       conditions: {},
       onTransition: []
+    },
+    {
+      from: 'senescence',
+      to: 'decay',
+      baseDuration: 1, // 1 day
+      conditions: {},
+      onTransition: [{ type: 'return_nutrients_to_soil' }]
+    },
+    {
+      from: 'decay',
+      to: 'dead',
+      baseDuration: 0.5, // 12 hours
+      conditions: {},
+      onTransition: [{ type: 'remove_plant' }]
     }
   ],
 

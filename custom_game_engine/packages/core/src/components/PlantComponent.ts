@@ -142,10 +142,11 @@ export class PlantComponent extends ComponentBase {
     this.age = data.age ?? 0;
     this.generation = data.generation ?? 0;
 
-    // Health values with defaults
-    this._health = data.health ?? 100;
-    this._hydration = data.hydration ?? 100;
-    this._nutrition = data.nutrition ?? 100;
+    // Health values with more realistic defaults
+    // Plants start slightly dehydrated to make health decay observable
+    this._health = data.health ?? 85;
+    this._hydration = data.hydration ?? 50;  // Half-full, needs watering
+    this._nutrition = data.nutrition ?? 70;  // Good soil
 
     // Reproduction
     this.flowerCount = data.flowerCount ?? 0;

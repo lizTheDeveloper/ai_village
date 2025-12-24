@@ -1,0 +1,1680 @@
+
+> @ai-village/game-engine@0.1.0 test
+> vitest run TillAction.test.ts TillingAction.test.ts
+
+
+ RUN  v1.6.1 /Users/annhoward/src/ai_village/custom_game_engine
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Basic Tilling Success > should change grass tile to dirt terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 0.00 → 75.39
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '75.39', phosphorus: '60.31', potassium: '67.85' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 75.38869444900443,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Basic Tilling Success > should set tilled flag to true
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 0.00 → 76.69
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '76.69', phosphorus: '61.35', potassium: '69.02' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 76.68556244339312,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Basic Tilling Success > should set plantability counter to 3
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 0.00 → 72.55
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '72.55', phosphorus: '58.04', potassium: '65.30' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 72.55189584338623,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Basic Tilling Success > should set fertility based on biome
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 0.00 → 74.93
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '74.93', phosphorus: '59.95', potassium: '67.44' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 74.93466207817862,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Basic Tilling Success > should initialize nutrients (N, P, K) based on fertility
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 0.00 → 76.09
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '76.09', phosphorus: '60.87', potassium: '68.48' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 76.08583288638025,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Valid Terrain Tilling > should allow tilling grass terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 0.00 → 78.42
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '78.42', phosphorus: '62.74', potassium: '70.58' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 78.42147135192754,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Valid Terrain Tilling > should allow tilling dirt terrain (re-tilling)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: true,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 78.57
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '78.57', phosphorus: '62.86', potassium: '70.71' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 78.56897305244843,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Invalid Terrain Rejection > should throw error when tilling stone terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'stone',
+  tilled: false,
+  biome: 'mountains',
+  fertility: 0,
+  moisture: 0,
+  plantability: 0
+}
+
+stderr | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Invalid Terrain Rejection > should throw error when tilling stone terrain
+[SoilSystem] ❌ ERROR: Cannot till stone terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Invalid Terrain Rejection > should throw error when tilling water terrain
+[SoilSystem] ===== TILLING TILE AT (3, 8) =====
+[SoilSystem] Current tile state: {
+  terrain: 'water',
+  tilled: false,
+  biome: 'river',
+  fertility: 0,
+  moisture: 100,
+  plantability: 0
+}
+
+stderr | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Invalid Terrain Rejection > should throw error when tilling water terrain
+[SoilSystem] ❌ ERROR: Cannot till water terrain at (3,8). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Invalid Terrain Rejection > should throw error when tilling sand terrain
+[SoilSystem] ===== TILLING TILE AT (10, 10) =====
+[SoilSystem] Current tile state: {
+  terrain: 'sand',
+  tilled: false,
+  biome: 'desert',
+  fertility: 20,
+  moisture: 10,
+  plantability: 0
+}
+
+stderr | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Invalid Terrain Rejection > should throw error when tilling sand terrain
+[SoilSystem] ❌ ERROR: Cannot till sand terrain at (10,10). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Invalid Terrain Rejection > should NOT modify tile state on invalid terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'stone',
+  tilled: false,
+  biome: 'mountains',
+  fertility: 0,
+  moisture: 0,
+  plantability: 0
+}
+
+stderr | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Invalid Terrain Rejection > should NOT modify tile state on invalid terrain
+[SoilSystem] ❌ ERROR: Cannot till stone terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > EventBus Integration > should emit soil:tilled event when tilling succeeds
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 0.00 → 71.52
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '71.52', phosphorus: '57.21', potassium: '64.37' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 71.51853461787505,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > EventBus Integration > should include position in soil:tilled event
+[SoilSystem] ===== TILLING TILE AT (15, 20) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'forest',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'forest': 0.00 → 62.32
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '62.32', phosphorus: '49.85', potassium: '56.09' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 15, y: 20 },
+    fertility: 62.317626210114284,
+    biome: 'forest'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > EventBus Integration > should include fertility in soil:tilled event
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 0.00 → 78.07
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '78.07', phosphorus: '62.45', potassium: '70.26' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 78.06671240849218,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > EventBus Integration > should include biome in soil:tilled event
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'river',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'river': 0.00 → 82.31
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '82.31', phosphorus: '65.84', potassium: '74.08' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 82.3056999538689,
+    biome: 'river'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > EventBus Integration > should NOT emit soil:tilled event on invalid terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'stone',
+  tilled: false,
+  biome: 'mountains',
+  fertility: 0,
+  moisture: 0,
+  plantability: 0
+}
+
+stderr | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > EventBus Integration > should NOT emit soil:tilled event on invalid terrain
+[SoilSystem] ❌ ERROR: Cannot till stone terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Biome-Specific Fertility > should set plains fertility to ~70-80
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 0.00 → 72.39
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '72.39', phosphorus: '57.91', potassium: '65.15' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 72.39256892694195,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Biome-Specific Fertility > should set forest fertility to ~60-70
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'forest',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'forest': 0.00 → 64.64
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '64.64', phosphorus: '51.71', potassium: '58.17' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 64.63887446080228,
+    biome: 'forest'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Biome-Specific Fertility > should set river fertility to ~75-85
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'river',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'river': 0.00 → 81.80
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '81.80', phosphorus: '65.44', potassium: '73.62' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 81.80269467572809,
+    biome: 'river'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Biome-Specific Fertility > should set desert fertility to ~20-30
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'desert',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'desert': 0.00 → 22.74
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '22.74', phosphorus: '18.19', potassium: '20.47' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 22.739622140170418,
+    biome: 'desert'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Biome-Specific Fertility > should set mountains fertility to ~40-50
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'mountains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'mountains': 0.00 → 40.90
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '40.90', phosphorus: '32.72', potassium: '36.81' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 40.9044814069727,
+    biome: 'mountains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Biome-Specific Fertility > should set ocean fertility to 0 (not farmable)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'ocean',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'ocean': 0.00 → 0.00
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '0.00', phosphorus: '0.00', potassium: '0.00' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: { position: { x: 5, y: 5 }, fertility: 0, biome: 'ocean' }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Biome-Specific Fertility > should use default fertility (50) for undefined biome
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: undefined,
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'undefined': 0.00 → 50.00
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '50.00', phosphorus: '40.00', potassium: '45.00' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: { position: { x: 5, y: 5 }, fertility: 50, biome: undefined }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Re-tilling Behavior > should allow re-tilling already tilled depleted dirt
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: true,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 74.81
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '74.81', phosphorus: '59.85', potassium: '67.33' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 74.80627198732137,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Re-tilling Behavior > should reset plantability counter to 3 on re-till
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: true,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 73.22
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '73.22', phosphorus: '58.58', potassium: '65.90' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 73.22059064346332,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+ ✓ packages/core/src/actions/__tests__/TillAction.test.ts  (48 tests | 8 skipped) 11ms
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Re-tilling Behavior > should refresh fertility on re-till
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: true,
+  biome: 'plains',
+  fertility: 20,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 20.00 → 79.30
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '79.30', phosphorus: '63.44', potassium: '71.37' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 79.30364940003336,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Re-tilling Behavior > should emit tilling event on re-till
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: true,
+  biome: 'plains',
+  fertility: 20,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 20.00 → 76.58
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '76.58', phosphorus: '61.27', potassium: '68.93' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 76.58334980178394,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Error Handling - CLAUDE.md Compliance > should throw clear error for invalid terrain type
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'stone',
+  tilled: false,
+  biome: 'mountains',
+  fertility: 0,
+  moisture: 0,
+  plantability: 0
+}
+
+stderr | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Error Handling - CLAUDE.md Compliance > should throw clear error for invalid terrain type
+[SoilSystem] ❌ ERROR: Cannot till stone terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Error Handling - CLAUDE.md Compliance > should include position in error message
+[SoilSystem] ===== TILLING TILE AT (15, 20) =====
+[SoilSystem] Current tile state: {
+  terrain: 'water',
+  tilled: false,
+  biome: 'river',
+  fertility: 0,
+  moisture: 100,
+  plantability: 0
+}
+
+stderr | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Error Handling - CLAUDE.md Compliance > should include position in error message
+[SoilSystem] ❌ ERROR: Cannot till water terrain at (15,20). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Error Handling - CLAUDE.md Compliance > should include terrain type in error message
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'sand',
+  tilled: false,
+  biome: 'desert',
+  fertility: 0,
+  moisture: 10,
+  plantability: 0
+}
+
+stderr | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Error Handling - CLAUDE.md Compliance > should include terrain type in error message
+[SoilSystem] ❌ ERROR: Cannot till sand terrain at (5,5). Only grass and dirt can be tilled.
+
+ ✓ packages/core/src/systems/__tests__/TillingAction.test.ts  (55 tests) 13ms
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 2: Basic Tilling Success > should change terrain from grass to dirt when tilled
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 73.46
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '73.46', phosphorus: '58.77', potassium: '66.11' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 73.45866870491956,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 2: Basic Tilling Success > should set tilled flag to true
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 70.26
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '70.26', phosphorus: '56.21', potassium: '63.23' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 70.25712854135854,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 2: Basic Tilling Success > should set plantability counter to 3
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 70.68
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '70.68', phosphorus: '56.55', potassium: '63.61' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 70.6818798902406,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 2: Basic Tilling Success > should set fertility based on biome
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 70.28
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '70.28', phosphorus: '56.22', potassium: '63.25' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 70.27989156914582,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 2: Basic Tilling Success > should initialize nutrients (N, P, K)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 78.15
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '78.15', phosphorus: '62.52', potassium: '70.33' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 78.14826819476352,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 3: Tilling Validation - Valid Terrain > should successfully till grass terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 76.71
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '76.71', phosphorus: '61.37', potassium: '69.04' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 76.71022830753805,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 3: Tilling Validation - Valid Terrain > should successfully till dirt terrain (re-tilling)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 77.92
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '77.92', phosphorus: '62.34', potassium: '70.13' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 77.9243262929364,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should throw error when attempting to till stone terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'stone',
+  tilled: false,
+  biome: 'mountains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+
+stderr | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should throw error when attempting to till stone terrain
+[SoilSystem] ❌ ERROR: Cannot till stone terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should throw error when attempting to till water terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'water',
+  tilled: false,
+  biome: 'river',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+
+stderr | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should throw error when attempting to till water terrain
+[SoilSystem] ❌ ERROR: Cannot till water terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should throw error when attempting to till sand terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'sand',
+  tilled: false,
+  biome: 'desert',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+
+stderr | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should throw error when attempting to till sand terrain
+[SoilSystem] ❌ ERROR: Cannot till sand terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should NOT modify tile state when validation fails
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'stone',
+  tilled: false,
+  biome: 'mountains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+
+stderr | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should NOT modify tile state when validation fails
+[SoilSystem] ❌ ERROR: Cannot till stone terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should NOT emit tilling event when validation fails
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'water',
+  tilled: false,
+  biome: 'river',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+
+stderr | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should NOT emit tilling event when validation fails
+[SoilSystem] ❌ ERROR: Cannot till water terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 6: SoilSystem Integration > should call SoilSystem.tillTile with correct parameters
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 78.44
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '78.44', phosphorus: '62.75', potassium: '70.59' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 78.43717541038276,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 6: SoilSystem Integration > should use existing fertility calculation logic
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 71.46
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '71.46', phosphorus: '57.17', potassium: '64.31' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 71.45701553872178,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 6: SoilSystem Integration > should initialize nutrients based on fertility
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 71.37
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '71.37', phosphorus: '57.10', potassium: '64.23' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 71.37168624286346,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 7: EventBus Integration > should emit soil:tilled event when tilling succeeds
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 71.72
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '71.72', phosphorus: '57.37', potassium: '64.55' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 71.71703836715115,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 7: EventBus Integration > should emit soil:tilled event with position data
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 71.70
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '71.70', phosphorus: '57.36', potassium: '64.53' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 71.69736997970786,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 7: EventBus Integration > should emit soil:tilled event with fertility data
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 71.11
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '71.11', phosphorus: '56.89', potassium: '64.00' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 71.11172927985524,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 7: EventBus Integration > should emit soil:tilled event with biome data
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 70.17
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '70.17', phosphorus: '56.13', potassium: '63.15' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 70.16719961193186,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 8: Fertility by Biome > should set fertility 70-80 for plains biome
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 70.43
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '70.43', phosphorus: '56.34', potassium: '63.39' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 70.42917379554129,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 8: Fertility by Biome > should set fertility 60-70 for forest biome
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'forest',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'forest': 50.00 → 68.75
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '68.75', phosphorus: '55.00', potassium: '61.87' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 68.74845721436066,
+    biome: 'forest'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 8: Fertility by Biome > should set fertility 75-85 for river biome
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'river',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'river': 50.00 → 80.87
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '80.87', phosphorus: '64.69', potassium: '72.78' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 80.86725623919034,
+    biome: 'river'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 8: Fertility by Biome > should set fertility 20-30 for desert biome
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'desert',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'desert': 50.00 → 21.10
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '21.10', phosphorus: '16.88', potassium: '18.99' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 21.10399524458027,
+    biome: 'desert'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 8: Fertility by Biome > should set fertility 40-50 for mountains biome
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'mountains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'mountains': 50.00 → 44.61
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '44.61', phosphorus: '35.69', potassium: '40.15' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 44.609022138418545,
+    biome: 'mountains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 8: Fertility by Biome > should set fertility 0 for ocean biome (not tillable)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'ocean',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'ocean': 50.00 → 0.00
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '0.00', phosphorus: '0.00', potassium: '0.00' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: { position: { x: 5, y: 5 }, fertility: 0, biome: 'ocean' }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 11: CLAUDE.md Compliance - No Silent Fallbacks > should throw when tile is null/undefined
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 11: CLAUDE.md Compliance - No Silent Fallbacks > should throw when position is invalid
+[SoilSystem] ===== TILLING TILE AT (NaN, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+
+stderr | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 11: CLAUDE.md Compliance - No Silent Fallbacks > should throw when position is invalid
+[SoilSystem] ❌ ERROR: tillTile requires valid position coordinates, got (NaN,5)
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 11: CLAUDE.md Compliance - No Silent Fallbacks > should throw clear error message for invalid terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'stone',
+  tilled: false,
+  biome: 'mountains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+
+stderr | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 11: CLAUDE.md Compliance - No Silent Fallbacks > should throw clear error message for invalid terrain
+[SoilSystem] ❌ ERROR: Cannot till stone terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 11: CLAUDE.md Compliance - No Silent Fallbacks > should NOT use fallback fertility values
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 72.87
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '72.87', phosphorus: '58.29', potassium: '65.58' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 72.86808148410258,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 11: CLAUDE.md Compliance - No Silent Fallbacks > should NOT catch and swallow errors
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'water',
+  tilled: false,
+  biome: 'river',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+
+stderr | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 11: CLAUDE.md Compliance - No Silent Fallbacks > should NOT catch and swallow errors
+[SoilSystem] ❌ ERROR: Cannot till water terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 12: Idempotency - Re-tilling > should allow re-tilling an already-tilled depleted tile
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 79.55
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '79.55', phosphorus: '63.64', potassium: '71.60' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 79.55045197588592,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: true,
+  biome: 'plains',
+  fertility: 79.55045197588592,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 79.55 → 70.90
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '70.90', phosphorus: '56.72', potassium: '63.81' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 70.89984019332364,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 12: Idempotency - Re-tilling > should reset plantability counter to 3 when re-tilling
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: true,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 71.45
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '71.45', phosphorus: '57.16', potassium: '64.31' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 71.45381066139002,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 12: Idempotency - Re-tilling > should refresh fertility when re-tilling
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: true,
+  biome: 'plains',
+  fertility: 30,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 30.00 → 74.72
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '74.72', phosphorus: '59.78', potassium: '67.25' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 74.71977268776935,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 12: Idempotency - Re-tilling > should emit tilling event when re-tilling
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: true,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 78.29
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '78.29', phosphorus: '62.63', potassium: '70.46' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 78.28673188472655,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Edge Cases > should handle tilling tile without biome (default fertility)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: undefined,
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'undefined': 50.00 → 50.00
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '50.00', phosphorus: '40.00', potassium: '45.00' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: { position: { x: 5, y: 5 }, fertility: 50, biome: undefined }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Edge Cases > should handle tilling at negative coordinates
+[SoilSystem] ===== TILLING TILE AT (-5, -5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 71.82
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '71.82', phosphorus: '57.46', potassium: '64.64' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: -5, y: -5 },
+    fertility: 71.82428301435073,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Edge Cases > should handle tilling at large coordinates
+[SoilSystem] ===== TILLING TILE AT (1000, 1000) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 71.26
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '71.26', phosphorus: '57.01', potassium: '64.14' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 1000, y: 1000 },
+    fertility: 71.26499158770804,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Edge Cases > should preserve existing moisture when tilling
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 75,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 72.46
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '72.46', phosphorus: '57.97', potassium: '65.22' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 72.46368431376422,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Edge Cases > should reset fertilizer state when tilling
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 77.18
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '77.18', phosphorus: '61.74', potassium: '69.46' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 77.18021352135219,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Integration with Other Systems > should work with PlantSystem (planted flag check)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 72.59
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '72.59', phosphorus: '58.07', potassium: '65.33' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 72.59358142806725,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Integration with Other Systems > should work with WaterSystem (moisture tracking)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 73.91
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '73.91', phosphorus: '59.13', potassium: '66.52' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 73.91404815727734,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Integration with Other Systems > should work with WeatherSystem (rain effects)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 72.21
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '72.21', phosphorus: '57.77', potassium: '64.99' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 72.2104860784185,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+
+ Test Files  2 passed (2)
+      Tests  95 passed | 8 skipped (103)
+   Start at  03:28:44
+   Duration  432ms (transform 198ms, setup 450ms, collect 75ms, tests 24ms, environment 0ms, prepare 78ms)
+

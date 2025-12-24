@@ -40,8 +40,9 @@ export class PlantInfoPanel {
    * @param canvasWidth Width of the canvas
    * @param canvasHeight Height of the canvas
    * @param world World instance to look up the selected entity
+   * @param tileInspectorOpen Whether the tile inspector is currently open
    */
-  render(ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number, world: any): void {
+  render(ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number, world: any, tileInspectorOpen: boolean = false): void {
     if (!this.selectedEntityId) {
       return; // Nothing to render
     }
@@ -68,9 +69,17 @@ export class PlantInfoPanel {
       return;
     }
 
-    // Position panel in bottom-right corner (below agent panel if present)
-    const x = canvasWidth - this.panelWidth - 20;
+    // Position panel - if tile inspector is open, position to the left of it
+    // Otherwise position in bottom-right corner
+    let x: number;
     const y = canvasHeight - this.panelHeight - 20;
+
+    if (tileInspectorOpen) {
+      // Position to the left of tile inspector (tile inspector width is 320 + 20 margin)
+      x = canvasWidth - this.panelWidth - 340 - 20;
+    } else {
+      x = canvasWidth - this.panelWidth - 20;
+    }
 
     // Draw panel background
     ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
@@ -130,6 +139,25 @@ export class PlantInfoPanel {
 
     // Title
     drawText('=== PLANT INFO ===', '#32CD32');
+
+    // Close button (X in top right)
+    const closeButtonSize = 24;
+    const closeButtonX = x + this.panelWidth - closeButtonSize - 8;
+    const closeButtonY = y + 8;
+
+    ctx.fillStyle = 'rgba(200, 50, 50, 0.8)';
+    ctx.fillRect(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize);
+    ctx.strokeStyle = 'rgba(255, 100, 100, 1)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize);
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 16px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('×', closeButtonX + closeButtonSize / 2, closeButtonY + closeButtonSize / 2 + 6);
+    ctx.textAlign = 'left';
+    ctx.font = '14px monospace';
+
     currentY += 4;
 
     // Species
@@ -192,16 +220,77 @@ export class PlantInfoPanel {
       drawText(`Generation: ${plant.generation}`, '#888888');
     }
 
-    // Production counts
+    // Production counts - always show for relevant species
+    const isFruitBearing = speciesName.toLowerCase().includes('berry') ||
+                          speciesName.toLowerCase().includes('fruit') ||
+                          ['tomato', 'potato', 'carrot'].includes(plant.speciesId);
+
     if (plant.flowerCount > 0) {
-      drawText(`Flowers: ${plant.flowerCount}`, '#FFB6C1');
+      drawText(`🌸 Flowers: ${plant.flowerCount}`, '#FFB6C1');
     }
-    if (plant.fruitCount > 0) {
-      drawText(`Fruit: ${plant.fruitCount}`, '#FF6347');
+
+    // Always show fruit count for fruit-bearing plants
+    if (plant.fruitCount > 0 || isFruitBearing) {
+      const fruitEmoji = plant.speciesId === 'berry-bush' ? '🫐' : '🍅';
+      drawText(`${fruitEmoji} Food: ${plant.fruitCount}`, '#FF6347');
     }
+
     if (plant.seedsProduced > 0) {
-      drawText(`Seeds: ${plant.seedsProduced}`, '#8B4513');
+      drawText(`🌰 Seeds: ${plant.seedsProduced}`, '#8B4513');
     }
+  }
+
+  /**
+   * Handle click events on the panel.
+   * @param screenX Screen X coordinate
+   * @param screenY Screen Y coordinate
+   * @param canvasWidth Width of the canvas
+   * @param canvasHeight Height of the canvas
+   * @param tileInspectorOpen Whether the tile inspector is currently open
+   * @returns True if click was handled
+   */
+  handleClick(screenX: number, screenY: number, canvasWidth: number, canvasHeight: number, tileInspectorOpen: boolean = false): boolean {
+    if (!this.selectedEntityId) {
+      return false;
+    }
+
+    // Calculate panel position (same logic as render)
+    let x: number;
+    const y = canvasHeight - this.panelHeight - 20;
+
+    if (tileInspectorOpen) {
+      x = canvasWidth - this.panelWidth - 340 - 20;
+    } else {
+      x = canvasWidth - this.panelWidth - 20;
+    }
+
+    // Check if click is inside panel
+    if (
+      screenX < x ||
+      screenX > x + this.panelWidth ||
+      screenY < y ||
+      screenY > y + this.panelHeight
+    ) {
+      return false;
+    }
+
+    // Check close button click
+    const closeButtonSize = 24;
+    const closeButtonX = x + this.panelWidth - closeButtonSize - 8;
+    const closeButtonY = y + 8;
+
+    if (
+      screenX >= closeButtonX &&
+      screenX <= closeButtonX + closeButtonSize &&
+      screenY >= closeButtonY &&
+      screenY <= closeButtonY + closeButtonSize
+    ) {
+      console.log('[PlantInfoPanel] Close button clicked');
+      this.setSelectedEntity(null);
+      return true;
+    }
+
+    return true; // Click was inside panel
   }
 
   /**

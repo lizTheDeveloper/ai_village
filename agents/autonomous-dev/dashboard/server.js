@@ -392,7 +392,7 @@ function getWorkOrders() {
 
     const orders = [];
     const dirs = fs.readdirSync(WORK_ORDERS_DIR).filter(d => {
-        if (d === 'archive') return false; // Exclude archive folder
+        if (d === 'archive' || d === '_archived') return false; // Exclude archive folders
         const stat = fs.statSync(path.join(WORK_ORDERS_DIR, d));
         return stat.isDirectory();
     });
@@ -1278,6 +1278,112 @@ function broadcast(data) {
 }
 
 // =============================================================================
+// Orchestrator Management
+// =============================================================================
+
+function restartAllOrchestrators() {
+    return new Promise((resolve, reject) => {
+        // Find all orchestrator processes
+        exec('ps aux | grep "orchestrator.sh" | grep -v grep', (error, stdout, stderr) => {
+            if (error && !stdout) {
+                // No orchestrators running
+                resolve({ success: true, restarted: [] });
+                return;
+            }
+
+            const lines = stdout.trim().split('\n').filter(line => line);
+            const orchestrators = [];
+
+            for (const line of lines) {
+                const parts = line.trim().split(/\s+/);
+                const pid = parseInt(parts[1]);
+
+                // Extract the feature name from command line
+                let featureName = null;
+                let isResume = false;
+
+                if (line.includes('--feature')) {
+                    const match = line.match(/--feature\s+(\S+)/);
+                    if (match) {
+                        featureName = match[1];
+                    }
+                } else if (line.includes('--resume')) {
+                    const match = line.match(/--resume\s+(\S+)/);
+                    if (match) {
+                        featureName = match[1];
+                        isResume = true;
+                    }
+                }
+
+                if (featureName) {
+                    orchestrators.push({ pid, featureName, isResume });
+                }
+            }
+
+            if (orchestrators.length === 0) {
+                resolve({ success: true, restarted: [] });
+                return;
+            }
+
+            // Kill all orchestrators
+            const killPromises = orchestrators.map(orch => {
+                return new Promise((killResolve) => {
+                    try {
+                        process.kill(orch.pid, 'SIGTERM');
+                        killResolve();
+                    } catch (err) {
+                        console.error(`Failed to kill orchestrator PID ${orch.pid}:`, err.message);
+                        killResolve();
+                    }
+                });
+            });
+
+            Promise.all(killPromises).then(() => {
+                // Wait a moment for processes to clean up
+                setTimeout(() => {
+                    // Restart each orchestrator
+                    const restarted = [];
+
+                    for (const orch of orchestrators) {
+                        try {
+                            const scriptPath = path.join(SCRIPTS_DIR, 'orchestrator.sh');
+                            const args = orch.isResume
+                                ? ['--resume', orch.featureName]
+                                : ['--feature', orch.featureName];
+
+                            const logFile = path.join(LOGS_DIR, `${orch.featureName}-orchestrator.log`);
+                            const proc = spawn('nohup', ['bash', scriptPath, ...args], {
+                                cwd: PROJECT_ROOT,
+                                detached: true,
+                                stdio: ['ignore',
+                                    fs.openSync(logFile, 'a'),
+                                    fs.openSync(logFile, 'a')
+                                ]
+                            });
+
+                            proc.unref(); // Allow parent to exit
+
+                            restarted.push({
+                                featureName: orch.featureName,
+                                oldPid: orch.pid,
+                                newPid: proc.pid,
+                                mode: orch.isResume ? 'resume' : 'feature'
+                            });
+
+                            console.log(`Restarted orchestrator: ${orch.featureName} (old PID: ${orch.pid}, new PID: ${proc.pid})`);
+                        } catch (err) {
+                            console.error(`Failed to restart orchestrator ${orch.featureName}:`, err.message);
+                        }
+                    }
+
+                    resolve({ success: true, restarted });
+                }, 1000);
+            }).catch(reject);
+        });
+    });
+}
+
+// =============================================================================
 // API Routes
 // =============================================================================
 
@@ -1346,6 +1452,32 @@ app.get('/api/work-orders/:name/screenshots/:file', (req, res) => {
         res.sendFile(filePath);
     } else {
         res.status(404).send('Screenshot not found');
+    }
+});
+
+app.post('/api/work-orders/:name/archive', (req, res) => {
+    try {
+        const workOrderName = req.params.name;
+        const sourcePath = path.join(WORK_ORDERS_DIR, workOrderName);
+        const archiveDir = path.join(WORK_ORDERS_DIR, '_archived');
+        const targetPath = path.join(archiveDir, workOrderName);
+
+        // Check if work order exists
+        if (!fs.existsSync(sourcePath)) {
+            return res.status(404).json({ error: 'Work order not found' });
+        }
+
+        // Create archive directory if it doesn't exist
+        if (!fs.existsSync(archiveDir)) {
+            fs.mkdirSync(archiveDir, { recursive: true });
+        }
+
+        // Move the work order to archive
+        fs.renameSync(sourcePath, targetPath);
+
+        res.json({ success: true, message: `Work order ${workOrderName} archived` });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
 
@@ -1461,11 +1593,25 @@ const serverStartTime = Date.now();
 
 app.get('/api/server/stats', (req, res) => {
     const uptime = Date.now() - serverStartTime;
+
+    // Count active servers/processes
+    let serversUp = 1; // Dashboard server itself
+    if (gameServerProcess) serversUp++;
+    if (parallelWorkersProcess) serversUp++;
+    if (bugQueueProcessorProcess) serversUp++;
+
     res.json({
         connectedSessions: sseClients.size,
+        serversUp: serversUp,
         uptime: Math.floor(uptime / 1000), // seconds
         port: PORT,
-        url: `http://localhost:${PORT}`
+        url: `http://localhost:${PORT}`,
+        services: {
+            dashboard: true,
+            gameServer: gameServerProcess !== null,
+            parallelWorkers: parallelWorkersProcess !== null,
+            bugQueueProcessor: bugQueueProcessorProcess !== null
+        }
     });
 });
 
@@ -1483,6 +1629,10 @@ app.get('/api/events', (req, res) => {
     res.setHeader('Connection', 'keep-alive');
 
     sseClients.add(res);
+    console.log(`  📡 New SSE client connected (${sseClients.size} total sessions)`);
+
+    // Broadcast session count update
+    broadcast({ type: 'session-update', count: sseClients.size });
 
     // Send heartbeat
     const heartbeat = setInterval(() => {
@@ -1492,6 +1642,9 @@ app.get('/api/events', (req, res) => {
     req.on('close', () => {
         clearInterval(heartbeat);
         sseClients.delete(res);
+        console.log(`  📡 SSE client disconnected (${sseClients.size} remaining sessions)`);
+        // Broadcast session count update
+        broadcast({ type: 'session-update', count: sseClients.size });
     });
 });
 
@@ -1556,6 +1709,72 @@ app.get('/api/game-server/status', (req, res) => {
         res.json(getGameServerStatus());
     } catch (err) {
         res.status(500).json({ error: err.message });
+    }
+});
+
+// Ollama status
+app.get('/api/ollama/status', async (req, res) => {
+    try {
+        const http = require('http');
+
+        // Check if Ollama is running by calling /api/tags
+        const tagsPromise = new Promise((resolve, reject) => {
+            const request = http.get('http://localhost:11434/api/tags', { timeout: 2000 }, (response) => {
+                let data = '';
+                response.on('data', chunk => data += chunk);
+                response.on('end', () => {
+                    try {
+                        resolve(JSON.parse(data));
+                    } catch (e) {
+                        reject(new Error('Invalid JSON'));
+                    }
+                });
+            });
+            request.on('error', reject);
+            request.on('timeout', () => {
+                request.destroy();
+                reject(new Error('Timeout'));
+            });
+        });
+
+        // Check running models via /api/ps
+        const psPromise = new Promise((resolve, reject) => {
+            const request = http.get('http://localhost:11434/api/ps', { timeout: 2000 }, (response) => {
+                let data = '';
+                response.on('data', chunk => data += chunk);
+                response.on('end', () => {
+                    try {
+                        resolve(JSON.parse(data));
+                    } catch (e) {
+                        reject(new Error('Invalid JSON'));
+                    }
+                });
+            });
+            request.on('error', reject);
+            request.on('timeout', () => {
+                request.destroy();
+                reject(new Error('Timeout'));
+            });
+        });
+
+        const [tags, ps] = await Promise.all([tagsPromise, psPromise]);
+
+        res.json({
+            running: true,
+            availableModels: tags.models || [],
+            loadedModels: ps.models || [],
+            modelCount: (tags.models || []).length,
+            loadedCount: (ps.models || []).length
+        });
+    } catch (err) {
+        res.json({
+            running: false,
+            error: err.message,
+            availableModels: [],
+            loadedModels: [],
+            modelCount: 0,
+            loadedCount: 0
+        });
     }
 });
 
@@ -1723,6 +1942,16 @@ app.get('/api/bug-queue-processor/logs', (req, res) => {
         res.json(getBugQueueProcessorLogs());
     } catch (err) {
         res.status(500).json({ error: err.message });
+    }
+});
+
+// Orchestrator restart
+app.post('/api/orchestrators/restart-all', async (req, res) => {
+    try {
+        const result = await restartAllOrchestrators();
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: err.message, success: false });
     }
 });
 

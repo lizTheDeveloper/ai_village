@@ -1,0 +1,2896 @@
+
+> @ai-village/game-engine@0.1.0 test
+> vitest run
+
+
+ RUN  v1.6.1 /Users/annhoward/src/ai_village/custom_game_engine
+
+ ✓ packages/core/src/metrics/events/__tests__/MetricEvents.test.ts  (26 tests) 5ms
+ ✓ packages/renderer/src/__tests__/DragDropSystem.test.ts  (29 tests) 10ms
+ ✓ packages/core/src/buildings/__tests__/BuildingDefinitions.test.ts  (44 tests) 11ms
+ ✓ packages/core/src/__tests__/AnimalHousing.test.ts  (27 tests | 5 skipped) 6ms
+ ✓ packages/core/src/__tests__/AnimalHousingCleanliness.test.ts  (24 tests) 5ms
+ ✓ packages/core/src/actions/__tests__/TillAction.test.ts  (48 tests | 8 skipped) 21ms
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Basic Tilling Success > should change grass tile to dirt terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 0.00 → 79.26
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '79.26', phosphorus: '63.41', potassium: '71.33' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 79.26008710013038,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Basic Tilling Success > should set tilled flag to true
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 0.00 → 71.11
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '71.11', phosphorus: '56.89', potassium: '64.00' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 71.10941941333087,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Basic Tilling Success > should set plantability counter to 3
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 0.00 → 73.85
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '73.85', phosphorus: '59.08', potassium: '66.47' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 73.85029980900892,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Basic Tilling Success > should set fertility based on biome
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 0.00 → 74.08
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '74.08', phosphorus: '59.26', potassium: '66.67' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 74.0759349925759,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Basic Tilling Success > should initialize nutrients (N, P, K) based on fertility
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 0.00 → 76.13
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '76.13', phosphorus: '60.91', potassium: '68.52' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 76.13264392231481,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Valid Terrain Tilling > should allow tilling grass terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 0.00 → 73.45
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '73.45', phosphorus: '58.76', potassium: '66.10' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 73.44550928368209,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Valid Terrain Tilling > should allow tilling dirt terrain (re-tilling)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: true,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 74.34
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '74.34', phosphorus: '59.47', potassium: '66.91' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 74.34068998245262,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Invalid Terrain Rejection > should throw error when tilling stone terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'stone',
+  tilled: false,
+  biome: 'mountains',
+  fertility: 0,
+  moisture: 0,
+  plantability: 0
+}
+
+stderr | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Invalid Terrain Rejection > should throw error when tilling stone terrain
+[SoilSystem] ❌ ERROR: Cannot till stone terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Invalid Terrain Rejection > should throw error when tilling water terrain
+[SoilSystem] ===== TILLING TILE AT (3, 8) =====
+[SoilSystem] Current tile state: {
+  terrain: 'water',
+  tilled: false,
+  biome: 'river',
+  fertility: 0,
+  moisture: 100,
+  plantability: 0
+}
+
+stderr | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Invalid Terrain Rejection > should throw error when tilling water terrain
+[SoilSystem] ❌ ERROR: Cannot till water terrain at (3,8). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Invalid Terrain Rejection > should throw error when tilling sand terrain
+[SoilSystem] ===== TILLING TILE AT (10, 10) =====
+[SoilSystem] Current tile state: {
+  terrain: 'sand',
+  tilled: false,
+  biome: 'desert',
+  fertility: 20,
+  moisture: 10,
+  plantability: 0
+}
+
+stderr | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Invalid Terrain Rejection > should throw error when tilling sand terrain
+[SoilSystem] ❌ ERROR: Cannot till sand terrain at (10,10). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Invalid Terrain Rejection > should NOT modify tile state on invalid terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'stone',
+  tilled: false,
+  biome: 'mountains',
+  fertility: 0,
+  moisture: 0,
+  plantability: 0
+}
+
+stderr | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Invalid Terrain Rejection > should NOT modify tile state on invalid terrain
+[SoilSystem] ❌ ERROR: Cannot till stone terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > EventBus Integration > should emit soil:tilled event when tilling succeeds
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 0.00 → 70.07
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '70.07', phosphorus: '56.06', potassium: '63.06' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 70.07106210561616,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > EventBus Integration > should include position in soil:tilled event
+[SoilSystem] ===== TILLING TILE AT (15, 20) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'forest',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'forest': 0.00 → 68.43
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '68.43', phosphorus: '54.75', potassium: '61.59' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 15, y: 20 },
+    fertility: 68.4340569058221,
+    biome: 'forest'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > EventBus Integration > should include fertility in soil:tilled event
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 0.00 → 75.94
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '75.94', phosphorus: '60.75', potassium: '68.35' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 75.94275272500217,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > EventBus Integration > should include biome in soil:tilled event
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'river',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'river': 0.00 → 84.31
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '84.31', phosphorus: '67.45', potassium: '75.88' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 84.31174711168434,
+    biome: 'river'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > EventBus Integration > should NOT emit soil:tilled event on invalid terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'stone',
+  tilled: false,
+  biome: 'mountains',
+  fertility: 0,
+  moisture: 0,
+  plantability: 0
+}
+
+stderr | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > EventBus Integration > should NOT emit soil:tilled event on invalid terrain
+[SoilSystem] ❌ ERROR: Cannot till stone terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Biome-Specific Fertility > should set plains fertility to ~70-80
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 0.00 → 71.86
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '71.86', phosphorus: '57.49', potassium: '64.68' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 71.86190766240674,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Biome-Specific Fertility > should set forest fertility to ~60-70
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'forest',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'forest': 0.00 → 62.12
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '62.12', phosphorus: '49.70', potassium: '55.91' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 62.12385531321622,
+    biome: 'forest'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Biome-Specific Fertility > should set river fertility to ~75-85
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'river',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'river': 0.00 → 81.93
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '81.93', phosphorus: '65.54', potassium: '73.73' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 81.92531545059673,
+    biome: 'river'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Biome-Specific Fertility > should set desert fertility to ~20-30
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'desert',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'desert': 0.00 → 27.93
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '27.93', phosphorus: '22.34', potassium: '25.13' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 27.925422554600736,
+    biome: 'desert'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Biome-Specific Fertility > should set mountains fertility to ~40-50
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'mountains',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'mountains': 0.00 → 47.70
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '47.70', phosphorus: '38.16', potassium: '42.93' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 47.70327895228059,
+    biome: 'mountains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Biome-Specific Fertility > should set ocean fertility to 0 (not farmable)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'ocean',
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'ocean': 0.00 → 0.00
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '0.00', phosphorus: '0.00', potassium: '0.00' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: { position: { x: 5, y: 5 }, fertility: 0, biome: 'ocean' }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Biome-Specific Fertility > should throw error for undefined biome (CLAUDE.md: no silent fallbacks)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: undefined,
+  fertility: 0,
+  moisture: 50,
+  plantability: 0
+}
+
+stderr | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Biome-Specific Fertility > should throw error for undefined biome (CLAUDE.md: no silent fallbacks)
+[SoilSystem] ❌ CRITICAL ERROR: Tile at (5,5) has no biome data. Terrain generation failed or chunk not generated. Cannot determine fertility for farming.
+[SoilSystem] Tile state: {
+  "terrain": "grass",
+  "moisture": 50,
+  "fertility": 0,
+  "tilled": false,
+  "plantability": 0,
+  "nutrients": {
+    "nitrogen": 0,
+    "phosphorus": 0,
+    "potassium": 0
+  },
+  "fertilized": false,
+  "fertilizerDuration": 0,
+  "lastWatered": 0,
+  "composted": false
+}
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Re-tilling Behavior > should allow re-tilling already tilled depleted dirt
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: true,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 78.75
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '78.75', phosphorus: '63.00', potassium: '70.87' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 78.74837495454639,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Re-tilling Behavior > should reset plantability counter to 3 on re-till
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: true,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 73.96
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '73.96', phosphorus: '59.17', potassium: '66.56' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 73.95823776528839,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Re-tilling Behavior > should refresh fertility on re-till
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: true,
+  biome: 'plains',
+  fertility: 20,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 20.00 → 73.39
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '73.39', phosphorus: '58.71', potassium: '66.05' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 73.38933101109218,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Re-tilling Behavior > should emit tilling event on re-till
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: true,
+  biome: 'plains',
+  fertility: 20,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 20.00 → 72.95
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '72.95', phosphorus: '58.36', potassium: '65.65' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 72.94799622568462,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Error Handling - CLAUDE.md Compliance > should throw clear error for invalid terrain type
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'stone',
+  tilled: false,
+  biome: 'mountains',
+  fertility: 0,
+  moisture: 0,
+  plantability: 0
+}
+
+stderr | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Error Handling - CLAUDE.md Compliance > should throw clear error for invalid terrain type
+[SoilSystem] ❌ ERROR: Cannot till stone terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Error Handling - CLAUDE.md Compliance > should include position in error message
+[SoilSystem] ===== TILLING TILE AT (15, 20) =====
+[SoilSystem] Current tile state: {
+  terrain: 'water',
+  tilled: false,
+  biome: 'river',
+  fertility: 0,
+  moisture: 100,
+  plantability: 0
+}
+
+stderr | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Error Handling - CLAUDE.md Compliance > should include position in error message
+[SoilSystem] ❌ ERROR: Cannot till water terrain at (15,20). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Error Handling - CLAUDE.md Compliance > should include terrain type in error message
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'sand',
+  tilled: false,
+  biome: 'desert',
+  fertility: 0,
+  moisture: 10,
+  plantability: 0
+}
+
+stderr | packages/core/src/actions/__tests__/TillAction.test.ts > Tilling Action > Error Handling - CLAUDE.md Compliance > should include terrain type in error message
+[SoilSystem] ❌ ERROR: Cannot till sand terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 2: Basic Tilling Success > should change terrain from grass to dirt when tilled
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 77.72
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '77.72', phosphorus: '62.17', potassium: '69.95' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 77.7175197612991,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 2: Basic Tilling Success > should set tilled flag to true
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 73.95
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '73.95', phosphorus: '59.16', potassium: '66.55' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 73.94745823123192,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 2: Basic Tilling Success > should set plantability counter to 3
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 77.94
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '77.94', phosphorus: '62.35', potassium: '70.15' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 77.94049909267505,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 2: Basic Tilling Success > should set fertility based on biome
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 70.11
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '70.11', phosphorus: '56.09', potassium: '63.10' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 70.10690888834016,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 2: Basic Tilling Success > should initialize nutrients (N, P, K)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 79.81
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '79.81', phosphorus: '63.84', potassium: '71.82' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 79.80544590854869,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 3: Tilling Validation - Valid Terrain > should successfully till grass terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 74.66
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '74.66', phosphorus: '59.73', potassium: '67.19' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 74.66015524676413,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 3: Tilling Validation - Valid Terrain > should successfully till dirt terrain (re-tilling)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 72.82
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '72.82', phosphorus: '58.26', potassium: '65.54' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 72.82416673384438,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should throw error when attempting to till stone terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'stone',
+  tilled: false,
+  biome: 'mountains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+
+stderr | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should throw error when attempting to till stone terrain
+[SoilSystem] ❌ ERROR: Cannot till stone terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should throw error when attempting to till water terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'water',
+  tilled: false,
+  biome: 'river',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+
+stderr | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should throw error when attempting to till water terrain
+[SoilSystem] ❌ ERROR: Cannot till water terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should throw error when attempting to till sand terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'sand',
+  tilled: false,
+  biome: 'desert',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+
+stderr | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should throw error when attempting to till sand terrain
+[SoilSystem] ❌ ERROR: Cannot till sand terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should NOT modify tile state when validation fails
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'stone',
+  tilled: false,
+  biome: 'mountains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+
+stderr | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should NOT modify tile state when validation fails
+[SoilSystem] ❌ ERROR: Cannot till stone terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should NOT emit tilling event when validation fails
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'water',
+  tilled: false,
+  biome: 'river',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+
+stderr | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 4: Tilling Validation - Invalid Terrain > should NOT emit tilling event when validation fails
+[SoilSystem] ❌ ERROR: Cannot till water terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 6: SoilSystem Integration > should call SoilSystem.tillTile with correct parameters
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 70.84
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '70.84', phosphorus: '56.67', potassium: '63.75' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 70.83805223208198,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 6: SoilSystem Integration > should use existing fertility calculation logic
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 76.33
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '76.33', phosphorus: '61.06', potassium: '68.70' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 76.32799385477901,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 6: SoilSystem Integration > should initialize nutrients based on fertility
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 75.48
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '75.48', phosphorus: '60.39', potassium: '67.93' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 75.48228647944694,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 7: EventBus Integration > should emit soil:tilled event when tilling succeeds
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 74.36
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '74.36', phosphorus: '59.49', potassium: '66.92' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 74.3584039910047,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 7: EventBus Integration > should emit soil:tilled event with position data
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 79.47
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '79.47', phosphorus: '63.57', potassium: '71.52' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 79.46680792407898,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 7: EventBus Integration > should emit soil:tilled event with fertility data
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 78.59
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '78.59', phosphorus: '62.88', potassium: '70.73' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 78.5938051426367,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 7: EventBus Integration > should emit soil:tilled event with biome data
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 77.24
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '77.24', phosphorus: '61.79', potassium: '69.52' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 77.24191140029579,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 8: Fertility by Biome > should set fertility 70-80 for plains biome
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 75.08
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '75.08', phosphorus: '60.07', potassium: '67.57' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 75.08328783917342,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 8: Fertility by Biome > should set fertility 60-70 for forest biome
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'forest',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'forest': 50.00 → 67.23
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '67.23', phosphorus: '53.78', potassium: '60.51' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 67.2298628199677,
+    biome: 'forest'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 8: Fertility by Biome > should set fertility 75-85 for river biome
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'river',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'river': 50.00 → 75.76
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '75.76', phosphorus: '60.61', potassium: '68.19' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 75.76268215056595,
+    biome: 'river'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 8: Fertility by Biome > should set fertility 20-30 for desert biome
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'desert',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'desert': 50.00 → 21.00
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '21.00', phosphorus: '16.80', potassium: '18.90' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 20.999822258232506,
+    biome: 'desert'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 8: Fertility by Biome > should set fertility 40-50 for mountains biome
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'mountains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'mountains': 50.00 → 40.41
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '40.41', phosphorus: '32.33', potassium: '36.37' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 40.411497357253,
+    biome: 'mountains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 8: Fertility by Biome > should set fertility 0 for ocean biome (not tillable)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'ocean',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'ocean': 50.00 → 0.00
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '0.00', phosphorus: '0.00', potassium: '0.00' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: { position: { x: 5, y: 5 }, fertility: 0, biome: 'ocean' }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 11: CLAUDE.md Compliance - No Silent Fallbacks > should throw when tile is null/undefined
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 11: CLAUDE.md Compliance - No Silent Fallbacks > should throw when position is invalid
+[SoilSystem] ===== TILLING TILE AT (NaN, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+
+stderr | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 11: CLAUDE.md Compliance - No Silent Fallbacks > should throw when position is invalid
+[SoilSystem] ❌ ERROR: tillTile requires valid position coordinates, got (NaN,5)
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 11: CLAUDE.md Compliance - No Silent Fallbacks > should throw clear error message for invalid terrain
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'stone',
+  tilled: false,
+  biome: 'mountains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+
+stderr | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 11: CLAUDE.md Compliance - No Silent Fallbacks > should throw clear error message for invalid terrain
+[SoilSystem] ❌ ERROR: Cannot till stone terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 11: CLAUDE.md Compliance - No Silent Fallbacks > should NOT use fallback fertility values
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 78.62
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '78.62', phosphorus: '62.90', potassium: '70.76' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 78.62326957201456,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 11: CLAUDE.md Compliance - No Silent Fallbacks > should NOT catch and swallow errors
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'water',
+  tilled: false,
+  biome: 'river',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+
+stderr | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 11: CLAUDE.md Compliance - No Silent Fallbacks > should NOT catch and swallow errors
+[SoilSystem] ❌ ERROR: Cannot till water terrain at (5,5). Only grass and dirt can be tilled.
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 12: Idempotency - Re-tilling > should allow re-tilling an already-tilled depleted tile
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 77.70
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '77.70', phosphorus: '62.16', potassium: '69.93' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 77.70335206524383,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: true,
+  biome: 'plains',
+  fertility: 77.70335206524383,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 77.70 → 70.63
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '70.63', phosphorus: '56.50', potassium: '63.57' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 70.62965278476834,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 12: Idempotency - Re-tilling > should reset plantability counter to 3 when re-tilling
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: true,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 70.48
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '70.48', phosphorus: '56.39', potassium: '63.44' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 70.48371416183194,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 12: Idempotency - Re-tilling > should refresh fertility when re-tilling
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: true,
+  biome: 'plains',
+  fertility: 30,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 30.00 → 74.97
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '74.97', phosphorus: '59.98', potassium: '67.48' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 74.97265265877384,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Acceptance Criterion 12: Idempotency - Re-tilling > should emit tilling event when re-tilling
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: true,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 78.03
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '78.03', phosphorus: '62.43', potassium: '70.23' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 78.03170889009306,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Edge Cases > should throw error when tilling tile without biome (CLAUDE.md)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: undefined,
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+
+stderr | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Edge Cases > should throw error when tilling tile without biome (CLAUDE.md)
+[SoilSystem] ❌ CRITICAL ERROR: Tile at (5,5) has no biome data. Terrain generation failed or chunk not generated. Cannot determine fertility for farming.
+[SoilSystem] Tile state: {
+  "terrain": "grass",
+  "moisture": 50,
+  "fertility": 50,
+  "tilled": false,
+  "plantability": 0,
+  "nutrients": {
+    "nitrogen": 0,
+    "phosphorus": 0,
+    "potassium": 0
+  },
+  "fertilized": false,
+  "fertilizerDuration": 0,
+  "lastWatered": 0,
+  "composted": false
+}
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Edge Cases > should handle tilling at negative coordinates
+[SoilSystem] ===== TILLING TILE AT (-5, -5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 70.81
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '70.81', phosphorus: '56.65', potassium: '63.73' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: -5, y: -5 },
+    fertility: 70.80928641560104,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Edge Cases > should handle tilling at large coordinates
+[SoilSystem] ===== TILLING TILE AT (1000, 1000) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 74.37
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '74.37', phosphorus: '59.50', potassium: '66.93' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 1000, y: 1000 },
+    fertility: 74.36971272789519,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Edge Cases > should preserve existing moisture when tilling
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 75,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 79.27
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '79.27', phosphorus: '63.41', potassium: '71.34' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 79.2676896889022,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Edge Cases > should reset fertilizer state when tilling
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'dirt',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: dirt → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 76.05
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '76.05', phosphorus: '60.84', potassium: '68.45' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 76.05453979403443,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Integration with Other Systems > should work with PlantSystem (planted flag check)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 79.08
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '79.08', phosphorus: '63.27', potassium: '71.18' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 79.08364846933308,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Integration with Other Systems > should work with WaterSystem (moisture tracking)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 72.59
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '72.59', phosphorus: '58.07', potassium: '65.33' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 72.58716724956531,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+stdout | packages/core/src/systems/__tests__/TillingAction.test.ts > Tilling Action > Integration with Other Systems > should work with WeatherSystem (rain effects)
+[SoilSystem] ===== TILLING TILE AT (5, 5) =====
+[SoilSystem] Current tile state: {
+  terrain: 'grass',
+  tilled: false,
+  biome: 'plains',
+  fertility: 50,
+  moisture: 50,
+  plantability: 0
+}
+[SoilSystem] ✅ Validation passed - proceeding with tilling
+[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency, 20s duration)
+[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T
+[SoilSystem] 🔨 Available tools: HOE (100% efficiency, 10s) > SHOVEL (80%, 12.5s) > HANDS (50%, 20s)
+[SoilSystem] Tool: hands, Estimated duration: 20.0s (efficiency: 50%)
+[SoilSystem] Changed terrain: grass → dirt
+[SoilSystem] Set fertility based on biome 'plains': 50.00 → 75.41
+[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses
+[SoilSystem] Initialized nutrients (NPK): { nitrogen: '75.41', phosphorus: '60.33', potassium: '67.87' }
+[SoilSystem] Emitting soil:tilled event: {
+  type: 'soil:tilled',
+  source: 'soil-system',
+  data: {
+    position: { x: 5, y: 5 },
+    fertility: 75.41028514594177,
+    biome: 'plains'
+  }
+}
+[SoilSystem] ===== TILLING COMPLETE =====
+
+ ✓ packages/core/src/systems/__tests__/TillingAction.test.ts  (55 tests) 20ms
+ ✓ packages/core/src/components/__tests__/EpisodicMemoryComponent.test.ts  (29 tests) 7ms
+ ✓ packages/core/src/__tests__/AnimalHousingIntegration.test.ts  (14 tests | 1 skipped) 6ms
+ ✓ packages/core/src/__tests__/AnimalProduction.test.ts  (15 tests) 7ms
+ ✓ packages/core/src/__tests__/TamingSystem.test.ts  (17 tests) 13ms
+ ✓ packages/core/src/systems/__tests__/ResourceGathering.test.ts  (37 tests) 13ms
+ ✓ packages/core/src/systems/__tests__/JournalingSystem.test.ts  (22 tests | 17 skipped) 5ms
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 1: Construction Progress Automation > should automatically increment progress each tick for buildings < 100%
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 1: Construction Progress Automation > should calculate progress based on buildTime
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 1: Construction Progress Automation > should not increment progress for completed buildings
+[BuildingSystem] Processing 1 building entities (0 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 2: Resource Deduction > should deduct resources from agent inventory on construction start
+[World.initiateConstruction] Consumed resources for tent: 10 cloth, 5 wood
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 2: Resource Deduction > should deduct multiple resource types correctly
+[World.initiateConstruction] Consumed resources for campfire: 10 stone, 5 wood
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 3: Building Completion > should emit building:complete event when progress reaches 100%
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: tent at (15, 20) - 99.0% → 100.0% (deltaTime=10.000s, buildTime=45s, increase=22.222%)
+[BuildingSystem] 🏗️ Construction complete! tent at (15, 20)
+[BuildingSystem] 🎉 building:complete event emitted for entity 1352ded1
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 3: Building Completion > should mark building as complete when progress reaches 100%
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: tent at (10, 10) - 99.0% → 100.0% (deltaTime=10.000s, buildTime=45s, increase=22.222%)
+[BuildingSystem] 🏗️ Construction complete! tent at (10, 10)
+[BuildingSystem] 🎉 building:complete event emitted for entity 0954f395
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 3: Building Completion > should emit event exactly once when crossing 100% threshold
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: campfire at (10, 10) - 99.0% → 100.0% (deltaTime=10.000s, buildTime=30s, increase=33.333%)
+[BuildingSystem] 🏗️ Construction complete! campfire at (10, 10)
+[BuildingSystem] 🎉 building:complete event emitted for entity bcfc868c
+[BuildingSystem] Processing 1 building entities (0 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 3: Building Completion > should include position in completion event
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: workbench at (42, 84) - 99.0% → 100.0% (deltaTime=10.000s, buildTime=60s, increase=16.667%)
+[BuildingSystem] 🏗️ Construction complete! workbench at (42, 84)
+[BuildingSystem] 🎉 building:complete event emitted for entity a34fceb2
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 4: Agent Autonomous Building (Integration) > should create construction site when agent initiates building
+[World.initiateConstruction] Consumed resources for tent: 10 cloth, 5 wood
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 4: Agent Autonomous Building (Integration) > should emit construction:started event when construction begins
+[World.initiateConstruction] Consumed resources for tent: 10 cloth, 5 wood
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 4: Agent Autonomous Building (Integration) > should complete full construction lifecycle
+[World.initiateConstruction] Consumed resources for campfire: 10 stone, 5 wood
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: campfire at (10, 10) - 0.0% → 100.0% (deltaTime=31.000s, buildTime=30s, increase=103.333%)
+[BuildingSystem] 🏗️ Construction complete! campfire at (10, 10)
+[BuildingSystem] 🎉 building:complete event emitted for entity e7587280
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Resource Deduction Edge Cases > should handle exact resource amounts correctly
+[World.initiateConstruction] Consumed resources for tent: 10 cloth, 5 wood
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Resource Deduction Edge Cases > should leave excess resources in inventory
+[World.initiateConstruction] Consumed resources for tent: 10 cloth, 5 wood
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Construction Progress Integration > should progress from 0% to 100% over buildTime
+[World.initiateConstruction] Consumed resources for campfire: 10 stone, 5 wood
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: campfire at (10, 10) - 0.0% → 50.0% (deltaTime=15.000s, buildTime=30s, increase=50.000%)
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: campfire at (10, 10) - 50.0% → 100.0% (deltaTime=15.000s, buildTime=30s, increase=50.000%)
+[BuildingSystem] 🏗️ Construction complete! campfire at (10, 10)
+[BuildingSystem] 🎉 building:complete event emitted for entity fea1fcc4
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Construction Progress Integration > should handle fractional progress increments
+[World.initiateConstruction] Consumed resources for tent: 10 cloth, 5 wood
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Multiple Buildings Simultaneously > should handle multiple buildings under construction at once
+[World.initiateConstruction] Consumed resources for tent: 10 cloth, 5 wood
+[World.initiateConstruction] Consumed resources for workbench: 20 wood
+[World.initiateConstruction] Consumed resources for campfire: 10 stone, 5 wood
+[BuildingSystem] Processing 3 building entities (3 under construction) at tick 0
+[BuildingSystem] Construction progress: tent at (10, 10) - 0.0% → 11.1% (deltaTime=5.000s, buildTime=45s, increase=11.111%)
+[BuildingSystem] Construction progress: workbench at (20, 10) - 0.0% → 8.3% (deltaTime=5.000s, buildTime=60s, increase=8.333%)
+[BuildingSystem] Construction progress: campfire at (30, 10) - 0.0% → 16.7% (deltaTime=5.000s, buildTime=30s, increase=16.667%)
+
+ ✓ packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts  (28 tests) 13ms
+ ✓ packages/core/src/systems/__tests__/StorageDeposit.test.ts  (14 tests) 10ms
+ ✓ packages/core/src/buildings/__tests__/CraftingStations.test.ts  (30 tests) 14ms
+ ✓ packages/core/src/__tests__/AnimalSystem.test.ts  (18 tests) 8ms
+stdout | packages/core/src/systems/__tests__/ReflectionSystem.test.ts > ReflectionSystem > end-of-day reflection > should trigger reflection when agent sleeps
+[Reflection] 💭 Agent 27aa9f0a is reflecting on 1 memories from today...
+[Reflection] 💭 Reflection: "Reflecting on today: 1 significant moments stand out."
+[Reflection] 💭 Insights: 
+
+stdout | packages/core/src/systems/__tests__/ReflectionSystem.test.ts > ReflectionSystem > end-of-day reflection > should generate reflection from today's memories
+[Reflection] 💭 Agent 2422dc53 is reflecting on 2 memories from today...
+[Reflection] 💭 Reflection: "Reflecting on today: 2 significant moments stand out."
+[Reflection] 💭 Insights: 
+
+stdout | packages/core/src/systems/__tests__/ReflectionSystem.test.ts > ReflectionSystem > end-of-day reflection > should mark important memories for consolidation
+[Reflection] 💭 Agent f68c7176 is reflecting on 1 memories from today...
+[Reflection] 💭 Reflection: "Reflecting on today: 1 significant moments stand out."
+[Reflection] 💭 Insights: 
+
+stdout | packages/core/src/systems/__tests__/ReflectionSystem.test.ts > ReflectionSystem > end-of-day reflection > should store reflection with timestamp
+[Reflection] 💭 Agent a0d0747b is reflecting on 1 memories from today...
+[Reflection] 💭 Reflection: "Reflecting on today: 1 significant moments stand out."
+[Reflection] 💭 Insights: 
+
+stdout | packages/core/src/systems/__tests__/ReflectionSystem.test.ts > ReflectionSystem > end-of-day reflection > should generate coherent reflection text via LLM
+[Reflection] 💭 Agent 3fce9390 is reflecting on 1 memories from today...
+[Reflection] 💭 Reflection: "Reflecting on today: 1 significant moments stand out."
+[Reflection] 💭 Insights: 
+
+stdout | packages/core/src/systems/__tests__/ReflectionSystem.test.ts > ReflectionSystem > reflection triggers > should trigger after significant event (importance > 0.7)
+[Reflection] 💭 Agent fc93b7a8 is reflecting on 1 memories from today...
+[Reflection] 💭 Reflection: "Reflecting on today: 1 significant moments stand out."
+[Reflection] 💭 Insights: 
+
+stdout | packages/core/src/systems/__tests__/ReflectionSystem.test.ts > ReflectionSystem > reflection triggers > should NOT reflect if no memories to reflect on
+[Reflection] 💭 Agent 147d49df has no memories to reflect on today
+
+stdout | packages/core/src/systems/__tests__/ReflectionSystem.test.ts > ReflectionSystem > event emission > should emit reflection:completed when done
+[Reflection] 💭 Agent 01df56d8 is reflecting on 1 memories from today...
+[Reflection] 💭 Reflection: "Reflecting on today: 1 significant moments stand out."
+[Reflection] 💭 Insights: 
+
+stdout | packages/core/src/systems/__tests__/ReflectionSystem.test.ts > ReflectionSystem > event emission > should include agent ID in reflection:completed event
+[Reflection] 💭 Agent 39c71ed6 is reflecting on 1 memories from today...
+[Reflection] 💭 Reflection: "Reflecting on today: 1 significant moments stand out."
+[Reflection] 💭 Insights: 
+
+ ✓ packages/core/src/systems/__tests__/ReflectionSystem.test.ts  (22 tests | 4 skipped) 12ms
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Progress Advancement > should advance construction progress based on time elapsed
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Progress Advancement > should advance different buildings at different rates based on buildTime
+[BuildingSystem] Processing 2 building entities (2 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Progress Advancement > should clamp progress to 100% maximum
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: tent at (0, 0) - 99.0% → 100.0% (deltaTime=1000.000s, buildTime=45s, increase=2222.222%)
+[BuildingSystem] 🏗️ Construction complete! tent at (0, 0)
+[BuildingSystem] 🎉 building:complete event emitted for entity 86c566ea
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Progress Advancement > should skip completed buildings
+[BuildingSystem] Processing 1 building entities (0 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Progress Advancement > should handle multiple simultaneous constructions
+[BuildingSystem] Processing 3 building entities (3 under construction) at tick 0
+[BuildingSystem] Construction progress: tent at (0, 0) - 0.0% → 11.1% (deltaTime=5.000s, buildTime=45s, increase=11.111%)
+[BuildingSystem] Construction progress: workbench at (10, 0) - 0.0% → 8.3% (deltaTime=5.000s, buildTime=60s, increase=8.333%)
+[BuildingSystem] Construction progress: campfire at (20, 0) - 0.0% → 16.7% (deltaTime=5.000s, buildTime=30s, increase=16.667%)
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Completion > should mark building as complete when progress reaches 100%
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: tent at (0, 0) - 99.0% → 100.0% (deltaTime=10.000s, buildTime=45s, increase=22.222%)
+[BuildingSystem] 🏗️ Construction complete! tent at (0, 0)
+[BuildingSystem] 🎉 building:complete event emitted for entity 75545390
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Completion > should emit "building:complete" event on completion
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: tent at (16, 32) - 99.0% → 100.0% (deltaTime=10.000s, buildTime=45s, increase=22.222%)
+[BuildingSystem] 🏗️ Construction complete! tent at (16, 32)
+[BuildingSystem] 🎉 building:complete event emitted for entity a41c2c13
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Completion > should emit event with correct entity ID and building type
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: campfire at (0, 0) - 99.0% → 100.0% (deltaTime=10.000s, buildTime=30s, increase=33.333%)
+[BuildingSystem] 🏗️ Construction complete! campfire at (0, 0)
+[BuildingSystem] 🎉 building:complete event emitted for entity e5ef2c58
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Completion > should only emit event once when crossing 100% threshold
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: tent at (0, 0) - 99.0% → 100.0% (deltaTime=10.000s, buildTime=45s, increase=22.222%)
+[BuildingSystem] 🏗️ Construction complete! tent at (0, 0)
+[BuildingSystem] 🎉 building:complete event emitted for entity 5190570a
+[BuildingSystem] Processing 1 building entities (0 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Error Handling per CLAUDE.md > should throw when entity missing BuildingComponent
+[BuildingSystem] Processing 1 building entities (0 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Error Handling per CLAUDE.md > should throw when entity missing PositionComponent
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Error Handling per CLAUDE.md > should throw when building type is unknown
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Edge Cases > should handle construction at exactly 100% progress
+[BuildingSystem] Processing 1 building entities (0 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Edge Cases > should handle progress from 99% to 101% (clamped to 100%)
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: tent at (0, 0) - 99.0% → 100.0% (deltaTime=1000.000s, buildTime=45s, increase=2222.222%)
+[BuildingSystem] 🏗️ Construction complete! tent at (0, 0)
+[BuildingSystem] 🎉 building:complete event emitted for entity 6a3ac537
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Edge Cases > should handle zero deltaTime
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Integration with Building Types > should use correct buildTime for each building type
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+
+ ✓ packages/core/src/systems/__tests__/ConstructionProgress.test.ts  (27 tests) 17ms
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > autonomic memory formation > should form memory automatically on significant event
+[MemoryFormation] 🧠 Forming memory for agent 3816f5a0-1538-4795-9030-fd0a0f25e7d7: {
+  eventType: 'harvest:first',
+  summary: 'Harvested first wheat',
+  emotionalIntensity: 0.8,
+  novelty: 1
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > autonomic memory formation > should form memory on high emotional intensity (>0.6)
+[MemoryFormation] 🧠 Forming memory for agent 43dd81f6-2e61-46b9-ad5f-dd9b73608ea4: {
+  eventType: 'social:conflict',
+  summary: 'Had a conflict with bob-123',
+  emotionalIntensity: 0.9,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > autonomic memory formation > should form memory on high novelty
+[MemoryFormation] 🧠 Forming memory for agent ebde8522-13de-45c2-ba97-12e305fc9736: {
+  eventType: 'discovery:location',
+  summary: 'Discovered a new location',
+  emotionalIntensity: 0,
+  novelty: 1
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > autonomic memory formation > should form memory on survival threat
+[MemoryFormation] 🧠 Forming memory for agent 2c78ff76-a7c9-4533-af6c-86990ef8db77: {
+  eventType: 'need:critical',
+  summary: 'My health became critically low',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > memory formation triggers > should trigger on emotional intensity > 0.6
+[MemoryFormation] 🧠 Forming memory for agent 143e5e33-cfe3-450e-a496-95a92a6323e2: {
+  eventType: 'agent:emotion_peak',
+  summary: 'Felt strong joy',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > memory formation triggers > should trigger on novelty > 0.7
+[MemoryFormation] 🧠 Forming memory for agent b03e0b96-a777-4ae2-99fc-e4ab4662f57e: {
+  eventType: 'event:novel',
+  summary: 'Experienced something completely new',
+  emotionalIntensity: 0,
+  novelty: 0.8
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > memory formation triggers > should trigger on social significance > 0.5
+[MemoryFormation] 🧠 Forming memory for agent a06ede05-7d09-4d6f-bfc1-5f370e41a868: {
+  eventType: 'social:interaction',
+  summary: 'Interacted with alice-123',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > memory formation triggers > should trigger on survival relevance > 0.5
+[MemoryFormation] 🧠 Forming memory for agent 54f4524e-94db-40b6-bdbd-1909af43f865: {
+  eventType: 'survival:close_call',
+  summary: 'Close call with starvation',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > memory formation triggers > should trigger on goal relevance > 0.7
+[MemoryFormation] 🧠 Forming memory for agent 505d6e12-53e0-498a-8565-f76f52bf504c: {
+  eventType: 'goal:progress',
+  summary: 'Made progress on build-house',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > importance calculation > should weight emotional intensity at 30%
+[MemoryFormation] 🧠 Forming memory for agent 986244de-0bcd-41f9-b554-b47db4eb8e7a: {
+  eventType: 'test:event',
+  summary: 'Test event',
+  emotionalIntensity: 1,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > importance calculation > should weight novelty at 30%
+[MemoryFormation] 🧠 Forming memory for agent 2b120b9f-291e-446a-aadd-7f4e5a08465a: {
+  eventType: 'test:event',
+  summary: 'Test event',
+  emotionalIntensity: 0,
+  novelty: 0.8
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > importance calculation > should weight goal relevance at 20%
+[MemoryFormation] 🧠 Forming memory for agent 4f674f5d-df17-42b8-b47f-244c21c59842: {
+  eventType: 'test:event',
+  summary: 'Test event',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > importance calculation > should weight social significance at 15%
+[MemoryFormation] 🧠 Forming memory for agent a73dd260-6593-4353-ae89-779a3e5fefda: {
+  eventType: 'test:event',
+  summary: 'Test event',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > importance calculation > should weight survival relevance at 25%
+[MemoryFormation] 🧠 Forming memory for agent a7c2bb1d-9733-4e3b-8b1c-be97dc3b369d: {
+  eventType: 'test:event',
+  summary: 'Test event',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > importance calculation > should combine all factors correctly
+[MemoryFormation] 🧠 Forming memory for agent 6fb72642-72a9-4c9c-bd35-64127a351c67: {
+  eventType: 'test:event',
+  summary: 'Test event',
+  emotionalIntensity: 0.8,
+  novelty: 0.85
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > conversation memory formation > should form memory when agent speaks
+[MemoryFormation] 🧠 Forming memory for agent 8d7128c8-ba48-4d7a-ab14-40b703c85204: {
+  eventType: 'conversation:utterance',
+  summary: 'Experienced conversation:utterance',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > conversation memory formation > should form memory when agent listens
+[MemoryFormation] 🧠 Forming memory for agent 3c1dcaa0-7a2a-430d-b53e-c0204cf1c02d: {
+  eventType: 'conversation:utterance',
+  summary: 'Experienced conversation:utterance',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > conversation memory formation > should preserve dialogue text in memory
+[MemoryFormation] 🧠 Forming memory for agent 065476f3-c707-44ef-a965-39ebe210a9d7: {
+  eventType: 'conversation:utterance',
+  summary: 'Experienced conversation:utterance',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > conversation memory formation > should reference same conversation in both memories
+[MemoryFormation] 🧠 Forming memory for agent f57c8a45-d503-4b14-a082-16ecbcb7388c: {
+  eventType: 'conversation:utterance',
+  summary: 'Experienced conversation:utterance',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+[MemoryFormation] 🧠 Forming memory for agent 04eb1b45-1990-43ee-8677-82d0eb3402ed: {
+  eventType: 'conversation:utterance',
+  summary: 'Experienced conversation:utterance',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > event emission > should emit memory:formed event when memory created
+[MemoryFormation] 🧠 Forming memory for agent 069d7912-07e9-4e6f-9b3f-5a2912ac850f: {
+  eventType: 'harvest:first',
+  summary: 'Harvested first crop',
+  emotionalIntensity: 0.8,
+  novelty: 1
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > event emission > should include agent ID in memory:formed event
+[MemoryFormation] 🧠 Forming memory for agent 38a395ae-77b8-4cfd-ab41-40539f40b9e3: {
+  eventType: 'test:event',
+  summary: 'Test event',
+  emotionalIntensity: 0.7,
+  novelty: 0
+}
+
+stderr | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > error handling > should throw if agent has no EpisodicMemoryComponent
+[MemoryFormation] Agent dde0a756-4f22-4879-a805-aff99e4bdc66 missing EpisodicMemoryComponent
+[MemoryFormation] Agent has components: []
+[MemoryFormation] Event that triggered memory formation: [
+  {
+    eventType: 'test:event',
+    data: {
+      agentId: 'dde0a756-4f22-4879-a805-aff99e4bdc66',
+      emotionalIntensity: 0.8
+    }
+  }
+]
+
+ ✓ packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts  (25 tests) 11ms
+ ✓ packages/core/src/buildings/__tests__/PlacementValidator.test.ts  (22 tests) 12ms
+ ✓ packages/core/src/components/__tests__/SocialMemoryComponent.test.ts  (22 tests) 6ms
+ ✓ packages/core/src/systems/__tests__/MemoryConsolidationSystem.test.ts  (21 tests) 8ms
+ ✓ packages/core/src/systems/__tests__/Phase9-SoilWeatherIntegration.test.ts  (39 tests) 10ms
+ ✓ packages/core/src/__tests__/WildAnimalSpawning.test.ts  (19 tests) 16ms
+ ✓ packages/core/src/buildings/__tests__/BuildingBlueprintRegistry.test.ts  (16 tests) 9ms
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Tool Definition > should define all 12 action tools
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: 'wander',
+  thinking: 'test...',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Tool Definition > should define tools with no parameters
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: '(no action)',
+  thinking: '(no thoughts)',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+[OllamaProvider] No tool call, using text fallback
+
+stderr | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Tool Definition > should define tools with no parameters
+[OllamaProvider] Empty response from Ollama: { message: { content: '', tool_calls: [] } }
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Response Parsing > should parse structured response with tool call
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: 'explore',
+  thinking: 'I should explore...',
+  speaking: 'Let me look around!',
+  tokensUsed: 150
+}
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Response Parsing > should handle empty thinking field
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: 'rest',
+  thinking: '(no thoughts)',
+  speaking: 'Time to rest',
+  tokensUsed: undefined
+}
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Response Parsing > should handle empty speaking (silent action)
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: 'wander',
+  thinking: 'Just going to wander...',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Response Parsing > should fall back to text when no tool call
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: '(no action)',
+  thinking: '(no thoughts)',
+  speaking: 'I will explore the area',
+  tokensUsed: undefined
+}
+[OllamaProvider] No tool call, using text fallback
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > API Configuration > should use /api/chat endpoint
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: '(no action)',
+  thinking: '(no thoughts)',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+[OllamaProvider] No tool call, using text fallback
+
+stderr | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > API Configuration > should use /api/chat endpoint
+[OllamaProvider] Empty response from Ollama: { message: { content: '', tool_calls: [] } }
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > API Configuration > should send correct request format
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: '(no action)',
+  thinking: '(no thoughts)',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+[OllamaProvider] No tool call, using text fallback
+
+stderr | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > API Configuration > should send correct request format
+[OllamaProvider] Empty response from Ollama: { message: { content: '', tool_calls: [] } }
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > API Configuration > should use default values when not specified
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: '(no action)',
+  thinking: '(no thoughts)',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+[OllamaProvider] No tool call, using text fallback
+
+stderr | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > API Configuration > should use default values when not specified
+[OllamaProvider] Empty response from Ollama: { message: { content: '', tool_calls: [] } }
+
+stderr | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Error Handling > should throw on HTTP error
+[OllamaProvider] Ollama generate error: Error: Ollama API error: 500 Internal Server Error
+    at OllamaProvider.generate (/Users/annhoward/src/ai_village/custom_game_engine/packages/llm/src/OllamaProvider.ts:135:15)
+    at /Users/annhoward/src/ai_village/custom_game_engine/packages/llm/src/__tests__/OllamaProvider.test.ts:255:7
+    at runTest (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:781:11)
+    at runSuite (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runFiles (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:958:5)
+    at startTests (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:967:3)
+    at file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:116:7
+    at withEnv (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:83:5)
+[OllamaProvider] Error details: {
+  message: 'Ollama API error: 500 Internal Server Error',
+  model: 'qwen3:4b',
+  url: 'http://localhost:11434/api/generate'
+}
+
+stderr | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Error Handling > should throw on network error
+[OllamaProvider] Ollama generate error: Error: Network error
+    at /Users/annhoward/src/ai_village/custom_game_engine/packages/llm/src/__tests__/OllamaProvider.test.ts:260:51
+    at file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:135:14
+    at file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:60:26
+    at runTest (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:781:17)
+    at runSuite (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runFiles (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:958:5)
+    at startTests (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:967:3)
+    at file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:116:7
+[OllamaProvider] Error details: {
+  message: 'Network error',
+  model: 'qwen3:4b',
+  url: 'http://localhost:11434/api/generate'
+}
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Error Handling > should log empty responses
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: '(no action)',
+  thinking: '(no thoughts)',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+[OllamaProvider] No tool call, using text fallback
+
+ ✓ packages/llm/src/__tests__/OllamaProvider.test.ts  (15 tests) 13ms
+ ✓ packages/core/src/buildings/__tests__/BuildingPlacement.integration.test.ts  (14 tests) 7ms
+ ✓ packages/core/src/crafting/__tests__/RecipeRegistry.test.ts  (15 tests) 6ms
+stdout | packages/core/src/systems/__tests__/Phase8-WeatherTemperature.test.ts > Phase 8: Weather & Temperature Systems > WeatherSystem > should update weather duration over time
+[WeatherSystem] Weather changed: clear → snow (intensity: 74%). Temp modifier: -5.9°C, Movement modifier: 78%
+
+ ✓ packages/core/src/systems/__tests__/Phase8-WeatherTemperature.test.ts  (19 tests) 17ms
+ ✓ packages/core/src/components/__tests__/BuildingComponent.test.ts  (35 tests) 5ms
+ ✓ packages/core/src/systems/__tests__/SoilSystem.test.ts  (27 tests) 9ms
+ ✓ packages/core/src/systems/__tests__/FertilizerAction.test.ts  (26 tests) 10ms
+ ✓ packages/core/src/components/__tests__/SemanticMemoryComponent.test.ts  (18 tests) 5ms
+ ✓ packages/llm/src/__tests__/StructuredPromptBuilder.test.ts  (15 tests) 15ms
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > buildPrompt > should build complete prompt with all sections
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > buildPrompt > should include personality traits in prompt
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > buildPrompt > should describe hunger levels correctly
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > buildPrompt > should describe energy levels correctly
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > hearing system integration > should include heard speech in prompt
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [ 'agent1' ],
+  seenAgentsCount: 1,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'talk', 'follow_agent', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > hearing system integration > should not show hearing section when no speech
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [ 'agent1' ],
+  seenAgentsCount: 1,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'talk', 'follow_agent', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > hearing system integration > should show agents present even if silent
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [ 'agent1', 'agent2' ],
+  seenAgentsCount: 2,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'talk', 'follow_agent', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > context collapse > should not show empty memories section
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > context collapse > should show memories when present
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > context collapse > should show empty area when nothing nearby
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > instruction clarity > should include "don't overthink" instruction
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > instruction clarity > should end with response prompt
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > resource type descriptions > should describe trees when wood resources are visible
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [ 'tree1', 'tree2' ],
+  seenResourcesCount: 2,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'seek_food', 'gather', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > resource type descriptions > should describe rocks when stone resources are visible
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [ 'rock1' ],
+  seenResourcesCount: 1,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'seek_food', 'gather', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > resource type descriptions > should describe mixed resources correctly
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [ 'tree1', 'rock1', 'food1' ],
+  seenResourcesCount: 3,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'seek_food', 'gather', 'build' ]
+
+ ✓ packages/core/src/__tests__/AnimalComponent.test.ts  (8 tests) 4ms
+ ✓ packages/core/src/systems/__tests__/SoilDepletion.test.ts  (14 tests) 6ms
+ ✓ packages/core/src/components/__tests__/InventoryComponent.test.ts  (16 tests) 4ms
+ ✓ packages/world/src/chunks/__tests__/Tile.test.ts  (10 tests) 4ms
+ ✓ packages/renderer/src/__tests__/GhostPreview.test.ts  (19 tests) 8ms
+ ✓ packages/world/src/chunks/__tests__/Chunk.test.ts  (16 tests) 5ms
+ ✓ packages/core/src/systems/__tests__/HearingSystem.test.ts  (5 tests) 4ms
+ ✓ packages/core/src/crafting/__tests__/CraftingSystem.test.ts  (14 tests) 8ms
+ ✓ packages/core/src/systems/__tests__/SleepSystem.test.ts  (17 tests) 5ms
+stdout | packages/core/src/__tests__/PlantSeedProduction.test.ts > PlantSeedProduction Integration > should produce seeds when transitioning vegetative → mature
+
+Test: Plant created - stage=vegetative, seedsProduced=0
+Emitting time:day_changed event
+[PlantSystem] New day started - will advance all plants by 1 day (total pending: 1 days)
+After emit - daySkipCount should be > 0
+Calling plantSystem.update with entities: 1
+[PlantSystem] Active with 1 plants, accumulated 0.00 game hours
+[PlantSystem] Processing 1 skipped day(s) = 24 hours for 1 plants
+[PlantSystem] 6d9678f8: Age increased by 1.0000 days (5.00 → 6.00) from 24.00 hours
+[PlantSystem] 6d9678f8: Test Plant (vegetative) age=6.0d progress=120% health=100
+[PlantSystem] 6d9678f8: test-plant stage vegetative → mature (age=6.0d, health=100)
+[PlantSystem] 6d9678f8: Executing 1 transition effect(s) for vegetative → mature
+[PlantSystem] 6d9678f8: Plant state before effects - seedsProduced=0, flowerCount=0, fruitCount=0
+[PlantSystem] 6d9678f8: Processing effect: produce_seeds
+[PlantSystem] 6d9678f8: produce_seeds effect START - plant.seedsProduced=0
+[PlantSystem] 6d9678f8: produce_seeds effect EXECUTED - species.seedsPerPlant=10, yieldModifier=1.00, calculated=10, plant.seedsProduced 0 → 10
+[PlantSystem] 6d9678f8: All effects complete - seedsProduced=10, flowerCount=0, fruitCount=0
+Test: After update - stage=mature, seedsProduced=10
+
+stdout | packages/core/src/__tests__/PlantSeedProduction.test.ts > PlantSeedProduction Integration > should produce MORE seeds when transitioning mature → seeding
+
+Test: Plant created - stage=mature, seedsProduced=10
+[PlantSystem] New day started - will advance all plants by 1 day (total pending: 1 days)
+[PlantSystem] Active with 1 plants, accumulated 0.00 game hours
+[PlantSystem] Processing 1 skipped day(s) = 24 hours for 1 plants
+[PlantSystem] db9799ff: Age increased by 1.0000 days (10.00 → 11.00) from 24.00 hours
+[PlantSystem] db9799ff: Test Plant (mature) age=11.0d progress=133% health=100
+[PlantSystem] db9799ff: test-plant stage mature → seeding (age=11.0d, health=100)
+[PlantSystem] db9799ff: Executing 2 transition effect(s) for mature → seeding
+[PlantSystem] db9799ff: Plant state before effects - seedsProduced=10, flowerCount=0, fruitCount=0
+[PlantSystem] db9799ff: Processing effect: produce_seeds
+[PlantSystem] db9799ff: produce_seeds effect START - plant.seedsProduced=10
+[PlantSystem] db9799ff: produce_seeds effect EXECUTED - species.seedsPerPlant=10, yieldModifier=1.00, calculated=10, plant.seedsProduced 10 → 20
+[PlantSystem] db9799ff: Processing effect: drop_seeds
+[PlantSystem] db9799ff: disperseSeeds called - plant.seedsProduced=20, count param=undefined
+[PlantSystem] db9799ff: Dispersing 6 seeds in 3-tile radius
+[PlantSystem] db9799ff: Dispersed seed at (0.0, -3.0)
+[PlantSystem] db9799ff: Dispersed seed at (0.0, 4.0)
+[PlantSystem] db9799ff: Dispersed seed at (-2.0, 1.0)
+[PlantSystem] db9799ff: Dispersed seed at (-2.0, -1.0)
+[PlantSystem] db9799ff: Placed 4/6 seeds in 3-tile radius (14 remaining)
+[PlantSystem] db9799ff: All effects complete - seedsProduced=14, flowerCount=0, fruitCount=0
+Test: After update - stage=seeding, seedsProduced=14
+
+stdout | packages/core/src/__tests__/PlantSeedProduction.test.ts > PlantSeedProduction Integration > should produce seeds correctly through full lifecycle vegetative → mature → seeding
+
+Test: Initial - stage=vegetative, seedsProduced=0
+[PlantSystem] New day started - will advance all plants by 1 day (total pending: 1 days)
+[PlantSystem] Active with 1 plants, accumulated 0.00 game hours
+[PlantSystem] Processing 1 skipped day(s) = 24 hours for 1 plants
+[PlantSystem] 915ec402: Age increased by 1.0000 days (5.00 → 6.00) from 24.00 hours
+[PlantSystem] 915ec402: Test Plant (vegetative) age=6.0d progress=120% health=100
+[PlantSystem] 915ec402: test-plant stage vegetative → mature (age=6.0d, health=100)
+[PlantSystem] 915ec402: Executing 1 transition effect(s) for vegetative → mature
+[PlantSystem] 915ec402: Plant state before effects - seedsProduced=0, flowerCount=0, fruitCount=0
+[PlantSystem] 915ec402: Processing effect: produce_seeds
+[PlantSystem] 915ec402: produce_seeds effect START - plant.seedsProduced=0
+[PlantSystem] 915ec402: produce_seeds effect EXECUTED - species.seedsPerPlant=10, yieldModifier=1.00, calculated=10, plant.seedsProduced 0 → 10
+[PlantSystem] 915ec402: All effects complete - seedsProduced=10, flowerCount=0, fruitCount=0
+Test: After vegetative → mature - stage=mature, seedsProduced=10
+[PlantSystem] New day started - will advance all plants by 1 day (total pending: 1 days)
+[PlantSystem] Processing 1 skipped day(s) = 24 hours for 1 plants
+[PlantSystem] 915ec402: Age increased by 1.0000 days (6.00 → 7.00) from 24.00 hours
+[PlantSystem] 915ec402: Test Plant (mature) age=7.0d progress=133% health=100
+[PlantSystem] 915ec402: test-plant stage mature → seeding (age=7.0d, health=100)
+[PlantSystem] 915ec402: Executing 2 transition effect(s) for mature → seeding
+[PlantSystem] 915ec402: Plant state before effects - seedsProduced=10, flowerCount=0, fruitCount=0
+[PlantSystem] 915ec402: Processing effect: produce_seeds
+[PlantSystem] 915ec402: produce_seeds effect START - plant.seedsProduced=10
+[PlantSystem] 915ec402: produce_seeds effect EXECUTED - species.seedsPerPlant=10, yieldModifier=1.00, calculated=10, plant.seedsProduced 10 → 20
+[PlantSystem] 915ec402: Processing effect: drop_seeds
+[PlantSystem] 915ec402: disperseSeeds called - plant.seedsProduced=20, count param=undefined
+[PlantSystem] 915ec402: Dispersing 6 seeds in 3-tile radius
+[PlantSystem] 915ec402: Dispersed seed at (2.0, -1.0)
+[PlantSystem] 915ec402: Dispersed seed at (-2.0, -1.0)
+[PlantSystem] 915ec402: Dispersed seed at (2.0, -3.0)
+[PlantSystem] 915ec402: Dispersed seed at (-2.0, 0.0)
+[PlantSystem] 915ec402: Placed 4/6 seeds in 3-tile radius (14 remaining)
+[PlantSystem] 915ec402: All effects complete - seedsProduced=14, flowerCount=0, fruitCount=0
+Test: After mature → seeding - stage=seeding, seedsProduced=14
+
+ ✓ packages/core/src/__tests__/PlantSeedProduction.test.ts  (3 tests) 8ms
+ ✓ packages/world/src/terrain/__tests__/PerlinNoise.test.ts  (10 tests) 12ms
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseResponse - Structured JSON > should parse valid structured response
+[ResponseParser] Structured response: {
+  action: 'explore',
+  thinking: 'I should explore to find food',
+  speaking: 'Time to look around!'
+}
+
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseResponse - Structured JSON > should handle response with no speaking
+[ResponseParser] Structured response: {
+  action: 'wander',
+  thinking: 'Just going to wander',
+  speaking: '(silent)'
+}
+
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseResponse - Structured JSON > should parse all 12 valid actions
+[ResponseParser] Structured response: { action: 'wander', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'idle', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'seek_food', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'follow_agent', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'talk', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'gather', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'explore', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'approach', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'observe', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'rest', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'work', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'help', thinking: 'test', speaking: '(silent)' }
+
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseResponse - Text Fallback > should parse plain text with action name
+[ResponseParser] Text-based match: explore
+
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseResponse - Text Fallback > should find action anywhere in text
+[ResponseParser] Text-based match: seek_food
+
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseBehavior - Legacy API > should extract just the action from structured response
+[ResponseParser] Structured response: { action: 'talk', thinking: 'test', speaking: 'hello' }
+
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseBehavior - Legacy API > should work with text response
+[ResponseParser] Text-based match: idle
+
+ ✓ packages/llm/src/__tests__/ResponseParser.test.ts  (12 tests) 6ms
+ ✓ packages/core/src/systems/__tests__/WateringAction.test.ts  (10 tests) 6ms
+ ✓ packages/core/src/events/__tests__/EventBus.test.ts  (10 tests) 6ms
+ ✓ packages/core/src/ecs/__tests__/ComponentRegistry.test.ts  (9 tests) 3ms
+ ✓ packages/world/src/chunks/__tests__/ChunkManager.test.ts  (9 tests) 10ms
+ ✓ packages/core/src/actions/__tests__/AgentAction.test.ts  (12 tests) 3ms
+ ✓ packages/core/src/ecs/__tests__/Entity.test.ts  (10 tests) 6ms
+ ↓ packages/renderer/src/__tests__/BuildingPlacementUI.test.ts  (1 test | 1 skipped)
+ ↓ packages/renderer/src/__tests__/AgentInfoPanel-thought-speech.test.ts  (19 tests | 19 skipped)
+ ✓ packages/renderer/src/__tests__/CraftingPanelUI.test.ts  (46 tests) 95ms
+ ✓ packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts  (32 tests) 149ms
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 1: Inventory Section Appears > should render inventory section below needs section when agent is selected
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 1: Inventory Section Appears > should render inventory divider line before inventory section
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 1: Inventory Section Appears > should not render inventory section if agent has no inventory component
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 2: Resource Counts Display > should display wood resources with icon and quantity
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 2: Resource Counts Display > should display stone resources with icon and quantity
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 2: Resource Counts Display > should display food resources with icon and quantity
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 2: Resource Counts Display > should display water resources with icon and quantity
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 2: Resource Counts Display > should display all resource types simultaneously
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 2: Resource Counts Display > should not display resources with zero quantity
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 3: Empty Inventory State > should show "(empty)" when inventory has no items
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 3: Empty Inventory State > should show capacity as "Weight: 0/100 Slots: 0/8" when empty
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 4: Capacity Display > should display current weight and max weight
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 4: Capacity Display > should display current slots and max slots
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 4: Capacity Display > should calculate weight correctly for mixed resources
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 5: Capacity Warning Colors > should use white color when weight is below 80%
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 5: Capacity Warning Colors > should use yellow color when weight exceeds 80%
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 5: Capacity Warning Colors > should use red color when weight reaches 100%
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 5: Capacity Warning Colors > should use yellow color when slots exceed 80%
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 5: Capacity Warning Colors > should use red color when slots reach 100%
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 6: Real-time Updates > should reflect inventory changes when entity is re-rendered
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 6: Real-time Updates > should update capacity display when weight changes
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 6: Real-time Updates > should show empty state when all resources are consumed
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Error Handling (per CLAUDE.md) > should throw when inventory.maxWeight is missing
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Error Handling (per CLAUDE.md) > should throw when inventory.maxWeight is undefined
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Error Handling (per CLAUDE.md) > should throw when inventory.slots is not an array
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Error Handling (per CLAUDE.md) > should throw when inventory.slots is null
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Error Handling (per CLAUDE.md) > should throw when inventory.currentWeight is missing
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Error Handling (per CLAUDE.md) > should throw when inventory.maxSlots is missing
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Edge Cases > should handle inventory with only empty slots
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Edge Cases > should handle inventory with partial slots filled
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Edge Cases > should handle very large resource quantities
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Edge Cases > should not overflow panel bounds with many resources
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stderr | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Edge Cases > should not overflow panel bounds with many resources
+[AgentInfoPanel] World not available or missing getEntity method
+
+
+ Test Files  55 passed | 2 skipped (57)
+      Tests  1121 passed | 55 skipped (1176)
+   Start at  05:35:47
+   Duration  2.77s (transform 2.35s, setup 14.31s, collect 4.07s, tests 714ms, environment 1.43s, prepare 3.72s)
+

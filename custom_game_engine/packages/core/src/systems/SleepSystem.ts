@@ -72,11 +72,6 @@ export class SleepSystem implements System {
       // CircadianComponent has methods, so we can't use spread operator
       (circadian as any).sleepDrive = newSleepDrive;
 
-      // Debug logging every 100 ticks for first few entities
-      if ((entity.id < '4' || entity.id.startsWith('0')) && world.tick % 100 === 0) {
-        console.log(`[SleepSystem] Entity ${entity.id.substring(0, 8)}: sleepDrive ${circadian.sleepDrive.toFixed(1)} (hours: ${hoursElapsed.toFixed(4)}, sleeping: ${circadian.isSleeping}, time: ${timeOfDay.toFixed(1)})`);
-      }
-
       // Process sleep (energy recovery) if sleeping
       if (circadian.isSleeping) {
         this.processSleep(impl, circadian, needs, hoursElapsed, world);
@@ -245,8 +240,6 @@ export class SleepSystem implements System {
         behaviorState: {},
       }));
     }
-
-    console.log(`[SleepSystem] Agent ${entity.id} woke up after ${hoursAsleep.toFixed(1)} game hours of sleep`);
 
     // Emit wake event
     world.eventBus.emit({

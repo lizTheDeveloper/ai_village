@@ -1,6 +1,6 @@
 import type { World, EventBus } from '@ai-village/core';
 import type { Camera } from './Camera.js';
-import type { Tile, ChunkManager } from '@ai-village/world';
+import type { Tile, ChunkManager, TerrainGenerator } from '@ai-village/world';
 
 const CHUNK_SIZE = 32; // From packages/world/src/chunks/Chunk.ts
 
@@ -17,6 +17,7 @@ export class TileInspectorPanel {
   private eventBus: EventBus;
   private camera: Camera;
   private chunkManager: ChunkManager;
+  private terrainGenerator: TerrainGenerator;
 
   // Button state tracking
   private buttons: Array<{
@@ -29,10 +30,11 @@ export class TileInspectorPanel {
     enabled: () => boolean;
   }> = [];
 
-  constructor(eventBus: EventBus, camera: Camera, chunkManager: ChunkManager) {
+  constructor(eventBus: EventBus, camera: Camera, chunkManager: ChunkManager, terrainGenerator: TerrainGenerator) {
     this.eventBus = eventBus;
     this.camera = camera;
     this.chunkManager = chunkManager;
+    this.terrainGenerator = terrainGenerator;
   }
 
   /**
@@ -147,6 +149,24 @@ export class TileInspectorPanel {
     ctx.fillStyle = '#FFFFFF';
     ctx.font = 'bold 16px monospace';
     ctx.fillText('Tile Inspector', panelX + this.padding, currentY + 14);
+
+    // Close button (X in top right)
+    const closeButtonSize = 24;
+    const closeButtonX = panelX + this.panelWidth - closeButtonSize - 8;
+    const closeButtonY = panelY + 8;
+
+    ctx.fillStyle = 'rgba(200, 50, 50, 0.8)';
+    ctx.fillRect(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize);
+    ctx.strokeStyle = 'rgba(255, 100, 100, 1)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize);
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 16px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('×', closeButtonX + closeButtonSize / 2, closeButtonY + closeButtonSize / 2 + 6);
+    ctx.textAlign = 'left';
+
     currentY += 30;
 
     // Coordinates
@@ -216,9 +236,32 @@ export class TileInspectorPanel {
 
     // Plantability (uses remaining)
     if (tile.tilled) {
-      ctx.fillStyle = '#FFFFFF';
+      // Color-code plantability based on remaining uses
+      const plantabilityColor = tile.plantability > 2 ? '#4CAF50' : (tile.plantability > 0 ? '#FFA500' : '#FF0000');
+      ctx.fillStyle = plantabilityColor;
       ctx.fillText(`Plantability: ${tile.plantability}/3 uses`, panelX + this.padding, currentY);
       currentY += this.lineHeight;
+
+      // Warning if depleted (needs fertilizer)
+      if (tile.plantability === 0) {
+        ctx.fillStyle = '#FF6600';
+        ctx.font = 'bold 12px monospace';
+        ctx.fillText('⚠️ Needs Fertilizer or Rest', panelX + this.padding, currentY);
+        currentY += this.lineHeight;
+        ctx.font = '12px monospace';
+      }
+
+      // Last tilled timestamp (convert ticks to days ago)
+      // Assume 20 ticks/second * 60 seconds * 24 hours = 28800 ticks per day
+      if (tile.lastTilled > 0) {
+        // Note: We don't have access to world.tick here, so we show the raw tick value
+        // In a full implementation, would pass current tick to calculate "X days ago"
+        ctx.fillStyle = '#888';
+        ctx.font = '10px monospace';
+        ctx.fillText(`Last tilled: tick ${tile.lastTilled}`, panelX + this.padding, currentY);
+        currentY += this.lineHeight;
+        ctx.font = '12px monospace';
+      }
     }
 
     currentY += 5;
@@ -429,6 +472,22 @@ export class TileInspectorPanel {
       return false;
     }
 
+    // Check close button click
+    const closeButtonSize = 24;
+    const closeButtonX = panelX + this.panelWidth - closeButtonSize - 8;
+    const closeButtonY = panelY + 8;
+
+    if (
+      screenX >= closeButtonX &&
+      screenX <= closeButtonX + closeButtonSize &&
+      screenY >= closeButtonY &&
+      screenY <= closeButtonY + closeButtonSize
+    ) {
+      console.log('[TileInspector] Close button clicked');
+      this.setSelectedTile(null);
+      return true;
+    }
+
     // Check button clicks
     for (const button of this.buttons) {
       const buttonX = panelX + button.x;
@@ -484,7 +543,7 @@ export class TileInspectorPanel {
   findTileAtScreenPosition(
     screenX: number,
     screenY: number,
-    _world: World
+    world: World
   ): { tile: Tile; x: number; y: number } | null {
     // Convert screen to world coordinates
     const worldPos = this.camera.screenToWorld(screenX, screenY);
@@ -506,6 +565,14 @@ export class TileInspectorPanel {
       return null;
     }
 
+    // CRITICAL FIX: Generate chunk if not already generated
+    // Per CLAUDE.md: All tiles MUST have biome data before farming operations
+    // Chunks created on-demand need terrain generation to set biome data
+    if (!chunk.generated) {
+      console.log(`[TileInspector] Generating terrain for chunk (${chunkX}, ${chunkY})`);
+      this.terrainGenerator.generateChunk(chunk, world as any);
+    }
+
     // Get tile from chunk
     const tileIndex = localY * CHUNK_SIZE + localX;
     const tile = chunk.tiles[tileIndex];
@@ -516,7 +583,7 @@ export class TileInspectorPanel {
     }
 
     console.log(
-      `[TileInspector] Found tile at world (${worldX}, ${worldY}): ${tile.terrain}, tilled=${tile.tilled}, fertility=${tile.fertility}`
+      `[TileInspector] Found tile at world (${worldX}, ${worldY}): ${tile.terrain}, tilled=${tile.tilled}, fertility=${tile.fertility}, biome=${tile.biome}`
     );
 
     return { tile, x: worldX, y: worldY };

@@ -9,6 +9,8 @@ import {
 import { Camera } from './Camera.js';
 import { renderSprite } from './SpriteRenderer.js';
 import { FloatingTextRenderer } from './FloatingTextRenderer.js';
+import { SpeechBubbleRenderer } from './SpeechBubbleRenderer.js';
+import { ParticleRenderer } from './ParticleRenderer.js';
 
 /**
  * 2D renderer using Canvas.
@@ -21,8 +23,11 @@ export class Renderer {
   private chunkManager: ChunkManager;
   private terrainGenerator: TerrainGenerator;
   private floatingTextRenderer!: FloatingTextRenderer;
+  private speechBubbleRenderer!: SpeechBubbleRenderer;
+  private particleRenderer!: ParticleRenderer;
 
   private tileSize = 16; // Pixels per tile at zoom=1
+  private hasLoggedTilledTile = false; // Debug flag to log first tilled tile rendering
 
   constructor(canvas: HTMLCanvasElement, seed: string = 'default') {
     this.canvas = canvas;
@@ -36,6 +41,8 @@ export class Renderer {
     this.chunkManager = new ChunkManager(3); // Load 3 chunks in each direction
     this.terrainGenerator = new TerrainGenerator(seed);
     this.floatingTextRenderer = new FloatingTextRenderer();
+    this.speechBubbleRenderer = new SpeechBubbleRenderer();
+    this.particleRenderer = new ParticleRenderer();
 
     // Handle resize
     this.resize();
@@ -69,6 +76,20 @@ export class Renderer {
    */
   getFloatingTextRenderer(): FloatingTextRenderer {
     return this.floatingTextRenderer;
+  }
+
+  /**
+   * Get the speech bubble renderer for agent dialogue.
+   */
+  getSpeechBubbleRenderer(): SpeechBubbleRenderer {
+    return this.speechBubbleRenderer;
+  }
+
+  /**
+   * Get the particle renderer for visual effects.
+   */
+  getParticleRenderer(): ParticleRenderer {
+    return this.particleRenderer;
   }
 
   /**
@@ -121,6 +142,7 @@ export class Renderer {
 
       const hasAgent = entity.components.has('agent');
       const hasPlant = entity.components.has('plant');
+      const hasAnimal = entity.components.has('animal');
 
       // Calculate world pixel coordinates
       const worldX = pos.x * this.tileSize;
@@ -148,11 +170,14 @@ export class Renderer {
 
       // Determine click radius based on entity type
       // Agents need a VERY large radius to be easily clickable (16 tiles = 256 pixels at zoom 1.0)
+      // Animals need a large radius to be easily clickable (8 tiles)
       // Plants need a moderate radius to be clickable (3 tiles)
       // Other entities use default (0.5 tiles)
       let clickRadius = tilePixelSize / 2;
       if (hasAgent) {
         clickRadius = tilePixelSize * 16; // Increased from 8 to 16 for more forgiving clicks
+      } else if (hasAnimal) {
+        clickRadius = tilePixelSize * 8; // Same as original agent radius
       } else if (hasPlant) {
         clickRadius = tilePixelSize * 3;
       }
@@ -185,16 +210,19 @@ export class Renderer {
 
     console.log(`[Renderer] Checked ${agentCount} agents, closestEntity: ${closestEntity ? closestEntity.id : 'null'}, closestDistance: ${closestDistance === Infinity ? 'Infinity' : closestDistance.toFixed(1)}, closestAgent: ${closestAgent ? closestAgent.id : 'null'}, closestAgentDistance: ${closestAgentDistance === Infinity ? 'Infinity' : closestAgentDistance.toFixed(1)}`);
 
-    // PRIORITIZE AGENTS: If we found an agent within click radius, return it instead of other entities
-    // This ensures agents are always selectable even if plants/buildings are closer
-    if (closestAgent) {
-      console.log(`[Renderer] Returning closest agent (prioritized over other entities)`);
-      return closestAgent;
+    // Return the closest entity overall (could be agent, plant, or building)
+    // If both agent and non-agent are within range, return whichever is closer
+    if (closestEntity) {
+      // Check if the closest entity is an agent
+      const isAgent = closestEntity.components.has('agent');
+      console.log(`[Renderer] Returning closest entity (${isAgent ? 'agent' : 'non-agent'}) at distance ${closestDistance.toFixed(1)}`);
+      return closestEntity;
     }
 
-    // If we found a non-agent entity, return it
-    if (closestEntity) {
-      return closestEntity;
+    // If we found an agent but no other entities, return the agent
+    if (closestAgent) {
+      console.log(`[Renderer] Returning closest agent (no other entities in range)`);
+      return closestAgent;
     }
 
     // If no entity found within radius, select the closest agent if it's reasonably close (within full viewport)
@@ -293,6 +321,47 @@ export class Renderer {
     // Draw entities (if any have position component)
     const entities = world.query().with('position', 'renderable').executeEntities();
 
+    // Debug: count buildings
+    // const buildingEntities = entities.filter(e => e.components.has('building'));
+    // if (buildingEntities.length > 0) {
+    //   console.log(`[Renderer] Found ${buildingEntities.length} buildings to render:`,
+    //     buildingEntities.map(e => ({
+    //       id: e.id,
+    //       building: e.components.get('building'),
+    //       renderable: e.components.get('renderable'),
+    //       position: e.components.get('position')
+    //     }))
+    //   );
+    // }
+
+    // Debug: count and log animals
+    const animalEntities = entities.filter(e => e.components.has('animal'));
+    // if (animalEntities.length > 0) {
+    //   console.log(`[Renderer] Found ${animalEntities.length} animals to render:`,
+    //     animalEntities.map(e => ({
+    //       id: e.id.substring(0, 10),
+    //       animal: e.components.get('animal'),
+    //       renderable: e.components.get('renderable'),
+    //       position: e.components.get('position')
+    //     }))
+    //   );
+    // } else {
+    if (animalEntities.length === 0) {
+      // Query all entities with animal component to see if they exist at all
+      const allAnimals = world.query().with('animal').executeEntities();
+      if (allAnimals.length > 0) {
+        console.warn(`[Renderer] Found ${allAnimals.length} animals in world, but none have both position+renderable!`,
+          allAnimals.map(e => ({
+            id: e.id.substring(0, 10),
+            hasPosition: e.components.has('position'),
+            hasRenderable: e.components.has('renderable'),
+            position: e.components.get('position'),
+            renderable: e.components.get('renderable')
+          }))
+        );
+      }
+    }
+
     for (const entity of entities) {
       const pos = entity.components.get('position') as
         | { x: number; y: number }
@@ -301,16 +370,41 @@ export class Renderer {
         | { spriteId: string; visible: boolean }
         | undefined;
 
-      if (!pos || !renderable || !renderable.visible) continue;
+      if (!pos || !renderable || !renderable.visible) {
+        // Debug: log why buildings are being skipped
+        // if (entity.components.has('building')) {
+        //   console.log(`[Renderer] Skipping building ${entity.id}:`, {
+        //     hasPos: !!pos,
+        //     hasRenderable: !!renderable,
+        //     visible: renderable?.visible
+        //   });
+        // }
+        continue;
+      }
 
       const worldX = pos.x * this.tileSize;
       const worldY = pos.y * this.tileSize;
       const screen = this.camera.worldToScreen(worldX, worldY);
 
+      // Debug: log when we're about to render a building
+      // if (entity.components.has('building')) {
+      //   const building = entity.components.get('building') as any;
+      //   console.log(`[Renderer] Rendering building ${entity.id}:`, {
+      //     type: building.buildingType,
+      //     worldPos: { x: pos.x, y: pos.y },
+      //     worldPixels: { x: worldX, y: worldY },
+      //     screenPos: { x: screen.x, y: screen.y },
+      //     sprite: renderable.spriteId,
+      //     tileSize: this.tileSize,
+      //     zoom: this.camera.zoom
+      //   });
+      // }
+
       // Check if this is a building under construction
       const building = entity.components.get('building') as
         | { progress: number; isComplete: boolean; buildingType: string }
         | undefined;
+
       const isUnderConstruction = building && !building.isComplete && building.progress < 100;
 
       // Render sprite with reduced opacity if under construction
@@ -368,7 +462,7 @@ export class Renderer {
 
       // Draw agent behavior label
       const agent = entity.components.get('agent') as
-        | { behavior: string; behaviorState?: Record<string, any> }
+        | { behavior: string; behaviorState?: Record<string, any>; recentSpeech?: string }
         | undefined;
       const circadian = entity.components.get('circadian') as
         | { isSleeping: boolean }
@@ -377,9 +471,30 @@ export class Renderer {
         this.drawAgentBehavior(screen.x, screen.y, agent.behavior, agent.behaviorState, circadian);
       }
 
+      // Register agent speech for speech bubble rendering
+      if (agent?.recentSpeech) {
+        this.speechBubbleRenderer.registerSpeech(entity.id, agent.recentSpeech);
+      }
+
       // Draw Z's above sleeping agents
       if (circadian?.isSleeping) {
         this.drawSleepingIndicator(screen.x, screen.y);
+      }
+
+      // Draw reflection indicator for agents currently reflecting
+      const reflection = entity.components.get('reflection') as
+        | { isReflecting: boolean; reflectionType?: string }
+        | undefined;
+      if (reflection?.isReflecting) {
+        this.drawReflectionIndicator(screen.x, screen.y, reflection.reflectionType);
+      }
+
+      // Draw animal state label
+      const animal = entity.components.get('animal') as
+        | { state: string; wild: boolean; name: string }
+        | undefined;
+      if (animal) {
+        this.drawAnimalState(screen.x, screen.y, animal.state, animal.wild);
       }
 
       // Highlight selected entity
@@ -403,8 +518,45 @@ export class Renderer {
     // Draw floating text (resource gathering feedback, etc.)
     this.floatingTextRenderer.render(this.ctx, this.camera, Date.now());
 
+    // Draw particles (dust, sparks, etc.)
+    this.particleRenderer.render(this.ctx, this.camera, Date.now());
+
+    // Update and render speech bubbles
+    this.speechBubbleRenderer.update();
+    this.renderSpeechBubbles(world);
+
     // Draw debug info
     this.drawDebugInfo(world);
+  }
+
+  /**
+   * Render speech bubbles above agents.
+   */
+  private renderSpeechBubbles(world: World): void {
+    // Collect agents with positions for speech bubble rendering
+    const agents = world.query().with('agent', 'position').executeEntities();
+    const agentData: Array<{ id: string; x: number; y: number; name?: string }> = [];
+
+    for (const entity of agents) {
+      const pos = entity.components.get('position') as { x: number; y: number } | undefined;
+      const identity = entity.components.get('identity') as { name: string } | undefined;
+
+      if (!pos) continue;
+
+      // Convert world position to screen position
+      const worldX = pos.x * this.tileSize + this.tileSize / 2;
+      const worldY = pos.y * this.tileSize;
+      const screen = this.camera.worldToScreen(worldX, worldY);
+
+      agentData.push({
+        id: entity.id,
+        x: screen.x,
+        y: screen.y,
+        name: identity?.name
+      });
+    }
+
+    this.speechBubbleRenderer.render(this.ctx, agentData);
   }
 
   /**
@@ -432,16 +584,34 @@ export class Renderer {
           tilePixelSize
         );
 
-        // Draw tilled indicator (darker brown overlay)
+        // Draw tilled indicator (VERY PROMINENT - must be clearly visible!)
         if (tile.tilled) {
-          this.ctx.fillStyle = 'rgba(101, 67, 33, 0.4)'; // Dark brown overlay
+          // DEBUG: Log first time we detect a tilled tile (to verify rendering is working)
+          if (!this.hasLoggedTilledTile) {
+            console.log(`[Renderer] ✅ RENDERING TILLED TILE - Visual feedback IS active!`);
+            console.log(`[Renderer] Tilled tile details:`, {
+              position: { x: chunk.x * CHUNK_SIZE + localX, y: chunk.y * CHUNK_SIZE + localY },
+              terrain: tile.terrain,
+              tilled: tile.tilled,
+              plantability: tile.plantability,
+              fertility: tile.fertility,
+            });
+            this.hasLoggedTilledTile = true;
+          }
+
+          // CRITICAL: Make tilled soil VERY different from untilled dirt
+          // Use an EVEN DARKER brown base for maximum distinction
+          // This creates extreme contrast with both grass (green) and natural dirt (light brown)
+          this.ctx.fillStyle = 'rgba(45, 25, 10, 1.0)'; // EVEN DARKER, 100% opacity for maximum visibility
           this.ctx.fillRect(screen.x, screen.y, tilePixelSize, tilePixelSize);
 
-          // Add horizontal lines to show tilled furrows
-          this.ctx.strokeStyle = 'rgba(139, 69, 19, 0.6)';
-          this.ctx.lineWidth = Math.max(1, this.camera.zoom * 0.5);
-          const furrowCount = 3;
+          // Add EXTRA THICK horizontal furrows (visible even at low zoom)
+          // Use nearly black furrows with increased thickness
+          this.ctx.strokeStyle = 'rgba(15, 8, 3, 1.0)'; // Even darker furrows
+          this.ctx.lineWidth = Math.max(4, this.camera.zoom * 3); // THICKER lines (was 3, now 4 minimum)
+          const furrowCount = 7; // Even more furrows for unmistakable pattern
           const furrowSpacing = tilePixelSize / (furrowCount + 1);
+
           for (let i = 1; i <= furrowCount; i++) {
             const y = screen.y + furrowSpacing * i;
             this.ctx.beginPath();
@@ -449,6 +619,31 @@ export class Renderer {
             this.ctx.lineTo(screen.x + tilePixelSize, y);
             this.ctx.stroke();
           }
+
+          // Add vertical lines for grid pattern (makes it unmistakable)
+          this.ctx.strokeStyle = 'rgba(15, 8, 3, 0.9)'; // Match furrow color
+          this.ctx.lineWidth = Math.max(3, this.camera.zoom * 1.5); // Thicker vertical lines
+          const verticalCount = 5; // More vertical lines for denser grid
+          const verticalSpacing = tilePixelSize / (verticalCount + 1);
+
+          for (let i = 1; i <= verticalCount; i++) {
+            const x = screen.x + verticalSpacing * i;
+            this.ctx.beginPath();
+            this.ctx.moveTo(x, screen.y);
+            this.ctx.lineTo(x, screen.y + tilePixelSize);
+            this.ctx.stroke();
+          }
+
+          // Add DOUBLE BORDER for maximum visibility
+          // Inner border: BRIGHTER orange for extreme visibility
+          this.ctx.strokeStyle = 'rgba(255, 140, 60, 1.0)'; // BRIGHTER orange (increased from 200,120,60)
+          this.ctx.lineWidth = Math.max(4, this.camera.zoom * 1.5); // THICKER inner border (was 3)
+          this.ctx.strokeRect(screen.x + 1, screen.y + 1, tilePixelSize - 2, tilePixelSize - 2);
+
+          // Outer border: darker for contrast
+          this.ctx.strokeStyle = 'rgba(90, 50, 20, 1.0)'; // Even darker outer border for more contrast
+          this.ctx.lineWidth = Math.max(3, this.camera.zoom); // Thicker outer border (was 2)
+          this.ctx.strokeRect(screen.x, screen.y, tilePixelSize, tilePixelSize);
         }
 
         // Draw moisture indicator (blue tint for wet tiles)
@@ -637,14 +832,16 @@ export class Renderer {
    * Shows what the agent is currently doing.
    */
   /**
-   * Draw floating Z's above sleeping agents
+   * Draw floating Z's bubble above sleeping agents
+   * Positioned above the behavior label for better visibility
    */
   private drawSleepingIndicator(screenX: number, screenY: number): void {
     // Only show if zoom is reasonable
     if (this.camera.zoom < 0.5) return;
 
     const centerX = screenX + (this.tileSize * this.camera.zoom) / 2;
-    const baseY = screenY - 30 * this.camera.zoom;
+    // Position Z's ABOVE the behavior label (which is at screenY - 8 to -18)
+    const baseY = screenY - 40 * this.camera.zoom;
 
     // Animate Z's with floating effect
     const time = Date.now() / 1000;
@@ -652,22 +849,56 @@ export class Renderer {
     const offset2 = Math.sin(time * 2 + 0.5) * 3 * this.camera.zoom;
     const offset3 = Math.sin(time * 2 + 1.0) * 3 * this.camera.zoom;
 
-    // Draw three Z's of increasing size
-    this.ctx.font = `${10 * this.camera.zoom}px Arial`;
-    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    // Draw three Z's of increasing size with bubble effect
+    this.ctx.font = `bold ${12 * this.camera.zoom}px Arial`;
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
     this.ctx.textAlign = 'center';
 
-    this.ctx.fillText('Z', centerX - 5 * this.camera.zoom, baseY + offset1);
+    this.ctx.fillText('Z', centerX - 8 * this.camera.zoom, baseY + offset1);
 
-    this.ctx.font = `${12 * this.camera.zoom}px Arial`;
-    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-    this.ctx.fillText('z', centerX + 2 * this.camera.zoom, baseY - 8 * this.camera.zoom + offset2);
+    this.ctx.font = `bold ${14 * this.camera.zoom}px Arial`;
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    this.ctx.fillText('Z', centerX + 2 * this.camera.zoom, baseY - 10 * this.camera.zoom + offset2);
 
-    this.ctx.font = `${14 * this.camera.zoom}px Arial`;
-    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-    this.ctx.fillText('z', centerX + 10 * this.camera.zoom, baseY - 16 * this.camera.zoom + offset3);
+    this.ctx.font = `bold ${16 * this.camera.zoom}px Arial`;
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    this.ctx.fillText('Z', centerX + 12 * this.camera.zoom, baseY - 20 * this.camera.zoom + offset3);
 
     // Reset
+    this.ctx.textAlign = 'left';
+  }
+
+  /**
+   * Draw reflection indicator above agents who are reflecting
+   * Shows a glowing thought bubble effect
+   */
+  private drawReflectionIndicator(screenX: number, screenY: number, reflectionType?: string): void {
+    // Only show if zoom is reasonable
+    if (this.camera.zoom < 0.5) return;
+
+    const centerX = screenX + (this.tileSize * this.camera.zoom) / 2;
+    // Position above the sleeping indicator area
+    const baseY = screenY - 60 * this.camera.zoom;
+
+    // Animate with pulsing glow effect
+    const time = Date.now() / 1000;
+    const pulse = Math.sin(time * 3) * 0.2 + 0.8; // Oscillate between 0.6 and 1.0
+
+    // Draw thought bubble emoji with glow
+    this.ctx.font = `bold ${18 * this.camera.zoom}px Arial`;
+    this.ctx.textAlign = 'center';
+
+    // Glow effect
+    this.ctx.shadowBlur = 8 * pulse * this.camera.zoom;
+    this.ctx.shadowColor = '#9370DB'; // Medium purple glow
+    this.ctx.fillStyle = `rgba(255, 255, 255, ${pulse})`;
+
+    // Use different emoji based on reflection type
+    const emoji = reflectionType === 'deep' ? '🌟' : '💭';
+    this.ctx.fillText(emoji, centerX, baseY);
+
+    // Reset shadow
+    this.ctx.shadowBlur = 0;
     this.ctx.textAlign = 'left';
   }
 
@@ -730,6 +961,65 @@ export class Renderer {
 
     // Draw text
     this.ctx.fillStyle = '#FFFFFF';
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.fillText(displayText, labelX, labelY - 4 * this.camera.zoom);
+
+    // Reset
+    this.ctx.textAlign = 'left';
+    this.ctx.textBaseline = 'alphabetic';
+  }
+
+  /**
+   * Draw animal state label above the animal.
+   * Shows what the animal is currently doing.
+   */
+  private drawAnimalState(
+    screenX: number,
+    screenY: number,
+    state: string,
+    wild: boolean
+  ): void {
+    // Only show if zoom is reasonable
+    if (this.camera.zoom < 0.5) return;
+
+    // Format state for display
+    let displayText = state.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+    // Add emoji indicators
+    if (state === 'sleeping') {
+      displayText = 'Sleeping 💤';
+    } else if (state === 'eating') {
+      displayText = 'Eating 🍽️';
+    } else if (state === 'drinking') {
+      displayText = 'Drinking 💧';
+    } else if (state === 'foraging') {
+      displayText = 'Foraging 🌾';
+    } else if (state === 'fleeing') {
+      displayText = 'Fleeing 💨';
+    } else if (state === 'idle') {
+      displayText = wild ? 'Wild' : 'Idle';
+    }
+
+    // Position above sprite
+    const labelX = screenX + (this.tileSize * this.camera.zoom) / 2;
+    const labelY = screenY - 8 * this.camera.zoom;
+
+    // Draw background
+    this.ctx.font = `${9 * this.camera.zoom}px monospace`;
+    const textWidth = this.ctx.measureText(displayText).width;
+    const padding = 3 * this.camera.zoom;
+
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    this.ctx.fillRect(
+      labelX - textWidth / 2 - padding,
+      labelY - 10 * this.camera.zoom,
+      textWidth + padding * 2,
+      12 * this.camera.zoom
+    );
+
+    // Draw text (different color for wild animals)
+    this.ctx.fillStyle = wild ? '#FFA500' : '#90EE90'; // Orange for wild, light green for tamed
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
     this.ctx.fillText(displayText, labelX, labelY - 4 * this.camera.zoom);

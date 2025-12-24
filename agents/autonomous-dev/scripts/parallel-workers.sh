@@ -88,7 +88,8 @@ get_next_feature() {
 
     # Get list of already-claimed features (from work-orders with .state files showing in-progress)
     local claimed=""
-    for state_file in "$AGENT_DIR/work-orders"/*/.state 2>/dev/null; do
+    shopt -s nullglob
+    for state_file in "$AGENT_DIR/work-orders"/*/.state; do
         if [[ -f "$state_file" ]]; then
             local state=$(cat "$state_file")
             if [[ "$state" != "READY_FOR_REVIEW" && "$state" != "APPROVED" ]]; then
@@ -97,6 +98,7 @@ get_next_feature() {
             fi
         fi
     done
+    shopt -u nullglob
 
     # Also exclude features workers are currently processing
     for pid in "${!WORKER_FEATURES[@]}"; do

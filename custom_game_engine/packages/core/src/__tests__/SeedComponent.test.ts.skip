@@ -1,0 +1,760 @@
+import { describe, it, expect, beforeEach } from 'vitest';
+import { WorldImpl } from '../ecs/World.js';
+import { EventBusImpl } from '../events/EventBus.js';
+import type { Entity } from '../ecs/Entity.js';
+
+/**
+ * Test Suite: Seed Component and Data Structure
+ *
+ * Covers:
+ * - Criterion 1: Seed Data Structure
+ * - Criterion 6: Seed Genetics Inheritance
+ * - Criterion 7: Seed Viability Calculation
+ * - Criterion 8: Seed Dormancy Mechanics
+ */
+
+// Type definitions that should exist after implementation
+interface SeedGenetics {
+  growthRate: number;        // 0-1
+  yield: number;             // 0-1
+  diseaseResistance: number; // 0-1
+  droughtTolerance: number;  // 0-1
+  coldTolerance: number;     // 0-1
+  flavor: number;            // 0-1
+}
+
+interface DormancyRequirements {
+  requiresColdStratification?: boolean;
+  coldDaysRequired?: number;
+  requiresLight?: boolean;
+  requiresScarification?: boolean;
+}
+
+interface HarvestMetadata {
+  fromPlantId?: string;
+  byAgentId?: string;
+  timestamp?: number;
+}
+
+interface SeedComponentData {
+  speciesId: string;
+  genetics: SeedGenetics;
+  generation: number;
+  parentPlantIds: string[];
+  viability: number;
+  vigor: number;
+  quality: number;
+  ageInDays: number;
+  dormant: boolean;
+  dormancyRequirements?: DormancyRequirements;
+  sourceType: 'wild' | 'cultivated' | 'traded' | 'generated';
+  harvestMetadata?: HarvestMetadata;
+}
+
+describe('SeedComponent', () => {
+  let world: WorldImpl;
+  let eventBus: EventBusImpl;
+  let seedEntity: Entity;
+
+  beforeEach(() => {
+    eventBus = new EventBusImpl();
+    world = new WorldImpl(eventBus);
+  });
+
+  describe('Criterion 1: Seed Data Structure', () => {
+    it('should create seed with all required properties', () => {
+      const SeedComponent = world.getComponentClass('SeedComponent');
+      if (!SeedComponent) {
+        throw new Error('SeedComponent not registered');
+      }
+
+      seedEntity = world.createEntity();
+
+      const seedData: SeedComponentData = {
+        speciesId: 'wheat',
+        genetics: {
+          growthRate: 0.75,
+          yield: 0.8,
+          diseaseResistance: 0.6,
+          droughtTolerance: 0.5,
+          coldTolerance: 0.7,
+          flavor: 0.65
+        },
+        generation: 0,
+        parentPlantIds: [],
+        viability: 0.95,
+        vigor: 1.0,
+        quality: 0.85,
+        ageInDays: 0,
+        dormant: false,
+        sourceType: 'wild',
+        harvestMetadata: {
+          fromPlantId: 'plant-123',
+          byAgentId: 'agent-456',
+          timestamp: Date.now()
+        }
+      };
+
+      seedEntity.addComponent('SeedComponent', seedData);
+      const seed = seedEntity.getComponent('SeedComponent');
+
+      expect(seed).toBeDefined();
+      expect(seed.speciesId).toBe('wheat');
+      expect(seed.genetics.growthRate).toBe(0.75);
+      expect(seed.genetics.yield).toBe(0.8);
+      expect(seed.genetics.diseaseResistance).toBe(0.6);
+      expect(seed.genetics.droughtTolerance).toBe(0.5);
+      expect(seed.genetics.coldTolerance).toBe(0.7);
+      expect(seed.genetics.flavor).toBe(0.65);
+      expect(seed.generation).toBe(0);
+      expect(seed.parentPlantIds).toEqual([]);
+      expect(seed.viability).toBe(0.95);
+      expect(seed.vigor).toBe(1.0);
+      expect(seed.quality).toBe(0.85);
+      expect(seed.ageInDays).toBe(0);
+      expect(seed.dormant).toBe(false);
+      expect(seed.sourceType).toBe('wild');
+      expect(seed.harvestMetadata.fromPlantId).toBe('plant-123');
+      expect(seed.harvestMetadata.byAgentId).toBe('agent-456');
+      expect(seed.harvestMetadata.timestamp).toBeGreaterThan(0);
+    });
+
+    it('should throw when speciesId is missing', () => {
+      const SeedComponent = world.getComponentClass('SeedComponent');
+      if (!SeedComponent) {
+        throw new Error('SeedComponent not registered');
+      }
+
+      seedEntity = world.createEntity();
+
+      expect(() => {
+        seedEntity.addComponent('SeedComponent', {
+          genetics: { growthRate: 0.5, yield: 0.5, diseaseResistance: 0.5, droughtTolerance: 0.5, coldTolerance: 0.5, flavor: 0.5 },
+          generation: 0,
+          parentPlantIds: [],
+          viability: 1.0,
+          vigor: 1.0,
+          quality: 1.0,
+          ageInDays: 0,
+          dormant: false,
+          sourceType: 'wild'
+        });
+      }).toThrow();
+    });
+
+    it('should throw when genetics is missing', () => {
+      const SeedComponent = world.getComponentClass('SeedComponent');
+      if (!SeedComponent) {
+        throw new Error('SeedComponent not registered');
+      }
+
+      seedEntity = world.createEntity();
+
+      expect(() => {
+        seedEntity.addComponent('SeedComponent', {
+          speciesId: 'wheat',
+          generation: 0,
+          parentPlantIds: [],
+          viability: 1.0,
+          vigor: 1.0,
+          quality: 1.0,
+          ageInDays: 0,
+          dormant: false,
+          sourceType: 'wild'
+        });
+      }).toThrow();
+    });
+
+    it('should throw when viability is missing', () => {
+      const SeedComponent = world.getComponentClass('SeedComponent');
+      if (!SeedComponent) {
+        throw new Error('SeedComponent not registered');
+      }
+
+      seedEntity = world.createEntity();
+
+      expect(() => {
+        seedEntity.addComponent('SeedComponent', {
+          speciesId: 'wheat',
+          genetics: { growthRate: 0.5, yield: 0.5, diseaseResistance: 0.5, droughtTolerance: 0.5, coldTolerance: 0.5, flavor: 0.5 },
+          generation: 0,
+          parentPlantIds: [],
+          vigor: 1.0,
+          quality: 1.0,
+          ageInDays: 0,
+          dormant: false,
+          sourceType: 'wild'
+        });
+      }).toThrow();
+    });
+
+    it('should support dormancy requirements', () => {
+      const SeedComponent = world.getComponentClass('SeedComponent');
+      if (!SeedComponent) {
+        throw new Error('SeedComponent not registered');
+      }
+
+      seedEntity = world.createEntity();
+
+      seedEntity.addComponent('SeedComponent', {
+        speciesId: 'apple',
+        genetics: { growthRate: 0.5, yield: 0.5, diseaseResistance: 0.5, droughtTolerance: 0.5, coldTolerance: 0.5, flavor: 0.5 },
+        generation: 0,
+        parentPlantIds: [],
+        viability: 0.9,
+        vigor: 1.0,
+        quality: 0.8,
+        ageInDays: 0,
+        dormant: true,
+        dormancyRequirements: {
+          requiresColdStratification: true,
+          coldDaysRequired: 90,
+          requiresLight: false,
+          requiresScarification: false
+        },
+        sourceType: 'wild'
+      });
+
+      const seed = seedEntity.getComponent('SeedComponent');
+
+      expect(seed.dormant).toBe(true);
+      expect(seed.dormancyRequirements?.requiresColdStratification).toBe(true);
+      expect(seed.dormancyRequirements?.coldDaysRequired).toBe(90);
+    });
+
+    it('should track multiple parent plants for cross-pollinated seeds', () => {
+      const SeedComponent = world.getComponentClass('SeedComponent');
+      if (!SeedComponent) {
+        throw new Error('SeedComponent not registered');
+      }
+
+      seedEntity = world.createEntity();
+
+      seedEntity.addComponent('SeedComponent', {
+        speciesId: 'tomato',
+        genetics: { growthRate: 0.6, yield: 0.7, diseaseResistance: 0.5, droughtTolerance: 0.4, coldTolerance: 0.3, flavor: 0.8 },
+        generation: 2,
+        parentPlantIds: ['plant-mother-123', 'plant-father-456'],
+        viability: 0.95,
+        vigor: 1.1,
+        quality: 0.9,
+        ageInDays: 5,
+        dormant: false,
+        sourceType: 'cultivated'
+      });
+
+      const seed = seedEntity.getComponent('SeedComponent');
+
+      expect(seed.parentPlantIds).toHaveLength(2);
+      expect(seed.parentPlantIds).toContain('plant-mother-123');
+      expect(seed.parentPlantIds).toContain('plant-father-456');
+      expect(seed.generation).toBe(2);
+    });
+  });
+
+  describe('Criterion 6: Seed Genetics Inheritance', () => {
+    it('should inherit genetics from parent plant', () => {
+      const SeedComponent = world.getComponentClass('SeedComponent');
+      const PlantComponent = world.getComponentClass('PlantComponent');
+
+      if (!SeedComponent || !PlantComponent) {
+        throw new Error('Required components not registered');
+      }
+
+      // Create parent plant with specific genetics
+      const parentPlant = world.createEntity();
+      parentPlant.addComponent('PlantComponent', {
+        speciesId: 'wheat',
+        genetics: {
+          growthRate: 0.75,
+          yield: 0.8,
+          diseaseResistance: 0.6,
+          droughtTolerance: 0.5,
+          coldTolerance: 0.7,
+          flavor: 0.65
+        }
+      });
+
+      // Create seed from parent (implementation will have a helper function for this)
+      seedEntity = world.createEntity();
+      const parentGenetics = parentPlant.getComponent('PlantComponent').genetics;
+
+      seedEntity.addComponent('SeedComponent', {
+        speciesId: 'wheat',
+        genetics: { ...parentGenetics }, // Should be copied from parent
+        generation: 1,
+        parentPlantIds: [parentPlant.id],
+        viability: 0.95,
+        vigor: 1.0,
+        quality: 0.85,
+        ageInDays: 0,
+        dormant: false,
+        sourceType: 'cultivated'
+      });
+
+      const seed = seedEntity.getComponent('SeedComponent');
+
+      // Genetics should match parent (before mutation)
+      expect(seed.genetics.growthRate).toBeCloseTo(0.75, 1);
+      expect(seed.genetics.yield).toBeCloseTo(0.8, 1);
+      expect(seed.genetics.diseaseResistance).toBeCloseTo(0.6, 1);
+    });
+
+    it('should apply mutations with 10% chance', () => {
+      // This test verifies mutation system exists
+      // Actual randomness will be tested with multiple iterations
+
+      const GeneticInheritance = require('../genetics/GeneticInheritance').default;
+
+      if (!GeneticInheritance) {
+        throw new Error('GeneticInheritance module not found');
+      }
+
+      const parentGenetics: SeedGenetics = {
+        growthRate: 0.5,
+        yield: 0.5,
+        diseaseResistance: 0.5,
+        droughtTolerance: 0.5,
+        coldTolerance: 0.5,
+        flavor: 0.5
+      };
+
+      // Create multiple seeds to test mutation variation
+      const seeds = Array.from({ length: 20 }, () =>
+        GeneticInheritance.inheritGenetics(parentGenetics)
+      );
+
+      // At least some seeds should have mutations (statistically)
+      const hasMutations = seeds.some(seed =>
+        seed.growthRate !== 0.5 ||
+        seed.yield !== 0.5 ||
+        seed.diseaseResistance !== 0.5
+      );
+
+      expect(hasMutations).toBe(true);
+    });
+
+    it('should clamp mutated trait values to valid ranges', () => {
+      const GeneticInheritance = require('../genetics/GeneticInheritance').default;
+
+      if (!GeneticInheritance) {
+        throw new Error('GeneticInheritance module not found');
+      }
+
+      const extremeGenetics: SeedGenetics = {
+        growthRate: 1.0,  // Max value
+        yield: 0.0,       // Min value
+        diseaseResistance: 1.0,
+        droughtTolerance: 0.0,
+        coldTolerance: 0.5,
+        flavor: 0.5
+      };
+
+      // Generate many seeds to ensure mutations occur
+      const seeds = Array.from({ length: 50 }, () =>
+        GeneticInheritance.inheritGenetics(extremeGenetics)
+      );
+
+      // All values should be clamped to [0, 1]
+      seeds.forEach(seed => {
+        expect(seed.growthRate).toBeGreaterThanOrEqual(0);
+        expect(seed.growthRate).toBeLessThanOrEqual(1);
+        expect(seed.yield).toBeGreaterThanOrEqual(0);
+        expect(seed.yield).toBeLessThanOrEqual(1);
+        expect(seed.diseaseResistance).toBeGreaterThanOrEqual(0);
+        expect(seed.diseaseResistance).toBeLessThanOrEqual(1);
+      });
+    });
+
+    it('should modify trait by ±0-20% on mutation', () => {
+      const GeneticInheritance = require('../genetics/GeneticInheritance').default;
+
+      if (!GeneticInheritance) {
+        throw new Error('GeneticInheritance module not found');
+      }
+
+      const parentGenetics: SeedGenetics = {
+        growthRate: 0.5,
+        yield: 0.5,
+        diseaseResistance: 0.5,
+        droughtTolerance: 0.5,
+        coldTolerance: 0.5,
+        flavor: 0.5
+      };
+
+      // Generate many seeds
+      const seeds = Array.from({ length: 100 }, () =>
+        GeneticInheritance.inheritGenetics(parentGenetics)
+      );
+
+      // Filter to only mutated values
+      const mutatedGrowthRates = seeds
+        .map(s => s.growthRate)
+        .filter(v => v !== 0.5);
+
+      // All mutations should be within ±20% of 0.5 (i.e., 0.4 to 0.6)
+      mutatedGrowthRates.forEach(value => {
+        expect(value).toBeGreaterThanOrEqual(0.4);
+        expect(value).toBeLessThanOrEqual(0.6);
+      });
+    });
+  });
+
+  describe('Criterion 7: Seed Viability Calculation', () => {
+    it('should calculate viability based on parent plant health', () => {
+      const calculateViability = require('../genetics/GeneticInheritance').calculateViability;
+
+      if (!calculateViability) {
+        throw new Error('calculateViability function not found');
+      }
+
+      const highHealthViability = calculateViability({
+        parentHealth: 100,
+        careQuality: 1.0,
+        ageInDays: 0
+      });
+
+      const lowHealthViability = calculateViability({
+        parentHealth: 30,
+        careQuality: 1.0,
+        ageInDays: 0
+      });
+
+      expect(highHealthViability).toBeGreaterThan(lowHealthViability);
+      expect(highHealthViability).toBeGreaterThanOrEqual(0);
+      expect(highHealthViability).toBeLessThanOrEqual(1);
+    });
+
+    it('should calculate viability based on care quality', () => {
+      const calculateViability = require('../genetics/GeneticInheritance').calculateViability;
+
+      if (!calculateViability) {
+        throw new Error('calculateViability function not found');
+      }
+
+      const highCareViability = calculateViability({
+        parentHealth: 80,
+        careQuality: 1.0,
+        ageInDays: 0
+      });
+
+      const lowCareViability = calculateViability({
+        parentHealth: 80,
+        careQuality: 0.3,
+        ageInDays: 0
+      });
+
+      expect(highCareViability).toBeGreaterThan(lowCareViability);
+    });
+
+    it('should decrease viability with seed age', () => {
+      const calculateViability = require('../genetics/GeneticInheritance').calculateViability;
+
+      if (!calculateViability) {
+        throw new Error('calculateViability function not found');
+      }
+
+      const freshViability = calculateViability({
+        parentHealth: 80,
+        careQuality: 1.0,
+        ageInDays: 0
+      });
+
+      const oldViability = calculateViability({
+        parentHealth: 80,
+        careQuality: 1.0,
+        ageInDays: 365
+      });
+
+      expect(oldViability).toBeLessThan(freshViability);
+      expect(oldViability).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should return viability between 0 and 1', () => {
+      const calculateViability = require('../genetics/GeneticInheritance').calculateViability;
+
+      if (!calculateViability) {
+        throw new Error('calculateViability function not found');
+      }
+
+      // Test extreme cases
+      const maxViability = calculateViability({
+        parentHealth: 100,
+        careQuality: 1.0,
+        ageInDays: 0
+      });
+
+      const minViability = calculateViability({
+        parentHealth: 0,
+        careQuality: 0.0,
+        ageInDays: 1000
+      });
+
+      expect(maxViability).toBeLessThanOrEqual(1);
+      expect(minViability).toBeGreaterThanOrEqual(0);
+    });
+  });
+
+  describe('Criterion 8: Seed Dormancy Mechanics', () => {
+    it('should mark seed as dormant with requirements', () => {
+      const SeedComponent = world.getComponentClass('SeedComponent');
+      if (!SeedComponent) {
+        throw new Error('SeedComponent not registered');
+      }
+
+      seedEntity = world.createEntity();
+
+      seedEntity.addComponent('SeedComponent', {
+        speciesId: 'cherry',
+        genetics: { growthRate: 0.4, yield: 0.6, diseaseResistance: 0.5, droughtTolerance: 0.3, coldTolerance: 0.8, flavor: 0.9 },
+        generation: 0,
+        parentPlantIds: [],
+        viability: 0.9,
+        vigor: 1.0,
+        quality: 0.85,
+        ageInDays: 0,
+        dormant: true,
+        dormancyRequirements: {
+          requiresColdStratification: true,
+          coldDaysRequired: 120,
+          requiresLight: false,
+          requiresScarification: false
+        },
+        sourceType: 'wild'
+      });
+
+      const seed = seedEntity.getComponent('SeedComponent');
+
+      expect(seed.dormant).toBe(true);
+      expect(seed.dormancyRequirements?.requiresColdStratification).toBe(true);
+      expect(seed.dormancyRequirements?.coldDaysRequired).toBe(120);
+    });
+
+    it('should prevent germination when dormant', () => {
+      const DormancySystem = world.getSystemClass('DormancySystem');
+
+      if (!DormancySystem) {
+        throw new Error('DormancySystem not registered');
+      }
+
+      seedEntity = world.createEntity();
+
+      seedEntity.addComponent('SeedComponent', {
+        speciesId: 'apple',
+        genetics: { growthRate: 0.5, yield: 0.5, diseaseResistance: 0.5, droughtTolerance: 0.5, coldTolerance: 0.5, flavor: 0.5 },
+        generation: 0,
+        parentPlantIds: [],
+        viability: 0.95,
+        vigor: 1.0,
+        quality: 0.9,
+        ageInDays: 0,
+        dormant: true,
+        dormancyRequirements: {
+          requiresColdStratification: true,
+          coldDaysRequired: 90
+        },
+        sourceType: 'wild'
+      });
+
+      const canGerminate = DormancySystem.canGerminate(seedEntity);
+
+      expect(canGerminate).toBe(false);
+    });
+
+    it('should track cold stratification days', () => {
+      const SeedComponent = world.getComponentClass('SeedComponent');
+      const DormancySystem = world.getSystemClass('DormancySystem');
+
+      if (!SeedComponent || !DormancySystem) {
+        throw new Error('Required components not registered');
+      }
+
+      seedEntity = world.createEntity();
+
+      seedEntity.addComponent('SeedComponent', {
+        speciesId: 'peach',
+        genetics: { growthRate: 0.5, yield: 0.5, diseaseResistance: 0.5, droughtTolerance: 0.5, coldTolerance: 0.5, flavor: 0.5 },
+        generation: 0,
+        parentPlantIds: [],
+        viability: 0.9,
+        vigor: 1.0,
+        quality: 0.85,
+        ageInDays: 0,
+        dormant: true,
+        dormancyRequirements: {
+          requiresColdStratification: true,
+          coldDaysRequired: 60
+        },
+        sourceType: 'wild'
+      });
+
+      // Simulate cold days
+      const system = new DormancySystem();
+
+      // Should track cold exposure
+      seedEntity.addComponent('ColdExposureComponent', {
+        daysExposed: 0
+      });
+
+      // Update for 60 days of cold
+      for (let i = 0; i < 60; i++) {
+        system.update(world, 1); // 1 day delta
+      }
+
+      const exposure = seedEntity.getComponent('ColdExposureComponent');
+      expect(exposure.daysExposed).toBeGreaterThanOrEqual(60);
+    });
+
+    it('should break dormancy when requirements met', () => {
+      const SeedComponent = world.getComponentClass('SeedComponent');
+      const DormancySystem = world.getSystemClass('DormancySystem');
+
+      if (!SeedComponent || !DormancySystem) {
+        throw new Error('Required components not registered');
+      }
+
+      seedEntity = world.createEntity();
+
+      seedEntity.addComponent('SeedComponent', {
+        speciesId: 'plum',
+        genetics: { growthRate: 0.5, yield: 0.5, diseaseResistance: 0.5, droughtTolerance: 0.5, coldTolerance: 0.5, flavor: 0.5 },
+        generation: 0,
+        parentPlantIds: [],
+        viability: 0.9,
+        vigor: 1.0,
+        quality: 0.85,
+        ageInDays: 0,
+        dormant: true,
+        dormancyRequirements: {
+          requiresColdStratification: true,
+          coldDaysRequired: 30
+        },
+        sourceType: 'wild'
+      });
+
+      seedEntity.addComponent('ColdExposureComponent', {
+        daysExposed: 30
+      });
+
+      const system = new DormancySystem();
+      system.update(world, 1);
+
+      const seed = seedEntity.getComponent('SeedComponent');
+      expect(seed.dormant).toBe(false);
+    });
+
+    it('should support manual scarification', () => {
+      const SeedComponent = world.getComponentClass('SeedComponent');
+      const scarifyAction = require('../actions/ScarifyAction').default;
+
+      if (!SeedComponent || !scarifyAction) {
+        throw new Error('Required components not registered');
+      }
+
+      seedEntity = world.createEntity();
+
+      seedEntity.addComponent('SeedComponent', {
+        speciesId: 'morning_glory',
+        genetics: { growthRate: 0.6, yield: 0.4, diseaseResistance: 0.5, droughtTolerance: 0.7, coldTolerance: 0.4, flavor: 0.3 },
+        generation: 0,
+        parentPlantIds: [],
+        viability: 0.9,
+        vigor: 1.0,
+        quality: 0.8,
+        ageInDays: 0,
+        dormant: true,
+        dormancyRequirements: {
+          requiresScarification: true
+        },
+        sourceType: 'wild'
+      });
+
+      // Apply scarification action
+      scarifyAction.execute(world, { seedEntityId: seedEntity.id });
+
+      const seed = seedEntity.getComponent('SeedComponent');
+      expect(seed.dormant).toBe(false);
+    });
+  });
+
+  describe('Error Handling (per CLAUDE.md)', () => {
+    it('should throw when creating seed without required fields', () => {
+      const SeedComponent = world.getComponentClass('SeedComponent');
+      if (!SeedComponent) {
+        throw new Error('SeedComponent not registered');
+      }
+
+      seedEntity = world.createEntity();
+
+      // Missing speciesId
+      expect(() => {
+        seedEntity.addComponent('SeedComponent', {
+          genetics: { growthRate: 0.5, yield: 0.5, diseaseResistance: 0.5, droughtTolerance: 0.5, coldTolerance: 0.5, flavor: 0.5 },
+          generation: 0,
+          parentPlantIds: [],
+          viability: 1.0,
+          vigor: 1.0,
+          quality: 1.0,
+          ageInDays: 0,
+          dormant: false,
+          sourceType: 'wild'
+        });
+      }).toThrow(/speciesId/i);
+    });
+
+    it('should throw when viability is out of range', () => {
+      const SeedComponent = world.getComponentClass('SeedComponent');
+      if (!SeedComponent) {
+        throw new Error('SeedComponent not registered');
+      }
+
+      seedEntity = world.createEntity();
+
+      expect(() => {
+        seedEntity.addComponent('SeedComponent', {
+          speciesId: 'wheat',
+          genetics: { growthRate: 0.5, yield: 0.5, diseaseResistance: 0.5, droughtTolerance: 0.5, coldTolerance: 0.5, flavor: 0.5 },
+          generation: 0,
+          parentPlantIds: [],
+          viability: 1.5, // Invalid
+          vigor: 1.0,
+          quality: 1.0,
+          ageInDays: 0,
+          dormant: false,
+          sourceType: 'wild'
+        });
+      }).toThrow();
+    });
+
+    it('should throw when genetics values are out of range', () => {
+      const SeedComponent = world.getComponentClass('SeedComponent');
+      if (!SeedComponent) {
+        throw new Error('SeedComponent not registered');
+      }
+
+      seedEntity = world.createEntity();
+
+      expect(() => {
+        seedEntity.addComponent('SeedComponent', {
+          speciesId: 'wheat',
+          genetics: {
+            growthRate: 2.0, // Invalid
+            yield: 0.5,
+            diseaseResistance: 0.5,
+            droughtTolerance: 0.5,
+            coldTolerance: 0.5,
+            flavor: 0.5
+          },
+          generation: 0,
+          parentPlantIds: [],
+          viability: 1.0,
+          vigor: 1.0,
+          quality: 1.0,
+          ageInDays: 0,
+          dormant: false,
+          sourceType: 'wild'
+        });
+      }).toThrow();
+    });
+  });
+});

@@ -26,12 +26,14 @@ export class World extends WorldImpl {
     entity.addComponent = (ComponentClassOrInstance: any, data?: any) => {
       // If it's already a component instance, use it directly
       if (ComponentClassOrInstance.type) {
-        return originalAddComponent(ComponentClassOrInstance);
+        originalAddComponent(ComponentClassOrInstance);
+        return ComponentClassOrInstance;
       }
 
       // Otherwise, instantiate the class with data
       const component = new ComponentClassOrInstance(data);
-      return originalAddComponent(component);
+      originalAddComponent(component);
+      return component;
     };
 
     // Add convenience getComponent that works with classes

@@ -34,6 +34,7 @@ export type AgentAction =
   | { type: 'fertilize'; position: Position; fertilizerType: string } // Apply fertilizer
   | { type: 'plant'; position: Position; seedType: string } // Plant a seed
   | { type: 'harvest'; position: Position } // Harvest a crop
+  | { type: 'gather_seeds'; plantId: string } // Gather seeds from wild plant
 
   // Goal setting
   | { type: 'set_personal_goal'; goal: string } // Set short-term personal goal
@@ -108,6 +109,41 @@ export function parseAction(response: string): AgentAction | null {
     return { type: 'follow', targetId: 'nearest' };
   }
 
+  // Farming actions (Phase 9)
+  if (
+    cleaned.includes('till') ||
+    cleaned.includes('tilling') ||
+    cleaned.includes('plow') ||
+    cleaned.includes('plowing') ||
+    cleaned.includes('prepare soil') ||
+    cleaned.includes('prepare ground') ||
+    cleaned.includes('prepare the soil') ||
+    cleaned.includes('prepare the ground') ||
+    cleaned.includes('preparing')
+  ) {
+    return { type: 'till', position: { x: 0, y: 0 } }; // Position will be set by caller
+  }
+
+  if (cleaned.includes('water') && !cleaned.includes('gather')) {
+    return { type: 'water', position: { x: 0, y: 0 } };
+  }
+
+  if (cleaned.includes('fertilize')) {
+    return { type: 'fertilize', position: { x: 0, y: 0 }, fertilizerType: 'compost' };
+  }
+
+  if (
+    cleaned.includes('plant') &&
+    !cleaned.includes('plantable') &&
+    !cleaned.includes('prepare') // Don't match "prepare soil for planting"
+  ) {
+    return { type: 'plant', position: { x: 0, y: 0 }, seedType: 'wheat' };
+  }
+
+  if (cleaned.includes('harvest')) {
+    return { type: 'harvest', position: { x: 0, y: 0 } };
+  }
+
   if (cleaned.includes('build') || cleaned.includes('construct')) {
     // Try to extract building type from response
     let buildingType: BuildingType = 'lean-to'; // fallback
@@ -149,7 +185,7 @@ export function isValidAction(action: unknown): boolean {
     'move', 'wander', 'follow', 'talk', 'help',
     'forage', 'pickup', 'eat', 'chop', 'mine',
     'build', 'construct', 'idle', 'rest',
-    'till', 'water', 'fertilize', 'plant', 'harvest'
+    'till', 'water', 'fertilize', 'plant', 'harvest', 'gather_seeds'
   ];
 
   return validTypes.includes(a.type);
@@ -177,6 +213,13 @@ export function actionToBehavior(action: AgentAction): AgentBehavior {
     case 'build':
     case 'construct':
       return 'build';
+    case 'till':
+      return 'till'; // Tilling behavior - finds grass and queues till actions
+    case 'water':
+    case 'fertilize':
+    case 'plant':
+    case 'harvest':
+      return 'farm'; // Farming behavior
     case 'idle':
     case 'rest':
       return 'idle';

@@ -1,0 +1,996 @@
+
+> @ai-village/game-engine@0.1.0 test
+> vitest run
+
+
+ RUN  v1.6.1 /Users/annhoward/src/ai_village/custom_game_engine
+
+ ✓ packages/core/src/metrics/events/__tests__/MetricEvents.test.ts  (26 tests) 5ms
+ ✓ packages/renderer/src/__tests__/DragDropSystem.test.ts  (29 tests) 12ms
+ ✓ packages/core/src/buildings/__tests__/BuildingDefinitions.test.ts  (44 tests) 13ms
+ ✓ packages/core/src/actions/__tests__/TillAction.test.ts  (48 tests | 8 skipped) 12ms
+ ✓ packages/core/src/__tests__/AnimalHousing.test.ts  (27 tests | 5 skipped) 6ms
+ ✓ packages/core/src/__tests__/AnimalHousingCleanliness.test.ts  (24 tests) 8ms
+ ✓ packages/core/src/systems/__tests__/TillingAction.test.ts  (55 tests) 12ms
+ ✓ packages/core/src/components/__tests__/EpisodicMemoryComponent.test.ts  (29 tests) 11ms
+ ✓ packages/core/src/__tests__/AnimalProduction.test.ts  (15 tests) 9ms
+ ✓ packages/core/src/__tests__/AnimalHousingIntegration.test.ts  (14 tests | 1 skipped) 13ms
+ ✓ packages/core/src/__tests__/TamingSystem.test.ts  (17 tests) 12ms
+ ✓ packages/core/src/systems/__tests__/ResourceGathering.test.ts  (37 tests) 11ms
+ ✓ packages/core/src/systems/__tests__/JournalingSystem.test.ts  (22 tests | 17 skipped) 6ms
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 1: Construction Progress Automation > should automatically increment progress each tick for buildings < 100%
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 1: Construction Progress Automation > should calculate progress based on buildTime
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 1: Construction Progress Automation > should not increment progress for completed buildings
+[BuildingSystem] Processing 1 building entities (0 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 2: Resource Deduction > should deduct resources from agent inventory on construction start
+[World.initiateConstruction] Consumed resources for tent: 10 cloth, 5 wood
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 2: Resource Deduction > should deduct multiple resource types correctly
+[World.initiateConstruction] Consumed resources for campfire: 10 stone, 5 wood
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 3: Building Completion > should emit building:complete event when progress reaches 100%
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: tent at (15, 20) - 99.0% → 100.0% (deltaTime=10.000s, buildTime=45s, increase=22.222%)
+[BuildingSystem] 🏗️ Construction complete! tent at (15, 20)
+[BuildingSystem] 🎉 building:complete event emitted for entity 6b18abeb
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 3: Building Completion > should mark building as complete when progress reaches 100%
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: tent at (10, 10) - 99.0% → 100.0% (deltaTime=10.000s, buildTime=45s, increase=22.222%)
+[BuildingSystem] 🏗️ Construction complete! tent at (10, 10)
+[BuildingSystem] 🎉 building:complete event emitted for entity 764e3efa
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 3: Building Completion > should emit event exactly once when crossing 100% threshold
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: campfire at (10, 10) - 99.0% → 100.0% (deltaTime=10.000s, buildTime=30s, increase=33.333%)
+[BuildingSystem] 🏗️ Construction complete! campfire at (10, 10)
+[BuildingSystem] 🎉 building:complete event emitted for entity 416336ef
+[BuildingSystem] Processing 1 building entities (0 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 3: Building Completion > should include position in completion event
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: workbench at (42, 84) - 99.0% → 100.0% (deltaTime=10.000s, buildTime=60s, increase=16.667%)
+[BuildingSystem] 🏗️ Construction complete! workbench at (42, 84)
+[BuildingSystem] 🎉 building:complete event emitted for entity ff1ddbdb
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 4: Agent Autonomous Building (Integration) > should create construction site when agent initiates building
+[World.initiateConstruction] Consumed resources for tent: 10 cloth, 5 wood
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 4: Agent Autonomous Building (Integration) > should emit construction:started event when construction begins
+[World.initiateConstruction] Consumed resources for tent: 10 cloth, 5 wood
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Criterion 4: Agent Autonomous Building (Integration) > should complete full construction lifecycle
+[World.initiateConstruction] Consumed resources for campfire: 10 stone, 5 wood
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: campfire at (10, 10) - 0.0% → 100.0% (deltaTime=31.000s, buildTime=30s, increase=103.333%)
+[BuildingSystem] 🏗️ Construction complete! campfire at (10, 10)
+[BuildingSystem] 🎉 building:complete event emitted for entity b20631b1
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Resource Deduction Edge Cases > should handle exact resource amounts correctly
+[World.initiateConstruction] Consumed resources for tent: 10 cloth, 5 wood
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Resource Deduction Edge Cases > should leave excess resources in inventory
+[World.initiateConstruction] Consumed resources for tent: 10 cloth, 5 wood
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Construction Progress Integration > should progress from 0% to 100% over buildTime
+[World.initiateConstruction] Consumed resources for campfire: 10 stone, 5 wood
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: campfire at (10, 10) - 0.0% → 50.0% (deltaTime=15.000s, buildTime=30s, increase=50.000%)
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: campfire at (10, 10) - 50.0% → 100.0% (deltaTime=15.000s, buildTime=30s, increase=50.000%)
+[BuildingSystem] 🏗️ Construction complete! campfire at (10, 10)
+[BuildingSystem] 🎉 building:complete event emitted for entity ee191af7
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Construction Progress Integration > should handle fractional progress increments
+[World.initiateConstruction] Consumed resources for tent: 10 cloth, 5 wood
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts > Agent Building Orchestration - Phase 7 > Multiple Buildings Simultaneously > should handle multiple buildings under construction at once
+[World.initiateConstruction] Consumed resources for tent: 10 cloth, 5 wood
+[World.initiateConstruction] Consumed resources for workbench: 20 wood
+[World.initiateConstruction] Consumed resources for campfire: 10 stone, 5 wood
+[BuildingSystem] Processing 3 building entities (3 under construction) at tick 0
+[BuildingSystem] Construction progress: tent at (10, 10) - 0.0% → 11.1% (deltaTime=5.000s, buildTime=45s, increase=11.111%)
+[BuildingSystem] Construction progress: workbench at (20, 10) - 0.0% → 8.3% (deltaTime=5.000s, buildTime=60s, increase=8.333%)
+[BuildingSystem] Construction progress: campfire at (30, 10) - 0.0% → 16.7% (deltaTime=5.000s, buildTime=30s, increase=16.667%)
+
+ ✓ packages/core/src/systems/__tests__/AgentBuildingOrchestration.test.ts  (28 tests) 16ms
+ ✓ packages/core/src/systems/__tests__/StorageDeposit.test.ts  (14 tests) 9ms
+ ✓ packages/core/src/buildings/__tests__/PlacementValidator.test.ts  (22 tests) 16ms
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > autonomic memory formation > should form memory automatically on significant event
+[MemoryFormation] 🧠 Forming memory for agent 27e45392-5f25-4a9b-a48a-81428c2b8e1d: {
+  eventType: 'harvest:first',
+  summary: 'Harvested first wheat',
+  emotionalIntensity: 0.8,
+  novelty: 1
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > autonomic memory formation > should form memory on high emotional intensity (>0.6)
+[MemoryFormation] 🧠 Forming memory for agent 5d55ee7a-6c14-461b-9942-eba7ca4163ba: {
+  eventType: 'social:conflict',
+  summary: 'Had a conflict with bob-123',
+  emotionalIntensity: 0.9,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > autonomic memory formation > should form memory on high novelty
+[MemoryFormation] 🧠 Forming memory for agent 85c13b63-4e19-45dc-90ae-43ff519285d2: {
+  eventType: 'discovery:location',
+  summary: 'Discovered a new location',
+  emotionalIntensity: 0,
+  novelty: 1
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > autonomic memory formation > should form memory on survival threat
+[MemoryFormation] 🧠 Forming memory for agent bd36d8a2-e0b9-4185-9829-d0fced76eecf: {
+  eventType: 'need:critical',
+  summary: 'My health became critically low',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > memory formation triggers > should trigger on emotional intensity > 0.6
+[MemoryFormation] 🧠 Forming memory for agent c04b930d-97cf-43d7-b299-8eb0fb10526d: {
+  eventType: 'agent:emotion_peak',
+  summary: 'Felt strong joy',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > memory formation triggers > should trigger on novelty > 0.7
+[MemoryFormation] 🧠 Forming memory for agent ac00a946-e37f-4def-b094-4ab71a1222ec: {
+  eventType: 'event:novel',
+  summary: 'Experienced something completely new',
+  emotionalIntensity: 0,
+  novelty: 0.8
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > memory formation triggers > should trigger on social significance > 0.5
+[MemoryFormation] 🧠 Forming memory for agent 849b0c9e-3ae6-4061-9282-d246ff49eb33: {
+  eventType: 'social:interaction',
+  summary: 'Interacted with alice-123',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > memory formation triggers > should trigger on survival relevance > 0.5
+[MemoryFormation] 🧠 Forming memory for agent 49690f63-2ec2-483e-b81b-9365727b0f90: {
+  eventType: 'survival:close_call',
+  summary: 'Close call with starvation',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > memory formation triggers > should trigger on goal relevance > 0.7
+[MemoryFormation] 🧠 Forming memory for agent 731e059e-3199-4300-a108-249aa3c824f6: {
+  eventType: 'goal:progress',
+  summary: 'Made progress on build-house',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > importance calculation > should weight emotional intensity at 30%
+[MemoryFormation] 🧠 Forming memory for agent 995a6d4f-e9c4-431b-8db9-2a9f3787c546: {
+  eventType: 'test:event',
+  summary: 'Test event',
+  emotionalIntensity: 1,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > importance calculation > should weight novelty at 30%
+[MemoryFormation] 🧠 Forming memory for agent f1a32610-e780-4474-b4cc-315e4dd8ebe1: {
+  eventType: 'test:event',
+  summary: 'Test event',
+  emotionalIntensity: 0,
+  novelty: 0.8
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > importance calculation > should weight goal relevance at 20%
+[MemoryFormation] 🧠 Forming memory for agent 540776ef-73f1-4374-ac56-c690ca49ed7b: {
+  eventType: 'test:event',
+  summary: 'Test event',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > importance calculation > should weight social significance at 15%
+[MemoryFormation] 🧠 Forming memory for agent 6e719f8d-6a54-4b41-8aba-47d32c9b245d: {
+  eventType: 'test:event',
+  summary: 'Test event',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > importance calculation > should weight survival relevance at 25%
+[MemoryFormation] 🧠 Forming memory for agent cbc6a7fd-4dcd-406f-87e4-1d0ea983c9cc: {
+  eventType: 'test:event',
+  summary: 'Test event',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > importance calculation > should combine all factors correctly
+[MemoryFormation] 🧠 Forming memory for agent 1b7e8132-fc5e-4d00-84ef-b26b8e8690ce: {
+  eventType: 'test:event',
+  summary: 'Test event',
+  emotionalIntensity: 0.8,
+  novelty: 0.85
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > conversation memory formation > should form memory when agent speaks
+[MemoryFormation] 🧠 Forming memory for agent 034a54c2-2e3a-4970-bf25-af71d724b8b0: {
+  eventType: 'conversation:utterance',
+  summary: 'Experienced conversation:utterance',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > conversation memory formation > should form memory when agent listens
+[MemoryFormation] 🧠 Forming memory for agent d2df1aec-01ff-4133-bbe1-d13a09d622ca: {
+  eventType: 'conversation:utterance',
+  summary: 'Experienced conversation:utterance',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > conversation memory formation > should preserve dialogue text in memory
+[MemoryFormation] 🧠 Forming memory for agent 78efce65-d579-4b07-b6f8-5c7b9d354065: {
+  eventType: 'conversation:utterance',
+  summary: 'Experienced conversation:utterance',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > conversation memory formation > should reference same conversation in both memories
+[MemoryFormation] 🧠 Forming memory for agent 5b3aa23e-09ec-4ddb-8eff-bd31e91b5da7: {
+  eventType: 'conversation:utterance',
+  summary: 'Experienced conversation:utterance',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+[MemoryFormation] 🧠 Forming memory for agent 44c08dc8-854d-4cd3-92c3-0129ce60c65d: {
+  eventType: 'conversation:utterance',
+  summary: 'Experienced conversation:utterance',
+  emotionalIntensity: 0,
+  novelty: 0
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > event emission > should emit memory:formed event when memory created
+[MemoryFormation] 🧠 Forming memory for agent ee4e5114-bbb8-47a7-b68e-a7653e638952: {
+  eventType: 'harvest:first',
+  summary: 'Harvested first crop',
+  emotionalIntensity: 0.8,
+  novelty: 1
+}
+
+stdout | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > event emission > should include agent ID in memory:formed event
+[MemoryFormation] 🧠 Forming memory for agent 7b36b598-92a9-45ee-ab06-2b565db36daa: {
+  eventType: 'test:event',
+  summary: 'Test event',
+  emotionalIntensity: 0.7,
+  novelty: 0
+}
+
+stderr | packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts > MemoryFormationSystem > error handling > should throw if agent has no EpisodicMemoryComponent
+[MemoryFormation] Agent 55b01898-9317-40ec-a86d-ba8ba3c861bf missing EpisodicMemoryComponent
+[MemoryFormation] Agent has components: []
+[MemoryFormation] Event that triggered memory formation: [
+  {
+    eventType: 'test:event',
+    data: {
+      agentId: '55b01898-9317-40ec-a86d-ba8ba3c861bf',
+      emotionalIntensity: 0.8
+    }
+  }
+]
+
+ ✓ packages/core/src/systems/__tests__/MemoryFormationSystem.test.ts  (25 tests) 9ms
+ ✓ packages/core/src/__tests__/AnimalSystem.test.ts  (18 tests) 11ms
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Progress Advancement > should advance construction progress based on time elapsed
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Progress Advancement > should advance different buildings at different rates based on buildTime
+[BuildingSystem] Processing 2 building entities (2 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Progress Advancement > should clamp progress to 100% maximum
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: tent at (0, 0) - 99.0% → 100.0% (deltaTime=1000.000s, buildTime=45s, increase=2222.222%)
+[BuildingSystem] 🏗️ Construction complete! tent at (0, 0)
+[BuildingSystem] 🎉 building:complete event emitted for entity 56ca1dcd
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Progress Advancement > should skip completed buildings
+[BuildingSystem] Processing 1 building entities (0 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Progress Advancement > should handle multiple simultaneous constructions
+[BuildingSystem] Processing 3 building entities (3 under construction) at tick 0
+[BuildingSystem] Construction progress: tent at (0, 0) - 0.0% → 11.1% (deltaTime=5.000s, buildTime=45s, increase=11.111%)
+[BuildingSystem] Construction progress: workbench at (10, 0) - 0.0% → 8.3% (deltaTime=5.000s, buildTime=60s, increase=8.333%)
+[BuildingSystem] Construction progress: campfire at (20, 0) - 0.0% → 16.7% (deltaTime=5.000s, buildTime=30s, increase=16.667%)
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Completion > should mark building as complete when progress reaches 100%
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: tent at (0, 0) - 99.0% → 100.0% (deltaTime=10.000s, buildTime=45s, increase=22.222%)
+[BuildingSystem] 🏗️ Construction complete! tent at (0, 0)
+[BuildingSystem] 🎉 building:complete event emitted for entity 5c79218a
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Completion > should emit "building:complete" event on completion
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: tent at (16, 32) - 99.0% → 100.0% (deltaTime=10.000s, buildTime=45s, increase=22.222%)
+[BuildingSystem] 🏗️ Construction complete! tent at (16, 32)
+[BuildingSystem] 🎉 building:complete event emitted for entity 67010b3c
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Completion > should emit event with correct entity ID and building type
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: campfire at (0, 0) - 99.0% → 100.0% (deltaTime=10.000s, buildTime=30s, increase=33.333%)
+[BuildingSystem] 🏗️ Construction complete! campfire at (0, 0)
+[BuildingSystem] 🎉 building:complete event emitted for entity 434ab847
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Construction Completion > should only emit event once when crossing 100% threshold
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: tent at (0, 0) - 99.0% → 100.0% (deltaTime=10.000s, buildTime=45s, increase=22.222%)
+[BuildingSystem] 🏗️ Construction complete! tent at (0, 0)
+[BuildingSystem] 🎉 building:complete event emitted for entity c5773710
+[BuildingSystem] Processing 1 building entities (0 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Error Handling per CLAUDE.md > should throw when entity missing BuildingComponent
+[BuildingSystem] Processing 1 building entities (0 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Error Handling per CLAUDE.md > should throw when entity missing PositionComponent
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Error Handling per CLAUDE.md > should throw when building type is unknown
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Edge Cases > should handle construction at exactly 100% progress
+[BuildingSystem] Processing 1 building entities (0 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Edge Cases > should handle progress from 99% to 101% (clamped to 100%)
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Construction progress: tent at (0, 0) - 99.0% → 100.0% (deltaTime=1000.000s, buildTime=45s, increase=2222.222%)
+[BuildingSystem] 🏗️ Construction complete! tent at (0, 0)
+[BuildingSystem] 🎉 building:complete event emitted for entity 7f73fa04
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Edge Cases > should handle zero deltaTime
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+
+stdout | packages/core/src/systems/__tests__/ConstructionProgress.test.ts > Construction Progress System - Phase 7 > Integration with Building Types > should use correct buildTime for each building type
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+[BuildingSystem] Processing 1 building entities (1 under construction) at tick 0
+
+ ✓ packages/core/src/systems/__tests__/ConstructionProgress.test.ts  (27 tests) 9ms
+ ✓ packages/core/src/systems/__tests__/ReflectionSystem.test.ts  (22 tests | 4 skipped) 10ms
+stdout | packages/core/src/systems/__tests__/ReflectionSystem.test.ts > ReflectionSystem > end-of-day reflection > should trigger reflection when agent sleeps
+[Reflection] 💭 Agent 7f148d47 is reflecting on 1 memories from today...
+[Reflection] 💭 Reflection: "Reflecting on today: 1 significant moments stand out."
+[Reflection] 💭 Insights: 
+
+stdout | packages/core/src/systems/__tests__/ReflectionSystem.test.ts > ReflectionSystem > end-of-day reflection > should generate reflection from today's memories
+[Reflection] 💭 Agent be78e483 is reflecting on 2 memories from today...
+[Reflection] 💭 Reflection: "Reflecting on today: 2 significant moments stand out."
+[Reflection] 💭 Insights: 
+
+stdout | packages/core/src/systems/__tests__/ReflectionSystem.test.ts > ReflectionSystem > end-of-day reflection > should mark important memories for consolidation
+[Reflection] 💭 Agent 0ef57e14 is reflecting on 1 memories from today...
+[Reflection] 💭 Reflection: "Reflecting on today: 1 significant moments stand out."
+[Reflection] 💭 Insights: 
+
+stdout | packages/core/src/systems/__tests__/ReflectionSystem.test.ts > ReflectionSystem > end-of-day reflection > should store reflection with timestamp
+[Reflection] 💭 Agent 73c3fd6f is reflecting on 1 memories from today...
+[Reflection] 💭 Reflection: "Reflecting on today: 1 significant moments stand out."
+[Reflection] 💭 Insights: 
+
+stdout | packages/core/src/systems/__tests__/ReflectionSystem.test.ts > ReflectionSystem > end-of-day reflection > should generate coherent reflection text via LLM
+[Reflection] 💭 Agent dbe1797f is reflecting on 1 memories from today...
+[Reflection] 💭 Reflection: "Reflecting on today: 1 significant moments stand out."
+[Reflection] 💭 Insights: 
+
+stdout | packages/core/src/systems/__tests__/ReflectionSystem.test.ts > ReflectionSystem > reflection triggers > should trigger after significant event (importance > 0.7)
+[Reflection] 💭 Agent bce1a1b5 is reflecting on 1 memories from today...
+[Reflection] 💭 Reflection: "Reflecting on today: 1 significant moments stand out."
+[Reflection] 💭 Insights: 
+
+stdout | packages/core/src/systems/__tests__/ReflectionSystem.test.ts > ReflectionSystem > reflection triggers > should NOT reflect if no memories to reflect on
+[Reflection] 💭 Agent c794b390 has no memories to reflect on today
+
+stdout | packages/core/src/systems/__tests__/ReflectionSystem.test.ts > ReflectionSystem > event emission > should emit reflection:completed when done
+[Reflection] 💭 Agent 526492db is reflecting on 1 memories from today...
+[Reflection] 💭 Reflection: "Reflecting on today: 1 significant moments stand out."
+[Reflection] 💭 Insights: 
+
+stdout | packages/core/src/systems/__tests__/ReflectionSystem.test.ts > ReflectionSystem > event emission > should include agent ID in reflection:completed event
+[Reflection] 💭 Agent 614aabd3 is reflecting on 1 memories from today...
+[Reflection] 💭 Reflection: "Reflecting on today: 1 significant moments stand out."
+[Reflection] 💭 Insights: 
+
+ ✓ packages/core/src/systems/__tests__/Phase9-SoilWeatherIntegration.test.ts  (39 tests) 6ms
+ ✓ packages/core/src/buildings/__tests__/CraftingStations.test.ts  (30 tests) 19ms
+ ✓ packages/core/src/components/__tests__/SocialMemoryComponent.test.ts  (22 tests) 8ms
+ ✓ packages/core/src/buildings/__tests__/BuildingPlacement.integration.test.ts  (14 tests) 12ms
+stdout | packages/core/src/systems/__tests__/Phase8-WeatherTemperature.test.ts > Phase 8: Weather & Temperature Systems > WeatherSystem > should update weather duration over time
+[WeatherSystem] Weather changed: clear → clear (intensity: 0%). Temp modifier: 0.0°C, Movement modifier: 100%
+
+ ✓ packages/core/src/systems/__tests__/Phase8-WeatherTemperature.test.ts  (19 tests) 12ms
+ ✓ packages/core/src/systems/__tests__/MemoryConsolidationSystem.test.ts  (21 tests) 11ms
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Tool Definition > should define all 12 action tools
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: 'wander',
+  thinking: 'test...',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Tool Definition > should define tools with no parameters
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: '(no action)',
+  thinking: '(no thoughts)',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+[OllamaProvider] No tool call, using text fallback
+
+stderr | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Tool Definition > should define tools with no parameters
+[OllamaProvider] Empty response from Ollama: { message: { content: '', tool_calls: [] } }
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Response Parsing > should parse structured response with tool call
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: 'explore',
+  thinking: 'I should explore...',
+  speaking: 'Let me look around!',
+  tokensUsed: 150
+}
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Response Parsing > should handle empty thinking field
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: 'rest',
+  thinking: '(no thoughts)',
+  speaking: 'Time to rest',
+  tokensUsed: undefined
+}
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Response Parsing > should handle empty speaking (silent action)
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: 'wander',
+  thinking: 'Just going to wander...',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Response Parsing > should fall back to text when no tool call
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: '(no action)',
+  thinking: '(no thoughts)',
+  speaking: 'I will explore the area',
+  tokensUsed: undefined
+}
+[OllamaProvider] No tool call, using text fallback
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > API Configuration > should use /api/chat endpoint
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: '(no action)',
+  thinking: '(no thoughts)',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+[OllamaProvider] No tool call, using text fallback
+
+stderr | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > API Configuration > should use /api/chat endpoint
+[OllamaProvider] Empty response from Ollama: { message: { content: '', tool_calls: [] } }
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > API Configuration > should send correct request format
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: '(no action)',
+  thinking: '(no thoughts)',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+[OllamaProvider] No tool call, using text fallback
+
+stderr | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > API Configuration > should send correct request format
+[OllamaProvider] Empty response from Ollama: { message: { content: '', tool_calls: [] } }
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > API Configuration > should use default values when not specified
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: '(no action)',
+  thinking: '(no thoughts)',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+[OllamaProvider] No tool call, using text fallback
+
+stderr | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > API Configuration > should use default values when not specified
+[OllamaProvider] Empty response from Ollama: { message: { content: '', tool_calls: [] } }
+
+stderr | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Error Handling > should throw on HTTP error
+[OllamaProvider] Ollama generate error: Error: Ollama API error: 500 Internal Server Error
+    at OllamaProvider.generate (/Users/annhoward/src/ai_village/custom_game_engine/packages/llm/src/OllamaProvider.ts:135:15)
+    at /Users/annhoward/src/ai_village/custom_game_engine/packages/llm/src/__tests__/OllamaProvider.test.ts:255:7
+    at runTest (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:781:11)
+    at runSuite (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runFiles (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:958:5)
+    at startTests (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:967:3)
+    at file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:116:7
+    at withEnv (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:83:5)
+[OllamaProvider] Error details: {
+  message: 'Ollama API error: 500 Internal Server Error',
+  model: 'qwen3:4b',
+  url: 'http://localhost:11434/api/generate'
+}
+
+stderr | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Error Handling > should throw on network error
+[OllamaProvider] Ollama generate error: Error: Network error
+    at /Users/annhoward/src/ai_village/custom_game_engine/packages/llm/src/__tests__/OllamaProvider.test.ts:260:51
+    at file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:135:14
+    at file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:60:26
+    at runTest (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:781:17)
+    at runSuite (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runSuite (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:909:15)
+    at runFiles (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:958:5)
+    at startTests (file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/@vitest/runner/dist/index.js:967:3)
+    at file:///Users/annhoward/src/ai_village/custom_game_engine/node_modules/vitest/dist/chunks/runtime-runBaseTests.oAvMKtQC.js:116:7
+[OllamaProvider] Error details: {
+  message: 'Network error',
+  model: 'qwen3:4b',
+  url: 'http://localhost:11434/api/generate'
+}
+
+stdout | packages/llm/src/__tests__/OllamaProvider.test.ts > OllamaProvider > Error Handling > should log empty responses
+[OllamaProvider] Response: {
+  model: 'qwen3:4b',
+  action: '(no action)',
+  thinking: '(no thoughts)',
+  speaking: '(silent)',
+  tokensUsed: undefined
+}
+[OllamaProvider] No tool call, using text fallback
+
+ ✓ packages/llm/src/__tests__/OllamaProvider.test.ts  (15 tests) 13ms
+ ✓ packages/core/src/buildings/__tests__/BuildingBlueprintRegistry.test.ts  (16 tests) 5ms
+ ✓ packages/core/src/__tests__/WildAnimalSpawning.test.ts  (19 tests) 12ms
+ ✓ packages/core/src/crafting/__tests__/RecipeRegistry.test.ts  (15 tests) 5ms
+ ✓ packages/core/src/components/__tests__/BuildingComponent.test.ts  (35 tests) 5ms
+ ✓ packages/core/src/components/__tests__/SemanticMemoryComponent.test.ts  (18 tests) 10ms
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > buildPrompt > should build complete prompt with all sections
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > buildPrompt > should include personality traits in prompt
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > buildPrompt > should describe hunger levels correctly
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > buildPrompt > should describe energy levels correctly
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > hearing system integration > should include heard speech in prompt
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [ 'agent1' ],
+  seenAgentsCount: 1,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'talk', 'follow_agent', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > hearing system integration > should not show hearing section when no speech
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [ 'agent1' ],
+  seenAgentsCount: 1,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'talk', 'follow_agent', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > hearing system integration > should show agents present even if silent
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [ 'agent1', 'agent2' ],
+  seenAgentsCount: 2,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'talk', 'follow_agent', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > context collapse > should not show empty memories section
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > context collapse > should show memories when present
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > context collapse > should show empty area when nothing nearby
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > instruction clarity > should include "don't overthink" instruction
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > instruction clarity > should end with response prompt
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [],
+  seenResourcesCount: 0,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > resource type descriptions > should describe trees when wood resources are visible
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [ 'tree1', 'tree2' ],
+  seenResourcesCount: 2,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'seek_food', 'gather', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > resource type descriptions > should describe rocks when stone resources are visible
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [ 'rock1' ],
+  seenResourcesCount: 1,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'seek_food', 'gather', 'build' ]
+
+stdout | packages/llm/src/__tests__/StructuredPromptBuilder.test.ts > StructuredPromptBuilder > resource type descriptions > should describe mixed resources correctly
+[StructuredPromptBuilder] Vision state: {
+  seenResources: [ 'tree1', 'rock1', 'food1' ],
+  seenResourcesCount: 3,
+  seenAgents: [],
+  seenAgentsCount: 0,
+  canSeeResources: undefined
+}
+[StructuredPromptBuilder] Final available actions: [ 'wander', 'idle', 'seek_food', 'gather', 'build' ]
+
+ ✓ packages/llm/src/__tests__/StructuredPromptBuilder.test.ts  (15 tests) 5ms
+ ✓ packages/core/src/systems/__tests__/FertilizerAction.test.ts  (26 tests) 6ms
+ ✓ packages/core/src/systems/__tests__/SoilSystem.test.ts  (27 tests) 8ms
+ ✓ packages/core/src/__tests__/AnimalComponent.test.ts  (8 tests) 6ms
+stdout | packages/core/src/__tests__/PlantSeedProduction.test.ts > PlantSeedProduction Integration > should produce seeds when transitioning vegetative → mature
+
+Test: Plant created - stage=vegetative, seedsProduced=0
+Emitting time:day_changed event
+[PlantSystem] New day started - will advance all plants by 1 day (total pending: 1 days)
+After emit - daySkipCount should be > 0
+Calling plantSystem.update with entities: 1
+[PlantSystem] Active with 1 plants, accumulated 0.00 game hours
+[PlantSystem] Processing 1 skipped day(s) = 24 hours for 1 plants
+[PlantSystem] 67c1f26b: Age increased by 1.0000 days (5.00 → 6.00) from 24.00 hours
+[PlantSystem] 67c1f26b: Test Plant (vegetative) age=6.0d progress=120% health=100
+[PlantSystem] 67c1f26b: test-plant stage vegetative → mature (age=6.0d, health=100)
+[PlantSystem] 67c1f26b: Executing 1 transition effect(s) for vegetative → mature
+[PlantSystem] 67c1f26b: Plant state before effects - seedsProduced=0, flowerCount=0, fruitCount=0
+[PlantSystem] 67c1f26b: Processing effect: produce_seeds
+[PlantSystem] 67c1f26b: produce_seeds effect START - plant.seedsProduced=0
+[PlantSystem] 67c1f26b: produce_seeds effect EXECUTED - species.seedsPerPlant=10, yieldModifier=1.00, calculated=10, plant.seedsProduced 0 → 10
+[PlantSystem] 67c1f26b: All effects complete - seedsProduced=10, flowerCount=0, fruitCount=0
+Test: After update - stage=mature, seedsProduced=10
+
+stdout | packages/core/src/__tests__/PlantSeedProduction.test.ts > PlantSeedProduction Integration > should produce MORE seeds when transitioning mature → seeding
+
+Test: Plant created - stage=mature, seedsProduced=10
+[PlantSystem] New day started - will advance all plants by 1 day (total pending: 1 days)
+[PlantSystem] Active with 1 plants, accumulated 0.00 game hours
+[PlantSystem] Processing 1 skipped day(s) = 24 hours for 1 plants
+[PlantSystem] 07ddc5b7: Age increased by 1.0000 days (10.00 → 11.00) from 24.00 hours
+[PlantSystem] 07ddc5b7: Test Plant (mature) age=11.0d progress=133% health=100
+[PlantSystem] 07ddc5b7: test-plant stage mature → seeding (age=11.0d, health=100)
+[PlantSystem] 07ddc5b7: Executing 2 transition effect(s) for mature → seeding
+[PlantSystem] 07ddc5b7: Plant state before effects - seedsProduced=10, flowerCount=0, fruitCount=0
+[PlantSystem] 07ddc5b7: Processing effect: produce_seeds
+[PlantSystem] 07ddc5b7: produce_seeds effect START - plant.seedsProduced=10
+[PlantSystem] 07ddc5b7: produce_seeds effect EXECUTED - species.seedsPerPlant=10, yieldModifier=1.00, calculated=10, plant.seedsProduced 10 → 20
+[PlantSystem] 07ddc5b7: Processing effect: drop_seeds
+[PlantSystem] 07ddc5b7: disperseSeeds called - plant.seedsProduced=20, count param=undefined
+[PlantSystem] 07ddc5b7: Dispersing 6 seeds in 3-tile radius
+[PlantSystem] 07ddc5b7: Dispersed seed at (0.0, -1.0)
+[PlantSystem] 07ddc5b7: Dispersed seed at (0.0, 2.0)
+[PlantSystem] 07ddc5b7: Dispersed seed at (0.0, 2.0)
+[PlantSystem] 07ddc5b7: Placed 3/6 seeds in 3-tile radius (14 remaining)
+[PlantSystem] 07ddc5b7: All effects complete - seedsProduced=14, flowerCount=0, fruitCount=0
+Test: After update - stage=seeding, seedsProduced=14
+
+stdout | packages/core/src/__tests__/PlantSeedProduction.test.ts > PlantSeedProduction Integration > should produce seeds correctly through full lifecycle vegetative → mature → seeding
+
+Test: Initial - stage=vegetative, seedsProduced=0
+[PlantSystem] New day started - will advance all plants by 1 day (total pending: 1 days)
+[PlantSystem] Active with 1 plants, accumulated 0.00 game hours
+[PlantSystem] Processing 1 skipped day(s) = 24 hours for 1 plants
+[PlantSystem] fe6aa394: Age increased by 1.0000 days (5.00 → 6.00) from 24.00 hours
+[PlantSystem] fe6aa394: Test Plant (vegetative) age=6.0d progress=120% health=100
+[PlantSystem] fe6aa394: test-plant stage vegetative → mature (age=6.0d, health=100)
+[PlantSystem] fe6aa394: Executing 1 transition effect(s) for vegetative → mature
+[PlantSystem] fe6aa394: Plant state before effects - seedsProduced=0, flowerCount=0, fruitCount=0
+[PlantSystem] fe6aa394: Processing effect: produce_seeds
+[PlantSystem] fe6aa394: produce_seeds effect START - plant.seedsProduced=0
+[PlantSystem] fe6aa394: produce_seeds effect EXECUTED - species.seedsPerPlant=10, yieldModifier=1.00, calculated=10, plant.seedsProduced 0 → 10
+[PlantSystem] fe6aa394: All effects complete - seedsProduced=10, flowerCount=0, fruitCount=0
+Test: After vegetative → mature - stage=mature, seedsProduced=10
+[PlantSystem] New day started - will advance all plants by 1 day (total pending: 1 days)
+[PlantSystem] Processing 1 skipped day(s) = 24 hours for 1 plants
+[PlantSystem] fe6aa394: Age increased by 1.0000 days (6.00 → 7.00) from 24.00 hours
+[PlantSystem] fe6aa394: Test Plant (mature) age=7.0d progress=133% health=100
+[PlantSystem] fe6aa394: test-plant stage mature → seeding (age=7.0d, health=100)
+[PlantSystem] fe6aa394: Executing 2 transition effect(s) for mature → seeding
+[PlantSystem] fe6aa394: Plant state before effects - seedsProduced=10, flowerCount=0, fruitCount=0
+[PlantSystem] fe6aa394: Processing effect: produce_seeds
+[PlantSystem] fe6aa394: produce_seeds effect START - plant.seedsProduced=10
+[PlantSystem] fe6aa394: produce_seeds effect EXECUTED - species.seedsPerPlant=10, yieldModifier=1.00, calculated=10, plant.seedsProduced 10 → 20
+[PlantSystem] fe6aa394: Processing effect: drop_seeds
+[PlantSystem] fe6aa394: disperseSeeds called - plant.seedsProduced=20, count param=undefined
+[PlantSystem] fe6aa394: Dispersing 6 seeds in 3-tile radius
+[PlantSystem] fe6aa394: Dispersed seed at (-2.0, 0.0)
+[PlantSystem] fe6aa394: Dispersed seed at (-2.0, -4.0)
+[PlantSystem] fe6aa394: Placed 2/6 seeds in 3-tile radius (14 remaining)
+[PlantSystem] fe6aa394: All effects complete - seedsProduced=14, flowerCount=0, fruitCount=0
+Test: After mature → seeding - stage=seeding, seedsProduced=14
+
+ ✓ packages/core/src/__tests__/PlantSeedProduction.test.ts  (3 tests) 4ms
+ ✓ packages/renderer/src/__tests__/GhostPreview.test.ts  (19 tests) 11ms
+ ✓ packages/core/src/systems/__tests__/SoilDepletion.test.ts  (14 tests) 12ms
+ ✓ packages/core/src/components/__tests__/InventoryComponent.test.ts  (16 tests) 4ms
+ ✓ packages/world/src/chunks/__tests__/Tile.test.ts  (10 tests) 5ms
+ ✓ packages/core/src/systems/__tests__/SleepSystem.test.ts  (17 tests) 6ms
+ ✓ packages/world/src/chunks/__tests__/Chunk.test.ts  (16 tests) 8ms
+ ✓ packages/core/src/systems/__tests__/HearingSystem.test.ts  (5 tests) 4ms
+ ✓ packages/core/src/crafting/__tests__/CraftingSystem.test.ts  (14 tests) 7ms
+ ✓ packages/core/src/events/__tests__/EventBus.test.ts  (10 tests) 9ms
+ ✓ packages/world/src/terrain/__tests__/PerlinNoise.test.ts  (10 tests) 10ms
+ ✓ packages/core/src/systems/__tests__/WateringAction.test.ts  (10 tests) 6ms
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseResponse - Structured JSON > should parse valid structured response
+[ResponseParser] Structured response: {
+  action: 'explore',
+  thinking: 'I should explore to find food',
+  speaking: 'Time to look around!'
+}
+
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseResponse - Structured JSON > should handle response with no speaking
+[ResponseParser] Structured response: {
+  action: 'wander',
+  thinking: 'Just going to wander',
+  speaking: '(silent)'
+}
+
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseResponse - Structured JSON > should parse all 12 valid actions
+[ResponseParser] Structured response: { action: 'wander', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'idle', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'seek_food', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'follow_agent', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'talk', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'gather', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'explore', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'approach', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'observe', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'rest', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'work', thinking: 'test', speaking: '(silent)' }
+[ResponseParser] Structured response: { action: 'help', thinking: 'test', speaking: '(silent)' }
+
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseResponse - Text Fallback > should parse plain text with action name
+[ResponseParser] Text-based match: explore
+
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseResponse - Text Fallback > should find action anywhere in text
+[ResponseParser] Text-based match: seek_food
+
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseBehavior - Legacy API > should extract just the action from structured response
+[ResponseParser] Structured response: { action: 'talk', thinking: 'test', speaking: 'hello' }
+
+stdout | packages/llm/src/__tests__/ResponseParser.test.ts > ResponseParser > parseBehavior - Legacy API > should work with text response
+[ResponseParser] Text-based match: idle
+
+ ✓ packages/llm/src/__tests__/ResponseParser.test.ts  (12 tests) 7ms
+ ✓ packages/core/src/ecs/__tests__/ComponentRegistry.test.ts  (9 tests) 4ms
+ ✓ packages/core/src/ecs/__tests__/Entity.test.ts  (10 tests) 4ms
+ ✓ packages/core/src/actions/__tests__/AgentAction.test.ts  (12 tests) 5ms
+ ↓ packages/renderer/src/__tests__/BuildingPlacementUI.test.ts  (1 test | 1 skipped)
+ ✓ packages/world/src/chunks/__tests__/ChunkManager.test.ts  (9 tests) 17ms
+ ↓ packages/renderer/src/__tests__/AgentInfoPanel-thought-speech.test.ts  (19 tests | 19 skipped)
+ ✓ packages/renderer/src/__tests__/CraftingPanelUI.test.ts  (46 tests) 77ms
+ ✓ packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts  (32 tests) 118ms
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 1: Inventory Section Appears > should render inventory section below needs section when agent is selected
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 1: Inventory Section Appears > should render inventory divider line before inventory section
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 1: Inventory Section Appears > should not render inventory section if agent has no inventory component
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 2: Resource Counts Display > should display wood resources with icon and quantity
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 2: Resource Counts Display > should display stone resources with icon and quantity
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 2: Resource Counts Display > should display food resources with icon and quantity
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 2: Resource Counts Display > should display water resources with icon and quantity
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 2: Resource Counts Display > should display all resource types simultaneously
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 2: Resource Counts Display > should not display resources with zero quantity
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 3: Empty Inventory State > should show "(empty)" when inventory has no items
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 3: Empty Inventory State > should show capacity as "Weight: 0/100 Slots: 0/8" when empty
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 4: Capacity Display > should display current weight and max weight
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 4: Capacity Display > should display current slots and max slots
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 4: Capacity Display > should calculate weight correctly for mixed resources
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 5: Capacity Warning Colors > should use white color when weight is below 80%
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 5: Capacity Warning Colors > should use yellow color when weight exceeds 80%
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 5: Capacity Warning Colors > should use red color when weight reaches 100%
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 5: Capacity Warning Colors > should use yellow color when slots exceed 80%
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 5: Capacity Warning Colors > should use red color when slots reach 100%
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 6: Real-time Updates > should reflect inventory changes when entity is re-rendered
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 6: Real-time Updates > should update capacity display when weight changes
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Acceptance Criterion 6: Real-time Updates > should show empty state when all resources are consumed
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Error Handling (per CLAUDE.md) > should throw when inventory.maxWeight is missing
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Error Handling (per CLAUDE.md) > should throw when inventory.maxWeight is undefined
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Error Handling (per CLAUDE.md) > should throw when inventory.slots is not an array
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Error Handling (per CLAUDE.md) > should throw when inventory.slots is null
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Error Handling (per CLAUDE.md) > should throw when inventory.currentWeight is missing
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Error Handling (per CLAUDE.md) > should throw when inventory.maxSlots is missing
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Edge Cases > should handle inventory with only empty slots
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Edge Cases > should handle inventory with partial slots filled
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Edge Cases > should handle very large resource quantities
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stdout | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Edge Cases > should not overflow panel bounds with many resources
+[AgentInfoPanel] setSelectedEntity called with: test-agent-12345678
+
+stderr | packages/renderer/src/__tests__/AgentInfoPanel-inventory.test.ts > AgentInfoPanel - Inventory Display > Edge Cases > should not overflow panel bounds with many resources
+[AgentInfoPanel] World not available or missing getEntity method
+
+
+ Test Files  55 passed | 2 skipped (57)
+      Tests  1121 passed | 55 skipped (1176)
+   Start at  00:49:31
+   Duration  2.69s (transform 2.42s, setup 15.88s, collect 4.38s, tests 671ms, environment 953ms, prepare 3.69s)
+

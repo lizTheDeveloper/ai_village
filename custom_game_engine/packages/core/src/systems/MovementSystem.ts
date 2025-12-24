@@ -22,6 +22,20 @@ export class MovementSystem implements System {
       const movement = impl.getComponent<MovementComponent>('movement')!;
       const position = impl.getComponent<PositionComponent>('position')!;
 
+      // Skip if sleeping - agents cannot move while asleep
+      const circadian = impl.getComponent('circadian') as any;
+      if (circadian && circadian.isSleeping) {
+        // Force velocity to 0 while sleeping
+        if (movement.velocityX !== 0 || movement.velocityY !== 0) {
+          impl.updateComponent<MovementComponent>('movement', (current) => ({
+            ...current,
+            velocityX: 0,
+            velocityY: 0,
+          }));
+        }
+        continue;
+      }
+
       // Skip if not moving
       if (movement.velocityX === 0 && movement.velocityY === 0) {
         continue;
@@ -70,12 +84,47 @@ export class MovementSystem implements System {
           chunkY: newChunkY,
         }));
       } else {
-        // Collision detected - stop movement
-        impl.updateComponent<MovementComponent>('movement', (current) => ({
-          ...current,
-          velocityX: 0,
-          velocityY: 0,
-        }));
+        // Collision detected - try to navigate around obstacle
+        // Simple obstacle avoidance: try perpendicular directions
+        const perpX1 = -deltaY; // Rotate 90° left
+        const perpY1 = deltaX;
+        const perpX2 = deltaY;  // Rotate 90° right
+        const perpY2 = -deltaX;
+
+        const alt1X = position.x + perpX1;
+        const alt1Y = position.y + perpY1;
+        const alt2X = position.x + perpX2;
+        const alt2Y = position.y + perpY2;
+
+        // Try moving perpendicular to obstacle
+        if (this.isPositionValid(world, entity.id, alt1X, alt1Y)) {
+          const newChunkX = Math.floor(alt1X / 32);
+          const newChunkY = Math.floor(alt1Y / 32);
+          impl.updateComponent<PositionComponent>('position', (current) => ({
+            ...current,
+            x: alt1X,
+            y: alt1Y,
+            chunkX: newChunkX,
+            chunkY: newChunkY,
+          }));
+        } else if (this.isPositionValid(world, entity.id, alt2X, alt2Y)) {
+          const newChunkX = Math.floor(alt2X / 32);
+          const newChunkY = Math.floor(alt2Y / 32);
+          impl.updateComponent<PositionComponent>('position', (current) => ({
+            ...current,
+            x: alt2X,
+            y: alt2Y,
+            chunkX: newChunkX,
+            chunkY: newChunkY,
+          }));
+        } else {
+          // Can't move in any direction - stop movement
+          impl.updateComponent<MovementComponent>('movement', (current) => ({
+            ...current,
+            velocityX: 0,
+            velocityY: 0,
+          }));
+        }
       }
     }
   }

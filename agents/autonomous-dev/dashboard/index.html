@@ -607,11 +607,14 @@
                 <span style="color: var(--text-secondary);">Dashboard:</span>
                 <a id="dashboard-url" href="" target="_blank" style="color: var(--accent-blue); text-decoration: none;">Loading...</a>
                 <span style="margin-left: 12px;" id="session-count">0 sessions</span>
+                <span style="margin-left: 12px; font-weight: 600; color: var(--accent-green);" id="servers-count">0 servers</span>
                 <span style="margin-left: 16px; color: var(--text-secondary);">Game Server:</span>
                 <a id="game-server-url" href="http://localhost:3000" target="_blank" style="color: var(--accent-blue); text-decoration: none;">http://localhost:3000</a>
                 <span style="margin-left: 8px;" id="game-server-status">●</span>
                 <span style="margin-left: 16px; color: var(--text-secondary);">Parallel Workers:</span>
                 <span style="margin-left: 8px;" id="parallel-workers-status">● Stopped</span>
+                <span style="margin-left: 16px; color: var(--text-secondary);">Ollama:</span>
+                <span style="margin-left: 8px;" id="ollama-status" title="Click for details" style="cursor: pointer;" onclick="showOllamaDetails()">● Checking...</span>
             </div>
         </div>
         <div class="header-actions">
@@ -620,6 +623,9 @@
             </button>
             <button class="btn btn-sm" id="parallel-workers-btn" onclick="openParallelWorkersModal()" title="Start/Stop parallel workers">
                 Start Workers
+            </button>
+            <button class="btn btn-danger" onclick="restartAllOrchestrators()" title="Restart all running orchestrators (useful after token refresh)">
+                Restart All Orchestrators
             </button>
             <button class="btn" onclick="refreshRoadmap()">
                 <span>Refresh from Markdown</span>
@@ -986,13 +992,32 @@
                 const stats = await response.json();
 
                 const urlLink = document.getElementById('dashboard-url');
-                urlLink.href = stats.url;
-                urlLink.textContent = stats.url;
+                urlLink.href = stats.url || 'http://localhost:3030';
+                urlLink.textContent = stats.url || 'http://localhost:3030';
 
                 const sessionCount = document.getElementById('session-count');
-                sessionCount.textContent = `${stats.connectedSessions} session${stats.connectedSessions !== 1 ? 's' : ''}`;
+                const sessions = stats.connectedSessions || 0;
+                sessionCount.textContent = `${sessions} session${sessions !== 1 ? 's' : ''}`;
+
+                const serversCount = document.getElementById('servers-count');
+                const servers = stats.serversUp || 0;
+                serversCount.textContent = `${servers} server${servers !== 1 ? 's' : ''} up`;
+
+                // Show tooltip with breakdown
+                if (stats.services) {
+                    const breakdown = [];
+                    if (stats.services.dashboard) breakdown.push('Dashboard');
+                    if (stats.services.gameServer) breakdown.push('Game Server');
+                    if (stats.services.parallelWorkers) breakdown.push('Parallel Workers');
+                    if (stats.services.bugQueueProcessor) breakdown.push('Bug Queue Processor');
+                    serversCount.title = `Running: ${breakdown.join(', ')}`;
+                } else {
+                    serversCount.title = 'Server breakdown unavailable';
+                }
             } catch (err) {
                 console.error('Failed to load server stats:', err);
+                // Set fallback values on error
+                document.getElementById('servers-count').textContent = '0 servers up';
             }
         }
 
@@ -1034,12 +1059,74 @@
                     await fetch('/api/game-server/start', { method: 'POST' });
                 }
                 // Wait a moment then refresh status
-                setTimeout(loadGameServerStatus, 1000);
+                setTimeout(() => {
+                    loadGameServerStatus();
+                    loadServerStats(); // Update server count
+                }, 1000);
             } catch (err) {
                 alert('Failed to toggle game server: ' + err.message);
             } finally {
                 btn.disabled = false;
             }
+        }
+
+        // Ollama status
+        let ollamaStatusData = null;
+
+        async function loadOllamaStatus() {
+            try {
+                const response = await fetch('/api/ollama/status');
+                ollamaStatusData = await response.json();
+
+                const statusIndicator = document.getElementById('ollama-status');
+
+                if (ollamaStatusData.running) {
+                    const loadedModel = ollamaStatusData.loadedModels.length > 0
+                        ? ollamaStatusData.loadedModels[0].name
+                        : 'idle';
+                    statusIndicator.textContent = `● ${loadedModel}`;
+                    statusIndicator.style.color = 'var(--accent-green)';
+                    statusIndicator.title = `Ollama running - ${ollamaStatusData.modelCount} models available, ${ollamaStatusData.loadedCount} loaded. Click for details.`;
+                } else {
+                    statusIndicator.textContent = '● Offline';
+                    statusIndicator.style.color = 'var(--accent-red)';
+                    statusIndicator.title = `Ollama not running: ${ollamaStatusData.error || 'Connection failed'}`;
+                }
+            } catch (err) {
+                const statusIndicator = document.getElementById('ollama-status');
+                statusIndicator.textContent = '● Error';
+                statusIndicator.style.color = 'var(--accent-red)';
+                statusIndicator.title = 'Failed to check Ollama status';
+                console.error('Failed to load Ollama status:', err);
+            }
+        }
+
+        function showOllamaDetails() {
+            if (!ollamaStatusData) {
+                alert('Ollama status not loaded yet');
+                return;
+            }
+
+            if (!ollamaStatusData.running) {
+                alert(`Ollama is not running.\n\nError: ${ollamaStatusData.error || 'Connection failed'}\n\nMake sure Ollama is installed and running.`);
+                return;
+            }
+
+            const availableModels = ollamaStatusData.availableModels.map(m =>
+                `  - ${m.name} (${(m.size / 1e9).toFixed(1)}GB, ${m.details?.parameter_size || 'unknown'})`
+            ).join('\n');
+
+            const loadedModels = ollamaStatusData.loadedModels.map(m => {
+                const vramGB = (m.size_vram / 1e9).toFixed(1);
+                return `  - ${m.name} (VRAM: ${vramGB}GB, ctx: ${m.context_length || 'N/A'})`;
+            }).join('\n') || '  (none)';
+
+            alert(
+                `Ollama Status\n` +
+                `=============\n\n` +
+                `Available Models (${ollamaStatusData.modelCount}):\n${availableModels || '  (none)'}\n\n` +
+                `Loaded Models (${ollamaStatusData.loadedCount}):\n${loadedModels}`
+            );
         }
 
         // Initialize
@@ -1053,6 +1140,7 @@
             loadServerStats();
             loadGameServerStatus();
             loadParallelWorkersStatus();
+            loadOllamaStatus();
 
             // Auto-refresh logs every 5 seconds
             setInterval(loadRecentLogs, 5000);
@@ -1062,6 +1150,8 @@
             setInterval(loadGameServerStatus, 5000);
             // Auto-refresh parallel workers status every 10 seconds
             setInterval(loadParallelWorkersStatus, 10000);
+            // Auto-refresh Ollama status every 10 seconds
+            setInterval(loadOllamaStatus, 10000);
         });
 
         // Tabs
@@ -1104,6 +1194,11 @@
 
         function handleSSEEvent(data) {
             switch (data.type) {
+                case 'session-update':
+                    // Update session count in real-time
+                    const sessionCount = document.getElementById('session-count');
+                    sessionCount.textContent = `${data.count} session${data.count !== 1 ? 's' : ''}`;
+                    break;
                 case 'pipeline-started':
                     loadPipelines();
                     loadWorkOrders(); // Refresh work orders to update running status
@@ -1122,6 +1217,7 @@
                 case 'parallel-workers-stopped':
                 case 'parallel-workers-log':
                     handleParallelWorkersSSE(data);
+                    loadServerStats(); // Update server count
                     break;
                 case 'bug-created':
                     loadBugs();
@@ -1282,16 +1378,21 @@
                                     <span>${wo.screenshotCount} screenshots</span>
                                 </div>
                             </div>
-                            ${isRunning ? `
-                                <span class="status-badge status-in_progress" style="padding: 8px 12px;">
-                                    <div class="spinner" style="width: 12px; height: 12px;"></div>
-                                    Running
-                                </span>
-                            ` : `
-                                <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); resumeWorkOrder('${wo.name}')" title="Resume this work order">
-                                    Resume
+                            <div style="display: flex; gap: 8px;">
+                                ${isRunning ? `
+                                    <span class="status-badge status-in_progress" style="padding: 8px 12px;">
+                                        <div class="spinner" style="width: 12px; height: 12px;"></div>
+                                        Running
+                                    </span>
+                                ` : `
+                                    <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); resumeWorkOrder('${wo.name}')" title="Resume this work order">
+                                        Resume
+                                    </button>
+                                `}
+                                <button class="btn btn-sm" onclick="event.stopPropagation(); archiveWorkOrder('${wo.name}')" title="Archive this work order" style="background: #666;">
+                                    📁 Archive
                                 </button>
-                            `}
+                            </div>
                         </div>
                     `;
                 }).join('');
@@ -1725,6 +1826,23 @@
             }
         }
 
+        async function archiveWorkOrder(name) {
+            if (!confirm(`Archive work order "${name}"? This will move it to the _archived folder.`)) {
+                return;
+            }
+            try {
+                const response = await fetch(`/api/work-orders/${name}/archive`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                loadWorkOrders();
+                alert(`Archived work order: ${name}`);
+            } catch (err) {
+                alert('Failed to archive work order: ' + err.message);
+            }
+        }
+
         // Launch Modal
         function openLaunchModal() {
             const modal = document.getElementById('launch-modal');
@@ -1849,6 +1967,29 @@
                 alert(`Auto mode pipeline launched (${data.id})`);
             } catch (err) {
                 alert('Failed to launch auto mode: ' + err.message);
+            }
+        }
+
+        async function restartAllOrchestrators() {
+            if (!confirm('Restart all running orchestrators? This is useful after switching accounts or token refresh.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/orchestrators/restart-all', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    loadPipelines();
+                    alert(`Restarted ${data.restarted.length} orchestrator(s):\n${data.restarted.map(o => `- ${o.featureName} (PID: ${o.newPid})`).join('\n')}`);
+                } else {
+                    alert('Failed to restart orchestrators: ' + (data.error || 'Unknown error'));
+                }
+            } catch (err) {
+                alert('Failed to restart orchestrators: ' + err.message);
             }
         }
 

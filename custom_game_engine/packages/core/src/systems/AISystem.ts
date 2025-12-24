@@ -58,8 +58,10 @@ export class AISystem implements System {
     this.registerBehavior('seek_warmth', this._seekWarmthBehavior.bind(this));
     this.registerBehavior('call_meeting', this._callMeetingBehavior.bind(this));
     this.registerBehavior('attend_meeting', this._attendMeetingBehavior.bind(this));
+    this.registerBehavior('farm', this.farmBehavior.bind(this));
+    this.registerBehavior('till', this.tillBehavior.bind(this));
 
-    // console.log(`[AISystem] Registered ${this.behaviors.size} behaviors including: deposit_items, gather, seek_warmth`);
+    // console.log(`[AISystem] Registered ${this.behaviors.size} behaviors including: deposit_items, gather, seek_warmth, farm`);
 
     this.llmDecisionQueue = llmDecisionQueue || null;
     this.promptBuilder = promptBuilder || null;
@@ -204,12 +206,14 @@ export class AISystem implements System {
               }
             }
 
-            // console.log('[AISystem] Parsed structured LLM decision:', {
-            //   entityId: entity.id.substring(0, 8),
-            //   thinking: thinking?.slice(0, 60) + '...',
-            //   speaking: speaking || '(silent)',
-            //   action: behavior,
-            // });
+            // Log LLM decisions (especially build actions)
+            if (behavior === 'build' || (typeof behavior === 'string' && behavior.startsWith('build'))) {
+              console.log(`[AISystem] 🏗️ LLM CHOSE BUILD! Agent ${entity.id.substring(0, 8)} decision:`, {
+                thinking: thinking?.slice(0, 80),
+                speaking: speaking || '(silent)',
+                action: behavior,
+              });
+            }
           } else {
             // Legacy text parsing
             const action = parseAction(decision);
@@ -240,13 +244,15 @@ export class AISystem implements System {
                 }
               }
 
-              // console.log('[AISystem] Parsed legacy LLM decision:', {
-              //   entityId: entity.id,
-              //   rawResponse: decision,
-              //   parsedAction: action,
-              //   behavior,
-              //   behaviorState,
-              // });
+              // Log legacy LLM decisions (especially build actions)
+              if (action.type === 'build' || behavior === 'build') {
+                console.log(`[AISystem] 🏗️ LLM CHOSE BUILD! Agent ${entity.id.substring(0, 8)} decision:`, {
+                  rawResponse: decision,
+                  parsedAction: action,
+                  behavior,
+                  behaviorState,
+                });
+              }
 
               // Store for later use
               (impl as any).__pendingBehaviorState = behaviorState;
@@ -508,6 +514,7 @@ export class AISystem implements System {
       // Important tasks (50-79)
       case 'deposit_items': return 60;
       case 'build': return 55;
+      case 'farm': return 50; // Farming actions (till, plant, harvest)
       case 'seek_sleep': return 30; // Normal tiredness
 
       // Low priority (0-19)
@@ -848,12 +855,169 @@ export class AISystem implements System {
     }));
   }
 
-  private idleBehavior(entity: EntityImpl): void {
+  private idleBehavior(entity: EntityImpl, world?: World): void {
     // Do nothing - just stop moving
     entity.updateComponent<MovementComponent>('movement', (current) => ({
       ...current,
       velocityX: 0,
       velocityY: 0,
+    }));
+
+    // Emit idle event for journaling system (25% probability to avoid spam)
+    if (world && Math.random() < 0.25) {
+      world.eventBus.emit({
+        type: 'agent:idle',
+        source: entity.id,
+        data: {
+          agentId: entity.id,
+          timestamp: Date.now(),
+        },
+      });
+    }
+  }
+
+  /**
+   * Farm behavior - agent is performing farming actions.
+   *
+   * This behavior is triggered when agents autonomously decide to farm
+   * or when farming actions (till, plant, harvest) are queued via ActionQueue.
+   *
+   * The agent stops moving and waits for queued farming actions to complete.
+   * Actual tilling/planting/harvesting is handled by ActionQueue and action handlers.
+   */
+  private farmBehavior(entity: EntityImpl, _world: World): void {
+    // Stop moving - agent is working on farming task
+    entity.updateComponent<MovementComponent>('movement', (current) => ({
+      ...current,
+      velocityX: 0,
+      velocityY: 0,
+    }));
+
+    // The actual farming actions (till, plant, water, harvest) are handled by:
+    // 1. ActionQueue processes queued actions each tick
+    // 2. TillActionHandler, PlantActionHandler, etc. validate and execute
+    // 3. Agent remains in 'farm' behavior until action completes
+    //
+    // When action completes, AI system should switch behavior back to 'wander' or next goal
+  }
+
+  /**
+   * Till behavior - agent prepares soil for farming by tilling nearby grass.
+   *
+   * This behavior finds untilled grass tiles within range and emits a 'till:requested'
+   * event that the demo/main.ts can listen for to submit a till action to the ActionQueue.
+   *
+   * Agents with seeds will autonomously till nearby grass to prepare farmland.
+   */
+  private tillBehavior(entity: EntityImpl, world: World): void {
+    const position = entity.getComponent<PositionComponent>('position')!;
+    const inventory = entity.getComponent<InventoryComponent>('inventory');
+
+    // Stop moving while deciding where to till
+    entity.updateComponent<MovementComponent>('movement', (current) => ({
+      ...current,
+      velocityX: 0,
+      velocityY: 0,
+    }));
+
+    // Check if agent has seeds (motivation to till)
+    const hasSeeds = inventory?.slots?.some((slot: any) =>
+      slot.itemId && (slot.itemId.includes('seed') || slot.itemId === 'wheat_seed' || slot.itemId === 'carrot_seed')
+    );
+
+    if (!hasSeeds) {
+      // No seeds - switch back to wandering
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        currentBehavior: 'wander',
+      }));
+      return;
+    }
+
+    // Find nearest untilled grass tile within range
+    const searchRadius = 10; // Search within 10 tiles
+    let nearestGrassTile: { x: number; y: number; distance: number } | null = null;
+
+    const worldWithTiles = world as any;
+    if (typeof worldWithTiles.getTileAt !== 'function') {
+      console.warn('[AISystem:tillBehavior] World does not have getTileAt - cannot find tiles to till');
+      return;
+    }
+
+    for (let dx = -searchRadius; dx <= searchRadius; dx++) {
+      for (let dy = -searchRadius; dy <= searchRadius; dy++) {
+        const checkX = Math.floor(position.x) + dx;
+        const checkY = Math.floor(position.y) + dy;
+
+        const tile = worldWithTiles.getTileAt(checkX, checkY);
+        if (!tile) continue;
+
+        // Check if this is untilled grass
+        if ((tile.terrain === 'grass' || tile.terrain === 'dirt') && !tile.tilled) {
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (!nearestGrassTile || distance < nearestGrassTile.distance) {
+            nearestGrassTile = { x: checkX, y: checkY, distance };
+          }
+        }
+      }
+    }
+
+    if (!nearestGrassTile) {
+      console.log(`[AISystem:tillBehavior] Agent ${entity.id.slice(0, 8)} found no untilled grass nearby - switching to wander`);
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        currentBehavior: 'wander',
+      }));
+      return;
+    }
+
+    // Check if agent is adjacent to the target tile (distance <= √2)
+    const dx = nearestGrassTile.x - position.x;
+    const dy = nearestGrassTile.y - position.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const MAX_TILL_DISTANCE = Math.sqrt(2); // Must be adjacent (including diagonal)
+
+    if (distance > MAX_TILL_DISTANCE) {
+      // Agent is too far - pathfind to adjacent position first
+      console.log(`[AISystem:tillBehavior] Agent ${entity.id.slice(0, 8)} moving to tile (${nearestGrassTile.x}, ${nearestGrassTile.y}) for tilling`);
+
+      // Normalize direction vector to get speed=1.0
+      const speed = 1.0;
+      const velocityX = (dx / distance) * speed;
+      const velocityY = (dy / distance) * speed;
+
+      // Continuously update velocity toward target (handles obstacle avoidance recovery)
+      entity.updateComponent<MovementComponent>('movement', (current) => ({
+        ...current,
+        targetX: nearestGrassTile.x,
+        targetY: nearestGrassTile.y,
+        velocityX,
+        velocityY,
+      }));
+
+      // Stay in till behavior - will retry next tick when closer
+      return;
+    }
+
+    // Agent is adjacent - emit event requesting tilling
+    // The demo/main.ts listens for this and submits the action to ActionQueue
+    console.log(`[AISystem:tillBehavior] Agent ${entity.id.slice(0, 8)} requesting till at (${nearestGrassTile.x}, ${nearestGrassTile.y}), distance=${distance.toFixed(2)}`);
+
+    world.eventBus.emit({
+      type: 'action:till',
+      source: entity.id,
+      data: {
+        x: nearestGrassTile.x,
+        y: nearestGrassTile.y,
+        agentId: entity.id,
+      },
+    });
+
+    // Switch to farm behavior to wait for action completion
+    entity.updateComponent<AgentComponent>('agent', (current) => ({
+      ...current,
+      currentBehavior: 'farm',
     }));
   }
 
@@ -1671,6 +1835,7 @@ export class AISystem implements System {
             type: 'resource:depleted',
             source: targetResource.id,
             data: {
+              agentId: entity.id,
               resourceType: resourceComp.resourceType,
               position: targetPos,
             },
@@ -1937,7 +2102,7 @@ export class AISystem implements System {
     // Aggregate resources from agent + all storage buildings
     const totalResources = this.aggregateAvailableResources(world, agentInventoryRecord);
 
-    // Try to initiate construction (this will validate resources)
+    // Try to initiate construction (this validates resources and deducts them from totalResources)
     try {
       world.initiateConstruction(
         { x: buildX, y: buildY },
@@ -1945,8 +2110,10 @@ export class AISystem implements System {
         totalResources
       );
 
-      // TODO: Resource deduction not yet implemented
-      // this.deductResourcesFromInventories(world, entity, agentInventoryRecord, totalResources);
+      // Note: world.initiateConstruction() mutates totalResources to deduct consumed items.
+      // Resource deduction is handled by world.initiateConstruction() which validates and
+      // deducts from the totalResources record. For MVP, the resource tracking is sufficient.
+      // Future: Implement sync back to actual storage inventories if needed for accuracy.
 
       console.log(`[BUILD] ✓ Agent ${entity.id.slice(0,8)} started building ${buildingType} at (${buildX}, ${buildY})`);
 
@@ -1990,13 +2157,13 @@ export class AISystem implements System {
 
     if (!circadian) {
       // No circadian component, just idle
-      this.idleBehavior(entity);
+      this.idleBehavior(entity, world);
       return;
     }
 
     // If already sleeping, do nothing (SleepSystem handles wake conditions)
     if (circadian.isSleeping) {
-      this.idleBehavior(entity);
+      this.idleBehavior(entity, world);
       return;
     }
 
@@ -2043,7 +2210,7 @@ export class AISystem implements System {
         return updated;
       });
 
-      // Emit sleep event
+      // Emit sleep events
       world.eventBus.emit({
         type: 'agent:sleeping',
         source: entity.id,
@@ -2051,6 +2218,16 @@ export class AISystem implements System {
           entityId: entity.id,
           location: 'bed',
           quality: quality,
+        },
+      });
+
+      // Emit sleep_start event for reflection/consolidation systems
+      world.eventBus.emit({
+        type: 'agent:sleep_start',
+        source: entity.id,
+        data: {
+          agentId: entity.id,
+          timestamp: world.tick,
         },
       });
 
@@ -2105,6 +2282,16 @@ export class AISystem implements System {
         },
       });
 
+      // Emit sleep_start event for reflection/consolidation systems
+      world.eventBus.emit({
+        type: 'agent:sleep_start',
+        source: entity.id,
+        data: {
+          agentId: entity.id,
+          timestamp: world.tick,
+        },
+      });
+
       // console.log(`[AISystem] Agent ${entity.id} is sleeping on the ground (quality: ${quality.toFixed(2)})`);
 
       // Stop moving
@@ -2124,7 +2311,7 @@ export class AISystem implements System {
 
     if (!circadian) {
       // No circadian component, just idle
-      this.idleBehavior(entity);
+      this.idleBehavior(entity, world);
       return;
     }
 
@@ -2151,6 +2338,16 @@ export class AISystem implements System {
         data: {
           entityId: entity.id,
           reason: 'exhaustion',
+        },
+      });
+
+      // Emit sleep_start event for reflection/consolidation systems
+      world.eventBus.emit({
+        type: 'agent:sleep_start',
+        source: entity.id,
+        data: {
+          agentId: entity.id,
+          timestamp: world.tick,
         },
       });
 

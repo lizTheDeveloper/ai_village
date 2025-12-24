@@ -150,29 +150,35 @@ export class BuildingSystem implements System {
         .join(', ');
       console.log(`[BuildingSystem] Building "${blueprintId}" requires: ${resourceList}`);
 
-      // Find nearest agent with inventory
-      const nearestAgent = this.findNearestAgentWithInventory(world, position);
-      if (nearestAgent) {
-        // Deduct resources from agent's inventory
-        const success = this.deductResourcesFromAgent(nearestAgent, resourceCost);
-        if (success) {
-          console.log(`[BuildingSystem] Deducted resources from agent ${nearestAgent.id}`);
-        } else {
-          console.error(`[BuildingSystem] Failed to deduct resources from agent ${nearestAgent.id}`);
-          // Per CLAUDE.md: Don't silently continue - emit error event
-          world.eventBus.emit({
-            type: 'building:placement:failed',
-            source: 'building-system',
-            data: {
-              blueprintId,
-              position,
-              reason: 'Failed to deduct resources from agent inventory',
-            },
-          });
-          return;
-        }
+      // Try to deduct resources from storage first, then agents
+      let success = this.deductResourcesFromStorage(world, resourceCost);
+
+      if (success) {
+        console.log(`[BuildingSystem] Deducted resources from storage buildings`);
       } else {
-        console.warn(`[BuildingSystem] No agent with inventory found near placement position`);
+        // Fall back to agent inventory
+        const nearestAgent = this.findNearestAgentWithInventory(world, position);
+        if (nearestAgent) {
+          success = this.deductResourcesFromAgent(nearestAgent, resourceCost);
+          if (success) {
+            console.log(`[BuildingSystem] Deducted resources from agent ${nearestAgent.id}`);
+          }
+        }
+      }
+
+      if (!success) {
+        console.error(`[BuildingSystem] Failed to deduct resources for ${blueprintId}`);
+        // Per CLAUDE.md: Don't silently continue - emit error event
+        world.eventBus.emit({
+          type: 'building:placement:failed',
+          source: 'building-system',
+          data: {
+            blueprintId,
+            position,
+            reason: 'Insufficient resources in storage and agent inventory',
+          },
+        });
+        return;
       }
     } else {
       console.log(`[BuildingSystem] Building "${blueprintId}" has no resource cost`);
@@ -184,12 +190,12 @@ export class BuildingSystem implements System {
     // Add components
     entity.addComponent(createBuildingComponent(blueprintId as any, 1, 0)); // Start at 0% progress
     entity.addComponent(createPositionComponent(position.x, position.y));
-    entity.addComponent(createRenderableComponent(blueprintId, 'object'));
+    entity.addComponent(createRenderableComponent(blueprintId, 'building'));
 
     // Add to world
     (world as any)._addEntity(entity);
 
-    console.log(`[BuildingSystem] Created building entity: ${entity.id}`);
+    console.log(`[BuildingSystem] Created building entity: ${entity.id} at tile (${position.x}, ${position.y})`);
 
     // Emit event for other systems
     world.eventBus.emit({
@@ -204,6 +210,15 @@ export class BuildingSystem implements System {
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+    // Log entity count every 100 ticks for debugging (only if we have buildings)
+    if (entities.length > 0 && world.tick % 100 === 0) {
+      const underConstruction = entities.filter(e => {
+        const b = (e as EntityImpl).getComponent<BuildingComponent>('building');
+        return b && !b.isComplete && b.progress < 100;
+      });
+      console.log(`[BuildingSystem] Processing ${entities.length} building entities (${underConstruction.length} under construction) at tick ${world.tick}`);
+    }
+
     // Process all buildings
     for (const entity of entities) {
       const impl = entity as EntityImpl;
@@ -254,6 +269,13 @@ export class BuildingSystem implements System {
     const wasUnderConstruction = building.progress < 100;
     const isNowComplete = newProgress >= 100;
 
+    // Log progress every 5% milestone for better visibility during playtest
+    const oldProgressMilestone = Math.floor(building.progress / 5);
+    const newProgressMilestone = Math.floor(newProgress / 5);
+    if (newProgressMilestone > oldProgressMilestone) {
+      console.log(`[BuildingSystem] Construction progress: ${building.buildingType} at (${position.x}, ${position.y}) - ${building.progress.toFixed(1)}% → ${newProgress.toFixed(1)}% (deltaTime=${deltaTime.toFixed(3)}s, buildTime=${constructionTimeSeconds}s, increase=${progressIncrease.toFixed(3)}%)`);
+    }
+
     // Update building component
     entity.updateComponent('building', (comp) => ({
       ...comp,
@@ -263,7 +285,8 @@ export class BuildingSystem implements System {
 
     // Emit completion event if just completed
     if (wasUnderConstruction && isNowComplete) {
-      console.log(`[BuildingSystem] Construction complete! ${building.buildingType} at (${position.x}, ${position.y})`);
+      console.log(`[BuildingSystem] 🏗️ Construction complete! ${building.buildingType} at (${position.x}, ${position.y})`);
+      console.log(`[BuildingSystem] 🎉 building:complete event emitted for entity ${entity.id.slice(0, 8)}`);
       world.eventBus.emit({
         type: 'building:complete',
         source: entity.id,
@@ -435,6 +458,100 @@ export class BuildingSystem implements System {
       ...comp,
       slots: [...inventory.slots],
     }));
+
+    return true;
+  }
+
+  /**
+   * Deduct resources from storage buildings.
+   * Returns true if successful, false if insufficient resources.
+   */
+  private deductResourcesFromStorage(
+    world: World,
+    resourceCost: Record<string, number>
+  ): boolean {
+    console.log('[BuildingSystem] deductResourcesFromStorage called with:', resourceCost);
+
+    // Get all storage buildings with inventory
+    const storageBuildings = world.query()
+      .with('building')
+      .with('inventory')
+      .executeEntities();
+
+    console.log('[BuildingSystem] Found', storageBuildings.length, 'storage buildings');
+
+    // First, check if we have enough resources across all storage
+    const availableResources: Record<string, number> = {};
+
+    for (const storage of storageBuildings) {
+      const building = storage.components.get('building') as { isComplete: boolean; buildingType: string } | undefined;
+      const inventory = storage.components.get('inventory') as {
+        slots: Array<{ itemId: string | null; quantity: number }>;
+      } | undefined;
+
+      // Only count complete storage buildings
+      if (!building?.isComplete) continue;
+      if (building.buildingType !== 'storage-chest' && building.buildingType !== 'storage-box') continue;
+
+      if (inventory?.slots) {
+        for (const slot of inventory.slots) {
+          if (slot.itemId && slot.quantity > 0) {
+            availableResources[slot.itemId] = (availableResources[slot.itemId] || 0) + slot.quantity;
+          }
+        }
+      }
+    }
+
+    console.log('[BuildingSystem] Available resources in storage:', availableResources);
+
+    // Check if we have enough of each resource
+    for (const [resourceType, amountNeeded] of Object.entries(resourceCost)) {
+      const available = availableResources[resourceType] || 0;
+      if (available < amountNeeded) {
+        console.log(`[BuildingSystem] Storage has ${available} ${resourceType}, needs ${amountNeeded}`);
+        return false;
+      }
+    }
+
+    console.log('[BuildingSystem] Storage has enough resources, proceeding to deduct');
+
+    // Now deduct resources from storage buildings
+    for (const [resourceType, amountNeeded] of Object.entries(resourceCost)) {
+      let remainingToRemove = amountNeeded;
+
+      for (const storage of storageBuildings) {
+        if (remainingToRemove <= 0) break;
+
+        const building = storage.components.get('building') as { isComplete: boolean; buildingType: string } | undefined;
+        if (!building?.isComplete) continue;
+        if (building.buildingType !== 'storage-chest' && building.buildingType !== 'storage-box') continue;
+
+        const inventory = storage.components.get('inventory') as {
+          slots: Array<{ itemId: string | null; quantity: number }>;
+        } | undefined;
+
+        if (inventory?.slots) {
+          for (const slot of inventory.slots) {
+            if (slot.itemId === resourceType && slot.quantity > 0 && remainingToRemove > 0) {
+              const amountFromSlot = Math.min(slot.quantity, remainingToRemove);
+              slot.quantity -= amountFromSlot;
+              remainingToRemove -= amountFromSlot;
+
+              // Clear slot if empty
+              if (slot.quantity === 0) {
+                slot.itemId = null;
+              }
+            }
+          }
+
+          // Update the storage's inventory component
+          (storage as EntityImpl).updateComponent('inventory', (comp) => ({
+            ...comp,
+            slots: [...inventory.slots],
+          }));
+        }
+      }
+    }
 
     return true;
   }

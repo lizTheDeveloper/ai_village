@@ -1,25 +1,32 @@
 import { ComponentBase } from '../ecs/Component.js';
 import type { PlantGenetics } from './PlantComponent.js';
 
+export interface HarvestMetadata {
+  fromPlantId?: string;
+  byAgentId?: string;
+  timestamp?: number;
+}
+
+export interface DormancyRequirements {
+  requiresColdStratification?: boolean;
+  coldDaysRequired?: number;
+  requiresLight?: boolean;
+  requiresScarification?: boolean;
+}
+
 export interface SeedComponentData {
   speciesId: string;
   genetics: PlantGenetics;
   generation?: number;
-  parentPlants?: [string, string] | null;
+  parentPlantIds?: string[];
   viability?: number;
   vigor?: number;
   quality?: number;
-  age?: number;
+  ageInDays?: number;
   dormant?: boolean;
-  dormancyRequirements?: {
-    coldDays?: number;
-    lightExposure?: boolean;
-    scarification?: boolean;
-  };
-  source?: 'wild' | 'cultivated' | 'traded' | 'generated';
-  harvestedFrom?: string;
-  harvestedBy?: string;
-  harvestedAt?: number;
+  dormancyRequirements?: DormancyRequirements;
+  sourceType?: 'wild' | 'cultivated' | 'traded' | 'generated';
+  harvestMetadata?: HarvestMetadata;
 }
 
 /**
@@ -33,27 +40,21 @@ export class SeedComponent extends ComponentBase {
   // Genetics
   public genetics: PlantGenetics;
   public generation: number;
-  public parentPlants: [string, string] | null;
+  public parentPlantIds: string[];
 
   // Quality
   public viability: number;  // 0-1 chance to germinate
-  public vigor: number;      // Growth speed modifier
-  public quality: number;    // Affects offspring quality
+  public vigor: number;      // Growth speed modifier (0-100)
+  public quality: number;    // Affects offspring quality (0-1)
 
   // State
-  public age: number;        // Days since produced
+  public ageInDays: number;  // Days since produced
   public dormant: boolean;   // Needs conditions to break
-  public dormancyRequirements?: {
-    coldDays?: number;
-    lightExposure?: boolean;
-    scarification?: boolean;
-  };
+  public dormancyRequirements?: DormancyRequirements;
 
   // Origin tracking
-  public source: 'wild' | 'cultivated' | 'traded' | 'generated';
-  public harvestedFrom?: string;  // Plant ID
-  public harvestedBy?: string;    // Agent ID
-  public harvestedAt?: number;    // Game time
+  public sourceType: 'wild' | 'cultivated' | 'traded' | 'generated';
+  public harvestMetadata?: HarvestMetadata;
 
   constructor(data: SeedComponentData) {
     super();
@@ -70,27 +71,63 @@ export class SeedComponent extends ComponentBase {
     }
     this.genetics = { ...data.genetics };
 
+    // REQUIRED: viability
+    if (data.viability === undefined) {
+      throw new Error('SeedComponent requires viability');
+    }
+    if (data.viability < 0 || data.viability > 1) {
+      throw new Error(`SeedComponent viability must be 0-1, got ${data.viability}`);
+    }
+    this.viability = data.viability;
+
+    // Validate genetics ranges (0-1 for most traits)
+    this.validateGenetics(data.genetics);
+
     // Generate unique ID
     this.id = `seed_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     this.generation = data.generation ?? 0;
-    this.parentPlants = data.parentPlants ?? null;
+    this.parentPlantIds = data.parentPlantIds ?? [];
 
     // Quality values
-    this.viability = data.viability ?? 0.8;
-    this.vigor = data.vigor ?? 75;
-    this.quality = data.quality ?? 75;
+    this.vigor = data.vigor ?? 1.0;
+    this.quality = data.quality ?? 0.75;
 
     // State
-    this.age = data.age ?? 0;
+    this.ageInDays = data.ageInDays ?? 0;
     this.dormant = data.dormant ?? false;
     this.dormancyRequirements = data.dormancyRequirements;
 
     // Origin
-    this.source = data.source ?? 'generated';
-    this.harvestedFrom = data.harvestedFrom;
-    this.harvestedBy = data.harvestedBy;
-    this.harvestedAt = data.harvestedAt;
+    this.sourceType = data.sourceType ?? 'generated';
+    this.harvestMetadata = data.harvestMetadata;
+  }
+
+  /**
+   * Validate genetics values are in correct ranges
+   */
+  private validateGenetics(genetics: PlantGenetics): void {
+    // growthRate and yieldAmount can be 0.5 - 2.0
+    if (genetics.growthRate < 0 || genetics.growthRate > 3.0) {
+      throw new Error(`SeedComponent genetics.growthRate must be 0-3.0, got ${genetics.growthRate}`);
+    }
+    if (genetics.yieldAmount < 0 || genetics.yieldAmount > 3.0) {
+      throw new Error(`SeedComponent genetics.yieldAmount must be 0-3.0, got ${genetics.yieldAmount}`);
+    }
+
+    // Resistance traits are 0-100
+    const resistanceTraits = [
+      { name: 'diseaseResistance', value: genetics.diseaseResistance },
+      { name: 'droughtTolerance', value: genetics.droughtTolerance },
+      { name: 'coldTolerance', value: genetics.coldTolerance },
+      { name: 'flavorProfile', value: genetics.flavorProfile }
+    ];
+
+    for (const trait of resistanceTraits) {
+      if (trait.value < 0 || trait.value > 100) {
+        throw new Error(`SeedComponent genetics.${trait.name} must be 0-100, got ${trait.value}`);
+      }
+    }
   }
 
   /**
@@ -102,17 +139,15 @@ export class SeedComponent extends ComponentBase {
       speciesId: this.speciesId,
       genetics: this.genetics,
       generation: this.generation,
-      parentPlants: this.parentPlants,
+      parentPlantIds: this.parentPlantIds,
       viability: this.viability,
       vigor: this.vigor,
       quality: this.quality,
-      age: this.age,
+      ageInDays: this.ageInDays,
       dormant: this.dormant,
       dormancyRequirements: this.dormancyRequirements,
-      source: this.source,
-      harvestedFrom: this.harvestedFrom,
-      harvestedBy: this.harvestedBy,
-      harvestedAt: this.harvestedAt
+      sourceType: this.sourceType,
+      harvestMetadata: this.harvestMetadata
     };
   }
 

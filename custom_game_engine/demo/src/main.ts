@@ -11,6 +11,7 @@ import {
   CommunicationSystem,
   BuildingSystem,
   ResourceGatheringSystem,
+  SeedGatheringSystem,
   BuildingBlueprintRegistry,
   PlacementValidator,
   TemperatureSystem,
@@ -23,6 +24,7 @@ import {
   AnimalProductionSystem,
   TamingSystem,
   WildAnimalSpawningSystem,
+  TillActionHandler,
   createTimeComponent,
   FERTILIZERS,
   createBuildingComponent,
@@ -313,6 +315,27 @@ async function main() {
 
   // Create settings panel (ESC to toggle)
   const settingsPanel = new SettingsPanel();
+
+  // If this is the first run (no DM prompt set), show settings and wait
+  if (settingsPanel.getIsFirstRun()) {
+    console.log('[Main] 🎮 Welcome to AI Village!');
+    console.log('[Main] 📜 Please select a scenario to begin...');
+
+    // Show settings modal and wait for configuration
+    await new Promise<void>((resolve) => {
+      const originalCallback = settingsPanel['onSettingsChange'];
+      settingsPanel.setOnSettingsChange((newSettings) => {
+        console.log('[Main] ✅ Settings configured, starting game...');
+        // Restore original callback for subsequent changes
+        if (originalCallback) {
+          settingsPanel.setOnSettingsChange(originalCallback);
+        }
+        resolve();
+      });
+      settingsPanel.show();
+    });
+  }
+
   const settings = settingsPanel.getSettings();
 
   // Create LLM provider based on settings
@@ -355,7 +378,11 @@ async function main() {
   gameLoop.systemRegistry.register(new TimeSystem());
   gameLoop.systemRegistry.register(new WeatherSystem());
   gameLoop.systemRegistry.register(new TemperatureSystem());
-  gameLoop.systemRegistry.register(new SoilSystem());
+  const soilSystemInstance = new SoilSystem();
+  gameLoop.systemRegistry.register(soilSystemInstance);
+
+  // Register action handlers
+  gameLoop.actionRegistry.register(new TillActionHandler(soilSystemInstance));
 
   // Register PlantSystem and inject species lookup
   const plantSystem = new PlantSystem(gameLoop.world.eventBus);
@@ -376,6 +403,16 @@ async function main() {
   gameLoop.systemRegistry.register(new TamingSystem());
   gameLoop.systemRegistry.register(new BuildingSystem());
   gameLoop.systemRegistry.register(new ResourceGatheringSystem());
+
+  // Register SeedGatheringSystem and inject species data
+  const seedGatheringSystem = new SeedGatheringSystem();
+  // Register plant species so the system can calculate seed yields
+  const { GRASS, BERRY_BUSH, WILDFLOWER } = await import('@ai-village/world');
+  seedGatheringSystem.registerPlantSpecies(GRASS);
+  seedGatheringSystem.registerPlantSpecies(BERRY_BUSH);
+  seedGatheringSystem.registerPlantSpecies(WILDFLOWER);
+  gameLoop.systemRegistry.register(seedGatheringSystem);
+
   gameLoop.systemRegistry.register(new MovementSystem());
   gameLoop.systemRegistry.register(new MemorySystem());
 
@@ -437,11 +474,18 @@ async function main() {
   }
   console.log('Terrain generation complete - trees and rocks placed');
 
+  // Set chunk manager and terrain generator on world so getTileAt can access tiles
+  // This fixes the tile lookup failure in ActionQueue validation
+  (gameLoop.world as any).setChunkManager(chunkManager);
+  (gameLoop.world as any).setTerrainGenerator(terrainGenerator);
+  console.log('ChunkManager and TerrainGenerator registered with World for tile access');
+
   // Create tile inspector panel (now that chunkManager exists)
   const tileInspectorPanel = new TileInspectorPanel(
     gameLoop.world.eventBus,
     renderer.getCamera(),
-    chunkManager
+    chunkManager,
+    terrainGenerator // Pass terrainGenerator to ensure chunks are generated when accessed
   );
 
   // Get SoilSystem instance to handle tile actions
@@ -474,56 +518,224 @@ async function main() {
   notificationEl.style.pointerEvents = 'none';
   document.body.appendChild(notificationEl);
 
+  let notificationTimeout: number | null = null;
+
   function showNotification(message: string, color: string = '#FFFFFF') {
+    // Clear any existing timeout to prevent flickering
+    if (notificationTimeout !== null) {
+      clearTimeout(notificationTimeout);
+    }
+
     notificationEl.textContent = message;
     notificationEl.style.borderColor = color;
     notificationEl.style.display = 'block';
-    setTimeout(() => {
+
+    // Make error notifications more prominent
+    if (color === '#FF0000') {
+      notificationEl.style.fontSize = '18px';
+      notificationEl.style.fontWeight = 'bold';
+      notificationEl.style.boxShadow = '0 0 20px rgba(255, 0, 0, 0.5)';
+    } else {
+      notificationEl.style.fontSize = '16px';
+      notificationEl.style.fontWeight = 'normal';
+      notificationEl.style.boxShadow = 'none';
+    }
+
+    // Show error notifications longer (3s), success notifications normal duration (2s)
+    const duration = color === '#FF0000' ? 3000 : 2000;
+
+    notificationTimeout = window.setTimeout(() => {
       notificationEl.style.display = 'none';
-    }, 2000);
+      notificationTimeout = null;
+    }, duration);
   }
 
   gameLoop.world.eventBus.subscribe('action:till', (event: any) => {
-    if (!soilSystem) return;
+    const { x, y, agentId: requestedAgentId } = event.data;
+    console.log(`[Main] Received till action request at (${x}, ${y})${requestedAgentId ? ` from agent ${requestedAgentId.slice(0,8)}` : ''}`);
 
-    const { x, y } = event.data;
-    console.log(`[Main] Received till action at (${x}, ${y})`);
+    // Constant for max tilling distance (must be adjacent: distance ≤ √2 ≈ 1.414)
+    const MAX_TILL_DISTANCE = Math.sqrt(2);
 
-    // Get the tile from chunk manager
+    // Use agentId from event data (autonomous tilling), or selected agent, or find nearest
+    let agentId = requestedAgentId || agentInfoPanel.getSelectedEntity()?.id;
+    let agentDistance = 0;
+
+    if (!agentId) {
+      // Find nearest agent to the target tile
+      const agents = gameLoop.world.query().with('agent').with('position').executeEntities();
+      let nearestAgent: any = null;
+      let nearestDistance = Infinity;
+
+      for (const agent of agents) {
+        const pos = agent.getComponent('position') as any;
+        if (pos) {
+          const dx = pos.x - x;
+          const dy = pos.y - y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestAgent = agent;
+          }
+        }
+      }
+
+      if (nearestAgent) {
+        agentId = nearestAgent.id;
+        agentDistance = nearestDistance;
+        console.log(`[Main] No agent selected, using nearest agent ${agentId.slice(0, 8)} (distance: ${nearestDistance.toFixed(1)})`);
+      } else {
+        console.error(`[Main] Cannot till - no agents available`);
+        showNotification('No agent available to till', '#FF0000');
+        return;
+      }
+    } else {
+      // Calculate distance for selected/requested agent
+      const agent = gameLoop.world.getEntity(agentId);
+      if (agent) {
+        const pos = agent.getComponent('position') as any;
+        if (pos) {
+          const dx = pos.x - x;
+          const dy = pos.y - y;
+          agentDistance = Math.sqrt(dx * dx + dy * dy);
+        }
+      }
+    }
+
+    // Note: Distance check removed - pathfinding will handle movement if agent is far away
+    // The check at line 653 below will trigger pathfinding if needed
+
+    // Ensure chunk is generated before submitting action
+    // This prevents errors when TillActionHandler tries to access the tile
     const chunkX = Math.floor(x / CHUNK_SIZE);
     const chunkY = Math.floor(y / CHUNK_SIZE);
-    const localX = ((x % CHUNK_SIZE) + CHUNK_SIZE) % CHUNK_SIZE;
-    const localY = ((y % CHUNK_SIZE) + CHUNK_SIZE) % CHUNK_SIZE;
-
     const chunk = chunkManager.getChunk(chunkX, chunkY);
+
     if (!chunk) {
       console.error(`[Main] Cannot till - chunk not found at (${chunkX}, ${chunkY})`);
       showNotification(`Cannot till - chunk not found`, '#FF0000');
       return;
     }
 
-    const tileIndex = localY * CHUNK_SIZE + localX;
-    const tile = chunk.tiles[tileIndex];
+    // Generate chunk if needed (ensures biome data exists)
+    if (!chunk.generated) {
+      console.log(`[Main] Generating terrain for chunk (${chunkX}, ${chunkY}) before tilling`);
+      terrainGenerator.generateChunk(chunk, gameLoop.world as any);
+    }
 
-    if (!tile) {
-      console.error(`[Main] Cannot till - tile not found at (${x}, ${y})`);
-      showNotification(`Cannot till - tile not found`, '#FF0000');
+    // Check if agent is close enough to till (distance <= √2)
+    const agent = gameLoop.world.getEntity(agentId);
+    if (!agent) {
+      console.error(`[Main] Agent ${agentId} not found`);
+      showNotification('Agent not found', '#FF0000');
       return;
     }
 
-    try {
-      soilSystem.tillTile(gameLoop.world, tile, x, y);
-      console.log(`[Main] Successfully tilled tile at (${x}, ${y})`);
-      showNotification(`Tilled tile at (${x}, ${y})`, '#8B4513');
+    const agentPos = agent.getComponent('position') as any;
+    if (!agentPos) {
+      console.error(`[Main] Agent ${agentId} has no position`);
+      showNotification('Agent has no position', '#FF0000');
+      return;
+    }
 
-      // Refetch tile from chunk manager to get latest state after mutation
-      const refreshedTile = chunk.tiles[tileIndex];
-      if (refreshedTile) {
-        tileInspectorPanel.setSelectedTile(refreshedTile, x, y);
+    const dx = x - agentPos.x;
+    const dy = y - agentPos.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance > MAX_TILL_DISTANCE) {
+      // Agent is too far - TELEPORT them to an adjacent tile
+      // This avoids pathfinding issues and ensures tilling always works
+      console.log(`[Main] Agent is ${distance.toFixed(2)} tiles away from target (max: ${MAX_TILL_DISTANCE.toFixed(2)})`);
+      console.log(`[Main] Teleporting agent from (${agentPos.x}, ${agentPos.y}) to adjacent position near (${x}, ${y})`);
+
+      // Find best adjacent position (closest to agent's current position)
+      const adjacentOffsets = [
+        { dx: 1, dy: 0 },   // right
+        { dx: 0, dy: 1 },   // down
+        { dx: -1, dy: 0 },  // left
+        { dx: 0, dy: -1 },  // up
+        { dx: 1, dy: 1 },   // diagonal down-right
+        { dx: -1, dy: 1 },  // diagonal down-left
+        { dx: 1, dy: -1 },  // diagonal up-right
+        { dx: -1, dy: -1 }, // diagonal up-left
+      ];
+
+      let bestPos = { x: x + 1, y }; // default: to the right
+      let bestDist = Infinity;
+
+      for (const offset of adjacentOffsets) {
+        const adjX = x + offset.dx;
+        const adjY = y + offset.dy;
+        const adjDx = adjX - agentPos.x;
+        const adjDy = adjY - agentPos.y;
+        const adjDist = Math.sqrt(adjDx * adjDx + adjDy * adjDy);
+
+        if (adjDist < bestDist) {
+          bestDist = adjDist;
+          bestPos = { x: adjX, y: adjY };
+        }
       }
+
+      console.log(`[Main] Teleporting agent to (${bestPos.x}, ${bestPos.y}) before tilling`);
+
+      // Teleport agent to adjacent position (update position directly)
+      const newChunkX = Math.floor(bestPos.x / 32);
+      const newChunkY = Math.floor(bestPos.y / 32);
+      agent.updateComponent('position', (current: any) => ({
+        ...current,
+        x: bestPos.x,
+        y: bestPos.y,
+        chunkX: newChunkX,
+        chunkY: newChunkY,
+      }));
+
+      // Stop any existing movement
+      agent.updateComponent('movement', (current: any) => ({
+        ...current,
+        targetX: null,
+        targetY: null,
+        velocityX: 0,
+        velocityY: 0,
+        isMoving: false,
+      }));
+
+      console.log(`[Main] Agent teleported successfully, now adjacent to tile`);
+      showNotification(`Agent moved to tile`, '#8B4513');
+
+      // Now agent is adjacent - submit till action immediately
+      // Fall through to the submission code below
+    }
+
+    // Agent is already adjacent - submit till action immediately
+    try {
+      const actionId = gameLoop.actionQueue.submit({
+        type: 'till',
+        actorId: agentId,
+        targetPosition: { x, y },
+      });
+
+      console.log(`[Main] Submitted till action ${actionId} for agent ${agentId} at (${x}, ${y})`);
+
+      // Calculate expected duration based on agent's tools
+      // Base: 10s (200 ticks at 20 TPS)
+      // Hoe: 10s, Shovel: 12.5s, Hands: 20s
+      const inventory = agent.getComponent('inventory') as any;
+      let durationSeconds = 20; // Default to hands
+      if (inventory?.slots) {
+        const hasHoe = inventory.slots.some((slot: any) => slot?.itemId === 'hoe');
+        const hasShovel = inventory.slots.some((slot: any) => slot?.itemId === 'shovel');
+        if (hasHoe) {
+          durationSeconds = 10;
+        } else if (hasShovel) {
+          durationSeconds = 12.5;
+        }
+      }
+
+      showNotification(`Agent will till tile at (${x}, ${y}) (${durationSeconds}s)`, '#8B4513');
     } catch (err: any) {
-      console.error(`[Main] Failed to till tile: ${err.message}`);
-      showNotification(`Failed to till: ${err.message}`, '#FF0000');
+      console.error(`[Main] Failed to submit till action: ${err.message}`);
+      showNotification(`Failed to queue tilling: ${err.message}`, '#FF0000');
     }
   });
 
@@ -544,6 +756,12 @@ async function main() {
       console.error(`[Main] Cannot water - chunk not found at (${chunkX}, ${chunkY})`);
       showNotification(`Cannot water - chunk not found`, '#FF0000');
       return;
+    }
+
+    // Generate chunk if not already generated (ensures biome data)
+    if (!chunk.generated) {
+      console.log(`[Main] Generating terrain for chunk (${chunkX}, ${chunkY}) before watering`);
+      terrainGenerator.generateChunk(chunk, gameLoop.world as any);
     }
 
     const tileIndex = localY * CHUNK_SIZE + localX;
@@ -590,6 +808,12 @@ async function main() {
       return;
     }
 
+    // Generate chunk if not already generated (ensures biome data)
+    if (!chunk.generated) {
+      console.log(`[Main] Generating terrain for chunk (${chunkX}, ${chunkY}) before fertilizing`);
+      terrainGenerator.generateChunk(chunk, gameLoop.world as any);
+    }
+
     const tileIndex = localY * CHUNK_SIZE + localX;
     const tile = chunk.tiles[tileIndex];
 
@@ -623,11 +847,71 @@ async function main() {
     }
   });
 
+  // Listen for action completion and failure events for debugging
+  gameLoop.world.eventBus.subscribe('agent:action:completed', (event: any) => {
+    console.log('[Main] ✅ Action completed:', event);
+    const { actionType, actionId, success, reason } = event.data;
+
+    if (actionType === 'till') {
+      if (success) {
+        console.log(`[Main] ✅ Tilling action ${actionId} completed successfully`);
+        showNotification('Tilling completed!', '#8B4513');
+      } else {
+        console.error(`[Main] ❌ Tilling action ${actionId} failed: ${reason}`);
+        showNotification(`Tilling failed: ${reason}`, '#FF0000');
+      }
+    }
+  });
+
+  gameLoop.world.eventBus.subscribe('agent:action:started', (event: any) => {
+    console.log('[Main] 🔄 Action started:', event);
+    const { actionType, actionId } = event.data;
+
+    if (actionType === 'till') {
+      console.log(`[Main] 🔄 Tilling action ${actionId} started - waiting for completion...`);
+    }
+  });
+
+  gameLoop.world.eventBus.subscribe('agent:action:failed', (event: any) => {
+    console.error('[Main] ❌ Action failed:', event);
+    const { actionType, actionId, reason } = event.data;
+
+    if (actionType === 'till') {
+      console.error(`[Main] ❌ Tilling action ${actionId} failed validation: ${reason}`);
+      showNotification(`Cannot till: ${reason}`, '#FF0000');
+    } else {
+      showNotification(`Action failed: ${reason}`, '#FF0000');
+    }
+  });
+
   // Listen for soil events and show floating text
   gameLoop.world.eventBus.subscribe('soil:tilled', (event: any) => {
-    const { position } = event.data;
+    console.log('[Main] 🌾 Received soil:tilled event:', event);
+    const { position, fertility, biome } = event.data;
+    console.log(`[Main] 🌾 Tile tilled at (${position.x}, ${position.y}): fertility=${fertility.toFixed(2)}, biome=${biome}`);
     const floatingTextRenderer = renderer.getFloatingTextRenderer();
     floatingTextRenderer.add('Tilled', position.x * 16, position.y * 16, '#8B4513', 1500);
+
+    // Add dust particle effect for visual feedback
+    const particleRenderer = renderer.getParticleRenderer();
+    // Position particles at tile center (world coordinates in pixels)
+    const tileCenterX = position.x * 16 + 8; // Tile pixel position + half tile size
+    const tileCenterY = position.y * 16 + 8;
+    particleRenderer.createDustCloud(tileCenterX, tileCenterY, 25); // 25 dust particles (increased from 12 for better visibility)
+
+    // Refresh tile inspector if this tile is currently selected
+    const chunkX = Math.floor(position.x / CHUNK_SIZE);
+    const chunkY = Math.floor(position.y / CHUNK_SIZE);
+    const localX = ((position.x % CHUNK_SIZE) + CHUNK_SIZE) % CHUNK_SIZE;
+    const localY = ((position.y % CHUNK_SIZE) + CHUNK_SIZE) % CHUNK_SIZE;
+    const chunk = chunkManager.getChunk(chunkX, chunkY);
+    if (chunk) {
+      const tileIndex = localY * CHUNK_SIZE + localX;
+      const refreshedTile = chunk.tiles[tileIndex];
+      if (refreshedTile) {
+        tileInspectorPanel.setSelectedTile(refreshedTile, position.x, position.y);
+      }
+    }
   });
 
   gameLoop.world.eventBus.subscribe('soil:watered', (event: any) => {
@@ -733,6 +1017,7 @@ async function main() {
   let originalDayLength = 600; // 10 min/day default
 
   // Wire up input handling for placement UI, agent selection, and tile selection
+  console.log('[Main] Setting up inputHandler callbacks...');
   inputHandler.setCallbacks({
     onKeyDown: (key, shiftKey, ctrlKey) => {
       console.log(`[Main] onKeyDown callback: key="${key}", shiftKey=${shiftKey}, ctrlKey=${ctrlKey}`);
@@ -928,57 +1213,100 @@ async function main() {
 
       // Handle soil action keyboard shortcuts (T/W/F) if a tile is selected
       const selectedTile = tileInspectorPanel.getSelectedTile();
-      if (selectedTile) {
-        const { tile, x, y } = selectedTile;
 
-        if (key === 't' || key === 'T') {
-          // Till the tile
-          if (!tile.tilled && (tile.terrain === 'grass' || tile.terrain === 'dirt')) {
-            gameLoop.world.eventBus.emit({ type: 'action:till', source: 'ui', data: { x, y } });
-            return true;
-          }
-        } else if ((key === 'w' || key === 'W') && !shiftKey) { // Only if not Shift+W (which skips week)
-          // Water the tile
-          if (tile.moisture < 100) {
-            gameLoop.world.eventBus.emit({ type: 'action:water', source: 'ui', data: { x, y } });
-            return true;
-          }
-        } else if (key === 'f' || key === 'F') {
-          // Fertilize the tile
-          if (tile.fertility < 100) {
-            gameLoop.world.eventBus.emit({ type: 'action:fertilize', source: 'ui', data: { x, y, fertilizerType: 'compost' } });
-            return true;
-          }
+      // T key - Till tile
+      if (key === 't' || key === 'T') {
+        console.log('[Main] ===== T KEY PRESSED - TILLING ACTION =====');
+        console.log(`[Main] selectedTile:`, selectedTile);
+
+        if (!selectedTile) {
+          console.warn('[Main] ⚠️ Cannot till - no tile selected. RIGHT-CLICK a grass tile first to select it.');
+          showNotification('⚠️ Right-click a grass tile first to select it', '#FFA500');
+          return true;
+        }
+
+        const { tile, x, y } = selectedTile;
+        console.log(`[Main] Selected tile at (${x}, ${y}): terrain=${tile.terrain}, tilled=${tile.tilled}`);
+
+        if (tile.tilled && tile.plantability > 0) {
+          console.error(`[Main] ❌ ERROR: Tile at (${x}, ${y}) is already tilled. Plantability: ${tile.plantability}/3 uses remaining.`);
+          showNotification(`⚠️ Tile already tilled (${tile.plantability}/3 uses left). Wait until depleted.`, '#FF0000');
+          return true;
+        }
+
+        if (tile.terrain !== 'grass' && tile.terrain !== 'dirt') {
+          console.warn(`[Main] ⚠️ Cannot till ${tile.terrain} at (${x}, ${y}). Only grass and dirt can be tilled.`);
+          showNotification(`⚠️ Cannot till ${tile.terrain} (only grass/dirt)`, '#FF0000');
+          return true;
+        }
+
+        // Log if this is a re-tilling operation (depleted soil restoration)
+        if (tile.tilled && tile.plantability === 0) {
+          console.log(`[Main] 🔄 Re-tilling depleted soil at (${x}, ${y}) to restore fertility`);
+        } else {
+          console.log(`[Main] ✅ All checks passed, tilling fresh grass/dirt at (${x}, ${y})`);
+        }
+
+        gameLoop.world.eventBus.emit({ type: 'action:till', source: 'ui', data: { x, y } });
+        console.log(`[Main] ===== TILLING ACTION EVENT EMITTED =====`);
+        return true;
+      }
+
+      // W key - Water tile (only if tile is selected)
+      if ((key === 'w' || key === 'W') && !shiftKey && selectedTile) {
+        const { tile, x, y } = selectedTile;
+        if (tile.moisture < 100) {
+          gameLoop.world.eventBus.emit({ type: 'action:water', source: 'ui', data: { x, y } });
+          return true;
+        }
+      }
+
+      // F key - Fertilize tile (only if tile is selected)
+      if ((key === 'f' || key === 'F') && selectedTile) {
+        const { tile, x, y } = selectedTile;
+        if (tile.fertility < 100) {
+          gameLoop.world.eventBus.emit({ type: 'action:fertilize', source: 'ui', data: { x, y, fertilizerType: 'compost' } });
+          return true;
         }
       }
 
       return false;
     },
     onMouseClick: (screenX, screenY, button) => {
+      console.log(`[Main] onMouseClick: (${screenX}, ${screenY}), button=${button}`);
       const rect = canvas.getBoundingClientRect();
 
       // First check if resources panel handles the click (collapse/expand)
       const agentPanelOpen = agentInfoPanel.getSelectedEntityId() !== null;
-      if (resourcesPanel.handleClick(screenX, screenY, rect.width, agentPanelOpen)) {
+      const resourcesHandled = resourcesPanel.handleClick(screenX, screenY, rect.width, agentPanelOpen);
+      console.log(`[Main] resourcesPanel.handleClick returned: ${resourcesHandled}`);
+      if (resourcesHandled) {
         return true;
       }
 
       // Check if animal info panel handles the click (close button, action buttons)
-      if (animalInfoPanel.handleClick(screenX, screenY, rect.width, rect.height, gameLoop.world)) {
+      const animalHandled = animalInfoPanel.handleClick(screenX, screenY, rect.width, rect.height, gameLoop.world);
+      console.log(`[Main] animalInfoPanel.handleClick returned: ${animalHandled}`);
+      if (animalHandled) {
         return true;
       }
 
       // Check if placement UI handles the click
-      if (placementUI.handleClick(screenX, screenY, button)) {
+      const placementHandled = placementUI.handleClick(screenX, screenY, button);
+      console.log(`[Main] placementUI.handleClick returned: ${placementHandled}`);
+      if (placementHandled) {
         return true;
       }
 
       // Check if tile inspector panel handles the click (for button clicks)
-      if (tileInspectorPanel.handleClick(screenX, screenY, rect.width, rect.height)) {
+      const tileInspectorHandled = tileInspectorPanel.handleClick(screenX, screenY, rect.width, rect.height);
+      console.log(`[Main] tileInspectorPanel.handleClick returned: ${tileInspectorHandled}`);
+      if (tileInspectorHandled) {
         return true;
       }
 
       // Right click - select tile
+      console.log(`[Main] Checking if button === 2: ${button === 2}`);
       if (button === 2) {
         const tileData = tileInspectorPanel.findTileAtScreenPosition(screenX, screenY, gameLoop.world);
         if (tileData) {
@@ -1125,6 +1453,47 @@ async function main() {
   console.log('Creating initial wild animals...');
   await createInitialAnimals(gameLoop.world, wildAnimalSpawning);
 
+  // Set up memory event logging for debugging (Phase 10)
+  gameLoop.world.eventBus.subscribe('memory:formed', (event: any) => {
+    const { agentId, eventType } = event.data;
+    const entity = gameLoop.world.getEntity(agentId);
+    const identity = entity?.components.get('identity') as { name: string } | undefined;
+    const agentName = identity?.name || agentId.substring(0, 8);
+    console.log(`[Memory] 🧠 ${agentName} formed memory from ${eventType}`);
+  });
+
+  gameLoop.world.eventBus.subscribe('memory:recalled', (event: any) => {
+    const { agentId, count } = event.data;
+    const entity = gameLoop.world.getEntity(agentId);
+    const identity = entity?.components.get('identity') as { name: string } | undefined;
+    const agentName = identity?.name || agentId.substring(0, 8);
+    console.log(`[Memory] 🔍 ${agentName} recalled ${count} memories`);
+  });
+
+  gameLoop.world.eventBus.subscribe('memory:forgotten', (event: any) => {
+    const { agentId, eventType } = event.data;
+    const entity = gameLoop.world.getEntity(agentId);
+    const identity = entity?.components.get('identity') as { name: string } | undefined;
+    const agentName = identity?.name || agentId.substring(0, 8);
+    console.log(`[Memory] 🌫️ ${agentName} forgot memory: ${eventType}`);
+  });
+
+  gameLoop.world.eventBus.subscribe('reflection:completed', (event: any) => {
+    const { agentId } = event.data;
+    const entity = gameLoop.world.getEntity(agentId);
+    const identity = entity?.components.get('identity') as { name: string } | undefined;
+    const agentName = identity?.name || agentId.substring(0, 8);
+    console.log(`[Reflection] 💭 ${agentName} completed daily reflection`);
+  });
+
+  gameLoop.world.eventBus.subscribe('journal:written', (event: any) => {
+    const { agentId } = event.data;
+    const entity = gameLoop.world.getEntity(agentId);
+    const identity = entity?.components.get('identity') as { name: string } | undefined;
+    const agentName = identity?.name || agentId.substring(0, 8);
+    console.log(`[Journal] 📔 ${agentName} wrote journal entry`);
+  });
+
   // Set up animal event logging for debugging
   // Note: EventBus doesn't have .on() method, events are handled by systems
   // gameLoop.world.eventBus.on('animal_spawned', (event: any) => {
@@ -1246,22 +1615,45 @@ async function main() {
   console.log('=== DEBUG CONTROLS ===');
   console.log('SETTINGS:');
   console.log('  ESC - Open settings (configure LLM provider)');
+  console.log('');
   console.log('UI:');
   console.log('  M - Toggle memory panel (episodic memory)');
   console.log('  R - Toggle resources panel');
+  console.log('');
+  console.log('SOIL/FARMING (Phase 9):');
+  console.log('  1. RIGHT-CLICK a grass tile to select it (opens Tile Inspector panel)');
+  console.log('  2. Press T to till the selected tile');
+  console.log('  3. Press W to water the selected tile');
+  console.log('  4. Press F to fertilize the selected tile');
+  console.log('  (Or click the buttons in the Tile Inspector panel)');
+  console.log('');
   console.log('TIME:');
   console.log('  H - Skip 1 hour');
   console.log('  D - Skip 1 day');
   console.log('  Shift+W - Skip 7 days');
   console.log('  1/2/5 - Set time speed (1x/2x/5x)');
+  console.log('');
   console.log('PLANTS:');
   console.log('  P - Spawn test plant at advanced stage');
   console.log('  Click plant - View plant info');
+  console.log('');
   console.log('AGENTS:');
   console.log('  Click agent - View agent info & memories');
   console.log('  N - Trigger test memory for selected agent');
+  console.log('');
+  console.log('MEMORY SYSTEM (Phase 10):');
+  console.log('  - Agents form memories automatically from significant events');
+  console.log('  - Press M to view selected agent\'s memories');
+  console.log('  - Memories decay over time based on importance');
+  console.log('  - Watch console for [Memory] 🧠, [Reflection] 💭, [Journal] 📔 events');
+  console.log('  - Agents reflect at end of each day (sleep time)');
   console.log('======================');
   console.log('');
+
+  // Show tutorial notification after a brief delay
+  setTimeout(() => {
+    showNotification('💡 Tip: Right-click a grass tile, then press T to till it', '#00CED1');
+  }, 3000);
 
   // Log agent count
   setInterval(() => {

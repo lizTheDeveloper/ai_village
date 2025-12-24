@@ -18,6 +18,22 @@ import { BuildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistr
 import { PlacementValidator } from '../buildings/PlacementValidator.js';
 
 /**
+ * ChunkManager interface for tile access.
+ * Defined here to avoid circular dependency with world package.
+ */
+export interface IChunkManager {
+  getChunk(chunkX: number, chunkY: number): any;
+}
+
+/**
+ * TerrainGenerator interface for generating chunks on-demand.
+ * Defined here to avoid circular dependency with world package.
+ */
+export interface ITerrainGenerator {
+  generateChunk(chunk: any, world: any): void;
+}
+
+/**
  * Read-only view of the world state.
  * Systems use this to query data.
  */
@@ -82,6 +98,13 @@ export interface World {
     buildingType: string,
     inventory: Record<string, number>
   ): Entity;
+
+  /**
+   * Get tile at world coordinates.
+   * Used by action handlers (tilling, planting, etc.) to access tile data.
+   * Returns undefined if tile doesn't exist or ChunkManager not set.
+   */
+  getTileAt?(x: number, y: number): any;
 }
 
 /**
@@ -125,12 +148,15 @@ export class WorldImpl implements WorldMutator {
   private _entities = new Map<EntityId, Entity>();
   private _features: Map<string, boolean> = new Map();
   private _eventBus: EventBus;
+  private _chunkManager?: IChunkManager;
+  private _terrainGenerator?: ITerrainGenerator;
 
   // Spatial indices (will be populated as needed)
   private chunkIndex = new Map<string, Set<EntityId>>();
 
-  constructor(eventBus: EventBus) {
+  constructor(eventBus: EventBus, chunkManager?: IChunkManager) {
     this._eventBus = eventBus;
+    this._chunkManager = chunkManager;
     this._gameTime = {
       totalTicks: 0,
       ticksPerHour: 1200, // 1 hour = 1 minute real time at 20 TPS
@@ -356,6 +382,63 @@ export class WorldImpl implements WorldMutator {
   }
 
   /**
+   * Get tile at world coordinates.
+   * Returns undefined if ChunkManager not set or tile doesn't exist.
+   * Per CLAUDE.md: No silent fallbacks - returns undefined if data unavailable.
+   *
+   * CRITICAL FIX: Generates chunks on-demand if they haven't been generated yet.
+   * This ensures biome data exists for all tiles accessed by action handlers.
+   */
+  getTileAt(x: number, y: number): any {
+    if (!this._chunkManager) {
+      return undefined;
+    }
+
+    // Convert world coordinates to chunk coordinates
+    const CHUNK_SIZE = 32; // Must match value in world package
+    const chunkX = Math.floor(x / CHUNK_SIZE);
+    const chunkY = Math.floor(y / CHUNK_SIZE);
+    const localX = ((x % CHUNK_SIZE) + CHUNK_SIZE) % CHUNK_SIZE;
+    const localY = ((y % CHUNK_SIZE) + CHUNK_SIZE) % CHUNK_SIZE;
+
+    // Get chunk (creates if doesn't exist)
+    const chunk = this._chunkManager.getChunk(chunkX, chunkY);
+    if (!chunk || !chunk.tiles) {
+      return undefined;
+    }
+
+    // CRITICAL FIX: Generate chunk if not already generated
+    // This prevents "No tile found" errors in ActionQueue validation
+    // The TileInspectorPanel does this, but ActionQueue validation also needs it
+    if (!chunk.generated && this._terrainGenerator) {
+      console.log(`[World.getTileAt] Generating chunk (${chunkX}, ${chunkY}) on-demand for tile (${x}, ${y})`);
+      this._terrainGenerator.generateChunk(chunk, this);
+    }
+
+    // Get tile from chunk (row-major order)
+    const tileIndex = localY * CHUNK_SIZE + localX;
+    return chunk.tiles[tileIndex];
+  }
+
+  /**
+   * Set ChunkManager for tile access.
+   * Called by game initialization after ChunkManager is created.
+   */
+  setChunkManager(chunkManager: IChunkManager): void {
+    this._chunkManager = chunkManager;
+  }
+
+  /**
+   * Set TerrainGenerator for on-demand chunk generation.
+   * Called by game initialization after TerrainGenerator is created.
+   * This enables World.getTileAt() to generate chunks that haven't been generated yet,
+   * preventing "No tile found" errors in action validation.
+   */
+  setTerrainGenerator(terrainGenerator: ITerrainGenerator): void {
+    this._terrainGenerator = terrainGenerator;
+  }
+
+  /**
    * Initiate construction of a building.
    * Creates a construction site entity with progress=0.
    * Per CLAUDE.md: No silent fallbacks - throws on validation failure.
@@ -379,6 +462,8 @@ export class WorldImpl implements WorldMutator {
     // Get blueprint
     const registry = new BuildingBlueprintRegistry();
     registry.registerDefaults();
+    registry.registerTier2Stations(); // Phase 10: Crafting Stations
+    registry.registerTier3Stations(); // Phase 10: Advanced Crafting Stations
     const blueprint = registry.get(buildingType);
 
     // Validate placement

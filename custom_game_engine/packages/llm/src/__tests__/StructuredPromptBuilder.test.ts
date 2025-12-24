@@ -4,6 +4,24 @@ import { StructuredPromptBuilder } from '../StructuredPromptBuilder';
 describe('StructuredPromptBuilder', () => {
   const builder = new StructuredPromptBuilder();
 
+  function createMockWorld(): any {
+    return {
+      getEntity: (id: string) => {
+        // Return a minimal mock entity
+        const components = new Map([
+          ['identity', { name: `Agent${id}` }],
+          ['position', { x: 0, y: 0 }],
+          ['agent', { state: 'idle' }]
+        ]);
+        return {
+          id,
+          components,
+          getComponent: (type: string) => components.get(type)
+        };
+      }
+    };
+  }
+
   function createMockEntity(overrides?: any): any {
     const components = new Map();
 
@@ -37,7 +55,8 @@ describe('StructuredPromptBuilder', () => {
   describe('buildPrompt', () => {
     it('should build complete prompt with all sections', () => {
       const entity = createMockEntity();
-      const prompt = builder.buildPrompt(entity, {});
+      const world = createMockWorld();
+      const prompt = builder.buildPrompt(entity, world);
 
       expect(prompt).toContain('You are TestAgent');
       expect(prompt).toContain('Hunger:');
@@ -49,7 +68,8 @@ describe('StructuredPromptBuilder', () => {
       const entity = createMockEntity({
         personality: { openness: 85, extraversion: 90 }
       });
-      const prompt = builder.buildPrompt(entity, {});
+      const world = createMockWorld();
+      const prompt = builder.buildPrompt(entity, world);
 
       expect(prompt).toContain('curious and adventurous');
       expect(prompt).toContain('outgoing and social');
@@ -58,9 +78,10 @@ describe('StructuredPromptBuilder', () => {
     it('should describe hunger levels correctly', () => {
       const veryHungry = createMockEntity({ needs: { hunger: 20 } });
       const satisfied = createMockEntity({ needs: { hunger: 95 } });
+      const world = createMockWorld();
 
-      const hungryPrompt = builder.buildPrompt(veryHungry, {});
-      const satisfiedPrompt = builder.buildPrompt(satisfied, {});
+      const hungryPrompt = builder.buildPrompt(veryHungry, world);
+      const satisfiedPrompt = builder.buildPrompt(satisfied, world);
 
       expect(hungryPrompt).toContain('very hungry');
       expect(satisfiedPrompt).toContain('satisfied');
@@ -69,9 +90,10 @@ describe('StructuredPromptBuilder', () => {
     it('should describe energy levels correctly', () => {
       const exhausted = createMockEntity({ needs: { energy: 25 } });
       const rested = createMockEntity({ needs: { energy: 95 } });
+      const world = createMockWorld();
 
-      const exhaustedPrompt = builder.buildPrompt(exhausted, {});
-      const restedPrompt = builder.buildPrompt(rested, {});
+      const exhaustedPrompt = builder.buildPrompt(exhausted, world);
+      const restedPrompt = builder.buildPrompt(rested, world);
 
       expect(exhaustedPrompt).toContain('exhausted');
       expect(restedPrompt).toContain('rested');
@@ -89,20 +111,23 @@ describe('StructuredPromptBuilder', () => {
           ]
         }
       });
+      const world = createMockWorld();
 
-      const prompt = builder.buildPrompt(entity, {});
+      const prompt = builder.buildPrompt(entity, world);
 
-      expect(prompt).toContain('What you hear:');
-      expect(prompt).toContain('Alice says: "Found some berries!"');
-      expect(prompt).toContain('Bob says: "Need help building"');
+      // When multiple people are talking, it shows GROUP CONVERSATION
+      expect(prompt).toContain('GROUP CONVERSATION');
+      expect(prompt).toContain('Alice: "Found some berries!"');
+      expect(prompt).toContain('Bob: "Need help building"');
     });
 
     it('should not show hearing section when no speech', () => {
       const entity = createMockEntity({
         vision: { seenAgents: ['agent1'], heardSpeech: [] }
       });
+      const world = createMockWorld();
 
-      const prompt = builder.buildPrompt(entity, {});
+      const prompt = builder.buildPrompt(entity, world);
 
       expect(prompt).not.toContain('What you hear:');
     });
@@ -114,10 +139,14 @@ describe('StructuredPromptBuilder', () => {
           seenResources: []
         }
       });
+      const world = createMockWorld();
 
-      const prompt = builder.buildPrompt(entity, {});
+      const prompt = builder.buildPrompt(entity, world);
 
-      expect(prompt).toContain('You see 2 other villagers nearby');
+      // Should show the agent names in "You see nearby:"
+      expect(prompt).toContain('You see nearby:');
+      expect(prompt).toContain('Agentagent1');
+      expect(prompt).toContain('Agentagent2');
     });
   });
 
@@ -127,7 +156,7 @@ describe('StructuredPromptBuilder', () => {
         memory: { memories: [] }
       });
 
-      const prompt = builder.buildPrompt(entity, {});
+      const prompt = builder.buildPrompt(entity, createMockWorld());
 
       expect(prompt).not.toContain('no significant recent memories');
       expect(prompt).not.toContain('Recent Memories:');
@@ -143,10 +172,10 @@ describe('StructuredPromptBuilder', () => {
         }
       });
 
-      const prompt = builder.buildPrompt(entity, {});
+      const prompt = builder.buildPrompt(entity, createMockWorld());
 
       expect(prompt).toContain('Recent Memories:');
-      expect(prompt).toContain('agent_seen');
+      expect(prompt).toContain('agent seen'); // Memory type is formatted with spaces
     });
 
     it('should show empty area when nothing nearby', () => {
@@ -158,7 +187,7 @@ describe('StructuredPromptBuilder', () => {
         }
       });
 
-      const prompt = builder.buildPrompt(entity, {});
+      const prompt = builder.buildPrompt(entity, createMockWorld());
 
       expect(prompt).toContain('The area around you is empty');
     });
@@ -167,7 +196,7 @@ describe('StructuredPromptBuilder', () => {
   describe('instruction clarity', () => {
     it('should include "don\'t overthink" instruction', () => {
       const entity = createMockEntity();
-      const prompt = builder.buildPrompt(entity, {});
+      const prompt = builder.buildPrompt(entity, createMockWorld());
 
       expect(prompt).toContain("Don't overthink");
       expect(prompt).toContain('gut reaction');
@@ -175,7 +204,7 @@ describe('StructuredPromptBuilder', () => {
 
     it('should end with response prompt', () => {
       const entity = createMockEntity();
-      const prompt = builder.buildPrompt(entity, {});
+      const prompt = builder.buildPrompt(entity, createMockWorld());
 
       expect(prompt).toMatch(/Your response:\s*$/);
     });

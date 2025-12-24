@@ -18,6 +18,7 @@ export interface PersonalityComponent extends Component {
   workEthic: number;         // prioritizes tasks
   creativity: number;        // tries new things
   generosity: number;        // shares/helps
+  leadership: number;        // takes initiative, organizes others
 }
 
 /**
@@ -37,6 +38,7 @@ export function generateRandomPersonality(): PersonalityComponent {
     workEthic: random(),
     creativity: random(),
     generosity: random(),
+    leadership: random(),
   };
 }
 
@@ -55,6 +57,7 @@ export function createPersonalityComponent(traits: Partial<Omit<PersonalityCompo
     workEthic: traits.workEthic ?? 50,
     creativity: traits.creativity ?? 50,
     generosity: traits.generosity ?? 50,
+    leadership: traits.leadership ?? 50,
   };
 }
 
@@ -97,6 +100,13 @@ export function getPersonalityDescription(personality: PersonalityComponent): st
     traits.push('hardworking and dedicated');
   } else if (personality.workEthic < 30) {
     traits.push('relaxed and carefree');
+  }
+
+  // Leadership
+  if (personality.leadership > 70) {
+    traits.push('natural leader who takes initiative');
+  } else if (personality.leadership < 30) {
+    traits.push('prefers to follow others');
   }
 
   return traits.length > 0 ? traits.join(', ') : 'balanced temperament';

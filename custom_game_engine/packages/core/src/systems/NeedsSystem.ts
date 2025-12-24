@@ -43,19 +43,22 @@ export class NeedsSystem implements System {
       const circadian = impl.getComponent('circadian') as any;
       const isSleeping = circadian?.isSleeping || false;
 
-      // Decay hunger (continues even while sleeping, but slower)
-      // Hunger decay rate is per real second, keep as-is for now
-      const hungerDecay = needs.hungerDecayRate * deltaTime * (isSleeping ? 0.3 : 1.0);
+      // Decay hunger (continues even while sleeping, but MUCH slower)
+      // Per CLAUDE.md: Don't let hunger wake agents during minimum sleep period
+      // Agents need to recover energy more than they need to eat
+      // Hunger decay rate is per real second
+      const hungerDecay = needs.hungerDecayRate * deltaTime * (isSleeping ? 0.1 : 1.0);
 
       // Energy decay based on activity level (per GAME minute, not real time)
-      // Per work order:
-      // - Idle/Walking: -0.5 energy/minute
-      // - Working (gathering, building): -1.5 energy/minute
-      // - Running: -2.0 energy/minute
-      // - Cold exposure (<10°C): -0.3 energy/minute additional
-      // - Hot exposure (>30°C): -0.3 energy/minute additional
+      // Rates balanced for 18-hour wake / 6-hour sleep cycle:
+      // Assuming ~8 hours working, ~10 hours wandering/idle per day
+      // - Idle/Walking: -0.05 energy/minute (~33 hours from 100 to 0)
+      // - Working (gathering, building): -0.15 energy/minute (~11 hours from 100 to 0)
+      // - Running: -0.2 energy/minute (~8 hours from 100 to 0)
+      // - Cold/Hot exposure: -0.03 energy/minute additional
+      // Average day: 8h*0.15 + 10h*0.05 = 72 + 30 = 102 energy used in 18h
 
-      let energyDecayPerGameMinute = 0.5; // Base rate: idle/walking
+      let energyDecayPerGameMinute = 0.05; // Base rate: idle/walking
 
       if (!isSleeping) {
         // Check agent's current behavior to determine activity level
@@ -67,13 +70,13 @@ export class NeedsSystem implements System {
           const isMoving = movement && (Math.abs(movement.velocityX) > 0.01 || Math.abs(movement.velocityY) > 0.01);
 
           if (behavior === 'gather' || behavior === 'build') {
-            energyDecayPerGameMinute = 1.5; // Working
+            energyDecayPerGameMinute = 0.15; // Working
           } else if (isMoving && movement.speed > 3.0) {
-            energyDecayPerGameMinute = 2.0; // Running
+            energyDecayPerGameMinute = 0.2; // Running
           } else if (isMoving) {
-            energyDecayPerGameMinute = 0.5; // Walking (base rate)
+            energyDecayPerGameMinute = 0.05; // Walking
           } else {
-            energyDecayPerGameMinute = 0.5; // Idle (base rate)
+            energyDecayPerGameMinute = 0.05; // Idle
           }
         }
 
@@ -81,9 +84,9 @@ export class NeedsSystem implements System {
         const temperature = impl.getComponent('temperature') as any;
         if (temperature) {
           if (temperature.currentTemp < 10) {
-            energyDecayPerGameMinute += 0.3; // Cold exposure
+            energyDecayPerGameMinute += 0.03; // Cold exposure
           } else if (temperature.currentTemp > 30) {
-            energyDecayPerGameMinute += 0.3; // Hot exposure
+            energyDecayPerGameMinute += 0.03; // Hot exposure
           }
         }
       }
@@ -93,10 +96,11 @@ export class NeedsSystem implements System {
       const newHunger = Math.max(0, needs.hunger - hungerDecay);
       const newEnergy = Math.max(0, needs.energy - energyDecay);
 
-      // Debug logging every 100 ticks for first 3 entities (to avoid spam but still see data)
-      if ((entity.id < '4' || entity.id.startsWith('0')) && world.tick % 100 === 0) {
-        console.log(`[NeedsSystem] Entity ${entity.id.substring(0, 8)}: energy ${needs.energy.toFixed(1)} → ${newEnergy.toFixed(1)} (decay: ${energyDecay.toFixed(3)}, gameMin: ${gameMinutesElapsed.toFixed(3)}, sleeping: ${isSleeping})`);
-      }
+      // Check for critical needs transitions (for memory formation)
+      const wasHungerCritical = needs.hunger < 20;
+      const isHungerCritical = newHunger < 20;
+      const wasEnergyCritical = needs.energy < 20;
+      const isEnergyCritical = newEnergy < 20;
 
       // Update needs
       impl.updateComponent<NeedsComponent>('needs', (current) => ({
@@ -104,6 +108,39 @@ export class NeedsSystem implements System {
         hunger: newHunger,
         energy: newEnergy,
       }));
+
+      // Emit events for critical needs transitions (triggers memory formation)
+      if (!wasHungerCritical && isHungerCritical) {
+        world.eventBus.emit({
+          type: 'need:critical',
+          source: entity.id,
+          data: {
+            agentId: entity.id,
+            needType: 'hunger',
+            value: newHunger,
+            survivalRelevance: 0.8,
+            emotionalIntensity: 0.7,
+            emotionalValence: -0.8,
+            timestamp: Date.now(),
+          },
+        });
+      }
+
+      if (!wasEnergyCritical && isEnergyCritical) {
+        world.eventBus.emit({
+          type: 'need:critical',
+          source: entity.id,
+          data: {
+            agentId: entity.id,
+            needType: 'energy',
+            value: newEnergy,
+            survivalRelevance: 0.7,
+            emotionalIntensity: 0.6,
+            emotionalValence: -0.6,
+            timestamp: Date.now(),
+          },
+        });
+      }
 
       // Check for death (starving for too long)
       if (newHunger === 0 && newEnergy === 0) {

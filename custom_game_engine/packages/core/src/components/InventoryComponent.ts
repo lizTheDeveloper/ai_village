@@ -123,6 +123,30 @@ export function isResourceType(itemId: string): boolean {
 }
 
 /**
+ * Check if a string is a seed item ID (format: "seed:{speciesId}")
+ */
+export function isSeedType(itemId: string): boolean {
+  return itemId.startsWith('seed:');
+}
+
+/**
+ * Get species ID from seed item ID (format: "seed:{speciesId}")
+ */
+export function getSeedSpeciesId(itemId: string): string {
+  if (!isSeedType(itemId)) {
+    throw new Error(`Not a seed item ID: ${itemId}`);
+  }
+  return itemId.substring(5); // Remove "seed:" prefix
+}
+
+/**
+ * Create seed item ID from species ID
+ */
+export function createSeedItemId(speciesId: string): string {
+  return `seed:${speciesId}`;
+}
+
+/**
  * Add items to inventory. Returns the amount actually added.
  * Throws if inventory is full or weight limit exceeded.
  */
@@ -135,13 +159,20 @@ export function addToInventory(
     throw new Error(`Cannot add non-positive quantity: ${quantity}`);
   }
 
-  if (!isResourceType(itemId)) {
-    throw new Error(`Unknown item type: ${itemId}. Currently only resources are supported.`);
-  }
+  let unitWeight: number;
+  let stackSize: number;
 
-  const resourceType = itemId as ResourceType;
-  const unitWeight = getResourceWeight(resourceType);
-  const stackSize = getResourceStackSize(resourceType);
+  if (isResourceType(itemId)) {
+    const resourceType = itemId as ResourceType;
+    unitWeight = getResourceWeight(resourceType);
+    stackSize = getResourceStackSize(resourceType);
+  } else if (isSeedType(itemId)) {
+    // Seeds are lightweight and stack well
+    unitWeight = 0.1; // 0.1 units per seed
+    stackSize = 100; // 100 seeds per stack
+  } else {
+    throw new Error(`Unknown item type: ${itemId}. Supported: resources, seeds (seed:speciesId).`);
+  }
 
   // Calculate how much we can actually add
   const weightAvailable = inventory.maxWeight - inventory.currentWeight;
@@ -226,8 +257,15 @@ export function removeFromInventory(
     );
   }
 
-  const resourceType = itemId as ResourceType;
-  const unitWeight = getResourceWeight(resourceType);
+  let unitWeight: number;
+  if (isResourceType(itemId)) {
+    const resourceType = itemId as ResourceType;
+    unitWeight = getResourceWeight(resourceType);
+  } else if (isSeedType(itemId)) {
+    unitWeight = 0.1; // Seeds weight
+  } else {
+    throw new Error(`Unknown item type for removal: ${itemId}`);
+  }
 
   let remainingToRemove = quantity;
 

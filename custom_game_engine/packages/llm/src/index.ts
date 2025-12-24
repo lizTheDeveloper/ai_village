@@ -4,6 +4,7 @@
 
 export * from './LLMProvider.js';
 export * from './OllamaProvider.js';
+export * from './OpenAICompatProvider.js';
 export * from './AgentContextBuilder.js';
 export * from './StructuredPromptBuilder.js';
 export * from './ResponseParser.js';

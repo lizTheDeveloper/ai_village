@@ -23,7 +23,15 @@ export * from './WeatherComponent.js';
 export * from './CircadianComponent.js';
 export * from './PlantComponent.js';
 export * from './SeedComponent.js';
+export * from './AnimalComponent.js';
+export * from './MeetingComponent.js';
+export * from './EpisodicMemoryComponent.js';
+export * from './SemanticMemoryComponent.js';
+export * from './SocialMemoryComponent.js';
+export * from './ReflectionComponent.js';
+export * from './JournalComponent.js';
 
 // Re-export types explicitly (export * doesn't re-export types)
 export type { AgentBehavior } from './AgentComponent.js';
 export type { PlantStage, PlantGenetics, GeneticMutation } from './PlantComponent.js';
+export type { AnimalLifeStage, AnimalState } from './AnimalComponent.js';

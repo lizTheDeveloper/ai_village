@@ -39,6 +39,12 @@ export class ResponseParser {
     'rest',
     'work',
     'help',
+    'build',
+    'deposit_items',
+    'call_meeting',
+    'attend_meeting',
+    'till',
+    'farm',
   ]);
 
   /**

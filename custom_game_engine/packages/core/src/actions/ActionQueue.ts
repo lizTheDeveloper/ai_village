@@ -164,6 +164,7 @@ export class ActionQueue implements IActionQueue {
     // Validate
     const validation = handler.validate(action, world);
     if (!validation.valid) {
+      console.error(`[ActionQueue] Action ${action.type} (${action.id}) failed validation: ${validation.reason}`);
       action.status = 'failed';
       action.result = {
         success: false,
@@ -174,6 +175,17 @@ export class ActionQueue implements IActionQueue {
       action.completedAt = this.getCurrentTick();
       this.actionHistory.push(action);
       this.actions.delete(action.id);
+
+      // Emit failure event so UI can show feedback
+      world.eventBus.emit({
+        type: 'agent:action:failed',
+        source: action.actorId,
+        data: {
+          actionId: action.id,
+          actionType: action.type,
+          reason: validation.reason,
+        },
+      });
       return;
     }
 

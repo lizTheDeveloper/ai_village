@@ -21,6 +21,7 @@ export interface Tile {
   fertilized: boolean;
   fertilizerDuration: number;
   lastWatered: number;
+  lastTilled: number;
   composted: boolean;
 }
 
@@ -63,21 +64,114 @@ export class SoilSystem implements System {
 
   /**
    * Till a grass tile to make it plantable
+   * TODO: Add agentId parameter for tool checking when agent-initiated tilling is implemented
    */
-  public tillTile(world: World, tile: Tile, x: number, y: number): void {
-    if (tile.terrain !== 'grass' && tile.terrain !== 'dirt') {
-      throw new Error(`Cannot till ${tile.terrain} terrain at (${x},${y}). Only grass and dirt can be tilled.`);
+  public tillTile(world: World, tile: Tile, x: number, y: number, agentId?: string): void {
+    console.log(`[SoilSystem] ===== TILLING TILE AT (${x}, ${y}) =====`);
+    console.log(`[SoilSystem] Current tile state:`, {
+      terrain: tile.terrain,
+      tilled: tile.tilled,
+      biome: tile.biome,
+      fertility: tile.fertility,
+      moisture: tile.moisture,
+      plantability: tile.plantability,
+    });
+
+    // CLAUDE.md: Validate inputs, no silent fallbacks
+    if (!tile) {
+      const error = 'tillTile requires a valid tile object';
+      console.error(`[SoilSystem] ❌ ERROR: ${error}`);
+      throw new Error(error);
+    }
+    if (!Number.isFinite(x) || !Number.isFinite(y)) {
+      const error = `tillTile requires valid position coordinates, got (${x},${y})`;
+      console.error(`[SoilSystem] ❌ ERROR: ${error}`);
+      throw new Error(error);
     }
 
-    // Change terrain to dirt
-    tile.terrain = 'dirt';
+    // CLAUDE.md: CRITICAL - Biome data is REQUIRED for fertility calculation
+    // If biome is missing, terrain generation failed - crash immediately
+    if (!tile.biome) {
+      const error = `Tile at (${x},${y}) has no biome data. Terrain generation failed or chunk not generated. Cannot determine fertility for farming.`;
+      console.error(`[SoilSystem] ❌ CRITICAL ERROR: ${error}`);
+      console.error(`[SoilSystem] Tile state:`, JSON.stringify(tile, null, 2));
+      throw new Error(error);
+    }
 
-    // Set fertility based on biome
-    tile.fertility = this.getInitialFertility(tile.biome);
+    if (tile.terrain !== 'grass' && tile.terrain !== 'dirt') {
+      const error = `Cannot till ${tile.terrain} terrain at (${x},${y}). Only grass and dirt can be tilled.`;
+      console.error(`[SoilSystem] ❌ ERROR: ${error}`);
+      throw new Error(error);
+    }
+
+    // Prevent re-tilling if tile still has plantability remaining
+    // Allow re-tilling if depleted (plantability === 0) to restore fertility
+    if (tile.tilled && tile.plantability > 0) {
+      const error = `Tile at (${x},${y}) is already tilled. Plantability: ${tile.plantability}/3 uses remaining. Wait until depleted to re-till.`;
+      console.error(`[SoilSystem] ❌ ERROR: ${error}`);
+      throw new Error(error);
+    }
+
+    console.log(`[SoilSystem] ✅ Validation passed - proceeding with tilling`);
+
+    // Tool checking (if agent-initiated)
+    // System checks agent inventory for hoe > shovel > hands
+    let toolUsed = 'hands';
+    let toolEfficiency = 0.5; // 50% efficiency for hands
+
+    if (agentId) {
+      console.log(`[SoilSystem] 🔍 Checking agent ${agentId} inventory for tools...`);
+      const agent = world.getEntity(agentId);
+      if (agent) {
+        const inventory = agent.components.get('inventory') as any;
+        if (inventory) {
+          // Check for hoe (best tool)
+          if (this.hasItemInInventory(inventory, 'hoe')) {
+            toolUsed = 'hoe';
+            toolEfficiency = 1.0;
+            console.log(`[SoilSystem] 🔨 Agent has HOE - using it (100% efficiency, fastest)`);
+          }
+          // Check for shovel (second best)
+          else if (this.hasItemInInventory(inventory, 'shovel')) {
+            toolUsed = 'shovel';
+            toolEfficiency = 0.8;
+            console.log(`[SoilSystem] 🔨 Agent has SHOVEL - using it (80% efficiency, medium speed)`);
+          }
+          // Fallback to hands
+          else {
+            console.log(`[SoilSystem] 🖐️ Agent has no farming tools - using HANDS (50% efficiency, slowest)`);
+          }
+        } else {
+          console.log(`[SoilSystem] ⚠️ Agent has no inventory component - defaulting to HANDS`);
+        }
+      } else {
+        console.log(`[SoilSystem] ⚠️ Agent ${agentId} not found - defaulting to HANDS`);
+      }
+    } else {
+      console.log(`[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency)`);
+      console.log(`[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T`);
+      console.log(`[SoilSystem] 🔨 Available tools: HOE (100% efficiency) > SHOVEL (80%) > HANDS (50%)`);
+    }
+
+    // Tool efficiency tracked for future use (currently tilling duration is fixed at 100 ticks = 5s in TillActionHandler)
+    // TODO: Apply tool efficiency to action duration when tool system is fully integrated
+    console.log(`[SoilSystem] Tool: ${toolUsed}, efficiency: ${(toolEfficiency * 100).toFixed(0)}%`);
+
+    // Change terrain to dirt
+    const oldTerrain = tile.terrain;
+    tile.terrain = 'dirt';
+    console.log(`[SoilSystem] Changed terrain: ${oldTerrain} → dirt`);
+
+    // Set fertility based on biome (biome is guaranteed to exist due to check above)
+    const oldFertility = tile.fertility;
+    tile.fertility = this.getInitialFertility(tile.biome!); // ! is safe due to validation
+    console.log(`[SoilSystem] Set fertility based on biome '${tile.biome}': ${oldFertility.toFixed(2)} → ${tile.fertility.toFixed(2)}`);
 
     // Make plantable
     tile.tilled = true;
     tile.plantability = 3;
+    tile.lastTilled = world.tick;
+    console.log(`[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses, lastTilled=${world.tick}`);
 
     // Initialize nutrients based on biome
     const nutrientBase = tile.fertility;
@@ -86,9 +180,14 @@ export class SoilSystem implements System {
       phosphorus: nutrientBase * 0.8,
       potassium: nutrientBase * 0.9,
     };
+    console.log(`[SoilSystem] Initialized nutrients (NPK):`, {
+      nitrogen: tile.nutrients.nitrogen.toFixed(2),
+      phosphorus: tile.nutrients.phosphorus.toFixed(2),
+      potassium: tile.nutrients.potassium.toFixed(2),
+    });
 
     // Emit tilling event
-    world.eventBus.emit({
+    const eventData = {
       type: 'soil:tilled',
       source: 'soil-system',
       data: {
@@ -96,7 +195,11 @@ export class SoilSystem implements System {
         fertility: tile.fertility,
         biome: tile.biome,
       },
-    });
+    };
+    console.log(`[SoilSystem] Emitting soil:tilled event:`, eventData);
+    world.eventBus.emit(eventData);
+
+    console.log(`[SoilSystem] ===== TILLING COMPLETE =====`);
   }
 
   /**
@@ -321,20 +424,27 @@ export class SoilSystem implements System {
   }
 
   /**
-   * Get initial fertility based on biome
+   * Check if inventory contains a specific item
+   * TODO: Move to InventoryComponent helper when tool system is fully implemented
    */
-  private getInitialFertility(biome?: BiomeType): number {
-    if (!biome) {
-      return 50; // Default for tiles without biome
-    }
+  private hasItemInInventory(inventory: any, itemId: string): boolean {
+    if (!inventory.slots) return false;
+    return inventory.slots.some((slot: any) => slot.itemId === itemId && slot.quantity > 0);
+  }
 
+  /**
+   * Get initial fertility based on biome
+   * CLAUDE.md: NO silent fallbacks
+   * NOTE: Biome is now validated in tillTile(), so this will never receive undefined
+   */
+  private getInitialFertility(biome: BiomeType): number {
     switch (biome) {
       case 'plains':
         return 70 + Math.random() * 10; // 70-80
       case 'forest':
         return 60 + Math.random() * 10; // 60-70
       case 'river':
-        return 75 + Math.random() * 10; // 75-85
+        return 80 + Math.random() * 10; // 80-90
       case 'desert':
         return 20 + Math.random() * 10; // 20-30
       case 'mountains':
@@ -342,7 +452,8 @@ export class SoilSystem implements System {
       case 'ocean':
         return 0; // Cannot farm in ocean
       default:
-        return 50;
+        // CLAUDE.md: If we get an unknown biome, that's a bug - crash
+        throw new Error(`Unknown biome type: ${biome} - cannot determine fertility`);
     }
   }
 }

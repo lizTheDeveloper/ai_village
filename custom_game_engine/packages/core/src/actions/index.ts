@@ -7,3 +7,5 @@ export * from './ActionHandler.js';
 export * from './ActionRegistry.js';
 export * from './ActionQueue.js';
 export * from './AgentAction.js';
+export * from './AnimalHousingActions.js';
+export * from './TillActionHandler.js';

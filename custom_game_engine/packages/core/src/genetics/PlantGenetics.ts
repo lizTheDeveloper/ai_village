@@ -4,14 +4,20 @@ import { SeedComponent } from '../components/SeedComponent.js';
 /**
  * Create a seed from a parent plant with inherited genetics
  */
-export function createSeedFromPlant(parent: PlantComponent, speciesId: string): SeedComponent {
+export function createSeedFromPlant(
+  parent: PlantComponent,
+  speciesId: string,
+  options?: {
+    parentEntityId?: string;
+    agentId?: string;
+    gameTime?: number;
+    sourceType?: 'wild' | 'cultivated' | 'traded' | 'generated';
+  }
+): SeedComponent {
   // REQUIRED: parent must have genetics
   if (!parent.genetics) {
     throw new Error('Cannot create seed from plant - parent missing genetics');
   }
-
-  // Get parent entity ID if available
-  const parentEntityId = (parent as any).entityId;
 
   // Calculate seed quality based on parent health and care
   const quality = calculateSeedQuality(parent);
@@ -24,6 +30,12 @@ export function createSeedFromPlant(parent: PlantComponent, speciesId: string): 
     parent.generation + 1
   );
 
+  // Build parent plant IDs array
+  const parentPlantIds: string[] = [];
+  if (options?.parentEntityId) {
+    parentPlantIds.push(options.parentEntityId);
+  }
+
   return new SeedComponent({
     speciesId,
     genetics: inheritedGenetics,
@@ -31,9 +43,30 @@ export function createSeedFromPlant(parent: PlantComponent, speciesId: string): 
     viability,
     vigor,
     quality,
-    source: 'cultivated',
-    harvestedFrom: parentEntityId
+    sourceType: options?.sourceType ?? 'cultivated',
+    parentPlantIds,
+    harvestMetadata: {
+      fromPlantId: options?.parentEntityId,
+      byAgentId: options?.agentId,
+      timestamp: options?.gameTime
+    }
   });
+}
+
+/**
+ * Calculate seed yield from a plant based on health, stage, and agent skill
+ * Per spec lines 310-316
+ */
+export function calculateSeedYield(
+  plant: PlantComponent,
+  baseSeedsPerPlant: number,
+  agentSkill: number = 50 // Default farming skill
+): number {
+  const healthMod = plant.health / 100;
+  const stageMod = plant.stage === 'seeding' ? 1.5 : 1.0;
+  const skillMod = 0.5 + (agentSkill / 100);
+
+  return Math.floor(baseSeedsPerPlant * healthMod * stageMod * skillMod);
 }
 
 /**
@@ -53,9 +86,9 @@ export function applyMutations(
     mutations: [...parentGenetics.mutations]
   };
 
-  // Mutation chance: 20% per trait
-  const MUTATION_CHANCE = 0.2;
-  const MUTATION_MAGNITUDE = 0.05; // ±5%
+  // Mutation chance: 10% per trait (per spec)
+  const MUTATION_CHANCE = 0.1;
+  const MUTATION_MAGNITUDE = 0.1; // ±10% variation
 
   const traits: Array<keyof PlantGenetics> = [
     'growthRate',
@@ -119,7 +152,7 @@ export function applyGenetics(
       return plant.genetics.yieldAmount;
 
     case 'hydrationDecay': {
-      const baseDecay = baseValue ?? 5; // Default 5% per day
+      const baseDecay = baseValue ?? 15; // Default 15% per day (was 5%, too slow to notice)
       const tolerance = plant.genetics.droughtTolerance / 100;
       return baseDecay * (1 - tolerance * 0.5); // Drought tolerance reduces decay
     }
@@ -155,19 +188,54 @@ export function canGerminate(seed: SeedComponent): boolean {
  */
 export function updateSeedViability(seed: SeedComponent): void {
   // Viability decreases with age
-  const ageFactor = Math.max(0, 1 - seed.age / 365); // Loses viability over a year
+  const ageFactor = Math.max(0, 1 - seed.ageInDays / 365); // Loses viability over a year
   seed.viability = Math.max(0, seed.viability * ageFactor);
 }
 
 /**
- * Calculate seed quality based on parent plant health
+ * Check if seed dormancy requirements are met
+ */
+export function checkDormancyRequirements(
+  seed: SeedComponent,
+  coldDaysExperienced: number = 0
+): boolean {
+  if (!seed.dormant) {
+    return true; // Not dormant, can germinate
+  }
+
+  if (!seed.dormancyRequirements) {
+    return true; // No specific requirements
+  }
+
+  const reqs = seed.dormancyRequirements;
+
+  // Check cold stratification
+  if (reqs.requiresColdStratification && reqs.coldDaysRequired) {
+    if (coldDaysExperienced < reqs.coldDaysRequired) {
+      return false; // Not enough cold days
+    }
+  }
+
+  // All requirements met
+  return true;
+}
+
+/**
+ * Break seed dormancy (e.g., after stratification or scarification)
+ */
+export function breakDormancy(seed: SeedComponent): void {
+  seed.dormant = false;
+}
+
+/**
+ * Calculate seed quality based on parent plant health (0-1 range)
  */
 function calculateSeedQuality(parent: PlantComponent): number {
   const healthFactor = parent.health / 100;
   const careFactor = parent.careQuality / 100;
   const geneticFactor = parent.geneticQuality / 100;
 
-  return (healthFactor + careFactor + geneticFactor) / 3 * 100;
+  return (healthFactor + careFactor + geneticFactor) / 3;
 }
 
 /**

@@ -25,7 +25,9 @@ export type AgentBehavior =
   | 'deposit_items'
   | 'seek_warmth'
   | 'call_meeting'
-  | 'attend_meeting';
+  | 'attend_meeting'
+  | 'till'
+  | 'farm';
 
 export interface SpeechHistoryEntry {
   text: string;

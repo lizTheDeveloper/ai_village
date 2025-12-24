@@ -5,6 +5,7 @@ import type { Tile, TerrainType, BiomeType } from '../chunks/Tile.js';
 import { PerlinNoise } from './PerlinNoise.js';
 import { createTree } from '../entities/TreeEntity.js';
 import { createRock } from '../entities/RockEntity.js';
+import { WildAnimalSpawningSystem } from '@ai-village/core';
 
 /**
  * Generates terrain using Perlin noise.
@@ -14,6 +15,7 @@ export class TerrainGenerator {
   private moistureNoise: PerlinNoise;
   private temperatureNoise: PerlinNoise;
   private seed: string;
+  private animalSpawner: WildAnimalSpawningSystem;
 
   // Terrain thresholds
   private readonly WATER_LEVEL = -0.3;
@@ -27,6 +29,7 @@ export class TerrainGenerator {
     this.elevationNoise = new PerlinNoise(seedHash);
     this.moistureNoise = new PerlinNoise(seedHash + 1000);
     this.temperatureNoise = new PerlinNoise(seedHash + 2000);
+    this.animalSpawner = new WildAnimalSpawningSystem();
   }
 
   /**
@@ -49,6 +52,15 @@ export class TerrainGenerator {
     // Place entities (trees, rocks)
     if (world) {
       this.placeEntities(chunk, world);
+
+      // Spawn wild animals in chunk
+      const chunkBiome = this.determineChunkBiome(chunk);
+      this.animalSpawner.spawnAnimalsInChunk(world, {
+        x: chunk.x,
+        y: chunk.y,
+        biome: chunkBiome,
+        size: CHUNK_SIZE,
+      });
     }
 
     chunk.generated = true;
@@ -135,17 +147,24 @@ export class TerrainGenerator {
       temperature
     );
 
-    // Normalize moisture and fertility (0-1 range)
+    // Normalize moisture (0-1 range)
     const normalizedMoisture = (moisture + 1) / 2;
-    let fertility = (moisture + 1) / 2;
 
-    // Adjust fertility based on terrain
+    // Calculate biome-based fertility (0-1 range)
+    // Work order spec requires:
+    // - Plains/Meadow: 70-80
+    // - Forest: 60-70
+    // - Riverside: 80-90
+    // - Desert: 20-30
+    // - Mountains: 40-50
+    let fertility = this.calculateBiomeFertility(biome, moisture);
+
+    // Adjust by terrain type
     if (terrain === 'water' || terrain === 'stone') {
-      fertility = 0;
-    } else if (terrain === 'sand') {
-      fertility *= 0.3;
-    } else if (terrain === 'forest') {
-      fertility *= 1.2;
+      fertility = 0; // Not farmable
+    } else if (terrain === 'sand' && biome !== 'desert') {
+      // Sand near water (beaches) - low fertility
+      fertility = Math.min(fertility, 0.3);
     }
 
     return {
@@ -163,9 +182,48 @@ export class TerrainGenerator {
       fertilized: false,
       fertilizerDuration: 0,
       lastWatered: 0,
+      lastTilled: 0,
       composted: false,
       plantId: null,
     };
+  }
+
+  /**
+   * Calculate fertility based on biome type.
+   * Returns a value in 0-1 range that will be multiplied by 100 for the tile.
+   *
+   * Spec requirements (per work order):
+   * - Plains/Meadow: 70-80
+   * - Forest: 60-70
+   * - Riverside: 80-90
+   * - Desert: 20-30
+   * - Mountains: 40-50
+   */
+  private calculateBiomeFertility(biome: BiomeType, moisture: number): number {
+    // Base fertility ranges per biome (0-100 scale)
+    const BIOME_FERTILITY_RANGES: Record<BiomeType, [number, number]> = {
+      plains: [70, 80],
+      forest: [60, 70],
+      river: [80, 90],
+      ocean: [0, 0], // Not farmable
+      desert: [20, 30],
+      mountains: [40, 50],
+    };
+
+    const range = BIOME_FERTILITY_RANGES[biome];
+    if (!range) {
+      throw new Error(`No fertility data for biome: ${biome}`);
+    }
+
+    const [min, max] = range;
+
+    // Add some variation based on moisture within the range
+    // Higher moisture = higher fertility within biome range
+    const normalizedMoisture = (moisture + 1) / 2; // Convert -1..1 to 0..1
+    const fertility = min + (max - min) * normalizedMoisture;
+
+    // Convert to 0-1 range for storage (will be multiplied by 100)
+    return fertility / 100;
   }
 
   /**
@@ -241,5 +299,36 @@ export class TerrainGenerator {
    */
   getSeed(): string {
     return this.seed;
+  }
+
+  /**
+   * Determine the dominant biome in a chunk for animal spawning.
+   * Counts biome occurrences and returns the most common one.
+   */
+  private determineChunkBiome(chunk: Chunk): BiomeType {
+    const biomeCounts = new Map<BiomeType, number>();
+
+    for (let localY = 0; localY < CHUNK_SIZE; localY++) {
+      for (let localX = 0; localX < CHUNK_SIZE; localX++) {
+        const tile = chunk.tiles[localY * CHUNK_SIZE + localX];
+        if (!tile || !tile.biome) continue;
+
+        const count = biomeCounts.get(tile.biome) || 0;
+        biomeCounts.set(tile.biome, count + 1);
+      }
+    }
+
+    // Find the most common biome
+    let dominantBiome: BiomeType = 'plains'; // Default fallback
+    let maxCount = 0;
+
+    for (const [biome, count] of biomeCounts.entries()) {
+      if (count > maxCount) {
+        maxCount = count;
+        dominantBiome = biome;
+      }
+    }
+
+    return dominantBiome;
   }
 }

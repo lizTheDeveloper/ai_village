@@ -1,0 +1,888 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { WorldImpl } from '../ecs/index.js';
+import { EventBusImpl } from '../events/EventBus.js';
+import type { Entity } from '../ecs/Entity.js';
+
+/**
+ * Test Suite: Seed Gathering and Harvesting Integration
+ *
+ * Covers:
+ * - Criterion 2: Initial Seed Distribution
+ * - Criterion 3: Wild Plant Seed Gathering
+ * - Criterion 4: Cultivated Plant Seed Harvesting
+ * - Criterion 10: Seed as Inventory Item
+ * - Criterion 12: Seed Generation Tracking
+ */
+
+interface SeedGenetics {
+  growthRate: number;
+  yield: number;
+  diseaseResistance: number;
+  droughtTolerance: number;
+  coldTolerance: number;
+  flavor: number;
+}
+
+describe('Seed Gathering and Harvesting', () => {
+  let world: WorldImpl;
+  let eventBus: EventBusImpl;
+  let agentEntity: Entity;
+  let plantEntity: Entity;
+
+  beforeEach(() => {
+    eventBus = new EventBusImpl();
+    world = new WorldImpl(eventBus);
+  });
+
+  describe('Criterion 2: Initial Seed Distribution', () => {
+    it('should grant agents initial seeds on new game', () => {
+      const InitializationSystem = world.getSystemClass('InitializationSystem');
+      if (!InitializationSystem) {
+        throw new Error('InitializationSystem not registered');
+      }
+
+      agentEntity = world.createEntity();
+      agentEntity.addComponent('AgentComponent', {
+        name: 'TestAgent'
+      });
+
+      agentEntity.addComponent('InventoryComponent', {
+        items: [],
+        capacity: 20
+      });
+
+      const system = new InitializationSystem();
+      system.initializeNewGame(world);
+
+      const inventory = agentEntity.getComponent('InventoryComponent');
+
+      // Should have wheat, carrot, and potato seeds
+      const seeds = inventory.items.filter((item: any) =>
+        item.type === 'seed'
+      );
+
+      expect(seeds.length).toBeGreaterThanOrEqual(3);
+
+      const speciesInSeeds = seeds.map((s: any) => s.speciesId);
+      expect(speciesInSeeds).toContain('wheat');
+      expect(speciesInSeeds).toContain('carrot');
+      expect(speciesInSeeds).toContain('potato');
+    });
+
+    it('should set initial seeds as cultivated source with no parent plants', () => {
+      const InitializationSystem = world.getSystemClass('InitializationSystem');
+      if (!InitializationSystem) {
+        throw new Error('InitializationSystem not registered');
+      }
+
+      agentEntity = world.createEntity();
+      agentEntity.addComponent('AgentComponent', { name: 'TestAgent' });
+      agentEntity.addComponent('InventoryComponent', { items: [], capacity: 20 });
+
+      const system = new InitializationSystem();
+      system.initializeNewGame(world);
+
+      const inventory = agentEntity.getComponent('InventoryComponent');
+      const wheatSeeds = inventory.items.find((item: any) =>
+        item.type === 'seed' && item.speciesId === 'wheat'
+      );
+
+      expect(wheatSeeds).toBeDefined();
+      expect(wheatSeeds.sourceType).toBe('cultivated');
+      expect(wheatSeeds.parentPlantIds).toEqual([]);
+      expect(wheatSeeds.generation).toBe(0);
+    });
+
+    it('should set appropriate viability and quality for starter seeds', () => {
+      const InitializationSystem = world.getSystemClass('InitializationSystem');
+      if (!InitializationSystem) {
+        throw new Error('InitializationSystem not registered');
+      }
+
+      agentEntity = world.createEntity();
+      agentEntity.addComponent('AgentComponent', { name: 'TestAgent' });
+      agentEntity.addComponent('InventoryComponent', { items: [], capacity: 20 });
+
+      const system = new InitializationSystem();
+      system.initializeNewGame(world);
+
+      const inventory = agentEntity.getComponent('InventoryComponent');
+      const seeds = inventory.items.filter((item: any) => item.type === 'seed');
+
+      seeds.forEach((seed: any) => {
+        expect(seed.viability).toBeGreaterThanOrEqual(0.8);
+        expect(seed.viability).toBeLessThanOrEqual(1.0);
+        expect(seed.quality).toBeGreaterThanOrEqual(0.7);
+        expect(seed.quality).toBeLessThanOrEqual(1.0);
+      });
+    });
+  });
+
+  describe('Criterion 3: Wild Plant Seed Gathering', () => {
+    beforeEach(() => {
+      agentEntity = world.createEntity();
+      agentEntity.addComponent('AgentComponent', { name: 'Gatherer' });
+      agentEntity.addComponent('InventoryComponent', { items: [], capacity: 20 });
+      agentEntity.addComponent('SkillsComponent', { foraging: 50 });
+
+      plantEntity = world.createEntity();
+      plantEntity.addComponent('PlantComponent', {
+        speciesId: 'wild_berry',
+        stage: 'mature',
+        health: 80,
+        seedsPerPlant: 20,
+        remainingSeeds: 20,
+        genetics: {
+          growthRate: 0.6,
+          yield: 0.7,
+          diseaseResistance: 0.5,
+          droughtTolerance: 0.6,
+          coldTolerance: 0.4,
+          flavor: 0.8
+        },
+        wild: true
+      });
+
+      plantEntity.addComponent('PositionComponent', { x: 10, y: 10 });
+    });
+
+    it('should check plant stage is valid for seed gathering', () => {
+      const ForageAction = require('../actions/ForageAction').default;
+
+      if (!ForageAction) {
+        throw new Error('ForageAction not found');
+      }
+
+      // Try gathering from seedling stage (should fail)
+      plantEntity.getComponent('PlantComponent').stage = 'seedling';
+
+      const result = ForageAction.execute(world, {
+        agentId: agentEntity.id,
+        plantId: plantEntity.id,
+        gatherSeeds: true
+      });
+
+      expect(result.success).toBe(false);
+
+      // Try gathering from mature stage (should succeed)
+      plantEntity.getComponent('PlantComponent').stage = 'mature';
+
+      const result2 = ForageAction.execute(world, {
+        agentId: agentEntity.id,
+        plantId: plantEntity.id,
+        gatherSeeds: true
+      });
+
+      expect(result2.success).toBe(true);
+    });
+
+    it('should calculate seed yield based on plant, health, stage, and skill', () => {
+      const ForageAction = require('../actions/ForageAction').default;
+
+      if (!ForageAction) {
+        throw new Error('ForageAction not found');
+      }
+
+      // Gather from seeding stage (1.5x multiplier)
+      plantEntity.getComponent('PlantComponent').stage = 'seeding';
+      plantEntity.getComponent('PlantComponent').health = 100;
+
+      const skillMultiplier = 0.5 + (50 / 100); // = 1.0
+      const healthMultiplier = 100 / 100; // = 1.0
+      const stageMultiplier = 1.5; // seeding stage
+      const baseSeedsPerPlant = 20;
+
+      const expectedYield = Math.floor(
+        baseSeedsPerPlant * healthMultiplier * stageMultiplier * skillMultiplier
+      );
+
+      const result = ForageAction.execute(world, {
+        agentId: agentEntity.id,
+        plantId: plantEntity.id,
+        gatherSeeds: true
+      });
+
+      expect(result.seedsGathered).toBeCloseTo(expectedYield, 0);
+    });
+
+    it('should create seeds with genetics inherited from parent plant', () => {
+      const ForageAction = require('../actions/ForageAction').default;
+
+      if (!ForageAction) {
+        throw new Error('ForageAction not found');
+      }
+
+      ForageAction.execute(world, {
+        agentId: agentEntity.id,
+        plantId: plantEntity.id,
+        gatherSeeds: true
+      });
+
+      const inventory = agentEntity.getComponent('InventoryComponent');
+      const seeds = inventory.items.filter((item: any) => item.type === 'seed');
+
+      expect(seeds.length).toBeGreaterThan(0);
+
+      const seed = seeds[0];
+      const parentGenetics = plantEntity.getComponent('PlantComponent').genetics;
+
+      // Genetics should be similar (allowing for 10% mutation)
+      expect(seed.genetics.growthRate).toBeCloseTo(parentGenetics.growthRate, 1);
+      expect(seed.genetics.flavor).toBeCloseTo(parentGenetics.flavor, 1);
+    });
+
+    it('should apply 10% mutation chance to genetics', () => {
+      const ForageAction = require('../actions/ForageAction').default;
+
+      if (!ForageAction) {
+        throw new Error('ForageAction not found');
+      }
+
+      // Gather many seeds to observe mutations
+      plantEntity.getComponent('PlantComponent').remainingSeeds = 100;
+
+      ForageAction.execute(world, {
+        agentId: agentEntity.id,
+        plantId: plantEntity.id,
+        gatherSeeds: true
+      });
+
+      const inventory = agentEntity.getComponent('InventoryComponent');
+      const seeds = inventory.items.filter((item: any) => item.type === 'seed');
+
+      const parentGenetics = plantEntity.getComponent('PlantComponent').genetics;
+
+      // Count how many seeds have at least one mutated trait
+      const mutatedSeeds = seeds.filter((seed: any) =>
+        seed.genetics.growthRate !== parentGenetics.growthRate ||
+        seed.genetics.yield !== parentGenetics.yield ||
+        seed.genetics.diseaseResistance !== parentGenetics.diseaseResistance
+      );
+
+      // Should have some mutations (statistically)
+      expect(mutatedSeeds.length).toBeGreaterThan(0);
+    });
+
+    it('should mark seeds as wild source', () => {
+      const ForageAction = require('../actions/ForageAction').default;
+
+      if (!ForageAction) {
+        throw new Error('ForageAction not found');
+      }
+
+      ForageAction.execute(world, {
+        agentId: agentEntity.id,
+        plantId: plantEntity.id,
+        gatherSeeds: true
+      });
+
+      const inventory = agentEntity.getComponent('InventoryComponent');
+      const seeds = inventory.items.filter((item: any) => item.type === 'seed');
+
+      seeds.forEach((seed: any) => {
+        expect(seed.sourceType).toBe('wild');
+      });
+    });
+
+    it('should add seeds to agent inventory', () => {
+      const ForageAction = require('../actions/ForageAction').default;
+
+      if (!ForageAction) {
+        throw new Error('ForageAction not found');
+      }
+
+      const inventoryBefore = agentEntity.getComponent('InventoryComponent').items.length;
+
+      ForageAction.execute(world, {
+        agentId: agentEntity.id,
+        plantId: plantEntity.id,
+        gatherSeeds: true
+      });
+
+      const inventoryAfter = agentEntity.getComponent('InventoryComponent').items.length;
+
+      expect(inventoryAfter).toBeGreaterThan(inventoryBefore);
+    });
+
+    it('should reduce plant remaining seed count', () => {
+      const ForageAction = require('../actions/ForageAction').default;
+
+      if (!ForageAction) {
+        throw new Error('ForageAction not found');
+      }
+
+      const seedsBefore = plantEntity.getComponent('PlantComponent').remainingSeeds;
+
+      ForageAction.execute(world, {
+        agentId: agentEntity.id,
+        plantId: plantEntity.id,
+        gatherSeeds: true
+      });
+
+      const seedsAfter = plantEntity.getComponent('PlantComponent').remainingSeeds;
+
+      expect(seedsAfter).toBeLessThan(seedsBefore);
+    });
+  });
+
+  describe('Criterion 4: Cultivated Plant Seed Harvesting', () => {
+    beforeEach(() => {
+      agentEntity = world.createEntity();
+      agentEntity.addComponent('AgentComponent', { name: 'Farmer' });
+      agentEntity.addComponent('InventoryComponent', { items: [], capacity: 20 });
+      agentEntity.addComponent('SkillsComponent', { farming: 60 });
+
+      plantEntity = world.createEntity();
+      plantEntity.addComponent('PlantComponent', {
+        speciesId: 'wheat',
+        stage: 'mature',
+        health: 90,
+        seedsPerPlant: 30,
+        remainingSeeds: 30,
+        generation: 1,
+        parentPlantIds: ['original-wheat-123'],
+        genetics: {
+          growthRate: 0.75,
+          yield: 0.8,
+          diseaseResistance: 0.6,
+          droughtTolerance: 0.5,
+          coldTolerance: 0.7,
+          flavor: 0.65
+        },
+        wild: false
+      });
+
+      plantEntity.addComponent('PositionComponent', { x: 5, y: 5 });
+    });
+
+    it('should calculate seed yield using same formula as wild gathering', () => {
+      const HarvestAction = require('../actions/HarvestAction').default;
+
+      if (!HarvestAction) {
+        throw new Error('HarvestAction not found');
+      }
+
+      const result = HarvestAction.execute(world, {
+        agentId: agentEntity.id,
+        plantId: plantEntity.id
+      });
+
+      expect(result.seedsHarvested).toBeGreaterThan(0);
+    });
+
+    it('should mark seeds as cultivated source', () => {
+      const HarvestAction = require('../actions/HarvestAction').default;
+
+      if (!HarvestAction) {
+        throw new Error('HarvestAction not found');
+      }
+
+      HarvestAction.execute(world, {
+        agentId: agentEntity.id,
+        plantId: plantEntity.id
+      });
+
+      const inventory = agentEntity.getComponent('InventoryComponent');
+      const seeds = inventory.items.filter((item: any) =>
+        item.type === 'seed' && item.speciesId === 'wheat'
+      );
+
+      expect(seeds.length).toBeGreaterThan(0);
+      seeds.forEach((seed: any) => {
+        expect(seed.sourceType).toBe('cultivated');
+      });
+    });
+
+    it('should track harvest metadata', () => {
+      const HarvestAction = require('../actions/HarvestAction').default;
+
+      if (!HarvestAction) {
+        throw new Error('HarvestAction not found');
+      }
+
+      const timestampBefore = Date.now();
+
+      HarvestAction.execute(world, {
+        agentId: agentEntity.id,
+        plantId: plantEntity.id
+      });
+
+      const timestampAfter = Date.now();
+
+      const inventory = agentEntity.getComponent('InventoryComponent');
+      const seed = inventory.items.find((item: any) =>
+        item.type === 'seed' && item.speciesId === 'wheat'
+      );
+
+      expect(seed.harvestMetadata).toBeDefined();
+      expect(seed.harvestMetadata.fromPlantId).toBe(plantEntity.id);
+      expect(seed.harvestMetadata.byAgentId).toBe(agentEntity.id);
+      expect(seed.harvestMetadata.timestamp).toBeGreaterThanOrEqual(timestampBefore);
+      expect(seed.harvestMetadata.timestamp).toBeLessThanOrEqual(timestampAfter);
+    });
+
+    it('should increment generation number', () => {
+      const HarvestAction = require('../actions/HarvestAction').default;
+
+      if (!HarvestAction) {
+        throw new Error('HarvestAction not found');
+      }
+
+      const parentGeneration = plantEntity.getComponent('PlantComponent').generation;
+
+      HarvestAction.execute(world, {
+        agentId: agentEntity.id,
+        plantId: plantEntity.id
+      });
+
+      const inventory = agentEntity.getComponent('InventoryComponent');
+      const seed = inventory.items.find((item: any) =>
+        item.type === 'seed' && item.speciesId === 'wheat'
+      );
+
+      expect(seed.generation).toBe(parentGeneration + 1);
+    });
+
+    it('should include parent plant ID in seed lineage', () => {
+      const HarvestAction = require('../actions/HarvestAction').default;
+
+      if (!HarvestAction) {
+        throw new Error('HarvestAction not found');
+      }
+
+      HarvestAction.execute(world, {
+        agentId: agentEntity.id,
+        plantId: plantEntity.id
+      });
+
+      const inventory = agentEntity.getComponent('InventoryComponent');
+      const seed = inventory.items.find((item: any) =>
+        item.type === 'seed' && item.speciesId === 'wheat'
+      );
+
+      expect(seed.parentPlantIds).toContain(plantEntity.id);
+    });
+
+    it('should include both parent plants if pollination occurred', () => {
+      const HarvestAction = require('../actions/HarvestAction').default;
+
+      if (!HarvestAction) {
+        throw new Error('HarvestAction not found');
+      }
+
+      // Simulate cross-pollination
+      plantEntity.addComponent('PollinationComponent', {
+        pollinatedBy: 'other-wheat-456'
+      });
+
+      HarvestAction.execute(world, {
+        agentId: agentEntity.id,
+        plantId: plantEntity.id
+      });
+
+      const inventory = agentEntity.getComponent('InventoryComponent');
+      const seed = inventory.items.find((item: any) =>
+        item.type === 'seed' && item.speciesId === 'wheat'
+      );
+
+      expect(seed.parentPlantIds).toHaveLength(2);
+      expect(seed.parentPlantIds).toContain(plantEntity.id);
+      expect(seed.parentPlantIds).toContain('other-wheat-456');
+    });
+
+    it('should add seeds to harvest yield', () => {
+      const HarvestAction = require('../actions/HarvestAction').default;
+
+      if (!HarvestAction) {
+        throw new Error('HarvestAction not found');
+      }
+
+      const result = HarvestAction.execute(world, {
+        agentId: agentEntity.id,
+        plantId: plantEntity.id
+      });
+
+      expect(result.harvest).toBeDefined();
+      expect(result.harvest.seeds).toBeGreaterThan(0);
+    });
+  });
+
+  describe('Criterion 10: Seed as Inventory Item', () => {
+    beforeEach(() => {
+      agentEntity = world.createEntity();
+      agentEntity.addComponent('AgentComponent', { name: 'TestAgent' });
+      agentEntity.addComponent('InventoryComponent', { items: [], capacity: 20 });
+
+      // Add seed to inventory
+      const inventory = agentEntity.getComponent('InventoryComponent');
+      inventory.items.push({
+        type: 'seed',
+        speciesId: 'wheat',
+        count: 10,
+        genetics: {
+          growthRate: 0.5,
+          yield: 0.5,
+          diseaseResistance: 0.5,
+          droughtTolerance: 0.5,
+          coldTolerance: 0.5,
+          flavor: 0.5
+        },
+        generation: 0,
+        parentPlantIds: [],
+        viability: 0.9,
+        vigor: 1.0,
+        quality: 0.85,
+        ageInDays: 5,
+        dormant: false,
+        sourceType: 'wild'
+      });
+    });
+
+    it('should represent seed as Item entity', () => {
+      const inventory = agentEntity.getComponent('InventoryComponent');
+      const seed = inventory.items[0];
+
+      expect(seed.type).toBe('seed');
+      expect(seed.speciesId).toBe('wheat');
+    });
+
+    it('should display seed count (stackable)', () => {
+      const inventory = agentEntity.getComponent('InventoryComponent');
+      const seed = inventory.items[0];
+
+      expect(seed.count).toBe(10);
+    });
+
+    it('should show seed species name', () => {
+      const inventory = agentEntity.getComponent('InventoryComponent');
+      const seed = inventory.items[0];
+
+      expect(seed.speciesId).toBe('wheat');
+    });
+
+    it('should allow planting via plant action', () => {
+      const PlantAction = require('../actions/PlantAction').default;
+
+      if (!PlantAction) {
+        throw new Error('PlantAction not found');
+      }
+
+      const result = PlantAction.execute(world, {
+        agentId: agentEntity.id,
+        seedSpeciesId: 'wheat',
+        position: { x: 10, y: 10 }
+      });
+
+      expect(result.success).toBe(true);
+
+      const inventory = agentEntity.getComponent('InventoryComponent');
+      const seed = inventory.items[0];
+
+      expect(seed.count).toBe(9); // One less after planting
+    });
+
+    it('should allow trading with other agents', () => {
+      const TradeAction = require('../actions/TradeAction').default;
+
+      if (!TradeAction) {
+        // Trading not implemented yet
+        return;
+      }
+
+      const otherAgent = world.createEntity();
+      otherAgent.addComponent('AgentComponent', { name: 'Trader' });
+      otherAgent.addComponent('InventoryComponent', { items: [], capacity: 20 });
+
+      TradeAction.execute(world, {
+        fromAgentId: agentEntity.id,
+        toAgentId: otherAgent.id,
+        itemType: 'seed',
+        speciesId: 'wheat',
+        count: 5
+      });
+
+      const senderInventory = agentEntity.getComponent('InventoryComponent');
+      const receiverInventory = otherAgent.getComponent('InventoryComponent');
+
+      const senderSeeds = senderInventory.items.find((i: any) =>
+        i.type === 'seed' && i.speciesId === 'wheat'
+      );
+      const receiverSeeds = receiverInventory.items.find((i: any) =>
+        i.type === 'seed' && i.speciesId === 'wheat'
+      );
+
+      expect(senderSeeds.count).toBe(5);
+      expect(receiverSeeds.count).toBe(5);
+    });
+
+    it('should track seed age while in inventory', () => {
+      const SeedAgingSystem = world.getSystemClass('SeedAgingSystem');
+
+      if (!SeedAgingSystem) {
+        throw new Error('SeedAgingSystem not registered');
+      }
+
+      const system = new SeedAgingSystem();
+
+      const inventory = agentEntity.getComponent('InventoryComponent');
+      const seedBefore = inventory.items[0];
+      const ageBefore = seedBefore.ageInDays;
+
+      // Simulate passage of time
+      system.update(world, 1); // 1 day
+
+      const seedAfter = inventory.items[0];
+      const ageAfter = seedAfter.ageInDays;
+
+      expect(ageAfter).toBeGreaterThan(ageBefore);
+    });
+  });
+
+  describe('Criterion 12: Seed Generation Tracking', () => {
+    it('should display generation number', () => {
+      const seed = {
+        type: 'seed',
+        speciesId: 'tomato',
+        generation: 3,
+        parentPlantIds: ['parent-1', 'parent-2'],
+        sourceType: 'cultivated',
+        harvestMetadata: {
+          byAgentId: 'agent-123',
+          fromPlantId: 'plant-456',
+          timestamp: Date.now()
+        },
+        ageInDays: 10,
+        genetics: {
+          growthRate: 0.5,
+          yield: 0.5,
+          diseaseResistance: 0.5,
+          droughtTolerance: 0.5,
+          coldTolerance: 0.5,
+          flavor: 0.5
+        },
+        viability: 0.9,
+        vigor: 1.0,
+        quality: 0.85,
+        dormant: false
+      };
+
+      expect(seed.generation).toBe(3);
+    });
+
+    it('should show parent plant IDs', () => {
+      const seed = {
+        type: 'seed',
+        speciesId: 'tomato',
+        generation: 3,
+        parentPlantIds: ['parent-1', 'parent-2'],
+        sourceType: 'cultivated',
+        genetics: {
+          growthRate: 0.5,
+          yield: 0.5,
+          diseaseResistance: 0.5,
+          droughtTolerance: 0.5,
+          coldTolerance: 0.5,
+          flavor: 0.5
+        },
+        viability: 0.9,
+        vigor: 1.0,
+        quality: 0.85,
+        ageInDays: 10,
+        dormant: false
+      };
+
+      expect(seed.parentPlantIds).toContain('parent-1');
+      expect(seed.parentPlantIds).toContain('parent-2');
+    });
+
+    it('should show source type', () => {
+      const wildSeed = {
+        sourceType: 'wild'
+      };
+
+      const cultivatedSeed = {
+        sourceType: 'cultivated'
+      };
+
+      expect(wildSeed.sourceType).toBe('wild');
+      expect(cultivatedSeed.sourceType).toBe('cultivated');
+    });
+
+    it('should show harvested by which agent', () => {
+      const seed = {
+        type: 'seed',
+        harvestMetadata: {
+          byAgentId: 'farmer-bob-123',
+          fromPlantId: 'wheat-plant-456',
+          timestamp: Date.now()
+        }
+      };
+
+      expect(seed.harvestMetadata.byAgentId).toBe('farmer-bob-123');
+    });
+
+    it('should show harvest timestamp', () => {
+      const timestamp = Date.now();
+      const seed = {
+        type: 'seed',
+        harvestMetadata: {
+          byAgentId: 'agent-123',
+          fromPlantId: 'plant-456',
+          timestamp: timestamp
+        }
+      };
+
+      expect(seed.harvestMetadata.timestamp).toBe(timestamp);
+    });
+
+    it('should show age in days', () => {
+      const seed = {
+        type: 'seed',
+        ageInDays: 45
+      };
+
+      expect(seed.ageInDays).toBe(45);
+    });
+
+    it('should indicate generation 0 as wild original', () => {
+      const originalSeed = {
+        generation: 0,
+        sourceType: 'wild',
+        parentPlantIds: []
+      };
+
+      expect(originalSeed.generation).toBe(0);
+      expect(originalSeed.sourceType).toBe('wild');
+      expect(originalSeed.parentPlantIds).toHaveLength(0);
+    });
+
+    it('should indicate generation 1+ as cultivated', () => {
+      const cultivatedSeed = {
+        generation: 1,
+        sourceType: 'cultivated',
+        parentPlantIds: ['parent-123']
+      };
+
+      expect(cultivatedSeed.generation).toBeGreaterThanOrEqual(1);
+      expect(cultivatedSeed.sourceType).toBe('cultivated');
+      expect(cultivatedSeed.parentPlantIds.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('Error Handling (per CLAUDE.md)', () => {
+    it('should throw when trying to gather seeds from invalid plant stage', () => {
+      const ForageAction = require('../actions/ForageAction').default;
+
+      if (!ForageAction) {
+        throw new Error('ForageAction not found');
+      }
+
+      agentEntity = world.createEntity();
+      agentEntity.addComponent('AgentComponent', { name: 'Agent' });
+      agentEntity.addComponent('InventoryComponent', { items: [], capacity: 20 });
+
+      plantEntity = world.createEntity();
+      plantEntity.addComponent('PlantComponent', {
+        speciesId: 'wheat',
+        stage: 'seedling', // Too early for seeds
+        seedsPerPlant: 20,
+        genetics: {
+          growthRate: 0.5,
+          yield: 0.5,
+          diseaseResistance: 0.5,
+          droughtTolerance: 0.5,
+          coldTolerance: 0.5,
+          flavor: 0.5
+        }
+      });
+
+      expect(() => {
+        const result = ForageAction.execute(world, {
+          agentId: agentEntity.id,
+          plantId: plantEntity.id,
+          gatherSeeds: true
+        });
+
+        if (!result.success) {
+          throw new Error(result.error || 'Cannot gather seeds from this plant stage');
+        }
+      }).toThrow(/stage/i);
+    });
+
+    it('should throw when plant has no remaining seeds', () => {
+      const ForageAction = require('../actions/ForageAction').default;
+
+      if (!ForageAction) {
+        throw new Error('ForageAction not found');
+      }
+
+      agentEntity = world.createEntity();
+      agentEntity.addComponent('AgentComponent', { name: 'Agent' });
+      agentEntity.addComponent('InventoryComponent', { items: [], capacity: 20 });
+
+      plantEntity = world.createEntity();
+      plantEntity.addComponent('PlantComponent', {
+        speciesId: 'wheat',
+        stage: 'mature',
+        seedsPerPlant: 20,
+        remainingSeeds: 0, // No seeds left
+        genetics: {
+          growthRate: 0.5,
+          yield: 0.5,
+          diseaseResistance: 0.5,
+          droughtTolerance: 0.5,
+          coldTolerance: 0.5,
+          flavor: 0.5
+        }
+      });
+
+      expect(() => {
+        const result = ForageAction.execute(world, {
+          agentId: agentEntity.id,
+          plantId: plantEntity.id,
+          gatherSeeds: true
+        });
+
+        if (!result.success) {
+          throw new Error(result.error || 'No seeds remaining on plant');
+        }
+      }).toThrow(/no seeds/i);
+    });
+
+    it('should throw when trying to plant seed without valid position', () => {
+      const PlantAction = require('../actions/PlantAction').default;
+
+      if (!PlantAction) {
+        throw new Error('PlantAction not found');
+      }
+
+      agentEntity = world.createEntity();
+      agentEntity.addComponent('AgentComponent', { name: 'Agent' });
+      agentEntity.addComponent('InventoryComponent', {
+        items: [{
+          type: 'seed',
+          speciesId: 'wheat',
+          count: 5,
+          genetics: { growthRate: 0.5, yield: 0.5, diseaseResistance: 0.5, droughtTolerance: 0.5, coldTolerance: 0.5, flavor: 0.5 },
+          generation: 0,
+          parentPlantIds: [],
+          viability: 0.9,
+          vigor: 1.0,
+          quality: 0.85,
+          ageInDays: 0,
+          dormant: false,
+          sourceType: 'wild'
+        }],
+        capacity: 20
+      });
+
+      expect(() => {
+        PlantAction.execute(world, {
+          agentId: agentEntity.id,
+          seedSpeciesId: 'wheat',
+          position: null // Invalid position
+        });
+      }).toThrow(/position/i);
+    });
+  });
+});

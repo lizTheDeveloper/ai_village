@@ -393,7 +393,7 @@ describe('Construction Progress System - Phase 7', () => {
     it('should set correct properties for heat sources', () => {
       const campfire = createBuildingComponent('campfire', 1, 0);
       expect(campfire.providesHeat).toBe(true);
-      expect(campfire.heatRadius).toBe(3);
+      expect(campfire.heatRadius).toBe(8); // Increased from 3 to cover spawn area
       expect(campfire.heatAmount).toBe(10);
       expect(campfire.blocksMovement).toBe(false); // Can walk through campfire
     });

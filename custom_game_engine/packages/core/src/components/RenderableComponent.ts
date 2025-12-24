@@ -1,6 +1,6 @@
 import type { Component, ComponentSchema } from '../ecs/Component.js';
 
-export type RenderLayer = 'terrain' | 'floor' | 'object' | 'entity' | 'effect' | 'ui';
+export type RenderLayer = 'terrain' | 'floor' | 'building' | 'object' | 'entity' | 'effect' | 'ui';
 
 /**
  * Anything that can be rendered.

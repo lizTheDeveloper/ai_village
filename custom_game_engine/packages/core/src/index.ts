@@ -20,3 +20,6 @@ export * from './buildings/index.js';
 export * from './archetypes/index.js';
 export * from './types/PlantSpecies.js';
 export * from './genetics/PlantGenetics.js';
+export * from './data/index.js';
+export * from './metrics/events/index.js';
+export * from './crafting/index.js';

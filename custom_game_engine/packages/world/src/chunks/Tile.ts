@@ -40,6 +40,9 @@ export interface Tile {
   /** Game tick when tile was last watered */
   lastWatered: number;
 
+  /** Game tick when tile was last tilled (0 if never tilled) */
+  lastTilled: number;
+
   /** Whether compost has been applied */
   composted: boolean;
 
@@ -65,10 +68,13 @@ export type BiomeType =
 
 /**
  * Create a default tile.
+ * NOTE: This creates a temporary tile structure. Biome MUST be set by terrain generation.
+ * Per CLAUDE.md: Tiles without biomes should not be used for farming operations.
  */
 export function createDefaultTile(): Tile {
   return {
     terrain: 'grass',
+    // biome is intentionally undefined - MUST be set by TerrainGenerator
     moisture: 50,
     fertility: 50,
     tilled: false,
@@ -81,6 +87,7 @@ export function createDefaultTile(): Tile {
     fertilized: false,
     fertilizerDuration: 0,
     lastWatered: 0,
+    lastTilled: 0,
     composted: false,
     plantId: null,
   };

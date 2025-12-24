@@ -209,62 +209,78 @@ export class BuildingPlacementUI {
   }
 
   /**
-   * Find the nearest agent with inventory to the placement position.
-   * Returns the agent's inventory as a resource map (resourceId -> quantity).
+   * Get available resources from storage buildings and nearest agent inventory.
+   * Returns aggregated resources as a resource map (resourceId -> quantity).
    */
   private findNearestAgentInventory(world: World, position: { x: number; y: number }): Record<string, number> | undefined {
-    // Query all agents with inventory
-    const agents = world.query().with('agent').with('inventory').with('position').executeEntities();
-
-    if (agents.length === 0) {
-      return undefined;
-    }
-
-    // Find nearest agent
-    let nearestAgent = null;
-    let nearestDistance = Infinity;
-
-    for (const agent of agents) {
-      const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
-      if (!agentPos) continue;
-
-      const dx = agentPos.x - position.x;
-      const dy = agentPos.y - position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      if (distance < nearestDistance) {
-        nearestDistance = distance;
-        nearestAgent = agent;
-      }
-    }
-
-    if (!nearestAgent) {
-      return undefined;
-    }
-
-    // Get the agent's inventory component
-    const inventory = nearestAgent.components.get('inventory') as {
-      slots: Array<{ itemId: string | null; quantity: number }>;
-    } | undefined;
-
-    if (!inventory) {
-      return undefined;
-    }
-
-    // Convert inventory to resource map
     const resourceMap: Record<string, number> = {};
-    for (const slot of inventory.slots) {
-      if (slot.itemId && slot.quantity > 0) {
-        const currentAmount = resourceMap[slot.itemId];
-        if (currentAmount !== undefined) {
-          resourceMap[slot.itemId] = currentAmount + slot.quantity;
-        } else {
-          resourceMap[slot.itemId] = slot.quantity;
+    let hasAnyResources = false;
+
+    // FIRST: Aggregate resources from all storage buildings
+    const storageBuildings = world.query()
+      .with('building')
+      .with('inventory')
+      .executeEntities();
+
+    for (const storage of storageBuildings) {
+      const building = storage.components.get('building') as { isComplete: boolean; buildingType: string } | undefined;
+      const inventory = storage.components.get('inventory') as {
+        slots: Array<{ itemId: string | null; quantity: number }>;
+      } | undefined;
+
+      // Only count complete storage buildings
+      if (!building?.isComplete) continue;
+      if (building.buildingType !== 'storage-chest' && building.buildingType !== 'storage-box') continue;
+
+      if (inventory?.slots) {
+        for (const slot of inventory.slots) {
+          if (slot.itemId && slot.quantity > 0) {
+            resourceMap[slot.itemId] = (resourceMap[slot.itemId] || 0) + slot.quantity;
+            hasAnyResources = true;
+          }
         }
       }
     }
 
-    return resourceMap;
+    // SECOND: Add resources from nearest agent inventory
+    const agents = world.query().with('agent').with('inventory').with('position').executeEntities();
+
+    if (agents.length > 0) {
+      // Find nearest agent
+      let nearestAgent = null;
+      let nearestDistance = Infinity;
+
+      for (const agent of agents) {
+        const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
+        if (!agentPos) continue;
+
+        const dx = agentPos.x - position.x;
+        const dy = agentPos.y - position.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestAgent = agent;
+        }
+      }
+
+      if (nearestAgent) {
+        const inventory = nearestAgent.components.get('inventory') as {
+          slots: Array<{ itemId: string | null; quantity: number }>;
+        } | undefined;
+
+        if (inventory) {
+          for (const slot of inventory.slots) {
+            if (slot.itemId && slot.quantity > 0) {
+              resourceMap[slot.itemId] = (resourceMap[slot.itemId] || 0) + slot.quantity;
+              hasAnyResources = true;
+            }
+          }
+        }
+      }
+    }
+
+    return hasAnyResources ? resourceMap : undefined;
   }
 
   /**
@@ -366,12 +382,16 @@ export class BuildingPlacementUI {
     }
 
     // Emit placement confirmed event
+    // Convert pixel coordinates to tile coordinates for PositionComponent
     this.eventBus.emit({
       type: 'building:placement:confirmed',
       source: 'building-placement-ui',
       data: {
         blueprintId: this.state.selectedBlueprint.id,
-        position: { ...this.state.ghostPosition },
+        position: {
+          x: this.state.ghostPosition.x / this.tileSize,
+          y: this.state.ghostPosition.y / this.tileSize
+        },
         rotation: this.state.ghostRotation,
       },
     });
@@ -713,7 +733,7 @@ export class BuildingPlacementUI {
       ctx.fillText(
         building.name.charAt(0),
         cardX + this.buildingCardSize / 2 - 5,
-        cardY + this.buildingCardSize / 2 + 6
+        cardY + 10
       );
 
       // Building name
@@ -721,8 +741,24 @@ export class BuildingPlacementUI {
       ctx.fillText(
         building.name.substring(0, 8),
         cardX + 2,
-        cardY + this.buildingCardSize - 4
+        cardY + 28
       );
+
+      // Resource costs (compactly displayed)
+      if (building.resourceCost && building.resourceCost.length > 0) {
+        ctx.font = '7px monospace';
+        ctx.fillStyle = building.unlocked ? '#FFD700' : '#666666';
+        let costY = cardY + 40;
+
+        // Show each resource type with icon
+        for (const cost of building.resourceCost) {
+          if (cost.amountRequired > 0) {
+            const icon = this.getResourceIcon(cost.resourceId);
+            ctx.fillText(`${icon}${cost.amountRequired}`, cardX + 2, costY);
+            costY += 9;
+          }
+        }
+      }
     });
 
     // Close hint
@@ -1008,5 +1044,25 @@ export class BuildingPlacementUI {
     }
 
     return lines;
+  }
+
+  /**
+   * Get icon for a resource type.
+   * @param resourceType The resource type (wood, stone, food, water)
+   * @returns Unicode icon for the resource
+   */
+  private getResourceIcon(resourceType: string): string {
+    switch (resourceType) {
+      case 'wood':
+        return '🪵';
+      case 'stone':
+        return '🪨';
+      case 'food':
+        return '🍎';
+      case 'water':
+        return '💧';
+      default:
+        return '?';
+    }
   }
 }

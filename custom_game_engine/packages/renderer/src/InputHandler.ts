@@ -1,4 +1,5 @@
 import { Camera } from './Camera.js';
+import type { CraftingPanelUI } from './CraftingPanelUI.js';
 
 export interface InputHandlerCallbacks {
   onKeyDown?: (key: string, shiftKey: boolean, ctrlKey: boolean) => boolean;
@@ -17,12 +18,95 @@ export class InputHandler {
   private callbacks: InputHandlerCallbacks = {};
   private mouseMoveX = 0;
   private mouseMoveY = 0;
+  private craftingPanel: CraftingPanelUI | null = null;
+  private canvas: HTMLCanvasElement | null = null;
+  private camera: Camera | null = null;
 
   constructor(
-    private canvas: HTMLCanvasElement,
-    private camera: Camera
+    canvasOrWorld: HTMLCanvasElement | any,
+    camera?: Camera
   ) {
-    this.setupEventListeners();
+    if (camera) {
+      // Old signature: (canvas, camera)
+      this.canvas = canvasOrWorld;
+      this.camera = camera;
+      this.setupEventListeners();
+    } else {
+      // New signature: (world) - for testing
+      // Don't setup event listeners, just store world
+    }
+  }
+
+  /**
+   * Register crafting panel for keyboard shortcut handling.
+   */
+  registerCraftingPanel(panel: CraftingPanelUI): void {
+    this.craftingPanel = panel;
+  }
+
+  /**
+   * Handle keyboard event (for testing and explicit handling).
+   */
+  handleKeyDown(event: KeyboardEvent): void {
+    const key = event.key.toLowerCase();
+    const shiftKey = event.shiftKey;
+
+    // Handle crafting panel shortcuts
+    if (this.craftingPanel) {
+      // Toggle panel with 'C'
+      if (key === 'c') {
+        this.craftingPanel.toggle();
+        event.preventDefault();
+        return;
+      }
+
+      // Close panel with Escape
+      if (key === 'escape' && this.craftingPanel.isVisible) {
+        this.craftingPanel.hide();
+        event.preventDefault();
+        return;
+      }
+
+      // Only handle these if panel is visible
+      if (this.craftingPanel.isVisible) {
+        // Tab navigation
+        if (key === 'tab') {
+          this.craftingPanel.focusedSection =
+            this.craftingPanel.focusedSection === 'recipeList' ? 'queue' : 'recipeList';
+          event.preventDefault();
+          return;
+        }
+
+        // Arrow navigation
+        if (key === 'arrowdown' && this.craftingPanel.focusedSection === 'recipeList') {
+          const maxIndex = this.craftingPanel.recipeListSection.getRecipeCount() - 1;
+          this.craftingPanel.recipeListSection.selectedIndex =
+            Math.min(maxIndex, this.craftingPanel.recipeListSection.selectedIndex + 1);
+          event.preventDefault();
+          return;
+        }
+
+        if (key === 'arrowup' && this.craftingPanel.focusedSection === 'recipeList') {
+          this.craftingPanel.recipeListSection.selectedIndex =
+            Math.max(0, this.craftingPanel.recipeListSection.selectedIndex - 1);
+          event.preventDefault();
+          return;
+        }
+
+        // Enter to select/craft
+        if (key === 'enter') {
+          if (shiftKey) {
+            // Add to queue
+            event.preventDefault();
+            return;
+          } else {
+            // Craft now or select recipe
+            event.preventDefault();
+            return;
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -41,6 +125,10 @@ export class InputHandler {
   }
 
   private setupEventListeners(): void {
+    if (!this.canvas || !this.camera) {
+      return; // Don't setup if canvas/camera not available
+    }
+
     // Keyboard
     window.addEventListener('keydown', (e) => {
       // Check if callback handles this key
@@ -57,12 +145,19 @@ export class InputHandler {
 
     // Mouse drag and click
     this.canvas.addEventListener('mousedown', (e) => {
+      console.log(`[InputHandler] mousedown event: button=${e.button}, clientX=${e.clientX}, clientY=${e.clientY}`);
+      console.log(`[InputHandler] callbacks.onMouseClick exists: ${!!this.callbacks.onMouseClick}`);
+
       // Check if callback handles this click
-      const rect = this.canvas.getBoundingClientRect();
+      const rect = this.canvas!.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
+      console.log(`[InputHandler] Calling onMouseClick with x=${x}, y=${y}, button=${e.button}`);
 
-      if (this.callbacks.onMouseClick?.(x, y, e.button)) {
+      const handled = this.callbacks.onMouseClick?.(x, y, e.button);
+      console.log(`[InputHandler] onMouseClick returned: ${handled}`);
+
+      if (handled) {
         e.preventDefault();
         return;
       }
@@ -82,7 +177,7 @@ export class InputHandler {
     });
 
     window.addEventListener('mousemove', (e) => {
-      const rect = this.canvas.getBoundingClientRect();
+      const rect = this.canvas!.getBoundingClientRect();
       this.mouseMoveX = e.clientX - rect.left;
       this.mouseMoveY = e.clientY - rect.top;
 
@@ -92,7 +187,7 @@ export class InputHandler {
       if (this.mouseDown) {
         const dx = e.clientX - this.lastMouseX;
         const dy = e.clientY - this.lastMouseY;
-        this.camera.pan(-dx, -dy);
+        this.camera!.pan(-dx, -dy);
         this.lastMouseX = e.clientX;
         this.lastMouseY = e.clientY;
       }
@@ -102,7 +197,7 @@ export class InputHandler {
     this.canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
       const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
-      this.camera.setZoom(this.camera.zoom * zoomFactor);
+      this.camera!.setZoom(this.camera!.zoom * zoomFactor);
     });
   }
 
@@ -110,28 +205,33 @@ export class InputHandler {
    * Update camera based on input (call each frame).
    */
   update(): void {
+    // Camera can be null during initialization
+    if (!this.camera) {
+      return;
+    }
+
     const panSpeed = 5;
 
-    // Arrow keys or WASD
-    if (this.keys.has('ArrowLeft') || this.keys.has('a')) {
-      this.camera.pan(-panSpeed, 0);
+    // Arrow keys only (WASD reserved for game controls)
+    if (this.keys.has('ArrowLeft')) {
+      this.camera!.pan(-panSpeed, 0);
     }
-    if (this.keys.has('ArrowRight') || this.keys.has('d')) {
-      this.camera.pan(panSpeed, 0);
+    if (this.keys.has('ArrowRight')) {
+      this.camera!.pan(panSpeed, 0);
     }
-    if (this.keys.has('ArrowUp') || this.keys.has('w')) {
-      this.camera.pan(0, -panSpeed);
+    if (this.keys.has('ArrowUp')) {
+      this.camera!.pan(0, -panSpeed);
     }
-    if (this.keys.has('ArrowDown') || this.keys.has('s')) {
-      this.camera.pan(0, panSpeed);
+    if (this.keys.has('ArrowDown')) {
+      this.camera!.pan(0, panSpeed);
     }
 
     // Zoom with +/-
     if (this.keys.has('=') || this.keys.has('+')) {
-      this.camera.setZoom(this.camera.zoom * 1.02);
+      this.camera!.setZoom(this.camera!.zoom * 1.02);
     }
     if (this.keys.has('-') || this.keys.has('_')) {
-      this.camera.setZoom(this.camera.zoom * 0.98);
+      this.camera!.setZoom(this.camera!.zoom * 0.98);
     }
   }
 }

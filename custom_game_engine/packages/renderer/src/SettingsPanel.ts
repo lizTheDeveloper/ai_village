@@ -22,10 +22,10 @@ const DEFAULT_SETTINGS: GameSettings = {
     model: 'qwen3:4b',
     apiKey: '',
   },
-  dungeonMasterPrompt: 'You all just woke up in this place together, with nothing but berries to survive. Work together and make a village!',
+  dungeonMasterPrompt: '',
 };
 
-// Preset configurations
+// LLM Preset configurations
 const PRESETS: Record<string, Partial<LLMSettings>> = {
   'ollama-local': {
     provider: 'ollama',
@@ -49,14 +49,39 @@ const PRESETS: Record<string, Partial<LLMSettings>> = {
   },
 };
 
+// Dungeon Master Prompt Presets
+const DM_PROMPT_PRESETS: Record<string, string> = {
+  'cooperative-survival': 'You all just woke up in this place together, with nothing but berries to survive. Work together and make a village!',
+  'hostile-wilderness': 'You wake to find yourself stranded in a dangerous wilderness where the nights are deadly cold and strange creatures watch from the shadows. Trust no one—resources are scarce and winter is coming.',
+  'garden-abundance': 'You awaken in a paradise of endless food, perfect weather, and natural shelter. There is no struggle here, only the question of what to create when survival is already assured.',
+  'amnesia-mystery': 'You wake with no memory of who you are or how you got here. Strange artifacts lie scattered around you, and distant ruins hint at a civilization that came before. What happened here?',
+  'last-survivors': 'You are the last humans on Earth. The old world is ash and ruin. You have each other, your wits, and three days of food. Rebuild civilization or die trying.',
+  'divine-experiment': 'You awaken in the Garden, placed here by forces you don\'t understand. You have been given free will, intelligence, and a world to shape. What will you make of this gift?',
+  'scientific-expedition': 'Welcome, research team. Your mission: catalog this new biome, establish sustainable operations, and report findings. Remember your training—science and cooperation are humanity\'s greatest tools.',
+  'prison-colony': 'You were exiled here as punishment, left to survive or perish beyond the gates. The guards are gone now. Freedom is yours—but can you build something better than what you fled?',
+  'resource-rush': 'They say there\'s gold in these hills, ancient technology in those ruins, and rare plants in that forest. You all got here first. The question is: will you share the wealth, or fight for it?',
+  'prophecy': 'The old texts spoke of this day—when the chosen ones would awaken in the sacred valley and fulfill an ancient purpose. You are those ones. But the prophecy never said what you\'re meant to do.',
+  'social-experiment': 'You are participants in the greatest social experiment ever conducted. Observers are watching, recording everything. Build a society worthy of study. Or don\'t. The choice—and the consequences—are yours.',
+};
+
 export class SettingsPanel {
   private container: HTMLDivElement | null = null;
   private isVisible = false;
   private settings: GameSettings;
   private onSettingsChange: ((settings: GameSettings) => void) | null = null;
+  private isFirstRun = false;
 
   constructor() {
     this.settings = this.loadSettings();
+    // Check if this is first run (no DM prompt set)
+    this.isFirstRun = !this.settings.dungeonMasterPrompt || this.settings.dungeonMasterPrompt.trim() === '';
+  }
+
+  /**
+   * Check if this is the first run (no DM prompt set)
+   */
+  getIsFirstRun(): boolean {
+    return this.isFirstRun;
   }
 
   /**
@@ -196,8 +221,13 @@ export class SettingsPanel {
       border-radius: 4px;
       cursor: pointer;
       font-size: 12px;
+      ${this.isFirstRun ? 'display: none;' : ''}
     `;
-    closeBtn.onclick = () => this.hide();
+    closeBtn.onclick = () => {
+      if (!this.isFirstRun) {
+        this.hide();
+      }
+    };
 
     header.appendChild(title);
     header.appendChild(closeBtn);
@@ -280,11 +310,41 @@ export class SettingsPanel {
     dmSection.style.cssText = 'margin-top: 20px;';
     dmSection.innerHTML = '<h3 style="margin: 0 0 12px 0; font-size: 14px; color: #8a8aaa; text-transform: uppercase;">Dungeon Master Prompt</h3>';
 
+    // DM Preset selector
+    const dmPresetGroup = this.createFormGroup('Scenario Preset', 'select');
+    const dmPresetSelect = dmPresetGroup.querySelector('select')!;
+    dmPresetSelect.id = 'settings-dm-preset';
+    dmPresetSelect.innerHTML = `
+      <option value="">Custom (Write Your Own)</option>
+      <option value="cooperative-survival">🤝 Cooperative Survival (Default)</option>
+      <option value="hostile-wilderness">❄️ Hostile Wilderness (Paranoid)</option>
+      <option value="garden-abundance">🌸 Garden of Abundance (Utopian)</option>
+      <option value="amnesia-mystery">🔍 Amnesia Mystery (Investigation)</option>
+      <option value="last-survivors">💀 Last Survivors (Post-Apocalyptic)</option>
+      <option value="divine-experiment">✨ Divine Experiment (Philosophical)</option>
+      <option value="scientific-expedition">🔬 Scientific Expedition (Methodical)</option>
+      <option value="prison-colony">⛓️ Prison Colony (Escape/Rebuild)</option>
+      <option value="resource-rush">💰 Resource Rush (Competition)</option>
+      <option value="prophecy">📜 The Prophecy (Destiny)</option>
+      <option value="social-experiment">🎭 Social Experiment (Meta)</option>
+    `;
+    dmPresetSelect.onchange = () => {
+      const preset = DM_PROMPT_PRESETS[dmPresetSelect.value];
+      if (preset) {
+        this.settings.dungeonMasterPrompt = preset;
+        const dmTextarea = document.getElementById('settings-dm-prompt') as HTMLTextAreaElement;
+        if (dmTextarea) {
+          dmTextarea.value = preset;
+        }
+      }
+    };
+    dmSection.appendChild(dmPresetGroup);
+
     const dmGroup = this.createFormGroup('Starting Memory (what agents remember when they wake up)', 'textarea');
     const dmTextarea = dmGroup.querySelector('textarea')!;
     dmTextarea.id = 'settings-dm-prompt';
     dmTextarea.value = this.settings.dungeonMasterPrompt;
-    dmTextarea.placeholder = 'You all just woke up in this place together...';
+    dmTextarea.placeholder = 'Select a preset above or write your own...';
     dmTextarea.rows = 4;
     dmTextarea.style.cssText = `
       width: 100%;
@@ -297,8 +357,13 @@ export class SettingsPanel {
       font-size: 13px;
       resize: vertical;
     `;
-    dmTextarea.onchange = () => {
+    dmTextarea.oninput = () => {
       this.settings.dungeonMasterPrompt = dmTextarea.value;
+      // Reset preset selector to "Custom" when user types
+      const dmPresetSelect = document.getElementById('settings-dm-preset') as HTMLSelectElement;
+      if (dmPresetSelect && !Object.values(DM_PROMPT_PRESETS).includes(dmTextarea.value)) {
+        dmPresetSelect.value = '';
+      }
     };
     dmSection.appendChild(dmGroup);
 
@@ -325,14 +390,18 @@ export class SettingsPanel {
       border-radius: 6px;
       cursor: pointer;
       font-size: 14px;
+      ${this.isFirstRun ? 'display: none;' : ''}
     `;
     cancelBtn.onclick = () => {
-      this.settings = this.loadSettings(); // Revert
-      this.hide();
+      if (!this.isFirstRun) {
+        this.settings = this.loadSettings(); // Revert
+        this.hide();
+      }
     };
 
     const saveBtn = document.createElement('button');
-    saveBtn.textContent = 'Save & Apply';
+    saveBtn.id = 'settings-save-btn';
+    saveBtn.textContent = this.isFirstRun ? 'Start Game' : 'Save & Apply';
     saveBtn.style.cssText = `
       background: #4a7c59;
       border: none;
@@ -343,13 +412,24 @@ export class SettingsPanel {
       font-size: 14px;
       font-weight: 500;
     `;
-    saveBtn.onclick = () => {
+
+    // Validation function
+    const validateAndSave = () => {
+      const prompt = this.settings.dungeonMasterPrompt.trim();
+      if (!prompt) {
+        alert('⚠️ Please select a scenario preset or write your own Dungeon Master prompt before starting the game.');
+        return;
+      }
+
       this.saveSettings();
+      this.isFirstRun = false;
       if (this.onSettingsChange) {
         this.onSettingsChange(this.settings);
       }
       this.hide();
     };
+
+    saveBtn.onclick = validateAndSave;
 
     buttonRow.appendChild(cancelBtn);
     buttonRow.appendChild(saveBtn);
@@ -363,15 +443,20 @@ export class SettingsPanel {
       color: #666;
       text-align: center;
     `;
-    helpText.textContent = 'Changes take effect immediately. Page reload recommended for clean state.';
+    if (this.isFirstRun) {
+      helpText.innerHTML = '🎮 <strong>Welcome to AI Village!</strong> Select a scenario preset to see how different starting conditions create wildly different emergent behaviors.';
+      helpText.style.color = '#8a8aaa';
+    } else {
+      helpText.textContent = 'Changes take effect immediately. Page reload recommended for clean state.';
+    }
     panel.appendChild(helpText);
 
     this.container.appendChild(panel);
     document.body.appendChild(this.container);
 
-    // Close on click outside
+    // Close on click outside (unless first run)
     this.container.onclick = (e) => {
-      if (e.target === this.container) {
+      if (e.target === this.container && !this.isFirstRun) {
         this.hide();
       }
     };

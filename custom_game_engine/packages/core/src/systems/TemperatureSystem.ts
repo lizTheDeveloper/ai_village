@@ -20,6 +20,7 @@ export class TemperatureSystem implements System {
   private readonly HEALTH_DAMAGE_RATE = 0.5; // Health damage per second in dangerous temps
   private readonly BASE_TEMP = 20; // Default world temperature in °C
   private readonly DAILY_VARIATION = 8; // ±8°C daily temperature swing
+  private readonly THERMAL_RATE = 0.15; // Rate of temperature change per second (0.15 = ~7 seconds to change 1°C)
   private currentWorldTemp: number = this.BASE_TEMP;
   private previousDangerousStates = new Map<string, boolean>();
 
@@ -50,11 +51,20 @@ export class TemperatureSystem implements System {
       const heatBonus = this.calculateHeatSourceBonus(world, posComp);
       effectiveTemp += heatBonus;
 
-      // Update agent temperature
+      // Get current temperature component to apply thermal inertia
+      const currentTempComp = impl.getComponent<TemperatureComponent>('temperature')!;
+
+      // Gradually adjust body temperature toward environmental temperature (thermal inertia)
+      // Body temperature changes slowly, not instantly
+      const tempDiff = effectiveTemp - currentTempComp.currentTemp;
+      const tempChange = tempDiff * this.THERMAL_RATE * deltaTime;
+      const newTemp = currentTempComp.currentTemp + tempChange;
+
+      // Update agent temperature with gradual change
       impl.updateComponent<TemperatureComponent>('temperature', (current) => ({
         ...current,
-        currentTemp: effectiveTemp,
-        state: this.calculateTemperatureState(effectiveTemp, current),
+        currentTemp: newTemp,
+        state: this.calculateTemperatureState(newTemp, current),
       }));
 
       // Get updated component after state calculation
@@ -70,10 +80,6 @@ export class TemperatureSystem implements System {
           const healthLoss = this.HEALTH_DAMAGE_RATE * deltaTime;
           const newHealth = Math.max(0, needsComp.health - healthLoss);
 
-          console.log(
-            `[TemperatureSystem] ${entity.id}: Taking ${healthLoss.toFixed(2)} damage from ${updatedTemp.state} (${effectiveTemp.toFixed(1)}°C). Health: ${needsComp.health.toFixed(1)} → ${newHealth.toFixed(1)}`
-          );
-
           impl.updateComponent<NeedsComponent>('needs', (current) => ({
             ...current,
             health: newHealth,
@@ -81,9 +87,6 @@ export class TemperatureSystem implements System {
 
           // Emit critical health event if health drops below 20%
           if (newHealth < 20 && needsComp.health >= 20) {
-            console.log(
-              `[TemperatureSystem] ${entity.id}: CRITICAL HEALTH from temperature exposure! Health: ${newHealth.toFixed(1)}`
-            );
             world.eventBus.emit({
               type: 'agent:health_critical',
               source: entity.id,

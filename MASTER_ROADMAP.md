@@ -21,22 +21,28 @@
 
 ## Current Status
 
-**Last Updated:** 2025-12-22
+**Last Updated:** 2025-12-24 (Phase 27 work order created)
 
 | Phase | Status | Description |
 |-------|--------|-------------|
-| Phase 0-6 | ✅ Complete | Foundation through LLM Integration |
+| Phase 0-3 | ✅ Complete | Foundation through Agent Needs |
+| Phase 4 | 🚧 In Progress | Memory & Social (Basic complete, Episodic Memory in progress) |
+| Phase 5-6 | ✅ Complete | Communication & LLM Integration |
 | Phase 7 | 🚧 In Progress | Building & Shelter |
 | Phase 8 | ✅ Complete | Temperature & Weather |
-| Phase 9-11 | ⏳ Ready | Farming, Crafting, Animals now unblocked |
-| Phase 22-26 | ⏳ Ready | Sociological Metrics System (can run parallel) |
-| Phase 27-28 | ⏳ Ready | Divine Communication & Angel Systems (can run parallel) |
+| Phase 9 | 🚧 In Progress | Farming (Soil, Plant Lifecycle) |
+| Phase 10 | 🚧 In Progress | Crafting (Quality System, Inventory UI) |
+| Phase 11 | 🚧 In Progress | Animals (Foundation work started) |
+| Phase 22 | 🚧 In Progress | Sociological Metrics (Event Schemas) |
+| Phase 27 | 🚧 In Progress | Divine Communication (Work order created) |
+| Phase 28 | 🔒 Blocked | Angel Systems (blocked on Phase 27) |
 
 **Next Available Work:**
-1. Phase 7 remaining tasks (Building Definitions, Resource Gathering, Construction Progress, Building Placement UI, Agent Inventory Display)
-2. **Phases 9-11 (Farming, Crafting, Animals) - NOW READY!**
-3. **Phase 22 (Sociological Metrics Foundation) - CAN START NOW!** (Runs parallel with other phases)
-4. **Phase 27 (Divine Communication - Prayer/Visions) - CAN START NOW!** (Runs parallel, integrates with Phase 4-6, 8)
+1. **Phase 4 (Episodic Memory)** - Work order ready for playtest
+2. **Phase 27 (Divine Communication - Prayer/Visions)** - Work order created, ready for tests
+3. Phase 7 remaining tasks (Resource Gathering, Building Placement UI, Agent Inventory Display)
+4. **Phases 9-11 tasks** - Multiple work orders in progress
+5. **Phase 22 (Sociological Metrics)** - Event schemas in progress, other tasks available
 
 ---
 
@@ -165,20 +171,32 @@ Farming                Crafting              Animals
 
 ---
 
-### Phase 4: Memory & Social Awareness ✅ COMPLETE
+### Phase 4: Memory & Social Awareness 🚧 IN PROGRESS
 
-**Status:** ✅ Complete
+**Status:** 🚧 Basic complete, episodic memory enhancement in progress
 **Dependencies:** Phase 3
 **Parallel Work:** 🔀 Can run parallel with Phase 5, 6
 
 | Task | Status | Spec |
 |------|--------|------|
 | Vision Component | ✅ | [agent-system/spatial-memory.md](openspec/specs/agent-system/spatial-memory.md) |
-| Memory Component | ✅ | [agent-system/memory-system.md](openspec/specs/agent-system/memory-system.md) |
+| Memory Component (Basic) | ✅ | [agent-system/memory-system.md](openspec/specs/agent-system/memory-system.md) |
+| Episodic Memory System | 🚧 | [agent-system/memory-system.md](openspec/specs/agent-system/memory-system.md) |
 | Relationship Component | ✅ | [agent-system/relationship-system.md](openspec/specs/agent-system/relationship-system.md) |
 | Spatial Awareness | ✅ | [agent-system/spatial-memory.md](openspec/specs/agent-system/spatial-memory.md) |
 
+**Work Order:** [agents/autonomous-dev/work-orders/episodic-memory-system/work-order.md](agents/autonomous-dev/work-orders/episodic-memory-system/work-order.md)
+
 **Implementation:** `packages/core/src/components/MemoryComponent.ts`, `packages/core/src/components/RelationshipComponent.ts`
+
+**Note:** Episodic Memory System is a major enhancement adding:
+- Rich event memories with emotional encoding
+- End-of-day reflections via LLM
+- Semantic memory (knowledge/beliefs)
+- Social memory (relationship details)
+- Memory sharing and storytelling
+- Personality-driven journaling
+- Natural memory decay and consolidation
 
 ---
 
@@ -286,8 +304,12 @@ Farming                Crafting              Animals
 | Plant Lifecycle | 🚧 | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | - |
 
 **Work Order:** [agents/autonomous-dev/work-orders/plant-lifecycle/work-order.md](agents/autonomous-dev/work-orders/plant-lifecycle/work-order.md)
-| Seed System | ⏳ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | 🔀 |
-| Tilling Action | ⏳ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | 🔀 |
+| Seed System | 🚧 | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | 🔀 |
+
+**Work Order:** [agents/autonomous-dev/work-orders/seed-system/work-order.md](agents/autonomous-dev/work-orders/seed-system/work-order.md)
+| Tilling Action | 🚧 | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | 🔀 |
+
+**Work Order:** [agents/autonomous-dev/work-orders/tilling-action/work-order.md](agents/autonomous-dev/work-orders/tilling-action/work-order.md)
 | Planting Action | ⏳ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | - |
 | Watering Action | ⏳ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | 🔀 |
 | Harvesting Action | ⏳ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | - |
@@ -322,21 +344,30 @@ Farming                Crafting              Animals
 
 ---
 
-### Phase 11: Animals ⏳ READY
+### Phase 11: Animals 🚧 IN PROGRESS
 
-**Status:** ⏳ Ready (Phase 8 complete)
+**Status:** 🚧 In Progress (Foundation work started)
 **Dependencies:** Phase 8 ✅ (animals need temperature comfort)
 **Parallel Work:** 🔀 Can run parallel with Phase 9, 10
 
 | Task | Status | Spec | Parallel |
 |------|--------|------|----------|
-| Animal Component | ⏳ | [animal-system/spec.md](openspec/specs/animal-system/spec.md) | - |
-| Animal AI | ⏳ | [animal-system/spec.md](openspec/specs/animal-system/spec.md) | - |
-| Taming System | ⏳ | [animal-system/spec.md](openspec/specs/animal-system/spec.md) | - |
-| Animal Products | ⏳ | [animal-system/spec.md](openspec/specs/animal-system/spec.md) | 🔀 |
+| Animal System Foundation | 🚧 | [animal-system/spec.md](openspec/specs/animal-system/spec.md) | - |
+
+**Work Order:** [agents/autonomous-dev/work-orders/animal-system-foundation/work-order.md](agents/autonomous-dev/work-orders/animal-system-foundation/work-order.md)
+
+**Foundation includes:** Animal Component, Animal AI, Taming System, Animal Products (eggs, milk), Wild animal spawning, Temperature integration
+
+**Future tasks (after foundation):**
+| Task | Status | Spec | Parallel |
+|------|--------|------|----------|
 | Breeding | ⏳ | [animal-system/spec.md](openspec/specs/animal-system/spec.md) | - |
-| Animal Housing | ⏳ | [construction-system/spec.md](openspec/specs/construction-system/spec.md) | 🔀 |
-| Animal Husbandry UI | ⏳ | [ui-system/animal-husbandry.md](openspec/specs/ui-system/animal-husbandry.md) | 🔀 |
+| Animal Housing | 🚧 | [construction-system/spec.md](openspec/specs/construction-system/spec.md) | 🔀 |
+
+**Work Order:** [agents/autonomous-dev/work-orders/animal-housing/work-order.md](agents/autonomous-dev/work-orders/animal-housing/work-order.md)
+| Animal Husbandry UI | 🚧 | [ui-system/animal-husbandry.md](openspec/specs/ui-system/animal-husbandry.md) | 🔀 |
+
+**Work Order:** [agents/autonomous-dev/work-orders/animal-husbandry-ui/work-order.md](agents/autonomous-dev/work-orders/animal-husbandry-ui/work-order.md)
 
 ---
 
@@ -487,7 +518,9 @@ These phases extend beyond the core game:
 | Task | Status | Spec | Parallel? |
 |------|--------|------|-----------|
 | MetricsCollectionSystem (ECS) | ⏳ Ready | [Section 2.1](custom_game_engine/specs/sociological-metrics-system.md#21-metricscollectionsystem-ecs-system) | - |
-| Event schemas (Interaction, Behavior, Spatial, Resource) | ⏳ Ready | [Section 2.2](custom_game_engine/specs/sociological-metrics-system.md#22-event-schemas) | 🔀 |
+| Event schemas (Interaction, Behavior, Spatial, Resource) | 🚧 In Progress | [Section 2.2](custom_game_engine/specs/sociological-metrics-system.md#22-event-schemas) | 🔀 |
+
+**Work Order:** [agents/autonomous-dev/work-orders/event-schemas/work-order.md](agents/autonomous-dev/work-orders/event-schemas/work-order.md)
 | RingBuffer implementation | ⏳ Ready | [Section 3.1](custom_game_engine/specs/sociological-metrics-system.md#31-in-memory-buffers-during-simulation) | 🔀 |
 | Event emitters in AISystem/World | ⏳ Ready | [Section 2.1](custom_game_engine/specs/sociological-metrics-system.md#21-metricscollectionsystem-ecs-system) | - |
 | Metrics configuration | ⏳ Ready | [Section 8.1](custom_game_engine/specs/sociological-metrics-system.md#81-metrics-configuration) | 🔀 |
@@ -623,26 +656,28 @@ These phases extend beyond the core game:
 
 ---
 
-### Phase 27: Divine Communication System ⏳ READY
+### Phase 27: Divine Communication System 🚧 IN PROGRESS
 
-**Status:** ⏳ Ready (foundational systems complete)
-**Dependencies:** Phase 3 (Agent Needs), Phase 4 (Memory & Social), Phase 5 (Communication), Phase 8 (Circadian/Sleep)
+**Status:** 🚧 In Progress (Work order created 2025-12-24 by spec-agent-001, ready for tests)
+**Dependencies:** Phase 3 (Agent Needs) ✅, Phase 4 (Memory & Social) ✅, Phase 5 (Communication) ✅, Phase 8 (Circadian/Sleep) ✅
 **Parallel Work:** 🔀 Can run parallel with Phase 7-11, 22-26
-**Estimated LOC:** ~3,000
+**Estimated LOC:** ~4,000
 **Spec:** [divine-communication-system.md](custom_game_engine/specs/divine-communication-system.md)
+
+**Work Order:** [agents/autonomous-dev/work-orders/divine-communication-system/work-order.md](agents/autonomous-dev/work-orders/divine-communication-system/work-order.md)
 
 | Task | Status | Spec | Parallel? |
 |------|--------|------|-----------|
-| PrayerComponent & System | ⏳ Ready | [Section 2](custom_game_engine/specs/divine-communication-system.md#2-prayer-system) | - |
-| Prayer triggers and generation | ⏳ Ready | [Section 2.2-2.3](custom_game_engine/specs/divine-communication-system.md#22-prayer-behavior) | 🔀 |
-| SpiritualComponent | ⏳ Ready | [Section 3.1](custom_game_engine/specs/divine-communication-system.md#31-spiritual-component) | 🔀 |
-| MeditateAction behavior | ⏳ Ready | [Section 3.2](custom_game_engine/specs/divine-communication-system.md#32-meditation-behavior) | - |
-| Vision generation with LLM | ⏳ Ready | [Section 4.2](custom_game_engine/specs/divine-communication-system.md#42-vision-generation) | - |
-| Player vision sending UI | ⏳ Ready | [UI Spec](custom_game_engine/specs/divine-systems-ui.md) | 🔀 |
-| Sacred site discovery | ⏳ Ready | [Section 5](custom_game_engine/specs/divine-communication-system.md#5-sacred-locations) | 🔀 |
-| Faith system | ⏳ Ready | [Section 7](custom_game_engine/specs/divine-communication-system.md#7-faith--doubt-mechanics) | - |
-| Group prayer & rituals | ⏳ Ready | [Section 6](custom_game_engine/specs/divine-communication-system.md#6-group-prayer--rituals) | 🔀 |
-| Integration with Dreams | ⏳ Ready | [Section 9.1](custom_game_engine/specs/divine-communication-system.md#91-with-circadiandreams-system) | - |
+| PrayerComponent & System | ⏳ | [Section 2](custom_game_engine/specs/divine-communication-system.md#2-prayer-system) | - |
+| Prayer triggers and generation | ⏳ | [Section 2.2-2.3](custom_game_engine/specs/divine-communication-system.md#22-prayer-behavior) | 🔀 |
+| SpiritualComponent | ⏳ | [Section 3.1](custom_game_engine/specs/divine-communication-system.md#31-spiritual-component) | 🔀 |
+| MeditateAction behavior | ⏳ | [Section 3.2](custom_game_engine/specs/divine-communication-system.md#32-meditation-behavior) | - |
+| Vision generation with LLM | ⏳ | [Section 4.2](custom_game_engine/specs/divine-communication-system.md#42-vision-generation) | - |
+| Player vision sending UI | ⏳ | [UI Spec](custom_game_engine/specs/divine-systems-ui.md) | 🔀 |
+| Sacred site discovery | ⏳ | [Section 5](custom_game_engine/specs/divine-communication-system.md#5-sacred-locations) | 🔀 |
+| Faith system | ⏳ | [Section 7](custom_game_engine/specs/divine-communication-system.md#7-faith--doubt-mechanics) | - |
+| Group prayer & rituals | ⏳ | [Section 6](custom_game_engine/specs/divine-communication-system.md#6-group-prayer--rituals) | 🔀 |
+| Integration with Dreams | ⏳ | [Section 9.1](custom_game_engine/specs/divine-communication-system.md#91-with-circadiandreams-system) | - |
 
 **Implementation:**
 - `packages/core/src/components/PrayerComponent.ts`

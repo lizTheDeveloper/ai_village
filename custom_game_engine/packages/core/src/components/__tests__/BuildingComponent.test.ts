@@ -12,7 +12,7 @@ describe('BuildingComponent - Phase 8 Breaking Changes', () => {
     it('should HAVE heatRadius field for heat sources after Phase 8', () => {
       const campfire = createBuildingComponent('campfire');
       expect(campfire).toHaveProperty('heatRadius');
-      expect(campfire.heatRadius).toBe(3); // Per spec
+      expect(campfire.heatRadius).toBe(8); // Increased from 3 to cover spawn area
     });
 
     it('should HAVE heatAmount field for heat sources after Phase 8', () => {
@@ -56,7 +56,7 @@ describe('BuildingComponent - Phase 8 Breaking Changes', () => {
     it('should set providesHeat=true for campfire', () => {
       const campfire = createBuildingComponent('campfire');
       expect(campfire.providesHeat).toBe(true);
-      expect(campfire.heatRadius).toBe(3);
+      expect(campfire.heatRadius).toBe(8); // Increased from 3 to cover spawn area
       expect(campfire.heatAmount).toBe(10);
     });
 

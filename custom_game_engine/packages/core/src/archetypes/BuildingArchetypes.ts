@@ -1,6 +1,7 @@
 import type { Archetype } from '../ecs/Archetype.js';
 import { createBuildingComponent } from '../components/BuildingComponent.js';
 import type { RenderableComponent } from '../components/RenderableComponent.js';
+import { createInventoryComponent } from '../components/InventoryComponent.js';
 
 /**
  * Lean-to building archetype.
@@ -70,7 +71,10 @@ export const storageBoxArchetype: Archetype = {
       visible: true,
     };
 
-    return [building, renderable];
+    // Storage box has smaller capacity: 10 slots, 200 weight
+    const inventory = createInventoryComponent(10, 200);
+
+    return [building, renderable, inventory];
   },
 };
 
@@ -118,7 +122,10 @@ export const storageChestArchetype: Archetype = {
       visible: true,
     };
 
-    return [building, renderable];
+    // Storage chest has larger capacity: 20 slots, 500 weight
+    const inventory = createInventoryComponent(20, 500);
+
+    return [building, renderable, inventory];
   },
 };
 
