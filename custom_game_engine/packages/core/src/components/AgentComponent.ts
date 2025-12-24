@@ -21,7 +21,11 @@ export type AgentBehavior =
   | 'forced_sleep'
   | 'flee_danger'
   | 'seek_water'
-  | 'seek_shelter';
+  | 'seek_shelter'
+  | 'deposit_items'
+  | 'seek_warmth'
+  | 'call_meeting'
+  | 'attend_meeting';
 
 export interface SpeechHistoryEntry {
   text: string;
@@ -44,7 +48,8 @@ export interface AgentComponent extends Component {
 export function createAgentComponent(
   behavior: AgentBehavior = 'wander',
   thinkInterval: number = 20, // Think once per second at 20 TPS
-  useLLM: boolean = false // Whether to use LLM for decisions
+  useLLM: boolean = false, // Whether to use LLM for decisions
+  thinkOffset: number = 0 // Initial offset to stagger agent thinking (prevents thundering herd)
 ): AgentComponent {
   return {
     type: 'agent',
@@ -52,7 +57,7 @@ export function createAgentComponent(
     behavior,
     behaviorState: {},
     thinkInterval,
-    lastThinkTick: 0,
+    lastThinkTick: -thinkOffset, // Negative offset means they'll think at different times
     useLLM,
     llmCooldown: 0,
   };

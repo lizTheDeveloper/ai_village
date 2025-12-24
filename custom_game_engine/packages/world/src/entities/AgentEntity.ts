@@ -19,7 +19,26 @@ import {
   generateRandomPersonality,
   generateRandomName,
   createIdentityComponent,
+  EpisodicMemoryComponent,
+  SemanticMemoryComponent,
+  SocialMemoryComponent,
+  ReflectionComponent,
+  JournalComponent,
 } from '@ai-village/core';
+
+/**
+ * Generate a unique think offset for an agent based on their entity ID
+ * This prevents all agents from thinking at the same time (thundering herd)
+ */
+function generateThinkOffset(entityId: string, maxOffset: number = 40): number {
+  // Simple hash of entity ID to get consistent but distributed offset
+  let hash = 0;
+  for (let i = 0; i < entityId.length; i++) {
+    hash = ((hash << 5) - hash) + entityId.charCodeAt(i);
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash) % maxOffset;
+}
 
 export function createWanderingAgent(
   world: WorldMutator,
@@ -47,8 +66,10 @@ export function createWanderingAgent(
   // Personality - random personality traits
   entity.addComponent(generateRandomPersonality());
 
-  // Agent behavior
-  entity.addComponent(createAgentComponent('wander', 20)); // Think every second
+  // Agent behavior - with staggered think offset to prevent thundering herd
+  const thinkInterval = 20;
+  const thinkOffset = generateThinkOffset(entity.id, thinkInterval * 2);
+  entity.addComponent(createAgentComponent('wander', thinkInterval, false, thinkOffset));
 
   // Movement
   entity.addComponent(createMovementComponent(speed, 0, 0));
@@ -93,6 +114,13 @@ export function createWanderingAgent(
   // Circadian rhythm - sleep drive and preferred sleep time
   entity.addComponent(createCircadianComponent());
 
+  // Episodic memory system (Phase 10)
+  entity.addComponent(new EpisodicMemoryComponent({ maxMemories: 1000 }));
+  entity.addComponent(new SemanticMemoryComponent());
+  entity.addComponent(new SocialMemoryComponent());
+  entity.addComponent(new ReflectionComponent());
+  entity.addComponent(new JournalComponent());
+
   // Add to world
   (world as any)._addEntity(entity);
 
@@ -106,7 +134,8 @@ export function createLLMAgent(
   world: WorldMutator,
   x: number,
   y: number,
-  speed: number = 2.0
+  speed: number = 2.0,
+  dungeonMasterPrompt?: string
 ): string {
   const entity = new EntityImpl(createEntityId(), world.tick);
 
@@ -128,8 +157,10 @@ export function createLLMAgent(
   // Personality - random personality traits
   entity.addComponent(generateRandomPersonality());
 
-  // Agent behavior - LLM-controlled
-  entity.addComponent(createAgentComponent('wander', 20, true)); // useLLM = true
+  // Agent behavior - LLM-controlled with staggered think offset to prevent thundering herd
+  const thinkInterval = 20;
+  const thinkOffset = generateThinkOffset(entity.id, thinkInterval * 2);
+  entity.addComponent(createAgentComponent('wander', thinkInterval, true, thinkOffset)); // useLLM = true
 
   // Movement
   entity.addComponent(createMovementComponent(speed, 0, 0));
@@ -173,6 +204,34 @@ export function createLLMAgent(
 
   // Circadian rhythm - sleep drive and preferred sleep time
   entity.addComponent(createCircadianComponent());
+
+  // Episodic memory system (Phase 10)
+  const episodicMemory = new EpisodicMemoryComponent({ maxMemories: 1000 });
+  entity.addComponent(episodicMemory);
+  entity.addComponent(new SemanticMemoryComponent());
+  entity.addComponent(new SocialMemoryComponent());
+  entity.addComponent(new ReflectionComponent());
+  entity.addComponent(new JournalComponent());
+
+  // Add initial "waking up" memory from Dungeon Master prompt
+  if (dungeonMasterPrompt) {
+    episodicMemory.formMemory({
+      eventType: 'awakening',
+      summary: dungeonMasterPrompt,
+      timestamp: world.tick,
+      location: { x, y },
+      emotionalValence: 0.2, // Slightly positive - hopeful beginning
+      emotionalIntensity: 0.7, // Quite intense - first memory
+      surprise: 0.9, // Very surprising - just woke up!
+      importance: 1.0, // Maximum importance - defines their origin story
+      novelty: 1.0, // Completely novel - first experience
+      socialSignificance: 0.8, // High social - mentions working together
+      survivalRelevance: 0.9, // High survival - mentions survival and making a village
+      clarity: 1.0, // Crystal clear
+      consolidated: true, // Immediately consolidated - this is foundational
+      markedForConsolidation: false, // Already consolidated
+    });
+  }
 
   // Add to world
   (world as any)._addEntity(entity);

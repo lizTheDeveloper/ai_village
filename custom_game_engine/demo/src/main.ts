@@ -4,6 +4,10 @@ import {
   MovementSystem,
   NeedsSystem,
   MemorySystem,
+  MemoryFormationSystem,
+  MemoryConsolidationSystem,
+  ReflectionSystem,
+  JournalingSystem,
   CommunicationSystem,
   BuildingSystem,
   ResourceGatheringSystem,
@@ -15,23 +19,30 @@ import {
   PlantSystem,
   TimeSystem,
   SleepSystem,
+  AnimalSystem,
+  AnimalProductionSystem,
+  TamingSystem,
+  WildAnimalSpawningSystem,
   createTimeComponent,
   FERTILIZERS,
   createBuildingComponent,
   createPositionComponent,
   createRenderableComponent,
   createWeatherComponent,
+  createInventoryComponent,
   EntityImpl,
   createEntityId,
   type World,
   type WorldMutator,
 } from '@ai-village/core';
-import { Renderer, InputHandler, BuildingPlacementUI, AgentInfoPanel, TileInspectorPanel, PlantInfoPanel } from '@ai-village/renderer';
+import { Renderer, InputHandler, BuildingPlacementUI, AgentInfoPanel, AnimalInfoPanel, TileInspectorPanel, PlantInfoPanel, ResourcesPanel, SettingsPanel, MemoryPanel } from '@ai-village/renderer';
 import {
   OllamaProvider,
+  OpenAICompatProvider,
   LLMDecisionQueue,
   StructuredPromptBuilder,
   LoadBalancingProvider,
+  type LLMProvider,
 } from '@ai-village/llm';
 import { TerrainGenerator, ChunkManager, createLLMAgent } from '@ai-village/world';
 
@@ -55,7 +66,7 @@ function createInitialBuildings(world: WorldMutator) {
   const campfireEntity = new EntityImpl(createEntityId(), (world as any)._tick);
   campfireEntity.addComponent(createBuildingComponent('campfire', 1, 100)); // 100% complete
   campfireEntity.addComponent(createPositionComponent(-3, -3));
-  campfireEntity.addComponent(createRenderableComponent('campfire', 'building')); // Make it visible
+  campfireEntity.addComponent(createRenderableComponent('campfire', 'object')); // Make it visible
   (world as any)._addEntity(campfireEntity);
   console.log(`Created campfire at (-3, -3) - Entity ${campfireEntity.id}`);
 
@@ -64,31 +75,50 @@ function createInitialBuildings(world: WorldMutator) {
   const tentEntity = new EntityImpl(createEntityId(), (world as any)._tick);
   tentEntity.addComponent(createBuildingComponent('tent', 1, 100)); // 100% complete
   tentEntity.addComponent(createPositionComponent(3, -3));
-  tentEntity.addComponent(createRenderableComponent('tent', 'building')); // Make it visible
+  tentEntity.addComponent(createRenderableComponent('tent', 'object')); // Make it visible
   (world as any)._addEntity(tentEntity);
   console.log(`Created tent at (3, -3) - Entity ${tentEntity.id}`);
 
-  // Create a building under construction (50% complete)
+  // Create a completed storage-chest for agents to deposit items
   // Position: Near village (0, -5)
+  const storageEntity = new EntityImpl(createEntityId(), (world as any)._tick);
+  storageEntity.addComponent(createBuildingComponent('storage-chest', 1, 100)); // 100% complete
+  storageEntity.addComponent(createPositionComponent(0, -5));
+  storageEntity.addComponent(createRenderableComponent('storage-chest', 'object')); // Make it visible
+  const storageInventory = createInventoryComponent(20, 500); // Storage chest: 20 slots, 500 weight
+  // Add starting resources: 50 wood
+  storageInventory.slots[0] = { itemId: 'wood', quantity: 50 };
+  storageEntity.addComponent(storageInventory);
+  (world as any)._addEntity(storageEntity);
+  console.log(`Created storage-chest (100% complete) at (0, -5) with 50 wood - Entity ${storageEntity.id}`);
+
+  // Create a building under construction (50% complete) for testing construction
+  // Position: West of village (-8, 0)
   const constructionEntity = new EntityImpl(createEntityId(), (world as any)._tick);
-  constructionEntity.addComponent(createBuildingComponent('storage-chest', 1, 50)); // 50% complete
-  constructionEntity.addComponent(createPositionComponent(0, -5));
-  constructionEntity.addComponent(createRenderableComponent('storage-chest', 'building')); // Make it visible
+  constructionEntity.addComponent(createBuildingComponent('storage-box', 1, 50)); // 50% complete storage-box
+  constructionEntity.addComponent(createPositionComponent(-8, 0));
+  constructionEntity.addComponent(createRenderableComponent('storage-box', 'object')); // Make it visible
+  constructionEntity.addComponent(createInventoryComponent(10, 200)); // Storage box: 10 slots, 200 weight
   (world as any)._addEntity(constructionEntity);
-  console.log(`Created storage-chest (50% complete) at (0, -5) - Entity ${constructionEntity.id}`);
+  console.log(`Created storage-box (50% complete) at (-8, 0) - Entity ${constructionEntity.id}`);
 }
 
 /**
  * Create initial agents for testing.
  * Spawns 10 LLM agents in a cluster near the campfire.
  */
-function createInitialAgents(world: WorldMutator) {
+function createInitialAgents(world: WorldMutator, dungeonMasterPrompt?: string) {
   const agentCount = 10;
   const centerX = 0; // Near camera center at (0, 0) for easier clicking
   const centerY = 0;
   const spread = 2; // Spread agents in a small area
 
   console.log(`Creating ${agentCount} agents in a cluster around (${centerX}, ${centerY})...`);
+  if (dungeonMasterPrompt) {
+    console.log(`📜 DM Prompt: "${dungeonMasterPrompt}"`);
+  }
+
+  const agentIds: string[] = [];
 
   for (let i = 0; i < agentCount; i++) {
     // Distribute agents in a small cluster
@@ -97,11 +127,39 @@ function createInitialAgents(world: WorldMutator) {
     const x = centerX + offsetX * spread + Math.random() * 0.5;
     const y = centerY + offsetY * spread + Math.random() * 0.5;
 
-    const agentId = createLLMAgent(world, x, y, 2.0);
+    const agentId = createLLMAgent(world, x, y, 2.0, dungeonMasterPrompt);
+    agentIds.push(agentId);
     console.log(`Created agent ${i + 1}/${agentCount}: ${agentId} at (${x.toFixed(1)}, ${y.toFixed(1)})`);
   }
 
   console.log(`Created ${agentCount} LLM agents`);
+
+  // Choose one random agent to be the leader
+  const leaderIndex = Math.floor(Math.random() * agentIds.length);
+  const leaderId = agentIds[leaderIndex];
+  const leaderEntity = world.getEntity(leaderId);
+
+  if (leaderEntity) {
+    // Update the leader's personality with high leadership trait
+    const currentPersonality = leaderEntity.getComponent('personality') as any;
+    if (currentPersonality) {
+      leaderEntity.updateComponent('personality', (p: any) => ({
+        ...p,
+        leadership: 95, // Very high leadership
+        extraversion: Math.max(p.extraversion, 75), // Leaders tend to be more social
+        conscientiousness: Math.max(p.conscientiousness, 70), // Leaders tend to be organized
+      }));
+
+      console.log(`\n🌟 Agent ${leaderId} has been chosen as the LEADER! 🌟`);
+      console.log(`Leadership trait: 95/100`);
+
+      // Get the agent's identity to log their name
+      const identity = leaderEntity.getComponent('identity') as any;
+      if (identity) {
+        console.log(`Leader's name: ${identity.name}\n`);
+      }
+    }
+  }
 }
 
 /**
@@ -126,14 +184,29 @@ async function createInitialPlants(world: WorldMutator) {
     // Pick a random wild species (grass, wildflower, berry bush)
     const species = wildSpecies[Math.floor(Math.random() * wildSpecies.length)];
 
-    // Random stage (most will be vegetative or mature)
-    const stages: Array<'sprout' | 'vegetative' | 'mature'> = ['sprout', 'vegetative', 'vegetative', 'mature', 'mature'];
-    const stage = stages[Math.floor(Math.random() * stages.length)];
+    // Edible plants (berry bushes) always spawn mature at game start so agents have food
+    // Non-edible plants can vary for visual diversity
+    const isEdibleSpecies = species.id === 'berry-bush';
+    let stage: 'sprout' | 'vegetative' | 'mature';
+    if (isEdibleSpecies) {
+      stage = 'mature'; // Always mature for food
+    } else {
+      // Non-edible: random stage for variety
+      const stages: Array<'sprout' | 'vegetative' | 'mature'> = ['sprout', 'vegetative', 'vegetative', 'mature', 'mature'];
+      stage = stages[Math.floor(Math.random() * stages.length)];
+    }
 
     // Calculate initial seeds for mature plants
     // (They would have produced seeds when transitioning to mature stage)
     const yieldAmount = species.baseGenetics.yieldAmount;
     const initialSeeds = stage === 'mature' ? Math.floor(species.seedsPerPlant * yieldAmount) : 0;
+
+    // Calculate initial fruitCount for mature berry bushes
+    // Berry bushes spawn 6-12 flowers that become fruit
+    // Mature bushes would have gone through flowering → fruiting transition
+    const initialFruit = (stage === 'mature' && isEdibleSpecies)
+      ? 6 + Math.floor(Math.random() * 7) // 6-12 fruit (same as flower spawn range)
+      : 0;
 
     // Create plant entity
     const plantEntity = new EntityImpl(createEntityId(), (world as any)._tick);
@@ -147,7 +220,8 @@ async function createInitialPlants(world: WorldMutator) {
       hydration: 50 + Math.random() * 30,
       nutrition: 50 + Math.random() * 30,
       genetics: { ...species.baseGenetics }, // Use species' base genetics
-      seedsProduced: initialSeeds // Pre-populate seeds for mature plants
+      seedsProduced: initialSeeds, // Pre-populate seeds for mature plants
+      fruitCount: initialFruit // Pre-populate fruit for mature edible plants
     });
 
     // Store entity ID on plant for logging
@@ -158,10 +232,41 @@ async function createInitialPlants(world: WorldMutator) {
     plantEntity.addComponent(createRenderableComponent(species.id, 'plant'));
     (world as any)._addEntity(plantEntity);
 
-    console.log(`Created ${species.name} (${stage}) at (${x.toFixed(1)}, ${y.toFixed(1)}) - Entity ${plantEntity.id} - seedsProduced=${plantComponent.seedsProduced}`);
+    console.log(`Created ${species.name} (${stage}) at (${x.toFixed(1)}, ${y.toFixed(1)}) - Entity ${plantEntity.id} - seedsProduced=${plantComponent.seedsProduced}, fruitCount=${plantComponent.fruitCount}`);
   }
 
   console.log(`Created ${plantCount} wild plants`);
+}
+
+/**
+ * Create initial wild animals for Phase 11 testing.
+ * Uses WildAnimalSpawningSystem to spawn animals in chunks around the origin.
+ * This function is called during demo initialization, not during normal chunk generation.
+ */
+async function createInitialAnimals(world: WorldMutator, spawningSystem: WildAnimalSpawningSystem) {
+  console.log('Spawning initial wild animals near origin for visibility...');
+
+  // Spawn animals close to the origin (0, 0) where agents and camera start
+  // This ensures they are visible immediately when the game loads
+  const animalsToSpawn = [
+    { species: 'chicken', position: { x: 3, y: 2 } },
+    { species: 'sheep', position: { x: -4, y: 3 } },
+    { species: 'rabbit', position: { x: 5, y: -2 } },
+    { species: 'rabbit', position: { x: -3, y: -4 } },
+  ];
+
+  let totalAnimals = 0;
+  for (const animalData of animalsToSpawn) {
+    try {
+      const entity = spawningSystem.spawnSpecificAnimal(world, animalData.species, animalData.position);
+      totalAnimals++;
+      console.log(`Spawned ${animalData.species} at (${animalData.position.x}, ${animalData.position.y})`);
+    } catch (error) {
+      console.error(`Failed to spawn ${animalData.species}:`, error);
+    }
+  }
+
+  console.log(`Created ${totalAnimals} wild animals near origin`);
 }
 
 // Helper functions for time manipulation (duplicated from TimeSystem for debug controls)
@@ -206,13 +311,47 @@ async function main() {
   // Create game loop
   const gameLoop = new GameLoop();
 
-  // Create LLM components - use single Ollama instance with higher concurrency
-  // Note: Multiple instances would need matching Ollama versions that support qwen3
-  const llmProvider = new OllamaProvider('qwen3:4b', 'http://localhost:11434');
-  const llmQueue = new LLMDecisionQueue(llmProvider, 4); // Higher concurrency
-  const promptBuilder = new StructuredPromptBuilder();
+  // Create settings panel (ESC to toggle)
+  const settingsPanel = new SettingsPanel();
+  const settings = settingsPanel.getSettings();
 
-  // Register systems (order: Time -> Weather -> Temperature -> Soil -> Plant -> AI -> Communication -> Needs -> Sleep -> Building -> ResourceGathering -> Movement -> Memory)
+  // Create LLM provider based on settings
+  let llmProvider: LLMProvider;
+  if (settings.llm.provider === 'openai-compat') {
+    llmProvider = new OpenAICompatProvider(
+      settings.llm.model,
+      settings.llm.baseUrl,
+      settings.llm.apiKey
+    );
+    console.log('[DEMO] Using OpenAI-compatible provider:', settings.llm.baseUrl, settings.llm.model);
+  } else {
+    llmProvider = new OllamaProvider(settings.llm.model, settings.llm.baseUrl);
+    console.log('[DEMO] Using Ollama native provider:', settings.llm.baseUrl, settings.llm.model);
+  }
+
+  // Check if provider is available before creating queue
+  const isLLMAvailable = await llmProvider.isAvailable();
+  let llmQueue: LLMDecisionQueue | null = null;
+  let promptBuilder: StructuredPromptBuilder | null = null;
+
+  if (isLLMAvailable) {
+    console.log('[DEMO] LLM provider available - agents will use LLM decisions');
+    // Use maxConcurrent=1 for turn-based conversation (prevents rate limiting and allows agents to hear each other's responses)
+    llmQueue = new LLMDecisionQueue(llmProvider, 1);
+    promptBuilder = new StructuredPromptBuilder();
+  } else {
+    console.warn(`[DEMO] LLM not available at ${settings.llm.baseUrl} - agents will use scripted behavior only`);
+    console.warn('[DEMO] Press ESC to open settings and configure LLM provider');
+  }
+
+  // Handle settings changes (requires page reload for clean state)
+  settingsPanel.setOnSettingsChange((newSettings) => {
+    console.log('[DEMO] Settings changed:', newSettings);
+    console.log('[DEMO] Reloading page to apply new LLM settings...');
+    window.location.reload();
+  });
+
+  // Register systems (order: Time -> Weather -> Temperature -> Soil -> Plant -> Animal -> AnimalProduction -> AI -> Communication -> Needs -> Sleep -> Taming -> Building -> ResourceGathering -> Movement -> Memory)
   gameLoop.systemRegistry.register(new TimeSystem());
   gameLoop.systemRegistry.register(new WeatherSystem());
   gameLoop.systemRegistry.register(new TemperatureSystem());
@@ -224,14 +363,27 @@ async function main() {
   plantSystem.setSpeciesLookup(getPlantSpecies);
   gameLoop.systemRegistry.register(plantSystem);
 
+  // Register Animal systems (after environment systems, before AI)
+  gameLoop.systemRegistry.register(new AnimalSystem(gameLoop.world.eventBus));
+  gameLoop.systemRegistry.register(new AnimalProductionSystem(gameLoop.world.eventBus));
+  const wildAnimalSpawning = new WildAnimalSpawningSystem();
+  gameLoop.systemRegistry.register(wildAnimalSpawning);
+
   gameLoop.systemRegistry.register(new AISystem(llmQueue, promptBuilder));
   gameLoop.systemRegistry.register(new CommunicationSystem());
   gameLoop.systemRegistry.register(new NeedsSystem());
   gameLoop.systemRegistry.register(new SleepSystem());
+  gameLoop.systemRegistry.register(new TamingSystem());
   gameLoop.systemRegistry.register(new BuildingSystem());
   gameLoop.systemRegistry.register(new ResourceGatheringSystem());
   gameLoop.systemRegistry.register(new MovementSystem());
   gameLoop.systemRegistry.register(new MemorySystem());
+
+  // Register episodic memory systems (Phase 10)
+  gameLoop.systemRegistry.register(new MemoryFormationSystem(gameLoop.world.eventBus));
+  gameLoop.systemRegistry.register(new MemoryConsolidationSystem(gameLoop.world.eventBus));
+  gameLoop.systemRegistry.register(new ReflectionSystem(gameLoop.world.eventBus));
+  gameLoop.systemRegistry.register(new JournalingSystem(gameLoop.world.eventBus));
 
   // Create renderer
   const renderer = new Renderer(canvas);
@@ -258,8 +410,17 @@ async function main() {
   // Create agent info panel
   const agentInfoPanel = new AgentInfoPanel();
 
+  // Create animal info panel
+  const animalInfoPanel = new AnimalInfoPanel();
+
   // Create plant info panel
   const plantInfoPanel = new PlantInfoPanel();
+
+  // Create resources panel (R to toggle)
+  const resourcesPanel = new ResourcesPanel();
+
+  // Create memory panel (M to toggle) - for playtesting Phase 10 episodic memory
+  const memoryPanel = new MemoryPanel();
 
   // Generate terrain with trees and rocks first (so we can create tile inspector)
   console.log('Generating terrain...');
@@ -355,8 +516,11 @@ async function main() {
       console.log(`[Main] Successfully tilled tile at (${x}, ${y})`);
       showNotification(`Tilled tile at (${x}, ${y})`, '#8B4513');
 
-      // Update the tile inspector to show new state
-      tileInspectorPanel.setSelectedTile(tile, x, y);
+      // Refetch tile from chunk manager to get latest state after mutation
+      const refreshedTile = chunk.tiles[tileIndex];
+      if (refreshedTile) {
+        tileInspectorPanel.setSelectedTile(refreshedTile, x, y);
+      }
     } catch (err: any) {
       console.error(`[Main] Failed to till tile: ${err.message}`);
       showNotification(`Failed to till: ${err.message}`, '#FF0000');
@@ -396,8 +560,11 @@ async function main() {
       console.log(`[Main] Successfully watered tile at (${x}, ${y})`);
       showNotification(`Watered tile at (${x}, ${y})`, '#1E90FF');
 
-      // Update the tile inspector to show new state
-      tileInspectorPanel.setSelectedTile(tile, x, y);
+      // Refetch tile from chunk manager to get latest state after mutation
+      const refreshedTile = chunk.tiles[tileIndex];
+      if (refreshedTile) {
+        tileInspectorPanel.setSelectedTile(refreshedTile, x, y);
+      }
     } catch (err: any) {
       console.error(`[Main] Failed to water tile: ${err.message}`);
       showNotification(`Failed to water: ${err.message}`, '#FF0000');
@@ -445,8 +612,11 @@ async function main() {
       console.log(`[Main] Successfully fertilized tile at (${x}, ${y})`);
       showNotification(`Applied ${fertilizerType} at (${x}, ${y})`, '#FFD700');
 
-      // Update the tile inspector to show new state
-      tileInspectorPanel.setSelectedTile(tile, x, y);
+      // Refetch tile from chunk manager to get latest state after mutation
+      const refreshedTile = chunk.tiles[tileIndex];
+      if (refreshedTile) {
+        tileInspectorPanel.setSelectedTile(refreshedTile, x, y);
+      }
     } catch (err: any) {
       console.error(`[Main] Failed to fertilize tile: ${err.message}`);
       showNotification(`Failed to fertilize: ${err.message}`, '#FF0000');
@@ -566,6 +736,26 @@ async function main() {
   inputHandler.setCallbacks({
     onKeyDown: (key, shiftKey, ctrlKey) => {
       console.log(`[Main] onKeyDown callback: key="${key}", shiftKey=${shiftKey}, ctrlKey=${ctrlKey}`);
+
+      // ESC - Toggle settings panel
+      if (key === 'Escape') {
+        settingsPanel.toggle();
+        return true;
+      }
+
+      // R - Toggle resources panel
+      if (key === 'r' || key === 'R') {
+        resourcesPanel.toggleCollapsed();
+        return true;
+      }
+
+      // M - Toggle memory panel
+      if (key === 'm' || key === 'M') {
+        memoryPanel.toggle();
+        console.log(`[Main] Memory panel ${memoryPanel.isVisible() ? 'opened' : 'closed'}`);
+        return true;
+      }
+
       // Check if placement UI handles the key first
       const handled = placementUI.handleKeyDown(key, shiftKey);
       console.log(`[Main] placementUI.handleKeyDown returned: ${handled}`);
@@ -579,8 +769,8 @@ async function main() {
       const timeEntity = timeEntities.length > 0 ? timeEntities[0] as EntityImpl : null;
       const timeComp = timeEntity?.getComponent<any>('time');
 
-      // H - Skip 1 hour
-      if (key === 'h' || key === 'H') {
+      // 1 - Skip 1 hour
+      if (key === '1') {
         if (timeComp) {
           const newTime = (timeComp.timeOfDay + 1) % 24;
           const newPhase = calculatePhase(newTime);
@@ -596,8 +786,8 @@ async function main() {
         return true;
       }
 
-      // D - Skip 1 day
-      if (key === 'd' || key === 'D') {
+      // 2 - Skip 1 day
+      if (key === '2') {
         if (timeComp) {
           // Keep same time, just advance 24 hours
           const currentTime = timeComp.timeOfDay;
@@ -615,8 +805,8 @@ async function main() {
         return true;
       }
 
-      // W - Skip 7 days
-      if (key === 'w' && shiftKey) { // Shift+W to avoid conflict with movement
+      // 3 - Skip 7 days
+      if (key === '3') {
         if (timeComp) {
           const currentTime = timeComp.timeOfDay;
 
@@ -650,6 +840,32 @@ async function main() {
         return true;
       }
 
+      // N - Trigger test memory event for selected agent (for testing episodic memory)
+      if (key === 'n' || key === 'N') {
+        const selectedEntity = agentInfoPanel.getSelectedEntity();
+        if (selectedEntity && selectedEntity.components.has('agent')) {
+          // Emit a test event with high significance to trigger memory formation
+          gameLoop.world.eventBus.emit({
+            type: 'test:event',
+            source: 'debug',
+            data: {
+              agentId: selectedEntity.id,
+              summary: 'Test memory event triggered manually',
+              emotionalIntensity: 0.8,
+              novelty: 0.9,
+              goalRelevance: 0.7,
+              timestamp: Date.now(),
+            },
+          });
+          console.log(`[DEBUG] Triggered test memory event for agent ${selectedEntity.id}`);
+          showNotification(`🧠 Test memory event triggered`, '#9370DB');
+        } else {
+          console.log('[DEBUG] No agent selected - click an agent first');
+          showNotification(`⚠️ Select an agent first (click one)`, '#FFA500');
+        }
+        return true;
+      }
+
       // P - Spawn test plant at advanced stage (for testing)
       if (key === 'p' || key === 'P') {
         (async () => {
@@ -670,6 +886,18 @@ async function main() {
           const speciesId = 'berry-bush';
           const species = getPlantSpecies(speciesId);
 
+          // Calculate appropriate seeds for the stage
+          // Plants at mature/seeding stages would have produced seeds via stage transitions
+          const yieldAmount = species.baseGenetics.yieldAmount;
+          let initialSeeds = 0;
+          if (stage === 'mature') {
+            // Would have produced seeds when transitioning to mature
+            initialSeeds = Math.floor(species.seedsPerPlant * yieldAmount);
+          } else if (stage === 'seeding') {
+            // Would have produced seeds at mature AND when transitioning to seeding
+            initialSeeds = Math.floor(species.seedsPerPlant * yieldAmount * 2);
+          }
+
           const plantEntity = new EntityImpl(createEntityId(), (gameLoop.world as any)._tick);
           const plantComponent = new PlantComponent({
             speciesId,
@@ -679,15 +907,20 @@ async function main() {
             generation: 0,
             health: 90,
             hydration: 70,
-            nutrition: 60
+            nutrition: 60,
+            genetics: { ...species.baseGenetics }, // Use species genetics
+            seedsProduced: initialSeeds // Initialize with appropriate seeds for stage
           });
+
+          // Store entity ID on plant for PlantSystem logging
+          (plantComponent as any).entityId = plantEntity.id;
 
           plantEntity.addComponent(plantComponent);
           plantEntity.addComponent(createPositionComponent(spawnX, spawnY));
           plantEntity.addComponent(createRenderableComponent(speciesId, 'plant'));
           (gameLoop.world as any)._addEntity(plantEntity);
 
-          console.log(`[DEBUG] Spawned ${species.name} (${stage}) at (${spawnX}, ${spawnY})`);
+          console.log(`[DEBUG] Spawned ${species.name} (${stage}) at (${spawnX}, ${spawnY}) - Entity ${plantEntity.id} - seedsProduced=${plantComponent.seedsProduced}`);
           showNotification(`🌱 Spawned ${species.name} (${stage})`, '#32CD32');
         })();
         return true;
@@ -722,13 +955,25 @@ async function main() {
       return false;
     },
     onMouseClick: (screenX, screenY, button) => {
-      // First check if placement UI handles the click
+      const rect = canvas.getBoundingClientRect();
+
+      // First check if resources panel handles the click (collapse/expand)
+      const agentPanelOpen = agentInfoPanel.getSelectedEntityId() !== null;
+      if (resourcesPanel.handleClick(screenX, screenY, rect.width, agentPanelOpen)) {
+        return true;
+      }
+
+      // Check if animal info panel handles the click (close button, action buttons)
+      if (animalInfoPanel.handleClick(screenX, screenY, rect.width, rect.height, gameLoop.world)) {
+        return true;
+      }
+
+      // Check if placement UI handles the click
       if (placementUI.handleClick(screenX, screenY, button)) {
         return true;
       }
 
       // Check if tile inspector panel handles the click (for button clicks)
-      const rect = canvas.getBoundingClientRect();
       if (tileInspectorPanel.handleClick(screenX, screenY, rect.width, rect.height)) {
         return true;
       }
@@ -748,26 +993,39 @@ async function main() {
         return true; // Always consume right clicks
       }
 
-      // Left click - select agent or plant
+      // Left click - select agent, animal, or plant
       if (button === 0) {
         const entity = renderer.findEntityAtScreenPosition(screenX, screenY, gameLoop.world);
         if (entity) {
           const hasAgent = entity.components.has('agent');
+          const hasAnimal = entity.components.has('animal');
           const hasPlant = entity.components.has('plant');
 
           if (hasAgent) {
             agentInfoPanel.setSelectedEntity(entity);
+            animalInfoPanel.setSelectedEntity(null); // Deselect animal
             plantInfoPanel.setSelectedEntity(null); // Deselect plant
+            memoryPanel.setSelectedEntity(entity); // Sync memory panel
+            return true;
+          } else if (hasAnimal) {
+            animalInfoPanel.setSelectedEntity(entity);
+            agentInfoPanel.setSelectedEntity(null); // Deselect agent
+            plantInfoPanel.setSelectedEntity(null); // Deselect plant
+            memoryPanel.setSelectedEntity(null); // Clear memory panel
             return true;
           } else if (hasPlant) {
             plantInfoPanel.setSelectedEntity(entity);
             agentInfoPanel.setSelectedEntity(null); // Deselect agent
+            animalInfoPanel.setSelectedEntity(null); // Deselect animal
+            memoryPanel.setSelectedEntity(null); // Clear memory panel
             return true;
           }
         } else {
           // Click on empty space - deselect all
           agentInfoPanel.setSelectedEntity(null);
+          animalInfoPanel.setSelectedEntity(null);
           plantInfoPanel.setSelectedEntity(null);
+          memoryPanel.setSelectedEntity(null);
         }
       }
 
@@ -783,7 +1041,7 @@ async function main() {
     inputHandler.update();
 
     // Render world with selected entity highlighting
-    const selectedEntity = agentInfoPanel.getSelectedEntity();
+    const selectedEntity = agentInfoPanel.getSelectedEntity() || animalInfoPanel.getSelectedEntity();
     renderer.render(gameLoop.world, selectedEntity);
 
     // Render building placement UI on top
@@ -792,9 +1050,13 @@ async function main() {
     // Render UI panels on top
     const ctx = renderer.getContext();
     const rect = canvas.getBoundingClientRect();
+    const agentPanelOpen = agentInfoPanel.getSelectedEntityId() !== null;
+    resourcesPanel.render(ctx, rect.width, gameLoop.world, agentPanelOpen); // Resources panel (top-right)
     agentInfoPanel.render(ctx, rect.width, rect.height, gameLoop.world);
+    animalInfoPanel.render(ctx, rect.width, rect.height, gameLoop.world);
     plantInfoPanel.render(ctx, rect.width, rect.height, gameLoop.world);
     tileInspectorPanel.render(ctx, rect.width, rect.height);
+    memoryPanel.render(ctx, rect.width, rect.height, gameLoop.world); // Memory panel (M to toggle)
 
     requestAnimationFrame(renderLoop);
   }
@@ -853,11 +1115,120 @@ async function main() {
 
   // Create initial agents (10 LLM agents clustered together)
   console.log('Creating initial agents...');
-  createInitialAgents(gameLoop.world);
+  createInitialAgents(gameLoop.world, settings.dungeonMasterPrompt);
 
   // Create initial wild plants for Phase 9
   console.log('Creating initial wild plants...');
   await createInitialPlants(gameLoop.world);
+
+  // Create initial wild animals for Phase 11
+  console.log('Creating initial wild animals...');
+  await createInitialAnimals(gameLoop.world, wildAnimalSpawning);
+
+  // Set up animal event logging for debugging
+  // Note: EventBus doesn't have .on() method, events are handled by systems
+  // gameLoop.world.eventBus.on('animal_spawned', (event: any) => {
+  //   console.log(`[Animal Event] animal_spawned:`, event.data);
+  // });
+
+  // gameLoop.world.eventBus.on('animal_tamed', (event: any) => {
+  //   console.log(`[Animal Event] animal_tamed:`, event.data);
+  // });
+
+  // gameLoop.world.eventBus.on('animal_state_changed', (event: any) => {
+  //   console.log(`[Animal Event] animal_state_changed:`, event.data);
+  // });
+
+  // gameLoop.world.eventBus.on('product_ready', (event: any) => {
+  //   console.log(`[Animal Event] product_ready:`, event.data);
+  // });
+
+  // gameLoop.world.eventBus.on('bond_level_changed', (event: any) => {
+  //   console.log(`[Animal Event] bond_level_changed:`, event.data);
+  // });
+
+  // gameLoop.world.eventBus.on('life_stage_changed', (event: any) => {
+  //   console.log(`[Animal Event] life_stage_changed:`, event.data);
+  // });
+
+  // gameLoop.world.eventBus.on('animal_died', (event: any) => {
+  //   console.log(`[Animal Event] animal_died:`, event.data);
+  // });
+
+  // Set up animal UI action handlers
+  // gameLoop.world.eventBus.on('ui_action', (event: any) => {
+  //   if (event.source !== 'animal_info_panel') return;
+  //   const { action, entityId } = event.data;
+  //     const entity = gameLoop.world.getEntity(entityId);
+  //     if (!entity) {
+  //       console.error(`[Main] UI action: entity ${entityId} not found`);
+  //       return;
+  //     }
+  // 
+  //     const animal = entity.components.get('animal') as any;
+  //     if (!animal) {
+  //       console.error(`[Main] UI action: entity ${entityId} is not an animal`);
+  //       return;
+  //     }
+  // 
+  //     if (action === 'tame') {
+  //       console.log(`[Main] Taming ${animal.name}...`);
+  //       // Find a nearby agent to be the owner
+  //       const agents = gameLoop.world.query().with('agent').executeEntities();
+  //       if (agents.length === 0) {
+  //         console.warn('[Main] No agents available to tame animal');
+  //         renderer.getFloatingTextRenderer().addText('No agents available!', entity, '#FF0000');
+  //         return;
+  //       }
+  //       // Use first agent as the tamer
+  //       const agent = agents[0];
+  //       const tamingSystem = gameLoop.systemRegistry.getSorted().find((s) => s.id === 'taming') as any;
+  //       if (!tamingSystem) {
+  //         console.error('[Main] TamingSystem not found');
+  //         return;
+  //       }
+  // 
+  //       const result = tamingSystem.attemptTaming(gameLoop.world, animal, agent.id, 'feeding', 'grass');
+  //       if (result.success) {
+  //         console.log(`[Main] Successfully tamed ${animal.name}!`);
+  //         renderer.getFloatingTextRenderer().addText('Tamed!', entity, '#00FF00');
+  //       } else {
+  //         console.log(`[Main] Failed to tame ${animal.name}: ${result.reason}`);
+  //         renderer.getFloatingTextRenderer().addText(`Failed: ${result.reason}`, entity, '#FFA500');
+  //       }
+  //     } else if (action === 'feed') {
+  //       console.log(`[Main] Feeding ${animal.name}...`);
+  //       // Reduce hunger by 20
+  //       animal.hunger = Math.max(0, animal.hunger - 20);
+  //       animal.mood = Math.min(100, animal.mood + 5);
+  //       renderer.getFloatingTextRenderer().addText('Fed!', entity, '#00FF00');
+  //     } else if (action === 'collect_product') {
+  //       console.log(`[Main] Collecting products from ${animal.name}...`);
+  //       const productionSystem = gameLoop.systemRegistry.getSorted().find((s) => s.id === 'animal_production') as any;
+  //       if (!productionSystem) {
+  //         console.error('[Main] AnimalProductionSystem not found');
+  //         return;
+  //       }
+  // 
+  //       // Try to collect the first available product
+  //       const species = animal.speciesId;
+  //       // For chickens: eggs, for cows: milk
+  //       const productId = species === 'chicken' ? 'eggs' : species === 'cow' ? 'milk' : null;
+  //       if (!productId) {
+  //         renderer.getFloatingTextRenderer().addText('No products available', entity, '#FFA500');
+  //         return;
+  //       }
+  // 
+  //       const result = productionSystem.collectProduct(entityId, productId);
+  //       if (result.success) {
+  //         console.log(`[Main] Collected ${result.quantity} ${productId} (quality: ${result.quality})`);
+  //         renderer.getFloatingTextRenderer().addText(`+${result.quantity} ${productId}`, entity, '#FFD700');
+  //       } else {
+  //         console.log(`[Main] Failed to collect ${productId}: ${result.reason}`);
+  //         renderer.getFloatingTextRenderer().addText(result.reason || 'Not ready', entity, '#FFA500');
+  //       }
+  //     }
+  //   });
 
   // Start
   console.log('Starting game loop...');
@@ -873,6 +1244,11 @@ async function main() {
   // Log debug controls
   console.log('');
   console.log('=== DEBUG CONTROLS ===');
+  console.log('SETTINGS:');
+  console.log('  ESC - Open settings (configure LLM provider)');
+  console.log('UI:');
+  console.log('  M - Toggle memory panel (episodic memory)');
+  console.log('  R - Toggle resources panel');
   console.log('TIME:');
   console.log('  H - Skip 1 hour');
   console.log('  D - Skip 1 day');
@@ -881,6 +1257,9 @@ async function main() {
   console.log('PLANTS:');
   console.log('  P - Spawn test plant at advanced stage');
   console.log('  Click plant - View plant info');
+  console.log('AGENTS:');
+  console.log('  Click agent - View agent info & memories');
+  console.log('  N - Trigger test memory for selected agent');
   console.log('======================');
   console.log('');
 
@@ -904,12 +1283,15 @@ async function main() {
     placementUI,
     buildingRegistry: blueprintRegistry,
     agentInfoPanel,
+    animalInfoPanel,
+    resourcesPanel,
   };
   (window as any).gameLoop = gameLoop;
   (window as any).renderer = renderer;
   (window as any).placementUI = placementUI;
   (window as any).blueprintRegistry = blueprintRegistry;
   (window as any).agentInfoPanel = agentInfoPanel;
+  (window as any).animalInfoPanel = animalInfoPanel;
 
   console.log('Building Placement UI ready. Press B to open building menu.');
 }
