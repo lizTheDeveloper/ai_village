@@ -125,19 +125,19 @@ export class SoilSystem implements System {
       if (agent) {
         const inventory = agent.components.get('inventory') as any;
         if (inventory) {
-          // Check for hoe (best tool)
+          // Check for hoe (best tool, 100% efficiency)
           if (this.hasItemInInventory(inventory, 'hoe')) {
             toolUsed = 'hoe';
             toolEfficiency = 1.0;
             console.log(`[SoilSystem] 🔨 Agent has HOE - using it (100% efficiency, fastest)`);
           }
-          // Check for shovel (second best)
+          // Check for shovel (second best, 80% efficiency)
           else if (this.hasItemInInventory(inventory, 'shovel')) {
             toolUsed = 'shovel';
             toolEfficiency = 0.8;
             console.log(`[SoilSystem] 🔨 Agent has SHOVEL - using it (80% efficiency, medium speed)`);
           }
-          // Fallback to hands
+          // Fallback to hands (50% efficiency)
           else {
             console.log(`[SoilSystem] 🖐️ Agent has no farming tools - using HANDS (50% efficiency, slowest)`);
           }
@@ -153,9 +153,10 @@ export class SoilSystem implements System {
       console.log(`[SoilSystem] 🔨 Available tools: HOE (100% efficiency) > SHOVEL (80%) > HANDS (50%)`);
     }
 
-    // Tool efficiency tracked for future use (currently tilling duration is fixed at 100 ticks = 5s in TillActionHandler)
-    // TODO: Apply tool efficiency to action duration when tool system is fully integrated
-    console.log(`[SoilSystem] Tool: ${toolUsed}, efficiency: ${(toolEfficiency * 100).toFixed(0)}%`);
+    // Calculate and log estimated duration for transparency
+    const baseDuration = 10; // seconds
+    const estimatedDuration = baseDuration / toolEfficiency; // 10s hoe, 12.5s shovel, 20s hands
+    console.log(`[SoilSystem] Tool: ${toolUsed}, Estimated duration: ${estimatedDuration.toFixed(1)}s (efficiency: ${(toolEfficiency * 100).toFixed(0)}%)`);
 
     // Change terrain to dirt
     const oldTerrain = tile.terrain;

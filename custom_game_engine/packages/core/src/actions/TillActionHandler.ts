@@ -59,13 +59,13 @@ export class TillActionHandler implements ActionHandler {
     }
 
     // Check for hoe (best tool, 100% efficiency)
-    const hasHoe = inventory.slots.some((slot: any) => slot?.itemId === 'hoe');
+    const hasHoe = inventory.slots.some((slot: any) => slot?.itemId === 'hoe' && slot?.quantity > 0);
     if (hasHoe) {
       return baseTicks; // 200 ticks = 10s
     }
 
     // Check for shovel (medium tool, 80% efficiency)
-    const hasShovel = inventory.slots.some((slot: any) => slot?.itemId === 'shovel');
+    const hasShovel = inventory.slots.some((slot: any) => slot?.itemId === 'shovel' && slot?.quantity > 0);
     if (hasShovel) {
       return Math.round(baseTicks / 0.8); // 250 ticks = 12.5s
     }

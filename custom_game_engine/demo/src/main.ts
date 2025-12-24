@@ -718,18 +718,35 @@ async function main() {
       console.log(`[Main] Submitted till action ${actionId} for agent ${agentId} at (${x}, ${y})`);
 
       // Calculate expected duration based on agent's tools
+      // This must match TillActionHandler.getDuration() logic exactly
       // Base: 10s (200 ticks at 20 TPS)
-      // Hoe: 10s, Shovel: 12.5s, Hands: 20s
+      // Hoe: 100% efficiency = 200 ticks = 10s
+      // Shovel: 80% efficiency = 250 ticks = 12.5s
+      // Hands: 50% efficiency = 400 ticks = 20s
       const inventory = agent.getComponent('inventory') as any;
-      let durationSeconds = 20; // Default to hands
+      let durationSeconds = 20; // Default to hands (400 ticks / 20 TPS = 20s)
+
+      console.log(`[Main] Checking agent inventory for tool... Inventory exists: ${!!inventory}, Has slots: ${!!inventory?.slots}`);
+
       if (inventory?.slots) {
-        const hasHoe = inventory.slots.some((slot: any) => slot?.itemId === 'hoe');
-        const hasShovel = inventory.slots.some((slot: any) => slot?.itemId === 'shovel');
+        console.log(`[Main] Inventory slots (${inventory.slots.length}):`, inventory.slots.map((s: any, i: number) => `[${i}]: ${s?.itemId || 'empty'}`).join(', '));
+
+        const hasHoe = inventory.slots.some((slot: any) => slot?.itemId === 'hoe' && slot?.quantity > 0);
+        const hasShovel = inventory.slots.some((slot: any) => slot?.itemId === 'shovel' && slot?.quantity > 0);
+
+        console.log(`[Main] Tool check: hasHoe=${hasHoe}, hasShovel=${hasShovel}`);
+
         if (hasHoe) {
           durationSeconds = 10;
+          console.log(`[Main] Agent has hoe - duration: 10s`);
         } else if (hasShovel) {
           durationSeconds = 12.5;
+          console.log(`[Main] Agent has shovel - duration: 12.5s`);
+        } else {
+          console.log(`[Main] Agent has no farming tools - duration: 20s (hands)`);
         }
+      } else {
+        console.log(`[Main] Agent has no inventory - duration: 20s (hands)`);
       }
 
       showNotification(`Agent will till tile at (${x}, ${y}) (${durationSeconds}s)`, '#8B4513');
