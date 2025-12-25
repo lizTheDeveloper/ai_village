@@ -172,11 +172,23 @@ export class StructuredPromptBuilder {
    * Build system prompt with role and personality.
    */
   private buildSystemPrompt(name: string, personality: any): string {
+    // Base prompt with building knowledge
+    let prompt = `You are ${name}, a villager in a forest village.
+
+You know how to build these structures:
+- lean-to: 10 wood + 5 leaves (shelter for sleeping)
+- storage-chest: 10 wood (store items safely)
+- campfire: 10 stone + 5 wood (warmth and cooking)
+- tent: 10 cloth + 5 wood (better shelter)
+- bed: 10 wood + 15 fiber (comfortable sleep)
+
+`;
+
     if (!personality) {
-      return `You are ${name}, a villager in a forest village.`;
+      return prompt;
     }
 
-    let prompt = `You are ${name}, a villager in a forest village.\n\nPersonality:\n`;
+    prompt += 'Personality:\n';
 
     // Describe personality based on Big Five
     if (personality.openness > 70) {

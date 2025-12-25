@@ -31,3 +31,6 @@ export * from './CraftingPanelUI.js';
 export * from './RecipeListSection.js';
 export * from './IngredientPanel.js';
 export * from './CraftingQueueSection.js';
+
+export * from './WindowManager.js';
+export * from './types/WindowTypes.js';
