@@ -529,7 +529,9 @@ export class BuildingSystem implements System {
       if (inventory?.slots) {
         for (const slot of inventory.slots) {
           if (slot.itemId && slot.quantity > 0) {
-            availableResources[slot.itemId] = (availableResources[slot.itemId] || 0) + slot.quantity;
+            // Per CLAUDE.md: Use ?? instead of || for default values
+            const currentAmount = availableResources[slot.itemId] ?? 0;
+            availableResources[slot.itemId] = currentAmount + slot.quantity;
           }
         }
       }
@@ -539,7 +541,8 @@ export class BuildingSystem implements System {
 
     // Check if we have enough of each resource
     for (const [resourceType, amountNeeded] of Object.entries(resourceCost)) {
-      const available = availableResources[resourceType] || 0;
+      // Per CLAUDE.md: Use ?? instead of || for default values
+      const available = availableResources[resourceType] ?? 0;
       if (available < amountNeeded) {
         console.log(`[BuildingSystem] Storage has ${available} ${resourceType}, needs ${amountNeeded}`);
         return false;

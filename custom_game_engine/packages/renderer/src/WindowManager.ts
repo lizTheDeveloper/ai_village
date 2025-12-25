@@ -80,7 +80,7 @@ export class WindowManager {
       dragOffsetX: 0,
       dragOffsetY: 0,
       lastInteractionTime: now,
-      openedTime: now,
+      openedTime: 0, // Will be set when first shown
     };
 
     this.windows.set(id, managedWindow);
@@ -102,8 +102,8 @@ export class WindowManager {
       throw new Error(`Window with ID "${id}" not found`);
     }
 
-    // Track if this is the first time showing (openedTime will be 0 or equal to creation time)
-    const wasNeverShown = window.openedTime === window.lastInteractionTime;
+    // Track if this is the first time showing (openedTime will be 0)
+    const wasNeverShown = window.openedTime === 0;
 
     // If already visible, just bring to front
     if (window.visible) {
@@ -578,11 +578,16 @@ export class WindowManager {
     const cascadeX = lastWindow.x + TITLE_BAR_HEIGHT;
     const cascadeY = lastWindow.y + TITLE_BAR_HEIGHT;
 
-    // Check if cascade position is within bounds and doesn't overlap
+    // Check if cascade position is within bounds (allow overlap for cascading)
     if (cascadeX + window.width <= this.canvas.width &&
-        cascadeY + window.height <= this.canvas.height &&
-        this.isPositionAvailable(cascadeX, cascadeY, window.width, window.height, window.id)) {
+        cascadeY + window.height <= this.canvas.height) {
       return { x: cascadeX, y: cascadeY };
+    }
+
+    // Cascade would go off-screen - try default position
+    if (window.config.defaultX + window.width <= this.canvas.width &&
+        window.config.defaultY + window.height <= this.canvas.height) {
+      return { x: window.config.defaultX, y: window.config.defaultY };
     }
 
     // No valid cascade position found
@@ -616,20 +621,24 @@ export class WindowManager {
    * Handle canvas resize
    */
   public handleCanvasResize(width: number, height: number): void {
+    // Save old dimensions BEFORE updating canvas
+    const oldWidth = this.canvas.width;
+    const oldHeight = this.canvas.height;
+
     this.canvas.width = width;
     this.canvas.height = height;
 
     // Track windows positioned relative to right/bottom edges
-    const rightAlignedThreshold = this.canvas.width * 0.6; // Windows in right 40%
-    const bottomAlignedThreshold = this.canvas.height * 0.6; // Windows in bottom 40%
+    const rightAlignedThreshold = oldWidth * 0.6; // Windows in right 40%
+    const bottomAlignedThreshold = oldHeight * 0.6; // Windows in bottom 40%
 
     // Reposition windows that are out of bounds
     for (const window of this.windows.values()) {
       const wasRightAligned = window.x > rightAlignedThreshold;
       const wasBottomAligned = window.y > bottomAlignedThreshold;
 
-      const oldOffsetFromRight = this.canvas.width - (window.x + window.width);
-      const oldOffsetFromBottom = this.canvas.height - (window.y + window.height);
+      const oldOffsetFromRight = oldWidth - (window.x + window.width);
+      const oldOffsetFromBottom = oldHeight - (window.y + window.height);
 
       // Clamp window size
       if (window.width > width) {

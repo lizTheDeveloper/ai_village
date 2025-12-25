@@ -56,7 +56,7 @@ import {
   LoadBalancingProvider,
   type LLMProvider,
 } from '@ai-village/llm';
-import { TerrainGenerator, ChunkManager, createLLMAgent } from '@ai-village/world';
+import { TerrainGenerator, ChunkManager, createLLMAgent, createBerryBush } from '@ai-village/world';
 
 /**
  * Phase 10 Demo (Sleep & Circadian Rhythm)
@@ -1998,6 +1998,21 @@ async function main() {
   // Create initial wild animals for Phase 11
   console.log('Creating initial wild animals...');
   await createInitialAnimals(gameLoop.world, wildAnimalSpawning);
+
+  // Spawn berry bushes near start for easy food access
+  console.log('Spawning berry bushes near start...');
+  const berryPositions = [
+    { x: 6, y: 4 }, { x: -7, y: 5 }, { x: 8, y: -3 },
+    { x: -6, y: -4 }, { x: 5, y: 7 }, { x: -8, y: 6 },
+    { x: 7, y: -6 }, { x: -5, y: -7 }, { x: 9, y: 2 },
+    { x: -9, y: -2 }, { x: 4, y: -8 }, { x: -4, y: 8 },
+    { x: 10, y: 0 }, { x: -10, y: 1 }, { x: 0, y: 10 },
+  ];
+
+  berryPositions.forEach(pos => {
+    createBerryBush(gameLoop.world, pos.x, pos.y);
+  });
+  console.log(`Spawned ${berryPositions.length} berry bushes around spawn point`);
 
   // Set up memory event logging for debugging (Phase 10)
   gameLoop.world.eventBus.subscribe('memory:formed', (event: any) => {

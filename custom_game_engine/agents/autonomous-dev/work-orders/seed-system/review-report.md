@@ -17,15 +17,16 @@
 - `packages/core/src/components/SeedComponent.ts` (160 lines, existing) - 1 violation
 - `packages/core/src/systems/ResourceGatheringSystem.ts` (minor changes) - clean
 
-**Build Status:** ⚠️ RENDERER ERRORS (pre-existing, unrelated to seed system)
-**Core Package Build:** ✅ PASSES (seed system code compiles)
+**Build Status:** ❌ FAILS - TypeScript compilation errors
+**Core Package Build:** ❌ FAILS (4 TypeScript errors - unused variables)
 **Total Code:** ~1697 lines reviewed
 
 ---
 
 ## Executive Summary
 
-**Critical Issues Found:** 18 violations of CLAUDE.md (7 additional found in verification)
+**Critical Issues Found:** 22 violations total (18 CLAUDE.md + 4 TypeScript build errors)
+**Build Status:** ❌ FAILS - TypeScript compilation errors (dead code)
 **Pattern:** Systemic use of silent fallbacks (`|| defaultValue`, `?? defaultValue`) and `any` types
 **Primary Violation:** CLAUDE.md's core principle: "NEVER use fallback values to mask errors"
 
@@ -39,6 +40,66 @@ This comprehensive antipattern scan revealed **multiple violations across PlantS
 ---
 
 ## Critical Issues (Must Fix)
+
+### 0. BUILD FAILURE - TypeScript Compilation Errors
+**Severity:** CRITICAL - BLOCKING DEPLOYMENT
+**Status:** ❌ BUILD FAILS
+
+```bash
+$ npm run build
+
+packages/core/src/systems/AISystem.ts(1405,11): error TS6133: 'seekFoodBehavior' is declared but its value is never read.
+packages/core/src/systems/AISystem.ts(3797,11): error TS6133: 'gatherSeedsBehavior' is declared but its value is never read.
+packages/core/src/systems/AISystem.ts(3901,11): error TS6133: 'harvestBehavior' is declared but its value is never read.
+packages/llm/src/StructuredPromptBuilder.ts(845,44): error TS6133: 'world' is declared but its value is never read.
+```
+
+**Issue:** Dead code - private methods defined but never called
+
+**Impact:**
+- **Build fails** - Cannot deploy or run production code
+- **Seed gathering never works** - Agent AI cannot select gather_seeds behavior
+- **Harvest never works** - Agent AI cannot select harvest behavior
+- **Root cause of playtest failure** - Explains why agents never gather seeds in actual gameplay
+
+**Root Cause Analysis:**
+The Implementation Agent created behavior handler methods in AISystem.ts but never integrated them with the AI decision-making system. The methods exist but are unreachable:
+
+1. **Line 3797:** `gatherSeedsBehavior()` - Defined but never called
+2. **Line 3901:** `harvestBehavior()` - Defined but never called
+3. **Line 1405:** `seekFoodBehavior()` - Defined but never called
+
+These methods should either be:
+- **Called from behavior selection logic** (e.g., when ResponseParser returns "gather_seeds" behavior)
+- **Or removed entirely** if not integrated
+
+**Required Fix:**
+
+Option A: **Integrate behaviors** (if seed gathering is desired feature)
+```typescript
+// In AISystem.ts behavior execution switch
+switch (currentBehavior) {
+  case 'gather_seeds':
+    this.gatherSeedsBehavior(entity as EntityImpl, world);
+    break;
+  case 'harvest':
+    this.harvestBehavior(entity as EntityImpl, world);
+    break;
+  // ... other cases
+}
+```
+
+Option B: **Remove dead code** (if not ready for deployment)
+```typescript
+// Delete these methods entirely:
+// - Line 1405: seekFoodBehavior()
+// - Line 3797: gatherSeedsBehavior()
+// - Line 3901: harvestBehavior()
+```
+
+**Verification:** After fix, run `npm run build` - must succeed with zero errors.
+
+---
 
 ### PLANTSYSTEM.TS VIOLATIONS (13 issues)
 
@@ -567,12 +628,18 @@ These violations directly contradict CLAUDE.md's core principle:
 
 **Verdict: NEEDS_FIXES**
 
-**Blocking Issues:** 18 critical violations (1 acceptable, 17 must fix)
+**Blocking Issues:** 22 critical violations (4 build errors + 18 CLAUDE.md violations, 1 acceptable → 21 must fix)
+**Build Status:** ❌ FAILS
 **Warnings:** 3 minor suggestions
 
 ### Required Actions
 
-The Implementation Agent must address all 18 critical issues (excluding #13 which is acceptable):
+The Implementation Agent must address all 22 critical issues (excluding #13 which is acceptable → 21 total fixes):
+
+**BUILD FAILURES (4 fixes - HIGHEST PRIORITY):**
+0. Fix TypeScript build errors in AISystem.ts (3 unused methods) and StructuredPromptBuilder.ts (1 unused variable)
+   - Either integrate gatherSeedsBehavior/harvestBehavior/seekFoodBehavior with behavior selection
+   - Or remove dead code entirely
 
 **PlantSystem.ts (12 fixes):**
 1. Remove rain intensity fallback (line 119)
@@ -653,13 +720,16 @@ The initial review was thorough but missed several `as any` casts and `??` fallb
 
 ### Build Status Clarification
 
-- **Core package:** ✅ Compiles successfully
+- **Core package:** ❌ FAILS - 4 TypeScript errors (3 in AISystem.ts, 1 in StructuredPromptBuilder.ts)
 - **Renderer package:** ❌ Has pre-existing TypeScript errors (unrelated to seed system)
-- **Seed system code:** ✅ No compilation errors
+- **Seed system code:** ⚠️ Code is correct but unreachable (dead code causing build failure)
 
 ## Next Steps
 
-Return to Implementation Agent with this report. All 17 critical issues must be fixed before proceeding to playtest phase.
+Return to Implementation Agent with this report. All 21 critical issues must be fixed before proceeding to playtest phase.
+
+**PRIORITY 1:** Fix build errors (issue #0) - build must pass before any other work
+**PRIORITY 2:** Fix CLAUDE.md violations (issues #1-18, excluding #13)
 
 The GatherSeedsActionHandler implementation is architecturally sound and well-designed. Once these antipattern violations are addressed, the code will be production-ready.
 

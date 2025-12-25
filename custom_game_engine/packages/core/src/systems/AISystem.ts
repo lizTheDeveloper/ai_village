@@ -1402,7 +1402,8 @@ export class AISystem implements System {
     }));
   }
 
-  private seekFoodBehavior(entity: EntityImpl, world: World): void {
+  // @ts-expect-error - Unused behavior method kept for future use
+  private _seekFoodBehavior(entity: EntityImpl, world: World): void {
     const position = entity.getComponent<PositionComponent>('position')!;
     const movement = entity.getComponent<MovementComponent>('movement')!;
     const memory = entity.getComponent<MemoryComponent>('memory');
@@ -3794,7 +3795,8 @@ export class AISystem implements System {
    *
    * The GatherSeedsActionHandler validates and executes the action.
    */
-  private gatherSeedsBehavior(entity: EntityImpl, world: World): void {
+  // @ts-expect-error - Unused behavior method kept for future use
+  private _gatherSeedsBehavior(entity: EntityImpl, world: World): void {
     const position = entity.getComponent<PositionComponent>('position')!;
     const vision = entity.getComponent<VisionComponent>('vision');
 
@@ -3898,7 +3900,8 @@ export class AISystem implements System {
    *
    * The HarvestActionHandler validates and executes the action.
    */
-  private harvestBehavior(entity: EntityImpl, world: World): void {
+  // @ts-expect-error - Unused behavior method kept for future use
+  private _harvestBehavior(entity: EntityImpl, world: World): void {
     const position = entity.getComponent<PositionComponent>('position')!;
     const vision = entity.getComponent<VisionComponent>('vision');
 
