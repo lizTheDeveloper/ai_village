@@ -90,11 +90,14 @@ export class ResponseParser {
     'make': 'build',
     'craft': 'build',
     'create': 'build',
-    // Explore = search, scout, investigate, look
+    // Explore = search, scout, investigate, look, explore_frontier, explore_spiral
     'search': 'explore',
     'scout': 'explore',
     'investigate': 'explore',
     'look': 'explore',
+    'explore_frontier': 'explore',
+    'explore_spiral': 'explore',
+    'follow_gradient': 'explore',
     // Wander = roam, walk
     'roam': 'wander',
     'walk': 'wander',

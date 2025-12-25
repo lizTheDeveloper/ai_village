@@ -842,10 +842,10 @@ export class StructuredPromptBuilder {
    * Get available actions based on context.
    * These MUST match the valid behaviors in ResponseParser.
    */
-  private getAvailableActions(vision: any, world: any, entity?: any): string[] {
+  private getAvailableActions(vision: any, _world: any, entity?: any): string[] {
     const actions = [
-      'wander - Explore the area',
-      'idle - Do nothing, rest and recover',
+      'wander - Move around the area',
+      'rest - Stop and recover energy',
     ];
 
     // Get agent context for contextual actions
@@ -944,28 +944,16 @@ export class StructuredPromptBuilder {
       actions.push('build - Construct a building (say "build <type>": campfire, tent, storage-chest, bed, etc.)');
     }
 
-    // Navigation & Exploration actions (Phase 4.5)
-    actions.push('navigate - Navigate to specific coordinates (say "navigate to x,y" or "go to 10,20")');
-    actions.push('explore_frontier - Explore the edges of known territory systematically');
-    actions.push('explore_spiral - Spiral outward from home base to explore new areas');
+    // Exploration (consolidated - system determines strategy)
+    actions.push('explore - Explore unknown areas to find new resources');
 
-    // Only add follow_gradient if agent has SocialGradient component with gradients
-    if (entity && entity.components.has('SocialGradient')) {
-      const socialGradient = entity.components.get('SocialGradient') as any;
-      if (socialGradient && socialGradient.allGradients && socialGradient.allGradients.length > 0) {
-        actions.push('follow_gradient - Follow social hints to find resources others have mentioned');
-      }
-    }
-
-    // Goal-setting tools (always available for planning and coordination)
-    actions.push('set_personal_goal - Set your short-term personal goal (say "set goal: <description>")');
-    actions.push('set_medium_term_goal - Set your medium-term plan (say "set medium goal: <description>")');
-    actions.push('set_group_goal - Set or update the group\'s goal (say "set group goal: <description>")');
+    // Navigation (specific coordinates)
+    actions.push('navigate - Go to specific coordinates (say "navigate to x,y" or "go to 10,20")');
 
     // Advanced farming actions (when contextually relevant)
     if (hasSeeds || (vision?.seenResources && vision.seenResources.length > 0)) {
-      actions.push('water - Water plants to help them grow (say "water" or "water plant")');
-      actions.push('fertilize - Fertilize soil to improve growth (say "fertilize" or "add fertilizer")');
+      actions.push('water - Water plants to help them grow');
+      actions.push('fertilize - Fertilize soil to improve growth');
     }
 
     // Debug log final actions list
