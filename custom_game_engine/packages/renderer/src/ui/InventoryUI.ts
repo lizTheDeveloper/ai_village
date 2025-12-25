@@ -41,7 +41,6 @@ const EQUIPMENT_SLOTS = [
  * Handles opening/closing, rendering, and coordinating all inventory subsystems
  */
 export class InventoryUI {
-  private canvas: HTMLCanvasElement;
   private world: World;
   private isOpenState: boolean = false;
   private playerInventory: InventoryComponent | null = null;
@@ -63,8 +62,7 @@ export class InventoryUI {
   // Hover state
   private hoveredSlot: SlotReference | null = null;
 
-  constructor(canvas: HTMLCanvasElement, world: World) {
-    this.canvas = canvas;
+  constructor(_canvas: HTMLCanvasElement, world: World) {
     this.world = world;
 
     // Initialize subsystems
@@ -99,12 +97,14 @@ export class InventoryUI {
     // Toggle inventory with I or Tab
     if (key === 'i' || key === 'I' || key === 'Tab') {
       this.isOpenState = !this.isOpenState;
+      console.log(`[InventoryUI] Toggled inventory via '${key}': isOpen=${this.isOpenState}`);
       return;
     }
 
     // Close with Escape
     if (key === 'Escape') {
       this.isOpenState = false;
+      console.log(`[InventoryUI] Closed inventory via Escape: isOpen=${this.isOpenState}`);
       return;
     }
 
@@ -190,20 +190,47 @@ export class InventoryUI {
 
   /**
    * Handle mouse move for tooltips
+   * Returns true if inventory is open (to prevent other tooltips)
    */
-  public handleMouseMove(x: number, y: number): void {
+  public handleMouseMove(x: number, y: number, canvasWidth: number, canvasHeight: number): boolean {
     if (!this.isOpenState || !this.playerInventory) {
       this.hoveredSlot = null;
-      return;
+      return false;
     }
 
-    // Simplified: just detect if mouse is over first slot for testing
-    // Real implementation would calculate which slot based on grid position
+    // Store canvas dimensions for getSlotAtPosition
+    this.lastCanvasWidth = canvasWidth;
+    this.lastCanvasHeight = canvasHeight;
+
+    // Calculate panel bounds (same as in render and handleClick)
+    const panelWidth = Math.min(800, canvasWidth - 40);
+    const panelHeight = Math.min(600, canvasHeight - 40);
+    const panelX = (canvasWidth - panelWidth) / 2;
+    const panelY = (canvasHeight - panelHeight) / 2;
+
+    // Check if mouse is inside panel
+    const isInsidePanel =
+      x >= panelX &&
+      x <= panelX + panelWidth &&
+      y >= panelY &&
+      y <= panelY + panelHeight;
+
+    if (!isInsidePanel) {
+      this.hoveredSlot = null;
+      return true; // Inventory open, but mouse not over it
+    }
+
+    // Check if mouse is over a backpack slot
     const slotRef = this.getSlotAtPosition(x, y);
+    console.log('[InventoryUI] handleMouseMove - slotRef:', slotRef);
 
     if (slotRef && slotRef.index !== undefined) {
       const slot = this.playerInventory.slots[slotRef.index];
+      console.log('[InventoryUI] handleMouseMove - slot:', slot);
+
       if (slot && slot.itemId) {
+        // Mouse is over an item - show tooltip
+        console.log('[InventoryUI] handleMouseMove - setting hoveredSlot for item:', slot.itemId);
         this.hoveredSlot = slotRef;
 
         const tooltipItem: TooltipItem = {
@@ -214,15 +241,19 @@ export class InventoryUI {
 
         this.tooltip.setItem(tooltipItem);
         this.tooltip.setPosition(x, y, {
-          screenWidth: this.canvas.width,
-          screenHeight: this.canvas.height,
+          screenWidth: canvasWidth,
+          screenHeight: canvasHeight,
         });
-        return;
+        return true;
       }
     }
 
+    // Mouse is inside panel but not over an item
+    console.log('[InventoryUI] handleMouseMove - no item under mouse, clearing hoveredSlot');
     this.hoveredSlot = null;
+    return true; // Inventory open
   }
+
 
   /**
    * Get active tooltip (if hovering over item)
@@ -318,12 +349,84 @@ export class InventoryUI {
   }
 
   /**
+   * Handle mouse click on inventory UI
+   * Returns true if click was handled (should block game canvas interaction)
+   */
+  public handleClick(screenX: number, screenY: number, button: number, canvasWidth: number, canvasHeight: number): boolean {
+    console.log(`[InventoryUI] handleClick called: screenX=${screenX}, screenY=${screenY}, button=${button}, canvasW=${canvasWidth}, canvasH=${canvasHeight}, isOpen=${this.isOpenState}`);
+
+    if (!this.isOpenState) {
+      console.log(`[InventoryUI] Inventory not open, returning false`);
+      return false; // Inventory not open, don't handle
+    }
+
+    // IMPORTANT: When inventory is open, ALWAYS consume clicks to prevent game interaction
+    // Even if clicking outside the panel (which closes it), we still handled the click
+    console.log(`[InventoryUI] Inventory is open, will consume this click`);
+
+    // Store canvas dimensions for getSlotAtPosition
+    this.lastCanvasWidth = canvasWidth;
+    this.lastCanvasHeight = canvasHeight;
+
+    // Calculate panel bounds
+    const panelWidth = Math.min(800, canvasWidth - 40);
+    const panelHeight = Math.min(600, canvasHeight - 40);
+    const panelX = (canvasWidth - panelWidth) / 2;
+    const panelY = (canvasHeight - panelHeight) / 2;
+
+    console.log(`[InventoryUI] Panel bounds: x=${panelX}-${panelX + panelWidth}, y=${panelY}-${panelY + panelHeight}`);
+
+    // Check if click is inside inventory panel bounds
+    const isInsidePanel =
+      screenX >= panelX &&
+      screenX <= panelX + panelWidth &&
+      screenY >= panelY &&
+      screenY <= panelY + panelHeight;
+
+    console.log(`[InventoryUI] Click isInsidePanel: ${isInsidePanel} (checks: x=${screenX >= panelX && screenX <= panelX + panelWidth}, y=${screenY >= panelY && screenY <= panelY + panelHeight})`);
+
+    if (!isInsidePanel) {
+      // Click outside panel - close inventory (backdrop click)
+      console.log(`[InventoryUI] Click outside panel, closing inventory`);
+      this.isOpenState = false;
+      return true; // Consumed the click
+    }
+
+    // Click is inside panel - handle item interaction
+    console.log(`[InventoryUI] Click inside panel, checking for item click`);
+
+    // Check if clicking on a backpack slot
+    const clickedSlot = this.getSlotAtPosition(screenX, screenY);
+    if (clickedSlot && clickedSlot.index !== undefined && this.playerInventory) {
+      const slot = this.playerInventory.slots[clickedSlot.index];
+      console.log(`[InventoryUI] Clicked on slot ${clickedSlot.index}, item=${slot?.itemId || 'empty'}`);
+
+      if (button === 0) {
+        // Left click - start drag or select item
+        if (slot && slot.itemId && slot.quantity > 0) {
+          console.log(`[InventoryUI] Starting drag for item ${slot.itemId}`);
+          this.startDrag(clickedSlot.index, screenX, screenY);
+        }
+      } else if (button === 2) {
+        // Right click - context menu (not implemented yet)
+        console.log(`[InventoryUI] Right-click on slot ${clickedSlot.index} - context menu not yet implemented`);
+      }
+    }
+
+    return true; // Always consume clicks inside inventory panel
+  }
+
+  /**
    * Render the inventory UI to canvas
    */
   public render(ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number): void {
     if (!this.isOpenState) {
       return; // Don't render if closed
     }
+
+    // Store canvas dimensions for slot position calculations
+    this.lastCanvasWidth = canvasWidth;
+    this.lastCanvasHeight = canvasHeight;
 
     // Calculate panel dimensions and position (centered)
     const panelWidth = Math.min(800, canvasWidth - 40);
@@ -589,20 +692,183 @@ export class InventoryUI {
       // TODO: Draw quick bar item if assigned
       // For now, just show empty slots
     }
+
+    // Render tooltip if hovering over item
+    if (this.hoveredSlot && this.playerInventory) {
+      this.renderTooltip(ctx);
+    }
+  }
+
+  /**
+   * Render tooltip for hovered item
+   */
+  private renderTooltip(ctx: CanvasRenderingContext2D): void {
+    console.log('[InventoryUI] renderTooltip called, hoveredSlot:', this.hoveredSlot);
+
+    if (!this.hoveredSlot || !this.playerInventory) {
+      console.log('[InventoryUI] renderTooltip early return: no hoveredSlot or playerInventory');
+      return;
+    }
+
+    // Get slot and item
+    const slotIndex = this.hoveredSlot.index;
+    if (slotIndex === undefined || slotIndex >= this.playerInventory.slots.length) {
+      console.log('[InventoryUI] renderTooltip early return: invalid slotIndex', slotIndex);
+      return;
+    }
+
+    const slot = this.playerInventory.slots[slotIndex];
+    if (!slot || !slot.itemId) {
+      console.log('[InventoryUI] renderTooltip early return: no slot or itemId');
+      return;
+    }
+
+    console.log('[InventoryUI] Rendering tooltip for item:', slot.itemId, 'at index:', slotIndex);
+
+    // Get tooltip position
+    const pos = this.tooltip.getPosition();
+    console.log('[InventoryUI] Tooltip position:', pos);
+
+    // Get tooltip content
+    const content = this.tooltip.getContent();
+    const rendering = this.tooltip.getRendering();
+
+    // Tooltip dimensions
+    const tooltipWidth = 220;
+    const lineHeight = 18;
+    const padding = 10;
+    const lines: string[] = [];
+
+    // Build tooltip lines
+    lines.push(content.name); // Item name
+    if (content.rarity) {
+      lines.push(`Rarity: ${content.rarity}`);
+    }
+    if (content.type) {
+      lines.push(`Type: ${content.type}`);
+    }
+    if (content.description) {
+      lines.push(''); // Blank line
+      lines.push(content.description);
+    }
+    if (content.value !== undefined) {
+      lines.push(''); // Blank line
+      lines.push(`Value: ${content.value} gold`);
+    }
+
+    // Add stats
+    for (const line of rendering.lines) {
+      lines.push(`${line.label}: ${line.text}`);
+    }
+
+    const tooltipHeight = lines.length * lineHeight + padding * 2;
+
+    // Draw tooltip background
+    ctx.fillStyle = 'rgba(20, 15, 10, 0.95)';
+    ctx.fillRect(pos.x, pos.y, tooltipWidth, tooltipHeight);
+
+    // Draw tooltip border
+    ctx.strokeStyle = rendering.nameColor;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(pos.x, pos.y, tooltipWidth, tooltipHeight);
+
+    // Draw tooltip text
+    ctx.font = '14px monospace';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+
+    let currentY = pos.y + padding;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (!line) {
+        continue; // Skip empty/undefined lines
+      }
+
+      // First line (name) uses rarity color
+      if (i === 0) {
+        ctx.fillStyle = rendering.nameColor;
+        ctx.font = 'bold 14px monospace';
+      } else {
+        ctx.fillStyle = '#DDD';
+        ctx.font = '14px monospace';
+      }
+
+      // Find corresponding rendering line for stat coloring
+      const renderLine = rendering.lines.find((rl) => line.startsWith(rl.label));
+      if (renderLine) {
+        if (renderLine.color === 'green') {
+          ctx.fillStyle = '#1eff00';
+        } else if (renderLine.color === 'red') {
+          ctx.fillStyle = '#ff4444';
+        }
+      }
+
+      ctx.fillText(line, pos.x + padding, currentY);
+      currentY += lineHeight;
+    }
   }
 
   // Private helper methods
 
   /**
-   * Get slot at screen position (simplified for testing)
+   * Get slot at screen position
+   * Calculates which backpack or equipment slot the mouse is over
+   * IMPORTANT: x and y are in CSS pixels, canvasWidth/Height from last render call
    */
   private getSlotAtPosition(x: number, y: number): SlotReference | null {
-    // Simplified: if x/y in certain range, return first slot
-    // Real implementation would calculate grid position
-    if (x >= 50 && x <= 150 && y >= 150 && y <= 250) {
-      return { type: 'backpack', index: 0 };
+    if (!this.lastCanvasWidth || !this.lastCanvasHeight) {
+      return null;
     }
+
+    // Calculate panel bounds (same as in render)
+    const panelWidth = Math.min(800, this.lastCanvasWidth - 40);
+    const panelHeight = Math.min(600, this.lastCanvasHeight - 40);
+    const panelX = (this.lastCanvasWidth - panelWidth) / 2;
+    const panelY = (this.lastCanvasHeight - panelHeight) / 2;
+
+    // Calculate backpack grid position
+    const backpackX = panelX + panelWidth / 2;
+    const sectionY = panelY + 60;
+
+    // Search box area (top right of backpack) - for reference, not used in slot detection yet
+    const searchBoxHeight = 24;
+    const searchBoxY = sectionY - 4;
+
+    // Filter controls area
+    const filterY = searchBoxY + searchBoxHeight + 8;
+    const filterButtonHeight = 20;
+
+    // Grid starts below filters
+    const gridStartY = filterY + filterButtonHeight + 12;
+    const slotSize = this.gridLayout.slotSize;
+    const spacing = this.gridLayout.spacing;
+
+    // Check if mouse is over backpack grid
+    for (let row = 0; row < this.gridLayout.rows; row++) {
+      for (let col = 0; col < this.gridLayout.columns; col++) {
+        const slotIndex = row * this.gridLayout.columns + col;
+        const slotX = backpackX + col * (slotSize + spacing);
+        const slotY = gridStartY + row * (slotSize + spacing);
+
+        if (
+          x >= slotX &&
+          x <= slotX + slotSize &&
+          y >= slotY &&
+          y <= slotY + slotSize
+        ) {
+          return { type: 'backpack', index: slotIndex };
+        }
+      }
+    }
+
+    // TODO: Check equipment slots (not implemented yet)
+    // TODO: Check quick bar slots (not implemented yet)
 
     return null;
   }
+
+  // Store last canvas dimensions for slot position calculations
+  private lastCanvasWidth: number = 0;
+  private lastCanvasHeight: number = 0;
 }

@@ -18,6 +18,7 @@ import {
   WeatherSystem,
   SoilSystem,
   PlantSystem,
+  PlantComponent,
   TimeSystem,
   SleepSystem,
   AnimalSystem,
@@ -198,19 +199,44 @@ async function createInitialPlants(world: WorldMutator) {
     // Edible plants (berry bushes) always spawn mature at game start so agents have food
     // Non-edible plants can vary for visual diversity
     const isEdibleSpecies = species.id === 'berry-bush';
-    let stage: 'sprout' | 'vegetative' | 'mature';
-    if (isEdibleSpecies) {
+
+    // For seed system testing: create some plants in seeding stage or near transition
+    // First 5 plants: mix of seeding (for immediate dispersal) and near-transition (for observation)
+    let stage: 'sprout' | 'vegetative' | 'mature' | 'seeding';
+    let stageProgress = 0;
+    let age = 20;
+
+    if (i < 5) {
+      // First 5 plants are in varied states to demonstrate seed mechanics
+      if (i < 2) {
+        // First 2: already in seeding stage (will disperse seeds immediately)
+        stage = 'seeding';
+        age = 25;
+        stageProgress = 0.3; // Partway through seeding stage
+      } else {
+        // Next 3: mature and near transition (will transition soon)
+        stage = 'mature';
+        age = 20;
+        stageProgress = 0.9; // 90% of the way to seeding - will transition in ~1-2 game hours
+      }
+    } else if (isEdibleSpecies) {
       stage = 'mature'; // Always mature for food
+      age = 20;
+      stageProgress = 0;
     } else {
       // Non-edible: random stage for variety
       const stages: Array<'sprout' | 'vegetative' | 'mature'> = ['sprout', 'vegetative', 'vegetative', 'mature', 'mature'];
-      stage = stages[Math.floor(Math.random() * stages.length)];
+      stage = stages[Math.floor(Math.random() * stages.length)] as any;
+      age = stage === 'mature' ? 20 : (stage === 'vegetative' ? 10 : 5);
+      stageProgress = 0;
     }
 
-    // Calculate initial seeds for mature plants
-    // (They would have produced seeds when transitioning to mature stage)
+    // Calculate initial seeds based on stage
+    // Seeding stage would have produced seeds at mature AND when transitioning to seeding
     const yieldAmount = species.baseGenetics.yieldAmount;
-    const initialSeeds = stage === 'mature' ? Math.floor(species.seedsPerPlant * yieldAmount) : 0;
+    const initialSeeds = stage === 'seeding'
+      ? Math.floor(species.seedsPerPlant * yieldAmount * 2) // Double seeds for seeding stage
+      : (stage === 'mature' ? Math.floor(species.seedsPerPlant * yieldAmount) : 0);
 
     // Calculate initial fruitCount for mature berry bushes
     // Berry bushes spawn 6-12 flowers that become fruit
@@ -225,13 +251,14 @@ async function createInitialPlants(world: WorldMutator) {
       speciesId: species.id,
       position: { x, y },
       stage,
-      age: stage === 'mature' ? 20 : (stage === 'vegetative' ? 10 : 5),
+      stageProgress, // Set explicit progress for seed testing
+      age,
       generation: 0,
       health: 80 + Math.random() * 20,
       hydration: 50 + Math.random() * 30,
       nutrition: 50 + Math.random() * 30,
       genetics: { ...species.baseGenetics }, // Use species' base genetics
-      seedsProduced: initialSeeds, // Pre-populate seeds for mature plants
+      seedsProduced: initialSeeds, // Pre-populate seeds for mature/seeding plants
       fruitCount: initialFruit // Pre-populate fruit for mature edible plants
     });
 
@@ -243,7 +270,7 @@ async function createInitialPlants(world: WorldMutator) {
     plantEntity.addComponent(createRenderableComponent(species.id, 'plant'));
     (world as any)._addEntity(plantEntity);
 
-    console.log(`Created ${species.name} (${stage}) at (${x.toFixed(1)}, ${y.toFixed(1)}) - Entity ${plantEntity.id} - seedsProduced=${plantComponent.seedsProduced}, fruitCount=${plantComponent.fruitCount}`);
+    console.log(`Created ${species.name} (${stage}, progress=${(stageProgress * 100).toFixed(0)}%) at (${x.toFixed(1)}, ${y.toFixed(1)}) - Entity ${plantEntity.id} - seedsProduced=${plantComponent.seedsProduced}, fruitCount=${plantComponent.fruitCount}`);
   }
 
   console.log(`Created ${plantCount} wild plants`);
@@ -795,6 +822,8 @@ async function main() {
     const { agentId, plantId } = event.data;
     console.log(`[Main] Received gather_seeds action request from agent ${agentId.slice(0,8)} for plant ${plantId.slice(0,8)}`);
 
+    const MAX_GATHER_DISTANCE = Math.sqrt(2); // Must be adjacent (including diagonal)
+
     // Verify agent exists
     const agent = gameLoop.world.getEntity(agentId);
     if (!agent) {
@@ -809,7 +838,80 @@ async function main() {
       return;
     }
 
-    // Submit gather_seeds action to ActionQueue
+    // Get agent and plant positions
+    const agentPos = agent.getComponent('position') as any;
+    const plantPos = plant.getComponent('position') as any;
+
+    if (!agentPos || !plantPos) {
+      console.error(`[Main] Agent or plant missing position component`);
+      return;
+    }
+
+    // Check if agent is close enough to gather
+    const dx = plantPos.x - agentPos.x;
+    const dy = plantPos.y - agentPos.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance > MAX_GATHER_DISTANCE) {
+      // Agent is too far - teleport them to an adjacent position
+      console.log(`[Main] Agent is ${distance.toFixed(2)} tiles away from plant (max: ${MAX_GATHER_DISTANCE.toFixed(2)})`);
+      console.log(`[Main] Teleporting agent from (${agentPos.x}, ${agentPos.y}) to adjacent position near plant (${plantPos.x}, ${plantPos.y})`);
+
+      // Find best adjacent position (closest to agent's current position)
+      const adjacentOffsets = [
+        { dx: 1, dy: 0 },   // right
+        { dx: 0, dy: 1 },   // down
+        { dx: -1, dy: 0 },  // left
+        { dx: 0, dy: -1 },  // up
+        { dx: 1, dy: 1 },   // diagonal down-right
+        { dx: -1, dy: 1 },  // diagonal down-left
+        { dx: 1, dy: -1 },  // diagonal up-right
+        { dx: -1, dy: -1 }, // diagonal up-left
+      ];
+
+      let bestPos = { x: plantPos.x + 1, y: plantPos.y }; // default: to the right
+      let bestDist = Infinity;
+
+      for (const offset of adjacentOffsets) {
+        const adjX = plantPos.x + offset.dx;
+        const adjY = plantPos.y + offset.dy;
+        const adjDx = adjX - agentPos.x;
+        const adjDy = adjY - agentPos.y;
+        const adjDist = Math.sqrt(adjDx * adjDx + adjDy * adjDy);
+
+        if (adjDist < bestDist) {
+          bestDist = adjDist;
+          bestPos = { x: adjX, y: adjY };
+        }
+      }
+
+      console.log(`[Main] Teleporting agent to (${bestPos.x}, ${bestPos.y}) before gathering`);
+
+      // Teleport agent to adjacent position
+      const newChunkX = Math.floor(bestPos.x / 32);
+      const newChunkY = Math.floor(bestPos.y / 32);
+      agent.updateComponent('position', (current: any) => ({
+        ...current,
+        x: bestPos.x,
+        y: bestPos.y,
+        chunkX: newChunkX,
+        chunkY: newChunkY,
+      }));
+
+      // Stop any existing movement
+      agent.updateComponent('movement', (current: any) => ({
+        ...current,
+        targetX: null,
+        targetY: null,
+        velocityX: 0,
+        velocityY: 0,
+        isMoving: false,
+      }));
+
+      console.log(`[Main] Agent teleported successfully, now adjacent to plant`);
+    }
+
+    // Agent is now adjacent - submit gather_seeds action to ActionQueue
     try {
       const actionId = gameLoop.actionQueue.submit({
         type: 'gather_seeds',
@@ -1141,9 +1243,49 @@ async function main() {
   });
 
   gameLoop.world.eventBus.subscribe('seed:dispersed', (event: any) => {
-    const { position } = event.data;
+    const { position, speciesId, seed } = event.data;
+
+    // REQUIRED: seed must be present in event data
+    if (!seed) {
+      throw new Error(`seed:dispersed event missing required seed object for ${speciesId} at (${position.x}, ${position.y})`);
+    }
+    if (!seed.genetics) {
+      throw new Error(`seed:dispersed event seed missing required genetics for ${speciesId}`);
+    }
+
     const floatingTextRenderer = renderer.getFloatingTextRenderer();
     floatingTextRenderer.add('🌰 Seed', position.x * 16, position.y * 16, '#8B4513', 1500);
+
+    console.log(`[Main] Seed dispersed at (${position.x}, ${position.y}): ${speciesId}`);
+
+    // Create a new plant entity from the dispersed seed
+    // Dispersed seeds start in 'seed' stage and will germinate naturally
+    const worldMutator = (gameLoop as any)._getWorldMutator();
+    const plantEntity = worldMutator.createEntity();
+
+    // Add PlantComponent with inherited genetics from seed
+    const plantComponent = new PlantComponent({
+      speciesId: speciesId,
+      position: { x: position.x, y: position.y },
+      stage: 'seed',
+      age: 0,
+      generation: seed.generation,
+      genetics: seed.genetics,
+      seedsProduced: 0,
+      health: 100,
+      hydration: 50,
+      nutrition: 70,
+    });
+    worldMutator.addComponent(plantEntity.id, plantComponent);
+
+    // Add PositionComponent
+    const positionComponent = createPositionComponent({
+      x: position.x,
+      y: position.y,
+    });
+    worldMutator.addComponent(plantEntity.id, positionComponent);
+
+    console.log(`[Main] Created plant entity ${plantEntity.id.slice(0,8)} from dispersed ${speciesId} seed at (${position.x}, ${position.y})`);
   });
 
   gameLoop.world.eventBus.subscribe('seed:germinated', (event: any) => {
@@ -1154,13 +1296,39 @@ async function main() {
   });
 
   gameLoop.world.eventBus.subscribe('seed:gathered', (event: any) => {
-    const { seedsGathered, speciesId, plantHealth, plantStage } = event.data;
+    const { seedsGathered, speciesId, plantHealth, plantStage, plantId } = event.data;
     console.log(`[Main] 🌰 Seed gathered: ${seedsGathered}x ${speciesId} (health: ${plantHealth}, stage: ${plantStage})`);
+    showNotification(`🌰 Gathered ${seedsGathered}x ${speciesId} seeds`, '#8B4513');
+
+    // Show floating text at plant position
+    if (plantId) {
+      const plant = gameLoop.world.getEntity(plantId);
+      if (plant) {
+        const position = plant.getComponent('position');
+        if (position) {
+          const floatingTextRenderer = renderer.getFloatingTextRenderer();
+          floatingTextRenderer.add(`🌰 +${seedsGathered}`, (position as any).x * 16, (position as any).y * 16, '#8B4513', 2000);
+        }
+      }
+    }
   });
 
   gameLoop.world.eventBus.subscribe('seed:harvested', (event: any) => {
-    const { seedsHarvested, speciesId, generation } = event.data;
+    const { seedsHarvested, speciesId, generation, plantId } = event.data;
     console.log(`[Main] 🌾 Seeds harvested: ${seedsHarvested}x ${speciesId} (gen ${generation})`);
+    showNotification(`🌾 Harvested ${seedsHarvested}x ${speciesId} seeds (gen ${generation})`, '#FFD700');
+
+    // Show floating text at plant position
+    if (plantId) {
+      const plant = gameLoop.world.getEntity(plantId);
+      if (plant) {
+        const position = plant.getComponent('position');
+        if (position) {
+          const floatingTextRenderer = renderer.getFloatingTextRenderer();
+          floatingTextRenderer.add(`🌾 +${seedsHarvested} seeds`, (position as any).x * 16, (position as any).y * 16, '#FFD700', 2000);
+        }
+      }
+    }
   });
 
   gameLoop.world.eventBus.subscribe('plant:healthChanged', (event: any) => {
@@ -1610,6 +1778,14 @@ async function main() {
       console.log(`[Main] onMouseClick: (${screenX}, ${screenY}), button=${button}`);
       const rect = canvas.getBoundingClientRect();
 
+      // Check if inventory UI handles the click (highest priority)
+      // Use CSS dimensions (rect.width/height) not buffer dimensions (canvas.width/height)
+      const inventoryHandled = inventoryUI.handleClick(screenX, screenY, button, rect.width, rect.height);
+      console.log(`[Main] inventoryUI.handleClick returned: ${inventoryHandled}`);
+      if (inventoryHandled) {
+        return true;
+      }
+
       // First check if resources panel handles the click (collapse/expand)
       const agentPanelOpen = agentInfoPanel.getSelectedEntityId() !== null;
       const resourcesHandled = resourcesPanel.handleClick(screenX, screenY, rect.width, agentPanelOpen);
@@ -1694,6 +1870,15 @@ async function main() {
       return false;
     },
     onMouseMove: (screenX, screenY) => {
+      const rect = canvas.getBoundingClientRect();
+
+      // Check if inventory UI handles mouse move (for tooltips)
+      // Use CSS dimensions (rect.width/height) not buffer dimensions (canvas.width/height)
+      const inventoryHandled = inventoryUI.handleMouseMove(screenX, screenY, rect.width, rect.height);
+      if (inventoryHandled) {
+        return; // Inventory open, don't update placement cursor
+      }
+
       placementUI.updateCursorPosition(screenX, screenY, gameLoop.world);
     },
   });
@@ -1711,11 +1896,14 @@ async function main() {
 
     // Update inventory UI with player/selected agent's inventory
     // If no agent selected, use first agent's inventory as "player"
-    const selectedAgentEntity = agentInfoPanel.getSelectedEntity();
-    if (selectedAgentEntity) {
-      const inventory = selectedAgentEntity.getComponent('inventory');
-      if (inventory && inventory.type === 'inventory') {
-        inventoryUI.setPlayerInventory(inventory);
+    const selectedAgentId = agentInfoPanel.getSelectedEntityId();
+    if (selectedAgentId) {
+      const selectedAgentEntity = gameLoop.world.getEntity(selectedAgentId);
+      if (selectedAgentEntity) {
+        const inventory = selectedAgentEntity.getComponent('inventory');
+        if (inventory && inventory.type === 'inventory') {
+          inventoryUI.setPlayerInventory(inventory);
+        }
       }
     } else {
       // No agent selected - try to find first agent with inventory
@@ -1741,6 +1929,7 @@ async function main() {
     memoryPanel.render(ctx, rect.width, rect.height, gameLoop.world); // Memory panel (M to toggle)
 
     // Render inventory UI (I or Tab to toggle) - Phase 10
+    // Use CSS dimensions (rect.width/height) not buffer dimensions (canvas.width/height)
     inventoryUI.render(ctx, rect.width, rect.height);
 
     requestAnimationFrame(renderLoop);
@@ -2045,7 +2234,54 @@ async function main() {
   (window as any).agentInfoPanel = agentInfoPanel;
   (window as any).animalInfoPanel = animalInfoPanel;
 
+  // Expose testing API for automated tests and debugging
+  (window as any).__gameTest = {
+    // Core systems
+    world: gameLoop.world,
+    gameLoop,
+    renderer,
+    eventBus: gameLoop.world.eventBus,
+
+    // Building systems
+    placementUI,
+    blueprintRegistry,
+    getAllBlueprints: () => blueprintRegistry.getAll(),
+    getBlueprintsByCategory: (category: string) =>
+      blueprintRegistry.getByCategory(category as any),
+    getUnlockedBlueprints: () => blueprintRegistry.getUnlocked(),
+
+    // Helper functions for testing
+    placeBuilding: (blueprintId: string, x: number, y: number) => {
+      gameLoop.world.eventBus.emit({
+        type: 'building:placement:confirmed',
+        source: 'test',
+        data: { blueprintId, position: { x, y }, rotation: 0 }
+      });
+    },
+
+    getBuildings: () => {
+      const buildings: any[] = [];
+      gameLoop.world.getEntitiesWithComponents(['building']).forEach(entity => {
+        const building = entity.getComponent('building');
+        const position = entity.getComponent('position');
+        buildings.push({
+          entityId: entity.id,
+          type: (building as any).buildingType,
+          position: position ? { x: (position as any).x, y: (position as any).y } : null,
+          building: building
+        });
+      });
+      return buildings;
+    },
+
+    // UI panels
+    agentInfoPanel,
+    animalInfoPanel,
+    resourcesPanel,
+  };
+
   console.log('Building Placement UI ready. Press B to open building menu.');
+  console.log('Test API available at window.__gameTest');
 }
 
 // Start when DOM is ready
