@@ -5,6 +5,7 @@
 export * from './Camera.js';
 export * from './Renderer.js';
 export * from './InputHandler.js';
+export * from './KeyboardRegistry.js';
 export * from './SpriteRenderer.js';
 export * from './FloatingTextRenderer.js';
 export * from './SpeechBubbleRenderer.js';

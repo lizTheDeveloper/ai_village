@@ -14,6 +14,10 @@ export class OllamaProvider implements LLMProvider {
 
   async generate(request: LLMRequest): Promise<LLMResponse> {
     try {
+      // Create AbortController for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
       // Define action tools - simple, no parameters
       const tools = [
         {
@@ -129,7 +133,10 @@ export class OllamaProvider implements LLMProvider {
             num_predict: request.maxTokens ?? 2000,
           },
         }),
+        signal: controller.signal, // Add timeout signal
       });
+
+      clearTimeout(timeoutId); // Clear timeout on successful response
 
       if (!response.ok) {
         throw new Error(`Ollama API error: ${response.status} ${response.statusText}`);

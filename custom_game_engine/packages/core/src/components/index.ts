@@ -30,6 +30,14 @@ export * from './SemanticMemoryComponent.js';
 export * from './SocialMemoryComponent.js';
 export * from './ReflectionComponent.js';
 export * from './JournalComponent.js';
+// Navigation & Exploration components
+export * from './SpatialMemoryComponent.js';
+export * from './TrustNetworkComponent.js';
+export * from './BeliefComponent.js';
+export * from './SocialGradientComponent.js';
+export * from './ExplorationStateComponent.js';
+export * from './SteeringComponent.js';
+export * from './VelocityComponent.js';
 
 // Re-export types explicitly (export * doesn't re-export types)
 export type { AgentBehavior } from './AgentComponent.js';

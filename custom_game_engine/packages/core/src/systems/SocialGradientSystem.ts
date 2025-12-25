@@ -17,13 +17,22 @@ export class SocialGradientSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   // Future: Add event bus support for gradient events
-  private lastProcessedTick: Map<string, number> = new Map();
+  private lastProcessedMessageCount: Map<string, number> = new Map();
+  private lastUpdateTick: number = 0;
+  private readonly updateInterval: number = 20; // Only run once per second (at 20 TPS)
+  private pendingProcessing: string[] = []; // Queue of agent IDs waiting to be processed
+  private readonly maxProcessPerUpdate: number = 2; // Process max 2 agents per update (round-robin)
 
   initialize(_world: World, _eventBus: EventBus): void {
     // Future: Subscribe to speech events via event bus
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
+    // Throttle: Only run once per second instead of 20x per second
+    if (world.tick - this.lastUpdateTick < this.updateInterval) {
+      return;
+    }
+    this.lastUpdateTick = world.tick;
     // Apply gradient decay to all entities
     const gradientsEntities = entities.filter(e => e.components.has('social_gradient'));
 
@@ -39,19 +48,63 @@ export class SocialGradientSystem implements System {
       }
     }
 
-    // Process speech events from event bus
-    // In a real implementation, this would listen to the event bus
-    // For now, we'll scan for agents that just spoke (have ConversationComponent)
+    // OPTIMIZATION: Only process speech when agents have NEW messages
+    // Round-robin scheduling: Queue agents with new messages, process limited number per update
     const agents = entities.filter(e =>
       e.components.has('agent') &&
       e.components.has('conversation')
     );
 
+    // Step 1: Identify agents with new messages and add to pending queue
     for (const agent of agents) {
+      const impl = agent as EntityImpl;
+      const speakerAgent = impl.getComponent('agent') as any;
+      if (!speakerAgent) continue;
+
+      const conversation = impl.getComponent('conversation') as any;
+      if (!conversation || !conversation.recentMessages || conversation.recentMessages.length === 0) {
+        continue;
+      }
+
+      const speakerId = speakerAgent.id;
+      const messageCount = conversation.recentMessages.length;
+      const lastCount = this.lastProcessedMessageCount.get(speakerId) ?? 0;
+
+      // Queue agent if there are new messages and not already queued
+      if (messageCount > lastCount && !this.pendingProcessing.includes(speakerId)) {
+        this.pendingProcessing.push(speakerId);
+      }
+    }
+
+    // Step 2: Process up to maxProcessPerUpdate agents from the queue (round-robin)
+    const processCount = Math.min(this.maxProcessPerUpdate, this.pendingProcessing.length);
+    for (let i = 0; i < processCount; i++) {
+      const speakerId = this.pendingProcessing.shift();
+      if (!speakerId) break;
+
       try {
+        // Find the agent entity by ID
+        const agent = entities.find(e => {
+          if (e.components.has('agent')) {
+            const agentComp = e.components.get('agent') as any;
+            return agentComp?.id === speakerId;
+          }
+          return e.id === speakerId;
+        });
+
+        if (!agent) continue;
+
+        const impl = agent as EntityImpl;
+        const conversation = impl.getComponent('conversation') as any;
+        if (!conversation) continue;
+
+        // Process this agent's speech
         this._processSpeech(agent, entities, world, currentTick);
+
+        // Update the message count to mark as processed
+        this.lastProcessedMessageCount.set(speakerId, conversation.recentMessages.length);
       } catch (error) {
-        throw new Error(`SocialGradientSystem failed for entity ${agent.id}: ${error}`);
+        throw new Error(`SocialGradientSystem failed for agent ${speakerId}: ${error}`);
       }
     }
   }
@@ -68,18 +121,11 @@ export class SocialGradientSystem implements System {
 
     const speakerId = speakerAgent.id;
 
-    // Get the most recent message
+    // Get the most recent message (the new one that triggered this processing)
     const messages = conversation.recentMessages;
     const lastMessage = messages[messages.length - 1];
 
     if (!lastMessage || !lastMessage.content) return;
-
-    // Skip if we've already processed this message
-    const messageKey = `${speakerId}:${currentTick}`;
-    if (this.lastProcessedTick.get(messageKey) === currentTick) {
-      return;
-    }
-    this.lastProcessedTick.set(messageKey, currentTick);
 
     // Parse gradients from speech
     const gradients = GradientParser.parseAll(lastMessage.content);

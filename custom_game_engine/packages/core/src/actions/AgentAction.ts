@@ -12,6 +12,11 @@ export type AgentAction =
   | { type: 'move'; target: Position }
   | { type: 'wander' }
   | { type: 'follow'; targetId: string }
+  // Navigation & Exploration (Phase 4.5)
+  | { type: 'navigate'; target: Position }
+  | { type: 'explore_frontier' }
+  | { type: 'explore_spiral' }
+  | { type: 'follow_gradient'; resourceType?: string }
 
   // Social
   | { type: 'talk'; targetId: string; topic?: string }
@@ -65,6 +70,30 @@ export function parseAction(response: string): AgentAction | null {
   }
 
   // Keyword-based parsing for natural language responses
+
+  // Navigation actions (check before generic 'explore')
+  if (cleaned.includes('navigate') || cleaned.includes('go to')) {
+    // Try to extract coordinates from "navigate to x,y" or "go to 10,20"
+    const coordMatch = cleaned.match(/(?:navigate\s+to|go\s+to)\s*(-?\d+)\s*,\s*(-?\d+)/);
+    if (coordMatch && coordMatch[1] && coordMatch[2]) {
+      return { type: 'navigate', target: { x: parseInt(coordMatch[1], 10), y: parseInt(coordMatch[2], 10) } };
+    }
+    return { type: 'navigate', target: { x: 0, y: 0 } }; // Default to origin
+  }
+
+  if (cleaned.includes('explore_frontier') || cleaned.includes('explore frontier')) {
+    return { type: 'explore_frontier' };
+  }
+
+  if (cleaned.includes('explore_spiral') || cleaned.includes('explore spiral')) {
+    return { type: 'explore_spiral' };
+  }
+
+  if (cleaned.includes('follow_gradient') || cleaned.includes('follow gradient')) {
+    return { type: 'follow_gradient' };
+  }
+
+  // Generic explore becomes wander
   if (cleaned.includes('wander') || cleaned.includes('explore')) {
     return { type: 'wander' };
   }
@@ -185,7 +214,8 @@ export function isValidAction(action: unknown): boolean {
     'move', 'wander', 'follow', 'talk', 'help',
     'forage', 'pickup', 'eat', 'chop', 'mine',
     'build', 'construct', 'idle', 'rest',
-    'till', 'water', 'fertilize', 'plant', 'harvest', 'gather_seeds'
+    'till', 'water', 'fertilize', 'plant', 'harvest', 'gather_seeds',
+    'navigate', 'explore_frontier', 'explore_spiral', 'follow_gradient'
   ];
 
   return validTypes.includes(a.type);
@@ -225,6 +255,15 @@ export function actionToBehavior(action: AgentAction): AgentBehavior {
       return 'idle';
     case 'move':
       return 'wander'; // TODO: Implement proper pathfinding
+    // Navigation & Exploration (Phase 4.5)
+    case 'navigate':
+      return 'navigate';
+    case 'explore_frontier':
+      return 'explore_frontier';
+    case 'explore_spiral':
+      return 'explore_spiral';
+    case 'follow_gradient':
+      return 'follow_gradient';
     default:
       return 'wander';
   }

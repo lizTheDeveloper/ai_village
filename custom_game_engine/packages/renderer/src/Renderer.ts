@@ -28,6 +28,7 @@ export class Renderer {
 
   private tileSize = 16; // Pixels per tile at zoom=1
   private hasLoggedTilledTile = false; // Debug flag to log first tilled tile rendering
+  private showTemperatureOverlay = false; // Debug flag to show temperature on tiles
 
   constructor(canvas: HTMLCanvasElement, seed: string = 'default') {
     this.canvas = canvas;
@@ -90,6 +91,20 @@ export class Renderer {
    */
   getParticleRenderer(): ParticleRenderer {
     return this.particleRenderer;
+  }
+
+  /**
+   * Toggle temperature overlay display.
+   */
+  toggleTemperatureOverlay(): void {
+    this.showTemperatureOverlay = !this.showTemperatureOverlay;
+  }
+
+  /**
+   * Get current temperature overlay state.
+   */
+  isTemperatureOverlayEnabled(): boolean {
+    return this.showTemperatureOverlay;
   }
 
   /**
@@ -210,19 +225,18 @@ export class Renderer {
 
     console.log(`[Renderer] Checked ${agentCount} agents, closestEntity: ${closestEntity ? closestEntity.id : 'null'}, closestDistance: ${closestDistance === Infinity ? 'Infinity' : closestDistance.toFixed(1)}, closestAgent: ${closestAgent ? closestAgent.id : 'null'}, closestAgentDistance: ${closestAgentDistance === Infinity ? 'Infinity' : closestAgentDistance.toFixed(1)}`);
 
-    // Return the closest entity overall (could be agent, plant, or building)
-    // If both agent and non-agent are within range, return whichever is closer
+    // PRIORITY: Return agent if one is within range (even if other entities are closer)
+    // This fixes UX issue where clicking on agents would select nearby plants/animals instead
+    if (closestAgent) {
+      console.log(`[Renderer] Returning closest agent (prioritized) at distance ${closestAgentDistance.toFixed(1)}`);
+      return closestAgent;
+    }
+
+    // Fall back to closest non-agent entity (plant, animal, building, etc.)
     if (closestEntity) {
-      // Check if the closest entity is an agent
       const isAgent = closestEntity.components.has('agent');
       console.log(`[Renderer] Returning closest entity (${isAgent ? 'agent' : 'non-agent'}) at distance ${closestDistance.toFixed(1)}`);
       return closestEntity;
-    }
-
-    // If we found an agent but no other entities, return the agent
-    if (closestAgent) {
-      console.log(`[Renderer] Returning closest agent (no other entities in range)`);
-      return closestAgent;
     }
 
     // If no entity found within radius, select the closest agent if it's reasonably close (within full viewport)
@@ -658,6 +672,42 @@ export class Renderer {
           this.ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)'; // Gold
           this.ctx.lineWidth = Math.max(1, this.camera.zoom);
           this.ctx.strokeRect(screen.x, screen.y, tilePixelSize, tilePixelSize);
+        }
+
+        // Draw temperature overlay (debug feature)
+        // Note: Temperature is not currently stored per-tile, but this allows for future expansion
+        const tileWithTemp = tile as any;
+        if (this.showTemperatureOverlay && tileWithTemp.temperature !== undefined) {
+          // Draw semi-transparent background for readability
+          this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+          this.ctx.fillRect(screen.x + 2, screen.y + 2, tilePixelSize - 4, tilePixelSize - 4);
+
+          // Color-code temperature: cold = blue, warm = orange, hot = red
+          let tempColor = '#FFFFFF';
+          const temp = tileWithTemp.temperature;
+          if (temp < 0) {
+            tempColor = '#4FC3F7'; // Cold blue
+          } else if (temp < 10) {
+            tempColor = '#81C784'; // Cool green
+          } else if (temp < 20) {
+            tempColor = '#FFD54F'; // Mild yellow
+          } else if (temp < 30) {
+            tempColor = '#FFB74D'; // Warm orange
+          } else {
+            tempColor = '#FF6E40'; // Hot red
+          }
+
+          this.ctx.fillStyle = tempColor;
+          this.ctx.font = `bold ${Math.max(8, this.camera.zoom * 8)}px monospace`;
+          this.ctx.textAlign = 'center';
+          this.ctx.textBaseline = 'middle';
+          this.ctx.fillText(
+            Math.round(temp).toString() + '°',
+            screen.x + tilePixelSize / 2,
+            screen.y + tilePixelSize / 2
+          );
+          this.ctx.textAlign = 'left';
+          this.ctx.textBaseline = 'alphabetic';
         }
       }
     }

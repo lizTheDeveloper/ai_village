@@ -10,20 +10,23 @@ export interface TimeComponent {
   type: 'time';
   version: number;
   timeOfDay: number;          // 0-24 hours (continuous)
-  dayLength: number;           // Real-time seconds per game day (default: 600 = 10 min/day)
+  dayLength: number;           // Real-time seconds per game day at 1x speed (default: 48s)
+  speedMultiplier: number;     // Time speed: 1 (48s/day), 2 (24s/day), 4 (12s/day), 8 (6s/day dev speed)
   phase: DayPhase;             // Current phase
   lightLevel: number;          // 0-1 (affects visibility and temperature)
 }
 
 export function createTimeComponent(
   timeOfDay: number = 6,        // Start at dawn
-  dayLength: number = 600       // 10 minutes per game day
+  dayLength: number = 48,       // 48 seconds per game day at 1x speed (20 year generation in 96 hours)
+  speedMultiplier: number = 1   // Default 1x speed
 ): TimeComponent {
   return {
     type: 'time',
     version: 1,
     timeOfDay,
     dayLength,
+    speedMultiplier,
     phase: calculatePhase(timeOfDay),
     lightLevel: calculateLightLevel(timeOfDay, calculatePhase(timeOfDay)),
   };
@@ -78,8 +81,12 @@ export class TimeSystem implements System {
       const time = impl.getComponent<TimeComponent>('time');
       if (!time) continue;
 
+      // Calculate effective day length based on speed multiplier
+      // 1x = 48s/day, 2x = 24s/day, 4x = 12s/day
+      const effectiveDayLength = time.dayLength / time.speedMultiplier;
+
       // Calculate hours elapsed (deltaTime is in seconds)
-      const hoursElapsed = (deltaTime / time.dayLength) * 24;
+      const hoursElapsed = (deltaTime / effectiveDayLength) * 24;
 
       // Update time of day (wrap at 24)
       let newTimeOfDay = time.timeOfDay + hoursElapsed;
@@ -90,7 +97,7 @@ export class TimeSystem implements System {
         world.eventBus.emit({
           type: 'time:day_changed',
           source: entity.id,
-          data: { newDay: Math.floor((world.tick * deltaTime) / time.dayLength) + 1 },
+          data: { newDay: Math.floor((world.tick * deltaTime) / effectiveDayLength) + 1 },
         });
       }
 

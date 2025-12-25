@@ -138,6 +138,30 @@ export class InventorySearch {
   }
 
   /**
+   * Get current search text
+   */
+  public getSearchText(): string {
+    return this.searchText;
+  }
+
+  /**
+   * Get list of active filters
+   */
+  public getActiveFilters(): string[] {
+    const filters: string[] = [];
+    if (this.searchText) {
+      filters.push(`text:${this.searchText}`);
+    }
+    if (this.typeFilter) {
+      filters.push(`type:${this.typeFilter}`);
+    }
+    if (this.rarityFilter) {
+      filters.push(`rarity:${this.rarityFilter}`);
+    }
+    return filters;
+  }
+
+  /**
    * Get filtered items
    */
   public getFilteredItems(): FilteredItem[] {

@@ -17,12 +17,19 @@ export class VerificationSystem implements System {
 
   private eventBus?: EventBus;
   private readonly verificationRange: number = 5; // Tiles
+  private lastUpdateTick: number = 0;
+  private readonly updateInterval: number = 40; // Only run every 2 seconds (at 20 TPS)
 
   initialize(_world: World, eventBus: EventBus): void {
     this.eventBus = eventBus;
   }
 
   update(_world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
+    // Throttle: Verification doesn't need to happen every frame
+    if (currentTick - this.lastUpdateTick < this.updateInterval) {
+      return;
+    }
+    this.lastUpdateTick = currentTick;
     // Get agents with social gradients (potential verifiers)
     const verifiers = entities.filter(e =>
       e.components.has('agent') &&

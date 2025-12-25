@@ -19,6 +19,13 @@ export function createCircadianComponent(
   });
 }
 
+export interface DreamContent {
+  memoryElements: string[]; // Snippets from memories that appear in dream
+  weirdElement: string; // One surreal/strange element
+  dreamNarrative: string; // The full dream description
+  interpretation: string; // Agent's interpretation upon waking
+}
+
 export interface CircadianComponentData {
   sleepDrive?: number;
   preferredSleepTime?: number;
@@ -27,6 +34,8 @@ export interface CircadianComponentData {
   sleepQuality?: number;
   sleepStartTime?: number | null;
   lastSleepLocation?: Entity | null;
+  lastDream?: DreamContent | null;
+  hasDreamedThisSleep?: boolean;
   genetics?: any; // SleepGenetics type (defined separately)
   energy?: number; // For validation
 }
@@ -40,6 +49,8 @@ export class CircadianComponent extends ComponentBase {
   public sleepQuality: number; // 0-1: affects energy recovery rate
   public sleepStartTime: number | null;
   public lastSleepLocation: Entity | null;
+  public lastDream: DreamContent | null; // Last dream experienced
+  public hasDreamedThisSleep: boolean; // Track if dreamed during current sleep
   public genetics?: any; // Will be typed as SleepGenetics
 
   constructor(data: CircadianComponentData) {
@@ -67,6 +78,8 @@ export class CircadianComponent extends ComponentBase {
     this.sleepQuality = data.sleepQuality ?? 0;
     this.sleepStartTime = data.sleepStartTime ?? null;
     this.lastSleepLocation = data.lastSleepLocation ?? null;
+    this.lastDream = data.lastDream ?? null;
+    this.hasDreamedThisSleep = data.hasDreamedThisSleep ?? false;
     this.genetics = data.genetics;
   }
 
@@ -165,6 +178,7 @@ export class CircadianComponent extends ComponentBase {
     this.lastSleepLocation = this.sleepLocation;
     this.sleepLocation = null;
     this.sleepStartTime = null;
+    this.hasDreamedThisSleep = false; // Reset for next sleep
   }
 
   /**

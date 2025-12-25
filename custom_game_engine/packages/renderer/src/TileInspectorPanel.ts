@@ -506,7 +506,9 @@ export class TileInspectorPanel {
       }
     }
 
-    return true; // Click was inside panel, but not on a button
+    // Click was inside panel but not on a button
+    // Return false to allow camera drag (trade-off: can click "through" panel to select entities)
+    return false;
   }
 
   /**

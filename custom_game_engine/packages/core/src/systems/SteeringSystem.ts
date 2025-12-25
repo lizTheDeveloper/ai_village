@@ -30,6 +30,9 @@ export class SteeringSystem implements System {
   public readonly priority: number = 30; // After AISystem (20), before Movement (40)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
+  // Track stuck agents for pathfinding fallback
+  private stuckTracker: Map<string, { lastPos: Vector2; stuckTime: number; target: Vector2 }> = new Map();
+
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     // Get entities with Steering component
     const steeringEntities = entities.filter(e => e.components.has('Steering'));
@@ -86,7 +89,7 @@ export class SteeringSystem implements System {
         break;
 
       case 'arrive':
-        steeringForce = this._arrive(position, velocity, steering);
+        steeringForce = this._arrive(position, velocity, steering, entity.id);
         break;
 
       case 'obstacle_avoidance':
@@ -148,8 +151,10 @@ export class SteeringSystem implements System {
 
   /**
    * Arrive behavior - slow down when approaching target
+   * Fixed to prevent jittering/oscillation when reaching target
+   * Includes stuck detection for dead-end scenarios
    */
-  private _arrive(position: any, velocity: any, steering: any): Vector2 {
+  private _arrive(position: any, velocity: any, steering: any, entityId?: string): Vector2 {
     if (!steering.target) {
       throw new Error('Arrive behavior requires target position');
     }
@@ -162,10 +167,53 @@ export class SteeringSystem implements System {
     const distance = Math.sqrt(desired.x * desired.x + desired.y * desired.y);
     if (distance === 0) return { x: 0, y: 0 };
 
-    // Check if within arrival tolerance
+    // Stuck detection: Check if agent is making progress toward target
+    if (entityId) {
+      const tracker = this.stuckTracker.get(entityId);
+      const now = Date.now();
+
+      if (!tracker) {
+        // Initialize tracker
+        this.stuckTracker.set(entityId, {
+          lastPos: { x: position.x, y: position.y },
+          stuckTime: now,
+          target: { x: steering.target.x, y: steering.target.y }
+        });
+      } else {
+        // Check if position changed significantly (moved at least 0.5 tiles)
+        const moved = Math.sqrt(
+          Math.pow(position.x - tracker.lastPos.x, 2) +
+          Math.pow(position.y - tracker.lastPos.y, 2)
+        );
+
+        if (moved > 0.5) {
+          // Made progress, reset stuck timer
+          tracker.lastPos = { x: position.x, y: position.y };
+          tracker.stuckTime = now;
+        } else if (now - tracker.stuckTime > 3000) {
+          // Stuck for 3+ seconds - need pathfinding!
+          // For now, just add random jitter to try different angles
+          console.log(`[SteeringSystem] Agent ${entityId} stuck for 3s, adding jitter`);
+          desired.x += (Math.random() - 0.5) * 2;
+          desired.y += (Math.random() - 0.5) * 2;
+          tracker.stuckTime = now; // Reset to prevent spam
+        }
+      }
+    }
+
+    // Dead zone - prevent micro-adjustments when very close
+    const deadZone = steering.deadZone ?? 0.5;
+    if (distance < deadZone) {
+      // Within dead zone - apply strong braking to stop completely
+      return { x: -velocity.vx * 10, y: -velocity.vy * 10 };
+    }
+
+    // Check if already stopped and within tolerance
+    const speed = Math.sqrt(velocity.vx * velocity.vx + velocity.vy * velocity.vy);
     const arrivalTolerance = steering.arrivalTolerance ?? 1.0;
-    if (distance < arrivalTolerance) {
-      // Stop
+
+    if (distance < arrivalTolerance && speed < 0.1) {
+      // Already stopped and close enough - apply gentle brake
       return { x: -velocity.vx, y: -velocity.vy };
     }
 
@@ -174,7 +222,14 @@ export class SteeringSystem implements System {
     let targetSpeed = steering.maxSpeed;
 
     if (distance < slowingRadius) {
-      targetSpeed = steering.maxSpeed * (distance / slowingRadius);
+      // Quadratic slow-down for smoother deceleration
+      const slowFactor = distance / slowingRadius;
+      targetSpeed = steering.maxSpeed * slowFactor * slowFactor;
+
+      // Extra damping when very close to prevent oscillation
+      if (distance < arrivalTolerance * 2) {
+        targetSpeed *= 0.5;
+      }
     }
 
     // Normalize and scale
@@ -188,10 +243,10 @@ export class SteeringSystem implements System {
   }
 
   /**
-   * Obstacle avoidance - ray-cast ahead and steer away
+   * Obstacle avoidance - check only immediate nearby tiles (simplified for performance)
    */
   private _avoidObstacles(entity: Entity, position: any, velocity: any, steering: any, world: World): Vector2 {
-    const lookAheadDistance = steering.lookAheadDistance ?? 5.0;
+    const lookAheadDistance = steering.lookAheadDistance ?? 2.0; // Reduced from 5.0 to 2.0
 
     // Ray-cast ahead
     const speed = Math.sqrt(velocity.vx * velocity.vx + velocity.vy * velocity.vy);
@@ -202,7 +257,8 @@ export class SteeringSystem implements System {
       y: position.y + (velocity.vy / speed) * lookAheadDistance,
     };
 
-    // Find nearby obstacles
+    // OPTIMIZATION: Only check obstacles within a small radius (3 tiles) instead of all entities
+    const checkRadius = 3.0;
     const obstacles = Array.from(world.entities.values()).filter((e: Entity) => {
       if (e.id === entity.id) return false;
       if (!e.components.has('collision')) return false;
@@ -210,6 +266,10 @@ export class SteeringSystem implements System {
       const obstaclePos = e.components.get('position');
       const collision = e.components.get('collision');
       if (!obstaclePos || !collision) return false;
+
+      // Quick distance check to filter out far obstacles BEFORE detailed checks
+      const quickDist = Math.abs((obstaclePos as any).x - position.x) + Math.abs((obstaclePos as any).y - position.y);
+      if (quickDist > checkRadius * 2) return false; // Manhattan distance early exit
 
       // Check if obstacle is in path
       const dist = this._distance(ahead, obstaclePos as any);

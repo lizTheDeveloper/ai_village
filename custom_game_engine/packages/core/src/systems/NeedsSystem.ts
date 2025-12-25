@@ -20,8 +20,10 @@ export class NeedsSystem implements System {
       const timeEntity = timeEntities[0] as EntityImpl;
       const timeComp = timeEntity.getComponent<TimeComponent>('time');
       if (timeComp) {
+        // Calculate effective day length based on speed multiplier
+        const effectiveDayLength = timeComp.dayLength / timeComp.speedMultiplier;
         // Calculate game hours elapsed, then convert to minutes
-        const hoursElapsed = (deltaTime / timeComp.dayLength) * 24;
+        const hoursElapsed = (deltaTime / effectiveDayLength) * 24;
         gameMinutesElapsed = hoursElapsed * 60;
       }
     }

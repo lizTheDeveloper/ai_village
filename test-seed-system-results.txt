@@ -1,0 +1,14 @@
+
+> @ai-village/game-engine@0.1.0 test
+> vitest run SeedSystem.integration.test.ts
+
+
+ RUN  v1.6.1 /Users/annhoward/src/ai_village/custom_game_engine
+
+ ✓ packages/core/src/systems/__tests__/SeedSystem.integration.test.ts  (35 tests) 5ms
+
+ Test Files  1 passed (1)
+      Tests  35 passed (35)
+   Start at  20:25:51
+   Duration  542ms (transform 261ms, setup 327ms, collect 36ms, tests 5ms, environment 0ms, prepare 47ms)
+

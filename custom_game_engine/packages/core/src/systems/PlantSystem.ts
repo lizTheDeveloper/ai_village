@@ -115,10 +115,12 @@ export class PlantSystem implements System {
 
     if (timeEntities.length > 0) {
       const timeEntity = timeEntities[0];
-      const timeComp = timeEntity!.components.get('time') as { dayLength: number } | undefined;
+      const timeComp = timeEntity!.components.get('time') as { dayLength: number; speedMultiplier: number } | undefined;
       if (timeComp) {
+        // Calculate effective day length based on speed multiplier
+        const effectiveDayLength = timeComp.dayLength / timeComp.speedMultiplier;
         // Convert real-time deltaTime to game hours
-        gameHoursElapsed = (deltaTime / timeComp.dayLength) * 24;
+        gameHoursElapsed = (deltaTime / effectiveDayLength) * 24;
       }
     } else {
       // Fallback: assume 10 minutes per day (600 seconds)

@@ -125,8 +125,11 @@ export class BuildingSystem implements System {
       'barn': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
     };
 
-    // Default for unknown types: no fuel required
-    return configs[buildingType] || { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 };
+    const config = configs[buildingType];
+    if (!config) {
+      throw new Error(`Unknown building type: "${buildingType}". Add fuel config to BuildingSystem.ts`);
+    }
+    return config;
   }
 
   /**

@@ -842,6 +842,19 @@ export class StructuredPromptBuilder {
       actions.push('build - Construct a building (say "build <type>": campfire, tent, storage-chest, bed, etc.)');
     }
 
+    // Navigation & Exploration actions (Phase 4.5)
+    actions.push('navigate - Navigate to specific coordinates (say "navigate to x,y" or "go to 10,20")');
+    actions.push('explore_frontier - Explore the edges of known territory systematically');
+    actions.push('explore_spiral - Spiral outward from home base to explore new areas');
+
+    // Only add follow_gradient if agent has SocialGradient component with gradients
+    if (entity && entity.components.has('SocialGradient')) {
+      const socialGradient = entity.components.get('SocialGradient') as any;
+      if (socialGradient && socialGradient.allGradients && socialGradient.allGradients.length > 0) {
+        actions.push('follow_gradient - Follow social hints to find resources others have mentioned');
+      }
+    }
+
     // Debug log final actions list
     console.log('[StructuredPromptBuilder] Final available actions:', actions.map(a => a.split(' - ')[0]));
 

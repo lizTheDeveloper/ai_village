@@ -25,6 +25,8 @@ import {
   TamingSystem,
   WildAnimalSpawningSystem,
   TillActionHandler,
+  GatherSeedsActionHandler,
+  HarvestActionHandler,
   createTimeComponent,
   FERTILIZERS,
   createBuildingComponent,
@@ -36,8 +38,15 @@ import {
   createEntityId,
   type World,
   type WorldMutator,
+  // Navigation & Exploration systems
+  SteeringSystem,
+  ExplorationSystem,
+  VerificationSystem,
+  SocialGradientSystem,
+  BeliefFormationSystem,
+  SpatialMemoryQuerySystem,
 } from '@ai-village/core';
-import { Renderer, InputHandler, BuildingPlacementUI, AgentInfoPanel, AnimalInfoPanel, TileInspectorPanel, PlantInfoPanel, ResourcesPanel, SettingsPanel, MemoryPanel } from '@ai-village/renderer';
+import { Renderer, InputHandler, KeyboardRegistry, BuildingPlacementUI, AgentInfoPanel, AnimalInfoPanel, TileInspectorPanel, PlantInfoPanel, ResourcesPanel, SettingsPanel, MemoryPanel, InventoryUI } from '@ai-village/renderer';
 import {
   OllamaProvider,
   OpenAICompatProvider,
@@ -383,6 +392,8 @@ async function main() {
 
   // Register action handlers
   gameLoop.actionRegistry.register(new TillActionHandler(soilSystemInstance));
+  gameLoop.actionRegistry.register(new GatherSeedsActionHandler());
+  gameLoop.actionRegistry.register(new HarvestActionHandler());
 
   // Register PlantSystem and inject species lookup
   const plantSystem = new PlantSystem(gameLoop.world.eventBus);
@@ -397,6 +408,11 @@ async function main() {
   gameLoop.systemRegistry.register(wildAnimalSpawning);
 
   gameLoop.systemRegistry.register(new AISystem(llmQueue, promptBuilder));
+  // Navigation & Exploration systems (after AI, before Movement)
+  gameLoop.systemRegistry.register(new SocialGradientSystem());
+  gameLoop.systemRegistry.register(new ExplorationSystem());
+  gameLoop.systemRegistry.register(new SteeringSystem());
+  gameLoop.systemRegistry.register(new VerificationSystem());
   gameLoop.systemRegistry.register(new CommunicationSystem());
   gameLoop.systemRegistry.register(new NeedsSystem());
   gameLoop.systemRegistry.register(new SleepSystem());
@@ -418,7 +434,9 @@ async function main() {
 
   // Register episodic memory systems (Phase 10)
   gameLoop.systemRegistry.register(new MemoryFormationSystem(gameLoop.world.eventBus));
+  gameLoop.systemRegistry.register(new SpatialMemoryQuerySystem());
   gameLoop.systemRegistry.register(new MemoryConsolidationSystem(gameLoop.world.eventBus));
+  gameLoop.systemRegistry.register(new BeliefFormationSystem());
   gameLoop.systemRegistry.register(new ReflectionSystem(gameLoop.world.eventBus));
   gameLoop.systemRegistry.register(new JournalingSystem(gameLoop.world.eventBus));
 
@@ -427,6 +445,27 @@ async function main() {
 
   // Create input handler
   const inputHandler = new InputHandler(canvas, renderer.getCamera());
+
+  // Create keyboard registry
+  const keyboardRegistry = new KeyboardRegistry();
+
+  // Register debug keyboard shortcuts
+  keyboardRegistry.register('toggle_temperature', {
+    key: 'T',
+    shift: true,
+    description: 'Toggle temperature overlay on tiles',
+    category: 'Debug',
+    handler: () => {
+      renderer.toggleTemperatureOverlay();
+      const enabled = renderer.isTemperatureOverlayEnabled();
+      showNotification(
+        enabled ? '🌡️ Temperature overlay ON' : '🌡️ Temperature overlay OFF',
+        '#4FC3F7'
+      );
+      console.log(`[Debug] Temperature overlay ${enabled ? 'enabled' : 'disabled'}`);
+      return true;
+    },
+  });
 
   // Create building placement system
   const blueprintRegistry = new BuildingBlueprintRegistry();
@@ -458,6 +497,9 @@ async function main() {
 
   // Create memory panel (M to toggle) - for playtesting Phase 10 episodic memory
   const memoryPanel = new MemoryPanel();
+
+  // Create inventory UI (I or Tab to toggle) - Phase 10 full-featured inventory
+  const inventoryUI = new InventoryUI(canvas, gameLoop.world);
 
   // Generate terrain with trees and rocks first (so we can create tile inspector)
   console.log('Generating terrain...');
@@ -521,6 +563,8 @@ async function main() {
   let notificationTimeout: number | null = null;
 
   function showNotification(message: string, color: string = '#FFFFFF') {
+    console.log(`[showNotification] Called with message="${message}", color=${color}`);
+
     // Clear any existing timeout to prevent flickering
     if (notificationTimeout !== null) {
       clearTimeout(notificationTimeout);
@@ -529,6 +573,8 @@ async function main() {
     notificationEl.textContent = message;
     notificationEl.style.borderColor = color;
     notificationEl.style.display = 'block';
+    notificationEl.style.visibility = 'visible';  // Ensure visibility
+    notificationEl.style.opacity = '1';  // Ensure opacity
 
     // Make error notifications more prominent
     if (color === '#FF0000') {
@@ -544,7 +590,10 @@ async function main() {
     // Show error notifications longer (3s), success notifications normal duration (2s)
     const duration = color === '#FF0000' ? 3000 : 2000;
 
+    console.log(`[showNotification] Notification will hide after ${duration}ms`);
+
     notificationTimeout = window.setTimeout(() => {
+      console.log(`[showNotification] Hiding notification after timeout`);
       notificationEl.style.display = 'none';
       notificationTimeout = null;
     }, duration);
@@ -713,46 +762,136 @@ async function main() {
         type: 'till',
         actorId: agentId,
         targetPosition: { x, y },
+        parameters: {},
+        priority: 1,
       });
 
       console.log(`[Main] Submitted till action ${actionId} for agent ${agentId} at (${x}, ${y})`);
 
-      // Calculate expected duration based on agent's tools
-      // This must match TillActionHandler.getDuration() logic exactly
-      // Base: 10s (200 ticks at 20 TPS)
-      // Hoe: 100% efficiency = 200 ticks = 10s
-      // Shovel: 80% efficiency = 250 ticks = 12.5s
-      // Hands: 50% efficiency = 400 ticks = 20s
-      const inventory = agent.getComponent('inventory') as any;
-      let durationSeconds = 20; // Default to hands (400 ticks / 20 TPS = 20s)
+      // Get duration directly from the action handler to ensure consistency
+      // This avoids duplicating logic and prevents UI/backend mismatches
+      const tillHandler = gameLoop.actionQueue.getHandler('till');
+      let durationSeconds = 20; // Fallback if handler not found
 
-      console.log(`[Main] Checking agent inventory for tool... Inventory exists: ${!!inventory}, Has slots: ${!!inventory?.slots}`);
-
-      if (inventory?.slots) {
-        console.log(`[Main] Inventory slots (${inventory.slots.length}):`, inventory.slots.map((s: any, i: number) => `[${i}]: ${s?.itemId || 'empty'}`).join(', '));
-
-        const hasHoe = inventory.slots.some((slot: any) => slot?.itemId === 'hoe' && slot?.quantity > 0);
-        const hasShovel = inventory.slots.some((slot: any) => slot?.itemId === 'shovel' && slot?.quantity > 0);
-
-        console.log(`[Main] Tool check: hasHoe=${hasHoe}, hasShovel=${hasShovel}`);
-
-        if (hasHoe) {
-          durationSeconds = 10;
-          console.log(`[Main] Agent has hoe - duration: 10s`);
-        } else if (hasShovel) {
-          durationSeconds = 12.5;
-          console.log(`[Main] Agent has shovel - duration: 12.5s`);
-        } else {
-          console.log(`[Main] Agent has no farming tools - duration: 20s (hands)`);
-        }
+      if (tillHandler && typeof tillHandler.getDuration === 'function') {
+        const durationTicks = tillHandler.getDuration(
+          { id: actionId, type: 'till', actorId: agentId, targetPosition: { x, y }, status: 'pending' },
+          gameLoop.world
+        );
+        durationSeconds = durationTicks / 20; // Convert ticks to seconds (20 TPS)
+        console.log(`[Main] Duration from handler: ${durationTicks} ticks = ${durationSeconds}s`);
       } else {
-        console.log(`[Main] Agent has no inventory - duration: 20s (hands)`);
+        console.warn(`[Main] Could not get duration from till handler, using fallback: ${durationSeconds}s`);
       }
 
       showNotification(`Agent will till tile at (${x}, ${y}) (${durationSeconds}s)`, '#8B4513');
     } catch (err: any) {
       console.error(`[Main] Failed to submit till action: ${err.message}`);
       showNotification(`Failed to queue tilling: ${err.message}`, '#FF0000');
+    }
+  });
+
+  gameLoop.world.eventBus.subscribe('action:gather_seeds', (event: any) => {
+    const { agentId, plantId } = event.data;
+    console.log(`[Main] Received gather_seeds action request from agent ${agentId.slice(0,8)} for plant ${plantId.slice(0,8)}`);
+
+    // Verify agent exists
+    const agent = gameLoop.world.getEntity(agentId);
+    if (!agent) {
+      console.error(`[Main] Agent ${agentId} not found for seed gathering`);
+      return;
+    }
+
+    // Verify plant exists
+    const plant = gameLoop.world.getEntity(plantId);
+    if (!plant) {
+      console.error(`[Main] Plant ${plantId} not found for seed gathering`);
+      return;
+    }
+
+    // Submit gather_seeds action to ActionQueue
+    try {
+      const actionId = gameLoop.actionQueue.submit({
+        type: 'gather_seeds',
+        actorId: agentId,
+        targetId: plantId,
+        parameters: {},
+        priority: 1,
+      });
+
+      console.log(`[Main] Submitted gather_seeds action ${actionId} for agent ${agentId.slice(0,8)} targeting plant ${plantId.slice(0,8)}`);
+
+      // Get duration from handler
+      const gatherSeedsHandler = gameLoop.actionQueue.getHandler('gather_seeds');
+      let durationSeconds = 5; // Fallback
+
+      if (gatherSeedsHandler && typeof gatherSeedsHandler.getDuration === 'function') {
+        const durationTicks = gatherSeedsHandler.getDuration(
+          { id: actionId, type: 'gather_seeds', actorId: agentId, targetId: plantId, status: 'pending' },
+          gameLoop.world
+        );
+        durationSeconds = durationTicks / 20; // Convert ticks to seconds (20 TPS)
+        console.log(`[Main] Gather seeds duration: ${durationTicks} ticks = ${durationSeconds}s`);
+      }
+
+      const plantComponent = plant.getComponent('plant') as any;
+      const speciesName = plantComponent?.speciesId || 'plant';
+      showNotification(`Agent gathering seeds from ${speciesName} (${durationSeconds}s)`, '#228B22');
+    } catch (err: any) {
+      console.error(`[Main] Failed to submit gather_seeds action: ${err.message}`);
+      showNotification(`Failed to gather seeds: ${err.message}`, '#FF0000');
+    }
+  });
+
+  gameLoop.world.eventBus.subscribe('action:harvest', (event: any) => {
+    const { agentId, plantId } = event.data;
+    console.log(`[Main] Received harvest action request from agent ${agentId.slice(0,8)} for plant ${plantId.slice(0,8)}`);
+
+    // Verify agent exists
+    const agent = gameLoop.world.getEntity(agentId);
+    if (!agent) {
+      console.error(`[Main] Agent ${agentId} not found for harvesting`);
+      return;
+    }
+
+    // Verify plant exists
+    const plant = gameLoop.world.getEntity(plantId);
+    if (!plant) {
+      console.error(`[Main] Plant ${plantId} not found for harvesting`);
+      return;
+    }
+
+    // Submit harvest action to ActionQueue
+    try {
+      const actionId = gameLoop.actionQueue.submit({
+        type: 'harvest',
+        actorId: agentId,
+        targetId: plantId,
+        parameters: {},
+        priority: 1,
+      });
+
+      console.log(`[Main] Submitted harvest action ${actionId} for agent ${agentId.slice(0,8)} targeting plant ${plantId.slice(0,8)}`);
+
+      // Get duration from handler
+      const harvestHandler = gameLoop.actionQueue.getHandler('harvest');
+      let durationSeconds = 8; // Fallback
+
+      if (harvestHandler && typeof harvestHandler.getDuration === 'function') {
+        const durationTicks = harvestHandler.getDuration(
+          { id: actionId, type: 'harvest', actorId: agentId, targetId: plantId, status: 'pending' },
+          gameLoop.world
+        );
+        durationSeconds = durationTicks / 20; // Convert ticks to seconds (20 TPS)
+        console.log(`[Main] Harvest duration: ${durationTicks} ticks = ${durationSeconds}s`);
+      }
+
+      const plantComponent = plant.getComponent('plant') as any;
+      const speciesName = plantComponent?.speciesId || 'plant';
+      showNotification(`Agent harvesting ${speciesName} (${durationSeconds}s)`, '#FF8C00');
+    } catch (err: any) {
+      console.error(`[Main] Failed to submit harvest action: ${err.message}`);
+      showNotification(`Failed to harvest: ${err.message}`, '#FF0000');
     }
   });
 
@@ -1014,6 +1153,16 @@ async function main() {
     console.log(`[Main] Seed germinated at (${position.x.toFixed(1)}, ${position.y.toFixed(1)})`);
   });
 
+  gameLoop.world.eventBus.subscribe('seed:gathered', (event: any) => {
+    const { seedsGathered, speciesId, plantHealth, plantStage } = event.data;
+    console.log(`[Main] 🌰 Seed gathered: ${seedsGathered}x ${speciesId} (health: ${plantHealth}, stage: ${plantStage})`);
+  });
+
+  gameLoop.world.eventBus.subscribe('seed:harvested', (event: any) => {
+    const { seedsHarvested, speciesId, generation } = event.data;
+    console.log(`[Main] 🌾 Seeds harvested: ${seedsHarvested}x ${speciesId} (gen ${generation})`);
+  });
+
   gameLoop.world.eventBus.subscribe('plant:healthChanged', (event: any) => {
     const { health, position, cause } = event.data;
     if (health < 30) {
@@ -1039,8 +1188,25 @@ async function main() {
     onKeyDown: (key, shiftKey, ctrlKey) => {
       console.log(`[Main] onKeyDown callback: key="${key}", shiftKey=${shiftKey}, ctrlKey=${ctrlKey}`);
 
-      // ESC - Toggle settings panel
+      // Check keyboard registry first
+      if (keyboardRegistry.handleKey(key, shiftKey, ctrlKey)) {
+        return true;
+      }
+
+      // ESC - Close inventory first (if open), otherwise toggle settings panel
       if (key === 'Escape') {
+        if (inventoryUI.isOpen()) {
+          inventoryUI.handleKeyPress(key, shiftKey, ctrlKey);
+          console.log(`[Main] Inventory closed with Escape`);
+
+          // Show controls panel when inventory closes
+          const controlsPanel = document.querySelector('.controls');
+          if (controlsPanel) {
+            controlsPanel.classList.remove('hidden');
+          }
+
+          return true;
+        }
         settingsPanel.toggle();
         return true;
       }
@@ -1058,6 +1224,24 @@ async function main() {
         return true;
       }
 
+      // I or Tab - Toggle inventory (Phase 10)
+      if (key === 'i' || key === 'I' || key === 'Tab') {
+        inventoryUI.handleKeyPress(key, shiftKey, ctrlKey);
+        console.log(`[Main] Inventory ${inventoryUI.isOpen() ? 'opened' : 'closed'}`);
+
+        // Hide/show controls panel when inventory opens/closes
+        const controlsPanel = document.querySelector('.controls');
+        if (controlsPanel) {
+          if (inventoryUI.isOpen()) {
+            controlsPanel.classList.add('hidden');
+          } else {
+            controlsPanel.classList.remove('hidden');
+          }
+        }
+
+        return true;
+      }
+
       // Check if placement UI handles the key first
       const handled = placementUI.handleKeyDown(key, shiftKey);
       console.log(`[Main] placementUI.handleKeyDown returned: ${handled}`);
@@ -1071,9 +1255,13 @@ async function main() {
       const timeEntity = timeEntities.length > 0 ? timeEntities[0] as EntityImpl : null;
       const timeComp = timeEntity?.getComponent<any>('time');
 
-      // 1 - Skip 1 hour
-      if (key === '1') {
-        if (timeComp) {
+      // TIME-SKIP CONTROLS (Shift + 1/2/3)
+      if (shiftKey) {
+        // Shift+1 - Skip 1 hour
+        if (key === '1') {
+          if (!timeComp) {
+            throw new Error('[TimeControls] Cannot skip time: time component not found');
+          }
           const newTime = (timeComp.timeOfDay + 1) % 24;
           const newPhase = calculatePhase(newTime);
           const newLightLevel = calculateLightLevel(newTime, newPhase);
@@ -1084,14 +1272,14 @@ async function main() {
 
           console.log(`[DEBUG] Skipped 1 hour → ${newTime.toFixed(2)}:00 (${newPhase})`);
           showNotification(`⏩ Skipped 1 hour → ${Math.floor(newTime)}:00`, '#FFA500');
+          return true;
         }
-        return true;
-      }
 
-      // 2 - Skip 1 day
-      if (key === '2') {
-        if (timeComp) {
-          // Keep same time, just advance 24 hours
+        // Shift+2 - Skip 1 day
+        if (key === '2') {
+          if (!timeComp) {
+            throw new Error('[TimeControls] Cannot skip time: time component not found');
+          }
           const currentTime = timeComp.timeOfDay;
 
           // Trigger day change event
@@ -1102,14 +1290,15 @@ async function main() {
           });
 
           console.log(`[DEBUG] Skipped 1 day (kept time at ${currentTime.toFixed(2)}:00)`);
-          showNotification(`⏩⏩ Skipped 1 day`, '#FF8C00');
+          showNotification(`⏩ Skipped 1 day`, '#FF8C00');
+          return true;
         }
-        return true;
-      }
 
-      // 3 - Skip 7 days
-      if (key === '3') {
-        if (timeComp) {
+        // Shift+3 - Skip 7 days
+        if (key === '3') {
+          if (!timeComp) {
+            throw new Error('[TimeControls] Cannot skip time: time component not found');
+          }
           const currentTime = timeComp.timeOfDay;
 
           // Trigger 7 day change events
@@ -1122,24 +1311,70 @@ async function main() {
           }
 
           console.log(`[DEBUG] Skipped 7 days (kept time at ${currentTime.toFixed(2)}:00)`);
-          showNotification(`⏩⏩⏩ Skipped 7 days`, '#FF4500');
+          showNotification(`⏩ Skipped 7 days`, '#FF4500');
+          return true;
         }
-        return true;
-      }
+      } else {
+        // SPEED CONTROLS (1/2/3/4 without Shift)
+        // 1 - Normal speed (1x)
+        if (key === '1') {
+          if (!timeComp) {
+            throw new Error('[TimeControls] Cannot set speed: time component not found');
+          }
+          timeEntity!.updateComponent('time', (current: any) => ({
+            ...current,
+            speedMultiplier: 1,
+          }));
 
-      // 1/2/5 - Set time speed multipliers
-      if (key === '1' || key === '2' || key === '5') {
-        if (timeComp) {
-          const multiplier = parseInt(key);
-          timeSpeedMultiplier = multiplier;
-
-          // Update day length (shorter = faster time)
-          (timeComp as any).dayLength = originalDayLength / multiplier;
-
-          console.log(`[DEBUG] Time speed set to ${multiplier}x (day length: ${timeComp.dayLength}s)`);
-          showNotification(`⏱️ Time speed: ${multiplier}x`, '#00CED1');
+          console.log(`[DEBUG] Time speed set to 1x (48s/day)`);
+          showNotification(`⏱️ Time speed: 1x`, '#00CED1');
+          return true;
         }
-        return true;
+
+        // 2 - Medium speed (2x)
+        if (key === '2') {
+          if (!timeComp) {
+            throw new Error('[TimeControls] Cannot set speed: time component not found');
+          }
+          timeEntity!.updateComponent('time', (current: any) => ({
+            ...current,
+            speedMultiplier: 2,
+          }));
+
+          console.log(`[DEBUG] Time speed set to 2x (24s/day)`);
+          showNotification(`⏱️ Time speed: 2x`, '#00CED1');
+          return true;
+        }
+
+        // 3 - Fast speed (4x - Rimworld max)
+        if (key === '3') {
+          if (!timeComp) {
+            throw new Error('[TimeControls] Cannot set speed: time component not found');
+          }
+          timeEntity!.updateComponent('time', (current: any) => ({
+            ...current,
+            speedMultiplier: 4,
+          }));
+
+          console.log(`[DEBUG] Time speed set to 4x (12s/day)`);
+          showNotification(`⏱️ Time speed: 4x`, '#00CED1');
+          return true;
+        }
+
+        // 4 - Dev/Testing speed (8x)
+        if (key === '4') {
+          if (!timeComp) {
+            throw new Error('[TimeControls] Cannot set speed: time component not found');
+          }
+          timeEntity!.updateComponent('time', (current: any) => ({
+            ...current,
+            speedMultiplier: 8,
+          }));
+
+          console.log(`[DEBUG] Time speed set to 8x (6s/day)`);
+          showNotification(`⏱️ Time speed: 8x`, '#00CED1');
+          return true;
+        }
       }
 
       // N - Trigger test memory event for selected agent (for testing episodic memory)
@@ -1161,6 +1396,88 @@ async function main() {
           });
           console.log(`[DEBUG] Triggered test memory event for agent ${selectedEntity.id}`);
           showNotification(`🧠 Test memory event triggered`, '#9370DB');
+        } else {
+          console.log('[DEBUG] No agent selected - click an agent first');
+          showNotification(`⚠️ Select an agent first (click one)`, '#FFA500');
+        }
+        return true;
+      }
+
+      // Q - Queue test behaviors for selected agent (for testing behavior queue)
+      if (key === 'q' || key === 'Q') {
+        const selectedEntityId = agentInfoPanel.getSelectedEntityId();
+        if (selectedEntityId) {
+          const selectedEntity = gameLoop.world.getEntity(selectedEntityId);
+          if (selectedEntity && selectedEntity.components.has('agent')) {
+            const agent = selectedEntity.components.get('agent') as any;
+
+            // Import queue helper functions
+            import('@ai-village/core').then(({ queueBehavior }) => {
+              // Queue a sequence of test behaviors
+              let updatedAgent = queueBehavior(agent, 'gather', {
+                label: 'Gather resources',
+                priority: 'normal',
+              });
+
+              updatedAgent = queueBehavior(updatedAgent, 'deposit_items', {
+                label: 'Deposit at storage',
+                priority: 'normal',
+              });
+
+              updatedAgent = queueBehavior(updatedAgent, 'till', {
+                label: 'Till soil',
+                priority: 'normal',
+              });
+
+              updatedAgent = queueBehavior(updatedAgent, 'farm', {
+                label: 'Plant seeds',
+                priority: 'normal',
+                repeats: 3,
+              });
+
+              // Update the agent component
+              selectedEntity.components.set('agent', updatedAgent);
+
+              console.log(`[DEBUG] Queued 4 behaviors for agent ${selectedEntityId.slice(0, 8)}`);
+              showNotification(`📋 Queued 4 test behaviors`, '#9370DB');
+            }).catch(err => {
+              console.error('[DEBUG] Failed to import queueBehavior:', err);
+              showNotification(`❌ Failed to queue behaviors`, '#FF0000');
+            });
+          } else {
+            console.log('[DEBUG] Selected entity is not an agent');
+            showNotification(`⚠️ Please select an agent`, '#FFA500');
+          }
+        } else {
+          console.log('[DEBUG] No agent selected - click an agent first');
+          showNotification(`⚠️ Select an agent first (click one)`, '#FFA500');
+        }
+        return true;
+      }
+
+      // C - Clear behavior queue for selected agent
+      if (key === 'c' || key === 'C') {
+        const selectedEntityId = agentInfoPanel.getSelectedEntityId();
+        if (selectedEntityId) {
+          const selectedEntity = gameLoop.world.getEntity(selectedEntityId);
+          if (selectedEntity && selectedEntity.components.has('agent')) {
+            const agent = selectedEntity.components.get('agent') as any;
+
+            // Import queue helper functions
+            import('@ai-village/core').then(({ clearBehaviorQueue }) => {
+              const updatedAgent = clearBehaviorQueue(agent);
+              selectedEntity.components.set('agent', updatedAgent);
+
+              console.log(`[DEBUG] Cleared behavior queue for agent ${selectedEntityId.slice(0, 8)}`);
+              showNotification(`🗑️ Behavior queue cleared`, '#9370DB');
+            }).catch(err => {
+              console.error('[DEBUG] Failed to import clearBehaviorQueue:', err);
+              showNotification(`❌ Failed to clear queue`, '#FF0000');
+            });
+          } else {
+            console.log('[DEBUG] Selected entity is not an agent');
+            showNotification(`⚠️ Please select an agent`, '#FFA500');
+          }
         } else {
           console.log('[DEBUG] No agent selected - click an agent first');
           showNotification(`⚠️ Select an agent first (click one)`, '#FFA500');
@@ -1392,6 +1709,26 @@ async function main() {
     // Render building placement UI on top
     placementUI.render(renderer.getContext());
 
+    // Update inventory UI with player/selected agent's inventory
+    // If no agent selected, use first agent's inventory as "player"
+    const selectedAgentEntity = agentInfoPanel.getSelectedEntity();
+    if (selectedAgentEntity) {
+      const inventory = selectedAgentEntity.getComponent('inventory');
+      if (inventory && inventory.type === 'inventory') {
+        inventoryUI.setPlayerInventory(inventory);
+      }
+    } else {
+      // No agent selected - try to find first agent with inventory
+      const agents = gameLoop.world.query().with('agent').with('inventory').executeEntities();
+      if (agents.length > 0) {
+        const firstAgent = agents[0];
+        const inventory = firstAgent.getComponent('inventory');
+        if (inventory && inventory.type === 'inventory') {
+          inventoryUI.setPlayerInventory(inventory);
+        }
+      }
+    }
+
     // Render UI panels on top
     const ctx = renderer.getContext();
     const rect = canvas.getBoundingClientRect();
@@ -1402,6 +1739,9 @@ async function main() {
     plantInfoPanel.render(ctx, rect.width, rect.height, gameLoop.world);
     tileInspectorPanel.render(ctx, rect.width, rect.height);
     memoryPanel.render(ctx, rect.width, rect.height, gameLoop.world); // Memory panel (M to toggle)
+
+    // Render inventory UI (I or Tab to toggle) - Phase 10
+    inventoryUI.render(ctx, rect.width, rect.height);
 
     requestAnimationFrame(renderLoop);
   }
@@ -1634,6 +1974,7 @@ async function main() {
   console.log('  ESC - Open settings (configure LLM provider)');
   console.log('');
   console.log('UI:');
+  console.log('  I or Tab - Toggle inventory (Phase 10)');
   console.log('  M - Toggle memory panel (episodic memory)');
   console.log('  R - Toggle resources panel');
   console.log('');
@@ -1645,10 +1986,10 @@ async function main() {
   console.log('  (Or click the buttons in the Tile Inspector panel)');
   console.log('');
   console.log('TIME:');
-  console.log('  H - Skip 1 hour');
-  console.log('  D - Skip 1 day');
-  console.log('  Shift+W - Skip 7 days');
-  console.log('  1/2/5 - Set time speed (1x/2x/5x)');
+  console.log('  Shift+1 - Skip 1 hour');
+  console.log('  Shift+2 - Skip 1 day');
+  console.log('  Shift+3 - Skip 7 days');
+  console.log('  1/2/3/4 - Set time speed (1x/2x/4x/8x)');
   console.log('');
   console.log('PLANTS:');
   console.log('  P - Spawn test plant at advanced stage');
@@ -1657,6 +1998,8 @@ async function main() {
   console.log('AGENTS:');
   console.log('  Click agent - View agent info & memories');
   console.log('  N - Trigger test memory for selected agent');
+  console.log('  Q - Queue test behaviors for selected agent');
+  console.log('  C - Clear behavior queue for selected agent');
   console.log('');
   console.log('MEMORY SYSTEM (Phase 10):');
   console.log('  - Agents form memories automatically from significant events');

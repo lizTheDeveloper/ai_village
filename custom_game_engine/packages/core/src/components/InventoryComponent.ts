@@ -54,7 +54,7 @@ export interface InventoryComponent extends Component {
  * Create a new InventoryComponent with default values.
  */
 export function createInventoryComponent(
-  maxSlots: number = 10,
+  maxSlots: number = 24,
   maxWeight: number = 100
 ): InventoryComponent {
   // Initialize with empty slots so addToInventory can fill them

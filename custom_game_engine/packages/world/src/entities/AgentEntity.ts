@@ -24,6 +24,14 @@ import {
   SocialMemoryComponent,
   ReflectionComponent,
   JournalComponent,
+  // Navigation & Exploration components
+  SpatialMemoryComponent,
+  TrustNetworkComponent,
+  BeliefComponent,
+  SocialGradientComponent,
+  ExplorationStateComponent,
+  createSteeringComponent,
+  createVelocityComponent,
 } from '@ai-village/core';
 
 /**
@@ -76,12 +84,12 @@ export function createWanderingAgent(
 
   // Needs - hunger, energy, health, decay rates
   // Note: Energy depletion is now handled by NeedsSystem based on activity level and game time
-  // Hunger decay rate: points per real second (unchanged)
+  // Hunger decay rate: 0.42 points/second at 1x speed (48s/day) = once per game day eating (50→30 in 48s)
   entity.addComponent(createNeedsComponent(
     100,    // hunger (start full)
     80,     // energy (start at 80 - well-rested but not max)
     100,    // health (start healthy)
-    2.0,    // hungerDecayRate (points per second)
+    0.42,   // hungerDecayRate (points per second) - adjusted for 48s game day
     0.5     // energyDecayRate (deprecated, kept for compatibility)
   ));
 
@@ -97,8 +105,13 @@ export function createWanderingAgent(
   // Relationships - track familiarity with other agents
   entity.addComponent(createRelationshipComponent());
 
-  // Inventory - carry resources (10 slots, 100 weight capacity)
-  entity.addComponent(createInventoryComponent(10, 100));
+  // Inventory - carry resources (24 slots per spec REQ-INV-003, 100 weight capacity)
+  const inventory = createInventoryComponent(24, 100);
+  // Add starting items for playtest verification (per playtest agent feedback)
+  inventory.slots[0] = { itemId: 'wood', quantity: 5 };
+  inventory.slots[1] = { itemId: 'stone', quantity: 3 };
+  inventory.slots[2] = { itemId: 'berry', quantity: 8 };
+  entity.addComponent(inventory);
 
   // Temperature - comfort range 18-24°C, tolerance 0-35°C
   entity.addComponent(
@@ -120,6 +133,15 @@ export function createWanderingAgent(
   entity.addComponent(new SocialMemoryComponent());
   entity.addComponent(new ReflectionComponent());
   entity.addComponent(new JournalComponent());
+
+  // Navigation & Exploration components (Phase 4.5)
+  entity.addComponent(new SpatialMemoryComponent());
+  entity.addComponent(new TrustNetworkComponent());
+  entity.addComponent(new BeliefComponent());
+  entity.addComponent(new SocialGradientComponent());
+  entity.addComponent(new ExplorationStateComponent());
+  entity.addComponent(createSteeringComponent('none', speed, speed * 2));
+  entity.addComponent(createVelocityComponent(0, 0));
 
   // Add to world
   (world as any)._addEntity(entity);
@@ -167,12 +189,12 @@ export function createLLMAgent(
 
   // Needs - hunger, energy, health, decay rates
   // Note: Energy depletion is now handled by NeedsSystem based on activity level and game time
-  // Hunger decay rate: points per real second (unchanged)
+  // Hunger decay rate: 0.42 points/second at 1x speed (48s/day) = once per game day eating (50→30 in 48s)
   entity.addComponent(createNeedsComponent(
     100,    // hunger (start full)
     80,     // energy (start at 80 - well-rested but not max)
     100,    // health (start healthy)
-    2.0,    // hungerDecayRate (points per second)
+    0.42,   // hungerDecayRate (points per second) - adjusted for 48s game day
     0.5     // energyDecayRate (deprecated, kept for compatibility)
   ));
 
@@ -188,8 +210,13 @@ export function createLLMAgent(
   // Relationships - track familiarity with other agents
   entity.addComponent(createRelationshipComponent());
 
-  // Inventory - carry resources (10 slots, 100 weight capacity)
-  entity.addComponent(createInventoryComponent(10, 100));
+  // Inventory - carry resources (24 slots per spec REQ-INV-003, 100 weight capacity)
+  const inventory = createInventoryComponent(24, 100);
+  // Add starting items for playtest verification (per playtest agent feedback)
+  inventory.slots[0] = { itemId: 'wood', quantity: 5 };
+  inventory.slots[1] = { itemId: 'stone', quantity: 3 };
+  inventory.slots[2] = { itemId: 'berry', quantity: 8 };
+  entity.addComponent(inventory);
 
   // Temperature - comfort range 18-24°C, tolerance 0-35°C
   entity.addComponent(
@@ -212,6 +239,15 @@ export function createLLMAgent(
   entity.addComponent(new SocialMemoryComponent());
   entity.addComponent(new ReflectionComponent());
   entity.addComponent(new JournalComponent());
+
+  // Navigation & Exploration components (Phase 4.5)
+  entity.addComponent(new SpatialMemoryComponent());
+  entity.addComponent(new TrustNetworkComponent());
+  entity.addComponent(new BeliefComponent());
+  entity.addComponent(new SocialGradientComponent());
+  entity.addComponent(new ExplorationStateComponent());
+  entity.addComponent(createSteeringComponent('none', speed, speed * 2));
+  entity.addComponent(createVelocityComponent(0, 0));
 
   // Add initial "waking up" memory from Dungeon Master prompt
   if (dungeonMasterPrompt) {

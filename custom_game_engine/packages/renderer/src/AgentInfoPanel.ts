@@ -88,6 +88,16 @@ export class AgentInfoPanel {
           personalGoal?: string;
           mediumTermGoal?: string;
           groupGoal?: string;
+          behaviorQueue?: Array<{
+            behavior: string;
+            priority: string;
+            repeats?: number;
+            currentRepeat?: number;
+            label?: string;
+          }>;
+          currentQueueIndex?: number;
+          queuePaused?: boolean;
+          queueInterruptedBy?: string;
         }
       | undefined;
     const needs = selectedEntity.components.get('needs') as
@@ -324,6 +334,11 @@ export class AgentInfoPanel {
 
     if (inventory) {
       currentY = this.renderInventory(ctx, x, currentY, inventory);
+    }
+
+    // Behavior Queue section
+    if (agent?.behaviorQueue && agent.behaviorQueue.length > 0) {
+      currentY = this.renderBehaviorQueue(ctx, x, currentY, agent);
     }
 
     // Last Thought section - Disabled to make room for inventory
@@ -630,6 +645,112 @@ export class AgentInfoPanel {
     ctx.fillText(capacityText, panelX + this.padding, y);
     y += this.lineHeight + 5;
 
+    return y;
+  }
+
+  /**
+   * Render the behavior queue section.
+   * @param ctx Canvas rendering context
+   * @param panelX Panel X position
+   * @param y Current Y position
+   * @param agent Agent component with queue data
+   * @returns Updated Y position
+   */
+  private renderBehaviorQueue(
+    ctx: CanvasRenderingContext2D,
+    panelX: number,
+    y: number,
+    agent: {
+      behaviorQueue?: Array<{
+        behavior: string;
+        priority: string;
+        repeats?: number;
+        currentRepeat?: number;
+        label?: string;
+      }>;
+      currentQueueIndex?: number;
+      queuePaused?: boolean;
+      queueInterruptedBy?: string;
+    }
+  ): number {
+    if (!agent.behaviorQueue || agent.behaviorQueue.length === 0) {
+      return y;
+    }
+
+    // Section separator
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.beginPath();
+    ctx.moveTo(panelX + this.padding, y);
+    ctx.lineTo(panelX + this.panelWidth - this.padding, y);
+    ctx.stroke();
+    y += 10;
+
+    // Section title
+    ctx.font = 'bold 12px monospace';
+    ctx.fillStyle = '#FFD700';
+
+    const queueStatus = agent.queuePaused
+      ? '⏸️ PAUSED'
+      : agent.queueInterruptedBy
+      ? `⚠️ INTERRUPTED (${agent.queueInterruptedBy})`
+      : '▶️ ACTIVE';
+
+    ctx.fillText(`Behavior Queue (${agent.behaviorQueue.length}) ${queueStatus}`, panelX + this.padding, y);
+    y += this.lineHeight + 5;
+
+    // Display queue items (limit to 5 items to save space)
+    const maxItems = Math.min(5, agent.behaviorQueue.length);
+    const currentIndex = agent.currentQueueIndex ?? 0;
+
+    ctx.font = '11px monospace';
+    for (let i = 0; i < maxItems; i++) {
+      const queuedBehavior = agent.behaviorQueue[i];
+      if (!queuedBehavior) continue;
+
+      // Highlight current behavior
+      const isCurrent = i === currentIndex;
+      const isCompleted = i < currentIndex;
+
+      if (isCurrent) {
+        // Draw background for current item
+        ctx.fillStyle = 'rgba(255, 215, 0, 0.15)';
+        ctx.fillRect(panelX + this.padding, y - 11, this.panelWidth - this.padding * 2, 14);
+      }
+
+      // Color code by status
+      ctx.fillStyle = isCompleted
+        ? '#888888' // Gray for completed
+        : isCurrent
+        ? '#00FF00' // Green for current
+        : '#FFFFFF'; // White for pending
+
+      // Format behavior name
+      const behaviorName = queuedBehavior.label || queuedBehavior.behavior.replace('_', ' ');
+      const priorityIndicator = queuedBehavior.priority === 'critical'
+        ? '🔴'
+        : queuedBehavior.priority === 'high'
+        ? '🟡'
+        : '';
+
+      const repeatInfo = queuedBehavior.repeats !== undefined && queuedBehavior.repeats > 1
+        ? ` (${(queuedBehavior.currentRepeat ?? 0) + 1}/${queuedBehavior.repeats})`
+        : '';
+
+      const statusIcon = isCompleted ? '✓' : isCurrent ? '▶' : '·';
+      const displayText = `${statusIcon} ${priorityIndicator}${behaviorName}${repeatInfo}`;
+
+      ctx.fillText(displayText, panelX + this.padding + 5, y);
+      y += 14;
+    }
+
+    // Show "... and N more" if queue is longer
+    if (agent.behaviorQueue.length > maxItems) {
+      ctx.fillStyle = '#888888';
+      ctx.fillText(`... and ${agent.behaviorQueue.length - maxItems} more`, panelX + this.padding + 5, y);
+      y += 14;
+    }
+
+    y += 5; // Extra spacing after section
     return y;
   }
 

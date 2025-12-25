@@ -11,6 +11,7 @@
 
 import type { BuildingBlueprint } from './BuildingBlueprintRegistry.js';
 import type { World } from '../ecs/World.js';
+import type { Position } from '../types.js';
 
 export type PlacementErrorType =
   | 'terrain_invalid'
@@ -40,10 +41,8 @@ export interface PlacementValidationResult {
   warnings: PlacementWarning[];
 }
 
-export interface Vector2 {
-  x: number;
-  y: number;
-}
+// Using Position from types.ts instead of Vector2 to avoid conflicts
+type Vector2 = Position;
 
 /**
  * Validator for building placement.

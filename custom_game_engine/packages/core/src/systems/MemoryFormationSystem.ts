@@ -70,6 +70,7 @@ export class MemoryFormationSystem implements System {
       'agent:sleeping',
       'agent:sleep_start',
       'agent:sleep_end',
+      'agent:dreamed',
 
       // Exploration and discovery
       'discovery:location',
@@ -196,6 +197,34 @@ export class MemoryFormationSystem implements System {
     // Conversation memories are ALWAYS formed (per spec)
     if (eventType === 'conversation:utterance') {
       return true;
+    }
+
+    // Dreams: remember if they contained significant memories OR randomly for trivial dreams
+    if (eventType === 'agent:dreamed') {
+      const dreamData = data as any;
+      const dream = dreamData.dream;
+
+      if (dream && dream.memoryElements && dream.memoryElements.length > 0) {
+        // Check if dream contained significant events (mentioned in memory summaries)
+        const significantKeywords = [
+          'conflict', 'starv', 'collapsed', 'critical', 'died', 'danger',
+          'love', 'hate', 'joy', 'fear', 'anger', 'discovered', 'built',
+          'failed', 'succeed'
+        ];
+
+        const hasSignificantMemory = dream.memoryElements.some((element: string) =>
+          significantKeywords.some(keyword =>
+            element.toLowerCase().includes(keyword)
+          )
+        );
+
+        if (hasSignificantMemory) {
+          return true; // Always remember intense dreams
+        }
+      }
+
+      // 0.1% chance to remember trivial dreams (roughly 1 in 1000, based on real memory rates)
+      return Math.random() < 0.001;
     }
 
     // Always form memories for significant game events
@@ -367,6 +396,14 @@ export class MemoryFormationSystem implements System {
         return `Started sleeping`;
       case 'agent:sleep_end':
         return `Woke up from sleep`;
+      case 'agent:dreamed': {
+        const dreamData = data as any;
+        const dream = dreamData.dream;
+        if (dream && dream.dreamNarrative) {
+          return dream.dreamNarrative;
+        }
+        return `Had a strange dream`;
+      }
 
       // Discovery
       case 'discovery:location':

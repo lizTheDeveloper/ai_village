@@ -17,6 +17,5 @@ export type {
   PlacementErrorType,
   PlacementError,
   PlacementWarning,
-  PlacementValidationResult,
-  Vector2
+  PlacementValidationResult
 } from './PlacementValidator.js';

@@ -4,6 +4,12 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { AgentComponent, AgentBehavior } from '../components/AgentComponent.js';
+import {
+  hasBehaviorQueue,
+  getCurrentQueuedBehavior,
+  advanceBehaviorQueue,
+  hasQueuedBehaviorTimedOut,
+} from '../components/AgentComponent.js';
 import type { MovementComponent } from '../components/MovementComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
@@ -60,6 +66,11 @@ export class AISystem implements System {
     this.registerBehavior('attend_meeting', this._attendMeetingBehavior.bind(this));
     this.registerBehavior('farm', this.farmBehavior.bind(this));
     this.registerBehavior('till', this.tillBehavior.bind(this));
+    // Navigation & Exploration behaviors
+    this.registerBehavior('navigate', this.navigateBehavior.bind(this));
+    this.registerBehavior('explore_frontier', this.exploreFrontierBehavior.bind(this));
+    this.registerBehavior('explore_spiral', this.exploreSpiralBehavior.bind(this));
+    this.registerBehavior('follow_gradient', this.followGradientBehavior.bind(this));
 
     // console.log(`[AISystem] Registered ${this.behaviors.size} behaviors including: deposit_items, gather, seek_warmth, farm`);
 
@@ -106,6 +117,28 @@ export class AISystem implements System {
 
       const autonomicResult = agentNeeds ? this.checkAutonomicSystem(agentNeeds, circadian, temperature) : null;
 
+      // Debug logging for queue interruption
+      if (hasBehaviorQueue(agent)) {
+        console.log('[AISystem] Queue processing - autonomicResult:', autonomicResult, 'queuePaused:', agent.queuePaused, 'hunger:', agentNeeds?.hunger, 'energy:', agentNeeds?.energy);
+      }
+
+      // If queue was paused and no longer needs interruption, resume it
+      if (agent.queuePaused && !autonomicResult) {
+        impl.updateComponent<AgentComponent>('agent', (current) => ({
+          ...current,
+          queuePaused: false,
+          queueInterruptedBy: undefined,
+        }));
+
+        world.eventBus.emit({
+          type: 'agent:queue:resumed',
+          source: entity.id,
+          data: {
+            resumedAt: agent.currentQueueIndex,
+          },
+        });
+      }
+
       if (autonomicResult) {
         // If autonomic behavior is the same as current behavior, just continue
         if (autonomicResult.behavior === agent.behavior) {
@@ -125,12 +158,35 @@ export class AISystem implements System {
         if (autonomicPriority > currentPriority) {
           // console.log(`[AISystem] Agent ${entity.id}: ${autonomicResult.behavior} (priority ${autonomicPriority}) interrupting ${agent.behavior} (priority ${currentPriority})`);
 
-          // Autonomic system takes control
-          impl.updateComponent<AgentComponent>('agent', (current) => ({
-            ...current,
-            behavior: autonomicResult.behavior,
-            behaviorState: {},
-          }));
+          // If agent has an active queue, pause it for interruption
+          const hasQueue = hasBehaviorQueue(agent) && !agent.queuePaused;
+          console.log('[AISystem] Autonomic interrupt - hasQueue:', hasQueue, 'hasBehaviorQueue:', hasBehaviorQueue(agent), 'queuePaused:', agent.queuePaused);
+
+          if (hasQueue) {
+            world.eventBus.emit({
+              type: 'agent:queue:interrupted',
+              source: entity.id,
+              data: {
+                interruptedBy: autonomicResult.behavior,
+                queueIndex: agent.currentQueueIndex,
+              },
+            });
+          }
+
+          // Autonomic system takes control (pause queue if present)
+          impl.updateComponent<AgentComponent>('agent', (current) => {
+            const updated = {
+              ...current,
+              behavior: autonomicResult.behavior,
+              behaviorState: {},
+              ...(hasQueue ? {
+                queuePaused: true,
+                queueInterruptedBy: autonomicResult.behavior,
+              } : {}),
+            };
+            console.log('[AISystem] After update - queuePaused:', updated.queuePaused, 'queueInterruptedBy:', updated.queueInterruptedBy);
+            return updated;
+          });
 
           // Execute autonomic behavior
           const handler = this.behaviors.get(autonomicResult.behavior);
@@ -148,6 +204,107 @@ export class AISystem implements System {
             handler(impl, world);
           }
           continue;
+        }
+      }
+
+      // BEHAVIOR QUEUE PROCESSING
+      // Process queued behaviors before LLM/scripted decision making
+      if (hasBehaviorQueue(agent)) {
+        const currentQueued = getCurrentQueuedBehavior(agent);
+
+        if (!currentQueued) {
+          // Queue is invalid, clear it
+          impl.updateComponent<AgentComponent>('agent', (current) => ({
+            ...current,
+            behaviorQueue: undefined,
+            currentQueueIndex: undefined,
+            queuePaused: undefined,
+          }));
+        } else {
+          // Queue interruption/resume is now handled by autonomic system above
+          // Process queue if not paused
+          if (!agent.queuePaused) {
+            // Check if current queued behavior completed
+            if (agent.behaviorCompleted) {
+              // Advance queue
+              const updatedAgent = advanceBehaviorQueue(agent, world.tick);
+
+              impl.updateComponent<AgentComponent>('agent', () => updatedAgent);
+
+              // Check if queue finished
+              if (!hasBehaviorQueue(updatedAgent)) {
+                world.eventBus.emit({
+                  type: 'agent:queue:completed',
+                  source: entity.id,
+                  data: {},
+                });
+
+                // Fall through to normal decision making
+              } else {
+                // Move to next queued behavior
+                const nextQueued = getCurrentQueuedBehavior(updatedAgent);
+                if (nextQueued) {
+                  // Set startedAt timestamp for timeout tracking
+                  const queueIndex = updatedAgent.currentQueueIndex ?? 0;
+                  const updatedQueue = [...(updatedAgent.behaviorQueue || [])];
+                  updatedQueue[queueIndex] = {
+                    ...nextQueued,
+                    startedAt: world.tick,
+                  };
+
+                  impl.updateComponent<AgentComponent>('agent', (current) => ({
+                    ...current,
+                    behavior: nextQueued.behavior,
+                    behaviorState: nextQueued.behaviorState || {},
+                    behaviorCompleted: false,
+                    behaviorQueue: updatedQueue,
+                  }));
+
+                  // Execute next queued behavior
+                  const handler = this.behaviors.get(nextQueued.behavior);
+                  if (handler) {
+                    handler(impl, world);
+                  }
+                  continue;
+                }
+              }
+            } else {
+              // Check for timeout
+              if (hasQueuedBehaviorTimedOut(agent, world.tick)) {
+                console.warn(`[AISystem] Queued behavior timed out for agent ${entity.id.substring(0, 8)}:`, {
+                  behavior: currentQueued.behavior,
+                  label: currentQueued.label,
+                  ticksElapsed: world.tick - (currentQueued.startedAt || 0),
+                });
+
+                // Force advance queue on timeout
+                const updatedAgent = advanceBehaviorQueue(agent, world.tick);
+                impl.updateComponent<AgentComponent>('agent', () => updatedAgent);
+
+                if (!hasBehaviorQueue(updatedAgent)) {
+                  // Queue finished, fall through to normal decision making
+                } else {
+                  continue;
+                }
+              } else {
+                // Continue executing current queued behavior
+                if (agent.behavior !== currentQueued.behavior) {
+                  // Switch to queued behavior (first time)
+                  impl.updateComponent<AgentComponent>('agent', (current) => ({
+                    ...current,
+                    behavior: currentQueued.behavior,
+                    behaviorState: currentQueued.behaviorState || {},
+                  }));
+                }
+
+                const handler = this.behaviors.get(currentQueued.behavior);
+                if (handler) {
+                  handler(impl, world);
+                }
+                continue;
+              }
+            }
+          }
         }
       }
 
@@ -439,6 +596,60 @@ export class AISystem implements System {
                 },
               });
             }
+          }
+        }
+      } else if (currentBehavior === 'wander' && inventory && Math.random() < 0.35) {
+        // 35% chance to gather seeds from nearby plants when wandering (increased for testing)
+        const position = impl.getComponent<PositionComponent>('position');
+        if (position) {
+          // Find nearby plants with seeds
+          const plantsWithSeeds = world
+            .query()
+            .with('plant')
+            .with('position')
+            .executeEntities()
+            .filter((plantEntity) => {
+              const plantImpl = plantEntity as EntityImpl;
+              const plant = plantImpl.getComponent<PlantComponent>('plant');
+              const plantPos = plantImpl.getComponent<PositionComponent>('position');
+
+              if (!plant || !plantPos) return false;
+
+              // Check if plant has seeds and is at a valid stage
+              const validStages = ['mature', 'seeding', 'senescence'];
+              if (!validStages.includes(plant.stage)) return false;
+              if (plant.seedsProduced <= 0) return false;
+
+              // Check distance (within 15 tiles)
+              const dx = plantPos.x - position.x;
+              const dy = plantPos.y - position.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              return distance <= 15;
+            });
+
+          if (plantsWithSeeds.length > 0) {
+            // Choose a random plant to gather from
+            const targetPlant = plantsWithSeeds[Math.floor(Math.random() * plantsWithSeeds.length)]!;
+            const targetPlantComp = (targetPlant as EntityImpl).getComponent<PlantComponent>('plant');
+
+            console.log(`[AISystem] Agent ${entity.id.slice(0,8)} requesting gather_seeds from ${targetPlantComp?.speciesId || 'unknown'} plant ${targetPlant.id.slice(0,8)} (${plantsWithSeeds.length} candidates)`);
+
+            // Emit gather_seeds action request
+            world.eventBus.emit({
+              type: 'action:gather_seeds',
+              source: entity.id,
+              data: {
+                agentId: entity.id,
+                plantId: targetPlant.id,
+              },
+            });
+
+            // Switch to a gather_seeds behavior (using 'farm' behavior as a waiting state)
+            impl.updateComponent<AgentComponent>('agent', (current) => ({
+              ...current,
+              behavior: 'farm',
+              behaviorState: { targetPlantId: targetPlant.id },
+            }));
           }
         }
       } else if (currentBehavior === 'talk' && Math.random() < 0.03) {
@@ -1018,6 +1229,7 @@ export class AISystem implements System {
     entity.updateComponent<AgentComponent>('agent', (current) => ({
       ...current,
       currentBehavior: 'farm',
+      behaviorCompleted: true, // Signal completion after tilling action is queued
     }));
   }
 
@@ -1224,29 +1436,27 @@ export class AISystem implements System {
           });
         }
       } else if (isPlantTarget) {
-        // Harvest food from edible plant
+        // Harvest food from edible plant using harvest action
         const plantComp = targetFoodImpl.getComponent<PlantComponent>('plant')!;
-        const harvestAmount = Math.min(20, plantComp.fruitCount * 5); // Each fruit = 5 hunger
 
-        // Update plant (reduce fruit count) - use immutable update for class component
-        const fruitsToRemove = Math.ceil(harvestAmount / 5);
-        targetFoodImpl.updateComponent('plant', (current: PlantComponent) => {
-          const updated = Object.create(Object.getPrototypeOf(current));
-          Object.assign(updated, current);
-          updated.fruitCount = Math.max(0, current.fruitCount - fruitsToRemove);
-          return updated;
+        console.log(`[AISystem] Agent ${entity.id.slice(0,8)} requesting harvest of ${plantComp.speciesId} plant ${targetFood.id.slice(0,8)} (fruitCount: ${plantComp.fruitCount})`);
+
+        // Emit harvest action request (will be handled by ActionQueue)
+        world.eventBus.emit({
+          type: 'action:harvest',
+          source: entity.id,
+          data: {
+            agentId: entity.id,
+            plantId: targetFood.id,
+          },
         });
 
-        // Update agent's hunger
-        const needs = entity.getComponent<NeedsComponent>('needs');
-        if (needs) {
-          entity.updateComponent<NeedsComponent>('needs', (current) => ({
-            ...current,
-            hunger: Math.min(100, current.hunger + harvestAmount),
-          }));
-        }
-
-        // console.log(`[AISystem] Agent ${entity.id.substring(0, 8)} ate ${fruitsToRemove} berries from plant, hunger +${harvestAmount}`);
+        // Switch to a harvest behavior (using 'farm' behavior as a waiting state)
+        entity.updateComponent<AgentComponent>('agent', (current) => ({
+          ...current,
+          behavior: 'farm',
+          behaviorState: { targetPlantId: targetFood.id, action: 'harvest' },
+        }));
 
         // Reinforce memory of this food location
         if (memory) {
@@ -1264,18 +1474,6 @@ export class AISystem implements System {
           );
           entity.updateComponent<MemoryComponent>('memory', () => updatedMemory);
         }
-
-        // Emit harvest event
-        world.eventBus.emit({
-          type: 'agent:ate',
-          source: entity.id,
-          data: {
-            agentId: entity.id,
-            plantId: targetFood.id,
-            amount: harvestAmount,
-            fruitCount: fruitsToRemove,
-          },
-        });
       } else {
         // Harvest from resource (original behavior)
         const resourceComp = targetFoodImpl.getComponent<ResourceComponent>('resource')!;
@@ -1331,6 +1529,15 @@ export class AISystem implements System {
         velocityX: 0,
         velocityY: 0,
       }));
+
+      // Check if behavior completed (hunger satisfied)
+      const needs = entity.getComponent<NeedsComponent>('needs');
+      if (needs && needs.hunger > 40) {
+        entity.updateComponent<AgentComponent>('agent', (current) => ({
+          ...current,
+          behaviorCompleted: true,
+        }));
+      }
     } else {
       // Move towards the target
       const dx = targetPos.x - position.x;
@@ -1755,6 +1962,7 @@ export class AISystem implements System {
               previousBehavior: 'gather',
               previousState: current.behaviorState,
             },
+            behaviorCompleted: true, // Signal completion when inventory is full
           }));
 
           // console.log(`[AISystem.gatherBehavior] Agent ${entity.id} switching to deposit_items behavior`);
@@ -2239,6 +2447,12 @@ export class AISystem implements System {
         velocityX: 0,
         velocityY: 0,
       }));
+
+      // Behavior completed when sleeping starts
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        behaviorCompleted: true,
+      }));
     } else if (bestSleepLocation) {
       // Move towards the bed
       const bedImpl = bestSleepLocation as EntityImpl;
@@ -2651,6 +2865,7 @@ export class AISystem implements System {
           ...current,
           behavior: previousBehavior || 'wander',
           behaviorState: previousState || {},
+          behaviorCompleted: true, // Signal completion when inventory is empty
         }));
 
         // Stop moving after deposit is complete
@@ -2978,6 +3193,183 @@ export class AISystem implements System {
       // Move towards the meeting
       const velocityX = (dx / distance) * movement.speed;
       const velocityY = (dy / distance) * movement.speed;
+
+      entity.updateComponent<MovementComponent>('movement', (current) => ({
+        ...current,
+        velocityX,
+        velocityY,
+      }));
+    }
+  }
+
+  /**
+   * Navigate behavior - Move to specific (x, y) coordinates using steering
+   * Expects behaviorState.target = { x, y }
+   */
+  private navigateBehavior(entity: EntityImpl, world: World): void {
+    const agent = entity.getComponent<AgentComponent>('agent')!;
+    const position = entity.getComponent<PositionComponent>('position')!;
+
+    // Check if we have a target
+    if (!agent.behaviorState || !agent.behaviorState.target) {
+      // No target - switch to wander
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        behavior: 'wander',
+        behaviorState: {},
+      }));
+      return;
+    }
+
+    const target = agent.behaviorState.target as { x: number; y: number };
+
+    // Update steering component if it exists
+    if (entity.hasComponent('Steering')) {
+      entity.updateComponent('Steering', (steering: any) => ({
+        ...steering,
+        behavior: 'arrive',
+        target: target,
+      }));
+    } else {
+      // Fallback: simple movement toward target
+      const dx = target.x - position.x;
+      const dy = target.y - position.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance < 2.0) {
+        // Arrived - emit event and switch to idle
+        world.eventBus?.emit({
+          type: 'navigation:arrived',
+          source: 'ai',
+          data: {
+            entityId: entity.id,
+            target: target,
+          },
+        });
+
+        entity.updateComponent<AgentComponent>('agent', (current) => ({
+          ...current,
+          behavior: 'idle',
+          behaviorState: {},
+          lastThought: `I arrived at my destination (${Math.floor(target.x)}, ${Math.floor(target.y)})`,
+        }));
+        return;
+      }
+
+      // Move toward target
+      const movement = entity.getComponent<MovementComponent>('movement')!;
+      const velocityX = (dx / distance) * movement.speed;
+      const velocityY = (dy / distance) * movement.speed;
+
+      entity.updateComponent<MovementComponent>('movement', (current) => ({
+        ...current,
+        velocityX,
+        velocityY,
+      }));
+    }
+  }
+
+  /**
+   * Explore frontier behavior - Explore edges of known territory
+   * Uses ExplorationSystem to identify frontier sectors
+   */
+  private exploreFrontierBehavior(entity: EntityImpl, _world: World): void {
+    // ExplorationSystem handles the heavy lifting
+    // Just ensure ExplorationState is set to frontier mode
+    if (entity.hasComponent('ExplorationState')) {
+      entity.updateComponent('ExplorationState', (state: any) => ({
+        ...state,
+        mode: 'frontier',
+      }));
+    } else {
+      // No exploration component - fall back to wander
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        behavior: 'wander',
+        behaviorState: {},
+      }));
+    }
+  }
+
+  /**
+   * Explore spiral behavior - Spiral outward from home base
+   * Uses ExplorationSystem to calculate spiral pattern
+   */
+  private exploreSpiralBehavior(entity: EntityImpl, _world: World): void {
+    // ExplorationSystem handles the heavy lifting
+    // Just ensure ExplorationState is set to spiral mode
+    if (entity.hasComponent('ExplorationState')) {
+      entity.updateComponent('ExplorationState', (state: any) => ({
+        ...state,
+        mode: 'spiral',
+      }));
+    } else {
+      // No exploration component - fall back to wander
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        behavior: 'wander',
+        behaviorState: {},
+      }));
+    }
+  }
+
+  /**
+   * Follow gradient behavior - Follow social gradients to resources
+   * Uses SocialGradient component to determine direction
+   */
+  private followGradientBehavior(entity: EntityImpl, _world: World): void {
+    const agent = entity.getComponent<AgentComponent>('agent')!;
+    const position = entity.getComponent<PositionComponent>('position')!;
+
+    // Check if we have social gradient component
+    if (!entity.hasComponent('SocialGradient')) {
+      // No gradients - switch to wander
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        behavior: 'wander',
+        behaviorState: {},
+      }));
+      return;
+    }
+
+    const socialGradient = entity.getComponent('SocialGradient') as any;
+
+    // Get resource type from behaviorState or use default
+    const resourceType = agent.behaviorState?.resourceType || 'wood';
+
+    // Get gradient for resource type
+    const gradient = socialGradient.getGradient?.(resourceType);
+
+    if (!gradient || !gradient.direction) {
+      // No gradient available - switch to explore
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        behavior: 'explore_frontier',
+        behaviorState: {},
+        lastThought: `I don't know where to find ${resourceType}, I'll explore`,
+      }));
+      return;
+    }
+
+    // Calculate target position from gradient
+    const distance = gradient.distance || 20; // Default 20 tiles if not specified
+    const bearing = gradient.direction; // In degrees
+
+    const targetX = position.x + Math.cos(bearing * Math.PI / 180) * distance;
+    const targetY = position.y + Math.sin(bearing * Math.PI / 180) * distance;
+
+    // Use steering to move toward gradient
+    if (entity.hasComponent('Steering')) {
+      entity.updateComponent('Steering', (steering: any) => ({
+        ...steering,
+        behavior: 'seek',
+        target: { x: targetX, y: targetY },
+      }));
+    } else {
+      // Fallback: simple movement
+      const movement = entity.getComponent<MovementComponent>('movement')!;
+      const velocityX = Math.cos(bearing * Math.PI / 180) * movement.speed;
+      const velocityY = Math.sin(bearing * Math.PI / 180) * movement.speed;
 
       entity.updateComponent<MovementComponent>('movement', (current) => ({
         ...current,

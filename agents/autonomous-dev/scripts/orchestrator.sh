@@ -7,9 +7,17 @@
 # 2. Test Agent - Writes tests (TDD)
 # 3. Implementation Agent - Builds feature
 # 4. Test Agent - Verifies tests pass
+# 4b. Test Maintenance - Fixes broken tests (if needed)
+# 4c. Review Agent - Checks for antipatterns (CLAUDE.md violations)
 # 5. Playtest Agent - UI testing
 # 6. Commit Agent - Creates git commit and documentation
 # 7. Loop until approved
+#
+# The Review Agent prevents antipatterns from entering the codebase:
+# - Silent fallbacks (|| default, ?? value)
+# - Any types (: any, as any)
+# - console.warn without throwing
+# - Magic numbers, dead code, untyped events
 #
 # Usage:
 #   ./orchestrator.sh                    # Process next available feature
@@ -267,15 +275,72 @@ run_test_agent_post() {
 
     local context="Feature: $FEATURE_NAME
 
-Your task: Run the full test suite and verify all tests pass.
+Your task:
+1. Write integration tests that actually RUN the systems (if not already present)
+2. Run the full test suite and verify all tests pass
+
+## Part 1: Write Integration Tests
+
+CRITICAL: Check if integration tests exist. If not, create them.
+
+Integration tests should:
+- Actually instantiate and run the systems being tested
+- Use real WorldImpl with EventBusImpl (not mocks)
+- Use real entities and components
+- Test behavior over simulated time (multiple update() calls)
+- Verify state changes, not just calculations
+- Use descriptive names like: [System].integration.test.ts
+
+Example pattern (for SleepSystem):
+\`\`\`typescript
+import { WorldImpl } from '../../ecs/World.js';
+import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
+import { EventBusImpl } from '../../events/EventBus.js';
+import { SleepSystem } from '../SleepSystem.js';
+
+describe('SleepSystem Integration', () => {
+  it('should accumulate sleep drive over 18 game hours', () => {
+    // Create real world with EventBus
+    const eventBus = new EventBusImpl();
+    const world = new WorldImpl(eventBus);
+
+    // Create entity with components
+    const agent = new EntityImpl(createEntityId(), 0);
+    agent.addComponent(createCircadianComponent());
+    agent.addComponent(createNeedsComponent(100, 100, 100, 0.42, 0.5));
+    (world as any)._addEntity(agent);
+
+    // Run the actual system
+    const system = new SleepSystem();
+    const deltaTime = 36; // 18 game hours
+    system.update(world, [agent], deltaTime);
+
+    // Verify actual behavior
+    const circadian = agent.getComponent('circadian') as any;
+    expect(circadian.sleepDrive).toBeGreaterThan(95);
+  });
+});
+\`\`\`
+
+Why integration tests matter:
+- Unit tests verify calculations (e.g., \"5.5 * 18 = 99\")
+- Integration tests verify the system actually runs correctly
+- Catches bugs like: wrong rates, missing EventBus, incorrect state mutations
+- Would have caught the sleep system bug where agents didn't sleep
+
+Create integration test file: packages/[package]/src/systems/__tests__/[System].integration.test.ts
+
+## Part 2: Run Full Test Suite
 
 Commands to run:
 cd custom_game_engine && npm run build && npm test
 
+## Part 3: Write Results
+
 IMPORTANT: Write your results to: agents/autonomous-dev/work-orders/$FEATURE_NAME/test-results.md
 
 The file MUST contain one of these verdicts on its own line:
-- Verdict: PASS (all tests pass)
+- Verdict: PASS (all tests pass, including new integration tests)
 - Verdict: FAIL (tests failing)
 - Verdict: TESTS_NEED_FIX (tests are broken/outdated, not implementation)"
 
@@ -319,6 +384,62 @@ After fixing, write updated results to: agents/autonomous-dev/work-orders/$FEATU
 Use verdict: Verdict: PASS or Verdict: FAIL"
 
     run_agent "test-maintenance" "$PROMPT_DIR/test-agent.md" "$context"
+}
+
+run_review_agent() {
+    header "PHASE 4c: CODE REVIEW AGENT"
+
+    local work_order="$WORK_ORDER_DIR/$FEATURE_NAME/work-order.md"
+    if [[ ! -f "$work_order" ]]; then
+        error "Work order not found: $work_order"
+        return 1
+    fi
+
+    local context="Feature: $FEATURE_NAME
+
+Work Order:
+$(cat "$work_order")
+
+---
+
+Your task: Review the implementation for antipatterns before it proceeds to playtest.
+
+1. Read the review checklist: agents/autonomous-dev/REVIEW_CHECKLIST.md
+2. Find changed files: git diff --name-only HEAD~1 (or check work order)
+3. Run antipattern scans on each file
+4. Check for CLAUDE.md violations:
+   - Silent fallbacks (|| 'default', ?? value)
+   - Any types (: any, as any)
+   - console.warn without throwing
+   - Magic numbers
+   - Untyped events
+
+Write your review to: agents/autonomous-dev/work-orders/$FEATURE_NAME/review-report.md
+
+Use verdict:
+- Verdict: APPROVED (all checks pass)
+- Verdict: NEEDS_FIXES (critical issues found - list them with file:line)
+- Verdict: BLOCKED (architectural concerns needing human decision)"
+
+    run_agent "review-agent" "$PROMPT_DIR/review-agent.md" "$context"
+}
+
+check_review_verdict() {
+    local report="$WORK_ORDER_DIR/$FEATURE_NAME/review-report.md"
+    if [[ ! -f "$report" ]]; then
+        echo "NO_REPORT"
+        return
+    fi
+
+    if grep -q "Verdict.*APPROVED" "$report"; then
+        echo "APPROVED"
+    elif grep -q "Verdict.*NEEDS_FIXES" "$report"; then
+        echo "NEEDS_FIXES"
+    elif grep -q "Verdict.*BLOCKED" "$report"; then
+        echo "BLOCKED"
+    else
+        echo "UNKNOWN"
+    fi
 }
 
 run_playtest_agent() {
@@ -502,7 +623,7 @@ run_pipeline() {
 
             case "$test_verdict" in
                 "PASS")
-                    set_feature_state "PLAYTEST"
+                    set_feature_state "REVIEW"
                     ;;
                 "TESTS_NEED_FIX")
                     log "Tests need maintenance, not implementation..."
@@ -531,11 +652,45 @@ run_pipeline() {
 
             case "$test_verdict" in
                 "PASS")
-                    set_feature_state "PLAYTEST"
+                    set_feature_state "REVIEW"
                     ;;
                 *)
                     warn "Tests still failing after maintenance, returning to implementation..."
                     set_feature_state "IMPL"
+                    continue
+                    ;;
+            esac
+        fi
+
+        # Phase 4c: Code Review (antipattern detection)
+        state=$(get_feature_state)
+        if [[ "$state" == "REVIEW" ]]; then
+            if ! run_review_agent; then
+                warn "Review agent failed, will retry..."
+                continue
+            fi
+
+            # Check review verdict
+            review_verdict=$(check_review_verdict)
+            log "Review verdict: $review_verdict"
+
+            case "$review_verdict" in
+                "APPROVED")
+                    set_feature_state "PLAYTEST"
+                    ;;
+                "NEEDS_FIXES")
+                    warn "Code review found issues, returning to implementation..."
+                    set_feature_state "IMPL"
+                    impl_retries=0  # Reset for new round
+                    continue
+                    ;;
+                "BLOCKED")
+                    error "Code review blocked - needs human decision"
+                    set_feature_state "BLOCKED_REVIEW"
+                    break
+                    ;;
+                *)
+                    warn "Could not determine review verdict, will retry..."
                     continue
                     ;;
             esac

@@ -145,6 +145,14 @@ export class ActionQueue implements IActionQueue {
     return this.actionHistory.filter((a) => a.createdAt >= since);
   }
 
+  /**
+   * Get the handler for a specific action type.
+   * Useful for accessing handler methods like getDuration() from UI code.
+   */
+  getHandler(actionType: string) {
+    return this.registry.get(actionType);
+  }
+
   private startAction(action: Action, world: WorldMutator): void {
     const handler = this.registry.get(action.type);
     if (!handler) {

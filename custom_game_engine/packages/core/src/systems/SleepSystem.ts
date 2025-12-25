@@ -65,8 +65,11 @@ export class SleepSystem implements System {
       const timeComp = timeEntity.getComponent<TimeComponent>('time');
       if (timeComp) {
         timeOfDay = timeComp.timeOfDay;
-        // Calculate hours elapsed based on deltaTime and day length
-        hoursElapsed = (deltaTime / timeComp.dayLength) * 24;
+        // Calculate effective day length based on speed multiplier
+        // This ensures sleep drive accumulates correctly at different time speeds
+        const effectiveDayLength = timeComp.dayLength / timeComp.speedMultiplier;
+        // Calculate hours elapsed based on deltaTime and effective day length
+        hoursElapsed = (deltaTime / effectiveDayLength) * 24;
       }
     }
 

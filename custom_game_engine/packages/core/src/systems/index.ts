@@ -25,3 +25,10 @@ export * from './MemoryConsolidationSystem.js';
 export * from './ReflectionSystem.js';
 export * from './JournalingSystem.js';
 export * from './SeedGatheringSystem.js';
+// Navigation & Exploration systems
+export * from './SteeringSystem.js';
+export * from './ExplorationSystem.js';
+export * from './VerificationSystem.js';
+export * from './SocialGradientSystem.js';
+export * from './BeliefFormationSystem.js';
+export * from './SpatialMemoryQuerySystem.js';
