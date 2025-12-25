@@ -522,8 +522,9 @@ export class AISystem implements System {
         // Autonomic resource gathering: switch to gather when resources are visible and needed
         const hasWood = inventory.slots.some(s => s.itemId === 'wood' && s.quantity >= 10);
         const hasStone = inventory.slots.some(s => s.itemId === 'stone' && s.quantity >= 10);
+        const hasFood = inventory.slots.some(s => s.itemId === 'food' && s.quantity >= 5);
 
-        if (!hasWood || !hasStone) {
+        if (!hasWood || !hasStone || !hasFood) {
           // Check for nearby resources within detection range
           const position = impl.getComponent<PositionComponent>('position')!;
           const detectionRange = 15; // tiles
@@ -540,13 +541,14 @@ export class AISystem implements System {
             const resourceComp = resourceImpl.getComponent<ResourceComponent>('resource')!;
             const resourcePos = resourceImpl.getComponent<PositionComponent>('position')!;
 
-            // Skip food and non-harvestable resources
-            if (resourceComp.resourceType === 'food' || !resourceComp.harvestable) continue;
+            // Skip non-harvestable resources
+            if (!resourceComp.harvestable) continue;
             if (resourceComp.amount <= 0) continue;
 
             // Only consider resources we need
             if (resourceComp.resourceType === 'wood' && hasWood) continue;
             if (resourceComp.resourceType === 'stone' && hasStone) continue;
+            if (resourceComp.resourceType === 'food' && hasFood) continue;
 
             const distance = Math.sqrt(
               Math.pow(resourcePos.x - position.x, 2) +
@@ -571,9 +573,10 @@ export class AISystem implements System {
         // Autonomic: stop gathering when we have enough materials
         const hasWood = inventory.slots.some(s => s.itemId === 'wood' && s.quantity >= 10);
         const hasStone = inventory.slots.some(s => s.itemId === 'stone' && s.quantity >= 10);
+        const hasFood = inventory.slots.some(s => s.itemId === 'food' && s.quantity >= 5);
 
-        if (hasWood && hasStone) {
-          // We have enough, switch to wandering
+        if (hasWood && hasStone && hasFood) {
+          // We have enough basic resources, switch to wandering
           impl.updateComponent<AgentComponent>('agent', (current) => ({
             ...current,
             behavior: 'wander',
@@ -1929,9 +1932,6 @@ export class AISystem implements System {
         // If preferred type specified, only consider that type
         if (preferredType && memResourceType !== preferredType) continue;
 
-        // Skip food (that's for seek_food behavior)
-        if (memResourceType === 'food') continue;
-
         const distance = Math.sqrt(
           Math.pow(mem.x - position.x, 2) +
           Math.pow(mem.y - position.y, 2)
@@ -1959,6 +1959,9 @@ export class AISystem implements System {
     }
 
     // If no memory or memory is stale, search for resources
+    // IMPORTANT: Only search within reasonable range to prevent agents from wandering across the entire map
+    const maxGatherRange = 50; // tiles - agents won't navigate further than this to gather resources
+
     if (!targetResource && !targetPos) {
       const resources = world
         .query()
@@ -1971,8 +1974,8 @@ export class AISystem implements System {
         const resourceComp = resourceImpl.getComponent<ResourceComponent>('resource')!;
         const resourcePos = resourceImpl.getComponent<PositionComponent>('position')!;
 
-        // Skip food and non-harvestable resources
-        if (resourceComp.resourceType === 'food' || !resourceComp.harvestable) continue;
+        // Skip non-harvestable resources
+        if (!resourceComp.harvestable) continue;
         if (resourceComp.amount <= 0) continue;
 
         // If preferred type specified, only consider that type
@@ -1983,7 +1986,8 @@ export class AISystem implements System {
           Math.pow(resourcePos.y - position.y, 2)
         );
 
-        if (distance < nearestDistance) {
+        // Only consider resources within max gather range
+        if (distance <= maxGatherRange && distance < nearestDistance) {
           nearestDistance = distance;
           targetResource = resource;
         }

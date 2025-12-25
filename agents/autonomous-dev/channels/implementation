@@ -2289,3 +2289,282 @@ All acceptance criteria verified:
 **Agent Signature:** implementation-agent-001
 **Timestamp:** 2025-12-25T01:04:23Z
 
+
+---
+
+# CLAIMED: Window Manager (UI Enhancement)
+
+**Date:** 2025-12-25 01:26
+**Spec Agent:** spec-agent-001
+**Status:** READY_FOR_TESTS
+
+---
+
+## Work Order Created
+
+Location: `custom_game_engine/agents/autonomous-dev/work-orders/window-manager/work-order.md`
+
+## Feature Summary
+
+Window management system for AI Village that handles multiple UI panels with:
+- Non-overlapping window positioning
+- Draggable title bars for all panels
+- Position persistence (localStorage)
+- Keyboard shortcuts preserved
+- Z-index management (click to bring to front)
+- Window minimize/maximize
+- Modal window dimming
+- Canvas resize handling
+
+## Phase Details
+
+**Phase:** UI Enhancement (not in numbered phases)
+**Parallel Work:** Can run alongside Phase 7-11
+**Dependencies:** None (pure UI enhancement)
+**Estimated LOC:** ~1,500
+**Estimated Time:** 8-12 hours
+
+## Current UI Panels to Manage
+
+10 panels identified:
+1. AgentInfoPanel (top-right, 300x500px)
+2. AnimalInfoPanel (top-right)
+3. PlantInfoPanel (top-right)
+4. ResourcesPanel (toggle: R key)
+5. MemoryPanel (toggle: M key, center-left, 400x600px)
+6. InventoryUI (toggle: I/Tab keys, modal)
+7. SettingsPanel (toggle: ESC key, modal)
+8. TileInspectorPanel
+9. CraftingPanelUI (modal)
+10. BuildingPlacementUI (ghost renderer)
+
+## Spec Summary
+
+### Key Requirements
+
+**R1: Non-Overlapping Windows**
+- Windows must not overlap
+- Nearest available space detection
+- Cascade/stack if no space available
+
+**R2: Window Visibility Controls**
+- All windows hideable/showable
+- Keyboard shortcuts preserved (R, M, I, ESC, Tab)
+- Windows menu for show/hide control
+- Visual indicator for visible windows
+
+**R3: Window Dragging**
+- Draggable title bars on all panels
+- Click and drag repositioning
+- Grid snapping (optional)
+- Visual feedback during drag (semi-transparent)
+
+**R4: Position Persistence**
+- Save positions to localStorage
+- Restore on game restart
+- Fallback to defaults if corrupted
+- Save on drag end, resize, close
+
+**R5: Default Layout**
+- Sensible default positions per window type
+- Logical zone arrangement (top-left, top-right, bottom-left, bottom-right, center)
+
+**R6: Window Types**
+- Docked Panels (200-400px, minimizable)
+- Modal/Overlay Panels (full screen, background dimming)
+
+## Acceptance Criteria (14 Total)
+
+1. WindowManager core functionality
+2. Window registration (all panels implement IWindowPanel)
+3. Draggable title bars
+4. Non-overlapping layout
+5. Cascade fallback when no space
+6. Position persistence (localStorage)
+7. LocalStorage fallback (corrupted data)
+8. Keyboard shortcuts preserved
+9. Z-index management (click to front)
+10. Window minimize
+11. Window close/hide
+12. Modal dimming
+13. Canvas resize handling
+14. Click-through to game world
+
+## Architecture
+
+### New Components Created
+
+**WindowManager class:**
+- `packages/renderer/src/WindowManager.ts`
+- Manages all windows
+- Handles rendering, dragging, overlap detection
+- Persistence to localStorage
+
+**IWindowPanel interface:**
+- `packages/renderer/src/IWindowPanel.ts`
+- Interface all panels must implement
+- Methods: getId(), getTitle(), getDefaultWidth(), getDefaultHeight(), isVisible(), setVisible(), render()
+
+**Type Definitions:**
+- `packages/renderer/src/types/WindowTypes.ts`
+- WindowConfig, ManagedWindow, SavedLayout interfaces
+
+### Existing Panels Modified
+
+All panels refactored to implement IWindowPanel:
+- AgentInfoPanel.ts
+- MemoryPanel.ts
+- ResourcesPanel.ts
+- TileInspectorPanel.ts
+- AnimalInfoPanel.ts
+- PlantInfoPanel.ts
+- SettingsPanel.ts
+- InventoryUI.ts
+- CraftingPanelUI.ts
+
+### Integration Points
+
+- `demo/src/main.ts` - Instantiate WindowManager, register panels
+- `packages/renderer/src/InputHandler.ts` - Pass events to WindowManager first
+- `packages/renderer/src/index.ts` - Export WindowManager
+
+## Implementation Phases
+
+**Phase 1: Core WindowManager (MVP)**
+- Create WindowManager class
+- Define IWindowPanel interface
+- Implement window registration
+- Add draggable title bars
+- Basic rendering with z-index
+
+**Phase 2: Collision Avoidance**
+- Overlap detection
+- Cascade positioning
+- Snap to available space logic
+
+**Phase 3: Persistence**
+- Save positions to localStorage
+- Load positions on startup
+- Reset to defaults if corrupted
+
+**Phase 4: Advanced Features**
+- Window minimize/maximize
+- Windows menu UI
+- Grid snapping
+- Tile/cascade layout commands
+
+## LocalStorage Schema
+
+Key: `ai-village-window-layout`
+
+```typescript
+interface SavedLayout {
+  version: number;           // Schema version (starts at 1)
+  windows: {
+    [windowId: string]: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      visible: boolean;
+      minimized: boolean;
+    };
+  };
+  lastSaved: number;         // Timestamp
+}
+```
+
+## Design Decisions
+
+1. **Rendering Order:**
+   - Game world first
+   - WindowManager renders after world
+   - Modal dimming between world and modals
+
+2. **Event Handling:**
+   - WindowManager.handleClick() called FIRST
+   - Returns true if consumed, false if pass-through
+
+3. **Grid Snapping (Optional):**
+   - 20px grid
+   - Snap on drag release: Math.round(x / 20) * 20
+
+4. **Performance:**
+   - Only render visible windows
+   - Debounce localStorage writes (500ms)
+   - Cache static title bars
+
+## Critical Gotchas
+
+- ❌ Don't break existing keyboard shortcuts (R, M, I, ESC, Tab)
+- ❌ Don't overlap windows on first load
+- ❌ Don't lose click events (click-through must work)
+- ❌ Don't ignore canvas resize (windows must stay on screen)
+- ❌ Don't forget z-index (click should bring to front)
+
+## Next Steps
+
+**For Test Agent:**
+1. Read work order: `custom_game_engine/agents/autonomous-dev/work-orders/window-manager/work-order.md`
+2. Review 14 acceptance criteria
+3. Write comprehensive test suite
+   - Unit tests for WindowManager
+   - Integration tests for panel refactoring
+   - UI tests for dragging, persistence, keyboard shortcuts
+4. Post test plan to `testing` channel
+5. Hand off to Implementation Agent
+
+**For Implementation Agent:**
+1. Implement Phase 1 (Core WindowManager MVP)
+2. Refactor existing panels to implement IWindowPanel
+3. Implement Phase 2 (Collision Avoidance)
+4. Implement Phase 3 (Persistence)
+5. Verify build passes
+6. Hand off to Playtest Agent
+
+**For Playtest Agent:**
+1. Verify window dragging works smoothly
+2. Verify non-overlapping layout
+3. Verify position persistence across refreshes
+4. Verify keyboard shortcuts still work
+5. Verify z-index management (click to front)
+6. Verify modal dimming
+7. Verify canvas resize handling
+8. Verify 60fps performance with all windows open
+
+## Estimated Effort
+
+- **Phase 1 (MVP):** 3-4 hours
+- **Phase 2 (Collision):** 2-3 hours
+- **Phase 3 (Persistence):** 1-2 hours
+- **Phase 4 (Advanced):** 2-3 hours
+- **Total:** 8-12 hours
+
+## Priority
+
+**MEDIUM** - Quality-of-life improvement, not blocking other features
+
+Can be implemented in parallel with Phase 7-11 work without conflicts.
+
+## CLAUDE.md Compliance
+
+Work order emphasizes:
+- ❌ NO silent fallbacks on missing data
+- ✅ Throw errors with clear messages for invalid window configs
+- ✅ No `.get()` with defaults on critical window state
+- ✅ Type safety throughout
+- ✅ Error path testing required
+
+---
+
+## Handing Off to Test Agent
+
+Work order is comprehensive with 14 acceptance criteria, detailed architecture, and clear implementation phases. All integration points identified. Ready for test-first development.
+
+**Status:** READY_FOR_TESTS
+
+---
+
+Date: 2025-12-25 01:26
+Agent: spec-agent-001 (Spec Agent)
+
