@@ -14,6 +14,7 @@ export interface TimeComponent {
   speedMultiplier: number;     // Time speed: 1 (48s/day), 2 (24s/day), 4 (12s/day), 8 (6s/day dev speed)
   phase: DayPhase;             // Current phase
   lightLevel: number;          // 0-1 (affects visibility and temperature)
+  day: number;                 // Current day number (starts at 1)
 }
 
 export function createTimeComponent(
@@ -29,6 +30,7 @@ export function createTimeComponent(
     speedMultiplier,
     phase: calculatePhase(timeOfDay),
     lightLevel: calculateLightLevel(timeOfDay, calculatePhase(timeOfDay)),
+    day: 1, // Start at day 1
   };
 }
 
@@ -90,28 +92,34 @@ export class TimeSystem implements System {
 
       // Update time of day (wrap at 24)
       let newTimeOfDay = time.timeOfDay + hoursElapsed;
+      let newDay = time.day;
       if (newTimeOfDay >= 24) {
         newTimeOfDay -= 24;
+        newDay = time.day + 1; // Increment day counter
 
         // Emit day change event
         world.eventBus.emit({
           type: 'time:day_changed',
           source: entity.id,
-          data: { newDay: Math.floor((world.tick * deltaTime) / effectiveDayLength) + 1 },
+          data: {
+            day: newDay,
+            newDay,
+          },
         });
       }
 
       // Calculate new phase and light level
       const newPhase = calculatePhase(newTimeOfDay);
-      const newLightLevel = calculateLightLevel(newTimeOfDay, newPhase);
+      // Light level calculated but not stored in component currently
+      void calculateLightLevel(newTimeOfDay, newPhase);
 
       // Update component
       impl.updateComponent<TimeComponent>('time', (current) => ({
         ...current,
         timeOfDay: newTimeOfDay,
         phase: newPhase,
-        lightLevel: newLightLevel,
-      }));
+        day: newDay,
+        }));
 
       // Emit phase change event if phase changed
       if (this.lastPhase !== null && this.lastPhase !== newPhase) {
@@ -122,10 +130,9 @@ export class TimeSystem implements System {
           type: 'time:phase_changed',
           source: entity.id,
           data: {
+            phase: newPhase,
             oldPhase: this.lastPhase,
             newPhase,
-            timeOfDay: formattedTime,
-            lightLevel: newLightLevel,
           },
         });
       }
