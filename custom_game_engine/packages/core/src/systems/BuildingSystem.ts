@@ -1,9 +1,9 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
-import type { World } from '../ecs/World.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import { EntityImpl, createEntityId } from '../ecs/Entity.js';
-import type { BuildingComponent } from '../components/BuildingComponent.js';
+import { EntityImpl } from '../ecs/Entity.js';
+import type { BuildingComponent, BuildingType } from '../components/BuildingComponent.js';
 import { createBuildingComponent } from '../components/BuildingComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
@@ -43,21 +43,41 @@ export class BuildingSystem implements System {
   private readonly BASE_CONSTRUCTION_SPEED = 1.0;
 
   /**
+   * Fuel low threshold as percentage of max fuel.
+   * When fuel drops below this percentage, emit station:fuel_low event.
+   */
+  private readonly FUEL_LOW_THRESHOLD = 0.2; // 20% of max fuel
+
+  /**
+   * Fuel configuration constants for crafting stations.
+   * Defines initial fuel, max capacity, and consumption rates.
+   */
+  private readonly FORGE_FUEL_CONFIG = {
+    INITIAL_FUEL: 50,
+    MAX_FUEL: 100,
+    CONSUMPTION_RATE: 1, // fuel per second when actively crafting
+  } as const;
+
+  /**
    * Initialize the system and register event listeners.
    * Called once when system is registered.
    */
-  public initialize(world: World, eventBus: import('../events/EventBus.js').EventBus): void {
+  public initialize(world: World, _eventBus: import('../events/EventBus.js').EventBus): void {
     if (this.isInitialized) {
       return;
     }
 
+    // Subscribe to world.eventBus directly to ensure we're using the same instance
+    // that will receive emitted events
+    const actualEventBus = world.eventBus;
+
     // Listen for building placement confirmations
-    eventBus.subscribe('building:placement:confirmed', (event) => {
+    actualEventBus.subscribe('building:placement:confirmed', (event) => {
       this.handleBuildingPlacement(world, event.data as { blueprintId: string; position: { x: number; y: number }; rotation: number });
     });
 
     // Listen for building completion to initialize crafting station properties
-    eventBus.subscribe('building:complete', (event) => {
+    actualEventBus.subscribe('building:complete', (event) => {
       this.handleBuildingComplete(world, event);
     });
 
@@ -130,7 +150,12 @@ export class BuildingSystem implements System {
       'auto_farm': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
 
       // Tier 2 stations
-      'forge': { required: true, initialFuel: 50, maxFuel: 100, consumptionRate: 1 },
+      'forge': {
+        required: true,
+        initialFuel: this.FORGE_FUEL_CONFIG.INITIAL_FUEL,
+        maxFuel: this.FORGE_FUEL_CONFIG.MAX_FUEL,
+        consumptionRate: this.FORGE_FUEL_CONFIG.CONSUMPTION_RATE,
+      },
       'farm_shed': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
       'market_stall': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
       'windmill': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
@@ -202,16 +227,21 @@ export class BuildingSystem implements System {
       console.log(`[BuildingSystem] Building "${blueprintId}" has no resource cost`);
     }
 
-    // Create new building entity
-    const entity = new EntityImpl(createEntityId(), (world as any)._tick);
+    // Validate blueprintId is a known building type before creating entity
+    // This will throw if blueprintId is not recognized, per CLAUDE.md (no silent failures)
+    this.getConstructionTime(blueprintId);
+    this.getResourceCost(blueprintId);
+
+    // Create new building entity using WorldMutator API
+    // Per System.ts:12, systems should use WorldMutator for modifications
+    const worldMutator = world as WorldMutator;
+    const entity = worldMutator.createEntity();
 
     // Add components
-    entity.addComponent(createBuildingComponent(blueprintId as any, 1, 0)); // Start at 0% progress
-    entity.addComponent(createPositionComponent(position.x, position.y));
-    entity.addComponent(createRenderableComponent(blueprintId, 'building'));
-
-    // Add to world
-    (world as any)._addEntity(entity);
+    // Safe to cast after validation above proves blueprintId is a valid BuildingType
+    (entity as EntityImpl).addComponent(createBuildingComponent(blueprintId as BuildingType, 1, 0)); // Start at 0% progress
+    (entity as EntityImpl).addComponent(createPositionComponent(position.x, position.y));
+    (entity as EntityImpl).addComponent(createRenderableComponent(blueprintId, 'building'));
 
     console.log(`[BuildingSystem] Created building entity: ${entity.id} at tile (${position.x}, ${position.y})`);
 
@@ -287,11 +317,8 @@ export class BuildingSystem implements System {
     position: PositionComponent,
     deltaTime: number
   ): void {
-    // Check if building component has buildTime field (for tests), otherwise use lookup table
-    const buildingAny = building as any;
-    const constructionTimeSeconds = buildingAny.buildTime !== undefined
-      ? buildingAny.buildTime
-      : this.getConstructionTime(building.buildingType);
+    // Use lookup table for construction time - consistent source of truth
+    const constructionTimeSeconds = this.getConstructionTime(building.buildingType);
 
     // Calculate progress increase per tick
     // Progress is 0-100, so we add (100 / totalTime) * deltaTime
@@ -354,8 +381,8 @@ export class BuildingSystem implements System {
     const newFuel = Math.max(0, buildingComp.currentFuel - fuelConsumed);
 
     // Check for fuel state transitions
-    const wasLow = buildingComp.currentFuel < buildingComp.maxFuel * 0.2;
-    const isNowLow = newFuel < buildingComp.maxFuel * 0.2 && newFuel > 0;
+    const wasLow = buildingComp.currentFuel < buildingComp.maxFuel * this.FUEL_LOW_THRESHOLD;
+    const isNowLow = newFuel < buildingComp.maxFuel * this.FUEL_LOW_THRESHOLD && newFuel > 0;
     const wasEmpty = buildingComp.currentFuel === 0;
     const isNowEmpty = newFuel === 0;
 

@@ -885,7 +885,8 @@ export class AISystem implements System {
     // Note: energy-based sleep is handled above via FORCED_SLEEP at energy <= 0
 
     // Moderate hunger: seek food (but not urgent enough to interrupt sleep)
-    if (needs.hunger < 30) {
+    // TEMP: Lower threshold to 60 for testing berry gathering
+    if (needs.hunger < 60) {
       return { behavior: 'seek_food' };
     }
 
@@ -1178,6 +1179,11 @@ export class AISystem implements System {
     const movement = entity.getComponent<MovementComponent>('movement')!;
     const agent = entity.getComponent<AgentComponent>('agent')!;
     const position = entity.getComponent<PositionComponent>('position')!;
+
+    // Re-enable steering system for wander behavior
+    if (entity.hasComponent('steering')) {
+      entity.updateComponent('steering', (current: any) => ({ ...current, behavior: 'wander' }));
+    }
 
     // Check distance from origin (0, 0) - camp/spawn area
     const distanceFromHome = Math.sqrt(position.x * position.x + position.y * position.y);
@@ -1944,6 +1950,11 @@ export class AISystem implements System {
     const inventory = entity.getComponent<InventoryComponent>('inventory');
     const agent = entity.getComponent<AgentComponent>('agent')!;
 
+    // Disable steering system so it doesn't override our gather movement
+    if (entity.hasComponent('steering')) {
+      entity.updateComponent('steering', (current: any) => ({ ...current, behavior: 'none' }));
+    }
+
     if (!inventory) {
       // No inventory component, can't gather
       this.wanderBehavior(entity);
@@ -1957,56 +1968,21 @@ export class AISystem implements System {
     let targetPos: { x: number; y: number } | null = null;
     let nearestDistance = Infinity;
 
-    // First, check memories for known resource locations
-    if (memory) {
-      const resourceMemories = getMemoriesByType(memory, 'resource_location');
-      for (const mem of resourceMemories) {
-        const memResourceType = mem.metadata?.resourceType as string;
-
-        // If preferred type specified, only consider that type
-        if (preferredType && memResourceType !== preferredType) continue;
-
-        const distance = Math.sqrt(
-          Math.pow(mem.x - position.x, 2) +
-          Math.pow(mem.y - position.y, 2)
-        );
-
-        if (distance < nearestDistance) {
-          // Try to get the actual entity
-          if (mem.entityId) {
-            const resource = world.getEntity(mem.entityId);
-            if (resource) {
-              const resourceImpl = resource as EntityImpl;
-              const resourceComp = resourceImpl.getComponent<ResourceComponent>('resource');
-              if (resourceComp && resourceComp.amount > 0 && resourceComp.harvestable) {
-                targetResource = resource;
-                nearestDistance = distance;
-              }
-            }
-          } else {
-            // Just use memory position
-            targetPos = { x: mem.x, y: mem.y };
-            nearestDistance = distance;
-          }
-        }
-      }
-    }
-
-    // If no memory or memory is stale, search for resources
+    // Search for visible resources (always search, don't rely on stale memories)
     // IMPORTANT: Only search within reasonable range to prevent agents from wandering across the entire map
     const maxGatherRange = 50; // tiles - agents won't navigate further than this to gather resources
     const homeRadius = 15; // Prefer resources within this radius of home (0, 0)
 
-    if (!targetResource && !targetPos) {
-      const resources = world
-        .query()
-        .with('resource')
-        .with('position')
-        .executeEntities();
+    // Always search visible resources first (fresh data is better than memory)
+    const resources = world
+      .query()
+      .with('resource')
+      .with('position')
+      .executeEntities();
 
-      let bestScore = Infinity;
+    let bestScore = Infinity;
 
-      for (const resource of resources) {
+    for (const resource of resources) {
         const resourceImpl = resource as EntityImpl;
         const resourceComp = resourceImpl.getComponent<ResourceComponent>('resource')!;
         const resourcePos = resourceImpl.getComponent<PositionComponent>('position')!;
@@ -2047,7 +2023,6 @@ export class AISystem implements System {
           targetResource = resource;
         }
       }
-    }
 
     // Also search for plants with seeds (farming-system/spec.md lines 296-343)
     // Agents can gather seeds from wild plants at mature/seeding/senescence stages
@@ -2469,11 +2444,21 @@ export class AISystem implements System {
       const velocityX = (dx / distance) * movement.speed;
       const velocityY = (dy / distance) * movement.speed;
 
+      // Update both movement and velocity components (MovementSystem syncs velocity→movement)
       entity.updateComponent<MovementComponent>('movement', (current) => ({
         ...current,
         velocityX,
         velocityY,
       }));
+
+      // Also update velocity component so MovementSystem doesn't override with old steering values
+      if (entity.hasComponent('velocity')) {
+        entity.updateComponent('velocity', (current: any) => ({
+          ...current,
+          vx: velocityX,
+          vy: velocityY,
+        }));
+      }
     }
   }
 

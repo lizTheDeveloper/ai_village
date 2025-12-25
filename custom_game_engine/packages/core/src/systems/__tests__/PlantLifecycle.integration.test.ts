@@ -38,6 +38,16 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
       stage: 'seedling',
       health: 100,
       growthProgress: 0,
+      age: 0,
+      genetics: {
+        growthRate: 1.0,
+        yieldAmount: 1.0,
+        diseaseResistance: 50,
+        droughtTolerance: 50,
+        coldTolerance: 50,
+        flavorProfile: 50,
+        mutations: []
+      }
     });
 
     // Emit day change event
@@ -67,12 +77,23 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
       nutrition: 80,
       growthProgress: 0,
       age: 0,
+      stageProgress: 0,
+      genetics: {
+        growthRate: 1.0,
+        yieldAmount: 1.0,
+        diseaseResistance: 50,
+        droughtTolerance: 50,
+        coldTolerance: 50,
+        flavorProfile: 50,
+        mutations: []
+      }
     });
 
     const entities = Array.from(harness.world.entities.values());
 
     const initialPlant = plant.getComponent('plant') as any;
     const initialProgress = initialPlant.growthProgress;
+    const initialAge = initialPlant.age;
 
     // Simulate time passing
     plantSystem.update(harness.world, entities, 3600.0); // 1 hour
@@ -81,7 +102,7 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
 
     // Growth progress should increase (or age should increase)
     expect(
-      updatedPlant.growthProgress > initialProgress || updatedPlant.age > initialPlant.age
+      updatedPlant.growthProgress > initialProgress || updatedPlant.age > initialAge
     ).toBe(true);
   });
 
@@ -121,6 +142,16 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
       stage: 'seedling',
       health: 100,
       growthProgress: 0,
+      age: 0,
+      genetics: {
+        growthRate: 1.0,
+        yieldAmount: 1.0,
+        diseaseResistance: 50,
+        droughtTolerance: 50,
+        coldTolerance: 50,
+        flavorProfile: 50,
+        mutations: []
+      }
     });
 
     harness.clearEvents();
@@ -153,6 +184,17 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
       hydration: 70,
       nutrition: 80,
       growthProgress: 0,
+      stageProgress: 0,
+      age: 0,
+      genetics: {
+        growthRate: 1.0,
+        yieldAmount: 1.0,
+        diseaseResistance: 50,
+        droughtTolerance: 50,
+        coldTolerance: 50,
+        flavorProfile: 50,
+        mutations: []
+      }
     });
 
     // Create unhealthy plant
@@ -167,6 +209,17 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
       hydration: 40,
       nutrition: 50,
       growthProgress: 0,
+      stageProgress: 0,
+      age: 0,
+      genetics: {
+        growthRate: 1.0,
+        yieldAmount: 1.0,
+        diseaseResistance: 50,
+        droughtTolerance: 50,
+        coldTolerance: 50,
+        flavorProfile: 50,
+        mutations: []
+      }
     });
 
     const entities = Array.from(harness.world.entities.values());
@@ -198,6 +251,17 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
       hydration: 70,
       nutrition: 80,
       growthProgress: 95, // Almost ready to advance
+      stageProgress: 0.95, // Almost ready to advance
+      age: 0,
+      genetics: {
+        growthRate: 1.0,
+        yieldAmount: 1.0,
+        diseaseResistance: 50,
+        droughtTolerance: 50,
+        coldTolerance: 50,
+        flavorProfile: 50,
+        mutations: []
+      }
     });
 
     harness.clearEvents();
@@ -232,6 +296,17 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
       hydration: 70,
       nutrition: 80,
       growthProgress: 10,
+      stageProgress: 0.1,
+      age: 0,
+      genetics: {
+        growthRate: 1.0,
+        yieldAmount: 1.0,
+        diseaseResistance: 50,
+        droughtTolerance: 50,
+        coldTolerance: 50,
+        flavorProfile: 50,
+        mutations: []
+      }
     });
 
     const plant2 = harness.world.createEntity('plant');
@@ -245,6 +320,17 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
       hydration: 65,
       nutrition: 75,
       growthProgress: 50,
+      stageProgress: 0.5,
+      age: 0,
+      genetics: {
+        growthRate: 1.0,
+        yieldAmount: 1.0,
+        diseaseResistance: 50,
+        droughtTolerance: 50,
+        coldTolerance: 50,
+        flavorProfile: 50,
+        mutations: []
+      }
     });
 
     const entities = Array.from(harness.world.entities.values());
@@ -272,6 +358,17 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
       hydration: 0,
       nutrition: 0,
       growthProgress: 0,
+      stageProgress: 0,
+      age: 0,
+      genetics: {
+        growthRate: 1.0,
+        yieldAmount: 1.0,
+        diseaseResistance: 50,
+        droughtTolerance: 50,
+        coldTolerance: 50,
+        flavorProfile: 50,
+        mutations: []
+      }
     });
 
     const entities = Array.from(harness.world.entities.values());

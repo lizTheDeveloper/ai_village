@@ -121,12 +121,10 @@ export class WindowManager {
     }
 
     // Check for space and handle collision avoidance
-    const position = this.findAvailablePosition(window);
+    let position = this.findAvailablePosition(window);
 
-    if (position) {
-      window.x = position.x;
-      window.y = position.y;
-    } else {
+    // Keep closing LRU windows until we find space
+    while (!position) {
       // No space found - try LRU eviction
       const lruWindowId = this.findLeastRecentlyUsedWindow();
 
@@ -150,13 +148,12 @@ export class WindowManager {
         } as WindowAutoCloseEvent);
 
         // Try to find position again
-        const newPosition = this.findAvailablePosition(window);
-        if (newPosition) {
-          window.x = newPosition.x;
-          window.y = newPosition.y;
-        }
+        position = this.findAvailablePosition(window);
       }
     }
+
+    window.x = position.x;
+    window.y = position.y;
 
     window.visible = true;
     window.panel.setVisible(true);
@@ -578,16 +575,11 @@ export class WindowManager {
     const cascadeX = lastWindow.x + TITLE_BAR_HEIGHT;
     const cascadeY = lastWindow.y + TITLE_BAR_HEIGHT;
 
-    // Check if cascade position is within bounds (allow overlap for cascading)
+    // Check if cascade position is within bounds and doesn't overlap
     if (cascadeX + window.width <= this.canvas.width &&
-        cascadeY + window.height <= this.canvas.height) {
+        cascadeY + window.height <= this.canvas.height &&
+        this.isPositionAvailable(cascadeX, cascadeY, window.width, window.height, window.id)) {
       return { x: cascadeX, y: cascadeY };
-    }
-
-    // Cascade would go off-screen - try default position
-    if (window.config.defaultX + window.width <= this.canvas.width &&
-        window.config.defaultY + window.height <= this.canvas.height) {
-      return { x: window.config.defaultX, y: window.config.defaultY };
     }
 
     // No valid cascade position found

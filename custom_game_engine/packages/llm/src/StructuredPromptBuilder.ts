@@ -905,6 +905,21 @@ export class StructuredPromptBuilder {
     // Always available - agents can pick resources, food, seeds, crops
     actions.push('pick - Get/collect anything: wood, stone, food, berries, seeds, crops (say "pick <thing>" or "get <thing>" or "harvest <thing>")');
 
+    // Check if mature plants are visible for seed gathering
+    const hasSeenMaturePlants = vision?.seenPlants && vision.seenPlants.length > 0 && _world && vision.seenPlants.some((plantId: string) => {
+      const plant = _world.getEntity(plantId);
+      if (!plant) return false;
+      const plantComp = plant.components.get('plant');
+      if (!plantComp) return false;
+      const validStages = ['mature', 'seeding', 'senescence'];
+      return validStages.includes(plantComp.stage) && plantComp.seedsProduced > 0;
+    });
+
+    // Add explicit seed gathering hint if mature plants are visible
+    if (hasSeenMaturePlants) {
+      actions.push('🌱 pick seeds - Mature plants nearby! Gather seeds for farming (say "pick seeds" or "gather seeds from plant")');
+    }
+
     // FARMING ACTIONS - always available (agents can farm anywhere with grass/dirt)
     const hasSeeds = inventory?.slots?.some((slot: any) =>
       slot.itemId && slot.itemId.includes('seed')

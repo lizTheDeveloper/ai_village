@@ -122,11 +122,12 @@ export function createBuildingComponent(
 
     // Tier 2 crafting stations (Phase 10)
     case 'forge':
-      // Metal crafting station - requires fuel
-      fuelRequired = true;
-      currentFuel = 50; // Start with half fuel
-      maxFuel = 100;
-      fuelConsumptionRate = 1; // 1 fuel per second when active
+      // Metal crafting station - fuel initialized by BuildingSystem on completion
+      // BuildingSystem owns fuel configuration (single source of truth)
+      fuelRequired = false; // Will be set to true by BuildingSystem
+      currentFuel = 0;
+      maxFuel = 0;
+      fuelConsumptionRate = 0;
       break;
     case 'farm_shed':
       // Farming storage - no fuel required

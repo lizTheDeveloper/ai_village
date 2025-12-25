@@ -23,7 +23,7 @@ export function createBerryBush(world: WorldMutator, x: number, y: number): stri
   entity.addComponent(createPhysicsComponent(false, 1, 1));
 
   // Renderable
-  entity.addComponent(createRenderableComponent('berries', 'object'));
+  entity.addComponent(createRenderableComponent('berry-bush', 'object'));
 
   // Tags
   entity.addComponent(createTagsComponent('berries', 'harvestable', 'food'));

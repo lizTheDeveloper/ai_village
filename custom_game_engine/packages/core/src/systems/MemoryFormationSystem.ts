@@ -99,7 +99,7 @@ export class MemoryFormationSystem implements System {
       'conversation:ended',
       'conversation:utterance',
       'plant:stageChanged',
-      'building:complete',
+      // Note: building:complete removed - it's a system event without agentId
 
       // Harvesting and resource events
       'harvest:first',
@@ -296,7 +296,7 @@ export class MemoryFormationSystem implements System {
       'agent:collapsed',
       'agent:harvested',
       'resource:gathered',
-      'building:complete',
+      // Note: building:complete removed - it's a system event without agentId
       'construction:failed',
       'items:deposited',
       'inventory:full',
@@ -433,8 +433,7 @@ export class MemoryFormationSystem implements System {
         return `Failed to build ${(data as any).buildingType || 'building'}: ${(data as any).reason || 'unknown reason'}`;
       case 'construction:gathering_resources':
         return `Gathering resources to build ${(data as any).buildingType || 'building'}`;
-      case 'building:complete':
-        return `Completed building ${(data as any).buildingType || 'building'}`;
+      // Note: building:complete removed - it's a system event without agentId
 
       // Inventory
       case 'items:deposited':

@@ -47,7 +47,32 @@ import {
   BeliefFormationSystem,
   SpatialMemoryQuerySystem,
 } from '@ai-village/core';
-import { Renderer, InputHandler, KeyboardRegistry, BuildingPlacementUI, AgentInfoPanel, AnimalInfoPanel, TileInspectorPanel, PlantInfoPanel, ResourcesPanel, SettingsPanel, MemoryPanel, InventoryUI } from '@ai-village/renderer';
+import {
+  Renderer,
+  InputHandler,
+  KeyboardRegistry,
+  BuildingPlacementUI,
+  AgentInfoPanel,
+  AnimalInfoPanel,
+  TileInspectorPanel,
+  PlantInfoPanel,
+  ResourcesPanel,
+  SettingsPanel,
+  MemoryPanel,
+  InventoryUI,
+  CraftingPanelUI,
+  WindowManager,
+  MenuBar,
+  AgentInfoPanelAdapter,
+  AnimalInfoPanelAdapter,
+  PlantInfoPanelAdapter,
+  MemoryPanelAdapter,
+  ResourcesPanelAdapter,
+  SettingsPanelAdapter,
+  TileInspectorPanelAdapter,
+  InventoryUIAdapter,
+  CraftingPanelUIAdapter,
+} from '@ai-village/renderer';
 import {
   OllamaProvider,
   OpenAICompatProvider,
@@ -528,6 +553,9 @@ async function main() {
   // Create inventory UI (I or Tab to toggle) - Phase 10 full-featured inventory
   const inventoryUI = new InventoryUI(canvas, gameLoop.world);
 
+  // Create crafting UI (C to toggle) - Phase 10 crafting system
+  const craftingUI = new CraftingPanelUI(gameLoop.world, canvas);
+
   // Generate terrain with trees and rocks first (so we can create tile inspector)
   console.log('Generating terrain...');
   const terrainGenerator = new TerrainGenerator('phase8-demo');
@@ -556,6 +584,145 @@ async function main() {
     chunkManager,
     terrainGenerator // Pass terrainGenerator to ensure chunks are generated when accessed
   );
+
+  // ===== WINDOW MANAGER SETUP =====
+  // Create WindowManager to manage all UI panels
+  console.log('[Main] Setting up WindowManager...');
+  const windowManager = new WindowManager(canvas);
+
+  // Create MenuBar for window management
+  const menuBar = new MenuBar(windowManager, canvas);
+
+  // Create adapters for all panels
+  const agentInfoAdapter = new AgentInfoPanelAdapter(agentInfoPanel);
+  const animalInfoAdapter = new AnimalInfoPanelAdapter(animalInfoPanel);
+  const plantInfoAdapter = new PlantInfoPanelAdapter(plantInfoPanel);
+  const memoryAdapter = new MemoryPanelAdapter(memoryPanel);
+  const resourcesAdapter = new ResourcesPanelAdapter(resourcesPanel);
+  const settingsAdapter = new SettingsPanelAdapter(settingsPanel);
+  const tileInspectorAdapter = new TileInspectorPanelAdapter(tileInspectorPanel);
+  const inventoryAdapter = new InventoryUIAdapter(inventoryUI);
+  const craftingAdapter = new CraftingPanelUIAdapter(craftingUI);
+
+  // Register windows with default positions
+  // Top-right zone: Agent/Animal/Plant Info (context-sensitive)
+  windowManager.registerWindow('agent-info', agentInfoAdapter, {
+    defaultX: canvas.width - 320,
+    defaultY: 10,
+    defaultWidth: 300,
+    defaultHeight: 500,
+    isDraggable: true,
+    showInWindowList: true,
+    keyboardShortcut: 'A',
+  });
+
+  windowManager.registerWindow('animal-info', animalInfoAdapter, {
+    defaultX: canvas.width - 320,
+    defaultY: 10,
+    defaultWidth: 300,
+    defaultHeight: 400,
+    isDraggable: true,
+    showInWindowList: true,
+  });
+
+  windowManager.registerWindow('plant-info', plantInfoAdapter, {
+    defaultX: canvas.width - 320,
+    defaultY: 10,
+    defaultWidth: 300,
+    defaultHeight: 350,
+    isDraggable: true,
+    showInWindowList: true,
+  });
+
+  // Top-right zone: Resources Panel
+  windowManager.registerWindow('resources', resourcesAdapter, {
+    defaultX: canvas.width - 260,
+    defaultY: 10,
+    defaultWidth: 250,
+    defaultHeight: 200,
+    isDraggable: true,
+    showInWindowList: true,
+    keyboardShortcut: 'R',
+  });
+
+  // Bottom-left zone: Memory Panel
+  windowManager.registerWindow('memory', memoryAdapter, {
+    defaultX: 10,
+    defaultY: canvas.height - 610,
+    defaultWidth: 400,
+    defaultHeight: 600,
+    isDraggable: true,
+    showInWindowList: true,
+    keyboardShortcut: 'M',
+  });
+
+  // Bottom-right zone: Tile Inspector Panel
+  windowManager.registerWindow('tile-inspector', tileInspectorAdapter, {
+    defaultX: canvas.width - 320,
+    defaultY: canvas.height - 410,
+    defaultWidth: 300,
+    defaultHeight: 400,
+    isDraggable: true,
+    showInWindowList: true,
+    keyboardShortcut: 'T',
+  });
+
+  // Center/Modal: Inventory (full-screen modal)
+  windowManager.registerWindow('inventory', inventoryAdapter, {
+    defaultX: 100,
+    defaultY: 50,
+    defaultWidth: canvas.width - 200,
+    defaultHeight: canvas.height - 100,
+    isDraggable: true,
+    isModal: true,
+    showInWindowList: true,
+    keyboardShortcut: 'I',
+  });
+
+  // Top-left zone: Settings Panel
+  windowManager.registerWindow('settings', settingsAdapter, {
+    defaultX: 10,
+    defaultY: 10,
+    defaultWidth: 400,
+    defaultHeight: 300,
+    isDraggable: true,
+    isModal: true,
+    showInWindowList: true,
+    keyboardShortcut: 'Escape',
+  });
+
+  // Center/Modal: Crafting Panel
+  windowManager.registerWindow('crafting', craftingAdapter, {
+    defaultX: 100,
+    defaultY: 80,
+    defaultWidth: 800,
+    defaultHeight: 600,
+    isDraggable: true,
+    isModal: true,
+    showInWindowList: true,
+    keyboardShortcut: 'C',
+  });
+
+  // Load saved window positions from localStorage
+  windowManager.loadLayout();
+
+  // Listen for auto-close events to show notifications
+  windowManager.on('window:auto-closed', (event: any) => {
+    showNotification(`Closed "${event.windowTitle}" to make space`, '#FFA500');
+  });
+
+  // Add mouseup listener to end window dragging
+  window.addEventListener('mouseup', () => {
+    windowManager.handleDragEnd();
+  });
+
+  // Handle canvas resize for WindowManager
+  window.addEventListener('resize', () => {
+    const rect = canvas.getBoundingClientRect();
+    windowManager.handleCanvasResize(rect.width, rect.height);
+  });
+
+  console.log('[Main] WindowManager setup complete - 9 windows registered');
 
   // Get SoilSystem instance to handle tile actions
   const soilSystem = gameLoop.systemRegistry
@@ -1364,7 +1531,7 @@ async function main() {
       // ESC - Close inventory first (if open), otherwise toggle settings panel
       if (key === 'Escape') {
         if (inventoryUI.isOpen()) {
-          inventoryUI.handleKeyPress(key, shiftKey, ctrlKey);
+          windowManager.hideWindow('inventory');
           console.log(`[Main] Inventory closed with Escape`);
 
           // Show controls panel when inventory closes
@@ -1375,32 +1542,47 @@ async function main() {
 
           return true;
         }
-        settingsPanel.toggle();
+        windowManager.toggleWindow('settings');
         return true;
       }
 
       // R - Toggle resources panel
       if (key === 'r' || key === 'R') {
-        resourcesPanel.toggleCollapsed();
+        windowManager.toggleWindow('resources');
         return true;
       }
 
       // M - Toggle memory panel
       if (key === 'm' || key === 'M') {
-        memoryPanel.toggle();
-        console.log(`[Main] Memory panel ${memoryPanel.isVisible() ? 'opened' : 'closed'}`);
+        windowManager.toggleWindow('memory');
+        console.log(`[Main] Memory panel toggled`);
+        return true;
+      }
+
+      // T - Toggle tile inspector panel
+      if (key === 't' || key === 'T') {
+        windowManager.toggleWindow('tile-inspector');
+        return true;
+      }
+
+      // C - Toggle crafting panel
+      if (key === 'c' || key === 'C') {
+        windowManager.toggleWindow('crafting');
+        const visible = windowManager.getWindow('crafting')?.visible ?? false;
+        console.log(`[Main] Crafting ${visible ? 'opened' : 'closed'}`);
         return true;
       }
 
       // I or Tab - Toggle inventory (Phase 10)
       if (key === 'i' || key === 'I' || key === 'Tab') {
-        inventoryUI.handleKeyPress(key, shiftKey, ctrlKey);
-        console.log(`[Main] Inventory ${inventoryUI.isOpen() ? 'opened' : 'closed'}`);
+        windowManager.toggleWindow('inventory');
+        const visible = windowManager.getWindow('inventory')?.visible ?? false;
+        console.log(`[Main] Inventory ${visible ? 'opened' : 'closed'}`);
 
         // Hide/show controls panel when inventory opens/closes
         const controlsPanel = document.querySelector('.controls');
         if (controlsPanel) {
-          if (inventoryUI.isOpen()) {
+          if (visible) {
             controlsPanel.classList.add('hidden');
           } else {
             controlsPanel.classList.remove('hidden');
@@ -1778,40 +1960,34 @@ async function main() {
       console.log(`[Main] onMouseClick: (${screenX}, ${screenY}), button=${button}`);
       const rect = canvas.getBoundingClientRect();
 
-      // Check if inventory UI handles the click (highest priority)
-      // Use CSS dimensions (rect.width/height) not buffer dimensions (canvas.width/height)
-      const inventoryHandled = inventoryUI.handleClick(screenX, screenY, button, rect.width, rect.height);
-      console.log(`[Main] inventoryUI.handleClick returned: ${inventoryHandled}`);
-      if (inventoryHandled) {
-        return true;
-      }
+      // Left click only for window management and menu bar
+      if (button === 0) {
+        // Check MenuBar first (it's on top)
+        const menuHandled = menuBar.handleClick(screenX, screenY);
+        if (menuHandled) {
+          console.log(`[Main] menuBar.handleClick returned true`);
+          return true;
+        }
 
-      // First check if resources panel handles the click (collapse/expand)
-      const agentPanelOpen = agentInfoPanel.getSelectedEntityId() !== null;
-      const resourcesHandled = resourcesPanel.handleClick(screenX, screenY, rect.width, agentPanelOpen);
-      console.log(`[Main] resourcesPanel.handleClick returned: ${resourcesHandled}`);
-      if (resourcesHandled) {
-        return true;
-      }
+        // Try to start drag on window title bar
+        const dragStarted = windowManager.handleDragStart(screenX, screenY);
+        if (dragStarted) {
+          console.log(`[Main] windowManager.handleDragStart returned true - dragging window`);
+          return true;
+        }
 
-      // Check if animal info panel handles the click (close button, action buttons)
-      const animalHandled = animalInfoPanel.handleClick(screenX, screenY, rect.width, rect.height, gameLoop.world);
-      console.log(`[Main] animalInfoPanel.handleClick returned: ${animalHandled}`);
-      if (animalHandled) {
-        return true;
+        // Check if WindowManager handles the click (title bar buttons, window focus)
+        const windowHandled = windowManager.handleClick(screenX, screenY);
+        console.log(`[Main] windowManager.handleClick returned: ${windowHandled}`);
+        if (windowHandled) {
+          return true;
+        }
       }
 
       // Check if placement UI handles the click
       const placementHandled = placementUI.handleClick(screenX, screenY, button);
       console.log(`[Main] placementUI.handleClick returned: ${placementHandled}`);
       if (placementHandled) {
-        return true;
-      }
-
-      // Check if tile inspector panel handles the click (for button clicks)
-      const tileInspectorHandled = tileInspectorPanel.handleClick(screenX, screenY, rect.width, rect.height);
-      console.log(`[Main] tileInspectorPanel.handleClick returned: ${tileInspectorHandled}`);
-      if (tileInspectorHandled) {
         return true;
       }
 
@@ -1872,6 +2048,9 @@ async function main() {
     onMouseMove: (screenX, screenY) => {
       const rect = canvas.getBoundingClientRect();
 
+      // Check if WindowManager handles the drag
+      windowManager.handleDrag(screenX, screenY);
+
       // Check if inventory UI handles mouse move (for tooltips)
       // Use CSS dimensions (rect.width/height) not buffer dimensions (canvas.width/height)
       const inventoryHandled = inventoryUI.handleMouseMove(screenX, screenY, rect.width, rect.height);
@@ -1917,20 +2096,15 @@ async function main() {
       }
     }
 
-    // Render UI panels on top
+    // Render UI panels via WindowManager and MenuBar
     const ctx = renderer.getContext();
     const rect = canvas.getBoundingClientRect();
-    const agentPanelOpen = agentInfoPanel.getSelectedEntityId() !== null;
-    resourcesPanel.render(ctx, rect.width, gameLoop.world, agentPanelOpen); // Resources panel (top-right)
-    agentInfoPanel.render(ctx, rect.width, rect.height, gameLoop.world);
-    animalInfoPanel.render(ctx, rect.width, rect.height, gameLoop.world);
-    plantInfoPanel.render(ctx, rect.width, rect.height, gameLoop.world);
-    tileInspectorPanel.render(ctx, rect.width, rect.height);
-    memoryPanel.render(ctx, rect.width, rect.height, gameLoop.world); // Memory panel (M to toggle)
 
-    // Render inventory UI (I or Tab to toggle) - Phase 10
-    // Use CSS dimensions (rect.width/height) not buffer dimensions (canvas.width/height)
-    inventoryUI.render(ctx, rect.width, rect.height);
+    // WindowManager handles all panel rendering with proper z-ordering and window chrome
+    windowManager.render(ctx);
+
+    // MenuBar renders on top of everything
+    menuBar.render(ctx);
 
     requestAnimationFrame(renderLoop);
   }
