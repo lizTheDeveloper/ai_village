@@ -29,10 +29,9 @@ export class ResponseParser {
   private validBehaviors: Set<string> = new Set([
     'wander',
     'idle',
-    'seek_food',
     'follow_agent',
     'talk',
-    'gather',
+    'pick',      // Unified action for gathering/harvesting/collecting resources
     'explore',
     'approach',
     'observe',
@@ -45,9 +44,34 @@ export class ResponseParser {
     'attend_meeting',
     'till',
     'farm',
-    'gather_seeds',
-    'harvest',
+    'plant',
+    'water',
+    'fertilize',
+    'navigate',
+    'explore_frontier',
+    'explore_spiral',
+    'seek_sleep',
+    'seek_warmth',
   ]);
+
+  // Synonym mapping - lemmatize similar actions to core behaviors
+  private synonyms: Record<string, AgentBehavior> = {
+    // Pick = gather, harvest, collect, get, take
+    'gather': 'pick',
+    'harvest': 'pick',
+    'collect': 'pick',
+    'get': 'pick',
+    'take': 'pick',
+    'grab': 'pick',
+    'gather_seeds': 'pick',
+    'seek_food': 'pick',
+    // Rest = sleep, idle
+    'sleep': 'rest',
+    // Talk = speak, say, chat
+    'speak': 'talk',
+    'say': 'talk',
+    'chat': 'talk',
+  };
 
   /**
    * Parse LLM response text into full agent response (thinking, speaking, action).
@@ -94,7 +118,19 @@ export class ResponseParser {
     // Fallback: Clean the response and search for behavior name
     const cleaned = responseText.toLowerCase().trim();
 
-    // Try to extract behavior name
+    // First check synonyms (check these before exact matches to catch variations)
+    for (const [synonym, canonical] of Object.entries(this.synonyms)) {
+      if (cleaned.includes(synonym)) {
+        console.log(`[ResponseParser] Synonym match: "${synonym}" → "${canonical}"`);
+        return {
+          thinking: responseText,
+          speaking: '',
+          action: canonical as AgentBehavior
+        };
+      }
+    }
+
+    // Then try to extract exact behavior name
     for (const behavior of Array.from(this.validBehaviors)) {
       if (cleaned.includes(behavior)) {
         console.log('[ResponseParser] Text-based match:', behavior);

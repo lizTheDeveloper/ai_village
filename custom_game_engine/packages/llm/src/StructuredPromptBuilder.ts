@@ -901,56 +901,20 @@ export class StructuredPromptBuilder {
       console.log(`[StructuredPromptBuilder] 🏗️ BUILD ACTION PROMOTED to position 2 - hasResources=${hasResources}, isCold=${isCold}, isTired=${isTired}`);
     }
 
-    // Add contextual actions - use exact behavior names from ResponseParser
-    if (vision?.seenResources && vision.seenResources.length > 0) {
-      actions.push('seek_food - Find and eat food');
-
-      // Make gather action more specific based on what's visible
-      let hasWood = false;
-      let hasStone = false;
-
-      if (world) {
-        for (const resourceId of vision.seenResources) {
-          const resource = world.getEntity(resourceId);
-          if (resource) {
-            const resourceComp = resource.getComponent('resource');
-            if (resourceComp) {
-              if (resourceComp.resourceType === 'wood') hasWood = true;
-              if (resourceComp.resourceType === 'stone') hasStone = true;
-            }
-          }
-        }
-      }
-
-      if (hasWood || hasStone) {
-        // Make the gather action more explicit with clear examples
-        const gatherExamples = [];
-        if (hasWood) gatherExamples.push('"chop" or "gather wood"');
-        if (hasStone) gatherExamples.push('"mine" or "gather stone"');
-        actions.push(`gather - Collect resources for building (say ${gatherExamples.join(' or ')})`);
-      }
-    }
+    // PICK - Unified collection action (replaces gather, harvest, seek_food, gather_seeds)
+    // Always available - agents can pick resources, food, seeds, crops
+    actions.push('pick - Get/collect anything: wood, stone, food, berries, seeds, crops (say "pick <thing>" or "get <thing>" or "harvest <thing>")');
 
     // FARMING ACTIONS - always available (agents can farm anywhere with grass/dirt)
-    // Check if agent is near grass/dirt tiles that could be tilled
-    // For now, make farming actions available if agent has seeds OR sees untilled soil
     const hasSeeds = inventory?.slots?.some((slot: any) =>
       slot.itemId && slot.itemId.includes('seed')
     );
 
-    // Always show farming actions to encourage autonomous farming behavior
-    // The actual validation happens when the action is executed
     actions.push('till - Prepare soil for planting (say "till" or "prepare soil")');
 
     if (hasSeeds) {
       actions.push('plant - Plant seeds in tilled soil (say "plant <seedType>")');
     }
-
-    // Add gather_seeds action - allows gathering seeds from wild or cultivated plants
-    actions.push('gather_seeds - Gather seeds from mature plants for planting (say "gather seeds from <plant>")');
-
-    // Add harvest action if agent sees mature plants (TODO: vision check)
-    actions.push('harvest - Harvest mature crops');
 
     if (vision?.seenAgents && vision.seenAgents.length > 0) {
       actions.push('talk - Have a conversation');

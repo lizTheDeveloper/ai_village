@@ -33,4 +33,16 @@ export * from './IngredientPanel.js';
 export * from './CraftingQueueSection.js';
 
 export * from './WindowManager.js';
+export * from './MenuBar.js';
 export * from './types/WindowTypes.js';
+
+// Window panel adapters
+export * from './adapters/AgentInfoPanelAdapter.js';
+export * from './adapters/AnimalInfoPanelAdapter.js';
+export * from './adapters/PlantInfoPanelAdapter.js';
+export * from './adapters/TileInspectorPanelAdapter.js';
+export * from './adapters/ResourcesPanelAdapter.js';
+export * from './adapters/MemoryPanelAdapter.js';
+export * from './adapters/InventoryUIAdapter.js';
+export * from './adapters/SettingsPanelAdapter.js';
+export * from './adapters/CraftingPanelUIAdapter.js';

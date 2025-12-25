@@ -67,6 +67,7 @@ export class BuildingSystem implements System {
   /**
    * Handle building completion event.
    * Initialize fuel properties for crafting stations that require fuel.
+   * Per CLAUDE.md: No silent failures - throws if entity not found.
    */
   private handleBuildingComplete(
     world: World,
@@ -79,8 +80,7 @@ export class BuildingSystem implements System {
     const entity = world.getEntity(entityId);
 
     if (!entity) {
-      console.warn(`[BuildingSystem] Entity ${entityId} not found for building completion`);
-      return;
+      throw new Error(`[BuildingSystem] Entity ${entityId} not found for building completion - entity may have been deleted before completion event processed`);
     }
 
     // Get fuel configuration for this building type
@@ -592,6 +592,7 @@ export class BuildingSystem implements System {
   /**
    * Get resource cost for a building type.
    * Returns the required resources to construct this building.
+   * Per CLAUDE.md: No silent fallbacks - throws on unknown building type.
    */
   private getResourceCost(buildingType: string): Record<string, number> {
     // Map of building types to resource costs (from BuildingBlueprintRegistry)
@@ -614,8 +615,11 @@ export class BuildingSystem implements System {
       'barn': { wood: 50, stone: 20 },
     };
 
-    // Return empty object for unknown types (some buildings may have no cost)
-    return resourceCosts[buildingType] || {};
+    const cost = resourceCosts[buildingType];
+    if (cost === undefined) {
+      throw new Error(`Unknown building type: "${buildingType}". Add resource cost to BuildingSystem.ts:getResourceCost()`);
+    }
+    return cost;
   }
 
   /**

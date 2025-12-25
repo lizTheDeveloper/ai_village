@@ -53,10 +53,18 @@ export class AISystem implements System {
   constructor(llmDecisionQueue?: any, promptBuilder?: any) {
     this.registerBehavior('wander', this.wanderBehavior.bind(this));
     this.registerBehavior('idle', this.idleBehavior.bind(this));
-    this.registerBehavior('seek_food', this.seekFoodBehavior.bind(this));
     this.registerBehavior('follow_agent', this.followAgentBehavior.bind(this));
     this.registerBehavior('talk', this.talkBehavior.bind(this));
+
+    // PICK - Unified collection behavior (replaces gather/harvest/gather_seeds/seek_food)
+    this.registerBehavior('pick', this.gatherBehavior.bind(this));
+
+    // Legacy behaviors - all route to gather for backward compatibility
     this.registerBehavior('gather', this.gatherBehavior.bind(this));
+    this.registerBehavior('harvest', this.gatherBehavior.bind(this));
+    this.registerBehavior('gather_seeds', this.gatherBehavior.bind(this));
+    this.registerBehavior('seek_food', this.gatherBehavior.bind(this));
+
     this.registerBehavior('build', this.buildBehavior.bind(this));
     this.registerBehavior('seek_sleep', this._seekSleepBehavior.bind(this));
     this.registerBehavior('forced_sleep', this._forcedSleepBehavior.bind(this));
@@ -66,8 +74,6 @@ export class AISystem implements System {
     this.registerBehavior('attend_meeting', this._attendMeetingBehavior.bind(this));
     this.registerBehavior('farm', this.farmBehavior.bind(this));
     this.registerBehavior('till', this.tillBehavior.bind(this));
-    this.registerBehavior('gather_seeds', this.gatherSeedsBehavior.bind(this));
-    this.registerBehavior('harvest', this.harvestBehavior.bind(this));
     // Navigation & Exploration behaviors
     this.registerBehavior('navigate', this.navigateBehavior.bind(this));
     this.registerBehavior('explore_frontier', this.exploreFrontierBehavior.bind(this));
