@@ -56,7 +56,7 @@ export class ResponseParser {
 
   // Synonym mapping - lemmatize similar actions to core behaviors
   private synonyms: Record<string, AgentBehavior> = {
-    // Pick = gather, harvest, collect, get, take
+    // Pick = gather, harvest, collect, get, take, forage, scavenge, find
     'gather': 'pick',
     'harvest': 'pick',
     'collect': 'pick',
@@ -65,12 +65,40 @@ export class ResponseParser {
     'grab': 'pick',
     'gather_seeds': 'pick',
     'seek_food': 'pick',
-    // Rest = sleep, idle
+    'forage': 'pick',
+    'scavenge': 'pick',
+    'find': 'pick',
+    'chop': 'pick',
+    'mine': 'pick',
+    'cut': 'pick',
+    'fetch': 'pick',
+    // Rest = sleep, idle, relax, recover
     'sleep': 'rest',
-    // Talk = speak, say, chat
+    'relax': 'rest',
+    'recover': 'rest',
+    'nap': 'rest',
+    // Talk = speak, say, chat, converse, discuss
     'speak': 'talk',
     'say': 'talk',
     'chat': 'talk',
+    'converse': 'talk',
+    'discuss': 'talk',
+    'ask': 'talk',
+    'tell': 'talk',
+    // Build = construct, make, craft, create
+    'construct': 'build',
+    'make': 'build',
+    'craft': 'build',
+    'create': 'build',
+    // Explore = search, scout, investigate, look
+    'search': 'explore',
+    'scout': 'explore',
+    'investigate': 'explore',
+    'look': 'explore',
+    // Wander = roam, walk
+    'roam': 'wander',
+    'walk': 'wander',
+    'stroll': 'wander',
   };
 
   /**
@@ -142,8 +170,18 @@ export class ResponseParser {
       }
     }
 
-    // No fallback - throw if we can't parse
-    throw new BehaviorParseError(responseText, Array.from(this.validBehaviors));
+    // FALLBACK: If we truly can't parse, default to wander but LOG IT LOUDLY
+    // This is a last resort to prevent agent getting stuck, not a silent fallback
+    console.error('[ResponseParser] ⚠️ FAILED TO PARSE BEHAVIOR - DEFAULTING TO WANDER');
+    console.error('[ResponseParser] Response text:', responseText.slice(0, 200));
+    console.error('[ResponseParser] Valid behaviors:', Array.from(this.validBehaviors).join(', '));
+    console.error('[ResponseParser] Consider adding synonym mapping for this phrase!');
+
+    return {
+      thinking: responseText,
+      speaking: `(I'm not sure what to do, so I'll just wander)`,
+      action: 'wander'
+    };
   }
 
   /**
