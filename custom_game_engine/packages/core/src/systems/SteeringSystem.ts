@@ -38,20 +38,8 @@ export class SteeringSystem implements System {
   private stuckTracker: Map<string, { lastPos: Vector2; stuckTime: number; target: Vector2 }> = new Map();
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    console.log(`[SteeringSystem] update() called with ${entities.length} entities`);
-
     // Get entities with steering component
     const steeringEntities = entities.filter(e => e.components.has('steering'));
-
-    // Debug: Log how many steering entities we have
-    if (steeringEntities.length > 0) {
-      console.log(`[SteeringSystem] Processing ${steeringEntities.length} steering entities`);
-    } else if (entities.length > 0) {
-      // Debug: Log what components the first entity has
-      const firstEntity = entities[0];
-      const componentTypes = Array.from(firstEntity.components.keys());
-      console.log(`[SteeringSystem] No steering entities found. First entity has components:`, componentTypes);
-    }
 
     for (const entity of steeringEntities) {
       try {

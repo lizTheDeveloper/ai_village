@@ -16,11 +16,40 @@ export class MovementSystem implements System {
     'position',
   ];
 
-  update(world: World, entities: ReadonlyArray<Entity>): void {
-    for (const entity of entities) {
+  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+    // Get time acceleration multiplier from TimeComponent
+    const timeEntities = world.query().with('time').executeEntities();
+    let timeSpeedMultiplier = 1.0;
+    if (timeEntities.length > 0) {
+      const timeEntity = timeEntities[0] as EntityImpl;
+      const timeComp = timeEntity.getComponent('time') as any;
+      if (timeComp && timeComp.speedMultiplier) {
+        timeSpeedMultiplier = timeComp.speedMultiplier;
+      }
+    }
+
+    // Filter entities with required components
+    const movementEntities = entities.filter(e =>
+      e.components.has('movement') && e.components.has('position')
+    );
+
+    for (const entity of movementEntities) {
       const impl = entity as EntityImpl;
       const movement = impl.getComponent<MovementComponent>('movement')!;
-      const position = impl.getComponent<PositionComponent>('position')!;
+      const position = impl.getComponent<PositionComponent>('position')!
+
+      // Sync velocity component to movement component (for SteeringSystem integration)
+      const velocity = impl.getComponent('velocity') as any;
+      if (velocity && (velocity.vx !== undefined || velocity.vy !== undefined)) {
+        impl.updateComponent<MovementComponent>('movement', (current) => ({
+          ...current,
+          velocityX: velocity.vx ?? current.velocityX,
+          velocityY: velocity.vy ?? current.velocityY,
+        }));
+        // Re-get movement after update
+        const updatedMovement = impl.getComponent<MovementComponent>('movement')!;
+        Object.assign(movement, updatedMovement);
+      }
 
       // Skip if sleeping - agents cannot move while asleep
       const circadian = impl.getComponent('circadian') as any;
@@ -64,9 +93,11 @@ export class MovementSystem implements System {
         // else: no penalty (100%)
       }
 
-      // Calculate new position (velocity is in tiles per second, tick is 1/20th second)
-      const deltaX = (movement.velocityX * speedMultiplier) / 20;
-      const deltaY = (movement.velocityY * speedMultiplier) / 20;
+      // Calculate new position using deltaTime and time acceleration
+      // Velocity is in tiles/second, deltaTime is in seconds
+      // Apply both fatigue penalty and time acceleration
+      const deltaX = movement.velocityX * speedMultiplier * deltaTime * timeSpeedMultiplier;
+      const deltaY = movement.velocityY * speedMultiplier * deltaTime * timeSpeedMultiplier;
       const newX = position.x + deltaX;
       const newY = position.y + deltaY;
 
