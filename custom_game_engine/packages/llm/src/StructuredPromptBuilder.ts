@@ -942,6 +942,17 @@ You know how to build these structures:
       }
     }
 
+    // Goal-setting tools (always available for planning and coordination)
+    actions.push('set_personal_goal - Set your short-term personal goal (say "set goal: <description>")');
+    actions.push('set_medium_term_goal - Set your medium-term plan (say "set medium goal: <description>")');
+    actions.push('set_group_goal - Set or update the group\'s goal (say "set group goal: <description>")');
+
+    // Advanced farming actions (when contextually relevant)
+    if (hasSeeds || (vision?.seenResources && vision.seenResources.length > 0)) {
+      actions.push('water - Water plants to help them grow (say "water" or "water plant")');
+      actions.push('fertilize - Fertilize soil to improve growth (say "fertilize" or "add fertilizer")');
+    }
+
     // Debug log final actions list
     console.log('[StructuredPromptBuilder] Final available actions:', actions.map(a => a.split(' - ')[0]));
 
