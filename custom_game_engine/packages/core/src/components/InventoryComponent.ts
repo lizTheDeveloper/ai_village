@@ -10,6 +10,8 @@ const RESOURCE_WEIGHTS: Record<ResourceType, number> = {
   stone: 3,
   food: 1,
   water: 1,
+  fiber: 0.5,
+  leaves: 0.3,
 };
 
 /**
@@ -30,6 +32,8 @@ const RESOURCE_STACK_SIZES: Record<ResourceType, number> = {
   stone: 30,
   food: 20,
   water: 10,
+  fiber: 100,
+  leaves: 100,
 };
 
 /**
@@ -152,7 +156,7 @@ export function calculateInventoryWeight(inventory: InventoryComponent): number 
  * Check if a string is a valid ResourceType.
  */
 export function isResourceType(itemId: string): boolean {
-  return itemId === 'food' || itemId === 'wood' || itemId === 'stone' || itemId === 'water';
+  return itemId === 'food' || itemId === 'wood' || itemId === 'stone' || itemId === 'water' || itemId === 'fiber' || itemId === 'leaves';
 }
 
 /**

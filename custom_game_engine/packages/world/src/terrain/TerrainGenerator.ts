@@ -5,6 +5,8 @@ import type { Tile, TerrainType, BiomeType } from '../chunks/Tile.js';
 import { PerlinNoise } from './PerlinNoise.js';
 import { createTree } from '../entities/TreeEntity.js';
 import { createRock } from '../entities/RockEntity.js';
+import { createLeafPile } from '../entities/LeafPileEntity.js';
+import { createFiberPlant } from '../entities/FiberPlantEntity.js';
 import { WildAnimalSpawningSystem } from '@ai-village/core';
 
 /**
@@ -109,6 +111,22 @@ export class TerrainGenerator {
           if (Math.random() > 0.9) {
             // 10% chance for rocks on beaches
             createRock(world, worldX, worldY);
+          }
+        }
+
+        // Place leaf piles in forests
+        if (tile.terrain === 'forest' && placementValue < -0.1) {
+          if (Math.random() > 0.7) {
+            // 30% chance for leaf piles in forests
+            createLeafPile(world, worldX, worldY);
+          }
+        }
+
+        // Place fiber plants in grass areas
+        if (tile.terrain === 'grass' && placementValue < 0.2) {
+          if (Math.random() > 0.85) {
+            // 15% chance for fiber plants in grass
+            createFiberPlant(world, worldX, worldY);
           }
         }
 

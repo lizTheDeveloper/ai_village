@@ -102,6 +102,9 @@ export class WindowManager {
       throw new Error(`Window with ID "${id}" not found`);
     }
 
+    // Track if this is the first time showing (openedTime will be 0 or equal to creation time)
+    const wasNeverShown = window.openedTime === window.lastInteractionTime;
+
     // If already visible, just bring to front
     if (window.visible) {
       this.bringToFront(id);
@@ -109,9 +112,12 @@ export class WindowManager {
       return;
     }
 
-    // Set openedTime if this is the first time showing
-    if (!window.visible && window.openedTime === window.lastInteractionTime) {
-      window.openedTime = Date.now();
+    // Clamp window size to canvas if too large
+    if (window.width > this.canvas.width) {
+      window.width = this.canvas.width;
+    }
+    if (window.height > this.canvas.height) {
+      window.height = this.canvas.height;
     }
 
     // Check for space and handle collision avoidance
@@ -154,8 +160,16 @@ export class WindowManager {
 
     window.visible = true;
     window.panel.setVisible(true);
+
+    // Set openedTime only on first show
+    if (wasNeverShown) {
+      window.openedTime = Date.now();
+    }
+
     this.bringToFront(id);
-    this.markWindowInteraction(id);
+
+    // Update lastInteractionTime
+    window.lastInteractionTime = Date.now();
   }
 
   /**
@@ -363,7 +377,9 @@ export class WindowManager {
       }
     }
 
+    // Bring to front and update interaction time
     this.bringToFront(clickedWindowId);
+    this.markWindowInteraction(clickedWindowId);
     return true;
   }
 
@@ -545,26 +561,31 @@ export class WindowManager {
    * Find a cascade position (offset by title bar height)
    */
   private findCascadePosition(window: ManagedWindow): { x: number; y: number } | null {
-    const visibleWindows = Array.from(this.windows.values()).filter(w => w.visible && w.id !== window.id);
+    const visibleWindows = Array.from(this.windows.values())
+      .filter(w => w.visible && w.id !== window.id)
+      .sort((a, b) => a.zIndex - b.zIndex); // Sort by z-index to get correct cascade order
 
     if (visibleWindows.length === 0) {
-      return { x: 0, y: 0 };
+      return { x: window.config.defaultX, y: window.config.defaultY };
     }
 
-    // Find the last shown window
-    const lastWindow = visibleWindows.reduce((prev, current) =>
-      current.openedTime > prev.openedTime ? current : prev
-    );
+    // Find the last shown window (highest z-index)
+    const lastWindow = visibleWindows[visibleWindows.length - 1];
+    if (!lastWindow) {
+      return { x: window.config.defaultX, y: window.config.defaultY };
+    }
 
     const cascadeX = lastWindow.x + TITLE_BAR_HEIGHT;
     const cascadeY = lastWindow.y + TITLE_BAR_HEIGHT;
 
-    // Check if cascade position is within bounds
+    // Check if cascade position is within bounds and doesn't overlap
     if (cascadeX + window.width <= this.canvas.width &&
-        cascadeY + window.height <= this.canvas.height) {
+        cascadeY + window.height <= this.canvas.height &&
+        this.isPositionAvailable(cascadeX, cascadeY, window.width, window.height, window.id)) {
       return { x: cascadeX, y: cascadeY };
     }
 
+    // No valid cascade position found
     return null;
   }
 
@@ -598,8 +619,18 @@ export class WindowManager {
     this.canvas.width = width;
     this.canvas.height = height;
 
+    // Track windows positioned relative to right/bottom edges
+    const rightAlignedThreshold = this.canvas.width * 0.6; // Windows in right 40%
+    const bottomAlignedThreshold = this.canvas.height * 0.6; // Windows in bottom 40%
+
     // Reposition windows that are out of bounds
     for (const window of this.windows.values()) {
+      const wasRightAligned = window.x > rightAlignedThreshold;
+      const wasBottomAligned = window.y > bottomAlignedThreshold;
+
+      const oldOffsetFromRight = this.canvas.width - (window.x + window.width);
+      const oldOffsetFromBottom = this.canvas.height - (window.y + window.height);
+
       // Clamp window size
       if (window.width > width) {
         window.width = width;
@@ -608,12 +639,26 @@ export class WindowManager {
         window.height = height;
       }
 
-      // Clamp position
-      if (window.x + window.width > width) {
-        window.x = Math.max(0, width - window.width);
+      // Maintain relative position for right-aligned windows
+      if (wasRightAligned) {
+        const newX = width - window.width - oldOffsetFromRight;
+        window.x = Math.max(0, Math.min(newX, width - window.width));
+      } else {
+        // Clamp position for left-aligned windows
+        if (window.x + window.width > width) {
+          window.x = Math.max(0, width - window.width);
+        }
       }
-      if (window.y + window.height > height) {
-        window.y = Math.max(0, height - window.height);
+
+      // Maintain relative position for bottom-aligned windows
+      if (wasBottomAligned) {
+        const newY = height - window.height - oldOffsetFromBottom;
+        window.y = Math.max(0, Math.min(newY, height - window.height));
+      } else {
+        // Clamp position for top-aligned windows
+        if (window.y + window.height > height) {
+          window.y = Math.max(0, height - window.height);
+        }
       }
     }
   }
