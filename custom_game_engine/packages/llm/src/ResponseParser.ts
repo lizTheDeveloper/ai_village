@@ -170,18 +170,17 @@ export class ResponseParser {
       }
     }
 
-    // FALLBACK: If we truly can't parse, default to wander but LOG IT LOUDLY
-    // This is a last resort to prevent agent getting stuck, not a silent fallback
-    console.error('[ResponseParser] ⚠️ FAILED TO PARSE BEHAVIOR - DEFAULTING TO WANDER');
-    console.error('[ResponseParser] Response text:', responseText.slice(0, 200));
-    console.error('[ResponseParser] Valid behaviors:', Array.from(this.validBehaviors).join(', '));
-    console.error('[ResponseParser] Consider adding synonym mapping for this phrase!');
+    // NO FALLBACK - Tell the agent to rephrase using core actions
+    const coreActions = ['pick', 'build', 'talk', 'wander', 'rest', 'explore', 'till', 'farm', 'plant'];
+    const errorMsg =
+      `I couldn't understand that action. Please rephrase using one of these core actions: ${coreActions.join(', ')}. ` +
+      `Examples: "pick wood", "build tent", "talk to someone", "wander around", "rest".`;
 
-    return {
-      thinking: responseText,
-      speaking: `(I'm not sure what to do, so I'll just wander)`,
-      action: 'wander'
-    };
+    console.error('[ResponseParser] ⚠️ FAILED TO PARSE BEHAVIOR');
+    console.error('[ResponseParser] Response:', responseText.slice(0, 200));
+    console.error('[ResponseParser] Error:', errorMsg);
+
+    throw new BehaviorParseError(errorMsg, coreActions);
   }
 
   /**
