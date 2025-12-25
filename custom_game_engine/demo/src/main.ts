@@ -2040,6 +2040,29 @@ async function main() {
     console.log(`[Journal] 📔 ${agentName} wrote journal entry`);
   });
 
+  // Set up farming action handlers
+  gameLoop.world.eventBus.subscribe('action:requested', (event: any) => {
+    const { eventType, actorId, plantId, position } = event.data;
+
+    if (eventType === 'gather_seeds:requested') {
+      console.log(`[Main] gather_seeds:requested - actor: ${actorId.slice(0, 8)}, plant: ${plantId.slice(0, 8)}, position: (${position.x}, ${position.y})`);
+
+      gameLoop.actionQueue.enqueue({
+        type: 'gather_seeds',
+        actorId,
+        targetId: plantId,
+      });
+    } else if (eventType === 'harvest:requested') {
+      console.log(`[Main] harvest:requested - actor: ${actorId.slice(0, 8)}, plant: ${plantId.slice(0, 8)}, position: (${position.x}, ${position.y})`);
+
+      gameLoop.actionQueue.enqueue({
+        type: 'harvest',
+        actorId,
+        targetId: plantId,
+      });
+    }
+  });
+
   // Set up animal event logging for debugging
   // Note: EventBus doesn't have .on() method, events are handled by systems
   // gameLoop.world.eventBus.on('animal_spawned', (event: any) => {

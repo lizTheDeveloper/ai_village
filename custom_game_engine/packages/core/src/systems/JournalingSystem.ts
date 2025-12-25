@@ -31,12 +31,7 @@ export class JournalingSystem implements System {
       }
     });
 
-    this.eventBus.subscribe('agent:resting', (event) => {
-      const data = event.data as any;
-      if (data.agentId) {
-        this.idleAgents.add(data.agentId as string);
-      }
-    });
+    // 'agent:resting' event removed - not in EventMap
   }
 
   update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
@@ -135,6 +130,7 @@ export class JournalingSystem implements System {
       source: this.id,
       data: {
         agentId,
+        entryCount: journalComp.entries.length,
         timestamp: Date.now(),
       },
     });

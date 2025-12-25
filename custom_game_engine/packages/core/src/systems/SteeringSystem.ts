@@ -336,7 +336,7 @@ export class SteeringSystem implements System {
   private _wander(position: any, velocity: any, steering: any): Vector2 {
     const wanderRadius = steering.wanderRadius ?? 2.0;
     const wanderDistance = steering.wanderDistance ?? 3.0;
-    const wanderJitter = steering.wanderJitter ?? 0.5;
+    const wanderJitter = steering.wanderJitter ?? 0.1; // Reduced from 0.5 to prevent jittery movement
 
     // Get or initialize wander angle
     if (steering.wanderAngle === undefined) {

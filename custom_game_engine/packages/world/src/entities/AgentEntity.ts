@@ -140,7 +140,7 @@ export function createWanderingAgent(
   entity.addComponent(new BeliefComponent());
   entity.addComponent(new SocialGradientComponent());
   entity.addComponent(new ExplorationStateComponent());
-  entity.addComponent(createSteeringComponent('none', speed, speed * 2));
+  entity.addComponent(createSteeringComponent('wander', speed, speed * 2));
   entity.addComponent(createVelocityComponent(0, 0));
 
   // Add to world
@@ -246,7 +246,7 @@ export function createLLMAgent(
   entity.addComponent(new BeliefComponent());
   entity.addComponent(new SocialGradientComponent());
   entity.addComponent(new ExplorationStateComponent());
-  entity.addComponent(createSteeringComponent('none', speed, speed * 2));
+  entity.addComponent(createSteeringComponent('wander', speed, speed * 2));
   entity.addComponent(createVelocityComponent(0, 0));
 
   // Add initial "waking up" memory from Dungeon Master prompt

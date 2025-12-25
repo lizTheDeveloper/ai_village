@@ -34,6 +34,9 @@ export class MemoryFormationSystem implements System {
 
   private _setupEventListeners(): void {
     // Listen for memory-triggering events
+    // Note: This list is currently unused but kept for reference
+    // The actual event subscriptions are done in validEventTypes below
+    /*
     const eventTypes = [
       // Harvesting and resource gathering
       'harvest:first',
@@ -84,10 +87,69 @@ export class MemoryFormationSystem implements System {
       // Testing
       'test:event',
     ];
+    */
 
-    for (const eventType of eventTypes) {
-      this.eventBus.subscribe(eventType, (event) => {
-        this._handleMemoryTrigger(eventType, event.data as MemoryTriggerEvent);
+    // Subscribe to all events that can trigger memory formation
+    // This includes both GameEventMap events and test/dynamic events
+    const memoryEventTypes = [
+      // Core game events
+      'agent:idle',
+      'agent:ate',
+      'conversation:started',
+      'conversation:ended',
+      'conversation:utterance',
+      'plant:stageChanged',
+      'building:complete',
+
+      // Harvesting and resource events
+      'harvest:first',
+      'agent:harvested',
+      'resource:gathered',
+      'resource:depleted',
+
+      // Construction events
+      'construction:failed',
+      'construction:gathering_resources',
+
+      // Inventory and storage
+      'items:deposited',
+      'inventory:full',
+      'storage:full',
+      'storage:not_found',
+
+      // Social interactions
+      'social:conflict',
+      'social:interaction',
+      'information:shared',
+
+      // Needs and survival
+      'need:critical',
+      'agent:starved',
+      'agent:collapsed',
+      'survival:close_call',
+
+      // Sleep and rest
+      'agent:sleeping',
+      'agent:sleep_start',
+      'agent:sleep_end',
+      'agent:dreamed',
+
+      // Exploration and discovery
+      'discovery:location',
+      'event:novel',
+
+      // Goals and actions
+      'goal:progress',
+      'action:walk',
+      'agent:emotion_peak',
+
+      // Testing
+      'test:event',
+    ];
+
+    for (const eventType of memoryEventTypes) {
+      this.eventBus.subscribe(eventType as any, (event) => {
+        this._handleMemoryTrigger(eventType as any, event.data as MemoryTriggerEvent);
       });
     }
   }
@@ -329,12 +391,25 @@ export class MemoryFormationSystem implements System {
       });
     }
 
+    // Calculate importance
+    const importance = Math.max(
+      data.emotionalIntensity ?? 0,
+      data.novelty ?? 0,
+      data.socialSignificance ?? 0,
+      data.survivalRelevance ?? 0,
+      data.goalRelevance ?? 0,
+      (data as any).importance ?? 0
+    );
+
     // Emit memory:formed event
     this.eventBus.emit({
       type: 'memory:formed',
       source: 'memory_formation',
       data: {
         agentId: data.agentId,
+        memoryType: 'episodic',
+        content: this._generateSummary(eventType, data),
+        importance,
         eventType,
       },
     });

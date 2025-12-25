@@ -4,7 +4,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { ConversationComponent } from '../components/ConversationComponent.js';
-import { isInConversation, endConversation, getConversationDuration } from '../components/ConversationComponent.js';
+import { isInConversation, endConversation } from '../components/ConversationComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 
 export class CommunicationSystem implements System {
@@ -14,14 +14,15 @@ export class CommunicationSystem implements System {
     'conversation',
   ];
 
-  private readonly maxConversationDuration: number = 300; // 15 seconds at 20 TPS
+  private readonly maxConversationDurationSeconds: number = 15; // 15 seconds of conversation
+  private conversationStartTimes: Map<string, number> = new Map(); // entityId -> real-time start
 
-  update(_world: World, entities: ReadonlyArray<Entity>): void {
+  update(_world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     for (const entity of entities) {
       const impl = entity as EntityImpl;
-      const conversation = impl.getComponent<ConversationComponent>('conversation')!;
+      const conversation = impl.getComponent<ConversationComponent>('conversation');
 
-      if (!isInConversation(conversation)) continue;
+      if (!conversation || !isInConversation(conversation)) continue;
 
       const partnerId = conversation.partnerId;
       if (!partnerId) continue;
@@ -31,6 +32,9 @@ export class CommunicationSystem implements System {
       if (!partner) {
         // Partner no longer exists, end conversation
         impl.updateComponent<ConversationComponent>('conversation', endConversation);
+
+        // Clean up timing tracker
+        this.conversationStartTimes.delete(entity.id);
 
         // Switch agent back to wandering
         const agent = impl.getComponent<AgentComponent>('agent');
@@ -44,17 +48,27 @@ export class CommunicationSystem implements System {
         continue;
       }
 
-      // Check conversation duration
-      const duration = getConversationDuration(conversation, _world.tick);
-      if (duration > this.maxConversationDuration) {
+      // Track conversation time in real seconds, not ticks
+      if (!this.conversationStartTimes.has(entity.id)) {
+        this.conversationStartTimes.set(entity.id, Date.now());
+      }
+
+      const startTime = this.conversationStartTimes.get(entity.id)!;
+      const durationSeconds = (Date.now() - startTime) / 1000;
+
+      if (durationSeconds > this.maxConversationDurationSeconds) {
         // Conversation has gone on too long, end it
         impl.updateComponent<ConversationComponent>('conversation', endConversation);
+
+        // Clean up timing tracker
+        this.conversationStartTimes.delete(entity.id);
 
         // End partner's conversation too
         const partnerImpl = partner as EntityImpl;
         const partnerConversation = partnerImpl.getComponent<ConversationComponent>('conversation');
         if (partnerConversation) {
           partnerImpl.updateComponent<ConversationComponent>('conversation', endConversation);
+          this.conversationStartTimes.delete(partnerId);
         }
 
         // Switch both agents back to wandering
@@ -81,10 +95,11 @@ export class CommunicationSystem implements System {
           type: 'conversation:ended',
           source: entity.id,
           data: {
+            conversationId: `conv-${entity.id}-${partnerId}`,
+            participants: [entity.id, partnerId],
             agent1: entity.id,
             agent2: partnerId,
-            duration,
-            messageCount: conversation.messages.length,
+            duration: durationSeconds,
           },
         });
       }

@@ -256,8 +256,8 @@ export class CraftingSystem implements System {
       type: 'crafting:job_started',
       source: 'crafting-system',
       data: {
-        jobId: job.id,
-        agentId: job.agentId,
+        jobId: String(job.id),
+        agentId: String(job.agentId),
         recipeId: job.recipeId
       }
     });
@@ -301,10 +301,10 @@ export class CraftingSystem implements System {
       type: 'crafting:completed',
       source: 'crafting-system',
       data: {
-        jobId: job.id,
-        agentId: job.agentId,
+        jobId: String(job.id),
+        agentId: String(job.agentId),
         recipeId: job.recipeId,
-        quantity: job.quantity
+        produced: [{ itemId: job.recipeId, amount: job.quantity }]
       }
     });
 

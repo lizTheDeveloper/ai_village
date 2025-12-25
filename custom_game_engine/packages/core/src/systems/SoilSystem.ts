@@ -42,10 +42,26 @@ export class SoilSystem implements System {
   public readonly requiredComponents: ReadonlyArray<string> = [];
 
   private lastDayProcessed: number = -1;
-  private readonly TICKS_PER_DAY = 20 * 60 * 24; // 20 ticks/sec * 60 sec * 24 hours
+  private accumulatedTime: number = 0; // Track elapsed time in seconds
+  private readonly SECONDS_PER_DAY = 24 * 60 * 60; // 24 hours in seconds
 
-  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    const currentDay = Math.floor(world.tick / this.TICKS_PER_DAY);
+  update(world: World, _entities: ReadonlyArray<Entity>, deltaTime: number): void {
+    // Get time acceleration from TimeComponent if available
+    const timeEntities = world.query().with('time').executeEntities();
+    let timeSpeedMultiplier = 1.0;
+    if (timeEntities.length > 0) {
+      const timeEntity = timeEntities[0] as any;
+      const timeComp = timeEntity.getComponent('time') as any;
+      if (timeComp && timeComp.speedMultiplier) {
+        timeSpeedMultiplier = timeComp.speedMultiplier;
+      }
+    }
+
+    // Accumulate real-time seconds (accounting for time acceleration)
+    this.accumulatedTime += deltaTime * timeSpeedMultiplier;
+
+    // Calculate current day based on accumulated time
+    const currentDay = Math.floor(this.accumulatedTime / this.SECONDS_PER_DAY);
 
     // Process daily soil updates (moisture decay, fertilizer duration)
     if (currentDay > this.lastDayProcessed) {
@@ -72,8 +88,7 @@ export class SoilSystem implements System {
       terrain: tile.terrain,
       tilled: tile.tilled,
       biome: tile.biome,
-      fertility: tile.fertility,
-      moisture: tile.moisture,
+            moisture: tile.moisture,
       plantability: tile.plantability,
     });
 
@@ -188,17 +203,15 @@ export class SoilSystem implements System {
     });
 
     // Emit tilling event
-    const eventData = {
+    console.log(`[SoilSystem] Emitting soil:tilled event for (${x}, ${y})`);
+    world.eventBus.emit({
       type: 'soil:tilled',
       source: 'soil-system',
       data: {
-        position: { x, y },
-        fertility: tile.fertility,
-        biome: tile.biome,
+        x,
+        y,
       },
-    };
-    console.log(`[SoilSystem] Emitting soil:tilled event:`, eventData);
-    world.eventBus.emit(eventData);
+    });
 
     console.log(`[SoilSystem] ===== TILLING COMPLETE =====`);
   }
@@ -222,9 +235,9 @@ export class SoilSystem implements System {
       type: 'soil:watered',
       source: 'soil-system',
       data: {
-        position: { x, y },
-        oldMoisture,
-        newMoisture: tile.moisture,
+        x,
+        y,
+        amount: 20,
       },
     });
 
@@ -234,7 +247,8 @@ export class SoilSystem implements System {
         type: 'soil:moistureChanged',
         source: 'soil-system',
         data: {
-          position: { x, y },
+          x,
+          y,
           oldMoisture,
           newMoisture: tile.moisture,
         },
@@ -256,8 +270,6 @@ export class SoilSystem implements System {
       throw new Error(`Tile at (${x},${y}) missing required nutrients data`);
     }
 
-    const oldFertility = tile.fertility;
-
     // Apply fertility boost (cap at 100)
     tile.fertility = Math.min(100, tile.fertility + fertilizerType.fertilityBoost);
 
@@ -272,9 +284,9 @@ export class SoilSystem implements System {
       tile.nutrients.potassium + fertilizerType.potassiumBoost
     );
 
-    // Set fertilized flag and duration (convert days to ticks)
+    // Set fertilized flag and duration (convert days to seconds)
     tile.fertilized = true;
-    tile.fertilizerDuration = fertilizerType.duration * this.TICKS_PER_DAY;
+    tile.fertilizerDuration = fertilizerType.duration * this.SECONDS_PER_DAY;
 
     if (fertilizerType.id === 'compost') {
       tile.composted = true;
@@ -285,10 +297,10 @@ export class SoilSystem implements System {
       type: 'soil:fertilized',
       source: 'soil-system',
       data: {
-        position: { x, y },
+        x,
+        y,
         fertilizerType: fertilizerType.id,
-        oldFertility,
-        newFertility: tile.fertility,
+        nutrientBoost: fertilizerType.fertilityBoost,
       },
     });
   }
@@ -314,8 +326,9 @@ export class SoilSystem implements System {
         type: 'soil:depleted',
         source: 'soil-system',
         data: {
-          position: { x, y },
-          fertility: tile.fertility,
+          x,
+          y,
+          nutrientLevel: tile.fertility,
         },
       });
     }
@@ -357,7 +370,8 @@ export class SoilSystem implements System {
         type: 'soil:moistureChanged',
         source: 'soil-system',
         data: {
-          position: { x, y },
+          x,
+          y,
           oldMoisture,
           newMoisture: tile.moisture,
         },
@@ -380,7 +394,8 @@ export class SoilSystem implements System {
         type: 'soil:moistureChanged',
         source: 'soil-system',
         data: {
-          position: { x, y },
+          x,
+          y,
           oldMoisture,
           newMoisture: tile.moisture,
         },
@@ -403,7 +418,8 @@ export class SoilSystem implements System {
         type: 'soil:moistureChanged',
         source: 'soil-system',
         data: {
-          position: { x, y },
+          x,
+          y,
           oldMoisture,
           newMoisture: tile.moisture,
         },

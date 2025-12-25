@@ -8,6 +8,7 @@ export interface VisionComponent extends Component {
   canSeeResources: boolean; // Can detect resources
   seenAgents: string[];   // Entity IDs of agents currently in vision range
   seenResources: string[]; // Entity IDs of resources currently in vision range
+  seenPlants?: string[];  // Entity IDs of plants currently in vision range
   heardSpeech: Array<{ speaker: string, text: string }>; // Speech heard from nearby agents
 }
 
@@ -26,6 +27,7 @@ export function createVisionComponent(
     canSeeResources,
     seenAgents: [],
     seenResources: [],
+    seenPlants: [],
     heardSpeech: [],
   };
 }

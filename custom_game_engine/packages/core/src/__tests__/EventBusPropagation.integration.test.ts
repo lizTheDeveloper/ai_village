@@ -33,8 +33,8 @@ describe('EventBus Propagation Integration', () => {
     agent.addComponent(createMemoryComponent());
     agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
 
-    // Create systems that listen to events
-    const memorySystem = new MemoryFormationSystem();
+    // Create systems that listen to events - pass eventBus
+    const memorySystem = new MemoryFormationSystem(harness.world.eventBus);
     harness.registerSystem('MemoryFormationSystem', memorySystem);
 
     // Clear setup events
@@ -50,6 +50,9 @@ describe('EventBus Propagation Integration', () => {
         amount: 5,
       },
     });
+
+    // Flush event queue to dispatch events
+    harness.world.eventBus.flush();
 
     // Verify event was emitted
     const events = harness.getEmittedEvents('resource:gathered');
@@ -214,6 +217,9 @@ describe('EventBus Propagation Integration', () => {
       data: { entityId: agent.id },
     });
 
+    // Flush event queue to dispatch events
+    harness.world.eventBus.flush();
+
     // Cleanup
     unsub();
 
@@ -248,6 +254,9 @@ describe('EventBus Propagation Integration', () => {
       data: {},
     });
 
+    // Flush event queue to dispatch events
+    harness.world.eventBus.flush();
+
     // Cleanup
     unsub1();
     unsub2();
@@ -275,6 +284,9 @@ describe('EventBus Propagation Integration', () => {
       data: {},
     });
 
+    // Flush to dispatch the first event
+    harness.world.eventBus.flush();
+
     expect(callCount).toBe(1);
 
     // Unsubscribe
@@ -286,6 +298,9 @@ describe('EventBus Propagation Integration', () => {
       source: 'test',
       data: {},
     });
+
+    // Flush to dispatch the second event
+    harness.world.eventBus.flush();
 
     // Call count should not increase
     expect(callCount).toBe(1);

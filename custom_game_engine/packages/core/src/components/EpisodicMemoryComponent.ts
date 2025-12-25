@@ -413,3 +413,10 @@ export class EpisodicMemoryComponent extends ComponentBase {
     return `mem-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 }
+
+/**
+ * Factory function to create an EpisodicMemoryComponent
+ */
+export function createEpisodicMemoryComponent(data?: { maxMemories?: number }): EpisodicMemoryComponent {
+  return new EpisodicMemoryComponent(data);
+}

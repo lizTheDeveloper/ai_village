@@ -101,7 +101,6 @@ export function assignAnimalToHousing(
       animalId: animalEntityId,
       speciesId: animal.speciesId,
       housingId: housingEntityId,
-      buildingType: building.buildingType,
     },
   });
 
@@ -220,14 +219,14 @@ export function cleanHousing(world: World, housingEntityId: string): AssignAnima
   }));
 
   // Emit event
+  // Note: agentId not available in this context, would need to be passed as parameter
   world.eventBus.emit({
     type: 'housing:cleaned',
     source: housingEntityId,
     data: {
+      housingId: housingEntityId,
       buildingId: housingEntityId,
-      buildingType: building.buildingType,
-      previousCleanliness,
-      newCleanliness: 100,
+      agentId: 'system', // Placeholder - actual agentId should be passed from action handler
     },
   });
 

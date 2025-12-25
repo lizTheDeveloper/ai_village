@@ -201,6 +201,7 @@ export class GatherSeedsActionHandler implements ActionHandler {
     // Get components
     const plant = plantEntity.components.get('plant') as PlantComponent;
     const inventory = actor.components.get('inventory') as InventoryComponent;
+    const plantPos = plantEntity.components.get('position') as PositionComponent;
 
     if (!plant) {
       return {
@@ -269,7 +270,7 @@ export class GatherSeedsActionHandler implements ActionHandler {
         effects: [],
         events: [
           {
-            type: 'seed:gathered',
+            type: 'action:gather_seeds',
             source: 'gather-seeds-action-handler',
             data: {
               actionId: action.id,
@@ -277,10 +278,7 @@ export class GatherSeedsActionHandler implements ActionHandler {
               plantId: action.targetId,
               speciesId: plant.speciesId,
               seedsGathered: amountAdded,
-              seedsRemaining: plant.seedsProduced,
-              farmingSkill,
-              plantHealth: plant.health,
-              plantStage: plant.stage,
+              position: { x: plantPos.x, y: plantPos.y },
             },
           },
         ],

@@ -28,8 +28,13 @@ export class TemperatureSystem implements System {
     // Calculate world ambient temperature
     this.currentWorldTemp = this.calculateWorldTemperature(world);
 
+    // Filter entities with required components
+    const temperatureEntities = entities.filter(e =>
+      e.components.has('temperature') && e.components.has('position')
+    );
+
     // Process each entity with temperature
-    for (const entity of entities) {
+    for (const entity of temperatureEntities) {
       const impl = entity as EntityImpl;
       const posComp = impl.getComponent<PositionComponent>('position')!;
 
@@ -90,7 +95,9 @@ export class TemperatureSystem implements System {
             world.eventBus.emit({
               type: 'agent:health_critical',
               source: entity.id,
-              data: { entityId: entity.id, health: newHealth },
+              data: { agentId: entity.id,
+            entityId: entity.id,
+            health: newHealth },
             });
           }
         }
@@ -101,11 +108,21 @@ export class TemperatureSystem implements System {
   /**
    * Calculate world ambient temperature based on time and season
    */
-  private calculateWorldTemperature(_world: World): number {
-    // For now, use a simple day/night cycle
-    // In the future, this could be enhanced with seasons, biomes, etc.
-    const timeOfDay = (Date.now() / 1000) % (24 * 60); // Simulate time in minutes
-    const timeRadians = (timeOfDay / (24 * 60)) * Math.PI * 2;
+  private calculateWorldTemperature(world: World): number {
+    // Find time entity to get current game time
+    let timeOfDay = 12; // Default noon if no time entity
+    for (const entity of world.entities.values()) {
+      const impl = entity as EntityImpl;
+      const timeComp = impl.getComponent<any>('time');
+      if (timeComp) {
+        timeOfDay = timeComp.timeOfDay;
+        break;
+      }
+    }
+
+    // Convert time of day (0-24) to radians for sine wave
+    // 0 hours = midnight (low), 12 hours = noon (peak)
+    const timeRadians = ((timeOfDay - 6) / 24) * Math.PI * 2; // Shift by 6 hours so peak is at noon
 
     // Daily variation using sine wave (peak at noon, low at midnight)
     const dailyVariation = this.DAILY_VARIATION * Math.sin(timeRadians);
@@ -247,12 +264,16 @@ export class TemperatureSystem implements System {
 
     if (isDangerous && !wasDangerous) {
       // Entered dangerous temperature range
+      const needsComp = entity.components.get('needs') as NeedsComponent | undefined;
+      const health = needsComp?.health ?? 100;
       world.eventBus.emit({
         type: 'temperature:danger',
         source: entity.id,
         data: {
+          agentId: entity.id,
           entityId: entity.id,
           temperature: tempComp.currentTemp,
+          health: health,
           state: tempComp.state,
         },
       });
@@ -262,7 +283,8 @@ export class TemperatureSystem implements System {
         type: 'temperature:comfortable',
         source: entity.id,
         data: {
-          entityId: entity.id,
+        agentId: entity.id,
+        entityId: entity.id,
           temperature: tempComp.currentTemp,
           state: tempComp.state,
         },

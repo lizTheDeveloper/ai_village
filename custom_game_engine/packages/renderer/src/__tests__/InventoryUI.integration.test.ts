@@ -206,8 +206,18 @@ describe('InventoryUI Integration Tests', () => {
     it('should show tooltip when hovering over item', () => {
       inventoryUI.handleKeyPress('i', false, false);
 
-      // Simulate mouse hover over first slot (simplified coordinates)
-      inventoryUI.handleMouseMove(100, 200);
+      // Render to initialize canvas dimensions
+      inventoryUI.render(ctx, canvas.width, canvas.height);
+
+      // Calculate first slot position based on layout
+      // Panel is centered: (1024-800)/2 = 112px from left
+      // Backpack starts at panelX + panelWidth/2 = 112 + 400 = 512
+      // Grid starts at sectionY + filters = 60 + 24 + 8 + 20 + 12 = 124 below panel top
+      // First slot: panelY (84) + 124 = 208, panelX (512)
+      const firstSlotX = 520; // A bit into the first slot
+      const firstSlotY = 220;
+
+      inventoryUI.handleMouseMove(firstSlotX, firstSlotY, canvas.width, canvas.height);
 
       const tooltip = inventoryUI.getActiveTooltip();
 
@@ -229,13 +239,20 @@ describe('InventoryUI Integration Tests', () => {
     it('should update tooltip when moving between items', () => {
       inventoryUI.handleKeyPress('i', false, false);
 
+      // Render to initialize canvas dimensions
+      inventoryUI.render(ctx, canvas.width, canvas.height);
+
+      // Calculate first slot position
+      const firstSlotX = 520;
+      const firstSlotY = 220;
+
       // Hover over first item
-      inventoryUI.handleMouseMove(100, 200);
+      inventoryUI.handleMouseMove(firstSlotX, firstSlotY, canvas.width, canvas.height);
       let tooltip = inventoryUI.getActiveTooltip();
       expect(tooltip?.itemId).toBe('wood');
 
-      // Move away
-      inventoryUI.handleMouseMove(500, 500);
+      // Move away to empty area
+      inventoryUI.handleMouseMove(50, 50, canvas.width, canvas.height);
       tooltip = inventoryUI.getActiveTooltip();
       expect(tooltip).toBeNull();
     });

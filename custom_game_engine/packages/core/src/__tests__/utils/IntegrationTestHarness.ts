@@ -2,9 +2,12 @@ import { WorldImpl } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
+import { createBuildingComponent } from '../../components/BuildingComponent.js';
 import { createTimeComponent } from '../../systems/TimeSystem.js';
+import { AnimalComponent } from '../../components/AnimalComponent.js';
 import type { Entity } from '../../ecs/Entity.js';
 import type { System } from '../../ecs/System.js';
+import type { BuildingType } from '../../components/BuildingComponent.js';
 
 /**
  * Test configuration options
@@ -26,7 +29,7 @@ export interface TestConfig {
 export class IntegrationTestHarness {
   public world: WorldImpl;
   public eventBus: EventBusImpl;
-  private timeEntity: Entity | null = null;
+  private timeEntity: EntityImpl | null = null;
   private systems: Map<string, System> = new Map();
   private emittedEvents: Array<{ type: string; data: any }> = [];
 
@@ -36,9 +39,9 @@ export class IntegrationTestHarness {
 
     // Capture all emitted events for assertions
     const originalEmit = this.eventBus.emit.bind(this.eventBus);
-    this.eventBus.emit = (eventType: string, data?: any) => {
-      this.emittedEvents.push({ type: eventType, data });
-      return originalEmit(eventType, data);
+    this.eventBus.emit = (event: any) => {
+      this.emittedEvents.push({ type: event.type, data: event.data });
+      return originalEmit(event);
     };
   }
 
@@ -86,7 +89,7 @@ export class IntegrationTestHarness {
   /**
    * Create test agent with position and optional additional components
    */
-  createTestAgent(position: { x: number; y: number }, traits?: any): Entity {
+  createTestAgent(position: { x: number; y: number }, traits?: any): EntityImpl {
     const agent = new EntityImpl(createEntityId(), 0);
 
     // Add position component
@@ -108,15 +111,11 @@ export class IntegrationTestHarness {
   /**
    * Create test building at position
    */
-  createTestBuilding(type: string, position: { x: number; y: number }): Entity {
+  createTestBuilding(type: string, position: { x: number; y: number }): EntityImpl {
     const building = new EntityImpl(createEntityId(), 0);
 
     building.addComponent(createPositionComponent(position.x, position.y));
-    building.addComponent({
-      type: 'building',
-      version: 1,
-      buildingType: type,
-    });
+    building.addComponent(createBuildingComponent(type as BuildingType, 1, 100));
 
     (this.world as any)._addEntity(building);
     return building;
@@ -125,15 +124,31 @@ export class IntegrationTestHarness {
   /**
    * Create test animal with species and position
    */
-  createTestAnimal(species: string, position: { x: number; y: number }): Entity {
+  createTestAnimal(species: string, position: { x: number; y: number }): EntityImpl {
     const animal = new EntityImpl(createEntityId(), 0);
 
     animal.addComponent(createPositionComponent(position.x, position.y));
-    animal.addComponent({
-      type: 'animal',
-      version: 1,
-      species,
-    });
+
+    // Create proper animal component with all required fields
+    animal.addComponent(new AnimalComponent({
+      id: animal.id,
+      speciesId: species,
+      name: `Test ${species}`,
+      position: { x: position.x, y: position.y },
+      age: 30, // Adult age
+      lifeStage: 'adult' as const,
+      health: 100,
+      size: 1.0,
+      state: 'idle' as const,
+      hunger: 50,
+      thirst: 50,
+      energy: 80,
+      stress: 20,
+      mood: 70,
+      wild: true,
+      bondLevel: 0,
+      trustLevel: 50,
+    }));
 
     (this.world as any)._addEntity(animal);
     return animal;
@@ -210,7 +225,8 @@ export class IntegrationTestHarness {
       throw new Error('Time entity not initialized');
     }
     const timeComponent = this.timeEntity.getComponent('time') as any;
-    return timeComponent.currentHour;
+    // TimeComponent uses timeOfDay (0-24), not currentHour
+    return timeComponent.timeOfDay;
   }
 
   /**
@@ -221,7 +237,8 @@ export class IntegrationTestHarness {
       throw new Error('Time entity not initialized');
     }
     const timeComponent = this.timeEntity.getComponent('time') as any;
-    timeComponent.currentHour = hour % 24;
+    // TimeComponent uses timeOfDay (0-24), not currentHour
+    timeComponent.timeOfDay = hour % 24;
   }
 
   /**

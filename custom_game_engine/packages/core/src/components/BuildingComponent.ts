@@ -12,6 +12,13 @@ export type BuildingType =
   | 'campfire'
   | 'tent'
   | 'well'
+  // Tier 2 crafting stations (Phase 10)
+  | 'forge'
+  | 'farm_shed'
+  | 'market_stall'
+  | 'windmill'
+  // Tier 3 crafting stations (Phase 10)
+  | 'workshop'
   // Tier 2.5 animal housing (per spec)
   | 'chicken-coop'
   | 'kennel'
@@ -111,6 +118,30 @@ export function createBuildingComponent(
       break;
     case 'well':
       // Water source - blocks movement
+      break;
+
+    // Tier 2 crafting stations (Phase 10)
+    case 'forge':
+      // Metal crafting station - requires fuel
+      fuelRequired = true;
+      currentFuel = 50; // Start with half fuel
+      maxFuel = 100;
+      fuelConsumptionRate = 1; // 1 fuel per second when active
+      break;
+    case 'farm_shed':
+      // Farming storage - no fuel required
+      storageCapacity = 40;
+      break;
+    case 'market_stall':
+      // Trading station - no fuel required
+      break;
+    case 'windmill':
+      // Grain processing - no fuel required (wind-powered)
+      break;
+
+    // Tier 3 crafting stations (Phase 10)
+    case 'workshop':
+      // Advanced crafting - no fuel required
       break;
 
     // Tier 2.5 animal housing (per construction-system/spec.md)

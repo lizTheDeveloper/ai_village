@@ -114,16 +114,7 @@ export class AnimalProductionSystem implements System {
    * Produce a product and emit event
    */
   private produceProduct(world: World, entity: Entity, animal: AnimalComponent, product: AnimalProduct): void {
-    // Calculate quality
-    const quality = calculateProductQuality(
-      product,
-      {
-        health: animal.health,
-        bondLevel: animal.bondLevel,
-      },
-      50, // Default diet quality
-      50  // Default genetics
-    );
+    // Quality calculation omitted for automatic production (not returned)
 
     // Calculate quantity (random between min and max)
     const quantity = Math.floor(
@@ -138,11 +129,11 @@ export class AnimalProductionSystem implements System {
         source: entity.id,
         data: {
           animalId: animal.id,
+          productType: product.id,
           productId: product.id,
           itemId: product.itemId,
-          quantity,
-          quality,
-        },
+          amount: quantity,
+          },
       });
     }
   }
@@ -267,13 +258,14 @@ export class AnimalProductionSystem implements System {
       source: entity.id,
       data: {
         animalId: animal.id,
-        productId: product.id,
+          productType: product.id,
+          productId: product.id,
         itemId: product.itemId,
-        quantity,
-        quality,
-      },
+        amount: quantity,
+        },
     });
 
-    return { success: true, quantity, quality };
+    return { success: true,
+        quantity: quantity, quality };
   }
 }

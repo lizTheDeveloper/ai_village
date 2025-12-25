@@ -159,6 +159,8 @@ export class InputHandler {
 
       if (handled) {
         e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
         return;
       }
 

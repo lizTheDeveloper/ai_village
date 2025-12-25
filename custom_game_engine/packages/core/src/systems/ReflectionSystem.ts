@@ -37,19 +37,22 @@ export class ReflectionSystem implements System {
       });
     });
 
+    // Deep reflection triggers
     this.eventBus.subscribe('time:new_week', (event) => {
       const data = event.data as any;
-      this.reflectionTriggers.set(data.agentId as string, {
+      // Trigger deep reflection for all agents
+      this.reflectionTriggers.set(data.agentId as string ?? 'broadcast', {
         type: 'deep',
-        timestamp: data.timestamp as number,
+        timestamp: (data.timestamp as number) ?? Date.now(),
       });
     });
 
     this.eventBus.subscribe('time:season_change', (event) => {
       const data = event.data as any;
-      this.reflectionTriggers.set(data.agentId as string, {
+      // Trigger deep reflection for all agents
+      this.reflectionTriggers.set(data.agentId as string ?? 'broadcast', {
         type: 'deep',
-        timestamp: data.timestamp as number,
+        timestamp: (data.timestamp as number) ?? Date.now(),
       });
     });
 
@@ -200,8 +203,8 @@ export class ReflectionSystem implements System {
       source: this.id,
       data: {
         agentId,
+        reflectionCount: reflectionComp.reflections.length,
         reflectionType: 'daily',
-        timestamp,
       },
     });
   }
@@ -272,8 +275,8 @@ export class ReflectionSystem implements System {
       source: this.id,
       data: {
         agentId,
+        reflectionCount: reflectionComp.reflections.length,
         reflectionType: 'deep',
-        timestamp,
       },
     });
   }

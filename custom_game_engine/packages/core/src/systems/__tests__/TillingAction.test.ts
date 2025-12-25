@@ -274,7 +274,8 @@ describe('Tilling Action', () => {
         expect.objectContaining({
           type: 'soil:tilled',
           data: expect.objectContaining({
-            position: { x: 5, y: 5 },
+            x: 5,
+            y: 5,
           }),
         })
       );
@@ -288,13 +289,17 @@ describe('Tilling Action', () => {
       soilSystem.tillTile(world, tile, 5, 5);
       eventBus.flush();
 
+      // soil:tilled event contains x, y - fertility is in tile state
       expect(handler).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            fertility: expect.any(Number),
+            x: 5,
+            y: 5,
           }),
         })
       );
+      // Verify fertility was set on tile
+      expect(tile.fertility).toBeGreaterThan(0);
     });
 
     it('should emit soil:tilled event with biome data', () => {
@@ -305,13 +310,17 @@ describe('Tilling Action', () => {
       soilSystem.tillTile(world, tile, 5, 5);
       eventBus.flush();
 
+      // soil:tilled event contains x, y - biome is in tile state
       expect(handler).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            biome: 'plains',
+            x: 5,
+            y: 5,
           }),
         })
       );
+      // Verify biome is preserved on tile
+      expect(tile.biome).toBe('plains');
     });
   });
 

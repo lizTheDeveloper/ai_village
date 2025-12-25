@@ -8,6 +8,8 @@ import { addToInventory, createSeedItemId } from '../components/InventoryCompone
 import { calculateSeedYield } from '../genetics/PlantGenetics.js';
 import { FARMING_CONFIG } from '../constants/GameBalance.js';
 import { EntityImpl } from '../ecs/Entity.js';
+import type { GameEvent } from '../events/GameEvent.js';
+import type { GameEventMap } from '../events/EventMap.js';
 
 /**
  * Handler for the harvest action.
@@ -194,6 +196,7 @@ export class HarvestActionHandler implements ActionHandler {
     // Get components
     const plant = plantEntity.components.get('plant') as PlantComponent;
     const inventory = actor.components.get('inventory') as InventoryComponent;
+    const plantPos = plantEntity.components.get('position') as PositionComponent;
 
     if (!plant) {
       return {
@@ -228,7 +231,7 @@ export class HarvestActionHandler implements ActionHandler {
     const seedYield = calculateSeedYield(plant, baseSeedsPerPlant, farmingSkill);
 
     const seedItemId = createSeedItemId(plant.speciesId);
-    const events = [];
+    const events: Array<Omit<GameEvent<keyof GameEventMap>, 'tick' | 'timestamp'>> = [];
     let fruitsAdded = 0;
     let seedsAdded = 0;
 
@@ -272,33 +275,39 @@ export class HarvestActionHandler implements ActionHandler {
       // Emit seed:harvested event
       if (seedsAdded > 0) {
         events.push({
-          type: 'seed:harvested',
+          type: 'seed:harvested' as const,
           source: 'harvest-action-handler',
           data: {
-            actionId: action.id,
-            actorId: action.actorId,
+            agentId: action.actorId,
             plantId: action.targetId,
             speciesId: plant.speciesId,
-            seedsHarvested: seedsAdded,
+            seedCount: seedsAdded,
             farmingSkill,
             plantHealth: plant.health,
             plantStage: plant.stage,
             generation: plant.generation,
+            position: { x: plantPos.x, y: plantPos.y },
+            actionId: action.id,
           },
         });
       }
 
       // Emit harvest:completed event
+      const harvestedItems: Array<{ itemId: string; amount: number }> = [];
+      if (fruitsAdded > 0) {
+        harvestedItems.push({ itemId: 'food', amount: fruitsAdded });
+      }
+      if (seedsAdded > 0) {
+        harvestedItems.push({ itemId: `seed:${plant.speciesId}`, amount: seedsAdded });
+      }
+
       events.push({
-        type: 'harvest:completed',
+        type: 'harvest:completed' as const,
         source: 'harvest-action-handler',
         data: {
-          actionId: action.id,
-          actorId: action.actorId,
-          plantId: action.targetId,
-          speciesId: plant.speciesId,
-          fruitsHarvested: fruitsAdded,
-          seedsHarvested: seedsAdded,
+          agentId: action.actorId,
+          position: { x: plantPos.x, y: plantPos.y },
+          harvested: harvestedItems,
         },
       });
 

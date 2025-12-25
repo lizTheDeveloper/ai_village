@@ -165,23 +165,21 @@ export class CraftingPanelUI {
     });
 
     // Listen for events
-    this.world.eventBus.subscribe('crafting:job_queued', (event) => {
-      const data = event.data as { agentId: number };
-      if (data.agentId === this.activeAgentId) {
-        this.queueSection.refresh();
-      }
+    this.world.eventBus.subscribe('crafting:job_queued', () => {
+      // event.data has jobId and recipeId, not agentId
+      // No agentId filtering - refresh for all queue changes
+      this.queueSection.refresh();
     });
 
-    this.world.eventBus.subscribe('crafting:job_completed', (event) => {
-      const data = event.data as { agentId: number };
-      if (data.agentId === this.activeAgentId) {
-        this.queueSection.refresh();
-      }
+    this.world.eventBus.subscribe('crafting:job_completed', () => {
+      // event.data has jobId and recipeId, not agentId
+      // No agentId filtering - refresh for all queue changes
+      this.queueSection.refresh();
     });
 
     this.world.eventBus.subscribe('inventory:changed', (event) => {
-      const data = event.data as { entityId: number };
-      if (data.entityId === this.activeAgentId) {
+      const data = event.data; // Has entityId as string
+      if (data.entityId === String(this.activeAgentId)) {
         this.ingredientPanel.refresh();
       }
     });

@@ -18,7 +18,12 @@ export class WeatherSystem implements System {
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     for (const entity of entities) {
       const impl = entity as EntityImpl;
-      const weather = impl.getComponent<WeatherComponent>('weather')!;
+      const weather = impl.getComponent<WeatherComponent>('weather');
+
+      // Skip entities without weather component
+      if (!weather) {
+        continue;
+      }
 
       // Tick down duration
       const newDuration = Math.max(0, weather.duration - deltaTime);
@@ -43,14 +48,11 @@ export class WeatherSystem implements System {
     const newWeatherType = this.selectNewWeatherType(currentWeather.weatherType);
 
     // Weather type defaults from WeatherComponent spec
-    const weatherDefaults: Record<
-      WeatherType,
-      { tempModifier: number; movementModifier: number }
-    > = {
-      clear: { tempModifier: 0, movementModifier: 1.0 },
-      rain: { tempModifier: -3, movementModifier: 0.8 },
-      snow: { tempModifier: -8, movementModifier: 0.7 },
-      storm: { tempModifier: -5, movementModifier: 0.5 },
+    const weatherDefaults: Record<WeatherType, { movementModifier: number }> = {
+      clear: { movementModifier: 1.0 },
+      rain: { movementModifier: 0.8 },
+      storm: { movementModifier: 0.6 },
+      snow: { movementModifier: 0.7 },
     };
 
     const defaults = weatherDefaults[newWeatherType];
@@ -62,17 +64,16 @@ export class WeatherSystem implements System {
       weatherType: newWeatherType,
       intensity: newIntensity,
       duration: newDuration,
-      tempModifier: defaults.tempModifier * newIntensity,
       movementModifier: 1.0 - (1.0 - defaults.movementModifier) * newIntensity,
     }));
 
     // Emit weather change event if type actually changed
     if (this.previousWeatherType !== newWeatherType) {
-      const tempMod = defaults.tempModifier * newIntensity;
+      // tempModifier removed
       const moveMod = 1.0 - (1.0 - defaults.movementModifier) * newIntensity;
 
       console.log(
-        `[WeatherSystem] Weather changed: ${this.previousWeatherType || 'clear'} → ${newWeatherType} (intensity: ${(newIntensity * 100).toFixed(0)}%). Temp modifier: ${tempMod.toFixed(1)}°C, Movement modifier: ${(moveMod * 100).toFixed(0)}%`
+        `[WeatherSystem] Weather changed: ${this.previousWeatherType || 'clear'} → ${newWeatherType} (intensity: ${(newIntensity * 100).toFixed(0)}%). Movement modifier: ${(moveMod * 100).toFixed(0)}%`
       );
 
       world.eventBus.emit({
@@ -80,10 +81,8 @@ export class WeatherSystem implements System {
         source: entity.id,
         data: {
           oldWeather: this.previousWeatherType || 'clear',
-          newWeather: newWeatherType,
+          weatherType: newWeatherType,
           intensity: newIntensity,
-          tempModifier: tempMod,
-          movementModifier: moveMod,
         },
       });
       this.previousWeatherType = newWeatherType;

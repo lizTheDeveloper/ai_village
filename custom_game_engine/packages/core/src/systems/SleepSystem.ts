@@ -3,7 +3,7 @@ import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
-import { CircadianComponent, type DreamContent } from '../components/CircadianComponent.js';
+import { CircadianComponent } from '../components/CircadianComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { TimeComponent } from './TimeSystem.js';
@@ -368,17 +368,12 @@ export class SleepSystem implements System {
       throw new Error('Failed to generate dream interpretation');
     }
 
-    const dream: DreamContent = {
-      memoryElements,
-      weirdElement,
-      dreamNarrative,
-      interpretation: interpretation,
-    };
+    void { memoryElements, weirdElement, dreamNarrative, interpretation }; // Used for dream generation, not stored directly
 
     // Update circadian with dream
     entity.updateComponent('circadian', (current: any) => ({
       ...current,
-      lastDream: dream,
+      lastDream: dreamNarrative,
       hasDreamedThisSleep: true,
     }));
 
@@ -387,8 +382,9 @@ export class SleepSystem implements System {
       type: 'agent:dreamed',
       source: entity.id,
       data: {
+        agentId: entity.id,
+        dreamContent: dreamNarrative,
         entityId: entity.id,
-        dream,
       },
     });
   }

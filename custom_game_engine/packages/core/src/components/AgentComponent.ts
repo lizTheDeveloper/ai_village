@@ -28,6 +28,8 @@ export type AgentBehavior =
   | 'attend_meeting'
   | 'till'
   | 'farm'
+  | 'gather_seeds'
+  | 'harvest'
   // Navigation & Exploration (Phase 4.5)
   | 'navigate'
   | 'explore_frontier'

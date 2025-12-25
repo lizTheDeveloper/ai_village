@@ -134,6 +134,24 @@ export class StructuredPromptBuilder {
           instruction = `You see other villagers nearby. Connecting with them could be valuable. What should you do?`;
         }
       }
+      // Encourage gathering seeds if plants with seeds are visible
+      else if (vision?.seenPlants && vision.seenPlants.length > 0) {
+        // Check if any plants have seeds
+        let plantsWithSeeds = 0;
+        for (const plantId of vision.seenPlants) {
+          const plant = world.getEntity(plantId);
+          if (plant) {
+            const plantComp = plant.getComponent('plant');
+            if (plantComp && plantComp.seedsProduced > 0) {
+              plantsWithSeeds++;
+            }
+          }
+        }
+
+        if (plantsWithSeeds > 0) {
+          instruction = `You see ${plantsWithSeeds} plant${plantsWithSeeds > 1 ? 's' : ''} with seeds ready to gather! Collecting seeds is essential for farming and growing your own food. Gather seeds now to secure your future food supply! What should you do?`;
+        }
+      }
       // Encourage gathering if no resources and resources are visible
       else if (!hasBuildingMaterials && vision?.seenResources && vision.seenResources.length > 0) {
         instruction = `Your inventory is empty and you see useful resources nearby. Gathering BOTH wood and stone now will help you build shelter and tools later. Both materials are equally important! What should you do?`;
@@ -343,7 +361,61 @@ export class StructuredPromptBuilder {
         }
       }
 
-      if (agentCount === 0 && resourceCount === 0) {
+      // Show plant information
+      const plantCount = vision.seenPlants?.length || 0;
+      if (plantCount > 0) {
+        // Group plants by species and stage
+        const plantsBySpecies: Record<string, { total: number; withSeeds: number; withFruit: number; stages: string[] }> = {};
+
+        for (const plantId of vision.seenPlants || []) {
+          const plant = world.getEntity(plantId);
+          if (plant) {
+            const plantComp = plant.getComponent('plant');
+            if (plantComp) {
+              const species = plantComp.speciesId;
+              if (!plantsBySpecies[species]) {
+                plantsBySpecies[species] = { total: 0, withSeeds: 0, withFruit: 0, stages: [] };
+              }
+              plantsBySpecies[species].total += 1;
+              if (plantComp.seedsProduced > 0) {
+                plantsBySpecies[species].withSeeds += 1;
+              }
+              if ((plantComp.fruitCount || 0) > 0) {
+                plantsBySpecies[species].withFruit += 1;
+              }
+              if (!plantsBySpecies[species].stages.includes(plantComp.stage)) {
+                plantsBySpecies[species].stages.push(plantComp.stage);
+              }
+            }
+          }
+        }
+
+        const plantDescriptions: string[] = [];
+        for (const [species, info] of Object.entries(plantsBySpecies)) {
+          const speciesName = species.replace(/-/g, ' ');
+          let desc = `${info.total} ${speciesName}${info.total > 1 ? 's' : ''}`;
+
+          const details: string[] = [];
+          if (info.withSeeds > 0) {
+            details.push(`${info.withSeeds} with seeds ready to gather`);
+          }
+          if (info.withFruit > 0) {
+            details.push(`${info.withFruit} with fruit`);
+          }
+
+          if (details.length > 0) {
+            desc += ` (${details.join(', ')})`;
+          }
+
+          plantDescriptions.push(desc);
+        }
+
+        if (plantDescriptions.length > 0) {
+          context += `- You see: ${plantDescriptions.join(', ')}\n`;
+        }
+      }
+
+      if (agentCount === 0 && resourceCount === 0 && plantCount === 0) {
         context += '- The area around you is empty\n';
       }
 
@@ -810,6 +882,9 @@ export class StructuredPromptBuilder {
     if (hasSeeds) {
       actions.push('plant - Plant seeds in tilled soil (say "plant <seedType>")');
     }
+
+    // Add gather_seeds action - allows gathering seeds from wild or cultivated plants
+    actions.push('gather_seeds - Gather seeds from mature plants for planting (say "gather seeds from <plant>")');
 
     // Add harvest action if agent sees mature plants (TODO: vision check)
     actions.push('harvest - Harvest mature crops');

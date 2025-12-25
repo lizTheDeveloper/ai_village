@@ -31,15 +31,10 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
     // Create a plant
     const plant = harness.world.createEntity('plant');
     plant.addComponent({
-      type: 'position',
-      version: 1,
-      x: 10,
-      y: 10,
-    });
-    plant.addComponent({
       type: 'plant',
       version: 1,
       speciesId: 'wheat',
+      position: { x: 10, y: 10 },
       stage: 'seedling',
       health: 100,
       growthProgress: 0,
@@ -62,17 +57,14 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
 
     const plant = harness.world.createEntity('plant');
     plant.addComponent({
-      type: 'position',
-      version: 1,
-      x: 10,
-      y: 10,
-    });
-    plant.addComponent({
       type: 'plant',
       version: 1,
       speciesId: 'wheat',
+      position: { x: 10, y: 10 },
       stage: 'seedling',
       health: 100,
+      hydration: 70,
+      nutrition: 80,
       growthProgress: 0,
       age: 0,
     });
@@ -122,15 +114,10 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
 
     const plant = harness.world.createEntity('plant');
     plant.addComponent({
-      type: 'position',
-      version: 1,
-      x: 10,
-      y: 10,
-    });
-    plant.addComponent({
       type: 'plant',
       version: 1,
       speciesId: 'wheat',
+      position: { x: 10, y: 10 },
       stage: 'seedling',
       health: 100,
       growthProgress: 0,
@@ -157,34 +144,28 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
     // Create healthy plant
     const healthyPlant = harness.world.createEntity('plant');
     healthyPlant.addComponent({
-      type: 'position',
-      version: 1,
-      x: 10,
-      y: 10,
-    });
-    healthyPlant.addComponent({
       type: 'plant',
       version: 1,
       speciesId: 'wheat',
+      position: { x: 10, y: 10 },
       stage: 'seedling',
       health: 100, // Perfect health
+      hydration: 70,
+      nutrition: 80,
       growthProgress: 0,
     });
 
     // Create unhealthy plant
     const unhealthyPlant = harness.world.createEntity('plant');
     unhealthyPlant.addComponent({
-      type: 'position',
-      version: 1,
-      x: 20,
-      y: 20,
-    });
-    unhealthyPlant.addComponent({
       type: 'plant',
       version: 1,
       speciesId: 'wheat',
+      position: { x: 20, y: 20 },
       stage: 'seedling',
       health: 30, // Poor health
+      hydration: 40,
+      nutrition: 50,
       growthProgress: 0,
     });
 
@@ -208,17 +189,14 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
 
     const plant = harness.world.createEntity('plant');
     plant.addComponent({
-      type: 'position',
-      version: 1,
-      x: 10,
-      y: 10,
-    });
-    plant.addComponent({
       type: 'plant',
       version: 1,
       speciesId: 'wheat',
+      position: { x: 10, y: 10 },
       stage: 'seedling',
       health: 100,
+      hydration: 70,
+      nutrition: 80,
       growthProgress: 95, // Almost ready to advance
     });
 
@@ -245,33 +223,27 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
     // Create multiple plants at different stages
     const plant1 = harness.world.createEntity('plant');
     plant1.addComponent({
-      type: 'position',
-      version: 1,
-      x: 10,
-      y: 10,
-    });
-    plant1.addComponent({
       type: 'plant',
       version: 1,
       speciesId: 'wheat',
+      position: { x: 10, y: 10 },
       stage: 'seedling',
       health: 100,
+      hydration: 70,
+      nutrition: 80,
       growthProgress: 10,
     });
 
     const plant2 = harness.world.createEntity('plant');
     plant2.addComponent({
-      type: 'position',
-      version: 1,
-      x: 20,
-      y: 20,
-    });
-    plant2.addComponent({
       type: 'plant',
       version: 1,
       speciesId: 'wheat',
+      position: { x: 20, y: 20 },
       stage: 'vegetative',
       health: 100,
+      hydration: 65,
+      nutrition: 75,
       growthProgress: 50,
     });
 
@@ -291,17 +263,14 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
 
     const plant = harness.world.createEntity('plant');
     plant.addComponent({
-      type: 'position',
-      version: 1,
-      x: 10,
-      y: 10,
-    });
-    plant.addComponent({
       type: 'plant',
       version: 1,
       speciesId: 'wheat',
+      position: { x: 10, y: 10 },
       stage: 'dead',
       health: 0,
+      hydration: 0,
+      nutrition: 0,
       growthProgress: 0,
     });
 

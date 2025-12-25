@@ -13,6 +13,16 @@ const RESOURCE_WEIGHTS: Record<ResourceType, number> = {
 };
 
 /**
+ * Weight table for consumable items (kg per item).
+ * These are items that aren't basic resources but are still tracked by weight.
+ */
+const ITEM_WEIGHTS: Record<string, number> = {
+  berry: 0.1, // Berries are lightweight
+  stew: 0.5,  // Prepared food has moderate weight
+  beer: 0.8,  // Liquids in containers are heavier
+};
+
+/**
  * Stack size limits per resource type.
  */
 const RESOURCE_STACK_SIZES: Record<ResourceType, number> = {
@@ -97,18 +107,41 @@ export function getResourceStackSize(resourceType: ResourceType): number {
 
 /**
  * Calculate total weight of inventory.
+ * CRITICAL: This function must never return negative values.
+ * Always recalculates from actual slot contents to prevent stale cached values.
  */
 export function calculateInventoryWeight(inventory: InventoryComponent): number {
   let totalWeight = 0;
 
   for (const slot of inventory.slots) {
     if (slot.itemId && slot.quantity > 0) {
+      let unitWeight = 0;
+
       // Check if it's a resource type
       if (isResourceType(slot.itemId)) {
-        const weight = getResourceWeight(slot.itemId as ResourceType);
-        totalWeight += weight * slot.quantity;
+        unitWeight = getResourceWeight(slot.itemId as ResourceType);
       }
-      // For future item types, add weight calculation here
+      // Check if it's a known consumable item
+      else if (slot.itemId in ITEM_WEIGHTS) {
+        const itemWeight = ITEM_WEIGHTS[slot.itemId];
+        if (itemWeight !== undefined) {
+          unitWeight = itemWeight;
+        } else {
+          // Fallback for undefined (should never happen due to 'in' check)
+          unitWeight = 0.5;
+        }
+      }
+      // Check if it's a seed
+      else if (isSeedType(slot.itemId)) {
+        unitWeight = 0.1; // Seeds are lightweight
+      }
+      // Unknown item type - log warning but don't crash
+      else {
+        console.warn(`[InventoryComponent] Unknown item type for weight calculation: ${slot.itemId}. Using default weight 0.5 kg.`);
+        unitWeight = 0.5; // Default moderate weight for unknown items
+      }
+
+      totalWeight += unitWeight * slot.quantity;
     }
   }
 
@@ -211,20 +244,25 @@ export function addToInventory(
     }
   }
 
-  // Update cached weight
+  // Recalculate weight from actual slot contents to prevent cache corruption
+  // This ensures weight is always accurate and never goes negative
   const actualAmountAdded = amountToAdd - remainingToAdd;
-  const newWeight = inventory.currentWeight + (actualAmountAdded * unitWeight);
 
   if (remainingToAdd > 0) {
     // Inventory is full
     throw new Error(`Inventory full. Could only add ${actualAmountAdded} of ${quantity} ${itemId}.`);
   }
 
+  const actualWeight = calculateInventoryWeight({
+    ...inventory,
+    slots: [...inventory.slots],
+  } as InventoryComponent);
+
   return {
     inventory: {
       ...inventory,
       slots: [...inventory.slots],
-      currentWeight: newWeight,
+      currentWeight: actualWeight,
     },
     amountAdded: actualAmountAdded,
   };
@@ -257,13 +295,8 @@ export function removeFromInventory(
     );
   }
 
-  let unitWeight: number;
-  if (isResourceType(itemId)) {
-    const resourceType = itemId as ResourceType;
-    unitWeight = getResourceWeight(resourceType);
-  } else if (isSeedType(itemId)) {
-    unitWeight = 0.1; // Seeds weight
-  } else {
+  // Validate item type exists (weight calculation happens in calculateInventoryWeight)
+  if (!isResourceType(itemId) && !isSeedType(itemId)) {
     throw new Error(`Unknown item type for removal: ${itemId}`);
   }
 
@@ -283,14 +316,18 @@ export function removeFromInventory(
     }
   }
 
-  // Update cached weight
-  const newWeight = inventory.currentWeight - (quantity * unitWeight);
+  // Recalculate weight from actual slot contents to prevent cache corruption
+  // This ensures weight never goes negative due to stale cached values
+  const actualWeight = calculateInventoryWeight({
+    ...inventory,
+    slots: [...inventory.slots],
+  } as InventoryComponent);
 
   return {
     inventory: {
       ...inventory,
       slots: [...inventory.slots],
-      currentWeight: newWeight,
+      currentWeight: actualWeight,
     },
     amountRemoved: quantity,
   };

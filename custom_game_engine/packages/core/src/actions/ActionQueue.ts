@@ -191,7 +191,7 @@ export class ActionQueue implements IActionQueue {
         data: {
           actionId: action.id,
           actionType: action.type,
-          reason: validation.reason,
+          reason: validation.reason || 'Validation failed',
         },
       });
       return;
@@ -243,7 +243,7 @@ export class ActionQueue implements IActionQueue {
         actionId: action.id,
         actionType: action.type,
         success: result.success,
-        reason: result.reason,
+        ...(result.reason && { reason: result.reason }),
       },
     });
 

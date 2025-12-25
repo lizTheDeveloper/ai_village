@@ -518,22 +518,57 @@ export class AISystem implements System {
           behavior: 'wander',
           behaviorState: {},
         }));
-      } else if (currentBehavior === 'wander' && inventory && Math.random() < 0.15) {
-        // 15% chance to gather resources when wandering (if inventory is light)
+      } else if (currentBehavior === 'wander' && inventory) {
+        // Autonomic resource gathering: switch to gather when resources are visible and needed
         const hasWood = inventory.slots.some(s => s.itemId === 'wood' && s.quantity >= 10);
         const hasStone = inventory.slots.some(s => s.itemId === 'stone' && s.quantity >= 10);
 
         if (!hasWood || !hasStone) {
-          // Switch to gathering
-          const preferredType = !hasWood ? 'wood' : 'stone';
-          impl.updateComponent<AgentComponent>('agent', (current) => ({
-            ...current,
-            behavior: 'gather',
-            behaviorState: { resourceType: preferredType },
-          }));
+          // Check for nearby resources within detection range
+          const position = impl.getComponent<PositionComponent>('position')!;
+          const detectionRange = 15; // tiles
+          const resources = world
+            .query()
+            .with('resource')
+            .with('position')
+            .executeEntities();
+
+          let nearestResource: { type: string; distance: number } | null = null;
+
+          for (const resource of resources) {
+            const resourceImpl = resource as EntityImpl;
+            const resourceComp = resourceImpl.getComponent<ResourceComponent>('resource')!;
+            const resourcePos = resourceImpl.getComponent<PositionComponent>('position')!;
+
+            // Skip food and non-harvestable resources
+            if (resourceComp.resourceType === 'food' || !resourceComp.harvestable) continue;
+            if (resourceComp.amount <= 0) continue;
+
+            // Only consider resources we need
+            if (resourceComp.resourceType === 'wood' && hasWood) continue;
+            if (resourceComp.resourceType === 'stone' && hasStone) continue;
+
+            const distance = Math.sqrt(
+              Math.pow(resourcePos.x - position.x, 2) +
+              Math.pow(resourcePos.y - position.y, 2)
+            );
+
+            if (distance <= detectionRange && (!nearestResource || distance < nearestResource.distance)) {
+              nearestResource = { type: resourceComp.resourceType, distance };
+            }
+          }
+
+          // If found nearby resource, immediately switch to gathering
+          if (nearestResource) {
+            impl.updateComponent<AgentComponent>('agent', (current) => ({
+              ...current,
+              behavior: 'gather',
+              behaviorState: { resourceType: nearestResource.type },
+            }));
+          }
         }
-      } else if (currentBehavior === 'gather' && inventory && Math.random() < 0.05) {
-        // 5% chance to stop gathering if we have enough materials
+      } else if (currentBehavior === 'gather' && inventory) {
+        // Autonomic: stop gathering when we have enough materials
         const hasWood = inventory.slots.some(s => s.itemId === 'wood' && s.quantity >= 10);
         const hasStone = inventory.slots.some(s => s.itemId === 'stone' && s.quantity >= 10);
 
@@ -836,6 +871,7 @@ export class AISystem implements System {
 
     const seenResourceIds: string[] = [];
     const seenAgentIds: string[] = [];
+    const seenPlantIds: string[] = [];
 
     // Detect nearby resources
     if (vision.canSeeResources) {
@@ -871,6 +907,45 @@ export class AISystem implements System {
 
           entity.updateComponent<MemoryComponent>('memory', () => updatedMemory);
         }
+      }
+    }
+
+    // Detect nearby plants
+    const plants = world.query().with('plant').with('position').executeEntities();
+    for (const plantEntity of plants) {
+      const plantImpl = plantEntity as EntityImpl;
+      const plantPos = plantImpl.getComponent<PositionComponent>('position')!;
+      const plant = plantImpl.getComponent<PlantComponent>('plant')!;
+
+      const distance = Math.sqrt(
+        Math.pow(plantPos.x - position.x, 2) +
+        Math.pow(plantPos.y - position.y, 2)
+      );
+
+      if (distance <= vision.range) {
+        // Track this plant in vision
+        seenPlantIds.push(plantEntity.id);
+
+        // Remember this plant location
+        const updatedMemory = addMemory(
+          memory,
+          {
+            type: 'plant_location',
+            x: plantPos.x,
+            y: plantPos.y,
+            entityId: plantEntity.id,
+            metadata: {
+              speciesId: plant.speciesId,
+              stage: plant.stage,
+              hasSeeds: plant.seedsProduced > 0,
+              hasFruit: (plant.fruitCount || 0) > 0
+            },
+          },
+          world.tick,
+          80
+        );
+
+        entity.updateComponent<MemoryComponent>('memory', () => updatedMemory);
       }
     }
 
@@ -913,6 +988,7 @@ export class AISystem implements System {
       ...current,
       seenAgents: seenAgentIds,
       seenResources: seenResourceIds,
+      seenPlants: seenPlantIds,
     }));
   }
 
@@ -1070,6 +1146,11 @@ export class AISystem implements System {
   private wanderBehavior(entity: EntityImpl): void {
     const movement = entity.getComponent<MovementComponent>('movement')!;
     const agent = entity.getComponent<AgentComponent>('agent')!;
+    const position = entity.getComponent<PositionComponent>('position')!;
+
+    // Check distance from origin (0, 0) - camp/spawn area
+    const distanceFromHome = Math.sqrt(position.x * position.x + position.y * position.y);
+    const maxWanderDistance = 30; // Maximum tiles from home before biasing back
 
     // Coherent wander: maintain direction with slight random jitter
     // Get or initialize wander angle from behavior state
@@ -1079,9 +1160,18 @@ export class AISystem implements System {
       wanderAngle = Math.random() * Math.PI * 2;
     }
 
-    // Add small random jitter to angle (max ±15 degrees per tick)
-    const jitterAmount = (Math.random() - 0.5) * (Math.PI / 6); // ±30° range
-    wanderAngle += jitterAmount;
+    // If too far from home, bias angle toward home
+    if (distanceFromHome > maxWanderDistance) {
+      // Calculate angle toward home (0, 0)
+      const angleToHome = Math.atan2(-position.y, -position.x);
+      // Bias wander angle toward home (lerp 50% toward home direction)
+      const angleDiff = angleToHome - wanderAngle;
+      wanderAngle += angleDiff * 0.3; // 30% bias toward home
+    } else {
+      // Add small random jitter to angle (max ±15 degrees per tick)
+      const jitterAmount = (Math.random() - 0.5) * (Math.PI / 6); // ±30° range
+      wanderAngle += jitterAmount;
+    }
 
     // Normalize angle to 0-2π range
     wanderAngle = wanderAngle % (Math.PI * 2);

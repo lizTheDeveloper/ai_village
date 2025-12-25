@@ -45,6 +45,8 @@ export class ResponseParser {
     'attend_meeting',
     'till',
     'farm',
+    'gather_seeds',
+    'harvest',
   ]);
 
   /**

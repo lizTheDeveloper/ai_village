@@ -173,6 +173,10 @@ export function parseAction(response: string): AgentAction | null {
     return { type: 'harvest', position: { x: 0, y: 0 } };
   }
 
+  if (cleaned.includes('gather_seeds') || cleaned.includes('gather seeds')) {
+    return { type: 'gather_seeds', plantId: 'nearest' };
+  }
+
   if (cleaned.includes('build') || cleaned.includes('construct')) {
     // Try to extract building type from response
     let buildingType: BuildingType = 'lean-to'; // fallback
@@ -248,8 +252,11 @@ export function actionToBehavior(action: AgentAction): AgentBehavior {
     case 'water':
     case 'fertilize':
     case 'plant':
-    case 'harvest':
       return 'farm'; // Farming behavior
+    case 'harvest':
+      return 'harvest'; // Harvest behavior
+    case 'gather_seeds':
+      return 'gather_seeds'; // Gather seeds behavior
     case 'idle':
     case 'rest':
       return 'idle';

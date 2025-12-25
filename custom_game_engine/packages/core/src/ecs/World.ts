@@ -510,9 +510,8 @@ export class WorldImpl implements WorldMutator {
       type: 'construction:started',
       source: 'world',
       data: {
-        entityId: entity.id,
-        buildingType,
-        position,
+        buildingId: entity.id,
+        blueprintId: buildingType,
       },
     });
 

@@ -15,8 +15,11 @@ export type SystemId = string;
 /** Identifies an action type (e.g., "move", "talk", "craft") */
 export type ActionType = string;
 
-/** Identifies an event type (e.g., "entity:created", "agent:action:completed") */
-export type EventType = string;
+/**
+ * Identifies an event type (e.g., "entity:created", "agent:action:completed")
+ * Now typed via EventMap for compile-time safety - re-exported from events/EventMap.ts
+ */
+export type { EventType } from './events/EventMap.js';
 
 /** Game tick counter - monotonically increasing */
 export type Tick = number;

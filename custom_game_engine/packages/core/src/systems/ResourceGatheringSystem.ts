@@ -56,6 +56,7 @@ export class ResourceGatheringSystem implements System {
           type: 'resource:regenerated',
           source: entity.id,
           data: {
+            resourceId: entity.id,
             resourceType: resource.resourceType,
             amount: newAmount,
           },

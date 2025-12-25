@@ -119,9 +119,10 @@ export class VerificationSystem implements System {
       this.recordVerification(claimantId, verifierId, result, currentTick);
 
       // Update VERIFIER's trust network with verification result
-      // The verifier tracks how much they trust the claimant based on accuracy
+      // When the verifier checks the claimant's information, it affects the verifier's trust in the claimant
+      // (If the claim is correct, trust increases; if wrong, trust decreases)
       if (!impl.hasComponent('trust_network')) {
-        continue; // Verifier needs trust network to track claimant's trustworthiness
+        continue; // Verifier needs trust network to track claimant's reliability
       }
 
       const trustNetwork = impl.getComponent('trust_network') as any;
@@ -140,10 +141,12 @@ export class VerificationSystem implements System {
             type: 'trust:verified',
             source: 'verification',
             data: {
+              trusterId: verifierId,
+              trusteeId: gradient.sourceAgentId,
+              informationType: 'verification',
               claimantId: gradient.sourceAgentId,
               verifierId,
               result,
-              tick: currentTick,
             },
           });
         } else {
@@ -151,10 +154,12 @@ export class VerificationSystem implements System {
             type: 'trust:violated',
             source: 'verification',
             data: {
+              trusterId: verifierId,
+              trusteeId: gradient.sourceAgentId,
+              informationType: 'verification',
               claimantId: gradient.sourceAgentId,
               verifierId,
               result,
-              tick: currentTick,
             },
           });
 
@@ -192,7 +197,8 @@ export class VerificationSystem implements System {
     const exactMatch = nearbyResources.find(e => {
       const resource = e.components.get('resource');
       if (!resource) return false;
-      return (resource as any).resourceType === gradient.resourceType && (resource as any).amount > 0;
+      const resourceType = (resource as any).type || (resource as any).resourceType;
+      return resourceType === gradient.resourceType && (resource as any).amount > 0;
     });
 
     if (exactMatch) {
@@ -203,7 +209,8 @@ export class VerificationSystem implements System {
     const wrongType = nearbyResources.find(e => {
       const resource = e.components.get('resource');
       if (!resource) return false;
-      return (resource as any).resourceType !== gradient.resourceType && (resource as any).amount > 0;
+      const resourceType = (resource as any).type || (resource as any).resourceType;
+      return resourceType !== gradient.resourceType && (resource as any).amount > 0;
     });
 
     if (wrongType) {

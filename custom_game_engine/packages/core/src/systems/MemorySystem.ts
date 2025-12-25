@@ -15,6 +15,11 @@ export class MemorySystem implements System {
       const impl = entity as EntityImpl;
       const memory = impl.getComponent<MemoryComponent>('memory')!;
 
+      // Per CLAUDE.md: No silent fallbacks - validate required fields
+      if (memory.decayRate === undefined) {
+        throw new Error(`Entity ${entity.id} has memory component missing required field: decayRate`);
+      }
+
       // Decay and filter memories
       const decayAmount = memory.decayRate * deltaTime;
       const updatedMemories = memory.memories

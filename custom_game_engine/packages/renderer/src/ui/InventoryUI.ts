@@ -1,4 +1,5 @@
 import type { World, InventoryComponent } from '@ai-village/core';
+import { calculateInventoryWeight } from '@ai-village/core';
 import { DragDropSystem, type SlotReference } from './DragDropSystem.js';
 import { InventorySearch } from './InventorySearch.js';
 import { ItemTooltip, type TooltipItem } from './ItemTooltip.js';
@@ -222,16 +223,19 @@ export class InventoryUI {
 
     // Check if mouse is over a backpack slot
     const slotRef = this.getSlotAtPosition(x, y);
-    console.log('[InventoryUI] handleMouseMove - slotRef:', slotRef);
 
     if (slotRef && slotRef.index !== undefined) {
       const slot = this.playerInventory.slots[slotRef.index];
-      console.log('[InventoryUI] handleMouseMove - slot:', slot);
 
       if (slot && slot.itemId) {
         // Mouse is over an item - show tooltip
-        console.log('[InventoryUI] handleMouseMove - setting hoveredSlot for item:', slot.itemId);
+        const wasHovering = this.hoveredSlot?.index === slotRef.index;
         this.hoveredSlot = slotRef;
+
+        // Only log when starting to hover (not every frame)
+        if (!wasHovering) {
+          console.log(`[InventoryUI] Hover started on slot ${slotRef.index}: ${slot.itemId} x${slot.quantity}`);
+        }
 
         const tooltipItem: TooltipItem = {
           itemId: slot.itemId,
@@ -249,7 +253,6 @@ export class InventoryUI {
     }
 
     // Mouse is inside panel but not over an item
-    console.log('[InventoryUI] handleMouseMove - no item under mouse, clearing hoveredSlot');
     this.hoveredSlot = null;
     return true; // Inventory open
   }
@@ -291,7 +294,12 @@ export class InventoryUI {
       (slot) => slot.itemId !== null && slot.quantity > 0
     ).length;
 
-    const capacityPercent = (this.playerInventory.currentWeight / this.playerInventory.maxWeight) * 100;
+    // CRITICAL FIX: Always recalculate weight from actual slot contents
+    // This prevents displaying incorrect weights from stale cached values
+    // Use the official calculateInventoryWeight function to ensure consistency
+    const actualWeight = calculateInventoryWeight(this.playerInventory);
+
+    const capacityPercent = (actualWeight / this.playerInventory.maxWeight) * 100;
 
     let color = 'white';
     if (capacityPercent >= 100) {
@@ -303,7 +311,7 @@ export class InventoryUI {
     return {
       slotsUsed,
       maxSlots: this.playerInventory.maxSlots,
-      currentWeight: this.playerInventory.currentWeight,
+      currentWeight: actualWeight,
       maxWeight: this.playerInventory.maxWeight,
       color,
     };
@@ -470,54 +478,87 @@ export class InventoryUI {
     const equipmentX = panelX + 20;
     ctx.fillText('EQUIPMENT', equipmentX, sectionY);
 
-    // Equipment slots - render all 11 slots in a grid layout
+    // Equipment slots - render all 11 slots in two columns around character preview
+    // This ensures all slots are visible in a more compact layout
     const equipSlotY = sectionY + 30;
-    const equipSlotSize = 50;
-    const equipSlotSpacing = 10;
-    const equipmentSlots = this.getEquipmentSlots();
+    const equipSlotSize = 36; // Compact slots to fit layout
+    const equipSlotSpacing = 4;
 
     ctx.strokeStyle = '#4a4540';
     ctx.lineWidth = 2;
 
-    // Layout: 2 columns, 6 rows (11 slots total)
-    const equipColumns = 2;
+    // Character preview in center
+    const previewWidth = 80;
+    const previewHeight = 120;
+    const previewX = equipmentX + 70;
+    const previewY = equipSlotY + 40;
+    ctx.fillStyle = '#3a3530';
+    ctx.fillRect(previewX, previewY, previewWidth, previewHeight);
+    ctx.strokeStyle = '#666';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(previewX, previewY, previewWidth, previewHeight);
+    ctx.fillStyle = '#888';
+    ctx.font = '11px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Character', previewX + previewWidth / 2, previewY + previewHeight / 2 - 5);
+    ctx.font = '9px monospace';
+    ctx.fillStyle = '#666';
+    ctx.fillText('Preview', previewX + previewWidth / 2, previewY + previewHeight / 2 + 8);
 
-    for (let i = 0; i < equipmentSlots.length; i++) {
-      const col = i % equipColumns;
-      const row = Math.floor(i / equipColumns);
-      const slotX = equipmentX + col * (equipSlotSize + 80);
-      const slotY = equipSlotY + row * (equipSlotSize + equipSlotSpacing);
+    // Slot layout: arranged around character preview
+    // Left column: head, chest, legs, feet, hands (5 slots)
+    // Right column: main_hand, off_hand, back, neck, ring_left, ring_right (6 slots)
+    const leftSlots = ['head', 'chest', 'legs', 'feet', 'hands'];
+    const rightSlots = ['main_hand', 'off_hand', 'back', 'neck', 'ring_left', 'ring_right'];
+
+    // Draw left column
+    for (let i = 0; i < leftSlots.length; i++) {
+      const slotName = leftSlots[i];
+      if (!slotName) continue; // Skip undefined slots
+
+      const slotX = equipmentX;
+      const slotY = equipSlotY + i * (equipSlotSize + equipSlotSpacing);
 
       // Draw empty slot
       ctx.fillStyle = '#2a2520';
       ctx.fillRect(slotX, slotY, equipSlotSize, equipSlotSize);
+      ctx.strokeStyle = '#4a4540';
+      ctx.lineWidth = 2;
       ctx.strokeRect(slotX, slotY, equipSlotSize, equipSlotSize);
 
-      // Draw slot label
-      ctx.fillStyle = '#888';
-      ctx.font = '11px monospace';
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'middle';
-      const slotName = equipmentSlots[i];
-      if (slotName) {
-        // Truncate long names
-        const displayName = slotName.toUpperCase().replace('_', ' ');
-        ctx.fillText(displayName, slotX + equipSlotSize + 5, slotY + equipSlotSize / 2);
-      }
+      // Draw slot label (abbreviated to fit)
+      ctx.fillStyle = '#AAA';
+      ctx.font = '9px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      const displayName = slotName.toUpperCase().replace(/_/g, ' ');
+      ctx.fillText(displayName, slotX + equipSlotSize / 2, slotY + equipSlotSize + 2);
     }
 
-    // Draw character preview placeholder (centered between equipment columns)
-    const previewX = equipmentX + 50;
-    const previewY = equipSlotY + 100;
-    ctx.fillStyle = '#444';
-    ctx.fillRect(previewX, previewY, 80, 120);
-    ctx.strokeStyle = '#666';
-    ctx.strokeRect(previewX, previewY, 80, 120);
-    ctx.fillStyle = '#888';
-    ctx.font = '12px monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('Character', previewX + 40, previewY + 60);
+    // Draw right column
+    for (let i = 0; i < rightSlots.length; i++) {
+      const slotName = rightSlots[i];
+      if (!slotName) continue; // Skip undefined slots
+
+      const slotX = previewX + previewWidth + 10;
+      const slotY = equipSlotY + i * (equipSlotSize + equipSlotSpacing);
+
+      // Draw empty slot
+      ctx.fillStyle = '#2a2520';
+      ctx.fillRect(slotX, slotY, equipSlotSize, equipSlotSize);
+      ctx.strokeStyle = '#4a4540';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(slotX, slotY, equipSlotSize, equipSlotSize);
+
+      // Draw slot label (abbreviated to fit)
+      ctx.fillStyle = '#AAA';
+      ctx.font = '9px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      const displayName = slotName.toUpperCase().replace(/_/g, ' ');
+      ctx.fillText(displayName, slotX + equipSlotSize / 2, slotY + equipSlotSize + 2);
+    }
 
     // Backpack section (right side)
     const backpackX = panelX + panelWidth / 2;
@@ -628,6 +669,16 @@ export class InventoryUI {
         if (this.playerInventory && slotIndex < this.playerInventory.slots.length) {
           const slot = this.playerInventory.slots[slotIndex];
           if (slot && slot.itemId && slot.quantity > 0) {
+            // Highlight slot if it's being hovered (for tooltip debugging)
+            const isHovered = this.hoveredSlot?.index === slotIndex;
+            if (isHovered) {
+              ctx.strokeStyle = '#FFD700'; // Gold border when hovered
+              ctx.lineWidth = 3;
+              ctx.strokeRect(slotX, slotY, slotSize, slotSize);
+              ctx.strokeStyle = '#4a4540'; // Reset
+              ctx.lineWidth = 2;
+            }
+
             // Draw item icon (simplified - just text for now)
             ctx.fillStyle = '#FFD700';
             ctx.font = 'bold 12px monospace';
@@ -694,81 +745,88 @@ export class InventoryUI {
     }
 
     // Render tooltip if hovering over item
+    // NOTE: Tooltip rendering happens LAST so it draws on top of everything
     if (this.hoveredSlot && this.playerInventory) {
+      console.log('[InventoryUI] Rendering tooltip for slot', this.hoveredSlot.index);
       this.renderTooltip(ctx);
     }
   }
 
   /**
    * Render tooltip for hovered item
+   * SIMPLIFIED: Always shows basic info even if ItemTooltip not fully initialized
    */
   private renderTooltip(ctx: CanvasRenderingContext2D): void {
-    console.log('[InventoryUI] renderTooltip called, hoveredSlot:', this.hoveredSlot);
-
     if (!this.hoveredSlot || !this.playerInventory) {
-      console.log('[InventoryUI] renderTooltip early return: no hoveredSlot or playerInventory');
       return;
     }
 
     // Get slot and item
     const slotIndex = this.hoveredSlot.index;
     if (slotIndex === undefined || slotIndex >= this.playerInventory.slots.length) {
-      console.log('[InventoryUI] renderTooltip early return: invalid slotIndex', slotIndex);
       return;
     }
 
     const slot = this.playerInventory.slots[slotIndex];
     if (!slot || !slot.itemId) {
-      console.log('[InventoryUI] renderTooltip early return: no slot or itemId');
       return;
     }
 
-    console.log('[InventoryUI] Rendering tooltip for item:', slot.itemId, 'at index:', slotIndex);
-
     // Get tooltip position
     const pos = this.tooltip.getPosition();
-    console.log('[InventoryUI] Tooltip position:', pos);
 
-    // Get tooltip content
-    const content = this.tooltip.getContent();
-    const rendering = this.tooltip.getRendering();
+    // Build basic tooltip content (fallback if ItemTooltip fails)
+    const lines: string[] = [];
+    let nameColor = '#9d9d9d'; // default gray
 
-    // Tooltip dimensions
+    // Try to get rich content from ItemTooltip
+    try {
+      const content = this.tooltip.getContent();
+      const rendering = this.tooltip.getRendering();
+      nameColor = rendering.nameColor;
+
+      lines.push(content.name);
+      if (content.rarity) {
+        lines.push(`Rarity: ${content.rarity}`);
+      }
+      if (content.type) {
+        lines.push(`Type: ${content.type}`);
+      }
+      if (content.description) {
+        lines.push('');
+        lines.push(content.description);
+      }
+      if (content.value !== undefined) {
+        lines.push('');
+        lines.push(`Value: ${content.value} gold`);
+      }
+
+      // Add stats
+      for (const line of rendering.lines) {
+        lines.push(`${line.label}: ${line.text}`);
+      }
+    } catch (error) {
+      // Fallback: Show basic item info if ItemTooltip fails
+      const itemName = slot.itemId.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      lines.push(itemName);
+      lines.push(`Quantity: ${slot.quantity}`);
+      if (slot.quality !== undefined) {
+        lines.push(`Quality: ${slot.quality}`);
+      }
+    }
+
+    // Calculate tooltip size
     const tooltipWidth = 220;
     const lineHeight = 18;
     const padding = 10;
-    const lines: string[] = [];
-
-    // Build tooltip lines
-    lines.push(content.name); // Item name
-    if (content.rarity) {
-      lines.push(`Rarity: ${content.rarity}`);
-    }
-    if (content.type) {
-      lines.push(`Type: ${content.type}`);
-    }
-    if (content.description) {
-      lines.push(''); // Blank line
-      lines.push(content.description);
-    }
-    if (content.value !== undefined) {
-      lines.push(''); // Blank line
-      lines.push(`Value: ${content.value} gold`);
-    }
-
-    // Add stats
-    for (const line of rendering.lines) {
-      lines.push(`${line.label}: ${line.text}`);
-    }
-
     const tooltipHeight = lines.length * lineHeight + padding * 2;
 
     // Draw tooltip background
     ctx.fillStyle = 'rgba(20, 15, 10, 0.95)';
     ctx.fillRect(pos.x, pos.y, tooltipWidth, tooltipHeight);
 
-    // Draw tooltip border
-    ctx.strokeStyle = rendering.nameColor;
+    // Draw tooltip border (use item rarity color)
+    ctx.strokeStyle = nameColor;
     ctx.lineWidth = 2;
     ctx.strokeRect(pos.x, pos.y, tooltipWidth, tooltipHeight);
 
@@ -782,26 +840,16 @@ export class InventoryUI {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       if (!line) {
-        continue; // Skip empty/undefined lines
+        continue;
       }
 
-      // First line (name) uses rarity color
+      // First line (name) uses rarity color and bold
       if (i === 0) {
-        ctx.fillStyle = rendering.nameColor;
+        ctx.fillStyle = nameColor;
         ctx.font = 'bold 14px monospace';
       } else {
         ctx.fillStyle = '#DDD';
         ctx.font = '14px monospace';
-      }
-
-      // Find corresponding rendering line for stat coloring
-      const renderLine = rendering.lines.find((rl) => line.startsWith(rl.label));
-      if (renderLine) {
-        if (renderLine.color === 'green') {
-          ctx.fillStyle = '#1eff00';
-        } else if (renderLine.color === 'red') {
-          ctx.fillStyle = '#ff4444';
-        }
       }
 
       ctx.fillText(line, pos.x + padding, currentY);

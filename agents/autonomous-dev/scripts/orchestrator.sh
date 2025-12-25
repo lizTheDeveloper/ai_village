@@ -197,6 +197,29 @@ run_spec_agent() {
     run_agent "spec-agent" "$PROMPT_DIR/spec-agent.md" "$context"
 }
 
+run_spec_agent_with_context() {
+    header "PHASE 1: SPEC AGENT"
+
+    local extra_context="$1"
+    local context=""
+
+    if [[ -n "$FEATURE_NAME" ]]; then
+        context="Process this specific feature: $FEATURE_NAME"
+    fi
+
+    if [[ -n "$extra_context" ]]; then
+        if [[ -n "$context" ]]; then
+            context="$context
+
+$extra_context"
+        else
+            context="$extra_context"
+        fi
+    fi
+
+    run_agent "spec-agent" "$PROMPT_DIR/spec-agent.md" "$context"
+}
+
 run_test_agent_pre() {
     header "PHASE 2: TEST AGENT (Pre-Implementation)"
 
@@ -554,28 +577,57 @@ check_playtest_verdict() {
 run_pipeline() {
     local impl_retries=0
     local playtest_retries=0
+    local spec_retries=0
 
     ensure_dirs
 
-    # Phase 1: Spec Agent
+    # Phase 1: Spec Agent (with retry logic - keeps trying until work order exists)
     local state=$(get_feature_state)
     if [[ "$state" == "NEW" ]] || [[ "$state" == "SPEC" ]]; then
         set_feature_state "SPEC"
-        if ! run_spec_agent; then
-            set_feature_state "BLOCKED"
-            error "Spec Agent failed"
-            return 1
-        fi
 
-        # Find the feature name from the work order if not specified
-        if [[ -z "$FEATURE_NAME" ]]; then
-            FEATURE_NAME=$(ls -t "$WORK_ORDER_DIR" | head -1)
-            if [[ -z "$FEATURE_NAME" ]]; then
-                error "No work order created"
-                return 1
+        while true; do
+            ((spec_retries++)) || true
+            log "Spec Agent attempt $spec_retries"
+
+            # Build context with increasingly explicit instructions on retry
+            local extra_context=""
+            if [[ $spec_retries -gt 1 ]]; then
+                extra_context="IMPORTANT: Previous attempt did not create a work order.
+
+Please CREATE the work order file. Your task is to:
+1. Create directory: agents/autonomous-dev/work-orders/[feature-name]/
+2. Write file: agents/autonomous-dev/work-orders/[feature-name]/work-order.md
+
+The work order MUST be created for the pipeline to continue. This is attempt #$spec_retries."
             fi
-            log "Feature: $FEATURE_NAME"
-        fi
+
+            if ! run_spec_agent_with_context "$extra_context"; then
+                warn "Spec Agent failed, retrying..."
+                continue
+            fi
+
+            # Find the feature name from the work order if not specified
+            if [[ -z "$FEATURE_NAME" ]]; then
+                FEATURE_NAME=$(ls -t "$WORK_ORDER_DIR" 2>/dev/null | head -1)
+                if [[ -z "$FEATURE_NAME" ]]; then
+                    warn "No work order directory created, retrying..."
+                    continue
+                fi
+                log "Feature: $FEATURE_NAME"
+            fi
+
+            # Verify work order file exists
+            local work_order="$WORK_ORDER_DIR/$FEATURE_NAME/work-order.md"
+            if [[ ! -f "$work_order" ]]; then
+                warn "Work order file not found at $work_order, retrying..."
+                continue
+            fi
+
+            # Success - work order created
+            success "Work order created after $spec_retries attempt(s): $work_order"
+            break
+        done
 
         set_feature_state "TESTS_PRE"
     fi

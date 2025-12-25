@@ -118,8 +118,8 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     const animalComponent = {
       type: 'animal',
       version: 1,
-      id: 'wolf-1',
-      speciesId: 'wolf', // Harder to tame
+      id: 'rabbit-1',
+      speciesId: 'rabbit', // Harder to tame
       health: 100,
       hunger: 50,
       thirst: 50,
@@ -286,8 +286,8 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     const animalComponent = {
       type: 'animal',
       version: 1,
-      id: 'wolf-1',
-      speciesId: 'wolf',
+      id: 'rabbit-1',
+      speciesId: 'rabbit',
       health: 100,
       hunger: 50,
       thirst: 50,

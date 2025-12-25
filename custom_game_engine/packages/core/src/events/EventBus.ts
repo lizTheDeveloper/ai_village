@@ -4,24 +4,61 @@ import type {
   EventPriority,
   Unsubscribe,
 } from './GameEvent.js';
-import type { EventType, Tick } from '../types.js';
+import type { EventType } from './EventMap.js';
+import type { Tick } from '../types.js';
 
 /**
- * Central event bus for system communication.
+ * Central event bus for system communication with type-safe event handling.
+ *
+ * Type-safe usage:
+ * ```typescript
+ * // Typed subscription - event.data is inferred
+ * eventBus.subscribe<'agent:action:started'>('agent:action:started', (event) => {
+ *   console.log(event.data.actionId); // TypeScript knows this exists!
+ * });
+ *
+ * // Typed emission - data structure is validated
+ * eventBus.emit<'agent:action:started'>({
+ *   type: 'agent:action:started',
+ *   source: agentId,
+ *   data: { actionId: 'abc', actionType: 'till' } // Must match EventMap!
+ * });
+ * ```
  */
 export interface EventBus {
-  /** Subscribe to one or more event types */
-  subscribe(
-    eventType: EventType | EventType[],
-    handler: EventHandler,
+  /**
+   * Subscribe to one or more event types with optional type safety.
+   *
+   * @param eventType - Single event type or array of types to subscribe to
+   * @param handler - Handler function (receives typed event if T is specified)
+   * @param priority - Optional priority for handler execution order
+   * @returns Unsubscribe function
+   */
+  subscribe<T extends EventType = EventType>(
+    eventType: T | EventType | EventType[],
+    handler: EventHandler<T>,
     priority?: EventPriority
   ): Unsubscribe;
 
-  /** Emit an event (queued for end of tick by default) */
-  emit(event: Omit<GameEvent, 'tick' | 'timestamp'>): void;
+  /**
+   * Emit an event (queued for end of tick by default).
+   * Use type parameter for compile-time validation of event data.
+   *
+   * @param event - Event object (tick and timestamp added automatically)
+   */
+  emit<T extends EventType = EventType>(
+    event: Omit<GameEvent<T>, 'tick' | 'timestamp'>
+  ): void;
 
-  /** Emit immediately (use sparingly) */
-  emitImmediate(event: Omit<GameEvent, 'tick' | 'timestamp'>): void;
+  /**
+   * Emit immediately (use sparingly - breaks tick atomicity).
+   * Use type parameter for compile-time validation of event data.
+   *
+   * @param event - Event object (tick and timestamp added automatically)
+   */
+  emitImmediate<T extends EventType = EventType>(
+    event: Omit<GameEvent<T>, 'tick' | 'timestamp'>
+  ): void;
 
   /** Process all queued events (called once per tick) */
   flush(): void;
@@ -72,9 +109,9 @@ export class EventBusImpl implements EventBus {
   // Index: eventType -> subscription IDs
   private typeIndex = new Map<EventType, Set<number>>();
 
-  subscribe(
-    eventType: EventType | EventType[],
-    handler: EventHandler,
+  subscribe<T extends EventType = EventType>(
+    eventType: T | EventType | EventType[],
+    handler: EventHandler<T>,
     priority: EventPriority = 'normal'
   ): Unsubscribe {
     const id = this.nextSubscriptionId++;
@@ -84,7 +121,7 @@ export class EventBusImpl implements EventBus {
     const subscription: Subscription = {
       id,
       eventTypes: typeSet,
-      handler,
+      handler: handler as EventHandler,
       priority,
     };
 
@@ -106,7 +143,7 @@ export class EventBusImpl implements EventBus {
     };
   }
 
-  emit(event: Omit<GameEvent, 'tick' | 'timestamp'>): void {
+  emit<T extends EventType = EventType>(event: Omit<GameEvent<T>, 'tick' | 'timestamp'>): void {
     const fullEvent: GameEvent = {
       ...event,
       tick: this.currentTick,
@@ -119,7 +156,7 @@ export class EventBusImpl implements EventBus {
     });
   }
 
-  emitImmediate(event: Omit<GameEvent, 'tick' | 'timestamp'>): void {
+  emitImmediate<T extends EventType = EventType>(event: Omit<GameEvent<T>, 'tick' | 'timestamp'>): void {
     const fullEvent: GameEvent = {
       ...event,
       tick: this.currentTick,

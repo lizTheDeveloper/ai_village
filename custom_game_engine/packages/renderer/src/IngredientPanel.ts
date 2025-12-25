@@ -40,8 +40,8 @@ export class IngredientPanel {
 
     // Listen for inventory changes
     this.world.eventBus.subscribe('inventory:changed', (event) => {
-      const data = event.data as { entityId: number };
-      if (this.agentId && data.entityId === this.agentId) {
+      const data = event.data; // Has entityId as string
+      if (this.agentId && data.entityId === String(this.agentId)) {
         this.refresh();
       }
     });

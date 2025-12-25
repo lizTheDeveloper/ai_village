@@ -17,6 +17,14 @@ export class TrustNetworkComponent extends ComponentBase {
   private _verificationHistory: Map<string, VerificationRecord[]> = new Map();
   private readonly _decayRate: number = 0.0001; // Decay toward 0.5 neutral (slower)
 
+  /**
+   * Direct access to trust levels for testing and debugging
+   * Note: Prefer using getTrustScore/setTrustScore for normal usage
+   */
+  get trustLevels(): Map<string, number> {
+    return this._trustScores;
+  }
+
   constructor(data?: { scores?: Map<string, number>; verificationHistory?: Map<string, VerificationRecord[]> }) {
     super();
     if (data?.scores) {

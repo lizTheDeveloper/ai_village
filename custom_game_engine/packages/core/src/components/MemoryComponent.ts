@@ -3,6 +3,7 @@ import type { Tick, EntityId } from '../types.js';
 
 export type MemoryType =
   | 'resource_location'  // Remembered a food/resource spot
+  | 'plant_location'     // Remembered a plant location
   | 'agent_seen'         // Saw another agent
   | 'danger'             // Dangerous location/entity
   | 'home';              // Safe/home location

@@ -15,15 +15,32 @@ export class MemoryConsolidationSystem implements System {
   public readonly priority: number = 105;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
-  private eventBus: EventBus;
+  private eventBus: EventBus | null = null;
   private consolidationTriggers: Set<string> = new Set();
+  private recallEvents: Array<{ agentId: string; memoryId: string }> = [];
 
-  constructor(eventBus: EventBus) {
-    this.eventBus = eventBus;
-    this._setupEventListeners();
+  constructor(eventBus?: EventBus) {
+    if (eventBus) {
+      this.eventBus = eventBus;
+      this._setupEventListeners();
+    }
+  }
+
+  /**
+   * Initialize system with eventBus
+   */
+  public initialize(_world: World, eventBus: EventBus): void {
+    if (!this.eventBus) {
+      this.eventBus = eventBus;
+      this._setupEventListeners();
+    }
   }
 
   private _setupEventListeners(): void {
+    if (!this.eventBus) {
+      throw new Error('EventBus not initialized in MemoryConsolidationSystem');
+    }
+
     // Listen for consolidation triggers
     this.eventBus.subscribe('agent:sleep_start', (event) => {
       const data = event.data as any;
@@ -41,22 +58,19 @@ export class MemoryConsolidationSystem implements System {
       this.consolidationTriggers.add(data.agentId as string);
     });
 
+    // Listen for memory recall events
     this.eventBus.subscribe('memory:recalled', (event) => {
       const data = event.data as any;
-      // Queue memory strengthening
-      this._queueMemoryStrengthening(data);
-    });
-  }
-
-  private recalledMemories: Array<{ agentId: string; memoryId: string }> = [];
-
-  private _queueMemoryStrengthening(data: any): void {
-    if (!data.agentId || !data.memoryId) {
-      return;
-    }
-    this.recalledMemories.push({
-      agentId: data.agentId,
-      memoryId: data.memoryId,
+      if (!data.agentId) {
+        throw new Error('memory:recalled event missing agentId');
+      }
+      if (!data.memoryId) {
+        throw new Error('memory:recalled event missing memoryId');
+      }
+      this.recallEvents.push({
+        agentId: data.agentId as string,
+        memoryId: data.memoryId as string,
+      });
     });
   }
 
@@ -66,6 +80,9 @@ export class MemoryConsolidationSystem implements System {
     const daysElapsed = actualDeltaTime / SECONDS_PER_DAY;
 
     // Flush event bus first to process consolidation triggers and recall events
+    if (!this.eventBus) {
+      throw new Error('EventBus not initialized in MemoryConsolidationSystem.update');
+    }
     this.eventBus.flush();
 
     // Get all entities with episodic memory
@@ -95,6 +112,9 @@ export class MemoryConsolidationSystem implements System {
       // Remove forgotten memories and emit events
       const forgotten = memComp.removeForgotten();
       for (const memory of forgotten) {
+        if (!this.eventBus) {
+          throw new Error('EventBus not initialized in MemoryConsolidationSystem');
+        }
         this.eventBus.emit({
           type: 'memory:forgotten',
           source: this.id,
@@ -117,7 +137,7 @@ export class MemoryConsolidationSystem implements System {
     }
 
     // Strengthen recalled memories
-    for (const { agentId, memoryId } of this.recalledMemories) {
+    for (const { agentId, memoryId } of this.recallEvents) {
       const entity = world.getEntity(agentId);
       if (!entity) continue;
 
@@ -149,9 +169,12 @@ export class MemoryConsolidationSystem implements System {
         // Memory may have been forgotten
       }
     }
-    this.recalledMemories = [];
+    this.recallEvents = [];
 
     // Flush event bus
+    if (!this.eventBus) {
+      throw new Error('EventBus not initialized in MemoryConsolidationSystem');
+    }
     this.eventBus.flush();
   }
 

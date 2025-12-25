@@ -45,11 +45,11 @@ export class NeedsSystem implements System {
       const circadian = impl.getComponent('circadian') as any;
       const isSleeping = circadian?.isSleeping || false;
 
-      // Decay hunger (continues even while sleeping, but MUCH slower)
+      // Decay hunger (paused during sleep to prevent waking agents)
       // Per CLAUDE.md: Don't let hunger wake agents during minimum sleep period
       // Agents need to recover energy more than they need to eat
       // Hunger decay rate is per real second
-      const hungerDecay = needs.hungerDecayRate * deltaTime * (isSleeping ? 0.1 : 1.0);
+      const hungerDecay = needs.hungerDecayRate * deltaTime * (isSleeping ? 0 : 1.0);
 
       // Energy decay based on activity level (per GAME minute, not real time)
       // Rates balanced for 18-hour wake / 6-hour sleep cycle:
@@ -121,9 +121,6 @@ export class NeedsSystem implements System {
             needType: 'hunger',
             value: newHunger,
             survivalRelevance: 0.8,
-            emotionalIntensity: 0.7,
-            emotionalValence: -0.8,
-            timestamp: Date.now(),
           },
         });
       }
@@ -137,9 +134,6 @@ export class NeedsSystem implements System {
             needType: 'energy',
             value: newEnergy,
             survivalRelevance: 0.7,
-            emotionalIntensity: 0.6,
-            emotionalValence: -0.6,
-            timestamp: Date.now(),
           },
         });
       }
@@ -150,7 +144,10 @@ export class NeedsSystem implements System {
         world.eventBus.emit({
           type: 'agent:starved',
           source: entity.id,
-          data: { entityId: entity.id },
+          data: {
+            agentId: entity.id,
+            survivalRelevance: 1.0,
+          },
         });
       }
     }

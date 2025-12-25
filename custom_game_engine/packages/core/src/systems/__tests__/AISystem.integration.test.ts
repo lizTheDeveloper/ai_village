@@ -62,6 +62,9 @@ describe('AISystem + ActionQueue Integration', () => {
 
     const entities = Array.from(harness.world.entities.values());
 
+    // Advance time slightly to make world.tick > 0
+    harness.advanceTime(1.0);
+
     // First tick - should think (lastThinkTick is 0)
     aiSystem.update(harness.world, entities, 1 / 60);
     const afterFirst = agent.getComponent('agent');
@@ -134,10 +137,11 @@ describe('AISystem + ActionQueue Integration', () => {
     const aiSystem = new AISystem();
     harness.registerSystem('AISystem', aiSystem);
 
-    // Advance world tick far past timeout
-    (harness.world as any).tick = 200;
-
     const entities = Array.from(harness.world.entities.values());
+
+    // Advance time far past timeout (100 ticks at 60fps = ~1.67 seconds)
+    harness.advanceTime(2.0);
+
     aiSystem.update(harness.world, entities, 1 / 60);
 
     const afterUpdate = agent.getComponent('agent');
@@ -165,11 +169,9 @@ describe('AISystem + ActionQueue Integration', () => {
     const entities = Array.from(harness.world.entities.values());
 
     // First update - might call LLM
-    (harness.world as any).tick = 0;
     aiSystem.update(harness.world, entities, 1 / 60);
 
     // Immediate second update - should NOT call LLM (cooldown)
-    (harness.world as any).tick = 1;
     aiSystem.update(harness.world, entities, 1 / 60);
 
     // LLM should only be called once due to rate limiting

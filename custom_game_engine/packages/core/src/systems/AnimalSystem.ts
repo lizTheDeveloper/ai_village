@@ -53,6 +53,16 @@ export class AnimalSystem implements System {
       animal.thirst = Math.min(100, animal.thirst + thirstIncrease);
       animal.energy = Math.max(0, Math.min(100, animal.energy - energyDecrease));
 
+      // Apply health damage from critical hunger/thirst
+      if (animal.hunger > 90) {
+        const starvationDamage = 0.5 * deltaTime; // 0.5 health per second
+        animal.health = Math.max(0, animal.health - starvationDamage);
+      }
+      if (animal.thirst > 90) {
+        const dehydrationDamage = 0.6 * deltaTime; // 0.6 health per second (slightly faster than hunger)
+        animal.health = Math.max(0, animal.health - dehydrationDamage);
+      }
+
       // Update age (deltaTime is in seconds, convert to days)
       // At 20 TPS, 1 tick = 0.05 seconds
       // 1 day = 86400 seconds
@@ -71,8 +81,8 @@ export class AnimalSystem implements System {
           source: entity.id,
           data: {
             animalId: animal.id,
-            oldStage,
-            newStage: newLifeStage,
+            from: oldStage,
+            to: newLifeStage,
           },
         });
 
@@ -92,8 +102,8 @@ export class AnimalSystem implements System {
           source: entity.id,
           data: {
             animalId: animal.id,
-            oldState,
-            newState,
+            from: oldState,
+            to: newState,
           },
         });
       }
@@ -128,6 +138,7 @@ export class AnimalSystem implements System {
           source: entity.id,
           data: {
             animalId: animal.id,
+            speciesId: animal.speciesId,
             cause: animal.health <= 0 ? 'health' : 'old_age',
           },
         });

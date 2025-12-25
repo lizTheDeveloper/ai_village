@@ -69,7 +69,7 @@ export class AnimalHousingSystem implements System {
 
       impl.updateComponent<BuildingComponent>('building', (current) => ({
         ...current,
-        cleanliness: newCleanliness,
+        cleanlinessLevel: newCleanliness,
       }));
 
       // Emit events based on cleanliness thresholds
@@ -78,10 +78,10 @@ export class AnimalHousingSystem implements System {
           type: 'housing:dirty',
           source: entity.id,
           data: {
+            housingId: entity.id,
             buildingId: entity.id,
             buildingType: building.buildingType,
-            cleanliness: newCleanliness,
-            occupantCount,
+            cleanlinessLevel: newCleanliness,
           },
         });
       }
@@ -188,9 +188,11 @@ export class AnimalHousingSystem implements System {
             type: 'housing:full',
             source: entity.id,
             data: {
-              buildingId: entity.id,
-              buildingType: building.buildingType,
-              capacity: building.animalCapacity,
+            housingId: entity.id,
+            buildingId: entity.id,
+            buildingType: building.buildingType,
+            capacity: building.animalCapacity,
+            occupied: actualOccupants.length,
             },
           });
         }
