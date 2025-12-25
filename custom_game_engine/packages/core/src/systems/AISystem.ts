@@ -1175,7 +1175,8 @@ export class AISystem implements System {
 
     // Check distance from origin (0, 0) - camp/spawn area
     const distanceFromHome = Math.sqrt(position.x * position.x + position.y * position.y);
-    const maxWanderDistance = 30; // Maximum tiles from home before biasing back
+    const maxWanderDistance = 12; // Maximum tiles from home before biasing back (tighter range)
+    const criticalDistance = 20; // Beyond this, strongly pull back to home
 
     // Coherent wander: maintain direction with slight random jitter
     // Get or initialize wander angle from behavior state
@@ -1185,16 +1186,20 @@ export class AISystem implements System {
       wanderAngle = Math.random() * Math.PI * 2;
     }
 
-    // If too far from home, bias angle toward home
-    if (distanceFromHome > maxWanderDistance) {
-      // Calculate angle toward home (0, 0)
+    // Progressive home bias based on distance
+    if (distanceFromHome > criticalDistance) {
+      // Very far - strongly pull back to home (90% bias)
       const angleToHome = Math.atan2(-position.y, -position.x);
-      // Bias wander angle toward home (lerp 50% toward home direction)
       const angleDiff = angleToHome - wanderAngle;
-      wanderAngle += angleDiff * 0.3; // 30% bias toward home
+      wanderAngle += angleDiff * 0.9; // Strong pull home
+    } else if (distanceFromHome > maxWanderDistance) {
+      // Moderately far - bias toward home (60% bias)
+      const angleToHome = Math.atan2(-position.y, -position.x);
+      const angleDiff = angleToHome - wanderAngle;
+      wanderAngle += angleDiff * 0.6; // Moderate pull home
     } else {
-      // Add small random jitter to angle (max ±15 degrees per tick)
-      const jitterAmount = (Math.random() - 0.5) * (Math.PI / 6); // ±30° range
+      // Close to home - random wander with smaller jitter
+      const jitterAmount = (Math.random() - 0.5) * (Math.PI / 12); // ±15° range (tighter spiral)
       wanderAngle += jitterAmount;
     }
 
@@ -1983,6 +1988,7 @@ export class AISystem implements System {
     // If no memory or memory is stale, search for resources
     // IMPORTANT: Only search within reasonable range to prevent agents from wandering across the entire map
     const maxGatherRange = 50; // tiles - agents won't navigate further than this to gather resources
+    const homeRadius = 15; // Prefer resources within this radius of home (0, 0)
 
     if (!targetResource && !targetPos) {
       const resources = world
@@ -1990,6 +1996,8 @@ export class AISystem implements System {
         .with('resource')
         .with('position')
         .executeEntities();
+
+      let bestScore = Infinity;
 
       for (const resource of resources) {
         const resourceImpl = resource as EntityImpl;
@@ -2003,14 +2011,32 @@ export class AISystem implements System {
         // If preferred type specified, only consider that type
         if (preferredType && resourceComp.resourceType !== preferredType) continue;
 
-        const distance = Math.sqrt(
+        // Distance from agent to resource
+        const distanceToAgent = Math.sqrt(
           Math.pow(resourcePos.x - position.x, 2) +
           Math.pow(resourcePos.y - position.y, 2)
         );
 
         // Only consider resources within max gather range
-        if (distance <= maxGatherRange && distance < nearestDistance) {
-          nearestDistance = distance;
+        if (distanceToAgent > maxGatherRange) continue;
+
+        // Distance from resource to home (0, 0)
+        const distanceToHome = Math.sqrt(
+          resourcePos.x * resourcePos.x +
+          resourcePos.y * resourcePos.y
+        );
+
+        // Scoring: prefer resources near home AND near agent
+        // If resource is within home radius, heavily favor it
+        let score = distanceToAgent;
+        if (distanceToHome > homeRadius) {
+          // Penalize resources far from home (add 2x the excess distance)
+          score += (distanceToHome - homeRadius) * 2.0;
+        }
+
+        if (score < bestScore) {
+          bestScore = score;
+          nearestDistance = distanceToAgent;
           targetResource = resource;
         }
       }
