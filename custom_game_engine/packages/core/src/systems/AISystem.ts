@@ -66,6 +66,8 @@ export class AISystem implements System {
     this.registerBehavior('attend_meeting', this._attendMeetingBehavior.bind(this));
     this.registerBehavior('farm', this.farmBehavior.bind(this));
     this.registerBehavior('till', this.tillBehavior.bind(this));
+    this.registerBehavior('gather_seeds', this.gatherSeedsBehavior.bind(this));
+    this.registerBehavior('harvest', this.harvestBehavior.bind(this));
     // Navigation & Exploration behaviors
     this.registerBehavior('navigate', this.navigateBehavior.bind(this));
     this.registerBehavior('explore_frontier', this.exploreFrontierBehavior.bind(this));
@@ -86,7 +88,12 @@ export class AISystem implements System {
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     for (const entity of entities) {
       const impl = entity as EntityImpl;
-      const agent = impl.getComponent<AgentComponent>('agent')!;
+      const agent = impl.getComponent<AgentComponent>('agent');
+
+      // Skip entities without agent component
+      if (!agent) {
+        continue;
+      }
 
       // Check if it's time to think
       const ticksSinceLastThink = world.tick - agent.lastThinkTick;
@@ -134,6 +141,7 @@ export class AISystem implements System {
           type: 'agent:queue:resumed',
           source: entity.id,
           data: {
+            agentId: entity.id,
             resumedAt: agent.currentQueueIndex,
           },
         });
@@ -167,8 +175,9 @@ export class AISystem implements System {
               type: 'agent:queue:interrupted',
               source: entity.id,
               data: {
+                agentId: entity.id,
+                reason: 'autonomic_override',
                 interruptedBy: autonomicResult.behavior,
-                queueIndex: agent.currentQueueIndex,
               },
             });
           }
@@ -236,7 +245,9 @@ export class AISystem implements System {
                 world.eventBus.emit({
                   type: 'agent:queue:completed',
                   source: entity.id,
-                  data: {},
+                  data: {
+                    agentId: entity.id,
+                  },
                 });
 
                 // Fall through to normal decision making
@@ -591,6 +602,8 @@ export class AISystem implements System {
                 type: 'conversation:started',
                 source: entity.id,
                 data: {
+                  participants: [entity.id, targetAgent.id],
+                  initiator: entity.id,
                   agent1: entity.id,
                   agent2: targetAgent.id,
                 },
@@ -635,12 +648,18 @@ export class AISystem implements System {
             console.log(`[AISystem] Agent ${entity.id.slice(0,8)} requesting gather_seeds from ${targetPlantComp?.speciesId || 'unknown'} plant ${targetPlant.id.slice(0,8)} (${plantsWithSeeds.length} candidates)`);
 
             // Emit gather_seeds action request
+            const posComp = (targetPlant as EntityImpl).getComponent<PositionComponent>('position');
             world.eventBus.emit({
               type: 'action:gather_seeds',
               source: entity.id,
               data: {
+                actionId: `gather_seeds_${Date.now()}`,
+                actorId: entity.id,
                 agentId: entity.id,
                 plantId: targetPlant.id,
+                speciesId: targetPlantComp?.speciesId || 'unknown',
+                seedsGathered: 0,
+                position: posComp ? { x: posComp.x, y: posComp.y } : { x: 0, y: 0 },
               },
             });
 
@@ -1050,19 +1069,43 @@ export class AISystem implements System {
 
   private wanderBehavior(entity: EntityImpl): void {
     const movement = entity.getComponent<MovementComponent>('movement')!;
+    const agent = entity.getComponent<AgentComponent>('agent')!;
 
-    // Choose a random direction
-    const angle = Math.random() * Math.PI * 2;
+    // Coherent wander: maintain direction with slight random jitter
+    // Get or initialize wander angle from behavior state
+    let wanderAngle = agent.behaviorState?.wanderAngle as number | undefined;
+    if (wanderAngle === undefined) {
+      // Initialize with random direction
+      wanderAngle = Math.random() * Math.PI * 2;
+    }
+
+    // Add small random jitter to angle (max ±15 degrees per tick)
+    const jitterAmount = (Math.random() - 0.5) * (Math.PI / 6); // ±30° range
+    wanderAngle += jitterAmount;
+
+    // Normalize angle to 0-2π range
+    wanderAngle = wanderAngle % (Math.PI * 2);
+    if (wanderAngle < 0) wanderAngle += Math.PI * 2;
+
+    // Calculate velocity from angle
     const speed = movement.speed;
-
-    const velocityX = Math.cos(angle) * speed;
-    const velocityY = Math.sin(angle) * speed;
+    const velocityX = Math.cos(wanderAngle) * speed;
+    const velocityY = Math.sin(wanderAngle) * speed;
 
     // Update movement velocity
     entity.updateComponent<MovementComponent>('movement', (current) => ({
       ...current,
       velocityX,
       velocityY,
+    }));
+
+    // Save wander angle for next tick
+    entity.updateComponent<AgentComponent>('agent', (current) => ({
+      ...current,
+      behaviorState: {
+        ...current.behaviorState,
+        wanderAngle,
+      },
     }));
   }
 
@@ -1429,8 +1472,10 @@ export class AISystem implements System {
             source: entity.id,
             data: {
               agentId: entity.id,
-              storageId: targetFood.id,
+              foodType: 'forage',
+              hungerRestored: foodTaken,
               amount: foodTaken,
+              storageId: targetFood.id,
               fromStorage: true,
             },
           });
@@ -1442,12 +1487,18 @@ export class AISystem implements System {
         console.log(`[AISystem] Agent ${entity.id.slice(0,8)} requesting harvest of ${plantComp.speciesId} plant ${targetFood.id.slice(0,8)} (fruitCount: ${plantComp.fruitCount})`);
 
         // Emit harvest action request (will be handled by ActionQueue)
+        const plantPos = targetFoodImpl.getComponent<PositionComponent>('position');
         world.eventBus.emit({
           type: 'action:harvest',
           source: entity.id,
           data: {
+            actionId: `harvest_${Date.now()}`,
+            actorId: entity.id,
             agentId: entity.id,
             plantId: targetFood.id,
+            speciesId: plantComp.speciesId,
+            harvested: [],
+            position: plantPos ? { x: plantPos.x, y: plantPos.y } : { x: 0, y: 0 },
           },
         });
 
@@ -1517,8 +1568,11 @@ export class AISystem implements System {
           source: entity.id,
           data: {
             agentId: entity.id,
+            plantId: targetFood.id,
+            speciesId: resourceComp.type || 'unknown',
+            position: { x: targetPos.x, y: targetPos.y },
+            harvested: [{ itemId: resourceComp.type || 'forage', amount: harvestAmount }],
             resourceId: targetFood.id,
-            amount: harvestAmount,
           },
         });
       }
@@ -1691,13 +1745,11 @@ export class AISystem implements System {
         type: 'conversation:utterance',
         source: entity.id,
         data: {
+          conversationId: `${entity.id}-${partnerId}`,
+          speaker: entity.id,
           speakerId: entity.id,
           listenerId: partnerId,
-          text: message,
-          conversationId: `${entity.id}-${partnerId}`,
-          timestamp: Date.now(),
-          emotionalIntensity: 0.3, // Default for casual conversation
-          socialSignificance: 0.4, // Conversations are socially significant
+          message: message,
         },
       });
     }
@@ -1744,8 +1796,9 @@ export class AISystem implements System {
             data: {
               from: entity.id,
               to: partnerId,
+              informationType: 'resource_location',
+              content: { x: sharedMemory.x, y: sharedMemory.y, entityId: sharedMemory.entityId },
               memoryType: 'resource_location',
-              location: { x: sharedMemory.x, y: sharedMemory.y },
             },
           });
         }
@@ -1847,8 +1900,74 @@ export class AISystem implements System {
       }
     }
 
-    if (!targetResource && !targetPos) {
-      // No resources found, wander
+    // Also search for plants with seeds (farming-system/spec.md lines 296-343)
+    // Agents can gather seeds from wild plants at mature/seeding/senescence stages
+    // ALWAYS search for seed-producing plants, even when gathering resources
+    let targetPlant: Entity | null = null;
+    let isPlantTarget = false;
+    let plantDistance = Infinity;
+
+    const plants = world
+      .query()
+      .with('plant')
+      .with('position')
+      .executeEntities();
+
+    for (const plant of plants) {
+      const plantImpl = plant as EntityImpl;
+      const plantComp = plantImpl.getComponent<PlantComponent>('plant');
+      const plantPos = plantImpl.getComponent<PositionComponent>('position')!;
+
+      if (!plantComp) continue;
+
+      // Check if plant has seeds available for gathering
+      const validStages = ['mature', 'seeding', 'senescence'];
+      const hasSeeds = plantComp.seedsProduced > 0;
+      const isValidStage = validStages.includes(plantComp.stage);
+
+      if (hasSeeds && isValidStage) {
+        const distance = Math.sqrt(
+          Math.pow(plantPos.x - position.x, 2) +
+          Math.pow(plantPos.y - position.y, 2)
+        );
+
+        if (distance < plantDistance) {
+          plantDistance = distance;
+          targetPlant = plant;
+          isPlantTarget = true;
+        }
+      }
+    }
+
+    // Prioritize seeds over resources if:
+    // 1. No resource found, OR
+    // 2. Plant is significantly closer (2x), OR
+    // 3. Agent has enough wood/stone already (10+ of the preferred type)
+    if (targetPlant && targetResource) {
+      const hasEnoughPreferred = preferredType
+        ? inventory.slots.some(s => s.itemId === preferredType && s.quantity >= 10)
+        : false;
+
+      if (plantDistance * 2 < nearestDistance || hasEnoughPreferred) {
+        // Prefer plant over resource
+        targetResource = null;
+        targetPos = null;
+      } else {
+        // Prefer resource over plant
+        targetPlant = null;
+        isPlantTarget = false;
+      }
+    }
+
+    // Update targetPos for plant if it's the chosen target
+    if (targetPlant && isPlantTarget && !targetResource) {
+      const targetPlantImpl = targetPlant as EntityImpl;
+      const plantPos = targetPlantImpl.getComponent<PositionComponent>('position')!;
+      targetPos = { x: plantPos.x, y: plantPos.y };
+    }
+
+    if (!targetResource && !targetPlant && !targetPos) {
+      // No resources or seed-producing plants found, wander
       // console.log(`[AISystem] Agent ${entity.id} in gather behavior but found no resources (preferredType: ${preferredType}), wandering`);
       this.wanderBehavior(entity);
       return;
@@ -1859,12 +1978,16 @@ export class AISystem implements System {
       const targetResourceImpl = targetResource as EntityImpl;
       const pos = targetResourceImpl.getComponent<PositionComponent>('position')!;
       targetPos = { x: pos.x, y: pos.y };
+    } else if (targetPlant) {
+      const targetPlantImpl = targetPlant as EntityImpl;
+      const pos = targetPlantImpl.getComponent<PositionComponent>('position')!;
+      targetPos = { x: pos.x, y: pos.y };
     }
 
     if (!targetPos) return;
 
     // Check if adjacent (within 1.5 tiles)
-    if (nearestDistance < 1.5 && targetResource) {
+    if (nearestDistance < 1.5 && (targetResource || targetPlant)) {
       // Calculate work speed penalty based on energy
       const needs = entity.getComponent<NeedsComponent>('needs');
       let workSpeedMultiplier = 1.0;
@@ -1907,50 +2030,52 @@ export class AISystem implements System {
         // else: no penalty (100%)
       }
 
-      // Harvest the resource
-      const targetResourceImpl = targetResource as EntityImpl;
-      const resourceComp = targetResourceImpl.getComponent<ResourceComponent>('resource')!;
-      const baseHarvestAmount = 10;
-      const harvestAmount = Math.min(
-        Math.floor(baseHarvestAmount * workSpeedMultiplier),
-        resourceComp.amount
-      );
+      // Harvest resource or gather seeds from plant
+      if (targetResource) {
+        // Harvesting from resource node (wood, stone, etc.)
+        const targetResourceImpl = targetResource as EntityImpl;
+        const resourceComp = targetResourceImpl.getComponent<ResourceComponent>('resource')!;
+        const baseHarvestAmount = 10;
+        const harvestAmount = Math.min(
+          Math.floor(baseHarvestAmount * workSpeedMultiplier),
+          resourceComp.amount
+        );
 
-      // If work speed penalty reduces harvest to 0, agent is too tired
-      if (harvestAmount === 0) {
-        entity.updateComponent<MovementComponent>('movement', (current: MovementComponent) => ({
+        // If work speed penalty reduces harvest to 0, agent is too tired
+        if (harvestAmount === 0) {
+          entity.updateComponent<MovementComponent>('movement', (current: MovementComponent) => ({
+            ...current,
+            velocityX: 0,
+            velocityY: 0,
+          }));
+          return;
+        }
+
+        // console.log(`[AISystem.gatherBehavior] Agent ${entity.id} harvesting ${harvestAmount} ${resourceComp.resourceType} from ${targetResource.id} (work speed: ${(workSpeedMultiplier * 100).toFixed(0)}%)`);
+
+        // Update resource
+        targetResourceImpl.updateComponent<ResourceComponent>('resource', (current) => ({
           ...current,
-          velocityX: 0,
-          velocityY: 0,
+          amount: Math.max(0, current.amount - harvestAmount),
         }));
-        return;
-      }
 
-      // console.log(`[AISystem.gatherBehavior] Agent ${entity.id} harvesting ${harvestAmount} ${resourceComp.resourceType} from ${targetResource.id} (work speed: ${(workSpeedMultiplier * 100).toFixed(0)}%)`);
+        // Add to inventory
+        try {
+          const result = addToInventory(inventory, resourceComp.resourceType, harvestAmount);
+          entity.updateComponent<InventoryComponent>('inventory', () => result.inventory);
 
-      // Update resource
-      targetResourceImpl.updateComponent<ResourceComponent>('resource', (current) => ({
-        ...current,
-        amount: Math.max(0, current.amount - harvestAmount),
-      }));
+          // console.log(`[AISystem.gatherBehavior] Agent ${entity.id} added ${result.amountAdded} ${resourceComp.resourceType} to inventory (weight: ${result.inventory.currentWeight}/${inventory.maxWeight}, slots: ${result.inventory.slots.filter(s => s.itemId).length}/${inventory.maxSlots})`);
 
-      // Add to inventory
-      try {
-        const result = addToInventory(inventory, resourceComp.resourceType, harvestAmount);
-        entity.updateComponent<InventoryComponent>('inventory', () => result.inventory);
-
-        // console.log(`[AISystem.gatherBehavior] Agent ${entity.id} added ${result.amountAdded} ${resourceComp.resourceType} to inventory (weight: ${result.inventory.currentWeight}/${inventory.maxWeight}, slots: ${result.inventory.slots.filter(s => s.itemId).length}/${inventory.maxSlots})`);
-
-        // Check if inventory is now full or nearly full
-        if (result.inventory.currentWeight >= result.inventory.maxWeight) {
+          // Check if inventory is now full or nearly full
+          if (result.inventory.currentWeight >= result.inventory.maxWeight) {
           // console.log(`[AISystem.gatherBehavior] Agent ${entity.id} inventory full after gathering (${result.inventory.currentWeight}/${result.inventory.maxWeight})`);
 
           world.eventBus.emit({
             type: 'inventory:full',
             source: entity.id,
             data: {
+              entityId: entity.id,
               agentId: entity.id,
-              reason: 'Inventory at capacity after gathering',
             },
           });
 
@@ -2009,6 +2134,7 @@ export class AISystem implements System {
         }
 
         // Emit resource gathered event
+        const resourcePos = targetResourceImpl.getComponent<PositionComponent>('position');
         world.eventBus.emit({
           type: 'resource:gathered',
           source: entity.id,
@@ -2016,6 +2142,7 @@ export class AISystem implements System {
             agentId: entity.id,
             resourceType: resourceComp.resourceType,
             amount: result.amountAdded,
+            position: resourcePos ? { x: resourcePos.x, y: resourcePos.y } : { x: 0, y: 0 },
             sourceEntityId: targetResource.id,
           },
         });
@@ -2043,9 +2170,9 @@ export class AISystem implements System {
             type: 'resource:depleted',
             source: targetResource.id,
             data: {
-              agentId: entity.id,
+              resourceId: targetResource.id,
               resourceType: resourceComp.resourceType,
-              position: targetPos,
+              agentId: entity.id,
             },
           });
         }
@@ -2057,8 +2184,8 @@ export class AISystem implements System {
           type: 'inventory:full',
           source: entity.id,
           data: {
+            entityId: entity.id,
             agentId: entity.id,
-            reason: (error as Error).message,
           },
         });
 
@@ -2073,6 +2200,109 @@ export class AISystem implements System {
         }));
 
         // console.log(`[AISystem.gatherBehavior] Agent ${entity.id} switching to deposit_items behavior`);
+      }
+    } else if (targetPlant && isPlantTarget) {
+        // Gathering seeds from plant (farming-system/spec.md lines 296-343)
+        const targetPlantImpl = targetPlant as EntityImpl;
+        const plantComp = targetPlantImpl.getComponent<PlantComponent>('plant');
+
+        if (!plantComp) {
+          // Plant component missing, can't gather
+          return;
+        }
+
+        // Calculate seed yield based on plant health and agent skill
+        // Formula from spec: baseSeedCount * (health/100) * stageMod * skillMod
+        const baseSeedCount = 5; // Base seeds for gathering (vs 10 for harvest action)
+        const healthMod = plantComp.health / 100;
+        const stageMod = plantComp.stage === 'seeding' ? 1.5 : 1.0;
+        const farmingSkill = 50; // Default skill (TODO: get from agent skills when implemented)
+        const skillMod = 0.5 + (farmingSkill / 100);
+
+        const seedYield = Math.floor(baseSeedCount * healthMod * stageMod * skillMod * workSpeedMultiplier);
+        const seedsToGather = Math.min(seedYield, plantComp.seedsProduced);
+
+        if (seedsToGather <= 0) {
+          // No seeds to gather
+          return;
+        }
+
+        // Create seed item ID for inventory (e.g., "seed-wheat", "seed-berry-bush")
+        const seedItemId = `seed-${plantComp.speciesId}`;
+
+        try {
+          const result = addToInventory(inventory, seedItemId, seedsToGather);
+          entity.updateComponent<InventoryComponent>('inventory', () => result.inventory);
+
+          console.log(`[AISystem.gatherBehavior] Agent ${entity.id} gathered ${result.amountAdded} ${seedItemId} from ${targetPlant.id}`);
+
+          // Update plant - reduce seedsProduced
+          targetPlantImpl.updateComponent<PlantComponent>('plant', (current) => {
+            const updated = Object.create(Object.getPrototypeOf(current));
+            Object.assign(updated, current);
+            updated.seedsProduced = Math.max(0, current.seedsProduced - result.amountAdded);
+            return updated;
+          });
+
+          // Emit seed:gathered event
+          world.eventBus.emit({
+            type: 'seed:gathered',
+            source: entity.id,
+            data: {
+              agentId: entity.id,
+              plantId: targetPlant.id,
+              speciesId: plantComp.speciesId,
+              seedCount: result.amountAdded,
+              sourceType: 'wild' as const,
+              position: targetPos,
+            },
+          });
+
+          // Check if inventory is now full
+          if (result.inventory.currentWeight >= result.inventory.maxWeight) {
+            world.eventBus.emit({
+              type: 'inventory:full',
+              source: entity.id,
+              data: {
+                entityId: entity.id,
+                agentId: entity.id,
+              },
+            });
+
+            entity.updateComponent<AgentComponent>('agent', (current) => ({
+              ...current,
+              behavior: 'deposit_items',
+              behaviorState: {
+                previousBehavior: 'gather',
+                previousState: current.behaviorState,
+              },
+              behaviorCompleted: true,
+            }));
+
+            return;
+          }
+        } catch (error) {
+          // Inventory full
+          console.log(`[AISystem.gatherBehavior] Agent ${entity.id} inventory full: ${(error as Error).message}`);
+
+          world.eventBus.emit({
+            type: 'inventory:full',
+            source: entity.id,
+            data: {
+              entityId: entity.id,
+              agentId: entity.id,
+            },
+          });
+
+          entity.updateComponent<AgentComponent>('agent', (current) => ({
+            ...current,
+            behavior: 'deposit_items',
+            behaviorState: {
+              previousBehavior: 'gather',
+              previousState: current.behaviorState,
+            },
+          }));
+        }
       }
 
       // Stop moving while harvesting
@@ -2197,17 +2427,13 @@ export class AISystem implements System {
 
     if (!inventory) {
       // No inventory - cannot build
-      const buildX = Math.floor(position.x);
-      const buildY = Math.floor(position.y);
-
       world.eventBus.emit({
         type: 'construction:failed',
         source: entity.id,
         data: {
-          builderId: entity.id,
-          buildingType,
-          position: { x: buildX, y: buildY },
+          buildingId: `${buildingType}_${Date.now()}`,
           reason: 'Agent missing InventoryComponent',
+          builderId: entity.id,
         },
       });
 
@@ -2255,9 +2481,9 @@ export class AISystem implements System {
         type: 'construction:gathering_resources',
         source: entity.id,
         data: {
+          buildingId: `${buildingType}_${Date.now()}`,
+          agentId: entity.id,
           builderId: entity.id,
-          buildingType,
-          missingResources: missing,
         },
       });
 
@@ -2280,10 +2506,9 @@ export class AISystem implements System {
         type: 'construction:failed',
         source: entity.id,
         data: {
-          builderId: entity.id,
-          buildingType,
-          position: { x: Math.floor(position.x), y: Math.floor(position.y) },
+          buildingId: `${buildingType}_${Date.now()}`,
           reason: 'No valid placement location found',
+          builderId: entity.id,
         },
       });
 
@@ -2339,10 +2564,9 @@ export class AISystem implements System {
         type: 'construction:failed',
         source: entity.id,
         data: {
-          builderId: entity.id,
-          buildingType,
-          position: { x: buildX, y: buildY },
+          buildingId: `${buildingType}_${Date.now()}`,
           reason: (error as Error).message,
+          builderId: entity.id,
         },
       });
 
@@ -2423,9 +2647,10 @@ export class AISystem implements System {
         type: 'agent:sleeping',
         source: entity.id,
         data: {
+          agentId: entity.id,
           entityId: entity.id,
-          location: 'bed',
-          quality: quality,
+          location: { x: position.x, y: position.y },
+          timestamp: world.tick,
         },
       });
 
@@ -2490,9 +2715,10 @@ export class AISystem implements System {
         type: 'agent:sleeping',
         source: entity.id,
         data: {
+          agentId: entity.id,
           entityId: entity.id,
-          location: 'ground',
-          quality: quality,
+          timestamp: world.tick,
+          location: { x: position.x, y: position.y },
         },
       });
 
@@ -2550,8 +2776,9 @@ export class AISystem implements System {
         type: 'agent:collapsed',
         source: entity.id,
         data: {
-          entityId: entity.id,
+          agentId: entity.id,
           reason: 'exhaustion',
+          entityId: entity.id,
         },
       });
 
@@ -2715,7 +2942,10 @@ export class AISystem implements System {
       world.eventBus.emit({
         type: 'storage:full',
         source: entity.id,
-        data: { agentId: entity.id },
+        data: {
+          storageId: 'all-storage-full',
+          agentId: entity.id
+        },
       });
 
       // Build more storage instead of giving up
@@ -2739,7 +2969,7 @@ export class AISystem implements System {
     if (nearestDistance < 1.5) {
       // Perform deposit
       const storageInventory = nearestStorageImpl.getComponent<InventoryComponent>('inventory')!;
-      const itemsDeposited: Array<{ resourceId: string; quantity: number }> = [];
+      const itemsDeposited: Array<{ itemId: string; amount: number }> = [];
 
       // Create mutable copies of inventories
       let agentInv = { ...inventory, slots: [...inventory.slots.map(s => ({ ...s }))] };
@@ -2775,8 +3005,8 @@ export class AISystem implements System {
           storageInv = addResult.inventory;
 
           itemsDeposited.push({
-            resourceId: itemId,
-            quantity: amountToTransfer,
+            itemId: itemId,
+            amount: amountToTransfer,
           });
 
           // console.log(`[AISystem] Agent ${entity.id} deposited ${amountToTransfer} ${itemId} into storage ${nearestStorage.id}`);
@@ -2799,7 +3029,10 @@ export class AISystem implements System {
           data: {
             agentId: entity.id,
             storageId: nearestStorage.id,
-            items: itemsDeposited,
+            items: itemsDeposited.map(item => ({
+              itemId: item.itemId,
+              amount: item.amount,
+            })),
           },
         });
       }
@@ -2816,7 +3049,10 @@ export class AISystem implements System {
           world.eventBus.emit({
             type: 'storage:full',
             source: entity.id,
-            data: { agentId: entity.id },
+            data: {
+              storageId: nearestStorage.id,
+              agentId: entity.id
+            },
           });
 
           // Switch to wander since storage is full
@@ -2876,13 +3112,35 @@ export class AISystem implements System {
         }));
       }
     } else {
-      // Move towards the storage
+      // Move towards the storage using arrive behavior to prevent jitter
       const dx = storagePos.x - position.x;
       const dy = storagePos.y - position.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      const velocityX = (dx / distance) * movement.speed;
-      const velocityY = (dy / distance) * movement.speed;
+      // Apply slowing radius for smooth deceleration as we approach
+      const slowingRadius = 5.0;
+      const arrivalTolerance = 1.5; // Match the deposit distance check
+      let targetSpeed = movement.speed;
+
+      // Slow down when approaching the storage
+      if (distance < slowingRadius) {
+        // Quadratic slow-down for smoother approach
+        const slowFactor = distance / slowingRadius;
+        targetSpeed = movement.speed * slowFactor * slowFactor;
+
+        // Extra damping when very close to prevent oscillation
+        if (distance < arrivalTolerance * 1.5) {
+          targetSpeed *= 0.5;
+        }
+
+        // Stop completely when at arrival distance
+        if (distance < arrivalTolerance) {
+          targetSpeed = 0;
+        }
+      }
+
+      const velocityX = targetSpeed > 0 ? (dx / distance) * targetSpeed : 0;
+      const velocityY = targetSpeed > 0 ? (dy / distance) * targetSpeed : 0;
 
       entity.updateComponent<MovementComponent>('movement', (current) => ({
         ...current,
@@ -3224,8 +3482,8 @@ export class AISystem implements System {
     const target = agent.behaviorState.target as { x: number; y: number };
 
     // Update steering component if it exists
-    if (entity.hasComponent('Steering')) {
-      entity.updateComponent('Steering', (steering: any) => ({
+    if (entity.hasComponent('steering')) {
+      entity.updateComponent('steering', (steering: any) => ({
         ...steering,
         behavior: 'arrive',
         target: target,
@@ -3242,8 +3500,9 @@ export class AISystem implements System {
           type: 'navigation:arrived',
           source: 'ai',
           data: {
+            agentId: entity.id,
             entityId: entity.id,
-            target: target,
+            destination: target,
           },
         });
 
@@ -3276,8 +3535,8 @@ export class AISystem implements System {
   private exploreFrontierBehavior(entity: EntityImpl, _world: World): void {
     // ExplorationSystem handles the heavy lifting
     // Just ensure ExplorationState is set to frontier mode
-    if (entity.hasComponent('ExplorationState')) {
-      entity.updateComponent('ExplorationState', (state: any) => ({
+    if (entity.hasComponent('exploration_state')) {
+      entity.updateComponent('exploration_state', (state: any) => ({
         ...state,
         mode: 'frontier',
       }));
@@ -3298,8 +3557,8 @@ export class AISystem implements System {
   private exploreSpiralBehavior(entity: EntityImpl, _world: World): void {
     // ExplorationSystem handles the heavy lifting
     // Just ensure ExplorationState is set to spiral mode
-    if (entity.hasComponent('ExplorationState')) {
-      entity.updateComponent('ExplorationState', (state: any) => ({
+    if (entity.hasComponent('exploration_state')) {
+      entity.updateComponent('exploration_state', (state: any) => ({
         ...state,
         mode: 'spiral',
       }));
@@ -3322,7 +3581,7 @@ export class AISystem implements System {
     const position = entity.getComponent<PositionComponent>('position')!;
 
     // Check if we have social gradient component
-    if (!entity.hasComponent('SocialGradient')) {
+    if (!entity.hasComponent('social_gradient')) {
       // No gradients - switch to wander
       entity.updateComponent<AgentComponent>('agent', (current) => ({
         ...current,
@@ -3332,7 +3591,7 @@ export class AISystem implements System {
       return;
     }
 
-    const socialGradient = entity.getComponent('SocialGradient') as any;
+    const socialGradient = entity.getComponent('social_gradient') as any;
 
     // Get resource type from behaviorState or use default
     const resourceType = agent.behaviorState?.resourceType || 'wood';
@@ -3359,8 +3618,8 @@ export class AISystem implements System {
     const targetY = position.y + Math.sin(bearing * Math.PI / 180) * distance;
 
     // Use steering to move toward gradient
-    if (entity.hasComponent('Steering')) {
-      entity.updateComponent('Steering', (steering: any) => ({
+    if (entity.hasComponent('steering')) {
+      entity.updateComponent('steering', (steering: any) => ({
         ...steering,
         behavior: 'seek',
         target: { x: targetX, y: targetY },
@@ -3377,5 +3636,213 @@ export class AISystem implements System {
         velocityY,
       }));
     }
+  }
+
+  /**
+   * Gather seeds behavior - agent gathers seeds from nearby mature plants.
+   *
+   * This behavior finds mature/seeding plants within range and submits a gather_seeds
+   * action to the ActionQueue.
+   *
+   * The GatherSeedsActionHandler validates and executes the action.
+   */
+  private gatherSeedsBehavior(entity: EntityImpl, world: World): void {
+    const position = entity.getComponent<PositionComponent>('position')!;
+    const vision = entity.getComponent<VisionComponent>('vision');
+
+    // Stop moving while deciding which plant to gather from
+    entity.updateComponent<MovementComponent>('movement', (current) => ({
+      ...current,
+      velocityX: 0,
+      velocityY: 0,
+    }));
+
+    // Find nearest mature plant with seeds
+    let nearestPlant: { entity: EntityImpl; distance: number } | null = null;
+
+    // Search all entities in vision range (plants might not be in seenAgents or seenResources)
+    for (const seenEntity of world.entities.values()) {
+      const seenImpl = seenEntity as EntityImpl;
+      const plant = seenImpl.getComponent<PlantComponent>('plant');
+      if (!plant) continue;
+
+      // Check if plant is at valid stage and has seeds
+      const validStages = ['mature', 'seeding', 'senescence'];
+      if (!validStages.includes(plant.stage) || plant.seedsProduced <= 0) {
+        continue;
+      }
+
+      const plantPos = seenImpl.getComponent<PositionComponent>('position');
+      if (!plantPos) continue;
+
+      // Check if plant is within vision range
+      const dx = plantPos.x - position.x;
+      const dy = plantPos.y - position.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (vision && distance > vision.range) continue;
+
+      if (!nearestPlant || distance < nearestPlant.distance) {
+        nearestPlant = { entity: seenImpl, distance };
+      }
+    }
+
+    if (!nearestPlant) {
+      // No plants found - switch to wander
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        currentBehavior: 'wander',
+      }));
+      return;
+    }
+
+    // Check if agent is adjacent to the plant
+    const MAX_GATHER_DISTANCE = Math.sqrt(2); // Allow diagonal
+
+    if (nearestPlant.distance > MAX_GATHER_DISTANCE) {
+      // Move toward plant
+      const plantPos = nearestPlant.entity.getComponent<PositionComponent>('position')!;
+      const dx = plantPos.x - position.x;
+      const dy = plantPos.y - position.y;
+      const distance = nearestPlant.distance;
+
+      const movement = entity.getComponent<MovementComponent>('movement')!;
+      const velocityX = (dx / distance) * movement.speed;
+      const velocityY = (dy / distance) * movement.speed;
+
+      entity.updateComponent<MovementComponent>('movement', (current) => ({
+        ...current,
+        targetX: plantPos.x,
+        targetY: plantPos.y,
+        velocityX,
+        velocityY,
+      }));
+      return;
+    }
+
+    // Agent is adjacent - emit gather_seeds request
+    const plantPos = nearestPlant.entity.getComponent<PositionComponent>('position')!;
+    world.eventBus.emit({
+      type: 'action:requested' as any,
+      source: entity.id,
+      data: {
+        eventType: 'gather_seeds:requested',
+        actorId: entity.id,
+        plantId: nearestPlant.entity.id,
+        position: { x: plantPos.x, y: plantPos.y },
+      },
+    });
+
+    console.log(`[AISystem:gatherSeedsBehavior] Agent ${entity.id.slice(0, 8)} requesting seed gathering from plant ${nearestPlant.entity.id.slice(0, 8)}`);
+
+    // Switch to idle while action is being processed
+    entity.updateComponent<AgentComponent>('agent', (current) => ({
+      ...current,
+      currentBehavior: 'idle',
+    }));
+  }
+
+  /**
+   * Harvest behavior - agent harvests nearby mature plants for fruit/seeds.
+   *
+   * This behavior finds harvestable plants within range and submits a harvest
+   * action to the ActionQueue.
+   *
+   * The HarvestActionHandler validates and executes the action.
+   */
+  private harvestBehavior(entity: EntityImpl, world: World): void {
+    const position = entity.getComponent<PositionComponent>('position')!;
+    const vision = entity.getComponent<VisionComponent>('vision');
+
+    // Stop moving while deciding which plant to harvest
+    entity.updateComponent<MovementComponent>('movement', (current) => ({
+      ...current,
+      velocityX: 0,
+      velocityY: 0,
+    }));
+
+    // Find nearest harvestable plant
+    let nearestPlant: { entity: EntityImpl; distance: number } | null = null;
+
+    // Search all entities in vision range
+    for (const seenEntity of world.entities.values()) {
+      const seenImpl = seenEntity as EntityImpl;
+      const plant = seenImpl.getComponent<PlantComponent>('plant');
+      if (!plant) continue;
+
+      // Check if plant is at valid stage for harvesting
+      const validStages = ['mature', 'seeding'];
+      if (!validStages.includes(plant.stage)) {
+        continue;
+      }
+
+      const plantPos = seenImpl.getComponent<PositionComponent>('position');
+      if (!plantPos) continue;
+
+      // Check if plant is within vision range
+      const dx = plantPos.x - position.x;
+      const dy = plantPos.y - position.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (vision && distance > vision.range) continue;
+
+      if (!nearestPlant || distance < nearestPlant.distance) {
+        nearestPlant = { entity: seenImpl, distance };
+      }
+    }
+
+    if (!nearestPlant) {
+      // No plants found - switch to wander
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        currentBehavior: 'wander',
+      }));
+      return;
+    }
+
+    // Check if agent is adjacent to the plant
+    const MAX_HARVEST_DISTANCE = Math.sqrt(2); // Allow diagonal
+
+    if (nearestPlant.distance > MAX_HARVEST_DISTANCE) {
+      // Move toward plant
+      const plantPos = nearestPlant.entity.getComponent<PositionComponent>('position')!;
+      const dx = plantPos.x - position.x;
+      const dy = plantPos.y - position.y;
+      const distance = nearestPlant.distance;
+
+      const movement = entity.getComponent<MovementComponent>('movement')!;
+      const velocityX = (dx / distance) * movement.speed;
+      const velocityY = (dy / distance) * movement.speed;
+
+      entity.updateComponent<MovementComponent>('movement', (current) => ({
+        ...current,
+        targetX: plantPos.x,
+        targetY: plantPos.y,
+        velocityX,
+        velocityY,
+      }));
+      return;
+    }
+
+    // Agent is adjacent - emit harvest request
+    const plantPos = nearestPlant.entity.getComponent<PositionComponent>('position')!;
+    world.eventBus.emit({
+      type: 'action:requested' as any,
+      source: entity.id,
+      data: {
+        eventType: 'harvest:requested',
+        actorId: entity.id,
+        plantId: nearestPlant.entity.id,
+        position: { x: plantPos.x, y: plantPos.y },
+      },
+    });
+
+    console.log(`[AISystem:harvestBehavior] Agent ${entity.id.slice(0, 8)} requesting harvest of plant ${nearestPlant.entity.id.slice(0, 8)}`);
+
+    // Switch to idle while action is being processed
+    entity.updateComponent<AgentComponent>('agent', (current) => ({
+      ...current,
+      currentBehavior: 'idle',
+    }));
   }
 }

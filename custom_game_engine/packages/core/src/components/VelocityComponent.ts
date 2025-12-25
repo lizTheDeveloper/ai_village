@@ -10,7 +10,7 @@ export interface VelocityComponentData {
  * Distinct from MovementComponent which stores speed/direction for basic movement
  */
 export class VelocityComponent extends ComponentBase {
-  public readonly type = 'Velocity';
+  public readonly type = 'velocity';
   public vx: number;
   public vy: number;
 

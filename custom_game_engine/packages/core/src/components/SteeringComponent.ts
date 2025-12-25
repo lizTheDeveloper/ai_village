@@ -26,7 +26,7 @@ export interface SteeringComponentData {
  * Used by SteeringSystem to calculate movement forces
  */
 export class SteeringComponent extends ComponentBase {
-  public readonly type = 'Steering';
+  public readonly type = 'steering';
   public behavior: SteeringBehavior;
   public maxSpeed: number;
   public maxForce: number;

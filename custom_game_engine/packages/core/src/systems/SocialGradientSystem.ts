@@ -169,7 +169,7 @@ export class SocialGradientSystem implements System {
       }
 
       // Add gradients to listener's social gradient component
-      const socialGradient = listenerImpl.getComponent('SocialGradient') as any;
+      const socialGradient = listenerImpl.getComponent('social_gradient') as any;
       if (!socialGradient) continue;
 
       for (const gradient of gradients) {
@@ -240,17 +240,17 @@ export class SocialGradientSystem implements System {
   ): { bearing: number; strength: number; confidence: number } | undefined {
     const impl = entity as EntityImpl;
 
-    if (!impl.hasComponent('SocialGradient')) {
+    if (!impl.hasComponent('social_gradient')) {
       return undefined;
     }
 
-    const socialGradient = impl.getComponent('SocialGradient') as any;
+    const socialGradient = impl.getComponent('social_gradient') as any;
     if (!socialGradient) return undefined;
 
     // Get trust scores if available
     let trustScores: Map<string, number> | undefined;
-    if (impl.hasComponent('TrustNetwork')) {
-      const trustNetwork = impl.getComponent('TrustNetwork') as any;
+    if (impl.hasComponent('trust_network')) {
+      const trustNetwork = impl.getComponent('trust_network') as any;
       if (trustNetwork) {
         trustScores = trustNetwork.scores;
       }

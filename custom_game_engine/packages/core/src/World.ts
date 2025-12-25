@@ -16,10 +16,11 @@ import { SocialGradientComponent } from './components/SocialGradientComponent.js
 import { ExplorationStateComponent } from './components/ExplorationStateComponent.js';
 import { SpatialMemoryComponent } from './components/SpatialMemoryComponent.js';
 import { BeliefComponent } from './components/BeliefComponent.js';
+import { EpisodicMemoryComponent } from './components/EpisodicMemoryComponent.js';
 
 // Component registry mapping strings to factory functions or classes
 const componentRegistry: Record<string, any> = {
-  'Agent': (data: any) => ({
+  'agent': (data: any) => ({
     type: 'agent',
     version: 1,
     behavior: data.behavior || 'wander',
@@ -30,47 +31,47 @@ const componentRegistry: Record<string, any> = {
     llmCooldown: data.llmCooldown || 0,
     ...data,
   }),
-  'Position': (data: any) => createPositionComponent(data.x || 0, data.y || 0),
-  'Velocity': (data: any) => ({
-    type: 'Velocity',
+  'position': (data: any) => createPositionComponent(data.x || 0, data.y || 0),
+  'velocity': (data: any) => ({
+    type: 'velocity',
     version: 1,
     vx: data.vx || 0,
     vy: data.vy || 0,
   }),
-  'Resource': (data: any) => ({
+  'resource': (data: any) => ({
     type: 'resource',
     version: 1,
     resourceType: data.type || data.resourceType,
     amount: data.amount || 0,
     regenerationRate: data.regenerationRate || 0,
   }),
-  'Building': (data: any) => ({
+  'building': (data: any) => ({
     type: 'building',
     version: 1,
     buildingType: data.buildingType,
     ...data,
   }),
-  'Collision': (data: any) => ({
-    type: 'Collision',
+  'collision': (data: any) => ({
+    type: 'collision',
     version: 1,
     radius: data.radius || 1.0,
   }),
-  'TrustNetwork': (data: any) => new TrustNetworkComponent(data),
-  'SocialGradient': () => new SocialGradientComponent(),
-  'SpatialMemory': (data: any) => new SpatialMemoryComponent(data),
-  'Belief': () => new BeliefComponent(),
-  'Steering': (data: any) => ({
-    type: 'Steering',
+  'trust_network': (data: any) => new TrustNetworkComponent(data),
+  'social_gradient': () => new SocialGradientComponent(),
+  'spatial_memory': (data: any) => new SpatialMemoryComponent(data),
+  'belief': () => new BeliefComponent(),
+  'steering': (data: any) => ({
+    type: 'steering',
     version: 1,
     ...data,
   }),
-  'ExplorationState': (data: any) => {
-    // Support both class-based and ad-hoc ExplorationState
+  'exploration_state': (data: any) => {
+    // Support both class-based and ad-hoc exploration_state
     // Tests use ad-hoc objects with Sets, production might use the class
     if (data && typeof data === 'object' && !data.type) {
       // Ad-hoc object from tests - preserve all fields including Sets
       return {
-        type: 'ExplorationState',
+        type: 'exploration_state',
         version: 1,
         ...data,
       };
@@ -78,6 +79,22 @@ const componentRegistry: Record<string, any> = {
     // Otherwise create the class
     return new ExplorationStateComponent();
   },
+  'episodic_memory': (data: any) => new EpisodicMemoryComponent(data),
+
+  // Backwards compatibility aliases (PascalCase → lowercase_with_underscores)
+  'Velocity': (data: any) => componentRegistry['velocity'](data),
+  'Steering': (data: any) => componentRegistry['steering'](data),
+  'ExplorationState': (data: any) => componentRegistry['exploration_state'](data),
+  'SpatialMemory': (data: any) => componentRegistry['spatial_memory'](data),
+  'EpisodicMemory': (data: any) => componentRegistry['episodic_memory'](data),
+  'TrustNetwork': (data: any) => componentRegistry['trust_network'](data),
+  'SocialGradient': () => componentRegistry['social_gradient'](),
+  'Belief': () => componentRegistry['belief'](),
+  'Position': (data: any) => componentRegistry['position'](data),
+  'Resource': (data: any) => componentRegistry['resource'](data),
+  'Building': (data: any) => componentRegistry['building'](data),
+  'Collision': (data: any) => componentRegistry['collision'](data),
+  'Agent': (data: any) => componentRegistry['agent'](data),
 };
 
 // Extend Entity interface with test convenience methods
@@ -144,11 +161,11 @@ export class World extends WorldImpl {
     entity.getComponent = (ComponentClass: any) => {
       // If it's a string, try as-is first, then try snake_case conversion
       if (typeof ComponentClass === 'string') {
-        // Try the string as-is first (for PascalCase like 'Steering', 'Position')
+        // Try the string as-is first (for lowercase_with_underscores like 'steering', 'position')
         const direct = originalGetComponent(ComponentClass);
         if (direct) return direct;
 
-        // Fallback: Convert CamelCase to snake_case (e.g., 'TrustNetwork' -> 'trust_network')
+        // Fallback: Convert PascalCase to snake_case for backwards compatibility (e.g., 'TrustNetwork' -> 'trust_network')
         const typeString = ComponentClass
           .replace(/([A-Z])/g, '_$1')
           .toLowerCase()

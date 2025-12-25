@@ -27,15 +27,31 @@ interface VelocityComponent {
  */
 export class SteeringSystem implements System {
   public readonly id: SystemId = 'steering';
-  public readonly priority: number = 30; // After AISystem (20), before Movement (40)
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  public readonly priority: number = 15; // After AISystem (10), before Movement (20)
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [
+    'steering',
+    'position',
+    'velocity',
+  ];
 
   // Track stuck agents for pathfinding fallback
   private stuckTracker: Map<string, { lastPos: Vector2; stuckTime: number; target: Vector2 }> = new Map();
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    // Get entities with Steering component
-    const steeringEntities = entities.filter(e => e.components.has('Steering'));
+    console.log(`[SteeringSystem] update() called with ${entities.length} entities`);
+
+    // Get entities with steering component
+    const steeringEntities = entities.filter(e => e.components.has('steering'));
+
+    // Debug: Log how many steering entities we have
+    if (steeringEntities.length > 0) {
+      console.log(`[SteeringSystem] Processing ${steeringEntities.length} steering entities`);
+    } else if (entities.length > 0) {
+      // Debug: Log what components the first entity has
+      const firstEntity = entities[0];
+      const componentTypes = Array.from(firstEntity.components.keys());
+      console.log(`[SteeringSystem] No steering entities found. First entity has components:`, componentTypes);
+    }
 
     for (const entity of steeringEntities) {
       try {
@@ -50,24 +66,24 @@ export class SteeringSystem implements System {
   private _updateSteering(entity: Entity, world: World, deltaTime: number): void {
     const impl = entity as EntityImpl;
     // Validate required components
-    if (!impl.hasComponent('Position')) {
-      throw new Error('SteeringSystem requires Position component');
+    if (!impl.hasComponent('position')) {
+      throw new Error('SteeringSystem requires position component');
     }
-    if (!impl.hasComponent('Velocity')) {
-      throw new Error('SteeringSystem requires Velocity component');
+    if (!impl.hasComponent('velocity')) {
+      throw new Error('SteeringSystem requires velocity component');
     }
 
-    const steering = impl.getComponent('Steering') as any as SteeringComponent;
+    const steering = impl.getComponent('steering') as any as SteeringComponent;
     if (!steering) {
       throw new Error('Steering component missing');
     }
-    const position = impl.getComponent('Position') as any as Vector2;
+    const position = impl.getComponent('position') as any as Vector2;
     if (!position) {
-      throw new Error('Position component missing');
+      throw new Error('position component missing');
     }
-    const velocity = impl.getComponent('Velocity') as any as VelocityComponent;
+    const velocity = impl.getComponent('velocity') as any as VelocityComponent;
     if (!velocity) {
-      throw new Error('Velocity component missing');
+      throw new Error('velocity component missing');
     }
 
     // Validate behavior type
@@ -116,9 +132,9 @@ export class SteeringSystem implements System {
     const speed = Math.sqrt(newVx * newVx + newVy * newVy);
     if (speed > steering.maxSpeed) {
       const scale = steering.maxSpeed / speed;
-      impl.updateComponent('Velocity', (v: any) => ({ ...v, vx: newVx * scale, vy: newVy * scale }));
+      impl.updateComponent('velocity', (v: any) => ({ ...v, vx: newVx * scale, vy: newVy * scale }));
     } else {
-      impl.updateComponent('Velocity', (v: any) => ({ ...v, vx: newVx, vy: newVy }));
+      impl.updateComponent('velocity', (v: any) => ({ ...v, vx: newVx, vy: newVy }));
     }
   }
 

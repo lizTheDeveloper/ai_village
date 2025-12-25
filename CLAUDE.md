@@ -1,5 +1,43 @@
 # AI Village Development Guidelines
 
+## Naming Conventions
+
+### Component Type Names
+
+Component type strings MUST use lowercase_with_underscores, not PascalCase:
+
+```typescript
+// GOOD: lowercase with underscores
+export class SteeringComponent extends ComponentBase {
+  public readonly type = 'steering';  // ✓
+}
+
+export class VelocityComponent extends ComponentBase {
+  public readonly type = 'velocity';  // ✓
+}
+
+export class SpatialMemoryComponent extends ComponentBase {
+  public readonly type = 'spatial_memory';  // ✓
+}
+
+// BAD: PascalCase
+export class SteeringComponent extends ComponentBase {
+  public readonly type = 'Steering';  // ✗ WRONG
+}
+```
+
+When checking for components, always use lowercase:
+
+```typescript
+// GOOD
+if (entity.hasComponent('steering')) { ... }
+const velocity = entity.getComponent('velocity');
+
+// BAD
+if (entity.hasComponent('Steering')) { ... }  // ✗ WRONG
+const velocity = entity.getComponent('Velocity');  // ✗ WRONG
+```
+
 ## Error Handling: No Silent Fallbacks
 
 **NEVER use fallback values to mask errors.** If data is missing or invalid, crash immediately with a clear error message. This ensures bugs are found and fixed at their source rather than hidden.

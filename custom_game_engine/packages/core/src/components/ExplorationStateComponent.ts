@@ -20,7 +20,7 @@ export interface FrontierSector {
  * Uses 16x16 tile sectors for efficient coverage tracking
  */
 export class ExplorationStateComponent extends ComponentBase {
-  public readonly type = 'ExplorationState';
+  public readonly type = 'exploration_state';
   private readonly _sectorSize: number = 16; // Tiles per sector
   private _exploredSectors: Map<string, SectorInfo> = new Map();
   private _explorationRadius: number = 64; // Default 4 sectors

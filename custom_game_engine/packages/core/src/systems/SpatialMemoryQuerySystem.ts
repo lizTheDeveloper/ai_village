@@ -25,8 +25,8 @@ export class SpatialMemoryQuerySystem implements System {
   update(_world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
     // Get entities with both spatial and episodic memory
     const memoryEntities = entities.filter(e =>
-      e.components.has('SpatialMemory') &&
-      e.components.has('EpisodicMemory')
+      e.components.has('spatial_memory') &&
+      e.components.has('episodic_memory')
     );
 
     for (const entity of memoryEntities) {
@@ -44,12 +44,12 @@ export class SpatialMemoryQuerySystem implements System {
   private _syncMemories(entity: Entity, currentTick: number): void {
     const impl = entity as EntityImpl;
 
-    const spatialMemory = impl.getComponent('SpatialMemory') as any;
+    const spatialMemory = impl.getComponent('spatial_memory') as any;
     if (!spatialMemory) {
       throw new Error('SpatialMemory component missing');
     }
 
-    const episodicMemory = impl.getComponent('EpisodicMemory') as any;
+    const episodicMemory = impl.getComponent('episodic_memory') as any;
     if (!episodicMemory) {
       throw new Error('EpisodicMemory component missing');
     }
@@ -182,17 +182,17 @@ export class SpatialMemoryQuerySystem implements System {
   ): { position: { x: number; y: number }; confidence: number } | null {
     const impl = entity as EntityImpl;
 
-    if (!impl.hasComponent('SpatialMemory')) {
+    if (!impl.hasComponent('spatial_memory')) {
       return null;
     }
 
-    const spatialMemory = impl.getComponent('SpatialMemory') as any;
+    const spatialMemory = impl.getComponent('spatial_memory') as any;
     if (!spatialMemory) return null;
 
     // Get agent position for distance ranking
     let agentPosition: { x: number; y: number } | undefined;
-    if (impl.hasComponent('Position')) {
-      agentPosition = impl.getComponent('Position') as any;
+    if (impl.hasComponent('position')) {
+      agentPosition = impl.getComponent('position') as any;
     }
 
     // Query memories
@@ -225,17 +225,17 @@ export class SpatialMemoryQuerySystem implements System {
   ): Array<{ position: { x: number; y: number }; confidence: number }> {
     const impl = entity as EntityImpl;
 
-    if (!impl.hasComponent('SpatialMemory')) {
+    if (!impl.hasComponent('spatial_memory')) {
       return [];
     }
 
-    const spatialMemory = impl.getComponent('SpatialMemory') as any;
+    const spatialMemory = impl.getComponent('spatial_memory') as any;
     if (!spatialMemory) return [];
 
     // Get agent position
     let agentPosition: { x: number; y: number } | undefined;
-    if (impl.hasComponent('Position')) {
-      agentPosition = impl.getComponent('Position') as any;
+    if (impl.hasComponent('position')) {
+      agentPosition = impl.getComponent('position') as any;
     }
 
     const results = spatialMemory.queryResourceLocations(

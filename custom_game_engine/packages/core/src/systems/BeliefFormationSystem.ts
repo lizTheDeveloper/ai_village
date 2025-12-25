@@ -33,8 +33,8 @@ export class BeliefFormationSystem implements System {
 
     // OPTIMIZATION: Belief formation only happens during sleep (memory consolidation)
     const believers = entities.filter(e =>
-      e.components.has('Belief') &&
-      e.components.has('EpisodicMemory') &&
+      e.components.has('belief') &&
+      e.components.has('episodic_memory') &&
       e.components.has('agent')
     );
 
@@ -56,12 +56,12 @@ export class BeliefFormationSystem implements System {
   private _updateBeliefs(entity: Entity, _entities: ReadonlyArray<Entity>, currentTick: number): void {
     const impl = entity as EntityImpl;
 
-    const belief = impl.getComponent('Belief') as any;
+    const belief = impl.getComponent('belief') as any;
     if (!belief) {
       throw new Error('Belief component missing');
     }
 
-    const episodicMemory = impl.getComponent('EpisodicMemory') as any;
+    const episodicMemory = impl.getComponent('episodic_memory') as any;
     if (!episodicMemory) {
       throw new Error('EpisodicMemory component missing');
     }
@@ -76,14 +76,14 @@ export class BeliefFormationSystem implements System {
    * Analyze character patterns (trustworthiness of other agents)
    */
   private _analyzeCharacterPatterns(entity: EntityImpl, episodicMemory: any, currentTick: number): void {
-    if (!entity.hasComponent('TrustNetwork')) {
+    if (!entity.hasComponent('trust_network')) {
       return; // Need trust network to form character beliefs
     }
 
-    const trustNetwork = entity.getComponent('TrustNetwork') as any;
+    const trustNetwork = entity.getComponent('trust_network') as any;
     if (!trustNetwork) return;
 
-    const belief = entity.getComponent('Belief') as any;
+    const belief = entity.getComponent('belief') as any;
     if (!belief) return;
 
     // Get all verification memories from episodic memory
@@ -131,10 +131,11 @@ export class BeliefFormationSystem implements System {
           type: 'belief:formed',
           source: 'belief_formation',
           data: {
-            entityId: entity.id,
-            beliefType: 'character',
-            subject: agentId,
-            tick: currentTick,
+            agentId: entity.id,
+          entityId: entity.id,
+          beliefType: 'character',
+          content: `Observed agent ${agentId}`,
+          confidence: 0.5,
           },
         });
       }
@@ -145,7 +146,7 @@ export class BeliefFormationSystem implements System {
    * Analyze world patterns (resource locations, terrain features)
    */
   private _analyzeWorldPatterns(entity: EntityImpl, episodicMemory: any, currentTick: number): void {
-    const belief = entity.getComponent('Belief') as any;
+    const belief = entity.getComponent('belief') as any;
     if (!belief) return;
 
     // Get resource gathering memories
@@ -191,7 +192,7 @@ export class BeliefFormationSystem implements System {
    * Analyze social patterns (cooperation, sharing behavior)
    */
   private _analyzeSocialPatterns(entity: EntityImpl, episodicMemory: any, currentTick: number): void {
-    const belief = entity.getComponent('Belief') as any;
+    const belief = entity.getComponent('belief') as any;
     if (!belief) return;
 
     // Get social interaction memories
