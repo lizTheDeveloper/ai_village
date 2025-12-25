@@ -534,7 +534,10 @@ export class AISystem implements System {
             .with('position')
             .executeEntities();
 
-          let nearestResource: { type: string; distance: number } | null = null;
+          // Track nearest resource of each type
+          let nearestFood: { type: string; distance: number } | null = null;
+          let nearestWood: { type: string; distance: number } | null = null;
+          let nearestStone: { type: string; distance: number } | null = null;
 
           for (const resource of resources) {
             const resourceImpl = resource as EntityImpl;
@@ -555,17 +558,36 @@ export class AISystem implements System {
               Math.pow(resourcePos.y - position.y, 2)
             );
 
-            if (distance <= detectionRange && (!nearestResource || distance < nearestResource.distance)) {
-              nearestResource = { type: resourceComp.resourceType, distance };
+            if (distance <= detectionRange) {
+              // Track nearest of each type
+              if (resourceComp.resourceType === 'food' && (!nearestFood || distance < nearestFood.distance)) {
+                nearestFood = { type: 'food', distance };
+              } else if (resourceComp.resourceType === 'wood' && (!nearestWood || distance < nearestWood.distance)) {
+                nearestWood = { type: 'wood', distance };
+              } else if (resourceComp.resourceType === 'stone' && (!nearestStone || distance < nearestStone.distance)) {
+                nearestStone = { type: 'stone', distance };
+              }
             }
           }
 
+          // PRIORITY ORDER: food > wood > stone
+          // Always gather food first if available and needed
+          let targetResource: { type: string; distance: number } | null = null;
+          if (nearestFood && !hasFood) {
+            targetResource = nearestFood;
+          } else if (nearestWood && !hasWood) {
+            targetResource = nearestWood;
+          } else if (nearestStone && !hasStone) {
+            // Only gather stone if we already have food and wood
+            targetResource = nearestStone;
+          }
+
           // If found nearby resource, immediately switch to gathering
-          if (nearestResource) {
+          if (targetResource) {
             impl.updateComponent<AgentComponent>('agent', (current) => ({
               ...current,
               behavior: 'gather',
-              behaviorState: { resourceType: nearestResource.type },
+              behaviorState: { resourceType: targetResource.type },
             }));
           }
         }

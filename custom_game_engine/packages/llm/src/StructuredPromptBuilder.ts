@@ -29,8 +29,8 @@ export class StructuredPromptBuilder {
     const temperature = agent.components.get('temperature') as any;
     const conversation = agent.components.get('conversation') as any;
 
-    // System Prompt: Role, personality, rules
-    const systemPrompt = this.buildSystemPrompt(name?.name || 'Agent', personality);
+    // System Prompt: Role, personality, rules, building knowledge
+    const systemPrompt = this.buildSystemPrompt(name?.name || 'Agent', personality, world, inventory);
 
     // World Context: Current situation
     const worldContext = this.buildWorldContext(needs, vision, inventory, world, temperature, memory, conversation);
@@ -87,12 +87,13 @@ export class StructuredPromptBuilder {
         instruction = `You have enough materials (${woodQty} wood, ${stoneQty} stone) to build something useful! Consider building storage-chest (10 wood) for supplies or a lean-to (10 wood + 5 leaves) for shelter. Building now will benefit everyone! What should you do?`;
         console.log(`[StructuredPromptBuilder] 🏗️ BUILDING SUGGESTION - sufficient materials (wood=${woodQty}, stone=${stoneQty})`);
       }
-      // Encourage gathering if low on materials
-      else if (!hasWood || !hasStone) {
-        const missing = [];
-        if (!hasWood) missing.push('wood (from trees)');
-        if (!hasStone) missing.push('stone (from rocks)');
-        instruction = `You're low on ${missing.join(' and ')}. Gathering ${missing.length > 1 ? 'both materials' : 'this material'} is important for construction. What should you do?`;
+      // Encourage gathering if low on materials - prioritize food and wood over stone
+      else if (!hasWood) {
+        instruction = `You're low on wood. Wood is the MOST IMPORTANT early-game resource - needed for storage, shelter, and tools. Gather wood from trees! What should you do?`;
+      }
+      // Only encourage stone gathering if agent already has wood
+      else if (hasWood && !hasStone) {
+        instruction = `You have wood but no stone. Stone is useful for some buildings like campfires. Consider gathering stone from rocks if needed. What should you do?`;
       }
       // Add motivation for social interaction (when not building-focused)
       else if (vision?.heardSpeech && vision.heardSpeech.length > 1) {
@@ -171,18 +172,40 @@ export class StructuredPromptBuilder {
   /**
    * Build system prompt with role and personality.
    */
-  private buildSystemPrompt(name: string, personality: any): string {
-    // Base prompt with building knowledge
-    let prompt = `You are ${name}, a villager in a forest village.
+  private buildSystemPrompt(name: string, personality: any, world?: any, inventory?: any): string {
+    // Base prompt
+    let prompt = `You are ${name}, a villager in a forest village.\n\n`;
 
-You know how to build these structures:
-- lean-to: 10 wood + 5 leaves (shelter for sleeping)
-- storage-chest: 10 wood (store items safely)
-- campfire: 10 stone + 5 wood (warmth and cooking)
-- tent: 10 cloth + 5 wood (better shelter)
-- bed: 10 wood + 15 fiber (comfortable sleep)
+    // Add complete building knowledge from registry
+    if (world && (world as any).buildingRegistry) {
+      const registry = (world as any).buildingRegistry;
+      const buildings = registry.getUnlocked();
 
-`;
+      if (buildings && buildings.length > 0) {
+        prompt += 'Buildings you know how to construct:\n';
+
+        for (const building of buildings) {
+          const costs = building.resourceCost
+            .map((c: any) => `${c.amountRequired} ${c.resourceId}`)
+            .join(' + ');
+
+          // Check if agent can afford this building
+          let canAfford = ' ';
+          if (inventory && inventory.slots) {
+            const hasAllResources = building.resourceCost.every((cost: any) => {
+              const total = inventory.slots
+                .filter((s: any) => s.itemId === cost.resourceId)
+                .reduce((sum: number, s: any) => sum + s.quantity, 0);
+              return total >= cost.amountRequired;
+            });
+            canAfford = hasAllResources ? ' ✅ CAN BUILD - ' : ' ';
+          }
+
+          prompt += `-${canAfford}${building.name}: ${costs} - ${building.description}\n`;
+        }
+        prompt += '\n';
+      }
+    }
 
     if (!personality) {
       return prompt;
@@ -352,22 +375,33 @@ You know how to build these structures:
         }
 
         const descriptions: string[] = [];
+
+        // Always show food first if visible (highest priority)
+        if (resourceTypes.food) {
+          descriptions.push(`${resourceTypes.food} food source${resourceTypes.food > 1 ? 's' : ''} 🍎`);
+        }
+
+        // Show wood (essential for early building)
         if (resourceTypes.wood) {
           descriptions.push(`${resourceTypes.wood} tree${resourceTypes.wood > 1 ? 's' : ''}`);
         }
-        if (resourceTypes.stone) {
+
+        // De-emphasize stone by only mentioning if there are few stones (< 5)
+        // This prevents "20 rocks nearby" from dominating the context
+        if (resourceTypes.stone && resourceTypes.stone < 5) {
           descriptions.push(`${resourceTypes.stone} rock${resourceTypes.stone > 1 ? 's' : ''}`);
-        }
-        if (resourceTypes.food) {
-          descriptions.push(`${resourceTypes.food} food source${resourceTypes.food > 1 ? 's' : ''}`);
+        } else if (resourceTypes.stone) {
+          descriptions.push('some rocks');
         }
 
         if (descriptions.length > 0) {
           context += `- You see ${descriptions.join(', ')} nearby`;
 
-          // Add gathering hint if trees or rocks are visible
-          if (resourceTypes.wood || resourceTypes.stone) {
-            context += ` (you can gather these for materials)`;
+          // Emphasize food gathering if food sources are visible
+          if (resourceTypes.food) {
+            context += ` (food is essential for survival!)`;
+          } else if (resourceTypes.wood) {
+            context += ` (wood is essential for building)`;
           }
           context += `\n`;
         }
@@ -724,20 +758,37 @@ You know how to build these structures:
       }
     }
 
+    // Calculate days of food for the village
+    const foodInStorage = totalStorage.food ?? 0;
+    const agentCount = world.query().with('agent').executeEntities().length;
+    const foodPerAgentPerDay = 2.5; // Average food consumption per agent per day
+    const daysOfFood = agentCount > 0 ? foodInStorage / (agentCount * foodPerAgentPerDay) : 0;
+
     // Always show storage status, even if empty
     if (!hasAnyItems) {
-      return `- Village Storage: empty (no food or resources in stockpile)\n`;
+      const urgency = agentCount > 0 ? ' ⚠️ CRITICAL - Village needs food gatherers!' : '';
+      return `- Village Storage: empty (no food or resources in stockpile)${urgency}\n`;
     }
 
     const items = Object.entries(totalStorage)
       .map(([item, qty]) => `${qty} ${item}`)
       .join(', ');
 
-    // Highlight if storage has food
-    const hasFood = (totalStorage.food ?? 0) > 0;
-    const foodNote = hasFood ? ' [food available!]' : '';
+    // Calculate food urgency message
+    let foodStatus = '';
+    if (foodInStorage === 0) {
+      foodStatus = ' ⚠️ NO FOOD - gather food immediately!';
+    } else if (daysOfFood < 1) {
+      foodStatus = ` ⚠️ FOOD CRITICAL - only ${daysOfFood.toFixed(1)} days of food left!`;
+    } else if (daysOfFood < 2) {
+      foodStatus = ` 🍎 LOW FOOD - ${daysOfFood.toFixed(1)} days of food remaining`;
+    } else if (daysOfFood < 5) {
+      foodStatus = ` 🍎 ${daysOfFood.toFixed(1)} days of food`;
+    } else {
+      foodStatus = ` ✅ ${daysOfFood.toFixed(1)} days of food - well stocked!`;
+    }
 
-    return `- Village Storage: ${items}${foodNote}\n`;
+    return `- Village Storage: ${items}${foodStatus}\n`;
   }
 
   /**
