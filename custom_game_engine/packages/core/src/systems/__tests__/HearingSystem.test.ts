@@ -1,18 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { WorldImpl, EntityImpl, createEntityId } from '../../ecs/index.js';
 import { EventBusImpl } from '../../events/EventBus.js';
-import { AISystem } from '../AISystem.js';
+import { HearingProcessor } from '../../perception/HearingProcessor.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
 import { createAgentComponent } from '../../components/AgentComponent.js';
 import { createVisionComponent } from '../../components/VisionComponent.js';
 import { createIdentityComponent } from '../../components/IdentityComponent.js';
-
-// Create a minimal AISystem for testing hearing without full LLM setup
-class TestAISystem extends AISystem {
-  public testProcessHearing(entity: EntityImpl, world: WorldImpl): void {
-    (this as any).processHearing(entity, world);
-  }
-}
 
 function createTestAgent(world: WorldImpl, name: string, x: number, y: number): EntityImpl {
   const entity = new EntityImpl(createEntityId(), world.tick);
@@ -29,15 +22,15 @@ function createTestAgent(world: WorldImpl, name: string, x: number, y: number): 
 
 describe('Hearing System', () => {
   let world: WorldImpl;
-  let aiSystem: TestAISystem;
+  let hearingProcessor: HearingProcessor;
 
   beforeEach(() => {
     // Create WorldImpl with minimal dependencies
     const eventBus = new EventBusImpl();
     world = new WorldImpl(eventBus);
 
-    // Create minimal AISystem (constructor params not important for hearing tests)
-    aiSystem = new TestAISystem(null as any, null as any);
+    // Create HearingProcessor for direct testing
+    hearingProcessor = new HearingProcessor();
   });
 
   it('should allow agents to hear nearby speech', () => {
@@ -52,7 +45,7 @@ describe('Hearing System', () => {
     }));
 
     // Process hearing for Bob
-    aiSystem.testProcessHearing(listener, world);
+    hearingProcessor.process(listener, world);
 
     // Check that Bob heard Alice
     const vision = listener.getComponent('vision') as any;
@@ -74,7 +67,7 @@ describe('Hearing System', () => {
     }));
 
     // Process hearing for Bob
-    aiSystem.testProcessHearing(listener, world);
+    hearingProcessor.process(listener, world);
 
     // Check that Bob did NOT hear Alice
     const vision = listener.getComponent('vision') as any;
@@ -99,7 +92,7 @@ describe('Hearing System', () => {
     }));
 
     // Process hearing for Bob
-    aiSystem.testProcessHearing(listener, world);
+    hearingProcessor.process(listener, world);
 
     // Check that Bob heard both Alice and Charlie
     const vision = listener.getComponent('vision') as any;
@@ -122,7 +115,7 @@ describe('Hearing System', () => {
     }));
 
     // Process hearing for Bob
-    aiSystem.testProcessHearing(agent, world);
+    hearingProcessor.process(agent, world);
 
     // Check that Bob did NOT hear himself
     const vision = agent.getComponent('vision') as any;
@@ -138,7 +131,7 @@ describe('Hearing System', () => {
     // Don't set recentSpeech at all
 
     // Process hearing for Bob
-    aiSystem.testProcessHearing(listener, world);
+    hearingProcessor.process(listener, world);
 
     // Check that Bob heard nothing
     const vision = listener.getComponent('vision') as any;

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { IntegrationTestHarness } from '../../__tests__/utils/IntegrationTestHarness.js';
 import { createMinimalWorld } from '../../__tests__/fixtures/worldFixtures.js';
-import { AISystem } from '../AISystem.js';
+import { AgentBrainSystem } from '../AgentBrainSystem.js';
 import { TimeSystem } from '../TimeSystem.js';
 import { NeedsSystem } from '../NeedsSystem.js';
 import { MovementSystem } from '../MovementSystem.js';
@@ -36,10 +36,10 @@ describe('Performance Monitoring Integration', () => {
   });
 
   it('should handle single agent efficiently', () => {
-    const aiSystem = new AISystem(harness.world.eventBus);
+    const aiSystem = new AgentBrainSystem(harness.world.eventBus);
     const needsSystem = new NeedsSystem();
 
-    harness.registerSystem('AISystem', aiSystem);
+    harness.registerSystem('AgentBrainSystem', aiSystem);
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
@@ -66,10 +66,10 @@ describe('Performance Monitoring Integration', () => {
   });
 
   it('should scale to 10 agents', () => {
-    const aiSystem = new AISystem(harness.world.eventBus);
+    const aiSystem = new AgentBrainSystem(harness.world.eventBus);
     const needsSystem = new NeedsSystem();
 
-    harness.registerSystem('AISystem', aiSystem);
+    harness.registerSystem('AgentBrainSystem', aiSystem);
     harness.registerSystem('NeedsSystem', needsSystem);
 
     // Create 10 agents
@@ -161,11 +161,11 @@ describe('Performance Monitoring Integration', () => {
   });
 
   it('should handle mixed entity types efficiently', () => {
-    const aiSystem = new AISystem(harness.world.eventBus);
+    const aiSystem = new AgentBrainSystem(harness.world.eventBus);
     const plantSystem = new PlantSystem(harness.world.eventBus);
     const animalSystem = new AnimalSystem(harness.world.eventBus);
 
-    harness.registerSystem('AISystem', aiSystem);
+    harness.registerSystem('AgentBrainSystem', aiSystem);
     harness.registerSystem('PlantSystem', plantSystem);
     harness.registerSystem('AnimalSystem', animalSystem);
 
@@ -293,8 +293,8 @@ describe('Performance Monitoring Integration', () => {
   });
 
   it('should teardown cleanup properly', () => {
-    const aiSystem = new AISystem(harness.world.eventBus);
-    harness.registerSystem('AISystem', aiSystem);
+    const aiSystem = new AgentBrainSystem(harness.world.eventBus);
+    harness.registerSystem('AgentBrainSystem', aiSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     agent.addComponent(createAgentComponent('test-agent', 'wander'));

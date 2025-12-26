@@ -29,7 +29,7 @@ test.describe('Agent Behavior E2E Tests', () => {
 
     // Check for AI system logs
     const aiLogs = consoleLogs.filter(log =>
-      log.includes('[AISystem]') || log.includes('[OllamaProvider]')
+      log.includes('[AgentBrainSystem]') || log.includes('[OllamaProvider]')
     );
 
     expect(aiLogs.length).toBeGreaterThan(0);
@@ -67,7 +67,7 @@ test.describe('Agent Behavior E2E Tests', () => {
 
       page.on('console', (msg) => {
         const text = msg.text();
-        if (text.includes('[AISystem] Parsed structured LLM decision')) {
+        if (text.includes('[AgentBrainSystem] Parsed structured LLM decision')) {
           structuredResponses.push(text);
         }
       });

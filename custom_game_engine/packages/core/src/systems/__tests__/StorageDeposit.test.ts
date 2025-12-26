@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { WorldImpl, EntityImpl, createEntityId } from '../../ecs/index.js';
 import { EventBusImpl } from '../../events/EventBus.js';
-import { AISystem } from '../AISystem.js';
+import { AgentBrainSystem } from '../AgentBrainSystem.js';
 import { MovementSystem } from '../MovementSystem.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
 import { createAgentComponent } from '../../components/AgentComponent.js';
@@ -18,13 +18,13 @@ import type { ResourceComponent } from '../../components/ResourceComponent.js';
 describe('Storage Deposit System', () => {
   let world: WorldImpl;
   let eventBus: EventBusImpl;
-  let aiSystem: AISystem;
+  let aiSystem: AgentBrainSystem;
   let movementSystem: MovementSystem;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
     world = new WorldImpl(eventBus);
-    aiSystem = new AISystem();
+    aiSystem = new AgentBrainSystem();
     movementSystem = new MovementSystem();
 
     // Advance world tick so agents can think (thinkInterval check)

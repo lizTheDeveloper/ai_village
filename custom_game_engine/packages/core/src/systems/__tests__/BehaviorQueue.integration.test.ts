@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { WorldImpl } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
-import { AISystem } from '../AISystem.js';
+import { AgentBrainSystem } from '../AgentBrainSystem.js';
 import { createAgentComponent, queueBehavior, type AgentComponent } from '../../components/AgentComponent.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
 import { createMovementComponent } from '../../components/MovementComponent.js';
@@ -13,7 +13,7 @@ import { createTemperatureComponent } from '../../components/TemperatureComponen
 /**
  * TRUE Integration tests for Behavior Queue System
  *
- * These tests actually RUN the AISystem with real WorldImpl and EventBusImpl
+ * These tests actually RUN the AgentBrainSystem with real WorldImpl and EventBusImpl
  * to verify the behavior queue processes correctly in a real environment.
  *
  * Unlike the mock-based tests, these tests:
@@ -24,7 +24,7 @@ import { createTemperatureComponent } from '../../components/TemperatureComponen
 
 describe('Behavior Queue System Integration', () => {
   let world: WorldImpl;
-  let aiSystem: AISystem;
+  let aiSystem: AgentBrainSystem;
   let agent: EntityImpl;
 
   beforeEach(() => {
@@ -33,7 +33,7 @@ describe('Behavior Queue System Integration', () => {
     world = new WorldImpl(eventBus);
 
     // Create AI system
-    aiSystem = new AISystem();
+    aiSystem = new AgentBrainSystem();
 
     // Create agent with required components
     // Set thinkInterval=1 to allow agent to think every tick (for faster testing)

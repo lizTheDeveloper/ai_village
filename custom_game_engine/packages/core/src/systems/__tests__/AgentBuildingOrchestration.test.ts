@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { WorldImpl, EntityImpl, createEntityId } from '../../ecs/index.js';
 import { BuildingSystem } from '../BuildingSystem.js';
-import { AISystem } from '../AISystem.js';
+import { AgentBrainSystem } from '../AgentBrainSystem.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { createBuildingComponent, type BuildingComponent } from '../../components/BuildingComponent.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
@@ -30,7 +30,7 @@ describe('Agent Building Orchestration - Phase 7', () => {
   let world: WorldImpl;
   let eventBus: EventBusImpl;
   let buildingSystem: BuildingSystem;
-  let aiSystem: AISystem;
+  let aiSystem: AgentBrainSystem;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
@@ -38,15 +38,8 @@ describe('Agent Building Orchestration - Phase 7', () => {
     buildingSystem = new BuildingSystem();
     buildingSystem.initialize(world, eventBus);
 
-    // AISystem requires provider - mock it
-    const mockProvider = {
-      generateResponse: vi.fn().mockResolvedValue({
-        behavior: 'wander',
-        thoughts: 'Test thoughts',
-        speech: null,
-      }),
-    };
-    aiSystem = new AISystem(mockProvider as any);
+    // AgentBrainSystem works without LLM for scripted behaviors
+    aiSystem = new AgentBrainSystem();
   });
 
   // Helper to create and register an entity

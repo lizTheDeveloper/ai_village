@@ -2,7 +2,8 @@
  * Core game systems.
  */
 
-export * from './AISystem.js';
+// Agent AI - modular system
+export * from './AgentBrainSystem.js';
 export * from './MovementSystem.js';
 export * from './NeedsSystem.js';
 export * from './MemorySystem.js';

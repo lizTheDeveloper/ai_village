@@ -78,7 +78,7 @@ test('Phase 6: LLM Integration', async ({ page }) => {
     }
 
     // Get LLM queue stats
-    const aiSystem = gameLoop.systemRegistry.getSorted().find((s: any) => s.constructor.name === 'AISystem');
+    const aiSystem = gameLoop.systemRegistry.getSorted().find((s: any) => s.constructor.name === 'AgentBrainSystem');
     let queueSize = 0;
     let activeRequests = 0;
 

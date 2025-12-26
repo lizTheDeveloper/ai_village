@@ -1,0 +1,189 @@
+/**
+ * HearingProcessor - Handles auditory perception for agents
+ *
+ * This processor detects speech from nearby agents within hearing range
+ * and updates the VisionComponent with heard speech.
+ *
+ * Part of Phase 3 of the AISystem decomposition (work-order: ai-system-refactor)
+ */
+
+import type { Entity, EntityImpl } from '../ecs/Entity.js';
+import type { World } from '../ecs/World.js';
+import type { PositionComponent } from '../components/PositionComponent.js';
+import type { VisionComponent } from '../components/VisionComponent.js';
+import type { AgentComponent } from '../components/AgentComponent.js';
+
+/**
+ * Heard speech entry
+ */
+export interface HeardSpeech {
+  speaker: string;
+  text: string;
+  speakerId?: string;
+  distance?: number;
+}
+
+/**
+ * Hearing processing result
+ */
+export interface HearingResult {
+  heardSpeech: HeardSpeech[];
+}
+
+/** Default hearing range in tiles */
+const DEFAULT_HEARING_RANGE = 50;
+
+/**
+ * HearingProcessor Class
+ *
+ * Usage:
+ * ```typescript
+ * const hearingProcessor = new HearingProcessor();
+ *
+ * // In system update loop
+ * const result = hearingProcessor.process(entity, world);
+ * if (result.heardSpeech.length > 0) {
+ *   console.log('Heard:', result.heardSpeech);
+ * }
+ * ```
+ */
+export class HearingProcessor {
+  private hearingRange: number;
+
+  constructor(hearingRange: number = DEFAULT_HEARING_RANGE) {
+    this.hearingRange = hearingRange;
+  }
+
+  /**
+   * Process hearing for an entity, collecting nearby speech.
+   */
+  process(entity: EntityImpl, world: World): HearingResult {
+    const vision = entity.getComponent<VisionComponent>('vision');
+    if (!vision) {
+      return { heardSpeech: [] };
+    }
+
+    const position = entity.getComponent<PositionComponent>('position');
+    if (!position) {
+      return { heardSpeech: [] };
+    }
+
+    const heardSpeech = this.collectNearbySpeech(entity, world, position);
+
+    // Update vision component with heard speech
+    entity.updateComponent<VisionComponent>('vision', (current) => ({
+      ...current,
+      heardSpeech,
+    }));
+
+    return { heardSpeech };
+  }
+
+  /**
+   * Collect speech from nearby agents within hearing range.
+   */
+  private collectNearbySpeech(
+    entity: EntityImpl,
+    world: World,
+    position: PositionComponent
+  ): HeardSpeech[] {
+    const agents = world.query().with('agent').with('position').executeEntities();
+    const heardSpeech: HeardSpeech[] = [];
+
+    for (const otherAgent of agents) {
+      if (otherAgent.id === entity.id) continue;
+
+      const otherImpl = otherAgent as EntityImpl;
+      const otherPos = otherImpl.getComponent<PositionComponent>('position');
+      const otherAgentComp = otherImpl.getComponent<AgentComponent>('agent');
+
+      if (!otherPos || !otherAgentComp) continue;
+
+      const distance = this.distance(position, otherPos);
+
+      // Within hearing range and has recent speech
+      if (distance <= this.hearingRange && otherAgentComp.recentSpeech) {
+        const identity = otherImpl.getComponent('identity') as any;
+        const speakerName = identity?.name || 'Someone';
+
+        heardSpeech.push({
+          speaker: speakerName,
+          text: otherAgentComp.recentSpeech,
+          speakerId: otherAgent.id,
+          distance,
+        });
+      }
+    }
+
+    return heardSpeech;
+  }
+
+  /**
+   * Check if entity can hear a specific other entity.
+   */
+  canHear(entity: EntityImpl, target: EntityImpl): boolean {
+    const position = entity.getComponent<PositionComponent>('position');
+    const targetPos = target.getComponent<PositionComponent>('position');
+
+    if (!position || !targetPos) return false;
+
+    const distance = this.distance(position, targetPos);
+    return distance <= this.hearingRange;
+  }
+
+  /**
+   * Get all agents within hearing range.
+   */
+  getAgentsInHearingRange(entity: EntityImpl, world: World): Entity[] {
+    const position = entity.getComponent<PositionComponent>('position');
+    if (!position) return [];
+
+    const agents = world.query().with('agent').with('position').executeEntities();
+
+    return agents.filter((other) => {
+      if (other.id === entity.id) return false;
+
+      const otherPos = (other as EntityImpl).getComponent<PositionComponent>('position');
+      if (!otherPos) return false;
+
+      const distance = this.distance(position, otherPos);
+      return distance <= this.hearingRange;
+    });
+  }
+
+  /**
+   * Calculate distance between two positions.
+   */
+  private distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+}
+
+// ============================================================================
+// Standalone functions for simpler usage
+// ============================================================================
+
+const hearingProcessor = new HearingProcessor();
+
+/**
+ * Process hearing for an entity.
+ */
+export function processHearing(entity: Entity, world: World): HearingResult {
+  return hearingProcessor.process(entity as EntityImpl, world);
+}
+
+/**
+ * Check if entity can hear target.
+ */
+export function canHear(entity: Entity, target: Entity): boolean {
+  return hearingProcessor.canHear(entity as EntityImpl, target as EntityImpl);
+}
+
+/**
+ * Get all agents within hearing range.
+ */
+export function getAgentsInHearingRange(entity: Entity, world: World): Entity[] {
+  return hearingProcessor.getAgentsInHearingRange(entity as EntityImpl, world);
+}
