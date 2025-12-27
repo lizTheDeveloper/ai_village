@@ -252,7 +252,7 @@ describe('SteeringSystem', () => {
 
       expect(() => {
         system.update(world, world.getAllEntities(), 1.0);
-      }).toThrow('Position');
+      }).toThrow(/Position/i);
     });
 
     it('should throw error for missing Velocity component', () => {
@@ -267,7 +267,7 @@ describe('SteeringSystem', () => {
 
       expect(() => {
         system.update(world, world.getAllEntities(), 1.0);
-      }).toThrow('Velocity');
+      }).toThrow(/Velocity/i);
     });
   });
 
@@ -284,6 +284,7 @@ describe('SteeringSystem', () => {
         ],
         maxSpeed: 2.0,
         maxForce: 0.5,
+        lookAheadDistance: 6.0, // Must be > distance to obstacle (5 units)
       });
 
       // Place obstacle

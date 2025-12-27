@@ -340,6 +340,7 @@ export interface GameEventMap {
     buildingId: EntityId;
     buildingType: string;
     entityId?: EntityId;
+    position?: { x: number; y: number };
   };
   'building:destroyed': {
     buildingId: EntityId;
@@ -350,6 +351,8 @@ export interface GameEventMap {
     buildingId: EntityId;
     blueprintId: string;
     entityId?: EntityId;
+    buildingType?: string;
+    position?: { x: number; y: number };
   };
   'construction:gathering_resources': {
     buildingId: EntityId;
@@ -505,6 +508,28 @@ export interface GameEventMap {
     speciesId?: string;
     buildingType?: string;
   };
+  'animal:behavior_changed': {
+    animalId: EntityId;
+    from: string;
+    to: string;
+    reason?: string;
+  };
+  'animal:fleeing': {
+    animalId: EntityId;
+    threatId: EntityId;
+    distanceToThreat: number;
+  };
+  'animal:grazing': {
+    animalId: EntityId;
+    plantId: EntityId;
+    speciesId: string;
+  };
+  'animal:resting': {
+    animalId: EntityId;
+    energyLevel: number;
+    isSleeping: boolean;
+    inHousing: boolean;
+  };
   'animal_spawned': {
     animalId: EntityId;
     speciesId: string;
@@ -528,6 +553,7 @@ export interface GameEventMap {
     animalId: EntityId;
     tamerId: EntityId;
     agentId?: EntityId;
+    method?: string;
   };
   'life_stage_changed': {
     animalId: EntityId;
@@ -538,8 +564,9 @@ export interface GameEventMap {
   'bond_level_changed': {
     animalId: EntityId;
     agentId: EntityId;
-    oldLevel: number;
-    newLevel: number;
+    oldLevel: string | number;
+    newLevel: string | number;
+    bondLevel?: number;
   };
   'product_ready': {
     animalId: EntityId;

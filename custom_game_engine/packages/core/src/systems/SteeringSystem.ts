@@ -3,23 +3,14 @@ import type { SystemId, ComponentType, Position } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
-import type { SteeringBehavior } from '../components/SteeringComponent.js';
+import type { SteeringBehavior, SteeringComponent } from '../components/SteeringComponent.js';
+import type { VelocityComponent } from '../components/VelocityComponent.js';
+import type { PositionComponent } from '../components/PositionComponent.js';
+import { getSteering, getVelocity, getPosition } from '../utils/componentHelpers.js';
+import { setComponentProperties } from '../utils/componentUtils.js';
 
 // Using Position from types.ts for all vector operations
 type Vector2 = Position;
-
-interface SteeringComponent {
-  behavior: SteeringBehavior;
-  maxSpeed: number;
-  maxForce: number;
-  target?: Vector2;
-  wanderAngle?: number;
-}
-
-interface VelocityComponent {
-  vx: number;
-  vy: number;
-}
 
 /**
  * SteeringSystem implements steering behaviors for navigation
@@ -53,25 +44,19 @@ export class SteeringSystem implements System {
 
   private _updateSteering(entity: Entity, world: World, deltaTime: number): void {
     const impl = entity as EntityImpl;
-    // Validate required components
-    if (!impl.hasComponent('position')) {
-      throw new Error('SteeringSystem requires position component');
-    }
-    if (!impl.hasComponent('velocity')) {
-      throw new Error('SteeringSystem requires velocity component');
-    }
 
-    const steering = impl.getComponent('steering') as any as SteeringComponent;
+    // Get typed components using helpers
+    const steering = getSteering(entity);
     if (!steering) {
       throw new Error('Steering component missing');
     }
-    const position = impl.getComponent('position') as any as Vector2;
+    const position = getPosition(entity);
     if (!position) {
-      throw new Error('position component missing');
+      throw new Error('Position component missing');
     }
-    const velocity = impl.getComponent('velocity') as any as VelocityComponent;
+    const velocity = getVelocity(entity);
     if (!velocity) {
-      throw new Error('velocity component missing');
+      throw new Error('Velocity component missing');
     }
 
     // Validate behavior type
@@ -120,16 +105,22 @@ export class SteeringSystem implements System {
     const speed = Math.sqrt(newVx * newVx + newVy * newVy);
     if (speed > steering.maxSpeed) {
       const scale = steering.maxSpeed / speed;
-      impl.updateComponent('velocity', (v: any) => ({ ...v, vx: newVx * scale, vy: newVy * scale }));
+      setComponentProperties<VelocityComponent>(impl, 'velocity', {
+        vx: newVx * scale,
+        vy: newVy * scale,
+      });
     } else {
-      impl.updateComponent('velocity', (v: any) => ({ ...v, vx: newVx, vy: newVy }));
+      setComponentProperties<VelocityComponent>(impl, 'velocity', {
+        vx: newVx,
+        vy: newVy,
+      });
     }
   }
 
   /**
    * Seek behavior - move toward target
    */
-  private _seek(position: any, velocity: any, steering: any): Vector2 {
+  private _seek(position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent): Vector2 {
     if (!steering.target) {
       throw new Error('Seek behavior requires target position');
     }
@@ -158,7 +149,7 @@ export class SteeringSystem implements System {
    * Fixed to prevent jittering/oscillation when reaching target
    * Includes stuck detection for dead-end scenarios
    */
-  private _arrive(position: any, velocity: any, steering: any, entityId?: string): Vector2 {
+  private _arrive(position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent, entityId?: string): Vector2 {
     if (!steering.target) {
       throw new Error('Arrive behavior requires target position');
     }
@@ -206,10 +197,11 @@ export class SteeringSystem implements System {
     }
 
     // Dead zone - prevent micro-adjustments when very close
-    const deadZone = steering.deadZone ?? 0.5;
-    if (distance < deadZone) {
-      // Within dead zone - apply strong braking to stop completely
-      return { x: -velocity.vx * 10, y: -velocity.vy * 10 };
+    if (distance < steering.deadZone) {
+      // Within dead zone - apply proportional braking that decays velocity smoothly
+      // Using velocity dampening instead of hard negative force to prevent oscillation
+      // This returns a force that will zero velocity over ~2-3 frames
+      return { x: -velocity.vx * 2, y: -velocity.vy * 2 };
     }
 
     // Check if already stopped and within tolerance
@@ -249,7 +241,7 @@ export class SteeringSystem implements System {
   /**
    * Obstacle avoidance - check only immediate nearby tiles (simplified for performance)
    */
-  private _avoidObstacles(entity: Entity, position: any, velocity: any, steering: any, world: World): Vector2 {
+  private _avoidObstacles(entity: Entity, position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent, world: World): Vector2 {
     const lookAheadDistance = steering.lookAheadDistance ?? 2.0; // Reduced from 5.0 to 2.0
 
     // Ray-cast ahead
@@ -267,17 +259,17 @@ export class SteeringSystem implements System {
       if (e.id === entity.id) return false;
       if (!e.components.has('collision')) return false;
 
-      const obstaclePos = e.components.get('position');
-      const collision = e.components.get('collision');
+      const obstaclePos = getPosition(e);
+      const collision = e.components.get('collision') as unknown as { radius: number } | undefined;
       if (!obstaclePos || !collision) return false;
 
       // Quick distance check to filter out far obstacles BEFORE detailed checks
-      const quickDist = Math.abs((obstaclePos as any).x - position.x) + Math.abs((obstaclePos as any).y - position.y);
+      const quickDist = Math.abs(obstaclePos.x - position.x) + Math.abs(obstaclePos.y - position.y);
       if (quickDist > checkRadius * 2) return false; // Manhattan distance early exit
 
       // Check if obstacle is in path
-      const dist = this._distance(ahead, obstaclePos as any);
-      return dist <= (collision as any).radius + 1.0;
+      const dist = this._distance(ahead, obstaclePos);
+      return dist <= collision.radius + 1.0;
     });
 
     if (obstacles.length === 0) {
@@ -286,15 +278,15 @@ export class SteeringSystem implements System {
 
     // Find closest obstacle
     const closest = obstacles.reduce((prev: Entity, curr: Entity) => {
-      const prevPos = prev.components.get('position');
-      const currPos = curr.components.get('position');
+      const prevPos = getPosition(prev);
+      const currPos = getPosition(curr);
       if (!prevPos || !currPos) return prev;
-      const prevDist = this._distance(position, prevPos as any);
-      const currDist = this._distance(position, currPos as any);
+      const prevDist = this._distance(position, prevPos);
+      const currDist = this._distance(position, currPos);
       return currDist < prevDist ? curr : prev;
     });
 
-    const obstaclePos = closest.components.get('position');
+    const obstaclePos = getPosition(closest);
     if (!obstaclePos) {
       return { x: 0, y: 0 };
     }
@@ -302,8 +294,8 @@ export class SteeringSystem implements System {
     // Calculate steering force to avoid obstacle
     // Steer perpendicular to current heading to go around obstacle
     const toObstacle = {
-      x: (obstaclePos as any).x - position.x,
-      y: (obstaclePos as any).y - position.y,
+      x: obstaclePos.x - position.x,
+      y: obstaclePos.y - position.y,
     };
 
     // Normalize velocity to get heading
@@ -333,7 +325,7 @@ export class SteeringSystem implements System {
   /**
    * Wander behavior - random but coherent movement
    */
-  private _wander(position: any, velocity: any, steering: any): Vector2 {
+  private _wander(position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent): Vector2 {
     const wanderRadius = steering.wanderRadius ?? 2.0;
     const wanderDistance = steering.wanderDistance ?? 3.0;
     const wanderJitter = steering.wanderJitter ?? 0.1; // Reduced from 0.5 to prevent jittery movement
@@ -372,7 +364,7 @@ export class SteeringSystem implements System {
   /**
    * Combined behaviors - blend multiple steering forces
    */
-  private _combined(entity: Entity, position: any, velocity: any, steering: any, world: World): Vector2 {
+  private _combined(entity: Entity, position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent, world: World): Vector2 {
     if (!steering.behaviors || steering.behaviors.length === 0) {
       return { x: 0, y: 0 };
     }

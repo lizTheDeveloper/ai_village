@@ -42,6 +42,7 @@ import {
   forcedSleepBehavior,
   gatherBehavior,
   depositItemsBehavior,
+  seekFoodBehavior,
   followAgentBehavior,
   talkBehavior,
   callMeetingBehavior,
@@ -135,11 +136,13 @@ export class AgentBrainSystem implements System {
     this.behaviors.register('explore_spiral', exploreSpiralBehavior, { description: 'Spiral exploration pattern' });
     this.behaviors.register('follow_gradient', followGradientBehavior, { description: 'Follow social gradients' });
 
+    // Food/hunger behavior
+    this.behaviors.register('seek_food', seekFoodBehavior, { description: 'Find and eat food' });
+
     // Aliases for backward compatibility
     this.behaviors.register('pick', gatherBehavior, { description: 'Alias for gather' });
     this.behaviors.register('harvest', gatherBehavior, { description: 'Alias for gather' });
     this.behaviors.register('gather_seeds', gatherBehavior, { description: 'Alias for gather' });
-    this.behaviors.register('seek_food', gatherBehavior, { description: 'Alias for gather' });
   }
 
   /**
@@ -166,7 +169,7 @@ export class AgentBrainSystem implements System {
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     for (const entity of entities) {
       const impl = entity as EntityImpl;
-      const agent = impl.getComponent<AgentComponent>('agent');
+      let agent = impl.getComponent<AgentComponent>('agent');
 
       if (!agent) continue;
 
@@ -175,6 +178,9 @@ export class AgentBrainSystem implements System {
 
       // Update last think time
       this.updateThinkTime(impl, world.tick);
+
+      // Re-fetch agent component after updating think time
+      agent = impl.getComponent<AgentComponent>('agent')!;
 
       // Phase 1: Perception
       this.perception.processAll(impl, world);

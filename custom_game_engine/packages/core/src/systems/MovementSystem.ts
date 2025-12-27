@@ -7,6 +7,13 @@ import type { MovementComponent } from '../components/MovementComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { PhysicsComponent } from '../components/PhysicsComponent.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
+import type { VelocityComponent } from '../components/VelocityComponent.js';
+import type { CircadianComponent } from '../components/CircadianComponent.js';
+import type { NeedsComponent } from '../components/NeedsComponent.js';
+
+interface TimeComponent {
+  speedMultiplier?: number;
+}
 
 export class MovementSystem implements System {
   public readonly id: SystemId = 'movement';
@@ -22,7 +29,7 @@ export class MovementSystem implements System {
     let timeSpeedMultiplier = 1.0;
     if (timeEntities.length > 0) {
       const timeEntity = timeEntities[0] as EntityImpl;
-      const timeComp = timeEntity.getComponent('time') as any;
+      const timeComp = timeEntity.getComponent('time') as TimeComponent | undefined;
       if (timeComp && timeComp.speedMultiplier) {
         timeSpeedMultiplier = timeComp.speedMultiplier;
       }
@@ -39,7 +46,7 @@ export class MovementSystem implements System {
       const position = impl.getComponent<PositionComponent>('position')!
 
       // Sync velocity component to movement component (for SteeringSystem integration)
-      const velocity = impl.getComponent('velocity') as any;
+      const velocity = impl.getComponent<VelocityComponent>('velocity');
       if (velocity && (velocity.vx !== undefined || velocity.vy !== undefined)) {
         impl.updateComponent<MovementComponent>('movement', (current) => ({
           ...current,
@@ -52,7 +59,7 @@ export class MovementSystem implements System {
       }
 
       // Skip if sleeping - agents cannot move while asleep
-      const circadian = impl.getComponent('circadian') as any;
+      const circadian = impl.getComponent<CircadianComponent>('circadian');
       if (circadian && circadian.isSleeping) {
         // Force velocity to 0 while sleeping
         if (movement.velocityX !== 0 || movement.velocityY !== 0) {
@@ -61,6 +68,14 @@ export class MovementSystem implements System {
             velocityX: 0,
             velocityY: 0,
           }));
+          // Also sync to VelocityComponent
+          if (velocity) {
+            impl.updateComponent<VelocityComponent>('velocity', (current) => ({
+              ...current,
+              vx: 0,
+              vy: 0,
+            }));
+          }
         }
         continue;
       }
@@ -72,7 +87,7 @@ export class MovementSystem implements System {
 
       // Apply fatigue penalty based on energy level
       let speedMultiplier = 1.0;
-      const needs = impl.getComponent('needs') as any;
+      const needs = impl.getComponent<NeedsComponent>('needs');
       if (needs && needs.energy !== undefined) {
         const energy = needs.energy;
 
@@ -155,6 +170,15 @@ export class MovementSystem implements System {
             velocityX: 0,
             velocityY: 0,
           }));
+          // Also sync back to VelocityComponent to prevent SteeringSystem from
+          // restoring the old velocity on the next frame
+          if (velocity) {
+            impl.updateComponent<VelocityComponent>('velocity', (current) => ({
+              ...current,
+              vx: 0,
+              vy: 0,
+            }));
+          }
         }
       }
     }
