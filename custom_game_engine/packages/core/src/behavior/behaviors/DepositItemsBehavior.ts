@@ -19,6 +19,9 @@ import {
   addToInventory,
   removeFromInventory,
   isResourceType,
+  isSeedType,
+  isFoodType,
+  isValidItemType,
   getResourceWeight,
 } from '../../components/InventoryComponent.js';
 
@@ -176,11 +179,18 @@ export class DepositItemsBehavior extends BaseBehavior {
       const itemId = slot.itemId;
       const quantityToTransfer = slot.quantity;
 
-      // Check if it's a resource type
-      if (!isResourceType(itemId)) continue;
+      // Check if item can be deposited
+      if (!isValidItemType(itemId)) continue;
 
-      // Calculate how much can fit in storage
-      const unitWeight = getResourceWeight(itemId as any);
+      // Calculate how much can fit in storage based on item type
+      let unitWeight = 1.0;
+      if (isResourceType(itemId)) {
+        unitWeight = getResourceWeight(itemId as any);
+      } else if (isSeedType(itemId)) {
+        unitWeight = 0.1; // Seeds are light
+      } else if (isFoodType(itemId)) {
+        unitWeight = 0.5; // Food is moderate weight
+      }
       const availableWeight = storageInv.maxWeight - storageInv.currentWeight;
       const maxByWeight = Math.floor(availableWeight / unitWeight);
       const amountToTransfer = Math.min(quantityToTransfer, maxByWeight);
@@ -243,8 +253,25 @@ export class DepositItemsBehavior extends BaseBehavior {
     storageEntity: EntityImpl,
     world: World,
     itemsDeposited: Array<{ itemId: string; amount: number }>,
-    _agent: AgentComponent
+    agent: AgentComponent
   ): void {
+    // Check if remaining items are even depositable
+    const inventory = entity.getComponent<InventoryComponent>('inventory')!;
+    const hasDepositableItems = inventory.slots.some(slot => {
+      if (!slot.itemId || slot.quantity === 0) return false;
+      return isValidItemType(slot.itemId);
+    });
+
+    if (!hasDepositableItems) {
+      // Remaining items can't be deposited (unknown types) - give up and return to previous behavior
+      console.log(`[DepositItemsBehavior] Agent ${entity.id} has non-depositable items, giving up`);
+      const previousBehavior = agent.behaviorState?.previousBehavior as AgentBehavior | undefined;
+      const previousState = agent.behaviorState?.previousState as Record<string, unknown> | undefined;
+      this.switchTo(entity, previousBehavior || 'wander', previousState || {});
+      this.stopAllMovement(entity);
+      return;
+    }
+
     if (itemsDeposited.length === 0) {
       // Storage was completely full, couldn't deposit anything
       world.eventBus.emit({

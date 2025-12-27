@@ -13,11 +13,9 @@ import type { World } from '../../ecs/World.js';
 import type { InventoryComponent } from '../../components/InventoryComponent.js';
 import type { NeedsComponent } from '../../components/NeedsComponent.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
+import { isFoodType } from '../../components/InventoryComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { GatherBehavior } from './GatherBehavior.js';
-
-/** Food types that can be eaten */
-const FOOD_TYPES = ['berry', 'wheat', 'food', 'apple', 'carrot', 'bread', 'cooked_meat'];
 
 /** Hunger restored per food item */
 const HUNGER_RESTORED = 25;
@@ -76,7 +74,7 @@ export class SeekFoodBehavior extends BaseBehavior {
   private findFoodInInventory(inventory: InventoryComponent): { slotIndex: number; itemId: string; quantity: number } | null {
     for (let i = 0; i < inventory.slots.length; i++) {
       const slot = inventory.slots[i];
-      if (slot && slot.itemId && slot.quantity > 0 && FOOD_TYPES.includes(slot.itemId)) {
+      if (slot && slot.itemId && slot.quantity > 0 && isFoodType(slot.itemId)) {
         return { slotIndex: i, itemId: slot.itemId, quantity: slot.quantity };
       }
     }

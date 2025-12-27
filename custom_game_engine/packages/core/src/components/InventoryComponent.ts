@@ -160,10 +160,29 @@ export function isResourceType(itemId: string): boolean {
 }
 
 /**
+ * Food items that can be eaten and stored
+ */
+const FOOD_ITEMS = ['berry', 'wheat', 'apple', 'carrot', 'bread', 'cooked_meat', 'raw_meat'];
+
+/**
+ * Check if a string is a food item type.
+ */
+export function isFoodType(itemId: string): boolean {
+  return FOOD_ITEMS.includes(itemId);
+}
+
+/**
  * Check if a string is a seed item ID (format: "seed:{speciesId}")
  */
 export function isSeedType(itemId: string): boolean {
   return itemId.startsWith('seed:');
+}
+
+/**
+ * Check if an item type is valid for inventory operations.
+ */
+export function isValidItemType(itemId: string): boolean {
+  return isResourceType(itemId) || isSeedType(itemId) || isFoodType(itemId);
 }
 
 /**
@@ -207,8 +226,12 @@ export function addToInventory(
     // Seeds are lightweight and stack well
     unitWeight = 0.1; // 0.1 units per seed
     stackSize = 100; // 100 seeds per stack
+  } else if (isFoodType(itemId)) {
+    // Food items - moderate weight, stackable
+    unitWeight = 0.5; // 0.5 units per food item
+    stackSize = 50; // 50 food items per stack
   } else {
-    throw new Error(`Unknown item type: ${itemId}. Supported: resources, seeds (seed:speciesId).`);
+    throw new Error(`Unknown item type: ${itemId}. Supported: resources, seeds (seed:speciesId), food.`);
   }
 
   // Calculate how much we can actually add
@@ -300,7 +323,7 @@ export function removeFromInventory(
   }
 
   // Validate item type exists (weight calculation happens in calculateInventoryWeight)
-  if (!isResourceType(itemId) && !isSeedType(itemId)) {
+  if (!isValidItemType(itemId)) {
     throw new Error(`Unknown item type for removal: ${itemId}`);
   }
 
