@@ -1,6 +1,6 @@
 import {
   GameLoop,
-  AISystem,
+  AgentBrainSystem,
   MovementSystem,
   NeedsSystem,
   MemorySystem,
@@ -13,6 +13,7 @@ import {
   ResourceGatheringSystem,
   SeedGatheringSystem,
   BuildingBlueprintRegistry,
+  registerShopBlueprints,
   PlacementValidator,
   TemperatureSystem,
   WeatherSystem,
@@ -25,7 +26,9 @@ import {
   AnimalProductionSystem,
   TamingSystem,
   WildAnimalSpawningSystem,
+  AnimalBrainSystem,
   TillActionHandler,
+  PlantActionHandler,
   GatherSeedsActionHandler,
   HarvestActionHandler,
   createTimeComponent,
@@ -46,6 +49,19 @@ import {
   SocialGradientSystem,
   BeliefFormationSystem,
   SpatialMemoryQuerySystem,
+  // Crafting systems (Phase 10)
+  CraftingSystem,
+  initializeDefaultRecipes,
+  globalRecipeRegistry,
+  // Trading system (Phase 12.7)
+  TradingSystem,
+  // Market Events system (Phase 12.8)
+  MarketEventSystem,
+  // Phase 13: Research & Discovery
+  ResearchSystem,
+  registerDefaultResearch,
+  // Metrics Collection System (with streaming support)
+  MetricsCollectionSystem,
 } from '@ai-village/core';
 import {
   Renderer,
@@ -59,19 +75,28 @@ import {
   ResourcesPanel,
   SettingsPanel,
   MemoryPanel,
+  RelationshipsPanel,
+  NotificationsPanel,
   InventoryUI,
   CraftingPanelUI,
+  ControlsPanel,
+  EconomyPanel,
   WindowManager,
   MenuBar,
   AgentInfoPanelAdapter,
   AnimalInfoPanelAdapter,
   PlantInfoPanelAdapter,
   MemoryPanelAdapter,
+  RelationshipsPanelAdapter,
   ResourcesPanelAdapter,
   SettingsPanelAdapter,
   TileInspectorPanelAdapter,
   InventoryUIAdapter,
   CraftingPanelUIAdapter,
+  NotificationsPanelAdapter,
+  EconomyPanelAdapter,
+  ShopPanel,
+  ShopPanelAdapter,
 } from '@ai-village/renderer';
 import {
   OllamaProvider,
@@ -79,6 +104,7 @@ import {
   LLMDecisionQueue,
   StructuredPromptBuilder,
   LoadBalancingProvider,
+  promptLogger,
   type LLMProvider,
 } from '@ai-village/llm';
 import { TerrainGenerator, ChunkManager, createLLMAgent, createBerryBush } from '@ai-village/world';
@@ -105,7 +131,6 @@ function createInitialBuildings(world: WorldMutator) {
   campfireEntity.addComponent(createPositionComponent(-3, -3));
   campfireEntity.addComponent(createRenderableComponent('campfire', 'object')); // Make it visible
   (world as any)._addEntity(campfireEntity);
-  console.log(`Created campfire at (-3, -3) - Entity ${campfireEntity.id}`);
 
   // Create a completed tent (provides shelter)
   // Position: Near campfire (3, -3)
@@ -114,7 +139,6 @@ function createInitialBuildings(world: WorldMutator) {
   tentEntity.addComponent(createPositionComponent(3, -3));
   tentEntity.addComponent(createRenderableComponent('tent', 'object')); // Make it visible
   (world as any)._addEntity(tentEntity);
-  console.log(`Created tent at (3, -3) - Entity ${tentEntity.id}`);
 
   // Create a completed storage-chest for agents to deposit items
   // Position: Near village (0, -5)
@@ -127,7 +151,6 @@ function createInitialBuildings(world: WorldMutator) {
   storageInventory.slots[0] = { itemId: 'wood', quantity: 50 };
   storageEntity.addComponent(storageInventory);
   (world as any)._addEntity(storageEntity);
-  console.log(`Created storage-chest (100% complete) at (0, -5) with 50 wood - Entity ${storageEntity.id}`);
 
   // Create a building under construction (50% complete) for testing construction
   // Position: West of village (-8, 0)
@@ -137,7 +160,6 @@ function createInitialBuildings(world: WorldMutator) {
   constructionEntity.addComponent(createRenderableComponent('storage-box', 'object')); // Make it visible
   constructionEntity.addComponent(createInventoryComponent(10, 200)); // Storage box: 10 slots, 200 weight
   (world as any)._addEntity(constructionEntity);
-  console.log(`Created storage-box (50% complete) at (-8, 0) - Entity ${constructionEntity.id}`);
 }
 
 /**
@@ -150,11 +172,6 @@ function createInitialAgents(world: WorldMutator, dungeonMasterPrompt?: string) 
   const centerY = 0;
   const spread = 2; // Spread agents in a small area
 
-  console.log(`Creating ${agentCount} agents in a cluster around (${centerX}, ${centerY})...`);
-  if (dungeonMasterPrompt) {
-    console.log(`📜 DM Prompt: "${dungeonMasterPrompt}"`);
-  }
-
   const agentIds: string[] = [];
 
   for (let i = 0; i < agentCount; i++) {
@@ -166,10 +183,7 @@ function createInitialAgents(world: WorldMutator, dungeonMasterPrompt?: string) 
 
     const agentId = createLLMAgent(world, x, y, 2.0, dungeonMasterPrompt);
     agentIds.push(agentId);
-    console.log(`Created agent ${i + 1}/${agentCount}: ${agentId} at (${x.toFixed(1)}, ${y.toFixed(1)})`);
   }
-
-  console.log(`Created ${agentCount} LLM agents`);
 
   // Choose one random agent to be the leader
   const leaderIndex = Math.floor(Math.random() * agentIds.length);
@@ -186,15 +200,6 @@ function createInitialAgents(world: WorldMutator, dungeonMasterPrompt?: string) 
         extraversion: Math.max(p.extraversion, 75), // Leaders tend to be more social
         conscientiousness: Math.max(p.conscientiousness, 70), // Leaders tend to be organized
       }));
-
-      console.log(`\n🌟 Agent ${leaderId} has been chosen as the LEADER! 🌟`);
-      console.log(`Leadership trait: 95/100`);
-
-      // Get the agent's identity to log their name
-      const identity = leaderEntity.getComponent('identity') as any;
-      if (identity) {
-        console.log(`Leader's name: ${identity.name}\n`);
-      }
     }
   }
 }
@@ -209,7 +214,6 @@ async function createInitialPlants(world: WorldMutator) {
   const { getWildSpawnableSpecies } = await import('@ai-village/world');
 
   const wildSpecies = getWildSpawnableSpecies();
-  console.log(`Creating initial wild plants from ${wildSpecies.length} species...`);
 
   // Spawn 20-30 wild plants scattered across the terrain
   const plantCount = 25;
@@ -294,11 +298,7 @@ async function createInitialPlants(world: WorldMutator) {
     plantEntity.addComponent(createPositionComponent(x, y));
     plantEntity.addComponent(createRenderableComponent(species.id, 'plant'));
     (world as any)._addEntity(plantEntity);
-
-    console.log(`Created ${species.name} (${stage}, progress=${(stageProgress * 100).toFixed(0)}%) at (${x.toFixed(1)}, ${y.toFixed(1)}) - Entity ${plantEntity.id} - seedsProduced=${plantComponent.seedsProduced}, fruitCount=${plantComponent.fruitCount}`);
   }
-
-  console.log(`Created ${plantCount} wild plants`);
 }
 
 /**
@@ -307,8 +307,6 @@ async function createInitialPlants(world: WorldMutator) {
  * This function is called during demo initialization, not during normal chunk generation.
  */
 async function createInitialAnimals(world: WorldMutator, spawningSystem: WildAnimalSpawningSystem) {
-  console.log('Spawning initial wild animals near origin for visibility...');
-
   // Spawn animals close to the origin (0, 0) where agents and camera start
   // This ensures they are visible immediately when the game loads
   const animalsToSpawn = [
@@ -318,18 +316,13 @@ async function createInitialAnimals(world: WorldMutator, spawningSystem: WildAni
     { species: 'rabbit', position: { x: -3, y: -4 } },
   ];
 
-  let totalAnimals = 0;
   for (const animalData of animalsToSpawn) {
     try {
-      const entity = spawningSystem.spawnSpecificAnimal(world, animalData.species, animalData.position);
-      totalAnimals++;
-      console.log(`Spawned ${animalData.species} at (${animalData.position.x}, ${animalData.position.y})`);
+      spawningSystem.spawnSpecificAnimal(world, animalData.species, animalData.position);
     } catch (error) {
       console.error(`Failed to spawn ${animalData.species}:`, error);
     }
   }
-
-  console.log(`Created ${totalAnimals} wild animals near origin`);
 }
 
 // Helper functions for time manipulation (duplicated from TimeSystem for debug controls)
@@ -362,8 +355,6 @@ function calculateLightLevel(timeOfDay: number, phase: DayPhase): number {
 }
 
 async function main() {
-  console.log('AI Village - Phase 10 Demo (Sleep & Circadian Rhythm)');
-
   const statusEl = document.getElementById('status');
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 
@@ -379,14 +370,10 @@ async function main() {
 
   // If this is the first run (no DM prompt set), show settings and wait
   if (settingsPanel.getIsFirstRun()) {
-    console.log('[Main] 🎮 Welcome to AI Village!');
-    console.log('[Main] 📜 Please select a scenario to begin...');
-
     // Show settings modal and wait for configuration
     await new Promise<void>((resolve) => {
       const originalCallback = settingsPanel['onSettingsChange'];
       settingsPanel.setOnSettingsChange((newSettings) => {
-        console.log('[Main] ✅ Settings configured, starting game...');
         // Restore original callback for subsequent changes
         if (originalCallback) {
           settingsPanel.setOnSettingsChange(originalCallback);
@@ -407,10 +394,8 @@ async function main() {
       settings.llm.baseUrl,
       settings.llm.apiKey
     );
-    console.log('[DEMO] Using OpenAI-compatible provider:', settings.llm.baseUrl, settings.llm.model);
   } else {
     llmProvider = new OllamaProvider(settings.llm.model, settings.llm.baseUrl);
-    console.log('[DEMO] Using Ollama native provider:', settings.llm.baseUrl, settings.llm.model);
   }
 
   // Check if provider is available before creating queue
@@ -419,7 +404,6 @@ async function main() {
   let promptBuilder: StructuredPromptBuilder | null = null;
 
   if (isLLMAvailable) {
-    console.log('[DEMO] LLM provider available - agents will use LLM decisions');
     // Use maxConcurrent=1 for turn-based conversation (prevents rate limiting and allows agents to hear each other's responses)
     llmQueue = new LLMDecisionQueue(llmProvider, 1);
     promptBuilder = new StructuredPromptBuilder();
@@ -430,8 +414,6 @@ async function main() {
 
   // Handle settings changes (requires page reload for clean state)
   settingsPanel.setOnSettingsChange((newSettings) => {
-    console.log('[DEMO] Settings changed:', newSettings);
-    console.log('[DEMO] Reloading page to apply new LLM settings...');
     window.location.reload();
   });
 
@@ -444,6 +426,7 @@ async function main() {
 
   // Register action handlers
   gameLoop.actionRegistry.register(new TillActionHandler(soilSystemInstance));
+  gameLoop.actionRegistry.register(new PlantActionHandler());
   gameLoop.actionRegistry.register(new GatherSeedsActionHandler());
   gameLoop.actionRegistry.register(new HarvestActionHandler());
 
@@ -454,12 +437,15 @@ async function main() {
   gameLoop.systemRegistry.register(plantSystem);
 
   // Register Animal systems (after environment systems, before AI)
+  // AnimalBrainSystem handles behavior execution (priority 12)
+  // AnimalSystem handles needs/lifecycle (priority 15)
+  gameLoop.systemRegistry.register(new AnimalBrainSystem());
   gameLoop.systemRegistry.register(new AnimalSystem(gameLoop.world.eventBus));
   gameLoop.systemRegistry.register(new AnimalProductionSystem(gameLoop.world.eventBus));
   const wildAnimalSpawning = new WildAnimalSpawningSystem();
   gameLoop.systemRegistry.register(wildAnimalSpawning);
 
-  gameLoop.systemRegistry.register(new AISystem(llmQueue, promptBuilder));
+  gameLoop.systemRegistry.register(new AgentBrainSystem(llmQueue, promptBuilder));
   // Navigation & Exploration systems (after AI, before Movement)
   gameLoop.systemRegistry.register(new SocialGradientSystem());
   gameLoop.systemRegistry.register(new ExplorationSystem());
@@ -470,7 +456,32 @@ async function main() {
   gameLoop.systemRegistry.register(new SleepSystem());
   gameLoop.systemRegistry.register(new TamingSystem());
   gameLoop.systemRegistry.register(new BuildingSystem());
-  gameLoop.systemRegistry.register(new ResourceGatheringSystem());
+
+  // Initialize crafting system with recipes (Phase 10)
+  initializeDefaultRecipes(globalRecipeRegistry);
+  const craftingSystem = new CraftingSystem();
+  craftingSystem.setRecipeRegistry(globalRecipeRegistry);
+  gameLoop.systemRegistry.register(craftingSystem);
+  // Make crafting system accessible on world for behaviors
+  (gameLoop.world as any).craftingSystem = craftingSystem;
+
+  // Register TradingSystem (Phase 12.7)
+  const tradingSystem = new TradingSystem();
+  gameLoop.systemRegistry.register(tradingSystem);
+
+  // Register MarketEventSystem (Phase 12.8)
+  const marketEventSystem = new MarketEventSystem(gameLoop.world.eventBus);
+  gameLoop.systemRegistry.register(marketEventSystem);
+  // Make market event system accessible for trading system integration
+  (gameLoop.world as any).marketEventSystem = marketEventSystem;
+
+  // Register ResearchSystem (Phase 13)
+  const researchSystem = new ResearchSystem();
+  gameLoop.systemRegistry.register(researchSystem);
+  // Initialize default research tech tree
+  registerDefaultResearch();
+
+  gameLoop.systemRegistry.register(new ResourceGatheringSystem(gameLoop.world.eventBus));
 
   // Register SeedGatheringSystem and inject species data
   const seedGatheringSystem = new SeedGatheringSystem();
@@ -491,6 +502,19 @@ async function main() {
   gameLoop.systemRegistry.register(new BeliefFormationSystem());
   gameLoop.systemRegistry.register(new ReflectionSystem(gameLoop.world.eventBus));
   gameLoop.systemRegistry.register(new JournalingSystem(gameLoop.world.eventBus));
+
+  // Metrics Collection System with streaming to metrics server
+  // Start the metrics server with: npm run metrics-server
+  const metricsSystem = new MetricsCollectionSystem(gameLoop.world, {
+    enabled: true,
+    streaming: true,
+    streamConfig: {
+      serverUrl: 'ws://localhost:8765',
+      batchSize: 10,
+      flushInterval: 5000,
+    },
+  });
+  gameLoop.systemRegistry.register(metricsSystem);
 
   // Create renderer
   const renderer = new Renderer(canvas);
@@ -514,7 +538,6 @@ async function main() {
         enabled ? '🌡️ Temperature overlay ON' : '🌡️ Temperature overlay OFF',
         '#4FC3F7'
       );
-      console.log(`[Debug] Temperature overlay ${enabled ? 'enabled' : 'disabled'}`);
       return true;
     },
   });
@@ -525,6 +548,9 @@ async function main() {
   blueprintRegistry.registerTier2Stations(); // Phase 10: Crafting Stations
   blueprintRegistry.registerTier3Stations(); // Phase 10: Advanced Crafting Stations
   blueprintRegistry.registerExampleBuildings(); // Examples for all 8 categories and 8 functions
+  registerShopBlueprints(blueprintRegistry); // Phase 12.4: Shop Buildings
+  // Make building registry accessible on world for behaviors (BuildBehavior needs this)
+  (gameLoop.world as any).buildingRegistry = blueprintRegistry;
 
   const placementValidator = new PlacementValidator();
 
@@ -538,6 +564,35 @@ async function main() {
   // Create agent info panel
   const agentInfoPanel = new AgentInfoPanel();
 
+  // Set up reset priorities callback
+  agentInfoPanel.setOnResetPriorities((entityId: string) => {
+    const entity = gameLoop.world.getEntity(entityId);
+    if (!entity) {
+      console.warn('[Main] Cannot reset priorities: entity not found', entityId);
+      return;
+    }
+
+    const entityImpl = entity as EntityImpl;
+    const agent = entityImpl.getComponent('agent');
+    if (!agent) {
+      console.warn('[Main] Cannot reset priorities: no agent component', entityId);
+      return;
+    }
+
+    // Reset all priorities to default balanced values
+    entityImpl.updateComponent('agent', (current: any) => ({
+      ...current,
+      priorities: {
+        gathering: 0.2,
+        building: 0.2,
+        farming: 0.2,
+        social: 0.2,
+        exploration: 0.2,
+        rest: 0.2,
+      },
+    }));
+  });
+
   // Create animal info panel
   const animalInfoPanel = new AnimalInfoPanel();
 
@@ -550,6 +605,18 @@ async function main() {
   // Create memory panel (M to toggle) - for playtesting Phase 10 episodic memory
   const memoryPanel = new MemoryPanel();
 
+  // Create relationships panel (R to toggle) - social relationships and trust
+  const relationshipsPanel = new RelationshipsPanel();
+
+  // Create notifications panel (N to toggle) - persistent notifications log
+  const notificationsPanel = new NotificationsPanel();
+
+  // Create economy panel (E to toggle) - economy dashboard
+  const economyPanel = new EconomyPanel();
+
+  // Create shop panel (Phase 12.7) - trading interface
+  const shopPanel = new ShopPanel();
+
   // Create inventory UI (I or Tab to toggle) - Phase 10 full-featured inventory
   const inventoryUI = new InventoryUI(canvas, gameLoop.world);
 
@@ -557,7 +624,6 @@ async function main() {
   const craftingUI = new CraftingPanelUI(gameLoop.world, canvas);
 
   // Generate terrain with trees and rocks first (so we can create tile inspector)
-  console.log('Generating terrain...');
   const terrainGenerator = new TerrainGenerator('phase8-demo');
   const chunkManager = new ChunkManager(3); // Load 3 chunks in each direction
 
@@ -569,13 +635,11 @@ async function main() {
       terrainGenerator.generateChunk(chunk, gameLoop.world as WorldMutator);
     }
   }
-  console.log('Terrain generation complete - trees and rocks placed');
 
   // Set chunk manager and terrain generator on world so getTileAt can access tiles
   // This fixes the tile lookup failure in ActionQueue validation
   (gameLoop.world as any).setChunkManager(chunkManager);
   (gameLoop.world as any).setTerrainGenerator(terrainGenerator);
-  console.log('ChunkManager and TerrainGenerator registered with World for tile access');
 
   // Create tile inspector panel (now that chunkManager exists)
   const tileInspectorPanel = new TileInspectorPanel(
@@ -587,7 +651,6 @@ async function main() {
 
   // ===== WINDOW MANAGER SETUP =====
   // Create WindowManager to manage all UI panels
-  console.log('[Main] Setting up WindowManager...');
   const windowManager = new WindowManager(canvas);
 
   // Create MenuBar for window management
@@ -598,26 +661,39 @@ async function main() {
   const animalInfoAdapter = new AnimalInfoPanelAdapter(animalInfoPanel);
   const plantInfoAdapter = new PlantInfoPanelAdapter(plantInfoPanel);
   const memoryAdapter = new MemoryPanelAdapter(memoryPanel);
+  const relationshipsAdapter = new RelationshipsPanelAdapter(relationshipsPanel);
   const resourcesAdapter = new ResourcesPanelAdapter(resourcesPanel);
+  const notificationsAdapter = new NotificationsPanelAdapter(notificationsPanel);
+  const economyAdapter = new EconomyPanelAdapter(economyPanel);
+  const shopAdapter = new ShopPanelAdapter(shopPanel);
   const settingsAdapter = new SettingsPanelAdapter(settingsPanel);
   const tileInspectorAdapter = new TileInspectorPanelAdapter(tileInspectorPanel);
   const inventoryAdapter = new InventoryUIAdapter(inventoryUI);
   const craftingAdapter = new CraftingPanelUIAdapter(craftingUI);
 
-  // Register windows with default positions
-  // Top-right zone: Agent/Animal/Plant Info (context-sensitive)
+  // Get CSS/logical dimensions (not physical canvas pixels which include DPI scaling)
+  const canvasRect = canvas.getBoundingClientRect();
+  const logicalWidth = canvasRect.width;
+  const logicalHeight = canvasRect.height;
+
+  // Initialize WindowManager with logical dimensions (fixes DPI mismatch)
+  windowManager.handleCanvasResize(logicalWidth, logicalHeight);
+
+  // Register windows with default positions using logical coordinates
+  // Top-left zone: Agent Info (context-sensitive, shown when agent selected)
   windowManager.registerWindow('agent-info', agentInfoAdapter, {
-    defaultX: canvas.width - 320,
+    defaultX: 10,
     defaultY: 10,
-    defaultWidth: 300,
-    defaultHeight: 500,
+    defaultWidth: 360,
+    defaultHeight: 530,
     isDraggable: true,
     showInWindowList: true,
     keyboardShortcut: 'A',
   });
 
+  // Top-right zone: Animal Info (context-sensitive, shown when animal selected)
   windowManager.registerWindow('animal-info', animalInfoAdapter, {
-    defaultX: canvas.width - 320,
+    defaultX: logicalWidth - 320,
     defaultY: 10,
     defaultWidth: 300,
     defaultHeight: 400,
@@ -625,18 +701,19 @@ async function main() {
     showInWindowList: true,
   });
 
+  // Top-right zone: Plant Info (context-sensitive, shown when plant selected)
   windowManager.registerWindow('plant-info', plantInfoAdapter, {
-    defaultX: canvas.width - 320,
-    defaultY: 10,
-    defaultWidth: 300,
-    defaultHeight: 350,
+    defaultX: logicalWidth - 340,
+    defaultY: 50,
+    defaultWidth: 320,
+    defaultHeight: 480,
     isDraggable: true,
     showInWindowList: true,
   });
 
   // Top-right zone: Resources Panel
   windowManager.registerWindow('resources', resourcesAdapter, {
-    defaultX: canvas.width - 260,
+    defaultX: logicalWidth - 260,
     defaultY: 10,
     defaultWidth: 250,
     defaultHeight: 200,
@@ -648,7 +725,7 @@ async function main() {
   // Bottom-left zone: Memory Panel
   windowManager.registerWindow('memory', memoryAdapter, {
     defaultX: 10,
-    defaultY: canvas.height - 610,
+    defaultY: logicalHeight - 610,
     defaultWidth: 400,
     defaultHeight: 600,
     isDraggable: true,
@@ -656,10 +733,21 @@ async function main() {
     keyboardShortcut: 'M',
   });
 
+  // Relationships Panel (next to memory panel)
+  windowManager.registerWindow('relationships', relationshipsAdapter, {
+    defaultX: 420,
+    defaultY: logicalHeight - 510,
+    defaultWidth: 380,
+    defaultHeight: 500,
+    isDraggable: true,
+    showInWindowList: true,
+    keyboardShortcut: 'L',
+  });
+
   // Bottom-right zone: Tile Inspector Panel
   windowManager.registerWindow('tile-inspector', tileInspectorAdapter, {
-    defaultX: canvas.width - 320,
-    defaultY: canvas.height - 410,
+    defaultX: logicalWidth - 320,
+    defaultY: logicalHeight - 410,
     defaultWidth: 300,
     defaultHeight: 400,
     isDraggable: true,
@@ -671,8 +759,8 @@ async function main() {
   windowManager.registerWindow('inventory', inventoryAdapter, {
     defaultX: 100,
     defaultY: 50,
-    defaultWidth: canvas.width - 200,
-    defaultHeight: canvas.height - 100,
+    defaultWidth: logicalWidth - 200,
+    defaultHeight: logicalHeight - 100,
     isDraggable: true,
     isModal: true,
     showInWindowList: true,
@@ -703,6 +791,51 @@ async function main() {
     keyboardShortcut: 'C',
   });
 
+  // Bottom-right: Notifications Panel (persistent notification log)
+  windowManager.registerWindow('notifications', notificationsAdapter, {
+    defaultX: logicalWidth - 420,
+    defaultY: logicalHeight - 350,
+    defaultWidth: 400,
+    defaultHeight: 300,
+    isDraggable: true,
+    showInWindowList: true,
+    keyboardShortcut: 'N',
+  });
+
+  // Economy Panel (E to toggle) - market and economy dashboard
+  windowManager.registerWindow('economy', economyAdapter, {
+    defaultX: logicalWidth - 420,
+    defaultY: logicalHeight - 520,
+    defaultWidth: 400,
+    defaultHeight: 500,
+    isDraggable: true,
+    showInWindowList: true,
+    keyboardShortcut: 'E',
+  });
+
+  // Shop Panel (Phase 12.7) - trading interface (modal, centered)
+  windowManager.registerWindow('shop', shopAdapter, {
+    defaultX: (logicalWidth - 500) / 2,
+    defaultY: (logicalHeight - 600) / 2,
+    defaultWidth: 500,
+    defaultHeight: 600,
+    isDraggable: false,
+    isModal: true,
+    showInWindowList: false, // Opened on demand when clicking shops
+  });
+
+  // Controls/Help Panel - shows all keybindings
+  const controlsPanel = new ControlsPanel(windowManager);
+  windowManager.registerWindow('controls', controlsPanel, {
+    defaultX: 10,
+    defaultY: 50,
+    defaultWidth: 300,
+    defaultHeight: 500,
+    isDraggable: true,
+    showInWindowList: true,
+    keyboardShortcut: 'H',
+  });
+
   // Load saved window positions from localStorage
   windowManager.loadLayout();
 
@@ -721,8 +854,6 @@ async function main() {
     const rect = canvas.getBoundingClientRect();
     windowManager.handleCanvasResize(rect.width, rect.height);
   });
-
-  console.log('[Main] WindowManager setup complete - 9 windows registered');
 
   // Get SoilSystem instance to handle tile actions
   const soilSystem = gameLoop.systemRegistry
@@ -757,8 +888,6 @@ async function main() {
   let notificationTimeout: number | null = null;
 
   function showNotification(message: string, color: string = '#FFFFFF') {
-    console.log(`[showNotification] Called with message="${message}", color=${color}`);
-
     // Clear any existing timeout to prevent flickering
     if (notificationTimeout !== null) {
       clearTimeout(notificationTimeout);
@@ -784,10 +913,7 @@ async function main() {
     // Show error notifications longer (3s), success notifications normal duration (2s)
     const duration = color === '#FF0000' ? 3000 : 2000;
 
-    console.log(`[showNotification] Notification will hide after ${duration}ms`);
-
     notificationTimeout = window.setTimeout(() => {
-      console.log(`[showNotification] Hiding notification after timeout`);
       notificationEl.style.display = 'none';
       notificationTimeout = null;
     }, duration);
@@ -795,7 +921,6 @@ async function main() {
 
   gameLoop.world.eventBus.subscribe('action:till', (event: any) => {
     const { x, y, agentId: requestedAgentId } = event.data;
-    console.log(`[Main] Received till action request at (${x}, ${y})${requestedAgentId ? ` from agent ${requestedAgentId.slice(0,8)}` : ''}`);
 
     // Constant for max tilling distance (must be adjacent: distance ≤ √2 ≈ 1.414)
     const MAX_TILL_DISTANCE = Math.sqrt(2);
@@ -827,7 +952,6 @@ async function main() {
       if (nearestAgent) {
         agentId = nearestAgent.id;
         agentDistance = nearestDistance;
-        console.log(`[Main] No agent selected, using nearest agent ${agentId.slice(0, 8)} (distance: ${nearestDistance.toFixed(1)})`);
       } else {
         console.error(`[Main] Cannot till - no agents available`);
         showNotification('No agent available to till', '#FF0000');
@@ -863,7 +987,6 @@ async function main() {
 
     // Generate chunk if needed (ensures biome data exists)
     if (!chunk.generated) {
-      console.log(`[Main] Generating terrain for chunk (${chunkX}, ${chunkY}) before tilling`);
       terrainGenerator.generateChunk(chunk, gameLoop.world as any);
     }
 
@@ -889,8 +1012,6 @@ async function main() {
     if (distance > MAX_TILL_DISTANCE) {
       // Agent is too far - TELEPORT them to an adjacent tile
       // This avoids pathfinding issues and ensures tilling always works
-      console.log(`[Main] Agent is ${distance.toFixed(2)} tiles away from target (max: ${MAX_TILL_DISTANCE.toFixed(2)})`);
-      console.log(`[Main] Teleporting agent from (${agentPos.x}, ${agentPos.y}) to adjacent position near (${x}, ${y})`);
 
       // Find best adjacent position (closest to agent's current position)
       const adjacentOffsets = [
@@ -920,8 +1041,6 @@ async function main() {
         }
       }
 
-      console.log(`[Main] Teleporting agent to (${bestPos.x}, ${bestPos.y}) before tilling`);
-
       // Teleport agent to adjacent position (update position directly)
       const newChunkX = Math.floor(bestPos.x / 32);
       const newChunkY = Math.floor(bestPos.y / 32);
@@ -943,7 +1062,6 @@ async function main() {
         isMoving: false,
       }));
 
-      console.log(`[Main] Agent teleported successfully, now adjacent to tile`);
       showNotification(`Agent moved to tile`, '#8B4513');
 
       // Now agent is adjacent - submit till action immediately
@@ -960,8 +1078,6 @@ async function main() {
         priority: 1,
       });
 
-      console.log(`[Main] Submitted till action ${actionId} for agent ${agentId} at (${x}, ${y})`);
-
       // Get duration directly from the action handler to ensure consistency
       // This avoids duplicating logic and prevents UI/backend mismatches
       const tillHandler = gameLoop.actionQueue.getHandler('till');
@@ -973,7 +1089,6 @@ async function main() {
           gameLoop.world
         );
         durationSeconds = durationTicks / 20; // Convert ticks to seconds (20 TPS)
-        console.log(`[Main] Duration from handler: ${durationTicks} ticks = ${durationSeconds}s`);
       } else {
         console.warn(`[Main] Could not get duration from till handler, using fallback: ${durationSeconds}s`);
       }
@@ -985,9 +1100,66 @@ async function main() {
     }
   });
 
+  // Handle action:plant event - submit plant action to ActionQueue
+  gameLoop.world.eventBus.subscribe('action:plant', (event: any) => {
+    const { x, y, agentId, seedType, speciesId } = event.data;
+
+    // Verify agent exists
+    const agent = gameLoop.world.getEntity(agentId);
+    if (!agent) {
+      console.error(`[Main] Agent ${agentId} not found for planting`);
+      return;
+    }
+
+    // Check agent is adjacent (distance <= √2)
+    const agentPos = agent.getComponent('position') as any;
+    if (!agentPos) {
+      console.error(`[Main] Agent ${agentId} has no position`);
+      return;
+    }
+
+    const dx = x - agentPos.x;
+    const dy = y - agentPos.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const MAX_PLANT_DISTANCE = Math.sqrt(2);
+
+    if (distance > MAX_PLANT_DISTANCE) {
+      console.warn(`[Main] Agent ${agentId.slice(0, 8)} is too far from plant target (${distance.toFixed(2)} > ${MAX_PLANT_DISTANCE.toFixed(2)})`);
+      // Don't fail - the behavior should handle movement
+      return;
+    }
+
+    // Submit plant action to ActionQueue
+    try {
+      const actionId = gameLoop.actionQueue.submit({
+        type: 'plant',
+        actorId: agentId,
+        targetPosition: { x, y },
+        parameters: { seedType },
+        priority: 1,
+      });
+
+      // Get duration from handler
+      const plantHandler = gameLoop.actionQueue.getHandler('plant');
+      let durationSeconds = 3; // Fallback
+
+      if (plantHandler && typeof plantHandler.getDuration === 'function') {
+        const durationTicks = plantHandler.getDuration(
+          { id: actionId, type: 'plant', actorId: agentId, targetPosition: { x, y }, status: 'pending' } as any,
+          gameLoop.world
+        );
+        durationSeconds = durationTicks / 20;
+      }
+
+      showNotification(`Planting ${speciesId || 'seed'} at (${x}, ${y}) (${durationSeconds}s)`, '#228B22');
+    } catch (err: any) {
+      console.error(`[Main] Failed to submit plant action: ${err.message}`);
+      showNotification(`Failed to queue planting: ${err.message}`, '#FF0000');
+    }
+  });
+
   gameLoop.world.eventBus.subscribe('action:gather_seeds', (event: any) => {
     const { agentId, plantId } = event.data;
-    console.log(`[Main] Received gather_seeds action request from agent ${agentId.slice(0,8)} for plant ${plantId.slice(0,8)}`);
 
     const MAX_GATHER_DISTANCE = Math.sqrt(2); // Must be adjacent (including diagonal)
 
@@ -1021,8 +1193,6 @@ async function main() {
 
     if (distance > MAX_GATHER_DISTANCE) {
       // Agent is too far - teleport them to an adjacent position
-      console.log(`[Main] Agent is ${distance.toFixed(2)} tiles away from plant (max: ${MAX_GATHER_DISTANCE.toFixed(2)})`);
-      console.log(`[Main] Teleporting agent from (${agentPos.x}, ${agentPos.y}) to adjacent position near plant (${plantPos.x}, ${plantPos.y})`);
 
       // Find best adjacent position (closest to agent's current position)
       const adjacentOffsets = [
@@ -1052,8 +1222,6 @@ async function main() {
         }
       }
 
-      console.log(`[Main] Teleporting agent to (${bestPos.x}, ${bestPos.y}) before gathering`);
-
       // Teleport agent to adjacent position
       const newChunkX = Math.floor(bestPos.x / 32);
       const newChunkY = Math.floor(bestPos.y / 32);
@@ -1074,8 +1242,6 @@ async function main() {
         velocityY: 0,
         isMoving: false,
       }));
-
-      console.log(`[Main] Agent teleported successfully, now adjacent to plant`);
     }
 
     // Agent is now adjacent - submit gather_seeds action to ActionQueue
@@ -1088,8 +1254,6 @@ async function main() {
         priority: 1,
       });
 
-      console.log(`[Main] Submitted gather_seeds action ${actionId} for agent ${agentId.slice(0,8)} targeting plant ${plantId.slice(0,8)}`);
-
       // Get duration from handler
       const gatherSeedsHandler = gameLoop.actionQueue.getHandler('gather_seeds');
       let durationSeconds = 5; // Fallback
@@ -1100,7 +1264,6 @@ async function main() {
           gameLoop.world
         );
         durationSeconds = durationTicks / 20; // Convert ticks to seconds (20 TPS)
-        console.log(`[Main] Gather seeds duration: ${durationTicks} ticks = ${durationSeconds}s`);
       }
 
       const plantComponent = plant.getComponent('plant') as any;
@@ -1114,7 +1277,6 @@ async function main() {
 
   gameLoop.world.eventBus.subscribe('action:harvest', (event: any) => {
     const { agentId, plantId } = event.data;
-    console.log(`[Main] Received harvest action request from agent ${agentId.slice(0,8)} for plant ${plantId.slice(0,8)}`);
 
     // Verify agent exists
     const agent = gameLoop.world.getEntity(agentId);
@@ -1140,8 +1302,6 @@ async function main() {
         priority: 1,
       });
 
-      console.log(`[Main] Submitted harvest action ${actionId} for agent ${agentId.slice(0,8)} targeting plant ${plantId.slice(0,8)}`);
-
       // Get duration from handler
       const harvestHandler = gameLoop.actionQueue.getHandler('harvest');
       let durationSeconds = 8; // Fallback
@@ -1152,7 +1312,6 @@ async function main() {
           gameLoop.world
         );
         durationSeconds = durationTicks / 20; // Convert ticks to seconds (20 TPS)
-        console.log(`[Main] Harvest duration: ${durationTicks} ticks = ${durationSeconds}s`);
       }
 
       const plantComponent = plant.getComponent('plant') as any;
@@ -1168,7 +1327,6 @@ async function main() {
     if (!soilSystem) return;
 
     const { x, y } = event.data;
-    console.log(`[Main] Received water action at (${x}, ${y})`);
 
     // Get the tile from chunk manager
     const chunkX = Math.floor(x / CHUNK_SIZE);
@@ -1185,7 +1343,6 @@ async function main() {
 
     // Generate chunk if not already generated (ensures biome data)
     if (!chunk.generated) {
-      console.log(`[Main] Generating terrain for chunk (${chunkX}, ${chunkY}) before watering`);
       terrainGenerator.generateChunk(chunk, gameLoop.world as any);
     }
 
@@ -1200,7 +1357,6 @@ async function main() {
 
     try {
       soilSystem.waterTile(gameLoop.world, tile, x, y);
-      console.log(`[Main] Successfully watered tile at (${x}, ${y})`);
       showNotification(`Watered tile at (${x}, ${y})`, '#1E90FF');
 
       // Refetch tile from chunk manager to get latest state after mutation
@@ -1218,7 +1374,6 @@ async function main() {
     if (!soilSystem) return;
 
     const { x, y, fertilizerType } = event.data;
-    console.log(`[Main] Received fertilize action at (${x}, ${y}) with ${fertilizerType}`);
 
     // Get the tile from chunk manager
     const chunkX = Math.floor(x / CHUNK_SIZE);
@@ -1235,7 +1390,6 @@ async function main() {
 
     // Generate chunk if not already generated (ensures biome data)
     if (!chunk.generated) {
-      console.log(`[Main] Generating terrain for chunk (${chunkX}, ${chunkY}) before fertilizing`);
       terrainGenerator.generateChunk(chunk, gameLoop.world as any);
     }
 
@@ -1258,7 +1412,6 @@ async function main() {
 
     try {
       soilSystem.fertilizeTile(gameLoop.world, tile, x, y, fertilizer);
-      console.log(`[Main] Successfully fertilized tile at (${x}, ${y})`);
       showNotification(`Applied ${fertilizerType} at (${x}, ${y})`, '#FFD700');
 
       // Refetch tile from chunk manager to get latest state after mutation
@@ -1274,12 +1427,10 @@ async function main() {
 
   // Listen for action completion and failure events for debugging
   gameLoop.world.eventBus.subscribe('agent:action:completed', (event: any) => {
-    console.log('[Main] ✅ Action completed:', event);
     const { actionType, actionId, success, reason } = event.data;
 
     if (actionType === 'till') {
       if (success) {
-        console.log(`[Main] ✅ Tilling action ${actionId} completed successfully`);
         showNotification('Tilling completed!', '#8B4513');
       } else {
         console.error(`[Main] ❌ Tilling action ${actionId} failed: ${reason}`);
@@ -1289,12 +1440,7 @@ async function main() {
   });
 
   gameLoop.world.eventBus.subscribe('agent:action:started', (event: any) => {
-    console.log('[Main] 🔄 Action started:', event);
     const { actionType, actionId } = event.data;
-
-    if (actionType === 'till') {
-      console.log(`[Main] 🔄 Tilling action ${actionId} started - waiting for completion...`);
-    }
   });
 
   gameLoop.world.eventBus.subscribe('agent:action:failed', (event: any) => {
@@ -1311,9 +1457,7 @@ async function main() {
 
   // Listen for soil events and show floating text
   gameLoop.world.eventBus.subscribe('soil:tilled', (event: any) => {
-    console.log('[Main] 🌾 Received soil:tilled event:', event);
     const { position, fertility, biome } = event.data;
-    console.log(`[Main] 🌾 Tile tilled at (${position.x}, ${position.y}): fertility=${fertility.toFixed(2)}, biome=${biome}`);
     const floatingTextRenderer = renderer.getFloatingTextRenderer();
     floatingTextRenderer.add('Tilled', position.x * 16, position.y * 16, '#8B4513', 1500);
 
@@ -1406,7 +1550,6 @@ async function main() {
 
     const emoji = stageEmojis[newStage] || '🌿';
     floatingTextRenderer.add(`${emoji} ${newStage}`, position.x * 16, position.y * 16, '#FFD700', 2000);
-    console.log(`[Main] Plant stage changed to ${newStage} at (${position.x.toFixed(1)}, ${position.y.toFixed(1)})`);
   });
 
   gameLoop.world.eventBus.subscribe('seed:dispersed', (event: any) => {
@@ -1422,8 +1565,6 @@ async function main() {
 
     const floatingTextRenderer = renderer.getFloatingTextRenderer();
     floatingTextRenderer.add('🌰 Seed', position.x * 16, position.y * 16, '#8B4513', 1500);
-
-    console.log(`[Main] Seed dispersed at (${position.x}, ${position.y}): ${speciesId}`);
 
     // Create a new plant entity from the dispersed seed
     // Dispersed seeds start in 'seed' stage and will germinate naturally
@@ -1451,21 +1592,57 @@ async function main() {
       y: position.y,
     });
     worldMutator.addComponent(plantEntity.id, positionComponent);
-
-    console.log(`[Main] Created plant entity ${plantEntity.id.slice(0,8)} from dispersed ${speciesId} seed at (${position.x}, ${position.y})`);
   });
 
   gameLoop.world.eventBus.subscribe('seed:germinated', (event: any) => {
     const { position } = event.data;
     const floatingTextRenderer = renderer.getFloatingTextRenderer();
     floatingTextRenderer.add('🌱 Germinated!', position.x * 16, position.y * 16, '#32CD32', 2000);
-    console.log(`[Main] Seed germinated at (${position.x.toFixed(1)}, ${position.y.toFixed(1)})`);
+  });
+
+  // Handle seed:planted event - create plant from agent-planted seed
+  gameLoop.world.eventBus.subscribe('seed:planted', (event: any) => {
+    const { speciesId, position, actorId } = event.data;
+    const worldMutator = gameLoop.world as WorldMutator;
+    const floatingTextRenderer = renderer.getFloatingTextRenderer();
+
+    // Get species data for proper plant initialization
+    const species = getPlantSpecies(speciesId);
+    if (!species) {
+      console.warn(`[Main] Unknown plant species: ${speciesId}, using default settings`);
+    }
+
+    // Create plant entity
+    const plantEntity = worldMutator.createEntity(`plant-${speciesId}-${Date.now()}`);
+
+    // Add PlantComponent (starts at 'seed' stage)
+    const plantComponent = new PlantComponent({
+      speciesId,
+      position: { x: position.x, y: position.y },
+      stage: 'seed',
+      stageProgress: 0,
+      age: 0,
+      generation: 0,
+      health: 100, // Freshly planted seeds start healthy
+      hydration: 70, // Tilled soil has decent moisture
+      nutrition: 80, // Tilled soil has nutrients
+    });
+    worldMutator.addComponent(plantEntity.id, plantComponent);
+
+    // Add PositionComponent
+    const positionComponent = createPositionComponent({
+      x: position.x,
+      y: position.y,
+    });
+    worldMutator.addComponent(plantEntity.id, positionComponent);
+
+    // Show floating text
+    floatingTextRenderer.add('🌱 Planted!', position.x * 16, position.y * 16, '#228B22', 1500);
   });
 
   gameLoop.world.eventBus.subscribe('seed:gathered', (event: any) => {
-    const { seedsGathered, speciesId, plantHealth, plantStage, plantId } = event.data;
-    console.log(`[Main] 🌰 Seed gathered: ${seedsGathered}x ${speciesId} (health: ${plantHealth}, stage: ${plantStage})`);
-    showNotification(`🌰 Gathered ${seedsGathered}x ${speciesId} seeds`, '#8B4513');
+    const { seedCount, speciesId, plantId } = event.data;
+    // Notification moved to items:deposited - only show floating text here
 
     // Show floating text at plant position
     if (plantId) {
@@ -1474,7 +1651,7 @@ async function main() {
         const position = plant.getComponent('position');
         if (position) {
           const floatingTextRenderer = renderer.getFloatingTextRenderer();
-          floatingTextRenderer.add(`🌰 +${seedsGathered}`, (position as any).x * 16, (position as any).y * 16, '#8B4513', 2000);
+          floatingTextRenderer.add(`🌰 +${seedCount}`, (position as any).x * 16, (position as any).y * 16, '#8B4513', 2000);
         }
       }
     }
@@ -1482,8 +1659,7 @@ async function main() {
 
   gameLoop.world.eventBus.subscribe('seed:harvested', (event: any) => {
     const { seedsHarvested, speciesId, generation, plantId } = event.data;
-    console.log(`[Main] 🌾 Seeds harvested: ${seedsHarvested}x ${speciesId} (gen ${generation})`);
-    showNotification(`🌾 Harvested ${seedsHarvested}x ${speciesId} seeds (gen ${generation})`, '#FFD700');
+    // Notification moved to items:deposited - only show floating text here
 
     // Show floating text at plant position
     if (plantId) {
@@ -1510,7 +1686,19 @@ async function main() {
     const { position } = event.data;
     const floatingTextRenderer = renderer.getFloatingTextRenderer();
     floatingTextRenderer.add('💀 Died', position.x * 16, position.y * 16, '#888888', 2000);
-    console.log(`[Main] Plant died at (${position.x.toFixed(1)}, ${position.y.toFixed(1)})`);
+  });
+
+  // Listen for item deposit events and add to notifications panel (accrued per agent)
+  gameLoop.world.eventBus.subscribe('items:deposited', (event: any) => {
+    const { agentId, items } = event.data;
+
+    // Get agent name if available
+    const agent = gameLoop.world.getEntity(agentId);
+    const identity = agent?.getComponent('identity') as { name: string } | undefined;
+    const agentName = identity?.name || `Agent ${agentId.slice(0, 6)}`;
+
+    // Add deposit (accrues with previous deposits from this agent)
+    notificationsPanel.addDeposit(agentName, items);
   });
 
   // Debug time controls state
@@ -1518,11 +1706,8 @@ async function main() {
   let originalDayLength = 600; // 10 min/day default
 
   // Wire up input handling for placement UI, agent selection, and tile selection
-  console.log('[Main] Setting up inputHandler callbacks...');
   inputHandler.setCallbacks({
     onKeyDown: (key, shiftKey, ctrlKey) => {
-      console.log(`[Main] onKeyDown callback: key="${key}", shiftKey=${shiftKey}, ctrlKey=${ctrlKey}`);
-
       // Check keyboard registry first
       if (keyboardRegistry.handleKey(key, shiftKey, ctrlKey)) {
         return true;
@@ -1532,14 +1717,6 @@ async function main() {
       if (key === 'Escape') {
         if (inventoryUI.isOpen()) {
           windowManager.hideWindow('inventory');
-          console.log(`[Main] Inventory closed with Escape`);
-
-          // Show controls panel when inventory closes
-          const controlsPanel = document.querySelector('.controls');
-          if (controlsPanel) {
-            controlsPanel.classList.remove('hidden');
-          }
-
           return true;
         }
         windowManager.toggleWindow('settings');
@@ -1555,7 +1732,6 @@ async function main() {
       // M - Toggle memory panel
       if (key === 'm' || key === 'M') {
         windowManager.toggleWindow('memory');
-        console.log(`[Main] Memory panel toggled`);
         return true;
       }
 
@@ -1569,32 +1745,36 @@ async function main() {
       if (key === 'c' || key === 'C') {
         windowManager.toggleWindow('crafting');
         const visible = windowManager.getWindow('crafting')?.visible ?? false;
-        console.log(`[Main] Crafting ${visible ? 'opened' : 'closed'}`);
+        // Set active agent when opening
+        if (visible) {
+          const selectedEntityId = agentInfoPanel.getSelectedEntityId();
+          if (selectedEntityId) {
+            craftingUI.setActiveAgent(selectedEntityId);
+          }
+        }
         return true;
       }
 
       // I or Tab - Toggle inventory (Phase 10)
       if (key === 'i' || key === 'I' || key === 'Tab') {
         windowManager.toggleWindow('inventory');
-        const visible = windowManager.getWindow('inventory')?.visible ?? false;
-        console.log(`[Main] Inventory ${visible ? 'opened' : 'closed'}`);
+        return true;
+      }
 
-        // Hide/show controls panel when inventory opens/closes
-        const controlsPanel = document.querySelector('.controls');
-        if (controlsPanel) {
-          if (visible) {
-            controlsPanel.classList.add('hidden');
-          } else {
-            controlsPanel.classList.remove('hidden');
-          }
-        }
+      // H - Toggle controls/help panel
+      if (key === 'h' || key === 'H') {
+        windowManager.toggleWindow('controls');
+        return true;
+      }
 
+      // E - Toggle economy dashboard
+      if (key === 'e' || key === 'E') {
+        windowManager.toggleWindow('economy');
         return true;
       }
 
       // Check if placement UI handles the key first
       const handled = placementUI.handleKeyDown(key, shiftKey);
-      console.log(`[Main] placementUI.handleKeyDown returned: ${handled}`);
       if (handled) {
         return true;
       }
@@ -1620,7 +1800,6 @@ async function main() {
           (timeComp as any).phase = newPhase;
           (timeComp as any).lightLevel = newLightLevel;
 
-          console.log(`[DEBUG] Skipped 1 hour → ${newTime.toFixed(2)}:00 (${newPhase})`);
           showNotification(`⏩ Skipped 1 hour → ${Math.floor(newTime)}:00`, '#FFA500');
           return true;
         }
@@ -1639,7 +1818,6 @@ async function main() {
             data: { newDay: Math.floor((gameLoop.world.tick * 0.1) / timeComp.dayLength) + 1 },
           });
 
-          console.log(`[DEBUG] Skipped 1 day (kept time at ${currentTime.toFixed(2)}:00)`);
           showNotification(`⏩ Skipped 1 day`, '#FF8C00');
           return true;
         }
@@ -1660,7 +1838,6 @@ async function main() {
             });
           }
 
-          console.log(`[DEBUG] Skipped 7 days (kept time at ${currentTime.toFixed(2)}:00)`);
           showNotification(`⏩ Skipped 7 days`, '#FF4500');
           return true;
         }
@@ -1676,7 +1853,6 @@ async function main() {
             speedMultiplier: 1,
           }));
 
-          console.log(`[DEBUG] Time speed set to 1x (48s/day)`);
           showNotification(`⏱️ Time speed: 1x`, '#00CED1');
           return true;
         }
@@ -1691,7 +1867,6 @@ async function main() {
             speedMultiplier: 2,
           }));
 
-          console.log(`[DEBUG] Time speed set to 2x (24s/day)`);
           showNotification(`⏱️ Time speed: 2x`, '#00CED1');
           return true;
         }
@@ -1706,7 +1881,6 @@ async function main() {
             speedMultiplier: 4,
           }));
 
-          console.log(`[DEBUG] Time speed set to 4x (12s/day)`);
           showNotification(`⏱️ Time speed: 4x`, '#00CED1');
           return true;
         }
@@ -1721,7 +1895,6 @@ async function main() {
             speedMultiplier: 8,
           }));
 
-          console.log(`[DEBUG] Time speed set to 8x (6s/day)`);
           showNotification(`⏱️ Time speed: 8x`, '#00CED1');
           return true;
         }
@@ -1744,10 +1917,8 @@ async function main() {
               timestamp: Date.now(),
             },
           });
-          console.log(`[DEBUG] Triggered test memory event for agent ${selectedEntity.id}`);
           showNotification(`🧠 Test memory event triggered`, '#9370DB');
         } else {
-          console.log('[DEBUG] No agent selected - click an agent first');
           showNotification(`⚠️ Select an agent first (click one)`, '#FFA500');
         }
         return true;
@@ -1788,18 +1959,15 @@ async function main() {
               // Update the agent component
               selectedEntity.components.set('agent', updatedAgent);
 
-              console.log(`[DEBUG] Queued 4 behaviors for agent ${selectedEntityId.slice(0, 8)}`);
               showNotification(`📋 Queued 4 test behaviors`, '#9370DB');
             }).catch(err => {
               console.error('[DEBUG] Failed to import queueBehavior:', err);
               showNotification(`❌ Failed to queue behaviors`, '#FF0000');
             });
           } else {
-            console.log('[DEBUG] Selected entity is not an agent');
             showNotification(`⚠️ Please select an agent`, '#FFA500');
           }
         } else {
-          console.log('[DEBUG] No agent selected - click an agent first');
           showNotification(`⚠️ Select an agent first (click one)`, '#FFA500');
         }
         return true;
@@ -1818,18 +1986,15 @@ async function main() {
               const updatedAgent = clearBehaviorQueue(agent);
               selectedEntity.components.set('agent', updatedAgent);
 
-              console.log(`[DEBUG] Cleared behavior queue for agent ${selectedEntityId.slice(0, 8)}`);
               showNotification(`🗑️ Behavior queue cleared`, '#9370DB');
             }).catch(err => {
               console.error('[DEBUG] Failed to import clearBehaviorQueue:', err);
               showNotification(`❌ Failed to clear queue`, '#FF0000');
             });
           } else {
-            console.log('[DEBUG] Selected entity is not an agent');
             showNotification(`⚠️ Please select an agent`, '#FFA500');
           }
         } else {
-          console.log('[DEBUG] No agent selected - click an agent first');
           showNotification(`⚠️ Select an agent first (click one)`, '#FFA500');
         }
         return true;
@@ -1889,7 +2054,6 @@ async function main() {
           plantEntity.addComponent(createRenderableComponent(speciesId, 'plant'));
           (gameLoop.world as any)._addEntity(plantEntity);
 
-          console.log(`[DEBUG] Spawned ${species.name} (${stage}) at (${spawnX}, ${spawnY}) - Entity ${plantEntity.id} - seedsProduced=${plantComponent.seedsProduced}`);
           showNotification(`🌱 Spawned ${species.name} (${stage})`, '#32CD32');
         })();
         return true;
@@ -1900,9 +2064,6 @@ async function main() {
 
       // T key - Till tile
       if (key === 't' || key === 'T') {
-        console.log('[Main] ===== T KEY PRESSED - TILLING ACTION =====');
-        console.log(`[Main] selectedTile:`, selectedTile);
-
         if (!selectedTile) {
           console.warn('[Main] ⚠️ Cannot till - no tile selected. RIGHT-CLICK a grass tile first to select it.');
           showNotification('⚠️ Right-click a grass tile first to select it', '#FFA500');
@@ -1910,7 +2071,6 @@ async function main() {
         }
 
         const { tile, x, y } = selectedTile;
-        console.log(`[Main] Selected tile at (${x}, ${y}): terrain=${tile.terrain}, tilled=${tile.tilled}`);
 
         if (tile.tilled && tile.plantability > 0) {
           console.error(`[Main] ❌ ERROR: Tile at (${x}, ${y}) is already tilled. Plantability: ${tile.plantability}/3 uses remaining.`);
@@ -1924,15 +2084,7 @@ async function main() {
           return true;
         }
 
-        // Log if this is a re-tilling operation (depleted soil restoration)
-        if (tile.tilled && tile.plantability === 0) {
-          console.log(`[Main] 🔄 Re-tilling depleted soil at (${x}, ${y}) to restore fertility`);
-        } else {
-          console.log(`[Main] ✅ All checks passed, tilling fresh grass/dirt at (${x}, ${y})`);
-        }
-
         gameLoop.world.eventBus.emit({ type: 'action:till', source: 'ui', data: { x, y } });
-        console.log(`[Main] ===== TILLING ACTION EVENT EMITTED =====`);
         return true;
       }
 
@@ -1957,7 +2109,6 @@ async function main() {
       return false;
     },
     onMouseClick: (screenX, screenY, button) => {
-      console.log(`[Main] onMouseClick: (${screenX}, ${screenY}), button=${button}`);
       const rect = canvas.getBoundingClientRect();
 
       // Left click only for window management and menu bar
@@ -1965,20 +2116,17 @@ async function main() {
         // Check MenuBar first (it's on top)
         const menuHandled = menuBar.handleClick(screenX, screenY);
         if (menuHandled) {
-          console.log(`[Main] menuBar.handleClick returned true`);
           return true;
         }
 
         // Try to start drag on window title bar
         const dragStarted = windowManager.handleDragStart(screenX, screenY);
         if (dragStarted) {
-          console.log(`[Main] windowManager.handleDragStart returned true - dragging window`);
           return true;
         }
 
         // Check if WindowManager handles the click (title bar buttons, window focus)
         const windowHandled = windowManager.handleClick(screenX, screenY);
-        console.log(`[Main] windowManager.handleClick returned: ${windowHandled}`);
         if (windowHandled) {
           return true;
         }
@@ -1986,60 +2134,113 @@ async function main() {
 
       // Check if placement UI handles the click
       const placementHandled = placementUI.handleClick(screenX, screenY, button);
-      console.log(`[Main] placementUI.handleClick returned: ${placementHandled}`);
       if (placementHandled) {
         return true;
       }
 
+      // Check if shop panel handles the click (modal)
+      if (shopPanel.isVisible()) {
+        const rect = canvas.getBoundingClientRect();
+        const shopHandled = shopPanel.handleClick(screenX, screenY, gameLoop.world, rect.width, rect.height);
+        if (shopHandled) {
+          return true;
+        }
+      }
+
       // Right click - select tile
-      console.log(`[Main] Checking if button === 2: ${button === 2}`);
       if (button === 2) {
         const tileData = tileInspectorPanel.findTileAtScreenPosition(screenX, screenY, gameLoop.world);
         if (tileData) {
-          console.log(`[Main] Selected tile at (${tileData.x}, ${tileData.y})`);
           tileInspectorPanel.setSelectedTile(tileData.tile, tileData.x, tileData.y);
+          windowManager.showWindow('tile-inspector');
           return true;
         } else {
           // No tile found - deselect
-          console.log('[Main] Deselected tile');
           tileInspectorPanel.setSelectedTile(null);
+          windowManager.hideWindow('tile-inspector');
         }
         return true; // Always consume right clicks
       }
 
-      // Left click - select agent, animal, or plant
+      // Left click - select agent, animal, plant, resource, or shop
       if (button === 0) {
         const entity = renderer.findEntityAtScreenPosition(screenX, screenY, gameLoop.world);
         if (entity) {
           const hasAgent = entity.components.has('agent');
           const hasAnimal = entity.components.has('animal');
           const hasPlant = entity.components.has('plant');
+          const hasResource = entity.components.has('resource');
+          const hasShop = entity.components.has('shop');
+          const hasBuilding = entity.components.has('building');
 
-          if (hasAgent) {
+          // Check for shops first (buildings with shop component)
+          if (hasShop && hasBuilding) {
+            // Get current selected agent to use for trading
+            const selectedAgent = agentInfoPanel.getSelectedEntity();
+            if (selectedAgent) {
+              shopPanel.openShop(entity.id, selectedAgent.id);
+              return true;
+            } else {
+              showNotification('Select an agent first to trade with shops', '#FFA500');
+              return true;
+            }
+          } else if (hasAgent) {
             agentInfoPanel.setSelectedEntity(entity);
             animalInfoPanel.setSelectedEntity(null); // Deselect animal
             plantInfoPanel.setSelectedEntity(null); // Deselect plant
             memoryPanel.setSelectedEntity(entity); // Sync memory panel
+            relationshipsPanel.setSelectedEntity(entity); // Sync relationships panel
+            // Show the agent-info window
+            windowManager.showWindow('agent-info');
+            windowManager.hideWindow('animal-info');
+            windowManager.hideWindow('plant-info');
             return true;
           } else if (hasAnimal) {
             animalInfoPanel.setSelectedEntity(entity);
             agentInfoPanel.setSelectedEntity(null); // Deselect agent
             plantInfoPanel.setSelectedEntity(null); // Deselect plant
             memoryPanel.setSelectedEntity(null); // Clear memory panel
+            relationshipsPanel.setSelectedEntity(null); // Clear relationships panel
+            // Show the animal-info window
+            windowManager.showWindow('animal-info');
+            windowManager.hideWindow('agent-info');
+            windowManager.hideWindow('plant-info');
             return true;
           } else if (hasPlant) {
             plantInfoPanel.setSelectedEntity(entity);
             agentInfoPanel.setSelectedEntity(null); // Deselect agent
             animalInfoPanel.setSelectedEntity(null); // Deselect animal
             memoryPanel.setSelectedEntity(null); // Clear memory panel
+            relationshipsPanel.setSelectedEntity(null); // Clear relationships panel
+            // Show the plant-info window
+            windowManager.showWindow('plant-info');
+            windowManager.hideWindow('agent-info');
+            windowManager.hideWindow('animal-info');
+            return true;
+          } else if (hasResource) {
+            // Resource entities (trees, rocks) - left-click does nothing special
+            // Use right-click to inspect the tile instead
+            // Deselect other panels
+            agentInfoPanel.setSelectedEntity(null);
+            animalInfoPanel.setSelectedEntity(null);
+            plantInfoPanel.setSelectedEntity(null);
+            memoryPanel.setSelectedEntity(null);
+            relationshipsPanel.setSelectedEntity(null);
+            windowManager.hideWindow('agent-info');
+            windowManager.hideWindow('animal-info');
+            windowManager.hideWindow('plant-info');
             return true;
           }
         } else {
-          // Click on empty space - deselect all
+          // Click on empty space - deselect all and hide info windows
           agentInfoPanel.setSelectedEntity(null);
           animalInfoPanel.setSelectedEntity(null);
           plantInfoPanel.setSelectedEntity(null);
           memoryPanel.setSelectedEntity(null);
+          relationshipsPanel.setSelectedEntity(null);
+          windowManager.hideWindow('agent-info');
+          windowManager.hideWindow('animal-info');
+          windowManager.hideWindow('plant-info');
         }
       }
 
@@ -2059,6 +2260,10 @@ async function main() {
       }
 
       placementUI.updateCursorPosition(screenX, screenY, gameLoop.world);
+    },
+    onWheel: (screenX, screenY, deltaY) => {
+      // Let WindowManager handle scrolling within windows
+      return windowManager.handleWheel(screenX, screenY, deltaY);
     },
   });
 
@@ -2101,7 +2306,10 @@ async function main() {
     const rect = canvas.getBoundingClientRect();
 
     // WindowManager handles all panel rendering with proper z-ordering and window chrome
-    windowManager.render(ctx);
+    windowManager.render(ctx, gameLoop.world);
+
+    // Shop panel renders as modal on top of windows (Phase 12.7)
+    shopPanel.render(ctx, gameLoop.world);
 
     // MenuBar renders on top of everything
     menuBar.render(ctx);
@@ -2144,37 +2352,26 @@ async function main() {
     120       // duration - 2 minutes
   );
   (worldEntity as any).addComponent(initialWeather);
-  console.log(
-    `[Main] Created world weather entity: ${worldEntity.id} - Initial weather: ${initialWeather.weatherType}, temp modifier: ${initialWeather.tempModifier}°C`
-  );
 
   // Add TimeComponent for day/night cycle
   const initialTime = createTimeComponent(6, 600); // Start at 6:00 AM (dawn), 10 min/day
   (worldEntity as any).addComponent(initialTime);
-  console.log(
-    `[Main] Created time component: Starting at ${initialTime.timeOfDay.toFixed(2)}:00 (${initialTime.phase}), light level: ${initialTime.lightLevel}`
-  );
 
   // Create initial buildings for playtest
   // Per work order acceptance criteria: "At least one building should be visible in the world"
   // This must be done BEFORE starting the game loop so buildings exist on first render
-  console.log('Creating initial buildings...');
   createInitialBuildings(gameLoop.world);
 
   // Create initial agents (10 LLM agents clustered together)
-  console.log('Creating initial agents...');
   createInitialAgents(gameLoop.world, settings.dungeonMasterPrompt);
 
   // Create initial wild plants for Phase 9
-  console.log('Creating initial wild plants...');
   await createInitialPlants(gameLoop.world);
 
   // Create initial wild animals for Phase 11
-  console.log('Creating initial wild animals...');
   await createInitialAnimals(gameLoop.world, wildAnimalSpawning);
 
   // Spawn berry bushes near start for easy food access
-  console.log('Spawning berry bushes near start...');
   const berryPositions = [
     { x: 6, y: 4 }, { x: -7, y: 5 }, { x: 8, y: -3 },
     { x: -6, y: -4 }, { x: 5, y: 7 }, { x: -8, y: 6 },
@@ -2186,64 +2383,18 @@ async function main() {
   berryPositions.forEach(pos => {
     createBerryBush(gameLoop.world, pos.x, pos.y);
   });
-  console.log(`Spawned ${berryPositions.length} berry bushes around spawn point`);
-
-  // Set up memory event logging for debugging (Phase 10)
-  gameLoop.world.eventBus.subscribe('memory:formed', (event: any) => {
-    const { agentId, eventType } = event.data;
-    const entity = gameLoop.world.getEntity(agentId);
-    const identity = entity?.components.get('identity') as { name: string } | undefined;
-    const agentName = identity?.name || agentId.substring(0, 8);
-    console.log(`[Memory] 🧠 ${agentName} formed memory from ${eventType}`);
-  });
-
-  gameLoop.world.eventBus.subscribe('memory:recalled', (event: any) => {
-    const { agentId, count } = event.data;
-    const entity = gameLoop.world.getEntity(agentId);
-    const identity = entity?.components.get('identity') as { name: string } | undefined;
-    const agentName = identity?.name || agentId.substring(0, 8);
-    console.log(`[Memory] 🔍 ${agentName} recalled ${count} memories`);
-  });
-
-  gameLoop.world.eventBus.subscribe('memory:forgotten', (event: any) => {
-    const { agentId, eventType } = event.data;
-    const entity = gameLoop.world.getEntity(agentId);
-    const identity = entity?.components.get('identity') as { name: string } | undefined;
-    const agentName = identity?.name || agentId.substring(0, 8);
-    console.log(`[Memory] 🌫️ ${agentName} forgot memory: ${eventType}`);
-  });
-
-  gameLoop.world.eventBus.subscribe('reflection:completed', (event: any) => {
-    const { agentId } = event.data;
-    const entity = gameLoop.world.getEntity(agentId);
-    const identity = entity?.components.get('identity') as { name: string } | undefined;
-    const agentName = identity?.name || agentId.substring(0, 8);
-    console.log(`[Reflection] 💭 ${agentName} completed daily reflection`);
-  });
-
-  gameLoop.world.eventBus.subscribe('journal:written', (event: any) => {
-    const { agentId } = event.data;
-    const entity = gameLoop.world.getEntity(agentId);
-    const identity = entity?.components.get('identity') as { name: string } | undefined;
-    const agentName = identity?.name || agentId.substring(0, 8);
-    console.log(`[Journal] 📔 ${agentName} wrote journal entry`);
-  });
 
   // Set up farming action handlers
   gameLoop.world.eventBus.subscribe('action:requested', (event: any) => {
     const { eventType, actorId, plantId, position } = event.data;
 
     if (eventType === 'gather_seeds:requested') {
-      console.log(`[Main] gather_seeds:requested - actor: ${actorId.slice(0, 8)}, plant: ${plantId.slice(0, 8)}, position: (${position.x}, ${position.y})`);
-
       gameLoop.actionQueue.enqueue({
         type: 'gather_seeds',
         actorId,
         targetId: plantId,
       });
     } else if (eventType === 'harvest:requested') {
-      console.log(`[Main] harvest:requested - actor: ${actorId.slice(0, 8)}, plant: ${plantId.slice(0, 8)}, position: (${position.x}, ${position.y})`);
-
       gameLoop.actionQueue.enqueue({
         type: 'harvest',
         actorId,
@@ -2358,75 +2509,22 @@ async function main() {
   //   });
 
   // Start
-  console.log('Starting game loop...');
   gameLoop.start();
 
-  console.log('Starting render loop...');
+  // Expose game globally for debugging and oscillation detection scripts
+  (window as any).game = {
+    world: gameLoop.world,
+    gameLoop,
+    renderer,
+  };
+
   renderLoop();
-
-  console.log('Phase 10 initialized successfully!');
-  console.log('Game loop:', gameLoop);
-  console.log('Systems:', gameLoop.systemRegistry.getSorted());
-
-  // Log debug controls
-  console.log('');
-  console.log('=== DEBUG CONTROLS ===');
-  console.log('SETTINGS:');
-  console.log('  ESC - Open settings (configure LLM provider)');
-  console.log('');
-  console.log('UI:');
-  console.log('  I or Tab - Toggle inventory (Phase 10)');
-  console.log('  M - Toggle memory panel (episodic memory)');
-  console.log('  R - Toggle resources panel');
-  console.log('');
-  console.log('SOIL/FARMING (Phase 9):');
-  console.log('  1. RIGHT-CLICK a grass tile to select it (opens Tile Inspector panel)');
-  console.log('  2. Press T to till the selected tile');
-  console.log('  3. Press W to water the selected tile');
-  console.log('  4. Press F to fertilize the selected tile');
-  console.log('  (Or click the buttons in the Tile Inspector panel)');
-  console.log('');
-  console.log('TIME:');
-  console.log('  Shift+1 - Skip 1 hour');
-  console.log('  Shift+2 - Skip 1 day');
-  console.log('  Shift+3 - Skip 7 days');
-  console.log('  1/2/3/4 - Set time speed (1x/2x/4x/8x)');
-  console.log('');
-  console.log('PLANTS:');
-  console.log('  P - Spawn test plant at advanced stage');
-  console.log('  Click plant - View plant info');
-  console.log('');
-  console.log('AGENTS:');
-  console.log('  Click agent - View agent info & memories');
-  console.log('  N - Trigger test memory for selected agent');
-  console.log('  Q - Queue test behaviors for selected agent');
-  console.log('  C - Clear behavior queue for selected agent');
-  console.log('');
-  console.log('MEMORY SYSTEM (Phase 10):');
-  console.log('  - Agents form memories automatically from significant events');
-  console.log('  - Press M to view selected agent\'s memories');
-  console.log('  - Memories decay over time based on importance');
-  console.log('  - Watch console for [Memory] 🧠, [Reflection] 💭, [Journal] 📔 events');
-  console.log('  - Agents reflect at end of each day (sleep time)');
-  console.log('======================');
-  console.log('');
 
   // Show tutorial notification after a brief delay
   setTimeout(() => {
     showNotification('💡 Tip: Right-click a grass tile, then press T to till it', '#00CED1');
   }, 3000);
 
-  // Log agent count
-  setInterval(() => {
-    const agents = gameLoop.world.query().with('agent').executeEntities();
-    const movingAgents = agents.filter((e) => {
-      const movement = e.getComponent('movement');
-      return movement && ((movement as any).velocityX !== 0 || (movement as any).velocityY !== 0);
-    });
-    console.log(
-      `Agents: ${agents.length} total, ${movingAgents.length} moving`
-    );
-  }, 5000);
 
   // Expose for debugging and tests
   (window as any).game = {
@@ -2473,7 +2571,8 @@ async function main() {
 
     getBuildings: () => {
       const buildings: any[] = [];
-      gameLoop.world.getEntitiesWithComponents(['building']).forEach(entity => {
+      const entities = gameLoop.world.query().with('building').executeEntities();
+      entities.forEach(entity => {
         const building = entity.getComponent('building');
         const position = entity.getComponent('position');
         buildings.push({
@@ -2486,14 +2585,72 @@ async function main() {
       return buildings;
     },
 
+    // Convenience helpers for playtest agent
+    getTier2Stations: () => {
+      return blueprintRegistry.getAll().filter(bp => bp.tier === 2).map(bp => ({
+        id: bp.id,
+        name: bp.name,
+        category: bp.category,
+        tier: bp.tier,
+        width: bp.width,
+        height: bp.height,
+        resourceCost: bp.resourceCost
+      }));
+    },
+
+    getTier3Stations: () => {
+      return blueprintRegistry.getAll().filter(bp => bp.tier === 3).map(bp => ({
+        id: bp.id,
+        name: bp.name,
+        category: bp.category,
+        tier: bp.tier,
+        width: bp.width,
+        height: bp.height,
+        resourceCost: bp.resourceCost
+      }));
+    },
+
+    getBlueprintDetails: (id: string) => {
+      const blueprint = blueprintRegistry.get(id);
+      return {
+        id: blueprint.id,
+        name: blueprint.name,
+        description: blueprint.description,
+        category: blueprint.category,
+        width: blueprint.width,
+        height: blueprint.height,
+        tier: blueprint.tier,
+        resourceCost: blueprint.resourceCost,
+        functionality: blueprint.functionality,
+        buildTime: blueprint.buildTime,
+        unlocked: blueprint.unlocked
+      };
+    },
+
+    getCraftingStations: () => {
+      return blueprintRegistry.getAll()
+        .filter(bp => bp.functionality.some(f => f.type === 'crafting'))
+        .map(bp => ({
+          id: bp.id,
+          name: bp.name,
+          tier: bp.tier,
+          recipes: bp.functionality
+            .filter(f => f.type === 'crafting')
+            .flatMap(f => (f as any).recipes),
+          speed: bp.functionality
+            .filter(f => f.type === 'crafting')
+            .map(f => (f as any).speed)[0] || 1.0
+        }));
+    },
+
     // UI panels
     agentInfoPanel,
     animalInfoPanel,
     resourcesPanel,
   };
 
-  console.log('Building Placement UI ready. Press B to open building menu.');
-  console.log('Test API available at window.__gameTest');
+  // Expose promptLogger globally for easy access
+  (window as any).promptLogger = promptLogger;
 }
 
 // Start when DOM is ready

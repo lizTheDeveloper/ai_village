@@ -14,18 +14,23 @@
     "test:coverage": "vitest run --coverage",
     "test:all": "npm run test --workspaces",
     "lint": "eslint .",
-    "clean": "rm -rf packages/*/dist"
+    "clean": "rm -rf packages/*/dist",
+    "detect-oscillation": "npx tsx scripts/detect-oscillation.ts",
+    "metrics-server": "npx tsx scripts/metrics-server.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
     "@types/node": "^20.10.0",
+    "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "^6.13.0",
     "@typescript-eslint/parser": "^6.13.0",
     "canvas": "^3.2.0",
     "eslint": "^8.54.0",
     "jsdom": "^27.3.0",
     "playwright": "^1.57.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.3.3",
-    "vitest": "^1.0.4"
+    "vitest": "^1.0.4",
+    "ws": "^8.18.3"
   }
 }
