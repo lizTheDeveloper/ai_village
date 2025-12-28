@@ -1,4 +1,19 @@
-import type { World } from '@ai-village/core';
+import type {
+  World,
+  WorldMutator,
+  Entity,
+  PositionComponent,
+  RenderableComponent,
+  BuildingComponent,
+  AgentComponent,
+  AnimalComponent,
+  PlantComponent,
+  ResourceComponent,
+  CircadianComponent,
+  ReflectionComponent,
+  IdentityComponent,
+  TemperatureComponent,
+} from '@ai-village/core';
 import {
   ChunkManager,
   TerrainGenerator,
@@ -29,6 +44,12 @@ export class Renderer {
   private tileSize = 16; // Pixels per tile at zoom=1
   private hasLoggedTilledTile = false; // Debug flag to log first tilled tile rendering
   private showTemperatureOverlay = false; // Debug flag to show temperature on tiles
+
+  // View toggles for labels and overlays
+  public showResourceAmounts = true;
+  public showBuildingLabels = true;
+  public showAgentNames = true;
+  public showAgentTasks = true;
 
   constructor(canvas: HTMLCanvasElement, seed: string = 'default') {
     this.canvas = canvas;
@@ -114,15 +135,8 @@ export class Renderer {
    * @param screenY Screen Y coordinate
    * @param world World instance
    */
-  findEntityAtScreenPosition(screenX: number, screenY: number, world: World): any | null {
+  findEntityAtScreenPosition(screenX: number, screenY: number, world: World): Entity | null {
     const entities = world.query().with('position', 'renderable').executeEntities();
-
-    console.log(`[Renderer] findEntityAtScreenPosition: screenX=${screenX}, screenY=${screenY}`);
-    console.log(`[Renderer] Camera: x=${this.camera.x}, y=${this.camera.y}, zoom=${this.camera.zoom}`);
-    console.log(`[Renderer] Viewport: width=${this.camera.viewportWidth}, height=${this.camera.viewportHeight}`);
-    console.log(`[Renderer] TileSize: ${this.tileSize}`);
-    console.log(`[Renderer] Found ${entities.length} entities with position+renderable`);
-
     // Validate camera state
     if (!isFinite(this.camera.x) || !isFinite(this.camera.y) || !isFinite(this.camera.zoom)) {
       console.error(`[Renderer] Invalid camera state: x=${this.camera.x}, y=${this.camera.y}, zoom=${this.camera.zoom}`);
@@ -137,9 +151,9 @@ export class Renderer {
       return null;
     }
 
-    let closestEntity: any | null = null;
+    let closestEntity: Entity | null = null;
     let closestDistance = Infinity;
-    let closestAgent: any | null = null;
+    let closestAgent: Entity | null = null;
     let closestAgentDistance = Infinity;
 
     // Check all entities and find the closest one to the click point
@@ -150,14 +164,15 @@ export class Renderer {
         console.warn('[Renderer] Entity or entity.components is null/undefined');
         continue;
       }
-      const pos = entity.components.get('position') as { x: number; y: number } | undefined;
-      const renderable = entity.components.get('renderable') as { visible: boolean } | undefined;
+      const pos = entity.components.get('position') as PositionComponent | undefined;
+      const renderable = entity.components.get('renderable') as RenderableComponent | undefined;
 
       if (!pos || !renderable || !renderable.visible) continue;
 
       const hasAgent = entity.components.has('agent');
       const hasPlant = entity.components.has('plant');
       const hasAnimal = entity.components.has('animal');
+      const hasResource = entity.components.has('resource');
 
       // Calculate world pixel coordinates
       const worldX = pos.x * this.tileSize;
@@ -186,34 +201,31 @@ export class Renderer {
       // Determine click radius based on entity type
       // Agents need a VERY large radius to be easily clickable (16 tiles = 256 pixels at zoom 1.0)
       // Animals need a large radius to be easily clickable (8 tiles)
-      // Plants need a moderate radius to be clickable (3 tiles)
+      // Plants and resources (trees, bushes) need a moderate radius to be clickable (3 tiles)
       // Other entities use default (0.5 tiles)
       let clickRadius = tilePixelSize / 2;
       if (hasAgent) {
         clickRadius = tilePixelSize * 16; // Increased from 8 to 16 for more forgiving clicks
       } else if (hasAnimal) {
         clickRadius = tilePixelSize * 8; // Same as original agent radius
-      } else if (hasPlant) {
-        clickRadius = tilePixelSize * 3;
+      } else if (hasPlant || hasResource) {
+        clickRadius = tilePixelSize * 3; // Trees, plants, berry bushes
       }
 
       if (hasAgent) {
         agentCount++;
-        console.log(`[Renderer]   Agent ${agentCount}: worldPixels=(${worldX.toFixed(1)}, ${worldY.toFixed(1)}), worldPos=(${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}), screen=(${screen.x.toFixed(1)}, ${screen.y.toFixed(1)}), center=(${centerX.toFixed(1)}, ${centerY.toFixed(1)}), distance=${distance.toFixed(1)}, clickRadius=${clickRadius.toFixed(1)}, tilePixelSize=${tilePixelSize.toFixed(1)}, passes=${distance <= clickRadius}`);
       }
 
       // Check if click is within radius
       const passesDistanceCheck = distance <= clickRadius;
       const passesClosestCheck = distance < closestDistance;
       if (hasAgent) {
-        console.log(`[Renderer]   Agent distance check: passesDistanceCheck=${passesDistanceCheck}, passesClosestCheck=${passesClosestCheck}, closestDistance=${closestDistance}`);
       }
 
       // Track closest agent separately (for prioritization)
       if (hasAgent && passesDistanceCheck && distance < closestAgentDistance) {
         closestAgent = entity;
         closestAgentDistance = distance;
-        console.log(`[Renderer]   ✓ Setting this agent as closest agent (distance=${distance.toFixed(1)})`);
       }
 
       // Track closest entity overall
@@ -223,27 +235,30 @@ export class Renderer {
       }
     }
 
-    console.log(`[Renderer] Checked ${agentCount} agents, closestEntity: ${closestEntity ? closestEntity.id : 'null'}, closestDistance: ${closestDistance === Infinity ? 'Infinity' : closestDistance.toFixed(1)}, closestAgent: ${closestAgent ? closestAgent.id : 'null'}, closestAgentDistance: ${closestAgentDistance === Infinity ? 'Infinity' : closestAgentDistance.toFixed(1)}`);
 
-    // PRIORITY: Return agent if one is within range (even if other entities are closer)
-    // This fixes UX issue where clicking on agents would select nearby plants/animals instead
-    if (closestAgent) {
-      console.log(`[Renderer] Returning closest agent (prioritized) at distance ${closestAgentDistance.toFixed(1)}`);
+    // PRIORITY: Only prefer agent if click is actually close to the agent (within 2 tiles)
+    // This prevents agents from "stealing" clicks meant for nearby plants/animals
+    const tilePixelSize = this.tileSize * this.camera.zoom;
+    const agentPriorityRadius = tilePixelSize * 2; // Only prioritize agent if click is very close
+
+    if (closestAgent && closestAgentDistance <= agentPriorityRadius) {
       return closestAgent;
     }
 
-    // Fall back to closest non-agent entity (plant, animal, building, etc.)
+    // Return the closest entity (whichever type is actually closest)
     if (closestEntity) {
-      const isAgent = closestEntity.components.has('agent');
-      console.log(`[Renderer] Returning closest entity (${isAgent ? 'agent' : 'non-agent'}) at distance ${closestDistance.toFixed(1)}`);
       return closestEntity;
+    }
+
+    // If no entity within normal range but an agent is within its extended range, return agent
+    if (closestAgent) {
+      return closestAgent;
     }
 
     // If no entity found within radius, select the closest agent if it's reasonably close (within full viewport)
     // FIXED: Increased max search distance to full viewport since clicks can be anywhere on screen
     if (agentCount > 0) {
-      console.log('[Renderer] No entity within click radius, searching for nearest agent...');
-      let nearestAgent: any | null = null;
+      let nearestAgent: Entity | null = null;
       let nearestDistance = Infinity;
       // Use full viewport diagonal distance as maximum
       const maxSearchDistance = Math.sqrt(this.camera.viewportWidth ** 2 + this.camera.viewportHeight ** 2);
@@ -252,8 +267,8 @@ export class Renderer {
         if (!entity || !entity.components) continue;
         if (!entity.components.has('agent')) continue;
 
-        const pos = entity.components.get('position') as { x: number; y: number } | undefined;
-        const renderable = entity.components.get('renderable') as { visible: boolean } | undefined;
+        const pos = entity.components.get('position') as PositionComponent | undefined;
+        const renderable = entity.components.get('renderable') as RenderableComponent | undefined;
 
         if (!pos || !renderable || !renderable.visible) continue;
 
@@ -268,20 +283,16 @@ export class Renderer {
         const centerY = screen.y + tilePixelSize / 2;
         const distance = Math.sqrt((screenX - centerX) ** 2 + (screenY - centerY) ** 2);
 
-        console.log(`[Renderer]   Fallback: Agent at screen=(${screen.x.toFixed(1)}, ${screen.y.toFixed(1)}), center=(${centerX.toFixed(1)}, ${centerY.toFixed(1)}), distance=${distance.toFixed(1)}`);
 
         if (distance < nearestDistance && distance < maxSearchDistance) {
           nearestAgent = entity;
           nearestDistance = distance;
-          console.log(`[Renderer]   Fallback: New nearest agent found, distance=${nearestDistance.toFixed(1)}`);
         }
       }
 
       if (nearestAgent) {
-        console.log(`[Renderer] Found nearest agent at distance ${nearestDistance.toFixed(1)} (within max ${maxSearchDistance.toFixed(1)})`);
         return nearestAgent;
       } else {
-        console.log(`[Renderer] No agents found within viewport distance`);
       }
     }
 
@@ -293,7 +304,7 @@ export class Renderer {
    * @param world World instance
    * @param selectedEntity Optional selected entity to highlight
    */
-  render(world: World, selectedEntity?: any): void {
+  render(world: World, selectedEntity?: Entity): void {
     // Clear
     this.ctx.fillStyle = '#1a1a1a';
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -311,7 +322,7 @@ export class Renderer {
 
     // Generate newly loaded chunks
     for (const chunk of loaded) {
-      this.terrainGenerator.generateChunk(chunk, world as any);
+      this.terrainGenerator.generateChunk(chunk, world as WorldMutator);
     }
 
     // Get visible bounds in world coordinates
@@ -377,12 +388,8 @@ export class Renderer {
     }
 
     for (const entity of entities) {
-      const pos = entity.components.get('position') as
-        | { x: number; y: number }
-        | undefined;
-      const renderable = entity.components.get('renderable') as
-        | { spriteId: string; visible: boolean }
-        | undefined;
+      const pos = entity.components.get('position') as PositionComponent | undefined;
+      const renderable = entity.components.get('renderable') as RenderableComponent | undefined;
 
       if (!pos || !renderable || !renderable.visible) {
         // Debug: log why buildings are being skipped
@@ -415,9 +422,7 @@ export class Renderer {
       // }
 
       // Check if this is a building under construction
-      const building = entity.components.get('building') as
-        | { progress: number; isComplete: boolean; buildingType: string }
-        | undefined;
+      const building = entity.components.get('building') as BuildingComponent | undefined;
 
       const isUnderConstruction = building && !building.isComplete && building.progress < 100;
 
@@ -427,7 +432,7 @@ export class Renderer {
       }
 
       // Get plant component for stage-based rendering
-      const plant = entity.components.get('plant') as { stage: string } | undefined;
+      const plant = entity.components.get('plant') as PlantComponent | undefined;
       const metadata = plant ? { stage: plant.stage } : undefined;
 
       renderSprite(
@@ -457,7 +462,7 @@ export class Renderer {
       }
 
       // Draw building name label for better visibility
-      if (building) {
+      if (building && this.showBuildingLabels) {
         this.drawBuildingLabel(screen.x, screen.y, building.buildingType, !!isUnderConstruction);
       }
 
@@ -467,21 +472,15 @@ export class Renderer {
       }
 
       // Draw resource amount bar for harvestable resources (trees, rocks)
-      const resource = entity.components.get('resource') as
-        | { resourceType: string; amount: number; maxAmount: number; harvestable: boolean }
-        | undefined;
-      if (resource && resource.harvestable && resource.maxAmount > 0) {
+      const resource = entity.components.get('resource') as ResourceComponent | undefined;
+      if (resource && resource.harvestable && resource.maxAmount > 0 && this.showResourceAmounts) {
         this.drawResourceAmount(screen.x, screen.y, resource.amount, resource.maxAmount, resource.resourceType);
       }
 
       // Draw agent behavior label
-      const agent = entity.components.get('agent') as
-        | { behavior: string; behaviorState?: Record<string, any>; recentSpeech?: string }
-        | undefined;
-      const circadian = entity.components.get('circadian') as
-        | { isSleeping: boolean }
-        | undefined;
-      if (agent && agent.behavior) {
+      const agent = entity.components.get('agent') as AgentComponent | undefined;
+      const circadian = entity.components.get('circadian') as CircadianComponent | undefined;
+      if (agent && agent.behavior && this.showAgentTasks) {
         this.drawAgentBehavior(screen.x, screen.y, agent.behavior, agent.behaviorState, circadian);
       }
 
@@ -496,17 +495,13 @@ export class Renderer {
       }
 
       // Draw reflection indicator for agents currently reflecting
-      const reflection = entity.components.get('reflection') as
-        | { isReflecting: boolean; reflectionType?: string }
-        | undefined;
+      const reflection = entity.components.get('reflection') as ReflectionComponent | undefined;
       if (reflection?.isReflecting) {
         this.drawReflectionIndicator(screen.x, screen.y, reflection.reflectionType);
       }
 
       // Draw animal state label
-      const animal = entity.components.get('animal') as
-        | { state: string; wild: boolean; name: string }
-        | undefined;
+      const animal = entity.components.get('animal') as AnimalComponent | undefined;
       if (animal) {
         this.drawAnimalState(screen.x, screen.y, animal.state, animal.wild);
       }
@@ -552,8 +547,8 @@ export class Renderer {
     const agentData: Array<{ id: string; x: number; y: number; name?: string }> = [];
 
     for (const entity of agents) {
-      const pos = entity.components.get('position') as { x: number; y: number } | undefined;
-      const identity = entity.components.get('identity') as { name: string } | undefined;
+      const pos = entity.components.get('position') as PositionComponent | undefined;
+      const identity = entity.components.get('identity') as IdentityComponent | undefined;
 
       if (!pos) continue;
 
@@ -566,7 +561,7 @@ export class Renderer {
         id: entity.id,
         x: screen.x,
         y: screen.y,
-        name: identity?.name
+        name: this.showAgentNames ? identity?.name : undefined
       });
     }
 
@@ -602,14 +597,6 @@ export class Renderer {
         if (tile.tilled) {
           // DEBUG: Log first time we detect a tilled tile (to verify rendering is working)
           if (!this.hasLoggedTilledTile) {
-            console.log(`[Renderer] ✅ RENDERING TILLED TILE - Visual feedback IS active!`);
-            console.log(`[Renderer] Tilled tile details:`, {
-              position: { x: chunk.x * CHUNK_SIZE + localX, y: chunk.y * CHUNK_SIZE + localY },
-              terrain: tile.terrain,
-              tilled: tile.tilled,
-              plantability: tile.plantability,
-              fertility: tile.fertility,
-            });
             this.hasLoggedTilledTile = true;
           }
 
@@ -676,7 +663,7 @@ export class Renderer {
 
         // Draw temperature overlay (debug feature)
         // Note: Temperature is not currently stored per-tile, but this allows for future expansion
-        const tileWithTemp = tile as any;
+        const tileWithTemp = tile as typeof tile & { temperature?: number };
         if (this.showTemperatureOverlay && tileWithTemp.temperature !== undefined) {
           // Draw semi-transparent background for readability
           this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
@@ -956,8 +943,8 @@ export class Renderer {
     screenX: number,
     screenY: number,
     behavior: string,
-    behaviorState?: Record<string, any>,
-    circadian?: { isSleeping: boolean }
+    behaviorState?: Record<string, unknown>,
+    circadian?: CircadianComponent
   ): void {
     // Only show if zoom is reasonable
     if (this.camera.zoom < 0.5) return;
@@ -972,10 +959,10 @@ export class Renderer {
     if (isActuallySleeping) {
       displayText = 'Sleeping 💤💤💤';
     } else if (behavior === 'gather' && behaviorState?.resourceType) {
-      const resourceType = behaviorState.resourceType;
+      const resourceType = behaviorState.resourceType as string;
       displayText = `Gathering ${resourceType.charAt(0).toUpperCase() + resourceType.slice(1)}`;
     } else if (behavior === 'build' && behaviorState?.buildingType) {
-      displayText = `Building ${behaviorState.buildingType}`;
+      displayText = `Building ${behaviorState.buildingType as string}`;
     } else if (behavior === 'seek_food') {
       displayText = 'Foraging';
     } else if (behavior === 'wander') {
@@ -1083,7 +1070,7 @@ export class Renderer {
    * Draw visual indicators for agent-building interactions.
    * Shows when agents are near buildings (seeking warmth, shelter, working on construction).
    */
-  private drawAgentBuildingInteractions(world: World, selectedEntity?: any): void {
+  private drawAgentBuildingInteractions(world: World, selectedEntity?: Entity): void {
     // Get all agents
     const agents = world.query().with('agent', 'position').executeEntities();
 
@@ -1093,17 +1080,16 @@ export class Renderer {
     const interactionRadius = 2.0; // tiles
 
     for (const agent of agents) {
-      const agentPos = agent.components.get('position') as { x: number; y: number } | undefined;
-      const agentComp = agent.components.get('agent') as { behavior: string } | undefined;
-      const temperature = agent.components.get('temperature') as { state: string } | undefined;
+      const agentPos = agent.components.get('position') as PositionComponent | undefined;
+      const agentComp = agent.components.get('agent') as AgentComponent | undefined;
+      const temperature = agent.components.get('temperature') as TemperatureComponent | undefined;
 
       if (!agentPos || !agentComp) continue;
 
       // Check if agent is near any building
       for (const building of buildings) {
-        const buildingPos = building.components.get('position') as { x: number; y: number } | undefined;
-        const buildingComp = building.components.get('building') as
-          { buildingType: string; isComplete: boolean } | undefined;
+        const buildingPos = building.components.get('position') as PositionComponent | undefined;
+        const buildingComp = building.components.get('building') as BuildingComponent | undefined;
 
         if (!buildingPos || !buildingComp) continue;
 
@@ -1221,7 +1207,10 @@ export class Renderer {
       if (!timeEntity) {
         throw new Error('Time entity is undefined');
       }
-      const timeComp = timeEntity.components.get('time') as any;
+      // TimeComponent interface (inline since it's not exported from core)
+      const timeComp = timeEntity.components.get('time') as
+        | { timeOfDay: number; phase: string; lightLevel: number }
+        | undefined;
       if (timeComp) {
         const hours = Math.floor(timeComp.timeOfDay);
         const minutes = Math.floor((timeComp.timeOfDay - hours) * 60);

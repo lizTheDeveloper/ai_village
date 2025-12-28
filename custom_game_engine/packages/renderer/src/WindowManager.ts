@@ -20,22 +20,28 @@ import type {
 const STORAGE_KEY = 'ai-village-window-layout';
 const LAYOUT_VERSION = 1;
 const TITLE_BAR_HEIGHT = 30;
+const MENU_BAR_HEIGHT = 30; // Windows cannot spawn above this Y coordinate
 const BUTTON_SIZE = 20;
 const BUTTON_PADDING = 10;
 const SPIRAL_SEARCH_STEP = 50;
 const MAX_SPIRAL_ITERATIONS = 100;
+const RESIZE_HANDLE_SIZE = 16; // Size of the resize handle in the lower right corner
 
 export class WindowManager {
   private windows: Map<string, ManagedWindow> = new Map();
-  private canvas: HTMLCanvasElement;
   private nextZIndex: number = 1;
   private eventListeners: Map<string, Array<(data: any) => void>> = new Map();
+  // Store logical (CSS) dimensions separately from physical canvas buffer
+  private logicalWidth: number = 0;
+  private logicalHeight: number = 0;
 
   constructor(canvas: HTMLCanvasElement) {
     if (!canvas) {
       throw new Error('Canvas cannot be null or undefined');
     }
-    this.canvas = canvas;
+    // Initialize with canvas dimensions (will be updated by handleCanvasResize)
+    this.logicalWidth = canvas.width;
+    this.logicalHeight = canvas.height;
   }
 
   /**
@@ -79,6 +85,11 @@ export class WindowManager {
       isDragging: false,
       dragOffsetX: 0,
       dragOffsetY: 0,
+      isResizing: false,
+      resizeStartWidth: 0,
+      resizeStartHeight: 0,
+      resizeStartMouseX: 0,
+      resizeStartMouseY: 0,
       lastInteractionTime: now,
       openedTime: 0, // Will be set when first shown
     };
@@ -94,6 +105,13 @@ export class WindowManager {
   }
 
   /**
+   * Get all registered windows
+   */
+  public getAllWindows(): ManagedWindow[] {
+    return Array.from(this.windows.values());
+  }
+
+  /**
    * Show a window
    */
   public showWindow(id: string): void {
@@ -101,6 +119,7 @@ export class WindowManager {
     if (!window) {
       throw new Error(`Window with ID "${id}" not found`);
     }
+
 
     // Track if this is the first time showing (openedTime will be 0)
     const wasNeverShown = window.openedTime === 0;
@@ -113,15 +132,22 @@ export class WindowManager {
     }
 
     // Clamp window size to canvas if too large
-    if (window.width > this.canvas.width) {
-      window.width = this.canvas.width;
+    if (window.width > this.logicalWidth) {
+      window.width = this.logicalWidth;
     }
-    if (window.height > this.canvas.height) {
-      window.height = this.canvas.height;
+    if (window.height > this.logicalHeight) {
+      window.height = this.logicalHeight;
     }
 
-    // Check for space and handle collision avoidance
-    let position = this.findAvailablePosition(window);
+    // Try to use the window's current position first (may have been restored from localStorage)
+    // Only find a new position if the current spot is occupied by another visible window
+    let position: { x: number; y: number } | null = null;
+    if (this.isPositionAvailable(window.x, window.y, window.width, window.height, window.id)) {
+      position = { x: window.x, y: window.y };
+    } else {
+      // Current position is occupied, find a new one
+      position = this.findAvailablePosition(window);
+    }
 
     // Keep closing LRU windows until we find space
     while (!position) {
@@ -136,7 +162,6 @@ export class WindowManager {
       // Close the LRU window
       const lruWindow = this.windows.get(lruWindowId);
       if (lruWindow) {
-        console.log(`Auto-closed "${lruWindowId}" (last used: ${new Date(lruWindow.lastInteractionTime).toISOString()})`);
 
         this.hideWindow(lruWindowId);
 
@@ -261,7 +286,7 @@ export class WindowManager {
 
   /**
    * Handle drag start
-   * Returns true if drag started successfully
+   * Returns true if drag or resize started successfully
    */
   public handleDragStart(x: number, y: number): boolean {
     // Find the topmost window at this position
@@ -276,6 +301,19 @@ export class WindowManager {
       return false;
     }
 
+    // Check if click is on resize handle
+    if (this.isOnResizeHandle(window, x, y)) {
+      // Start resizing
+      window.isResizing = true;
+      window.resizeStartWidth = window.width;
+      window.resizeStartHeight = window.height;
+      window.resizeStartMouseX = x;
+      window.resizeStartMouseY = y;
+
+      this.bringToFront(clickedWindow);
+      return true;
+    }
+
     // Check if click is in title bar and window is draggable
     if (window.config.isDraggable === false) {
       return false;
@@ -285,6 +323,12 @@ export class WindowManager {
 
     if (!inTitleBar) {
       return false;
+    }
+
+    // Don't start drag if clicking on a title bar button
+    const button = this.detectTitleBarButton(window, x, y);
+    if (button) {
+      return false; // Let handleClick handle the button
     }
 
     // Start dragging
@@ -298,7 +342,7 @@ export class WindowManager {
   }
 
   /**
-   * Handle drag movement
+   * Handle drag movement (for both dragging and resizing)
    */
   public handleDrag(x: number, y: number): void {
     // Validate coordinates
@@ -306,34 +350,62 @@ export class WindowManager {
       throw new Error('Invalid drag coordinates: x and y must be finite numbers');
     }
 
-    // Find the dragging window
+    // Find the dragging or resizing window
     const draggingWindow = Array.from(this.windows.values()).find(w => w.isDragging);
+    const resizingWindow = Array.from(this.windows.values()).find(w => w.isResizing);
 
-    if (!draggingWindow) {
-      return;
+    if (draggingWindow) {
+      // Calculate new position
+      let newX = x - draggingWindow.dragOffsetX;
+      let newY = y - draggingWindow.dragOffsetY;
+
+      // Clamp to canvas bounds (Y must stay below menu bar)
+      newX = Math.max(0, Math.min(newX, this.logicalWidth - draggingWindow.width));
+      newY = Math.max(MENU_BAR_HEIGHT, Math.min(newY, this.logicalHeight - TITLE_BAR_HEIGHT));
+
+      draggingWindow.x = newX;
+      draggingWindow.y = newY;
+    } else if (resizingWindow) {
+      // Calculate new size
+      const deltaX = x - resizingWindow.resizeStartMouseX;
+      const deltaY = y - resizingWindow.resizeStartMouseY;
+
+      let newWidth = resizingWindow.resizeStartWidth + deltaX;
+      let newHeight = resizingWindow.resizeStartHeight + deltaY;
+
+      // Apply min/max constraints
+      const minWidth = resizingWindow.config.minWidth ?? 100;
+      const minHeight = resizingWindow.config.minHeight ?? 100;
+      const maxWidth = resizingWindow.config.maxWidth ?? this.logicalWidth;
+      const maxHeight = resizingWindow.config.maxHeight ?? this.logicalHeight;
+
+      newWidth = Math.max(minWidth, Math.min(newWidth, maxWidth));
+      newHeight = Math.max(minHeight, Math.min(newHeight, maxHeight));
+
+      // Don't resize beyond canvas bounds
+      newWidth = Math.min(newWidth, this.logicalWidth - resizingWindow.x);
+      newHeight = Math.min(newHeight, this.logicalHeight - resizingWindow.y);
+
+      resizingWindow.width = newWidth;
+      resizingWindow.height = newHeight;
     }
-
-    // Calculate new position
-    let newX = x - draggingWindow.dragOffsetX;
-    let newY = y - draggingWindow.dragOffsetY;
-
-    // Clamp to canvas bounds
-    newX = Math.max(0, Math.min(newX, this.canvas.width - draggingWindow.width));
-    newY = Math.max(0, Math.min(newY, this.canvas.height - TITLE_BAR_HEIGHT));
-
-    draggingWindow.x = newX;
-    draggingWindow.y = newY;
   }
 
   /**
-   * Handle drag end
+   * Handle drag end (for both dragging and resizing)
    */
   public handleDragEnd(): void {
-    // Find the dragging window
+    // Find the dragging or resizing window
     const draggingWindow = Array.from(this.windows.values()).find(w => w.isDragging);
+    const resizingWindow = Array.from(this.windows.values()).find(w => w.isResizing);
 
     if (draggingWindow) {
       draggingWindow.isDragging = false;
+      this.saveLayout();
+    }
+
+    if (resizingWindow) {
+      resizingWindow.isResizing = false;
       this.saveLayout();
     }
   }
@@ -371,6 +443,16 @@ export class WindowManager {
         this.pinWindow(clickedWindowId, !window.pinned);
         this.markWindowInteraction(clickedWindowId);
         return true;
+      }
+    } else if (!window.minimized) {
+      // Click is in content area - forward to panel if it handles clicks
+      const contentY = window.y + TITLE_BAR_HEIGHT;
+      const contentHeight = window.height - TITLE_BAR_HEIGHT;
+
+      if (window.panel.handleContentClick) {
+        const relativeX = x - window.x;
+        const relativeY = y - contentY;
+        window.panel.handleContentClick(relativeX, relativeY, window.width, contentHeight);
       }
     }
 
@@ -420,6 +502,51 @@ export class WindowManager {
     }
 
     return null;
+  }
+
+  /**
+   * Check if a click is on the resize handle (lower right corner)
+   */
+  private isOnResizeHandle(window: ManagedWindow, x: number, y: number): boolean {
+    if (!window.config.isResizable || window.minimized) {
+      return false;
+    }
+
+    const handleX = window.x + window.width - RESIZE_HANDLE_SIZE;
+    const handleY = window.y + window.height - RESIZE_HANDLE_SIZE;
+
+    return x >= handleX && x < window.x + window.width &&
+           y >= handleY && y < window.y + window.height;
+  }
+
+  /**
+   * Handle mouse wheel scroll over a window
+   * Forwards to the panel's handleScroll method if implemented
+   */
+  public handleWheel(x: number, y: number, deltaY: number): boolean {
+    const windowId = this.getWindowAtPosition(x, y);
+    if (!windowId) {
+      return false;
+    }
+
+    const window = this.windows.get(windowId);
+    if (!window || window.minimized) {
+      return false;
+    }
+
+    // Check if mouse is in content area (not title bar)
+    const inTitleBar = y >= window.y && y < window.y + TITLE_BAR_HEIGHT;
+    if (inTitleBar) {
+      return false;
+    }
+
+    // Forward to panel's handleScroll if implemented
+    if (window.panel.handleScroll) {
+      const contentHeight = window.height - TITLE_BAR_HEIGHT;
+      return window.panel.handleScroll(deltaY, contentHeight);
+    }
+
+    return false;
   }
 
   /**
@@ -576,8 +703,8 @@ export class WindowManager {
     const cascadeY = lastWindow.y + TITLE_BAR_HEIGHT;
 
     // Check if cascade position is within bounds and doesn't overlap
-    if (cascadeX + window.width <= this.canvas.width &&
-        cascadeY + window.height <= this.canvas.height &&
+    if (cascadeX + window.width <= this.logicalWidth &&
+        cascadeY + window.height <= this.logicalHeight &&
         this.isPositionAvailable(cascadeX, cascadeY, window.width, window.height, window.id)) {
       return { x: cascadeX, y: cascadeY };
     }
@@ -590,8 +717,8 @@ export class WindowManager {
    * Check if a position is available (no overlap with other windows)
    */
   private isPositionAvailable(x: number, y: number, width: number, height: number, excludeId?: string): boolean {
-    // Check canvas bounds
-    if (x < 0 || y < 0 || x + width > this.canvas.width || y + height > this.canvas.height) {
+    // Check canvas bounds (Y must be at or below menu bar)
+    if (x < 0 || y < MENU_BAR_HEIGHT || x + width > this.logicalWidth || y + height > this.logicalHeight) {
       return false;
     }
 
@@ -610,15 +737,16 @@ export class WindowManager {
   }
 
   /**
-   * Handle canvas resize
+   * Handle canvas resize (receives logical/CSS dimensions, not physical pixels)
    */
   public handleCanvasResize(width: number, height: number): void {
-    // Save old dimensions BEFORE updating canvas
-    const oldWidth = this.canvas.width;
-    const oldHeight = this.canvas.height;
+    // Save old dimensions BEFORE updating
+    const oldWidth = this.logicalWidth;
+    const oldHeight = this.logicalHeight;
 
-    this.canvas.width = width;
-    this.canvas.height = height;
+    // Store logical dimensions (don't modify canvas.width which is the physical buffer)
+    this.logicalWidth = width;
+    this.logicalHeight = height;
 
     // Track windows positioned relative to right/bottom edges
     const rightAlignedThreshold = oldWidth * 0.6; // Windows in right 40%
@@ -654,11 +782,15 @@ export class WindowManager {
       // Maintain relative position for bottom-aligned windows
       if (wasBottomAligned) {
         const newY = height - window.height - oldOffsetFromBottom;
-        window.y = Math.max(0, Math.min(newY, height - window.height));
+        window.y = Math.max(MENU_BAR_HEIGHT, Math.min(newY, height - window.height));
       } else {
-        // Clamp position for top-aligned windows
+        // Clamp position for top-aligned windows (stay below menu bar)
         if (window.y + window.height > height) {
-          window.y = Math.max(0, height - window.height);
+          window.y = Math.max(MENU_BAR_HEIGHT, height - window.height);
+        }
+        // Ensure window is below menu bar
+        if (window.y < MENU_BAR_HEIGHT) {
+          window.y = MENU_BAR_HEIGHT;
         }
       }
     }
@@ -730,7 +862,8 @@ export class WindowManager {
         }
 
         window.x = savedWindow.x;
-        window.y = savedWindow.y;
+        // Ensure restored windows are below menu bar
+        window.y = Math.max(MENU_BAR_HEIGHT, savedWindow.y);
         window.width = savedWindow.width;
         window.height = savedWindow.height;
         window.visible = savedWindow.visible ?? false;
@@ -772,7 +905,7 @@ export class WindowManager {
       this.loadLayout();
     } else if (mode === 'cascade') {
       let offsetX = 50;
-      let offsetY = 50;
+      let offsetY = MENU_BAR_HEIGHT + 20; // Start below menu bar
 
       for (const window of visibleWindows) {
         window.x = offsetX;
@@ -781,18 +914,19 @@ export class WindowManager {
         offsetY += TITLE_BAR_HEIGHT;
       }
     } else if (mode === 'tile') {
-      // Simple tile layout
+      // Simple tile layout (account for menu bar height)
       const count = visibleWindows.length;
       const cols = Math.ceil(Math.sqrt(count));
       const rows = Math.ceil(count / cols);
-      const tileWidth = this.canvas.width / cols;
-      const tileHeight = this.canvas.height / rows;
+      const tileWidth = this.logicalWidth / cols;
+      const availableHeight = this.logicalHeight - MENU_BAR_HEIGHT;
+      const tileHeight = availableHeight / rows;
 
       visibleWindows.forEach((window, i) => {
         const col = i % cols;
         const row = Math.floor(i / cols);
         window.x = col * tileWidth;
-        window.y = row * tileHeight;
+        window.y = MENU_BAR_HEIGHT + row * tileHeight;
         window.width = tileWidth - 10;
         window.height = tileHeight - 10;
       });
@@ -803,8 +937,10 @@ export class WindowManager {
 
   /**
    * Render all windows
+   * @param ctx Canvas rendering context
+   * @param world Optional world instance to pass to panels that need it
    */
-  public render(ctx: CanvasRenderingContext2D): void {
+  public render(ctx: CanvasRenderingContext2D, world?: any): void {
     // Sort windows by z-index
     const sortedWindows = Array.from(this.windows.values())
       .filter(w => w.visible)
@@ -812,17 +948,17 @@ export class WindowManager {
 
     for (const window of sortedWindows) {
       // Render window
-      this.renderWindow(ctx, window);
+      this.renderWindow(ctx, window, world);
     }
   }
 
   /**
    * Render a single window
    */
-  private renderWindow(ctx: CanvasRenderingContext2D, window: ManagedWindow): void {
-    // Draw window background
+  private renderWindow(ctx: CanvasRenderingContext2D, window: ManagedWindow, world?: any): void {
+    // Draw window background (only title bar height when minimized)
     ctx.fillStyle = '#2a2a2a';
-    ctx.fillRect(window.x, window.y, window.width, window.height);
+    ctx.fillRect(window.x, window.y, window.width, window.minimized ? TITLE_BAR_HEIGHT : window.height);
 
     // Draw title bar
     ctx.fillStyle = '#1e1e1e';
@@ -847,15 +983,46 @@ export class WindowManager {
       ctx.rect(window.x, contentY, window.width, contentHeight);
       ctx.clip();
 
-      window.panel.render(ctx, window.x, contentY, window.width, contentHeight);
+      // Translate so panels can render at (0, 0) relative to content area
+      ctx.translate(window.x, contentY);
+
+      // Notify panel of its screen position (for HTML overlay elements)
+      const panelAny = window.panel as any;
+      if (typeof panelAny.setScreenPosition === 'function') {
+        panelAny.setScreenPosition(window.x, contentY);
+      }
+
+      // Pass (0, 0) as position since we've already translated
+      window.panel.render(ctx, 0, 0, window.width, contentHeight, world);
 
       ctx.restore();
     }
 
     // Draw border
-    ctx.strokeStyle = window.isDragging ? '#0078d4' : '#3a3a3a';
+    ctx.strokeStyle = window.isDragging || window.isResizing ? '#0078d4' : '#3a3a3a';
     ctx.lineWidth = 2;
     ctx.strokeRect(window.x, window.y, window.width, window.minimized ? TITLE_BAR_HEIGHT : window.height);
+
+    // Draw resize handle if window is resizable and not minimized
+    if (window.config.isResizable && !window.minimized) {
+      const handleX = window.x + window.width - RESIZE_HANDLE_SIZE;
+      const handleY = window.y + window.height - RESIZE_HANDLE_SIZE;
+
+      // Draw resize handle background
+      ctx.fillStyle = window.isResizing ? '#0078d4' : '#555555';
+      ctx.fillRect(handleX, handleY, RESIZE_HANDLE_SIZE, RESIZE_HANDLE_SIZE);
+
+      // Draw resize grip lines (three diagonal lines)
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 3; i++) {
+        const offset = i * 4 + 4;
+        ctx.beginPath();
+        ctx.moveTo(handleX + offset, handleY + RESIZE_HANDLE_SIZE);
+        ctx.lineTo(handleX + RESIZE_HANDLE_SIZE, handleY + offset);
+        ctx.stroke();
+      }
+    }
   }
 
   /**
@@ -887,6 +1054,9 @@ export class WindowManager {
     ctx.fillRect(pinX, buttonY, BUTTON_SIZE, BUTTON_SIZE);
     ctx.fillStyle = '#ffffff';
     ctx.fillText('📌', pinX + BUTTON_SIZE / 2, buttonY + BUTTON_SIZE / 2);
+
+    // Reset text alignment to default for subsequent rendering
+    ctx.textAlign = 'left';
   }
 
   /**

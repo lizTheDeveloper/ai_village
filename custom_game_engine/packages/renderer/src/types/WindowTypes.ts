@@ -71,6 +71,26 @@ export interface IWindowPanel {
     y: number,
     width: number
   ): void;
+
+  /**
+   * Optional scroll handling for panels with scrollable content
+   *
+   * @param deltaY - Scroll delta (positive = scroll down, negative = scroll up)
+   * @param contentHeight - Height of the content area
+   * @returns true if scroll was handled
+   */
+  handleScroll?(deltaY: number, contentHeight: number): boolean;
+
+  /**
+   * Optional click handling for interactive panel content
+   *
+   * @param x - X position relative to panel content area (0,0 = top-left of content)
+   * @param y - Y position relative to panel content area
+   * @param width - Width of the content area
+   * @param height - Height of the content area
+   * @returns true if click was handled by the panel
+   */
+  handleContentClick?(x: number, y: number, width: number, height: number): boolean;
 }
 
 /**
@@ -162,6 +182,21 @@ export interface ManagedWindow {
 
   /** Y offset from window origin to mouse during drag */
   dragOffsetY: number;
+
+  /** Whether window is currently being resized */
+  isResizing: boolean;
+
+  /** Initial width when resize started */
+  resizeStartWidth: number;
+
+  /** Initial height when resize started */
+  resizeStartHeight: number;
+
+  /** Initial mouse X when resize started */
+  resizeStartMouseX: number;
+
+  /** Initial mouse Y when resize started */
+  resizeStartMouseY: number;
 
   /** Timestamp of last user interaction (click, drag, focus) */
   lastInteractionTime: number;

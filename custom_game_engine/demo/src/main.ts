@@ -656,6 +656,9 @@ async function main() {
   // Create MenuBar for window management
   const menuBar = new MenuBar(windowManager, canvas);
 
+  // Set renderer for view toggle buttons
+  menuBar.setRenderer(renderer);
+
   // Create adapters for all panels
   const agentInfoAdapter = new AgentInfoPanelAdapter(agentInfoPanel);
   const animalInfoAdapter = new AnimalInfoPanelAdapter(animalInfoPanel);
@@ -687,6 +690,9 @@ async function main() {
     defaultWidth: 360,
     defaultHeight: 530,
     isDraggable: true,
+    isResizable: true,
+    minWidth: 300,
+    minHeight: 400,
     showInWindowList: true,
     keyboardShortcut: 'A',
   });
@@ -698,6 +704,9 @@ async function main() {
     defaultWidth: 300,
     defaultHeight: 400,
     isDraggable: true,
+    isResizable: true,
+    minWidth: 250,
+    minHeight: 300,
     showInWindowList: true,
   });
 
@@ -708,6 +717,9 @@ async function main() {
     defaultWidth: 320,
     defaultHeight: 480,
     isDraggable: true,
+    isResizable: true,
+    minWidth: 250,
+    minHeight: 350,
     showInWindowList: true,
   });
 
@@ -718,6 +730,9 @@ async function main() {
     defaultWidth: 250,
     defaultHeight: 200,
     isDraggable: true,
+    isResizable: true,
+    minWidth: 200,
+    minHeight: 150,
     showInWindowList: true,
     keyboardShortcut: 'R',
   });
@@ -729,6 +744,9 @@ async function main() {
     defaultWidth: 400,
     defaultHeight: 600,
     isDraggable: true,
+    isResizable: true,
+    minWidth: 300,
+    minHeight: 400,
     showInWindowList: true,
     keyboardShortcut: 'M',
   });
@@ -740,6 +758,9 @@ async function main() {
     defaultWidth: 380,
     defaultHeight: 500,
     isDraggable: true,
+    isResizable: true,
+    minWidth: 300,
+    minHeight: 350,
     showInWindowList: true,
     keyboardShortcut: 'L',
   });
@@ -751,6 +772,9 @@ async function main() {
     defaultWidth: 300,
     defaultHeight: 400,
     isDraggable: true,
+    isResizable: true,
+    minWidth: 250,
+    minHeight: 300,
     showInWindowList: true,
     keyboardShortcut: 'T',
   });
@@ -762,6 +786,9 @@ async function main() {
     defaultWidth: logicalWidth - 200,
     defaultHeight: logicalHeight - 100,
     isDraggable: true,
+    isResizable: true,
+    minWidth: 400,
+    minHeight: 300,
     isModal: true,
     showInWindowList: true,
     keyboardShortcut: 'I',
@@ -774,6 +801,9 @@ async function main() {
     defaultWidth: 400,
     defaultHeight: 300,
     isDraggable: true,
+    isResizable: true,
+    minWidth: 350,
+    minHeight: 250,
     isModal: true,
     showInWindowList: true,
     keyboardShortcut: 'Escape',
@@ -786,6 +816,9 @@ async function main() {
     defaultWidth: 800,
     defaultHeight: 600,
     isDraggable: true,
+    isResizable: true,
+    minWidth: 600,
+    minHeight: 400,
     isModal: true,
     showInWindowList: true,
     keyboardShortcut: 'C',
@@ -798,6 +831,9 @@ async function main() {
     defaultWidth: 400,
     defaultHeight: 300,
     isDraggable: true,
+    isResizable: true,
+    minWidth: 300,
+    minHeight: 200,
     showInWindowList: true,
     keyboardShortcut: 'N',
   });
@@ -809,6 +845,9 @@ async function main() {
     defaultWidth: 400,
     defaultHeight: 500,
     isDraggable: true,
+    isResizable: true,
+    minWidth: 350,
+    minHeight: 400,
     showInWindowList: true,
     keyboardShortcut: 'E',
   });
@@ -832,6 +871,9 @@ async function main() {
     defaultWidth: 300,
     defaultHeight: 500,
     isDraggable: true,
+    isResizable: true,
+    minWidth: 250,
+    minHeight: 350,
     showInWindowList: true,
     keyboardShortcut: 'H',
   });

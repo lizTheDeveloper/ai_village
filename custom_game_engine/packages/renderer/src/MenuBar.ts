@@ -1,4 +1,5 @@
 import type { WindowManager } from './WindowManager.js';
+import type { Renderer } from './Renderer.js';
 
 /**
  * Menu bar component that displays at the top of the game screen.
@@ -6,6 +7,7 @@ import type { WindowManager } from './WindowManager.js';
  */
 export class MenuBar {
   private windowManager: WindowManager;
+  private renderer: Renderer | null = null;
   private canvas: HTMLCanvasElement;
   private height: number = 30;
   private isWindowMenuOpen: boolean = false;
@@ -13,6 +15,14 @@ export class MenuBar {
 
   // Menu button bounds for click detection
   private windowMenuBounds = { x: 50, y: 0, width: 70, height: 30 };
+
+  // View toggle buttons
+  private viewToggles = [
+    { key: 'showResourceAmounts', emoji: '📊', tooltip: 'Resource Amounts', x: 0, width: 30 },
+    { key: 'showBuildingLabels', emoji: '🏠', tooltip: 'Building Labels', x: 0, width: 30 },
+    { key: 'showAgentNames', emoji: '👤', tooltip: 'Agent Names', x: 0, width: 30 },
+    { key: 'showAgentTasks', emoji: '📋', tooltip: 'Agent Tasks', x: 0, width: 30 },
+  ];
 
   constructor(windowManager: WindowManager, canvas: HTMLCanvasElement) {
     if (!windowManager) {
@@ -24,6 +34,20 @@ export class MenuBar {
 
     this.windowManager = windowManager;
     this.canvas = canvas;
+
+    // Calculate view toggle button positions (to the right of Window menu)
+    let currentX = this.windowMenuBounds.x + this.windowMenuBounds.width + 10;
+    for (const toggle of this.viewToggles) {
+      toggle.x = currentX;
+      currentX += toggle.width + 5;
+    }
+  }
+
+  /**
+   * Set the renderer instance for view toggles.
+   */
+  setRenderer(renderer: Renderer): void {
+    this.renderer = renderer;
   }
 
   /**
@@ -38,6 +62,15 @@ export class MenuBar {
    * Returns true if click was handled by menu bar.
    */
   handleClick(x: number, y: number): boolean {
+    // Check if clicking on a menu item in the dropdown (must check FIRST, before closing menu)
+    if (this.isWindowMenuOpen) {
+      const dropdownY = this.windowMenuBounds.y + this.windowMenuBounds.height;
+      // If click is below menu bar and within dropdown X range, handle as dropdown click
+      if (y >= dropdownY && x >= this.windowMenuBounds.x) {
+        return this.handleWindowMenuItemClick(x, y);
+      }
+    }
+
     // Check if click is within menu bar area
     if (y < 0 || y > this.height) {
       // Close menu if clicking outside
@@ -46,6 +79,21 @@ export class MenuBar {
         return true;
       }
       return false;
+    }
+
+    // Check if clicking on view toggle buttons
+    if (this.renderer) {
+      for (const toggle of this.viewToggles) {
+        if (x >= toggle.x && x <= toggle.x + toggle.width &&
+            y >= 0 && y <= this.height) {
+          // Toggle the corresponding view option
+          const key = toggle.key as keyof Renderer;
+          if (typeof this.renderer[key] === 'boolean') {
+            (this.renderer[key] as boolean) = !(this.renderer[key] as boolean);
+          }
+          return true;
+        }
+      }
     }
 
     // Check if clicking on "Window" menu button
@@ -57,11 +105,6 @@ export class MenuBar {
       return true;
     }
 
-    // Check if clicking on a menu item in the dropdown
-    if (this.isWindowMenuOpen && x >= this.windowMenuBounds.x) {
-      return this.handleWindowMenuItemClick(x, y);
-    }
-
     return false;
   }
 
@@ -70,7 +113,7 @@ export class MenuBar {
    */
   private handleWindowMenuItemClick(x: number, y: number): boolean {
     const dropdownX = this.windowMenuBounds.x;
-    const dropdownY = this.windowMenuBounds.height;
+    const dropdownY = this.windowMenuBounds.y + this.windowMenuBounds.height; // Fixed: use y + height
     const dropdownWidth = 250;
     const itemHeight = 24;
 
@@ -192,6 +235,33 @@ export class MenuBar {
     ctx.fillStyle = '#ffffff';
     ctx.fillText('Window', this.windowMenuBounds.x + 10, this.height / 2);
 
+    // Draw view toggle buttons
+    if (this.renderer) {
+      for (const toggle of this.viewToggles) {
+        const key = toggle.key as keyof Renderer;
+        const isActive = this.renderer[key] as boolean;
+
+        // Button background (green if active, dark if inactive)
+        ctx.fillStyle = isActive ? '#4CAF50' : '#3a3a3a';
+        ctx.fillRect(toggle.x, 2, toggle.width, this.height - 4);
+
+        // Button border
+        ctx.strokeStyle = '#666666';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(toggle.x, 2, toggle.width, this.height - 4);
+
+        // Draw emoji icon
+        ctx.font = '16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(toggle.emoji, toggle.x + toggle.width / 2, this.height / 2);
+
+        // Reset text alignment
+        ctx.textAlign = 'left';
+      }
+    }
+
     // Draw dropdown menu if open
     if (this.isWindowMenuOpen) {
       this.renderWindowMenu(ctx);
@@ -203,7 +273,7 @@ export class MenuBar {
    */
   private renderWindowMenu(ctx: CanvasRenderingContext2D): void {
     const dropdownX = this.windowMenuBounds.x;
-    const dropdownY = this.windowMenuBounds.height;
+    const dropdownY = this.windowMenuBounds.y + this.windowMenuBounds.height;
     const dropdownWidth = 250;
     const itemHeight = 24;
 
