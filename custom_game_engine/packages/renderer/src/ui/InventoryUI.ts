@@ -1,5 +1,6 @@
 import type { World, InventoryComponent } from '@ai-village/core';
 import { calculateInventoryWeight } from '@ai-village/core';
+import { getQualityTier, getQualityColor } from '@ai-village/core';
 import { DragDropSystem, type SlotReference } from './DragDropSystem.js';
 import { InventorySearch } from './InventorySearch.js';
 import { ItemTooltip, type TooltipItem } from './ItemTooltip.js';
@@ -98,14 +99,12 @@ export class InventoryUI {
     // Toggle inventory with I or Tab
     if (key === 'i' || key === 'I' || key === 'Tab') {
       this.isOpenState = !this.isOpenState;
-      console.log(`[InventoryUI] Toggled inventory via '${key}': isOpen=${this.isOpenState}`);
       return;
     }
 
     // Close with Escape
     if (key === 'Escape') {
       this.isOpenState = false;
-      console.log(`[InventoryUI] Closed inventory via Escape: isOpen=${this.isOpenState}`);
       return;
     }
 
@@ -234,7 +233,6 @@ export class InventoryUI {
 
         // Only log when starting to hover (not every frame)
         if (!wasHovering) {
-          console.log(`[InventoryUI] Hover started on slot ${slotRef.index}: ${slot.itemId} x${slot.quantity}`);
         }
 
         const tooltipItem: TooltipItem = {
@@ -361,17 +359,12 @@ export class InventoryUI {
    * Returns true if click was handled (should block game canvas interaction)
    */
   public handleClick(screenX: number, screenY: number, button: number, canvasWidth: number, canvasHeight: number): boolean {
-    console.log(`[InventoryUI] handleClick called: screenX=${screenX}, screenY=${screenY}, button=${button}, canvasW=${canvasWidth}, canvasH=${canvasHeight}, isOpen=${this.isOpenState}`);
-
     if (!this.isOpenState) {
-      console.log(`[InventoryUI] Inventory not open, returning false`);
       return false; // Inventory not open, don't handle
     }
 
     // IMPORTANT: When inventory is open, ALWAYS consume clicks to prevent game interaction
     // Even if clicking outside the panel (which closes it), we still handled the click
-    console.log(`[InventoryUI] Inventory is open, will consume this click`);
-
     // Store canvas dimensions for getSlotAtPosition
     this.lastCanvasWidth = canvasWidth;
     this.lastCanvasHeight = canvasHeight;
@@ -381,9 +374,6 @@ export class InventoryUI {
     const panelHeight = Math.min(600, canvasHeight - 40);
     const panelX = (canvasWidth - panelWidth) / 2;
     const panelY = (canvasHeight - panelHeight) / 2;
-
-    console.log(`[InventoryUI] Panel bounds: x=${panelX}-${panelX + panelWidth}, y=${panelY}-${panelY + panelHeight}`);
-
     // Check if click is inside inventory panel bounds
     const isInsidePanel =
       screenX >= panelX &&
@@ -391,33 +381,25 @@ export class InventoryUI {
       screenY >= panelY &&
       screenY <= panelY + panelHeight;
 
-    console.log(`[InventoryUI] Click isInsidePanel: ${isInsidePanel} (checks: x=${screenX >= panelX && screenX <= panelX + panelWidth}, y=${screenY >= panelY && screenY <= panelY + panelHeight})`);
 
     if (!isInsidePanel) {
       // Click outside panel - close inventory (backdrop click)
-      console.log(`[InventoryUI] Click outside panel, closing inventory`);
       this.isOpenState = false;
       return true; // Consumed the click
     }
 
     // Click is inside panel - handle item interaction
-    console.log(`[InventoryUI] Click inside panel, checking for item click`);
-
     // Check if clicking on a backpack slot
     const clickedSlot = this.getSlotAtPosition(screenX, screenY);
     if (clickedSlot && clickedSlot.index !== undefined && this.playerInventory) {
       const slot = this.playerInventory.slots[clickedSlot.index];
-      console.log(`[InventoryUI] Clicked on slot ${clickedSlot.index}, item=${slot?.itemId || 'empty'}`);
-
       if (button === 0) {
         // Left click - start drag or select item
         if (slot && slot.itemId && slot.quantity > 0) {
-          console.log(`[InventoryUI] Starting drag for item ${slot.itemId}`);
           this.startDrag(clickedSlot.index, screenX, screenY);
         }
       } else if (button === 2) {
         // Right click - context menu (not implemented yet)
-        console.log(`[InventoryUI] Right-click on slot ${clickedSlot.index} - context menu not yet implemented`);
       }
     }
 
@@ -692,6 +674,23 @@ export class InventoryUI {
             ctx.textAlign = 'right';
             ctx.textBaseline = 'bottom';
             ctx.fillText(slot.quantity.toString(), slotX + slotSize - 4, slotY + slotSize - 4);
+
+            // Draw quality badge (Phase 10)
+            if (slot.quality !== undefined) {
+              const qualityTier = getQualityTier(slot.quality);
+              const qualityColor = getQualityColor(qualityTier);
+
+              // Draw quality indicator in top-right corner
+              ctx.fillStyle = qualityColor;
+              ctx.beginPath();
+              ctx.arc(slotX + slotSize - 6, slotY + 6, 4, 0, Math.PI * 2);
+              ctx.fill();
+
+              // Add border to quality dot
+              ctx.strokeStyle = '#000';
+              ctx.lineWidth = 1;
+              ctx.stroke();
+            }
           }
         }
       }
@@ -747,7 +746,6 @@ export class InventoryUI {
     // Render tooltip if hovering over item
     // NOTE: Tooltip rendering happens LAST so it draws on top of everything
     if (this.hoveredSlot && this.playerInventory) {
-      console.log('[InventoryUI] Rendering tooltip for slot', this.hoveredSlot.index);
       this.renderTooltip(ctx);
     }
   }

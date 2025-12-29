@@ -38,6 +38,14 @@ export interface ResourceCost {
   amountRequired: number;
 }
 
+/**
+ * Skill requirement for Progressive Skill Reveal System.
+ */
+export interface SkillRequirement {
+  skill: 'building' | 'farming' | 'gathering' | 'cooking' | 'crafting' | 'social' | 'exploration' | 'combat' | 'animal_handling' | 'medicine';
+  level: 0 | 1 | 2 | 3 | 4 | 5;
+}
+
 export interface BuildingBlueprint {
   id: string;
   name: string;
@@ -53,6 +61,7 @@ export interface BuildingBlueprint {
   techRequired: string[];
   terrainRequired: string[];
   terrainForbidden: string[];
+  skillRequired?: SkillRequirement;
 
   // Status
   unlocked: boolean;
@@ -150,6 +159,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 0 },
       unlocked: true,
       buildTime: 60,
       tier: 1,
@@ -245,6 +255,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 1 },
       unlocked: true,
       buildTime: 45,
       tier: 1,
@@ -275,6 +286,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 2 },
       unlocked: true,
       buildTime: 60,
       tier: 1,
@@ -305,6 +317,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 1 },
       unlocked: true,
       buildTime: 45,
       tier: 1,
@@ -332,6 +345,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 1 },
       unlocked: true,
       buildTime: 90,
       tier: 1,
@@ -406,6 +420,12 @@ export class BuildingBlueprintRegistry {
       snapToGrid: true,
       requiresFoundation: false,
     });
+
+    // Register all tier 2+ buildings
+    this.registerTier2Stations();
+    this.registerTier3Stations();
+    this.registerResearchBuildings();
+    this.registerGovernanceBuildings();
   }
 
   /**
@@ -428,6 +448,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 2 },
       unlocked: true,
       buildTime: 120,
       tier: 2,
@@ -456,6 +477,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 2 },
       unlocked: true,
       buildTime: 90,
       tier: 2,
@@ -484,6 +506,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 2 },
       unlocked: true,
       buildTime: 75,
       tier: 2,
@@ -514,6 +537,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 2 },
       unlocked: true,
       buildTime: 100,
       tier: 2,
@@ -548,6 +572,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 1 },
       unlocked: true,
       buildTime: 15,
       tier: 1,
@@ -579,6 +604,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 3 },
       unlocked: true,
       buildTime: 120,
       tier: 2,
@@ -610,6 +636,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 3 },
       unlocked: true,
       buildTime: 180,
       tier: 3,
@@ -646,6 +673,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 3 },
       unlocked: true,
       buildTime: 180,
       tier: 3,
@@ -681,6 +709,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 3 },
       unlocked: true,
       buildTime: 150,
       tier: 3,
@@ -695,6 +724,788 @@ export class BuildingBlueprintRegistry {
       rotationAngles: [0, 90, 180, 270],
       snapToGrid: true,
       requiresFoundation: false,
+    });
+  }
+
+  /**
+   * Register buildings unlocked through research system.
+   * Phase 13: Research & Discovery
+   */
+  registerResearchBuildings(): void {
+    // === Tier 1 Research Buildings ===
+
+    // Small Garden - Unlocked by agriculture_i
+    this.register({
+      id: 'small_garden',
+      name: 'Small Garden',
+      description: 'A small plot for growing basic crops',
+      category: 'farming',
+      width: 2,
+      height: 2,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 10 },
+        { resourceId: 'stone', amountRequired: 5 },
+      ],
+      techRequired: ['agriculture_i'],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      unlocked: false,
+      buildTime: 45,
+      tier: 1,
+      functionality: [
+        {
+          type: 'gathering_boost',
+          resourceTypes: ['vegetables', 'herbs'],
+          radius: 2,
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: false,
+    });
+
+    // Loom - Unlocked by textiles_i
+    this.register({
+      id: 'loom',
+      name: 'Loom',
+      description: 'A weaving loom for creating cloth and textiles',
+      category: 'production',
+      width: 2,
+      height: 2,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 30 },
+        { resourceId: 'fiber', amountRequired: 10 },
+      ],
+      techRequired: ['textiles_i'],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      unlocked: false,
+      buildTime: 75,
+      tier: 1,
+      functionality: [
+        {
+          type: 'crafting',
+          recipes: ['cloth', 'simple_clothing', 'rope'],
+          speed: 1.0,
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: false,
+    });
+
+    // Oven - Unlocked by cuisine_i
+    this.register({
+      id: 'oven',
+      name: 'Oven',
+      description: 'A brick oven for baking and advanced cooking',
+      category: 'production',
+      width: 2,
+      height: 1,
+      resourceCost: [
+        { resourceId: 'stone', amountRequired: 25 },
+        { resourceId: 'clay', amountRequired: 15 },
+      ],
+      techRequired: ['cuisine_i'],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      unlocked: false,
+      buildTime: 60,
+      tier: 1,
+      functionality: [
+        {
+          type: 'crafting',
+          recipes: ['bread', 'pastries', 'dried_meat', 'preserved_food'],
+          speed: 1.2,
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: false,
+    });
+
+    // === Tier 2 Research Buildings ===
+
+    // Irrigation Channel - Unlocked by agriculture_ii
+    this.register({
+      id: 'irrigation_channel',
+      name: 'Irrigation Channel',
+      description: 'A water channel system for automatic crop watering',
+      category: 'farming',
+      width: 1,
+      height: 4,
+      resourceCost: [
+        { resourceId: 'stone', amountRequired: 20 },
+        { resourceId: 'clay', amountRequired: 10 },
+      ],
+      techRequired: ['agriculture_ii'],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['deep_water'],
+      unlocked: false,
+      buildTime: 90,
+      tier: 2,
+      functionality: [
+        {
+          type: 'automation',
+          tasks: ['water_plants'],
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90],
+      snapToGrid: true,
+      requiresFoundation: false,
+    });
+
+    // Warehouse - Unlocked by construction_ii
+    this.register({
+      id: 'warehouse',
+      name: 'Warehouse',
+      description: 'A large building for bulk storage',
+      category: 'storage',
+      width: 4,
+      height: 3,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 80 },
+        { resourceId: 'stone', amountRequired: 40 },
+      ],
+      techRequired: ['construction_ii'],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 4 },
+      unlocked: false,
+      buildTime: 150,
+      tier: 2,
+      functionality: [
+        {
+          type: 'storage',
+          itemTypes: [],
+          capacity: 200,
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+
+    // Monument - Unlocked by construction_ii
+    this.register({
+      id: 'monument',
+      name: 'Monument',
+      description: 'A decorative monument that boosts village morale',
+      category: 'decoration',
+      width: 2,
+      height: 2,
+      resourceCost: [
+        { resourceId: 'stone', amountRequired: 60 },
+        { resourceId: 'gold', amountRequired: 5 },
+      ],
+      techRequired: ['construction_ii'],
+      terrainRequired: ['grass', 'dirt', 'stone'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 4 },
+      unlocked: false,
+      buildTime: 180,
+      tier: 2,
+      functionality: [
+        {
+          type: 'mood_aura',
+          moodBonus: 15,
+          radius: 8,
+        },
+      ],
+      canRotate: false,
+      rotationAngles: [0],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+
+    // Alchemy Lab - Unlocked by alchemy_i
+    this.register({
+      id: 'alchemy_lab',
+      name: 'Alchemy Lab',
+      description: 'A laboratory for brewing potions and conducting experiments',
+      category: 'research',
+      width: 3,
+      height: 3,
+      resourceCost: [
+        { resourceId: 'stone', amountRequired: 40 },
+        { resourceId: 'wood', amountRequired: 30 },
+        { resourceId: 'glass', amountRequired: 15 },
+      ],
+      techRequired: ['alchemy_i'],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      unlocked: false,
+      buildTime: 120,
+      tier: 2,
+      functionality: [
+        {
+          type: 'crafting',
+          recipes: ['healing_potion', 'energy_potion', 'fertilizer', 'transmutations'],
+          speed: 1.0,
+        },
+        {
+          type: 'research',
+          fields: ['alchemy'],
+          bonus: 1.5,
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+
+    // Water Wheel - Unlocked by machinery_i
+    this.register({
+      id: 'water_wheel',
+      name: 'Water Wheel',
+      description: 'A water-powered wheel that provides automation power',
+      category: 'production',
+      width: 2,
+      height: 2,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 50 },
+        { resourceId: 'iron', amountRequired: 20 },
+      ],
+      techRequired: ['machinery_i'],
+      terrainRequired: ['water', 'shallow_water'],
+      terrainForbidden: ['deep_water'],
+      unlocked: false,
+      buildTime: 120,
+      tier: 2,
+      functionality: [
+        {
+          type: 'automation',
+          tasks: ['grind_grain', 'power_machines'],
+        },
+      ],
+      canRotate: false,
+      rotationAngles: [0],
+      snapToGrid: true,
+      requiresFoundation: false,
+    });
+
+    // === Tier 3 Research Buildings ===
+
+    // Greenhouse - Unlocked by agriculture_iii
+    this.register({
+      id: 'greenhouse',
+      name: 'Greenhouse',
+      description: 'A climate-controlled structure for growing exotic crops year-round',
+      category: 'farming',
+      width: 4,
+      height: 4,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 60 },
+        { resourceId: 'glass', amountRequired: 40 },
+        { resourceId: 'iron', amountRequired: 20 },
+      ],
+      techRequired: ['agriculture_iii'],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      unlocked: false,
+      buildTime: 180,
+      tier: 3,
+      functionality: [
+        {
+          type: 'gathering_boost',
+          resourceTypes: ['exotic_crops', 'herbs', 'flowers'],
+          radius: 4,
+        },
+        {
+          type: 'automation',
+          tasks: ['water_plants', 'control_temperature'],
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+
+    // Grand Hall - Unlocked by construction_iii
+    this.register({
+      id: 'grand_hall',
+      name: 'Grand Hall',
+      description: 'A magnificent hall for gatherings and celebrations',
+      category: 'community',
+      width: 5,
+      height: 4,
+      resourceCost: [
+        { resourceId: 'stone', amountRequired: 100 },
+        { resourceId: 'wood', amountRequired: 80 },
+        { resourceId: 'gold', amountRequired: 10 },
+      ],
+      techRequired: ['construction_iii'],
+      terrainRequired: ['grass', 'dirt', 'stone'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 5 },
+      unlocked: false,
+      buildTime: 300,
+      tier: 3,
+      functionality: [
+        {
+          type: 'mood_aura',
+          moodBonus: 25,
+          radius: 15,
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+
+    // Conveyor System - Unlocked by construction_iii
+    this.register({
+      id: 'conveyor_system',
+      name: 'Conveyor System',
+      description: 'An automated system for moving items between buildings',
+      category: 'production',
+      width: 1,
+      height: 3,
+      resourceCost: [
+        { resourceId: 'iron', amountRequired: 40 },
+        { resourceId: 'wood', amountRequired: 20 },
+      ],
+      techRequired: ['construction_iii'],
+      terrainRequired: ['grass', 'dirt', 'stone'],
+      terrainForbidden: ['water', 'deep_water'],
+      unlocked: false,
+      buildTime: 90,
+      tier: 3,
+      functionality: [
+        {
+          type: 'automation',
+          tasks: ['move_items', 'sort_items'],
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: false,
+    });
+
+    // === Tier 4 Research Buildings ===
+
+    // Trading Post - Unlocked by society_i
+    this.register({
+      id: 'trading_post',
+      name: 'Trading Post',
+      description: 'A trading hub for commerce with other settlements',
+      category: 'commercial',
+      width: 4,
+      height: 3,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 70 },
+        { resourceId: 'stone', amountRequired: 50 },
+        { resourceId: 'gold', amountRequired: 20 },
+      ],
+      techRequired: ['society_i'],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 4 },
+      unlocked: false,
+      buildTime: 200,
+      tier: 4,
+      functionality: [
+        {
+          type: 'shop',
+          shopType: 'trading',
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+
+    // Bank - Unlocked by society_i
+    this.register({
+      id: 'bank',
+      name: 'Bank',
+      description: 'A secure vault for storing currency and valuables',
+      category: 'commercial',
+      width: 3,
+      height: 3,
+      resourceCost: [
+        { resourceId: 'stone', amountRequired: 80 },
+        { resourceId: 'iron', amountRequired: 50 },
+        { resourceId: 'gold', amountRequired: 30 },
+      ],
+      techRequired: ['society_i'],
+      terrainRequired: ['grass', 'dirt', 'stone'],
+      terrainForbidden: ['water', 'deep_water'],
+      unlocked: false,
+      buildTime: 240,
+      tier: 4,
+      functionality: [
+        {
+          type: 'storage',
+          itemTypes: ['currency', 'valuables', 'gems'],
+          capacity: 1000,
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+
+    // === Tier 5 Research Buildings ===
+
+    // Arcane Tower - Unlocked by arcane_studies
+    this.register({
+      id: 'arcane_tower',
+      name: 'Arcane Tower',
+      description: 'A mystical tower for studying the arcane arts',
+      category: 'research',
+      width: 3,
+      height: 3,
+      resourceCost: [
+        { resourceId: 'stone', amountRequired: 100 },
+        { resourceId: 'mithril_ingot', amountRequired: 20 },
+        { resourceId: 'crystal', amountRequired: 30 },
+      ],
+      techRequired: ['arcane_studies'],
+      terrainRequired: ['grass', 'dirt', 'stone'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 5 },
+      unlocked: false,
+      buildTime: 360,
+      tier: 5,
+      functionality: [
+        {
+          type: 'research',
+          fields: ['arcane', 'experimental'],
+          bonus: 2.0,
+        },
+        {
+          type: 'crafting',
+          recipes: ['enchanted_items', 'magical_artifacts'],
+          speed: 1.0,
+        },
+      ],
+      canRotate: false,
+      rotationAngles: [0],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+
+    // Inventor's Hall - Unlocked by experimental_research
+    this.register({
+      id: 'inventors_hall',
+      name: "Inventor's Hall",
+      description: 'A grand hall for experimental research and procedural invention',
+      category: 'research',
+      width: 5,
+      height: 5,
+      resourceCost: [
+        { resourceId: 'stone', amountRequired: 120 },
+        { resourceId: 'wood', amountRequired: 80 },
+        { resourceId: 'iron', amountRequired: 60 },
+        { resourceId: 'gold', amountRequired: 40 },
+      ],
+      techRequired: ['experimental_research'],
+      terrainRequired: ['grass', 'dirt', 'stone'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 5 },
+      unlocked: false,
+      buildTime: 480,
+      tier: 5,
+      functionality: [
+        {
+          type: 'research',
+          fields: ['experimental', 'agriculture', 'construction', 'crafting', 'metallurgy', 'alchemy'],
+          bonus: 2.5,
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+  }
+
+  /**
+   * Register governance buildings per governance-dashboard work order.
+   * Phase 11: Governance Infrastructure & Information Systems
+   *
+   * These buildings provide data collection and analytics for population management.
+   */
+  registerGovernanceBuildings(): void {
+    // Town Hall - Basic governance (3x3, 50 Wood + 20 Stone)
+    this.register({
+      id: 'town_hall',
+      name: 'Town Hall',
+      description: 'Central governance building providing basic population tracking',
+      category: 'community',
+      width: 3,
+      height: 3,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 50 },
+        { resourceId: 'stone', amountRequired: 20 },
+      ],
+      techRequired: [],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 0 },
+      unlocked: true,
+      buildTime: 240, // 4 hours = 240 minutes
+      tier: 2,
+      functionality: [
+        {
+          type: 'mood_aura',
+          moodBonus: 5,
+          radius: 10,
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+
+    // Census Bureau - Demographics tracking (3x2, 100 Wood + 50 Stone + 20 Cloth)
+    this.register({
+      id: 'census_bureau',
+      name: 'Census Bureau',
+      description: 'Tracks demographics, birth/death rates, and population projections. Requires Town Hall.',
+      category: 'community',
+      width: 3,
+      height: 2,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 100 },
+        { resourceId: 'stone', amountRequired: 50 },
+        { resourceId: 'cloth', amountRequired: 20 },
+      ],
+      techRequired: [],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 1 },
+      unlocked: true,
+      buildTime: 480, // 8 hours
+      tier: 3,
+      functionality: [],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+
+    // Granary/Warehouse - Resource tracking (4x3, 80 Wood + 30 Stone)
+    // Note: This is different from the research-unlocked warehouse
+    this.register({
+      id: 'granary',
+      name: 'Granary',
+      description: 'Tracks resource stockpiles, production/consumption rates, and days until depletion',
+      category: 'storage',
+      width: 4,
+      height: 3,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 80 },
+        { resourceId: 'stone', amountRequired: 30 },
+      ],
+      techRequired: [],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 0 },
+      unlocked: true,
+      buildTime: 360, // 6 hours
+      tier: 2,
+      functionality: [
+        {
+          type: 'storage',
+          itemTypes: [],
+          capacity: 1000,
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+
+    // Weather Station - Environmental monitoring (2x2, 60 Wood + 40 Stone + 10 Metal)
+    this.register({
+      id: 'weather_station',
+      name: 'Weather Station',
+      description: 'Provides weather forecasting and extreme weather warnings. Must be in open area.',
+      category: 'community',
+      width: 2,
+      height: 2,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 60 },
+        { resourceId: 'stone', amountRequired: 40 },
+        { resourceId: 'iron', amountRequired: 10 },
+      ],
+      techRequired: [],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 0 },
+      unlocked: true,
+      buildTime: 300, // 5 hours
+      tier: 2,
+      functionality: [],
+      canRotate: false,
+      rotationAngles: [0],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+
+    // Health Clinic - Medical tracking (4x3, 100 Wood + 50 Stone + 30 Cloth)
+    this.register({
+      id: 'health_clinic',
+      name: 'Health Clinic',
+      description: 'Tracks population health, diseases, and mortality. Requires healers (1 per 20 agents).',
+      category: 'community',
+      width: 4,
+      height: 3,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 100 },
+        { resourceId: 'stone', amountRequired: 50 },
+        { resourceId: 'cloth', amountRequired: 30 },
+      ],
+      techRequired: [],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 1 },
+      unlocked: true,
+      buildTime: 600, // 10 hours
+      tier: 3,
+      functionality: [
+        {
+          type: 'mood_aura',
+          moodBonus: 10,
+          radius: 8,
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+
+    // Meeting Hall - Social cohesion tracking (4x4, 120 Wood + 60 Stone)
+    this.register({
+      id: 'meeting_hall',
+      name: 'Meeting Hall',
+      description: 'Tracks social networks, relationships, and community cohesion',
+      category: 'community',
+      width: 4,
+      height: 4,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 120 },
+        { resourceId: 'stone', amountRequired: 60 },
+      ],
+      techRequired: [],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 1 },
+      unlocked: true,
+      buildTime: 480, // 8 hours
+      tier: 3,
+      functionality: [
+        {
+          type: 'mood_aura',
+          moodBonus: 15,
+          radius: 12,
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+
+    // Watchtower - Threat detection (2x2, 80 Wood + 60 Stone)
+    this.register({
+      id: 'watchtower',
+      name: 'Watchtower',
+      description: 'Detects threats and provides early warnings. Must be staffed by watchman.',
+      category: 'community',
+      width: 2,
+      height: 2,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 80 },
+        { resourceId: 'stone', amountRequired: 60 },
+      ],
+      techRequired: [],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 0 },
+      unlocked: true,
+      buildTime: 360, // 6 hours
+      tier: 2,
+      functionality: [],
+      canRotate: false,
+      rotationAngles: [0],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+
+    // Labor Guild - Workforce management (3x3, 90 Wood + 40 Stone)
+    this.register({
+      id: 'labor_guild',
+      name: 'Labor Guild',
+      description: 'Tracks workforce allocation, skills, and labor efficiency. Requires Town Hall.',
+      category: 'community',
+      width: 3,
+      height: 3,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 90 },
+        { resourceId: 'stone', amountRequired: 40 },
+      ],
+      techRequired: [],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 1 },
+      unlocked: true,
+      buildTime: 420, // 7 hours
+      tier: 3,
+      functionality: [],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+
+    // Archive/Library - Historical data (5x4, 150 Wood + 80 Stone + 50 Cloth)
+    this.register({
+      id: 'archive',
+      name: 'Archive',
+      description: 'Stores historical data and provides trend analysis. Requires Census Bureau + Town Hall.',
+      category: 'research',
+      width: 5,
+      height: 4,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 150 },
+        { resourceId: 'stone', amountRequired: 80 },
+        { resourceId: 'cloth', amountRequired: 50 },
+      ],
+      techRequired: [],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 2 },
+      unlocked: true,
+      buildTime: 720, // 12 hours
+      tier: 4,
+      functionality: [
+        {
+          type: 'research',
+          fields: ['history', 'sociology', 'demographics'],
+          bonus: 1.5,
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: true,
     });
   }
 

@@ -108,19 +108,19 @@ describe('CraftingPanelUI (REQ-CRAFT-001)', () => {
 
   describe('Agent Association', () => {
     it('should set active agent', () => {
-      const agentId = 123;
+      const agentId = 'agent-123';
       panel.setActiveAgent(agentId);
       expect(panel.activeAgentId).toBe(agentId);
     });
 
     it('should throw when setting invalid agent ID', () => {
-      expect(() => panel.setActiveAgent(-1)).toThrow('Invalid agent ID');
-      expect(() => panel.setActiveAgent(0)).toThrow('Invalid agent ID');
+      // Empty string should be treated as invalid
+      expect(() => panel.setActiveAgent('')).toThrow('Invalid agent ID');
     });
 
     it('should refresh panel when agent changes', () => {
       const mockRefresh = vi.spyOn(panel, 'refresh');
-      panel.setActiveAgent(123);
+      panel.setActiveAgent('agent-123');
       expect(mockRefresh).toHaveBeenCalled();
     });
   });

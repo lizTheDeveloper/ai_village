@@ -4,9 +4,11 @@ import type { World, WorldMutator } from '../ecs/World.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { PlantComponent } from '../components/PlantComponent.js';
 import type { InventoryComponent } from '../components/InventoryComponent.js';
-import { addToInventory, createSeedItemId } from '../components/InventoryComponent.js';
+import { addToInventory, addToInventoryWithQuality, createSeedItemId } from '../components/InventoryComponent.js';
+import type { SkillsComponent } from '../components/SkillsComponent.js';
+import { getEfficiencyBonus } from '../components/SkillsComponent.js';
 import { calculateSeedYield } from '../genetics/PlantGenetics.js';
-import { FARMING_CONFIG } from '../constants/GameBalance.js';
+import { calculateHarvestQuality } from '../items/ItemQuality.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { GameEvent } from '../events/GameEvent.js';
 import type { GameEventMap } from '../events/EventMap.js';
@@ -41,9 +43,27 @@ export class HarvestActionHandler implements ActionHandler {
    *
    * Base duration: 8 seconds = 160 ticks (at 20 TPS)
    * Harvesting takes longer than gathering seeds.
+   *
+   * Modified by farming skill level:
+   * - Level 0: 0% speed bonus
+   * - Level 5: 25% speed bonus (Master farmer)
    */
-  getDuration(_action: Action, _world: World): number {
-    return 160; // 8 seconds at 20 TPS
+  getDuration(action: Action, world: World): number {
+    const baseTicks = 160; // 8 seconds at 20 TPS
+
+    // Apply skill efficiency bonus
+    const actor = world.getEntity(action.actorId);
+    if (actor) {
+      const skillsComp = actor.components.get('skills') as SkillsComponent | undefined;
+      if (skillsComp) {
+        const farmingLevel = skillsComp.levels.farming;
+        const skillBonus = getEfficiencyBonus(farmingLevel); // 0-25%
+        const speedMultiplier = 1 - (skillBonus / 100);
+        return Math.max(1, Math.round(baseTicks * speedMultiplier));
+      }
+    }
+
+    return baseTicks;
   }
 
   /**
@@ -216,13 +236,26 @@ export class HarvestActionHandler implements ActionHandler {
       };
     }
 
-    // Get agent farming skill (use default since skill system not yet implemented)
-    const farmingSkill = FARMING_CONFIG.DEFAULT_FARMING_SKILL;
+    // Get agent farming skill from skills component
+    const skillsComp = actor.components.get('skills') as SkillsComponent | undefined;
+    const farmingLevel = skillsComp?.levels.farming ?? 0;
+    // Convert skill level (0-5) to skill percentage (0-100)
+    const farmingSkill = (farmingLevel / 5) * 100;
 
     // Calculate fruit yield (use fruitCount if available, otherwise base on health)
-    const fruitYield = plant.fruitCount > 0
-      ? plant.fruitCount
-      : Math.floor((plant.health / 100) * 3); // 0-3 fruit based on health
+    // REQUIREMENT: Must yield at least 1 whole fruit - no fractional harvests
+    let fruitYield: number;
+    if (plant.fruitCount > 0) {
+      // Use existing fruit count (always a whole number)
+      fruitYield = plant.fruitCount;
+    } else {
+      // Calculate based on health: 0-3 fruit, but must be at least 1 to harvest
+      fruitYield = Math.floor((plant.health / 100) * 3);
+    }
+    // Ensure we always get at least 1 fruit from a successful harvest (if plant has any potential)
+    if (fruitYield === 0 && plant.health > 0) {
+      fruitYield = 1;
+    }
 
     // Calculate seed yield based on formula from spec
     // baseYield * (health/100) * stageMod * skillMod
@@ -230,18 +263,23 @@ export class HarvestActionHandler implements ActionHandler {
     const baseSeedsPerPlant = 20; // Base yield for harvesting (more than gathering)
     const seedYield = calculateSeedYield(plant, baseSeedsPerPlant, farmingSkill);
 
+    // Calculate quality for harvested crops (Phase 10)
+    const plantMaturity = plant.stage === 'mature' || plant.stage === 'seeding';
+    const harvestQuality = calculateHarvestQuality(farmingLevel, plant.health, plantMaturity);
+
     const seedItemId = createSeedItemId(plant.speciesId);
     const events: Array<Omit<GameEvent<keyof GameEventMap>, 'tick' | 'timestamp'>> = [];
     let fruitsAdded = 0;
     let seedsAdded = 0;
 
     try {
-      // Add fruit to inventory (if any)
+      // Add fruit to inventory WITH QUALITY (if any)
       if (fruitYield > 0) {
-        const { inventory: inventoryAfterFruit, amountAdded: fruitsAddedCount } = addToInventory(
+        const { inventory: inventoryAfterFruit, amountAdded: fruitsAddedCount } = addToInventoryWithQuality(
           inventory,
           'food', // Generic food resource
-          fruitYield
+          fruitYield,
+          harvestQuality
         );
         fruitsAdded = fruitsAddedCount;
         (actor as EntityImpl).updateComponent<InventoryComponent>('inventory', () => inventoryAfterFruit);
@@ -249,7 +287,7 @@ export class HarvestActionHandler implements ActionHandler {
         // Update inventory reference for seed addition
         const currentInventory = actor.components.get('inventory') as InventoryComponent;
 
-        // Add seeds to inventory
+        // Add seeds to inventory (seeds don't have quality - use regular addToInventory)
         if (seedYield > 0) {
           const { inventory: inventoryAfterSeeds, amountAdded: seedsAddedCount } = addToInventory(
             currentInventory,

@@ -42,6 +42,7 @@ export interface PlantComponentData {
   age?: number;
   generation?: number;
   stageProgress?: number;
+  growthStage?: number;
   health?: number;
   hydration?: number;
   nutrition?: number;
@@ -73,6 +74,7 @@ export class PlantComponent extends ComponentBase {
   public stageProgress: number;
   public age: number;
   public generation: number;
+  public growthStage?: number; // 0-1, overall growth progress (computed from stage + stageProgress)
 
   // Health (0-100, clamped)
   private _health: number;
@@ -141,6 +143,7 @@ export class PlantComponent extends ComponentBase {
     this.stageProgress = data.stageProgress ?? 0;
     this.age = data.age ?? 0;
     this.generation = data.generation ?? 0;
+    this.growthStage = data.growthStage;
 
     // Health values with more realistic defaults
     // Plants start slightly dehydrated to make health decay observable
@@ -260,6 +263,7 @@ export class PlantComponent extends ComponentBase {
       stageProgress: this.stageProgress,
       age: this.age,
       generation: this.generation,
+      growthStage: this.growthStage,
       health: this.health,
       hydration: this.hydration,
       nutrition: this.nutrition,

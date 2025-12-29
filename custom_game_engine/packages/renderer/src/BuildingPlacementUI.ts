@@ -22,6 +22,7 @@ import type {
   BuildingBlueprintRegistry,
   PlacementValidator,
   PlacementValidationResult,
+  UnlockQueryService,
 } from '@ai-village/core';
 import { Camera } from './Camera.js';
 import { GhostRenderer, type GhostState } from './GhostRenderer.js';
@@ -55,6 +56,7 @@ export class BuildingPlacementUI {
   private readonly eventBus: EventBus;
   private readonly ghostRenderer: GhostRenderer;
   private readonly tileSize = 16;
+  private unlockService: UnlockQueryService | null = null;
 
   private state: PlacementState = {
     isMenuOpen: false,
@@ -84,6 +86,28 @@ export class BuildingPlacementUI {
   }
 
   /**
+   * Set the unlock query service for checking research requirements.
+   * When set, buildings are filtered based on research state.
+   */
+  setUnlockService(service: UnlockQueryService | null): void {
+    this.unlockService = service;
+  }
+
+  /**
+   * Check if a building is unlocked based on research requirements.
+   * Uses dynamic research state check instead of static blueprint.unlocked flag.
+   */
+  isBuildingUnlocked(blueprint: BuildingBlueprint): boolean {
+    // If no unlock service, fall back to static unlocked flag
+    if (!this.unlockService) {
+      return blueprint.unlocked;
+    }
+    // Check research requirements via techRequired field
+    const requirements = blueprint.techRequired ?? [];
+    return this.unlockService.isBuildingUnlocked(requirements);
+  }
+
+  /**
    * Get current placement state.
    */
   getState(): Readonly<PlacementState> {
@@ -109,7 +133,6 @@ export class BuildingPlacementUI {
    * Triggered by 'B' key.
    */
   toggleMenu(): void {
-    console.log(`[BuildingPlacementUI] toggleMenu called, current state: ${this.state.isMenuOpen}`);
     if (this.state.isMenuOpen) {
       this.closeMenu();
     } else {
@@ -121,14 +144,12 @@ export class BuildingPlacementUI {
    * Open the building selection menu.
    */
   openMenu(): void {
-    console.log(`[BuildingPlacementUI] openMenu called, setting isMenuOpen to true`);
     this.state.isMenuOpen = true;
     this.eventBus.emit({
       type: 'building:menu:opened',
       source: 'building-placement-ui',
       data: {},
     });
-    console.log(`[BuildingPlacementUI] Menu is now open: ${this.state.isMenuOpen}`);
   }
 
   /**
@@ -154,14 +175,11 @@ export class BuildingPlacementUI {
    * Select a building from the menu and enter placement mode.
    */
   selectBuilding(blueprintId: string): void {
-    console.log(`[BuildingPlacementUI] selectBuilding called with ID: ${blueprintId}`);
     const blueprint = this.registry.get(blueprintId);
-    console.log(`[BuildingPlacementUI] Blueprint found:`, blueprint);
 
     this.state.selectedBlueprint = blueprint;
     this.state.isInPlacementMode = true;
     this.state.ghostRotation = 0;
-    console.log(`[BuildingPlacementUI] Entering placement mode, closing menu`);
     this.closeMenu();
 
     this.eventBus.emit({
@@ -169,7 +187,6 @@ export class BuildingPlacementUI {
       source: 'building-placement-ui',
       data: { blueprintId },
     });
-    console.log(`[BuildingPlacementUI] Emitted building:placement:started event`);
   }
 
   /**
@@ -430,10 +447,8 @@ export class BuildingPlacementUI {
    * @returns true if the input was handled
    */
   handleKeyDown(key: string, shiftKey: boolean): boolean {
-    console.log(`[BuildingPlacementUI] handleKeyDown called: key="${key}", shiftKey=${shiftKey}`);
     switch (key.toLowerCase()) {
       case 'b':
-        console.log(`[BuildingPlacementUI] 'B' key pressed, toggling menu`);
         this.toggleMenu();
         return true;
 
@@ -478,28 +493,22 @@ export class BuildingPlacementUI {
    * @returns true if the click was handled
    */
   handleClick(screenX: number, screenY: number, button: number): boolean {
-    console.log(`[BuildingPlacementUI] handleClick: (${screenX}, ${screenY}), button: ${button}, menuOpen: ${this.state.isMenuOpen}, inPlacementMode: ${this.state.isInPlacementMode}`);
-
     // Right click cancels placement
     if (button === 2 && this.state.isInPlacementMode) {
-      console.log(`[BuildingPlacementUI] Right click - cancelling placement`);
       this.cancelPlacement();
       return true;
     }
 
     // Check if click is in menu area
     if (this.state.isMenuOpen && screenX < this.menuWidth) {
-      console.log(`[BuildingPlacementUI] Click is in menu area`);
       return this.handleMenuClick(screenX, screenY);
     }
 
     // Left click confirms placement
     if (button === 0 && this.state.isInPlacementMode) {
-      console.log(`[BuildingPlacementUI] Left click in placement mode - confirming`);
       return this.confirmPlacement();
     }
 
-    console.log(`[BuildingPlacementUI] Click not handled`);
     return false;
   }
 
@@ -507,8 +516,6 @@ export class BuildingPlacementUI {
    * Handle click within the menu.
    */
   private handleMenuClick(screenX: number, screenY: number): boolean {
-    console.log(`[BuildingPlacementUI] Menu click at (${screenX}, ${screenY})`);
-
     // Calculate category tabs
     const categories: BuildingCategory[] = [
       'residential',
@@ -530,7 +537,6 @@ export class BuildingPlacementUI {
       const tabWidth = (this.menuWidth - this.menuPadding * 2) / categories.length;
       const tabIndex = Math.floor((screenX - this.menuPadding) / tabWidth);
       if (tabIndex >= 0 && tabIndex < categories.length) {
-        console.log(`[BuildingPlacementUI] Category tab clicked: ${categories[tabIndex]}`);
         this.selectCategory(categories[tabIndex]!);
         return true;
       }
@@ -540,7 +546,6 @@ export class BuildingPlacementUI {
     // Note: cards are rendered at tabY + tabHeight + 15
     const cardsY = tabY + tabHeight + 15;
     const buildings = this.registry.getByCategory(this.state.selectedCategory);
-    console.log(`[BuildingPlacementUI] Checking ${buildings.length} buildings in category ${this.state.selectedCategory}`);
 
     const cardsPerRow = Math.floor(
       (this.menuWidth - this.menuPadding * 2) /
@@ -562,18 +567,17 @@ export class BuildingPlacementUI {
         screenY < cardY + this.buildingCardSize
       ) {
         const building = buildings[i];
-        console.log(`[BuildingPlacementUI] Building card clicked: ${building?.name}, unlocked: ${building?.unlocked}`);
-        if (building && building.unlocked) {
+        const isUnlocked = building ? this.isBuildingUnlocked(building) : false;
+        if (building && isUnlocked) {
           this.selectBuilding(building.id);
           return true;
-        } else if (building && !building.unlocked) {
-          console.log(`[BuildingPlacementUI] Building ${building.name} is locked`);
+        } else if (building && !isUnlocked) {
+          // Locked building clicked - ignore
           return true;
         }
       }
     }
 
-    console.log(`[BuildingPlacementUI] Click was in menu area but no building/category hit`);
     return true; // Click was in menu area
   }
 
@@ -630,8 +634,6 @@ export class BuildingPlacementUI {
    */
   private renderMenu(ctx: CanvasRenderingContext2D): void {
     const menuHeight = ctx.canvas.height;
-
-    console.log(`[BuildingPlacementUI] Rendering menu: menuWidth=${this.menuWidth}, menuHeight=${menuHeight}, canvas.width=${ctx.canvas.width}, canvas.height=${ctx.canvas.height}`);
 
     // Menu background
     ctx.fillStyle = 'rgba(40, 30, 20, 0.95)';
@@ -718,17 +720,19 @@ export class BuildingPlacementUI {
         this.menuPadding + col * (this.buildingCardSize + this.buildingCardMargin);
       const cardY = cardsY + row * (this.buildingCardSize + this.buildingCardMargin);
 
-      // Card background
-      ctx.fillStyle = building.unlocked ? 'rgba(80, 60, 40, 0.9)' : 'rgba(40, 40, 40, 0.9)';
+      const isUnlocked = this.isBuildingUnlocked(building);
+
+      // Card background - darker for locked
+      ctx.fillStyle = isUnlocked ? 'rgba(80, 60, 40, 0.9)' : 'rgba(40, 40, 40, 0.9)';
       ctx.fillRect(cardX, cardY, this.buildingCardSize, this.buildingCardSize);
 
-      // Card border
-      ctx.strokeStyle = building.unlocked ? '#654321' : '#444444';
+      // Card border - gray for locked
+      ctx.strokeStyle = isUnlocked ? '#654321' : '#444444';
       ctx.lineWidth = 1;
       ctx.strokeRect(cardX, cardY, this.buildingCardSize, this.buildingCardSize);
 
-      // Building icon (placeholder - just the first letter)
-      ctx.fillStyle = building.unlocked ? '#ffffff' : '#666666';
+      // Building icon (placeholder - just the first letter) - dimmed for locked
+      ctx.fillStyle = isUnlocked ? '#ffffff' : '#666666';
       ctx.font = 'bold 16px monospace';
       ctx.fillText(
         building.name.charAt(0),
@@ -747,7 +751,7 @@ export class BuildingPlacementUI {
       // Resource costs (compactly displayed)
       if (building.resourceCost && building.resourceCost.length > 0) {
         ctx.font = '7px monospace';
-        ctx.fillStyle = building.unlocked ? '#FFD700' : '#666666';
+        ctx.fillStyle = isUnlocked ? '#FFD700' : '#666666';
         let costY = cardY + 40;
 
         // Show each resource type with icon
@@ -758,6 +762,16 @@ export class BuildingPlacementUI {
             costY += 9;
           }
         }
+      }
+
+      // Draw status indicator
+      ctx.font = '14px sans-serif';
+      if (isUnlocked) {
+        ctx.fillStyle = '#4CAF50'; // Green for available
+        ctx.fillText('✓', cardX + this.buildingCardSize - 14, cardY + 14);
+      } else {
+        ctx.fillStyle = '#888'; // Gray lock for locked
+        ctx.fillText('🔒', cardX + this.buildingCardSize - 16, cardY + 14);
       }
     });
 
@@ -906,19 +920,21 @@ export class BuildingPlacementUI {
       ctx.canvas.height - tooltipHeight - 10
     ));
 
+    const isUnlocked = this.isBuildingUnlocked(blueprint);
+
     // Background
     ctx.fillStyle = 'rgba(20, 15, 10, 0.95)';
     ctx.fillRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight);
 
-    // Border
-    ctx.strokeStyle = blueprint.unlocked ? '#8B4513' : '#444444';
+    // Border - gray for locked
+    ctx.strokeStyle = isUnlocked ? '#8B4513' : '#444444';
     ctx.lineWidth = 2;
     ctx.strokeRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight);
 
     let currentY = tooltipY + padding + lineHeight;
 
-    // Building name
-    ctx.fillStyle = blueprint.unlocked ? '#ffffff' : '#888888';
+    // Building name - dimmed for locked
+    ctx.fillStyle = isUnlocked ? '#ffffff' : '#888888';
     ctx.font = 'bold 12px monospace';
     ctx.fillText(blueprint.name, tooltipX + padding, currentY);
     currentY += lineHeight;

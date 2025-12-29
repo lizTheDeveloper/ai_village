@@ -5,7 +5,6 @@
  */
 export class ResourcesPanel {
   private panelWidth = 280;
-  private panelHeight = 200;
   private padding = 10;
   private lineHeight = 18;
   private isCollapsed = false;
@@ -13,25 +12,15 @@ export class ResourcesPanel {
   /**
    * Render the resources panel.
    * @param ctx Canvas rendering context
-   * @param canvasWidth Width of the canvas
+   * @param _canvasWidth Width of the canvas (unused - WindowManager handles positioning)
    * @param world World instance to query storage buildings
-   * @param agentPanelOpen Whether the agent info panel is currently open
+   * @param _agentPanelOpen Whether the agent info panel is currently open (unused)
    */
-  render(ctx: CanvasRenderingContext2D, canvasWidth: number, world: any, agentPanelOpen = false): void {
-    // Position in top-right corner, below agent panel if it's open
-    const x = canvasWidth - this.panelWidth - 20;
-    const y = agentPanelOpen ? 540 : 20; // Agent panel is ~520px tall, add 20px spacing
-
-    // Draw panel background
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+  render(ctx: CanvasRenderingContext2D, _canvasWidth: number, world: any, _agentPanelOpen = false): void {
+    // WindowManager handles positioning via translate, so render at (0, 0)
+    const x = 0;
+    const y = 0;
     const headerHeight = 30;
-    const bodyHeight = this.isCollapsed ? 0 : this.panelHeight - headerHeight;
-    ctx.fillRect(x, y, this.panelWidth, headerHeight + bodyHeight);
-
-    // Draw panel border
-    ctx.strokeStyle = 'rgba(139, 69, 19, 0.7)'; // Brown border for resources
-    ctx.lineWidth = 2;
-    ctx.strokeRect(x, y, this.panelWidth, headerHeight + bodyHeight);
 
     // Set up text rendering
     ctx.font = '14px monospace';
@@ -129,7 +118,6 @@ export class ResourcesPanel {
 
     // Only log if debug logging is enabled
     if (this.debugLoggingEnabled) {
-      console.log(`[ResourcesPanel] Found ${storageBuildings.length} buildings with building+inventory components`);
     }
 
     for (const storage of storageBuildings) {
@@ -156,7 +144,6 @@ export class ResourcesPanel {
     // Only log when resources actually change (not every frame)
     const currentSnapshot = JSON.stringify(totalResources);
     if (this.debugLoggingEnabled && currentSnapshot !== this.lastResourcesSnapshot) {
-      console.log(`[ResourcesPanel] Resources changed:`, totalResources);
       this.lastResourcesSnapshot = currentSnapshot;
     }
 

@@ -1,4 +1,14 @@
-import type { Entity } from '@ai-village/core';
+import type {
+  Entity,
+  World,
+  IdentityComponent,
+  EpisodicMemoryComponent,
+  EpisodicMemory,
+  SemanticMemoryComponent,
+  ReflectionComponent,
+  JournalComponent,
+  AgentComponent,
+} from '@ai-village/core';
 
 /**
  * UI Panel displaying episodic memory information for the selected agent.
@@ -42,7 +52,7 @@ export class MemoryPanel {
    * @param canvasHeight Height of the canvas
    * @param world World instance to look up the selected entity
    */
-  render(ctx: CanvasRenderingContext2D, _canvasWidth: number, canvasHeight: number, world: any): void {
+  render(ctx: CanvasRenderingContext2D, _canvasWidth: number, _canvasHeight: number, world: World): void {
     if (!this.visible || !this.selectedEntityId) {
       return; // Nothing to render
     }
@@ -61,26 +71,17 @@ export class MemoryPanel {
       return;
     }
 
-    // Position panel in center-left
-    const x = 20;
-    const y = (canvasHeight - this.panelHeight) / 2;
-
-    // Draw panel background
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-    ctx.fillRect(x, y, this.panelWidth, this.panelHeight);
-
-    // Draw panel border
-    ctx.strokeStyle = 'rgba(100, 200, 255, 0.6)';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(x, y, this.panelWidth, this.panelHeight);
+    // WindowManager handles positioning via translate, so render at (0, 0)
+    const x = 0;
+    const y = 0;
 
     // Get components
-    const identity = selectedEntity.components.get('identity') as { name: string } | undefined;
-    const episodicMemory = selectedEntity.components.get('episodic_memory') as any;
-    const semanticMemory = selectedEntity.components.get('semantic_memory') as any;
-    const socialMemory = selectedEntity.components.get('social_memory') as any;
-    const reflection = selectedEntity.components.get('reflection') as any;
-    const journal = selectedEntity.components.get('journal') as any;
+    const identity = selectedEntity.components.get('identity') as IdentityComponent | undefined;
+    const episodicMemory = selectedEntity.components.get('episodic_memory') as EpisodicMemoryComponent | undefined;
+    const semanticMemory = selectedEntity.components.get('semantic_memory') as SemanticMemoryComponent | undefined;
+    const reflection = selectedEntity.components.get('reflection') as ReflectionComponent | undefined;
+    const journal = selectedEntity.components.get('journal') as JournalComponent | undefined;
+    const agent = selectedEntity.components.get('agent') as AgentComponent | undefined;
 
     // Render content
     let currentY = y + this.padding;
@@ -88,7 +89,7 @@ export class MemoryPanel {
     // Title
     ctx.fillStyle = '#FFFFFF';
     ctx.font = 'bold 18px monospace';
-    ctx.fillText('Memory System', x + this.padding, currentY + 14);
+    ctx.fillText('Memory & Goals', x + this.padding, currentY + 14);
     currentY += 26;
 
     // Agent name
@@ -97,6 +98,53 @@ export class MemoryPanel {
       ctx.font = 'bold 14px monospace';
       ctx.fillText(`Agent: ${identity.name}`, x + this.padding, currentY);
       currentY += this.lineHeight + 8;
+    }
+
+    // Goals section
+    if (agent) {
+      const hasGoals = agent.personalGoal || agent.mediumTermGoal || agent.groupGoal;
+      if (hasGoals) {
+        this.renderSeparator(ctx, x, currentY);
+        currentY += 10;
+
+        ctx.fillStyle = '#88FF88';
+        ctx.font = 'bold 14px monospace';
+        ctx.fillText('🎯 Goals', x + this.padding, currentY);
+        currentY += this.lineHeight + 5;
+
+        // Personal goal (short-term)
+        if (agent.personalGoal) {
+          ctx.fillStyle = '#AAFFAA';
+          ctx.font = '11px monospace';
+          ctx.fillText('Personal:', x + this.padding, currentY);
+          currentY += this.lineHeight;
+          ctx.fillStyle = '#CCFFCC';
+          ctx.font = '10px monospace';
+          currentY = this.renderWrappedText(ctx, agent.personalGoal, x, currentY, 2);
+        }
+
+        // Medium-term goal
+        if (agent.mediumTermGoal) {
+          ctx.fillStyle = '#AAFFAA';
+          ctx.font = '11px monospace';
+          ctx.fillText('Medium-term:', x + this.padding, currentY);
+          currentY += this.lineHeight;
+          ctx.fillStyle = '#CCFFCC';
+          ctx.font = '10px monospace';
+          currentY = this.renderWrappedText(ctx, agent.mediumTermGoal, x, currentY, 2);
+        }
+
+        // Group goal
+        if (agent.groupGoal) {
+          ctx.fillStyle = '#AAFFAA';
+          ctx.font = '11px monospace';
+          ctx.fillText('Group:', x + this.padding, currentY);
+          currentY += this.lineHeight;
+          ctx.fillStyle = '#CCFFCC';
+          ctx.font = '10px monospace';
+          currentY = this.renderWrappedText(ctx, agent.groupGoal, x, currentY, 2);
+        }
+      }
     }
 
     // Episodic Memories
@@ -155,38 +203,6 @@ export class MemoryPanel {
       }
     }
 
-    // Social Memory
-    if (socialMemory && currentY < y + this.panelHeight - 100) {
-      this.renderSeparator(ctx, x, currentY);
-      currentY += 10;
-
-      ctx.fillStyle = '#88FFCC';
-      ctx.font = 'bold 14px monospace';
-      ctx.fillText('👥 Social Memory', x + this.padding, currentY);
-      currentY += this.lineHeight + 5;
-
-      const socialMemories = socialMemory.socialMemories as Map<string, any> | undefined;
-      const relationshipCount = socialMemories ? socialMemories.size : 0;
-      ctx.fillStyle = '#AAAAAA';
-      ctx.font = '12px monospace';
-      ctx.fillText(`Relationships: ${relationshipCount}`, x + this.padding, currentY);
-      currentY += this.lineHeight + 5;
-
-      // Show a few relationships
-      if (socialMemories && socialMemories.size > 0) {
-        const relationshipsArray = Array.from(socialMemories.entries()).slice(0, 2);
-        for (const [agentId, socialMem] of relationshipsArray) {
-        ctx.fillStyle = '#AAFFDD';
-        ctx.font = '11px monospace';
-        const sentimentIcon = socialMem.overallSentiment > 0 ? '😊' : socialMem.overallSentiment < 0 ? '😠' : '😐';
-        const trustText = `trust:${Math.round(socialMem.trust * 100)}%`;
-        const relationshipType = socialMem.relationshipType || 'unknown';
-        currentY = this.renderWrappedText(ctx, `${sentimentIcon} ${agentId.substring(0, 8)}: ${relationshipType} (${trustText})`, x, currentY, 1);
-        if (currentY > y + this.panelHeight - 50) break;
-        }
-      }
-    }
-
     // Reflections
     if (reflection && currentY < y + this.panelHeight - 100) {
       this.renderSeparator(ctx, x, currentY);
@@ -206,9 +222,11 @@ export class MemoryPanel {
       // Show most recent reflection
       if (reflections.length > 0) {
         const latestReflection = reflections[reflections.length - 1];
-        ctx.fillStyle = '#DDAAFF';
-        ctx.font = '11px monospace';
-        currentY = this.renderWrappedText(ctx, latestReflection.summary || 'No summary', x, currentY, 3);
+        if (latestReflection) {
+          ctx.fillStyle = '#DDAAFF';
+          ctx.font = '11px monospace';
+          currentY = this.renderWrappedText(ctx, latestReflection.text || 'No text', x, currentY, 3);
+        }
       }
     }
 
@@ -231,9 +249,11 @@ export class MemoryPanel {
       // Show most recent entry
       if (entries.length > 0) {
         const latestEntry = entries[entries.length - 1];
-        ctx.fillStyle = '#FFDDAA';
-        ctx.font = '11px monospace';
-        currentY = this.renderWrappedText(ctx, latestEntry.content || 'No content', x, currentY, 2);
+        if (latestEntry) {
+          ctx.fillStyle = '#FFDDAA';
+          ctx.font = '11px monospace';
+          currentY = this.renderWrappedText(ctx, latestEntry.text || 'No content', x, currentY, 2);
+        }
       }
     }
 
@@ -247,7 +267,7 @@ export class MemoryPanel {
   /**
    * Render a single memory entry
    */
-  private renderMemory(ctx: CanvasRenderingContext2D, panelX: number, y: number, memory: any): number {
+  private renderMemory(ctx: CanvasRenderingContext2D, panelX: number, y: number, memory: EpisodicMemory): number {
     // Event type and importance (defensive clamp to [0,1])
     const importance = Math.max(0, Math.min(1, memory.importance ?? 0));
     ctx.fillStyle = this.getImportanceColor(importance);
@@ -285,7 +305,7 @@ export class MemoryPanel {
     // Line 3: Timestamp, location, participants
     const timestamp = new Date(memory.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     const location = memory.location ? `(${memory.location.x.toFixed(0)},${memory.location.y.toFixed(0)})` : '';
-    const participants = memory.participants?.length > 0 ? `👥${memory.participants.length}` : '';
+    const participants = memory.participants && memory.participants.length > 0 ? `👥${memory.participants.length}` : '';
     const metaLine3 = `${timestamp} ${location} ${participants}`.trim();
     if (metaLine3) {
       ctx.fillText(metaLine3, panelX + this.padding, y);

@@ -69,13 +69,6 @@ export class WeatherSystem implements System {
 
     // Emit weather change event if type actually changed
     if (this.previousWeatherType !== newWeatherType) {
-      // tempModifier removed
-      const moveMod = 1.0 - (1.0 - defaults.movementModifier) * newIntensity;
-
-      console.log(
-        `[WeatherSystem] Weather changed: ${this.previousWeatherType || 'clear'} → ${newWeatherType} (intensity: ${(newIntensity * 100).toFixed(0)}%). Movement modifier: ${(moveMod * 100).toFixed(0)}%`
-      );
-
       world.eventBus.emit({
         type: 'weather:changed',
         source: entity.id,

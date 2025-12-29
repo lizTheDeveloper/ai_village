@@ -17,7 +17,6 @@
  *
  * // Get full item definition
  * const item = itemRegistry.get('wood');
- * console.log(item.weight, item.stackSize);
  * ```
  *
  * Part of the Item System refactor (work-order: item-system)
@@ -27,6 +26,7 @@
 export {
   type ItemDefinition,
   type ItemCategory,
+  type ItemRarity,
   type CraftingIngredient,
   defineItem,
 } from './ItemDefinition.js';
@@ -61,3 +61,39 @@ export {
   registerSeedsForSpecies,
   type PlantSpeciesInfo,
 } from './SeedItemFactory.js';
+
+// Data-driven item loading (Phase 5)
+export {
+  ItemLoader,
+  ItemValidationError,
+  parseItemData,
+  parseItemsFromJson,
+  loadItemsFromJson,
+  loadItemsFromJsonString,
+  type RawItemData,
+} from './ItemLoader.js';
+
+// Quality system (Phase 10)
+export {
+  type ItemQuality,
+  getQualityTier,
+  getQualityColor,
+  getQualityDisplayName,
+  calculateCraftingQuality,
+  calculateHarvestQuality,
+  calculateGatheringQuality,
+  getQualityPriceMultiplier,
+  DEFAULT_QUALITY,
+} from './ItemQuality.js';
+
+// Auto-initialize the global registry with default items
+// This must be done after all imports to avoid circular dependencies
+import { itemRegistry } from './ItemRegistry.js';
+import { DEFAULT_ITEMS } from './defaultItems.js';
+import { DEFAULT_SEEDS } from './SeedItemFactory.js';
+
+// Register all default items and seeds at module load time
+if (itemRegistry.size === 0) {
+  itemRegistry.registerAll(DEFAULT_ITEMS);
+  itemRegistry.registerAll(DEFAULT_SEEDS);
+}

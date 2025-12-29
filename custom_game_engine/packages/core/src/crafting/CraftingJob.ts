@@ -3,14 +3,16 @@
  */
 export type CraftingJobStatus = 'queued' | 'in_progress' | 'completed' | 'cancelled' | 'waiting_ingredients';
 
+import type { EntityId } from '../types.js';
+
 /**
  * A crafting job in the queue.
  */
 export interface CraftingJob {
   /** Unique job ID */
   id: string;
-  /** Agent performing the crafting */
-  agentId: number;
+  /** Agent performing the crafting (EntityId is a string UUID) */
+  agentId: EntityId;
   /** Recipe being crafted */
   recipeId: string;
   /** Quantity to craft */
@@ -37,7 +39,7 @@ export interface CraftingJob {
  * Create a new crafting job.
  */
 export function createCraftingJob(
-  agentId: number,
+  agentId: EntityId,
   recipeId: string,
   quantity: number,
   totalTime: number

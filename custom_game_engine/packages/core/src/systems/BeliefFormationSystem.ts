@@ -2,9 +2,10 @@ import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { BeliefType, EvidenceType } from '../components/BeliefComponent.js';
+import type { EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
+import { getAgent, getEpisodicMemory, getBelief, getTrustNetwork } from '../utils/componentHelpers.js';
 
 /**
  * BeliefFormationSystem detects patterns in episodic memories and forms beliefs
@@ -40,8 +41,7 @@ export class BeliefFormationSystem implements System {
 
     for (const entity of believers) {
       try {
-        const impl = entity as any;
-        const agent = impl.getComponent('agent');
+        const agent = getAgent(entity);
 
         // Only process beliefs during sleep (when brain consolidates memories)
         if (agent && agent.behavior === 'forced_sleep') {
@@ -54,48 +54,44 @@ export class BeliefFormationSystem implements System {
   }
 
   private _updateBeliefs(entity: Entity, _entities: ReadonlyArray<Entity>, currentTick: number): void {
-    const impl = entity as EntityImpl;
-
-    const belief = impl.getComponent('belief') as any;
+    const belief = getBelief(entity);
     if (!belief) {
       throw new Error('Belief component missing');
     }
 
-    const episodicMemory = impl.getComponent('episodic_memory') as any;
+    const episodicMemory = getEpisodicMemory(entity);
     if (!episodicMemory) {
       throw new Error('EpisodicMemory component missing');
     }
 
     // Analyze memories for patterns
-    this._analyzeCharacterPatterns(impl, episodicMemory, currentTick);
-    this._analyzeWorldPatterns(impl, episodicMemory, currentTick);
-    this._analyzeSocialPatterns(impl, episodicMemory, currentTick);
+    this._analyzeCharacterPatterns(entity, episodicMemory.episodicMemories, currentTick);
+    this._analyzeWorldPatterns(entity, episodicMemory.episodicMemories, currentTick);
+    this._analyzeSocialPatterns(entity, episodicMemory.episodicMemories, currentTick);
   }
 
   /**
    * Analyze character patterns (trustworthiness of other agents)
    */
-  private _analyzeCharacterPatterns(entity: EntityImpl, episodicMemory: any, currentTick: number): void {
-    if (!entity.hasComponent('trust_network')) {
+  private _analyzeCharacterPatterns(entity: Entity, memories: readonly EpisodicMemory[], _currentTick: number): void {
+    const trustNetwork = getTrustNetwork(entity);
+    if (!trustNetwork) {
       return; // Need trust network to form character beliefs
     }
 
-    const trustNetwork = entity.getComponent('trust_network') as any;
-    if (!trustNetwork) return;
-
-    const belief = entity.getComponent('belief') as any;
+    const belief = getBelief(entity);
     if (!belief) return;
 
     // Get all verification memories from episodic memory
-    const memories = episodicMemory.memories ?? [];
-    const verificationMemories = memories.filter((m: any) =>
-      m.type === 'trust_verified' || m.type === 'trust_violated'
+    const verificationMemories = memories.filter(m =>
+      m.eventType === 'trust_verified' || m.eventType === 'trust_violated'
     );
 
-    // Group by agent ID
-    const agentMemories = new Map<string, any[]>();
+    // Group by agent ID (stored in participants array)
+    const agentMemories = new Map<string, EpisodicMemory[]>();
     for (const memory of verificationMemories) {
-      const agentId = memory.agentId ?? memory.data?.agentId;
+      // Agent ID should be in participants array
+      const agentId = memory.participants?.[0];
       if (!agentId) continue;
 
       if (!agentMemories.has(agentId)) {
@@ -112,7 +108,7 @@ export class BeliefFormationSystem implements System {
 
       // Record evidence from verification memories
       for (const memory of memories) {
-        const evidenceType: EvidenceType = memory.result === 'correct' || memory.type === 'trust_verified'
+        const evidenceType: EvidenceType = memory.eventType === 'trust_verified'
           ? 'accurate_claim'
           : 'false_claim';
 
@@ -120,7 +116,7 @@ export class BeliefFormationSystem implements System {
           'character' as BeliefType,
           agentId,
           evidenceType,
-          memory.tick ?? currentTick
+          memory.timestamp
         );
       }
 
@@ -145,23 +141,34 @@ export class BeliefFormationSystem implements System {
   /**
    * Analyze world patterns (resource locations, terrain features)
    */
-  private _analyzeWorldPatterns(entity: EntityImpl, episodicMemory: any, currentTick: number): void {
-    const belief = entity.getComponent('belief') as any;
+  private _analyzeWorldPatterns(entity: Entity, memories: readonly EpisodicMemory[], currentTick: number): void {
+    const belief = getBelief(entity);
     if (!belief) return;
 
     // Get resource gathering memories
-    const memories = episodicMemory.memories ?? [];
-    const resourceMemories = memories.filter((m: any) =>
-      m.type === 'resource:gathered' || m.type === 'resource_location'
+    const resourceMemories = memories.filter(m =>
+      m.eventType === 'resource:gathered' || m.eventType === 'resource_location'
     );
 
     // Detect patterns like "stone near mountains", "wood near water"
     // For simplicity, we'll detect if a resource type is consistently found in similar locations
 
-    // Group by resource type
-    const resourcePatterns = new Map<string, any[]>();
+    // Group by resource type (extract from summary)
+    const resourcePatterns = new Map<string, EpisodicMemory[]>();
     for (const memory of resourceMemories) {
-      const resourceType = memory.resourceType ?? memory.data?.resourceType;
+      // Try to extract resource type from summary
+      const summaryLower = memory.summary.toLowerCase();
+      let resourceType: string | undefined;
+
+      // Common resource types to look for
+      const resourceTypes = ['wood', 'stone', 'food', 'water', 'berries', 'meat'];
+      for (const type of resourceTypes) {
+        if (summaryLower.includes(type)) {
+          resourceType = type;
+          break;
+        }
+      }
+
       if (!resourceType) continue;
 
       if (!resourcePatterns.has(resourceType)) {
@@ -191,16 +198,15 @@ export class BeliefFormationSystem implements System {
   /**
    * Analyze social patterns (cooperation, sharing behavior)
    */
-  private _analyzeSocialPatterns(entity: EntityImpl, episodicMemory: any, currentTick: number): void {
-    const belief = entity.getComponent('belief') as any;
+  private _analyzeSocialPatterns(entity: Entity, memories: readonly EpisodicMemory[], currentTick: number): void {
+    const belief = getBelief(entity);
     if (!belief) return;
 
     // Get social interaction memories
-    const memories = episodicMemory.memories ?? [];
-    const socialMemories = memories.filter((m: any) =>
-      m.type === 'conversation' ||
-      m.type === 'cooperation' ||
-      m.type === 'resource:shared'
+    const socialMemories = memories.filter(m =>
+      m.eventType === 'conversation' ||
+      m.eventType === 'cooperation' ||
+      m.eventType === 'resource:shared'
     );
 
     if (socialMemories.length < this.patternThreshold) {
@@ -208,8 +214,8 @@ export class BeliefFormationSystem implements System {
     }
 
     // Detect patterns of cooperation vs competition
-    const cooperationCount = socialMemories.filter((m: any) =>
-      m.type === 'cooperation' || m.type === 'resource:shared'
+    const cooperationCount = socialMemories.filter(m =>
+      m.eventType === 'cooperation' || m.eventType === 'resource:shared'
     ).length;
 
     if (cooperationCount >= this.patternThreshold) {

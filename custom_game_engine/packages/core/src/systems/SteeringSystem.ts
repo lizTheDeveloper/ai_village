@@ -188,7 +188,6 @@ export class SteeringSystem implements System {
         } else if (now - tracker.stuckTime > 3000) {
           // Stuck for 3+ seconds - need pathfinding!
           // For now, just add random jitter to try different angles
-          console.log(`[SteeringSystem] Agent ${entityId} stuck for 3s, adding jitter`);
           desired.x += (Math.random() - 0.5) * 2;
           desired.y += (Math.random() - 0.5) * 2;
           tracker.stuckTime = now; // Reset to prevent spam

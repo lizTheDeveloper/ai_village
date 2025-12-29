@@ -38,8 +38,33 @@ export * from './SocialGradientComponent.js';
 export * from './ExplorationStateComponent.js';
 export * from './SteeringComponent.js';
 export * from './VelocityComponent.js';
+export * from './GatheringStatsComponent.js';
+// Governance building components
+export * from './governance.js';
+// Economy components
+export * from './CurrencyComponent.js';
+export * from './ShopComponent.js';
+export * from './MarketStateComponent.js';
+// Research component
+export * from './ResearchStateComponent.js';
+// Mood system
+export * from './MoodComponent.js';
+// Food preferences
+export * from './PreferenceComponent.js';
+// Cooking skill
+export * from './CookingSkillComponent.js';
+// Skills system
+export * from './SkillsComponent.js';
+export * from './SkillConstants.js';
+// Personal goals
+export * from './GoalsComponent.js';
 
 // Re-export types explicitly (export * doesn't re-export types)
 export type { AgentBehavior } from './AgentComponent.js';
 export type { PlantStage, PlantGenetics, GeneticMutation } from './PlantComponent.js';
 export type { AnimalLifeStage, AnimalState } from './AnimalComponent.js';
+export type { EmotionalState, MoodFactors, RecentMeal } from './MoodComponent.js';
+export type { FlavorType, FlavorPreferences, FoodMemory } from './PreferenceComponent.js';
+export type { CookingSpecializations, RecipeComplexity, CookingExperience, RecipeExperience } from './CookingSkillComponent.js';
+export type { SkillId, SkillLevel, SkillPrerequisite } from './SkillsComponent.js';
+export type { GoalCategory, PersonalGoal } from './GoalsComponent.js';

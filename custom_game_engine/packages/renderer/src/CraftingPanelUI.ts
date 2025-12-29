@@ -1,4 +1,4 @@
-import type { World } from '@ai-village/core';
+import type { World, EntityId } from '@ai-village/core';
 import { RecipeListSection } from './RecipeListSection.js';
 import { IngredientPanel } from './IngredientPanel.js';
 import { CraftingQueueSection } from './CraftingQueueSection.js';
@@ -44,10 +44,10 @@ interface PanelState {
  */
 export class CraftingPanelUI {
   private world: World;
-  private canvas: HTMLCanvasElement;
+  private _canvas: HTMLCanvasElement; // Retained for potential future use
 
   public isVisible: boolean = false;
-  public activeAgentId: number | null = null;
+  public activeAgentId: EntityId | null = null;
   public workstationId: string | null = null;
   public selectedRecipeId: string | null = null;
   public focusedSection: FocusedSection = 'recipeList';
@@ -79,27 +79,27 @@ export class CraftingPanelUI {
     }
 
     this.world = world;
-    this.canvas = canvas;
+    this._canvas = canvas;
+    void this._canvas; // Suppress unused warning - retained for potential future use
 
-    // Panel dimensions (800x600, centered)
+    // Panel dimensions - use relative coordinates (0,0 origin) for WindowManager compatibility
     const panelWidth = 800;
     const panelHeight = 600;
-    const panelX = (canvas.width - panelWidth) / 2;
-    const panelY = (canvas.height - panelHeight) / 2;
 
-    this.bounds = { x: panelX, y: panelY, width: panelWidth, height: panelHeight };
+    // Bounds are relative to the window/panel origin (0,0)
+    this.bounds = { x: 0, y: 0, width: panelWidth, height: panelHeight };
 
-    // Close button (top right)
+    // Close button (top right, relative to panel origin)
     this.closeButton = {
-      x: panelX + panelWidth - 40,
-      y: panelY + 10,
+      x: panelWidth - 40,
+      y: 10,
       width: 30,
       height: 30
     };
 
-    // Create UI sections
-    const recipeListX = panelX + 10;
-    const recipeListY = panelY + 50;
+    // Create UI sections with relative coordinates
+    const recipeListX = 10;
+    const recipeListY = 50;
     const recipeListWidth = 260;
     const recipeListHeight = 350;
 
@@ -111,30 +111,30 @@ export class CraftingPanelUI {
       recipeListHeight
     );
 
-    // Recipe details section (stub)
+    // Recipe details section (stub) - relative coordinates
     this.recipeDetailsSection = {
       setRecipe: (_recipeId: string) => { /* stub */ },
       render: (ctx: CanvasRenderingContext2D) => {
-        // Draw placeholder
+        // Draw placeholder at relative position
         ctx.fillStyle = '#1a1a1a';
-        ctx.fillRect(panelX + 280, panelY + 50, 500, 250);
+        ctx.fillRect(280, 50, 500, 250);
         ctx.strokeStyle = '#666';
-        ctx.strokeRect(panelX + 280, panelY + 50, 500, 250);
+        ctx.strokeRect(280, 50, 500, 250);
       }
     };
 
     this.ingredientPanel = new IngredientPanel(
       world,
-      panelX + 280,
-      panelY + 310,
+      280,
+      310,
       250,
       200
     );
 
     this.queueSection = new CraftingQueueSection(
       world,
-      panelX + 10,
-      panelY + 410,
+      10,
+      410,
       770,
       180
     );
@@ -222,8 +222,8 @@ export class CraftingPanelUI {
     }
   }
 
-  setActiveAgent(agentId: number): void {
-    if (agentId <= 0) {
+  setActiveAgent(agentId: EntityId): void {
+    if (!agentId) {
       throw new Error('Invalid agent ID');
     }
 
@@ -311,40 +311,26 @@ export class CraftingPanelUI {
       return;
     }
 
+    // Note: When rendered through WindowManager, ctx is already translated to window position.
+    // WindowManager handles the title bar and close button, so we only render content here.
+    // All coordinates here are relative to the panel origin (0,0).
+
+    // Draw panel background at relative (0,0)
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(0, 0, this.bounds.width, this.bounds.height);
+
+    // Show placeholder if no agent is set
     if (!this.activeAgentId) {
-      throw new Error('No active agent');
+      ctx.fillStyle = '#888888';
+      ctx.font = '16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Select an agent to view crafting options', this.bounds.width / 2, this.bounds.height / 2);
+      ctx.textAlign = 'left';
+      return;
     }
 
-    // Draw semi-transparent overlay
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-    // Draw panel background
-    ctx.fillStyle = '#2a2a2a';
-    ctx.fillRect(this.bounds.x, this.bounds.y, this.bounds.width, this.bounds.height);
-
-    // Draw panel border
-    ctx.strokeStyle = '#666';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(this.bounds.x, this.bounds.y, this.bounds.width, this.bounds.height);
-
-    // Draw header
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 18px sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText(this.getHeader(), this.bounds.x + 10, this.bounds.y + 30);
-
-    // Draw close button
-    ctx.fillStyle = '#c44';
-    ctx.fillRect(this.closeButton.x, this.closeButton.y, this.closeButton.width, this.closeButton.height);
-    ctx.strokeStyle = '#fff';
-    ctx.strokeRect(this.closeButton.x, this.closeButton.y, this.closeButton.width, this.closeButton.height);
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 20px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('X', this.closeButton.x + 15, this.closeButton.y + 22);
-
-    // Render sections
+    // Render sections (they use relative coordinates set in constructor)
     this.recipeListSection.render(ctx);
     this.recipeDetailsSection.render(ctx);
     this.ingredientPanel.render(ctx);
@@ -356,19 +342,8 @@ export class CraftingPanelUI {
       return false;
     }
 
-    // Check close button
-    if (x >= this.closeButton.x && x <= this.closeButton.x + this.closeButton.width &&
-        y >= this.closeButton.y && y <= this.closeButton.y + this.closeButton.height) {
-      this.hide();
-      return true;
-    }
-
-    // Check if click is outside panel bounds
-    if (x < this.bounds.x || x > this.bounds.x + this.bounds.width ||
-        y < this.bounds.y || y > this.bounds.y + this.bounds.height) {
-      this.hide();
-      return true;
-    }
+    // Note: WindowManager handles the close button in its title bar.
+    // We only handle clicks within our content sections here.
 
     // Delegate to sections
     if (this.recipeListSection.handleClick(x, y)) {

@@ -1,11 +1,55 @@
-import type { Component } from '../ecs/Component.js';
+import { ComponentBase } from '../ecs/Component.js';
+
+export interface PersonalityTraits {
+  openness: number;
+  conscientiousness: number;
+  extraversion: number;
+  agreeableness: number;
+  neuroticism: number;
+  workEthic: number;
+  creativity: number;
+  generosity: number;
+  leadership: number;
+}
 
 /**
+ * Class-based PersonalityComponent for tests and new systems
+ * Traits are 0-1.0 scale
+ */
+export class PersonalityComponent extends ComponentBase {
+  public readonly type = 'personality';
+  public openness: number;
+  public conscientiousness: number;
+  public extraversion: number;
+  public agreeableness: number;
+  public neuroticism: number;
+  public workEthic: number;
+  public creativity: number;
+  public generosity: number;
+  public leadership: number;
+
+  constructor(traits: PersonalityTraits) {
+    super();
+    this.openness = traits.openness;
+    this.conscientiousness = traits.conscientiousness;
+    this.extraversion = traits.extraversion;
+    this.agreeableness = traits.agreeableness;
+    this.neuroticism = traits.neuroticism;
+    this.workEthic = traits.workEthic;
+    this.creativity = traits.creativity;
+    this.generosity = traits.generosity;
+    this.leadership = traits.leadership;
+  }
+}
+
+/**
+ * Legacy interface-based personality component
  * Personality traits based on Big Five + game-specific traits.
  * From agent-system/spec.md
  */
-export interface PersonalityComponent extends Component {
+export interface PersonalityComponentLegacy {
   type: 'personality';
+  version: number;
 
   // Big Five traits (0-100)
   openness: number;          // curious vs cautious
@@ -24,7 +68,7 @@ export interface PersonalityComponent extends Component {
 /**
  * Generate random personality traits.
  */
-export function generateRandomPersonality(): PersonalityComponent {
+export function generateRandomPersonality(): PersonalityComponentLegacy {
   const random = () => Math.floor(Math.random() * 100);
 
   return {
@@ -45,7 +89,7 @@ export function generateRandomPersonality(): PersonalityComponent {
 /**
  * Create personality with specific traits.
  */
-export function createPersonalityComponent(traits: Partial<Omit<PersonalityComponent, 'type' | 'version'>>): PersonalityComponent {
+export function createPersonalityComponent(traits: Partial<Omit<PersonalityComponentLegacy, 'type' | 'version'>>): PersonalityComponentLegacy {
   return {
     type: 'personality',
     version: 1,
@@ -64,7 +108,7 @@ export function createPersonalityComponent(traits: Partial<Omit<PersonalityCompo
 /**
  * Get personality description for prompts.
  */
-export function getPersonalityDescription(personality: PersonalityComponent): string {
+export function getPersonalityDescription(personality: PersonalityComponentLegacy | PersonalityComponent): string {
   const traits: string[] = [];
 
   // Openness

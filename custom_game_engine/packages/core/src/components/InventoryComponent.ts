@@ -1,40 +1,15 @@
 import type { Component } from '../ecs/Component.js';
 import type { ResourceType } from './ResourceComponent.js';
+import {
+  itemRegistry,
+  isSeedItemId,
+  getSeedSpeciesId as getSeedSpeciesIdFromItems,
+  createSeedItemId as createSeedItemIdFromItems,
+} from '../items/index.js';
 
-/**
- * Resource weight table (units per item).
- * Based on items-system/spec.md
- */
-const RESOURCE_WEIGHTS: Record<ResourceType, number> = {
-  wood: 2,
-  stone: 3,
-  food: 1,
-  water: 1,
-  fiber: 0.5,
-  leaves: 0.3,
-};
-
-/**
- * Weight table for consumable items (kg per item).
- * These are items that aren't basic resources but are still tracked by weight.
- */
-const ITEM_WEIGHTS: Record<string, number> = {
-  berry: 0.1, // Berries are lightweight
-  stew: 0.5,  // Prepared food has moderate weight
-  beer: 0.8,  // Liquids in containers are heavier
-};
-
-/**
- * Stack size limits per resource type.
- */
-const RESOURCE_STACK_SIZES: Record<ResourceType, number> = {
-  wood: 50,
-  stone: 30,
-  food: 20,
-  water: 10,
-  fiber: 100,
-  leaves: 100,
-};
+// Re-export seed utilities for backward compatibility
+export { getSeedSpeciesIdFromItems as getSeedSpeciesId };
+export { createSeedItemIdFromItems as createSeedItemId };
 
 /**
  * A slot in an agent's inventory.
@@ -89,62 +64,33 @@ export function createInventoryComponent(
 
 /**
  * Get the weight of a single unit of a resource.
+ * Uses the ItemRegistry for lookups.
  */
 export function getResourceWeight(resourceType: ResourceType): number {
-  const weight = RESOURCE_WEIGHTS[resourceType];
-  if (weight === undefined) {
-    throw new Error(`Unknown resource type: ${resourceType}`);
-  }
-  return weight;
+  return itemRegistry.getWeight(resourceType);
 }
 
 /**
  * Get the maximum stack size for a resource.
+ * Uses the ItemRegistry for lookups.
  */
 export function getResourceStackSize(resourceType: ResourceType): number {
-  const stackSize = RESOURCE_STACK_SIZES[resourceType];
-  if (stackSize === undefined) {
-    throw new Error(`Unknown resource type: ${resourceType}`);
-  }
-  return stackSize;
+  return itemRegistry.getStackSize(resourceType);
 }
 
 /**
  * Calculate total weight of inventory.
  * CRITICAL: This function must never return negative values.
  * Always recalculates from actual slot contents to prevent stale cached values.
+ * Uses ItemRegistry for weight lookups.
  */
 export function calculateInventoryWeight(inventory: InventoryComponent): number {
   let totalWeight = 0;
 
   for (const slot of inventory.slots) {
     if (slot.itemId && slot.quantity > 0) {
-      let unitWeight = 0;
-
-      // Check if it's a resource type
-      if (isResourceType(slot.itemId)) {
-        unitWeight = getResourceWeight(slot.itemId as ResourceType);
-      }
-      // Check if it's a known consumable item
-      else if (slot.itemId in ITEM_WEIGHTS) {
-        const itemWeight = ITEM_WEIGHTS[slot.itemId];
-        if (itemWeight !== undefined) {
-          unitWeight = itemWeight;
-        } else {
-          // Fallback for undefined (should never happen due to 'in' check)
-          unitWeight = 0.5;
-        }
-      }
-      // Check if it's a seed
-      else if (isSeedType(slot.itemId)) {
-        unitWeight = 0.1; // Seeds are lightweight
-      }
-      // Unknown item type - log warning but don't crash
-      else {
-        console.warn(`[InventoryComponent] Unknown item type for weight calculation: ${slot.itemId}. Using default weight 0.5 kg.`);
-        unitWeight = 0.5; // Default moderate weight for unknown items
-      }
-
+      // Use ItemRegistry for weight lookup (returns 1.0 for unknown items)
+      const unitWeight = itemRegistry.getWeight(slot.itemId);
       totalWeight += unitWeight * slot.quantity;
     }
   }
@@ -154,57 +100,40 @@ export function calculateInventoryWeight(inventory: InventoryComponent): number 
 
 /**
  * Check if a string is a valid ResourceType.
+ * Uses ItemRegistry for category lookup.
  */
 export function isResourceType(itemId: string): boolean {
-  return itemId === 'food' || itemId === 'wood' || itemId === 'stone' || itemId === 'water' || itemId === 'fiber' || itemId === 'leaves';
+  return itemRegistry.isResource(itemId);
 }
 
 /**
- * Food items that can be eaten and stored
- */
-const FOOD_ITEMS = ['berry', 'wheat', 'apple', 'carrot', 'bread', 'cooked_meat', 'raw_meat'];
-
-/**
  * Check if a string is a food item type.
+ * Uses ItemRegistry for category lookup.
  */
 export function isFoodType(itemId: string): boolean {
-  return FOOD_ITEMS.includes(itemId);
+  return itemRegistry.isFood(itemId);
 }
 
 /**
  * Check if a string is a seed item ID (format: "seed:{speciesId}")
+ * Uses the SeedItemFactory utility from items module.
  */
 export function isSeedType(itemId: string): boolean {
-  return itemId.startsWith('seed:');
+  return isSeedItemId(itemId);
 }
 
 /**
  * Check if an item type is valid for inventory operations.
+ * Uses ItemRegistry - any registered item is valid.
  */
 export function isValidItemType(itemId: string): boolean {
-  return isResourceType(itemId) || isSeedType(itemId) || isFoodType(itemId);
-}
-
-/**
- * Get species ID from seed item ID (format: "seed:{speciesId}")
- */
-export function getSeedSpeciesId(itemId: string): string {
-  if (!isSeedType(itemId)) {
-    throw new Error(`Not a seed item ID: ${itemId}`);
-  }
-  return itemId.substring(5); // Remove "seed:" prefix
-}
-
-/**
- * Create seed item ID from species ID
- */
-export function createSeedItemId(speciesId: string): string {
-  return `seed:${speciesId}`;
+  return itemRegistry.has(itemId);
 }
 
 /**
  * Add items to inventory. Returns the amount actually added.
  * Throws if inventory is full or weight limit exceeded.
+ * Uses ItemRegistry for weight and stack size lookups.
  */
 export function addToInventory(
   inventory: InventoryComponent,
@@ -215,24 +144,9 @@ export function addToInventory(
     throw new Error(`Cannot add non-positive quantity: ${quantity}`);
   }
 
-  let unitWeight: number;
-  let stackSize: number;
-
-  if (isResourceType(itemId)) {
-    const resourceType = itemId as ResourceType;
-    unitWeight = getResourceWeight(resourceType);
-    stackSize = getResourceStackSize(resourceType);
-  } else if (isSeedType(itemId)) {
-    // Seeds are lightweight and stack well
-    unitWeight = 0.1; // 0.1 units per seed
-    stackSize = 100; // 100 seeds per stack
-  } else if (isFoodType(itemId)) {
-    // Food items - moderate weight, stackable
-    unitWeight = 0.5; // 0.5 units per food item
-    stackSize = 50; // 50 food items per stack
-  } else {
-    throw new Error(`Unknown item type: ${itemId}. Supported: resources, seeds (seed:speciesId), food.`);
-  }
+  // Use ItemRegistry for weight and stack size (returns defaults for unknown items)
+  const unitWeight = itemRegistry.getWeight(itemId);
+  const stackSize = itemRegistry.getStackSize(itemId);
 
   // Calculate how much we can actually add
   const weightAvailable = inventory.maxWeight - inventory.currentWeight;
@@ -296,6 +210,84 @@ export function addToInventory(
 }
 
 /**
+ * Add items to inventory with a specific quality.
+ * Items with different qualities don't stack together.
+ * Throws if inventory is full or weight limit exceeded.
+ */
+export function addToInventoryWithQuality(
+  inventory: InventoryComponent,
+  itemId: string,
+  quantity: number,
+  quality: number
+): { inventory: InventoryComponent; amountAdded: number } {
+  if (quantity <= 0) {
+    throw new Error(`Cannot add non-positive quantity: ${quantity}`);
+  }
+
+  // Use ItemRegistry for weight and stack size
+  const unitWeight = itemRegistry.getWeight(itemId);
+  const stackSize = itemRegistry.getStackSize(itemId);
+
+  // Calculate how much we can actually add
+  const weightAvailable = inventory.maxWeight - inventory.currentWeight;
+  const maxByWeight = Math.floor(weightAvailable / unitWeight);
+
+  let amountToAdd = Math.min(quantity, maxByWeight);
+  let remainingToAdd = amountToAdd;
+
+  if (remainingToAdd === 0) {
+    throw new Error(`Inventory weight limit exceeded. Cannot add ${itemId}.`);
+  }
+
+  // Try to add to existing stacks with SAME quality first
+  for (const slot of inventory.slots) {
+    if (slot.itemId === itemId && slot.quality === quality && slot.quantity < stackSize) {
+      const spaceInStack = stackSize - slot.quantity;
+      const amountForThisStack = Math.min(remainingToAdd, spaceInStack);
+      slot.quantity += amountForThisStack;
+      remainingToAdd -= amountForThisStack;
+
+      if (remainingToAdd === 0) break;
+    }
+  }
+
+  // If still have items to add, find empty slots
+  if (remainingToAdd > 0) {
+    for (const slot of inventory.slots) {
+      if (slot.itemId === null || slot.quantity === 0) {
+        const amountForThisStack = Math.min(remainingToAdd, stackSize);
+        slot.itemId = itemId;
+        slot.quantity = amountForThisStack;
+        slot.quality = quality;
+        remainingToAdd -= amountForThisStack;
+
+        if (remainingToAdd === 0) break;
+      }
+    }
+  }
+
+  const actualAmountAdded = amountToAdd - remainingToAdd;
+
+  if (remainingToAdd > 0) {
+    throw new Error(`Inventory full. Could only add ${actualAmountAdded} of ${quantity} ${itemId}.`);
+  }
+
+  const actualWeight = calculateInventoryWeight({
+    ...inventory,
+    slots: [...inventory.slots],
+  } as InventoryComponent);
+
+  return {
+    inventory: {
+      ...inventory,
+      slots: [...inventory.slots],
+      currentWeight: actualWeight,
+    },
+    amountAdded: actualAmountAdded,
+  };
+}
+
+/**
  * Remove items from inventory. Returns the amount actually removed.
  * Throws if not enough items available.
  */
@@ -322,10 +314,8 @@ export function removeFromInventory(
     );
   }
 
-  // Validate item type exists (weight calculation happens in calculateInventoryWeight)
-  if (!isValidItemType(itemId)) {
-    throw new Error(`Unknown item type for removal: ${itemId}`);
-  }
+  // Note: We don't validate item type for removal - if it's in the inventory,
+  // it can be removed. Weight calculation uses registry defaults for unknown items.
 
   let remainingToRemove = quantity;
 

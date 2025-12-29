@@ -1,4 +1,16 @@
 import type { Entity } from '@ai-village/core';
+import {
+  type SkillsComponent,
+  type SkillId,
+  type SkillLevel,
+  type GoalsComponent,
+  type EpisodicMemoryComponent,
+  type EpisodicMemory,
+  getFoodStorageInfo,
+  getVillageInfo,
+  formatGoalsForPrompt,
+  getAvailableBuildings,
+} from '@ai-village/core';
 
 /**
  * Structured prompt following agent-system/spec.md REQ-AGT-002
@@ -7,6 +19,7 @@ export interface AgentPrompt {
   systemPrompt: string;       // Role, personality, rules
   worldContext: string;        // Current situation
   memories: string;            // Relevant memories
+  goals?: string;              // Personal goals (optional)
   availableActions: string[];  // What they can do
   instruction: string;         // What to decide
 }
@@ -24,19 +37,25 @@ export class StructuredPromptBuilder {
     const personality = agent.components.get('personality') as any;
     const needs = agent.components.get('needs') as any;
     const vision = agent.components.get('vision') as any;
-    const memory = agent.components.get('memory') as any;
+    const episodicMemory = agent.components.get('episodic_memory') as EpisodicMemoryComponent | undefined;
+    const legacyMemory = agent.components.get('memory') as any; // For spatial knowledge only
     const inventory = agent.components.get('inventory') as any;
     const temperature = agent.components.get('temperature') as any;
     const conversation = agent.components.get('conversation') as any;
+    const skills = agent.components.get('skills') as SkillsComponent | undefined;
 
-    // System Prompt: Role, personality, rules, building knowledge
-    const systemPrompt = this.buildSystemPrompt(name?.name || 'Agent', personality, world, inventory);
+    // System Prompt: Role, personality, rules, skill-gated building knowledge
+    const systemPrompt = this.buildSystemPrompt(name?.name || 'Agent', personality, world, inventory, skills);
 
-    // World Context: Current situation
-    const worldContext = this.buildWorldContext(needs, vision, inventory, world, temperature, memory, conversation);
+    // World Context: Current situation (uses legacy memory for spatial knowledge only)
+    const worldContext = this.buildWorldContext(needs, vision, inventory, world, temperature, legacyMemory, conversation, agent);
 
-    // Memories: Relevant recent memories
-    const memoriesText = this.buildMemories(memory);
+    // Memories: Relevant recent memories (uses episodic memory for meaningful events)
+    const memoriesText = this.buildEpisodicMemories(episodicMemory, world);
+
+    // Personal Goals
+    const goals = agent.components.get('goals') as GoalsComponent | undefined;
+    const goalsText = goals ? formatGoalsForPrompt(goals) : undefined;
 
     // Available Actions
     const actions = this.getAvailableActions(vision, world, agent);
@@ -71,21 +90,17 @@ export class StructuredPromptBuilder {
       // STRONGEST PRIORITY: Agent has resources + urgent need
       if (hasBuildingMaterials && isCold) {
         instruction = `YOU ARE COLD and you have building materials! This is URGENT - building a campfire (10 stone + 5 wood) or tent (10 cloth + 5 wood) will save you from freezing. You MUST build shelter NOW! What will you build?`;
-        console.log(`[StructuredPromptBuilder] 🏗️ CRITICAL BUILDING INSTRUCTION - cold + materials (wood=${woodQty}, stone=${stoneQty})`);
       }
       else if (hasBuildingMaterials && isTired) {
         instruction = `You're exhausted and have materials. Building a bed (10 wood + 15 fiber) or bedroll will help you recover faster. You should build sleeping quarters NOW before you collapse! What will you build?`;
-        console.log(`[StructuredPromptBuilder] 🏗️ URGENT BUILDING INSTRUCTION - tired + materials (wood=${woodQty}, stone=${stoneQty})`);
       }
       // STRONG PRIORITY: Agent has abundant materials (village development)
       else if (woodQty >= 15 || stoneQty >= 15) {
         instruction = `You have abundant building materials (${woodQty} wood, ${stoneQty} stone)! The village desperately needs infrastructure. You should BUILD something now - storage for supplies, shelter for sleeping, or tools for crafting. This is your chance to help the community thrive! What will you build?`;
-        console.log(`[StructuredPromptBuilder] 🏗️ STRONG BUILDING INSTRUCTION - abundant materials (wood=${woodQty}, stone=${stoneQty})`);
       }
       // MODERATE PRIORITY: Agent has enough materials for basic building
       else if (woodQty >= 10 || stoneQty >= 10) {
         instruction = `You have enough materials (${woodQty} wood, ${stoneQty} stone) to build something useful! Consider building storage-chest (10 wood) for supplies or a lean-to (10 wood + 5 leaves) for shelter. Building now will benefit everyone! What should you do?`;
-        console.log(`[StructuredPromptBuilder] 🏗️ BUILDING SUGGESTION - sufficient materials (wood=${woodQty}, stone=${stoneQty})`);
       }
       // Encourage gathering if low on materials - prioritize food and wood over stone
       else if (!hasWood) {
@@ -164,6 +179,7 @@ export class StructuredPromptBuilder {
       systemPrompt,
       worldContext,
       memories: memoriesText,
+      goals: goalsText,
       availableActions: actions,
       instruction,
     });
@@ -171,26 +187,40 @@ export class StructuredPromptBuilder {
 
   /**
    * Build system prompt with role and personality.
+   * Per progressive-skill-reveal-spec.md: Building availability is skill-gated.
    */
-  private buildSystemPrompt(name: string, personality: any, world?: any, inventory?: any): string {
+  private buildSystemPrompt(name: string, personality: any, world?: any, inventory?: any, skills?: SkillsComponent): string {
     // Base prompt
     let prompt = `You are ${name}, a villager in a forest village.\n\n`;
 
-    // Add complete building knowledge from registry
+    // Add skill-gated building knowledge from registry
+    // Per progressive-skill-reveal-spec.md Section 4: Tiered Building Availability
     if (world && (world as any).buildingRegistry) {
       const registry = (world as any).buildingRegistry;
-      const buildings = registry.getUnlocked();
+
+      // Filter buildings based on skill levels if skills provided
+      let buildings;
+      if (skills) {
+        const skillLevels: Partial<Record<SkillId, SkillLevel>> = {};
+        for (const skillId of Object.keys(skills.levels) as SkillId[]) {
+          skillLevels[skillId] = skills.levels[skillId];
+        }
+        buildings = getAvailableBuildings(registry, skillLevels);
+      } else {
+        // Fallback: show all unlocked buildings if no skills component
+        buildings = registry.getUnlocked();
+      }
 
       if (buildings && buildings.length > 0) {
-        prompt += 'Buildings you know how to construct:\n';
+        prompt += 'Buildings you can construct (you can build ANY of these):\n';
 
         for (const building of buildings) {
           const costs = building.resourceCost
             .map((c: any) => `${c.amountRequired} ${c.resourceId}`)
             .join(' + ');
 
-          // Check if agent can afford this building
-          let canAfford = ' ';
+          // Check if agent has materials in stock for this building
+          let stockStatus = ' ';
           if (inventory && inventory.slots) {
             const hasAllResources = building.resourceCost.every((cost: any) => {
               const total = inventory.slots
@@ -198,10 +228,10 @@ export class StructuredPromptBuilder {
                 .reduce((sum: number, s: any) => sum + s.quantity, 0);
               return total >= cost.amountRequired;
             });
-            canAfford = hasAllResources ? ' ✅ CAN BUILD - ' : ' ';
+            stockStatus = hasAllResources ? ' ✅ IN STOCK - ' : ' ';
           }
 
-          prompt += `-${canAfford}${building.name}: ${costs} - ${building.description}\n`;
+          prompt += `-${stockStatus}${building.name}: ${costs} - ${building.description}\n`;
         }
         prompt += '\n';
       }
@@ -251,8 +281,14 @@ export class StructuredPromptBuilder {
 
   /**
    * Build world context from current situation.
+   * Per progressive-skill-reveal-spec.md: Information depth scales with skill level.
    */
-  private buildWorldContext(needs: any, vision: any, inventory: any, world: any, temperature?: any, memory?: any, conversation?: any): string {
+  private buildWorldContext(needs: any, vision: any, inventory: any, world: any, temperature?: any, memory?: any, conversation?: any, entity?: Entity): string {
+    // Get agent's skill levels for skill-gated information
+    const skills = entity?.components.get('skills') as SkillsComponent | undefined;
+    const cookingSkill = (skills?.levels.cooking ?? 0) as SkillLevel;
+    const buildingSkill = (skills?.levels.building ?? 0) as SkillLevel;
+
     let context = 'Current Situation:\n';
 
     // PRIORITY: Show active conversation history first
@@ -331,7 +367,8 @@ export class StructuredPromptBuilder {
     }
 
     // Storage/Stockpile levels - check all storage buildings
-    const storageInfo = this.getStorageInfo(world);
+    // Per progressive-skill-reveal-spec.md: Food information depth scales with cooking skill
+    const storageInfo = this.getStorageInfo(world, cookingSkill);
     if (storageInfo) {
       context += storageInfo;
     }
@@ -339,8 +376,9 @@ export class StructuredPromptBuilder {
     // Vision - buildings
     if (vision) {
       // Show recently seen buildings with types and locations
+      // Per progressive-skill-reveal-spec.md: Building information depth scales with building skill
       if (vision.seenBuildings && vision.seenBuildings.length > 0) {
-        const buildingInfo = this.getSeenBuildingsInfo(world, vision.seenBuildings);
+        const buildingInfo = this.getSeenBuildingsInfo(world, vision.seenBuildings, buildingSkill);
         if (buildingInfo) {
           context += buildingInfo;
         }
@@ -666,15 +704,37 @@ export class StructuredPromptBuilder {
    * Get information about recently seen buildings (from vision).
    * Shows building types and their functions.
    */
-  private getSeenBuildingsInfo(world: any, seenBuildingIds: string[]): string | null {
+  /**
+   * Get information about buildings the agent can see.
+   * Per progressive-skill-reveal-spec.md: Information depth scales with building skill.
+   */
+  private getSeenBuildingsInfo(world: any, seenBuildingIds: string[], buildingSkill: SkillLevel): string | null {
     if (!world || !seenBuildingIds || seenBuildingIds.length === 0) {
       return null;
     }
 
-    const buildingDescriptions: string[] = [];
-    const buildingTypes: Record<string, number> = {};
+    // Collect all complete buildings in the village for village info
+    const allBuildings = world.query()
+      .with('building')
+      .executeEntities();
 
-    // Collect building info (limit to 5 most recent)
+    // Transform building data for skill-gated info function
+    const buildingData = allBuildings.map((b: Entity) => {
+      const building = b.components.get('building') as any;
+      const identity = b.components.get('identity') as any;
+      return {
+        id: b.id,
+        name: building?.buildingType || 'unknown',
+        status: building?.isComplete ? 'complete' : 'in-progress',
+        purpose: identity?.name,
+      };
+    });
+
+    // Use skill-gated village info from SkillsComponent
+    const villageInfo = getVillageInfo({ buildings: buildingData }, buildingSkill);
+
+    // Also show visible nearby buildings
+    const buildingDescriptions: string[] = [];
     const recentBuildings = seenBuildingIds.slice(-5);
 
     for (const buildingId of recentBuildings) {
@@ -682,46 +742,34 @@ export class StructuredPromptBuilder {
       if (!building) continue;
 
       const buildingComp = building.getComponent('building');
-      const posComp = building.getComponent('position');
-
-      if (!buildingComp || !posComp) continue;
+      if (!buildingComp) continue;
 
       const type = buildingComp.buildingType;
-      buildingTypes[type] = (buildingTypes[type] || 0) + 1;
+      const status = buildingComp.isComplete ? '' : ' (under construction)';
 
-      // Add functional description
-      const distance = 'nearby'; // Could calculate actual distance if needed
-      let description = '';
-
-      if (type === 'campfire') {
-        description = `${type} (${distance}) - provides warmth`;
-      } else if (type === 'storage-chest' || type === 'storage-box') {
-        description = `${type} (${distance}) - stores items`;
-      } else if (type === 'tent' || type === 'lean-to' || type === 'bed' || type === 'bedroll') {
-        description = `${type} (${distance}) - for sleeping`;
-      } else if (type === 'well') {
-        description = `${type} (${distance}) - provides water`;
-      } else if (type === 'workbench') {
-        description = `${type} (${distance}) - for crafting`;
-      } else {
-        description = `${type} (${distance})`;
-      }
-
-      buildingDescriptions.push(description);
+      buildingDescriptions.push(`${type}${status}`);
     }
 
-    if (buildingDescriptions.length === 0) {
+    if (buildingDescriptions.length === 0 && !villageInfo) {
       return null;
     }
 
-    return `- Buildings you see: ${buildingDescriptions.join(', ')}\n`;
+    let result = '';
+    if (buildingDescriptions.length > 0) {
+      result += `- Buildings you see: ${buildingDescriptions.join(', ')}\n`;
+    }
+    if (villageInfo) {
+      result += `- ${villageInfo}\n`;
+    }
+
+    return result;
   }
 
   /**
    * Get storage/stockpile information from all storage buildings in the world.
-   * Shows total available resources across all storage.
+   * Per progressive-skill-reveal-spec.md: Information depth scales with cooking skill.
    */
-  private getStorageInfo(world: any): string | null {
+  private getStorageInfo(world: any, cookingSkill: SkillLevel): string | null {
     if (!world || typeof world.query !== 'function') {
       return null;
     }
@@ -738,98 +786,153 @@ export class StructuredPromptBuilder {
 
     // Aggregate all items in storage
     const totalStorage: Record<string, number> = {};
-    let hasAnyItems = false;
 
     for (const storage of storageBuildings) {
-      const building = storage.getComponent('building');
-      const inventory = storage.getComponent('inventory');
+      const building = storage.components.get('building');
+      const inventory = storage.components.get('inventory');
 
       // Only count complete storage buildings
       if (!building?.isComplete) continue;
-      if (building.buildingType !== 'storage-chest' && building.buildingType !== 'storage-box') continue;
+      if (building.buildingType !== 'storage-chest' && building.buildingType !== 'storage-box' && building.buildingType !== 'granary' && building.buildingType !== 'warehouse') continue;
 
       if (inventory?.slots) {
         for (const slot of inventory.slots) {
           if (slot.itemId && slot.quantity > 0) {
             totalStorage[slot.itemId] = (totalStorage[slot.itemId] || 0) + slot.quantity;
-            hasAnyItems = true;
           }
         }
       }
     }
 
-    // Calculate days of food for the village
-    const foodInStorage = totalStorage.food ?? 0;
     const agentCount = world.query().with('agent').executeEntities().length;
-    const foodPerAgentPerDay = 2.5; // Average food consumption per agent per day
-    const daysOfFood = agentCount > 0 ? foodInStorage / (agentCount * foodPerAgentPerDay) : 0;
+    const consumptionRate = agentCount * 2.5; // 2.5 food per agent per day
 
-    // Always show storage status, even if empty
-    if (!hasAnyItems) {
-      const urgency = agentCount > 0 ? ' ⚠️ CRITICAL - Village needs food gatherers!' : '';
-      return `- Village Storage: empty (no food or resources in stockpile)${urgency}\n`;
-    }
+    // Use skill-gated food info from SkillsComponent
+    const foodInfo = getFoodStorageInfo({
+      items: totalStorage,
+      villageSize: agentCount,
+      consumptionRate,
+    }, cookingSkill);
 
-    const items = Object.entries(totalStorage)
-      .map(([item, qty]) => `${qty} ${item}`)
-      .join(', ');
-
-    // Calculate food urgency message
-    let foodStatus = '';
-    if (foodInStorage === 0) {
-      foodStatus = ' ⚠️ NO FOOD - gather food immediately!';
-    } else if (daysOfFood < 1) {
-      foodStatus = ` ⚠️ FOOD CRITICAL - only ${daysOfFood.toFixed(1)} days of food left!`;
-    } else if (daysOfFood < 2) {
-      foodStatus = ` 🍎 LOW FOOD - ${daysOfFood.toFixed(1)} days of food remaining`;
-    } else if (daysOfFood < 5) {
-      foodStatus = ` 🍎 ${daysOfFood.toFixed(1)} days of food`;
-    } else {
-      foodStatus = ` ✅ ${daysOfFood.toFixed(1)} days of food - well stocked!`;
-    }
-
-    return `- Village Storage: ${items}${foodStatus}\n`;
+    return `- Village Storage: ${foodInfo}\n`;
   }
 
   /**
-   * Build memories section with meaningful details.
+   * Build memories section from episodic memories.
+   * Only includes truly memorable events - things worth remembering.
+   * Routine tasks (harvesting, gathering, etc.) are handled by the autonomic system.
    */
-  private buildMemories(memory: any): string {
-    if (!memory?.memories || memory.memories.length === 0) {
+  private buildEpisodicMemories(episodicMemory: EpisodicMemoryComponent | undefined, world?: any): string {
+    if (!episodicMemory) {
       return 'You have no significant recent memories.';
     }
 
-    const recentMemories = memory.memories.slice(-5);
+    const allMemories = episodicMemory.episodicMemories;
+    if (!allMemories || allMemories.length === 0) {
+      return 'You have no significant recent memories.';
+    }
+
+    // Only include truly memorable events - not routine operational tasks
+    // Agents don't consciously remember every harvest, that's autonomic
+    const memorableEventTypes = new Set([
+      // Social - meeting people, conversations
+      'conversation:utterance',
+      'conversation:started',
+      'conversation:ended',
+      'social:conflict',
+      'social:interaction',
+      'information:shared',
+      // Major accomplishments
+      'construction:started',  // Starting to build something significant
+      'harvest:first',         // First harvest of a crop type (milestone)
+      // Survival events - emotionally impactful
+      'need:critical',
+      'agent:starved',
+      'agent:collapsed',
+      'survival:close_call',
+      // Dreams and reflection
+      'agent:dreamed',
+      // Novel experiences
+      'event:novel',
+    ]);
+
+    // Only exclude pure noise events that never have emotional weight
+    // Everything else flows through to the emotional weight check
+    // (e.g., finding a diamond has emotional weight, routine wood gathering doesn't)
+    const noiseEventTypes = new Set([
+      'discovery:location',    // Spatial navigation noise
+      'action:walk',           // Movement noise
+      'agent:idle',            // Doing nothing
+      'plant:stageChanged',    // Passive plant growth
+    ]);
+
+    const meaningfulMemories = allMemories.filter((m: EpisodicMemory) => {
+      // Exclude pure noise events
+      if (noiseEventTypes.has(m.eventType)) {
+        return false;
+      }
+
+      // Always include explicitly memorable event types
+      if (memorableEventTypes.has(m.eventType)) {
+        return true;
+      }
+
+      // Include if sufficient emotional weight to consolidate into long-term memory
+      if (m.emotionalIntensity > 0.3) {
+        return true;
+      }
+
+      // Include if important
+      if (m.importance > 0.5) {
+        return true;
+      }
+
+      // Include conversation/dialogue memories
+      if (m.dialogueText) {
+        return true;
+      }
+
+      return false;
+    });
+
+    if (meaningfulMemories.length === 0) {
+      return 'You have no significant recent memories.';
+    }
+
+    // Take last 5 meaningful memories, most recent first
+    const recentMemories = meaningfulMemories.slice(-5).reverse();
     let text = 'Recent Memories:\n';
 
-    recentMemories.forEach((m: any, i: number) => {
-      let description = '';
+    recentMemories.forEach((m: EpisodicMemory, i: number) => {
+      // Use the summary from episodic memory (already human-readable)
+      let description = m.summary;
 
-      // Create meaningful descriptions based on memory type
-      if (m.type === 'resource_gathered') {
-        description = `You gathered ${m.metadata?.resourceType || 'resources'}`;
-      } else if (m.type === 'conversation') {
-        const speaker = m.metadata?.speaker || 'someone';
-        const topic = m.metadata?.topic || 'something';
-        description = `You talked with ${speaker} about ${topic}`;
-      } else if (m.type === 'building_seen') {
-        const buildingType = m.metadata?.buildingType || 'a building';
-        description = `You saw a ${buildingType}`;
-      } else if (m.type === 'agent_interaction') {
-        const agent = m.metadata?.agentName || 'someone';
-        description = `You interacted with ${agent}`;
-      } else if (m.type === 'ate_food') {
-        description = `You ate some food`;
-      } else if (m.type === 'slept') {
-        description = `You slept and recovered energy`;
-      } else if (m.type === 'built_structure') {
-        const structure = m.metadata?.buildingType || 'something';
-        description = `You built a ${structure}`;
-      } else if (m.type === 'deposited_items') {
-        description = `You stored items in storage`;
-      } else {
-        // Fallback to type name if no specific handler
-        description = m.type.replace(/_/g, ' ');
+      // Add emotional context for significant memories
+      if (m.emotionalIntensity > 0.5) {
+        const emotion = m.emotionalValence > 0 ? '😊' : m.emotionalValence < 0 ? '😢' : '';
+        if (emotion) {
+          description = `${emotion} ${description}`;
+        }
+      }
+
+      // For conversation memories, show dialogue if available
+      if (m.dialogueText && !description.includes(m.dialogueText)) {
+        description = `${description}: "${m.dialogueText}"`;
+      }
+
+      // Resolve participant names if world is available
+      if (m.participants && m.participants.length > 0 && world) {
+        const participantNames = m.participants.map((id: string) => {
+          const entity = world.getEntity(id);
+          if (entity) {
+            const identity = entity.getComponent('identity');
+            return identity?.name || id.slice(0, 8);
+          }
+          return id.slice(0, 8);
+        });
+        if (!description.includes(participantNames[0])) {
+          description += ` (with ${participantNames.join(', ')})`;
+        }
       }
 
       text += `${i + 1}. ${description}\n`;
@@ -839,19 +942,30 @@ export class StructuredPromptBuilder {
   }
 
   /**
-   * Get available actions based on context.
-   * These MUST match the valid behaviors in ResponseParser.
+   * Get available actions based on context and skills.
+   * Uses ActionDefinitions as the single source of truth.
+   * Per progressive-skill-reveal-spec.md: Filter actions by skill level.
+   *
+   * NOTE: Autonomic behaviors (wander, rest, idle, seek_sleep, seek_warmth)
+   * are NOT included. These are fallback behaviors handled by AutonomicSystem,
+   * not executive decisions for the LLM to make.
    */
   private getAvailableActions(vision: any, _world: any, entity?: any): string[] {
-    const actions = [
-      'wander - Move around the area',
-      'rest - Stop and recover energy',
-    ];
+    const actions: string[] = [];
 
     // Get agent context for contextual actions
     const needs = entity?.components.get('needs');
     const temperature = entity?.components.get('temperature');
     const inventory = entity?.components.get('inventory');
+    const skills = entity?.components.get('skills') as SkillsComponent | undefined;
+
+    // Get skill-filtered actions if agent has skills component
+    const skillLevels: Partial<Record<SkillId, SkillLevel>> = {};
+    if (skills) {
+      for (const skillId of Object.keys(skills.levels)) {
+        skillLevels[skillId as SkillId] = skills.levels[skillId as SkillId];
+      }
+    }
 
     // Calculate if agent has building-relevant needs or resources
     const isCold = temperature?.state === 'cold' || temperature?.state === 'dangerously_cold';
@@ -860,20 +974,18 @@ export class StructuredPromptBuilder {
       (slot.itemId === 'wood' || slot.itemId === 'stone' || slot.itemId === 'cloth') && slot.quantity >= 5
     );
 
-    // Debug logging to understand vision state
-    if (vision) {
-      console.log('[StructuredPromptBuilder] Vision state:', {
-        seenResources: vision.seenResources,
-        seenResourcesCount: vision.seenResources?.length || 0,
-        seenAgents: vision.seenAgents,
-        seenAgentsCount: vision.seenAgents?.length || 0,
-        canSeeResources: vision.canSeeResources,
-      });
-    }
+    // Check if agent has required skills for skill-gated actions
+    const buildingSkill = skillLevels.building ?? 0;
+    const farmingSkill = skillLevels.farming ?? 0;
+    const craftingSkill = skillLevels.crafting ?? 0;
+    const cookingSkill = skillLevels.cooking ?? 0;
+    const animalHandlingSkill = skillLevels.animal_handling ?? 0;
+    const medicineSkill = skillLevels.medicine ?? 0;
 
     // PRIORITY 1: Building actions (when contextually relevant)
-    // Show building EARLY in the list when agent has materials
-    if (hasResources) {
+    // Per progressive-skill-reveal-spec.md: build requires building skill 1+
+    // Show building EARLY in the list when agent has materials AND sufficient skill
+    if (hasResources && buildingSkill >= 1) {
       let buildDesc = 'build - Construct a building (say "build <type>": campfire, tent, storage-chest, bed, etc.)';
 
       // Make description more urgent based on needs
@@ -897,13 +1009,16 @@ export class StructuredPromptBuilder {
         }
       }
 
-      actions.splice(1, 0, buildDesc); // Insert as SECOND action (after wander)
-      console.log(`[StructuredPromptBuilder] 🏗️ BUILD ACTION PROMOTED to position 2 - hasResources=${hasResources}, isCold=${isCold}, isTired=${isTired}`);
+      // Insert build as FIRST action when urgent
+      actions.unshift(buildDesc);
     }
 
-    // PICK - Unified collection action (replaces gather, harvest, seek_food, gather_seeds)
-    // Always available - agents can pick resources, food, seeds, crops
-    actions.push('pick - Get/collect anything: wood, stone, food, berries, seeds, crops (say "pick <thing>" or "get <thing>" or "harvest <thing>")');
+    // PICK - Single item pickup (quick grab nearby)
+    actions.push('pick - Grab a single item nearby (say "pick wood" or "pick berries")');
+
+    // GATHER - Stockpile resources with auto-deposit to storage
+    // This is for when you want to collect a lot of something
+    actions.push('gather - Stockpile resources: collect a specified amount and automatically store in a chest (say "gather 20 wood" or "gather 50 stone")');
 
     // Check if mature plants are visible for seed gathering
     const hasSeenMaturePlants = vision?.seenPlants && vision.seenPlants.length > 0 && _world && vision.seenPlants.some((plantId: string) => {
@@ -917,18 +1032,20 @@ export class StructuredPromptBuilder {
 
     // Add explicit seed gathering hint if mature plants are visible
     if (hasSeenMaturePlants) {
-      actions.push('🌱 pick seeds - Mature plants nearby! Gather seeds for farming (say "pick seeds" or "gather seeds from plant")');
+      actions.push('🌱 gather seeds - Mature plants nearby! Collect seeds for farming (say "gather seeds")');
     }
 
-    // FARMING ACTIONS - always available (agents can farm anywhere with grass/dirt)
+    // FARMING ACTIONS - Per progressive-skill-reveal-spec.md: requires farming skill 1+
     const hasSeeds = inventory?.slots?.some((slot: any) =>
       slot.itemId && slot.itemId.includes('seed')
     );
 
-    actions.push('till - Prepare soil for planting (say "till" or "prepare soil")');
+    if (farmingSkill >= 1) {
+      actions.push('till - Prepare soil for planting (say "till" or "prepare soil")');
 
-    if (hasSeeds) {
-      actions.push('plant - Plant seeds in tilled soil (say "plant <seedType>")');
+      if (hasSeeds) {
+        actions.push('plant - Plant seeds in tilled soil (say "plant <seedType>")');
+      }
     }
 
     if (vision?.seenAgents && vision.seenAgents.length > 0) {
@@ -954,8 +1071,9 @@ export class StructuredPromptBuilder {
     }
 
     // Always available: build action (if not already added above)
-    // Add at end if not contextually relevant (no materials)
-    if (!actions.some(a => a.includes('BUILD') || a.startsWith('build'))) {
+    // Per progressive-skill-reveal-spec.md: build requires building skill 1+
+    // Add at end if not contextually relevant (no materials) but agent has skill
+    if (!actions.some(a => a.includes('BUILD') || a.startsWith('build')) && buildingSkill >= 1) {
       actions.push('build - Construct a building (say "build <type>": campfire, tent, storage-chest, bed, etc.)');
     }
 
@@ -966,13 +1084,32 @@ export class StructuredPromptBuilder {
     actions.push('navigate - Go to specific coordinates (say "navigate to x,y" or "go to 10,20")');
 
     // Advanced farming actions (when contextually relevant)
-    if (hasSeeds || (vision?.seenResources && vision.seenResources.length > 0)) {
+    // Per progressive-skill-reveal-spec.md: requires farming skill 1+
+    if ((hasSeeds || (vision?.seenResources && vision.seenResources.length > 0)) && farmingSkill >= 1) {
       actions.push('water - Water plants to help them grow');
       actions.push('fertilize - Fertilize soil to improve growth');
     }
 
-    // Debug log final actions list
-    console.log('[StructuredPromptBuilder] Final available actions:', actions.map(a => a.split(' - ')[0]));
+    // Crafting action - Per progressive-skill-reveal-spec.md: requires crafting skill 1+
+    if (craftingSkill >= 1) {
+      actions.push('craft - Craft items at a workbench or crafting station');
+    }
+
+    // Cooking action - Per progressive-skill-reveal-spec.md: requires cooking skill 1+
+    if (cookingSkill >= 1) {
+      actions.push('cook - Cook food at a campfire or oven');
+    }
+
+    // Animal handling actions - Per progressive-skill-reveal-spec.md: requires animal_handling skill 2+
+    if (animalHandlingSkill >= 2) {
+      actions.push('tame - Tame a wild animal');
+      actions.push('house - Lead a tamed animal to housing');
+    }
+
+    // Medicine action - Per progressive-skill-reveal-spec.md: requires medicine skill 2+
+    if (medicineSkill >= 2) {
+      actions.push('heal - Heal an injured agent');
+    }
 
     return actions;
   }
@@ -993,12 +1130,374 @@ export class StructuredPromptBuilder {
       sections.push(prompt.memories);
     }
 
+    if (prompt.goals && prompt.goals.trim()) {
+      sections.push('Personal Goals:\n' + prompt.goals);
+    }
+
     if (prompt.availableActions && prompt.availableActions.length > 0) {
       sections.push('Available Actions:\n' + prompt.availableActions.map(a => `- ${a}`).join('\n'));
     }
 
     sections.push(prompt.instruction);
 
-    return sections.join('\n\n') + '\n\nYour response:';
+    // Response format instructions - must be JSON
+    const responseFormat = `RESPOND IN JSON ONLY. Use this exact format:
+{
+  "thinking": "your internal thoughts about what to do",
+  "speaking": "what you say out loud (or empty string if silent)",
+  "action": {
+    "type": "action_name",
+    "target": "optional target like 'wood' or agent name",
+    "amount": optional_number
   }
+}
+
+Example responses:
+{"thinking": "I should gather wood for building", "speaking": "", "action": {"type": "gather", "target": "wood", "amount": 20}}
+{"thinking": "I want to chat with Haven", "speaking": "Hey Haven!", "action": {"type": "talk", "target": "Haven"}}
+{"thinking": "Let me explore", "speaking": "", "action": {"type": "explore"}}`;
+
+    sections.push(responseFormat);
+
+    return sections.join('\n\n');
+  }
+}
+
+/**
+ * Get build time estimate based on agent's task familiarity.
+ * Per progressive-skill-reveal-spec.md:
+ * - Returns null if never built before
+ * - Returns last build time if built before
+ */
+export function getBuildTimeEstimate(
+  buildingType: string,
+  taskFamiliarity: any
+): string | null {
+  if (!taskFamiliarity || !taskFamiliarity.builds) {
+    return null;
+  }
+
+  const buildData = taskFamiliarity.builds[buildingType];
+  if (!buildData || !buildData.lastTime) {
+    return null;
+  }
+
+  const seconds = buildData.lastTime;
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+
+  if (hours > 0) {
+    return `(last time: ${hours} hour${hours > 1 ? 's' : ''})`;
+  } else if (minutes > 0) {
+    return `(last time: ${minutes} min)`;
+  } else {
+    return `(last time: ${seconds}s)`;
+  }
+}
+
+/**
+ * Get craft time estimate based on agent's task familiarity.
+ * Per progressive-skill-reveal-spec.md:
+ * - Returns null if never crafted before
+ * - Returns last craft time if crafted before
+ */
+export function getCraftTimeEstimate(
+  recipeId: string,
+  taskFamiliarity: any
+): string | null {
+  if (!taskFamiliarity || !taskFamiliarity.crafts) {
+    return null;
+  }
+
+  const craftData = taskFamiliarity.crafts[recipeId];
+  if (!craftData || !craftData.lastTime) {
+    return null;
+  }
+
+  const seconds = craftData.lastTime;
+  const minutes = Math.floor(seconds / 60);
+
+  if (minutes > 0) {
+    return `(last time: ${minutes} min)`;
+  } else {
+    return `(last time: ${seconds}s)`;
+  }
+}
+
+/**
+ * Build building section with time estimates and skill gates.
+ * Per progressive-skill-reveal-spec.md:
+ * - Shows only available buildings based on skill level
+ * - Includes time estimates for previously built structures
+ * - Does NOT suggest collaboration for simple structures
+ */
+export function buildBuildingSection(
+  availableBuildings: string[],
+  taskFamiliarity: any,
+  _skills?: any
+): string {
+  if (availableBuildings.length === 0) {
+    return 'No buildings available';
+  }
+
+  const buildingList = availableBuildings.map(buildingId => {
+    const estimate = getBuildTimeEstimate(buildingId, taskFamiliarity);
+    if (estimate) {
+      return `${buildingId} ${estimate}`;
+    }
+    return buildingId;
+  }).join(', ');
+
+  return `Buildings: ${buildingList}`;
+}
+
+/**
+ * Build crafting section with recipes.
+ * Per progressive-skill-reveal-spec.md:
+ * - Crafting is ALWAYS solo (no collaboration suggestions)
+ */
+export function buildCraftingSection(
+  availableRecipes: string[],
+  taskFamiliarity: any,
+  _skills?: any
+): string {
+  if (availableRecipes.length === 0) {
+    return 'No recipes available';
+  }
+
+  const recipeList = availableRecipes.map(recipeId => {
+    const estimate = getCraftTimeEstimate(recipeId, taskFamiliarity);
+    if (estimate) {
+      return `${recipeId} ${estimate}`;
+    }
+    return recipeId;
+  }).join(', ');
+
+  return `Recipes: ${recipeList}`;
+}
+
+/**
+ * Get strategic advice for in-progress buildings.
+ * Per progressive-skill-reveal-spec.md:
+ * - Should NOT suggest gathering more materials (materials already committed)
+ * - Should indicate that materials are consumed
+ */
+export function getStrategicAdviceForInProgress(building: {
+  type: string;
+  isComplete: boolean;
+  progress: number;
+}): string {
+  if (building.isComplete) {
+    return '';
+  }
+
+  return `${building.type} is under construction (${Math.floor(building.progress * 100)}% complete). Materials already committed.`;
+}
+
+/**
+ * Generate strategic instruction based on agent skills and village state.
+ * Per progressive-skill-reveal-spec.md:
+ * - Only suggest domain actions to skilled agents
+ * - Unskilled agents get basic survival instructions
+ */
+export function generateStrategicInstruction(
+  agent: { skills: { levels: Record<string, number> } },
+  villageState: { needsStorage?: boolean; foodLow?: boolean }
+): string {
+  const skills = agent.skills.levels;
+  const suggestions: string[] = [];
+
+  // Building suggestions - only for builders (level 2+)
+  if ((skills.building ?? 0) >= 2 && villageState.needsStorage) {
+    suggestions.push('Village needs more storage capacity');
+  }
+
+  // Food suggestions - only for cooks/farmers (level 2+)
+  if (((skills.cooking ?? 0) >= 2 || (skills.farming ?? 0) >= 2) && villageState.foodLow) {
+    suggestions.push('food supplies are critically low');
+  }
+
+  // If no skilled suggestions, give basic survival instruction
+  if (suggestions.length === 0) {
+    return 'Focus on gathering resources and meeting your basic needs';
+  }
+
+  return suggestions.join('. ');
+}
+
+/**
+ * Get skilled agents formatted as village resources.
+ * Per progressive-skill-reveal-spec.md:
+ * - Skilled agents appear as resources (like buildings)
+ */
+export function getSkilledAgentsAsResources(
+  agents: Array<{
+    id: string;
+    name: string;
+    skills: { levels: Record<string, number> };
+  }>
+): string {
+  const resources: string[] = [];
+
+  for (const agent of agents) {
+    const skills = agent.skills.levels;
+    const skillList: string[] = [];
+
+    if ((skills.building ?? 0) >= 2) skillList.push('building');
+    if ((skills.cooking ?? 0) >= 2) skillList.push('cook');
+    if ((skills.farming ?? 0) >= 2) skillList.push('farming');
+    if ((skills.crafting ?? 0) >= 2) skillList.push('crafting');
+
+    if (skillList.length > 0) {
+      resources.push(`${agent.name} (skilled ${skillList.join(', ')})`);
+    }
+  }
+
+  return resources.join('\n');
+}
+
+/**
+ * Get perceived agent skills based on observer's social skill.
+ * Per progressive-skill-reveal-spec.md:
+ * - Social 0: Nothing
+ * - Social 1: Vague impression
+ * - Social 2: General skill
+ * - Social 3: Specific level
+ */
+export function getPerceivedAgentSkills(
+  observer: { skills: { levels: Record<string, number> } },
+  target: { name: string; skills: { levels: Record<string, number> } }
+): string {
+  const socialLevel = observer.skills.levels.social ?? 0;
+
+  if (socialLevel === 0) {
+    return '';
+  }
+
+  // Find target's highest skill
+  const skills = target.skills.levels;
+  let highestSkill = '';
+  let highestLevel = 0;
+  for (const [skillId, level] of Object.entries(skills)) {
+    if (level > highestLevel) {
+      highestLevel = level;
+      highestSkill = skillId;
+    }
+  }
+
+  if (highestLevel === 0) {
+    return '';
+  }
+
+  if (socialLevel === 1) {
+    // Vague impression
+    if (highestSkill === 'building') return `${target.name} seems handy with tools`;
+    if (highestSkill === 'cooking') return `${target.name} seems interested in food`;
+    if (highestSkill === 'farming') return `${target.name} seems to like working with plants`;
+    return `${target.name} seems skilled at something`;
+  }
+
+  if (socialLevel === 2) {
+    // General skill
+    return `${target.name} is good at ${highestSkill}`;
+  }
+
+  // Social 3+: Specific level
+  return `${target.name}: skilled ${highestSkill} (level ${highestLevel})`;
+}
+
+/**
+ * Get affordances available through relationships.
+ * Per progressive-skill-reveal-spec.md:
+ * - Stranger: Nothing
+ * - Acquaintance: Can ask questions
+ * - Friend: Can request help
+ * - Close friend: Can delegate tasks
+ */
+export function getAffordancesThroughRelationships(
+  agent: {
+    relationships: Array<{
+      targetId: string;
+      targetName: string;
+      relationshipLevel: string;
+    }>;
+  },
+  otherAgents: Array<{
+    id: string;
+    name: string;
+    skills: { levels: Record<string, number> };
+  }>
+): string {
+  const affordances: string[] = [];
+
+  for (const rel of agent.relationships) {
+    if (rel.relationshipLevel === 'stranger') {
+      continue; // No affordances
+    }
+
+    const targetAgent = otherAgents.find(a => a.id === rel.targetId);
+    if (!targetAgent) continue;
+
+    const skills = targetAgent.skills.levels;
+    const skillList: string[] = [];
+    const buildingExamples: string[] = [];
+
+    if ((skills.building ?? 0) >= 2) {
+      skillList.push('building');
+      buildingExamples.push('forge', 'workshop', 'cabin');
+    }
+    if ((skills.cooking ?? 0) >= 2) {
+      skillList.push('cooking');
+    }
+    if ((skills.farming ?? 0) >= 2) {
+      skillList.push('farming');
+    }
+
+    if (skillList.length === 0) continue;
+
+    if (rel.relationshipLevel === 'acquaintance') {
+      affordances.push(`${rel.targetName} (${skillList.join(', ')}) - can ask questions`);
+    } else if (rel.relationshipLevel === 'friend') {
+      const examples = buildingExamples.length > 0 ? ` (${buildingExamples.join(', ')})` : '';
+      affordances.push(`${rel.targetName} (${skillList.join(', ')}) - can request help with tasks${examples}`);
+    } else if (rel.relationshipLevel === 'close_friend') {
+      affordances.push(`${rel.targetName} (${skillList.join(', ')}) - can delegate tasks, teach/learn`);
+    }
+  }
+
+  if (affordances.length === 0) {
+    return '';
+  }
+
+  return `AVAILABLE THROUGH RELATIONSHIPS:\n${affordances.join('\n')}`;
+}
+
+/**
+ * Get building access description based on ownership.
+ * Per progressive-skill-reveal-spec.md:
+ * - Communal: Available to all
+ * - Personal: Owner only
+ * - Shared: Owner + shared list
+ */
+export function getBuildingAccessDescription(building: {
+  id: string;
+  name: string;
+  ownerId?: string;
+  ownerName?: string;
+  accessType: string;
+  sharedWith?: string[];
+}): string {
+  if (building.accessType === 'communal') {
+    return `${building.name} (communal)`;
+  }
+
+  if (building.accessType === 'personal') {
+    return `${building.name} (${building.ownerName}'s)`;
+  }
+
+  if (building.accessType === 'shared') {
+    return `${building.name} (shared: ${building.ownerName})`;
+  }
+
+  return building.name;
 }

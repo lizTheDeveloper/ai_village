@@ -1,21 +1,36 @@
 /**
+ * Event data structure
+ */
+export interface GameEvent {
+  type: string;
+  source?: string;
+  data?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+/**
+ * Event handler type
+ */
+export type EventHandler = (event: GameEvent) => void;
+
+/**
  * Simple EventBus for tests and basic usage
  */
 export class EventBus {
-  private handlers: Map<string, Set<(data: any) => void>> = new Map();
-  private queue: Array<{ type: string; data?: any; [key: string]: any }> = [];
+  private handlers: Map<string, Set<EventHandler>> = new Map();
+  private queue: Array<GameEvent> = [];
 
   /**
    * Subscribe to an event (alias for on())
    */
-  subscribe(eventType: string, handler: (event: any) => void): void {
+  subscribe(eventType: string, handler: EventHandler): void {
     this.on(eventType, handler);
   }
 
   /**
    * Subscribe to an event
    */
-  on(eventType: string, handler: (data: any) => void): void {
+  on(eventType: string, handler: EventHandler): void {
     if (!this.handlers.has(eventType)) {
       this.handlers.set(eventType, new Set());
     }
@@ -25,17 +40,17 @@ export class EventBus {
   /**
    * Unsubscribe from an event
    */
-  off(eventType: string, handler: (data: any) => void): void {
+  off(eventType: string, handler: EventHandler): void {
     this.handlers.get(eventType)?.delete(handler);
   }
 
   /**
    * Emit an event
    * Supports both signatures:
-   * - emit(eventType: string, data: any) - legacy test format
-   * - emit(event: { type: string, data?: any, ... }) - production format
+   * - emit(eventType: string, data: Record<string, unknown>) - legacy test format
+   * - emit(event: GameEvent) - production format
    */
-  emit(eventTypeOrEvent: string | { type: string; [key: string]: any }, data?: any): void {
+  emit(eventTypeOrEvent: string | GameEvent, data?: Record<string, unknown>): void {
     if (typeof eventTypeOrEvent === 'string') {
       // Legacy format: emit('event:type', { data })
       this.queue.push({ type: eventTypeOrEvent, data });

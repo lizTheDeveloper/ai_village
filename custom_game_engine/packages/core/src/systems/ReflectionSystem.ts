@@ -3,9 +3,12 @@ import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
-import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
-import { SemanticMemoryComponent } from '../components/SemanticMemoryComponent.js';
-import { ReflectionComponent } from '../components/ReflectionComponent.js';
+import type { EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
+import type { EventData } from '../events/EventMap.js';
+import { getEpisodicMemory, getSemanticMemory, getReflection } from '../utils/componentHelpers.js';
+import type { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
+import type { SemanticMemoryComponent } from '../components/SemanticMemoryComponent.js';
+import type { ReflectionComponent } from '../components/ReflectionComponent.js';
 
 const ONE_DAY_MS = 86400000;
 
@@ -30,51 +33,51 @@ export class ReflectionSystem implements System {
 
   private _setupEventListeners(): void {
     this.eventBus.subscribe('agent:sleep_start', (event) => {
-      const data = event.data as any;
-      this.reflectionTriggers.set(data.agentId as string, {
+      const data = event.data as EventData<'agent:sleep_start'>;
+      this.reflectionTriggers.set(data.agentId, {
         type: 'daily',
-        timestamp: data.timestamp as number,
+        timestamp: data.timestamp ?? Date.now(),
       });
     });
 
     // Deep reflection triggers
     this.eventBus.subscribe('time:new_week', (event) => {
-      const data = event.data as any;
+      const data = event.data as EventData<'time:new_week'>;
       // Trigger deep reflection for all agents
-      this.reflectionTriggers.set(data.agentId as string ?? 'broadcast', {
+      this.reflectionTriggers.set(data.agentId ?? 'broadcast', {
         type: 'deep',
-        timestamp: (data.timestamp as number) ?? Date.now(),
+        timestamp: data.timestamp ?? Date.now(),
       });
     });
 
     this.eventBus.subscribe('time:season_change', (event) => {
-      const data = event.data as any;
+      const data = event.data as EventData<'time:season_change'>;
       // Trigger deep reflection for all agents
-      this.reflectionTriggers.set(data.agentId as string ?? 'broadcast', {
+      this.reflectionTriggers.set(data.agentId ?? 'broadcast', {
         type: 'deep',
-        timestamp: (data.timestamp as number) ?? Date.now(),
+        timestamp: data.timestamp ?? Date.now(),
       });
     });
 
     // Significant event reflection (importance > 0.7)
     this.eventBus.subscribe('memory:formed', (event) => {
-      const data = event.data as any;
-      const importance = data.importance as number;
+      const data = event.data as EventData<'memory:formed'>;
+      const importance = data.importance;
       if (importance > 0.7) {
-        this.reflectionTriggers.set(data.agentId as string, {
+        this.reflectionTriggers.set(data.agentId, {
           type: 'post_event',
-          timestamp: (data.timestamp as number) ?? Date.now(),
+          timestamp: data.timestamp ?? Date.now(),
         });
       }
     });
 
     // Idle reflection (30% probability)
     this.eventBus.subscribe('agent:idle', (event) => {
-      const data = event.data as any;
+      const data = event.data as EventData<'agent:idle'>;
       if (Math.random() < 0.3) {
-        this.reflectionTriggers.set(data.agentId as string, {
+        this.reflectionTriggers.set(data.agentId, {
           type: 'daily',
-          timestamp: (data.timestamp as number) ?? Date.now(),
+          timestamp: data.timestamp ?? Date.now(),
         });
       }
     });
@@ -91,9 +94,9 @@ export class ReflectionSystem implements System {
         throw new Error(`Agent ${agentId} not found (reflection trigger)`);
       }
 
-      const episodicMem = entity.components.get('episodic_memory') as EpisodicMemoryComponent | undefined;
-      const semanticMem = entity.components.get('semantic_memory') as SemanticMemoryComponent | undefined;
-      const reflectionComp = entity.components.get('reflection') as ReflectionComponent | undefined;
+      const episodicMem = getEpisodicMemory(entity);
+      const semanticMem = getSemanticMemory(entity);
+      const reflectionComp = getReflection(entity);
 
       if (!episodicMem) {
         throw new Error(`Agent ${agentId} missing EpisodicMemoryComponent`);
@@ -143,7 +146,6 @@ export class ReflectionSystem implements System {
 
     // Skip reflection if no memories (nothing to reflect on)
     if (todaysMemories.length === 0) {
-      console.log(`[Reflection] 💭 Agent ${agentId.slice(0,8)} has no memories to reflect on today`);
       return;
     }
 
@@ -151,7 +153,6 @@ export class ReflectionSystem implements System {
     reflectionComp.isReflecting = true;
     reflectionComp.reflectionType = 'daily';
 
-    console.log(`[Reflection] 💭 Agent ${agentId.slice(0,8)} is reflecting on ${todaysMemories.length} memories from today...`);
 
     // Extract themes and insights
     const themes = this._extractThemes(todaysMemories);
@@ -159,8 +160,6 @@ export class ReflectionSystem implements System {
 
     // Generate reflection text
     const text = this._generateReflectionText(todaysMemories, 'daily');
-    console.log(`[Reflection] 💭 Reflection: "${text.substring(0, 80)}${text.length > 80 ? '...' : ''}"`);
-    console.log(`[Reflection] 💭 Insights: ${insights.join(', ')}`);
 
     // Add reflection
     reflectionComp.addReflection({
@@ -281,7 +280,7 @@ export class ReflectionSystem implements System {
     });
   }
 
-  private _extractThemes(memories: any[]): string[] {
+  private _extractThemes(memories: readonly EpisodicMemory[]): string[] {
     const themeCount: Map<string, number> = new Map();
 
     // Theme mapping - map specific events to broader themes
@@ -298,16 +297,11 @@ export class ReflectionSystem implements System {
     for (const memory of memories) {
       // Extract themes from event types
       const eventType = memory.eventType.split(':')[0];
+      if (!eventType) {
+        continue; // Skip if eventType is empty
+      }
       const theme = themeMapping[eventType] ?? eventType;
       themeCount.set(theme, (themeCount.get(theme) ?? 0) + 1);
-
-      // Extract from tags if present
-      if (memory.tags) {
-        for (const tag of memory.tags) {
-          const tagTheme = themeMapping[tag] ?? tag;
-          themeCount.set(tagTheme, (themeCount.get(tagTheme) ?? 0) + 1);
-        }
-      }
     }
 
     // Return themes that appear more than once
@@ -317,7 +311,7 @@ export class ReflectionSystem implements System {
       .map(([theme]) => theme);
   }
 
-  private _generateInsights(memories: any[]): string[] {
+  private _generateInsights(memories: readonly EpisodicMemory[]): string[] {
     const insights: string[] = [];
 
     // Group by emotional valence
@@ -342,7 +336,7 @@ export class ReflectionSystem implements System {
     return insights;
   }
 
-  private _identifyIdentityPatterns(memories: any[]): string[] {
+  private _identifyIdentityPatterns(memories: readonly EpisodicMemory[]): string[] {
     const patterns: string[] = [];
 
     // Look for recurring behaviors
@@ -361,7 +355,7 @@ export class ReflectionSystem implements System {
     return patterns;
   }
 
-  private _generateNarrative(memories: any[], themes: string[]): string {
+  private _generateNarrative(memories: readonly EpisodicMemory[], themes: string[]): string {
     let narrative = `Over this period, I experienced ${memories.length} significant events. `;
 
     if (themes.length > 0) {
@@ -384,7 +378,7 @@ export class ReflectionSystem implements System {
   }
 
   private _generateReflectionText(
-    memories: any[],
+    memories: readonly EpisodicMemory[],
     type: 'daily' | 'deep'
   ): string {
     if (type === 'daily') {

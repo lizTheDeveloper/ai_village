@@ -265,8 +265,8 @@ describe('Storage Deposit System', () => {
       expect(eventData.agentId).toBe(agent.id);
       expect(eventData.storageId).toBe(storage.id);
       expect(eventData.items).toHaveLength(1);
-      expect(eventData.items[0].resourceId).toBe('stone');
-      expect(eventData.items[0].quantity).toBe(10);
+      expect(eventData.items[0].itemId).toBe('stone');
+      expect(eventData.items[0].amount).toBe(10);
     });
   });
 

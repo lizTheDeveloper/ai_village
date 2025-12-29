@@ -125,9 +125,12 @@ export class ActionQueue implements IActionQueue {
       this.startAction(action, world);
     }
 
-    // 2. Progress executing actions
+    // 2. Get speed multiplier from time component
+    const speedMultiplier = this.getSpeedMultiplier(world);
+
+    // 3. Progress executing actions
     for (const [actionId, state] of this.executingActions) {
-      state.remainingTicks--;
+      state.remainingTicks -= speedMultiplier;
 
       if (state.remainingTicks <= 0) {
         const action = this.actions.get(actionId);
@@ -257,5 +260,22 @@ export class ActionQueue implements IActionQueue {
   private applyEffects(_effects: ReadonlyArray<ActionEffect>, _world: WorldMutator): void {
     // This will be implemented properly when we have full effect system
     // For now, just a placeholder
+  }
+
+  /**
+   * Get the current speed multiplier from the world's time component.
+   * Returns 1 (normal speed) if no time component exists.
+   */
+  private getSpeedMultiplier(world: WorldMutator): number {
+    const timeEntities = world.query().with('time').executeEntities();
+    const timeEntity = timeEntities[0];
+
+    if (!timeEntity) {
+      return 1; // Default to 1x speed if no time entity
+    }
+
+    const timeComponent = timeEntity.components.get('time') as { speedMultiplier: number } | undefined;
+
+    return timeComponent?.speedMultiplier ?? 1;
   }
 }

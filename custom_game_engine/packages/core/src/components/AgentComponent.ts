@@ -19,6 +19,8 @@ export type AgentBehavior =
   | 'work'
   | 'help'
   | 'build'
+  | 'plan_build'   // Strategic building - queues materials gathering then construction
+  | 'craft'        // Crafting at stations
   | 'eat'
   | 'seek_sleep'
   | 'forced_sleep'
@@ -38,7 +40,14 @@ export type AgentBehavior =
   | 'navigate'
   | 'explore_frontier'
   | 'explore_spiral'
-  | 'follow_gradient';
+  | 'follow_gradient'
+  // Animal Husbandry
+  | 'tame_animal'
+  | 'house_animal'
+  // Economy
+  | 'trade'
+  // Self-management
+  | 'set_priorities';
 
 export interface SpeechHistoryEntry {
   text: string;
@@ -55,6 +64,41 @@ export interface QueuedBehavior {
   startedAt?: number; // Tick when behavior started (for timeout detection)
 }
 
+/**
+ * Strategic priorities that influence automated behavior selection.
+ * Values are 0-1 weights. Higher = more likely to choose that category.
+ */
+export interface StrategicPriorities {
+  gathering?: number;   // Wood, stone, food collection
+  building?: number;    // Construction, infrastructure
+  farming?: number;     // Till, plant, water, harvest
+  social?: number;      // Talk, help, meetings
+  exploration?: number; // Wander, explore new areas
+  rest?: number;        // Idle, sleep, recovery
+}
+
+/**
+ * A planned build that the agent intends to construct.
+ * Triggers automatically when agent is near and has resources.
+ */
+export interface PlannedBuild {
+  buildingType: string;           // Type of building to construct
+  position: { x: number; y: number }; // Where to build
+  priority: 'low' | 'normal' | 'high'; // Build priority
+  createdAt: number;              // Tick when plan was created
+  reason?: string;                // Why this build was planned (for debugging)
+}
+
+/** Distance within which a planned build can be executed */
+export const PLANNED_BUILD_REACH = 3;
+
+/**
+ * Resource collection targets.
+ * Agent will gather until these targets are met.
+ * Key is resource type (wood, stone, food, seeds), value is target amount.
+ */
+export type ResourceTargets = Record<string, number>;
+
 export interface AgentComponent extends Component {
   type: 'agent';
   behavior: AgentBehavior;
@@ -70,6 +114,16 @@ export interface AgentComponent extends Component {
   mediumTermGoal?: string; // Medium-term personal goal
   groupGoal?: string; // Agent's view of the group goal (future: shared in hive minds)
 
+  // Idle/boredom tracking - agents start idle and wander when bored
+  idleStartTick?: number; // Tick when agent became idle (undefined = not idle)
+
+  // Strategic Priorities (LLM sets, scripted system uses)
+  priorities?: StrategicPriorities; // Weights for automated behavior selection
+
+  // Planned Builds (LLM sets, drives gathering + triggers when near + has resources)
+  // Resource targets are derived from what's needed for planned builds
+  plannedBuilds?: PlannedBuild[]; // Buildings agent intends to construct
+
   // Behavior Queue System
   behaviorQueue?: QueuedBehavior[]; // Queue of behaviors to execute sequentially
   currentQueueIndex?: number; // Index of currently executing queued behavior
@@ -78,11 +132,25 @@ export interface AgentComponent extends Component {
   behaviorCompleted?: boolean; // Set by behaviors when they complete
 }
 
+/**
+ * Default strategic priorities for agents.
+ * Balanced distribution gives agents variety in their behaviors.
+ */
+export const DEFAULT_PRIORITIES: StrategicPriorities = {
+  gathering: 0.25,   // Resource collection
+  building: 0.20,    // Construction
+  farming: 0.15,     // Agriculture
+  social: 0.15,      // Talking, meetings
+  exploration: 0.15, // Wandering, exploring
+  rest: 0.10,        // Resting, recovery
+};
+
 export function createAgentComponent(
   behavior: AgentBehavior = 'wander',
   thinkInterval: number = 20, // Think once per second at 20 TPS
   useLLM: boolean = false, // Whether to use LLM for decisions
-  thinkOffset: number = 0 // Initial offset to stagger agent thinking (prevents thundering herd)
+  thinkOffset: number = 0, // Initial offset to stagger agent thinking (prevents thundering herd)
+  priorities?: StrategicPriorities // Optional custom priorities (uses defaults if not provided)
 ): AgentComponent {
   return {
     type: 'agent',
@@ -93,6 +161,8 @@ export function createAgentComponent(
     lastThinkTick: -thinkOffset, // Negative offset means they'll think at different times
     useLLM,
     llmCooldown: 0,
+    // Set priorities for scripted decision making (enables building, farming, etc.)
+    priorities: priorities ?? { ...DEFAULT_PRIORITIES },
   };
 }
 

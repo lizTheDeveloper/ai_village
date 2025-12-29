@@ -94,13 +94,14 @@ describe('Goal Generation', () => {
       });
 
       const goals: GoalCategory[] = [];
-      for (let i = 0; i < 50; i++) {
+      for (let i = 0; i < 100; i++) {
         const goal = generatePersonalGoal(personality, {});
         goals.push(goal.category);
       }
 
       const explorationCount = goals.filter(g => g === 'exploration').length;
-      expect(explorationCount).toBeGreaterThan(5);
+      // With openness=0.85, expect ~20-25% exploration goals
+      expect(explorationCount).toBeGreaterThanOrEqual(15);
     });
   });
 

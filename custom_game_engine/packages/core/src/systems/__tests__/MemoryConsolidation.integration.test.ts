@@ -31,6 +31,9 @@ describe('MemoryConsolidationSystem + SleepSystem + MemorySystem Integration', (
     const consolidationSystem = new MemoryConsolidationSystem();
     harness.registerSystem('MemoryConsolidationSystem', consolidationSystem);
 
+    // Initialize system with EventBus from harness
+    consolidationSystem.initialize(harness.world, harness.eventBus);
+
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     const circadian = createCircadianComponent();
@@ -71,11 +74,14 @@ describe('MemoryConsolidationSystem + SleepSystem + MemorySystem Integration', (
       maxMemories: 100,
     });
 
-    const entities = Array.from(harness.world.entities.values());
+    // Filter entities to only those with required components for each system
+    const allEntities = Array.from(harness.world.entities.values());
+    const sleepEntities = allEntities.filter(e => e.hasComponent('circadian'));
+    const memoryEntities = allEntities.filter(e => e.hasComponent('memory'));
 
-    // Update both systems
-    sleepSystem.update(harness.world, entities, 2.0);
-    memorySystem.update(harness.world, entities, 2.0);
+    // Update both systems with filtered entities
+    sleepSystem.update(harness.world, sleepEntities, 2.0);
+    memorySystem.update(harness.world, memoryEntities, 2.0);
 
     // Memory should decay (or potentially consolidate)
     const memory = agent.getComponent('memory') as any;
@@ -85,6 +91,9 @@ describe('MemoryConsolidationSystem + SleepSystem + MemorySystem Integration', (
   it('should awake agents not trigger consolidation', () => {
     const consolidationSystem = new MemoryConsolidationSystem();
     harness.registerSystem('MemoryConsolidationSystem', consolidationSystem);
+
+    // Initialize system with EventBus from harness
+    consolidationSystem.initialize(harness.world, harness.eventBus);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 

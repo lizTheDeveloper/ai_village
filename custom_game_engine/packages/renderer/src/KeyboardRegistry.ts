@@ -179,6 +179,5 @@ export class KeyboardRegistry {
   resetKeyMap(): void {
     this.keyMap = {};
     localStorage.removeItem('keyboardMappings');
-    console.log('[KeyboardRegistry] Key mappings reset to defaults');
   }
 }

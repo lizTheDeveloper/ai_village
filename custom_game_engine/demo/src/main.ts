@@ -53,6 +53,11 @@ import {
   CraftingSystem,
   initializeDefaultRecipes,
   globalRecipeRegistry,
+  // Skill systems (Phase 4 unified)
+  SkillSystem,
+  CookingSystem,
+  // Idle Behaviors & Personal Goals
+  IdleBehaviorSystem,
   // Trading system (Phase 12.7)
   TradingSystem,
   // Market Events system (Phase 12.8)
@@ -62,6 +67,10 @@ import {
   registerDefaultResearch,
   // Metrics Collection System (with streaming support)
   MetricsCollectionSystem,
+  // Live Entity API for dashboard queries
+  LiveEntityAPI,
+  // Governance Data System (Phase 11)
+  GovernanceDataSystem,
 } from '@ai-village/core';
 import {
   Renderer,
@@ -97,6 +106,8 @@ import {
   EconomyPanelAdapter,
   ShopPanel,
   ShopPanelAdapter,
+  GovernanceDashboardPanel,
+  GovernanceDashboardPanelAdapter,
 } from '@ai-village/renderer';
 import {
   OllamaProvider,
@@ -445,6 +456,9 @@ async function main() {
   const wildAnimalSpawning = new WildAnimalSpawningSystem();
   gameLoop.systemRegistry.register(wildAnimalSpawning);
 
+  // Idle Behaviors & Personal Goals (priority 15, before AgentBrainSystem)
+  gameLoop.systemRegistry.register(new IdleBehaviorSystem());
+
   gameLoop.systemRegistry.register(new AgentBrainSystem(llmQueue, promptBuilder));
   // Navigation & Exploration systems (after AI, before Movement)
   gameLoop.systemRegistry.register(new SocialGradientSystem());
@@ -464,6 +478,14 @@ async function main() {
   gameLoop.systemRegistry.register(craftingSystem);
   // Make crafting system accessible on world for behaviors
   (gameLoop.world as any).craftingSystem = craftingSystem;
+
+  // Register Skill systems (Phase 4 unified)
+  // SkillSystem handles skill XP and leveling from events
+  gameLoop.systemRegistry.register(new SkillSystem());
+  // CookingSystem integrates cooking skill with crafting for food quality
+  const cookingSystem = new CookingSystem();
+  cookingSystem.setRecipeRegistry(globalRecipeRegistry);
+  gameLoop.systemRegistry.register(cookingSystem);
 
   // Register TradingSystem (Phase 12.7)
   const tradingSystem = new TradingSystem();
@@ -503,8 +525,17 @@ async function main() {
   gameLoop.systemRegistry.register(new ReflectionSystem(gameLoop.world.eventBus));
   gameLoop.systemRegistry.register(new JournalingSystem(gameLoop.world.eventBus));
 
+  // Governance Data System - populates governance building components
+  const governanceDataSystem = new GovernanceDataSystem();
+  governanceDataSystem.initialize(gameLoop.world, gameLoop.world.eventBus);
+  gameLoop.systemRegistry.register(governanceDataSystem);
+
   // Metrics Collection System with streaming to metrics server
   // Start the metrics server with: npm run metrics-server
+  // Generate a unique game session ID for this game instance
+  const gameSessionId = `game_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  console.log(`[Demo] Game session ID: ${gameSessionId}`);
+
   const metricsSystem = new MetricsCollectionSystem(gameLoop.world, {
     enabled: true,
     streaming: true,
@@ -512,9 +543,23 @@ async function main() {
       serverUrl: 'ws://localhost:8765',
       batchSize: 10,
       flushInterval: 5000,
+      gameSessionId,  // Pass session ID to server for proper isolation
     },
   });
   gameLoop.systemRegistry.register(metricsSystem);
+
+  // Set up Live Entity API for dashboard queries
+  // This allows the metrics dashboard to query live entity state in real-time
+  const streamClient = metricsSystem.getStreamClient();
+  if (streamClient) {
+    const liveEntityAPI = new LiveEntityAPI(gameLoop.world);
+    // Set prompt builder if available for generating live LLM prompts
+    if (promptBuilder) {
+      liveEntityAPI.setPromptBuilder(promptBuilder);
+    }
+    liveEntityAPI.attach(streamClient);
+    console.log('[Demo] Live Entity API attached for dashboard queries');
+  }
 
   // Create renderer
   const renderer = new Renderer(canvas);
@@ -544,9 +589,7 @@ async function main() {
 
   // Create building placement system
   const blueprintRegistry = new BuildingBlueprintRegistry();
-  blueprintRegistry.registerDefaults();
-  blueprintRegistry.registerTier2Stations(); // Phase 10: Crafting Stations
-  blueprintRegistry.registerTier3Stations(); // Phase 10: Advanced Crafting Stations
+  blueprintRegistry.registerDefaults(); // This calls registerTier2Stations(), registerTier3Stations(), registerResearchBuildings(), and registerGovernanceBuildings()
   blueprintRegistry.registerExampleBuildings(); // Examples for all 8 categories and 8 functions
   registerShopBlueprints(blueprintRegistry); // Phase 12.4: Shop Buildings
   // Make building registry accessible on world for behaviors (BuildBehavior needs this)
@@ -617,6 +660,9 @@ async function main() {
   // Create shop panel (Phase 12.7) - trading interface
   const shopPanel = new ShopPanel();
 
+  // Create governance dashboard panel (G to toggle) - governance infrastructure
+  const governancePanel = new GovernanceDashboardPanel();
+
   // Create inventory UI (I or Tab to toggle) - Phase 10 full-featured inventory
   const inventoryUI = new InventoryUI(canvas, gameLoop.world);
 
@@ -669,6 +715,7 @@ async function main() {
   const notificationsAdapter = new NotificationsPanelAdapter(notificationsPanel);
   const economyAdapter = new EconomyPanelAdapter(economyPanel);
   const shopAdapter = new ShopPanelAdapter(shopPanel);
+  const governanceAdapter = new GovernanceDashboardPanelAdapter(governancePanel);
   const settingsAdapter = new SettingsPanelAdapter(settingsPanel);
   const tileInspectorAdapter = new TileInspectorPanelAdapter(tileInspectorPanel);
   const inventoryAdapter = new InventoryUIAdapter(inventoryUI);
@@ -861,6 +908,31 @@ async function main() {
     isDraggable: false,
     isModal: true,
     showInWindowList: false, // Opened on demand when clicking shops
+  });
+
+  // Governance Dashboard Panel - governance infrastructure & information systems
+  windowManager.registerWindow('governance', governanceAdapter, {
+    defaultX: logicalWidth - 420,
+    defaultY: 10,
+    defaultWidth: 400,
+    defaultHeight: 500,
+    isDraggable: true,
+    isResizable: true,
+    minWidth: 350,
+    minHeight: 400,
+    showInWindowList: true,
+    keyboardShortcut: 'G',
+  });
+
+  // Register governance dashboard keyboard shortcut
+  keyboardRegistry.register('toggle_governance', {
+    key: 'G',
+    description: 'Toggle governance dashboard',
+    category: 'Windows',
+    handler: () => {
+      windowManager.toggleWindow('governance');
+      return true;
+    },
   });
 
   // Controls/Help Panel - shows all keybindings

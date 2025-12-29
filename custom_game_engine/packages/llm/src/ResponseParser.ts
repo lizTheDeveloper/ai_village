@@ -1,4 +1,17 @@
 import type { AgentBehavior } from '@ai-village/core';
+import { VALID_BEHAVIORS, BEHAVIOR_SYNONYMS } from './ActionDefinitions.js';
+
+/**
+ * Action can be a simple string behavior OR an object with type and parameters
+ * for multi-turn tool use patterns.
+ */
+export type AgentAction = AgentBehavior | {
+  type: AgentBehavior;
+  building?: string;      // For plan_build
+  target?: string;        // For talk, follow_agent
+  priorities?: Record<string, number>;  // For set_priorities
+  [key: string]: unknown; // Allow additional parameters
+};
 
 /**
  * Structured response from LLM with thinking, speaking, and action
@@ -6,7 +19,8 @@ import type { AgentBehavior } from '@ai-village/core';
 export interface AgentResponse {
   thinking: string;      // Internal thoughts
   speaking: string;      // What the agent says out loud
-  action: AgentBehavior; // The action to take
+  action: AgentBehavior; // The normalized action type
+  actionParams?: Record<string, unknown>; // Additional parameters from object-style action
 }
 
 /**
@@ -24,89 +38,19 @@ export class BehaviorParseError extends Error {
 
 /**
  * Parses LLM responses into valid agent behaviors.
+ * Uses shared VALID_BEHAVIORS and BEHAVIOR_SYNONYMS from ActionDefinitions.
  */
 export class ResponseParser {
-  private validBehaviors: Set<string> = new Set([
-    'wander',
-    'idle',
-    'follow_agent',
-    'talk',
-    'pick',      // Unified action for gathering/harvesting/collecting resources
-    'explore',
-    'approach',
-    'observe',
-    'rest',
-    'work',
-    'help',
-    'build',
-    'deposit_items',
-    'call_meeting',
-    'attend_meeting',
-    'till',
-    'farm',
-    'plant',
-    'water',
-    'fertilize',
-    'navigate',
-    'explore_frontier',
-    'explore_spiral',
-    'seek_sleep',
-    'seek_warmth',
-  ]);
+  // Use shared valid behaviors from ActionDefinitions (single source of truth)
+  private validBehaviors: Set<string> = VALID_BEHAVIORS;
 
-  // Synonym mapping - lemmatize similar actions to core behaviors
-  private synonyms: Record<string, AgentBehavior> = {
-    // Pick = gather, harvest, collect, get, take, forage, scavenge, find
-    'gather': 'pick',
-    'harvest': 'pick',
-    'collect': 'pick',
-    'get': 'pick',
-    'take': 'pick',
-    'grab': 'pick',
-    'gather_seeds': 'pick',
-    'seek_food': 'pick',
-    'forage': 'pick',
-    'scavenge': 'pick',
-    'find': 'pick',
-    'chop': 'pick',
-    'mine': 'pick',
-    'cut': 'pick',
-    'fetch': 'pick',
-    // Rest = sleep, idle, relax, recover
-    'sleep': 'rest',
-    'relax': 'rest',
-    'recover': 'rest',
-    'nap': 'rest',
-    // Talk = speak, say, chat, converse, discuss
-    'speak': 'talk',
-    'say': 'talk',
-    'chat': 'talk',
-    'converse': 'talk',
-    'discuss': 'talk',
-    'ask': 'talk',
-    'tell': 'talk',
-    // Build = construct, make, craft, create
-    'construct': 'build',
-    'make': 'build',
-    'craft': 'build',
-    'create': 'build',
-    // Explore = search, scout, investigate, look, explore_frontier, explore_spiral
-    'search': 'explore',
-    'scout': 'explore',
-    'investigate': 'explore',
-    'look': 'explore',
-    'explore_frontier': 'explore',
-    'explore_spiral': 'explore',
-    'follow_gradient': 'explore',
-    // Wander = roam, walk
-    'roam': 'wander',
-    'walk': 'wander',
-    'stroll': 'wander',
-  };
+  // Use shared synonyms from ActionDefinitions (single source of truth)
+  private synonyms: Record<string, AgentBehavior> = BEHAVIOR_SYNONYMS;
 
   /**
    * Parse LLM response text into full agent response (thinking, speaking, action).
    * Handles both structured JSON (from function calling) and plain text.
+   * Supports action as string OR object with type field (for multi-turn tool use).
    * Throws BehaviorParseError if parsing fails - no silent fallbacks.
    */
   parseResponse(responseText: string): AgentResponse {
@@ -117,22 +61,55 @@ export class ResponseParser {
     // Try parsing as JSON first (structured output from function calling)
     try {
       const parsed = JSON.parse(responseText);
-      if (parsed.action && this.isValidBehavior(parsed.action)) {
-        const response: AgentResponse = {
-          thinking: parsed.thinking || '',
-          speaking: parsed.speaking || '',
-          action: parsed.action as AgentBehavior
-        };
 
-        console.log('[ResponseParser] Structured response:', {
-          action: response.action,
-          thinking: response.thinking.slice(0, 80) || '(no thoughts)',
-          speaking: response.speaking || '(silent)',
-        });
-
-        return response;
+      // Handle action as object with type field: { "type": "plan_build", "building": "workbench" }
+      if (parsed.action && typeof parsed.action === 'object' && parsed.action.type) {
+        const actionType = parsed.action.type;
+        if (this.isValidBehavior(actionType)) {
+          // Extract action params (everything except 'type')
+          const { type, ...actionParams } = parsed.action;
+          return {
+            thinking: parsed.thinking || '',
+            speaking: parsed.speaking || '',
+            action: actionType as AgentBehavior,
+            actionParams: Object.keys(actionParams).length > 0 ? actionParams : undefined,
+          };
+        }
+        // Check if action type is a synonym
+        const canonical = this.synonyms[actionType.toLowerCase()];
+        if (canonical) {
+          const { type, ...actionParams } = parsed.action;
+          return {
+            thinking: parsed.thinking || '',
+            speaking: parsed.speaking || '',
+            action: canonical,
+            actionParams: Object.keys(actionParams).length > 0 ? actionParams : undefined,
+          };
+        }
+        throw new BehaviorParseError(
+          `Invalid action type in structured response: ${actionType}`,
+          Array.from(this.validBehaviors)
+        );
       }
-      if (parsed.action) {
+
+      // Handle action as simple string: { "action": "wander" }
+      if (parsed.action && typeof parsed.action === 'string') {
+        if (this.isValidBehavior(parsed.action)) {
+          return {
+            thinking: parsed.thinking || '',
+            speaking: parsed.speaking || '',
+            action: parsed.action as AgentBehavior,
+          };
+        }
+        // Check if it's a synonym
+        const canonical = this.synonyms[parsed.action.toLowerCase()];
+        if (canonical) {
+          return {
+            thinking: parsed.thinking || '',
+            speaking: parsed.speaking || '',
+            action: canonical,
+          };
+        }
         throw new BehaviorParseError(
           `Invalid action in structured response: ${parsed.action}`,
           Array.from(this.validBehaviors)
@@ -152,7 +129,6 @@ export class ResponseParser {
     // First check synonyms (check these before exact matches to catch variations)
     for (const [synonym, canonical] of Object.entries(this.synonyms)) {
       if (cleaned.includes(synonym)) {
-        console.log(`[ResponseParser] Synonym match: "${synonym}" → "${canonical}"`);
         return {
           thinking: responseText,
           speaking: '',
@@ -164,7 +140,6 @@ export class ResponseParser {
     // Then try to extract exact behavior name
     for (const behavior of Array.from(this.validBehaviors)) {
       if (cleaned.includes(behavior)) {
-        console.log('[ResponseParser] Text-based match:', behavior);
         return {
           thinking: responseText,
           speaking: '',
@@ -174,14 +149,10 @@ export class ResponseParser {
     }
 
     // NO FALLBACK - Tell the agent to rephrase using core actions
-    const coreActions = ['pick', 'build', 'talk', 'wander', 'rest', 'explore', 'till', 'farm', 'plant'];
+    const coreActions = ['pick', 'gather', 'build', 'talk', 'explore', 'till', 'farm', 'plant'];
     const errorMsg =
       `I couldn't understand that action. Please rephrase using one of these core actions: ${coreActions.join(', ')}. ` +
-      `Examples: "pick wood", "build tent", "talk to someone", "wander around", "rest".`;
-
-    console.error('[ResponseParser] ⚠️ FAILED TO PARSE BEHAVIOR');
-    console.error('[ResponseParser] Response:', responseText.slice(0, 200));
-    console.error('[ResponseParser] Error:', errorMsg);
+      `Examples: "pick wood", "gather 20 wood", "build tent", "talk to someone", "explore".`;
 
     throw new BehaviorParseError(errorMsg, coreActions);
   }

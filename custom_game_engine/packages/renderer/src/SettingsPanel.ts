@@ -10,8 +10,15 @@ export interface LLMSettings {
   apiKey: string;
 }
 
+export interface AgentBehaviorSettings {
+  minThinkCadenceSeconds: number;   // Minimum seconds between LLM calls when busy
+  idleThinkDelaySeconds: number;    // Delay before LLM call when idle
+  enableLLMAgents: boolean;         // Master toggle for LLM agents
+}
+
 export interface GameSettings {
   llm: LLMSettings;
+  agentBehavior: AgentBehaviorSettings;
   dungeonMasterPrompt: string;
 }
 
@@ -21,6 +28,11 @@ const DEFAULT_SETTINGS: GameSettings = {
     baseUrl: 'http://localhost:11434',
     model: 'qwen3:4b',
     apiKey: '',
+  },
+  agentBehavior: {
+    minThinkCadenceSeconds: 300,  // 5 minutes when busy
+    idleThinkDelaySeconds: 5,     // 5 seconds when idle
+    enableLLMAgents: true,        // LLM agents enabled by default
   },
   dungeonMasterPrompt: '',
 };
@@ -106,7 +118,12 @@ export class SettingsPanel {
       const saved = localStorage.getItem('ai-village-settings');
       if (saved) {
         const parsed = JSON.parse(saved);
-        return { ...DEFAULT_SETTINGS, ...parsed, llm: { ...DEFAULT_SETTINGS.llm, ...parsed.llm } };
+        return {
+          ...DEFAULT_SETTINGS,
+          ...parsed,
+          llm: { ...DEFAULT_SETTINGS.llm, ...parsed.llm },
+          agentBehavior: { ...DEFAULT_SETTINGS.agentBehavior, ...parsed.agentBehavior },
+        };
       }
     } catch (e) {
       console.warn('[SettingsPanel] Failed to load settings:', e);
@@ -120,7 +137,6 @@ export class SettingsPanel {
   private saveSettings(): void {
     try {
       localStorage.setItem('ai-village-settings', JSON.stringify(this.settings));
-      console.log('[SettingsPanel] Settings saved:', this.settings);
     } catch (e) {
       console.warn('[SettingsPanel] Failed to save settings:', e);
     }
@@ -192,6 +208,8 @@ export class SettingsPanel {
       padding: 24px;
       min-width: 450px;
       max-width: 500px;
+      max-height: 85vh;
+      overflow-y: auto;
       color: #e0e0e0;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     `;
@@ -304,6 +322,69 @@ export class SettingsPanel {
     llmSection.appendChild(apiKeyGroup);
 
     panel.appendChild(llmSection);
+
+    // Agent Behavior Section
+    const behaviorSection = document.createElement('div');
+    behaviorSection.style.cssText = 'margin-top: 20px;';
+    behaviorSection.innerHTML = '<h3 style="margin: 0 0 12px 0; font-size: 14px; color: #8a8aaa; text-transform: uppercase;">Agent Behavior</h3>';
+
+    // Enable LLM Agents toggle
+    const enableLLMGroup = document.createElement('div');
+    enableLLMGroup.style.cssText = 'margin-bottom: 12px; display: flex; align-items: center; gap: 8px;';
+    const enableLLMCheckbox = document.createElement('input');
+    enableLLMCheckbox.type = 'checkbox';
+    enableLLMCheckbox.id = 'settings-enable-llm';
+    enableLLMCheckbox.checked = this.settings.agentBehavior.enableLLMAgents;
+    enableLLMCheckbox.onchange = () => {
+      this.settings.agentBehavior.enableLLMAgents = enableLLMCheckbox.checked;
+    };
+    const enableLLMLabel = document.createElement('label');
+    enableLLMLabel.htmlFor = 'settings-enable-llm';
+    enableLLMLabel.textContent = 'Enable LLM-powered agents';
+    enableLLMLabel.style.cssText = 'font-size: 13px; color: #ccc; cursor: pointer;';
+    enableLLMGroup.appendChild(enableLLMCheckbox);
+    enableLLMGroup.appendChild(enableLLMLabel);
+    behaviorSection.appendChild(enableLLMGroup);
+
+    // Min think cadence (when busy)
+    const cadenceGroup = this.createFormGroup('Min think interval when busy (seconds)', 'text');
+    const cadenceInput = cadenceGroup.querySelector('input')!;
+    cadenceInput.id = 'settings-min-cadence';
+    cadenceInput.type = 'number';
+    cadenceInput.min = '10';
+    cadenceInput.max = '3600';
+    cadenceInput.value = String(this.settings.agentBehavior.minThinkCadenceSeconds);
+    cadenceInput.onchange = () => {
+      const val = parseInt(cadenceInput.value, 10);
+      if (!isNaN(val) && val >= 10) {
+        this.settings.agentBehavior.minThinkCadenceSeconds = val;
+      }
+    };
+    behaviorSection.appendChild(cadenceGroup);
+
+    // Idle think delay
+    const idleDelayGroup = this.createFormGroup('Think delay when idle (seconds)', 'text');
+    const idleDelayInput = idleDelayGroup.querySelector('input')!;
+    idleDelayInput.id = 'settings-idle-delay';
+    idleDelayInput.type = 'number';
+    idleDelayInput.min = '1';
+    idleDelayInput.max = '60';
+    idleDelayInput.value = String(this.settings.agentBehavior.idleThinkDelaySeconds);
+    idleDelayInput.onchange = () => {
+      const val = parseInt(idleDelayInput.value, 10);
+      if (!isNaN(val) && val >= 1) {
+        this.settings.agentBehavior.idleThinkDelaySeconds = val;
+      }
+    };
+    behaviorSection.appendChild(idleDelayGroup);
+
+    // Help text for behavior section
+    const behaviorHelp = document.createElement('p');
+    behaviorHelp.style.cssText = 'margin: 8px 0 0 0; font-size: 11px; color: #666; font-style: italic;';
+    behaviorHelp.textContent = 'Higher intervals = fewer LLM calls. Agents work autonomously between thinks.';
+    behaviorSection.appendChild(behaviorHelp);
+
+    panel.appendChild(behaviorSection);
 
     // Dungeon Master Prompt Section
     const dmSection = document.createElement('div');

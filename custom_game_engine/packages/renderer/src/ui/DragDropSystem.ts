@@ -1,5 +1,5 @@
 import type { InventoryComponent } from '@ai-village/core';
-import { getResourceStackSize, isResourceType } from '@ai-village/core';
+import { itemRegistry } from '@ai-village/core';
 
 export type SlotType = 'backpack' | 'equipment' | 'container' | 'quickbar';
 
@@ -516,10 +516,8 @@ export class DragDropSystem {
       return { success: false, updatedInventory: inventory, error: 'Empty slots' };
     }
 
-    // Get max stack size
-    const maxStack = isResourceType(sourceSlotData.itemId)
-      ? getResourceStackSize(sourceSlotData.itemId as any)
-      : 99;
+    // Get max stack size from item registry
+    const maxStack = itemRegistry.getStackSize(sourceSlotData.itemId);
 
     const spaceInTarget = maxStack - targetSlotData.quantity;
     const amountToTransfer = Math.min(sourceSlotData.quantity, spaceInTarget);

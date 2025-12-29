@@ -1,8 +1,15 @@
 import type { ActionHandler } from './ActionHandler.js';
 import type { Action, ActionResult, ValidationResult } from './Action.js';
 import type { World } from '../ecs/World.js';
-import type { SoilSystem } from '../systems/SoilSystem.js';
+import type { SoilSystem, Tile } from '../systems/SoilSystem.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
+import type { InventoryComponent, InventorySlot } from '../components/InventoryComponent.js';
+import type { SkillsComponent } from '../components/SkillsComponent.js';
+import { getEfficiencyBonus } from '../components/SkillsComponent.js';
+
+interface WorldWithTiles extends World {
+  getTileAt(x: number, y: number): Tile | null;
+}
 
 /**
  * Handler for the Till action.
@@ -40,7 +47,11 @@ export class TillActionHandler implements ActionHandler {
    * - Shovel: 80% efficiency = 12.5s (250 ticks)
    * - Hands: 50% efficiency = 20s (400 ticks)
    *
-   * Duration = baseTicks / toolEfficiency
+   * Also modified by farming skill level:
+   * - Level 0: 0% speed bonus
+   * - Level 5: 25% speed bonus (Master farmer)
+   *
+   * Duration = (baseTicks / toolEfficiency) * (1 - skillBonus)
    */
   getDuration(action: Action, world: World): number {
     const baseTicks = 200; // 10 seconds at 20 TPS
@@ -52,26 +63,40 @@ export class TillActionHandler implements ActionHandler {
       return baseTicks * 2; // 400 ticks = 20s
     }
 
-    const inventory = actor.components.get('inventory') as any;
-    if (!inventory || !inventory.slots) {
+    const inventoryComp = actor.components.get('inventory') as InventoryComponent | undefined;
+    if (!inventoryComp || !inventoryComp.slots) {
       // No inventory, use hands
       return baseTicks * 2; // 400 ticks = 20s
     }
 
+    // Calculate tool-based duration
+    let toolDuration: number;
+
     // Check for hoe (best tool, 100% efficiency)
-    const hasHoe = inventory.slots.some((slot: any) => slot?.itemId === 'hoe' && slot?.quantity > 0);
+    const hasHoe = inventoryComp.slots.some((slot: InventorySlot) => slot?.itemId === 'hoe' && slot?.quantity > 0);
     if (hasHoe) {
-      return baseTicks; // 200 ticks = 10s
+      toolDuration = baseTicks; // 200 ticks = 10s
+    } else {
+      // Check for shovel (medium tool, 80% efficiency)
+      const hasShovel = inventoryComp.slots.some((slot: InventorySlot) => slot?.itemId === 'shovel' && slot?.quantity > 0);
+      if (hasShovel) {
+        toolDuration = Math.round(baseTicks / 0.8); // 250 ticks = 12.5s
+      } else {
+        // Default to hands (50% efficiency)
+        toolDuration = baseTicks * 2; // 400 ticks = 20s
+      }
     }
 
-    // Check for shovel (medium tool, 80% efficiency)
-    const hasShovel = inventory.slots.some((slot: any) => slot?.itemId === 'shovel' && slot?.quantity > 0);
-    if (hasShovel) {
-      return Math.round(baseTicks / 0.8); // 250 ticks = 12.5s
+    // Apply skill efficiency bonus
+    const skillsComp = actor.components.get('skills') as SkillsComponent | undefined;
+    if (skillsComp) {
+      const farmingLevel = skillsComp.levels.farming;
+      const skillBonus = getEfficiencyBonus(farmingLevel); // 0-25%
+      const speedMultiplier = 1 - (skillBonus / 100);
+      return Math.max(1, Math.round(toolDuration * speedMultiplier));
     }
 
-    // Default to hands (50% efficiency)
-    return baseTicks * 2; // 400 ticks = 20s
+    return toolDuration;
   }
 
   /**
@@ -130,7 +155,7 @@ export class TillActionHandler implements ActionHandler {
     }
 
     // Check world has tile access
-    const worldWithTiles = world as any;
+    const worldWithTiles = world as WorldWithTiles;
     if (typeof worldWithTiles.getTileAt !== 'function') {
       return {
         valid: false,
@@ -181,7 +206,7 @@ export class TillActionHandler implements ActionHandler {
     const targetPos = action.targetPosition;
 
     // Get tile from world
-    const worldWithTiles = world as any;
+    const worldWithTiles = world as WorldWithTiles;
     const tile = worldWithTiles.getTileAt(targetPos.x, targetPos.y);
 
     if (!tile) {
@@ -214,24 +239,25 @@ export class TillActionHandler implements ActionHandler {
           },
         ],
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       // SoilSystem threw an error (invalid terrain, etc.)
       // Return failed result with clear error message
+      const err = error as Error;
       return {
         success: false,
-        reason: error.message || 'Failed to till tile',
+        reason: err.message || 'Failed to till tile',
         effects: [],
         events: [
           {
-            type: 'action:failed',
-            source: 'till-action-handler',
+            type: 'action:failed' as const,
+            source: 'till-action-handler' as const,
             data: {
               actionId: action.id,
               actionType: action.type,
               actorId: action.actorId,
               position: targetPos,
-              error: error.message,
-            },
+              error: err.message,
+            } as Record<string, unknown>,
           },
         ],
       };

@@ -10,14 +10,17 @@ const CHUNK_SIZE = 32; // From packages/world/src/chunks/Chunk.ts
  */
 export class TileInspectorPanel {
   private selectedTile: { tile: Tile; x: number; y: number } | null = null;
-  private panelWidth = 320;
-  private panelHeight = 420; // Optimized to fit in standard viewport
+  private panelWidth = 384;  // 20% larger than original 320
+  private panelHeight = 504; // 20% larger than original 420
   private padding = 12;
   private lineHeight = 18;
   private eventBus: EventBus;
   private camera: Camera;
   private chunkManager: ChunkManager;
   private terrainGenerator: TerrainGenerator;
+  private scrollOffset = 0;
+  private maxScrollOffset = 0;
+  private contentHeight = 0;
 
   // Button state tracking
   private buttons: Array<{
@@ -61,6 +64,16 @@ export class TileInspectorPanel {
    */
   getSelectedTile(): { tile: Tile; x: number; y: number } | null {
     return this.selectedTile;
+  }
+
+  /**
+   * Handle scroll events.
+   * @param deltaY Scroll delta (positive = scroll down)
+   */
+  handleScroll(deltaY: number): void {
+    const scrollSpeed = 20;
+    this.scrollOffset += deltaY > 0 ? scrollSpeed : -scrollSpeed;
+    this.scrollOffset = Math.max(0, Math.min(this.scrollOffset, this.maxScrollOffset));
   }
 
   /**
@@ -113,7 +126,7 @@ export class TileInspectorPanel {
   }
 
   /**
-   * Render the tile inspector panel.
+   * Render the tile inspector panel (legacy standalone mode).
    * @param ctx Canvas rendering context
    * @param canvasWidth Width of the canvas
    * @param canvasHeight Height of the canvas
@@ -123,15 +136,8 @@ export class TileInspectorPanel {
       return; // Nothing to render
     }
 
-    const tile = this.selectedTile.tile;
-    const tileX = this.selectedTile.x;
-    const tileY = this.selectedTile.y;
-
     // Position panel in right side, with bottom margin to ensure buttons are visible
     const panelX = canvasWidth - this.panelWidth - 20;
-    // Position so bottom of panel is at canvas height - 20px margin
-    // If canvas height is 727.5, and panel height is 420, then panelY should be ~287.5
-    // But we'll use a fixed safe value that works for most screens
     const panelY = Math.max(20, _canvasHeight - this.panelHeight - 20);
 
     // Draw panel background
@@ -139,33 +145,78 @@ export class TileInspectorPanel {
     ctx.fillRect(panelX, panelY, this.panelWidth, this.panelHeight);
 
     // Draw panel border
-    ctx.strokeStyle = 'rgba(139, 69, 19, 0.8)'; // Brown border for soil theme
+    ctx.strokeStyle = 'rgba(139, 69, 19, 0.8)';
     ctx.lineWidth = 3;
     ctx.strokeRect(panelX, panelY, this.panelWidth, this.panelHeight);
 
-    let currentY = panelY + this.padding;
+    // Render content
+    this.renderContent(ctx, panelX, panelY, true);
+  }
+
+  /**
+   * Render at a specific position (for WindowManager integration).
+   * Does not draw background, border, or close button - WindowManager handles those.
+   */
+  renderAt(ctx: CanvasRenderingContext2D, x: number, y: number, _width: number, _height: number): void {
+    if (!this.selectedTile) {
+      return;
+    }
+
+    this.renderContent(ctx, x, y, false);
+  }
+
+  /**
+   * Render the panel content.
+   * @param showCloseButton Whether to render the close button (legacy mode only)
+   */
+  private renderContent(
+    ctx: CanvasRenderingContext2D,
+    panelX: number,
+    panelY: number,
+    showCloseButton: boolean
+  ): void {
+    const tile = this.selectedTile!.tile;
+    const tileX = this.selectedTile!.x;
+    const tileY = this.selectedTile!.y;
+
+    // Calculate visible area (leave space for buttons at bottom)
+    const buttonAreaHeight = 110;
+    const visibleHeight = this.panelHeight - buttonAreaHeight;
+
+    // Set up clipping for scrollable content
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(panelX, panelY, this.panelWidth, visibleHeight);
+    ctx.clip();
+
+    // Apply scroll offset
+    const scrollY = panelY - this.scrollOffset;
+
+    let currentY = scrollY + this.padding;
 
     // Title
     ctx.fillStyle = '#FFFFFF';
     ctx.font = 'bold 16px monospace';
     ctx.fillText('Tile Inspector', panelX + this.padding, currentY + 14);
 
-    // Close button (X in top right)
-    const closeButtonSize = 24;
-    const closeButtonX = panelX + this.panelWidth - closeButtonSize - 8;
-    const closeButtonY = panelY + 8;
+    // Close button (only in legacy standalone mode)
+    if (showCloseButton) {
+      const closeButtonSize = 24;
+      const closeButtonX = panelX + this.panelWidth - closeButtonSize - 8;
+      const closeButtonY = panelY + 8; // Fixed position, not scrolled
 
-    ctx.fillStyle = 'rgba(200, 50, 50, 0.8)';
-    ctx.fillRect(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize);
-    ctx.strokeStyle = 'rgba(255, 100, 100, 1)';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize);
+      ctx.fillStyle = 'rgba(200, 50, 50, 0.8)';
+      ctx.fillRect(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize);
+      ctx.strokeStyle = 'rgba(255, 100, 100, 1)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize);
 
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 16px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('×', closeButtonX + closeButtonSize / 2, closeButtonY + closeButtonSize / 2 + 6);
-    ctx.textAlign = 'left';
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 16px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('×', closeButtonX + closeButtonSize / 2, closeButtonY + closeButtonSize / 2 + 6);
+      ctx.textAlign = 'left';
+    }
 
     currentY += 30;
 
@@ -320,7 +371,23 @@ export class TileInspectorPanel {
       currentY += this.lineHeight;
     }
 
-    // Render action buttons
+    // Calculate content height and max scroll
+    this.contentHeight = (currentY - scrollY) + this.padding;
+    this.maxScrollOffset = Math.max(0, this.contentHeight - visibleHeight);
+
+    // Restore context (end of scrollable content area)
+    ctx.restore();
+
+    // Draw scroll indicator if content is scrollable
+    if (this.maxScrollOffset > 0) {
+      const scrollBarHeight = Math.max(20, (visibleHeight / this.contentHeight) * visibleHeight);
+      const scrollBarY = panelY + (this.scrollOffset / this.maxScrollOffset) * (visibleHeight - scrollBarHeight);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.fillRect(panelX + this.panelWidth - 6, scrollBarY, 4, scrollBarHeight);
+    }
+
+    // Render action buttons (outside scroll area)
     this.renderButtons(ctx, panelX, panelY);
   }
 
@@ -483,7 +550,6 @@ export class TileInspectorPanel {
       screenY >= closeButtonY &&
       screenY <= closeButtonY + closeButtonSize
     ) {
-      console.log('[TileInspector] Close button clicked');
       this.setSelectedTile(null);
       return true;
     }
@@ -512,10 +578,41 @@ export class TileInspectorPanel {
   }
 
   /**
+   * Handle click events relative to panel origin (for WindowManager integration).
+   * @param x X coordinate relative to panel content area
+   * @param y Y coordinate relative to panel content area
+   * @param _width Width of the content area (unused)
+   * @param _height Height of the content area (unused)
+   * @returns True if click was handled
+   */
+  handleClickAt(x: number, y: number, _width: number, _height: number): boolean {
+    if (!this.selectedTile) {
+      return false;
+    }
+
+    // Check button clicks (button positions are relative to panel origin)
+    for (const button of this.buttons) {
+      if (
+        x >= button.x &&
+        x <= button.x + button.width &&
+        y >= button.y &&
+        y <= button.y + button.height
+      ) {
+        if (button.enabled()) {
+          button.onClick();
+          return true;
+        }
+      }
+    }
+
+    // Click was inside panel but not on a button
+    return false;
+  }
+
+  /**
    * Till the selected tile.
    */
   private tillTile(x: number, y: number): void {
-    console.log(`[TileInspector] Tilling tile at (${x}, ${y})`);
     this.eventBus.emit({ type: 'action:till', source: 'ui', data: { x, y } });
   }
 
@@ -523,7 +620,6 @@ export class TileInspectorPanel {
    * Water the selected tile.
    */
   private waterTile(x: number, y: number): void {
-    console.log(`[TileInspector] Watering tile at (${x}, ${y})`);
     this.eventBus.emit({ type: 'action:water', source: 'ui', data: { x, y } });
   }
 
@@ -531,7 +627,6 @@ export class TileInspectorPanel {
    * Fertilize the selected tile.
    */
   private fertilizeTile(x: number, y: number, fertilizerType: string): void {
-    console.log(`[TileInspector] Fertilizing tile at (${x}, ${y}) with ${fertilizerType}`);
     this.eventBus.emit({ type: 'action:fertilize', source: 'ui', data: { x, y, fertilizerType } });
   }
 
@@ -571,7 +666,6 @@ export class TileInspectorPanel {
     // Per CLAUDE.md: All tiles MUST have biome data before farming operations
     // Chunks created on-demand need terrain generation to set biome data
     if (!chunk.generated) {
-      console.log(`[TileInspector] Generating terrain for chunk (${chunkX}, ${chunkY})`);
       this.terrainGenerator.generateChunk(chunk, world as any);
     }
 
@@ -584,9 +678,6 @@ export class TileInspectorPanel {
       return null;
     }
 
-    console.log(
-      `[TileInspector] Found tile at world (${worldX}, ${worldY}): ${tile.terrain}, tilled=${tile.tilled}, fertility=${tile.fertility}, biome=${tile.biome}`
-    );
 
     return { tile, x: worldX, y: worldY };
   }

@@ -19,7 +19,6 @@ import type { EntityId } from '../types.js';
  * });
  *
  * eventBus.subscribe<'agent:action:started'>('agent:action:started', (event) => {
- *   console.log(event.data.actionType); // TypeScript knows this exists
  * });
  * ```
  */
@@ -96,6 +95,11 @@ export interface GameEventMap {
     amount?: number;
     storageId?: EntityId;
     fromStorage?: boolean;
+    fromPlant?: EntityId;
+    /** Food quality for mood system (0-100) */
+    quality?: number;
+    /** Flavor profile for preference system */
+    flavors?: ('sweet' | 'savory' | 'spicy' | 'bitter' | 'sour' | 'umami')[];
   };
   'agent:collapsed': {
     agentId: EntityId;
@@ -171,6 +175,20 @@ export interface GameEventMap {
     actorId?: EntityId;
     position?: { x: number; y: number };
   };
+  'action:plant': {
+    x: number;
+    y: number;
+    agentId?: EntityId;
+    seedType?: string;
+    speciesId?: string;
+  };
+  'action:water': {
+    x?: number;
+    y?: number;
+    agentId?: EntityId;
+    plantId?: EntityId;
+    position?: { x: number; y: number };
+  };
   'action:completed': {
     actionType: string;
     actionId?: string;
@@ -195,13 +213,13 @@ export interface GameEventMap {
     position: { x: number; y: number };
   };
   'action:harvest': {
-    actionId: string;
-    actorId: EntityId;
+    actionId?: string;
+    actorId?: EntityId;
     agentId?: EntityId;
-    plantId: EntityId;
-    speciesId: string;
-    harvested: Array<{ itemId: string; amount: number }>;
-    position: { x: number; y: number };
+    plantId?: EntityId;
+    speciesId?: string;
+    harvested?: Array<{ itemId: string; amount: number }>;
+    position?: { x: number; y: number };
   };
 
   // === Plant Events ===
@@ -246,6 +264,13 @@ export interface GameEventMap {
     returned: number;
     position?: { x: number; y: number };
   };
+  'plant:fruitRegenerated': {
+    plantId: EntityId;
+    speciesId: string;
+    fruitAdded: number;
+    totalFruit: number;
+    position?: { x: number; y: number };
+  };
 
   // === Seed Events ===
   'seed:gathered': {
@@ -285,6 +310,13 @@ export interface GameEventMap {
     speciesId: string;
     position: { x: number; y: number };
     generation?: number;
+  };
+  'seed:planted': {
+    actionId?: string;
+    actorId: EntityId;
+    speciesId: string;
+    position: { x: number; y: number };
+    seedItemId?: string;
   };
 
   // === Harvest Events ===
@@ -353,6 +385,7 @@ export interface GameEventMap {
     entityId?: EntityId;
     buildingType?: string;
     position?: { x: number; y: number };
+    builderId?: EntityId;
   };
   'construction:gathering_resources': {
     buildingId: EntityId;
@@ -363,6 +396,22 @@ export interface GameEventMap {
     buildingId: EntityId;
     reason: string;
     builderId?: EntityId;
+    agentId: EntityId;
+  };
+
+  // === Zone Events ===
+  'zone:menu:opened': Record<string, never>;
+  'zone:menu:closed': Record<string, never>;
+  'zone:type:selected': {
+    zoneType: string;
+  };
+  'zone:painted': {
+    zoneId: string;
+    zoneType: string;
+    tileCount: number;
+  };
+  'zone:erased': {
+    tileCount: number;
   };
 
   // === Crafting Events ===
@@ -388,12 +437,24 @@ export interface GameEventMap {
     jobId: string | number;
     recipeId: string;
     agentId: EntityId;
-    produced: Array<{ itemId: string; amount: number }>;
+    produced: Array<{ itemId: string; amount: number; quality?: number }>;
   };
   'crafting:panel_opened': Record<string, never>;
   'crafting:panel_closed': Record<string, never>;
   'crafting:recipe_selected': {
     recipeId: string;
+  };
+
+  // === Cooking Events ===
+  'cooking:completed': {
+    agentId: EntityId;
+    recipeId: string;
+    itemId: string;
+    quantity: number;
+    quality: number;
+    xpGained: number;
+    leveledUp: boolean;
+    newLevel?: number;
   };
 
   // === Conversation & Social Events ===
@@ -507,6 +568,19 @@ export interface GameEventMap {
     housingId: EntityId;
     speciesId?: string;
     buildingType?: string;
+  };
+  'agent:tamed_animal': {
+    agentId: EntityId;
+    animalId: EntityId;
+    speciesId: string;
+    method: string;
+  };
+  'agent:housed_animal': {
+    agentId: EntityId;
+    animalId: EntityId;
+    speciesId: string;
+    housingId: EntityId;
+    housingType: string;
   };
   'animal:behavior_changed': {
     animalId: EntityId;
@@ -662,6 +736,13 @@ export interface GameEventMap {
     buildingType?: string;
   };
 
+  // === UI & Notification Events ===
+  'notification:show': {
+    message: string;
+    type: 'info' | 'success' | 'warning' | 'error';
+    duration?: number;
+  };
+
   // === Time Events ===
   'time:day_changed': {
     day: number;
@@ -718,11 +799,6 @@ export interface GameEventMap {
   };
 
   // === Action Events (additional) ===
-  'action:water': {
-    x: number;
-    y: number;
-    agentId?: EntityId;
-  };
   'action:fertilize': {
     x: number;
     y: number;
@@ -733,7 +809,233 @@ export interface GameEventMap {
   // === Research Events ===
   'research:unlocked': {
     researchId: string;
+    type?: 'recipe' | 'building' | 'item' | 'research' | 'ability' | 'crop' | 'knowledge' | 'generated';
+    contentId?: string;
     agentId?: EntityId;
+  };
+  'research:started': {
+    researchId: string;
+    agentId: EntityId;
+    researchers: EntityId[];
+  };
+  'research:progress': {
+    researchId: string;
+    progress: number;
+    progressRequired: number;
+    agentId?: EntityId;
+  };
+  'research:completed': {
+    researchId: string;
+    researchers: EntityId[];
+    unlocks: Array<{ type: string; id: string }>;
+    tick: number;
+  };
+  'research:failed': {
+    researchId: string;
+    agentId: EntityId;
+    reason: string;
+  };
+  'research:insight_gained': {
+    researchId: string;
+    agentId: EntityId;
+    insightId: string;
+    content: string;
+    breakthroughBonus: number;
+  };
+  'discovery:created': {
+    discoveryType: 'item' | 'recipe' | 'building' | 'research';
+    discoveryId: string;
+    name: string;
+    tier: number;
+    generatedBy: EntityId;
+    researchContext?: string;
+  };
+  'capability_gap:detected': {
+    gapId: string;
+    agentId: EntityId;
+    attemptedAction: string;
+    description: string;
+  };
+
+  // === Agent Lifecycle Events ===
+  'agent:birth': {
+    agentId: EntityId;
+    name: string;
+    useLLM: boolean;
+    generation: number;
+    parents: [string, string] | null;
+    initialStats: {
+      health: number;
+      hunger: number;
+      energy: number;
+    };
+  };
+
+  // === Mood Events ===
+  'mood:changed': {
+    agentId: EntityId;
+    currentMood: number;
+    emotionalState: string;
+    description: string;
+  };
+
+  // === Behavior Goal Events ===
+  'behavior:goal_achieved': {
+    agentId: EntityId;
+    behavior: string;
+    goalType?: string;
+    summary?: string;
+    resourcesGathered?: Record<string, number>;
+    itemsCrafted?: Array<{ itemId: string; amount: number }>;
+  };
+
+  // === LLM Decision Events ===
+  'llm:request': {
+    agentId: EntityId;
+    promptLength: number;
+    reason: 'idle' | 'task_complete' | 'periodic' | 'manual';
+  };
+  'llm:response': {
+    agentId: EntityId;
+    responseLength: number;
+    success: boolean;
+    latencyMs?: number;
+  };
+  'llm:decision': {
+    agentId: EntityId;
+    decision: string;
+    behavior?: string;
+    reasoning?: string;
+    source: 'llm' | 'fallback';
+  };
+  'llm:error': {
+    agentId: EntityId;
+    error: string;
+    errorType: 'timeout' | 'connection' | 'parse' | 'unknown';
+  };
+  'agent:llm_context': {
+    agentId: EntityId;
+    agentName?: string;
+    context: string;
+    tick: number;
+    // Live state snapshot
+    behavior?: string;
+    behaviorState?: Record<string, unknown>;
+    priorities?: Record<string, number>;
+    plannedBuilds?: Array<{ buildingType: string; position?: { x: number; y: number } }>;
+    position?: { x: number; y: number };
+    needs?: { hunger?: number; energy?: number; social?: number };
+    inventory?: Array<{ item: string; qty: number }>;
+    // Skills snapshot
+    skills?: Record<string, number>;  // e.g. { building: 2, farming: 1, gathering: 3 }
+    personalGoal?: string;
+    mediumTermGoal?: string;
+    groupGoal?: string;
+    lastThought?: string;
+    recentSpeech?: string;
+  };
+
+  // === Trading & Economy Events ===
+  'trade:buy': {
+    buyerId: EntityId;
+    sellerId: EntityId;
+    shopId?: EntityId;
+    itemId: string;
+    quantity: number;
+    totalPrice: number;
+    unitPrice: number;
+  };
+
+  'trade:sell': {
+    sellerId: EntityId;
+    buyerId: EntityId;
+    shopId?: EntityId;
+    itemId: string;
+    quantity: number;
+    totalPrice: number;
+    unitPrice: number;
+  };
+
+  'trade:offer_made': {
+    offerId: string;
+    offererId: EntityId;
+    targetId: EntityId;
+    offeredItems: Array<{ itemId: string; quantity: number }>;
+    requestedItems: Array<{ itemId: string; quantity: number }>;
+    currencyOffered: number;
+    currencyRequested: number;
+  };
+
+  'trade:offer_accepted': {
+    offerId: string;
+    offererId: EntityId;
+    targetId: EntityId;
+  };
+
+  'trade:offer_rejected': {
+    offerId: string;
+    offererId: EntityId;
+    targetId: EntityId;
+    reason?: string;
+  };
+
+  'market:price_changed': {
+    itemId: string;
+    oldPrice: number;
+    newPrice: number;
+    reason: string;
+  };
+
+  'market:event_started': {
+    eventId: string;
+    eventType: 'shortage' | 'surplus' | 'festival' | 'merchant_arrival';
+    description: string;
+    duration: number;
+  };
+
+  'market:event_ended': {
+    eventId: string;
+    eventType: 'shortage' | 'surplus' | 'festival' | 'merchant_arrival';
+  };
+
+  // === Skill Events ===
+  'skill:xp_gain': {
+    agentId: EntityId;
+    skillId: string;
+    amount: number;
+    source: string;
+  };
+  'skill:level_up': {
+    agentId: EntityId;
+    skillId: string;
+    oldLevel: number;
+    newLevel: number;
+  };
+
+  // === Goal Events ===
+  'agent:goal_formed': {
+    agentId: EntityId;
+    goalId: string;
+    category: string;
+    description: string;
+  };
+  'agent:goal_milestone': {
+    agentId: EntityId;
+    goalId: string;
+    milestoneIndex: number;
+    description: string;
+  };
+  'agent:goal_completed': {
+    agentId: EntityId;
+    goalId: string;
+    category: string;
+    description: string;
+  };
+  'agent:internal_monologue': {
+    agentId: EntityId;
+    behaviorType: string;
+    monologue: string;
+    timestamp: number;
   };
 }
 

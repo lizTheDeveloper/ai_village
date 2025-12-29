@@ -534,14 +534,15 @@ describe('WindowManager Integration Tests', () => {
     });
 
     it('should not auto-close pinned windows', () => {
-      // Canvas 440x180, window size 200x150
+      // Canvas 440x210 (180 + 30 for menu bar), window size 200x150
       // Can fit 2 windows side-by-side, but not 3
-      const smallCanvas = createMockCanvas(440, 180);
+      const menuBarHeight = 30;
+      const smallCanvas = createMockCanvas(440, 180 + menuBarHeight);
       const manager = new WindowManager(smallCanvas);
 
-      // Create pinned window at left side
+      // Create pinned window at left side (Y must be >= menuBarHeight)
       const pinnedPanel = new MockPanel('pinned', 'Pinned', 200, 150);
-      const pinnedConfig = createWindowConfig(10, 10, 200, 150);
+      const pinnedConfig = createWindowConfig(10, menuBarHeight, 200, 150);
       manager.registerWindow('pinned', pinnedPanel, pinnedConfig);
       manager.showWindow('pinned');
       manager.pinWindow('pinned', true);
@@ -551,7 +552,7 @@ describe('WindowManager Integration Tests', () => {
 
       // Create unpinned window at right side - different position so it fits
       const unpinnedPanel = new MockPanel('unpinned', 'Unpinned', 200, 150);
-      const unpinnedConfig = createWindowConfig(220, 10, 200, 150);
+      const unpinnedConfig = createWindowConfig(220, menuBarHeight, 200, 150);
       manager.registerWindow('unpinned', unpinnedPanel, unpinnedConfig);
       manager.showWindow('unpinned');
 
@@ -560,7 +561,7 @@ describe('WindowManager Integration Tests', () => {
 
       // Try to open a third window - no space left, must trigger LRU eviction
       const newPanel = new MockPanel('new', 'New', 200, 150);
-      const newConfig = createWindowConfig(10, 10, 200, 150);
+      const newConfig = createWindowConfig(10, menuBarHeight, 200, 150);
       manager.registerWindow('new', newPanel, newConfig);
       manager.showWindow('new');
 

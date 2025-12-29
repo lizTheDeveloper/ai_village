@@ -123,13 +123,20 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
       movementModifier: 0.7,
     });
 
+    // Create temperature component with proper thresholds
+    // currentTemp: 5, comfortMin: 15, comfortMax: 25, toleranceMin: 10, toleranceMax: 35
+    // 5 < 10 (toleranceMin) so state will be 'dangerously_cold'
     agent.addComponent({
       type: 'temperature',
       version: 1,
-      currentTemp: 5, // Already cold
+      currentTemp: 5, // Below toleranceMin (10) = dangerously cold
+      comfortMin: 15,
+      comfortMax: 25,
+      toleranceMin: 10,
+      toleranceMax: 35,
       state: 'dangerously_cold',
     });
-    agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100)); // Full health
+    agent.addComponent(createNeedsComponent(100, 100, 100, 100, 37)); // Full health, normal body temp
 
     const tempSystem = new TemperatureSystem();
     harness.registerSystem('TemperatureSystem', tempSystem);

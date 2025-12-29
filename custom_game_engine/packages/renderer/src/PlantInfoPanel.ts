@@ -7,17 +7,19 @@ import type { Entity } from '@ai-village/core';
 export class PlantInfoPanel {
   private selectedEntityId: string | null = null;
   private panelWidth = 320;
-  private panelHeight = 400;
+  private panelHeight = 480; // Increased to fit all content including buttons
   private padding = 10;
   private lineHeight = 18;
+  private scrollOffset = 0;
+  private contentHeight = 0; // Calculated during render
 
   /**
    * Set the currently selected plant entity.
    * @param entity Plant entity to display, or null to clear selection
    */
   setSelectedEntity(entity: Entity | null): void {
-    console.log('[PlantInfoPanel] setSelectedEntity called with:', entity ? `Entity ${entity.id}` : 'null');
     this.selectedEntityId = entity ? entity.id : null;
+    this.scrollOffset = 0; // Reset scroll when selecting new entity
   }
 
   /**
@@ -35,14 +37,32 @@ export class PlantInfoPanel {
   }
 
   /**
-   * Render the plant info panel.
-   * @param ctx Canvas rendering context
-   * @param canvasWidth Width of the canvas
-   * @param canvasHeight Height of the canvas
-   * @param world World instance to look up the selected entity
-   * @param tileInspectorOpen Whether the tile inspector is currently open
+   * Handle scroll events.
+   * @param deltaY Scroll delta (positive = down, negative = up)
+   * @param viewportHeight Height of the visible content area
+   * @returns True if scroll was handled
    */
-  render(ctx: CanvasRenderingContext2D, canvasWidth: number, canvasHeight: number, world: any, tileInspectorOpen: boolean = false): void {
+  handleScroll(deltaY: number, viewportHeight: number): boolean {
+    const scrollSpeed = 30;
+    const maxScroll = Math.max(0, this.contentHeight - viewportHeight + this.padding * 2);
+
+    this.scrollOffset += deltaY > 0 ? scrollSpeed : -scrollSpeed;
+    this.scrollOffset = Math.max(0, Math.min(maxScroll, this.scrollOffset));
+
+    return true;
+  }
+
+  /**
+   * Render the plant info panel.
+   * When used via WindowManager adapter, ctx is already translated to window position,
+   * so we render at (0, 0) relative to the content area.
+   * @param ctx Canvas rendering context
+   * @param width Width of the content area
+   * @param height Height of the content area
+   * @param world World instance to look up the selected entity
+   * @param _tileInspectorOpen Deprecated - positioning handled by WindowManager
+   */
+  render(ctx: CanvasRenderingContext2D, width: number, height: number, world: any, _tileInspectorOpen: boolean = false): void {
     if (!this.selectedEntityId) {
       return; // Nothing to render
     }
@@ -69,26 +89,22 @@ export class PlantInfoPanel {
       return;
     }
 
-    // Position panel - if tile inspector is open, position to the left of it
-    // Otherwise position in bottom-right corner
-    let x: number;
-    const y = canvasHeight - this.panelHeight - 20;
+    // Render at (0, 0) - WindowManager handles positioning via translate
+    const x = 0;
+    const y = 0;
 
-    if (tileInspectorOpen) {
-      // Position to the left of tile inspector (tile inspector width is 320 + 20 margin)
-      x = canvasWidth - this.panelWidth - 340 - 20;
-    } else {
-      x = canvasWidth - this.panelWidth - 20;
-    }
+    // Use provided dimensions (from WindowManager) or fall back to defaults
+    const renderWidth = width || this.panelWidth;
+    const renderHeight = height || this.panelHeight;
 
-    // Draw panel background
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-    ctx.fillRect(x, y, this.panelWidth, this.panelHeight);
+    // Set up clipping for scroll
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x, y, renderWidth, renderHeight);
+    ctx.clip();
 
-    // Draw panel border
-    ctx.strokeStyle = 'rgba(34, 139, 34, 0.7)'; // Green border for plants
-    ctx.lineWidth = 2;
-    ctx.strokeRect(x, y, this.panelWidth, this.panelHeight);
+    // Apply scroll offset
+    ctx.translate(0, -this.scrollOffset);
 
     // Set up text rendering
     ctx.font = '14px monospace';
@@ -106,7 +122,7 @@ export class PlantInfoPanel {
 
     // Helper function to draw progress bar
     const drawProgressBar = (label: string, value: number, maxValue: number, color: string) => {
-      const barWidth = this.panelWidth - 2 * this.padding;
+      const barWidth = renderWidth - 2 * this.padding;
       const barHeight = 14;
       const fillWidth = (value / maxValue) * barWidth;
 
@@ -137,27 +153,7 @@ export class PlantInfoPanel {
       currentY += barHeight + 4;
     };
 
-    // Title
-    drawText('=== PLANT INFO ===', '#32CD32');
-
-    // Close button (X in top right)
-    const closeButtonSize = 24;
-    const closeButtonX = x + this.panelWidth - closeButtonSize - 8;
-    const closeButtonY = y + 8;
-
-    ctx.fillStyle = 'rgba(200, 50, 50, 0.8)';
-    ctx.fillRect(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize);
-    ctx.strokeStyle = 'rgba(255, 100, 100, 1)';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize);
-
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 16px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('×', closeButtonX + closeButtonSize / 2, closeButtonY + closeButtonSize / 2 + 6);
-    ctx.textAlign = 'left';
-    ctx.font = '14px monospace';
-
+    // Title - removed, WindowManager shows title in title bar
     currentY += 4;
 
     // Species
@@ -238,6 +234,83 @@ export class PlantInfoPanel {
     if (plant.seedsProduced > 0) {
       drawText(`🌰 Seeds: ${plant.seedsProduced}`, '#8B4513');
     }
+
+    currentY += 8;
+
+    // Contents section - show resource data if entity has resource component
+    const resource = selectedEntity.components.get('resource') as any | undefined;
+    if (resource) {
+      drawText('--- Contents ---', '#87CEEB');
+
+      const resourceType = resource.resourceType || resource.type || 'unknown';
+      const amount = resource.amount ?? 0;
+      const maxAmount = resource.maxAmount ?? amount;
+      const regenRate = resource.regenerationRate ?? 0;
+
+      // Resource type with icon
+      const resourceIcons: Record<string, string> = {
+        'food': '🍎',
+        'wood': '🪵',
+        'stone': '🪨',
+        'fiber': '🧵',
+        'water': '💧',
+      };
+      const icon = resourceIcons[resourceType] || '📦';
+      drawText(`${icon} ${resourceType.charAt(0).toUpperCase() + resourceType.slice(1)}`, '#90EE90');
+
+      // Amount bar
+      const barWidth = renderWidth - 2 * this.padding;
+      const barHeight = 14;
+      const fillWidth = maxAmount > 0 ? (amount / maxAmount) * barWidth : 0;
+
+      ctx.fillStyle = '#CCCCCC';
+      ctx.fillText(`Amount: ${Math.round(amount)}/${Math.round(maxAmount)}`, x + this.padding, currentY);
+      currentY += this.lineHeight;
+
+      // Background
+      ctx.fillStyle = 'rgba(50, 50, 50, 0.8)';
+      ctx.fillRect(x + this.padding, currentY, barWidth, barHeight);
+
+      // Fill
+      ctx.fillStyle = amount > maxAmount * 0.5 ? '#4CAF50' : amount > maxAmount * 0.25 ? '#FFC107' : '#FF5722';
+      ctx.fillRect(x + this.padding, currentY, fillWidth, barHeight);
+
+      // Border
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x + this.padding, currentY, barWidth, barHeight);
+
+      currentY += barHeight + 6;
+
+      // Regeneration rate
+      if (regenRate > 0) {
+        drawText(`⏱️ Regen: +${regenRate.toFixed(2)}/sec`, '#CCCCCC');
+      }
+    }
+
+    // Save content height for scroll calculations
+    this.contentHeight = currentY - y;
+
+    // Restore context (removes clipping and scroll transform)
+    ctx.restore();
+
+    // Draw scroll indicator if content overflows
+    if (this.contentHeight > renderHeight) {
+      const scrollbarWidth = 6;
+      const scrollbarX = renderWidth - scrollbarWidth - 2;
+      const scrollbarHeight = renderHeight - 4;
+      const thumbHeight = Math.max(20, (renderHeight / this.contentHeight) * scrollbarHeight);
+      const maxScroll = this.contentHeight - renderHeight;
+      const thumbY = 2 + (this.scrollOffset / maxScroll) * (scrollbarHeight - thumbHeight);
+
+      // Track
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.fillRect(scrollbarX, 2, scrollbarWidth, scrollbarHeight);
+
+      // Thumb
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.fillRect(scrollbarX, thumbY, scrollbarWidth, thumbHeight);
+    }
   }
 
   /**
@@ -285,7 +358,6 @@ export class PlantInfoPanel {
       screenY >= closeButtonY &&
       screenY <= closeButtonY + closeButtonSize
     ) {
-      console.log('[PlantInfoPanel] Close button clicked');
       this.setSelectedEntity(null);
       return true;
     }
@@ -297,16 +369,12 @@ export class PlantInfoPanel {
    * Get display name for species ID
    */
   private getSpeciesDisplayName(speciesId: string): string {
-    const names: Record<string, string> = {
-      'grass': 'Grass',
-      'wildflower': 'Wildflower',
-      'berry-bush': 'Berry Bush',
-      'wheat': 'Wheat',
-      'carrot': 'Carrot',
-      'potato': 'Potato',
-      'tomato': 'Tomato'
-    };
-    return names[speciesId] || speciesId;
+    // TODO: Look up from PlantSpeciesRegistry once it exists
+    // For now, convert kebab-case to Title Case
+    return speciesId
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 
   /**

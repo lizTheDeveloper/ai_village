@@ -75,17 +75,22 @@ export function createSeedItem(
  * Common plant species with their seed definitions
  */
 export const DEFAULT_SEEDS: ItemDefinition[] = [
+  // Trees
   createSeedItem('oak', 'Oak', { gatherSources: ['oak_tree'] }),
   createSeedItem('pine', 'Pine', { gatherSources: ['pine_tree'] }),
   createSeedItem('birch', 'Birch', { gatherSources: ['birch_tree'] }),
   createSeedItem('apple', 'Apple', { gatherSources: ['apple_tree'] }),
+  // Bushes and plants
   createSeedItem('berry_bush', 'Berry Bush', { gatherSources: ['berry_bush'] }),
+  createSeedItem('grass', 'Grass', { gatherSources: ['grass', 'grass_plant'] }),
+  // Crops
   createSeedItem('wheat', 'Wheat', { gatherSources: ['wheat_plant'] }),
   createSeedItem('carrot', 'Carrot', { gatherSources: ['carrot_plant'] }),
   createSeedItem('potato', 'Potato', { gatherSources: ['potato_plant'] }),
   createSeedItem('tomato', 'Tomato', { gatherSources: ['tomato_plant'] }),
   createSeedItem('corn', 'Corn', { gatherSources: ['corn_plant'] }),
   createSeedItem('pumpkin', 'Pumpkin', { gatherSources: ['pumpkin_plant'] }),
+  // Industrial plants
   createSeedItem('sunflower', 'Sunflower', { gatherSources: ['sunflower'] }),
   createSeedItem('flax', 'Flax', { gatherSources: ['flax_plant'] }),
   createSeedItem('cotton', 'Cotton', { gatherSources: ['cotton_plant'] }),

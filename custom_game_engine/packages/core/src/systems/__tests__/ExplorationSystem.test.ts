@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { World } from '../../World';
 import { ExplorationSystem } from '../ExplorationSystem';
+import { createExplorationStateComponent } from '../../components/ExplorationStateComponent';
+import { createPositionComponent } from '../../components/PositionComponent';
+import { createSteeringComponent } from '../../components/SteeringComponent';
+import { createAgentComponent } from '../../components/AgentComponent';
+import type { EntityImpl } from '../../ecs/Entity';
 
 describe('ExplorationSystem', () => {
   let world: World;
@@ -14,25 +19,28 @@ describe('ExplorationSystem', () => {
   describe('AC3: Exploration Covers Territory', () => {
     it('should identify frontier sectors correctly', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 80, y: 80 }); // Sector 5,5
-      entity.addComponent('ExplorationState', {
+      const entityImpl = entity as EntityImpl;
+
+      // Add components using factory functions
+      entityImpl.addComponent(createPositionComponent(80, 80)); // Sector 5,5
+
+      const explorationState = createExplorationStateComponent({
         mode: 'frontier',
-        exploredSectors: new Set(['5,5']),
         explorationRadius: 64, // 4 sectors
       });
-      entity.addComponent('Steering', {
-        behavior: 'none',
-        maxSpeed: 2.0,
-        maxForce: 0.5,
-      });
+      // Mark sector 5,5 as explored
+      explorationState.markSectorExplored(5, 5, 0);
+      entityImpl.addComponent(explorationState);
+
+      entityImpl.addComponent(createSteeringComponent('none', 2.0, 0.5));
 
       // Run multiple updates to allow frontier calculation
       for (let i = 0; i < 5; i++) {
         system.update(world, world.getAllEntities(), 1.0 + i);
       }
 
-      const explorationState = entity.getComponent('ExplorationState');
-      const frontier = explorationState.frontierSectors;
+      const updatedState = entityImpl.getComponent('exploration_state');
+      const frontier = updatedState?.getFrontierSectors();
 
       // Should identify adjacent unexplored sectors
       expect(frontier).toBeDefined();
@@ -43,34 +51,34 @@ describe('ExplorationSystem', () => {
 
     it('should create spiral pattern when exploring', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 100, y: 100 });
-      entity.addComponent('ExplorationState', {
+      const entityImpl = entity as EntityImpl;
+
+      entityImpl.addComponent(createPositionComponent(100, 100));
+
+      const explorationState = createExplorationStateComponent({
         mode: 'spiral',
         homeBase: { x: 100, y: 100 },
-        spiralStep: 0,
         explorationRadius: 64,
       });
-      entity.addComponent('Steering', {
-        behavior: 'none',
-        maxSpeed: 2.0,
-        maxForce: 0.5,
-      });
+      entityImpl.addComponent(explorationState);
+
+      entityImpl.addComponent(createSteeringComponent('none', 2.0, 0.5));
 
       const targets = [];
       for (let i = 0; i < 20; i++) {
         system.update(world, world.getAllEntities(), 1.0 + i);
-        const explorationState = entity.getComponent('ExplorationState');
-        if (explorationState.currentTarget) {
+        const state = entityImpl.getComponent('exploration_state');
+        if (state?.currentTarget) {
           targets.push({
-            x: explorationState.currentTarget.x,
-            y: explorationState.currentTarget.y
+            x: state.currentTarget.x,
+            y: state.currentTarget.y
           });
         }
       }
 
       // Verify spiral pattern: spiral step should increase
-      const explorationState = entity.getComponent('ExplorationState');
-      expect(explorationState.spiralStep).toBeGreaterThan(0);
+      const finalState = entityImpl.getComponent('exploration_state');
+      expect(finalState?.spiralStep).toBeGreaterThan(0);
 
       // Should have generated targets
       expect(targets.length).toBeGreaterThan(0);
@@ -78,23 +86,24 @@ describe('ExplorationSystem', () => {
 
     it('should not revisit recently explored sectors', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 80, y: 80 });
-      entity.addComponent('ExplorationState', {
+      const entityImpl = entity as EntityImpl;
+
+      entityImpl.addComponent(createPositionComponent(80, 80));
+
+      const explorationState = createExplorationStateComponent({
         mode: 'frontier',
-        exploredSectors: new Set(['5,5']),
-        sectorExplorationTimes: new Map([['5,5', 100]]),
         explorationRadius: 64,
       });
-      entity.addComponent('Steering', {
-        behavior: 'none',
-        maxSpeed: 2.0,
-        maxForce: 0.5,
-      });
+      // Mark sector 5,5 as explored at tick 100
+      explorationState.markSectorExplored(5, 5, 100);
+      entityImpl.addComponent(explorationState);
+
+      entityImpl.addComponent(createSteeringComponent('none', 2.0, 0.5));
 
       system.update(world, world.getAllEntities(), 150); // 50 ticks later
 
-      const explorationState = entity.getComponent('ExplorationState');
-      const frontier = explorationState.frontierSectors;
+      const state = entityImpl.getComponent('exploration_state');
+      const frontier = state?.getFrontierSectors();
 
       // Should not include recently explored sector
       if (frontier) {
@@ -111,70 +120,76 @@ describe('ExplorationSystem', () => {
   describe('frontier exploration algorithm', () => {
     it('should prioritize closest frontier sectors', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 80, y: 80 }); // Sector 5,5
-      entity.addComponent('ExplorationState', {
+      const entityImpl = entity as EntityImpl;
+
+      entityImpl.addComponent(createPositionComponent(80, 80)); // Sector 5,5
+
+      const explorationState = createExplorationStateComponent({
         mode: 'frontier',
-        exploredSectors: new Set(['5,5']),
         explorationRadius: 96,
       });
-      entity.addComponent('Steering', {
-        behavior: 'none',
-        maxSpeed: 2.0,
-        maxForce: 0.5,
-      });
+      explorationState.markSectorExplored(5, 5, 0);
+      entityImpl.addComponent(explorationState);
+
+      entityImpl.addComponent(createSteeringComponent('none', 2.0, 0.5));
 
       system.update(world, world.getAllEntities(), 1.0);
 
-      const steering = entity.getComponent('Steering');
+      const steering = entityImpl.getComponent('steering');
 
       // Should have target set to nearest frontier
-      expect(steering.target).toBeDefined();
-      expect(steering.behavior).toBe('arrive');
+      expect(steering?.target).toBeDefined();
+      expect(steering?.behavior).toBe('arrive');
     });
 
     it('should mark sectors as explored when visited', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 80, y: 80 }); // Sector 5,5
-      entity.addComponent('ExplorationState', {
+      const entityImpl = entity as EntityImpl;
+
+      entityImpl.addComponent(createPositionComponent(80, 80)); // Sector 5,5
+
+      const explorationState = createExplorationStateComponent({
         mode: 'frontier',
-        exploredSectors: new Set(),
         explorationRadius: 64,
       });
+      entityImpl.addComponent(explorationState);
 
       system.update(world, world.getAllEntities(), 100);
 
-      const explorationState = entity.getComponent('ExplorationState');
+      const state = entityImpl.getComponent('exploration_state');
 
       // Current sector should be marked explored
-      expect(explorationState.exploredSectors.has('5,5')).toBe(true);
+      expect(state?.exploredSectors.has('5,5')).toBe(true);
     });
 
     it('should switch to new frontier target when current reached', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 80, y: 80 });
-      entity.addComponent('ExplorationState', {
+      const entityImpl = entity as EntityImpl;
+
+      entityImpl.addComponent(createPositionComponent(80, 80));
+
+      const explorationState = createExplorationStateComponent({
         mode: 'frontier',
         currentTarget: { x: 96, y: 80 }, // Sector 6,5
-        exploredSectors: new Set(['5,5']),
         explorationRadius: 96,
       });
-      entity.addComponent('Steering', {
-        behavior: 'arrive',
-        target: { x: 96, y: 80 },
-        maxSpeed: 2.0,
-        maxForce: 0.5,
-      });
+      explorationState.markSectorExplored(5, 5, 0);
+      entityImpl.addComponent(explorationState);
 
-      // Move to target
-      entity.getComponent('Position').x = 96;
-      entity.getComponent('Position').y = 80;
+      entityImpl.addComponent(createSteeringComponent('arrive', 2.0, 0.5));
+
+      // Move to target - need to update position
+      const pos = entityImpl.getComponent('position');
+      if (pos) {
+        entityImpl.updateComponent('position', () => createPositionComponent(96, 80));
+      }
 
       system.update(world, world.getAllEntities(), 200);
 
-      const explorationState = entity.getComponent('ExplorationState');
+      const state = entityImpl.getComponent('exploration_state');
 
       // Should have new target
-      expect(explorationState.currentTarget).not.toEqual({ x: 96, y: 80 });
+      expect(state?.currentTarget).not.toEqual({ x: 96, y: 80 });
     });
   });
 
@@ -199,11 +214,16 @@ describe('ExplorationSystem', () => {
   describe('AC10: No Silent Fallbacks (CLAUDE.md Compliance)', () => {
     it('should throw error for invalid exploration mode', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 100, y: 100 });
-      entity.addComponent('ExplorationState', {
-        mode: 'invalid',
+      const entityImpl = entity as EntityImpl;
+
+      entityImpl.addComponent(createPositionComponent(100, 100));
+
+      const explorationState = createExplorationStateComponent({
         explorationRadius: 64,
       });
+      // Set invalid mode directly
+      (explorationState as any).mode = 'invalid';
+      entityImpl.addComponent(explorationState);
 
       expect(() => {
         system.update(world, world.getAllEntities(), 1.0);
@@ -212,7 +232,9 @@ describe('ExplorationSystem', () => {
 
     it('should skip entities without ExplorationState component', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 100, y: 100 });
+      const entityImpl = entity as EntityImpl;
+
+      entityImpl.addComponent(createPositionComponent(100, 100));
       // Missing ExplorationState
 
       // Should not throw - just skips entity
@@ -223,12 +245,16 @@ describe('ExplorationSystem', () => {
 
     it('should throw error for missing home base in spiral mode', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 100, y: 100 });
-      entity.addComponent('ExplorationState', {
+      const entityImpl = entity as EntityImpl;
+
+      entityImpl.addComponent(createPositionComponent(100, 100));
+
+      const explorationState = createExplorationStateComponent({
         mode: 'spiral',
         // Missing homeBase
         explorationRadius: 64,
       });
+      entityImpl.addComponent(explorationState);
 
       expect(() => {
         system.update(world, world.getAllEntities(), 1.0);
@@ -245,17 +271,17 @@ describe('ExplorationSystem', () => {
       // Create 20 explorer agents
       for (let i = 0; i < 20; i++) {
         const entity = world.createEntity();
-        entity.addComponent('Position', { x: 100 + i * 10, y: 100 + i * 10 });
-        entity.addComponent('ExplorationState', {
+        const entityImpl = entity as EntityImpl;
+
+        entityImpl.addComponent(createPositionComponent(100 + i * 10, 100 + i * 10));
+
+        const explorationState = createExplorationStateComponent({
           mode: 'frontier',
-          exploredSectors: new Set(),
           explorationRadius: 64,
         });
-        entity.addComponent('Steering', {
-          behavior: 'none',
-          maxSpeed: 2.0,
-          maxForce: 0.5,
-        });
+        entityImpl.addComponent(explorationState);
+
+        entityImpl.addComponent(createSteeringComponent('none', 2.0, 0.5));
       }
 
       const startTime = performance.now();
@@ -276,12 +302,20 @@ describe('ExplorationSystem', () => {
   describe('exploration coverage metrics', () => {
     it('should calculate exploration coverage percentage', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 100, y: 100 });
-      entity.addComponent('ExplorationState', {
+      const entityImpl = entity as EntityImpl;
+
+      entityImpl.addComponent(createPositionComponent(100, 100));
+
+      const explorationState = createExplorationStateComponent({
         mode: 'frontier',
-        exploredSectors: new Set(['5,5', '6,5', '5,6', '6,6']),
         explorationRadius: 64, // ~16 sectors in radius
       });
+      // Mark several sectors as explored
+      explorationState.markSectorExplored(5, 5, 0);
+      explorationState.markSectorExplored(6, 5, 0);
+      explorationState.markSectorExplored(5, 6, 0);
+      explorationState.markSectorExplored(6, 6, 0);
+      entityImpl.addComponent(explorationState);
 
       const coverage = system.calculateCoverage(entity);
 
@@ -291,12 +325,18 @@ describe('ExplorationSystem', () => {
 
     it('should emit event when coverage milestone reached', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 100, y: 100 });
-      entity.addComponent('ExplorationState', {
+      const entityImpl = entity as EntityImpl;
+
+      // Add agent component (required for milestone events)
+      entityImpl.addComponent(createAgentComponent());
+
+      entityImpl.addComponent(createPositionComponent(100, 100));
+
+      const explorationState = createExplorationStateComponent({
         mode: 'frontier',
-        exploredSectors: new Set(),
         explorationRadius: 64,
       });
+      entityImpl.addComponent(explorationState);
 
       // Initialize system with eventBus
       const eventBus = world.eventBus;
@@ -306,10 +346,12 @@ describe('ExplorationSystem', () => {
       eventBus.subscribe('exploration:milestone', (e: any) => events.push(e));
 
       // Explore enough to hit 90% coverage
-      const explorationState = entity.getComponent('ExplorationState');
-      for (let x = 0; x < 10; x++) {
-        for (let y = 0; y < 10; y++) {
-          explorationState.exploredSectors.add(`${x},${y}`);
+      const state = entityImpl.getComponent('exploration_state');
+      if (state) {
+        for (let x = 0; x < 10; x++) {
+          for (let y = 0; y < 10; y++) {
+            state.markSectorExplored(x, y, 900);
+          }
         }
       }
 

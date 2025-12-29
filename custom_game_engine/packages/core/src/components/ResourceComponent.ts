@@ -1,6 +1,6 @@
 import type { Component } from '../ecs/Component.js';
 
-export type ResourceType = 'food' | 'wood' | 'stone' | 'water' | 'fiber' | 'leaves';
+export type ResourceType = 'food' | 'wood' | 'stone' | 'water' | 'fiber' | 'leaves' | 'iron_ore' | 'coal' | 'copper_ore' | 'gold_ore';
 
 export interface ResourceComponent extends Component {
   type: 'resource';

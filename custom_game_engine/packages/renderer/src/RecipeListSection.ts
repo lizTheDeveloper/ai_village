@@ -1,6 +1,7 @@
-import type { World } from '@ai-village/core';
+import type { World, EntityId } from '@ai-village/core';
 import { globalRecipeRegistry } from '@ai-village/core';
 import type { Recipe } from '@ai-village/core';
+import type { UnlockQueryService } from '@ai-village/core';
 
 type ViewMode = 'grid' | 'list';
 type SortMode = 'name' | 'category' | 'recently_used' | 'craftable_first' | 'level_required';
@@ -25,9 +26,10 @@ export class RecipeListSection {
   public scrollOffset: number = 0;
   public gridColumns: number = 3;
 
-  private agentId: number | null = null;
+  private agentId: EntityId | null = null;
   private onRecipeSelectedCallback: ((recipeId: string) => void) | null = null;
   public selectedIndex: number = 0;
+  private unlockService: UnlockQueryService | null = null;
 
   constructor(_world: World, x: number, y: number, width: number, height: number) {
     if (width <= 0) {
@@ -40,8 +42,8 @@ export class RecipeListSection {
     this.bounds = { x, y, width, height };
   }
 
-  setAgentId(agentId: number): void {
-    if (agentId <= 0) {
+  setAgentId(agentId: EntityId): void {
+    if (!agentId) {
       throw new Error('Invalid agent ID');
     }
     this.agentId = agentId;
@@ -102,6 +104,28 @@ export class RecipeListSection {
     this.refresh();
   }
 
+  /**
+   * Set the unlock query service for checking research requirements.
+   * When set, recipes are filtered based on research state.
+   */
+  setUnlockService(service: UnlockQueryService | null): void {
+    this.unlockService = service;
+    this.refresh();
+  }
+
+  /**
+   * Check if a recipe is unlocked based on research requirements.
+   */
+  isRecipeUnlocked(recipe: Recipe): boolean {
+    // If no unlock service, treat all recipes as unlocked
+    if (!this.unlockService) {
+      return true;
+    }
+    // Check research requirements
+    const requirements = recipe.researchRequirements ?? [];
+    return this.unlockService.isRecipeUnlocked(requirements);
+  }
+
   selectRecipe(recipeId: string): void {
     this.selectedRecipeId = recipeId;
   }
@@ -133,8 +157,22 @@ export class RecipeListSection {
       recipes = recipes.filter(r => r.stationRequired === this.stationFilter);
     }
 
-    // Apply craftability filter (stub - would check inventory)
-    // For now, just return all recipes
+    // Apply craftability/unlock filter
+    switch (this.craftabilityFilter) {
+      case 'Locked':
+        // Show only locked recipes
+        recipes = recipes.filter(r => !this.isRecipeUnlocked(r));
+        break;
+      case 'Craftable':
+        // Only show unlocked recipes (for now - full impl would also check inventory)
+        recipes = recipes.filter(r => this.isRecipeUnlocked(r));
+        break;
+      case 'All':
+      case 'Missing One':
+      default:
+        // Show all recipes, but unlocked recipes could be marked differently in render
+        break;
+    }
 
     return recipes;
   }
@@ -328,29 +366,38 @@ export class RecipeListSection {
         return;
       }
 
-      // Draw background
-      ctx.fillStyle = recipe.id === this.selectedRecipeId ? '#444' : '#222';
+      const isUnlocked = this.isRecipeUnlocked(recipe);
+
+      // Draw background - darker for locked
+      ctx.fillStyle = !isUnlocked ? '#1a1a1a' :
+        recipe.id === this.selectedRecipeId ? '#444' : '#222';
       ctx.fillRect(x, y, cellWidth - 10, cellHeight - 10);
 
-      // Draw border
-      ctx.strokeStyle = recipe.id === this.hoveredRecipeId ? '#0af' : '#666';
+      // Draw border - gray for locked
+      ctx.strokeStyle = !isUnlocked ? '#333' :
+        recipe.id === this.hoveredRecipeId ? '#0af' : '#666';
       ctx.lineWidth = recipe.id === this.selectedRecipeId ? 2 : 1;
       ctx.strokeRect(x, y, cellWidth - 10, cellHeight - 10);
 
-      // Draw icon placeholder
-      ctx.fillStyle = '#555';
+      // Draw icon placeholder - dimmed for locked
+      ctx.fillStyle = isUnlocked ? '#555' : '#333';
       ctx.fillRect(x + (cellWidth - 74) / 2, y + 5, 64, 64);
 
-      // Draw name
-      ctx.fillStyle = '#fff';
+      // Draw name - dimmed for locked
+      ctx.fillStyle = isUnlocked ? '#fff' : '#666';
       ctx.font = '12px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(recipe.name, x + cellWidth / 2 - 5, y + 77);
 
-      // Draw status indicator (stub - would check craftability)
-      ctx.fillStyle = '#4CAF50'; // Green for available
+      // Draw status indicator
       ctx.font = '16px sans-serif';
-      ctx.fillText('✓', x + cellWidth - 20, y + 20);
+      if (isUnlocked) {
+        ctx.fillStyle = '#4CAF50'; // Green for available
+        ctx.fillText('✓', x + cellWidth - 20, y + 20);
+      } else {
+        ctx.fillStyle = '#888'; // Gray lock for locked
+        ctx.fillText('🔒', x + cellWidth - 20, y + 20);
+      }
     });
   }
 
@@ -367,30 +414,39 @@ export class RecipeListSection {
         return;
       }
 
-      // Draw background
-      ctx.fillStyle = recipe.id === this.selectedRecipeId ? '#444' : '#222';
+      const isUnlocked = this.isRecipeUnlocked(recipe);
+
+      // Draw background - darker for locked
+      ctx.fillStyle = !isUnlocked ? '#1a1a1a' :
+        recipe.id === this.selectedRecipeId ? '#444' : '#222';
       ctx.fillRect(x, y, itemWidth, itemHeight - 5);
 
-      // Draw border
-      ctx.strokeStyle = recipe.id === this.hoveredRecipeId ? '#0af' : '#666';
+      // Draw border - gray for locked
+      ctx.strokeStyle = !isUnlocked ? '#333' :
+        recipe.id === this.hoveredRecipeId ? '#0af' : '#666';
       ctx.lineWidth = recipe.id === this.selectedRecipeId ? 2 : 1;
       ctx.strokeRect(x, y, itemWidth, itemHeight - 5);
 
-      // Draw icon placeholder
-      ctx.fillStyle = '#555';
+      // Draw icon placeholder - dimmed for locked
+      ctx.fillStyle = isUnlocked ? '#555' : '#333';
       ctx.fillRect(x + 5, y + 3, 32, 32);
 
-      // Draw name
-      ctx.fillStyle = '#fff';
+      // Draw name - dimmed for locked
+      ctx.fillStyle = isUnlocked ? '#fff' : '#666';
       ctx.font = '14px sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText(recipe.name, x + 45, y + 22);
 
       // Draw status indicator
-      ctx.fillStyle = '#4CAF50';
       ctx.font = '16px sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText('✓', x + itemWidth - 10, y + 22);
+      if (isUnlocked) {
+        ctx.fillStyle = '#4CAF50';
+        ctx.fillText('✓', x + itemWidth - 10, y + 22);
+      } else {
+        ctx.fillStyle = '#888';
+        ctx.fillText('🔒', x + itemWidth - 10, y + 22);
+      }
     });
   }
 }

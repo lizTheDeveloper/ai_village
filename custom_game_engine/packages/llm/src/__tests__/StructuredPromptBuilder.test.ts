@@ -166,8 +166,8 @@ describe('StructuredPromptBuilder', () => {
       const entity = createMockEntity({
         memory: {
           memories: [
-            { type: 'agent_seen' },
-            { type: 'resource_found' }
+            { type: 'agent_seen', metadata: {} },
+            { type: 'resource_location', metadata: { resourceType: 'wood' } }
           ]
         }
       });
@@ -175,7 +175,8 @@ describe('StructuredPromptBuilder', () => {
       const prompt = builder.buildPrompt(entity, createMockWorld());
 
       expect(prompt).toContain('Recent Memories:');
-      expect(prompt).toContain('agent seen'); // Memory type is formatted with spaces
+      expect(prompt).toContain('You saw someone');
+      expect(prompt).toContain('You found wood');
     });
 
     it('should show empty area when nothing nearby', () => {
@@ -206,7 +207,7 @@ describe('StructuredPromptBuilder', () => {
       const entity = createMockEntity();
       const prompt = builder.buildPrompt(entity, createMockWorld());
 
-      expect(prompt).toMatch(/Your response:\s*$/);
+      expect(prompt).toMatch(/Your response \(JSON only\):\s*$/);
     });
   });
 
@@ -217,9 +218,15 @@ describe('StructuredPromptBuilder', () => {
       });
 
       const mockWorld = {
-        getEntity: (_id: string) => ({
-          getComponent: () => ({ resourceType: 'wood' })
-        })
+        getEntity: (_id: string) => {
+          const components = new Map([
+            ['resource', { resourceType: 'wood' }]
+          ]);
+          return {
+            components,
+            getComponent: (type: string) => components.get(type)
+          };
+        }
       };
 
       const prompt = builder.buildPrompt(entity, mockWorld);
@@ -234,9 +241,15 @@ describe('StructuredPromptBuilder', () => {
       });
 
       const mockWorld = {
-        getEntity: (_id: string) => ({
-          getComponent: () => ({ resourceType: 'stone' })
-        })
+        getEntity: (_id: string) => {
+          const components = new Map([
+            ['resource', { resourceType: 'stone' }]
+          ]);
+          return {
+            components,
+            getComponent: (type: string) => components.get(type)
+          };
+        }
       };
 
       const prompt = builder.buildPrompt(entity, mockWorld);
@@ -255,8 +268,12 @@ describe('StructuredPromptBuilder', () => {
         getEntity: (_id: string) => {
           callCount++;
           const types = ['wood', 'stone', 'food'];
+          const components = new Map([
+            ['resource', { resourceType: types[(callCount - 1) % 3] }]
+          ]);
           return {
-            getComponent: () => ({ resourceType: types[(callCount - 1) % 3] })
+            components,
+            getComponent: (type: string) => components.get(type)
           };
         }
       };

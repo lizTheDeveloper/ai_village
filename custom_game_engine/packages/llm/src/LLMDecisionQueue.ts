@@ -1,10 +1,12 @@
 import type { LLMProvider, LLMRequest } from './LLMProvider.js';
+import { promptLogger } from './PromptLogger.js';
 
 interface DecisionRequest {
   agentId: string;
   prompt: string;
   resolve: (response: string) => void;
   reject: (error: Error) => void;
+  startTime: number;
 }
 
 /**
@@ -30,7 +32,7 @@ export class LLMDecisionQueue {
    */
   requestDecision(agentId: string, prompt: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      this.queue.push({ agentId, prompt, resolve, reject });
+      this.queue.push({ agentId, prompt, resolve, reject, startTime: Date.now() });
       this.processQueue();
     });
   }
@@ -82,6 +84,36 @@ export class LLMDecisionQueue {
       };
 
       const response = await this.provider.generate(llmRequest);
+      const durationMs = Date.now() - request.startTime;
+
+      // Log the prompt/response pair for analysis
+      let parsedAction: unknown = undefined;
+      let thinking: string | undefined;
+      let speaking: string | undefined;
+
+      try {
+        const parsed = JSON.parse(response.text);
+        parsedAction = parsed.action;
+        thinking = parsed.thinking;
+        speaking = parsed.speaking;
+      } catch {
+        // Not JSON, that's fine
+      }
+
+      // Extract agent name from prompt if available
+      const nameMatch = request.prompt.match(/You are (\w+),/);
+      const agentName = nameMatch ? nameMatch[1] : undefined;
+
+      promptLogger.log({
+        agentId: request.agentId,
+        agentName,
+        prompt: request.prompt,
+        response: response.text,
+        parsedAction,
+        thinking,
+        speaking,
+        durationMs,
+      });
 
       // Store raw response for synchronous retrieval
       this.decisions.set(request.agentId, response.text);

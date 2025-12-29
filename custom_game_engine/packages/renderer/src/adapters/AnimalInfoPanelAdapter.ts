@@ -7,6 +7,7 @@ import { AnimalInfoPanel } from '../AnimalInfoPanel.js';
 export class AnimalInfoPanelAdapter implements IWindowPanel {
   private panel: AnimalInfoPanel;
   private visible: boolean = false;
+  private world: any = null;
 
   constructor(panel: AnimalInfoPanel) {
     if (!panel) {
@@ -42,8 +43,8 @@ export class AnimalInfoPanelAdapter implements IWindowPanel {
 
   render(
     ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
+    _x: number,
+    _y: number,
     width: number,
     height: number,
     world?: any
@@ -52,13 +53,37 @@ export class AnimalInfoPanelAdapter implements IWindowPanel {
       return;
     }
 
-    ctx.save();
-    ctx.translate(x, y);
+    // Store world reference for click handling
+    this.world = world;
 
-    // Call original render with world parameter
-    this.panel.render(ctx, width, height, world);
+    // Use renderAt which renders at (0,0) without background/border/close button
+    // WindowManager handles positioning via translate before calling render
+    this.panel.renderAt(ctx, 0, 0, width, height, world);
+  }
 
-    ctx.restore();
+  /**
+   * Handle clicks on the panel content area.
+   * Forwards to the AnimalInfoPanel's button handling.
+   */
+  handleContentClick(x: number, y: number, width: number, height: number): boolean {
+    // Need world for handleClickAt, but we don't have it here
+    // Store world reference for click handling
+    return this.panel.handleClickAt(x, y, width, height, this.world);
+  }
+
+  /**
+   * Handle scroll events for the panel.
+   */
+  handleScroll(deltaY: number, _contentHeight: number): boolean {
+    this.panel.handleScroll(deltaY);
+    return true;
+  }
+
+  /**
+   * Set the world reference for click handling.
+   */
+  setWorld(world: any): void {
+    this.world = world;
   }
 
   /**

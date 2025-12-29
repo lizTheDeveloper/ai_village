@@ -7,12 +7,33 @@ import { AgentInfoPanel } from '../AgentInfoPanel.js';
 export class AgentInfoPanelAdapter implements IWindowPanel {
   private panel: AgentInfoPanel;
   private visible: boolean = false;
+  private world: any = null;
+  // Track the actual window screen position for HTML overlay elements
+  private screenX: number = 0;
+  private screenY: number = 0;
 
   constructor(panel: AgentInfoPanel) {
     if (!panel) {
       throw new Error('AgentInfoPanel cannot be null or undefined');
     }
     this.panel = panel;
+  }
+
+  /**
+   * Update the screen position of the window (called by WindowManager before render).
+   * This is needed for HTML overlay elements like the LLM context textarea.
+   */
+  setScreenPosition(x: number, y: number): void {
+    this.screenX = x;
+    this.screenY = y;
+  }
+
+  /**
+   * Set the world reference for rendering.
+   * Must be called before render() will display content.
+   */
+  setWorld(world: any): void {
+    this.world = world;
   }
 
   getId(): string {
@@ -28,7 +49,7 @@ export class AgentInfoPanelAdapter implements IWindowPanel {
   }
 
   getDefaultHeight(): number {
-    return 500;
+    return 530;
   }
 
   isVisible(): boolean {
@@ -42,25 +63,42 @@ export class AgentInfoPanelAdapter implements IWindowPanel {
 
   render(
     ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
+    _x: number,
+    _y: number,
     width: number,
     height: number,
     world?: any
   ): void {
-    if (!this.isVisible() || !world) {
+    // Use provided world or fall back to stored world
+    const worldToUse = world || this.world;
+
+    if (!this.isVisible() || !worldToUse) {
       return;
     }
 
-    // AgentInfoPanel renders at its own position, so we need to translate context
-    ctx.save();
-    ctx.translate(x, y);
+    // WindowManager handles positioning via translate
+    // Panel renders at (0, 0) relative to content area
+    // Pass screen position for HTML overlay elements (like textarea)
+    this.panel.renderAt(ctx, 0, 0, width, height, worldToUse, this.screenX, this.screenY);
+  }
 
-    // Call original render with world parameter
-    // Note: AgentInfoPanel expects canvasWidth/canvasHeight, not x/y position
-    this.panel.render(ctx, width, height, world);
+  /**
+   * Handle clicks on the panel content area.
+   * Forwards to the AgentInfoPanel's tab handling.
+   */
+  handleContentClick(x: number, y: number, width: number, _height: number): boolean {
+    // The panel's handleClick expects absolute panel coordinates
+    // Since WindowManager translates for us, we pass (0,0) as the panel origin
+    // Pass width so tab hit detection uses actual window dimensions
+    return this.panel.handleClick(x, y, 0, 0, width);
+  }
 
-    ctx.restore();
+  /**
+   * Handle scroll events for the inventory tab.
+   */
+  handleScroll(deltaY: number, _contentHeight: number): boolean {
+    this.panel.handleScroll(deltaY);
+    return true;
   }
 
   /**

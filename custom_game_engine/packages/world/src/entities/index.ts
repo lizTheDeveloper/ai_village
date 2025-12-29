@@ -8,3 +8,4 @@ export * from './LeafPileEntity.js';
 export * from './FiberPlantEntity.js';
 export * from './BerryBushEntity.js';
 export * from './AgentEntity.js';
+export * from './OreDepositEntity.js';

@@ -33,7 +33,9 @@ export { RingBuffer } from './metrics/RingBuffer.js';
 export { MetricsAPI } from './metrics/api/MetricsAPI.js';
 export { MetricsLiveStream } from './metrics/api/MetricsLiveStream.js';
 // Browser-compatible streaming client
-export { MetricsStreamClient, type MetricsStreamConfig, type ConnectionState, type StreamStats } from './metrics/MetricsStreamClient.js';
+export { MetricsStreamClient, type MetricsStreamConfig, type ConnectionState, type StreamStats, type QueryRequest, type QueryResponse, type QueryHandler } from './metrics/MetricsStreamClient.js';
+// Live Entity API for dashboard queries
+export { LiveEntityAPI, type PromptBuilder, type EntitySummary, type EntityDetails } from './metrics/LiveEntityAPI.js';
 // Analyzers
 export {
   NetworkAnalyzer,
@@ -81,6 +83,16 @@ export {
   loadItemsFromJson,
   loadItemsFromJsonString,
   type RawItemData,
+  // Quality system (Phase 10)
+  type ItemQuality,
+  getQualityTier,
+  getQualityColor,
+  getQualityDisplayName,
+  calculateCraftingQuality,
+  calculateHarvestQuality,
+  calculateGatheringQuality,
+  getQualityPriceMultiplier,
+  DEFAULT_QUALITY,
 } from './items/index.js';
 
 // Animal behaviors

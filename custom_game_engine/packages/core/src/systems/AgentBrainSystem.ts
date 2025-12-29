@@ -49,7 +49,11 @@ import {
   attendMeetingBehavior,
   farmBehavior,
   tillBehavior,
+  plantBehavior,
+  waterBehavior,
   buildBehavior,
+  craftBehavior,
+  tradeBehavior,
   seekWarmthBehavior,
   navigateBehavior,
   exploreFrontierBehavior,
@@ -123,9 +127,17 @@ export class AgentBrainSystem implements System {
     // Farm behaviors
     this.behaviors.register('farm', farmBehavior, { description: 'Farm action state' });
     this.behaviors.register('till', tillBehavior, { description: 'Till soil for farming' });
+    this.behaviors.register('plant', plantBehavior, { description: 'Plant seeds in tilled soil' });
+    this.behaviors.register('water', waterBehavior, { description: 'Water dry plants' });
 
     // Build behaviors
     this.behaviors.register('build', buildBehavior, { description: 'Construct a building' });
+
+    // Crafting behaviors
+    this.behaviors.register('craft', craftBehavior, { description: 'Craft items at stations' });
+
+    // Trade behaviors
+    this.behaviors.register('trade', tradeBehavior, { description: 'Buy or sell items at shops' });
 
     // Survival behaviors
     this.behaviors.register('seek_warmth', seekWarmthBehavior, { description: 'Find heat source' });
@@ -143,6 +155,8 @@ export class AgentBrainSystem implements System {
     this.behaviors.register('pick', gatherBehavior, { description: 'Alias for gather' });
     this.behaviors.register('harvest', gatherBehavior, { description: 'Alias for gather' });
     this.behaviors.register('gather_seeds', gatherBehavior, { description: 'Alias for gather' });
+    this.behaviors.register('explore', exploreFrontierBehavior, { description: 'Alias for explore_frontier' });
+    this.behaviors.register('rest', idleBehavior, { description: 'Alias for idle (rest is recovery-focused idle)' });
   }
 
   /**
@@ -229,6 +243,9 @@ export class AgentBrainSystem implements System {
       const currentPriority = getBehaviorPriority(agent.behavior);
 
       if (autonomicResult.priority > currentPriority) {
+        const fromBehavior = agent.behavior;
+        const toBehavior = autonomicResult.behavior;
+
         // Handle queue interruption
         if (hasBehaviorQueue(agent) && !agent.queuePaused) {
           world.eventBus.emit({
@@ -254,6 +271,20 @@ export class AgentBrainSystem implements System {
             behavior: autonomicResult.behavior,
             behaviorState: {},
           }));
+        }
+
+        // Emit behavior:change event for metrics
+        if (fromBehavior !== toBehavior) {
+          world.eventBus.emit({
+            type: 'behavior:change',
+            source: entity.id,
+            data: {
+              agentId: entity.id,
+              from: fromBehavior,
+              to: toBehavior,
+              reason: 'autonomic',
+            },
+          });
         }
 
         return { behavior: autonomicResult.behavior, execute: true };
@@ -295,11 +326,28 @@ export class AgentBrainSystem implements System {
     );
 
     if (decisionResult.changed && decisionResult.behavior) {
+      const fromBehavior = agent.behavior;
+      const toBehavior = decisionResult.behavior;
+
       entity.updateComponent<AgentComponent>('agent', (current) => ({
         ...current,
         behavior: decisionResult.behavior!,
         behaviorState: decisionResult.behaviorState ?? {},
       }));
+
+      // Emit behavior:change event for metrics
+      if (fromBehavior !== toBehavior) {
+        world.eventBus.emit({
+          type: 'behavior:change',
+          source: entity.id,
+          data: {
+            agentId: entity.id,
+            from: fromBehavior,
+            to: toBehavior,
+            reason: 'decision',
+          },
+        });
+      }
 
       return { behavior: decisionResult.behavior, execute: true };
     }
@@ -362,22 +410,55 @@ export class AgentBrainSystem implements System {
       // Get next behavior and update agent state in a single update
       const nextQueued = getCurrentQueuedBehavior(updatedAgent);
       if (nextQueued) {
+        const fromBehavior = agent.behavior;
+        const toBehavior = nextQueued.behavior;
+
         entity.updateComponent<AgentComponent>('agent', () => ({
           ...updatedAgent,
           behavior: nextQueued.behavior,
           behaviorState: nextQueued.behaviorState ?? {},
         }));
+
+        // Emit behavior:change event for metrics
+        if (fromBehavior !== toBehavior) {
+          world.eventBus.emit({
+            type: 'behavior:change',
+            source: entity.id,
+            data: {
+              agentId: entity.id,
+              from: fromBehavior,
+              to: toBehavior,
+              reason: 'queue_advance',
+            },
+          });
+        }
+
         return { behavior: nextQueued.behavior, execute: true };
       }
     }
 
     // Ensure agent is executing the current queued behavior
     if (agent.behavior !== currentQueued.behavior) {
+      const fromBehavior = agent.behavior;
+      const toBehavior = currentQueued.behavior;
+
       entity.updateComponent<AgentComponent>('agent', (current) => ({
         ...current,
         behavior: currentQueued.behavior,
         behaviorState: currentQueued.behaviorState ?? {},
       }));
+
+      // Emit behavior:change event for metrics
+      world.eventBus.emit({
+        type: 'behavior:change',
+        source: entity.id,
+        data: {
+          agentId: entity.id,
+          from: fromBehavior,
+          to: toBehavior,
+          reason: 'queue_sync',
+        },
+      });
     }
 
     // Continue current queued behavior

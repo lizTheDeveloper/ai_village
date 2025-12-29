@@ -14,7 +14,6 @@ import type { Tick } from '../types.js';
  * ```typescript
  * // Typed subscription - event.data is inferred
  * eventBus.subscribe<'agent:action:started'>('agent:action:started', (event) => {
- *   console.log(event.data.actionId); // TypeScript knows this exists!
  * });
  *
  * // Typed emission - data structure is validated

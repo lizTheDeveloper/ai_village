@@ -1,11 +1,13 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
+import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
-import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
-import { JournalComponent } from '../components/JournalComponent.js';
+import type { EventData } from '../events/EventMap.js';
+import type { EpisodicMemory, EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
+import type { JournalComponent } from '../components/JournalComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
+import type { PersonalityComponent } from '../components/PersonalityComponent.js';
 
 /**
  * JournalingSystem handles personality-driven journaling behavior
@@ -25,9 +27,9 @@ export class JournalingSystem implements System {
 
   private _setupEventListeners(): void {
     this.eventBus.subscribe('agent:idle', (event) => {
-      const data = event.data as any;
+      const data = event.data as EventData<'agent:idle'>;
       if (data.agentId) {
-        this.idleAgents.add(data.agentId as string);
+        this.idleAgents.add(data.agentId);
       }
     });
 
@@ -45,10 +47,11 @@ export class JournalingSystem implements System {
         throw new Error(`Agent ${agentId} not found (idle trigger)`);
       }
 
-      const agentComp = (entity as any).getComponent?.('agent') as AgentComponent | undefined;
-      const personality = (entity as any).getComponent?.('personality');
-      const episodicMem = (entity as any).getComponent?.('episodic_memory') as EpisodicMemoryComponent | undefined;
-      const journalComp = (entity as any).getComponent?.('journal') as JournalComponent | undefined;
+      const entityImpl = entity as EntityImpl;
+      const agentComp = entityImpl.getComponent<AgentComponent>('agent');
+      const personality = entityImpl.getComponent<PersonalityComponent>('personality');
+      const episodicMem = entityImpl.getComponent<EpisodicMemoryComponent>('episodic_memory');
+      const journalComp = entityImpl.getComponent<JournalComponent>('journal');
 
       if (!agentComp) {
         throw new Error(`Agent ${agentId} missing AgentComponent`);
@@ -70,7 +73,7 @@ export class JournalingSystem implements System {
     this.eventBus.flush();
   }
 
-  private _shouldJournal(personality: any): boolean {
+  private _shouldJournal(personality: PersonalityComponent | undefined): boolean {
     // If no personality component, use default probability
     if (!personality) return Math.random() < 0.1;
 
@@ -136,7 +139,7 @@ export class JournalingSystem implements System {
     });
   }
 
-  private _generateJournalText(memories: any[]): string {
+  private _generateJournalText(memories: EpisodicMemory[]): string {
     const entries: string[] = [];
 
     for (const memory of memories) {
@@ -153,19 +156,15 @@ export class JournalingSystem implements System {
     return entries.join(' ');
   }
 
-  private _extractTopics(memories: any[]): string[] {
+  private _extractTopics(memories: EpisodicMemory[]): string[] {
     const topics = new Set<string>();
 
     for (const memory of memories) {
       // Extract from event type
-      const eventType = memory.eventType.split(':')[0];
-      topics.add(eventType);
-
-      // Extract from tags if present
-      if (memory.tags) {
-        for (const tag of memory.tags) {
-          topics.add(tag);
-        }
+      const eventTypeParts = memory.eventType.split(':');
+      const mainTopic = eventTypeParts[0];
+      if (mainTopic) {
+        topics.add(mainTopic);
       }
     }
 

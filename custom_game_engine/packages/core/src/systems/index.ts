@@ -33,3 +33,21 @@ export * from './VerificationSystem.js';
 export * from './SocialGradientSystem.js';
 export * from './BeliefFormationSystem.js';
 export * from './SpatialMemoryQuerySystem.js';
+// Metrics & Analytics
+export * from './MetricsCollectionSystem.js';
+// Governance & Information Infrastructure
+export * from './GovernanceDataSystem.js';
+// Economy & Trading
+export * from './TradingSystem.js';
+export * from './MarketEventSystem.js';
+// Phase 13: Research & Discovery
+export * from './ResearchSystem.js';
+// Mood System
+export * from './MoodSystem.js';
+// Cooking System
+export * from './CookingSystem.js';
+// Skills System
+export * from './SkillSystem.js';
+// Idle Behaviors & Personal Goals
+export * from './IdleBehaviorSystem.js';
+export * from './GoalGenerationSystem.js';

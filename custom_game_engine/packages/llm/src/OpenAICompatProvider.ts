@@ -87,103 +87,147 @@ export class OpenAICompatProvider implements LLMProvider {
       // const _isQwen = this.isQwenModel();
       // const _isLlama = this.isLlamaModel();
 
-      // Define action tools - OpenAI function calling format
-      // Actions have no parameters - speech comes from message content
+      // Define action tools - matches ActionDefinitions.ts
+      // NOTE: Autonomic behaviors (wander, rest, idle) are NOT included
       const tools = [
         {
           type: 'function',
           function: {
-            name: 'wander',
-            description: 'Explore the area, move around randomly',
-            parameters: { type: 'object', properties: {}, required: [] }
-          }
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'idle',
-            description: 'Do nothing, rest and recover energy',
-            parameters: { type: 'object', properties: {}, required: [] }
-          }
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'seek_food',
-            description: 'Find and eat food to satisfy hunger',
-            parameters: { type: 'object', properties: {}, required: [] }
-          }
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'follow_agent',
-            description: 'Follow another agent you see nearby',
-            parameters: { type: 'object', properties: {}, required: [] }
-          }
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'talk',
-            description: 'Start a conversation with a nearby agent',
-            parameters: { type: 'object', properties: {}, required: [] }
+            name: 'pick',
+            description: 'Pick up a single item nearby',
+            parameters: {
+              type: 'object',
+              properties: {
+                target: { type: 'string', description: 'What to pick: wood, stone, berry, etc.' }
+              },
+              required: ['target']
+            }
           }
         },
         {
           type: 'function',
           function: {
             name: 'gather',
-            description: 'Gather resources from the environment (forage, collect items)',
-            parameters: { type: 'object', properties: {}, required: [] }
+            description: 'Stockpile resources - gather a specified amount and store in chest',
+            parameters: {
+              type: 'object',
+              properties: {
+                target: { type: 'string', description: 'Resource type: wood, stone, berry, etc.' },
+                amount: { type: 'number', description: 'How many to gather (e.g. 20)' }
+              },
+              required: ['target']
+            }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'build',
+            description: 'Construct a building',
+            parameters: {
+              type: 'object',
+              properties: {
+                building: { type: 'string', description: 'Building type: campfire, tent, storage-chest, workbench, bed, etc.' }
+              },
+              required: ['building']
+            }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'talk',
+            description: 'Have a conversation with someone nearby',
+            parameters: {
+              type: 'object',
+              properties: {
+                target: { type: 'string', description: 'Name of agent to talk to, or "nearest"' }
+              },
+              required: []
+            }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'follow_agent',
+            description: 'Follow another agent',
+            parameters: {
+              type: 'object',
+              properties: {
+                target: { type: 'string', description: 'Name of agent to follow' }
+              },
+              required: []
+            }
           }
         },
         {
           type: 'function',
           function: {
             name: 'explore',
-            description: 'Explore with purpose, looking for something specific',
+            description: 'Explore unknown areas to find new resources',
             parameters: { type: 'object', properties: {}, required: [] }
           }
         },
         {
           type: 'function',
           function: {
-            name: 'approach',
-            description: 'Move toward a nearby agent or location',
+            name: 'till',
+            description: 'Prepare soil for planting',
             parameters: { type: 'object', properties: {}, required: [] }
           }
         },
         {
           type: 'function',
           function: {
-            name: 'observe',
-            description: 'Watch and pay attention to surroundings or someone nearby',
+            name: 'plant',
+            description: 'Plant seeds in tilled soil',
+            parameters: {
+              type: 'object',
+              properties: {
+                seed: { type: 'string', description: 'Seed type to plant: wheat, carrot, etc.' }
+              },
+              required: ['seed']
+            }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'deposit_items',
+            description: 'Store items in a storage building',
             parameters: { type: 'object', properties: {}, required: [] }
           }
         },
         {
           type: 'function',
           function: {
-            name: 'rest',
-            description: 'Sit down and rest to recover energy',
-            parameters: { type: 'object', properties: {}, required: [] }
+            name: 'call_meeting',
+            description: 'Call a meeting to discuss something with the village',
+            parameters: {
+              type: 'object',
+              properties: {
+                topic: { type: 'string', description: 'What to discuss' }
+              },
+              required: []
+            }
           }
         },
         {
           type: 'function',
           function: {
-            name: 'work',
-            description: 'Do productive work (farm, craft, build)',
-            parameters: { type: 'object', properties: {}, required: [] }
-          }
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'help',
-            description: 'Help a nearby agent with their task',
-            parameters: { type: 'object', properties: {}, required: [] }
+            name: 'set_priorities',
+            description: 'Set task priorities for what to focus on',
+            parameters: {
+              type: 'object',
+              properties: {
+                gathering: { type: 'number', description: 'Priority 0-100' },
+                building: { type: 'number', description: 'Priority 0-100' },
+                farming: { type: 'number', description: 'Priority 0-100' },
+                social: { type: 'number', description: 'Priority 0-100' }
+              },
+              required: []
+            }
           }
         }
       ];
@@ -198,19 +242,39 @@ export class OpenAICompatProvider implements LLMProvider {
       }
 
       // System message to instruct the model on response format
+      // Adjust thinking instructions based on model type
+      const isQwen = this.model.toLowerCase().includes('qwen');
+      const isLlama = this.model.toLowerCase().includes('llama');
+      const isDeepseek = this.model.toLowerCase().includes('deepseek');
+
+      let thinkingInstructions: string;
+      if (isQwen) {
+        // Qwen3 uses <think> tags for reasoning
+        thinkingInstructions = `First, reason about what to do inside <think>...</think> tags. This is your internal thought process - take your time to consider the situation.`;
+      } else if (isDeepseek) {
+        // DeepSeek also supports thinking tags
+        thinkingInstructions = `Use <think>...</think> tags to reason through what you should do before acting.`;
+      } else if (isLlama) {
+        // Llama models - just ask for brief reasoning
+        thinkingInstructions = `Briefly consider what you should do based on the situation.`;
+      } else {
+        // Default - simple reasoning request
+        thinkingInstructions = `Think briefly about what action makes sense.`;
+      }
+
       const systemMessage = {
         role: 'system',
-        content: `You are an AI controlling a village character. When responding:
+        content: `You are an AI controlling a village character.
 
-1. THINK first: Briefly reason about what you observe and what you should do (this is your internal thought)
-2. SPEAK: Say something out loud that your character would say (a short phrase or sentence)
-3. ACT: Call one of the action tools to perform your chosen action
+${thinkingInstructions}
 
-IMPORTANT: Your spoken words should be written directly in the message content - just write what the character says, nothing else. Do NOT prefix with "Content:" or any other labels.
+Then respond with:
+1. What you SAY out loud (a short phrase, or nothing if silent)
+2. Call a tool to perform your ACTION
 
-Example response:
-- Message content: "Time to gather some wood!" (what you say - just the words, no labels)
-- Tool call: gather (your action)
+Your spoken words go directly in the message content - just the words, no labels.
+
+Example: "Time to gather wood!" + call gather(target: "wood", amount: 10)
 
 Keep speech brief and natural.`
       };
@@ -253,8 +317,29 @@ Keep speech brief and natural.`
       const content = message.content || '';
       const toolCalls = message.tool_calls || [];
 
-      // Extract action from tool call
-      const action = toolCalls.length > 0 ? toolCalls[0].function.name : '';
+      // Extract action from tool call - include arguments
+      let action: string | { type: string; [key: string]: unknown } = '';
+      if (toolCalls.length > 0) {
+        const toolCall = toolCalls[0];
+        const actionName = toolCall.function.name;
+        let actionArgs: Record<string, unknown> = {};
+
+        // Parse arguments if present
+        try {
+          if (toolCall.function.arguments) {
+            actionArgs = JSON.parse(toolCall.function.arguments);
+          }
+        } catch {
+          // Arguments parsing failed, use empty object
+        }
+
+        // If there are arguments, create action object with type and params
+        if (Object.keys(actionArgs).length > 0) {
+          action = { type: actionName, ...actionArgs };
+        } else {
+          action = actionName;
+        }
+      }
 
       // Extract thinking - different models use different formats
       // Qwen3: uses message.reasoning field
@@ -301,9 +386,8 @@ Keep speech brief and natural.`
       // });
 
       // If no action was called, fall back to text parsing
-      if (!action) {
-        // console.log('[OpenAICompatProvider] No tool call, using text fallback');
-
+      const hasAction = action && (typeof action === 'string' ? action.length > 0 : true);
+      if (!hasAction) {
         if (!content) {
           console.error('[OpenAICompatProvider] Empty response:', data);
         }
@@ -336,8 +420,6 @@ Keep speech brief and natural.`
    * Fallback generation without tool calling (text-based action extraction)
    */
   private async generateWithoutTools(request: LLMRequest): Promise<LLMResponse> {
-    console.log('[OpenAICompatProvider] Using text-based fallback...');
-
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
@@ -347,19 +429,30 @@ Keep speech brief and natural.`
     }
 
     // System message for text-based responses
+    // Model-specific thinking format
+    const isQwen = this.model.toLowerCase().includes('qwen');
+    const isDeepseek = this.model.toLowerCase().includes('deepseek');
+
+    let thoughtFormat: string;
+    if (isQwen || isDeepseek) {
+      thoughtFormat = `<think>[your reasoning]</think>`;
+    } else {
+      thoughtFormat = `Thought: [your reasoning]`;
+    }
+
     const systemMessage = {
       role: 'system',
-      content: `You are an AI controlling a village character. Respond with your thought, what you say, and what action you take.
+      content: `You are an AI controlling a village character.
 
 Format your response like this:
-Thought: [your internal reasoning]
+${thoughtFormat}
 Speech: [what you say out loud, or "..." if silent]
-Action: [choose ONE: wander, idle, seek_food, follow_agent, talk, gather, explore, approach, observe, rest, work, help, build, deposit_items, seek_warmth, seek_sleep]
+Action: [choose ONE: pick, gather, build, talk, follow_agent, explore, till, plant, deposit_items, call_meeting, set_priorities]
+
+Actions can have targets: "gather wood 20" or "build storage-chest" or "talk Haven"
 
 Be brief and natural.`
     };
-
-    console.log('[OpenAICompatProvider] Making text-based request...');
     const response = await fetch(`${this.baseUrl}/chat/completions`, {
       method: 'POST',
       headers,
@@ -379,20 +472,38 @@ Be brief and natural.`
       console.error('[OpenAICompatProvider] Text-based request failed:', response.status, errorText);
       throw new Error(`API error: ${response.status} ${response.statusText} - ${errorText}`);
     }
-
-    console.log('[OpenAICompatProvider] Text-based request succeeded, parsing...');
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || '';
-    console.log('[OpenAICompatProvider] Raw content:', content);
 
     // Parse the structured text response
-    const thoughtMatch = content.match(/Thought:\s*(.+?)(?=\n|Speech:|Action:|$)/is);
-    const speechMatch = content.match(/Speech:\s*(.+?)(?=\n|Action:|$)/is);
-    const actionMatch = content.match(/Action:\s*(\w+)/i);
+    // Support both <think> tags (Qwen/DeepSeek) and "Thought:" prefix
+    let thinking = '';
+    let contentAfterThink = content;
 
-    const thinking = thoughtMatch ? thoughtMatch[1].trim() : '';
+    const thinkTagMatch = content.match(/<think>([\s\S]*?)<\/think>/);
+    if (thinkTagMatch) {
+      thinking = thinkTagMatch[1].trim();
+      contentAfterThink = content.replace(/<think>[\s\S]*?<\/think>/, '').trim();
+    } else {
+      const thoughtMatch = content.match(/Thought:\s*(.+?)(?=\n|Speech:|Action:|$)/is);
+      if (thoughtMatch) {
+        thinking = thoughtMatch[1].trim();
+      }
+    }
+
+    const speechMatch = contentAfterThink.match(/Speech:\s*(.+?)(?=\n|Action:|$)/is);
+    const actionMatch = contentAfterThink.match(/Action:\s*(.+?)(?=\n|$)/i);
+
     const speech = speechMatch ? speechMatch[1].trim().replace(/^["']|["']$/g, '') : '';
-    const action = actionMatch ? actionMatch[1].toLowerCase().trim() : 'idle';
+
+    // Parse action - may include target like "gather wood 20"
+    let action = 'gather'; // Default to gather, not idle (idle is autonomic)
+    if (actionMatch) {
+      const actionStr = actionMatch[1].trim().toLowerCase();
+      // Extract first word as action type
+      const parts = actionStr.split(/\s+/);
+      action = parts[0] || 'gather';
+    }
 
     // Format as JSON for the parser
     const responseText = JSON.stringify({
@@ -401,11 +512,6 @@ Be brief and natural.`
       action: action
     });
 
-    console.log('[OpenAICompatProvider] Text-based response:', {
-      action,
-      speech: speech.slice(0, 40),
-      thinking: thinking.slice(0, 40)
-    });
 
     return {
       text: responseText,

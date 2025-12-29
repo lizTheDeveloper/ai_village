@@ -196,7 +196,7 @@ export function initializeDefaultRecipes(registry: RecipeRegistry = globalRecipe
     researchRequirements: []
   });
 
-  // Food (hand-craftable)
+  // Food (oven - baking specialization)
   registry.registerRecipe({
     id: 'bread',
     name: 'Bread',
@@ -208,7 +208,7 @@ export function initializeDefaultRecipes(registry: RecipeRegistry = globalRecipe
     output: { itemId: 'bread', quantity: 1 },
     craftingTime: 10,
     xpGain: 5,
-    stationRequired: null,
+    stationRequired: 'oven',
     skillRequirements: [],
     researchRequirements: []
   });
@@ -283,6 +283,7 @@ export function initializeDefaultRecipes(registry: RecipeRegistry = globalRecipe
     researchRequirements: []
   });
 
+  // Stew (cauldron - stewing specialization)
   registry.registerRecipe({
     id: 'stew',
     name: 'Vegetable Stew',
@@ -296,8 +297,299 @@ export function initializeDefaultRecipes(registry: RecipeRegistry = globalRecipe
     output: { itemId: 'stew', quantity: 1 },
     craftingTime: 12,
     xpGain: 8,
-    stationRequired: 'oven',
+    stationRequired: 'cauldron',
     skillRequirements: [],
     researchRequirements: []
+  });
+
+  // Cooked meat (campfire - grilling specialization)
+  registry.registerRecipe({
+    id: 'cooked_meat',
+    name: 'Cooked Meat',
+    category: 'Food',
+    description: 'Freshly grilled meat.',
+    ingredients: [
+      { itemId: 'raw_meat', quantity: 1 }
+    ],
+    output: { itemId: 'cooked_meat', quantity: 1 },
+    craftingTime: 8,
+    xpGain: 5,
+    stationRequired: 'campfire',
+    skillRequirements: [],
+    researchRequirements: []
+  });
+
+  // === Farming Tools ===
+  registry.registerRecipe({
+    id: 'stone_hoe',
+    name: 'Stone Hoe',
+    category: 'Tools',
+    description: 'A basic hoe for tilling soil.',
+    ingredients: [
+      { itemId: 'wood', quantity: 2 },
+      { itemId: 'stone', quantity: 2 }
+    ],
+    output: { itemId: 'stone_hoe', quantity: 1 },
+    craftingTime: 4,
+    xpGain: 8,
+    stationRequired: null,
+    skillRequirements: [],
+    researchRequirements: ['agriculture_i']
+  });
+
+  // === Materials ===
+  registry.registerRecipe({
+    id: 'cloth',
+    name: 'Cloth',
+    category: 'Materials',
+    description: 'Woven cloth from plant fibers.',
+    ingredients: [
+      { itemId: 'fiber', quantity: 3 }
+    ],
+    output: { itemId: 'cloth', quantity: 1 },
+    craftingTime: 8,
+    xpGain: 5,
+    stationRequired: 'loom',
+    skillRequirements: [],
+    researchRequirements: ['textiles_i']
+  });
+
+  registry.registerRecipe({
+    id: 'rope',
+    name: 'Rope',
+    category: 'Materials',
+    description: 'Sturdy rope braided from fibers.',
+    ingredients: [
+      { itemId: 'fiber', quantity: 5 }
+    ],
+    output: { itemId: 'rope', quantity: 1 },
+    craftingTime: 5,
+    xpGain: 5,
+    stationRequired: null,
+    skillRequirements: [],
+    researchRequirements: ['crafting_i']
+  });
+
+  registry.registerRecipe({
+    id: 'fertilizer',
+    name: 'Fertilizer',
+    category: 'Materials',
+    description: 'Nutrient-rich compost for crops.',
+    ingredients: [
+      { itemId: 'fiber', quantity: 5 },
+      { itemId: 'leaves', quantity: 5 }
+    ],
+    output: { itemId: 'fertilizer', quantity: 2 },
+    craftingTime: 10,
+    xpGain: 8,
+    stationRequired: null,
+    skillRequirements: [],
+    researchRequirements: ['agriculture_ii']
+  });
+
+  // === Preserved Food ===
+  registry.registerRecipe({
+    id: 'dried_meat',
+    name: 'Dried Meat',
+    category: 'Food',
+    description: 'Preserved meat that lasts longer.',
+    ingredients: [
+      { itemId: 'raw_meat', quantity: 2 }
+    ],
+    output: { itemId: 'dried_meat', quantity: 1 },
+    craftingTime: 15,
+    xpGain: 10,
+    stationRequired: 'campfire',
+    skillRequirements: [],
+    researchRequirements: ['cuisine_i']
+  });
+
+  // === Clothing ===
+  registry.registerRecipe({
+    id: 'simple_clothing',
+    name: 'Simple Clothing',
+    category: 'Decorations',
+    description: 'Basic woven garments.',
+    ingredients: [
+      { itemId: 'cloth', quantity: 3 }
+    ],
+    output: { itemId: 'simple_clothing', quantity: 1 },
+    craftingTime: 12,
+    xpGain: 10,
+    stationRequired: 'loom',
+    skillRequirements: [],
+    researchRequirements: ['textiles_i']
+  });
+
+  registry.registerRecipe({
+    id: 'fine_clothing',
+    name: 'Fine Clothing',
+    category: 'Decorations',
+    description: 'Well-crafted garments.',
+    ingredients: [
+      { itemId: 'cloth', quantity: 5 },
+      { itemId: 'fiber', quantity: 2 }
+    ],
+    output: { itemId: 'fine_clothing', quantity: 1 },
+    craftingTime: 20,
+    xpGain: 20,
+    stationRequired: 'loom',
+    skillRequirements: [],
+    researchRequirements: ['textiles_ii']
+  });
+
+  registry.registerRecipe({
+    id: 'leather_armor',
+    name: 'Leather Armor',
+    category: 'Decorations',
+    description: 'Protective leather armor.',
+    ingredients: [
+      { itemId: 'leather', quantity: 8 },
+      { itemId: 'fiber', quantity: 3 }
+    ],
+    output: { itemId: 'leather_armor', quantity: 1 },
+    craftingTime: 25,
+    xpGain: 30,
+    stationRequired: 'workbench',
+    skillRequirements: [],
+    researchRequirements: ['textiles_ii']
+  });
+
+  // === Potions ===
+  registry.registerRecipe({
+    id: 'healing_potion',
+    name: 'Healing Potion',
+    category: 'Materials',
+    description: 'A potion that restores health.',
+    ingredients: [
+      { itemId: 'berry', quantity: 5 },
+      { itemId: 'water', quantity: 1 }
+    ],
+    output: { itemId: 'healing_potion', quantity: 1 },
+    craftingTime: 15,
+    xpGain: 15,
+    stationRequired: 'alchemy_lab',
+    skillRequirements: [],
+    researchRequirements: ['alchemy_i']
+  });
+
+  registry.registerRecipe({
+    id: 'energy_potion',
+    name: 'Energy Potion',
+    category: 'Materials',
+    description: 'A potion that restores energy.',
+    ingredients: [
+      { itemId: 'wheat', quantity: 3 },
+      { itemId: 'water', quantity: 1 }
+    ],
+    output: { itemId: 'energy_potion', quantity: 1 },
+    craftingTime: 15,
+    xpGain: 15,
+    stationRequired: 'alchemy_lab',
+    skillRequirements: [],
+    researchRequirements: ['alchemy_i']
+  });
+
+  // === Advanced Materials ===
+  registry.registerRecipe({
+    id: 'steel_ingot',
+    name: 'Steel Ingot',
+    category: 'Materials',
+    description: 'Strong steel alloy.',
+    ingredients: [
+      { itemId: 'iron_ingot', quantity: 2 },
+      { itemId: 'coal', quantity: 1 }
+    ],
+    output: { itemId: 'steel_ingot', quantity: 1 },
+    craftingTime: 25,
+    xpGain: 20,
+    stationRequired: 'forge',
+    skillRequirements: [],
+    researchRequirements: ['metallurgy_ii']
+  });
+
+  registry.registerRecipe({
+    id: 'copper_ingot',
+    name: 'Copper Ingot',
+    category: 'Materials',
+    description: 'Smelted copper.',
+    ingredients: [
+      { itemId: 'copper_ore', quantity: 2 }
+    ],
+    output: { itemId: 'copper_ingot', quantity: 1 },
+    craftingTime: 18,
+    xpGain: 12,
+    stationRequired: 'forge',
+    skillRequirements: [],
+    researchRequirements: ['metallurgy_i']
+  });
+
+  registry.registerRecipe({
+    id: 'mithril_ingot',
+    name: 'Mithril Ingot',
+    category: 'Materials',
+    description: 'Legendary lightweight metal.',
+    ingredients: [
+      { itemId: 'iron_ingot', quantity: 2 },
+      { itemId: 'gold_ingot', quantity: 1 }
+    ],
+    output: { itemId: 'mithril_ingot', quantity: 1 },
+    craftingTime: 40,
+    xpGain: 50,
+    stationRequired: 'forge',
+    skillRequirements: [{ skill: 'smithing', level: 5 }],
+    researchRequirements: ['metallurgy_iii']
+  });
+
+  registry.registerRecipe({
+    id: 'adamantine_ingot',
+    name: 'Adamantine Ingot',
+    category: 'Materials',
+    description: 'Legendary unbreakable metal.',
+    ingredients: [
+      { itemId: 'steel_ingot', quantity: 3 },
+      { itemId: 'coal', quantity: 5 }
+    ],
+    output: { itemId: 'adamantine_ingot', quantity: 1 },
+    craftingTime: 60,
+    xpGain: 80,
+    stationRequired: 'forge',
+    skillRequirements: [{ skill: 'smithing', level: 7 }],
+    researchRequirements: ['metallurgy_iii']
+  });
+
+  // === Steel Tools ===
+  registry.registerRecipe({
+    id: 'steel_sword',
+    name: 'Steel Sword',
+    category: 'Weapons',
+    description: 'A powerful steel blade.',
+    ingredients: [
+      { itemId: 'steel_ingot', quantity: 3 },
+      { itemId: 'wood', quantity: 1 }
+    ],
+    output: { itemId: 'steel_sword', quantity: 1 },
+    craftingTime: 35,
+    xpGain: 60,
+    stationRequired: 'forge',
+    skillRequirements: [{ skill: 'smithing', level: 4 }],
+    researchRequirements: ['metallurgy_ii']
+  });
+
+  registry.registerRecipe({
+    id: 'steel_pickaxe',
+    name: 'Steel Pickaxe',
+    category: 'Tools',
+    description: 'A durable steel pickaxe.',
+    ingredients: [
+      { itemId: 'steel_ingot', quantity: 3 },
+      { itemId: 'wood', quantity: 2 }
+    ],
+    output: { itemId: 'steel_pickaxe', quantity: 1 },
+    craftingTime: 30,
+    xpGain: 50,
+    stationRequired: 'forge',
+    skillRequirements: [],
+    researchRequirements: ['metallurgy_ii']
   });
 }

@@ -443,9 +443,10 @@ describe('LRU (Least Recently Used) Eviction System', () => {
     });
 
     it('should prefer closing unpinned window over pinned window', () => {
+      const menuBarHeight = 30;
       const smallCanvas = document.createElement('canvas');
       smallCanvas.width = 800;
-      smallCanvas.height = 400;
+      smallCanvas.height = 400 + menuBarHeight; // Account for menu bar
       windowManager = new WindowManager(smallCanvas);
 
       // Create two windows
@@ -455,7 +456,7 @@ describe('LRU (Least Recently Used) Eviction System', () => {
       vi.setSystemTime(1000);
       windowManager.registerWindow('older-pinned', panel1, {
         defaultX: 0,
-        defaultY: 0,
+        defaultY: menuBarHeight,
         defaultWidth: 400,
         defaultHeight: 400,
       });
@@ -465,7 +466,7 @@ describe('LRU (Least Recently Used) Eviction System', () => {
       vi.setSystemTime(2000);
       windowManager.registerWindow('newer-unpinned', panel2, {
         defaultX: 400,
-        defaultY: 0,
+        defaultY: menuBarHeight,
         defaultWidth: 400,
         defaultHeight: 400,
       });
@@ -476,7 +477,7 @@ describe('LRU (Least Recently Used) Eviction System', () => {
       vi.setSystemTime(3000);
       windowManager.registerWindow('third', panel3, {
         defaultX: 0,
-        defaultY: 0,
+        defaultY: menuBarHeight,
         defaultWidth: 400,
         defaultHeight: 400,
       });
@@ -492,19 +493,21 @@ describe('LRU (Least Recently Used) Eviction System', () => {
       expect(windowManager.getWindow('third')!.visible).toBe(true);
     });
 
-    it('should log auto-close event to console', () => {
-      const consoleSpy = vi.spyOn(console, 'log');
+    it('should emit auto-close event when closing window to make space', () => {
+      const menuBarHeight = 30;
+      const autoCloseSpy = vi.fn();
 
       const smallCanvas = document.createElement('canvas');
       smallCanvas.width = 600;
-      smallCanvas.height = 400;
+      smallCanvas.height = 400 + menuBarHeight; // Account for menu bar
       windowManager = new WindowManager(smallCanvas);
+      windowManager.on('window:auto-closed', autoCloseSpy);
 
       const panel1 = new MockPanel('old', 'Old Window', 600, 400);
       vi.setSystemTime(1000);
       windowManager.registerWindow('old', panel1, {
         defaultX: 0,
-        defaultY: 0,
+        defaultY: menuBarHeight,
         defaultWidth: 600,
         defaultHeight: 400,
       });
@@ -514,20 +517,19 @@ describe('LRU (Least Recently Used) Eviction System', () => {
       vi.setSystemTime(2000);
       windowManager.registerWindow('new', panel2, {
         defaultX: 0,
-        defaultY: 0,
+        defaultY: menuBarHeight,
         defaultWidth: 600,
         defaultHeight: 400,
       });
       windowManager.showWindow('new');
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Auto-closed "old"')
+      expect(autoCloseSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          windowId: 'old',
+          windowTitle: 'Old Window',
+          reason: 'out-of-space',
+        })
       );
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('last used:')
-      );
-
-      consoleSpy.mockRestore();
     });
   });
 

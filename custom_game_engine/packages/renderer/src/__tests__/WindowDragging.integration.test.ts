@@ -392,6 +392,16 @@ describe('Window Dragging and Positioning', () => {
       windowManager.showWindow('overlap-1');
       windowManager.showWindow('overlap-2');
 
+      const window1 = windowManager.getWindow('overlap-1')!;
+      const window2 = windowManager.getWindow('overlap-2')!;
+
+      // Manually force overlap for this test (normally prevented by WindowManager)
+      window2.x = 150;
+      window2.y = 150;
+
+      const initialWindow1Z = window1.zIndex;
+      const initialWindow2Z = window2.zIndex;
+
       // Click in overlapping region
       const clickX = 200;
       const clickY = 200;
@@ -400,12 +410,10 @@ describe('Window Dragging and Positioning', () => {
 
       expect(handled).toBe(true);
 
-      // The window with higher z-index should handle the click
-      const window1Z = windowManager.getWindow('overlap-1')!.zIndex;
-      const window2Z = windowManager.getWindow('overlap-2')!.zIndex;
-
-      // Window 2 was shown last, so should have higher z-index
-      expect(window2Z).toBeGreaterThan(window1Z);
+      // Window 2 has higher initial z-index, so it should handle the click
+      // and be brought to front (increasing its z-index even more)
+      expect(window2.zIndex).toBeGreaterThan(initialWindow2Z);
+      expect(window2.zIndex).toBeGreaterThan(window1.zIndex);
     });
   });
 

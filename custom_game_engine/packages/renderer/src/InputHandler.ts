@@ -5,6 +5,7 @@ export interface InputHandlerCallbacks {
   onKeyDown?: (key: string, shiftKey: boolean, ctrlKey: boolean) => boolean;
   onMouseClick?: (screenX: number, screenY: number, button: number) => boolean;
   onMouseMove?: (screenX: number, screenY: number) => void;
+  onWheel?: (screenX: number, screenY: number, deltaY: number) => boolean;
 }
 
 /**
@@ -145,17 +146,12 @@ export class InputHandler {
 
     // Mouse drag and click
     this.canvas.addEventListener('mousedown', (e) => {
-      console.log(`[InputHandler] mousedown event: button=${e.button}, clientX=${e.clientX}, clientY=${e.clientY}`);
-      console.log(`[InputHandler] callbacks.onMouseClick exists: ${!!this.callbacks.onMouseClick}`);
-
       // Check if callback handles this click
       const rect = this.canvas!.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      console.log(`[InputHandler] Calling onMouseClick with x=${x}, y=${y}, button=${e.button}`);
 
       const handled = this.callbacks.onMouseClick?.(x, y, e.button);
-      console.log(`[InputHandler] onMouseClick returned: ${handled}`);
 
       if (handled) {
         e.preventDefault();
@@ -195,9 +191,21 @@ export class InputHandler {
       }
     });
 
-    // Mouse wheel zoom
+    // Mouse wheel - first check callbacks, then zoom
     this.canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
+
+      // Convert to canvas-relative coordinates (same as mousemove)
+      const rect = this.canvas!.getBoundingClientRect();
+      const canvasX = e.clientX - rect.left;
+      const canvasY = e.clientY - rect.top;
+
+      // Let callbacks handle the wheel event first (e.g., window scrolling)
+      if (this.callbacks.onWheel?.(canvasX, canvasY, e.deltaY)) {
+        return;
+      }
+
+      // Default behavior: zoom camera
       const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
       this.camera!.setZoom(this.camera!.zoom * zoomFactor);
     });

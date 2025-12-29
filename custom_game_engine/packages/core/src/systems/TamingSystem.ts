@@ -106,6 +106,7 @@ export class TamingSystem implements System {
           animalId: animal.id,
           tamerId: agentId,
           agentId,
+          method,
         },
       });
 
@@ -199,8 +200,9 @@ export class TamingSystem implements System {
         data: {
           animalId: animal.id,
           agentId,
-          oldLevel: animal.bondLevel - bondGain,
-          newLevel: animal.bondLevel,
+          oldLevel: oldLevel.name,
+          newLevel: newLevel.name,
+          bondLevel: animal.bondLevel,
         },
       });
     }

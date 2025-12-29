@@ -41,7 +41,8 @@ describe('Behavior Queue System Integration', () => {
     agent.addComponent(createAgentComponent('wander', 1, false, 0)); // behavior='wander', thinkInterval=1, useLLM=false
     agent.addComponent(createPositionComponent(0, 0, 0));
     agent.addComponent(createMovementComponent(1.0));
-    agent.addComponent(createNeedsComponent(50, 50, 20, 0.42, 0.5));
+    // Set hunger=70 to avoid autonomic seek_food trigger (which happens at < 60)
+    agent.addComponent(createNeedsComponent(70, 70, 100, 37, 100));
     agent.addComponent(createCircadianComponent());
     agent.addComponent(createTemperatureComponent(20, 15, 25, 10, 30)); // currentTemp=20, comfortMin=15, comfortMax=25, toleranceMin=10, toleranceMax=30
 
@@ -174,10 +175,10 @@ describe('Behavior Queue System Integration', () => {
       world.advanceTick();
       aiSystem.update(world, [agent], 1);
 
-      // Now raise hunger above threshold (>30 means no autonomic override per AISystem line 749)
+      // Now raise hunger above threshold (>= 60 means no autonomic override)
       agent.updateComponent<NeedsComponent>('needs', (current) => ({
         ...current,
-        hunger: 50, // Satisfied
+        hunger: 70, // Satisfied - above seek_food threshold of 60
       }));
 
       agent.updateComponent<AgentComponent>('agent', (current) => ({

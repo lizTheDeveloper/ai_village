@@ -12,17 +12,31 @@ import type { EventBus } from '../events/EventBus.js';
 import type { IQueryBuilder } from './QueryBuilder.js';
 import { QueryBuilder } from './QueryBuilder.js';
 import { EntityImpl, createEntityId } from './Entity.js';
-import { createBuildingComponent } from '../components/BuildingComponent.js';
+import { createBuildingComponent, type BuildingType } from '../components/BuildingComponent.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
+import { createRenderableComponent } from '../components/RenderableComponent.js';
 import { BuildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistry.js';
 import { PlacementValidator } from '../buildings/PlacementValidator.js';
+import { resetUsedNames } from '../components/IdentityComponent.js';
+
+/**
+ * Chunk interface from world package.
+ * Defined here to avoid circular dependency.
+ */
+export interface IChunk {
+  readonly x: number;
+  readonly y: number;
+  generated: boolean;
+  tiles: unknown[];
+  entities: Set<EntityId>;
+}
 
 /**
  * ChunkManager interface for tile access.
  * Defined here to avoid circular dependency with world package.
  */
 export interface IChunkManager {
-  getChunk(chunkX: number, chunkY: number): any;
+  getChunk(chunkX: number, chunkY: number): IChunk | undefined;
 }
 
 /**
@@ -30,7 +44,7 @@ export interface IChunkManager {
  * Defined here to avoid circular dependency with world package.
  */
 export interface ITerrainGenerator {
-  generateChunk(chunk: any, world: any): void;
+  generateChunk(chunk: IChunk, world: WorldMutator): void;
 }
 
 /**
@@ -91,12 +105,14 @@ export interface World {
   /**
    * Initiate construction of a building.
    * Validates placement, deducts resources, creates construction site.
+   * @param builderId - Optional ID of the agent who initiated construction
    * @throws Error if validation fails or insufficient resources
    */
   initiateConstruction(
     position: { x: number; y: number },
     buildingType: string,
-    inventory: Record<string, number>
+    inventory: Record<string, number>,
+    builderId?: string
   ): Entity;
 
   /**
@@ -105,6 +121,18 @@ export interface World {
    * Returns undefined if tile doesn't exist or ChunkManager not set.
    */
   getTileAt?(x: number, y: number): any;
+
+  /**
+   * Get terrain type at world coordinates.
+   * Returns 'grass', 'dirt', 'water', etc. or null if tile doesn't exist.
+   */
+  getTerrainAt?(x: number, y: number): string | null;
+
+  /**
+   * Get tile data (fertility, moisture) at world coordinates.
+   * Returns null if tile doesn't exist.
+   */
+  getTileData?(x: number, y: number): { fertility?: number; moisture?: number } | null;
 }
 
 /**
@@ -165,6 +193,8 @@ export class WorldImpl implements WorldMutator {
       season: 'spring',
       year: 1,
     };
+    // Reset used names when starting a new world to ensure unique names
+    resetUsedNames();
   }
 
   get tick(): Tick {
@@ -282,7 +312,7 @@ export class WorldImpl implements WorldMutator {
     }
 
     // Cast to internal implementation to mutate
-    const entityImpl = entity as any;
+    const entityImpl = entity as EntityImpl;
     entityImpl.addComponent(component);
 
     // Update spatial index if position component
@@ -312,7 +342,7 @@ export class WorldImpl implements WorldMutator {
       throw new Error(`Entity ${entityId} does not exist`);
     }
 
-    const entityImpl = entity as any;
+    const entityImpl = entity as EntityImpl;
     entityImpl.updateComponent(componentType, updater);
   }
 
@@ -333,7 +363,7 @@ export class WorldImpl implements WorldMutator {
       }
     }
 
-    const entityImpl = entity as any;
+    const entityImpl = entity as EntityImpl;
     entityImpl.removeComponent(componentType);
 
     this._eventBus.emit({
@@ -411,7 +441,6 @@ export class WorldImpl implements WorldMutator {
     // This prevents "No tile found" errors in ActionQueue validation
     // The TileInspectorPanel does this, but ActionQueue validation also needs it
     if (!chunk.generated && this._terrainGenerator) {
-      console.log(`[World.getTileAt] Generating chunk (${chunkX}, ${chunkY}) on-demand for tile (${x}, ${y})`);
       this._terrainGenerator.generateChunk(chunk, this);
     }
 
@@ -439,14 +468,39 @@ export class WorldImpl implements WorldMutator {
   }
 
   /**
+   * Get terrain type at world coordinates.
+   * Convenience method for PlacementScorer and BuildBehavior.
+   * Returns the terrain string ('grass', 'dirt', etc.) or null if tile doesn't exist.
+   */
+  getTerrainAt(x: number, y: number): string | null {
+    const tile = this.getTileAt(x, y);
+    return tile?.terrain ?? null;
+  }
+
+  /**
+   * Get tile data (fertility, moisture, etc.) at world coordinates.
+   * Convenience method for PlacementScorer utility calculations.
+   */
+  getTileData(x: number, y: number): { fertility?: number; moisture?: number } | null {
+    const tile = this.getTileAt(x, y);
+    if (!tile) return null;
+    return {
+      fertility: tile.fertility,
+      moisture: tile.moisture,
+    };
+  }
+
+  /**
    * Initiate construction of a building.
    * Creates a construction site entity with progress=0.
    * Per CLAUDE.md: No silent fallbacks - throws on validation failure.
+   * @param builderId - Optional ID of the agent who initiated construction
    */
   initiateConstruction(
     position: { x: number; y: number },
     buildingType: string,
-    inventory: Record<string, number>
+    inventory: Record<string, number>,
+    builderId?: string
   ): Entity {
     // Validate inputs
     if (!buildingType || buildingType.trim() === '') {
@@ -459,11 +513,18 @@ export class WorldImpl implements WorldMutator {
       throw new Error('Inventory is required');
     }
 
-    // Get blueprint
-    const registry = new BuildingBlueprintRegistry();
-    registry.registerDefaults();
-    registry.registerTier2Stations(); // Phase 10: Crafting Stations
-    registry.registerTier3Stations(); // Phase 10: Advanced Crafting Stations
+    // Get blueprint from world's registry if available, otherwise create temp registry
+    // This prevents duplicate registration issues
+    let registry: BuildingBlueprintRegistry;
+    if ((this as any).buildingRegistry) {
+      registry = (this as any).buildingRegistry;
+    } else {
+      registry = new BuildingBlueprintRegistry();
+      registry.registerDefaults();
+      registry.registerTier2Stations(); // Phase 10: Crafting Stations
+      registry.registerTier3Stations(); // Phase 10: Advanced Crafting Stations
+      registry.registerGovernanceBuildings(); // Phase 11: Governance Infrastructure
+    }
     const blueprint = registry.get(buildingType);
 
     // Validate placement
@@ -488,30 +549,33 @@ export class WorldImpl implements WorldMutator {
       consumedResources.push({ resourceId: cost.resourceId, amount: cost.amountRequired });
     }
 
-    // Log resource consumption for visibility
-    if (consumedResources.length > 0) {
-      const resourceList = consumedResources.map(r => `${r.amount} ${r.resourceId}`).join(', ');
-      console.log(`[World.initiateConstruction] Consumed resources for ${buildingType}: ${resourceList}`);
-    }
 
     // Create construction site entity
     const entity = this.createEntity();
 
     // Add building component with progress=0 (under construction)
-    const buildingComponent = createBuildingComponent(buildingType as any, 1, 0);
+    const buildingComponent = createBuildingComponent(buildingType as BuildingType, 1, 0);
     (entity as EntityImpl).addComponent(buildingComponent);
 
     // Add position component using the helper function
     const positionComponent = createPositionComponent(position.x, position.y);
     (entity as EntityImpl).addComponent(positionComponent);
 
+    // Add renderable component so the building is visible
+    // Uses buildingType as spriteId (e.g., 'workbench', 'storage-chest')
+    const renderableComponent = createRenderableComponent(buildingType, 'building');
+    (entity as EntityImpl).addComponent(renderableComponent);
+
     // Emit construction started event
     this._eventBus.emit({
       type: 'construction:started',
-      source: 'world',
+      source: builderId ?? 'world',
       data: {
         buildingId: entity.id,
         blueprintId: buildingType,
+        buildingType,
+        position,
+        builderId,
       },
     });
 

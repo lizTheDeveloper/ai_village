@@ -1,4 +1,4 @@
-import type { World, CraftingJob } from '@ai-village/core';
+import type { World, CraftingJob, EntityId } from '@ai-village/core';
 import { CraftingSystem } from '@ai-village/core';
 
 /**
@@ -7,7 +7,7 @@ import { CraftingSystem } from '@ai-village/core';
 export class CraftingQueueSection {
   private world: World;
   public readonly bounds: { x: number; y: number; width: number; height: number };
-  public agentId: number | null = null;
+  public agentId: EntityId | null = null;
   private queue: CraftingJob[] = [];
   private craftingSystem: CraftingSystem | null = null;
 
@@ -40,8 +40,8 @@ export class CraftingQueueSection {
     this.refresh();
   }
 
-  setAgentId(agentId: number): void {
-    if (agentId <= 0) {
+  setAgentId(agentId: EntityId): void {
+    if (!agentId) {
       throw new Error('Invalid agent ID');
     }
     this.agentId = agentId;

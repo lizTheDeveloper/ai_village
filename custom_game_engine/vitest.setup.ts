@@ -1,11 +1,22 @@
 import { beforeEach } from 'vitest';
-import { globalRecipeRegistry, initializeDefaultRecipes } from '@ai-village/core';
+import {
+  globalRecipeRegistry,
+  initializeDefaultRecipes,
+  itemRegistry,
+  registerDefaultItems,
+  registerDefaultSeeds,
+} from '@ai-village/core';
 
-// Initialize default recipes before each test
-// This ensures tests have access to standard recipes like stone_axe, bread, etc.
+// Initialize default items and recipes before each test
+// This ensures tests have access to standard items like wood, stone, berry, etc.
 beforeEach(() => {
   // Clear any existing recipes
   (globalRecipeRegistry as any).recipes.clear();
+
+  // Clear any existing items and re-register defaults
+  itemRegistry.clear();
+  registerDefaultItems(itemRegistry);
+  registerDefaultSeeds(itemRegistry);
 
   // Initialize default recipes
   initializeDefaultRecipes();

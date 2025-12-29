@@ -5,6 +5,10 @@ import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { TimeComponent } from './TimeSystem.js';
+import type { CircadianComponent } from '../components/CircadianComponent.js';
+import type { AgentComponent } from '../components/AgentComponent.js';
+import type { MovementComponent } from '../components/MovementComponent.js';
+import type { TemperatureComponent } from '../components/TemperatureComponent.js';
 
 export class NeedsSystem implements System {
   public readonly id: SystemId = 'needs';
@@ -42,53 +46,55 @@ export class NeedsSystem implements System {
       }
 
       // Check if agent is sleeping (don't deplete energy while sleeping)
-      const circadian = impl.getComponent('circadian') as any;
+      const circadian = impl.getComponent<CircadianComponent>('circadian');
       const isSleeping = circadian?.isSleeping || false;
 
       // Decay hunger (paused during sleep to prevent waking agents)
       // Per CLAUDE.md: Don't let hunger wake agents during minimum sleep period
       // Agents need to recover energy more than they need to eat
-      // Hunger decay rate is per real second
-      const hungerDecay = needs.hungerDecayRate * deltaTime * (isSleeping ? 0 : 1.0);
+      // Hunger decay rate is per GAME MINUTE (not real time!)
+      // At 0.08/min, agents drop 50 hunger in 625 game minutes (~10 hours) = ~2-3 meals/day
+      const hungerDecayPerGameMinute = 0.08; // ~2-3 meals per 18-hour waking period
+      const hungerDecay = isSleeping ? 0 : hungerDecayPerGameMinute * gameMinutesElapsed;
 
       // Energy decay based on activity level (per GAME minute, not real time)
-      // Rates balanced for 18-hour wake / 6-hour sleep cycle:
-      // Assuming ~8 hours working, ~10 hours wandering/idle per day
-      // - Idle/Walking: -0.05 energy/minute (~33 hours from 100 to 0)
-      // - Working (gathering, building): -0.15 energy/minute (~11 hours from 100 to 0)
-      // - Running: -0.2 energy/minute (~8 hours from 100 to 0)
-      // - Cold/Hot exposure: -0.03 energy/minute additional
-      // Average day: 8h*0.15 + 10h*0.05 = 72 + 30 = 102 energy used in 18h
+      // Rates balanced for ~18-hour wake / ~6-hour sleep cycle per game day
+      // At these rates, agents can work a full day before needing sleep:
+      // - Idle/Walking: -0.03 energy/minute (~55 hours from 100 to 0)
+      // - Working (gathering, building): -0.08 energy/minute (~21 hours from 100 to 0)
+      // - Running: -0.12 energy/minute (~14 hours from 100 to 0)
+      // - Cold/Hot exposure: -0.02 energy/minute additional
+      // Average day: 8h*0.08 + 10h*0.03 = 38 + 18 = 56 energy used in 18h (sleep once/day)
 
-      let energyDecayPerGameMinute = 0.05; // Base rate: idle/walking
+      let energyDecayPerGameMinute = 0.03; // Base rate: idle/walking
 
       if (!isSleeping) {
         // Check agent's current behavior to determine activity level
-        const agent = impl.getComponent('agent') as any;
-        const movement = impl.getComponent('movement') as any;
+        const agent = impl.getComponent<AgentComponent>('agent');
+        const movement = impl.getComponent<MovementComponent>('movement');
 
         if (agent) {
           const behavior = agent.behavior;
           const isMoving = movement && (Math.abs(movement.velocityX) > 0.01 || Math.abs(movement.velocityY) > 0.01);
 
           if (behavior === 'gather' || behavior === 'build') {
-            energyDecayPerGameMinute = 0.15; // Working
+            energyDecayPerGameMinute = 0.08; // Working
           } else if (isMoving && movement.speed > 3.0) {
-            energyDecayPerGameMinute = 0.2; // Running
+            energyDecayPerGameMinute = 0.12; // Running
           } else if (isMoving) {
-            energyDecayPerGameMinute = 0.05; // Walking
+            energyDecayPerGameMinute = 0.03; // Walking
           } else {
-            energyDecayPerGameMinute = 0.05; // Idle
+            energyDecayPerGameMinute = 0.03; // Idle
           }
         }
 
         // Add temperature penalties
-        const temperature = impl.getComponent('temperature') as any;
+        const temperature = impl.getComponent<TemperatureComponent>('temperature');
         if (temperature) {
           if (temperature.currentTemp < 10) {
-            energyDecayPerGameMinute += 0.03; // Cold exposure
+            energyDecayPerGameMinute += 0.02; // Cold exposure
           } else if (temperature.currentTemp > 30) {
-            energyDecayPerGameMinute += 0.03; // Hot exposure
+            energyDecayPerGameMinute += 0.02; // Hot exposure
           }
         }
       }

@@ -14,11 +14,15 @@ import {
   createConversationComponent,
   createRelationshipComponent,
   createInventoryComponent,
+  calculateInventoryWeight,
   createTemperatureComponent,
   createCircadianComponent,
   generateRandomPersonality,
   generateRandomName,
   createIdentityComponent,
+  createGatheringStatsComponent,
+  generateRandomStartingSkills,
+  createGoalsComponent,
   EpisodicMemoryComponent,
   SemanticMemoryComponent,
   SocialMemoryComponent,
@@ -74,10 +78,11 @@ export function createWanderingAgent(
   // Personality - random personality traits
   entity.addComponent(generateRandomPersonality());
 
-  // Agent behavior - with staggered think offset to prevent thundering herd
+  // Agent behavior - start idle, will wander when bored
+  // with staggered think offset to prevent thundering herd
   const thinkInterval = 20;
   const thinkOffset = generateThinkOffset(entity.id, thinkInterval * 2);
-  entity.addComponent(createAgentComponent('wander', thinkInterval, false, thinkOffset));
+  entity.addComponent(createAgentComponent('idle', thinkInterval, false, thinkOffset));
 
   // Movement
   entity.addComponent(createMovementComponent(speed, 0, 0));
@@ -111,6 +116,8 @@ export function createWanderingAgent(
   inventory.slots[0] = { itemId: 'wood', quantity: 5 };
   inventory.slots[1] = { itemId: 'stone', quantity: 3 };
   inventory.slots[2] = { itemId: 'berry', quantity: 8 };
+  // Recalculate weight after adding items directly to slots
+  inventory.currentWeight = calculateInventoryWeight(inventory);
   entity.addComponent(inventory);
 
   // Temperature - comfort range 18-24°C, tolerance 0-35°C
@@ -140,11 +147,41 @@ export function createWanderingAgent(
   entity.addComponent(new BeliefComponent());
   entity.addComponent(new SocialGradientComponent());
   entity.addComponent(new ExplorationStateComponent());
-  entity.addComponent(createSteeringComponent('wander', speed, speed * 2));
+  entity.addComponent(createSteeringComponent('none', speed, speed * 2));
   entity.addComponent(createVelocityComponent(0, 0));
+
+  // Gathering stats - track what the agent has gathered and deposited
+  entity.addComponent(createGatheringStatsComponent());
+
+  // Skills - personality-based starting skills for role diversity
+  const personalityWander = entity.getComponent('personality') as any;
+  entity.addComponent(generateRandomStartingSkills(personalityWander));
+
+  // Personal Goals - track agent's aspirations and progress
+  entity.addComponent(createGoalsComponent());
 
   // Add to world
   (world as any)._addEntity(entity);
+
+  // Emit agent:birth event for metrics tracking
+  const identity = entity.getComponent('identity') as { name: string } | undefined;
+  const needs = entity.getComponent('needs') as { health: number; hunger: number; energy: number } | undefined;
+  world.eventBus.emit({
+    type: 'agent:birth',
+    source: entity.id,
+    data: {
+      agentId: entity.id,
+      name: identity?.name ?? 'Unknown',
+      useLLM: false,
+      generation: 0,
+      parents: null,
+      initialStats: {
+        health: needs?.health ?? 100,
+        hunger: needs?.hunger ?? 100,
+        energy: needs?.energy ?? 80,
+      },
+    },
+  });
 
   return entity.id;
 }
@@ -179,10 +216,11 @@ export function createLLMAgent(
   // Personality - random personality traits
   entity.addComponent(generateRandomPersonality());
 
-  // Agent behavior - LLM-controlled with staggered think offset to prevent thundering herd
+  // Agent behavior - LLM-controlled, start idle, will wander when bored
+  // with staggered think offset to prevent thundering herd
   const thinkInterval = 20;
   const thinkOffset = generateThinkOffset(entity.id, thinkInterval * 2);
-  entity.addComponent(createAgentComponent('wander', thinkInterval, true, thinkOffset)); // useLLM = true
+  entity.addComponent(createAgentComponent('idle', thinkInterval, true, thinkOffset)); // useLLM = true
 
   // Movement
   entity.addComponent(createMovementComponent(speed, 0, 0));
@@ -216,6 +254,8 @@ export function createLLMAgent(
   inventory.slots[0] = { itemId: 'wood', quantity: 5 };
   inventory.slots[1] = { itemId: 'stone', quantity: 3 };
   inventory.slots[2] = { itemId: 'berry', quantity: 8 };
+  // Recalculate weight after adding items directly to slots
+  inventory.currentWeight = calculateInventoryWeight(inventory);
   entity.addComponent(inventory);
 
   // Temperature - comfort range 18-24°C, tolerance 0-35°C
@@ -246,8 +286,18 @@ export function createLLMAgent(
   entity.addComponent(new BeliefComponent());
   entity.addComponent(new SocialGradientComponent());
   entity.addComponent(new ExplorationStateComponent());
-  entity.addComponent(createSteeringComponent('wander', speed, speed * 2));
+  entity.addComponent(createSteeringComponent('none', speed, speed * 2));
   entity.addComponent(createVelocityComponent(0, 0));
+
+  // Gathering stats - track what the agent has gathered and deposited
+  entity.addComponent(createGatheringStatsComponent());
+
+  // Skills - personality-based starting skills for role diversity
+  const personalityLLM = entity.getComponent('personality') as any;
+  entity.addComponent(generateRandomStartingSkills(personalityLLM));
+
+  // Personal Goals - track agent's aspirations and progress
+  entity.addComponent(createGoalsComponent());
 
   // Add initial "waking up" memory from Dungeon Master prompt
   if (dungeonMasterPrompt) {
@@ -271,6 +321,26 @@ export function createLLMAgent(
 
   // Add to world
   (world as any)._addEntity(entity);
+
+  // Emit agent:birth event for metrics tracking
+  const identity = entity.getComponent('identity') as { name: string } | undefined;
+  const needs = entity.getComponent('needs') as { health: number; hunger: number; energy: number } | undefined;
+  world.eventBus.emit({
+    type: 'agent:birth',
+    source: entity.id,
+    data: {
+      agentId: entity.id,
+      name: identity?.name ?? 'Unknown',
+      useLLM: true,
+      generation: 0,
+      parents: null,
+      initialStats: {
+        health: needs?.health ?? 100,
+        hunger: needs?.hunger ?? 100,
+        energy: needs?.energy ?? 80,
+      },
+    },
+  });
 
   return entity.id;
 }

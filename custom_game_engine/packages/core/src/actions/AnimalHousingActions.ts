@@ -104,10 +104,6 @@ export function assignAnimalToHousing(
     },
   });
 
-  console.log(
-    `[AnimalHousingActions] Assigned ${animal.speciesId} (${animalEntityId}) to ${building.buildingType} (${housingEntityId})`
-  );
-
   return { success: true };
 }
 
@@ -172,8 +168,6 @@ export function removeAnimalFromHousing(
     },
   });
 
-  console.log(`[AnimalHousingActions] Removed ${animal.speciesId} (${animalEntityId}) from housing`);
-
   return { success: true };
 }
 
@@ -210,8 +204,6 @@ export function cleanHousing(world: World, housingEntityId: string): AssignAnima
     };
   }
 
-  const previousCleanliness = building.cleanliness;
-
   // Restore cleanliness to 100%
   housingImpl.updateComponent<BuildingComponent>('building', (current) => ({
     ...current,
@@ -229,10 +221,6 @@ export function cleanHousing(world: World, housingEntityId: string): AssignAnima
       agentId: 'system', // Placeholder - actual agentId should be passed from action handler
     },
   });
-
-  console.log(
-    `[AnimalHousingActions] Cleaned ${building.buildingType} (${housingEntityId}). Cleanliness: ${previousCleanliness.toFixed(0)}% → 100%`
-  );
 
   return { success: true };
 }

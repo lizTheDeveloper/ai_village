@@ -46,8 +46,12 @@ export class MovementSystem implements System {
       const position = impl.getComponent<PositionComponent>('position')!
 
       // Sync velocity component to movement component (for SteeringSystem integration)
+      // Only sync when steering is active - when steering is 'none', behaviors control velocity directly
       const velocity = impl.getComponent<VelocityComponent>('velocity');
-      if (velocity && (velocity.vx !== undefined || velocity.vy !== undefined)) {
+      const steering = impl.getComponent('steering') as { behavior?: string } | undefined;
+      const steeringActive = steering && steering.behavior && steering.behavior !== 'none';
+
+      if (steeringActive && velocity && (velocity.vx !== undefined || velocity.vy !== undefined)) {
         impl.updateComponent<MovementComponent>('movement', (current) => ({
           ...current,
           velocityX: velocity.vx ?? current.velocityX,
@@ -116,25 +120,12 @@ export class MovementSystem implements System {
       const newX = position.x + deltaX;
       const newY = position.y + deltaY;
 
-      // Check collision at new position
-      if (this.isPositionValid(world, entity.id, newX, newY)) {
-        // Update position
-        const newChunkX = Math.floor(newX / 32);
-        const newChunkY = Math.floor(newY / 32);
-
-        impl.updateComponent<PositionComponent>('position', (current) => ({
-          ...current,
-          x: newX,
-          y: newY,
-          chunkX: newChunkX,
-          chunkY: newChunkY,
-        }));
-      } else {
-        // Collision detected - try to navigate around obstacle
-        // Simple obstacle avoidance: try perpendicular directions
-        const perpX1 = -deltaY; // Rotate 90° left
+      // Check for hard collisions (buildings) - these block completely
+      if (this.hasHardCollision(world, entity.id, newX, newY)) {
+        // Try perpendicular directions to slide along walls
+        const perpX1 = -deltaY;
         const perpY1 = deltaX;
-        const perpX2 = deltaY;  // Rotate 90° right
+        const perpX2 = deltaY;
         const perpY2 = -deltaX;
 
         const alt1X = position.x + perpX1;
@@ -142,60 +133,114 @@ export class MovementSystem implements System {
         const alt2X = position.x + perpX2;
         const alt2Y = position.y + perpY2;
 
-        // Try moving perpendicular to obstacle
-        if (this.isPositionValid(world, entity.id, alt1X, alt1Y)) {
-          const newChunkX = Math.floor(alt1X / 32);
-          const newChunkY = Math.floor(alt1Y / 32);
-          impl.updateComponent<PositionComponent>('position', (current) => ({
-            ...current,
-            x: alt1X,
-            y: alt1Y,
-            chunkX: newChunkX,
-            chunkY: newChunkY,
-          }));
-        } else if (this.isPositionValid(world, entity.id, alt2X, alt2Y)) {
-          const newChunkX = Math.floor(alt2X / 32);
-          const newChunkY = Math.floor(alt2Y / 32);
-          impl.updateComponent<PositionComponent>('position', (current) => ({
-            ...current,
-            x: alt2X,
-            y: alt2Y,
-            chunkX: newChunkX,
-            chunkY: newChunkY,
-          }));
+        if (!this.hasHardCollision(world, entity.id, alt1X, alt1Y)) {
+          this.updatePosition(impl, alt1X, alt1Y);
+        } else if (!this.hasHardCollision(world, entity.id, alt2X, alt2Y)) {
+          this.updatePosition(impl, alt2X, alt2Y);
         } else {
-          // Can't move in any direction - stop movement
-          impl.updateComponent<MovementComponent>('movement', (current) => ({
-            ...current,
-            velocityX: 0,
-            velocityY: 0,
-          }));
-          // Also sync back to VelocityComponent to prevent SteeringSystem from
-          // restoring the old velocity on the next frame
-          if (velocity) {
-            impl.updateComponent<VelocityComponent>('velocity', (current) => ({
-              ...current,
-              vx: 0,
-              vy: 0,
-            }));
-          }
+          // Completely blocked by buildings - stop
+          this.stopEntity(impl, velocity);
+        }
+      } else {
+        // Check for soft collisions (other agents) - these slow but don't block
+        const softCollisionPenalty = this.getSoftCollisionPenalty(world, entity.id, newX, newY);
+
+        // Apply soft collision penalty (agents can push through each other, just slower)
+        const adjustedDeltaX = deltaX * softCollisionPenalty;
+        const adjustedDeltaY = deltaY * softCollisionPenalty;
+        const adjustedNewX = position.x + adjustedDeltaX;
+        const adjustedNewY = position.y + adjustedDeltaY;
+
+        // Final check that adjusted position doesn't hit a building
+        if (!this.hasHardCollision(world, entity.id, adjustedNewX, adjustedNewY)) {
+          this.updatePosition(impl, adjustedNewX, adjustedNewY);
+        } else {
+          // The adjusted position would hit a building - try original with penalty
+          this.updatePosition(impl, newX, newY);
         }
       }
     }
   }
 
-  private isPositionValid(
+  private updatePosition(impl: EntityImpl, x: number, y: number): void {
+    const newChunkX = Math.floor(x / 32);
+    const newChunkY = Math.floor(y / 32);
+    impl.updateComponent<PositionComponent>('position', (current) => ({
+      ...current,
+      x,
+      y,
+      chunkX: newChunkX,
+      chunkY: newChunkY,
+    }));
+  }
+
+  private stopEntity(impl: EntityImpl, velocity: VelocityComponent | undefined): void {
+    impl.updateComponent<MovementComponent>('movement', (current) => ({
+      ...current,
+      velocityX: 0,
+      velocityY: 0,
+    }));
+    if (velocity) {
+      impl.updateComponent<VelocityComponent>('velocity', (current) => ({
+        ...current,
+        vx: 0,
+        vy: 0,
+      }));
+    }
+  }
+
+  /**
+   * Check for hard collisions (buildings) - these block movement completely
+   */
+  private hasHardCollision(
+    world: World,
+    _entityId: string,
+    x: number,
+    y: number
+  ): boolean {
+    const buildingQuery = world.query().with('position').with('building');
+    const buildings = buildingQuery.executeEntities();
+
+    for (const building of buildings) {
+      const impl = building as EntityImpl;
+      const buildingComp = impl.getComponent<BuildingComponent>('building')!;
+
+      if (!buildingComp.blocksMovement) {
+        continue;
+      }
+
+      const pos = impl.getComponent<PositionComponent>('position')!;
+      const distance = Math.sqrt(
+        Math.pow(pos.x - x, 2) + Math.pow(pos.y - y, 2)
+      );
+
+      if (distance < 0.5) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Calculate soft collision penalty from nearby agents/physics entities.
+   * Returns a multiplier between 0.2 (very crowded) and 1.0 (no collision).
+   * Agents can push through each other but move slower when overlapping.
+   */
+  private getSoftCollisionPenalty(
     world: World,
     entityId: string,
     x: number,
     y: number
-  ): boolean {
-    // Check collision with physics entities
+  ): number {
     const physicsQuery = world.query().with('position').with('physics');
     const physicsEntities = physicsQuery.executeEntities();
 
+    let penalty = 1.0;
+    const softCollisionRadius = 0.8; // Start slowing at this distance
+    const minPenalty = 0.2; // Never slow below 20% speed
+
     for (const entity of physicsEntities) {
-      // Skip self
       if (entity.id === entityId) {
         continue;
       }
@@ -204,49 +249,23 @@ export class MovementSystem implements System {
       const pos = impl.getComponent<PositionComponent>('position')!;
       const physics = impl.getComponent<PhysicsComponent>('physics')!;
 
-      // Skip non-solid entities
       if (!physics.solid) {
         continue;
       }
 
-      // Simple AABB collision check (treating entities as points for now)
-      // In the future, we'd use physics.width and physics.height
       const distance = Math.sqrt(
         Math.pow(pos.x - x, 2) + Math.pow(pos.y - y, 2)
       );
 
-      // Collision if within 0.5 tiles
-      if (distance < 0.5) {
-        return false;
+      // Apply graduated slowdown based on proximity
+      if (distance < softCollisionRadius) {
+        // Linear interpolation: at distance 0 -> minPenalty, at softCollisionRadius -> 1.0
+        const proximityFactor = distance / softCollisionRadius;
+        const thisPenalty = minPenalty + (1 - minPenalty) * proximityFactor;
+        penalty = Math.min(penalty, thisPenalty);
       }
     }
 
-    // Check collision with buildings that block movement
-    const buildingQuery = world.query().with('position').with('building');
-    const buildings = buildingQuery.executeEntities();
-
-    for (const building of buildings) {
-      const impl = building as EntityImpl;
-      const buildingComp = impl.getComponent<BuildingComponent>('building')!;
-
-      // Skip buildings that don't block movement (e.g., campfires)
-      if (!buildingComp.blocksMovement) {
-        continue;
-      }
-
-      const pos = impl.getComponent<PositionComponent>('position')!;
-
-      // Check distance to building
-      const distance = Math.sqrt(
-        Math.pow(pos.x - x, 2) + Math.pow(pos.y - y, 2)
-      );
-
-      // Collision if within 0.5 tiles
-      if (distance < 0.5) {
-        return false;
-      }
-    }
-
-    return true;
+    return penalty;
   }
 }

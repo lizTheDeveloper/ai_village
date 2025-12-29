@@ -28,7 +28,7 @@ export class PlantInfoPanelAdapter implements IWindowPanel {
   }
 
   getDefaultHeight(): number {
-    return 400;
+    return 480; // Taller to fit all content
   }
 
   isVisible(): boolean {
@@ -42,8 +42,8 @@ export class PlantInfoPanelAdapter implements IWindowPanel {
 
   render(
     ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
+    _x: number,
+    _y: number,
     width: number,
     height: number,
     world?: any
@@ -52,13 +52,15 @@ export class PlantInfoPanelAdapter implements IWindowPanel {
       return;
     }
 
-    ctx.save();
-    ctx.translate(x, y);
-
-    // Call original render - tileInspectorOpen is managed separately
+    // WindowManager handles positioning via translate, panel renders at (0, 0)
     this.panel.render(ctx, width, height, world, false);
+  }
 
-    ctx.restore();
+  /**
+   * Handle scroll events for scrollable content.
+   */
+  handleScroll(deltaY: number, contentHeight: number): boolean {
+    return this.panel.handleScroll(deltaY, contentHeight);
   }
 
   /**

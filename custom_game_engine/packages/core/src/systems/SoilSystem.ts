@@ -82,16 +82,7 @@ export class SoilSystem implements System {
    * Till a grass tile to make it plantable
    * TODO: Add agentId parameter for tool checking when agent-initiated tilling is implemented
    */
-  public tillTile(world: World, tile: Tile, x: number, y: number, agentId?: string): void {
-    console.log(`[SoilSystem] ===== TILLING TILE AT (${x}, ${y}) =====`);
-    console.log(`[SoilSystem] Current tile state:`, {
-      terrain: tile.terrain,
-      tilled: tile.tilled,
-      biome: tile.biome,
-            moisture: tile.moisture,
-      plantability: tile.plantability,
-    });
-
+  public tillTile(world: World, tile: Tile, x: number, y: number, _agentId?: string): void {
     // CLAUDE.md: Validate inputs, no silent fallbacks
     if (!tile) {
       const error = 'tillTile requires a valid tile object';
@@ -126,69 +117,15 @@ export class SoilSystem implements System {
       console.error(`[SoilSystem] ❌ ERROR: ${error}`);
       throw new Error(error);
     }
-
-    console.log(`[SoilSystem] ✅ Validation passed - proceeding with tilling`);
-
-    // Tool checking (if agent-initiated)
-    // System checks agent inventory for hoe > shovel > hands
-    let toolUsed = 'hands';
-    let toolEfficiency = 0.5; // 50% efficiency for hands
-
-    if (agentId) {
-      console.log(`[SoilSystem] 🔍 Checking agent ${agentId} inventory for tools...`);
-      const agent = world.getEntity(agentId);
-      if (agent) {
-        const inventory = agent.components.get('inventory') as any;
-        if (inventory) {
-          // Check for hoe (best tool, 100% efficiency)
-          if (this.hasItemInInventory(inventory, 'hoe')) {
-            toolUsed = 'hoe';
-            toolEfficiency = 1.0;
-            console.log(`[SoilSystem] 🔨 Agent has HOE - using it (100% efficiency, fastest)`);
-          }
-          // Check for shovel (second best, 80% efficiency)
-          else if (this.hasItemInInventory(inventory, 'shovel')) {
-            toolUsed = 'shovel';
-            toolEfficiency = 0.8;
-            console.log(`[SoilSystem] 🔨 Agent has SHOVEL - using it (80% efficiency, medium speed)`);
-          }
-          // Fallback to hands (50% efficiency)
-          else {
-            console.log(`[SoilSystem] 🖐️ Agent has no farming tools - using HANDS (50% efficiency, slowest)`);
-          }
-        } else {
-          console.log(`[SoilSystem] ⚠️ Agent has no inventory component - defaulting to HANDS`);
-        }
-      } else {
-        console.log(`[SoilSystem] ⚠️ Agent ${agentId} not found - defaulting to HANDS`);
-      }
-    } else {
-      console.log(`[SoilSystem] ℹ️ MANUAL TILLING (keyboard shortcut T) - Using HANDS by default (50% efficiency)`);
-      console.log(`[SoilSystem] 💡 TIP: To use agent tools, SELECT AN AGENT FIRST, then press T`);
-      console.log(`[SoilSystem] 🔨 Available tools: HOE (100% efficiency) > SHOVEL (80%) > HANDS (50%)`);
-    }
-
-    // Calculate and log estimated duration for transparency
-    const baseDuration = 10; // seconds
-    const estimatedDuration = baseDuration / toolEfficiency; // 10s hoe, 12.5s shovel, 20s hands
-    console.log(`[SoilSystem] Tool: ${toolUsed}, Estimated duration: ${estimatedDuration.toFixed(1)}s (efficiency: ${(toolEfficiency * 100).toFixed(0)}%)`);
-
     // Change terrain to dirt
-    const oldTerrain = tile.terrain;
     tile.terrain = 'dirt';
-    console.log(`[SoilSystem] Changed terrain: ${oldTerrain} → dirt`);
-
     // Set fertility based on biome (biome is guaranteed to exist due to check above)
-    const oldFertility = tile.fertility;
     tile.fertility = this.getInitialFertility(tile.biome!); // ! is safe due to validation
-    console.log(`[SoilSystem] Set fertility based on biome '${tile.biome}': ${oldFertility.toFixed(2)} → ${tile.fertility.toFixed(2)}`);
 
     // Make plantable
     tile.tilled = true;
     tile.plantability = 3;
     tile.lastTilled = world.tick;
-    console.log(`[SoilSystem] Set tile as plantable: tilled=true, plantability=3/3 uses, lastTilled=${world.tick}`);
-
     // Initialize nutrients based on biome
     const nutrientBase = tile.fertility;
     tile.nutrients = {
@@ -196,14 +133,8 @@ export class SoilSystem implements System {
       phosphorus: nutrientBase * 0.8,
       potassium: nutrientBase * 0.9,
     };
-    console.log(`[SoilSystem] Initialized nutrients (NPK):`, {
-      nitrogen: tile.nutrients.nitrogen.toFixed(2),
-      phosphorus: tile.nutrients.phosphorus.toFixed(2),
-      potassium: tile.nutrients.potassium.toFixed(2),
-    });
 
     // Emit tilling event
-    console.log(`[SoilSystem] Emitting soil:tilled event for (${x}, ${y})`);
     world.eventBus.emit({
       type: 'soil:tilled',
       source: 'soil-system',
@@ -212,8 +143,6 @@ export class SoilSystem implements System {
         y,
       },
     });
-
-    console.log(`[SoilSystem] ===== TILLING COMPLETE =====`);
   }
 
   /**
@@ -438,15 +367,6 @@ export class SoilSystem implements System {
         tile.fertilized = false;
       }
     }
-  }
-
-  /**
-   * Check if inventory contains a specific item
-   * TODO: Move to InventoryComponent helper when tool system is fully implemented
-   */
-  private hasItemInInventory(inventory: any, itemId: string): boolean {
-    if (!inventory.slots) return false;
-    return inventory.slots.some((slot: any) => slot.itemId === itemId && slot.quantity > 0);
   }
 
   /**

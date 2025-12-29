@@ -49,8 +49,8 @@ describe('Save/Load Persistence Integration', () => {
 
   it('should preserve component data structure', () => {
     const agent = harness.createTestAgent({ x: 15, y: 20 });
-    // createNeedsComponent(hunger, energy, health, hungerDecayRate, energyDecayRate)
-    const needs = createNeedsComponent(70, 50, 80, 2.5, 1.5);
+    // createNeedsComponent(hunger, energy, health, thirst, temperature, hungerDecayRate, energyDecayRate)
+    const needs = createNeedsComponent(70, 50, 80, 100, 37, 2.5, 1.5);
     agent.addComponent(needs);
 
     // Get component

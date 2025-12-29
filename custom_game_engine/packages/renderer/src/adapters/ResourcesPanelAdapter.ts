@@ -41,7 +41,7 @@ export class ResourcesPanelAdapter implements IWindowPanel {
 
   render(
     ctx: CanvasRenderingContext2D,
-    x: number,
+    _x: number,
     _y: number,
     width: number,
     _height: number,
@@ -51,15 +51,8 @@ export class ResourcesPanelAdapter implements IWindowPanel {
       return;
     }
 
-    // ResourcesPanel needs world and agentPanelOpen flag
-    // We'll render within the content area provided by WindowManager
-    ctx.save();
-
-    // Call original render - it renders its own content
-    // We pass width as canvasWidth since panel positions itself relative to that
-    this.panel.render(ctx, x + width, world, false);
-
-    ctx.restore();
+    // WindowManager handles positioning via translate, panel renders at (0, 0)
+    this.panel.render(ctx, width, world, false);
   }
 
   /**

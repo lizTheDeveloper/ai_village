@@ -58,36 +58,6 @@
       display: block;
     }
 
-    .controls {
-      position: absolute;
-      bottom: 1rem;
-      left: 1rem;
-      background: rgba(0, 0, 0, 0.8);
-      padding: 1rem;
-      border-radius: 8px;
-      font-size: 0.75rem;
-      line-height: 1.6;
-      pointer-events: none;
-      transition: opacity 0.2s ease;
-    }
-
-    .controls.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .controls h3 {
-      font-size: 0.875rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .controls kbd {
-      background: #333;
-      padding: 0.125rem 0.375rem;
-      border-radius: 3px;
-      font-family: monospace;
-      font-size: 0.75rem;
-    }
   </style>
 </head>
 <body>
@@ -99,30 +69,6 @@
 
     <main>
       <canvas id="canvas"></canvas>
-
-      <div class="controls">
-        <h3>Controls</h3>
-        <p><kbd>WASD</kbd> or <kbd>Arrow Keys</kbd> - Pan camera</p>
-        <p><kbd>Mouse Drag</kbd> - Pan camera</p>
-        <p><kbd>Mouse Wheel</kbd> - Zoom</p>
-        <p><kbd>+</kbd> / <kbd>-</kbd> - Zoom</p>
-        <p><kbd>B</kbd> - Build menu</p>
-        <p><kbd>Left Click</kbd> - Select agent</p>
-        <p><kbd>Right Click</kbd> - Inspect tile</p>
-
-        <p style="margin-top: 10px; color: #00CED1;"><strong>Time Controls:</strong></p>
-        <p><kbd>1</kbd>/<kbd>2</kbd>/<kbd>3</kbd>/<kbd>4</kbd> - Speed (1x/2x/4x/8x)</p>
-        <p><kbd>Shift+1</kbd>/<kbd>Shift+2</kbd>/<kbd>Shift+3</kbd> - Skip time</p>
-
-        <p style="margin-top: 10px; color: #9370DB;"><strong>Behavior Queue:</strong></p>
-        <p><kbd>Q</kbd> - Queue test behaviors (selected agent)</p>
-        <p><kbd>C</kbd> - Clear behavior queue (selected agent)</p>
-
-        <p style="margin-top: 10px; color: #8B4513;"><strong>Soil Actions:</strong></p>
-        <p><kbd>T</kbd> - Till selected tile</p>
-        <p><kbd>W</kbd> - Water selected tile</p>
-        <p><kbd>F</kbd> - Fertilize selected tile</p>
-      </div>
     </main>
   </div>
 

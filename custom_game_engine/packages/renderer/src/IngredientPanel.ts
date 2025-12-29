@@ -1,4 +1,4 @@
-import type { World } from '@ai-village/core';
+import type { World, EntityId } from '@ai-village/core';
 import { globalRecipeRegistry } from '@ai-village/core';
 
 export interface IngredientDisplay {
@@ -16,7 +16,7 @@ export class IngredientPanel {
   public readonly bounds: { x: number; y: number; width: number; height: number };
 
   public recipeId: string | null = null;
-  public agentId: number | null = null;
+  public agentId: EntityId | null = null;
   public ingredients: IngredientDisplay[] = [];
   private hoveredIngredient: string | null = null;
 
@@ -41,13 +41,13 @@ export class IngredientPanel {
     // Listen for inventory changes
     this.world.eventBus.subscribe('inventory:changed', (event) => {
       const data = event.data; // Has entityId as string
-      if (this.agentId && data.entityId === String(this.agentId)) {
+      if (this.agentId && data.entityId === this.agentId) {
         this.refresh();
       }
     });
   }
 
-  setRecipe(recipeId: string, agentId: number): void {
+  setRecipe(recipeId: string, agentId: EntityId): void {
     if (!recipeId) {
       throw new Error('Recipe ID is required');
     }

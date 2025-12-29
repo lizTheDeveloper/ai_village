@@ -7,6 +7,12 @@ import { createTree } from '../entities/TreeEntity.js';
 import { createRock } from '../entities/RockEntity.js';
 import { createLeafPile } from '../entities/LeafPileEntity.js';
 import { createFiberPlant } from '../entities/FiberPlantEntity.js';
+import {
+  createIronDeposit,
+  createCoalDeposit,
+  createCopperDeposit,
+  createGoldDeposit,
+} from '../entities/OreDepositEntity.js';
 import { WildAnimalSpawningSystem } from '@ai-village/core';
 
 /**
@@ -127,6 +133,29 @@ export class TerrainGenerator {
           if (Math.random() > 0.85) {
             // 15% chance for fiber plants in grass
             createFiberPlant(world, worldX, worldY);
+          }
+        }
+
+        // Place ore deposits in stone/mountain terrain
+        // Use separate noise layers for each ore type to create natural veins
+        if (tile.terrain === 'stone') {
+          const oreNoise = placementNoise.noise(worldX * 0.15, worldY * 0.15);
+
+          // Iron ore - common, 15% chance in stone
+          if (oreNoise > 0.3 && Math.random() > 0.85) {
+            createIronDeposit(world, worldX, worldY);
+          }
+          // Coal - common, 10% chance in stone (different noise range)
+          else if (oreNoise < -0.3 && Math.random() > 0.9) {
+            createCoalDeposit(world, worldX, worldY);
+          }
+          // Copper - uncommon, 5% chance in stone
+          else if (oreNoise > 0.1 && oreNoise < 0.3 && Math.random() > 0.95) {
+            createCopperDeposit(world, worldX, worldY);
+          }
+          // Gold - rare, 2% chance only in deep stone (high elevation)
+          else if (oreNoise < -0.5 && Math.random() > 0.98) {
+            createGoldDeposit(world, worldX, worldY);
           }
         }
 

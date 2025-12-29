@@ -5,9 +5,15 @@
  * - Physical properties (weight, stackSize)
  * - Behavior flags (isEdible, isStorable, isGatherable)
  * - Relationships (craftedFrom, growsInto)
+ * - Food attributes (quality, flavors)
  *
  * Part of the Item System refactor (work-order: item-system)
  */
+
+/**
+ * Flavor types for food preference system.
+ */
+export type FlavorType = 'sweet' | 'savory' | 'spicy' | 'bitter' | 'sour' | 'umami';
 
 /**
  * Item categories for filtering and grouping
@@ -21,6 +27,11 @@ export type ItemCategory =
   | 'consumable'    // potion, medicine, etc.
   | 'equipment'     // armor, weapons, etc.
   | 'misc';         // everything else
+
+/**
+ * Item rarity tiers affecting value
+ */
+export type ItemRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 
 /**
  * Crafting ingredient specification
@@ -55,6 +66,12 @@ export interface ItemDefinition {
   /** Hunger restored when eaten (if isEdible) */
   readonly hungerRestored?: number;
 
+  /** Food quality affecting mood satisfaction (0-100, higher = better) */
+  readonly quality?: number;
+
+  /** Flavor profile for food preference system */
+  readonly flavors?: readonly FlavorType[];
+
   /** Whether this item can be deposited to storage */
   readonly isStorable: boolean;
 
@@ -72,6 +89,12 @@ export interface ItemDefinition {
 
   /** Optional: For seeds - the plant species this grows into */
   readonly growsInto?: string;
+
+  /** Base value in currency (for economy system) */
+  readonly baseValue: number;
+
+  /** Rarity tier (affects market value) */
+  readonly rarity: ItemRarity;
 
   /** Optional: Custom metadata for extensions */
   readonly metadata?: Readonly<Record<string, unknown>>;
@@ -94,12 +117,16 @@ export function defineItem(
     stackSize: overrides.stackSize ?? 50,
     isEdible: overrides.isEdible ?? false,
     hungerRestored: overrides.hungerRestored,
+    quality: overrides.quality,
+    flavors: overrides.flavors,
     isStorable: overrides.isStorable ?? true,
     isGatherable: overrides.isGatherable ?? false,
     gatherSources: overrides.gatherSources,
     requiredTool: overrides.requiredTool,
     craftedFrom: overrides.craftedFrom,
     growsInto: overrides.growsInto,
+    baseValue: overrides.baseValue ?? 10,
+    rarity: overrides.rarity ?? 'common',
     metadata: overrides.metadata,
   };
 }

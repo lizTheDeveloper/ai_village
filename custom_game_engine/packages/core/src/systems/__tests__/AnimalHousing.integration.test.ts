@@ -28,7 +28,7 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     const housingSystem = new AnimalHousingSystem();
     harness.registerSystem('AnimalHousingSystem', housingSystem);
 
-    const coop = harness.createTestBuilding('chicken_coop', { x: 10, y: 10 });
+    const coop = harness.createTestBuilding('chicken-coop', { x: 10, y: 10 });
     coop.updateComponent('building', (comp: any) => ({
       ...comp,
       isComplete: true,
@@ -49,13 +49,50 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     const housingSystem = new AnimalHousingSystem();
     harness.registerSystem('AnimalHousingSystem', housingSystem);
 
-    const coop = harness.createTestBuilding('chicken_coop', { x: 10, y: 10 });
+    const coop = harness.createTestBuilding('chicken-coop', { x: 10, y: 10 });
     coop.updateComponent('building', (comp: any) => ({
       ...comp,
       isComplete: true,
-      currentOccupants: ['chicken-1', 'chicken-2'],
+      currentOccupants: [],
       cleanliness: 100,
     }));
+
+    // Create actual animal entities with housingBuildingId set to the coop
+    const chicken1 = harness.world.createEntity('chicken-1');
+    (chicken1 as any).addComponent({
+      type: 'animal',
+      id: 'chicken-1',
+      speciesId: 'chicken',
+      housingBuildingId: coop.id,
+      state: 'idle',
+      hunger: 50,
+      energy: 80,
+      stress: 10,
+      health: 100,
+      mood: 70,
+      age: 100,
+      wild: false,
+      trustLevel: 50,
+    });
+    (chicken1 as any).addComponent({ type: 'position', version: 1, x: 10, y: 10 });
+
+    const chicken2 = harness.world.createEntity('chicken-2');
+    (chicken2 as any).addComponent({
+      type: 'animal',
+      id: 'chicken-2',
+      speciesId: 'chicken',
+      housingBuildingId: coop.id,
+      state: 'idle',
+      hunger: 50,
+      energy: 80,
+      stress: 10,
+      health: 100,
+      mood: 70,
+      age: 100,
+      wild: false,
+      trustLevel: 50,
+    });
+    (chicken2 as any).addComponent({ type: 'position', version: 1, x: 10, y: 10 });
 
     const entities = Array.from(harness.world.entities.values());
 
@@ -63,7 +100,7 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
 
     const building = coop.getComponent('building') as any;
 
-    // Occupancy should be tracked
+    // Occupancy should be tracked from actual animals with housingBuildingId
     expect(building.currentOccupants.length).toBe(2);
   });
 
@@ -74,7 +111,7 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     harness.registerSystem('AnimalHousingSystem', housingSystem);
     harness.registerSystem('AnimalSystem', animalSystem);
 
-    const coop = harness.createTestBuilding('chicken_coop', { x: 10, y: 10 });
+    const coop = harness.createTestBuilding('chicken-coop', { x: 10, y: 10 });
     coop.updateComponent('building', (comp: any) => ({
       ...comp,
       isComplete: true,
@@ -118,7 +155,7 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     const housingSystem = new AnimalHousingSystem();
     harness.registerSystem('AnimalHousingSystem', housingSystem);
 
-    const coop = harness.createTestBuilding('chicken_coop', { x: 10, y: 10 });
+    const coop = harness.createTestBuilding('chicken-coop', { x: 10, y: 10 });
     coop.updateComponent('building', (comp: any) => ({
       ...comp,
       isComplete: false, // Under construction
@@ -139,7 +176,7 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     const housingSystem = new AnimalHousingSystem();
     harness.registerSystem('AnimalHousingSystem', housingSystem);
 
-    const coop = harness.createTestBuilding('chicken_coop', { x: 10, y: 10 });
+    const coop = harness.createTestBuilding('chicken-coop', { x: 10, y: 10 });
     const initialCleanliness = 100;
 
     coop.updateComponent('building', (comp: any) => ({
@@ -169,7 +206,7 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     harness.registerSystem('BuildingSystem', buildingSystem);
     harness.registerSystem('AnimalHousingSystem', housingSystem);
 
-    const coop = harness.createTestBuilding('chicken_coop', { x: 10, y: 10 });
+    const coop = harness.createTestBuilding('chicken-coop', { x: 10, y: 10 });
     coop.updateComponent('building', (comp: any) => ({
       ...comp,
       isComplete: false,
@@ -196,7 +233,7 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     const housingSystem = new AnimalHousingSystem();
     harness.registerSystem('AnimalHousingSystem', housingSystem);
 
-    const coop = harness.createTestBuilding('chicken_coop', { x: 10, y: 10 });
+    const coop = harness.createTestBuilding('chicken-coop', { x: 10, y: 10 });
     coop.updateComponent('building', (comp: any) => ({
       ...comp,
       isComplete: true,

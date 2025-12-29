@@ -10,6 +10,7 @@ export interface SteeringComponentData {
   wanderAngle?: number;
   slowingRadius?: number;
   arrivalTolerance?: number;
+  deadZone?: number;
   lookAheadDistance?: number;
   wanderRadius?: number;
   wanderDistance?: number;
@@ -34,6 +35,7 @@ export class SteeringComponent extends ComponentBase {
   public wanderAngle?: number;
   public slowingRadius: number;
   public arrivalTolerance: number;
+  public deadZone: number;
   public lookAheadDistance: number;
   public wanderRadius: number;
   public wanderDistance: number;
@@ -60,6 +62,7 @@ export class SteeringComponent extends ComponentBase {
     this.wanderAngle = data.wanderAngle;
     this.slowingRadius = data.slowingRadius ?? 5.0;
     this.arrivalTolerance = data.arrivalTolerance ?? 1.0;
+    this.deadZone = data.deadZone ?? 0.5;
     this.lookAheadDistance = data.lookAheadDistance ?? 5.0;
     this.wanderRadius = data.wanderRadius ?? 2.0;
     this.wanderDistance = data.wanderDistance ?? 3.0;

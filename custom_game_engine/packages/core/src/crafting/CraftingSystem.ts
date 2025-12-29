@@ -3,6 +3,24 @@ import { System } from '../ecs/System.js';
 import type { CraftingJob } from './CraftingJob.js';
 import { createCraftingJob } from './CraftingJob.js';
 import type { Recipe } from './Recipe.js';
+import type { RecipeRegistry } from './RecipeRegistry.js';
+import type { InventoryComponent } from '../components/InventoryComponent.js';
+import {
+  getItemCount,
+  hasItem,
+  removeFromInventory,
+  addToInventoryWithQuality,
+} from '../components/InventoryComponent.js';
+import type { SkillsComponent } from '../components/SkillsComponent.js';
+import {
+  getQualityMultiplier,
+  getTotalSynergyQualityBonus,
+  getTaskFamiliarityBonus,
+  recordTaskCompletion,
+  addSpecializationXP,
+} from '../components/SkillsComponent.js';
+import type { EntityImpl } from '../ecs/Entity.js';
+import type { EntityId } from '../types.js';
 
 /**
  * Ingredient availability status.
@@ -23,7 +41,7 @@ export interface IngredientAvailability {
  * Agent crafting queue state.
  */
 interface AgentCraftingQueue {
-  agentId: number;
+  agentId: EntityId;
   queue: CraftingJob[];
   paused: boolean;
 }
@@ -37,8 +55,27 @@ export class CraftingSystem implements System {
   public readonly priority = 55; // After BuildingSystem (50), before MemorySystem (100)
   public readonly requiredComponents = [] as const; // Process queues manually, not entity-based
 
-  private queues: Map<number, AgentCraftingQueue> = new Map();
+  private queues: Map<EntityId, AgentCraftingQueue> = new Map();
   private readonly MAX_QUEUE_SIZE = 10;
+  private recipeRegistry: RecipeRegistry | null = null;
+
+  /**
+   * Set the recipe registry for looking up recipes.
+   */
+  setRecipeRegistry(registry: RecipeRegistry): void {
+    this.recipeRegistry = registry;
+  }
+
+  /**
+   * Get the recipe registry.
+   * @throws If registry is not set
+   */
+  getRecipeRegistry(): RecipeRegistry {
+    if (!this.recipeRegistry) {
+      throw new Error('Recipe registry not set. Call setRecipeRegistry() first.');
+    }
+    return this.recipeRegistry;
+  }
 
   /**
    * Queue a new crafting job for an agent.
@@ -46,7 +83,7 @@ export class CraftingSystem implements System {
    * @throws If agent entity not found
    * @throws If queue is full
    */
-  queueJob(agentId: number, recipe: Recipe, quantity: number): CraftingJob {
+  queueJob(agentId: EntityId, recipe: Recipe, quantity: number): CraftingJob {
     if (quantity <= 0) {
       throw new Error('Job quantity must be positive');
     }
@@ -77,7 +114,7 @@ export class CraftingSystem implements System {
   /**
    * Get the crafting queue for an agent.
    */
-  getQueue(agentId: number): CraftingJob[] {
+  getQueue(agentId: EntityId): CraftingJob[] {
     const queueState = this.queues.get(agentId);
     return queueState ? [...queueState.queue] : [];
   }
@@ -85,7 +122,7 @@ export class CraftingSystem implements System {
   /**
    * Get the currently active job for an agent.
    */
-  getCurrentJob(agentId: number): CraftingJob | null {
+  getCurrentJob(agentId: EntityId): CraftingJob | null {
     const queue = this.getQueue(agentId);
     if (queue.length === 0) {
       return null;
@@ -101,7 +138,7 @@ export class CraftingSystem implements System {
    * Reorder a job in the queue.
    * @throws If position is invalid
    */
-  reorderQueue(agentId: number, jobId: string, newPosition: number): void {
+  reorderQueue(agentId: EntityId, jobId: string, newPosition: number): void {
     const queueState = this.queues.get(agentId);
     if (!queueState) {
       throw new Error('Agent has no crafting queue');
@@ -135,7 +172,7 @@ export class CraftingSystem implements System {
    * Cancel a queued job.
    * @throws If job not found
    */
-  cancelJob(agentId: number, jobId: string): void {
+  cancelJob(agentId: EntityId, jobId: string): void {
     const queueState = this.queues.get(agentId);
     if (!queueState) {
       throw new Error('Agent has no crafting queue');
@@ -158,7 +195,7 @@ export class CraftingSystem implements System {
   /**
    * Clear all jobs in the queue.
    */
-  clearQueue(agentId: number): void {
+  clearQueue(agentId: EntityId): void {
     const queueState = this.queues.get(agentId);
     if (queueState) {
       queueState.queue = [];
@@ -168,7 +205,7 @@ export class CraftingSystem implements System {
   /**
    * Pause the crafting queue.
    */
-  pauseQueue(agentId: number): void {
+  pauseQueue(agentId: EntityId): void {
     const queueState = this.queues.get(agentId);
     if (queueState) {
       queueState.paused = true;
@@ -178,7 +215,7 @@ export class CraftingSystem implements System {
   /**
    * Resume the crafting queue.
    */
-  resumeQueue(agentId: number): void {
+  resumeQueue(agentId: EntityId): void {
     const queueState = this.queues.get(agentId);
     if (queueState) {
       queueState.paused = false;
@@ -188,31 +225,82 @@ export class CraftingSystem implements System {
   /**
    * Check if queue is paused.
    */
-  isQueuePaused(agentId: number): boolean {
+  isQueuePaused(agentId: EntityId): boolean {
     const queueState = this.queues.get(agentId);
     return queueState ? queueState.paused : false;
   }
 
   /**
    * Check ingredient availability for a recipe.
+   * @param world - The game world to look up the agent entity
+   * @param agentId - The agent's entity ID
+   * @param recipe - The recipe to check ingredients for
    */
-  checkIngredientAvailability(_agentId: number, recipe: Recipe): IngredientAvailability[] {
-    // This is a stub for the UI - full implementation would check inventory
-    // For now, return mock data based on ingredient requirements
-    return recipe.ingredients.map(ing => ({
-      itemId: ing.itemId,
-      required: ing.quantity,
-      available: 0, // Would query inventory
-      status: 'MISSING' as IngredientStatus
-    }));
+  checkIngredientAvailability(world: World, agentId: EntityId, recipe: Recipe): IngredientAvailability[] {
+    const entity = world.getEntity(agentId);
+    if (!entity) {
+      throw new Error(`Agent entity ${agentId} not found`);
+    }
+
+    const inventory = entity.components.get('inventory') as InventoryComponent | undefined;
+    if (!inventory) {
+      // No inventory means all ingredients are missing
+      return recipe.ingredients.map(ing => ({
+        itemId: ing.itemId,
+        required: ing.quantity,
+        available: 0,
+        status: 'MISSING' as IngredientStatus
+      }));
+    }
+
+    return recipe.ingredients.map(ing => {
+      const available = getItemCount(inventory, ing.itemId);
+      let status: IngredientStatus;
+
+      if (available >= ing.quantity) {
+        status = 'AVAILABLE';
+      } else if (available > 0) {
+        status = 'PARTIAL';
+      } else {
+        status = 'MISSING';
+      }
+
+      return {
+        itemId: ing.itemId,
+        required: ing.quantity,
+        available,
+        status
+      };
+    });
   }
 
   /**
    * Calculate maximum craftable quantity based on ingredients.
+   * @param world - The game world to look up the agent entity
+   * @param agentId - The agent's entity ID
+   * @param recipe - The recipe to check
    */
-  calculateMaxCraftable(_agentId: number, _recipe: Recipe): number {
-    // Stub implementation - would calculate based on inventory
-    return 0;
+  calculateMaxCraftable(world: World, agentId: EntityId, recipe: Recipe): number {
+    const entity = world.getEntity(agentId);
+    if (!entity) {
+      throw new Error(`Agent entity ${agentId} not found`);
+    }
+
+    const inventory = entity.components.get('inventory') as InventoryComponent | undefined;
+    if (!inventory) {
+      return 0;
+    }
+
+    // Calculate how many times we can craft based on available ingredients
+    let maxCraftable = Infinity;
+
+    for (const ing of recipe.ingredients) {
+      const available = getItemCount(inventory, ing.itemId);
+      const craftableFromThis = Math.floor(available / ing.quantity);
+      maxCraftable = Math.min(maxCraftable, craftableFromThis);
+    }
+
+    return maxCraftable === Infinity ? 0 : maxCraftable;
   }
 
   /**
@@ -246,8 +334,48 @@ export class CraftingSystem implements System {
 
   /**
    * Start a crafting job.
+   * Consumes ingredients from the agent's inventory.
+   * @throws If agent not found, no inventory, or insufficient ingredients
    */
   private startJob(world: World, job: CraftingJob): void {
+    // Get the recipe to know what ingredients to consume
+    if (!this.recipeRegistry) {
+      throw new Error('Recipe registry not set. Cannot start crafting job.');
+    }
+
+    const recipe = this.recipeRegistry.getRecipe(job.recipeId);
+    const entity = world.getEntity(job.agentId);
+    if (!entity) {
+      throw new Error(`Agent entity ${job.agentId} not found`);
+    }
+
+    const inventory = entity.components.get('inventory') as InventoryComponent | undefined;
+    if (!inventory) {
+      throw new Error(`Agent ${job.agentId} has no inventory. Cannot craft.`);
+    }
+
+    // Check if we have all ingredients (fail early per CLAUDE.md)
+    for (const ing of recipe.ingredients) {
+      const required = ing.quantity * job.quantity;
+      if (!hasItem(inventory, ing.itemId, required)) {
+        const available = getItemCount(inventory, ing.itemId);
+        throw new Error(
+          `Insufficient ${ing.itemId}: need ${required}, have ${available}`
+        );
+      }
+    }
+
+    // Consume all ingredients
+    let currentInventory = inventory;
+    for (const ing of recipe.ingredients) {
+      const required = ing.quantity * job.quantity;
+      const result = removeFromInventory(currentInventory, ing.itemId, required);
+      currentInventory = result.inventory;
+    }
+
+    // Update the entity's inventory
+    (entity as EntityImpl).updateComponent<InventoryComponent>('inventory', () => currentInventory);
+
     job.status = 'in_progress';
     job.startedAt = Date.now();
 
@@ -261,9 +389,6 @@ export class CraftingSystem implements System {
         recipeId: job.recipeId
       }
     });
-
-    // Consume ingredients (stub - would actually modify inventory)
-    // For now, we'll assume ingredients are consumed
   }
 
   /**
@@ -281,11 +406,77 @@ export class CraftingSystem implements System {
 
   /**
    * Complete a crafting job.
+   * Adds crafted items to the agent's inventory with quality based on skill level.
    */
   private completeJob(world: World, job: CraftingJob): void {
+    // Get the recipe to know what to produce
+    if (!this.recipeRegistry) {
+      throw new Error('Recipe registry not set. Cannot complete crafting job.');
+    }
+
+    const recipe = this.recipeRegistry.getRecipe(job.recipeId);
+    const entity = world.getEntity(job.agentId);
+    if (!entity) {
+      throw new Error(`Agent entity ${job.agentId} not found`);
+    }
+
+    const inventory = entity.components.get('inventory') as InventoryComponent | undefined;
+    if (!inventory) {
+      throw new Error(`Agent ${job.agentId} has no inventory. Cannot receive crafted items.`);
+    }
+
+    // Calculate quality based on crafting skill level + familiarity + synergy bonuses
+    let skillsComp = entity.components.get('skills') as SkillsComponent | undefined;
+    const craftingLevel = skillsComp?.levels.crafting ?? 0;
+
+    // Base quality from skill level (0.7 to 1.2)
+    const baseQuality = getQualityMultiplier(craftingLevel);
+
+    // Familiarity bonus (0-20) - making the same recipe repeatedly improves quality
+    const familiarityBonus = skillsComp
+      ? getTaskFamiliarityBonus(skillsComp, 'crafting', job.recipeId) / 100
+      : 0;
+
+    // Synergy bonus (e.g., Master Builder chain)
+    const synergyBonus = skillsComp ? getTotalSynergyQualityBonus(skillsComp) : 0;
+
+    // Total quality multiplier
+    const quality = baseQuality + familiarityBonus + synergyBonus;
+
+    // Add crafted items to inventory with quality
+    const outputQuantity = recipe.output.quantity * job.quantity;
+    let currentInventory = inventory;
+
+    try {
+      const result = addToInventoryWithQuality(currentInventory, recipe.output.itemId, outputQuantity, quality);
+      currentInventory = result.inventory;
+      job.completedCount = job.quantity;
+    } catch (error) {
+      // Inventory full - throw per CLAUDE.md guidelines
+      throw new Error(
+        `Cannot add crafted ${recipe.output.itemId} to inventory: ${(error as Error).message}`
+      );
+    }
+
+    // Update the entity's inventory
+    (entity as EntityImpl).updateComponent<InventoryComponent>('inventory', () => currentInventory);
+
+    // Record task completion for familiarity bonus (if skills component exists)
+    if (skillsComp) {
+      const qualityPercent = Math.round(quality * 100);
+      skillsComp = recordTaskCompletion(skillsComp, 'crafting', job.recipeId, qualityPercent, world.tick);
+
+      // Add specialization XP based on recipe station/category
+      const specName = this.getSpecializationForRecipe(recipe);
+      if (specName) {
+        skillsComp = addSpecializationXP(skillsComp, 'crafting', specName, 5);
+      }
+
+      (entity as EntityImpl).updateComponent<SkillsComponent>('skills', () => skillsComp!);
+    }
+
     job.status = 'completed';
     job.completedAt = Date.now();
-    job.completedCount = job.quantity;
 
     // Remove from queue
     const queueState = this.queues.get(job.agentId);
@@ -296,7 +487,7 @@ export class CraftingSystem implements System {
       }
     }
 
-    // Emit completion event
+    // Emit completion event with actual output including quality
     world.eventBus.emit({
       type: 'crafting:completed',
       source: 'crafting-system',
@@ -304,11 +495,44 @@ export class CraftingSystem implements System {
         jobId: String(job.id),
         agentId: String(job.agentId),
         recipeId: job.recipeId,
-        produced: [{ itemId: job.recipeId, amount: job.quantity }]
+        produced: [{ itemId: recipe.output.itemId, amount: outputQuantity, quality }]
       }
     });
 
-    // Add items to inventory (stub)
-    // Grant XP (stub)
+    // Note: XP granting is handled by SkillSystem listening to crafting:completed
+  }
+
+  /**
+   * Get crafting specialization based on recipe station or category.
+   * Maps to woodworking, smithing, leatherworking, or weaving.
+   */
+  private getSpecializationForRecipe(recipe: Recipe): string | null {
+    // Station-based specialization
+    if (recipe.stationRequired) {
+      const stationSpecs: Record<string, string> = {
+        'workbench': 'woodworking',
+        'forge': 'smithing',
+        'anvil': 'smithing',
+        'loom': 'weaving',
+        'tanning_rack': 'leatherworking',
+      };
+      if (stationSpecs[recipe.stationRequired]) {
+        return stationSpecs[recipe.stationRequired] ?? null;
+      }
+    }
+
+    // Category-based fallback
+    const categorySpecs: Record<string, string> = {
+      'Tools': 'woodworking',
+      'Weapons': 'smithing',
+      'Armor': 'smithing',
+      'Clothing': 'weaving',
+      'Furniture': 'woodworking',
+    };
+    if (recipe.category && categorySpecs[recipe.category]) {
+      return categorySpecs[recipe.category] ?? null;
+    }
+
+    return null;
   }
 }

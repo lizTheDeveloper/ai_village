@@ -45,14 +45,19 @@ describe('AgentAction', () => {
   });
 
   describe('actionToBehavior', () => {
-    it('should map chop action to gather behavior', () => {
+    it('should map chop action to pick behavior', () => {
       const behavior = actionToBehavior({ type: 'chop', targetId: 'nearest' });
-      expect(behavior).toBe('gather');
+      expect(behavior).toBe('pick');
     });
 
-    it('should map mine action to gather behavior', () => {
+    it('should map mine action to pick behavior', () => {
       const behavior = actionToBehavior({ type: 'mine', targetId: 'nearest' });
-      expect(behavior).toBe('gather');
+      expect(behavior).toBe('pick');
+    });
+
+    it('should map gather action to pick behavior', () => {
+      const behavior = actionToBehavior({ type: 'gather', targetId: 'nearest' });
+      expect(behavior).toBe('pick');
     });
 
     it('should map forage action to seek_food behavior', () => {

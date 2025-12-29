@@ -7,6 +7,7 @@ import {
   createRenderableComponent,
   createTagsComponent,
   createResourceComponent,
+  PlantComponent,
 } from '@ai-village/core';
 
 /**
@@ -30,6 +31,16 @@ export function createBerryBush(world: WorldMutator, x: number, y: number): stri
 
   // Resource - berry bushes provide food
   entity.addComponent(createResourceComponent('food', 20, 0.3)); // 20 food, regenerates 0.3/sec
+
+  // Plant - berry bushes are mature wild plants
+  entity.addComponent(new PlantComponent({
+    speciesId: 'berry-bush',
+    position: { x, y },
+    stage: 'mature',
+    health: 100,
+    hydration: 80,
+    nutrition: 80,
+  }));
 
   // Add to world
   (world as any)._addEntity(entity);

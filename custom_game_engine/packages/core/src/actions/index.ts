@@ -9,5 +9,8 @@ export * from './ActionQueue.js';
 export * from './AgentAction.js';
 export * from './AnimalHousingActions.js';
 export * from './TillActionHandler.js';
+export * from './PlantActionHandler.js';
 export * from './GatherSeedsActionHandler.js';
 export * from './HarvestActionHandler.js';
+export * from './CraftActionHandler.js';
+export * from './TradeActionHandler.js';

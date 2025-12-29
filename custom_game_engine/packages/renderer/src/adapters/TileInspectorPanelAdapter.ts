@@ -24,11 +24,11 @@ export class TileInspectorPanelAdapter implements IWindowPanel {
   }
 
   getDefaultWidth(): number {
-    return 320;
+    return 384;  // 20% larger than original 320
   }
 
   getDefaultHeight(): number {
-    return 420;
+    return 504;  // 20% larger than original 420
   }
 
   isVisible(): boolean {
@@ -42,8 +42,8 @@ export class TileInspectorPanelAdapter implements IWindowPanel {
 
   render(
     ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
+    _x: number,
+    _y: number,
     width: number,
     height: number,
     _world?: any
@@ -52,13 +52,26 @@ export class TileInspectorPanelAdapter implements IWindowPanel {
       return;
     }
 
-    ctx.save();
-    ctx.translate(x, y);
+    // Use renderAt which renders at (0,0) without background/border/close button
+    // WindowManager handles positioning via translate before calling render
+    this.panel.renderAt(ctx, 0, 0, width, height);
+  }
 
-    // Call original render with canvas dimensions (it doesn't use world)
-    this.panel.render(ctx, width, height);
+  /**
+   * Handle clicks on the panel content area.
+   * Forwards to the TileInspectorPanel's button handling.
+   */
+  handleContentClick(x: number, y: number, width: number, height: number): boolean {
+    // The panel's handleClickAt expects coordinates relative to panel origin
+    return this.panel.handleClickAt(x, y, width, height);
+  }
 
-    ctx.restore();
+  /**
+   * Handle scroll events for the panel.
+   */
+  handleScroll(deltaY: number, _contentHeight: number): boolean {
+    this.panel.handleScroll(deltaY);
+    return true;
   }
 
   /**

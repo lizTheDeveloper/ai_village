@@ -299,7 +299,7 @@ describe('MemoryFormationSystem', () => {
       eventBus.emit('conversation:utterance', {
         speakerId: agent.id,
         listenerId: 'bob-123',
-        text: 'Hello, how are you?',
+        message: 'Hello, how are you?',
         timestamp: Date.now()
       });
 
@@ -316,7 +316,7 @@ describe('MemoryFormationSystem', () => {
       eventBus.emit('conversation:utterance', {
         speakerId: 'alice-456',
         listenerId: agent.id,
-        text: 'Nice weather today',
+        message: 'Nice weather today',
         timestamp: Date.now()
       });
 
@@ -332,7 +332,7 @@ describe('MemoryFormationSystem', () => {
       eventBus.emit('conversation:utterance', {
         speakerId: agent.id,
         listenerId: 'charlie-789',
-        text: 'I really love gardening',
+        message: 'I really love gardening',
         timestamp: Date.now()
       });
 
@@ -353,7 +353,7 @@ describe('MemoryFormationSystem', () => {
         conversationId,
         speakerId: speaker.id,
         listenerId: listener.id,
-        text: 'Test message',
+        message: 'Test message',
         timestamp: Date.now()
       });
 

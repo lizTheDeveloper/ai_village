@@ -122,7 +122,7 @@ describe('Animal Production System', () => {
       const eventCall = eventHandler.mock.calls[0][0];
 
       // Eggs typically 1 per day (we set minQuantity=1, maxQuantity=1)
-      expect(eventCall.data.quantity).toBe(1);
+      expect(eventCall.data.amount).toBe(1);
     });
 
     it('should not produce when animal health is below minimum', () => {

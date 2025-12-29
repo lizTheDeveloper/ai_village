@@ -85,7 +85,7 @@ describe('Episodic Memory Integration', () => {
         data: {
           speakerId: agent.id,
           listenerId: listener.id,
-          text: 'Hello, how are you?',
+          message: 'Hello, how are you?',
           emotionalIntensity: 0.5
         }
       });

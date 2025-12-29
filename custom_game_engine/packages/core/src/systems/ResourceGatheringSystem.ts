@@ -42,16 +42,10 @@ export class ResourceGatheringSystem implements System {
 
       // Log regeneration for visibility (playtest requirement)
       if (regenAmount > 0.1) { // Only log if significant regeneration occurred
-        console.log(
-          `[ResourceGatheringSystem] ${resource.resourceType} regenerated +${regenAmount.toFixed(1)} (now ${newAmount.toFixed(1)}/${resource.maxAmount}) on entity ${entity.id}`
-        );
       }
 
       // Emit event if fully regenerated
       if (newAmount >= resource.maxAmount && resource.amount < resource.maxAmount) {
-        console.log(
-          `[ResourceGatheringSystem] ${resource.resourceType} fully regenerated to ${newAmount} on entity ${entity.id}`
-        );
         world.eventBus.emit({
           type: 'resource:regenerated',
           source: entity.id,

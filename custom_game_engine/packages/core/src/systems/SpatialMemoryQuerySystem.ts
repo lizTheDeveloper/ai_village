@@ -2,9 +2,11 @@ import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { ResourceType } from '../components/ResourceComponent.js';
+import type { SpatialMemoryComponent, ResourceLocationMemory } from '../components/SpatialMemoryComponent.js';
+import type { EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
+import { getPosition, getSpatialMemory, getEpisodicMemory } from '../utils/componentHelpers.js';
 
 /**
  * SpatialMemoryQuerySystem synchronizes between EpisodicMemory and SpatialMemory
@@ -42,19 +44,17 @@ export class SpatialMemoryQuerySystem implements System {
    * Synchronize episodic memories with spatial memory index
    */
   private _syncMemories(entity: Entity, currentTick: number): void {
-    const impl = entity as EntityImpl;
-
-    const spatialMemory = impl.getComponent('spatial_memory') as any;
+    const spatialMemory = getSpatialMemory(entity);
     if (!spatialMemory) {
       throw new Error('SpatialMemory component missing');
     }
 
-    const episodicMemory = impl.getComponent('episodic_memory') as any;
+    const episodicMemory = getEpisodicMemory(entity);
     if (!episodicMemory) {
       throw new Error('EpisodicMemory component missing');
     }
 
-    const memories = episodicMemory.memories ?? [];
+    const memories = episodicMemory.episodicMemories;
 
     // Track how many memories we've processed
     const lastProcessed = this.lastProcessedMemoryCount.get(entity.id) ?? 0;
@@ -76,7 +76,7 @@ export class SpatialMemoryQuerySystem implements System {
   /**
    * Index a resource-related memory into spatial memory
    */
-  private _indexResourceMemory(memory: any, spatialMemory: any, currentTick: number): void {
+  private _indexResourceMemory(memory: EpisodicMemory, spatialMemory: SpatialMemoryComponent, currentTick: number): void {
     // Check if memory contains resource location information
     if (!this._isResourceLocationMemory(memory)) {
       return;
@@ -84,7 +84,7 @@ export class SpatialMemoryQuerySystem implements System {
 
     const resourceType = this._extractResourceType(memory);
     const position = this._extractPosition(memory);
-    const tick = memory.tick ?? currentTick;
+    const tick = memory.timestamp ?? currentTick;
 
     if (!resourceType || !position) {
       return; // Missing required information
@@ -108,7 +108,7 @@ export class SpatialMemoryQuerySystem implements System {
   /**
    * Check if memory contains resource location info
    */
-  private _isResourceLocationMemory(memory: any): boolean {
+  private _isResourceLocationMemory(memory: EpisodicMemory): boolean {
     const validTypes = [
       'resource:gathered',
       'resource:seen',
@@ -116,25 +116,15 @@ export class SpatialMemoryQuerySystem implements System {
       'vision:resource',
     ];
 
-    return validTypes.includes(memory.type);
+    return validTypes.includes(memory.eventType);
   }
 
   /**
    * Extract resource type from memory
    */
-  private _extractResourceType(memory: any): ResourceType | null {
-    // Try direct property
-    if (memory.resourceType) {
-      return memory.resourceType as ResourceType;
-    }
-
-    // Try data object
-    if (memory.data?.resourceType) {
-      return memory.data.resourceType as ResourceType;
-    }
-
-    // Try description parsing (less reliable)
-    const description = memory.description ?? '';
+  private _extractResourceType(memory: EpisodicMemory): ResourceType | null {
+    // Try description parsing
+    const description = memory.summary ?? '';
     const validResources: ResourceType[] = ['food', 'wood', 'stone', 'water'];
 
     for (const resource of validResources) {
@@ -149,24 +139,10 @@ export class SpatialMemoryQuerySystem implements System {
   /**
    * Extract position from memory
    */
-  private _extractPosition(memory: any): { x: number; y: number } | null {
-    // Try direct property
-    if (memory.position && typeof memory.position.x === 'number' && typeof memory.position.y === 'number') {
-      return { x: memory.position.x, y: memory.position.y };
-    }
-
-    // Try location property
+  private _extractPosition(memory: EpisodicMemory): { x: number; y: number } | null {
+    // Try location property from EpisodicMemory
     if (memory.location && typeof memory.location.x === 'number' && typeof memory.location.y === 'number') {
       return { x: memory.location.x, y: memory.location.y };
-    }
-
-    // Try data object
-    if (memory.data?.position && typeof memory.data.position.x === 'number' && typeof memory.data.position.y === 'number') {
-      return { x: memory.data.position.x, y: memory.data.position.y };
-    }
-
-    if (memory.data?.location && typeof memory.data.location.x === 'number' && typeof memory.data.location.y === 'number') {
-      return { x: memory.data.location.x, y: memory.data.location.y };
     }
 
     return null;
@@ -180,26 +156,19 @@ export class SpatialMemoryQuerySystem implements System {
     resourceType: ResourceType,
     currentTick: number
   ): { position: { x: number; y: number }; confidence: number } | null {
-    const impl = entity as EntityImpl;
-
-    if (!impl.hasComponent('spatial_memory')) {
+    const spatialMemory = getSpatialMemory(entity);
+    if (!spatialMemory) {
       return null;
     }
 
-    const spatialMemory = impl.getComponent('spatial_memory') as any;
-    if (!spatialMemory) return null;
-
     // Get agent position for distance ranking
-    let agentPosition: { x: number; y: number } | undefined;
-    if (impl.hasComponent('position')) {
-      agentPosition = impl.getComponent('position') as any;
-    }
+    const agentPosition = getPosition(entity);
 
     // Query memories
     const results = spatialMemory.queryResourceLocations(
       resourceType,
       currentTick,
-      agentPosition,
+      agentPosition ?? undefined,
       1 // Just get the best one
     );
 
@@ -208,6 +177,10 @@ export class SpatialMemoryQuerySystem implements System {
     }
 
     const best = results[0];
+    if (!best) {
+      return null;
+    }
+
     return {
       position: best.position,
       confidence: best.confidence,
@@ -223,29 +196,22 @@ export class SpatialMemoryQuerySystem implements System {
     currentTick: number,
     limit?: number
   ): Array<{ position: { x: number; y: number }; confidence: number }> {
-    const impl = entity as EntityImpl;
-
-    if (!impl.hasComponent('spatial_memory')) {
+    const spatialMemory = getSpatialMemory(entity);
+    if (!spatialMemory) {
       return [];
     }
 
-    const spatialMemory = impl.getComponent('spatial_memory') as any;
-    if (!spatialMemory) return [];
-
     // Get agent position
-    let agentPosition: { x: number; y: number } | undefined;
-    if (impl.hasComponent('position')) {
-      agentPosition = impl.getComponent('position') as any;
-    }
+    const agentPosition = getPosition(entity);
 
     const results = spatialMemory.queryResourceLocations(
       resourceType,
       currentTick,
-      agentPosition,
+      agentPosition ?? undefined,
       limit
     );
 
-    return results.map((r: any) => ({
+    return results.map((r: ResourceLocationMemory) => ({
       position: r.position,
       confidence: r.confidence,
     }));

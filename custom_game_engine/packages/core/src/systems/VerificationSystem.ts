@@ -2,9 +2,10 @@ import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
-import type { VerificationResult } from '../components/TrustNetworkComponent.js';
+import type { VerificationResult, VerificationRecord } from '../components/TrustNetworkComponent.js';
+import type { Gradient } from '../components/SocialGradientComponent.js';
+import { getPosition, getSocialGradient, getTrustNetwork, getResource } from '../utils/componentHelpers.js';
 
 /**
  * VerificationSystem checks resource claims and updates trust scores
@@ -47,18 +48,17 @@ export class VerificationSystem implements System {
   }
 
   private _verifyGradients(verifier: Entity, entities: ReadonlyArray<Entity>, currentTick: number): void {
-    const impl = verifier as EntityImpl;
-    const position = impl.getComponent('position') as any as { x: number; y: number };
+    const position = getPosition(verifier);
     if (!position) {
       throw new Error('position component missing');
     }
-    const socialGradient = impl.getComponent('social_gradient') as any;
+    const socialGradient = getSocialGradient(verifier);
     if (!socialGradient) {
       throw new Error('SocialGradient component missing');
     }
 
     // Get all gradients that have claim positions
-    const gradients = socialGradient.allGradients as any[];
+    const gradients = socialGradient.allGradients;
 
     for (const gradient of gradients) {
       if (!gradient.claimPosition) continue;
@@ -70,18 +70,8 @@ export class VerificationSystem implements System {
         continue; // Too far to verify
       }
 
-      // Find the claimant entity by agent ID (check agent component first, then entity ID)
-      const claimant = entities.find(e => {
-        // First try to match on agent component ID if it exists
-        if (e.components.has('agent')) {
-          const agent = e.components.get('agent') as any;
-          if (agent?.id === gradient.sourceAgentId) {
-            return true;
-          }
-        }
-        // Fall back to entity ID
-        return e.id === gradient.sourceAgentId;
-      });
+      // Find the claimant entity by entity ID
+      const claimant = entities.find(e => e.id === gradient.sourceAgentId);
 
       if (!claimant) {
         // Can't verify without claimant
@@ -91,21 +81,18 @@ export class VerificationSystem implements System {
       // Verify the claim
       let result = this._checkClaim(gradient, position, entities, currentTick);
 
-      // Record verification - use agent.id if available, otherwise entity.id
-      const verifierAgent = impl.getComponent('agent') as any;
-      const verifierId = verifierAgent?.id || verifier.id;
-      const claimantAgent = (claimant as EntityImpl).getComponent('agent') as any;
-      const claimantId = claimantAgent?.id || claimant.id;
+      // Record verification using entity IDs
+      const verifierId = verifier.id;
+      const claimantId = claimant.id;
 
       // Check for pattern of bad information (3+ failures)
       // Get claimant's trust network to check their history
-      const claimantImpl = claimant as EntityImpl;
-      if (claimantImpl.hasComponent('trust_network')) {
-        const claimantTrustNetwork = claimantImpl.getComponent('trust_network') as any;
+      const claimantTrustNetwork = getTrustNetwork(claimant);
+      if (claimantTrustNetwork) {
         const history = claimantTrustNetwork.getVerificationHistory(verifierId);
 
         // Count recent failures (false_report, misidentified)
-        const failures = history.filter((record: any) =>
+        const failures = history.filter((record: VerificationRecord) =>
           record.result === 'false_report' ||
           record.result === 'misidentified'
         );
@@ -121,13 +108,9 @@ export class VerificationSystem implements System {
       // Update VERIFIER's trust network with verification result
       // When the verifier checks the claimant's information, it affects the verifier's trust in the claimant
       // (If the claim is correct, trust increases; if wrong, trust decreases)
-      if (!impl.hasComponent('trust_network')) {
-        continue; // Verifier needs trust network to track claimant's reliability
-      }
-
-      const trustNetwork = impl.getComponent('trust_network') as any;
+      const trustNetwork = getTrustNetwork(verifier);
       if (!trustNetwork) {
-        throw new Error('TrustNetwork component missing');
+        continue; // Verifier needs trust network to track claimant's reliability
       }
 
       // recordVerification handles both trust score update and history tracking
@@ -181,24 +164,20 @@ export class VerificationSystem implements System {
   /**
    * Check if a gradient claim is accurate
    */
-  private _checkClaim(gradient: any, _verifierPos: any, entities: ReadonlyArray<Entity>, currentTick: number): VerificationResult {
+  private _checkClaim(gradient: Gradient, _verifierPos: { x: number; y: number }, entities: ReadonlyArray<Entity>, currentTick: number): VerificationResult {
     // Look for resources near claimed position
     const nearbyResources = entities.filter(e => {
-      if (!e.components.has('resource')) return false;
-      if (!e.components.has('position')) return false;
-
-      const resourcePos = e.components.get('position');
+      const resourcePos = getPosition(e);
       if (!resourcePos) return false;
-      const dist = this._distance(gradient.claimPosition, resourcePos as any);
+      const dist = this._distance(gradient.claimPosition!, resourcePos);
       return dist < 10; // Within 10 tiles of claim
     });
 
     // Check for exact match
     const exactMatch = nearbyResources.find(e => {
-      const resource = e.components.get('resource');
+      const resource = getResource(e);
       if (!resource) return false;
-      const resourceType = (resource as any).type || (resource as any).resourceType;
-      return resourceType === gradient.resourceType && (resource as any).amount > 0;
+      return resource.resourceType === gradient.resourceType && resource.amount > 0;
     });
 
     if (exactMatch) {
@@ -207,10 +186,9 @@ export class VerificationSystem implements System {
 
     // Check for wrong resource type
     const wrongType = nearbyResources.find(e => {
-      const resource = e.components.get('resource');
+      const resource = getResource(e);
       if (!resource) return false;
-      const resourceType = (resource as any).type || (resource as any).resourceType;
-      return resourceType !== gradient.resourceType && (resource as any).amount > 0;
+      return resource.resourceType !== gradient.resourceType && resource.amount > 0;
     });
 
     if (wrongType) {

@@ -19,7 +19,7 @@ export class MemoryPanelAdapter implements IWindowPanel {
   }
 
   getTitle(): string {
-    return 'Memory System';
+    return 'Memory & Goals';
   }
 
   getDefaultWidth(): number {
@@ -48,8 +48,8 @@ export class MemoryPanelAdapter implements IWindowPanel {
 
   render(
     ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
+    _x: number,
+    _y: number,
     width: number,
     height: number,
     world?: any
@@ -58,13 +58,8 @@ export class MemoryPanelAdapter implements IWindowPanel {
       return;
     }
 
-    ctx.save();
-    ctx.translate(x, y);
-
-    // Call original render - pass canvas dimensions for layout
+    // WindowManager handles positioning via translate, panel renders at (0, 0)
     this.panel.render(ctx, width, height, world);
-
-    ctx.restore();
   }
 
   /**

@@ -26,6 +26,7 @@ export class MemoryFormationSystem implements System {
   private eventBus: EventBus;
   private pendingMemories: Map<string, any[]> = new Map();
   private requiredAgents: Set<string> = new Set(); // Agents that MUST exist (not from conversation)
+  private pendingBroadcasts: any[] = []; // Events to broadcast to ALL agents
 
   constructor(eventBus: EventBus) {
     this.eventBus = eventBus;
@@ -104,16 +105,16 @@ export class MemoryFormationSystem implements System {
       // Harvesting and resource events
       'harvest:first',
       'agent:harvested',
-      'resource:gathered',
+      // 'resource:gathered' - removed (too spammy)
       'resource:depleted',
 
       // Construction events
-      'construction:failed',
-      'construction:gathering_resources',
+      // 'construction:failed' - removed (can be spammy when repeatedly failing)
+      // 'construction:gathering_resources' - removed (too routine)
 
       // Inventory and storage
       'items:deposited',
-      'inventory:full',
+      // 'inventory:full' - removed (too spammy)
       'storage:full',
       'storage:not_found',
 
@@ -152,6 +153,15 @@ export class MemoryFormationSystem implements System {
         this._handleMemoryTrigger(eventType as any, event.data as MemoryTriggerEvent);
       });
     }
+
+    // Subscribe to broadcast events - these create memories for ALL alive agents
+    this.eventBus.subscribe('construction:started', (event) => {
+      // Queue for broadcast processing during update()
+      this.pendingBroadcasts.push({
+        eventType: 'construction:started',
+        data: event.data,
+      });
+    });
   }
 
   private _handleMemoryTrigger(eventType: string, data: MemoryTriggerEvent): void {
@@ -242,7 +252,7 @@ export class MemoryFormationSystem implements System {
       for (const { eventType, data } of memories) {
         // Determine if event is significant enough to form memory
         if (this._shouldFormMemory(eventType, data)) {
-          this._formMemory(memComp, eventType, data);
+          this._formMemory(memComp, eventType, data, world);
         }
       }
     }
@@ -251,8 +261,80 @@ export class MemoryFormationSystem implements System {
     this.pendingMemories.clear();
     this.requiredAgents.clear();
 
+    // Process broadcast events - create memories for ALL alive agents
+    this._processBroadcasts(world);
+
     // Flush events emitted during memory formation (memory:formed events)
     this.eventBus.flush();
+  }
+
+  /**
+   * Process broadcast events that should create memories for ALL alive agents.
+   * Used for significant world events like construction starting.
+   */
+  private _processBroadcasts(world: World): void {
+    if (this.pendingBroadcasts.length === 0) {
+      return;
+    }
+
+    // Get all agents with episodic memory
+    const agents = world.query().with('agent').with('episodic_memory').executeEntities();
+
+    for (const broadcast of this.pendingBroadcasts) {
+      const { eventType, data } = broadcast;
+
+      // Generate summary for this broadcast event (pass world for name lookups)
+      const summary = this._generateBroadcastSummary(eventType, data, world);
+
+      for (const agent of agents) {
+        const memComp = agent.components.get('episodic_memory') as EpisodicMemoryComponent | undefined;
+        if (!memComp) continue;
+
+        // Create memory for this agent
+        memComp.formMemory({
+          eventType,
+          summary,
+          timestamp: Date.now(),
+          location: data.position,
+          emotionalIntensity: 0.3,
+          emotionalValence: 0.2, // Slightly positive - new construction
+          surprise: 0.4,
+          novelty: 0.5,
+          socialSignificance: 0.6, // Building is a community event
+          participants: data.builderId ? [data.builderId] : undefined,
+        });
+      }
+    }
+
+    // Clear processed broadcasts
+    this.pendingBroadcasts = [];
+  }
+
+  /**
+   * Generate summary for broadcast events.
+   */
+  private _generateBroadcastSummary(eventType: string, data: any, world?: World): string {
+    switch (eventType) {
+      case 'construction:started': {
+        const buildingType = data.buildingType || 'building';
+        const builderId = data.builderId;
+        if (builderId && world) {
+          // Try to get builder's name
+          const builderEntity = world.getEntity(builderId);
+          if (builderEntity) {
+            const identity = builderEntity.components.get('identity') as { name?: string } | undefined;
+            const builderName = identity?.name || builderId;
+            return `${builderName} started building a ${buildingType}`;
+          }
+        }
+        if (builderId) {
+          return `${builderId} started building a ${buildingType}`;
+        }
+        return `Construction started on a ${buildingType}`;
+      }
+      default:
+        return `World event: ${eventType}`;
+    }
   }
 
   private _shouldFormMemory(eventType: string, data: MemoryTriggerEvent): boolean {
@@ -295,11 +377,11 @@ export class MemoryFormationSystem implements System {
       'agent:starved',
       'agent:collapsed',
       'agent:harvested',
-      'resource:gathered',
+      // 'resource:gathered' - removed (too spammy)
       // Note: building:complete removed - it's a system event without agentId
-      'construction:failed',
+      // 'construction:failed' - removed (can be spammy when repeatedly failing)
       'items:deposited',
-      'inventory:full',
+      // 'inventory:full' - removed (too spammy)
       'storage:full',
       'conversation:started',
       'information:shared',
@@ -340,32 +422,40 @@ export class MemoryFormationSystem implements System {
   private _formMemory(
     memComp: EpisodicMemoryComponent,
     eventType: string,
-    data: MemoryTriggerEvent
+    data: MemoryTriggerEvent,
+    world: World
   ): void {
     // Generate summary from event data
     const summary = this._generateSummary(eventType, data);
 
     // Log memory formation for debugging
-    console.log(`[MemoryFormation] 🧠 Forming memory for agent ${data.agentId}:`, {
-      eventType,
-      summary: summary.substring(0, 60) + (summary.length > 60 ? '...' : ''),
-      emotionalIntensity: data.emotionalIntensity ?? 0,
-      novelty: data.novelty ?? 0,
-    });
 
     // Handle conversation memories
     if (eventType === 'conversation:utterance') {
       const convData = data as any;
+
+      // Resolve speaker name from identity component instead of using UUID
+      let speakerName = convData.speakerId;
+      if (convData.speakerId !== data.agentId) {
+        const speakerEntity = world.getEntity(convData.speakerId);
+        if (speakerEntity) {
+          const identity = speakerEntity.components.get('identity') as { name?: string } | undefined;
+          speakerName = identity?.name || convData.speakerId;
+        }
+      }
+
       memComp.formMemory({
         eventType,
         summary: convData.speakerId === data.agentId
-          ? `I said: ${convData.text}`
-          : `${convData.speakerId} said: ${convData.text}`,
+          ? `I said: ${convData.message}`
+          : `${speakerName} said: ${convData.message}`,
         timestamp: convData.timestamp ?? Date.now(),
-        emotionalIntensity: data.emotionalIntensity ?? 0.3,
-        emotionalValence: data.emotionalValence ?? 0,
+        // Conversations are socially significant - higher base importance
+        emotionalIntensity: data.emotionalIntensity ?? 0.5,
+        emotionalValence: data.emotionalValence ?? 0.1, // Slightly positive by default
         surprise: data.surprise ?? 0,
-        dialogueText: convData.text,
+        socialSignificance: data.socialSignificance ?? 0.6, // Conversations are socially important
+        dialogueText: convData.message,
         conversationId: convData.conversationId,
         participants: [convData.speakerId, convData.listenerId].filter(
           (id) => id !== data.agentId

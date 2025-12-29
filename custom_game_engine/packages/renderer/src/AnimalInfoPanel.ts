@@ -10,13 +10,15 @@ export class AnimalInfoPanel {
   private panelHeight = 450;
   private padding = 8;
   private lineHeight = 16;
+  private scrollOffset = 0;
+  private maxScrollOffset = 0;
+  private contentHeight = 0;
 
   /**
    * Set the currently selected animal entity.
    * @param entity Animal entity to display, or null to clear selection
    */
   setSelectedEntity(entity: Entity | null): void {
-    console.log('[AnimalInfoPanel] setSelectedEntity called with:', entity ? entity.id : 'null');
     this.selectedEntityId = entity ? entity.id : null;
   }
 
@@ -36,7 +38,17 @@ export class AnimalInfoPanel {
   }
 
   /**
-   * Render the animal info panel.
+   * Handle scroll events.
+   * @param deltaY Scroll delta (positive = scroll down)
+   */
+  handleScroll(deltaY: number): void {
+    const scrollSpeed = 20;
+    this.scrollOffset += deltaY > 0 ? scrollSpeed : -scrollSpeed;
+    this.scrollOffset = Math.max(0, Math.min(this.scrollOffset, this.maxScrollOffset));
+  }
+
+  /**
+   * Render the animal info panel (legacy standalone mode).
    * @param ctx Canvas rendering context
    * @param canvasWidth Width of the canvas
    * @param canvasHeight Height of the canvas
@@ -44,7 +56,7 @@ export class AnimalInfoPanel {
    */
   render(ctx: CanvasRenderingContext2D, canvasWidth: number, _canvasHeight: number, world: any): void {
     if (!this.selectedEntityId) {
-      return; // Nothing to render
+      return;
     }
 
     // Guard against undefined world
@@ -53,11 +65,54 @@ export class AnimalInfoPanel {
       return;
     }
 
+    // Position panel in top-right corner
+    const x = canvasWidth - this.panelWidth - 20;
+    const y = 20;
+
+    // Draw panel background
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+    ctx.fillRect(x, y, this.panelWidth, this.panelHeight);
+
+    // Draw panel border
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, this.panelWidth, this.panelHeight);
+
+    this.renderContent(ctx, x, y, world, true);
+  }
+
+  /**
+   * Render at a specific position (for WindowManager integration).
+   * Does not draw background, border, or close button - WindowManager handles those.
+   */
+  renderAt(ctx: CanvasRenderingContext2D, x: number, y: number, _width: number, _height: number, world: any): void {
+    if (!this.selectedEntityId) {
+      return;
+    }
+
+    if (!world || typeof world.getEntity !== 'function') {
+      return;
+    }
+
+    this.renderContent(ctx, x, y, world, false);
+  }
+
+  /**
+   * Render the panel content.
+   * @param showCloseButton Whether to render the close button (legacy mode only)
+   */
+  private renderContent(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    world: any,
+    showCloseButton: boolean
+  ): void {
     // Look up the entity from the world
     const selectedEntity = world.getEntity(this.selectedEntityId);
     if (!selectedEntity) {
       console.warn('[AnimalInfoPanel] Selected entity not found in world:', this.selectedEntityId);
-      this.selectedEntityId = null; // Clear invalid selection
+      this.selectedEntityId = null;
       return;
     }
 
@@ -82,22 +137,8 @@ export class AnimalInfoPanel {
       | undefined;
 
     if (!animal) {
-      // Not an animal, don't render
       return;
     }
-
-    // Position panel in top-right corner
-    const x = canvasWidth - this.panelWidth - 20;
-    const y = 20;
-
-    // Draw panel background
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-    ctx.fillRect(x, y, this.panelWidth, this.panelHeight);
-
-    // Draw panel border
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(x, y, this.panelWidth, this.panelHeight);
 
     // Get position component
     const position = selectedEntity.components.get('position') as
@@ -108,12 +149,25 @@ export class AnimalInfoPanel {
       | { currentTemp: number; state: string }
       | undefined;
 
+    // Calculate visible area (leave space for buttons at bottom)
+    const buttonAreaHeight = 50;
+    const visibleHeight = this.panelHeight - buttonAreaHeight;
+
+    // Set up clipping for scrollable content
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x, y, this.panelWidth, visibleHeight);
+    ctx.clip();
+
+    // Apply scroll offset
+    const scrollY = y - this.scrollOffset;
+
     // Set up text rendering
     ctx.fillStyle = '#FFFFFF';
     ctx.font = 'bold 14px monospace';
     ctx.textAlign = 'left';
 
-    let currentY = y + this.padding + this.lineHeight;
+    let currentY = scrollY + this.padding + this.lineHeight;
 
     // Title: Animal Name
     ctx.fillText(animal.name, x + this.padding, currentY);
@@ -312,27 +366,45 @@ export class AnimalInfoPanel {
       currentY += this.lineHeight + 4;
     }
 
-    // Action Buttons
+    // Calculate content height and max scroll
+    this.contentHeight = (currentY - scrollY) + this.padding;
+    this.maxScrollOffset = Math.max(0, this.contentHeight - visibleHeight);
+
+    // Restore context (end of scrollable content area)
+    ctx.restore();
+
+    // Draw scroll indicator if content is scrollable
+    if (this.maxScrollOffset > 0) {
+      const scrollBarHeight = Math.max(20, (visibleHeight / this.contentHeight) * visibleHeight);
+      const scrollBarY = y + (this.scrollOffset / this.maxScrollOffset) * (visibleHeight - scrollBarHeight);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.fillRect(x + this.panelWidth - 6, scrollBarY, 4, scrollBarHeight);
+    }
+
+    // Action Buttons (drawn outside scroll area)
     const buttonY = y + this.panelHeight - 40;
     const buttonHeight = 30;
     const buttonWidth = (this.panelWidth - 3 * this.padding) / 2;
 
-    // Draw close button (X in top right corner)
-    const closeButtonSize = 24;
-    const closeButtonX = x + this.panelWidth - closeButtonSize - this.padding;
-    const closeButtonY = y + this.padding;
+    // Draw close button (X in top right corner) - only in legacy standalone mode
+    if (showCloseButton) {
+      const closeButtonSize = 24;
+      const closeButtonX = x + this.panelWidth - closeButtonSize - this.padding;
+      const closeButtonY = y + this.padding;
 
-    ctx.fillStyle = 'rgba(200, 50, 50, 0.8)';
-    ctx.fillRect(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize);
-    ctx.strokeStyle = 'rgba(255, 100, 100, 1)';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize);
+      ctx.fillStyle = 'rgba(200, 50, 50, 0.8)';
+      ctx.fillRect(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize);
+      ctx.strokeStyle = 'rgba(255, 100, 100, 1)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize);
 
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 16px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('×', closeButtonX + closeButtonSize / 2, closeButtonY + closeButtonSize / 2 + 6);
-    ctx.textAlign = 'left';
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 16px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('×', closeButtonX + closeButtonSize / 2, closeButtonY + closeButtonSize / 2 + 6);
+      ctx.textAlign = 'left';
+    }
 
     // Action buttons at bottom
     if (animal.wild) {
@@ -554,7 +626,6 @@ export class AnimalInfoPanel {
       screenY >= closeButtonY &&
       screenY <= closeButtonY + closeButtonSize
     ) {
-      console.log('[AnimalInfoPanel] Close button clicked');
       this.setSelectedEntity(null);
       return true;
     }
@@ -574,7 +645,6 @@ export class AnimalInfoPanel {
         screenY >= buttonY &&
         screenY <= buttonY + buttonHeight
       ) {
-        console.log('[AnimalInfoPanel] Tame button clicked for', animal.name);
         // Emit event for main.ts to handle
         world.eventBus.emit({
           type: 'ui_action',
@@ -597,7 +667,6 @@ export class AnimalInfoPanel {
         screenY >= buttonY &&
         screenY <= buttonY + buttonHeight
       ) {
-        console.log('[AnimalInfoPanel] Feed button clicked for', animal.name);
         world.eventBus.emit({
           type: 'ui_action',
           source: 'animal_info_panel',
@@ -617,7 +686,6 @@ export class AnimalInfoPanel {
         screenY >= buttonY &&
         screenY <= buttonY + buttonHeight
       ) {
-        console.log('[AnimalInfoPanel] Collect button clicked for', animal.name);
         world.eventBus.emit({
           type: 'ui_action',
           source: 'animal_info_panel',
@@ -631,5 +699,87 @@ export class AnimalInfoPanel {
     }
 
     return true; // Click was inside panel, consume it
+  }
+
+  /**
+   * Handle click events relative to panel origin (for WindowManager integration).
+   * @param clickX X coordinate relative to panel content area
+   * @param clickY Y coordinate relative to panel content area
+   * @param _width Width of the content area (unused)
+   * @param _height Height of the content area (unused)
+   * @param world World instance
+   * @returns True if click was handled
+   */
+  handleClickAt(clickX: number, clickY: number, _width: number, _height: number, world: any): boolean {
+    if (!this.selectedEntityId || !world) {
+      return false;
+    }
+
+    const selectedEntity = world.getEntity(this.selectedEntityId);
+    if (!selectedEntity) {
+      return false;
+    }
+
+    const animal = selectedEntity.components.get('animal') as any;
+    if (!animal) {
+      return false;
+    }
+
+    // Button positions (relative to panel origin at 0,0)
+    const buttonY = this.panelHeight - 40;
+    const buttonHeight = 30;
+    const buttonWidth = (this.panelWidth - 3 * this.padding) / 2;
+
+    // Tame button (for wild animals)
+    if (animal.wild) {
+      const tameButtonX = this.padding;
+      if (
+        clickX >= tameButtonX &&
+        clickX <= tameButtonX + buttonWidth * 2 + this.padding &&
+        clickY >= buttonY &&
+        clickY <= buttonY + buttonHeight
+      ) {
+        world.eventBus.emit({
+          type: 'ui_action',
+          source: 'animal_info_panel',
+          data: { action: 'tame', entityId: this.selectedEntityId },
+        });
+        return true;
+      }
+    } else {
+      // Feed button (for tamed animals)
+      const feedButtonX = this.padding;
+      if (
+        clickX >= feedButtonX &&
+        clickX <= feedButtonX + buttonWidth &&
+        clickY >= buttonY &&
+        clickY <= buttonY + buttonHeight
+      ) {
+        world.eventBus.emit({
+          type: 'ui_action',
+          source: 'animal_info_panel',
+          data: { action: 'feed', entityId: this.selectedEntityId },
+        });
+        return true;
+      }
+
+      // Collect button
+      const collectButtonX = this.padding * 2 + buttonWidth;
+      if (
+        clickX >= collectButtonX &&
+        clickX <= collectButtonX + buttonWidth &&
+        clickY >= buttonY &&
+        clickY <= buttonY + buttonHeight
+      ) {
+        world.eventBus.emit({
+          type: 'ui_action',
+          source: 'animal_info_panel',
+          data: { action: 'collect_product', entityId: this.selectedEntityId },
+        });
+        return true;
+      }
+    }
+
+    return false;
   }
 }

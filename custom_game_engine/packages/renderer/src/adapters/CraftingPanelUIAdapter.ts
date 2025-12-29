@@ -60,6 +60,17 @@ export class CraftingPanelUIAdapter implements IWindowPanel {
   }
 
   /**
+   * Handle content clicks - delegates to the CraftingPanelUI.
+   */
+  handleContentClick(x: number, y: number, _width: number, _height: number): boolean {
+    // The panel renders at its bounds position (bounds.x, bounds.y) after ctx.translate.
+    // WindowManager gives us coordinates relative to window content area, which already
+    // match the panel's internal coordinate system since render uses the same translation.
+    // Pass coordinates directly without additional offset.
+    return this.panel.handleClick(x, y);
+  }
+
+  /**
    * Get the underlying CraftingPanelUI instance for direct access.
    */
   getPanel(): CraftingPanelUI {

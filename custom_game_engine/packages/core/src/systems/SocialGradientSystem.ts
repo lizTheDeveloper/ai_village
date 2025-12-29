@@ -2,10 +2,16 @@ import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import { GradientParser } from '../parsers/GradientParser.js';
 import type { ResourceType } from '../components/ResourceComponent.js';
+import {
+  getAgent,
+  getPosition,
+  getConversation,
+  getSocialGradient,
+  getTrustNetwork
+} from '../utils/componentHelpers.js';
 
 /**
  * SocialGradientSystem listens for agent speech and parses gradient information
@@ -38,8 +44,7 @@ export class SocialGradientSystem implements System {
 
     for (const entity of gradientsEntities) {
       try {
-        const impl = entity as EntityImpl;
-        const socialGradient = impl.getComponent('social_gradient') as any;
+        const socialGradient = getSocialGradient(entity);
         if (socialGradient) {
           socialGradient.applyDecay(currentTick);
         }
@@ -57,17 +62,16 @@ export class SocialGradientSystem implements System {
 
     // Step 1: Identify agents with new messages and add to pending queue
     for (const agent of agents) {
-      const impl = agent as EntityImpl;
-      const speakerAgent = impl.getComponent('agent') as any;
+      const speakerAgent = getAgent(agent);
       if (!speakerAgent) continue;
 
-      const conversation = impl.getComponent('conversation') as any;
-      if (!conversation || !conversation.recentMessages || conversation.recentMessages.length === 0) {
+      const conversation = getConversation(agent);
+      if (!conversation || !conversation.messages || conversation.messages.length === 0) {
         continue;
       }
 
-      const speakerId = speakerAgent.id;
-      const messageCount = conversation.recentMessages.length;
+      const speakerId = agent.id;
+      const messageCount = conversation.messages.length;
       const lastCount = this.lastProcessedMessageCount.get(speakerId) ?? 0;
 
       // Queue agent if there are new messages and not already queued
@@ -84,25 +88,18 @@ export class SocialGradientSystem implements System {
 
       try {
         // Find the agent entity by ID
-        const agent = entities.find(e => {
-          if (e.components.has('agent')) {
-            const agentComp = e.components.get('agent') as any;
-            return agentComp?.id === speakerId;
-          }
-          return e.id === speakerId;
-        });
+        const agent = entities.find(e => e.id === speakerId);
 
         if (!agent) continue;
 
-        const impl = agent as EntityImpl;
-        const conversation = impl.getComponent('conversation') as any;
+        const conversation = getConversation(agent);
         if (!conversation) continue;
 
         // Process this agent's speech
         this._processSpeech(agent, entities, world, currentTick);
 
         // Update the message count to mark as processed
-        this.lastProcessedMessageCount.set(speakerId, conversation.recentMessages.length);
+        this.lastProcessedMessageCount.set(speakerId, conversation.messages.length);
       } catch (error) {
         throw new Error(`SocialGradientSystem failed for agent ${speakerId}: ${error}`);
       }
@@ -110,32 +107,31 @@ export class SocialGradientSystem implements System {
   }
 
   private _processSpeech(speaker: Entity, entities: ReadonlyArray<Entity>, _world: World, currentTick: number): void {
-    const impl = speaker as EntityImpl;
-    const speakerAgent = impl.getComponent('agent') as any;
+    const speakerAgent = getAgent(speaker);
     if (!speakerAgent) return;
 
-    const conversation = impl.getComponent('conversation') as any;
-    if (!conversation || !conversation.recentMessages || conversation.recentMessages.length === 0) {
+    const conversation = getConversation(speaker);
+    if (!conversation || !conversation.messages || conversation.messages.length === 0) {
       return;
     }
 
-    const speakerId = speakerAgent.id;
+    const speakerId = speaker.id;
 
     // Get the most recent message (the new one that triggered this processing)
-    const messages = conversation.recentMessages;
+    const messages = conversation.messages;
     const lastMessage = messages[messages.length - 1];
 
-    if (!lastMessage || !lastMessage.content) return;
+    if (!lastMessage || !lastMessage.message) return;
 
     // Parse gradients from speech
-    const gradients = GradientParser.parseAll(lastMessage.content);
+    const gradients = GradientParser.parseAll(lastMessage.message);
 
     if (gradients.length === 0) {
       return; // No gradient information found
     }
 
     // Get speaker's position for calculating claim positions
-    const speakerPos = impl.getComponent('position') as any as { x: number; y: number } | undefined;
+    const speakerPos = getPosition(speaker);
 
     // Broadcast gradients to nearby agents
     const listeners = entities.filter(e => {
@@ -146,30 +142,29 @@ export class SocialGradientSystem implements System {
 
       // Check if within hearing range (same as conversation system)
       if (speakerPos) {
-        const listenerPos = e.components.get('position') as any as { x: number; y: number };
-        const distance = this._distance(speakerPos, listenerPos);
-        return distance < 20; // 20 tile hearing range
+        const listenerPos = getPosition(e);
+        if (listenerPos) {
+          const distance = this._distance(speakerPos, listenerPos);
+          return distance < 20; // 20 tile hearing range
+        }
       }
 
       return true;
     });
 
     for (const listener of listeners) {
-      const listenerImpl = listener as EntityImpl;
-      const listenerAgent = listenerImpl.getComponent('agent') as any;
+      const listenerAgent = getAgent(listener);
       if (!listenerAgent) continue;
 
       // Get trust score for speaker
       let trustScore = 0.5; // Default neutral
-      if (listenerImpl.hasComponent('trust_network')) {
-        const trustNetwork = listenerImpl.getComponent('trust_network') as any;
-        if (trustNetwork) {
-          trustScore = trustNetwork.getTrustScore(speakerId);
-        }
+      const trustNetwork = getTrustNetwork(listener);
+      if (trustNetwork) {
+        trustScore = trustNetwork.getTrustScore(speakerId);
       }
 
       // Add gradients to listener's social gradient component
-      const socialGradient = listenerImpl.getComponent('social_gradient') as any;
+      const socialGradient = getSocialGradient(listener);
       if (!socialGradient) continue;
 
       for (const gradient of gradients) {
@@ -191,16 +186,8 @@ export class SocialGradientSystem implements System {
           confidence: gradient.confidence * trustScore, // Weight by trust
           sourceAgentId: speakerId,
           tick: currentTick,
+          claimPosition, // Include claim position for verification
         });
-
-        // Store claim position for verification
-        // We'll extend the gradient interface to include this
-        const allGradients = socialGradient.allGradients;
-        const lastAddedGradient = allGradients[allGradients.length - 1];
-        if (lastAddedGradient && claimPosition) {
-          // Mutate to add claim position (not ideal but works for now)
-          (lastAddedGradient as any).claimPosition = claimPosition;
-        }
       }
     }
   }
@@ -238,22 +225,19 @@ export class SocialGradientSystem implements System {
     entity: Entity,
     resourceType: ResourceType
   ): { bearing: number; strength: number; confidence: number } | undefined {
-    const impl = entity as EntityImpl;
-
-    if (!impl.hasComponent('social_gradient')) {
+    if (!entity.components.has('social_gradient')) {
       return undefined;
     }
 
-    const socialGradient = impl.getComponent('social_gradient') as any;
+    const socialGradient = getSocialGradient(entity);
     if (!socialGradient) return undefined;
 
     // Get trust scores if available
     let trustScores: Map<string, number> | undefined;
-    if (impl.hasComponent('trust_network')) {
-      const trustNetwork = impl.getComponent('trust_network') as any;
-      if (trustNetwork) {
-        trustScores = trustNetwork.scores;
-      }
+    const trustNetwork = getTrustNetwork(entity);
+    if (trustNetwork) {
+      // Convert ReadonlyMap to Map for compatibility
+      trustScores = new Map(trustNetwork.scores);
     }
 
     return socialGradient.getBlendedGradient(resourceType, trustScores);

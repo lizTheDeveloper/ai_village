@@ -43,7 +43,6 @@ const DEFAULT_HEARING_RANGE = 50;
  * // In system update loop
  * const result = hearingProcessor.process(entity, world);
  * if (result.heardSpeech.length > 0) {
- *   console.log('Heard:', result.heardSpeech);
  * }
  * ```
  */

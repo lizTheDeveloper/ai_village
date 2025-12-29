@@ -351,4 +351,111 @@ export const BERRY_BUSH: PlantSpecies = {
   }
 };
 
-export const WILD_PLANTS = [GRASS, WILDFLOWER, BERRY_BUSH];
+export const TREE: PlantSpecies = {
+  id: 'tree',
+  name: 'Tree',
+  category: 'tree',
+  biomes: ['forest', 'plains'],
+  rarity: 'common',
+
+  stageTransitions: [
+    {
+      from: 'seed',
+      to: 'germinating',
+      baseDuration: 2, // 2 days
+      conditions: { minHydration: 20, minTemperature: 5 },
+      onTransition: [{ type: 'become_visible' }]
+    },
+    {
+      from: 'germinating',
+      to: 'sprout',
+      baseDuration: 5, // 5 days
+      conditions: { minHydration: 15 },
+      onTransition: []
+    },
+    {
+      from: 'sprout',
+      to: 'vegetative',
+      baseDuration: 10, // 10 days
+      conditions: { minHydration: 15 },
+      onTransition: []
+    },
+    {
+      from: 'vegetative',
+      to: 'mature',
+      baseDuration: 30, // 30 days to full maturity
+      conditions: { minHydration: 10 },
+      onTransition: []
+    },
+    {
+      from: 'mature',
+      to: 'seeding',
+      baseDuration: 365, // Trees stay mature for a long time
+      conditions: {},
+      onTransition: [{ type: 'produce_seeds' }, { type: 'drop_seeds', params: { radius: 5 } }]
+    },
+    {
+      from: 'seeding',
+      to: 'mature',
+      baseDuration: 30, // Cycle back to mature (perennial)
+      conditions: { minHealth: 30 },
+      onTransition: []
+    },
+    {
+      from: 'seeding',
+      to: 'senescence',
+      baseDuration: 365, // Very long time to die
+      conditions: {},
+      onTransition: []
+    },
+    {
+      from: 'senescence',
+      to: 'decay',
+      baseDuration: 30, // 30 days
+      conditions: {},
+      onTransition: [{ type: 'return_nutrients_to_soil' }]
+    },
+    {
+      from: 'decay',
+      to: 'dead',
+      baseDuration: 30, // 30 days
+      conditions: {},
+      onTransition: [{ type: 'remove_plant' }]
+    }
+  ],
+
+  baseGenetics: {
+    growthRate: 0.3, // Trees grow slowly
+    yieldAmount: 2.0, // But produce lots when mature
+    diseaseResistance: 80,
+    droughtTolerance: 60,
+    coldTolerance: 70,
+    flavorProfile: 10,
+    mutations: []
+  },
+
+  seedsPerPlant: 100,
+  seedDispersalRadius: 5,
+  requiresDormancy: true,
+
+  optimalTemperatureRange: [5, 30],
+  optimalMoistureRange: [25, 75],
+  preferredSeasons: ['spring', 'summer', 'fall'],
+
+  properties: {
+    fiber: true // Trees provide wood/fiber material
+  },
+
+  sprites: {
+    seed: 'tree-seed',
+    sprout: 'tree-sprout',
+    vegetative: 'tree-vegetative',
+    flowering: 'tree-flowering',
+    fruiting: 'tree-fruiting',
+    mature: 'tree',
+    seeding: 'tree',
+    withered: 'tree-withered'
+  }
+};
+
+export const WILD_PLANTS = [GRASS, WILDFLOWER, BERRY_BUSH, TREE];

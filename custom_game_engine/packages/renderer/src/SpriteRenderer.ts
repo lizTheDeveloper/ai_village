@@ -37,6 +37,103 @@ export function renderSprite(
       ctx.fill();
       break;
 
+    case 'iron_deposit':
+      // Draw iron ore deposit - dark gray rock with rusty streaks
+      ctx.fillStyle = '#5a5a5a'; // Dark gray base
+      ctx.beginPath();
+      ctx.moveTo(x + size / 2, y + size / 5);
+      ctx.lineTo(x + (size * 4) / 5, y + (size * 3) / 4);
+      ctx.lineTo(x + (size * 3) / 4, y + (size * 4) / 5);
+      ctx.lineTo(x + size / 4, y + (size * 4) / 5);
+      ctx.lineTo(x + size / 5, y + (size * 3) / 4);
+      ctx.closePath();
+      ctx.fill();
+      // Rusty orange streaks
+      ctx.strokeStyle = '#8B4513'; // Saddle brown/rust
+      ctx.lineWidth = size / 12;
+      ctx.beginPath();
+      ctx.moveTo(x + size * 0.3, y + size * 0.4);
+      ctx.lineTo(x + size * 0.5, y + size * 0.55);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x + size * 0.6, y + size * 0.35);
+      ctx.lineTo(x + size * 0.55, y + size * 0.6);
+      ctx.stroke();
+      break;
+
+    case 'coal_deposit':
+      // Draw coal deposit - black chunky rock
+      ctx.fillStyle = '#1a1a1a'; // Very dark gray/black
+      ctx.beginPath();
+      ctx.moveTo(x + size / 2, y + size / 5);
+      ctx.lineTo(x + (size * 4) / 5, y + size / 3);
+      ctx.lineTo(x + (size * 3) / 4, y + (size * 4) / 5);
+      ctx.lineTo(x + size / 4, y + (size * 4) / 5);
+      ctx.lineTo(x + size / 5, y + size / 3);
+      ctx.closePath();
+      ctx.fill();
+      // Shiny black highlights
+      ctx.fillStyle = '#333333';
+      ctx.beginPath();
+      ctx.arc(x + size * 0.4, y + size * 0.45, size / 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x + size * 0.6, y + size * 0.55, size / 12, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+
+    case 'copper_deposit':
+      // Draw copper ore deposit - greenish-brown rock
+      ctx.fillStyle = '#5d5d4d'; // Grayish brown base
+      ctx.beginPath();
+      ctx.moveTo(x + size / 2, y + size / 5);
+      ctx.lineTo(x + (size * 4) / 5, y + (size * 3) / 4);
+      ctx.lineTo(x + (size * 3) / 4, y + (size * 4) / 5);
+      ctx.lineTo(x + size / 4, y + (size * 4) / 5);
+      ctx.lineTo(x + size / 5, y + (size * 3) / 4);
+      ctx.closePath();
+      ctx.fill();
+      // Green copper patina streaks
+      ctx.strokeStyle = '#2E8B57'; // Sea green
+      ctx.lineWidth = size / 10;
+      ctx.beginPath();
+      ctx.moveTo(x + size * 0.35, y + size * 0.35);
+      ctx.lineTo(x + size * 0.45, y + size * 0.55);
+      ctx.stroke();
+      // Copper orange spots
+      ctx.fillStyle = '#CD853F'; // Peru/copper color
+      ctx.beginPath();
+      ctx.arc(x + size * 0.55, y + size * 0.5, size / 12, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+
+    case 'gold_deposit':
+      // Draw gold ore deposit - brown rock with gold flecks
+      ctx.fillStyle = '#6b5b4b'; // Brown/tan base
+      ctx.beginPath();
+      ctx.moveTo(x + size / 2, y + size / 5);
+      ctx.lineTo(x + (size * 4) / 5, y + (size * 3) / 4);
+      ctx.lineTo(x + (size * 3) / 4, y + (size * 4) / 5);
+      ctx.lineTo(x + size / 4, y + (size * 4) / 5);
+      ctx.lineTo(x + size / 5, y + (size * 3) / 4);
+      ctx.closePath();
+      ctx.fill();
+      // Gold flecks
+      ctx.fillStyle = '#FFD700'; // Gold
+      ctx.beginPath();
+      ctx.arc(x + size * 0.4, y + size * 0.4, size / 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x + size * 0.55, y + size * 0.55, size / 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x + size * 0.6, y + size * 0.35, size / 16, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x + size * 0.35, y + size * 0.6, size / 18, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+
     case 'agent':
       // Draw a simple character - circle for head, body
       // Head

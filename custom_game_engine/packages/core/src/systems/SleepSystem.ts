@@ -3,11 +3,12 @@ import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
-import { CircadianComponent } from '../components/CircadianComponent.js';
+import type { CircadianComponent, DreamContent } from '../components/CircadianComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { TimeComponent } from './TimeSystem.js';
-import type { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
+import type { EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
+import { getAgent, getNeeds, getCircadian, getEpisodicMemory, getBuilding } from '../utils/componentHelpers.js';
 
 /**
  * Weird/surreal elements that can appear in dreams
@@ -75,8 +76,8 @@ export class SleepSystem implements System {
 
     for (const entity of entities) {
       const impl = entity as EntityImpl;
-      const circadian = impl.getComponent<CircadianComponent>('circadian');
-      const needs = impl.getComponent<NeedsComponent>('needs');
+      const circadian = getCircadian(impl);
+      const needs = getNeeds(impl);
 
       if (!circadian || !needs) continue;
 
@@ -108,8 +109,8 @@ export class SleepSystem implements System {
       }
 
       // Apply sleep drive changes directly by mutating the component
-      // CircadianComponent has methods, so we can't use spread operator
-      (circadian as any).sleepDrive = newSleepDrive;
+      // CircadianComponent has public mutable properties
+      circadian.sleepDrive = newSleepDrive;
 
       // Process sleep (energy recovery) if sleeping
       if (circadian.isSleeping) {
@@ -147,22 +148,17 @@ export class SleepSystem implements System {
     }));
 
     // Track accumulated sleep duration in game hours
-    const currentSleepDuration = (circadian as any).sleepDurationHours || 0;
-    (circadian as any).sleepDurationHours = currentSleepDuration + hoursElapsed;
+    circadian.sleepDurationHours = circadian.sleepDurationHours + hoursElapsed;
 
     // Update circadian sleepQuality dynamically based on conditions
     const updatedQuality = this.calculateSleepQuality(entity, circadian);
     if (Math.abs(updatedQuality - sleepQuality) > 0.05) {
-      // Only update if significant change
-      entity.updateComponent('circadian', (current: any) => ({
-        ...current,
-        sleepQuality: updatedQuality,
-      }));
+      // Only update if significant change (mutable property)
+      circadian.sleepQuality = updatedQuality;
     }
 
     // Generate dream during REM sleep (after 2+ hours, once per sleep)
-    const sleepDurationHours = (circadian as any).sleepDurationHours || 0;
-    if (!circadian.hasDreamedThisSleep && sleepDurationHours >= 2) {
+    if (!circadian.hasDreamedThisSleep && circadian.sleepDurationHours >= 2) {
       this.generateDream(entity, circadian, world);
     }
 
@@ -183,10 +179,8 @@ export class SleepSystem implements System {
 
     // Location bonuses
     if (circadian.sleepLocation) {
-      const location = circadian.sleepLocation as any;
-
       // Check if sleeping in a bed
-      const buildingComp = location.getComponent?.('building');
+      const buildingComp = getBuilding(circadian.sleepLocation);
       if (buildingComp) {
         if (buildingComp.buildingType === 'bed') {
           quality += 0.4; // Bed: 0.9 total
@@ -199,7 +193,7 @@ export class SleepSystem implements System {
     }
 
     // Environmental penalties
-    const needs = entity.getComponent<NeedsComponent>('needs');
+    const needs = getNeeds(entity);
     if (needs) {
       // Temperature penalties (if we had temperature on needs)
       // Note: Current NeedsComponent doesn't have temperature field
@@ -213,7 +207,7 @@ export class SleepSystem implements System {
   /**
    * Check if agent should wake up
    * NOTE: Sleep duration is tracked in GAME HOURS by SleepSystem.processSleep via hoursElapsed accumulation,
-   * not in real-time ticks. We use circadian.sleepDuration if available, otherwise estimate from ticks.
+   * not in real-time ticks. We use circadian.sleepDurationHours.
    */
   private shouldWake(
     _entity: EntityImpl,
@@ -227,7 +221,7 @@ export class SleepSystem implements System {
 
     // Get accumulated sleep duration from circadian component (in game hours)
     // This is updated by processSleep each frame
-    const hoursAsleep = (circadian as any).sleepDurationHours || 0;
+    const hoursAsleep = circadian.sleepDurationHours;
 
     // Minimum sleep duration: 4 game hours
     if (hoursAsleep < 4) {
@@ -263,21 +257,15 @@ export class SleepSystem implements System {
     circadian: CircadianComponent,
     world: World
   ): void {
-    // Get accumulated sleep duration for logging
-    const hoursAsleep = (circadian as any).sleepDurationHours || 0;
-
-    // Update circadian component (immutable)
-    entity.updateComponent('circadian', (current: any) => ({
-      ...current,
-      isSleeping: false,
-      lastSleepLocation: current.sleepLocation,
-      sleepLocation: null,
-      sleepStartTime: null,
-      sleepDurationHours: 0, // Reset sleep duration counter
-    }));
+    // Update circadian component by mutating properties
+    circadian.isSleeping = false;
+    circadian.lastSleepLocation = circadian.sleepLocation;
+    circadian.sleepLocation = null;
+    circadian.sleepStartTime = null;
+    circadian.sleepDurationHours = 0; // Reset sleep duration counter
 
     // Update agent behavior (switch from sleeping to wandering)
-    const agent = entity.getComponent<AgentComponent>('agent');
+    const agent = getAgent(entity);
     if (agent && (agent.behavior === 'seek_sleep' || agent.behavior === 'forced_sleep')) {
       entity.updateComponent<AgentComponent>('agent', (current) => ({
         ...current,
@@ -286,20 +274,13 @@ export class SleepSystem implements System {
       }));
     }
 
-    // Emit wake event with dream if present
-    const dreamData: any = {
-      entityId: entity.id,
-      sleepDuration: hoursAsleep,
-    };
-
-    if (circadian.lastDream) {
-      dreamData.dream = circadian.lastDream;
-    }
-
+    // Emit wake event
     world.eventBus.emit({
       type: 'agent:woke',
       source: entity.id,
-      data: dreamData,
+      data: {
+        agentId: entity.id,
+      },
     });
   }
 
@@ -308,16 +289,16 @@ export class SleepSystem implements System {
    */
   private generateDream(
     entity: EntityImpl,
-    _circadian: CircadianComponent,
+    circadian: CircadianComponent,
     world: World
   ): void {
-    const memComp = entity.getComponent<EpisodicMemoryComponent>('episodic_memory');
+    const memComp = getEpisodicMemory(entity);
     const memoryElements: string[] = [];
 
     if (memComp && memComp.episodicMemories.length > 0) {
       // Get recent and emotional memories (last 10, sorted by recency and emotion)
       const memories = [...memComp.episodicMemories]
-        .sort((a: any, b: any) => {
+        .sort((a: EpisodicMemory, b: EpisodicMemory) => {
           const aScore = (world.tick - a.timestamp) / 1000 + a.emotionalIntensity * 500;
           const bScore = (world.tick - b.timestamp) / 1000 + b.emotionalIntensity * 500;
           return bScore - aScore; // Higher score = more recent or emotional
@@ -368,14 +349,17 @@ export class SleepSystem implements System {
       throw new Error('Failed to generate dream interpretation');
     }
 
-    void { memoryElements, weirdElement, dreamNarrative, interpretation }; // Used for dream generation, not stored directly
+    // Create dream content object
+    const dreamContent: DreamContent = {
+      memoryElements,
+      weirdElement,
+      dreamNarrative,
+      interpretation,
+    };
 
-    // Update circadian with dream
-    entity.updateComponent('circadian', (current: any) => ({
-      ...current,
-      lastDream: dreamNarrative,
-      hasDreamedThisSleep: true,
-    }));
+    // Update circadian with dream (mutable properties)
+    circadian.lastDream = dreamContent;
+    circadian.hasDreamedThisSleep = true;
 
     // Emit dream event
     world.eventBus.emit({

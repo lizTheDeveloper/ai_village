@@ -6,7 +6,11 @@ export type MemoryType =
   | 'plant_location'     // Remembered a plant location
   | 'agent_seen'         // Saw another agent
   | 'danger'             // Dangerous location/entity
-  | 'home';              // Safe/home location
+  | 'home'               // Safe/home location
+  | 'lesson'             // Learned from experience (e.g., "campfire solves cold")
+  | 'success'            // Successfully completed something (e.g., "built workbench")
+  | 'failure'            // Failed attempt to learn from (e.g., "couldn't build - no materials")
+  | 'knowledge';         // Learned from others (e.g., "Finn said gather food first")
 
 export interface Memory {
   type: MemoryType;

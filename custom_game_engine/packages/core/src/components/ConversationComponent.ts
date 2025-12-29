@@ -18,7 +18,7 @@ export interface ConversationComponent extends Component {
 }
 
 export function createConversationComponent(
-  maxMessages: number = 10
+  maxMessages: number = 20  // Keep more history for rolling chat log
 ): ConversationComponent {
   return {
     type: 'conversation',

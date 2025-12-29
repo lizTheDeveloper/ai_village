@@ -5,7 +5,10 @@
 
 import { WorldImpl } from './ecs/World.js';
 import { EventBusImpl } from './events/EventBus.js';
+import type { EventBus } from './events/EventBus.js';
 import type { Entity } from './ecs/Entity.js';
+import { EntityImpl } from './ecs/Entity.js';
+import type { Component } from './ecs/Component.js';
 
 // Import component factory functions
 import { createPositionComponent } from './components/PositionComponent.js';
@@ -18,60 +21,63 @@ import { SpatialMemoryComponent } from './components/SpatialMemoryComponent.js';
 import { BeliefComponent } from './components/BeliefComponent.js';
 import { EpisodicMemoryComponent } from './components/EpisodicMemoryComponent.js';
 
+// Type for component factory functions
+type ComponentFactory = (data?: Record<string, unknown>) => Component;
+
 // Component registry mapping strings to factory functions or classes
-const componentRegistry: Record<string, any> = {
-  'agent': (data: any) => ({
-    type: 'agent',
+const componentRegistry: Record<string, ComponentFactory> = {
+  'agent': (data = {}) => ({
+    type: 'agent' as const,
     version: 1,
-    behavior: data.behavior || 'wander',
-    behaviorState: data.behaviorState || {},
-    thinkInterval: data.thinkInterval || 20,
-    lastThinkTick: data.lastThinkTick || 0,
-    useLLM: data.useLLM || false,
-    llmCooldown: data.llmCooldown || 0,
+    behavior: (data.behavior as string) || 'wander',
+    behaviorState: (data.behaviorState as Record<string, unknown>) || {},
+    thinkInterval: (data.thinkInterval as number) || 20,
+    lastThinkTick: (data.lastThinkTick as number) || 0,
+    useLLM: (data.useLLM as boolean) || false,
+    llmCooldown: (data.llmCooldown as number) || 0,
     ...data,
   }),
-  'position': (data: any) => createPositionComponent(data.x || 0, data.y || 0),
-  'velocity': (data: any) => ({
-    type: 'velocity',
+  'position': (data = {}) => createPositionComponent((data.x as number) || 0, (data.y as number) || 0),
+  'velocity': (data = {}) => ({
+    type: 'velocity' as const,
     version: 1,
-    vx: data.vx || 0,
-    vy: data.vy || 0,
+    vx: (data.vx as number) || 0,
+    vy: (data.vy as number) || 0,
   }),
-  'resource': (data: any) => ({
-    type: 'resource',
+  'resource': (data = {}) => ({
+    type: 'resource' as const,
     version: 1,
-    resourceType: data.type || data.resourceType,
-    amount: data.amount || 0,
-    regenerationRate: data.regenerationRate || 0,
+    resourceType: (data.type as string) || (data.resourceType as string),
+    amount: (data.amount as number) || 0,
+    regenerationRate: (data.regenerationRate as number) || 0,
   }),
-  'building': (data: any) => ({
-    type: 'building',
+  'building': (data = {}) => ({
+    type: 'building' as const,
     version: 1,
-    buildingType: data.buildingType,
+    buildingType: data.buildingType as string,
     ...data,
   }),
-  'collision': (data: any) => ({
-    type: 'collision',
+  'collision': (data = {}) => ({
+    type: 'collision' as const,
     version: 1,
-    radius: data.radius || 1.0,
+    radius: (data.radius as number) || 1.0,
   }),
-  'trust_network': (data: any) => new TrustNetworkComponent(data),
+  'trust_network': (data = {}) => new TrustNetworkComponent(data),
   'social_gradient': () => new SocialGradientComponent(),
-  'spatial_memory': (data: any) => new SpatialMemoryComponent(data),
+  'spatial_memory': (data = {}) => new SpatialMemoryComponent(data),
   'belief': () => new BeliefComponent(),
-  'steering': (data: any) => ({
-    type: 'steering',
+  'steering': (data = {}) => ({
+    type: 'steering' as const,
     version: 1,
     ...data,
   }),
-  'exploration_state': (data: any) => {
+  'exploration_state': (data = {}) => {
     // Support both class-based and ad-hoc exploration_state
     // Tests use ad-hoc objects with Sets, production might use the class
     if (data && typeof data === 'object' && !data.type) {
       // Ad-hoc object from tests - preserve all fields including Sets
       return {
-        type: 'exploration_state',
+        type: 'exploration_state' as const,
         version: 1,
         ...data,
       };
@@ -79,33 +85,36 @@ const componentRegistry: Record<string, any> = {
     // Otherwise create the class
     return new ExplorationStateComponent();
   },
-  'episodic_memory': (data: any) => new EpisodicMemoryComponent(data),
+  'episodic_memory': (data = {}) => new EpisodicMemoryComponent(data),
 
   // Backwards compatibility aliases (PascalCase → lowercase_with_underscores)
-  'Velocity': (data: any) => componentRegistry['velocity'](data),
-  'Steering': (data: any) => componentRegistry['steering'](data),
-  'ExplorationState': (data: any) => componentRegistry['exploration_state'](data),
-  'SpatialMemory': (data: any) => componentRegistry['spatial_memory'](data),
-  'EpisodicMemory': (data: any) => componentRegistry['episodic_memory'](data),
-  'TrustNetwork': (data: any) => componentRegistry['trust_network'](data),
-  'SocialGradient': () => componentRegistry['social_gradient'](),
-  'Belief': () => componentRegistry['belief'](),
-  'Position': (data: any) => componentRegistry['position'](data),
-  'Resource': (data: any) => componentRegistry['resource'](data),
-  'Building': (data: any) => componentRegistry['building'](data),
-  'Collision': (data: any) => componentRegistry['collision'](data),
-  'Agent': (data: any) => componentRegistry['agent'](data),
+  'Velocity': (data) => componentRegistry['velocity']!(data),
+  'Steering': (data) => componentRegistry['steering']!(data),
+  'ExplorationState': (data) => componentRegistry['exploration_state']!(data),
+  'SpatialMemory': (data) => componentRegistry['spatial_memory']!(data),
+  'EpisodicMemory': (data) => componentRegistry['episodic_memory']!(data),
+  'TrustNetwork': (data) => componentRegistry['trust_network']!(data),
+  'SocialGradient': () => componentRegistry['social_gradient']!(),
+  'Belief': () => componentRegistry['belief']!(),
+  'Position': (data) => componentRegistry['position']!(data),
+  'Resource': (data) => componentRegistry['resource']!(data),
+  'Building': (data) => componentRegistry['building']!(data),
+  'Collision': (data) => componentRegistry['collision']!(data),
+  'Agent': (data) => componentRegistry['agent']!(data),
 };
+
+// Type for component class or string identifier
+type ComponentClassOrString = string | { new(data?: unknown): Component } | { prototype: Component };
 
 // Extend Entity interface with test convenience methods
 interface TestEntity extends Entity {
-  addComponent(ComponentClass: any, data: any): void;
-  getComponent(ComponentClass: any): any;
+  addComponent(ComponentClass: ComponentClassOrString, data?: Record<string, unknown>): Component;
+  getComponent<T extends Component = Component>(ComponentClass: ComponentClassOrString): T | undefined;
 }
 
 export class World extends WorldImpl {
   constructor() {
-    super(new EventBusImpl() as any);
+    super(new EventBusImpl() as EventBus);
   }
 
   /**
@@ -118,21 +127,26 @@ export class World extends WorldImpl {
 
   /**
    * Expose eventBus for tests
+   * Note: WorldImpl has public readonly eventBus property, so we just delegate to parent
    */
-  get eventBus() {
-    return (this as any)._eventBus;
+  get eventBus(): EventBus {
+    return super.eventBus;
   }
 
   createEntity(): TestEntity {
-    const entity = super.createEntity() as any;
+    const entity = super.createEntity() as unknown as TestEntity;
 
     // Add convenience method for tests
-    const originalAddComponent = entity.addComponent.bind(entity);
-    entity.addComponent = (ComponentClassOrInstance: any, data?: any) => {
+    // Store original addComponent from EntityImpl - it takes a Component
+    const entityImpl = entity as unknown as EntityImpl;
+    const originalAddComponent = entityImpl.addComponent.bind(entity);
+
+    entity.addComponent = (ComponentClassOrInstance: ComponentClassOrString, data?: Record<string, unknown>): Component => {
       // If it's already a component instance, use it directly
-      if (ComponentClassOrInstance?.type) {
-        originalAddComponent(ComponentClassOrInstance);
-        return ComponentClassOrInstance;
+      if (typeof ComponentClassOrInstance === 'object' && ComponentClassOrInstance !== null && 'type' in ComponentClassOrInstance) {
+        const component = ComponentClassOrInstance as unknown as Component;
+        originalAddComponent(component);
+        return component;
       }
 
       // If it's a string, look up in registry
@@ -148,7 +162,8 @@ export class World extends WorldImpl {
 
       // Otherwise, try to instantiate as a class
       try {
-        const component = new ComponentClassOrInstance(data);
+        const ComponentClass = ComponentClassOrInstance as { new(data?: unknown): Component };
+        const component = new ComponentClass(data);
         originalAddComponent(component);
         return component;
       } catch (error) {
@@ -158,11 +173,11 @@ export class World extends WorldImpl {
 
     // Add convenience getComponent that works with classes
     const originalGetComponent = entity.getComponent.bind(entity);
-    entity.getComponent = (ComponentClass: any) => {
+    entity.getComponent = <T extends Component = Component>(ComponentClass: ComponentClassOrString): T | undefined => {
       // If it's a string, try as-is first, then try snake_case conversion
       if (typeof ComponentClass === 'string') {
         // Try the string as-is first (for lowercase_with_underscores like 'steering', 'position')
-        const direct = originalGetComponent(ComponentClass);
+        const direct = originalGetComponent<T>(ComponentClass);
         if (direct) return direct;
 
         // Fallback: Convert PascalCase to snake_case for backwards compatibility (e.g., 'TrustNetwork' -> 'trust_network')
@@ -170,23 +185,24 @@ export class World extends WorldImpl {
           .replace(/([A-Z])/g, '_$1')
           .toLowerCase()
           .replace(/^_/, ''); // Remove leading underscore
-        return originalGetComponent(typeString);
+        return originalGetComponent<T>(typeString);
       }
 
       // If it's a class with a prototype, get the type from an instance
-      if (ComponentClass.prototype) {
+      if ('prototype' in ComponentClass && ComponentClass.prototype) {
         // Create temporary instance to get type
         try {
-          const temp = new ComponentClass({});
-          return originalGetComponent(temp.type);
+          const ComponentConstructor = ComponentClass as { new(data?: unknown): Component };
+          const temp = new ComponentConstructor({});
+          return originalGetComponent<T>(temp.type);
         } catch {
-          // Fallback: assume ComponentClass is the type string
-          return originalGetComponent(ComponentClass);
+          // Fallback: assume ComponentClass is the type string (shouldn't happen but be safe)
+          return originalGetComponent<T>(String(ComponentClass));
         }
       }
 
       // Otherwise assume it's a type string
-      return originalGetComponent(ComponentClass);
+      return originalGetComponent<T>(String(ComponentClass));
     };
 
     return entity as TestEntity;

@@ -73,12 +73,7 @@ export class MeetingDetector {
       // Decide whether to attend based on relationship
       const shouldAttend = this.shouldAttendMeeting(entity, caller.id, relationship || null);
 
-      const identity = entity.getComponent('identity') as any;
-      const myName = identity?.name || 'Someone';
-
       if (shouldAttend) {
-        console.log(`[Meeting] ${myName} heard ${speech.speaker}'s meeting call and is heading there!`);
-
         // Switch to attend_meeting behavior
         entity.updateComponent<AgentComponent>('agent', (current) => ({
           ...current,
@@ -96,9 +91,6 @@ export class MeetingDetector {
           attending: true,
         };
       } else {
-        console.log(
-          `[Meeting] ${myName} heard ${speech.speaker}'s meeting call but decided not to attend (low relationship)`
-        );
 
         return {
           detected: true,

@@ -10,6 +10,15 @@ import type { PlantSpecies, StageTransition } from '../types/PlantSpecies.js';
 
 import type { EventBus as CoreEventBus } from '../events/EventBus.js';
 
+/**
+ * Soil state interface for planting validation
+ */
+interface SoilState {
+  nutrients: number;
+  moisture?: number;
+  tilled?: boolean;
+}
+
 interface Environment {
   temperature: number;
   moisture: number;
@@ -41,6 +50,9 @@ export class PlantSystem implements System {
   private accumulatedTime: number = 0;
   private readonly HOUR_THRESHOLD = 1.0; // Update plants every game hour
   private lastUpdateLog: number = 0;
+
+  // Track entity IDs for plants (to avoid using 'as any')
+  private plantEntityIds: WeakMap<PlantComponent, string> = new WeakMap();
 
   constructor(eventBus: CoreEventBus) {
     this.eventBus = eventBus;
@@ -150,7 +162,6 @@ export class PlantSystem implements System {
     this.eventBus.subscribe('time:day_changed', () => {
       this.dayStarted = true;
       this.daySkipCount += 1; // Increment day skip counter
-      console.log(`[PlantSystem] New day started - will advance all plants by 1 day (total pending: ${this.daySkipCount} days)`);
     });
   }
 
@@ -161,7 +172,7 @@ export class PlantSystem implements System {
     if (entities.length === 0) return;
 
     // Get time component to calculate game hours elapsed
-    const timeEntities = (world as any).query().with('time').executeEntities();
+    const timeEntities = world.query().with('time').executeEntities();
     let gameHoursElapsed = 0;
 
     if (timeEntities.length > 0) {
@@ -181,10 +192,9 @@ export class PlantSystem implements System {
     // Accumulate time
     this.accumulatedTime += gameHoursElapsed;
 
-    // Log periodically (every 30 seconds real-time)
+    // Track last update time
     const now = Date.now();
     if (now - this.lastUpdateLog > 30000) {
-      console.log(`[PlantSystem] Active with ${entities.length} plants, accumulated ${this.accumulatedTime.toFixed(2)} game hours`);
       this.lastUpdateLog = now;
     }
 
@@ -196,11 +206,9 @@ export class PlantSystem implements System {
     if (this.daySkipCount > 0) {
       // Day skip event - process full days
       hoursToProcess = this.daySkipCount * 24;
-      console.log(`[PlantSystem] Processing ${this.daySkipCount} skipped day(s) = ${hoursToProcess} hours for ${entities.length} plants`);
     } else if (shouldUpdate) {
       // Normal hourly update
       hoursToProcess = this.accumulatedTime;
-      console.log(`[PlantSystem] Hourly update for ${entities.length} plants (accumulated ${this.accumulatedTime.toFixed(2)} hours)`);
     }
 
     // Skip processing if no hours to process
@@ -212,6 +220,9 @@ export class PlantSystem implements System {
       const impl = entity as EntityImpl;
       const plant = impl.getComponent<PlantComponent>('plant');
       if (!plant) continue;
+
+      // Store entity ID for this plant
+      this.plantEntityIds.set(plant, entity.id);
 
       // Validate position exists on plant component
       if (!plant.position) {
@@ -247,7 +258,6 @@ export class PlantSystem implements System {
         // Check for death
         if (plant.health <= 0 && plant.stage !== 'dead') {
           plant.stage = 'dead';
-          console.log(`[PlantSystem] ${entity.id.substring(0, 8)}: Plant died (health=0)`);
           this.eventBus.emit({
             type: 'plant:died',
             source: 'plant-system',
@@ -274,6 +284,12 @@ export class PlantSystem implements System {
       } catch (error) {
         throw error; // Re-throw to ensure errors aren't silenced
       }
+    }
+
+    // MIDNIGHT FRUIT REGENERATION: All plants regenerate fruit once per day at midnight
+    // This runs only when the day has just changed (midnight)
+    if (this.dayStarted) {
+      this.regenerateFruitAtMidnight(entities, world);
     }
 
     // Reset accumulated time and flags after update
@@ -343,8 +359,8 @@ export class PlantSystem implements System {
    */
   private applyWeatherEffects(plant: PlantComponent, environment: Environment): void {
     // Get entity ID for logging
-    const entityId = (plant as any).entityId || 'unknown';
-    const previousHydration = plant.hydration;
+    const entityId = this.plantEntityIds.get(plant) || 'unknown';
+    void environment; // Environment used later in hot weather check
 
     // Rain increases hydration
     if (this.weatherRainIntensity && !plant.isIndoors) {
@@ -352,8 +368,6 @@ export class PlantSystem implements System {
                            this.weatherRainIntensity === 'light' ? 10 : 20;
       plant.hydration = Math.min(100, plant.hydration + hydrationGain);
 
-      // Log hydration gain from rain
-      console.log(`[PlantSystem] ${entityId.substring(0, 8)}: Gained ${hydrationGain} hydration from ${this.weatherRainIntensity} rain (${previousHydration.toFixed(0)} → ${plant.hydration.toFixed(0)})`);
     }
 
     // Frost damages cold-sensitive plants
@@ -362,8 +376,6 @@ export class PlantSystem implements System {
       if (frostDamage > 0) {
         const previousHealth = plant.health;
         plant.health -= frostDamage;
-
-        console.log(`[PlantSystem] ${entityId.substring(0, 8)}: Frost damage ${frostDamage.toFixed(0)} (health ${previousHealth.toFixed(0)} → ${plant.health.toFixed(0)})`);
 
         this.eventBus.emit({
           type: 'plant:healthChanged',
@@ -383,10 +395,6 @@ export class PlantSystem implements System {
     if (environment.temperature > 30) {
       const extraDecay = (environment.temperature - 30) * 0.5;
       plant.hydration -= extraDecay;
-
-      if (extraDecay > 1) { // Only log significant decay
-        console.log(`[PlantSystem] ${entityId.substring(0, 8)}: Hot weather causing extra hydration decay -${extraDecay.toFixed(1)} (temp: ${environment.temperature.toFixed(1)}°C)`);
-      }
     }
   }
 
@@ -420,23 +428,11 @@ export class PlantSystem implements System {
     entityId: string,
     hoursElapsed: number
   ): void {
-    // DIAGNOSTIC LOGGING: Always log for first plant to debug day skip issue
-    const isFirstPlant = entityId === (Object.values((world as any)._entities)[0] as any)?.id;
-    if (isFirstPlant) {
-      console.log(`[PlantSystem DEBUG] updatePlantHourly called with hoursElapsed=${hoursElapsed.toFixed(4)}`);
-    }
-
     // Convert hours to fraction of a day
     const daysElapsed = hoursElapsed / 24;
 
     // Age the plant (in days)
-    const previousAge = plant.age;
     plant.age += daysElapsed;
-
-    // Log age changes for debugging
-    if (daysElapsed >= 0.01 || isFirstPlant) { // Log all non-trivial changes + first plant always
-      console.log(`[PlantSystem] ${entityId.substring(0, 8)}: Age increased by ${daysElapsed.toFixed(4)} days (${previousAge.toFixed(2)} → ${plant.age.toFixed(2)}) from ${hoursElapsed.toFixed(2)} hours`);
-    }
 
     // Track health before damage
     const previousHealth = plant.health;
@@ -460,11 +456,6 @@ export class PlantSystem implements System {
 
     // Clamp health
     plant.health = Math.max(0, Math.min(100, plant.health));
-
-    // Log health changes with causes
-    if (healthChangeCauses.length > 0 && previousHealth !== plant.health) {
-      console.log(`[PlantSystem] ${entityId.substring(0, 8)}: Health ${previousHealth.toFixed(0)} → ${plant.health.toFixed(0)} (${healthChangeCauses.join(', ')})`);
-    }
 
     // Emit health warning if critical
     if (plant.health < 50 && previousHealth !== plant.health) {
@@ -491,11 +482,6 @@ export class PlantSystem implements System {
     const growthAmount = this.calculateGrowthProgress(plant, species, environment);
     const hourlyGrowth = (growthAmount / 24) * hoursElapsed;
     plant.stageProgress += hourlyGrowth;
-
-    // Log plant status periodically
-    if (hoursElapsed >= 1.0) {
-      console.log(`[PlantSystem] ${entityId.substring(0, 8)}: ${species.name} (${plant.stage}) age=${plant.age.toFixed(1)}d progress=${(plant.stageProgress * 100).toFixed(0)}% health=${plant.health.toFixed(0)}`);
-    }
 
     // Emit nutrient consumption
     this.eventBus.emit({
@@ -611,8 +597,6 @@ export class PlantSystem implements System {
     plant.stage = transition.to;
     plant.stageProgress = 0;
 
-    console.log(`[PlantSystem] ${entityId.substring(0, 8)}: ${plant.speciesId} stage ${previousStage} → ${plant.stage} (age=${plant.age.toFixed(1)}d, health=${plant.health.toFixed(0)})`);
-
     // Execute transition effects
     this.executeTransitionEffects(plant, transition, species, world);
 
@@ -673,16 +657,10 @@ export class PlantSystem implements System {
     species: PlantSpecies,
     world: World
   ): void {
-    // Get entity ID for logging throughout effects
-    const entityId = (plant as any).entityId || 'unknown';
-
-    // DIAGNOSTIC: Log effect execution start
-    console.log(`[PlantSystem] ${entityId.substring(0, 8)}: Executing ${transition.onTransition.length} transition effect(s) for ${transition.from} → ${transition.to}`);
-    console.log(`[PlantSystem] ${entityId.substring(0, 8)}: Plant state before effects - seedsProduced=${plant.seedsProduced}, flowerCount=${plant.flowerCount}, fruitCount=${plant.fruitCount}`);
+    // Get entity ID for event emission
+    const entityId = this.plantEntityIds.get(plant) || 'unknown';
 
     for (const effect of transition.onTransition) {
-      console.log(`[PlantSystem] ${entityId.substring(0, 8)}: Processing effect: ${effect.type}`);
-
       switch (effect.type) {
         case 'become_visible':
           // Plant becomes visible (rendering concern)
@@ -691,32 +669,24 @@ export class PlantSystem implements System {
         case 'spawn_flowers':
           const flowerCount = this.parseRange(effect.params?.count || '3-8');
           plant.flowerCount = flowerCount;
-          console.log(`[PlantSystem] ${entityId.substring(0, 8)}: spawn_flowers - created ${flowerCount} flowers`);
           break;
 
         case 'flowers_become_fruit':
           plant.fruitCount = plant.flowerCount;
           plant.flowerCount = 0;
-          console.log(`[PlantSystem] ${entityId.substring(0, 8)}: flowers_become_fruit - ${plant.fruitCount} flowers became fruit`);
           break;
 
         case 'fruit_ripens':
           // Fruit is now harvestable
-          console.log(`[PlantSystem] ${entityId.substring(0, 8)}: fruit_ripens - ${plant.fruitCount} fruit now harvestable`);
           break;
 
         case 'produce_seeds': {
-          console.log(`[PlantSystem] ${entityId.substring(0, 8)}: produce_seeds effect START - plant.seedsProduced=${plant.seedsProduced}`);
-
           const seedCount = species.seedsPerPlant;
           const yieldModifier = applyGenetics(plant, 'yield');
           const calculatedSeeds = Math.floor(seedCount * yieldModifier);
 
           // Add to existing seeds (for perennial plants that cycle back to mature)
-          const previousSeeds = plant.seedsProduced;
           plant.seedsProduced += calculatedSeeds;
-
-          console.log(`[PlantSystem] ${entityId.substring(0, 8)}: produce_seeds effect EXECUTED - species.seedsPerPlant=${seedCount}, yieldModifier=${yieldModifier.toFixed(2)}, calculated=${calculatedSeeds}, plant.seedsProduced ${previousSeeds} → ${plant.seedsProduced}`);
 
           this.eventBus.emit({
             type: 'plant:mature',
@@ -749,13 +719,9 @@ export class PlantSystem implements System {
 
         case 'remove_plant':
           plant.stage = 'dead';
-          console.log(`[PlantSystem] ${entityId.substring(0, 8)}: remove_plant - plant marked as dead`);
           break;
       }
     }
-
-    // DIAGNOSTIC: Log effect execution complete
-    console.log(`[PlantSystem] ${entityId.substring(0, 8)}: All effects complete - seedsProduced=${plant.seedsProduced}, flowerCount=${plant.flowerCount}, fruitCount=${plant.fruitCount}`);
   }
 
   /**
@@ -787,24 +753,16 @@ export class PlantSystem implements System {
     world: World,
     count?: number
   ): void {
-    // Store entity ID on plant for seed creation
-    const entityId = (plant as any).entityId || `plant_${Date.now()}`;
-    (plant as any).entityId = entityId;
-
-    // DIAGNOSTIC: Log the seedsProduced value before calculation
-    console.log(`[PlantSystem] ${entityId.substring(0, 8)}: disperseSeeds called - plant.seedsProduced=${plant.seedsProduced}, count param=${count ?? 'undefined'}`);
+    // Get entity ID for seed creation
+    const entityId = this.plantEntityIds.get(plant) || `plant_${Date.now()}`;
 
     const seedsToDrop = count ?? Math.floor(plant.seedsProduced * 0.3);
 
     // If no seeds to drop, return early
     if (seedsToDrop === 0) {
-      console.log(`[PlantSystem] ${entityId.substring(0, 8)}: No seeds to disperse (plant.seedsProduced=${plant.seedsProduced})`);
       return;
     }
 
-    console.log(`[PlantSystem] ${entityId.substring(0, 8)}: Dispersing ${seedsToDrop} seeds in ${species.seedDispersalRadius}-tile radius`);
-
-    let seedsPlaced = 0;
     for (let i = 0; i < seedsToDrop; i++) {
       // Random position near parent
       const angle = Math.random() * Math.PI * 2;
@@ -826,9 +784,6 @@ export class PlantSystem implements System {
       });
 
       plant.seedsDropped.push(dropPos);
-      seedsPlaced++;
-
-      console.log(`[PlantSystem] ${entityId.substring(0, 8)}: Dispersed seed at (${dropPos.x.toFixed(1)}, ${dropPos.y.toFixed(1)})`);
 
       this.eventBus.emit({
         type: 'seed:dispersed',
@@ -849,8 +804,6 @@ export class PlantSystem implements System {
     if (count === undefined) {
       plant.seedsProduced -= seedsToDrop;
     }
-
-    console.log(`[PlantSystem] ${entityId.substring(0, 8)}: Placed ${seedsPlaced}/${seedsToDrop} seeds in ${species.seedDispersalRadius}-tile radius (${plant.seedsProduced} remaining)`);
   }
 
   /**
@@ -870,11 +823,8 @@ export class PlantSystem implements System {
     _world?: World
   ): Promise<boolean> {
     if (!canGerminate(seed)) {
-      console.log(`[PlantSystem] Seed ${seed.id.substring(0, 8)}: Cannot germinate (viability=${seed.viability.toFixed(2)}, dormant=${seed.dormant})`);
       return false;
     }
-
-    console.log(`[PlantSystem] Seed ${seed.id.substring(0, 8)}: Germinating at (${position.x.toFixed(1)}, ${position.y.toFixed(1)}) - generation ${seed.generation}`);
 
     // Emit event for germination - world manager will create plant entity
     this.eventBus.emit({
@@ -897,7 +847,7 @@ export class PlantSystem implements System {
   public canPlantAt(
     _position: { x: number; y: number },
     _speciesId: string,
-    soilState: any
+    soilState: SoilState
   ): boolean {
     // Check soil nutrients
     if (soilState.nutrients < 10) {
@@ -918,6 +868,73 @@ export class PlantSystem implements System {
       return min + Math.floor(Math.random() * (max - min + 1));
     }
     return parseInt(range, 10) || 0;
+  }
+
+  /**
+   * Regenerate fruit at midnight for all plants in appropriate stages.
+   *
+   * REQUIREMENT: Plants can only regenerate fruit once per day (at midnight).
+   * This prevents continuous fruit regeneration and makes the game more balanced.
+   *
+   * Plants regenerate fruit if they are:
+   * - In 'mature' or 'fruiting' stage (actively producing)
+   * - Have health > 50 (healthy enough to produce)
+   * - Have flowerCount > 0 (flowers available to become fruit)
+   *
+   * Fruit regeneration is based on:
+   * - Number of flowers available
+   * - Plant health (higher health = more fruit)
+   * - Genetic yield modifier
+   */
+  private regenerateFruitAtMidnight(entities: ReadonlyArray<Entity>, _world: World): void {
+    let plantsRegenerated = 0;
+
+    for (const entity of entities) {
+      const impl = entity as EntityImpl;
+      const plant = impl.getComponent<PlantComponent>('plant');
+      if (!plant) continue;
+
+      // Only regenerate for plants in appropriate stages
+      const canRegenerate = ['mature', 'fruiting'].includes(plant.stage);
+      if (!canRegenerate) continue;
+
+      // Must be healthy enough to produce fruit
+      if (plant.health < 50) continue;
+
+      // Get species to determine base fruit production
+      const species = this.getSpecies(plant.speciesId);
+
+      // Calculate fruit regeneration based on health and genetics
+      // Base: seedsPerPlant / 3 (fruit is less than seeds typically)
+      const baseFruitCount = Math.max(1, Math.floor(species.seedsPerPlant / 3));
+      const healthModifier = plant.health / 100;
+      const yieldModifier = applyGenetics(plant, 'yield');
+
+      // Calculate new fruit to add (at least 1 if conditions are met)
+      const fruitToAdd = Math.max(1, Math.floor(baseFruitCount * healthModifier * yieldModifier));
+
+      // Add fruit up to a reasonable maximum (based on species seedsPerPlant)
+      const maxFruit = species.seedsPerPlant * 2;
+      const previousFruit = plant.fruitCount;
+      plant.fruitCount = Math.min(maxFruit, plant.fruitCount + fruitToAdd);
+
+      if (plant.fruitCount > previousFruit) {
+        const entityId = this.plantEntityIds.get(plant) || entity.id;
+        plantsRegenerated++;
+
+        this.eventBus.emit({
+          type: 'plant:fruitRegenerated',
+          source: 'plant-system',
+          data: {
+            plantId: entityId,
+            speciesId: plant.speciesId,
+            fruitAdded: plant.fruitCount - previousFruit,
+            totalFruit: plant.fruitCount,
+            position: plant.position
+          }
+        });
+      }
+    }
   }
 
 }

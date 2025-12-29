@@ -9,11 +9,12 @@ export interface VisionComponent extends Component {
   seenAgents: string[];   // Entity IDs of agents currently in vision range
   seenResources: string[]; // Entity IDs of resources currently in vision range
   seenPlants?: string[];  // Entity IDs of plants currently in vision range
+  seenBuildings?: string[]; // Entity IDs of visible buildings
   heardSpeech: Array<{ speaker: string, text: string }>; // Speech heard from nearby agents
 }
 
 export function createVisionComponent(
-  range: number = 10.0,
+  range: number = 25.0, // Increased from 10 to enable social interactions
   fieldOfView: number = 360,
   canSeeAgents: boolean = true,
   canSeeResources: boolean = true

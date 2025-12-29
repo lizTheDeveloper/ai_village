@@ -7,6 +7,7 @@ import {
   createRenderableComponent,
   createTagsComponent,
   createResourceComponent,
+  PlantComponent,
 } from '@ai-village/core';
 
 /**
@@ -29,6 +30,16 @@ export function createTree(world: WorldMutator, x: number, y: number): string {
 
   // Resource - trees provide wood
   entity.addComponent(createResourceComponent('wood', 100, 0.5)); // 100 wood, regenerates 0.5/sec
+
+  // Plant - trees are mature wild plants
+  entity.addComponent(new PlantComponent({
+    speciesId: 'tree',
+    position: { x, y },
+    stage: 'mature',
+    health: 100,
+    hydration: 80,
+    nutrition: 80,
+  }));
 
   // Add to world
   (world as any)._addEntity(entity);

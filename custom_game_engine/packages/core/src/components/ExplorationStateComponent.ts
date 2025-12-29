@@ -32,6 +32,38 @@ export class ExplorationStateComponent extends ComponentBase {
     stepsInDirection: number;
   };
 
+  // Runtime state used by ExplorationSystem
+  public mode?: 'frontier' | 'spiral' | 'none';
+  public currentTarget?: { x: number; y: number };
+  public homeBase?: { x: number; y: number };
+
+  // Public accessors for ExplorationSystem compatibility
+  public get exploredSectors(): Set<string> {
+    return new Set(this._exploredSectors.keys());
+  }
+
+  public get sectorExplorationTimes(): Map<string, number> {
+    const times = new Map<string, number>();
+    for (const [key, info] of this._exploredSectors) {
+      times.set(key, info.lastExplored);
+    }
+    return times;
+  }
+
+  public get explorationRadius(): number {
+    return this._explorationRadius;
+  }
+
+  public get spiralStep(): number {
+    return this._spiralState?.step ?? 0;
+  }
+
+  public set spiralStep(value: number) {
+    if (this._spiralState) {
+      this._spiralState.step = value;
+    }
+  }
+
   constructor() {
     super();
   }
@@ -358,4 +390,37 @@ export class ExplorationStateComponent extends ComponentBase {
       y: sector.y * this._sectorSize + this._sectorSize / 2,
     };
   }
+}
+
+/**
+ * Factory function to create ExplorationStateComponent
+ */
+export function createExplorationStateComponent(options?: {
+  mode?: 'frontier' | 'spiral' | 'none';
+  explorationRadius?: number;
+  homeBase?: { x: number; y: number };
+  currentTarget?: { x: number; y: number };
+}): ExplorationStateComponent {
+  const component = new ExplorationStateComponent();
+
+  if (options?.mode) {
+    component.mode = options.mode;
+  }
+
+  if (options?.explorationRadius !== undefined) {
+    component.setExplorationRadius(options.explorationRadius);
+  }
+
+  if (options?.homeBase) {
+    component.homeBase = options.homeBase;
+    if (options.mode === 'spiral') {
+      component.initializeSpiral(options.homeBase);
+    }
+  }
+
+  if (options?.currentTarget) {
+    component.currentTarget = options.currentTarget;
+  }
+
+  return component;
 }

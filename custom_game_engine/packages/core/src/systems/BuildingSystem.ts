@@ -8,7 +8,14 @@ import { createBuildingComponent } from '../components/BuildingComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
 import { createRenderableComponent } from '../components/RenderableComponent.js';
+import { createInventoryComponent } from '../components/InventoryComponent.js';
+import { createShopComponent, type ShopType } from '../components/ShopComponent.js';
 import type { GameEvent } from '../events/GameEvent.js';
+import { createTownHallComponent } from '../components/TownHallComponent.js';
+import { createCensusBureauComponent } from '../components/CensusBureauComponent.js';
+import { createWarehouseComponent } from '../components/WarehouseComponent.js';
+import { createWeatherStationComponent } from '../components/WeatherStationComponent.js';
+import { createHealthClinicComponent } from '../components/HealthClinicComponent.js';
 
 /**
  * BuildingSystem handles construction progress for buildings.
@@ -49,6 +56,18 @@ export class BuildingSystem implements System {
   private readonly FUEL_LOW_THRESHOLD = 0.2; // 20% of max fuel
 
   /**
+   * Mapping of building types to shop types.
+   * When a building with a shop type completes, a ShopComponent is added.
+   */
+  private readonly SHOP_BUILDING_TYPES: Record<string, ShopType> = {
+    'general_store': 'general',
+    'blacksmith': 'blacksmith',
+    'farm_supply_shop': 'farm_supply',
+    'tavern': 'tavern',
+    'market_stall': 'general',
+  };
+
+  /**
    * Fuel configuration constants for crafting stations.
    * Defines initial fuel, max capacity, and consumption rates.
    */
@@ -87,6 +106,7 @@ export class BuildingSystem implements System {
   /**
    * Handle building completion event.
    * Initialize fuel properties for crafting stations that require fuel.
+   * Add inventory components for storage buildings.
    * Per CLAUDE.md: No silent failures - throws if entity not found.
    */
   private handleBuildingComplete(
@@ -103,6 +123,33 @@ export class BuildingSystem implements System {
       throw new Error(`[BuildingSystem] Entity ${entityId} not found for building completion - entity may have been deleted before completion event processed`);
     }
 
+    // Check if this is a storage building and add inventory component
+    const storageCapacity = this.getStorageCapacity(buildingType);
+    if (storageCapacity !== null) {
+      // Add inventory component with capacity from blueprint
+      // Use capacity as slots, and capacity * 10 as weight limit
+      const inventoryComp = createInventoryComponent(storageCapacity, storageCapacity * 10);
+      (entity as EntityImpl).addComponent(inventoryComp);
+    }
+
+    // Check if this is a shop building and add shop component
+    const shopType = this.SHOP_BUILDING_TYPES[buildingType];
+    if (shopType) {
+      // Get the building component to find the builder
+      const buildingComp = (entity as EntityImpl).getComponent<BuildingComponent>('building');
+      if (!buildingComp) {
+        throw new Error(`Entity ${entityId} missing BuildingComponent when adding ShopComponent`);
+      }
+
+      // TODO: Track builderId in BuildingComponent or pass from event data
+      const builderId = 'system'; // Placeholder until builder tracking is implemented
+      const shopComponent = createShopComponent(shopType, builderId, data.buildingType);
+      (entity as EntityImpl).addComponent(shopComponent);
+    }
+
+    // Check if this is a governance building and add governance component
+    this.addGovernanceComponent(entity as EntityImpl, buildingType);
+
     // Get fuel configuration for this building type
     const fuelConfig = this.getFuelConfiguration(buildingType);
 
@@ -116,8 +163,26 @@ export class BuildingSystem implements System {
         fuelConsumptionRate: fuelConfig.consumptionRate,
       }));
 
-      console.log(`[BuildingSystem] Initialized fuel for ${buildingType}: ${fuelConfig.initialFuel}/${fuelConfig.maxFuel}`);
     }
+  }
+
+  /**
+   * Get storage capacity for a building type.
+   * Returns null if the building type doesn't have storage functionality.
+   */
+  private getStorageCapacity(buildingType: string): number | null {
+    // Map of building types to storage capacity (from BuildingBlueprintRegistry)
+    const storageCapacities: Record<string, number> = {
+      'storage-chest': 20,
+      'storage-box': 10,
+      'farm-storage': 40,
+      'warehouse': 200,
+      'bank': 1000,
+      'barn': 100,
+      'granary': 1000, // Governance building for resource tracking
+    };
+
+    return storageCapacities[buildingType] ?? null;
   }
 
   /**
@@ -163,6 +228,43 @@ export class BuildingSystem implements System {
       // Tier 3 stations
       'workshop': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
       'barn': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+
+      // === Research System Buildings (Phase 13) ===
+      // Tier 1
+      'small_garden': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'loom': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'oven': { required: true, initialFuel: 30, maxFuel: 60, consumptionRate: 0.5 }, // Uses fuel for baking
+
+      // Tier 2
+      'irrigation_channel': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'warehouse': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'monument': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'alchemy_lab': { required: true, initialFuel: 40, maxFuel: 80, consumptionRate: 0.8 }, // Uses fuel for brewing
+      'water_wheel': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 }, // Water-powered
+
+      // Tier 3
+      'greenhouse': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'grand_hall': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'conveyor_system': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+
+      // Tier 4
+      'trading_post': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'bank': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+
+      // Tier 5
+      'arcane_tower': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 }, // Magic-powered
+      'inventors_hall': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+
+      // === Governance Buildings (Phase 11) ===
+      'town_hall': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'census_bureau': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'granary': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'weather_station': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'health_clinic': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'meeting_hall': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'watchtower': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'labor_guild': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'archive': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
     };
 
     const config = configs[buildingType];
@@ -170,6 +272,38 @@ export class BuildingSystem implements System {
       throw new Error(`Unknown building type: "${buildingType}". Add fuel config to BuildingSystem.ts`);
     }
     return config;
+  }
+
+  /**
+   * Add governance component to governance buildings when they complete.
+   * Per governance-dashboard work order: Buildings collect governance data.
+   */
+  private addGovernanceComponent(entity: EntityImpl, buildingType: string): void {
+    switch (buildingType) {
+      case 'town_hall':
+        entity.addComponent(createTownHallComponent());
+        break;
+
+      case 'census_bureau':
+        entity.addComponent(createCensusBureauComponent());
+        break;
+
+      case 'granary':
+        // Granary uses warehouse component with resource tracking
+        entity.addComponent(createWarehouseComponent('food'));
+        break;
+
+      case 'weather_station':
+        entity.addComponent(createWeatherStationComponent());
+        break;
+
+      case 'health_clinic':
+        entity.addComponent(createHealthClinicComponent());
+        break;
+
+      // Note: Other governance buildings (meeting_hall, watchtower, labor_guild, archive)
+      // don't have dedicated components yet. They will be added in future phases.
+    }
   }
 
   /**
@@ -183,28 +317,20 @@ export class BuildingSystem implements System {
   ): void {
     const { blueprintId, position } = data;
 
-    console.log(`[BuildingSystem] Placing building: ${blueprintId} at (${position.x}, ${position.y})`);
 
     // Get the resource requirements for this building type
     const resourceCost = this.getResourceCost(blueprintId);
     if (resourceCost && Object.keys(resourceCost).length > 0) {
-      const resourceList = Object.entries(resourceCost)
-        .map(([type, amount]) => `${amount} ${type}`)
-        .join(', ');
-      console.log(`[BuildingSystem] Building "${blueprintId}" requires: ${resourceList}`);
-
       // Try to deduct resources from storage first, then agents
       let success = this.deductResourcesFromStorage(world, resourceCost);
 
       if (success) {
-        console.log(`[BuildingSystem] Deducted resources from storage buildings`);
       } else {
         // Fall back to agent inventory
         const nearestAgent = this.findNearestAgentWithInventory(world, position);
         if (nearestAgent) {
           success = this.deductResourcesFromAgent(nearestAgent, resourceCost);
           if (success) {
-            console.log(`[BuildingSystem] Deducted resources from agent ${nearestAgent.id}`);
           }
         }
       }
@@ -224,7 +350,6 @@ export class BuildingSystem implements System {
         return;
       }
     } else {
-      console.log(`[BuildingSystem] Building "${blueprintId}" has no resource cost`);
     }
 
     // Validate blueprintId is a known building type before creating entity
@@ -243,7 +368,6 @@ export class BuildingSystem implements System {
     (entity as EntityImpl).addComponent(createPositionComponent(position.x, position.y));
     (entity as EntityImpl).addComponent(createRenderableComponent(blueprintId, 'building'));
 
-    console.log(`[BuildingSystem] Created building entity: ${entity.id} at tile (${position.x}, ${position.y})`);
 
     // Emit construction:started event
     world.eventBus.emit({
@@ -253,6 +377,8 @@ export class BuildingSystem implements System {
         buildingId: entity.id,
         blueprintId,
         entityId: entity.id,
+        buildingType: blueprintId,
+        position,
       },
     });
 
@@ -271,14 +397,6 @@ export class BuildingSystem implements System {
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    // Log entity count every 100 ticks for debugging (only if we have buildings)
-    if (entities.length > 0 && world.tick % 100 === 0) {
-      const underConstruction = entities.filter(e => {
-        const b = (e as EntityImpl).getComponent<BuildingComponent>('building');
-        return b && !b.isComplete && b.progress < 100;
-      });
-      console.log(`[BuildingSystem] Processing ${entities.length} building entities (${underConstruction.length} under construction) at tick ${world.tick}`);
-    }
 
     // Process all buildings
     for (const entity of entities) {
@@ -333,7 +451,6 @@ export class BuildingSystem implements System {
     const oldProgressMilestone = Math.floor(building.progress / 5);
     const newProgressMilestone = Math.floor(newProgress / 5);
     if (newProgressMilestone > oldProgressMilestone) {
-      console.log(`[BuildingSystem] Construction progress: ${building.buildingType} at (${position.x}, ${position.y}) - ${building.progress.toFixed(1)}% → ${newProgress.toFixed(1)}% (deltaTime=${deltaTime.toFixed(3)}s, buildTime=${constructionTimeSeconds}s, increase=${progressIncrease.toFixed(3)}%)`);
     }
 
     // Update building component
@@ -345,8 +462,6 @@ export class BuildingSystem implements System {
 
     // Emit completion event if just completed
     if (wasUnderConstruction && isNowComplete) {
-      console.log(`[BuildingSystem] 🏗️ Construction complete! ${building.buildingType} at (${position.x}, ${position.y})`);
-      console.log(`[BuildingSystem] 🎉 building:complete event emitted for entity ${entity.id.slice(0, 8)}`);
       world.eventBus.emit({
         type: 'building:complete',
         source: entity.id,
@@ -354,6 +469,7 @@ export class BuildingSystem implements System {
           buildingId: entity.id,
           entityId: entity.id,
           buildingType: building.buildingType,
+          position: { x: position.x, y: position.y },
         },
       });
     }
@@ -490,7 +606,6 @@ export class BuildingSystem implements System {
       }
 
       if (totalAvailable < amountNeeded) {
-        console.log(`[BuildingSystem] Agent ${agent.id} has ${totalAvailable} ${resourceType}, needs ${amountNeeded}`);
         return false;
       }
     }
@@ -530,7 +645,6 @@ export class BuildingSystem implements System {
     world: World,
     resourceCost: Record<string, number>
   ): boolean {
-    console.log('[BuildingSystem] deductResourcesFromStorage called with:', resourceCost);
 
     // Get all storage buildings with inventory
     const storageBuildings = world.query()
@@ -538,7 +652,6 @@ export class BuildingSystem implements System {
       .with('inventory')
       .executeEntities();
 
-    console.log('[BuildingSystem] Found', storageBuildings.length, 'storage buildings');
 
     // First, check if we have enough resources across all storage
     const availableResources: Record<string, number> = {};
@@ -564,19 +677,16 @@ export class BuildingSystem implements System {
       }
     }
 
-    console.log('[BuildingSystem] Available resources in storage:', availableResources);
 
     // Check if we have enough of each resource
     for (const [resourceType, amountNeeded] of Object.entries(resourceCost)) {
       // Per CLAUDE.md: Use ?? instead of || for default values
       const available = availableResources[resourceType] ?? 0;
       if (available < amountNeeded) {
-        console.log(`[BuildingSystem] Storage has ${available} ${resourceType}, needs ${amountNeeded}`);
         return false;
       }
     }
 
-    console.log('[BuildingSystem] Storage has enough resources, proceeding to deduct');
 
     // Now deduct resources from storage buildings
     for (const [resourceType, amountNeeded] of Object.entries(resourceCost)) {
@@ -625,24 +735,66 @@ export class BuildingSystem implements System {
    * Per CLAUDE.md: No silent fallbacks - throws on unknown building type.
    */
   private getResourceCost(buildingType: string): Record<string, number> {
-    // Map of building types to resource costs (from BuildingBlueprintRegistry)
+    // NOTE: These MUST match BuildingBlueprintRegistry resource costs.
     const resourceCosts: Record<string, Record<string, number>> = {
-      // Tier 1 buildings
-      'workbench': { wood: 10 },
-      'storage-chest': { wood: 15 },
+      // Tier 1 buildings (match BuildingBlueprintRegistry)
+      'workbench': { wood: 20 },
+      'storage-chest': { wood: 10 },
       'campfire': { wood: 5, stone: 3 },
       'tent': { wood: 8 },
       'well': { stone: 20, wood: 10 },
       'lean-to': { wood: 12 },
       'storage-box': { wood: 8 },
+      'bed': { wood: 15 },
+      'bedroll': { wood: 5 },
       // Tier 2 crafting stations
       'forge': { stone: 30, wood: 15 },
       'farm_shed': { wood: 25, stone: 10 },
       'market_stall': { wood: 20 },
       'windmill': { wood: 30, stone: 15 },
+      // Shop buildings (Phase 12.4)
+      'general_store': { wood: 30, stone: 20 },
+      'blacksmith': { wood: 25, stone: 35, iron: 15 },
+      'farm_supply_shop': { wood: 35, stone: 15 },
+      'tavern': { wood: 40, stone: 25 },
       // Tier 3+ crafting stations
       'workshop': { wood: 40, stone: 25 },
       'barn': { wood: 50, stone: 20 },
+      // Governance buildings (per governance-dashboard work order)
+      'town-hall': { wood: 50, stone: 20 },
+      'census-bureau': { wood: 100, stone: 50, cloth: 20 },
+      'weather-station': { wood: 60, stone: 40, metal: 10 },
+      'health-clinic': { wood: 100, stone: 50, cloth: 30 },
+      'meeting-hall': { wood: 120, stone: 60 },
+      'watchtower': { wood: 80, stone: 60 },
+      'labor-guild': { wood: 90, stone: 40 },
+      'archive': { wood: 150, stone: 80, cloth: 50, ink: 20 },
+
+      // === Research System Buildings (Phase 13) ===
+      // Tier 1
+      'small_garden': { wood: 10, stone: 5 },
+      'loom': { wood: 30, fiber: 10 },
+      'oven': { stone: 25, clay: 15 },
+
+      // Tier 2
+      'irrigation_channel': { stone: 20, clay: 10 },
+      'warehouse': { wood: 80, stone: 40 },
+      'monument': { stone: 60, gold: 5 },
+      'alchemy_lab': { stone: 40, wood: 30, glass: 15 },
+      'water_wheel': { wood: 50, iron: 20 },
+
+      // Tier 3
+      'greenhouse': { wood: 60, glass: 40, iron: 20 },
+      'grand_hall': { stone: 100, wood: 80, gold: 10 },
+      'conveyor_system': { iron: 40, wood: 20 },
+
+      // Tier 4
+      'trading_post': { wood: 70, stone: 50, gold: 20 },
+      'bank': { stone: 80, iron: 50, gold: 30 },
+
+      // Tier 5
+      'arcane_tower': { stone: 100, mithril_ingot: 20, crystal: 30 },
+      'inventors_hall': { stone: 120, wood: 80, iron: 60, gold: 40 },
     };
 
     const cost = resourceCosts[buildingType];
@@ -667,14 +819,62 @@ export class BuildingSystem implements System {
       'well': 90,
       'lean-to': 60,
       'storage-box': 45,
+      'bed': 45,
+      'bedroll': 20,
       // Tier 2 crafting stations
       'forge': 120,
       'farm_shed': 90,
       'market_stall': 75,
       'windmill': 100,
+      // Shop buildings (Phase 12.4)
+      'general_store': 150,
+      'blacksmith': 180,
+      'farm_supply_shop': 120,
+      'tavern': 200,
       // Tier 3+ crafting stations
       'workshop': 180,
       'barn': 150,
+      // Animal housing buildings (per animalHousingDefinitions.ts)
+      'chicken-coop': 90,
+      'kennel': 75,
+      'stable': 120,
+      'apiary': 60,
+      'aquarium': 90,
+      // Governance buildings (per governance-dashboard work order)
+      'town-hall': 4 * 3600, // 4 hours
+      'census-bureau': 8 * 3600, // 8 hours
+      'weather-station': 5 * 3600, // 5 hours
+      'health-clinic': 10 * 3600, // 10 hours
+      'meeting-hall': 8 * 3600, // 8 hours
+      'watchtower': 6 * 3600, // 6 hours
+      'labor-guild': 7 * 3600, // 7 hours
+      'archive': 12 * 3600, // 12 hours
+
+      // === Research System Buildings (Phase 13) ===
+      // Tier 1
+      'small_garden': 45,
+      'loom': 75,
+      'oven': 60,
+
+      // Tier 2
+      'irrigation_channel': 90,
+      'warehouse': 150,
+      'monument': 180,
+      'alchemy_lab': 120,
+      'water_wheel': 120,
+
+      // Tier 3
+      'greenhouse': 180,
+      'grand_hall': 300,
+      'conveyor_system': 90,
+
+      // Tier 4
+      'trading_post': 200,
+      'bank': 240,
+
+      // Tier 5
+      'arcane_tower': 360,
+      'inventors_hall': 480,
     };
 
     const time = constructionTimes[buildingType];

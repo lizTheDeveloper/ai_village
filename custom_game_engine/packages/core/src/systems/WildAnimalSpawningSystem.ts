@@ -7,7 +7,8 @@ import { AnimalComponent } from '../components/AnimalComponent.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
 import { createRenderableComponent } from '../components/RenderableComponent.js';
 import { createTemperatureComponent } from '../components/TemperatureComponent.js';
-import { getSpawnableSpecies, getAnimalSpecies } from '../data/animalSpecies.js';
+import { createMovementComponent } from '../components/MovementComponent.js';
+import { getSpawnableSpecies, getAnimalSpecies, type AnimalSpecies } from '../data/animalSpecies.js';
 
 /**
  * WildAnimalSpawningSystem spawns wild animals in chunks
@@ -111,27 +112,50 @@ export class WildAnimalSpawningSystem implements System {
     const x = chunkX * chunkSize + Math.random() * chunkSize;
     const y = chunkY * chunkSize + Math.random() * chunkSize;
 
+    const entity = this.createAnimalEntity(world, speciesData, speciesId, x, y);
+
+    // Emit spawn event
+    world.eventBus.emit({
+      type: 'animal_spawned',
+      source: entity.id,
+      data: {
+        animalId: entity.id,
+        speciesId,
+        position: { x, y },
+        chunkX,
+        chunkY,
+        biome,
+      },
+    });
+
+    return entity;
+  }
+
+  /**
+   * Create an animal entity with all required components.
+   * Shared between spawnAnimal() and spawnSpecificAnimal() to stay DRY.
+   */
+  private createAnimalEntity(
+    world: World,
+    speciesData: AnimalSpecies,
+    speciesId: string,
+    x: number,
+    y: number
+  ): Entity {
     // Random age (adult or juvenile for wild animals)
     const minAge = speciesData.infantDuration + speciesData.juvenileDuration;
     const maxAge = speciesData.infantDuration + speciesData.juvenileDuration + speciesData.adultDuration * 0.5;
     const age = minAge + Math.random() * (maxAge - minAge);
 
     // Determine life stage based on age
-    let lifeStage: 'infant' | 'juvenile' | 'adult' | 'elder' = 'adult';
-    if (age < speciesData.infantDuration) {
-      lifeStage = 'infant';
-    } else if (age < speciesData.infantDuration + speciesData.juvenileDuration) {
-      lifeStage = 'juvenile';
-    } else if (age < speciesData.infantDuration + speciesData.juvenileDuration + speciesData.adultDuration) {
-      lifeStage = 'adult';
-    } else {
-      lifeStage = 'elder';
-    }
+    const lifeStage = this.getLifeStage(age, speciesData);
 
     // Create animal entity
     const entity = world.createEntity();
+    const entityImpl = entity as EntityImpl;
     const animalId = entity.id;
 
+    // Add AnimalComponent
     const animalData = {
       id: animalId,
       speciesId,
@@ -148,49 +172,49 @@ export class WildAnimalSpawningSystem implements System {
       stress: Math.random() * 20, // 0-20 stress
       mood: 50 + Math.random() * 30, // 50-80 mood
       wild: true,
+      isDomesticated: false,
       bondLevel: 0,
       trustLevel: 0,
     };
-
-    // Create the component instance and add it
-    const component = new AnimalComponent(animalData);
-    (entity as EntityImpl).addComponent(component);
+    entityImpl.addComponent(new AnimalComponent(animalData));
 
     // Add PositionComponent (required for rendering and spatial queries)
-    const positionComponent = createPositionComponent(x, y);
-    (entity as EntityImpl).addComponent(positionComponent);
+    entityImpl.addComponent(createPositionComponent(x, y));
 
     // Add RenderableComponent (required for rendering)
-    const renderableComponent = createRenderableComponent(speciesId, 'entity');
-    (entity as EntityImpl).addComponent(renderableComponent);
+    entityImpl.addComponent(createRenderableComponent(speciesId, 'entity'));
+
+    // Add MovementComponent (required for AnimalBrainSystem and movement)
+    entityImpl.addComponent(createMovementComponent(speciesData.baseSpeed));
 
     // Add TemperatureComponent (Phase 8 integration - animals need temperature comfort)
-    // Default current temp to 20°C (comfortable for most animals)
-    // Tolerance extends beyond comfort by ±10°C
-    const temperatureComponent = createTemperatureComponent(
+    entityImpl.addComponent(createTemperatureComponent(
       20, // currentTemp - will be updated by TemperatureSystem
       speciesData.minComfortTemp,
       speciesData.maxComfortTemp,
       speciesData.minComfortTemp - 10, // toleranceMin
       speciesData.maxComfortTemp + 10  // toleranceMax
-    );
-    (entity as EntityImpl).addComponent(temperatureComponent);
-
-    // Emit spawn event
-    world.eventBus.emit({
-      type: 'animal_spawned',
-      source: entity.id,
-      data: {
-        animalId,
-        speciesId,
-        position: { x, y },
-        chunkX,
-        chunkY,
-        biome,
-      },
-    });
+    ));
 
     return entity;
+  }
+
+  /**
+   * Determine life stage based on age and species durations.
+   */
+  private getLifeStage(
+    age: number,
+    speciesData: AnimalSpecies
+  ): 'infant' | 'juvenile' | 'adult' | 'elder' {
+    if (age < speciesData.infantDuration) {
+      return 'infant';
+    } else if (age < speciesData.infantDuration + speciesData.juvenileDuration) {
+      return 'juvenile';
+    } else if (age < speciesData.infantDuration + speciesData.juvenileDuration + speciesData.adultDuration) {
+      return 'adult';
+    } else {
+      return 'elder';
+    }
   }
 
   /**
@@ -221,80 +245,20 @@ export class WildAnimalSpawningSystem implements System {
 
     const { x, y } = position;
 
+    // Use shared helper for component creation
+    const entity = this.createAnimalEntity(world, speciesData, speciesId, x, y);
+
     // Calculate chunk coordinates for event emission
-    const chunkSize = 32; // Default chunk size
+    const chunkSize = 32;
     const chunkX = Math.floor(x / chunkSize);
     const chunkY = Math.floor(y / chunkSize);
-
-    // Random age (adult or juvenile for wild animals)
-    const minAge = speciesData.infantDuration + speciesData.juvenileDuration;
-    const maxAge = speciesData.infantDuration + speciesData.juvenileDuration + speciesData.adultDuration * 0.5;
-    const age = minAge + Math.random() * (maxAge - minAge);
-
-    // Determine life stage based on age
-    let lifeStage: 'infant' | 'juvenile' | 'adult' | 'elder' = 'adult';
-    if (age < speciesData.infantDuration) {
-      lifeStage = 'infant';
-    } else if (age < speciesData.infantDuration + speciesData.juvenileDuration) {
-      lifeStage = 'juvenile';
-    } else if (age < speciesData.infantDuration + speciesData.juvenileDuration + speciesData.adultDuration) {
-      lifeStage = 'adult';
-    } else {
-      lifeStage = 'elder';
-    }
-
-    // Create animal entity
-    const entity = world.createEntity();
-    const animalId = entity.id;
-
-    const animalData = {
-      id: animalId,
-      speciesId,
-      name: `Wild ${speciesData.name}`,
-      position: { x, y },
-      age,
-      lifeStage,
-      health: 80 + Math.random() * 20, // 80-100 health
-      size: speciesData.baseSize,
-      state: 'idle' as const,
-      hunger: Math.random() * 30, // 0-30 hunger
-      thirst: Math.random() * 30, // 0-30 thirst
-      energy: 70 + Math.random() * 30, // 70-100 energy
-      stress: Math.random() * 20, // 0-20 stress
-      mood: 50 + Math.random() * 30, // 50-80 mood
-      wild: true,
-      bondLevel: 0,
-      trustLevel: 0,
-    };
-
-    // Create the component instance and add it
-    const component = new AnimalComponent(animalData);
-    (entity as EntityImpl).addComponent(component);
-
-    // Add PositionComponent (required for rendering and spatial queries)
-    const positionComponent = createPositionComponent(x, y);
-    (entity as EntityImpl).addComponent(positionComponent);
-
-    // Add RenderableComponent (required for rendering)
-    const renderableComponent = createRenderableComponent(speciesId, 'entity');
-    (entity as EntityImpl).addComponent(renderableComponent);
-
-    // Add TemperatureComponent (Phase 8 integration - animals need temperature comfort)
-    const temperatureComponent = createTemperatureComponent(
-      20, // currentTemp - will be updated by TemperatureSystem
-      speciesData.minComfortTemp,
-      speciesData.maxComfortTemp,
-      speciesData.minComfortTemp - 10, // toleranceMin
-      speciesData.maxComfortTemp + 10  // toleranceMax
-    );
-    (entity as EntityImpl).addComponent(temperatureComponent);
 
     // Emit spawn event
     world.eventBus.emit({
       type: 'animal_spawned',
       source: entity.id,
       data: {
-        animalId,
+        animalId: entity.id,
         speciesId,
         position: { x, y },
         chunkX,

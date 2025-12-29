@@ -123,9 +123,6 @@ export class TimeSystem implements System {
 
       // Emit phase change event if phase changed
       if (this.lastPhase !== null && this.lastPhase !== newPhase) {
-        const formattedTime = this.formatTime(newTimeOfDay);
-        console.log(`[TimeSystem] Phase changed: ${this.lastPhase} → ${newPhase} at ${formattedTime}`);
-
         world.eventBus.emit({
           type: 'time:phase_changed',
           source: entity.id,
@@ -139,15 +136,6 @@ export class TimeSystem implements System {
 
       this.lastPhase = newPhase;
     }
-  }
-
-  /**
-   * Format time of day as HH:MM
-   */
-  private formatTime(timeOfDay: number): string {
-    const hours = Math.floor(timeOfDay);
-    const minutes = Math.floor((timeOfDay - hours) * 60);
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
 
   /**

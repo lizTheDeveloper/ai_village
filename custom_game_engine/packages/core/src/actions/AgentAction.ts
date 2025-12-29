@@ -28,10 +28,17 @@ export type AgentAction =
   | { type: 'eat'; itemId?: string }
   | { type: 'chop'; targetId: string } // Chop tree for wood
   | { type: 'mine'; targetId: string } // Mine rock for stone
+  | { type: 'gather'; resourceType?: string } // Generic gather (maps to pick)
 
   // Building
   | { type: 'build'; buildingType: BuildingType; position: Position }
   | { type: 'construct'; buildingId: string } // Continue construction
+
+  // Crafting (Phase 10)
+  | { type: 'craft'; recipeId: string; quantity?: number } // Craft at station
+
+  // Trading (Phase 12)
+  | { type: 'trade'; shopId: string; itemId: string; quantity: number; subtype: 'buy' | 'sell' }
 
   // Farming (Phase 9)
   | { type: 'till'; position: Position } // Till grass to make plantable
@@ -191,6 +198,8 @@ export function parseAction(response: string): AgentAction | null {
       buildingType = 'tent';
     } else if (cleaned.includes('workbench') || cleaned.includes('work bench')) {
       buildingType = 'workbench';
+    } else if (cleaned.includes('forge')) {
+      buildingType = 'forge';
     } else if (cleaned.includes('well')) {
       buildingType = 'well';
     } else if (cleaned.includes('lean-to') || cleaned.includes('leanto') || cleaned.includes('shelter')) {
@@ -198,6 +207,56 @@ export function parseAction(response: string): AgentAction | null {
     }
 
     return { type: 'build', buildingType, position: { x: 0, y: 0 } };
+  }
+
+  // Crafting actions (Phase 10)
+  if (cleaned.includes('craft') || cleaned.includes('make') || cleaned.includes('create')) {
+    // Try to extract recipe from response
+    let recipeId = 'wood_plank'; // fallback
+
+    // Check for specific items (ordered by specificity)
+    if (cleaned.includes('stone_axe') || cleaned.includes('stone axe')) {
+      recipeId = 'stone_axe';
+    } else if (cleaned.includes('iron_axe') || cleaned.includes('iron axe')) {
+      recipeId = 'iron_axe';
+    } else if (cleaned.includes('iron_pickaxe') || cleaned.includes('iron pickaxe') || cleaned.includes('pickaxe')) {
+      recipeId = 'iron_pickaxe';
+    } else if (cleaned.includes('iron_sword') || cleaned.includes('iron sword') || cleaned.includes('sword')) {
+      recipeId = 'iron_sword';
+    } else if (cleaned.includes('iron_ingot') || cleaned.includes('iron ingot') || cleaned.includes('smelt iron')) {
+      recipeId = 'iron_ingot';
+    } else if (cleaned.includes('plank') || cleaned.includes('planks') || cleaned.includes('wood plank')) {
+      recipeId = 'wood_plank';
+    } else if (cleaned.includes('torch')) {
+      recipeId = 'torch';
+    } else if (cleaned.includes('rope')) {
+      recipeId = 'rope';
+    }
+
+    return { type: 'craft', recipeId };
+  }
+
+  // Trading actions (Phase 12)
+  if (cleaned.includes('buy') || cleaned.includes('purchase')) {
+    // Default to buying wood from nearest shop
+    return {
+      type: 'trade',
+      shopId: 'nearest',
+      itemId: 'wood',
+      quantity: 1,
+      subtype: 'buy',
+    };
+  }
+
+  if (cleaned.includes('sell')) {
+    // Default to selling wood to nearest shop
+    return {
+      type: 'trade',
+      shopId: 'nearest',
+      itemId: 'wood',
+      quantity: 1,
+      subtype: 'sell',
+    };
   }
 
   // Default fallback
@@ -216,8 +275,8 @@ export function isValidAction(action: unknown): boolean {
 
   const validTypes = [
     'move', 'wander', 'follow', 'talk', 'help',
-    'forage', 'pickup', 'eat', 'chop', 'mine',
-    'build', 'construct', 'idle', 'rest',
+    'forage', 'pickup', 'eat', 'chop', 'mine', 'gather',
+    'build', 'construct', 'craft', 'trade', 'idle', 'rest',
     'till', 'water', 'fertilize', 'plant', 'harvest', 'gather_seeds',
     'navigate', 'explore_frontier', 'explore_spiral', 'follow_gradient'
   ];
@@ -243,10 +302,15 @@ export function actionToBehavior(action: AgentAction): AgentBehavior {
       return 'seek_food'; // Forage from environment
     case 'chop':
     case 'mine':
-      return 'gather';
+    case 'gather':
+      return 'pick'; // 'gather' is a synonym for 'pick' - the actual valid behavior
     case 'build':
     case 'construct':
       return 'build';
+    case 'craft':
+      return 'craft';
+    case 'trade':
+      return 'idle'; // Trade is instant, use idle behavior
     case 'till':
       return 'till'; // Tilling behavior - finds grass and queues till actions
     case 'water':
@@ -258,8 +322,8 @@ export function actionToBehavior(action: AgentAction): AgentBehavior {
     case 'gather_seeds':
       return 'gather_seeds'; // Gather seeds behavior
     case 'idle':
-    case 'rest':
       return 'idle';
+    // NOTE: 'rest' removed - sleep is autonomic (triggered by AutonomicSystem)
     case 'move':
       return 'wander'; // TODO: Implement proper pathfinding
     // Navigation & Exploration (Phase 4.5)

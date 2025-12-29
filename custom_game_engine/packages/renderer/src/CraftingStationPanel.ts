@@ -376,8 +376,6 @@ export class CraftingStationPanel {
         ...comp,
         currentFuel: newFuel,
       }));
-
-      console.log(`[CraftingStationPanel] Added fuel. New level: ${newFuel}/${building.maxFuel}`);
     }
   }
 }

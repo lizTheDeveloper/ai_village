@@ -1,5 +1,16 @@
 import { ComponentBase } from '../ecs/Component';
 import type { Entity } from '../ecs/Entity';
+import type { SleepGenetics } from '../genetics/SleepGenetics';
+import type { BuildingComponent } from './BuildingComponent';
+import type { NeedsComponent } from './NeedsComponent';
+
+/**
+ * Helper interface for entities that have getComponent method
+ */
+export interface EntityWithComponents extends Entity {
+  getComponent<T>(type: string): T | undefined;
+  hasComponent(type: string): boolean;
+}
 
 /**
  * Create a CircadianComponent with default values
@@ -36,7 +47,8 @@ export interface CircadianComponentData {
   lastSleepLocation?: Entity | null;
   lastDream?: DreamContent | null;
   hasDreamedThisSleep?: boolean;
-  genetics?: any; // SleepGenetics type (defined separately)
+  sleepDurationHours?: number; // Accumulated sleep duration in game hours
+  genetics?: SleepGenetics;
   energy?: number; // For validation
 }
 
@@ -51,7 +63,8 @@ export class CircadianComponent extends ComponentBase {
   public lastSleepLocation: Entity | null;
   public lastDream: DreamContent | null; // Last dream experienced
   public hasDreamedThisSleep: boolean; // Track if dreamed during current sleep
-  public genetics?: any; // Will be typed as SleepGenetics
+  public sleepDurationHours: number; // Accumulated sleep duration in game hours
+  public genetics?: SleepGenetics;
 
   constructor(data: CircadianComponentData) {
     super();
@@ -80,6 +93,7 @@ export class CircadianComponent extends ComponentBase {
     this.lastSleepLocation = data.lastSleepLocation ?? null;
     this.lastDream = data.lastDream ?? null;
     this.hasDreamedThisSleep = data.hasDreamedThisSleep ?? false;
+    this.sleepDurationHours = data.sleepDurationHours ?? 0;
     this.genetics = data.genetics;
   }
 
@@ -126,28 +140,31 @@ export class CircadianComponent extends ComponentBase {
 
   /**
    * Calculate sleep quality based on location and conditions
-   * Requires entity to have AgentComponent for temperature check
+   * Requires entity to have needs component for temperature check
    */
-  public calculateSleepQuality(location: Entity | null, entity?: any): number {
+  public calculateSleepQuality(location: Entity | null, entity?: EntityWithComponents): number {
     let quality = 0.5; // Base quality (ground)
 
-    // Location bonuses
-    if (location) {
-      if ((location as any).type === 'bed') {
-        quality += 0.4;
-      } else if ((location as any).type === 'building') {
-        quality += 0.2;
-      } else if ((location as any).type === 'campfire') {
-        quality += 0.1;
+    // Location bonuses - check if location has building component
+    if (location && (location as EntityWithComponents).getComponent) {
+      const buildingComp = (location as EntityWithComponents).getComponent<BuildingComponent>('building');
+      if (buildingComp) {
+        // Check building type for sleep quality bonuses
+        if (buildingComp.buildingType === 'bed') {
+          quality += 0.4;
+        } else if (buildingComp.buildingType === 'tent' || buildingComp.buildingType === 'lean-to') {
+          quality += 0.2;
+        } else if (buildingComp.buildingType === 'campfire') {
+          quality += 0.1;
+        }
       }
     }
 
-    // Environmental penalties
-    if (entity && entity.getComponent) {
-      const AgentComponent = require('./AgentComponent').AgentComponent;
-      const agentComp = entity.getComponent(AgentComponent);
-      if (agentComp && agentComp.needs) {
-        const temperature = agentComp.needs.temperature;
+    // Environmental penalties - check entity's needs component
+    if (entity) {
+      const needsComp = entity.getComponent<NeedsComponent>('needs');
+      if (needsComp) {
+        const temperature = needsComp.temperature;
         if (temperature < 15) {
           quality -= 0.2; // Too cold
         }
@@ -185,7 +202,7 @@ export class CircadianComponent extends ComponentBase {
    * Check if agent should wake up
    * Requires entity parameter to check needs
    */
-  public shouldWake(currentTime: number, entity?: any): boolean {
+  public shouldWake(currentTime: number, entity?: EntityWithComponents): boolean {
     if (!this.isSleeping) {
       return false;
     }
@@ -194,21 +211,20 @@ export class CircadianComponent extends ComponentBase {
     const sleepDuration = this.getSleepDuration(currentTime);
 
     let criticalNeed = false;
-    if (entity && entity.getComponent) {
-      const AgentComponent = require('./AgentComponent').AgentComponent;
-      const agentComp = entity.getComponent(AgentComponent);
-      if (agentComp && agentComp.needs) {
-        criticalNeed = agentComp.needs.hunger < 10 || agentComp.needs.thirst < 10;
+    if (entity) {
+      const needsComp = entity.getComponent<NeedsComponent>('needs');
+      if (needsComp) {
+        criticalNeed = needsComp.hunger < 10 || needsComp.thirst < 10;
 
         if (sleepDuration < 4 && !criticalNeed) {
           return false;
         }
 
         // Wake conditions
-        const energyFull = agentComp.needs.energy >= 100;
+        const energyFull = needsComp.energy >= 100;
         const sleepDriveDepleted = this.sleepDrive < 10;
-        const criticalHunger = agentComp.needs.hunger < 10;
-        const criticalThirst = agentComp.needs.thirst < 10;
+        const criticalHunger = needsComp.hunger < 10;
+        const criticalThirst = needsComp.thirst < 10;
 
         return energyFull || sleepDriveDepleted || criticalHunger || criticalThirst;
       }

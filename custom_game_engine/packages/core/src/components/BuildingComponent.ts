@@ -4,6 +4,7 @@ import type { Component } from '../ecs/Component.js';
  * Building types - includes Tier 1 buildings from construction-system/spec.md
  * Plus legacy types for backward compatibility
  * Plus Tier 2.5 animal housing from construction-system/spec.md
+ * Plus governance buildings from governance-dashboard work order
  */
 export type BuildingType =
   // Tier 1 buildings (per spec)
@@ -31,7 +32,17 @@ export type BuildingType =
   | 'bedroll'
   // Legacy types (backward compatibility)
   | 'lean-to'
-  | 'storage-box';
+  | 'storage-box'
+  // Governance buildings (per governance-dashboard work order)
+  | 'town-hall'
+  | 'census-bureau'
+  | 'warehouse'
+  | 'weather-station'
+  | 'health-clinic'
+  | 'meeting-hall'
+  | 'watchtower'
+  | 'labor-guild'
+  | 'archive';
 
 export interface BuildingComponent extends Component {
   type: 'building';
@@ -61,6 +72,19 @@ export interface BuildingComponent extends Component {
   allowedSpecies: string[]; // Species IDs that can be housed in this building
   currentOccupants: string[]; // Entity IDs of animals currently housed
   cleanliness: number; // 0-100, cleanliness level (affects animal comfort)
+  // Governance buildings properties
+  isGovernanceBuilding: boolean; // Whether this is a governance building
+  condition: number; // 0-100, building condition/health (affects data quality)
+  requiredStaff: number; // Number of staff required for optimal operation
+  currentStaff: string[]; // Entity IDs of agents currently staffed
+  governanceType?: string; // Type of governance function (population-tracking, demographics, etc)
+  resourceType?: string; // For warehouses: type of resource tracked (food, wood, etc)
+  requiresOpenArea?: boolean; // For weather station: must be in open area
+  // Progressive Skill Reveal: Building ownership
+  ownerId?: string; // Entity ID of the building owner
+  ownerName?: string; // Name of the building owner
+  accessType: 'communal' | 'personal' | 'shared'; // Who can use this building
+  sharedWith: string[]; // Entity IDs allowed to use (for 'shared' type)
 }
 
 export function createBuildingComponent(
@@ -94,6 +118,15 @@ export function createBuildingComponent(
   let allowedSpecies: string[] = [];
   let currentOccupants: string[] = [];
   let cleanliness = 100; // Start clean
+
+  // Governance buildings properties
+  let isGovernanceBuilding = false;
+  let condition = 100; // Start in perfect condition
+  let requiredStaff = 0;
+  let currentStaff: string[] = [];
+  let governanceType: string | undefined;
+  let resourceType: string | undefined;
+  let requiresOpenArea: boolean | undefined;
 
   switch (buildingType) {
     // Tier 1 buildings (per construction-system/spec.md)
@@ -218,6 +251,92 @@ export function createBuildingComponent(
     case 'storage-box':
       storageCapacity = 10; // Legacy: smaller than storage-chest
       break;
+
+    // Governance buildings (per governance-dashboard work order)
+    case 'town-hall':
+      // Basic governance - population tracking
+      // Cost: 50 wood, 20 stone; 2 builders, 4 hours
+      isGovernanceBuilding = true;
+      governanceType = 'population-tracking';
+      requiredStaff = 0; // No staff required
+      interior = true;
+      interiorRadius = 4;
+      break;
+    case 'census-bureau':
+      // Demographics and analytics
+      // Cost: 100 wood, 50 stone, 20 cloth; 3 builders, 8 hours
+      // Requires Town Hall first
+      isGovernanceBuilding = true;
+      governanceType = 'demographics';
+      requiredStaff = 1; // Census taker
+      interior = true;
+      interiorRadius = 3;
+      break;
+    case 'warehouse':
+      // Resource tracking and storage
+      // Cost: 80 wood, 30 stone; 2 builders, 6 hours
+      // Capacity: 1000 units
+      isGovernanceBuilding = true;
+      governanceType = 'resource-tracking';
+      requiredStaff = 0; // Optional warehouse keeper
+      storageCapacity = 1000;
+      interior = true;
+      interiorRadius = 4;
+      // resourceType set at construction time
+      break;
+    case 'weather-station':
+      // Environmental monitoring
+      // Cost: 60 wood, 40 stone, 10 metal; 2 builders, 5 hours
+      isGovernanceBuilding = true;
+      governanceType = 'environmental-monitoring';
+      requiredStaff = 0; // No staff required
+      requiresOpenArea = true;
+      break;
+    case 'health-clinic':
+      // Medical tracking and treatment
+      // Cost: 100 wood, 50 stone, 30 cloth; 3 builders, 10 hours
+      isGovernanceBuilding = true;
+      governanceType = 'health-tracking';
+      requiredStaff = 1; // Healer (1 per 20 agents)
+      interior = true;
+      interiorRadius = 4;
+      break;
+    case 'meeting-hall':
+      // Social cohesion tracking
+      // Cost: 120 wood, 60 stone; 3 builders, 8 hours
+      isGovernanceBuilding = true;
+      governanceType = 'social-cohesion';
+      requiredStaff = 0; // No staff required
+      interior = true;
+      interiorRadius = 6; // Large interior
+      break;
+    case 'watchtower':
+      // Threat detection
+      // Cost: 80 wood, 60 stone; 2 builders, 6 hours
+      isGovernanceBuilding = true;
+      governanceType = 'threat-detection';
+      requiredStaff = 1; // Watchman
+      break;
+    case 'labor-guild':
+      // Workforce management
+      // Cost: 90 wood, 40 stone; 2 builders, 7 hours
+      // Requires Town Hall
+      isGovernanceBuilding = true;
+      governanceType = 'workforce-management';
+      requiredStaff = 0; // No staff required
+      interior = true;
+      interiorRadius = 4;
+      break;
+    case 'archive':
+      // Historical data and analysis
+      // Cost: 150 wood, 80 stone, 50 cloth, 20 ink; 4 builders, 12 hours
+      // Requires Census Bureau + Town Hall
+      isGovernanceBuilding = true;
+      governanceType = 'historical-analysis';
+      requiredStaff = 1; // Librarian/scholar (high intelligence)
+      interior = true;
+      interiorRadius = 5;
+      break;
   }
 
   return {
@@ -246,7 +365,40 @@ export function createBuildingComponent(
     allowedSpecies,
     currentOccupants,
     cleanliness,
+    isGovernanceBuilding,
+    condition,
+    requiredStaff,
+    currentStaff,
+    governanceType,
+    resourceType,
+    requiresOpenArea,
+    // Building ownership - default to communal
+    accessType: 'communal',
+    sharedWith: [],
   };
+}
+
+/**
+ * Check if an agent can access a building based on ownership.
+ * Per progressive-skill-reveal-spec.md:
+ * - Communal: Anyone can access
+ * - Personal: Only owner can access
+ * - Shared: Owner + sharedWith list can access
+ */
+export function canAccessBuilding(building: BuildingComponent, agentId: string): boolean {
+  if (building.accessType === 'communal') {
+    return true;
+  }
+
+  if (building.accessType === 'personal') {
+    return building.ownerId === agentId;
+  }
+
+  if (building.accessType === 'shared') {
+    return building.ownerId === agentId || building.sharedWith.includes(agentId);
+  }
+
+  return false;
 }
 
 /**

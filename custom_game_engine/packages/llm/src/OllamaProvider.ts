@@ -115,8 +115,72 @@ export class OllamaProvider implements LLMProvider {
             description: 'Help a nearby agent with their task',
             parameters: { type: 'object', properties: {} }
           }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'build',
+            description: 'Build a structure (campfire, workbench, storage-chest, tent, bed, farm-shed)',
+            parameters: {
+              type: 'object',
+              properties: {
+                building: {
+                  type: 'string',
+                  description: 'Type of building to construct',
+                  enum: ['campfire', 'workbench', 'storage-chest', 'tent', 'bed', 'farm-shed', 'lean-to', 'well']
+                }
+              },
+              required: ['building']
+            }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'plan_build',
+            description: 'Plan to build something - your character will automatically gather materials and build it',
+            parameters: {
+              type: 'object',
+              properties: {
+                building: {
+                  type: 'string',
+                  description: 'Type of building to plan',
+                  enum: ['campfire', 'workbench', 'storage-chest', 'tent', 'bed', 'farm-shed', 'lean-to', 'well', 'forge']
+                }
+              },
+              required: ['building']
+            }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'set_priorities',
+            description: 'Set your strategic priorities (0-1 weights) to guide your behavior',
+            parameters: {
+              type: 'object',
+              properties: {
+                gathering: { type: 'number', description: 'Priority for gathering wood, stone, food (0-1)' },
+                building: { type: 'number', description: 'Priority for construction (0-1)' },
+                farming: { type: 'number', description: 'Priority for farming (0-1)' },
+                social: { type: 'number', description: 'Priority for talking/helping (0-1)' },
+                exploration: { type: 'number', description: 'Priority for exploring (0-1)' },
+                rest: { type: 'number', description: 'Priority for resting (0-1)' }
+              }
+            }
+          }
         }
       ];
+
+      // System message to guide model to use tools
+      const systemMessage = `You are a character in a village survival simulation. You MUST respond by calling exactly ONE of the available tools/functions. Do NOT respond with text - only use function calls.
+
+When you decide what to do, call the appropriate function:
+- To build something: call plan_build with the building type (workbench, campfire, storage-chest, tent, forge, etc.)
+- To set your priorities: call set_priorities with your priority weights (0-1)
+- For simple actions: call wander, rest, gather, idle, explore, talk, or work
+
+IMPORTANT: You MUST use a tool call. Text responses will be ignored.`;
 
       const response = await fetch(`${this.baseUrl}/api/chat`, {
         method: 'POST',
@@ -125,7 +189,10 @@ export class OllamaProvider implements LLMProvider {
         },
         body: JSON.stringify({
           model: this.model,
-          messages: [{ role: 'user', content: request.prompt }],
+          messages: [
+            { role: 'system', content: systemMessage },
+            { role: 'user', content: request.prompt }
+          ],
           stream: false,
           tools: tools,
           options: {
@@ -150,8 +217,23 @@ export class OllamaProvider implements LLMProvider {
       const speaking = message.content || '';   // Assistant message
       const toolCalls = message.tool_calls || [];
 
-      // Extract action from tool call
-      const action = toolCalls.length > 0 ? toolCalls[0].function.name : '';
+      // Extract action from tool call (with parameters for complex actions)
+      let action: string | { type: string; [key: string]: unknown } = '';
+      if (toolCalls.length > 0) {
+        const toolCall = toolCalls[0];
+        const funcName = toolCall.function.name;
+        const funcArgs = toolCall.function.arguments || {};
+
+        // For actions with parameters, return structured object
+        if (funcName === 'plan_build' || funcName === 'build') {
+          action = { type: funcName, building: funcArgs.building || 'workbench' };
+        } else if (funcName === 'set_priorities') {
+          action = { type: 'set_priorities', priorities: funcArgs };
+        } else {
+          // Simple action - just the name
+          action = funcName;
+        }
+      }
 
       // Format as JSON string for the parser
       const responseText = JSON.stringify({
@@ -160,20 +242,10 @@ export class OllamaProvider implements LLMProvider {
         action: action
       });
 
-      console.log('[OllamaProvider] Response:', {
-        model: this.model,
-        action: action || '(no action)',
-        thinking: thinking ? thinking.slice(0, 60) + '...' : '(no thoughts)',
-        speaking: speaking || '(silent)',
-        tokensUsed: data.eval_count,
-      });
 
       // If no action was called, fall back to text parsing
       if (!action) {
         const fallbackText = speaking || thinking || '';
-
-        console.log('[OllamaProvider] No tool call, using text fallback');
-
         if (!fallbackText) {
           console.error('[OllamaProvider] Empty response from Ollama:', data);
         }
