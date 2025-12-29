@@ -1,4 +1,0 @@
-
-> @ai-village/game-engine@0.1.0 build
-> tsc --build
-
