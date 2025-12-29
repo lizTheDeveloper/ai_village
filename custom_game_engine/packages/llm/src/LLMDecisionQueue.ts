@@ -76,10 +76,14 @@ export class LLMDecisionQueue {
    */
   private async processRequest(request: DecisionRequest): Promise<void> {
     try {
+      // Estimate prompt tokens (~4 chars per token) and allow 3x for thinking model response
+      const estimatedPromptTokens = Math.ceil(request.prompt.length / 4);
+      const maxTokens = Math.max(1000, Math.ceil(estimatedPromptTokens * 0.5));
+
       const llmRequest: LLMRequest = {
         prompt: request.prompt,
         temperature: 0.7,
-        maxTokens: 100, // Increased for structured responses
+        maxTokens, // Thinking models need room for reasoning + tool call
         // Let OllamaProvider handle stop sequences
       };
 

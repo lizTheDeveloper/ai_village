@@ -9,6 +9,7 @@ import {
   createResourceComponent,
   PlantComponent,
 } from '@ai-village/core';
+import { BERRY_BUSH } from '../plant-species/wild-plants.js';
 
 /**
  * Create a berry bush entity at the specified position.
@@ -40,6 +41,9 @@ export function createBerryBush(world: WorldMutator, x: number, y: number): stri
     health: 100,
     hydration: 80,
     nutrition: 80,
+    // Harvest behavior from species - berry bushes regrow after picking
+    harvestDestroysPlant: BERRY_BUSH.harvestDestroysPlant ?? true,
+    harvestResetStage: BERRY_BUSH.harvestResetStage ?? 'fruiting',
   }));
 
   // Add to world

@@ -17,6 +17,17 @@ import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import {
+  MARKET_EVENT_CHECK_INTERVAL,
+  MARKET_EVENT_CHANCE,
+  MARKET_EVENT_DURATION_MIN_DAYS,
+  MARKET_EVENT_DURATION_MAX_DAYS,
+  MARKET_SHORTAGE_MULTIPLIER_MIN,
+  MARKET_SHORTAGE_MULTIPLIER_MAX,
+  MARKET_SURPLUS_MULTIPLIER_MIN,
+  MARKET_SURPLUS_MULTIPLIER_MAX,
+  TICKS_PER_DAY,
+} from '../constants/index.js';
 
 /**
  * Types of market events that can occur
@@ -48,8 +59,8 @@ export class MarketEventSystem implements System {
   private eventBus: EventBus;
   private activeEvents: ActiveMarketEvent[] = [];
   private lastEventCheck = 0;
-  private eventCheckInterval = 2400; // Check every 2 minutes at 20 TPS (120 seconds)
-  private eventChance = 0.1; // 10% chance per check
+  private eventCheckInterval = MARKET_EVENT_CHECK_INTERVAL; // Check every 2 minutes at 20 TPS (120 seconds)
+  private eventChance = MARKET_EVENT_CHANCE; // 10% chance per check
   private nextEventId = 1;
 
   constructor(eventBus: EventBus) {
@@ -143,10 +154,8 @@ export class MarketEventSystem implements System {
     const id = `market_event_${this.nextEventId++}`;
 
     // Duration: 1-5 in-game days
-    // At 20 TPS, 1 day = 28800 ticks (24 hours * 60 minutes * 60 seconds / 3 = 28800)
-    const daysInTicks = 28800;
-    const durationDays = 1 + Math.floor(Math.random() * 5); // 1-5 days
-    const duration = durationDays * daysInTicks;
+    const durationDays = MARKET_EVENT_DURATION_MIN_DAYS + Math.floor(Math.random() * (MARKET_EVENT_DURATION_MAX_DAYS - MARKET_EVENT_DURATION_MIN_DAYS + 1)); // 1-5 days
+    const duration = durationDays * TICKS_PER_DAY;
 
     // Define item categories
     const categories = ['food', 'materials', 'tools', 'seeds', 'crafted'];
@@ -155,7 +164,7 @@ export class MarketEventSystem implements System {
     switch (type) {
       case 'shortage': {
         // Shortage increases prices (1.5x - 2.5x)
-        const modifier = 1.5 + Math.random() * 1.0;
+        const modifier = MARKET_SHORTAGE_MULTIPLIER_MIN + Math.random() * (MARKET_SHORTAGE_MULTIPLIER_MAX - MARKET_SHORTAGE_MULTIPLIER_MIN);
         return {
           id,
           type,
@@ -169,7 +178,7 @@ export class MarketEventSystem implements System {
 
       case 'surplus': {
         // Surplus decreases prices (0.5x - 0.8x)
-        const modifier = 0.5 + Math.random() * 0.3;
+        const modifier = MARKET_SURPLUS_MULTIPLIER_MIN + Math.random() * (MARKET_SURPLUS_MULTIPLIER_MAX - MARKET_SURPLUS_MULTIPLIER_MIN);
         return {
           id,
           type,
@@ -204,7 +213,7 @@ export class MarketEventSystem implements System {
           itemCategory: category,
           priceModifier: modifier,
           startTick: currentTick,
-          duration: daysInTicks, // Merchant stays for 1 day
+          duration: TICKS_PER_DAY, // Merchant stays for 1 day
           description: `Traveling merchant arrived with ${category}! Prices reduced by 30% for 1 day.`,
         };
       }
@@ -279,8 +288,7 @@ export class MarketEventSystem implements System {
     }
   ): ActiveMarketEvent {
     const id = `market_event_${this.nextEventId++}`;
-    const daysInTicks = 28800; // 1 day at 20 TPS
-    const duration = options.durationDays * daysInTicks;
+    const duration = options.durationDays * TICKS_PER_DAY;
 
     const event: ActiveMarketEvent = {
       id,

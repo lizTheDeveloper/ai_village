@@ -57,6 +57,9 @@ export interface PlantComponentData {
   visualVariant?: number;
   currentSprite?: string;
   isIndoors?: boolean;
+  // Harvest behavior (copied from species at creation)
+  harvestDestroysPlant?: boolean;
+  harvestResetStage?: 'flowering' | 'fruiting' | 'vegetative';
 }
 
 /**
@@ -101,6 +104,10 @@ export class PlantComponent extends ComponentBase {
 
   // Environment
   public isIndoors: boolean;
+
+  // Harvest behavior
+  public harvestDestroysPlant: boolean;
+  public harvestResetStage: 'flowering' | 'fruiting' | 'vegetative';
 
   constructor(data: PlantComponentData) {
     super();
@@ -176,6 +183,10 @@ export class PlantComponent extends ComponentBase {
 
     // Environment
     this.isIndoors = data.isIndoors ?? false;
+
+    // Harvest behavior (default: destroy plant on harvest, reset to fruiting if not destroyed)
+    this.harvestDestroysPlant = data.harvestDestroysPlant ?? true;
+    this.harvestResetStage = data.harvestResetStage ?? 'fruiting';
   }
 
   /**
@@ -277,7 +288,9 @@ export class PlantComponent extends ComponentBase {
       environmentMatch: this.environmentMatch,
       visualVariant: this.visualVariant,
       currentSprite: this.currentSprite,
-      isIndoors: this.isIndoors
+      isIndoors: this.isIndoors,
+      harvestDestroysPlant: this.harvestDestroysPlant,
+      harvestResetStage: this.harvestResetStage
     };
   }
 

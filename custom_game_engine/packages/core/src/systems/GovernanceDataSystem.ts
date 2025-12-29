@@ -53,7 +53,14 @@ export class GovernanceDataSystem implements System {
 
     eventBus.subscribe('agent:collapsed', (event) => {
       if (event.data) {
-        this.recordDeath(world, event.data.agentId, event.data.reason || 'exhaustion', event.timestamp || Date.now());
+        // Per CLAUDE.md: No silent fallbacks - require all fields
+        if (!event.data.reason) {
+          throw new Error(`Death event (agent:collapsed) for agent ${event.data.agentId} missing required 'reason' field`);
+        }
+        if (!event.timestamp) {
+          throw new Error(`Death event (agent:collapsed) for agent ${event.data.agentId} missing required 'timestamp' field`);
+        }
+        this.recordDeath(world, event.data.agentId, event.data.reason, event.timestamp);
       }
     });
 
@@ -70,7 +77,15 @@ export class GovernanceDataSystem implements System {
     const entities = world.query().with('identity').executeEntities();
     const agent = entities.find(e => e.id === agentId);
     const identityComp = agent ? (agent as EntityImpl).getComponent<IdentityComponent>('identity') : null;
-    const agentName = identityComp?.name || 'Unknown';
+
+    // Per CLAUDE.md: No silent fallbacks - require identity component with name
+    if (!identityComp) {
+      throw new Error(`Agent ${agentId} missing required 'identity' component for death recording`);
+    }
+    if (!identityComp.name) {
+      throw new Error(`Agent ${agentId} identity component missing required 'name' field`);
+    }
+    const agentName = identityComp.name;
 
     this.deathLog.push({
       agent: agentName,
@@ -87,19 +102,27 @@ export class GovernanceDataSystem implements System {
 
   /**
    * Update all governance buildings with latest data.
+   * Performance: Single query for all agents, passed to all methods
    */
   update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    this.updateTownHalls(world);
-    this.updateCensusBureaus(world);
+    // Single query for identity agents (used by TownHalls and CensusBureaus)
+    const agentsWithIdentity = world.query().with('identity').executeEntities();
+
+    // Single query for agents with needs (used by HealthClinics)
+    const agentsWithNeeds = world.query().with('agent', 'needs').executeEntities();
+
+    this.updateTownHalls(world, agentsWithIdentity);
+    this.updateCensusBureaus(world, agentsWithIdentity);
     this.updateWarehouses(world);
     this.updateWeatherStations(world);
-    this.updateHealthClinics(world);
+    this.updateHealthClinics(world, agentsWithNeeds);
   }
 
   /**
    * Update TownHall components with population data.
+   * Performance: Uses pre-queried agents to avoid repeated queries
    */
-  private updateTownHalls(world: World): void {
+  private updateTownHalls(world: World, agents: ReadonlyArray<Entity>): void {
     const townHalls = world.query().with('town_hall', 'building').executeEntities();
 
     for (const entity of townHalls) {
@@ -126,8 +149,7 @@ export class GovernanceDataSystem implements System {
         latency = Infinity;
       }
 
-      // Get all agents
-      const agents = world.query().with('identity').executeEntities();
+      // Use pre-queried agents instead of querying again
       const agentRecords: AgentRecord[] = [];
 
       for (const agentEntity of agents) {
@@ -159,8 +181,9 @@ export class GovernanceDataSystem implements System {
 
   /**
    * Update CensusBureau components with demographics data.
+   * Performance: Uses pre-queried agents to avoid repeated queries
    */
-  private updateCensusBureaus(world: World): void {
+  private updateCensusBureaus(world: World, agents: ReadonlyArray<Entity>): void {
     const bureaus = world.query().with('census_bureau', 'building').executeEntities();
 
     for (const entity of bureaus) {
@@ -172,8 +195,7 @@ export class GovernanceDataSystem implements System {
         continue;
       }
 
-      // Get all agents
-      const agents = world.query().with('identity').executeEntities();
+      // Use pre-queried agents instead of querying again
       const agentCount = agents.length;
 
       // Age distribution - simplified placeholder (would need age component)
@@ -280,8 +302,9 @@ export class GovernanceDataSystem implements System {
 
   /**
    * Update HealthClinic components with population health stats.
+   * Performance: Uses pre-queried agents to avoid repeated queries
    */
-  private updateHealthClinics(world: World): void {
+  private updateHealthClinics(world: World, agents: ReadonlyArray<Entity>): void {
     const clinics = world.query().with('health_clinic', 'building').executeEntities();
 
     for (const entity of clinics) {
@@ -293,8 +316,7 @@ export class GovernanceDataSystem implements System {
         continue;
       }
 
-      // Get all agents with needs
-      const agents = world.query().with('agent', 'needs').executeEntities();
+      // Use pre-queried agents instead of querying again
       let healthy = 0;
       let sick = 0;
       let critical = 0;

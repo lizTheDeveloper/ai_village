@@ -1285,9 +1285,14 @@ export function getAvailableBuildings(
   const buildingLevel = skills.building ?? 0;
 
   return allBuildings.filter((blueprint: any) => {
+    // Must be unlocked (via research or default)
+    if (!blueprint.unlocked) {
+      return false;
+    }
+
     const required = blueprint.skillRequired;
 
-    // No requirement = available to all
+    // No skill requirement = available to all (still needs to be unlocked)
     if (!required) {
       return true;
     }

@@ -8,6 +8,7 @@
  */
 
 import type { Component } from '../ecs/Component.js';
+import { MOOD_DECAY_RATE } from '../constants/index.js';
 
 /**
  * Emotional states that describe the agent's current mood.
@@ -235,8 +236,7 @@ export function applyMoodChange(
   tick: number
 ): MoodComponent {
   // Apply mood decay toward baseline
-  const decayRate = 0.01; // 1% per update toward baseline
-  const decayedMood = component.currentMood + (component.baselineMood - component.currentMood) * decayRate;
+  const decayedMood = component.currentMood + (component.baselineMood - component.currentMood) * MOOD_DECAY_RATE;
 
   // Apply the mood change
   const newMood = Math.max(-100, Math.min(100, decayedMood + delta));

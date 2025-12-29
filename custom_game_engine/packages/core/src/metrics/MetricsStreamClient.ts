@@ -125,7 +125,6 @@ export class MetricsStreamClient {
     }
 
     this.connectionState = 'connecting';
-    console.log(`[MetricsStreamClient] Connecting to ${this.config.serverUrl}...`);
 
     try {
       this.ws = new WebSocket(this.config.serverUrl);
@@ -133,7 +132,6 @@ export class MetricsStreamClient {
       this.ws.onopen = () => {
         this.connectionState = 'connected';
         this.lastError = null;
-        console.log('[MetricsStreamClient] Connected to metrics server');
 
         // Send client info including test status and game session ID
         this.ws!.send(JSON.stringify({
@@ -156,7 +154,6 @@ export class MetricsStreamClient {
           const message = JSON.parse(event.data);
           if (message.type === 'session') {
             this.sessionId = message.sessionId;
-            console.log(`[MetricsStreamClient] Session ID: ${this.sessionId}`);
           } else if (message.type === 'query' && this.queryHandler) {
             // Handle query request from server
             const query: QueryRequest = {
@@ -180,7 +177,6 @@ export class MetricsStreamClient {
       };
 
       this.ws.onclose = () => {
-        console.log('[MetricsStreamClient] Disconnected from metrics server');
         this.handleDisconnect();
       };
 
@@ -265,7 +261,6 @@ export class MetricsStreamClient {
     if (this.buffer.length === 0) return;
 
     if (!this.isConnected()) {
-      console.log(`[MetricsStreamClient] Not connected, buffering ${this.buffer.length} metrics`);
       return;
     }
 
@@ -317,7 +312,6 @@ export class MetricsStreamClient {
   private scheduleReconnect(): void {
     if (this.reconnectTimer) return;
 
-    console.log(`[MetricsStreamClient] Reconnecting in ${this.config.reconnectDelay}ms...`);
     this.reconnectTimer = setTimeout(() => {
       this.reconnectTimer = null;
       this.connect();

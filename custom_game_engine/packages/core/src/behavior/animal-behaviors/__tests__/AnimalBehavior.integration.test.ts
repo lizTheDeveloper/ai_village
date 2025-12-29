@@ -79,21 +79,33 @@ describe('Animal Behavior Integration Tests', () => {
     it('prioritizes fleeing over grazing when stressed', () => {
       const system = new AnimalBrainSystem();
 
-      // Create a stressed and hungry animal
+      // Create a stressed and hungry wild animal with low trust (so it will perceive agents as threats)
       const animal = new EntityImpl(createEntityId(), 0);
       animal.addComponent(createPositionComponent(50, 50));
       animal.addComponent(createMovementComponent());
       animal.addComponent(createTestAnimalComponent({
         hunger: 80,
-        stress: 70,
+        stress: 75,
+        wild: true,
+        trustLevel: 20,
         state: 'idle',
       }));
       (harness.world as any)._addEntity(animal);
 
+      // Create a threat (agent) nearby to trigger actual fleeing behavior
+      const agent = new EntityImpl(createEntityId(), 0);
+      agent.addComponent(createPositionComponent(55, 55)); // 5 units away - within threat detection range
+      agent.addComponent({
+        type: 'agent',
+        version: 1,
+        behavior: 'wander',
+      });
+      (harness.world as any)._addEntity(agent);
+
       // Update the system
       system.update(harness.world, [animal], 0.05);
 
-      // Animal should be fleeing (stress priority > hunger priority)
+      // Animal should be fleeing (stress priority > hunger priority, and threat is present)
       const updatedAnimal = animal.getComponent('animal') as AnimalComponent;
       expect(updatedAnimal.state).toBe('fleeing');
     });

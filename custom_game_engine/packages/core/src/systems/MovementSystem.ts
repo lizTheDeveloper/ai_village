@@ -10,9 +10,16 @@ import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { VelocityComponent } from '../components/VelocityComponent.js';
 import type { CircadianComponent } from '../components/CircadianComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
+import type { EventBus } from '../events/EventBus.js';
 
 interface TimeComponent {
   speedMultiplier?: number;
+}
+
+interface BuildingCollisionData {
+  x: number;
+  y: number;
+  blocksMovement: boolean;
 }
 
 export class MovementSystem implements System {
@@ -22,6 +29,63 @@ export class MovementSystem implements System {
     'movement',
     'position',
   ];
+
+  // Performance: Cache building positions to avoid querying every frame
+  private buildingCollisionCache: BuildingCollisionData[] | null = null;
+  private cacheValidUntilTick = 0;
+  private readonly CACHE_DURATION_TICKS = 20; // Cache for 1 second at 20 TPS
+
+  /**
+   * Initialize event listeners to invalidate cache on building changes
+   */
+  initialize(_world: World, eventBus: EventBus): void {
+    // Invalidate cache when buildings change
+    eventBus.subscribe('building:complete', () => {
+      this.buildingCollisionCache = null;
+    });
+
+    eventBus.subscribe('building:destroyed', () => {
+      this.buildingCollisionCache = null;
+    });
+
+    eventBus.subscribe('building:placement:confirmed', () => {
+      this.buildingCollisionCache = null;
+    });
+  }
+
+  /**
+   * Get building collision data with caching
+   * Performance: Returns cached data if valid, otherwise rebuilds cache
+   */
+  private getBuildingCollisions(world: World): BuildingCollisionData[] {
+    // Return cached data if still valid
+    if (this.buildingCollisionCache && world.tick < this.cacheValidUntilTick) {
+      return this.buildingCollisionCache;
+    }
+
+    // Rebuild cache
+    const buildings = world.query().with('position').with('building').executeEntities();
+    this.buildingCollisionCache = [];
+
+    for (const building of buildings) {
+      const impl = building as EntityImpl;
+      const pos = impl.getComponent<PositionComponent>('position');
+      const buildingComp = impl.getComponent<BuildingComponent>('building');
+
+      if (pos && buildingComp) {
+        this.buildingCollisionCache.push({
+          x: pos.x,
+          y: pos.y,
+          blocksMovement: buildingComp.blocksMovement,
+        });
+      }
+    }
+
+    // Cache valid for 1 second
+    this.cacheValidUntilTick = world.tick + this.CACHE_DURATION_TICKS;
+
+    return this.buildingCollisionCache;
+  }
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     // Get time acceleration multiplier from TimeComponent
@@ -42,13 +106,17 @@ export class MovementSystem implements System {
 
     for (const entity of movementEntities) {
       const impl = entity as EntityImpl;
+
+      // Performance: Get all components once at start
       const movement = impl.getComponent<MovementComponent>('movement')!;
-      const position = impl.getComponent<PositionComponent>('position')!
+      const position = impl.getComponent<PositionComponent>('position')!;
+      const velocity = impl.getComponent<VelocityComponent>('velocity');
+      const steering = impl.getComponent('steering') as { behavior?: string } | undefined;
+      const circadian = impl.getComponent<CircadianComponent>('circadian');
+      const needs = impl.getComponent<NeedsComponent>('needs');
 
       // Sync velocity component to movement component (for SteeringSystem integration)
       // Only sync when steering is active - when steering is 'none', behaviors control velocity directly
-      const velocity = impl.getComponent<VelocityComponent>('velocity');
-      const steering = impl.getComponent('steering') as { behavior?: string } | undefined;
       const steeringActive = steering && steering.behavior && steering.behavior !== 'none';
 
       if (steeringActive && velocity && (velocity.vx !== undefined || velocity.vy !== undefined)) {
@@ -63,7 +131,6 @@ export class MovementSystem implements System {
       }
 
       // Skip if sleeping - agents cannot move while asleep
-      const circadian = impl.getComponent<CircadianComponent>('circadian');
       if (circadian && circadian.isSleeping) {
         // Force velocity to 0 while sleeping
         if (movement.velocityX !== 0 || movement.velocityY !== 0) {
@@ -91,7 +158,6 @@ export class MovementSystem implements System {
 
       // Apply fatigue penalty based on energy level
       let speedMultiplier = 1.0;
-      const needs = impl.getComponent<NeedsComponent>('needs');
       if (needs && needs.energy !== undefined) {
         const energy = needs.energy;
 
@@ -191,6 +257,7 @@ export class MovementSystem implements System {
 
   /**
    * Check for hard collisions (buildings) - these block movement completely
+   * Performance: Uses cached building positions
    */
   private hasHardCollision(
     world: World,
@@ -198,20 +265,15 @@ export class MovementSystem implements System {
     x: number,
     y: number
   ): boolean {
-    const buildingQuery = world.query().with('position').with('building');
-    const buildings = buildingQuery.executeEntities();
+    const buildings = this.getBuildingCollisions(world);
 
     for (const building of buildings) {
-      const impl = building as EntityImpl;
-      const buildingComp = impl.getComponent<BuildingComponent>('building')!;
-
-      if (!buildingComp.blocksMovement) {
+      if (!building.blocksMovement) {
         continue;
       }
 
-      const pos = impl.getComponent<PositionComponent>('position')!;
       const distance = Math.sqrt(
-        Math.pow(pos.x - x, 2) + Math.pow(pos.y - y, 2)
+        Math.pow(building.x - x, 2) + Math.pow(building.y - y, 2)
       );
 
       if (distance < 0.5) {

@@ -53,7 +53,6 @@ export class MetricsCollectionSystem implements System {
     if (this.config.streaming) {
       this.streamClient = new MetricsStreamClient(this.config.streamConfig);
       this.streamClient.connect();
-      console.log('[MetricsCollectionSystem] Streaming enabled');
     }
   }
 

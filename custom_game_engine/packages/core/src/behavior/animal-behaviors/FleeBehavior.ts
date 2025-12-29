@@ -63,6 +63,12 @@ export class FleeBehavior extends BaseAnimalBehavior {
     if (!threat) {
       // No threat visible - calm down and stop fleeing
       this.stopMovement(entity);
+      // Actively reduce stress when safe (faster recovery than passive decay)
+      entity.updateComponent('animal', (current: AnimalComponent) => ({
+        ...current,
+        stress: Math.max(0, current.stress - 10),
+        state: 'idle' as const,
+      }));
       return {
         complete: true,
         newState: 'idle',
@@ -122,10 +128,20 @@ export class FleeBehavior extends BaseAnimalBehavior {
 
   /**
    * Check if fleeing behavior can start.
+   * Only triggers at panic-level stress (>70) or for wild animals near humans.
+   * Combined with stress reduction when no threat found (-10/tick), this prevents
+   * the flee→idle→flee loop that occurred with the old threshold of 50.
    */
   canStart(_entity: EntityImpl, animal: AnimalComponent): boolean {
-    // Can flee if stressed or wild (untamed animals flee from humans)
-    return animal.stress > 50 || (animal.wild && animal.trustLevel < 30);
+    // Panic threshold - animal must be highly stressed to START fleeing
+    if (animal.stress > 70) {
+      return true;
+    }
+    // Wild animals flee from humans if untrusting and moderately stressed
+    if (animal.wild && animal.trustLevel < 30 && animal.stress > 40) {
+      return true;
+    }
+    return false;
   }
 
   /**

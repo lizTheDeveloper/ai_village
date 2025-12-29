@@ -25,9 +25,13 @@ import type { CurrencyComponent } from '../components/CurrencyComponent.js';
 import type { ShopComponent } from '../components/ShopComponent.js';
 import type { TradingSystem } from '../systems/TradingSystem.js';
 import type { GameEvent } from '../events/GameEvent.js';
+import {
+  TRADE_DURATION,
+  INTERACTION_DISTANCE,
+} from '../constants/index.js';
 
 /** Distance at which agent can trade with a shop */
-const TRADE_DISTANCE = 2.0;
+const TRADE_DISTANCE = INTERACTION_DISTANCE;
 
 /**
  * Handler for the trade action.
@@ -45,7 +49,7 @@ export class TradeActionHandler implements ActionHandler {
    */
   getDuration(_action: Action, _world: World): number {
     // Trading takes about 2 seconds at 20 TPS
-    return 40;
+    return TRADE_DURATION;
   }
 
   /**

@@ -41,7 +41,7 @@ describe('ProgressiveSkillReveal Integration Tests', () => {
     eventBus = new EventBusImpl();
     world = new WorldImpl(eventBus);
     skillSystem = new SkillSystem();
-    skillSystem.init(world);
+    skillSystem.initialize(world, eventBus);
   });
 
   // ============================================

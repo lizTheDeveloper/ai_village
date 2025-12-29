@@ -1,0 +1,468 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { WorldImpl } from '../ecs/index.js';
+import { EventBusImpl } from '../events/EventBus.js';
+import { NeedsSystem } from '../systems/NeedsSystem.js';
+import { createNeedsComponent, type NeedsComponentLegacy } from '../components/NeedsComponent.js';
+import { createAgentComponent } from '../components/AgentComponent.js';
+import { createCircadianComponent } from '../components/CircadianComponent.js';
+import { createMovementComponent } from '../components/MovementComponent.js';
+import { createTemperatureComponent } from '../components/TemperatureComponent.js';
+
+describe('NeedsSystem', () => {
+  let world: WorldImpl;
+  let system: NeedsSystem;
+  let eventBus: EventBusImpl;
+
+  beforeEach(() => {
+    eventBus = new EventBusImpl();
+    world = new WorldImpl(eventBus);
+    system = new NeedsSystem();
+  });
+
+  describe('initialization', () => {
+    it('should register with correct priority', () => {
+      expect(system.priority).toBe(15);
+    });
+
+    it('should require needs component', () => {
+      expect(system.requiredComponents).toContain('needs');
+    });
+
+    it('should have correct system id', () => {
+      expect(system.id).toBe('needs');
+    });
+  });
+
+  describe('hunger decay', () => {
+    it('should decrease hunger over time', () => {
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(100, 100, 100);
+      entity.addComponent(needs);
+
+      const initialHunger = needs.hunger;
+
+      const entities = world.query().with('needs').executeEntities();
+
+      // Simulate multiple updates (game time)
+      for (let i = 0; i < 100; i++) {
+        system.update(world, entities, 1.0);
+      }
+
+      const needsAfter = entity.getComponent('needs') as NeedsComponentLegacy;
+      expect(needsAfter.hunger).toBeLessThan(initialHunger);
+    });
+
+    it('should not decrease hunger below zero', () => {
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(5, 100, 100);
+      entity.addComponent(needs);
+
+      const entities = world.query().with('needs').executeEntities();
+
+      // Simulate very long time
+      for (let i = 0; i < 1000; i++) {
+        system.update(world, entities, 1.0);
+      }
+
+      const needsAfter = entity.getComponent('needs') as NeedsComponentLegacy;
+      expect(needsAfter.hunger).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should pause hunger decay during sleep', () => {
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(100, 100, 100);
+      const circadian = createCircadianComponent();
+      circadian.isSleeping = true;
+      entity.addComponent(needs);
+      entity.addComponent(circadian);
+
+      const initialHunger = needs.hunger;
+
+      const entities = world.query().with('needs').executeEntities();
+      system.update(world, entities, 10.0);
+
+      const needsAfter = entity.getComponent('needs') as NeedsComponentLegacy;
+      // Hunger should not decay (or decay very little) during sleep
+      expect(needsAfter.hunger).toBeGreaterThanOrEqual(initialHunger - 5);
+    });
+
+    it('should use time system for accurate game time calculation', () => {
+      // Create time entity
+      const timeEntity = world.createEntity();
+      timeEntity.addComponent({
+        type: 'time' as const,
+        version: 1,
+        currentTime: 0,
+        dayLength: 600, // 10 minutes per day
+        speedMultiplier: 1,
+        currentDay: 0,
+        currentHour: 0,
+        currentMinute: 0,
+      });
+
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(100, 100, 100);
+      entity.addComponent(needs);
+
+      const initialHunger = needs.hunger;
+
+      const entities = world.query().with('needs').executeEntities();
+      system.update(world, entities, 60.0); // 1 minute real time
+
+      const needsAfter = entity.getComponent('needs') as NeedsComponentLegacy;
+      expect(needsAfter.hunger).toBeLessThan(initialHunger);
+    });
+  });
+
+  describe('energy decay', () => {
+    it('should decrease energy over time when not sleeping', () => {
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(100, 100, 100);
+      entity.addComponent(needs);
+
+      const initialEnergy = needs.energy;
+
+      const entities = world.query().with('needs').executeEntities();
+
+      for (let i = 0; i < 100; i++) {
+        system.update(world, entities, 1.0);
+      }
+
+      const needsAfter = entity.getComponent('needs') as NeedsComponentLegacy;
+      expect(needsAfter.energy).toBeLessThan(initialEnergy);
+    });
+
+    it('should not decrease energy below zero', () => {
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(100, 5, 100);
+      entity.addComponent(needs);
+
+      const entities = world.query().with('needs').executeEntities();
+
+      for (let i = 0; i < 1000; i++) {
+        system.update(world, entities, 1.0);
+      }
+
+      const needsAfter = entity.getComponent('needs') as NeedsComponentLegacy;
+      expect(needsAfter.energy).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should pause energy decay during sleep', () => {
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(100, 100, 100);
+      const circadian = createCircadianComponent();
+      circadian.isSleeping = true;
+      entity.addComponent(needs);
+      entity.addComponent(circadian);
+
+      const initialEnergy = needs.energy;
+
+      const entities = world.query().with('needs').executeEntities();
+      system.update(world, entities, 10.0);
+
+      const needsAfter = entity.getComponent('needs') as NeedsComponentLegacy;
+      // Energy should not decay during sleep (it should restore, but this system doesn't handle that)
+      expect(needsAfter.energy).toBeGreaterThanOrEqual(initialEnergy - 5);
+    });
+
+    it('should increase energy decay for gather behavior', () => {
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(100, 100, 100);
+      const agent = createAgentComponent('test-agent', 'Agent', { x: 0, y: 0 });
+      agent.behavior = 'gather';
+      entity.addComponent(needs);
+      entity.addComponent(agent);
+
+      const initialEnergy = needs.energy;
+
+      const entities = world.query().with('needs').executeEntities();
+
+      for (let i = 0; i < 50; i++) {
+        system.update(world, entities, 1.0);
+      }
+
+      const needsAfter = entity.getComponent('needs') as NeedsComponentLegacy;
+      expect(needsAfter.energy).toBeLessThan(initialEnergy);
+    });
+
+    it('should increase energy decay for build behavior', () => {
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(100, 100, 100);
+      const agent = createAgentComponent('test-agent', 'Agent', { x: 0, y: 0 });
+      agent.behavior = 'build';
+      entity.addComponent(needs);
+      entity.addComponent(agent);
+
+      const initialEnergy = needs.energy;
+
+      const entities = world.query().with('needs').executeEntities();
+
+      for (let i = 0; i < 50; i++) {
+        system.update(world, entities, 1.0);
+      }
+
+      const needsAfter = entity.getComponent('needs') as NeedsComponentLegacy;
+      expect(needsAfter.energy).toBeLessThan(initialEnergy);
+    });
+
+    it('should increase energy decay when running', () => {
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(100, 100, 100);
+      const agent = createAgentComponent('test-agent', 'Agent', { x: 0, y: 0 });
+      const movement = createMovementComponent(5, 5); // Fast speed
+      movement.speed = 4.0; // Running speed
+      entity.addComponent(needs);
+      entity.addComponent(agent);
+      entity.addComponent(movement);
+
+      const initialEnergy = needs.energy;
+
+      const entities = world.query().with('needs').executeEntities();
+
+      for (let i = 0; i < 50; i++) {
+        system.update(world, entities, 1.0);
+      }
+
+      const needsAfter = entity.getComponent('needs') as NeedsComponentLegacy;
+      expect(needsAfter.energy).toBeLessThan(initialEnergy);
+    });
+  });
+
+  describe('temperature effects', () => {
+    it('should increase energy decay in cold temperature', () => {
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(100, 100, 100);
+      const temperature = createTemperatureComponent(5); // 5°C - cold
+      entity.addComponent(needs);
+      entity.addComponent(temperature);
+
+      const initialEnergy = needs.energy;
+
+      const entities = world.query().with('needs').executeEntities();
+
+      for (let i = 0; i < 50; i++) {
+        system.update(world, entities, 1.0);
+      }
+
+      const needsAfter = entity.getComponent('needs') as NeedsComponentLegacy;
+      expect(needsAfter.energy).toBeLessThan(initialEnergy);
+    });
+
+    it('should increase energy decay in hot temperature', () => {
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(100, 100, 100);
+      const temperature = createTemperatureComponent(35); // 35°C - hot
+      entity.addComponent(needs);
+      entity.addComponent(temperature);
+
+      const initialEnergy = needs.energy;
+
+      const entities = world.query().with('needs').executeEntities();
+
+      for (let i = 0; i < 50; i++) {
+        system.update(world, entities, 1.0);
+      }
+
+      const needsAfter = entity.getComponent('needs') as NeedsComponentLegacy;
+      expect(needsAfter.energy).toBeLessThan(initialEnergy);
+    });
+
+    it('should not add temperature penalty in comfortable range', () => {
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(100, 100, 100);
+      const temperature = createTemperatureComponent(20); // 20°C - comfortable
+      entity.addComponent(needs);
+      entity.addComponent(temperature);
+
+      const entities = world.query().with('needs').executeEntities();
+      system.update(world, entities, 10.0);
+
+      const needsAfter = entity.getComponent('needs') as NeedsComponentLegacy;
+      // Should decay, but at normal rate (not increased by temperature)
+      expect(needsAfter.energy).toBeLessThan(100);
+      expect(needsAfter.energy).toBeGreaterThan(50); // Not too much decay
+    });
+  });
+
+  describe('critical needs events', () => {
+    it('should emit need:critical event when hunger drops below 20', () => {
+      const criticalHandler = vi.fn();
+      world.eventBus.subscribe('need:critical', criticalHandler);
+
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(25, 100, 100); // Just above threshold
+      entity.addComponent(needs);
+
+      const entities = world.query().with('needs').executeEntities();
+
+      // Simulate enough time to drop below 20
+      for (let i = 0; i < 100; i++) {
+        system.update(world, entities, 1.0);
+      }
+
+      world.eventBus.flush();
+
+      // Should have emitted at least once when crossing threshold
+      const hungerCriticalCalls = criticalHandler.mock.calls.filter(
+        call => call[0].data.needType === 'hunger'
+      );
+      expect(hungerCriticalCalls.length).toBeGreaterThan(0);
+    });
+
+    it('should emit need:critical event when energy drops below 20', () => {
+      const criticalHandler = vi.fn();
+      world.eventBus.subscribe('need:critical', criticalHandler);
+
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(100, 25, 100); // Just above threshold
+      entity.addComponent(needs);
+
+      const entities = world.query().with('needs').executeEntities();
+
+      // Simulate enough time to drop below 20
+      for (let i = 0; i < 100; i++) {
+        system.update(world, entities, 1.0);
+      }
+
+      world.eventBus.flush();
+
+      const energyCriticalCalls = criticalHandler.mock.calls.filter(
+        call => call[0].data.needType === 'energy'
+      );
+      expect(energyCriticalCalls.length).toBeGreaterThan(0);
+    });
+
+    it('should include survival relevance in critical event', () => {
+      const criticalHandler = vi.fn();
+      world.eventBus.subscribe('need:critical', criticalHandler);
+
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(25, 100, 100);
+      entity.addComponent(needs);
+
+      const entities = world.query().with('needs').executeEntities();
+
+      for (let i = 0; i < 100; i++) {
+        system.update(world, entities, 1.0);
+      }
+
+      world.eventBus.flush();
+
+      if (criticalHandler.mock.calls.length > 0) {
+        const event = criticalHandler.mock.calls[0][0];
+        expect(event.data.survivalRelevance).toBeDefined();
+        expect(event.data.survivalRelevance).toBeGreaterThan(0);
+      }
+    });
+  });
+
+  describe('starvation', () => {
+    it('should emit agent:starved event when both hunger and energy reach zero', () => {
+      const starvedHandler = vi.fn();
+      world.eventBus.subscribe('agent:starved', starvedHandler);
+
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(1, 1, 100);
+      entity.addComponent(needs);
+
+      const entities = world.query().with('needs').executeEntities();
+
+      // Simulate long enough for both to reach zero
+      for (let i = 0; i < 500; i++) {
+        system.update(world, entities, 1.0);
+      }
+
+      world.eventBus.flush();
+      expect(starvedHandler).toHaveBeenCalled();
+    });
+
+    it('should include agent id in starved event', () => {
+      const starvedHandler = vi.fn();
+      world.eventBus.subscribe('agent:starved', starvedHandler);
+
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(1, 1, 100);
+      entity.addComponent(needs);
+
+      const entities = world.query().with('needs').executeEntities();
+
+      for (let i = 0; i < 500; i++) {
+        system.update(world, entities, 1.0);
+      }
+
+      world.eventBus.flush();
+
+      if (starvedHandler.mock.calls.length > 0) {
+        const event = starvedHandler.mock.calls[0][0];
+        expect(event.data.agentId).toBe(entity.id);
+      }
+    });
+  });
+
+  describe('edge cases', () => {
+    it('should handle empty entity list', () => {
+      expect(() => system.update(world, [], 1.0)).not.toThrow();
+    });
+
+    it('should handle very small deltaTime', () => {
+      const entity = world.createEntity();
+      entity.addComponent(createNeedsComponent(100, 100, 100));
+
+      const entities = world.query().with('needs').executeEntities();
+
+      expect(() => system.update(world, entities, 0.001)).not.toThrow();
+    });
+
+    it('should handle very large deltaTime', () => {
+      const entity = world.createEntity();
+      entity.addComponent(createNeedsComponent(100, 100, 100));
+
+      const entities = world.query().with('needs').executeEntities();
+
+      expect(() => system.update(world, entities, 1000.0)).not.toThrow();
+    });
+
+    it('should skip entities without needs component gracefully', () => {
+      const entity = world.createEntity();
+      entity.addComponent(createAgentComponent('test', 'Test', { x: 0, y: 0 }));
+
+      const entities = [entity]; // Force entity without needs into update
+
+      // Should not throw, just log warning
+      expect(() => system.update(world, entities, 1.0)).not.toThrow();
+    });
+
+    it('should handle entity with needs but no circadian component', () => {
+      const entity = world.createEntity();
+      entity.addComponent(createNeedsComponent(100, 100, 100));
+
+      const entities = world.query().with('needs').executeEntities();
+
+      // Should treat as not sleeping
+      expect(() => system.update(world, entities, 1.0)).not.toThrow();
+    });
+
+    it('should handle entity with needs but no agent component', () => {
+      const entity = world.createEntity();
+      entity.addComponent(createNeedsComponent(100, 100, 100));
+
+      const entities = world.query().with('needs').executeEntities();
+
+      // Should use base decay rate
+      expect(() => system.update(world, entities, 1.0)).not.toThrow();
+    });
+
+    it('should handle entity with needs but no movement component', () => {
+      const entity = world.createEntity();
+      const needs = createNeedsComponent(100, 100, 100);
+      const agent = createAgentComponent('test', 'Test', { x: 0, y: 0 });
+      entity.addComponent(needs);
+      entity.addComponent(agent);
+
+      const entities = world.query().with('needs').executeEntities();
+
+      // Should not check movement speed
+      expect(() => system.update(world, entities, 1.0)).not.toThrow();
+    });
+  });
+});

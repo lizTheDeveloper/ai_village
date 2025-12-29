@@ -6,6 +6,10 @@ import type { EventBus } from '../events/EventBus.js';
 import type { VerificationResult, VerificationRecord } from '../components/TrustNetworkComponent.js';
 import type { Gradient } from '../components/SocialGradientComponent.js';
 import { getPosition, getSocialGradient, getTrustNetwork, getResource } from '../utils/componentHelpers.js';
+import {
+  VERIFICATION_RANGE,
+  CLAIM_AGE_THRESHOLD,
+} from '../constants/index.js';
 
 /**
  * VerificationSystem checks resource claims and updates trust scores
@@ -17,7 +21,7 @@ export class VerificationSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   private eventBus?: EventBus;
-  private readonly verificationRange: number = 5; // Tiles
+  private readonly verificationRange: number = VERIFICATION_RANGE; // Tiles
   private lastUpdateTick: number = 0;
   private readonly updateInterval: number = 40; // Only run every 2 seconds (at 20 TPS)
 
@@ -197,7 +201,7 @@ export class VerificationSystem implements System {
 
     // Check if claim is old (might have been depleted)
     const claimAge = currentTick - gradient.tick;
-    if (claimAge > 200) {
+    if (claimAge > CLAIM_AGE_THRESHOLD) {
       // Resource may have been harvested - stale info
       return 'stale';
     }

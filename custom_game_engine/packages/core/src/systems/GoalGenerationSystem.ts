@@ -58,12 +58,9 @@ export class GoalGenerationSystem implements System {
     // Track goal progress from action completion
     this.eventBus.subscribe('agent:action:completed', (event) => {
       const { actionType } = event.data;
-      const actionId = event.data.actionId;
 
-      // Extract agentId from actionId (format: "agentId-actionType-timestamp")
-      if (!actionId) return;
-
-      const agentId = actionId.split('-')[0];
+      // The agentId is in event.source (set to action.actorId by ActionQueue)
+      const agentId = event.source;
       if (!agentId) return;
 
       const entity = (this.eventBus as any).world?.getEntity(agentId);
@@ -122,7 +119,8 @@ export class GoalGenerationSystem implements System {
       creative: (personality.creativity || 0.5) * 4 + personality.openness * 4,
       exploration: personality.openness * 5,
       security: personality.conscientiousness * 2 + (1 - (personality.neuroticism || 0.5)) * 2,
-      legacy: (personality.leadership || 0.5) + (personality.generosity || 0.5),
+      connection: personality.agreeableness * 1.5 + Math.max(0, (1 - personality.extraversion) - 0.3) * 2,
+      recognition: Math.max(0, (personality.neuroticism || 0.5) - 0.3) * 3 + (personality.leadership || 0.5) * 1.5,
     };
 
     const totalWeight = Object.values(weights).reduce((sum, w) => sum + w, 0);
@@ -162,8 +160,10 @@ export class GoalGenerationSystem implements System {
         return this._createExplorationGoal(personality);
       case 'security':
         return this._createSecurityGoal(personality);
-      case 'legacy':
-        return this._createLegacyGoal(personality);
+      case 'connection':
+        return this._createConnectionGoal(personality);
+      case 'recognition':
+        return this._createRecognitionGoal(personality);
       default:
         return null;
     }
@@ -255,18 +255,34 @@ export class GoalGenerationSystem implements System {
     };
   }
 
-  private _createLegacyGoal(_personality: PersonalityComponent): {
+  private _createConnectionGoal(_personality: PersonalityComponent): {
     description: string;
     motivation: string;
     milestones: Array<{ description: string; completed: boolean; progress: number }>;
   } {
     return {
-      description: 'Help others and leave a positive legacy',
-      motivation: 'I want to make a lasting difference',
+      description: 'Form a deep bond with someone special',
+      motivation: 'I want meaningful connections with people I trust',
       milestones: [
-        { description: 'Teach skills to others', completed: false, progress: 0 },
-        { description: 'Contribute to community projects', completed: false, progress: 0 },
-        { description: 'Be remembered as a helpful person', completed: false, progress: 0 },
+        { description: 'Find someone I connect with', completed: false, progress: 0 },
+        { description: 'Share personal thoughts and feelings', completed: false, progress: 0 },
+        { description: 'Build a lasting friendship or partnership', completed: false, progress: 0 },
+      ],
+    };
+  }
+
+  private _createRecognitionGoal(_personality: PersonalityComponent): {
+    description: string;
+    motivation: string;
+    milestones: Array<{ description: string; completed: boolean; progress: number }>;
+  } {
+    return {
+      description: 'Earn respect and recognition from others',
+      motivation: 'I want to be valued for my contributions',
+      milestones: [
+        { description: 'Complete important tasks', completed: false, progress: 0 },
+        { description: 'Help the community in visible ways', completed: false, progress: 0 },
+        { description: 'Be known as someone reliable and skilled', completed: false, progress: 0 },
       ],
     };
   }
@@ -311,22 +327,31 @@ export class GoalGenerationSystem implements System {
             progressDelta = 0.06;
           }
           break;
-        case 'legacy':
-          if (this._isLegacyAction(actionType)) {
-            progressDelta = 0.1;
+        case 'connection':
+          if (this._isConnectionAction(actionType)) {
+            progressDelta = 0.08;
+          }
+          break;
+        case 'recognition':
+          if (this._isRecognitionAction(actionType)) {
+            progressDelta = 0.08;
           }
           break;
       }
 
       if (progressDelta > 0) {
         const newProgress = Math.min(1.0, goal.progress + progressDelta);
+
+        // Check if goal will be completed BEFORE updating progress
+        const willComplete = newProgress >= 1.0 && !goal.completed;
+
         goalsComp.updateGoalProgress(goal.id, newProgress);
 
         // Check milestones
         this._checkMilestones(agentId, goal, goalsComp);
 
-        // Emit goal completion event if complete
-        if (newProgress >= 1.0 && !goal.completed) {
+        // Emit goal completion event if just completed
+        if (willComplete) {
           this.eventBus.emit({
             type: 'agent:goal_completed',
             source: this.id,
@@ -394,8 +419,12 @@ export class GoalGenerationSystem implements System {
     return ['build', 'gather', 'harvest'].includes(actionType);
   }
 
-  private _isLegacyAction(actionType: string): boolean {
-    return ['help', 'teach', 'chat_idle'].includes(actionType);
+  private _isConnectionAction(actionType: string): boolean {
+    return ['chat_idle', 'help', 'socialize'].includes(actionType);
+  }
+
+  private _isRecognitionAction(actionType: string): boolean {
+    return ['build', 'teach', 'craft', 'help'].includes(actionType);
   }
 }
 
@@ -422,7 +451,8 @@ export function generatePersonalGoal(
     creative: (personality.creativity || 0.5) * 4 + personality.openness * 4,
     exploration: personality.openness * 5,
     security: personality.conscientiousness * 2 + (1 - (personality.neuroticism || 0.5)) * 2,
-    legacy: (personality.leadership || 0.5) + (personality.generosity || 0.5),
+    connection: personality.agreeableness * 1.5 + Math.max(0, (1 - personality.extraversion) - 0.3) * 2,
+    recognition: Math.max(0, (personality.neuroticism || 0.5) - 0.3) * 3 + (personality.leadership || 0.5) * 1.5,
   };
 
   const totalWeight = Object.values(weights).reduce((sum, w) => sum + w, 0);
@@ -473,8 +503,10 @@ function createGoalForCategory(
       return createExplorationGoal(personality);
     case 'security':
       return createSecurityGoal(personality);
-    case 'legacy':
-      return createLegacyGoal(personality);
+    case 'connection':
+      return createConnectionGoal(personality);
+    case 'recognition':
+      return createRecognitionGoal(personality);
     default:
       return createMasteryGoal(personality, skills);
   }
@@ -601,20 +633,38 @@ function createSecurityGoal(_personality: PersonalityComponent): {
   };
 }
 
-function createLegacyGoal(_personality: PersonalityComponent): {
+function createConnectionGoal(_personality: PersonalityComponent): {
   description: string;
   motivation: string;
   milestones: Array<{ description: string; completed: boolean; progress: number }>;
   targetDays: number;
 } {
   return {
-    description: 'Help others and leave a positive legacy',
-    motivation: 'I want to make a lasting difference',
+    description: 'Form a deep bond with someone special',
+    motivation: 'I want meaningful connections with people I trust',
     milestones: [
-      { description: 'Teach skills to others', completed: false, progress: 0 },
-      { description: 'Contribute to community projects', completed: false, progress: 0 },
-      { description: 'Be remembered as a helpful person', completed: false, progress: 0 },
+      { description: 'Find someone I connect with', completed: false, progress: 0 },
+      { description: 'Share personal thoughts and feelings', completed: false, progress: 0 },
+      { description: 'Build a lasting friendship or partnership', completed: false, progress: 0 },
     ],
-    targetDays: Math.floor(15 + Math.random() * 15), // 15-30 days
+    targetDays: Math.floor(10 + Math.random() * 15), // 10-25 days
+  };
+}
+
+function createRecognitionGoal(_personality: PersonalityComponent): {
+  description: string;
+  motivation: string;
+  milestones: Array<{ description: string; completed: boolean; progress: number }>;
+  targetDays: number;
+} {
+  return {
+    description: 'Earn respect and recognition from others',
+    motivation: 'I want to be valued for my contributions',
+    milestones: [
+      { description: 'Complete important tasks', completed: false, progress: 0 },
+      { description: 'Help the community in visible ways', completed: false, progress: 0 },
+      { description: 'Be known as someone reliable and skilled', completed: false, progress: 0 },
+    ],
+    targetDays: Math.floor(7 + Math.random() * 14), // 7-21 days
   };
 }

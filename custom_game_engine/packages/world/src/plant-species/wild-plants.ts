@@ -348,7 +348,11 @@ export const BERRY_BUSH: PlantSpecies = {
     mature: 'berry-bush-mature',
     seeding: 'berry-bush-seeding',
     withered: 'berry-bush-withered'
-  }
+  },
+
+  // Berry bushes regrow after harvest - picking berries doesn't destroy the bush
+  harvestDestroysPlant: false,
+  harvestResetStage: 'fruiting'  // Reset to fruiting stage to regrow berries
 };
 
 export const TREE: PlantSpecies = {
@@ -455,7 +459,11 @@ export const TREE: PlantSpecies = {
     mature: 'tree',
     seeding: 'tree',
     withered: 'tree-withered'
-  }
+  },
+
+  // Trees regrow after harvest - picking fruit doesn't destroy the tree
+  harvestDestroysPlant: false,
+  harvestResetStage: 'fruiting'
 };
 
 export const WILD_PLANTS = [GRASS, WILDFLOWER, BERRY_BUSH, TREE];

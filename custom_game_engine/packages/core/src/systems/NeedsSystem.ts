@@ -41,8 +41,7 @@ export class NeedsSystem implements System {
       const needs = impl.getComponent<NeedsComponent>('needs')!;
 
       if (!needs) {
-        console.warn(`[NeedsSystem] Entity ${entity.id} has no needs component!`);
-        continue;
+        throw new Error(`Entity ${entity.id} missing required needs component`);
       }
 
       // Check if agent is sleeping (don't deplete energy while sleeping)

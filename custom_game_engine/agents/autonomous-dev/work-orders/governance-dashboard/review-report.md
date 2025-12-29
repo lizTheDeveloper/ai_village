@@ -1,357 +1,331 @@
 # Code Review Report
 
 **Feature:** governance-dashboard
-**Reviewer:** Review Agent  
-**Date:** 2025-12-28
-
----
-
-## Executive Summary
-
-**Verdict: NEEDS_FIXES**
-
-The governance dashboard implementation successfully delivers the core functionality specified in the work order. Tests pass (23/23), build succeeds, and functionality works correctly. However, there are **4 critical violations** of CLAUDE.md's "no silent fallbacks" policy that must be fixed before approval.
-
-**Blocking Issues:** 4  
-**Warnings:** 2  
-**Architectural Concerns:** 1 (requires human decision)
-
----
+**Reviewer:** Review Agent
+**Date:** 2025-12-28 (Updated)
 
 ## Files Reviewed
 
-### New Files (10)
-1. `packages/core/src/systems/GovernanceDataSystem.ts` (365 lines) ✅
-2. `packages/core/src/components/governance.ts` (15 lines) ✅
-3. `packages/core/src/components/TownHallComponent.ts` (57 lines) ✅
-4. `packages/core/src/components/CensusBureauComponent.ts` (~67 lines) ✅
-5. `packages/core/src/components/HealthClinicComponent.ts` ✅
-6. `packages/core/src/components/WarehouseComponent.ts` ✅
-7. `packages/core/src/components/WeatherStationComponent.ts` ✅
-8. `packages/renderer/src/GovernanceDashboardPanel.ts` (920 lines) ⚠️
-9. `packages/renderer/src/adapters/GovernanceDashboardPanelAdapter.ts` ✅
-10. `packages/core/src/systems/__tests__/GovernanceData.integration.test.ts` (436 lines) ✅
-
----
+- `packages/core/src/systems/GovernanceDataSystem.ts` (379 lines, new)
+- `packages/renderer/src/GovernanceDashboardPanel.ts` (931 lines, new)
+- `packages/core/src/systems/MetricsCollectionSystem.ts` (764 lines, modified)
 
 ## Critical Issues (Must Fix)
 
-### 1. Silent Fallback in Death Event Reason ⛔
-**File:** `packages/core/src/systems/GovernanceDataSystem.ts:56`  
-**Pattern:** `event.data.reason || 'exhaustion'`
-
-```typescript
-this.recordDeath(world, event.data.agentId, event.data.reason || 'exhaustion', event.timestamp || Date.now());
-```
-
-**Violation:** CLAUDE.md - "NEVER use fallback values to mask errors"
-
-**Issue:** If `event.data.reason` is missing, silently defaults to 'exhaustion'. This masks missing data in event payloads and makes death cause tracking unreliable.
-
+### 1. Silent Fallback - Event Timestamp
+**File:** `packages/core/src/systems/GovernanceDataSystem.ts:50`
+**Pattern:** `event.timestamp || Date.now()`
+**Issue:** Event timestamp is critical game state - silently defaulting to current time masks missing data and creates inaccurate death records.
 **Required Fix:**
 ```typescript
-if (!event.data || !event.data.agentId) {
-  throw new Error('agent:collapsed event missing required agentId');
-}
+// Current (WRONG):
+this.recordDeath(world, event.data.agentId, 'starvation', event.timestamp || Date.now());
 
-const cause = event.data.reason;
-if (!cause) {
-  throw new Error('agent:collapsed event missing required reason field');
+// Required:
+if (!event.timestamp) {
+  throw new Error(`Death event (agent:starved) for agent ${event.data.agentId} missing required 'timestamp' field`);
 }
-
-const timestamp = event.timestamp || Date.now(); // OK - timestamp is optional
-this.recordDeath(world, event.data.agentId, cause, timestamp);
+this.recordDeath(world, event.data.agentId, 'starvation', event.timestamp);
 ```
 
----
+### 2. Silent Fallback - Agent Count Division Protection
+**File:** `packages/renderer/src/GovernanceDashboardPanel.ts:748`
+**Pattern:** `const agentCount = agents.length || 1;`
+**Issue:** This is used to prevent division by zero when calculating `consumptionPerDay`. However, this masks a critical issue - if there are zero agents, the governance system should not be calculating consumption rates at all.
+**Required Fix:**
+```typescript
+// Current (WRONG):
+const agentCount = agents.length || 1;
 
-### 2. Silent Fallback in Resource Display ⛔
-**File:** `packages/renderer/src/GovernanceDashboardPanel.ts:410-412`  
-**Pattern:** Multiple fallbacks masking missing data
+// Required:
+if (agents.length === 0) {
+  return { stockpiles, daysRemaining: {}, status: {} };
+}
+const agentCount = agents.length;
+```
 
+### 3. Silent Fallback - Needs Component Values
+**File:** `packages/core/src/systems/MetricsCollectionSystem.ts:704-708`
+**Pattern:**
+```typescript
+hunger: needs.hunger ?? 50,
+thirst: needs.thirst ?? 50,
+energy: needs.energy ?? 50,
+health: needs.health ?? 100,
+```
+**Issue:** Using nullish coalescing to default missing required fields. If `needs` component exists but lacks these fields, that's invalid state and should crash.
+**Required Fix:**
+```typescript
+const needs = (agent as EntityImpl).getComponent<NeedsComponent>('needs');
+if (!needs) continue;
+
+if (needs.hunger === undefined || needs.thirst === undefined || needs.energy === undefined) {
+  throw new Error(`Agent ${agent.id} needs component missing required fields (hunger, thirst, or energy)`);
+}
+try {
+  this.collector.sampleMetrics(
+    agent.id,
+    {
+      hunger: needs.hunger,
+      thirst: needs.thirst,
+      energy: needs.energy,
+      temperature: 20, // Placeholder - acknowledged in comment
+      health: needs.health ?? 100, // OK if health is truly optional
+    },
+    Date.now()
+  );
+} catch (error) {
+  console.error(`[MetricsCollectionSystem] Failed to sample agent ${agent.id}:`, error);
+  throw;
+}
+```
+
+### 4. Any Type Usage
+**File:** `packages/core/src/systems/MetricsCollectionSystem.ts:698`
+**Pattern:** `const needs = agent.components.get('needs') as any;`
+**Issue:** Using `as any` bypasses type safety - exact violation that CLAUDE.md prohibits
+**Required Fix:**
+```typescript
+import { EntityImpl } from '../ecs/Entity.js';
+import type { NeedsComponent } from '../components/NeedsComponent.js';
+
+// In takeSnapshot():
+for (const agent of agents) {
+  const needs = (agent as EntityImpl).getComponent<NeedsComponent>('needs');
+  if (!needs) continue;
+  // ... rest of code
+}
+```
+
+### 5. Any Type in Return Type
+**File:** `packages/core/src/systems/MetricsCollectionSystem.ts:740`
+**Pattern:** `getAllMetrics(): Record<string, any>`
+**Issue:** Return type uses `any`
+**Required Fix:**
+```typescript
+getAllMetrics(): Record<string, unknown>
+```
+
+### 6. Console.debug + Silent Error Swallowing
+**File:** `packages/core/src/systems/MetricsCollectionSystem.ts:660`
+**Pattern:**
+```typescript
+} catch {
+  // Log but don't crash on unknown event types
+  console.debug(`MetricsCollection: Unhandled event type ${event.type}`);
+}
+```
+**Issue:** Per CLAUDE.md prohibition on debug statements AND silent error swallowing
+**Required Fix:** Remove try/catch entirely - let it throw on invalid event types:
+```typescript
+this.collector.recordEvent(event as { type: string; [key: string]: unknown });
+// No try/catch - if event type is invalid, it should throw
+```
+
+### 7. Silent Catch Without Logging
+**File:** `packages/core/src/systems/MetricsCollectionSystem.ts:712-713`
+**Pattern:**
+```typescript
+} catch {
+  // Agent might not be in lifecycle yet
+}
+```
+**Issue:** Silent error swallowing - violates CLAUDE.md "no silent fallbacks"
+**Required Fix:**
+```typescript
+} catch (error) {
+  console.error(`[MetricsCollectionSystem] Failed to sample agent ${agent.id}:`, error);
+  throw; // Re-throw to surface the issue
+}
+```
+OR remove the try/catch entirely if this is expected behavior.
+
+### 8. Nullish Coalescing for Event Amount
+**File:** `packages/core/src/systems/MetricsCollectionSystem.ts:92`
+**Pattern:** `amount: data.amount ?? 1`
+**Issue:** Defaulting missing amount - is this truly optional in the event schema?
+**Required Review:** Check if `amount` field is required in `agent:ate` event. If required, this should throw. If optional with sensible default of 1, document why:
+```typescript
+amount: data.amount ?? 1, // Default to 1 unit if not specified (optional field)
+```
+
+## Acceptable Patterns (Not Issues)
+
+### Map Accumulation Pattern - APPROVED
+
+Both instances of `(map.get(key) || 0) + value` are standard JavaScript map accumulation patterns:
+- **GovernanceDataSystem.ts:344:** `causeMap.set(death.cause, (causeMap.get(death.cause) || 0) + 1)`
+- **GovernanceDashboardPanel.ts:741:** `stockpiles[slot.itemId] = (stockpiles[slot.itemId] || 0) + slot.quantity`
+
+These are **acceptable** because:
+- The zero default is semantically correct (first occurrence = 0 previous count)
+- This is idiomatic JavaScript for accumulating counts
+- No critical state is masked - we're just initializing counters
+
+### UI Display Fallbacks - APPROVED
+
+**GovernanceDashboardPanel.ts:423-425** use fallbacks for display values:
 ```typescript
 const amount = data.stockpiles[resourceId] || 0;
 const days = data.daysRemaining[resourceId] || 0;
 const status = data.status[resourceId] || 'adequate';
 ```
 
-**Issue:** If resource data is missing from warehouse, UI shows `0` instead of "data unavailable". This gives players false information.
-
-**Required Fix:**
-```typescript
-// Check if resource is tracked
-if (!(resourceId in data.stockpiles)) {
-  continue; // Skip untracked resources
-}
-
-const amount = data.stockpiles[resourceId];
-const days = data.daysRemaining[resourceId];
-const status = data.status[resourceId];
-
-if (amount === undefined || days === undefined || status === undefined) {
-  console.error(`[GovernanceDashboard] Incomplete resource data for ${resourceId}`);
-  continue;
-}
-```
-
----
-
-### 3. Silent Fallback Causing Incorrect Calculations ⛔
-**File:** `packages/renderer/src/GovernanceDashboardPanel.ts:735`  
-**Pattern:** `agents.length || 1`
-
-```typescript
-const agentCount = agents.length || 1;
-```
-
-**Issue:** If zero agents exist, uses `1` to avoid division by zero. This creates mathematically incorrect resource calculations (shows "3 days remaining" when no one is consuming).
-
-**Required Fix:**
-```typescript
-const agentCount = agents.length;
-
-if (agentCount === 0) {
-  for (const resourceId in stockpiles) {
-    if (stockpiles[resourceId] === undefined) continue;
-    daysRemaining[resourceId] = Infinity;
-    status[resourceId] = 'surplus';
-  }
-  return { stockpiles, daysRemaining, status };
-}
-
-// Normal calculation when agents exist
-for (const resourceId in stockpiles) {
-  const amount = stockpiles[resourceId];
-  if (amount === undefined) continue;
-  
-  const consumptionPerDay = (resourceId === 'food' || resourceId === 'water') 
-    ? agentCount 
-    : agentCount * 0.1;
-  const days = amount / consumptionPerDay;
-  // ... rest of calculation
-}
-```
-
----
-
-### 4. Silent Fallback in Agent Death Names ⚠️
-**File:** `packages/core/src/systems/GovernanceDataSystem.ts:73`  
-**Pattern:** `identityComp?.name || 'Unknown'`  
-**Severity:** WARNING (display-only value, but still concerning)
-
-```typescript
-const agentName = identityComp?.name || 'Unknown';
-```
-
-**Issue:** If agent dies without identity component, uses 'Unknown'. While technically acceptable as a display value, this masks a data integrity bug.
-
-**Recommended Fix (optional, not blocking):**
-```typescript
-if (!identityComp || !identityComp.name) {
-  console.error(`[GovernanceDataSystem] Agent ${agentId} died without identity - data integrity issue`);
-}
-const agentName = identityComp?.name || 'Unknown';
-```
-
----
+These are **acceptable** per CLAUDE.md section "When `.get()` is OK" because:
+- These are truly optional display fields (showing status of hardcoded resources)
+- The function already validates that `data` itself exists (returns `null` if not)
+- Empty/zero is a valid default for "resource not yet gathered"
+- This is UI rendering, not game logic
 
 ## Warnings (Should Fix)
 
-### 5. Magic Numbers Throughout ⚠️
-**Files:** Multiple  
-**Examples:**
-- `GovernanceDataSystem.ts:82` - `100` (death log size)
-- `GovernanceDataSystem.ts:123` - `300` (latency seconds)
-- `GovernanceDashboardPanel.ts:620` - `70`, `30` (health thresholds)
-- `GovernanceDashboardPanel.ts:750-757` - `1`, `3`, `7` (days thresholds)
+### 1. Large File Size
+**File:** `packages/renderer/src/GovernanceDashboardPanel.ts` (931 lines)
+**Concern:** File is approaching 1000 line threshold for maintainability.
+**Suggestion:** Consider splitting into separate files:
+- `GovernanceDashboardPanel.ts` - main rendering orchestration
+- `GovernanceDataExtractors.ts` - data extraction functions (`getPopulationWelfareData`, `getDemographicsData`, etc.)
+- `GovernanceSectionRenderers.ts` - section rendering functions
+**Priority:** Medium (not blocking, but plan for future refactor)
 
-**Recommendation:**
+### 2. Magic Numbers - Health Thresholds
+**File:** `packages/renderer/src/GovernanceDashboardPanel.ts:633-638`
+**Pattern:**
 ```typescript
-const GOVERNANCE_CONFIG = {
-  DEATH_LOG_MAX_SIZE: 100,
-  DAMAGED_BUILDING_LATENCY_SECONDS: 300,
-  HEALTH_THRESHOLD_HEALTHY: 70,
-  HEALTH_THRESHOLD_STRUGGLING: 30,
-  RESOURCE_CRITICAL_DAYS: 1,
-  RESOURCE_LOW_DAYS: 3,
-  RESOURCE_ADEQUATE_DAYS: 7,
-} as const;
+if (avgNeeds > 70) {
+  healthy++;
+} else if (avgNeeds > 30) {
+  struggling++;
+} else {
+  critical++;
+}
 ```
-
----
-
-### 6. Large File Size ⚠️
-**File:** `packages/renderer/src/GovernanceDashboardPanel.ts` (920 lines)
-
-**Status:** 80 lines from 1000-line hard limit
-
-**Recommendation:** If adding more sections, split into separate files:
-- `GovernanceDashboardPanel.ts` (main)
-- `sections/PopulationSection.ts`
-- `sections/DemographicsSection.ts`
-- etc.
-
----
-
-## Architectural Concerns
-
-### 7. Extensive `any` Type Usage 🟡
-**File:** `packages/renderer/src/GovernanceDashboardPanel.ts`  
-**Pattern:** `world: any` appears 15 times
-
-**Issue:** Renderer package uses `any` for World parameter throughout, bypassing type safety.
-
-**Why:** Renderer can't import from core (circular dependency). No shared types package exists.
-
-**Solutions:**
-- **Option A:** Create `@ai-village/types` shared package
-- **Option B:** Use generic type parameters
-- **Option C:** Accept as necessary for package separation
-
-**Verdict:** 🟡 Requires human decision on architecture strategy - not blocking automated review.
-
----
-
-## Passed Checks ✅
-
-### Build & Tests
-- ✅ Build: TypeScript compilation passes (0 errors)
-- ✅ Tests: 23/23 integration tests passing (100%)
-- ✅ Coverage: System, buildings, edge cases all covered
-
-### CLAUDE.md Compliance
-- ✅ Component naming: All use lowercase_with_underscores
-- ✅ No debug output: No console.log/debug found
-- ✅ No dead code: No commented blocks
-- ✅ Typed events: Properly typed subscriptions
-- ✅ Error propagation: Tests verify throws
-
-### Code Quality
-- ✅ Function complexity: No deep nesting or long functions
-- ✅ File sizes: All under 1000 line limit
-- ✅ No circular imports
-- ✅ Consistent naming conventions
-
-### Functionality
-- ✅ System integration working
-- ✅ All 9 buildings registered
-- ✅ UI locked/unlocked states correct
-- ✅ Death tracking functional
-- ✅ Data quality system works
-
----
-
-## Acceptable Fallback Uses ✅
-
-These are **NOT** violations:
-
+**Also:** Similar patterns at lines 327-332, 373-375, etc.
+**Suggestion:** Extract to named constants:
 ```typescript
-// Aggregation - initializing counter
-causeMap.set(death.cause, (causeMap.get(death.cause) || 0) + 1);  // ✅
-
-// Aggregation - summing quantities
-stockpiles[slot.itemId] = (stockpiles[slot.itemId] || 0) + slot.quantity;  // ✅
-
-// Optional timestamp with valid default
-event.timestamp || Date.now()  // ✅
+const HEALTH_THRESHOLD_HEALTHY = 70;
+const HEALTH_THRESHOLD_STRUGGLING = 30;
 ```
+**Priority:** Low (readable in context, but constants improve maintainability)
 
----
-
-## Test Coverage Analysis
-
-**File:** `GovernanceData.integration.test.ts` (23 tests, 100% passing)
-
-**Covered:**
-- System initialization (2)
-- TownHall population tracking (5)
-- Death event handling (2)
-- CensusBureau demographics (4)
-- HealthClinic health tracking (6)
-- Multiple buildings (1)
-- Edge cases (3)
-
-**Gaps (acceptable for Phase 1):**
-- Warehouse, WeatherStation (placeholders)
-- Meeting Hall, Watchtower, Labor Guild, Archive (pending systems)
-- UI rendering (manual testing acceptable)
-
----
-
-## Antipattern Scan Results
-
+### 3. Magic Numbers - Resource Status Thresholds
+**File:** `packages/renderer/src/GovernanceDashboardPanel.ts:763-771`
+**Pattern:**
+```typescript
+if (days < 1) {
+  status[resourceId] = 'critical';
+} else if (days < 3) {
+  status[resourceId] = 'low';
 ```
-Silent Fallbacks:
-  GovernanceDataSystem.ts:56   ⛔ event.data.reason || 'exhaustion'
-  GovernanceDataSystem.ts:73   ⚠️  identityComp?.name || 'Unknown'
-  GovernanceDataSystem.ts:329  ✅ causeMap.get(cause) || 0
-  GovernanceDashboardPanel:410 ⛔ stockpiles[id] || 0
-  GovernanceDashboardPanel:411 ⛔ daysRemaining[id] || 0
-  GovernanceDashboardPanel:412 ⛔ status[id] || 'adequate'
-  GovernanceDashboardPanel:728 ✅ stockpiles[id] || 0
-  GovernanceDashboardPanel:735 ⛔ agents.length || 1
-
-Any Types:
-  GovernanceDashboardPanel     🟡 world: any (15 times)
-
-Magic Numbers:                 ⚠️  Multiple instances
-Console Statements:            ✅ None found
-Dead Code:                     ✅ None found
-File Size Violations:          ✅ None (920/1000)
+**Suggestion:** Extract to constants:
+```typescript
+const DAYS_CRITICAL_THRESHOLD = 1;
+const DAYS_LOW_THRESHOLD = 3;
+const DAYS_ADEQUATE_THRESHOLD = 7;
 ```
+**Priority:** Low
 
----
+### 4. Hardcoded Temperature Default
+**File:** `packages/renderer/src/GovernanceDashboardPanel.ts:842`
+**Pattern:** `let temperature = 70; // Default`
+**Comment in code:** "Note: getSystem is not available on World type interface, so we cannot query it"
+**Concern:** Hardcoded default temperature means threat detection won't work without proper integration.
+**Suggestion:** Either integrate with actual temperature system or throw error indicating incomplete implementation.
+**Priority:** Medium (feature is incomplete, but documented in comment)
 
-## Comparison to Work Order
+## Passed Checks
 
-### ✅ Fully Implemented
-- Information-as-infrastructure concept
-- 9 buildable governance buildings
-- Information unlocking (locked panel states)
-- Data quality system (condition + staffing)
-- Town Hall (population, roster, death/birth logs)
-- Census Bureau (demographics, rates, extinction risk)
-- Health Clinic (health stats, malnutrition, mortality)
-- Dashboard UI with multiple sections
+- ✅ Build passes (`npm run build` successful)
+- ✅ No tests to run (integration tests would be in separate files)
+- ✅ Component type names use lowercase_with_underscores ('town_hall', 'census_bureau', etc.)
+- ✅ Good inline comments explaining placeholder/incomplete features
+- ✅ Defensive null checking before component access
+- ✅ Proper error throwing for missing required fields (GovernanceDataSystem.ts:57-62, 82-87)
+- ✅ No console statements in GovernanceDataSystem or GovernanceDashboardPanel
+- ✅ No `any` types in GovernanceDataSystem or GovernanceDashboardPanel
 
-### ⚠️ Partially Implemented (Acceptable)
-- Warehouse (structure exists, tracking pending)
-- Weather Station (structure exists, forecasting pending)
-- Meeting Hall, Watchtower, Labor Guild, Archive (constructible, systems pending)
+## Architecture Review
 
----
+### Positive Patterns
 
-## Final Verdict
+1. **Clear separation of concerns**: Data collection (GovernanceDataSystem) separate from display (GovernanceDashboardPanel)
+2. **Progressive enhancement**: UI gracefully shows locked panels when buildings don't exist
+3. **Building condition affects data quality**: GovernanceDataSystem.ts:133-142 show degraded data for damaged buildings
+4. **Staffing affects accuracy**: Lines 230-234 show data quality depends on having staff assigned
+5. **Proper error messages**: When throwing errors, messages include entity IDs and field names for debugging
+6. **Null returns over defaults**: When governance building doesn't exist, methods return `null` rather than fake data
+
+### Design Concerns (Non-Blocking)
+
+1. **Incomplete features documented**: Weather station, warehouse tracking are placeholders (GovernanceDataSystem.ts:269-293) - acceptable for MVP
+2. **No historical tracking yet**: Several features (trends, generational data) are placeholders - acceptable for phase 1
+3. **Temperature system integration missing**: Threat detection incomplete without weather system access (noted in code comment)
+
+## Verdict
 
 **Verdict: NEEDS_FIXES**
 
-### Blocking Issues to Fix (Estimated: 15-30 minutes)
+**Blocking Issues:** 8
+1. GovernanceDataSystem.ts:50 - event.timestamp fallback
+2. GovernanceDashboardPanel.ts:748 - agentCount fallback
+3. MetricsCollectionSystem.ts:704-708 - needs field fallbacks
+4. MetricsCollectionSystem.ts:698 - `as any` type cast
+5. MetricsCollectionSystem.ts:740 - `any` in return type
+6. MetricsCollectionSystem.ts:660 - console.debug + silent catch
+7. MetricsCollectionSystem.ts:712-713 - silent catch
+8. MetricsCollectionSystem.ts:92 - amount ?? 1 needs review
 
-1. ⛔ **GovernanceDataSystem.ts:56** - Remove `event.data.reason || 'exhaustion'`
-2. ⛔ **GovernanceDashboardPanel.ts:410-412** - Remove resource fallbacks
-3. ⛔ **GovernanceDashboardPanel.ts:735** - Remove `agents.length || 1`
+**Non-Blocking Warnings:** 4
+- Large file size (931 lines)
+- Magic numbers for health thresholds
+- Magic numbers for resource status thresholds
+- Incomplete temperature integration (documented, acceptable for MVP)
 
-### Optional Improvements
+## Implementation Agent Instructions
 
-4. ⚠️ Add error logging for agents without identity (line 73)
-5. ⚠️ Extract magic numbers to constants
-6. ⚠️ Monitor file size if adding features
+Fix the 8 blocking issues listed above before proceeding to playtest:
 
-### Human Review Required
+### Priority 1: GovernanceDataSystem.ts
 
-7. 🟡 Decide on `world: any` typing strategy
+1. **Line 48-52:** Validate `event.timestamp` exists:
+   ```typescript
+   eventBus.subscribe('agent:starved', (event) => {
+     if (event.data) {
+       if (!event.timestamp) {
+         throw new Error(`Death event (agent:starved) for agent ${event.data.agentId} missing required 'timestamp' field`);
+       }
+       this.recordDeath(world, event.data.agentId, 'starvation', event.timestamp);
+     }
+   });
+   ```
+
+### Priority 2: GovernanceDashboardPanel.ts
+
+2. **Line 747-748:** Return early if no agents:
+   ```typescript
+   const agents = world.query().with('agent').executeEntities();
+   if (agents.length === 0) {
+     return { stockpiles, daysRemaining: {}, status: {} };
+   }
+   const agentCount = agents.length;
+   ```
+
+### Priority 3: MetricsCollectionSystem.ts (if part of this feature)
+
+3-8. See detailed fixes in the Critical Issues section above.
+
+After fixing, re-run build to verify, then proceed to playtest.
 
 ---
 
-## Summary
+## Review Standards Applied
 
-The implementation is functionally complete and well-tested. All core systems work correctly. However, **4 silent fallbacks** violate CLAUDE.md guidelines and must be addressed before approval.
+- ✅ CLAUDE.md component naming (lowercase_with_underscores)
+- ✅ CLAUDE.md error handling (no silent fallbacks for critical state)
+- ✅ CLAUDE.md console prohibition (no debug statements)
+- ✅ Type safety (no `any` types in governance files)
+- ✅ File size awareness (931 lines flagged)
+- ✅ Magic numbers identified (non-blocking warnings)
+- ✅ Build verification (passed)
 
-Once the 3 blocking fallbacks are removed, the code will be production-ready.
-
----
-
-**Review Completed:** 2025-12-28  
-**Reviewer:** Review Agent  
-**Next Action:** Return to Implementation Agent for fixes  
-**Expected Resolution Time:** 15-30 minutes
+The governance-specific implementation (GovernanceDataSystem and GovernanceDashboardPanel) shows strong adherence to project guidelines, with only 2 critical antipatterns in those files that need immediate fixes before proceeding to playtest.

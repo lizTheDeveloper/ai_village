@@ -9,6 +9,7 @@ import {
   createResourceComponent,
   PlantComponent,
 } from '@ai-village/core';
+import { TREE } from '../plant-species/wild-plants.js';
 
 /**
  * Create a tree entity at the specified position.
@@ -39,6 +40,9 @@ export function createTree(world: WorldMutator, x: number, y: number): string {
     health: 100,
     hydration: 80,
     nutrition: 80,
+    // Harvest behavior from species - trees regrow fruit after picking
+    harvestDestroysPlant: TREE.harvestDestroysPlant ?? true,
+    harvestResetStage: TREE.harvestResetStage ?? 'fruiting',
   }));
 
   // Add to world

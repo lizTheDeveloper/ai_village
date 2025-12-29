@@ -12,6 +12,12 @@ import { calculateHarvestQuality } from '../items/ItemQuality.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { GameEvent } from '../events/GameEvent.js';
 import type { GameEventMap } from '../events/EventMap.js';
+import {
+  HARVEST_DURATION_BASE,
+  BASE_SEED_YIELD_HARVEST,
+  BASE_FRUIT_YIELD,
+  SKILL_LEVEL_HARVEST_THRESHOLD,
+} from '../constants/index.js';
 
 /**
  * Handler for the harvest action.
@@ -26,7 +32,10 @@ import type { GameEventMap } from '../events/EventMap.js';
  * - Seed yield based on plant health, stage, and agent skill
  * - Seeding stage gives 1.5x more seeds than mature stage
  * - Seeds inherit genetics from parent plant
- * - Plant is removed after successful harvest
+ *
+ * Harvest behavior (controlled by plant.harvestDestroysPlant):
+ * - If true (default): Plant is destroyed after harvest (carrots, wheat)
+ * - If false: Plant resets to harvestResetStage and regrows (berry bushes, fruit trees)
  *
  * CLAUDE.md Compliance:
  * - No silent fallbacks - all validation errors return clear failure reasons
@@ -49,7 +58,7 @@ export class HarvestActionHandler implements ActionHandler {
    * - Level 5: 25% speed bonus (Master farmer)
    */
   getDuration(action: Action, world: World): number {
-    const baseTicks = 160; // 8 seconds at 20 TPS
+    const baseTicks = HARVEST_DURATION_BASE; // 8 seconds at 20 TPS
 
     // Apply skill efficiency bonus
     const actor = world.getEntity(action.actorId);
@@ -240,7 +249,7 @@ export class HarvestActionHandler implements ActionHandler {
     const skillsComp = actor.components.get('skills') as SkillsComponent | undefined;
     const farmingLevel = skillsComp?.levels.farming ?? 0;
     // Convert skill level (0-5) to skill percentage (0-100)
-    const farmingSkill = (farmingLevel / 5) * 100;
+    const farmingSkill = (farmingLevel / SKILL_LEVEL_HARVEST_THRESHOLD) * 100;
 
     // Calculate fruit yield (use fruitCount if available, otherwise base on health)
     // REQUIREMENT: Must yield at least 1 whole fruit - no fractional harvests
@@ -250,7 +259,7 @@ export class HarvestActionHandler implements ActionHandler {
       fruitYield = plant.fruitCount;
     } else {
       // Calculate based on health: 0-3 fruit, but must be at least 1 to harvest
-      fruitYield = Math.floor((plant.health / 100) * 3);
+      fruitYield = Math.floor((plant.health / 100) * BASE_FRUIT_YIELD);
     }
     // Ensure we always get at least 1 fruit from a successful harvest (if plant has any potential)
     if (fruitYield === 0 && plant.health > 0) {
@@ -260,8 +269,7 @@ export class HarvestActionHandler implements ActionHandler {
     // Calculate seed yield based on formula from spec
     // baseYield * (health/100) * stageMod * skillMod
     // Seeding stage gives 1.5x more seeds (per spec lines 310-316)
-    const baseSeedsPerPlant = 20; // Base yield for harvesting (more than gathering)
-    const seedYield = calculateSeedYield(plant, baseSeedsPerPlant, farmingSkill);
+    const seedYield = calculateSeedYield(plant, BASE_SEED_YIELD_HARVEST, farmingSkill);
 
     // Calculate quality for harvested crops (Phase 10)
     const plantMaturity = plant.stage === 'mature' || plant.stage === 'seeding';
@@ -349,12 +357,25 @@ export class HarvestActionHandler implements ActionHandler {
         },
       });
 
-      // Remove plant entity from world (harvest complete)
-      (world as WorldMutator).destroyEntity(action.targetId, 'harvested');
+      // Check if harvest destroys the plant or allows regrowth
+      if (plant.harvestDestroysPlant) {
+        // Destructive harvest (carrots, wheat, etc.) - remove plant from world
+        (world as WorldMutator).destroyEntity(action.targetId, 'harvested');
+      } else {
+        // Non-destructive harvest (berry bushes, fruit trees) - reset plant to regrow
+        (plantEntity as EntityImpl).updateComponent<PlantComponent>('plant', (p) => {
+          p.stage = plant.harvestResetStage;
+          p.stageProgress = 0;
+          p.fruitCount = 0;  // Reset fruit count, will regrow
+          // Keep health, genetics, etc. - plant continues living
+          return p;
+        });
+      }
 
+      const destroyedText = plant.harvestDestroysPlant ? '' : ' (plant will regrow)';
       return {
         success: true,
-        reason: `Harvested ${fruitsAdded} fruit and ${seedsAdded} ${plant.speciesId} seeds`,
+        reason: `Harvested ${fruitsAdded} fruit and ${seedsAdded} ${plant.speciesId} seeds${destroyedText}`,
         effects: [],
         events,
       };

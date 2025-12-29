@@ -90,4 +90,12 @@ export interface PlantSpecies {
 
   // Visual
   sprites: PlantSprites;
+
+  // Harvest behavior
+  // If true (default), plant is destroyed when harvested (e.g., carrots, wheat)
+  // If false, plant resets to fruiting stage and can regrow (e.g., berry bushes, fruit trees)
+  harvestDestroysPlant?: boolean;
+
+  // Stage to reset to after non-destructive harvest (default: 'fruiting')
+  harvestResetStage?: 'flowering' | 'fruiting' | 'vegetative';
 }

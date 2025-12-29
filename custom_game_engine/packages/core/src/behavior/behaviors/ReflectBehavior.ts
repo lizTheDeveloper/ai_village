@@ -193,7 +193,8 @@ export class ReflectBehavior extends BaseBehavior {
       creative: 0,
       exploration: 0,
       security: 0,
-      legacy: 0,
+      connection: 0,
+      recognition: 0,
     };
 
     // Mastery: conscientiousness + work ethic
@@ -211,8 +212,11 @@ export class ReflectBehavior extends BaseBehavior {
     // Security: conscientiousness + neuroticism
     weights.security = personality.conscientiousness + personality.neuroticism;
 
-    // Legacy: leadership + generosity
-    weights.legacy = personality.leadership + personality.generosity;
+    // Connection: agreeableness + generosity (deep bonds with specific individuals)
+    weights.connection = personality.agreeableness + personality.generosity;
+
+    // Recognition: leadership + extraversion (status, being valued)
+    weights.recognition = personality.leadership + personality.extraversion;
 
     // Select category by weighted random
     const totalWeight = Object.values(weights).reduce((sum, w) => sum + w, 0);
@@ -266,11 +270,17 @@ export class ReflectBehavior extends BaseBehavior {
         { description: 'Ensure reliable food supply', motivation: 'No one should go hungry.' },
         { description: 'Create shelter for others', motivation: 'Everyone deserves protection from the elements.' },
       ],
-      legacy: [
-        { description: 'Teach others valuable skills', motivation: 'Knowledge should be shared, not hoarded.' },
-        { description: 'Contribute to community projects', motivation: 'I want to leave this place better than I found it.' },
-        { description: 'Mentor newcomers', motivation: 'Everyone was new once - I should help.' },
-        { description: 'Build something that will last', motivation: 'I want to create a lasting positive impact.' },
+      connection: [
+        { description: 'Form a deep bond with someone special', motivation: 'Meaningful relationships make life worth living.' },
+        { description: 'Support a friend through hard times', motivation: 'True friends are there when it matters.' },
+        { description: 'Spend quality time with loved ones', motivation: 'The best moments are shared with those we care about.' },
+        { description: 'Build trust with a community member', motivation: 'Trust is the foundation of real connection.' },
+      ],
+      recognition: [
+        { description: 'Become known for a valuable skill', motivation: 'I want my contributions to be recognized.' },
+        { description: 'Lead a community initiative', motivation: 'Leadership is how I can make the biggest impact.' },
+        { description: 'Earn respect from peers', motivation: 'Being valued by others gives my work meaning.' },
+        { description: 'Establish a reputation for excellence', motivation: 'I want to be remembered for doing things well.' },
       ],
     };
 

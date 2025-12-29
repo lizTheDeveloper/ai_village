@@ -58,6 +58,7 @@ import {
   CookingSystem,
   // Idle Behaviors & Personal Goals
   IdleBehaviorSystem,
+  GoalGenerationSystem,
   // Trading system (Phase 12.7)
   TradingSystem,
   // Market Events system (Phase 12.8)
@@ -92,22 +93,23 @@ import {
   EconomyPanel,
   WindowManager,
   MenuBar,
-  AgentInfoPanelAdapter,
-  AnimalInfoPanelAdapter,
-  PlantInfoPanelAdapter,
-  MemoryPanelAdapter,
-  RelationshipsPanelAdapter,
-  ResourcesPanelAdapter,
-  SettingsPanelAdapter,
-  TileInspectorPanelAdapter,
-  InventoryUIAdapter,
-  CraftingPanelUIAdapter,
-  NotificationsPanelAdapter,
-  EconomyPanelAdapter,
+  // Panel adapter factory functions
+  createAgentInfoPanelAdapter,
+  createAnimalInfoPanelAdapter,
+  createPlantInfoPanelAdapter,
+  createMemoryPanelAdapter,
+  createRelationshipsPanelAdapter,
+  createResourcesPanelAdapter,
+  createSettingsPanelAdapter,
+  createTileInspectorPanelAdapter,
+  createInventoryPanelAdapter,
+  createCraftingPanelAdapter,
+  createNotificationsPanelAdapter,
+  createEconomyPanelAdapter,
   ShopPanel,
-  ShopPanelAdapter,
+  createShopPanelAdapter,
   GovernanceDashboardPanel,
-  GovernanceDashboardPanelAdapter,
+  createGovernanceDashboardPanelAdapter,
 } from '@ai-village/renderer';
 import {
   OllamaProvider,
@@ -458,6 +460,7 @@ async function main() {
 
   // Idle Behaviors & Personal Goals (priority 15, before AgentBrainSystem)
   gameLoop.systemRegistry.register(new IdleBehaviorSystem());
+  gameLoop.systemRegistry.register(new GoalGenerationSystem(gameLoop.world.eventBus));
 
   gameLoop.systemRegistry.register(new AgentBrainSystem(llmQueue, promptBuilder));
   // Navigation & Exploration systems (after AI, before Movement)
@@ -592,6 +595,7 @@ async function main() {
   blueprintRegistry.registerDefaults(); // This calls registerTier2Stations(), registerTier3Stations(), registerResearchBuildings(), and registerGovernanceBuildings()
   blueprintRegistry.registerExampleBuildings(); // Examples for all 8 categories and 8 functions
   registerShopBlueprints(blueprintRegistry); // Phase 12.4: Shop Buildings
+  // Note: registerGovernanceBlueprints is already called by registerDefaults()
   // Make building registry accessible on world for behaviors (BuildBehavior needs this)
   (gameLoop.world as any).buildingRegistry = blueprintRegistry;
 
@@ -705,21 +709,21 @@ async function main() {
   // Set renderer for view toggle buttons
   menuBar.setRenderer(renderer);
 
-  // Create adapters for all panels
-  const agentInfoAdapter = new AgentInfoPanelAdapter(agentInfoPanel);
-  const animalInfoAdapter = new AnimalInfoPanelAdapter(animalInfoPanel);
-  const plantInfoAdapter = new PlantInfoPanelAdapter(plantInfoPanel);
-  const memoryAdapter = new MemoryPanelAdapter(memoryPanel);
-  const relationshipsAdapter = new RelationshipsPanelAdapter(relationshipsPanel);
-  const resourcesAdapter = new ResourcesPanelAdapter(resourcesPanel);
-  const notificationsAdapter = new NotificationsPanelAdapter(notificationsPanel);
-  const economyAdapter = new EconomyPanelAdapter(economyPanel);
-  const shopAdapter = new ShopPanelAdapter(shopPanel);
-  const governanceAdapter = new GovernanceDashboardPanelAdapter(governancePanel);
-  const settingsAdapter = new SettingsPanelAdapter(settingsPanel);
-  const tileInspectorAdapter = new TileInspectorPanelAdapter(tileInspectorPanel);
-  const inventoryAdapter = new InventoryUIAdapter(inventoryUI);
-  const craftingAdapter = new CraftingPanelUIAdapter(craftingUI);
+  // Create adapters for all panels using factory functions
+  const agentInfoAdapter = createAgentInfoPanelAdapter(agentInfoPanel);
+  const animalInfoAdapter = createAnimalInfoPanelAdapter(animalInfoPanel);
+  const plantInfoAdapter = createPlantInfoPanelAdapter(plantInfoPanel);
+  const memoryAdapter = createMemoryPanelAdapter(memoryPanel);
+  const relationshipsAdapter = createRelationshipsPanelAdapter(relationshipsPanel);
+  const resourcesAdapter = createResourcesPanelAdapter(resourcesPanel);
+  const notificationsAdapter = createNotificationsPanelAdapter(notificationsPanel);
+  const economyAdapter = createEconomyPanelAdapter(economyPanel);
+  const shopAdapter = createShopPanelAdapter(shopPanel);
+  const governanceAdapter = createGovernanceDashboardPanelAdapter(governancePanel);
+  const settingsAdapter = createSettingsPanelAdapter(settingsPanel);
+  const tileInspectorAdapter = createTileInspectorPanelAdapter(tileInspectorPanel);
+  const inventoryAdapter = createInventoryPanelAdapter(inventoryUI);
+  const craftingAdapter = createCraftingPanelAdapter(craftingUI);
 
   // Get CSS/logical dimensions (not physical canvas pixels which include DPI scaling)
   const canvasRect = canvas.getBoundingClientRect();
@@ -2304,6 +2308,10 @@ async function main() {
             plantInfoPanel.setSelectedEntity(null); // Deselect plant
             memoryPanel.setSelectedEntity(entity); // Sync memory panel
             relationshipsPanel.setSelectedEntity(entity); // Sync relationships panel
+            // Sync crafting panel if it's open
+            if (windowManager.getWindow('crafting')?.visible) {
+              craftingUI.setActiveAgent(entity.id);
+            }
             // Show the agent-info window
             windowManager.showWindow('agent-info');
             windowManager.hideWindow('animal-info');
@@ -2539,98 +2547,8 @@ async function main() {
   //   console.log(`[Animal Event] bond_level_changed:`, event.data);
   // });
 
-  // gameLoop.world.eventBus.on('life_stage_changed', (event: any) => {
-  //   console.log(`[Animal Event] life_stage_changed:`, event.data);
-  // });
-
-  // gameLoop.world.eventBus.on('animal_died', (event: any) => {
-  //   console.log(`[Animal Event] animal_died:`, event.data);
-  // });
-
-  // Set up animal UI action handlers
-  // gameLoop.world.eventBus.on('ui_action', (event: any) => {
-  //   if (event.source !== 'animal_info_panel') return;
-  //   const { action, entityId } = event.data;
-  //     const entity = gameLoop.world.getEntity(entityId);
-  //     if (!entity) {
-  //       console.error(`[Main] UI action: entity ${entityId} not found`);
-  //       return;
-  //     }
-  // 
-  //     const animal = entity.components.get('animal') as any;
-  //     if (!animal) {
-  //       console.error(`[Main] UI action: entity ${entityId} is not an animal`);
-  //       return;
-  //     }
-  // 
-  //     if (action === 'tame') {
-  //       console.log(`[Main] Taming ${animal.name}...`);
-  //       // Find a nearby agent to be the owner
-  //       const agents = gameLoop.world.query().with('agent').executeEntities();
-  //       if (agents.length === 0) {
-  //         console.warn('[Main] No agents available to tame animal');
-  //         renderer.getFloatingTextRenderer().addText('No agents available!', entity, '#FF0000');
-  //         return;
-  //       }
-  //       // Use first agent as the tamer
-  //       const agent = agents[0];
-  //       const tamingSystem = gameLoop.systemRegistry.getSorted().find((s) => s.id === 'taming') as any;
-  //       if (!tamingSystem) {
-  //         console.error('[Main] TamingSystem not found');
-  //         return;
-  //       }
-  // 
-  //       const result = tamingSystem.attemptTaming(gameLoop.world, animal, agent.id, 'feeding', 'grass');
-  //       if (result.success) {
-  //         console.log(`[Main] Successfully tamed ${animal.name}!`);
-  //         renderer.getFloatingTextRenderer().addText('Tamed!', entity, '#00FF00');
-  //       } else {
-  //         console.log(`[Main] Failed to tame ${animal.name}: ${result.reason}`);
-  //         renderer.getFloatingTextRenderer().addText(`Failed: ${result.reason}`, entity, '#FFA500');
-  //       }
-  //     } else if (action === 'feed') {
-  //       console.log(`[Main] Feeding ${animal.name}...`);
-  //       // Reduce hunger by 20
-  //       animal.hunger = Math.max(0, animal.hunger - 20);
-  //       animal.mood = Math.min(100, animal.mood + 5);
-  //       renderer.getFloatingTextRenderer().addText('Fed!', entity, '#00FF00');
-  //     } else if (action === 'collect_product') {
-  //       console.log(`[Main] Collecting products from ${animal.name}...`);
-  //       const productionSystem = gameLoop.systemRegistry.getSorted().find((s) => s.id === 'animal_production') as any;
-  //       if (!productionSystem) {
-  //         console.error('[Main] AnimalProductionSystem not found');
-  //         return;
-  //       }
-  // 
-  //       // Try to collect the first available product
-  //       const species = animal.speciesId;
-  //       // For chickens: eggs, for cows: milk
-  //       const productId = species === 'chicken' ? 'eggs' : species === 'cow' ? 'milk' : null;
-  //       if (!productId) {
-  //         renderer.getFloatingTextRenderer().addText('No products available', entity, '#FFA500');
-  //         return;
-  //       }
-  // 
-  //       const result = productionSystem.collectProduct(entityId, productId);
-  //       if (result.success) {
-  //         console.log(`[Main] Collected ${result.quantity} ${productId} (quality: ${result.quality})`);
-  //         renderer.getFloatingTextRenderer().addText(`+${result.quantity} ${productId}`, entity, '#FFD700');
-  //       } else {
-  //         console.log(`[Main] Failed to collect ${productId}: ${result.reason}`);
-  //         renderer.getFloatingTextRenderer().addText(result.reason || 'Not ready', entity, '#FFA500');
-  //       }
-  //     }
-  //   });
-
   // Start
   gameLoop.start();
-
-  // Expose game globally for debugging and oscillation detection scripts
-  (window as any).game = {
-    world: gameLoop.world,
-    gameLoop,
-    renderer,
-  };
 
   renderLoop();
 

@@ -6,6 +6,12 @@ import { EntityImpl } from '../ecs/Entity.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { AnimalComponent } from '../components/AnimalComponent.js';
 import { isAnimalHousing, getAnimalHousingDefinition } from '../data/animalHousingDefinitions.js';
+import {
+  CLEANLINESS_UPDATE_INTERVAL,
+  CLEANLINESS_WARNING,
+  CLEANLINESS_PENALTY,
+  STRESS_PENALTY_MULTIPLIER,
+} from '../constants/index.js';
 
 /**
  * AnimalHousingSystem manages animal housing buildings:
@@ -20,7 +26,7 @@ export class AnimalHousingSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['building'];
 
   private lastCleanlinessUpdate = 0;
-  private readonly CLEANLINESS_UPDATE_INTERVAL = 24 * 60 * 60; // Daily in seconds
+  private readonly CLEANLINESS_UPDATE_INTERVAL = CLEANLINESS_UPDATE_INTERVAL; // Daily in seconds
 
   update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     const currentTime = Date.now() / 1000;
@@ -73,7 +79,7 @@ export class AnimalHousingSystem implements System {
       }));
 
       // Emit events based on cleanliness thresholds
-      if (newCleanliness < 30 && building.cleanliness >= 30) {
+      if (newCleanliness < CLEANLINESS_WARNING && building.cleanliness >= CLEANLINESS_WARNING) {
         world.eventBus.emit({
           type: 'housing:dirty',
           source: entity.id,
@@ -124,14 +130,14 @@ export class AnimalHousingSystem implements System {
       }
 
       // Apply cleanliness effects
-      if (building.cleanliness < 50) {
+      if (building.cleanliness < CLEANLINESS_PENALTY) {
         // Dirty housing causes stress
-        const comfortPenalty = (50 - building.cleanliness) / 50; // 0-1 scale
+        const comfortPenalty = (CLEANLINESS_PENALTY - building.cleanliness) / CLEANLINESS_PENALTY; // 0-1 scale
         const stressPenalty = comfortPenalty * 10; // Up to 10 stress
 
         impl.updateComponent<AnimalComponent>('animal', (current) => ({
           ...current,
-          stress: Math.min(100, current.stress + stressPenalty * 0.01), // Small increase per tick
+          stress: Math.min(100, current.stress + stressPenalty * STRESS_PENALTY_MULTIPLIER), // Small increase per tick
         }));
       }
 

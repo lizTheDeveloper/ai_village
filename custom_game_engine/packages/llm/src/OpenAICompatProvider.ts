@@ -18,6 +18,9 @@ export class OpenAICompatProvider implements LLMProvider {
   private baseUrl: string;
   private model: string;
   private apiKey: string;
+  private readonly timeout = 30000; // 30 second timeout
+  private readonly maxRetries = 3;
+  private readonly retryDelayMs = 1000;
 
   constructor(
     model: string = 'qwen/qwen3-32b',
@@ -41,6 +44,55 @@ export class OpenAICompatProvider implements LLMProvider {
     //   baseUrl: this.baseUrl,
     //   hasApiKey: !!this.apiKey
     // });
+  }
+
+  /**
+   * Fetch with timeout and retry logic for transient failures
+   */
+  private async fetchWithRetry(
+    url: string,
+    options: RequestInit,
+    retries = this.maxRetries
+  ): Promise<Response> {
+    let lastError: Error | undefined;
+
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+      try {
+        const response = await fetch(url, {
+          ...options,
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        return response;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        lastError = error instanceof Error ? error : new Error(String(error));
+
+        // Check if it's a retryable error (network issues, timeout)
+        const isRetryable =
+          lastError.name === 'AbortError' ||
+          lastError.message.includes('Failed to fetch') ||
+          lastError.message.includes('network') ||
+          lastError.message.includes('ECONNRESET');
+
+        if (isRetryable && attempt < retries) {
+          const delay = this.retryDelayMs * Math.pow(2, attempt); // Exponential backoff
+          console.warn(
+            `[OpenAICompatProvider] Fetch failed (attempt ${attempt + 1}/${retries + 1}), retrying in ${delay}ms:`,
+            lastError.message
+          );
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          continue;
+        }
+
+        throw lastError;
+      }
+    }
+
+    throw lastError || new Error('Fetch failed after retries');
   }
 
 
@@ -123,11 +175,25 @@ export class OpenAICompatProvider implements LLMProvider {
           type: 'function',
           function: {
             name: 'build',
-            description: 'Construct a building',
+            description: 'Construct a building (requires materials in inventory)',
             parameters: {
               type: 'object',
               properties: {
                 building: { type: 'string', description: 'Building type: campfire, tent, storage-chest, workbench, bed, etc.' }
+              },
+              required: ['building']
+            }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'plan_build',
+            description: 'Plan a building project - automatically gathers required resources then builds. This is the easiest way to build!',
+            parameters: {
+              type: 'object',
+              properties: {
+                building: { type: 'string', description: 'Building type: storage-chest, campfire, tent, workbench, bed, etc.' }
               },
               required: ['building']
             }
@@ -279,7 +345,7 @@ Example: "Time to gather wood!" + call gather(target: "wood", amount: 10)
 Keep speech brief and natural.`
       };
 
-      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      const response = await this.fetchWithRetry(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -377,13 +443,15 @@ Keep speech brief and natural.`
         action: action
       });
 
-      // console.log('[OpenAICompatProvider] Response:', {
-      //   model: this.model,
-      //   action: action || '(no action)',
-      //   speaking: speech ? speech.slice(0, 60) + '...' : '(silent)',
-      //   thinking: thinking ? thinking.slice(0, 60) + '...' : '(none)',
-      //   tokensUsed: data.usage?.total_tokens,
-      // });
+      console.log('[OpenAICompatProvider] Response:', {
+        model: this.model,
+        action: action || '(no action)',
+        speaking: speech ? speech.slice(0, 60) + '...' : '(silent)',
+        thinking: thinking ? thinking.slice(0, 60) + '...' : '(none)',
+        tokensUsed: data.usage?.total_tokens,
+        hasToolCalls: toolCalls.length > 0,
+        hasReasoning: !!message.reasoning,
+      });
 
       // If no action was called, fall back to text parsing
       const hasAction = action && (typeof action === 'string' ? action.length > 0 : true);
@@ -409,8 +477,10 @@ Keep speech brief and natural.`
       console.error('[OpenAICompatProvider] Generate error:', error);
       console.error('[OpenAICompatProvider] Error details:', {
         message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
         model: this.model,
         url: `${this.baseUrl}/chat/completions`,
+        hasApiKey: !!this.apiKey,
       });
       throw error;
     }
@@ -447,13 +517,14 @@ Keep speech brief and natural.`
 Format your response like this:
 ${thoughtFormat}
 Speech: [what you say out loud, or "..." if silent]
-Action: [choose ONE: pick, gather, build, talk, follow_agent, explore, till, plant, deposit_items, call_meeting, set_priorities]
+Action: [choose ONE: pick, gather, build, plan_build, talk, follow_agent, explore, till, plant, deposit_items, call_meeting, set_priorities]
 
 Actions can have targets: "gather wood 20" or "build storage-chest" or "talk Haven"
+Use plan_build to queue a building project - you'll automatically gather resources then build it! Example: "plan_build storage-chest"
 
 Be brief and natural.`
     };
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
+    const response = await this.fetchWithRetry(`${this.baseUrl}/chat/completions`, {
       method: 'POST',
       headers,
       body: JSON.stringify({

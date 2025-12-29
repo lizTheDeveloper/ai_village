@@ -105,9 +105,6 @@ export class PromptLogger {
       this.entries = this.entries.slice(-this.maxEntries);
     }
 
-    // Console log for visibility
-    const name = data.agentName || data.agentId.substring(0, 8);
-    console.log(`[LLM] ${name}: "${instruction.substring(0, 50)}..." → ${actionType}`);
   }
 
   /**
@@ -252,44 +249,11 @@ export class PromptLogger {
   }
 
   /**
-   * Pretty print analysis to console
+   * Pretty print analysis to console (deprecated - use analyze() for data)
    */
   print(): void {
-    const analysis = this.analyze();
-
-    console.log('\n' + '='.repeat(60));
-    console.log('📊 PROMPT/RESPONSE ANALYSIS');
-    console.log('='.repeat(60));
-    console.log(`Total Decisions: ${analysis.totalDecisions}`);
-
-    console.log('\nAction Distribution:');
-    const sorted = Object.entries(analysis.actionDistribution).sort((a, b) => b[1] - a[1]);
-    for (const [action, count] of sorted) {
-      const pct = ((count / analysis.totalDecisions) * 100).toFixed(1);
-      console.log(`  ${action}: ${count} (${pct}%)`);
-    }
-
-    console.log('\nInstruction → Action Patterns:');
-    for (const [instr, actions] of Object.entries(analysis.instructionToAction)) {
-      const topActions = Object.entries(actions).sort((a, b) => b[1] - a[1]).slice(0, 2);
-      console.log(`  ${instr}: ${topActions.map(([a, c]) => `${a}(${c})`).join(', ')}`);
-    }
-
-    console.log('\nAgent Behavior:');
-    for (const [agent, data] of Object.entries(analysis.agentBehavior)) {
-      console.log(`  ${agent}: ${data.lastActions.join(' → ')} ${data.hasBuilt ? '✅' : '❌'}`);
-    }
-
-    if (analysis.issues.length > 0) {
-      console.log('\n⚠️ Issues:');
-      for (const issue of analysis.issues) {
-        console.log(`  - ${issue}`);
-      }
-    } else {
-      console.log('\n✅ No issues detected');
-    }
-
-    console.log('='.repeat(60) + '\n');
+    // No-op: console output disabled
+    // Use analyze() to get the data programmatically
   }
 }
 

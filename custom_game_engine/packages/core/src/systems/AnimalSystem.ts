@@ -188,8 +188,8 @@ export class AnimalSystem implements System {
    * Determine animal state based on needs and conditions
    */
   private determineState(animal: AnimalComponent): 'idle' | 'sleeping' | 'eating' | 'drinking' | 'foraging' | 'fleeing' {
-    // Highest priority: flee if very stressed
-    if (animal.stress > 80) {
+    // Highest priority: flee if very stressed (matches FleeBehavior.canStart threshold)
+    if (animal.stress > 70) {
       return 'fleeing';
     }
 

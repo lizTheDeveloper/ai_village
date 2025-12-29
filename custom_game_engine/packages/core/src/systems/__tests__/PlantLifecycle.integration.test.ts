@@ -4,6 +4,7 @@ import { createDawnWorld } from '../../__tests__/fixtures/worldFixtures.js';
 import { PlantSystem } from '../PlantSystem.js';
 import { TimeSystem } from '../TimeSystem.js';
 import { SeedGatheringSystem } from '../SeedGatheringSystem.js';
+import type { PlantSpecies } from '../../types/PlantSpecies.js';
 
 /**
  * Integration tests for PlantSystem + TimeSystem + SeedGatheringSystem
@@ -20,12 +21,82 @@ import { SeedGatheringSystem } from '../SeedGatheringSystem.js';
 describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
   let harness: IntegrationTestHarness;
 
+  const wheatSpecies: PlantSpecies = {
+    id: 'wheat',
+    name: 'Wheat',
+    category: 'crop',
+    biomes: ['plains'],
+    rarity: 'common',
+    stageTransitions: [
+      {
+        from: 'seedling',
+        to: 'vegetative',
+        baseDuration: 2,
+        conditions: {},
+        onTransition: []
+      },
+      {
+        from: 'vegetative',
+        to: 'flowering',
+        baseDuration: 3,
+        conditions: {},
+        onTransition: []
+      },
+      {
+        from: 'flowering',
+        to: 'mature',
+        baseDuration: 2,
+        conditions: {},
+        onTransition: []
+      },
+      {
+        from: 'mature',
+        to: 'seeding',
+        baseDuration: 1,
+        conditions: {},
+        onTransition: [
+          { type: 'produce_seeds' }
+        ]
+      }
+    ],
+    baseGenetics: {
+      growthRate: 1.0,
+      yieldAmount: 1.0,
+      diseaseResistance: 50,
+      droughtTolerance: 50,
+      coldTolerance: 50,
+      flavorProfile: 50,
+      mutations: []
+    },
+    seedsPerPlant: 10,
+    seedDispersalRadius: 2,
+    requiresDormancy: false,
+    optimalTemperatureRange: [15, 25],
+    optimalMoistureRange: [30, 70],
+    preferredSeasons: ['spring', 'summer'],
+    properties: {},
+    sprites: {
+      seed: 'wheat-seed',
+      sprout: 'wheat-sprout',
+      vegetative: 'wheat-vegetative',
+      flowering: 'wheat-flowering',
+      fruiting: 'wheat-fruiting',
+      mature: 'wheat-mature',
+      seeding: 'wheat-seeding',
+      withered: 'wheat-withered'
+    }
+  };
+
   beforeEach(() => {
     harness = createDawnWorld();
   });
 
   it('should plant system subscribe to time events', () => {
     const plantSystem = new PlantSystem(harness.world.eventBus);
+    plantSystem.setSpeciesLookup((id: string) => {
+      if (id === 'wheat') return wheatSpecies;
+      throw new Error(`Unknown species: ${id}`);
+    });
     harness.registerSystem('PlantSystem', plantSystem);
 
     // Create a plant
@@ -63,6 +134,10 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
 
   it('should plants advance growth over time', () => {
     const plantSystem = new PlantSystem(harness.world.eventBus);
+    plantSystem.setSpeciesLookup((id: string) => {
+      if (id === 'wheat') return wheatSpecies;
+      throw new Error(`Unknown species: ${id}`);
+    });
     harness.registerSystem('PlantSystem', plantSystem);
 
     const plant = harness.world.createEntity('plant');
@@ -129,6 +204,10 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
   it('should time system progression trigger plant updates', () => {
     const timeSystem = new TimeSystem();
     const plantSystem = new PlantSystem(harness.world.eventBus);
+    plantSystem.setSpeciesLookup((id: string) => {
+      if (id === 'wheat') return wheatSpecies;
+      throw new Error(`Unknown species: ${id}`);
+    });
 
     harness.registerSystem('TimeSystem', timeSystem);
     harness.registerSystem('PlantSystem', plantSystem);
@@ -170,6 +249,10 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
 
   it('should plant health affect growth rate', () => {
     const plantSystem = new PlantSystem(harness.world.eventBus);
+    plantSystem.setSpeciesLookup((id: string) => {
+      if (id === 'wheat') return wheatSpecies;
+      throw new Error(`Unknown species: ${id}`);
+    });
     harness.registerSystem('PlantSystem', plantSystem);
 
     // Create healthy plant
@@ -238,6 +321,10 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
 
   it('should plants emit stage transition events', () => {
     const plantSystem = new PlantSystem(harness.world.eventBus);
+    plantSystem.setSpeciesLookup((id: string) => {
+      if (id === 'wheat') return wheatSpecies;
+      throw new Error(`Unknown species: ${id}`);
+    });
     harness.registerSystem('PlantSystem', plantSystem);
 
     const plant = harness.world.createEntity('plant');
@@ -282,6 +369,10 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
 
   it('should multiple plants update independently', () => {
     const plantSystem = new PlantSystem(harness.world.eventBus);
+    plantSystem.setSpeciesLookup((id: string) => {
+      if (id === 'wheat') return wheatSpecies;
+      throw new Error(`Unknown species: ${id}`);
+    });
     harness.registerSystem('PlantSystem', plantSystem);
 
     // Create multiple plants at different stages
@@ -345,6 +436,10 @@ describe('PlantSystem + TimeSystem + SeedGathering Integration', () => {
 
   it('should dead plants not grow', () => {
     const plantSystem = new PlantSystem(harness.world.eventBus);
+    plantSystem.setSpeciesLookup((id: string) => {
+      if (id === 'wheat') return wheatSpecies;
+      throw new Error(`Unknown species: ${id}`);
+    });
     harness.registerSystem('PlantSystem', plantSystem);
 
     const plant = harness.world.createEntity('plant');

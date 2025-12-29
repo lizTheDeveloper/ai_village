@@ -27,6 +27,7 @@ export class MemoryFormationSystem implements System {
   private pendingMemories: Map<string, any[]> = new Map();
   private requiredAgents: Set<string> = new Set(); // Agents that MUST exist (not from conversation)
   private pendingBroadcasts: any[] = []; // Events to broadcast to ALL agents
+  private pendingError: Error | null = null; // Store errors from event handlers to re-throw in update()
 
   constructor(eventBus: EventBus) {
     this.eventBus = eventBus;
@@ -170,54 +171,78 @@ export class MemoryFormationSystem implements System {
       if (eventType === 'conversation:utterance') {
         const convData = data as any;
         if (!convData.speakerId || !convData.listenerId) {
-          console.error(`[MemoryFormation] Invalid conversation:utterance event - missing speakerId or listenerId:`, data);
-          return; // Skip invalid event, don't crash
+          throw new Error(`Invalid conversation:utterance event - missing ${!convData.speakerId ? 'speakerId' : 'listenerId'}. Event: conversationId=${convData.conversationId || 'unknown'}, data=${JSON.stringify(data)}`);
         }
 
-        // Queue for both participants
-        // Note: Validation of entity existence happens later in update()
-        const participants = [convData.speakerId, convData.listenerId];
-        for (const agentId of participants) {
-          if (!this.pendingMemories.has(agentId)) {
-            this.pendingMemories.set(agentId, []);
-          }
-          this.pendingMemories.get(agentId)!.push({
-            eventType,
-            data: { ...data, agentId },
-          });
+      // Queue for both participants
+      // Note: Validation of entity existence happens later in update()
+      const participants = [convData.speakerId, convData.listenerId];
+      for (const agentId of participants) {
+        if (!this.pendingMemories.has(agentId)) {
+          this.pendingMemories.set(agentId, []);
         }
-        return;
+        this.pendingMemories.get(agentId)!.push({
+          eventType,
+          data: { ...data, agentId },
+        });
+      }
+      return;
+    }
+
+    // Handle conversation:started specially - uses participants array instead of agentId
+    if (eventType === 'conversation:started') {
+      const convData = data as any;
+      const participants = convData.participants as string[] | undefined;
+      if (!participants || participants.length < 2) {
+        throw new Error(`Invalid conversation:started event - ${!participants ? 'missing participants array' : `only ${participants.length} participant(s), need at least 2`}. Event: conversationId=${convData.conversationId || 'unknown'}, data=${JSON.stringify(data)}`);
       }
 
-      // Standard events require agentId
-      if (!data.agentId) {
-        console.error(`[MemoryFormation] Event ${eventType} missing required agentId. Event data:`, data);
-        console.error(`[MemoryFormation] This is a programming error - the system emitting '${eventType}' events must include agentId in the event data.`);
-        return; // Skip invalid event, don't crash
+      // Queue memory for all participants
+      for (const agentId of participants) {
+        if (!this.pendingMemories.has(agentId)) {
+          this.pendingMemories.set(agentId, []);
+        }
+        this.pendingMemories.get(agentId)!.push({
+          eventType,
+          data: { ...data, agentId },
+        });
       }
+      return;
+    }
 
-      // Queue memory for formation during update
-      if (!this.pendingMemories.has(data.agentId)) {
-        this.pendingMemories.set(data.agentId, []);
-      }
+    // Standard events require agentId
+    if (!data.agentId) {
+      throw new Error(`Event ${eventType} missing required agentId. This is a programming error - the system emitting '${eventType}' events must include agentId in the event data. Event data: ${JSON.stringify(data)}`);
+    }
 
-      this.pendingMemories.get(data.agentId)!.push({
-        eventType,
-        data,
-      });
+    // Queue memory for formation during update
+    if (!this.pendingMemories.has(data.agentId)) {
+      this.pendingMemories.set(data.agentId, []);
+    }
+
+    this.pendingMemories.get(data.agentId)!.push({
+      eventType,
+      data,
+    });
 
       // Mark this agent as required (direct event, not from conversation)
       this.requiredAgents.add(data.agentId);
     } catch (error) {
-      // Log unexpected errors but don't crash the game
-      console.error(`[MemoryFormation] Unexpected error in event handler for ${eventType}:`, error);
-      console.error(`[MemoryFormation] Event data:`, data);
+      // Store error to re-throw in update() (EventBus catches errors in handlers)
+      this.pendingError = error as Error;
     }
   }
 
   update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     // Flush event bus first to process any queued events (which may add to pendingMemories)
     this.eventBus.flush();
+
+    // Re-throw any errors that occurred in event handlers
+    if (this.pendingError) {
+      const error = this.pendingError;
+      this.pendingError = null;
+      throw error;
+    }
 
     // Process pending memories
     const agentIds = Array.from(this.pendingMemories.keys());

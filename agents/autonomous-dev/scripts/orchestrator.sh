@@ -565,6 +565,9 @@ check_playtest_verdict() {
         echo "APPROVED"
     elif grep -q "Verdict.*NEEDS_WORK" "$report"; then
         echo "NEEDS_WORK"
+    elif grep -q "Verdict.*BLOCKED" "$report"; then
+        # BLOCKED is treated as NEEDS_WORK - send back to implementation
+        echo "NEEDS_WORK"
     else
         echo "UNKNOWN"
     fi

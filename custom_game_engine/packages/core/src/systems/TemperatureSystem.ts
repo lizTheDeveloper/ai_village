@@ -8,6 +8,13 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { WeatherComponent } from '../components/WeatherComponent.js';
+import {
+  HEALTH_DAMAGE_RATE,
+  WORLD_TEMP_BASE,
+  TEMP_DAILY_VARIATION,
+  THERMAL_CHANGE_RATE,
+  HEALTH_CRITICAL,
+} from '../constants/index.js';
 
 export class TemperatureSystem implements System {
   public readonly id: SystemId = 'temperature';
@@ -17,10 +24,10 @@ export class TemperatureSystem implements System {
     'position',
   ];
 
-  private readonly HEALTH_DAMAGE_RATE = 0.5; // Health damage per second in dangerous temps
-  private readonly BASE_TEMP = 20; // Default world temperature in °C
-  private readonly DAILY_VARIATION = 8; // ±8°C daily temperature swing
-  private readonly THERMAL_RATE = 0.15; // Rate of temperature change per second (0.15 = ~7 seconds to change 1°C)
+  private readonly HEALTH_DAMAGE_RATE = HEALTH_DAMAGE_RATE; // Health damage per second in dangerous temps
+  private readonly BASE_TEMP = WORLD_TEMP_BASE; // Default world temperature in °C
+  private readonly DAILY_VARIATION = TEMP_DAILY_VARIATION; // ±8°C daily temperature swing
+  private readonly THERMAL_RATE = THERMAL_CHANGE_RATE; // Rate of temperature change per second (0.15 = ~7 seconds to change 1°C)
   private currentWorldTemp: number = this.BASE_TEMP;
   private previousDangerousStates = new Map<string, boolean>();
 
@@ -91,7 +98,7 @@ export class TemperatureSystem implements System {
           }));
 
           // Emit critical health event if health drops below 20%
-          if (newHealth < 20 && needsComp.health >= 20) {
+          if (newHealth < HEALTH_CRITICAL && needsComp.health >= HEALTH_CRITICAL) {
             world.eventBus.emit({
               type: 'agent:health_critical',
               source: entity.id,

@@ -54,8 +54,8 @@ export class InputHandler {
 
     // Handle crafting panel shortcuts
     if (this.craftingPanel) {
-      // Toggle panel with 'C'
-      if (key === 'c') {
+      // Toggle panel with 'C' (but not Cmd+C or Ctrl+C)
+      if (key === 'c' && !event.metaKey && !event.ctrlKey) {
         this.craftingPanel.toggle();
         event.preventDefault();
         return;

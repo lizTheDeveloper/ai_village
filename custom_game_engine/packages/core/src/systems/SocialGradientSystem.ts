@@ -26,7 +26,7 @@ export class SocialGradientSystem implements System {
   private lastProcessedMessageCount: Map<string, number> = new Map();
   private lastUpdateTick: number = 0;
   private readonly updateInterval: number = 20; // Only run once per second (at 20 TPS)
-  private pendingProcessing: string[] = []; // Queue of agent IDs waiting to be processed
+  private pendingProcessing = new Set<string>(); // Set for O(1) lookup - queue of agent IDs waiting to be processed
   private readonly maxProcessPerUpdate: number = 2; // Process max 2 agents per update (round-robin)
 
   initialize(_world: World, _eventBus: EventBus): void {
@@ -74,21 +74,25 @@ export class SocialGradientSystem implements System {
       const messageCount = conversation.messages.length;
       const lastCount = this.lastProcessedMessageCount.get(speakerId) ?? 0;
 
-      // Queue agent if there are new messages and not already queued
-      if (messageCount > lastCount && !this.pendingProcessing.includes(speakerId)) {
-        this.pendingProcessing.push(speakerId);
+      // Queue agent if there are new messages and not already queued - O(1) Set lookup
+      if (messageCount > lastCount && !this.pendingProcessing.has(speakerId)) {
+        this.pendingProcessing.add(speakerId);
       }
     }
 
+    // Build entity lookup map for O(1) access by ID
+    const entityById = new Map(entities.map(e => [e.id, e]));
+
     // Step 2: Process up to maxProcessPerUpdate agents from the queue (round-robin)
-    const processCount = Math.min(this.maxProcessPerUpdate, this.pendingProcessing.length);
-    for (let i = 0; i < processCount; i++) {
-      const speakerId = this.pendingProcessing.shift();
-      if (!speakerId) break;
+    const processCount = Math.min(this.maxProcessPerUpdate, this.pendingProcessing.size);
+    const speakersToProcess = Array.from(this.pendingProcessing).slice(0, processCount);
+
+    for (const speakerId of speakersToProcess) {
+      this.pendingProcessing.delete(speakerId);
 
       try {
-        // Find the agent entity by ID
-        const agent = entities.find(e => e.id === speakerId);
+        // O(1) lookup by ID using map
+        const agent = entityById.get(speakerId);
 
         if (!agent) continue;
 

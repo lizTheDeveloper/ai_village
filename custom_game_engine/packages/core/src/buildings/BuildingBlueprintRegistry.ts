@@ -8,7 +8,7 @@
 
 /**
  * Building categories per construction-system/spec.md
- * EXACTLY 8 categories as specified in spec.
+ * Extended to include governance category.
  */
 export type BuildingCategory =
   | 'production'    // Crafting, processing
@@ -18,20 +18,28 @@ export type BuildingCategory =
   | 'community'     // Town hall, plaza, wells
   | 'farming'       // Barns, greenhouses
   | 'research'      // Labs, libraries
-  | 'decoration';   // Fences, statues
+  | 'decoration'    // Fences, statues
+  | 'governance';   // Information infrastructure
 
 /**
  * Building functionality types per construction-system/spec.md REQ-CON-003
+ * Extended to include governance and other custom function types.
  */
 export type BuildingFunction =
   | { type: 'crafting'; recipes: string[]; speed: number }
-  | { type: 'storage'; itemTypes: string[]; capacity: number }
+  | { type: 'storage'; itemTypes?: string[]; capacity: number }
   | { type: 'sleeping'; restBonus: number }
   | { type: 'shop'; shopType: string }
   | { type: 'research'; fields: string[]; bonus: number }
   | { type: 'gathering_boost'; resourceTypes: string[]; radius: number }
   | { type: 'mood_aura'; moodBonus: number; radius: number }
-  | { type: 'automation'; tasks: string[] };
+  | { type: 'automation'; tasks: string[] }
+  | { type: 'governance'; governanceType: string }
+  | { type: 'healing'; healingRate: number }
+  | { type: 'social_hub'; radius: number }
+  | { type: 'vision_extension'; radiusBonus: number }
+  | { type: 'job_board' }
+  | { type: 'knowledge_repository' };
 
 export interface ResourceCost {
   resourceId: string;
@@ -159,7 +167,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
-      skillRequired: { skill: 'building', level: 0 },
+      skillRequired: { skill: 'building', level: 1 },
       unlocked: true,
       buildTime: 60,
       tier: 1,
@@ -177,6 +185,7 @@ export class BuildingBlueprintRegistry {
     });
 
     // Storage Chest - 20 item slots (1x1, 10 Wood)
+    // Per progressive-skill-reveal spec: Level 0 building (no skill required)
     this.register({
       id: 'storage-chest',
       name: 'Storage Chest',
@@ -188,6 +197,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 0 },
       unlocked: true,
       buildTime: 45,
       tier: 1,
@@ -205,6 +215,7 @@ export class BuildingBlueprintRegistry {
     });
 
     // Campfire - Cooking, warmth (1x1, 10 Stone + 5 Wood)
+    // Per progressive-skill-reveal spec: Level 0 building (no skill required)
     this.register({
       id: 'campfire',
       name: 'Campfire',
@@ -219,6 +230,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 0 },
       unlocked: true,
       buildTime: 30,
       tier: 1,
@@ -364,6 +376,7 @@ export class BuildingBlueprintRegistry {
 
     // Legacy buildings for backward compatibility
     // Lean-to - maps to Tent conceptually but different materials
+    // Per progressive-skill-reveal spec: Level 0 building (no skill required)
     this.register({
       id: 'lean-to',
       name: 'Lean-To',
@@ -378,6 +391,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 0 },
       unlocked: true,
       buildTime: 60,
       tier: 1,
@@ -394,6 +408,7 @@ export class BuildingBlueprintRegistry {
     });
 
     // Storage box - legacy, similar to storage-chest but smaller
+    // Per progressive-skill-reveal spec: Level 0 building (no skill required)
     this.register({
       id: 'storage-box',
       name: 'Storage Box',
@@ -405,6 +420,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 0 },
       unlocked: true,
       buildTime: 45,
       tier: 1,
@@ -506,7 +522,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
-      skillRequired: { skill: 'building', level: 2 },
+      skillRequired: { skill: 'building', level: 3 },
       unlocked: true,
       buildTime: 75,
       tier: 2,
@@ -749,6 +765,7 @@ export class BuildingBlueprintRegistry {
       techRequired: ['agriculture_i'],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 1 },
       unlocked: false,
       buildTime: 45,
       tier: 1,
@@ -780,6 +797,7 @@ export class BuildingBlueprintRegistry {
       techRequired: ['textiles_i'],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 2 },
       unlocked: false,
       buildTime: 75,
       tier: 1,
@@ -811,6 +829,7 @@ export class BuildingBlueprintRegistry {
       techRequired: ['cuisine_i'],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 3 },
       unlocked: false,
       buildTime: 60,
       tier: 1,
@@ -844,6 +863,7 @@ export class BuildingBlueprintRegistry {
       techRequired: ['agriculture_ii'],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['deep_water'],
+      skillRequired: { skill: 'building', level: 3 },
       unlocked: false,
       buildTime: 90,
       tier: 2,
@@ -939,6 +959,7 @@ export class BuildingBlueprintRegistry {
       techRequired: ['alchemy_i'],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 4 },
       unlocked: false,
       buildTime: 120,
       tier: 2,
@@ -975,6 +996,7 @@ export class BuildingBlueprintRegistry {
       techRequired: ['machinery_i'],
       terrainRequired: ['water', 'shallow_water'],
       terrainForbidden: ['deep_water'],
+      skillRequired: { skill: 'building', level: 4 },
       unlocked: false,
       buildTime: 120,
       tier: 2,
@@ -1008,6 +1030,7 @@ export class BuildingBlueprintRegistry {
       techRequired: ['agriculture_iii'],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 4 },
       unlocked: false,
       buildTime: 180,
       tier: 3,
@@ -1076,6 +1099,7 @@ export class BuildingBlueprintRegistry {
       techRequired: ['construction_iii'],
       terrainRequired: ['grass', 'dirt', 'stone'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 5 },
       unlocked: false,
       buildTime: 90,
       tier: 3,
@@ -1141,6 +1165,7 @@ export class BuildingBlueprintRegistry {
       techRequired: ['society_i'],
       terrainRequired: ['grass', 'dirt', 'stone'],
       terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 5 },
       unlocked: false,
       buildTime: 240,
       tier: 4,
@@ -1254,7 +1279,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
-      skillRequired: { skill: 'building', level: 0 },
+      skillRequired: { skill: 'building', level: 2 },
       unlocked: true,
       buildTime: 240, // 4 hours = 240 minutes
       tier: 2,
@@ -1287,7 +1312,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
-      skillRequired: { skill: 'building', level: 1 },
+      skillRequired: { skill: 'building', level: 2 },
       unlocked: true,
       buildTime: 480, // 8 hours
       tier: 3,
@@ -1314,7 +1339,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
-      skillRequired: { skill: 'building', level: 0 },
+      skillRequired: { skill: 'building', level: 2 },
       unlocked: true,
       buildTime: 360, // 6 hours
       tier: 2,
@@ -1347,7 +1372,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
-      skillRequired: { skill: 'building', level: 0 },
+      skillRequired: { skill: 'building', level: 2 },
       unlocked: true,
       buildTime: 300, // 5 hours
       tier: 2,
@@ -1374,7 +1399,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
-      skillRequired: { skill: 'building', level: 1 },
+      skillRequired: { skill: 'building', level: 2 },
       unlocked: true,
       buildTime: 600, // 10 hours
       tier: 3,
@@ -1406,7 +1431,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
-      skillRequired: { skill: 'building', level: 1 },
+      skillRequired: { skill: 'building', level: 2 },
       unlocked: true,
       buildTime: 480, // 8 hours
       tier: 3,
@@ -1438,7 +1463,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
-      skillRequired: { skill: 'building', level: 0 },
+      skillRequired: { skill: 'building', level: 2 },
       unlocked: true,
       buildTime: 360, // 6 hours
       tier: 2,
@@ -1464,7 +1489,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
-      skillRequired: { skill: 'building', level: 1 },
+      skillRequired: { skill: 'building', level: 2 },
       unlocked: true,
       buildTime: 420, // 7 hours
       tier: 3,
@@ -1491,7 +1516,7 @@ export class BuildingBlueprintRegistry {
       techRequired: [],
       terrainRequired: ['grass', 'dirt'],
       terrainForbidden: ['water', 'deep_water'],
-      skillRequired: { skill: 'building', level: 2 },
+      skillRequired: { skill: 'building', level: 3 },
       unlocked: true,
       buildTime: 720, // 12 hours
       tier: 4,

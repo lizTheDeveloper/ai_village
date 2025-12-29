@@ -39,6 +39,7 @@ export interface GameEventMap {
   'agent:action:completed': {
     actionId: string;
     actionType: string;
+    agentId?: string;
     success?: boolean;
     result?: unknown;
     reason?: string;

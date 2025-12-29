@@ -421,6 +421,7 @@ function getWorkOrders() {
             const report = fs.readFileSync(playtestPath, 'utf-8');
             if (report.includes('APPROVED')) order.verdict = 'APPROVED';
             else if (report.includes('NEEDS_WORK')) order.verdict = 'NEEDS_WORK';
+            else if (report.includes('BLOCKED')) order.verdict = 'BLOCKED';
         }
 
         orders.push(order);

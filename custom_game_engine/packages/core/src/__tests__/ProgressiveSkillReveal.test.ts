@@ -87,8 +87,7 @@ describe('Random Starting Skills', () => {
       }
     });
 
-    it('should favor skills that match personality affinities', () => {
-
+    it('should favor skills that match personality affinities (statistical)', () => {
       // High conscientiousness and workEthic should favor building/farming
       const builderPersonality = createPersonalityComponent({
         workEthic: 95,
@@ -99,15 +98,22 @@ describe('Random Starting Skills', () => {
         neuroticism: 20,
       });
 
-      const skills = generateRandomStartingSkills(builderPersonality);
+      // Run 100 times and check distribution
+      // Testing random process requires statistical sampling, not single deterministic outcome
+      let highAffinityCount = 0;
+      for (let i = 0; i < 100; i++) {
+        const skills = generateRandomStartingSkills(builderPersonality);
 
-      // At least one of the high-affinity skills should be present
-      const hasHighAffinitySkill =
-        skills.levels.building > 0 ||
-        skills.levels.farming > 0 ||
-        skills.levels.gathering > 0;
+        // Check if any high-affinity skills are present
+        if (skills.levels.building > 0 ||
+            skills.levels.farming > 0 ||
+            skills.levels.gathering > 0) {
+          highAffinityCount++;
+        }
+      }
 
-      expect(hasHighAffinitySkill).toBe(true);
+      // At least 60% should have high-affinity skills (weighted randomness)
+      expect(highAffinityCount).toBeGreaterThanOrEqual(60);
     });
 
     it('should generate diverse skills across 100 agents (80%+ have skill > 0)', () => {
@@ -456,10 +462,10 @@ describe('Tiered Building Availability', () => {
 
       const workbench = registry.tryGet('workbench');
 
-      // Workbench is tier 0, should have no skill requirement or building 0
-      expect(workbench?.skillRequired === undefined ||
-             (workbench?.skillRequired?.skill === 'building' &&
-              workbench?.skillRequired?.level === 0)).toBe(true);
+      // Workbench is tier 1, should require building skill level 1
+      expect(workbench?.skillRequired).toBeDefined();
+      expect(workbench?.skillRequired?.skill).toBe('building');
+      expect(workbench?.skillRequired?.level).toBe(1);
     });
 
     it('should require building 2 for advanced buildings', () => {

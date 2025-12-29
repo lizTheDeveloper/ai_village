@@ -18,7 +18,8 @@ export type GoalCategory =
   | 'creative'     // Innovation, expression (creativity, openness)
   | 'exploration'  // Discovery, adventure (openness)
   | 'security'     // Safety, resources, shelter (conscientiousness, neuroticism)
-  | 'legacy';      // Teaching, mentoring, leaving a mark (leadership, generosity)
+  | 'connection'   // Deep bonds with specific individuals
+  | 'recognition'; // Status, reputation, being valued
 
 /**
  * A milestone within a goal
@@ -86,7 +87,7 @@ export class GoalsComponent extends ComponentBase {
     }
 
     // Validate category
-    const validCategories: GoalCategory[] = ['mastery', 'social', 'creative', 'exploration', 'security', 'legacy'];
+    const validCategories: GoalCategory[] = ['mastery', 'social', 'creative', 'exploration', 'security', 'connection', 'recognition'];
     if (!validCategories.includes(goal.category)) {
       throw new Error(`Invalid goal category: ${goal.category}. Valid: ${validCategories.join(', ')}`);
     }
@@ -143,10 +144,11 @@ export class GoalsComponent extends ComponentBase {
       throw new Error(`Goal not found: ${id}`);
     }
 
-    goal.progress = progress;
+    // Clamp progress to 0-1 range
+    goal.progress = Math.max(0, Math.min(1, progress));
 
     // Mark as completed if progress reaches 1.0
-    if (progress >= 1.0 && !goal.completed) {
+    if (goal.progress >= 1.0 && !goal.completed) {
       goal.completed = true;
       goal.completedAt = Date.now();
     }
@@ -165,7 +167,13 @@ export class GoalsComponent extends ComponentBase {
       throw new Error(`Invalid milestone index: ${milestoneIndex}`);
     }
 
-    goal.milestones[milestoneIndex]!.progress = progress;
+    // Clamp progress to 0-1 range
+    goal.milestones[milestoneIndex]!.progress = Math.max(0, Math.min(1, progress));
+
+    // Auto-complete milestone if progress reaches 1.0
+    if (goal.milestones[milestoneIndex]!.progress >= 1.0) {
+      goal.milestones[milestoneIndex]!.completed = true;
+    }
   }
 
   /**

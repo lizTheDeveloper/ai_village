@@ -6,10 +6,10 @@ export interface PersonalityTraits {
   extraversion: number;
   agreeableness: number;
   neuroticism: number;
-  workEthic: number;
-  creativity: number;
-  generosity: number;
-  leadership: number;
+  workEthic?: number;
+  creativity?: number;
+  generosity?: number;
+  leadership?: number;
 }
 
 /**
@@ -35,10 +35,11 @@ export class PersonalityComponent extends ComponentBase {
     this.extraversion = traits.extraversion;
     this.agreeableness = traits.agreeableness;
     this.neuroticism = traits.neuroticism;
-    this.workEthic = traits.workEthic;
-    this.creativity = traits.creativity;
-    this.generosity = traits.generosity;
-    this.leadership = traits.leadership;
+    // Derive game-specific traits from Big Five if not provided
+    this.workEthic = traits.workEthic ?? traits.conscientiousness;
+    this.creativity = traits.creativity ?? traits.openness;
+    this.generosity = traits.generosity ?? traits.agreeableness;
+    this.leadership = traits.leadership ?? (traits.extraversion * 0.6 + traits.conscientiousness * 0.4);
   }
 }
 

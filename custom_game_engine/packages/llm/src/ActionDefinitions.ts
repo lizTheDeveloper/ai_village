@@ -54,7 +54,9 @@ export const ACTION_DEFINITIONS: ActionDefinition[] = [
 
   // Building - agent decides WHAT to build
   { behavior: 'build', description: 'Construct a building', alwaysAvailable: true, category: 'building', skillRequired: { skill: 'building', level: 1 } },
-  { behavior: 'plan_build', description: 'Plan and queue a building project', alwaysAvailable: true, category: 'building', skillRequired: { skill: 'building', level: 1 } },
+  // plan_build has NO skill requirement - it's the beginner-friendly way to build
+  // The system handles gathering resources automatically
+  { behavior: 'plan_build', description: 'Plan and queue a building project (auto-gathers resources)', alwaysAvailable: true, category: 'building' },
 
   // Farming - agent decides to work the land
   { behavior: 'till', description: 'Prepare soil for planting', alwaysAvailable: true, category: 'farming', skillRequired: { skill: 'farming', level: 1 } },
@@ -155,45 +157,3 @@ export const BEHAVIOR_SYNONYMS: Record<string, AgentBehavior> = {
   'focus': 'set_priorities',
 };
 
-/**
- * Get the description for a behavior, for use in prompts.
- */
-export function getActionDescription(behavior: string): string {
-  return BEHAVIOR_DESCRIPTIONS.get(behavior) ?? behavior;
-}
-
-/**
- * Get all actions for a category.
- */
-export function getActionsByCategory(category: ActionDefinition['category']): ActionDefinition[] {
-  return ACTION_DEFINITIONS.filter(def => def.category === category);
-}
-
-/**
- * Get all always-available actions.
- */
-export function getAlwaysAvailableActions(): ActionDefinition[] {
-  return ACTION_DEFINITIONS.filter(def => def.alwaysAvailable);
-}
-
-/**
- * Get actions available based on skill levels.
- * Filters out actions that require skills the agent doesn't have.
- * Per progressive-skill-reveal-spec.md:
- * - Universal actions (no skill required): always available
- * - Skill-gated actions: require minimum skill level
- */
-export function getActionsForSkills(
-  skills: Partial<Record<string, number>>
-): ActionDefinition[] {
-  return ACTION_DEFINITIONS.filter(def => {
-    // No skill required = always available
-    if (!def.skillRequired) {
-      return true;
-    }
-
-    // Check if agent has required skill level
-    const agentSkillLevel = skills[def.skillRequired.skill] ?? 0;
-    return agentSkillLevel >= def.skillRequired.level;
-  });
-}

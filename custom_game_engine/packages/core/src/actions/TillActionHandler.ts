@@ -6,6 +6,12 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 import type { InventoryComponent, InventorySlot } from '../components/InventoryComponent.js';
 import type { SkillsComponent } from '../components/SkillsComponent.js';
 import { getEfficiencyBonus } from '../components/SkillsComponent.js';
+import {
+  TILL_DURATION_WITH_HOE,
+  TILL_DURATION_WITH_SHOVEL,
+  TILL_DURATION_BY_HAND,
+  DIAGONAL_DISTANCE,
+} from '../constants/index.js';
 
 interface WorldWithTiles extends World {
   getTileAt(x: number, y: number): Tile | null;
@@ -54,19 +60,17 @@ export class TillActionHandler implements ActionHandler {
    * Duration = (baseTicks / toolEfficiency) * (1 - skillBonus)
    */
   getDuration(action: Action, world: World): number {
-    const baseTicks = 200; // 10 seconds at 20 TPS
-
     // Check if actor has tools in inventory
     const actor = world.getEntity(action.actorId);
     if (!actor) {
       // No actor found, use hands (slowest)
-      return baseTicks * 2; // 400 ticks = 20s
+      return TILL_DURATION_BY_HAND;
     }
 
     const inventoryComp = actor.components.get('inventory') as InventoryComponent | undefined;
     if (!inventoryComp || !inventoryComp.slots) {
       // No inventory, use hands
-      return baseTicks * 2; // 400 ticks = 20s
+      return TILL_DURATION_BY_HAND;
     }
 
     // Calculate tool-based duration
@@ -75,15 +79,15 @@ export class TillActionHandler implements ActionHandler {
     // Check for hoe (best tool, 100% efficiency)
     const hasHoe = inventoryComp.slots.some((slot: InventorySlot) => slot?.itemId === 'hoe' && slot?.quantity > 0);
     if (hasHoe) {
-      toolDuration = baseTicks; // 200 ticks = 10s
+      toolDuration = TILL_DURATION_WITH_HOE;
     } else {
       // Check for shovel (medium tool, 80% efficiency)
       const hasShovel = inventoryComp.slots.some((slot: InventorySlot) => slot?.itemId === 'shovel' && slot?.quantity > 0);
       if (hasShovel) {
-        toolDuration = Math.round(baseTicks / 0.8); // 250 ticks = 12.5s
+        toolDuration = TILL_DURATION_WITH_SHOVEL;
       } else {
         // Default to hands (50% efficiency)
-        toolDuration = baseTicks * 2; // 400 ticks = 20s
+        toolDuration = TILL_DURATION_BY_HAND;
       }
     }
 
@@ -145,12 +149,11 @@ export class TillActionHandler implements ActionHandler {
     const dx = targetPos.x - actorPos.x;
     const dy = targetPos.y - actorPos.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    const MAX_TILL_DISTANCE = Math.sqrt(2); // Allow diagonal tilling
 
-    if (distance > MAX_TILL_DISTANCE) {
+    if (distance > DIAGONAL_DISTANCE) {
       return {
         valid: false,
-        reason: `Target tile (${targetPos.x},${targetPos.y}) is too far from actor at (${actorPos.x},${actorPos.y}). Distance: ${distance.toFixed(2)}, max: ${MAX_TILL_DISTANCE.toFixed(2)}`,
+        reason: `Target tile (${targetPos.x},${targetPos.y}) is too far from actor at (${actorPos.x},${actorPos.y}). Distance: ${distance.toFixed(2)}, max: ${DIAGONAL_DISTANCE.toFixed(2)}`,
       };
     }
 

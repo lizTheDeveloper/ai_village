@@ -3,6 +3,13 @@ import type { SystemId, ComponentType } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
+import {
+  DAWN_START_HOUR,
+  DAY_START_HOUR,
+  DUSK_START_HOUR,
+  NIGHT_START_HOUR,
+  GAME_DAY_SECONDS,
+} from '../constants/index.js';
 
 export type DayPhase = 'dawn' | 'day' | 'dusk' | 'night';
 
@@ -19,7 +26,7 @@ export interface TimeComponent {
 
 export function createTimeComponent(
   timeOfDay: number = 6,        // Start at dawn
-  dayLength: number = 48,       // 48 seconds per game day at 1x speed (20 year generation in 96 hours)
+  dayLength: number = GAME_DAY_SECONDS,       // 48 seconds per game day at 1x speed (20 year generation in 96 hours)
   speedMultiplier: number = 1   // Default 1x speed
 ): TimeComponent {
   return {
@@ -38,9 +45,9 @@ export function createTimeComponent(
  * Calculate the current phase based on time of day
  */
 function calculatePhase(timeOfDay: number): DayPhase {
-  if (timeOfDay >= 5 && timeOfDay < 7) return 'dawn';
-  if (timeOfDay >= 7 && timeOfDay < 17) return 'day';
-  if (timeOfDay >= 17 && timeOfDay < 19) return 'dusk';
+  if (timeOfDay >= DAWN_START_HOUR && timeOfDay < DAY_START_HOUR) return 'dawn';
+  if (timeOfDay >= DAY_START_HOUR && timeOfDay < DUSK_START_HOUR) return 'day';
+  if (timeOfDay >= DUSK_START_HOUR && timeOfDay < NIGHT_START_HOUR) return 'dusk';
   return 'night'; // 19:00-5:00
 }
 
@@ -51,14 +58,14 @@ function calculateLightLevel(timeOfDay: number, phase: DayPhase): number {
   switch (phase) {
     case 'dawn': {
       // 5:00-7:00: 0.3 → 1.0
-      const progress = (timeOfDay - 5) / 2; // 0 to 1
+      const progress = (timeOfDay - DAWN_START_HOUR) / (DAY_START_HOUR - DAWN_START_HOUR); // 0 to 1
       return 0.3 + (0.7 * progress);
     }
     case 'day':
       return 1.0;
     case 'dusk': {
       // 17:00-19:00: 1.0 → 0.1
-      const progress = (timeOfDay - 17) / 2; // 0 to 1
+      const progress = (timeOfDay - DUSK_START_HOUR) / (NIGHT_START_HOUR - DUSK_START_HOUR); // 0 to 1
       return 1.0 - (0.9 * progress);
     }
     case 'night':

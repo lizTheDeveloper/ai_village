@@ -133,13 +133,13 @@ describe('AnimalBehavior Unit Tests', () => {
     });
 
     it('canStart returns true when animal is stressed', () => {
-      const entity = createAnimalEntity(createMockAnimal({ stress: 60 }));
+      const entity = createAnimalEntity(createMockAnimal({ stress: 75 }));
       const animal = entity.getComponent('animal') as AnimalComponent;
       expect(flee.canStart(entity, animal)).toBe(true);
     });
 
     it('canStart returns true for wild animal with low trust', () => {
-      const entity = createAnimalEntity(createMockAnimal({ wild: true, trustLevel: 20, stress: 30 }));
+      const entity = createAnimalEntity(createMockAnimal({ wild: true, trustLevel: 20, stress: 45 }));
       const animal = entity.getComponent('animal') as AnimalComponent;
       expect(flee.canStart(entity, animal)).toBe(true);
     });

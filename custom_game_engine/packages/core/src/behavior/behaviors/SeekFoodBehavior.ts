@@ -19,9 +19,10 @@ import { itemRegistry } from '../../items/index.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { eatFromStorage, eatFromPlant, type InteractionResult } from '../../services/InteractionAPI.js';
 import { isEdibleSpecies } from '../../services/TargetingAPI.js';
+import { HUNGER_THRESHOLD_SEEK_FOOD, HUNGER_RESTORED_DEFAULT } from '../../constants/index.js';
 
 /** Default hunger restored if item not in registry */
-const DEFAULT_HUNGER_RESTORED = 25;
+const DEFAULT_HUNGER_RESTORED = HUNGER_RESTORED_DEFAULT;
 
 /**
  * SeekFoodBehavior - Eat food from inventory or gather if none available
@@ -47,7 +48,7 @@ export class SeekFoodBehavior extends BaseBehavior {
       this.eatFood(entity, world, foodSlot.slotIndex, foodSlot.itemId, needs);
 
       // Check if still hungry
-      if (needs.hunger < 70) {
+      if (needs.hunger < HUNGER_THRESHOLD_SEEK_FOOD) {
         // Still hungry, continue seeking food
         return;
       } else {
@@ -65,7 +66,7 @@ export class SeekFoodBehavior extends BaseBehavior {
     if (plantResult?.success) {
       // Check if still hungry
       const updatedNeeds = entity.getComponent<NeedsComponent>('needs');
-      if (updatedNeeds && updatedNeeds.hunger >= 70) {
+      if (updatedNeeds && updatedNeeds.hunger >= HUNGER_THRESHOLD_SEEK_FOOD) {
         this.switchTo(entity, 'wander', {});
         return { complete: true, reason: 'Hunger satisfied from plant' };
       }
@@ -78,7 +79,7 @@ export class SeekFoodBehavior extends BaseBehavior {
     if (storageResult?.success) {
       // Check if still hungry
       const updatedNeeds = entity.getComponent<NeedsComponent>('needs');
-      if (updatedNeeds && updatedNeeds.hunger >= 70) {
+      if (updatedNeeds && updatedNeeds.hunger >= HUNGER_THRESHOLD_SEEK_FOOD) {
         this.switchTo(entity, 'wander', {});
         return { complete: true, reason: 'Hunger satisfied from storage' };
       }

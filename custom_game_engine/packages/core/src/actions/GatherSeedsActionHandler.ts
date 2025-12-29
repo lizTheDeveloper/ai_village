@@ -8,6 +8,10 @@ import { addToInventory, createSeedItemId } from '../components/InventoryCompone
 import { calculateSeedYield } from '../genetics/PlantGenetics.js';
 import { FARMING_CONFIG } from '../constants/GameBalance.js';
 import { EntityImpl } from '../ecs/Entity.js';
+import {
+  GATHER_SEEDS_DURATION,
+  BASE_SEED_YIELD_GATHER,
+} from '../constants/index.js';
 
 /**
  * Handler for the gather_seeds action.
@@ -40,7 +44,7 @@ export class GatherSeedsActionHandler implements ActionHandler {
    * Gathering seeds is faster than tilling.
    */
   getDuration(_action: Action, _world: World): number {
-    return 100; // 5 seconds at 20 TPS
+    return GATHER_SEEDS_DURATION; // 5 seconds at 20 TPS
   }
 
   /**
@@ -226,8 +230,7 @@ export class GatherSeedsActionHandler implements ActionHandler {
 
     // Calculate seed yield based on formula from spec
     // baseYield * (health/100) * stageMod * skillMod
-    const baseSeedsPerPlant = 10; // Default base yield for gathering (less than harvest)
-    const seedYield = calculateSeedYield(plant, baseSeedsPerPlant, farmingSkill);
+    const seedYield = calculateSeedYield(plant, BASE_SEED_YIELD_GATHER, farmingSkill);
 
     // Don't allow gathering more seeds than plant has
     const seedsToGather = Math.min(seedYield, plant.seedsProduced);

@@ -7,6 +7,19 @@
  * Per CLAUDE.md: No silent fallbacks - crashes on invalid state.
  */
 
+import type { World } from '@ai-village/core';
+import { EntityImpl } from '@ai-village/core';
+import type {
+  BuildingComponent,
+  NeedsComponent,
+  CensusBureauComponent,
+  HealthClinicComponent,
+  InventoryComponent,
+  RelationshipComponent,
+  PositionComponent,
+  AgentComponent,
+} from '@ai-village/core';
+
 interface PopulationWelfareData {
   healthy: number;
   struggling: number;
@@ -69,7 +82,7 @@ export class GovernanceDashboardPanel {
    * @param _canvasWidth Width of the canvas (unused - WindowManager handles positioning)
    * @param world World instance to query governance buildings
    */
-  render(ctx: CanvasRenderingContext2D, _canvasWidth: number, world: any): void {
+  render(ctx: CanvasRenderingContext2D, _canvasWidth: number, world: World): void {
     const x = 0;
     const y = 0;
     const headerHeight = 30;
@@ -156,15 +169,15 @@ export class GovernanceDashboardPanel {
       currentY += this.lineHeight + this.sectionSpacing;
     }
 
-    // Render Resource section (requires Granary)
-    const hasGranary = this.hasBuilding(world, 'granary');
-    if (hasGranary) {
+    // Render Resource section (requires Warehouse)
+    const hasWarehouse = this.hasBuilding(world, 'warehouse');
+    if (hasWarehouse) {
       currentY = this.renderResourceSection(ctx, x, currentY, world);
       currentY += this.sectionSpacing;
     } else {
       ctx.fillStyle = '#888888';
       ctx.font = '12px monospace';
-      ctx.fillText('🔒 Granary needed for resource tracking', x + this.padding, currentY);
+      ctx.fillText('🔒 Warehouse needed for resource tracking', x + this.padding, currentY);
       currentY += this.lineHeight;
       ctx.fillStyle = '#666666';
       ctx.font = '10px monospace';
@@ -232,7 +245,7 @@ export class GovernanceDashboardPanel {
   /**
    * Render population section from Town Hall data.
    */
-  private renderPopulationSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: any): number {
+  private renderPopulationSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: World): number {
     const data = this.getPopulationWelfareData(world);
 
     // Section title
@@ -277,7 +290,7 @@ export class GovernanceDashboardPanel {
   /**
    * Render demographics section from Census Bureau data.
    */
-  private renderDemographicsSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: any): number {
+  private renderDemographicsSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: World): number {
     const data = this.getDemographicsData(world);
 
     if (!data) {
@@ -341,7 +354,7 @@ export class GovernanceDashboardPanel {
   /**
    * Render health section from Health Clinic data.
    */
-  private renderHealthSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: any): number {
+  private renderHealthSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: World): number {
     const data = this.getHealthData(world);
 
     if (!data) {
@@ -390,7 +403,7 @@ export class GovernanceDashboardPanel {
   /**
    * Render resource sustainability section from Granary data.
    */
-  private renderResourceSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: any): number {
+  private renderResourceSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: World): number {
     const data = this.getResourceData(world);
 
     if (!data) {
@@ -439,7 +452,7 @@ export class GovernanceDashboardPanel {
   /**
    * Render social stability section from Meeting Hall data.
    */
-  private renderSocialSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: any): number {
+  private renderSocialSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: World): number {
     const data = this.getSocialData(world);
 
     if (!data) {
@@ -483,7 +496,7 @@ export class GovernanceDashboardPanel {
   /**
    * Render threat monitoring section from Watchtower + Weather Station data.
    */
-  private renderThreatSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: any): number {
+  private renderThreatSection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: World): number {
     const data = this.getThreatData(world);
 
     if (!data) {
@@ -529,7 +542,7 @@ export class GovernanceDashboardPanel {
   /**
    * Render productivity section from Labor Guild data.
    */
-  private renderProductivitySection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: any): number {
+  private renderProductivitySection(ctx: CanvasRenderingContext2D, x: number, currentY: number, world: World): number {
     const data = this.getProductivityData(world);
 
     if (!data) {
@@ -572,7 +585,7 @@ export class GovernanceDashboardPanel {
   /**
    * Check if a specific building type exists and is complete.
    */
-  private hasBuilding(world: any, componentType: string): boolean {
+  private hasBuilding(world: World, componentType: string): boolean {
     if (!world || typeof world.query !== 'function') {
       return false;
     }
@@ -582,7 +595,7 @@ export class GovernanceDashboardPanel {
       .executeEntities();
 
     for (const building of buildings) {
-      const buildingComp = building.getComponent('building');
+      const buildingComp = (building as EntityImpl).getComponent<BuildingComponent>('building');
       if (buildingComp?.isComplete) {
         return true;
       }
@@ -594,7 +607,7 @@ export class GovernanceDashboardPanel {
   /**
    * Get population welfare data from Town Hall.
    */
-  private getPopulationWelfareData(world: any): PopulationWelfareData {
+  private getPopulationWelfareData(world: World): PopulationWelfareData {
     if (!world || typeof world.query !== 'function') {
       return { healthy: 0, struggling: 0, critical: 0, totalPopulation: 0 };
     }
@@ -609,7 +622,7 @@ export class GovernanceDashboardPanel {
     let critical = 0;
 
     for (const agent of agents) {
-      const needs = agent.getComponent('needs');
+      const needs = (agent as EntityImpl).getComponent<NeedsComponent>('needs');
       if (!needs) {
         continue;
       }
@@ -637,7 +650,7 @@ export class GovernanceDashboardPanel {
   /**
    * Get demographics data from Census Bureau.
    */
-  private getDemographicsData(world: any): DemographicsData | null {
+  private getDemographicsData(world: World): DemographicsData | null {
     if (!world || typeof world.query !== 'function') {
       return null;
     }
@@ -647,8 +660,8 @@ export class GovernanceDashboardPanel {
       .executeEntities();
 
     for (const bureau of bureaus) {
-      const buildingComp = bureau.getComponent('building');
-      const censusBureau = bureau.getComponent('census_bureau');
+      const buildingComp = (bureau as EntityImpl).getComponent<BuildingComponent>('building');
+      const censusBureau = (bureau as EntityImpl).getComponent<CensusBureauComponent>('census_bureau');
 
       if (!buildingComp?.isComplete || !censusBureau) {
         continue;
@@ -671,7 +684,7 @@ export class GovernanceDashboardPanel {
   /**
    * Get health data from Health Clinic.
    */
-  private getHealthData(world: any): HealthData | null {
+  private getHealthData(world: World): HealthData | null {
     if (!world || typeof world.query !== 'function') {
       return null;
     }
@@ -681,8 +694,8 @@ export class GovernanceDashboardPanel {
       .executeEntities();
 
     for (const clinic of clinics) {
-      const buildingComp = clinic.getComponent('building');
-      const healthClinic = clinic.getComponent('health_clinic');
+      const buildingComp = (clinic as EntityImpl).getComponent<BuildingComponent>('building');
+      const healthClinic = (clinic as EntityImpl).getComponent<HealthClinicComponent>('health_clinic');
 
       if (!buildingComp?.isComplete || !healthClinic) {
         continue;
@@ -702,7 +715,7 @@ export class GovernanceDashboardPanel {
   /**
    * Get resource data from Granary + actual stockpiles.
    */
-  private getResourceData(world: any): ResourceData | null {
+  private getResourceData(world: World): ResourceData | null {
     if (!world || typeof world.query !== 'function') {
       return null;
     }
@@ -715,8 +728,8 @@ export class GovernanceDashboardPanel {
     const stockpiles: Record<string, number> = {};
 
     for (const storage of storageBuildings) {
-      const building = storage.getComponent('building');
-      const inventory = storage.getComponent('inventory');
+      const building = (storage as EntityImpl).getComponent<BuildingComponent>('building');
+      const inventory = (storage as EntityImpl).getComponent<InventoryComponent>('inventory');
 
       if (!building?.isComplete || !inventory) {
         continue;
@@ -764,7 +777,7 @@ export class GovernanceDashboardPanel {
   /**
    * Get social stability data from Meeting Hall + relationships.
    */
-  private getSocialData(world: any): SocialData | null {
+  private getSocialData(world: World): SocialData | null {
     if (!world || typeof world.query !== 'function') {
       return null;
     }
@@ -781,8 +794,8 @@ export class GovernanceDashboardPanel {
     let agentsWithNeeds = 0;
 
     for (const agent of agents) {
-      const relationships = agent.getComponent('relationships');
-      const needs = agent.getComponent('needs');
+      const relationships = (agent as EntityImpl).getComponent<RelationshipComponent>('relationships');
+      const needs = (agent as EntityImpl).getComponent<NeedsComponent>('needs');
 
       // Count relationships
       if (relationships && relationships.relationships) {
@@ -820,17 +833,15 @@ export class GovernanceDashboardPanel {
   /**
    * Get threat monitoring data from Watchtower + Weather Station.
    */
-  private getThreatData(world: any): ThreatData | null {
+  private getThreatData(world: World): ThreatData | null {
     if (!world || typeof world.query !== 'function') {
       return null;
     }
 
     // Get current temperature from weather system
     let temperature = 70; // Default
-    const timeSystem = world.getSystem('time');
-    if (timeSystem && typeof timeSystem.getCurrentTemperature === 'function') {
-      temperature = timeSystem.getCurrentTemperature();
-    }
+    // Note: getSystem is not available on World type interface, so we cannot query it
+    // This feature would require passing TimeSystem separately or extending World interface
 
     // Count agents at risk from temperature
     const agents = world.query().with('agent', 'needs').executeEntities();
@@ -838,7 +849,7 @@ export class GovernanceDashboardPanel {
     let activeThreats = 0;
 
     for (const agent of agents) {
-      const needs = agent.getComponent('needs');
+      const needs = (agent as EntityImpl).getComponent<NeedsComponent>('needs');
       if (!needs) continue;
 
       // Check if agent is critically low on any need
@@ -852,7 +863,7 @@ export class GovernanceDashboardPanel {
       activeThreats++;
       // Count agents outside
       for (const agent of agents) {
-        const position = agent.getComponent('position');
+        const position = (agent as EntityImpl).getComponent<PositionComponent>('position');
         if (position) {
           // Simplified: assume agents outside are at risk
           agentsAtRisk++;
@@ -870,7 +881,7 @@ export class GovernanceDashboardPanel {
   /**
    * Get productivity data from Labor Guild + agent states.
    */
-  private getProductivityData(world: any): ProductivityData | null {
+  private getProductivityData(world: World): ProductivityData | null {
     if (!world || typeof world.query !== 'function') {
       return null;
     }
@@ -884,11 +895,11 @@ export class GovernanceDashboardPanel {
     let activeAgents = 0;
 
     for (const agent of agents) {
-      const agentComp = agent.getComponent('agent');
+      const agentComp = (agent as EntityImpl).getComponent<AgentComponent>('agent');
       if (!agentComp) continue;
 
       // Consider agent active if they have a current behavior that isn't idle/wander
-      if (agentComp.currentBehavior && !['idle', 'wander'].includes(agentComp.currentBehavior)) {
+      if (agentComp.behavior && !['idle', 'wander'].includes(agentComp.behavior)) {
         activeAgents++;
       }
     }

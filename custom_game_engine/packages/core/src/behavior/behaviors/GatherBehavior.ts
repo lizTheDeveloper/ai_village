@@ -25,22 +25,27 @@ import type { BuildingType } from '../../components/BuildingComponent.js';
 import type { ResourceCost } from '../../buildings/BuildingBlueprintRegistry.js';
 import type { GatheringStatsComponent } from '../../components/GatheringStatsComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
-import { addToInventory, addToInventoryWithQuality } from '../../components/InventoryComponent.js';
+import { addToInventoryWithQuality } from '../../components/InventoryComponent.js';
 import { addMemory } from '../../components/MemoryComponent.js';
 import { recordGathered } from '../../components/GatheringStatsComponent.js';
 import { WanderBehavior } from './WanderBehavior.js';
 import { createSeedItemId, calculateGatheringQuality } from '../../items/index.js';
 import type { SkillsComponent } from '../../components/SkillsComponent.js';
 import { addSkillXP } from '../../components/SkillsComponent.js';
+import {
+  GATHER_MAX_RANGE,
+  HOME_RADIUS,
+  HARVEST_DISTANCE,
+  ENERGY_MODERATE,
+  ENERGY_LOW,
+  ENERGY_HIGH,
+  ENERGY_CRITICAL,
+  WORK_SPEED_LOW,
+  WORK_SPEED_CRITICAL,
+  GATHER_RESOURCE_BASE_TICKS,
+  GATHER_SPEED_PER_SKILL_LEVEL,
+} from '../../constants/index.js';
 
-/** Maximum distance agent will travel to gather resources */
-const MAX_GATHER_RANGE = 50;
-
-/** Prefer resources within this radius of home (0, 0) */
-const HOME_RADIUS = 15;
-
-/** Distance at which agent can harvest resources */
-const HARVEST_DISTANCE = 1.5;
 
 /**
  * Get the current game day from the world's time entity.
@@ -53,6 +58,45 @@ function getCurrentDay(world: World): number {
     return timeComp?.day ?? 0;
   }
   return 0;
+}
+
+/**
+ * State stored in agent.behaviorState for gathering progress
+ */
+interface GatherBehaviorState {
+  /** Preferred resource type to gather */
+  resourceType?: string;
+  /** Target amount needed (for build tasks) */
+  targetAmount?: number;
+  /** Building to return to after gathering */
+  returnToBuild?: string;
+  /** Entity ID of resource being gathered */
+  gatherTargetId?: string;
+  /** Tick when gathering started */
+  gatherStartTick?: number;
+  /** Required ticks to complete gathering */
+  gatherDurationTicks?: number;
+  /** Index signature for compatibility with Record<string, unknown> */
+  [key: string]: unknown;
+}
+
+/**
+ * Calculate gathering duration in ticks based on skill and difficulty.
+ *
+ * Formula:
+ *   duration = baseTicks * difficulty / gatherSpeed
+ *   gatherSpeed = 1.0 + (skillLevel * 0.2)
+ *
+ * Examples:
+ *   - Skill 0, difficulty 1.0: 20 / 1.0 = 20 ticks (1 second)
+ *   - Skill 5, difficulty 1.0: 20 / 2.0 = 10 ticks (0.5 seconds)
+ *   - Skill 0, difficulty 10.0: 200 / 1.0 = 200 ticks (10 seconds)
+ *   - Skill 5, difficulty 10.0: 200 / 2.0 = 100 ticks (5 seconds)
+ */
+function calculateGatherDuration(gatheringSkillLevel: number, gatherDifficulty: number): number {
+  const gatherSpeed = 1.0 + (gatheringSkillLevel * GATHER_SPEED_PER_SKILL_LEVEL);
+  const baseDuration = GATHER_RESOURCE_BASE_TICKS * gatherDifficulty;
+  return Math.ceil(baseDuration / gatherSpeed);
 }
 
 /**
@@ -107,10 +151,223 @@ export class GatherBehavior extends BaseBehavior {
       }
 
       if (target.type === 'resource') {
-        this.harvestResource(entity, target.entity, world, inventory, agent, workSpeedMultiplier);
+        this.handleResourceGathering(entity, target.entity, world, inventory, agent);
       } else {
         this.gatherSeeds(entity, target.entity, world, inventory, targetPos, workSpeedMultiplier);
       }
+    }
+  }
+
+  /**
+   * Handle resource gathering with skill-based timing.
+   * Gathers exactly 1 resource per completion.
+   */
+  private handleResourceGathering(
+    entity: EntityImpl,
+    resourceEntity: Entity,
+    world: World,
+    inventory: InventoryComponent,
+    agent: AgentComponent
+  ): void {
+    const state = agent.behaviorState as GatherBehaviorState;
+    const resourceImpl = resourceEntity as EntityImpl;
+    const resourceComp = resourceImpl.getComponent<ResourceComponent>('resource')!;
+
+    // Check if resource still has at least 1 unit
+    if (resourceComp.amount < 1) {
+      // Resource depleted, clear gather state and find new target
+      this.clearGatherState(entity);
+      return;
+    }
+
+    // Get gathering skill level
+    const skillsComp = entity.getComponent<SkillsComponent>('skills');
+    const gatheringLevel = skillsComp?.levels.gathering ?? 0;
+
+    // Check if we're already gathering this resource
+    if (state.gatherTargetId === resourceEntity.id && state.gatherStartTick !== undefined) {
+      // Continue gathering - check if enough time has passed
+      const elapsedTicks = world.tick - state.gatherStartTick;
+      const requiredTicks = state.gatherDurationTicks ?? GATHER_RESOURCE_BASE_TICKS;
+
+      if (elapsedTicks >= requiredTicks) {
+        // Gathering complete! Harvest exactly 1 resource
+        this.completeResourceHarvest(entity, resourceEntity, world, inventory, agent, gatheringLevel);
+        // Clear gather state to allow gathering again
+        this.clearGatherState(entity);
+      }
+      // Still gathering - wait for next tick
+    } else {
+      // Start gathering this resource
+      const gatherDifficulty = resourceComp.gatherDifficulty ?? 1.0;
+      const durationTicks = calculateGatherDuration(gatheringLevel, gatherDifficulty);
+
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        behaviorState: {
+          ...current.behaviorState,
+          gatherTargetId: resourceEntity.id,
+          gatherStartTick: world.tick,
+          gatherDurationTicks: durationTicks,
+        },
+      }));
+    }
+  }
+
+  /**
+   * Clear the gather progress state.
+   */
+  private clearGatherState(entity: EntityImpl): void {
+    entity.updateComponent<AgentComponent>('agent', (current) => {
+      const state = { ...current.behaviorState } as GatherBehaviorState;
+      delete state.gatherTargetId;
+      delete state.gatherStartTick;
+      delete state.gatherDurationTicks;
+      return {
+        ...current,
+        behaviorState: state,
+      };
+    });
+  }
+
+  /**
+   * Complete harvesting exactly 1 resource after gathering timer completes.
+   */
+  private completeResourceHarvest(
+    entity: EntityImpl,
+    resourceEntity: Entity,
+    world: World,
+    inventory: InventoryComponent,
+    agent: AgentComponent,
+    gatheringLevel: number
+  ): void {
+    const resourceImpl = resourceEntity as EntityImpl;
+    const resourceComp = resourceImpl.getComponent<ResourceComponent>('resource')!;
+    const resourcePos = resourceImpl.getComponent<PositionComponent>('position');
+    const memory = entity.getComponent<MemoryComponent>('memory');
+
+    // Double-check resource still has at least 1 unit
+    if (resourceComp.amount < 1) {
+      return;
+    }
+
+    // Always harvest exactly 1 unit
+    const harvestAmount = 1;
+
+    // Update resource
+    resourceImpl.updateComponent<ResourceComponent>('resource', (current) => ({
+      ...current,
+      amount: Math.max(0, current.amount - harvestAmount),
+    }));
+
+    // Calculate quality based on gathering skill (Phase 10)
+    const gatherQuality = calculateGatheringQuality(gatheringLevel, resourceComp.resourceType);
+
+    // Add to inventory WITH QUALITY
+    try {
+      const result = addToInventoryWithQuality(inventory, resourceComp.resourceType, harvestAmount, gatherQuality);
+      entity.updateComponent<InventoryComponent>('inventory', () => result.inventory);
+
+      // Record gathering stats
+      const gatheringStats = entity.getComponent<GatheringStatsComponent>('gathering_stats');
+      if (gatheringStats) {
+        const currentDay = getCurrentDay(world);
+        recordGathered(gatheringStats, resourceComp.resourceType, result.amountAdded, currentDay);
+        entity.updateComponent<GatheringStatsComponent>('gathering_stats', () => gatheringStats);
+      }
+
+      // Award gathering XP (5 base XP per resource gathered)
+      const skillsComp = entity.getComponent<SkillsComponent>('skills');
+      if (skillsComp) {
+        const baseXP = 5 * result.amountAdded;
+        const oldLevel = skillsComp.levels.gathering;
+        const xpResult = addSkillXP(skillsComp, 'gathering', baseXP);
+        entity.updateComponent<SkillsComponent>('skills', () => xpResult.component);
+
+        // Emit skill XP event for metrics tracking
+        world.eventBus.emit({
+          type: 'skill:xp_gain',
+          source: entity.id,
+          data: {
+            agentId: entity.id,
+            skillId: 'gathering',
+            amount: baseXP,
+            source: 'gathering',
+          },
+        });
+
+        // Emit level up event if applicable
+        if (xpResult.leveledUp) {
+          world.eventBus.emit({
+            type: 'skill:level_up',
+            source: entity.id,
+            data: {
+              agentId: entity.id,
+              skillId: 'gathering',
+              oldLevel,
+              newLevel: xpResult.newLevel,
+            },
+          });
+        }
+      }
+
+      // Emit resource gathered event
+      world.eventBus.emit({
+        type: 'resource:gathered',
+        source: entity.id,
+        data: {
+          agentId: entity.id,
+          resourceType: resourceComp.resourceType,
+          amount: result.amountAdded,
+          position: resourcePos ? { x: resourcePos.x, y: resourcePos.y } : { x: 0, y: 0 },
+          sourceEntityId: resourceEntity.id,
+        },
+      });
+
+      // Check if inventory is now full
+      if (result.inventory.currentWeight >= result.inventory.maxWeight) {
+        this.handleInventoryFull(entity, world, agent);
+        return;
+      }
+
+      // Check if we're gathering for a building
+      if (agent.behaviorState?.returnToBuild) {
+        this.checkBuildProgress(entity, world, result.inventory, agent);
+        return;
+      }
+
+      // Reinforce memory of this resource location
+      if (memory && resourcePos) {
+        const updatedMemory = addMemory(
+          memory,
+          {
+            type: 'resource_location',
+            x: resourcePos.x,
+            y: resourcePos.y,
+            entityId: resourceEntity.id,
+            metadata: { resourceType: resourceComp.resourceType },
+          },
+          world.tick,
+          100
+        );
+        entity.updateComponent<MemoryComponent>('memory', () => updatedMemory);
+      }
+
+      // Check if resource depleted
+      if (resourceComp.amount - harvestAmount <= 0) {
+        world.eventBus.emit({
+          type: 'resource:depleted',
+          source: resourceEntity.id,
+          data: {
+            resourceId: resourceEntity.id,
+            resourceType: resourceComp.resourceType,
+            agentId: entity.id,
+          },
+        });
+      }
+    } catch (error) {
+      // Inventory full or weight limit exceeded
+      this.handleInventoryFull(entity, world, agent);
     }
   }
 
@@ -181,7 +438,7 @@ export class GatherBehavior extends BaseBehavior {
       const distanceToAgent = this.distance(position, resourcePos);
 
       // Only consider resources within max gather range
-      if (distanceToAgent > MAX_GATHER_RANGE) continue;
+      if (distanceToAgent > GATHER_MAX_RANGE) continue;
 
       // Distance from resource to home (0, 0)
       const distanceToHome = Math.sqrt(resourcePos.x * resourcePos.x + resourcePos.y * resourcePos.y);
@@ -260,169 +517,17 @@ export class GatherBehavior extends BaseBehavior {
     // 30-10: -50% work speed
     // 10-0: Cannot work
 
-    if (energy < 10) {
+    if (energy < ENERGY_CRITICAL) {
       return 0; // Cannot work
-    } else if (energy < 30) {
-      return 0.5; // -50% work speed
-    } else if (energy < 50) {
-      return 0.75; // -25% work speed
-    } else if (energy < 70) {
+    } else if (energy < ENERGY_LOW) {
+      return WORK_SPEED_CRITICAL; // -50% work speed
+    } else if (energy < ENERGY_MODERATE) {
+      return WORK_SPEED_LOW; // -25% work speed
+    } else if (energy < ENERGY_HIGH) {
       return 0.9; // -10% work speed
     }
 
     return 1.0; // Full speed
-  }
-
-  private harvestResource(
-    entity: EntityImpl,
-    resourceEntity: Entity,
-    world: World,
-    inventory: InventoryComponent,
-    agent: AgentComponent,
-    workSpeedMultiplier: number
-  ): void {
-    const resourceImpl = resourceEntity as EntityImpl;
-    const resourceComp = resourceImpl.getComponent<ResourceComponent>('resource')!;
-    const resourcePos = resourceImpl.getComponent<PositionComponent>('position');
-    const memory = entity.getComponent<MemoryComponent>('memory');
-
-    const baseHarvestAmount = 1;
-    // REQUIREMENT: Can't gather less than 1 whole fruit/resource
-    // First check if resource has at least 1 whole unit available
-    if (resourceComp.amount < 1) {
-      // Resource doesn't have a whole unit to gather yet
-      return;
-    }
-
-    // Calculate harvest amount - use floor of resource amount to ensure whole units
-    const harvestAmount = Math.min(
-      Math.floor(baseHarvestAmount * workSpeedMultiplier),
-      Math.floor(resourceComp.amount) // Only gather whole units
-    );
-
-    // If work speed penalty reduces harvest to 0, or less than 1 whole unit, can't gather
-    if (harvestAmount < 1) {
-      this.stopAllMovement(entity);
-      return;
-    }
-
-    // Update resource
-    resourceImpl.updateComponent<ResourceComponent>('resource', (current) => ({
-      ...current,
-      amount: Math.max(0, current.amount - harvestAmount),
-    }));
-
-    // Calculate quality based on gathering skill (Phase 10)
-    const skillsComp = entity.getComponent<SkillsComponent>('skills');
-    const gatheringLevel = skillsComp?.levels.gathering ?? 0;
-    const gatherQuality = calculateGatheringQuality(gatheringLevel, resourceComp.resourceType);
-
-    // Add to inventory WITH QUALITY
-    try {
-      const result = addToInventoryWithQuality(inventory, resourceComp.resourceType, harvestAmount, gatherQuality);
-      entity.updateComponent<InventoryComponent>('inventory', () => result.inventory);
-
-      // Record gathering stats
-      const gatheringStats = entity.getComponent<GatheringStatsComponent>('gathering_stats');
-      if (gatheringStats) {
-        const currentDay = getCurrentDay(world);
-        recordGathered(gatheringStats, resourceComp.resourceType, result.amountAdded, currentDay);
-        entity.updateComponent<GatheringStatsComponent>('gathering_stats', () => gatheringStats);
-      }
-
-      // Award gathering XP (5 base XP per resource gathered)
-      if (skillsComp) {
-        const baseXP = 5 * result.amountAdded;
-        const oldLevel = skillsComp.levels.gathering;
-        const xpResult = addSkillXP(skillsComp, 'gathering', baseXP);
-        entity.updateComponent<SkillsComponent>('skills', () => xpResult.component);
-
-        // Emit skill XP event for metrics tracking
-        world.eventBus.emit({
-          type: 'skill:xp_gain',
-          source: entity.id,
-          data: {
-            agentId: entity.id,
-            skillId: 'gathering',
-            amount: baseXP,
-            source: 'gathering',
-          },
-        });
-
-        // Emit level up event if applicable
-        if (xpResult.leveledUp) {
-          world.eventBus.emit({
-            type: 'skill:level_up',
-            source: entity.id,
-            data: {
-              agentId: entity.id,
-              skillId: 'gathering',
-              oldLevel,
-              newLevel: xpResult.newLevel,
-            },
-          });
-        }
-      }
-
-      // Emit resource gathered event BEFORE any early returns
-      // This ensures metrics are tracked even when inventory fills or building in progress
-      world.eventBus.emit({
-        type: 'resource:gathered',
-        source: entity.id,
-        data: {
-          agentId: entity.id,
-          resourceType: resourceComp.resourceType,
-          amount: result.amountAdded,
-          position: resourcePos ? { x: resourcePos.x, y: resourcePos.y } : { x: 0, y: 0 },
-          sourceEntityId: resourceEntity.id,
-        },
-      });
-
-      // Check if inventory is now full
-      if (result.inventory.currentWeight >= result.inventory.maxWeight) {
-        this.handleInventoryFull(entity, world, agent);
-        return;
-      }
-
-      // Check if we're gathering for a building
-      if (agent.behaviorState?.returnToBuild) {
-        this.checkBuildProgress(entity, world, result.inventory, agent);
-        return;
-      }
-
-      // Reinforce memory of this resource location
-      if (memory && resourcePos) {
-        const updatedMemory = addMemory(
-          memory,
-          {
-            type: 'resource_location',
-            x: resourcePos.x,
-            y: resourcePos.y,
-            entityId: resourceEntity.id,
-            metadata: { resourceType: resourceComp.resourceType },
-          },
-          world.tick,
-          100
-        );
-        entity.updateComponent<MemoryComponent>('memory', () => updatedMemory);
-      }
-
-      // Check if resource depleted
-      if (resourceComp.amount - harvestAmount <= 0) {
-        world.eventBus.emit({
-          type: 'resource:depleted',
-          source: resourceEntity.id,
-          data: {
-            resourceId: resourceEntity.id,
-            resourceType: resourceComp.resourceType,
-            agentId: entity.id,
-          },
-        });
-      }
-    } catch (error) {
-      // Inventory full or weight limit exceeded
-      this.handleInventoryFull(entity, world, agent);
-    }
   }
 
   private gatherSeeds(
@@ -445,7 +550,7 @@ export class GatherBehavior extends BaseBehavior {
     const baseSeedCount = 5;
     const healthMod = plantComp.health / 100;
     const stageMod = plantComp.stage === 'seeding' ? 1.5 : 1.0;
-    const farmingSkill = 50; // Default skill (TODO: get from agent skills when implemented)
+    const farmingSkill = ENERGY_MODERATE; // Default skill (TODO: get from agent skills when implemented)
     const skillMod = 0.5 + (farmingSkill / 100);
 
     const seedYield = Math.floor(baseSeedCount * healthMod * stageMod * skillMod * workSpeedMultiplier);
@@ -466,8 +571,17 @@ export class GatherBehavior extends BaseBehavior {
     // Create seed item ID for inventory using SeedItemFactory
     const seedItemId = createSeedItemId(plantComp.speciesId);
 
+    // Calculate seed quality based on farming skill and plant health
+    const skillsComp = entity.getComponent<SkillsComponent>('skills');
+    const farmingLevel = skillsComp?.levels.farming ?? 0;
+    // Seeds get quality based on plant health and farming skill
+    // Formula: base 50 + (skill * 8) + (health / 10) - gives range ~50-100
+    const seedQuality = Math.min(100, Math.max(0,
+      ENERGY_MODERATE + (farmingLevel * 8) + (plantComp.health / 10) + (Math.random() - 0.5) * 10
+    ));
+
     try {
-      const result = addToInventory(inventory, seedItemId, seedsToGather);
+      const result = addToInventoryWithQuality(inventory, seedItemId, seedsToGather, Math.round(seedQuality));
       entity.updateComponent<InventoryComponent>('inventory', () => result.inventory);
 
       // Record gathering stats for seeds

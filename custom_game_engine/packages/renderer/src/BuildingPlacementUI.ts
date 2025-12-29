@@ -526,6 +526,7 @@ export class BuildingPlacementUI {
       'farming',
       'research',
       'decoration',
+      'governance',
     ];
 
     // Check category tab clicks
@@ -664,6 +665,7 @@ export class BuildingPlacementUI {
       'farming',
       'research',
       'decoration',
+      'governance',
     ];
 
     const tabY = this.menuPadding + 38; // After title + subtitle
@@ -697,6 +699,7 @@ export class BuildingPlacementUI {
         farming: 'Frm',
         research: 'Rch',
         decoration: 'Dec',
+        governance: 'Gov',
       };
       const label = labelMap[cat];
       const metrics = ctx.measureText(label);
@@ -1013,6 +1016,24 @@ export class BuildingPlacementUI {
             break;
           case 'automation':
             funcText = `  Automation (${func.tasks.length} tasks)`;
+            break;
+          case 'governance':
+            funcText = `  Governance (${func.governanceType})`;
+            break;
+          case 'healing':
+            funcText = `  Healing (+${func.healingRate} HP/s)`;
+            break;
+          case 'social_hub':
+            funcText = `  Social Hub (radius ${func.radius})`;
+            break;
+          case 'vision_extension':
+            funcText = `  Vision +${func.radiusBonus} tiles`;
+            break;
+          case 'job_board':
+            funcText = `  Job Board`;
+            break;
+          case 'knowledge_repository':
+            funcText = `  Knowledge Repository`;
             break;
         }
         ctx.fillStyle = '#66ccff';

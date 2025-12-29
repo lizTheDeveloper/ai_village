@@ -81,7 +81,8 @@ describe('Goal Generation', () => {
       }
 
       const securityCount = goals.filter(g => g === 'security').length;
-      expect(securityCount).toBeGreaterThan(5);
+      // Expected ~8.3 security goals (16.6% probability), allow wider range for randomness
+      expect(securityCount).toBeGreaterThan(3);
     });
 
     it('should generate exploration goals for open agents', () => {

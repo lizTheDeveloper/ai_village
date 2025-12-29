@@ -1,18 +1,21 @@
 import type { World, ShopComponent, EntityId, InventoryComponent, CurrencyComponent } from '@ai-village/core';
 import { EntityImpl } from '@ai-village/core';
-import { itemRegistry, calculateBuyPrice, calculateSellPrice } from '@ai-village/core';
+import { itemRegistry, calculateBuyPrice, calculateSellPrice, getQualityTier, getQualityColor, getQualityDisplayName, getQualityPriceMultiplier } from '@ai-village/core';
 
 interface ShopItem {
   itemId: string;
   quantity: number;
   price: number;
   affordable: boolean;
+  quality?: number;
 }
 
 interface SellableItem {
   itemId: string;
   quantity: number;
   price: number;
+  quality?: number;
+  slotIndex: number;
 }
 
 /**
@@ -30,8 +33,8 @@ export class ShopPanel {
   private canvasHeight = 0;
 
   // Click regions for buy/sell buttons
-  private buyButtons: Array<{ itemId: string; x: number; y: number; width: number; height: number }> = [];
-  private sellButtons: Array<{ itemId: string; x: number; y: number; width: number; height: number }> = [];
+  private buyButtons: Array<{ itemId: string; quality?: number; x: number; y: number; width: number; height: number }> = [];
+  private sellButtons: Array<{ itemId: string; quality?: number; slotIndex: number; x: number; y: number; width: number; height: number }> = [];
 
   openShop(shopId: EntityId, agentId: EntityId): void {
     if (!shopId) {
@@ -184,7 +187,9 @@ export class ShopPanel {
       const itemDef = itemRegistry.get(stock.itemId);
       if (!itemDef) continue;
 
-      const price = calculateBuyPrice({ definition: itemDef }, shop, marketState);
+      // Shop stock doesn't track quality per-item, use default quality
+      const quality = 50; // Default quality for shop stock
+      const price = calculateBuyPrice({ definition: itemDef, quality }, shop, marketState);
       const affordable = agentCurrency.balance >= price;
 
       shopItems.push({
@@ -192,6 +197,7 @@ export class ShopPanel {
         quantity: stock.quantity,
         price,
         affordable,
+        quality,
       });
     }
 
@@ -203,11 +209,27 @@ export class ShopPanel {
       ctx.font = '14px sans-serif';
       ctx.fillStyle = item.affordable ? '#fff' : '#888';
       ctx.textAlign = 'left';
-      ctx.fillText(
-        `${itemDef.displayName} x${item.quantity} - ${item.price} currency`,
-        panelX + 20,
-        yOffset
-      );
+
+      // Build display string with quality
+      let displayText = `${itemDef.displayName} x${item.quantity}`;
+      if (item.quality !== undefined) {
+        const tier = getQualityTier(item.quality);
+        const tierName = getQualityDisplayName(tier);
+        displayText += ` [${tierName}]`;
+      }
+      displayText += ` - ${item.price} currency`;
+
+      ctx.fillText(displayText, panelX + 20, yOffset);
+
+      // Draw quality color indicator
+      if (item.quality !== undefined) {
+        const tier = getQualityTier(item.quality);
+        const color = getQualityColor(tier);
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(panelX + 12, yOffset - 4, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       // Draw buy button
       const buttonX = panelX + this.panelWidth - 90;
@@ -250,24 +272,25 @@ export class ShopPanel {
     ctx.fillText('Your Inventory (Sell)', panelX + 10, yOffset);
     yOffset += 20;
 
-    // Get sellable items
+    // Get sellable items - show each quality stack separately
     const sellableItems: SellableItem[] = [];
-    const seenItems = new Set<string>();
 
-    for (const slot of agentInventory.slots) {
-      if (!slot.itemId || slot.quantity <= 0) continue;
-      if (seenItems.has(slot.itemId)) continue;
-      seenItems.add(slot.itemId);
+    for (let i = 0; i < agentInventory.slots.length; i++) {
+      const slot = agentInventory.slots[i];
+      if (!slot || !slot.itemId || slot.quantity <= 0) continue;
 
       const itemDef = itemRegistry.get(slot.itemId);
       if (!itemDef) continue;
 
-      const price = calculateSellPrice({ definition: itemDef }, shop, marketState);
+      const quality = slot.quality;
+      const price = calculateSellPrice({ definition: itemDef, quality }, shop, marketState);
 
       sellableItems.push({
         itemId: slot.itemId,
         quantity: slot.quantity,
         price,
+        quality,
+        slotIndex: i,
       });
     }
 
@@ -279,11 +302,28 @@ export class ShopPanel {
       ctx.font = '14px sans-serif';
       ctx.fillStyle = '#fff';
       ctx.textAlign = 'left';
-      ctx.fillText(
-        `${itemDef.displayName} x${item.quantity} - ${item.price} currency`,
-        panelX + 20,
-        yOffset
-      );
+
+      // Build display string with quality
+      let displayText = `${itemDef.displayName} x${item.quantity}`;
+      if (item.quality !== undefined) {
+        const tier = getQualityTier(item.quality);
+        const tierName = getQualityDisplayName(tier);
+        const multiplier = getQualityPriceMultiplier(item.quality);
+        displayText += ` [${tierName}] (${multiplier.toFixed(1)}x)`;
+      }
+      displayText += ` - ${item.price} currency`;
+
+      ctx.fillText(displayText, panelX + 20, yOffset);
+
+      // Draw quality color indicator
+      if (item.quality !== undefined) {
+        const tier = getQualityTier(item.quality);
+        const color = getQualityColor(tier);
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(panelX + 12, yOffset - 4, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       // Draw sell button
       const buttonX = panelX + this.panelWidth - 90;
@@ -302,6 +342,8 @@ export class ShopPanel {
       // Store button region
       this.sellButtons.push({
         itemId: item.itemId,
+        quality: item.quality,
+        slotIndex: item.slotIndex,
         x: buttonX,
         y: buttonY,
         width: buttonWidth,

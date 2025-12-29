@@ -45,7 +45,8 @@
  */
 
 import type { World } from '../ecs/World.js';
-import { System } from '../ecs/System.js';
+import type { System } from '../ecs/System.js';
+import type { EventBus } from '../events/EventBus.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import type { EntityId } from '../types.js';
@@ -75,7 +76,7 @@ export class SkillSystem implements System {
   /**
    * Initialize and subscribe to XP-granting events.
    */
-  init(world: World): void {
+  initialize(world: World, _eventBus: EventBus): void {
     this.world = world;
 
     // Building XP - use entityId if available (builder reference)

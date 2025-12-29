@@ -43,18 +43,5 @@ export * from './WindowManager.js';
 export * from './MenuBar.js';
 export * from './types/WindowTypes.js';
 
-// Window panel adapters
-export * from './adapters/AgentInfoPanelAdapter.js';
-export * from './adapters/AnimalInfoPanelAdapter.js';
-export * from './adapters/PlantInfoPanelAdapter.js';
-export * from './adapters/TileInspectorPanelAdapter.js';
-export * from './adapters/ResourcesPanelAdapter.js';
-export * from './adapters/MemoryPanelAdapter.js';
-export * from './adapters/RelationshipsPanelAdapter.js';
-export * from './adapters/InventoryUIAdapter.js';
-export * from './adapters/SettingsPanelAdapter.js';
-export * from './adapters/CraftingPanelUIAdapter.js';
-export * from './adapters/NotificationsPanelAdapter.js';
-export * from './adapters/EconomyPanelAdapter.js';
-export * from './adapters/ShopPanelAdapter.js';
-export * from './adapters/GovernanceDashboardPanelAdapter.js';
+// Window panel adapters - consolidated generic implementation
+export * from './adapters/index.js';

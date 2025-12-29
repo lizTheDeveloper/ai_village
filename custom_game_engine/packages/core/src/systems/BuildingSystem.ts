@@ -640,21 +640,22 @@ export class BuildingSystem implements System {
   /**
    * Deduct resources from storage buildings.
    * Returns true if successful, false if insufficient resources.
+   * Performance: Single query with O(1) lookups via Map
    */
   private deductResourcesFromStorage(
     world: World,
     resourceCost: Record<string, number>
   ): boolean {
 
-    // Get all storage buildings with inventory
+    // Get all storage buildings with inventory (single query)
     const storageBuildings = world.query()
       .with('building')
       .with('inventory')
       .executeEntities();
 
-
-    // First, check if we have enough resources across all storage
-    const availableResources: Record<string, number> = {};
+    // Build resource availability map in single pass
+    // Map: resourceType -> Array of {storage, slotIndex, quantity}
+    const availability = new Map<string, Array<{ storage: Entity, slotIndex: number, quantity: number }>>();
 
     for (const storage of storageBuildings) {
       const building = storage.components.get('building') as { isComplete: boolean; buildingType: string } | undefined;
@@ -667,62 +668,60 @@ export class BuildingSystem implements System {
       if (building.buildingType !== 'storage-chest' && building.buildingType !== 'storage-box') continue;
 
       if (inventory?.slots) {
-        for (const slot of inventory.slots) {
-          if (slot.itemId && slot.quantity > 0) {
-            // Per CLAUDE.md: Use ?? instead of || for default values
-            const currentAmount = availableResources[slot.itemId] ?? 0;
-            availableResources[slot.itemId] = currentAmount + slot.quantity;
+        for (let slotIndex = 0; slotIndex < inventory.slots.length; slotIndex++) {
+          const slot = inventory.slots[slotIndex];
+          if (slot && slot.itemId && slot.quantity > 0) {
+            if (!availability.has(slot.itemId)) {
+              availability.set(slot.itemId, []);
+            }
+            availability.get(slot.itemId)!.push({ storage, slotIndex, quantity: slot.quantity });
           }
         }
       }
     }
 
-
-    // Check if we have enough of each resource
+    // Check if we have enough of each resource using pre-built map
     for (const [resourceType, amountNeeded] of Object.entries(resourceCost)) {
-      // Per CLAUDE.md: Use ?? instead of || for default values
-      const available = availableResources[resourceType] ?? 0;
-      if (available < amountNeeded) {
-        return false;
+      const sources = availability.get(resourceType);
+      if (!sources) {
+        return false; // Resource type not available
+      }
+
+      const totalAvailable = sources.reduce((sum, src) => sum + src.quantity, 0);
+      if (totalAvailable < amountNeeded) {
+        return false; // Insufficient quantity
       }
     }
 
-
-    // Now deduct resources from storage buildings
+    // Now deduct resources using pre-built map - O(costs.length)
     for (const [resourceType, amountNeeded] of Object.entries(resourceCost)) {
       let remainingToRemove = amountNeeded;
+      const sources = availability.get(resourceType)!; // We know it exists from check above
 
-      for (const storage of storageBuildings) {
+      for (const source of sources) {
         if (remainingToRemove <= 0) break;
 
-        const building = storage.components.get('building') as { isComplete: boolean; buildingType: string } | undefined;
-        if (!building?.isComplete) continue;
-        if (building.buildingType !== 'storage-chest' && building.buildingType !== 'storage-box') continue;
-
-        const inventory = storage.components.get('inventory') as {
+        const inventory = source.storage.components.get('inventory') as {
           slots: Array<{ itemId: string | null; quantity: number }>;
         } | undefined;
 
-        if (inventory?.slots) {
-          for (const slot of inventory.slots) {
-            if (slot.itemId === resourceType && slot.quantity > 0 && remainingToRemove > 0) {
-              const amountFromSlot = Math.min(slot.quantity, remainingToRemove);
-              slot.quantity -= amountFromSlot;
-              remainingToRemove -= amountFromSlot;
+        const slot = inventory?.slots?.[source.slotIndex];
+        if (slot) {
+          const amountFromSlot = Math.min(slot.quantity, remainingToRemove);
+          slot.quantity -= amountFromSlot;
+          remainingToRemove -= amountFromSlot;
 
-              // Clear slot if empty
-              if (slot.quantity === 0) {
-                slot.itemId = null;
-              }
-            }
+          // Clear slot if empty
+          if (slot.quantity === 0) {
+            slot.itemId = null;
           }
-
-          // Update the storage's inventory component
-          (storage as EntityImpl).updateComponent('inventory', (comp) => ({
-            ...comp,
-            slots: [...inventory.slots],
-          }));
         }
+
+        // Update the storage's inventory component
+        (source.storage as EntityImpl).updateComponent('inventory', (comp) => ({
+          ...comp,
+          slots: [...inventory!.slots],
+        }));
       }
     }
 

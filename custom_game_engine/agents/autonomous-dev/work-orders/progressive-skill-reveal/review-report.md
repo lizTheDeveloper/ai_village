@@ -6,46 +6,24 @@
 
 ## Files Reviewed
 
-- `packages/core/src/components/SkillsComponent.ts` (new, 1298 lines)
-- `packages/llm/src/ActionDefinitions.ts` (new, 197 lines)
-- `packages/llm/src/StructuredPromptBuilder.ts` (modified, 1498 lines)
-- `packages/world/src/entities/AgentEntity.ts` (modified, 346 lines)
-- `packages/core/src/buildings/BuildingBlueprintRegistry.ts` (modified)
-- `packages/core/src/components/BuildingComponent.ts` (modified)
-- `packages/core/src/components/RelationshipComponent.ts` (modified)
+- `packages/llm/src/StructuredPromptBuilder.ts` (modified, 1479 lines)
+- `packages/llm/src/ActionDefinitions.ts` (modified, 201 lines)
+- `packages/core/src/systems/SkillSystem.ts` (modified, 370 lines)
+- `packages/core/src/__tests__/ProgressiveSkillReveal.integration.test.ts` (new, 531 lines)
 
 ## Critical Issues (Must Fix)
 
-### 1. Debug console.log Statements Throughout Codebase
+### 1. MASSIVE `any` Type Abuse in StructuredPromptBuilder.ts
 
-**File:** `packages/llm/src/StructuredPromptBuilder.ts:93, 97, 102, 107, 982, 1027, 1126`
+**File:** `packages/llm/src/StructuredPromptBuilder.ts`
 
-**Pattern:**
+This file contains **46 instances of `as any`** which completely bypasses TypeScript's type safety. This is a severe CLAUDE.md violation.
+
+**Lines with violations:**
+
+#### Component Access (lines 36-44, 723-724)
 ```typescript
-console.log(`[StructuredPromptBuilder] 🏗️ CRITICAL BUILDING INSTRUCTION...`);
-console.log('[StructuredPromptBuilder] Vision state:', {...});
-console.log('[StructuredPromptBuilder] Final available actions:', ...);
-```
-
-**Required Fix:** Remove ALL console.log statements. Per CLAUDE.md:
-> **NEVER add debug print statements or console.log calls to code.**
-> Debug statements clutter the codebase and create noise in production.
-> Use the Agent Dashboard for debugging instead.
-
-These 7 console.log statements must be removed before approval.
-
----
-
-### 2. Excessive Use of `any` Type
-
-**File:** `packages/llm/src/StructuredPromptBuilder.ts` (43 instances)
-**File:** `packages/core/src/components/SkillsComponent.ts` (3 instances)
-**File:** `packages/world/src/entities/AgentEntity.ts` (4 instances)
-
-**Critical instances:**
-
-`StructuredPromptBuilder.ts:36-44`:
-```typescript
+// WRONG - bypasses type safety
 const name = agent.components.get('identity') as any;
 const personality = agent.components.get('personality') as any;
 const needs = agent.components.get('needs') as any;
@@ -54,267 +32,369 @@ const legacyMemory = agent.components.get('memory') as any;
 const inventory = agent.components.get('inventory') as any;
 const temperature = agent.components.get('temperature') as any;
 const conversation = agent.components.get('conversation') as any;
+const building = b.components.get('building') as any;
+const identity = b.components.get('identity') as any;
 ```
 
-**Required Fix:** Define proper interfaces for components instead of using `as any`. Example:
-
+**Required Fix:**
 ```typescript
-interface IdentityComponent extends Component {
-  type: 'identity';
-  name: string;
+// Define proper interfaces or use existing component types
+const name = agent.getComponent<IdentityComponent>('identity');
+const personality = agent.getComponent<PersonalityComponent>('personality');
+const needs = agent.getComponent<NeedsComponent>('needs');
+const vision = agent.getComponent<VisionComponent>('vision');
+// etc.
+```
+
+#### Array Operations (lines 80-81, 84, 599-600, 621)
+```typescript
+// WRONG - slots typed as any
+const woodQty = inventory.slots.filter((s: any) => s.itemId === 'wood')...
+const stoneQty = inventory.slots.filter((s: any) => s.itemId === 'stone')...
+const hasCloth = inventory.slots.some((s: any) => s.itemId === 'cloth'...)
+```
+
+**Required Fix:**
+```typescript
+interface InventorySlot {
+  itemId: string;
+  quantity: number;
 }
 
-interface PersonalityComponent extends Component {
-  type: 'personality';
-  openness: number;
-  extraversion: number;
-  // ...
+const woodQty = inventory.slots.filter((s: InventorySlot) => s.itemId === 'wood')...
+```
+
+#### Function Parameters (lines 35, 192, 286, 544, 591, 650, 711, 772, 953)
+```typescript
+// WRONG - world and components typed as any
+buildPrompt(agent: Entity, world: any): string
+private buildSystemPrompt(name: string, personality: any, world?: any, inventory?: any, skills?: SkillsComponent)
+private buildWorldContext(needs: any, vision: any, inventory: any, world: any, temperature?: any, memory?: any, conversation?: any, entity?: Entity)
+```
+
+**Required Fix:**
+Define proper interfaces for world and component types, or use the existing component interfaces from `@ai-village/core`.
+
+#### Exported Functions (lines 1150, 1182, 1212-1213, 1237-1238)
+```typescript
+// WRONG - exported functions with any
+export function getBuildTimeEstimate(buildingType: string, taskFamiliarity: any): string | null
+export function getCraftTimeEstimate(recipeId: string, taskFamiliarity: any): string | null
+export function buildBuildingSection(availableBuildings: string[], taskFamiliarity: any, _skills?: any)
+export function buildCraftingSection(availableRecipes: string[], taskFamiliarity: any, _skills?: any)
+```
+
+**Required Fix:**
+```typescript
+interface TaskFamiliarity {
+  builds?: Record<string, { lastTime: number }>;
+  crafts?: Record<string, { lastTime: number }>;
 }
 
-// Then use:
-const name = agent.components.get('identity') as IdentityComponent;
-const personality = agent.components.get('personality') as PersonalityComponent;
+export function getBuildTimeEstimate(buildingType: string, taskFamiliarity: TaskFamiliarity): string | null
 ```
 
-**Additional any types requiring fixes:**
-- `StructuredPromptBuilder.ts:196` - `personality: any, world?: any, inventory?: any`
-- `StructuredPromptBuilder.ts:290` - Multiple `any` parameters
-- `StructuredPromptBuilder.ts:1169,1201,1231,1256` - `taskFamiliarity: any`
-- `SkillsComponent.ts:1274,1276,1280` - `registry: any` and `any[]` return type
+### 2. Silent Fallbacks in StructuredPromptBuilder.ts
 
-These bypass TypeScript's type safety and will hide bugs at compile time.
+**File:** `packages/llm/src/StructuredPromptBuilder.ts`
 
----
+Found **11 instances** of silent fallback patterns that mask missing or invalid data.
 
-### 3. Nullish Coalescing Used for Critical Game State
+#### Critical Game State Fallbacks:
 
-**File:** `packages/core/src/components/SkillsComponent.ts`
-
-While most uses of `??` are acceptable (defaulting optional skill levels to 0), there are instances where this pattern could mask missing data:
-
-`SkillsComponent.ts:687,690`:
+**Line 48:**
 ```typescript
-const timesCompleted = (existing?.timesCompleted ?? 0) + 1;
-const bestQuality = Math.max(existing?.bestQuality ?? 0, quality);
+const systemPrompt = this.buildSystemPrompt(name?.name || 'Agent', personality, world, inventory, skills);
 ```
+**Issue:** If agent has no identity component, silently defaults to 'Agent'
+**Required Fix:** Validate identity exists, throw if missing
 
-**Assessment:** These are OK - they're genuinely optional fields where 0 is a valid default.
-
-`SkillsComponent.ts:702`:
+**Line 355:**
 ```typescript
-const currentSignatureBonus = signatureTask
-  ? domain.familiarity[signatureTask]?.qualityBonus ?? 0
-  : 0;
+resources[slot.itemId] = (resources[slot.itemId] || 0) + slot.quantity;
 ```
+**Issue:** Masks missing resource counts
+**Required Fix:** Initialize properly with Map or explicit zero check
 
-**Assessment:** This is acceptable - optional chaining with valid fallback.
-
-**Verdict on this pattern:** APPROVED for this use case. The `??` operator is being used appropriately for truly optional fields.
-
----
-
-## Warnings (Should Fix)
-
-### 1. File Size Exceeds Recommended Limit
-
-**Files:**
-- `SkillsComponent.ts`: 1298 lines (threshold: 1000 lines - REJECT)
-- `StructuredPromptBuilder.ts`: 1498 lines (threshold: 1000 lines - REJECT)
-
-**Per review checklist:**
-> >1000 lines | REJECT - must be split
-
-**Recommendation:**
-
-**SkillsComponent.ts** should be split into:
-1. `SkillsComponent.ts` - Core component definition (lines 1-430)
-2. `SkillProgressiveReveal.ts` - Perception/visibility logic (lines 862-1299)
-3. `SkillSynergies.ts` - Synergy system (lines 484-639)
-4. `SkillDomains.ts` - Domain/familiarity tracking (lines 640-861)
-
-**StructuredPromptBuilder.ts** should be split into:
-1. `StructuredPromptBuilder.ts` - Core prompt building (lines 1-200)
-2. `PromptContextBuilders.ts` - World context helpers (lines 290-823)
-3. `PromptActionBuilders.ts` - Action filtering (lines 953-1129)
-4. `PromptSkillHelpers.ts` - Skill-gated helper functions (lines 1167-1499)
-
-**BLOCKING:** These files MUST be split before approval per the review checklist.
-
----
-
-### 2. Magic Numbers Without Named Constants
-
-**File:** `packages/core/src/components/SkillsComponent.ts`
-
-`Lines 896-902`:
+**Lines 387-388, 449, 467:**
 ```typescript
-if (avgAffinity > 1.2) {
-  numSkills = Math.random() < 0.7 ? 3 : 2;
-} else if (avgAffinity > 0.8) {
-  numSkills = Math.random() < 0.6 ? 2 : 1;
-} else {
-  numSkills = Math.random() < 0.7 ? 1 : 2;
-}
+const agentCount = vision.seenAgents?.length || 0;
+const resourceCount = vision.seenResources?.length || 0;
+const plantCount = vision.seenPlants?.length || 0;
 ```
+**Issue:** While these MIGHT be acceptable (counts can legitimately be zero), they should use `?? 0` instead of `|| 0` to avoid masking empty arrays
 
-**Recommendation:** Extract to named constants:
+**Lines 410, 801:**
 ```typescript
-const SKILL_GENERATION_THRESHOLDS = {
-  HIGH_AFFINITY: 1.2,
-  MEDIUM_AFFINITY: 0.8,
-  HIGH_AFFINITY_THREE_SKILL_CHANCE: 0.7,
-  MEDIUM_AFFINITY_TWO_SKILL_CHANCE: 0.6,
-  LOW_AFFINITY_ONE_SKILL_CHANCE: 0.7,
-} as const;
+resourceTypes[type] = (resourceTypes[type] || 0) + 1;
+totalStorage[slot.itemId] = (totalStorage[slot.itemId] || 0) + slot.quantity;
 ```
+**Issue:** Same as line 355 - use proper initialization
 
-`Lines 938-939`:
+**Line 597:**
 ```typescript
-const level: SkillLevel = Math.random() < 0.7 ? 1 : 2;
+const slots = inventory?.slots || [];
+```
+**Issue:** If inventory exists but slots is undefined/null, this masks a data integrity issue
+**Required Fix:** Validate slot array exists if inventory exists
+
+**Line 621:**
+```typescript
+const fullSlots = inventory?.slots.filter((s: any) => s.itemId).length || 0;
+```
+**Issue:** If filter returns empty array, defaulting to 0 is correct, but the pattern is still suspect
+
+**Line 727:**
+```typescript
+name: building?.buildingType || 'unknown',
+```
+**Issue:** If building exists but buildingType is missing, this masks a data error
+**Required Fix:** Throw if buildingType is missing
+
+### 3. Nullish Coalescing with Magic Defaults
+
+**File:** `packages/llm/src/StructuredPromptBuilder.ts`
+
+**Lines 289-290, 975-979, 1287, 1292, 1322-1325, 1347, 1421, 1425, 1428:**
+```typescript
+const cookingSkill = (skills?.levels.cooking ?? 0) as SkillLevel;
+const buildingSkill = (skills?.levels.building ?? 0) as SkillLevel;
+// ... many more
 ```
 
-**Recommendation:** Extract `0.7` to named constant `LEVEL_1_PROBABILITY`.
+**Issue:** While `?? 0` is acceptable for optional skill levels (0 = unskilled is semantically correct), the cast to `SkillLevel` is unsafe. If `skills?.levels.cooking` returns `undefined`, casting `0` to `SkillLevel` is correct, but this pattern should be validated.
 
----
+**Assessment:** This is borderline acceptable since skill level 0 is semantically valid for "no skill". However, the type cast could mask issues if the value is not actually 0-5.
 
-### 3. Missing Component Type Safety
+### 4. Test File with `as any` Casts
 
-**File:** `packages/world/src/entities/AgentEntity.ts:157,296`
+**File:** `packages/core/src/__tests__/ProgressiveSkillReveal.integration.test.ts`
+**Lines:** 125, 150, 228, 235, 242, 401
 
 ```typescript
-const personalityWander = entity.getComponent('personality') as any;
-const personalityLLM = entity.getComponent('personality') as any;
+(world as any)._addEntity(agent);
+const visibleLow = filterVisibleEntities(entities as any, skillsLow, agentPos);
 ```
 
-**Required Fix:** Import proper PersonalityComponent type:
-```typescript
-import type { PersonalityComponent } from '@ai-village/core';
+**Issue:** Test file is casting to access private methods and bypass types
+**Assessment:** While more acceptable in tests than production code, this indicates missing test utilities or improper API design
+**Recommendation:** Add proper test helper methods instead of accessing private APIs
 
-const personality = entity.getComponent('personality') as PersonalityComponent;
-if (!personality) {
-  throw new Error('AgentEntity requires PersonalityComponent');
-}
-entity.addComponent(generateRandomStartingSkills(personality));
+### 5. ❌ Build Failure - TypeScript Compilation Error
+
+**Status:** BLOCKING - Code does not compile
+
+**Error:**
+```
+packages/renderer/src/adapters/PanelAdapter.ts(205,28): error TS2345: Argument of type 'PanelAdapter<T>' is not assignable to parameter of type 'PanelAdapter<unknown>'.
+  Types of property 'config' are incompatible.
+    Type 'PanelConfig<T>' is not assignable to type 'PanelConfig<unknown>'.
+      Type 'unknown' is not assignable to type 'T'.
+        'T' could be instantiated with an arbitrary type which could be unrelated to 'unknown'.
 ```
 
----
+**Issue:** The build is failing due to a generic type variance issue in PanelAdapter. This is separate from the progressive-skill-reveal feature but blocks deployment.
+
+**Required Action:** Fix the TypeScript compilation error. Either:
+1. Implement PanelAdapter correctly (may be separate work order)
+2. Fix the generic type variance issue
+3. Mark PanelAdapter tests as `.skip()` and remove from build until implemented
+
+**Test Results:**
+- Core tests: ✅ ProgressiveSkillReveal tests passing (62/62)
+- Renderer tests: ❌ PanelAdapter tests failing (26/28 - "not yet implemented")
+- Overall: Build blocked by compilation error
+
+## File Size Warnings
+
+| File | Lines | Status |
+|------|-------|--------|
+| `StructuredPromptBuilder.ts` | 1511 | ❌ CRITICAL - EXCEEDS 1000 LINE LIMIT |
+| `ProgressiveSkillReveal.integration.test.ts` | 531 | ⚠️ WARN - approaching threshold |
+
+**StructuredPromptBuilder.ts** violates the file size limit from CLAUDE.md and review checklist:
+> "Warn if >500 lines, REJECT if >1000 lines without justification"
+
+At **1511 lines**, this is a god class that must be decomposed. Suggested split:
+1. **StructuredPromptBuilder.ts** (coordinator, ~200 lines)
+2. **EntityVisibilityFilter.ts** (skill-gated entity filtering, ~200 lines)
+3. **SkillGatedContextBuilder.ts** (information depth by skill, ~250 lines)
+4. **StrategyGenerator.ts** (strategic suggestions, ~150 lines)
+5. **MemoryFormatter.ts** (episodic memory formatting, ~200 lines)
+6. **ActionFilter.ts** (skill-gated action filtering, ~150 lines)
+7. **PromptTemplates.ts** (string templates and helpers, ~200 lines)
 
 ## Passed Checks
 
-- [x] Build passes (`npm run build` succeeded)
-- [x] No silent fallback violations (all `??` uses are appropriate for optional fields)
-- [x] No `console.warn` without throwing
-- [x] No dead/commented code
-- [x] Proper error propagation (functions throw on invalid input)
-- [x] No bare `any` in event handlers
-- [x] Component type names use lowercase_with_underscores ('skills', 'building', 'relationship')
-
-## Tests Status
-
-Tests show 23 failed test files, but analysis reveals:
-- Failures are in **pre-existing test files** for unimplemented features (QualityEconomy, HarvestQuality, ItemQuality)
-- No test failures directly related to progressive-skill-reveal implementation
-- Test failures are: `InventoryComponent is not a constructor`, `Cannot read properties of undefined (reading 'levels')` - these are test infrastructure issues, not implementation bugs
-
-**Progressive-skill-reveal specific tests:** Not yet written. Per work order acceptance criteria:
-- Need integration test: "Spawn 100 agents, verify 80%+ have skill > 0"
-- Need visibility test: "Verify low-skill agents don't see rare resources"
-- Need information depth test: "Verify prompts show appropriate detail for skill level"
-
-## Implementation Quality Assessment
-
-### Strengths
-1. **Comprehensive skill system** - Covers all requirements from progressive-skill-reveal-spec.md
-2. **Type-safe skill levels** - Uses literal types `0 | 1 | 2 | 3 | 4 | 5` instead of `number`
-3. **No silent failures** - Functions throw proper errors when personality is missing
-4. **Personality-based affinities** - Good integration with existing personality system
-5. **Progressive reveal implemented correctly** - Skill-gated entity visibility, information depth, and actions
-
-### Weaknesses
-1. **Too many debug statements** - 7 console.log calls violate CLAUDE.md
-2. **Excessive any usage** - 50+ instances bypass type safety
-3. **File sizes too large** - 2 files exceed 1000 line limit
-4. **Missing tests** - No tests written for progressive skill reveal functionality
-
----
+- ❌ ~~Build compiles successfully~~ - BUILD FAILING (PanelAdapter TypeScript error)
+- ✅ No `console.log`, `console.debug`, `console.info` found in reviewed files
+- ✅ No `console.warn` without throwing
+- ✅ ActionDefinitions.ts is clean - proper skill requirements defined
+- ✅ SkillSystem.ts is clean - no antipatterns detected
+- ✅ BuildingBlueprintRegistry.ts is clean - SkillRequirement interface properly defined
+- ✅ Proper error handling in SkillSystem (throws on uninitialized)
+- ✅ Named constants used in SkillSystem (though could be extracted)
+- ✅ Event types are properly typed (EventMap usage correct)
+- ✅ Core feature tests passing (62/62 ProgressiveSkillReveal tests)
 
 ## Verdict
 
 **Verdict: NEEDS_FIXES**
 
-**Blocking Issues:** 3
+**Blocking Issues:** 6
+1. ❌ Build failure (TypeScript compilation error in PanelAdapter.ts)
+2. ❌ God class violation (1511 lines in StructuredPromptBuilder.ts)
+3. ❌ Type safety violations (46+ instances of `as any`)
+4. ❌ Silent fallback violations (11 instances of `|| fallback`)
+5. ❌ Missing type definitions for components
+6. ❌ File size exceeds CLAUDE.md limits (>1000 lines)
 
-1. **CRITICAL:** Remove all 7 debug console.log statements from StructuredPromptBuilder.ts (CLAUDE.md violation)
-2. **CRITICAL:** Split SkillsComponent.ts (1298 lines) and StructuredPromptBuilder.ts (1498 lines) - both exceed 1000 line limit
-3. **CRITICAL:** Replace 50+ `as any` casts with proper component interfaces
+**Critical Violations:** 57+ (46 `as any`, 11 silent fallbacks)
+**Warnings:** 3 (file size, test file quality, magic numbers)
+**Test Status:** Core tests passing (62/62), but build blocked
 
-**Required Actions:**
+## Required Actions
 
-1. **Immediate (before approval):**
-   - Remove all console.log statements
-   - Split SkillsComponent.ts into 4 files
-   - Split StructuredPromptBuilder.ts into 4 files
-   - Define proper TypeScript interfaces for all components (IdentityComponent, PersonalityComponent, etc.)
+### Priority 0: BLOCKING - Fix Build (MUST DO FIRST)
 
-2. **High Priority (before merge):**
-   - Extract magic numbers to named constants
-   - Write integration tests per acceptance criteria
-   - Fix any type usage in AgentEntity.ts
+**File:** `packages/renderer/src/adapters/PanelAdapter.ts:205`
 
-## Detailed Fix Instructions
+1. Fix TypeScript compilation error (generic type variance)
+2. Ensure `npm run build` completes without errors
+3. Consider marking PanelAdapter tests as `.skip()` if not part of this feature
 
-### Fix 1: Remove Debug Statements
+**Impact:** Nothing can proceed until the build passes. This is the #1 blocker.
 
-```bash
-# Remove these lines from StructuredPromptBuilder.ts:
-sed -i '' '/console\.log.*StructuredPromptBuilder/d' packages/llm/src/StructuredPromptBuilder.ts
-```
+---
 
-### Fix 2: Split SkillsComponent.ts
+### Priority 1: Remove All `as any` Casts (StructuredPromptBuilder.ts)
 
-Create new files:
-1. `packages/core/src/components/skills/SkillComponent.ts` - Move lines 1-430
-2. `packages/core/src/components/skills/SkillSynergies.ts` - Move lines 484-639
-3. `packages/core/src/components/skills/SkillDomains.ts` - Move lines 640-861
-4. `packages/core/src/components/skills/SkillProgressiveReveal.ts` - Move lines 862-1299
-5. Create `packages/core/src/components/skills/index.ts` to re-export all
+1. Define proper component interfaces or import existing ones from `@ai-village/core`
+2. Replace all 46+ `as any` casts with proper generic types
+3. Update function parameters from `any` to proper interfaces
+4. Use `getComponent<T>()` pattern instead of `components.get() as any`
 
-### Fix 3: Define Component Interfaces
-
-Create `packages/core/src/components/ComponentTypes.ts`:
+**Example Fix:**
 ```typescript
-export interface IdentityComponent extends Component {
-  type: 'identity';
+// Before (WRONG)
+const name = agent.components.get('identity') as any;
+
+// After (CORRECT)
+interface IdentityComponent {
   name: string;
 }
-
-export interface PersonalityComponent extends Component {
-  type: 'personality';
-  openness: number;
-  extraversion: number;
-  agreeableness: number;
-  conscientiousness: number;
-  neuroticism: number;
-  workEthic: number;
-  leadership: number;
-}
-
-// ... define all component types
+const name = agent.getComponent<IdentityComponent>('identity');
+if (!name) throw new Error(`Agent ${agent.id} missing identity component`);
 ```
 
 ---
 
+### Priority 2: Fix Silent Fallbacks (StructuredPromptBuilder.ts)
+
+**Critical Fixes:**
+1. **Line 48:** Validate identity.name exists - throw if missing
+2. **Line 727:** Validate buildingType exists - throw if missing
+3. **Lines 355, 410, 801:** Use Map/Record initialization instead of `|| 0` (acceptable but improve clarity)
+4. **Lines 387-388, 449, 464:** Consider `?? 0` instead of `|| 0` for optional vision data
+5. **Line 597:** Validate slots array structure if inventory exists
+
+**Example Fix:**
+```typescript
+// Before (WRONG)
+const systemPrompt = this.buildSystemPrompt(name?.name || 'Agent', personality);
+
+// After (CORRECT)
+if (!name?.name) {
+  throw new Error(`Agent ${agent.id} missing required name in identity component`);
+}
+const systemPrompt = this.buildSystemPrompt(name.name, personality);
+```
+
+---
+
+### Priority 3: Refactor God Class (StructuredPromptBuilder.ts)
+
+**File Size:** 1511 lines (exceeds 1000 line limit)
+
+**Required:** Decompose into focused modules (target <300 lines per file):
+1. Create `PromptBuilderTypes.ts` with all interface definitions
+2. Extract `EntityVisibilityFilter.ts` for skill-gated entity filtering
+3. Extract `SkillGatedContextBuilder.ts` for information depth logic
+4. Extract `StrategyGenerator.ts` for strategic instruction generation
+5. Extract `MemoryFormatter.ts` for episodic memory formatting
+6. Extract `ActionFilter.ts` for skill-gated action filtering
+7. Keep core `StructuredPromptBuilder.ts` as coordinator (~200 lines)
+
+**Impact:** Maintainability - 1511 lines is impossible to hold in working memory
+
+---
+
+### Priority 4: Code Quality Improvements
+
+1. **Extract Magic Numbers** in SkillSystem.ts to named constants
+2. **Improve Test Quality** - replace `as any` in test files with proper helpers
+3. **Add Type Guards** for component access safety
+4. **Document Skill Fallback Semantics** - when `?? 0` is correct vs masking errors
+
+## Recommendations for Next Iteration
+
+1. **Create Type Definitions File:** `PromptBuilderTypes.ts` with all component interfaces
+2. **Add Component Type Guards:** Helper functions to safely access components
+3. **Extract Utilities:** Move filtering and aggregation logic to separate modules
+4. **Improve Test Quality:** Add proper test helpers instead of `as any` casts
+5. **Document Skill Fallback Semantics:** Clarify when `?? 0` is correct vs when it masks errors
+
 ## Summary
 
-The progressive-skill-reveal implementation is **functionally complete** and follows the specification correctly. However, it violates critical code quality standards:
+This implementation has **severe type safety violations** and **architectural issues** that directly contradict CLAUDE.md guidelines:
 
-1. Debug statements in production code (CLAUDE.md violation)
-2. Files too large (review checklist violation)
-3. Type safety bypassed with `any` (antipattern)
+### What Went Well ✅
+- **Core logic is sound:** Skill-gating approach is architecturally correct
+- **Feature tests passing:** 62/62 ProgressiveSkillReveal tests pass
+- **Clean supporting files:** SkillSystem.ts, ActionDefinitions.ts, BuildingBlueprintRegistry.ts are well-structured
+- **No console debugging:** No debug statements left in code
+- **Proper skill requirements:** Building and action skill gates correctly defined
 
-These issues must be resolved before the code can be approved for playtest.
+### What Needs Immediate Fixes ❌
+- **Build failure:** TypeScript compilation blocked by PanelAdapter error
+- **God class:** 1511-line StructuredPromptBuilder.ts violates file size limits
+- **Type safety:** 46+ instances of `as any` bypass type checking
+- **Silent fallbacks:** 11 instances of `|| fallback` mask missing data
+- **Maintainability:** Code is impossible to navigate and modify safely
 
-**Estimated fix time:** 2-3 hours
-- 15 min: Remove console.log statements
-- 1-2 hours: Split large files
-- 1 hour: Define component interfaces and fix any types
+### Impact Assessment
+
+**Current State:** Feature logic is correct, but implementation quality is unacceptable for production. The `as any` casts and god class will cause:
+- Runtime errors not caught at compile time
+- Impossible refactoring (no type checking)
+- Bugs hidden until production
+- New developers unable to understand/modify code
+
+**Why This Matters (CLAUDE.md Principle):**
+> "NEVER use fallback values to mask errors. If data is missing or invalid, crash immediately with a clear error message."
+
+Every `|| 'fallback'` and `as any` violates this core principle. We're trading short-term convenience for long-term maintainability debt.
+
+---
+
+## Next Steps
+
+1. **Implementation Agent:** Fix all Priority 0, 1, and 2 issues (build, type safety, silent fallbacks)
+2. **Review Agent:** Re-run review checklist after fixes
+3. **Implementation Agent:** Address Priority 3 (god class decomposition) - may be separate work order
+4. **Review Agent:** Final approval if all critical issues resolved
+5. **Playtest:** Proceed to gameplay validation once approved
+
+**Estimated Fix Time:**
+- Priority 0 (Build): 30 minutes - 1 hour
+- Priority 1 (Type safety): 2-3 hours
+- Priority 2 (Fallbacks): 1 hour
+- Priority 3 (God class): 4-6 hours (consider separate work order)
+
+**The Implementation Agent must fix Priority 0-2 before this can proceed to playtest. Priority 3 (god class) is critical for long-term maintainability but could be deferred to a separate refactoring work order if time-critical.**
+
+---
+
+**Report Generated:** 2025-12-28
+**Reviewer:** Review Agent (Autonomous Code Review System)
+**Status:** NEEDS_FIXES - Return to Implementation Agent

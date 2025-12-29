@@ -13,12 +13,10 @@ import {
 } from '../components/InventoryComponent.js';
 import type { SkillsComponent } from '../components/SkillsComponent.js';
 import {
-  getQualityMultiplier,
-  getTotalSynergyQualityBonus,
-  getTaskFamiliarityBonus,
   recordTaskCompletion,
   addSpecializationXP,
 } from '../components/SkillsComponent.js';
+import { calculateCraftingQuality } from '../items/ItemQuality.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import type { EntityId } from '../types.js';
 
@@ -427,21 +425,11 @@ export class CraftingSystem implements System {
 
     // Calculate quality based on crafting skill level + familiarity + synergy bonuses
     let skillsComp = entity.components.get('skills') as SkillsComponent | undefined;
-    const craftingLevel = skillsComp?.levels.crafting ?? 0;
 
-    // Base quality from skill level (0.7 to 1.2)
-    const baseQuality = getQualityMultiplier(craftingLevel);
-
-    // Familiarity bonus (0-20) - making the same recipe repeatedly improves quality
-    const familiarityBonus = skillsComp
-      ? getTaskFamiliarityBonus(skillsComp, 'crafting', job.recipeId) / 100
-      : 0;
-
-    // Synergy bonus (e.g., Master Builder chain)
-    const synergyBonus = skillsComp ? getTotalSynergyQualityBonus(skillsComp) : 0;
-
-    // Total quality multiplier
-    const quality = baseQuality + familiarityBonus + synergyBonus;
+    // Use the centralized quality calculation function from ItemQuality
+    const quality = skillsComp
+      ? calculateCraftingQuality(skillsComp, 'crafting', job.recipeId)
+      : 50; // Default quality if no skills component
 
     // Add crafted items to inventory with quality
     const outputQuantity = recipe.output.quantity * job.quantity;
@@ -463,8 +451,8 @@ export class CraftingSystem implements System {
 
     // Record task completion for familiarity bonus (if skills component exists)
     if (skillsComp) {
-      const qualityPercent = Math.round(quality * 100);
-      skillsComp = recordTaskCompletion(skillsComp, 'crafting', job.recipeId, qualityPercent, world.tick);
+      // Quality is already 0-100 range from calculateCraftingQuality
+      skillsComp = recordTaskCompletion(skillsComp, 'crafting', job.recipeId, quality, world.tick);
 
       // Add specialization XP based on recipe station/category
       const specName = this.getSpecializationForRecipe(recipe);

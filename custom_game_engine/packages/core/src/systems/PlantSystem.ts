@@ -67,58 +67,15 @@ export class PlantSystem implements System {
   }
 
   /**
-   * Get species definition with fallback for tests
-   * Per CLAUDE.md: No silent fallbacks for production, but tests need minimal defaults
+   * Get species definition - throws if species not found
+   * Per CLAUDE.md: No silent fallbacks for production
    */
   private getSpecies(speciesId: string): PlantSpecies {
-    if (this.speciesLookup) {
-      return this.speciesLookup(speciesId);
+    if (!this.speciesLookup) {
+      throw new Error(`PlantSystem species lookup not configured. Cannot resolve species "${speciesId}". Call setSpeciesLookup() to configure species definitions.`);
     }
 
-    // Fallback for tests - minimal species definition
-    console.warn(`[PlantSystem] Using fallback species for "${speciesId}" - set speciesLookup for production`);
-    return {
-      id: speciesId,
-      name: speciesId,
-      category: 'crop',
-      biomes: ['plains', 'forest'],
-      rarity: 'common' as const,
-      stageTransitions: [
-        { from: 'seed', to: 'germinating', baseDuration: 1, conditions: {}, onTransition: [] },
-        { from: 'germinating', to: 'sprout', baseDuration: 1, conditions: {}, onTransition: [] },
-        { from: 'sprout', to: 'vegetative', baseDuration: 3, conditions: {}, onTransition: [] },
-        { from: 'vegetative', to: 'flowering', baseDuration: 7, conditions: {}, onTransition: [] },
-        { from: 'flowering', to: 'mature', baseDuration: 14, conditions: {}, onTransition: [] },
-      ],
-      baseGenetics: {
-        growthRate: 1.0,
-        yieldAmount: 1.0,
-        diseaseResistance: 50,
-        droughtTolerance: 50,
-        coldTolerance: 50,
-        flavorProfile: 50,
-        mutations: [],
-      },
-      seedsPerPlant: 3,
-      seedDispersalRadius: 5,
-      requiresDormancy: false,
-      optimalTemperatureRange: [15, 25] as [number, number],
-      optimalMoistureRange: [30, 70] as [number, number],
-      preferredSeasons: ['spring', 'summer'],
-      properties: {
-        edible: true,
-      },
-      sprites: {
-        seed: 'seed_default',
-        sprout: 'sprout_default',
-        vegetative: 'vegetative_default',
-        flowering: 'flowering_default',
-        fruiting: 'fruiting_default',
-        mature: 'mature_default',
-        seeding: 'seeding_default',
-        withered: 'withered_default',
-      },
-    };
+    return this.speciesLookup(speciesId);
   }
 
   /**
@@ -211,6 +168,25 @@ export class PlantSystem implements System {
       hoursToProcess = this.accumulatedTime;
     }
 
+    // Validate all plant entities first (regardless of time accumulation)
+    for (const entity of entities) {
+      const impl = entity as EntityImpl;
+      const plant = impl.getComponent<PlantComponent>('plant');
+      if (!plant) continue;
+
+      // Validate position exists on plant component
+      if (!plant.position) {
+        throw new Error(`Plant entity ${entity.id} missing required position field in PlantComponent`);
+      }
+
+      // Validate required fields
+      this.validatePlant(plant);
+
+      // Validate species exists (throws if lookup not configured or species unknown)
+      const species = this.getSpecies(plant.speciesId);
+      void species; // Use species to prevent unused variable warning
+    }
+
     // Skip processing if no hours to process
     if (!shouldUpdate || hoursToProcess === 0) {
       return;
@@ -224,16 +200,8 @@ export class PlantSystem implements System {
       // Store entity ID for this plant
       this.plantEntityIds.set(plant, entity.id);
 
-      // Validate position exists on plant component
-      if (!plant.position) {
-        throw new Error(`Plant entity ${entity.id} missing required position field in PlantComponent`);
-      }
-
       try {
-        // Validate required fields
-        this.validatePlant(plant);
-
-        // Get species definition (with fallback for tests)
+        // Get species definition
         const species = this.getSpecies(plant.speciesId);
 
         // Get environment for this plant
