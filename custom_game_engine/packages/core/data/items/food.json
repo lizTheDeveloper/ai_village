@@ -1,0 +1,110 @@
+[
+  {
+    "id": "berry",
+    "displayName": "Berry",
+    "category": "food",
+    "weight": 0.2,
+    "stackSize": 50,
+    "isEdible": true,
+    "hungerRestored": 15,
+    "isGatherable": true,
+    "gatherSources": ["berry_bush"]
+  },
+  {
+    "id": "wheat",
+    "displayName": "Wheat",
+    "category": "food",
+    "weight": 0.3,
+    "stackSize": 50,
+    "isEdible": true,
+    "hungerRestored": 10,
+    "isGatherable": true,
+    "gatherSources": ["wheat_plant"]
+  },
+  {
+    "id": "apple",
+    "displayName": "Apple",
+    "category": "food",
+    "weight": 0.3,
+    "stackSize": 30,
+    "isEdible": true,
+    "hungerRestored": 20,
+    "isGatherable": true,
+    "gatherSources": ["apple_tree"]
+  },
+  {
+    "id": "carrot",
+    "displayName": "Carrot",
+    "category": "food",
+    "weight": 0.2,
+    "stackSize": 40,
+    "isEdible": true,
+    "hungerRestored": 15,
+    "isGatherable": true,
+    "gatherSources": ["carrot_plant"]
+  },
+  {
+    "id": "raw_meat",
+    "displayName": "Raw Meat",
+    "category": "food",
+    "weight": 1.0,
+    "stackSize": 20,
+    "isEdible": true,
+    "hungerRestored": 15,
+    "isGatherable": false
+  },
+  {
+    "id": "cooked_meat",
+    "displayName": "Cooked Meat",
+    "category": "food",
+    "weight": 0.8,
+    "stackSize": 20,
+    "isEdible": true,
+    "hungerRestored": 50,
+    "isGatherable": false,
+    "craftedFrom": [{"itemId": "raw_meat", "amount": 1}]
+  },
+  {
+    "id": "bread",
+    "displayName": "Bread",
+    "category": "food",
+    "weight": 0.5,
+    "stackSize": 20,
+    "isEdible": true,
+    "hungerRestored": 40,
+    "isGatherable": false,
+    "craftedFrom": [{"itemId": "wheat", "amount": 3}]
+  },
+  {
+    "id": "fish",
+    "displayName": "Fish",
+    "category": "food",
+    "weight": 0.5,
+    "stackSize": 20,
+    "isEdible": true,
+    "hungerRestored": 25,
+    "isGatherable": true,
+    "gatherSources": ["fishing_spot"],
+    "requiredTool": "fishing_rod"
+  },
+  {
+    "id": "egg",
+    "displayName": "Egg",
+    "category": "food",
+    "weight": 0.2,
+    "stackSize": 30,
+    "isEdible": true,
+    "hungerRestored": 10,
+    "isGatherable": false
+  },
+  {
+    "id": "milk",
+    "displayName": "Milk",
+    "category": "food",
+    "weight": 0.5,
+    "stackSize": 10,
+    "isEdible": true,
+    "hungerRestored": 15,
+    "isGatherable": false
+  }
+]

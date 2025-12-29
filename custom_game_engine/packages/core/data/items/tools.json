@@ -1,0 +1,62 @@
+[
+  {
+    "id": "axe",
+    "displayName": "Axe",
+    "category": "tool",
+    "weight": 3.0,
+    "stackSize": 1,
+    "isGatherable": false,
+    "craftedFrom": [
+      {"itemId": "wood", "amount": 2},
+      {"itemId": "stone", "amount": 3}
+    ]
+  },
+  {
+    "id": "pickaxe",
+    "displayName": "Pickaxe",
+    "category": "tool",
+    "weight": 3.5,
+    "stackSize": 1,
+    "isGatherable": false,
+    "craftedFrom": [
+      {"itemId": "wood", "amount": 2},
+      {"itemId": "stone", "amount": 3}
+    ]
+  },
+  {
+    "id": "hoe",
+    "displayName": "Hoe",
+    "category": "tool",
+    "weight": 2.5,
+    "stackSize": 1,
+    "isGatherable": false,
+    "craftedFrom": [
+      {"itemId": "wood", "amount": 2},
+      {"itemId": "stone", "amount": 2}
+    ]
+  },
+  {
+    "id": "fishing_rod",
+    "displayName": "Fishing Rod",
+    "category": "tool",
+    "weight": 1.5,
+    "stackSize": 1,
+    "isGatherable": false,
+    "craftedFrom": [
+      {"itemId": "wood", "amount": 3},
+      {"itemId": "fiber", "amount": 2}
+    ]
+  },
+  {
+    "id": "hammer",
+    "displayName": "Hammer",
+    "category": "tool",
+    "weight": 2.0,
+    "stackSize": 1,
+    "isGatherable": false,
+    "craftedFrom": [
+      {"itemId": "wood", "amount": 1},
+      {"itemId": "stone", "amount": 2}
+    ]
+  }
+]

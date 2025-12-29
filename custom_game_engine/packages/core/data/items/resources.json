@@ -1,0 +1,59 @@
+[
+  {
+    "id": "wood",
+    "displayName": "Wood",
+    "category": "resource",
+    "weight": 2.0,
+    "stackSize": 50,
+    "isGatherable": true,
+    "gatherSources": ["tree", "dead_tree"],
+    "requiredTool": "axe"
+  },
+  {
+    "id": "stone",
+    "displayName": "Stone",
+    "category": "resource",
+    "weight": 3.0,
+    "stackSize": 50,
+    "isGatherable": true,
+    "gatherSources": ["rock", "boulder"],
+    "requiredTool": "pickaxe"
+  },
+  {
+    "id": "fiber",
+    "displayName": "Plant Fiber",
+    "category": "resource",
+    "weight": 0.5,
+    "stackSize": 100,
+    "isGatherable": true,
+    "gatherSources": ["grass", "plant", "flax"]
+  },
+  {
+    "id": "leaves",
+    "displayName": "Leaves",
+    "category": "resource",
+    "weight": 0.3,
+    "stackSize": 100,
+    "isGatherable": true,
+    "gatherSources": ["tree", "bush"]
+  },
+  {
+    "id": "water",
+    "displayName": "Water",
+    "category": "resource",
+    "weight": 1.0,
+    "stackSize": 20,
+    "isGatherable": true,
+    "gatherSources": ["water_source", "well", "river"]
+  },
+  {
+    "id": "food",
+    "displayName": "Food",
+    "category": "resource",
+    "weight": 0.5,
+    "stackSize": 50,
+    "isEdible": true,
+    "hungerRestored": 20,
+    "isGatherable": true
+  }
+]

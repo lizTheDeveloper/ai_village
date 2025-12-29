@@ -1,0 +1,78 @@
+[
+  {
+    "id": "iron_ore",
+    "displayName": "Iron Ore",
+    "category": "material",
+    "weight": 4.0,
+    "stackSize": 30,
+    "isGatherable": true,
+    "gatherSources": ["iron_deposit"],
+    "requiredTool": "pickaxe"
+  },
+  {
+    "id": "iron_ingot",
+    "displayName": "Iron Ingot",
+    "category": "material",
+    "weight": 3.0,
+    "stackSize": 30,
+    "isGatherable": false,
+    "craftedFrom": [{"itemId": "iron_ore", "amount": 2}]
+  },
+  {
+    "id": "coal",
+    "displayName": "Coal",
+    "category": "material",
+    "weight": 1.5,
+    "stackSize": 50,
+    "isGatherable": true,
+    "gatherSources": ["coal_deposit"],
+    "requiredTool": "pickaxe"
+  },
+  {
+    "id": "gold_ore",
+    "displayName": "Gold Ore",
+    "category": "material",
+    "weight": 5.0,
+    "stackSize": 20,
+    "isGatherable": true,
+    "gatherSources": ["gold_deposit"],
+    "requiredTool": "pickaxe"
+  },
+  {
+    "id": "copper_ore",
+    "displayName": "Copper Ore",
+    "category": "material",
+    "weight": 3.5,
+    "stackSize": 30,
+    "isGatherable": true,
+    "gatherSources": ["copper_deposit"],
+    "requiredTool": "pickaxe"
+  },
+  {
+    "id": "cloth",
+    "displayName": "Cloth",
+    "category": "material",
+    "weight": 0.5,
+    "stackSize": 50,
+    "isGatherable": false,
+    "craftedFrom": [{"itemId": "fiber", "amount": 3}]
+  },
+  {
+    "id": "rope",
+    "displayName": "Rope",
+    "category": "material",
+    "weight": 0.8,
+    "stackSize": 30,
+    "isGatherable": false,
+    "craftedFrom": [{"itemId": "fiber", "amount": 5}]
+  },
+  {
+    "id": "plank",
+    "displayName": "Wooden Plank",
+    "category": "material",
+    "weight": 1.5,
+    "stackSize": 50,
+    "isGatherable": false,
+    "craftedFrom": [{"itemId": "wood", "amount": 1}]
+  }
+]
