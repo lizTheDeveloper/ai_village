@@ -7,9 +7,35 @@
 
 import type { StoredMetric } from './MetricsStorage.js';
 
+/**
+ * Query request from the metrics server
+ */
+export interface QueryRequest {
+  requestId: string;
+  queryType: 'entities' | 'entity' | 'entity_prompt';
+  entityId?: string;
+}
+
+/**
+ * Query response to send back to server
+ */
+export interface QueryResponse {
+  requestId: string;
+  success: boolean;
+  data?: unknown;
+  error?: string;
+}
+
+/**
+ * Handler function for processing queries from the server
+ */
+export type QueryHandler = (query: QueryRequest) => Promise<QueryResponse>;
+
 export interface MetricsStreamConfig {
   /** WebSocket server URL (default: ws://localhost:8765) */
   serverUrl?: string;
+  /** Game session ID - if provided, server will use this instead of generating one */
+  gameSessionId?: string;
   /** Batch size before sending (default: 10) */
   batchSize?: number;
   /** Flush interval in ms (default: 5000) */
@@ -18,8 +44,10 @@ export interface MetricsStreamConfig {
   autoReconnect?: boolean;
   /** Reconnect delay in ms (default: 3000) */
   reconnectDelay?: number;
-  /** Max buffer size before dropping old metrics (default: 1000) */
+  /** Max buffer size before dropping old metrics (default: 10000) */
   maxBufferSize?: number;
+  /** Mark this session as a test run (default: auto-detect via VITEST env) */
+  isTest?: boolean;
 }
 
 export type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
@@ -39,26 +67,53 @@ export interface StreamStats {
 export class MetricsStreamClient {
   private ws: WebSocket | null = null;
   private buffer: StoredMetric[] = [];
-  private config: Required<MetricsStreamConfig>;
+  private config: Required<Omit<MetricsStreamConfig, 'gameSessionId'>> & Pick<MetricsStreamConfig, 'gameSessionId'>;
   private flushTimer: ReturnType<typeof setInterval> | null = null;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private connectionState: ConnectionState = 'disconnected';
   private sessionId: string | null = null;
   private lastError: string | null = null;
+  private queryHandler: QueryHandler | null = null;
   private stats = {
     messagesSent: 0,
     bytesTransmitted: 0,
   };
 
   constructor(config: MetricsStreamConfig = {}) {
+    // Auto-detect test environment if not explicitly set
+    const isTest = config.isTest ?? this.detectTestEnvironment();
+
     this.config = {
       serverUrl: config.serverUrl ?? 'ws://localhost:8765',
+      gameSessionId: config.gameSessionId,  // Pass through game's session ID
       batchSize: config.batchSize ?? 10,
       flushInterval: config.flushInterval ?? 5000,
       autoReconnect: config.autoReconnect ?? true,
       reconnectDelay: config.reconnectDelay ?? 3000,
-      maxBufferSize: config.maxBufferSize ?? 1000,
+      maxBufferSize: config.maxBufferSize ?? 10000,
+      isTest,
     };
+  }
+
+  /**
+   * Detect if running in a test environment
+   */
+  private detectTestEnvironment(): boolean {
+    // Check for common test environment indicators
+    if (typeof process !== 'undefined' && process.env) {
+      // Vitest, Jest, Mocha, etc.
+      if (process.env.VITEST || process.env.JEST_WORKER_ID || process.env.NODE_ENV === 'test') {
+        return true;
+      }
+    }
+    // Check for Vite's import.meta.env in browser
+    if (typeof globalThis !== 'undefined') {
+      const meta = (globalThis as any).import?.meta?.env;
+      if (meta?.VITEST || meta?.MODE === 'test') {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -80,6 +135,13 @@ export class MetricsStreamClient {
         this.lastError = null;
         console.log('[MetricsStreamClient] Connected to metrics server');
 
+        // Send client info including test status and game session ID
+        this.ws!.send(JSON.stringify({
+          type: 'client_info',
+          isTest: this.config.isTest,
+          gameSessionId: this.config.gameSessionId,  // Tell server which game this is
+        }));
+
         // Start flush timer
         this.startFlushTimer();
 
@@ -95,6 +157,22 @@ export class MetricsStreamClient {
           if (message.type === 'session') {
             this.sessionId = message.sessionId;
             console.log(`[MetricsStreamClient] Session ID: ${this.sessionId}`);
+          } else if (message.type === 'query' && this.queryHandler) {
+            // Handle query request from server
+            const query: QueryRequest = {
+              requestId: message.requestId,
+              queryType: message.queryType,
+              entityId: message.entityId,
+            };
+            this.queryHandler(query).then((response) => {
+              this.sendQueryResponse(response);
+            }).catch((err) => {
+              this.sendQueryResponse({
+                requestId: query.requestId,
+                success: false,
+                error: err instanceof Error ? err.message : 'Unknown error',
+              });
+            });
           }
         } catch {
           // Ignore parse errors
@@ -132,6 +210,33 @@ export class MetricsStreamClient {
     }
 
     this.connectionState = 'disconnected';
+  }
+
+  /**
+   * Set a handler for processing queries from the server.
+   * The handler receives query requests and should return responses.
+   */
+  setQueryHandler(handler: QueryHandler): void {
+    this.queryHandler = handler;
+  }
+
+  /**
+   * Send a query response back to the server
+   */
+  private sendQueryResponse(response: QueryResponse): void {
+    if (!this.isConnected()) {
+      console.error('[MetricsStreamClient] Cannot send query response - not connected');
+      return;
+    }
+
+    try {
+      this.ws!.send(JSON.stringify({
+        type: 'query_response',
+        ...response,
+      }));
+    } catch (err) {
+      console.error('[MetricsStreamClient] Failed to send query response:', err);
+    }
   }
 
   /**
