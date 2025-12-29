@@ -1,0 +1,199 @@
+/**
+ * Shared action definitions for LLM agent behaviors.
+ *
+ * This is the SINGLE SOURCE OF TRUTH for valid agent actions.
+ * Both ResponseParser and StructuredPromptBuilder use these definitions.
+ */
+
+import type { AgentBehavior } from '@ai-village/core';
+
+/**
+ * Skill requirement for Progressive Skill Reveal System.
+ */
+export interface ActionSkillRequirement {
+  skill: 'building' | 'farming' | 'gathering' | 'cooking' | 'crafting' | 'social' | 'exploration' | 'combat' | 'animal_handling' | 'medicine';
+  level: 0 | 1 | 2 | 3 | 4 | 5;
+}
+
+/**
+ * Action definition with behavior name and description for LLM prompts.
+ */
+export interface ActionDefinition {
+  /** The canonical behavior name that maps to a behavior handler */
+  behavior: AgentBehavior;
+  /** Description shown in LLM prompts */
+  description: string;
+  /** Whether this action is always shown or contextually conditional */
+  alwaysAvailable: boolean;
+  /** Category for grouping */
+  category: 'movement' | 'social' | 'building' | 'farming' | 'gathering' | 'exploration' | 'survival' | 'animal' | 'priority';
+  /** Skill requirement (optional - undefined means no skill required) */
+  skillRequired?: ActionSkillRequirement;
+}
+
+/**
+ * All valid agent actions with their descriptions.
+ * ResponseParser validates against these behaviors.
+ * StructuredPromptBuilder uses descriptions for prompts.
+ */
+export const ACTION_DEFINITIONS: ActionDefinition[] = [
+  // NOTE: 'wander', 'idle', 'rest', 'seek_sleep', 'seek_warmth' are NOT included here.
+  // These are autonomic/fallback behaviors, not executive decisions for the LLM to make.
+  // When the agent has nothing specific to do, they default to wandering.
+
+  // Gathering - agent decides WHAT to collect
+  { behavior: 'pick', description: 'Pick up a single item nearby', alwaysAvailable: true, category: 'gathering' },
+  { behavior: 'gather', description: 'Stockpile resources - gather a specified amount and store in chest', alwaysAvailable: true, category: 'gathering' },
+
+  // Social - agent decides WHO to interact with
+  { behavior: 'talk', description: 'Have a conversation', alwaysAvailable: false, category: 'social' },
+  { behavior: 'follow_agent', description: 'Follow someone', alwaysAvailable: false, category: 'social' },
+  { behavior: 'call_meeting', description: 'Call a meeting to discuss something', alwaysAvailable: false, category: 'social' },
+  { behavior: 'attend_meeting', description: 'Attend an ongoing meeting', alwaysAvailable: false, category: 'social' },
+  { behavior: 'help', description: 'Help another agent with their task', alwaysAvailable: false, category: 'social' },
+
+  // Building - agent decides WHAT to build
+  { behavior: 'build', description: 'Construct a building', alwaysAvailable: true, category: 'building', skillRequired: { skill: 'building', level: 1 } },
+  { behavior: 'plan_build', description: 'Plan and queue a building project', alwaysAvailable: true, category: 'building', skillRequired: { skill: 'building', level: 1 } },
+
+  // Farming - agent decides to work the land
+  { behavior: 'till', description: 'Prepare soil for planting', alwaysAvailable: true, category: 'farming', skillRequired: { skill: 'farming', level: 1 } },
+  { behavior: 'farm', description: 'Work on farming tasks', alwaysAvailable: true, category: 'farming', skillRequired: { skill: 'farming', level: 1 } },
+  { behavior: 'plant', description: 'Plant seeds in tilled soil', alwaysAvailable: false, category: 'farming', skillRequired: { skill: 'farming', level: 1 } },
+
+  // Exploration - agent decides to discover new areas
+  { behavior: 'explore', description: 'Explore unknown areas to find new resources', alwaysAvailable: true, category: 'exploration' },
+
+  // Animal Husbandry - agent decides to work with animals
+  { behavior: 'tame_animal', description: 'Approach and tame a wild animal', alwaysAvailable: true, category: 'animal', skillRequired: { skill: 'animal_handling', level: 2 } },
+  { behavior: 'house_animal', description: 'Lead a tamed animal to its housing', alwaysAvailable: true, category: 'animal', skillRequired: { skill: 'animal_handling', level: 2 } },
+
+  // Priority Management - agent decides what to focus on
+  { behavior: 'set_priorities', description: 'Set task priorities (gathering, building, farming, social)', alwaysAvailable: true, category: 'priority' },
+];
+
+/**
+ * Set of all valid behavior names.
+ * Used by ResponseParser for validation.
+ */
+export const VALID_BEHAVIORS: Set<string> = new Set(
+  ACTION_DEFINITIONS.map(def => def.behavior)
+);
+
+/**
+ * Map of behavior names to their descriptions.
+ */
+export const BEHAVIOR_DESCRIPTIONS: Map<string, string> = new Map(
+  ACTION_DEFINITIONS.map(def => [def.behavior, def.description])
+);
+
+/**
+ * Synonym mapping - maps user-friendly terms to canonical behaviors.
+ */
+export const BEHAVIOR_SYNONYMS: Record<string, AgentBehavior> = {
+  // Pick = single item pickup
+  'get': 'pick',
+  'take': 'pick',
+  'grab': 'pick',
+
+  // Gather = stockpile with amount, auto-deposits to storage
+  'stockpile': 'gather',
+  'collect': 'gather',
+  'harvest': 'gather',
+  'forage': 'gather',
+  'scavenge': 'gather',
+  'hoard': 'gather',
+  'seek_food': 'gather',
+  'gather_seeds': 'gather',
+
+  // NOTE: 'sleep', 'nap', 'rest' are NOT valid LLM actions - sleep is autonomic
+
+  // Talk synonyms
+  'speak': 'talk',
+  'chat': 'talk',
+  'converse': 'talk',
+  'greet': 'talk',
+  'say': 'talk',
+
+  // Explore synonyms
+  'search': 'explore',
+  'scout': 'explore',
+  'investigate': 'explore',
+  'look_around': 'explore',
+
+  // Build synonyms
+  'construct': 'build',
+  'make': 'build',
+  'create': 'build',
+
+  // Follow synonyms
+  'follow': 'follow_agent',
+
+  // NOTE: 'wander', 'idle' are NOT valid LLM actions - they are fallback behaviors.
+  // Navigation/wait synonyms removed since agents shouldn't explicitly choose to wander/idle.
+
+  // Farming synonyms
+  'water': 'farm',
+  'fertilize': 'farm',
+  'tend': 'farm',
+  'cultivate': 'farm',
+  'sow': 'plant',
+  'seed': 'plant',
+  'plow': 'till',
+  'prepare_soil': 'till',
+
+  // NOTE: Survival synonyms (seek_warmth, seek_sleep) removed - these are autonomic behaviors
+
+  // Animal synonyms
+  'tame': 'tame_animal',
+  'befriend': 'tame_animal',
+  'house': 'house_animal',
+  'shelter_animal': 'house_animal',
+
+  // Priority synonyms
+  'prioritize': 'set_priorities',
+  'focus': 'set_priorities',
+};
+
+/**
+ * Get the description for a behavior, for use in prompts.
+ */
+export function getActionDescription(behavior: string): string {
+  return BEHAVIOR_DESCRIPTIONS.get(behavior) ?? behavior;
+}
+
+/**
+ * Get all actions for a category.
+ */
+export function getActionsByCategory(category: ActionDefinition['category']): ActionDefinition[] {
+  return ACTION_DEFINITIONS.filter(def => def.category === category);
+}
+
+/**
+ * Get all always-available actions.
+ */
+export function getAlwaysAvailableActions(): ActionDefinition[] {
+  return ACTION_DEFINITIONS.filter(def => def.alwaysAvailable);
+}
+
+/**
+ * Get actions available based on skill levels.
+ * Filters out actions that require skills the agent doesn't have.
+ * Per progressive-skill-reveal-spec.md:
+ * - Universal actions (no skill required): always available
+ * - Skill-gated actions: require minimum skill level
+ */
+export function getActionsForSkills(
+  skills: Partial<Record<string, number>>
+): ActionDefinition[] {
+  return ACTION_DEFINITIONS.filter(def => {
+    // No skill required = always available
+    if (!def.skillRequired) {
+      return true;
+    }
+
+    // Check if agent has required skill level
+    const agentSkillLevel = skills[def.skillRequired.skill] ?? 0;
+    return agentSkillLevel >= def.skillRequired.level;
+  });
+}
