@@ -1,5 +1,7 @@
 # AI Village Development Guidelines
 
+> *This project is dedicated to Tarn Adams and Dwarf Fortress. See [README.md](./README.md) for our philosophy on open source, monetization, and the inspirations behind this project.*
+
 ## Naming Conventions
 
 ### Component Type Names
@@ -117,6 +119,27 @@ except SpecificError as e:
     raise  # Still crash, but with context
 ```
 
+### Debug Output Prohibition
+
+**NEVER add debug print statements or console.log calls to code.** This includes:
+
+```typescript
+// ❌ PROHIBITED - Never add these
+console.log('Debug:', variable);
+console.debug('State:', state);
+console.info('Processing:', data);
+
+// ✅ ALLOWED - Only for errors
+console.error('[ComponentName] Critical error:', error);
+console.warn('[ComponentName] Warning:', issue);
+```
+
+Reasons:
+- Debug statements clutter the codebase
+- They are rarely removed after debugging
+- They create noise in production
+- Use the Agent Dashboard for debugging instead
+
 ## TypeScript Patterns
 
 The same principles apply to TypeScript code:
@@ -135,6 +158,104 @@ return fallback;
 // GOOD: Throw with context
 throw new ParseError(`Could not parse: ${text}. Valid options: ${validOptions}`);
 ```
+
+## Running the Game
+
+### 1. Start the Metrics Dashboard (Terminal 1)
+
+The dashboard collects metrics from the game and provides a text-based interface for debugging:
+
+```bash
+cd custom_game_engine
+npm run metrics-server
+```
+
+This starts:
+- **WebSocket server** on `ws://localhost:8765` (receives metrics from game)
+- **HTTP dashboard** on `http://localhost:8766` (query with curl)
+
+### 2. Start the Game Dev Server (Terminal 2)
+
+```bash
+cd custom_game_engine
+npm run dev
+```
+
+This starts Vite dev server on `http://localhost:5173`
+
+### 3. Open the Game in Browser
+
+Open `http://localhost:5173` in a browser. The game will:
+- Connect to the metrics server automatically
+- Start streaming events to the dashboard
+- Create a new session visible at `http://localhost:8766/`
+
+### 4. Query the Dashboard with curl
+
+**Always use curl to query the dashboard** - it's designed for LLM consumption:
+
+```bash
+# Session browser - list all sessions
+curl http://localhost:8766/
+
+# Main dashboard (latest session)
+curl "http://localhost:8766/dashboard?session=latest"
+
+# Agent list for a session
+curl "http://localhost:8766/dashboard/agents?session=<session_id>"
+
+# Detailed agent info (use full UUID from agent list)
+curl "http://localhost:8766/dashboard/agent?id=<agent_uuid>"
+
+# Event timeline
+curl "http://localhost:8766/dashboard/timeline?session=<session_id>"
+
+# Resource flow analysis
+curl "http://localhost:8766/dashboard/resources?session=<session_id>"
+
+# Live game status (requires running game)
+curl http://localhost:8766/api/live/status
+curl http://localhost:8766/api/live/entities
+
+# Raw metrics
+curl http://localhost:8766/metrics/summary
+```
+
+### Dashboard Shows:
+- **Villager count and status** - current behavior, last activity
+- **LLM success rate** - e.g., "LLM: 34/34" means 100% success
+- **Buildings** - complete vs in-progress counts
+- **Resources** - gathered/consumed totals
+- **Conversations** - social interaction count
+- **Issues/Warnings** - stuck agents, duplicate buildings, loops
+
+## Playwright MCP Usage
+
+**IMPORTANT: Playwright has limitations with existing browser windows.**
+
+### When NOT to use Playwright:
+- If a browser tab is already open, `browser_navigate` will error
+- If the user already has the game open in their browser
+- For simple dashboard queries (use curl instead)
+
+### If you must use Playwright:
+1. **Check first** with `browser_snapshot` to see if a page is loaded
+2. **Close existing tabs** with `browser_close` before navigating
+3. Use `browser_console_messages` to check for JavaScript errors
+
+### Prefer curl for the dashboard:
+```bash
+# Good - use curl for dashboard
+curl "http://localhost:8766/dashboard?session=latest"
+
+# Avoid - Playwright for text dashboard
+# browser_navigate to http://localhost:8766/dashboard
+```
+
+Playwright is useful for:
+- Taking screenshots of the actual game UI
+- Checking browser console for errors
+- Interacting with game UI elements
 
 ## Verification Before Completion
 

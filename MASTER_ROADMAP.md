@@ -21,28 +21,44 @@
 
 ## Current Status
 
-**Last Updated:** 2025-12-24 (Phase 27 work order created)
+**Last Updated:** 2025-12-28
 
 | Phase | Status | Description |
 |-------|--------|-------------|
 | Phase 0-3 | ✅ Complete | Foundation through Agent Needs |
-| Phase 4 | 🚧 In Progress | Memory & Social (Basic complete, Episodic Memory in progress) |
+| Phase 4 | ✅ Complete | Memory & Social (Episodic memory, spatial, relationships) |
 | Phase 5-6 | ✅ Complete | Communication & LLM Integration |
-| Phase 7 | 🚧 In Progress | Building & Shelter |
+| Phase 7 | ✅ Complete | Building & Shelter (Construction, inventory display) |
 | Phase 8 | ✅ Complete | Temperature & Weather |
-| Phase 9 | 🚧 In Progress | Farming (Soil, Plant Lifecycle) |
-| Phase 10 | 🚧 In Progress | Crafting (Quality System, Inventory UI) |
-| Phase 11 | 🚧 In Progress | Animals (Foundation work started) |
-| Phase 22 | 🚧 In Progress | Sociological Metrics (Event Schemas) |
-| Phase 27 | 🚧 In Progress | Divine Communication (Work order created) |
+| Phase 9 | ✅ Complete | Farming (Soil, Plant Lifecycle, Tilling, Seeds) |
+| Phase 10 | ✅ Complete | Crafting (core loop done, polish items optional) |
+| Phase 11 | ✅ Complete | Animals (Foundation, housing, production) |
+| Phase 22 | ✅ Complete | Sociological Metrics Foundation (all tasks done) |
+| Phase 23 | ✅ Complete | Sociological Metrics Storage & API |
+| Phase 24 | ✅ Complete | Sociological Metrics Analysis Modules |
+| Phase 27 | ⏳ Ready | Divine Communication (can start anytime) |
+| Phase 12 | ✅ Complete | Economy & Trade (Currency, Trading, Shops, Market Events) |
+| Phase 25 | ⏳ Ready | Sociological Metrics Visualization Dashboard |
 | Phase 28 | 🔒 Blocked | Angel Systems (blocked on Phase 27) |
+| Phase 29 | ⏳ Ready | Item System Refactor (Materials, Traits, Instances) |
+| Phase 30 | ⏳ Ready | Magic System (Multi-source, Verb/Noun Composition) |
+| Phase 31 | ⏳ Ready | Persistence Layer (World Serialization, Migrations) |
+| Phase 32 | 🔒 Blocked | Universe Forking (Parallel World Testing) - blocked on Phase 31 |
+| Phase 33 | 🔒 Blocked | LLM Effect Generation (Safe Generated Effects) - blocked on Phase 30, 32 |
+| Phase 34 | 🔒 Blocked | Cross-Universe Sharing (Effect Packages, Trust) - blocked on Phase 31, 33 |
+| Skill System | 🚧 In Progress | Progressive Skill Reveal - skill-gated prompt context (claimed 2025-12-28) |
 
-**Next Available Work:**
-1. **Phase 4 (Episodic Memory)** - Work order ready for playtest
-2. **Phase 27 (Divine Communication - Prayer/Visions)** - Work order created, ready for tests
-3. Phase 7 remaining tasks (Resource Gathering, Building Placement UI, Agent Inventory Display)
-4. **Phases 9-11 tasks** - Multiple work orders in progress
-5. **Phase 22 (Sociological Metrics)** - Event schemas in progress, other tasks available
+**Parallel Work Available (pick any):**
+- **Phase 8**: seek_cooling behavior (small task)
+- **Phase 13**: Research & Discovery (Phase 12 ✅ complete!)
+- **Phase 14**: Governance (Phase 12 ✅ complete!)
+- **Phase 15**: Multi-Village (Phase 12 ✅ complete!)
+- **Phase 25**: Sociological Metrics Dashboard (Phase 23-24 ✅ complete)
+- **Phase 27**: Divine Communication system
+- **Phase 29**: Item System Refactor (no dependencies, can start now!)
+- **Phase 30**: Magic System (no dependencies, can start now!)
+- **Phase 31**: Persistence Layer (no dependencies, can start now!)
+- **Technical Debt**: AI System refactor
 
 ---
 
@@ -62,13 +78,13 @@ Phase 3: Agent Needs ───────────────────�
     │
     ├──────────────┬──────────────┬──────────────┐
     ▼              ▼              ▼              ▼
-Phase 4       Phase 5       Phase 6       Phase 7 ──────┬─────── 🚧 IN PROGRESS
-Memory        Communication  LLM           Building      │
-✅            ✅             ✅            🚧            │ 🔀 PARALLEL
-    │              │              │              │        │
-    └──────────────┴──────────────┴──────────────┘        │
-                            │                             │
-                            ▼                             ▼
+Phase 4       Phase 5       Phase 6       Phase 7 ─────────────── ✅ COMPLETE
+Memory        Communication  LLM           Building
+✅            ✅             ✅            ✅
+    │              │              │              │
+    └──────────────┴──────────────┴──────────────┘
+                            │
+                            ▼
                       Phase 8: Temperature & Weather ──────────── ✅ COMPLETE
                             │
     ┌───────────────────────┼───────────────────────┐
@@ -76,12 +92,12 @@ Memory        Communication  LLM           Building      │
     ▼                       ▼                       ▼
 Phase 9 🔀             Phase 10 🔀            Phase 11 🔀
 Farming                Crafting              Animals
-⏳                     ⏳                    ⏳
+✅                     ✅                    ✅
     │                       │                       │
     └───────────────────────┼───────────────────────┘
                             │
                             ▼
-                      Phase 12: Economy ────────────────────────── 🔒
+                      Phase 12: Economy ────────────────────────── ⏳ READY
                             │
             ┌───────────────┼───────────────┐
             ▼               ▼               ▼
@@ -171,9 +187,9 @@ Farming                Crafting              Animals
 
 ---
 
-### Phase 4: Memory & Social Awareness 🚧 IN PROGRESS
+### Phase 4: Memory & Social Awareness ✅ COMPLETE
 
-**Status:** 🚧 Basic complete, episodic memory enhancement in progress
+**Status:** ✅ Complete
 **Dependencies:** Phase 3
 **Parallel Work:** 🔀 Can run parallel with Phase 5, 6
 
@@ -181,15 +197,13 @@ Farming                Crafting              Animals
 |------|--------|------|
 | Vision Component | ✅ | [agent-system/spatial-memory.md](openspec/specs/agent-system/spatial-memory.md) |
 | Memory Component (Basic) | ✅ | [agent-system/memory-system.md](openspec/specs/agent-system/memory-system.md) |
-| Episodic Memory System | 🚧 | [agent-system/memory-system.md](openspec/specs/agent-system/memory-system.md) |
+| Episodic Memory System | ✅ | [agent-system/memory-system.md](openspec/specs/agent-system/memory-system.md) |
 | Relationship Component | ✅ | [agent-system/relationship-system.md](openspec/specs/agent-system/relationship-system.md) |
 | Spatial Awareness | ✅ | [agent-system/spatial-memory.md](openspec/specs/agent-system/spatial-memory.md) |
 
-**Work Order:** [agents/autonomous-dev/work-orders/episodic-memory-system/work-order.md](agents/autonomous-dev/work-orders/episodic-memory-system/work-order.md)
-
 **Implementation:** `packages/core/src/components/MemoryComponent.ts`, `packages/core/src/components/RelationshipComponent.ts`
 
-**Note:** Episodic Memory System is a major enhancement adding:
+**Completed features:**
 - Rich event memories with emotional encoding
 - End-of-day reflections via LLM
 - Semantic memory (knowledge/beliefs)
@@ -235,29 +249,23 @@ Farming                Crafting              Animals
 
 ---
 
-### Phase 7: Building & Shelter 🚧 IN PROGRESS
+### Phase 7: Building & Shelter ✅ COMPLETE
 
-**Status:** 🚧 In Progress
+**Status:** ✅ Complete
 **Dependencies:** Phase 3, 4, 5, 6
 **Parallel Work:** Tasks within this phase can be parallelized as marked
 
 | Task | Status | Spec | Parallel |
 |------|--------|------|----------|
 | Building Component | ✅ | [construction-system/spec.md](openspec/specs/construction-system/spec.md) | - |
-| Building Definitions | 🚧 | [construction-system/spec.md](openspec/specs/construction-system/spec.md) | 🔀 |
-| Resource Gathering | 🚧 | [items-system/spec.md](openspec/specs/items-system/spec.md) | 🔀 |
+| Building Definitions | ✅ | [construction-system/spec.md](openspec/specs/construction-system/spec.md) | 🔀 |
+| Resource Gathering | ✅ | [items-system/spec.md](openspec/specs/items-system/spec.md) | 🔀 |
 | Construction Progress | ✅ | [construction-system/spec.md](openspec/specs/construction-system/spec.md) | - |
-
-**Work Order:** [agents/autonomous-dev/work-orders/construction-progress/work-order.md](agents/autonomous-dev/work-orders/construction-progress/work-order.md)
-| Building Placement UI | 🚧 | [ui-system/building-placement.md](openspec/specs/ui-system/building-placement.md) | 🔀 |
-| Agent Inventory Display | 🚧 | [ui-system/agent-inventory-display.md](openspec/specs/ui-system/agent-inventory-display.md) | 🔀 |
-
-**Work Order:** [agents/autonomous-dev/work-orders/agent-inventory-display/work-order.md](agents/autonomous-dev/work-orders/agent-inventory-display/work-order.md)
+| Building Placement UI | ✅ | [ui-system/building-placement.md](openspec/specs/ui-system/building-placement.md) | 🔀 |
+| Agent Inventory Display | ✅ | [ui-system/agent-inventory-display.md](openspec/specs/ui-system/agent-inventory-display.md) | 🔀 |
 | Shelter Need Satisfaction | ✅ | Replaced by Phase 8 Temperature System | - |
 
 **Implementation:** `packages/core/src/components/BuildingComponent.ts`, `packages/core/src/systems/BuildingSystem.ts`
-
-**Tests:** `tests/phase7*.spec.ts`
 
 ---
 
@@ -277,7 +285,7 @@ Farming                Crafting              Animals
 | Remove Shelter Need | ✅ | [temperature-shelter-system.md](custom_game_engine/specs/temperature-shelter-system.md) | - |
 | Add Health to Needs | ✅ | [temperature-shelter-system.md](custom_game_engine/specs/temperature-shelter-system.md) | - |
 | seek_warmth Behavior | ✅ | [temperature-shelter-system.md](custom_game_engine/specs/temperature-shelter-system.md) | 🔀 |
-| seek_cooling Behavior | ✅ | [temperature-shelter-system.md](custom_game_engine/specs/temperature-shelter-system.md) | 🔀 |
+| seek_cooling Behavior | ⏳ | [temperature-shelter-system.md](custom_game_engine/specs/temperature-shelter-system.md) | 🔀 |
 | Temperature LLM Context | ✅ | [temperature-shelter-system.md](custom_game_engine/specs/temperature-shelter-system.md) | - |
 
 **Implementation:** `packages/core/src/systems/TemperatureSystem.ts`, `packages/core/src/systems/WeatherSystem.ts`
@@ -290,152 +298,150 @@ Farming                Crafting              Animals
 
 ---
 
-### Phase 9: Farming ⏳ READY
+### Phase 9: Farming ✅ COMPLETE
 
-**Status:** ⏳ Ready (Phase 8 complete)
+**Status:** ✅ Complete (core farming loop working)
 **Dependencies:** Phase 8 ✅ (weather affects crops)
 **Parallel Work:** 🔀 Can run parallel with Phase 10, 11
 
 | Task | Status | Spec | Parallel |
 |------|--------|------|----------|
-| Soil/Tile System | 🚧 | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | - |
-
-**Work Order:** [agents/autonomous-dev/work-orders/soil-tile-system/work-order.md](agents/autonomous-dev/work-orders/soil-tile-system/work-order.md)
-| Plant Lifecycle | 🚧 | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | - |
-
-**Work Order:** [agents/autonomous-dev/work-orders/plant-lifecycle/work-order.md](agents/autonomous-dev/work-orders/plant-lifecycle/work-order.md)
-| Seed System | 🚧 | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | 🔀 |
-
-**Work Order:** [agents/autonomous-dev/work-orders/seed-system/work-order.md](agents/autonomous-dev/work-orders/seed-system/work-order.md)
-| Tilling Action | 🚧 | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | 🔀 |
-
-**Work Order:** [agents/autonomous-dev/work-orders/tilling-action/work-order.md](agents/autonomous-dev/work-orders/tilling-action/work-order.md)
-| Planting Action | ⏳ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | - |
-| Watering Action | ⏳ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | 🔀 |
-| Harvesting Action | ⏳ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | - |
+| Soil/Tile System | ✅ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | - |
+| Plant Lifecycle | ✅ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | - |
+| Seed System | ✅ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | 🔀 |
+| Tilling Action | ✅ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | 🔀 |
+| Planting Action | ✅ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | - |
+| Watering Action | ✅ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | 🔀 |
+| Harvesting Action | ✅ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | - |
 | Crop Hybridization | ⏳ | [farming-system/spec.md](openspec/specs/farming-system/spec.md) | - |
 | Farming Buildings | ⏳ | [construction-system/spec.md](openspec/specs/construction-system/spec.md) | 🔀 |
 | Farm Management UI | ⏳ | [ui-system/farm-management.md](openspec/specs/ui-system/farm-management.md) | 🔀 |
 
 ---
 
-### Phase 10: Crafting & Items ⏳ READY
+### Phase 10: Crafting & Items ✅ COMPLETE
 
-**Status:** ⏳ Ready (Phase 8 complete)
-**Dependencies:** Phase 8 ✅ (needs temperature for item durability)
+**Status:** ✅ Complete (core crafting loop working, polish items optional)
+**Dependencies:** Phase 8 ✅
 **Parallel Work:** 🔀 Can run parallel with Phase 9, 11
 
 | Task | Status | Spec | Parallel |
 |------|--------|------|----------|
-| Recipe System | ⏳ | [items-system/spec.md](openspec/specs/items-system/spec.md) | - |
-| Crafting Stations | 🚧 | [construction-system/spec.md](openspec/specs/construction-system/spec.md) | 🔀 |
+| Recipe System | ✅ | [items-system/spec.md](openspec/specs/items-system/spec.md) | - |
+| Crafting Stations | [P] | [construction-system/spec.md](openspec/specs/construction-system/spec.md) | 🔀 |
+| Crafting UI | ✅ | [ui-system/crafting.md](openspec/specs/ui-system/crafting.md) | 🔀 |
+| Inventory UI | ✅ | [ui-system/inventory.md](openspec/specs/ui-system/inventory.md) | 🔀 |
+| Item System Refactor | 🚧 | [items-system/spec.md](openspec/specs/items-system/spec.md) | - |
 
-**Work Order:** [agents/autonomous-dev/work-orders/crafting-stations/work-order.md](agents/autonomous-dev/work-orders/crafting-stations/work-order.md)
+**Polish (not blocking):**
+| Task | Status | Spec | Parallel |
+|------|--------|------|----------|
 | Tool Durability | ⏳ | [items-system/spec.md](openspec/specs/items-system/spec.md) | 🔀 |
 | Quality System | 🚧 | [items-system/spec.md](openspec/specs/items-system/spec.md) | 🔀 |
 
-**Work Order:** [agents/autonomous-dev/work-orders/quality-system/work-order.md](agents/autonomous-dev/work-orders/quality-system/work-order.md)
-| Crafting UI | 🚧 | [ui-system/crafting.md](openspec/specs/ui-system/crafting.md) | 🔀 |
+**Work Order:** [agents/autonomous-dev/work-orders/itemquality-system/work-order.md](agents/autonomous-dev/work-orders/itemquality-system/work-order.md)
+**Status:** READY_FOR_TESTS (claimed 2025-12-28 by spec-agent-001)
 
-**Work Order:** [agents/autonomous-dev/work-orders/crafting-ui/work-order.md](agents/autonomous-dev/work-orders/crafting-ui/work-order.md)
-| Inventory UI | 🚧 | [ui-system/inventory.md](openspec/specs/ui-system/inventory.md) | 🔀 |
-
-**Work Order:** [agents/autonomous-dev/work-orders/inventory-ui/work-order.md](agents/autonomous-dev/work-orders/inventory-ui/work-order.md)
+**Note:** Crafting Stations [P] = awaiting playtest verification
 
 ---
 
-### Phase 11: Animals 🚧 IN PROGRESS
+### Phase 11: Animals ✅ COMPLETE
 
-**Status:** 🚧 In Progress (Foundation work started)
+**Status:** ✅ Complete (foundation and housing done)
 **Dependencies:** Phase 8 ✅ (animals need temperature comfort)
 **Parallel Work:** 🔀 Can run parallel with Phase 9, 10
 
 | Task | Status | Spec | Parallel |
 |------|--------|------|----------|
-| Animal System Foundation | 🚧 | [animal-system/spec.md](openspec/specs/animal-system/spec.md) | - |
-
-**Work Order:** [agents/autonomous-dev/work-orders/animal-system-foundation/work-order.md](agents/autonomous-dev/work-orders/animal-system-foundation/work-order.md)
-
-**Foundation includes:** Animal Component, Animal AI, Taming System, Animal Products (eggs, milk), Wild animal spawning, Temperature integration
-
-**Future tasks (after foundation):**
-| Task | Status | Spec | Parallel |
-|------|--------|------|----------|
+| Animal System Foundation | ✅ | [animal-system/spec.md](openspec/specs/animal-system/spec.md) | - |
+| Animal Housing | ✅ | [construction-system/spec.md](openspec/specs/construction-system/spec.md) | 🔀 |
+| Taming System | ✅ | [animal-system/spec.md](openspec/specs/animal-system/spec.md) | - |
+| Animal Products | ✅ | [animal-system/spec.md](openspec/specs/animal-system/spec.md) | - |
+| Wild Animal Spawning | ✅ | [animal-system/spec.md](openspec/specs/animal-system/spec.md) | - |
 | Breeding | ⏳ | [animal-system/spec.md](openspec/specs/animal-system/spec.md) | - |
-| Animal Housing | 🚧 | [construction-system/spec.md](openspec/specs/construction-system/spec.md) | 🔀 |
-
-**Work Order:** [agents/autonomous-dev/work-orders/animal-housing/work-order.md](agents/autonomous-dev/work-orders/animal-housing/work-order.md)
-| Animal Husbandry UI | 🚧 | [ui-system/animal-husbandry.md](openspec/specs/ui-system/animal-husbandry.md) | 🔀 |
-
-**Work Order:** [agents/autonomous-dev/work-orders/animal-husbandry-ui/work-order.md](agents/autonomous-dev/work-orders/animal-husbandry-ui/work-order.md)
+| Animal Husbandry UI | ⏳ | [ui-system/animal-husbandry.md](openspec/specs/ui-system/animal-husbandry.md) | 🔀 |
 
 ---
 
-### Phase 12: Economy & Trade 🔒 BLOCKED
+### Phase 12: Economy & Trade ✅ COMPLETE
 
-**Status:** 🔒 Blocked on Phase 9, 10, 11
-**Dependencies:** Phases 9-11 (needs goods to trade)
-**Parallel Work:** None (integrates previous phases)
+**Status:** ✅ Complete (2025-12-26)
+**Dependencies:** Phases 9 ✅, 10 ✅, 11 ✅
+**Implementation:** `packages/core/src/economy/`, `packages/core/src/systems/TradingSystem.ts`
 
 | Task | Status | Spec | Parallel |
 |------|--------|------|----------|
-| Currency System | 🔒 | [economy-system/spec.md](openspec/specs/economy-system/spec.md) | - |
-| Value Calculation | 🔒 | [economy-system/spec.md](openspec/specs/economy-system/spec.md) | - |
-| Shop Buildings | 🔒 | [construction-system/spec.md](openspec/specs/construction-system/spec.md) | 🔀 |
-| Trading System | 🔒 | [economy-system/spec.md](openspec/specs/economy-system/spec.md) | - |
-| Price Negotiation | 🔒 | [economy-system/spec.md](openspec/specs/economy-system/spec.md) | - |
-| Economy Dashboard UI | 🔒 | [ui-system/economy-dashboard.md](openspec/specs/ui-system/economy-dashboard.md) | 🔀 |
-| Trading UI | 🔒 | [ui-system/trading.md](openspec/specs/ui-system/trading.md) | 🔀 |
+| Currency System | ✅ | [economy-system/spec.md](openspec/specs/economy-system/spec.md) | - |
+| Value Calculation | ✅ | [economy-system/spec.md](openspec/specs/economy-system/spec.md) | - |
+| Shop Buildings | ✅ | [construction-system/spec.md](openspec/specs/construction-system/spec.md) | 🔀 |
+| Trading System | ✅ | [economy-system/spec.md](openspec/specs/economy-system/spec.md) | - |
+| Market Events | ✅ | [economy-system/spec.md](openspec/specs/economy-system/spec.md) | - |
+| Economy Dashboard UI | ✅ | [ui-system/economy-dashboard.md](openspec/specs/ui-system/economy-dashboard.md) | 🔀 |
+| Trading UI | ✅ | [ui-system/trading.md](openspec/specs/ui-system/trading.md) | 🔀 |
+
+**Completed features:**
+- CurrencyComponent with transaction history
+- ShopComponent with stock management
+- MarketStateComponent for supply/demand tracking
+- PricingService with dynamic pricing
+- TradingSystem for buy/sell transactions
+- TradeActionHandler for action queue integration
+- TradeBehavior for autonomous agent trading
+- Shop building blueprints (general store, blacksmith, tavern, farm supply)
+- Economy Dashboard UI (E key)
+- Shop Panel UI (click on shops)
+- MarketEventSystem with shortages, surpluses, festivals
 
 ---
 
-### Phase 13: Research & Discovery 🔒 BLOCKED
+### Phase 13: Research & Discovery ⏳ READY
 
-**Status:** 🔒 Blocked on Phase 12
-**Dependencies:** Phase 12 (needs economy for research costs)
+**Status:** ⏳ Ready (Phase 12 ✅ complete)
+**Dependencies:** Phase 12 ✅
 **Parallel Work:** 🔀 Can run parallel with Phase 14, 15
 
 | Task | Status | Spec | Parallel |
 |------|--------|------|----------|
-| Research Tree | 🔒 | [research-system/spec.md](openspec/specs/research-system/spec.md) | - |
-| Research Buildings | 🔒 | [construction-system/spec.md](openspec/specs/construction-system/spec.md) | 🔀 |
-| Research Points | 🔒 | [research-system/spec.md](openspec/specs/research-system/spec.md) | - |
-| Discovery System | 🔒 | [research-system/spec.md](openspec/specs/research-system/spec.md) | - |
-| Procedural Recipes | 🔒 | [research-system/capability-evolution.md](openspec/specs/research-system/capability-evolution.md) | - |
-| Research Tree UI | 🔒 | [ui-system/research-tree.md](openspec/specs/ui-system/research-tree.md) | 🔀 |
+| Research Tree | ⏳ | [research-system/spec.md](openspec/specs/research-system/spec.md) | - |
+| Research Buildings | ⏳ | [construction-system/spec.md](openspec/specs/construction-system/spec.md) | 🔀 |
+| Research Points | ⏳ | [research-system/spec.md](openspec/specs/research-system/spec.md) | - |
+| Discovery System | ⏳ | [research-system/spec.md](openspec/specs/research-system/spec.md) | - |
+| Procedural Recipes | ⏳ | [research-system/capability-evolution.md](openspec/specs/research-system/capability-evolution.md) | - |
+| Research Tree UI | ⏳ | [ui-system/research-tree.md](openspec/specs/ui-system/research-tree.md) | 🔀 |
 
 ---
 
-### Phase 14: Governance 🔒 BLOCKED
+### Phase 14: Governance ⏳ READY
 
-**Status:** 🔒 Blocked on Phase 12
-**Dependencies:** Phase 12 (needs economy, multiple agents with relationships)
+**Status:** ⏳ Ready (Phase 12 ✅ complete)
+**Dependencies:** Phase 12 ✅
 **Parallel Work:** 🔀 Can run parallel with Phase 13, 15
 
 | Task | Status | Spec | Parallel |
 |------|--------|------|----------|
-| Government Types | 🔒 | [governance-system/spec.md](openspec/specs/governance-system/spec.md) | - |
-| Leadership Roles | 🔒 | [governance-system/spec.md](openspec/specs/governance-system/spec.md) | - |
-| Law System | 🔒 | [governance-system/spec.md](openspec/specs/governance-system/spec.md) | 🔀 |
-| Voting/Decisions | 🔒 | [governance-system/spec.md](openspec/specs/governance-system/spec.md) | 🔀 |
-| Governance UI | 🔒 | [ui-system/governance.md](openspec/specs/ui-system/governance.md) | 🔀 |
+| Government Types | ⏳ | [governance-system/spec.md](openspec/specs/governance-system/spec.md) | - |
+| Leadership Roles | ⏳ | [governance-system/spec.md](openspec/specs/governance-system/spec.md) | - |
+| Law System | ⏳ | [governance-system/spec.md](openspec/specs/governance-system/spec.md) | 🔀 |
+| Voting/Decisions | ⏳ | [governance-system/spec.md](openspec/specs/governance-system/spec.md) | 🔀 |
+| Governance UI | ⏳ | [ui-system/governance.md](openspec/specs/ui-system/governance.md) | 🔀 |
 
 ---
 
-### Phase 15: Multi-Village 🔒 BLOCKED
+### Phase 15: Multi-Village ⏳ READY
 
-**Status:** 🔒 Blocked on Phase 12
-**Dependencies:** Phase 12 (needs trade routes)
+**Status:** ⏳ Ready (Phase 12 ✅ complete)
+**Dependencies:** Phase 12 ✅
 **Parallel Work:** 🔀 Can run parallel with Phase 13, 14
 
 | Task | Status | Spec | Parallel |
 |------|--------|------|----------|
-| Abstraction Layers | 🔒 | [world-system/abstraction-layers.md](openspec/specs/world-system/abstraction-layers.md) | - |
-| Village Summaries | 🔒 | [world-system/abstraction-layers.md](openspec/specs/world-system/abstraction-layers.md) | - |
-| Trade Routes | 🔒 | [economy-system/inter-village-trade.md](openspec/specs/economy-system/inter-village-trade.md) | 🔀 |
-| Caravans | 🔒 | [economy-system/inter-village-trade.md](openspec/specs/economy-system/inter-village-trade.md) | 🔀 |
-| News Propagation | 🔒 | [agent-system/chroniclers.md](openspec/specs/agent-system/chroniclers.md) | 🔀 |
-| Map UI | 🔒 | [ui-system/map.md](openspec/specs/ui-system/map.md) | 🔀 |
+| Abstraction Layers | ⏳ | [world-system/abstraction-layers.md](openspec/specs/world-system/abstraction-layers.md) | - |
+| Village Summaries | ⏳ | [world-system/abstraction-layers.md](openspec/specs/world-system/abstraction-layers.md) | - |
+| Trade Routes | ⏳ | [economy-system/inter-village-trade.md](openspec/specs/economy-system/inter-village-trade.md) | 🔀 |
+| Caravans | ⏳ | [economy-system/inter-village-trade.md](openspec/specs/economy-system/inter-village-trade.md) | 🔀 |
+| News Propagation | ⏳ | [agent-system/chroniclers.md](openspec/specs/agent-system/chroniclers.md) | 🔀 |
+| Map UI | ⏳ | [ui-system/map.md](openspec/specs/ui-system/map.md) | 🔀 |
 
 ---
 
@@ -507,23 +513,23 @@ These phases extend beyond the core game:
 | Universe Types | [universe-system/spec.md](openspec/specs/universe-system/spec.md) |
 | Cross-Game Progression | [nexus-system/spec.md](openspec/specs/nexus-system/spec.md) |
 
-### Phase 22: Sociological Metrics - Foundation ⏳ READY
+### Phase 22: Sociological Metrics - Foundation ✅ COMPLETE
 
-**Status:** ⏳ Ready (foundational systems complete)
-**Dependencies:** Phase 3 (Agent Needs), Phase 4 (Memory & Social), Phase 5 (Communication)
+**Status:** ✅ Complete (finished 2025-12-26)
+**Dependencies:** Phase 3 (Agent Needs) ✅, Phase 4 (Memory & Social) ✅, Phase 5 (Communication) ✅
 **Parallel Work:** 🔀 Can run parallel with Phase 7-11
 **Estimated LOC:** ~1,500
 **Spec:** [sociological-metrics-system.md](custom_game_engine/specs/sociological-metrics-system.md)
 
 | Task | Status | Spec | Parallel? |
 |------|--------|------|-----------|
-| MetricsCollectionSystem (ECS) | ⏳ Ready | [Section 2.1](custom_game_engine/specs/sociological-metrics-system.md#21-metricscollectionsystem-ecs-system) | - |
-| Event schemas (Interaction, Behavior, Spatial, Resource) | 🚧 In Progress | [Section 2.2](custom_game_engine/specs/sociological-metrics-system.md#22-event-schemas) | 🔀 |
+| MetricsCollectionSystem (ECS) | ✅ Complete | [Section 2.1](custom_game_engine/specs/sociological-metrics-system.md#21-metricscollectionsystem-ecs-system) | - |
+| Event schemas (Interaction, Behavior, Spatial, Resource) | ✅ Complete | [Section 2.2](custom_game_engine/specs/sociological-metrics-system.md#22-event-schemas) | 🔀 |
+| RingBuffer implementation | ✅ Complete | [Section 3.1](custom_game_engine/specs/sociological-metrics-system.md#31-in-memory-buffers-during-simulation) | 🔀 |
+| Event emitters in AISystem/World | ✅ Complete | [Section 2.1](custom_game_engine/specs/sociological-metrics-system.md#21-metricscollectionsystem-ecs-system) | - |
+| Metrics configuration | ✅ Complete | [Section 8.1](custom_game_engine/specs/sociological-metrics-system.md#81-metrics-configuration) | 🔀 |
 
-**Work Order:** [agents/autonomous-dev/work-orders/event-schemas/work-order.md](agents/autonomous-dev/work-orders/event-schemas/work-order.md)
-| RingBuffer implementation | ⏳ Ready | [Section 3.1](custom_game_engine/specs/sociological-metrics-system.md#31-in-memory-buffers-during-simulation) | 🔀 |
-| Event emitters in AISystem/World | ⏳ Ready | [Section 2.1](custom_game_engine/specs/sociological-metrics-system.md#21-metricscollectionsystem-ecs-system) | - |
-| Metrics configuration | ⏳ Ready | [Section 8.1](custom_game_engine/specs/sociological-metrics-system.md#81-metrics-configuration) | 🔀 |
+**Work Order:** [agents/autonomous-dev/work-orders/sociological-metrics-foundation/work-order.md](agents/autonomous-dev/work-orders/sociological-metrics-foundation/work-order.md)
 
 **Implementation:**
 - `packages/core/src/systems/MetricsCollectionSystem.ts`
@@ -535,9 +541,9 @@ These phases extend beyond the core game:
 
 ---
 
-### Phase 23: Sociological Metrics - Storage & API 🔒 BLOCKED
+### Phase 23: Sociological Metrics - Storage & API ✅ COMPLETE
 
-**Status:** 🔒 Blocked on Phase 22
+**Status:** ✅ Complete
 **Dependencies:** Phase 22 (Foundation)
 **Parallel Work:** Tasks within phase can be parallelized
 **Estimated LOC:** ~1,000
@@ -545,25 +551,28 @@ These phases extend beyond the core game:
 
 | Task | Status | Spec | Parallel? |
 |------|--------|------|-----------|
-| SQLite database schema | 🔒 Blocked | [Section 3.2](custom_game_engine/specs/sociological-metrics-system.md#32-persistent-storage-sqlite) | - |
-| Periodic flush mechanism | 🔒 Blocked | [Section 6.1](custom_game_engine/specs/sociological-metrics-system.md#61-optimization-strategies) | - |
-| REST API endpoints | 🔒 Blocked | [Section 5.1](custom_game_engine/specs/sociological-metrics-system.md#51-rest-api) | 🔀 |
-| WebSocket server for live updates | 🔒 Blocked | [Section 5.2](custom_game_engine/specs/sociological-metrics-system.md#52-websocket-api) | 🔀 |
-| CSV/JSON export functionality | 🔒 Blocked | [Section 3.3](custom_game_engine/specs/sociological-metrics-system.md#33-export-formats) | 🔀 |
+| Tiered file storage (hot/warm/cold) | ✅ Complete | [Section 3.2](custom_game_engine/specs/sociological-metrics-system.md#32-persistent-storage-sqlite) | - |
+| Periodic flush mechanism | ✅ Complete | [Section 6.1](custom_game_engine/specs/sociological-metrics-system.md#61-optimization-strategies) | - |
+| REST-like API interface | ✅ Complete | [Section 5.1](custom_game_engine/specs/sociological-metrics-system.md#51-rest-api) | 🔀 |
+| Live streaming (pub/sub) | ✅ Complete | [Section 5.2](custom_game_engine/specs/sociological-metrics-system.md#52-websocket-api) | 🔀 |
+| CSV/JSON export functionality | ✅ Complete | [Section 3.3](custom_game_engine/specs/sociological-metrics-system.md#33-export-formats) | 🔀 |
+
+**Implementation Notes:**
+- Used file-based tiered storage instead of SQLite (avoids native dependencies, works in-browser)
+- MetricsAPI provides REST-like interface callable directly or wrappable with Express
+- MetricsLiveStream provides pub/sub for real-time updates (wrappable with WebSocket for server deployment)
 
 **Implementation:**
-- `packages/core/src/metrics/storage/MetricsDatabase.ts`
-- `packages/core/src/metrics/api/MetricsAPI.ts`
-- `packages/core/src/metrics/api/MetricsWebSocket.ts`
-- `packages/core/src/metrics/exporters/`
-
-**Database:** `custom_game_engine/data/metrics.db`
+- `packages/core/src/metrics/MetricsStorage.ts` (tiered hot/warm/cold storage)
+- `packages/core/src/metrics/api/MetricsAPI.ts` (REST-like queries)
+- `packages/core/src/metrics/api/MetricsLiveStream.ts` (real-time streaming)
+- `packages/core/src/metrics/api/index.ts`
 
 ---
 
-### Phase 24: Sociological Metrics - Analysis Modules 🔒 BLOCKED
+### Phase 24: Sociological Metrics - Analysis Modules ✅ COMPLETE
 
-**Status:** 🔒 Blocked on Phase 22
+**Status:** ✅ Complete
 **Dependencies:** Phase 22 (Foundation)
 **Parallel Work:** 🔀 All analyzers can be developed in parallel
 **Estimated LOC:** ~2,000
@@ -571,28 +580,29 @@ These phases extend beyond the core game:
 
 | Task | Status | Spec | Parallel? |
 |------|--------|------|-----------|
-| NetworkAnalyzer (graph metrics) | 🔒 Blocked | [Section 4.1](custom_game_engine/specs/sociological-metrics-system.md#41-networkanalyzer) | 🔀 |
-| SpatialAnalyzer (territory, heatmaps) | 🔒 Blocked | [Section 4.3](custom_game_engine/specs/sociological-metrics-system.md#43-spatialanalyzer) | 🔀 |
-| InequalityAnalyzer (Gini, stratification) | 🔒 Blocked | [Section 4.4](custom_game_engine/specs/sociological-metrics-system.md#44-inequalityanalyzer) | 🔀 |
-| CulturalDiffusionAnalyzer | 🔒 Blocked | [Section 4.2](custom_game_engine/specs/sociological-metrics-system.md#42-culturaldiffusionanalyzer) | 🔀 |
+| NetworkAnalyzer (graph metrics) | ✅ Complete | [Section 4.1](custom_game_engine/specs/sociological-metrics-system.md#41-networkanalyzer) | 🔀 |
+| SpatialAnalyzer (territory, heatmaps) | ✅ Complete | [Section 4.3](custom_game_engine/specs/sociological-metrics-system.md#43-spatialanalyzer) | 🔀 |
+| InequalityAnalyzer (Gini, stratification) | ✅ Complete | [Section 4.4](custom_game_engine/specs/sociological-metrics-system.md#44-inequalityanalyzer) | 🔀 |
+| CulturalDiffusionAnalyzer | ✅ Complete | [Section 4.2](custom_game_engine/specs/sociological-metrics-system.md#42-culturaldiffusionanalyzer) | 🔀 |
 
 **Implementation:**
 - `packages/core/src/metrics/analyzers/NetworkAnalyzer.ts`
 - `packages/core/src/metrics/analyzers/SpatialAnalyzer.ts`
 - `packages/core/src/metrics/analyzers/InequalityAnalyzer.ts`
 - `packages/core/src/metrics/analyzers/CulturalDiffusionAnalyzer.ts`
+- `packages/core/src/metrics/analyzers/index.ts`
 
 **Key Metrics:**
-- **Network**: Density, clustering, centrality, communities, diameter
-- **Spatial**: Territory formation, hotspots, heatmaps, segregation indices
-- **Inequality**: Gini coefficient, wealth mobility, social stratification
-- **Cultural**: Behavior diffusion cascades, adoption rates, innovation tracking
+- **Network**: Density, clustering, centrality (degree/betweenness/closeness/eigenvector), communities, diameter
+- **Spatial**: Territory detection, hotspot detection, heatmaps, segregation indices (dissimilarity/isolation/concentration/clustering)
+- **Inequality**: Gini coefficient, Theil index, Atkinson index, Palma ratio, Lorenz curves, mobility matrices
+- **Cultural**: Diffusion cascades, adoption curves (S-curves), influencer detection, transmission rates
 
 ---
 
-### Phase 25: Sociological Metrics - Visualization Dashboard 🔒 BLOCKED
+### Phase 25: Sociological Metrics - Visualization Dashboard ⏳ READY
 
-**Status:** 🔒 Blocked on Phase 23, 24
+**Status:** ⏳ Ready (Phase 23, 24 complete)
 **Dependencies:** Phase 23 (Storage & API), Phase 24 (Analysis)
 **Parallel Work:** 🔀 All visualization components can be built in parallel
 **Estimated LOC:** ~2,500
@@ -600,13 +610,13 @@ These phases extend beyond the core game:
 
 | Task | Status | Spec | Parallel? |
 |------|--------|------|-----------|
-| Dashboard React app setup | 🔒 Blocked | [Section 7.1, 7.2](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | - |
-| Network visualization (force-directed graph) | 🔒 Blocked | [Section 7.1](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | 🔀 |
-| Behavior timeline view | 🔒 Blocked | [Section 7.1](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | 🔀 |
-| Spatial heatmap overlay | 🔒 Blocked | [Section 7.1](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | 🔀 |
-| Inequality dashboard (Lorenz curves) | 🔒 Blocked | [Section 7.1](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | 🔀 |
-| Cultural diffusion view (Sankey diagrams) | 🔒 Blocked | [Section 7.1](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | 🔀 |
-| Time series explorer | 🔒 Blocked | [Section 7.1](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | 🔀 |
+| Dashboard React app setup | ⏳ Ready | [Section 7.1, 7.2](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | - |
+| Network visualization (force-directed graph) | ⏳ Ready | [Section 7.1](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | 🔀 |
+| Behavior timeline view | ⏳ Ready | [Section 7.1](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | 🔀 |
+| Spatial heatmap overlay | ⏳ Ready | [Section 7.1](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | 🔀 |
+| Inequality dashboard (Lorenz curves) | ⏳ Ready | [Section 7.1](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | 🔀 |
+| Cultural diffusion view (Sankey diagrams) | ⏳ Ready | [Section 7.1](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | 🔀 |
+| Time series explorer | ⏳ Ready | [Section 7.1](custom_game_engine/specs/sociological-metrics-system.md#71-dashboard-components) | 🔀 |
 
 **Implementation:**
 - `packages/metrics-dashboard/` (new package)
@@ -656,9 +666,9 @@ These phases extend beyond the core game:
 
 ---
 
-### Phase 27: Divine Communication System 🚧 IN PROGRESS
+### Phase 27: Divine Communication System ⏳ READY
 
-**Status:** 🚧 In Progress (Work order created 2025-12-24 by spec-agent-001, ready for tests)
+**Status:** ⏳ Ready (Work order created 2025-12-24, spec complete, ready for implementation)
 **Dependencies:** Phase 3 (Agent Needs) ✅, Phase 4 (Memory & Social) ✅, Phase 5 (Communication) ✅, Phase 8 (Circadian/Sleep) ✅
 **Parallel Work:** 🔀 Can run parallel with Phase 7-11, 22-26
 **Estimated LOC:** ~4,000
@@ -698,6 +708,242 @@ These phases extend beyond the core game:
 - **Rituals**: Emergent prayer practices
 
 **Player Role:** You are God - agents pray to you, you respond with visions
+
+---
+
+### Phase 29: Item System Refactor ⏳ READY
+
+**Status:** ⏳ Ready (no dependencies, can start immediately)
+**Dependencies:** None
+**Parallel Work:** 🔀 Can run parallel with Phase 30, 31
+**Estimated LOC:** ~2,000
+**Spec:** [ITEM_MAGIC_PERSISTENCE_SPEC.md](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md)
+
+> *Inspired by Dwarf Fortress - where leather and iron are fundamentally the same thing, just with different properties.*
+
+| Task | Status | Spec | Parallel? |
+|------|--------|------|-----------|
+| MaterialTemplate interface & registry | ⏳ Ready | [Part 1](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-1-item-system-architecture) | - |
+| ItemDefinition with traits (refactor) | ⏳ Ready | [Part 1](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-1-item-system-architecture) | - |
+| ItemInstance type for runtime items | ⏳ Ready | [Part 1](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-1-item-system-architecture) | 🔀 |
+| Trait composition (EdibleTrait, WeaponTrait, etc.) | ⏳ Ready | [Part 1](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#trait-composition) | 🔀 |
+| Material-based property inheritance | ⏳ Ready | [Part 1](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#material-template-system) | - |
+| ItemQuality system | ⏳ Ready | [Part 1](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#item-definition-vs-instance) | 🔀 |
+
+**Implementation:**
+- `packages/core/src/materials/MaterialTemplate.ts`
+- `packages/core/src/materials/MaterialRegistry.ts`
+- `packages/core/src/items/ItemDefinition.ts` (refactor)
+- `packages/core/src/items/ItemInstance.ts` (new)
+- `packages/core/src/items/traits/` (new directory)
+
+**Key Design Decisions:**
+- Materials define base properties (density, hardness, magic affinity)
+- Items reference materials, inheriting properties
+- Traits are optional property bags (composable)
+- Instances can override/add traits (for enchantments)
+
+---
+
+### Phase 30: Magic System ⏳ READY
+
+**Status:** ⏳ Ready (no dependencies, can start immediately)
+**Dependencies:** None (but benefits from Phase 29)
+**Parallel Work:** 🔀 Can run parallel with Phase 29, 31
+**Estimated LOC:** ~3,000
+**Spec:** [ITEM_MAGIC_PERSISTENCE_SPEC.md](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md)
+
+> *Inspired by Ars Magica - verb/noun composition for emergent spell creation.*
+
+| Task | Status | Spec | Parallel? |
+|------|--------|------|-----------|
+| MagicSource registry | ⏳ Ready | [Part 2](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-2-magic-system-architecture) | - |
+| Technique enum (create, perceive, transform, etc.) | ⏳ Ready | [Part 2](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#multi-source-magic-multiverse-ready) | 🔀 |
+| Form enum (fire, water, mind, void, etc.) | ⏳ Ready | [Part 2](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#multi-source-magic-multiverse-ready) | 🔀 |
+| ComposedSpell interface | ⏳ Ready | [Part 2](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#spell-composition-ars-magica-style) | - |
+| EffectExpression type (universal format) | ⏳ Ready | [Part 3](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-3-effect-system-the-execution-model) | - |
+| EffectOperation types (instruction set) | ⏳ Ready | [Part 3](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#effect-operations-the-instruction-set) | 🔀 |
+| Expression language (safe, side-effect-free) | ⏳ Ready | [Part 3](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#expression-language-safe-side-effect-free) | - |
+| EffectInterpreter with limits | ⏳ Ready | [Part 3](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#effect-interpreter-safe-execution) | - |
+| Initial magic sources (Arcane, Divine, Void) | ⏳ Ready | [Part 2](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#example-magic-sources) | 🔀 |
+| ComposedSpell → EffectExpression compiler | ⏳ Ready | [Part 2](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#spell-composition-ars-magica-style) | - |
+
+**Implementation:**
+- `packages/core/src/magic/MagicSource.ts`
+- `packages/core/src/magic/MagicRegistry.ts`
+- `packages/core/src/magic/Technique.ts`
+- `packages/core/src/magic/Form.ts`
+- `packages/core/src/magic/ComposedSpell.ts`
+- `packages/core/src/effects/EffectExpression.ts`
+- `packages/core/src/effects/EffectOperation.ts`
+- `packages/core/src/effects/EffectInterpreter.ts`
+- `packages/core/src/effects/Expression.ts`
+
+**Key Design Decisions:**
+- Multiple magic sources (Arcane, Divine, Void, etc.) with different rules
+- Verb/Noun composition (Technique + Form = Spell)
+- All effects compile to EffectExpression (universal bytecode)
+- Expression language is safe (no side effects, guaranteed termination)
+- Interpreter has hard limits (max operations, max damage, etc.)
+
+---
+
+### Phase 31: Persistence Layer ⏳ READY
+
+**Status:** ⏳ Ready (no dependencies, can start immediately)
+**Dependencies:** None
+**Parallel Work:** 🔀 Can run parallel with Phase 29, 30
+**Estimated LOC:** ~2,500
+**Spec:** [ITEM_MAGIC_PERSISTENCE_SPEC.md](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md)
+
+| Task | Status | Spec | Parallel? |
+|------|--------|------|-----------|
+| Schema versioning system | ⏳ Ready | [Part 7](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-7-persistence-layer) | - |
+| Migration registry | ⏳ Ready | [Part 7](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#migration-system) | - |
+| SerializedWorldState format | ⏳ Ready | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#world-serialization) | - |
+| World.serialize() / deserialize() | ⏳ Ready | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#world-serialization) | - |
+| SaveFile format | ⏳ Ready | [Part 7](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#save-file-format) | 🔀 |
+| IndexedDB storage backend | ⏳ Ready | [Part 7](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#storage-backends) | 🔀 |
+| FileSystem storage backend | ⏳ Ready | [Part 7](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#storage-backends) | 🔀 |
+| Checksum validation | ⏳ Ready | [Part 7](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#save-file-format) | 🔀 |
+
+**Implementation:**
+- `packages/core/src/persistence/Versioned.ts`
+- `packages/core/src/persistence/Migration.ts`
+- `packages/core/src/persistence/MigrationRegistry.ts`
+- `packages/core/src/persistence/SerializedWorldState.ts`
+- `packages/core/src/persistence/SaveFile.ts`
+- `packages/core/src/persistence/StorageBackend.ts`
+- `packages/core/src/persistence/IndexedDBStorage.ts`
+- `packages/core/src/persistence/FileSystemStorage.ts`
+- `packages/core/src/World.ts` (add serialize/deserialize)
+
+**Key Design Decisions:**
+- Every persisted type has a schema version
+- Migrations are one-way (old→new), registered in MigrationRegistry
+- SaveFile includes header, world state, player state, registry versions
+- Multiple storage backends (IndexedDB for browser, filesystem for desktop)
+- Checksums for integrity validation
+
+---
+
+### Phase 32: Universe Forking 🔒 BLOCKED
+
+**Status:** 🔒 Blocked on Phase 31 (Persistence Layer)
+**Dependencies:** Phase 31 (World.serialize/deserialize required)
+**Parallel Work:** Tasks within phase can be parallelized
+**Estimated LOC:** ~2,000
+**Spec:** [ITEM_MAGIC_PERSISTENCE_SPEC.md](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md)
+
+> *The game world itself is the sandbox. Fork it, test effects, observe results.*
+
+| Task | Status | Spec | Parallel? |
+|------|--------|------|-----------|
+| WorldFork interface | 🔒 Blocked | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-5-universe-forking-parallel-world-testing) | - |
+| UniverseManager.fork() | 🔒 Blocked | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#fork-execution) | - |
+| UniverseManager.runFork() | 🔒 Blocked | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#fork-execution) | - |
+| InvariantChecker | 🔒 Blocked | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#invariant-checking) | 🔀 |
+| ForkResults collection | 🔒 Blocked | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#fork-execution) | 🔀 |
+| WorldDiff utility | 🔒 Blocked | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#fork-execution) | 🔀 |
+| Fork execution in Web Worker | 🔒 Blocked | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#fork-execution) | - |
+
+**Implementation:**
+- `packages/core/src/universe/WorldFork.ts`
+- `packages/core/src/universe/UniverseManager.ts`
+- `packages/core/src/universe/InvariantChecker.ts`
+- `packages/core/src/universe/ForkResults.ts`
+- `packages/core/src/universe/WorldDiff.ts`
+- `packages/core/src/workers/ForkWorker.ts`
+
+**Key Features:**
+- Fork universe at any point (serialize state)
+- Inject experimental effects into fork
+- Run simulation forward N cycles
+- Collect crashes, invariant violations, balance metrics
+- Compare world state before/after (diff)
+
+---
+
+### Phase 33: LLM Effect Generation 🔒 BLOCKED
+
+**Status:** 🔒 Blocked on Phase 30 (Magic System) and Phase 32 (Universe Forking)
+**Dependencies:** Phase 30 (EffectExpression), Phase 32 (testing infrastructure)
+**Parallel Work:** Tasks within phase can be parallelized
+**Estimated LOC:** ~2,500
+**Spec:** [ITEM_MAGIC_PERSISTENCE_SPEC.md](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md)
+
+> *LLMs generate novel effects, universes validate them, humans approve them.*
+
+| Task | Status | Spec | Parallel? |
+|------|--------|------|-----------|
+| EffectGenerationPrompt structure | 🔒 Blocked | [Part 4](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-4-llm-generated-effects) | - |
+| JSON Schema for EffectExpression | 🔒 Blocked | [Part 4](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#generation-prompt-structure) | 🔀 |
+| Schema validation | 🔒 Blocked | [Part 4](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#validation-layers) | - |
+| Power level estimation | 🔒 Blocked | [Part 4](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#validation-layers) | 🔀 |
+| Infinite loop detection | 🔒 Blocked | [Part 4](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#validation-layers) | 🔀 |
+| EffectTestingPipeline | 🔒 Blocked | [Part 4](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#generation-pipeline) | - |
+| HumanReviewQueue | 🔒 Blocked | [Part 8](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-8-human-review-system) | 🔀 |
+| BlessedEffectRegistry | 🔒 Blocked | [Part 8](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#blessed-effect-registry) | - |
+| Feedback loop to LLM | 🔒 Blocked | [Part 4](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#generation-pipeline) | 🔀 |
+
+**Implementation:**
+- `packages/core/src/effects/generation/EffectGenerationPrompt.ts`
+- `packages/core/src/effects/generation/EffectValidator.ts`
+- `packages/core/src/effects/generation/EffectTestingPipeline.ts`
+- `packages/core/src/effects/generation/effectSchema.json`
+- `packages/core/src/effects/review/HumanReviewQueue.ts`
+- `packages/core/src/effects/review/HumanReviewRequest.ts`
+- `packages/core/src/effects/registry/BlessedEffectRegistry.ts`
+
+**Key Features:**
+- LLM generates EffectExpression JSON (not arbitrary code)
+- Schema validation catches malformed effects
+- Power level estimation prevents OP effects
+- Universe fork testing catches crashes/exploits
+- Human review queue for final approval
+- Only blessed effects can be used in main game
+
+---
+
+### Phase 34: Cross-Universe Sharing 🔒 BLOCKED
+
+**Status:** 🔒 Blocked on Phase 31 (Persistence) and Phase 33 (Effect Generation)
+**Dependencies:** Phase 31 (serialization), Phase 33 (blessed effects)
+**Parallel Work:** Tasks within phase can be parallelized
+**Estimated LOC:** ~2,000
+**Spec:** [ITEM_MAGIC_PERSISTENCE_SPEC.md](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md)
+
+> *Effects are portable artifacts. Share them between universes and games.*
+
+| Task | Status | Spec | Parallel? |
+|------|--------|------|-----------|
+| EffectPackage format | 🔒 Blocked | [Part 6](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-6-cross-universe-sharing) | - |
+| CreatorIdentity & provenance | 🔒 Blocked | [Part 6](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#effect-package-format) | 🔀 |
+| EffectLore (narrative history) | 🔒 Blocked | [Part 6](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#effect-package-format) | 🔀 |
+| TrustPolicy configuration | 🔒 Blocked | [Part 6](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#trust-model) | - |
+| CrossUniverseImporter | 🔒 Blocked | [Part 6](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#trust-model) | - |
+| Local validation on import | 🔒 Blocked | [Part 6](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#trust-model) | - |
+| Export to JSON file | 🔒 Blocked | [Part 6](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#effect-package-format) | 🔀 |
+| Import from JSON file | 🔒 Blocked | [Part 6](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#trust-model) | 🔀 |
+| UniverseIdentity (multiverse lore) | 🔒 Blocked | [Part 6](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#effect-package-format) | 🔀 |
+
+**Implementation:**
+- `packages/core/src/sharing/EffectPackage.ts`
+- `packages/core/src/sharing/CreatorIdentity.ts`
+- `packages/core/src/sharing/EffectLore.ts`
+- `packages/core/src/sharing/TrustPolicy.ts`
+- `packages/core/src/sharing/CrossUniverseImporter.ts`
+- `packages/core/src/sharing/UniverseIdentity.ts`
+- `packages/core/src/sharing/exporter.ts`
+- `packages/core/src/sharing/importer.ts`
+
+**Key Features:**
+- Effects are self-contained JSON packages
+- Provenance tracks creator, origin universe, approval chain
+- Trust policy controls auto-accept/reject/validate
+- Local validation re-tests imported effects in YOUR universe
+- Lore generation tells the "story" of how effects traveled
+- No central server required - just share JSON files
 
 ---
 

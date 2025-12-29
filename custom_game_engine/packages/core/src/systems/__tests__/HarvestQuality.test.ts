@@ -376,6 +376,7 @@ describe('Harvest Quality Integration', () => {
       const plantComp = plant.getComponent('plant') as PlantComponent;
       plantComp.growthStage = 3;
       plantComp.maturity = 1.0;
+      plantComp.health = 100;
 
       const startTime = performance.now();
 

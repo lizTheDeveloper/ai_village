@@ -2,6 +2,8 @@
 
 A custom TypeScript game engine built for the AI Village simulation project.
 
+> *This project is dedicated to Tarn Adams and Dwarf Fortress. See the [project README](../README.md) for our philosophy and inspirations.*
+
 ## Phase 0: Foundation ✅ COMPLETE
 
 All core systems are implemented and building successfully.

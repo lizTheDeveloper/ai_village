@@ -258,7 +258,7 @@ $(cat "$work_order")
 Your task: Implement this feature. Make all tests pass.
 
 NOTE: If tests are broken/outdated (testing wrong behavior), you can write to:
-  agents/autonomous-dev/work-orders/$FEATURE_NAME/test-results.md
+  $WORK_ORDER_DIR/$FEATURE_NAME/test-results.md
 With: Verdict: TESTS_NEED_FIX
 And explain what tests need fixing. The test agent will fix them."
 
@@ -360,7 +360,7 @@ cd custom_game_engine && npm run build && npm test
 
 ## Part 3: Write Results
 
-IMPORTANT: Write your results to: agents/autonomous-dev/work-orders/$FEATURE_NAME/test-results.md
+IMPORTANT: Write your results to: $WORK_ORDER_DIR/$FEATURE_NAME/test-results.md (absolute path: $(cd "$WORK_ORDER_DIR" && pwd)/$FEATURE_NAME/test-results.md)
 
 The file MUST contain one of these verdicts on its own line:
 - Verdict: PASS (all tests pass, including new integration tests)
@@ -403,7 +403,7 @@ $(cat "$results_file")
 Your task: Fix the broken tests to match the current implementation.
 Do NOT change the implementation - only fix the tests.
 
-After fixing, write updated results to: agents/autonomous-dev/work-orders/$FEATURE_NAME/test-results.md
+After fixing, write updated results to: $WORK_ORDER_DIR/$FEATURE_NAME/test-results.md
 Use verdict: Verdict: PASS or Verdict: FAIL"
 
     run_agent "test-maintenance" "$PROMPT_DIR/test-agent.md" "$context"
@@ -437,7 +437,7 @@ Your task: Review the implementation for antipatterns before it proceeds to play
    - Magic numbers
    - Untyped events
 
-Write your review to: agents/autonomous-dev/work-orders/$FEATURE_NAME/review-report.md
+Write your review to: $WORK_ORDER_DIR/$FEATURE_NAME/review-report.md
 
 Use verdict:
 - Verdict: APPROVED (all checks pass)
@@ -484,8 +484,8 @@ $(cat "$work_order")
 ---
 
 Your task: Test this feature through the UI using Playwright MCP.
-Save screenshots to: agents/autonomous-dev/work-orders/$FEATURE_NAME/screenshots/
-Write report to: agents/autonomous-dev/work-orders/$FEATURE_NAME/playtest-report.md
+Save screenshots to: $WORK_ORDER_DIR/$FEATURE_NAME/screenshots/
+Write report to: $WORK_ORDER_DIR/$FEATURE_NAME/playtest-report.md
 
 REMEMBER: You cannot read code files. Only test via the browser."
 
