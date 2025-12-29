@@ -1,0 +1,204 @@
+/**
+ * WanderBehavior - Frontier-seeking wandering with fallback to home bias
+ *
+ * Agents wander toward unexplored frontier sectors first (like slime molds).
+ * When all nearby frontiers are explored, they fall back to home bias.
+ * This creates natural "desire paths" rather than random ant trails.
+ *
+ * Part of the AISystem decomposition (work-order: ai-system-refactor)
+ */
+
+import type { EntityImpl } from '../../ecs/Entity.js';
+import type { World } from '../../ecs/World.js';
+import type { MovementComponent } from '../../components/MovementComponent.js';
+import type { AgentComponent } from '../../components/AgentComponent.js';
+import type { PositionComponent } from '../../components/PositionComponent.js';
+import { ExplorationStateComponent } from '../../components/ExplorationStateComponent.js';
+import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
+
+/** Maximum distance from home before biasing back (when no frontier) */
+const MAX_WANDER_DISTANCE = 20;
+
+/** Beyond this distance, strongly pull back to home */
+const CRITICAL_DISTANCE = 32;
+
+/** Bias strength toward frontier (0-1, higher = more direct paths) */
+const FRONTIER_BIAS = 0.7;
+
+/** Jitter amount for variety in movement (radians, ~10°) */
+const WANDER_JITTER = Math.PI / 18;
+
+/**
+ * WanderBehavior - Frontier-seeking wandering
+ *
+ * Uses exploration state to head toward unexplored areas.
+ * Creates direct "desire paths" rather than random walks.
+ */
+export class WanderBehavior extends BaseBehavior {
+  readonly name = 'wander' as const;
+
+  execute(entity: EntityImpl, _world: World): BehaviorResult | void {
+    const movement = entity.getComponent<MovementComponent>('movement');
+    const agent = entity.getComponent<AgentComponent>('agent');
+    const position = entity.getComponent<PositionComponent>('position');
+
+    // Per CLAUDE.md: No silent fallbacks - crash on missing required components
+    if (!movement) {
+      throw new Error(`[WanderBehavior] Entity ${entity.id} missing required 'movement' component`);
+    }
+    if (!agent) {
+      throw new Error(`[WanderBehavior] Entity ${entity.id} missing required 'agent' component`);
+    }
+    if (!position) {
+      throw new Error(`[WanderBehavior] Entity ${entity.id} missing required 'position' component`);
+    }
+
+    // Clear idleStartTick when wandering (no longer idle)
+    if (agent.idleStartTick !== undefined) {
+      entity.updateComponent<AgentComponent>('agent', (current) => ({
+        ...current,
+        idleStartTick: undefined,
+      }));
+    }
+
+    // Enable steering system for wander behavior
+    if (entity.hasComponent('steering')) {
+      entity.updateComponent('steering', (current: any) => ({
+        ...current,
+        behavior: 'wander',
+      }));
+    }
+
+    // Get or initialize wander angle
+    let wanderAngle = agent.behaviorState?.wanderAngle as number | undefined;
+    if (wanderAngle === undefined) {
+      wanderAngle = Math.random() * Math.PI * 2;
+    }
+
+    // Try frontier-seeking first, fall back to home bias
+    const exploration = entity.getComponent('exploration_state') as ExplorationStateComponent | undefined;
+
+    if (exploration) {
+      wanderAngle = this.applyFrontierBias(wanderAngle, position, exploration);
+    } else {
+      // No exploration component - use simple home bias
+      const distanceFromHome = Math.sqrt(position.x * position.x + position.y * position.y);
+      wanderAngle = this.applyHomeBias(wanderAngle, position, distanceFromHome);
+    }
+
+    // Normalize angle to 0-2π range
+    wanderAngle = wanderAngle % (Math.PI * 2);
+    if (wanderAngle < 0) wanderAngle += Math.PI * 2;
+
+    // Calculate velocity from angle
+    const speed = movement.speed;
+    const velocityX = Math.cos(wanderAngle) * speed;
+    const velocityY = Math.sin(wanderAngle) * speed;
+
+    // Update movement velocity
+    entity.updateComponent<MovementComponent>('movement', (current) => ({
+      ...current,
+      velocityX,
+      velocityY,
+    }));
+
+    // Save wander angle for next tick
+    entity.updateComponent<AgentComponent>('agent', (current) => ({
+      ...current,
+      behaviorState: {
+        ...current.behaviorState,
+        wanderAngle,
+      },
+    }));
+  }
+
+  /**
+   * Apply bias toward unexplored frontier sectors.
+   * Creates direct paths to unexplored areas like slime molds.
+   */
+  private applyFrontierBias(
+    wanderAngle: number,
+    position: PositionComponent,
+    exploration: ExplorationStateComponent
+  ): number {
+    // Get frontier sectors (unexplored areas adjacent to explored)
+    const frontiers = exploration.getFrontierSectors();
+
+    if (frontiers.length === 0) {
+      // All explored - fall back to home bias
+      const distanceFromHome = Math.sqrt(position.x * position.x + position.y * position.y);
+      return this.applyHomeBias(wanderAngle, position, distanceFromHome);
+    }
+
+    // Find closest frontier sector
+    const currentSector = exploration.worldToSector(position);
+    let closestFrontier = frontiers[0]!; // Safe: we checked frontiers.length > 0 above
+    let closestDist = Infinity;
+
+    for (const frontier of frontiers) {
+      const dx = frontier.x - currentSector.x;
+      const dy = frontier.y - currentSector.y;
+      const dist = dx * dx + dy * dy; // squared distance is fine for comparison
+      if (dist < closestDist) {
+        closestDist = dist;
+        closestFrontier = frontier;
+      }
+    }
+
+    // Calculate angle to closest frontier (convert sector to world coords)
+    const frontierWorld = exploration.sectorToWorld({ x: closestFrontier.x, y: closestFrontier.y });
+    const angleToFrontier = Math.atan2(
+      frontierWorld.y - position.y,
+      frontierWorld.x - position.x
+    );
+
+    // Apply bias toward frontier with small jitter for natural movement
+    const jitter = (Math.random() - 0.5) * WANDER_JITTER;
+    const angleDiff = this.normalizeAngle(angleToFrontier - wanderAngle);
+
+    return wanderAngle + angleDiff * FRONTIER_BIAS + jitter;
+  }
+
+  /**
+   * Apply progressive home bias based on distance from origin.
+   * Fallback when no frontiers are available.
+   */
+  private applyHomeBias(
+    wanderAngle: number,
+    position: PositionComponent,
+    distanceFromHome: number
+  ): number {
+    if (distanceFromHome > CRITICAL_DISTANCE) {
+      // Very far - strongly pull back to home (80% bias)
+      const angleToHome = Math.atan2(-position.y, -position.x);
+      const angleDiff = this.normalizeAngle(angleToHome - wanderAngle);
+      return wanderAngle + angleDiff * 0.8;
+    } else if (distanceFromHome > MAX_WANDER_DISTANCE) {
+      // Moderately far - bias toward home (50% bias)
+      const angleToHome = Math.atan2(-position.y, -position.x);
+      const angleDiff = this.normalizeAngle(angleToHome - wanderAngle);
+      return wanderAngle + angleDiff * 0.5;
+    } else {
+      // Close to home - random wander with jitter
+      const jitter = (Math.random() - 0.5) * WANDER_JITTER * 2;
+      return wanderAngle + jitter;
+    }
+  }
+
+  /**
+   * Normalize angle difference to -π to π range.
+   */
+  private normalizeAngle(angle: number): number {
+    while (angle > Math.PI) angle -= Math.PI * 2;
+    while (angle < -Math.PI) angle += Math.PI * 2;
+    return angle;
+  }
+}
+
+/**
+ * Standalone function for use with BehaviorRegistry.
+ */
+export function wanderBehavior(entity: EntityImpl, world: World): void {
+  const behavior = new WanderBehavior();
+  behavior.execute(entity, world);
+}

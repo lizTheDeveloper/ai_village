@@ -1,0 +1,101 @@
+/**
+ * FollowAgentBehavior - Follow another agent
+ *
+ * Agent follows a target agent, maintaining a comfortable distance (3-5 tiles).
+ * Speeds up when too far, slows down when too close.
+ *
+ * Part of the AISystem decomposition (work-order: ai-system-refactor)
+ */
+
+import type { EntityImpl } from '../../ecs/Entity.js';
+import type { World } from '../../ecs/World.js';
+import type { MovementComponent } from '../../components/MovementComponent.js';
+import type { AgentComponent } from '../../components/AgentComponent.js';
+import type { PositionComponent } from '../../components/PositionComponent.js';
+import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
+
+/** Minimum distance to maintain from target */
+const MIN_FOLLOW_DISTANCE = 3;
+
+/** Maximum distance before speeding up */
+const MAX_FOLLOW_DISTANCE = 5;
+
+/** Speed multiplier when catching up */
+const CATCH_UP_SPEED = 1.2;
+
+/**
+ * FollowAgentBehavior - Follow a target agent
+ */
+export class FollowAgentBehavior extends BaseBehavior {
+  readonly name = 'follow_agent' as const;
+
+  execute(entity: EntityImpl, world: World): BehaviorResult | void {
+    // Disable steering system
+    this.disableSteering(entity);
+
+    const position = entity.getComponent<PositionComponent>('position')!;
+    const movement = entity.getComponent<MovementComponent>('movement')!;
+    const agent = entity.getComponent<AgentComponent>('agent')!;
+
+    const targetId = agent.behaviorState?.targetId as string | undefined;
+    if (!targetId) {
+      // No target, switch to wandering
+      this.switchTo(entity, 'wander', {});
+      return { complete: true, reason: 'No target to follow' };
+    }
+
+    const targetEntity = world.getEntity(targetId);
+    if (!targetEntity) {
+      // Target no longer exists, switch to wandering
+      this.switchTo(entity, 'wander', {});
+      return { complete: true, reason: 'Target no longer exists' };
+    }
+
+    const targetImpl = targetEntity as EntityImpl;
+    const targetPos = targetImpl.getComponent<PositionComponent>('position');
+    if (!targetPos) {
+      return { complete: true, reason: 'Target has no position' };
+    }
+
+    const dx = targetPos.x - position.x;
+    const dy = targetPos.y - position.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance < MIN_FOLLOW_DISTANCE) {
+      // Too close, stop
+      entity.updateComponent<MovementComponent>('movement', (current) => ({
+        ...current,
+        velocityX: 0,
+        velocityY: 0,
+      }));
+    } else if (distance > MAX_FOLLOW_DISTANCE) {
+      // Too far, speed up to catch up
+      const velocityX = (dx / distance) * movement.speed * CATCH_UP_SPEED;
+      const velocityY = (dy / distance) * movement.speed * CATCH_UP_SPEED;
+
+      entity.updateComponent<MovementComponent>('movement', (current) => ({
+        ...current,
+        velocityX,
+        velocityY,
+      }));
+    } else {
+      // Just right, match speed and follow
+      const velocityX = (dx / distance) * movement.speed;
+      const velocityY = (dy / distance) * movement.speed;
+
+      entity.updateComponent<MovementComponent>('movement', (current) => ({
+        ...current,
+        velocityX,
+        velocityY,
+      }));
+    }
+  }
+}
+
+/**
+ * Standalone function for use with BehaviorRegistry.
+ */
+export function followAgentBehavior(entity: EntityImpl, world: World): void {
+  const behavior = new FollowAgentBehavior();
+  behavior.execute(entity, world);
+}

@@ -14,16 +14,24 @@ import type { AgentComponent, AgentBehavior } from '../../components/AgentCompon
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { InventoryComponent } from '../../components/InventoryComponent.js';
 import type { BuildingComponent } from '../../components/BuildingComponent.js';
+import type { GatheringStatsComponent } from '../../components/GatheringStatsComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
-import {
-  addToInventory,
-  removeFromInventory,
-  isResourceType,
-  isSeedType,
-  isFoodType,
-  isValidItemType,
-  getResourceWeight,
-} from '../../components/InventoryComponent.js';
+import { addToInventory, removeFromInventory } from '../../components/InventoryComponent.js';
+import { recordDeposited } from '../../components/GatheringStatsComponent.js';
+import { itemRegistry } from '../../items/index.js';
+
+/**
+ * Get the current game day from the world's time entity.
+ */
+function getCurrentDay(world: World): number {
+  const timeEntities = world.query().with('time').executeEntities();
+  if (timeEntities.length > 0) {
+    const timeEntity = timeEntities[0] as EntityImpl;
+    const timeComp = timeEntity.getComponent('time') as { day?: number } | undefined;
+    return timeComp?.day ?? 0;
+  }
+  return 0;
+}
 
 /**
  * DepositItemsBehavior - Move to storage and deposit items
@@ -179,18 +187,11 @@ export class DepositItemsBehavior extends BaseBehavior {
       const itemId = slot.itemId;
       const quantityToTransfer = slot.quantity;
 
-      // Check if item can be deposited
-      if (!isValidItemType(itemId)) continue;
+      // Check if item can be deposited (must be in registry and storable)
+      if (!itemRegistry.isStorable(itemId)) continue;
 
-      // Calculate how much can fit in storage based on item type
-      let unitWeight = 1.0;
-      if (isResourceType(itemId)) {
-        unitWeight = getResourceWeight(itemId as any);
-      } else if (isSeedType(itemId)) {
-        unitWeight = 0.1; // Seeds are light
-      } else if (isFoodType(itemId)) {
-        unitWeight = 0.5; // Food is moderate weight
-      }
+      // Get weight from item registry
+      const unitWeight = itemRegistry.getWeight(itemId);
       const availableWeight = storageInv.maxWeight - storageInv.currentWeight;
       const maxByWeight = Math.floor(availableWeight / unitWeight);
       const amountToTransfer = Math.min(quantityToTransfer, maxByWeight);
@@ -221,6 +222,18 @@ export class DepositItemsBehavior extends BaseBehavior {
     // Update both entities with new inventories
     entity.updateComponent<InventoryComponent>('inventory', () => agentInv);
     storageEntity.updateComponent<InventoryComponent>('inventory', () => storageInv);
+
+    // Record deposit stats
+    if (itemsDeposited.length > 0) {
+      const gatheringStats = entity.getComponent<GatheringStatsComponent>('gathering_stats');
+      if (gatheringStats) {
+        const currentDay = getCurrentDay(world);
+        for (const item of itemsDeposited) {
+          recordDeposited(gatheringStats, item.itemId, item.amount, currentDay);
+        }
+        entity.updateComponent<GatheringStatsComponent>('gathering_stats', () => gatheringStats);
+      }
+    }
 
     // Emit deposit event
     if (itemsDeposited.length > 0) {
@@ -259,12 +272,11 @@ export class DepositItemsBehavior extends BaseBehavior {
     const inventory = entity.getComponent<InventoryComponent>('inventory')!;
     const hasDepositableItems = inventory.slots.some(slot => {
       if (!slot.itemId || slot.quantity === 0) return false;
-      return isValidItemType(slot.itemId);
+      return itemRegistry.isStorable(slot.itemId);
     });
 
     if (!hasDepositableItems) {
       // Remaining items can't be deposited (unknown types) - give up and return to previous behavior
-      console.log(`[DepositItemsBehavior] Agent ${entity.id} has non-depositable items, giving up`);
       const previousBehavior = agent.behaviorState?.previousBehavior as AgentBehavior | undefined;
       const previousState = agent.behaviorState?.previousState as Record<string, unknown> | undefined;
       this.switchTo(entity, previousBehavior || 'wander', previousState || {});

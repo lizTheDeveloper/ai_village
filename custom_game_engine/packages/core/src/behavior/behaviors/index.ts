@@ -14,6 +14,13 @@ export { BaseBehavior, type BehaviorResult, type IBehavior } from './BaseBehavio
 export { WanderBehavior, wanderBehavior } from './WanderBehavior.js';
 export { IdleBehavior, idleBehavior } from './IdleBehavior.js';
 
+// Idle & reflection behaviors
+export { ReflectBehavior, reflectBehavior } from './ReflectBehavior.js';
+export { ObserveBehavior, observeBehavior } from './ObserveBehavior.js';
+export { SitQuietlyBehavior, sitQuietlyBehavior } from './SitQuietlyBehavior.js';
+export { AmuseSelfBehavior, amuseSelfBehavior } from './AmuseSelfBehavior.js';
+export { PracticeSkillBehavior, practiceSkillBehavior } from './PracticeSkillBehavior.js';
+
 // Sleep behaviors
 export {
   SeekSleepBehavior,
@@ -41,12 +48,24 @@ export {
 export {
   FarmBehavior,
   TillBehavior,
+  PlantBehavior,
+  WaterBehavior,
+  HarvestBehavior,
   farmBehavior,
   tillBehavior,
+  plantBehavior,
+  waterBehavior,
+  harvestBehavior,
 } from './FarmBehaviors.js';
 
 // Build behaviors
 export { BuildBehavior, buildBehavior } from './BuildBehavior.js';
+
+// Crafting behaviors
+export { CraftBehavior, craftBehavior } from './CraftBehavior.js';
+
+// Trade behaviors
+export { TradeBehavior, tradeBehavior } from './TradeBehavior.js';
 
 // Survival behaviors
 export { SeekWarmthBehavior, seekWarmthBehavior } from './SeekWarmthBehavior.js';
@@ -62,3 +81,11 @@ export {
   exploreSpiralBehavior,
   followGradientBehavior,
 } from './NavigationBehaviors.js';
+
+// Animal husbandry behaviors
+export {
+  TameAnimalBehavior,
+  HouseAnimalBehavior,
+  tameAnimalBehavior,
+  houseAnimalBehavior,
+} from './AnimalBehaviors.js';

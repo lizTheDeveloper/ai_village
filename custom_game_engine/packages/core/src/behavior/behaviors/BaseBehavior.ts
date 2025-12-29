@@ -150,6 +150,7 @@ export abstract class BaseBehavior implements IBehavior {
   /**
    * Move toward a target position with smooth arrival.
    * Handles slowing down as the entity approaches the target.
+   * Uses predictive velocity clamping to prevent oscillation from overshooting.
    *
    * @param entity - The entity to move
    * @param targetPos - Target position {x, y}
@@ -162,8 +163,6 @@ export abstract class BaseBehavior implements IBehavior {
     options: {
       /** Base movement speed (default: from movement component) */
       speed?: number;
-      /** Distance at which to start slowing (default: 5.0) */
-      slowingRadius?: number;
       /** Distance considered "arrived" (default: 1.5) */
       arrivalDistance?: number;
     } = {}
@@ -185,34 +184,41 @@ export abstract class BaseBehavior implements IBehavior {
     }
 
     const baseSpeed = options.speed ?? movement.speed;
-    const slowingRadius = options.slowingRadius ?? 5.0;
     const arrivalDistance = options.arrivalDistance ?? 1.5;
 
-    // If within arrival distance, stop and report we've arrived
-    // Use <= to ensure we don't get stuck at exactly arrivalDistance
+    // Hysteresis: if already stopped and within arrival zone, stay stopped
+    // Only start moving again if we've drifted significantly outside (arrivalDistance + 0.5)
+    const isCurrentlyStopped = Math.abs(movement.velocityX) < 0.01 && Math.abs(movement.velocityY) < 0.01;
+    const hysteresisDistance = arrivalDistance + 0.5;
+
+    if (isCurrentlyStopped && distance <= hysteresisDistance) {
+      // Already stopped and close enough - don't restart movement
+      return distance;
+    }
+
+    // If within arrival distance, stop immediately
     if (distance <= arrivalDistance) {
       this.stopAllMovement(entity);
       return distance;
     }
 
+    // Calculate distance remaining beyond arrival zone
+    const distanceToArrival = distance - arrivalDistance;
+
+    // Use full speed - predictive clamping handles stopping smoothly
     let targetSpeed = baseSpeed;
 
-    // Slow down when approaching
-    if (distance < slowingRadius) {
-      // Quadratic slow-down for smoother approach
-      const slowFactor = distance / slowingRadius;
-      targetSpeed = baseSpeed * slowFactor * slowFactor;
+    // Predictive velocity clamping: ensure we don't overshoot in one frame
+    // This is the key anti-oscillation fix - we cap velocity so that even at
+    // worst-case frame timing, we won't overshoot the arrival zone
+    // Assume worst case: deltaTime=1/30 (low framerate) with 20x time acceleration
+    const maxDeltaTime = (1 / 30) * 20; // ~0.67 seconds game time per frame
+    const maxMovementThisFrame = targetSpeed * maxDeltaTime;
 
-      // Extra damping when getting close to prevent overshoot
-      if (distance < arrivalDistance * 2) {
-        targetSpeed *= 0.5;
-      }
-
-      // Minimum speed to prevent getting stuck
-      const minSpeed = 0.1;
-      if (targetSpeed < minSpeed && distance > arrivalDistance) {
-        targetSpeed = minSpeed;
-      }
+    // If we'd overshoot the arrival zone, clamp speed to exactly reach it
+    if (maxMovementThisFrame > distanceToArrival) {
+      // Set speed so that at max deltaTime, we'd just reach arrival distance
+      targetSpeed = distanceToArrival / maxDeltaTime;
     }
 
     const vx = (dx / distance) * targetSpeed;

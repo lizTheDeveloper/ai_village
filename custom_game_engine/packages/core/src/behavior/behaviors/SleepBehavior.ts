@@ -13,7 +13,7 @@ import type { World } from '../../ecs/World.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { CircadianComponent } from '../../components/CircadianComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
-import { getCircadian, getBuilding, getPosition } from '../../utils/componentHelpers.js';
+import { getCircadian, getBuilding, getPosition, getNeeds } from '../../utils/componentHelpers.js';
 import { safeUpdateComponent } from '../../utils/componentUtils.js';
 
 /**
@@ -153,12 +153,15 @@ export class SeekSleepBehavior extends BaseBehavior {
  * ForcedSleepBehavior - Collapse and sleep immediately
  *
  * Used when agent is critically exhausted and must sleep now.
+ * The behavior checks wake conditions and returns completion when the agent
+ * should wake up - this allows the behavior system to properly transition.
  */
 export class ForcedSleepBehavior extends BaseBehavior {
   readonly name = 'forced_sleep' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
     const circadian = getCircadian(entity);
+    const needs = getNeeds(entity);
 
     if (!circadian) {
       this.stopMovement(entity);
@@ -200,6 +203,31 @@ export class ForcedSleepBehavior extends BaseBehavior {
 
     // Stop moving
     this.stopMovement(entity);
+
+    // Check wake conditions - behavior should complete when agent is ready to wake
+    // This allows the behavior system to transition properly instead of staying stuck
+    if (needs && circadian.isSleeping) {
+      const hoursAsleep = circadian.sleepDurationHours;
+
+      // Wake conditions (same as SleepSystem.shouldWake):
+      // 1. Energy fully restored
+      const energyFull = needs.energy >= 100;
+      // 2. Urgent hunger
+      const urgentNeed = needs.hunger < 10;
+      // 3. Well rested with depleted sleep drive
+      const wellRestedAndSatisfied = needs.energy >= 70 && circadian.sleepDrive < 10;
+      // 4. Maximum sleep duration (12 hours)
+      const maxSleepReached = hoursAsleep >= 12;
+      // 5. Minimum 4 hours passed with reasonable energy
+      const minimumMetWithEnergy = hoursAsleep >= 4 && needs.energy >= 50;
+
+      if (energyFull || urgentNeed || wellRestedAndSatisfied || maxSleepReached || minimumMetWithEnergy) {
+        // Signal completion - SleepSystem will handle the actual wake transition
+        return { complete: true, reason: 'Wake conditions met' };
+      }
+    }
+
+    // Continue sleeping - return void to keep behavior active
   }
 }
 
