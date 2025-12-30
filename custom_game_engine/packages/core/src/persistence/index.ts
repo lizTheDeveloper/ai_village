@@ -63,6 +63,9 @@ export type {
 // Validation
 export { validateSaveFile, validateWorldState, InvariantViolationError } from './InvariantChecker.js';
 
+// Compression
+export { compress, decompress, formatBytes, getCompressionRatio } from './compression.js';
+
 // Error exports
 export {
   MigrationError,

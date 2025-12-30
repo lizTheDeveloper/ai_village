@@ -1,15 +1,28 @@
 /**
- * In-memory storage backend (for testing)
+ * In-memory storage backend (for testing) with compression
  */
 
 import type { StorageBackend, SaveFile, SaveMetadata, StorageInfo } from '../types.js';
+import { compress, decompress, formatBytes } from '../compression.js';
 
 export class MemoryStorage implements StorageBackend {
-  private saves: Map<string, SaveFile> = new Map();
+  private saves: Map<string, string> = new Map();  // Stores compressed data
   private metadata: Map<string, SaveMetadata> = new Map();
 
   async save(key: string, data: SaveFile): Promise<void> {
-    this.saves.set(key, data);
+    // Serialize to JSON
+    const jsonString = JSON.stringify(data);
+    const originalSize = jsonString.length;
+
+    // Compress the JSON data
+    const compressedData = await compress(jsonString);
+    const compressedSize = compressedData.length;
+
+    console.log(
+      `[MemoryStorage] Compressed ${key}: ${formatBytes(originalSize)} -> ${formatBytes(compressedSize)} (${((1 - compressedSize / originalSize) * 100).toFixed(1)}% reduction)`
+    );
+
+    this.saves.set(key, compressedData);
 
     const meta: SaveMetadata = {
       key,
@@ -19,7 +32,7 @@ export class MemoryStorage implements StorageBackend {
       playTime: data.header.playTime,
       gameVersion: data.header.gameVersion,
       formatVersion: data.header.formatVersion,
-      fileSize: JSON.stringify(data).length,
+      fileSize: compressedSize,  // Use compressed size
       screenshot: data.header.screenshot,
     };
 
@@ -29,13 +42,18 @@ export class MemoryStorage implements StorageBackend {
   }
 
   async load(key: string): Promise<SaveFile | null> {
-    const save = this.saves.get(key);
+    const compressedData = this.saves.get(key);
 
-    if (save) {
-      console.log(`[MemoryStorage] Loaded: ${key}`);
+    if (!compressedData) {
+      return null;
     }
 
-    return save || null;
+    // Decompress the data
+    const decompressedString = await decompress(compressedData);
+    const saveFile = JSON.parse(decompressedString) as SaveFile;
+
+    console.log(`[MemoryStorage] Loaded and decompressed: ${key}`);
+    return saveFile;
   }
 
   async list(): Promise<SaveMetadata[]> {
@@ -56,8 +74,9 @@ export class MemoryStorage implements StorageBackend {
   async getStorageInfo(): Promise<StorageInfo> {
     let totalBytes = 0;
 
-    for (const save of this.saves.values()) {
-      totalBytes += JSON.stringify(save).length;
+    // Calculate total size of compressed data
+    for (const compressedData of this.saves.values()) {
+      totalBytes += compressedData.length;
     }
 
     return {

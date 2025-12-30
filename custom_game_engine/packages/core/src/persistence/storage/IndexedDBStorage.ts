@@ -1,8 +1,9 @@
 /**
- * IndexedDB storage backend for browser
+ * IndexedDB storage backend for browser with compression support
  */
 
 import type { StorageBackend, SaveFile, SaveMetadata, StorageInfo } from '../types.js';
+import { compress, decompress, formatBytes } from '../compression.js';
 
 export class IndexedDBStorage implements StorageBackend {
   private dbName = 'ai_village';
@@ -65,10 +66,22 @@ export class IndexedDBStorage implements StorageBackend {
   }
 
   /**
-   * Save a file.
+   * Save a file with compression.
    */
   async save(key: string, data: SaveFile): Promise<void> {
     await this.init();
+
+    // Serialize to JSON
+    const jsonString = JSON.stringify(data);
+    const originalSize = jsonString.length;
+
+    // Compress the JSON data
+    const compressedData = await compress(jsonString);
+    const compressedSize = compressedData.length;
+
+    console.log(
+      `[IndexedDBStorage] Compressed ${key}: ${formatBytes(originalSize)} -> ${formatBytes(compressedSize)} (${((1 - compressedSize / originalSize) * 100).toFixed(1)}% reduction)`
+    );
 
     const transaction = this.db!.transaction(
       [this.storeName, this.metadataStore],
@@ -86,9 +99,9 @@ export class IndexedDBStorage implements StorageBackend {
       };
 
       try {
-        // Save full file
+        // Save compressed file
         const saveStore = transaction.objectStore(this.storeName);
-        saveStore.put({ key, data });
+        saveStore.put({ key, data: compressedData, compressed: true });
 
         // Save metadata
         const metadata: SaveMetadata = {
@@ -99,7 +112,7 @@ export class IndexedDBStorage implements StorageBackend {
           playTime: data.header.playTime,
           gameVersion: data.header.gameVersion,
           formatVersion: data.header.formatVersion,
-          fileSize: JSON.stringify(data).length,
+          fileSize: compressedSize,  // Use compressed size
           screenshot: data.header.screenshot,
         };
 
@@ -112,7 +125,7 @@ export class IndexedDBStorage implements StorageBackend {
   }
 
   /**
-   * Load a file.
+   * Load a file with decompression.
    */
   async load(key: string): Promise<SaveFile | null> {
     await this.init();
@@ -123,7 +136,7 @@ export class IndexedDBStorage implements StorageBackend {
     return new Promise((resolve, reject) => {
       const request = store.get(key);
 
-      request.onsuccess = () => {
+      request.onsuccess = async () => {
         const result = request.result;
 
         if (!result) {
@@ -131,8 +144,24 @@ export class IndexedDBStorage implements StorageBackend {
           return;
         }
 
-        console.log(`[IndexedDBStorage] Loaded: ${key}`);
-        resolve(result.data);
+        try {
+          // Check if data is compressed
+          const isCompressed = result.compressed === true;
+
+          if (isCompressed) {
+            // Decompress the data
+            const decompressedString = await decompress(result.data);
+            const saveFile = JSON.parse(decompressedString) as SaveFile;
+            console.log(`[IndexedDBStorage] Loaded and decompressed: ${key}`);
+            resolve(saveFile);
+          } else {
+            // Legacy uncompressed data
+            console.log(`[IndexedDBStorage] Loaded (uncompressed): ${key}`);
+            resolve(result.data);
+          }
+        } catch (error) {
+          reject(new Error(`Failed to decompress save file: ${error instanceof Error ? error.message : String(error)}`));
+        }
       };
 
       request.onerror = () => {
