@@ -233,3 +233,10 @@ export type {
   HereditaryModification,
   ModificationSource,
 } from './GeneticComponent.js';
+// Realm system components
+export { RealmComponent } from './RealmComponent.js';
+export type { RealmComponent as RealmComponentType } from './RealmComponent.js';
+export { PortalComponent } from './PortalComponent.js';
+export type { PortalComponent as PortalComponentType } from './PortalComponent.js';
+export { RealmLocationComponent } from './RealmLocationComponent.js';
+export type { RealmLocationComponent as RealmLocationComponentType } from './RealmLocationComponent.js';

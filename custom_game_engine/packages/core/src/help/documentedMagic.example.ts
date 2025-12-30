@@ -1516,3 +1516,739 @@ Performance requirements make musical magic awkward for combat: you're standing 
     'persistent_sound',
   ],
 });
+
+// ============================================================================
+// TEMPORAL MAGIC
+// ============================================================================
+
+export const TEMPORAL_MAGIC_HELP = createEffectHelp('temporal_magic', {
+  summary: 'Magic that touches time—the most forbidden and most coveted of all paradigms',
+  description: `Time is not a river. Time is an ocean, and we are drops of water pretending we understand the current because we can feel ourselves moving. Temporal magic is the practice of dropping the pretense: of perceiving time as it actually is, and—very carefully, very rarely—nudging it in directions it wasn't going.
+
+The Temporal Accords* forbid almost everything interesting. This isn't arbitrary caution; it's learned caution, paid for with civilizations that no longer exist because someone decided to "just try something." The Grandfather Paradox is real. Causality violations are real. The temporal immune response—wherein time itself attacks changes that threaten its structure—is extremely real and invariably fatal to the mage who triggered it.
+
+What's permitted:
+
+**Temporal Perception** is safe. Slowing your perception of time, speeding it up, experiencing moments from multiple angles—these affect only you, create no paradoxes, generate no immune response. The combat applications are obvious: perceived speed that isn't actual speed, seeing attacks before they complete, having eternities to plan in millisecond windows. The side effects are also obvious: temporal perception disorders, difficulty relating to normal time, the existential crisis that comes from truly understanding that every moment stretches forever if you look closely enough.
+
+**Local Deceleration** is mostly safe. Slowing time in a small area creates a bubble where effects happen more slowly: falling objects float, projectiles crawl, conversations take hours from the outside but minutes within. The bubble must be stable, must be bounded, and must return to normal gradually rather than snapping back. Sudden temporal resumption causes whiplash that can be physically dangerous.
+
+**Local Acceleration** is theoretically safe but practically problematic. Speeding a bubble means everything inside ages faster: useful for waiting out poisons, terrible for the subjects who experience years while hours pass outside. The psychological effects of temporal acceleration—of genuinely living more time than the world—are poorly documented because most subjects refuse to discuss them.
+
+**Temporal Viewing** is permitted with restrictions. Seeing the past is safe—it's already happened, it can't be changed, observation doesn't affect it. Seeing the future is dangerous because the future hasn't been selected yet; observation can influence which future actualizes, and mages who see too much often go mad trying to navigate the probability storms. Viewing permits require psychological screening and mandatory counseling.
+
+What's forbidden:
+
+**Actual time travel** is forbidden absolutely. The Accords specify penalties up to and including temporal erasure—being removed from history such that you never existed—for attempts at travel. Nobody has successfully traveled anyway; the immune response stops attempts before they complete. But the Accords remain in force because nobody wants to find out what happens if someone succeeds.
+
+**Causal editing** is forbidden. Changing the past, altering causality chains, making effects precede causes—all violations carry the same penalties as travel. The desire is understandable: who wouldn't want to undo tragedy? The danger is existential: one edited cause can cascade into unmade civilizations.
+
+*Written in a temporal bubble to ensure all signatories existed in the same moment, regardless of their native timestreams. The drafting took four subjective years. Everyone agreed it was worth it.`,
+  category: 'magic',
+  tags: ['temporal', 'time', 'paradigm', 'forbidden', 'perception', 'dangerous'],
+  effectCategory: 'paradigm',
+  targetType: 'varies',
+
+  mechanics: {
+    values: {
+      source: 'temporal manipulation',
+      perceptionSafe: 'self-only effects',
+      bubbleMaxSize: '10 meter radius typical',
+      viewingRange: 'past unlimited / future 1 week max',
+      immuneResponseThreshold: 'any causal violation',
+    },
+    formulas: {
+      perceptionDilation: 'baseFactor * (1 + skill/10) * stabilityMargin',
+      bubbleDuration: 'power / dilationFactor / size',
+      paradoxRisk: 'causualImpact * timeDistance * subjectImportance',
+    },
+    conditions: {
+      'Accords in force': 'Temporal violations trigger Accord enforcement',
+      'Immune response': 'Time defends itself against changes',
+      'Perception limits': 'Extended temporal perception causes disorders',
+      'Future uncertainty': 'Observed futures are not determined futures',
+    },
+    dependencies: ['temporal_sensitivity', 'stability_training', 'accord_compliance'],
+    unlocks: ['time_perception', 'local_bubbles', 'temporal_viewing', 'chrono_combat'],
+  },
+
+  tips: [
+    'Master perception before attempting bubbles—the cognitive load is real',
+    'Keep bubbles small and brief; complexity scales exponentially with size and duration',
+    'Future viewing shows probabilities, not certainties—don\'t treat visions as fate',
+    'The immune response is not negotiable. Don\'t test it.',
+  ],
+
+  warnings: [
+    'Temporal viewing of futures can cause prophetic obsession—see a counselor regularly',
+    'Extended perception dilation disconnects you from normal timeflow; maintain social anchors',
+    'The Accords enforce themselves through the Temporal Authority, which exists outside normal time',
+    'Paradox attempts don\'t fail safely. They fail with prejudice.',
+    'There are no second chances with temporal immune response. You get erased or you don\'t.',
+  ],
+
+  examples: [
+    {
+      title: 'The Frozen Moment',
+      description:
+        'The arrow was already in flight. Vel saw it leaving the bow, saw the trajectory, knew it would hit her student before she could move. So she didn\'t move—she dilated. Perception stretched like taffy, milliseconds becoming minutes, the arrow hanging almost motionless while her thoughts raced. She couldn\'t move faster; temporal magic didn\'t work that way. But she could think faster, plan faster, see the exact path and calculate the exact angle. When she released the dilation, she moved with perfect precision: not superhuman speed, just ordinary speed applied to a superhuman plan. Her hand intercepted the arrow exactly where she knew it would be. Her student lived. Vel collapsed immediately afterward—the cognitive debt of sixty seconds of perception compressed into three milliseconds of real time. "Worth it," she muttered, before the healers arrived.',
+    },
+    {
+      title: 'The Viewed Future',
+      description:
+        'Seer Thoma was licensed for future viewing, six months range, weekly sessions with a counselor. He followed the rules precisely. It didn\'t help. The problem with seeing futures wasn\'t the visions—it was the knowledge that every vision was a probability, that his observation affected which probability manifested, that watching his daughter\'s death in seventeen different possible futures made him responsible for which version became real. He started avoiding her. Every interaction might be the one that nudged toward tragedy. Every choice might be the choice that killed her. He stopped viewing. The license lapsed. His daughter grew up with a father who loved her but flinched at contact, who saw deaths that hadn\'t happened in her smile. "You saved her life," his counselor said, years later. "Maybe," he replied. "I\'ll never know which future was original and which one I made. I just know I stopped looking. Sometimes that\'s all you can do."',
+    },
+  ],
+
+  relatedTopics: [
+    'temporal_accords',
+    'perception_dilation',
+    'time_bubbles',
+    'future_viewing',
+    'immune_response',
+    'paradox_theory',
+  ],
+});
+
+// ============================================================================
+// LINGUISTIC MAGIC
+// ============================================================================
+
+export const LINGUISTIC_MAGIC_HELP = createEffectHelp('linguistic_magic', {
+  summary: 'Magic through words themselves—not sounds but meanings made manifest',
+  description: `Words have power. Everyone knows this; it's a cliché, an aphorism, something grandmothers say. What grandmothers don't mention is that the power is literal, measurable, and extremely dangerous in the wrong hands.*
+
+Linguistic magic differs from True Name magic, though the two are often confused. True Names deal with the essential identity of things—what something is at its core. Linguistic magic deals with how that identity is described—the gap between reality and representation, and what happens when you force them to align.
+
+Consider: you write "FIRE" on a piece of paper. The word represents fire but isn't fire. Linguistic magic collapses the distinction. The word becomes what it describes, or reality becomes what the word claims. The paper burns. This sounds simple. It isn't. Because words don't have single meanings, because context shapes interpretation, because every linguistic act involves negotiation between speaker, listener, and the language itself.
+
+**The Theory of Magical Grammar** formalizes the principles:
+
+**Nouns manifest**. Write "sword" and a sword exists—but what kind of sword? The word contains all swords; the manifestation is determined by subconscious interpretation, environmental factors, or careful grammatical specification. "A sword" differs from "the sword" differs from "my sword" differs from "the Sword of Ending Dawn, forged in the First Age, bearer of seventeen souls." Specificity costs more power but produces more controlled results.
+
+**Verbs actuate**. "Fall" makes things fall. "Rise" makes things rise. But tense matters: "fell" affects the past (forbidden), "falls" affects the present, "will fall" attempts to bind the future (dangerous). Conjugation is magical grammar; misparsed tense can have catastrophic temporal implications.
+
+**Adjectives modify**. "Heavy stone" is heavier than "stone." "Beautiful face" becomes more beautiful. But adjectives compete: "burning ice" creates contradiction-states that some linguistic mages exploit and others avoid because reality doesn't appreciate paradox.
+
+**Sentences compound**. Subject-verb-object creates relationship magic: "Fire burns enemy" directs effect. Complex sentences create complex effects. Run-on sentences create cascading effects that can exceed caster control. Punctuation matters; a misplaced comma has killed.
+
+The paradigm rewards education, vocabulary, and grammatical precision. It punishes ambiguity, homophone confusion, and the casual relationship with language that most people have. Linguistic mages are often insufferable pedants. The pedantry is survival skill: "their" versus "there" versus "they're" isn't just an error when words become reality.
+
+*Grandmother was a linguistic mage. She knew exactly what she was saying. You should have listened more carefully.`,
+  category: 'magic',
+  tags: ['linguistic', 'words', 'paradigm', 'grammar', 'writing', 'speech'],
+  effectCategory: 'paradigm',
+  targetType: 'varies',
+
+  mechanics: {
+    values: {
+      source: 'language / meaning',
+      manifestationSpeed: 'instant on completion',
+      specificityBonus: '+50% power per descriptive layer',
+      ambiguityPenalty: 'random interpretation fills gaps',
+      mediumOptions: 'spoken, written, signed, thought',
+    },
+    formulas: {
+      effectPower: 'wordPower * grammarPrecision * intentClarity',
+      manifestationControl: 'specificity / ambiguity * skill',
+      cascadeRisk: 'sentenceComplexity * powerLevel / control',
+    },
+    conditions: {
+      'Words must be understood': 'Gibberish has no power',
+      'Medium affects duration': 'Written lasts longer than spoken',
+      'Contradictions unstable': 'Paradox adjectives create reality stress',
+      'Interpretation varies': 'Same words can manifest differently',
+    },
+    dependencies: ['vocabulary', 'grammatical_knowledge', 'clear_intention'],
+    unlocks: ['word_manifestation', 'verb_actuation', 'linguistic_binding', 'naming_power'],
+  },
+
+  tips: [
+    'Build vocabulary constantly—more words means more precise manifestations',
+    'Write spells in advance when possible; careful composition beats improvisation',
+    'Avoid pronouns until you\'re advanced; referential ambiguity causes misfires',
+    'Dead languages have fixed meanings; living languages shift. Choose accordingly.',
+  ],
+
+  warnings: [
+    'Homophones are enemies: "there" vs "their" can redirect effects entirely',
+    'Complex sentences can cascade beyond control; keep grammar simple under pressure',
+    'Tense errors can touch time; be especially careful with past and future',
+    'The language you think in affects unconscious casting; bilingual mages need extra training',
+    'Autocorrect on magical devices has caused deaths. Disable it.',
+  ],
+
+  examples: [
+    {
+      title: 'The Precise Word',
+      description:
+        'The beast was immune to fire, cold, lightning—everything Scribe Dara tried bounced off its hide. She needed something specific, something exact, something the creature\'s defenses weren\'t calibrated for. She grabbed her pen, wrote with desperate precision: "The creature\'s heart stops." Too simple—could affect her heart too, could affect any heart nearby. She crossed it out, rewrote: "The creature before me, the scaled thing from the northern waste, specifically its heart—the organ, the physical structure—stops beating, ceases function, ends." The specificity cost enormous power; her vision grayed at the edges. But the words became real. The creature\'s heart stopped. Just that heart, just that creature, just as described. It fell. Dara collapsed. "Should have specified \'non-fatally for me,\'" she muttered, but she was smiling. Precision had its price, but vagueness would have killed her.',
+    },
+    {
+      title: 'The Homophone Disaster',
+      description:
+        'Young Apprentice Caro meant to write "their armor fails." He wrote "there armor fails." The spell activated, targeting "there"—a location, not a possession. Every piece of armor in that direction, for approximately eight hundred meters, simultaneously lost structural integrity. The city guard\'s equipment collapsed. The palace guards\' equipment collapsed. The ceremonial armor in the museum collapsed. Seventeen people died from falling protection, four from weapons suddenly freed from sheaths, and one from pure embarrassment when his decorative breastplate fell off during a speech. Caro was sentenced to ten years studying grammar, banned from combat linguistics, and required to personally apologize to each affected family. "It\'s just one letter," he\'d protested. The judge\'s response: "Yes. One letter. Twenty-two deaths. Welcome to linguistic magic."',
+    },
+  ],
+
+  relatedTopics: [
+    'magical_grammar',
+    'word_manifestation',
+    'linguistic_binding',
+    'dead_languages',
+    'vocabulary_building',
+    'precision_casting',
+  ],
+});
+
+// ============================================================================
+// ENCHANTING SYSTEM
+// ============================================================================
+
+export const ENCHANTING_SYSTEM_HELP = createEffectHelp('enchanting_system', {
+  summary: 'Binding magic permanently into objects—the art of making wonder last',
+  description: `Any mage can throw fire. Enchanting is the art of making fire throw itself—permanently, reliably, on demand, without the mage being present. It's the difference between performance and engineering, between talent and infrastructure, between "I can do this" and "anyone can do this, even while I sleep."*
+
+The EnchantmentBindingSystem manages the complex process of moving magical effects from casters into objects. It's not transfer—you can't just pour a spell into a sword and call it done. It's translation: taking an effect designed for momentary existence and rewriting it for permanent residence in matter that wasn't designed to hold magic.
+
+**Material Compatibility** is the first hurdle. Some materials hold enchantment naturally: certain metals, crystals, specially prepared woods. Others resist: iron actively fights magical binding; unstable materials can't maintain enchantment structure; living things complicate everything by having their own magic that interferes. The enchanter must match material to effect: fire enchantments in ruby or obsidian, ice in sapphire or quartz, sharpness in steel that's been properly treated to accept the binding.
+
+**Effect Translation** is the technical core. A fire spell exists as momentary pattern—energy shaped, directed, released. An enchanted fire effect must be a stable structure—energy stored, channels defined, triggers established. The translation requires understanding both the original spell (how it works moment-to-moment) and enchantment architecture (how to rebuild that working as permanent structure). Good enchanters are often mediocre casters; the skills are different.
+
+**Power Sourcing** determines whether enchantments are self-sustaining or require external input. Self-contained enchantments store power at creation, spending slowly, eventually depleting. Channeling enchantments draw power from environment (ambient magic, ley lines) or user (mana on use). Rechargeable enchantments accept power input to restore depleted reserves. Each approach has tradeoffs: self-contained is convenient but expires; channeling is permanent but location-dependent; rechargeable requires infrastructure.
+
+**Trigger Design** makes enchantments practical. An enchanted sword that's always on fire is less useful than one that ignites on command. Triggers can be physical (press a button), verbal (say the activation word), conditional (activates when swung, deactivates when sheathed), or mental (thought-activated, requiring attunement). Complex triggers add complexity to the enchantment; each condition is another potential failure point.
+
+The Enchanters' Guild maintains standards, registers craftspeople, and—importantly—tracks enchanted objects. Unregistered enchantments are illegal in most jurisdictions, not for tax reasons but for safety: an unknown enchanted item could do anything, and "could do anything" is dangerous in ways bureaucracies correctly fear.
+
+*The economic implications are significant. Enchanted items democratize magic—anyone can use a wand. This has historically threatened magical aristocracies, which is why enchanting has been banned, controlled, or monopolized at various points in history. The current semi-free market is a relatively recent development.`,
+  category: 'magic',
+  tags: ['enchanting', 'items', 'permanent', 'crafting', 'binding', 'system'],
+  effectCategory: 'system',
+  targetType: 'object',
+
+  mechanics: {
+    values: {
+      materialCompatibility: 'varies by material type',
+      enchantmentSlots: '1-5 depending on item size/quality',
+      powerDuration: 'self-contained: 1-100 years',
+      triggerComplexity: '1-10 conditions supported',
+      guildRegistration: 'required for legal sale',
+    },
+    formulas: {
+      bindingStrength: 'enchantmentPower * materialMatch * craftsmanship',
+      powerDecay: 'baseDrain * useFrequency * environmentalStress',
+      triggerReliability: 'baseReliability * (1 - conditionComplexity/20)',
+    },
+    conditions: {
+      'Material must match': 'Incompatible materials reject enchantment',
+      'Slots limited': 'Items can only hold so many effects',
+      'Power source required': 'Self-contained, channeling, or rechargeable',
+      'Triggers can fail': 'Complex triggers have higher failure rates',
+    },
+    dependencies: ['compatible_material', 'enchanting_skill', 'power_source'],
+    unlocks: ['permanent_effects', 'item_creation', 'trigger_design', 'mass_production'],
+  },
+
+  tips: [
+    'Test material compatibility before committing expensive enchantments',
+    'Simple triggers are reliable triggers; add complexity only when necessary',
+    'Register your work; unregistered items are legal liability and can be seized',
+    'Rechargeable beats self-contained for items meant to last generations',
+  ],
+
+  warnings: [
+    'Failed bindings can destroy the item or explode violently',
+    'Over-enchanting items past their slot capacity causes structural failure',
+    'Incompatible enchantments on the same item can interfere or cancel',
+    'Living things can\'t be enchanted like objects; attempting it causes harm',
+    'Counterfeit enchantments exist; test items before trusting them in crisis',
+  ],
+
+  examples: [
+    {
+      title: 'The Family Blade',
+      description:
+        'Enchanter Mira had one commission that mattered: her daughter\'s coming-of-age blade. Not powerful—her daughter wasn\'t a warrior—but perfect. She chose a mid-grade steel, compatible with protection and loyalty enchantments. The binding took three days: first the sharpness (easy, nearly automatic in good steel), then the protection (owner-attuned, activating on perceived threat), then the loyalty (would never turn against its wielder, would resist being used by enemies). Simple triggers: the sword just worked. Power source: rechargeable, drawing from a small crystal in the pommel. Expected lifespan: centuries, if the crystal was replaced every twenty years. Her daughter accepted the blade at sixteen, knowing exactly what it represented: not just metal, not just magic, but three days of her mother\'s absolute attention, translated into something that would protect her when her mother couldn\'t.',
+    },
+    {
+      title: 'The Slot Overflow',
+      description:
+        'Artificer Vann was greedy. The amulet he\'d crafted could hold five enchantments; he pushed seven. It held. He pushed eight. Still held. He pushed nine, and the amulet became something else—a vortex of unstable magic that collapsed into a four-meter crater, taking Vann\'s workshop, Vann\'s left hand, and Vann\'s reputation. The Guild investigation found the obvious: slot overflow, binding failure, cascade release. Vann\'s defense: "It held at eight." The Guild\'s response: "It held at eight by luck. You gambled on luck continuing. The universe declined." He kept his license but lost the hand. The phantom pain reminded him, daily, that capacity limits existed for reasons. He never pushed past five again.',
+    },
+  ],
+
+  relatedTopics: [
+    'material_compatibility',
+    'effect_translation',
+    'power_sourcing',
+    'trigger_design',
+    'guild_registration',
+    'slot_capacity',
+  ],
+});
+
+// ============================================================================
+// METAMAGIC
+// ============================================================================
+
+export const METAMAGIC_HELP = createEffectHelp('metamagic', {
+  summary: 'Magic about magic—modifying, combining, and transcending spell limitations',
+  description: `Normal mages cast spells. Metamages cast spells about spells. It's the difference between playing chess and playing chess while simultaneously redesigning the rules—which sounds unfair because it is, which is why metamages are either revered or resented depending on how recently they've beaten you.*
+
+The MetamagicSystem handles effects that modify other effects: making spells bigger, smaller, faster, slower, combined, split, delayed, or fundamentally altered in ways the original spell design never anticipated. It's not a paradigm—metamagic works with any paradigm—but it requires deep understanding of how magic itself functions, the architecture beneath the surface effects.
+
+**Amplification** is the simplest metamagic: more power, more effect, more everything. Double the mana, double the fireball. Triple the investment, triple the healing. The relationship is roughly linear until it isn't; at high amplification, diminishing returns appear, and past a certain point additional power just dissipates as waste heat. The limit varies by spell and caster; finding your own ceiling requires careful experimentation.
+
+**Modification** changes spell properties without changing core function. A fire spell can be modified for blue flame (hotter, harder to control), cold flame (visual fire, no heat, useful for signaling), sticky flame (adheres to targets), or slow flame (burns for hours at low intensity). Modifications consume extra power and require understanding what you're changing; random modification produces random results, occasionally explosive ones.
+
+**Combination** merges spells into unified effects. Fire + lightning = plasma. Shield + attack = reflecting barrier. Healing + harm = rapid cellular change that can repair or destroy depending on intention. Combinations require both spells to be known, both paradigms to be compatible (or incompatibility must be managed), and the caster must understand how the effects interact. Failed combinations usually cancel; catastrophic combinations happen when effects merge in unplanned ways.
+
+**Extension** affects duration, range, or area. Longer duration means more mana investment; greater range means more precise targeting; larger area means more power diluted across more space. Extensions trade efficiency for coverage; a spell extended too far becomes too weak to function.
+
+**Delay and Contingency** add temporal components. Delayed spells wait to trigger; contingent spells trigger on conditions. Both require stable spell structure that can persist without the caster's attention, which adds complexity and cost. The maximum delay varies by spell—simple effects can wait days; complex ones decay in hours.
+
+Metamagic is powerful because it makes other magic more powerful. It's also dangerous because mistakes compound: a metamagic error on a modified amplified combined spell produces a metamagic-scale disaster. The learning curve is steep, the failures memorable, and the successes sufficient to make every other mage nervous when you're in the room.
+
+*Revered by students, resented by peers, feared by enemies. Metamages learn to accept complicated social dynamics.`,
+  category: 'magic',
+  tags: ['metamagic', 'modification', 'amplification', 'combination', 'system', 'advanced'],
+  effectCategory: 'system',
+  targetType: 'spell',
+
+  mechanics: {
+    values: {
+      amplificationMax: '3x typical / 5x theoretical',
+      modificationSlots: '1-3 per spell',
+      combinationLimit: '2-3 spells simultaneously',
+      extensionCost: 'linear for duration/range, quadratic for area',
+      maxDelay: '24 hours for simple / 1 hour for complex',
+    },
+    formulas: {
+      amplifiedPower: 'basePower * amplificationFactor * efficiency',
+      modificationCost: 'baseCost * (1 + modificationDepth * 0.5)',
+      combinationStability: 'min(spell1Stability, spell2Stability) * compatibilityFactor',
+    },
+    conditions: {
+      'Paradigm knowledge required': 'Must understand base spell to modify it',
+      'Diminishing returns': 'High amplification wastes power',
+      'Combination compatibility': 'Some spells don\'t combine safely',
+      'Extension efficiency': 'Area extensions dilute power',
+    },
+    dependencies: ['spell_understanding', 'metamagic_training', 'power_reserves'],
+    unlocks: ['spell_amplification', 'effect_modification', 'spell_combination', 'contingency_magic'],
+  },
+
+  tips: [
+    'Master base spells before metamodifying them—you can\'t improve what you don\'t understand',
+    'Test modifications at low power; failed mods at high power are the memorable kind',
+    'Combination spells should be practiced repeatedly before combat use',
+    'Delays and contingencies need dead-man releases; unstable stored spells are bombs',
+  ],
+
+  warnings: [
+    'Amplification past 3x has exponentially increasing failure risk',
+    'Modified modifications (meta-metamagic) can produce unpredictable results',
+    'Incompatible combinations can merge in dangerous ways rather than simply failing',
+    'Extended spells maintain caster link—you feel if they\'re dispelled or triggered',
+    'Contingency spells still draw power while waiting; too many active drains reserves',
+  ],
+
+  examples: [
+    {
+      title: 'The Modified Fireball',
+      description:
+        'Standard fireball: explosion of flame, indiscriminate, area-of-effect. Kai\'s modified fireball: blue-tinged (hotter by 40%), adherent (flame sticks to first target, doesn\'t spread), delayed-detonation (three seconds after impact). The modifications tripled the mana cost and required years of practice. But when he threw it at the golem—immune to normal fire, resistant to most magic—the blue adherent flames stuck, the delay gave them time to burrow into gaps, and the detonation happened inside the construct\'s core. Modified magic wasn\'t about raw power. It was about precision, about understanding what a spell actually did and making it do that better. "Why can\'t you just throw harder?" apprentices asked. "Because harder isn\'t smarter," Kai replied. "And the golem was smart-resistant. Not modified-resistant."',
+    },
+    {
+      title: 'The Combination Gone Wrong',
+      description:
+        'Arcanist Vel wanted healing lightning: restorative energy delivered at combat speed. Lightning was fast; healing was... not fast. She combined them, balanced the competing effects, tested at low power. It worked. A subject could be healed from across the room, instantly, efficiently. She scaled up. At full power, the combination became something else—the lightning accelerated the healing past natural limits, causing rapid cellular division that was technically growth and technically cancer and technically still healing just wrong. The test subject survived. Barely. The tumor removal took eight hours. Vel classified her notes: "Combination unstable at scale. Reverted to alternating approach. Do not attempt merger above 20% power." The notes would save future researchers. The test subject\'s scars would remind Vel, personally, that combinations weren\'t just double spells. They were new spells, with new failure modes.',
+    },
+  ],
+
+  relatedTopics: [
+    'spell_amplification',
+    'effect_modification',
+    'combination_theory',
+    'extension_limits',
+    'contingency_design',
+    'metamagic_failures',
+  ],
+});
+
+// ============================================================================
+// LEY LINES
+// ============================================================================
+
+export const LEY_LINES_HELP = createEffectHelp('ley_lines', {
+  summary: 'The magical geography of power—rivers of energy flowing through the world',
+  description: `The world has veins. Not metaphorically—literally, geographically, in the form of ley lines: channels of concentrated magical energy that flow across continents, intersect at nodes of power, and make everything that happens on or near them more magical.*
+
+The LeyLineNetwork tracks these flows, maps their intersections, and predicts their fluctuations. Understanding ley geography is fundamental to understanding why magic works better in some places than others—why the Academy built where it built, why sacred sites cluster where they cluster, why some battlefields have been fought over a hundred times across ten thousand years.
+
+**Line Strength** varies from faint traces (barely detectable, minimal boost) to continental arteries (overwhelming power, difficult to control). Most useful lines are medium-strength: enough boost to matter, not so much power that working near them becomes dangerous. The strongest lines—the Deep Channels—are rarely approached; the magical pressure is physically uncomfortable, and accidents at that power level reshape geography.
+
+**Node Points** are where lines intersect. The more lines, the more power, the more significance. Single intersections (two lines) might support a village witch. Triple intersections support magical academies. Quintuple intersections are capitals, holy cities, or dead zones—sometimes the power is too much, overwhelming whatever tries to use it, leaving a place powerful and empty. The rarest intersections, where seven or more lines meet, are called World Roots. There are perhaps a dozen known. Each is a story too large to summarize.
+
+**Flow Patterns** matter for working. Ley lines have direction—power flows from source to terminus, wherever those are (the endpoints are often mysterious). Casting with the flow amplifies effects; casting against it costs more and produces strain. Seasonal variations exist: lines strengthen or weaken with solstices, with lunar cycles, with events that shouldn't affect geography but do. Smart practitioners track the calendar as carefully as they track the map.
+
+**Practical Applications**:
+
+**Power amplification**: Cast near a line, draw on its energy, produce effects beyond normal capacity. The line doesn't deplete—you're not draining it, just using what flows—so sustainable high-power magic becomes possible.
+
+**Travel acceleration**: Walking along ley lines is faster than walking off them. Not physically faster, but distances compress; terrain smooths; hours pass like minutes. Ley-roads have been used for rapid transit since before recorded history.
+
+**Communication enhancement**: Messages sent along lines travel faster and clearer. Ley-telegraph systems exist in advanced regions: sending stations at nodes, receiving stations at nodes, information flowing at near-instant speeds along the magical paths.
+
+**Site selection**: Anything magical works better on lines. Temples, academies, fortifications—all choose locations based on ley access. Wars have been fought over node control. The political map often mirrors the magical map, which isn't coincidence.
+
+*The vein metaphor is older than recorded history. So is the controversy about what, exactly, is bleeding.`,
+  category: 'magic',
+  tags: ['ley_lines', 'geography', 'power', 'nodes', 'travel', 'system'],
+  effectCategory: 'system',
+  targetType: 'world',
+
+  mechanics: {
+    values: {
+      lineStrengths: 'trace, minor, moderate, major, deep channel',
+      nodeTypes: 'single (2) to World Root (7+)',
+      flowBonus: '+10% to +300% depending on alignment',
+      travelAcceleration: '2x to 10x apparent speed',
+      communicationSpeed: 'near-instant along connected lines',
+    },
+    formulas: {
+      amplificationBonus: 'lineStrength * flowAlignment * casterAttunement',
+      travelSpeed: 'baseSpeed * lineStrength * directionMatch',
+      nodepower: 'sum(intersectingLines) * synergyFactor',
+    },
+    conditions: {
+      'Lines have direction': 'Flow alignment affects efficiency',
+      'Seasonal variation': 'Power fluctuates with calendar',
+      'Deep channels dangerous': 'Strongest lines can overwhelm users',
+      'Nodes are contested': 'Powerful locations attract competition',
+    },
+    dependencies: ['ley_sensitivity', 'geographic_knowledge', 'calendar_awareness'],
+    unlocks: ['ley_amplification', 'ley_travel', 'node_access', 'ley_communication'],
+  },
+
+  tips: [
+    'Learn to sense ley lines before trying to use them—working blind causes accidents',
+    'Track seasonal patterns; the same line can be safe in summer and overwhelming at solstice',
+    'Ley-roads are faster but more trafficked; expect to encounter others on major routes',
+    'Node politics are real; know who claims which intersection before visiting',
+  ],
+
+  warnings: [
+    'Deep channels can cause magical overload in unprepared casters',
+    'Countercurrent casting (against the flow) strains both caster and line',
+    'World Roots are not tourist destinations; pilgrims die regularly',
+    'Ley-dependency develops with extended amplified casting; maintain off-line practice',
+    'Node control is political power; territorial conflicts are common and sometimes violent',
+  ],
+
+  examples: [
+    {
+      title: 'The Ley-Amplified Stand',
+      description:
+        'Defender Tomas couldn\'t hold the pass. He was competent, not exceptional, and the invading mages outnumbered him twenty to one. But he knew the pass—had studied it, walked every meter, felt the ley line that ran east-west through its exact center. He positioned himself on the line, aligned with the flow, and waited. When the invaders came, casting conventional attacks, Tomas drew deep. The line answered. His shields, normally adequate, became fortress walls of pure force. His counterattacks, normally modest, struck with triple strength. He held for six hours. Twenty mages, bottlenecked by geography, unable to bring numbers to bear, exhausted themselves against amplified defenses. When reinforcements arrived, Tomas could barely stand—the strain of channeling that much power, even with the line\'s help, had nearly broken him. But he\'d held. One competent mage, correctly positioned, had stopped an army. "Location," he said afterward, "is everything."',
+    },
+    {
+      title: 'The World Root Pilgrimage',
+      description:
+        'The Sevenfolded Confluence was legendary: seven major lines meeting at a mountain peak, power beyond imagination, a place where reality itself was negotiable. Hundreds of pilgrims attempted the approach each year. Perhaps a dozen reached it. The rest turned back (if wise), collapsed from magical overload (if foolish but lucky), or died (if foolish and unlucky). Sera made the journey because she had no choice—her curse could only be lifted at a World Root, and the Confluence was nearest. The approach took three weeks, each day harder as the ambient magic intensified. The final kilometer was almost unbearable: every step through thickening power, her senses overwhelmed by the flow of seven lines converging. She reached the summit barely conscious. The Confluence took her curse—traded it for something she couldn\'t remember afterward, a negotiation conducted in the space where too much power met desperate need. She descended changed. The curse was gone. Something else was present. She never spoke of what the trade had cost, but she never attempted another World Root. Once, apparently, was enough.',
+    },
+  ],
+
+  relatedTopics: [
+    'ley_mapping',
+    'node_politics',
+    'seasonal_patterns',
+    'ley_travel',
+    'deep_channels',
+    'world_roots',
+  ],
+});
+
+// ============================================================================
+// MANA CRYSTALS
+// ============================================================================
+
+export const MANA_CRYSTALS_HELP = createEffectHelp('mana_crystals', {
+  summary: 'Crystallized magic—storage, amplification, and the economy of power',
+  description: `Mana, under the right conditions, solidifies. Not into anything useful at first—raw crystallized magic is unstable, dangerous, and tends to explode when looked at wrong. But refined, purified, carefully shaped? Mana crystals become the batteries that power magical civilization: storage for power, amplifiers for casting, currency for those who trade in the essential resources of magic.*
+
+The ManaCapacitor system tracks crystal properties, calculates storage limits, and manages the complex energy dynamics of crystalline magic. Natural crystals form where mana concentration exceeds sustainable thresholds—ley line intersections, ancient battle sites, places where too much magic happened too often. Artificial crystals are grown in controlled environments, faster but usually smaller, purer but often less potent.
+
+**Crystal Properties**:
+
+**Capacity** determines how much mana a crystal can hold. Size matters, but structure matters more; a fist-sized quartz might hold less than a thumb-sized ruby, depending on lattice configuration. Maximum natural capacity peaks at about a thousand units—enough to fuel a week of heavy casting or one extremely dramatic emergency. Larger crystals exist in legend; no verified examples have survived intact.
+
+**Conductivity** affects how quickly mana flows in or out. High-conductivity crystals charge and discharge rapidly—useful for combat, risky for storage. Low-conductivity crystals are stable long-term but can't deliver power quickly. Most practitioners keep both: slow crystals for reserves, fast crystals for emergencies.
+
+**Affinity** limits what types of magic a crystal handles efficiently. Fire-affinity crystals store fire magic at 100% efficiency but lightning magic at 70%, healing magic at 50%. Pure crystals (no affinity) are rare and expensive; most crystals carry some bias, and smart practitioners match crystal to use.
+
+**Stability** measures how safely a crystal retains charge. Unstable crystals leak, flare, or—in extreme cases—detonate. Age typically increases stability as crystalline structure settles; fresh crystals are handled with caution. The stability ratings are: inert (empty), stable (normal operation), stressed (approaching capacity), critical (handle with care), and cascade (run).
+
+**Practical Uses**:
+
+**Power storage**: The obvious use. Charge crystals during low-demand periods; draw during high-demand. The Academy maintains crystal reserves measured in millions of units, enough to defend against siege for months.
+
+**Emergency amplification**: Drain a crystal into a spell for power beyond personal capacity. Risky—the surge can damage caster or crystal—but effective when survival matters more than safety.
+
+**Currency**: Crystals are portable, valuable, and universally needed. In magical economies, they often serve as money, with standardized sizes and capacities acting as denominations. The Crystal Bank maintains exchange rates and authentication services.
+
+**Enchantment power sources**: Rechargeable enchantments draw from embedded crystals, which can be replaced when depleted. This makes powerful enchantments sustainable without ley-line dependency.
+
+*The economic implications are profound. Whoever controls crystal supplies controls magical capability. Mining rights are fought over; refinement techniques are closely guarded; and the Crystal Cartels exert influence that rivals national governments in regions where magic matters most.`,
+  category: 'magic',
+  tags: ['mana', 'crystals', 'storage', 'economy', 'power', 'system'],
+  effectCategory: 'system',
+  targetType: 'object',
+
+  mechanics: {
+    values: {
+      capacityRange: '10 to 1000 units typical',
+      conductivityRange: 'slow (hours) to fast (seconds)',
+      affinityPenalty: '20-70% for mismatched magic types',
+      stabilityGrades: 'inert, stable, stressed, critical, cascade',
+      maxDrawRate: 'conductivity * 10 units per second',
+    },
+    formulas: {
+      storageEfficiency: 'basePurity * affinityMatch * structureQuality',
+      chargeRate: 'conductivity * inputPower * (1 - currentCharge/capacity)',
+      cascadeRisk: '(currentCharge/capacity)^3 * (1 - stability)',
+    },
+    conditions: {
+      'Capacity is absolute': 'Overcharging causes cascade',
+      'Affinity affects efficiency': 'Mismatched types waste power',
+      'Age increases stability': 'New crystals are more volatile',
+      'Temperature matters': 'Heat increases conductivity and decreases stability',
+    },
+    dependencies: ['crystal_quality', 'charging_infrastructure', 'handling_skill'],
+    unlocks: ['power_storage', 'emergency_amplification', 'currency_exchange', 'enchantment_power'],
+  },
+
+  tips: [
+    'Match crystal affinity to your primary casting type for best efficiency',
+    'Never charge a crystal past 90% unless you\'re willing to lose it',
+    'Keep emergency crystals in separate containers; cascade can spread',
+    'Verify crystal authenticity before accepting in trade—forgeries exist',
+  ],
+
+  warnings: [
+    'Cascade explosions scale with stored power; large crystals make large craters',
+    'Rapid discharge through the body can cause mana burn or worse',
+    'Crystal addiction is real—dependency on external power sources atrophies internal generation',
+    'Theft of major crystals triggers pursuit by cartels, guilds, and occasionally nations',
+    'Natural formation sites are often claimed and defended; unauthorized mining has consequences',
+  ],
+
+  examples: [
+    {
+      title: 'The Emergency Drain',
+      description:
+        'The ward was failing. The demon\'s assault had already depleted her personal reserves; Magister Ora had maybe ten seconds before the protection collapsed entirely. She grabbed the emergency crystal—a fist-sized ruby, fire-affinity, eight hundred units at maximum stable charge. She\'d never drained one this size before. The theory said it was possible. The theory also mentioned a 15% chance of catastrophic mana burn. She drained it anyway. Power flooded in, more than her body was meant to hold, channeling immediately into the ward. The reinforcement blazed so bright the demon flinched back. Ora held for twelve more seconds—long enough for backup to arrive, long enough for the banishing to complete. Then she collapsed, the crystal empty, her hands burned where she\'d held it, her mana channels screaming from the overload. "Worth it," she whispered, before the healers sedated her. The burns took a month to heal. The channels never fully recovered. She kept the crystal on her shelf: a reminder that emergency measures cost more than the emergency.',
+    },
+    {
+      title: 'The Cartel Negotiation',
+      description:
+        'The Azure Consortium controlled sixty percent of the Eastern crystal trade. Trader Venn knew this when he approached them with his proposal: a new deposit, found in unclaimed territory, potentially worth millions. The Consortium\'s representative listened politely, then explained the situation. "You have two options. We buy your claim at our price—generous, all things considered. Or you develop it independently, and we... compete. Aggressively. Prices will drop until you\'re mining at a loss. Your buyers will find their shipments delayed. Your refiners will have accidents." Venn had expected this. He\'d also approached the rival Diamond League, the Crown Mining Authority, and the Mages\' Guild. His counteroffer: a four-way split, no single faction controlling, prices stabilized by mutual agreement. It took six months of negotiation. Three assassination attempts. One actual war, briefly, in a border region. But eventually everyone agreed: the deposit was too valuable to fight over when cooperation was profitable. Venn took his broker\'s percentage and retired young. Crystal politics, he\'d learned, was about knowing when you had leverage—and when to cash it out before someone decided you were easier to remove than to negotiate with.',
+    },
+  ],
+
+  relatedTopics: [
+    'crystal_mining',
+    'refinement_techniques',
+    'capacity_testing',
+    'cartel_politics',
+    'mana_burn',
+    'currency_standards',
+  ],
+});
+
+// ============================================================================
+// RITUAL MAGIC
+// ============================================================================
+
+export const RITUAL_MAGIC_HELP = createEffectHelp('ritual_magic', {
+  summary: 'Slow magic, powerful magic—effects that require preparation, participants, and patience',
+  description: `Combat magic is improvised jazz. Ritual magic is a symphony: composed in advance, rehearsed extensively, performed according to strict score, producing effects that improvisation can never match. The tradeoff is time. Lots of time. If you need results in seconds, ritual isn't for you. If you need results that last centuries? Ritual is the only option.*
+
+The RitualCircleSystem manages the complex requirements of ceremonial magic: spatial configuration, temporal alignment, participant coordination, and power accumulation. A ritual isn't just a spell cast slowly; it's a spell rebuilt from the ground up to handle power levels that would kill an individual caster, produce durations that would exhaust any personal reserve, and create effects that reality normally refuses to permit.
+
+**Preparation Phase**:
+
+The **ritual space** must be prepared: usually a circle, often geometric, always precise. Errors in preparation don't just reduce effectiveness—they redirect effects, sometimes at the preparers. Master ritualists spend hours on site selection, ground leveling, and geometric validation before drawing a single line.
+
+**Components** must be gathered: material components (crystals, herbs, blood, rare elements), temporal components (performed at the right moon phase, the right season, the right hour), and sometimes narrative components (reenacting a mythic event, speaking specific words at specific moments). Missing components reduce power at best, cause failure at worst, occasionally summon something unexpected when the ritual's hunger finds alternative fuel.
+
+**Participants** must be aligned: synchronized breathing, coordinated power contribution, shared intent. Solo rituals exist but hit strict power ceilings. Group rituals multiply capacity but require trust—a participant who breaks rhythm, who holds back power, who harbors conflicting intentions, can destabilize everything. The most powerful rituals historically involved hundreds of participants, training together for years.
+
+**Execution Phase**:
+
+Rituals run on strict timelines. Once begun, they cannot be paused; interruption wastes all accumulated power and sometimes backfires dramatically. Duration varies from minutes (simple empowerments) to days (major summonings) to years (legendary effects that require generational commitment). The record for longest continuous ritual is fourteen years, three months, and six days—raising a mountain, they say, though verification is obviously difficult.
+
+**Power Accumulation** happens throughout. Participants contribute steadily; the ritual structure stores and compounds their input. Peak power arrives at the conclusion, releasing everything accumulated toward the intended effect. This is why major rituals can reshape geography while individual casters can barely reshape furniture: time converts many small contributions into one vast result.
+
+*The term "ritual" gets misused for any fancy spellcasting. Real rituals require diagrams, timing, and often more than one person. Everything else is just magic with ceremony, which is fine but different.`,
+  category: 'magic',
+  tags: ['ritual', 'ceremony', 'group', 'preparation', 'powerful', 'slow'],
+  effectCategory: 'system',
+  targetType: 'varies',
+
+  mechanics: {
+    values: {
+      minimumDuration: '10 minutes (simple empowerment)',
+      maximumDuration: 'years (legendary effects)',
+      participantScaling: 'logarithmic past 10',
+      preparationTime: '3x to 10x ritual duration',
+      componentRequirement: 'mandatory for most rituals',
+    },
+    formulas: {
+      accumulatedPower: 'sum(participantContributions) * duration * ritualEfficiency',
+      effectScale: 'log10(accumulatedPower) * purposeAlignment',
+      failureRisk: '(1 - preparation) * complexity * (1 - synchronization)',
+    },
+    conditions: {
+      'Cannot interrupt': 'Stopping wastes all accumulated power',
+      'Preparation mandatory': 'Unprepared rituals fail or backfire',
+      'Timing precise': 'Wrong moment can misdirect entire effect',
+      'Group alignment critical': 'Conflicting intentions cause instability',
+    },
+    dependencies: ['ritual_space', 'components', 'participants', 'timing'],
+    unlocks: ['major_summonings', 'permanent_effects', 'geographic_alteration', 'legendary_magic'],
+  },
+
+  tips: [
+    'Prepare obsessively—ritual failures are expensive in every way',
+    'Vet participants carefully; one weak link weakens the whole chain',
+    'Keep backup components; running short mid-ritual is catastrophic',
+    'Document everything—successful rituals should be reproducible',
+  ],
+
+  warnings: [
+    'Interrupted rituals release power uncontrolled; establish perimeter security',
+    'Long rituals create fatigue; plan for participant rotation without breaking continuity',
+    'Failed rituals can attract things that feed on wasted power; prepare banishing backup',
+    'Major rituals draw attention from beings who monitor such things; expect observation',
+    'Never ritual improvise. If you haven\'t rehearsed, you aren\'t ready.',
+  ],
+
+  examples: [
+    {
+      title: 'The Mountain Ward',
+      description:
+        'The Valdren border needed permanent protection. Not temporary shields that required constant maintenance, but something that would last—centuries, ideally. The Crown commissioned a ritual: forty-seven mages, six months of preparation, fourteen days of continuous casting. The geometric layout covered three acres. The component list ran to forty pages. The timing had to align with a lunar eclipse at summer solstice, which happened twice per century. They got one chance. For two weeks, the participants rotated in shifts: eight hours channeling, sixteen hours resting, no breaks, no excuses. The accumulated power grew visible—a shimmering dome that expanded slowly outward. On the final night, at the eclipse\'s peak, the leader spoke the completion words and released everything. The ward snapped into place: invisible now, but present, a barrier that would reject hostile magic for as long as the mountains stood. That was four hundred years ago. The ward still holds. The mages who cast it are long dead, but their work continues. Ritual magic: slow to cast, permanent in effect.',
+    },
+    {
+      title: 'The Failed Summoning',
+      description:
+        'Everything was perfect. The circle, validated three times. The components, verified authentic. The timing, aligned to astronomical precision. Fifteen participants, trained together for two years. Master Vorn began the summoning, calling a guardian spirit to protect the academy. Three hours in, Apprentice Kolth coughed. Just a cough—harmless, involuntary, couldn\'t be helped. The rhythm broke. Fifteen synchronized contributors became fourteen synchronized and one half-beat off. The accumulated power, already vast, recognized the gap and flowed toward it like water to a drain. The spirit came—but wrong, twisted by the assymetric summoning, hostile rather than protective. It killed Kolth first (drawn to the breach), then Vorn (who tried to bind it anyway), then three others before the survivors managed a banishing. The academy recorded the lesson: perfection wasn\'t optional. Perfection was the only acceptable standard. Kolth\'s cough killed five people. The ritual hadn\'t failed from malice or incompetence. It had failed from a cough, and that was enough.',
+    },
+  ],
+
+  relatedTopics: [
+    'ritual_preparation',
+    'group_synchronization',
+    'component_sourcing',
+    'timing_alignment',
+    'failure_recovery',
+    'legendary_rituals',
+  ],
+});
+
+// ============================================================================
+// COUNTERSPELLING
+// ============================================================================
+
+export const COUNTERSPELLING_HELP = createEffectHelp('counterspelling', {
+  summary: 'The art of unmaking—stopping, redirecting, and destroying hostile magic',
+  description: `Every spell can be countered. This is fundamental: magic operates through patterns, and patterns can be disrupted, interrupted, or inverted. The CounterspellRegistry tracks known techniques, analyzes incoming effects, and calculates optimal disruption strategies. It's the defensive playbook for magical combat—and like any playbook, it's only useful if you've studied before the game starts.*
+
+Counterspelling divides into reactive and proactive categories:
+
+**Reactive Counterspelling** responds to spells already cast:
+
+**Disruption** interferes with spell structure mid-flight. Pump opposing energy into an incoming fireball, and it detonates early, far from target. The technique requires reading incoming spells quickly, identifying structural weaknesses, and applying precise counter-force before impact. It's the most common combat counter: fast, flexible, but power-intensive.
+
+**Absorption** captures incoming magic rather than destroying it. Properly prepared shields don't just block—they drink, converting hostile energy into stored power or redirected effect. The technique requires appropriate receptacle (shields, crystals, specially prepared wards) and fails spectacularly if receptacle capacity is exceeded.
+
+**Reflection** turns spells back on their casters. The holy grail of reactive countering: use their power against them, add insult to injury. But reflection requires understanding the incoming spell well enough to reverse its targeting—which means recognizing it, which means study, which means slower reaction time. Expert reflectors are rare and terrifying.
+
+**Proactive Counterspelling** prevents spells from being cast:
+
+**Suppression fields** create areas where magic of certain types simply doesn't work. Mana doesn't flow, patterns don't form, effects don't manifest. Creating suppression requires more power than any individual spell it blocks, but once established, it blocks everything in category without per-spell effort.
+
+**Disruption of casting** targets the caster, not the spell. Interrupt concentration, break verbal components, interfere with somatic gestures. Less elegant than countering the magic itself but often more practical—a mage who can't complete casting can't threaten you regardless of their power.
+
+**Preemptive binding** traps hostile potential before it activates. Specialized contracts, prepared wards, or conditional curses that trigger when specific magics are attempted. The technique requires anticipating what opponents will try, which requires intelligence—both kinds.
+
+The counter-counter game is ancient. Every technique has known counters; every counter has known counter-counters. Magical duels are often decided by preparation depth: who studied more variations, who anticipated more contingencies, who brought the right answers to the questions being asked.
+
+*The Registry is controversial. Some argue that documenting counter-techniques helps defenders. Others argue it helps attackers design uncounterable spells. Both are correct, which is why the Registry exists but access is restricted.`,
+  category: 'magic',
+  tags: ['counterspelling', 'defense', 'disruption', 'absorption', 'combat', 'system'],
+  effectCategory: 'system',
+  targetType: 'spell',
+
+  mechanics: {
+    values: {
+      disruptionCost: '50-150% of incoming spell cost',
+      absorptionLimit: 'receptacle capacity',
+      reflectionDifficulty: 'scales with spell complexity',
+      suppressionCost: '200-500% of single spell cost per minute',
+      reactionWindow: '0.5 to 3 seconds depending on spell speed',
+    },
+    formulas: {
+      disruptionSuccess: 'counterPower / spellPower * techniqueMatch',
+      absorptionEfficiency: 'receptacleCapacity / incomingPower',
+      reflectionAccuracy: 'spellUnderstanding * skill / complexity',
+    },
+    conditions: {
+      'Reaction speed matters': 'Must respond within casting-to-impact window',
+      'Power requirements high': 'Countering usually costs more than casting',
+      'Study improves efficiency': 'Known spells easier to counter',
+      'Paradigm matching': 'Same-paradigm counters are more efficient',
+    },
+    dependencies: ['reaction_speed', 'power_reserves', 'spell_knowledge', 'technique_training'],
+    unlocks: ['disruption_techniques', 'absorption_shields', 'reflection_wards', 'suppression_fields'],
+  },
+
+  tips: [
+    'Study your likely opponents\' preferred spells before engagement',
+    'Absorption is more efficient than disruption when you have appropriate receptacles',
+    'Suppression fields are expensive but worth it against multiple casters',
+    'Sometimes the best counter is a faster attack; don\'t get locked in defensive posture',
+  ],
+
+  warnings: [
+    'Failed disruption can redirect rather than stop—worse than not trying',
+    'Absorption past capacity causes explosive feedback',
+    'Reflection requires understanding; reflecting unknown spells usually fails',
+    'Suppression often blocks your own casting too; plan accordingly',
+    'Counter-counter loops can drain both parties; know when to disengage',
+  ],
+
+  examples: [
+    {
+      title: 'The Perfect Counter',
+      description:
+        'Duelist Mara had studied her opponent for months: his preferred spells, his timing patterns, his structural signatures. When the duel began, she recognized his first cast within milliseconds—a standard force lance, Academy-style, predictable and precisely formed. Her counterspell was already prepared: opposing energy at exactly the frequency needed, applied at exactly the structural weak point she\'d identified. The lance unraveled a meter from her face. He cast again—fire this time, more complex. She\'d studied that too: counter-force, applied here and here, the spell collapsing into harmless sparks. Three more exchanges. Three more perfect counters. He was powerful; she was prepared. Power met knowledge, and knowledge won. His surrender came after the sixth failed spell, when he realized she\'d countered every technique in his repertoire. "How?" he asked. "Research," she answered. "You cast the same twelve spells in every duel. I learned to unmake each one." The lesson was expensive for him, enlightening for observers: preparation beat power, every time, when preparation was thorough enough.',
+    },
+    {
+      title: 'The Suppression Gambit',
+      description:
+        'The enemy had twenty mages. Commander Thall had five. Direct magical combat would be suicide—twenty to five, even with training differential, meant defeat. So Thall didn\'t fight magically. He established a suppression field: massive power drain, covering the entire engagement zone, blocking all magic of Grade 5 or below. It cost half his reserves per minute. It would drain him dry in eight minutes. But for those eight minutes, nobody cast anything. Twenty mages became twenty people with sticks. Five mages became five soldiers who\'d trained for exactly this scenario. The battle was brief, brutal, and entirely non-magical. When suppression dropped, Thall could barely stand—but the enemy mages couldn\'t stand at all. "Expensive trick," his second said afterward. "But effective." "Once," Thall replied. "Next time they\'ll prepare for it. Suppression gambits only work when opponents don\'t expect them." He was right. He never used the tactic again. He didn\'t need to. The reputation of "the mage who made magic irrelevant" was worth more than any single victory.',
+    },
+  ],
+
+  relatedTopics: [
+    'disruption_techniques',
+    'absorption_shields',
+    'reflection_theory',
+    'suppression_fields',
+    'counter_counter_techniques',
+    'duel_preparation',
+  ],
+});

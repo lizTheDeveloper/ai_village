@@ -960,3 +960,371 @@ Some gods embrace this development, treating their servants as valued staff who 
     'cosmic_employment',
   ],
 });
+
+// ============================================================================
+// PROPHETS AND CHOSEN ONES
+// ============================================================================
+
+export const PROPHETS_CHOSEN_HELP = createEffectHelp('prophets_chosen', {
+  summary: 'Mortals marked by the divine—vessels of revelation and instruments of godly will',
+  description: `Being chosen is not a promotion. It's a job description that nobody showed you before you signed, with responsibilities that exceed anything you're qualified for and a benefits package that consists entirely of "eventual martyrdom, probably."*
+
+The ProphetSystem manages the complex relationship between deities and their mortal instruments. Why do gods need prophets? Because divine communication is hard. Gods think in concepts too vast for mortal minds, perceive time non-linearly, and have agendas spanning millennia. A message that makes perfect sense to a deity sounds like screaming static to humans. Prophets are translators: mortals who somehow survive the divine download and can convert cosmic significance into words ordinary people understand.
+
+**Selection Criteria** vary by deity, but common factors include:
+
+**Sensitivity** to divine frequencies—some mortals are naturally more receptive to godly transmission. This isn't virtue; it's something like spiritual wifi reception, and nobody knows why some people have it and others don't. Sensitivity often correlates with mental instability, which raises uncomfortable questions about prophetic traditions throughout history.
+
+**Willingness** matters more than you'd expect. Gods can technically force selection on unwilling candidates, but the results are poor: garbled messages, resentful representatives, active sabotage. The best prophets feel called, even if they resist initially.
+
+**Durability** is crucial. Prophecy physically damages mortals—the body wasn't designed for divine bandwidth. Strong prophets survive longer, deliver more messages, and break down slower. Fragile ones burn bright and brief.
+
+**The Prophet's Experience**:
+
+Initial selection often feels like violation: sudden awareness of presence, overwhelming certainty that something notices you. Many prospective prophets reject the call initially. Those who accept describe a period of calibration—learning to receive divine communication without screaming, speaking in tongues, or achieving temporary combustion.
+
+Established prophets operate as ongoing channels. Some receive periodic visions; others maintain constant low-level connection. The most powerful exist as partial vessels, their identity partly divine, their perspective permanently shifted toward the eternal.
+
+**The Chosen One Variant**:
+
+Distinct from prophets, Chosen Ones are designated for specific tasks rather than ongoing communication. "You will defeat the Dark Lord." "You will found the sacred city." "You will be the one who sorts out that mess in accounting."** The chosen state is temporary, ending when the task completes (or the Chosen One dies trying, which is the more common outcome). Selection criteria focus on capability rather than sensitivity—a Chosen One needs to accomplish things, not relay messages.
+
+*Martyrdom optional but statistically likely. Historically, 73% of documented prophets died to violence, divine overload, or "mysterious circumstances." The remaining 27% mostly wished they had.
+
+**The accounting prophecy was real. It took seventeen years. Nobody talks about it.`,
+  category: 'divinity',
+  tags: ['prophets', 'chosen', 'vessels', 'communication', 'mortal', 'divine'],
+  effectCategory: 'system',
+  targetType: 'individual',
+
+  mechanics: {
+    values: {
+      prophetLifespan: '-30% to -70% due to divine strain',
+      messageClarityRange: '40% (new) to 95% (experienced)',
+      chosenTaskSuccess: '35% complete, 45% partial, 20% fail',
+      selectionFrequency: '1-5 prophets per deity per century',
+    },
+    formulas: {
+      messageClarity: 'sensitivity * training * deityCooperation',
+      burnoutRate: 'messageIntensity * frequency / durability',
+      chosenSuccessChance: 'taskDifficulty / (chosenCapability * divineSupport)',
+    },
+    conditions: {
+      'Selection irrevocable': 'Once marked, always marked',
+      'Communication degrades': 'Physical toll accumulates over time',
+      'Identity blurs': 'Long-term prophets partially merge with deity perspective',
+      'Death meaningful': 'Prophetic death often carries theological weight',
+    },
+    dependencies: ['deity_attention', 'mortal_sensitivity', 'cultural_support'],
+    unlocks: ['divine_messages', 'miraculous_abilities', 'religious_authority', 'martyr_potential'],
+  },
+
+  tips: [
+    'New prophets should build support networks before major revelations—isolation increases burnout',
+    'Chosen Ones benefit from accepting help; the prophecy says YOU will succeed, not that you\'ll succeed alone',
+    'Recording revelations immediately preserves clarity; divine messages fade like dreams',
+    'Other prophets of the same god are allies, not competitors—different receivers, same source',
+  ],
+
+  warnings: [
+    'Prophetic authority attracts those who want to control it; expect political interference',
+    'False prophets exist; verification methods are imperfect but necessary',
+    'The message may be true without being complete—gods share what serves their purpose',
+    'Burnout doesn\'t announce itself; monitor physical and mental health obsessively',
+    'Chosen One status doesn\'t guarantee survival past task completion—negotiate aftercare',
+  ],
+
+  examples: [
+    {
+      title: 'The Reluctant Voice',
+      description:
+        'Tam was a baker. She liked bread, quiet mornings, and the simple satisfaction of feeding her village. Then the Sun God decided she had excellent reception. The visions started: searing light, impossible colors, words that tasted like fire. She refused for three years, blocking the transmissions, pretending normalcy. The god waited. When plague came and Tam realized she\'d seen it coming months ago, seen the cure, and suppressed both from stubbornness, her resistance broke. She announced herself as prophet, endured the expected mockery, delivered the plague cure that saved half the village. Now she bakes bread and relays divine messages, both with the same weary competence. "I didn\'t want this," she tells new initiates. "Nobody does. That\'s fine. Wanting isn\'t required. Doing is required. Do the work. Maybe save some lives. The bread helps more than you\'d think."',
+    },
+    {
+      title: 'The Chosen Who Chose Otherwise',
+      description:
+        'Marcus received his destiny at fifteen: he would defeat the Lich of Thornhallow, save the eastern kingdoms, and die in the process. The death part was heavily implied but unmistakable. He trained for twelve years, became everything a Chosen One should be, and then—at the battle\'s eve—he delegated. "I\'m the Chosen," he told his assembled army. "I don\'t have to be the only one." He led from the back, coordinated the assault, let the Lich believe he was facing an ordinary general. When the undead army overextended, Marcus\'s lieutenants struck the vulnerable points while Marcus handled logistics. The Lich fell. Marcus survived. Theologians argued for decades whether he\'d fulfilled the prophecy (the Lich was defeated) or violated it (he didn\'t die). Marcus didn\'t care. He was alive, the kingdoms were saved, and the god who\'d chosen him had been oddly silent since the victory. Whether that meant approval or disappointment, Marcus never found out. He preferred it that way.',
+    },
+  ],
+
+  relatedTopics: [
+    'divine_selection',
+    'prophetic_burnout',
+    'chosen_one_tasks',
+    'false_prophets',
+    'martyrdom',
+    'message_clarity',
+  ],
+});
+
+// ============================================================================
+// HOLY ARTIFACTS
+// ============================================================================
+
+export const HOLY_ARTIFACTS_HELP = createEffectHelp('holy_artifacts', {
+  summary: 'Objects imbued with divine power—relics that carry godly essence into the material world',
+  description: `Gods are vast and mortals are small. This creates logistics problems. You can't carry a deity in your pocket, but you can carry a piece of them—a fragment of divinity compressed into matter, portable godhood for the discerning worshipper. These are holy artifacts: objects that touch the divine and bring that touch to wherever they travel.*
+
+The RelicSystem tracks divine objects, their powers, their locations, and the complex theological implications of godhood in a bottle. Not all holy objects are equal; the taxonomy distinguishes:
+
+**Primary Relics** are directly created by gods: the sword Solaris forged in the Solar Throne, the First Stone that the Earth Mother shaped before mountains existed. These objects contain genuine divine essence, fragments of the deity's own power. They're rare, they're powerful, and they're usually accompanied by lengthy lists of forbidden uses that previous owners learned the hard way.
+
+**Secondary Relics** were touched by divinity: a prophet's walking staff, a saint's burial shroud, the breakfast bowl of someone who achieved unexpected ascension (it happens, and the bowl is now significantly holier than you'd expect a breakfast bowl to be). These objects carry residual grace—less power than primary relics but easier to handle and less likely to accidentally smite the unworthy.
+
+**Tertiary Relics** are objects significant to the faith without direct divine contact: the first written copy of sacred texts, the foundation stone of the original temple, the commemorative plate from the religion's centennial celebration.** Minimal power, maximal symbolic value, extensively fought over regardless.
+
+**Artifact Properties**:
+
+**Divine Connection**: All relics maintain some link to their associated deity. Primary relics can channel miraculous power directly; secondary relics provide faith bonuses and minor effects; tertiary relics mostly provide theological legitimacy and pilgrimage destinations.
+
+**Proximity Effects**: Holy artifacts affect their surroundings. Wounds heal faster near the Chalice of Mercy. Lies fail near the Truth-Tongue. The Sword of Wrath makes everyone nearby slightly angrier, which is why it's kept in a vault rather than displayed.
+
+**Attunement Requirements**: Most relics work better (or only) for aligned individuals. The heretic who steals a holy sword may find it won't cut, or won't stop cutting, or works exactly as intended but notifies every priest within fifty miles.
+
+**Degradation**: Even divine objects fade. Primary relics last millennia; secondary relics last centuries; tertiary relics last until someone forgets why they mattered. Sustained worship can maintain artifacts; neglect accelerates decay.
+
+*The phrase "godhood in a bottle" is deprecated by the Theological Standards Committee. The official term is "contained divine emanation." Nobody uses it.
+
+**The plate is surprisingly important. Seventeen religious wars have included the plate's custody among their stated causes.`,
+  category: 'divinity',
+  tags: ['artifacts', 'relics', 'holy', 'objects', 'divine', 'power'],
+  effectCategory: 'system',
+  targetType: 'object',
+
+  mechanics: {
+    values: {
+      primaryRelicPower: '100% of designated effect',
+      secondaryRelicPower: '20-50% residual',
+      tertiaryRelicPower: 'minimal, mostly symbolic',
+      degradationRate: 'primary: millennia, secondary: centuries, tertiary: decades',
+    },
+    formulas: {
+      effectStrength: 'relicClass * divineFavor * userAlignment',
+      degradationSpeed: 'baseRate / (worshipAttention + environmentalProtection)',
+      detectionRange: 'relicPower * currentCharge * interferenceModifier',
+    },
+    conditions: {
+      'Alignment affects use': 'Opposed faiths may trigger negative effects',
+      'Location matters': 'Sacred sites enhance relics; profane sites suppress',
+      'Worship maintains': 'Active veneration slows degradation',
+      'Theft has consequences': 'Relics often report to their deities',
+    },
+    dependencies: ['divine_origin', 'maintenance_worship', 'proper_storage'],
+    unlocks: ['miraculous_effects', 'faith_amplification', 'pilgrimage_sites', 'theological_legitimacy'],
+  },
+
+  tips: [
+    'Secondary relics are more practical than primary—similar effects, less catastrophic misuse potential',
+    'Relic care is a skill; neglected artifacts lose power and can develop quirks',
+    'Proximity effects work on enemies too; strategic positioning matters',
+    'Multiple relics can interfere; test compatibility before storing together',
+  ],
+
+  warnings: [
+    'Primary relics can act independently if insufficiently respected',
+    'Theft triggers divine attention—stolen relics are rarely kept successfully',
+    'Fake relics are common; authentication requires expertise',
+    'Opposing relics in proximity create theological instability—results unpredictable',
+    'Some relics are hidden intentionally; finding them may not be desirable',
+  ],
+
+  examples: [
+    {
+      title: 'The Sword That Chose',
+      description:
+        'The Blade of First Light was forged by the Sun God himself, given to mortal champions to fight darkness wherever it gathered. For three thousand years, it passed from hero to hero, always somehow finding the right hands at the right moment. When the current champion fell, the sword disappeared—as it always did, seeking its next wielder. This time, it appeared in the hands of a twelve-year-old farm girl who had never held a weapon. The temple priests protested: surely a mistake, surely a test, surely the goddess would correct this obvious error. The sword disagreed. Every time they took it from the girl, it returned to her. Every time they gave it to a "proper" champion, it went limp, refused to cut, occasionally flew back to the farm. Eventually, the priests accepted what the relic had decided: the child was chosen. She trained, grew, became the champion the sword knew she could be. The priests learned to trust divine objects over divine expectations—a lesson the sword had taught, silently but clearly.',
+    },
+    {
+      title: 'The Fading Shroud',
+      description:
+        'Saint Vera\'s burial shroud had healed wounds for eight centuries. Pilgrims came by thousands; the sick left whole; the dying left alive. But the shroud was secondary relic, not primary, and eight centuries is a long time. The current abbot noticed the change first: healings taking longer, working less completely, failing outright for severe cases. The shroud was fading. He increased the worship schedule—more prayers, more veneration, more attention. It slowed the decline but didn\'t stop it. He reached out to the Saint\'s deity directly, begged for renewal. The answer came in a dream: "Vera\'s time passes. Nothing mortal is eternal, including sanctity. Let the shroud rest. Another relic will rise when needed." The abbot announced the shroud\'s retirement at the next festival, expecting devastation. Instead, pilgrims wept, yes, but they also told stories: healings remembered, lives changed, gratitude for eight centuries of mercy. The shroud went into honored storage, its power spent but its legacy eternal. The abbot understood, finally, that endings weren\'t failures. They were completions.',
+    },
+  ],
+
+  relatedTopics: [
+    'relic_authentication',
+    'artifact_storage',
+    'pilgrimage_sites',
+    'relic_theft',
+    'degradation_management',
+    'fake_relics',
+  ],
+});
+
+// ============================================================================
+// HERESY AND APOSTASY
+// ============================================================================
+
+export const HERESY_APOSTASY_HELP = createEffectHelp('heresy_apostasy', {
+  summary: 'When faith breaks—deviation, denial, and the consequences of theological dissent',
+  description: `Here's a theological dilemma: if gods gain power from belief, what happens when that belief turns wrong? Not absent—heresy isn't atheism. The heretic believes, often fervently. They just believe things that the deity, the institution, or the orthodoxy says they shouldn't. And the power flows anyway, which creates problems nobody is comfortable discussing.*
+
+The HeresyTracker monitors deviations from established doctrine, calculates their theological impact, and predicts schism potential. It's a controversial system—many argue that tracking "wrong" belief gives it too much legitimacy. Others counter that ignoring heresy doesn't make it disappear, just makes you surprised when your deity suddenly has aspects that believe they should be burning things.
+
+**Heresy Types**:
+
+**Doctrinal Heresy** involves wrong beliefs about right gods: "The Sun God values mercy above justice" when orthodoxy says justice comes first. The deity receives the worship; the deity's understood nature shifts slightly toward the heretical interpretation. Enough doctrinal heresy reshapes divine identity, which is why temples police doctrine so aggressively.
+
+**Practical Heresy** involves wrong practices around right beliefs: worshipping correctly but through forbidden methods, achieving genuine connection via technically prohibited routes. The power flows; the institution panics; the practitioner often genuinely doesn't understand what they've done wrong.
+
+**Structural Heresy** challenges fundamental assumptions: "The Sun God and Moon Goddess are the same entity" when orthodoxy holds them separate. If enough people believe this, reality bends—the deities don't merge but gain shared aspects, overlapping domains, confused identities. Structural heresy creates theological complexity that can persist for millennia.
+
+**Apostasy** is simpler: complete abandonment of faith. The apostate doesn't believe wrong things; they stop believing at all. Individual apostasy costs one believer's power—minor. Mass apostasy threatens divine existence. The interesting cases involve former prophets, priests who lose faith, chosen ones who decide to refuse: people whose connection to the divine was strong enough that its severance echoes.
+
+**Institutional Responses** range from re-education (for minor deviation) to excommunication (for persistent heresy) to active elimination (when heresy threatens orthodoxy's survival). The harshness correlates with institutional insecurity: confident faiths can tolerate more deviation because they don't fear every variant thought will unmake them.
+
+*The uncomfortable discussion: heretical worship still feeds the deity. A god of mercy receiving worship from believers who think that god values wrath doesn't get nothing—they get power that tastes like wrath. Enough wrong worship changes the deity. The orthodox aren't entirely wrong to fear this.`,
+  category: 'divinity',
+  tags: ['heresy', 'apostasy', 'deviation', 'doctrine', 'schism', 'consequences'],
+  effectCategory: 'system',
+  targetType: 'population',
+
+  mechanics: {
+    values: {
+      deityShiftThreshold: '15% believers with consistent deviation',
+      apostasyImpact: '-1 believer worth of power each',
+      schismThreshold: '25% following alternate interpretation',
+      heresyDetection: 'varies by institutional surveillance',
+    },
+    formulas: {
+      deityNatureShift: 'hereticalBelieverPercent * deviationSeverity * beliefIntensity',
+      apostasyConsequence: 'formerConnectionStrength * publicVisibility * replacementDifficulty',
+      institutionalResponse: 'threatPerception * resourceAvailability * historicalPrecedent',
+    },
+    conditions: {
+      'Heresy still powers': 'Wrong belief feeds the deity, wrongly',
+      'Numbers matter': 'Individual heresy is tolerable; mass heresy transforms',
+      'Intensity matters': 'Fervent heretics shift deity more than casual ones',
+      'Position matters': 'High-ranking apostasy causes more disruption',
+    },
+    dependencies: ['doctrinal_clarity', 'institutional_strength', 'surveillance_capacity'],
+    unlocks: ['theological_diversity', 'schism_potential', 'reformation_movements', 'divine_mutation'],
+  },
+
+  tips: [
+    'Minor heresies often indicate genuine spiritual insight—investigate before condemning',
+    'Apostasy prevention through inclusion works better than through punishment',
+    'Schisms can be managed if addressed early; ignored schisms become permanent',
+    'Historical heresies often became tomorrow\'s orthodoxy—context matters',
+  ],
+
+  warnings: [
+    'Heresy hunts often create more heresy than they eliminate',
+    'Forced orthodoxy produces surface compliance and underground resistance',
+    'Mass apostasy can occur suddenly when conditions align—monitor faith health',
+    'Burning heretics makes martyrs; martyrs inspire more heretics',
+    'The deity may side with the heretics if their interpretation better serves divine interests',
+  ],
+
+  examples: [
+    {
+      title: 'The Mercy Heresy',
+      description:
+        'The War God\'s doctrine was clear: strength through conflict, growth through struggle, victory through blood. Then came the Mercy Heresy—a sect believing the War God valued warrior\'s mercy, the strength to spare a defeated foe. Orthodox temples condemned it. Heresy hunters pursued its adherents. But the sect grew, and with it, something strange: the War God began manifesting mercy aspects. A second face appeared in visions, softer, holding both sword and open hand. Orthodox priests were horrified. The heretics claimed vindication. The War God, when directly queried through costly ritual, gave an ambiguous response: "I am what my faithful believe. They believe I show mercy. Now I do." The heresy became a recognized aspect within two generations. Sometimes wrong belief becomes right belief simply by persisting long enough.',
+    },
+    {
+      title: 'The Prophet Who Left',
+      description:
+        'High Prophet Salas had served the Light Goddess for forty years. His connection was so strong he glowed, literally, divine radiance leaking from his skin. When he announced his apostasy, the faithful assumed it was a test—surely he would reveal deeper truth, surely the goddess had some purpose. He didn\'t. There was no revelation. He simply stopped believing. "I served what I thought was perfect," he explained. "I found imperfection. I cannot worship what I cannot respect." His departure cost the faith one believer\'s worth of power—negligible. But his visibility cost them thousands of believers who followed his doubt. The glow faded over months as the divine connection dissolved, leaving an ordinary old man who had once been extraordinary. The Light Goddess said nothing publicly. Privately, worshippers reported dreams: the goddess weeping, not for lost power but for lost friendship. Even gods, it seemed, could feel betrayed.',
+    },
+  ],
+
+  relatedTopics: [
+    'doctrinal_enforcement',
+    'schism_management',
+    'apostasy_prevention',
+    'heresy_investigation',
+    'deity_mutation',
+    'reformation_history',
+  ],
+});
+
+// ============================================================================
+// DIVINE INTERVENTION
+// ============================================================================
+
+export const DIVINE_INTERVENTION_HELP = createEffectHelp('divine_intervention', {
+  summary: 'When gods act directly—the rarest, costliest, and most dramatic divine expressions',
+  description: `Prayer is a request. Miracles are approved requests, delegated implementation. Divine intervention is when the god shows up personally, reality bends around them like fabric around a stone, and things happen that were not supposed to happen according to any physics, probability, or prior arrangement. It's rare. It's expensive. It usually means something has gone very wrong or very right.*
+
+The InterventionManager tracks divine direct actions, measures their cosmic cost, and handles the reality distortion that follows when something infinite touches something finite. Gods don't intervene casually because intervention costs them—not worship or belief but something harder to replace, usually described as "divine attention" or "focus." A god actively intervening somewhere is a god not attending to their other responsibilities. The multiverse is large; divine attention is finite; intervention is opportunity cost at cosmic scale.
+
+**Intervention Categories**:
+
+**Manifestation** puts the deity physically (or quasi-physically) present in mortal space. The god appears—a face in the clouds, a figure of living light, a voice from everywhere at once. Reality struggles to accommodate; mortals in proximity often experience trauma, revelation, or both. Manifestation is expensive, brief, and used for communications too important for prophets.
+
+**Action** involves direct divine modification of reality: the storm that appears from nowhere, the sword that suddenly shatters, the impossible survival of someone who should have died. Unlike miracles (which work through established channels), intervention actions bypass normal causality. The god reaches in and changes things directly. Reality protests; paradox ripples outward; theologians gain employment explaining what happened.
+
+**Preservation** is defensive intervention: preventing something that was going to happen. The meteor that misses, the plague that fails to spread, the assassination that unaccountably fails. Preservation costs more than action because it requires countering established probability rather than inserting new events.
+
+**Cessation** unmakes something that already happened—the rarest and costliest intervention type. Time doesn't reverse; the event remains in memory. But its consequences disappear, its effects undo, its existence becomes somehow both real and unreal. Cessation is used for catastrophic errors, divine embarrassments, or outcomes so bad that even the cost of unmake is acceptable.
+
+**Why Don't Gods Intervene More?**:
+
+The question every suffering mortal asks. The answer involves economics: intervention cost versus outcome value. A god could intervene to save every dying believer—and would have no attention left for anything else, including maintaining their own divine existence. Intervention is reserved for pivotal moments, critical individuals, situations where the cost of acting is less than the cost of not acting. Cold comfort for those who pray and receive silence.
+
+*"Something has gone very wrong" covers approximately 87% of documented interventions. The remaining 13% are celebrations, rewards, and divine surprise parties, which are apparently a thing that happens.`,
+  category: 'divinity',
+  tags: ['intervention', 'divine', 'direct', 'rare', 'costly', 'dramatic'],
+  effectCategory: 'system',
+  targetType: 'varies',
+
+  mechanics: {
+    values: {
+      manifestationCost: '10% divine focus for duration',
+      actionCost: '5-50% depending on reality deviation',
+      preservationCost: '2x equivalent action cost',
+      cessationCost: '10x equivalent action cost minimum',
+    },
+    formulas: {
+      interventionCost: 'effectMagnitude * probabilityDeviation * durationFactor',
+      focusRecovery: 'baseRecovery * worshipIntensity * restPeriod',
+      paradoxGeneration: 'effectMagnitude * causalDisturbance',
+    },
+    conditions: {
+      'Cost is real': 'Intervention depletes finite divine resources',
+      'Paradox accumulates': 'Reality distortion from intervention persists',
+      'Attention is finite': 'Intervention here means absence elsewhere',
+      'Precedent matters': 'Interventions establish expectations for future requests',
+    },
+    dependencies: ['divine_focus_reserve', 'situation_severity', 'cost_benefit_calculation'],
+    unlocks: ['direct_divine_action', 'reality_modification', 'impossible_preservation', 'history_alteration'],
+  },
+
+  tips: [
+    'Intervention requests require extreme circumstances—don\'t waste divine attention on solvable problems',
+    'Multiple small interventions cost more than one large intervention—be specific',
+    'Post-intervention reality is fragile; act carefully in the aftermath',
+    'Document everything—intervention events are theologically significant',
+  ],
+
+  warnings: [
+    'Requesting intervention for insufficient cause can permanently reduce divine favor',
+    'Intervention attracts attention from other cosmic entities—expect observers',
+    'Paradox from major intervention can create reality scars that persist millennia',
+    'Gods who intervene too often deplete into dormancy',
+    'Cessation doesn\'t remove memories—those who remember unmade events often suffer',
+  ],
+
+  examples: [
+    {
+      title: 'The Storm That Waited',
+      description:
+        'The invasion fleet outnumbered the island defenders fifty to one. No military solution existed. The faithful of the Storm Lady prayed—not for victory, not for safety, just "please, anything." The Storm Lady heard and considered: two thousand believers, her strongest temple, a domain well-served by demonstrating she protected her own. She intervened. The storm that appeared was impossible—windspeed exceeding anything recorded, lightning too frequent to be natural, waves that rose only under enemy ships while the harbor stayed calm. The invasion fleet sank entirely. The Storm Lady withdrew, exhausted; for three months, weather across her domain was strange as she recovered her focus. Her believers built a new temple with salvaged enemy wood. Worth it, she decided. The investment had been vast but the message clear: her faithful were protected. For fifty years, no fleet approached that island.',
+    },
+    {
+      title: 'The Cessation of Thornvale',
+      description:
+        'A god made a mistake. The Harvest Lord, answering what he thought was sincere prayer, blessed the crops of Thornvale—only to discover the prayer came from a demon wearing mortal form, and the "blessing" had been corrupted into blight that would spread and destroy the entire agricultural region. He could contain the blight with preservation, but the damage to Thornvale was done: ten thousand dead, the land poisoned for generations. He chose cessation. The cost was staggering—nearly half his accumulated focus, centuries of careful accumulation, spent in one desperate correction. The blight unhappened. The deaths unoccurred. The prayer unspoke itself. Thornvale survived, confused by dreams of a disaster that had never been. The Harvest Lord collapsed into dormancy for thirty years, too depleted to maintain consciousness. When he woke, the first thing he did was create verification systems for prayer authentication. Some mistakes were too expensive to make twice.',
+    },
+  ],
+
+  relatedTopics: [
+    'intervention_costs',
+    'manifestation_trauma',
+    'reality_paradox',
+    'cessation_effects',
+    'divine_economics',
+    'prayer_escalation',
+  ],
+});

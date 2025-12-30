@@ -7,6 +7,7 @@ import type { GoalCategory, PersonalGoal } from '../components/GoalsComponent.js
 import { PersonalityComponent } from '../components/PersonalityComponent.js';
 import { GoalsComponent } from '../components/GoalsComponent.js';
 import { SkillsComponent } from '../components/SkillsComponent.js';
+import { GoalDescriptionLibrary } from './GoalDescriptionLibrary.js';
 
 /**
  * GoalGenerationSystem handles automatic goal generation during reflection
@@ -171,120 +172,134 @@ export class GoalGenerationSystem implements System {
   }
 
   private _createMasteryGoal(
-    _personality: PersonalityComponent,
+    personality: PersonalityComponent,
     _skills: SkillsComponent | null
   ): {
     description: string;
     motivation: string;
     milestones: Array<{ description: string; completed: boolean; progress: number }>;
   } {
-    const skillTypes = [CT.Building, 'farming', 'gathering', 'crafting'];
-    const chosenSkill = skillTypes[Math.floor(Math.random() * skillTypes.length)];
+    const skillTypes = ['building', 'farming', 'gathering', 'crafting'];
+    const chosenSkill = skillTypes[Math.floor(Math.random() * skillTypes.length)]!;
+
+    const template = GoalDescriptionLibrary.getMasteryGoal(personality, chosenSkill);
 
     return {
-      description: `Become a skilled ${chosenSkill === CT.Building ? 'builder' : chosenSkill === 'farming' ? 'farmer' : chosenSkill === 'gathering' ? 'gatherer' : 'crafter'}`,
-      motivation: `I want to master the art of ${chosenSkill}`,
-      milestones: [
-        { description: `Practice ${chosenSkill} regularly`, completed: false, progress: 0 },
-        { description: `Complete 10 ${chosenSkill} tasks`, completed: false, progress: 0 },
-        { description: `Achieve excellence in ${chosenSkill}`, completed: false, progress: 0 },
-      ],
+      description: template.description,
+      motivation: template.motivation,
+      milestones: template.milestones.map(m => ({
+        description: m,
+        completed: false,
+        progress: 0
+      })),
     };
   }
 
-  private _createSocialGoal(_personality: PersonalityComponent): {
+  private _createSocialGoal(personality: PersonalityComponent): {
     description: string;
     motivation: string;
     milestones: Array<{ description: string; completed: boolean; progress: number }>;
   } {
+    const template = GoalDescriptionLibrary.getSocialGoal(personality);
+
     return {
-      description: 'Build strong friendships in the village',
-      motivation: 'I value deep connections with others',
-      milestones: [
-        { description: 'Have meaningful conversations', completed: false, progress: 0 },
-        { description: 'Help neighbors with their tasks', completed: false, progress: 0 },
-        { description: 'Become a trusted member of the community', completed: false, progress: 0 },
-      ],
+      description: template.description,
+      motivation: template.motivation,
+      milestones: template.milestones.map(m => ({
+        description: m,
+        completed: false,
+        progress: 0
+      })),
     };
   }
 
-  private _createCreativeGoal(_personality: PersonalityComponent): {
+  private _createCreativeGoal(personality: PersonalityComponent): {
     description: string;
     motivation: string;
     milestones: Array<{ description: string; completed: boolean; progress: number }>;
   } {
+    const template = GoalDescriptionLibrary.getCreativeGoal(personality);
+
     return {
-      description: 'Create something unique and beautiful',
-      motivation: 'I want to express my creativity',
-      milestones: [
-        { description: 'Experiment with new designs', completed: false, progress: 0 },
-        { description: 'Build an artistic structure', completed: false, progress: 0 },
-        { description: 'Leave a creative mark on the village', completed: false, progress: 0 },
-      ],
+      description: template.description,
+      motivation: template.motivation,
+      milestones: template.milestones.map(m => ({
+        description: m,
+        completed: false,
+        progress: 0
+      })),
     };
   }
 
-  private _createExplorationGoal(_personality: PersonalityComponent): {
+  private _createExplorationGoal(personality: PersonalityComponent): {
     description: string;
     motivation: string;
     milestones: Array<{ description: string; completed: boolean; progress: number }>;
   } {
+    const template = GoalDescriptionLibrary.getExplorationGoal(personality);
+
     return {
-      description: 'Discover new places and resources',
-      motivation: 'I love exploring the unknown',
-      milestones: [
-        { description: 'Explore unexplored areas', completed: false, progress: 0 },
-        { description: 'Find rare resources', completed: false, progress: 0 },
-        { description: 'Map the entire region', completed: false, progress: 0 },
-      ],
+      description: template.description,
+      motivation: template.motivation,
+      milestones: template.milestones.map(m => ({
+        description: m,
+        completed: false,
+        progress: 0
+      })),
     };
   }
 
-  private _createSecurityGoal(_personality: PersonalityComponent): {
+  private _createSecurityGoal(personality: PersonalityComponent): {
     description: string;
     motivation: string;
     milestones: Array<{ description: string; completed: boolean; progress: number }>;
   } {
+    const template = GoalDescriptionLibrary.getSecurityGoal(personality);
+
     return {
-      description: 'Ensure safety and resource security',
-      motivation: 'I want to feel secure and prepared',
-      milestones: [
-        { description: 'Build a safe shelter', completed: false, progress: 0 },
-        { description: 'Stockpile essential resources', completed: false, progress: 0 },
-        { description: 'Create emergency reserves', completed: false, progress: 0 },
-      ],
+      description: template.description,
+      motivation: template.motivation,
+      milestones: template.milestones.map(m => ({
+        description: m,
+        completed: false,
+        progress: 0
+      })),
     };
   }
 
-  private _createConnectionGoal(_personality: PersonalityComponent): {
+  private _createConnectionGoal(personality: PersonalityComponent): {
     description: string;
     motivation: string;
     milestones: Array<{ description: string; completed: boolean; progress: number }>;
   } {
+    const template = GoalDescriptionLibrary.getConnectionGoal(personality);
+
     return {
-      description: 'Form a deep bond with someone special',
-      motivation: 'I want meaningful connections with people I trust',
-      milestones: [
-        { description: 'Find someone I connect with', completed: false, progress: 0 },
-        { description: 'Share personal thoughts and feelings', completed: false, progress: 0 },
-        { description: 'Build a lasting friendship or partnership', completed: false, progress: 0 },
-      ],
+      description: template.description,
+      motivation: template.motivation,
+      milestones: template.milestones.map(m => ({
+        description: m,
+        completed: false,
+        progress: 0
+      })),
     };
   }
 
-  private _createRecognitionGoal(_personality: PersonalityComponent): {
+  private _createRecognitionGoal(personality: PersonalityComponent): {
     description: string;
     motivation: string;
     milestones: Array<{ description: string; completed: boolean; progress: number }>;
   } {
+    const template = GoalDescriptionLibrary.getRecognitionGoal(personality);
+
     return {
-      description: 'Earn respect and recognition from others',
-      motivation: 'I want to be valued for my contributions',
-      milestones: [
-        { description: 'Complete important tasks', completed: false, progress: 0 },
-        { description: 'Help the community in visible ways', completed: false, progress: 0 },
-        { description: 'Be known as someone reliable and skilled', completed: false, progress: 0 },
-      ],
+      description: template.description,
+      motivation: template.motivation,
+      milestones: template.milestones.map(m => ({
+        description: m,
+        completed: false,
+        progress: 0
+      })),
     };
   }
 
@@ -514,7 +529,7 @@ function createGoalForCategory(
 }
 
 function createMasteryGoal(
-  _personality: PersonalityComponent,
+  personality: PersonalityComponent,
   skills: Record<string, number>
 ): {
   description: string;
@@ -546,126 +561,136 @@ function createMasteryGoal(
     chosenSkill = skillTypes[Math.floor(Math.random() * skillTypes.length)]!;
   }
 
-  const skillLabel = chosenSkill === 'building' ? 'builder' :
-                     chosenSkill === 'farming' ? 'farmer' :
-                     chosenSkill === 'gathering' ? 'gatherer' : 'crafter';
+  const template = GoalDescriptionLibrary.getMasteryGoal(personality, chosenSkill);
 
   return {
-    description: `Become a skilled ${skillLabel}`,
-    motivation: `I want to master the art of ${chosenSkill}`,
-    milestones: [
-      { description: `Practice ${chosenSkill} regularly`, completed: false, progress: 0 },
-      { description: `Complete many ${chosenSkill} tasks`, completed: false, progress: 0 },
-      { description: `Achieve excellence in ${chosenSkill}`, completed: false, progress: 0 },
-    ],
+    description: template.description,
+    motivation: template.motivation,
+    milestones: template.milestones.map(m => ({
+      description: m,
+      completed: false,
+      progress: 0
+    })),
     targetDays: Math.floor(7 + Math.random() * 14), // 7-21 days
   };
 }
 
-function createSocialGoal(_personality: PersonalityComponent): {
+function createSocialGoal(personality: PersonalityComponent): {
   description: string;
   motivation: string;
   milestones: Array<{ description: string; completed: boolean; progress: number }>;
   targetDays: number;
 } {
+  const template = GoalDescriptionLibrary.getSocialGoal(personality);
+
   return {
-    description: 'Build strong friendships in the village',
-    motivation: 'I value deep connections with others',
-    milestones: [
-      { description: 'Have meaningful conversations', completed: false, progress: 0 },
-      { description: 'Help neighbors with their tasks', completed: false, progress: 0 },
-      { description: 'Become a trusted member of the community', completed: false, progress: 0 },
-    ],
+    description: template.description,
+    motivation: template.motivation,
+    milestones: template.milestones.map(m => ({
+      description: m,
+      completed: false,
+      progress: 0
+    })),
     targetDays: Math.floor(10 + Math.random() * 15), // 10-25 days
   };
 }
 
-function createCreativeGoal(_personality: PersonalityComponent): {
+function createCreativeGoal(personality: PersonalityComponent): {
   description: string;
   motivation: string;
   milestones: Array<{ description: string; completed: boolean; progress: number }>;
   targetDays: number;
 } {
+  const template = GoalDescriptionLibrary.getCreativeGoal(personality);
+
   return {
-    description: 'Create something unique and beautiful',
-    motivation: 'I want to express my creativity',
-    milestones: [
-      { description: 'Experiment with new designs', completed: false, progress: 0 },
-      { description: 'Build an artistic structure', completed: false, progress: 0 },
-      { description: 'Leave a creative mark on the village', completed: false, progress: 0 },
-    ],
+    description: template.description,
+    motivation: template.motivation,
+    milestones: template.milestones.map(m => ({
+      description: m,
+      completed: false,
+      progress: 0
+    })),
     targetDays: Math.floor(7 + Math.random() * 14), // 7-21 days
   };
 }
 
-function createExplorationGoal(_personality: PersonalityComponent): {
+function createExplorationGoal(personality: PersonalityComponent): {
   description: string;
   motivation: string;
   milestones: Array<{ description: string; completed: boolean; progress: number }>;
   targetDays: number;
 } {
+  const template = GoalDescriptionLibrary.getExplorationGoal(personality);
+
   return {
-    description: 'Discover new places and resources',
-    motivation: 'I love exploring the unknown',
-    milestones: [
-      { description: 'Explore unexplored areas', completed: false, progress: 0 },
-      { description: 'Find rare resources', completed: false, progress: 0 },
-      { description: 'Map the entire region', completed: false, progress: 0 },
-    ],
+    description: template.description,
+    motivation: template.motivation,
+    milestones: template.milestones.map(m => ({
+      description: m,
+      completed: false,
+      progress: 0
+    })),
     targetDays: Math.floor(5 + Math.random() * 10), // 5-15 days
   };
 }
 
-function createSecurityGoal(_personality: PersonalityComponent): {
+function createSecurityGoal(personality: PersonalityComponent): {
   description: string;
   motivation: string;
   milestones: Array<{ description: string; completed: boolean; progress: number }>;
   targetDays: number;
 } {
+  const template = GoalDescriptionLibrary.getSecurityGoal(personality);
+
   return {
-    description: 'Ensure safety and resource security',
-    motivation: 'I want to feel secure and prepared',
-    milestones: [
-      { description: 'Build a safe shelter', completed: false, progress: 0 },
-      { description: 'Stockpile essential resources', completed: false, progress: 0 },
-      { description: 'Create emergency reserves', completed: false, progress: 0 },
-    ],
+    description: template.description,
+    motivation: template.motivation,
+    milestones: template.milestones.map(m => ({
+      description: m,
+      completed: false,
+      progress: 0
+    })),
     targetDays: Math.floor(10 + Math.random() * 20), // 10-30 days
   };
 }
 
-function createConnectionGoal(_personality: PersonalityComponent): {
+function createConnectionGoal(personality: PersonalityComponent): {
   description: string;
   motivation: string;
   milestones: Array<{ description: string; completed: boolean; progress: number }>;
   targetDays: number;
 } {
+  const template = GoalDescriptionLibrary.getConnectionGoal(personality);
+
   return {
-    description: 'Form a deep bond with someone special',
-    motivation: 'I want meaningful connections with people I trust',
-    milestones: [
-      { description: 'Find someone I connect with', completed: false, progress: 0 },
-      { description: 'Share personal thoughts and feelings', completed: false, progress: 0 },
-      { description: 'Build a lasting friendship or partnership', completed: false, progress: 0 },
-    ],
+    description: template.description,
+    motivation: template.motivation,
+    milestones: template.milestones.map(m => ({
+      description: m,
+      completed: false,
+      progress: 0
+    })),
     targetDays: Math.floor(10 + Math.random() * 15), // 10-25 days
   };
 }
 
-function createRecognitionGoal(_personality: PersonalityComponent): {
+function createRecognitionGoal(personality: PersonalityComponent): {
   description: string;
   motivation: string;
   milestones: Array<{ description: string; completed: boolean; progress: number }>;
   targetDays: number;
 } {
+  const template = GoalDescriptionLibrary.getRecognitionGoal(personality);
+
   return {
-    description: 'Earn respect and recognition from others',
-    motivation: 'I want to be valued for my contributions',
-    milestones: [
-      { description: 'Complete important tasks', completed: false, progress: 0 },
-      { description: 'Help the community in visible ways', completed: false, progress: 0 },
-      { description: 'Be known as someone reliable and skilled', completed: false, progress: 0 },
-    ],
+    description: template.description,
+    motivation: template.motivation,
+    milestones: template.milestones.map(m => ({
+      description: m,
+      completed: false,
+      progress: 0
+    })),
     targetDays: Math.floor(7 + Math.random() * 14), // 7-21 days
   };
 }

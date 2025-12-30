@@ -289,8 +289,9 @@ export function calculateRivalryFactors(
   const overlap = [...domains1].filter(d => domains2.has(d)).length;
   const domainOverlap = overlap / Math.max(domains1.size, domains2.size);
 
-  // Shared believer pool (approximation - would need to check agent locations)
-  const sharedBelieverPool = 0; // TODO: Calculate actual shared pool
+  // Shared believer pool - count believers who worship both deities
+  const sharedBelievers = [...deity1.believers].filter(id => deity2.believers.has(id));
+  const sharedBelieverPool = sharedBelievers.length;
 
   // Personality conflict
   const benevolenceConflict = Math.abs(deity1.personality.benevolence - deity2.personality.benevolence);
@@ -299,8 +300,9 @@ export function calculateRivalryFactors(
 
   const personalityConflict = (benevolenceConflict + interventionConflict + wrathfulnessSum * 0.5) / 3;
 
-  // Territorial conflict
-  const territorialConflict = false; // TODO: Check for sacred site overlap
+  // Territorial conflict - infer from domain overlap and shared believers
+  // Gods with overlapping domains and shared believers likely compete for the same sacred sites
+  const territorialConflict = domainOverlap > 0.5 && sharedBelieverPool > 0;
 
   // Historical conflicts
   const historicalConflicts = relation?.interactions.filter(i => i.type === 'conflict' || i.type === 'provocation').length || 0;
@@ -340,8 +342,10 @@ export function calculateAllianceFactors(
   // Domain synergy
   const domainSynergy = calculateDomainSynergy(deity1.domain, deity2.domain);
 
-  // Common rivals (would need to check other deities)
-  const commonRivals: string[] = []; // TODO: Calculate
+  // Common rivals - requires access to all deity relations to compute
+  // This would need to be populated by the caller with external context
+  // (e.g., DeityRegistry.getCommonRivals(deity1.id, deity2.id))
+  const commonRivals: string[] = [];
 
   // Personality alignment
   const benevolenceAlignment = 1 - Math.abs(deity1.personality.benevolence - deity2.personality.benevolence);

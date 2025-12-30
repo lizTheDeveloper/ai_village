@@ -10,7 +10,18 @@
  * Universes with identical configurations share the same ID and can
  * have parallel timelines, while different configurations create
  * separate universes that can only connect via portals.
+ *
+ * Dynamically loads all available paradigms from magic registries.
  */
+
+import {
+  CORE_PARADIGM_REGISTRY,
+  HYBRID_PARADIGM_REGISTRY,
+  WHIMSICAL_PARADIGM_REGISTRY,
+  NULL_PARADIGM_REGISTRY,
+  ANIMIST_PARADIGM_REGISTRY,
+  DIMENSIONAL_PARADIGM_REGISTRY,
+} from '@ai-village/core';
 
 export interface UniverseConfig {
   magicParadigmId: string | null;  // null = no magic
@@ -24,48 +35,115 @@ export interface PresetParadigm {
   name: string;
   description: string;
   preview: string;  // Short flavor text
+  category: string;  // Group for UI organization
 }
 
 export class UniverseConfigScreen {
   private container: HTMLElement;
   private selectedParadigm: string | null = null;
   private onCreate: ((config: UniverseConfig) => void) | null = null;
+  private presets: PresetParadigm[] = [];
 
-  // Preset magic paradigms (in real impl, load from MagicParadigm registry)
-  private presets: PresetParadigm[] = [
-    {
+  /**
+   * Build preset list from all magic paradigm registries.
+   */
+  private buildPresets(): PresetParadigm[] {
+    const presets: PresetParadigm[] = [];
+
+    // Add "No Magic" option
+    presets.push({
       id: 'none',
       name: 'The First World',
       description: 'A world without magic. Pure survival, technology, and human ingenuity.',
       preview: 'Build from nothing. No supernatural forces, only what you can craft.',
-    },
-    {
-      id: 'elemental',
-      name: 'Elemental Weaving',
-      description: 'Magic drawn from natural elements: earth, water, fire, air, lightning.',
-      preview: 'Ambient power flows through ley lines. Mages channel elemental forces.',
-    },
-    {
-      id: 'divine',
-      name: 'Divine Covenant',
-      description: 'Power granted by gods in exchange for faith and devotion.',
-      preview: 'Prayer fuels miracles. Gods answer those who believe.',
-    },
-    {
-      id: 'blood',
-      name: 'Blood Heritage',
-      description: 'Magic passed through bloodlines. Inherited power and ancient secrets.',
-      preview: 'Born with power or born without. Lineage determines destiny.',
-    },
-    {
-      id: 'knowledge',
-      name: 'True Names',
-      description: 'Power from knowing the secret names and nature of things.',
-      preview: 'Knowledge is power. Speak true names to command reality.',
-    },
-  ];
+      category: 'No Magic',
+    });
+
+    // Load from core paradigms
+    for (const [id, paradigm] of Object.entries(CORE_PARADIGM_REGISTRY)) {
+      presets.push({
+        id,
+        name: paradigm.name,
+        description: paradigm.description,
+        preview: this.extractFirstSentence(paradigm.lore || paradigm.description),
+        category: 'Core Magic',
+      });
+    }
+
+    // Load from hybrid paradigms
+    for (const [id, hybrid] of Object.entries(HYBRID_PARADIGM_REGISTRY)) {
+      presets.push({
+        id,
+        name: hybrid.name,
+        description: hybrid.description,
+        preview: this.extractFirstSentence(hybrid.lore || hybrid.description),
+        category: 'Hybrid Magic',
+      });
+    }
+
+    // Load from whimsical paradigms
+    for (const [id, paradigm] of Object.entries(WHIMSICAL_PARADIGM_REGISTRY)) {
+      presets.push({
+        id,
+        name: paradigm.name,
+        description: paradigm.description,
+        preview: this.extractFirstSentence(paradigm.lore || paradigm.description),
+        category: 'Whimsical Magic',
+      });
+    }
+
+    // Load from null paradigms
+    for (const [id, paradigm] of Object.entries(NULL_PARADIGM_REGISTRY)) {
+      presets.push({
+        id,
+        name: paradigm.name,
+        description: paradigm.description,
+        preview: this.extractFirstSentence(paradigm.lore || paradigm.description),
+        category: 'Magic Negation',
+      });
+    }
+
+    // Load from animist paradigms
+    for (const [id, paradigm] of Object.entries(ANIMIST_PARADIGM_REGISTRY)) {
+      presets.push({
+        id,
+        name: paradigm.name,
+        description: paradigm.description,
+        preview: this.extractFirstSentence(paradigm.lore || paradigm.description),
+        category: 'Animist Magic',
+      });
+    }
+
+    // Load from dimensional paradigms
+    for (const [id, paradigm] of Object.entries(DIMENSIONAL_PARADIGM_REGISTRY)) {
+      presets.push({
+        id,
+        name: paradigm.name,
+        description: paradigm.description,
+        preview: this.extractFirstSentence(paradigm.lore || paradigm.description),
+        category: 'Dimensional Magic',
+      });
+    }
+
+    return presets;
+  }
+
+  /**
+   * Extract first sentence from lore text for preview.
+   */
+  private extractFirstSentence(text: string): string {
+    const match = text.match(/^[^.!?]+[.!?]/);
+    if (match) {
+      return match[0].trim();
+    }
+    // Fallback: take first 100 chars
+    return text.substring(0, 100).trim() + (text.length > 100 ? '...' : '');
+  }
 
   constructor(containerId: string = 'universe-config-screen') {
+    // Build paradigm list from registries
+    this.presets = this.buildPresets();
+
     const existing = document.getElementById(containerId);
     if (existing) {
       this.container = existing;
@@ -82,12 +160,13 @@ export class UniverseConfigScreen {
         display: none;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         padding: 40px;
         box-sizing: border-box;
         z-index: 10001;
         font-family: monospace;
         color: #e0e0e0;
+        overflow-y: auto;
       `;
       document.body.appendChild(this.container);
     }
@@ -131,7 +210,7 @@ export class UniverseConfigScreen {
 
     // Subtitle
     const subtitle = document.createElement('p');
-    subtitle.textContent = 'Choose the laws of magic that will govern this reality';
+    subtitle.textContent = `Choose the laws of magic that will govern this reality (${this.presets.length} paradigms available)`;
     subtitle.style.cssText = `
       margin: 0 0 40px 0;
       font-size: 14px;
@@ -140,23 +219,62 @@ export class UniverseConfigScreen {
     `;
     this.container.appendChild(subtitle);
 
-    // Paradigm cards grid
-    const grid = document.createElement('div');
-    grid.style.cssText = `
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      max-width: 1200px;
-      width: 100%;
-      margin-bottom: 40px;
-    `;
-
+    // Group paradigms by category
+    const categorized = new Map<string, PresetParadigm[]>();
     for (const preset of this.presets) {
-      const card = this.renderParadigmCard(preset);
-      grid.appendChild(card);
+      const category = preset.category;
+      if (!categorized.has(category)) {
+        categorized.set(category, []);
+      }
+      categorized.get(category)!.push(preset);
     }
 
-    this.container.appendChild(grid);
+    // Render each category
+    const categoryOrder = [
+      'No Magic',
+      'Core Magic',
+      'Hybrid Magic',
+      'Animist Magic',
+      'Whimsical Magic',
+      'Dimensional Magic',
+      'Magic Negation',
+    ];
+
+    for (const category of categoryOrder) {
+      const presetsInCategory = categorized.get(category);
+      if (!presetsInCategory || presetsInCategory.length === 0) continue;
+
+      // Category header
+      const categoryHeader = document.createElement('h2');
+      categoryHeader.textContent = `${category} (${presetsInCategory.length})`;
+      categoryHeader.style.cssText = `
+        margin: 30px 0 15px 0;
+        font-size: 20px;
+        color: #64b5f6;
+        text-align: left;
+        max-width: 1200px;
+        width: 100%;
+      `;
+      this.container.appendChild(categoryHeader);
+
+      // Paradigm cards grid for this category
+      const grid = document.createElement('div');
+      grid.style.cssText = `
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+        max-width: 1200px;
+        width: 100%;
+        margin-bottom: 20px;
+      `;
+
+      for (const preset of presetsInCategory) {
+        const card = this.renderParadigmCard(preset);
+        grid.appendChild(card);
+      }
+
+      this.container.appendChild(grid);
+    }
 
     // Create button
     const createButton = document.createElement('button');

@@ -104,7 +104,6 @@ import {
   registerDefaultResearch,
   // Phase 30: Magic System
   MagicSystem,
-  initializeMagicSystem,
   SpellRegistry,
   // Metrics Collection System (with streaming support)
   MetricsCollectionSystem,
@@ -2541,67 +2540,41 @@ async function main() {
   const storage = new IndexedDBStorage('ai-village-saves');
   saveLoadService.setStorage(storage);
 
-  // Check for existing checkpoints and show universe selection or timeline
+  // Check for existing saves and auto-load the most recent one
   const existingSaves = await saveLoadService.listSaves();
-  const hasCheckpoints = existingSaves.length > 0;
+  let loadedCheckpoint = false;
+  let universeSelection: { type: 'new' | 'load'; magicParadigm?: string; checkpointKey?: string };
 
-  // Show universe selection screen or timeline
-  const universeSelection = await new Promise<{ type: 'new' | 'load'; magicParadigm?: string; checkpointKey?: string }>((resolve) => {
-    if (!hasCheckpoints) {
-      // No checkpoints - show universe creation screen
+  if (existingSaves.length > 0) {
+    // Auto-load the most recent save
+    const mostRecent = existingSaves[0]; // Saves are sorted by timestamp descending
+    console.log(`[Demo] Auto-loading most recent save: ${mostRecent.name}`);
+
+    const result = await saveLoadService.load(mostRecent.key, gameLoop.world);
+    if (result.success) {
+      console.log(`[Demo] Successfully loaded: ${result.metadata.name}`);
+      loadedCheckpoint = true;
+      universeSelection = { type: 'load', checkpointKey: mostRecent.key };
+    } else {
+      console.error(`[Demo] Failed to load checkpoint: ${result.error}`);
+      console.log('[Demo] Falling back to new game creation');
+      // Fall back to showing universe creation screen
+      universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
+        const universeConfigScreen = new UniverseConfigScreen();
+        universeConfigScreen.show((selectedParadigm) => {
+          resolve({ type: 'new', magicParadigm: selectedParadigm });
+        });
+      });
+    }
+  } else {
+    // No saves - show universe creation screen
+    console.log('[Demo] No existing saves found - showing universe creation');
+    universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
       const universeConfigScreen = new UniverseConfigScreen();
       universeConfigScreen.show((selectedParadigm) => {
         resolve({ type: 'new', magicParadigm: selectedParadigm });
       });
-    } else {
-      // Has checkpoints - show timeline browser with "New Universe" option
-      const timelinePanel = new TimelinePanel();
-
-      // Convert saves to checkpoints
-      const checkpoints = existingSaves.map(save => ({
-        key: save.key,
-        name: save.name,
-        day: (save as any).day || 0,
-        tick: (save as any).tick || 0,
-        timestamp: save.timestamp,
-        universeId: (save as any).universeId || 'unknown',
-        magicLawsHash: (save as any).magicLawsHash || 'base',
-      }));
-
-      timelinePanel.setTimelines(checkpoints);
-
-      // Add "New Universe" button to timeline panel
-      // TODO: Enhance TimelinePanel to support "New Universe" button
-      // For now, user can close the timeline to create new universe
-
-      timelinePanel.show(async (checkpointKey) => {
-        if (checkpointKey === 'new_universe') {
-          // User wants to create new universe
-          timelinePanel.hide();
-          const universeConfigScreen = new UniverseConfigScreen();
-          universeConfigScreen.show((selectedParadigm) => {
-            resolve({ type: 'new', magicParadigm: selectedParadigm });
-          });
-        } else {
-          // User selected existing checkpoint
-          resolve({ type: 'load', checkpointKey });
-        }
-      });
-    }
-  });
-
-  // If loading existing checkpoint, load it now before world creation
-  let loadedCheckpoint = false;
-  if (universeSelection.type === 'load' && universeSelection.checkpointKey) {
-    const result = await saveLoadService.load(universeSelection.checkpointKey, gameLoop.world);
-    if (result.success) {
-      console.log(`[Demo] Loaded checkpoint: ${result.metadata.name}`);
-      loadedCheckpoint = true;
-      // Skip world initialization since we loaded from checkpoint
-    } else {
-      console.error(`[Demo] Failed to load checkpoint: ${result.error}`);
-      // Fall back to new game
-    }
+    });
   }
 
   // Register all systems
@@ -2886,36 +2859,28 @@ async function main() {
     const namedLandmarksComponent = createNamedLandmarksComponent();
     (worldEntity as any).addComponent(namedLandmarksComponent);
 
-    // Initialize magic system based on selected paradigm
+    // Note: Magic system is automatically initialized by MagicSystem.initialize()
+    // We just need to unlock spells for the selected paradigm
     const selectedParadigm = universeSelection.magicParadigm || 'none';
-    initializeMagicSystem(gameLoop.world);
 
     if (selectedParadigm !== 'none') {
       console.log(`[Demo] Enabling magic paradigm: ${selectedParadigm}`);
 
-      // Map UI paradigm IDs to spell paradigm IDs
-      const paradigmMapping: Record<string, string[]> = {
-        'elemental': ['academic'], // Elemental = Academic magic with elemental spells
-        'divine': ['divine'],       // Divine = Divine/Priest magic
-        'blood': ['blood'],         // Blood = Blood magic (if spells exist)
-        'knowledge': ['academic'],  // Knowledge = Academic magic (true names)
-      };
-
-      const enabledParadigms = paradigmMapping[selectedParadigm] || [];
-
-      // Enable spells for the selected paradigm(s)
+      // Unlock all spells that belong to the selected paradigm
       const spellRegistry = SpellRegistry.getInstance();
       const allSpells = spellRegistry.getAllSpells();
 
-      // Unlock spells that match the enabled paradigm(s)
+      let unlockedCount = 0;
       for (const spell of allSpells) {
-        if (enabledParadigms.includes(spell.paradigmId)) {
+        // Match spells that belong to this paradigm
+        if (spell.paradigmId === selectedParadigm) {
           spellRegistry.unlockSpell(spell.id);
           console.log(`[Demo] Unlocked spell: ${spell.name} (${spell.id})`);
+          unlockedCount++;
         }
       }
 
-      console.log(`[Demo] Magic system configured with ${selectedParadigm} paradigm`);
+      console.log(`[Demo] Magic system configured with '${selectedParadigm}' paradigm (${unlockedCount} spells unlocked)`);
     } else {
       console.log('[Demo] Magic system disabled (The First World)');
     }
@@ -2970,6 +2935,29 @@ async function main() {
   // Start game
   gameLoop.start();
   renderLoop();
+
+  // Set up periodic auto-saves every minute
+  const AUTOSAVE_INTERVAL_MS = 60000; // 1 minute
+  setInterval(async () => {
+    try {
+      const timeComp = gameLoop.world.query().with('time').executeEntities()[0]?.getComponent<any>('time');
+      const day = timeComp?.day || 0;
+      const tick = timeComp?.currentTick || 0;
+
+      const saveName = `autosave_day${day}_${new Date().toISOString().split('T')[1].split('.')[0].replace(/:/g, '-')}`;
+      const result = await saveLoadService.save(gameLoop.world, saveName);
+
+      if (result.success) {
+        console.log(`[Demo] Auto-save successful: ${saveName}`);
+      } else {
+        console.error(`[Demo] Auto-save failed: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('[Demo] Auto-save error:', error);
+    }
+  }, AUTOSAVE_INTERVAL_MS);
+
+  console.log(`[Demo] Auto-save enabled - saving every ${AUTOSAVE_INTERVAL_MS / 1000} seconds`);
 
   setTimeout(() => {
     showNotification('💡 Tip: Right-click a grass tile, then press T to till it', '#00CED1');
