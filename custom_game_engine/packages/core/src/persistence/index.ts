@@ -60,6 +60,9 @@ export type {
   MigrationContext,
 } from './types.js';
 
+// Validation
+export { validateSaveFile, validateWorldState, InvariantViolationError } from './InvariantChecker.js';
+
 // Error exports
 export {
   MigrationError,

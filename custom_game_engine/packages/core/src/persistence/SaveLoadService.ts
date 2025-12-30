@@ -11,6 +11,7 @@ import type {
 } from './types.js';
 import { worldSerializer } from './WorldSerializer.js';
 import { computeChecksumSync, getGameVersion } from './utils.js';
+import { validateWorldState, validateSaveFile } from './InvariantChecker.js';
 
 export interface SaveOptions {
   /** Save name */
@@ -56,6 +57,9 @@ export class SaveLoadService {
     }
 
     console.log(`[SaveLoad] Saving game: ${options.name}`);
+
+    // Validate world state before serialization
+    validateWorldState(world);
 
     // Calculate play time
     const currentSessionTime = (Date.now() - this.playStartTime) / 1000;
@@ -123,6 +127,9 @@ export class SaveLoadService {
     const { checksums, ...saveFileWithoutChecksum } = saveFile;
     saveFile.checksums.overall = computeChecksumSync(saveFileWithoutChecksum);
 
+    // Validate save file before writing to storage
+    await validateSaveFile(saveFile);
+
     // Save to storage
     await this.storageBackend.save(key, saveFile);
 
@@ -149,6 +156,9 @@ export class SaveLoadService {
           error: `Save file not found: ${key}`,
         };
       }
+
+      // Validate save file structure and invariants
+      await validateSaveFile(saveFile);
 
       // Verify overall checksum
       const { checksums, ...saveFileWithoutChecksum } = saveFile;
