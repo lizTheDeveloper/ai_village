@@ -54,6 +54,7 @@ export function registerAllSerializers(): void {
     'cursed',
     'research_state',
     'census_bureau',
+    'passage',
   ];
 
   for (const componentType of genericComponents) {

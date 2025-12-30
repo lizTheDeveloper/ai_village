@@ -116,6 +116,16 @@ export interface GameEventMap {
     health: number;
     entityId?: EntityId;
   };
+  'agent:unconscious': {
+    entityId: EntityId;
+  };
+  'agent:regained_consciousness': {
+    entityId: EntityId;
+  };
+  'body:modifications_expired': {
+    entityId: EntityId;
+    modificationIds: string[];
+  };
   'agent:harvested': {
     agentId: EntityId;
     plantId: EntityId;
@@ -272,6 +282,79 @@ export interface GameEventMap {
     totalFruit: number;
     position?: { x: number; y: number };
   };
+  'plant:companionEffect': {
+    plantId: EntityId;
+    speciesId: string;
+    position: { x: number; y: number };
+    benefitCount: number;
+    harmCount: number;
+    modifier: number;
+  };
+
+  // === Plant Disease & Pest Events ===
+  'plant:diseaseContracted': {
+    entityId: string;
+    diseaseId: string;
+    diseaseName: string;
+    incubationDays: number;
+  };
+  'plant:diseaseSymptoms': {
+    entityId: string;
+    diseaseId: string;
+    diseaseName: string;
+    severity: string;
+  };
+  'plant:diseaseSpread': {
+    fromEntityId: string;
+    toEntityId: string;
+    diseaseId: string;
+    diseaseName: string;
+  };
+  'plant:diseaseRecovered': {
+    entityId: string;
+    diseaseId: string;
+    diseaseName: string;
+  };
+  'plant:diseaseTreated': {
+    entityId: string;
+    diseaseId: string;
+    diseaseName: string;
+    treatmentId: string;
+  };
+  'plant:diedFromDisease': {
+    entityId: string;
+    diseaseId: string;
+    diseaseName: string;
+  };
+  'plant:pestInfestation': {
+    entityId: string;
+    pestId: string;
+    pestName: string;
+    population: number;
+  };
+  'plant:pestMigrated': {
+    fromEntityId: string;
+    toEntityId: string;
+    pestId: string;
+    pestName: string;
+    population: number;
+  };
+  'plant:pestsGone': {
+    entityId: string;
+    pestId: string;
+    pestName: string;
+  };
+  'plant:pestsEliminated': {
+    entityId: string;
+    pestId: string;
+    pestName: string;
+    treatmentId: string;
+  };
+  'plant:treated': {
+    entityId: string;
+    treatmentId: string;
+    treatmentType: string;
+  };
 
   // === Seed Events ===
   'seed:gathered': {
@@ -318,6 +401,13 @@ export interface GameEventMap {
     speciesId: string;
     position: { x: number; y: number };
     seedItemId?: string;
+  };
+
+  // === Wild Plant Population Events ===
+  'wild_plant:spawn': {
+    speciesId: string;
+    position: { x: number; y: number };
+    biome: string;
   };
 
   // === Harvest Events ===
@@ -374,6 +464,7 @@ export interface GameEventMap {
     buildingType: string;
     entityId?: EntityId;
     position?: { x: number; y: number };
+    builderId?: EntityId;
   };
   'building:destroyed': {
     buildingId: EntityId;
@@ -514,6 +605,86 @@ export interface GameEventMap {
     content: string;
     confidence: number;
   };
+
+  'belief:generated': {
+    deityId: EntityId;
+    amount: number;
+    believers: number;
+    currentBelief: number;
+  };
+
+  'prayer:offered': {
+    agentId: EntityId;
+    deityId: EntityId;
+    prayerType: string;
+    urgency: string;
+    prayerId: string;
+  };
+
+  'prayer:answered': {
+    agentId: EntityId;
+    deityId: EntityId;
+    prayerId: string;
+    responseType: string;
+  };
+
+  // === Divine Power Events ===
+  /** Request from UI to execute a divine power */
+  'divine_power:request': {
+    deityId: EntityId;
+    powerType: string;
+    targetId?: EntityId;
+    prayerId?: string;
+    params?: Record<string, unknown>;
+  };
+
+  'divine_power:whisper': {
+    deityId: EntityId;
+    targetId: EntityId;
+    message: string;
+    cost: number;
+  };
+
+  'divine_power:dream_hint': {
+    deityId: EntityId;
+    targetId: EntityId;
+    content: string;
+    cost: number;
+  };
+
+  'divine_power:clear_vision': {
+    deityId: EntityId;
+    targetId: EntityId;
+    visionContent: string;
+    cost: number;
+  };
+
+  'divine_power:minor_miracle': {
+    deityId: EntityId;
+    miracleType: string;
+    cost: number;
+  };
+
+  'divine_power:bless_individual': {
+    deityId: EntityId;
+    targetId: EntityId;
+    blessingType: string;
+    cost: number;
+  };
+
+  'divine_power:mass_vision': {
+    deityId: EntityId;
+    targetIds: EntityId[];
+    visionContent: string;
+    cost: number;
+  };
+
+  'divine_power:major_miracle': {
+    deityId: EntityId;
+    miracleType: string;
+    cost: number;
+  };
+
   'trust:verified': {
     trusterId: EntityId;
     trusteeId: EntityId;
@@ -744,6 +915,15 @@ export interface GameEventMap {
     duration?: number;
   };
 
+  /** UI action event for panels to trigger game actions */
+  'ui_action': {
+    action: string;
+    entityId?: string;
+    targetId?: string;
+    position?: { x: number; y: number };
+    data?: unknown;
+  };
+
   // === Time Events ===
   'time:day_changed': {
     day: number;
@@ -756,6 +936,7 @@ export interface GameEventMap {
   };
   'time:new_week': {
     week: number;
+    day?: number;
     agentId?: EntityId;
     timestamp?: number;
   };
@@ -908,6 +1089,10 @@ export interface GameEventMap {
     behavior?: string;
     reasoning?: string;
     source: 'llm' | 'fallback';
+    /** Raw LLM response text (truncated to 2000 chars for metrics) */
+    rawResponse?: string;
+    /** Duration of LLM call in milliseconds */
+    latencyMs?: number;
   };
   'llm:error': {
     agentId: EntityId;
@@ -1037,6 +1222,272 @@ export interface GameEventMap {
     behaviorType: string;
     monologue: string;
     timestamp: number;
+  };
+
+  // ============================================================================
+  // Forward-Compatibility: Combat Events
+  // These events are placeholders for future combat system implementation.
+  // ============================================================================
+
+  /** An entity attacks another */
+  'combat:attack': {
+    attackerId: EntityId;
+    targetId: EntityId;
+    weaponId?: string;
+    attackType: 'melee' | 'ranged' | 'magic';
+  };
+
+  /** Damage is dealt to an entity */
+  'combat:damage': {
+    entityId: EntityId;
+    attackerId?: EntityId;
+    bodyPart?: string;
+    amount: number;
+    damageType: 'slashing' | 'piercing' | 'bludgeoning' | 'fire' | 'frost' | 'lightning' | 'poison' | 'magic';
+    blocked?: number;
+    absorbed?: number;
+  };
+
+  /** An entity dies */
+  'combat:death': {
+    entityId: EntityId;
+    killerId?: EntityId;
+    cause: string;
+    position?: { x: number; y: number; z?: number };
+  };
+
+  /** Combat begins between entities */
+  'combat:started': {
+    participants: EntityId[];
+    initiator: EntityId;
+    position: { x: number; y: number };
+  };
+
+  /** Combat ends */
+  'combat:ended': {
+    participants: EntityId[];
+    winner?: EntityId;
+    duration: number;
+  };
+
+  /** An entity dodges an attack */
+  'combat:dodge': {
+    entityId: EntityId;
+    attackerId: EntityId;
+  };
+
+  /** An entity blocks an attack */
+  'combat:block': {
+    entityId: EntityId;
+    attackerId: EntityId;
+    damageBlocked: number;
+  };
+
+  /** An injury is inflicted */
+  'combat:injury': {
+    entityId: EntityId;
+    bodyPart: string;
+    injuryType: 'cut' | 'bruise' | 'fracture' | 'burn' | 'puncture';
+    severity: 'minor' | 'moderate' | 'severe' | 'critical';
+  };
+
+  // ============================================================================
+  // Forward-Compatibility: Governance Events
+  // These events are placeholders for future governance system implementation.
+  // ============================================================================
+
+  /** A noble issues a mandate */
+  'mandate:issued': {
+    mandateId: string;
+    nobleId: EntityId;
+    type: 'production' | 'export_ban' | 'import_required' | 'construction' | 'military' | 'festival';
+    target: string;
+    quantity?: number;
+    deadline: number;
+  };
+
+  /** A mandate is violated */
+  'mandate:violated': {
+    mandateId: string;
+    agentId: EntityId;
+    nobleId: EntityId;
+  };
+
+  /** A mandate is fulfilled */
+  'mandate:fulfilled': {
+    mandateId: string;
+    agentId: EntityId;
+    nobleId: EntityId;
+  };
+
+  /** Punishment is executed */
+  'punishment:executed': {
+    agentId: EntityId;
+    type: 'beating' | 'imprisonment' | 'fine' | 'exile' | 'execution';
+    reason: string;
+    issuerId?: EntityId;
+  };
+
+  /** A noble title is granted */
+  'title:granted': {
+    agentId: EntityId;
+    title: string;
+    grantedBy?: EntityId;
+  };
+
+  /** A noble title is revoked */
+  'title:revoked': {
+    agentId: EntityId;
+    title: string;
+    revokedBy?: EntityId;
+    reason?: string;
+  };
+
+  /** An agent joins a guild */
+  'guild:joined': {
+    agentId: EntityId;
+    guildId: string;
+  };
+
+  /** An agent leaves a guild */
+  'guild:left': {
+    agentId: EntityId;
+    guildId: string;
+    reason?: 'resigned' | 'expelled' | 'disbanded';
+  };
+
+  /** A guild makes a petition */
+  'guild:petition': {
+    guildId: string;
+    petitionType: 'guild_hall' | 'tavern' | 'temple' | 'library';
+    status: 'requested' | 'approved' | 'denied';
+  };
+
+  // ============================================================================
+  // Forward-Compatibility: Mental Breakdown Events
+  // These events are placeholders for future stress/breakdown system.
+  // ============================================================================
+
+  /** Agent begins a mental breakdown */
+  'stress:breakdown': {
+    agentId: EntityId;
+    type: 'tantrum' | 'catatonic' | 'berserk' | 'strange_mood' | 'depression' | 'panic_attack';
+    stressLevel: number;
+    trigger?: string;
+  };
+
+  /** Agent recovers from breakdown */
+  'stress:recovered': {
+    agentId: EntityId;
+    breakdownType: string;
+    duration: number;
+  };
+
+  /** Strange mood begins (DF-style artifact creation) */
+  'mood:strange_mood': {
+    agentId: EntityId;
+    moodType: 'fey' | 'secretive' | 'possessed' | 'macabre' | 'fell';
+    requiredMaterials?: string[];
+    requiredWorkshop?: string;
+  };
+
+  /** Strange mood succeeds - artifact created */
+  'mood:artifact_created': {
+    agentId: EntityId;
+    artifactId: string;
+    artifactName: string;
+    skillGained: string;
+  };
+
+  /** Strange mood fails - agent goes insane */
+  'mood:insanity': {
+    agentId: EntityId;
+    insanityType: 'melancholy' | 'berserk' | 'catatonic';
+    reason: string;
+  };
+
+  /** Trauma is experienced */
+  'trauma:experienced': {
+    agentId: EntityId;
+    traumaType: string;
+    severity: number;
+    relatedEntityId?: EntityId;
+  };
+
+  // === Magic Events (Phase 30) ===
+  /** Spell is cast by an entity */
+  'magic:spell_cast': {
+    spellId: string;
+    spell: string;
+    technique: string;
+    form: string;
+    paradigm?: string;
+    manaCost: number;
+    targetEntityId?: string;
+    targetPosition?: { x: number; y: number };
+    casterId?: string;
+    targetId?: string;
+    success?: boolean;
+    mishap?: boolean;
+    wasTerminal?: boolean;
+  };
+
+  /** Entity learns a new spell */
+  'magic:spell_learned': {
+    entityId: EntityId;
+    spellId: string;
+    proficiency?: number;
+  };
+
+  /** Mana is granted to an entity */
+  'magic:grant_mana': {
+    entityId: EntityId;
+    source: 'arcane' | 'divine' | 'void' | 'nature' | 'psionic' | 'blood' | 'ancestral';
+    amount: number;
+  };
+
+  /** Warning that a spell cast would be terminal */
+  'magic:terminal_warning': {
+    spellId: string;
+    warning?: string;
+  };
+
+  /** A terminal effect occurred from spell casting */
+  'magic:terminal_effect': {
+    spellId: string;
+    effect: {
+      type: string;
+      cause?: string;
+      [key: string]: unknown;
+    };
+  };
+
+  // === Passage Events (Multiverse) ===
+  /** Passage between universes becomes active */
+  'passage:activated': {
+    passageId: string;
+    sourceUniverse: string;
+    targetUniverse: string;
+  };
+
+  /** Entity successfully traversed a passage */
+  'passage:entity_traversed': {
+    passageId: string;
+    sourceUniverse: string;
+    targetUniverse: string;
+    targetPosition?: { x: number; y: number; z: number };
+    cost: number;
+  };
+
+  /** Traversal attempt failed */
+  'passage:traversal_failed': {
+    passageId: string;
+    reason: string;
+  };
+
+  /** Passage collapsed and became inactive */
+  'passage:collapsed': {
+    passageId: string;
   };
 }
 
