@@ -91,6 +91,8 @@ export * from './DivineBodyModification.js';
 export * from './MassEventSystem.js';
 // Multiverse & Passages
 export * from './PassageSystem.js';
+// Realm System - Mythological pocket dimensions
+export * from './RealmManager.js';
 // Auto-save & Time Travel
 export * from './AutoSaveSystem.js';
 export * from './CheckpointNamingService.js';
