@@ -95,6 +95,7 @@ export * from './PassageSystem.js';
 export * from './RealmManager.js';
 export * from './PortalSystem.js';
 export * from './RealmTimeSystem.js';
+export * from './DeathTransitionSystem.js';
 // Auto-save & Time Travel
 export * from './AutoSaveSystem.js';
 export * from './CheckpointNamingService.js';

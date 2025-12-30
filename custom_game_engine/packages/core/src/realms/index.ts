@@ -34,3 +34,13 @@ export {
   transitionToRealm,
   returnToMortalWorld,
 } from './RealmTransition.js';
+
+// Realm initialization
+export * from './RealmInitializer.js';
+export {
+  createRealmEntity,
+  initializeUnderworld,
+  initializeCelestialRealm,
+  initializeDreamRealm,
+  initializeAllRealms,
+} from './RealmInitializer.js';
