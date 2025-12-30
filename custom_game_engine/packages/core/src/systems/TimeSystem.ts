@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -10,6 +11,7 @@ import {
   NIGHT_START_HOUR,
   GAME_DAY_SECONDS,
 } from '../constants/index.js';
+import { multiverseCoordinator } from '../multiverse/index.js';
 
 export type DayPhase = 'dawn' | 'day' | 'dusk' | 'night';
 
@@ -76,23 +78,39 @@ function calculateLightLevel(timeOfDay: number, phase: DayPhase): number {
 /**
  * TimeSystem manages the day/night cycle
  * Integrates with WeatherSystem via temperature modifiers
+ * Integrates with MultiverseCoordinator for time scale management
  */
 export class TimeSystem implements System {
   public readonly id: SystemId = 'time';
   public readonly priority: number = 3; // Run early, before Weather (priority 5)
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = ['time'];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Time];
 
   private lastPhase: DayPhase | null = null;
+  private lastDay: number = 1; // Track previous day to detect week changes
+  private universeId: string = 'universe:main'; // Default universe ID
+
+  /**
+   * Set the universe ID for this time system.
+   * Used to get time scale from MultiverseCoordinator.
+   */
+  setUniverseId(universeId: string): void {
+    this.universeId = universeId;
+  }
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+    // Get time scale from MultiverseCoordinator if registered
+    const universe = multiverseCoordinator.getUniverse(this.universeId);
+    const timeScale = universe?.config.timeScale ?? 1.0;
     for (const entity of entities) {
       const impl = entity as EntityImpl;
-      const time = impl.getComponent<TimeComponent>('time');
+      const time = impl.getComponent<TimeComponent>(CT.Time);
       if (!time) continue;
 
-      // Calculate effective day length based on speed multiplier
-      // 1x = 48s/day, 2x = 24s/day, 4x = 12s/day
-      const effectiveDayLength = time.dayLength / time.speedMultiplier;
+      // Calculate effective day length based on time scale from MultiverseCoordinator
+      // timeScale 1.0 = 48s/day, 2.0 = 24s/day, 4.0 = 12s/day
+      // Note: speedMultiplier in component is now deprecated, use MultiverseCoordinator
+      const effectiveTimeScale = timeScale * time.speedMultiplier;
+      const effectiveDayLength = time.dayLength / effectiveTimeScale;
 
       // Calculate hours elapsed (deltaTime is in seconds)
       const hoursElapsed = (deltaTime / effectiveDayLength) * 24;
@@ -104,6 +122,10 @@ export class TimeSystem implements System {
         newTimeOfDay -= 24;
         newDay = time.day + 1; // Increment day counter
 
+        // Check if new week started (every 7 days)
+        const previousWeek = Math.floor((this.lastDay - 1) / 7);
+        const currentWeek = Math.floor((newDay - 1) / 7);
+
         // Emit day change event
         world.eventBus.emit({
           type: 'time:day_changed',
@@ -113,6 +135,19 @@ export class TimeSystem implements System {
             newDay,
           },
         });
+
+        // Emit week change event if week changed
+        if (currentWeek > previousWeek) {
+          world.eventBus.emit({
+            type: 'time:new_week',
+            source: entity.id,
+            data: {
+              week: currentWeek,
+            },
+          });
+        }
+
+        this.lastDay = newDay;
       }
 
       // Calculate new phase and light level
@@ -121,7 +156,7 @@ export class TimeSystem implements System {
       void calculateLightLevel(newTimeOfDay, newPhase);
 
       // Update component
-      impl.updateComponent<TimeComponent>('time', (current) => ({
+      impl.updateComponent<TimeComponent>(CT.Time, (current) => ({
         ...current,
         timeOfDay: newTimeOfDay,
         phase: newPhase,

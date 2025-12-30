@@ -1,0 +1,249 @@
+/**
+ * WorldSerializer - Serializes/deserializes entire World instances
+ */
+
+import type { World } from '../ecs/World.js';
+import type { Entity } from '../ecs/Entity.js';
+import type { Component } from '../ecs/Component.js';
+import type {
+  UniverseSnapshot,
+  VersionedEntity,
+  WorldSnapshot,
+} from './types.js';
+import { componentSerializerRegistry } from './serializers/index.js';
+import { computeChecksumSync } from './utils.js';
+
+export class WorldSerializer {
+  /**
+   * Serialize entire world to snapshot.
+   */
+  async serializeWorld(
+    world: World,
+    universeId: string,
+    universeName: string
+  ): Promise<UniverseSnapshot> {
+    console.log(`[WorldSerializer] Serializing world for universe: ${universeName}`);
+
+    // Serialize all entities
+    const entities = await this.serializeEntities(Array.from(world.entities.values()));
+
+    // Serialize world state
+    const worldState = this.serializeWorldState(world);
+
+    // Compute checksums
+    const entitiesChecksum = computeChecksumSync(entities);
+    const componentsChecksum = computeChecksumSync(
+      entities.flatMap(e => e.components)
+    );
+    const worldStateChecksum = computeChecksumSync(worldState);
+
+    // Get time component if it exists
+    const timeEntities = world.query().with('time').execute();
+    const timeEntityId = timeEntities[0];
+    const timeComponent = timeEntityId
+      ? world.getComponent(timeEntityId, 'time') as any
+      : undefined;
+
+    const snapshot: UniverseSnapshot = {
+      $schema: 'https://aivillage.dev/schemas/universe/v1',
+      $version: 1,
+
+      identity: {
+        id: universeId,
+        name: universeName,
+        createdAt: Date.now(),
+        schemaVersion: 1,
+      },
+
+      time: {
+        universeId,
+        universeTick: '0',  // Will be set by MultiverseCoordinator
+        timeScale: 1.0,
+        day: timeComponent?.day ?? 1,
+        timeOfDay: timeComponent?.timeOfDay ?? 6,
+        phase: timeComponent?.phase ?? 'dawn',
+        paused: false,
+        pausedDuration: 0,
+      },
+
+      config: {},  // TODO: Add UniverseDivineConfig
+
+      entities,
+
+      worldState,
+
+      checksums: {
+        entities: entitiesChecksum,
+        components: componentsChecksum,
+        worldState: worldStateChecksum,
+      },
+    };
+
+    console.log(
+      `[WorldSerializer] Serialized ${entities.length} entities, ` +
+      `${entities.flatMap(e => e.components).length} components`
+    );
+
+    return snapshot;
+  }
+
+  /**
+   * Deserialize world from snapshot.
+   */
+  async deserializeWorld(snapshot: UniverseSnapshot, world: World): Promise<void> {
+    console.log(`[WorldSerializer] Deserializing universe: ${snapshot.identity.name}`);
+
+    // Verify checksums
+    const entitiesChecksum = computeChecksumSync(snapshot.entities);
+    if (entitiesChecksum !== snapshot.checksums.entities) {
+      console.warn(
+        `[WorldSerializer] Entity checksum mismatch! ` +
+        `Expected ${snapshot.checksums.entities}, got ${entitiesChecksum}. ` +
+        `Save file may be corrupted.`
+      );
+    }
+
+    // Deserialize entities
+    const deserializedEntities = await this.deserializeEntities(snapshot.entities);
+
+    // Add entities to world
+    // Note: WorldImpl doesn't have addEntity in its interface, so we need to access internal API
+    const worldImpl = world as any;  // TODO: Add proper save/load support to World interface
+    for (const entity of deserializedEntities) {
+      worldImpl._entities.set(entity.id, entity);
+    }
+
+    // TODO: Deserialize world state (terrain, weather, etc.)
+
+    console.log(`[WorldSerializer] Deserialized ${deserializedEntities.length} entities`);
+  }
+
+  /**
+   * Serialize all entities.
+   */
+  private async serializeEntities(entities: ReadonlyArray<Entity>): Promise<VersionedEntity[]> {
+    const serialized: VersionedEntity[] = [];
+
+    for (const entity of entities) {
+      try {
+        const versionedEntity = await this.serializeEntity(entity);
+        serialized.push(versionedEntity);
+      } catch (error) {
+        console.error(
+          `[WorldSerializer] Failed to serialize entity ${entity.id}:`,
+          error
+        );
+        throw error;
+      }
+    }
+
+    return serialized;
+  }
+
+  /**
+   * Serialize a single entity.
+   */
+  private async serializeEntity(entity: Entity): Promise<VersionedEntity> {
+    const components = [];
+
+    // Get all components
+    const componentTypes = Array.from(entity.components.keys());
+
+    for (const type of componentTypes) {
+      const component = entity.components.get(type);
+
+      if (!component) continue;
+
+      try {
+        const serialized = componentSerializerRegistry.serialize(component);
+        components.push(serialized);
+      } catch (error) {
+        console.error(
+          `[WorldSerializer] Failed to serialize component ${type} ` +
+          `for entity ${entity.id}:`,
+          error
+        );
+        throw error;
+      }
+    }
+
+    return {
+      $schema: 'https://aivillage.dev/schemas/entity/v1',
+      $version: 1,
+      id: entity.id,
+      components,
+    };
+  }
+
+  /**
+   * Deserialize entities.
+   */
+  private async deserializeEntities(
+    entities: VersionedEntity[]
+  ): Promise<Entity[]> {
+    const deserialized: Entity[] = [];
+
+    for (const entityData of entities) {
+      try {
+        const entity = await this.deserializeEntity(entityData);
+        deserialized.push(entity);
+      } catch (error) {
+        console.error(
+          `[WorldSerializer] Failed to deserialize entity ${entityData.id}:`,
+          error
+        );
+        throw error;
+      }
+    }
+
+    return deserialized;
+  }
+
+  /**
+   * Deserialize a single entity.
+   */
+  private async deserializeEntity(data: VersionedEntity): Promise<Entity> {
+    // Import Entity implementation
+    const { EntityImpl } = await import('../ecs/Entity.js');
+
+    // Create entity with ID and createdAt (0 for now, will be set by world)
+    const entity = new EntityImpl(data.id, 0);
+
+    // Deserialize all components
+    for (const componentData of data.components) {
+      try {
+        const component = componentSerializerRegistry.deserialize(componentData) as Component;
+        entity.addComponent(component);
+      } catch (error) {
+        console.error(
+          `[WorldSerializer] Failed to deserialize component ${componentData.type} ` +
+          `for entity ${data.id}:`,
+          error
+        );
+        throw error;
+      }
+    }
+
+    return entity;
+  }
+
+  /**
+   * Serialize world state (terrain, weather, etc.).
+   */
+  private serializeWorldState(_world: World): WorldSnapshot {
+    // TODO: Implement terrain serialization
+    // TODO: Implement weather serialization
+    // TODO: Implement zone serialization
+    // TODO: Implement building placement serialization
+
+    return {
+      terrain: null,
+      weather: null,
+      zones: [],
+      buildings: [],
+    };
+  }
+}
+
+// Global singleton
+export const worldSerializer = new WorldSerializer();
