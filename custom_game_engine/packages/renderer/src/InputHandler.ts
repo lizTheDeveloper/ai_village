@@ -1,11 +1,65 @@
-import { Camera } from './Camera.js';
+import { Camera, ViewMode } from './Camera.js';
 import type { CraftingPanelUI } from './CraftingPanelUI.js';
+
+// ============================================================================
+// Enums
+// ============================================================================
+
+/**
+ * Input action types for unified handling.
+ */
+export enum InputAction {
+  /** Pan camera in a direction */
+  PanCamera = 'pan_camera',
+  /** Zoom camera in/out */
+  ZoomCamera = 'zoom_camera',
+  /** Adjust Z-depth in side-view */
+  AdjustDepth = 'adjust_depth',
+  /** Toggle view mode */
+  ToggleViewMode = 'toggle_view_mode',
+  /** Reset camera position */
+  ResetCamera = 'reset_camera',
+  /** Reset Z-depth to surface */
+  ResetDepth = 'reset_depth',
+}
+
+/**
+ * Mouse button types.
+ */
+export enum MouseButton {
+  Left = 0,
+  Middle = 1,
+  Right = 2,
+}
+
+/**
+ * Scroll direction.
+ */
+export enum ScrollDirection {
+  Up = 'up',
+  Down = 'down',
+}
+
+// ============================================================================
+// Interfaces
+// ============================================================================
 
 export interface InputHandlerCallbacks {
   onKeyDown?: (key: string, shiftKey: boolean, ctrlKey: boolean) => boolean;
   onMouseClick?: (screenX: number, screenY: number, button: number) => boolean;
   onMouseMove?: (screenX: number, screenY: number) => void;
   onWheel?: (screenX: number, screenY: number, deltaY: number) => boolean;
+  /** Called when view mode changes */
+  onViewModeChange?: (mode: ViewMode) => void;
+  /** Called when z-depth changes in side-view */
+  onDepthChange?: (z: number) => void;
+}
+
+/** Stores bound event listener for cleanup */
+interface BoundHandler {
+  element: EventTarget;
+  event: string;
+  handler: EventListener;
 }
 
 /**
@@ -22,6 +76,7 @@ export class InputHandler {
   private craftingPanel: CraftingPanelUI | null = null;
   private canvas: HTMLCanvasElement | null = null;
   private camera: Camera | null = null;
+  private boundHandlers: BoundHandler[] = [];
 
   constructor(
     canvasOrWorld: HTMLCanvasElement | any,
@@ -125,90 +180,172 @@ export class InputHandler {
     return { x: this.mouseMoveX, y: this.mouseMoveY };
   }
 
+  /**
+   * Helper to add event listener and track it for cleanup.
+   */
+  private addListener(element: EventTarget, event: string, handler: EventListener): void {
+    element.addEventListener(event, handler);
+    this.boundHandlers.push({ element, event, handler });
+  }
+
   private setupEventListeners(): void {
     if (!this.canvas || !this.camera) {
       return; // Don't setup if canvas/camera not available
     }
 
     // Keyboard
-    window.addEventListener('keydown', (e) => {
+    const handleKeyDown = (e: Event) => {
+      const ke = e as KeyboardEvent;
       // Check if callback handles this key
-      if (this.callbacks.onKeyDown?.(e.key, e.shiftKey, e.ctrlKey)) {
-        e.preventDefault();
+      if (this.callbacks.onKeyDown?.(ke.key, ke.shiftKey, ke.ctrlKey)) {
+        ke.preventDefault();
         return;
       }
-      this.keys.add(e.key);
-    });
+      this.keys.add(ke.key);
+    };
+    this.addListener(window, 'keydown', handleKeyDown);
 
-    window.addEventListener('keyup', (e) => {
-      this.keys.delete(e.key);
-    });
+    const handleKeyUp = (e: Event) => {
+      const ke = e as KeyboardEvent;
+      this.keys.delete(ke.key);
+    };
+    this.addListener(window, 'keyup', handleKeyUp);
 
     // Mouse drag and click
-    this.canvas.addEventListener('mousedown', (e) => {
+    const handleMouseDown = (e: Event) => {
+      const me = e as MouseEvent;
       // Check if callback handles this click
       const rect = this.canvas!.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const x = me.clientX - rect.left;
+      const y = me.clientY - rect.top;
 
-      const handled = this.callbacks.onMouseClick?.(x, y, e.button);
+      const handled = this.callbacks.onMouseClick?.(x, y, me.button);
 
       if (handled) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
+        me.preventDefault();
+        me.stopPropagation();
+        me.stopImmediatePropagation();
         return;
       }
 
       this.mouseDown = true;
-      this.lastMouseX = e.clientX;
-      this.lastMouseY = e.clientY;
-    });
+      this.lastMouseX = me.clientX;
+      this.lastMouseY = me.clientY;
+    };
+    this.addListener(this.canvas, 'mousedown', handleMouseDown);
 
     // Prevent context menu on right click
-    this.canvas.addEventListener('contextmenu', (e) => {
+    const handleContextMenu = (e: Event) => {
       e.preventDefault();
-    });
+    };
+    this.addListener(this.canvas, 'contextmenu', handleContextMenu);
 
-    window.addEventListener('mouseup', () => {
+    const handleMouseUp = () => {
       this.mouseDown = false;
-    });
+    };
+    this.addListener(window, 'mouseup', handleMouseUp);
 
-    window.addEventListener('mousemove', (e) => {
+    const handleMouseMove = (e: Event) => {
+      const me = e as MouseEvent;
       const rect = this.canvas!.getBoundingClientRect();
-      this.mouseMoveX = e.clientX - rect.left;
-      this.mouseMoveY = e.clientY - rect.top;
+      this.mouseMoveX = me.clientX - rect.left;
+      this.mouseMoveY = me.clientY - rect.top;
 
       // Notify callback of mouse move
       this.callbacks.onMouseMove?.(this.mouseMoveX, this.mouseMoveY);
 
       if (this.mouseDown) {
-        const dx = e.clientX - this.lastMouseX;
-        const dy = e.clientY - this.lastMouseY;
+        const dx = me.clientX - this.lastMouseX;
+        const dy = me.clientY - this.lastMouseY;
         this.camera!.pan(-dx, -dy);
-        this.lastMouseX = e.clientX;
-        this.lastMouseY = e.clientY;
+        this.lastMouseX = me.clientX;
+        this.lastMouseY = me.clientY;
       }
-    });
+    };
+    this.addListener(window, 'mousemove', handleMouseMove);
 
-    // Mouse wheel - first check callbacks, then zoom
-    this.canvas.addEventListener('wheel', (e) => {
-      e.preventDefault();
+    // Mouse wheel - zoom or depth change
+    const handleWheel = (e: Event) => {
+      const we = e as WheelEvent;
+      we.preventDefault();
 
       // Convert to canvas-relative coordinates (same as mousemove)
       const rect = this.canvas!.getBoundingClientRect();
-      const canvasX = e.clientX - rect.left;
-      const canvasY = e.clientY - rect.top;
+      const canvasX = we.clientX - rect.left;
+      const canvasY = we.clientY - rect.top;
 
       // Let callbacks handle the wheel event first (e.g., window scrolling)
-      if (this.callbacks.onWheel?.(canvasX, canvasY, e.deltaY)) {
+      if (this.callbacks.onWheel?.(canvasX, canvasY, we.deltaY)) {
         return;
       }
 
-      // Default behavior: zoom camera
-      const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
-      this.camera!.setZoom(this.camera!.zoom * zoomFactor);
-    });
+      // Shift + scroll = change depth slice (Y position for which row we're viewing)
+      if (we.shiftKey) {
+        // Scroll up = move forward (into screen), scroll down = move back
+        const delta = we.deltaY > 0 ? 1 : -1;
+        this.camera!.adjustDepthSlice(delta);
+        this.callbacks.onDepthChange?.(this.camera!.y);
+      } else {
+        // Regular scroll = zoom (both modes)
+        const zoomFactor = we.deltaY > 0 ? 0.9 : 1.1;
+        this.camera!.setZoom(this.camera!.zoom * zoomFactor);
+      }
+    };
+    this.addListener(this.canvas, 'wheel', handleWheel);
+  }
+
+  // ==========================================================================
+  // View Mode Control
+  // ==========================================================================
+
+  /**
+   * Toggle between view modes.
+   * Call this from keyboard handler (V key).
+   */
+  toggleViewMode(): ViewMode {
+    if (!this.camera) return ViewMode.TopDown;
+    const newMode = this.camera.toggleViewMode();
+    this.callbacks.onViewModeChange?.(newMode);
+    return newMode;
+  }
+
+  /**
+   * Set specific view mode.
+   */
+  setViewMode(mode: ViewMode): void {
+    if (!this.camera) return;
+    this.camera.setViewMode(mode);
+    this.callbacks.onViewModeChange?.(mode);
+  }
+
+  /**
+   * Get current view mode.
+   */
+  getViewMode(): ViewMode {
+    return this.camera?.viewMode ?? ViewMode.TopDown;
+  }
+
+  /**
+   * Reset z-depth to surface level.
+   */
+  resetDepth(): void {
+    if (!this.camera) return;
+    this.camera.resetFocusDepth();
+    this.callbacks.onDepthChange?.(0);
+  }
+
+  /**
+   * Remove all event listeners and clean up resources.
+   * Call this when the InputHandler is no longer needed.
+   */
+  destroy(): void {
+    for (const { element, event, handler } of this.boundHandlers) {
+      element.removeEventListener(event, handler);
+    }
+    this.boundHandlers = [];
+    this.keys.clear();
+    this.callbacks = {};
+    this.craftingPanel = null;
   }
 
   /**
@@ -222,26 +359,78 @@ export class InputHandler {
 
     const panSpeed = 5;
 
-    // Arrow keys only (WASD reserved for game controls)
-    if (this.keys.has('ArrowLeft')) {
-      this.camera!.pan(-panSpeed, 0);
-    }
-    if (this.keys.has('ArrowRight')) {
-      this.camera!.pan(panSpeed, 0);
-    }
-    if (this.keys.has('ArrowUp')) {
-      this.camera!.pan(0, -panSpeed);
-    }
-    if (this.keys.has('ArrowDown')) {
-      this.camera!.pan(0, panSpeed);
+    // Arrow keys behavior depends on view mode
+    if (this.camera.isSideView()) {
+      // Side-view mode:
+      // Left/Right = pan horizontally (X axis)
+      // Up/Down = scroll vertically (look up at mountains, down at caves)
+      if (this.keys.has('ArrowLeft')) {
+        this.camera!.pan(-panSpeed, 0);
+      }
+      if (this.keys.has('ArrowRight')) {
+        this.camera!.pan(panSpeed, 0);
+      }
+      if (this.keys.has('ArrowUp')) {
+        this.camera!.panSideViewVertical(panSpeed); // Look up
+      }
+      if (this.keys.has('ArrowDown')) {
+        this.camera!.panSideViewVertical(-panSpeed); // Look down
+      }
+    } else {
+      // Top-down mode: normal panning
+      if (this.keys.has('ArrowLeft')) {
+        this.camera!.pan(-panSpeed, 0);
+      }
+      if (this.keys.has('ArrowRight')) {
+        this.camera!.pan(panSpeed, 0);
+      }
+      if (this.keys.has('ArrowUp')) {
+        this.camera!.pan(0, -panSpeed);
+      }
+      if (this.keys.has('ArrowDown')) {
+        this.camera!.pan(0, panSpeed);
+      }
     }
 
-    // Zoom with +/-
-    if (this.keys.has('=') || this.keys.has('+')) {
-      this.camera!.setZoom(this.camera!.zoom * 1.02);
+    // Zoom with +/- (only in top-down mode)
+    if (!this.camera.isSideView()) {
+      if (this.keys.has('=') || this.keys.has('+')) {
+        this.camera!.setZoom(this.camera!.zoom * 1.02);
+      }
+      if (this.keys.has('-') || this.keys.has('_')) {
+        this.camera!.setZoom(this.camera!.zoom * 0.98);
+      }
     }
-    if (this.keys.has('-') || this.keys.has('_')) {
-      this.camera!.setZoom(this.camera!.zoom * 0.98);
+
+    // Z-depth adjustment with [ and ] keys (any mode, but mainly for side-view)
+    if (this.keys.has('[')) {
+      this.camera!.adjustFocusDepth(-0.5); // Move closer (decrease z)
+      this.callbacks.onDepthChange?.(this.camera!.z);
+    }
+    if (this.keys.has(']')) {
+      this.camera!.adjustFocusDepth(0.5); // Move further (increase z)
+      this.callbacks.onDepthChange?.(this.camera!.z);
+    }
+
+    // Reset z-depth with 0 key
+    if (this.keys.has('0') && this.camera.isSideView()) {
+      this.resetDepth();
     }
   }
+
+  /**
+   * Check if V key was pressed this frame (for view mode toggle).
+   * Call this from main loop and clear the key.
+   */
+  checkViewModeToggle(): boolean {
+    if (this.keys.has('v') || this.keys.has('V')) {
+      this.keys.delete('v');
+      this.keys.delete('V');
+      return true;
+    }
+    return false;
+  }
 }
+
+// Re-export ViewMode for convenience
+export { ViewMode };

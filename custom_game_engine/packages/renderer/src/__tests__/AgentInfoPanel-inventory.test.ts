@@ -175,6 +175,7 @@ describe('AgentInfoPanel - Inventory Display', () => {
       });
 
       registerEntity(entity);
+      panel.setTab('inventory'); // Switch to inventory tab for individual items
       panel.render(mockCtx, 1024, 768, mockWorld);
 
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
@@ -226,6 +227,7 @@ describe('AgentInfoPanel - Inventory Display', () => {
       });
 
       registerEntity(entity);
+      panel.setTab('inventory'); // Switch to inventory tab for individual items
       panel.render(mockCtx, 1024, 768, mockWorld);
 
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
@@ -248,6 +250,7 @@ describe('AgentInfoPanel - Inventory Display', () => {
       });
 
       registerEntity(entity);
+      panel.setTab('inventory'); // Switch to inventory tab for individual items
       panel.render(mockCtx, 1024, 768, mockWorld);
 
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
@@ -274,6 +277,7 @@ describe('AgentInfoPanel - Inventory Display', () => {
       });
 
       registerEntity(entity);
+      panel.setTab('inventory'); // Switch to inventory tab for individual items
       panel.render(mockCtx, 1024, 768, mockWorld);
 
       const fillTextCalls = (mockCtx.fillText as any).mock.calls;
@@ -517,6 +521,7 @@ describe('AgentInfoPanel - Inventory Display', () => {
       });
 
       registerEntity(entity);
+      panel.setTab('inventory'); // Switch to inventory tab for individual items
       panel.render(mockCtx, 1024, 768, mockWorld);
 
       // Verify initial wood count
@@ -796,6 +801,7 @@ describe('AgentInfoPanel - Inventory Display', () => {
       });
 
       registerEntity(entity);
+      panel.setTab('inventory'); // Switch to inventory tab for individual items
 
       expect(() => {
         panel.render(mockCtx, 1024, 768, mockWorld);

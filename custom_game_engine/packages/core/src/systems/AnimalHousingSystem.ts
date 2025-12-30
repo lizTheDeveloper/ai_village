@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -23,7 +24,7 @@ import {
 export class AnimalHousingSystem implements System {
   public readonly id: SystemId = 'animal-housing';
   public readonly priority: number = 51; // Run after BuildingSystem (50)
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = ['building'];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Building];
 
   private lastCleanlinessUpdate = 0;
   private readonly CLEANLINESS_UPDATE_INTERVAL = CLEANLINESS_UPDATE_INTERVAL; // Daily in seconds
@@ -50,7 +51,7 @@ export class AnimalHousingSystem implements System {
   private updateCleanliness(world: World): void {
     for (const entity of world.entities.values()) {
       const impl = entity as EntityImpl;
-      const building = impl.getComponent<BuildingComponent>('building');
+      const building = impl.getComponent<BuildingComponent>(CT.Building);
 
       if (!building || !isAnimalHousing(building.buildingType)) {
         continue;
@@ -73,7 +74,7 @@ export class AnimalHousingSystem implements System {
 
       const newCleanliness = Math.max(0, building.cleanliness - dailyDecay);
 
-      impl.updateComponent<BuildingComponent>('building', (current) => ({
+      impl.updateComponent<BuildingComponent>(CT.Building, (current) => ({
         ...current,
         cleanlinessLevel: newCleanliness,
       }));
@@ -100,7 +101,7 @@ export class AnimalHousingSystem implements System {
   private applyHousingEffects(world: World): void {
     for (const entity of world.entities.values()) {
       const impl = entity as EntityImpl;
-      const animal = impl.getComponent<AnimalComponent>('animal');
+      const animal = impl.getComponent<AnimalComponent>(CT.Animal);
 
       if (!animal || !animal.housingBuildingId) {
         continue;
@@ -110,7 +111,7 @@ export class AnimalHousingSystem implements System {
       const housingEntity = world.entities.get(animal.housingBuildingId);
       if (!housingEntity) {
         // Housing no longer exists - unhouse animal
-        impl.updateComponent<AnimalComponent>('animal', (current) => ({
+        impl.updateComponent<AnimalComponent>(CT.Animal, (current) => ({
           ...current,
           housingBuildingId: undefined,
         }));
@@ -118,11 +119,11 @@ export class AnimalHousingSystem implements System {
       }
 
       const housingImpl = housingEntity as EntityImpl;
-      const building = housingImpl.getComponent<BuildingComponent>('building');
+      const building = housingImpl.getComponent<BuildingComponent>(CT.Building);
 
       if (!building || !isAnimalHousing(building.buildingType)) {
         // Not a valid housing building
-        impl.updateComponent<AnimalComponent>('animal', (current) => ({
+        impl.updateComponent<AnimalComponent>(CT.Animal, (current) => ({
           ...current,
           housingBuildingId: undefined,
         }));
@@ -135,7 +136,7 @@ export class AnimalHousingSystem implements System {
         const comfortPenalty = (CLEANLINESS_PENALTY - building.cleanliness) / CLEANLINESS_PENALTY; // 0-1 scale
         const stressPenalty = comfortPenalty * 10; // Up to 10 stress
 
-        impl.updateComponent<AnimalComponent>('animal', (current) => ({
+        impl.updateComponent<AnimalComponent>(CT.Animal, (current) => ({
           ...current,
           stress: Math.min(100, current.stress + stressPenalty * STRESS_PENALTY_MULTIPLIER), // Small increase per tick
         }));
@@ -156,7 +157,7 @@ export class AnimalHousingSystem implements System {
     // Scan all animals for housing assignments
     for (const entity of world.entities.values()) {
       const impl = entity as EntityImpl;
-      const animal = impl.getComponent<AnimalComponent>('animal');
+      const animal = impl.getComponent<AnimalComponent>(CT.Animal);
 
       if (!animal || !animal.housingBuildingId) {
         continue;
@@ -170,7 +171,7 @@ export class AnimalHousingSystem implements System {
     // Update building occupancy lists
     for (const entity of world.entities.values()) {
       const impl = entity as EntityImpl;
-      const building = impl.getComponent<BuildingComponent>('building');
+      const building = impl.getComponent<BuildingComponent>(CT.Building);
 
       if (!building || !isAnimalHousing(building.buildingType)) {
         continue;
@@ -183,7 +184,7 @@ export class AnimalHousingSystem implements System {
         building.currentOccupants.length !== actualOccupants.length ||
         !building.currentOccupants.every((id) => actualOccupants.includes(id))
       ) {
-        impl.updateComponent<BuildingComponent>('building', (current) => ({
+        impl.updateComponent<BuildingComponent>(CT.Building, (current) => ({
           ...current,
           currentOccupants: actualOccupants,
         }));

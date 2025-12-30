@@ -3,7 +3,7 @@ import { IntegrationTestHarness } from '../../__tests__/utils/IntegrationTestHar
 import { createMinimalWorld } from '../../__tests__/fixtures/worldFixtures.js';
 import { GovernanceDataSystem } from '../GovernanceDataSystem.js';
 import { createAgentComponent } from '../../components/AgentComponent.js';
-import { createNeedsComponent } from '../../components/NeedsComponent.js';
+import { NeedsComponent } from '../../components/NeedsComponent.js';
 import { createIdentityComponent } from '../../components/IdentityComponent.js';
 import { createBuildingComponent } from '../../components/BuildingComponent.js';
 import { createTownHallComponent } from '../../components/TownHallComponent.js';
@@ -273,11 +273,23 @@ describe('GovernanceDataSystem Integration', () => {
 
       const healthyAgent = harness.createTestAgent({ x: 10, y: 10 });
       healthyAgent.addComponent(createAgentComponent('healthy', 'wander'));
-      healthyAgent.addComponent(createNeedsComponent(90, 90, 90, 90, 90));
+      healthyAgent.addComponent(new NeedsComponent({
+    hunger: 0.9,
+    energy: 0.9,
+    health: 0.9,
+    thirst: 0.9,
+    temperature: 0.9,
+  }));
 
       const sickAgent = harness.createTestAgent({ x: 20, y: 20 });
       sickAgent.addComponent(createAgentComponent('sick', 'wander'));
-      sickAgent.addComponent(createNeedsComponent(40, 40, 40, 40, 40));
+      sickAgent.addComponent(new NeedsComponent({
+    hunger: 0.4,
+    energy: 0.4,
+    health: 0.4,
+    thirst: 0.4,
+    temperature: 0.4,
+  }));
 
       governanceSystem.update(harness.world, [], 0);
 
@@ -292,7 +304,13 @@ describe('GovernanceDataSystem Integration', () => {
 
       const criticalAgent = harness.createTestAgent({ x: 10, y: 10 });
       criticalAgent.addComponent(createAgentComponent('critical', 'wander'));
-      criticalAgent.addComponent(createNeedsComponent(10, 10, 10, 10, 10));
+      criticalAgent.addComponent(new NeedsComponent({
+    hunger: 0.1,
+    energy: 0.1,
+    health: 0.1,
+    thirst: 0.1,
+    temperature: 0.1,
+  }));
 
       governanceSystem.update(harness.world, [], 0);
 
@@ -306,7 +324,13 @@ describe('GovernanceDataSystem Integration', () => {
 
       const malnourishedAgent = harness.createTestAgent({ x: 10, y: 10 });
       malnourishedAgent.addComponent(createAgentComponent('malnourished', 'wander'));
-      malnourishedAgent.addComponent(createNeedsComponent(20, 50, 50, 50, 50)); // Low hunger
+      malnourishedAgent.addComponent(new NeedsComponent({
+    hunger: 0.2,
+    energy: 0.5,
+    health: 0.5,
+    thirst: 0.5,
+    temperature: 0.5,
+  })); // Low hunger
 
       governanceSystem.update(harness.world, [], 0);
 
@@ -341,7 +365,13 @@ describe('GovernanceDataSystem Integration', () => {
       for (let i = 0; i < 25; i++) {
         const agent = harness.createTestAgent({ x: 10 + i, y: 10 });
         agent.addComponent(createAgentComponent(`agent-${i}`, 'wander'));
-        agent.addComponent(createNeedsComponent(80, 80, 80, 80, 80));
+        agent.addComponent(new NeedsComponent({
+    hunger: 0.8,
+    energy: 0.8,
+    health: 0.8,
+    thirst: 0.8,
+    temperature: 0.8,
+  }));
       }
 
       governanceSystem.update(harness.world, [], 0);
@@ -381,7 +411,13 @@ describe('GovernanceDataSystem Integration', () => {
       const agent = harness.createTestAgent({ x: 10, y: 10 });
       agent.addComponent(createIdentityComponent('TestAgent'));
       agent.addComponent(createAgentComponent('test', 'wander'));
-      agent.addComponent(createNeedsComponent(80, 80, 80, 80, 80));
+      agent.addComponent(new NeedsComponent({
+    hunger: 0.8,
+    energy: 0.8,
+    health: 0.8,
+    thirst: 0.8,
+    temperature: 0.8,
+  }));
 
       governanceSystem.update(harness.world, [], 0);
 

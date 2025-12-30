@@ -62,6 +62,13 @@ custom_game_engine/
   - ✅ IndexedDB serializer
   - ✅ Snapshot/restore
 
+- **Help System**
+  - ✅ Self-documenting items/effects (embed docs in definitions)
+  - ✅ HelpRegistry with search, tag, category indexing
+  - ✅ Markdown wiki generator (human-readable)
+  - ✅ JSON wiki generator (LLM-friendly)
+  - ✅ See [packages/core/src/help/README.md](packages/core/src/help/README.md)
+
 - **Game Loop**
   - ✅ Fixed 20 TPS timestep
   - ✅ System execution in priority order

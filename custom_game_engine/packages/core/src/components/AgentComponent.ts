@@ -29,6 +29,7 @@ export type AgentBehavior =
   | 'seek_shelter'
   | 'deposit_items'
   | 'seek_warmth'
+  | 'seek_cooling'
   | 'call_meeting'
   | 'attend_meeting'
   | 'till'
@@ -46,6 +47,8 @@ export type AgentBehavior =
   | 'house_animal'
   // Economy
   | 'trade'
+  // Magic (Phase 30)
+  | 'cast_spell'
   // Self-management
   | 'set_priorities';
 
@@ -75,6 +78,7 @@ export interface StrategicPriorities {
   social?: number;      // Talk, help, meetings
   exploration?: number; // Wander, explore new areas
   rest?: number;        // Idle, sleep, recovery
+  magic?: number;       // Spell casting and magical activities
 }
 
 /**
@@ -99,6 +103,69 @@ export const PLANNED_BUILD_REACH = 3;
  */
 export type ResourceTargets = Record<string, number>;
 
+// ============================================================================
+// Forward-Compatibility: Governance & Social Hierarchy
+// ============================================================================
+
+/** Noble/leadership titles an agent can hold */
+export type NobleTitle =
+  | 'mayor'           // Elected leader
+  | 'chief'           // Tribal leader
+  | 'captain'         // Military leader
+  | 'sheriff'         // Law enforcement
+  | 'judge'           // Justice system
+  | 'priest'          // Religious leader
+  | 'guildmaster'     // Craft guild leader
+  | 'merchant_prince' // Trade leader
+  | 'elder';          // Council member
+
+/** Mandate types that nobles can issue */
+export type MandateType =
+  | 'production'      // Must produce X items
+  | 'export_ban'      // Cannot sell certain items
+  | 'import_required' // Must acquire certain items
+  | 'construction'    // Must build something
+  | 'military'        // Military orders
+  | 'festival';       // Organize celebration
+
+/**
+ * An active mandate/order from a noble.
+ * Future: Agents must fulfill these or face consequences.
+ */
+export interface ActiveMandate {
+  /** Unique identifier */
+  id: string;
+  /** Type of mandate */
+  type: MandateType;
+  /** Who issued this mandate */
+  issuerId: string;
+  /** What the mandate requires (item ID, building type, etc.) */
+  target: string;
+  /** Quantity required (if applicable) */
+  quantity?: number;
+  /** Game tick when mandate was issued */
+  issuedAt: number;
+  /** Game tick when mandate expires */
+  deadline: number;
+  /** Whether this mandate has been fulfilled */
+  fulfilled: boolean;
+}
+
+/**
+ * Custom LLM configuration for per-agent LLM provider overrides.
+ * If set, this agent will use these settings instead of global LLM settings.
+ */
+export interface CustomLLMConfig {
+  /** Custom API base URL (e.g., https://api.anthropic.com/v1) */
+  baseUrl?: string;
+  /** Custom model name (e.g., claude-3-5-sonnet-20241022) */
+  model?: string;
+  /** Custom API key */
+  apiKey?: string;
+  /** Custom headers as key-value pairs (e.g., {"anthropic-version": "2023-06-01"}) */
+  customHeaders?: Record<string, string>;
+}
+
 export interface AgentComponent extends Component {
   type: 'agent';
   behavior: AgentBehavior;
@@ -107,6 +174,7 @@ export interface AgentComponent extends Component {
   lastThinkTick: number;
   useLLM: boolean; // Whether to use LLM for decision making
   llmCooldown: number; // Ticks remaining before next LLM call
+  customLLM?: CustomLLMConfig; // Per-agent LLM configuration override
   recentSpeech?: string; // What the agent recently said (for nearby agents to hear)
   lastThought?: string; // The agent's most recent internal thought/reasoning
   speechHistory?: SpeechHistoryEntry[]; // History of what the agent has said
@@ -130,6 +198,40 @@ export interface AgentComponent extends Component {
   queuePaused?: boolean; // Whether queue processing is paused
   queueInterruptedBy?: AgentBehavior; // Behavior that interrupted the queue
   behaviorCompleted?: boolean; // Set by behaviors when they complete
+
+  // ============================================================================
+  // Forward-Compatibility: Governance & Social Hierarchy (optional)
+  // ============================================================================
+
+  /**
+   * Noble/leadership titles this agent holds.
+   * Future: Affects what mandates they can issue and social standing.
+   */
+  titles?: NobleTitle[];
+
+  /**
+   * Entity ID of the noble/leader this agent serves.
+   * Future: Used for loyalty, mandate compliance, rebellion.
+   */
+  allegiance?: string;
+
+  /**
+   * Active mandates this agent must fulfill.
+   * Future: Failing mandates causes stress and punishment.
+   */
+  activeMandates?: ActiveMandate[];
+
+  /**
+   * Guild memberships.
+   * Future: Affects crafting bonuses, social groups, and obligations.
+   */
+  guilds?: string[];
+
+  /**
+   * Reputation with different factions (0-100).
+   * Future: Affects trading, trust, and access.
+   */
+  reputation?: Record<string, number>;
 }
 
 /**
@@ -143,6 +245,7 @@ export const DEFAULT_PRIORITIES: StrategicPriorities = {
   social: 0.15,      // Talking, meetings
   exploration: 0.15, // Wandering, exploring
   rest: 0.10,        // Resting, recovery
+  magic: 0.0,        // Spell casting (0 by default - only magic users set this)
 };
 
 export function createAgentComponent(

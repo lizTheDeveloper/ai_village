@@ -1,3 +1,4 @@
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Unit tests for AgentBrainSystem
  *
@@ -8,7 +9,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
 import { createMovementComponent } from '../../components/MovementComponent.js';
-import { createNeedsComponent } from '../../components/NeedsComponent.js';
+import { NeedsComponent } from '../../components/NeedsComponent.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
 import type { World } from '../../ecs/World.js';
 
@@ -18,7 +19,7 @@ import { BehaviorRegistry } from '../../behavior/BehaviorRegistry.js';
 // Helper to create a mock agent component
 function createMockAgent(overrides: Partial<AgentComponent> = {}): AgentComponent {
   return {
-    type: 'agent',
+    type: ComponentType.Agent,
     version: 1,
     name: 'TestAgent',
     behavior: 'idle',
@@ -127,7 +128,7 @@ describe('AgentBrainSystem', () => {
 
       system.update(world, [entity], 0.05);
 
-      const updatedAgent = entity.getComponent('agent') as AgentComponent;
+      const updatedAgent = entity.getComponent(ComponentType.Agent) as AgentComponent;
       expect(updatedAgent.lastThinkTick).toBe(100);
     });
 
@@ -164,7 +165,11 @@ describe('AgentBrainSystem', () => {
       const entity = createAgentEntity(agent);
 
       // Add critical needs
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 5; // Critical
       entity.addComponent(needs);
 
@@ -173,7 +178,7 @@ describe('AgentBrainSystem', () => {
       system.update(world, [entity], 0.05);
 
       // Should have switched to seek_sleep
-      const updatedAgent = entity.getComponent('agent') as AgentComponent;
+      const updatedAgent = entity.getComponent(ComponentType.Agent) as AgentComponent;
       expect(updatedAgent.behavior).toBe('seek_sleep');
       expect(sleepHandler).toHaveBeenCalled();
     });
@@ -191,7 +196,11 @@ describe('AgentBrainSystem', () => {
       const entity = createAgentEntity(agent);
 
       // Add exhausted needs
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 0;
       entity.addComponent(needs);
 
@@ -199,7 +208,7 @@ describe('AgentBrainSystem', () => {
 
       system.update(world, [entity], 0.05);
 
-      const updatedAgent = entity.getComponent('agent') as AgentComponent;
+      const updatedAgent = entity.getComponent(ComponentType.Agent) as AgentComponent;
       expect(updatedAgent.behavior).toBe('forced_sleep');
     });
   });
@@ -221,7 +230,11 @@ describe('AgentBrainSystem', () => {
       });
       const entity = createAgentEntity(agent);
 
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 5;
       entity.addComponent(needs);
 

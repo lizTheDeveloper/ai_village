@@ -22,11 +22,19 @@ export interface GameSettings {
   dungeonMasterPrompt: string;
 }
 
+// Detect macOS for MLX default
+const isMacOS = navigator.platform.toLowerCase().includes('mac');
+
 const DEFAULT_SETTINGS: GameSettings = {
-  llm: {
+  llm: isMacOS ? {
+    provider: 'openai-compat',
+    baseUrl: 'http://localhost:8080/v1',
+    model: 'mlx-community/Qwen3-4B-Instruct-4bit',
+    apiKey: '',
+  } : {
     provider: 'ollama',
     baseUrl: 'http://localhost:11434',
-    model: 'qwen3:4b',
+    model: 'qwen3:1.7b',
     apiKey: '',
   },
   agentBehavior: {
@@ -39,10 +47,16 @@ const DEFAULT_SETTINGS: GameSettings = {
 
 // LLM Preset configurations
 const PRESETS: Record<string, Partial<LLMSettings>> = {
+  'mlx-server': {
+    provider: 'openai-compat',
+    baseUrl: 'http://localhost:8080/v1',
+    model: 'mlx-community/Qwen3-4B-Instruct-4bit',
+    apiKey: '', // No API key needed for local MLX server
+  },
   'ollama-local': {
     provider: 'ollama',
     baseUrl: 'http://localhost:11434',
-    model: 'qwen3:4b',
+    model: 'qwen3:1.7b',
   },
   'ollama-openai': {
     provider: 'openai-compat',
@@ -304,7 +318,7 @@ export class SettingsPanel {
     const modelInput = modelGroup.querySelector('input')!;
     modelInput.id = 'settings-model';
     modelInput.value = this.settings.llm.model;
-    modelInput.placeholder = 'qwen3:4b or llama-3.3-70b-versatile';
+    modelInput.placeholder = isMacOS ? 'mlx-community/Qwen3-4B-Instruct-4bit' : 'qwen3:1.7b or qwen3:0.6b';
     modelInput.onchange = () => {
       this.settings.llm.model = modelInput.value;
     };

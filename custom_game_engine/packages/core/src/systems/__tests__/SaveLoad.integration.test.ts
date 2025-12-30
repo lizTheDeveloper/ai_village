@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { IntegrationTestHarness } from '../../__tests__/utils/IntegrationTestHarness.js';
 import { createMinimalWorld } from '../../__tests__/fixtures/worldFixtures.js';
-import { createNeedsComponent } from '../../components/NeedsComponent.js';
+import { NeedsComponent } from '../../components/NeedsComponent.js';
 import { createCircadianComponent } from '../../components/CircadianComponent.js';
-import { createMemoryComponent } from '../../components/MemoryComponent.js';
+import { MemoryComponent } from '../../components/MemoryComponent.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Integration tests for Save/Load Persistence
  *
@@ -27,7 +28,13 @@ describe('Save/Load Persistence Integration', () => {
 
   it('should serialize world entities', () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
-    agent.addComponent(createNeedsComponent(80, 60, 90, 85, 95));
+    agent.addComponent(new NeedsComponent({
+    hunger: 0.8,
+    energy: 0.6,
+    health: 0.9,
+    thirst: 0.85,
+    temperature: 0.95,
+  }));
 
     const entities = Array.from(harness.world.entities.values());
 
@@ -49,27 +56,40 @@ describe('Save/Load Persistence Integration', () => {
 
   it('should preserve component data structure', () => {
     const agent = harness.createTestAgent({ x: 15, y: 20 });
-    // createNeedsComponent(hunger, energy, health, thirst, temperature, hungerDecayRate, energyDecayRate)
-    const needs = createNeedsComponent(70, 50, 80, 100, 37, 2.5, 1.5);
+    const needs = new NeedsComponent({
+      hunger: 0.7,
+      energy: 0.5,
+      health: 0.8,
+      thirst: 1.0,
+      temperature: 37,
+      hungerDecayRate: 0.0025,
+      energyDecayRate: 0.0015,
+    });
     agent.addComponent(needs);
 
     // Get component
-    const retrievedNeeds = agent.getComponent('needs') as any;
+    const retrievedNeeds = agent.getComponent(ComponentType.Needs) as any;
 
     // Verify data preserved
-    expect(retrievedNeeds.hunger).toBe(70);
-    expect(retrievedNeeds.energy).toBe(50);
-    expect(retrievedNeeds.health).toBe(80);
-    expect(retrievedNeeds.hungerDecayRate).toBe(2.5);
-    expect(retrievedNeeds.energyDecayRate).toBe(1.5);
+    expect(retrievedNeeds.hunger).toBe(0.7);
+    expect(retrievedNeeds.energy).toBe(0.5);
+    expect(retrievedNeeds.health).toBe(0.8);
+    expect(retrievedNeeds.hungerDecayRate).toBe(0.0025);
+    expect(retrievedNeeds.energyDecayRate).toBe(0.0015);
   });
 
   it('should handle entity with multiple components', () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
-    agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 37,
+  }));
     agent.addComponent(createCircadianComponent());
-    agent.addComponent(createMemoryComponent());
+    agent.addComponent(new MemoryComponent(agent.id));
 
     // Count components
     const componentCount = agent.components.size;
@@ -82,7 +102,7 @@ describe('Save/Load Persistence Integration', () => {
 
     const agent = harness.createTestAgent({ x, y });
 
-    const position = agent.getComponent('position') as any;
+    const position = agent.getComponent(ComponentType.Position) as any;
     expect(position.x).toBe(x);
     expect(position.y).toBe(y);
   });
@@ -107,11 +127,11 @@ describe('Save/Load Persistence Integration', () => {
 
   it('should preserve memory component structure', () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
-    const memory = createMemoryComponent();
+    const memory = new MemoryComponent(agent.id);
 
     agent.addComponent(memory);
 
-    const retrieved = agent.getComponent('memory') as any;
+    const retrieved = agent.getComponent(ComponentType.Memory) as any;
 
     expect(retrieved).toBeDefined();
     expect(retrieved.memories).toBeDefined();
@@ -123,10 +143,16 @@ describe('Save/Load Persistence Integration', () => {
     const agent2 = harness.createTestAgent({ x: 20, y: 20 });
 
     // Only agent1 has needs
-    agent1.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
+    agent1.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
 
-    const needs1 = agent1.getComponent('needs');
-    const needs2 = agent2.getComponent('needs');
+    const needs1 = agent1.getComponent(ComponentType.Needs);
+    const needs2 = agent2.getComponent(ComponentType.Needs);
 
     expect(needs1).toBeDefined();
     expect(needs2).toBeUndefined();
@@ -138,7 +164,7 @@ describe('Save/Load Persistence Integration', () => {
 
     agent.addComponent(circadian);
 
-    const retrieved = agent.getComponent('circadian') as any;
+    const retrieved = agent.getComponent(ComponentType.Circadian) as any;
 
     expect(retrieved).toBeDefined();
     expect(retrieved.sleepDrive).toBeDefined();
@@ -150,7 +176,13 @@ describe('Save/Load Persistence Integration', () => {
     const originalId = agent.id;
 
     // Add component
-    agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 37,
+  }));
 
     // ID should remain the same
     expect(agent.id).toBe(originalId);
@@ -173,11 +205,17 @@ describe('Save/Load Persistence Integration', () => {
 
   it('should preserve component version numbers', () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
-    const needs = createNeedsComponent(100, 100, 100, 100, 100);
+    const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  });
 
     agent.addComponent(needs);
 
-    const retrieved = agent.getComponent('needs') as any;
+    const retrieved = agent.getComponent(ComponentType.Needs) as any;
 
     expect(retrieved.version).toBeDefined();
     expect(typeof retrieved.version).toBe('number');
@@ -186,8 +224,8 @@ describe('Save/Load Persistence Integration', () => {
   it('should serialize building entities', () => {
     const building = harness.createTestBuilding('shelter', { x: 50, y: 50 });
 
-    const buildingComp = building.getComponent('building');
-    const positionComp = building.getComponent('position');
+    const buildingComp = building.getComponent(ComponentType.Building);
+    const positionComp = building.getComponent(ComponentType.Position);
 
     expect(buildingComp).toBeDefined();
     expect(positionComp).toBeDefined();
@@ -196,8 +234,8 @@ describe('Save/Load Persistence Integration', () => {
   it('should preserve animal entities', () => {
     const animal = harness.createTestAnimal('chicken', { x: 30, y: 30 });
 
-    const animalComp = animal.getComponent('animal');
-    const positionComp = animal.getComponent('position');
+    const animalComp = animal.getComponent(ComponentType.Animal);
+    const positionComp = animal.getComponent(ComponentType.Position);
 
     expect(animalComp).toBeDefined();
     expect(positionComp).toBeDefined();
@@ -207,9 +245,15 @@ describe('Save/Load Persistence Integration', () => {
     // Create complex world
     for (let i = 0; i < 3; i++) {
       const agent = harness.createTestAgent({ x: i * 10, y: i * 10 });
-      agent.addComponent(createNeedsComponent(100 - i * 10, 90 - i * 5, 95, 85, 90));
+      agent.addComponent(new NeedsComponent({
+        hunger: (100 - i * 10) / 100,
+        energy: (90 - i * 5) / 100,
+        health: 0.95,
+        thirst: 0.85,
+        temperature: 37,
+      }));
       agent.addComponent(createCircadianComponent());
-      agent.addComponent(createMemoryComponent());
+      agent.addComponent(new MemoryComponent(agent.id));
     }
 
     for (let i = 0; i < 2; i++) {
@@ -233,9 +277,15 @@ describe('Save/Load Persistence Integration', () => {
 
   it('should component types be consistent', () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
-    agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 37,
+  }));
 
-    const needs = agent.getComponent('needs') as any;
+    const needs = agent.getComponent(ComponentType.Needs) as any;
 
     expect(needs.type).toBe('needs');
   });

@@ -3,6 +3,7 @@ import { WorldImpl } from '../ecs/index.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { AnimalComponent } from '../components/AnimalComponent.js';
 
+import { ComponentType } from '../types/ComponentType.js';
 describe('Animal Component and Entity', () => {
   let world: WorldImpl;
 
@@ -37,7 +38,7 @@ describe('Animal Component and Entity', () => {
 
       const component = new AnimalComponent(animalData);
       entity.addComponent(component);
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
 
       expect(animal).toBeDefined();
       expect(animal.id).toBe('animal-1');
@@ -168,7 +169,7 @@ describe('Animal Component and Entity', () => {
 
       const component = new AnimalComponent(wildAnimalData);
       entity.addComponent(component);
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
 
       expect(animal.wild).toBe(true);
       expect(animal.bondLevel).toBe(0);
@@ -202,7 +203,7 @@ describe('Animal Component and Entity', () => {
 
       const component = new AnimalComponent(tamedAnimalData);
       entity.addComponent(component);
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
 
       expect(animal.wild).toBe(false);
       expect(animal.ownerId).toBe('agent-1');
@@ -244,7 +245,7 @@ describe('Animal Component and Entity', () => {
 
         const component = new AnimalComponent(animalData);
         entity.addComponent(component);
-        const animal = entity.getComponent('animal') as AnimalComponent;
+        const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
         expect(animal.lifeStage).toBe(stage);
       });
     });
@@ -285,7 +286,7 @@ describe('Animal Component and Entity', () => {
 
         const component = new AnimalComponent(animalData);
         entity.addComponent(component);
-        const animal = entity.getComponent('animal') as AnimalComponent;
+        const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
         expect(animal.state).toBe(state);
       });
     });

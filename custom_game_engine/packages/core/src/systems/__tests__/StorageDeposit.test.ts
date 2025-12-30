@@ -15,6 +15,8 @@ import { createBuildingComponent } from '../../components/BuildingComponent.js';
 import type { RenderableComponent } from '../../components/RenderableComponent.js';
 import type { ResourceComponent } from '../../components/ResourceComponent.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
+import { BuildingType } from '../../types/BuildingType.js';
 describe('Storage Deposit System', () => {
   let world: WorldImpl;
   let eventBus: EventBusImpl;
@@ -40,7 +42,7 @@ describe('Storage Deposit System', () => {
       agent.addComponent(createPositionComponent(10, 10));
 
       agent.addComponent<MovementComponent>({
-        type: 'movement',
+        type: ComponentType.Movement,
         version: 1,
         velocityX: 0,
         velocityY: 0,
@@ -53,7 +55,7 @@ describe('Storage Deposit System', () => {
       (world as any)._addEntity(agent);
 
       // Should not throw when processing
-      const entities = world.query().with('agent').executeEntities();
+      const entities = world.query().with(ComponentType.Agent).executeEntities();
       expect(() => aiSystem.update(world, entities, 1)).not.toThrow();
     });
   });
@@ -65,7 +67,7 @@ describe('Storage Deposit System', () => {
       agent.addComponent(createPositionComponent(10, 10));
 
       agent.addComponent<MovementComponent>({
-        type: 'movement',
+        type: ComponentType.Movement,
         version: 1,
         velocityX: 0,
         velocityY: 0,
@@ -87,7 +89,7 @@ describe('Storage Deposit System', () => {
       storage.addComponent(createPositionComponent(15, 15));
 
       storage.addComponent<BuildingComponent>(
-        createBuildingComponent('storage-chest', 1, 100)
+        createBuildingComponent(BuildingType.StorageChest, 1, 100)
       );
 
       // Mark building as complete
@@ -99,7 +101,7 @@ describe('Storage Deposit System', () => {
       storage.addComponent<InventoryComponent>(createInventoryComponent(20, 500));
 
       storage.addComponent<RenderableComponent>({
-        type: 'renderable',
+        type: ComponentType.Renderable,
         version: 1,
         spriteId: 'storage-chest',
         tint: '#8B4513',
@@ -110,19 +112,19 @@ describe('Storage Deposit System', () => {
       (world as any)._addEntity(storage);
 
       // Run AI system to trigger deposit behavior
-      const entities = world.query().with('agent').executeEntities();
+      const entities = world.query().with(ComponentType.Agent).executeEntities();
       aiSystem.update(world, entities, 1);
 
       // Run movement system if needed
-      const movingEntities = world.query().with('movement').executeEntities();
+      const movingEntities = world.query().with(ComponentType.Movement).executeEntities();
       movementSystem.update(world, movingEntities, 1);
 
       // Agent should have pathfinding toward storage
-      const movement = agent.getComponent<MovementComponent>('movement');
+      const movement = agent.getComponent(ComponentType.Movement);
       expect(movement).toBeDefined();
 
       // Agent should still be in deposit_items mode (not switched to wander)
-      const agentComp = agent.getComponent<AgentComponent>('agent');
+      const agentComp = agent.getComponent(ComponentType.Agent);
       expect(agentComp?.behavior).toBe('deposit_items');
     });
 
@@ -132,7 +134,7 @@ describe('Storage Deposit System', () => {
       agent.addComponent(createPositionComponent(10, 10));
 
       agent.addComponent<MovementComponent>({
-        type: 'movement',
+        type: ComponentType.Movement,
         version: 1,
         velocityX: 0,
         velocityY: 0,
@@ -154,7 +156,7 @@ describe('Storage Deposit System', () => {
       storage.addComponent(createPositionComponent(10.5, 10));
 
       storage.addComponent<BuildingComponent>(
-        createBuildingComponent('storage-chest', 1, 100)
+        createBuildingComponent(BuildingType.StorageChest, 1, 100)
       );
 
       storage.updateComponent<BuildingComponent>('building', (current) => ({
@@ -165,7 +167,7 @@ describe('Storage Deposit System', () => {
       storage.addComponent<InventoryComponent>(createInventoryComponent(20, 500));
 
       storage.addComponent<RenderableComponent>({
-        type: 'renderable',
+        type: ComponentType.Renderable,
         version: 1,
         spriteId: 'storage-chest',
         tint: '#8B4513',
@@ -182,15 +184,15 @@ describe('Storage Deposit System', () => {
       });
 
       // Run AI system
-      const entities = world.query().with('agent').executeEntities();
+      const entities = world.query().with(ComponentType.Agent).executeEntities();
       aiSystem.update(world, entities, 1);
 
       // Flush events
       eventBus.flush();
 
       // Check items were transferred
-      const agentInv = agent.getComponent<InventoryComponent>('inventory');
-      const storageInv = storage.getComponent<InventoryComponent>('inventory');
+      const agentInv = agent.getComponent(ComponentType.Inventory);
+      const storageInv = storage.getComponent(ComponentType.Inventory);
 
       expect(agentInv).toBeDefined();
       expect(storageInv).toBeDefined();
@@ -210,7 +212,7 @@ describe('Storage Deposit System', () => {
       agent.addComponent(createPositionComponent(10, 10));
 
       agent.addComponent<MovementComponent>({
-        type: 'movement',
+        type: ComponentType.Movement,
         version: 1,
         velocityX: 0,
         velocityY: 0,
@@ -231,7 +233,7 @@ describe('Storage Deposit System', () => {
       storage.addComponent(createPositionComponent(10.5, 10));
 
       storage.addComponent<BuildingComponent>(
-        createBuildingComponent('storage-chest', 1, 100)
+        createBuildingComponent(BuildingType.StorageChest, 1, 100)
       );
 
       storage.updateComponent<BuildingComponent>('building', (current) => ({
@@ -242,7 +244,7 @@ describe('Storage Deposit System', () => {
       storage.addComponent<InventoryComponent>(createInventoryComponent(20, 500));
 
       storage.addComponent<RenderableComponent>({
-        type: 'renderable',
+        type: ComponentType.Renderable,
         version: 1,
         spriteId: 'storage-chest',
         tint: '#8B4513',
@@ -257,7 +259,7 @@ describe('Storage Deposit System', () => {
         eventData = event.data;
       });
 
-      const entities = world.query().with('agent').executeEntities();
+      const entities = world.query().with(ComponentType.Agent).executeEntities();
       aiSystem.update(world, entities, 1);
       eventBus.flush();
 
@@ -278,7 +280,7 @@ describe('Storage Deposit System', () => {
       agent.addComponent(createPositionComponent(10, 10));
 
       agent.addComponent<MovementComponent>({
-        type: 'movement',
+        type: ComponentType.Movement,
         version: 1,
         velocityX: 0,
         velocityY: 0,
@@ -305,7 +307,7 @@ describe('Storage Deposit System', () => {
       resource.addComponent(createPositionComponent(10.5, 10));
 
       resource.addComponent<ResourceComponent>({
-        type: 'resource',
+        type: ComponentType.Resource,
         version: 1,
         resourceType: 'wood',
         amount: 10,
@@ -315,7 +317,7 @@ describe('Storage Deposit System', () => {
       });
 
       resource.addComponent<RenderableComponent>({
-        type: 'renderable',
+        type: ComponentType.Renderable,
         version: 1,
         spriteId: 'tree',
         tint: '#228B22',
@@ -330,7 +332,7 @@ describe('Storage Deposit System', () => {
       storage.addComponent(createPositionComponent(15, 15));
 
       storage.addComponent<BuildingComponent>(
-        createBuildingComponent('storage-chest', 1, 100)
+        createBuildingComponent(BuildingType.StorageChest, 1, 100)
       );
 
       storage.updateComponent<BuildingComponent>('building', (current) => ({
@@ -341,7 +343,7 @@ describe('Storage Deposit System', () => {
       storage.addComponent<InventoryComponent>(createInventoryComponent(20, 500));
 
       storage.addComponent<RenderableComponent>({
-        type: 'renderable',
+        type: ComponentType.Renderable,
         version: 1,
         spriteId: 'storage-chest',
         tint: '#8B4513',
@@ -358,12 +360,12 @@ describe('Storage Deposit System', () => {
       });
 
       // Run update - agent should try to gather and hit inventory limit
-      const entities = world.query().with('agent').executeEntities();
+      const entities = world.query().with(ComponentType.Agent).executeEntities();
       aiSystem.update(world, entities, 1);
       eventBus.flush();
 
       // Agent should have switched to deposit_items
-      const agentCompAfter = agent.getComponent<AgentComponent>('agent');
+      const agentCompAfter = agent.getComponent(ComponentType.Agent);
       expect(agentCompAfter?.behavior).toBe('deposit_items');
 
       // Previous behavior should be saved
@@ -380,12 +382,12 @@ describe('Storage Deposit System', () => {
       storage.addComponent(createPositionComponent(10, 10));
 
       storage.addComponent<BuildingComponent>(
-        createBuildingComponent('storage-chest', 1, 100)
+        createBuildingComponent(BuildingType.StorageChest, 1, 100)
       );
 
       storage.addComponent<InventoryComponent>(createInventoryComponent(20, 500));
 
-      const inventory = storage.getComponent<InventoryComponent>('inventory');
+      const inventory = storage.getComponent(ComponentType.Inventory);
       expect(inventory).toBeDefined();
       expect(inventory!.maxWeight).toBe(500);
       expect(inventory!.maxSlots).toBe(20);
@@ -397,12 +399,12 @@ describe('Storage Deposit System', () => {
       storage.addComponent(createPositionComponent(10, 10));
 
       storage.addComponent<BuildingComponent>(
-        createBuildingComponent('storage-box', 1, 100)
+        createBuildingComponent(BuildingType.StorageBox, 1, 100)
       );
 
       storage.addComponent<InventoryComponent>(createInventoryComponent(10, 200));
 
-      const inventory = storage.getComponent<InventoryComponent>('inventory');
+      const inventory = storage.getComponent(ComponentType.Inventory);
       expect(inventory).toBeDefined();
       expect(inventory!.maxWeight).toBe(200);
       expect(inventory!.maxSlots).toBe(10);
@@ -416,7 +418,7 @@ describe('Storage Deposit System', () => {
       agent.addComponent(createPositionComponent(10, 10));
 
       agent.addComponent<MovementComponent>({
-        type: 'movement',
+        type: ComponentType.Movement,
         version: 1,
         velocityX: 0,
         velocityY: 0,
@@ -439,7 +441,7 @@ describe('Storage Deposit System', () => {
       storage.addComponent(createPositionComponent(10.5, 10));
 
       storage.addComponent<BuildingComponent>(
-        createBuildingComponent('storage-chest', 1, 100)
+        createBuildingComponent(BuildingType.StorageChest, 1, 100)
       );
 
       storage.updateComponent<BuildingComponent>('building', (current) => ({
@@ -454,7 +456,7 @@ describe('Storage Deposit System', () => {
       storage.addComponent<InventoryComponent>(storageInv);
 
       storage.addComponent<RenderableComponent>({
-        type: 'renderable',
+        type: ComponentType.Renderable,
         version: 1,
         spriteId: 'storage-chest',
         tint: '#8B4513',
@@ -464,12 +466,12 @@ describe('Storage Deposit System', () => {
 
       (world as any)._addEntity(storage);
 
-      const entities = world.query().with('agent').executeEntities();
+      const entities = world.query().with(ComponentType.Agent).executeEntities();
       aiSystem.update(world, entities, 1);
 
       // Check partial transfer
-      const finalAgentInv = agent.getComponent<InventoryComponent>('inventory');
-      const finalStorageInv = storage.getComponent<InventoryComponent>('inventory');
+      const finalAgentInv = agent.getComponent(ComponentType.Inventory);
+      const finalStorageInv = storage.getComponent(ComponentType.Inventory);
 
       expect(finalAgentInv).toBeDefined();
       expect(finalStorageInv).toBeDefined();
@@ -487,7 +489,7 @@ describe('Storage Deposit System', () => {
       agent.addComponent(createPositionComponent(10, 10));
 
       agent.addComponent<MovementComponent>({
-        type: 'movement',
+        type: ComponentType.Movement,
         version: 1,
         velocityX: 0,
         velocityY: 0,
@@ -508,7 +510,7 @@ describe('Storage Deposit System', () => {
       storage.addComponent(createPositionComponent(10.5, 10));
 
       storage.addComponent<BuildingComponent>(
-        createBuildingComponent('storage-chest', 1, 100)
+        createBuildingComponent(BuildingType.StorageChest, 1, 100)
       );
 
       storage.updateComponent<BuildingComponent>('building', (current) => ({
@@ -523,7 +525,7 @@ describe('Storage Deposit System', () => {
       storage.addComponent<InventoryComponent>(storageInv);
 
       storage.addComponent<RenderableComponent>({
-        type: 'renderable',
+        type: ComponentType.Renderable,
         version: 1,
         spriteId: 'storage-chest',
         tint: '#8B4513',
@@ -538,7 +540,7 @@ describe('Storage Deposit System', () => {
         eventEmitted = true;
       });
 
-      const entities = world.query().with('agent').executeEntities();
+      const entities = world.query().with(ComponentType.Agent).executeEntities();
       aiSystem.update(world, entities, 1);
       eventBus.flush();
 
@@ -552,7 +554,7 @@ describe('Storage Deposit System', () => {
       agent.addComponent(createPositionComponent(10, 10));
 
       agent.addComponent<MovementComponent>({
-        type: 'movement',
+        type: ComponentType.Movement,
         version: 1,
         velocityX: 0,
         velocityY: 0,
@@ -580,7 +582,7 @@ describe('Storage Deposit System', () => {
       storage.addComponent(createPositionComponent(10.5, 10));
 
       storage.addComponent<BuildingComponent>(
-        createBuildingComponent('storage-chest', 1, 100)
+        createBuildingComponent(BuildingType.StorageChest, 1, 100)
       );
 
       storage.updateComponent<BuildingComponent>('building', (current) => ({
@@ -591,7 +593,7 @@ describe('Storage Deposit System', () => {
       storage.addComponent<InventoryComponent>(createInventoryComponent(20, 500));
 
       storage.addComponent<RenderableComponent>({
-        type: 'renderable',
+        type: ComponentType.Renderable,
         version: 1,
         spriteId: 'storage-chest',
         tint: '#8B4513',
@@ -601,11 +603,11 @@ describe('Storage Deposit System', () => {
 
       (world as any)._addEntity(storage);
 
-      const entities = world.query().with('agent').executeEntities();
+      const entities = world.query().with(ComponentType.Agent).executeEntities();
       aiSystem.update(world, entities, 1);
 
       // Agent should return to gather behavior
-      const agentCompAfter = agent.getComponent<AgentComponent>('agent');
+      const agentCompAfter = agent.getComponent(ComponentType.Agent);
       expect(agentCompAfter?.behavior).toBe('gather');
       expect(agentCompAfter?.behaviorState?.targetResourceId).toBe('wood-resource');
     });
@@ -615,7 +617,7 @@ describe('Storage Deposit System', () => {
       agent.addComponent(createPositionComponent(10, 10));
 
       agent.addComponent<MovementComponent>({
-        type: 'movement',
+        type: ComponentType.Movement,
         version: 1,
         velocityX: 0,
         velocityY: 0,
@@ -636,7 +638,7 @@ describe('Storage Deposit System', () => {
       storage.addComponent(createPositionComponent(10.5, 10));
 
       storage.addComponent<BuildingComponent>(
-        createBuildingComponent('storage-chest', 1, 100)
+        createBuildingComponent(BuildingType.StorageChest, 1, 100)
       );
 
       storage.updateComponent<BuildingComponent>('building', (current) => ({
@@ -647,7 +649,7 @@ describe('Storage Deposit System', () => {
       storage.addComponent<InventoryComponent>(createInventoryComponent(20, 500));
 
       storage.addComponent<RenderableComponent>({
-        type: 'renderable',
+        type: ComponentType.Renderable,
         version: 1,
         spriteId: 'storage-chest',
         tint: '#8B4513',
@@ -657,11 +659,11 @@ describe('Storage Deposit System', () => {
 
       (world as any)._addEntity(storage);
 
-      const entities = world.query().with('agent').executeEntities();
+      const entities = world.query().with(ComponentType.Agent).executeEntities();
       aiSystem.update(world, entities, 1);
 
       // Agent should default to wander
-      const agentCompAfter = agent.getComponent<AgentComponent>('agent');
+      const agentCompAfter = agent.getComponent(ComponentType.Agent);
       expect(agentCompAfter?.behavior).toBe('wander');
     });
   });
@@ -672,7 +674,7 @@ describe('Storage Deposit System', () => {
       agent.addComponent(createPositionComponent(10, 10));
 
       agent.addComponent<MovementComponent>({
-        type: 'movement',
+        type: ComponentType.Movement,
         version: 1,
         velocityX: 0,
         velocityY: 0,
@@ -694,14 +696,14 @@ describe('Storage Deposit System', () => {
         eventEmitted = true;
       });
 
-      const entities = world.query().with('agent').executeEntities();
+      const entities = world.query().with(ComponentType.Agent).executeEntities();
       aiSystem.update(world, entities, 1);
       eventBus.flush();
 
       expect(eventEmitted).toBe(true);
 
       // Agent should switch to wander
-      const agentComp = agent.getComponent<AgentComponent>('agent');
+      const agentComp = agent.getComponent(ComponentType.Agent);
       expect(agentComp?.behavior).toBe('wander');
     });
 
@@ -710,7 +712,7 @@ describe('Storage Deposit System', () => {
       agent.addComponent(createPositionComponent(10, 10));
 
       agent.addComponent<MovementComponent>({
-        type: 'movement',
+        type: ComponentType.Movement,
         version: 1,
         velocityX: 0,
         velocityY: 0,
@@ -732,7 +734,7 @@ describe('Storage Deposit System', () => {
       storage.addComponent(createPositionComponent(10.5, 10)); // Adjacent to agent
 
       storage.addComponent<BuildingComponent>(
-        createBuildingComponent('storage-chest', 1, 100)
+        createBuildingComponent(BuildingType.StorageChest, 1, 100)
       );
 
       storage.updateComponent<BuildingComponent>('building', (current) => ({
@@ -749,7 +751,7 @@ describe('Storage Deposit System', () => {
       storage.addComponent<InventoryComponent>(storageInv);
 
       storage.addComponent<RenderableComponent>({
-        type: 'renderable',
+        type: ComponentType.Renderable,
         version: 1,
         spriteId: 'storage-chest',
         tint: '#8B4513',
@@ -764,14 +766,14 @@ describe('Storage Deposit System', () => {
         eventEmitted = true;
       });
 
-      const entities = world.query().with('agent').executeEntities();
+      const entities = world.query().with(ComponentType.Agent).executeEntities();
       aiSystem.update(world, entities, 1);
       eventBus.flush();
 
       expect(eventEmitted).toBe(true);
 
       // Agent should switch to build behavior to create more storage
-      const agentComp = agent.getComponent<AgentComponent>('agent');
+      const agentComp = agent.getComponent(ComponentType.Agent);
       expect(agentComp?.behavior).toBe('build');
       expect(agentComp?.behaviorState?.buildingType).toBe('storage-chest');
     });
@@ -781,7 +783,7 @@ describe('Storage Deposit System', () => {
       agent.addComponent(createPositionComponent(10, 10));
 
       agent.addComponent<MovementComponent>({
-        type: 'movement',
+        type: ComponentType.Movement,
         version: 1,
         velocityX: 0,
         velocityY: 0,
@@ -802,13 +804,13 @@ describe('Storage Deposit System', () => {
       const storage = new EntityImpl(createEntityId(), world.tick);
       storage.addComponent(createPositionComponent(10.5, 10));
 
-      const building = createBuildingComponent('storage-chest', 1, 50); // progress = 50, so isComplete = false
+      const building = createBuildingComponent(BuildingType.StorageChest, 1, 50); // progress = 50, so isComplete = false
       storage.addComponent<BuildingComponent>(building);
 
       storage.addComponent<InventoryComponent>(createInventoryComponent(20, 500));
 
       storage.addComponent<RenderableComponent>({
-        type: 'renderable',
+        type: ComponentType.Renderable,
         version: 1,
         spriteId: 'storage-chest',
         tint: '#8B4513',
@@ -823,14 +825,14 @@ describe('Storage Deposit System', () => {
         eventEmitted = true;
       });
 
-      const entities = world.query().with('agent').executeEntities();
+      const entities = world.query().with(ComponentType.Agent).executeEntities();
       aiSystem.update(world, entities, 1);
       eventBus.flush();
 
       // Should treat incomplete storage as non-existent
       expect(eventEmitted).toBe(true);
 
-      const agentComp = agent.getComponent<AgentComponent>('agent');
+      const agentComp = agent.getComponent(ComponentType.Agent);
       expect(agentComp?.behavior).toBe('wander');
     });
   });

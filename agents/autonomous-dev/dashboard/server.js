@@ -1461,7 +1461,7 @@ app.post('/api/work-orders/:name/archive', (req, res) => {
         const workOrderName = req.params.name;
         const sourcePath = path.join(WORK_ORDERS_DIR, workOrderName);
         const archiveDir = path.join(WORK_ORDERS_DIR, '_archived');
-        const targetPath = path.join(archiveDir, workOrderName);
+        let targetPath = path.join(archiveDir, workOrderName);
 
         // Check if work order exists
         if (!fs.existsSync(sourcePath)) {
@@ -1471,6 +1471,12 @@ app.post('/api/work-orders/:name/archive', (req, res) => {
         // Create archive directory if it doesn't exist
         if (!fs.existsSync(archiveDir)) {
             fs.mkdirSync(archiveDir, { recursive: true });
+        }
+
+        // If target already exists, add timestamp to make unique
+        if (fs.existsSync(targetPath)) {
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            targetPath = path.join(archiveDir, `${workOrderName}_${timestamp}`);
         }
 
         // Move the work order to archive

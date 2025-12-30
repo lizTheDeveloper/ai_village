@@ -4,7 +4,7 @@ import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { GovernanceDataSystem } from '../GovernanceDataSystem.js';
 import { createIdentityComponent } from '../../components/IdentityComponent.js';
-import { createNeedsComponent } from '../../components/NeedsComponent.js';
+import { NeedsComponent } from '../../components/NeedsComponent.js';
 import { createBuildingComponent } from '../../components/BuildingComponent.js';
 import { createTownHallComponent } from '../../components/TownHallComponent.js';
 import { createCensusBureauComponent } from '../../components/CensusBureauComponent.js';
@@ -14,6 +14,8 @@ import type { TownHallComponent } from '../../components/TownHallComponent.js';
 import type { CensusBureauComponent } from '../../components/CensusBureauComponent.js';
 import type { HealthClinicComponent } from '../../components/HealthClinicComponent.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
+import { BuildingType } from '../../types/BuildingType.js';
 describe('GovernanceDataSystem Integration', () => {
   let eventBus: EventBusImpl;
   let world: WorldImpl;
@@ -30,7 +32,7 @@ describe('GovernanceDataSystem Integration', () => {
     it('should track population count in TownHall', () => {
       // Create TownHall building
       const townHall = new EntityImpl(createEntityId(), 0);
-      townHall.addComponent(createBuildingComponent('town-hall', 1, 100));
+      townHall.addComponent(createBuildingComponent(BuildingType.TownHall, 1, 100));
       townHall.addComponent(createTownHallComponent());
       (world as any)._addEntity(townHall);
 
@@ -55,7 +57,7 @@ describe('GovernanceDataSystem Integration', () => {
     it('should adjust data quality based on building condition', () => {
       // Create damaged TownHall (condition = 60)
       const townHall = new EntityImpl(createEntityId(), 0);
-      const buildingComp = createBuildingComponent('town-hall', 1, 100);
+      const buildingComp = createBuildingComponent(BuildingType.TownHall, 1, 100);
       buildingComp.condition = 60;
       townHall.addComponent(buildingComp);
       townHall.addComponent(createTownHallComponent());
@@ -73,7 +75,7 @@ describe('GovernanceDataSystem Integration', () => {
     it('should mark data unavailable for destroyed building', () => {
       // Create destroyed TownHall (condition = 40)
       const townHall = new EntityImpl(createEntityId(), 0);
-      const buildingComp = createBuildingComponent('town-hall', 1, 100);
+      const buildingComp = createBuildingComponent(BuildingType.TownHall, 1, 100);
       buildingComp.condition = 40;
       townHall.addComponent(buildingComp);
       townHall.addComponent(createTownHallComponent());
@@ -96,7 +98,7 @@ describe('GovernanceDataSystem Integration', () => {
 
       // Create TownHall
       const townHall = new EntityImpl(createEntityId(), 0);
-      townHall.addComponent(createBuildingComponent('town-hall', 1, 100));
+      townHall.addComponent(createBuildingComponent(BuildingType.TownHall, 1, 100));
       townHall.addComponent(createTownHallComponent());
       (world as any)._addEntity(townHall);
 
@@ -121,7 +123,7 @@ describe('GovernanceDataSystem Integration', () => {
     it('should calculate replacement rate from births and deaths', () => {
       // Create CensusBureau
       const bureau = new EntityImpl(createEntityId(), 0);
-      bureau.addComponent(createBuildingComponent('census-bureau', 1, 100));
+      bureau.addComponent(createBuildingComponent(BuildingType.CensusBureau, 1, 100));
       bureau.addComponent(createCensusBureauComponent());
       (world as any)._addEntity(bureau);
 
@@ -133,7 +135,7 @@ describe('GovernanceDataSystem Integration', () => {
       }
 
       // Trigger death event (recorded immediately in event handler)
-      const agent1 = world.query().with('identity').executeEntities()[0];
+      const agent1 = world.query().with(ComponentType.Identity).executeEntities()[0];
       eventBus.emitImmediate({
         type: 'agent:starved',
         data: { agentId: agent1.id },
@@ -153,7 +155,7 @@ describe('GovernanceDataSystem Integration', () => {
     it('should calculate extinction risk based on population and replacement rate', () => {
       // Create CensusBureau
       const bureau = new EntityImpl(createEntityId(), 0);
-      bureau.addComponent(createBuildingComponent('census-bureau', 1, 100));
+      bureau.addComponent(createBuildingComponent(BuildingType.CensusBureau, 1, 100));
       bureau.addComponent(createCensusBureauComponent());
       (world as any)._addEntity(bureau);
 
@@ -175,7 +177,7 @@ describe('GovernanceDataSystem Integration', () => {
     it('should improve data quality when staffed', () => {
       // Create CensusBureau with staff
       const bureau = new EntityImpl(createEntityId(), 0);
-      const buildingComp = createBuildingComponent('census-bureau', 1, 100);
+      const buildingComp = createBuildingComponent(BuildingType.CensusBureau, 1, 100);
       buildingComp.currentStaff = ['staff-agent-id'];
       bureau.addComponent(buildingComp);
       bureau.addComponent(createCensusBureauComponent());
@@ -193,7 +195,7 @@ describe('GovernanceDataSystem Integration', () => {
     it('should have stale data quality when unstaffed', () => {
       // Create CensusBureau without staff
       const bureau = new EntityImpl(createEntityId(), 0);
-      const buildingComp = createBuildingComponent('census-bureau', 1, 100);
+      const buildingComp = createBuildingComponent(BuildingType.CensusBureau, 1, 100);
       buildingComp.currentStaff = [];
       bureau.addComponent(buildingComp);
       bureau.addComponent(createCensusBureauComponent());
@@ -214,26 +216,44 @@ describe('GovernanceDataSystem Integration', () => {
     it('should categorize agents by health status', () => {
       // Create HealthClinic
       const clinic = new EntityImpl(createEntityId(), 0);
-      clinic.addComponent(createBuildingComponent('health-clinic', 1, 100));
+      clinic.addComponent(createBuildingComponent(BuildingType.HealthClinic, 1, 100));
       clinic.addComponent(createHealthClinicComponent());
       (world as any)._addEntity(clinic);
 
       // Create healthy agent (hunger=80, energy=80)
       const healthyAgent = new EntityImpl(createEntityId(), 0);
       healthyAgent.addComponent(createAgentComponent());
-      healthyAgent.addComponent(createNeedsComponent(80, 80, 80, 0, 0));
+      healthyAgent.addComponent(new NeedsComponent({
+    hunger: 0.8,
+    energy: 0.8,
+    health: 0.8,
+    thirst: 0.0,
+    temperature: 0.0,
+  }));
       (world as any)._addEntity(healthyAgent);
 
       // Create sick agent (hunger=50, energy=50)
       const sickAgent = new EntityImpl(createEntityId(), 0);
       sickAgent.addComponent(createAgentComponent());
-      sickAgent.addComponent(createNeedsComponent(50, 50, 50, 0, 0));
+      sickAgent.addComponent(new NeedsComponent({
+    hunger: 0.5,
+    energy: 0.5,
+    health: 0.5,
+    thirst: 0.0,
+    temperature: 0.0,
+  }));
       (world as any)._addEntity(sickAgent);
 
       // Create critical agent (hunger=20, energy=20)
       const criticalAgent = new EntityImpl(createEntityId(), 0);
       criticalAgent.addComponent(createAgentComponent());
-      criticalAgent.addComponent(createNeedsComponent(20, 20, 20, 0, 0));
+      criticalAgent.addComponent(new NeedsComponent({
+    hunger: 0.2,
+    energy: 0.2,
+    health: 0.2,
+    thirst: 0.0,
+    temperature: 0.0,
+  }));
       (world as any)._addEntity(criticalAgent);
 
       // Run system
@@ -249,7 +269,7 @@ describe('GovernanceDataSystem Integration', () => {
     it('should track malnutrition counts', () => {
       // Create HealthClinic
       const clinic = new EntityImpl(createEntityId(), 0);
-      clinic.addComponent(createBuildingComponent('health-clinic', 1, 100));
+      clinic.addComponent(createBuildingComponent(BuildingType.HealthClinic, 1, 100));
       clinic.addComponent(createHealthClinicComponent());
       (world as any)._addEntity(clinic);
 
@@ -257,14 +277,26 @@ describe('GovernanceDataSystem Integration', () => {
       for (let i = 0; i < 3; i++) {
         const agent = new EntityImpl(createEntityId(), 0);
         agent.addComponent(createAgentComponent());
-        agent.addComponent(createNeedsComponent(20, 50, 50, 0, 0)); // Low hunger
+        agent.addComponent(new NeedsComponent({
+    hunger: 0.2,
+    energy: 0.5,
+    health: 0.5,
+    thirst: 0.0,
+    temperature: 0.0,
+  })); // Low hunger
         (world as any)._addEntity(agent);
       }
 
       // Create healthy agent
       const healthyAgent = new EntityImpl(createEntityId(), 0);
       healthyAgent.addComponent(createAgentComponent());
-      healthyAgent.addComponent(createNeedsComponent(80, 80, 80, 0, 0));
+      healthyAgent.addComponent(new NeedsComponent({
+    hunger: 0.8,
+    energy: 0.8,
+    health: 0.8,
+    thirst: 0.0,
+    temperature: 0.0,
+  }));
       (world as any)._addEntity(healthyAgent);
 
       // Run system
@@ -278,7 +310,7 @@ describe('GovernanceDataSystem Integration', () => {
     it('should calculate mortality causes from death log', () => {
       // Create HealthClinic
       const clinic = new EntityImpl(createEntityId(), 0);
-      clinic.addComponent(createBuildingComponent('health-clinic', 1, 100));
+      clinic.addComponent(createBuildingComponent(BuildingType.HealthClinic, 1, 100));
       clinic.addComponent(createHealthClinicComponent());
       (world as any)._addEntity(clinic);
 
@@ -290,7 +322,7 @@ describe('GovernanceDataSystem Integration', () => {
       }
 
       // Trigger 3 starvation deaths and 2 collapsed deaths (recorded immediately in event handlers)
-      const agents = world.query().with('identity').executeEntities();
+      const agents = world.query().with(ComponentType.Identity).executeEntities();
       eventBus.emitImmediate({
         type: 'agent:starved',
         data: { agentId: agents[0].id },
@@ -329,7 +361,7 @@ describe('GovernanceDataSystem Integration', () => {
     it('should calculate recommended staff based on population', () => {
       // Create HealthClinic
       const clinic = new EntityImpl(createEntityId(), 0);
-      clinic.addComponent(createBuildingComponent('health-clinic', 1, 100));
+      clinic.addComponent(createBuildingComponent(BuildingType.HealthClinic, 1, 100));
       clinic.addComponent(createHealthClinicComponent());
       (world as any)._addEntity(clinic);
 
@@ -337,7 +369,13 @@ describe('GovernanceDataSystem Integration', () => {
       for (let i = 0; i < 45; i++) {
         const agent = new EntityImpl(createEntityId(), 0);
         agent.addComponent(createAgentComponent());
-        agent.addComponent(createNeedsComponent(70, 70, 70, 0, 0));
+        agent.addComponent(new NeedsComponent({
+    hunger: 0.7,
+    energy: 0.7,
+    health: 0.7,
+    thirst: 0.0,
+    temperature: 0.0,
+  }));
         (world as any)._addEntity(agent);
       }
 
@@ -352,7 +390,7 @@ describe('GovernanceDataSystem Integration', () => {
     it('should adjust data quality based on staffing', () => {
       // Create HealthClinic with staff
       const clinic = new EntityImpl(createEntityId(), 0);
-      const buildingComp = createBuildingComponent('health-clinic', 1, 100);
+      const buildingComp = createBuildingComponent(BuildingType.HealthClinic, 1, 100);
       buildingComp.currentStaff = ['healer-agent-id'];
       clinic.addComponent(buildingComp);
       clinic.addComponent(createHealthClinicComponent());
@@ -433,12 +471,10 @@ describe('GovernanceDataSystem Integration', () => {
       });
 
       // Verify error was logged
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Error in event handler'),
-        expect.objectContaining({
-          message: expect.stringContaining("missing required 'identity' component")
-        })
-      );
+      expect(consoleErrorSpy).toHaveBeenCalled();
+      const errorCall = consoleErrorSpy.mock.calls[0];
+      expect(errorCall[0]).toContain('Error in event handler');
+      expect(errorCall[1].message).toMatch(/missing required.*identity.*component/i);
 
       consoleErrorSpy.mockRestore();
     });
@@ -448,12 +484,12 @@ describe('GovernanceDataSystem Integration', () => {
     it('should update all TownHalls independently', () => {
       // Create two TownHalls
       const townHall1 = new EntityImpl(createEntityId(), 0);
-      townHall1.addComponent(createBuildingComponent('town-hall', 1, 100));
+      townHall1.addComponent(createBuildingComponent(BuildingType.TownHall, 1, 100));
       townHall1.addComponent(createTownHallComponent());
       (world as any)._addEntity(townHall1);
 
       const townHall2 = new EntityImpl(createEntityId(), 0);
-      const building2 = createBuildingComponent('town-hall', 1, 100);
+      const building2 = createBuildingComponent(BuildingType.TownHall, 1, 100);
       building2.condition = 60; // Damaged
       townHall2.addComponent(building2);
       townHall2.addComponent(createTownHallComponent());

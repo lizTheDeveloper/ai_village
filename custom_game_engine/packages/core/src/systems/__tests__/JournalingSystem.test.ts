@@ -6,7 +6,7 @@ import { SemanticMemoryComponent } from '../../components/SemanticMemoryComponen
 import { SocialMemoryComponent } from '../../components/SocialMemoryComponent';
 import { JournalComponent } from '../../components/JournalComponent';
 import { createAgentComponent } from '../../components/AgentComponent';
-import { createPersonalityComponent } from '../../components/PersonalityComponent';
+import { PersonalityComponent } from '../../components/PersonalityComponent';
 import { EventBus } from '../../EventBus';
 
 describe('JournalingSystem', () => {
@@ -26,12 +26,12 @@ describe('JournalingSystem', () => {
     agent.addComponent(agentComp);
 
     // Add PersonalityComponent (0-100 scale)
-    const personality = createPersonalityComponent({
-      openness: 70,
-      conscientiousness: 80,
-      extraversion: 20, // Introverted
-      agreeableness: 60,
-      neuroticism: 40
+    const personality = new PersonalityComponent({
+      openness: 0.7,
+      conscientiousness: 0.8,
+      extraversion: 0.2, // Introverted
+      agreeableness: 0.6,
+      neuroticism: 0.4
     });
     agent.addComponent(personality);
 
@@ -65,24 +65,24 @@ describe('JournalingSystem', () => {
     it('should be more likely for introverted agents', () => {
       const introvert = world.createEntity();
       introvert.addComponent(createAgentComponent());
-      introvert.addComponent(createPersonalityComponent({
-        openness: 70,
-        conscientiousness: 80,
-        extraversion: 10, // Very introverted
-        agreeableness: 60,
-        neuroticism: 40
+      introvert.addComponent(new PersonalityComponent({
+        openness: 0.7,
+        conscientiousness: 0.8,
+        extraversion: 0.1, // Very introverted
+        agreeableness: 0.6,
+        neuroticism: 0.4
       }));
       introvert.addComponent(EpisodicMemoryComponent, {});
       introvert.addComponent(JournalComponent, {});
 
       const extrovert = world.createEntity();
       extrovert.addComponent(createAgentComponent());
-      extrovert.addComponent(createPersonalityComponent({
-        openness: 50,
-        conscientiousness: 60,
-        extraversion: 90, // Very extroverted
-        agreeableness: 70,
-        neuroticism: 30
+      extrovert.addComponent(new PersonalityComponent({
+        openness: 0.5,
+        conscientiousness: 0.6,
+        extraversion: 0.9, // Very extroverted
+        agreeableness: 0.7,
+        neuroticism: 0.3
       }));
       extrovert.addComponent(EpisodicMemoryComponent, {});
       extrovert.addComponent(JournalComponent, {});
@@ -115,24 +115,24 @@ describe('JournalingSystem', () => {
     it('should be more likely for open agents', () => {
       const openAgent = world.createEntity();
       openAgent.addComponent(createAgentComponent());
-      openAgent.addComponent(createPersonalityComponent({
-        openness: 95, // Very open
-        conscientiousness: 70,
-        extraversion: 50,
-        agreeableness: 60,
-        neuroticism: 40
+      openAgent.addComponent(new PersonalityComponent({
+        openness: 0.95, // Very open
+        conscientiousness: 0.7,
+        extraversion: 0.5,
+        agreeableness: 0.6,
+        neuroticism: 0.4
       }));
       openAgent.addComponent(EpisodicMemoryComponent, {});
       openAgent.addComponent(JournalComponent, {});
 
       const closedAgent = world.createEntity();
       closedAgent.addComponent(createAgentComponent());
-      closedAgent.addComponent(createPersonalityComponent({
-        openness: 10, // Very closed
-        conscientiousness: 70,
-        extraversion: 50,
-        agreeableness: 60,
-        neuroticism: 40
+      closedAgent.addComponent(new PersonalityComponent({
+        openness: 0.1, // Very closed
+        conscientiousness: 0.7,
+        extraversion: 0.5,
+        agreeableness: 0.6,
+        neuroticism: 0.4
       }));
       closedAgent.addComponent(EpisodicMemoryComponent, {});
       closedAgent.addComponent(JournalComponent, {});
@@ -153,24 +153,24 @@ describe('JournalingSystem', () => {
     it('should be more likely for conscientious agents', () => {
       const conscientious = world.createEntity();
       conscientious.addComponent(createAgentComponent());
-      conscientious.addComponent(createPersonalityComponent({
-        openness: 70,
-        conscientiousness: 95, // Very conscientious
-        extraversion: 50,
-        agreeableness: 60,
-        neuroticism: 40
+      conscientious.addComponent(new PersonalityComponent({
+        openness: 0.7,
+        conscientiousness: 0.95, // Very conscientious
+        extraversion: 0.5,
+        agreeableness: 0.6,
+        neuroticism: 0.4
       }));
       conscientious.addComponent(EpisodicMemoryComponent, {});
       conscientious.addComponent(JournalComponent, {});
 
       const unconscientious = world.createEntity();
       unconscientious.addComponent(createAgentComponent());
-      unconscientious.addComponent(createPersonalityComponent({
-        openness: 70,
-        conscientiousness: 10, // Not conscientious
-        extraversion: 50,
-        agreeableness: 60,
-        neuroticism: 40
+      unconscientious.addComponent(new PersonalityComponent({
+        openness: 0.7,
+        conscientiousness: 0.1, // Not conscientious
+        extraversion: 0.5,
+        agreeableness: 0.6,
+        neuroticism: 0.4
       }));
       unconscientious.addComponent(EpisodicMemoryComponent, {});
       unconscientious.addComponent(JournalComponent, {});

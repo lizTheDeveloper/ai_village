@@ -1,5 +1,49 @@
 import type { WindowManager } from './WindowManager.js';
 import type { Renderer } from './Renderer.js';
+import type { WindowMenuCategory, ManagedWindow } from './types/WindowTypes.js';
+
+/**
+ * Menu item definition
+ */
+interface MenuItem {
+  type: 'window' | 'action' | 'divider' | 'submenu';
+  label?: string;
+  windowId?: string;
+  action?: string;
+  shortcut?: string;
+  items?: MenuItem[];
+  category?: WindowMenuCategory;
+}
+
+/**
+ * Menu definition
+ */
+interface MenuDefinition {
+  id: string;
+  label: string;
+  width: number;
+}
+
+/**
+ * Category display info
+ */
+interface CategoryInfo {
+  label: string;
+  order: number;
+}
+
+const CATEGORY_INFO: Record<WindowMenuCategory, CategoryInfo> = {
+  info: { label: 'Info Panels', order: 1 },
+  economy: { label: 'Economy', order: 2 },
+  social: { label: 'Social', order: 3 },
+  farming: { label: 'Farming', order: 4 },
+  animals: { label: 'Animals', order: 5 },
+  magic: { label: 'Magic', order: 6 },
+  divinity: { label: 'Divine', order: 7 },
+  settings: { label: 'Settings', order: 8 },
+  default: { label: 'Other', order: 9 },
+  dev: { label: 'Developer', order: 99 },
+};
 
 /**
  * Menu bar component that displays at the top of the game screen.
@@ -10,11 +54,24 @@ export class MenuBar {
   private renderer: Renderer | null = null;
   private canvas: HTMLCanvasElement;
   private height: number = 30;
-  private isWindowMenuOpen: boolean = false;
+  private openMenuId: string | null = null;
   private hoveredMenuItem: string | null = null;
+  private devMode: boolean = true; // Can be toggled
 
-  // Menu button bounds for click detection
-  private windowMenuBounds = { x: 50, y: 0, width: 70, height: 30 };
+  // Menu definitions
+  private menus: MenuDefinition[] = [
+    { id: 'file', label: 'File', width: 40 },
+    { id: 'agent', label: 'Agent', width: 55 },
+    { id: 'economy', label: 'Economy', width: 75 },
+    { id: 'farming', label: 'Farming', width: 70 },
+    { id: 'animals', label: 'Animals', width: 65 },
+    { id: 'magic', label: 'Magic', width: 55 },
+    { id: 'divinity', label: 'Divinity', width: 70 },
+    { id: 'dev', label: 'Dev', width: 40 },
+  ];
+
+  // Computed menu bounds
+  private menuBounds: Map<string, { x: number; y: number; width: number; height: number }> = new Map();
 
   // View toggle buttons
   private viewToggles = [
@@ -34,9 +91,26 @@ export class MenuBar {
 
     this.windowManager = windowManager;
     this.canvas = canvas;
+    this.computeMenuBounds();
+  }
 
-    // Calculate view toggle button positions (to the right of Window menu)
-    let currentX = this.windowMenuBounds.x + this.windowMenuBounds.width + 10;
+  /**
+   * Compute menu button positions
+   */
+  private computeMenuBounds(): void {
+    let currentX = 10;
+    for (const menu of this.menus) {
+      this.menuBounds.set(menu.id, {
+        x: currentX,
+        y: 0,
+        width: menu.width,
+        height: this.height,
+      });
+      currentX += menu.width + 5;
+    }
+
+    // Calculate view toggle button positions (after menus)
+    currentX += 10;
     for (const toggle of this.viewToggles) {
       toggle.x = currentX;
       currentX += toggle.width + 5;
@@ -48,6 +122,13 @@ export class MenuBar {
    */
   setRenderer(renderer: Renderer): void {
     this.renderer = renderer;
+  }
+
+  /**
+   * Enable/disable dev mode (controls Dev menu visibility)
+   */
+  setDevMode(enabled: boolean): void {
+    this.devMode = enabled;
   }
 
   /**
@@ -63,19 +144,22 @@ export class MenuBar {
    */
   handleClick(x: number, y: number): boolean {
     // Check if clicking on a menu item in the dropdown (must check FIRST, before closing menu)
-    if (this.isWindowMenuOpen) {
-      const dropdownY = this.windowMenuBounds.y + this.windowMenuBounds.height;
-      // If click is below menu bar and within dropdown X range, handle as dropdown click
-      if (y >= dropdownY && x >= this.windowMenuBounds.x) {
-        return this.handleWindowMenuItemClick(x, y);
+    if (this.openMenuId) {
+      const bounds = this.menuBounds.get(this.openMenuId);
+      if (bounds) {
+        const dropdownY = bounds.y + bounds.height;
+        // If click is below menu bar, check dropdown
+        if (y >= dropdownY) {
+          return this.handleDropdownClick(this.openMenuId, x, y);
+        }
       }
     }
 
     // Check if click is within menu bar area
     if (y < 0 || y > this.height) {
       // Close menu if clicking outside
-      if (this.isWindowMenuOpen) {
-        this.isWindowMenuOpen = false;
+      if (this.openMenuId) {
+        this.openMenuId = null;
         return true;
       }
       return false;
@@ -96,109 +180,502 @@ export class MenuBar {
       }
     }
 
-    // Check if clicking on "Window" menu button
-    if (x >= this.windowMenuBounds.x &&
-        x <= this.windowMenuBounds.x + this.windowMenuBounds.width &&
-        y >= this.windowMenuBounds.y &&
-        y <= this.windowMenuBounds.y + this.windowMenuBounds.height) {
-      this.isWindowMenuOpen = !this.isWindowMenuOpen;
-      return true;
+    // Check if clicking on menu buttons
+    for (const menu of this.menus) {
+      // Skip dev menu if not in dev mode
+      if (menu.id === 'dev' && !this.devMode) continue;
+
+      const bounds = this.menuBounds.get(menu.id);
+      if (!bounds) continue;
+
+      if (x >= bounds.x && x <= bounds.x + bounds.width &&
+          y >= bounds.y && y <= bounds.y + bounds.height) {
+        // Toggle this menu
+        this.openMenuId = this.openMenuId === menu.id ? null : menu.id;
+        return true;
+      }
     }
 
     return false;
   }
 
   /**
-   * Handle click on an item in the Window menu dropdown.
+   * Handle click in a dropdown menu
    */
-  private handleWindowMenuItemClick(x: number, y: number): boolean {
-    const dropdownX = this.windowMenuBounds.x;
-    const dropdownY = this.windowMenuBounds.y + this.windowMenuBounds.height; // Fixed: use y + height
-    const dropdownWidth = 250;
+  private handleDropdownClick(menuId: string, x: number, y: number): boolean {
+    const bounds = this.menuBounds.get(menuId);
+    if (!bounds) return false;
+
+    const dropdownX = bounds.x;
+    const dropdownY = bounds.y + bounds.height;
+    const dropdownWidth = this.getDropdownWidth(menuId);
+    const items = this.getMenuItems(menuId);
     const itemHeight = 24;
-
-    // Get all windows for the menu
-    const windows = Array.from(this.windowManager['windows'].values());
-    const menuWindows = windows.filter(w => w.config.showInWindowList !== false);
-
-    // Calculate dropdown height
-    const itemCount = menuWindows.length + 6; // Windows + dividers + actions
-    const dropdownHeight = itemCount * itemHeight;
+    const dropdownHeight = this.calculateDropdownHeight(items);
 
     // Check if click is within dropdown bounds
     if (x < dropdownX || x > dropdownX + dropdownWidth ||
         y < dropdownY || y > dropdownY + dropdownHeight) {
-      this.isWindowMenuOpen = false;
+      this.openMenuId = null;
       return true;
     }
 
-    // Calculate which item was clicked
-    const itemIndex = Math.floor((y - dropdownY) / itemHeight);
+    // Find which item was clicked
+    let currentY = dropdownY;
+    for (const item of items) {
+      if (item.type === 'divider') {
+        currentY += itemHeight;
+        continue;
+      }
 
-    if (itemIndex < menuWindows.length) {
-      // Clicked on a window item - toggle its visibility
-      const window = menuWindows[itemIndex];
-      if (!window) {
+      if (y >= currentY && y < currentY + itemHeight) {
+        this.handleMenuItemClick(item);
+        this.openMenuId = null;
         return true;
       }
-      this.windowManager.toggleWindow(window.id);
-      this.isWindowMenuOpen = false;
-      return true;
-    }
 
-    // Handle action items (Minimize All, Show All, Arrange, Reset)
-    const actionIndex = itemIndex - menuWindows.length - 1; // Skip divider
-
-    if (actionIndex === 0) {
-      // Minimize All
-      for (const window of windows) {
-        if (window.visible) {
-          this.windowManager.hideWindow(window.id);
-        }
-      }
-      this.isWindowMenuOpen = false;
-      return true;
-    } else if (actionIndex === 1) {
-      // Show All
-      for (const window of menuWindows) {
-        if (!window.visible) {
-          this.windowManager.showWindow(window.id);
-        }
-      }
-      this.isWindowMenuOpen = false;
-      return true;
-    } else if (actionIndex === 3) {
-      // Arrange: Cascade
-      this.windowManager.arrangeWindows('cascade');
-      this.isWindowMenuOpen = false;
-      return true;
-    } else if (actionIndex === 4) {
-      // Arrange: Tile
-      this.windowManager.arrangeWindows('tile');
-      this.isWindowMenuOpen = false;
-      return true;
-    } else if (actionIndex === 6) {
-      // Reset to Defaults
-      this.windowManager.resetLayout();
-      this.isWindowMenuOpen = false;
-      return true;
+      currentY += itemHeight;
     }
 
     return true;
   }
 
   /**
+   * Handle menu item click
+   */
+  private handleMenuItemClick(item: MenuItem): void {
+    if (item.type === 'window' && item.windowId) {
+      this.windowManager.toggleWindow(item.windowId);
+    } else if (item.type === 'action' && item.action) {
+      this.executeAction(item.action);
+    }
+  }
+
+  /**
+   * Execute a menu action
+   */
+  private executeAction(action: string): void {
+    const windows = Array.from(this.windowManager['windows'].values());
+
+    switch (action) {
+      case 'minimize-all':
+        for (const window of windows) {
+          if (window.visible) {
+            this.windowManager.hideWindow(window.id);
+          }
+        }
+        break;
+      case 'show-all':
+        for (const window of windows) {
+          if (!window.visible && window.config.showInWindowList !== false) {
+            this.windowManager.showWindow(window.id);
+          }
+        }
+        break;
+      case 'cascade':
+        this.windowManager.arrangeWindows('cascade');
+        break;
+      case 'tile':
+        this.windowManager.arrangeWindows('tile');
+        break;
+      case 'reset':
+      case 'load-layout':
+        this.windowManager.resetLayout();
+        break;
+      case 'save-layout':
+        this.windowManager.saveLayout();
+        break;
+    }
+  }
+
+  /**
+   * Get menu items for a specific menu
+   */
+  private getMenuItems(menuId: string): MenuItem[] {
+    switch (menuId) {
+      case 'file':
+        return this.getFileMenuItems();
+      case 'agent':
+        return this.getAgentMenuItems();
+      case 'economy':
+        return this.getEconomyMenuItems();
+      case 'farming':
+        return this.getFarmingMenuItems();
+      case 'animals':
+        return this.getAnimalsMenuItems();
+      case 'magic':
+        return this.getMagicMenuItems();
+      case 'divinity':
+        return this.getDivinityMenuItems();
+      case 'dev':
+        return this.getDevMenuItems();
+      default:
+        return [];
+    }
+  }
+
+  /**
+   * Get File menu items
+   */
+  private getFileMenuItems(): MenuItem[] {
+    const windows = Array.from(this.windowManager['windows'].values()) as ManagedWindow[];
+    const settingsWindows = windows.filter(w =>
+      w.config.showInWindowList !== false &&
+      w.config.menuCategory === 'settings'
+    );
+
+    const items: MenuItem[] = [];
+
+    // Add settings windows
+    for (const window of settingsWindows) {
+      items.push({
+        type: 'window',
+        label: window.panel.getTitle(),
+        windowId: window.id,
+        shortcut: window.config.keyboardShortcut,
+      });
+    }
+
+    if (items.length > 0) {
+      items.push({ type: 'divider' });
+    }
+
+    items.push({ type: 'action', label: 'Save Layout', action: 'save-layout' });
+    items.push({ type: 'action', label: 'Load Layout', action: 'load-layout' });
+    items.push({ type: 'divider' });
+    items.push({ type: 'action', label: 'Reset Layout', action: 'reset' });
+
+    return items;
+  }
+
+  /**
+   * Get Agent menu items (info and social panels)
+   */
+  private getAgentMenuItems(): MenuItem[] {
+    const windows = Array.from(this.windowManager['windows'].values()) as ManagedWindow[];
+    const agentWindows = windows.filter(w =>
+      w.config.showInWindowList !== false &&
+      (w.config.menuCategory === 'info' || w.config.menuCategory === 'social')
+    );
+
+    const items: MenuItem[] = [];
+
+    // Group by category
+    const byCategory = new Map<WindowMenuCategory, ManagedWindow[]>();
+    for (const window of agentWindows) {
+      const category = window.config.menuCategory ?? 'default';
+      if (!byCategory.has(category)) {
+        byCategory.set(category, []);
+      }
+      byCategory.get(category)!.push(window);
+    }
+
+    // Sort categories by order
+    const sortedCategories = Array.from(byCategory.keys()).sort((a, b) =>
+      CATEGORY_INFO[a].order - CATEGORY_INFO[b].order
+    );
+
+    // Add windows by category
+    for (const category of sortedCategories) {
+      const categoryWindows = byCategory.get(category)!;
+      if (categoryWindows.length === 0) continue;
+
+      // Add category header
+      if (items.length > 0) {
+        items.push({ type: 'divider' });
+      }
+      items.push({
+        type: 'action',
+        label: `── ${CATEGORY_INFO[category].label} ──`,
+        action: '' // Non-clickable header
+      });
+
+      // Add windows in this category
+      for (const window of categoryWindows) {
+        items.push({
+          type: 'window',
+          label: window.panel.getTitle(),
+          windowId: window.id,
+          shortcut: window.config.keyboardShortcut,
+        });
+      }
+    }
+
+    // Add action items
+    if (items.length > 0) {
+      items.push({ type: 'divider' });
+    }
+    items.push({ type: 'action', label: 'Minimize All', action: 'minimize-all' });
+    items.push({ type: 'action', label: 'Show All', action: 'show-all' });
+    items.push({ type: 'divider' });
+    items.push({ type: 'action', label: 'Arrange: Cascade', action: 'cascade' });
+    items.push({ type: 'action', label: 'Arrange: Tile', action: 'tile' });
+
+    return items;
+  }
+
+  /**
+   * Get Economy menu items
+   */
+  private getEconomyMenuItems(): MenuItem[] {
+    const windows = Array.from(this.windowManager['windows'].values()) as ManagedWindow[];
+    const economyWindows = windows.filter(w =>
+      w.config.showInWindowList !== false &&
+      w.config.menuCategory === 'economy'
+    );
+
+    const items: MenuItem[] = [];
+
+    for (const window of economyWindows) {
+      items.push({
+        type: 'window',
+        label: window.panel.getTitle(),
+        windowId: window.id,
+        shortcut: window.config.keyboardShortcut,
+      });
+    }
+
+    if (items.length === 0) {
+      items.push({ type: 'action', label: '(No panels)', action: '' });
+    }
+
+    // Add window actions
+    items.push({ type: 'divider' });
+    items.push({ type: 'action', label: 'Minimize All', action: 'minimize-all' });
+    items.push({ type: 'action', label: 'Show All', action: 'show-all' });
+    items.push({ type: 'divider' });
+    items.push({ type: 'action', label: 'Arrange: Cascade', action: 'cascade' });
+    items.push({ type: 'action', label: 'Arrange: Tile', action: 'tile' });
+
+    return items;
+  }
+
+  /**
+   * Get Farming menu items (Tile Inspector, Plant Info)
+   */
+  private getFarmingMenuItems(): MenuItem[] {
+    const windows = Array.from(this.windowManager['windows'].values()) as ManagedWindow[];
+    const farmingWindows = windows.filter(w =>
+      w.config.showInWindowList !== false &&
+      w.config.menuCategory === 'farming'
+    );
+
+    const items: MenuItem[] = [];
+
+    for (const window of farmingWindows) {
+      items.push({
+        type: 'window',
+        label: window.panel.getTitle(),
+        windowId: window.id,
+        shortcut: window.config.keyboardShortcut,
+      });
+    }
+
+    if (items.length === 0) {
+      items.push({ type: 'action', label: '(No panels)', action: '' });
+    }
+
+    // Add window actions
+    items.push({ type: 'divider' });
+    items.push({ type: 'action', label: 'Minimize All', action: 'minimize-all' });
+    items.push({ type: 'action', label: 'Show All', action: 'show-all' });
+    items.push({ type: 'divider' });
+    items.push({ type: 'action', label: 'Arrange: Cascade', action: 'cascade' });
+    items.push({ type: 'action', label: 'Arrange: Tile', action: 'tile' });
+
+    return items;
+  }
+
+  /**
+   * Get Animals menu items
+   */
+  private getAnimalsMenuItems(): MenuItem[] {
+    const windows = Array.from(this.windowManager['windows'].values()) as ManagedWindow[];
+    const animalWindows = windows.filter(w =>
+      w.config.showInWindowList !== false &&
+      w.config.menuCategory === 'animals'
+    );
+
+    const items: MenuItem[] = [];
+
+    for (const window of animalWindows) {
+      items.push({
+        type: 'window',
+        label: window.panel.getTitle(),
+        windowId: window.id,
+        shortcut: window.config.keyboardShortcut,
+      });
+    }
+
+    if (items.length === 0) {
+      items.push({ type: 'action', label: '(No panels)', action: '' });
+    }
+
+    // Add window actions
+    items.push({ type: 'divider' });
+    items.push({ type: 'action', label: 'Minimize All', action: 'minimize-all' });
+    items.push({ type: 'action', label: 'Show All', action: 'show-all' });
+    items.push({ type: 'divider' });
+    items.push({ type: 'action', label: 'Arrange: Cascade', action: 'cascade' });
+    items.push({ type: 'action', label: 'Arrange: Tile', action: 'tile' });
+
+    return items;
+  }
+
+  /**
+   * Get Magic menu items
+   */
+  private getMagicMenuItems(): MenuItem[] {
+    const windows = Array.from(this.windowManager['windows'].values()) as ManagedWindow[];
+    const magicWindows = windows.filter(w =>
+      w.config.showInWindowList !== false &&
+      w.config.menuCategory === 'magic'
+    );
+
+    const items: MenuItem[] = [];
+
+    for (const window of magicWindows) {
+      items.push({
+        type: 'window',
+        label: window.panel.getTitle(),
+        windowId: window.id,
+        shortcut: window.config.keyboardShortcut,
+      });
+    }
+
+    if (items.length === 0) {
+      items.push({ type: 'action', label: '(No panels)', action: '' });
+    }
+
+    // Add window actions
+    items.push({ type: 'divider' });
+    items.push({ type: 'action', label: 'Minimize All', action: 'minimize-all' });
+    items.push({ type: 'action', label: 'Show All', action: 'show-all' });
+    items.push({ type: 'divider' });
+    items.push({ type: 'action', label: 'Arrange: Cascade', action: 'cascade' });
+    items.push({ type: 'action', label: 'Arrange: Tile', action: 'tile' });
+
+    return items;
+  }
+
+  /**
+   * Get Divinity menu items
+   */
+  private getDivinityMenuItems(): MenuItem[] {
+    const windows = Array.from(this.windowManager['windows'].values()) as ManagedWindow[];
+    const divinityWindows = windows.filter(w =>
+      w.config.showInWindowList !== false &&
+      w.config.menuCategory === 'divinity'
+    );
+
+    const items: MenuItem[] = [];
+
+    // Add divinity windows
+    for (const window of divinityWindows) {
+      items.push({
+        type: 'window',
+        label: window.panel.getTitle(),
+        windowId: window.id,
+        shortcut: window.config.keyboardShortcut,
+      });
+    }
+
+    // Show placeholder if empty
+    if (items.length === 0) {
+      items.push({ type: 'action', label: '(No panels)', action: '' });
+    }
+
+    // Add window actions
+    items.push({ type: 'divider' });
+    items.push({ type: 'action', label: 'Minimize All', action: 'minimize-all' });
+    items.push({ type: 'action', label: 'Show All', action: 'show-all' });
+    items.push({ type: 'divider' });
+    items.push({ type: 'action', label: 'Arrange: Cascade', action: 'cascade' });
+    items.push({ type: 'action', label: 'Arrange: Tile', action: 'tile' });
+
+    return items;
+  }
+
+  /**
+   * Get Dev menu items
+   */
+  private getDevMenuItems(): MenuItem[] {
+    const windows = Array.from(this.windowManager['windows'].values()) as ManagedWindow[];
+    const devWindows = windows.filter(w =>
+      w.config.showInWindowList !== false &&
+      w.config.menuCategory === 'dev'
+    );
+
+    const items: MenuItem[] = [];
+
+    // Add dev windows
+    for (const window of devWindows) {
+      items.push({
+        type: 'window',
+        label: window.panel.getTitle(),
+        windowId: window.id,
+        shortcut: window.config.keyboardShortcut,
+      });
+    }
+
+    // Show placeholder if empty
+    if (items.length === 0) {
+      items.push({ type: 'action', label: '(No panels)', action: '' });
+    }
+
+    // Add window actions
+    items.push({ type: 'divider' });
+    items.push({ type: 'action', label: 'Minimize All', action: 'minimize-all' });
+    items.push({ type: 'action', label: 'Show All', action: 'show-all' });
+    items.push({ type: 'divider' });
+    items.push({ type: 'action', label: 'Arrange: Cascade', action: 'cascade' });
+    items.push({ type: 'action', label: 'Arrange: Tile', action: 'tile' });
+
+    return items;
+  }
+
+  /**
+   * Get dropdown width for a menu
+   */
+  private getDropdownWidth(menuId: string): number {
+    switch (menuId) {
+      case 'file': return 160;
+      case 'agent': return 250;
+      case 'economy': return 200;
+      case 'farming': return 180;
+      case 'animals': return 180;
+      case 'magic': return 180;
+      case 'divinity': return 200;
+      case 'dev': return 180;
+      default: return 200;
+    }
+  }
+
+  /**
+   * Calculate dropdown height based on items
+   */
+  private calculateDropdownHeight(items: MenuItem[]): number {
+    const itemHeight = 24;
+    return items.length * itemHeight;
+  }
+
+  /**
    * Handle mouse move for hover effects.
    */
   handleMouseMove(x: number, y: number): void {
-    // Check if hovering over "Window" menu button
-    if (x >= this.windowMenuBounds.x &&
-        x <= this.windowMenuBounds.x + this.windowMenuBounds.width &&
-        y >= this.windowMenuBounds.y &&
-        y <= this.windowMenuBounds.y + this.windowMenuBounds.height) {
-      this.hoveredMenuItem = 'window';
-    } else {
-      this.hoveredMenuItem = null;
+    this.hoveredMenuItem = null;
+
+    for (const menu of this.menus) {
+      if (menu.id === 'dev' && !this.devMode) continue;
+
+      const bounds = this.menuBounds.get(menu.id);
+      if (!bounds) continue;
+
+      if (x >= bounds.x && x <= bounds.x + bounds.width &&
+          y >= bounds.y && y <= bounds.y + bounds.height) {
+        this.hoveredMenuItem = menu.id;
+        break;
+      }
     }
   }
 
@@ -219,21 +696,34 @@ export class MenuBar {
     ctx.stroke();
 
     // Draw menu items
-    ctx.fillStyle = '#ffffff';
     ctx.font = '14px sans-serif';
     ctx.textBaseline = 'middle';
 
-    // "File" menu (placeholder - not implemented)
-    ctx.fillStyle = this.hoveredMenuItem === 'file' ? '#4a4a4a' : 'transparent';
-    ctx.fillRect(10, 0, 40, this.height);
-    ctx.fillStyle = '#888888'; // Grayed out
-    ctx.fillText('File', 15, this.height / 2);
+    for (const menu of this.menus) {
+      // Skip dev menu if not in dev mode
+      if (menu.id === 'dev' && !this.devMode) continue;
 
-    // "Window" menu
-    ctx.fillStyle = this.hoveredMenuItem === 'window' || this.isWindowMenuOpen ? '#4a4a4a' : 'transparent';
-    ctx.fillRect(this.windowMenuBounds.x, this.windowMenuBounds.y, this.windowMenuBounds.width, this.windowMenuBounds.height);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText('Window', this.windowMenuBounds.x + 10, this.height / 2);
+      const bounds = this.menuBounds.get(menu.id);
+      if (!bounds) continue;
+
+      const isHovered = this.hoveredMenuItem === menu.id;
+      const isOpen = this.openMenuId === menu.id;
+      const isDisabled = menu.id === 'file'; // File menu placeholder
+
+      // Draw button background
+      ctx.fillStyle = isHovered || isOpen ? '#4a4a4a' : 'transparent';
+      ctx.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+
+      // Draw text
+      if (isDisabled) {
+        ctx.fillStyle = '#888888';
+      } else if (menu.id === 'dev') {
+        ctx.fillStyle = '#FF6666'; // Red for dev menu
+      } else {
+        ctx.fillStyle = '#ffffff';
+      }
+      ctx.fillText(menu.label, bounds.x + 10, this.height / 2);
+    }
 
     // Draw view toggle buttons
     if (this.renderer) {
@@ -263,27 +753,24 @@ export class MenuBar {
     }
 
     // Draw dropdown menu if open
-    if (this.isWindowMenuOpen) {
-      this.renderWindowMenu(ctx);
+    if (this.openMenuId) {
+      this.renderDropdown(ctx, this.openMenuId);
     }
   }
 
   /**
-   * Render the Window menu dropdown.
+   * Render a dropdown menu
    */
-  private renderWindowMenu(ctx: CanvasRenderingContext2D): void {
-    const dropdownX = this.windowMenuBounds.x;
-    const dropdownY = this.windowMenuBounds.y + this.windowMenuBounds.height;
-    const dropdownWidth = 250;
+  private renderDropdown(ctx: CanvasRenderingContext2D, menuId: string): void {
+    const bounds = this.menuBounds.get(menuId);
+    if (!bounds) return;
+
+    const dropdownX = bounds.x;
+    const dropdownY = bounds.y + bounds.height;
+    const dropdownWidth = this.getDropdownWidth(menuId);
+    const items = this.getMenuItems(menuId);
     const itemHeight = 24;
-
-    // Get all windows for the menu
-    const windows = Array.from(this.windowManager['windows'].values());
-    const menuWindows = windows.filter(w => w.config.showInWindowList !== false);
-
-    // Calculate dropdown height
-    const itemCount = menuWindows.length + 6; // Windows + dividers + actions
-    const dropdownHeight = itemCount * itemHeight;
+    const dropdownHeight = this.calculateDropdownHeight(items);
 
     // Draw dropdown background
     ctx.fillStyle = '#2a2a2a';
@@ -294,67 +781,51 @@ export class MenuBar {
     ctx.lineWidth = 2;
     ctx.strokeRect(dropdownX, dropdownY, dropdownWidth, dropdownHeight);
 
-    // Draw window list
+    // Draw items
     let currentY = dropdownY;
     ctx.font = '13px sans-serif';
     ctx.textBaseline = 'middle';
 
-    for (const window of menuWindows) {
-      // Highlight on hover
-      // (hover detection would require mouse tracking - skipped for now)
-
-      // Draw checkmark if window is visible
-      ctx.fillStyle = '#ffffff';
-      const checkmark = window.visible ? '✓' : ' ';
-      ctx.fillText(checkmark, dropdownX + 10, currentY + itemHeight / 2);
-
-      // Draw window title
-      ctx.fillText(window.panel.getTitle(), dropdownX + 30, currentY + itemHeight / 2);
-
-      // Draw keyboard shortcut if available
-      if (window.config.keyboardShortcut) {
-        const shortcut = this.formatShortcut(window.config.keyboardShortcut);
-        ctx.fillStyle = '#888888';
-        ctx.textAlign = 'right';
-        ctx.fillText(shortcut, dropdownX + dropdownWidth - 10, currentY + itemHeight / 2);
-        ctx.textAlign = 'left';
-        ctx.fillStyle = '#ffffff';
-      }
-
-      currentY += itemHeight;
-    }
-
-    // Draw divider
-    ctx.strokeStyle = '#3a3a3a';
-    ctx.beginPath();
-    ctx.moveTo(dropdownX + 5, currentY);
-    ctx.lineTo(dropdownX + dropdownWidth - 5, currentY);
-    ctx.stroke();
-    currentY += itemHeight;
-
-    // Draw action items
-    const actions = [
-      'Minimize All',
-      'Show All',
-      '---',
-      'Arrange: Cascade',
-      'Arrange: Tile',
-      '---',
-      'Reset to Defaults',
-    ];
-
-    for (const action of actions) {
-      if (action === '---') {
-        // Draw divider
+    for (const item of items) {
+      if (item.type === 'divider') {
         ctx.strokeStyle = '#3a3a3a';
         ctx.beginPath();
-        ctx.moveTo(dropdownX + 5, currentY);
-        ctx.lineTo(dropdownX + dropdownWidth - 5, currentY);
+        ctx.moveTo(dropdownX + 5, currentY + itemHeight / 2);
+        ctx.lineTo(dropdownX + dropdownWidth - 5, currentY + itemHeight / 2);
         ctx.stroke();
       } else {
-        ctx.fillStyle = '#ffffff';
-        ctx.fillText(action, dropdownX + 10, currentY + itemHeight / 2);
+        // Check if this is a category header (non-clickable)
+        const isCategoryHeader = item.type === 'action' && !item.action;
+
+        if (isCategoryHeader) {
+          ctx.fillStyle = '#888888';
+          ctx.font = 'bold 11px sans-serif';
+        } else {
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '13px sans-serif';
+        }
+
+        // Draw checkmark for window items
+        if (item.type === 'window' && item.windowId) {
+          const window = this.windowManager['windows'].get(item.windowId);
+          const checkmark = window?.visible ? '✓' : ' ';
+          ctx.fillText(checkmark, dropdownX + 10, currentY + itemHeight / 2);
+        }
+
+        // Draw label
+        const labelX = item.type === 'window' ? dropdownX + 30 : dropdownX + 10;
+        ctx.fillText(item.label ?? '', labelX, currentY + itemHeight / 2);
+
+        // Draw shortcut if available
+        if (item.shortcut) {
+          const shortcut = this.formatShortcut(item.shortcut);
+          ctx.fillStyle = '#888888';
+          ctx.textAlign = 'right';
+          ctx.fillText(shortcut, dropdownX + dropdownWidth - 10, currentY + itemHeight / 2);
+          ctx.textAlign = 'left';
+        }
       }
+
       currentY += itemHeight;
     }
   }
@@ -378,16 +849,16 @@ export class MenuBar {
   }
 
   /**
-   * Check if the window menu is currently open.
+   * Check if a menu is currently open.
    */
   isMenuOpen(): boolean {
-    return this.isWindowMenuOpen;
+    return this.openMenuId !== null;
   }
 
   /**
    * Close all open menus.
    */
   closeMenus(): void {
-    this.isWindowMenuOpen = false;
+    this.openMenuId = null;
   }
 }

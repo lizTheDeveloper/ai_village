@@ -8,19 +8,22 @@
  * - Queuing crafting jobs
  * - Waiting for job completion
  * - Inventory full -> switch to deposit
+ * - Auto-gathering missing ingredients
  *
  * Part of the crafting system implementation.
  */
 
 import type { EntityImpl } from '../../ecs/Entity.js';
 import type { World } from '../../ecs/World.js';
-import type { AgentComponent } from '../../components/AgentComponent.js';
+import type { AgentComponent, AgentBehavior } from '../../components/AgentComponent.js';
+import { queueBehavior } from '../../components/AgentComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { InventoryComponent } from '../../components/InventoryComponent.js';
 import type { BuildingComponent } from '../../components/BuildingComponent.js';
-import type { CraftingSystem } from '../../crafting/CraftingSystem.js';
+import type { CraftingSystem, IngredientAvailability } from '../../crafting/CraftingSystem.js';
 import type { Recipe } from '../../crafting/Recipe.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
+import { ComponentType } from '../../types/ComponentType.js';
 
 /** Distance at which agent can use a crafting station */
 const CRAFT_DISTANCE = 1.5;
@@ -51,9 +54,9 @@ export class CraftBehavior extends BaseBehavior {
   readonly name = 'craft' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>('position');
-    const inventory = entity.getComponent<InventoryComponent>('inventory');
-    const agent = entity.getComponent<AgentComponent>('agent');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
 
     if (!position || !agent) {
       return { complete: true, reason: 'Missing required components' };
@@ -118,7 +121,7 @@ export class CraftBehavior extends BaseBehavior {
       return;
     }
 
-    const position = entity.getComponent<PositionComponent>('position')!;
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
 
     // Find nearby crafting station of the required type
     const station = this.findNearestStation(world, position, recipe.stationRequired);
@@ -160,7 +163,7 @@ export class CraftBehavior extends BaseBehavior {
       return;
     }
 
-    const stationPos = stationEntity.components.get('position') as PositionComponent | undefined;
+    const stationPos = stationEntity.components.get(ComponentType.Position) as PositionComponent | undefined;
     if (!stationPos) {
       this.updateState(entity, { phase: 'find_station', targetStationId: undefined });
       return;
@@ -200,15 +203,8 @@ export class CraftBehavior extends BaseBehavior {
         const allAvailable = availability.every(a => a.status === 'AVAILABLE');
 
         if (!allAvailable) {
-          // Missing ingredients
-          const missing = availability
-            .filter(a => a.status !== 'AVAILABLE')
-            .map(a => `${a.itemId} (need ${a.required}, have ${a.available})`)
-            .join(', ');
-          return {
-            complete: true,
-            reason: `Missing ingredients: ${missing}`
-          };
+          // Queue gather behaviors for missing ingredients, then re-queue this craft
+          return this.queueGatherAndRecraft(entity, availability, recipe, quantity);
         }
       }
 
@@ -257,8 +253,8 @@ export class CraftBehavior extends BaseBehavior {
   ): { entityId: string; position: PositionComponent } | null {
     const buildings = world
       .query()
-      .with('building')
-      .with('position')
+      .with(ComponentType.Building)
+      .with(ComponentType.Position)
       .executeEntities();
 
     let nearest: { entityId: string; position: PositionComponent } | null = null;
@@ -266,8 +262,8 @@ export class CraftBehavior extends BaseBehavior {
 
     for (const building of buildings) {
       const buildingImpl = building as EntityImpl;
-      const buildingComp = buildingImpl.getComponent<BuildingComponent>('building');
-      const buildingPos = buildingImpl.getComponent<PositionComponent>('position');
+      const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+      const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
 
       if (!buildingComp || !buildingPos) continue;
 
@@ -298,6 +294,60 @@ export class CraftBehavior extends BaseBehavior {
     // The crafting system should be accessible via world property
     // This is set up when the game initializes systems
     return (world as any).craftingSystem ?? null;
+  }
+
+  /**
+   * Queue gather behaviors for missing ingredients, then re-queue the craft behavior.
+   * This allows agents to automatically gather materials before crafting.
+   */
+  private queueGatherAndRecraft(
+    entity: EntityImpl,
+    availability: IngredientAvailability[],
+    recipe: Recipe,
+    quantity: number
+  ): BehaviorResult {
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
+    if (!agent) {
+      return { complete: true, reason: 'Missing agent component' };
+    }
+
+    let updatedAgent = agent;
+
+    // Queue gather behaviors for each missing ingredient
+    const missingIngredients = availability.filter(a => a.status !== 'AVAILABLE');
+
+    for (const ingredient of missingIngredients) {
+      const amountNeeded = ingredient.required - ingredient.available;
+
+      // Queue gather behavior for this resource type
+      updatedAgent = queueBehavior(updatedAgent, 'gather' as AgentBehavior, {
+        behaviorState: {
+          resourceType: ingredient.itemId,
+          targetAmount: amountNeeded
+        },
+        priority: 'normal',
+        label: `Gather ${ingredient.itemId} for ${recipe.name}`
+      });
+    }
+
+    // Re-queue the craft behavior to execute after gathering
+    updatedAgent = queueBehavior(updatedAgent, 'craft' as AgentBehavior, {
+      behaviorState: {
+        recipeId: recipe.id,
+        quantity: quantity
+      },
+      priority: 'normal',
+      label: `Craft ${recipe.name}`
+    });
+
+    // Update the agent component with new queue
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, () => updatedAgent);
+
+    // Mark this behavior as complete so the queue takes over
+    return {
+      complete: true,
+      reason: `Queued gathering for ${missingIngredients.map(i => i.itemId).join(', ')} before crafting`
+    };
   }
 }
 

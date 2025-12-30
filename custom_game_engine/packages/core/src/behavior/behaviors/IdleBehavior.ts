@@ -12,6 +12,7 @@ import type { EntityImpl } from '../../ecs/Entity.js';
 import type { World } from '../../ecs/World.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
+import { ComponentType } from '../../types/ComponentType.js';
 
 /**
  * IdleBehavior - Agent does nothing
@@ -35,9 +36,9 @@ export class IdleBehavior extends BaseBehavior {
     this.disableSteeringAndStop(entity);
 
     // Track when agent became idle (for boredom system)
-    const agent = entity.getComponent<AgentComponent>('agent');
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
     if (agent && agent.idleStartTick === undefined) {
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         idleStartTick: world.tick,
       }));

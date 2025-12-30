@@ -1,6 +1,7 @@
 import type { World } from '../ecs/World.js';
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import { NeedsComponent } from '../components/NeedsComponent';
 import { PersonalityComponent } from '../components/PersonalityComponent';
 import { ActionQueue } from '../actions/ActionQueueClass';
@@ -38,21 +39,21 @@ export class IdleBehaviorSystem implements System {
 
     for (const entity of entities) {
       // Skip entities without required components
-      if (!entity.components || !entity.components.has('needs') ||
-          !entity.components.has('personality') ||
-          !entity.components.has('action_queue')) {
+      if (!entity.components || !entity.components.has(CT.Needs) ||
+          !entity.components.has(CT.Personality) ||
+          !entity.components.has(CT.ActionQueue)) {
         continue;
       }
 
-      const queue = entity.getComponent('action_queue') as ActionQueue | null;
+      const queue = entity.getComponent(CT.ActionQueue) as ActionQueue | null;
 
       // Skip if entity has queued actions or if queue is missing
       if (!queue || !queue.isEmpty()) {
         continue;
       }
 
-      const needs = entity.getComponent('needs') as NeedsComponent | null;
-      const personality = entity.getComponent('personality') as PersonalityComponent | null;
+      const needs = entity.getComponent(CT.Needs) as NeedsComponent | null;
+      const personality = entity.getComponent(CT.Personality) as PersonalityComponent | null;
 
       if (!needs || !personality) {
         throw new Error(`Entity ${(entity as any).id} missing required component: needs or personality`);

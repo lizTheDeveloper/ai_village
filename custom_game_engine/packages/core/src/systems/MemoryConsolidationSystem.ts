@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
@@ -13,7 +14,7 @@ const SECONDS_PER_DAY = 86400;
  * Maps event type to the category label used in summaries.
  */
 const REPETITIVE_EVENT_TYPES: Record<string, string> = {
-  'resource:gathered': 'resource',
+  'resource:gathered': CT.Resource,
   'agent:harvested': 'harvest',
   'action:walk': 'exploration',
   'discovery:location': 'discovery',
@@ -126,7 +127,7 @@ export class MemoryConsolidationSystem implements System {
         this.consolidationTriggers.clear();
         throw new Error(`Agent ${agentId} not found (consolidation trigger)`);
       }
-      const memComp = entity.components.get('episodic_memory') as EpisodicMemoryComponent | undefined;
+      const memComp = entity.components.get(CT.EpisodicMemory) as EpisodicMemoryComponent | undefined;
       if (!memComp) {
         this.consolidationTriggers.clear();
         throw new Error(`Agent ${agentId} missing EpisodicMemoryComponent`);
@@ -134,7 +135,7 @@ export class MemoryConsolidationSystem implements System {
     }
 
     for (const entity of memoryEntities) {
-      const memComp = entity.components.get('episodic_memory') as EpisodicMemoryComponent | undefined;
+      const memComp = entity.components.get(CT.EpisodicMemory) as EpisodicMemoryComponent | undefined;
       if (!memComp) continue;
 
       // Apply decay
@@ -172,7 +173,7 @@ export class MemoryConsolidationSystem implements System {
       const entity = world.getEntity(agentId);
       if (!entity) continue;
 
-      const memComp = entity.components.get('episodic_memory') as EpisodicMemoryComponent | undefined;
+      const memComp = entity.components.get(CT.EpisodicMemory) as EpisodicMemoryComponent | undefined;
       if (!memComp) continue;
 
       try {
@@ -277,7 +278,7 @@ export class MemoryConsolidationSystem implements System {
       // Extract info for summary
       const parts = groupKey.split(':');
       const eventType = parts[0] || 'unknown';
-      const resourceType = parts[1] || 'resource';
+      const resourceType = parts[1] || CT.Resource;
       const count = memories.length;
 
       // Calculate aggregate values
@@ -351,7 +352,7 @@ export class MemoryConsolidationSystem implements System {
       }
     }
 
-    return 'resource';
+    return CT.Resource;
   }
 
   /**

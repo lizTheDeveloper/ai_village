@@ -188,7 +188,7 @@ describe('Quality Economy Integration', () => {
       const startTime = performance.now();
 
       for (let i = 0; i < 10000; i++) {
-        getQualityPriceMultiplier(Math.random() * 100);
+        getQualityPriceMultiplier(Math.random());
       }
 
       const duration = performance.now() - startTime;
@@ -202,8 +202,8 @@ describe('Quality Economy Integration', () => {
       const startTime = performance.now();
 
       for (let i = 0; i < 1000; i++) {
-        calculateBuyPrice({ definition: item, quality: Math.random() * 100 }, mockShop);
-        calculateSellPrice({ definition: item, quality: Math.random() * 100 }, mockShop);
+        calculateBuyPrice({ definition: item, quality: Math.random() }, mockShop);
+        calculateSellPrice({ definition: item, quality: Math.random() }, mockShop);
       }
 
       const duration = performance.now() - startTime;

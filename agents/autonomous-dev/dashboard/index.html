@@ -1842,6 +1842,9 @@
                     headers: { 'Content-Type': 'application/json' }
                 });
                 const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to archive');
+                }
                 loadWorkOrders();
                 alert(`Archived work order: ${name}`);
             } catch (err) {

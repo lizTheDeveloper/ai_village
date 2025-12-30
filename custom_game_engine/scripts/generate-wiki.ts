@@ -1,0 +1,210 @@
+#!/usr/bin/env tsx
+/**
+ * Wiki Generator CLI
+ *
+ * Generates wiki documentation from embedded help entries in items and effects.
+ *
+ * Usage:
+ *   npm run generate-wiki              # Generate all wikis
+ *   npm run generate-wiki -- --format=md  # Markdown only
+ *   npm run generate-wiki -- --format=json # JSON only
+ *   npm run generate-wiki -- --category=items # Single category
+ */
+
+import * as fs from 'fs';
+import * as path from 'path';
+import {
+  helpRegistry,
+  MarkdownWikiGenerator,
+  JsonWikiGenerator,
+} from '../packages/core/src/help/index.js';
+
+// Parse command line arguments
+const args = process.argv.slice(2);
+const format = args.find(arg => arg.startsWith('--format='))?.split('=')[1] || 'both';
+const category = args.find(arg => arg.startsWith('--category='))?.split('=')[1];
+
+// Output directory
+const WIKI_DIR = path.join(process.cwd(), 'wiki');
+
+/**
+ * Load all documented items and register their help entries
+ */
+function loadItemHelp() {
+  // Import and register documented items
+  // In a real implementation, you would iterate through all item definitions
+  // and register those with help entries
+  console.log('Loading item documentation...');
+
+  // Example: Load from documented items file
+  // For now, this is a placeholder showing the pattern
+  // You would import actual items from defaultItems.ts and filter for those with help entries
+}
+
+/**
+ * Load all documented effects and register their help entries
+ */
+function loadEffectHelp() {
+  console.log('Loading effect documentation...');
+
+  // Example: Load from spell effect definitions
+  // You would import actual effects from SpellEffectRegistry and filter for those with help entries
+}
+
+/**
+ * Generate markdown wiki
+ */
+function generateMarkdownWiki() {
+  console.log('Generating Markdown wiki...');
+
+  const mdDir = path.join(WIKI_DIR, 'markdown');
+  if (!fs.existsSync(mdDir)) {
+    fs.mkdirSync(mdDir, { recursive: true });
+  }
+
+  const generator = new MarkdownWikiGenerator(helpRegistry);
+  const categories = category ? [category] : helpRegistry.getCategories();
+
+  for (const cat of categories) {
+    console.log(`  - ${cat}...`);
+    const markdown = generator.generateCategory(cat, {
+      includeToc: true,
+      includeLore: true,
+      includeMechanics: true,
+      includeExamples: true,
+      includeRelated: true,
+    });
+
+    const filename = path.join(mdDir, `${cat}.md`);
+    fs.writeFileSync(filename, markdown, 'utf-8');
+    console.log(`    Written: ${filename}`);
+  }
+
+  // Generate index
+  const indexMd = generateMarkdownIndex(categories);
+  const indexFilename = path.join(mdDir, 'README.md');
+  fs.writeFileSync(indexFilename, indexMd, 'utf-8');
+  console.log(`  Written index: ${indexFilename}`);
+}
+
+/**
+ * Generate JSON wiki
+ */
+function generateJsonWiki() {
+  console.log('Generating JSON wiki...');
+
+  const jsonDir = path.join(WIKI_DIR, 'json');
+  if (!fs.existsSync(jsonDir)) {
+    fs.mkdirSync(jsonDir, { recursive: true });
+  }
+
+  const generator = new JsonWikiGenerator(helpRegistry);
+
+  if (category) {
+    const json = generator.generateCategory(category);
+    const filename = path.join(jsonDir, `${category}.json`);
+    fs.writeFileSync(filename, JSON.stringify(json, null, 2), 'utf-8');
+    console.log(`  Written: ${filename}`);
+  } else {
+    const fullWiki = generator.generateFull();
+    const filename = path.join(jsonDir, 'wiki.json');
+    fs.writeFileSync(filename, JSON.stringify(fullWiki, null, 2), 'utf-8');
+    console.log(`  Written: ${filename}`);
+  }
+}
+
+/**
+ * Generate markdown index page
+ */
+function generateMarkdownIndex(categories: string[]): string {
+  const stats = helpRegistry.getStats();
+
+  let md = `# AI Village Game Wiki\n\n`;
+  md += `Auto-generated documentation from embedded help entries.\n\n`;
+  md += `**Total Entries:** ${stats.totalEntries}\n\n`;
+  md += `**Last Updated:** ${new Date().toISOString()}\n\n`;
+  md += `---\n\n`;
+  md += `## Categories\n\n`;
+
+  for (const cat of categories) {
+    const count = stats.categories[cat] || 0;
+    md += `- [${capitalize(cat)}](./${cat}.md) (${count} entries)\n`;
+  }
+
+  md += `\n---\n\n`;
+  md += `## Tags\n\n`;
+
+  const topTags = Object.entries(stats.tags)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 20);
+
+  for (const [tag, count] of topTags) {
+    md += `- \`${tag}\` (${count})\n`;
+  }
+
+  return md;
+}
+
+/**
+ * Print usage statistics
+ */
+function printStats() {
+  const stats = helpRegistry.getStats();
+
+  console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('📊 Wiki Statistics');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+  console.log(`Total Entries: ${stats.totalEntries}\n`);
+
+  console.log('Categories:');
+  for (const [cat, count] of Object.entries(stats.categories)) {
+    console.log(`  ${cat.padEnd(15)} ${count} entries`);
+  }
+
+  console.log(`\nTotal Tags: ${Object.keys(stats.tags).length}`);
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+}
+
+/**
+ * Capitalize first letter
+ */
+function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// ============================================================================
+// Main
+// ============================================================================
+
+console.log('🚀 AI Village Wiki Generator\n');
+
+// Load all help entries
+loadItemHelp();
+loadEffectHelp();
+
+// Check if we have any entries
+if (helpRegistry.getStats().totalEntries === 0) {
+  console.log('⚠️  No help entries found. Make sure items/effects have help documentation.');
+  console.log('   See packages/core/src/help/documentedItems.example.ts for examples.\n');
+  process.exit(0);
+}
+
+// Generate wikis
+try {
+  if (format === 'md' || format === 'both') {
+    generateMarkdownWiki();
+  }
+
+  if (format === 'json' || format === 'both') {
+    generateJsonWiki();
+  }
+
+  printStats();
+
+  console.log('✅ Wiki generation complete!\n');
+  console.log(`   Markdown: ${path.join(WIKI_DIR, 'markdown')}`);
+  console.log(`   JSON:     ${path.join(WIKI_DIR, 'json')}\n`);
+} catch (error) {
+  console.error('❌ Error generating wiki:', error);
+  process.exit(1);
+}

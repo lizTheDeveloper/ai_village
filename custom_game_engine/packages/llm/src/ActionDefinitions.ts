@@ -63,8 +63,8 @@ export const ACTION_DEFINITIONS: ActionDefinition[] = [
   { behavior: 'farm', description: 'Work on farming tasks', alwaysAvailable: true, category: 'farming', skillRequired: { skill: 'farming', level: 1 } },
   { behavior: 'plant', description: 'Plant seeds in tilled soil', alwaysAvailable: false, category: 'farming', skillRequired: { skill: 'farming', level: 1 } },
 
-  // Exploration - agent decides to discover new areas
-  { behavior: 'explore', description: 'Explore unknown areas to find new resources', alwaysAvailable: true, category: 'exploration' },
+  // Exploration - systematic exploration of unknown areas
+  { behavior: 'explore', description: 'Systematically explore unknown areas to find new resources', alwaysAvailable: true, category: 'exploration' },
 
   // Animal Husbandry - agent decides to work with animals
   { behavior: 'tame_animal', description: 'Approach and tame a wild animal', alwaysAvailable: true, category: 'animal', skillRequired: { skill: 'animal_handling', level: 2 } },
@@ -117,7 +117,7 @@ export const BEHAVIOR_SYNONYMS: Record<string, AgentBehavior> = {
   'greet': 'talk',
   'say': 'talk',
 
-  // Explore synonyms
+  // Exploration synonyms - use dedicated explore behavior
   'search': 'explore',
   'scout': 'explore',
   'investigate': 'explore',

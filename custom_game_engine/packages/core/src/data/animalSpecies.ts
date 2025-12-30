@@ -3,11 +3,13 @@
  * Defines all animal species and their characteristics
  */
 
-export type AnimalCategory = 'livestock' | 'pet' | 'wild' | 'working';
-export type AnimalTemperament = 'docile' | 'skittish' | 'aggressive' | 'friendly' | 'neutral';
-export type AnimalDiet = 'herbivore' | 'carnivore' | 'omnivore';
-export type SocialStructure = 'solitary' | 'pair' | 'herd' | 'pack' | 'flock';
-export type ActivityPattern = 'diurnal' | 'nocturnal' | 'crepuscular';
+import type {
+  AnimalCategory,
+  AnimalTemperament,
+  AnimalDiet,
+  SocialStructure,
+  ActivityPattern,
+} from '../types/AnimalTypes.js';
 
 export interface AnimalSpecies {
   id: string;

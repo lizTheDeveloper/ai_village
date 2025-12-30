@@ -410,26 +410,16 @@ describe('MemoryFormationSystem', () => {
 
   // Error handling - per CLAUDE.md
   describe('error handling', () => {
-    it('should log error and skip memory formation if event missing agentId', () => {
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
+    it('should throw when event missing required agentId', () => {
       // Emit event without agentId
       eventBus.emit('test:event', {
         emotionalIntensity: 0.8
       });
 
-      // Should NOT throw - should log error instead
+      // Per CLAUDE.md: "NEVER use fallback values to mask errors. If data is missing or invalid, crash immediately."
       expect(() => {
         system.update(world, 1);
-      }).not.toThrow();
-
-      // Verify error was logged
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Event test:event missing required agentId'),
-        expect.anything()
-      );
-
-      consoleSpy.mockRestore();
+      }).toThrow(/Event test:event missing required agentId/);
     });
 
     it('should throw if agent has no EpisodicMemoryComponent', () => {

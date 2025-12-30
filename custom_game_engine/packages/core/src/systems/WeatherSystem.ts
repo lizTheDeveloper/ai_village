@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -7,9 +8,9 @@ import type { WeatherComponent } from '../components/WeatherComponent.js';
 import type { WeatherType } from '../components/WeatherComponent.js';
 
 export class WeatherSystem implements System {
-  public readonly id: SystemId = 'weather';
+  public readonly id: SystemId = CT.Weather;
   public readonly priority: number = 5; // Run early, before temperature system
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = ['weather'];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Weather];
 
   private readonly WEATHER_TRANSITION_CHANCE = 0.01; // 1% chance per update to transition
   private readonly MIN_WEATHER_DURATION = 60; // Minimum 60 seconds per weather state
@@ -18,7 +19,7 @@ export class WeatherSystem implements System {
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     for (const entity of entities) {
       const impl = entity as EntityImpl;
-      const weather = impl.getComponent<WeatherComponent>('weather');
+      const weather = impl.getComponent<WeatherComponent>(CT.Weather);
 
       // Skip entities without weather component
       if (!weather) {
@@ -28,7 +29,7 @@ export class WeatherSystem implements System {
       // Tick down duration
       const newDuration = Math.max(0, weather.duration - deltaTime);
 
-      impl.updateComponent<WeatherComponent>('weather', (current) => ({
+      impl.updateComponent<WeatherComponent>(CT.Weather, (current) => ({
         ...current,
         duration: newDuration,
       }));
@@ -44,7 +45,7 @@ export class WeatherSystem implements System {
    * Transition to a new weather type
    */
   private transitionWeather(world: World, entity: Entity, impl: EntityImpl): void {
-    const currentWeather = impl.getComponent<WeatherComponent>('weather')!;
+    const currentWeather = impl.getComponent<WeatherComponent>(CT.Weather)!;
     const newWeatherType = this.selectNewWeatherType(currentWeather.weatherType);
 
     // Weather type defaults from WeatherComponent spec
@@ -53,13 +54,14 @@ export class WeatherSystem implements System {
       rain: { movementModifier: 0.8 },
       storm: { movementModifier: 0.6 },
       snow: { movementModifier: 0.7 },
+      fog: { movementModifier: 0.9 },
     };
 
     const defaults = weatherDefaults[newWeatherType];
     const newIntensity = this.selectIntensity(newWeatherType);
     const newDuration = this.selectDuration();
 
-    impl.updateComponent<WeatherComponent>('weather', (current) => ({
+    impl.updateComponent<WeatherComponent>(CT.Weather, (current) => ({
       ...current,
       weatherType: newWeatherType,
       intensity: newIntensity,
@@ -92,6 +94,7 @@ export class WeatherSystem implements System {
       rain: 25,
       snow: 15,
       storm: 10,
+      fog: 10,
     };
 
     // Reduce chance of same weather type repeating

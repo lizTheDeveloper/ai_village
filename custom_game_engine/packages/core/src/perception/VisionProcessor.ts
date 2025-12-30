@@ -4,6 +4,8 @@
  * This processor detects nearby entities (resources, plants, agents) within
  * an agent's vision range and updates the VisionComponent and MemoryComponent.
  *
+ * Enhanced with terrain feature detection based on geomorphometry research.
+ *
  * Part of Phase 3 of the AISystem decomposition (work-order: ai-system-refactor)
  */
 
@@ -11,10 +13,38 @@ import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { VisionComponent } from '../components/VisionComponent.js';
-import type { MemoryComponent } from '../components/MemoryComponent.js';
 import type { ResourceComponent } from '../components/ResourceComponent.js';
 import type { PlantComponent } from '../components/PlantComponent.js';
-import { addMemory } from '../components/MemoryComponent.js';
+import { SpatialMemoryComponent, addSpatialMemory } from '../components/SpatialMemoryComponent.js';
+import { ComponentType } from '../types/ComponentType.js';
+import type {
+  TerrainFeature,
+  TerrainAnalyzer,
+  TerrainCache,
+  TerrainDescriptionCacheStatic,
+} from '../types/TerrainTypes.js';
+
+/**
+ * Terrain services injected at runtime from @ai-village/world.
+ * Using let to allow injection after module load.
+ */
+let terrainAnalyzer: TerrainAnalyzer | null = null;
+let terrainCache: TerrainCache | null = null;
+let terrainDescriptionCacheStatic: TerrainDescriptionCacheStatic | null = null;
+
+/**
+ * Inject terrain services from @ai-village/world at runtime.
+ * Called by the application bootstrap to avoid circular dependencies.
+ */
+export function injectTerrainServices(
+  analyzer: TerrainAnalyzer,
+  cache: TerrainCache,
+  descriptionCache: TerrainDescriptionCacheStatic
+): void {
+  terrainAnalyzer = analyzer;
+  terrainCache = cache;
+  terrainDescriptionCacheStatic = descriptionCache;
+}
 
 /**
  * Vision processing result
@@ -23,6 +53,10 @@ export interface VisionResult {
   seenResources: string[];
   seenPlants: string[];
   seenAgents: string[];
+  /** Natural language description of nearby terrain features */
+  terrainDescription: string;
+  /** Detected terrain features (peaks, cliffs, lakes, etc.) */
+  terrainFeatures: TerrainFeature[];
 }
 
 /**
@@ -41,72 +75,90 @@ export class VisionProcessor {
    * Process vision for an entity, detecting nearby entities and updating components.
    */
   process(entity: EntityImpl, world: World): VisionResult {
-    const vision = entity.getComponent<VisionComponent>('vision');
-    let memory = entity.getComponent<MemoryComponent>('memory');
+    const vision = entity.getComponent<VisionComponent>(ComponentType.Vision);
+    const spatialMemory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
 
-    if (!vision || !memory) {
-      return { seenResources: [], seenPlants: [], seenAgents: [] };
+    if (!vision || !spatialMemory) {
+      return {
+        seenResources: [],
+        seenPlants: [],
+        seenAgents: [],
+        terrainDescription: '',
+        terrainFeatures: [],
+      };
     }
 
-    const position = entity.getComponent<PositionComponent>('position');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) {
-      return { seenResources: [], seenPlants: [], seenAgents: [] };
+      return {
+        seenResources: [],
+        seenPlants: [],
+        seenAgents: [],
+        terrainDescription: '',
+        terrainFeatures: [],
+      };
     }
 
     const seenResourceIds: string[] = [];
     const seenAgentIds: string[] = [];
     const seenPlantIds: string[] = [];
 
-    // Detect nearby resources (returns updated memory)
+    // Detect nearby resources (mutates spatialMemory in place)
     if (vision.canSeeResources) {
-      memory = this.detectResources(entity, world, position, vision, memory, seenResourceIds);
+      this.detectResources(world, position, vision, spatialMemory, seenResourceIds);
     }
 
-    // Detect nearby plants (returns updated memory)
-    memory = this.detectPlants(entity, world, position, vision, memory, seenPlantIds);
+    // Detect nearby plants (mutates spatialMemory in place)
+    this.detectPlants(world, position, vision, spatialMemory, seenPlantIds);
 
-    // Detect nearby agents (returns updated memory)
+    // Detect nearby agents (mutates spatialMemory in place)
     if (vision.canSeeAgents) {
-      memory = this.detectAgents(entity, world, position, vision, memory, seenAgentIds);
+      this.detectAgents(entity, world, position, vision, spatialMemory, seenAgentIds);
     }
 
-    // Update memory component with all accumulated memories
-    entity.updateComponent<MemoryComponent>('memory', () => memory);
+    // Detect terrain features (peaks, cliffs, lakes, etc.)
+    const { features, description } = this.detectTerrainFeatures(
+      world,
+      position,
+      vision,
+      spatialMemory
+    );
 
-    // Update vision component with currently seen entities
-    entity.updateComponent<VisionComponent>('vision', (current) => ({
+    // Update vision component with currently seen entities and terrain
+    entity.updateComponent<VisionComponent>(ComponentType.Vision, (current) => ({
       ...current,
       seenAgents: seenAgentIds,
       seenResources: seenResourceIds,
       seenPlants: seenPlantIds,
+      terrainDescription: description,
     }));
 
     return {
       seenResources: seenResourceIds,
       seenPlants: seenPlantIds,
       seenAgents: seenAgentIds,
+      terrainDescription: description,
+      terrainFeatures: features,
     };
   }
 
   /**
    * Detect nearby resources within vision range.
-   * Returns updated memory with all seen resources.
+   * Mutates spatialMemory in place.
    */
   private detectResources(
-    _entity: EntityImpl,
     world: World,
     position: PositionComponent,
     vision: VisionComponent,
-    memory: MemoryComponent,
+    spatialMemory: SpatialMemoryComponent,
     seenResourceIds: string[]
-  ): MemoryComponent {
-    const resources = world.query().with('resource').with('position').executeEntities();
-    let currentMemory = memory;
+  ): void {
+    const resources = world.query().with(ComponentType.Resource).with(ComponentType.Position).executeEntities();
 
     for (const resource of resources) {
       const resourceImpl = resource as EntityImpl;
-      const resourcePos = resourceImpl.getComponent<PositionComponent>('position');
-      const resourceComp = resourceImpl.getComponent<ResourceComponent>('resource');
+      const resourcePos = resourceImpl.getComponent<PositionComponent>(ComponentType.Position);
+      const resourceComp = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource);
 
       if (!resourcePos || !resourceComp) continue;
 
@@ -116,9 +168,9 @@ export class VisionProcessor {
         // Track this resource in vision
         seenResourceIds.push(resource.id);
 
-        // Remember this resource location (accumulate in currentMemory)
-        currentMemory = addMemory(
-          currentMemory,
+        // Remember this resource location
+        addSpatialMemory(
+          spatialMemory,
           {
             type: 'resource_location',
             x: resourcePos.x,
@@ -131,29 +183,25 @@ export class VisionProcessor {
         );
       }
     }
-
-    return currentMemory;
   }
 
   /**
    * Detect nearby plants within vision range.
-   * Returns updated memory with all seen plants.
+   * Mutates spatialMemory in place.
    */
   private detectPlants(
-    _entity: EntityImpl,
     world: World,
     position: PositionComponent,
     vision: VisionComponent,
-    memory: MemoryComponent,
+    spatialMemory: SpatialMemoryComponent,
     seenPlantIds: string[]
-  ): MemoryComponent {
-    const plants = world.query().with('plant').with('position').executeEntities();
-    let currentMemory = memory;
+  ): void {
+    const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
 
     for (const plantEntity of plants) {
       const plantImpl = plantEntity as EntityImpl;
-      const plantPos = plantImpl.getComponent<PositionComponent>('position');
-      const plant = plantImpl.getComponent<PlantComponent>('plant');
+      const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+      const plant = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
 
       if (!plantPos || !plant) continue;
 
@@ -163,9 +211,9 @@ export class VisionProcessor {
         // Track this plant in vision
         seenPlantIds.push(plantEntity.id);
 
-        // Remember this plant location (accumulate in currentMemory)
-        currentMemory = addMemory(
-          currentMemory,
+        // Remember this plant location
+        addSpatialMemory(
+          spatialMemory,
           {
             type: 'plant_location',
             x: plantPos.x,
@@ -183,29 +231,26 @@ export class VisionProcessor {
         );
       }
     }
-
-    return currentMemory;
   }
 
   /**
    * Detect nearby agents within vision range.
-   * Returns updated memory with all seen agents.
+   * Mutates spatialMemory in place.
    */
   private detectAgents(
     entity: EntityImpl,
     world: World,
     position: PositionComponent,
     vision: VisionComponent,
-    memory: MemoryComponent,
+    spatialMemory: SpatialMemoryComponent,
     seenAgentIds: string[]
-  ): MemoryComponent {
-    const agents = world.query().with('agent').with('position').executeEntities();
-    let currentMemory = memory;
+  ): void {
+    const agents = world.query().with(ComponentType.Agent).with(ComponentType.Position).executeEntities();
 
     for (const otherAgent of agents) {
       if (otherAgent.id === entity.id) continue;
 
-      const otherPos = (otherAgent as EntityImpl).getComponent<PositionComponent>('position');
+      const otherPos = (otherAgent as EntityImpl).getComponent<PositionComponent>(ComponentType.Position);
       if (!otherPos) continue;
 
       const distance = this.distance(position, otherPos);
@@ -214,9 +259,9 @@ export class VisionProcessor {
         // Track this agent in vision
         seenAgentIds.push(otherAgent.id);
 
-        // Remember this agent sighting (accumulate in currentMemory)
-        currentMemory = addMemory(
-          currentMemory,
+        // Remember this agent sighting
+        addSpatialMemory(
+          spatialMemory,
           {
             type: 'agent_seen',
             x: otherPos.x,
@@ -228,8 +273,157 @@ export class VisionProcessor {
         );
       }
     }
+  }
 
-    return currentMemory;
+  /**
+   * Detect terrain features (peaks, cliffs, lakes, valleys, etc.).
+   *
+   * Uses research-based geomorphometry algorithms:
+   * - TPI (Topographic Position Index) for feature classification
+   * - Slope analysis for cliffs (>30° per US Army FM 3-25.26)
+   * - Flood fill for water body detection
+   *
+   * Features are cached per sector (32x32 tiles) to avoid expensive re-computation.
+   *
+   * Only describes terrain in the direction the agent is moving/facing (forward cone).
+   *
+   * Stores significant terrain features in spatial memory for navigation and landmarks.
+   *
+   * @param world World instance
+   * @param position Observer position
+   * @param vision Vision component
+   * @param spatialMemory Spatial memory component
+   * @returns Features array and natural language description
+   */
+  private detectTerrainFeatures(
+    world: World,
+    position: PositionComponent,
+    vision: VisionComponent,
+    spatialMemory: SpatialMemoryComponent
+  ): { features: TerrainFeature[]; description: string } {
+    // Get tile accessor function from world
+    const worldWithTerrain = world as {
+      getTileAt?: (x: number, y: number) => any;
+      getEntity?: (id: string) => any;
+    };
+
+    if (!worldWithTerrain.getTileAt) {
+      return { features: [], description: '' };
+    }
+
+    // Skip terrain analysis if services not injected
+    if (!terrainDescriptionCacheStatic || !terrainCache || !terrainAnalyzer) {
+      return { features: [], description: '' };
+    }
+
+    // Get all sectors that intersect with vision range
+    const sectors = terrainDescriptionCacheStatic.getSectorsInRadius(
+      position.x,
+      position.y,
+      vision.range
+    );
+
+    // Collect features from all sectors (using cache when available)
+    const allFeatures: TerrainFeature[] = [];
+
+    for (const { sectorX, sectorY } of sectors) {
+      // Try to get from cache first
+      let sectorFeatures = terrainCache!.get(sectorX, sectorY, world.tick);
+
+      if (!sectorFeatures) {
+        // Cache miss - analyze this sector
+        // Each sector is 32x32 tiles, centered on sector * 32
+        const sectorCenterX = sectorX * 32 + 16;
+        const sectorCenterY = sectorY * 32 + 16;
+        const sectorRadius = 32; // Analyze full sector plus some overlap
+
+        sectorFeatures = terrainAnalyzer!.analyzeArea(
+          worldWithTerrain.getTileAt.bind(worldWithTerrain),
+          sectorCenterX,
+          sectorCenterY,
+          sectorRadius
+        );
+
+        // Cache the results
+        terrainCache!.set(sectorX, sectorY, sectorFeatures, world.tick);
+      }
+
+      // Add features from this sector that are within vision range
+      for (const feature of sectorFeatures) {
+        const dx = feature.x - position.x;
+        const dy = feature.y - position.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance <= vision.range) {
+          allFeatures.push(feature);
+        }
+      }
+    }
+
+    // Filter features to only those in the forward direction (120° cone)
+    // Get agent's facing direction from velocity or last movement
+    const entity = worldWithTerrain.getEntity ? worldWithTerrain.getEntity((position as any).entityId) : null;
+    const velocity = entity?.components.get('velocity') as { vx: number; vy: number } | undefined;
+
+    let facingAngle = 0; // Default to east if no velocity
+    if (velocity && (velocity.vx !== 0 || velocity.vy !== 0)) {
+      facingAngle = Math.atan2(velocity.vy, velocity.vx);
+    }
+
+    // Filter features to forward 120° cone
+    const forwardFeatures = allFeatures.filter(f => {
+      const dx = f.x - position.x;
+      const dy = f.y - position.y;
+      const angleToFeature = Math.atan2(dy, dx);
+
+      // Calculate angle difference
+      let angleDiff = angleToFeature - facingAngle;
+      // Normalize to -π to π
+      while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+      while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+
+      // Keep features within 120° forward cone (±60° from facing direction)
+      return Math.abs(angleDiff) < (120 * Math.PI / 180) / 2;
+    });
+
+    // Generate natural language description for LLM agents (only forward features)
+    const description = terrainAnalyzer!.describeNearby(
+      forwardFeatures,
+      position.x,
+      position.y,
+      vision.range
+    );
+
+    const features = forwardFeatures;
+
+    // Store significant terrain features as landmarks in spatial memory
+    // Only store major features (peaks, cliffs, lakes) to avoid memory clutter
+    const significantTypes = new Set(['peak', 'cliff', 'lake', 'ridge', 'valley']);
+
+    for (const feature of features) {
+      if (!significantTypes.has(feature.type)) continue;
+      if (feature.distance && feature.distance > vision.range) continue;
+
+      // Store terrain landmark
+      addSpatialMemory(
+        spatialMemory,
+        {
+          type: 'terrain_landmark',
+          x: feature.x,
+          y: feature.y,
+          metadata: {
+            featureType: feature.type,
+            description: feature.description,
+            elevation: feature.elevation,
+            size: feature.size,
+          },
+        },
+        world.tick,
+        200 // Higher importance for landmarks (persist longer)
+      );
+    }
+
+    return { features, description };
   }
 
   /**

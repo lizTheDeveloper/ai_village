@@ -1,3 +1,5 @@
+import { ComponentType } from '../types/ComponentType.js';
+import { BuildingType } from '../types/BuildingType.js';
 /**
  * MiningMetalworking.integration.test.ts
  *
@@ -36,17 +38,17 @@ describe('Mining & Metalworking System Integration Tests', () => {
     it('should create iron deposit with correct components', () => {
       const deposit = createOreDeposit(harness, 'iron_ore', 10, 15, 75);
 
-      expect(deposit.hasComponent('position')).toBe(true);
-      expect(deposit.hasComponent('physics')).toBe(true);
-      expect(deposit.hasComponent('renderable')).toBe(true);
-      expect(deposit.hasComponent('tags')).toBe(true);
-      expect(deposit.hasComponent('resource')).toBe(true);
+      expect(deposit.hasComponent(ComponentType.Position)).toBe(true);
+      expect(deposit.hasComponent(ComponentType.Physics)).toBe(true);
+      expect(deposit.hasComponent(ComponentType.Renderable)).toBe(true);
+      expect(deposit.hasComponent(ComponentType.Tags)).toBe(true);
+      expect(deposit.hasComponent(ComponentType.Resource)).toBe(true);
 
-      const position = deposit.getComponent('position') as any;
+      const position = deposit.getComponent(ComponentType.Position) as any;
       expect(position.x).toBe(10);
       expect(position.y).toBe(15);
 
-      const resource = deposit.getComponent('resource') as any;
+      const resource = deposit.getComponent(ComponentType.Resource) as any;
       expect(resource.resourceType).toBe('iron_ore');
       expect(resource.amount).toBe(75);
       expect(resource.regenerationRate).toBe(0); // Finite resource
@@ -55,7 +57,7 @@ describe('Mining & Metalworking System Integration Tests', () => {
     it('should create coal deposit with no regeneration', () => {
       const deposit = createOreDeposit(harness, 'coal', 5, 5, 60);
 
-      const resource = deposit.getComponent('resource') as any;
+      const resource = deposit.getComponent(ComponentType.Resource) as any;
       expect(resource.resourceType).toBe('coal');
       expect(resource.amount).toBe(60);
       expect(resource.maxAmount).toBe(60);
@@ -65,7 +67,7 @@ describe('Mining & Metalworking System Integration Tests', () => {
     it('should create copper deposit with correct tags', () => {
       const deposit = createOreDeposit(harness, 'copper_ore', 20, 20, 45);
 
-      const tags = deposit.getComponent('tags') as any;
+      const tags = deposit.getComponent(ComponentType.Tags) as any;
       expect(tags.tags).toContain('copper_deposit');
       expect(tags.tags).toContain('minable');
       expect(tags.tags).toContain('obstacle');
@@ -74,7 +76,7 @@ describe('Mining & Metalworking System Integration Tests', () => {
     it('should create gold deposit as rare resource', () => {
       const deposit = createOreDeposit(harness, 'gold_ore', 30, 30, 20);
 
-      const resource = deposit.getComponent('resource') as any;
+      const resource = deposit.getComponent(ComponentType.Resource) as any;
       expect(resource.resourceType).toBe('gold_ore');
       expect(resource.amount).toBe(20);
       expect(resource.harvestable).toBe(true);
@@ -83,7 +85,7 @@ describe('Mining & Metalworking System Integration Tests', () => {
     it('should make deposit solid physics obstacle', () => {
       const deposit = createOreDeposit(harness, 'iron_ore', 0, 0, 50);
 
-      const physics = deposit.getComponent('physics') as any;
+      const physics = deposit.getComponent(ComponentType.Physics) as any;
       expect(physics.solid).toBe(true);
     });
   });
@@ -287,7 +289,7 @@ describe('Mining & Metalworking System Integration Tests', () => {
       resourceSystem.update(harness.world, entities, 1.0);
 
       // Verify ore did NOT regenerate (regenerationRate = 0)
-      const resource = deposit.getComponent('resource') as any;
+      const resource = deposit.getComponent(ComponentType.Resource) as any;
       expect(resource.amount).toBe(50); // Still 50, no regen
     });
 
@@ -300,7 +302,7 @@ describe('Mining & Metalworking System Integration Tests', () => {
         amount: 0,
       }));
 
-      const resource = deposit.getComponent('resource') as any;
+      const resource = deposit.getComponent(ComponentType.Resource) as any;
       expect(resource.amount).toBe(0);
       expect(resource.harvestable).toBe(true); // Still marked harvestable (empty)
     });
@@ -310,7 +312,7 @@ describe('Mining & Metalworking System Integration Tests', () => {
     it('should have Forge registered with smelting recipes', () => {
       const registry = new BuildingBlueprintRegistry();
       registry.registerDefaults();
-      registry.registerTier2Stations();
+      // Note: registerDefaults() already calls registerTier2Stations()
 
       const forge = registry.get('forge');
 
@@ -343,13 +345,13 @@ describe('Mining & Metalworking System Integration Tests', () => {
         source: forge.id,
         data: {
           entityId: forge.id,
-          buildingType: 'forge',
+          buildingType: BuildingType.Forge,
         },
       });
 
       harness.eventBus.flush();
 
-      const building = forge.getComponent('building') as any;
+      const building = forge.getComponent(ComponentType.Building) as any;
       expect(building.fuelRequired).toBe(true);
     });
   });

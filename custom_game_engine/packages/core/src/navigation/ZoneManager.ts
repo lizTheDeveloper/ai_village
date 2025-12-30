@@ -32,6 +32,7 @@
  */
 
 import type { BuildingType } from '../components/BuildingComponent.js';
+import { BuildingType as BT } from '../types/BuildingType.js';
 
 /**
  * Zone types that can be designated by players
@@ -63,12 +64,12 @@ export interface Zone {
  * Buildings in non-matching zones get a penalty (but not forbidden).
  */
 export const ZONE_BUILDING_AFFINITY: Record<ZoneType, readonly BuildingType[]> = {
-  farming: ['well', 'farm_shed'],
-  storage: ['storage-chest', 'storage-box', 'barn'],
-  industry: ['workbench', 'forge', 'windmill', 'workshop'],
-  housing: ['tent', 'bed', 'bedroll', 'lean-to'],
-  social: ['campfire'],
-  pasture: ['barn', 'stable', 'chicken-coop', 'kennel'],
+  farming: [BT.Well, BT.FarmShed],
+  storage: [BT.StorageChest, BT.StorageBox, BT.Barn],
+  industry: [BT.Workbench, BT.Forge, BT.Windmill, BT.Workshop],
+  housing: [BT.Tent, BT.Bed, BT.Bedroll, BT.LeanTo],
+  social: [BT.Campfire],
+  pasture: [BT.Barn, BT.Stable, BT.ChickenCoop, BT.Kennel],
   wilderness: [], // Nothing allowed
   restricted: [], // Nothing allowed
 };

@@ -3,6 +3,7 @@ import { WorldImpl } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { TradingSystem } from '../TradingSystem.js';
+import { ComponentType } from '../../types/ComponentType.js';
 import {
   createInventoryComponent,
   addToInventoryWithQuality,
@@ -52,7 +53,7 @@ describe('TradingSystem Quality Integration', () => {
 
   it('should apply quality multiplier when selling items', () => {
     // Add poor quality wheat (quality 20) to agent
-    let agentInventory = agent.getComponent('inventory') as InventoryComponent;
+    const agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
     if (!agentInventory) {
       throw new Error('Agent inventory missing');
     }
@@ -60,14 +61,14 @@ describe('TradingSystem Quality Integration', () => {
     const addResult = addToInventoryWithQuality(agentInventory, 'wheat', 10, 20);
     agent.addComponent(addResult.inventory);
 
-    const startingGold = (agent.getComponent('currency') as CurrencyComponent).balance;
+    const startingGold = (agent.getComponent(ComponentType.Currency) as CurrencyComponent).balance;
 
     // Sell poor quality wheat (quality is read from inventory automatically)
     const tradeResult = tradingSystem.sellToShop(world, agent.id, shop.id, 'wheat', 10);
 
     expect(tradeResult.success).toBe(true);
 
-    const endingGold = (agent.getComponent('currency') as CurrencyComponent).balance;
+    const endingGold = (agent.getComponent(ComponentType.Currency) as CurrencyComponent).balance;
     const profit = endingGold - startingGold;
 
     // Quality multiplier for 20 = 0.5 + (20/100) * 1.5 = 0.8x
@@ -79,7 +80,7 @@ describe('TradingSystem Quality Integration', () => {
 
   it('should pay more for legendary quality items', () => {
     // Add legendary quality wheat (quality 100) to agent
-    let agentInventory = agent.getComponent('inventory') as InventoryComponent;
+    const agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
     if (!agentInventory) {
       throw new Error('Agent inventory missing');
     }
@@ -87,14 +88,14 @@ describe('TradingSystem Quality Integration', () => {
     const addResult = addToInventoryWithQuality(agentInventory, 'wheat', 10, 100);
     agent.addComponent(addResult.inventory);
 
-    const startingGold = (agent.getComponent('currency') as CurrencyComponent).balance;
+    const startingGold = (agent.getComponent(ComponentType.Currency) as CurrencyComponent).balance;
 
     // Sell legendary quality wheat (quality is read from inventory)
     const tradeResult = tradingSystem.sellToShop(world, agent.id, shop.id, 'wheat', 10);
 
     expect(tradeResult.success).toBe(true);
 
-    const endingGold = (agent.getComponent('currency') as CurrencyComponent).balance;
+    const endingGold = (agent.getComponent(ComponentType.Currency) as CurrencyComponent).balance;
     const profit = endingGold - startingGold;
 
     // Quality multiplier for 100 = 2.0x base value
@@ -105,14 +106,14 @@ describe('TradingSystem Quality Integration', () => {
     // The shop already has wheat (from beforeEach), but that has default quality 50
     // Buying higher quality wheat should cost more (but shop uses DEFAULT_QUALITY for its stock)
     // This test verifies the pricing system works
-    const startingGold = (agent.getComponent('currency') as CurrencyComponent).balance;
+    const startingGold = (agent.getComponent(ComponentType.Currency) as CurrencyComponent).balance;
 
     // Buy wheat from shop
     const tradeResult = tradingSystem.buyFromShop(world, agent.id, shop.id, 'wheat', 10);
 
     expect(tradeResult.success).toBe(true);
 
-    const endingGold = (agent.getComponent('currency') as CurrencyComponent).balance;
+    const endingGold = (agent.getComponent(ComponentType.Currency) as CurrencyComponent).balance;
     const cost = startingGold - endingGold;
 
     // Should have paid something
@@ -121,7 +122,7 @@ describe('TradingSystem Quality Integration', () => {
 
   it('should correctly price different quality tiers of the same item', () => {
     // Add multiple quality tiers of wheat to agent
-    let agentInventory = agent.getComponent('inventory') as InventoryComponent;
+    let agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
     if (!agentInventory) {
       throw new Error('Agent inventory missing');
     }
@@ -142,11 +143,11 @@ describe('TradingSystem Quality Integration', () => {
 
     // Sell each quality tier (quality is read from inventory slots automatically)
     for (const quality of [20, 50, 70, 90, 100]) {
-      const startGold = (agent.getComponent('currency') as CurrencyComponent).balance;
+      const startGold = (agent.getComponent(ComponentType.Currency) as CurrencyComponent).balance;
       const tradeResult = tradingSystem.sellToShop(world, agent.id, shop.id, 'wheat', 10);
       expect(tradeResult.success).toBe(true);
 
-      const endGold = (agent.getComponent('currency') as CurrencyComponent).balance;
+      const endGold = (agent.getComponent(ComponentType.Currency) as CurrencyComponent).balance;
       prices[quality] = endGold - startGold;
     }
 
@@ -164,7 +165,7 @@ describe('TradingSystem Quality Integration', () => {
 
   it('should fail when trying to sell more than available in inventory', () => {
     // Add wheat quality 50
-    let agentInventory = agent.getComponent('inventory') as InventoryComponent;
+    const agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
     if (!agentInventory) {
       throw new Error('Agent inventory missing');
     }
@@ -193,7 +194,7 @@ describe('TradingSystem Quality Integration', () => {
 
     for (const quality of testQualities) {
       // Add wheat to agent
-      let agentInventory = agent.getComponent('inventory') as InventoryComponent;
+      const agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
       if (!agentInventory) {
         throw new Error('Agent inventory missing');
       }
@@ -201,12 +202,12 @@ describe('TradingSystem Quality Integration', () => {
       const addResult = addToInventoryWithQuality(agentInventory, 'wheat', 1, quality);
       agent.addComponent(addResult.inventory);
 
-      const startGold = (agent.getComponent('currency') as CurrencyComponent).balance;
+      const startGold = (agent.getComponent(ComponentType.Currency) as CurrencyComponent).balance;
 
       // Sell item (quality is read from inventory)
       tradingSystem.sellToShop(world, agent.id, shop.id, 'wheat', 1);
 
-      const endGold = (agent.getComponent('currency') as CurrencyComponent).balance;
+      const endGold = (agent.getComponent(ComponentType.Currency) as CurrencyComponent).balance;
       const actualProfit = endGold - startGold;
 
       // Calculate expected multiplier
@@ -220,7 +221,7 @@ describe('TradingSystem Quality Integration', () => {
 
   it('should handle multiple trades with different quality items in same session', () => {
     // Agent has multiple quality tiers
-    let agentInventory = agent.getComponent('inventory') as InventoryComponent;
+    let agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
     if (!agentInventory) {
       throw new Error('Agent inventory missing');
     }
@@ -232,21 +233,21 @@ describe('TradingSystem Quality Integration', () => {
     result = addToInventoryWithQuality(agentInventory, 'wheat', 5, 90);
     agent.addComponent(result.inventory);
 
-    const startGold = (agent.getComponent('currency') as CurrencyComponent).balance;
+    const startGold = (agent.getComponent(ComponentType.Currency) as CurrencyComponent).balance;
 
     // Sell all three quality tiers (quality is read from inventory)
     tradingSystem.sellToShop(world, agent.id, shop.id, 'wheat', 5);
     tradingSystem.sellToShop(world, agent.id, shop.id, 'wheat', 5);
     tradingSystem.sellToShop(world, agent.id, shop.id, 'wheat', 5);
 
-    const endGold = (agent.getComponent('currency') as CurrencyComponent).balance;
+    const endGold = (agent.getComponent(ComponentType.Currency) as CurrencyComponent).balance;
     const totalProfit = endGold - startGold;
 
     // Should have made profit from all three sales
     expect(totalProfit).toBeGreaterThan(0);
 
     // Agent should have no wheat left
-    agentInventory = agent.getComponent('inventory') as InventoryComponent;
+    agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
     if (!agentInventory) {
       throw new Error('Agent inventory missing');
     }

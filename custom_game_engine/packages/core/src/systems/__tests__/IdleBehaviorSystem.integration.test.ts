@@ -4,13 +4,14 @@ import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { IdleBehaviorSystem } from '../IdleBehaviorSystem.js';
 import { createAgentComponent } from '../../components/AgentComponent.js';
-import { createPersonalityComponent } from '../../components/PersonalityComponent.js';
-import { createNeedsComponent } from '../../components/NeedsComponent.js';
+import { PersonalityComponent } from '../../components/PersonalityComponent.js';
+import { NeedsComponent } from '../../components/NeedsComponent.js';
 import { createMoodComponent } from '../../components/MoodComponent.js';
-import { MemoryComponent } from '../../components/MemoryComponentClass.js';
+import { MemoryComponent } from '../../components/MemoryComponent.js';
 import { GoalsComponent } from '../../components/GoalsComponent.js';
 import { ActionQueue } from '../../actions/ActionQueueClass.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Integration tests for IdleBehaviorSystem
  *
@@ -33,14 +34,20 @@ describe('IdleBehaviorSystem Integration', () => {
     // Create agent with balanced personality
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent(createAgentComponent('Test Agent'));
-    agent.addComponent(createPersonalityComponent({
+    agent.addComponent(new PersonalityComponent({
       openness: 0.6,
       conscientiousness: 0.6,
       extraversion: 0.6,
       agreeableness: 0.6,
       neuroticism: 0.4,
     }));
-    agent.addComponent(createNeedsComponent(80, 80, 80, 0.42, 0.5));
+    agent.addComponent(new NeedsComponent({
+    hunger: 0.8,
+    energy: 0.8,
+    health: 0.8,
+    hungerDecayRate: 0.42,
+    energyDecayRate: 0.5,
+  }));
     agent.addComponent(createMoodComponent());
     agent.addComponent(new MemoryComponent(agent.id));
     agent.addComponent(new GoalsComponent());
@@ -52,7 +59,7 @@ describe('IdleBehaviorSystem Integration', () => {
 
     // Run 100 iterations
     for (let i = 0; i < 100; i++) {
-      const actionQueue = agent.getComponent('action_queue') as any;
+      const actionQueue = agent.getComponent(ComponentType.ActionQueue) as any;
       actionQueue.clear();
 
       idleBehaviorSystem.update(world, 1);
@@ -75,7 +82,7 @@ describe('IdleBehaviorSystem Integration', () => {
   it('should select chat_idle more often when agent is lonely', () => {
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent(createAgentComponent('Lonely Agent'));
-    agent.addComponent(createPersonalityComponent({
+    agent.addComponent(new PersonalityComponent({
       openness: 0.5,
       conscientiousness: 0.5,
       extraversion: 0.7, // Extraverted
@@ -83,7 +90,13 @@ describe('IdleBehaviorSystem Integration', () => {
       neuroticism: 0.3,
     }));
 
-    const needs = createNeedsComponent(80, 80, 20, 0.42, 0.5); // Low social
+    const needs = new NeedsComponent({
+    hunger: 0.8,
+    energy: 0.8,
+    health: 0.2,
+    hungerDecayRate: 0.42,
+    energyDecayRate: 0.5,
+  }); // Low social
     agent.addComponent(needs);
     agent.addComponent(createMoodComponent());
     agent.addComponent(new MemoryComponent(agent.id));
@@ -95,7 +108,7 @@ describe('IdleBehaviorSystem Integration', () => {
 
     // Run 50 iterations
     for (let i = 0; i < 50; i++) {
-      const actionQueue = agent.getComponent('action_queue') as any;
+      const actionQueue = agent.getComponent(ComponentType.ActionQueue) as any;
       actionQueue.clear();
 
       idleBehaviorSystem.update(world, 1);
@@ -113,7 +126,7 @@ describe('IdleBehaviorSystem Integration', () => {
   it('should select sit_quietly more often when agent is content', () => {
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent(createAgentComponent('Content Agent'));
-    agent.addComponent(createPersonalityComponent({
+    agent.addComponent(new PersonalityComponent({
       openness: 0.5,
       conscientiousness: 0.5,
       extraversion: 0.3, // Introverted
@@ -121,7 +134,13 @@ describe('IdleBehaviorSystem Integration', () => {
       neuroticism: 0.2, // Low neuroticism
     }));
 
-    const needs = createNeedsComponent(90, 90, 90, 0.42, 0.5); // All needs met
+    const needs = new NeedsComponent({
+    hunger: 0.9,
+    energy: 0.9,
+    health: 0.9,
+    hungerDecayRate: 0.42,
+    energyDecayRate: 0.5,
+  }); // All needs met
     agent.addComponent(needs);
     agent.addComponent(createMoodComponent());
     agent.addComponent(new MemoryComponent(agent.id));
@@ -133,7 +152,7 @@ describe('IdleBehaviorSystem Integration', () => {
 
     // Run 50 iterations
     for (let i = 0; i < 50; i++) {
-      const actionQueue = agent.getComponent('action_queue') as any;
+      const actionQueue = agent.getComponent(ComponentType.ActionQueue) as any;
       actionQueue.clear();
 
       idleBehaviorSystem.update(world, 1);
@@ -151,14 +170,20 @@ describe('IdleBehaviorSystem Integration', () => {
   it('should weight reflection higher for conscientious agents', () => {
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent(createAgentComponent('Reflective Agent'));
-    agent.addComponent(createPersonalityComponent({
+    agent.addComponent(new PersonalityComponent({
       openness: 0.7,
       conscientiousness: 0.7,
       extraversion: 0.5,
       agreeableness: 0.6,
       neuroticism: 0.3,
     }));
-    agent.addComponent(createNeedsComponent(80, 80, 80, 0.42, 0.5));
+    agent.addComponent(new NeedsComponent({
+    hunger: 0.8,
+    energy: 0.8,
+    health: 0.8,
+    hungerDecayRate: 0.42,
+    energyDecayRate: 0.5,
+  }));
     agent.addComponent(createMoodComponent());
 
     const memory = new MemoryComponent(agent.id);
@@ -172,7 +197,7 @@ describe('IdleBehaviorSystem Integration', () => {
 
     // Run 50 iterations
     for (let i = 0; i < 50; i++) {
-      const actionQueue = agent.getComponent('action_queue') as any;
+      const actionQueue = agent.getComponent(ComponentType.ActionQueue) as any;
       actionQueue.clear();
 
       idleBehaviorSystem.update(world, 1);
@@ -190,7 +215,7 @@ describe('IdleBehaviorSystem Integration', () => {
   it('should NOT select behaviors when agent has existing actions', () => {
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent(createAgentComponent('Busy Agent'));
-    agent.addComponent(createPersonalityComponent({
+    agent.addComponent(new PersonalityComponent({
       openness: 0.5,
       conscientiousness: 0.5,
       extraversion: 0.5,
@@ -198,7 +223,13 @@ describe('IdleBehaviorSystem Integration', () => {
       neuroticism: 0.5,
     }));
 
-    const needs = createNeedsComponent(80, 80, 80, 0.42, 0.5);
+    const needs = new NeedsComponent({
+    hunger: 0.8,
+    energy: 0.8,
+    health: 0.8,
+    hungerDecayRate: 0.42,
+    energyDecayRate: 0.5,
+  });
     agent.addComponent(needs);
     agent.addComponent(createMoodComponent());
     agent.addComponent(new MemoryComponent(agent.id));
@@ -220,14 +251,20 @@ describe('IdleBehaviorSystem Integration', () => {
   it('should select practice_skill when agent is highly conscientious', () => {
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent(createAgentComponent('Skilled Agent'));
-    agent.addComponent(createPersonalityComponent({
+    agent.addComponent(new PersonalityComponent({
       openness: 0.8,
       conscientiousness: 0.8,
       extraversion: 0.4,
       agreeableness: 0.5,
       neuroticism: 0.3,
     }));
-    agent.addComponent(createNeedsComponent(80, 80, 80, 0.42, 0.5));
+    agent.addComponent(new NeedsComponent({
+    hunger: 0.8,
+    energy: 0.8,
+    health: 0.8,
+    hungerDecayRate: 0.42,
+    energyDecayRate: 0.5,
+  }));
     agent.addComponent(createMoodComponent());
     agent.addComponent(new MemoryComponent(agent.id));
 
@@ -250,7 +287,7 @@ describe('IdleBehaviorSystem Integration', () => {
 
     // Run 50 iterations
     for (let i = 0; i < 50; i++) {
-      const actionQueue = agent.getComponent('action_queue') as any;
+      const actionQueue = agent.getComponent(ComponentType.ActionQueue) as any;
       actionQueue.clear();
 
       idleBehaviorSystem.update(world, 1);
@@ -268,14 +305,20 @@ describe('IdleBehaviorSystem Integration', () => {
   it('should select behaviors based on personality weighting', () => {
     const agent = new EntityImpl(createEntityId(), 0);
     agent.addComponent(createAgentComponent('Stable Agent'));
-    agent.addComponent(createPersonalityComponent({
+    agent.addComponent(new PersonalityComponent({
       openness: 0.5,
       conscientiousness: 0.5,
       extraversion: 0.5,
       agreeableness: 0.5,
       neuroticism: 0.5,
     }));
-    agent.addComponent(createNeedsComponent(80, 80, 80, 0.42, 0.5));
+    agent.addComponent(new NeedsComponent({
+    hunger: 0.8,
+    energy: 0.8,
+    health: 0.8,
+    hungerDecayRate: 0.42,
+    energyDecayRate: 0.5,
+  }));
     agent.addComponent(createMoodComponent());
     agent.addComponent(new MemoryComponent(agent.id));
     agent.addComponent(new GoalsComponent());
@@ -286,7 +329,7 @@ describe('IdleBehaviorSystem Integration', () => {
 
     // Run 50 iterations
     for (let i = 0; i < 50; i++) {
-      const actionQueue = agent.getComponent('action_queue') as any;
+      const actionQueue = agent.getComponent(ComponentType.ActionQueue) as any;
       actionQueue.clear();
 
       idleBehaviorSystem.update(world, 1);

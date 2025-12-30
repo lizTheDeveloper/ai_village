@@ -1,10 +1,9 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-
-// Local type definitions to avoid circular dependencies with world package
-export type BiomeType = 'plains' | 'forest' | 'desert' | 'mountains' | 'ocean' | 'river';
+import type { BiomeType } from '../types/TerrainTypes.js';
 
 export interface Tile {
   terrain: string;
@@ -47,11 +46,11 @@ export class SoilSystem implements System {
 
   update(world: World, _entities: ReadonlyArray<Entity>, deltaTime: number): void {
     // Get time acceleration from TimeComponent if available
-    const timeEntities = world.query().with('time').executeEntities();
+    const timeEntities = world.query().with(CT.Time).executeEntities();
     let timeSpeedMultiplier = 1.0;
     if (timeEntities.length > 0) {
       const timeEntity = timeEntities[0] as any;
-      const timeComp = timeEntity.getComponent('time') as any;
+      const timeComp = timeEntity.getComponent(CT.Time) as any;
       if (timeComp && timeComp.speedMultiplier) {
         timeSpeedMultiplier = timeComp.speedMultiplier;
       }

@@ -1,5 +1,7 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
+import { BuildingType as BT } from '../types/BuildingType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -53,17 +55,17 @@ const WEIRD_DREAM_ELEMENTS = [
 export class SleepSystem implements System {
   public readonly id: SystemId = 'sleep';
   public readonly priority: number = 12; // After Needs (priority 15), before Memory (100)
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = ['circadian', 'needs'];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Circadian, CT.Needs];
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     // Get time component from world entity (should be only one)
-    const timeEntities = world.query().with('time').executeEntities();
+    const timeEntities = world.query().with(CT.Time).executeEntities();
     let timeOfDay = 12; // Default noon if no time entity
     let hoursElapsed = 0;
 
     if (timeEntities.length > 0) {
       const timeEntity = timeEntities[0] as EntityImpl;
-      const timeComp = timeEntity.getComponent<TimeComponent>('time');
+      const timeComp = timeEntity.getComponent<TimeComponent>(CT.Time);
       if (timeComp) {
         timeOfDay = timeComp.timeOfDay;
         // Calculate effective day length based on speed multiplier
@@ -99,9 +101,10 @@ export class SleepSystem implements System {
         }
 
         // Modified by energy level (low energy = higher sleep drive)
-        if (needs.energy < 30) {
+        // NeedsComponent uses 0-1 scale (0.3 = 30%, 0.5 = 50%)
+        if (needs.energy < 0.3) {
           increment *= 1.5; // 50% faster when tired (8.25/hour base, 9.9/hour at night)
-        } else if (needs.energy < 50) {
+        } else if (needs.energy < 0.5) {
           increment *= 1.25; // 25% faster when moderately tired
         }
 
@@ -132,20 +135,21 @@ export class SleepSystem implements System {
     // Get sleep quality from circadian component (set by AISystem when sleep started)
     const sleepQuality = circadian.sleepQuality || 0.5;
 
-    // Base energy recovery: +10 energy per game hour
-    const baseRecovery = 10 * hoursElapsed;
+    // Base energy recovery: +10% (0.1) per game hour on 0-1 scale
+    const baseRecovery = 0.1 * hoursElapsed;
 
     // Apply quality modifier
     const recoveryAmount = baseRecovery * sleepQuality;
 
-    // Recover energy
-    const newEnergy = Math.min(100, needs.energy + recoveryAmount);
+    // Recover energy (0-1 scale, 1.0 = full)
+    const newEnergy = Math.min(1.0, needs.energy + recoveryAmount);
 
     // Update needs component
-    entity.updateComponent<NeedsComponent>('needs', (current) => ({
-      ...current,
-      energy: newEnergy,
-    }));
+    entity.updateComponent<NeedsComponent>(CT.Needs, (current) => {
+      const updated = current.clone();
+      updated.energy = newEnergy;
+      return updated;
+    });
 
     // Track accumulated sleep duration in game hours
     circadian.sleepDurationHours = circadian.sleepDurationHours + hoursElapsed;
@@ -182,9 +186,9 @@ export class SleepSystem implements System {
       // Check if sleeping in a bed
       const buildingComp = getBuilding(circadian.sleepLocation);
       if (buildingComp) {
-        if (buildingComp.buildingType === 'bed') {
+        if (buildingComp.buildingType === BT.Bed) {
           quality += 0.4; // Bed: 0.9 total
-        } else if (buildingComp.buildingType === 'bedroll') {
+        } else if (buildingComp.buildingType === BT.Bedroll) {
           quality += 0.2; // Bedroll: 0.7 total
         } else {
           quality += 0.1; // Other building: 0.6 total
@@ -226,22 +230,24 @@ export class SleepSystem implements System {
     // Minimum sleep duration: 4 game hours
     if (hoursAsleep < 4) {
       // Only wake for critical hunger (not energy - agent needs to recover!)
-      if (needs.hunger < 10) {
+      // NeedsComponent uses 0-1 scale (0.1 = 10%)
+      if (needs.hunger < 0.1) {
         return true; // Critical hunger overrides minimum sleep
       }
       return false;
     }
 
     // Wake conditions (prioritize energy recovery):
-    // 1. Energy fully restored (100)
-    const energyFull = needs.energy >= 100;
+    // NeedsComponent uses 0-1 scale (1.0 = 100%, 0.7 = 70%, 0.1 = 10%)
+    // 1. Energy fully restored (100%)
+    const energyFull = needs.energy >= 1.0;
 
-    // 2. Urgent hunger (< 10)
-    const urgentNeed = needs.hunger < 10;
+    // 2. Urgent hunger (< 10%)
+    const urgentNeed = needs.hunger < 0.1;
 
-    // 3. Energy sufficiently recovered (>= 70) AND sleep drive depleted (< 10)
+    // 3. Energy sufficiently recovered (>= 70%) AND sleep drive depleted (< 10)
     // This prevents premature waking when sleep drive depletes before energy recovers
-    const wellRestedAndSatisfied = needs.energy >= 70 && circadian.sleepDrive < 10;
+    const wellRestedAndSatisfied = needs.energy >= 0.7 && circadian.sleepDrive < 10;
 
     // 4. Maximum sleep duration reached (12 hours - prevent oversleeping)
     const maxSleepReached = hoursAsleep >= 12;
@@ -267,7 +273,7 @@ export class SleepSystem implements System {
     // Update agent behavior (switch from sleeping to wandering)
     const agent = getAgent(entity);
     if (agent && (agent.behavior === 'seek_sleep' || agent.behavior === 'forced_sleep')) {
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
         ...current,
         behavior: 'wander',
         behaviorState: {},

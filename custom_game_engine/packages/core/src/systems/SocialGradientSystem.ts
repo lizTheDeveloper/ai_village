@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
@@ -18,7 +19,7 @@ import {
  * Updates SocialGradientComponent with trust-weighted directional hints
  */
 export class SocialGradientSystem implements System {
-  public readonly id: SystemId = 'social_gradient';
+  public readonly id: SystemId = CT.SocialGradient;
   public readonly priority: number = 22; // After AISystem, before Exploration
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
@@ -40,7 +41,7 @@ export class SocialGradientSystem implements System {
     }
     this.lastUpdateTick = world.tick;
     // Apply gradient decay to all entities
-    const gradientsEntities = entities.filter(e => e.components.has('social_gradient'));
+    const gradientsEntities = entities.filter(e => e.components.has(CT.SocialGradient));
 
     for (const entity of gradientsEntities) {
       try {
@@ -56,8 +57,8 @@ export class SocialGradientSystem implements System {
     // OPTIMIZATION: Only process speech when agents have NEW messages
     // Round-robin scheduling: Queue agents with new messages, process limited number per update
     const agents = entities.filter(e =>
-      e.components.has('agent') &&
-      e.components.has('conversation')
+      e.components.has(CT.Agent) &&
+      e.components.has(CT.Conversation)
     );
 
     // Step 1: Identify agents with new messages and add to pending queue
@@ -140,9 +141,9 @@ export class SocialGradientSystem implements System {
     // Broadcast gradients to nearby agents
     const listeners = entities.filter(e => {
       if (e.id === speaker.id) return false; // Don't send to self
-      if (!e.components.has('agent')) return false;
-      if (!e.components.has('social_gradient')) return false;
-      if (!e.components.has('position')) return false;
+      if (!e.components.has(CT.Agent)) return false;
+      if (!e.components.has(CT.SocialGradient)) return false;
+      if (!e.components.has(CT.Position)) return false;
 
       // Check if within hearing range (same as conversation system)
       if (speakerPos) {
@@ -229,7 +230,7 @@ export class SocialGradientSystem implements System {
     entity: Entity,
     resourceType: ResourceType
   ): { bearing: number; strength: number; confidence: number } | undefined {
-    if (!entity.components.has('social_gradient')) {
+    if (!entity.components.has(CT.SocialGradient)) {
       return undefined;
     }
 

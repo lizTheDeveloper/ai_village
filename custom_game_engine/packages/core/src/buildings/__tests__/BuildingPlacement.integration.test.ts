@@ -4,6 +4,8 @@ import { EventBusImpl } from '../../events/EventBus.js';
 import { BuildingBlueprintRegistry } from '../BuildingBlueprintRegistry.js';
 import { PlacementValidator } from '../PlacementValidator.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
+import { BuildingType } from '../../types/BuildingType.js';
 /**
  * Integration tests for Building Placement System
  *
@@ -338,8 +340,8 @@ describe('Building Creation from Placement', () => {
   it('should create building entity with correct initial state', () => {
     // This is a specification test - the building system should create entities like this
     const expectedBuildingComponent = {
-      type: 'building',
-      buildingType: 'campfire',
+      type: ComponentType.Building,
+      buildingType: BuildingType.Campfire,
       tier: 1,
       progress: 0,
       isComplete: false,

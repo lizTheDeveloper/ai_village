@@ -215,7 +215,28 @@ export const WILDFLOWER: PlantSpecies = {
   preferredSeasons: ['spring', 'summer'],
 
   properties: {
-    dye: true
+    crafting: {
+      dye: {
+        color: 'yellow',
+        intensity: 0.6,
+        permanence: 0.7
+      },
+      scent: {
+        profile: 'light floral, honey-like',
+        intensity: 0.5,
+        persistence: 4
+      }
+    },
+    environmental: {
+      companionEffects: {
+        attracts: ['bee', 'butterfly'],
+        benefitsNearby: ['berry-bush', 'tomato']
+      },
+      soilEffects: {
+        nitrogenFixer: false,
+        fertilityOnDecay: 5
+      }
+    }
   },
 
   sprites: {
@@ -336,7 +357,29 @@ export const BERRY_BUSH: PlantSpecies = {
   preferredSeasons: ['spring', 'summer', 'fall'],
 
   properties: {
-    edible: true
+    edible: true,
+    nutritionValue: 25,
+    taste: {
+      sweet: 0.7,
+      bitter: 0.1,
+      sour: 0.3,
+      savory: 0.0,
+      spicy: 0.0,
+      aromatic: 0.4
+    },
+    medicinal: {
+      treats: ['fatigue'],
+      effectiveness: 0.3,
+      preparation: ['raw'],
+      dosage: 'small',
+      toxicIfOverused: false,
+      synergiesWith: ['chamomile']
+    },
+    environmental: {
+      companionEffects: {
+        attracts: ['bird', 'squirrel']
+      }
+    }
   },
 
   sprites: {
@@ -447,7 +490,34 @@ export const TREE: PlantSpecies = {
   preferredSeasons: ['spring', 'summer', 'fall'],
 
   properties: {
-    fiber: true // Trees provide wood/fiber material
+    crafting: {
+      fiber: {
+        strength: 0.8,
+        flexibility: 0.3,
+        waterResistance: 0.6
+      },
+      structural: {
+        hardness: 0.7,
+        flexibility: 0.2,
+        waterResistance: 0.5,
+        weight: 1.0
+      }
+    },
+    environmental: {
+      aura: {
+        radius: 3,
+        effect: 'shade',
+        magnitude: 0.6
+      },
+      companionEffects: {
+        benefitsNearby: ['mushroom', 'fern'],
+        attracts: ['bird', 'squirrel']
+      },
+      soilEffects: {
+        acidifying: true,
+        fertilityOnDecay: 15
+      }
+    }
   },
 
   sprites: {

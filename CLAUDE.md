@@ -2,6 +2,10 @@
 
 > *This project is dedicated to Tarn Adams and Dwarf Fortress. See [README.md](./README.md) for our philosophy on open source, monetization, and the inspirations behind this project.*
 
+## Help System
+
+Items/effects embed documentation via `help` field. Wiki auto-generates from definitions. See `packages/core/src/help/README.md` and `documentedItems.example.ts`.
+
 ## Naming Conventions
 
 ### Component Type Names
@@ -161,7 +165,31 @@ throw new ParseError(`Could not parse: ${text}. Valid options: ${validOptions}`)
 
 ## Running the Game
 
-### 1. Start the Metrics Dashboard (Terminal 1)
+### macOS with Apple Silicon (Recommended)
+
+**See [MLX_SETUP.md](MLX_SETUP.md) for detailed MLX server installation and setup.**
+
+For macOS users, MLX provides 2-5x faster inference than Ollama:
+
+**Terminal 1: Start MLX Server**
+```bash
+pip install mlx-lm  # First time only
+mlx_lm.server --model mlx-community/Qwen3-4B-Instruct-4bit
+```
+
+Wait for: `INFO: Uvicorn running on http://localhost:8080`
+
+The game automatically detects macOS and uses MLX server by default.
+
+### All Platforms (Linux/Windows/macOS)
+
+**Terminal 1: Start Ollama** (if not using MLX)
+```bash
+ollama serve
+# In another terminal: ollama pull qwen3:1.7b
+```
+
+### 1. Start the Metrics Dashboard (Terminal 2)
 
 The dashboard collects metrics from the game and provides a text-based interface for debugging:
 
@@ -174,7 +202,7 @@ This starts:
 - **WebSocket server** on `ws://localhost:8765` (receives metrics from game)
 - **HTTP dashboard** on `http://localhost:8766` (query with curl)
 
-### 2. Start the Game Dev Server (Terminal 2)
+### 2. Start the Game Dev Server (Terminal 3)
 
 ```bash
 cd custom_game_engine

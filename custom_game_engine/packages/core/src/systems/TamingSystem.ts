@@ -1,19 +1,14 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { AnimalComponent } from '../components/AnimalComponent.js';
 import { getAnimalSpecies } from '../data/animalSpecies.js';
+import type { TamingMethod, InteractionType } from '../types/AnimalTypes.js';
 
-/**
- * Taming method types
- */
-export type TamingMethod = 'feeding' | 'patience' | 'rescue' | 'raising';
-
-/**
- * Interaction types for bond building
- */
-export type InteractionType = 'feeding' | 'grooming' | 'playing' | 'rescuing' | 'training';
+// Re-export for backwards compatibility
+export type { TamingMethod, InteractionType };
 
 /**
  * TamingSystem handles taming attempts and bond building
@@ -22,7 +17,7 @@ export type InteractionType = 'feeding' | 'grooming' | 'playing' | 'rescuing' | 
 export class TamingSystem implements System {
   public readonly id: SystemId = 'taming';
   public readonly priority: number = 70;
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = ['animal'];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Animal];
 
   private world: World | null = null;
 
@@ -57,7 +52,7 @@ export class TamingSystem implements System {
     }
 
     // Calculate base taming chance
-    let baseChance = 100 - species.tameDifficulty;
+    const baseChance = 100 - species.tameDifficulty;
 
     // Apply method effectiveness
     let methodBonus = 0;
@@ -250,7 +245,7 @@ export class TamingSystem implements System {
       throw new Error(`Entity ${entityId} not found`);
     }
 
-    const animal = entity.components.get('animal') as AnimalComponent | undefined;
+    const animal = entity.components.get(CT.Animal) as AnimalComponent | undefined;
     if (!animal) {
       throw new Error(`Entity ${entityId} does not have animal component`);
     }
@@ -264,7 +259,7 @@ export class TamingSystem implements System {
     }
 
     // Calculate base taming chance
-    let baseChance = 100 - species.tameDifficulty;
+    const baseChance = 100 - species.tameDifficulty;
 
     // Apply method effectiveness
     let methodBonus = 0;
@@ -314,7 +309,7 @@ export class TamingSystem implements System {
       throw new Error(`Entity ${entityId} not found`);
     }
 
-    const animal = entity.components.get('animal') as AnimalComponent | undefined;
+    const animal = entity.components.get(CT.Animal) as AnimalComponent | undefined;
     if (!animal) {
       throw new Error(`Entity ${entityId} does not have animal component`);
     }
@@ -339,7 +334,7 @@ export class TamingSystem implements System {
       throw new Error(`Entity ${entityId} not found`);
     }
 
-    const animal = entity.components.get('animal') as AnimalComponent | undefined;
+    const animal = entity.components.get(CT.Animal) as AnimalComponent | undefined;
     if (!animal) {
       throw new Error(`Entity ${entityId} does not have animal component`);
     }
@@ -360,7 +355,7 @@ export class TamingSystem implements System {
       throw new Error(`Entity ${entityId} not found`);
     }
 
-    const animal = entity.components.get('animal') as AnimalComponent | undefined;
+    const animal = entity.components.get(CT.Animal) as AnimalComponent | undefined;
     if (!animal) {
       throw new Error(`Entity ${entityId} does not have animal component`);
     }

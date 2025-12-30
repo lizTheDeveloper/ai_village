@@ -1,3 +1,4 @@
+import type { World, InventorySlot, BuildingComponent, InventoryComponent } from '@ai-village/core';
 
 /**
  * UI Panel displaying village resources and stockpile.
@@ -16,7 +17,7 @@ export class ResourcesPanel {
    * @param world World instance to query storage buildings
    * @param _agentPanelOpen Whether the agent info panel is currently open (unused)
    */
-  render(ctx: CanvasRenderingContext2D, _canvasWidth: number, world: any, _agentPanelOpen = false): void {
+  render(ctx: CanvasRenderingContext2D, _canvasWidth: number, world: World, _agentPanelOpen = false): void {
     // WindowManager handles positioning via translate, so render at (0, 0)
     const x = 0;
     const y = 0;
@@ -103,7 +104,7 @@ export class ResourcesPanel {
   /**
    * Aggregate all resources across all storage buildings.
    */
-  private aggregateStorageResources(world: any): Record<string, number> {
+  private aggregateStorageResources(world: World): Record<string, number> {
     if (!world || typeof world.query !== 'function') {
       return {};
     }
@@ -121,8 +122,8 @@ export class ResourcesPanel {
     }
 
     for (const storage of storageBuildings) {
-      const building = storage.getComponent('building');
-      const inventory = storage.getComponent('inventory');
+      const building = storage.components.get('building') as BuildingComponent | undefined;
+      const inventory = storage.components.get('inventory') as InventoryComponent | undefined;
 
       // Only count complete storage buildings
       if (!building?.isComplete) {
@@ -153,7 +154,7 @@ export class ResourcesPanel {
   /**
    * Get storage capacity information.
    */
-  private getStorageCapacityInfo(world: any): string | null {
+  private getStorageCapacityInfo(world: World): string | null {
     if (!world || typeof world.query !== 'function') {
       return null;
     }
@@ -168,8 +169,8 @@ export class ResourcesPanel {
     let totalSlots = 0;
 
     for (const storage of storageBuildings) {
-      const building = storage.getComponent('building');
-      const inventory = storage.getComponent('inventory');
+      const building = storage.components.get('building') as BuildingComponent | undefined;
+      const inventory = storage.components.get('inventory') as InventoryComponent | undefined;
 
       if (!building?.isComplete) continue;
       if (building.buildingType !== 'storage-chest' && building.buildingType !== 'storage-box') continue;
@@ -178,7 +179,7 @@ export class ResourcesPanel {
 
       if (inventory?.slots) {
         totalSlots += inventory.maxSlots || inventory.slots.length;
-        usedSlots += inventory.slots.filter((s: any) => s.itemId && s.quantity > 0).length;
+        usedSlots += inventory.slots.filter((s: InventorySlot) => s.itemId && s.quantity > 0).length;
       }
     }
 

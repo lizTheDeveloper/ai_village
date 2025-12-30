@@ -143,29 +143,29 @@ export class RecipeListSection {
 
     // Apply category filter
     if (this.activeCategory !== 'All') {
-      recipes = recipes.filter(r => r.category === this.activeCategory);
+      recipes = recipes.filter((r: Recipe) => r.category === this.activeCategory);
     }
 
     // Apply search filter
     if (this.searchQuery) {
       const query = this.searchQuery.toLowerCase();
-      recipes = recipes.filter(r => r.name.toLowerCase().includes(query));
+      recipes = recipes.filter((r: Recipe) => r.name.toLowerCase().includes(query));
     }
 
     // Apply station filter
     if (this.stationFilter !== undefined) {
-      recipes = recipes.filter(r => r.stationRequired === this.stationFilter);
+      recipes = recipes.filter((r: Recipe) => r.stationRequired === this.stationFilter);
     }
 
     // Apply craftability/unlock filter
     switch (this.craftabilityFilter) {
       case 'Locked':
         // Show only locked recipes
-        recipes = recipes.filter(r => !this.isRecipeUnlocked(r));
+        recipes = recipes.filter((r: Recipe) => !this.isRecipeUnlocked(r));
         break;
       case 'Craftable':
         // Only show unlocked recipes (for now - full impl would also check inventory)
-        recipes = recipes.filter(r => this.isRecipeUnlocked(r));
+        recipes = recipes.filter((r: Recipe) => this.isRecipeUnlocked(r));
         break;
       case 'All':
       case 'Missing One':

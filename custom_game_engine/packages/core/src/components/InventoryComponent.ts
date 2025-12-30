@@ -152,7 +152,7 @@ export function addToInventory(
   const weightAvailable = inventory.maxWeight - inventory.currentWeight;
   const maxByWeight = Math.floor(weightAvailable / unitWeight);
 
-  let amountToAdd = Math.min(quantity, maxByWeight);
+  const amountToAdd = Math.min(quantity, maxByWeight);
   let remainingToAdd = amountToAdd;
 
   if (remainingToAdd === 0) {
@@ -232,7 +232,7 @@ export function addToInventoryWithQuality(
   const weightAvailable = inventory.maxWeight - inventory.currentWeight;
   const maxByWeight = Math.floor(weightAvailable / unitWeight);
 
-  let amountToAdd = Math.min(quantity, maxByWeight);
+  const amountToAdd = Math.min(quantity, maxByWeight);
   let remainingToAdd = amountToAdd;
 
   if (remainingToAdd === 0) {

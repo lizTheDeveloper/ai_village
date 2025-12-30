@@ -3,6 +3,7 @@ import type { World } from '../../ecs/World';
 import type { Entity } from '../../ecs/Entity';
 import type { AgentBehavior } from '../../components/AgentComponent';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Tests for behavior queue processing in AISystem
  * These tests verify that AISystem.update() correctly processes the behavior queue
@@ -17,7 +18,7 @@ interface QueuedBehavior {
 }
 
 interface QueuedAgentComponent {
-  type: 'agent';
+  type: ComponentType.Agent;
   version: number;
   behavior: AgentBehavior;
   behaviorState: Record<string, unknown>;
@@ -33,7 +34,7 @@ interface QueuedAgentComponent {
 }
 
 interface NeedsComponent {
-  type: 'needs';
+  type: ComponentType.Needs;
   version: number;
   hunger: number;
   energy: number;
@@ -48,7 +49,7 @@ describe('Behavior Queue Processing in AISystem', () => {
 
   beforeEach(() => {
     mockAgent = {
-      type: 'agent',
+      type: ComponentType.Agent,
       version: 1,
       behavior: 'wander',
       behaviorState: {},
@@ -63,7 +64,7 @@ describe('Behavior Queue Processing in AISystem', () => {
     };
 
     mockNeeds = {
-      type: 'needs',
+      type: ComponentType.Needs,
       version: 1,
       hunger: 50,
       energy: 50,
@@ -451,7 +452,7 @@ describe('Behavior Queue Processing in AISystem', () => {
   describe('CLAUDE.md Compliance - Queue Processing', () => {
     it('should throw when accessing queue on agent without behaviorQueue field', () => {
       const invalidAgent = {
-        type: 'agent' as const,
+        type: ComponentType.Agent,
         version: 1,
         behavior: 'wander' as AgentBehavior,
         behaviorState: {},
@@ -487,7 +488,7 @@ describe('Behavior Queue Processing in AISystem', () => {
 
     it('should NOT use fallback for missing queuePaused field', () => {
       const invalidAgent = {
-        type: 'agent' as const,
+        type: ComponentType.Agent,
         version: 1,
         behavior: 'wander' as AgentBehavior,
         behaviorState: {},

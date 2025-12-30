@@ -30,8 +30,8 @@ describe('PerlinNoise', () => {
     const testPoints = 100;
 
     for (let i = 0; i < testPoints; i++) {
-      const x = Math.random() * 100;
-      const y = Math.random() * 100;
+      const x = Math.random();
+      const y = Math.random();
       const value1 = noise1.noise(x, y);
       const value2 = noise2.noise(x, y);
       totalDifference += Math.abs(value1 - value2);

@@ -67,8 +67,12 @@ export { CraftBehavior, craftBehavior } from './CraftBehavior.js';
 // Trade behaviors
 export { TradeBehavior, tradeBehavior } from './TradeBehavior.js';
 
+// Magic behaviors
+export { CastSpellBehavior, castSpellBehavior } from './CastSpellBehavior.js';
+
 // Survival behaviors
 export { SeekWarmthBehavior, seekWarmthBehavior } from './SeekWarmthBehavior.js';
+export { SeekCoolingBehavior, seekCoolingBehavior } from './SeekCoolingBehavior.js';
 
 // Navigation behaviors
 export {

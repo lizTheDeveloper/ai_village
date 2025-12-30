@@ -6,9 +6,10 @@ import { TimeSystem } from '../systems/TimeSystem.js';
 import { WeatherSystem } from '../systems/WeatherSystem.js';
 import { TemperatureSystem } from '../systems/TemperatureSystem.js';
 import { MemoryFormationSystem } from '../systems/MemoryFormationSystem.js';
-import { createMemoryComponent } from '../components/MemoryComponent.js';
-import { createNeedsComponent } from '../components/NeedsComponent.js';
+import { MemoryComponent } from '../components/MemoryComponent.js';
+import { NeedsComponent } from '../components/NeedsComponent.js';
 
+import { ComponentType } from '../types/ComponentType.js';
 /**
  * Integration tests for EventBus event propagation across systems
  *
@@ -30,8 +31,14 @@ describe('EventBus Propagation Integration', () => {
 
   it('should propagate events to multiple listening systems', () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
-    agent.addComponent(createMemoryComponent());
-    agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
+    agent.addComponent(new MemoryComponent(agent.id || entity.id));
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
 
     // Create systems that listen to events - pass eventBus
     const memorySystem = new MemoryFormationSystem(harness.world.eventBus);
@@ -65,7 +72,7 @@ describe('EventBus Propagation Integration', () => {
     // Create weather entity
     const weatherEntity = harness.world.createEntity('weather');
     weatherEntity.addComponent({
-      type: 'weather',
+      type: ComponentType.Weather,
       version: 1,
       weatherType: 'clear',
       intensity: 0.5,
@@ -77,7 +84,7 @@ describe('EventBus Propagation Integration', () => {
     // Create agent with temperature
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     agent.addComponent({
-      type: 'temperature',
+      type: ComponentType.Temperature,
       version: 1,
       currentTemp: 20,
       state: 'comfortable',
@@ -195,7 +202,13 @@ describe('EventBus Propagation Integration', () => {
 
   it('should allow event listeners to modify world state', () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
-    agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
 
     // Subscribe to event and modify agent
     const unsub = harness.world.eventBus.subscribe('test:modify_agent', (event: any) => {
@@ -224,7 +237,7 @@ describe('EventBus Propagation Integration', () => {
     unsub();
 
     // Agent's state should be modified
-    const needs = agent.getComponent('needs') as any;
+    const needs = agent.getComponent(ComponentType.Needs) as any;
     expect(needs.hunger).toBe(50);
   });
 

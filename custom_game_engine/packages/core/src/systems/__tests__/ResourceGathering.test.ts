@@ -4,12 +4,13 @@ import { EventBusImpl } from '../../events/EventBus.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
 import { createInventoryComponent } from '../../components/InventoryComponent.js';
 import { createAgentComponent } from '../../components/AgentComponent.js';
-import { createNeedsComponent } from '../../components/NeedsComponent.js';
+import { NeedsComponent } from '../../components/NeedsComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
 import type { InventoryComponent } from '../../components/InventoryComponent.js';
 import type { ResourceComponent } from '../../components/ResourceComponent.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 describe('Resource Gathering System', () => {
   let world: WorldImpl;
   let agent: EntityImpl;
@@ -31,7 +32,7 @@ describe('Resource Gathering System', () => {
     tree = new EntityImpl(createEntityId(), world.tick);
     tree.addComponent(createPositionComponent(2, 0));
     tree.addComponent({
-      type: 'resource',
+      type: ComponentType.Resource,
       version: 1,
       resourceType: 'wood',
       amount: 100,
@@ -45,7 +46,7 @@ describe('Resource Gathering System', () => {
     rock = new EntityImpl(createEntityId(), world.tick);
     rock.addComponent(createPositionComponent(0, 2));
     rock.addComponent({
-      type: 'resource',
+      type: ComponentType.Resource,
       version: 1,
       resourceType: 'stone',
       amount: 50,
@@ -59,7 +60,7 @@ describe('Resource Gathering System', () => {
   describe('Acceptance Criterion 2: Wood Gathering (Chop Action)', () => {
     it('should move agent toward tree when not adjacent', () => {
       // Agent at (0,0), tree at (2,0) - distance > 1.5
-      const initialPosition = agent.getComponent<PositionComponent>('position');
+      const initialPosition = agent.getComponent(ComponentType.Position);
       expect(initialPosition).toBeDefined();
 
       // After AI system processes 'chop' behavior, agent should move closer
@@ -78,7 +79,7 @@ describe('Resource Gathering System', () => {
         y: 0,
       }));
 
-      const initialTreeResource = tree.getComponent<ResourceComponent>('resource');
+      const initialTreeResource = tree.getComponent(ComponentType.Resource);
       if (!initialTreeResource) {
         throw new Error('Tree missing ResourceComponent');
       }
@@ -101,7 +102,7 @@ describe('Resource Gathering System', () => {
         y: 0,
       }));
 
-      const inventory = agent.getComponent<InventoryComponent>('inventory');
+      const inventory = agent.getComponent(ComponentType.Inventory);
       if (!inventory) {
         throw new Error('Agent missing InventoryComponent');
       }
@@ -118,7 +119,7 @@ describe('Resource Gathering System', () => {
     });
 
     it('should decrease tree ResourceComponent amount when harvested', () => {
-      const resource = tree.getComponent<ResourceComponent>('resource');
+      const resource = tree.getComponent(ComponentType.Resource);
       if (!resource) {
         throw new Error('Tree missing ResourceComponent');
       }
@@ -132,7 +133,7 @@ describe('Resource Gathering System', () => {
         amount: Math.max(0, r.amount - harvestAmount),
       }));
 
-      const updatedResource = tree.getComponent<ResourceComponent>('resource');
+      const updatedResource = tree.getComponent(ComponentType.Resource);
       if (!updatedResource) {
         throw new Error('Tree missing ResourceComponent after update');
       }
@@ -174,7 +175,7 @@ describe('Resource Gathering System', () => {
 
       // Attempt to harvest should throw or fail gracefully
       expect(() => {
-        const resource = tree.getComponent<ResourceComponent>('resource');
+        const resource = tree.getComponent(ComponentType.Resource);
         if (!resource) {
           throw new Error('Cannot harvest: ResourceComponent missing');
         }
@@ -187,7 +188,7 @@ describe('Resource Gathering System', () => {
         amount: 0,
       }));
 
-      const resource = tree.getComponent<ResourceComponent>('resource');
+      const resource = tree.getComponent(ComponentType.Resource);
       if (!resource) {
         throw new Error('Tree missing ResourceComponent');
       }
@@ -200,7 +201,7 @@ describe('Resource Gathering System', () => {
   describe('Acceptance Criterion 3: Stone Gathering (Mine Action)', () => {
     it('should move agent toward rock when not adjacent', () => {
       // Agent at (0,0), rock at (0,2) - distance > 1.5
-      const initialPosition = agent.getComponent<PositionComponent>('position');
+      const initialPosition = agent.getComponent(ComponentType.Position);
       expect(initialPosition).toBeDefined();
 
       const distance = Math.sqrt(
@@ -217,7 +218,7 @@ describe('Resource Gathering System', () => {
         y: 1.2,
       }));
 
-      const initialRockResource = rock.getComponent<ResourceComponent>('resource');
+      const initialRockResource = rock.getComponent(ComponentType.Resource);
       if (!initialRockResource) {
         throw new Error('Rock missing ResourceComponent');
       }
@@ -236,7 +237,7 @@ describe('Resource Gathering System', () => {
         y: 1.2,
       }));
 
-      const inventory = agent.getComponent<InventoryComponent>('inventory');
+      const inventory = agent.getComponent(ComponentType.Inventory);
       if (!inventory) {
         throw new Error('Agent missing InventoryComponent');
       }
@@ -251,7 +252,7 @@ describe('Resource Gathering System', () => {
     });
 
     it('should decrease rock ResourceComponent amount when mined', () => {
-      const resource = rock.getComponent<ResourceComponent>('resource');
+      const resource = rock.getComponent(ComponentType.Resource);
       if (!resource) {
         throw new Error('Rock missing ResourceComponent');
       }
@@ -264,7 +265,7 @@ describe('Resource Gathering System', () => {
         amount: Math.max(0, r.amount - harvestAmount),
       }));
 
-      const updatedResource = rock.getComponent<ResourceComponent>('resource');
+      const updatedResource = rock.getComponent(ComponentType.Resource);
       if (!updatedResource) {
         throw new Error('Rock missing ResourceComponent after update');
       }
@@ -319,7 +320,7 @@ describe('Resource Gathering System', () => {
 
       // Attempt to gather wood (weight 2 per unit)
       // Should fail or gather 0 units
-      const inventory = agent.getComponent<InventoryComponent>('inventory');
+      const inventory = agent.getComponent(ComponentType.Inventory);
       if (!inventory) {
         throw new Error('Agent missing InventoryComponent');
       }
@@ -347,7 +348,7 @@ describe('Resource Gathering System', () => {
         y: 0,
       }));
 
-      const inventory = agent.getComponent<InventoryComponent>('inventory');
+      const inventory = agent.getComponent(ComponentType.Inventory);
       if (!inventory) {
         throw new Error('Agent missing InventoryComponent');
       }
@@ -376,7 +377,7 @@ describe('Resource Gathering System', () => {
     });
 
     it('should update currentWeight when resources are added', () => {
-      const inventory = agent.getComponent<InventoryComponent>('inventory');
+      const inventory = agent.getComponent(ComponentType.Inventory);
       if (!inventory) {
         throw new Error('Agent missing InventoryComponent');
       }
@@ -390,7 +391,7 @@ describe('Resource Gathering System', () => {
         currentWeight: inv.currentWeight + (10 * 2),
       }));
 
-      const updatedInventory = agent.getComponent<InventoryComponent>('inventory');
+      const updatedInventory = agent.getComponent(ComponentType.Inventory);
       if (!updatedInventory) {
         throw new Error('Agent missing InventoryComponent after update');
       }
@@ -402,7 +403,7 @@ describe('Resource Gathering System', () => {
   describe('Acceptance Criterion 7: Gather Behavior for AISystem', () => {
     it('should look for nearest harvestable resource in vision', () => {
       // Agent with gather behavior should scan for resources
-      const ai = agent.getComponent('agent') as AgentComponent;
+      const ai = agent.getComponent(ComponentType.Agent) as AgentComponent;
       if (!ai) {
         throw new Error('Agent missing AgentComponent');
       }
@@ -415,15 +416,15 @@ describe('Resource Gathering System', () => {
 
     it('should prefer resource matching current need when hungry', () => {
       // Add needs component
-      agent.addComponent(createNeedsComponent(
-        80, // High hunger
-        50, // energy
-        100, // health
-        2.0, // hungerDecayRate
-        1.0 // energyDecayRate
-      ));
+      agent.addComponent(new NeedsComponent({
+        hunger: 0.8, // High hunger
+        energy: 0.5,
+        health: 1.0,
+        hungerDecayRate: 0.002,
+        energyDecayRate: 0.001,
+      }));
 
-      const ai = agent.getComponent('agent') as AgentComponent;
+      const ai = agent.getComponent(ComponentType.Agent) as AgentComponent;
       if (!ai) {
         throw new Error('Agent missing AgentComponent');
       }
@@ -435,14 +436,14 @@ describe('Resource Gathering System', () => {
 
     it('should move toward nearest resource', () => {
       // Agent should pathfind to nearest harvestable resource
-      const position = agent.getComponent<PositionComponent>('position');
+      const position = agent.getComponent(ComponentType.Position);
       if (!position) {
         throw new Error('Agent missing PositionComponent');
       }
 
       // Find nearest resource
-      const treePos = tree.getComponent<PositionComponent>('position');
-      const rockPos = rock.getComponent<PositionComponent>('position');
+      const treePos = tree.getComponent(ComponentType.Position);
+      const rockPos = rock.getComponent(ComponentType.Position);
 
       if (!treePos || !rockPos) {
         throw new Error('Resources missing PositionComponent');
@@ -469,8 +470,8 @@ describe('Resource Gathering System', () => {
         y: 0,
       }));
 
-      const position = agent.getComponent<PositionComponent>('position');
-      const treePos = tree.getComponent<PositionComponent>('position');
+      const position = agent.getComponent(ComponentType.Position);
+      const treePos = tree.getComponent(ComponentType.Position);
 
       if (!position || !treePos) {
         throw new Error('Missing PositionComponent');
@@ -490,7 +491,7 @@ describe('Resource Gathering System', () => {
   describe('Error Handling (CLAUDE.md compliance)', () => {
     it('should throw when ResourceComponent is missing required field', () => {
       expect(() => {
-        const invalidResource = tree.getComponent('resource') as ResourceComponent;
+        const invalidResource = tree.getComponent(ComponentType.Resource) as ResourceComponent;
         if (!invalidResource) {
           throw new Error('ResourceComponent missing');
         }
@@ -506,7 +507,7 @@ describe('Resource Gathering System', () => {
       }));
 
       expect(() => {
-        const resource = tree.getComponent('resource') as ResourceComponent;
+        const resource = tree.getComponent(ComponentType.Resource) as ResourceComponent;
         if (!resource) {
           throw new Error('ResourceComponent missing');
         }
@@ -520,7 +521,7 @@ describe('Resource Gathering System', () => {
       agent.removeComponent('inventory');
 
       expect(() => {
-        const inventory = agent.getComponent('inventory') as InventoryComponent;
+        const inventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
         if (!inventory) {
           throw new Error('Agent missing required InventoryComponent');
         }
@@ -535,7 +536,7 @@ describe('Resource Gathering System', () => {
       (world as any)._addEntity(emptyEntity);
 
       expect(() => {
-        const resource = emptyEntity.getComponent('resource') as ResourceComponent;
+        const resource = emptyEntity.getComponent(ComponentType.Resource) as ResourceComponent;
         if (!resource) {
           throw new Error('Cannot harvest: entity has no ResourceComponent');
         }
@@ -551,7 +552,7 @@ describe('Resource Gathering System', () => {
       //   stone: 5,
       // };
 
-      const inventory = agent.getComponent<InventoryComponent>('inventory');
+      const inventory = agent.getComponent(ComponentType.Inventory);
       if (!inventory) {
         throw new Error('Agent missing InventoryComponent');
       }
@@ -578,7 +579,7 @@ describe('Resource Gathering System', () => {
         stone: 5,
       };
 
-      const inventory = agent.getComponent<InventoryComponent>('inventory');
+      const inventory = agent.getComponent(ComponentType.Inventory);
       if (!inventory) {
         throw new Error('Agent missing InventoryComponent');
       }
@@ -614,7 +615,7 @@ describe('Resource Gathering System', () => {
     });
 
     it('should not proceed with construction if resources missing', () => {
-      const inventory = agent.getComponent<InventoryComponent>('inventory');
+      const inventory = agent.getComponent(ComponentType.Inventory);
       if (!inventory) {
         throw new Error('Agent missing InventoryComponent');
       }
@@ -641,7 +642,7 @@ describe('Resource Gathering System', () => {
         amount: 50, // Half of maxAmount (100)
       }));
 
-      const resource = tree.getComponent<ResourceComponent>('resource');
+      const resource = tree.getComponent(ComponentType.Resource);
       if (!resource) {
         throw new Error('Tree missing ResourceComponent');
       }
@@ -660,7 +661,7 @@ describe('Resource Gathering System', () => {
 
     it('should not regenerate beyond maxAmount', () => {
       // Tree already at max
-      const resource = tree.getComponent<ResourceComponent>('resource');
+      const resource = tree.getComponent(ComponentType.Resource);
       if (!resource) {
         throw new Error('Tree missing ResourceComponent');
       }
@@ -683,7 +684,7 @@ describe('Resource Gathering System', () => {
       // Create resource with 0 regeneration rate
       const depleted = new EntityImpl(createEntityId(), world.tick);
       depleted.addComponent({
-        type: 'resource',
+        type: ComponentType.Resource,
         version: 1,
         resourceType: 'stone',
         amount: 0,
@@ -693,7 +694,7 @@ describe('Resource Gathering System', () => {
       } as ResourceComponent);
       (world as any)._addEntity(depleted);
 
-      const resource = depleted.getComponent('resource') as ResourceComponent;
+      const resource = depleted.getComponent(ComponentType.Resource) as ResourceComponent;
       if (!resource) {
         throw new Error('Resource missing');
       }
@@ -736,8 +737,8 @@ describe('Resource Gathering System', () => {
         amount: 25,
       }));
 
-      const treeResource = tree.getComponent<ResourceComponent>('resource');
-      const rockResource = rock.getComponent<ResourceComponent>('resource');
+      const treeResource = tree.getComponent(ComponentType.Resource);
+      const rockResource = rock.getComponent(ComponentType.Resource);
 
       if (!treeResource || !rockResource) {
         throw new Error('Resources missing');
@@ -756,7 +757,7 @@ describe('Resource Gathering System', () => {
         amount: 0,
       }));
 
-      const resource = tree.getComponent<ResourceComponent>('resource');
+      const resource = tree.getComponent(ComponentType.Resource);
       if (!resource) {
         throw new Error('Tree missing ResourceComponent');
       }
@@ -781,7 +782,7 @@ describe('Resource Gathering System', () => {
       }));
 
       // Both should be able to harvest (first-come-first-serve or concurrent)
-      const resource = tree.getComponent('resource') as ResourceComponent;
+      const resource = tree.getComponent(ComponentType.Resource) as ResourceComponent;
       if (!resource) {
         throw new Error('Tree missing ResourceComponent');
       }
@@ -814,7 +815,7 @@ describe('Resource Gathering System', () => {
       }));
 
       // Gather more wood - should stack in same slot
-      const inventory = agent.getComponent<InventoryComponent>('inventory');
+      const inventory = agent.getComponent(ComponentType.Inventory);
       if (!inventory) {
         throw new Error('Agent missing InventoryComponent');
       }
@@ -833,7 +834,7 @@ describe('Resource Gathering System', () => {
         currentWeight: 100,
       }));
 
-      const inventory = agent.getComponent<InventoryComponent>('inventory');
+      const inventory = agent.getComponent(ComponentType.Inventory);
       if (!inventory) {
         throw new Error('Agent missing InventoryComponent');
       }

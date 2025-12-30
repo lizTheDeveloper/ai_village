@@ -155,6 +155,13 @@ export class AgentInfoPanel {
   }
 
   /**
+   * Set a callback for when LLM config should be opened.
+   */
+  setOnOpenLLMConfig(callback: (agentEntity: any) => void): void {
+    this.contextSection.setOnOpenConfig(callback);
+  }
+
+  /**
    * Handle click on the panel.
    */
   handleClick(clickX: number, clickY: number, panelX: number, panelY: number, width?: number): boolean {
@@ -163,6 +170,15 @@ export class AgentInfoPanel {
     // Delegate tab click handling to TabbedPanel
     if (this.tabs.handleClick(clickX, clickY, panelX, panelY, actualWidth)) {
       return true;
+    }
+
+    // Check if click is on the config LLM button (context tab)
+    const currentTab = this.tabs.getCurrentTab();
+    if (currentTab === 'context') {
+      console.log('[AgentInfoPanel] Delegating click to contextSection:', clickX, clickY);
+      if (this.contextSection.handleClick(clickX, clickY)) {
+        return true;
+      }
     }
 
     // Check if click is on the reset priorities button

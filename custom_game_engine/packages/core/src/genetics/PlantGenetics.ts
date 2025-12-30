@@ -1,5 +1,217 @@
-import { PlantComponent, type PlantGenetics } from '../components/PlantComponent.js';
+import { PlantComponent, type PlantGenetics, type GeneticMutation } from '../components/PlantComponent.js';
 import { SeedComponent } from '../components/SeedComponent.js';
+import type { PlantCategory } from '../types/PlantSpecies.js';
+
+/**
+ * Cross-breeding compatibility rules
+ * Plants can only hybridize within the same category (e.g., crop x crop)
+ */
+export interface HybridizationResult {
+  success: boolean;
+  reason?: string;
+  seed?: SeedComponent;
+  hybridName?: string;
+}
+
+/**
+ * Hybrid vigor bonus - offspring get a boost from genetic diversity
+ */
+const HYBRID_VIGOR_BONUS = 0.1; // +10% to all traits
+
+/**
+ * Compatibility check for plant hybridization
+ * Only plants of the same category can cross-breed
+ */
+export function canHybridizePlants(
+  parent1Category: PlantCategory,
+  parent2Category: PlantCategory
+): boolean {
+  return parent1Category === parent2Category;
+}
+
+/**
+ * Create a hybrid seed from two parent plants
+ * Combines genetics from both parents with a chance for hybrid vigor
+ */
+export function createHybridSeed(
+  parent1: PlantComponent,
+  parent2: PlantComponent,
+  speciesId1: string,
+  speciesId2: string,
+  options?: {
+    parentEntityId1?: string;
+    parentEntityId2?: string;
+    agentId?: string;
+    gameTime?: number;
+  }
+): HybridizationResult {
+  // REQUIRED: both parents must have genetics
+  if (!parent1.genetics || !parent2.genetics) {
+    return {
+      success: false,
+      reason: 'Both parents must have genetics for hybridization'
+    };
+  }
+
+  // Calculate hybrid vigor based on genetic diversity
+  const geneticDiversity = calculateGeneticDiversity(parent1.genetics, parent2.genetics);
+
+  // Blend genetics from both parents
+  const hybridGenetics = blendGenetics(
+    parent1.genetics,
+    parent2.genetics,
+    geneticDiversity
+  );
+
+  // Calculate seed quality from both parents
+  const quality = (calculateParentContribution(parent1) + calculateParentContribution(parent2)) / 2;
+  const viability = Math.min(1.0, 0.85 + geneticDiversity * 0.1); // Diversity helps viability
+  const vigor = Math.min(100, 80 + geneticDiversity * 20); // Hybrid vigor
+
+  // Higher generation is max of parents + 1
+  const generation = Math.max(parent1.generation, parent2.generation) + 1;
+
+  // Create hybrid species ID
+  const hybridSpeciesId = createHybridSpeciesId(speciesId1, speciesId2);
+
+  // Build parent plant IDs array
+  const parentPlantIds: string[] = [];
+  if (options?.parentEntityId1) parentPlantIds.push(options.parentEntityId1);
+  if (options?.parentEntityId2) parentPlantIds.push(options.parentEntityId2);
+
+  const seed = new SeedComponent({
+    speciesId: hybridSpeciesId,
+    genetics: hybridGenetics,
+    generation,
+    viability,
+    vigor,
+    quality,
+    sourceType: 'cultivated',
+    parentPlantIds,
+    isHybrid: true,
+    hybridParentSpecies: [speciesId1, speciesId2],
+    harvestMetadata: {
+      fromPlantId: options?.parentEntityId1,
+      byAgentId: options?.agentId,
+      timestamp: options?.gameTime
+    }
+  });
+
+  return {
+    success: true,
+    seed,
+    hybridName: hybridSpeciesId
+  };
+}
+
+/**
+ * Calculate genetic diversity between two parents (0-1)
+ * Higher diversity = more hybrid vigor
+ */
+function calculateGeneticDiversity(g1: PlantGenetics, g2: PlantGenetics): number {
+  const traits = [
+    'growthRate', 'yieldAmount', 'diseaseResistance',
+    'droughtTolerance', 'coldTolerance', 'flavorProfile'
+  ] as const;
+
+  let totalDifference = 0;
+  let traitCount = 0;
+
+  for (const trait of traits) {
+    const v1 = g1[trait] as number;
+    const v2 = g2[trait] as number;
+
+    // Normalize difference based on trait range
+    let maxRange = 100;
+    if (trait === 'growthRate' || trait === 'yieldAmount') {
+      maxRange = 3;
+    }
+
+    const diff = Math.abs(v1 - v2) / maxRange;
+    totalDifference += diff;
+    traitCount++;
+  }
+
+  return totalDifference / traitCount;
+}
+
+/**
+ * Blend genetics from two parents
+ * Each trait has a chance to come from either parent, with some averaging
+ */
+function blendGenetics(
+  g1: PlantGenetics,
+  g2: PlantGenetics,
+  diversity: number
+): PlantGenetics {
+  const vigorBonus = 1 + (HYBRID_VIGOR_BONUS * diversity);
+
+  // For each trait, either:
+  // - Take from parent 1 (25%)
+  // - Take from parent 2 (25%)
+  // - Average with hybrid vigor (50%)
+  const blend = (v1: number, v2: number, trait: string): number => {
+    const roll = Math.random();
+    let value: number;
+
+    if (roll < 0.25) {
+      value = v1;
+    } else if (roll < 0.5) {
+      value = v2;
+    } else {
+      value = ((v1 + v2) / 2) * vigorBonus;
+    }
+
+    // Clamp based on trait type
+    if (trait === 'growthRate' || trait === 'yieldAmount') {
+      return Math.max(0.3, Math.min(3.5, value)); // Slightly higher max for hybrids
+    }
+    return Math.max(0, Math.min(100, value));
+  };
+
+  const result: PlantGenetics = {
+    growthRate: blend(g1.growthRate, g2.growthRate, 'growthRate'),
+    yieldAmount: blend(g1.yieldAmount, g2.yieldAmount, 'yieldAmount'),
+    diseaseResistance: blend(g1.diseaseResistance, g2.diseaseResistance, 'diseaseResistance'),
+    droughtTolerance: blend(g1.droughtTolerance, g2.droughtTolerance, 'droughtTolerance'),
+    coldTolerance: blend(g1.coldTolerance, g2.coldTolerance, 'coldTolerance'),
+    flavorProfile: blend(g1.flavorProfile, g2.flavorProfile, 'flavorProfile'),
+    mutations: [...g1.mutations, ...g2.mutations]
+  };
+
+  // Record hybridization as a special mutation
+  result.mutations.push({
+    trait: 'hybrid',
+    delta: diversity,
+    generation: Math.max(
+      ...g1.mutations.map(m => m.generation),
+      ...g2.mutations.map(m => m.generation),
+      0
+    ) + 1
+  } as GeneticMutation);
+
+  return result;
+}
+
+/**
+ * Create a hybrid species ID from two parent species
+ */
+function createHybridSpeciesId(species1: string, species2: string): string {
+  // Sort alphabetically for consistent naming
+  const sorted = [species1, species2].sort();
+  return `hybrid_${sorted[0]}_x_${sorted[1]}`;
+}
+
+/**
+ * Calculate a parent's contribution to seed quality
+ */
+function calculateParentContribution(parent: PlantComponent): number {
+  const healthFactor = parent.health / 100;
+  const careFactor = parent.careQuality / 100;
+  const geneticFactor = parent.geneticQuality / 100;
+
+  return (healthFactor + careFactor + geneticFactor) / 3;
+}
 
 /**
  * Create a seed from a parent plant with inherited genetics

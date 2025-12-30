@@ -11,13 +11,15 @@ import { createInventoryComponent } from '../../components/InventoryComponent.js
 import { createPositionComponent } from '../../components/PositionComponent.js';
 import { createIdentityComponent } from '../../components/IdentityComponent.js';
 import { createAgentComponent } from '../../components/AgentComponent.js';
-import { createNeedsComponent } from '../../components/NeedsComponent.js';
+import { NeedsComponent } from '../../components/NeedsComponent.js';
 import { createMovementComponent } from '../../components/MovementComponent.js';
 import { createVelocityComponent } from '../../components/VelocityComponent.js';
 import { createSteeringComponent } from '../../components/SteeringComponent.js';
 import { SocialGradientComponent } from '../../components/SocialGradientComponent.js';
 import { createConversationComponent } from '../../components/ConversationComponent.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
+import { BuildingType } from '../../types/BuildingType.js';
 /**
  * Integration tests for Performance Hotspot Optimizations
  *
@@ -48,7 +50,7 @@ describe('Performance Optimizations Integration', () => {
       // Create multiple storage buildings with inventory
       for (let i = 0; i < 10; i++) {
         const storage = new EntityImpl(createEntityId(), 0);
-        storage.addComponent(createBuildingComponent('storage', 1, 100));
+        storage.addComponent(createBuildingComponent(BuildingType.StorageChest, 1, 100));
         storage.addComponent(createInventoryComponent('storage', 20));
         storage.addComponent(createPositionComponent(i * 5, 0));
         (world as any)._addEntity(storage);
@@ -72,7 +74,7 @@ describe('Performance Optimizations Integration', () => {
 
       // Create multiple governance buildings that would each trigger queries
       const townHall = new EntityImpl(createEntityId(), 0);
-      townHall.addComponent(createBuildingComponent('town-hall', 1, 100));
+      townHall.addComponent(createBuildingComponent(BuildingType.TownHall, 1, 100));
       (world as any)._addEntity(townHall);
 
       // Create many agents to make query cost significant
@@ -80,7 +82,13 @@ describe('Performance Optimizations Integration', () => {
         const agent = new EntityImpl(createEntityId(), 0);
         agent.addComponent(createIdentityComponent(`Agent${i}`, 5, i));
         agent.addComponent(createAgentComponent());
-        agent.addComponent(createNeedsComponent(70, 70, 70, 0, 0));
+        agent.addComponent(new NeedsComponent({
+    hunger: 0.7,
+    energy: 0.7,
+    health: 0.7,
+    thirst: 0.0,
+    temperature: 0.0,
+  }));
         (world as any)._addEntity(agent);
       }
 
@@ -146,7 +154,7 @@ describe('Performance Optimizations Integration', () => {
       // Create many buildings to make uncached queries expensive
       for (let i = 0; i < 100; i++) {
         const building = new EntityImpl(createEntityId(), 0);
-        building.addComponent(createBuildingComponent('house', 1, 100));
+        building.addComponent(createBuildingComponent(BuildingType.Tent, 1, 100));
         building.addComponent(createPositionComponent(i % 10 * 5, Math.floor(i / 10) * 5));
         (world as any)._addEntity(building);
       }
@@ -159,7 +167,13 @@ describe('Performance Optimizations Integration', () => {
         agent.addComponent(createVelocityComponent(0, 0, 1));
         agent.addComponent(createSteeringComponent());
         agent.addComponent(createAgentComponent());
-        agent.addComponent(createNeedsComponent(70, 70, 70, 0, 0));
+        agent.addComponent(new NeedsComponent({
+    hunger: 0.7,
+    energy: 0.7,
+    health: 0.7,
+    thirst: 0.0,
+    temperature: 0.0,
+  }));
         (world as any)._addEntity(agent);
       }
 
@@ -181,7 +195,7 @@ describe('Performance Optimizations Integration', () => {
 
       // Create buildings
       const building1 = new EntityImpl(createEntityId(), 0);
-      building1.addComponent(createBuildingComponent('house', 1, 100));
+      building1.addComponent(createBuildingComponent(BuildingType.Tent, 1, 100));
       building1.addComponent(createPositionComponent(5, 5));
       (world as any)._addEntity(building1);
 
@@ -192,7 +206,13 @@ describe('Performance Optimizations Integration', () => {
       agent.addComponent(createVelocityComponent(1, 1, 1));
       agent.addComponent(createSteeringComponent());
       agent.addComponent(createAgentComponent());
-      agent.addComponent(createNeedsComponent(70, 70, 70, 0, 0));
+      agent.addComponent(new NeedsComponent({
+    hunger: 0.7,
+    energy: 0.7,
+    health: 0.7,
+    thirst: 0.0,
+    temperature: 0.0,
+  }));
       (world as any)._addEntity(agent);
 
       const entities = Array.from(world.entities.values());
@@ -228,7 +248,13 @@ describe('Performance Optimizations Integration', () => {
         agent.addComponent(createVelocityComponent(0, 0, 1));
         agent.addComponent(createSteeringComponent());
         agent.addComponent(createAgentComponent());
-        agent.addComponent(createNeedsComponent(70, 70, 70, 0, 0));
+        agent.addComponent(new NeedsComponent({
+    hunger: 0.7,
+    energy: 0.7,
+    health: 0.7,
+    thirst: 0.0,
+    temperature: 0.0,
+  }));
         (world as any)._addEntity(agent);
       }
 
@@ -303,7 +329,7 @@ describe('Performance Optimizations Integration', () => {
       // 10 buildings
       for (let i = 0; i < 10; i++) {
         const building = new EntityImpl(createEntityId(), 0);
-        building.addComponent(createBuildingComponent('house', 1, 100));
+        building.addComponent(createBuildingComponent(BuildingType.Tent, 1, 100));
         building.addComponent(createPositionComponent(i * 5, 0));
         building.addComponent(createInventoryComponent('storage', 20));
         (world as any)._addEntity(building);
@@ -314,7 +340,13 @@ describe('Performance Optimizations Integration', () => {
         const agent = new EntityImpl(createEntityId(), 0);
         agent.addComponent(createIdentityComponent(`Agent${i}`, 5, i));
         agent.addComponent(createAgentComponent());
-        agent.addComponent(createNeedsComponent(70, 70, 70, 0, 0));
+        agent.addComponent(new NeedsComponent({
+    hunger: 0.7,
+    energy: 0.7,
+    health: 0.7,
+    thirst: 0.0,
+    temperature: 0.0,
+  }));
         agent.addComponent(createPositionComponent(i % 10, Math.floor(i / 10)));
         agent.addComponent(createMovementComponent());
         agent.addComponent(createVelocityComponent(0, 0, 1));
@@ -331,7 +363,7 @@ describe('Performance Optimizations Integration', () => {
 
       // BuildingSystem only processes entities with 'building' and 'position'
       const buildingEntities = allEntities.filter(e =>
-        e.hasComponent('building') && e.hasComponent('position')
+        e.hasComponent(ComponentType.Building) && e.hasComponent(ComponentType.Position)
       );
       let start = performance.now();
       buildingSystem.update(world, buildingEntities, 1.0);
@@ -345,7 +377,7 @@ describe('Performance Optimizations Integration', () => {
       timings.push({ system: 'GovernanceDataSystem', duration: end - start });
 
       // SocialGradientSystem processes entities with social_gradient
-      const socialEntities = allEntities.filter(e => e.hasComponent('social_gradient'));
+      const socialEntities = allEntities.filter(e => e.hasComponent(ComponentType.SocialGradient));
       start = performance.now();
       socialSystem.update(world, socialEntities, 1.0);
       end = performance.now();
@@ -353,7 +385,7 @@ describe('Performance Optimizations Integration', () => {
 
       // MovementSystem processes entities with movement components
       const movementEntities = allEntities.filter(e =>
-        e.hasComponent('movement') && e.hasComponent('position')
+        e.hasComponent(ComponentType.Movement) && e.hasComponent(ComponentType.Position)
       );
       start = performance.now();
       movementSystem.update(world, movementEntities, 1.0);
@@ -386,7 +418,7 @@ describe('Performance Optimizations Integration', () => {
         // Create entities
         for (let i = 0; i < count; i++) {
           const building = new EntityImpl(createEntityId(), 0);
-          building.addComponent(createBuildingComponent('storage', 1, 100));
+          building.addComponent(createBuildingComponent(BuildingType.StorageChest, 1, 100));
           building.addComponent(createInventoryComponent('storage', 20));
           building.addComponent(createPositionComponent(i, 0));
           (world as any)._addEntity(building);

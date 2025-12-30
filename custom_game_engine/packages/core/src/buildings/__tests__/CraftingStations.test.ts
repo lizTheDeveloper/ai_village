@@ -19,7 +19,7 @@ describe('Crafting Stations - Tier 2', () => {
   beforeEach(() => {
     registry = new BuildingBlueprintRegistry();
     registry.registerDefaults();
-    registry.registerTier2Stations();
+    // Note: registerDefaults() already calls registerTier2Stations()
   });
 
   describe('Criterion 1: Core Tier 2 Crafting Stations', () => {
@@ -224,8 +224,7 @@ describe('Crafting Stations - Tier 3+', () => {
   beforeEach(() => {
     registry = new BuildingBlueprintRegistry();
     registry.registerDefaults();
-    registry.registerTier2Stations();
-    registry.registerTier3Stations();
+    // Note: registerDefaults() already calls registerTier2Stations() and registerTier3Stations()
   });
 
   describe('Criterion 5: Tier 3+ Stations', () => {
@@ -320,8 +319,7 @@ describe('Fuel System', () => {
   beforeEach(() => {
     registry = new BuildingBlueprintRegistry();
     registry.registerDefaults();
-    registry.registerTier2Stations();
-    registry.registerTier3Stations();
+    // Note: registerDefaults() already calls registerTier2Stations() and registerTier3Stations()
   });
 
   describe('Criterion 3: Fuel System (BuildingComponent)', () => {
@@ -375,8 +373,7 @@ describe('Integration Tests', () => {
   beforeEach(() => {
     registry = new BuildingBlueprintRegistry();
     registry.registerDefaults();
-    registry.registerTier2Stations();
-    registry.registerTier3Stations();
+    // Note: registerDefaults() already calls registerTier2Stations() and registerTier3Stations()
   });
 
   it('should register all Tier 2 stations without conflicts', () => {

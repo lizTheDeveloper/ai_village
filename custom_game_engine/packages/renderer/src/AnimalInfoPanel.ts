@@ -1,4 +1,4 @@
-import type { Entity } from '@ai-village/core';
+import type { Entity, World, AnimalComponent } from '@ai-village/core';
 
 /**
  * UI Panel displaying information about the selected animal.
@@ -54,7 +54,7 @@ export class AnimalInfoPanel {
    * @param canvasHeight Height of the canvas
    * @param world World instance to look up the selected entity
    */
-  render(ctx: CanvasRenderingContext2D, canvasWidth: number, _canvasHeight: number, world: any): void {
+  render(ctx: CanvasRenderingContext2D, canvasWidth: number, _canvasHeight: number, world: World | undefined): void {
     if (!this.selectedEntityId) {
       return;
     }
@@ -85,7 +85,7 @@ export class AnimalInfoPanel {
    * Render at a specific position (for WindowManager integration).
    * Does not draw background, border, or close button - WindowManager handles those.
    */
-  renderAt(ctx: CanvasRenderingContext2D, x: number, y: number, _width: number, _height: number, world: any): void {
+  renderAt(ctx: CanvasRenderingContext2D, x: number, y: number, _width: number, _height: number, world: World | undefined): void {
     if (!this.selectedEntityId) {
       return;
     }
@@ -105,11 +105,14 @@ export class AnimalInfoPanel {
     ctx: CanvasRenderingContext2D,
     x: number,
     y: number,
-    world: any,
+    world: World | undefined,
     showCloseButton: boolean
   ): void {
+    if (!world) {
+      return;
+    }
     // Look up the entity from the world
-    const selectedEntity = world.getEntity(this.selectedEntityId);
+    const selectedEntity = world.getEntity(this.selectedEntityId!);
     if (!selectedEntity) {
       console.warn('[AnimalInfoPanel] Selected entity not found in world:', this.selectedEntityId);
       this.selectedEntityId = null;
@@ -585,18 +588,18 @@ export class AnimalInfoPanel {
    * @param world World instance
    * @returns True if click was handled by the panel
    */
-  handleClick(screenX: number, screenY: number, canvasWidth: number, _canvasHeight: number, world: any): boolean {
-    if (!this.selectedEntityId) {
+  handleClick(screenX: number, screenY: number, canvasWidth: number, _canvasHeight: number, world: World | undefined): boolean {
+    if (!this.selectedEntityId || !world) {
       return false;
     }
 
     // Get entity and animal component
-    const selectedEntity = world?.getEntity(this.selectedEntityId);
+    const selectedEntity = world.getEntity(this.selectedEntityId);
     if (!selectedEntity) {
       return false;
     }
 
-    const animal = selectedEntity.components.get('animal') as any | undefined;
+    const animal = selectedEntity.components.get('animal') as AnimalComponent | undefined;
     if (!animal) {
       return false;
     }
@@ -710,7 +713,7 @@ export class AnimalInfoPanel {
    * @param world World instance
    * @returns True if click was handled
    */
-  handleClickAt(clickX: number, clickY: number, _width: number, _height: number, world: any): boolean {
+  handleClickAt(clickX: number, clickY: number, _width: number, _height: number, world: World | undefined): boolean {
     if (!this.selectedEntityId || !world) {
       return false;
     }
@@ -720,7 +723,7 @@ export class AnimalInfoPanel {
       return false;
     }
 
-    const animal = selectedEntity.components.get('animal') as any;
+    const animal = selectedEntity.components.get('animal') as AnimalComponent | undefined;
     if (!animal) {
       return false;
     }
@@ -739,7 +742,8 @@ export class AnimalInfoPanel {
         clickY >= buttonY &&
         clickY <= buttonY + buttonHeight
       ) {
-        world.eventBus.emit({
+        // Type cast needed - ui_action not in GameEventMap
+        (world.eventBus.emit as (event: { type: string; source: string; data: unknown }) => void)({
           type: 'ui_action',
           source: 'animal_info_panel',
           data: { action: 'tame', entityId: this.selectedEntityId },
@@ -755,7 +759,8 @@ export class AnimalInfoPanel {
         clickY >= buttonY &&
         clickY <= buttonY + buttonHeight
       ) {
-        world.eventBus.emit({
+        // Type cast needed - ui_action not in GameEventMap
+        (world.eventBus.emit as (event: { type: string; source: string; data: unknown }) => void)({
           type: 'ui_action',
           source: 'animal_info_panel',
           data: { action: 'feed', entityId: this.selectedEntityId },
@@ -771,7 +776,8 @@ export class AnimalInfoPanel {
         clickY >= buttonY &&
         clickY <= buttonY + buttonHeight
       ) {
-        world.eventBus.emit({
+        // Type cast needed - ui_action not in GameEventMap
+        (world.eventBus.emit as (event: { type: string; source: string; data: unknown }) => void)({
           type: 'ui_action',
           source: 'animal_info_panel',
           data: { action: 'collect_product', entityId: this.selectedEntityId },

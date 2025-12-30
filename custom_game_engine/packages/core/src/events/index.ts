@@ -4,4 +4,5 @@
 
 export * from './GameEvent.js';
 export * from './EventBus.js';
+export type { EventBus } from './EventBus.js';
 export * from './EventMap.js';

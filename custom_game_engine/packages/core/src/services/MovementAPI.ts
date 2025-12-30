@@ -21,6 +21,7 @@ import type { VelocityComponent } from '../components/VelocityComponent.js';
 import type { SteeringComponent, SteeringBehavior as ComponentSteeringBehavior } from '../components/SteeringComponent.js';
 import { getSteering } from '../utils/componentHelpers.js';
 import { safeUpdateComponent } from '../utils/componentUtils.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 
 /**
  * Steering behavior types supported by SteeringSystem
@@ -54,8 +55,8 @@ export class MovementAPI {
    * Disables steering to prevent oscillation.
    */
   moveToward(entity: EntityImpl, target: Position): void {
-    const position = entity.getComponent<PositionComponent>('position');
-    const movement = entity.getComponent<MovementComponent>('movement');
+    const position = entity.getComponent<PositionComponent>(CT.Position);
+    const movement = entity.getComponent<MovementComponent>(CT.Movement);
 
     if (!position || !movement) return;
 
@@ -76,7 +77,7 @@ export class MovementAPI {
     this.disableSteering(entity);
 
     // Set velocity
-    entity.updateComponent<MovementComponent>('movement', (current) => ({
+    entity.updateComponent<MovementComponent>(CT.Movement, (current) => ({
       ...current,
       velocityX: vx,
       velocityY: vy,
@@ -86,8 +87,8 @@ export class MovementAPI {
     }));
 
     // Also update velocity component if present
-    if (entity.hasComponent('velocity')) {
-      safeUpdateComponent<VelocityComponent>(entity, 'velocity', () => ({
+    if (entity.hasComponent(CT.Velocity)) {
+      safeUpdateComponent<VelocityComponent>(entity, CT.Velocity, () => ({
         vx,
         vy,
       }));
@@ -98,7 +99,7 @@ export class MovementAPI {
    * Command entity to move toward another entity.
    */
   moveTowardEntity(entity: EntityImpl, target: Entity): void {
-    const targetPos = (target as EntityImpl).getComponent<PositionComponent>('position');
+    const targetPos = (target as EntityImpl).getComponent<PositionComponent>(CT.Position);
     if (!targetPos) {
       throw new Error(`Target entity ${target.id} has no position`);
     }
@@ -109,8 +110,8 @@ export class MovementAPI {
    * Check if entity has reached its target (within threshold).
    */
   hasReachedTarget(entity: EntityImpl, threshold: number = 1.0): boolean {
-    const movement = entity.getComponent<MovementComponent>('movement');
-    const position = entity.getComponent<PositionComponent>('position');
+    const movement = entity.getComponent<MovementComponent>(CT.Movement);
+    const position = entity.getComponent<PositionComponent>(CT.Position);
 
     if (!movement || !position) return true;
     if (movement.targetX === undefined && movement.targetY === undefined) return true;
@@ -129,16 +130,16 @@ export class MovementAPI {
     this.disableSteering(entity);
 
     // Zero out velocity component
-    if (entity.hasComponent('velocity')) {
-      safeUpdateComponent<VelocityComponent>(entity, 'velocity', () => ({
+    if (entity.hasComponent(CT.Velocity)) {
+      safeUpdateComponent<VelocityComponent>(entity, CT.Velocity, () => ({
         vx: 0,
         vy: 0,
       }));
     }
 
     // Zero out movement velocity and clear target
-    if (entity.hasComponent('movement')) {
-      entity.updateComponent<MovementComponent>('movement', (current) => ({
+    if (entity.hasComponent(CT.Movement)) {
+      entity.updateComponent<MovementComponent>(CT.Movement, (current) => ({
         ...current,
         velocityX: 0,
         velocityY: 0,
@@ -151,7 +152,7 @@ export class MovementAPI {
    * Flee from a threat (move in opposite direction).
    */
   fleeFrom(entity: EntityImpl, threat: Position, distance: number = 10): void {
-    const position = entity.getComponent<PositionComponent>('position');
+    const position = entity.getComponent<PositionComponent>(CT.Position);
     if (!position) return;
 
     // Calculate direction away from threat
@@ -169,7 +170,7 @@ export class MovementAPI {
    * Calculate distance between entity and target position.
    */
   distanceTo(entity: EntityImpl, target: Position): number {
-    const position = entity.getComponent<PositionComponent>('position');
+    const position = entity.getComponent<PositionComponent>(CT.Position);
     if (!position) return Infinity;
 
     const dx = target.x - position.x;
@@ -188,9 +189,9 @@ export class MovementAPI {
    * Enable steering system control for autonomous movement.
    */
   enableSteering(entity: EntityImpl, behavior: SteeringBehavior, target?: Position): void {
-    if (!entity.hasComponent('steering')) return;
+    if (!entity.hasComponent(CT.Steering)) return;
 
-    safeUpdateComponent<SteeringComponent>(entity, 'steering', () => ({
+    safeUpdateComponent<SteeringComponent>(entity, CT.Steering, () => ({
       behavior,
       ...(target ? { target: { x: target.x, y: target.y } } : {}),
     }));
@@ -200,8 +201,8 @@ export class MovementAPI {
    * Disable steering system to prevent conflicts with manual velocity control.
    */
   private disableSteering(entity: EntityImpl): void {
-    if (entity.hasComponent('steering')) {
-      safeUpdateComponent<SteeringComponent>(entity, 'steering', () => ({
+    if (entity.hasComponent(CT.Steering)) {
+      safeUpdateComponent<SteeringComponent>(entity, CT.Steering, () => ({
         behavior: 'none',
       }));
     }
@@ -231,23 +232,23 @@ export function setVelocity(entity: Entity, vx: number, vy: number): void {
   const impl = entity as EntityImpl;
 
   // Disable steering system to prevent conflict
-  if (impl.hasComponent('steering')) {
-    safeUpdateComponent<SteeringComponent>(impl, 'steering', () => ({
+  if (impl.hasComponent(CT.Steering)) {
+    safeUpdateComponent<SteeringComponent>(impl, CT.Steering, () => ({
       behavior: 'none',
     }));
   }
 
   // Set velocity component
-  if (impl.hasComponent('velocity')) {
-    safeUpdateComponent<VelocityComponent>(impl, 'velocity', () => ({
+  if (impl.hasComponent(CT.Velocity)) {
+    safeUpdateComponent<VelocityComponent>(impl, CT.Velocity, () => ({
       vx,
       vy,
     }));
   }
 
   // Set movement velocity directly
-  if (impl.hasComponent('movement')) {
-    impl.updateComponent<MovementComponent>('movement', (current) => ({
+  if (impl.hasComponent(CT.Movement)) {
+    impl.updateComponent<MovementComponent>(CT.Movement, (current) => ({
       ...current,
       velocityX: vx,
       velocityY: vy,
@@ -261,8 +262,8 @@ export function setVelocity(entity: Entity, vx: number, vy: number): void {
  */
 export function moveToward(entity: Entity, target: Position, speed?: number): number {
   const impl = entity as EntityImpl;
-  const position = impl.getComponent<PositionComponent>('position');
-  const movement = impl.getComponent<MovementComponent>('movement');
+  const position = impl.getComponent<PositionComponent>(CT.Position);
+  const movement = impl.getComponent<MovementComponent>(CT.Movement);
 
   if (!position || !movement) return Infinity;
 

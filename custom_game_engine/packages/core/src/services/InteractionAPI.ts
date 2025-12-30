@@ -17,6 +17,7 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 import type { GatheringStatsComponent } from '../components/GatheringStatsComponent.js';
 import { addToInventory } from '../components/InventoryComponent.js';
 import { recordGathered, recordDeposited } from '../components/GatheringStatsComponent.js';
+import { ComponentType } from '../types/ComponentType.js';
 
 /**
  * Result of an interaction attempt
@@ -53,10 +54,10 @@ export class InteractionAPI {
    * Get the current game day from the world's time entity.
    */
   private getCurrentDay(world: World): number {
-    const timeEntities = world.query().with('time').executeEntities();
+    const timeEntities = world.query().with(ComponentType.Time).executeEntities();
     if (timeEntities.length > 0) {
       const timeEntity = timeEntities[0] as EntityImpl;
-      const timeComp = timeEntity.getComponent('time') as { day?: number } | undefined;
+      const timeComp = timeEntity.getComponent(ComponentType.Time) as { day?: number } | undefined;
       return timeComp?.day ?? 0;
     }
     return 0;
@@ -72,13 +73,13 @@ export class InteractionAPI {
     world: World,
     options?: HarvestOptions
   ): InteractionResult {
-    const inventory = agent.getComponent<InventoryComponent>('inventory');
+    const inventory = agent.getComponent<InventoryComponent>(ComponentType.Inventory);
     if (!inventory) {
       return { success: false, message: 'Agent has no inventory' };
     }
 
     const resourceImpl = resourceEntity as EntityImpl;
-    const resource = resourceImpl.getComponent<ResourceComponent>('resource');
+    const resource = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource);
     if (!resource) {
       return { success: false, message: 'Target is not a resource' };
     }
@@ -106,16 +107,16 @@ export class InteractionAPI {
     // Try to add to inventory
     try {
       const result = addToInventory(inventory, resource.resourceType, harvestAmount);
-      agent.updateComponent<InventoryComponent>('inventory', () => result.inventory);
+      agent.updateComponent<InventoryComponent>(ComponentType.Inventory, () => result.inventory);
 
       // Update resource amount
-      resourceImpl.updateComponent<ResourceComponent>('resource', (current) => ({
+      resourceImpl.updateComponent<ResourceComponent>(ComponentType.Resource, (current) => ({
         ...current,
         amount: Math.max(0, current.amount - result.amountAdded),
       }));
 
       // Emit harvest event - use resource:gathered from EventMap
-      const targetPos = resourceImpl.getComponent<PositionComponent>('position');
+      const targetPos = resourceImpl.getComponent<PositionComponent>(ComponentType.Position);
       world.eventBus.emit<'resource:gathered'>({
         type: 'resource:gathered',
         source: agent.id,
@@ -129,11 +130,11 @@ export class InteractionAPI {
       });
 
       // Record gathering stats
-      const gatheringStats = agent.getComponent<GatheringStatsComponent>('gathering_stats');
+      const gatheringStats = agent.getComponent<GatheringStatsComponent>(ComponentType.GatheringStats);
       if (gatheringStats) {
         const currentDay = this.getCurrentDay(world);
         recordGathered(gatheringStats, resource.resourceType, result.amountAdded, currentDay);
-        agent.updateComponent<GatheringStatsComponent>('gathering_stats', () => gatheringStats);
+        agent.updateComponent<GatheringStatsComponent>(ComponentType.GatheringStats, () => gatheringStats);
       }
 
       return {
@@ -172,8 +173,8 @@ export class InteractionAPI {
     foodType: string,
     world: World
   ): InteractionResult {
-    const inventory = agent.getComponent<InventoryComponent>('inventory');
-    const needs = agent.getComponent<NeedsComponent>('needs');
+    const inventory = agent.getComponent<InventoryComponent>(ComponentType.Inventory);
+    const needs = agent.getComponent<NeedsComponent>(ComponentType.Needs);
 
     if (!inventory) {
       return { success: false, message: 'Agent has no inventory' };
@@ -196,7 +197,7 @@ export class InteractionAPI {
     const slot = inventory.slots[slotIndex]!;
     const consumed = 1;
 
-    agent.updateComponent<InventoryComponent>('inventory', (current) => {
+    agent.updateComponent<InventoryComponent>(ComponentType.Inventory, (current) => {
       const newSlots = [...current.slots];
       const currentSlot = newSlots[slotIndex]!;
       newSlots[slotIndex] = {
@@ -216,12 +217,13 @@ export class InteractionAPI {
       };
     });
 
-    // Restore hunger (food restores ~25 hunger)
-    const hungerRestored = 25;
-    agent.updateComponent<NeedsComponent>('needs', (current) => ({
-      ...current,
-      hunger: Math.min(100, current.hunger + hungerRestored),
-    }));
+    // Restore hunger (food restores ~25% on 0-1 scale)
+    const hungerRestored = 0.25;
+    agent.updateComponent<NeedsComponent>(ComponentType.Needs, (current) => {
+      const updated = current.clone();
+      updated.hunger = Math.min(1.0, current.hunger + hungerRestored);
+      return updated;
+    });
 
     // Emit eat event
     world.eventBus.emit<'agent:ate'>({
@@ -255,13 +257,13 @@ export class InteractionAPI {
     world: World,
     foodType?: string
   ): InteractionResult {
-    const needs = agent.getComponent<NeedsComponent>('needs');
+    const needs = agent.getComponent<NeedsComponent>(ComponentType.Needs);
     if (!needs) {
       return { success: false, message: 'Agent has no needs' };
     }
 
     const storageImpl = storageEntity as EntityImpl;
-    const storageInventory = storageImpl.getComponent<InventoryComponent>('inventory');
+    const storageInventory = storageImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
     if (!storageInventory) {
       return { success: false, message: 'Storage has no inventory' };
     }
@@ -289,7 +291,7 @@ export class InteractionAPI {
 
     // Consume food directly from storage
     const consumed = 1;
-    storageImpl.updateComponent<InventoryComponent>('inventory', (current) => {
+    storageImpl.updateComponent<InventoryComponent>(ComponentType.Inventory, (current) => {
       const newSlots = [...current.slots];
       const currentSlot = newSlots[foundSlotIndex]!;
       newSlots[foundSlotIndex] = {
@@ -309,12 +311,13 @@ export class InteractionAPI {
       };
     });
 
-    // Restore hunger (food restores ~25 hunger)
-    const hungerRestored = 25;
-    agent.updateComponent<NeedsComponent>('needs', (current) => ({
-      ...current,
-      hunger: Math.min(100, current.hunger + hungerRestored),
-    }));
+    // Restore hunger (food restores ~25% on 0-1 scale)
+    const hungerRestored = 0.25;
+    agent.updateComponent<NeedsComponent>(ComponentType.Needs, (current) => {
+      const updated = current.clone();
+      updated.hunger = Math.min(1.0, current.hunger + hungerRestored);
+      return updated;
+    });
 
     // Emit eat event
     world.eventBus.emit<'agent:ate'>({
@@ -349,13 +352,13 @@ export class InteractionAPI {
     plantEntity: Entity,
     world: World
   ): InteractionResult {
-    const needs = agent.getComponent<NeedsComponent>('needs');
+    const needs = agent.getComponent<NeedsComponent>(ComponentType.Needs);
     if (!needs) {
       return { success: false, message: 'Agent has no needs' };
     }
 
     const plantImpl = plantEntity as EntityImpl;
-    const plant = plantImpl.getComponent('plant') as {
+    const plant = plantImpl.getComponent(ComponentType.Plant) as {
       speciesId: string;
       fruitCount: number;
     } | undefined;
@@ -369,7 +372,7 @@ export class InteractionAPI {
     }
 
     // Consume one fruit from the plant
-    plantImpl.updateComponent('plant', (current: any) => ({
+    plantImpl.updateComponent(ComponentType.Plant, (current: any) => ({
       ...current,
       fruitCount: Math.max(0, current.fruitCount - 1),
     }));
@@ -377,12 +380,13 @@ export class InteractionAPI {
     // Determine food type from species (e.g., berry-bush -> berry)
     const foodType = this.getFoodTypeFromSpecies(plant.speciesId);
 
-    // Restore hunger (food restores ~25 hunger)
-    const hungerRestored = 25;
-    agent.updateComponent<NeedsComponent>('needs', (current) => ({
-      ...current,
-      hunger: Math.min(100, current.hunger + hungerRestored),
-    }));
+    // Restore hunger (food restores ~25% on 0-1 scale)
+    const hungerRestored = 0.25;
+    agent.updateComponent<NeedsComponent>(ComponentType.Needs, (current) => {
+      const updated = current.clone();
+      updated.hunger = Math.min(1.0, current.hunger + hungerRestored);
+      return updated;
+    });
 
     // Emit eat event
     world.eventBus.emit<'agent:ate'>({
@@ -431,13 +435,13 @@ export class InteractionAPI {
     world: World,
     itemType?: string
   ): InteractionResult {
-    const inventory = agent.getComponent<InventoryComponent>('inventory');
+    const inventory = agent.getComponent<InventoryComponent>(ComponentType.Inventory);
     if (!inventory) {
       return { success: false, message: 'Agent has no inventory' };
     }
 
     const storageImpl = storageEntity as EntityImpl;
-    const storageInventory = storageImpl.getComponent<InventoryComponent>('inventory');
+    const storageInventory = storageImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
     if (!storageInventory) {
       return { success: false, message: 'Storage has no inventory' };
     }
@@ -456,10 +460,10 @@ export class InteractionAPI {
       // Try to add to storage
       try {
         const result = addToInventory(storageInventory, slot.itemId, slot.quantity);
-        storageImpl.updateComponent<InventoryComponent>('inventory', () => result.inventory);
+        storageImpl.updateComponent<InventoryComponent>(ComponentType.Inventory, () => result.inventory);
 
         // Remove from agent inventory
-        agent.updateComponent<InventoryComponent>('inventory', (current) => {
+        agent.updateComponent<InventoryComponent>(ComponentType.Inventory, (current) => {
           const newSlots = [...current.slots];
           newSlots[i] = {
             itemId: null,
@@ -500,13 +504,13 @@ export class InteractionAPI {
     });
 
     // Record deposit stats
-    const gatheringStats = agent.getComponent<GatheringStatsComponent>('gathering_stats');
+    const gatheringStats = agent.getComponent<GatheringStatsComponent>(ComponentType.GatheringStats);
     if (gatheringStats) {
       const currentDay = this.getCurrentDay(world);
       for (const [itemId, amount] of Object.entries(depositedItems)) {
         recordDeposited(gatheringStats, itemId, amount, currentDay);
       }
-      agent.updateComponent<GatheringStatsComponent>('gathering_stats', () => gatheringStats);
+      agent.updateComponent<GatheringStatsComponent>(ComponentType.GatheringStats, () => gatheringStats);
     }
 
     return {
@@ -527,13 +531,13 @@ export class InteractionAPI {
     itemEntity: Entity,
     world: World
   ): InteractionResult {
-    const inventory = agent.getComponent<InventoryComponent>('inventory');
+    const inventory = agent.getComponent<InventoryComponent>(ComponentType.Inventory);
     if (!inventory) {
       return { success: false, message: 'Agent has no inventory' };
     }
 
     const itemImpl = itemEntity as EntityImpl;
-    const item = itemImpl.getComponent('item') as any;
+    const item = itemImpl.getComponent(ComponentType.Item) as any;
     if (!item) {
       return { success: false, message: 'Target is not an item' };
     }
@@ -541,7 +545,7 @@ export class InteractionAPI {
     // Try to add to inventory
     try {
       const result = addToInventory(inventory, item.itemId, item.quantity || 1);
-      agent.updateComponent<InventoryComponent>('inventory', () => result.inventory);
+      agent.updateComponent<InventoryComponent>(ComponentType.Inventory, () => result.inventory);
 
       // Remove item from world (use WorldMutator for entity destruction)
       (world as WorldMutator).destroyEntity(itemEntity.id, 'picked_up');
@@ -574,14 +578,14 @@ export class InteractionAPI {
    * Check if agent can harvest a resource.
    */
   canHarvest(agent: EntityImpl, resourceEntity: Entity): boolean {
-    const inventory = agent.getComponent<InventoryComponent>('inventory');
+    const inventory = agent.getComponent<InventoryComponent>(ComponentType.Inventory);
     if (!inventory) return false;
 
     // Check if inventory has space
     if (inventory.currentWeight >= inventory.maxWeight) return false;
 
     const resourceImpl = resourceEntity as EntityImpl;
-    const resource = resourceImpl.getComponent<ResourceComponent>('resource');
+    const resource = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource);
     if (!resource) return false;
 
     return resource.harvestable && resource.amount > 0;
@@ -591,7 +595,7 @@ export class InteractionAPI {
    * Check if agent has food in inventory.
    */
   hasFood(agent: EntityImpl, foodType?: string): boolean {
-    const inventory = agent.getComponent<InventoryComponent>('inventory');
+    const inventory = agent.getComponent<InventoryComponent>(ComponentType.Inventory);
     if (!inventory) return false;
 
     const foodTypes = foodType
@@ -607,7 +611,7 @@ export class InteractionAPI {
    * Get total food count in inventory.
    */
   getFoodCount(agent: EntityImpl): number {
-    const inventory = agent.getComponent<InventoryComponent>('inventory');
+    const inventory = agent.getComponent<InventoryComponent>(ComponentType.Inventory);
     if (!inventory) return 0;
 
     const foodTypes = ['berry', 'wheat', 'food', 'apple', 'carrot'];

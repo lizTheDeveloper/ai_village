@@ -31,6 +31,56 @@ export {
   defineItem,
 } from './ItemDefinition.js';
 
+// Trait system (Phase 29)
+export {
+  type ItemTraits,
+} from './ItemTraits.js';
+
+export {
+  type EdibleTrait,
+  type FlavorType as EdibleFlavorType,
+} from './traits/EdibleTrait.js';
+
+export {
+  type WeaponTrait,
+  type DamageType,
+} from './traits/WeaponTrait.js';
+
+export {
+  type MagicalTrait,
+  type EffectExpression,
+} from './traits/MagicalTrait.js';
+
+export {
+  type ContainerTrait,
+} from './traits/ContainerTrait.js';
+
+export {
+  type ToolTrait,
+  type ToolType,
+} from './traits/ToolTrait.js';
+
+// Item instances (Phase 29)
+export {
+  type ItemInstance,
+  type ItemQuality as ItemQualityTier,
+  getQualityTier as getItemQualityTier,
+} from './ItemInstance.js';
+
+export {
+  ItemInstanceRegistry,
+  itemInstanceRegistry,
+} from './ItemInstanceRegistry.js';
+
+// Migration utilities (Phase 29)
+export {
+  migrateItemDefinitionV1toV2,
+  migrateItemDefinitions,
+  isItemDefinitionV1,
+  isItemDefinitionV2,
+  getEffectiveEdibleData,
+} from './migration.js';
+
 // Registry
 export {
   ItemRegistry,
@@ -72,6 +122,32 @@ export {
   loadItemsFromJsonString,
   type RawItemData,
 } from './ItemLoader.js';
+
+// Armor trait (forward-compatibility)
+export {
+  type ArmorTrait,
+  type ArmorSlot,
+} from './traits/ArmorTrait.js';
+
+// Artifact system (forward-compatibility)
+export {
+  type StrangeMoodType,
+  type MoodMaterialRequirement,
+  type StrangeMood,
+  type DecorationType,
+  type ArtifactImage,
+  type ArtifactImageSubject,
+  type ArtifactDecoration,
+  type ArtifactRarity,
+  type Artifact,
+  type ArtifactHistoryEntry,
+  type ArtifactEvent,
+  type ArtifactRegistry,
+  generateArtifactName,
+  createArtifactFromMood,
+  createMasterwork,
+  recordArtifactEvent,
+} from './ArtifactSystem.js';
 
 // Quality system (Phase 10)
 export {

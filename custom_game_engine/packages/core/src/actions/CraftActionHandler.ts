@@ -26,6 +26,7 @@ import type { CraftingSystem } from '../crafting/CraftingSystem.js';
 import type { Recipe } from '../crafting/Recipe.js';
 import type { GameEvent } from '../events/GameEvent.js';
 import { EntityImpl } from '../ecs/Entity.js';
+import { ComponentType } from '../types/ComponentType.js';
 
 /** Distance at which agent can use a crafting station */
 const CRAFT_DISTANCE = 1.5;
@@ -70,7 +71,7 @@ export class CraftActionHandler implements ActionHandler {
       // Apply skill efficiency bonus
       const actor = world.getEntity(action.actorId);
       if (actor) {
-        const skillsComp = actor.components.get('skills') as SkillsComponent | undefined;
+        const skillsComp = actor.components.get(ComponentType.Skills) as SkillsComponent | undefined;
         if (skillsComp) {
           const craftingLevel = skillsComp.levels.crafting;
           const skillBonus = getEfficiencyBonus(craftingLevel); // 0-25%
@@ -116,7 +117,7 @@ export class CraftActionHandler implements ActionHandler {
     }
 
     // Check actor has position
-    const actorPos = actor.components.get('position') as PositionComponent | undefined;
+    const actorPos = actor.components.get(ComponentType.Position) as PositionComponent | undefined;
     if (!actorPos) {
       return {
         valid: false,
@@ -125,7 +126,7 @@ export class CraftActionHandler implements ActionHandler {
     }
 
     // Check actor has inventory
-    const inventory = actor.components.get('inventory') as InventoryComponent | undefined;
+    const inventory = actor.components.get(ComponentType.Inventory) as InventoryComponent | undefined;
     if (!inventory) {
       return {
         valid: false,
@@ -166,7 +167,7 @@ export class CraftActionHandler implements ActionHandler {
 
     // Check skill requirements
     if (recipe.skillRequirements && recipe.skillRequirements.length > 0) {
-      const skillsComp = actor.components.get('skills') as SkillsComponent | undefined;
+      const skillsComp = actor.components.get(ComponentType.Skills) as SkillsComponent | undefined;
       for (const req of recipe.skillRequirements) {
         const agentLevel = skillsComp?.levels[req.skill as keyof typeof skillsComp.levels] ?? 0;
         if (agentLevel < req.level) {
@@ -315,14 +316,14 @@ export class CraftActionHandler implements ActionHandler {
   ): boolean {
     const buildings = world
       .query()
-      .with('building')
-      .with('position')
+      .with(ComponentType.Building)
+      .with(ComponentType.Position)
       .executeEntities();
 
     for (const building of buildings) {
       const buildingImpl = building as EntityImpl;
-      const buildingComp = buildingImpl.getComponent<BuildingComponent>('building');
-      const buildingPos = buildingImpl.getComponent<PositionComponent>('position');
+      const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+      const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
 
       if (!buildingComp || !buildingPos) continue;
 

@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import type { AgentComponent, AgentBehavior } from '../AgentComponent';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Queue data structure (will be added to AgentComponent)
  */
@@ -156,7 +157,7 @@ describe('Behavior Queue System - Component & Helpers', () => {
 
   beforeEach(() => {
     agent = {
-      type: 'agent',
+      type: ComponentType.Agent,
       version: 1,
       behavior: 'wander',
       behaviorState: {},
@@ -505,7 +506,7 @@ describe('Behavior Queue System - Component & Helpers', () => {
   describe('Acceptance Criterion 12: CLAUDE.md Compliance', () => {
     it('should throw when queueBehavior called on agent without behaviorQueue', () => {
       const invalidAgent: QueuedAgentComponent = {
-        type: 'agent',
+        type: ComponentType.Agent,
         version: 1,
         behavior: 'wander',
         behaviorState: {},
@@ -537,7 +538,7 @@ describe('Behavior Queue System - Component & Helpers', () => {
 
     it('should throw when clearBehaviorQueue called on agent without behaviorQueue field', () => {
       const invalidAgent: AgentComponent = {
-        type: 'agent',
+        type: ComponentType.Agent,
         version: 1,
         behavior: 'wander',
         behaviorState: {},
@@ -554,7 +555,7 @@ describe('Behavior Queue System - Component & Helpers', () => {
 
     it('should throw when pauseBehaviorQueue called on agent without queuePaused field', () => {
       const invalidAgent: AgentComponent = {
-        type: 'agent',
+        type: ComponentType.Agent,
         version: 1,
         behavior: 'wander',
         behaviorState: {},
@@ -571,7 +572,7 @@ describe('Behavior Queue System - Component & Helpers', () => {
 
     it('should throw when resumeBehaviorQueue called on agent without queuePaused field', () => {
       const invalidAgent: AgentComponent = {
-        type: 'agent',
+        type: ComponentType.Agent,
         version: 1,
         behavior: 'wander',
         behaviorState: {},
@@ -588,7 +589,7 @@ describe('Behavior Queue System - Component & Helpers', () => {
 
     it('should throw when hasBehaviorQueue called on agent without behaviorQueue field', () => {
       const invalidAgent: AgentComponent = {
-        type: 'agent',
+        type: ComponentType.Agent,
         version: 1,
         behavior: 'wander',
         behaviorState: {},
@@ -605,7 +606,7 @@ describe('Behavior Queue System - Component & Helpers', () => {
 
     it('should throw when getCurrentQueuedBehavior called on agent without behaviorQueue', () => {
       const invalidAgent: AgentComponent = {
-        type: 'agent',
+        type: ComponentType.Agent,
         version: 1,
         behavior: 'wander',
         behaviorState: {},
@@ -622,7 +623,7 @@ describe('Behavior Queue System - Component & Helpers', () => {
 
     it('should throw when advanceBehaviorQueue called on agent without behaviorQueue', () => {
       const invalidAgent: QueuedAgentComponent = {
-        type: 'agent',
+        type: ComponentType.Agent,
         version: 1,
         behavior: 'wander',
         behaviorState: {},
@@ -641,7 +642,7 @@ describe('Behavior Queue System - Component & Helpers', () => {
 
     it('should throw when advanceBehaviorQueue called on agent without currentQueueIndex', () => {
       const invalidAgent: QueuedAgentComponent = {
-        type: 'agent',
+        type: ComponentType.Agent,
         version: 1,
         behavior: 'wander',
         behaviorState: {},
@@ -664,7 +665,7 @@ describe('Behavior Queue System - Component & Helpers', () => {
 
       expect(() => {
         const invalidAgent: Partial<QueuedAgentComponent> = {
-          type: 'agent',
+          type: ComponentType.Agent,
           version: 1,
           behavior: 'wander',
           behaviorState: {},

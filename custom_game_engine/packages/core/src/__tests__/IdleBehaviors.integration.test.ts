@@ -5,10 +5,11 @@ import { IdleBehaviorSystem } from '../systems/IdleBehaviorSystem';
 import { ReflectionSystem } from '../systems/ReflectionSystem';
 import { NeedsComponent } from '../components/NeedsComponent';
 import { PersonalityComponent } from '../components/PersonalityComponent';
-import { MemoryComponent } from '../components/MemoryComponentClass';
+import { MemoryComponent } from '../components/MemoryComponent';
 import { GoalsComponent } from '../components/GoalsComponent';
 import { ActionQueue } from '../actions/ActionQueueClass';
 
+import { ComponentType } from '../types/ComponentType.js';
 describe('Idle Behaviors Integration', () => {
   let world: World;
   let idleBehaviorSystem: IdleBehaviorSystem;
@@ -38,7 +39,7 @@ describe('Idle Behaviors Integration', () => {
 
       const behaviors: string[] = [];
       for (let i = 0; i < 100; i++) {
-        const queue = entity.getComponent('action_queue') as ActionQueue;
+        const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         queue.clear();
         idleBehaviorSystem.update(world, 1);
         const action = queue.peek();
@@ -69,7 +70,7 @@ describe('Idle Behaviors Integration', () => {
 
       const behaviors = new Set<string>();
       for (let i = 0; i < 100; i++) {
-        const queue = entity.getComponent('action_queue') as ActionQueue;
+        const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         queue.clear();
         idleBehaviorSystem.update(world, 1);
         const action = queue.peek();
@@ -105,7 +106,7 @@ describe('Idle Behaviors Integration', () => {
       for (let i = 0; i < 1000; i++) {
         idleBehaviorSystem.update(world, 1);
 
-        const queue = entity.getComponent('action_queue') as ActionQueue;
+        const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         const action = queue.peek();
         if (action?.type === 'reflect') {
           // Execute reflection
@@ -171,7 +172,7 @@ describe('Idle Behaviors Integration', () => {
           agents.forEach(agent => {
             idleBehaviorSystem.update(world, 1);
 
-            const queue = agent.getComponent('action_queue') as ActionQueue;
+            const queue = agent.getComponent(ComponentType.ActionQueue) as ActionQueue;
             const action = queue.peek();
             if (action?.type === 'reflect') {
               queue.dequeue();
@@ -183,7 +184,7 @@ describe('Idle Behaviors Integration', () => {
 
       // Count agents with goals
       const agentsWithGoals = agents.filter(agent => {
-        const goals = agent.getComponent('goals') as GoalsComponent;
+        const goals = agent.getComponent(ComponentType.Goals) as GoalsComponent;
         return goals.getActiveGoalCount() > 0;
       });
 
@@ -207,12 +208,12 @@ describe('Idle Behaviors Integration', () => {
 
       // Force multiple reflections
       for (let i = 0; i < 50; i++) {
-        const memory = entity.getComponent('memory') as MemoryComponent;
+        const memory = entity.getComponent(ComponentType.Memory) as MemoryComponent;
         memory.lastReflectionTime = 0; // Reset cooldown
         reflectionSystem.update(world, 1);
       }
 
-      const goals = entity.getComponent('goals') as GoalsComponent;
+      const goals = entity.getComponent(ComponentType.Goals) as GoalsComponent;
       const allGoals = goals.goals;
 
       if (allGoals.length > 0) {
@@ -266,7 +267,7 @@ describe('Idle Behaviors Integration', () => {
 
       for (let i = 0; i < 50; i++) {
         // Lonely agent
-        const lonelyQueue = lonelyEntity.getComponent('action_queue') as ActionQueue;
+        const lonelyQueue = lonelyEntity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         lonelyQueue.clear();
         idleBehaviorSystem.update(world, 1);
         const lonelyAction = lonelyQueue.peek();
@@ -275,7 +276,7 @@ describe('Idle Behaviors Integration', () => {
         }
 
         // Content agent
-        const contentQueue = contentEntity.getComponent('action_queue') as ActionQueue;
+        const contentQueue = contentEntity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         contentQueue.clear();
         idleBehaviorSystem.update(world, 1);
         const contentAction = contentQueue.peek();
@@ -335,7 +336,7 @@ describe('Idle Behaviors Integration', () => {
       });
 
       // Progress should update
-      const updatedGoals = entity.getComponent('goals') as GoalsComponent;
+      const updatedGoals = entity.getComponent(ComponentType.Goals) as GoalsComponent;
       const goal = updatedGoals.getGoal('goal-1');
 
       expect(goal?.progress).toBeGreaterThan(0);
@@ -474,7 +475,7 @@ describe('Idle Behaviors Integration', () => {
 
       const behaviors: string[] = [];
       for (let i = 0; i < 50; i++) {
-        const queue = entity.getComponent('action_queue') as ActionQueue;
+        const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         queue.clear();
         idleBehaviorSystem.update(world, 1);
         const action = queue.peek();

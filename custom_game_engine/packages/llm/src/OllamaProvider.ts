@@ -16,7 +16,7 @@ export class OllamaProvider implements LLMProvider {
     try {
       // Create AbortController for timeout
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout for local LLM
 
       // Define action tools - simple, no parameters
       const tools = [
@@ -65,14 +65,6 @@ export class OllamaProvider implements LLMProvider {
           function: {
             name: 'gather',
             description: 'Gather resources from the environment (forage, collect items)',
-            parameters: { type: 'object', properties: {} }
-          }
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'explore',
-            description: 'Explore with purpose, looking for something specific',
             parameters: { type: 'object', properties: {} }
           }
         },
@@ -197,7 +189,7 @@ IMPORTANT: You MUST use a tool call. Text responses will be ignored.`;
           tools: tools,
           options: {
             temperature: request.temperature ?? 0.7,
-            num_predict: request.maxTokens ?? 2000,
+            num_predict: request.maxTokens ?? 40960,
           },
         }),
         signal: controller.signal, // Add timeout signal

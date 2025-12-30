@@ -1,3 +1,5 @@
+import { ComponentType } from '../../types/ComponentType.js';
+import { BuildingType } from '../../types/BuildingType.js';
 /**
  * CraftingStations.integration.test.ts
  *
@@ -25,8 +27,7 @@ describe('CraftingStations Integration Tests', () => {
     // Initialize registry with all stations
     registry = new BuildingBlueprintRegistry();
     registry.registerDefaults();
-    registry.registerTier2Stations();
-    registry.registerTier3Stations();
+    // Note: registerDefaults() already calls registerTier2Stations() and registerTier3Stations()
 
     // Initialize BuildingSystem
     buildingSystem = new BuildingSystem();
@@ -49,7 +50,7 @@ describe('CraftingStations Integration Tests', () => {
       const entities = Array.from(harness.world.entities.values());
 
       // Before completion - fuel properties exist with default values
-      const beforeBuilding = forge.getComponent('building') as any;
+      const beforeBuilding = forge.getComponent(ComponentType.Building) as any;
       expect(beforeBuilding.fuelRequired).toBe(false);
 
       // Run system to complete construction
@@ -60,7 +61,7 @@ describe('CraftingStations Integration Tests', () => {
       harness.eventBus.flush();
 
       // After completion - fuel properties should be initialized
-      const afterBuilding = forge.getComponent('building') as any;
+      const afterBuilding = forge.getComponent(ComponentType.Building) as any;
 
       // The update() call completes construction, which emits building:complete event,
       // which triggers handleBuildingComplete, which initializes fuel
@@ -104,11 +105,11 @@ describe('CraftingStations Integration Tests', () => {
         source: farmShed.id,
         data: {
           entityId: farmShed.id,
-          buildingType: 'farm_shed',
+          buildingType: BuildingType.FarmShed,
         },
       });
 
-      const building = farmShed.getComponent('building') as any;
+      const building = farmShed.getComponent(ComponentType.Building) as any;
 
       // Farm Shed should NOT require fuel (but properties exist with default values)
       expect(building.fuelRequired).toBe(false);
@@ -123,11 +124,11 @@ describe('CraftingStations Integration Tests', () => {
         source: windmill.id,
         data: {
           entityId: windmill.id,
-          buildingType: 'windmill',
+          buildingType: BuildingType.Windmill,
         },
       });
 
-      const building = windmill.getComponent('building') as any;
+      const building = windmill.getComponent(ComponentType.Building) as any;
 
       // Windmill uses wind power, no fuel needed (but properties exist with default values)
       expect(building.fuelRequired).toBe(false);
@@ -141,11 +142,11 @@ describe('CraftingStations Integration Tests', () => {
         source: workshop.id,
         data: {
           entityId: workshop.id,
-          buildingType: 'workshop',
+          buildingType: BuildingType.Workshop,
         },
       });
 
-      const building = workshop.getComponent('building') as any;
+      const building = workshop.getComponent(ComponentType.Building) as any;
 
       // Workshop doesn't require fuel per spec (but properties exist with default values)
       expect(building.fuelRequired).toBe(false);
@@ -157,13 +158,13 @@ describe('CraftingStations Integration Tests', () => {
       // Create an agent with required resources (forge needs 30 stone + 15 wood)
       const agent = harness.createTestAgent({ x: 10, y: 10 }, 'Builder');
       agent.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         version: 1,
         name: 'Builder',
         traits: {},
       });
       agent.addComponent({
-        type: 'inventory',
+        type: ComponentType.Inventory,
         version: 1,
         slots: [
           { itemId: 'stone', quantity: 40 },
@@ -197,18 +198,18 @@ describe('CraftingStations Integration Tests', () => {
 
       // Find the new forge entity
       const forgeEntity = Array.from(harness.world.entities.values()).find(
-        e => e.hasComponent('building') &&
-        (e.getComponent('building') as any).buildingType === 'forge'
+        e => e.hasComponent(ComponentType.Building) &&
+        (e.getComponent(ComponentType.Building) as any).buildingType === BuildingType.Forge
       );
 
       expect(forgeEntity).toBeDefined();
 
       if (forgeEntity) {
-        const position = forgeEntity.getComponent('position') as any;
+        const position = forgeEntity.getComponent(ComponentType.Position) as any;
         expect(position.x).toBe(20);
         expect(position.y).toBe(20);
 
-        const building = forgeEntity.getComponent('building') as any;
+        const building = forgeEntity.getComponent(ComponentType.Building) as any;
         expect(building.buildingType).toBe('forge');
         expect(building.progress).toBe(0); // Starts at 0% construction
       }
@@ -218,13 +219,13 @@ describe('CraftingStations Integration Tests', () => {
       // Create an agent with required resources (workshop needs 40 wood + 25 stone)
       const agent = harness.createTestAgent({ x: 10, y: 10 }, 'Builder');
       agent.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         version: 1,
         name: 'Builder',
         traits: {},
       });
       agent.addComponent({
-        type: 'inventory',
+        type: ComponentType.Inventory,
         version: 1,
         slots: [
           { itemId: 'wood', quantity: 60 },
@@ -249,14 +250,14 @@ describe('CraftingStations Integration Tests', () => {
       harness.eventBus.flush();
 
       const workshopEntity = Array.from(harness.world.entities.values()).find(
-        e => e.hasComponent('building') &&
-        (e.getComponent('building') as any).buildingType === 'workshop'
+        e => e.hasComponent(ComponentType.Building) &&
+        (e.getComponent(ComponentType.Building) as any).buildingType === BuildingType.Workshop
       );
 
       expect(workshopEntity).toBeDefined();
 
       if (workshopEntity) {
-        const building = workshopEntity.getComponent('building') as any;
+        const building = workshopEntity.getComponent(ComponentType.Building) as any;
         expect(building.buildingType).toBe('workshop');
         expect(building.progress).toBe(0);
         expect(building.isComplete).toBe(false); // Should start under construction
@@ -281,14 +282,14 @@ describe('CraftingStations Integration Tests', () => {
       // Update for 25 seconds (should be ~33% complete: 25/75 * 100 = 33.33%)
       buildingSystem.update(harness.world, entities, 25.0);
 
-      const afterFirstUpdate = building.getComponent('building') as any;
+      const afterFirstUpdate = building.getComponent(ComponentType.Building) as any;
       expect(afterFirstUpdate.progress).toBeGreaterThan(30);
       expect(afterFirstUpdate.progress).toBeLessThan(40);
 
       // Update for another 25 seconds (should be ~66% complete: 50/75 * 100 = 66.66%)
       buildingSystem.update(harness.world, entities, 25.0);
 
-      const afterSecondUpdate = building.getComponent('building') as any;
+      const afterSecondUpdate = building.getComponent(ComponentType.Building) as any;
       expect(afterSecondUpdate.progress).toBeGreaterThan(63);
       expect(afterSecondUpdate.progress).toBeLessThan(70);
     });
@@ -312,7 +313,7 @@ describe('CraftingStations Integration Tests', () => {
       // Update for 10 seconds (more than enough to complete)
       buildingSystem.update(harness.world, entities, 10.0);
 
-      const finalBuilding = building.getComponent('building') as any;
+      const finalBuilding = building.getComponent(ComponentType.Building) as any;
 
       // Progress should be at or above 100
       expect(finalBuilding.progress).toBeGreaterThanOrEqual(100);
@@ -372,7 +373,7 @@ describe('CraftingStations Integration Tests', () => {
         source: buildingId,
         data: {
           entityId: buildingId,
-          buildingType: 'forge',
+          buildingType: BuildingType.Forge,
         },
       });
 
@@ -385,7 +386,7 @@ describe('CraftingStations Integration Tests', () => {
       // This test verifies the BuildingSystem handles unknown building types
       const invalidBuilding = harness.world.createEntity('building');
       invalidBuilding.addComponent({
-        type: 'position',
+        type: ComponentType.Position,
         version: 1,
         x: 10,
         y: 10,

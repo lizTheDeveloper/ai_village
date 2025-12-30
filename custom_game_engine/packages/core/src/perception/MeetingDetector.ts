@@ -12,6 +12,7 @@ import type { World } from '../ecs/World.js';
 import type { VisionComponent } from '../components/VisionComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
+import { ComponentType } from '../types/ComponentType.js';
 
 /**
  * Meeting detection result
@@ -48,9 +49,9 @@ export class MeetingDetector {
    * Process meeting calls for an entity.
    */
   process(entity: EntityImpl, world: World): MeetingDetectionResult {
-    const agent = entity.getComponent<AgentComponent>('agent');
-    const vision = entity.getComponent<VisionComponent>('vision');
-    const relationship = entity.getComponent<RelationshipComponent>('relationship');
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
+    const vision = entity.getComponent<VisionComponent>(ComponentType.Vision);
+    const relationship = entity.getComponent<RelationshipComponent>(ComponentType.Relationship);
 
     if (!agent || !vision?.heardSpeech) {
       return { detected: false };
@@ -75,7 +76,7 @@ export class MeetingDetector {
 
       if (shouldAttend) {
         // Switch to attend_meeting behavior
-        entity.updateComponent<AgentComponent>('agent', (current) => ({
+        entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
           ...current,
           behavior: 'attend_meeting',
           behaviorState: {
@@ -130,14 +131,14 @@ export class MeetingDetector {
    * Find the agent who called the meeting by speaker name.
    */
   private findMeetingCaller(world: World, speakerName: string, selfId: string): Entity | null {
-    const agents = world.query().with('agent').with('position').executeEntities();
+    const agents = world.query().with(ComponentType.Agent).with(ComponentType.Position).executeEntities();
 
     for (const agent of agents) {
       if (agent.id === selfId) continue;
 
       const impl = agent as EntityImpl;
-      const identity = impl.getComponent('identity') as any;
-      const meeting = impl.getComponent('meeting') as any;
+      const identity = impl.getComponent(ComponentType.Identity) as any;
+      const meeting = impl.getComponent(ComponentType.Meeting) as any;
 
       // Check if this agent has a meeting and their name matches the speaker
       if (meeting && identity?.name === speakerName) {

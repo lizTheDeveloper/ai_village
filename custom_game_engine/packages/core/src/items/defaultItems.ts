@@ -81,9 +81,19 @@ export const FOOD_ITEMS: ItemDefinition[] = [
   defineItem('berry', 'Berry', 'food', {
     weight: 0.2,
     stackSize: 50,
+    baseMaterial: 'organic',
+    traits: {
+      edible: {
+        hungerRestored: 15,
+        quality: 40,
+        flavors: ['sweet', 'sour'],
+        spoilRate: 0.1,
+      },
+    },
+    // Legacy fields for backward compatibility
     isEdible: true,
     hungerRestored: 15,
-    quality: 40, // Basic foraged food
+    quality: 40,
     flavors: ['sweet', 'sour'],
     isGatherable: true,
     gatherSources: ['berry_bush'],

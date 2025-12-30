@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -24,7 +25,7 @@ export class ExplorationSystem implements System {
    * Helper to get typed exploration state from entity
    */
   private getExplorationState(entity: EntityImpl): ExplorationStateComponent | null {
-    return entity.getComponent<ExplorationStateComponent>('exploration_state') ?? null;
+    return entity.getComponent<ExplorationStateComponent>(CT.ExplorationState) ?? null;
   }
 
   initialize(_world: World, eventBus: EventBus): void {
@@ -33,7 +34,7 @@ export class ExplorationSystem implements System {
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     // Get entities with ExplorationState
-    const explorers = entities.filter(e => e.components.has('exploration_state'));
+    const explorers = entities.filter(e => e.components.has(CT.ExplorationState));
 
     for (const entity of explorers) {
       try {
@@ -47,7 +48,7 @@ export class ExplorationSystem implements System {
 
   private _updateExploration(entity: Entity, _world: World, currentTick: number): void {
     const impl = entity as EntityImpl;
-    if (!impl.hasComponent('exploration_state')) {
+    if (!impl.hasComponent(CT.ExplorationState)) {
       throw new Error('ExplorationSystem requires ExplorationState component');
     }
 
@@ -135,8 +136,8 @@ export class ExplorationSystem implements System {
         explorationState.currentTarget = targetWorld;
 
         // Update steering if component exists
-        if (impl.hasComponent('steering')) {
-          impl.updateComponent('steering', (state) => ({
+        if (impl.hasComponent(CT.Steering)) {
+          impl.updateComponent(CT.Steering, (state) => ({
             ...state,
             behavior: 'arrive',
             target: targetWorld,
@@ -175,8 +176,8 @@ export class ExplorationSystem implements System {
         const nextPos = this._getNextSpiralPosition(explorationState);
         explorationState.currentTarget = nextPos;
 
-        if (impl.hasComponent('steering')) {
-          impl.updateComponent('steering', (state) => ({
+        if (impl.hasComponent(CT.Steering)) {
+          impl.updateComponent(CT.Steering, (state) => ({
             ...state,
             behavior: 'arrive',
             target: nextPos,
@@ -189,8 +190,8 @@ export class ExplorationSystem implements System {
       explorationState.spiralStep = (explorationState.spiralStep ?? 0) + 1;
       explorationState.currentTarget = firstPos;
 
-      if (impl.hasComponent('steering')) {
-        impl.updateComponent('steering', (state) => ({
+      if (impl.hasComponent(CT.Steering)) {
+        impl.updateComponent(CT.Steering, (state) => ({
           ...state,
           behavior: 'arrive',
           target: firstPos,

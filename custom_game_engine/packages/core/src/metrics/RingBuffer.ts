@@ -72,7 +72,7 @@ export class RingBuffer<T> {
 
     const result: T[] = [];
     // Start from (writeIndex - actualCount) and go to writeIndex - 1
-    let startIndex = (this.writeIndex - actualCount + this.capacity) % this.capacity;
+    const startIndex = (this.writeIndex - actualCount + this.capacity) % this.capacity;
 
     for (let i = 0; i < actualCount; i++) {
       const idx = (startIndex + i) % this.capacity;

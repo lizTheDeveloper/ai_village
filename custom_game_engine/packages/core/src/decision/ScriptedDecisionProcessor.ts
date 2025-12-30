@@ -16,10 +16,13 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 import type { ResourceComponent } from '../components/ResourceComponent.js';
 import type { PlantComponent } from '../components/PlantComponent.js';
 import type { ConversationComponent } from '../components/ConversationComponent.js';
+import type { MagicComponent } from '../components/MagicComponent.js';
 import { isHungry } from '../components/NeedsComponent.js';
 import { isInConversation, startConversation } from '../components/ConversationComponent.js';
 import { calculateFarmingContext, calculateFarmingUtilities, shouldFarm } from './FarmingUtilityCalculator.js';
 import { calculateStorageStats, suggestBuildingFromStorage } from '../utils/StorageContext.js';
+import { suggestSpells } from './SpellUtilityCalculator.js';
+import { ComponentType } from '../types/ComponentType.js';
 /**
  * Building cost lookup.
  * NOTE: These MUST match BuildingBlueprintRegistry resource costs.
@@ -88,15 +91,15 @@ export class ScriptedDecisionProcessor {
     world: World,
     getNearbyAgents: (entity: EntityImpl, world: World, range: number) => Entity[]
   ): ScriptedDecisionResult {
-    const agent = entity.getComponent<AgentComponent>('agent');
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
     if (!agent) return { changed: false };
-    const needs = entity.getComponent<NeedsComponent>('needs');
-    const inventory = entity.getComponent<InventoryComponent>('inventory');
+    const needs = entity.getComponent<NeedsComponent>(ComponentType.Needs);
+    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
     const currentBehavior = agent.behavior;
     // Check hunger state
     if (needs && isHungry(needs) && currentBehavior !== 'seek_food') {
       // Switch to seeking food when hungry
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         behavior: 'seek_food',
         behaviorState: {},
@@ -105,7 +108,7 @@ export class ScriptedDecisionProcessor {
     }
     if (needs && !isHungry(needs) && currentBehavior === 'seek_food') {
       // Switch back to wandering when satisfied
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         behavior: 'wander',
         behaviorState: {},
@@ -143,7 +146,7 @@ export class ScriptedDecisionProcessor {
     }
     // Stop following randomly
     if (currentBehavior === 'follow_agent' && Math.random() < 0.05) {
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         behavior: 'wander',
         behaviorState: {},
@@ -181,7 +184,7 @@ export class ScriptedDecisionProcessor {
     if (hasWood && hasStone && hasFood) {
       return null; // Have enough of everything
     }
-    const position = entity.getComponent<PositionComponent>('position');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) return null;
     // Track nearest resources of each type
     const nearest = this.findNearestResources(world, position, hasFood, hasWood, hasStone);
@@ -198,7 +201,7 @@ export class ScriptedDecisionProcessor {
       // Use seek_food for plant-based food (handles harvest action)
       // Use gather for resource-based items
       const behavior = targetResource.isPlant ? 'seek_food' : 'gather';
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         behavior,
         behaviorState: { resourceType: targetResource!.type },
@@ -219,11 +222,11 @@ export class ScriptedDecisionProcessor {
   ): { food: ResourceTarget | null; wood: ResourceTarget | null; stone: ResourceTarget | null } {
     const result = { food: null as ResourceTarget | null, wood: null as ResourceTarget | null, stone: null as ResourceTarget | null };
     // Check resources
-    const resources = world.query().with('resource').with('position').executeEntities();
+    const resources = world.query().with(ComponentType.Resource).with(ComponentType.Position).executeEntities();
     for (const resource of resources) {
       const resourceImpl = resource as EntityImpl;
-      const resourceComp = resourceImpl.getComponent<ResourceComponent>('resource');
-      const resourcePos = resourceImpl.getComponent<PositionComponent>('position');
+      const resourceComp = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource);
+      const resourcePos = resourceImpl.getComponent<PositionComponent>(ComponentType.Position);
       if (!resourceComp || !resourcePos) continue;
       if (!resourceComp.harvestable || resourceComp.amount <= 0) continue;
       // Only consider resources we need
@@ -243,11 +246,11 @@ export class ScriptedDecisionProcessor {
     }
     // Also search for edible plants with fruit
     if (!hasFood) {
-      const plants = world.query().with('plant').with('position').executeEntities();
+      const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
       for (const plant of plants) {
         const plantImpl = plant as EntityImpl;
-        const plantComp = plantImpl.getComponent<PlantComponent>('plant');
-        const plantPos = plantImpl.getComponent<PositionComponent>('position');
+        const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
         if (!plantComp || !plantPos) continue;
         const isEdible = EDIBLE_SPECIES.includes(plantComp.speciesId);
         const hasFruit = plantComp.fruitCount > 0;
@@ -273,7 +276,7 @@ export class ScriptedDecisionProcessor {
     const hasStone = inventory.slots.some((s) => s.itemId === 'stone' && s.quantity >= 10);
     const hasFood = inventory.slots.some((s) => s.itemId === 'food' && s.quantity >= 5);
     if (hasWood && hasStone && hasFood) {
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         behavior: 'wander',
         behaviorState: {},
@@ -294,7 +297,7 @@ export class ScriptedDecisionProcessor {
     if (nearbyAgents.length > 0) {
       const targetAgent = nearbyAgents[Math.floor(Math.random() * nearbyAgents.length)];
       if (targetAgent) {
-        entity.updateComponent<AgentComponent>('agent', (current) => ({
+        entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
           ...current,
           behavior: 'follow_agent',
           behaviorState: { targetId: targetAgent.id },
@@ -312,30 +315,30 @@ export class ScriptedDecisionProcessor {
     world: World,
     getNearbyAgents: (entity: EntityImpl, world: World, range: number) => Entity[]
   ): ScriptedDecisionResult | null {
-    const conversation = entity.getComponent<ConversationComponent>('conversation');
+    const conversation = entity.getComponent<ConversationComponent>(ComponentType.Conversation);
     if (!conversation || isInConversation(conversation)) return null;
     const nearbyAgents = getNearbyAgents(entity, world, 3); // Must be close (3 tiles)
     if (nearbyAgents.length === 0) return null;
     const targetAgent = nearbyAgents[Math.floor(Math.random() * nearbyAgents.length)];
     if (!targetAgent) return null;
     const targetImpl = targetAgent as EntityImpl;
-    const targetConversation = targetImpl.getComponent<ConversationComponent>('conversation');
+    const targetConversation = targetImpl.getComponent<ConversationComponent>(ComponentType.Conversation);
     // Only start conversation if target is not already talking
     if (!targetConversation || isInConversation(targetConversation)) return null;
     // Start conversation for both agents
-    entity.updateComponent<ConversationComponent>('conversation', (current) =>
+    entity.updateComponent<ConversationComponent>(ComponentType.Conversation, (current) =>
       startConversation(current, targetAgent.id, world.tick)
     );
-    targetImpl.updateComponent<ConversationComponent>('conversation', (current) =>
+    targetImpl.updateComponent<ConversationComponent>(ComponentType.Conversation, (current) =>
       startConversation(current, entity.id, world.tick)
     );
     // Switch both to talk behavior
-    entity.updateComponent<AgentComponent>('agent', (current) => ({
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
       behavior: 'talk',
       behaviorState: { partnerId: targetAgent.id },
     }));
-    targetImpl.updateComponent<AgentComponent>('agent', (current) => ({
+    targetImpl.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
       behavior: 'talk',
       behaviorState: { partnerId: entity.id },
@@ -360,18 +363,18 @@ export class ScriptedDecisionProcessor {
     entity: EntityImpl,
     world: World
   ): ScriptedDecisionResult | null {
-    const position = entity.getComponent<PositionComponent>('position');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) return null;
     // Find nearby plants with seeds
     const plantsWithSeeds = world
       .query()
-      .with('plant')
-      .with('position')
+      .with(ComponentType.Plant)
+      .with(ComponentType.Position)
       .executeEntities()
       .filter((plantEntity) => {
         const plantImpl = plantEntity as EntityImpl;
-        const plant = plantImpl.getComponent<PlantComponent>('plant');
-        const plantPos = plantImpl.getComponent<PositionComponent>('position');
+        const plant = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
         if (!plant || !plantPos) return false;
         // Check if plant has seeds and is at a valid stage
         const validStages = ['mature', 'seeding', 'senescence'];
@@ -384,9 +387,9 @@ export class ScriptedDecisionProcessor {
     if (plantsWithSeeds.length === 0) return null;
     // Choose a random plant to gather from
     const targetPlant = plantsWithSeeds[Math.floor(Math.random() * plantsWithSeeds.length)]!;
-    const targetPlantComp = (targetPlant as EntityImpl).getComponent<PlantComponent>('plant');
+    const targetPlantComp = (targetPlant as EntityImpl).getComponent<PlantComponent>(ComponentType.Plant);
     // Emit gather_seeds action request
-    const posComp = (targetPlant as EntityImpl).getComponent<PositionComponent>('position');
+    const posComp = (targetPlant as EntityImpl).getComponent<PositionComponent>(ComponentType.Position);
     world.eventBus.emit({
       type: 'action:gather_seeds',
       source: entity.id,
@@ -401,7 +404,7 @@ export class ScriptedDecisionProcessor {
       },
     });
     // Switch to gather_seeds behavior
-    entity.updateComponent<AgentComponent>('agent', (current) => ({
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
       behavior: 'gather_seeds',
       behaviorState: {
@@ -422,29 +425,29 @@ export class ScriptedDecisionProcessor {
     entity: EntityImpl,
     world: World
   ): ScriptedDecisionResult | null {
-    const conversation = entity.getComponent<ConversationComponent>('conversation');
+    const conversation = entity.getComponent<ConversationComponent>(ComponentType.Conversation);
     if (!conversation?.partnerId) return null;
     const partner = world.getEntity(conversation.partnerId);
     if (!partner) return null;
     const partnerImpl = partner as EntityImpl;
     // End conversation for both
-    entity.updateComponent<ConversationComponent>('conversation', (current) => ({
+    entity.updateComponent<ConversationComponent>(ComponentType.Conversation, (current) => ({
       ...current,
       isActive: false,
       partnerId: null,
     }));
-    partnerImpl.updateComponent<ConversationComponent>('conversation', (current) => ({
+    partnerImpl.updateComponent<ConversationComponent>(ComponentType.Conversation, (current) => ({
       ...current,
       isActive: false,
       partnerId: null,
     }));
     // Switch both back to wandering
-    entity.updateComponent<AgentComponent>('agent', (current) => ({
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
       behavior: 'wander',
       behaviorState: {},
     }));
-    partnerImpl.updateComponent<AgentComponent>('agent', (current) => ({
+    partnerImpl.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
       behavior: 'wander',
       behaviorState: {},
@@ -460,7 +463,7 @@ export class ScriptedDecisionProcessor {
     plannedBuilds: PlannedBuild[],
     inventory: InventoryComponent
   ): ScriptedDecisionResult | null {
-    const position = entity.getComponent<PositionComponent>('position');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) return null;
     // Sort by priority (high > normal > low)
     const priorityOrder = { high: 0, normal: 1, low: 2 };
@@ -492,7 +495,7 @@ export class ScriptedDecisionProcessor {
       if (distToBuild <= PLANNED_BUILD_REACH) {
         // Near enough - start building!
         this.removePlannedBuild(entity, build);
-        entity.updateComponent<AgentComponent>('agent', (current) => ({
+        entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
           ...current,
           behavior: 'build',
           behaviorState: {
@@ -510,7 +513,7 @@ export class ScriptedDecisionProcessor {
         };
       } else {
         // Move toward build location
-        entity.updateComponent<AgentComponent>('agent', (current) => ({
+        entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
           ...current,
           behavior: 'navigate',
           behaviorState: {
@@ -530,7 +533,7 @@ export class ScriptedDecisionProcessor {
     const mostNeeded = Object.entries(missing).sort((a, b) => b[1] - a[1])[0];
     if (mostNeeded) {
       const [resourceType] = mostNeeded;
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         behavior: 'gather',
         behaviorState: {
@@ -550,7 +553,7 @@ export class ScriptedDecisionProcessor {
    * Remove a completed/invalid planned build from the agent.
    */
   private removePlannedBuild(entity: EntityImpl, build: PlannedBuild): void {
-    entity.updateComponent<AgentComponent>('agent', (current) => ({
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
       plannedBuilds: (current.plannedBuilds || []).filter(
         (b) =>
@@ -569,8 +572,8 @@ export class ScriptedDecisionProcessor {
     priorities: StrategicPriorities,
     getNearbyAgents: (entity: EntityImpl, world: World, range: number) => Entity[]
   ): ScriptedDecisionResult | null {
-    const inventory = entity.getComponent<InventoryComponent>('inventory');
-    const position = entity.getComponent<PositionComponent>('position');
+    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     // Build candidate behaviors based on what's possible/available
     const candidates: BehaviorCandidate[] = [];
     // GATHERING: wood, stone, food - only gather what we actually need
@@ -627,13 +630,13 @@ export class ScriptedDecisionProcessor {
           }
           if (Object.keys(missing).length > 0) {
             // Missing resources - add gather candidates for each missing resource
-            // These use 'building' category so building priority applies
+            // These use ComponentType.Building category so building priority applies
             for (const [resourceType, amountNeeded] of Object.entries(missing)) {
               // Check if this resource is available nearby
-              const resourcesNearby = world.query().with('resource').with('position').executeEntities();
+              const resourcesNearby = world.query().with(ComponentType.Resource).with(ComponentType.Position).executeEntities();
               const hasNearbyResource = resourcesNearby.some((r) => {
-                const rc = r.components.get('resource') as ResourceComponent | undefined;
-                const rp = r.components.get('position') as PositionComponent | undefined;
+                const rc = r.components.get(ComponentType.Resource) as ResourceComponent | undefined;
+                const rp = r.components.get(ComponentType.Position) as PositionComponent | undefined;
                 if (!rc || !rp || !rc.harvestable || rc.amount <= 0) return false;
                 if (rc.resourceType !== resourceType) return false;
                 const dist = this.distance(position, rp);
@@ -647,7 +650,7 @@ export class ScriptedDecisionProcessor {
                     targetAmount: amountNeeded,
                     forBuild: suggestion.buildingType,
                   },
-                  category: 'building', // Use building priority for build-related gathering
+                  category: ComponentType.Building, // Use building priority for build-related gathering
                   baseWeight: baseWeight * 0.9, // Slightly lower than building itself
                 });
               }
@@ -660,7 +663,7 @@ export class ScriptedDecisionProcessor {
                 buildingType: suggestion.buildingType,
                 reason: suggestion.reason,
               },
-              category: 'building',
+              category: ComponentType.Building,
               baseWeight,
             });
           }
@@ -711,7 +714,7 @@ export class ScriptedDecisionProcessor {
         // Plant: plant seeds in tilled soil
         if (farmingUtilities.plant > 0) {
           candidates.push({
-            behavior: 'plant',
+            behavior: ComponentType.Plant,
             behaviorState: {},
             category: 'farming',
             baseWeight: farmingUtilities.plant,
@@ -797,6 +800,29 @@ export class ScriptedDecisionProcessor {
         baseWeight: 0.3,
       });
     }
+
+    // MAGIC: spell casting for magic users
+    if (priorities.magic && priorities.magic > 0) {
+      const magic = entity.getComponent<MagicComponent>(ComponentType.Magic);
+      if (magic && magic.magicUser && magic.knownSpells.length > 0) {
+        // Get spell suggestions based on current context
+        const spellSuggestions = suggestSpells(entity, world, { maxSuggestions: 3, minUtility: 0.3 });
+
+        for (const suggestion of spellSuggestions) {
+          candidates.push({
+            behavior: 'cast_spell',
+            behaviorState: {
+              spellId: suggestion.spellId,
+              targetId: suggestion.targetId,
+              reason: suggestion.reason,
+            },
+            category: 'magic',
+            baseWeight: suggestion.utility,
+          });
+        }
+      }
+    }
+
     if (candidates.length === 0) {
       return null; // No valid candidates
     }
@@ -812,7 +838,7 @@ export class ScriptedDecisionProcessor {
       return null;
     }
     // Execute highest priority behavior
-    entity.updateComponent<AgentComponent>('agent', (current) => ({
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
       behavior: best.behavior,
       behaviorState: best.behaviorState,

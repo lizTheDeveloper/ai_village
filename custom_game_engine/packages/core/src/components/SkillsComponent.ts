@@ -12,6 +12,7 @@
 
 import type { Component } from '../ecs/Component.js';
 import type { PersonalityComponent } from './PersonalityComponent.js';
+import type { MagicSkillProgress } from '../magic/MagicSkillTree.js';
 
 /**
  * Skill identifiers for all trainable skills.
@@ -210,6 +211,9 @@ export interface SkillsComponent extends Component {
 
   /** Extended domain data (familiarity, specializations) - optional for backward compat */
   domains?: Partial<Record<SkillId, SkillDomainData>>;
+
+  /** Magic skill tree progress by paradigm ID */
+  magicProgress?: Record<string, MagicSkillProgress>;
 }
 
 /**
@@ -287,19 +291,19 @@ export function createSkillsComponent(): SkillsComponent {
 export function generateAffinitiesFromPersonality(
   personality: PersonalityComponent
 ): Record<SkillId, number> {
-  // Helper to calculate affinity from trait values (0-100)
+  // Helper to calculate affinity from trait values (0-1)
   // Maps average of traits to 0.5-2.0 range
   const calculateAffinity = (traits: number[]): number => {
     const average = traits.reduce((sum, t) => sum + t, 0) / traits.length;
-    // Map 0-100 to 0.5-2.0 range with some variance
-    const base = 0.5 + (average / 100) * 1.5;
+    // Map 0-1 to 0.5-2.0 range with some variance
+    const base = 0.5 + average * 1.5;
     // Add small random variance (-0.1 to +0.1)
     const variance = (Math.random() - 0.5) * 0.2;
     return Math.max(0.5, Math.min(2.0, base + variance));
   };
 
-  // Stability is inverse of neuroticism
-  const stability = 100 - personality.neuroticism;
+  // Stability is inverse of neuroticism (both in 0-1 range)
+  const stability = 1 - personality.neuroticism;
 
   return {
     // Building: workEthic + conscientiousness

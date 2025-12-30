@@ -5,6 +5,12 @@ describe('StructuredPromptBuilder', () => {
   const builder = new StructuredPromptBuilder();
 
   function createMockWorld(): any {
+    const mockQueryBuilder = {
+      with: () => mockQueryBuilder,
+      without: () => mockQueryBuilder,
+      executeEntities: () => [],
+      execute: () => [],
+    };
     return {
       getEntity: (id: string) => {
         // Return a minimal mock entity
@@ -18,7 +24,10 @@ describe('StructuredPromptBuilder', () => {
           components,
           getComponent: (type: string) => components.get(type)
         };
-      }
+      },
+      query: () => mockQueryBuilder,
+      tick: 0,
+      time: { hour: 12, day: 1 },
     };
   }
 
@@ -34,8 +43,8 @@ describe('StructuredPromptBuilder', () => {
       ...overrides?.personality
     });
     components.set('needs', {
-      hunger: 50,
-      energy: 60,
+      hunger: 0.5,  // 0-1 scale
+      energy: 0.6,  // 0-1 scale
       ...overrides?.needs
     });
     components.set('vision', {
@@ -76,8 +85,8 @@ describe('StructuredPromptBuilder', () => {
     });
 
     it('should describe hunger levels correctly', () => {
-      const veryHungry = createMockEntity({ needs: { hunger: 20 } });
-      const satisfied = createMockEntity({ needs: { hunger: 95 } });
+      const veryHungry = createMockEntity({ needs: { hunger: 0.2 } }); // 0-1 scale
+      const satisfied = createMockEntity({ needs: { hunger: 0.95 } }); // 0-1 scale
       const world = createMockWorld();
 
       const hungryPrompt = builder.buildPrompt(veryHungry, world);
@@ -88,8 +97,8 @@ describe('StructuredPromptBuilder', () => {
     });
 
     it('should describe energy levels correctly', () => {
-      const exhausted = createMockEntity({ needs: { energy: 25 } });
-      const rested = createMockEntity({ needs: { energy: 95 } });
+      const exhausted = createMockEntity({ needs: { energy: 0.25 } }); // 0-1 scale
+      const rested = createMockEntity({ needs: { energy: 0.95 } }); // 0-1 scale
       const world = createMockWorld();
 
       const exhaustedPrompt = builder.buildPrompt(exhausted, world);
@@ -212,22 +221,36 @@ describe('StructuredPromptBuilder', () => {
   });
 
   describe('resource type descriptions', () => {
+    // Helper to create inline mock worlds with query support
+    const createInlineMockWorld = (getEntityFn: (id: string) => any) => {
+      const mockQueryBuilder = {
+        with: () => mockQueryBuilder,
+        without: () => mockQueryBuilder,
+        executeEntities: () => [],
+        execute: () => [],
+      };
+      return {
+        getEntity: getEntityFn,
+        query: () => mockQueryBuilder,
+        tick: 0,
+        time: { hour: 12, day: 1 },
+      };
+    };
+
     it('should describe trees when wood resources are visible', () => {
       const entity = createMockEntity({
         vision: { seenResources: ['tree1', 'tree2'] }
       });
 
-      const mockWorld = {
-        getEntity: (_id: string) => {
-          const components = new Map([
-            ['resource', { resourceType: 'wood' }]
-          ]);
-          return {
-            components,
-            getComponent: (type: string) => components.get(type)
-          };
-        }
-      };
+      const mockWorld = createInlineMockWorld((_id: string) => {
+        const components = new Map([
+          ['resource', { resourceType: 'wood' }]
+        ]);
+        return {
+          components,
+          getComponent: (type: string) => components.get(type)
+        };
+      });
 
       const prompt = builder.buildPrompt(entity, mockWorld);
 
@@ -240,17 +263,15 @@ describe('StructuredPromptBuilder', () => {
         vision: { seenResources: ['rock1'] }
       });
 
-      const mockWorld = {
-        getEntity: (_id: string) => {
-          const components = new Map([
-            ['resource', { resourceType: 'stone' }]
-          ]);
-          return {
-            components,
-            getComponent: (type: string) => components.get(type)
-          };
-        }
-      };
+      const mockWorld = createInlineMockWorld((_id: string) => {
+        const components = new Map([
+          ['resource', { resourceType: 'stone' }]
+        ]);
+        return {
+          components,
+          getComponent: (type: string) => components.get(type)
+        };
+      });
 
       const prompt = builder.buildPrompt(entity, mockWorld);
 
@@ -264,19 +285,17 @@ describe('StructuredPromptBuilder', () => {
       });
 
       let callCount = 0;
-      const mockWorld = {
-        getEntity: (_id: string) => {
-          callCount++;
-          const types = ['wood', 'stone', 'food'];
-          const components = new Map([
-            ['resource', { resourceType: types[(callCount - 1) % 3] }]
-          ]);
-          return {
-            components,
-            getComponent: (type: string) => components.get(type)
-          };
-        }
-      };
+      const mockWorld = createInlineMockWorld((_id: string) => {
+        callCount++;
+        const types = ['wood', 'stone', 'food'];
+        const components = new Map([
+          ['resource', { resourceType: types[(callCount - 1) % 3] }]
+        ]);
+        return {
+          components,
+          getComponent: (type: string) => components.get(type)
+        };
+      });
 
       const prompt = builder.buildPrompt(entity, mockWorld);
 

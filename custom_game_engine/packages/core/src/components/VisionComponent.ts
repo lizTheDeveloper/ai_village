@@ -11,6 +11,7 @@ export interface VisionComponent extends Component {
   seenPlants?: string[];  // Entity IDs of plants currently in vision range
   seenBuildings?: string[]; // Entity IDs of visible buildings
   heardSpeech: Array<{ speaker: string, text: string }>; // Speech heard from nearby agents
+  terrainDescription?: string; // Natural language description of nearby terrain features (peaks, cliffs, etc.)
 }
 
 export function createVisionComponent(

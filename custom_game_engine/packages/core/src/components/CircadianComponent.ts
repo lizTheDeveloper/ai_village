@@ -220,11 +220,11 @@ export class CircadianComponent extends ComponentBase {
           return false;
         }
 
-        // Wake conditions
-        const energyFull = needsComp.energy >= 100;
+        // Wake conditions (NeedsComponent uses 0-1 scale)
+        const energyFull = needsComp.energy >= 1.0;
         const sleepDriveDepleted = this.sleepDrive < 10;
-        const criticalHunger = needsComp.hunger < 10;
-        const criticalThirst = needsComp.thirst < 10;
+        const criticalHunger = needsComp.hunger < 0.1;
+        const criticalThirst = needsComp.thirst < 0.1;
 
         return energyFull || sleepDriveDepleted || criticalHunger || criticalThirst;
       }

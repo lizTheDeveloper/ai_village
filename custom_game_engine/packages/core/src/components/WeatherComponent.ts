@@ -1,6 +1,8 @@
 import type { Component } from '../ecs/Component.js';
+import type { WeatherType } from '../types/WeatherTypes.js';
 
-export type WeatherType = 'clear' | 'rain' | 'snow' | 'storm';
+// Re-export for backwards compatibility
+export type { WeatherType };
 
 export interface WeatherComponent extends Component {
   type: 'weather';
@@ -41,7 +43,7 @@ export function createWeatherComponent(
   }
 
   // Validate weather type
-  const validTypes: WeatherType[] = ['clear', 'rain', 'snow', 'storm'];
+  const validTypes: WeatherType[] = ['clear', 'rain', 'snow', 'storm', 'fog'];
   if (!validTypes.includes(weatherType)) {
     throw new Error(`Invalid weather type: ${weatherType}. Must be one of: ${validTypes.join(', ')}`);
   }
@@ -52,6 +54,7 @@ export function createWeatherComponent(
     rain: { tempModifier: -3, movementModifier: 0.8 },
     snow: { tempModifier: -8, movementModifier: 0.7 },
     storm: { tempModifier: -5, movementModifier: 0.5 },
+    fog: { tempModifier: -2, movementModifier: 0.9 },
   };
 
   const defaults = weatherDefaults[weatherType];

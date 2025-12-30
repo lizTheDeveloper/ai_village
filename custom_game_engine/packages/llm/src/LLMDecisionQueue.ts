@@ -1,5 +1,17 @@
 import type { LLMProvider, LLMRequest } from './LLMProvider.js';
+import { OpenAICompatProvider } from './OpenAICompatProvider.js';
 import { promptLogger } from './PromptLogger.js';
+
+/**
+ * Custom LLM configuration for per-agent overrides.
+ * Matches CustomLLMConfig from @ai-village/core (structural typing ensures compatibility).
+ */
+export interface CustomLLMConfig {
+  baseUrl?: string;
+  model?: string;
+  apiKey?: string;
+  customHeaders?: Record<string, string>;
+}
 
 interface DecisionRequest {
   agentId: string;
@@ -7,6 +19,7 @@ interface DecisionRequest {
   resolve: (response: string) => void;
   reject: (error: Error) => void;
   startTime: number;
+  customConfig?: CustomLLMConfig; // Per-agent custom LLM configuration
 }
 
 /**
@@ -20,6 +33,7 @@ export class LLMDecisionQueue {
   private maxConcurrent: number;
   private activeRequests = 0;
   private decisions: Map<string, string> = new Map();
+  private configuredMaxTokens: number = 40960;
 
   constructor(provider: LLMProvider, maxConcurrent: number = 2) {
     this.provider = provider;
@@ -27,12 +41,31 @@ export class LLMDecisionQueue {
   }
 
   /**
+   * Set the maximum tokens for LLM responses.
+   * The actual max tokens used will be at least 3x the prompt size.
+   */
+  setMaxTokens(maxTokens: number): void {
+    this.configuredMaxTokens = maxTokens;
+  }
+
+  /**
+   * Get the current configured max tokens.
+   */
+  getMaxTokens(): number {
+    return this.configuredMaxTokens;
+  }
+
+  /**
    * Request a decision for an agent (non-blocking).
    * Returns raw LLM response text for parsing by AISystem.
+   *
+   * @param agentId - Unique identifier for the agent
+   * @param prompt - The prompt to send to the LLM
+   * @param customConfig - Optional per-agent custom LLM configuration
    */
-  requestDecision(agentId: string, prompt: string): Promise<string> {
+  requestDecision(agentId: string, prompt: string, customConfig?: CustomLLMConfig): Promise<string> {
     return new Promise((resolve, reject) => {
-      this.queue.push({ agentId, prompt, resolve, reject, startTime: Date.now() });
+      this.queue.push({ agentId, prompt, resolve, reject, startTime: Date.now(), customConfig });
       this.processQueue();
     });
   }
@@ -76,9 +109,10 @@ export class LLMDecisionQueue {
    */
   private async processRequest(request: DecisionRequest): Promise<void> {
     try {
-      // Estimate prompt tokens (~4 chars per token) and allow 3x for thinking model response
+      // Calculate max tokens: at least 3x estimated prompt tokens, but respect configured max
       const estimatedPromptTokens = Math.ceil(request.prompt.length / 4);
-      const maxTokens = Math.max(1000, Math.ceil(estimatedPromptTokens * 0.5));
+      const minTokens = estimatedPromptTokens * 3;
+      const maxTokens = Math.max(minTokens, this.configuredMaxTokens);
 
       const llmRequest: LLMRequest = {
         prompt: request.prompt,
@@ -87,7 +121,25 @@ export class LLMDecisionQueue {
         // Let OllamaProvider handle stop sequences
       };
 
-      const response = await this.provider.generate(llmRequest);
+      // Use custom provider if custom config is provided
+      let provider = this.provider;
+      if (request.customConfig) {
+        const config = request.customConfig;
+        // Create custom provider on-the-fly
+        provider = new OpenAICompatProvider(
+          config.model || 'default-model',
+          config.baseUrl || 'http://localhost:8080/v1',
+          config.apiKey || ''
+        );
+
+        // Apply custom headers if provided
+        if (config.customHeaders) {
+          // Store headers for fetch interceptor
+          (provider as any).customHeaders = config.customHeaders;
+        }
+      }
+
+      const response = await provider.generate(llmRequest);
       const durationMs = Date.now() - request.startTime;
 
       // Log the prompt/response pair for analysis

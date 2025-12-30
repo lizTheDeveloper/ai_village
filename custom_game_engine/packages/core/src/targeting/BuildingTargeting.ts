@@ -17,12 +17,14 @@ import {
   getRememberedLocation,
   forgetLocation,
 } from '../services/TargetingAPI.js';
+import { BuildingType } from '../types/BuildingType.js';
+import { ComponentType } from '../types/ComponentType.js';
 
 /**
  * Options for building targeting
  */
 export interface BuildingTargetingOptions {
-  /** Filter by specific building type (e.g., 'storage', 'bed', 'crafting_station') */
+  /** Filter by specific building type (e.g., 'storage', BuildingType.Bed, 'crafting_station') */
   buildingType?: string;
   /** Only find completed buildings */
   completed?: boolean;
@@ -68,7 +70,7 @@ export interface BuildingTarget {
  * });
  *
  * // Find bed
- * const bed = targeting.findNearest(entity, world, { buildingType: 'bed' });
+ * const bed = targeting.findNearest(entity, world, { buildingType: BuildingType.Bed });
  *
  * // Find warm shelter
  * const shelter = targeting.findNearest(entity, world, { providesWarmth: true });
@@ -83,8 +85,8 @@ export class BuildingTargeting {
     world: World,
     options: BuildingTargetingOptions = {}
   ): BuildingTarget | null {
-    const position = entity.getComponent<PositionComponent>('position');
-    const vision = entity.getComponent<VisionComponent>('vision');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const vision = entity.getComponent<VisionComponent>(ComponentType.Vision);
 
     if (!position || !vision) return null;
 
@@ -101,15 +103,15 @@ export class BuildingTargeting {
       // Fall back to querying world for nearby buildings (within vision range)
       const allBuildings = world
         .query()
-        .with('building')
-        .with('position')
+        .with(ComponentType.Building)
+        .with(ComponentType.Position)
         .executeEntities();
 
       const visionRange = vision.range || 15;
 
       for (const buildingEntity of allBuildings) {
         const impl = buildingEntity as EntityImpl;
-        const buildingPos = impl.getComponent<PositionComponent>('position');
+        const buildingPos = impl.getComponent<PositionComponent>(ComponentType.Position);
         if (!buildingPos) continue;
 
         const dist = this.distance(position, buildingPos);
@@ -126,8 +128,8 @@ export class BuildingTargeting {
       if (!buildingEntity) continue;
 
       const impl = buildingEntity as EntityImpl;
-      const building = impl.getComponent('building') as any;
-      const buildingPos = impl.getComponent<PositionComponent>('position');
+      const building = impl.getComponent(ComponentType.Building) as any;
+      const buildingPos = impl.getComponent<PositionComponent>(ComponentType.Position);
 
       if (!building || !buildingPos) continue;
 
@@ -200,8 +202,8 @@ export class BuildingTargeting {
     world: World,
     options: BuildingTargetingOptions = {}
   ): BuildingTarget[] {
-    const position = entity.getComponent<PositionComponent>('position');
-    const vision = entity.getComponent<VisionComponent>('vision');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const vision = entity.getComponent<VisionComponent>(ComponentType.Vision);
 
     if (!position || !vision) return [];
 
@@ -213,15 +215,15 @@ export class BuildingTargeting {
     if (candidates.length === 0) {
       const allBuildings = world
         .query()
-        .with('building')
-        .with('position')
+        .with(ComponentType.Building)
+        .with(ComponentType.Position)
         .executeEntities();
 
       const visionRange = vision.range || 15;
 
       for (const buildingEntity of allBuildings) {
         const impl = buildingEntity as EntityImpl;
-        const buildingPos = impl.getComponent<PositionComponent>('position');
+        const buildingPos = impl.getComponent<PositionComponent>(ComponentType.Position);
         if (!buildingPos) continue;
 
         const dist = this.distance(position, buildingPos);
@@ -238,8 +240,8 @@ export class BuildingTargeting {
       if (!buildingEntity) continue;
 
       const impl = buildingEntity as EntityImpl;
-      const building = impl.getComponent('building') as any;
-      const buildingPos = impl.getComponent<PositionComponent>('position');
+      const building = impl.getComponent(ComponentType.Building) as any;
+      const buildingPos = impl.getComponent<PositionComponent>(ComponentType.Position);
 
       if (!building || !buildingPos) continue;
 
@@ -312,7 +314,7 @@ export class BuildingTargeting {
     maxDistance?: number
   ): BuildingTarget | null {
     return this.findNearest(entity, world, {
-      buildingType: 'bed',
+      buildingType: BuildingType.Bed,
       completed: true,
       maxDistance,
     });
@@ -370,7 +372,7 @@ export class BuildingTargeting {
     world: World,
     options: BuildingTargetingOptions = {}
   ): TargetResult {
-    const position = entity.getComponent<PositionComponent>('position');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) return { type: 'unknown' };
 
     // First: Try to find visible building

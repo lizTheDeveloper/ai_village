@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type { AgentBehavior } from '../../components/AgentComponent';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Tests for Acceptance Criterion 11: Behavior Completion Signaling
  *
@@ -9,7 +10,7 @@ import type { AgentBehavior } from '../../components/AgentComponent';
  */
 
 interface QueuedAgentComponent {
-  type: 'agent';
+  type: ComponentType.Agent;
   version: number;
   behavior: AgentBehavior;
   behaviorState: Record<string, unknown>;
@@ -31,7 +32,7 @@ interface QueuedAgentComponent {
 }
 
 interface NeedsComponent {
-  type: 'needs';
+  type: ComponentType.Needs;
   version: number;
   hunger: number;
   energy: number;
@@ -39,7 +40,7 @@ interface NeedsComponent {
 }
 
 interface InventoryComponent {
-  type: 'inventory';
+  type: ComponentType.Inventory;
   version: number;
   slots: Array<{ itemId: string | null; quantity: number }>;
   maxSlots: number;
@@ -62,7 +63,7 @@ describe('Behavior Completion Signaling', () => {
 
   beforeEach(() => {
     agent = {
-      type: 'agent',
+      type: ComponentType.Agent,
       version: 1,
       behavior: 'wander',
       behaviorState: {},
@@ -74,7 +75,7 @@ describe('Behavior Completion Signaling', () => {
     };
 
     needs = {
-      type: 'needs',
+      type: ComponentType.Needs,
       version: 1,
       hunger: 50,
       energy: 50,
@@ -82,7 +83,7 @@ describe('Behavior Completion Signaling', () => {
     };
 
     inventory = {
-      type: 'inventory',
+      type: ComponentType.Inventory,
       version: 1,
       slots: [],
       maxSlots: 10,
@@ -504,7 +505,7 @@ describe('Behavior Completion Signaling', () => {
   describe('CLAUDE.md Compliance - Completion Signaling', () => {
     it('should throw when behaviorCompleted field is missing', () => {
       const invalidAgent = {
-        type: 'agent' as const,
+        type: ComponentType.Agent,
         version: 1,
         behavior: 'gather' as AgentBehavior,
         behaviorState: {},
@@ -524,7 +525,7 @@ describe('Behavior Completion Signaling', () => {
 
     it('should NOT use fallback for missing behaviorCompleted field', () => {
       const invalidAgent: Partial<QueuedAgentComponent> = {
-        type: 'agent',
+        type: ComponentType.Agent,
         version: 1,
         behavior: 'gather',
         behaviorState: {},

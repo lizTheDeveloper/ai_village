@@ -34,6 +34,12 @@ export interface SectionRenderContext {
 export interface AgentComponentData {
   behavior: string;
   useLLM: boolean;
+  customLLM?: {
+    baseUrl?: string;
+    model?: string;
+    apiKey?: string;
+    customHeaders?: Record<string, string>;
+  };
   recentSpeech?: string;
   lastThought?: string;
   speechHistory?: Array<{ text: string; tick: number }>;
@@ -58,6 +64,13 @@ export interface AgentComponentData {
     exploration?: number;
     rest?: number;
   };
+  plannedBuilds?: Array<{
+    buildingType: string;
+    position: { x: number; y: number };
+    priority: 'low' | 'normal' | 'high';
+    createdAt: number;
+    reason?: string;
+  }>;
 }
 
 /**

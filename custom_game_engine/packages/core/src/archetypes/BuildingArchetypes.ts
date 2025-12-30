@@ -1,5 +1,5 @@
 import type { Archetype } from '../ecs/Archetype.js';
-import { createBuildingComponent } from '../components/BuildingComponent.js';
+import { createBuildingComponent, BuildingType } from '../components/BuildingComponent.js';
 import type { RenderableComponent } from '../components/RenderableComponent.js';
 import { createInventoryComponent } from '../components/InventoryComponent.js';
 
@@ -12,7 +12,7 @@ export const leanToArchetype: Archetype = {
   name: 'lean-to',
   description: 'A simple shelter that protects from the elements',
   create: () => {
-    const building = createBuildingComponent('lean-to', 1, 100);
+    const building = createBuildingComponent(BuildingType.LeanTo, 1, 100);
 
     const renderable: RenderableComponent = {
       type: 'renderable',
@@ -36,7 +36,7 @@ export const campfireArchetype: Archetype = {
   name: 'campfire',
   description: 'A warming fire that doesn\'t block movement',
   create: () => {
-    const building = createBuildingComponent('campfire', 1, 100);
+    const building = createBuildingComponent(BuildingType.Campfire, 1, 100);
 
     const renderable: RenderableComponent = {
       type: 'renderable',
@@ -60,7 +60,7 @@ export const storageBoxArchetype: Archetype = {
   name: 'storage-box',
   description: 'A box for storing items',
   create: () => {
-    const building = createBuildingComponent('storage-box', 1, 100);
+    const building = createBuildingComponent(BuildingType.StorageBox, 1, 100);
 
     const renderable: RenderableComponent = {
       type: 'renderable',
@@ -87,7 +87,7 @@ export const workbenchArchetype: Archetype = {
   name: 'workbench',
   description: 'A basic crafting station for simple tools and items',
   create: () => {
-    const building = createBuildingComponent('workbench', 1, 100);
+    const building = createBuildingComponent(BuildingType.Workbench, 1, 100);
 
     const renderable: RenderableComponent = {
       type: 'renderable',
@@ -111,7 +111,7 @@ export const storageChestArchetype: Archetype = {
   name: 'storage-chest',
   description: 'A wooden chest for storing items',
   create: () => {
-    const building = createBuildingComponent('storage-chest', 1, 100);
+    const building = createBuildingComponent(BuildingType.StorageChest, 1, 100);
 
     const renderable: RenderableComponent = {
       type: 'renderable',
@@ -138,7 +138,7 @@ export const tentArchetype: Archetype = {
   name: 'tent',
   description: 'A simple tent for basic shelter and rest',
   create: () => {
-    const building = createBuildingComponent('tent', 1, 100);
+    const building = createBuildingComponent(BuildingType.Tent, 1, 100);
 
     const renderable: RenderableComponent = {
       type: 'renderable',
@@ -162,7 +162,7 @@ export const wellArchetype: Archetype = {
   name: 'well',
   description: 'A stone well providing fresh water',
   create: () => {
-    const building = createBuildingComponent('well', 1, 100);
+    const building = createBuildingComponent(BuildingType.Well, 1, 100);
 
     const renderable: RenderableComponent = {
       type: 'renderable',

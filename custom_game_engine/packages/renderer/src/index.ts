@@ -29,6 +29,7 @@ export * from './ControlsPanel.js';
 export * from './EconomyPanel.js';
 export * from './ShopPanel.js';
 export * from './TimelinePanel.js';
+export * from './UniverseConfigScreen.js';
 export * from './GovernanceDashboardPanel.js';
 export * from './MagicSystemsPanel.js';
 export * from './SpellbookPanel.js';

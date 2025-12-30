@@ -15,6 +15,7 @@ import type { AgentComponent } from '../../components/AgentComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { InventoryComponent } from '../../components/InventoryComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
+import { ComponentType } from '../../types/ComponentType.js';
 
 /** Search radius for tillable tiles */
 const TILL_SEARCH_RADIUS = 10;
@@ -54,8 +55,8 @@ export class TillBehavior extends BaseBehavior {
   readonly name = 'till' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>('position')!;
-    const inventory = entity.getComponent<InventoryComponent>('inventory');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
 
     // Stop moving while deciding where to till
     this.stopMovement(entity);
@@ -91,7 +92,7 @@ export class TillBehavior extends BaseBehavior {
       const velocityX = (dx / distance) * speed;
       const velocityY = (dy / distance) * speed;
 
-      entity.updateComponent<MovementComponent>('movement', (current) => ({
+      entity.updateComponent<MovementComponent>(ComponentType.Movement, (current) => ({
         ...current,
         targetX: nearestGrassTile.x,
         targetY: nearestGrassTile.y,
@@ -116,7 +117,7 @@ export class TillBehavior extends BaseBehavior {
     });
 
     // Switch to farm behavior to wait for action completion
-    entity.updateComponent<AgentComponent>('agent', (current) => ({
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
       behavior: 'farm',
       behaviorState: {},
@@ -172,8 +173,8 @@ export class PlantBehavior extends BaseBehavior {
   readonly name = 'plant' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>('position')!;
-    const inventory = entity.getComponent<InventoryComponent>('inventory');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
 
     // Stop moving while deciding where to plant
     this.stopMovement(entity);
@@ -217,7 +218,7 @@ export class PlantBehavior extends BaseBehavior {
       const velocityX = (dx / distance) * speed;
       const velocityY = (dy / distance) * speed;
 
-      entity.updateComponent<MovementComponent>('movement', (current) => ({
+      entity.updateComponent<MovementComponent>(ComponentType.Movement, (current) => ({
         ...current,
         targetX: nearestTilledTile.x,
         targetY: nearestTilledTile.y,
@@ -245,7 +246,7 @@ export class PlantBehavior extends BaseBehavior {
     });
 
     // Switch to farm behavior to wait for action completion
-    entity.updateComponent<AgentComponent>('agent', (current) => ({
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
       behavior: 'farm',
       behaviorState: { lastAction: 'plant' },
@@ -295,10 +296,10 @@ export class PlantBehavior extends BaseBehavior {
   }
 
   private hasPlantAt(world: World, x: number, y: number): boolean {
-    const plants = world.query().with('plant').with('position').executeEntities();
+    const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
     for (const plantEntity of plants) {
       const plantImpl = plantEntity as EntityImpl;
-      const plantPos = plantImpl.getComponent<PositionComponent>('position');
+      const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
       if (plantPos && Math.floor(plantPos.x) === x && Math.floor(plantPos.y) === y) {
         return true;
       }
@@ -379,7 +380,7 @@ export class WaterBehavior extends BaseBehavior {
   readonly name = 'water' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>('position')!;
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
 
     // Stop moving while deciding what to water
     this.stopMovement(entity);
@@ -405,7 +406,7 @@ export class WaterBehavior extends BaseBehavior {
       const velocityX = (dx / distance) * speed;
       const velocityY = (dy / distance) * speed;
 
-      entity.updateComponent<MovementComponent>('movement', (current) => ({
+      entity.updateComponent<MovementComponent>(ComponentType.Movement, (current) => ({
         ...current,
         targetX: nearestDryPlant.x,
         targetY: nearestDryPlant.y,
@@ -432,14 +433,14 @@ export class WaterBehavior extends BaseBehavior {
     const plantEntity = world.getEntity(nearestDryPlant.plantId);
     if (plantEntity) {
       const plantImpl = plantEntity as EntityImpl;
-      plantImpl.updateComponent<any>('plant', (plant) => ({
+      plantImpl.updateComponent<any>(ComponentType.Plant, (plant) => ({
         ...plant,
         _hydration: Math.min(100, (plant._hydration ?? plant.hydration ?? 50) + 20),
       }));
     }
 
     // Switch to farm behavior briefly, then continue
-    entity.updateComponent<AgentComponent>('agent', (current) => ({
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
       behavior: 'farm',
       behaviorState: { lastAction: 'water' },
@@ -451,7 +452,7 @@ export class WaterBehavior extends BaseBehavior {
     world: World,
     position: PositionComponent
   ): { plantId: string; x: number; y: number; hydration: number; distance: number } | null {
-    const plants = world.query().with('plant').with('position').executeEntities();
+    const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
     let nearestDryPlant: { plantId: string; x: number; y: number; hydration: number; distance: number } | null = null;
 
     const WATER_SEARCH_RADIUS = 15;
@@ -459,8 +460,8 @@ export class WaterBehavior extends BaseBehavior {
 
     for (const plantEntity of plants) {
       const plantImpl = plantEntity as EntityImpl;
-      const plant = plantImpl.getComponent<any>('plant');
-      const plantPos = plantImpl.getComponent<PositionComponent>('position');
+      const plant = plantImpl.getComponent<any>(ComponentType.Plant);
+      const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
 
       if (!plant || !plantPos) continue;
 
@@ -507,8 +508,8 @@ export class HarvestBehavior extends BaseBehavior {
   readonly name = 'harvest' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>('position')!;
-    const inventory = entity.getComponent<InventoryComponent>('inventory');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
 
     // Stop moving while deciding what to harvest
     this.stopMovement(entity);
@@ -543,7 +544,7 @@ export class HarvestBehavior extends BaseBehavior {
       const velocityX = (dx / distance) * speed;
       const velocityY = (dy / distance) * speed;
 
-      entity.updateComponent<MovementComponent>('movement', (current) => ({
+      entity.updateComponent<MovementComponent>(ComponentType.Movement, (current) => ({
         ...current,
         targetX: nearestHarvestable.x,
         targetY: nearestHarvestable.y,
@@ -568,7 +569,7 @@ export class HarvestBehavior extends BaseBehavior {
     });
 
     // Switch to farm behavior to wait for action completion
-    entity.updateComponent<AgentComponent>('agent', (current) => ({
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
       behavior: 'farm',
       behaviorState: { lastAction: 'harvest' },
@@ -580,7 +581,7 @@ export class HarvestBehavior extends BaseBehavior {
     world: World,
     position: PositionComponent
   ): { plantId: string; x: number; y: number; speciesId: string; distance: number } | null {
-    const plants = world.query().with('plant').with('position').executeEntities();
+    const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
     let nearestHarvestable: { plantId: string; x: number; y: number; speciesId: string; distance: number } | null = null;
 
     const HARVEST_SEARCH_RADIUS = 15;
@@ -588,8 +589,8 @@ export class HarvestBehavior extends BaseBehavior {
 
     for (const plantEntity of plants) {
       const plantImpl = plantEntity as EntityImpl;
-      const plant = plantImpl.getComponent<any>('plant');
-      const plantPos = plantImpl.getComponent<PositionComponent>('position');
+      const plant = plantImpl.getComponent<any>(ComponentType.Plant);
+      const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
 
       if (!plant || !plantPos) continue;
 

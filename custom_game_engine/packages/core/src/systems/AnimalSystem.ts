@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
@@ -11,9 +12,9 @@ import { getAnimalSpecies } from '../data/animalSpecies.js';
  * Priority: 15 (same as NeedsSystem, runs after AI, before Movement)
  */
 export class AnimalSystem implements System {
-  public readonly id: SystemId = 'animal';
+  public readonly id: SystemId = CT.Animal;
   public readonly priority: number = 15;
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = ['animal'];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Animal];
 
   constructor(_eventBus?: EventBus) {
     // EventBus passed for consistency but not used directly (world.eventBus is used instead)
@@ -21,14 +22,14 @@ export class AnimalSystem implements System {
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     for (const entity of entities) {
-      const animal = entity.components.get('animal') as AnimalComponent | undefined;
+      const animal = entity.components.get(CT.Animal) as AnimalComponent | undefined;
       if (!animal) {
         continue;
       }
 
       // Validate required fields (per CLAUDE.md - crash if missing)
       if (animal.health === undefined || animal.health === null) {
-        throw new Error(`Animal ${animal.id} missing required 'health' field`);
+        throw new Error(`Animal ${animal.id} missing required CT.Health field`);
       }
       if (animal.hunger === undefined || animal.hunger === null) {
         throw new Error(`Animal ${animal.id} missing required 'hunger' field`);
@@ -139,7 +140,7 @@ export class AnimalSystem implements System {
           data: {
             animalId: animal.id,
             speciesId: animal.speciesId,
-            cause: animal.health <= 0 ? 'health' : 'old_age',
+            cause: animal.health <= 0 ? CT.Health : 'old_age',
           },
         });
 

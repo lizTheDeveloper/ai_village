@@ -1,3 +1,4 @@
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Research Flow Integration Tests
  *
@@ -62,7 +63,7 @@ describe('Research Flow Integration', () => {
         progressRequired: 100,
         unlocks: [
           { type: 'recipe', recipeId: 'stone_hoe' },
-          { type: 'building', buildingId: 'small_garden' },
+          { type: ComponentType.Building, buildingId: 'small_garden' },
         ],
       }),
       createResearch('agriculture_ii', {
@@ -79,14 +80,14 @@ describe('Research Flow Integration', () => {
         progressRequired: 150,
         unlocks: [
           { type: 'recipe', recipeId: 'iron_ingot' },
-          { type: 'item', itemId: 'iron_hammer' },
+          { type: ComponentType.Item, itemId: 'iron_hammer' },
         ],
       }),
       createResearch('advanced_farming', {
         tier: 3,
         progressRequired: 300,
         prerequisites: ['agriculture_ii', 'metallurgy_i'],
-        unlocks: [{ type: 'building', buildingId: 'greenhouse' }],
+        unlocks: [{ type: ComponentType.Building, buildingId: 'greenhouse' }],
       }),
     ]);
 

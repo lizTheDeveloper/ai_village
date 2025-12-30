@@ -1,20 +1,20 @@
 import type { ActionHandler } from './ActionHandler.js';
 import type { Action, ActionResult, ValidationResult } from './Action.js';
-import type { World } from '../ecs/World.js';
-import type { SoilSystem, Tile } from '../systems/SoilSystem.js';
+import type { World, ITile } from '../ecs/World.js';
+import type { SoilSystem } from '../systems/SoilSystem.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { InventoryComponent, InventorySlot } from '../components/InventoryComponent.js';
 import type { SkillsComponent } from '../components/SkillsComponent.js';
 import { getEfficiencyBonus } from '../components/SkillsComponent.js';
-import {
-  TILL_DURATION_WITH_HOE,
+import { ComponentType } from '../types/ComponentType.js';
+import {  TILL_DURATION_WITH_HOE,
   TILL_DURATION_WITH_SHOVEL,
   TILL_DURATION_BY_HAND,
   DIAGONAL_DISTANCE,
 } from '../constants/index.js';
 
 interface WorldWithTiles extends World {
-  getTileAt(x: number, y: number): Tile | null;
+  getTileAt(x: number, y: number): ITile | undefined;
 }
 
 /**
@@ -67,7 +67,7 @@ export class TillActionHandler implements ActionHandler {
       return TILL_DURATION_BY_HAND;
     }
 
-    const inventoryComp = actor.components.get('inventory') as InventoryComponent | undefined;
+    const inventoryComp = actor.components.get(ComponentType.Inventory) as InventoryComponent | undefined;
     if (!inventoryComp || !inventoryComp.slots) {
       // No inventory, use hands
       return TILL_DURATION_BY_HAND;
@@ -92,7 +92,7 @@ export class TillActionHandler implements ActionHandler {
     }
 
     // Apply skill efficiency bonus
-    const skillsComp = actor.components.get('skills') as SkillsComponent | undefined;
+    const skillsComp = actor.components.get(ComponentType.Skills) as SkillsComponent | undefined;
     if (skillsComp) {
       const farmingLevel = skillsComp.levels.farming;
       const skillBonus = getEfficiencyBonus(farmingLevel); // 0-25%
@@ -137,7 +137,7 @@ export class TillActionHandler implements ActionHandler {
     }
 
     // Check actor has position
-    const actorPos = actor.components.get('position') as PositionComponent | undefined;
+    const actorPos = actor.components.get(ComponentType.Position) as PositionComponent | undefined;
     if (!actorPos) {
       return {
         valid: false,

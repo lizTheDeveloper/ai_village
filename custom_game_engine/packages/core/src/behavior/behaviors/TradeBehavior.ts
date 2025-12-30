@@ -19,6 +19,7 @@ import type { ShopComponent } from '../../components/ShopComponent.js';
 import type { TradingSystem } from '../../systems/TradingSystem.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { getStockQuantity } from '../../components/ShopComponent.js';
+import { ComponentType } from '../../types/ComponentType.js';
 
 /** Distance at which agent can trade with a shop */
 const TRADE_DISTANCE = 2.0;
@@ -49,8 +50,8 @@ export class TradeBehavior extends BaseBehavior {
   readonly name = 'trade' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>('position');
-    const agent = entity.getComponent<AgentComponent>('agent');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
 
     if (!position || !agent) {
       return { complete: true, reason: 'Missing required components' };
@@ -101,12 +102,12 @@ export class TradeBehavior extends BaseBehavior {
     world: World,
     state: TradeBehaviorState
   ): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>('position')!;
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
 
     // If shopId already specified, validate it and move to next phase
     if (state.shopId) {
       const shop = world.getEntity(state.shopId);
-      if (shop && shop.components.has('shop')) {
+      if (shop && shop.components.has(ComponentType.Shop)) {
         this.updateState(entity, { phase: 'move_to_shop' });
         return;
       }
@@ -154,7 +155,7 @@ export class TradeBehavior extends BaseBehavior {
       return;
     }
 
-    const shopPos = shopEntity.components.get('position') as PositionComponent | undefined;
+    const shopPos = shopEntity.components.get(ComponentType.Position) as PositionComponent | undefined;
     if (!shopPos) {
       this.updateState(entity, { phase: 'find_shop', shopId: undefined });
       return;
@@ -248,8 +249,8 @@ export class TradeBehavior extends BaseBehavior {
   ): { entityId: string; position: PositionComponent } | null {
     const shops = world
       .query()
-      .with('shop')
-      .with('position')
+      .with(ComponentType.Shop)
+      .with(ComponentType.Position)
       .executeEntities();
 
     let nearest: { entityId: string; position: PositionComponent } | null = null;
@@ -257,8 +258,8 @@ export class TradeBehavior extends BaseBehavior {
 
     for (const shopEntity of shops) {
       const shopImpl = shopEntity as EntityImpl;
-      const shop = shopImpl.getComponent<ShopComponent>('shop');
-      const shopPos = shopImpl.getComponent<PositionComponent>('position');
+      const shop = shopImpl.getComponent<ShopComponent>(ComponentType.Shop);
+      const shopPos = shopImpl.getComponent<PositionComponent>(ComponentType.Position);
 
       if (!shop || !shopPos) continue;
 

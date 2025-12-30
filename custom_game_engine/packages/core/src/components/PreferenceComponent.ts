@@ -10,11 +10,10 @@
  */
 
 import type { Component } from '../ecs/Component.js';
+import type { FlavorType } from '../types/ItemTypes.js';
 
-/**
- * Flavor types that foods can have.
- */
-export type FlavorType = 'sweet' | 'savory' | 'spicy' | 'bitter' | 'sour' | 'umami';
+// Re-export for backwards compatibility
+export type { FlavorType };
 
 /**
  * All possible flavor types.

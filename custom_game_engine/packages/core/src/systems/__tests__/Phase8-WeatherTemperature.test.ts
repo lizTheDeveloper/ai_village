@@ -9,10 +9,12 @@ import type { TemperatureComponent } from '../../components/TemperatureComponent
 import { createWeatherComponent } from '../../components/WeatherComponent';
 import type { WeatherComponent } from '../../components/WeatherComponent';
 import { createPositionComponent } from '../../components/PositionComponent';
-import { createNeedsComponent } from '../../components/NeedsComponent';
+import { NeedsComponent } from '../../components/NeedsComponent';
 import type { NeedsComponent } from '../../components/NeedsComponent';
 import { createBuildingComponent } from '../../components/BuildingComponent';
 
+import { ComponentType } from '../../types/ComponentType.js';
+import { BuildingType } from '../../types/BuildingType.js';
 /**
  * Phase 8: Weather & Temperature System Tests
  *
@@ -130,11 +132,11 @@ describe('Phase 8: Weather & Temperature Systems', () => {
       world._addEntity(agent);
 
       // Run temperature system
-      const entities = world.query().with('temperature').with('position').executeEntities();
+      const entities = world.query().with(ComponentType.Temperature).with(ComponentType.Position).executeEntities();
       temperatureSystem.update(world, entities, 0.016);
 
       // Check temperature was updated
-      const temp = agent.getComponent<TemperatureComponent>('temperature');
+      const temp = agent.getComponent(ComponentType.Temperature);
       expect(temp).toBeDefined();
       expect(temp!.state).toBeDefined();
     });
@@ -149,19 +151,25 @@ describe('Phase 8: Weather & Temperature Systems', () => {
       const agent = new EntityImpl(createEntityId(), world.tick);
       agent.addComponent(createTemperatureComponent(20, 20, 25, 18, 27)); // Narrow tolerance
       agent.addComponent(createPositionComponent(0, 0));
-      agent.addComponent(createNeedsComponent(100, 100, 100));
+      agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
       world._addEntity(agent);
 
       const initialHealth = 100;
 
       // Simulate 10 seconds to ensure health damage occurs
       for (let i = 0; i < 600; i++) {
-        const entities = world.query().with('temperature').with('position').executeEntities();
+        const entities = world.query().with(ComponentType.Temperature).with(ComponentType.Position).executeEntities();
         temperatureSystem.update(world, entities, 0.016);
       }
 
       // Health should have decreased due to dangerous temperature
-      const needs = agent.getComponent<NeedsComponent>('needs');
+      const needs = agent.getComponent(ComponentType.Needs);
       expect(needs).toBeDefined();
       expect(needs!.health).toBeLessThan(initialHealth);
     });
@@ -169,7 +177,7 @@ describe('Phase 8: Weather & Temperature Systems', () => {
     it('should apply heat bonus from campfire', () => {
       // Create campfire at (0, 0)
       const campfire = new EntityImpl(createEntityId(), world.tick);
-      campfire.addComponent(createBuildingComponent('campfire', 1, 100)); // Complete campfire
+      campfire.addComponent(createBuildingComponent(BuildingType.Campfire, 1, 100)); // Complete campfire
       campfire.addComponent(createPositionComponent(0, 0));
       world._addEntity(campfire);
 
@@ -180,11 +188,11 @@ describe('Phase 8: Weather & Temperature Systems', () => {
       world._addEntity(agent);
 
       // Run temperature system
-      const entities = world.query().with('temperature').with('position').executeEntities();
+      const entities = world.query().with(ComponentType.Temperature).with(ComponentType.Position).executeEntities();
       temperatureSystem.update(world, entities, 0.016);
 
       // Agent should be warmer due to campfire
-      const temp = agent.getComponent<TemperatureComponent>('temperature');
+      const temp = agent.getComponent(ComponentType.Temperature);
       expect(temp).toBeDefined();
       // Temperature should be higher than initial due to heat source
       expect(temp!.currentTemp).toBeGreaterThan(10);
@@ -193,7 +201,7 @@ describe('Phase 8: Weather & Temperature Systems', () => {
     it('should apply building insulation effect', () => {
       // Create tent at (0, 0) with interior radius 2
       const tent = new EntityImpl(createEntityId(), world.tick);
-      tent.addComponent(createBuildingComponent('tent', 1, 100)); // Complete tent
+      tent.addComponent(createBuildingComponent(BuildingType.Tent, 1, 100)); // Complete tent
       tent.addComponent(createPositionComponent(0, 0));
       world._addEntity(tent);
 
@@ -204,11 +212,11 @@ describe('Phase 8: Weather & Temperature Systems', () => {
       world._addEntity(agent);
 
       // Run temperature system
-      const entities = world.query().with('temperature').with('position').executeEntities();
+      const entities = world.query().with(ComponentType.Temperature).with(ComponentType.Position).executeEntities();
       temperatureSystem.update(world, entities, 0.016);
 
       // Agent should be warmer due to insulation and base temperature
-      const temp = agent.getComponent<TemperatureComponent>('temperature');
+      const temp = agent.getComponent(ComponentType.Temperature);
       expect(temp).toBeDefined();
       // Temperature should be modified by building effects
       expect(temp!.currentTemp).toBeGreaterThan(5);
@@ -223,7 +231,7 @@ describe('Phase 8: Weather & Temperature Systems', () => {
       world._addEntity(worldEntity);
 
       // Run weather system
-      const entities = world.query().with('weather').executeEntities();
+      const entities = world.query().with(ComponentType.Weather).executeEntities();
       weatherSystem.update(world, entities, 1.0);
 
       // Duration should have increased
@@ -245,7 +253,7 @@ describe('Phase 8: Weather & Temperature Systems', () => {
       world._addEntity(agent);
 
       // Run temperature system (don't run weather system to avoid random transitions)
-      const tempEntities = world.query().with('temperature').with('position').executeEntities();
+      const tempEntities = world.query().with(ComponentType.Temperature).with(ComponentType.Position).executeEntities();
       temperatureSystem.update(world, tempEntities, 0.016);
 
       // Check that weather component exists with correct modifiers
@@ -255,7 +263,7 @@ describe('Phase 8: Weather & Temperature Systems', () => {
       expect(weather!.tempModifier).toBe(-8);
 
       // Temperature system should have processed the agent
-      const temp = agent.getComponent<TemperatureComponent>('temperature');
+      const temp = agent.getComponent(ComponentType.Temperature);
       expect(temp).toBeDefined();
       // Just verify temperature was calculated (state should be set)
       expect(temp!.state).toBeDefined();
@@ -276,11 +284,11 @@ describe('Phase 8: Weather & Temperature Systems', () => {
       world._addEntity(agent);
 
       // Run weather system first
-      const weatherEntities = world.query().with('weather').executeEntities();
+      const weatherEntities = world.query().with(ComponentType.Weather).executeEntities();
       weatherSystem.update(world, weatherEntities, 0.016);
 
       // Then run temperature system
-      const tempEntities = world.query().with('temperature').with('position').executeEntities();
+      const tempEntities = world.query().with(ComponentType.Temperature).with(ComponentType.Position).executeEntities();
       temperatureSystem.update(world, tempEntities, 0.016);
 
       // Verify both systems processed their entities
@@ -288,7 +296,7 @@ describe('Phase 8: Weather & Temperature Systems', () => {
       expect(weather).toBeDefined();
       expect(weather!.weatherType).toBe('snow');
 
-      const temp = agent.getComponent<TemperatureComponent>('temperature');
+      const temp = agent.getComponent(ComponentType.Temperature);
       expect(temp).toBeDefined();
       expect(temp!.currentTemp).toBeDefined();
       expect(temp!.state).toBeDefined();

@@ -45,6 +45,14 @@ export {
   type ScriptedDecisionResult,
 } from './ScriptedDecisionProcessor.js';
 
+// Spell Utility Calculator (Magic System integration)
+export {
+  SpellUtilityCalculator,
+  suggestSpells,
+  type SpellSuggestion,
+  type SpellUtilityContext,
+} from './SpellUtilityCalculator.js';
+
 // Import classes for DecisionProcessor orchestrator
 import { AutonomicSystem as AutonomicSystemClass, type AutonomicResult as AutonomicResultType } from './AutonomicSystem.js';
 import { getBehaviorPriority as getBehaviorPriorityFn } from './BehaviorPriority.js';

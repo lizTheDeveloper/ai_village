@@ -1,8 +1,9 @@
 import type { Component } from '../ecs/Component.js';
 import type { Position } from '../types.js';
+import type { AnimalLifeStage, AnimalState } from '../types/AnimalTypes.js';
 
-export type AnimalLifeStage = 'infant' | 'juvenile' | 'adult' | 'elder';
-export type AnimalState = 'idle' | 'sleeping' | 'eating' | 'drinking' | 'foraging' | 'fleeing';
+// Re-export for backwards compatibility
+export type { AnimalLifeStage, AnimalState };
 
 export interface AnimalComponentData {
   id: string;

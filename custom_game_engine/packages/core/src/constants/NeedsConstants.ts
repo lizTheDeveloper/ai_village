@@ -1,15 +1,16 @@
 // packages/core/src/constants/NeedsConstants.ts
+// All thresholds use 0-1 scale (0 = empty/dead, 1 = full/healthy)
 
-// Hunger thresholds (0-100 scale for legacy, 0-1 for new)
-export const HUNGER_THRESHOLD_SEEK_FOOD = 70;
-export const HUNGER_RESTORED_DEFAULT = 25;
+// Hunger thresholds (0-1 scale)
+export const HUNGER_THRESHOLD_SEEK_FOOD = 0.7;  // 70% - seek food when below this
+export const HUNGER_RESTORED_DEFAULT = 0.25;     // 25% restored per food item
 
-// Energy thresholds
-export const ENERGY_CRITICAL = 10;
-export const ENERGY_LOW = 30;
-export const ENERGY_MODERATE = 50;
-export const ENERGY_HIGH = 70;
-export const ENERGY_FULL = 100;
+// Energy thresholds (0-1 scale)
+export const ENERGY_CRITICAL = 0.1;   // 10%
+export const ENERGY_LOW = 0.3;        // 30%
+export const ENERGY_MODERATE = 0.5;   // 50%
+export const ENERGY_HIGH = 0.7;       // 70%
+export const ENERGY_FULL = 1.0;       // 100%
 
 // Energy work multipliers
 export const WORK_SPEED_CRITICAL = 0.5;
@@ -17,10 +18,10 @@ export const WORK_SPEED_LOW = 0.75;
 export const WORK_SPEED_MODERATE = 0.9;
 export const WORK_SPEED_NORMAL = 1.0;
 
-// Sleep completion thresholds
-export const SLEEP_COMPLETE_ENERGY = 100;
-export const SLEEP_INTERRUPT_HUNGER = 10;
-export const SLEEP_INTERRUPT_ENERGY = 70;
+// Sleep completion thresholds (0-1 scale)
+export const SLEEP_COMPLETE_ENERGY = 1.0;    // 100%
+export const SLEEP_INTERRUPT_HUNGER = 0.1;   // 10%
+export const SLEEP_INTERRUPT_ENERGY = 0.7;   // 70%
 
 // Sleep quality modifiers
 export const SLEEP_QUALITY_SHELTER = 0.5;
@@ -30,8 +31,8 @@ export const SLEEP_QUALITY_LUXURY = 0.1;
 export const SLEEP_QUALITY_MIN = 0.1;
 export const SLEEP_QUALITY_MAX = 1.0;
 
-// Health thresholds
-export const HEALTH_CRITICAL = 20;
+// Health thresholds (0-1 scale)
+export const HEALTH_CRITICAL = 0.2;  // 20%
 export const HEALTH_DAMAGE_RATE = 0.5; // per second in dangerous temps
 
 // Cleanliness thresholds (housing)

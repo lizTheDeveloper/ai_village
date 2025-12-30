@@ -7,8 +7,9 @@ import { NeedsSystem } from '../NeedsSystem.js';
 import { WeatherSystem } from '../WeatherSystem.js';
 import { TemperatureSystem } from '../TemperatureSystem.js';
 import { createCircadianComponent } from '../../components/CircadianComponent.js';
-import { createNeedsComponent } from '../../components/NeedsComponent.js';
+import { NeedsComponent } from '../../components/NeedsComponent.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Integration tests for Complete Game Day Cycle
  *
@@ -54,7 +55,13 @@ describe('Complete Game Day Cycle Integration', () => {
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     agent.addComponent(createCircadianComponent());
-    agent.addComponent(createNeedsComponent(100, 50, 100, 100, 100)); // Low energy
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 0.5,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  })); // Low energy
 
     // Set to night time
     harness.setGameHour(22); // 10 PM
@@ -64,7 +71,7 @@ describe('Complete Game Day Cycle Integration', () => {
     // Update sleep system
     sleepSystem.update(harness.world, entities, 1.0);
 
-    const circadian = agent.getComponent('circadian');
+    const circadian = agent.getComponent(ComponentType.Circadian);
     expect(circadian).toBeDefined();
   });
 
@@ -76,7 +83,13 @@ describe('Complete Game Day Cycle Integration', () => {
     const circadian = createCircadianComponent();
     (circadian as any).isSleeping = true;
     agent.addComponent(circadian);
-    agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100)); // Full energy
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  })); // Full energy
 
     // Set to morning
     harness.setGameHour(8); // 8 AM
@@ -97,20 +110,27 @@ describe('Complete Game Day Cycle Integration', () => {
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
-    agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
 
-    const entities = Array.from(harness.world.entities.values());
+    // Filter to only entities with needs component
+    const entitiesWithNeeds = harness.world.query().with(ComponentType.Needs).executeEntities();
 
-    const initialNeeds = agent.getComponent('needs') as any;
+    const initialNeeds = agent.getComponent(ComponentType.Needs) as any;
     const initialHunger = initialNeeds.hunger;
     const initialEnergy = initialNeeds.energy;
 
     // Simulate several hours
     for (let i = 0; i < 10; i++) {
-      needsSystem.update(harness.world, entities, 360.0); // 6 minutes per update
+      needsSystem.update(harness.world, entitiesWithNeeds, 360.0); // 6 minutes per update
     }
 
-    const finalNeeds = agent.getComponent('needs') as any;
+    const finalNeeds = agent.getComponent(ComponentType.Needs) as any;
 
     // Needs should have decayed
     expect(finalNeeds.hunger).toBeLessThan(initialHunger);
@@ -165,20 +185,29 @@ describe('Complete Game Day Cycle Integration', () => {
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     agent.addComponent(createCircadianComponent());
-    agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
 
-    const entities = Array.from(harness.world.entities.values());
+    // Filter entities for each system's required components
+    const timeEntities = harness.world.query().with(ComponentType.Time).executeEntities();
+    const sleepEntities = harness.world.query().with(ComponentType.Circadian).executeEntities();
+    const needsEntities = harness.world.query().with(ComponentType.Needs).executeEntities();
 
     // Simulate 12 hours
     for (let hour = 0; hour < 12; hour++) {
-      timeSystem.update(harness.world, entities, 2.0);
-      sleepSystem.update(harness.world, entities, 2.0);
-      needsSystem.update(harness.world, entities, 2.0);
+      timeSystem.update(harness.world, timeEntities, 2.0);
+      sleepSystem.update(harness.world, sleepEntities, 2.0);
+      needsSystem.update(harness.world, needsEntities, 2.0);
     }
 
     // All systems should have processed without errors
-    expect(agent.getComponent('circadian')).toBeDefined();
-    expect(agent.getComponent('needs')).toBeDefined();
+    expect(agent.getComponent(ComponentType.Circadian)).toBeDefined();
+    expect(agent.getComponent(ComponentType.Needs)).toBeDefined();
   });
 
   it('should day counter increment correctly', () => {
@@ -218,17 +247,25 @@ describe('Complete Game Day Cycle Integration', () => {
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
-    agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
 
-    const entities = Array.from(harness.world.entities.values());
+    // Filter entities for each system's required components
+    const tempEntities = harness.world.query().with(ComponentType.Temperature).executeEntities();
+    const needsEntities = harness.world.query().with(ComponentType.Needs).executeEntities();
 
     // Run systems over time
     for (let i = 0; i < 10; i++) {
-      tempSystem.update(harness.world, entities, 60.0);
-      needsSystem.update(harness.world, entities, 60.0);
+      tempSystem.update(harness.world, tempEntities, 60.0);
+      needsSystem.update(harness.world, needsEntities, 60.0);
     }
 
-    const needs = agent.getComponent('needs') as any;
+    const needs = agent.getComponent(ComponentType.Needs) as any;
     expect(needs.health).toBeGreaterThan(0);
   });
 
@@ -242,7 +279,13 @@ describe('Complete Game Day Cycle Integration', () => {
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     agent.addComponent(createCircadianComponent());
-    agent.addComponent(createNeedsComponent(100, 50, 100, 100, 100));
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 0.5,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
 
     harness.clearEvents();
 

@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
@@ -34,9 +35,9 @@ export class BeliefFormationSystem implements System {
 
     // OPTIMIZATION: Belief formation only happens during sleep (memory consolidation)
     const believers = entities.filter(e =>
-      e.components.has('belief') &&
-      e.components.has('episodic_memory') &&
-      e.components.has('agent')
+      e.components.has(CT.Belief) &&
+      e.components.has(CT.EpisodicMemory) &&
+      e.components.has(CT.Agent)
     );
 
     for (const entity of believers) {
@@ -204,7 +205,7 @@ export class BeliefFormationSystem implements System {
 
     // Get social interaction memories
     const socialMemories = memories.filter(m =>
-      m.eventType === 'conversation' ||
+      m.eventType === CT.Conversation ||
       m.eventType === 'cooperation' ||
       m.eventType === 'resource:shared'
     );

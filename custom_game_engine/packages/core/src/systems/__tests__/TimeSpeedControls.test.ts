@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createTimeComponent, type TimeComponent } from '../TimeSystem';
 
+import { ComponentType } from '../../types/ComponentType.js';
 describe('Time Speed Keyboard Controls', () => {
   let timeComponent: TimeComponent;
 
@@ -211,7 +212,7 @@ describe('Time Speed Keyboard Controls', () => {
       expect(() => {
         // @ts-expect-error - Testing missing required field
         const invalid: TimeComponent = {
-          type: 'time',
+          type: ComponentType.Time,
           version: 1,
           timeOfDay: 12,
           dayLength: 48,
@@ -229,7 +230,7 @@ describe('Time Speed Keyboard Controls', () => {
       expect(() => {
         // @ts-expect-error - Testing missing required field
         const invalid: TimeComponent = {
-          type: 'time',
+          type: ComponentType.Time,
           version: 1,
           timeOfDay: 12,
           speedMultiplier: 1,
@@ -250,7 +251,7 @@ describe('Time Speed Keyboard Controls', () => {
       expect(() => {
         // @ts-expect-error - Testing missing field
         const component: Partial<TimeComponent> = {
-          type: 'time',
+          type: ComponentType.Time,
           version: 1,
           timeOfDay: 12,
           dayLength: 48,

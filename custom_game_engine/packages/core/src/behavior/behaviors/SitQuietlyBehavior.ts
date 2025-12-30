@@ -10,6 +10,7 @@ import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import type { EntityImpl } from '../../ecs/Entity.js';
 import type { World } from '../../ecs/World.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
+import { ComponentType } from '../../types/ComponentType.js';
 
 /**
  * SitQuietlyBehavior - Peaceful rest
@@ -30,7 +31,7 @@ export class SitQuietlyBehavior extends BaseBehavior {
     if (currentTick - lastMonologue > 400) {
       // Update every ~20 seconds
       const monologue = this.generatePeacefulMonologue();
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         lastThought: monologue,
         behaviorState: {

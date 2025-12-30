@@ -46,6 +46,7 @@
 
 import type { World } from '../ecs/World.js';
 import type { System } from '../ecs/System.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EntityImpl } from '../ecs/Entity.js';
@@ -86,7 +87,7 @@ export class SkillSystem implements System {
       if (builderId) {
         // Complex buildings give more XP
         const baseXP = 20;
-        this.awardXP(builderId, 'building', baseXP, 'building:complete');
+        this.awardXP(builderId, CT.Building, baseXP, 'building:complete');
       }
     });
 
@@ -112,7 +113,7 @@ export class SkillSystem implements System {
       // This represents learning about plant growth, food sources, and botanical knowledge
       if (event.data.sourceEntityId) {
         const sourceEntity = world.getEntity(event.data.sourceEntityId);
-        if (sourceEntity?.components.has('plant')) {
+        if (sourceEntity?.components.has(CT.Plant)) {
           // Smaller XP than gathering - foraging wild plants teaches basic farming concepts
           const farmingXP = Math.min(3, 1 + Math.floor(amount / 5));
           this.awardXP(event.data.agentId, 'farming', farmingXP, 'resource:gathered:plant');
@@ -257,7 +258,7 @@ export class SkillSystem implements System {
       const agentId = event.data.entityId;
       if (agentId) {
         const baseXP = 5;
-        this.awardXP(agentId, 'building', baseXP, 'construction:started');
+        this.awardXP(agentId, CT.Building, baseXP, 'construction:started');
       }
     });
 
@@ -301,7 +302,7 @@ export class SkillSystem implements System {
     const result = addSkillXP(skills, skillId, baseXP);
 
     // Update the component
-    (entity as EntityImpl).updateComponent<SkillsComponent>('skills', () => result.component);
+    (entity as EntityImpl).updateComponent<SkillsComponent>(CT.Skills, () => result.component);
 
     // Emit XP gain event immediately (handlers may be listening during event processing)
     this.world.eventBus.emitImmediate({
@@ -346,10 +347,10 @@ export class SkillSystem implements System {
    * Get or create skills component for an entity.
    */
   private getOrCreateSkills(entity: EntityImpl): SkillsComponent {
-    let skills = entity.getComponent<SkillsComponent>('skills');
+    let skills = entity.getComponent<SkillsComponent>(CT.Skills);
     if (!skills) {
       // Check if entity has personality for affinity generation
-      const personality = entity.getComponent<PersonalityComponent>('personality');
+      const personality = entity.getComponent<PersonalityComponent>(CT.Personality);
       if (personality) {
         skills = createSkillsComponentFromPersonality(personality);
       } else {

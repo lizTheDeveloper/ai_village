@@ -8,6 +8,7 @@
   "exclude": ["src/**/__tests__/**/*", "src/**/*.test.ts"],
   "references": [
     { "path": "../core" },
-    { "path": "../world" }
+    { "path": "../world" },
+    { "path": "../llm" }
   ]
 }

@@ -5,6 +5,7 @@ import { AnimalSystem } from '../AnimalSystem.js';
 import { AnimalProductionSystem } from '../AnimalProductionSystem.js';
 import { AnimalHousingSystem } from '../AnimalHousingSystem.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Integration tests for AnimalSystem + AnimalProductionSystem + AnimalHousingSystem
  *
@@ -30,7 +31,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
     animal.addComponent({
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'chicken-1',
       speciesId: 'chicken',
@@ -50,13 +51,13 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
 
     const entities = Array.from(harness.world.entities.values());
 
-    const initialAnimal = animal.getComponent('animal') as any;
+    const initialAnimal = animal.getComponent(ComponentType.Animal) as any;
     const initialHunger = initialAnimal.hunger;
 
     // Simulate time passing
     animalSystem.update(harness.world, entities, 100.0);
 
-    const updatedAnimal = animal.getComponent('animal') as any;
+    const updatedAnimal = animal.getComponent(ComponentType.Animal) as any;
 
     // Hunger and thirst should increase
     expect(updatedAnimal.hunger).toBeGreaterThan(initialHunger);
@@ -68,7 +69,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
     animal.addComponent({
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'chicken-1',
       speciesId: 'chicken',
@@ -88,13 +89,13 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
 
     const entities = Array.from(harness.world.entities.values());
 
-    const initialAnimal = animal.getComponent('animal') as any;
+    const initialAnimal = animal.getComponent(ComponentType.Animal) as any;
     const initialAge = initialAnimal.age;
 
     // Simulate time (1 day = 86400 seconds)
     animalSystem.update(harness.world, entities, 86400.0);
 
-    const updatedAnimal = animal.getComponent('animal') as any;
+    const updatedAnimal = animal.getComponent(ComponentType.Animal) as any;
 
     // Age should increase
     expect(updatedAnimal.age).toBeGreaterThan(initialAge);
@@ -106,7 +107,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
     animal.addComponent({
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'chicken-1',
       speciesId: 'chicken',
@@ -143,7 +144,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
     animal.addComponent({
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'chicken-1',
       speciesId: 'chicken',
@@ -163,13 +164,13 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
 
     const entities = Array.from(harness.world.entities.values());
 
-    const initialAnimal = animal.getComponent('animal') as any;
+    const initialAnimal = animal.getComponent(ComponentType.Animal) as any;
     const initialHealth = initialAnimal.health;
 
     // Simulate extended starvation
     animalSystem.update(harness.world, entities, 10.0);
 
-    const updatedAnimal = animal.getComponent('animal') as any;
+    const updatedAnimal = animal.getComponent(ComponentType.Animal) as any;
 
     // Health should decrease from starvation
     expect(updatedAnimal.health).toBeLessThan(initialHealth);
@@ -181,7 +182,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
     animal.addComponent({
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'chicken-1',
       speciesId: 'chicken',
@@ -201,13 +202,13 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
 
     const entities = Array.from(harness.world.entities.values());
 
-    const initialAnimal = animal.getComponent('animal') as any;
+    const initialAnimal = animal.getComponent(ComponentType.Animal) as any;
     const initialEnergy = initialAnimal.energy;
 
     // Simulate sleep time
     animalSystem.update(harness.world, entities, 100.0);
 
-    const updatedAnimal = animal.getComponent('animal') as any;
+    const updatedAnimal = animal.getComponent(ComponentType.Animal) as any;
 
     // Energy should recover (or at least not decay as fast)
     expect(updatedAnimal.energy).toBeGreaterThanOrEqual(initialEnergy - 1);
@@ -219,7 +220,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
     animal.addComponent({
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'chicken-1',
       speciesId: 'chicken',
@@ -239,13 +240,13 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
 
     const entities = Array.from(harness.world.entities.values());
 
-    const initialAnimal = animal.getComponent('animal') as any;
+    const initialAnimal = animal.getComponent(ComponentType.Animal) as any;
     const initialStress = initialAnimal.stress;
 
     // Simulate time for stress to decay
     animalSystem.update(harness.world, entities, 10.0);
 
-    const updatedAnimal = animal.getComponent('animal') as any;
+    const updatedAnimal = animal.getComponent(ComponentType.Animal) as any;
 
     // Stress should decrease
     expect(updatedAnimal.stress).toBeLessThan(initialStress);
@@ -257,7 +258,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
     animal.addComponent({
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'chicken-1',
       speciesId: 'chicken',
@@ -299,7 +300,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
     animal.addComponent({
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'chicken-1',
       speciesId: 'chicken',
@@ -324,7 +325,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
     housingSystem.update(harness.world, entities, 1.0);
 
     // Housing system should process animals
-    expect(animal.getComponent('animal')).toBeDefined();
+    expect(animal.getComponent(ComponentType.Animal)).toBeDefined();
   });
 
   it('should housing cleanliness decay with occupants', () => {
@@ -346,7 +347,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
     housingSystem.update(harness.world, entities, 1.0);
 
     // Cleanliness logic tested internally
-    expect(coop.getComponent('building')).toBeDefined();
+    expect(coop.getComponent(ComponentType.Building)).toBeDefined();
   });
 
   it('should animal system throw on missing required fields', () => {
@@ -355,7 +356,7 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
     animal.addComponent({
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'chicken-1',
       speciesId: 'chicken',
@@ -378,6 +379,6 @@ describe('AnimalSystem + AnimalProductionSystem + AnimalHousingSystem Integratio
     // Should throw on missing health
     expect(() => {
       animalSystem.update(harness.world, entities, 1.0);
-    }).toThrow('missing required \'health\' field');
+    }).toThrow(/missing required.*health.*field/i);
   });
 });

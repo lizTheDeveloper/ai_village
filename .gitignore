@@ -71,3 +71,20 @@ test-inventory-display.mjs
 test-soil-system.mjs
 custom_game_engine/*.mjs
 custom_game_engine/test-*.sh
+
+# TypeScript build artifacts
+*.js
+*.d.ts
+*.js.map
+*.d.ts.map
+!*.config.js
+!vite.config.ts
+*.tsbuildinfo
+
+# Temporary files
+custom_game_engine/fix-*.py
+custom_game_engine/fix-*.sh
+custom_game_engine/migrate-*.sh
+
+# Metrics data
+custom_game_engine/metrics-data/

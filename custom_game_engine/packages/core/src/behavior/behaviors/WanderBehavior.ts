@@ -15,6 +15,7 @@ import type { AgentComponent } from '../../components/AgentComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import { ExplorationStateComponent } from '../../components/ExplorationStateComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
+import { ComponentType } from '../../types/ComponentType.js';
 
 /** Maximum distance from home before biasing back (when no frontier) */
 const MAX_WANDER_DISTANCE = 20;
@@ -37,10 +38,10 @@ const WANDER_JITTER = Math.PI / 18;
 export class WanderBehavior extends BaseBehavior {
   readonly name = 'wander' as const;
 
-  execute(entity: EntityImpl, _world: World): BehaviorResult | void {
-    const movement = entity.getComponent<MovementComponent>('movement');
-    const agent = entity.getComponent<AgentComponent>('agent');
-    const position = entity.getComponent<PositionComponent>('position');
+  execute(entity: EntityImpl, world: World): BehaviorResult | void {
+    const movement = entity.getComponent<MovementComponent>(ComponentType.Movement);
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
 
     // Per CLAUDE.md: No silent fallbacks - crash on missing required components
     if (!movement) {
@@ -55,28 +56,34 @@ export class WanderBehavior extends BaseBehavior {
 
     // Clear idleStartTick when wandering (no longer idle)
     if (agent.idleStartTick !== undefined) {
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         idleStartTick: undefined,
       }));
     }
 
     // Enable steering system for wander behavior
-    if (entity.hasComponent('steering')) {
-      entity.updateComponent('steering', (current: any) => ({
+    if (entity.hasComponent(ComponentType.Steering)) {
+      entity.updateComponent(ComponentType.Steering, (current: any) => ({
         ...current,
         behavior: 'wander',
       }));
     }
 
-    // Get or initialize wander angle
+    // Get or initialize wander angle and start tick
     let wanderAngle = agent.behaviorState?.wanderAngle as number | undefined;
+    let wanderStartTick = agent.behaviorState?.wanderStartTick as number | undefined;
+
+    // Initialize on first wander tick
     if (wanderAngle === undefined) {
       wanderAngle = Math.random() * Math.PI * 2;
     }
+    if (wanderStartTick === undefined) {
+      wanderStartTick = world.tick;
+    }
 
     // Try frontier-seeking first, fall back to home bias
-    const exploration = entity.getComponent('exploration_state') as ExplorationStateComponent | undefined;
+    const exploration = entity.getComponent(ComponentType.ExplorationState) as ExplorationStateComponent | undefined;
 
     if (exploration) {
       wanderAngle = this.applyFrontierBias(wanderAngle, position, exploration);
@@ -96,18 +103,19 @@ export class WanderBehavior extends BaseBehavior {
     const velocityY = Math.sin(wanderAngle) * speed;
 
     // Update movement velocity
-    entity.updateComponent<MovementComponent>('movement', (current) => ({
+    entity.updateComponent<MovementComponent>(ComponentType.Movement, (current) => ({
       ...current,
       velocityX,
       velocityY,
     }));
 
-    // Save wander angle for next tick
-    entity.updateComponent<AgentComponent>('agent', (current) => ({
+    // Save wander angle and start tick for next tick
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
       behaviorState: {
         ...current.behaviorState,
         wanderAngle,
+        wanderStartTick,
       },
     }));
   }

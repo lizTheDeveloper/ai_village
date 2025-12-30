@@ -6,6 +6,7 @@ import { PlantSystem } from '../PlantSystem.js';
 import { WeatherSystem } from '../WeatherSystem.js';
 import type { Tile } from '../SoilSystem.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Integration tests for SoilSystem + PlantSystem + WeatherSystem
  *
@@ -157,7 +158,7 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     // Create weather entity with rain
     const weatherEntity = harness.world.createEntity('weather');
     weatherEntity.addComponent({
-      type: 'weather',
+      type: ComponentType.Weather,
       version: 1,
       weatherType: 'rain',
       intensity: 0.8,
@@ -177,7 +178,7 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     weatherSystem.update(harness.world, entities, 0.1);
 
     // Weather component should still exist and have valid properties
-    const weather = weatherEntity.getComponent('weather') as any;
+    const weather = weatherEntity.getComponent(ComponentType.Weather) as any;
     expect(weather.weatherType).toBeDefined();
     expect(['clear', 'rain', 'storm', 'snow']).toContain(weather.weatherType);
     expect(weather.intensity).toBeGreaterThanOrEqual(0);
@@ -207,13 +208,13 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     // Create a plant
     const plant = harness.world.createEntity('plant');
     plant.addComponent({
-      type: 'position',
+      type: ComponentType.Position,
       version: 1,
       x: 10,
       y: 10,
     });
     plant.addComponent({
-      type: 'plant',
+      type: ComponentType.Plant,
       version: 1,
       speciesId: 'wheat',
       stage: 'seedling',
@@ -230,7 +231,7 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
 
     // Plant system receives frost notification
     // Actual damage would be applied in update()
-    expect(plant.getComponent('plant')).toBeDefined();
+    expect(plant.getComponent(ComponentType.Plant)).toBeDefined();
   });
 
   it('should soil moisture changes propagate to plant system', () => {
@@ -307,7 +308,7 @@ describe('SoilSystem + PlantSystem + WeatherSystem Integration', () => {
     // Create weather with temperature modifier
     const weatherEntity = harness.world.createEntity('weather');
     weatherEntity.addComponent({
-      type: 'weather',
+      type: ComponentType.Weather,
       version: 1,
       weatherType: 'clear',
       intensity: 0.5,

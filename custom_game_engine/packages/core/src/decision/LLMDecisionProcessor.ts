@@ -14,6 +14,8 @@ import type { InventoryComponent } from '../components/InventoryComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import { parseAction, actionToBehavior } from '../actions/AgentAction.js';
 import { calculateStorageStats } from '../utils/StorageContext.js';
+import { ComponentType } from '../types/ComponentType.js';
+import { BuildingType } from '../types/BuildingType.js';
 /**
  * Building cost lookup.
  * NOTE: These MUST match BuildingBlueprintRegistry resource costs.
@@ -65,7 +67,7 @@ function actionObjectToBehavior(action: ParsedAction): { behavior: AgentBehavior
       }
       return { behavior: 'gather', behaviorState };
     case 'build':
-      behaviorState.buildingType = action.building || 'lean-to';
+      behaviorState.buildingType = action.building || BuildingType.LeanTo;
       return { behavior: 'build', behaviorState };
     case 'craft':
       behaviorState.recipeId = action.recipe || action.target || 'wood_plank';
@@ -80,9 +82,9 @@ function actionObjectToBehavior(action: ParsedAction): { behavior: AgentBehavior
     case 'follow':
       behaviorState.targetId = action.target || 'nearest';
       return { behavior: 'follow_agent', behaviorState };
-    case 'plant':
+    case ComponentType.Plant:
       behaviorState.seedType = action.seed || 'wheat';
-      return { behavior: 'plant', behaviorState };
+      return { behavior: ComponentType.Plant, behaviorState };
     case 'till':
       return { behavior: 'till', behaviorState };
     case 'water':
@@ -131,10 +133,10 @@ function generateBehaviorLabel(action: ParsedAction): string {
     case 'build':
       return `Build ${action.building || 'structure'}`;
     case 'craft':
-      return `Craft ${action.recipe || action.target || 'item'}`;
+      return `Craft ${action.recipe || action.target || ComponentType.Item}`;
     case 'talk':
       return `Talk to ${action.target || 'someone'}`;
-    case 'plant':
+    case ComponentType.Plant:
       return `Plant ${action.seed || 'seeds'}`;
     case 'till':
       return 'Till soil';
@@ -165,7 +167,7 @@ function selectBehaviorFromPriorities(
   getNearbyAgents: (entity: EntityImpl, world: World, range: number) => Entity[]
 ): { behavior: AgentBehavior; behaviorState: Record<string, unknown> } | null {
   // Find the highest priority category
-  const categories = ['building', 'gathering', 'farming', 'social', 'exploration', 'rest'] as const;
+  const categories = [ComponentType.Building, 'gathering', 'farming', 'social', 'exploration', 'rest'] as const;
   let highestPriority = 0;
   let highestCategory: string | null = null;
 
@@ -187,7 +189,7 @@ function selectBehaviorFromPriorities(
       // Try to find a nearby agent to talk to
       const nearbyAgents = getNearbyAgents(entity, world, 15);
       const availableAgents = nearbyAgents.filter(other => {
-        const otherConv = other.components.get('conversation') as { isActive?: boolean } | undefined;
+        const otherConv = other.components.get(ComponentType.Conversation) as { isActive?: boolean } | undefined;
         return !otherConv?.isActive;
       });
       if (availableAgents.length > 0) {
@@ -202,11 +204,11 @@ function selectBehaviorFromPriorities(
     case 'gathering': {
       return { behavior: 'gather', behaviorState: { resourceType: 'wood' } };
     }
-    case 'building': {
+    case ComponentType.Building: {
       // Check if agent has a planned build
-      const agent = entity.getComponent<AgentComponent>('agent');
+      const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
       if (agent?.plannedBuilds && agent.plannedBuilds.length > 0) {
-        return { behavior: 'build', behaviorState: { buildingType: agent.plannedBuilds[0]?.buildingType || 'storage-chest' } };
+        return { behavior: 'build', behaviorState: { buildingType: agent.plannedBuilds[0]?.buildingType || BuildingType.StorageChest } };
       }
       // No planned build, gather resources for building
       return { behavior: 'gather', behaviorState: { resourceType: 'wood', forBuild: true } };
@@ -235,11 +237,21 @@ export interface LLMDecisionResult {
   source: 'llm' | 'fallback';
 }
 /**
+ * Custom LLM configuration for per-agent LLM settings
+ */
+export interface CustomLLMConfig {
+  model?: string;
+  baseUrl?: string;
+  apiKey?: string;
+  customHeaders?: Record<string, string>;
+}
+
+/**
  * Interface for LLM decision queue
  */
 export interface LLMDecisionQueue {
   getDecision(entityId: string): string | null;
-  requestDecision(entityId: string, prompt: string): Promise<void>;
+  requestDecision(entityId: string, prompt: string, customConfig?: CustomLLMConfig): Promise<string>;
 }
 /**
  * Interface for prompt builder
@@ -259,7 +271,7 @@ export interface PromptBuilder {
  * // In update loop for LLM agents
  * const result = processor.process(entity, world, agent);
  * if (result.changed) {
- *   entity.updateComponent('agent', c => ({
+ *   entity.updateComponent(ComponentType.Agent, c => ({
  *     ...c,
  *     behavior: result.behavior,
  *     behaviorState: result.behaviorState
@@ -317,7 +329,7 @@ export class LLMDecisionProcessor {
     }
     // Currently doing productive work (not idle/wander)
     const productiveBehaviors = [
-      'gather', 'build', 'farm', 'till', 'plant', 'water', 'harvest',
+      'gather', 'build', 'farm', 'till', ComponentType.Plant, 'water', 'harvest',
       'deposit_items', 'navigate', 'explore', 'seek_food', 'talk'
     ];
     if (productiveBehaviors.includes(agent.behavior)) {
@@ -363,14 +375,14 @@ export class LLMDecisionProcessor {
   ): LLMDecisionResult {
     // Decrement cooldown
     if (agent.llmCooldown > 0) {
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         llmCooldown: Math.max(0, current.llmCooldown - 1),
       }));
     }
     // PLANNED BUILD SYSTEM - Execute planned builds autonomously
     // If agent has planned builds and is in an interruptible behavior, drive them to gather resources and build
-    const inventory = entity.getComponent<InventoryComponent>('inventory');
+    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
     // Behaviors that can be interrupted to work on planned builds
     const interruptibleBehaviors = ['wander', 'idle', 'rest', 'talk', 'follow_agent', 'explore'];
     if (
@@ -389,7 +401,7 @@ export class LLMDecisionProcessor {
     if (decision) {
       // Clear behaviorCompleted flag when processing new decision
       if (agent.behaviorCompleted) {
-        entity.updateComponent<AgentComponent>('agent', (current) => ({
+        entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
           ...current,
           behaviorCompleted: false,
         }));
@@ -424,11 +436,11 @@ export class LLMDecisionProcessor {
         });
 
         // Emit comprehensive agent state snapshot for dashboard
-        const identity = entity.components.get('identity') as { name?: string } | undefined;
-        const position = entity.getComponent<PositionComponent>('position');
-        const inventory = entity.getComponent<InventoryComponent>('inventory');
-        const needs = entity.components.get('needs') as { hunger?: number; energy?: number; social?: number } | undefined;
-        const skillsComp = entity.components.get('skills') as { levels?: Record<string, number> } | undefined;
+        const identity = entity.components.get(ComponentType.Identity) as { name?: string } | undefined;
+        const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+        const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
+        const needs = entity.components.get(ComponentType.Needs) as { hunger?: number; energy?: number; social?: number } | undefined;
+        const skillsComp = entity.components.get(ComponentType.Skills) as { levels?: Record<string, number> } | undefined;
 
         // Build skills snapshot (only include non-zero skills)
         let skills: Record<string, number> | undefined;
@@ -481,7 +493,8 @@ export class LLMDecisionProcessor {
           },
         });
 
-        this.llmDecisionQueue.requestDecision(entity.id, prompt).catch((err: Error) => {
+        // Pass custom LLM config if agent has it configured
+        this.llmDecisionQueue.requestDecision(entity.id, prompt, agent.customLLM).catch((err: Error) => {
           console.error(`[LLMDecisionProcessor] LLM decision failed for ${entity.id}:`, err);
 
           // Categorize the error type
@@ -507,7 +520,7 @@ export class LLMDecisionProcessor {
           });
 
           // On LLM failure, temporarily fall back to scripted behavior
-          entity.updateComponent<AgentComponent>('agent', (current) => ({
+          entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
             ...current,
             llmCooldown: 60, // 3 second cooldown before retry (at 20 TPS)
           }));
@@ -557,19 +570,19 @@ export class LLMDecisionProcessor {
       if (typeof action === 'object' && action !== null && !Array.isArray(action) && 'type' in action) {
         const typedAction = action as { type: string; goal?: string; priorities?: StrategicPriorities };
         if (typedAction.type === 'set_personal_goal' && typedAction.goal) {
-          entity.updateComponent<AgentComponent>('agent', (current) => ({
+          entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
             ...current,
             personalGoal: typedAction.goal,
           }));
           return { changed: false, source: 'llm' };
         } else if (typedAction.type === 'set_medium_term_goal' && typedAction.goal) {
-          entity.updateComponent<AgentComponent>('agent', (current) => ({
+          entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
             ...current,
             mediumTermGoal: typedAction.goal,
           }));
           return { changed: false, source: 'llm' };
         } else if (typedAction.type === 'set_group_goal' && typedAction.goal) {
-          entity.updateComponent<AgentComponent>('agent', (current) => ({
+          entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
             ...current,
             groupGoal: typedAction.goal,
           }));
@@ -583,7 +596,7 @@ export class LLMDecisionProcessor {
           const selectedBehavior = selectBehaviorFromPriorities(priorities, entity, world, getNearbyAgents);
 
           if (selectedBehavior) {
-            entity.updateComponent<AgentComponent>('agent', (current) => ({
+            entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
               ...current,
               priorities,
               behavior: selectedBehavior.behavior,
@@ -616,7 +629,7 @@ export class LLMDecisionProcessor {
           }
 
           // Fallback: just set priorities without changing behavior
-          entity.updateComponent<AgentComponent>('agent', (current) => ({
+          entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
             ...current,
             priorities,
             recentSpeech: speaking,
@@ -651,15 +664,15 @@ export class LLMDecisionProcessor {
             priority?: 'low' | 'normal' | 'high';
             reason?: string;
           };
-          const buildingType = buildAction.building || 'storage-chest';
+          const buildingType = buildAction.building || BuildingType.StorageChest;
 
           // CHECK FOR DUPLICATES: Don't build if this building type is already in progress or planned
           // 1. Check world for existing/in-progress buildings of this type
-          const existingBuildings = world.query().with('building').executeEntities();
+          const existingBuildings = world.query().with(ComponentType.Building).executeEntities();
           let completeCount = 0;
           let inProgressCount = 0;
           for (const b of existingBuildings) {
-            const bc = b.components.get('building') as { buildingType?: string; isComplete?: boolean } | undefined;
+            const bc = b.components.get(ComponentType.Building) as { buildingType?: string; isComplete?: boolean } | undefined;
             if (bc?.buildingType === buildingType) {
               if (bc.isComplete) completeCount++;
               else inProgressCount++;
@@ -681,15 +694,15 @@ export class LLMDecisionProcessor {
           const limit = BUILDING_LIMITS[buildingType] ?? 1; // Default to 1 for unlisted buildings
 
           // 2. Check if this agent already has this building type planned
-          const agent = entity.getComponent<AgentComponent>('agent');
+          const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
           const alreadyPlannedBySelf = agent?.plannedBuilds?.some(p => p.buildingType === buildingType) ?? false;
 
           // 3. Check if ANY other agent has this building type planned
-          const allAgents = world.query().with('agent').executeEntities();
+          const allAgents = world.query().with(ComponentType.Agent).executeEntities();
           let plannedByOthers = 0;
           for (const otherAgent of allAgents) {
             if (otherAgent.id === entity.id) continue;
-            const otherAgentComp = otherAgent.components.get('agent') as AgentComponent | undefined;
+            const otherAgentComp = otherAgent.components.get(ComponentType.Agent) as AgentComponent | undefined;
             if (otherAgentComp?.plannedBuilds?.some(p => p.buildingType === buildingType)) {
               plannedByOthers++;
             }
@@ -710,7 +723,7 @@ export class LLMDecisionProcessor {
             reason: buildAction.reason,
           };
           // Add to planned builds for persistence
-          entity.updateComponent<AgentComponent>('agent', (current) => {
+          entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => {
             const existingPlans = current.plannedBuilds || [];
             return {
               ...current,
@@ -734,9 +747,9 @@ export class LLMDecisionProcessor {
           });
 
           // IMMEDIATELY start working on the build (don't wait for idle state)
-          const inventory = entity.getComponent<InventoryComponent>('inventory');
+          const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
           if (inventory) {
-            const updatedAgent = entity.getComponent<AgentComponent>('agent');
+            const updatedAgent = entity.getComponent<AgentComponent>(ComponentType.Agent);
             if (updatedAgent?.plannedBuilds) {
               const buildResult = this.processPlannedBuilds(entity, world, updatedAgent.plannedBuilds, inventory);
               if (buildResult) {
@@ -828,7 +841,7 @@ export class LLMDecisionProcessor {
     }
     if (behavior) {
       // Apply the decision with optional behavior queue
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         behavior,
         behaviorState,
@@ -903,14 +916,14 @@ export class LLMDecisionProcessor {
       agent.llmCooldown > 0 &&
       (agent.behavior === 'wander' || agent.behavior === 'idle' || agent.behavior === 'rest')
     ) {
-      const inventory = entity.getComponent<InventoryComponent>('inventory');
+      const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
       // Check if agent should gather resources
       if (inventory && Math.random() < 0.2) {
         const hasWood = inventory.slots.some((s) => s.itemId === 'wood' && s.quantity >= 10);
         const hasStone = inventory.slots.some((s) => s.itemId === 'stone' && s.quantity >= 10);
         if (!hasWood || !hasStone) {
           const preferredType = !hasWood ? 'wood' : 'stone';
-          entity.updateComponent<AgentComponent>('agent', (current) => ({
+          entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
             ...current,
             behavior: 'gather',
             behaviorState: { resourceType: preferredType },
@@ -936,7 +949,7 @@ export class LLMDecisionProcessor {
     plannedBuilds: PlannedBuild[],
     inventory: InventoryComponent
   ): LLMDecisionResult | null {
-    const position = entity.getComponent<PositionComponent>('position');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) return null;
     // Sort by priority (high > normal > low)
     const priorityOrder = { high: 0, normal: 1, low: 2 };
@@ -979,7 +992,7 @@ export class LLMDecisionProcessor {
       if (distToBuild <= PLANNED_BUILD_REACH || (build.position.x === 0 && build.position.y === 0)) {
         // Near enough OR no specific position - start building!
         this.removePlannedBuild(entity, build);
-        entity.updateComponent<AgentComponent>('agent', (current) => ({
+        entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
           ...current,
           behavior: 'build',
           behaviorState: {
@@ -998,7 +1011,7 @@ export class LLMDecisionProcessor {
         };
       } else {
         // Move toward build location
-        entity.updateComponent<AgentComponent>('agent', (current) => ({
+        entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
           ...current,
           behavior: 'navigate',
           behaviorState: {
@@ -1019,7 +1032,7 @@ export class LLMDecisionProcessor {
     const mostNeeded = Object.entries(missing).sort((a, b) => b[1] - a[1])[0];
     if (mostNeeded) {
       const [resourceType, amountNeeded] = mostNeeded;
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         behavior: 'gather',
         behaviorState: {
@@ -1041,7 +1054,7 @@ export class LLMDecisionProcessor {
    * Remove a completed/invalid planned build from the agent.
    */
   private removePlannedBuild(entity: EntityImpl, build: PlannedBuild): void {
-    entity.updateComponent<AgentComponent>('agent', (current) => ({
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
       plannedBuilds: (current.plannedBuilds || []).filter(
         (b) =>

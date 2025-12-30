@@ -8,8 +8,9 @@ import {
   createTagsComponent,
   createAgentComponent,
   createMovementComponent,
-  createNeedsComponent,
-  createMemoryComponent,
+  NeedsComponent,
+  MemoryComponent,
+  PersonalityComponent,
   createVisionComponent,
   createConversationComponent,
   createRelationshipComponent,
@@ -17,7 +18,6 @@ import {
   calculateInventoryWeight,
   createTemperatureComponent,
   createCircadianComponent,
-  generateRandomPersonality,
   generateRandomName,
   createIdentityComponent,
   createGatheringStatsComponent,
@@ -36,6 +36,7 @@ import {
   ExplorationStateComponent,
   createSteeringComponent,
   createVelocityComponent,
+  createSpiritualComponent,
 } from '@ai-village/core';
 
 /**
@@ -75,8 +76,17 @@ export function createWanderingAgent(
   // Identity - give agent a name
   entity.addComponent(createIdentityComponent(generateRandomName()));
 
-  // Personality - random personality traits
-  entity.addComponent(generateRandomPersonality());
+  // Personality - random personality traits (0-1 scale)
+  const randomTrait = () => Math.random();
+  entity.addComponent(
+    new PersonalityComponent({
+      openness: randomTrait(),
+      conscientiousness: randomTrait(),
+      extraversion: randomTrait(),
+      agreeableness: randomTrait(),
+      neuroticism: randomTrait(),
+    })
+  );
 
   // Agent behavior - start idle, will wander when bored
   // with staggered think offset to prevent thundering herd
@@ -88,18 +98,22 @@ export function createWanderingAgent(
   entity.addComponent(createMovementComponent(speed, 0, 0));
 
   // Needs - hunger, energy, health, decay rates
-  // Note: Energy depletion is now handled by NeedsSystem based on activity level and game time
-  // Hunger decay rate: 0.42 points/second at 1x speed (48s/day) = once per game day eating (50→30 in 48s)
-  entity.addComponent(createNeedsComponent(
-    100,    // hunger (start full)
-    80,     // energy (start at 80 - well-rested but not max)
-    100,    // health (start healthy)
-    0.42,   // hungerDecayRate (points per second) - adjusted for 48s game day
-    0.5     // energyDecayRate (deprecated, kept for compatibility)
-  ));
+  // Note: Values are 0-1 scale (1 = full/healthy, 0 = empty/critical)
+  // Energy depletion is now handled by NeedsSystem based on activity level and game time
+  // Hunger decay rate: 0.0042 per second at 1x speed (48s/day)
+  entity.addComponent(
+    new NeedsComponent({
+      hunger: 1.0, // start full
+      energy: 0.8, // start at 80% - well-rested but not max
+      health: 1.0, // start healthy
+      thirst: 1.0,
+      hungerDecayRate: 0.0042, // 0.42/100 converted to 0-1 scale
+      energyDecayRate: 0.005, // 0.5/100 converted to 0-1 scale
+    })
+  );
 
-  // Memory - remember up to 20 things, decay 1 point/sec
-  entity.addComponent(createMemoryComponent(20, 1.0));
+  // Memory - episodic/semantic/procedural memory
+  entity.addComponent(new MemoryComponent(entity.id));
 
   // Vision - see 10 tiles around, can see both agents and resources
   entity.addComponent(createVisionComponent(10, 360, true, true));
@@ -157,6 +171,10 @@ export function createWanderingAgent(
   const personalityWander = entity.getComponent('personality') as any;
   entity.addComponent(generateRandomStartingSkills(personalityWander));
 
+  // Spiritual component - faith and divine connection based on personality
+  const spiritualityTrait = personalityWander?.spirituality ?? 0.5;
+  entity.addComponent(createSpiritualComponent(spiritualityTrait));
+
   // Personal Goals - track agent's aspirations and progress
   entity.addComponent(createGoalsComponent());
 
@@ -213,8 +231,14 @@ export function createLLMAgent(
   // Identity - give agent a name
   entity.addComponent(createIdentityComponent(generateRandomName()));
 
-  // Personality - random personality traits
-  entity.addComponent(generateRandomPersonality());
+  // Personality - random personality traits (TODO: create personality generation)
+  entity.addComponent(new PersonalityComponent({
+    openness: Math.random(),
+    conscientiousness: Math.random(),
+    extraversion: Math.random(),
+    agreeableness: Math.random(),
+    neuroticism: Math.random(),
+  }));
 
   // Agent behavior - LLM-controlled, start idle, will wander when bored
   // with staggered think offset to prevent thundering herd
@@ -228,16 +252,16 @@ export function createLLMAgent(
   // Needs - hunger, energy, health, decay rates
   // Note: Energy depletion is now handled by NeedsSystem based on activity level and game time
   // Hunger decay rate: 0.42 points/second at 1x speed (48s/day) = once per game day eating (50→30 in 48s)
-  entity.addComponent(createNeedsComponent(
-    100,    // hunger (start full)
-    80,     // energy (start at 80 - well-rested but not max)
-    100,    // health (start healthy)
-    0.42,   // hungerDecayRate (points per second) - adjusted for 48s game day
-    0.5     // energyDecayRate (deprecated, kept for compatibility)
-  ));
+  entity.addComponent(new NeedsComponent({
+    hunger: 1.0,      // hunger (start full) - 0-1 scale
+    energy: 0.8,      // energy (start at 80 - well-rested but not max) - 0-1 scale
+    health: 1.0,      // health (start healthy) - 0-1 scale
+    hungerDecayRate: 0.0042,  // hungerDecayRate (0.42/100 for 0-1 scale)
+    energyDecayRate: 0.005,   // energyDecayRate (0.5/100 for 0-1 scale)
+  }));
 
-  // Memory - remember up to 20 things, decay 1 point/sec
-  entity.addComponent(createMemoryComponent(20, 1.0));
+  // Memory - remember up to 20 things
+  entity.addComponent(new MemoryComponent(entity.id));
 
   // Vision - see 10 tiles around, can see both agents and resources
   entity.addComponent(createVisionComponent(10, 360, true, true));
@@ -295,6 +319,10 @@ export function createLLMAgent(
   // Skills - personality-based starting skills for role diversity
   const personalityLLM = entity.getComponent('personality') as any;
   entity.addComponent(generateRandomStartingSkills(personalityLLM));
+
+  // Spiritual component - faith and divine connection based on personality
+  const spiritualityTrait = personalityLLM?.spirituality ?? 0.5;
+  entity.addComponent(createSpiritualComponent(spiritualityTrait));
 
   // Personal Goals - track agent's aspirations and progress
   entity.addComponent(createGoalsComponent());

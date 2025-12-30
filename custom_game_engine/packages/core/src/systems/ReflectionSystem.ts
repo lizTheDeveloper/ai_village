@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
@@ -16,7 +17,7 @@ const ONE_DAY_MS = 86400000;
  * ReflectionSystem handles agent reflections on their experiences
  */
 export class ReflectionSystem implements System {
-  public readonly id: SystemId = 'reflection';
+  public readonly id: SystemId = CT.Reflection;
   public readonly priority: number = 110;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
@@ -184,7 +185,7 @@ export class ReflectionSystem implements System {
     if (insights.length > 0) {
       for (const insight of insights) {
         semanticMem.formBelief({
-          category: 'reflection',
+          category: CT.Reflection,
           content: insight,
           confidence: 0.6,
           sourceMemories: todaysMemories.map((m) => m.id),
@@ -256,7 +257,7 @@ export class ReflectionSystem implements System {
     // Update semantic memory with identity insights
     for (const insight of identityInsights) {
       semanticMem.formBelief({
-        category: 'identity',
+        category: CT.Identity,
         content: insight,
         confidence: 0.7,
         sourceMemories: relevantMemories.map((m) => m.id),
@@ -329,7 +330,7 @@ export class ReflectionSystem implements System {
     if (themes.includes('farming') || themes.includes('harvest')) {
       insights.push('Farming continues to be central to my life');
     }
-    if (themes.includes('social') || themes.includes('conversation')) {
+    if (themes.includes('social') || themes.includes(CT.Conversation)) {
       insights.push('Social connections are important');
     }
 

@@ -9,6 +9,12 @@ export type EntityId = string;
 /** Identifies a component type (e.g., "position", "agent", "needs") */
 export type ComponentType = string;
 
+/** Type-safe component type values - use for hasComponent/getComponent calls */
+export { ComponentType as CT } from './types/ComponentType.js';
+
+/** Type-safe building type values - use for building type comparisons */
+export { BuildingType } from './types/BuildingType.js';
+
 /** Identifies a system (e.g., "movement", "farming", "memory") */
 export type SystemId = string;
 
@@ -27,8 +33,16 @@ export type Tick = number;
 /** Timestamp in milliseconds since epoch */
 export type Timestamp = number;
 
-/** 2D position */
+/** 3D position (z defaults to 0 for 2D compatibility) */
 export interface Position {
+  readonly x: number;
+  readonly y: number;
+  /** Z-level for future 3D support. 0 = surface level, negative = underground, positive = above ground */
+  readonly z?: number;
+}
+
+/** 2D position without z-level (for legacy code and explicit 2D operations) */
+export interface Position2D {
   readonly x: number;
   readonly y: number;
 }

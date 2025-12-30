@@ -1,6 +1,36 @@
-import type { World, ShopComponent, EntityId, InventoryComponent, CurrencyComponent } from '@ai-village/core';
+import type { World, ShopComponent, EntityId, InventoryComponent, CurrencyComponent, MarketStateComponent } from '@ai-village/core';
 import { EntityImpl } from '@ai-village/core';
 import { itemRegistry, calculateBuyPrice, calculateSellPrice, getQualityTier, getQualityColor, getQualityDisplayName, getQualityPriceMultiplier } from '@ai-village/core';
+
+/**
+ * Interface for TradingSystem methods used by ShopPanel.
+ * Avoids needing to import the full TradingSystem class.
+ */
+interface TradingSystemMethods {
+  buyFromShop(
+    world: World,
+    buyerId: EntityId,
+    shopId: EntityId,
+    itemId: string,
+    quantity: number
+  ): { success: boolean; totalPrice?: number; reason?: string };
+
+  sellToShop(
+    world: World,
+    sellerId: EntityId,
+    shopId: EntityId,
+    itemId: string,
+    quantity: number
+  ): { success: boolean; totalPrice?: number; reason?: string };
+}
+
+/**
+ * Extended World interface that includes getSystem method.
+ * The public World interface doesn't expose this, but the implementation has it.
+ */
+interface WorldWithSystems extends World {
+  getSystem?(systemId: string): unknown;
+}
 
 interface ShopItem {
   itemId: string;
@@ -70,8 +100,8 @@ export class ShopPanel {
     return true;
   }
 
-  render(ctx: CanvasRenderingContext2D, world: World): void {
-    if (!this.visible || !this.selectedShopId || !this.selectedAgentId) {
+  render(ctx: CanvasRenderingContext2D, world: World | undefined): void {
+    if (!this.visible || !this.selectedShopId || !this.selectedAgentId || !world) {
       return;
     }
 
@@ -110,7 +140,7 @@ export class ShopPanel {
     // Get market state for pricing
     const marketEntities = world.query().with('market_state').executeEntities();
     const marketState = marketEntities.length > 0 && marketEntities[0]
-      ? marketEntities[0].components.get('market_state') as any
+      ? marketEntities[0].components.get('market_state') as MarketStateComponent | undefined
       : undefined;
 
     // Calculate panel position (centered)
@@ -410,20 +440,22 @@ export class ShopPanel {
     return false;
   }
 
-  private handleBuy(world: World, itemId: string): void {
-    if (!this.selectedShopId || !this.selectedAgentId) {
+  private handleBuy(world: World | undefined, itemId: string): void {
+    if (!this.selectedShopId || !this.selectedAgentId || !world) {
       return;
     }
 
     // Get TradingSystem
-    const tradingSystem = (world as any).getSystem?.('trading');
-    if (!tradingSystem || !('buyFromShop' in tradingSystem)) {
+    const worldWithSystems = world as WorldWithSystems;
+    const tradingSystem = worldWithSystems.getSystem?.('trading');
+    if (!tradingSystem || typeof tradingSystem !== 'object' || !('buyFromShop' in tradingSystem)) {
       console.error('TradingSystem not found');
       return;
     }
 
     // Buy one item
-    const result = (tradingSystem as any).buyFromShop(
+    const typedTradingSystem = tradingSystem as TradingSystemMethods;
+    const result = typedTradingSystem.buyFromShop(
       world,
       this.selectedAgentId,
       this.selectedShopId,
@@ -456,20 +488,22 @@ export class ShopPanel {
     }
   }
 
-  private handleSell(world: World, itemId: string): void {
-    if (!this.selectedShopId || !this.selectedAgentId) {
+  private handleSell(world: World | undefined, itemId: string): void {
+    if (!this.selectedShopId || !this.selectedAgentId || !world) {
       return;
     }
 
     // Get TradingSystem
-    const tradingSystem = (world as any).getSystem?.('trading');
-    if (!tradingSystem || !('sellToShop' in tradingSystem)) {
+    const worldWithSystems = world as WorldWithSystems;
+    const tradingSystem = worldWithSystems.getSystem?.('trading');
+    if (!tradingSystem || typeof tradingSystem !== 'object' || !tradingSystem || !('sellToShop' in tradingSystem)) {
       console.error('TradingSystem not found');
       return;
     }
 
     // Sell one item
-    const result = (tradingSystem as any).sellToShop(
+    const typedTradingSystem = tradingSystem as TradingSystemMethods;
+    const result = typedTradingSystem.sellToShop(
       world,
       this.selectedAgentId,
       this.selectedShopId,

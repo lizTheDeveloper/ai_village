@@ -6,12 +6,14 @@
  */
 
 import type { EntityImpl } from '../../ecs/Entity.js';
+import { CT } from '../../types.js';
 import type { World } from '../../ecs/World.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
 import type { SteeringComponent } from '../../components/SteeringComponent.js';
 import type { SocialGradientComponent } from '../../components/SocialGradientComponent.js';
 import type { ResourceType } from '../../components/ResourceComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
+import { ComponentType } from '../../types/ComponentType.js';
 
 /**
  * Navigate behavior - Move to specific (x, y) coordinates
@@ -21,7 +23,7 @@ export class NavigateBehavior extends BaseBehavior {
   readonly name = 'navigate';
 
   execute(entity: EntityImpl, _world: World): BehaviorResult | void {
-    const agent = entity.getComponent<AgentComponent>('agent')!;
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
 
     // Check if we have a target
     if (!agent.behaviorState || !agent.behaviorState.target) {
@@ -32,8 +34,8 @@ export class NavigateBehavior extends BaseBehavior {
     const target = agent.behaviorState.target as { x: number; y: number };
 
     // Use steering system if available
-    if (entity.hasComponent('steering')) {
-      entity.updateComponent<SteeringComponent>('steering', (steering) => ({
+    if (entity.hasComponent(CT.Steering)) {
+      entity.updateComponent<SteeringComponent>(ComponentType.Steering, (steering) => ({
         ...steering,
         behavior: 'arrive',
         target: target,
@@ -48,7 +50,7 @@ export class NavigateBehavior extends BaseBehavior {
     if (distance <= 2.0) {
       // Arrived at target
       this.stopAllMovement(entity);
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         behavior: 'wander',
         behaviorState: {},
@@ -69,7 +71,7 @@ export class ExploreFrontierBehavior extends BaseBehavior {
   execute(entity: EntityImpl, _world: World): BehaviorResult | void {
     // ExplorationSystem handles the heavy lifting based on agent behavior
     // The behavior just indicates we want frontier exploration mode
-    if (!entity.hasComponent('exploration_state')) {
+    if (!entity.hasComponent(CT.ExplorationState)) {
       this.switchTo(entity, 'wander', {});
       return { complete: false, reason: 'No exploration component' };
     }
@@ -86,7 +88,7 @@ export class ExploreSpiralBehavior extends BaseBehavior {
 
   execute(entity: EntityImpl, _world: World): BehaviorResult | void {
     // ExplorationSystem handles the heavy lifting based on agent behavior
-    if (!entity.hasComponent('exploration_state')) {
+    if (!entity.hasComponent(CT.ExplorationState)) {
       this.switchTo(entity, 'wander', {});
       return { complete: false, reason: 'No exploration component' };
     }
@@ -102,15 +104,15 @@ export class FollowGradientBehavior extends BaseBehavior {
   readonly name = 'follow_gradient';
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const agent = entity.getComponent<AgentComponent>('agent')!;
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
 
     // Check if we have social gradient component
-    if (!entity.hasComponent('social_gradient')) {
+    if (!entity.hasComponent(CT.SocialGradient)) {
       this.switchTo(entity, 'wander', {});
       return { complete: false, reason: 'No social gradient component' };
     }
 
-    const socialGradient = entity.getComponent<SocialGradientComponent>('social_gradient');
+    const socialGradient = entity.getComponent<SocialGradientComponent>(ComponentType.SocialGradient);
     if (!socialGradient) {
       return { complete: false, reason: 'Could not get social gradient' };
     }

@@ -4,6 +4,7 @@ import { createMinimalWorld } from '../../__tests__/fixtures/worldFixtures.js';
 import { WildAnimalSpawningSystem } from '../WildAnimalSpawningSystem.js';
 import { AnimalSystem } from '../AnimalSystem.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Integration tests for WildAnimalSpawningSystem + World + AnimalSystem
  *
@@ -149,10 +150,10 @@ describe('WildAnimalSpawningSystem + World + AnimalSystem Integration', () => {
       const animal = spawned[0];
 
       // Should have animal component
-      expect(animal.components.has('animal')).toBe(true);
+      expect(animal.components.has(ComponentType.Animal)).toBe(true);
 
       // Should have position component
-      expect(animal.components.has('position')).toBe(true);
+      expect(animal.components.has(ComponentType.Position)).toBe(true);
     }
   });
 
@@ -170,7 +171,7 @@ describe('WildAnimalSpawningSystem + World + AnimalSystem Integration', () => {
     const spawned = spawningSystem.spawnAnimalsInChunk(harness.world, chunkData);
 
     if (spawned.length > 0) {
-      const animalComponent = spawned[0].components.get('animal') as any;
+      const animalComponent = spawned[0].components.get(ComponentType.Animal) as any;
 
       // Should be wild
       expect(animalComponent.wild).toBe(true);
@@ -200,7 +201,7 @@ describe('WildAnimalSpawningSystem + World + AnimalSystem Integration', () => {
       animalSystem.update(harness.world, entities, 1.0);
 
       // Animals should still be alive and processing
-      const animalComponent = spawned[0].components.get('animal') as any;
+      const animalComponent = spawned[0].components.get(ComponentType.Animal) as any;
       expect(animalComponent).toBeDefined();
       expect(animalComponent.health).toBeGreaterThan(0);
     }

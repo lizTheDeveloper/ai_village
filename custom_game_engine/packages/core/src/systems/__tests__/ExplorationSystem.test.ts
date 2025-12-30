@@ -7,6 +7,7 @@ import { createSteeringComponent } from '../../components/SteeringComponent';
 import { createAgentComponent } from '../../components/AgentComponent';
 import type { EntityImpl } from '../../ecs/Entity';
 
+import { ComponentType } from '../../types/ComponentType.js';
 describe('ExplorationSystem', () => {
   let world: World;
   let system: ExplorationSystem;
@@ -39,7 +40,7 @@ describe('ExplorationSystem', () => {
         system.update(world, world.getAllEntities(), 1.0 + i);
       }
 
-      const updatedState = entityImpl.getComponent('exploration_state');
+      const updatedState = entityImpl.getComponent(ComponentType.ExplorationState);
       const frontier = updatedState?.getFrontierSectors();
 
       // Should identify adjacent unexplored sectors
@@ -67,7 +68,7 @@ describe('ExplorationSystem', () => {
       const targets = [];
       for (let i = 0; i < 20; i++) {
         system.update(world, world.getAllEntities(), 1.0 + i);
-        const state = entityImpl.getComponent('exploration_state');
+        const state = entityImpl.getComponent(ComponentType.ExplorationState);
         if (state?.currentTarget) {
           targets.push({
             x: state.currentTarget.x,
@@ -77,7 +78,7 @@ describe('ExplorationSystem', () => {
       }
 
       // Verify spiral pattern: spiral step should increase
-      const finalState = entityImpl.getComponent('exploration_state');
+      const finalState = entityImpl.getComponent(ComponentType.ExplorationState);
       expect(finalState?.spiralStep).toBeGreaterThan(0);
 
       // Should have generated targets
@@ -102,7 +103,7 @@ describe('ExplorationSystem', () => {
 
       system.update(world, world.getAllEntities(), 150); // 50 ticks later
 
-      const state = entityImpl.getComponent('exploration_state');
+      const state = entityImpl.getComponent(ComponentType.ExplorationState);
       const frontier = state?.getFrontierSectors();
 
       // Should not include recently explored sector
@@ -135,7 +136,7 @@ describe('ExplorationSystem', () => {
 
       system.update(world, world.getAllEntities(), 1.0);
 
-      const steering = entityImpl.getComponent('steering');
+      const steering = entityImpl.getComponent(ComponentType.Steering);
 
       // Should have target set to nearest frontier
       expect(steering?.target).toBeDefined();
@@ -156,7 +157,7 @@ describe('ExplorationSystem', () => {
 
       system.update(world, world.getAllEntities(), 100);
 
-      const state = entityImpl.getComponent('exploration_state');
+      const state = entityImpl.getComponent(ComponentType.ExplorationState);
 
       // Current sector should be marked explored
       expect(state?.exploredSectors.has('5,5')).toBe(true);
@@ -179,14 +180,14 @@ describe('ExplorationSystem', () => {
       entityImpl.addComponent(createSteeringComponent('arrive', 2.0, 0.5));
 
       // Move to target - need to update position
-      const pos = entityImpl.getComponent('position');
+      const pos = entityImpl.getComponent(ComponentType.Position);
       if (pos) {
         entityImpl.updateComponent('position', () => createPositionComponent(96, 80));
       }
 
       system.update(world, world.getAllEntities(), 200);
 
-      const state = entityImpl.getComponent('exploration_state');
+      const state = entityImpl.getComponent(ComponentType.ExplorationState);
 
       // Should have new target
       expect(state?.currentTarget).not.toEqual({ x: 96, y: 80 });
@@ -346,7 +347,7 @@ describe('ExplorationSystem', () => {
       eventBus.subscribe('exploration:milestone', (e: any) => events.push(e));
 
       // Explore enough to hit 90% coverage
-      const state = entityImpl.getComponent('exploration_state');
+      const state = entityImpl.getComponent(ComponentType.ExplorationState);
       if (state) {
         for (let x = 0; x < 10; x++) {
           for (let y = 0; y < 10; y++) {

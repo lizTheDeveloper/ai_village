@@ -3,7 +3,7 @@ import { IntegrationTestHarness } from '../../__tests__/utils/IntegrationTestHar
 import { createMinimalWorld } from '../../__tests__/fixtures/worldFixtures.js';
 import { VerificationSystem } from '../VerificationSystem.js';
 import { TrustNetworkComponent } from '../../components/TrustNetworkComponent.js';
-import { createMemoryComponent } from '../../components/MemoryComponent.js';
+import { MemoryComponent } from '../../components/MemoryComponent.js';
 import { BeliefComponent } from '../../components/BeliefComponent.js';
 
 /**
@@ -34,8 +34,8 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
 
     agent1.addComponent(new TrustNetworkComponent());
     agent2.addComponent(new TrustNetworkComponent());
-    agent1.addComponent(createMemoryComponent());
-    agent2.addComponent(createMemoryComponent());
+    agent1.addComponent(new MemoryComponent(agent1.id));
+    agent2.addComponent(new MemoryComponent(agent2.id));
 
     const entities = Array.from(harness.world.entities.values());
 
@@ -66,8 +66,8 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
 
     agent1.addComponent(trust1);
     agent2.addComponent(trust2);
-    agent1.addComponent(createMemoryComponent());
-    agent2.addComponent(createMemoryComponent());
+    agent1.addComponent(new MemoryComponent(agent1.id));
+    agent2.addComponent(new MemoryComponent(agent2.id));
 
     // Set initial trust
     trust1.trustLevels.set(agent2.id, 0.5);
@@ -102,8 +102,8 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
 
     agent1.addComponent(new TrustNetworkComponent());
     agent2.addComponent(new TrustNetworkComponent());
-    agent1.addComponent(createMemoryComponent());
-    agent2.addComponent(createMemoryComponent());
+    agent1.addComponent(new MemoryComponent(agent1.id));
+    agent2.addComponent(new MemoryComponent(agent2.id));
 
     harness.clearEvents();
 
@@ -155,7 +155,7 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     agent.addComponent(new TrustNetworkComponent());
-    agent.addComponent(createMemoryComponent());
+    agent.addComponent(new MemoryComponent(agent.id));
     agent.addComponent(new BeliefComponent());
 
     const entities = Array.from(harness.world.entities.values());
@@ -171,7 +171,7 @@ describe('VerificationSystem + TrustNetwork Integration', () => {
 
     // Agent without trust network
     const agent = harness.createTestAgent({ x: 10, y: 10 });
-    agent.addComponent(createMemoryComponent());
+    agent.addComponent(new MemoryComponent(agent.id));
 
     const entities = Array.from(harness.world.entities.values());
 

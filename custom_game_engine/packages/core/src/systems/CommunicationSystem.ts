@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -11,7 +12,7 @@ export class CommunicationSystem implements System {
   public readonly id: SystemId = 'communication';
   public readonly priority: number = 15; // Run after AI (10), before movement (20)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
-    'conversation',
+    CT.Conversation,
   ];
 
   private readonly maxConversationDurationSeconds: number = 15; // 15 seconds of conversation
@@ -20,7 +21,7 @@ export class CommunicationSystem implements System {
   update(_world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     for (const entity of entities) {
       const impl = entity as EntityImpl;
-      const conversation = impl.getComponent<ConversationComponent>('conversation');
+      const conversation = impl.getComponent<ConversationComponent>(CT.Conversation);
 
       if (!conversation || !isInConversation(conversation)) continue;
 
@@ -31,15 +32,15 @@ export class CommunicationSystem implements System {
       const partner = _world.getEntity(partnerId);
       if (!partner) {
         // Partner no longer exists, end conversation
-        impl.updateComponent<ConversationComponent>('conversation', endConversation);
+        impl.updateComponent<ConversationComponent>(CT.Conversation, endConversation);
 
         // Clean up timing tracker
         this.conversationStartTimes.delete(entity.id);
 
         // Switch agent back to wandering
-        const agent = impl.getComponent<AgentComponent>('agent');
+        const agent = impl.getComponent<AgentComponent>(CT.Agent);
         if (agent && agent.behavior === 'talk') {
-          impl.updateComponent<AgentComponent>('agent', (current) => ({
+          impl.updateComponent<AgentComponent>(CT.Agent, (current) => ({
             ...current,
             behavior: 'wander',
             behaviorState: {},
@@ -58,32 +59,32 @@ export class CommunicationSystem implements System {
 
       if (durationSeconds > this.maxConversationDurationSeconds) {
         // Conversation has gone on too long, end it
-        impl.updateComponent<ConversationComponent>('conversation', endConversation);
+        impl.updateComponent<ConversationComponent>(CT.Conversation, endConversation);
 
         // Clean up timing tracker
         this.conversationStartTimes.delete(entity.id);
 
         // End partner's conversation too
         const partnerImpl = partner as EntityImpl;
-        const partnerConversation = partnerImpl.getComponent<ConversationComponent>('conversation');
+        const partnerConversation = partnerImpl.getComponent<ConversationComponent>(CT.Conversation);
         if (partnerConversation) {
-          partnerImpl.updateComponent<ConversationComponent>('conversation', endConversation);
+          partnerImpl.updateComponent<ConversationComponent>(CT.Conversation, endConversation);
           this.conversationStartTimes.delete(partnerId);
         }
 
         // Switch both agents back to wandering
-        const agent = impl.getComponent<AgentComponent>('agent');
+        const agent = impl.getComponent<AgentComponent>(CT.Agent);
         if (agent && agent.behavior === 'talk') {
-          impl.updateComponent<AgentComponent>('agent', (current) => ({
+          impl.updateComponent<AgentComponent>(CT.Agent, (current) => ({
             ...current,
             behavior: 'wander',
             behaviorState: {},
           }));
         }
 
-        const partnerAgent = partnerImpl.getComponent<AgentComponent>('agent');
+        const partnerAgent = partnerImpl.getComponent<AgentComponent>(CT.Agent);
         if (partnerAgent && partnerAgent.behavior === 'talk') {
-          partnerImpl.updateComponent<AgentComponent>('agent', (current) => ({
+          partnerImpl.updateComponent<AgentComponent>(CT.Agent, (current) => ({
             ...current,
             behavior: 'wander',
             behaviorState: {},

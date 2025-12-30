@@ -1,4 +1,5 @@
 import { ComponentBase } from '../ecs/Component.js';
+import { ComponentType } from '../types/ComponentType.js';
 
 export interface QueuedAction {
   type: string;
@@ -10,7 +11,7 @@ export interface QueuedAction {
  * Class-based ActionQueue for tests
  */
 export class ActionQueue extends ComponentBase {
-  public readonly type = 'action_queue';
+  public readonly type = ComponentType.ActionQueue;
   private queue: QueuedAction[] = [];
 
   constructor(public entityId: string) {

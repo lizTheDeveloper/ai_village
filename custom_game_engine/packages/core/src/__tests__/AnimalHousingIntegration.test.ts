@@ -9,6 +9,8 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 import type { TemperatureComponent } from '../components/TemperatureComponent.js';
 import type { WeatherComponent } from '../components/WeatherComponent.js';
 
+import { ComponentType } from '../types/ComponentType.js';
+import { BuildingType } from '../types/BuildingType.js';
 describe('Animal Housing - Integration Tests', () => {
   let world: WorldImpl;
   let eventBus: EventBusImpl;
@@ -26,9 +28,9 @@ describe('Animal Housing - Integration Tests', () => {
     it('should apply building insulation to housed animals', () => {
       // Create stable with insulation
       const stableEntity = world.createEntity();
-      const stablePos: PositionComponent = { type: 'position', version: 1, x: 50, y: 50 };
+      const stablePos: PositionComponent = { type: ComponentType.Position, version: 1, x: 50, y: 50 };
       stableEntity.addComponent(stablePos);
-      const stable = createBuildingComponent('stable' as any, 2);
+      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
       stable.isComplete = true;
       stable.insulation = 0.7; // 70% insulation
       stable.baseTemperature = 10; // +10°C
@@ -38,7 +40,7 @@ describe('Animal Housing - Integration Tests', () => {
 
       // Create horse inside stable
       const horseEntity = world.createEntity();
-      const horsePos: PositionComponent = { type: 'position', version: 1, x: 50, y: 50 };
+      const horsePos: PositionComponent = { type: ComponentType.Position, version: 1, x: 50, y: 50 };
       horseEntity.addComponent(horsePos);
 
       const horseData = {
@@ -66,7 +68,7 @@ describe('Animal Housing - Integration Tests', () => {
 
       // Add temperature component to horse (for TemperatureSystem)
       const horseTempComp: TemperatureComponent = {
-        type: 'temperature',
+        type: ComponentType.Temperature,
         version: 1,
         currentTemp: 20,
         comfortMin: 10,
@@ -87,7 +89,7 @@ describe('Animal Housing - Integration Tests', () => {
       // Horse should be comfortable at 10°C (within comfortMin: 10)
       temperatureSystem.update(world, [horseEntity], 1.0);
 
-      const updatedTemp = horseEntity.getComponent('temperature') as TemperatureComponent;
+      const updatedTemp = horseEntity.getComponent(ComponentType.Temperature) as TemperatureComponent;
       expect(updatedTemp.currentTemp).toBeGreaterThanOrEqual(8); // Should be warmer than ambient
       expect(updatedTemp.state).toBe('comfortable'); // Should be comfortable, not cold
     });
@@ -98,9 +100,9 @@ describe('Animal Housing - Integration Tests', () => {
 
       // Housed horse in stable
       const stableEntity = world.createEntity();
-      const stablePos: PositionComponent = { type: 'position', version: 1, x: 50, y: 50 };
+      const stablePos: PositionComponent = { type: ComponentType.Position, version: 1, x: 50, y: 50 };
       stableEntity.addComponent(stablePos);
-      const stable = createBuildingComponent('stable' as any, 2);
+      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
       stable.isComplete = true;
       stable.insulation = 0.8;
       stable.baseTemperature = 12;
@@ -109,7 +111,7 @@ describe('Animal Housing - Integration Tests', () => {
       stableEntity.addComponent(stable);
 
       const housedHorseEntity = world.createEntity();
-      const housedPos: PositionComponent = { type: 'position', version: 1, x: 50, y: 50 };
+      const housedPos: PositionComponent = { type: ComponentType.Position, version: 1, x: 50, y: 50 };
       housedHorseEntity.addComponent(housedPos);
       const housedHorseData = {
         id: 'horse-housed',
@@ -135,7 +137,7 @@ describe('Animal Housing - Integration Tests', () => {
       housedHorseEntity.addComponent(housedHorse);
 
       const housedTempComp: TemperatureComponent = {
-        type: 'temperature',
+        type: ComponentType.Temperature,
         version: 1,
         currentTemp: 20,
         comfortMin: 10,
@@ -148,7 +150,7 @@ describe('Animal Housing - Integration Tests', () => {
 
       // Unhosed horse outside
       const unhousingHorseEntity = world.createEntity();
-      const unhousingPos: PositionComponent = { type: 'position', version: 1, x: 100, y: 100 };
+      const unhousingPos: PositionComponent = { type: ComponentType.Position, version: 1, x: 100, y: 100 };
       unhousingHorseEntity.addComponent(unhousingPos);
       const unhousedHorseData = {
         id: 'horse-unhoused',
@@ -173,7 +175,7 @@ describe('Animal Housing - Integration Tests', () => {
       unhousingHorseEntity.addComponent(unhousedHorse);
 
       const unhousedTempComp: TemperatureComponent = {
-        type: 'temperature',
+        type: ComponentType.Temperature,
         version: 1,
         currentTemp: 20,
         comfortMin: 10,
@@ -188,8 +190,8 @@ describe('Animal Housing - Integration Tests', () => {
       temperatureSystem.update(world, [housedHorseEntity, unhousingHorseEntity], 1.0);
 
       // Housed horse should have warmer temperature
-      const housedTemp = housedHorseEntity.getComponent('temperature') as TemperatureComponent;
-      const unhousedTemp = unhousingHorseEntity.getComponent('temperature') as TemperatureComponent;
+      const housedTemp = housedHorseEntity.getComponent(ComponentType.Temperature) as TemperatureComponent;
+      const unhousedTemp = unhousingHorseEntity.getComponent(ComponentType.Temperature) as TemperatureComponent;
 
       expect(housedTemp.currentTemp).toBeGreaterThan(unhousedTemp.currentTemp);
     });
@@ -197,9 +199,9 @@ describe('Animal Housing - Integration Tests', () => {
     it('should apply weather protection to housed animals during storms', () => {
       // Create chicken coop with weather protection
       const coopEntity = world.createEntity();
-      const coopPos: PositionComponent = { type: 'position', version: 1, x: 30, y: 30 };
+      const coopPos: PositionComponent = { type: ComponentType.Position, version: 1, x: 30, y: 30 };
       coopEntity.addComponent(coopPos);
-      const coop = createBuildingComponent('chicken-coop' as any, 2);
+      const coop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
       coop.isComplete = true;
       coop.weatherProtection = 0.9; // 90% protection
       coop.interior = true;
@@ -208,7 +210,7 @@ describe('Animal Housing - Integration Tests', () => {
 
       // Create chicken inside coop
       const chickenEntity = world.createEntity();
-      const chickenPos: PositionComponent = { type: 'position', version: 1, x: 30, y: 30 };
+      const chickenPos: PositionComponent = { type: ComponentType.Position, version: 1, x: 30, y: 30 };
       chickenEntity.addComponent(chickenPos);
       const chickenData = {
         id: 'chicken-1',
@@ -236,7 +238,7 @@ describe('Animal Housing - Integration Tests', () => {
       // Create storm weather
       const weatherEntity = world.createEntity();
       const weather: WeatherComponent = {
-        type: 'weather',
+        type: ComponentType.Weather,
         version: 1,
         condition: 'rain',
         intensity: 0.8, // Heavy rain
@@ -253,9 +255,9 @@ describe('Animal Housing - Integration Tests', () => {
     it('should not apply building effects to animals outside interior radius', () => {
       // Create barn
       const barnEntity = world.createEntity();
-      const barnPos: PositionComponent = { type: 'position', version: 1, x: 50, y: 50 };
+      const barnPos: PositionComponent = { type: ComponentType.Position, version: 1, x: 50, y: 50 };
       barnEntity.addComponent(barnPos);
-      const barn = createBuildingComponent('barn' as any, 3);
+      const barn = createBuildingComponent(BuildingType.Barn as any, 3);
       barn.isComplete = true;
       barn.insulation = 0.8;
       barn.baseTemperature = 15;
@@ -265,7 +267,7 @@ describe('Animal Housing - Integration Tests', () => {
 
       // Create cow FAR from barn (outside radius)
       const cowEntity = world.createEntity();
-      const cowPos: PositionComponent = { type: 'position', version: 1, x: 60, y: 60 }; // 10 tiles away
+      const cowPos: PositionComponent = { type: ComponentType.Position, version: 1, x: 60, y: 60 }; // 10 tiles away
       cowEntity.addComponent(cowPos);
       const cowData = {
         id: 'cow-1',
@@ -291,7 +293,7 @@ describe('Animal Housing - Integration Tests', () => {
       cowEntity.addComponent(cow);
 
       const cowTempComp: TemperatureComponent = {
-        type: 'temperature',
+        type: ComponentType.Temperature,
         version: 1,
         currentTemp: 20,
         comfortMin: 5,
@@ -311,11 +313,11 @@ describe('Animal Housing - Integration Tests', () => {
     it('should reduce housed animal stress from cleanliness penalty', () => {
       // Create dirty kennel
       const kennelEntity = world.createEntity();
-      const kennel = createBuildingComponent('kennel' as any, 2);
+      const kennel = createBuildingComponent(BuildingType.Kennel as any, 2);
       kennel.isComplete = true;
       kennelEntity.addComponent(kennel);
 
-      const building = kennelEntity.getComponent('building') as BuildingComponent;
+      const building = kennelEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).cleanliness = 25; // Very dirty
       (building as any).currentOccupants = 6;
 
@@ -349,7 +351,7 @@ describe('Animal Housing - Integration Tests', () => {
 
       animalSystem.update(world, [dogEntity], 1.0);
 
-      const updatedAnimal = dogEntity.getComponent('animal') as AnimalComponent;
+      const updatedAnimal = dogEntity.getComponent(ComponentType.Animal) as AnimalComponent;
 
       // With dirty housing, mood should be reduced
       // This will fail until AnimalHousingSystem applies cleanliness penalty
@@ -358,11 +360,11 @@ describe('Animal Housing - Integration Tests', () => {
     it('should improve animal mood when housing is cleaned', () => {
       // Create dirty chicken coop
       const coopEntity = world.createEntity();
-      const coop = createBuildingComponent('chicken-coop' as any, 2);
+      const coop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
       coop.isComplete = true;
       coopEntity.addComponent(coop);
 
-      const building = coopEntity.getComponent('building') as BuildingComponent;
+      const building = coopEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).cleanliness = 20; // Very dirty
       (building as any).currentOccupants = 8;
 
@@ -399,18 +401,18 @@ describe('Animal Housing - Integration Tests', () => {
       // Stress penalty removed, stress decays, mood should improve
       animalSystem.update(world, [chickenEntity], 1.0);
 
-      const updatedAnimal = chickenEntity.getComponent('animal') as AnimalComponent;
+      const updatedAnimal = chickenEntity.getComponent(ComponentType.Animal) as AnimalComponent;
       // Mood should improve after cleaning (stress reduced)
     });
 
     it('should handle animal lifecycle events while housed', () => {
       // Create stable
       const stableEntity = world.createEntity();
-      const stable = createBuildingComponent('stable' as any, 2);
+      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
       stable.isComplete = true;
       stableEntity.addComponent(stable);
 
-      const building = stableEntity.getComponent('building') as BuildingComponent;
+      const building = stableEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).currentOccupants = 1;
 
       // Create very old horse near death
@@ -450,7 +452,7 @@ describe('Animal Housing - Integration Tests', () => {
   describe('Event-Driven Integration', () => {
     it('should emit animal_housed event when animal assigned to housing', () => {
       const coopEntity = world.createEntity();
-      const coop = createBuildingComponent('chicken-coop' as any, 2);
+      const coop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
       coop.isComplete = true;
       coopEntity.addComponent(coop);
 
@@ -488,7 +490,7 @@ describe('Animal Housing - Integration Tests', () => {
 
     it('should emit animal_unhoused event when animal removed from housing', () => {
       const kennelEntity = world.createEntity();
-      const kennel = createBuildingComponent('kennel' as any, 2);
+      const kennel = createBuildingComponent(BuildingType.Kennel as any, 2);
       kennel.isComplete = true;
       kennelEntity.addComponent(kennel);
 
@@ -527,11 +529,11 @@ describe('Animal Housing - Integration Tests', () => {
 
     it('should listen to new_day event and decay cleanliness', () => {
       const barnEntity = world.createEntity();
-      const barn = createBuildingComponent('barn' as any, 3);
+      const barn = createBuildingComponent(BuildingType.Barn as any, 3);
       barn.isComplete = true;
       barnEntity.addComponent(barn);
 
-      const building = barnEntity.getComponent('building') as BuildingComponent;
+      const building = barnEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).cleanliness = 100;
       (building as any).currentOccupants = 12; // Full
 
@@ -550,7 +552,7 @@ describe('Animal Housing - Integration Tests', () => {
 
     it('should listen to tick event for system updates', () => {
       const stableEntity = world.createEntity();
-      const stable = createBuildingComponent('stable' as any, 2);
+      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
       stable.isComplete = true;
       stableEntity.addComponent(stable);
 
@@ -572,9 +574,9 @@ describe('Animal Housing - Integration Tests', () => {
 
       // Create stable
       const stableEntity = world.createEntity();
-      const stablePos: PositionComponent = { type: 'position', version: 1, x: 50, y: 50 };
+      const stablePos: PositionComponent = { type: ComponentType.Position, version: 1, x: 50, y: 50 };
       stableEntity.addComponent(stablePos);
-      const stable = createBuildingComponent('stable' as any, 2);
+      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
       stable.isComplete = true;
       stable.insulation = 0.8;
       stable.baseTemperature = 12;
@@ -583,13 +585,13 @@ describe('Animal Housing - Integration Tests', () => {
       stable.interiorRadius = 3;
       stableEntity.addComponent(stable);
 
-      const building = stableEntity.getComponent('building') as BuildingComponent;
+      const building = stableEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).cleanliness = 60; // Moderately clean
       (building as any).currentOccupants = 2;
 
       // Create horse
       const horseEntity = world.createEntity();
-      const horsePos: PositionComponent = { type: 'position', version: 1, x: 50, y: 50 };
+      const horsePos: PositionComponent = { type: ComponentType.Position, version: 1, x: 50, y: 50 };
       horseEntity.addComponent(horsePos);
       const horseData = {
         id: 'horse-1',
@@ -615,7 +617,7 @@ describe('Animal Housing - Integration Tests', () => {
       horseEntity.addComponent(horse);
 
       const horseTempComp: TemperatureComponent = {
-        type: 'temperature',
+        type: ComponentType.Temperature,
         version: 1,
         currentTemp: 20,
         comfortMin: 10,
@@ -636,8 +638,8 @@ describe('Animal Housing - Integration Tests', () => {
       // 2. Low stress from good cleanliness (AnimalHousingSystem)
       // 3. Good mood from comfort (AnimalSystem)
 
-      const updatedHorse = horseEntity.getComponent('animal') as AnimalComponent;
-      const updatedTemp = horseEntity.getComponent('temperature') as TemperatureComponent;
+      const updatedHorse = horseEntity.getComponent(ComponentType.Animal) as AnimalComponent;
+      const updatedTemp = horseEntity.getComponent(ComponentType.Temperature) as TemperatureComponent;
 
       expect(updatedTemp.state).toBe('comfortable');
       expect(updatedHorse.stress).toBeLessThan(20);
@@ -648,11 +650,11 @@ describe('Animal Housing - Integration Tests', () => {
   describe('Capacity and Assignment Edge Cases', () => {
     it('should reject assignment when housing is at capacity', () => {
       const coopEntity = world.createEntity();
-      const coop = createBuildingComponent('chicken-coop' as any, 2);
+      const coop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
       coop.isComplete = true;
       coopEntity.addComponent(coop);
 
-      const building = coopEntity.getComponent('building') as BuildingComponent;
+      const building = coopEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).animalCapacity = 8;
       (building as any).currentOccupants = 8; // Full
 
@@ -685,12 +687,12 @@ describe('Animal Housing - Integration Tests', () => {
 
     it('should allow reassignment from one housing to another', () => {
       const coop1 = world.createEntity();
-      const building1 = createBuildingComponent('chicken-coop' as any, 2);
+      const building1 = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
       building1.isComplete = true;
       coop1.addComponent(building1);
 
       const coop2 = world.createEntity();
-      const building2 = createBuildingComponent('chicken-coop' as any, 2);
+      const building2 = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
       building2.isComplete = true;
       coop2.addComponent(building2);
 

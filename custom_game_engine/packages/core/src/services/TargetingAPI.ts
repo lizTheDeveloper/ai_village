@@ -18,6 +18,7 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 import type { VisionComponent } from '../components/VisionComponent.js';
 import type { SpatialMemoryComponent } from '../components/SpatialMemoryComponent.js';
 import { getPlant, getResource, getBuilding } from '../utils/componentHelpers.js';
+import { ComponentType } from '../types/ComponentType.js';
 
 /**
  * Target result types - indicates how the target was found
@@ -75,8 +76,8 @@ export class TargetingAPI {
     filter: EntityFilter,
     options?: { maxDistance?: number; minDistance?: number }
   ): Entity | null {
-    const position = entity.getComponent<PositionComponent>('position');
-    const vision = entity.getComponent<VisionComponent>('vision');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const vision = entity.getComponent<VisionComponent>(ComponentType.Vision);
 
     if (!position || !vision) return null;
 
@@ -102,7 +103,7 @@ export class TargetingAPI {
       if (!filter(visibleEntity)) continue;
 
       // Calculate distance
-      const targetPos = (visibleEntity as EntityImpl).getComponent<PositionComponent>('position');
+      const targetPos = (visibleEntity as EntityImpl).getComponent<PositionComponent>(ComponentType.Position);
       if (!targetPos) continue;
 
       const dist = this.distance(position, targetPos);
@@ -128,7 +129,7 @@ export class TargetingAPI {
     world: World,
     filter: EntityFilter
   ): Entity[] {
-    const vision = entity.getComponent<VisionComponent>('vision');
+    const vision = entity.getComponent<VisionComponent>(ComponentType.Vision);
     if (!vision) return [];
 
     const visibleIds = [
@@ -153,23 +154,35 @@ export class TargetingAPI {
    * Get remembered location (may be stale!).
    * Returns null if no memory exists for this category.
    *
-   * TODO: This uses a deprecated internal API of SpatialMemoryComponent.
-   * SpatialMemoryComponent should expose a proper key-value memory interface
-   * or we should create a separate GenericMemoryComponent for non-resource memories.
+   * Uses the memories array with metadata to find stored locations.
+   * Category format: 'resource:wood' maps to SpatialMemory with metadata.category='resource:wood'
    */
   getRememberedLocation(
     entity: EntityImpl,
     category: string
   ): { x: number; y: number; tick: number } | null {
-    const memory = entity.getComponent<SpatialMemoryComponent>('spatial_memory');
+    const memory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
     if (!memory) return null;
 
-    // DEPRECATED: Accessing internal locations map that may not exist
-    // @ts-expect-error - accessing private/non-existent property for backward compatibility
-    const locations = memory.locations as Map<string, { x: number; y: number; tick: number }> | undefined;
+    // Find memory with matching category in metadata
+    const found = memory.memories.find(
+      (m) => m.metadata && (m.metadata as { category?: string }).category === category
+    );
 
-    if (locations && locations.has(category)) {
-      return locations.get(category)!;
+    if (found) {
+      return { x: found.x, y: found.y, tick: found.createdAt };
+    }
+
+    // Also check resource memories for 'resource:X' categories
+    if (category.startsWith('resource:')) {
+      const resourceType = category.slice(9); // Remove 'resource:' prefix
+      const resourceMemories = memory.queryResourceLocations(resourceType);
+      if (resourceMemories.length > 0) {
+        const best = resourceMemories[0];
+        if (best) {
+          return { x: best.position.x, y: best.position.y, tick: best.tick };
+        }
+      }
     }
 
     return null;
@@ -178,7 +191,8 @@ export class TargetingAPI {
   /**
    * Remember a location for future reference.
    *
-   * TODO: This uses a deprecated internal API of SpatialMemoryComponent.
+   * Stores the location in the memories array with metadata.category set.
+   * For 'resource:X' categories, also uses recordResourceLocation for compatibility.
    */
   rememberLocation(
     entity: EntityImpl,
@@ -186,32 +200,59 @@ export class TargetingAPI {
     position: { x: number; y: number },
     tick: number
   ): void {
-    const memory = entity.getComponent<SpatialMemoryComponent>('spatial_memory');
+    const memory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
     if (!memory) return;
 
-    // DEPRECATED: Accessing internal locations map that may not exist
-    // @ts-expect-error - accessing private/non-existent property for backward compatibility
-    const locations = memory.locations as Map<string, { x: number; y: number; tick: number }> | undefined;
+    // For resource categories, use the dedicated resource location API
+    if (category.startsWith('resource:')) {
+      const resourceType = category.slice(9); // Remove 'resource:' prefix
+      memory.recordResourceLocation(resourceType, position, tick);
+      return;
+    }
 
-    if (locations) {
-      locations.set(category, { x: position.x, y: position.y, tick });
+    // For other categories, store in memories array with metadata
+    // First, remove any existing memory with this category
+    const existingIndex = memory.memories.findIndex(
+      (m) => m.metadata && (m.metadata as { category?: string }).category === category
+    );
+    if (existingIndex >= 0) {
+      memory.memories.splice(existingIndex, 1);
+    }
+
+    // Add new memory with category metadata
+    memory.memories.push({
+      type: 'knowledge', // Using 'knowledge' type for generic location memories
+      x: position.x,
+      y: position.y,
+      strength: 100,
+      createdAt: tick,
+      lastReinforced: tick,
+      metadata: { category },
+    });
+
+    // Trim if over limit
+    if (memory.memories.length > memory.maxMemories) {
+      memory.memories.sort((a, b) => a.strength - b.strength);
+      memory.memories.shift();
     }
   }
 
   /**
    * Forget a remembered location.
    *
-   * TODO: This uses a deprecated internal API of SpatialMemoryComponent.
+   * Removes the memory with matching category from the memories array.
+   * Note: Resource memories stored via recordResourceLocation cannot be selectively forgotten.
    */
   forgetLocation(entity: EntityImpl, category: string): void {
-    const memory = entity.getComponent<SpatialMemoryComponent>('spatial_memory');
+    const memory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
     if (!memory) return;
 
-    // DEPRECATED: Accessing internal locations map that may not exist
-    // @ts-expect-error - accessing private/non-existent property for backward compatibility
-    const locations = memory.locations as Map<string, { x: number; y: number; tick: number }> | undefined;
-    if (locations) {
-      locations.delete(category);
+    // Find and remove memory with matching category
+    const existingIndex = memory.memories.findIndex(
+      (m) => m.metadata && (m.metadata as { category?: string }).category === category
+    );
+    if (existingIndex >= 0) {
+      memory.memories.splice(existingIndex, 1);
     }
   }
 
@@ -229,7 +270,7 @@ export class TargetingAPI {
     world: World,
     options: TargetingOptions
   ): TargetResult {
-    const position = entity.getComponent<PositionComponent>('position');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) return { type: 'unknown' };
 
     // First: Try to find visible target
@@ -239,7 +280,7 @@ export class TargetingAPI {
     });
 
     if (visible) {
-      const targetPos = (visible as EntityImpl).getComponent<PositionComponent>('position');
+      const targetPos = (visible as EntityImpl).getComponent<PositionComponent>(ComponentType.Position);
       const dist = targetPos ? this.distance(position, targetPos) : 0;
 
       // Remember this location for future reference
@@ -433,7 +474,7 @@ export function isOtherAgent(selfId: string): EntityFilter {
   return (entity: Entity) => {
     if (entity.id === selfId) return false;
     const impl = entity as EntityImpl;
-    return impl.hasComponent('agent');
+    return impl.hasComponent(ComponentType.Agent);
   };
 }
 

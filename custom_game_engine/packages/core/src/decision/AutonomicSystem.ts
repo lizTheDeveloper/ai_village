@@ -14,6 +14,7 @@ import type { CircadianComponent } from '../components/CircadianComponent.js';
 import type { TemperatureComponent } from '../components/TemperatureComponent.js';
 import type { AgentBehavior, AgentComponent } from '../components/AgentComponent.js';
 import type { World } from '../ecs/World.js';
+import { ComponentType } from '../types/ComponentType.js';
 
 /** Ticks of idleness before boredom triggers wander (~5 game minutes at 20 TPS) */
 const BOREDOM_THRESHOLD_TICKS = 100;
@@ -45,7 +46,7 @@ export interface AutonomicResult {
  * const result = autonomic.check(entity);
  * if (result) {
  *   // Apply autonomic behavior
- *   entity.updateComponent('agent', c => ({ ...c, behavior: result.behavior }));
+ *   entity.updateComponent(ComponentType.Agent, c => ({ ...c, behavior: result.behavior }));
  * }
  * ```
  */
@@ -55,12 +56,12 @@ export class AutonomicSystem {
    * Returns null if no override is needed.
    */
   check(entity: EntityImpl, world?: World): AutonomicResult | null {
-    const needs = entity.getComponent<NeedsComponent>('needs');
+    const needs = entity.getComponent<NeedsComponent>(ComponentType.Needs);
     if (!needs) return null;
 
-    const circadian = entity.getComponent<CircadianComponent>('circadian');
-    const temperature = entity.getComponent<TemperatureComponent>('temperature');
-    const agent = entity.getComponent<AgentComponent>('agent');
+    const circadian = entity.getComponent<CircadianComponent>(ComponentType.Circadian);
+    const temperature = entity.getComponent<TemperatureComponent>(ComponentType.Temperature);
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
 
     // First check survival needs
     const needsResult = this.checkNeeds(needs, circadian || undefined, temperature || undefined);
@@ -76,22 +77,37 @@ export class AutonomicSystem {
   }
 
   /**
-   * Check if agent is bored from being idle too long.
-   * Triggers wander behavior when idle for > BOREDOM_THRESHOLD_TICKS.
+   * Check if agent is bored from being idle or wandering too long.
+   * - Idle -> wander after BOREDOM_THRESHOLD_TICKS
+   * - Wander -> explore after 2x BOREDOM_THRESHOLD_TICKS (to break wander loops)
    */
   checkBoredom(agent: AgentComponent, currentTick: number): AutonomicResult | null {
-    // Only check if agent is idle and we have a start time
-    if (agent.behavior !== 'idle' || agent.idleStartTick === undefined) {
-      return null;
+    // Check if agent is idle
+    if (agent.behavior === 'idle' && agent.idleStartTick !== undefined) {
+      const idleDuration = currentTick - agent.idleStartTick;
+      if (idleDuration >= BOREDOM_THRESHOLD_TICKS) {
+        return {
+          behavior: 'wander',
+          priority: 10, // Low priority - can be interrupted by any need
+          reason: `Bored (idle for ${idleDuration} ticks)`,
+        };
+      }
     }
 
-    const idleDuration = currentTick - agent.idleStartTick;
-    if (idleDuration >= BOREDOM_THRESHOLD_TICKS) {
-      return {
-        behavior: 'wander',
-        priority: 10, // Low priority - can be interrupted by any need
-        reason: `Bored (idle for ${idleDuration} ticks)`,
-      };
+    // Check if agent is stuck wandering too long (break the wander loop)
+    if (agent.behavior === 'wander') {
+      const wanderStartTick = agent.behaviorState?.wanderStartTick as number | undefined;
+      if (wanderStartTick !== undefined) {
+        const wanderDuration = currentTick - wanderStartTick;
+        // After wandering for 2x boredom threshold, switch to explore to find something useful
+        if (wanderDuration >= BOREDOM_THRESHOLD_TICKS * 2) {
+          return {
+            behavior: 'explore',
+            priority: 15, // Slightly higher than wander
+            reason: `Wandering too long (${wanderDuration} ticks), exploring for activities`,
+          };
+        }
+      }
     }
 
     return null;
@@ -116,18 +132,18 @@ export class AutonomicSystem {
       return {
         behavior: 'forced_sleep',
         priority: 100,
-        reason: `Critical exhaustion (energy: ${needs.energy.toFixed(1)})`,
+        reason: `Critical exhaustion (energy: ${(needs.energy * 100).toFixed(0)}%)`,
       };
     }
 
-    // Low energy threshold: < 30 energy = seek sleep
-    // Increased from 10 to give agents time to find bed before collapsing
+    // Low energy threshold: < 0.3 (30%) energy = seek sleep
+    // Increased from 0.1 to give agents time to find bed before collapsing
     // At working rate of 4.8 energy/hour, this gives ~4 hours buffer before collapse
-    if (needs.energy < 30) {
+    if (needs.energy < 0.3) {
       return {
         behavior: 'seek_sleep',
         priority: 85,
-        reason: `Low energy (energy: ${needs.energy.toFixed(1)})`,
+        reason: `Low energy (energy: ${(needs.energy * 100).toFixed(0)}%)`,
       };
     }
 
@@ -160,13 +176,13 @@ export class AutonomicSystem {
       }
     }
 
-    // Hunger critical threshold: 10 (very hungry, but can still function)
+    // Hunger critical threshold: 0.1 (10%) (very hungry, but can still function)
     // Only interrupt if NOT critically exhausted (energy > 0)
-    if (needs.hunger < 10 && needs.energy > 0) {
+    if (needs.hunger < 0.1 && needs.energy > 0) {
       return {
         behavior: 'seek_food',
         priority: 80,
-        reason: `Critical hunger (hunger: ${needs.hunger.toFixed(1)})`,
+        reason: `Critical hunger (hunger: ${(needs.hunger * 100).toFixed(0)}%)`,
       };
     }
 
@@ -181,12 +197,12 @@ export class AutonomicSystem {
     }
 
     // Moderate hunger: seek food (but not urgent enough to interrupt sleep)
-    // TEMP: Lower threshold to 60 for testing berry gathering
-    if (needs.hunger < 60) {
+    // TEMP: Lower threshold to 0.6 (60%) for testing berry gathering
+    if (needs.hunger < 0.6) {
       return {
         behavior: 'seek_food',
         priority: 40,
-        reason: `Hungry (hunger: ${needs.hunger.toFixed(1)})`,
+        reason: `Hungry (hunger: ${(needs.hunger * 100).toFixed(0)}%)`,
       };
     }
 

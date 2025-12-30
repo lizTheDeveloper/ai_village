@@ -3,9 +3,10 @@ import { WorldImpl } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { GoalGenerationSystem } from '../GoalGenerationSystem.js';
-import { createPersonalityComponent } from '../../components/PersonalityComponent.js';
+import { PersonalityComponent } from '../../components/PersonalityComponent.js';
 import { GoalsComponent } from '../../components/GoalsComponent.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Integration tests for GoalGenerationSystem
  *
@@ -55,7 +56,7 @@ describe('GoalGenerationSystem Integration', () => {
 
     // Create agent with personality and goals components
     const agent = new EntityImpl(createEntityId(), 0);
-    agent.addComponent(createPersonalityComponent({
+    agent.addComponent(new PersonalityComponent({
       openness: 0.7,
       conscientiousness: 0.8,
       extraversion: 0.5,
@@ -86,14 +87,14 @@ describe('GoalGenerationSystem Integration', () => {
     Math.random = originalRandom;
 
     // Should have formed a goal
-    const goalsComp = agent.getComponent('goals') as GoalsComponent;
+    const goalsComp = agent.getComponent(ComponentType.Goals) as GoalsComponent;
     expect(goalsComp.getActiveGoalCount()).toBe(1);
     expect(goalFormationHandler).toHaveBeenCalled();
   });
 
   it('should NOT generate goal when agent already has 3 or more goals', () => {
     const agent = new EntityImpl(createEntityId(), 0);
-    agent.addComponent(createPersonalityComponent({
+    agent.addComponent(new PersonalityComponent({
       openness: 0.7,
       conscientiousness: 0.8,
       extraversion: 0.5,
@@ -151,7 +152,7 @@ describe('GoalGenerationSystem Integration', () => {
       const trialSystem = new GoalGenerationSystem(trialEventBus);
 
       const agent = new EntityImpl(createEntityId(), 0);
-      agent.addComponent(createPersonalityComponent({
+      agent.addComponent(new PersonalityComponent({
         openness: 0.3,
         conscientiousness: 0.9, // Very high conscientiousness
         extraversion: 0.3,
@@ -182,7 +183,7 @@ describe('GoalGenerationSystem Integration', () => {
       flushAll(trialEventBus);
       Math.random = originalRandom;
 
-      const goalsComp = agent.getComponent('goals') as GoalsComponent;
+      const goalsComp = agent.getComponent(ComponentType.Goals) as GoalsComponent;
       const goals = goalsComp.getActiveGoals();
 
       if (goals.length > 0) {
@@ -209,7 +210,7 @@ describe('GoalGenerationSystem Integration', () => {
     // Use simple numeric ID to avoid UUID dash parsing issues in implementation
     const agentId = 'agent1';
     const agent = new EntityImpl(agentId, 0);
-    agent.addComponent(createPersonalityComponent({
+    agent.addComponent(new PersonalityComponent({
       openness: 0.5,
       conscientiousness: 0.5,
       extraversion: 0.5,
@@ -257,7 +258,7 @@ describe('GoalGenerationSystem Integration', () => {
   it('should emit milestone events when milestones are reached', () => {
     const agentId = 'agent2';
     const agent = new EntityImpl(agentId, 0);
-    agent.addComponent(createPersonalityComponent({
+    agent.addComponent(new PersonalityComponent({
       openness: 0.5,
       conscientiousness: 0.5,
       extraversion: 0.5,
@@ -308,7 +309,7 @@ describe('GoalGenerationSystem Integration', () => {
   it('should emit goal completion event when goal reaches 100%', () => {
     const agentId = 'agent3';
     const agent = new EntityImpl(agentId, 0);
-    agent.addComponent(createPersonalityComponent({
+    agent.addComponent(new PersonalityComponent({
       openness: 0.5,
       conscientiousness: 0.5,
       extraversion: 0.5,
@@ -359,7 +360,7 @@ describe('GoalGenerationSystem Integration', () => {
 
   it('should NOT update progress for irrelevant actions', () => {
     const agent = new EntityImpl(createEntityId(), 0);
-    agent.addComponent(createPersonalityComponent({
+    agent.addComponent(new PersonalityComponent({
       openness: 0.5,
       conscientiousness: 0.5,
       extraversion: 0.5,
@@ -401,7 +402,7 @@ describe('GoalGenerationSystem Integration', () => {
   it('should handle multiple goals and update only relevant ones', () => {
     const agentId = 'agent4';
     const agent = new EntityImpl(agentId, 0);
-    agent.addComponent(createPersonalityComponent({
+    agent.addComponent(new PersonalityComponent({
       openness: 0.5,
       conscientiousness: 0.5,
       extraversion: 0.5,
@@ -465,7 +466,7 @@ describe('GoalGenerationSystem Integration', () => {
       (testEventBus as any).world = testWorld;
 
       const agent = new EntityImpl(createEntityId(), 0);
-      agent.addComponent(createPersonalityComponent({
+      agent.addComponent(new PersonalityComponent({
         openness: 0.5,
         conscientiousness: 0.5,
         extraversion: 0.5,
@@ -483,7 +484,7 @@ describe('GoalGenerationSystem Integration', () => {
 
       testEventBus.flush();
 
-      const goalsComp = agent.getComponent('goals') as GoalsComponent;
+      const goalsComp = agent.getComponent(ComponentType.Goals) as GoalsComponent;
       if (goalsComp.getActiveGoalCount() > 0) {
         goalsFormedCount++;
       }

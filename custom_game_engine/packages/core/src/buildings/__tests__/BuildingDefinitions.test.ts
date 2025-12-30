@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import type { BuildingBlueprint, BuildingCategory } from '../BuildingBlueprintRegistry.js';
 import { BuildingBlueprintRegistry } from '../BuildingBlueprintRegistry.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Building Function type definitions - per spec REQ-CON-003
  * These tests verify the BuildingFunction type exists and is properly defined.
@@ -45,7 +46,7 @@ describe('BuildingFunction Types', () => {
 
     it('should define shop function type', () => {
       const shopFunction: any = {
-        type: 'shop',
+        type: ComponentType.Shop,
         shopType: 'general',
       };
 
@@ -187,8 +188,7 @@ describe('BuildingCategory Types', () => {
     it('should have actual buildings for all 8 categories including research and decoration', () => {
       const registry = new BuildingBlueprintRegistry();
       registry.registerDefaults();
-      registry.registerTier2Stations();
-      registry.registerTier3Stations();
+    // Note: registerDefaults() already calls registerTier2Stations() and registerTier3Stations()
       registry.registerExampleBuildings(); // Includes decoration, research examples
 
       // Verify ALL 8 categories have at least one building

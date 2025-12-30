@@ -167,6 +167,12 @@ export class GameLoop {
 
     // Execute each system
     for (const system of systems) {
+      // Skip undefined or malformed systems
+      if (!system || !system.id || !system.requiredComponents) {
+        console.error('[GameLoop] Skipping malformed system:', system);
+        continue;
+      }
+
       const systemStart = performance.now();
 
       try {
@@ -257,6 +263,12 @@ export class GameLoop {
 
     // Final flush for tick-end events
     this.eventBus.flush();
+
+    // Prune event history periodically to prevent memory leaks
+    // Keep last 5000 ticks of history, prune every 1000 ticks
+    if (this._world.tick % 1000 === 0) {
+      this.eventBus.pruneHistory(this._world.tick - 5000);
+    }
 
     // Update stats
     const tickTime = performance.now() - tickStart;

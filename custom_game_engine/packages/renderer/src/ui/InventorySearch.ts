@@ -1,4 +1,4 @@
-import type { InventoryComponent } from '@ai-village/core';
+import type { InventoryComponent, InventorySlot } from '@ai-village/core';
 
 export interface FilteredItem {
   itemId: string;
@@ -176,7 +176,7 @@ export class InventorySearch {
       return [];
     }
 
-    return this.inventory.slots.map((_, index) => {
+    return this.inventory.slots.map((_: InventorySlot, index: number) => {
       return this.visualStates.get(index) || { highlighted: false, dimmed: false };
     });
   }
@@ -212,7 +212,7 @@ export class InventorySearch {
     const results: FilteredItem[] = [];
     const hasFilters = this.searchText || this.typeFilter || this.rarityFilter;
 
-    this.inventory.slots.forEach((slot, index) => {
+    this.inventory.slots.forEach((slot: InventorySlot, index: number) => {
       if (!slot.itemId || slot.quantity === 0) {
         // Empty slot
         if (hasFilters) {

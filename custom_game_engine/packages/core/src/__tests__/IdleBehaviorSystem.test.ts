@@ -7,6 +7,7 @@ import { PersonalityComponent } from '../components/PersonalityComponent';
 import { ActionQueue } from '../actions/ActionQueueClass';
 import type { IdleBehaviorType } from '../systems/IdleBehaviorSystem';
 
+import { ComponentType } from '../types/ComponentType.js';
 describe('IdleBehaviorSystem', () => {
   let world: World;
   let system: IdleBehaviorSystem;
@@ -32,7 +33,7 @@ describe('IdleBehaviorSystem', () => {
 
       system.update(world, 1);
 
-      const queue = entity.getComponent('action_queue') as ActionQueue;
+      const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
       expect(queue.isEmpty()).toBe(false);
     });
 
@@ -66,7 +67,7 @@ describe('IdleBehaviorSystem', () => {
       entity.addComponent(new NeedsComponent());
       entity.addComponent(new ActionQueue(entity.id));
 
-      const queue = entity.getComponent('action_queue') as ActionQueue;
+      const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
       const initialSize = queue.size();
 
       // Should not throw, just skip the entity
@@ -95,7 +96,7 @@ describe('IdleBehaviorSystem', () => {
       // Run multiple times to get statistical distribution
       const behaviors: IdleBehaviorType[] = [];
       for (let i = 0; i < 50; i++) {
-        const queue = entity.getComponent('action_queue') as ActionQueue;
+        const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         queue.clear();
         system.update(world, 1);
         const action = queue.peek();
@@ -123,7 +124,7 @@ describe('IdleBehaviorSystem', () => {
 
       const behaviors: IdleBehaviorType[] = [];
       for (let i = 0; i < 50; i++) {
-        const queue = entity.getComponent('action_queue') as ActionQueue;
+        const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         queue.clear();
         system.update(world, 1);
         const action = queue.peek();
@@ -150,7 +151,7 @@ describe('IdleBehaviorSystem', () => {
 
       const behaviors: IdleBehaviorType[] = [];
       for (let i = 0; i < 50; i++) {
-        const queue = entity.getComponent('action_queue') as ActionQueue;
+        const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         queue.clear();
         system.update(world, 1);
         const action = queue.peek();
@@ -181,7 +182,7 @@ describe('IdleBehaviorSystem', () => {
 
       const behaviors: IdleBehaviorType[] = [];
       for (let i = 0; i < 50; i++) {
-        const queue = entity.getComponent('action_queue') as ActionQueue;
+        const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         queue.clear();
         system.update(world, 1);
         const action = queue.peek();
@@ -212,7 +213,7 @@ describe('IdleBehaviorSystem', () => {
 
       const behaviors: IdleBehaviorType[] = [];
       for (let i = 0; i < 50; i++) {
-        const queue = entity.getComponent('action_queue') as ActionQueue;
+        const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         queue.clear();
         system.update(world, 1);
         const action = queue.peek();
@@ -241,7 +242,7 @@ describe('IdleBehaviorSystem', () => {
 
       const behaviors: IdleBehaviorType[] = [];
       for (let i = 0; i < 50; i++) {
-        const queue = entity.getComponent('action_queue') as ActionQueue;
+        const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         queue.clear();
         system.update(world, 1);
         const action = queue.peek();
@@ -270,7 +271,7 @@ describe('IdleBehaviorSystem', () => {
 
       system.update(world, 1);
 
-      const queue = entity.getComponent('action_queue') as ActionQueue;
+      const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
       const action = queue.peek();
       expect(action?.priority).toBeLessThan(0.4); // Low priority
     });
@@ -291,7 +292,7 @@ describe('IdleBehaviorSystem', () => {
 
       const behaviors = new Set<string>();
       for (let i = 0; i < 100; i++) {
-        const queue = entity.getComponent('action_queue') as ActionQueue;
+        const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
         queue.clear();
         system.update(world, 1);
         const action = queue.peek();

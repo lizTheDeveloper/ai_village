@@ -27,10 +27,22 @@ const SPIRAL_SEARCH_STEP = 50;
 const MAX_SPIRAL_ITERATIONS = 100;
 const RESIZE_HANDLE_SIZE = 16; // Size of the resize handle in the lower right corner
 
+/**
+ * Type guard to check if an object has a setScreenPosition method
+ */
+function hasSetScreenPosition(obj: unknown): obj is { setScreenPosition(x: number, y: number): void } {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    'setScreenPosition' in obj &&
+    typeof (obj as Record<string, unknown>).setScreenPosition === 'function'
+  );
+}
+
 export class WindowManager {
   private windows: Map<string, ManagedWindow> = new Map();
   private nextZIndex: number = 1;
-  private eventListeners: Map<string, Array<(data: any) => void>> = new Map();
+  private eventListeners: Map<string, Array<(data: unknown) => void>> = new Map();
   // Store logical (CSS) dimensions separately from physical canvas buffer
   private logicalWidth: number = 0;
   private logicalHeight: number = 0;
@@ -940,7 +952,7 @@ export class WindowManager {
    * @param ctx Canvas rendering context
    * @param world Optional world instance to pass to panels that need it
    */
-  public render(ctx: CanvasRenderingContext2D, world?: any): void {
+  public render(ctx: CanvasRenderingContext2D, world?: unknown): void {
     // Sort windows by z-index
     const sortedWindows = Array.from(this.windows.values())
       .filter(w => w.visible)
@@ -955,7 +967,7 @@ export class WindowManager {
   /**
    * Render a single window
    */
-  private renderWindow(ctx: CanvasRenderingContext2D, window: ManagedWindow, world?: any): void {
+  private renderWindow(ctx: CanvasRenderingContext2D, window: ManagedWindow, world?: unknown): void {
     // Draw window background (only title bar height when minimized)
     ctx.fillStyle = '#2a2a2a';
     ctx.fillRect(window.x, window.y, window.width, window.minimized ? TITLE_BAR_HEIGHT : window.height);
@@ -987,9 +999,8 @@ export class WindowManager {
       ctx.translate(window.x, contentY);
 
       // Notify panel of its screen position (for HTML overlay elements)
-      const panelAny = window.panel as any;
-      if (typeof panelAny.setScreenPosition === 'function') {
-        panelAny.setScreenPosition(window.x, contentY);
+      if (hasSetScreenPosition(window.panel)) {
+        window.panel.setScreenPosition(window.x, contentY);
       }
 
       // Pass (0, 0) as position since we've already translated
@@ -1062,7 +1073,7 @@ export class WindowManager {
   /**
    * Event emitter - emit an event
    */
-  private emit(event: string, data: any): void {
+  private emit(event: string, data: unknown): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
       listeners.forEach(listener => listener(data));
@@ -1072,10 +1083,62 @@ export class WindowManager {
   /**
    * Event emitter - register a listener
    */
-  public on(event: string, callback: (data: any) => void): void {
+  public on(event: string, callback: (data: unknown) => void): void {
     if (!this.eventListeners.has(event)) {
       this.eventListeners.set(event, []);
     }
     this.eventListeners.get(event)!.push(callback);
+  }
+
+  // ============================================================================
+  // View-Based Panel Registration
+  // ============================================================================
+
+  /**
+   * Register panels from the DashboardView registry.
+   * This enables automatic panel creation from unified view definitions.
+   *
+   * @param viewPanels - Array of panels and their configs from ViewPanelFactory
+   */
+  public registerViewPanels(viewPanels: Array<{ panel: IWindowPanel; config: WindowConfig }>): void {
+    for (const { panel, config } of viewPanels) {
+      const id = panel.getId();
+
+      // Skip if already registered
+      if (this.windows.has(id)) {
+        console.warn(`[WindowManager] Panel '${id}' already registered, skipping`);
+        continue;
+      }
+
+      this.registerWindow(id, panel, config);
+    }
+  }
+
+  /**
+   * Subscribe to view registry changes to auto-add new views.
+   * When new views are registered, they are automatically added to the window system.
+   *
+   * @param createPanelsCallback - Function that creates panels from the registry
+   * @returns Unsubscribe function
+   */
+  public subscribeToViewRegistry(
+    createPanelsCallback: () => Array<{ panel: IWindowPanel; config: WindowConfig }>
+  ): () => void {
+    // Import viewRegistry only when needed to avoid circular dependencies
+    const onViewRegistryChange = (): void => {
+      const newPanels = createPanelsCallback();
+      this.registerViewPanels(newPanels);
+    };
+
+    // Call immediately to register existing views
+    onViewRegistryChange();
+
+    // Subscribe to future changes (if viewRegistry has subscribe method)
+    // For now, we only register once on setup
+    // TODO: Wire up viewRegistry.subscribe() when needed
+
+    return () => {
+      // Unsubscribe logic would go here
+    };
   }
 }

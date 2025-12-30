@@ -5,6 +5,7 @@ import { AnimalHousingSystem } from '../AnimalHousingSystem.js';
 import { AnimalSystem } from '../AnimalSystem.js';
 import { BuildingSystem } from '../BuildingSystem.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Integration tests for AnimalHousingSystem + AnimalSystem + BuildingSystem
  *
@@ -42,7 +43,7 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     housingSystem.update(harness.world, entities, 1.0);
 
     // Should process without errors
-    expect(coop.getComponent('building')).toBeDefined();
+    expect(coop.getComponent(ComponentType.Building)).toBeDefined();
   });
 
   it('should housing with animals track occupancy', () => {
@@ -60,7 +61,7 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     // Create actual animal entities with housingBuildingId set to the coop
     const chicken1 = harness.world.createEntity('chicken-1');
     (chicken1 as any).addComponent({
-      type: 'animal',
+      type: ComponentType.Animal,
       id: 'chicken-1',
       speciesId: 'chicken',
       housingBuildingId: coop.id,
@@ -74,11 +75,11 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
       wild: false,
       trustLevel: 50,
     });
-    (chicken1 as any).addComponent({ type: 'position', version: 1, x: 10, y: 10 });
+    (chicken1 as any).addComponent({ type: ComponentType.Position, version: 1, x: 10, y: 10 });
 
     const chicken2 = harness.world.createEntity('chicken-2');
     (chicken2 as any).addComponent({
-      type: 'animal',
+      type: ComponentType.Animal,
       id: 'chicken-2',
       speciesId: 'chicken',
       housingBuildingId: coop.id,
@@ -92,13 +93,13 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
       wild: false,
       trustLevel: 50,
     });
-    (chicken2 as any).addComponent({ type: 'position', version: 1, x: 10, y: 10 });
+    (chicken2 as any).addComponent({ type: ComponentType.Position, version: 1, x: 10, y: 10 });
 
     const entities = Array.from(harness.world.entities.values());
 
     housingSystem.update(harness.world, entities, 1.0);
 
-    const building = coop.getComponent('building') as any;
+    const building = coop.getComponent(ComponentType.Building) as any;
 
     // Occupancy should be tracked from actual animals with housingBuildingId
     expect(building.currentOccupants.length).toBe(2);
@@ -121,7 +122,7 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
     animal.addComponent({
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'chicken-1',
       speciesId: 'chicken',
@@ -147,7 +148,7 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     animalSystem.update(harness.world, entities, 1.0);
 
     // Animal should receive housing benefits
-    const animalComp = animal.getComponent('animal') as any;
+    const animalComp = animal.getComponent(ComponentType.Animal) as any;
     expect(animalComp).toBeDefined();
   });
 
@@ -191,7 +192,7 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     // Update housing system
     housingSystem.update(harness.world, entities, 1.0);
 
-    const building = coop.getComponent('building') as any;
+    const building = coop.getComponent(ComponentType.Building) as any;
 
     // Cleanliness should not decay without animals
     expect(building.cleanliness).toBe(initialCleanliness);
@@ -225,7 +226,7 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     housingSystem.update(harness.world, entities, 1.0);
 
     // Building should be complete or progressing
-    const building = coop.getComponent('building') as any;
+    const building = coop.getComponent(ComponentType.Building) as any;
     expect(building.progress).toBeGreaterThanOrEqual(80);
   });
 
@@ -259,7 +260,7 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
     animal.addComponent({
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'chicken-1',
       speciesId: 'chicken',
@@ -284,7 +285,7 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     housingSystem.update(harness.world, entities, 1.0);
 
     // Animal without housing should be skipped
-    expect(animal.getComponent('animal')).toBeDefined();
+    expect(animal.getComponent(ComponentType.Animal)).toBeDefined();
   });
 
   it('should multiple housing buildings process independently', () => {
@@ -313,7 +314,7 @@ describe('AnimalHousingSystem + AnimalSystem + BuildingSystem Integration', () =
     housingSystem.update(harness.world, entities, 1.0);
 
     // Both buildings should be processed
-    expect(coop1.getComponent('building')).toBeDefined();
-    expect(coop2.getComponent('building')).toBeDefined();
+    expect(coop1.getComponent(ComponentType.Building)).toBeDefined();
+    expect(coop2.getComponent(ComponentType.Building)).toBeDefined();
   });
 });

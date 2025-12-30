@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType, Position } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -17,12 +18,12 @@ type Vector2 = Position;
  * Supports: seek, arrive, obstacle avoidance, wander, and combined behaviors
  */
 export class SteeringSystem implements System {
-  public readonly id: SystemId = 'steering';
+  public readonly id: SystemId = CT.Steering;
   public readonly priority: number = 15; // After AISystem (10), before Movement (20)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
-    'steering',
-    'position',
-    'velocity',
+    CT.Steering,
+    CT.Position,
+    CT.Velocity,
   ];
 
   // Track stuck agents for pathfinding fallback
@@ -30,7 +31,7 @@ export class SteeringSystem implements System {
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     // Get entities with steering component
-    const steeringEntities = entities.filter(e => e.components.has('steering'));
+    const steeringEntities = entities.filter(e => e.components.has(CT.Steering));
 
     for (const entity of steeringEntities) {
       try {
@@ -105,12 +106,12 @@ export class SteeringSystem implements System {
     const speed = Math.sqrt(newVx * newVx + newVy * newVy);
     if (speed > steering.maxSpeed) {
       const scale = steering.maxSpeed / speed;
-      setComponentProperties<VelocityComponent>(impl, 'velocity', {
+      setComponentProperties<VelocityComponent>(impl, CT.Velocity, {
         vx: newVx * scale,
         vy: newVy * scale,
       });
     } else {
-      setComponentProperties<VelocityComponent>(impl, 'velocity', {
+      setComponentProperties<VelocityComponent>(impl, CT.Velocity, {
         vx: newVx,
         vy: newVy,
       });
@@ -368,7 +369,7 @@ export class SteeringSystem implements System {
       return { x: 0, y: 0 };
     }
 
-    let combined = { x: 0, y: 0 };
+    const combined = { x: 0, y: 0 };
 
     for (const behavior of steering.behaviors) {
       const weight = behavior.weight ?? 1.0;

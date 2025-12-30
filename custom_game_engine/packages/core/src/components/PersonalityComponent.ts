@@ -10,148 +10,166 @@ export interface PersonalityTraits {
   creativity?: number;
   generosity?: number;
   leadership?: number;
+  spirituality?: number;
 }
 
 /**
- * Class-based PersonalityComponent for tests and new systems
- * Traits are 0-1.0 scale
+ * Personality component based on Big Five + game-specific traits.
+ * All traits are on 0-1.0 scale (0 = low, 1 = high)
  */
 export class PersonalityComponent extends ComponentBase {
   public readonly type = 'personality';
+
+  /** Openness: 0 = cautious/traditional, 1 = curious/adventurous */
   public openness: number;
+
+  /** Conscientiousness: 0 = spontaneous/flexible, 1 = organized/disciplined */
   public conscientiousness: number;
+
+  /** Extraversion: 0 = quiet/introspective, 1 = outgoing/social */
   public extraversion: number;
+
+  /** Agreeableness: 0 = independent/competitive, 1 = helpful/cooperative */
   public agreeableness: number;
+
+  /** Neuroticism: 0 = resilient, 1 = sensitive */
   public neuroticism: number;
+
+  /** Work ethic: 0 = relaxed/carefree, 1 = hardworking/dedicated */
   public workEthic: number;
+
+  /** Creativity: 0 = conventional, 1 = innovative */
   public creativity: number;
+
+  /** Generosity: 0 = self-focused, 1 = sharing/helping */
   public generosity: number;
+
+  /** Leadership: 0 = prefers to follow, 1 = natural leader */
   public leadership: number;
+
+  /** Spirituality: 0 = skeptical/rational, 1 = deeply spiritual/divine connection */
+  public spirituality: number;
 
   constructor(traits: PersonalityTraits) {
     super();
+
+    // Validate required Big Five traits
+    if (traits.openness === undefined) {
+      throw new Error('PersonalityComponent requires openness trait');
+    }
+    if (traits.conscientiousness === undefined) {
+      throw new Error('PersonalityComponent requires conscientiousness trait');
+    }
+    if (traits.extraversion === undefined) {
+      throw new Error('PersonalityComponent requires extraversion trait');
+    }
+    if (traits.agreeableness === undefined) {
+      throw new Error('PersonalityComponent requires agreeableness trait');
+    }
+    if (traits.neuroticism === undefined) {
+      throw new Error('PersonalityComponent requires neuroticism trait');
+    }
+
+    // Validate trait ranges
+    const validateRange = (value: number, name: string) => {
+      if (value < 0 || value > 1) {
+        throw new Error(`${name} must be in range 0-1, got ${value}`);
+      }
+    };
+
+    validateRange(traits.openness, 'openness');
+    validateRange(traits.conscientiousness, 'conscientiousness');
+    validateRange(traits.extraversion, 'extraversion');
+    validateRange(traits.agreeableness, 'agreeableness');
+    validateRange(traits.neuroticism, 'neuroticism');
+
     this.openness = traits.openness;
     this.conscientiousness = traits.conscientiousness;
     this.extraversion = traits.extraversion;
     this.agreeableness = traits.agreeableness;
     this.neuroticism = traits.neuroticism;
+
     // Derive game-specific traits from Big Five if not provided
     this.workEthic = traits.workEthic ?? traits.conscientiousness;
     this.creativity = traits.creativity ?? traits.openness;
     this.generosity = traits.generosity ?? traits.agreeableness;
-    this.leadership = traits.leadership ?? (traits.extraversion * 0.6 + traits.conscientiousness * 0.4);
+    this.leadership =
+      traits.leadership ?? traits.extraversion * 0.6 + traits.conscientiousness * 0.4;
+    this.spirituality =
+      traits.spirituality ?? traits.openness * 0.5 + (1 - traits.neuroticism) * 0.3;
+
+    // Validate derived traits if provided
+    if (traits.workEthic !== undefined) validateRange(traits.workEthic, 'workEthic');
+    if (traits.creativity !== undefined) validateRange(traits.creativity, 'creativity');
+    if (traits.generosity !== undefined) validateRange(traits.generosity, 'generosity');
+    if (traits.leadership !== undefined) validateRange(traits.leadership, 'leadership');
+    if (traits.spirituality !== undefined) validateRange(traits.spirituality, 'spirituality');
   }
-}
 
-/**
- * Legacy interface-based personality component
- * Personality traits based on Big Five + game-specific traits.
- * From agent-system/spec.md
- */
-export interface PersonalityComponentLegacy {
-  type: 'personality';
-  version: number;
-
-  // Big Five traits (0-100)
-  openness: number;          // curious vs cautious
-  conscientiousness: number; // organized vs spontaneous
-  extraversion: number;      // social vs solitary
-  agreeableness: number;     // cooperative vs competitive
-  neuroticism: number;       // sensitive vs resilient
-
-  // Game-specific traits (0-100)
-  workEthic: number;         // prioritizes tasks
-  creativity: number;        // tries new things
-  generosity: number;        // shares/helps
-  leadership: number;        // takes initiative, organizes others
-}
-
-/**
- * Generate random personality traits.
- */
-export function generateRandomPersonality(): PersonalityComponentLegacy {
-  const random = () => Math.floor(Math.random() * 100);
-
-  return {
-    type: 'personality',
-    version: 1,
-    openness: random(),
-    conscientiousness: random(),
-    extraversion: random(),
-    agreeableness: random(),
-    neuroticism: random(),
-    workEthic: random(),
-    creativity: random(),
-    generosity: random(),
-    leadership: random(),
-  };
-}
-
-/**
- * Create personality with specific traits.
- */
-export function createPersonalityComponent(traits: Partial<Omit<PersonalityComponentLegacy, 'type' | 'version'>>): PersonalityComponentLegacy {
-  return {
-    type: 'personality',
-    version: 1,
-    openness: traits.openness ?? 50,
-    conscientiousness: traits.conscientiousness ?? 50,
-    extraversion: traits.extraversion ?? 50,
-    agreeableness: traits.agreeableness ?? 50,
-    neuroticism: traits.neuroticism ?? 50,
-    workEthic: traits.workEthic ?? 50,
-    creativity: traits.creativity ?? 50,
-    generosity: traits.generosity ?? 50,
-    leadership: traits.leadership ?? 50,
-  };
+  /** Clone this component */
+  clone(): PersonalityComponent {
+    return new PersonalityComponent({ ...this });
+  }
 }
 
 /**
  * Get personality description for prompts.
+ * Uses 0-1 scale with 0.7 threshold for high traits and 0.3 for low traits
  */
-export function getPersonalityDescription(personality: PersonalityComponentLegacy | PersonalityComponent): string {
+export function getPersonalityDescription(personality: PersonalityComponent): string {
+  if (!personality) {
+    throw new Error('getPersonalityDescription: personality parameter is required');
+  }
+
   const traits: string[] = [];
 
   // Openness
-  if (personality.openness > 70) {
+  if (personality.openness > 0.7) {
     traits.push('curious and adventurous');
-  } else if (personality.openness < 30) {
+  } else if (personality.openness < 0.3) {
     traits.push('cautious and traditional');
   }
 
   // Extraversion
-  if (personality.extraversion > 70) {
+  if (personality.extraversion > 0.7) {
     traits.push('outgoing and social');
-  } else if (personality.extraversion < 30) {
+  } else if (personality.extraversion < 0.3) {
     traits.push('quiet and introspective');
   }
 
   // Agreeableness
-  if (personality.agreeableness > 70) {
+  if (personality.agreeableness > 0.7) {
     traits.push('helpful and cooperative');
-  } else if (personality.agreeableness < 30) {
+  } else if (personality.agreeableness < 0.3) {
     traits.push('independent and competitive');
   }
 
   // Conscientiousness
-  if (personality.conscientiousness > 70) {
+  if (personality.conscientiousness > 0.7) {
     traits.push('organized and disciplined');
-  } else if (personality.conscientiousness < 30) {
+  } else if (personality.conscientiousness < 0.3) {
     traits.push('spontaneous and flexible');
   }
 
   // Work ethic
-  if (personality.workEthic > 70) {
+  if (personality.workEthic > 0.7) {
     traits.push('hardworking and dedicated');
-  } else if (personality.workEthic < 30) {
+  } else if (personality.workEthic < 0.3) {
     traits.push('relaxed and carefree');
   }
 
   // Leadership
-  if (personality.leadership > 70) {
+  if (personality.leadership > 0.7) {
     traits.push('natural leader who takes initiative');
-  } else if (personality.leadership < 30) {
+  } else if (personality.leadership < 0.3) {
     traits.push('prefers to follow others');
+  }
+
+  // Spirituality
+  if (personality.spirituality > 0.7) {
+    traits.push('deeply spiritual with divine connection');
+  } else if (personality.spirituality < 0.3) {
+    traits.push('skeptical and rational-minded');
   }
 
   return traits.length > 0 ? traits.join(', ') : 'balanced temperament';

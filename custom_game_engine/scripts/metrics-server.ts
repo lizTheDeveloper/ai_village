@@ -17,18 +17,136 @@
  *   GET /metrics/building    - Building-related metrics
  *   GET /metrics/summary     - Summary statistics
  *
+ * Unified Dashboard Views (shared with Player UI):
+ *   GET /views               - List all available views
+ *   GET /view/:id            - Get view data as formatted text
+ *   GET /view/:id?format=json - Get view data as JSON
+ *   GET /view/:id?session=<id> - Get view for specific session
+ *
  * Live Entity API (queries running game in real-time):
- *   GET /api/live/status     - Check if game is connected
- *   GET /api/live/entities   - List all agents (live)
- *   GET /api/live/entity     - Get entity state by ID (live)
- *   GET /api/live/prompt     - Get LLM prompt for agent (live)
+ *   GET  /api/live/status      - Check if game is connected
+ *   GET  /api/live/entities    - List all agents (live)
+ *   GET  /api/live/entity      - Get entity state by ID (live)
+ *   GET  /api/live/prompt      - Get LLM prompt for agent (live)
+ *   POST /api/live/set-llm     - Set custom LLM config for agent (live)
+ *   GET  /api/live/universe    - Get universe configuration (dimensions, laws, etc.)
+ *   GET  /api/live/magic       - Get magic system info (enabled paradigms, etc.)
+ *   GET  /api/live/divinity    - Get divinity info (gods, belief, pantheons, etc.)
  */
 
 import { WebSocketServer, WebSocket } from 'ws';
 import { createServer, type IncomingMessage, type ServerResponse } from 'http';
+import { spawn, type ChildProcess } from 'child_process';
 import { MetricsStorage, type StoredMetric } from '../packages/core/src/metrics/MetricsStorage.js';
+import { viewRegistry, registerBuiltInViews, hasTextFormatter, type ViewContext } from '../packages/core/src/dashboard/index.js';
 import * as path from 'path';
 import * as fs from 'fs';
+
+// ============================================================================
+// HEADLESS GAME PROCESS MANAGEMENT
+// ============================================================================
+
+interface HeadlessGameProcess {
+  sessionId: string;
+  process: ChildProcess;
+  startedAt: number;
+  status: 'starting' | 'running' | 'stopped' | 'error';
+  agentCount: number;
+}
+
+const headlessGames = new Map<string, HeadlessGameProcess>();
+
+function spawnHeadlessGame(sessionId: string, agentCount: number = 5): HeadlessGameProcess {
+  // Use vite-node to run demo/headless.ts with proper workspace module resolution
+  const scriptPath = path.join(process.cwd(), 'demo', 'headless.ts');
+
+  const child = spawn('npx', [
+    'vite-node',
+    '--root', 'demo',
+    scriptPath,
+    '--',
+    `--session-id=${sessionId}`,
+    `--agents=${agentCount}`,
+  ], {
+    cwd: process.cwd(),
+    stdio: ['ignore', 'pipe', 'pipe'],
+    detached: false,
+  });
+
+  const gameProcess: HeadlessGameProcess = {
+    sessionId,
+    process: child,
+    startedAt: Date.now(),
+    status: 'starting',
+    agentCount,
+  };
+
+  child.stdout?.on('data', (data: Buffer) => {
+    const output = data.toString().trim();
+    if (output) {
+      console.log(`[Headless:${sessionId}] ${output}`);
+    }
+    if (output.includes('Game running') || output.includes('Started at')) {
+      gameProcess.status = 'running';
+    }
+  });
+
+  child.stderr?.on('data', (data: Buffer) => {
+    console.error(`[Headless:${sessionId}] ERROR: ${data.toString().trim()}`);
+  });
+
+  child.on('error', (err) => {
+    console.error(`[Headless:${sessionId}] Process error:`, err);
+    gameProcess.status = 'error';
+  });
+
+  child.on('exit', (code) => {
+    console.log(`[Headless:${sessionId}] Exited with code ${code}`);
+    gameProcess.status = 'stopped';
+    headlessGames.delete(sessionId);
+  });
+
+  headlessGames.set(sessionId, gameProcess);
+  return gameProcess;
+}
+
+function stopHeadlessGame(sessionId: string): boolean {
+  const game = headlessGames.get(sessionId);
+  if (!game) return false;
+
+  game.process.kill('SIGTERM');
+  game.status = 'stopped';
+  headlessGames.delete(sessionId);
+  return true;
+}
+
+function listHeadlessGames(): Array<{
+  sessionId: string;
+  status: string;
+  startedAt: number;
+  uptime: number;
+  agentCount: number;
+}> {
+  const result: Array<{
+    sessionId: string;
+    status: string;
+    startedAt: number;
+    uptime: number;
+    agentCount: number;
+  }> = [];
+
+  for (const [sessionId, game] of headlessGames) {
+    result.push({
+      sessionId,
+      status: game.status,
+      startedAt: game.startedAt,
+      uptime: Date.now() - game.startedAt,
+      agentCount: game.agentCount,
+    });
+  }
+
+  return result;
+}
 
 const PORT = 8765;
 const DATA_DIR = path.join(process.cwd(), 'metrics-data');
@@ -40,6 +158,9 @@ if (!fs.existsSync(DATA_DIR)) {
 
 // Initialize storage
 const storage = new MetricsStorage(DATA_DIR);
+
+// Register dashboard views
+registerBuiltInViews();
 
 // Track active WebSocket sessions
 const wsSessions = new Map<WebSocket, string>();
@@ -486,6 +607,24 @@ function getSessionSummary(sessionId: string): SessionSummary {
   };
 }
 
+/**
+ * Build ViewContext for dashboard views.
+ * Views can work with historical session metrics since we don't have direct World access.
+ */
+function buildViewContext(sessionId?: string): ViewContext {
+  const context: ViewContext = {
+    world: undefined, // No direct World access in metrics server
+  };
+
+  // If session ID provided, include session metrics
+  if (sessionId) {
+    const metrics = getSessionMetrics(sessionId);
+    context.sessionMetrics = metrics;
+  }
+
+  return context;
+}
+
 function generateSessionChooser(limit = 10): string {
   const now = Date.now();
   const allSessions = getAllSessions();
@@ -784,6 +923,10 @@ function generateDashboard(metrics: StoredMetric[], sessionId?: string): string 
   // Trade tracking
   const tradeEvents: Array<{ buyer: string; seller: string; item: string; price: number; timestamp: number }> = [];
 
+  // LLM error tracking for dashboard
+  const llmErrors: Array<{ agentId: string; error: string; errorType: string; timestamp: number }> = [];
+  const llmContextEvents: Array<{ agentId: string; timestamp: number; behavior?: string }> = [];
+
   // Crafting tracking
   const craftingInProgress: Map<string, { recipeId: string; stationId: string; startedAt: number; agentId?: string }> = new Map();
   const craftingCompleted: Array<{ recipeId: string; itemId: string; amount: number; timestamp: number }> = [];
@@ -949,6 +1092,27 @@ function generateDashboard(metrics: StoredMetric[], sessionId?: string): string 
           reasoning
         });
       }
+    }
+
+    // Track LLM errors
+    if (m.type === 'llm:error' && m.agentId) {
+      const errData = (data.data as any) || data;
+      llmErrors.push({
+        agentId: m.agentId,
+        error: String(errData.error || 'unknown error'),
+        errorType: String(errData.errorType || 'unknown'),
+        timestamp: m.timestamp,
+      });
+    }
+
+    // Track LLM context events (prompts)
+    if (m.type === 'agent:llm_context' && m.agentId) {
+      const ctxData = (data.data as any) || data;
+      llmContextEvents.push({
+        agentId: m.agentId,
+        timestamp: m.timestamp,
+        behavior: ctxData.behavior ? String(ctxData.behavior) : undefined,
+      });
     }
 
     // Track building progress
@@ -1551,6 +1715,62 @@ AI VILLAGE DASHBOARD | ${sessionStatus}
     output += '\n';
   }
 
+  // LLM Debug Section - shows call/decision ratio, errors, and helps debug agent behavior
+  const llmAgents = new Set([...llmContextEvents.map(e => e.agentId), ...llmDecisions.map(d => d.agentId)]);
+  const llmSuccessRate = llmContextEvents.length > 0
+    ? Math.round((llmDecisions.length / llmContextEvents.length) * 100)
+    : 0;
+
+  if (llmContextEvents.length > 0 || llmErrors.length > 0) {
+    output += `## LLM DEBUG (Language Model Interface)\n`;
+    output += `  Calls: ${llmContextEvents.length} | Decisions: ${llmDecisions.length} | Errors: ${llmErrors.length}`;
+    if (llmContextEvents.length > 0) {
+      output += ` | Success: ${llmSuccessRate}%`;
+    }
+    output += '\n';
+
+    // Show agents with LLM activity
+    if (llmAgents.size > 0 && llmAgents.size <= 5) {
+      const agentCalls: Map<string, { calls: number; decisions: number; errors: number }> = new Map();
+      for (const ctx of llmContextEvents) {
+        if (!agentCalls.has(ctx.agentId)) agentCalls.set(ctx.agentId, { calls: 0, decisions: 0, errors: 0 });
+        agentCalls.get(ctx.agentId)!.calls++;
+      }
+      for (const dec of llmDecisions) {
+        if (!agentCalls.has(dec.agentId)) agentCalls.set(dec.agentId, { calls: 0, decisions: 0, errors: 0 });
+        agentCalls.get(dec.agentId)!.decisions++;
+      }
+      for (const err of llmErrors) {
+        if (!agentCalls.has(err.agentId)) agentCalls.set(err.agentId, { calls: 0, decisions: 0, errors: 0 });
+        agentCalls.get(err.agentId)!.errors++;
+      }
+
+      output += `  Per Agent:\n`;
+      for (const [agentId, stats] of Array.from(agentCalls.entries()).slice(0, 5)) {
+        const name = agentNames.get(agentId) || agentId.slice(0, 8);
+        const successRate = stats.calls > 0 ? Math.round((stats.decisions / stats.calls) * 100) : 0;
+        let status = '';
+        if (stats.errors > 0) status = ' [ERRORS]';
+        else if (successRate < 50 && stats.calls >= 2) status = ' [LOW SUCCESS]';
+        output += `    ${name.padEnd(10)} ${stats.calls} calls, ${stats.decisions} decisions${status}\n`;
+      }
+    }
+
+    // Show recent errors
+    if (llmErrors.length > 0) {
+      output += `  Recent Errors:\n`;
+      const recentErrs = llmErrors.slice(-3);
+      for (const err of recentErrs) {
+        const name = agentNames.get(err.agentId) || err.agentId.slice(0, 8);
+        const timeAgo = formatRelativeTime(err.timestamp, now);
+        output += `    [${timeAgo}] ${name}: [${err.errorType}] ${err.error.slice(0, 50)}\n`;
+      }
+    }
+
+    output += `  Inspect: curl http://localhost:${HTTP_PORT}/dashboard/agent?id=<ID>\n`;
+    output += '\n';
+  }
+
   // Detect issues only (not verbose stats)
   const SESSION_MIN_AGE = 60000;
   const STUCK_THRESHOLD = 120000;
@@ -1710,6 +1930,33 @@ AI VILLAGE DASHBOARD | ${sessionStatus}
 
   output += '\n';
 
+  // Live Query System - Add universe/magic/divinity info if available
+  output += `## LIVE QUERY SYSTEM
+---------------------------------------------------------------------------
+  Use the Live Query API to get real-time game state information:
+
+  Universe:  curl http://localhost:${HTTP_PORT}/api/live/universe
+  Magic:     curl http://localhost:${HTTP_PORT}/api/live/magic
+  Divinity:  curl http://localhost:${HTTP_PORT}/api/live/divinity
+  Entities:  curl http://localhost:${HTTP_PORT}/api/live/entities
+  Entity:    curl "http://localhost:${HTTP_PORT}/api/live/entity?id=<entityId>"
+
+  The Live Query system queries the running game in real-time via WebSocket.
+  Queries are sent to the game client and responses are returned immediately.
+  This provides access to full entity state, component data, and system info.
+
+## LLM DEV TOOLS (Actions API)
+---------------------------------------------------------------------------
+  Perform dev actions on the running game (spawn agents, give items, etc.):
+
+  List all actions:  curl http://localhost:${HTTP_PORT}/api/actions
+
+  The Actions API allows you (the LLM) to modify the running game via POST
+  requests. Spawn agents, teleport them, give items, set needs, create deities,
+  grant spells, and more. See /api/actions for full documentation.
+
+`;
+
   output += `---\n`;
 
   return output;
@@ -1751,6 +1998,18 @@ Generated: ${formatTimestamp(now)}
     }
     output += '\n';
   }
+
+  output += `\n## LIVE QUERY SYSTEM
+---------------------------------------------------------------------------
+  Real-time game state queries (WebSocket to running game):
+
+  curl http://localhost:${HTTP_PORT}/api/live/universe    # Universe config
+  curl http://localhost:${HTTP_PORT}/api/live/magic       # Magic users & stats
+  curl http://localhost:${HTTP_PORT}/api/live/divinity    # Gods & belief
+  curl http://localhost:${HTTP_PORT}/api/live/entities    # All entities
+  curl "http://localhost:${HTTP_PORT}/api/live/entity?id=<ID>"  # Specific entity
+
+`;
 
   return output;
 }
@@ -1886,6 +2145,14 @@ This is a menu of agents in this session. Use curl to view detailed info.
   output += `View resources:     curl http://localhost:${HTTP_PORT}/dashboard/resources\n`;
   output += `View timeline:      curl http://localhost:${HTTP_PORT}/dashboard/timeline\n`;
 
+  output += `\n`;
+  output += `## Live Query API (real-time)\n`;
+  output += `---------------------------------------------------------------------------\n`;
+  output += `Universe:   curl http://localhost:${HTTP_PORT}/api/live/universe\n`;
+  output += `Magic:      curl http://localhost:${HTTP_PORT}/api/live/magic\n`;
+  output += `Divinity:   curl http://localhost:${HTTP_PORT}/api/live/divinity\n`;
+  output += `Entities:   curl http://localhost:${HTTP_PORT}/api/live/entities\n`;
+
   return output;
 }
 
@@ -1944,8 +2211,12 @@ ${Array.from(new Set(metrics.filter(m => m.agentId).map(m => m.agentId))).join('
   const resourcesConsumed: Record<string, number> = {};
   const conversations: Array<{ partnerId: string; timestamp: number }> = [];
   const sleepEvents: Array<{ type: string; timestamp: number }> = [];
-  const llmDecisions: Array<{ decision: string; reasoning?: string; timestamp: number }> = [];
+  const llmDecisions: Array<{ decision: string; reasoning?: string; timestamp: number; behavior?: string }> = [];
   const craftingEvents: Array<{ recipeId: string; produced: Array<{ itemId: string; amount: number }>; quality?: number; timestamp: number }> = [];
+
+  // Track all LLM context events for call history
+  const llmContextHistory: Array<{ prompt: string; timestamp: number; state?: Record<string, unknown> }> = [];
+  const llmErrors: Array<{ error: string; errorType: string; timestamp: number }> = [];
 
   for (const m of agentMetrics) {
     const data = m.data || {};
@@ -1980,6 +2251,13 @@ ${Array.from(new Set(metrics.filter(m => m.agentId).map(m => m.agentId))).join('
         lastThought: (nestedData.lastThought || data.lastThought) as string | undefined,
         recentSpeech: (nestedData.recentSpeech || data.recentSpeech) as string | undefined,
       };
+
+      // Also add to context history for LLM call pairing
+      llmContextHistory.push({
+        prompt: lastLLMContext,
+        timestamp: m.timestamp,
+        state: lastAgentState ? { ...lastAgentState } : undefined,
+      });
     }
 
     // LLM decisions
@@ -1987,6 +2265,16 @@ ${Array.from(new Set(metrics.filter(m => m.agentId).map(m => m.agentId))).join('
       llmDecisions.push({
         decision: String(data.decision || data.behavior || 'unknown'),
         reasoning: data.reasoning ? String(data.reasoning) : undefined,
+        timestamp: m.timestamp,
+        behavior: data.behavior ? String(data.behavior) : undefined,
+      });
+    }
+
+    // LLM errors
+    if (m.type === 'llm:error') {
+      llmErrors.push({
+        error: String(data.error || 'unknown error'),
+        errorType: String(data.errorType || 'unknown'),
         timestamp: m.timestamp,
       });
     }
@@ -2166,23 +2454,141 @@ Generated: ${formatTimestamp(now)}
     }
   }
 
-  // LLM Decisions (if agent uses LLM)
-  if (usesLLM || llmDecisions.length > 0) {
+  // LLM Call History - shows prompt + decision pairs for debugging
+  if (usesLLM || llmDecisions.length > 0 || llmContextHistory.length > 0) {
     output += `
-  LLM DECISIONS (recent)
-  ----------------------
+  ================================================================================
+  LLM CALL HISTORY (Language Model Interface Debug)
+  ================================================================================
+  Total LLM calls: ${llmContextHistory.length}
+  Total decisions: ${llmDecisions.length}
+  Total errors: ${llmErrors.length}
 `;
-    const recentDecisions = llmDecisions.slice(-5).reverse();
-    if (recentDecisions.length === 0) {
-      output += `    No LLM decisions recorded yet\n`;
+
+    // Pair prompts with decisions (they should happen close together)
+    // Show the most recent 3 pairs in detail
+    const recentContexts = llmContextHistory.slice(-3).reverse();
+
+    if (recentContexts.length === 0 && llmDecisions.length === 0) {
+      output += `
+  No LLM calls recorded yet. LLM calls happen when:
+    - Agent is idle and needs a new goal
+    - Agent completes current task
+    - Periodic decision refresh
+`;
     } else {
+      for (let i = 0; i < recentContexts.length; i++) {
+        const ctx = recentContexts[i];
+        const relTime = formatRelativeTime(ctx.timestamp, now);
+
+        // Find the closest decision after this prompt (within 10 seconds)
+        const matchingDecision = llmDecisions.find(d =>
+          d.timestamp >= ctx.timestamp && d.timestamp - ctx.timestamp < 10000
+        );
+
+        // Find any error around this time
+        const matchingError = llmErrors.find(e =>
+          e.timestamp >= ctx.timestamp && e.timestamp - ctx.timestamp < 10000
+        );
+
+        output += `
+  --- LLM Call #${llmContextHistory.length - i} [${relTime}] ---
+`;
+
+        // Show state at time of call
+        if (ctx.state) {
+          const stateItems: string[] = [];
+          if (ctx.state.behavior) stateItems.push(`behavior: ${ctx.state.behavior}`);
+          if (ctx.state.needs) {
+            const needs = ctx.state.needs as { hunger?: number; energy?: number; social?: number };
+            const needsStr = Object.entries(needs)
+              .filter(([, v]) => v !== undefined)
+              .map(([k, v]) => `${k}: ${Math.round((v as number) * 100)}%`)
+              .join(', ');
+            if (needsStr) stateItems.push(`needs: ${needsStr}`);
+          }
+          if (ctx.state.position) {
+            const pos = ctx.state.position as { x: number; y: number };
+            stateItems.push(`pos: (${pos.x}, ${pos.y})`);
+          }
+          if (stateItems.length > 0) {
+            output += `  State: ${stateItems.join(' | ')}\n`;
+          }
+        }
+
+        // Extract key instruction from prompt (first non-header line with substance)
+        const promptLines = ctx.prompt.split('\n').filter(l => l.trim().length > 0);
+        let instruction = '';
+        for (const line of promptLines) {
+          // Skip headers and identity lines
+          if (line.startsWith('You are ') || line.startsWith('===') || line.startsWith('---')) continue;
+          if (line.includes('VILLAGE STATE') || line.includes('CURRENT STATE')) continue;
+          // Look for action-oriented lines
+          if (line.includes('[') && line.includes(']')) {
+            instruction = line.trim();
+            break;
+          }
+          // Or lines with key context
+          if (line.length > 20 && !instruction) {
+            instruction = line.trim().slice(0, 100);
+          }
+        }
+        if (instruction) {
+          output += `  Instruction: "${instruction}${instruction.length >= 100 ? '...' : ''}"\n`;
+        }
+
+        // Show decision result
+        if (matchingDecision) {
+          output += `  Decision: ${matchingDecision.behavior || matchingDecision.decision}\n`;
+          if (matchingDecision.reasoning) {
+            const reasonShort = matchingDecision.reasoning.length > 100
+              ? matchingDecision.reasoning.slice(0, 97) + '...'
+              : matchingDecision.reasoning;
+            output += `  Thinking: "${reasonShort}"\n`;
+          }
+        } else if (matchingError) {
+          output += `  ERROR: [${matchingError.errorType}] ${matchingError.error.slice(0, 80)}\n`;
+        } else {
+          output += `  Result: (pending or no response captured)\n`;
+        }
+      }
+    }
+
+    // Show recent decisions summary
+    if (llmDecisions.length > 0) {
+      output += `
+  Recent Decisions Summary:
+`;
+      const recentDecisions = llmDecisions.slice(-5).reverse();
       for (const d of recentDecisions) {
         const relTime = formatRelativeTime(d.timestamp, now);
-        output += `    [${relTime.padEnd(12)}] ${d.decision}`;
-        if (d.reasoning) output += `\n                     "${d.reasoning}"`;
+        const decisionStr = d.behavior || d.decision;
+        output += `    [${relTime.padEnd(10)}] ${decisionStr.padEnd(20)}`;
+        if (d.reasoning) {
+          const shortReason = d.reasoning.length > 40 ? d.reasoning.slice(0, 37) + '...' : d.reasoning;
+          output += ` "${shortReason}"`;
+        }
         output += '\n';
       }
     }
+
+    // Show errors if any
+    if (llmErrors.length > 0) {
+      output += `
+  LLM Errors:
+`;
+      const recentErrors = llmErrors.slice(-3).reverse();
+      for (const err of recentErrors) {
+        const relTime = formatRelativeTime(err.timestamp, now);
+        output += `    [${relTime.padEnd(10)}] [${err.errorType}] ${err.error.slice(0, 60)}\n`;
+      }
+    }
+
+    output += `
+  ---------------------------------------------------------------------------
+  To see full prompt, scroll to LLM PROMPT section below.
+  For real-time prompt: curl "http://localhost:${HTTP_PORT}/api/live/prompt?id=${agentId}"
+`;
   }
 
   // Resources
@@ -2333,13 +2739,13 @@ Generated: ${formatTimestamp(now)}
     }
     output += '\n';
 
-    // Needs
+    // Needs (values are on 0-1 scale, convert to percentage)
     if (lastAgentState.needs) {
       const { hunger, energy, social } = lastAgentState.needs;
       const needsStr = [
-        hunger !== undefined ? `Hunger: ${hunger}%` : null,
-        energy !== undefined ? `Energy: ${energy}%` : null,
-        social !== undefined ? `Social: ${social}%` : null,
+        hunger !== undefined ? `Hunger: ${Math.round(hunger * 100)}%` : null,
+        energy !== undefined ? `Energy: ${Math.round(energy * 100)}%` : null,
+        social !== undefined ? `Social: ${Math.round(social * 100)}%` : null,
       ].filter(Boolean).join(' | ');
       if (needsStr) output += `    Needs: ${needsStr}\n`;
     }
@@ -2403,6 +2809,18 @@ ${lastLLMContext}
   }
 
   output += `
+================================================================================
+LIVE QUERY - Get real-time entity state
+================================================================================
+  Full entity:     curl "http://localhost:${HTTP_PORT}/api/live/entity?id=${agentId}"
+  All entities:    curl http://localhost:${HTTP_PORT}/api/live/entities
+  Magic systems:   curl http://localhost:${HTTP_PORT}/api/live/magic
+  Divinity:        curl http://localhost:${HTTP_PORT}/api/live/divinity
+  Universe:        curl http://localhost:${HTTP_PORT}/api/live/universe
+
+  The Live Query API queries the running game in real-time to get current
+  component state (Magic, Spiritual, Skills, Inventory, etc.) for this agent.
+
 ================================================================================
 COMMANDS
 ================================================================================
@@ -2471,6 +2889,14 @@ Generated: ${formatTimestamp(now)}
     output += `  ${resource}: ${total}\n`;
   }
 
+  output += `\n`;
+  output += `## Live Query API (real-time game state)\n`;
+  output += `---------------------------------------------------------------------------\n`;
+  output += `Universe:   curl http://localhost:${HTTP_PORT}/api/live/universe\n`;
+  output += `Magic:      curl http://localhost:${HTTP_PORT}/api/live/magic\n`;
+  output += `Divinity:   curl http://localhost:${HTTP_PORT}/api/live/divinity\n`;
+  output += `Entities:   curl http://localhost:${HTTP_PORT}/api/live/entities\n`;
+
   return output;
 }
 
@@ -2504,6 +2930,188 @@ function getMetricsForRequest(url: URL): StoredMetric[] {
 
   // Specific session
   return getSessionMetrics(sessionParam);
+}
+
+// ============================================================
+// Action Handlers (for /api/actions/*)
+// ============================================================
+
+/**
+ * Send an action command to the game client
+ */
+async function sendActionToGame(client: WebSocket, action: string, params: Record<string, unknown>): Promise<unknown> {
+  return new Promise((resolve, reject) => {
+    const requestId = `action_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+
+    const message = {
+      type: 'action',
+      requestId,
+      action,
+      params,
+    };
+
+    // Set up response handler
+    const timeout = setTimeout(() => {
+      reject(new Error(`Action timeout: ${action}`));
+    }, 10000);
+
+    const handler = (data: Buffer) => {
+      try {
+        const response = JSON.parse(data.toString());
+        if (response.requestId === requestId) {
+          clearTimeout(timeout);
+          client.off('message', handler);
+
+          if (response.success) {
+            resolve(response.data || { success: true });
+          } else {
+            reject(new Error(response.error || 'Action failed'));
+          }
+        }
+      } catch (err) {
+        // Ignore parse errors for other messages
+      }
+    };
+
+    client.on('message', handler);
+    client.send(JSON.stringify(message));
+  });
+}
+
+async function handleSpawnAgent(client: WebSocket, params: Record<string, unknown>) {
+  if (!params.name || typeof params.x !== 'number' || typeof params.y !== 'number') {
+    throw new Error('Missing required parameters: name, x, y');
+  }
+
+  return sendActionToGame(client, 'spawn-agent', params);
+}
+
+async function handleTeleport(client: WebSocket, params: Record<string, unknown>) {
+  if (!params.agentId || typeof params.x !== 'number' || typeof params.y !== 'number') {
+    throw new Error('Missing required parameters: agentId, x, y');
+  }
+
+  return sendActionToGame(client, 'teleport', params);
+}
+
+async function handleSetNeed(client: WebSocket, params: Record<string, unknown>) {
+  if (!params.agentId || !params.need || typeof params.value !== 'number') {
+    throw new Error('Missing required parameters: agentId, need, value');
+  }
+
+  const validNeeds = ['hunger', 'energy', 'warmth', 'social', 'safety'];
+  if (!validNeeds.includes(params.need as string)) {
+    throw new Error(`Invalid need. Must be one of: ${validNeeds.join(', ')}`);
+  }
+
+  if (params.value < 0 || params.value > 1) {
+    throw new Error('Value must be between 0.0 and 1.0');
+  }
+
+  return sendActionToGame(client, 'set-need', params);
+}
+
+async function handleGiveItem(client: WebSocket, params: Record<string, unknown>) {
+  if (!params.agentId || !params.itemType) {
+    throw new Error('Missing required parameters: agentId, itemType');
+  }
+
+  return sendActionToGame(client, 'give-item', {
+    ...params,
+    amount: params.amount || 1,
+  });
+}
+
+async function handleTriggerBehavior(client: WebSocket, params: Record<string, unknown>) {
+  if (!params.agentId || !params.behavior) {
+    throw new Error('Missing required parameters: agentId, behavior');
+  }
+
+  return sendActionToGame(client, 'trigger-behavior', params);
+}
+
+async function handleSetSpeed(client: WebSocket, params: Record<string, unknown>) {
+  if (typeof params.speed !== 'number') {
+    throw new Error('Missing required parameter: speed');
+  }
+
+  if (params.speed < 0.1 || params.speed > 10) {
+    throw new Error('Speed must be between 0.1 and 10.0');
+  }
+
+  return sendActionToGame(client, 'set-speed', params);
+}
+
+async function handlePause(client: WebSocket, params: Record<string, unknown>) {
+  if (typeof params.paused !== 'boolean') {
+    throw new Error('Missing required parameter: paused (boolean)');
+  }
+
+  return sendActionToGame(client, 'pause', params);
+}
+
+async function handleSpawnEntity(client: WebSocket, params: Record<string, unknown>) {
+  if (!params.type || typeof params.x !== 'number' || typeof params.y !== 'number') {
+    throw new Error('Missing required parameters: type, x, y');
+  }
+
+  return sendActionToGame(client, 'spawn-entity', params);
+}
+
+async function handleGrantSpell(client: WebSocket, params: Record<string, unknown>) {
+  if (!params.agentId || !params.spellId) {
+    throw new Error('Missing required parameters: agentId, spellId');
+  }
+
+  return sendActionToGame(client, 'grant-spell', params);
+}
+
+async function handleAddBelief(client: WebSocket, params: Record<string, unknown>) {
+  if (!params.deityId || typeof params.amount !== 'number') {
+    throw new Error('Missing required parameters: deityId, amount');
+  }
+
+  return sendActionToGame(client, 'add-belief', params);
+}
+
+async function handleCreateDeity(client: WebSocket, params: Record<string, unknown>) {
+  if (!params.name) {
+    throw new Error('Missing required parameter: name');
+  }
+
+  return sendActionToGame(client, 'create-deity', {
+    ...params,
+    controller: params.controller || 'dormant',
+  });
+}
+
+async function handleSetLLMConfig(client: WebSocket, params: Record<string, unknown>) {
+  if (!params.agentId) {
+    throw new Error('Missing required parameter: agentId');
+  }
+
+  const config: Record<string, unknown> = {};
+
+  if (params.baseUrl && typeof params.baseUrl === 'string') {
+    config.baseUrl = params.baseUrl;
+  }
+
+  if (params.model && typeof params.model === 'string') {
+    config.model = params.model;
+  }
+
+  if (params.apiKey && typeof params.apiKey === 'string') {
+    config.apiKey = params.apiKey;
+  }
+
+  if (params.customHeaders && typeof params.customHeaders === 'object') {
+    config.customHeaders = params.customHeaders;
+  }
+
+  return sendActionToGame(client, 'set-llm-config', {
+    agentId: params.agentId,
+    config,
+  });
 }
 
 // HTTP Server for querying metrics
@@ -2620,6 +3228,192 @@ Available agents:
     return;
   }
 
+  // === Category-based Dashboard Routes ===
+  // Hierarchical routes that group related views by category
+
+  const categoryRoutes: Record<string, { title: string; viewIds: string[] }> = {
+    '/dashboard/magic': {
+      title: 'MAGIC SYSTEMS',
+      viewIds: ['magic-systems', 'spellbook'],
+    },
+    '/dashboard/divinity': {
+      title: 'DIVINITY & DIVINE POWERS',
+      viewIds: ['divine-powers', 'vision-composer'],
+    },
+    '/dashboard/economy': {
+      title: 'ECONOMY & TRADE',
+      viewIds: ['resources', 'economy', 'shop', 'crafting'],
+    },
+    '/dashboard/social': {
+      title: 'SOCIAL & GOVERNANCE',
+      viewIds: ['population', 'relationships', 'memory', 'governance'],
+    },
+    '/dashboard/info': {
+      title: 'ENTITY INFORMATION',
+      viewIds: ['agent-info', 'animal-info', 'plant-info', 'tile-inspector'],
+    },
+    '/dashboard/environment': {
+      title: 'ENVIRONMENT',
+      viewIds: ['weather'],
+    },
+    '/dashboard/settings': {
+      title: 'SETTINGS & CONTROLS',
+      viewIds: ['settings', 'controls'],
+    },
+    '/dashboard/dev': {
+      title: 'DEVELOPER TOOLS',
+      viewIds: ['dev'],
+    },
+  };
+
+  const categoryRoute = categoryRoutes[pathname];
+  if (categoryRoute) {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+
+    const sessionParam = url.searchParams.get('session');
+    let sessionId = sessionParam;
+    if (sessionParam === 'latest') {
+      const sessions = getAllSessions();
+      sessionId = sessions.length > 0 ? sessions[0].id : undefined;
+    }
+
+    const context = buildViewContext(sessionId);
+    const lines: string[] = [
+      categoryRoute.title,
+      '═'.repeat(60),
+      '',
+    ];
+
+    // Render each view in the category
+    for (const viewId of categoryRoute.viewIds) {
+      const view = viewRegistry.get(viewId);
+      if (view && hasTextFormatter(view)) {
+        try {
+          const data = view.getData(context);
+          const formatted = view.textFormatter(data);
+          lines.push(formatted);
+          lines.push('');
+          lines.push('─'.repeat(60));
+          lines.push('');
+        } catch (err) {
+          lines.push(`[Error loading ${viewId}: ${err instanceof Error ? err.message : String(err)}]`);
+          lines.push('');
+        }
+      }
+    }
+
+    // Navigation footer
+    lines.push('');
+    lines.push('NAVIGATION');
+    lines.push('─'.repeat(40));
+    lines.push('Categories:');
+    lines.push(`  curl http://localhost:${HTTP_PORT}/dashboard/magic     - Magic systems`);
+    lines.push(`  curl http://localhost:${HTTP_PORT}/dashboard/divinity  - Divine powers`);
+    lines.push(`  curl http://localhost:${HTTP_PORT}/dashboard/economy   - Economy & trade`);
+    lines.push(`  curl http://localhost:${HTTP_PORT}/dashboard/social    - Social & governance`);
+    lines.push(`  curl http://localhost:${HTTP_PORT}/dashboard/info      - Entity info`);
+    lines.push(`  curl http://localhost:${HTTP_PORT}/dashboard/dev       - Dev tools`);
+    lines.push('');
+    lines.push('Individual views:');
+    for (const viewId of categoryRoute.viewIds) {
+      lines.push(`  curl http://localhost:${HTTP_PORT}/view/${viewId}`);
+    }
+
+    res.end(lines.join('\n'));
+    return;
+  }
+
+  // === Dashboard View Endpoints ===
+  // Unified view system for both LLM and Player UI
+
+  if (pathname === '/views') {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+
+    const allViews = viewRegistry.getAll();
+    const lines: string[] = [
+      'AVAILABLE VIEWS',
+      '═'.repeat(60),
+      '',
+    ];
+
+    for (const view of allViews) {
+      const hasText = hasTextFormatter(view);
+      const availability = hasText ? '✓ text' : '  canvas-only';
+      lines.push(`  ${view.id.padEnd(20)} - ${view.title.padEnd(30)} (${view.category})`);
+      lines.push(`  ${' '.repeat(20)}   ${availability}`);
+      if (view.description) {
+        lines.push(`  ${' '.repeat(20)}   ${view.description}`);
+      }
+      lines.push('');
+    }
+
+    lines.push('');
+    lines.push('Usage:');
+    lines.push(`  curl http://localhost:${HTTP_PORT}/view/<id>           - Get formatted text`);
+    lines.push(`  curl http://localhost:${HTTP_PORT}/view/<id>?format=json - Get raw JSON data`);
+    lines.push('');
+    lines.push('Example:');
+    lines.push(`  curl http://localhost:${HTTP_PORT}/view/resources`);
+    lines.push(`  curl http://localhost:${HTTP_PORT}/view/population?format=json`);
+
+    res.end(lines.join('\n'));
+    return;
+  }
+
+  if (pathname.startsWith('/view/')) {
+    const viewId = pathname.slice('/view/'.length);
+    const format = url.searchParams.get('format') || 'text';
+    const sessionParam = url.searchParams.get('session');
+
+    // Resolve session ID
+    let sessionId = sessionParam;
+    if (sessionParam === 'latest') {
+      const sessions = getAllSessions();
+      sessionId = sessions.length > 0 ? sessions[0].id : undefined;
+    }
+
+    // Get view from registry
+    const view = viewRegistry.get(viewId);
+    if (!view) {
+      res.statusCode = 404;
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      const availableViews = viewRegistry.getAll().map(v => v.id).join(', ');
+      res.end(`View not found: ${viewId}\n\nAvailable views: ${availableViews}\n\nUse: curl http://localhost:${HTTP_PORT}/views\n`);
+      return;
+    }
+
+    try {
+      // Build context
+      const context = buildViewContext(sessionId);
+
+      // Get data from view
+      const data = await Promise.resolve(view.getData(context));
+
+      // Format response based on requested format
+      if (format === 'json') {
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(data, null, 2));
+      } else {
+        // Text format
+        if (!hasTextFormatter(view)) {
+          res.statusCode = 400;
+          res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+          res.end(`View '${viewId}' does not support text formatting.\n\nTry: curl http://localhost:${HTTP_PORT}/view/${viewId}?format=json\n`);
+          return;
+        }
+
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        const formattedText = view.textFormatter(data);
+        res.end(formattedText);
+      }
+    } catch (error) {
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      res.end(`Error rendering view: ${error instanceof Error ? error.message : String(error)}\n`);
+    }
+    return;
+  }
+
   // === Live Entity API Endpoints ===
   // These query the running game in real-time via WebSocket
 
@@ -2712,6 +3506,451 @@ Available agents:
     return;
   }
 
+  if (pathname === '/api/live/universe') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const gameClient = getActiveGameClient();
+    if (!gameClient) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({ error: 'No game client connected', connected: false }));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'universe');
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
+  if (pathname === '/api/live/magic') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const gameClient = getActiveGameClient();
+    if (!gameClient) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({ error: 'No game client connected', connected: false }));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'magic');
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
+  if (pathname === '/api/live/divinity') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const gameClient = getActiveGameClient();
+    if (!gameClient) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({ error: 'No game client connected', connected: false }));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'divinity');
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
+  // === Dev Actions API (LLM-accessible dev tools) ===
+  if (pathname === '/api/actions' && req.method === 'GET') {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const actionsHelp = `================================================================================
+LLM DEV TOOLS - Available Actions
+================================================================================
+This API allows you (the LLM) to perform dev actions on the running game.
+All actions are POST requests with JSON bodies.
+
+Game Status: ${getActiveGameClient() ? '🟢 CONNECTED' : '🔴 NOT CONNECTED'}
+
+================================================================================
+AGENT ACTIONS
+================================================================================
+
+1. SPAWN AGENT
+   curl -X POST http://localhost:${HTTP_PORT}/api/actions/spawn-agent \\
+     -H "Content-Type: application/json" \\
+     -d '{"name": "Bob", "x": 10, "y": 10, "useLLM": true}'
+
+   Parameters:
+     - name (string, required): Agent name
+     - x, y (number, required): Spawn position
+     - useLLM (boolean, optional): Use LLM for decisions (default: true)
+
+2. TELEPORT AGENT
+   curl -X POST http://localhost:${HTTP_PORT}/api/actions/teleport \\
+     -H "Content-Type: application/json" \\
+     -d '{"agentId": "agent_123", "x": 50, "y": 50}'
+
+   Parameters:
+     - agentId (string, required): Agent to teleport
+     - x, y (number, required): Destination
+
+3. SET AGENT NEED
+   curl -X POST http://localhost:${HTTP_PORT}/api/actions/set-need \\
+     -H "Content-Type: application/json" \\
+     -d '{"agentId": "agent_123", "need": "hunger", "value": 0.5}'
+
+   Parameters:
+     - agentId (string, required): Target agent
+     - need (string, required): hunger, energy, warmth, social, safety
+     - value (number, required): 0.0 to 1.0 (0 = critical, 1 = satisfied)
+
+4. GIVE ITEM TO AGENT
+   curl -X POST http://localhost:${HTTP_PORT}/api/actions/give-item \\
+     -H "Content-Type: application/json" \\
+     -d '{"agentId": "agent_123", "itemType": "wood", "amount": 10}'
+
+   Parameters:
+     - agentId (string, required): Target agent
+     - itemType (string, required): Item type ID
+     - amount (number, optional): Quantity (default: 1)
+
+5. TRIGGER BEHAVIOR
+   curl -X POST http://localhost:${HTTP_PORT}/api/actions/trigger-behavior \\
+     -H "Content-Type: application/json" \\
+     -d '{"agentId": "agent_123", "behavior": "gather", "target": "tree_456"}'
+
+   Parameters:
+     - agentId (string, required): Target agent
+     - behavior (string, required): Behavior to trigger
+     - target (string, optional): Target entity ID
+
+================================================================================
+WORLD ACTIONS
+================================================================================
+
+6. SET GAME SPEED
+   curl -X POST http://localhost:${HTTP_PORT}/api/actions/set-speed \\
+     -H "Content-Type: application/json" \\
+     -d '{"speed": 2.0}'
+
+   Parameters:
+     - speed (number, required): 0.1 to 10.0 (1.0 = normal)
+
+7. PAUSE/RESUME GAME
+   curl -X POST http://localhost:${HTTP_PORT}/api/actions/pause \\
+     -H "Content-Type: application/json" \\
+     -d '{"paused": true}'
+
+   Parameters:
+     - paused (boolean, required): true = pause, false = resume
+
+8. SPAWN ENTITY
+   curl -X POST http://localhost:${HTTP_PORT}/api/actions/spawn-entity \\
+     -H "Content-Type: application/json" \\
+     -d '{"type": "tree", "x": 20, "y": 20}'
+
+   Parameters:
+     - type (string, required): Entity type (tree, animal, building, etc.)
+     - x, y (number, required): Spawn position
+     - data (object, optional): Additional entity data
+
+================================================================================
+MAGIC/DIVINITY ACTIONS
+================================================================================
+
+9. GRANT SPELL
+   curl -X POST http://localhost:${HTTP_PORT}/api/actions/grant-spell \\
+     -H "Content-Type: application/json" \\
+     -d '{"agentId": "agent_123", "spellId": "fireball"}'
+
+   Parameters:
+     - agentId (string, required): Target agent
+     - spellId (string, required): Spell to grant
+
+10. ADD BELIEF
+    curl -X POST http://localhost:${HTTP_PORT}/api/actions/add-belief \\
+      -H "Content-Type: application/json" \\
+      -d '{"deityId": "deity_123", "amount": 100}'
+
+    Parameters:
+      - deityId (string, required): Target deity
+      - amount (number, required): Belief points to add
+
+11. CREATE DEITY
+    curl -X POST http://localhost:${HTTP_PORT}/api/actions/create-deity \\
+      -H "Content-Type: application/json" \\
+      -d '{"name": "Gaia", "domain": "nature", "controller": "player"}'
+
+    Parameters:
+      - name (string, required): Deity name
+      - domain (string, optional): Divine domain
+      - controller (string, optional): player, ai, dormant (default: dormant)
+
+================================================================================
+QUERY ACTIONS (for getting IDs and state)
+================================================================================
+
+  Get entities:  curl http://localhost:${HTTP_PORT}/api/live/entities
+  Get entity:    curl "http://localhost:${HTTP_PORT}/api/live/entity?id=<entityId>"
+  Get magic:     curl http://localhost:${HTTP_PORT}/api/live/magic
+  Get divinity:  curl http://localhost:${HTTP_PORT}/api/live/divinity
+
+================================================================================
+NOTES
+================================================================================
+- All actions require a connected game (start the game first)
+- Actions are sent to the game via WebSocket and executed in real-time
+- Errors will return 400/500 status codes with error messages
+- Actions modify the live game state - use carefully!
+
+================================================================================
+`;
+
+    res.end(actionsHelp);
+    return;
+  }
+
+  // Handle CORS preflight for POST requests
+  if (req.method === 'OPTIONS' && pathname.startsWith('/api/actions/')) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.statusCode = 204;
+    res.end();
+    return;
+  }
+
+  // Action handlers - all require POST
+  if (pathname.startsWith('/api/actions/') && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const gameClient = getActiveGameClient();
+    if (!gameClient) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({ error: 'No game client connected', connected: false }));
+      return;
+    }
+
+    // Parse request body
+    let body = '';
+    req.on('data', chunk => { body += chunk.toString(); });
+    req.on('end', async () => {
+      try {
+        const params = JSON.parse(body);
+        const action = pathname.replace('/api/actions/', '');
+
+        // Route to specific action handler
+        let result;
+        switch (action) {
+          case 'spawn-agent':
+            result = await handleSpawnAgent(gameClient, params);
+            break;
+          case 'teleport':
+            result = await handleTeleport(gameClient, params);
+            break;
+          case 'set-need':
+            result = await handleSetNeed(gameClient, params);
+            break;
+          case 'give-item':
+            result = await handleGiveItem(gameClient, params);
+            break;
+          case 'trigger-behavior':
+            result = await handleTriggerBehavior(gameClient, params);
+            break;
+          case 'set-speed':
+            result = await handleSetSpeed(gameClient, params);
+            break;
+          case 'pause':
+            result = await handlePause(gameClient, params);
+            break;
+          case 'spawn-entity':
+            result = await handleSpawnEntity(gameClient, params);
+            break;
+          case 'grant-spell':
+            result = await handleGrantSpell(gameClient, params);
+            break;
+          case 'add-belief':
+            result = await handleAddBelief(gameClient, params);
+            break;
+          case 'create-deity':
+            result = await handleCreateDeity(gameClient, params);
+            break;
+          case 'set-llm-config':
+            result = await handleSetLLMConfig(gameClient, params);
+            break;
+          default:
+            res.statusCode = 404;
+            res.end(JSON.stringify({ error: `Unknown action: ${action}` }));
+            return;
+        }
+
+        res.end(JSON.stringify(result, null, 2));
+      } catch (err) {
+        res.statusCode = 400;
+        res.end(JSON.stringify({
+          error: err instanceof Error ? err.message : 'Invalid request',
+          details: err instanceof Error ? err.stack : undefined
+        }));
+      }
+    });
+    return;
+  }
+
+  // === Headless Game Control API ===
+  if (pathname === '/api/headless/list') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.end(JSON.stringify({
+      games: listHeadlessGames(),
+      total: headlessGames.size,
+    }, null, 2));
+    return;
+  }
+
+  if (pathname === '/api/headless/spawn' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    let body = '';
+    req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+    req.on('end', () => {
+      try {
+        const params = body ? JSON.parse(body) : {};
+        const sessionId = params.sessionId || `headless_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        const agentCount = params.agentCount || 5;
+
+        // Check if already running
+        if (headlessGames.has(sessionId)) {
+          res.statusCode = 409;
+          res.end(JSON.stringify({ error: `Game with session ${sessionId} already running` }));
+          return;
+        }
+
+        const game = spawnHeadlessGame(sessionId, agentCount);
+        res.end(JSON.stringify({
+          success: true,
+          sessionId,
+          agentCount,
+          status: game.status,
+          dashboardUrl: `http://localhost:${HTTP_PORT}/dashboard?session=${sessionId}`,
+        }, null, 2));
+      } catch (err) {
+        res.statusCode = 400;
+        res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Invalid request' }));
+      }
+    });
+    return;
+  }
+
+  if (pathname === '/api/headless/stop' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    let body = '';
+    req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+    req.on('end', () => {
+      try {
+        const params = body ? JSON.parse(body) : {};
+        const sessionId = params.sessionId;
+
+        if (!sessionId) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ error: 'sessionId is required' }));
+          return;
+        }
+
+        const stopped = stopHeadlessGame(sessionId);
+        if (stopped) {
+          res.end(JSON.stringify({ success: true, sessionId, message: 'Game stopped' }));
+        } else {
+          res.statusCode = 404;
+          res.end(JSON.stringify({ error: `No game found with session ${sessionId}` }));
+        }
+      } catch (err) {
+        res.statusCode = 400;
+        res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Invalid request' }));
+      }
+    });
+    return;
+  }
+
+  if (pathname === '/api/headless/stop-all' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const stopped: string[] = [];
+    for (const sessionId of headlessGames.keys()) {
+      if (stopHeadlessGame(sessionId)) {
+        stopped.push(sessionId);
+      }
+    }
+
+    res.end(JSON.stringify({ success: true, stopped, count: stopped.length }));
+    return;
+  }
+
+  if (pathname === '/api/headless' || pathname === '/api/headless/') {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const helpText = `================================================================================
+HEADLESS GAME CONTROL API
+================================================================================
+Run game simulations without a browser window.
+
+ENDPOINTS:
+--------------------------------------------------------------------------------
+
+1. LIST RUNNING GAMES
+   curl http://localhost:${HTTP_PORT}/api/headless/list
+
+   Returns: Array of running headless games with status
+
+2. SPAWN NEW GAME
+   curl -X POST http://localhost:${HTTP_PORT}/api/headless/spawn \\
+     -H "Content-Type: application/json" \\
+     -d '{"sessionId": "my_game_123", "agentCount": 5}'
+
+   Parameters:
+     - sessionId (string, optional): Custom session ID (auto-generated if not provided)
+     - agentCount (number, optional): Number of agents to spawn (default: 5)
+
+   Returns: Session info and dashboard URL
+
+3. STOP GAME
+   curl -X POST http://localhost:${HTTP_PORT}/api/headless/stop \\
+     -H "Content-Type: application/json" \\
+     -d '{"sessionId": "my_game_123"}'
+
+   Parameters:
+     - sessionId (string, required): Session ID of game to stop
+
+4. STOP ALL GAMES
+   curl -X POST http://localhost:${HTTP_PORT}/api/headless/stop-all
+
+   Stops all running headless games
+
+================================================================================
+RUNNING GAMES: ${headlessGames.size}
+================================================================================
+${listHeadlessGames().map(g => `  ${g.sessionId}: ${g.status} (${g.agentCount} agents, ${Math.round(g.uptime / 1000)}s uptime)`).join('\n') || '  (none)'}
+`;
+    res.end(helpText);
+    return;
+  }
+
   // === JSON Endpoints ===
   res.setHeader('Content-Type', 'application/json');
 
@@ -2763,6 +4002,22 @@ Available agents:
           '/dashboard/agent?id=<agentId> - Detailed agent info (more-agent-info)',
           '/dashboard/resources?session=<id> - Resource flow',
         ],
+        category_views: [
+          '/dashboard/magic - Magic systems & spellbook',
+          '/dashboard/divinity - Divine powers & vision composer',
+          '/dashboard/economy - Resources, economy, shop, crafting',
+          '/dashboard/social - Population, relationships, governance',
+          '/dashboard/info - Agent, animal, plant, tile info',
+          '/dashboard/environment - Weather & environment',
+          '/dashboard/settings - Settings & controls',
+          '/dashboard/dev - Developer tools',
+        ],
+        unified_views: [
+          '/views - List all available dashboard views',
+          '/view/<id> - Get view data as formatted text',
+          '/view/<id>?format=json - Get view data as JSON',
+          '/view/<id>?session=<id> - Get view for specific session',
+        ],
         json_api: [
           '/metrics?session=<id> - Raw metrics',
           '/metrics/building?session=<id> - Building metrics',
@@ -2773,6 +4028,30 @@ Available agents:
           '/api/live/entities - List all agents (live)',
           '/api/live/entity?id=<entityId> - Get entity state (live)',
           '/api/live/prompt?id=<entityId> - Get LLM prompt (live)',
+          '/api/live/universe - Get universe configuration (dimensions, laws, etc.)',
+          '/api/live/magic - Get magic system info (enabled paradigms, etc.)',
+          '/api/live/divinity - Get divinity info (gods, belief, pantheons, etc.)',
+        ],
+        actions_api: [
+          '/api/actions - List all available dev actions (LLM dev tools)',
+          'POST /api/actions/spawn-agent - Spawn a new agent',
+          'POST /api/actions/teleport - Teleport an agent',
+          'POST /api/actions/give-item - Give items to an agent',
+          'POST /api/actions/set-need - Set agent needs (hunger, energy, etc.)',
+          'POST /api/actions/trigger-behavior - Trigger a behavior',
+          'POST /api/actions/set-speed - Change game speed',
+          'POST /api/actions/pause - Pause/resume game',
+          'POST /api/actions/spawn-entity - Spawn entities (trees, animals, etc.)',
+          'POST /api/actions/grant-spell - Grant spells to agents',
+          'POST /api/actions/add-belief - Add belief to deities',
+          'POST /api/actions/create-deity - Create a new deity',
+        ],
+        headless_api: [
+          '/api/headless - Headless game control help',
+          '/api/headless/list - List running headless games',
+          'POST /api/headless/spawn - Start a headless game',
+          'POST /api/headless/stop - Stop a headless game by session ID',
+          'POST /api/headless/stop-all - Stop all headless games',
         ],
       },
     }, null, 2));

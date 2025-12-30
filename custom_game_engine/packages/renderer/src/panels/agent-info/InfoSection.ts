@@ -14,15 +14,14 @@ import type {
   InventoryComponentData,
   GoalsComponent,
 } from './types.js';
+import type { PersonalGoal } from '@ai-village/core';
 import {
   wrapText,
   renderWrappedText,
   renderSeparator,
-  countResourcesByType,
   getTemperatureStateColor,
   getNeedBarColor,
 } from './renderUtils.js';
-import { InventorySection } from './InventorySection.js';
 
 export class InfoSection {
   private panelWidth = 360;
@@ -36,7 +35,7 @@ export class InfoSection {
     position: PositionComponentData | undefined,
     temperature: TemperatureComponentData | undefined,
     movement: MovementComponentData | undefined,
-    inventory: InventoryComponentData | undefined,
+    _inventory: InventoryComponentData | undefined,
     goals?: GoalsComponent
   ): void {
     const { ctx, x, y, padding, lineHeight } = context;
@@ -136,7 +135,7 @@ export class InfoSection {
 
       // New personal goals system
       if (goals && goals.goals.length > 0) {
-        const activeGoals = goals.goals.filter(g => !g.completed);
+        const activeGoals = goals.goals.filter((g: PersonalGoal) => !g.completed);
 
         if (activeGoals.length > 0) {
           ctx.fillStyle = '#FFD700';
@@ -279,9 +278,15 @@ export class InfoSection {
       currentY = renderWrappedText(ctx, `"${agent.recentSpeech}"`, x, currentY, padding, lineHeight, this.panelWidth - padding * 2, 2);
     }
 
-    // Inventory section
-    if (inventory) {
-      currentY = this.renderInventorySummary(ctx, x, currentY, inventory, padding, lineHeight);
+    // Planned Builds section
+    if (agent?.plannedBuilds && agent.plannedBuilds.length > 0) {
+      currentY = this.renderPlannedBuilds(ctx, x, currentY, agent, padding, lineHeight);
+    }
+
+    // Action Queue section
+    const actionQueue = entity.components.get('action_queue') as any;
+    if (actionQueue && !actionQueue.isEmpty()) {
+      currentY = this.renderActionQueue(ctx, x, currentY, actionQueue, padding, lineHeight);
     }
 
     // Behavior Queue section
@@ -304,6 +309,9 @@ export class InfoSection {
     const barX = panelX + padding + 60;
     const barY = y - 9;
 
+    // NeedsComponent uses 0-1 scale, convert to percentage for display
+    const displayValue = value * 100;
+
     ctx.fillStyle = '#FFFFFF';
     ctx.font = '12px monospace';
     ctx.fillText(label, panelX + padding, y);
@@ -311,8 +319,8 @@ export class InfoSection {
     ctx.fillStyle = 'rgba(50, 50, 50, 0.8)';
     ctx.fillRect(barX, barY, barWidth, barHeight);
 
-    const fillWidth = (barWidth * value) / 100;
-    const color = getNeedBarColor(label, value);
+    const fillWidth = (barWidth * displayValue) / 100;
+    const color = getNeedBarColor(label, displayValue);
     ctx.fillStyle = color;
     ctx.fillRect(barX, barY, fillWidth, barHeight);
 
@@ -323,97 +331,135 @@ export class InfoSection {
     ctx.fillStyle = '#FFFFFF';
     ctx.font = '10px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(`${value.toFixed(0)}`, barX + barWidth / 2, barY + barHeight - 2);
+    ctx.fillText(`${displayValue.toFixed(0)}`, barX + barWidth / 2, barY + barHeight - 2);
     ctx.textAlign = 'left';
 
     return y + lineHeight;
   }
 
-  private renderInventorySummary(
+  private renderPlannedBuilds(
     ctx: CanvasRenderingContext2D,
     panelX: number,
     y: number,
-    inventory: InventoryComponentData,
+    agent: AgentComponentData,
     padding: number,
     lineHeight: number
   ): number {
-    if (inventory.maxWeight === undefined) {
-      throw new Error("InventoryComponent missing required 'maxWeight' field");
-    }
-    if (inventory.maxSlots === undefined) {
-      throw new Error("InventoryComponent missing required 'maxSlots' field");
-    }
-    if (inventory.currentWeight === undefined) {
-      throw new Error("InventoryComponent missing required 'currentWeight' field");
+    if (!agent.plannedBuilds || agent.plannedBuilds.length === 0) {
+      return y;
     }
 
     renderSeparator(ctx, panelX, y, this.panelWidth, padding);
     y += 10;
 
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 14px monospace';
-    ctx.fillText('INVENTORY', panelX + padding, y);
+    ctx.font = 'bold 12px monospace';
+    ctx.fillStyle = '#88CCFF';
+    ctx.fillText(`🏗️ Planned Builds (${agent.plannedBuilds.length})`, panelX + padding, y);
     y += lineHeight + 5;
 
-    const resourceCounts = countResourcesByType(inventory.slots);
-    const hasAnyResources = Object.values(resourceCounts).some((count) => count > 0);
+    const maxItems = Math.min(5, agent.plannedBuilds.length);
+    ctx.font = '11px monospace';
 
-    ctx.font = '12px monospace';
+    for (let i = 0; i < maxItems; i++) {
+      const build = agent.plannedBuilds[i];
+      if (!build) continue;
 
-    if (!hasAnyResources) {
-      ctx.fillStyle = '#888';
-      ctx.fillText('(empty)', panelX + padding, y);
-      y += lineHeight;
-    } else {
-      const categories = InventorySection.categorizeItems(resourceCounts);
-      const categoryIcons: Record<string, string> = {
-        Food: '🍎',
-        Materials: '🪨',
-        Seeds: '🌱',
-        Other: '📦',
-      };
-      const categoryColors: Record<string, string> = {
-        Food: '#AAFFAA',
-        Materials: '#FFCC88',
-        Seeds: '#88DDFF',
-        Other: '#CCCCCC',
-      };
+      // Priority color
+      const priorityColor =
+        build.priority === 'high' ? '#FFD700' :
+        build.priority === 'normal' ? '#FFFFFF' :
+        '#888888';
 
-      for (const [category, data] of Object.entries(categories)) {
-        if (data.total > 0) {
-          const icon = categoryIcons[category] || '📦';
-          ctx.fillStyle = categoryColors[category] || '#FFFFFF';
-          ctx.fillText(`${icon} ${category}: ${data.total} (${data.items.length} types)`, panelX + padding, y);
-          y += lineHeight;
+      ctx.fillStyle = priorityColor;
+
+      // Building name and position
+      const buildingName = build.buildingType.replace('_', ' ');
+      const posText = `${buildingName} @ (${build.position.x.toFixed(0)}, ${build.position.y.toFixed(0)})`;
+      ctx.fillText(posText, panelX + padding + 5, y);
+      y += 14;
+
+      // Reason (if available)
+      if (build.reason) {
+        ctx.fillStyle = '#888888';
+        const wrappedReason = wrapText(build.reason, this.panelWidth - padding * 2 - 10);
+        for (const line of wrappedReason.slice(0, 2)) {
+          ctx.fillText(`  ${line}`, panelX + padding + 5, y);
+          y += 12;
         }
       }
+    }
 
-      const totalItems = Object.values(resourceCounts).reduce((sum, count) => sum + count, 0);
-      const uniqueTypes = Object.keys(resourceCounts).length;
+    if (agent.plannedBuilds.length > maxItems) {
       ctx.fillStyle = '#888888';
-      ctx.font = '10px monospace';
-      ctx.fillText(`Total: ${totalItems} items, ${uniqueTypes} types`, panelX + padding, y);
-      y += lineHeight;
-      ctx.font = '12px monospace';
+      ctx.fillText(`... and ${agent.plannedBuilds.length - maxItems} more`, panelX + padding + 5, y);
+      y += 14;
     }
 
-    const usedSlots = inventory.slots.filter((s) => s.itemId !== null && s.quantity > 0).length;
-    const weightPercent = (inventory.currentWeight / inventory.maxWeight) * 100;
-    const slotsPercent = (usedSlots / inventory.maxSlots) * 100;
+    y += 5;
+    return y;
+  }
 
-    let capacityColor = '#FFFFFF';
-    if (weightPercent >= 100 || slotsPercent >= 100) {
-      capacityColor = '#FF0000';
-    } else if (weightPercent >= 80 || slotsPercent >= 80) {
-      capacityColor = '#FFFF00';
-    }
+  private renderActionQueue(
+    ctx: CanvasRenderingContext2D,
+    panelX: number,
+    y: number,
+    actionQueue: any,
+    padding: number,
+    lineHeight: number
+  ): number {
+    renderSeparator(ctx, panelX, y, this.panelWidth, padding);
+    y += 10;
 
-    ctx.font = '11px monospace';
-    ctx.fillStyle = capacityColor;
-    const capacityText = `Weight: ${Math.round(inventory.currentWeight)}/${inventory.maxWeight}  Slots: ${usedSlots}/${inventory.maxSlots}`;
-    ctx.fillText(capacityText, panelX + padding, y);
+    ctx.font = 'bold 12px monospace';
+    ctx.fillStyle = '#FFAA00';
+    ctx.fillText(`⚙️ Action Queue (${actionQueue.size()})`, panelX + padding, y);
     y += lineHeight + 5;
 
+    // Get all actions by accessing the private queue field
+    // Since this is a UI display, we'll peek at the internal state
+    const actions = (actionQueue as any).queue || [];
+    const maxItems = Math.min(5, actions.length);
+
+    ctx.font = '11px monospace';
+    for (let i = 0; i < maxItems; i++) {
+      const action = actions[i];
+      if (!action) continue;
+
+      const isCurrent = i === 0;
+
+      if (isCurrent) {
+        ctx.fillStyle = 'rgba(255, 170, 0, 0.15)';
+        ctx.fillRect(panelX + padding, y - 11, this.panelWidth - padding * 2, 14);
+      }
+
+      ctx.fillStyle = isCurrent ? '#00FF00' : '#FFFFFF';
+
+      const actionName = action.type.replace('_', ' ');
+      const priorityText = action.priority ? ` [P${action.priority}]` : '';
+      const statusIcon = isCurrent ? '▶' : '·';
+      const displayText = `${statusIcon} ${actionName}${priorityText}`;
+
+      ctx.fillText(displayText, panelX + padding + 5, y);
+      y += 14;
+
+      // Show target if available
+      if (action.targetId || action.targetPos) {
+        ctx.fillStyle = '#888888';
+        const target = action.targetId
+          ? `ID: ${action.targetId.substring(0, 8)}`
+          : `Pos: (${action.targetPos?.x?.toFixed(0)}, ${action.targetPos?.y?.toFixed(0)})`;
+        ctx.fillText(`  ${target}`, panelX + padding + 5, y);
+        y += 12;
+      }
+    }
+
+    if (actions.length > maxItems) {
+      ctx.fillStyle = '#888888';
+      ctx.fillText(`... and ${actions.length - maxItems} more`, panelX + padding + 5, y);
+      y += 14;
+    }
+
+    y += 5;
     return y;
   }
 

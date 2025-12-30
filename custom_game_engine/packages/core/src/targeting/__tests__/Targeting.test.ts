@@ -1,3 +1,5 @@
+import { ComponentType } from '../../types/ComponentType.js';
+import { BuildingType } from '../../types/BuildingType.js';
 /**
  * Tests for Targeting Module - Phase 2 of AISystem Decomposition
  *
@@ -10,6 +12,7 @@ import type { EntityImpl } from '../../ecs/Entity.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { VisionComponent } from '../../components/VisionComponent.js';
 import { createIdentityComponent } from '../../components/IdentityComponent.js';
+import { SpatialMemoryComponent, addSpatialMemory } from '../../components/SpatialMemoryComponent.js';
 
 import { ResourceTargeting, findNearestResource, findResourceTarget } from '../ResourceTargeting.js';
 import { PlantTargeting, findNearestPlant, findNearestEdiblePlant } from '../PlantTargeting.js';
@@ -44,7 +47,7 @@ describe('Targeting Module', () => {
     position: { x: number; y: number },
     seenEntities: { agents?: string[]; resources?: string[]; plants?: string[] } = {}
   ): EntityImpl {
-    return createEntity({
+    const agent = createEntity({
       position: { x: position.x, y: position.y },
       vision: {
         range: 15,
@@ -57,8 +60,10 @@ describe('Targeting Module', () => {
         heardSpeech: [],
       },
       agent: { name: 'TestAgent', behavior: 'idle' },
-      spatial_memory: { locations: new Map() },
     });
+    // Add SpatialMemoryComponent using the class
+    agent.addComponent(new SpatialMemoryComponent());
+    return agent;
   }
 
   // ============================================================================
@@ -285,7 +290,7 @@ describe('Targeting Module', () => {
       const storage = createEntity({
         position: { x: 10, y: 0 },
         building: {
-          buildingType: 'storage',
+          buildingType: BuildingType.StorageChest,
           constructionProgress: 1.0,
           capacity: 100,
           storedItems: [],
@@ -294,32 +299,32 @@ describe('Targeting Module', () => {
 
       const agent = createAgentWithVision({ x: 0, y: 0 });
       // Add building to vision range via query (buildings aren't in seenBuildings by default)
-      (agent.getComponent('vision') as any).range = 15;
+      (agent.getComponent(ComponentType.Vision) as any).range = 15;
 
       const targeting = new BuildingTargeting();
-      const nearest = targeting.findNearest(agent, world, { buildingType: 'storage' });
+      const nearest = targeting.findNearest(agent, world, { buildingType: BuildingType.StorageChest });
 
       expect(nearest).not.toBeNull();
-      expect(nearest!.buildingType).toBe('storage');
+      expect(nearest!.buildingType).toBe(BuildingType.StorageChest);
       expect(nearest!.isComplete).toBe(true);
     });
 
     it('filters by completion status', () => {
       const incomplete = createEntity({
         position: { x: 5, y: 0 },
-        building: { buildingType: 'house', constructionProgress: 0.5 },
+        building: { buildingType: BuildingType.Tent, constructionProgress: 0.5 },
       });
 
       const complete = createEntity({
         position: { x: 10, y: 0 },
-        building: { buildingType: 'house', constructionProgress: 1.0 },
+        building: { buildingType: BuildingType.Tent, constructionProgress: 1.0 },
       });
 
       const agent = createAgentWithVision({ x: 0, y: 0 });
 
       const targeting = new BuildingTargeting();
       const nearest = targeting.findNearest(agent, world, {
-        buildingType: 'house',
+        buildingType: BuildingType.Tent,
         completed: true,
       });
 
@@ -331,7 +336,7 @@ describe('Targeting Module', () => {
       const full = createEntity({
         position: { x: 5, y: 0 },
         building: {
-          buildingType: 'storage',
+          buildingType: BuildingType.StorageChest,
           constructionProgress: 1.0,
           capacity: 10,
           storedItems: new Array(10).fill('item'),
@@ -341,7 +346,7 @@ describe('Targeting Module', () => {
       const hasSpace = createEntity({
         position: { x: 10, y: 0 },
         building: {
-          buildingType: 'storage',
+          buildingType: BuildingType.StorageChest,
           constructionProgress: 1.0,
           capacity: 10,
           storedItems: ['item1', 'item2'],
@@ -352,7 +357,7 @@ describe('Targeting Module', () => {
 
       const targeting = new BuildingTargeting();
       const nearest = targeting.findNearest(agent, world, {
-        buildingType: 'storage',
+        buildingType: BuildingType.StorageChest,
         hasCapacity: true,
       });
 
@@ -389,7 +394,7 @@ describe('Targeting Module', () => {
       const agent = createAgentWithVision({ x: 0, y: 0 });
 
       // Add self to seen agents
-      const vision = agent.getComponent<VisionComponent>('vision')!;
+      const vision = agent.getComponent(ComponentType.Vision)!;
       (vision as any).seenAgents = [agent.id];
 
       const targeting = new AgentTargeting();
@@ -498,7 +503,7 @@ describe('Targeting Module', () => {
       });
 
       // Add predator to prey's vision
-      const vision = prey.getComponent<VisionComponent>('vision')!;
+      const vision = prey.getComponent(ComponentType.Vision)!;
       (vision as any).seenAgents = [predator.id];
 
       const targeting = new ThreatTargeting();
@@ -533,7 +538,7 @@ describe('Targeting Module', () => {
         animal: { isPredator: true, preySpecies: ['rabbit'], threatLevel: 50 },
       });
 
-      const vision = animal.getComponent<VisionComponent>('vision')!;
+      const vision = animal.getComponent(ComponentType.Vision)!;
       (vision as any).seenAgents = [threat1.id, threat2.id];
 
       const assessment = assessThreats(animal, world);
@@ -577,7 +582,7 @@ describe('Targeting Module', () => {
         resource: { resourceType: 'fire', dangerLevel: 100 },
       });
 
-      const vision = agent.getComponent<VisionComponent>('vision')!;
+      const vision = agent.getComponent(ComponentType.Vision)!;
       (vision as any).seenResources = [fire.id];
 
       const threat = findNearestThreat(agent, world);
@@ -621,8 +626,18 @@ describe('Targeting Module', () => {
       const agent = createAgentWithVision({ x: 0, y: 0 });
 
       // No visible resources, but we have a remembered location
-      const spatialMemory = agent.getComponent('spatial_memory') as any;
-      spatialMemory.locations.set('resource:wood', { x: 50, y: 50, tick: 100 });
+      const spatialMemory = agent.getComponent(ComponentType.SpatialMemory) as SpatialMemoryComponent;
+      addSpatialMemory(
+        spatialMemory,
+        {
+          type: 'resource_location',
+          x: 50,
+          y: 50,
+          metadata: { resourceType: 'wood', category: 'resource:wood' },
+        },
+        100,
+        80
+      );
 
       const result = findResourceTarget(agent, world, { resourceType: 'wood' });
 

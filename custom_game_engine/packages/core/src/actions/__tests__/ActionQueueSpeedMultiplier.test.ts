@@ -5,6 +5,7 @@ import type { Action } from '../Action';
 import type { WorldMutator } from '../../ecs/World';
 import { EntityImpl } from '../../ecs/Entity';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Unit tests for ActionQueue speed multiplier support
  *
@@ -23,12 +24,12 @@ describe('ActionQueue Speed Multiplier', () => {
       id: 'time-entity',
       getComponent: vi.fn((type: string) => {
         if (type === 'time') {
-          return { type: 'time', speedMultiplier };
+          return { type: ComponentType.Time, speedMultiplier };
         }
         return undefined;
       }),
       hasComponent: vi.fn((type: string) => type === 'time'),
-      components: new Map([['time', { type: 'time', speedMultiplier }]]),
+      components: new Map([['time', { type: ComponentType.Time, speedMultiplier }]]),
     } as unknown as EntityImpl;
     return entity;
   }
@@ -233,21 +234,21 @@ describe('ActionQueue Speed Multiplier', () => {
 
     it('should handle dynamic speed changes during action', () => {
       let currentSpeed = 1;
-      const timeComponent = { type: 'time' as const, speedMultiplier: currentSpeed };
+      const timeComponent = { type: ComponentType.Time, speedMultiplier: currentSpeed };
       const componentsMap = new Map([['time', timeComponent]]);
 
       const timeEntity = {
         id: 'time-entity',
         getComponent: vi.fn((type: string) => {
           if (type === 'time') {
-            return { type: 'time', speedMultiplier: currentSpeed };
+            return { type: ComponentType.Time, speedMultiplier: currentSpeed };
           }
           return undefined;
         }),
         hasComponent: vi.fn((type: string) => type === 'time'),
         get components() {
           // Update the map's value to reflect current speed
-          componentsMap.set('time', { type: 'time', speedMultiplier: currentSpeed });
+          componentsMap.set('time', { type: ComponentType.Time, speedMultiplier: currentSpeed });
           return componentsMap;
         },
       } as unknown as EntityImpl;

@@ -1,52 +1,13 @@
 import type { Component } from '../ecs/Component.js';
+import { BuildingType, type BuildingTypeString } from '../types/BuildingType.js';
 
-/**
- * Building types - includes Tier 1 buildings from construction-system/spec.md
- * Plus legacy types for backward compatibility
- * Plus Tier 2.5 animal housing from construction-system/spec.md
- * Plus governance buildings from governance-dashboard work order
- */
-export type BuildingType =
-  // Tier 1 buildings (per spec)
-  | 'workbench'
-  | 'storage-chest'
-  | 'campfire'
-  | 'tent'
-  | 'well'
-  // Tier 2 crafting stations (Phase 10)
-  | 'forge'
-  | 'farm_shed'
-  | 'market_stall'
-  | 'windmill'
-  // Tier 3 crafting stations (Phase 10)
-  | 'workshop'
-  // Tier 2.5 animal housing (per spec)
-  | 'chicken-coop'
-  | 'kennel'
-  | 'stable'
-  | 'apiary'
-  | 'aquarium'
-  | 'barn'
-  // Sleeping/furniture
-  | 'bed'
-  | 'bedroll'
-  // Legacy types (backward compatibility)
-  | 'lean-to'
-  | 'storage-box'
-  // Governance buildings (per governance-dashboard work order)
-  | 'town-hall'
-  | 'census-bureau'
-  | 'warehouse'
-  | 'weather-station'
-  | 'health-clinic'
-  | 'meeting-hall'
-  | 'watchtower'
-  | 'labor-guild'
-  | 'archive';
+// Re-export enum and type for backwards compatibility
+export { BuildingType };
+export type { BuildingTypeString };
 
 export interface BuildingComponent extends Component {
   type: 'building';
-  buildingType: BuildingType;
+  buildingType: BuildingTypeString;
   tier: number; // Building quality/advancement level (1-3)
   progress: number; // Construction progress (0-100)
   isComplete: boolean; // Whether construction is finished
@@ -56,6 +17,8 @@ export interface BuildingComponent extends Component {
   providesHeat: boolean; // Whether it provides heat (campfire)
   heatRadius: number; // Tiles from heat source (0 = no heat)
   heatAmount: number; // Degrees celsius of heat provided
+  providesShade: boolean; // Whether it provides shade/cooling
+  shadeRadius: number; // Tiles of shade coverage (0 = no shade)
   insulation: number; // 0-1, how much it reduces ambient temperature effect
   baseTemperature: number; // Degrees celsius added to interior
   weatherProtection: number; // 0-1, how much it protects from weather effects
@@ -100,6 +63,8 @@ export function createBuildingComponent(
   let providesHeat = false;
   let heatRadius = 0;
   let heatAmount = 0;
+  let providesShade = false;
+  let shadeRadius = 0;
   let insulation = 0;
   let baseTemperature = 0;
   let weatherProtection = 0;
@@ -111,19 +76,19 @@ export function createBuildingComponent(
   let currentFuel = 0;
   let maxFuel = 0;
   let fuelConsumptionRate = 0;
-  let activeRecipe: string | null = null;
+  const activeRecipe: string | null = null;
 
   // Phase 11: Animal housing properties
   let animalCapacity = 0;
   let allowedSpecies: string[] = [];
-  let currentOccupants: string[] = [];
-  let cleanliness = 100; // Start clean
+  const currentOccupants: string[] = [];
+  const cleanliness = 100; // Start clean
 
   // Governance buildings properties
   let isGovernanceBuilding = false;
-  let condition = 100; // Start in perfect condition
+  const condition = 100; // Start in perfect condition
   let requiredStaff = 0;
-  let currentStaff: string[] = [];
+  const currentStaff: string[] = [];
   let governanceType: string | undefined;
   let resourceType: string | undefined;
   let requiresOpenArea: boolean | undefined;
@@ -351,6 +316,8 @@ export function createBuildingComponent(
     providesHeat,
     heatRadius,
     heatAmount,
+    providesShade,
+    shadeRadius,
     insulation,
     baseTemperature,
     weatherProtection,

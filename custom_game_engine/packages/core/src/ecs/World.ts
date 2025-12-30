@@ -18,6 +18,10 @@ import { createRenderableComponent } from '../components/RenderableComponent.js'
 import { BuildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistry.js';
 import { PlacementValidator } from '../buildings/PlacementValidator.js';
 import { resetUsedNames } from '../components/IdentityComponent.js';
+import type { TerrainType, BiomeType } from '../types/TerrainTypes.js';
+
+// Re-export for backwards compatibility
+export type { TerrainType, BiomeType };
 
 /**
  * Chunk interface from world package.
@@ -45,6 +49,32 @@ export interface IChunkManager {
  */
 export interface ITerrainGenerator {
   generateChunk(chunk: IChunk, world: WorldMutator): void;
+}
+
+/**
+ * Tile interface for world coordinates.
+ * Defined here to avoid circular dependency with world package.
+ * Must match the Tile interface in @ai-village/world.
+ */
+export interface ITile {
+  terrain: TerrainType;
+  floor?: string;
+  moisture: number;
+  fertility: number;
+  biome?: BiomeType;
+  tilled: boolean;
+  plantability: number;
+  nutrients: {
+    nitrogen: number;
+    phosphorus: number;
+    potassium: number;
+  };
+  fertilized: boolean;
+  fertilizerDuration: number;
+  lastWatered: number;
+  lastTilled: number;
+  composted: boolean;
+  plantId: string | null;
 }
 
 /**
@@ -120,7 +150,7 @@ export interface World {
    * Used by action handlers (tilling, planting, etc.) to access tile data.
    * Returns undefined if tile doesn't exist or ChunkManager not set.
    */
-  getTileAt?(x: number, y: number): any;
+  getTileAt?(x: number, y: number): ITile | undefined;
 
   /**
    * Get terrain type at world coordinates.
@@ -178,6 +208,7 @@ export class WorldImpl implements WorldMutator {
   private _eventBus: EventBus;
   private _chunkManager?: IChunkManager;
   private _terrainGenerator?: ITerrainGenerator;
+  private buildingRegistry?: BuildingBlueprintRegistry;
 
   // Spatial indices (will be populated as needed)
   private chunkIndex = new Map<string, Set<EntityId>>();
@@ -419,7 +450,7 @@ export class WorldImpl implements WorldMutator {
    * CRITICAL FIX: Generates chunks on-demand if they haven't been generated yet.
    * This ensures biome data exists for all tiles accessed by action handlers.
    */
-  getTileAt(x: number, y: number): any {
+  getTileAt(x: number, y: number): ITile | undefined {
     if (!this._chunkManager) {
       return undefined;
     }
@@ -446,7 +477,7 @@ export class WorldImpl implements WorldMutator {
 
     // Get tile from chunk (row-major order)
     const tileIndex = localY * CHUNK_SIZE + localX;
-    return chunk.tiles[tileIndex];
+    return chunk.tiles[tileIndex] as ITile | undefined;
   }
 
   /**
@@ -513,19 +544,14 @@ export class WorldImpl implements WorldMutator {
       throw new Error('Inventory is required');
     }
 
-    // Get blueprint from world's registry if available, otherwise create temp registry
+    // Get blueprint from world's registry if available, otherwise create and cache
     // This prevents duplicate registration issues
-    let registry: BuildingBlueprintRegistry;
-    if ((this as any).buildingRegistry) {
-      registry = (this as any).buildingRegistry;
-    } else {
-      registry = new BuildingBlueprintRegistry();
-      registry.registerDefaults();
-      registry.registerTier2Stations(); // Phase 10: Crafting Stations
-      registry.registerTier3Stations(); // Phase 10: Advanced Crafting Stations
-      registry.registerGovernanceBuildings(); // Phase 11: Governance Infrastructure
+    if (!this.buildingRegistry) {
+      this.buildingRegistry = new BuildingBlueprintRegistry();
+      // registerDefaults() internally calls all tier registration methods
+      this.buildingRegistry.registerDefaults();
     }
-    const blueprint = registry.get(buildingType);
+    const blueprint = this.buildingRegistry.get(buildingType);
 
     // Validate placement
     const validator = new PlacementValidator();

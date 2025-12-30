@@ -1,3 +1,4 @@
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Navigation System Integration Tests
  *
@@ -65,7 +66,7 @@ function createTestAgent(
 
   // Add agent component
   const agentComponent: AgentComponent = {
-    type: 'agent',
+    type: ComponentType.Agent,
     version: 1,
     behavior: behavior as any,
     behaviorState,
@@ -77,7 +78,7 @@ function createTestAgent(
 
   // Add vision component
   const visionComponent: VisionComponent = {
-    type: 'vision',
+    type: ComponentType.Vision,
     version: 1,
     range: 30,
     canSeeResources: true,
@@ -109,7 +110,7 @@ function createTestResource(
   entity.addComponent(createPositionComponent(position.x, position.y));
 
   const resourceComponent: ResourceComponent = {
-    type: 'resource',
+    type: ComponentType.Resource,
     version: 1,
     resourceType,
     amount,
@@ -127,7 +128,7 @@ function createTestResource(
  * Simulate agent update (execute behavior)
  */
 function updateAgent(entity: EntityImpl, world: WorldImpl): void {
-  const agent = entity.getComponent<AgentComponent>('agent');
+  const agent = entity.getComponent(ComponentType.Agent);
   if (!agent) return;
 
   switch (agent.behavior) {
@@ -150,8 +151,8 @@ function updateAgent(entity: EntityImpl, world: WorldImpl): void {
  * Apply movement velocity to position
  */
 function applyMovement(entity: EntityImpl, deltaTime: number = 1 / 20): void {
-  const position = entity.getComponent<PositionComponent>('position');
-  const movement = entity.getComponent<MovementComponent>('movement');
+  const position = entity.getComponent(ComponentType.Position);
+  const movement = entity.getComponent(ComponentType.Movement);
 
   if (position && movement) {
     entity.updateComponent<PositionComponent>('position', (p) => ({
@@ -190,7 +191,7 @@ describe('Navigation Integration Tests', () => {
         world.advanceTick();
       }
 
-      const position = agent.getComponent<PositionComponent>('position')!;
+      const position = agent.getComponent(ComponentType.Position)!;
 
       // Agent should have moved toward target (within arrival threshold or arrived)
       expect(position.x).toBeGreaterThan(5);
@@ -203,7 +204,7 @@ describe('Navigation Integration Tests', () => {
 
       // First update - measure initial velocity
       updateAgent(agent, world);
-      const movement1 = agent.getComponent<MovementComponent>('movement')!;
+      const movement1 = agent.getComponent(ComponentType.Movement)!;
       const initialVelocity = Math.abs(movement1.velocityX);
 
       // Move closer
@@ -213,8 +214,8 @@ describe('Navigation Integration Tests', () => {
         world.advanceTick();
       }
 
-      const position = agent.getComponent<PositionComponent>('position')!;
-      const movement2 = agent.getComponent<MovementComponent>('movement')!;
+      const position = agent.getComponent(ComponentType.Position)!;
+      const movement2 = agent.getComponent(ComponentType.Movement)!;
       const laterVelocity = Math.abs(movement2.velocityX);
 
       // Should be moving toward target
@@ -258,7 +259,7 @@ describe('Navigation Integration Tests', () => {
 
       updateAgent(agent, world);
 
-      const agentComp = agent.getComponent<AgentComponent>('agent')!;
+      const agentComp = agent.getComponent(ComponentType.Agent)!;
       expect(agentComp.behavior).toBe('wander');
     });
   });
@@ -269,7 +270,7 @@ describe('Navigation Integration Tests', () => {
         radius: 2,
       });
 
-      const hearsay = agent.getComponent<HearsayMemoryComponent>('hearsay_memory')!;
+      const hearsay = agent.getComponent(ComponentType.HearsayMemory)!;
       const startSector = worldToSector(50, 50);
 
       // Mark current sector as explored
@@ -282,7 +283,7 @@ describe('Navigation Integration Tests', () => {
         world.advanceTick();
       }
 
-      const position = agent.getComponent<PositionComponent>('position')!;
+      const position = agent.getComponent(ComponentType.Position)!;
 
       // Agent should have moved from starting position
       const distance = Math.sqrt(
@@ -299,7 +300,7 @@ describe('Navigation Integration Tests', () => {
         { radius: 1 }
       );
 
-      const hearsay = agent.getComponent<HearsayMemoryComponent>('hearsay_memory')!;
+      const hearsay = agent.getComponent(ComponentType.HearsayMemory)!;
 
       // Run exploration
       for (let i = 0; i < 200; i++) {
@@ -317,7 +318,7 @@ describe('Navigation Integration Tests', () => {
         radius: 1, // Small radius - only checks 1 sector in each direction
       });
 
-      const hearsay = agent.getComponent<HearsayMemoryComponent>('hearsay_memory')!;
+      const hearsay = agent.getComponent(ComponentType.HearsayMemory)!;
       const center = worldToSector(50, 50);
 
       // Mark only HearsayMemory sectors as explored (MapKnowledge still has unexplored)
@@ -331,7 +332,7 @@ describe('Navigation Integration Tests', () => {
       // Run exploration - should still have a target from MapKnowledge fallback
       updateAgent(agent, world);
 
-      const agentComp = agent.getComponent<AgentComponent>('agent')!;
+      const agentComp = agent.getComponent(ComponentType.Agent)!;
       // Behavior should remain explore_frontier (using MapKnowledge fallback)
       // OR should have set a target sector from MapKnowledge
       // Either indicates the fallback mechanism is working
@@ -355,7 +356,7 @@ describe('Navigation Integration Tests', () => {
         world.advanceTick();
 
         if (i % 50 === 0) {
-          const pos = agent.getComponent<PositionComponent>('position')!;
+          const pos = agent.getComponent(ComponentType.Position)!;
           positions.push({ x: pos.x, y: pos.y });
         }
       }
@@ -383,7 +384,7 @@ describe('Navigation Integration Tests', () => {
 
       updateAgent(agent, world);
 
-      const agentComp = agent.getComponent<AgentComponent>('agent')!;
+      const agentComp = agent.getComponent(ComponentType.Agent)!;
       expect(agentComp.behaviorState.spiralInitialized).toBe(true);
       expect(agentComp.behaviorState.homeSectorX).toBeDefined();
       expect(agentComp.behaviorState.homeSectorY).toBeDefined();
@@ -396,7 +397,7 @@ describe('Navigation Integration Tests', () => {
         resourceType: 'food',
       });
 
-      const hearsay = agent.getComponent<HearsayMemoryComponent>('hearsay_memory')!;
+      const hearsay = agent.getComponent(ComponentType.HearsayMemory)!;
 
       // Add hearsay: "food is to the east, close"
       addHearsay(hearsay, 'food', 'east', 'close', 'alice', 'Alice', { x: 100, y: 100 }, 0);
@@ -418,7 +419,7 @@ describe('Navigation Integration Tests', () => {
         world.advanceTick();
       }
 
-      const position = agent.getComponent<PositionComponent>('position')!;
+      const position = agent.getComponent(ComponentType.Position)!;
 
       // Agent should have moved east (positive x direction)
       expect(position.x).toBeGreaterThan(100);
@@ -432,7 +433,7 @@ describe('Navigation Integration Tests', () => {
       // No hearsay added - should switch to explore
       updateAgent(agent, world);
 
-      const agentComp = agent.getComponent<AgentComponent>('agent')!;
+      const agentComp = agent.getComponent(ComponentType.Agent)!;
       expect(agentComp.behavior).toBe('explore_frontier');
     });
 
@@ -441,7 +442,7 @@ describe('Navigation Integration Tests', () => {
         resourceType: 'food',
       });
 
-      const hearsay = agent.getComponent<HearsayMemoryComponent>('hearsay_memory')!;
+      const hearsay = agent.getComponent(ComponentType.HearsayMemory)!;
 
       // Add hearsay: "food is nearby"
       addHearsay(hearsay, 'food', 'nearby', 'close', 'alice', 'Alice', { x: 100, y: 100 }, 0);
@@ -607,7 +608,8 @@ describe('Navigation Integration Tests', () => {
       recordMovement(fromPos, toPos, 100);
 
       const sector = mapKnowledge.getSector(0, 0);
-      expect(sector.pathTraffic.get('e')).toBe(1);
+      // Traffic increments by 0.5 per traversal (pheromone-like system)
+      expect(sector.pathTraffic.get('e')).toBe(0.5);
     });
 
     it('repeated movement creates worn paths', () => {
@@ -621,7 +623,8 @@ describe('Navigation Integration Tests', () => {
       const sector = mapKnowledge.getSector(0, 0);
       const traffic = sector.pathTraffic.get('e') ?? 0;
 
-      expect(traffic).toBe(50);
+      // Traffic is capped at 1.0 (maxTraffic) in the pheromone-like system
+      expect(traffic).toBe(1.0);
 
       // Path weight should be reduced (worn paths are faster)
       const pathWeight = mapKnowledge.getPathWeight(0, 0, 'e');
@@ -648,7 +651,7 @@ describe('Navigation Integration Tests', () => {
     it('agent receives hearsay, navigates to location, and verifies', () => {
       // Create agent
       const agent = createTestAgent(world, { x: 100, y: 100 }, 'idle', {});
-      const hearsay = agent.getComponent<HearsayMemoryComponent>('hearsay_memory')!;
+      const hearsay = agent.getComponent(ComponentType.HearsayMemory)!;
 
       // Create resource at target location
       const resource = createTestResource(world, { x: 120, y: 100 }, 'berry', 50);
@@ -690,7 +693,7 @@ describe('Navigation Integration Tests', () => {
         world.advanceTick();
       }
 
-      const position = agent.getComponent<PositionComponent>('position')!;
+      const position = agent.getComponent(ComponentType.Position)!;
 
       // Agent should have moved east toward the resource
       expect(position.x).toBeGreaterThan(100);
@@ -722,7 +725,7 @@ describe('Navigation Integration Tests', () => {
         { radius: 2 }
       );
 
-      const hearsay = agent.getComponent<HearsayMemoryComponent>('hearsay_memory')!;
+      const hearsay = agent.getComponent(ComponentType.HearsayMemory)!;
 
       // Run exploration with larger delta time for faster movement
       for (let i = 0; i < 200; i++) {
@@ -736,7 +739,7 @@ describe('Navigation Integration Tests', () => {
       expect(hearsay.exploredSectors.size).toBeGreaterThan(0);
 
       // Agent should have moved from starting position
-      const position = agent.getComponent<PositionComponent>('position')!;
+      const position = agent.getComponent(ComponentType.Position)!;
       const startX = SECTOR_SIZE / 2;
       const startY = SECTOR_SIZE / 2;
       const distance = Math.sqrt(

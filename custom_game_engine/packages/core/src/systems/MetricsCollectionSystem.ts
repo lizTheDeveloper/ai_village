@@ -11,6 +11,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { EventBus } from '../events/EventBus.js';
 import { MetricsCollector } from '../metrics/MetricsCollector.js';
 import { MetricsStreamClient, type MetricsStreamConfig } from '../metrics/MetricsStreamClient.js';
@@ -692,10 +693,10 @@ export class MetricsCollectionSystem implements System {
    */
   private takeSnapshot(world: World): void {
     // Get all agents
-    const agents = world.query().with('agent').with('needs').executeEntities();
+    const agents = world.query().with(CT.Agent).with(CT.Needs).executeEntities();
 
     for (const agent of agents) {
-      const needs = agent.components.get('needs') as any;
+      const needs = agent.components.get(CT.Needs) as any;
       if (needs) {
         try {
           this.collector.sampleMetrics(

@@ -1,3 +1,4 @@
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Unit tests for UnlockQueryService
  *
@@ -47,7 +48,7 @@ describe('UnlockQueryService', () => {
         tier: 1,
         unlocks: [
           { type: 'recipe', recipeId: 'stone_hoe' },
-          { type: 'building', buildingId: 'small_garden' },
+          { type: ComponentType.Building, buildingId: 'small_garden' },
         ],
       }),
       createResearch('metallurgy_i', {
@@ -55,13 +56,13 @@ describe('UnlockQueryService', () => {
         prerequisites: ['agriculture_i'],
         unlocks: [
           { type: 'recipe', recipeId: 'iron_ingot' },
-          { type: 'item', itemId: 'iron_hammer' },
+          { type: ComponentType.Item, itemId: 'iron_hammer' },
         ],
       }),
       createResearch('alchemy_i', {
         tier: 3,
         prerequisites: ['metallurgy_i'],
-        unlocks: [{ type: 'building', buildingId: 'alchemy_lab' }],
+        unlocks: [{ type: ComponentType.Building, buildingId: 'alchemy_lab' }],
       }),
     ]);
   });

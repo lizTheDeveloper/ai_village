@@ -94,6 +94,21 @@ export interface IWindowPanel {
 }
 
 /**
+ * Menu category for organizing windows in the menu bar
+ */
+export type WindowMenuCategory =
+  | 'info'      // Agent info
+  | 'economy'   // Resources, Economy, Shop, Crafting
+  | 'social'    // Memory, Relationships, Governance
+  | 'farming'   // Tile Inspector, Plant Info
+  | 'animals'   // Animal Info
+  | 'magic'     // Magic Systems, Spellbook
+  | 'divinity'  // Divine Powers, Prayer, Angels, Sacred Geography, Divine Analytics
+  | 'dev'       // Dev Panel - only shown in dev mode
+  | 'settings'  // Settings, Notifications, Controls
+  | 'default';  // Uncategorized windows
+
+/**
  * Configuration for a managed window
  */
 export interface WindowConfig {
@@ -135,6 +150,9 @@ export interface WindowConfig {
 
   /** Keyboard shortcut to toggle window (e.g., "KeyM" for memory panel) */
   keyboardShortcut?: string;
+
+  /** Menu category for organizing windows (defaults to 'default') */
+  menuCategory?: WindowMenuCategory;
 }
 
 /**

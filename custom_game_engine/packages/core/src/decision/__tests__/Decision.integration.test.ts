@@ -1,3 +1,4 @@
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Integration tests for Decision Module
  *
@@ -8,7 +9,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { IntegrationTestHarness } from '../../__tests__/utils/IntegrationTestHarness.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
-import { createNeedsComponent } from '../../components/NeedsComponent.js';
+import { NeedsComponent } from '../../components/NeedsComponent.js';
 import { createCircadianComponent } from '../../components/CircadianComponent.js';
 import { createInventoryComponent } from '../../components/InventoryComponent.js';
 import { DecisionProcessor, AutonomicSystem } from '../index.js';
@@ -27,11 +28,15 @@ describe('Decision Integration Tests', () => {
 
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(50, 50));
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 0;
       agent.addComponent(needs);
       agent.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'ExhaustedAgent',
         behavior: 'gather',
         behaviorState: {},
@@ -52,12 +57,16 @@ describe('Decision Integration Tests', () => {
 
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(50, 50));
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 5; // Low energy
       needs.hunger = 5; // Critical hunger
       agent.addComponent(needs);
       agent.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'TiredHungryAgent',
         behavior: 'wander',
         behaviorState: {},
@@ -78,7 +87,11 @@ describe('Decision Integration Tests', () => {
 
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(50, 50));
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 50; // Healthy energy
       needs.hunger = 80; // Not hungry
       agent.addComponent(needs);
@@ -86,7 +99,7 @@ describe('Decision Integration Tests', () => {
       circadian.sleepDrive = 90; // Above 85 threshold triggers forced_sleep
       agent.addComponent(circadian);
       agent.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'SleepyAgent',
         behavior: 'wander',
         behaviorState: {},
@@ -108,11 +121,15 @@ describe('Decision Integration Tests', () => {
 
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(50, 50));
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 0; // Critical
       agent.addComponent(needs);
       agent.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'TestAgent',
         behavior: 'gather',
         behaviorState: {},
@@ -121,7 +138,7 @@ describe('Decision Integration Tests', () => {
       });
       (harness.world as any)._addEntity(agent);
 
-      const agentComp = agent.getComponent('agent') as any;
+      const agentComp = agent.getComponent(ComponentType.Agent) as any;
       const result = processor.process(
         agent,
         harness.world,
@@ -139,12 +156,16 @@ describe('Decision Integration Tests', () => {
 
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(50, 50));
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 80;
       needs.hunger = 80; // Full
       agent.addComponent(needs);
       agent.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'HealthyAgent',
         behavior: 'wander',
         behaviorState: {},
@@ -156,7 +177,7 @@ describe('Decision Integration Tests', () => {
       agent.addComponent(inventory);
       (harness.world as any)._addEntity(agent);
 
-      const agentComp = agent.getComponent('agent') as any;
+      const agentComp = agent.getComponent(ComponentType.Agent) as any;
       const result = processor.process(
         agent,
         harness.world,
@@ -175,19 +196,23 @@ describe('Decision Integration Tests', () => {
 
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(50, 50));
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 80;
       needs.hunger = 80;
       agent.addComponent(needs);
       agent.addComponent({
-        type: 'temperature',
+        type: ComponentType.Temperature,
         currentTemp: -10,
         comfortMin: 15,
         comfortMax: 25,
         state: 'dangerously_cold',
       });
       agent.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'ColdAgent',
         behavior: 'gather',
         behaviorState: {},
@@ -208,7 +233,11 @@ describe('Decision Integration Tests', () => {
 
       // Critical hunger
       const agentCritical = new EntityImpl(createEntityId(), 0);
-      const needsCritical = createNeedsComponent();
+      const needsCritical = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needsCritical.energy = 50;
       needsCritical.hunger = 5;
       agentCritical.addComponent(needsCritical);
@@ -218,7 +247,11 @@ describe('Decision Integration Tests', () => {
 
       // Moderate hunger
       const agentModerate = new EntityImpl(createEntityId(), 0);
-      const needsModerate = createNeedsComponent();
+      const needsModerate = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needsModerate.energy = 50;
       needsModerate.hunger = 40;
       agentModerate.addComponent(needsModerate);
@@ -235,11 +268,15 @@ describe('Decision Integration Tests', () => {
       // Exhausted agent
       const exhaustedAgent = new EntityImpl(createEntityId(), 0);
       exhaustedAgent.addComponent(createPositionComponent(50, 50));
-      const exhaustedNeeds = createNeedsComponent();
+      const exhaustedNeeds = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       exhaustedNeeds.energy = 0;
       exhaustedAgent.addComponent(exhaustedNeeds);
       exhaustedAgent.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'ExhaustedAgent',
         behavior: 'wander',
         behaviorState: {},
@@ -251,12 +288,16 @@ describe('Decision Integration Tests', () => {
       // Healthy agent
       const healthyAgent = new EntityImpl(createEntityId(), 0);
       healthyAgent.addComponent(createPositionComponent(100, 100));
-      const healthyNeeds = createNeedsComponent();
+      const healthyNeeds = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       healthyNeeds.energy = 100;
       healthyNeeds.hunger = 100;
       healthyAgent.addComponent(healthyNeeds);
       healthyAgent.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'HealthyAgent',
         behavior: 'wander',
         behaviorState: {},
@@ -265,8 +306,8 @@ describe('Decision Integration Tests', () => {
       });
       (harness.world as any)._addEntity(healthyAgent);
 
-      const exhaustedComp = exhaustedAgent.getComponent('agent') as any;
-      const healthyComp = healthyAgent.getComponent('agent') as any;
+      const exhaustedComp = exhaustedAgent.getComponent(ComponentType.Agent) as any;
+      const healthyComp = healthyAgent.getComponent(ComponentType.Agent) as any;
 
       const resultExhausted = processor.process(
         exhaustedAgent,

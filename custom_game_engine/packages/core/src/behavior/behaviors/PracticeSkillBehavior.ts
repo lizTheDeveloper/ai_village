@@ -9,6 +9,7 @@ import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import type { EntityImpl } from '../../ecs/Entity.js';
 import type { World } from '../../ecs/World.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
+import { ComponentType } from '../../types/ComponentType.js';
 
 /**
  * PracticeSkillBehavior - Skill improvement
@@ -33,7 +34,7 @@ export class PracticeSkillBehavior extends BaseBehavior {
 
       // Generate initial monologue
       const monologue = this.generatePracticeMonologue(skill);
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         lastThought: monologue,
       }));
@@ -56,7 +57,7 @@ export class PracticeSkillBehavior extends BaseBehavior {
     if (currentTick - lastMonologue > 400) {
       const skill = state.practicingSkill as string;
       const monologue = this.generatePracticeMonologue(skill);
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         lastThought: monologue,
         behaviorState: {

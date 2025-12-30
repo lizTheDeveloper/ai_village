@@ -5,6 +5,8 @@ import { BuildingSystem } from '../BuildingSystem.js';
 import { BuildingBlueprintRegistry } from '../../buildings/BuildingBlueprintRegistry.js';
 import type { BuildingComponent } from '../../components/BuildingComponent.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
+import { BuildingType } from '../../types/BuildingType.js';
 /**
  * Integration tests for Crafting Stations (Phase 10)
  *
@@ -25,8 +27,7 @@ describe('CraftingStations Integration', () => {
     harness = createMinimalWorld();
     registry = new BuildingBlueprintRegistry();
     registry.registerDefaults();
-    registry.registerTier2Stations();
-    registry.registerTier3Stations();
+    // Note: registerDefaults() already calls registerTier2Stations() and registerTier3Stations()
   });
 
   describe('Tier 2 Station Registration', () => {
@@ -135,7 +136,7 @@ describe('CraftingStations Integration', () => {
         fuelConsumptionRate: 1,
       }));
 
-      const updatedBuilding = building.getComponent('building') as BuildingComponent;
+      const updatedBuilding = building.getComponent(ComponentType.Building) as BuildingComponent;
 
       // Forge should have fuel properties initialized
       expect(updatedBuilding.fuelRequired).toBe(true);
@@ -161,14 +162,14 @@ describe('CraftingStations Integration', () => {
       const buildingSystem = new BuildingSystem();
       buildingSystem.initialize(harness.world, harness.world.eventBus);
 
-      const initialFuel = (building.getComponent('building') as BuildingComponent).currentFuel;
+      const initialFuel = (building.getComponent(ComponentType.Building) as BuildingComponent).currentFuel;
 
       const entities = Array.from(harness.world.entities.values());
 
       // Run for 10 seconds
       buildingSystem.update(harness.world, entities, 10.0);
 
-      const updatedBuilding = building.getComponent('building') as BuildingComponent;
+      const updatedBuilding = building.getComponent(ComponentType.Building) as BuildingComponent;
 
       // Should have consumed 10 fuel (1 per second * 10 seconds)
       expect(updatedBuilding.currentFuel).toBe(initialFuel - 10);
@@ -192,14 +193,14 @@ describe('CraftingStations Integration', () => {
       const buildingSystem = new BuildingSystem();
       buildingSystem.initialize(harness.world, harness.world.eventBus);
 
-      const initialFuel = (building.getComponent('building') as BuildingComponent).currentFuel;
+      const initialFuel = (building.getComponent(ComponentType.Building) as BuildingComponent).currentFuel;
 
       const entities = Array.from(harness.world.entities.values());
 
       // Run for 10 seconds
       buildingSystem.update(harness.world, entities, 10.0);
 
-      const updatedBuilding = building.getComponent('building') as BuildingComponent;
+      const updatedBuilding = building.getComponent(ComponentType.Building) as BuildingComponent;
 
       // Should NOT have consumed any fuel (no active recipe)
       expect(updatedBuilding.currentFuel).toBe(initialFuel);
@@ -266,7 +267,7 @@ describe('CraftingStations Integration', () => {
       // Consume all fuel (5 seconds = 5 fuel)
       buildingSystem.update(harness.world, entities, 6.0);
 
-      const updatedBuilding = building.getComponent('building') as BuildingComponent;
+      const updatedBuilding = building.getComponent(ComponentType.Building) as BuildingComponent;
 
       // Fuel should be 0
       expect(updatedBuilding.currentFuel).toBe(0);
@@ -302,11 +303,11 @@ describe('CraftingStations Integration', () => {
         source: building.id,
         data: {
           entityId: building.id,
-          buildingType: 'farm_shed',
+          buildingType: BuildingType.FarmShed,
         },
       });
 
-      const updatedBuilding = building.getComponent('building') as BuildingComponent;
+      const updatedBuilding = building.getComponent(ComponentType.Building) as BuildingComponent;
 
       // Farm shed should NOT require fuel
       expect(updatedBuilding.fuelRequired).toBe(false);
@@ -336,7 +337,7 @@ describe('CraftingStations Integration', () => {
       // Try to consume 10 fuel (should stop at 0)
       buildingSystem.update(harness.world, entities, 10.0);
 
-      const updatedBuilding = building.getComponent('building') as BuildingComponent;
+      const updatedBuilding = building.getComponent(ComponentType.Building) as BuildingComponent;
 
       // Fuel should be exactly 0, not negative
       expect(updatedBuilding.currentFuel).toBe(0);
@@ -419,7 +420,7 @@ describe('CraftingStations Integration', () => {
           source: 'non-existent-id',
           data: {
             entityId: 'non-existent-id',
-            buildingType: 'forge',
+            buildingType: BuildingType.Forge,
           },
         });
       }).not.toThrow();

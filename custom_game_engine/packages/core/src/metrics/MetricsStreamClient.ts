@@ -12,7 +12,7 @@ import type { StoredMetric } from './MetricsStorage.js';
  */
 export interface QueryRequest {
   requestId: string;
-  queryType: 'entities' | 'entity' | 'entity_prompt';
+  queryType: 'entities' | 'entity' | 'entity_prompt' | 'universe' | 'magic' | 'divinity';
   entityId?: string;
 }
 
@@ -30,6 +30,30 @@ export interface QueryResponse {
  * Handler function for processing queries from the server
  */
 export type QueryHandler = (query: QueryRequest) => Promise<QueryResponse>;
+
+/**
+ * Action request from the metrics server
+ */
+export interface ActionRequest {
+  requestId: string;
+  action: string;
+  params: Record<string, unknown>;
+}
+
+/**
+ * Action response to send back to server
+ */
+export interface ActionResponse {
+  requestId: string;
+  success: boolean;
+  data?: unknown;
+  error?: string;
+}
+
+/**
+ * Handler function for processing actions from the server
+ */
+export type ActionHandler = (action: ActionRequest) => Promise<ActionResponse>;
 
 export interface MetricsStreamConfig {
   /** WebSocket server URL (default: ws://localhost:8765) */
@@ -74,6 +98,7 @@ export class MetricsStreamClient {
   private sessionId: string | null = null;
   private lastError: string | null = null;
   private queryHandler: QueryHandler | null = null;
+  private actionHandler: ActionHandler | null = null;
   private stats = {
     messagesSent: 0,
     bytesTransmitted: 0,
@@ -170,6 +195,22 @@ export class MetricsStreamClient {
                 error: err instanceof Error ? err.message : 'Unknown error',
               });
             });
+          } else if (message.type === 'action' && this.actionHandler) {
+            // Handle action request from server
+            const action: ActionRequest = {
+              requestId: message.requestId,
+              action: message.action,
+              params: message.params || {},
+            };
+            this.actionHandler(action).then((response) => {
+              this.sendActionResponse(response);
+            }).catch((err) => {
+              this.sendActionResponse({
+                requestId: action.requestId,
+                success: false,
+                error: err instanceof Error ? err.message : 'Unknown error',
+              });
+            });
           }
         } catch {
           // Ignore parse errors
@@ -217,6 +258,14 @@ export class MetricsStreamClient {
   }
 
   /**
+   * Set a handler for processing actions from the server.
+   * The handler receives action requests and should return responses.
+   */
+  setActionHandler(handler: ActionHandler): void {
+    this.actionHandler = handler;
+  }
+
+  /**
    * Send a query response back to the server
    */
   private sendQueryResponse(response: QueryResponse): void {
@@ -232,6 +281,25 @@ export class MetricsStreamClient {
       }));
     } catch (err) {
       console.error('[MetricsStreamClient] Failed to send query response:', err);
+    }
+  }
+
+  /**
+   * Send an action response back to the server
+   */
+  private sendActionResponse(response: ActionResponse): void {
+    if (!this.isConnected()) {
+      console.error('[MetricsStreamClient] Cannot send action response - not connected');
+      return;
+    }
+
+    try {
+      this.ws!.send(JSON.stringify({
+        type: 'action_response',
+        ...response,
+      }));
+    } catch (err) {
+      console.error('[MetricsStreamClient] Failed to send action response:', err);
     }
   }
 

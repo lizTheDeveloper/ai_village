@@ -4,6 +4,8 @@ import { EventBusImpl } from '../events/EventBus.js';
 import { createBuildingComponent, type BuildingComponent } from '../components/BuildingComponent.js';
 import { AnimalComponent } from '../components/AnimalComponent.js';
 
+import { ComponentType } from '../types/ComponentType.js';
+import { BuildingType } from '../types/BuildingType.js';
 describe('Animal Housing - Cleanliness System', () => {
   let world: WorldImpl;
   let eventBus: EventBusImpl;
@@ -16,10 +18,10 @@ describe('Animal Housing - Cleanliness System', () => {
   describe('Acceptance Criterion 5: Cleanliness Tracking', () => {
     it('should initialize cleanliness to 100 for new housing', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent('chicken-coop' as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
       housingEntity.addComponent(chickenCoop);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
 
       // New housing should be clean
       expect((building as any).cleanliness).toBe(100);
@@ -27,7 +29,7 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should decrease cleanliness daily based on occupancy', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent('chicken-coop' as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
       chickenCoop.isComplete = true;
       housingEntity.addComponent(chickenCoop);
 
@@ -59,7 +61,7 @@ describe('Animal Housing - Cleanliness System', () => {
       }
 
       // Get building before decay
-      const buildingBefore = housingEntity.getComponent('building') as BuildingComponent;
+      const buildingBefore = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       const cleanlinessBefore = (buildingBefore as any).cleanliness;
 
       // Simulate one day passing
@@ -73,13 +75,13 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should decay cleanliness faster with more animals', () => {
       const coopFull = world.createEntity();
-      const building1 = createBuildingComponent('chicken-coop' as any, 2);
+      const building1 = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
       building1.isComplete = true;
       coopFull.addComponent(building1);
       (building1 as any).currentOccupants = 8; // Full
 
       const coopHalf = world.createEntity();
-      const building2 = createBuildingComponent('chicken-coop' as any, 2);
+      const building2 = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
       building2.isComplete = true;
       coopHalf.addComponent(building2);
       (building2 as any).currentOccupants = 4; // Half full
@@ -93,11 +95,11 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should not decay cleanliness below 0', () => {
       const housingEntity = world.createEntity();
-      const barn = createBuildingComponent('barn' as any, 3);
+      const barn = createBuildingComponent(BuildingType.Barn as any, 3);
       barn.isComplete = true;
       housingEntity.addComponent(barn);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).cleanliness = 10; // Nearly dirty
       (building as any).currentOccupants = 12; // Full barn
 
@@ -109,11 +111,11 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should not decay cleanliness in empty housing', () => {
       const housingEntity = world.createEntity();
-      const stable = createBuildingComponent('stable' as any, 2);
+      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
       stable.isComplete = true;
       housingEntity.addComponent(stable);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).cleanliness = 100;
       (building as any).currentOccupants = 0; // Empty
 
@@ -125,14 +127,14 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should emit housing_dirty event when cleanliness drops below 30', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent('chicken-coop' as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
       chickenCoop.isComplete = true;
       housingEntity.addComponent(chickenCoop);
 
       const eventListener = vi.fn();
       eventBus.subscribe('housing_dirty', eventListener);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).cleanliness = 35; // Above threshold
 
       // Simulate cleanliness dropping to 25
@@ -144,11 +146,11 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should track cleanliness over multiple days', () => {
       const housingEntity = world.createEntity();
-      const kennel = createBuildingComponent('kennel' as any, 2);
+      const kennel = createBuildingComponent(BuildingType.Kennel as any, 2);
       kennel.isComplete = true;
       housingEntity.addComponent(kennel);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).currentOccupants = 6; // Full kennel
 
       // Day 0: 100%
@@ -164,11 +166,11 @@ describe('Animal Housing - Cleanliness System', () => {
   describe('Cleanliness Effects on Animals', () => {
     it('should increase animal stress in dirty housing', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent('chicken-coop' as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
       chickenCoop.isComplete = true;
       housingEntity.addComponent(chickenCoop);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).cleanliness = 20; // Very dirty
 
       const chickenEntity = world.createEntity();
@@ -195,7 +197,7 @@ describe('Animal Housing - Cleanliness System', () => {
       chicken.housingBuildingId = housingEntity.id;
       chickenEntity.addComponent(chicken);
 
-      const animal = chickenEntity.getComponent('animal') as AnimalComponent;
+      const animal = chickenEntity.getComponent(ComponentType.Animal) as AnimalComponent;
       const stressBefore = animal.stress;
 
       // AnimalHousingSystem should apply stress penalty
@@ -208,11 +210,11 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should reduce animal mood in dirty housing', () => {
       const housingEntity = world.createEntity();
-      const stable = createBuildingComponent('stable' as any, 2);
+      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
       stable.isComplete = true;
       housingEntity.addComponent(stable);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).cleanliness = 10; // Extremely dirty
 
       const horseEntity = world.createEntity();
@@ -239,7 +241,7 @@ describe('Animal Housing - Cleanliness System', () => {
       horse.housingBuildingId = housingEntity.id;
       horseEntity.addComponent(horse);
 
-      const animal = horseEntity.getComponent('animal') as AnimalComponent;
+      const animal = horseEntity.getComponent(ComponentType.Animal) as AnimalComponent;
 
       // Dirty housing should reduce mood
       // This will be tested via AnimalSystem integration
@@ -247,11 +249,11 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should not penalize animals in clean housing (cleanliness >= 50)', () => {
       const housingEntity = world.createEntity();
-      const kennel = createBuildingComponent('kennel' as any, 2);
+      const kennel = createBuildingComponent(BuildingType.Kennel as any, 2);
       kennel.isComplete = true;
       housingEntity.addComponent(kennel);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).cleanliness = 80; // Clean
 
       const dogEntity = world.createEntity();
@@ -286,11 +288,11 @@ describe('Animal Housing - Cleanliness System', () => {
   describe('Cleaning Actions', () => {
     it('should restore cleanliness to 100 when cleaned', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent('chicken-coop' as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
       chickenCoop.isComplete = true;
       housingEntity.addComponent(chickenCoop);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).cleanliness = 25; // Dirty
 
       // Execute CleanHousingAction
@@ -301,14 +303,14 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should emit housing_cleaned event when cleaned', () => {
       const housingEntity = world.createEntity();
-      const stable = createBuildingComponent('stable' as any, 2);
+      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
       stable.isComplete = true;
       housingEntity.addComponent(stable);
 
       const eventListener = vi.fn();
       eventBus.subscribe('housing_cleaned', eventListener);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).cleanliness = 30;
 
       // Execute CleanHousingAction
@@ -319,11 +321,11 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should reduce animal stress after cleaning', () => {
       const housingEntity = world.createEntity();
-      const barn = createBuildingComponent('barn' as any, 3);
+      const barn = createBuildingComponent(BuildingType.Barn as any, 3);
       barn.isComplete = true;
       housingEntity.addComponent(barn);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).cleanliness = 15; // Very dirty
 
       const cowEntity = world.createEntity();
@@ -359,11 +361,11 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should allow multiple cleanings in succession', () => {
       const housingEntity = world.createEntity();
-      const kennel = createBuildingComponent('kennel' as any, 2);
+      const kennel = createBuildingComponent(BuildingType.Kennel as any, 2);
       kennel.isComplete = true;
       housingEntity.addComponent(kennel);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
 
       // Clean once
       (building as any).cleanliness = 50;
@@ -375,11 +377,11 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should not allow cleaning to exceed 100', () => {
       const housingEntity = world.createEntity();
-      const apiary = createBuildingComponent('apiary' as any, 2);
+      const apiary = createBuildingComponent(BuildingType.Apiary as any, 2);
       apiary.isComplete = true;
       housingEntity.addComponent(apiary);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).cleanliness = 95;
 
       // Execute CleanHousingAction
@@ -391,14 +393,14 @@ describe('Animal Housing - Cleanliness System', () => {
   describe('Event Emissions', () => {
     it('should emit housing_dirty event only once when crossing threshold', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent('chicken-coop' as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
       chickenCoop.isComplete = true;
       housingEntity.addComponent(chickenCoop);
 
       const eventListener = vi.fn();
       eventBus.subscribe('housing_dirty', eventListener);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).cleanliness = 35;
 
       // First drop below 30 - should emit
@@ -415,14 +417,14 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should emit housing_full event when reaching capacity', () => {
       const housingEntity = world.createEntity();
-      const kennel = createBuildingComponent('kennel' as any, 2);
+      const kennel = createBuildingComponent(BuildingType.Kennel as any, 2);
       kennel.isComplete = true;
       housingEntity.addComponent(kennel);
 
       const eventListener = vi.fn();
       eventBus.subscribe('housing_full', eventListener);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).currentOccupants = 5; // Not full
 
       // Assign 6th dog - reaches capacity
@@ -434,14 +436,14 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should include building ID and cleanliness in housing_dirty event', () => {
       const housingEntity = world.createEntity();
-      const stable = createBuildingComponent('stable' as any, 2);
+      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
       stable.isComplete = true;
       housingEntity.addComponent(stable);
 
       const eventListener = vi.fn();
       eventBus.subscribe('housing_dirty', eventListener);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).cleanliness = 25;
 
       // AnimalHousingSystem emits event
@@ -454,7 +456,7 @@ describe('Animal Housing - Cleanliness System', () => {
   describe('Edge Cases', () => {
     it('should handle cleanliness decay when building is destroyed', () => {
       const housingEntity = world.createEntity();
-      const chickenCoop = createBuildingComponent('chicken-coop' as any, 2);
+      const chickenCoop = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
       chickenCoop.isComplete = true;
       housingEntity.addComponent(chickenCoop);
 
@@ -487,17 +489,17 @@ describe('Animal Housing - Cleanliness System', () => {
       // world.removeEntity(housingEntity.id); // API doesn't exist, skipping this test logic
 
       // Animals should become unhoused
-      const animal = chickenEntity.getComponent('animal') as AnimalComponent;
+      const animal = chickenEntity.getComponent(ComponentType.Animal) as AnimalComponent;
       // housingBuildingId should be cleared or handle gracefully
     });
 
     it('should handle animal death while housed', () => {
       const housingEntity = world.createEntity();
-      const kennel = createBuildingComponent('kennel' as any, 2);
+      const kennel = createBuildingComponent(BuildingType.Kennel as any, 2);
       kennel.isComplete = true;
       housingEntity.addComponent(kennel);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).currentOccupants = 3;
 
       const dogEntity = world.createEntity();
@@ -533,11 +535,11 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should handle concurrent cleaning attempts', () => {
       const housingEntity = world.createEntity();
-      const barn = createBuildingComponent('barn' as any, 3);
+      const barn = createBuildingComponent(BuildingType.Barn as any, 3);
       barn.isComplete = true;
       housingEntity.addComponent(barn);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).cleanliness = 40;
 
       // Agent 1 starts cleaning
@@ -548,12 +550,12 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should maintain cleanliness at 100 for newly built housing', () => {
       const housingEntity = world.createEntity();
-      const aquarium = createBuildingComponent('aquarium' as any, 2);
+      const aquarium = createBuildingComponent(BuildingType.Aquarium as any, 2);
       aquarium.progress = 100;
       aquarium.isComplete = true;
       housingEntity.addComponent(aquarium);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       expect((building as any).cleanliness).toBe(100);
 
       // Even after update ticks, should remain 100 if no animals
@@ -568,7 +570,7 @@ describe('Animal Housing - Cleanliness System', () => {
       const housingBuildings = [];
       for (let i = 0; i < 20; i++) {
         const housingEntity = world.createEntity();
-        const building = createBuildingComponent('chicken-coop' as any, 2);
+        const building = createBuildingComponent(BuildingType.ChickenCoop as any, 2);
         building.isComplete = true;
         housingEntity.addComponent(building);
         housingBuildings.push(housingEntity);
@@ -580,11 +582,11 @@ describe('Animal Housing - Cleanliness System', () => {
 
     it('should only decay cleanliness once per day, not per tick', () => {
       const housingEntity = world.createEntity();
-      const stable = createBuildingComponent('stable' as any, 2);
+      const stable = createBuildingComponent(BuildingType.Stable as any, 2);
       stable.isComplete = true;
       housingEntity.addComponent(stable);
 
-      const building = housingEntity.getComponent('building') as BuildingComponent;
+      const building = housingEntity.getComponent(ComponentType.Building) as BuildingComponent;
       (building as any).currentOccupants = 4;
       (building as any).cleanliness = 100;
 

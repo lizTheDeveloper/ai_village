@@ -1,123 +1,114 @@
-import type { Component } from '../ecs/Component.js';
-import type { Tick, EntityId } from '../types.js';
+import { ComponentBase } from '../ecs/Component.js';
 
 export type MemoryType =
-  | 'resource_location'  // Remembered a food/resource spot
-  | 'plant_location'     // Remembered a plant location
-  | 'agent_seen'         // Saw another agent
-  | 'danger'             // Dangerous location/entity
-  | 'home'               // Safe/home location
-  | 'lesson'             // Learned from experience (e.g., "campfire solves cold")
-  | 'success'            // Successfully completed something (e.g., "built workbench")
-  | 'failure'            // Failed attempt to learn from (e.g., "couldn't build - no materials")
-  | 'knowledge';         // Learned from others (e.g., "Finn said gather food first")
+  | 'episodic'
+  | 'semantic'
+  | 'procedural'
+  | 'success'            // Successfully completed something
+  | 'failure'            // Failed attempt to learn from
+  | 'knowledge'          // Learned from others
+  | 'resource_location'; // Remembered a resource location
 
 export interface Memory {
+  id: string;
   type: MemoryType;
-  x: number;
-  y: number;
-  entityId?: EntityId;   // Optional reference to entity
-  strength: number;      // 0-100, higher = stronger memory
-  createdAt: Tick;
-  lastReinforced: Tick;
-  metadata?: Record<string, unknown>; // Additional data
-}
-
-export interface MemoryComponent extends Component {
-  type: 'memory';
-  memories: Memory[];
-  maxMemories: number;  // Maximum memories to store
-  decayRate: number;    // Strength lost per second
-}
-
-export function createMemoryComponent(
-  maxMemories: number = 20,
-  decayRate: number = 1.0
-): MemoryComponent {
-  return {
-    type: 'memory',
-    version: 1,
-    memories: [],
-    maxMemories,
-    decayRate,
-  };
+  content: string;
+  importance: number;
+  timestamp: number;
+  location: { x: number; y: number };
+  // Legacy fields for backwards compatibility
+  x?: number;
+  y?: number;
+  strength?: number;
+  entityId?: string;
+  metadata?: Record<string, unknown>;
 }
 
 /**
- * Add or reinforce a memory
+ * Class-based MemoryComponent for tests and new systems
+ */
+export class MemoryComponent extends ComponentBase {
+  public readonly type = 'memory';
+  public memories: Memory[] = [];
+  public lastReflectionTime?: number;
+
+  constructor(public entityId: string) {
+    super();
+  }
+
+  /**
+   * Add a memory
+   */
+  addMemory(memory: Memory): void {
+    this.memories.push(memory);
+  }
+
+  /**
+   * Get memories by type
+   */
+  getMemoriesByType(type: MemoryType): Memory[] {
+    return this.memories.filter(m => m.type === type);
+  }
+
+  /**
+   * Get recent memories (within time window)
+   */
+  getRecentMemories(timeWindow: number): Memory[] {
+    const cutoff = Date.now() - timeWindow;
+    return this.memories.filter(m => m.timestamp >= cutoff);
+  }
+
+  /**
+   * Get memories sorted by importance
+   */
+  getMemoriesByImportance(minImportance: number = 0): Memory[] {
+    return this.memories
+      .filter(m => m.importance >= minImportance)
+      .sort((a, b) => b.importance - a.importance);
+  }
+}
+
+/**
+ * Standalone helper function for backwards compatibility
+ * Adds a memory to a MemoryComponent instance
+ * Supports both old and new API signatures:
+ * - New: addMemory(component, memory)
+ * - Old: addMemory(component, memoryData, tick, strength)
  */
 export function addMemory(
   component: MemoryComponent,
-  memory: Omit<Memory, 'strength' | 'createdAt' | 'lastReinforced'>,
-  currentTick: Tick,
-  initialStrength: number = 100
+  memoryOrData: Memory | Partial<Memory>,
+  tick?: number,
+  strength?: number
 ): MemoryComponent {
-  const memories = [...component.memories];
-
-  // Check if similar memory already exists
-  const existingIndex = memories.findIndex(
-    (m) =>
-      m.type === memory.type &&
-      (memory.entityId ? m.entityId === memory.entityId :
-       Math.abs(m.x - memory.x) < 2 && Math.abs(m.y - memory.y) < 2)
-  );
-
-  if (existingIndex >= 0) {
-    // Reinforce existing memory
-    memories[existingIndex] = {
-      ...memories[existingIndex]!,
-      strength: Math.min(100, memories[existingIndex]!.strength + 20),
-      lastReinforced: currentTick,
-      x: memory.x, // Update position
-      y: memory.y,
+  // If called with old signature (4 args), construct Memory object
+  if (tick !== undefined || strength !== undefined) {
+    const data = memoryOrData as Partial<Memory>;
+    const memory: Memory = {
+      id: `mem_${Date.now()}_${Math.random()}`,
+      type: (data.type as any) || 'episodic',
+      content: data.content || '',
+      importance: strength !== undefined ? strength / 100 : (data.importance || 0.5),
+      timestamp: tick || Date.now(),
+      location: data.location || { x: data.x || 0, y: data.y || 0 },
+      x: data.x,
+      y: data.y,
+      strength,
+      entityId: data.entityId,
+      metadata: data.metadata,
     };
+    component.addMemory(memory);
   } else {
-    // Add new memory
-    const newMemory: Memory = {
-      ...memory,
-      strength: initialStrength,
-      createdAt: currentTick,
-      lastReinforced: currentTick,
-    };
-
-    memories.push(newMemory);
-
-    // Remove weakest memory if over limit
-    if (memories.length > component.maxMemories) {
-      memories.sort((a, b) => a.strength - b.strength);
-      memories.shift();
-    }
+    // New API: just pass through the memory object
+    component.addMemory(memoryOrData as Memory);
   }
-
-  return {
-    ...component,
-    memories,
-  };
+  return component;
 }
 
 /**
- * Get strongest memory of a specific type
+ * Standalone helper function for backwards compatibility
+ * Gets memories by type from a MemoryComponent instance
  */
-export function getStrongestMemory(
-  component: MemoryComponent,
-  type: MemoryType
-): Memory | null {
-  const matching = component.memories.filter((m) => m.type === type);
-  if (matching.length === 0) return null;
-
-  return matching.reduce((strongest, current) =>
-    current.strength > strongest.strength ? current : strongest
-  );
-}
-
-/**
- * Get all memories of a type, sorted by strength
- */
-export function getMemoriesByType(
-  component: MemoryComponent,
-  type: MemoryType
-): Memory[] {
-  return component.memories
-    .filter((m) => m.type === type)
-    .sort((a, b) => b.strength - a.strength);
+export function getMemoriesByType(component: MemoryComponent, type: MemoryType): Memory[] {
+  return component.getMemoriesByType(type);
 }

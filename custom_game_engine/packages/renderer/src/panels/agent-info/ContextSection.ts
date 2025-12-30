@@ -1,5 +1,5 @@
 /**
- * ContextSection - Renders the LLM Context tab with copyable prompt text.
+ * ContextSection - Renders the LLM Context tab with copyable prompt text and custom LLM config.
  */
 
 import type { SectionRenderContext, IdentityComponent, AgentComponentData } from './types.js';
@@ -10,9 +10,86 @@ import { renderSeparator } from './renderUtils.js';
 export class ContextSection {
   private contextText: SelectableText;
   private promptBuilder = new StructuredPromptBuilder();
+  private onOpenConfigCallback: ((agentEntity: any) => void) | null = null;
+  private lastPromptContent: string = '';
 
   constructor() {
     this.contextText = new SelectableText('agent-context-textarea');
+  }
+
+  /**
+   * Set callback for when config button is clicked
+   */
+  setOnOpenConfig(callback: (agentEntity: any) => void): void {
+    this.onOpenConfigCallback = callback;
+  }
+
+  /**
+   * Handle click events - check if click is on config or copy button
+   */
+  handleClick(canvasX: number, canvasY: number): boolean {
+    // Check copy button first
+    const copyBounds = (this as any).copyButtonBounds;
+    if (copyBounds) {
+      if (
+        canvasX >= copyBounds.x &&
+        canvasX <= copyBounds.x + copyBounds.width &&
+        canvasY >= copyBounds.y &&
+        canvasY <= copyBounds.y + copyBounds.height
+      ) {
+        this.copyToClipboard();
+        return true;
+      }
+    }
+
+    // Check config button
+    const configBounds = (this as any).configButtonBounds;
+    if (!configBounds) {
+      console.warn('[ContextSection] No button bounds set');
+      return false;
+    }
+
+    console.log('[ContextSection] Click:', canvasX, canvasY, 'Bounds:', configBounds);
+
+    // Check if click is within config button bounds
+    if (
+      canvasX >= configBounds.x &&
+      canvasX <= configBounds.x + configBounds.width &&
+      canvasY >= configBounds.y &&
+      canvasY <= configBounds.y + configBounds.height
+    ) {
+      console.log('[ContextSection] Config button clicked!');
+      const agentEntity = configBounds.agentEntity;
+      if (this.onOpenConfigCallback && agentEntity) {
+        console.log('[ContextSection] Opening config for agent');
+        this.onOpenConfigCallback(agentEntity);
+      } else {
+        console.warn('[ContextSection] No callback or agent entity', {
+          hasCallback: !!this.onOpenConfigCallback,
+          hasEntity: !!agentEntity
+        });
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Copy the LLM context to clipboard
+   */
+  private copyToClipboard(): void {
+    if (!this.lastPromptContent) {
+      return;
+    }
+
+    navigator.clipboard.writeText(this.lastPromptContent)
+      .then(() => {
+        console.log('[ContextSection] Copied to clipboard');
+      })
+      .catch(err => {
+        console.error('[ContextSection] Failed to copy:', err);
+      });
   }
 
   hide(): void {
@@ -66,6 +143,64 @@ export class ContextSection {
       return;
     }
 
+    // Custom LLM config status and button
+    const hasCustomConfig = agent?.customLLM && (
+      agent.customLLM.baseUrl ||
+      agent.customLLM.model ||
+      agent.customLLM.apiKey ||
+      agent.customLLM.customHeaders
+    );
+
+    if (hasCustomConfig) {
+      ctx.fillStyle = '#FFD700';
+      ctx.font = '11px monospace';
+      ctx.fillText(`✓ Custom LLM: ${agent?.customLLM?.model || 'configured'}`, x + padding, currentY);
+      currentY += lineHeight;
+    }
+
+    // Draw clickable config button
+    const buttonX = x + padding;
+    const buttonY = currentY;
+    const buttonWidth = 140;
+    const buttonHeight = 20;
+
+    ctx.fillStyle = '#4CAF50';
+    ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 11px monospace';
+    ctx.fillText('⚙ Configure LLM', buttonX + 8, buttonY + 14);
+
+    // Store config button bounds for click detection
+    (this as any).configButtonBounds = {
+      x: buttonX,
+      y: buttonY,
+      width: buttonWidth,
+      height: buttonHeight,
+      agentEntity: selectedEntity, // Store the entity directly
+    };
+
+    // Draw copy button next to config button
+    const copyButtonX = buttonX + buttonWidth + 8;
+    const copyButtonY = buttonY;
+    const copyButtonWidth = 80;
+    const copyButtonHeight = 20;
+
+    ctx.fillStyle = '#2196F3';
+    ctx.fillRect(copyButtonX, copyButtonY, copyButtonWidth, copyButtonHeight);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 11px monospace';
+    ctx.fillText('📋 Copy', copyButtonX + 10, copyButtonY + 14);
+
+    // Store copy button bounds for click detection
+    (this as any).copyButtonBounds = {
+      x: copyButtonX,
+      y: copyButtonY,
+      width: copyButtonWidth,
+      height: copyButtonHeight,
+    };
+
+    currentY += buttonHeight + 10;
+
     // Draw separator
     renderSeparator(ctx, x, currentY, width, padding);
     currentY += 8;
@@ -95,6 +230,9 @@ export class ContextSection {
         ? '(No prompt generated - prompt was empty)'
         : prompt;
 
+      // Store prompt content for copying
+      this.lastPromptContent = content;
+
       this.contextText.show(
         canvasRect,
         screenX,
@@ -106,6 +244,9 @@ export class ContextSection {
         content
       );
     } catch (e) {
+      const errorContent = `Error generating prompt:\n${String(e)}`;
+      this.lastPromptContent = errorContent;
+
       this.contextText.show(
         canvasRect,
         screenX,
@@ -114,7 +255,7 @@ export class ContextSection {
         textareaY,
         textareaWidth,
         textareaHeight,
-        `Error generating prompt:\n${String(e)}`
+        errorContent
       );
     }
   }

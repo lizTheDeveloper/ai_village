@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -16,12 +17,12 @@ import type { ResourceComponent } from '../components/ResourceComponent.js';
 export class ResourceGatheringSystem implements System {
   public readonly id: SystemId = 'resource-gathering';
   public readonly priority: number = 5; // Run early, before AI decisions
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = ['resource'];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Resource];
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     for (const entity of entities) {
       const impl = entity as EntityImpl;
-      const resource = impl.getComponent<ResourceComponent>('resource');
+      const resource = impl.getComponent<ResourceComponent>(CT.Resource);
 
       if (!resource) continue;
 
@@ -35,7 +36,7 @@ export class ResourceGatheringSystem implements System {
       const regenAmount = resource.regenerationRate * deltaTime;
       const newAmount = Math.min(resource.maxAmount, resource.amount + regenAmount);
 
-      impl.updateComponent<ResourceComponent>('resource', (current) => ({
+      impl.updateComponent<ResourceComponent>(CT.Resource, (current) => ({
         ...current,
         amount: newAmount,
       }));

@@ -1,4 +1,11 @@
 import type { World, EntityId } from '@ai-village/core';
+
+// Local type for event callbacks
+interface EventPayload {
+  type: string;
+  data: Record<string, unknown>;
+}
+import { globalRecipeRegistry } from '@ai-village/core';
 import { RecipeListSection } from './RecipeListSection.js';
 import { IngredientPanel } from './IngredientPanel.js';
 import { CraftingQueueSection } from './CraftingQueueSection.js';
@@ -111,15 +118,90 @@ export class CraftingPanelUI {
       recipeListHeight
     );
 
-    // Recipe details section (stub) - relative coordinates
+    // Recipe details section with Craft button
+    const detailsX = 280;
+    const detailsY = 50;
+    const detailsWidth = 500;
+    const detailsHeight = 250;
+    const buttonWidth = 120;
+    const buttonHeight = 36;
+    const buttonX = detailsX + detailsWidth - buttonWidth - 20;
+    const buttonY = detailsY + detailsHeight - buttonHeight - 20;
+
     this.recipeDetailsSection = {
-      setRecipe: (_recipeId: string) => { /* stub */ },
+      bounds: { x: detailsX, y: detailsY, width: detailsWidth, height: detailsHeight },
+      craftButton: { x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight },
+      setRecipe: (_recipeId: string) => { /* Update handled by parent */ },
       render: (ctx: CanvasRenderingContext2D) => {
-        // Draw placeholder at relative position
+        // Draw panel background
         ctx.fillStyle = '#1a1a1a';
-        ctx.fillRect(280, 50, 500, 250);
+        ctx.fillRect(detailsX, detailsY, detailsWidth, detailsHeight);
         ctx.strokeStyle = '#666';
-        ctx.strokeRect(280, 50, 500, 250);
+        ctx.strokeRect(detailsX, detailsY, detailsWidth, detailsHeight);
+
+        if (!this.selectedRecipeId) {
+          // No recipe selected
+          ctx.fillStyle = '#888';
+          ctx.font = '14px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('Select a recipe to view details', detailsX + detailsWidth / 2, detailsY + detailsHeight / 2);
+          ctx.textAlign = 'left';
+          return;
+        }
+
+        // Get recipe details
+        const recipe = globalRecipeRegistry.getRecipe(this.selectedRecipeId);
+
+        // Draw recipe name
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 18px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(recipe.name, detailsX + 20, detailsY + 35);
+
+        // Draw description
+        ctx.fillStyle = '#ccc';
+        ctx.font = '14px sans-serif';
+        ctx.fillText(recipe.description || 'No description', detailsX + 20, detailsY + 60);
+
+        // Draw crafting time
+        ctx.fillStyle = '#888';
+        ctx.font = '12px sans-serif';
+        ctx.fillText(`Crafting time: ${recipe.craftingTime}s`, detailsX + 20, detailsY + 85);
+
+        // Draw output
+        ctx.fillStyle = '#4CAF50';
+        ctx.font = '14px sans-serif';
+        ctx.fillText(`Produces: ${recipe.output.quantity}x ${recipe.output.itemId}`, detailsX + 20, detailsY + 110);
+
+        // Draw "Craft Now" button
+        ctx.fillStyle = '#2E7D32';
+        ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        ctx.strokeStyle = '#4CAF50';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(buttonX, buttonY, buttonWidth, buttonHeight);
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('CRAFT NOW', buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'alphabetic';
+      },
+      handleClick: (x: number, y: number): boolean => {
+        if (!this.selectedRecipeId) return false;
+
+        // Check if click is on Craft button
+        const btn = this.recipeDetailsSection.craftButton;
+        if (x >= btn.x && x <= btn.x + btn.width &&
+            y >= btn.y && y <= btn.y + btn.height) {
+          // Trigger craft callback
+          if (this._onCraftNowCallback) {
+            this._onCraftNowCallback(this.selectedRecipeId, 1);
+          }
+          return true;
+        }
+        return false;
       }
     };
 
@@ -177,7 +259,7 @@ export class CraftingPanelUI {
       this.queueSection.refresh();
     });
 
-    this.world.eventBus.subscribe('inventory:changed', (event) => {
+    this.world.eventBus.subscribe('inventory:changed', (event: EventPayload) => {
       const data = event.data; // Has entityId as string
       if (data.entityId === String(this.activeAgentId)) {
         this.ingredientPanel.refresh();
@@ -188,7 +270,7 @@ export class CraftingPanelUI {
       this.recipeListSection.refresh();
     });
 
-    this.world.eventBus.subscribe('building:destroyed', (event) => {
+    this.world.eventBus.subscribe('building:destroyed', (event: EventPayload) => {
       const data = event.data as { buildingId: string };
       if (data.buildingId === this.workstationId) {
         this.hide();
@@ -345,7 +427,12 @@ export class CraftingPanelUI {
     // Note: WindowManager handles the close button in its title bar.
     // We only handle clicks within our content sections here.
 
-    // Delegate to sections
+    // Check recipe details section (Craft button)
+    if (this.recipeDetailsSection.handleClick(x, y)) {
+      return true;
+    }
+
+    // Delegate to recipe list
     if (this.recipeListSection.handleClick(x, y)) {
       return true;
     }

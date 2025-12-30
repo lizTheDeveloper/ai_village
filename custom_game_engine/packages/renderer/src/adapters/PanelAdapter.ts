@@ -1,4 +1,5 @@
-import type { IWindowPanel } from '../types/WindowTypes.js';
+import type { IWindowPanel, WindowMenuCategory } from '../types/WindowTypes.js';
+import type { World } from '@ai-village/core';
 
 /**
  * Configuration for a generic panel adapter.
@@ -18,6 +19,9 @@ export interface PanelConfig<T> {
 
   /** Default height of the panel */
   defaultHeight: number;
+
+  /** Menu category for organizing in the menu bar */
+  menuCategory?: WindowMenuCategory;
 
   /**
    * How to check if the panel is visible.
@@ -42,7 +46,7 @@ export interface PanelConfig<T> {
     y: number,
     width: number,
     height: number,
-    world?: any
+    world?: World
   ) => void;
 
   /**
@@ -162,7 +166,7 @@ export class PanelAdapter<T> implements IWindowPanel {
     y: number,
     width: number,
     height: number,
-    world?: any
+    world?: World
   ): void {
     if (!this.isVisible() || !world) {
       return;
@@ -172,7 +176,9 @@ export class PanelAdapter<T> implements IWindowPanel {
       this.config.renderMethod(this.panel, ctx, x, y, width, height, world);
     } else {
       // Default: assume panel has a render method with standard signature
-      (this.panel as any).render(ctx, x, y, width, height, world);
+      // Type assertion needed because not all panels have identical signatures
+      type PanelWithRender = { render(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, world?: World): void };
+      (this.panel as unknown as PanelWithRender).render(ctx, x, y, width, height, world);
     }
   }
 

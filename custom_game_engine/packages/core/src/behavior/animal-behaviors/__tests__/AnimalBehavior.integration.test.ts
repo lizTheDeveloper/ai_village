@@ -1,3 +1,4 @@
+import { ComponentType } from '../../../types/ComponentType.js';
 /**
  * Integration tests for Animal Behavior Module
  *
@@ -23,7 +24,7 @@ import {
 // Helper to create an animal component
 function createTestAnimalComponent(overrides: Partial<AnimalComponent> = {}): AnimalComponent {
   return {
-    type: 'animal',
+    type: ComponentType.Animal,
     version: 1,
     id: `animal-${Math.random().toString(36).substr(2, 9)}`,
     speciesId: 'chicken',
@@ -72,7 +73,7 @@ describe('Animal Behavior Integration Tests', () => {
       system.update(harness.world, [animal], 0.05);
 
       // Animal should have switched to foraging state
-      const updatedAnimal = animal.getComponent('animal') as AnimalComponent;
+      const updatedAnimal = animal.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(updatedAnimal.state).toBe('foraging');
     });
 
@@ -96,7 +97,7 @@ describe('Animal Behavior Integration Tests', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(55, 55)); // 5 units away - within threat detection range
       agent.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         version: 1,
         behavior: 'wander',
       });
@@ -106,7 +107,7 @@ describe('Animal Behavior Integration Tests', () => {
       system.update(harness.world, [animal], 0.05);
 
       // Animal should be fleeing (stress priority > hunger priority, and threat is present)
-      const updatedAnimal = animal.getComponent('animal') as AnimalComponent;
+      const updatedAnimal = animal.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(updatedAnimal.state).toBe('fleeing');
     });
 
@@ -127,7 +128,7 @@ describe('Animal Behavior Integration Tests', () => {
       system.update(harness.world, [animal], 0.05);
 
       // Animal should be sleeping
-      const updatedAnimal = animal.getComponent('animal') as AnimalComponent;
+      const updatedAnimal = animal.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(updatedAnimal.state).toBe('sleeping');
     });
 
@@ -190,8 +191,8 @@ describe('Animal Behavior Integration Tests', () => {
       system.update(harness.world, [hungryAnimal, tiredAnimal], 0.05);
 
       // Each animal should have appropriate state
-      const hungry = hungryAnimal.getComponent('animal') as AnimalComponent;
-      const tired = tiredAnimal.getComponent('animal') as AnimalComponent;
+      const hungry = hungryAnimal.getComponent(ComponentType.Animal) as AnimalComponent;
+      const tired = tiredAnimal.getComponent(ComponentType.Animal) as AnimalComponent;
 
       expect(hungry.state).toBe('foraging');
       expect(tired.state).toBe('sleeping');
@@ -235,7 +236,7 @@ describe('Animal Behavior Integration Tests', () => {
       system.update(harness.world, [animal], 0.05);
 
       // Should transition back to idle
-      const updatedAnimal = animal.getComponent('animal') as AnimalComponent;
+      const updatedAnimal = animal.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(updatedAnimal.state).toBe('idle');
     });
 
@@ -256,7 +257,7 @@ describe('Animal Behavior Integration Tests', () => {
       system.update(harness.world, [animal], 0.05);
 
       // Should transition to idle
-      const updatedAnimal = animal.getComponent('animal') as AnimalComponent;
+      const updatedAnimal = animal.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(updatedAnimal.state).toBe('idle');
     });
 
@@ -277,7 +278,7 @@ describe('Animal Behavior Integration Tests', () => {
       system.update(harness.world, [animal], 0.05);
 
       // Should transition to idle
-      const updatedAnimal = animal.getComponent('animal') as AnimalComponent;
+      const updatedAnimal = animal.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(updatedAnimal.state).toBe('idle');
     });
   });

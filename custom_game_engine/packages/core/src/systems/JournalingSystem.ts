@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
@@ -48,10 +49,10 @@ export class JournalingSystem implements System {
       }
 
       const entityImpl = entity as EntityImpl;
-      const agentComp = entityImpl.getComponent<AgentComponent>('agent');
-      const personality = entityImpl.getComponent<PersonalityComponent>('personality');
-      const episodicMem = entityImpl.getComponent<EpisodicMemoryComponent>('episodic_memory');
-      const journalComp = entityImpl.getComponent<JournalComponent>('journal');
+      const agentComp = entityImpl.getComponent<AgentComponent>(CT.Agent);
+      const personality = entityImpl.getComponent<PersonalityComponent>(CT.Personality);
+      const episodicMem = entityImpl.getComponent<EpisodicMemoryComponent>(CT.EpisodicMemory);
+      const journalComp = entityImpl.getComponent<JournalComponent>(CT.Journal);
 
       if (!agentComp) {
         throw new Error(`Agent ${agentId} missing AgentComponent`);

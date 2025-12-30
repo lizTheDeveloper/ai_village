@@ -137,7 +137,9 @@ export class RestBehavior extends BaseAnimalBehavior {
 export class IdleBehavior extends BaseAnimalBehavior {
   readonly name = 'idle' as const;
 
-  private wanderTarget: { x: number; y: number } | null = null;
+  // Per-entity wander targets (keyed by entity ID)
+  // This is necessary because all animals share the same IdleBehavior instance
+  private wanderTargets: Map<string, { x: number; y: number }> = new Map();
 
   /**
    * Execute idle behavior.
@@ -163,19 +165,21 @@ export class IdleBehavior extends BaseAnimalBehavior {
       return { complete: true, newState: 'drinking', reason: 'Getting thirsty' };
     }
 
-    // Random wandering
-    if (!this.wanderTarget || this.hasReached(entity, this.wanderTarget, 1.0) || Math.random() < 0.01) {
+    // Get this entity's wander target
+    let wanderTarget = this.wanderTargets.get(entity.id);
+
+    // Random wandering - pick new target if needed
+    if (!wanderTarget || this.hasReached(entity, wanderTarget, 1.0) || Math.random() < 0.01) {
       // Pick a new random target nearby
-      this.wanderTarget = {
+      wanderTarget = {
         x: position.x + (Math.random() - 0.5) * 10,
         y: position.y + (Math.random() - 0.5) * 10,
       };
+      this.wanderTargets.set(entity.id, wanderTarget);
     }
 
     // Move slowly toward wander target
-    if (this.wanderTarget) {
-      this.moveToward(entity, this.wanderTarget, 0.3);
-    }
+    this.moveToward(entity, wanderTarget, 0.3);
 
     return { complete: false, reason: 'Wandering' };
   }

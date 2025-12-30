@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -33,7 +34,7 @@ interface Environment {
 export class PlantSystem implements System {
   public readonly id: SystemId = 'plant';
   public readonly priority = 20; // After SoilSystem, WeatherSystem
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = ['plant'];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Plant];
   private eventBus: CoreEventBus;
   private speciesLookup: ((id: string) => PlantSpecies) | null = null;
 
@@ -128,8 +129,21 @@ export class PlantSystem implements System {
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     if (entities.length === 0) return;
 
+    // Clear companion planting cache at start of each update
+    this.clearCompanionCache();
+
+    // Get agent positions for proximity-based simulation culling
+    const agentPositions: Array<{ x: number; y: number }> = [];
+    const agentEntities = world.query().with(CT.Agent).with(CT.Position).executeEntities();
+    for (const agentEntity of agentEntities) {
+      const pos = agentEntity.components.get(CT.Position) as { x: number; y: number } | undefined;
+      if (pos) {
+        agentPositions.push({ x: pos.x, y: pos.y });
+      }
+    }
+
     // Get time component to calculate game hours elapsed
-    const timeEntities = world.query().with('time').executeEntities();
+    const timeEntities = world.query().with(CT.Time).executeEntities();
     let gameHoursElapsed = 0;
 
     if (timeEntities.length > 0) {
@@ -171,7 +185,7 @@ export class PlantSystem implements System {
     // Validate all plant entities first (regardless of time accumulation)
     for (const entity of entities) {
       const impl = entity as EntityImpl;
-      const plant = impl.getComponent<PlantComponent>('plant');
+      const plant = impl.getComponent<PlantComponent>(CT.Plant);
       if (!plant) continue;
 
       // Validate position exists on plant component
@@ -194,8 +208,28 @@ export class PlantSystem implements System {
 
     for (const entity of entities) {
       const impl = entity as EntityImpl;
-      const plant = impl.getComponent<PlantComponent>('plant');
+      const plant = impl.getComponent<PlantComponent>(CT.Plant);
       if (!plant) continue;
+
+      // Simulation culling: Only update wild plants if near agents
+      // Planted crops always simulate (even when agents are far away)
+      if (!plant.planted) {
+        const VISION_RANGE = 15; // tiles - from GameBalance.VISION_RANGE_TILES
+        let nearAgent = false;
+
+        for (const agentPos of agentPositions) {
+          const dx = plant.position.x - agentPos.x;
+          const dy = plant.position.y - agentPos.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance <= VISION_RANGE) {
+            nearAgent = true;
+            break;
+          }
+        }
+
+        // Skip wild plants that are far from all agents (pause simulation)
+        if (!nearAgent) continue;
+      }
 
       // Store entity ID for this plant
       this.plantEntityIds.set(plant, entity.id);
@@ -446,8 +480,8 @@ export class PlantSystem implements System {
       return;
     }
 
-    // Progress current stage
-    const growthAmount = this.calculateGrowthProgress(plant, species, environment);
+    // Progress current stage (including companion planting effects)
+    const growthAmount = this.calculateGrowthProgress(plant, species, environment, world, entityId);
     const hourlyGrowth = (growthAmount / 24) * hoursElapsed;
     plant.stageProgress += hourlyGrowth;
 
@@ -473,7 +507,9 @@ export class PlantSystem implements System {
   private calculateGrowthProgress(
     plant: PlantComponent,
     species: PlantSpecies,
-    environment: Environment
+    environment: Environment,
+    world?: World,
+    entityId?: string
   ): number {
     // Find current stage transition
     const transition = species.stageTransitions.find(t => t.from === plant.stage);
@@ -498,6 +534,12 @@ export class PlantSystem implements System {
     // Health affects growth
     const healthModifier = plant.health / 100;
     progress *= healthModifier;
+
+    // Apply companion planting modifier
+    if (world && entityId) {
+      const companionModifier = this.calculateCompanionModifier(plant, species, world, entityId);
+      progress *= companionModifier;
+    }
 
     return progress;
   }
@@ -777,9 +819,45 @@ export class PlantSystem implements System {
   /**
    * Check if tile is suitable for seed placement
    */
-  private isTileSuitable(position: { x: number; y: number }, _world: World): boolean {
-    // Simple check - avoid checking for tile occupancy for now
-    return position.x % 2 === 0; // Placeholder logic to make tests pass
+  private isTileSuitable(position: { x: number; y: number }, world: World): boolean {
+    // Check if world has tile access
+    const worldWithTiles = world as { getTileAt?: (x: number, y: number) => any };
+    if (typeof worldWithTiles.getTileAt !== 'function') {
+      return false; // No tile access available
+    }
+
+    // Check if tile exists
+    const tile = worldWithTiles.getTileAt(position.x, position.y);
+    if (!tile) {
+      return false; // Tile doesn't exist
+    }
+
+    // Check terrain type - seeds can only grow on suitable terrain
+    const validTerrain = ['grass', 'dirt', 'tilled_soil'];
+    if (tile.terrain && !validTerrain.includes(tile.terrain)) {
+      return false; // Wrong terrain type
+    }
+
+    // Check if tile is already occupied by a plant
+    const existingPlants = world.query().with(CT.Plant).with(CT.Position).executeEntities();
+    for (const plantEntity of existingPlants) {
+      const plantImpl = plantEntity as EntityImpl;
+      const plantComp = plantImpl.getComponent<PlantComponent>(CT.Plant);
+      if (plantComp && plantComp.position) {
+        const plantX = Math.floor(plantComp.position.x);
+        const plantY = Math.floor(plantComp.position.y);
+        if (plantX === position.x && plantY === position.y) {
+          return false; // Already has a plant
+        }
+      }
+    }
+
+    // Check soil quality if tilled
+    if (tile.terrain === 'tilled_soil' && tile.fertility !== undefined && tile.fertility < 0.2) {
+      return false; // Soil too depleted
+    }
+
+    return true; // Tile is suitable
   }
 
   /**
@@ -838,6 +916,206 @@ export class PlantSystem implements System {
     return parseInt(range, 10) || 0;
   }
 
+  // ============================================
+  // Companion Planting System
+  // ============================================
+
+  /** Radius to check for companion plants (in tiles) */
+  private static readonly COMPANION_RADIUS = 3;
+
+  /** Bonus growth rate from beneficial companion */
+  private static readonly COMPANION_BONUS = 0.15;
+
+  /** Penalty growth rate from harmful companion */
+  private static readonly COMPANION_PENALTY = 0.20;
+
+  /** Cache of nearby plants per position (cleared each update) */
+  private nearbyPlantsCache: Map<string, Array<{ speciesId: string; distance: number }>> = new Map();
+
+  /**
+   * Get nearby plants within companion radius
+   * Uses caching to avoid repeated queries for the same position
+   */
+  private getNearbyPlants(
+    position: { x: number; y: number },
+    world: World,
+    excludeEntityId: string
+  ): Array<{ speciesId: string; distance: number }> {
+    const cacheKey = `${position.x},${position.y}`;
+
+    if (this.nearbyPlantsCache.has(cacheKey)) {
+      return this.nearbyPlantsCache.get(cacheKey)!;
+    }
+
+    const nearbyPlants: Array<{ speciesId: string; distance: number }> = [];
+    const allPlants = world.query().with(CT.Plant).executeEntities();
+
+    for (const plantEntity of allPlants) {
+      if (plantEntity.id === excludeEntityId) continue;
+
+      const plantImpl = plantEntity as EntityImpl;
+      const plantComp = plantImpl.getComponent<PlantComponent>(CT.Plant);
+      if (!plantComp || !plantComp.position) continue;
+
+      // Skip dead plants
+      if (plantComp.stage === 'dead') continue;
+
+      const dx = plantComp.position.x - position.x;
+      const dy = plantComp.position.y - position.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance <= PlantSystem.COMPANION_RADIUS && distance > 0) {
+        nearbyPlants.push({
+          speciesId: plantComp.speciesId,
+          distance
+        });
+      }
+    }
+
+    this.nearbyPlantsCache.set(cacheKey, nearbyPlants);
+    return nearbyPlants;
+  }
+
+  /**
+   * Calculate companion planting growth modifier
+   * Returns a multiplier (1.0 = no effect, >1.0 = bonus, <1.0 = penalty)
+   */
+  private calculateCompanionModifier(
+    plant: PlantComponent,
+    species: PlantSpecies,
+    world: World,
+    entityId: string
+  ): number {
+    const companionEffects = species.properties?.environmental?.companionEffects;
+    if (!companionEffects) {
+      return 1.0; // No companion effects defined
+    }
+
+    const nearbyPlants = this.getNearbyPlants(plant.position, world, entityId);
+    if (nearbyPlants.length === 0) {
+      return 1.0; // No nearby plants
+    }
+
+    let modifier = 1.0;
+    let benefitCount = 0;
+    let harmCount = 0;
+
+    // Check which nearby plants affect this plant
+    for (const nearby of nearbyPlants) {
+      // Distance-based effect falloff (closer = stronger)
+      const distanceFactor = 1 - (nearby.distance / PlantSystem.COMPANION_RADIUS);
+
+      // Check if this nearby plant benefits from us
+      // (We need to check the nearby plant's species for what it benefits)
+      const nearbySpecies = this.speciesLookup ? this.speciesLookup(nearby.speciesId) : null;
+      const nearbyCompanionEffects = nearbySpecies?.properties?.environmental?.companionEffects;
+
+      // Does the nearby plant benefit us?
+      if (nearbyCompanionEffects?.benefitsNearby?.includes(species.id)) {
+        modifier += PlantSystem.COMPANION_BONUS * distanceFactor;
+        benefitCount++;
+      }
+
+      // Does the nearby plant harm us?
+      if (nearbyCompanionEffects?.harmsNearby?.includes(species.id)) {
+        modifier -= PlantSystem.COMPANION_PENALTY * distanceFactor;
+        harmCount++;
+      }
+
+      // Do WE benefit from this nearby plant?
+      if (companionEffects.benefitsNearby?.includes(nearby.speciesId)) {
+        modifier += PlantSystem.COMPANION_BONUS * distanceFactor;
+        benefitCount++;
+      }
+
+      // Do WE get harmed by this nearby plant?
+      if (companionEffects.harmsNearby?.includes(nearby.speciesId)) {
+        modifier -= PlantSystem.COMPANION_PENALTY * distanceFactor;
+        harmCount++;
+      }
+    }
+
+    // Clamp modifier to reasonable range
+    modifier = Math.max(0.5, Math.min(1.5, modifier));
+
+    // Emit event if significant companion effects are active
+    if (benefitCount > 0 || harmCount > 0) {
+      this.eventBus.emit({
+        type: 'plant:companionEffect',
+        source: 'plant-system',
+        data: {
+          plantId: entityId,
+          speciesId: species.id,
+          position: plant.position,
+          benefitCount,
+          harmCount,
+          modifier
+        }
+      });
+    }
+
+    return modifier;
+  }
+
+  /**
+   * Check if any nearby plants provide pest repellent effects
+   * Returns list of pests that are repelled
+   */
+  public getRepelledPests(
+    position: { x: number; y: number },
+    world: World
+  ): string[] {
+    const repelledPests: Set<string> = new Set();
+
+    const nearbyPlants = this.getNearbyPlants(position, world, '');
+
+    for (const nearby of nearbyPlants) {
+      const nearbySpecies = this.speciesLookup ? this.speciesLookup(nearby.speciesId) : null;
+      const companionEffects = nearbySpecies?.properties?.environmental?.companionEffects;
+
+      if (companionEffects?.repels) {
+        for (const pest of companionEffects.repels) {
+          repelledPests.add(pest);
+        }
+      }
+    }
+
+    return Array.from(repelledPests);
+  }
+
+  /**
+   * Check if any nearby plants attract specific creatures
+   * Returns list of creatures that are attracted
+   */
+  public getAttractedCreatures(
+    position: { x: number; y: number },
+    world: World
+  ): string[] {
+    const attractedCreatures: Set<string> = new Set();
+
+    const nearbyPlants = this.getNearbyPlants(position, world, '');
+
+    for (const nearby of nearbyPlants) {
+      const nearbySpecies = this.speciesLookup ? this.speciesLookup(nearby.speciesId) : null;
+      const companionEffects = nearbySpecies?.properties?.environmental?.companionEffects;
+
+      if (companionEffects?.attracts) {
+        for (const creature of companionEffects.attracts) {
+          attractedCreatures.add(creature);
+        }
+      }
+    }
+
+    return Array.from(attractedCreatures);
+  }
+
+  /**
+   * Clear the nearby plants cache (called at start of each update)
+   */
+  private clearCompanionCache(): void {
+    this.nearbyPlantsCache.clear();
+  }
+
   /**
    * Regenerate fruit at midnight for all plants in appropriate stages.
    *
@@ -859,7 +1137,7 @@ export class PlantSystem implements System {
 
     for (const entity of entities) {
       const impl = entity as EntityImpl;
-      const plant = impl.getComponent<PlantComponent>('plant');
+      const plant = impl.getComponent<PlantComponent>(CT.Plant);
       if (!plant) continue;
 
       // Only regenerate for plants in appropriate stages

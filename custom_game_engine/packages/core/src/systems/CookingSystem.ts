@@ -18,6 +18,7 @@
 
 import type { World } from '../ecs/World.js';
 import { System } from '../ecs/System.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import type { EntityId } from '../types.js';
@@ -150,7 +151,7 @@ export class CookingSystem implements System {
     }
 
     // Update the component on the entity
-    (entity as EntityImpl).updateComponent<SkillsComponent>('skills', () => skillsComp);
+    (entity as EntityImpl).updateComponent<SkillsComponent>(CT.Skills, () => skillsComp);
 
     // Calculate total produced
     const totalProduced = produced.reduce((sum, p) => sum + p.amount, 0);
@@ -178,7 +179,7 @@ export class CookingSystem implements System {
    * Get or create skills component for an entity.
    */
   private getOrCreateSkillsComponent(entity: EntityImpl): SkillsComponent {
-    let skills = entity.getComponent<SkillsComponent>('skills');
+    let skills = entity.getComponent<SkillsComponent>(CT.Skills);
     if (!skills) {
       skills = createSkillsComponent();
       entity.addComponent(skills);
@@ -266,7 +267,7 @@ export class CookingSystem implements System {
    * Happy cooks make better food!
    */
   private getMoodBonus(entity: Entity): number {
-    const mood = entity.components.get('mood') as MoodComponent | undefined;
+    const mood = entity.components.get(CT.Mood) as MoodComponent | undefined;
     if (!mood) {
       return 0;
     }

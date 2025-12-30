@@ -7,6 +7,7 @@ import { WeatherSystem } from '../WeatherSystem.js';
 import { TemperatureSystem } from '../TemperatureSystem.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Integration tests for TimeSystem + WeatherSystem + TemperatureSystem
  *
@@ -30,7 +31,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
     // Create weather entity
     const weatherEntity = harness.world.createEntity('weather');
     weatherEntity.addComponent({
-      type: 'weather',
+      type: ComponentType.Weather,
       version: 1,
       weatherType: 'clear',
       intensity: 0.5,
@@ -42,7 +43,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
     // Create entity with temperature
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     agent.addComponent({
-      type: 'temperature',
+      type: ComponentType.Temperature,
       version: 1,
       currentTemp: 20,
       state: 'comfortable',
@@ -76,7 +77,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
     // Create weather entity with rain (cold modifier)
     const weatherEntity = harness.world.createEntity('weather');
     weatherEntity.addComponent({
-      type: 'weather',
+      type: ComponentType.Weather,
       version: 1,
       weatherType: 'rain',
       intensity: 1.0, // Full intensity
@@ -88,7 +89,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
     // Create agent with temperature
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     agent.addComponent({
-      type: 'temperature',
+      type: ComponentType.Temperature,
       version: 1,
       currentTemp: 20,
       state: 'comfortable',
@@ -104,7 +105,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
       tempSystem.update(harness.world, entities, 1.0);
     }
 
-    const updatedTemp = agent.getComponent('temperature');
+    const updatedTemp = agent.getComponent(ComponentType.Temperature);
 
     // Temperature should be cooler due to rain
     // Base temp (20) + rain modifier (-3) = ~17°C
@@ -115,7 +116,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
     // Create weather entity
     const weatherEntity = harness.world.createEntity('weather');
     weatherEntity.addComponent({
-      type: 'weather',
+      type: ComponentType.Weather,
       version: 1,
       weatherType: 'clear',
       intensity: 0.3,
@@ -127,7 +128,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
     // Create agent with temperature
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     agent.addComponent({
-      type: 'temperature',
+      type: ComponentType.Temperature,
       version: 1,
       currentTemp: 20,
       state: 'comfortable',
@@ -140,21 +141,21 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
     harness.setGameHour(6);
     const entities = Array.from(harness.world.entities.values());
     tempSystem.update(harness.world, entities, 1.0);
-    const dawnTemp = agent.getComponent('temperature').currentTemp;
+    const dawnTemp = agent.getComponent(ComponentType.Temperature).currentTemp;
 
     // Record temperature at noon (12 PM)
     harness.setGameHour(12);
     for (let i = 0; i < 10; i++) {
       tempSystem.update(harness.world, entities, 1.0);
     }
-    const noonTemp = agent.getComponent('temperature').currentTemp;
+    const noonTemp = agent.getComponent(ComponentType.Temperature).currentTemp;
 
     // Record temperature at night (midnight)
     harness.setGameHour(0);
     for (let i = 0; i < 10; i++) {
       tempSystem.update(harness.world, entities, 1.0);
     }
-    const nightTemp = agent.getComponent('temperature').currentTemp;
+    const nightTemp = agent.getComponent(ComponentType.Temperature).currentTemp;
 
     // Noon should be warmer than dawn, night should be cooler
     expect(noonTemp).toBeGreaterThanOrEqual(dawnTemp - 1); // Allow small margin
@@ -165,7 +166,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
     // Create weather entity starting with clear weather
     const weatherEntity = harness.world.createEntity('weather');
     weatherEntity.addComponent({
-      type: 'weather',
+      type: ComponentType.Weather,
       version: 1,
       weatherType: 'clear',
       intensity: 0.5,
@@ -177,7 +178,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
     // Create agent with temperature
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     agent.addComponent({
-      type: 'temperature',
+      type: ComponentType.Temperature,
       version: 1,
       currentTemp: 20,
       state: 'comfortable',
@@ -193,7 +194,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
 
     // Record initial temperature
     tempSystem.update(harness.world, entities, 1.0);
-    const initialTemp = agent.getComponent('temperature').currentTemp;
+    const initialTemp = agent.getComponent(ComponentType.Temperature).currentTemp;
 
     // Force weather transition by updating with long duration
     weatherSystem.update(harness.world, entities, 10.0);
@@ -203,10 +204,10 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
       tempSystem.update(harness.world, entities, 1.0);
     }
 
-    const finalTemp = agent.getComponent('temperature').currentTemp;
+    const finalTemp = agent.getComponent(ComponentType.Temperature).currentTemp;
 
     // Weather might have changed, affecting temperature
-    const weatherComp = weatherEntity.getComponent('weather');
+    const weatherComp = weatherEntity.getComponent(ComponentType.Weather);
     expect(weatherComp).toBeDefined();
   });
 
@@ -214,7 +215,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
     // Create weather entity with snow
     const weatherEntity = harness.world.createEntity('weather');
     weatherEntity.addComponent({
-      type: 'weather',
+      type: ComponentType.Weather,
       version: 1,
       weatherType: 'snow',
       intensity: 1.0,
@@ -226,7 +227,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
     // Create agent with temperature
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     agent.addComponent({
-      type: 'temperature',
+      type: ComponentType.Temperature,
       version: 1,
       currentTemp: 20,
       state: 'comfortable',
@@ -234,7 +235,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
 
     // Add needs component to track health damage
     agent.addComponent({
-      type: 'needs',
+      type: ComponentType.Needs,
       version: 1,
       hunger: 100,
       energy: 100,
@@ -253,7 +254,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
       tempSystem.update(harness.world, entities, 1.0);
     }
 
-    const updatedTemp = agent.getComponent('temperature');
+    const updatedTemp = agent.getComponent(ComponentType.Temperature);
 
     // Temperature should be significantly colder
     expect(updatedTemp.currentTemp).toBeLessThan(15);
@@ -268,7 +269,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
     const weatherEntity = harness.world.createEntity('weather');
     const initialDuration = 100;
     weatherEntity.addComponent({
-      type: 'weather',
+      type: ComponentType.Weather,
       version: 1,
       weatherType: 'clear',
       intensity: 0.5,
@@ -285,7 +286,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
     // Update with 1 second delta time
     weatherSystem.update(harness.world, entities, 1.0);
 
-    const weather = weatherEntity.getComponent('weather');
+    const weather = weatherEntity.getComponent(ComponentType.Weather);
 
     // Duration should have decreased by 1 second
     expect(weather.duration).toBeLessThan(initialDuration);
@@ -296,7 +297,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
     // Create weather entity
     const weatherEntity = harness.world.createEntity('weather');
     weatherEntity.addComponent({
-      type: 'weather',
+      type: ComponentType.Weather,
       version: 1,
       weatherType: 'clear',
       intensity: 0.5,
@@ -308,7 +309,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
     // Create agent with temperature
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     agent.addComponent({
-      type: 'temperature',
+      type: ComponentType.Temperature,
       version: 1,
       currentTemp: 10, // Start cold
       state: 'cold',
@@ -322,7 +323,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
     // Update once (should move toward ambient but not instantly)
     tempSystem.update(harness.world, entities, 1.0);
 
-    const afterOneUpdate = agent.getComponent('temperature').currentTemp;
+    const afterOneUpdate = agent.getComponent(ComponentType.Temperature).currentTemp;
 
     // Temperature should have changed slightly but not jumped to 20°C
     expect(afterOneUpdate).toBeGreaterThan(10);
@@ -333,7 +334,7 @@ describe('TimeSystem + WeatherSystem + TemperatureSystem Integration', () => {
       tempSystem.update(harness.world, entities, 1.0);
     }
 
-    const afterManyUpdates = agent.getComponent('temperature').currentTemp;
+    const afterManyUpdates = agent.getComponent(ComponentType.Temperature).currentTemp;
 
     // Should be much closer to ambient now
     expect(afterManyUpdates).toBeGreaterThan(afterOneUpdate);

@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -20,8 +21,8 @@ export class TemperatureSystem implements System {
   public readonly id: SystemId = 'temperature';
   public readonly priority: number = 14; // Run after weather (5), before needs (15)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
-    'temperature',
-    'position',
+    CT.Temperature,
+    CT.Position,
   ];
 
   private readonly HEALTH_DAMAGE_RATE = HEALTH_DAMAGE_RATE; // Health damage per second in dangerous temps
@@ -37,13 +38,13 @@ export class TemperatureSystem implements System {
 
     // Filter entities with required components
     const temperatureEntities = entities.filter(e =>
-      e.components.has('temperature') && e.components.has('position')
+      e.components.has(CT.Temperature) && e.components.has(CT.Position)
     );
 
     // Process each entity with temperature
     for (const entity of temperatureEntities) {
       const impl = entity as EntityImpl;
-      const posComp = impl.getComponent<PositionComponent>('position')!;
+      const posComp = impl.getComponent<PositionComponent>(CT.Position)!;
 
       // Calculate agent's effective temperature
       let effectiveTemp = this.currentWorldTemp;
@@ -64,7 +65,7 @@ export class TemperatureSystem implements System {
       effectiveTemp += heatBonus;
 
       // Get current temperature component to apply thermal inertia
-      const currentTempComp = impl.getComponent<TemperatureComponent>('temperature')!;
+      const currentTempComp = impl.getComponent<TemperatureComponent>(CT.Temperature)!;
 
       // Gradually adjust body temperature toward environmental temperature (thermal inertia)
       // Body temperature changes slowly, not instantly
@@ -73,29 +74,30 @@ export class TemperatureSystem implements System {
       const newTemp = currentTempComp.currentTemp + tempChange;
 
       // Update agent temperature with gradual change
-      impl.updateComponent<TemperatureComponent>('temperature', (current) => ({
+      impl.updateComponent<TemperatureComponent>(CT.Temperature, (current) => ({
         ...current,
         currentTemp: newTemp,
         state: this.calculateTemperatureState(newTemp, current),
       }));
 
       // Get updated component after state calculation
-      const updatedTemp = impl.getComponent<TemperatureComponent>('temperature')!;
+      const updatedTemp = impl.getComponent<TemperatureComponent>(CT.Temperature)!;
 
       // Check for state transitions and emit events
       this.checkTemperatureEvents(world, entity, updatedTemp);
 
       // Apply health damage if in dangerous temperature
       if (updatedTemp.state === 'dangerously_cold' || updatedTemp.state === 'dangerously_hot') {
-        const needsComp = impl.getComponent<NeedsComponent>('needs');
+        const needsComp = impl.getComponent<NeedsComponent>(CT.Needs);
         if (needsComp) {
           const healthLoss = this.HEALTH_DAMAGE_RATE * deltaTime;
           const newHealth = Math.max(0, needsComp.health - healthLoss);
 
-          impl.updateComponent<NeedsComponent>('needs', (current) => ({
-            ...current,
-            health: newHealth,
-          }));
+          impl.updateComponent<NeedsComponent>(CT.Needs, (current) => {
+            const updated = current.clone();
+            updated.health = newHealth;
+            return updated;
+          });
 
           // Emit critical health event if health drops below 20%
           if (newHealth < HEALTH_CRITICAL && needsComp.health >= HEALTH_CRITICAL) {
@@ -144,7 +146,7 @@ export class TemperatureSystem implements System {
     // Find world entity with weather component
     for (const entity of world.entities.values()) {
       const impl = entity as EntityImpl;
-      const weather = impl.getComponent<WeatherComponent>('weather');
+      const weather = impl.getComponent<WeatherComponent>(CT.Weather);
       if (weather) {
         return weather.tempModifier;
       }
@@ -226,8 +228,8 @@ export class TemperatureSystem implements System {
 
     for (const entity of world.entities.values()) {
       const impl = entity as EntityImpl;
-      const buildingComp = impl.getComponent<BuildingComponent>('building');
-      const posComp = impl.getComponent<PositionComponent>('position');
+      const buildingComp = impl.getComponent<BuildingComponent>(CT.Building);
+      const posComp = impl.getComponent<PositionComponent>(CT.Position);
 
       if (buildingComp && posComp) {
         buildings.push({

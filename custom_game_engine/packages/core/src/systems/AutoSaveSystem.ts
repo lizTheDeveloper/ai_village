@@ -132,13 +132,7 @@ export class AutoSaveSystem implements System {
       console.log(`[AutoSave] Checkpoint created: ${checkpointName} (${key})`);
 
       // Emit event for name generation
-      world.eventBus.emit({
-        type: 'checkpoint:created',
-        source: 'auto_save',
-        data: {
-          checkpoint,
-        },
-      });
+      this.emitEvent(world, 'checkpoint:created', 'auto_save', { checkpoint });
 
       // Request LLM to generate a poetic name asynchronously
       this.generateCheckpointName(checkpoint, world);
@@ -191,13 +185,7 @@ export class AutoSaveSystem implements System {
     console.log(`[AutoSave] TODO: Generate LLM name for checkpoint day ${checkpoint.day}`);
 
     // Emit event that can be handled by LLM system
-    world.eventBus.emit({
-      type: 'checkpoint:name_request',
-      source: 'auto_save',
-      data: {
-        checkpoint,
-      },
-    });
+    this.emitEvent(world, 'checkpoint:name_request', 'auto_save', { checkpoint });
   }
 
   /**
@@ -228,14 +216,10 @@ export class AutoSaveSystem implements System {
       }
 
       // Emit fork event
-      world.eventBus.emit({
-        type: 'universe:forked',
-        source: 'auto_save',
-        data: {
-          sourceCheckpoint: checkpoint,
-          newUniverseId: checkpoint.universeId,
-          forkPoint: checkpoint.tick,
-        },
+      this.emitEvent(world, 'universe:forked', 'auto_save', {
+        sourceCheckpoint: checkpoint,
+        newUniverseId: checkpoint.universeId,
+        forkPoint: checkpoint.tick,
       });
 
       console.log(`[AutoSave] Rewound to checkpoint: ${checkpoint.name} (day ${checkpoint.day})`);

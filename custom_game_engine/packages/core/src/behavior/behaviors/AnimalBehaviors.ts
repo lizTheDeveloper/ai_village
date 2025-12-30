@@ -18,6 +18,7 @@ import { TamingSystem, type TamingMethod } from '../../systems/TamingSystem.js';
 import { assignAnimalToHousing } from '../../actions/AnimalHousingActions.js';
 import { getAnimalSpecies } from '../../data/animalSpecies.js';
 import { isAnimalHousing, canHouseSpecies } from '../../data/animalHousingDefinitions.js';
+import { ComponentType } from '../../types/ComponentType.js';
 /** Distance at which taming can be attempted */
 const TAMING_DISTANCE = 2.0;
 /** Distance at which housing assignment happens */
@@ -40,9 +41,9 @@ const MAX_HOUSING_RANGE = 50;
 export class TameAnimalBehavior extends BaseBehavior {
   readonly name = 'tame_animal' as const;
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>('position')!;
-    const agent = entity.getComponent<AgentComponent>('agent')!;
-    const inventory = entity.getComponent<InventoryComponent>('inventory');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
+    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
     this.disableSteering(entity);
     const state = agent.behaviorState || {};
     const targetAnimalId = state.targetAnimalId as string | undefined;
@@ -57,8 +58,8 @@ export class TameAnimalBehavior extends BaseBehavior {
       // Specific target
       const animalEntity = world.getEntity(targetAnimalId) as EntityImpl | undefined;
       if (animalEntity) {
-        const animal = animalEntity.getComponent<AnimalComponent>('animal');
-        const animalPos = animalEntity.getComponent<PositionComponent>('position');
+        const animal = animalEntity.getComponent<AnimalComponent>(ComponentType.Animal);
+        const animalPos = animalEntity.getComponent<PositionComponent>(ComponentType.Position);
         if (animal && animalPos && animal.wild) {
           targetAnimal = { entity: animalEntity, animal, position: animalPos };
         }
@@ -126,7 +127,7 @@ export class TameAnimalBehavior extends BaseBehavior {
         const slot = inventory.slots.find(s => s.itemId === foodToOffer && s.quantity > 0);
         if (slot) {
           slot.quantity -= 1;
-          entity.updateComponent<InventoryComponent>('inventory', () => inventory);
+          entity.updateComponent<InventoryComponent>(ComponentType.Inventory, () => inventory);
         }
       }
       if (result.success) {
@@ -160,13 +161,13 @@ export class TameAnimalBehavior extends BaseBehavior {
     position: PositionComponent,
     preferredSpecies?: string
   ): { entity: EntityImpl; animal: AnimalComponent; position: PositionComponent } | null {
-    const animals = world.query().with('animal').with('position').executeEntities();
+    const animals = world.query().with(ComponentType.Animal).with(ComponentType.Position).executeEntities();
     let bestAnimal: { entity: EntityImpl; animal: AnimalComponent; position: PositionComponent } | null = null;
     let bestScore = Infinity;
     for (const animalEntity of animals) {
       const impl = animalEntity as EntityImpl;
-      const animal = impl.getComponent<AnimalComponent>('animal')!;
-      const animalPos = impl.getComponent<PositionComponent>('position')!;
+      const animal = impl.getComponent<AnimalComponent>(ComponentType.Animal)!;
+      const animalPos = impl.getComponent<PositionComponent>(ComponentType.Position)!;
       // Must be wild
       if (!animal.wild) continue;
       // Check if species can be tamed
@@ -200,8 +201,8 @@ export class TameAnimalBehavior extends BaseBehavior {
 export class HouseAnimalBehavior extends BaseBehavior {
   readonly name = 'house_animal' as const;
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>('position')!;
-    const agent = entity.getComponent<AgentComponent>('agent')!;
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
     this.disableSteering(entity);
     const state = agent.behaviorState || {};
     const targetAnimalId = state.targetAnimalId as string | undefined;
@@ -222,8 +223,8 @@ export class HouseAnimalBehavior extends BaseBehavior {
       this.complete(entity);
       return { complete: true, reason: 'Animal no longer exists' };
     }
-    const animal = animalEntity.getComponent<AnimalComponent>('animal');
-    const animalPos = animalEntity.getComponent<PositionComponent>('position');
+    const animal = animalEntity.getComponent<AnimalComponent>(ComponentType.Animal);
+    const animalPos = animalEntity.getComponent<PositionComponent>(ComponentType.Position);
     if (!animal || !animalPos) {
       this.complete(entity);
       return { complete: true, reason: 'Invalid animal entity' };
@@ -247,8 +248,8 @@ export class HouseAnimalBehavior extends BaseBehavior {
     if (targetHousingId) {
       const housingEntity = world.getEntity(targetHousingId) as EntityImpl | undefined;
       if (housingEntity) {
-        const building = housingEntity.getComponent<BuildingComponent>('building');
-        const housingPos = housingEntity.getComponent<PositionComponent>('position');
+        const building = housingEntity.getComponent<BuildingComponent>(ComponentType.Building);
+        const housingPos = housingEntity.getComponent<PositionComponent>(ComponentType.Position);
         if (building && housingPos) {
           housing = { entity: housingEntity, building, position: housingPos };
         }
@@ -292,10 +293,10 @@ export class HouseAnimalBehavior extends BaseBehavior {
     world: World,
     ownerId: string
   ): { entity: EntityImpl; animal: AnimalComponent } | null {
-    const animals = world.query().with('animal').executeEntities();
+    const animals = world.query().with(ComponentType.Animal).executeEntities();
     for (const animalEntity of animals) {
       const impl = animalEntity as EntityImpl;
-      const animal = impl.getComponent<AnimalComponent>('animal')!;
+      const animal = impl.getComponent<AnimalComponent>(ComponentType.Animal)!;
       if (!animal.wild && animal.ownerId === ownerId && !animal.housingBuildingId) {
         return { entity: impl, animal };
       }
@@ -307,13 +308,13 @@ export class HouseAnimalBehavior extends BaseBehavior {
     position: PositionComponent,
     speciesId: string
   ): { entity: EntityImpl; building: BuildingComponent; position: PositionComponent } | null {
-    const buildings = world.query().with('building').with('position').executeEntities();
+    const buildings = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
     let bestHousing: { entity: EntityImpl; building: BuildingComponent; position: PositionComponent } | null = null;
     let bestDistance = Infinity;
     for (const buildingEntity of buildings) {
       const impl = buildingEntity as EntityImpl;
-      const building = impl.getComponent<BuildingComponent>('building')!;
-      const buildingPos = impl.getComponent<PositionComponent>('position')!;
+      const building = impl.getComponent<BuildingComponent>(ComponentType.Building)!;
+      const buildingPos = impl.getComponent<PositionComponent>(ComponentType.Position)!;
       // Must be animal housing
       if (!isAnimalHousing(building.buildingType)) continue;
       // Must be complete

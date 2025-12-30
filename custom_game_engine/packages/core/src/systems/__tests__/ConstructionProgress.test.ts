@@ -5,6 +5,7 @@ import { createBuildingComponent, isUnderConstruction, getRemainingWork, type Bu
 import { EventBusImpl } from '../../events/EventBus.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
 
+import { BuildingType } from '../../types/BuildingType.js';
 /**
  * Construction Progress Tests - Phase 7
  *
@@ -52,7 +53,7 @@ describe('Construction Progress System - Phase 7', () => {
     it('should advance construction progress based on time elapsed', () => {
       // Create a building under construction
       const entity = createTestEntity();
-      entity.addComponent(createBuildingComponent('tent', 1, 0));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 0));
       entity.addComponent(createPositionComponent(0, 0));
 
       // Advance time by 1 second
@@ -69,12 +70,12 @@ describe('Construction Progress System - Phase 7', () => {
     it('should advance different buildings at different rates based on buildTime', () => {
       // Create tent (buildTime=45s)
       const tent = createTestEntity();
-      tent.addComponent(createBuildingComponent('tent', 1, 0));
+      tent.addComponent(createBuildingComponent(BuildingType.Tent, 1, 0));
       tent.addComponent(createPositionComponent(0, 0));
 
       // Create campfire (buildTime=30s)
       const campfire = createTestEntity();
-      campfire.addComponent(createBuildingComponent('campfire', 1, 0));
+      campfire.addComponent(createBuildingComponent(BuildingType.Campfire, 1, 0));
       campfire.addComponent(createPositionComponent(10, 10));
 
       // Advance 1 second
@@ -90,7 +91,7 @@ describe('Construction Progress System - Phase 7', () => {
     it('should clamp progress to 100% maximum', () => {
       // Create building at 99%
       const entity = createTestEntity();
-      entity.addComponent(createBuildingComponent('tent', 1, 99));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
       entity.addComponent(createPositionComponent(0, 0));
 
       // Advance by a large amount of time
@@ -106,7 +107,7 @@ describe('Construction Progress System - Phase 7', () => {
     it('should skip completed buildings', () => {
       // Create completed building
       const entity = createTestEntity();
-      entity.addComponent(createBuildingComponent('tent', 1, 100));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 100));
       entity.addComponent(createPositionComponent(0, 0));
 
       // Advance time
@@ -121,15 +122,15 @@ describe('Construction Progress System - Phase 7', () => {
 
     it('should handle multiple simultaneous constructions', () => {
       const building1 = createTestEntity();
-      building1.addComponent(createBuildingComponent('tent', 1, 0));
+      building1.addComponent(createBuildingComponent(BuildingType.Tent, 1, 0));
       building1.addComponent(createPositionComponent(0, 0));
 
       const building2 = createTestEntity();
-      building2.addComponent(createBuildingComponent('workbench', 1, 0));
+      building2.addComponent(createBuildingComponent(BuildingType.Workbench, 1, 0));
       building2.addComponent(createPositionComponent(10, 0));
 
       const building3 = createTestEntity();
-      building3.addComponent(createBuildingComponent('campfire', 1, 0));
+      building3.addComponent(createBuildingComponent(BuildingType.Campfire, 1, 0));
       building3.addComponent(createPositionComponent(20, 0));
 
       const buildings = [building1, building2, building3];
@@ -147,7 +148,7 @@ describe('Construction Progress System - Phase 7', () => {
   describe('Construction Completion', () => {
     it('should mark building as complete when progress reaches 100%', () => {
       const entity = createTestEntity();
-      entity.addComponent(createBuildingComponent('tent', 1, 99));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
       entity.addComponent(createPositionComponent(0, 0));
 
       // Advance enough to complete
@@ -164,7 +165,7 @@ describe('Construction Progress System - Phase 7', () => {
       eventBus.subscribe('building:complete', eventSpy);
 
       const entity = createTestEntity();
-      entity.addComponent(createBuildingComponent('tent', 1, 99));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
       entity.addComponent(createPositionComponent(16, 32));
 
       // Complete construction
@@ -187,7 +188,7 @@ describe('Construction Progress System - Phase 7', () => {
       eventBus.subscribe('building:complete', eventSpy);
 
       const entity = createTestEntity();
-      entity.addComponent(createBuildingComponent('campfire', 1, 99));
+      entity.addComponent(createBuildingComponent(BuildingType.Campfire, 1, 99));
       entity.addComponent(createPositionComponent(0, 0));
 
       buildingSystem.update(world, [entity], 10);
@@ -204,7 +205,7 @@ describe('Construction Progress System - Phase 7', () => {
       eventBus.subscribe('building:complete', eventSpy);
 
       const entity = createTestEntity();
-      entity.addComponent(createBuildingComponent('tent', 1, 99));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
       entity.addComponent(createPositionComponent(0, 0));
 
       // First update completes construction
@@ -221,27 +222,27 @@ describe('Construction Progress System - Phase 7', () => {
 
   describe('Helper Functions', () => {
     it('isUnderConstruction should return true for progress < 100', () => {
-      const building = createBuildingComponent('tent', 1, 50);
+      const building = createBuildingComponent(BuildingType.Tent, 1, 50);
       expect(isUnderConstruction(building)).toBe(true);
     });
 
     it('isUnderConstruction should return false for progress = 100', () => {
-      const building = createBuildingComponent('tent', 1, 100);
+      const building = createBuildingComponent(BuildingType.Tent, 1, 100);
       expect(isUnderConstruction(building)).toBe(false);
     });
 
     it('getRemainingWork should return correct amount', () => {
-      const building = createBuildingComponent('tent', 1, 30);
+      const building = createBuildingComponent(BuildingType.Tent, 1, 30);
       expect(getRemainingWork(building)).toBe(70);
     });
 
     it('getRemainingWork should return 0 for completed buildings', () => {
-      const building = createBuildingComponent('tent', 1, 100);
+      const building = createBuildingComponent(BuildingType.Tent, 1, 100);
       expect(getRemainingWork(building)).toBe(0);
     });
 
     it('getRemainingWork should not return negative values', () => {
-      const building = createBuildingComponent('tent', 1, 100);
+      const building = createBuildingComponent(BuildingType.Tent, 1, 100);
       expect(getRemainingWork(building)).toBeGreaterThanOrEqual(0);
     });
   });
@@ -259,7 +260,7 @@ describe('Construction Progress System - Phase 7', () => {
 
     it('should throw when entity missing PositionComponent', () => {
       const entity = createTestEntity();
-      entity.addComponent(createBuildingComponent('tent', 1, 0));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 0));
       // Missing position component
 
       expect(() => {
@@ -270,7 +271,7 @@ describe('Construction Progress System - Phase 7', () => {
     it('should throw when building type is unknown', () => {
       const entity = createTestEntity();
       // Create building with invalid type (bypass type checking for test)
-      const invalidBuilding = createBuildingComponent('tent', 1, 0);
+      const invalidBuilding = createBuildingComponent(BuildingType.Tent, 1, 0);
       (invalidBuilding as any).buildingType = 'invalid-building-type';
 
       entity.addComponent(invalidBuilding);
@@ -285,7 +286,7 @@ describe('Construction Progress System - Phase 7', () => {
   describe('Edge Cases', () => {
     it('should handle construction at exactly 100% progress', () => {
       const entity = createTestEntity();
-      entity.addComponent(createBuildingComponent('tent', 1, 100));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 100));
       entity.addComponent(createPositionComponent(0, 0));
 
       const building = getBuildingComponent(entity);
@@ -304,7 +305,7 @@ describe('Construction Progress System - Phase 7', () => {
 
     it('should handle progress from 99% to 101% (clamped to 100%)', () => {
       const entity = createTestEntity();
-      entity.addComponent(createBuildingComponent('tent', 1, 99));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
       entity.addComponent(createPositionComponent(0, 0));
 
       // Large deltaTime that would push past 100%
@@ -317,7 +318,7 @@ describe('Construction Progress System - Phase 7', () => {
 
     it('should handle zero deltaTime', () => {
       const entity = createTestEntity();
-      entity.addComponent(createBuildingComponent('tent', 1, 50));
+      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 50));
       entity.addComponent(createPositionComponent(0, 0));
 
       buildingSystem.update(world, [entity], 0);
@@ -330,7 +331,7 @@ describe('Construction Progress System - Phase 7', () => {
 
     it('should handle negative progress (clamped to 0)', () => {
       // Create building with negative progress (edge case)
-      const building = createBuildingComponent('tent', 1, -10);
+      const building = createBuildingComponent(BuildingType.Tent, 1, -10);
 
       // createBuildingComponent should clamp to 0
       expect(building.progress).toBe(0);
@@ -367,31 +368,31 @@ describe('Construction Progress System - Phase 7', () => {
     });
 
     it('should create building with correct tier', () => {
-      const tier2Building = createBuildingComponent('tent', 2, 0);
+      const tier2Building = createBuildingComponent(BuildingType.Tent, 2, 0);
       expect(tier2Building.tier).toBe(2);
 
-      const tier3Building = createBuildingComponent('workbench', 3, 0);
+      const tier3Building = createBuildingComponent(BuildingType.Workbench, 3, 0);
       expect(tier3Building.tier).toBe(3);
     });
 
     it('should clamp tier to valid range (1-3)', () => {
-      const tooLow = createBuildingComponent('tent', 0, 0);
+      const tooLow = createBuildingComponent(BuildingType.Tent, 0, 0);
       expect(tooLow.tier).toBe(1);
 
-      const tooHigh = createBuildingComponent('tent', 10, 0);
+      const tooHigh = createBuildingComponent(BuildingType.Tent, 10, 0);
       expect(tooHigh.tier).toBe(3);
     });
   });
 
   describe('BuildingComponent Properties', () => {
     it('should set correct properties for storage buildings', () => {
-      const storageChest = createBuildingComponent('storage-chest', 1, 0);
+      const storageChest = createBuildingComponent(BuildingType.StorageChest, 1, 0);
       expect(storageChest.storageCapacity).toBe(20);
       expect(storageChest.blocksMovement).toBe(true);
     });
 
     it('should set correct properties for heat sources', () => {
-      const campfire = createBuildingComponent('campfire', 1, 0);
+      const campfire = createBuildingComponent(BuildingType.Campfire, 1, 0);
       expect(campfire.providesHeat).toBe(true);
       expect(campfire.heatRadius).toBe(8); // Increased from 3 to cover spawn area
       expect(campfire.heatAmount).toBe(10);
@@ -399,7 +400,7 @@ describe('Construction Progress System - Phase 7', () => {
     });
 
     it('should set correct properties for shelters', () => {
-      const tent = createBuildingComponent('tent', 1, 0);
+      const tent = createBuildingComponent(BuildingType.Tent, 1, 0);
       expect(tent.insulation).toBe(0.5);
       expect(tent.baseTemperature).toBe(8);
       expect(tent.weatherProtection).toBe(0.7);

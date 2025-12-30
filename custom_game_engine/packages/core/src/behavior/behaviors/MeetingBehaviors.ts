@@ -15,6 +15,7 @@ import type { AgentComponent } from '../../components/AgentComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { IdentityComponent } from '../../components/IdentityComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
+import { ComponentType } from '../../types/ComponentType.js';
 import {
   createMeetingComponent,
   updateMeetingStatus,
@@ -39,12 +40,12 @@ export class CallMeetingBehavior extends BaseBehavior {
   readonly name = 'call_meeting' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const agent = entity.getComponent<AgentComponent>('agent')!;
-    const position = entity.getComponent<PositionComponent>('position')!;
-    const identity = entity.getComponent<IdentityComponent>('identity');
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+    const identity = entity.getComponent<IdentityComponent>(ComponentType.Identity);
 
     // Check if we already have a meeting component
-    let meeting = entity.getComponent<MeetingComponent>('meeting');
+    const meeting = entity.getComponent<MeetingComponent>(ComponentType.Meeting);
 
     if (!meeting) {
       // Create new meeting
@@ -78,7 +79,7 @@ export class CallMeetingBehavior extends BaseBehavior {
     const callerName = identity?.name || 'Someone';
     const announcement = `${callerName} is calling a meeting about ${topic}! Everyone gather around!`;
 
-    entity.updateComponent<AgentComponent>('agent', (current) => ({
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
       recentSpeech: announcement,
       lastThought: `I'm calling a meeting to discuss ${topic}`,
@@ -100,10 +101,10 @@ export class CallMeetingBehavior extends BaseBehavior {
     if (hasMeetingEnded(meeting, world.tick)) {
 
       // Remove meeting component
-      entity.removeComponent('meeting');
+      entity.removeComponent(ComponentType.Meeting);
 
       // Go back to wandering
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         behavior: 'wander',
         behaviorState: {},
@@ -117,7 +118,7 @@ export class CallMeetingBehavior extends BaseBehavior {
 
     // Periodically remind people
     if (meeting.status === 'calling' && world.tick % REMINDER_INTERVAL === 0) {
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         recentSpeech: `The meeting is starting! Please come join us!`,
       }));
@@ -132,10 +133,10 @@ export class AttendMeetingBehavior extends BaseBehavior {
   readonly name = 'attend_meeting' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const agent = entity.getComponent<AgentComponent>('agent')!;
-    const position = entity.getComponent<PositionComponent>('position')!;
-    const movement = entity.getComponent<MovementComponent>('movement')!;
-    const identity = entity.getComponent<IdentityComponent>('identity');
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+    const movement = entity.getComponent<MovementComponent>(ComponentType.Movement)!;
+    const identity = entity.getComponent<IdentityComponent>(ComponentType.Identity);
 
     // Get meeting caller ID from behavior state
     const meetingCallerId = agent.behaviorState.meetingCallerId as string;
@@ -154,7 +155,7 @@ export class AttendMeetingBehavior extends BaseBehavior {
     }
 
     const callerImpl = caller as EntityImpl;
-    const meeting = callerImpl.getComponent<MeetingComponent>('meeting');
+    const meeting = callerImpl.getComponent<MeetingComponent>(ComponentType.Meeting);
 
     if (!meeting || meeting.status === 'ended') {
       // Meeting doesn't exist or has ended
@@ -175,7 +176,7 @@ export class AttendMeetingBehavior extends BaseBehavior {
       const velocityX = (dx / distance) * movement.speed;
       const velocityY = (dy / distance) * movement.speed;
 
-      entity.updateComponent<MovementComponent>('movement', (current) => ({
+      entity.updateComponent<MovementComponent>(ComponentType.Movement, (current) => ({
         ...current,
         velocityX,
         velocityY,
@@ -193,7 +194,7 @@ export class AttendMeetingBehavior extends BaseBehavior {
       const updatedMeeting = addMeetingAttendee(meeting, entity.id);
       callerImpl.updateComponent('meeting', () => updatedMeeting);
 
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         lastThought: `I've joined the meeting about ${meeting.topic}`,
       }));

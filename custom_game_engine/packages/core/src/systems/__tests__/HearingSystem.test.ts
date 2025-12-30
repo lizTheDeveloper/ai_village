@@ -7,6 +7,7 @@ import { createAgentComponent } from '../../components/AgentComponent.js';
 import { createVisionComponent } from '../../components/VisionComponent.js';
 import { createIdentityComponent } from '../../components/IdentityComponent.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 function createTestAgent(world: WorldImpl, name: string, x: number, y: number): EntityImpl {
   const entity = new EntityImpl(createEntityId(), world.tick);
 
@@ -48,7 +49,7 @@ describe('Hearing System', () => {
     hearingProcessor.process(listener, world);
 
     // Check that Bob heard Alice
-    const vision = listener.getComponent('vision') as any;
+    const vision = listener.getComponent(ComponentType.Vision) as any;
     expect(vision.heardSpeech).toBeDefined();
     expect(vision.heardSpeech.length).toBe(1);
     expect(vision.heardSpeech[0].speaker).toBe('Alice');
@@ -70,7 +71,7 @@ describe('Hearing System', () => {
     hearingProcessor.process(listener, world);
 
     // Check that Bob did NOT hear Alice
-    const vision = listener.getComponent('vision') as any;
+    const vision = listener.getComponent(ComponentType.Vision) as any;
     expect(vision.heardSpeech).toEqual([]);
   });
 
@@ -95,7 +96,7 @@ describe('Hearing System', () => {
     hearingProcessor.process(listener, world);
 
     // Check that Bob heard both Alice and Charlie
-    const vision = listener.getComponent('vision') as any;
+    const vision = listener.getComponent(ComponentType.Vision) as any;
     expect(vision.heardSpeech).toBeDefined();
     expect(vision.heardSpeech.length).toBe(2);
 
@@ -118,7 +119,7 @@ describe('Hearing System', () => {
     hearingProcessor.process(agent, world);
 
     // Check that Bob did NOT hear himself
-    const vision = agent.getComponent('vision') as any;
+    const vision = agent.getComponent(ComponentType.Vision) as any;
     expect(vision.heardSpeech).toEqual([]);
   });
 
@@ -134,7 +135,7 @@ describe('Hearing System', () => {
     hearingProcessor.process(listener, world);
 
     // Check that Bob heard nothing
-    const vision = listener.getComponent('vision') as any;
+    const vision = listener.getComponent(ComponentType.Vision) as any;
     expect(vision.heardSpeech).toEqual([]);
   });
 });

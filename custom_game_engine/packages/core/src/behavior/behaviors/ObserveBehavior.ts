@@ -10,6 +10,7 @@ import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import type { EntityImpl } from '../../ecs/Entity.js';
 import type { World } from '../../ecs/World.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
+import { ComponentType } from '../../types/ComponentType.js';
 
 /**
  * ObserveBehavior - Watch and learn
@@ -30,7 +31,7 @@ export class ObserveBehavior extends BaseBehavior {
     if (currentTick - lastMonologue > 300) {
       // Update every ~15 seconds
       const monologue = this.generateObservationMonologue();
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         lastThought: monologue,
         behaviorState: {

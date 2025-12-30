@@ -298,6 +298,24 @@ export const TIER_3_RESEARCH: ResearchDefinition[] = [
       ],
     }
   ),
+
+  defineResearch(
+    'genetics_i',
+    'Basic Genetics',
+    'Study heredity, traits, and the fundamentals of biological inheritance.',
+    'genetics',
+    3,
+    {
+      progressRequired: 300,
+      prerequisites: ['nature_i', 'alchemy_i'],
+      requiredBuilding: 'library',
+      unlocks: [
+        { type: 'knowledge', knowledgeId: 'genetic_theory' },
+        { type: 'knowledge', knowledgeId: 'trait_inheritance' },
+        { type: 'ability', abilityId: 'analyze_genetics' },
+      ],
+    }
+  ),
 ];
 
 // ============================================================================
@@ -371,6 +389,25 @@ export const TIER_4_RESEARCH: ResearchDefinition[] = [
       ],
     }
   ),
+
+  defineResearch(
+    'genetics_ii',
+    'Selective Breeding',
+    'Master controlled breeding programs to enhance desired traits.',
+    'genetics',
+    4,
+    {
+      progressRequired: 500,
+      prerequisites: ['genetics_i', 'agriculture_iii'],
+      requiredBuilding: 'library',
+      unlocks: [
+        { type: 'building', buildingId: 'breeding_facility' },
+        { type: 'ability', abilityId: 'selective_breeding' },
+        { type: 'ability', abilityId: 'trait_selection' },
+        { type: 'knowledge', knowledgeId: 'pedigree_analysis' },
+      ],
+    }
+  ),
 ];
 
 // ============================================================================
@@ -426,6 +463,117 @@ export const TIER_5_RESEARCH: ResearchDefinition[] = [
         { type: 'building', buildingId: 'grand_hall' },
         { type: 'building', buildingId: 'monument' },
         { type: 'ability', abilityId: 'design_custom_building' },
+      ],
+    }
+  ),
+
+  defineResearch(
+    'genetic_engineering',
+    'Genetic Engineering',
+    'Unlock the ability to directly modify genetic code and manipulate hereditary traits.',
+    'genetics',
+    5,
+    {
+      progressRequired: 1000,
+      prerequisites: ['genetics_ii', 'alchemy_i', 'experimental_research'],
+      requiredBuilding: 'inventors_hall',
+      requiredItems: [
+        { itemId: 'rare_essence', amount: 10 },
+        { itemId: 'research_notes', amount: 50 },
+      ],
+      unlocks: [
+        { type: 'building', buildingId: 'gene_lab' },
+        { type: 'ability', abilityId: 'gene_splicing' },
+        { type: 'ability', abilityId: 'modify_genome' },
+        { type: 'knowledge', knowledgeId: 'genetic_code' },
+      ],
+    }
+  ),
+
+  defineResearch(
+    'chimera_synthesis',
+    'Chimera Synthesis',
+    'Master the forbidden art of creating hybrid life forms by fusing multiple species.',
+    'genetics',
+    5,
+    {
+      progressRequired: 1500,
+      prerequisites: ['genetic_engineering', 'arcane_studies'],
+      requiredBuilding: 'gene_lab',
+      requiredItems: [
+        { itemId: 'mythical_essence', amount: 5 },
+        { itemId: 'genetic_samples', amount: 20 },
+      ],
+      unlocks: [
+        { type: 'ability', abilityId: 'create_chimera' },
+        { type: 'ability', abilityId: 'species_fusion' },
+        { type: 'recipe', recipeId: 'chimera_serum' },
+        { type: 'knowledge', knowledgeId: 'multi_species_genetics' },
+      ],
+    }
+  ),
+
+  defineResearch(
+    'trait_engineering',
+    'Trait Engineering',
+    'Design and install specific genetic traits with precision control.',
+    'genetics',
+    5,
+    {
+      progressRequired: 1200,
+      prerequisites: ['genetic_engineering'],
+      requiredBuilding: 'gene_lab',
+      requiredItems: [
+        { itemId: 'trait_catalyst', amount: 15 },
+      ],
+      unlocks: [
+        { type: 'ability', abilityId: 'install_trait' },
+        { type: 'ability', abilityId: 'remove_trait' },
+        { type: 'ability', abilityId: 'enhance_trait' },
+        { type: 'recipe', recipeId: 'trait_serum' },
+      ],
+    }
+  ),
+
+  defineResearch(
+    'mutation_control',
+    'Mutation Control',
+    'Learn to trigger and direct beneficial mutations while suppressing harmful ones.',
+    'genetics',
+    5,
+    {
+      progressRequired: 1100,
+      prerequisites: ['genetic_engineering'],
+      requiredBuilding: 'gene_lab',
+      unlocks: [
+        { type: 'ability', abilityId: 'induced_mutation' },
+        { type: 'ability', abilityId: 'mutation_suppression' },
+        { type: 'ability', abilityId: 'directed_evolution' },
+        { type: 'recipe', recipeId: 'mutagen' },
+        { type: 'recipe', recipeId: 'stabilizer' },
+      ],
+    }
+  ),
+
+  defineResearch(
+    'genetic_autonomy',
+    'Genetic Autonomy',
+    'The pinnacle of genetic mastery - enable beings to freely choose and modify their own genetic traits.',
+    'genetics',
+    5,
+    {
+      progressRequired: 2000,
+      prerequisites: ['trait_engineering', 'mutation_control', 'chimera_synthesis'],
+      requiredBuilding: 'gene_lab',
+      requiredItems: [
+        { itemId: 'divine_essence', amount: 3 },
+        { itemId: 'genetic_template', amount: 1 },
+      ],
+      unlocks: [
+        { type: 'ability', abilityId: 'genetic_self_modification' },
+        { type: 'ability', abilityId: 'choose_traits' },
+        { type: 'ability', abilityId: 'genetic_expression_control' },
+        { type: 'knowledge', knowledgeId: 'autonomous_genetics' },
       ],
     }
   ),

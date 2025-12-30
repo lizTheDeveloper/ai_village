@@ -1,3 +1,4 @@
+import { ComponentType } from '../../../types/ComponentType.js';
 /**
  * Unit tests for Animal Behavior Module
  *
@@ -22,7 +23,7 @@ import {
 // Helper to create a mock animal component
 function createMockAnimal(overrides: Partial<AnimalComponent> = {}): AnimalComponent {
   return {
-    type: 'animal',
+    type: ComponentType.Animal,
     version: 1,
     id: 'test-animal',
     speciesId: 'chicken',
@@ -84,13 +85,13 @@ describe('AnimalBehavior Unit Tests', () => {
 
     it('canStart returns true when animal is hungry', () => {
       const entity = createAnimalEntity(createMockAnimal({ hunger: 60 }));
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(graze.canStart(entity, animal)).toBe(true);
     });
 
     it('canStart returns false when animal is not hungry', () => {
       const entity = createAnimalEntity(createMockAnimal({ hunger: 30 }));
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(graze.canStart(entity, animal)).toBe(false);
     });
 
@@ -111,7 +112,7 @@ describe('AnimalBehavior Unit Tests', () => {
 
     it('execute completes when no longer hungry', () => {
       const entity = createAnimalEntity(createMockAnimal({ hunger: 15 }));
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const world = createMockWorld();
 
       const result = graze.execute(entity, world, animal);
@@ -134,19 +135,19 @@ describe('AnimalBehavior Unit Tests', () => {
 
     it('canStart returns true when animal is stressed', () => {
       const entity = createAnimalEntity(createMockAnimal({ stress: 75 }));
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(flee.canStart(entity, animal)).toBe(true);
     });
 
     it('canStart returns true for wild animal with low trust', () => {
       const entity = createAnimalEntity(createMockAnimal({ wild: true, trustLevel: 20, stress: 45 }));
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(flee.canStart(entity, animal)).toBe(true);
     });
 
     it('canStart returns false for calm tame animal', () => {
       const entity = createAnimalEntity(createMockAnimal({ wild: false, trustLevel: 60, stress: 20 }));
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(flee.canStart(entity, animal)).toBe(false);
     });
 
@@ -162,7 +163,7 @@ describe('AnimalBehavior Unit Tests', () => {
 
     it('execute returns idle when no threat', () => {
       const entity = createAnimalEntity(createMockAnimal({ stress: 60 }));
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const world = createMockWorld();
 
       const result = flee.execute(entity, world, animal);
@@ -185,13 +186,13 @@ describe('AnimalBehavior Unit Tests', () => {
 
     it('canStart returns true when animal is tired', () => {
       const entity = createAnimalEntity(createMockAnimal({ energy: 30 }));
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(rest.canStart(entity, animal)).toBe(true);
     });
 
     it('canStart returns false when animal has energy', () => {
       const entity = createAnimalEntity(createMockAnimal({ energy: 60 }));
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(rest.canStart(entity, animal)).toBe(false);
     });
 
@@ -212,7 +213,7 @@ describe('AnimalBehavior Unit Tests', () => {
 
     it('execute completes when fully rested', () => {
       const entity = createAnimalEntity(createMockAnimal({ energy: 96 }));
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const world = createMockWorld();
 
       const result = rest.execute(entity, world, animal);
@@ -235,7 +236,7 @@ describe('AnimalBehavior Unit Tests', () => {
 
     it('canStart always returns true', () => {
       const entity = createAnimalEntity(createMockAnimal());
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(idle.canStart(entity, animal)).toBe(true);
     });
 
@@ -246,7 +247,7 @@ describe('AnimalBehavior Unit Tests', () => {
 
     it('execute transitions to foraging when hungry', () => {
       const entity = createAnimalEntity(createMockAnimal({ hunger: 60 }));
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const world = createMockWorld();
 
       const result = idle.execute(entity, world, animal);
@@ -257,7 +258,7 @@ describe('AnimalBehavior Unit Tests', () => {
 
     it('execute transitions to sleeping when tired', () => {
       const entity = createAnimalEntity(createMockAnimal({ energy: 20 }));
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const world = createMockWorld();
 
       const result = idle.execute(entity, world, animal);
@@ -268,7 +269,7 @@ describe('AnimalBehavior Unit Tests', () => {
 
     it('execute transitions to drinking when thirsty', () => {
       const entity = createAnimalEntity(createMockAnimal({ thirst: 70 }));
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const world = createMockWorld();
 
       const result = idle.execute(entity, world, animal);

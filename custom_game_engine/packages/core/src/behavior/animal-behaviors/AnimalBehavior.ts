@@ -5,6 +5,7 @@
  */
 
 import type { EntityImpl } from '../../ecs/Entity.js';
+import { CT } from '../../types.js';
 import type { World } from '../../ecs/World.js';
 import type { AnimalComponent, AnimalState } from '../../components/AnimalComponent.js';
 
@@ -96,7 +97,7 @@ export abstract class BaseAnimalBehavior implements IAnimalBehavior {
     target: { x: number; y: number },
     speed: number = 1.0
   ): void {
-    const movement = entity.getComponent('movement');
+    const movement = entity.getComponent(CT.Movement);
     if (!movement) {
       throw new Error(
         `Animal ${entity.id} missing required 'movement' component. ` +
@@ -104,7 +105,7 @@ export abstract class BaseAnimalBehavior implements IAnimalBehavior {
       );
     }
 
-    const position = entity.getComponent('position') as { x: number; y: number } | undefined;
+    const position = entity.getComponent(CT.Position) as { x: number; y: number } | undefined;
     if (!position) {
       throw new Error(
         `Animal ${entity.id} missing required 'position' component. ` +
@@ -140,7 +141,7 @@ export abstract class BaseAnimalBehavior implements IAnimalBehavior {
    * @throws Error if entity lacks movement component
    */
   protected stopMovement(entity: EntityImpl): void {
-    const movement = entity.getComponent('movement');
+    const movement = entity.getComponent(CT.Movement);
     if (!movement) {
       throw new Error(
         `Animal ${entity.id} missing required 'movement' component. ` +
@@ -164,7 +165,7 @@ export abstract class BaseAnimalBehavior implements IAnimalBehavior {
     target: { x: number; y: number },
     threshold: number = 1.5
   ): boolean {
-    const position = entity.getComponent('position') as any;
+    const position = entity.getComponent(CT.Position) as any;
     if (!position) return false;
 
     return this.distance(position, target) <= threshold;

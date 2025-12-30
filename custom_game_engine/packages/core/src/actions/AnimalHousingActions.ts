@@ -8,6 +8,7 @@ import { EntityImpl } from '../ecs/Entity.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { AnimalComponent } from '../components/AnimalComponent.js';
 import { isAnimalHousing, canHouseSpecies } from '../data/animalHousingDefinitions.js';
+import { ComponentType } from '../types/ComponentType.js';
 
 export interface AssignAnimalResult {
   success: boolean;
@@ -30,7 +31,7 @@ export function assignAnimalToHousing(
   }
 
   const animalImpl = animalEntity as EntityImpl;
-  const animal = animalImpl.getComponent<AnimalComponent>('animal');
+  const animal = animalImpl.getComponent<AnimalComponent>(ComponentType.Animal);
 
   if (!animal) {
     throw new Error(`Entity ${animalEntityId} does not have AnimalComponent`);
@@ -43,7 +44,7 @@ export function assignAnimalToHousing(
   }
 
   const housingImpl = housingEntity as EntityImpl;
-  const building = housingImpl.getComponent<BuildingComponent>('building');
+  const building = housingImpl.getComponent<BuildingComponent>(ComponentType.Building);
 
   if (!building) {
     throw new Error(`Entity ${housingEntityId} does not have BuildingComponent`);
@@ -82,13 +83,13 @@ export function assignAnimalToHousing(
   }
 
   // Assign animal to housing
-  animalImpl.updateComponent<AnimalComponent>('animal', (current) => ({
+  animalImpl.updateComponent<AnimalComponent>(ComponentType.Animal, (current) => ({
     ...current,
     housingBuildingId: housingEntityId,
   }));
 
   // Add to occupants list
-  housingImpl.updateComponent<BuildingComponent>('building', (current) => ({
+  housingImpl.updateComponent<BuildingComponent>(ComponentType.Building, (current) => ({
     ...current,
     currentOccupants: [...current.currentOccupants, animalEntityId],
   }));
@@ -121,7 +122,7 @@ export function removeAnimalFromHousing(
   }
 
   const animalImpl = animalEntity as EntityImpl;
-  const animal = animalImpl.getComponent<AnimalComponent>('animal');
+  const animal = animalImpl.getComponent<AnimalComponent>(ComponentType.Animal);
 
   if (!animal) {
     throw new Error(`Entity ${animalEntityId} does not have AnimalComponent`);
@@ -140,11 +141,11 @@ export function removeAnimalFromHousing(
   const housingEntity = world.entities.get(housingEntityId);
   if (housingEntity) {
     const housingImpl = housingEntity as EntityImpl;
-    const building = housingImpl.getComponent<BuildingComponent>('building');
+    const building = housingImpl.getComponent<BuildingComponent>(ComponentType.Building);
 
     if (building) {
       // Remove from occupants list
-      housingImpl.updateComponent<BuildingComponent>('building', (current) => ({
+      housingImpl.updateComponent<BuildingComponent>(ComponentType.Building, (current) => ({
         ...current,
         currentOccupants: current.currentOccupants.filter((id) => id !== animalEntityId),
       }));
@@ -152,7 +153,7 @@ export function removeAnimalFromHousing(
   }
 
   // Remove housing assignment from animal
-  animalImpl.updateComponent<AnimalComponent>('animal', (current) => ({
+  animalImpl.updateComponent<AnimalComponent>(ComponentType.Animal, (current) => ({
     ...current,
     housingBuildingId: undefined,
   }));
@@ -174,7 +175,7 @@ export function removeAnimalFromHousing(
 /**
  * Clean a housing building, restoring cleanliness to 100%
  */
-export function cleanHousing(world: World, housingEntityId: string): AssignAnimalResult {
+export function cleanHousing(world: World, housingEntityId: string, agentId?: string): AssignAnimalResult {
   // Get housing entity
   const housingEntity = world.entities.get(housingEntityId);
   if (!housingEntity) {
@@ -182,7 +183,7 @@ export function cleanHousing(world: World, housingEntityId: string): AssignAnima
   }
 
   const housingImpl = housingEntity as EntityImpl;
-  const building = housingImpl.getComponent<BuildingComponent>('building');
+  const building = housingImpl.getComponent<BuildingComponent>(ComponentType.Building);
 
   if (!building) {
     throw new Error(`Entity ${housingEntityId} does not have BuildingComponent`);
@@ -205,20 +206,22 @@ export function cleanHousing(world: World, housingEntityId: string): AssignAnima
   }
 
   // Restore cleanliness to 100%
-  housingImpl.updateComponent<BuildingComponent>('building', (current) => ({
+  housingImpl.updateComponent<BuildingComponent>(ComponentType.Building, (current) => ({
     ...current,
     cleanliness: 100,
   }));
 
   // Emit event
-  // Note: agentId not available in this context, would need to be passed as parameter
+  if (!agentId) {
+    throw new Error(`cleanHousing requires agentId parameter to track who cleaned ${housingEntityId}`);
+  }
   world.eventBus.emit({
     type: 'housing:cleaned',
     source: housingEntityId,
     data: {
       housingId: housingEntityId,
       buildingId: housingEntityId,
-      agentId: 'system', // Placeholder - actual agentId should be passed from action handler
+      agentId,
     },
   });
 
@@ -235,7 +238,7 @@ export function getHousingInfo(world: World, housingEntityId: string) {
   }
 
   const housingImpl = housingEntity as EntityImpl;
-  const building = housingImpl.getComponent<BuildingComponent>('building');
+  const building = housingImpl.getComponent<BuildingComponent>(ComponentType.Building);
 
   if (!building) {
     throw new Error(`Entity ${housingEntityId} does not have BuildingComponent`);

@@ -213,8 +213,8 @@ describe('Magic Numbers Extraction', () => {
         HUNGER_RESTORED_DEFAULT
       } = await import('../constants/NeedsConstants');
 
-      expect(HUNGER_THRESHOLD_SEEK_FOOD).toBe(70);
-      expect(HUNGER_RESTORED_DEFAULT).toBe(25);
+      expect(HUNGER_THRESHOLD_SEEK_FOOD).toBe(0.7); // 70% on 0-1 scale
+      expect(HUNGER_RESTORED_DEFAULT).toBe(0.25); // 25% on 0-1 scale
     });
 
     it('should define energy thresholds', async () => {
@@ -226,11 +226,11 @@ describe('Magic Numbers Extraction', () => {
         ENERGY_FULL
       } = await import('../constants/NeedsConstants');
 
-      expect(ENERGY_CRITICAL).toBe(10);
-      expect(ENERGY_LOW).toBe(30);
-      expect(ENERGY_MODERATE).toBe(50);
-      expect(ENERGY_HIGH).toBe(70);
-      expect(ENERGY_FULL).toBe(100);
+      expect(ENERGY_CRITICAL).toBe(0.1); // 10% on 0-1 scale
+      expect(ENERGY_LOW).toBe(0.3); // 30% on 0-1 scale
+      expect(ENERGY_MODERATE).toBe(0.5); // 50% on 0-1 scale
+      expect(ENERGY_HIGH).toBe(0.7); // 70% on 0-1 scale
+      expect(ENERGY_FULL).toBe(1.0); // 100% on 0-1 scale
     });
 
     it('should define energy work multipliers', async () => {
@@ -254,9 +254,9 @@ describe('Magic Numbers Extraction', () => {
         SLEEP_INTERRUPT_ENERGY
       } = await import('../constants/NeedsConstants');
 
-      expect(SLEEP_COMPLETE_ENERGY).toBe(100);
-      expect(SLEEP_INTERRUPT_HUNGER).toBe(10);
-      expect(SLEEP_INTERRUPT_ENERGY).toBe(70);
+      expect(SLEEP_COMPLETE_ENERGY).toBe(1.0); // 100% on 0-1 scale
+      expect(SLEEP_INTERRUPT_HUNGER).toBe(0.1); // 10% on 0-1 scale
+      expect(SLEEP_INTERRUPT_ENERGY).toBe(0.7); // 70% on 0-1 scale
     });
 
     it('should define sleep quality modifiers', async () => {
@@ -283,7 +283,7 @@ describe('Magic Numbers Extraction', () => {
         HEALTH_DAMAGE_RATE
       } = await import('../constants/NeedsConstants');
 
-      expect(HEALTH_CRITICAL).toBe(20);
+      expect(HEALTH_CRITICAL).toBe(0.2); // 20% on 0-1 scale
       expect(HEALTH_DAMAGE_RATE).toBe(0.5);
     });
 
@@ -462,7 +462,7 @@ describe('Magic Numbers Extraction', () => {
 
     it('should import constants used by SeekFoodBehavior', async () => {
       const { HUNGER_THRESHOLD_SEEK_FOOD } = await import('../constants/NeedsConstants');
-      expect(HUNGER_THRESHOLD_SEEK_FOOD).toBe(70);
+      expect(HUNGER_THRESHOLD_SEEK_FOOD).toBe(0.7); // 70% on 0-1 scale
     });
 
     it('should import constants used by MarketEventSystem', async () => {

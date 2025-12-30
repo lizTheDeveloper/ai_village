@@ -7,6 +7,7 @@ import { MemoryConsolidationSystem } from '../MemoryConsolidationSystem.js';
 import { EpisodicMemoryComponent } from '../../components/EpisodicMemoryComponent.js';
 import type { EpisodicMemory } from '../../components/EpisodicMemoryComponent.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Integration tests for Episodic Memory System
  *
@@ -42,7 +43,7 @@ describe('Episodic Memory Integration', () => {
   describe('Memory Formation from Events', () => {
     it('should automatically create memory when harvest event fires', () => {
       // Get initial memory count
-      const memory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       expect(memory.episodicMemories.length).toBe(0);
 
       // Fire harvest event
@@ -63,7 +64,7 @@ describe('Episodic Memory Integration', () => {
       memoryFormationSystem.update(world, 0);
 
       // Memory should be created
-      const updatedMemory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const updatedMemory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       expect(updatedMemory.episodicMemories.length).toBe(1);
 
       const formed = updatedMemory.episodicMemories[0] as EpisodicMemory;
@@ -94,8 +95,8 @@ describe('Episodic Memory Integration', () => {
       memoryFormationSystem.update(world, 0);
 
       // Both agents should have memories
-      const speakerMemory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
-      const listenerMemory = listener.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const speakerMemory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
+      const listenerMemory = listener.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
 
       expect(speakerMemory.episodicMemories.length).toBe(1);
       expect(listenerMemory.episodicMemories.length).toBe(1);
@@ -123,7 +124,7 @@ describe('Episodic Memory Integration', () => {
       memoryFormationSystem.update(world, 0);
 
       // Memory should be high importance
-      const memory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       const formed = memory.episodicMemories[0] as EpisodicMemory;
 
       expect(formed.importance).toBeGreaterThan(0.5);
@@ -151,7 +152,7 @@ describe('Episodic Memory Integration', () => {
       memoryFormationSystem.update(world, 0);
 
       // Should have 3 memories
-      const memory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       expect(memory.episodicMemories.length).toBe(3);
     });
   });
@@ -159,7 +160,7 @@ describe('Episodic Memory Integration', () => {
   describe('Memory Decay over Time', () => {
     it('should decay memory clarity over game days', () => {
       // Create a memory
-      const memory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       memory.formMemory({
         eventType: 'test',
         summary: 'Test memory',
@@ -175,7 +176,7 @@ describe('Episodic Memory Integration', () => {
       memoryConsolidationSystem.update(world, tenDays);
 
       // Clarity should have decayed
-      const updatedMemory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const updatedMemory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       const decayedClarity = updatedMemory.episodicMemories[0]?.clarity ?? 1.0;
 
       expect(decayedClarity).toBeLessThan(initialClarity);
@@ -184,7 +185,7 @@ describe('Episodic Memory Integration', () => {
 
     it('should decay low-importance memories faster than high-importance', () => {
       // Create two memories with different importance via emotional factors
-      const memory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
 
       memory.formMemory({
         eventType: 'test',
@@ -212,7 +213,7 @@ describe('Episodic Memory Integration', () => {
       const thirtyDays = 30 * 86400;
       memoryConsolidationSystem.update(world, thirtyDays);
 
-      const updatedMemory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const updatedMemory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       const lowImportanceClarity = updatedMemory.episodicMemories[0]?.clarity ?? 0;
       const highImportanceClarity = updatedMemory.episodicMemories[1]?.clarity ?? 0;
 
@@ -221,7 +222,7 @@ describe('Episodic Memory Integration', () => {
 
     it('should preserve memory summary even after decay', () => {
       // Create an important memory that will be consolidated
-      const memory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       memory.formMemory({
         eventType: 'test',
         summary: 'Original summary',
@@ -237,7 +238,7 @@ describe('Episodic Memory Integration', () => {
       memoryConsolidationSystem.update(world, 0);
 
       // Verify it's consolidated
-      let updatedMemory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      let updatedMemory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       expect(updatedMemory.episodicMemories[0]?.consolidated).toBe(true);
 
       // Simulate 30 game days of decay
@@ -245,7 +246,7 @@ describe('Episodic Memory Integration', () => {
       memoryConsolidationSystem.update(world, thirtyDays);
 
       // Consolidated memory should survive and preserve summary
-      updatedMemory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      updatedMemory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       expect(updatedMemory.episodicMemories.length).toBeGreaterThan(0);
       expect(updatedMemory.episodicMemories[0]?.summary).toBe(originalSummary);
     });
@@ -254,7 +255,7 @@ describe('Episodic Memory Integration', () => {
   describe('Memory Consolidation during Sleep', () => {
     it('should consolidate memories when agent sleeps', () => {
       // Create unconsolidated memories
-      const memory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
 
       memory.formMemory({
         eventType: 'test',
@@ -278,13 +279,13 @@ describe('Episodic Memory Integration', () => {
       memoryConsolidationSystem.update(world, 0);
 
       // Memory should be consolidated
-      const updatedMemory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const updatedMemory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       expect(updatedMemory.episodicMemories[0]?.consolidated).toBe(true);
     });
 
     it('should only consolidate marked memories during sleep', () => {
       // Create one marked and one unmarked memory
-      const memory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
 
       memory.formMemory({
         eventType: 'test',
@@ -314,7 +315,7 @@ describe('Episodic Memory Integration', () => {
       // Run consolidation system
       memoryConsolidationSystem.update(world, 0);
 
-      const updatedMemory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const updatedMemory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       expect(updatedMemory.episodicMemories[0]?.consolidated).toBe(true);
       expect(updatedMemory.episodicMemories[1]?.consolidated).toBe(false);
     });
@@ -323,7 +324,7 @@ describe('Episodic Memory Integration', () => {
   describe('Memory Retrieval for Decision-Making', () => {
     it('should prioritize memories with matching participants', () => {
       // Create memories with different participants
-      const memory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
 
       memory.formMemory({
         eventType: 'test',
@@ -358,7 +359,7 @@ describe('Episodic Memory Integration', () => {
     });
 
     it('should retrieve recent memories with higher priority', () => {
-      const memory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       const now = Date.now();
 
       memory.formMemory({
@@ -385,7 +386,7 @@ describe('Episodic Memory Integration', () => {
     });
 
     it('should increment recall counter when memories retrieved', () => {
-      const memory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
 
       memory.formMemory({
         eventType: 'test',
@@ -399,19 +400,19 @@ describe('Episodic Memory Integration', () => {
       memory.retrieveRelevant({ limit: 1 });
 
       // Check component state after first retrieval
-      let updatedMemory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      let updatedMemory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       expect(updatedMemory.episodicMemories[0]?.timesRecalled).toBe(1);
 
       memory.retrieveRelevant({ limit: 1 });
       memory.retrieveRelevant({ limit: 1 });
 
       // Check final state
-      updatedMemory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      updatedMemory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       expect(updatedMemory.episodicMemories[0]?.timesRecalled).toBe(3);
     });
 
     it('should retrieve memories by location proximity', () => {
-      const memory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
 
       memory.formMemory({
         eventType: 'test',
@@ -453,7 +454,7 @@ describe('Episodic Memory Integration', () => {
 
       memoryFormationSystem.update(world, 0);
 
-      let memory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      let memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       expect(memory.episodicMemories.length).toBe(1);
       expect(memory.episodicMemories[0]?.consolidated).toBe(false);
 
@@ -461,7 +462,7 @@ describe('Episodic Memory Integration', () => {
       memory.retrieveRelevant({ limit: 1 });
 
       // Check component state after retrieval
-      memory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       expect(memory.episodicMemories[0]?.timesRecalled).toBe(1);
 
       // Step 3: Consolidate during sleep
@@ -473,7 +474,7 @@ describe('Episodic Memory Integration', () => {
 
       memoryConsolidationSystem.update(world, 0);
 
-      memory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       expect(memory.episodicMemories[0]?.consolidated).toBe(true);
 
       // Step 4: Decay over time
@@ -481,7 +482,7 @@ describe('Episodic Memory Integration', () => {
       const thirtyDays = 30 * 86400;
       memoryConsolidationSystem.update(world, thirtyDays);
 
-      memory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
       const finalClarity = memory.episodicMemories[0]?.clarity ?? 1.0;
 
       expect(finalClarity).toBeLessThan(initialClarity);
@@ -516,8 +517,8 @@ describe('Episodic Memory Integration', () => {
       memoryFormationSystem.update(world, 0);
 
       // Each agent should have their own memory
-      const memory1 = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
-      const memory2 = agent2.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const memory1 = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
+      const memory2 = agent2.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
 
       expect(memory1.episodicMemories.length).toBe(1);
       expect(memory2.episodicMemories.length).toBe(1);
@@ -530,7 +531,7 @@ describe('Episodic Memory Integration', () => {
     it('should skip events with missing agentId without crashing', () => {
       // MemoryFormationSystem is resilient - logs error but doesn't crash
       // This prevents bad events from breaking the game
-      const memory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
 
       eventBus.emit({
         type: 'agent:harvested',
@@ -541,18 +542,14 @@ describe('Episodic Memory Integration', () => {
         }
       });
 
-      // Should not throw - just skip the invalid event
+      // Should throw - missing agentId is a programming error (CLAUDE.md: no silent fallbacks)
       expect(() => {
         memoryFormationSystem.update(world, 0);
-      }).not.toThrow();
-
-      // No memory should be formed
-      const updatedMemory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
-      expect(updatedMemory.episodicMemories.length).toBe(0);
+      }).toThrow(/missing required agentId/);
     });
 
     it('should throw when memory formation missing required fields', () => {
-      const memory = agent.getComponent('episodic_memory') as EpisodicMemoryComponent;
+      const memory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent;
 
       // Missing eventType
       expect(() => {

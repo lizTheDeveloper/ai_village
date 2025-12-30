@@ -3,6 +3,7 @@ import type { WorldMutator } from '../ecs/World.js';
 import type { Action, ActionEffect } from './Action.js';
 import type { IActionRegistry } from './ActionRegistry.js';
 import { v4 as uuidv4 } from 'uuid';
+import { ComponentType } from '../types/ComponentType.js';
 
 /**
  * Queue and process actions.
@@ -267,14 +268,14 @@ export class ActionQueue implements IActionQueue {
    * Returns 1 (normal speed) if no time component exists.
    */
   private getSpeedMultiplier(world: WorldMutator): number {
-    const timeEntities = world.query().with('time').executeEntities();
+    const timeEntities = world.query().with(ComponentType.Time).executeEntities();
     const timeEntity = timeEntities[0];
 
     if (!timeEntity) {
       return 1; // Default to 1x speed if no time entity
     }
 
-    const timeComponent = timeEntity.components.get('time') as { speedMultiplier: number } | undefined;
+    const timeComponent = timeEntity.components.get(ComponentType.Time) as { speedMultiplier: number } | undefined;
 
     return timeComponent?.speedMultiplier ?? 1;
   }

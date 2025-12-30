@@ -46,15 +46,12 @@ import type { SpatialMemoryComponent } from '../components/SpatialMemoryComponen
 import { getMapKnowledge, worldToSector, type AreaResourceType } from '../navigation/MapKnowledge.js';
 import { getZoneManager } from '../navigation/ZoneManager.js';
 import { getPosition } from '../utils/componentHelpers.js';
+import { ComponentType } from '../types/ComponentType.js';
+import type { TerrainType } from '../types/TerrainTypes.js';
 
 // ============================================================================
 // Types
 // ============================================================================
-
-/**
- * Terrain types the world can have
- */
-type TerrainType = 'grass' | 'dirt' | 'sand' | 'stone' | 'water' | 'deep_water' | 'forest';
 
 /**
  * A scored placement candidate
@@ -413,7 +410,7 @@ export class PlacementScorer {
     buildingType: BuildingType,
     searchRadius: number = 10
   ): PlacementCandidate | null {
-    const position = agent.getComponent<PositionComponent>('position');
+    const position = agent.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) return null;
 
     const candidates: PlacementCandidate[] = [];
@@ -450,7 +447,7 @@ export class PlacementScorer {
     searchRadius: number = 10,
     count: number = 5
   ): PlacementCandidate[] {
-    const position = agent.getComponent<PositionComponent>('position');
+    const position = agent.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) return [];
 
     const candidates: PlacementCandidate[] = [];
@@ -516,9 +513,9 @@ export class PlacementScorer {
 
       case 'near_storage': {
         const storageBuildings = this.world.query()
-          .with('building')
-          .with('inventory')
-          .with('position')
+          .with(ComponentType.Building)
+          .with(ComponentType.Inventory)
+          .with(ComponentType.Position)
           .executeEntities();
 
         for (const storage of storageBuildings) {
@@ -565,8 +562,8 @@ export class PlacementScorer {
 
   private hasOverlappingBuilding(x: number, y: number): boolean {
     const buildings = this.world.query()
-      .with('building')
-      .with('position')
+      .with(ComponentType.Building)
+      .with(ComponentType.Position)
       .executeEntities();
 
     for (const building of buildings) {
@@ -641,12 +638,12 @@ export class PlacementScorer {
   // ==========================================================================
 
   private getHomeProximity(agent: EntityImpl, x: number, y: number): number {
-    const exploration = agent.getComponent<ExplorationStateComponent>('exploration_state');
+    const exploration = agent.getComponent<ExplorationStateComponent>(ComponentType.ExplorationState);
     const homeBase = exploration?.homeBase;
 
     if (!homeBase) {
       // No home base - use agent's current position
-      const pos = agent.getComponent<PositionComponent>('position');
+      const pos = agent.getComponent<PositionComponent>(ComponentType.Position);
       if (!pos) return 0;
 
       const dist = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
@@ -658,7 +655,7 @@ export class PlacementScorer {
   }
 
   private getFamiliarity(agent: EntityImpl, x: number, y: number): number {
-    const exploration = agent.getComponent<ExplorationStateComponent>('exploration_state');
+    const exploration = agent.getComponent<ExplorationStateComponent>(ComponentType.ExplorationState);
     if (!exploration) return 0;
 
     const sector = exploration.worldToSector({ x, y });
@@ -671,7 +668,7 @@ export class PlacementScorer {
   }
 
   private getPositiveMemories(agent: EntityImpl, x: number, y: number): number {
-    const memory = agent.getComponent<EpisodicMemoryComponent>('episodic_memory');
+    const memory = agent.getComponent<EpisodicMemoryComponent>(ComponentType.EpisodicMemory);
     if (!memory) return 0;
 
     let score = 0;
@@ -698,7 +695,7 @@ export class PlacementScorer {
     y: number,
     resourceType: string
   ): number {
-    const spatialMem = agent.getComponent<SpatialMemoryComponent>('spatial_memory');
+    const spatialMem = agent.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
     if (!spatialMem) return 0;
 
     let score = 0;

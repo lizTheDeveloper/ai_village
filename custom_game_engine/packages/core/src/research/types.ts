@@ -24,7 +24,8 @@ export type ResearchField =
   | 'nature'
   | 'society'
   | 'arcane'
-  | 'experimental';
+  | 'experimental'
+  | 'genetics';
 
 /**
  * Types of content that can be unlocked by research.

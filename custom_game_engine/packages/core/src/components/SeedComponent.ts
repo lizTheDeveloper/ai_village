@@ -27,6 +27,10 @@ export interface SeedComponentData {
   dormancyRequirements?: DormancyRequirements;
   sourceType?: 'wild' | 'cultivated' | 'traded' | 'generated';
   harvestMetadata?: HarvestMetadata;
+  /** Whether this seed is from cross-breeding */
+  isHybrid?: boolean;
+  /** Parent species IDs if hybrid */
+  hybridParentSpecies?: [string, string];
 }
 
 /**
@@ -55,6 +59,10 @@ export class SeedComponent extends ComponentBase {
   // Origin tracking
   public sourceType: 'wild' | 'cultivated' | 'traded' | 'generated';
   public harvestMetadata?: HarvestMetadata;
+
+  // Hybridization
+  public isHybrid: boolean;
+  public hybridParentSpecies?: [string, string];
 
   constructor(data: SeedComponentData) {
     super();
@@ -101,18 +109,23 @@ export class SeedComponent extends ComponentBase {
     // Origin
     this.sourceType = data.sourceType ?? 'generated';
     this.harvestMetadata = data.harvestMetadata;
+
+    // Hybridization
+    this.isHybrid = data.isHybrid ?? false;
+    this.hybridParentSpecies = data.hybridParentSpecies;
   }
 
   /**
    * Validate genetics values are in correct ranges
    */
   private validateGenetics(genetics: PlantGenetics): void {
-    // growthRate and yieldAmount can be 0.5 - 2.0
-    if (genetics.growthRate < 0 || genetics.growthRate > 3.0) {
-      throw new Error(`SeedComponent genetics.growthRate must be 0-3.0, got ${genetics.growthRate}`);
+    // growthRate and yieldAmount can be up to 3.5 for hybrids
+    const maxGrowthYield = 3.5;
+    if (genetics.growthRate < 0 || genetics.growthRate > maxGrowthYield) {
+      throw new Error(`SeedComponent genetics.growthRate must be 0-${maxGrowthYield}, got ${genetics.growthRate}`);
     }
-    if (genetics.yieldAmount < 0 || genetics.yieldAmount > 3.0) {
-      throw new Error(`SeedComponent genetics.yieldAmount must be 0-3.0, got ${genetics.yieldAmount}`);
+    if (genetics.yieldAmount < 0 || genetics.yieldAmount > maxGrowthYield) {
+      throw new Error(`SeedComponent genetics.yieldAmount must be 0-${maxGrowthYield}, got ${genetics.yieldAmount}`);
     }
 
     // Resistance traits are 0-100
@@ -147,7 +160,9 @@ export class SeedComponent extends ComponentBase {
       dormant: this.dormant,
       dormancyRequirements: this.dormancyRequirements,
       sourceType: this.sourceType,
-      harvestMetadata: this.harvestMetadata
+      harvestMetadata: this.harvestMetadata,
+      isHybrid: this.isHybrid,
+      hybridParentSpecies: this.hybridParentSpecies
     };
   }
 

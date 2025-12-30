@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { WorldImpl, type Entity } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { TradingSystem } from '../TradingSystem';
+import { ComponentType } from '../../types/ComponentType.js';
 import {
   createInventoryComponent,
   addToInventoryWithQuality,
@@ -37,14 +38,14 @@ describe.skip('Quality Economy Integration', () => {
     shop.addComponent(createPositionComponent(10, 10)); // Same position as agent
 
     // Stock shop with base items
-    let shopInventory = createInventoryComponent(100);
+    const shopInventory = createInventoryComponent(100);
     const addResult = addToInventoryWithQuality(shopInventory, 'wheat', 50, 50); // Normal quality
     shop.addComponent(addResult.inventory);
   });
 
   describe('Criterion 3: Quality Affects Economic Value', () => {
     it('should calculate 0.5x price multiplier for quality 0', () => {
-      let agentInventory = agent.getComponent('inventory') as InventoryComponent;
+      const agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
       const result = addToInventoryWithQuality(agentInventory, 'wheat', 10, 0);
       agent.addComponent(result.inventory);
 
@@ -58,12 +59,12 @@ describe.skip('Quality Economy Integration', () => {
       expect(tradeResult.success).toBe(true);
 
       // Check agent received correct payment
-      const currency = agent.getComponent('currency') as CurrencyComponent;
+      const currency = agent.getComponent(ComponentType.Currency) as CurrencyComponent;
       expect(currency.gold).toBe(1000 + expectedPrice * 10); // 1000 starting + (5 * 10 wheat)
     });
 
     it('should calculate 0.8x price multiplier for quality 20 (poor)', () => {
-      let agentInventory = agent.getComponent('inventory') as InventoryComponent;
+      const agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
       const result = addToInventoryWithQuality(agentInventory, 'wheat', 10, 20);
       agent.addComponent(result.inventory);
 
@@ -75,12 +76,12 @@ describe.skip('Quality Economy Integration', () => {
 
       expect(tradeResult.success).toBe(true);
 
-      const currency = agent.getComponent('currency') as CurrencyComponent;
+      const currency = agent.getComponent(ComponentType.Currency) as CurrencyComponent;
       expect(currency.gold).toBeCloseTo(1000 + expectedPrice * 10, 1);
     });
 
     it('should calculate 1.0x price multiplier for quality 33 (normal)', () => {
-      let agentInventory = agent.getComponent('inventory') as InventoryComponent;
+      const agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
       const result = addToInventoryWithQuality(agentInventory, 'wheat', 10, 33);
       agent.addComponent(result.inventory);
 
@@ -92,12 +93,12 @@ describe.skip('Quality Economy Integration', () => {
 
       expect(tradeResult.success).toBe(true);
 
-      const currency = agent.getComponent('currency') as CurrencyComponent;
+      const currency = agent.getComponent(ComponentType.Currency) as CurrencyComponent;
       expect(currency.gold).toBeCloseTo(1000 + expectedPrice * 10, 1);
     });
 
     it('should calculate 2.0x price multiplier for quality 100 (legendary)', () => {
-      let agentInventory = agent.getComponent('inventory') as InventoryComponent;
+      const agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
       const result = addToInventoryWithQuality(agentInventory, 'wheat', 10, 100);
       agent.addComponent(result.inventory);
 
@@ -109,12 +110,12 @@ describe.skip('Quality Economy Integration', () => {
 
       expect(tradeResult.success).toBe(true);
 
-      const currency = agent.getComponent('currency') as CurrencyComponent;
+      const currency = agent.getComponent(ComponentType.Currency) as CurrencyComponent;
       expect(currency.gold).toBe(1000 + expectedPrice * 10);
     });
 
     it('should apply quality multiplier when buying from shop', () => {
-      let shopInventory = shop.getComponent('inventory') as InventoryComponent;
+      const shopInventory = shop.getComponent(ComponentType.Inventory) as InventoryComponent;
 
       // Stock shop with high quality item
       const result = addToInventoryWithQuality(shopInventory, 'sword', 1, 90); // Masterwork sword
@@ -128,12 +129,12 @@ describe.skip('Quality Economy Integration', () => {
 
       expect(tradeResult.success).toBe(true);
 
-      const currency = agent.getComponent('currency') as CurrencyComponent;
+      const currency = agent.getComponent(ComponentType.Currency) as CurrencyComponent;
       expect(currency.gold).toBeCloseTo(1000 - expectedPrice, 1);
     });
 
     it('should combine quality multiplier with rarity and demand', () => {
-      let agentInventory = agent.getComponent('inventory') as InventoryComponent;
+      const agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
 
       // Assume rare item with high demand
       const result = addToInventoryWithQuality(agentInventory, 'diamond', 1, 85);
@@ -151,12 +152,12 @@ describe.skip('Quality Economy Integration', () => {
       expect(tradeResult.success).toBe(true);
 
       // Verify price was calculated with quality multiplier
-      const currency = agent.getComponent('currency') as CurrencyComponent;
+      const currency = agent.getComponent(ComponentType.Currency) as CurrencyComponent;
       expect(currency.gold).toBeGreaterThan(1000); // Should have gained money
     });
 
     it('should handle quality differences when trading same item type', () => {
-      let agentInventory = agent.getComponent('inventory') as InventoryComponent;
+      let agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
 
       // Add poor and legendary wheat
       let result = addToInventoryWithQuality(agentInventory, 'wheat', 10, 20); // Poor
@@ -166,11 +167,11 @@ describe.skip('Quality Economy Integration', () => {
 
       // Sell poor quality
       const result1 = tradingSystem.sellItem(world, agent.id, shop.id, 'wheat', 10, 20);
-      const goldAfterPoor = (agent.getComponent('currency') as CurrencyComponent).gold;
+      const goldAfterPoor = (agent.getComponent(ComponentType.Currency) as CurrencyComponent).gold;
 
       // Sell legendary quality
       const result2 = tradingSystem.sellItem(world, agent.id, shop.id, 'wheat', 10, 100);
-      const goldAfterLegendary = (agent.getComponent('currency') as CurrencyComponent).gold;
+      const goldAfterLegendary = (agent.getComponent(ComponentType.Currency) as CurrencyComponent).gold;
 
       expect(result1.success).toBe(true);
       expect(result2.success).toBe(true);
@@ -185,7 +186,7 @@ describe.skip('Quality Economy Integration', () => {
 
   describe('Edge Cases - Quality Economy', () => {
     it('should throw when trying to sell item without quality specified', () => {
-      let agentInventory = agent.getComponent('inventory') as InventoryComponent;
+      const agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
       const result = addToInventoryWithQuality(agentInventory, 'wheat', 10, 50);
       agent.addComponent(result.inventory);
 
@@ -196,7 +197,7 @@ describe.skip('Quality Economy Integration', () => {
     });
 
     it('should throw when trying to sell item with quality not in inventory', () => {
-      let agentInventory = agent.getComponent('inventory') as InventoryComponent;
+      const agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
       const result = addToInventoryWithQuality(agentInventory, 'wheat', 10, 50);
       agent.addComponent(result.inventory);
 
@@ -208,11 +209,11 @@ describe.skip('Quality Economy Integration', () => {
 
     it('should handle insufficient funds when buying high quality items', () => {
       // Set agent to low gold
-      let currency = agent.getComponent('currency') as CurrencyComponent;
+      let currency = agent.getComponent(ComponentType.Currency) as CurrencyComponent;
       currency = { ...currency, gold: 10 };
       agent.addComponent(currency);
 
-      let shopInventory = shop.getComponent('inventory') as InventoryComponent;
+      const shopInventory = shop.getComponent(ComponentType.Inventory) as InventoryComponent;
       const result = addToInventoryWithQuality(shopInventory, 'diamond', 1, 100);
       shop.addComponent(result.inventory);
 
@@ -223,7 +224,7 @@ describe.skip('Quality Economy Integration', () => {
     });
 
     it('should handle shop not having item with specified quality', () => {
-      let shopInventory = shop.getComponent('inventory') as InventoryComponent;
+      const shopInventory = shop.getComponent(ComponentType.Inventory) as InventoryComponent;
       const result = addToInventoryWithQuality(shopInventory, 'wheat', 10, 50);
       shop.addComponent(result.inventory);
 
@@ -235,7 +236,7 @@ describe.skip('Quality Economy Integration', () => {
     });
 
     it('should handle legacy items with undefined quality as default', () => {
-      let agentInventory = agent.getComponent('inventory') as InventoryComponent;
+      const agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
       if (!agentInventory) {
         throw new Error('Agent inventory is undefined - test setup failed');
       }
@@ -253,7 +254,7 @@ describe.skip('Quality Economy Integration', () => {
 
   describe('Performance - Quality Economy', () => {
     it('should calculate quality price multiplier quickly', () => {
-      let agentInventory = agent.getComponent('inventory') as InventoryComponent;
+      const agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
       if (!agentInventory) {
         throw new Error('Agent inventory is undefined - test setup failed');
       }
@@ -272,7 +273,7 @@ describe.skip('Quality Economy Integration', () => {
     });
 
     it('should handle bulk transactions with quality efficiently', () => {
-      let agentInventory = agent.getComponent('inventory') as InventoryComponent;
+      let agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
       if (!agentInventory) {
         throw new Error('Agent inventory is undefined - test setup failed');
       }
@@ -317,24 +318,24 @@ describe.skip('Quality Economy Integration', () => {
       ];
 
       for (const testCase of testCases) {
-        let agentInventory = agent.getComponent('inventory') as InventoryComponent;
+        const agentInventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
         if (!agentInventory) {
           throw new Error('Agent inventory is undefined - test setup failed');
         }
         const result = addToInventoryWithQuality(agentInventory, 'test_item', 1, testCase.quality);
         agent.addComponent(result.inventory);
 
-        const startingGold = (agent.getComponent('currency') as CurrencyComponent).gold;
+        const startingGold = (agent.getComponent(ComponentType.Currency) as CurrencyComponent).gold;
 
         tradingSystem.sellItem(world, agent.id, shop.id, 'test_item', 1, testCase.quality);
 
-        const endingGold = (agent.getComponent('currency') as CurrencyComponent).gold;
+        const endingGold = (agent.getComponent(ComponentType.Currency) as CurrencyComponent).gold;
         const actualMultiplier = (endingGold - startingGold) / 10; // Assuming base value is 10
 
         expect(actualMultiplier).toBeCloseTo(testCase.expectedMultiplier, 2);
 
         // Reset for next test
-        let currency = agent.getComponent('currency') as CurrencyComponent;
+        let currency = agent.getComponent(ComponentType.Currency) as CurrencyComponent;
         currency = { ...currency, gold: 1000 };
         agent.addComponent(currency);
       }

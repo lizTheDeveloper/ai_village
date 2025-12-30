@@ -23,7 +23,105 @@ export type EmotionalState =
   | 'frustrated'   // Annoyed, blocked
   | 'lonely'       // Isolated, craving connection
   | 'proud'        // Accomplished, self-satisfied
-  | 'grateful';    // Appreciative, thankful
+  | 'grateful'     // Appreciative, thankful
+  // Forward-compatibility: Mental breakdown states
+  | 'enraged'      // Tantrum state - may attack or destroy
+  | 'despairing'   // Deep depression - may become catatonic
+  | 'manic'        // Hyperactive, reckless behavior
+  | 'obsessed'     // Strange mood - focused on single task
+  | 'terrified';   // Panic state - may flee or freeze
+
+// ============================================================================
+// Forward-Compatibility: Stress & Trauma System
+// Separate from mood - stress accumulates over time and can trigger breakdowns
+// ============================================================================
+
+/** Types of traumatic events that cause stress */
+export type TraumaType =
+  | 'death_witnessed'    // Saw someone die
+  | 'death_of_friend'    // Close relationship died
+  | 'injury_severe'      // Was badly injured
+  | 'starvation'         // Nearly starved to death
+  | 'isolation'          // Extended loneliness
+  | 'failure_public'     // Failed at something publicly
+  | 'betrayal'           // Trust was violated
+  | 'loss_of_home'       // Lost dwelling/territory
+  | 'attack_survived';   // Was attacked and survived
+
+/**
+ * Represents a traumatic event that contributes to stress.
+ */
+export interface Trauma {
+  /** Unique identifier */
+  id: string;
+  /** Type of trauma */
+  type: TraumaType;
+  /** How severe this trauma was (0-1) */
+  severity: number;
+  /** Game tick when trauma occurred */
+  timestamp: number;
+  /** Whether the agent has processed/resolved this trauma */
+  resolved: boolean;
+  /** Related entity (who died, who attacked, etc.) */
+  relatedEntityId?: string;
+  /** Description for memory/journal */
+  description?: string;
+}
+
+/** Types of mental breakdowns */
+export type BreakdownType =
+  | 'tantrum'        // Destructive rage
+  | 'catatonic'      // Unresponsive, won't move
+  | 'berserk'        // Attack anyone nearby
+  | 'strange_mood'   // Compelled to create artifact
+  | 'depression'     // Severe sadness, slow movement
+  | 'panic_attack';  // Flee and hide
+
+/** Coping mechanisms agents can use to reduce stress */
+export type CopingMechanism =
+  | 'socializing'    // Talking to others
+  | 'crafting'       // Creating things
+  | 'eating'         // Comfort eating
+  | 'sleeping'       // Rest and recovery
+  | 'drinking'       // Alcohol (future)
+  | 'praying'        // Religious activity (future)
+  | 'art'            // Creating or viewing art
+  | 'nature'         // Being outdoors
+  | 'exercise';      // Physical activity
+
+/**
+ * Stress state tracking, separate from mood.
+ * Stress accumulates from trauma and decays slowly.
+ * High stress can trigger mental breakdowns.
+ */
+export interface StressState {
+  /** Current stress level (0-100) */
+  level: number;
+
+  /** Stress threshold for breakdown (varies by personality, 50-90) */
+  breakdownThreshold: number;
+
+  /** Recent traumatic events */
+  recentTraumas: Trauma[];
+
+  /** Coping mechanisms this agent uses */
+  copingMechanisms: CopingMechanism[];
+
+  /** Whether agent is currently in a breakdown state */
+  inBreakdown: boolean;
+
+  /** Type of current breakdown (if any) */
+  breakdownType?: BreakdownType;
+
+  /** Game tick when breakdown started */
+  breakdownStartedAt?: number;
+
+  /** How many breakdowns this agent has had (lifetime) */
+  totalBreakdowns: number;
+
+  /** Last tick when stress was reduced via coping */
+  lastCopingTick: number;
+}
 
 /**
  * Factors that contribute to current mood.
@@ -108,6 +206,37 @@ export interface MoodComponent extends Component {
 
   /** Last time mood was updated (tick) */
   lastUpdate: number;
+
+  // ============================================================================
+  // Forward-Compatibility: Stress System (optional)
+  // ============================================================================
+
+  /**
+   * Stress state tracking.
+   * Future: Used for mental breakdown mechanics (tantrum spirals, strange moods).
+   * When undefined, agent has no stress tracking (backward compatible).
+   */
+  stress?: StressState;
+}
+
+/**
+ * Create a default stress state for an agent.
+ * @param breakdownThreshold - How much stress before breakdown (50-90, based on personality)
+ * @param copingMechanisms - What helps this agent cope with stress
+ */
+export function createStressState(
+  breakdownThreshold: number = 70,
+  copingMechanisms: CopingMechanism[] = ['socializing', 'sleeping']
+): StressState {
+  return {
+    level: 0,
+    breakdownThreshold,
+    recentTraumas: [],
+    copingMechanisms,
+    inBreakdown: false,
+    totalBreakdowns: 0,
+    lastCopingTick: 0,
+  };
 }
 
 /**
@@ -371,6 +500,12 @@ export function getMoodDescription(component: MoodComponent): string {
     lonely: 'feeling lonely',
     proud: 'feeling proud',
     grateful: 'feeling grateful',
+    // Forward-compatibility: breakdown states
+    enraged: 'in a violent rage',
+    despairing: 'in deep despair',
+    manic: 'in a manic state',
+    obsessed: 'obsessively focused',
+    terrified: 'paralyzed with fear',
   };
 
   return `${moodLevel}, ${stateDescriptions[component.emotionalState]}`;

@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { GoalCategory, PersonalGoal } from '../components/GoalsComponent.js';
@@ -31,8 +32,8 @@ export class GoalGenerationSystem implements System {
       const entity = (this.eventBus as any).world?.getEntity(agentId);
       if (!entity) return;
 
-      const goalsComp = entity.getComponent('goals') as GoalsComponent | null;
-      const personalityComp = entity.getComponent('personality') as PersonalityComponent | null;
+      const goalsComp = entity.getComponent(CT.Goals) as GoalsComponent | null;
+      const personalityComp = entity.getComponent(CT.Personality) as PersonalityComponent | null;
 
       if (!goalsComp || !personalityComp) return;
 
@@ -66,7 +67,7 @@ export class GoalGenerationSystem implements System {
       const entity = (this.eventBus as any).world?.getEntity(agentId);
       if (!entity) return;
 
-      const goalsComp = entity.getComponent('goals') as GoalsComponent | null;
+      const goalsComp = entity.getComponent(CT.Goals) as GoalsComponent | null;
       if (!goalsComp) return;
 
       this._updateGoalProgress(agentId, goalsComp, actionType);
@@ -90,7 +91,7 @@ export class GoalGenerationSystem implements System {
     const category = this._selectGoalCategory(personality);
 
     // Get skills if available
-    const skillsComp = entity.getComponent('skills') as SkillsComponent | null;
+    const skillsComp = entity.getComponent(CT.Skills) as SkillsComponent | null;
 
     // Generate goal based on category
     const goal = this._createGoalForCategory(category, personality, skillsComp);
@@ -177,11 +178,11 @@ export class GoalGenerationSystem implements System {
     motivation: string;
     milestones: Array<{ description: string; completed: boolean; progress: number }>;
   } {
-    const skillTypes = ['building', 'farming', 'gathering', 'crafting'];
+    const skillTypes = [CT.Building, 'farming', 'gathering', 'crafting'];
     const chosenSkill = skillTypes[Math.floor(Math.random() * skillTypes.length)];
 
     return {
-      description: `Become a skilled ${chosenSkill === 'building' ? 'builder' : chosenSkill === 'farming' ? 'farmer' : chosenSkill === 'gathering' ? 'gatherer' : 'crafter'}`,
+      description: `Become a skilled ${chosenSkill === CT.Building ? 'builder' : chosenSkill === 'farming' ? 'farmer' : chosenSkill === 'gathering' ? 'gatherer' : 'crafter'}`,
       motivation: `I want to master the art of ${chosenSkill}`,
       milestones: [
         { description: `Practice ${chosenSkill} regularly`, completed: false, progress: 0 },
@@ -400,7 +401,7 @@ export class GoalGenerationSystem implements System {
 
   // Action type checkers
   private _isMasteryAction(actionType: string): boolean {
-    return ['build', 'craft', 'till', 'plant', 'harvest', 'gather'].includes(actionType);
+    return ['build', 'craft', 'till', CT.Plant, 'harvest', 'gather'].includes(actionType);
   }
 
   private _isSocialAction(actionType: string): boolean {

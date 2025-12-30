@@ -3,7 +3,7 @@
  * Defines products that animals can produce
  */
 
-export type ProductionType = 'continuous' | 'periodic' | 'terminal';
+import type { ProductionType, AnimalLifeStage } from '../types/AnimalTypes.js';
 
 export interface AnimalProduct {
   id: string;
@@ -12,7 +12,7 @@ export interface AnimalProduct {
   productionType: ProductionType;
 
   // Production conditions
-  minLifeStage: 'infant' | 'juvenile' | 'adult' | 'elder';
+  minLifeStage: AnimalLifeStage;
   minHealth: number; // 0-100
   minBondLevel?: number; // Required bond level (for continuous products like milking)
 

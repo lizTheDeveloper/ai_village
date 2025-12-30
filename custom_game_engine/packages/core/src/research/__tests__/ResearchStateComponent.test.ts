@@ -80,7 +80,7 @@ describe('ResearchStateComponent', () => {
     });
 
     it('throws for already completed research', () => {
-      let state = createResearchStateComponent();
+      const state = createResearchStateComponent();
       state.completed.add('agriculture_i');
 
       expect(() => startResearch(state, 'agriculture_i', 'agent-1', 100)).toThrow(
@@ -282,7 +282,7 @@ describe('ResearchStateComponent', () => {
 
   describe('isResearchCompleted', () => {
     it('returns true for completed research', () => {
-      let state = createResearchStateComponent();
+      const state = createResearchStateComponent();
       state.completed.add('agriculture_i');
 
       expect(isResearchCompleted(state, 'agriculture_i')).toBe(true);

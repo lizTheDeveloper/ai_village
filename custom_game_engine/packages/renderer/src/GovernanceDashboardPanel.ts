@@ -627,12 +627,12 @@ export class GovernanceDashboardPanel {
         continue;
       }
 
-      // Calculate average health from needs
+      // Calculate average health from needs (NeedsComponent uses 0-1 scale)
       const avgNeeds = (needs.hunger + needs.thirst + needs.energy) / 3;
 
-      if (avgNeeds > 70) {
+      if (avgNeeds > 0.7) {
         healthy++;
-      } else if (avgNeeds > 30) {
+      } else if (avgNeeds > 0.3) {
         struggling++;
       } else {
         critical++;
@@ -808,10 +808,10 @@ export class GovernanceDashboardPanel {
         isolatedCount++;
       }
 
-      // Calculate morale from needs
+      // Calculate morale from needs (NeedsComponent uses 0-1 scale, convert to 0-100)
       if (needs) {
         const avgNeeds = (needs.hunger + needs.thirst + needs.energy) / 3;
-        totalMorale += avgNeeds;
+        totalMorale += avgNeeds * 100; // Convert to 0-100 scale
         agentsWithNeeds++;
       }
     }
@@ -839,7 +839,7 @@ export class GovernanceDashboardPanel {
     }
 
     // Get current temperature from weather system
-    let temperature = 70; // Default
+    const temperature = 70; // Default
     // Note: getSystem is not available on World type interface, so we cannot query it
     // This feature would require passing TimeSystem separately or extending World interface
 
@@ -852,8 +852,8 @@ export class GovernanceDashboardPanel {
       const needs = (agent as EntityImpl).getComponent<NeedsComponent>('needs');
       if (!needs) continue;
 
-      // Check if agent is critically low on any need
-      if (needs.hunger < 20 || needs.thirst < 20 || needs.energy < 20) {
+      // Check if agent is critically low on any need (NeedsComponent uses 0-1 scale)
+      if (needs.hunger < 0.2 || needs.thirst < 0.2 || needs.energy < 0.2) {
         agentsAtRisk++;
       }
     }

@@ -93,3 +93,4 @@ export * from './MassEventSystem.js';
 export * from './PassageSystem.js';
 // Auto-save & Time Travel
 export * from './AutoSaveSystem.js';
+export * from './CheckpointNamingService.js';

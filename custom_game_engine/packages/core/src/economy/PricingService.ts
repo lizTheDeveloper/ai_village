@@ -2,6 +2,7 @@ import type { ItemDefinition, ItemRarity } from '../items/ItemDefinition.js';
 import type { MarketStateComponent } from '../components/MarketStateComponent.js';
 import type { MarketEventSystem } from '../systems/MarketEventSystem.js';
 import { getDemandMultiplier, getSupplyPenalty } from '../components/MarketStateComponent.js';
+import { materialRegistry } from '../materials/MaterialRegistry.js';
 
 /**
  * Rarity multipliers for item pricing
@@ -21,6 +22,7 @@ export interface PriceBreakdown {
   baseValue: number;
   qualityMultiplier: number;
   rarityMultiplier: number;
+  materialMultiplier: number; // Phase 29: material value
   demandMultiplier: number;
   supplyPenalty: number;
   eventModifier: number;
@@ -29,11 +31,12 @@ export interface PriceBreakdown {
 
 /**
  * Calculate the market price for an item
- * Formula: baseValue * quality * rarity * demand * supply * eventModifier
+ * Formula: baseValue * quality * rarity * material * demand * supply * eventModifier
  * Quality range: 0.5 - 2.0 (based on 0-100 quality rating)
+ * Material: 0.1 - 20.0 (based on material valueMultiplier)
  */
 export function calculateItemPrice(
-  item: { definition: ItemDefinition; quality?: number },
+  item: { definition: ItemDefinition; quality?: number; materialOverride?: string },
   marketState: MarketStateComponent | undefined,
   marketEventSystem?: MarketEventSystem
 ): PriceBreakdown {
@@ -45,6 +48,14 @@ export function calculateItemPrice(
   // Quality: 0 = 0.5x, 50 = 1.0x, 100 = 2.0x
   const quality = 0.5 + ((item.quality ?? 50) / 100) * 1.5;
   const rarity = RARITY_MULTIPLIERS[item.definition.rarity] ?? 1.0;
+
+  // Material multiplier (Phase 29)
+  let material = 1.0;
+  const materialId = item.materialOverride ?? item.definition.baseMaterial;
+  if (materialId && materialRegistry.has(materialId)) {
+    const mat = materialRegistry.get(materialId);
+    material = mat.valueMultiplier;
+  }
 
   let demand = 1.0;
   let supply = 1.0;
@@ -66,12 +77,13 @@ export function calculateItemPrice(
     );
   }
 
-  const final = Math.floor(base * quality * rarity * demand * supply * eventModifier);
+  const final = Math.floor(base * quality * rarity * material * demand * supply * eventModifier);
 
   return {
     baseValue: base,
     qualityMultiplier: quality,
     rarityMultiplier: rarity,
+    materialMultiplier: material,
     demandMultiplier: demand,
     supplyPenalty: supply,
     eventModifier,
@@ -84,7 +96,7 @@ export function calculateItemPrice(
  * Applies shop's buyMarkup on top of market price
  */
 export function calculateBuyPrice(
-  item: { definition: ItemDefinition; quality?: number },
+  item: { definition: ItemDefinition; quality?: number; materialOverride?: string },
   shop: { buyMarkup: number },
   marketState: MarketStateComponent | undefined,
   marketEventSystem?: MarketEventSystem
@@ -98,7 +110,7 @@ export function calculateBuyPrice(
  * Applies shop's sellMarkdown on top of market price
  */
 export function calculateSellPrice(
-  item: { definition: ItemDefinition; quality?: number },
+  item: { definition: ItemDefinition; quality?: number; materialOverride?: string },
   shop: { sellMarkdown: number },
   marketState: MarketStateComponent | undefined,
   marketEventSystem?: MarketEventSystem

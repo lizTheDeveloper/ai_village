@@ -10,9 +10,10 @@ import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import type { EntityImpl } from '../../ecs/Entity.js';
 import type { World } from '../../ecs/World.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
-import type { MemoryComponent } from '../../components/MemoryComponent.js';
+import type { SpatialMemoryComponent } from '../../components/SpatialMemoryComponent.js';
 import type { PersonalityComponent } from '../../components/PersonalityComponent.js';
 import type { GoalsComponent, GoalCategory, PersonalGoal } from '../../components/GoalsComponent.js';
+import { ComponentType } from '../../types/ComponentType.js';
 
 /**
  * ReflectBehavior - Introspection and goal formation
@@ -36,7 +37,7 @@ export class ReflectBehavior extends BaseBehavior {
 
       // Generate initial internal monologue
       const monologue = this.generateReflectionMonologue(entity, world);
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         lastThought: monologue,
         behaviorState: {
@@ -76,7 +77,7 @@ export class ReflectBehavior extends BaseBehavior {
    * Generate reflection monologue based on recent memories.
    */
   private generateReflectionMonologue(entity: EntityImpl, _world: World): string {
-    const memory = entity.getComponent<MemoryComponent>('memory');
+    const memory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
 
     if (!memory || memory.memories.length === 0) {
       return this.getDefaultReflection();
@@ -134,11 +135,11 @@ export class ReflectBehavior extends BaseBehavior {
    */
   private attemptGoalFormation(entity: EntityImpl, _world: World, currentTick: number): void {
     // Check if agent has goals component
-    if (!entity.hasComponent('goals')) {
+    if (!entity.hasComponent(ComponentType.Goals)) {
       return; // No goals component - skip
     }
 
-    const goals = entity.getComponent<GoalsComponent>('goals');
+    const goals = entity.getComponent<GoalsComponent>(ComponentType.Goals);
     if (!goals) {
       return;
     }
@@ -154,7 +155,7 @@ export class ReflectBehavior extends BaseBehavior {
     }
 
     // Get personality
-    const personality = entity.getComponent<PersonalityComponent>('personality');
+    const personality = entity.getComponent<PersonalityComponent>(ComponentType.Personality);
     if (!personality) {
       return; // Need personality to form goals
     }

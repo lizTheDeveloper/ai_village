@@ -4,7 +4,13 @@ import type {
   IdentityComponent,
   SocialMemoryComponent,
   SocialMemory,
+  Relationship,
 } from '@ai-village/core';
+
+// Local type for verification record
+interface VerificationInfo {
+  result: string;
+}
 import { RelationshipComponent, TrustNetworkComponent } from '@ai-village/core';
 
 /**
@@ -285,7 +291,8 @@ export class RelationshipsPanel {
 
     if (relationships.size > 0) {
       // Sort by familiarity
-      const sorted = Array.from(relationships.entries())
+      const entries: [string, Relationship][] = Array.from(relationships.entries()) as [string, Relationship][];
+      const sorted = entries
         .sort((a, b) => b[1].familiarity - a[1].familiarity)
         .slice(0, 5); // Top 5
 
@@ -356,7 +363,8 @@ export class RelationshipsPanel {
 
     if (scores.size > 0) {
       // Sort by trust score
-      const sorted = Array.from(scores.entries())
+      const scoreEntries: [string, number][] = Array.from(scores.entries()) as [string, number][];
+      const sorted = scoreEntries
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5); // Top 5
 
@@ -378,7 +386,7 @@ export class RelationshipsPanel {
         // Show verification history summary
         const history = trustNetwork.getVerificationHistory(agentId);
         if (history.length > 0) {
-          const correct = history.filter(h => h.result === 'correct').length;
+          const correct = history.filter((h: VerificationInfo) => h.result === 'correct').length;
           const failed = history.length - correct;
           ctx.fillStyle = '#777777';
           ctx.font = '10px monospace';

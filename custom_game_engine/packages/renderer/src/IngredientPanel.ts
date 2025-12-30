@@ -1,4 +1,15 @@
 import type { World, EntityId } from '@ai-village/core';
+
+// Local types
+interface EventPayload {
+  type: string;
+  data: Record<string, unknown>;
+}
+
+interface Ingredient {
+  itemId: string;
+  quantity: number;
+}
 import { globalRecipeRegistry } from '@ai-village/core';
 
 export interface IngredientDisplay {
@@ -39,7 +50,7 @@ export class IngredientPanel {
     this.bounds = { x, y, width, height };
 
     // Listen for inventory changes
-    this.world.eventBus.subscribe('inventory:changed', (event) => {
+    this.world.eventBus.subscribe('inventory:changed', (event: EventPayload) => {
       const data = event.data; // Has entityId as string
       if (this.agentId && data.entityId === this.agentId) {
         this.refresh();
@@ -81,13 +92,44 @@ export class IngredientPanel {
       throw new Error(`Recipe '${this.recipeId}' must have at least one ingredient`);
     }
 
-    // Stub: Would check actual inventory
-    this.ingredients = recipe.ingredients.map(ing => ({
-      itemId: ing.itemId,
-      required: ing.quantity,
-      available: 10, // Mock data
-      status: 'AVAILABLE' as const
-    }));
+    // Get agent's inventory to check availability
+    const agent = this.world.getEntity(this.agentId);
+    if (!agent) {
+      throw new Error(`Agent entity ${this.agentId} not found`);
+    }
+
+    const inventory = agent.components.get('inventory') as any;
+    if (!inventory || !inventory.slots) {
+      throw new Error(`Agent ${this.agentId} has no inventory component`);
+    }
+
+    // Check actual availability for each ingredient
+    this.ingredients = recipe.ingredients.map((ing: Ingredient) => {
+      // Count available items in inventory
+      let available = 0;
+      for (const slot of inventory.slots) {
+        if (slot.itemId === ing.itemId) {
+          available += slot.quantity;
+        }
+      }
+
+      // Determine status based on availability
+      let status: 'AVAILABLE' | 'PARTIAL' | 'MISSING' | 'IN_STORAGE';
+      if (available >= ing.quantity) {
+        status = 'AVAILABLE';
+      } else if (available > 0) {
+        status = 'PARTIAL';
+      } else {
+        status = 'MISSING';
+      }
+
+      return {
+        itemId: ing.itemId,
+        required: ing.quantity,
+        available,
+        status
+      };
+    });
   }
 
   onTakeFromStorage(callback: (itemId: string, quantity: number) => void): void {

@@ -5,6 +5,7 @@ import { TamingSystem } from '../TamingSystem.js';
 import { AnimalSystem } from '../AnimalSystem.js';
 import { createInventoryComponent } from '../../components/InventoryComponent.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Integration tests for TamingSystem + AnimalSystem + InventorySystem
  *
@@ -30,7 +31,7 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
 
     const animal = harness.createTestAnimal('chicken', { x: 10, y: 10 });
     const animalComponent = {
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'chicken-1',
       speciesId: 'chicken',
@@ -78,7 +79,7 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     harness.registerSystem('TamingSystem', tamingSystem);
 
     const animalComponent = {
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'chicken-1',
       speciesId: 'chicken',
@@ -116,7 +117,7 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     harness.registerSystem('TamingSystem', tamingSystem);
 
     const animalComponent = {
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'rabbit-1',
       speciesId: 'rabbit', // Harder to tame
@@ -159,7 +160,7 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     harness.registerSystem('TamingSystem', tamingSystem);
 
     const animalComponent = {
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'deer-1',
       speciesId: 'deer',
@@ -198,7 +199,7 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     harness.registerSystem('TamingSystem', tamingSystem);
 
     const animalComponent = {
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'horse-1',
       speciesId: 'horse',
@@ -239,7 +240,7 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     const animalComponent = {
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'dog-1',
       speciesId: 'dog',
@@ -284,7 +285,7 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     const animalComponent = {
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'rabbit-1',
       speciesId: 'rabbit',
@@ -323,7 +324,7 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     const stranger = harness.createTestAgent({ x: 20, y: 20 });
 
     const animalComponent = {
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'cat-1',
       speciesId: 'cat',
@@ -363,7 +364,7 @@ describe('TamingSystem + AnimalSystem + InventorySystem Integration', () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     const animalComponent = {
-      type: 'animal',
+      type: ComponentType.Animal,
       version: 1,
       id: 'chicken-1',
       speciesId: 'chicken',

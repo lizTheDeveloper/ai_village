@@ -55,6 +55,25 @@ export interface Sector {
 
   /** Human-readable name if assigned (e.g., "north forest", "river bend") */
   areaName?: string;
+
+  // ============================================================================
+  // Terrain data for elevation-based pathfinding
+  // ============================================================================
+
+  /** Average elevation of tiles in this sector (0 = sea level) */
+  averageElevation: number;
+
+  /** Minimum elevation in sector (for cliff detection) */
+  minElevation: number;
+
+  /** Maximum elevation in sector (for peak detection) */
+  maxElevation: number;
+
+  /** Ratio of water tiles in this sector (0-1, 1 = all water) */
+  waterRatio: number;
+
+  /** Whether terrain data has been calculated for this sector */
+  terrainCalculated: boolean;
 }
 
 /**
@@ -69,6 +88,12 @@ function createSector(sectorX: number, sectorY: number): Sector {
     lastVisited: -1,
     currentOccupancy: 0,
     explored: false,
+    // Terrain data - defaults to sea level, no water
+    averageElevation: 0,
+    minElevation: 0,
+    maxElevation: 0,
+    waterRatio: 0,
+    terrainCalculated: false,
   };
 }
 
@@ -286,19 +311,109 @@ export class MapKnowledge {
   }
 
   /**
+   * Update terrain data for a sector from tile information.
+   * Called during terrain generation or when a sector is first visited.
+   *
+   * @param sectorX - Sector X coordinate
+   * @param sectorY - Sector Y coordinate
+   * @param tiles - Array of tile data with elevation and terrain type
+   */
+  updateSectorTerrain(
+    sectorX: number,
+    sectorY: number,
+    tiles: Array<{ elevation: number; terrain: string }>
+  ): void {
+    const sector = this.getSector(sectorX, sectorY);
+
+    if (tiles.length === 0) return;
+
+    let totalElevation = 0;
+    let minElev = Infinity;
+    let maxElev = -Infinity;
+    let waterCount = 0;
+
+    for (const tile of tiles) {
+      totalElevation += tile.elevation;
+      minElev = Math.min(minElev, tile.elevation);
+      maxElev = Math.max(maxElev, tile.elevation);
+      if (tile.terrain === 'water') {
+        waterCount++;
+      }
+    }
+
+    sector.averageElevation = totalElevation / tiles.length;
+    sector.minElevation = minElev;
+    sector.maxElevation = maxElev;
+    sector.waterRatio = waterCount / tiles.length;
+    sector.terrainCalculated = true;
+  }
+
+  /**
+   * Calculate elevation cost for moving between sectors.
+   * Uphill is harder (positive cost), downhill is easier (negative/zero cost).
+   *
+   * @param fromElevation - Starting sector elevation
+   * @param toElevation - Destination sector elevation
+   * @returns Cost modifier (0-1 range, higher = harder)
+   */
+  private calculateElevationCost(fromElevation: number, toElevation: number): number {
+    const elevationDiff = toElevation - fromElevation;
+
+    if (elevationDiff <= 0) {
+      // Downhill or flat - no extra cost (actually slightly easier)
+      // Going downhill reduces cost by up to 0.1
+      return Math.max(-0.1, elevationDiff * 0.02);
+    }
+
+    // Uphill - each level of elevation adds cost
+    // 1 level up = 0.05 cost, 5 levels up = 0.25 cost, 10 levels = 0.5 cost
+    return Math.min(0.5, elevationDiff * 0.05);
+  }
+
+  /**
    * Get path weight for pathfinding (no goal - exploration mode).
    * Used when wandering without a specific destination.
+   *
+   * Factors:
+   * - Traffic (worn paths are easier)
+   * - Elevation (uphill is harder, downhill is easier)
+   * - Water (mostly water = very high cost / impassable)
    */
   getPathWeight(sectorX: number, sectorY: number, direction: Direction): number {
     const sector = this.getSector(sectorX, sectorY);
     const traffic = sector.pathTraffic.get(direction) ?? 0;
 
-    // Traffic is 0-1 normalized
+    // Get neighbor sector for elevation comparison
+    const neighbor = getNeighborCoords(sectorX, sectorY, direction);
+    const neighborSector = this.getSector(neighbor.x, neighbor.y);
+
+    // Water blocking: sectors that are mostly water are nearly impassable
+    if (neighborSector.terrainCalculated && neighborSector.waterRatio > 0.7) {
+      return 10.0; // Very high cost - effectively blocked
+    }
+
+    // Base cost from traffic (worn paths)
     // traffic 0 → cost 1.0 (no path)
     // traffic 0.5 → cost 0.75
     // traffic 1.0 → cost 0.5 (well-worn path)
     const freshnessBonus = traffic * 0.5;
-    return 1.0 - freshnessBonus;
+    let baseCost = 1.0 - freshnessBonus;
+
+    // Add elevation cost if terrain data is available
+    if (sector.terrainCalculated && neighborSector.terrainCalculated) {
+      const elevationCost = this.calculateElevationCost(
+        sector.averageElevation,
+        neighborSector.averageElevation
+      );
+      baseCost += elevationCost;
+    }
+
+    // Partial water adds some cost (wading through shallow water)
+    if (neighborSector.terrainCalculated && neighborSector.waterRatio > 0.3) {
+      baseCost += neighborSector.waterRatio * 0.5;
+    }
+
+    return Math.max(0.1, baseCost);
   }
 
   /**
@@ -308,10 +423,11 @@ export class MapKnowledge {
    * This means agents will take small detours onto worn paths, but never
    * circuitous routes. Direct line to goal beats even the freshest path.
    *
-   * Weighting: 45% path freshness, 55% goal alignment
-   * - A perfect path (1.0) in wrong direction: 0.45 bonus
-   * - Direct line to goal (1.0 alignment): 0.55 bonus
-   * - So direct always wins, but worn path that's "mostly" toward goal wins big
+   * Factors:
+   * - Goal alignment (55% weight) - moving toward goal
+   * - Path freshness (30% weight) - worn paths are easier
+   * - Elevation (15% weight) - uphill is harder
+   * - Water blocking - mostly water = impassable
    *
    * @param sectorX - Current sector X
    * @param sectorY - Current sector Y
@@ -332,6 +448,12 @@ export class MapKnowledge {
 
     // Get neighbor coords in this direction
     const neighbor = getNeighborCoords(sectorX, sectorY, direction);
+    const neighborSector = this.getSector(neighbor.x, neighbor.y);
+
+    // Water blocking: sectors that are mostly water are nearly impassable
+    if (neighborSector.terrainCalculated && neighborSector.waterRatio > 0.7) {
+      return 10.0; // Very high cost - effectively blocked
+    }
 
     // Calculate how well this direction aligns with goal
     // Distance from current to goal
@@ -349,14 +471,31 @@ export class MapKnowledge {
       goalAlignment = Math.min(1.0, Math.max(0.0, 0.5 + improvement / 4));
     }
 
-    // Combine: 45% freshness, 55% goal alignment
-    // Goal ALWAYS wins, but barely - so you'll slightly detour for worn paths
-    const freshnessBonus = traffic * 0.45; // 0 to 0.45
-    const alignmentBonus = goalAlignment * 0.55; // 0 to 0.55
-    const totalBonus = freshnessBonus + alignmentBonus;
+    // Calculate elevation penalty (0 to 0.15)
+    let elevationPenalty = 0;
+    if (sector.terrainCalculated && neighborSector.terrainCalculated) {
+      const elevationCost = this.calculateElevationCost(
+        sector.averageElevation,
+        neighborSector.averageElevation
+      );
+      // Scale to 0-0.15 range (15% of total weight)
+      elevationPenalty = Math.max(0, elevationCost * 0.3);
+    }
 
-    // Base cost 1.0, reduced by combined bonus
-    return Math.max(0.1, 1.0 - totalBonus);
+    // Combine: 30% freshness, 55% goal alignment
+    // Remaining ~15% is elevation penalty
+    const freshnessBonus = traffic * 0.30; // 0 to 0.30
+    const alignmentBonus = goalAlignment * 0.55; // 0 to 0.55
+    const totalBonus = freshnessBonus + alignmentBonus - elevationPenalty;
+
+    // Partial water adds cost
+    let waterCost = 0;
+    if (neighborSector.terrainCalculated && neighborSector.waterRatio > 0.3) {
+      waterCost = neighborSector.waterRatio * 0.3;
+    }
+
+    // Base cost 1.0, reduced by combined bonus, increased by water
+    return Math.max(0.1, 1.0 - totalBonus + waterCost);
   }
 
   /**
@@ -525,10 +664,11 @@ export class MapKnowledge {
 
   /**
    * Get best direction to explore from a position.
-   * Prefers unexplored sectors, avoids crowded ones.
+   * Prefers unexplored sectors, avoids crowded ones and water.
    */
   getBestExplorationDirection(worldX: number, worldY: number): Direction | null {
     const { sectorX, sectorY } = worldToSector(worldX, worldY);
+    const currentSector = this.getSector(sectorX, sectorY);
 
     let bestDir: Direction | null = null;
     let bestScore = -Infinity;
@@ -538,6 +678,11 @@ export class MapKnowledge {
       const neighborSector = this.sectors.get(getSectorKey(neighbor.x, neighbor.y));
 
       let score = 0;
+
+      // Avoid water-heavy sectors
+      if (neighborSector?.terrainCalculated && neighborSector.waterRatio > 0.7) {
+        score -= 200; // Strong penalty for water
+      }
 
       if (!neighborSector || !neighborSector.explored) {
         // Unexplored = high priority
@@ -551,6 +696,17 @@ export class MapKnowledge {
         // Traffic is now 0-1, so multiply by 10 for meaningful contribution
         const traffic = neighborSector.pathTraffic.get(oppositeDirection(dir)) ?? 0;
         score += traffic * 10;
+
+        // Penalize uphill, prefer downhill/flat
+        if (currentSector.terrainCalculated && neighborSector.terrainCalculated) {
+          const elevationDiff = neighborSector.averageElevation - currentSector.averageElevation;
+          score -= elevationDiff * 2; // Uphill = negative score, downhill = bonus
+        }
+
+        // Partial water penalty
+        if (neighborSector.terrainCalculated && neighborSector.waterRatio > 0.3) {
+          score -= neighborSector.waterRatio * 20;
+        }
       }
 
       if (score > bestScore) {
@@ -574,6 +730,12 @@ export class MapKnowledge {
       lastVisited: number;
       explored: boolean;
       areaName?: string;
+      // Terrain data
+      averageElevation: number;
+      minElevation: number;
+      maxElevation: number;
+      waterRatio: number;
+      terrainCalculated: boolean;
     }> = [];
 
     for (const [, sector] of this.sectors) {
@@ -585,6 +747,12 @@ export class MapKnowledge {
         lastVisited: sector.lastVisited,
         explored: sector.explored,
         areaName: sector.areaName,
+        // Terrain data
+        averageElevation: sector.averageElevation,
+        minElevation: sector.minElevation,
+        maxElevation: sector.maxElevation,
+        waterRatio: sector.waterRatio,
+        terrainCalculated: sector.terrainCalculated,
       });
     }
 
@@ -605,6 +773,12 @@ export class MapKnowledge {
       sector.explored = sectorData.explored;
       sector.areaName = sectorData.areaName;
       sector.currentOccupancy = 0; // Reset on load
+      // Terrain data (with fallbacks for saves without terrain data)
+      sector.averageElevation = sectorData.averageElevation ?? 0;
+      sector.minElevation = sectorData.minElevation ?? 0;
+      sector.maxElevation = sectorData.maxElevation ?? 0;
+      sector.waterRatio = sectorData.waterRatio ?? 0;
+      sector.terrainCalculated = sectorData.terrainCalculated ?? false;
 
       mapKnowledge.sectors.set(getSectorKey(sector.x, sector.y), sector);
     }

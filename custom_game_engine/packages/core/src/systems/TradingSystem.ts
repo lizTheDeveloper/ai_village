@@ -15,6 +15,7 @@
 
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType, EntityId } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -116,22 +117,22 @@ export class TradingSystem implements System {
     const buyerImpl = buyer as EntityImpl;
     const shopImpl = shopEntity as EntityImpl;
 
-    const buyerCurrency = buyerImpl.getComponent<CurrencyComponent>('currency');
+    const buyerCurrency = buyerImpl.getComponent<CurrencyComponent>(CT.Currency);
     if (!buyerCurrency) {
       throw new Error(`Buyer ${buyerId} has no currency component`);
     }
 
-    const buyerInventory = buyerImpl.getComponent<InventoryComponent>('inventory');
+    const buyerInventory = buyerImpl.getComponent<InventoryComponent>(CT.Inventory);
     if (!buyerInventory) {
       throw new Error(`Buyer ${buyerId} has no inventory component`);
     }
 
-    const shop = shopImpl.getComponent<ShopComponent>('shop');
+    const shop = shopImpl.getComponent<ShopComponent>(CT.Shop);
     if (!shop) {
       throw new Error(`Shop entity ${shopEntityId} has no shop component`);
     }
 
-    const shopCurrency = shopImpl.getComponent<CurrencyComponent>('currency');
+    const shopCurrency = shopImpl.getComponent<CurrencyComponent>(CT.Currency);
     if (!shopCurrency) {
       throw new Error(`Shop ${shopEntityId} has no currency component`);
     }
@@ -207,13 +208,13 @@ export class TradingSystem implements System {
       const { inventory: newBuyerInventory } = addToInventory(buyerInventory, itemId, quantity);
 
       // Update components
-      buyerImpl.updateComponent('currency', () => newBuyerCurrency);
-      shopImpl.updateComponent('currency', () => newShopCurrency);
-      shopImpl.updateComponent('shop', () => ({
+      buyerImpl.updateComponent(CT.Currency, () => newBuyerCurrency);
+      shopImpl.updateComponent(CT.Currency, () => newShopCurrency);
+      shopImpl.updateComponent(CT.Shop, () => ({
         ...newShop,
         totalSales: newShop.totalSales + totalPrice,
       }));
-      buyerImpl.updateComponent('inventory', () => newBuyerInventory);
+      buyerImpl.updateComponent(CT.Inventory, () => newBuyerInventory);
 
       // Update market statistics
       if (marketState) {
@@ -295,22 +296,22 @@ export class TradingSystem implements System {
     const sellerImpl = seller as EntityImpl;
     const shopImpl = shopEntity as EntityImpl;
 
-    const sellerCurrency = sellerImpl.getComponent<CurrencyComponent>('currency');
+    const sellerCurrency = sellerImpl.getComponent<CurrencyComponent>(CT.Currency);
     if (!sellerCurrency) {
       throw new Error(`Seller ${sellerId} has no currency component`);
     }
 
-    const sellerInventory = sellerImpl.getComponent<InventoryComponent>('inventory');
+    const sellerInventory = sellerImpl.getComponent<InventoryComponent>(CT.Inventory);
     if (!sellerInventory) {
       throw new Error(`Seller ${sellerId} has no inventory component`);
     }
 
-    const shop = shopImpl.getComponent<ShopComponent>('shop');
+    const shop = shopImpl.getComponent<ShopComponent>(CT.Shop);
     if (!shop) {
       throw new Error(`Shop entity ${shopEntityId} has no shop component`);
     }
 
-    const shopCurrency = shopImpl.getComponent<CurrencyComponent>('currency');
+    const shopCurrency = shopImpl.getComponent<CurrencyComponent>(CT.Currency);
     if (!shopCurrency) {
       throw new Error(`Shop ${shopEntityId} has no currency component`);
     }
@@ -406,10 +407,10 @@ export class TradingSystem implements System {
       const newShop = addStock(shop, itemId, quantity);
 
       // Update components
-      sellerImpl.updateComponent('currency', () => newSellerCurrency);
-      shopImpl.updateComponent('currency', () => newShopCurrency);
-      sellerImpl.updateComponent('inventory', () => newSellerInventory);
-      shopImpl.updateComponent('shop', () => ({
+      sellerImpl.updateComponent(CT.Currency, () => newSellerCurrency);
+      shopImpl.updateComponent(CT.Currency, () => newShopCurrency);
+      sellerImpl.updateComponent(CT.Inventory, () => newSellerInventory);
+      shopImpl.updateComponent(CT.Shop, () => ({
         ...newShop,
         totalPurchases: newShop.totalPurchases + totalPrice,
       }));
@@ -452,7 +453,7 @@ export class TradingSystem implements System {
    */
   private getMarketState(world: World): MarketStateComponent | undefined {
     // Market state is a singleton component on a special entity
-    const marketEntities = world.query().with('market_state').executeEntities();
+    const marketEntities = world.query().with(CT.MarketState).executeEntities();
     if (marketEntities.length === 0) {
       return undefined;
     }
@@ -462,7 +463,7 @@ export class TradingSystem implements System {
       return undefined;
     }
 
-    return marketEntity.components.get('market_state') as MarketStateComponent | undefined;
+    return marketEntity.components.get(CT.MarketState) as MarketStateComponent | undefined;
   }
 
   /**
@@ -505,11 +506,11 @@ export class TradingSystem implements System {
     };
 
     // Find market entity and update its component
-    const marketEntities = world.query().with('market_state').executeEntities();
+    const marketEntities = world.query().with(CT.MarketState).executeEntities();
     if (marketEntities.length > 0 && marketEntities[0]) {
       const marketEntity = marketEntities[0] as EntityImpl;
       const updatedMarketState = updateItemStats(marketState, itemId, newStats);
-      marketEntity.updateComponent('market_state', () => updatedMarketState);
+      marketEntity.updateComponent(CT.MarketState, () => updatedMarketState);
     }
   }
 
@@ -517,13 +518,13 @@ export class TradingSystem implements System {
    * Find the nearest shop to a given position
    */
   public findNearestShop(world: World, position: PositionComponent): EntityId | null {
-    const shops = world.query().with('shop').with('position').executeEntities();
+    const shops = world.query().with(CT.Shop).with(CT.Position).executeEntities();
 
     let nearestShop: EntityId | null = null;
     let nearestDistance = Infinity;
 
     for (const shop of shops) {
-      const shopPos = shop.components.get('position') as PositionComponent | undefined;
+      const shopPos = shop.components.get(CT.Position) as PositionComponent | undefined;
       if (!shopPos) continue;
 
       const dx = shopPos.x - position.x;

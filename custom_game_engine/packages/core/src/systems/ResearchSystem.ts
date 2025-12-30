@@ -15,6 +15,7 @@
 
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType, EntityId } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -51,7 +52,7 @@ interface ResearchBuildingBonus {
 export class ResearchSystem implements System {
   public readonly id: SystemId = 'research';
   public readonly priority: number = 55; // After BuildingSystem (16), before most others
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = ['agent', 'position'];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Agent, CT.Position];
 
   private isInitialized = false;
   private eventBus: EventBus | null = null;
@@ -142,7 +143,7 @@ export class ResearchSystem implements System {
     }
 
     const newState = startResearch(researchState, researchId, agentId, world.tick);
-    (worldEntity as EntityImpl).updateComponent('research_state', () => newState);
+    (worldEntity as EntityImpl).updateComponent(CT.ResearchState, () => newState);
 
     this.eventBus?.emit({
       type: 'research:started',
@@ -192,7 +193,7 @@ export class ResearchSystem implements System {
     const result: Array<{ agent: Entity; building: ResearchBuildingBonus }> = [];
 
     for (const agent of agents) {
-      const pos = (agent as EntityImpl).getComponent<PositionComponent>('position');
+      const pos = (agent as EntityImpl).getComponent<PositionComponent>(CT.Position);
       if (!pos) continue;
 
       // Find nearest research building
@@ -241,7 +242,7 @@ export class ResearchSystem implements System {
 
       // Find agents contributing to this research
       const contributors = researchingAgents.filter(({ agent }) => {
-        const agentComp = (agent as EntityImpl).getComponent<AgentComponent>('agent');
+        const agentComp = (agent as EntityImpl).getComponent<AgentComponent>(CT.Agent);
         return agentComp && progress.researchers.includes(agent.id);
       });
 
@@ -281,7 +282,7 @@ export class ResearchSystem implements System {
     }
 
     // Update world entity with new state
-    (worldEntity as EntityImpl).updateComponent('research_state', () => currentState);
+    (worldEntity as EntityImpl).updateComponent(CT.ResearchState, () => currentState);
   }
 
   /**
@@ -352,6 +353,10 @@ export class ResearchSystem implements System {
         return unlock.knowledgeId;
       case 'generated':
         return unlock.generationType;
+      default: {
+        const exhaustiveCheck: never = unlock;
+        throw new Error(`Unknown unlock type: ${(exhaustiveCheck as any).type}`);
+      }
     }
   }
 
@@ -362,11 +367,11 @@ export class ResearchSystem implements System {
     switch (unlock.type) {
       case 'recipe':
         break;
-      case 'building':
+      case CT.Building:
         // Update building blueprint to mark as unlocked
         this.unlockBuilding(unlock.buildingId);
         break;
-      case 'item':
+      case CT.Item:
         break;
       case 'research':
         break;
@@ -387,15 +392,15 @@ export class ResearchSystem implements System {
    */
   private getResearchBuildings(world: World): ResearchBuildingBonus[] {
     const buildings = world.query()
-      .with('building')
-      .with('position')
+      .with(CT.Building)
+      .with(CT.Position)
       .executeEntities();
 
     const result: ResearchBuildingBonus[] = [];
 
     for (const building of buildings) {
-      const buildingComp = (building as EntityImpl).getComponent<BuildingComponent>('building');
-      const pos = (building as EntityImpl).getComponent<PositionComponent>('position');
+      const buildingComp = (building as EntityImpl).getComponent<BuildingComponent>(CT.Building);
+      const pos = (building as EntityImpl).getComponent<PositionComponent>(CT.Position);
 
       if (!buildingComp || !buildingComp.isComplete || !pos) continue;
 
@@ -431,7 +436,7 @@ export class ResearchSystem implements System {
       return null;
     }
 
-    let state = (worldEntity as EntityImpl).getComponent<ResearchStateComponent>('research_state');
+    let state = (worldEntity as EntityImpl).getComponent<ResearchStateComponent>(CT.ResearchState);
     if (!state) {
       // Create and attach research state
       state = createResearchStateComponent();
@@ -447,7 +452,7 @@ export class ResearchSystem implements System {
   private findWorldEntity(world: World): Entity | null {
     // Try to find existing world entity
     const worldEntities = world.query()
-      .with('research_state')
+      .with(CT.ResearchState)
       .executeEntities();
 
     if (worldEntities.length > 0) {
@@ -456,7 +461,7 @@ export class ResearchSystem implements System {
 
     // Try to find any entity we can attach to (agents are good candidates)
     const agents = world.query()
-      .with('agent')
+      .with(CT.Agent)
       .executeEntities();
 
     if (agents.length > 0) {
@@ -492,7 +497,7 @@ export class ResearchSystem implements System {
     const agent = world.getEntity(agentId);
     if (!agent) return false;
 
-    const pos = (agent as EntityImpl).getComponent<PositionComponent>('position');
+    const pos = (agent as EntityImpl).getComponent<PositionComponent>(CT.Position);
     if (!pos) return false;
 
     const buildings = this.getResearchBuildings(world);
@@ -515,7 +520,7 @@ export class ResearchSystem implements System {
     const agent = world.getEntity(agentId);
     if (!agent) return 1.0;
 
-    const pos = (agent as EntityImpl).getComponent<PositionComponent>('position');
+    const pos = (agent as EntityImpl).getComponent<PositionComponent>(CT.Position);
     if (!pos) return 1.0;
 
     const buildings = this.getResearchBuildings(world);

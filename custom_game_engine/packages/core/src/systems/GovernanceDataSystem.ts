@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -74,13 +75,13 @@ export class GovernanceDataSystem implements System {
    */
   private recordDeath(world: World, agentId: string, cause: string, timestamp: number): void {
     // Find agent name from identity component
-    const entities = world.query().with('identity').executeEntities();
+    const entities = world.query().with(CT.Identity).executeEntities();
     const agent = entities.find(e => e.id === agentId);
-    const identityComp = agent ? (agent as EntityImpl).getComponent<IdentityComponent>('identity') : null;
+    const identityComp = agent ? (agent as EntityImpl).getComponent<IdentityComponent>(CT.Identity) : null;
 
     // Per CLAUDE.md: No silent fallbacks - require identity component with name
     if (!identityComp) {
-      throw new Error(`Agent ${agentId} missing required 'identity' component for death recording`);
+      throw new Error(`Agent ${agentId} missing required CT.Identity component for death recording`);
     }
     if (!identityComp.name) {
       throw new Error(`Agent ${agentId} identity component missing required 'name' field`);
@@ -106,10 +107,10 @@ export class GovernanceDataSystem implements System {
    */
   update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     // Single query for identity agents (used by TownHalls and CensusBureaus)
-    const agentsWithIdentity = world.query().with('identity').executeEntities();
+    const agentsWithIdentity = world.query().with(CT.Identity).executeEntities();
 
     // Single query for agents with needs (used by HealthClinics)
-    const agentsWithNeeds = world.query().with('agent', 'needs').executeEntities();
+    const agentsWithNeeds = world.query().with(CT.Agent, CT.Needs).executeEntities();
 
     this.updateTownHalls(world, agentsWithIdentity);
     this.updateCensusBureaus(world, agentsWithIdentity);
@@ -123,12 +124,12 @@ export class GovernanceDataSystem implements System {
    * Performance: Uses pre-queried agents to avoid repeated queries
    */
   private updateTownHalls(world: World, agents: ReadonlyArray<Entity>): void {
-    const townHalls = world.query().with('town_hall', 'building').executeEntities();
+    const townHalls = world.query().with(CT.TownHall, CT.Building).executeEntities();
 
     for (const entity of townHalls) {
       const impl = entity as EntityImpl;
-      const building = impl.getComponent<BuildingComponent>('building');
-      const townHall = impl.getComponent<TownHallComponent>('town_hall');
+      const building = impl.getComponent<BuildingComponent>(CT.Building);
+      const townHall = impl.getComponent<TownHallComponent>(CT.TownHall);
 
       if (!building || !townHall) {
         continue;
@@ -154,7 +155,7 @@ export class GovernanceDataSystem implements System {
 
       for (const agentEntity of agents) {
         const agentImpl = agentEntity as EntityImpl;
-        const identity = agentImpl.getComponent<IdentityComponent>('identity');
+        const identity = agentImpl.getComponent<IdentityComponent>(CT.Identity);
         if (identity) {
           agentRecords.push({
             id: agentEntity.id,
@@ -167,7 +168,7 @@ export class GovernanceDataSystem implements System {
       }
 
       // Update TownHall component
-      impl.updateComponent<TownHallComponent>('town_hall', (current) => ({
+      impl.updateComponent<TownHallComponent>(CT.TownHall, (current) => ({
         ...current,
         populationCount: agentRecords.length,
         agents: agentRecords,
@@ -184,12 +185,12 @@ export class GovernanceDataSystem implements System {
    * Performance: Uses pre-queried agents to avoid repeated queries
    */
   private updateCensusBureaus(world: World, agents: ReadonlyArray<Entity>): void {
-    const bureaus = world.query().with('census_bureau', 'building').executeEntities();
+    const bureaus = world.query().with(CT.CensusBureau, CT.Building).executeEntities();
 
     for (const entity of bureaus) {
       const impl = entity as EntityImpl;
-      const building = impl.getComponent<BuildingComponent>('building');
-      const bureau = impl.getComponent<CensusBureauComponent>('census_bureau');
+      const building = impl.getComponent<BuildingComponent>(CT.Building);
+      const bureau = impl.getComponent<CensusBureauComponent>(CT.CensusBureau);
 
       if (!building || !bureau) {
         continue;
@@ -241,7 +242,7 @@ export class GovernanceDataSystem implements System {
       const accuracy = (building.currentStaff && building.currentStaff.length > 0) ? 0.9 : 0.5;
 
       // Update CensusBureau component
-      impl.updateComponent<CensusBureauComponent>('census_bureau', (current) => ({
+      impl.updateComponent<CensusBureauComponent>(CT.CensusBureau, (current) => ({
         ...current,
         demographics: { children, adults, elders },
         birthRate,
@@ -263,11 +264,11 @@ export class GovernanceDataSystem implements System {
    * Update Warehouse components with resource tracking.
    */
   private updateWarehouses(world: World): void {
-    const warehouses = world.query().with('warehouse', 'building').executeEntities();
+    const warehouses = world.query().with(CT.Warehouse, CT.Building).executeEntities();
 
     for (const entity of warehouses) {
       const impl = entity as EntityImpl;
-      const warehouse = impl.getComponent<WarehouseComponent>('warehouse');
+      const warehouse = impl.getComponent<WarehouseComponent>(CT.Warehouse);
 
       if (!warehouse) {
         continue;
@@ -283,11 +284,11 @@ export class GovernanceDataSystem implements System {
    * Update WeatherStation components with forecasts.
    */
   private updateWeatherStations(world: World): void {
-    const stations = world.query().with('weather_station', 'building').executeEntities();
+    const stations = world.query().with(CT.WeatherStation, CT.Building).executeEntities();
 
     for (const entity of stations) {
       const impl = entity as EntityImpl;
-      const station = impl.getComponent<WeatherStationComponent>('weather_station');
+      const station = impl.getComponent<WeatherStationComponent>(CT.WeatherStation);
 
       if (!station) {
         continue;
@@ -305,12 +306,12 @@ export class GovernanceDataSystem implements System {
    * Performance: Uses pre-queried agents to avoid repeated queries
    */
   private updateHealthClinics(world: World, agents: ReadonlyArray<Entity>): void {
-    const clinics = world.query().with('health_clinic', 'building').executeEntities();
+    const clinics = world.query().with(CT.HealthClinic, CT.Building).executeEntities();
 
     for (const entity of clinics) {
       const impl = entity as EntityImpl;
-      const building = impl.getComponent<BuildingComponent>('building');
-      const clinic = impl.getComponent<HealthClinicComponent>('health_clinic');
+      const building = impl.getComponent<BuildingComponent>(CT.Building);
+      const clinic = impl.getComponent<HealthClinicComponent>(CT.HealthClinic);
 
       if (!building || !clinic) {
         continue;
@@ -325,21 +326,21 @@ export class GovernanceDataSystem implements System {
 
       for (const agentEntity of agents) {
         const agentImpl = agentEntity as EntityImpl;
-        const needs = agentImpl.getComponent<NeedsComponent>('needs');
+        const needs = agentImpl.getComponent<NeedsComponent>(CT.Needs);
 
         if (needs) {
           // Health based on hunger/energy
           const avgHealth = (needs.hunger + needs.energy) / 2;
 
-          if (avgHealth > 70) {
+          if (avgHealth > 0.7) {
             healthy++;
-          } else if (avgHealth > 30) {
+          } else if (avgHealth > 0.3) {
             sick++;
           } else {
             critical++;
           }
 
-          if (needs.hunger < 30) {
+          if (needs.hunger < 0.3) {
             malnourished++;
           }
         }
@@ -365,7 +366,7 @@ export class GovernanceDataSystem implements System {
       const recommendedStaff = Math.ceil(totalAgents / 20);
 
       // Update HealthClinic component
-      impl.updateComponent<HealthClinicComponent>('health_clinic', (current) => ({
+      impl.updateComponent<HealthClinicComponent>(CT.HealthClinic, (current) => ({
         ...current,
         populationHealth: { healthy, sick, critical },
         malnutrition: {

@@ -5,6 +5,7 @@ import { AnimalComponent } from '../components/AnimalComponent.js';
 import { AnimalSystem } from '../systems/AnimalSystem.js';
 import { ANIMAL_SPECIES } from '../data/animalSpecies.js';
 
+import { ComponentType } from '../types/ComponentType.js';
 describe('Animal System', () => {
   let world: WorldImpl;
   let animalSystem: AnimalSystem;
@@ -117,7 +118,7 @@ describe('Animal System', () => {
       const entities = [entity];
       animalSystem.update(world, entities, 1);
 
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(animal.state).toBe('eating');
     });
 
@@ -144,10 +145,10 @@ describe('Animal System', () => {
       });
       entity.addComponent(component);
 
-      const entities = world.query().with('animal').executeEntities();
+      const entities = world.query().with(ComponentType.Animal).executeEntities();
       animalSystem.update(world, entities, 1);
 
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(animal.state).toBe('drinking');
     });
 
@@ -174,10 +175,10 @@ describe('Animal System', () => {
       });
       entity.addComponent(component);
 
-      const entities = world.query().with('animal').executeEntities();
+      const entities = world.query().with(ComponentType.Animal).executeEntities();
       animalSystem.update(world, entities, 1);
 
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(animal.state).toBe('sleeping');
     });
 
@@ -204,10 +205,10 @@ describe('Animal System', () => {
       });
       entity.addComponent(component);
 
-      const entities = world.query().with('animal').executeEntities();
+      const entities = world.query().with(ComponentType.Animal).executeEntities();
       animalSystem.update(world, entities, 1);
 
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(animal.state).toBe('fleeing');
     });
   });
@@ -236,12 +237,12 @@ describe('Animal System', () => {
       });
       entity.addComponent(component);
 
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialHunger = animal.hunger;
 
       // Update for multiple ticks (simulate time passing)
       for (let i = 0; i < 100; i++) {
-        const entities = world.query().with('animal').executeEntities();
+        const entities = world.query().with(ComponentType.Animal).executeEntities();
         animalSystem.update(world, entities, 1);
       }
 
@@ -272,12 +273,12 @@ describe('Animal System', () => {
       });
       entity.addComponent(component);
 
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialThirst = animal.thirst;
 
       // Update for multiple ticks
       for (let i = 0; i < 100; i++) {
-        const entities = world.query().with('animal').executeEntities();
+        const entities = world.query().with(ComponentType.Animal).executeEntities();
         animalSystem.update(world, entities, 1);
       }
 
@@ -308,12 +309,12 @@ describe('Animal System', () => {
       });
       entity.addComponent(component);
 
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialEnergy = animal.energy;
 
       // Update for multiple ticks
       for (let i = 0; i < 50; i++) {
-        const entities = world.query().with('animal').executeEntities();
+        const entities = world.query().with(ComponentType.Animal).executeEntities();
         animalSystem.update(world, entities, 1);
       }
 
@@ -344,12 +345,12 @@ describe('Animal System', () => {
       });
       entity.addComponent(component);
 
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialEnergy = animal.energy;
 
       // Update for multiple ticks
       for (let i = 0; i < 50; i++) {
-        const entities = world.query().with('animal').executeEntities();
+        const entities = world.query().with(ComponentType.Animal).executeEntities();
         animalSystem.update(world, entities, 1);
       }
 
@@ -385,7 +386,7 @@ describe('Animal System', () => {
 
       // Advance time to trigger maturation (simulate 1 day passing)
       // deltaTime in seconds: 86400 seconds = 1 day
-      const entities = world.query().with('animal').executeEntities();
+      const entities = world.query().with(ComponentType.Animal).executeEntities();
       animalSystem.update(world, entities, 86400);
 
       // Flush event queue to dispatch queued events
@@ -420,10 +421,10 @@ describe('Animal System', () => {
       entity.addComponent(component);
 
       // Simulate agent approaching (increase stress)
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       animal.stress = 85; // High enough to trigger fleeing
 
-      const entities = world.query().with('animal').executeEntities();
+      const entities = world.query().with(ComponentType.Animal).executeEntities();
       animalSystem.update(world, entities, 1);
 
       expect(animal.state).toBe('fleeing');
@@ -452,10 +453,10 @@ describe('Animal System', () => {
       });
       entity.addComponent(component);
 
-      const entities = world.query().with('animal').executeEntities();
+      const entities = world.query().with(ComponentType.Animal).executeEntities();
       animalSystem.update(world, entities, 1);
 
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       // Docile animals should not flee at moderate stress
       expect(animal.state).not.toBe('fleeing');
     });
@@ -465,7 +466,7 @@ describe('Animal System', () => {
     it('should throw when processing animal with missing health field', () => {
       const entity = world.createEntity();
       const invalidAnimal = {
-        type: 'animal' as const, // Required for query to find it
+        type: ComponentType.Animal, // Required for query to find it
         version: 1,
         id: 'invalid-animal',
         speciesId: 'chicken',
@@ -490,7 +491,7 @@ describe('Animal System', () => {
       (entity as any).components.set('animal', invalidAnimal);
 
       expect(() => {
-        const entities = world.query().with('animal').executeEntities();
+        const entities = world.query().with(ComponentType.Animal).executeEntities();
       animalSystem.update(world, entities, 1);
       }).toThrow();
     });

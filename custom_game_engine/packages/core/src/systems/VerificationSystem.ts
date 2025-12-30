@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
@@ -37,9 +38,9 @@ export class VerificationSystem implements System {
     this.lastUpdateTick = currentTick;
     // Get agents with social gradients (potential verifiers)
     const verifiers = entities.filter(e =>
-      e.components.has('agent') &&
-      e.components.has('position') &&
-      e.components.has('social_gradient')
+      e.components.has(CT.Agent) &&
+      e.components.has(CT.Position) &&
+      e.components.has(CT.SocialGradient)
     );
 
     for (const verifier of verifiers) {

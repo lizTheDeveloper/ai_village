@@ -1,4 +1,5 @@
 import { ComponentBase } from '../ecs/Component';
+import type { PlantDiseaseState, PlantPestState } from '../types/PlantDisease.js';
 
 /**
  * PlantStage represents the 11 distinct lifecycle stages of a plant
@@ -57,9 +58,16 @@ export interface PlantComponentData {
   visualVariant?: number;
   currentSprite?: string;
   isIndoors?: boolean;
+  planted?: boolean; // True if planted by agent, false if wild/natural
   // Harvest behavior (copied from species at creation)
   harvestDestroysPlant?: boolean;
   harvestResetStage?: 'flowering' | 'fruiting' | 'vegetative';
+  // Shade properties (trees provide shade when tall/mature)
+  providesShade?: boolean;
+  shadeRadius?: number;
+  // Disease and pest state
+  diseases?: PlantDiseaseState[];
+  pests?: PlantPestState[];
 }
 
 /**
@@ -105,9 +113,20 @@ export class PlantComponent extends ComponentBase {
   // Environment
   public isIndoors: boolean;
 
+  // Origin (agent-planted vs natural/wild)
+  public planted: boolean;
+
   // Harvest behavior
   public harvestDestroysPlant: boolean;
   public harvestResetStage: 'flowering' | 'fruiting' | 'vegetative';
+
+  // Shade properties (trees provide shade when tall/mature)
+  public providesShade: boolean;
+  public shadeRadius: number;
+
+  // Disease and pest state
+  public diseases: PlantDiseaseState[];
+  public pests: PlantPestState[];
 
   constructor(data: PlantComponentData) {
     super();
@@ -184,9 +203,20 @@ export class PlantComponent extends ComponentBase {
     // Environment
     this.isIndoors = data.isIndoors ?? false;
 
+    // Origin (default: false for wild/natural plants)
+    this.planted = data.planted ?? false;
+
     // Harvest behavior (default: destroy plant on harvest, reset to fruiting if not destroyed)
     this.harvestDestroysPlant = data.harvestDestroysPlant ?? true;
     this.harvestResetStage = data.harvestResetStage ?? 'fruiting';
+
+    // Shade properties (default: no shade)
+    this.providesShade = data.providesShade ?? false;
+    this.shadeRadius = data.shadeRadius ?? 0;
+
+    // Disease and pest state (default: empty arrays)
+    this.diseases = data.diseases ? [...data.diseases] : [];
+    this.pests = data.pests ? [...data.pests] : [];
   }
 
   /**
@@ -289,8 +319,13 @@ export class PlantComponent extends ComponentBase {
       visualVariant: this.visualVariant,
       currentSprite: this.currentSprite,
       isIndoors: this.isIndoors,
+      planted: this.planted,
       harvestDestroysPlant: this.harvestDestroysPlant,
-      harvestResetStage: this.harvestResetStage
+      harvestResetStage: this.harvestResetStage,
+      providesShade: this.providesShade,
+      shadeRadius: this.shadeRadius,
+      diseases: this.diseases,
+      pests: this.pests
     };
   }
 

@@ -149,10 +149,10 @@ export class ResponseParser {
     }
 
     // NO FALLBACK - Tell the agent to rephrase using core actions
-    const coreActions = ['pick', 'gather', 'build', 'talk', 'explore', 'till', 'farm', 'plant'];
+    const coreActions = ['pick', 'gather', 'build', 'talk', 'wander', 'till', 'farm', 'plant'];
     const errorMsg =
       `I couldn't understand that action. Please rephrase using one of these core actions: ${coreActions.join(', ')}. ` +
-      `Examples: "pick wood", "gather 20 wood", "build tent", "talk to someone", "explore".`;
+      `Examples: "pick wood", "gather 20 wood", "build tent", "talk to someone", "wander".`;
 
     throw new BehaviorParseError(errorMsg, coreActions);
   }

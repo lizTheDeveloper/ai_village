@@ -25,8 +25,8 @@ import type { CurrencyComponent } from '../components/CurrencyComponent.js';
 import type { ShopComponent } from '../components/ShopComponent.js';
 import type { TradingSystem } from '../systems/TradingSystem.js';
 import type { GameEvent } from '../events/GameEvent.js';
-import {
-  TRADE_DURATION,
+import { ComponentType } from '../types/ComponentType.js';
+import {  TRADE_DURATION,
   INTERACTION_DISTANCE,
 } from '../constants/index.js';
 
@@ -109,7 +109,7 @@ export class TradeActionHandler implements ActionHandler {
     }
 
     // Check actor has required components
-    const actorPos = actor.components.get('position') as PositionComponent | undefined;
+    const actorPos = actor.components.get(ComponentType.Position) as PositionComponent | undefined;
     if (!actorPos) {
       return {
         valid: false,
@@ -117,7 +117,7 @@ export class TradeActionHandler implements ActionHandler {
       };
     }
 
-    const inventory = actor.components.get('inventory') as InventoryComponent | undefined;
+    const inventory = actor.components.get(ComponentType.Inventory) as InventoryComponent | undefined;
     if (!inventory) {
       return {
         valid: false,
@@ -125,7 +125,7 @@ export class TradeActionHandler implements ActionHandler {
       };
     }
 
-    const currency = actor.components.get('currency') as CurrencyComponent | undefined;
+    const currency = actor.components.get(ComponentType.Currency) as CurrencyComponent | undefined;
     if (!currency) {
       return {
         valid: false,
@@ -142,7 +142,7 @@ export class TradeActionHandler implements ActionHandler {
       };
     }
 
-    const shop = shopEntity.components.get('shop') as ShopComponent | undefined;
+    const shop = shopEntity.components.get(ComponentType.Shop) as ShopComponent | undefined;
     if (!shop) {
       return {
         valid: false,
@@ -150,7 +150,7 @@ export class TradeActionHandler implements ActionHandler {
       };
     }
 
-    const shopPos = shopEntity.components.get('position') as PositionComponent | undefined;
+    const shopPos = shopEntity.components.get(ComponentType.Position) as PositionComponent | undefined;
     if (!shopPos) {
       return {
         valid: false,

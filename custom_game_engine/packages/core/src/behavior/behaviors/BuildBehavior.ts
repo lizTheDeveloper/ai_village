@@ -21,6 +21,8 @@ import type { ResourceCost } from '../../buildings/BuildingBlueprintRegistry.js'
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { getPosition } from '../../utils/componentHelpers.js';
 import { createPlacementScorer } from '../../services/PlacementScorer.js';
+import { ComponentType } from '../../types/ComponentType.js';
+import { BuildingType as BT } from '../../types/BuildingType.js';
 
 interface WorldWithBuilding extends World {
   buildingRegistry?: {
@@ -41,15 +43,15 @@ interface WorldWithBuilding extends World {
 
 /** Valid building types that can be constructed */
 const VALID_BUILDING_TYPES: BuildingType[] = [
-  'workbench',
-  'storage-chest',
-  'campfire',
-  'tent',
-  'well',
-  'lean-to',
-  'storage-box',
-  'bed',
-  'bedroll',
+  BT.Workbench,
+  BT.StorageChest,
+  BT.Campfire,
+  BT.Tent,
+  BT.Well,
+  BT.LeanTo,
+  BT.StorageBox,
+  BT.Bed,
+  BT.Bedroll,
 ];
 
 /**
@@ -59,9 +61,9 @@ export class BuildBehavior extends BaseBehavior {
   readonly name = 'build' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>('position')!;
-    const agent = entity.getComponent<AgentComponent>('agent')!;
-    const inventory = entity.getComponent<InventoryComponent>('inventory');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
+    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
 
     // Stop moving while building
     this.stopMovement(entity);
@@ -73,11 +75,11 @@ export class BuildBehavior extends BaseBehavior {
     }
 
     // Get and validate building type
-    let buildingType = agent.behaviorState?.buildingType as BuildingType || 'lean-to';
+    let buildingType = agent.behaviorState?.buildingType as BuildingType || BT.LeanTo;
 
 
     if (!VALID_BUILDING_TYPES.includes(buildingType)) {
-      buildingType = 'lean-to'; // Default to lean-to for shelter
+      buildingType = BT.LeanTo; // Default to lean-to for shelter
     }
 
     if (!inventory) {
@@ -125,7 +127,7 @@ export class BuildBehavior extends BaseBehavior {
       // Switch to gathering the first missing resource
       const firstMissing = missing[0]!;
 
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         behavior: 'gather',
         behaviorState: {
@@ -196,7 +198,7 @@ export class BuildBehavior extends BaseBehavior {
 
 
       // Store the building ID and wait for construction to complete
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         behaviorState: {
           ...current.behaviorState,
@@ -235,11 +237,11 @@ export class BuildBehavior extends BaseBehavior {
     buildingId: string
   ): BehaviorResult | void {
     // Find the building entity
-    const buildings = world.query().with('building').with('position').executeEntities();
+    const buildings = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
 
     for (const building of buildings) {
       if (building.id === buildingId) {
-        const buildingComp = (building as EntityImpl).getComponent<BuildingComponent>('building');
+        const buildingComp = (building as EntityImpl).getComponent<BuildingComponent>(ComponentType.Building);
 
         if (buildingComp?.isComplete) {
           // Construction complete!
@@ -315,7 +317,7 @@ export class BuildBehavior extends BaseBehavior {
           const terrain = worldWithBuilding.getTerrainAt?.(testX, testY);
           if (terrain && (terrain === 'grass' || terrain === 'dirt' || terrain === 'sand')) {
             // Check no existing buildings
-            const buildings = world.query().with('building').with('position').executeEntities();
+            const buildings = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
             let blocked = false;
 
             for (const building of buildings) {
@@ -345,17 +347,17 @@ export class BuildBehavior extends BaseBehavior {
     const totalResources = { ...agentInventory };
 
     // Find all storage buildings with inventory
-    const storageBuildings = world.query().with('building').with('inventory').executeEntities();
+    const storageBuildings = world.query().with(ComponentType.Building).with(ComponentType.Inventory).executeEntities();
 
     for (const storage of storageBuildings) {
       const storageImpl = storage as EntityImpl;
-      const building = storageImpl.getComponent<BuildingComponent>('building');
-      const storageInv = storageImpl.getComponent<InventoryComponent>('inventory');
+      const building = storageImpl.getComponent<BuildingComponent>(ComponentType.Building);
+      const storageInv = storageImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
 
       if (!building || !storageInv || !building.isComplete) continue;
 
       // Only count storage buildings (not agents or other entities)
-      if (building.buildingType !== 'storage-chest' && building.buildingType !== 'storage-box') {
+      if (building.buildingType !== BT.StorageChest && building.buildingType !== BT.StorageBox) {
         continue;
       }
 

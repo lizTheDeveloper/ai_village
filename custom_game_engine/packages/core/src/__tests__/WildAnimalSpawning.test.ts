@@ -4,6 +4,7 @@ import { AnimalComponent } from '../components/AnimalComponent.js';
 import { WildAnimalSpawningSystem } from '../systems/WildAnimalSpawningSystem.js';
 import { EventBusImpl } from '../events/EventBus.js';
 
+import { ComponentType } from '../types/ComponentType.js';
 describe('Wild Animal Spawning System', () => {
   let world: WorldImpl;
   let spawningSystem: WildAnimalSpawningSystem;
@@ -38,12 +39,12 @@ describe('Wild Animal Spawning System', () => {
       spawningSystem.spawnAnimalsInChunk(world, chunkData);
 
       // Should have spawned at least one animal
-      const animals = world.query().with('animal').executeEntities();
+      const animals = world.query().with(ComponentType.Animal).executeEntities();
       expect(animals.length).toBeGreaterThan(0);
 
       // At least one should be a rabbit (common in grasslands)
       const hasRabbit = animals.some((entity) => {
-        const animal = entity.getComponent('animal') as AnimalComponent;
+        const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
         return animal.speciesId === 'rabbit';
       });
       expect(hasRabbit).toBe(true);
@@ -62,12 +63,12 @@ describe('Wild Animal Spawning System', () => {
 
       spawningSystem.spawnAnimalsInChunk(world, chunkData);
 
-      const animals = world.query().with('animal').executeEntities();
+      const animals = world.query().with(ComponentType.Animal).executeEntities();
       expect(animals.length).toBeGreaterThan(0);
 
       // Should have forest-appropriate animals (deer, rabbit, fox)
       const hasForestAnimal = animals.some((entity) => {
-        const animal = entity.getComponent('animal') as AnimalComponent;
+        const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
         return ['deer', 'rabbit', 'fox'].includes(animal.speciesId);
       });
       expect(hasForestAnimal).toBe(true);
@@ -83,17 +84,17 @@ describe('Wild Animal Spawning System', () => {
 
       spawningSystem.spawnAnimalsInChunk(world, chunkData);
 
-      const animals = world.query().with('animal').executeEntities();
+      const animals = world.query().with(ComponentType.Animal).executeEntities();
 
       // Grasslands may have sheep
       const hasSheep = animals.some((entity) => {
-        const animal = entity.getComponent('animal') as AnimalComponent;
+        const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
         return animal.speciesId === 'sheep';
       });
 
       // This test is flexible - grasslands should have herbivores
       const hasHerbivore = animals.some((entity) => {
-        const animal = entity.getComponent('animal') as AnimalComponent;
+        const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
         return ['sheep', 'rabbit', 'deer', 'cow'].includes(animal.speciesId);
       });
       expect(hasHerbivore).toBe(true);
@@ -109,11 +110,11 @@ describe('Wild Animal Spawning System', () => {
 
       spawningSystem.spawnAnimalsInChunk(world, chunkData);
 
-      const animals = world.query().with('animal').executeEntities();
+      const animals = world.query().with(ComponentType.Animal).executeEntities();
 
       // Chickens should not spawn in cold tundra
       const hasChicken = animals.some((entity) => {
-        const animal = entity.getComponent('animal') as AnimalComponent;
+        const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
         return animal.speciesId === 'chicken';
       });
       expect(hasChicken).toBe(false);
@@ -129,7 +130,7 @@ describe('Wild Animal Spawning System', () => {
 
       spawningSystem.spawnAnimalsInChunk(world, grasslandChunk);
 
-      const animalsCount = world.query().with('animal').executeEntities().length;
+      const animalsCount = world.query().with(ComponentType.Animal).executeEntities().length;
 
       // Should spawn reasonable number based on density
       // Grasslands are abundant, expect 3-10 animals per chunk
@@ -147,7 +148,7 @@ describe('Wild Animal Spawning System', () => {
 
       spawningSystem.spawnAnimalsInChunk(world, desertChunk);
 
-      const desertAnimals = world.query().with('animal').executeEntities().length;
+      const desertAnimals = world.query().with(ComponentType.Animal).executeEntities().length;
 
       // Desert should have fewer animals than grassland
       expect(desertAnimals).toBeLessThanOrEqual(5);
@@ -187,11 +188,11 @@ describe('Wild Animal Spawning System', () => {
 
       spawningSystem.spawnAnimalsInChunk(world, chunkData);
 
-      const animals = world.query().with('animal').executeEntities();
+      const animals = world.query().with(ComponentType.Animal).executeEntities();
 
       // All animals should be within chunk boundaries
       animals.forEach((entity) => {
-        const animal = entity.getComponent('animal') as AnimalComponent;
+        const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
         const chunkStartX = chunkData.x * chunkData.size;
         const chunkStartY = chunkData.y * chunkData.size;
         const chunkEndX = chunkStartX + chunkData.size;
@@ -214,11 +215,11 @@ describe('Wild Animal Spawning System', () => {
 
       spawningSystem.spawnAnimalsInChunk(world, chunkData);
 
-      const animals = world.query().with('animal').executeEntities();
+      const animals = world.query().with(ComponentType.Animal).executeEntities();
 
       // All spawned animals should be wild
       animals.forEach((entity) => {
-        const animal = entity.getComponent('animal') as AnimalComponent;
+        const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
         expect(animal.wild).toBe(true);
         expect(animal.ownerId).toBeUndefined();
         expect(animal.bondLevel).toBe(0);
@@ -236,11 +237,11 @@ describe('Wild Animal Spawning System', () => {
 
       spawningSystem.spawnAnimalsInChunk(world, chunkData);
 
-      const animals = world.query().with('animal').executeEntities();
+      const animals = world.query().with(ComponentType.Animal).executeEntities();
 
       // Most wild animals should be adult or juvenile
       animals.forEach((entity) => {
-        const animal = entity.getComponent('animal') as AnimalComponent;
+        const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
         expect(['juvenile', 'adult', 'elder']).toContain(animal.lifeStage);
       });
     });
@@ -255,8 +256,8 @@ describe('Wild Animal Spawning System', () => {
 
       spawningSystem.spawnAnimalsInChunk(world, chunkData);
 
-      const animals = world.query().with('animal').executeEntities();
-      const ages = animals.map((e) => e.getComponent('animal') as AnimalComponent).map(c => c.age);
+      const animals = world.query().with(ComponentType.Animal).executeEntities();
+      const ages = animals.map((e) => e.getComponent(ComponentType.Animal) as AnimalComponent).map(c => c.age);
 
       // Should have variety in ages (not all the same)
       const uniqueAges = new Set(ages);
@@ -275,11 +276,11 @@ describe('Wild Animal Spawning System', () => {
 
       spawningSystem.spawnAnimalsInChunk(world, forestChunk);
 
-      const animals = world.query().with('animal').executeEntities();
+      const animals = world.query().with(ComponentType.Animal).executeEntities();
 
       // All spawned animals should be appropriate for forest biome
       animals.forEach((entity) => {
-        const animal = entity.getComponent('animal') as AnimalComponent;
+        const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
         const forestSpecies = [
           'deer',
           'rabbit',
@@ -305,11 +306,11 @@ describe('Wild Animal Spawning System', () => {
 
       spawningSystem.spawnAnimalsInChunk(world, desertChunk);
 
-      const animals = world.query().with('animal').executeEntities();
+      const animals = world.query().with(ComponentType.Animal).executeEntities();
 
       // Should not spawn cold-climate or forest animals in desert
       const hasColdAnimal = animals.some((entity) => {
-        const animal = entity.getComponent('animal') as AnimalComponent;
+        const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
         return ['bear', 'wolf'].includes(animal.speciesId);
       });
 
@@ -334,11 +335,11 @@ describe('Wild Animal Spawning System', () => {
 
       // System should listen to chunk_generated and spawn animals
       // (This requires the system to be registered and listening)
-      const entities = world.query().with('animal').executeEntities();
+      const entities = world.query().with(ComponentType.Animal).executeEntities();
       spawningSystem.update(world, entities, 1);
 
       // Animals should have been spawned
-      const animals = world.query().with('animal').executeEntities();
+      const animals = world.query().with(ComponentType.Animal).executeEntities();
       expect(animals.length).toBeGreaterThanOrEqual(0);
     });
   });
@@ -395,7 +396,7 @@ describe('Wild Animal Spawning System', () => {
         spawningSystem.spawnAnimalsInChunk(world, chunkData);
       }
 
-      const animals = world.query().with('animal').executeEntities();
+      const animals = world.query().with(ComponentType.Animal).executeEntities();
 
       // Should not exceed reasonable maximum (e.g., 50 animals in one chunk)
       expect(animals.length).toBeLessThanOrEqual(50);
@@ -413,7 +414,7 @@ describe('Wild Animal Spawning System', () => {
 
       spawningSystem.spawnAnimalsInChunk(world, chunkData);
 
-      const animals = world.query().with('animal').executeEntities();
+      const animals = world.query().with(ComponentType.Animal).executeEntities();
 
       // Animals should have temperature component (per Phase 8 integration)
       // This will be validated when TemperatureComponent exists

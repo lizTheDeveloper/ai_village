@@ -29,7 +29,7 @@ import {
   createSkillsComponent,
   addSkillXP,
 } from '../components/SkillsComponent.js';
-import { createPersonalityComponent } from '../components/PersonalityComponent.js';
+import { PersonalityComponent } from '../components/PersonalityComponent.js';
 import { BuildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistry.js';
 
 describe('ProgressiveSkillReveal Integration Tests', () => {
@@ -50,13 +50,13 @@ describe('ProgressiveSkillReveal Integration Tests', () => {
 
   describe('Random Starting Skills Generation', () => {
     it('should generate 1-3 starting skills for agents with personality', () => {
-      const personality = createPersonalityComponent({
-        workEthic: 80,
-        conscientiousness: 75,
-        openness: 60,
-        agreeableness: 50,
-        extraversion: 40,
-        neuroticism: 30,
+      const personality = new PersonalityComponent({
+        workEthic: 0.8,
+        conscientiousness: 0.75,
+        openness: 0.6,
+        agreeableness: 0.5,
+        extraversion: 0.4,
+        neuroticism: 0.3,
       });
 
       const skills = generateRandomStartingSkills(personality);
@@ -84,13 +84,13 @@ describe('ProgressiveSkillReveal Integration Tests', () => {
 
       // Generate 50 agents and track skill distribution
       for (let i = 0; i < 50; i++) {
-        const personality = createPersonalityComponent({
-          workEthic: Math.random() * 100,
-          conscientiousness: Math.random() * 100,
-          openness: Math.random() * 100,
-          agreeableness: Math.random() * 100,
-          extraversion: Math.random() * 100,
-          neuroticism: Math.random() * 100,
+        const personality = new PersonalityComponent({
+          workEthic: Math.random(),
+          conscientiousness: Math.random(),
+          openness: Math.random(),
+          agreeableness: Math.random(),
+          extraversion: Math.random(),
+          neuroticism: Math.random(),
         });
 
         const skills = generateRandomStartingSkills(personality);
@@ -493,13 +493,13 @@ describe('ProgressiveSkillReveal Integration Tests', () => {
       for (let i = 0; i < 20; i++) {
         const agent = new EntityImpl(createEntityId(), 0);
 
-        const personality = createPersonalityComponent({
-          workEthic: Math.random() * 100,
-          conscientiousness: Math.random() * 100,
-          openness: Math.random() * 100,
-          agreeableness: Math.random() * 100,
-          extraversion: Math.random() * 100,
-          neuroticism: Math.random() * 100,
+        const personality = new PersonalityComponent({
+          workEthic: Math.random(),
+          conscientiousness: Math.random(),
+          openness: Math.random(),
+          agreeableness: Math.random(),
+          extraversion: Math.random(),
+          neuroticism: Math.random(),
         });
 
         const skills = generateRandomStartingSkills(personality);

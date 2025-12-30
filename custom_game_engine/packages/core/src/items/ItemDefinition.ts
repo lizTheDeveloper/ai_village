@@ -3,17 +3,23 @@
  *
  * This interface defines everything about an item in one place:
  * - Physical properties (weight, stackSize)
- * - Behavior flags (isEdible, isStorable, isGatherable)
+ * - Behavior flags (isEdible, isStorable, isGatherable) - DEPRECATED: use traits
  * - Relationships (craftedFrom, growsInto)
- * - Food attributes (quality, flavors)
+ * - Food attributes (quality, flavors) - DEPRECATED: use traits.edible
+ * - Material properties (baseMaterial)
+ * - Trait composition (traits)
+ * - Self-documenting help entry (help)
  *
  * Part of the Item System refactor (work-order: item-system)
+ * Phase 29: Trait Composition - Adds compositional traits (edible, weapon, magical, etc.)
  */
 
-/**
- * Flavor types for food preference system.
- */
-export type FlavorType = 'sweet' | 'savory' | 'spicy' | 'bitter' | 'sour' | 'umami';
+import { ItemTraits } from './ItemTraits';
+import type { FlavorType, ItemRarity } from '../types/ItemTypes.js';
+import type { ItemHelpEntry } from '../help/HelpEntry.js';
+
+// Re-export for backwards compatibility
+export type { FlavorType, ItemRarity };
 
 /**
  * Item categories for filtering and grouping
@@ -27,11 +33,6 @@ export type ItemCategory =
   | 'consumable'    // potion, medicine, etc.
   | 'equipment'     // armor, weapons, etc.
   | 'misc';         // everything else
-
-/**
- * Item rarity tiers affecting value
- */
-export type ItemRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 
 /**
  * Crafting ingredient specification
@@ -60,17 +61,29 @@ export interface ItemDefinition {
   /** Maximum stack size in a single slot */
   readonly stackSize: number;
 
-  /** Whether this item can be eaten to restore hunger */
+  // ========== NEW: TRAIT-BASED SYSTEM ==========
+
+  /** Material this item is made from (references MaterialRegistry) */
+  readonly baseMaterial?: string;
+
+  /** Compositional traits (edible, weapon, magical, container, tool) */
+  readonly traits?: ItemTraits;
+
+  // ========== DEPRECATED: FLAT FLAGS (kept for backward compatibility) ==========
+
+  /** @deprecated Use traits.edible instead */
   readonly isEdible: boolean;
 
-  /** Hunger restored when eaten (if isEdible) */
+  /** @deprecated Use traits.edible.hungerRestored instead */
   readonly hungerRestored?: number;
 
-  /** Food quality affecting mood satisfaction (0-100, higher = better) */
+  /** @deprecated Use traits.edible.quality instead */
   readonly quality?: number;
 
-  /** Flavor profile for food preference system */
+  /** @deprecated Use traits.edible.flavors instead */
   readonly flavors?: readonly FlavorType[];
+
+  // ========== END DEPRECATED ==========
 
   /** Whether this item can be deposited to storage */
   readonly isStorable: boolean;
@@ -98,6 +111,9 @@ export interface ItemDefinition {
 
   /** Optional: Custom metadata for extensions */
   readonly metadata?: Readonly<Record<string, unknown>>;
+
+  /** Optional: Self-documenting help entry for wiki generation */
+  readonly help?: Partial<ItemHelpEntry>;
 }
 
 /**
@@ -115,6 +131,8 @@ export function defineItem(
     category,
     weight: overrides.weight ?? 1.0,
     stackSize: overrides.stackSize ?? 50,
+    baseMaterial: overrides.baseMaterial,
+    traits: overrides.traits,
     isEdible: overrides.isEdible ?? false,
     hungerRestored: overrides.hungerRestored,
     quality: overrides.quality,
@@ -128,5 +146,6 @@ export function defineItem(
     baseValue: overrides.baseValue ?? 10,
     rarity: overrides.rarity ?? 'common',
     metadata: overrides.metadata,
+    help: overrides.help,
   };
 }

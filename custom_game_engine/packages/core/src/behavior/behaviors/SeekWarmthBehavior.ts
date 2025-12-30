@@ -16,6 +16,7 @@ import type { MovementComponent } from '../../components/MovementComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { BuildingComponent } from '../../components/BuildingComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
+import { ComponentType } from '../../types/ComponentType.js';
 
 /**
  * SeekWarmthBehavior - Find a heat source to warm up
@@ -24,9 +25,9 @@ export class SeekWarmthBehavior extends BaseBehavior {
   readonly name = 'seek_warmth' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>('position')!;
-    const movement = entity.getComponent<MovementComponent>('movement')!;
-    const temperature = entity.getComponent('temperature') as any;
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+    const movement = entity.getComponent<MovementComponent>(ComponentType.Movement)!;
+    const temperature = entity.getComponent(ComponentType.Temperature) as any;
 
     if (!temperature) {
       // No temperature component, switch to wandering
@@ -51,8 +52,8 @@ export class SeekWarmthBehavior extends BaseBehavior {
     }
 
     const heatSourceImpl = heatSource.entity as EntityImpl;
-    const heatSourcePos = heatSourceImpl.getComponent<PositionComponent>('position')!;
-    const heatSourceComp = heatSourceImpl.getComponent<BuildingComponent>('building')!;
+    const heatSourcePos = heatSourceImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+    const heatSourceComp = heatSourceImpl.getComponent<BuildingComponent>(ComponentType.Building)!;
 
     // Check if we're in heat range
     const inHeatRange = heatSourceComp.providesHeat && heatSource.distance <= heatSourceComp.heatRadius;
@@ -70,7 +71,7 @@ export class SeekWarmthBehavior extends BaseBehavior {
       const velocityX = (dx / distance) * movement.speed;
       const velocityY = (dy / distance) * movement.speed;
 
-      entity.updateComponent<MovementComponent>('movement', (current) => ({
+      entity.updateComponent<MovementComponent>(ComponentType.Movement, (current) => ({
         ...current,
         velocityX,
         velocityY,
@@ -82,14 +83,14 @@ export class SeekWarmthBehavior extends BaseBehavior {
     world: World,
     position: PositionComponent
   ): { entity: Entity; distance: number } | null {
-    const buildings = world.query().with('building').with('position').executeEntities();
+    const buildings = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
     let bestHeatSource: Entity | null = null;
     let nearestDistance = Infinity;
 
     for (const building of buildings) {
       const buildingImpl = building as EntityImpl;
-      const buildingComp = buildingImpl.getComponent<BuildingComponent>('building');
-      const buildingPos = buildingImpl.getComponent<PositionComponent>('position');
+      const buildingComp = buildingImpl.getComponent<BuildingComponent>(ComponentType.Building);
+      const buildingPos = buildingImpl.getComponent<PositionComponent>(ComponentType.Position);
 
       if (!buildingComp || !buildingPos || !buildingComp.isComplete) continue;
 

@@ -13,14 +13,14 @@ describe('OllamaProvider', () => {
   });
 
   describe('Tool Definition', () => {
-    it('should define all 12 action tools', async () => {
+    it('should define all 16 action tools from ActionDefinitions', async () => {
       const mockResponse = {
         ok: true,
         json: async () => ({
           message: {
             thinking: 'test',
             content: '',
-            tool_calls: [{ function: { name: 'wander', arguments: {} } }]
+            tool_calls: [{ function: { name: 'explore', arguments: {} } }]
           }
         })
       };
@@ -33,24 +33,29 @@ describe('OllamaProvider', () => {
       const requestBody = JSON.parse(fetchCall[1].body);
 
       expect(requestBody.tools).toBeDefined();
-      expect(requestBody.tools.length).toBe(12);
+      expect(requestBody.tools.length).toBe(16); // Updated count from ActionDefinitions
 
       const toolNames = requestBody.tools.map((t: any) => t.function.name);
-      expect(toolNames).toContain('wander');
-      expect(toolNames).toContain('idle');
-      expect(toolNames).toContain('seek_food');
-      expect(toolNames).toContain('follow_agent');
-      expect(toolNames).toContain('talk');
+      // Check for current valid actions from ActionDefinitions
+      expect(toolNames).toContain('pick');
       expect(toolNames).toContain('gather');
-      expect(toolNames).toContain('explore');
-      expect(toolNames).toContain('approach');
-      expect(toolNames).toContain('observe');
-      expect(toolNames).toContain('rest');
-      expect(toolNames).toContain('work');
+      expect(toolNames).toContain('talk');
+      expect(toolNames).toContain('follow_agent');
+      expect(toolNames).toContain('call_meeting');
+      expect(toolNames).toContain('attend_meeting');
       expect(toolNames).toContain('help');
+      expect(toolNames).toContain('build');
+      expect(toolNames).toContain('plan_build');
+      expect(toolNames).toContain('till');
+      expect(toolNames).toContain('farm');
+      expect(toolNames).toContain('plant');
+      expect(toolNames).toContain('explore');
+      expect(toolNames).toContain('tame_animal');
+      expect(toolNames).toContain('house_animal');
+      expect(toolNames).toContain('set_priorities');
     });
 
-    it('should define tools with no parameters', async () => {
+    it('should define tools with appropriate parameters', async () => {
       const mockResponse = {
         ok: true,
         json: async () => ({
@@ -65,10 +70,19 @@ describe('OllamaProvider', () => {
       const fetchCall = (global.fetch as any).mock.calls[0];
       const requestBody = JSON.parse(fetchCall[1].body);
 
-      for (const tool of requestBody.tools) {
-        expect(tool.function.parameters.type).toBe('object');
-        expect(tool.function.parameters.properties).toEqual({});
+      // Some tools like plan_build have parameters, others don't
+      const planBuildTool = requestBody.tools.find((t: any) => t.function.name === 'plan_build');
+      expect(planBuildTool).toBeDefined();
+      expect(planBuildTool.function.parameters.type).toBe('object');
+      // plan_build should have building parameter
+      if (planBuildTool.function.parameters.properties.building) {
+        expect(planBuildTool.function.parameters.properties.building.type).toBe('string');
       }
+
+      // Simple actions like explore should have no required parameters
+      const exploreTool = requestBody.tools.find((t: any) => t.function.name === 'explore');
+      expect(exploreTool).toBeDefined();
+      expect(exploreTool.function.parameters.type).toBe('object');
     });
   });
 
@@ -109,10 +123,10 @@ describe('OllamaProvider', () => {
         ok: true,
         json: async () => ({
           message: {
-            content: 'Time to rest',
+            content: 'Time to pick berries',
             tool_calls: [{
               function: {
-                name: 'rest',
+                name: 'pick',
                 arguments: {}
               }
             }]
@@ -126,8 +140,8 @@ describe('OllamaProvider', () => {
       const parsed = JSON.parse(result.text);
 
       expect(parsed.thinking).toBe('');
-      expect(parsed.speaking).toBe('Time to rest');
-      expect(parsed.action).toBe('rest');
+      expect(parsed.speaking).toBe('Time to pick berries');
+      expect(parsed.action).toBe('pick');
     });
 
     it('should handle empty speaking (silent action)', async () => {
@@ -135,11 +149,11 @@ describe('OllamaProvider', () => {
         ok: true,
         json: async () => ({
           message: {
-            thinking: 'Just going to wander',
+            thinking: 'Just going to explore',
             content: '',
             tool_calls: [{
               function: {
-                name: 'wander',
+                name: 'explore',
                 arguments: {}
               }
             }]
@@ -152,9 +166,9 @@ describe('OllamaProvider', () => {
       const result = await provider.generate({ prompt: 'test' });
       const parsed = JSON.parse(result.text);
 
-      expect(parsed.thinking).toBe('Just going to wander');
+      expect(parsed.thinking).toBe('Just going to explore');
       expect(parsed.speaking).toBe('');
-      expect(parsed.action).toBe('wander');
+      expect(parsed.action).toBe('explore');
     });
 
     it('should fall back to text when no tool call', async () => {

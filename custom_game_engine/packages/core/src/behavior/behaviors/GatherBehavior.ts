@@ -18,7 +18,6 @@ import type { AgentComponent } from '../../components/AgentComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import type { InventoryComponent } from '../../components/InventoryComponent.js';
 import type { ResourceComponent } from '../../components/ResourceComponent.js';
-import type { MemoryComponent } from '../../components/MemoryComponent.js';
 import type { NeedsComponent } from '../../components/NeedsComponent.js';
 import type { PlantComponent } from '../../components/PlantComponent.js';
 import type { BuildingType } from '../../components/BuildingComponent.js';
@@ -26,12 +25,14 @@ import type { ResourceCost } from '../../buildings/BuildingBlueprintRegistry.js'
 import type { GatheringStatsComponent } from '../../components/GatheringStatsComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { addToInventoryWithQuality } from '../../components/InventoryComponent.js';
-import { addMemory } from '../../components/MemoryComponent.js';
+import { SpatialMemoryComponent, addSpatialMemory } from '../../components/SpatialMemoryComponent.js';
 import { recordGathered } from '../../components/GatheringStatsComponent.js';
 import { WanderBehavior } from './WanderBehavior.js';
 import { createSeedItemId, calculateGatheringQuality } from '../../items/index.js';
 import type { SkillsComponent } from '../../components/SkillsComponent.js';
 import { addSkillXP } from '../../components/SkillsComponent.js';
+import { ComponentType } from '../../types/ComponentType.js';
+import { isEdibleSpecies } from '../../services/TargetingAPI.js';
 import {
   GATHER_MAX_RANGE,
   HOME_RADIUS,
@@ -46,15 +47,21 @@ import {
   GATHER_SPEED_PER_SKILL_LEVEL,
 } from '../../constants/index.js';
 
+/**
+ * Food types that should be gathered from plants (fruit) rather than resource entities.
+ * These map to plant species that produce edible fruit.
+ */
+const PLANT_FRUIT_TYPES = new Set(['berry', 'berries', 'fruit', 'apple', 'carrot', 'wheat']);
+
 
 /**
  * Get the current game day from the world's time entity.
  */
 function getCurrentDay(world: World): number {
-  const timeEntities = world.query().with('time').executeEntities();
+  const timeEntities = world.query().with(ComponentType.Time).executeEntities();
   if (timeEntities.length > 0) {
     const timeEntity = timeEntities[0] as EntityImpl;
-    const timeComp = timeEntity.getComponent('time') as { day?: number } | undefined;
+    const timeComp = timeEntity.getComponent(ComponentType.Time) as { day?: number } | undefined;
     return timeComp?.day ?? 0;
   }
   return 0;
@@ -106,9 +113,9 @@ export class GatherBehavior extends BaseBehavior {
   readonly name = 'gather' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>('position')!;
-    const inventory = entity.getComponent<InventoryComponent>('inventory');
-    const agent = entity.getComponent<AgentComponent>('agent')!;
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
 
     // Disable steering system so it doesn't override our gather movement
     this.disableSteering(entity);
@@ -152,6 +159,8 @@ export class GatherBehavior extends BaseBehavior {
 
       if (target.type === 'resource') {
         this.handleResourceGathering(entity, target.entity, world, inventory, agent);
+      } else if (target.subtype === 'fruit') {
+        this.gatherFruit(entity, target.entity, world, inventory, targetPos, workSpeedMultiplier);
       } else {
         this.gatherSeeds(entity, target.entity, world, inventory, targetPos, workSpeedMultiplier);
       }
@@ -171,7 +180,7 @@ export class GatherBehavior extends BaseBehavior {
   ): void {
     const state = agent.behaviorState as GatherBehaviorState;
     const resourceImpl = resourceEntity as EntityImpl;
-    const resourceComp = resourceImpl.getComponent<ResourceComponent>('resource')!;
+    const resourceComp = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource)!;
 
     // Check if resource still has at least 1 unit
     if (resourceComp.amount < 1) {
@@ -181,7 +190,7 @@ export class GatherBehavior extends BaseBehavior {
     }
 
     // Get gathering skill level
-    const skillsComp = entity.getComponent<SkillsComponent>('skills');
+    const skillsComp = entity.getComponent<SkillsComponent>(ComponentType.Skills);
     const gatheringLevel = skillsComp?.levels.gathering ?? 0;
 
     // Check if we're already gathering this resource
@@ -202,7 +211,7 @@ export class GatherBehavior extends BaseBehavior {
       const gatherDifficulty = resourceComp.gatherDifficulty ?? 1.0;
       const durationTicks = calculateGatherDuration(gatheringLevel, gatherDifficulty);
 
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         behaviorState: {
           ...current.behaviorState,
@@ -218,7 +227,7 @@ export class GatherBehavior extends BaseBehavior {
    * Clear the gather progress state.
    */
   private clearGatherState(entity: EntityImpl): void {
-    entity.updateComponent<AgentComponent>('agent', (current) => {
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => {
       const state = { ...current.behaviorState } as GatherBehaviorState;
       delete state.gatherTargetId;
       delete state.gatherStartTick;
@@ -242,9 +251,8 @@ export class GatherBehavior extends BaseBehavior {
     gatheringLevel: number
   ): void {
     const resourceImpl = resourceEntity as EntityImpl;
-    const resourceComp = resourceImpl.getComponent<ResourceComponent>('resource')!;
-    const resourcePos = resourceImpl.getComponent<PositionComponent>('position');
-    const memory = entity.getComponent<MemoryComponent>('memory');
+    const resourceComp = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource)!;
+    const resourcePos = resourceImpl.getComponent<PositionComponent>(ComponentType.Position);
 
     // Double-check resource still has at least 1 unit
     if (resourceComp.amount < 1) {
@@ -266,23 +274,23 @@ export class GatherBehavior extends BaseBehavior {
     // Add to inventory WITH QUALITY
     try {
       const result = addToInventoryWithQuality(inventory, resourceComp.resourceType, harvestAmount, gatherQuality);
-      entity.updateComponent<InventoryComponent>('inventory', () => result.inventory);
+      entity.updateComponent<InventoryComponent>(ComponentType.Inventory, () => result.inventory);
 
       // Record gathering stats
-      const gatheringStats = entity.getComponent<GatheringStatsComponent>('gathering_stats');
+      const gatheringStats = entity.getComponent<GatheringStatsComponent>(ComponentType.GatheringStats);
       if (gatheringStats) {
         const currentDay = getCurrentDay(world);
         recordGathered(gatheringStats, resourceComp.resourceType, result.amountAdded, currentDay);
-        entity.updateComponent<GatheringStatsComponent>('gathering_stats', () => gatheringStats);
+        entity.updateComponent<GatheringStatsComponent>(ComponentType.GatheringStats, () => gatheringStats);
       }
 
       // Award gathering XP (5 base XP per resource gathered)
-      const skillsComp = entity.getComponent<SkillsComponent>('skills');
+      const skillsComp = entity.getComponent<SkillsComponent>(ComponentType.Skills);
       if (skillsComp) {
         const baseXP = 5 * result.amountAdded;
         const oldLevel = skillsComp.levels.gathering;
         const xpResult = addSkillXP(skillsComp, 'gathering', baseXP);
-        entity.updateComponent<SkillsComponent>('skills', () => xpResult.component);
+        entity.updateComponent<SkillsComponent>(ComponentType.Skills, () => xpResult.component);
 
         // Emit skill XP event for metrics tracking
         world.eventBus.emit({
@@ -337,9 +345,11 @@ export class GatherBehavior extends BaseBehavior {
       }
 
       // Reinforce memory of this resource location
-      if (memory && resourcePos) {
-        const updatedMemory = addMemory(
-          memory,
+      // Update spatial memory with resource location
+      const spatialMemory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
+      if (spatialMemory && resourcePos) {
+        addSpatialMemory(
+          spatialMemory,
           {
             type: 'resource_location',
             x: resourcePos.x,
@@ -350,7 +360,6 @@ export class GatherBehavior extends BaseBehavior {
           world.tick,
           100
         );
-        entity.updateComponent<MemoryComponent>('memory', () => updatedMemory);
       }
 
       // Check if resource depleted
@@ -376,30 +385,46 @@ export class GatherBehavior extends BaseBehavior {
     position: PositionComponent,
     preferredType: string | undefined,
     _inventory: InventoryComponent
-  ): { type: 'resource' | 'plant'; entity: Entity; position: { x: number; y: number }; distance: number } | null {
+  ): { type: 'resource' | 'plant'; subtype?: 'fruit' | 'seeds'; entity: Entity; position: { x: number; y: number }; distance: number } | null {
     const isSeekingSeeds = preferredType === 'seeds';
+    const isSeekingPlantFruit = preferredType && PLANT_FRUIT_TYPES.has(preferredType.toLowerCase());
 
-    // If explicitly seeking seeds, only look for plants
+    // If explicitly seeking seeds, only look for plants with seeds
     if (isSeekingSeeds) {
       const plantTarget = this.findNearestPlantWithSeeds(world, position);
       if (plantTarget) {
-        return { type: 'plant', entity: plantTarget.entity, position: plantTarget.position, distance: plantTarget.distance };
+        return { type: 'plant', subtype: 'seeds', entity: plantTarget.entity, position: plantTarget.position, distance: plantTarget.distance };
       }
       return null;
     }
 
-    // Otherwise, look for the specified resource type
+    // If seeking fruit/berries, look for plants with fruit
+    if (isSeekingPlantFruit) {
+      const plantTarget = this.findNearestPlantWithFruit(world, position);
+      if (plantTarget) {
+        return { type: 'plant', subtype: 'fruit', entity: plantTarget.entity, position: plantTarget.position, distance: plantTarget.distance };
+      }
+      // Don't return null yet - also check resources as fallback
+    }
+
+    // Look for the specified resource type
     const resourceTarget = this.findNearestResource(world, position, preferredType);
 
     if (resourceTarget) {
       return { type: 'resource', entity: resourceTarget.entity, position: resourceTarget.position, distance: resourceTarget.distance };
     }
 
-    // Fallback: if no resources found and no specific type requested, try seeds
+    // Fallback: if no resources found and no specific type requested, try plants
     if (!preferredType) {
-      const plantTarget = this.findNearestPlantWithSeeds(world, position);
-      if (plantTarget) {
-        return { type: 'plant', entity: plantTarget.entity, position: plantTarget.position, distance: plantTarget.distance };
+      // Try plants with fruit first (for food)
+      const fruitTarget = this.findNearestPlantWithFruit(world, position);
+      if (fruitTarget) {
+        return { type: 'plant', subtype: 'fruit', entity: fruitTarget.entity, position: fruitTarget.position, distance: fruitTarget.distance };
+      }
+      // Then try plants with seeds
+      const seedTarget = this.findNearestPlantWithSeeds(world, position);
+      if (seedTarget) {
+        return { type: 'plant', subtype: 'seeds', entity: seedTarget.entity, position: seedTarget.position, distance: seedTarget.distance };
       }
     }
 
@@ -413,8 +438,8 @@ export class GatherBehavior extends BaseBehavior {
   ): { entity: Entity; position: { x: number; y: number }; distance: number } | null {
     const resources = world
       .query()
-      .with('resource')
-      .with('position')
+      .with(ComponentType.Resource)
+      .with(ComponentType.Position)
       .executeEntities();
 
     let bestScore = Infinity;
@@ -424,8 +449,8 @@ export class GatherBehavior extends BaseBehavior {
 
     for (const resource of resources) {
       const resourceImpl = resource as EntityImpl;
-      const resourceComp = resourceImpl.getComponent<ResourceComponent>('resource')!;
-      const resourcePos = resourceImpl.getComponent<PositionComponent>('position')!;
+      const resourceComp = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource)!;
+      const resourcePos = resourceImpl.getComponent<PositionComponent>(ComponentType.Position)!;
 
       // Skip non-harvestable resources
       if (!resourceComp.harvestable) continue;
@@ -461,24 +486,87 @@ export class GatherBehavior extends BaseBehavior {
     return bestResource ? { entity: bestResource, position: bestPosition!, distance: bestDistance } : null;
   }
 
+  /**
+   * Find the nearest plant with harvestable fruit.
+   * Uses home-biased scoring and distance limits like resource gathering.
+   */
+  private findNearestPlantWithFruit(
+    world: World,
+    position: PositionComponent
+  ): { entity: Entity; position: { x: number; y: number }; distance: number } | null {
+    const plants = world
+      .query()
+      .with(ComponentType.Plant)
+      .with(ComponentType.Position)
+      .executeEntities();
+
+    let bestScore = Infinity;
+    let bestPlant: Entity | null = null;
+    let bestPos: { x: number; y: number } | null = null;
+    let bestDistance = Infinity;
+
+    for (const plant of plants) {
+      const plantImpl = plant as EntityImpl;
+      const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+      const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+
+      if (!plantComp) continue;
+
+      // Check if plant has harvestable fruit and is edible species
+      const hasFruit = (plantComp.fruitCount ?? 0) > 0;
+      const isEdible = isEdibleSpecies(plantComp.speciesId);
+
+      if (hasFruit && isEdible) {
+        const distanceToAgent = this.distance(position, plantPos);
+
+        // Only consider plants within max gather range
+        if (distanceToAgent > GATHER_MAX_RANGE) continue;
+
+        // Distance from plant to home (0, 0)
+        const distanceToHome = Math.sqrt(plantPos.x * plantPos.x + plantPos.y * plantPos.y);
+
+        // Scoring: prefer plants near home AND near agent (same as resources)
+        let score = distanceToAgent;
+        if (distanceToHome > HOME_RADIUS) {
+          // Penalize plants far from home (add 2x the excess distance)
+          score += (distanceToHome - HOME_RADIUS) * 2.0;
+        }
+
+        if (score < bestScore) {
+          bestScore = score;
+          bestPlant = plant;
+          bestPos = { x: plantPos.x, y: plantPos.y };
+          bestDistance = distanceToAgent;
+        }
+      }
+    }
+
+    return bestPlant ? { entity: bestPlant, position: bestPos!, distance: bestDistance } : null;
+  }
+
+  /**
+   * Find the nearest plant with seeds available.
+   * Uses home-biased scoring and distance limits like resource gathering.
+   */
   private findNearestPlantWithSeeds(
     world: World,
     position: PositionComponent
   ): { entity: Entity; position: { x: number; y: number }; distance: number } | null {
     const plants = world
       .query()
-      .with('plant')
-      .with('position')
+      .with(ComponentType.Plant)
+      .with(ComponentType.Position)
       .executeEntities();
 
-    let nearestPlant: Entity | null = null;
-    let nearestPos: { x: number; y: number } | null = null;
-    let nearestDistance = Infinity;
+    let bestScore = Infinity;
+    let bestPlant: Entity | null = null;
+    let bestPos: { x: number; y: number } | null = null;
+    let bestDistance = Infinity;
 
     for (const plant of plants) {
       const plantImpl = plant as EntityImpl;
-      const plantComp = plantImpl.getComponent<PlantComponent>('plant');
-      const plantPos = plantImpl.getComponent<PositionComponent>('position')!;
+      const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+      const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position)!;
 
       if (!plantComp) continue;
 
@@ -488,21 +576,35 @@ export class GatherBehavior extends BaseBehavior {
       const isValidStage = validStages.includes(plantComp.stage);
 
       if (hasSeeds && isValidStage) {
-        const distance = this.distance(position, plantPos);
+        const distanceToAgent = this.distance(position, plantPos);
 
-        if (distance < nearestDistance) {
-          nearestDistance = distance;
-          nearestPlant = plant;
-          nearestPos = { x: plantPos.x, y: plantPos.y };
+        // Only consider plants within max gather range
+        if (distanceToAgent > GATHER_MAX_RANGE) continue;
+
+        // Distance from plant to home (0, 0)
+        const distanceToHome = Math.sqrt(plantPos.x * plantPos.x + plantPos.y * plantPos.y);
+
+        // Scoring: prefer plants near home AND near agent (same as resources)
+        let score = distanceToAgent;
+        if (distanceToHome > HOME_RADIUS) {
+          // Penalize plants far from home (add 2x the excess distance)
+          score += (distanceToHome - HOME_RADIUS) * 2.0;
+        }
+
+        if (score < bestScore) {
+          bestScore = score;
+          bestPlant = plant;
+          bestPos = { x: plantPos.x, y: plantPos.y };
+          bestDistance = distanceToAgent;
         }
       }
     }
 
-    return nearestPlant ? { entity: nearestPlant, position: nearestPos!, distance: nearestDistance } : null;
+    return bestPlant ? { entity: bestPlant, position: bestPos!, distance: bestDistance } : null;
   }
 
   private calculateWorkSpeed(entity: EntityImpl): number {
-    const needs = entity.getComponent<NeedsComponent>('needs');
+    const needs = entity.getComponent<NeedsComponent>(ComponentType.Needs);
 
     if (!needs) {
       return 1.0; // No needs = full speed
@@ -539,7 +641,7 @@ export class GatherBehavior extends BaseBehavior {
     workSpeedMultiplier: number
   ): void {
     const plantImpl = plantEntity as EntityImpl;
-    const plantComp = plantImpl.getComponent<PlantComponent>('plant');
+    const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
 
     if (!plantComp) {
       return;
@@ -572,7 +674,7 @@ export class GatherBehavior extends BaseBehavior {
     const seedItemId = createSeedItemId(plantComp.speciesId);
 
     // Calculate seed quality based on farming skill and plant health
-    const skillsComp = entity.getComponent<SkillsComponent>('skills');
+    const skillsComp = entity.getComponent<SkillsComponent>(ComponentType.Skills);
     const farmingLevel = skillsComp?.levels.farming ?? 0;
     // Seeds get quality based on plant health and farming skill
     // Formula: base 50 + (skill * 8) + (health / 10) - gives range ~50-100
@@ -582,19 +684,19 @@ export class GatherBehavior extends BaseBehavior {
 
     try {
       const result = addToInventoryWithQuality(inventory, seedItemId, seedsToGather, Math.round(seedQuality));
-      entity.updateComponent<InventoryComponent>('inventory', () => result.inventory);
+      entity.updateComponent<InventoryComponent>(ComponentType.Inventory, () => result.inventory);
 
       // Record gathering stats for seeds
-      const gatheringStats = entity.getComponent<GatheringStatsComponent>('gathering_stats');
+      const gatheringStats = entity.getComponent<GatheringStatsComponent>(ComponentType.GatheringStats);
       if (gatheringStats) {
         const currentDay = getCurrentDay(world);
         recordGathered(gatheringStats, seedItemId, result.amountAdded, currentDay);
-        entity.updateComponent<GatheringStatsComponent>('gathering_stats', () => gatheringStats);
+        entity.updateComponent<GatheringStatsComponent>(ComponentType.GatheringStats, () => gatheringStats);
       }
 
 
       // Update plant - reduce seedsProduced
-      plantImpl.updateComponent<PlantComponent>('plant', (current) => {
+      plantImpl.updateComponent<PlantComponent>(ComponentType.Plant, (current) => {
         const updated = Object.create(Object.getPrototypeOf(current));
         Object.assign(updated, current);
         updated.seedsProduced = Math.max(0, current.seedsProduced - result.amountAdded);
@@ -617,12 +719,128 @@ export class GatherBehavior extends BaseBehavior {
 
       // Check if inventory is now full
       if (result.inventory.currentWeight >= result.inventory.maxWeight) {
-        const agent = entity.getComponent<AgentComponent>('agent')!;
+        const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
         this.handleInventoryFull(entity, world, agent);
       }
     } catch (error) {
       // Inventory full
-      const agent = entity.getComponent<AgentComponent>('agent')!;
+      const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
+      this.handleInventoryFull(entity, world, agent);
+    }
+  }
+
+  /**
+   * Gather fruit from a plant (e.g., berries from berry bushes).
+   * Adds the fruit to inventory and reduces plant's fruitCount.
+   */
+  private gatherFruit(
+    entity: EntityImpl,
+    plantEntity: Entity,
+    world: World,
+    inventory: InventoryComponent,
+    targetPos: { x: number; y: number },
+    workSpeedMultiplier: number
+  ): void {
+    const plantImpl = plantEntity as EntityImpl;
+    const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+
+    if (!plantComp) {
+      return;
+    }
+
+    // Check if plant has fruit
+    const fruitCount = plantComp.fruitCount ?? 0;
+    if (fruitCount < 1) {
+      return;
+    }
+
+    // Calculate fruit yield based on work speed
+    // Gather 1-3 fruit per action based on work speed
+    const baseYield = Math.max(1, Math.floor(2 * workSpeedMultiplier));
+    const fruitToGather = Math.min(baseYield, fruitCount);
+
+    if (fruitToGather < 1) {
+      return;
+    }
+
+    // Determine the food item ID based on species
+    // berry-bush -> berry, wheat -> wheat, etc.
+    const speciesId = plantComp.speciesId;
+    let foodItemId = speciesId;
+    if (speciesId === 'berry-bush' || speciesId === 'berry_bush') {
+      foodItemId = 'berry';
+    } else if (speciesId.endsWith('-bush') || speciesId.endsWith('_bush')) {
+      foodItemId = speciesId.replace(/-bush$/, '').replace(/_bush$/, '');
+    }
+
+    // Calculate fruit quality based on gathering skill and plant health
+    const skillsComp = entity.getComponent<SkillsComponent>(ComponentType.Skills);
+    const gatheringLevel = skillsComp?.levels.gathering ?? 0;
+    // Fruit quality: base 50 + (skill * 5) + (health / 5) - gives range ~50-100
+    const fruitQuality = Math.min(100, Math.max(0,
+      50 + (gatheringLevel * 5) + (plantComp.health / 5) + (Math.random() - 0.5) * 10
+    ));
+
+    try {
+      const result = addToInventoryWithQuality(inventory, foodItemId, fruitToGather, Math.round(fruitQuality));
+      entity.updateComponent<InventoryComponent>(ComponentType.Inventory, () => result.inventory);
+
+      // Record gathering stats for fruit
+      const gatheringStats = entity.getComponent<GatheringStatsComponent>(ComponentType.GatheringStats);
+      if (gatheringStats) {
+        const currentDay = getCurrentDay(world);
+        recordGathered(gatheringStats, foodItemId, result.amountAdded, currentDay);
+        entity.updateComponent<GatheringStatsComponent>(ComponentType.GatheringStats, () => gatheringStats);
+      }
+
+      // Award gathering XP
+      if (skillsComp) {
+        const baseXP = 3 * result.amountAdded; // 3 XP per fruit gathered
+        const xpResult = addSkillXP(skillsComp, 'gathering', baseXP);
+        entity.updateComponent<SkillsComponent>(ComponentType.Skills, () => xpResult.component);
+
+        // Emit skill XP event for metrics tracking
+        world.eventBus.emit({
+          type: 'skill:xp_gain',
+          source: entity.id,
+          data: {
+            agentId: entity.id,
+            skillId: 'gathering',
+            amount: baseXP,
+            source: 'fruit_gathering',
+          },
+        });
+      }
+
+      // Update plant - reduce fruitCount
+      plantImpl.updateComponent<PlantComponent>(ComponentType.Plant, (current) => {
+        const updated = Object.create(Object.getPrototypeOf(current));
+        Object.assign(updated, current);
+        updated.fruitCount = Math.max(0, (current.fruitCount ?? 0) - result.amountAdded);
+        return updated;
+      });
+
+      // Emit fruit:gathered event
+      world.eventBus.emit({
+        type: 'resource:gathered',
+        source: entity.id,
+        data: {
+          agentId: entity.id,
+          resourceType: foodItemId,
+          amount: result.amountAdded,
+          position: targetPos,
+          sourceEntityId: plantEntity.id,
+        },
+      });
+
+      // Check if inventory is now full
+      if (result.inventory.currentWeight >= result.inventory.maxWeight) {
+        const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
+        this.handleInventoryFull(entity, world, agent);
+      }
+    } catch (error) {
+      // Inventory full
+      const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
       this.handleInventoryFull(entity, world, agent);
     }
   }
@@ -638,7 +856,7 @@ export class GatherBehavior extends BaseBehavior {
     });
 
     // Switch to deposit_items behavior, saving previous behavior to return to
-    entity.updateComponent<AgentComponent>('agent', (current) => ({
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
       behavior: 'deposit_items',
       behaviorState: {
@@ -678,7 +896,7 @@ export class GatherBehavior extends BaseBehavior {
       });
 
       // Switch to build
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         behavior: 'build',
         behaviorState: { buildingType },
@@ -687,7 +905,7 @@ export class GatherBehavior extends BaseBehavior {
       // Still missing something, keep gathering
       const nextMissing = stillMissing[0]!;
 
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         behavior: 'gather',
         behaviorState: {

@@ -23,23 +23,23 @@ describe('ResponseParser', () => {
 
     it('should handle response with no speaking', () => {
       const response = JSON.stringify({
-        thinking: 'Just going to wander',
+        thinking: 'Just going to explore',
         speaking: '',
-        action: 'wander'
+        action: 'explore'
       });
 
       const result = parser.parseResponse(response);
 
       expect(result.speaking).toBe('');
-      expect(result.action).toBe('wander');
+      expect(result.action).toBe('explore');
     });
 
     it('should parse all core valid actions', () => {
-      // These are actual valid behaviors (not synonyms)
+      // These are actual valid behaviors from ActionDefinitions
       const actions = [
-        'wander', 'idle', 'follow_agent', 'talk', 'pick',
-        'explore', 'approach', 'observe', 'rest', 'work', 'help',
-        'build', 'deposit_items', 'till', 'farm', 'plant'
+        'pick', 'gather', 'talk', 'follow_agent', 'call_meeting', 'attend_meeting', 'help',
+        'build', 'plan_build', 'till', 'farm', 'plant', 'explore',
+        'tame_animal', 'house_animal', 'set_priorities'
       ];
 
       for (const action of actions) {
@@ -82,8 +82,8 @@ describe('ResponseParser', () => {
 
       const result = parser.parseResponse(response);
 
-      // seek_food is a synonym that maps to 'pick'
-      expect(result.action).toBe('pick');
+      // seek_food is a synonym that maps to 'gather'
+      expect(result.action).toBe('gather');
     });
 
     it('should throw on empty response', () => {
@@ -113,21 +113,21 @@ describe('ResponseParser', () => {
     });
 
     it('should work with text response', () => {
-      const response = 'I should idle and rest';
+      const response = 'I should explore and pick berries';
 
       const behavior = parser.parseBehavior(response);
 
-      expect(behavior).toBe('idle');
+      expect(behavior).toBe('explore');
     });
   });
 
   describe('isValidBehavior', () => {
     it('should validate core behaviors', () => {
-      // These are actual valid behaviors (not synonyms)
+      // These are actual valid behaviors from ActionDefinitions (not synonyms)
       const validBehaviors = [
-        'wander', 'idle', 'follow_agent', 'talk', 'pick',
-        'explore', 'approach', 'observe', 'rest', 'work', 'help',
-        'build', 'deposit_items', 'till', 'farm', 'plant'
+        'pick', 'gather', 'talk', 'follow_agent', 'call_meeting', 'attend_meeting', 'help',
+        'build', 'plan_build', 'till', 'farm', 'plant', 'explore',
+        'tame_animal', 'house_animal', 'set_priorities'
       ];
 
       for (const behavior of validBehaviors) {
@@ -144,8 +144,10 @@ describe('ResponseParser', () => {
     it('should reject synonyms (they are not valid behaviors)', () => {
       // Synonyms map to valid behaviors but are not themselves valid
       expect(parser.isValidBehavior('seek_food')).toBe(false);
-      expect(parser.isValidBehavior('gather')).toBe(false);
       expect(parser.isValidBehavior('harvest')).toBe(false);
+      expect(parser.isValidBehavior('stockpile')).toBe(false);
+      expect(parser.isValidBehavior('wander')).toBe(false); // autonomic, not a valid LLM action
+      expect(parser.isValidBehavior('rest')).toBe(false); // autonomic, not a valid LLM action
     });
   });
 
@@ -181,12 +183,12 @@ describe('ResponseParser', () => {
       const response = JSON.stringify({
         thinking: 'Need wood',
         speaking: '',
-        action: { type: 'gather', target: 'wood' }
+        action: { type: 'harvest', target: 'wood' }
       });
 
       const result = parser.parseResponse(response);
 
-      expect(result.action).toBe('pick');  // gather maps to pick
+      expect(result.action).toBe('gather');  // harvest is a synonym for gather
       expect(result.actionParams).toEqual({ target: 'wood' });
     });
 
@@ -203,41 +205,41 @@ describe('ResponseParser', () => {
 
     it('should return no actionParams for simple string action', () => {
       const response = JSON.stringify({
-        thinking: 'Just wandering',
+        thinking: 'Just exploring',
         speaking: '',
-        action: 'wander'
+        action: 'explore'
       });
 
       const result = parser.parseResponse(response);
 
-      expect(result.action).toBe('wander');
+      expect(result.action).toBe('explore');
       expect(result.actionParams).toBeUndefined();
     });
   });
 
   describe('Synonym mapping', () => {
-    it('should map seek_food to pick', () => {
+    it('should map seek_food to gather', () => {
       const response = 'I will seek_food in the forest';
       const result = parser.parseResponse(response);
-      expect(result.action).toBe('pick');
+      expect(result.action).toBe('gather');
     });
 
-    it('should map gather to pick', () => {
+    it('should find gather as valid action', () => {
       const response = 'Time to gather resources';
       const result = parser.parseResponse(response);
-      expect(result.action).toBe('pick');
+      expect(result.action).toBe('gather'); // gather is a valid behavior, not a synonym
     });
 
-    it('should map harvest to pick', () => {
+    it('should map harvest to gather', () => {
       const response = 'I should harvest the crops';
       const result = parser.parseResponse(response);
-      expect(result.action).toBe('pick');
+      expect(result.action).toBe('gather');
     });
 
-    it('should map sleep to rest', () => {
-      const response = 'I need to sleep now';
+    it('should map stockpile to gather', () => {
+      const response = 'I need to stockpile food';
       const result = parser.parseResponse(response);
-      expect(result.action).toBe('rest');
+      expect(result.action).toBe('gather');
     });
 
     it('should map construct to build', () => {

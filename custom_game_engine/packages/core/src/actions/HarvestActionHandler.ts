@@ -12,8 +12,8 @@ import { calculateHarvestQuality } from '../items/ItemQuality.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { GameEvent } from '../events/GameEvent.js';
 import type { GameEventMap } from '../events/EventMap.js';
-import {
-  HARVEST_DURATION_BASE,
+import { ComponentType } from '../types/ComponentType.js';
+import {  HARVEST_DURATION_BASE,
   BASE_SEED_YIELD_HARVEST,
   BASE_FRUIT_YIELD,
   SKILL_LEVEL_HARVEST_THRESHOLD,
@@ -63,7 +63,7 @@ export class HarvestActionHandler implements ActionHandler {
     // Apply skill efficiency bonus
     const actor = world.getEntity(action.actorId);
     if (actor) {
-      const skillsComp = actor.components.get('skills') as SkillsComponent | undefined;
+      const skillsComp = actor.components.get(ComponentType.Skills) as SkillsComponent | undefined;
       if (skillsComp) {
         const farmingLevel = skillsComp.levels.farming;
         const skillBonus = getEfficiencyBonus(farmingLevel); // 0-25%
@@ -106,7 +106,7 @@ export class HarvestActionHandler implements ActionHandler {
     }
 
     // Check actor has position
-    const actorPos = actor.components.get('position') as PositionComponent | undefined;
+    const actorPos = actor.components.get(ComponentType.Position) as PositionComponent | undefined;
     if (!actorPos) {
       return {
         valid: false,
@@ -115,7 +115,7 @@ export class HarvestActionHandler implements ActionHandler {
     }
 
     // Check actor has inventory
-    const inventory = actor.components.get('inventory') as InventoryComponent | undefined;
+    const inventory = actor.components.get(ComponentType.Inventory) as InventoryComponent | undefined;
     if (!inventory) {
       return {
         valid: false,
@@ -133,7 +133,7 @@ export class HarvestActionHandler implements ActionHandler {
     }
 
     // Check plant has PlantComponent
-    const plant = plantEntity.components.get('plant') as PlantComponent | undefined;
+    const plant = plantEntity.components.get(ComponentType.Plant) as PlantComponent | undefined;
     if (!plant) {
       return {
         valid: false,
@@ -151,7 +151,7 @@ export class HarvestActionHandler implements ActionHandler {
     }
 
     // Check plant has position
-    const plantPos = plantEntity.components.get('position') as PositionComponent | undefined;
+    const plantPos = plantEntity.components.get(ComponentType.Position) as PositionComponent | undefined;
     if (!plantPos) {
       return {
         valid: false,
@@ -223,9 +223,9 @@ export class HarvestActionHandler implements ActionHandler {
     }
 
     // Get components
-    const plant = plantEntity.components.get('plant') as PlantComponent;
-    const inventory = actor.components.get('inventory') as InventoryComponent;
-    const plantPos = plantEntity.components.get('position') as PositionComponent;
+    const plant = plantEntity.components.get(ComponentType.Plant) as PlantComponent;
+    const inventory = actor.components.get(ComponentType.Inventory) as InventoryComponent;
+    const plantPos = plantEntity.components.get(ComponentType.Position) as PositionComponent;
 
     if (!plant) {
       return {
@@ -246,7 +246,7 @@ export class HarvestActionHandler implements ActionHandler {
     }
 
     // Get agent farming skill from skills component
-    const skillsComp = actor.components.get('skills') as SkillsComponent | undefined;
+    const skillsComp = actor.components.get(ComponentType.Skills) as SkillsComponent | undefined;
     const farmingLevel = skillsComp?.levels.farming ?? 0;
     // Convert skill level (0-5) to skill percentage (0-100)
     const farmingSkill = (farmingLevel / SKILL_LEVEL_HARVEST_THRESHOLD) * 100;
@@ -290,10 +290,10 @@ export class HarvestActionHandler implements ActionHandler {
           harvestQuality
         );
         fruitsAdded = fruitsAddedCount;
-        (actor as EntityImpl).updateComponent<InventoryComponent>('inventory', () => inventoryAfterFruit);
+        (actor as EntityImpl).updateComponent<InventoryComponent>(ComponentType.Inventory, () => inventoryAfterFruit);
 
         // Update inventory reference for seed addition
-        const currentInventory = actor.components.get('inventory') as InventoryComponent;
+        const currentInventory = actor.components.get(ComponentType.Inventory) as InventoryComponent;
 
         // Add seeds to inventory (seeds don't have quality - use regular addToInventory)
         if (seedYield > 0) {
@@ -303,7 +303,7 @@ export class HarvestActionHandler implements ActionHandler {
             seedYield
           );
           seedsAdded = seedsAddedCount;
-          (actor as EntityImpl).updateComponent<InventoryComponent>('inventory', () => inventoryAfterSeeds);
+          (actor as EntityImpl).updateComponent<InventoryComponent>(ComponentType.Inventory, () => inventoryAfterSeeds);
         }
       } else {
         // No fruit, just add seeds
@@ -314,7 +314,7 @@ export class HarvestActionHandler implements ActionHandler {
             seedYield
           );
           seedsAdded = seedsAddedCount;
-          (actor as EntityImpl).updateComponent<InventoryComponent>('inventory', () => inventoryAfterSeeds);
+          (actor as EntityImpl).updateComponent<InventoryComponent>(ComponentType.Inventory, () => inventoryAfterSeeds);
         }
       }
 
@@ -363,7 +363,7 @@ export class HarvestActionHandler implements ActionHandler {
         (world as WorldMutator).destroyEntity(action.targetId, 'harvested');
       } else {
         // Non-destructive harvest (berry bushes, fruit trees) - reset plant to regrow
-        (plantEntity as EntityImpl).updateComponent<PlantComponent>('plant', (p) => {
+        (plantEntity as EntityImpl).updateComponent<PlantComponent>(ComponentType.Plant, (p) => {
           p.stage = plant.harvestResetStage;
           p.stageProgress = 0;
           p.fruitCount = 0;  // Reset fruit count, will regrow

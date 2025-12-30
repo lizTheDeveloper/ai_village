@@ -5,6 +5,7 @@ import type { Tile, TerrainType, BiomeType } from '../chunks/Tile.js';
 import { PerlinNoise } from './PerlinNoise.js';
 import { createTree } from '../entities/TreeEntity.js';
 import { createRock } from '../entities/RockEntity.js';
+import { createMountain } from '../entities/MountainEntity.js';
 import { createLeafPile } from '../entities/LeafPileEntity.js';
 import { createFiberPlant } from '../entities/FiberPlantEntity.js';
 import {
@@ -13,7 +14,7 @@ import {
   createCopperDeposit,
   createGoldDeposit,
 } from '../entities/OreDepositEntity.js';
-import { WildAnimalSpawningSystem } from '@ai-village/core';
+import { WildAnimalSpawningSystem, getMapKnowledge, SECTOR_SIZE } from '@ai-village/core';
 
 /**
  * Generates terrain using Perlin noise.
@@ -57,6 +58,9 @@ export class TerrainGenerator {
       }
     }
 
+    // Update MapKnowledge sector terrain data for pathfinding
+    this.updateSectorTerrainData(chunk);
+
     // Place entities (trees, rocks)
     if (world) {
       this.placeEntities(chunk, world);
@@ -75,6 +79,49 @@ export class TerrainGenerator {
   }
 
   /**
+   * Update MapKnowledge sector terrain data from chunk tiles.
+   * Sectors may span multiple chunks, so we collect tiles per sector.
+   */
+  private updateSectorTerrainData(chunk: Chunk): void {
+    const mapKnowledge = getMapKnowledge();
+
+    // Group tiles by sector
+    const sectorTiles = new Map<string, Array<{ elevation: number; terrain: string }>>();
+
+    for (let localY = 0; localY < CHUNK_SIZE; localY++) {
+      for (let localX = 0; localX < CHUNK_SIZE; localX++) {
+        const worldX = chunk.x * CHUNK_SIZE + localX;
+        const worldY = chunk.y * CHUNK_SIZE + localY;
+        const tile = chunk.tiles[localY * CHUNK_SIZE + localX];
+
+        if (!tile) continue;
+
+        // Calculate sector coordinates
+        const sectorX = Math.floor(worldX / SECTOR_SIZE);
+        const sectorY = Math.floor(worldY / SECTOR_SIZE);
+        const key = `${sectorX},${sectorY}`;
+
+        if (!sectorTiles.has(key)) {
+          sectorTiles.set(key, []);
+        }
+
+        sectorTiles.get(key)!.push({
+          elevation: tile.elevation,
+          terrain: tile.terrain,
+        });
+      }
+    }
+
+    // Update each sector
+    for (const [key, tiles] of sectorTiles) {
+      const parts = key.split(',') as [string, string];
+      const sectorX = parseInt(parts[0], 10);
+      const sectorY = parseInt(parts[1], 10);
+      mapKnowledge.updateSectorTerrain(sectorX, sectorY, tiles);
+    }
+  }
+
+  /**
    * Place trees and rocks in a chunk.
    */
   private placeEntities(chunk: Chunk, world: WorldMutator): void {
@@ -88,6 +135,9 @@ export class TerrainGenerator {
         const tile = chunk.tiles[localY * CHUNK_SIZE + localX];
         if (!tile) continue;
 
+        // Skip water tiles - no land entities in water
+        if (tile.terrain === 'water') continue;
+
         // Get placement value
         const placementValue = placementNoise.noise(worldX * 0.1, worldY * 0.1);
 
@@ -95,12 +145,16 @@ export class TerrainGenerator {
         if (tile.terrain === 'forest' && placementValue > 0.3) {
           if (Math.random() > 0.4) {
             // 60% chance (increased from 30% for better resource availability)
-            createTree(world, worldX, worldY);
+            // Random tree height: 1-4 tiles (taller in forests)
+            const treeHeight = 1 + Math.floor(Math.random() * 4);
+            createTree(world, worldX, worldY, treeHeight);
           }
         } else if (tile.terrain === 'grass' && placementValue > 0.4) {
           if (Math.random() > 0.85) {
             // 15% chance (increased from 5% for better resource availability)
-            createTree(world, worldX, worldY);
+            // Shorter trees on grass: 0-2 tiles
+            const treeHeight = Math.floor(Math.random() * 3);
+            createTree(world, worldX, worldY, treeHeight);
           }
         }
 
@@ -109,6 +163,16 @@ export class TerrainGenerator {
           if (Math.random() > 0.5) {
             // 50% chance (increased from 20% for better resource availability)
             createRock(world, worldX, worldY);
+          }
+        }
+
+        // Place mountains in mountain biome
+        if (tile.biome === 'mountains' && placementValue > 0.3) {
+          if (Math.random() > 0.85) {
+            // 15% chance for mountain peaks
+            // Height based on noise value - higher placement value = taller peak
+            const mountainHeight = 3 + Math.floor((placementValue - 0.3) * 15);
+            createMountain(world, worldX, worldY, mountainHeight);
           }
         }
 
@@ -166,14 +230,79 @@ export class TerrainGenerator {
   }
 
   /**
+   * Ridged noise - creates sharp mountain ridges and cliffs.
+   * Based on technique from Red Blob Games and Minecraft terrain generation.
+   * Uses absolute value to create sharp peaks instead of smooth hills.
+   */
+  private ridgedNoise(x: number, y: number): number {
+    // Use 4 octaves for detailed ridges
+    let value = 0;
+    let amplitude = 1;
+    let frequency = 1;
+    const persistence = 0.5;
+    const lacunarity = 2;
+
+    for (let i = 0; i < 4; i++) {
+      // Get noise value and apply ridge transformation
+      const noise = this.elevationNoise.noise(x * frequency, y * frequency);
+      // Ridge: 2 * (0.5 - abs(0.5 - noise)) creates sharp peaks
+      const ridge = 2 * (0.5 - Math.abs(0.5 - noise));
+      value += ridge * amplitude;
+
+      amplitude *= persistence;
+      frequency *= lacunarity;
+    }
+
+    // Normalize to -1 to 1 range
+    return (value / 2) - 0.5;
+  }
+
+  /**
    * Generate a single tile at world coordinates.
    */
   private generateTile(worldX: number, worldY: number): Tile {
     // Scale for noise (smaller = more zoomed out)
-    const scale = 0.02;
+    const scale = 0.015; // Slightly larger features
 
-    // Get noise values
-    const elevation = this.elevationNoise.octaveNoise(worldX * scale, worldY * scale, 4, 0.5);
+    // Multi-octave noise for base elevation (smooth rolling terrain)
+    // Using 6 octaves with persistence 0.5 for natural fractal detail
+    const baseElevation = this.elevationNoise.octaveNoise(worldX * scale, worldY * scale, 6, 0.5);
+
+    // Continentalness - determines if area is ocean/land/mountains (large scale)
+    const continentalness = this.elevationNoise.octaveNoise(
+      worldX * scale * 0.3,
+      worldY * scale * 0.3,
+      3,
+      0.6
+    );
+
+    // Ridged noise for sharp mountain peaks and cliffs (abs value creates ridges)
+    const ridgedNoise = this.ridgedNoise(worldX * scale * 2, worldY * scale * 2);
+
+    // Erosion factor - flatter areas vs rough terrain
+    const erosion = this.moistureNoise.octaveNoise(
+      worldX * scale * 0.8,
+      worldY * scale * 0.8,
+      4,
+      0.5
+    );
+
+    // Flatten spawn area (within 20 tiles of origin for gentler starting terrain)
+    const distanceFromSpawn = Math.sqrt(worldX * worldX + worldY * worldY);
+    const spawnFlatten = Math.max(0, 1 - distanceFromSpawn / 20); // 1.0 at origin, 0.0 at distance 20+
+
+    // Blend elevation based on continentalness and erosion
+    let elevation = baseElevation * 0.6 + continentalness * 0.4;
+
+    // Add ridges in mountainous areas, smooth in eroded areas
+    if (continentalness > 0.3) {
+      const ridgeStrength = (continentalness - 0.3) * (1 - erosion * 0.5);
+      elevation = elevation * (1 - ridgeStrength) + ridgedNoise * ridgeStrength;
+    }
+
+    // Flatten spawn area - lerp toward 0 elevation
+    elevation = elevation * (1 - spawnFlatten * 0.8);
+
     const moisture = this.moistureNoise.octaveNoise(
       worldX * scale * 1.3,
       worldY * scale * 1.3,
@@ -193,6 +322,29 @@ export class TerrainGenerator {
       moisture,
       temperature
     );
+
+    // Calculate tile Z elevation based on improved noise
+    // Scale: water = -2 to -1, plains = -1 to 2, hills = 2-6, mountains = 6-15
+    let tileElevation = 0;
+    if (biome === 'ocean' || biome === 'river') {
+      // Water is below sea level
+      tileElevation = Math.floor((elevation + 1) * -1.5); // -3 to -1
+    } else if (biome === 'mountains') {
+      // Mountains use ridged noise for cliffs - map 0.5-1.0 to 6-15
+      const mountainFactor = (elevation - this.STONE_LEVEL) / (1 - this.STONE_LEVEL);
+      tileElevation = 6 + Math.floor(mountainFactor * 9);
+    } else if (elevation > 0.15) {
+      // Hills start at lower threshold for more varied terrain
+      // Map 0.15-0.5 to elevation 2-6
+      const hillFactor = (elevation - 0.15) / (0.5 - 0.15);
+      tileElevation = 2 + Math.floor(hillFactor * 4);
+    } else if (elevation > -0.1) {
+      // Gentle rolling plains - small elevation changes (-1 to 2)
+      tileElevation = Math.floor(elevation * 5);
+    } else {
+      // Low areas (slight depressions) - elevation -1 to 0
+      tileElevation = Math.floor(elevation * 3);
+    }
 
     // Normalize moisture (0-1 range)
     const normalizedMoisture = (moisture + 1) / 2;
@@ -217,6 +369,7 @@ export class TerrainGenerator {
     return {
       terrain,
       biome,
+      elevation: tileElevation,
       moisture: Math.max(0, Math.min(100, normalizedMoisture * 100)),
       fertility: Math.max(0, Math.min(100, fertility * 100)),
       tilled: false,

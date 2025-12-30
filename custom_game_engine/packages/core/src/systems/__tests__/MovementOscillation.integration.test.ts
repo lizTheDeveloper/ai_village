@@ -6,17 +6,18 @@ import { SteeringSystem } from '../SteeringSystem.js';
 import { AgentBrainSystem } from '../AgentBrainSystem.js';
 import { createMovementComponent } from '../../components/MovementComponent.js';
 import { createAgentComponent } from '../../components/AgentComponent.js';
-import { createNeedsComponent } from '../../components/NeedsComponent.js';
+import { NeedsComponent } from '../../components/NeedsComponent.js';
 import { createCircadianComponent } from '../../components/CircadianComponent.js';
 import { createSteeringComponent } from '../../components/SteeringComponent.js';
 import { createVelocityComponent } from '../../components/VelocityComponent.js';
 import { createInventoryComponent } from '../../components/InventoryComponent.js';
 import { createVisionComponent } from '../../components/VisionComponent.js';
-import { createMemoryComponent } from '../../components/MemoryComponent.js';
+import { MemoryComponent } from '../../components/MemoryComponent.js';
 import { createResourceComponent } from '../../components/ResourceComponent.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Oscillation Detection Utilities
  *
@@ -67,8 +68,8 @@ function trackPosition(
 
   for (let tick = 0; tick < tickCount; tick++) {
     // Sample position before update
-    const position = agent.getComponent('position');
-    const movement = agent.getComponent('movement');
+    const position = agent.getComponent(ComponentType.Position);
+    const movement = agent.getComponent(ComponentType.Movement);
 
     samples.push({
       tick,
@@ -204,8 +205,8 @@ describe('Movement Oscillation Detection', () => {
       const entities = Array.from(harness.world.entities.values());
 
       for (let tick = 0; tick < 100; tick++) {
-        const position = agent.getComponent('position');
-        const movement = agent.getComponent('movement') as any;
+        const position = agent.getComponent(ComponentType.Position);
+        const movement = agent.getComponent(ComponentType.Movement) as any;
 
         samples.push({
           tick,
@@ -235,8 +236,8 @@ describe('Movement Oscillation Detection', () => {
       const entities = Array.from(harness.world.entities.values());
 
       for (let tick = 0; tick < 100; tick++) {
-        const position = agent.getComponent('position');
-        const movement = agent.getComponent('movement') as any;
+        const position = agent.getComponent(ComponentType.Position);
+        const movement = agent.getComponent(ComponentType.Movement) as any;
 
         samples.push({
           tick,
@@ -267,8 +268,8 @@ describe('Movement Oscillation Detection', () => {
 
       // Simulate oscillating behavior by alternating velocity every 3 ticks
       for (let tick = 0; tick < 100; tick++) {
-        const position = agent.getComponent('position');
-        const movement = agent.getComponent('movement') as any;
+        const position = agent.getComponent(ComponentType.Position);
+        const movement = agent.getComponent(ComponentType.Movement) as any;
 
         samples.push({
           tick,
@@ -317,8 +318,8 @@ describe('Movement Oscillation Detection', () => {
       agent.addComponent(createSteeringComponent('none', 1.0, 2.0));
 
       for (let tick = 0; tick < 100; tick++) {
-        const position = agent.getComponent('position');
-        const movement = agent.getComponent('movement') as any;
+        const position = agent.getComponent(ComponentType.Position);
+        const movement = agent.getComponent(ComponentType.Movement) as any;
 
         samples.push({
           tick,
@@ -354,8 +355,8 @@ describe('Movement Oscillation Detection', () => {
       const entities = Array.from(harness.world.entities.values());
 
       for (let tick = 0; tick < 100; tick++) {
-        const position = agent.getComponent('position');
-        const movement = agent.getComponent('movement') as any;
+        const position = agent.getComponent(ComponentType.Position);
+        const movement = agent.getComponent(ComponentType.Movement) as any;
 
         samples.push({
           tick,
@@ -397,7 +398,13 @@ describe('Movement Oscillation Detection', () => {
       agent.addComponent(createAgentComponent('idle', 20, false, 20));
       agent.addComponent(createSteeringComponent('wander', 1.0, 2.0));
       agent.addComponent(createVelocityComponent(1, 1));
-      agent.addComponent(createNeedsComponent(100, 100, 100, 0.1, 0.1)); // Required for AgentBrainSystem
+      agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    hungerDecayRate: 0.1,
+    energyDecayRate: 0.1,
+  })); // Required for AgentBrainSystem
       // Note: createTestAgent already adds entity to world
 
       const aiSystem = new AgentBrainSystem();
@@ -408,11 +415,11 @@ describe('Movement Oscillation Detection', () => {
       aiSystem.update(harness.world, entities, 1 / 60);
 
       // Check that steering was disabled by idleBehavior
-      const steering = agent.getComponent('steering') as any;
+      const steering = agent.getComponent(ComponentType.Steering) as any;
       expect(steering.behavior).toBe('none');
 
       // Check velocity is 0
-      const movement = agent.getComponent('movement') as any;
+      const movement = agent.getComponent(ComponentType.Movement) as any;
       expect(movement.velocityX).toBe(0);
       expect(movement.velocityY).toBe(0);
     });
@@ -431,7 +438,13 @@ describe('Movement Oscillation Detection', () => {
       agent.addComponent(createAgentComponent('gather', 20, false, 20));
       agent.addComponent(createSteeringComponent('wander', 1.0, 2.0));
       agent.addComponent(createVelocityComponent(1, 1));
-      agent.addComponent(createNeedsComponent(100, 100, 100, 0.1, 0.1));
+      agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    hungerDecayRate: 0.1,
+    energyDecayRate: 0.1,
+  }));
       agent.addComponent(createInventoryComponent(10, 100));
       // Note: createTestAgent already adds entity to world
 
@@ -440,7 +453,7 @@ describe('Movement Oscillation Detection', () => {
       aiSystem.update(harness.world, entities, 1 / 60);
 
       // Check that steering was disabled by gatherBehavior
-      const steering = agent.getComponent('steering') as any;
+      const steering = agent.getComponent(ComponentType.Steering) as any;
       expect(steering.behavior).toBe('none');
     });
 
@@ -461,7 +474,13 @@ describe('Movement Oscillation Detection', () => {
       }));
       agent.addComponent(createSteeringComponent('seek', 1.0, 2.0));
       agent.addComponent(createVelocityComponent(1, 1));
-      agent.addComponent(createNeedsComponent(100, 100, 100, 0.1, 0.1));
+      agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    hungerDecayRate: 0.1,
+    energyDecayRate: 0.1,
+  }));
       // Note: createTestAgent already adds entity to world
 
       const aiSystem = new AgentBrainSystem();
@@ -469,7 +488,7 @@ describe('Movement Oscillation Detection', () => {
       aiSystem.update(harness.world, entities, 1 / 60);
 
       // Check that steering was disabled
-      const steering = agent.getComponent('steering') as any;
+      const steering = agent.getComponent(ComponentType.Steering) as any;
       expect(steering.behavior).toBe('none');
     });
 
@@ -481,9 +500,15 @@ describe('Movement Oscillation Detection', () => {
       agent.addComponent(createAgentComponent('talk', 20, false, 20));
       agent.addComponent(createSteeringComponent('seek', 1.0, 2.0));
       agent.addComponent(createVelocityComponent(1, 1));
-      agent.addComponent(createNeedsComponent(100, 100, 100, 0.1, 0.1));
+      agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    hungerDecayRate: 0.1,
+    energyDecayRate: 0.1,
+  }));
       agent.addComponent({
-        type: 'conversation',
+        type: ComponentType.Conversation,
         version: 1,
         isActive: true,
         partnerId: 'test-partner',
@@ -497,7 +522,7 @@ describe('Movement Oscillation Detection', () => {
       aiSystem.update(harness.world, entities, 1 / 60);
 
       // Check that steering was disabled
-      const steering = agent.getComponent('steering') as any;
+      const steering = agent.getComponent(ComponentType.Steering) as any;
       expect(steering.behavior).toBe('none');
     });
 
@@ -509,7 +534,13 @@ describe('Movement Oscillation Detection', () => {
       agent.addComponent(createAgentComponent('seek_sleep', 20, false, 20));
       agent.addComponent(createSteeringComponent('wander', 1.0, 2.0));
       agent.addComponent(createVelocityComponent(1, 1));
-      agent.addComponent(createNeedsComponent(100, 100, 100, 0.1, 0.1));
+      agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    hungerDecayRate: 0.1,
+    energyDecayRate: 0.1,
+  }));
       agent.addComponent(createCircadianComponent());
       // Note: createTestAgent already adds entity to world
 
@@ -518,7 +549,7 @@ describe('Movement Oscillation Detection', () => {
       aiSystem.update(harness.world, entities, 1 / 60);
 
       // Check that steering was disabled
-      const steering = agent.getComponent('steering') as any;
+      const steering = agent.getComponent(ComponentType.Steering) as any;
       expect(steering.behavior).toBe('none');
     });
   });
@@ -532,11 +563,17 @@ describe('Movement Oscillation Detection', () => {
       agent.addComponent(createAgentComponent('rest', 20, false, 0));
       agent.addComponent(createSteeringComponent('none', 2.0, 4.0));
       agent.addComponent(createVelocityComponent(0, 0));
-      agent.addComponent(createNeedsComponent(100, 80, 100, 0.42, 0.5));
+      agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 0.8,
+    health: 1.0,
+    hungerDecayRate: 0.42,
+    energyDecayRate: 0.5,
+  }));
       agent.addComponent(createCircadianComponent());
       agent.addComponent(createInventoryComponent(24, 100));
       agent.addComponent(createVisionComponent(10, 360, true, true));
-      agent.addComponent(createMemoryComponent(20, 1.0));
+      agent.addComponent(new MemoryComponent(agent.id));
       // Note: createTestAgent already adds entity to world
 
       const aiSystem = new AgentBrainSystem();
@@ -552,17 +589,6 @@ describe('Movement Oscillation Detection', () => {
       );
 
       const metrics = analyzeOscillation(samples);
-
-      // Report metrics for debugging
-      console.log('1000-tick test metrics:', {
-        totalDistance: metrics.totalDistanceTraveled.toFixed(2),
-        netDisplacement: metrics.netDisplacement.toFixed(2),
-        efficiency: (metrics.efficiencyRatio * 100).toFixed(1) + '%',
-        reversals: metrics.directionReversals,
-        reversalRate: ((metrics.directionReversals / 1000) * 100).toFixed(1) + '%',
-        variance: `(${metrics.positionVariance.x.toFixed(2)}, ${metrics.positionVariance.y.toFixed(2)})`,
-        isOscillating: metrics.isOscillating,
-      });
 
       // Should NOT be oscillating
       expect(metrics.isOscillating).toBe(false);

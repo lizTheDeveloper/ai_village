@@ -19,7 +19,8 @@ export type BuildingCategory =
   | 'farming'       // Barns, greenhouses
   | 'research'      // Labs, libraries
   | 'decoration'    // Fences, statues
-  | 'governance';   // Information infrastructure
+  | 'governance'    // Information infrastructure
+  | 'religious';    // Temples, shrines, sacred sites
 
 /**
  * Building functionality types per construction-system/spec.md REQ-CON-003
@@ -39,7 +40,19 @@ export type BuildingFunction =
   | { type: 'social_hub'; radius: number }
   | { type: 'vision_extension'; radiusBonus: number }
   | { type: 'job_board' }
-  | { type: 'knowledge_repository' };
+  | { type: 'knowledge_repository' }
+  | { type: 'prayer_site'; beliefMultiplier: number; prayerCapacity: number; domainBonus?: string[] }
+  | { type: 'ritual_site'; ritualTypes: string[] }
+  | { type: 'priest_quarters'; priestCapacity: number }
+  | { type: 'pilgrimage_site'; attractionRadius: number }
+  | { type: 'meditation_site'; visionClarityBonus: number; meditationSpeedBonus: number }
+  // Farming-specific functions
+  | { type: 'pest_deterrent'; pestTypes: string[]; radius: number; effectiveness: number }
+  | { type: 'irrigation'; waterRate: number; radius: number }
+  | { type: 'fertilizer_production'; outputRate: number; capacity: number }
+  | { type: 'pollination'; radius: number; yieldBonus: number }
+  | { type: 'climate_control'; temperatureModifier: number; radius: number }
+  | { type: 'disease_prevention'; diseaseTypes: string[]; radius: number; effectiveness: number };
 
 export interface ResourceCost {
   resourceId: string;

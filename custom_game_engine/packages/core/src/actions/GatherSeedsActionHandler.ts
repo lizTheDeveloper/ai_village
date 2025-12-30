@@ -12,6 +12,7 @@ import {
   GATHER_SEEDS_DURATION,
   BASE_SEED_YIELD_GATHER,
 } from '../constants/index.js';
+import { ComponentType } from '../types/ComponentType.js';
 
 /**
  * Handler for the gather_seeds action.
@@ -79,7 +80,7 @@ export class GatherSeedsActionHandler implements ActionHandler {
     }
 
     // Check actor has position
-    const actorPos = actor.components.get('position') as PositionComponent | undefined;
+    const actorPos = actor.components.get(ComponentType.Position) as PositionComponent | undefined;
     if (!actorPos) {
       return {
         valid: false,
@@ -88,7 +89,7 @@ export class GatherSeedsActionHandler implements ActionHandler {
     }
 
     // Check actor has inventory
-    const inventory = actor.components.get('inventory') as InventoryComponent | undefined;
+    const inventory = actor.components.get(ComponentType.Inventory) as InventoryComponent | undefined;
     if (!inventory) {
       return {
         valid: false,
@@ -106,7 +107,7 @@ export class GatherSeedsActionHandler implements ActionHandler {
     }
 
     // Check plant has PlantComponent
-    const plant = plantEntity.components.get('plant') as PlantComponent | undefined;
+    const plant = plantEntity.components.get(ComponentType.Plant) as PlantComponent | undefined;
     if (!plant) {
       return {
         valid: false,
@@ -132,7 +133,7 @@ export class GatherSeedsActionHandler implements ActionHandler {
     }
 
     // Check plant has position
-    const plantPos = plantEntity.components.get('position') as PositionComponent | undefined;
+    const plantPos = plantEntity.components.get(ComponentType.Position) as PositionComponent | undefined;
     if (!plantPos) {
       return {
         valid: false,
@@ -203,9 +204,9 @@ export class GatherSeedsActionHandler implements ActionHandler {
     }
 
     // Get components
-    const plant = plantEntity.components.get('plant') as PlantComponent;
-    const inventory = actor.components.get('inventory') as InventoryComponent;
-    const plantPos = plantEntity.components.get('position') as PositionComponent;
+    const plant = plantEntity.components.get(ComponentType.Plant) as PlantComponent;
+    const inventory = actor.components.get(ComponentType.Inventory) as InventoryComponent;
+    const plantPos = plantEntity.components.get(ComponentType.Position) as PositionComponent;
 
     if (!plant) {
       return {
@@ -256,10 +257,10 @@ export class GatherSeedsActionHandler implements ActionHandler {
       );
 
       // Update actor's inventory using EntityImpl method
-      (actor as EntityImpl).updateComponent<InventoryComponent>('inventory', () => updatedInventory);
+      (actor as EntityImpl).updateComponent<InventoryComponent>(ComponentType.Inventory, () => updatedInventory);
 
       // Update plant component - reduce seedsProduced
-      (plantEntity as EntityImpl).updateComponent<PlantComponent>('plant', (current) => {
+      (plantEntity as EntityImpl).updateComponent<PlantComponent>(ComponentType.Plant, (current) => {
         const updated = Object.create(Object.getPrototypeOf(current));
         Object.assign(updated, current);
         updated.seedsProduced = current.seedsProduced - amountAdded;

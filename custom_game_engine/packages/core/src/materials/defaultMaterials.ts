@@ -1,0 +1,243 @@
+import { MaterialTemplate } from './MaterialTemplate';
+import { materialRegistry } from './MaterialRegistry';
+
+/**
+ * Built-in materials for the game.
+ * These are registered automatically at startup.
+ */
+export const DEFAULT_MATERIALS: MaterialTemplate[] = [
+  // Metals
+  {
+    id: 'iron',
+    name: 'Iron',
+    description: 'Strong, durable metal commonly used for tools and weapons',
+    categories: ['metal'],
+    density: 7870,
+    hardness: 80,
+    flexibility: 10,
+    meltingPoint: 1538,
+    heatConductivity: 90,
+    magicAffinity: 15,
+    valueMultiplier: 1.0,
+  },
+  {
+    id: 'gold',
+    name: 'Gold',
+    description: 'Soft, precious metal with high magical affinity',
+    categories: ['metal', 'magical'],
+    density: 19320,
+    hardness: 25,
+    flexibility: 30,
+    meltingPoint: 1064,
+    heatConductivity: 95,
+    magicAffinity: 85,
+    resonantForms: ['transmutation', 'enchantment'],
+    valueMultiplier: 20.0,
+  },
+  {
+    id: 'copper',
+    name: 'Copper',
+    description: 'Malleable metal, easier to work than iron',
+    categories: ['metal'],
+    density: 8960,
+    hardness: 60,
+    flexibility: 25,
+    meltingPoint: 1085,
+    heatConductivity: 95,
+    magicAffinity: 20,
+    valueMultiplier: 0.8,
+  },
+  {
+    id: 'steel',
+    name: 'Steel',
+    description: 'Refined iron alloy with superior strength',
+    categories: ['metal'],
+    density: 7850,
+    hardness: 90,
+    flexibility: 15,
+    meltingPoint: 1370,
+    heatConductivity: 85,
+    magicAffinity: 10,
+    valueMultiplier: 2.0,
+  },
+
+  // Wood
+  {
+    id: 'oak',
+    name: 'Oak',
+    description: 'Strong hardwood, good for tools and construction',
+    categories: ['wood', 'organic'],
+    density: 600,
+    hardness: 30,
+    flexibility: 50,
+    ignitePoint: 300,
+    heatConductivity: 10,
+    magicAffinity: 40,
+    resonantForms: ['nature', 'growth'],
+    valueMultiplier: 0.3,
+  },
+  {
+    id: 'pine',
+    name: 'Pine',
+    description: 'Softwood, easy to work but less durable',
+    categories: ['wood', 'organic'],
+    density: 500,
+    hardness: 20,
+    flexibility: 60,
+    ignitePoint: 260,
+    heatConductivity: 8,
+    magicAffinity: 35,
+    valueMultiplier: 0.2,
+  },
+  {
+    id: 'ebony',
+    name: 'Ebony',
+    description: 'Dense, dark hardwood with magical properties',
+    categories: ['wood', 'organic', 'magical'],
+    density: 1200,
+    hardness: 50,
+    flexibility: 30,
+    ignitePoint: 350,
+    heatConductivity: 12,
+    magicAffinity: 70,
+    resonantForms: ['shadow', 'protection'],
+    valueMultiplier: 5.0,
+  },
+
+  // Stone
+  {
+    id: 'granite',
+    name: 'Granite',
+    description: 'Hard igneous rock, excellent for construction',
+    categories: ['stone'],
+    density: 2750,
+    hardness: 70,
+    flexibility: 5,
+    heatConductivity: 30,
+    magicAffinity: 10,
+    valueMultiplier: 0.5,
+  },
+  {
+    id: 'marble',
+    name: 'Marble',
+    description: 'Beautiful metamorphic rock, takes enchantments well',
+    categories: ['stone'],
+    density: 2700,
+    hardness: 60,
+    flexibility: 5,
+    heatConductivity: 25,
+    magicAffinity: 50,
+    valueMultiplier: 2.0,
+  },
+
+  // Leather & Cloth
+  {
+    id: 'leather',
+    name: 'Leather',
+    description: 'Flexible material from animal hides',
+    categories: ['leather', 'organic'],
+    density: 900,
+    hardness: 15,
+    flexibility: 70,
+    ignitePoint: 200,
+    heatConductivity: 5,
+    magicAffinity: 25,
+    valueMultiplier: 1.5,
+  },
+  {
+    id: 'cloth',
+    name: 'Cloth',
+    description: 'Woven fabric for clothing and bags',
+    categories: ['cloth', 'organic'],
+    density: 400,
+    hardness: 5,
+    flexibility: 90,
+    ignitePoint: 210,
+    heatConductivity: 3,
+    magicAffinity: 30,
+    valueMultiplier: 0.5,
+  },
+  {
+    id: 'silk',
+    name: 'Silk',
+    description: 'Fine fabric with natural magical resonance',
+    categories: ['cloth', 'organic', 'magical'],
+    density: 450,
+    hardness: 8,
+    flexibility: 95,
+    ignitePoint: 180,
+    heatConductivity: 2,
+    magicAffinity: 60,
+    resonantForms: ['enchantment', 'protection'],
+    valueMultiplier: 8.0,
+  },
+
+  // Organic
+  {
+    id: 'organic',
+    name: 'Organic Matter',
+    description: 'Generic organic material from plants and animals',
+    categories: ['organic'],
+    density: 800,
+    hardness: 10,
+    flexibility: 60,
+    ignitePoint: 250,
+    heatConductivity: 8,
+    magicAffinity: 30,
+    valueMultiplier: 0.3,
+  },
+  {
+    id: 'bone',
+    name: 'Bone',
+    description: 'Hard organic material from animal skeletons',
+    categories: ['organic'],
+    density: 1850,
+    hardness: 40,
+    flexibility: 20,
+    ignitePoint: 400,
+    heatConductivity: 15,
+    magicAffinity: 45,
+    resonantForms: ['necromancy', 'spirit'],
+    valueMultiplier: 1.0,
+  },
+
+  // Ceramic & Glass
+  {
+    id: 'ceramic',
+    name: 'Ceramic',
+    description: 'Fired clay, brittle but heat resistant',
+    categories: ['ceramic'],
+    density: 2400,
+    hardness: 55,
+    flexibility: 5,
+    meltingPoint: 1600,
+    heatConductivity: 20,
+    magicAffinity: 20,
+    valueMultiplier: 0.6,
+  },
+  {
+    id: 'glass',
+    name: 'Glass',
+    description: 'Transparent material, fragile but beautiful',
+    categories: ['glass'],
+    density: 2500,
+    hardness: 50,
+    flexibility: 5,
+    meltingPoint: 1400,
+    heatConductivity: 25,
+    magicAffinity: 55,
+    valueMultiplier: 3.0,
+  },
+];
+
+/**
+ * Register all default materials.
+ * Call this during game initialization.
+ */
+export function registerDefaultMaterials(): void {
+  for (const material of DEFAULT_MATERIALS) {
+    if (!materialRegistry.has(material.id)) {
+      materialRegistry.register(material);
+    }
+  }
+}

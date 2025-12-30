@@ -1,3 +1,4 @@
+import { ComponentType } from '../../../types/ComponentType.js';
 /**
  * Tests for TradeBehavior
  */
@@ -27,12 +28,12 @@ describe('TradeBehavior', () => {
     // Create agent entity
     agent = new EntityImpl('agent-1');
     agent.addComponent<PositionComponent>({
-      type: 'position',
+      type: ComponentType.Position,
       x: 0,
       y: 0,
     });
     agent.addComponent<AgentComponent>({
-      type: 'agent',
+      type: ComponentType.Agent,
       name: 'Test Agent',
       behavior: 'trade',
       behaviorState: {},
@@ -43,19 +44,19 @@ describe('TradeBehavior', () => {
       behaviorCompleted: false,
     });
     agent.addComponent<InventoryComponent>({
-      type: 'inventory',
+      type: ComponentType.Inventory,
       slots: [],
       maxSlots: 10,
       maxWeight: 100,
       currentWeight: 0,
     });
     agent.addComponent<CurrencyComponent>({
-      type: 'currency',
+      type: ComponentType.Currency,
       balance: 1000,
       transactions: [],
     });
     agent.addComponent({
-      type: 'movement',
+      type: ComponentType.Movement,
       speed: 1.0,
       velocityX: 0,
       velocityY: 0,
@@ -67,12 +68,12 @@ describe('TradeBehavior', () => {
     // Create shop entity
     shop = new EntityImpl('shop-1');
     shop.addComponent<PositionComponent>({
-      type: 'position',
+      type: ComponentType.Position,
       x: 5,
       y: 5,
     });
     shop.addComponent<ShopComponent>({
-      type: 'shop',
+      type: ComponentType.Shop,
       shopType: 'general',
       ownerId: 'npc-1',
       name: 'Test Shop',
@@ -89,7 +90,7 @@ describe('TradeBehavior', () => {
       totalPurchases: 0,
     });
     shop.addComponent<CurrencyComponent>({
-      type: 'currency',
+      type: ComponentType.Currency,
       balance: 5000,
       transactions: [],
     });
@@ -158,7 +159,7 @@ describe('TradeBehavior', () => {
       behavior.execute(agent, world);
 
       // Should find shop and move to move_to_shop phase
-      const agentComp = agent.getComponent<AgentComponent>('agent');
+      const agentComp = agent.getComponent(ComponentType.Agent);
       expect(agentComp?.behaviorState?.shopId).toBe('shop-1');
       expect(agentComp?.behaviorState?.phase).toBe('move_to_shop');
     });
@@ -178,7 +179,7 @@ describe('TradeBehavior', () => {
       // Far from shop, should still be moving
       behavior.execute(agent, world);
 
-      const agentComp = agent.getComponent<AgentComponent>('agent');
+      const agentComp = agent.getComponent(ComponentType.Agent);
       // Should still be in move_to_shop phase until close enough
       expect(agentComp?.behaviorState?.phase).toBe('move_to_shop');
     });
@@ -186,7 +187,7 @@ describe('TradeBehavior', () => {
     it('should transition to trading phase when near shop', () => {
       // Move agent next to shop (within TRADE_DISTANCE = 2.0)
       agent.updateComponent<PositionComponent>('position', () => ({
-        type: 'position',
+        type: ComponentType.Position,
         x: 5.0,
         y: 6.5,  // Distance = 1.5, which is < 2.0
       }));
@@ -204,7 +205,7 @@ describe('TradeBehavior', () => {
 
       behavior.execute(agent, world);
 
-      const agentComp = agent.getComponent<AgentComponent>('agent');
+      const agentComp = agent.getComponent(ComponentType.Agent);
       expect(agentComp?.behaviorState?.phase).toBe('trading');
     });
   });
@@ -222,7 +223,7 @@ describe('TradeBehavior', () => {
 
       behavior.execute(agent, world);
 
-      const agentComp = agent.getComponent<AgentComponent>('agent');
+      const agentComp = agent.getComponent(ComponentType.Agent);
       expect(agentComp?.behaviorState?.shopId).toBe('shop-1');
     });
 

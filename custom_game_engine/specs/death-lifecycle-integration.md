@@ -1,0 +1,1130 @@
+# Death Lifecycle Integration Specification
+
+**Status:** Draft
+**Phase:** 9+ (Integration of body, lifecycle, and corpse systems)
+**Depends On:** body-parts-system.md, lifecycle-system.md, corpse-system.md
+
+---
+
+## Overview
+
+This spec documents how the body, lifecycle, and corpse systems integrate to create a complete death experience. From injury → death → corpse → burial → legacy.
+
+**Core Flow:**
+```
+Living Agent (BodyComponent + NeedsComponent)
+  ↓ (injury/illness/age)
+Death Event (LifecycleSystem)
+  ↓
+Corpse Entity (CorpseComponent)
+  ↓ (decay/burial/animation)
+Final State (Grave/Undead/Ashes/Lost)
+  ↓
+Legacy & Memory (MourningProcess + FamilyTree)
+```
+
+---
+
+## 1. Death Triggers
+
+### 1.1 How Death Occurs
+
+```typescript
+/**
+ * All paths to death funnel through this function.
+ * It handles the transition from living → dead → corpse.
+ */
+function triggerAgentDeath(
+  agent: Entity,
+  cause: DeathCause,
+  world: World
+): DeathResult {
+  // 1. Verify agent is alive
+  if (agent.isDead) {
+    return { success: false, reason: 'Already dead' };
+  }
+
+  // 2. Gather death context
+  const deathContext = gatherDeathContext(agent, cause, world);
+
+  // 3. Create death event (lifecycle system)
+  const deathEvent = createDeathEvent(agent, cause, deathContext);
+
+  // 4. Create corpse entity (corpse system)
+  const corpse = createCorpseFromAgent(
+    agent,
+    cause,
+    world.currentTime,
+    agent.components.get('position')
+  );
+
+  // 5. Handle immediate consequences
+  handleDeathConsequences(agent, deathEvent, world);
+
+  // 6. Initiate mourning process (lifecycle system)
+  initiateMourningProcess(agent, deathEvent, world);
+
+  // 7. Transfer legacy (lifecycle system)
+  processLegacy(agent, deathEvent, world);
+
+  // 8. Remove living agent
+  markAgentAsDead(agent, world);
+
+  return {
+    success: true,
+    deathEvent,
+    corpse,
+  };
+}
+```
+
+### 1.2 Death Triggers from Body System
+
+```typescript
+/**
+ * Body system monitors for death conditions.
+ * Located in BodySystem.update()
+ */
+class BodySystem implements System {
+  private checkVitalParts(
+    entity: Entity,
+    body: BodyComponent,
+    world: World
+  ): void {
+    // Check head destruction
+    if (body.parts.head.health === 0) {
+      triggerAgentDeath(entity, 'combat', world); // Or 'accident'
+      return;
+    }
+
+    // Check torso destruction
+    if (body.parts.torso.health === 0) {
+      triggerAgentDeath(entity, 'combat', world);
+      return;
+    }
+  }
+
+  private checkConsciousness(
+    entity: Entity,
+    body: BodyComponent,
+    world: World
+  ): void {
+    // Excessive blood loss → unconsciousness → death
+    if (body.bloodLoss > 80) {
+      body.consciousness = false;
+
+      // Death after prolonged unconsciousness
+      if (body.bloodLoss > 95) {
+        triggerAgentDeath(entity, 'blood_loss', world);
+      }
+    }
+  }
+}
+```
+
+### 1.3 Death Triggers from Needs System
+
+```typescript
+/**
+ * Needs system monitors for starvation/exposure.
+ * Located in NeedsSystem.update()
+ */
+class NeedsSystem implements System {
+  private checkStarvation(
+    entity: Entity,
+    needs: NeedsComponent,
+    world: World
+  ): void {
+    // Prolonged starvation
+    if (needs.hunger < 5 && needs.health < 10) {
+      const hoursSinceLastFood = (world.currentTime - needs.lastAte) / 3600;
+
+      if (hoursSinceLastFood > 72) { // 3 days
+        triggerAgentDeath(entity, 'starvation', world);
+      }
+    }
+  }
+
+  private checkExposure(
+    entity: Entity,
+    needs: NeedsComponent,
+    body: BodyComponent,
+    world: World
+  ): void {
+    // Hypothermia from cold exposure
+    const temp = entity.components.get('temperature');
+    if (temp?.current < -10 && needs.health < 20) {
+      triggerAgentDeath(entity, 'exposure', world);
+    }
+
+    // Heatstroke from heat exposure
+    if (temp?.current > 45 && needs.health < 20) {
+      triggerAgentDeath(entity, 'exposure', world);
+    }
+  }
+}
+```
+
+### 1.4 Death Triggers from Lifecycle System
+
+```typescript
+/**
+ * Lifecycle system handles natural death from old age.
+ * Located in LifecycleSystem.update()
+ */
+class LifecycleSystem implements System {
+  private checkMortality(
+    entity: Entity,
+    lifecycle: LifecycleComponent,
+    world: World
+  ): void {
+    const stage = lifecycle.currentStage;
+    const age = lifecycle.age;
+
+    // Calculate death probability
+    const baseMortality = stage.characteristics.baseMortalityRate;
+    const healthMod = this.getHealthModifier(entity);
+    const ageMod = age > stage.ageRange.max ? 2.0 : 1.0;
+
+    const deathChance = baseMortality * healthMod * ageMod;
+
+    // Roll for death
+    if (Math.random() < deathChance) {
+      triggerAgentDeath(entity, 'old_age', world);
+    }
+  }
+}
+```
+
+---
+
+## 2. Death Context Gathering
+
+### 2.1 Context Collection
+
+```typescript
+interface DeathContext {
+  // Witnesses
+  witnesses: WitnessInfo[];
+  location: Position;
+  locationName: string;        // "at the market", "in their home"
+
+  // Circumstances
+  lastWords?: string;           // Generated by LLM if conscious
+  finalMoments: string;         // Description of death
+  peacefulDeath: boolean;
+
+  // State at death
+  finalHealth: number;
+  finalInjuries: Injury[];
+  finalNeeds: NeedsSnapshot;
+
+  // Social context
+  nearbyFamily: string[];
+  nearbyFriends: string[];
+  alone: boolean;
+
+  // Legacy items
+  equippedItems: ItemStack[];
+  inventoryItems: ItemStack[];
+  ownedBuildings: string[];
+}
+
+function gatherDeathContext(
+  agent: Entity,
+  cause: DeathCause,
+  world: World
+): DeathContext {
+  const position = agent.components.get('position');
+  const body = agent.components.get('body') as BodyComponent;
+  const needs = agent.components.get('needs') as NeedsComponent;
+  const inventory = agent.components.get('inventory') as InventoryComponent;
+
+  // Find witnesses
+  const nearby = world.getAgentsNear(position, 10);
+  const witnesses: WitnessInfo[] = nearby.map(w => ({
+    witnessId: w.id,
+    distance: calculateDistance(position, w.position),
+    relationship: getRelationshipType(agent, w),
+    emotionalImpact: calculateEmotionalImpact(agent, w),
+  }));
+
+  // Generate final moments description
+  const finalMoments = generateFinalMomentsDescription(
+    agent,
+    cause,
+    body.consciousness,
+    witnesses
+  );
+
+  // Generate last words if conscious
+  let lastWords: string | undefined;
+  if (body.consciousness && witnesses.length > 0) {
+    lastWords = generateLastWords(agent, cause, witnesses, world);
+  }
+
+  return {
+    witnesses,
+    location: { ...position },
+    locationName: getLocationName(position, world),
+    lastWords,
+    finalMoments,
+    peacefulDeath: cause === 'old_age' && body.consciousness,
+
+    finalHealth: needs.health,
+    finalInjuries: getAllInjuries(body),
+    finalNeeds: snapshotNeeds(needs),
+
+    nearbyFamily: findNearbyFamily(agent, nearby),
+    nearbyFriends: findNearbyFriends(agent, nearby),
+    alone: witnesses.length === 0,
+
+    equippedItems: inventory.equipped,
+    inventoryItems: inventory.items,
+    ownedBuildings: findOwnedBuildings(agent, world),
+  };
+}
+```
+
+### 2.2 Last Words Generation
+
+```typescript
+/**
+ * Generate last words using LLM if agent is conscious.
+ */
+async function generateLastWords(
+  agent: Entity,
+  cause: DeathCause,
+  witnesses: Entity[],
+  world: World
+): Promise<string> {
+  const personality = agent.components.get('personality');
+  const memory = agent.components.get('memory');
+  const relationships = agent.components.get('relationships');
+
+  // Build LLM prompt
+  const prompt = `
+You are ${agent.name}, dying from ${cause}.
+
+Your personality:
+${formatPersonality(personality)}
+
+People present:
+${witnesses.map(w => `- ${w.name} (${getRelationshipType(agent, w)})`).join('\n')}
+
+Recent memories:
+${formatRecentMemories(memory)}
+
+Generate your last words. Be brief (1-2 sentences), emotional, and true to your character.
+Consider:
+- Who you're speaking to
+- Unfinished business
+- What matters most to you
+- Your personality traits
+
+Last words:`;
+
+  const response = await world.llmService.generate(prompt);
+  return response.trim();
+}
+```
+
+---
+
+## 3. Corpse Creation Pipeline
+
+### 3.1 Body → Corpse Conversion
+
+```typescript
+/**
+ * Convert a living agent's BodyComponent into a CorpseComponent.
+ * Preserves injury state, missing parts, etc.
+ */
+function createCorpseFromAgent(
+  agent: Entity,
+  cause: DeathCause,
+  deathTime: GameTime,
+  location: Position
+): Entity {
+  const body = agent.components.get('body') as BodyComponent;
+  const identity = agent.components.get('identity');
+
+  // 1. Convert body parts to corpse parts
+  const corpseParts = convertBodyPartsToCorpseParts(body.parts);
+
+  // 2. Calculate initial disease risk
+  const diseaseRisk = calculateInitialDiseaseRisk(cause, body);
+
+  // 3. Determine necromantic viability
+  const necromancyViability = calculateInitialViability(body, cause);
+
+  // 4. Check for infectious disease
+  const infectiousDisease = checkForInfectiousDisease(agent);
+
+  // 5. Create corpse component
+  const corpse: CorpseComponent = {
+    type: 'corpse',
+    version: 1,
+
+    // Identity
+    deceasedAgentId: agent.id,
+    deceasedName: identity?.name ?? 'Unknown',
+    species: identity?.species ?? 'human',
+    deathTime,
+    deathCause: cause,
+
+    // Physical state
+    decayState: 'fresh',
+    decayProgress: 0,
+    temperature: getAmbientTemperature(location, world),
+    exposed: isOutdoors(location, world),
+
+    // Body integrity
+    bodyParts: corpseParts,
+    dismembered: checkIfDismembered(corpseParts),
+    missingParts: findMissingParts(corpseParts),
+
+    // Preservation
+    preserved: false,
+    preservationQuality: 0,
+
+    // Disease
+    diseaseRisk,
+    infectiousDisease,
+
+    // Necromancy
+    necromancyViability,
+    animatedBefore: false,
+    curseStatus: checkForCurse(agent),
+
+    // Forensics
+    injuries: getAllInjuries(body),
+    timeSinceDeath: 0,
+    autopsyPerformed: false,
+
+    // Social
+    claimed: false,
+    burialPrepared: false,
+    funeralHeld: false,
+  };
+
+  // 6. Create corpse entity
+  const corpseEntity = world.createEntity();
+  corpseEntity.addComponent('corpse', corpse);
+  corpseEntity.addComponent('position', location);
+  corpseEntity.addComponent('renderable', createCorpseRenderable(identity));
+
+  // 7. Emit corpse creation event
+  world.emit('corpse:created', {
+    deceasedId: agent.id,
+    corpseId: corpseEntity.id,
+    cause,
+    location,
+  });
+
+  return corpseEntity;
+}
+
+function convertBodyPartsToCorpseParts(
+  livingParts: Record<BodyPartId, BodyPartState>
+): Record<BodyPartId, CorpsePartState> {
+  const corpseParts: Record<BodyPartId, CorpsePartState> = {} as any;
+
+  for (const [partId, partState] of Object.entries(livingParts)) {
+    corpseParts[partId as BodyPartId] = {
+      present: partState.health > 0,
+      condition: getInitialCondition(partState),
+      harvestable: isHarvestable(partState),
+      necromanticValue: calculatePartValue(partId as BodyPartId, partState),
+    };
+  }
+
+  return corpseParts;
+}
+
+function getInitialCondition(part: BodyPartState): PartCondition {
+  if (part.health === 0) return 'damaged';
+  if (part.health < part.maxHealth * 0.3) return 'damaged';
+  if (part.infected) return 'damaged';
+  return 'intact';
+}
+
+function calculateInitialDiseaseRisk(
+  cause: DeathCause,
+  body: BodyComponent
+): number {
+  // Died from illness → high disease risk
+  if (cause === 'illness') return 0.8;
+
+  // Infected wounds → moderate risk
+  const hasInfection = Object.values(body.parts).some(p => p.infected);
+  if (hasInfection) return 0.5;
+
+  // Blood loss → low risk
+  if (cause === 'blood_loss') return 0.2;
+
+  // Default
+  return 0.3;
+}
+
+function calculateInitialViability(
+  body: BodyComponent,
+  cause: DeathCause
+): number {
+  let viability = 1.0;
+
+  // Missing vital parts reduce viability
+  if (body.parts.head.health === 0) viability *= 0.1;  // Very hard without head
+  if (body.parts.torso.health === 0) viability *= 0.3;
+
+  // Extensive injuries reduce viability
+  const totalInjuries = Object.values(body.parts)
+    .reduce((sum, p) => sum + p.injuries.length, 0);
+  viability *= Math.max(0.3, 1 - (totalInjuries * 0.05));
+
+  // Cause affects viability
+  if (cause === 'old_age') viability *= 0.7;      // Old bodies harder to animate
+  if (cause === 'illness') viability *= 0.5;      // Diseased bodies problematic
+  if (cause === 'cremation') viability = 0;       // Can't animate ashes
+
+  return Math.max(0, Math.min(1, viability));
+}
+```
+
+---
+
+## 4. Immediate Death Consequences
+
+### 4.1 Witness Reactions
+
+```typescript
+/**
+ * Witnesses react emotionally to the death.
+ */
+function notifyWitnesses(
+  deceased: Entity,
+  witnesses: WitnessInfo[],
+  cause: DeathCause,
+  world: World
+): void {
+  for (const witnessInfo of witnesses) {
+    const witness = world.getEntity(witnessInfo.witnessId);
+    if (!witness) continue;
+
+    const relationship = witness.components.get('relationships');
+    const mood = witness.components.get('mood') as MoodComponent;
+    const memory = witness.components.get('memory') as MemoryComponent;
+
+    // Emotional impact
+    const impact = witnessInfo.emotionalImpact;
+
+    // Affect mood
+    mood.factors.social -= impact * 50;
+
+    // Add traumatic memory
+    memory.addMemory({
+      type: 'witnessed_death',
+      importance: impact,
+      emotionalValence: -impact,
+      participants: [deceased.id],
+      location: witnessInfo.location,
+      timestamp: world.currentTime,
+      description: `Witnessed ${deceased.name} die from ${cause}`,
+    });
+
+    // If violent death, add trauma
+    if (cause === 'combat' || cause === 'accident') {
+      mood.traumaLevel = Math.min(100, mood.traumaLevel + impact * 30);
+    }
+
+    // Emit witness event for LLM context
+    world.emit('death:witnessed', {
+      witnessId: witness.id,
+      deceasedId: deceased.id,
+      cause,
+      emotionalImpact: impact,
+    });
+  }
+}
+```
+
+### 4.2 Dropped Items
+
+```typescript
+/**
+ * Handle items when agent dies.
+ * Equipped items may drop, inventory scatters.
+ */
+function handleDroppedItems(
+  deceased: Entity,
+  deathContext: DeathContext,
+  world: World
+): void {
+  const position = deceased.components.get('position');
+
+  // Drop equipped items (weapon, tools, armor)
+  for (const item of deathContext.equippedItems) {
+    const itemEntity = world.createItemEntity(item);
+    itemEntity.components.set('position', {
+      x: position.x + (Math.random() - 0.5) * 2,
+      y: position.y + (Math.random() - 0.5) * 2,
+    });
+  }
+
+  // Inventory items stay on corpse (can be looted)
+  const corpse = world.getCorpseForAgent(deceased.id);
+  if (corpse) {
+    corpse.components.set('inventory', {
+      items: deathContext.inventoryItems,
+      capacity: 100,
+    });
+  }
+}
+```
+
+---
+
+## 5. Mourning Integration
+
+### 5.1 Mourning Initialization
+
+```typescript
+/**
+ * Start the mourning process for family/friends.
+ * From lifecycle-system.md REQ-LIFE-007
+ */
+function initiateMourningProcess(
+  deceased: Entity,
+  deathEvent: DeathEvent,
+  world: World
+): MourningProcess {
+  const relationships = deceased.components.get('relationships');
+
+  // Find mourners
+  const family = relationships?.getFamilyMembers() ?? [];
+  const friends = relationships?.getFriends() ?? [];
+  const mourners: MournerState[] = [];
+
+  // Family mourns intensely
+  for (const familyId of family) {
+    const familyMember = world.getEntity(familyId);
+    if (!familyMember || familyMember.isDead) continue;
+
+    mourners.push({
+      agentId: familyId,
+      relationship: getRelationshipType(deceased, familyMember),
+      griefIntensity: calculateGriefIntensity(deceased, familyMember, 'family'),
+      griefStage: 'shock',
+      behaviorChanges: ['reduced_productivity', 'seeks_comfort', 'visits_grave'],
+    });
+  }
+
+  // Friends mourn moderately
+  for (const friendId of friends) {
+    const friend = world.getEntity(friendId);
+    if (!friend || friend.isDead) continue;
+
+    mourners.push({
+      agentId: friendId,
+      relationship: 'friend',
+      griefIntensity: calculateGriefIntensity(deceased, friend, 'friend'),
+      griefStage: 'shock',
+      behaviorChanges: ['mild_sadness', 'attends_funeral'],
+    });
+  }
+
+  const mourningProcess: MourningProcess = {
+    deceased: deceased.id,
+    mourners,
+    funeralEvent: null,
+    memorialBuilt: null,
+    deathDate: deathEvent.deathTime,
+    mourningPeriod: 7 * 24 * 3600, // 7 days in ticks
+    acceptanceDate: null,
+  };
+
+  // Schedule funeral
+  scheduleFuneral(mourningProcess, deathEvent, world);
+
+  return mourningProcess;
+}
+```
+
+### 5.2 Grief Progression
+
+```typescript
+/**
+ * Update mourner grief over time.
+ * Stages: shock → denial → anger → bargaining → depression → acceptance
+ */
+class MourningSystem implements System {
+  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+    for (const entity of entities) {
+      const grief = entity.components.get('grief') as GriefComponent;
+      if (!grief) continue;
+
+      // Progress through grief stages
+      grief.timeSinceDeaththe += deltaTime;
+
+      const daysSinceDeath = grief.timeSinceDeath / (24 * 3600);
+
+      // Update stage
+      if (daysSinceDeath < 1) {
+        grief.stage = 'shock';
+      } else if (daysSinceDeath < 2) {
+        grief.stage = 'denial';
+      } else if (daysSinceDeath < 4) {
+        grief.stage = 'anger';
+      } else if (daysSinceDeath < 5) {
+        grief.stage = 'bargaining';
+      } else if (daysSinceDeath < 7) {
+        grief.stage = 'depression';
+      } else {
+        grief.stage = 'acceptance';
+      }
+
+      // Reduce grief intensity over time
+      grief.intensity = Math.max(0, grief.intensity - 0.01 * deltaTime);
+
+      // Remove component when accepted
+      if (grief.stage === 'acceptance' && grief.intensity < 0.1) {
+        entity.removeComponent('grief');
+      }
+    }
+  }
+}
+```
+
+---
+
+## 6. Legacy Processing
+
+### 6.1 Estate Distribution
+
+```typescript
+/**
+ * Distribute deceased's possessions to heirs.
+ * From lifecycle-system.md REQ-LIFE-008
+ */
+function processLegacy(
+  deceased: Entity,
+  deathEvent: DeathEvent,
+  world: World
+): Legacy {
+  const relationships = deceased.components.get('relationships');
+  const inventory = deceased.components.get('inventory');
+
+  // Determine heirs
+  const heirs = determineHeirs(deceased, relationships);
+
+  // Create legacy record
+  const legacy: Legacy = {
+    agentId: deceased.id,
+
+    // Material
+    estate: deathEvent.estate.items,
+    buildings: deathEvent.estate.buildings,
+    currency: deathEvent.estate.currency,
+
+    // Knowledge
+    learnedRecipes: getLearnedRecipes(deceased),
+    discoveredItems: getDiscoveredItems(deceased),
+    writtenWorks: getWrittenWorks(deceased),
+
+    // Social
+    relationships: preserveRelationships(deceased),
+    reputation: getReputation(deceased),
+    stories: gatherStories(deceased),
+
+    // Distribution
+    will: deceased.components.get('will'),
+    inheritedBy: new Map(),
+  };
+
+  // Distribute according to will or default inheritance
+  distributeEstate(legacy, heirs, world);
+
+  // Store legacy for future reference
+  world.storeHistory('legacy', legacy);
+
+  return legacy;
+}
+
+function determineHeirs(
+  deceased: Entity,
+  relationships: RelationshipsComponent
+): Entity[] {
+  const heirs: Entity[] = [];
+
+  // Priority 1: Spouse
+  const spouse = relationships?.getSpouse();
+  if (spouse && !spouse.isDead) {
+    heirs.push(spouse);
+  }
+
+  // Priority 2: Children
+  const children = relationships?.getChildren() ?? [];
+  for (const child of children) {
+    if (!child.isDead) {
+      heirs.push(child);
+    }
+  }
+
+  // Priority 3: Parents (if no spouse/children)
+  if (heirs.length === 0) {
+    const parents = relationships?.getParents() ?? [];
+    for (const parent of parents) {
+      if (!parent.isDead) {
+        heirs.push(parent);
+      }
+    }
+  }
+
+  // Priority 4: Siblings (if no closer family)
+  if (heirs.length === 0) {
+    const siblings = relationships?.getSiblings() ?? [];
+    for (const sibling of siblings) {
+      if (!sibling.isDead) {
+        heirs.push(sibling);
+      }
+    }
+  }
+
+  // No heirs: Estate goes to village commons
+  return heirs;
+}
+
+function distributeEstate(
+  legacy: Legacy,
+  heirs: Entity[],
+  world: World
+): void {
+  if (heirs.length === 0) {
+    // Donate to village commons
+    world.village.treasury += legacy.currency;
+    world.village.storage.addItems(legacy.estate);
+    return;
+  }
+
+  // Split currency equally
+  const perHeirCurrency = Math.floor(legacy.currency / heirs.length);
+  for (const heir of heirs) {
+    const inventory = heir.components.get('inventory');
+    inventory.currency += perHeirCurrency;
+    legacy.inheritedBy.set(heir.id, { currency: perHeirCurrency });
+  }
+
+  // Distribute items (eldest child gets priority, then equal split)
+  distributeItems(legacy.estate, heirs);
+
+  // Buildings transfer to spouse or eldest child
+  if (heirs.length > 0) {
+    const primaryHeir = heirs[0];
+    for (const buildingId of legacy.buildings) {
+      const building = world.getBuilding(buildingId);
+      if (building) {
+        building.owner = primaryHeir.id;
+      }
+    }
+  }
+}
+```
+
+---
+
+## 7. Complete Death Timeline
+
+### 7.1 Typical Death Sequence
+
+```
+T+0: Death trigger
+  - BodySystem detects vital part destruction OR
+  - NeedsSystem detects starvation/exposure OR
+  - LifecycleSystem rolls natural death
+  ↓
+T+0.1s: Death context gathering
+  - Find witnesses
+  - Generate last words (if conscious)
+  - Record final state
+  - Snapshot possessions
+  ↓
+T+0.2s: Corpse creation
+  - Convert BodyComponent → CorpseComponent
+  - Create corpse entity at death location
+  - Transfer injuries, missing parts
+  - Calculate initial decay/disease/viability
+  ↓
+T+0.3s: Immediate reactions
+  - Witnesses experience shock
+  - Equipped items drop
+  - Nearby agents notified
+  ↓
+T+1min: Mourning initialization
+  - Family/friends identified
+  - Grief intensity calculated
+  - Funeral scheduled
+  ↓
+T+1hr: Family response
+  - Family claims body
+  - Burial preparations begin
+  - Funeral arrangements
+  ↓
+T+24hr: Funeral (typical)
+  - Village gathers
+  - Last rites performed
+  - Burial or cremation
+  - Grave created
+  ↓
+T+1 week: Mourning progression
+  - Mourners progress through grief stages
+  - Work productivity affected
+  - Grave visiting behavior
+  ↓
+T+1 month: Acceptance
+  - Most mourners reach acceptance
+  - Life returns to normal
+  - Deceased becomes memory/history
+  ↓
+T+1 year: Legacy
+  - Buildings may pass to heirs
+  - Family tree updated
+  - Chroniclers may write about them
+  - Grave becomes historical site
+```
+
+### 7.2 Alternative Paths
+
+```
+NECROMANCY PATH:
+T+0 → T+24hr (corpse fresh)
+  - Necromancer finds corpse
+  - Checks viability
+  - Casts raise undead
+  - Corpse becomes undead entity
+  - Family horrified
+  - Social consequences
+
+LOST BODY PATH:
+T+0 → Death in wilderness
+  - No witnesses
+  - Body not found
+  - No funeral possible
+  - Family grieves without closure
+  - May send search parties
+  - Memorial without body
+
+MASS CASUALTY PATH:
+T+0 → Disaster (plague, war, etc.)
+  - Multiple deaths simultaneously
+  - Mass grave created
+  - Disease risk elevated
+  - Village trauma
+  - Mourning process collective
+  - Historical event
+
+PRESERVATION PATH:
+T+0 → T+1hr
+  - Important figure dies
+  - Embalmed immediately
+  - Lying in state
+  - Public funeral
+  - Monument erected
+  - Becomes historical figure
+```
+
+---
+
+## 8. System Interactions
+
+### 8.1 System Dependencies
+
+```
+BodySystem
+  ├─ Monitors vital parts → triggers death
+  ├─ Tracks blood loss → triggers death
+  └─ Provides injury state → transferred to corpse
+
+NeedsSystem
+  ├─ Monitors starvation → triggers death
+  ├─ Monitors exposure → triggers death
+  └─ Provides health snapshot → recorded in death event
+
+LifecycleSystem
+  ├─ Rolls mortality → triggers death
+  ├─ Creates DeathEvent → core death record
+  ├─ Initiates mourning → emotional processing
+  └─ Processes legacy → inheritance
+
+CorpseSystem
+  ├─ Creates corpse entity → physical remains
+  ├─ Manages decay → disease/necromancy
+  ├─ Handles burial → final resting place
+  └─ Enables necromancy → undead creation
+
+RelationshipSystem
+  ├─ Identifies mourners → who griefs
+  ├─ Calculates grief intensity → emotional impact
+  └─ Determines heirs → inheritance
+
+MagicSystem (Necromancy)
+  ├─ Checks corpse viability → can it be raised?
+  ├─ Animates corpse → creates undead
+  └─ Removes corpse → no longer available
+
+GovernanceSystem
+  ├─ May investigate death → forensics
+  ├─ Records death → census data
+  └─ Manages cemetery → burial sites
+```
+
+### 8.2 Event Flow
+
+```typescript
+// All death-related events
+interface DeathEventMap {
+  // Trigger
+  'agent:death_imminent': { agentId: string; cause: DeathCause };
+
+  // Core death
+  'agent:died': DeathEvent;
+
+  // Corpse
+  'corpse:created': { deceasedId: string; corpseId: string; cause: DeathCause };
+  'corpse:claimed': { corpseId: string; claimedBy: string };
+  'corpse:decay_transition': { corpseId: string; newState: DecayState };
+
+  // Burial
+  'corpse:buried': { deceased: string; location: Position; attendees: string[] };
+  'corpse:cremated': { deceased: string; ashes: string };
+  'funeral:held': { deceased: string; attendees: string[] };
+
+  // Necromancy
+  'corpse:animated': { corpseId: string; necromancer: string; undeadType: UndeadType };
+  'necromancy:witnessed': { necromancer: string; witness: string };
+
+  // Social
+  'death:witnessed': { witnessId: string; deceasedId: string; emotionalImpact: number };
+  'mourning:initiated': { deceased: string; mourners: string[] };
+  'grief:stage_change': { mournerId: string; newStage: GriefStage };
+
+  // Legacy
+  'legacy:distributed': { deceased: string; heirs: string[] };
+  'inheritance:received': { heir: string; from: string; value: number };
+}
+```
+
+---
+
+## 9. LLM Integration
+
+### 9.1 Death Context in Prompts
+
+```typescript
+/**
+ * Add death-related context to agent prompts.
+ */
+function getDeathContextForLLM(agent: Entity, world: World): string {
+  const context: string[] = [];
+
+  // Recent deaths witnessed
+  const memory = agent.components.get('memory');
+  const recentDeaths = memory?.getMemoriesByType('witnessed_death')
+    .filter(m => m.timestamp > world.currentTime - (7 * 24 * 3600)) // Last week
+    ?? [];
+
+  if (recentDeaths.length > 0) {
+    context.push(`Recent deaths you witnessed:`);
+    for (const death of recentDeaths) {
+      context.push(`- ${death.description}`);
+    }
+  }
+
+  // Active grief
+  const grief = agent.components.get('grief');
+  if (grief) {
+    context.push(`\nYou are grieving the death of ${grief.deceasedName}.`);
+    context.push(`Grief stage: ${grief.stage}`);
+    context.push(`Your grief affects your mood and productivity.`);
+  }
+
+  // Nearby corpses
+  const nearbyCorpses = world.getCorpsesNear(agent.position, 10);
+  if (nearbyCorpses.length > 0) {
+    context.push(`\nThere are unburied corpses nearby:`);
+    for (const corpse of nearbyCorpses) {
+      const claimed = corpse.claimed ? '(claimed)' : '(UNCLAIMED - needs burial)';
+      context.push(`- ${corpse.deceasedName} ${claimed}`);
+    }
+  }
+
+  return context.join('\n');
+}
+```
+
+---
+
+## 10. Implementation Checklist
+
+### 10.1 Core Death Flow
+- [ ] Implement triggerAgentDeath() central function
+- [ ] Connect BodySystem vital checks to death trigger
+- [ ] Connect NeedsSystem starvation/exposure to death trigger
+- [ ] Connect LifecycleSystem mortality to death trigger
+
+### 10.2 Corpse Creation
+- [ ] Implement createCorpseFromAgent()
+- [ ] Convert BodyComponent → CorpseComponent
+- [ ] Transfer injuries and missing parts
+- [ ] Calculate initial viability/disease
+
+### 10.3 Death Context
+- [ ] Implement gatherDeathContext()
+- [ ] Generate last words with LLM
+- [ ] Find witnesses and calculate impact
+- [ ] Record final state snapshot
+
+### 10.4 Immediate Consequences
+- [ ] Notify witnesses with emotional impact
+- [ ] Drop equipped items
+- [ ] Scatter inventory on corpse
+- [ ] Update mood for nearby agents
+
+### 10.5 Mourning
+- [ ] Initialize mourning process
+- [ ] Identify family/friends as mourners
+- [ ] Calculate grief intensity
+- [ ] Schedule funeral
+- [ ] Progress through grief stages
+
+### 10.6 Legacy
+- [ ] Determine heirs
+- [ ] Distribute estate items
+- [ ] Transfer buildings
+- [ ] Preserve knowledge/recipes
+- [ ] Store in history
+
+### 10.7 Integration
+- [ ] Wire up all system dependencies
+- [ ] Emit proper events at each stage
+- [ ] Add death context to LLM prompts
+- [ ] Update UI for death notifications
+
+---
+
+## Success Criteria
+
+The death lifecycle is complete when:
+
+1. ✅ Death can be triggered from multiple systems
+2. ✅ Agent → Corpse conversion preserves body state
+3. ✅ Witnesses react emotionally
+4. ✅ Family claims and buries corpses
+5. ✅ Mourning progresses through stages
+6. ✅ Legacy is distributed to heirs
+7. ✅ LLM agents understand death context
+8. ✅ Necromancy can animate corpses
+9. ✅ Graves persist as memorials
+10. ✅ Death becomes part of village history
+
+**Visual Confirmation:**
+Agent injured → health critical → death → corpse created → family grieves → funeral held → grave created → life continues with memories

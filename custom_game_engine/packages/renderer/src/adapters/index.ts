@@ -21,9 +21,60 @@ import type { ResourcesPanel } from '../ResourcesPanel.js';
 import type { SettingsPanel } from '../SettingsPanel.js';
 import type { ShopPanel } from '../ShopPanel.js';
 import type { TileInspectorPanel } from '../TileInspectorPanel.js';
+import type { MagicSystemsPanel } from '../MagicSystemsPanel.js';
+import type { SpellbookPanel } from '../SpellbookPanel.js';
+import type { DivinePowersPanel } from '../DivinePowersPanel.js';
+import type { VisionComposerPanel } from '../VisionComposerPanel.js';
+import type { DevPanel } from '../DevPanel.js';
+import type { FarmManagementPanel } from '../FarmManagementPanel.js';
+import type { DivineAnalyticsPanel } from '../divine/DivineAnalyticsPanel.js';
+import type { SacredGeographyPanel } from '../divine/SacredGeographyPanel.js';
+import type { AngelManagementPanel } from '../divine/AngelManagementPanel.js';
+import type { PrayerPanel } from '../divine/PrayerPanel.js';
+import type { LLMConfigPanel } from '../LLMConfigPanel.js';
+import type { World } from '@ai-village/core';
 
 // Export the generic adapter and config type
 export { PanelAdapter, type PanelConfig };
+
+// Export view-based adapters (Phase 2: Unified Dashboard System)
+export { ViewAdapter } from './ViewAdapter.js';
+export {
+  createPanelFromView,
+  createAllViewPanels,
+  getViewPanelsByCategory,
+  findPanelForView,
+  createWindowConfigForView,
+  mapViewCategoryToMenuCategory,
+} from './ViewPanelFactory.js';
+
+// ============================================================================
+// Adapter State Interfaces
+// ============================================================================
+
+/** State for AgentInfoPanel adapter */
+interface AgentInfoPanelAdapterState {
+  visible: boolean;
+  world: World | null;
+  screenX: number;
+  screenY: number;
+}
+
+/** State for AnimalInfoPanel adapter */
+interface AnimalInfoPanelAdapterState {
+  visible: boolean;
+  world: World | null;
+}
+
+/** State for TileInspectorPanel adapter */
+interface TileInspectorPanelAdapterState {
+  visible: boolean;
+}
+
+/** State for NotificationsPanel adapter */
+interface NotificationsPanelAdapterState {
+  visible: boolean;
+}
 
 // ============================================================================
 // Panel Configurations
@@ -39,6 +90,7 @@ export const RESOURCES_PANEL_CONFIG: PanelConfig<ResourcesPanel> = {
   defaultWidth: 280,
   defaultHeight: 200,
   renderMethod: (panel, ctx, _x, _y, width, _height, world) => {
+    if (!world) return;
     panel.render(ctx, width, world, false);
   },
 };
@@ -59,6 +111,7 @@ export const MEMORY_PANEL_CONFIG: PanelConfig<MemoryPanel> = {
     }
   },
   renderMethod: (panel, ctx, _x, _y, width, height, world) => {
+    if (!world) return;
     panel.render(ctx, width, height, world);
   },
 };
@@ -67,7 +120,7 @@ export const MEMORY_PANEL_CONFIG: PanelConfig<MemoryPanel> = {
  * Configuration for AgentInfoPanel adapter.
  * Pattern: Conditional visibility - requires entity selection
  */
-export const AGENT_INFO_PANEL_CONFIG: PanelConfig<AgentInfoPanel & { _adapter?: { visible: boolean; world: any; screenX: number; screenY: number } }> = {
+export const AGENT_INFO_PANEL_CONFIG: PanelConfig<AgentInfoPanel & { _adapter?: AgentInfoPanelAdapterState }> = {
   id: 'agent-info',
   title: 'Agent Info',
   defaultWidth: 300,
@@ -84,7 +137,7 @@ export const AGENT_INFO_PANEL_CONFIG: PanelConfig<AgentInfoPanel & { _adapter?: 
   },
   renderMethod: (panel, ctx, _x, _y, width, height, world) => {
     if (!panel._adapter) return;
-    const worldToUse = world || panel._adapter.world;
+    const worldToUse = world ?? panel._adapter.world ?? undefined;
     if (!worldToUse) return;
     panel.renderAt(ctx, 0, 0, width, height, worldToUse, panel._adapter.screenX, panel._adapter.screenY);
   },
@@ -101,7 +154,7 @@ export const AGENT_INFO_PANEL_CONFIG: PanelConfig<AgentInfoPanel & { _adapter?: 
  * Configuration for AnimalInfoPanel adapter.
  * Pattern: Conditional visibility - requires entity selection
  */
-export const ANIMAL_INFO_PANEL_CONFIG: PanelConfig<AnimalInfoPanel & { _adapter?: { visible: boolean; world: any } }> = {
+export const ANIMAL_INFO_PANEL_CONFIG: PanelConfig<AnimalInfoPanel & { _adapter?: AnimalInfoPanelAdapterState }> = {
   id: 'animal-info',
   title: 'Animal Info',
   defaultWidth: 300,
@@ -128,7 +181,7 @@ export const ANIMAL_INFO_PANEL_CONFIG: PanelConfig<AnimalInfoPanel & { _adapter?
   },
   handleContentClick: (panel, x, y, width, height) => {
     if (!panel._adapter) return false;
-    return panel.handleClickAt(x, y, width, height, panel._adapter.world);
+    return panel.handleClickAt(x, y, width, height, panel._adapter.world ?? undefined);
   },
 };
 
@@ -153,7 +206,7 @@ export const PLANT_INFO_PANEL_CONFIG: PanelConfig<PlantInfoPanel> = {
  * Configuration for TileInspectorPanel adapter.
  * Pattern: Conditional visibility - requires tile selection
  */
-export const TILE_INSPECTOR_PANEL_CONFIG: PanelConfig<TileInspectorPanel & { _adapter?: { visible: boolean } }> = {
+export const TILE_INSPECTOR_PANEL_CONFIG: PanelConfig<TileInspectorPanel & { _adapter?: TileInspectorPanelAdapterState }> = {
   id: 'tile-inspector',
   title: 'Tile Inspector',
   defaultWidth: 384,
@@ -196,6 +249,7 @@ export const ECONOMY_PANEL_CONFIG: PanelConfig<EconomyPanel> = {
     }
   },
   renderMethod: (panel, ctx, _x, _y, width, height, world) => {
+    if (!world) return;
     panel.render(ctx, width, height, world);
   },
 };
@@ -216,6 +270,7 @@ export const RELATIONSHIPS_PANEL_CONFIG: PanelConfig<RelationshipsPanel> = {
     }
   },
   renderMethod: (panel, ctx, _x, _y, width, height, world) => {
+    if (!world) return;
     panel.render(ctx, width, height, world);
   },
   handleScroll: (panel, deltaY, contentHeight) => {
@@ -233,6 +288,7 @@ export const GOVERNANCE_DASHBOARD_PANEL_CONFIG: PanelConfig<GovernanceDashboardP
   defaultWidth: 400,
   defaultHeight: 500,
   renderMethod: (panel, ctx, _x, _y, width, _height, world) => {
+    if (!world) return;
     panel.render(ctx, width, world);
   },
 };
@@ -241,7 +297,7 @@ export const GOVERNANCE_DASHBOARD_PANEL_CONFIG: PanelConfig<GovernanceDashboardP
  * Configuration for NotificationsPanel adapter.
  * Pattern: Simple - uses internal visible state, dynamic title
  */
-export const NOTIFICATIONS_PANEL_CONFIG: PanelConfig<NotificationsPanel & { _adapter?: { visible: boolean } }> = {
+export const NOTIFICATIONS_PANEL_CONFIG: PanelConfig<NotificationsPanel & { _adapter?: NotificationsPanelAdapterState }> = {
   id: 'notifications',
   title: 'Notifications', // Note: actual title includes count, handled by adapter subclass if needed
   defaultWidth: 400,
@@ -346,6 +402,65 @@ export const SHOP_PANEL_CONFIG: PanelConfig<ShopPanel> = {
   },
 };
 
+/**
+ * Configuration for MagicSystemsPanel adapter.
+ * Pattern: Delegate visibility - panel has isVisible/toggle methods
+ */
+export const MAGIC_SYSTEMS_PANEL_CONFIG: PanelConfig<MagicSystemsPanel> = {
+  id: 'magic-systems',
+  title: 'Magic Systems',
+  defaultWidth: 380,
+  defaultHeight: 450,
+  menuCategory: 'magic',
+  getVisible: (panel) => panel.isVisible(),
+  setVisible: (panel, visible) => {
+    if (visible !== panel.isVisible()) {
+      panel.toggle();
+    }
+  },
+  renderMethod: (panel, ctx, _x, _y, width, height, world) => {
+    panel.render(ctx, width, height, world);
+  },
+  handleScroll: (panel, deltaY, contentHeight) => {
+    return panel.handleScroll(deltaY, contentHeight);
+  },
+  handleContentClick: (panel, x, y, _width, _height) => {
+    return panel.handleClick(x, y);
+  },
+};
+
+/**
+ * Configuration for FarmManagementPanel adapter.
+ * Pattern: Adapter visibility - visibility stored in _adapter state
+ */
+interface FarmManagementPanelAdapterState {
+  visible: boolean;
+}
+
+export const FARM_MANAGEMENT_PANEL_CONFIG: PanelConfig<FarmManagementPanel & { _adapter?: FarmManagementPanelAdapterState }> = {
+  id: 'farm-management',
+  title: 'Farm Management',
+  defaultWidth: 320,
+  defaultHeight: 480,
+  menuCategory: 'farming',
+  getVisible: (panel) => panel._adapter?.visible ?? false,
+  setVisible: (panel, visible) => {
+    if (!panel._adapter) {
+      panel._adapter = { visible: false };
+    }
+    panel._adapter.visible = visible;
+  },
+  renderMethod: (panel, ctx, _x, _y, width, height, world) => {
+    panel.render(ctx, width, height, world);
+  },
+  handleScroll: (panel, deltaY, contentHeight) => {
+    return panel.handleScroll(deltaY, contentHeight);
+  },
+  handleContentClick: (panel, x, y, width, _height) => {
+    return panel.handleClick(x, y, width);
+  },
+};
+
 // ============================================================================
 // Factory Functions (backward compatibility)
 // ============================================================================
@@ -367,43 +482,54 @@ export function createMemoryPanelAdapter(panel: MemoryPanel): PanelAdapter<Memor
 /**
  * Create an AgentInfoPanel adapter (replaces AgentInfoPanelAdapter)
  */
-export function createAgentInfoPanelAdapter(panel: AgentInfoPanel): PanelAdapter<AgentInfoPanel & { _adapter?: { visible: boolean; world: any; screenX: number; screenY: number } }> {
-  const adapter = new PanelAdapter(panel as any, AGENT_INFO_PANEL_CONFIG);
+export function createAgentInfoPanelAdapter(panel: AgentInfoPanel): PanelAdapter<AgentInfoPanel & { _adapter?: AgentInfoPanelAdapterState }> & { setWorld: (world: World | null) => void; setScreenPosition: (x: number, y: number) => void } {
+  type PanelWithAdapter = AgentInfoPanel & { _adapter?: AgentInfoPanelAdapterState };
+  const panelWithAdapter = panel as PanelWithAdapter;
+  const adapter = new PanelAdapter(panelWithAdapter, AGENT_INFO_PANEL_CONFIG);
 
   // Add setWorld and setScreenPosition methods for backward compatibility
-  (adapter as any).setWorld = (world: any) => {
-    if (!(panel as any)._adapter) {
-      (panel as any)._adapter = { visible: false, world: null, screenX: 0, screenY: 0 };
-    }
-    (panel as any)._adapter.world = world;
+  const extendedAdapter = adapter as typeof adapter & {
+    setWorld: (world: World | null) => void;
+    setScreenPosition: (x: number, y: number) => void;
   };
 
-  (adapter as any).setScreenPosition = (x: number, y: number) => {
-    if (!(panel as any)._adapter) {
-      (panel as any)._adapter = { visible: false, world: null, screenX: 0, screenY: 0 };
+  extendedAdapter.setWorld = (world: World | null) => {
+    if (!panelWithAdapter._adapter) {
+      panelWithAdapter._adapter = { visible: false, world: null, screenX: 0, screenY: 0 };
     }
-    (panel as any)._adapter.screenX = x;
-    (panel as any)._adapter.screenY = y;
+    panelWithAdapter._adapter.world = world;
   };
 
-  return adapter;
+  extendedAdapter.setScreenPosition = (x: number, y: number) => {
+    if (!panelWithAdapter._adapter) {
+      panelWithAdapter._adapter = { visible: false, world: null, screenX: 0, screenY: 0 };
+    }
+    panelWithAdapter._adapter.screenX = x;
+    panelWithAdapter._adapter.screenY = y;
+  };
+
+  return extendedAdapter;
 }
 
 /**
  * Create an AnimalInfoPanel adapter (replaces AnimalInfoPanelAdapter)
  */
-export function createAnimalInfoPanelAdapter(panel: AnimalInfoPanel): PanelAdapter<AnimalInfoPanel & { _adapter?: { visible: boolean; world: any } }> {
-  const adapter = new PanelAdapter(panel as any, ANIMAL_INFO_PANEL_CONFIG);
+export function createAnimalInfoPanelAdapter(panel: AnimalInfoPanel): PanelAdapter<AnimalInfoPanel & { _adapter?: AnimalInfoPanelAdapterState }> & { setWorld: (world: World | null) => void } {
+  type PanelWithAdapter = AnimalInfoPanel & { _adapter?: AnimalInfoPanelAdapterState };
+  const panelWithAdapter = panel as PanelWithAdapter;
+  const adapter = new PanelAdapter(panelWithAdapter, ANIMAL_INFO_PANEL_CONFIG);
 
   // Add setWorld method for backward compatibility
-  (adapter as any).setWorld = (world: any) => {
-    if (!(panel as any)._adapter) {
-      (panel as any)._adapter = { visible: false, world: null };
+  const extendedAdapter = adapter as typeof adapter & { setWorld: (world: World | null) => void };
+
+  extendedAdapter.setWorld = (world: World | null) => {
+    if (!panelWithAdapter._adapter) {
+      panelWithAdapter._adapter = { visible: false, world: null };
     }
-    (panel as any)._adapter.world = world;
+    panelWithAdapter._adapter.world = world;
   };
 
-  return adapter;
+  return extendedAdapter;
 }
 
 /**
@@ -416,8 +542,9 @@ export function createPlantInfoPanelAdapter(panel: PlantInfoPanel): PanelAdapter
 /**
  * Create a TileInspectorPanel adapter (replaces TileInspectorPanelAdapter)
  */
-export function createTileInspectorPanelAdapter(panel: TileInspectorPanel): PanelAdapter<TileInspectorPanel & { _adapter?: { visible: boolean } }> {
-  return new PanelAdapter(panel as any, TILE_INSPECTOR_PANEL_CONFIG);
+export function createTileInspectorPanelAdapter(panel: TileInspectorPanel): PanelAdapter<TileInspectorPanel & { _adapter?: TileInspectorPanelAdapterState }> {
+  type PanelWithAdapter = TileInspectorPanel & { _adapter?: TileInspectorPanelAdapterState };
+  return new PanelAdapter(panel as PanelWithAdapter, TILE_INSPECTOR_PANEL_CONFIG);
 }
 
 /**
@@ -444,17 +571,21 @@ export function createGovernanceDashboardPanelAdapter(panel: GovernanceDashboard
 /**
  * Create a NotificationsPanel adapter (replaces NotificationsPanelAdapter)
  */
-export function createNotificationsPanelAdapter(panel: NotificationsPanel): PanelAdapter<NotificationsPanel & { _adapter?: { visible: boolean } }> {
-  const adapter = new PanelAdapter(panel as any, NOTIFICATIONS_PANEL_CONFIG);
+export function createNotificationsPanelAdapter(panel: NotificationsPanel): PanelAdapter<NotificationsPanel & { _adapter?: NotificationsPanelAdapterState }> & { getTitle: () => string } {
+  type PanelWithAdapter = NotificationsPanel & { _adapter?: NotificationsPanelAdapterState };
+  const panelWithAdapter = panel as PanelWithAdapter;
+  const adapter = new PanelAdapter(panelWithAdapter, NOTIFICATIONS_PANEL_CONFIG);
 
   // Override getTitle to include notification count
   const originalGetTitle = adapter.getTitle.bind(adapter);
-  (adapter as any).getTitle = () => {
+  const extendedAdapter = adapter as typeof adapter & { getTitle: () => string };
+
+  extendedAdapter.getTitle = () => {
     const count = panel.getCount();
     return count > 0 ? `Notifications (${count})` : originalGetTitle();
   };
 
-  return adapter;
+  return extendedAdapter;
 }
 
 /**
@@ -479,8 +610,305 @@ export function createSettingsPanelAdapter(panel: SettingsPanel): PanelAdapter<S
 }
 
 /**
+ * Configuration for LLMConfigPanel adapter.
+ * Pattern: Special - uses getIsVisible/toggle, DOM-based (no canvas render)
+ */
+export const LLM_CONFIG_PANEL_CONFIG: PanelConfig<LLMConfigPanel> = {
+  id: 'llm-config',
+  title: 'Custom LLM Config',
+  defaultWidth: 500,
+  defaultHeight: 400,
+  getVisible: (panel) => panel.getIsVisible(),
+  setVisible: (panel, visible) => {
+    if (visible !== panel.getIsVisible()) {
+      panel.toggle();
+    }
+  },
+  renderMethod: (_panel, _ctx, _x, _y, _width, _height, _world) => {
+    // LLMConfigPanel uses DOM elements, not canvas rendering
+  },
+};
+
+/**
+ * Create an LLMConfigPanel adapter
+ */
+export function createLLMConfigPanelAdapter(panel: LLMConfigPanel): PanelAdapter<LLMConfigPanel> {
+  return new PanelAdapter(panel, LLM_CONFIG_PANEL_CONFIG);
+}
+
+/**
  * Create a ShopPanel adapter (replaces ShopPanelAdapter)
  */
 export function createShopPanelAdapter(panel: ShopPanel): PanelAdapter<ShopPanel> {
   return new PanelAdapter(panel, SHOP_PANEL_CONFIG);
+}
+
+/**
+ * Create a MagicSystemsPanel adapter
+ */
+export function createMagicSystemsPanelAdapter(panel: MagicSystemsPanel): PanelAdapter<MagicSystemsPanel> {
+  return new PanelAdapter(panel, MAGIC_SYSTEMS_PANEL_CONFIG);
+}
+
+/**
+ * Configuration for SpellbookPanel adapter.
+ * Pattern: Delegate visibility - panel has isVisible/toggle methods
+ */
+export const SPELLBOOK_PANEL_CONFIG: PanelConfig<SpellbookPanel> = {
+  id: 'spellbook',
+  title: 'Spellbook',
+  defaultWidth: 420,
+  defaultHeight: 550,
+  menuCategory: 'magic',
+  getVisible: (panel) => panel.isVisible(),
+  setVisible: (panel, visible) => {
+    if (visible !== panel.isVisible()) {
+      panel.toggle();
+    }
+  },
+  renderMethod: (panel, ctx, _x, _y, width, height, world) => {
+    panel.render(ctx, width, height, world);
+  },
+  handleScroll: (panel, deltaY, contentHeight) => {
+    return panel.handleScroll(deltaY, contentHeight);
+  },
+  handleContentClick: (panel, x, y, _width, _height) => {
+    return panel.handleClick(x, y);
+  },
+};
+
+/**
+ * Create a SpellbookPanel adapter
+ */
+export function createSpellbookPanelAdapter(panel: SpellbookPanel): PanelAdapter<SpellbookPanel> {
+  return new PanelAdapter(panel, SPELLBOOK_PANEL_CONFIG);
+}
+
+/**
+ * Configuration for DivinePowersPanel adapter.
+ * Pattern: Delegate visibility - panel has isVisible/toggle methods
+ */
+export const DIVINE_POWERS_PANEL_CONFIG: PanelConfig<DivinePowersPanel> = {
+  id: 'divine-powers',
+  title: 'Divine Powers',
+  defaultWidth: 400,
+  defaultHeight: 550,
+  menuCategory: 'divinity',
+  getVisible: (panel) => panel.isVisible(),
+  setVisible: (panel, visible) => {
+    if (visible !== panel.isVisible()) {
+      panel.toggle();
+    }
+  },
+  renderMethod: (panel, ctx, _x, _y, width, height, world) => {
+    panel.render(ctx, width, height, world);
+  },
+  handleScroll: (panel, deltaY, contentHeight) => {
+    return panel.handleScroll(deltaY, contentHeight);
+  },
+  handleContentClick: (panel, x, y, _width, _height) => {
+    return panel.handleClick(x, y);
+  },
+};
+
+/**
+ * Create a DivinePowersPanel adapter
+ */
+export function createDivinePowersPanelAdapter(panel: DivinePowersPanel): PanelAdapter<DivinePowersPanel> {
+  return new PanelAdapter(panel, DIVINE_POWERS_PANEL_CONFIG);
+}
+
+/**
+ * Configuration for VisionComposerPanel adapter.
+ * Pattern: Delegate visibility - panel has isVisible/toggle methods
+ */
+export const VISION_COMPOSER_PANEL_CONFIG: PanelConfig<VisionComposerPanel> = {
+  id: 'vision-composer',
+  title: 'Vision Composer',
+  defaultWidth: 500,
+  defaultHeight: 600,
+  menuCategory: 'divinity',
+  getVisible: (panel) => panel.isVisible(),
+  setVisible: (panel, visible) => {
+    if (visible !== panel.isVisible()) {
+      panel.toggle();
+    }
+  },
+  renderMethod: (panel, ctx, _x, _y, width, height, world) => {
+    panel.render(ctx, width, height, world);
+  },
+  handleScroll: (panel, deltaY, contentHeight) => {
+    return panel.handleScroll(deltaY, contentHeight);
+  },
+  handleContentClick: (panel, x, y, _width, _height) => {
+    return panel.handleClick(x, y);
+  },
+};
+
+/**
+ * Create a VisionComposerPanel adapter
+ */
+export function createVisionComposerPanelAdapter(panel: VisionComposerPanel): PanelAdapter<VisionComposerPanel> {
+  return new PanelAdapter(panel, VISION_COMPOSER_PANEL_CONFIG);
+}
+
+/**
+ * Configuration for DevPanel adapter.
+ * Pattern: Delegate visibility - panel has isVisible/toggle methods
+ */
+export const DEV_PANEL_CONFIG: PanelConfig<DevPanel> = {
+  id: 'dev-panel',
+  title: 'Dev Tools',
+  defaultWidth: 450,
+  defaultHeight: 650,
+  menuCategory: 'dev',
+  getVisible: (panel) => panel.isVisible(),
+  setVisible: (panel, visible) => {
+    if (visible !== panel.isVisible()) {
+      panel.toggle();
+    }
+  },
+  renderMethod: (panel, ctx, _x, _y, width, height, world) => {
+    panel.render(ctx, width, height, world);
+  },
+  handleScroll: (panel, deltaY, contentHeight) => {
+    return panel.handleScroll(deltaY, contentHeight);
+  },
+  handleContentClick: (panel, x, y, _width, _height) => {
+    return panel.handleClick(x, y);
+  },
+};
+
+/**
+ * Create a DevPanel adapter
+ */
+export function createDevPanelAdapter(panel: DevPanel): PanelAdapter<DevPanel> {
+  return new PanelAdapter(panel, DEV_PANEL_CONFIG);
+}
+
+// ============================================================================
+// Divine Panel Configurations
+// ============================================================================
+
+/**
+ * Configuration for DivineAnalyticsPanel adapter.
+ * Pattern: Delegate visibility - panel has isVisible/setVisible methods
+ */
+export const DIVINE_ANALYTICS_PANEL_CONFIG: PanelConfig<DivineAnalyticsPanel> = {
+  id: 'divine-analytics',
+  title: 'Divine Insights',
+  defaultWidth: 700,
+  defaultHeight: 550,
+  menuCategory: 'divinity',
+  getVisible: (panel) => panel.isVisible(),
+  setVisible: (panel, visible) => panel.setVisible(visible),
+  renderMethod: (panel, ctx, x, y, width, height, world) => {
+    panel.render(ctx, x, y, width, height, world);
+  },
+  handleScroll: (panel, deltaY, contentHeight) => {
+    return panel.handleScroll ? panel.handleScroll(deltaY, contentHeight) : false;
+  },
+};
+
+/**
+ * Create a DivineAnalyticsPanel adapter
+ */
+export function createDivineAnalyticsPanelAdapter(panel: DivineAnalyticsPanel): PanelAdapter<DivineAnalyticsPanel> {
+  return new PanelAdapter(panel, DIVINE_ANALYTICS_PANEL_CONFIG);
+}
+
+/**
+ * Configuration for SacredGeographyPanel adapter.
+ * Pattern: Delegate visibility - panel has isVisible/setVisible methods
+ */
+export const SACRED_GEOGRAPHY_PANEL_CONFIG: PanelConfig<SacredGeographyPanel> = {
+  id: 'sacred-geography',
+  title: 'Sacred Geography',
+  defaultWidth: 600,
+  defaultHeight: 500,
+  menuCategory: 'divinity',
+  getVisible: (panel) => panel.isVisible(),
+  setVisible: (panel, visible) => panel.setVisible(visible),
+  renderMethod: (panel, ctx, x, y, width, height, world) => {
+    panel.render(ctx, x, y, width, height, world);
+  },
+  handleContentClick: (panel, x, y, _width, _height) => {
+    return panel.handleClick ? panel.handleClick(x, y) : false;
+  },
+};
+
+/**
+ * Create a SacredGeographyPanel adapter
+ */
+export function createSacredGeographyPanelAdapter(panel: SacredGeographyPanel): PanelAdapter<SacredGeographyPanel> {
+  return new PanelAdapter(panel, SACRED_GEOGRAPHY_PANEL_CONFIG);
+}
+
+/**
+ * Configuration for AngelManagementPanel adapter.
+ * Pattern: Delegate visibility - panel has isVisible/setVisible methods
+ */
+export const ANGEL_MANAGEMENT_PANEL_CONFIG: PanelConfig<AngelManagementPanel> = {
+  id: 'angel-management',
+  title: 'Heavenly Host',
+  defaultWidth: 550,
+  defaultHeight: 500,
+  menuCategory: 'divinity',
+  getVisible: (panel) => panel.isVisible(),
+  setVisible: (panel, visible) => panel.setVisible(visible),
+  renderMethod: (panel, ctx, x, y, width, height, world) => {
+    panel.render(ctx, x, y, width, height, world);
+  },
+  handleScroll: (panel, deltaY, _contentHeight) => {
+    panel.handleScroll(deltaY);
+    return true;
+  },
+  handleContentClick: (panel, x, y, _width, _height) => {
+    return panel.handleClick(x, y);
+  },
+};
+
+/**
+ * Create an AngelManagementPanel adapter
+ */
+export function createAngelManagementPanelAdapter(panel: AngelManagementPanel): PanelAdapter<AngelManagementPanel> {
+  return new PanelAdapter(panel, ANGEL_MANAGEMENT_PANEL_CONFIG);
+}
+
+/**
+ * Configuration for PrayerPanel adapter.
+ * Pattern: Delegate visibility - panel has isVisible/setVisible methods
+ */
+export const PRAYER_PANEL_CONFIG: PanelConfig<PrayerPanel> = {
+  id: 'prayers',
+  title: 'Prayers & Supplications',
+  defaultWidth: 550,
+  defaultHeight: 450,
+  menuCategory: 'divinity',
+  getVisible: (panel) => panel.isVisible(),
+  setVisible: (panel, visible) => panel.setVisible(visible),
+  renderMethod: (panel, ctx, x, y, width, height, world) => {
+    panel.render(ctx, x, y, width, height, world);
+  },
+  handleScroll: (panel, deltaY, _contentHeight) => {
+    panel.handleScroll(deltaY);
+    return true;
+  },
+  handleContentClick: (panel, x, y, _width, _height) => {
+    return panel.handleClick(x, y);
+  },
+};
+
+/**
+ * Create a PrayerPanel adapter
+ */
+export function createPrayerPanelAdapter(panel: PrayerPanel): PanelAdapter<PrayerPanel> {
+  return new PanelAdapter(panel, PRAYER_PANEL_CONFIG);
+}
+
+/**
+ * Create a FarmManagementPanel adapter
+ */
+export function createFarmManagementPanelAdapter(panel: FarmManagementPanel): PanelAdapter<FarmManagementPanel & { _adapter?: FarmManagementPanelAdapterState }> {
+  return new PanelAdapter(panel, FARM_MANAGEMENT_PANEL_CONFIG);
 }

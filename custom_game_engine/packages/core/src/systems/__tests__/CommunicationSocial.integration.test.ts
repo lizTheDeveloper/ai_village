@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { IntegrationTestHarness } from '../../__tests__/utils/IntegrationTestHarness.js';
 import { createMinimalWorld } from '../../__tests__/fixtures/worldFixtures.js';
 import { CommunicationSystem } from '../CommunicationSystem.js';
-import { createMemoryComponent } from '../../components/MemoryComponent.js';
+import { MemoryComponent } from '../../components/MemoryComponent.js';
 import { TrustNetworkComponent } from '../../components/TrustNetworkComponent.js';
 
 /**
@@ -31,8 +31,8 @@ describe('CommunicationSystem + Social Network Integration', () => {
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
     const agent2 = harness.createTestAgent({ x: 11, y: 11 });
 
-    agent1.addComponent(createMemoryComponent());
-    agent2.addComponent(createMemoryComponent());
+    agent1.addComponent(new MemoryComponent(agent1.id));
+    agent2.addComponent(new MemoryComponent(agent2.id));
     agent1.addComponent(new TrustNetworkComponent());
     agent2.addComponent(new TrustNetworkComponent());
 
@@ -50,8 +50,8 @@ describe('CommunicationSystem + Social Network Integration', () => {
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
     const agent2 = harness.createTestAgent({ x: 10, y: 11 });
 
-    agent1.addComponent(createMemoryComponent());
-    agent2.addComponent(createMemoryComponent());
+    agent1.addComponent(new MemoryComponent(agent1.id));
+    agent2.addComponent(new MemoryComponent(agent2.id));
     agent1.addComponent(new TrustNetworkComponent());
     agent2.addComponent(new TrustNetworkComponent());
 
@@ -78,8 +78,8 @@ describe('CommunicationSystem + Social Network Integration', () => {
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
     const agent2 = harness.createTestAgent({ x: 100, y: 100 });
 
-    agent1.addComponent(createMemoryComponent());
-    agent2.addComponent(createMemoryComponent());
+    agent1.addComponent(new MemoryComponent(agent1.id));
+    agent2.addComponent(new MemoryComponent(agent2.id));
     agent1.addComponent(new TrustNetworkComponent());
     agent2.addComponent(new TrustNetworkComponent());
 
@@ -118,8 +118,8 @@ describe('CommunicationSystem + Social Network Integration', () => {
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
     const agent2 = harness.createTestAgent({ x: 11, y: 11 });
 
-    agent1.addComponent(createMemoryComponent());
-    agent2.addComponent(createMemoryComponent());
+    agent1.addComponent(new MemoryComponent(agent1.id));
+    agent2.addComponent(new MemoryComponent(agent2.id));
 
     const trust1 = new TrustNetworkComponent();
     const trust2 = new TrustNetworkComponent();
@@ -156,7 +156,7 @@ describe('CommunicationSystem + Social Network Integration', () => {
     const agents = [];
     for (let i = 0; i < 5; i++) {
       const agent = harness.createTestAgent({ x: 10 + i, y: 10 });
-      agent.addComponent(createMemoryComponent());
+      agent.addComponent(new MemoryComponent(agent.id || entity.id));
       agent.addComponent(new TrustNetworkComponent());
       agents.push(agent);
     }
@@ -175,8 +175,8 @@ describe('CommunicationSystem + Social Network Integration', () => {
     const agent1 = harness.createTestAgent({ x: 10, y: 10 });
     const agent2 = harness.createTestAgent({ x: 11, y: 11 });
 
-    const memory1 = createMemoryComponent();
-    const memory2 = createMemoryComponent();
+    const memory1 = new MemoryComponent(agent1.id);
+    const memory2 = new MemoryComponent(agent2.id);
 
     agent1.addComponent(memory1);
     agent2.addComponent(memory2);

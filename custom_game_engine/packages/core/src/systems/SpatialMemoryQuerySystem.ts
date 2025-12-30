@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
@@ -27,8 +28,8 @@ export class SpatialMemoryQuerySystem implements System {
   update(_world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
     // Get entities with both spatial and episodic memory
     const memoryEntities = entities.filter(e =>
-      e.components.has('spatial_memory') &&
-      e.components.has('episodic_memory')
+      e.components.has(CT.SpatialMemory) &&
+      e.components.has(CT.EpisodicMemory)
     );
 
     for (const entity of memoryEntities) {

@@ -1,13 +1,13 @@
 import type { ActionHandler } from './ActionHandler.js';
 import type { Action, ActionResult, ValidationResult } from './Action.js';
-import type { World } from '../ecs/World.js';
-import type { Tile } from '../systems/SoilSystem.js';
+import type { World, ITile } from '../ecs/World.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { InventoryComponent, InventorySlot } from '../components/InventoryComponent.js';
 import type { EntityImpl } from '../ecs/Entity.js';
+import { ComponentType } from '../types/ComponentType.js';
 
 interface WorldWithTiles extends World {
-  getTileAt(x: number, y: number): Tile | null;
+  getTileAt(x: number, y: number): ITile | undefined;
 }
 
 /**
@@ -27,7 +27,7 @@ interface WorldWithTiles extends World {
  * - Seed item validation is strict (must exist in inventory)
  */
 export class PlantActionHandler implements ActionHandler {
-  public readonly type = 'plant' as const;
+  public readonly type = ComponentType.Plant as const;
   public readonly description = 'Plant a seed in tilled soil';
   public readonly interruptible = true;
 
@@ -75,7 +75,7 @@ export class PlantActionHandler implements ActionHandler {
     }
 
     // Check actor has position
-    const actorPos = actor.components.get('position') as PositionComponent | undefined;
+    const actorPos = actor.components.get(ComponentType.Position) as PositionComponent | undefined;
     if (!actorPos) {
       return {
         valid: false,
@@ -84,7 +84,7 @@ export class PlantActionHandler implements ActionHandler {
     }
 
     // Check actor has inventory
-    const inventory = actor.components.get('inventory') as InventoryComponent | undefined;
+    const inventory = actor.components.get(ComponentType.Inventory) as InventoryComponent | undefined;
     if (!inventory || !inventory.slots) {
       return {
         valid: false,
@@ -149,10 +149,10 @@ export class PlantActionHandler implements ActionHandler {
     }
 
     // Check no existing plant at this location
-    const existingPlants = world.query().with('plant').with('position').executeEntities();
+    const existingPlants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
     for (const plantEntity of existingPlants) {
       const plantImpl = plantEntity as EntityImpl;
-      const plantPos = plantImpl.getComponent<PositionComponent>('position');
+      const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
       if (plantPos && Math.floor(plantPos.x) === targetPos.x && Math.floor(plantPos.y) === targetPos.y) {
         return {
           valid: false,
@@ -198,7 +198,7 @@ export class PlantActionHandler implements ActionHandler {
     }
 
     const actorImpl = actor as EntityImpl;
-    const inventory = actorImpl.getComponent<InventoryComponent>('inventory');
+    const inventory = actorImpl.getComponent<InventoryComponent>(ComponentType.Inventory);
     if (!inventory) {
       return {
         success: false,
@@ -242,7 +242,7 @@ export class PlantActionHandler implements ActionHandler {
     // Remove one seed from inventory
     const slotIndex = inventory.slots.indexOf(seedSlot);
     if (slotIndex >= 0) {
-      actorImpl.updateComponent<InventoryComponent>('inventory', (inv) => {
+      actorImpl.updateComponent<InventoryComponent>(ComponentType.Inventory, (inv) => {
         const newSlots = [...inv.slots];
         const slot = newSlots[slotIndex];
         if (slot && slot.quantity > 1) {

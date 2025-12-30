@@ -4,8 +4,11 @@ import { createMinimalWorld } from '../../__tests__/fixtures/worldFixtures.js';
 import { SpatialMemoryQuerySystem } from '../SpatialMemoryQuerySystem.js';
 import { MemorySystem } from '../MemorySystem.js';
 import { ExplorationSystem } from '../ExplorationSystem.js';
-import { createMemoryComponent } from '../../components/MemoryComponent.js';
+import { MemoryComponent } from '../../components/MemoryComponent.js';
+import { SpatialMemoryComponent } from '../../components/SpatialMemoryComponent.js';
+import { ExplorationStateComponent } from '../../components/ExplorationStateComponent.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Integration tests for SpatialMemoryQuerySystem + MemorySystem + ExplorationSystem
  *
@@ -30,7 +33,8 @@ describe('SpatialMemoryQuerySystem + MemorySystem + ExplorationSystem Integratio
     harness.registerSystem('SpatialMemoryQuerySystem', spatialSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
-    agent.addComponent(createMemoryComponent());
+    agent.addComponent(new MemoryComponent(agent.id));
+    agent.addComponent(new SpatialMemoryComponent());
 
     const entities = Array.from(harness.world.entities.values());
 
@@ -47,23 +51,17 @@ describe('SpatialMemoryQuerySystem + MemorySystem + ExplorationSystem Integratio
     harness.registerSystem('MemorySystem', memorySystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
-    agent.addComponent(createMemoryComponent());
-
-    // Add exploration state
-    agent.addComponent({
-      type: 'ExplorationState',
-      version: 1,
-      mode: 'frontier',
-      target: null,
-      visited: new Set(),
-      frontierCells: [],
-    });
+    agent.addComponent(new MemoryComponent(agent.id));
+    agent.addComponent(new SpatialMemoryComponent());
+    agent.addComponent(new ExplorationStateComponent());
 
     const entities = Array.from(harness.world.entities.values());
 
     explorationSystem.update(harness.world, entities, 1.0);
     memorySystem.update(harness.world, entities, 1.0);
 
-    expect(agent.getComponent('memory')).toBeDefined();
+    expect(agent.getComponent(ComponentType.Memory)).toBeDefined();
+    expect(agent.getComponent(ComponentType.SpatialMemory)).toBeDefined();
+    expect(agent.getComponent(ComponentType.ExplorationState)).toBeDefined();
   });
 });

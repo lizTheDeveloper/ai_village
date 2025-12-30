@@ -1,30 +1,43 @@
 /**
  * TimelinePanel - Visual timeline browser for universe/checkpoint selection
  *
- * Replaces traditional "load game" screen with a 2D timeline view:
- * - Horizontal axis: Different universes (grouped by magic law configuration)
- * - Vertical axis: Time within universe (checkpoints = days)
+ * Advanced timeline visualization with:
+ * - Parallel timelines: Multiple playthroughs in the same universe (same magic laws)
+ * - Fork branches: Timeline splits when rewinding to earlier checkpoint
+ * - Portal grid: Visual connections between universes via portals
  *
  * User flow:
  * 1. Select a universe (each has different magic laws)
- * 2. Select when in that universe (which checkpoint/day)
- * 3. Load that checkpoint (may fork if rewinding from current time)
+ * 2. Select a timeline within that universe (different playthroughs)
+ * 3. Select when in that timeline (which checkpoint/day)
+ * 4. Load that checkpoint (may fork if rewinding from current time)
  */
 
 import type { Checkpoint } from '../../core/src/systems/AutoSaveSystem.js';
+
+export interface Timeline {
+  id: string;  // Unique timeline ID
+  universeId: string;
+  checkpoints: Checkpoint[];
+  forkParent?: string;  // Parent timeline ID if this is a fork
+  forkPoint?: number;   // Day number where fork occurred
+  isActive: boolean;    // Currently active timeline
+}
 
 export interface UniverseTimeline {
   universeId: string;
   universeName: string;
   magicLawsHash: string;
-  checkpoints: Checkpoint[];
-  currentDay: number;  // Latest day in this universe
+  timelines: Timeline[];  // Multiple parallel timelines
+  portalConnections: string[];  // Other universe IDs connected by portals
+  currentDay: number;  // Latest day across all timelines
 }
 
 export class TimelinePanel {
   private container: HTMLElement;
   private universes: Map<string, UniverseTimeline> = new Map();
   private selectedUniverse: string | null = null;
+  private selectedTimeline: string | null = null;
   private selectedCheckpoint: string | null = null;
   private onLoad: ((checkpointKey: string) => void) | null = null;
 
@@ -70,37 +83,55 @@ export class TimelinePanel {
   hide(): void {
     this.container.style.display = 'none';
     this.selectedUniverse = null;
+    this.selectedTimeline = null;
     this.selectedCheckpoint = null;
   }
 
   /**
    * Set available universes and checkpoints.
+   * Groups checkpoints into timelines and detects forks.
    */
-  setTimelines(checkpoints: Checkpoint[]): void {
+  setTimelines(checkpoints: Checkpoint[], portalConnections?: Map<string, string[]>): void {
     this.universes.clear();
 
     // Group checkpoints by universe
+    const universeCheckpoints = new Map<string, Checkpoint[]>();
     for (const checkpoint of checkpoints) {
-      let timeline = this.universes.get(checkpoint.universeId);
-
-      if (!timeline) {
-        timeline = {
-          universeId: checkpoint.universeId,
-          universeName: this.generateUniverseName(checkpoint.magicLawsHash),
-          magicLawsHash: checkpoint.magicLawsHash,
-          checkpoints: [],
-          currentDay: 0,
-        };
-        this.universes.set(checkpoint.universeId, timeline);
+      let list = universeCheckpoints.get(checkpoint.universeId);
+      if (!list) {
+        list = [];
+        universeCheckpoints.set(checkpoint.universeId, list);
       }
-
-      timeline.checkpoints.push(checkpoint);
-      timeline.currentDay = Math.max(timeline.currentDay, checkpoint.day);
+      list.push(checkpoint);
     }
 
-    // Sort checkpoints by day within each universe
-    for (const timeline of this.universes.values()) {
-      timeline.checkpoints.sort((a, b) => a.day - b.day);
+    // Build timelines for each universe
+    for (const [universeId, checkpointList] of universeCheckpoints) {
+      const sortedCheckpoints = checkpointList.sort((a, b) => a.day - b.day);
+
+      // For now, create a single timeline per universe
+      // In the future, detect forks from checkpoint metadata
+      const mainTimeline: Timeline = {
+        id: `${universeId}_main`,
+        universeId,
+        checkpoints: sortedCheckpoints,
+        isActive: true,
+      };
+
+      const universeName = this.generateUniverseName(
+        sortedCheckpoints[0]?.magicLawsHash || 'base'
+      );
+
+      const universe: UniverseTimeline = {
+        universeId,
+        universeName,
+        magicLawsHash: sortedCheckpoints[0]?.magicLawsHash || 'base',
+        timelines: [mainTimeline],
+        portalConnections: portalConnections?.get(universeId) || [],
+        currentDay: Math.max(...sortedCheckpoints.map(c => c.day), 0),
+      };
+
+      this.universes.set(universeId, universe);
     }
 
     this.render();
@@ -141,7 +172,7 @@ export class TimelinePanel {
       return;
     }
 
-    // Two-column layout: universes | checkpoints
+    // Three-column layout: universes | timelines | checkpoints
     const mainLayout = document.createElement('div');
     mainLayout.style.cssText = `
       display: flex;
@@ -154,7 +185,11 @@ export class TimelinePanel {
     const universeList = this.renderUniverseList();
     mainLayout.appendChild(universeList);
 
-    // Right: Checkpoint list (for selected universe)
+    // Middle: Timeline list (for selected universe)
+    const timelineList = this.renderTimelineList();
+    mainLayout.appendChild(timelineList);
+
+    // Right: Checkpoint list (for selected timeline)
     const checkpointList = this.renderCheckpointList();
     mainLayout.appendChild(checkpointList);
 
@@ -228,6 +263,7 @@ export class TimelinePanel {
 
       universeCard.onclick = () => {
         this.selectedUniverse = timeline.universeId;
+        this.selectedTimeline = null;  // Reset timeline selection
         this.selectedCheckpoint = null;  // Reset checkpoint selection
         this.render();
       };
@@ -238,7 +274,9 @@ export class TimelinePanel {
       universeCard.appendChild(name);
 
       const info = document.createElement('div');
-      info.textContent = `${timeline.checkpoints.length} checkpoints • Day ${timeline.currentDay}`;
+      const totalCheckpoints = timeline.timelines.reduce((sum, t) => sum + t.checkpoints.length, 0);
+      const timelineCount = timeline.timelines.length;
+      info.textContent = `${timelineCount} timeline(s) • ${totalCheckpoints} checkpoints • Day ${timeline.currentDay}`;
       info.style.cssText = 'font-size: 12px; color: #aaa;';
       universeCard.appendChild(info);
 
@@ -249,7 +287,232 @@ export class TimelinePanel {
   }
 
   /**
-   * Render the checkpoint list (right panel) for selected universe.
+   * Render a visual tree showing timeline fork relationships.
+   */
+  private renderTimelineTree(universe: UniverseTimeline): HTMLElement {
+    const container = document.createElement('div');
+    container.style.cssText = `
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #0a0a0a;
+      border: 1px solid #444;
+      border-radius: 4px;
+    `;
+
+    const title = document.createElement('div');
+    title.textContent = 'Timeline Branches';
+    title.style.cssText = 'font-size: 12px; color: #888; margin-bottom: 10px;';
+    container.appendChild(title);
+
+    // Create SVG for timeline tree
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', '200');
+    svg.style.cssText = 'background: #0a0a0a;';
+
+    // Build tree structure
+    const rootTimeline = universe.timelines.find(t => !t.forkParent);
+    if (!rootTimeline) return container;
+
+    // Layout parameters
+    const xStart = 20;
+    const yStart = 20;
+    const xSpacing = 100;
+    const ySpacing = 40;
+
+    // Render root timeline
+    this.renderTimelineNode(svg, rootTimeline, xStart, yStart);
+
+    // Render child timelines (forks)
+    let childIndex = 0;
+    for (const timeline of universe.timelines) {
+      if (timeline.forkParent === rootTimeline.id) {
+        childIndex++;
+        const childX = xStart + xSpacing;
+        const childY = yStart + (childIndex * ySpacing);
+
+        // Draw branch line from parent to child
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', String(xStart + 50));
+        line.setAttribute('y1', String(yStart + 10));
+        line.setAttribute('x2', String(childX));
+        line.setAttribute('y2', String(childY + 10));
+        line.setAttribute('stroke', '#4CAF50');
+        line.setAttribute('stroke-width', '2');
+        line.setAttribute('stroke-dasharray', '5,5');
+        svg.appendChild(line);
+
+        // Render child node
+        this.renderTimelineNode(svg, timeline, childX, childY);
+      }
+    }
+
+    container.appendChild(svg);
+    return container;
+  }
+
+  /**
+   * Render a single timeline node in the SVG tree.
+   */
+  private renderTimelineNode(
+    svg: SVGSVGElement,
+    timeline: Timeline,
+    x: number,
+    y: number
+  ): void {
+    // Circle for timeline node
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', String(x + 10));
+    circle.setAttribute('cy', String(y + 10));
+    circle.setAttribute('r', '8');
+    circle.setAttribute('fill', timeline.isActive ? '#4CAF50' : '#666');
+    circle.setAttribute('stroke', '#fff');
+    circle.setAttribute('stroke-width', '2');
+    svg.appendChild(circle);
+
+    // Label
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', String(x + 25));
+    text.setAttribute('y', String(y + 15));
+    text.setAttribute('fill', '#aaa');
+    text.setAttribute('font-size', '11');
+    text.setAttribute('font-family', 'monospace');
+
+    const label = timeline.forkParent
+      ? `Fork @ Day ${timeline.forkPoint}`
+      : 'Main';
+    text.textContent = label;
+    svg.appendChild(text);
+  }
+
+  /**
+   * Render the timeline list (middle panel) for selected universe.
+   */
+  private renderTimelineList(): HTMLElement {
+    const panel = document.createElement('div');
+    panel.style.cssText = `
+      flex: 1;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      padding: 15px;
+      overflow-y: auto;
+    `;
+
+    const header = document.createElement('h2');
+    header.textContent = 'Timelines';
+    header.style.cssText = 'margin: 0 0 15px 0; font-size: 18px; color: #fff;';
+    panel.appendChild(header);
+
+    if (!this.selectedUniverse) {
+      const placeholder = document.createElement('p');
+      placeholder.textContent = 'Select a universe to view timelines';
+      placeholder.style.cssText = 'color: #666; text-align: center; margin-top: 50px;';
+      panel.appendChild(placeholder);
+      return panel;
+    }
+
+    const universe = this.universes.get(this.selectedUniverse);
+    if (!universe) return panel;
+
+    // Add timeline tree visualization if there are forks
+    const hasForks = universe.timelines.some(t => t.forkParent);
+    if (hasForks) {
+      const treeViz = this.renderTimelineTree(universe);
+      panel.appendChild(treeViz);
+    }
+
+    // Show portal connections if any
+    if (universe.portalConnections.length > 0) {
+      const portalInfo = document.createElement('div');
+      portalInfo.style.cssText = `
+        padding: 10px;
+        margin-bottom: 15px;
+        background: #1e2a3a;
+        border: 1px solid #4a5a6a;
+        border-radius: 4px;
+        font-size: 12px;
+        color: #aaa;
+      `;
+      portalInfo.innerHTML = `<strong style="color: #64b5f6;">Portal Connections:</strong><br/>
+        Connected to ${universe.portalConnections.length} other universe(s)`;
+      panel.appendChild(portalInfo);
+    }
+
+    // Render timelines
+    for (const timeline of universe.timelines) {
+      const card = document.createElement('div');
+      const isSelected = this.selectedTimeline === timeline.id;
+
+      card.style.cssText = `
+        padding: 12px;
+        margin-bottom: 10px;
+        background: ${isSelected ? '#2a4a2a' : '#252525'};
+        border: 2px solid ${isSelected ? '#4CAF50' : '#333'};
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+      `;
+
+      card.onmouseover = () => {
+        if (!isSelected) {
+          card.style.background = '#303030';
+        }
+      };
+      card.onmouseout = () => {
+        if (!isSelected) {
+          card.style.background = '#252525';
+        }
+      };
+
+      card.onclick = () => {
+        this.selectedTimeline = timeline.id;
+        this.selectedCheckpoint = null;  // Reset checkpoint selection
+        this.render();
+      };
+
+      // Timeline name/label
+      const name = document.createElement('div');
+      const timelineName = timeline.forkParent
+        ? `Fork from Day ${timeline.forkPoint}`
+        : 'Main Timeline';
+      name.textContent = timelineName;
+      name.style.cssText = 'font-weight: bold; margin-bottom: 5px; color: #fff;';
+      card.appendChild(name);
+
+      // Timeline info
+      const info = document.createElement('div');
+      const checkpointCount = timeline.checkpoints.length;
+      const latestDay = Math.max(...timeline.checkpoints.map(c => c.day), 0);
+      info.textContent = `${checkpointCount} checkpoints • Day ${latestDay}`;
+      info.style.cssText = 'font-size: 12px; color: #aaa;';
+      card.appendChild(info);
+
+      // Active indicator
+      if (timeline.isActive) {
+        const activeTag = document.createElement('div');
+        activeTag.textContent = 'Active';
+        activeTag.style.cssText = `
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          background: #4CAF50;
+          color: #fff;
+          padding: 2px 8px;
+          border-radius: 10px;
+          font-size: 10px;
+          font-weight: bold;
+        `;
+        card.appendChild(activeTag);
+      }
+
+      panel.appendChild(card);
+    }
+
+    return panel;
+  }
+
+  /**
+   * Render the checkpoint list (right panel) for selected timeline.
    */
   private renderCheckpointList(): HTMLElement {
     const panel = document.createElement('div');
@@ -266,15 +529,19 @@ export class TimelinePanel {
     header.style.cssText = 'margin: 0 0 15px 0; font-size: 18px; color: #fff;';
     panel.appendChild(header);
 
-    if (!this.selectedUniverse) {
+    if (!this.selectedTimeline) {
       const placeholder = document.createElement('p');
-      placeholder.textContent = 'Select a universe to view checkpoints';
+      placeholder.textContent = 'Select a timeline to view checkpoints';
       placeholder.style.cssText = 'color: #666; text-align: center; margin-top: 50px;';
       panel.appendChild(placeholder);
       return panel;
     }
 
-    const timeline = this.universes.get(this.selectedUniverse);
+    // Find the selected timeline
+    const universe = this.universes.get(this.selectedUniverse!);
+    if (!universe) return panel;
+
+    const timeline = universe.timelines.find(t => t.id === this.selectedTimeline);
     if (!timeline) return panel;
 
     // Render checkpoints in reverse order (newest first)

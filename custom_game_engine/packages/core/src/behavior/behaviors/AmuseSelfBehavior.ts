@@ -10,6 +10,7 @@ import type { EntityImpl } from '../../ecs/Entity.js';
 import type { World } from '../../ecs/World.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
 import type { PersonalityComponent } from '../../components/PersonalityComponent.js';
+import { ComponentType } from '../../types/ComponentType.js';
 
 /**
  * AmuseSelfBehavior - Self-entertainment
@@ -26,7 +27,7 @@ export class AmuseSelfBehavior extends BaseBehavior {
 
     // Initialize amusement type based on personality
     if (!state.amusementType) {
-      const personality = entity.getComponent<PersonalityComponent>('personality');
+      const personality = entity.getComponent<PersonalityComponent>(ComponentType.Personality);
       const amusementType = this.selectAmusementType(personality);
       this.updateState(entity, {
         amusementType,
@@ -35,7 +36,7 @@ export class AmuseSelfBehavior extends BaseBehavior {
 
       // Generate initial monologue
       const monologue = this.generateAmusementMonologue(amusementType);
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         lastThought: monologue,
       }));
@@ -45,7 +46,7 @@ export class AmuseSelfBehavior extends BaseBehavior {
     const lastMonologue = (state.lastMonologue as number | undefined) ?? 0;
     if (currentTick - lastMonologue > 300) {
       const monologue = this.generateAmusementMonologue(state.amusementType as string);
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         lastThought: monologue,
         behaviorState: {

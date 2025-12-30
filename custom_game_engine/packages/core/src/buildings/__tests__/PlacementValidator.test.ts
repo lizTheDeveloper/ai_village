@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { ComponentType } from '../../types/ComponentType.js';
 // NOTE: These imports will fail until the module is implemented (TDD red phase)
 import {
   PlacementValidator,
@@ -50,7 +51,7 @@ function createMockWorld(options: {
             id: `entity-${i}`,
             components: new Map<string, unknown>([
               ['position', e.position],
-              ['building', { type: 'building' }],
+              ['building', { type: ComponentType.Building }],
             ]),
           })),
         };

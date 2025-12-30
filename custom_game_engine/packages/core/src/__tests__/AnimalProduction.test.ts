@@ -5,6 +5,7 @@ import { AnimalProductionSystem } from '../systems/AnimalProductionSystem.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { ANIMAL_PRODUCTS } from '../data/animalProducts.js';
 
+import { ComponentType } from '../types/ComponentType.js';
 describe('Animal Production System', () => {
   let world: WorldImpl;
   let productionSystem: AnimalProductionSystem;
@@ -71,7 +72,7 @@ describe('Animal Production System', () => {
       entity.addComponent(component);
 
       // Simulate time passing (1 day = 86400 seconds)
-      const entities = world.query().with('animal').executeEntities();
+      const entities = world.query().with(ComponentType.Animal).executeEntities();
       productionSystem.update(world, entities, 86400);
 
       // Flush event queue to dispatch queued events
@@ -112,7 +113,7 @@ describe('Animal Production System', () => {
       entity.addComponent(component);
 
       // Fast-forward to trigger production (1 day = 86400 seconds)
-      const entities = world.query().with('animal').executeEntities();
+      const entities = world.query().with(ComponentType.Animal).executeEntities();
       productionSystem.update(world, entities, 86400);
 
       // Flush event queue
@@ -153,7 +154,7 @@ describe('Animal Production System', () => {
       entity.addComponent(component);
 
       // Fast-forward (1 day = 86400 seconds)
-      const entities = world.query().with('animal').executeEntities();
+      const entities = world.query().with(ComponentType.Animal).executeEntities();
       productionSystem.update(world, entities, 86400);
 
       // Should not produce due to low health
@@ -188,7 +189,7 @@ describe('Animal Production System', () => {
       entity.addComponent(component);
 
       // Fast-forward (1 day = 86400 seconds)
-      const entities = world.query().with('animal').executeEntities();
+      const entities = world.query().with(ComponentType.Animal).executeEntities();
       productionSystem.update(world, entities, 86400);
 
       // Juveniles don't produce
@@ -222,7 +223,7 @@ describe('Animal Production System', () => {
       entity.addComponent(component);
 
       // Initialize the system by calling update once
-      const entities = world.query().with('animal').executeEntities();
+      const entities = world.query().with(ComponentType.Animal).executeEntities();
       productionSystem.update(world, entities, 0);
 
       const result = productionSystem.collectProduct(entity.id, 'cow_milk');
@@ -280,7 +281,7 @@ describe('Animal Production System', () => {
       unhealthyEntity.addComponent(unhealthyComponent);
 
       // Initialize the system
-      const entities = world.query().with('animal').executeEntities();
+      const entities = world.query().with(ComponentType.Animal).executeEntities();
       productionSystem.update(world, entities, 0);
 
       const healthyResult = productionSystem.collectProduct(healthyEntity.id, 'cow_milk');
@@ -341,7 +342,7 @@ describe('Animal Production System', () => {
       lowBondEntity.addComponent(lowBondComponent);
 
       // Initialize the system
-      const entities = world.query().with('animal').executeEntities();
+      const entities = world.query().with(ComponentType.Animal).executeEntities();
       productionSystem.update(world, entities, 0);
 
       const highBondResult = productionSystem.collectProduct(highBondEntity.id, 'cow_milk');
@@ -379,7 +380,7 @@ describe('Animal Production System', () => {
       entity.addComponent(component);
 
       // Initialize the system
-      const entities = world.query().with('animal').executeEntities();
+      const entities = world.query().with(ComponentType.Animal).executeEntities();
       productionSystem.update(world, entities, 0);
 
       // Try to collect as a different agent (agent-2) - should fail because owned by agent-1
@@ -414,7 +415,7 @@ describe('Animal Production System', () => {
       entity.addComponent(component);
 
       // Initialize the system
-      const entities = world.query().with('animal').executeEntities();
+      const entities = world.query().with(ComponentType.Animal).executeEntities();
       productionSystem.update(world, entities, 0);
 
       // First collection should succeed
@@ -453,7 +454,7 @@ describe('Animal Production System', () => {
       entity.addComponent(component);
 
       // Initialize the system
-      const entities = world.query().with('animal').executeEntities();
+      const entities = world.query().with(ComponentType.Animal).executeEntities();
       productionSystem.update(world, entities, 0);
 
       const result = productionSystem.collectProduct(entity.id, 'cow_milk');
@@ -488,7 +489,7 @@ describe('Animal Production System', () => {
       entity.addComponent(component);
 
       // Initialize the system
-      const entities = world.query().with('animal').executeEntities();
+      const entities = world.query().with(ComponentType.Animal).executeEntities();
       productionSystem.update(world, entities, 0);
 
       const result = productionSystem.collectProduct(entity.id, 'cow_milk');
@@ -526,7 +527,7 @@ describe('Animal Production System', () => {
 
       // Should throw when update tries to process this invalid animal
       expect(() => {
-        const entities = world.query().with('animal').executeEntities();
+        const entities = world.query().with(ComponentType.Animal).executeEntities();
         productionSystem.update(world, entities, 86400);
       }).toThrow('missing required \'health\' field');
     });

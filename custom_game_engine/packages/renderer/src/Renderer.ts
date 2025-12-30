@@ -7,19 +7,21 @@ import type {
   BuildingComponent,
   AgentComponent,
   AnimalComponent,
-  PlantComponent,
   ResourceComponent,
   CircadianComponent,
   ReflectionComponent,
   IdentityComponent,
   TemperatureComponent,
 } from '@ai-village/core';
+import type { PlantComponent } from '@ai-village/core';
 import {
   ChunkManager,
   TerrainGenerator,
   CHUNK_SIZE,
   TERRAIN_COLORS,
   type Chunk,
+  type Tile,
+  globalHorizonCalculator,
 } from '@ai-village/world';
 import { Camera } from './Camera.js';
 import { renderSprite } from './SpriteRenderer.js';
@@ -51,6 +53,9 @@ export class Renderer {
   public showAgentNames = true;
   public showAgentTasks = true;
 
+  // Bound handlers for cleanup
+  private boundResizeHandler: (() => void) | null = null;
+
   constructor(canvas: HTMLCanvasElement, seed: string = 'default') {
     this.canvas = canvas;
     const ctx = canvas.getContext('2d');
@@ -66,9 +71,21 @@ export class Renderer {
     this.speechBubbleRenderer = new SpeechBubbleRenderer();
     this.particleRenderer = new ParticleRenderer();
 
-    // Handle resize
+    // Handle resize - store bound handler for cleanup
     this.resize();
-    window.addEventListener('resize', () => this.resize());
+    this.boundResizeHandler = () => this.resize();
+    window.addEventListener('resize', this.boundResizeHandler);
+  }
+
+  /**
+   * Remove all event listeners and clean up resources.
+   * Call this when the Renderer is no longer needed.
+   */
+  destroy(): void {
+    if (this.boundResizeHandler) {
+      window.removeEventListener('resize', this.boundResizeHandler);
+      this.boundResizeHandler = null;
+    }
   }
 
   private resize(): void {
@@ -328,23 +345,126 @@ export class Renderer {
     // Get visible bounds in world coordinates
     const bounds = this.camera.getVisibleBounds();
 
-    // Calculate chunk bounds
-    const startChunkX = Math.floor(bounds.left / CHUNK_SIZE);
-    const endChunkX = Math.floor(bounds.right / CHUNK_SIZE);
-    const startChunkY = Math.floor(bounds.top / CHUNK_SIZE);
-    const endChunkY = Math.floor(bounds.bottom / CHUNK_SIZE);
+    // Calculate chunk bounds (convert world pixels to tiles, then to chunks)
+    const startChunkX = Math.floor(bounds.left / this.tileSize / CHUNK_SIZE);
+    const endChunkX = Math.floor(bounds.right / this.tileSize / CHUNK_SIZE);
+    const startChunkY = Math.floor(bounds.top / this.tileSize / CHUNK_SIZE);
+    const endChunkY = Math.floor(bounds.bottom / this.tileSize / CHUNK_SIZE);
 
-    // Render terrain tiles
-    for (let chunkX = startChunkX; chunkX <= endChunkX; chunkX++) {
-      for (let chunkY = startChunkY; chunkY <= endChunkY; chunkY++) {
-        if (!this.chunkManager.hasChunk(chunkX, chunkY)) continue;
-        const chunk = this.chunkManager.getChunk(chunkX, chunkY);
-        this.renderChunk(chunk);
+    // Render terrain or background based on view mode
+    if (this.camera.isSideView()) {
+      this.renderSideViewBackground();
+      // Render terrain as ground cross-section in side-view
+      this.renderSideViewTerrain(startChunkX, endChunkX, startChunkY, endChunkY);
+    } else {
+      // Top-down mode: render terrain tiles
+      for (let chunkX = startChunkX; chunkX <= endChunkX; chunkX++) {
+        for (let chunkY = startChunkY; chunkY <= endChunkY; chunkY++) {
+          if (!this.chunkManager.hasChunk(chunkX, chunkY)) continue;
+          const chunk = this.chunkManager.getChunk(chunkX, chunkY);
+          this.renderChunk(chunk);
+        }
       }
     }
 
     // Draw entities (if any have position component)
-    const entities = world.query().with('position', 'renderable').executeEntities();
+    let entities = world.query().with('position', 'renderable').executeEntities();
+
+    // Get agent positions for proximity culling
+    const agentPositions: Array<{ x: number; y: number }> = [];
+    const agentEntities = world.query().with('agent', 'position').executeEntities();
+    for (const agentEntity of agentEntities) {
+      const pos = agentEntity.components.get('position') as PositionComponent | undefined;
+      if (pos) {
+        agentPositions.push({ x: pos.x, y: pos.y });
+      }
+    }
+
+    // Vision range for culling (from GameBalance.VISION_RANGE_TILES)
+    const VISION_RANGE = 15; // tiles
+    const VIEWPORT_MARGIN = 2; // tiles - small margin for smooth scrolling
+
+    // Filter entities based on smart culling:
+    // Keep if: building, planted crop, near any agent, or in viewport
+    entities = [...entities].filter((entity) => {
+      const pos = entity.components.get('position') as PositionComponent | undefined;
+      if (!pos) return false;
+
+      // Always keep buildings (agent-created)
+      if (entity.components.has('building')) return true;
+
+      // Always keep planted crops (agent-created)
+      const plant = entity.components.get('plant') as PlantComponent | undefined;
+      if (plant?.planted) return true;
+
+      // Keep if within vision range of any agent
+      for (const agentPos of agentPositions) {
+        const dx = pos.x - agentPos.x;
+        const dy = pos.y - agentPos.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance <= VISION_RANGE) return true;
+      }
+
+      // Keep if within viewport bounds (for player visibility)
+      const inViewportX = pos.x >= bounds.left / this.tileSize - VIEWPORT_MARGIN &&
+                         pos.x <= bounds.right / this.tileSize + VIEWPORT_MARGIN;
+      const inViewportY = pos.y >= bounds.top / this.tileSize - VIEWPORT_MARGIN &&
+                         pos.y <= bounds.bottom / this.tileSize + VIEWPORT_MARGIN;
+      if (inViewportX && inViewportY) return true;
+
+      // Cull everything else
+      return false;
+    });
+
+    // In side-view mode, filter to only show entities "in front" of the camera
+    // based on facing direction, within a few depth layers
+    if (this.camera.isSideView()) {
+      const depthAxis = this.camera.getDepthAxis(); // 'x' or 'y'
+      const depthDirection = this.camera.getDepthDirection(); // +1 or -1
+      const maxDepthLayers = 5; // Show entities up to 5 tiles in front
+
+      // Camera position in world tiles
+      const cameraWorldX = this.camera.x / this.tileSize;
+      const cameraWorldY = this.camera.y / this.tileSize;
+
+      // Filter to only entities in front of the camera within depth range
+      entities = [...entities].filter((entity) => {
+        const pos = entity.components.get('position') as PositionComponent | undefined;
+        if (!pos) return false;
+
+        // Get entity position on depth axis
+        const entityDepth = depthAxis === 'x' ? pos.x : pos.y;
+        const cameraDepth = depthAxis === 'x' ? cameraWorldX : cameraWorldY;
+
+        // Calculate signed distance in front of camera
+        // depthDirection tells us which way is "forward"
+        const signedDistance = (entityDepth - cameraDepth) * depthDirection;
+
+        // Only show entities that are in front (signedDistance >= 0) and within max depth
+        // Also allow entities slightly behind (within 1 tile) for the current row
+        if (signedDistance < -1 || signedDistance > maxDepthLayers) return false;
+
+        return true;
+      });
+
+      // Sort by depth (furthest first) then by Z (height)
+      entities = [...entities].sort((a, b) => {
+        const posA = a.components.get('position') as PositionComponent | undefined;
+        const posB = b.components.get('position') as PositionComponent | undefined;
+        if (!posA || !posB) return 0;
+
+        // Sort by depth - furthest entities render first (back to front)
+        const depthA = depthAxis === 'x' ? posA.x : posA.y;
+        const depthB = depthAxis === 'x' ? posB.x : posB.y;
+        const depthDiff = (depthB - depthA) * depthDirection;
+        if (Math.abs(depthDiff) > 0.5) return depthDiff;
+
+        // Then by Z (height) - lower entities render first
+        const zA = (posA as any)?.z ?? 0;
+        const zB = (posB as any)?.z ?? 0;
+        return zA - zB;
+      });
+    }
 
     // Debug: count buildings
     // const buildingEntities = entities.filter(e => e.components.has('building'));
@@ -359,91 +479,202 @@ export class Renderer {
     //   );
     // }
 
-    // Debug: count and log animals
-    const animalEntities = entities.filter(e => e.components.has('animal'));
-    // if (animalEntities.length > 0) {
-    //   console.log(`[Renderer] Found ${animalEntities.length} animals to render:`,
-    //     animalEntities.map(e => ({
-    //       id: e.id.substring(0, 10),
-    //       animal: e.components.get('animal'),
-    //       renderable: e.components.get('renderable'),
-    //       position: e.components.get('position')
-    //     }))
-    //   );
-    // } else {
-    if (animalEntities.length === 0) {
-      // Query all entities with animal component to see if they exist at all
-      const allAnimals = world.query().with('animal').executeEntities();
-      if (allAnimals.length > 0) {
-        console.warn(`[Renderer] Found ${allAnimals.length} animals in world, but none have both position+renderable!`,
-          allAnimals.map(e => ({
-            id: e.id.substring(0, 10),
-            hasPosition: e.components.has('position'),
-            hasRenderable: e.components.has('renderable'),
-            position: e.components.get('position'),
-            renderable: e.components.get('renderable')
-          }))
-        );
-      }
+    // Sort entities for proper rendering order (both modes)
+    if (!this.camera.isSideView()) {
+      // Top-down mode: sort by Y (lower Y = further from camera = render first)
+      // Then by Z (lower Z = underground = render first)
+      entities = [...entities].sort((a, b) => {
+        const posA = a.components.get('position') as PositionComponent | undefined;
+        const posB = b.components.get('position') as PositionComponent | undefined;
+        if (!posA || !posB) return 0;
+
+        // Primary sort by Y (lower Y renders first - back to front)
+        if (posA.y !== posB.y) {
+          return posA.y - posB.y;
+        }
+
+        // Secondary sort by Z
+        const zA = (posA as any)?.z ?? 0;
+        const zB = (posB as any)?.z ?? 0;
+        return zA - zB;
+      });
     }
 
     for (const entity of entities) {
       const pos = entity.components.get('position') as PositionComponent | undefined;
       const renderable = entity.components.get('renderable') as RenderableComponent | undefined;
 
-      if (!pos || !renderable || !renderable.visible) {
-        // Debug: log why buildings are being skipped
-        // if (entity.components.has('building')) {
-        //   console.log(`[Renderer] Skipping building ${entity.id}:`, {
-        //     hasPos: !!pos,
-        //     hasRenderable: !!renderable,
-        //     visible: renderable?.visible
-        //   });
-        // }
-        continue;
-      }
+      if (!pos || !renderable || !renderable.visible) continue;
+
+      // Get entity z-coordinate (default to 0)
+      const entityZ = (pos as any).z ?? 0;
+
+      // In side-view mode, no parallax needed since we only show entities at the same depth slice
+      // All visible entities are rendered at full scale and opacity
+      const parallaxScale = 1;
+      const parallaxOpacity = 1;
 
       const worldX = pos.x * this.tileSize;
       const worldY = pos.y * this.tileSize;
-      const screen = this.camera.worldToScreen(worldX, worldY);
 
-      // Debug: log when we're about to render a building
-      // if (entity.components.has('building')) {
-      //   const building = entity.components.get('building') as any;
-      //   console.log(`[Renderer] Rendering building ${entity.id}:`, {
-      //     type: building.buildingType,
-      //     worldPos: { x: pos.x, y: pos.y },
-      //     worldPixels: { x: worldX, y: worldY },
-      //     screenPos: { x: screen.x, y: screen.y },
-      //     sprite: renderable.spriteId,
-      //     tileSize: this.tileSize,
-      //     zoom: this.camera.zoom
-      //   });
-      // }
+      // In side-view mode, use special screen positioning based on facing direction
+      let screen: { x: number; y: number };
+      let terrainElevation = 0; // Track terrain elevation for procedural drawing
+      if (this.camera.isSideView()) {
+        // Side-view coordinate mapping depends on facing direction:
+        // For N/S facing: X = screen horizontal, Y = depth
+        // For E/W facing: Y = screen horizontal, X = depth
+        // Z = vertical HEIGHT on screen (z=0 at terrain surface, z>0 above terrain)
+
+        const depthAxis = this.camera.getDepthAxis();
+        const isNorthSouth = depthAxis === 'y';
+
+        // Apply vertical camera offset (same as terrain rendering)
+        const baseSeaLevelY = this.camera.viewportHeight * 0.70;
+        const seaLevelScreenY = baseSeaLevelY + this.camera.sideViewVerticalOffset;
+        const tilePixelSize = this.tileSize * this.camera.zoom * parallaxScale;
+
+        // Get the terrain elevation at this entity's ACTUAL position
+        // Use the entity's actual world coordinates to get the elevation
+        // This ensures entities follow the terrain height correctly
+        terrainElevation = this.getTerrainElevationAt(
+          Math.floor(pos.x),
+          Math.floor(pos.y)
+        );
+
+        // Ground level for this tile based on terrain elevation
+        const terrainScreenY = seaLevelScreenY - terrainElevation * tilePixelSize;
+
+        // Screen X: horizontal position relative to camera
+        // N/S facing: use world X position, E/W facing: use world Y position
+        let screenX: number;
+        if (isNorthSouth) {
+          screenX = (worldX - this.camera.x) * this.camera.zoom * parallaxScale + this.camera.viewportWidth / 2;
+        } else {
+          screenX = (worldY - this.camera.y) * this.camera.zoom * parallaxScale + this.camera.viewportWidth / 2;
+        }
+
+        // Screen Y: based on entity's Z height ABOVE the terrain
+        const heightAboveTerrain = entityZ;
+        const verticalOffset = heightAboveTerrain * tilePixelSize;
+
+        // Sprite bottom at terrain level, offset by entity height
+        const screenY = terrainScreenY - tilePixelSize - verticalOffset;
+
+        screen = { x: screenX, y: screenY };
+      } else {
+        screen = this.camera.worldToScreen(worldX, worldY, entityZ);
+      }
 
       // Check if this is a building under construction
       const building = entity.components.get('building') as BuildingComponent | undefined;
 
       const isUnderConstruction = building && !building.isComplete && building.progress < 100;
 
-      // Render sprite with reduced opacity if under construction
+      // Calculate effective opacity (construction + parallax)
+      let effectiveOpacity = parallaxOpacity;
       if (isUnderConstruction) {
-        this.ctx.globalAlpha = 0.5;
+        effectiveOpacity *= 0.5;
       }
+      this.ctx.globalAlpha = effectiveOpacity;
 
       // Get plant component for stage-based rendering
       const plant = entity.components.get('plant') as PlantComponent | undefined;
       const metadata = plant ? { stage: plant.stage } : undefined;
 
-      renderSprite(
-        this.ctx,
-        renderable.spriteId,
-        screen.x,
-        screen.y,
-        this.tileSize * this.camera.zoom,
-        metadata
-      );
+      // Calculate size with parallax scaling
+      const baseSize = this.tileSize * this.camera.zoom;
+      const scaledSize = baseSize * parallaxScale;
 
+      // Center the scaled sprite
+      const offsetX = (scaledSize - baseSize) / 2;
+      const offsetY = (scaledSize - baseSize) / 2;
+
+      // In side-view, draw entities with height procedurally
+      if (this.camera.isSideView()) {
+        // Calculate terrain-based ground level for this entity
+        // Apply vertical camera offset (same as elsewhere)
+        const baseSeaLevelY = this.camera.viewportHeight * 0.70;
+        const seaLevelScreenY = baseSeaLevelY + this.camera.sideViewVerticalOffset;
+        const tilePixelSize = this.tileSize * this.camera.zoom * parallaxScale;
+        const terrainScreenY = seaLevelScreenY - terrainElevation * tilePixelSize;
+
+        // Used for stem/pole rendering on generic tall entities
+        const spriteTop = screen.y - offsetY;
+        const spriteBottom = spriteTop + scaledSize;
+
+        // Create deterministic seed from entity position
+        const entitySeed = Math.floor(pos.x * 1000 + pos.y * 7919);
+
+        // Draw based on entity type
+        if (renderable.spriteId === 'tree') {
+          // Procedural tree: trunk + layered canopy
+          // Tree height: entityZ is the tree height, grows from terrain surface
+          const treeHeight = Math.max(1, entityZ + 1) * tilePixelSize;
+          this.drawProceduralTree(
+            screen.x - offsetX + scaledSize / 2, // center X
+            terrainScreenY, // terrain ground Y (not fixed!)
+            scaledSize * 0.25, // trunk width
+            treeHeight, // total height
+            scaledSize * 0.8, // canopy width
+            parallaxOpacity,
+            entitySeed
+          );
+        } else if (renderable.spriteId === 'rock') {
+          // Rocks: draw stacked/scaled vertically from terrain
+          const rockHeight = Math.max(1, entityZ + 1) * tilePixelSize;
+          this.drawProceduralRock(
+            screen.x - offsetX,
+            terrainScreenY - rockHeight,
+            scaledSize,
+            rockHeight,
+            parallaxOpacity,
+            entitySeed
+          );
+        } else if (renderable.spriteId === 'mountain') {
+          // Mountains: draw as triangular peak with snow cap from terrain
+          const mountainHeight = Math.max(1, entityZ + 1) * tilePixelSize;
+          this.drawProceduralMountain(
+            screen.x - offsetX + scaledSize / 2, // center X
+            terrainScreenY, // terrain ground Y (not fixed!)
+            scaledSize * (1 + entityZ * 0.3), // width scales with height
+            mountainHeight,
+            parallaxOpacity,
+            entitySeed
+          );
+        } else if (entityZ > 0) {
+          // Generic tall entity: draw a stem/pole and sprite at top
+          const stemWidth = scaledSize * 0.15;
+          const stemX = screen.x - offsetX + (scaledSize - stemWidth) / 2;
+          this.ctx.fillStyle = '#666666';
+          this.ctx.fillRect(stemX, spriteBottom, stemWidth, terrainScreenY - spriteBottom);
+
+          // Draw sprite at top
+          renderSprite(this.ctx, renderable.spriteId, screen.x - offsetX, screen.y - offsetY, scaledSize, metadata);
+        } else {
+          // Ground-level entity in side-view: render at terrain surface
+          renderSprite(
+            this.ctx,
+            renderable.spriteId,
+            screen.x - offsetX,
+            screen.y - offsetY,
+            scaledSize,
+            metadata
+          );
+        }
+      } else {
+        // Normal rendering (top-down or ground-level entities)
+        renderSprite(
+          this.ctx,
+          renderable.spriteId,
+          screen.x - offsetX,
+          screen.y - offsetY,
+          scaledSize,
+          metadata
+        );
+      }
+
+      // Reset alpha
       this.ctx.globalAlpha = 1.0;
 
       // Draw highlight border for buildings
@@ -566,6 +797,620 @@ export class Renderer {
     }
 
     this.speechBubbleRenderer.render(this.ctx, agentData);
+  }
+
+  /**
+   * Render background for side-view mode.
+   * Shows a sky gradient above the ground line.
+   */
+  private renderSideViewBackground(): void {
+    const width = this.camera.viewportWidth;
+    const height = this.camera.viewportHeight;
+    const groundY = height * 0.70; // Ground line at 70% down
+
+    // Create sky gradient (only above ground line)
+    const skyGradient = this.ctx.createLinearGradient(0, 0, 0, groundY);
+
+    // Sky colors - darker at top, lighter near horizon
+    skyGradient.addColorStop(0, '#0a0a1a');    // Dark sky at top
+    skyGradient.addColorStop(0.3, '#1a1a3e');  // Deep blue
+    skyGradient.addColorStop(0.6, '#2a4a6e');  // Mid blue
+    skyGradient.addColorStop(0.85, '#5588bb'); // Light blue
+    skyGradient.addColorStop(1, '#88bbdd');    // Horizon
+
+    // Fill sky area
+    this.ctx.fillStyle = skyGradient;
+    this.ctx.fillRect(0, 0, width, groundY);
+
+    // Draw horizon glow
+    const horizonGlow = this.ctx.createLinearGradient(0, groundY - 20, 0, groundY);
+    horizonGlow.addColorStop(0, 'rgba(255, 200, 150, 0)');
+    horizonGlow.addColorStop(1, 'rgba(255, 200, 150, 0.3)');
+    this.ctx.fillStyle = horizonGlow;
+    this.ctx.fillRect(0, groundY - 20, width, 20);
+
+    // Draw focus depth indicator
+    this.drawDepthIndicator();
+  }
+
+  /**
+   * Render terrain as ground cross-section in side-view mode.
+   * Shows multiple layers of terrain in front of the camera based on facing direction.
+   */
+  private renderSideViewTerrain(
+    startChunkX: number,
+    endChunkX: number,
+    startChunkY: number,
+    endChunkY: number
+  ): void {
+    // In side-view, we render terrain layers based on facing direction
+    // The depth axis (X for E/W, Y for N/S) determines which slices we show
+
+    const baseSeaLevelY = this.camera.viewportHeight * 0.70;
+    const seaLevelScreenY = baseSeaLevelY + this.camera.sideViewVerticalOffset;
+    const tilePixelSize = this.tileSize * this.camera.zoom;
+
+    const depthAxis = this.camera.getDepthAxis();
+    const depthDirection = this.camera.getDepthDirection();
+    const maxDepthLayers = 5; // Show this many terrain rows in front
+
+    // For N/S facing: X is screen horizontal, iterate over Y depth slices
+    // For E/W facing: Y is screen horizontal, iterate over X depth slices
+    const isNorthSouth = depthAxis === 'y';
+
+    // Get camera position
+    const cameraWorldX = Math.floor(this.camera.x / this.tileSize);
+    const cameraWorldY = Math.floor(this.camera.y / this.tileSize);
+
+    // Get camera elevation for horizon calculations
+    const cameraElevation = this.getTerrainElevationAt(cameraWorldX, cameraWorldY);
+
+    // Render depth layers from back to front
+    for (let layerIdx = maxDepthLayers - 1; layerIdx >= 0; layerIdx--) {
+      // Calculate world position of this depth layer
+      const depthOffset = layerIdx * depthDirection;
+      const layerDepthPos = isNorthSouth
+        ? cameraWorldY + depthOffset
+        : cameraWorldX + depthOffset;
+
+      // Calculate base depth fading (further = more faded)
+      const baseDepthFade = 1 - (layerIdx / maxDepthLayers) * 0.3;
+
+      if (isNorthSouth) {
+        // North/South facing: iterate X horizontally, layer is at fixed Y
+        const chunkY = Math.floor(layerDepthPos / CHUNK_SIZE);
+        const localY = layerDepthPos - chunkY * CHUNK_SIZE;
+        if (localY < 0 || localY >= CHUNK_SIZE) continue;
+
+        for (let chunkX = startChunkX; chunkX <= endChunkX; chunkX++) {
+          if (!this.chunkManager.hasChunk(chunkX, chunkY)) continue;
+          const chunk = this.chunkManager.getChunk(chunkX, chunkY);
+
+          for (let localX = 0; localX < CHUNK_SIZE; localX++) {
+            const tile = chunk.tiles[localY * CHUNK_SIZE + localX];
+            if (!tile) continue;
+
+            const worldTileX = chunkX * CHUNK_SIZE + localX;
+            const screenX = (worldTileX * this.tileSize - this.camera.x) * this.camera.zoom
+              + this.camera.viewportWidth / 2;
+
+            if (screenX + tilePixelSize < 0 || screenX > this.camera.viewportWidth) continue;
+
+            // Calculate horizon-aware fade based on tile elevation and distance
+            const tileElevation = (tile as any).elevation ?? 0;
+            const distance = Math.abs(layerIdx); // Depth distance in tiles
+            const horizonFade = globalHorizonCalculator.getFogFade(
+              cameraElevation,
+              tileElevation,
+              distance,
+              maxDepthLayers
+            );
+
+            // Combine base depth fade with horizon curvature fade
+            const depthFade = Math.min(baseDepthFade, horizonFade);
+
+            this.renderSideViewTile(tile, screenX, seaLevelScreenY, tilePixelSize, depthFade, layerIdx);
+          }
+        }
+      } else {
+        // East/West facing: iterate Y horizontally, layer is at fixed X
+        const chunkX = Math.floor(layerDepthPos / CHUNK_SIZE);
+        const localX = layerDepthPos - chunkX * CHUNK_SIZE;
+        if (localX < 0 || localX >= CHUNK_SIZE) continue;
+
+        for (let chunkY = startChunkY; chunkY <= endChunkY; chunkY++) {
+          if (!this.chunkManager.hasChunk(chunkX, chunkY)) continue;
+          const chunk = this.chunkManager.getChunk(chunkX, chunkY);
+
+          for (let localY = 0; localY < CHUNK_SIZE; localY++) {
+            const tile = chunk.tiles[localY * CHUNK_SIZE + localX];
+            if (!tile) continue;
+
+            const worldTileY = chunkY * CHUNK_SIZE + localY;
+            const screenX = (worldTileY * this.tileSize - this.camera.y) * this.camera.zoom
+              + this.camera.viewportWidth / 2;
+
+            if (screenX + tilePixelSize < 0 || screenX > this.camera.viewportWidth) continue;
+
+            // Calculate horizon-aware fade based on tile elevation and distance
+            const tileElevation = (tile as any).elevation ?? 0;
+            const distance = Math.abs(layerIdx); // Depth distance in tiles
+            const horizonFade = globalHorizonCalculator.getFogFade(
+              cameraElevation,
+              tileElevation,
+              distance,
+              maxDepthLayers
+            );
+
+            // Combine base depth fade with horizon curvature fade
+            const depthFade = Math.min(baseDepthFade, horizonFade);
+
+            this.renderSideViewTile(tile, screenX, seaLevelScreenY, tilePixelSize, depthFade, layerIdx);
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Render a single tile in side-view mode.
+   */
+  private renderSideViewTile(
+    tile: Tile,
+    screenX: number,
+    seaLevelScreenY: number,
+    tilePixelSize: number,
+    depthFade: number,
+    layerIdx: number
+  ): void {
+    const elevation = (tile as any).elevation ?? 0;
+    const elevationOffset = elevation * tilePixelSize;
+    const tileScreenY = seaLevelScreenY - elevationOffset;
+
+    // Get base color and apply depth fading
+    const baseColor = TERRAIN_COLORS[tile.terrain];
+    const color = this.applyDepthFade(baseColor, depthFade);
+
+    // Draw the surface tile
+    this.ctx.fillStyle = color;
+    this.ctx.fillRect(screenX, tileScreenY, tilePixelSize, tilePixelSize);
+
+    // Draw earth/rock underneath elevated terrain
+    if (elevation > 0) {
+      for (let h = 1; h <= elevation; h++) {
+        const layerY = tileScreenY + h * tilePixelSize;
+        if (layerY > this.camera.viewportHeight) break;
+
+        const layerRatio = h / elevation;
+        let layerColor: string;
+        if (layerRatio < 0.3) {
+          layerColor = this.darkenColor('#7a7a7a', 0.9 - h * 0.02);
+        } else if (layerRatio < 0.7) {
+          layerColor = this.darkenColor('#6b5a4a', 0.9 - h * 0.02);
+        } else {
+          layerColor = this.darkenColor('#8B7355', 0.9 - h * 0.02);
+        }
+        this.ctx.fillStyle = this.applyDepthFade(layerColor, depthFade);
+        this.ctx.fillRect(screenX, layerY, tilePixelSize, tilePixelSize);
+      }
+    }
+
+    // Draw underground layers (only for front layer to avoid overdraw)
+    if (layerIdx === 0) {
+      const startDepth = Math.max(0, -elevation);
+      for (let depth = startDepth + 1; depth <= startDepth + 6; depth++) {
+        const undergroundY = seaLevelScreenY + depth * tilePixelSize;
+        if (undergroundY > this.camera.viewportHeight) break;
+
+        const darkening = 1 - (depth - startDepth) * 0.1;
+        this.ctx.fillStyle = this.darkenColor('#8B7355', darkening);
+        this.ctx.fillRect(screenX, undergroundY, tilePixelSize, tilePixelSize);
+      }
+    }
+
+    // Draw water at sea level for water tiles
+    if (tile.terrain === 'water') {
+      this.ctx.fillStyle = `rgba(100, 150, 200, ${0.6 * depthFade})`;
+      this.ctx.fillRect(screenX, seaLevelScreenY, tilePixelSize, tilePixelSize * 2);
+
+      this.ctx.fillStyle = `rgba(200, 230, 255, ${0.4 * depthFade})`;
+      this.ctx.fillRect(screenX, seaLevelScreenY, tilePixelSize, tilePixelSize * 0.3);
+    }
+
+    // Draw grid lines for tile boundaries (front layer only)
+    if (layerIdx === 0) {
+      this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+      this.ctx.lineWidth = 1;
+      this.ctx.strokeRect(screenX, tileScreenY, tilePixelSize, tilePixelSize);
+    }
+
+    // Draw grass tufts on front layer only
+    if (layerIdx === 0 && tile.terrain !== 'water' && tile.terrain !== 'stone') {
+      const grassHeight = Math.max(2, 4 * this.camera.zoom);
+      this.ctx.fillStyle = '#2d5a27';
+
+      const tuftX = screenX + tilePixelSize * 0.3;
+      const tuftX2 = screenX + tilePixelSize * 0.7;
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(tuftX, tileScreenY);
+      this.ctx.lineTo(tuftX + 3 * this.camera.zoom, tileScreenY - grassHeight);
+      this.ctx.lineTo(tuftX + 6 * this.camera.zoom, tileScreenY);
+      this.ctx.fill();
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(tuftX2, tileScreenY);
+      this.ctx.lineTo(tuftX2 + 4 * this.camera.zoom, tileScreenY - grassHeight * 1.2);
+      this.ctx.lineTo(tuftX2 + 8 * this.camera.zoom, tileScreenY);
+      this.ctx.fill();
+    }
+  }
+
+  /**
+   * Apply depth fading to a color for layered side-view rendering.
+   */
+  private applyDepthFade(color: string, fade: number): string {
+    // Parse hex color
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+
+    // Blend toward a fog color (light blue-gray)
+    const fogR = 180, fogG = 195, fogB = 210;
+    const newR = Math.round(r * fade + fogR * (1 - fade));
+    const newG = Math.round(g * fade + fogG * (1 - fade));
+    const newB = Math.round(b * fade + fogB * (1 - fade));
+
+    return `rgb(${newR}, ${newG}, ${newB})`;
+  }
+
+  /**
+   * Darken a hex color by a factor (0-1, where 1 is original color).
+   */
+  private darkenColor(hex: string, factor: number): string {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+
+    const newR = Math.floor(r * factor);
+    const newG = Math.floor(g * factor);
+    const newB = Math.floor(b * factor);
+
+    return `rgb(${newR}, ${newG}, ${newB})`;
+  }
+
+  /**
+   * Create a seeded pseudo-random number generator.
+   * Returns a function that generates deterministic random numbers (0-1) based on the seed.
+   * Uses a simple mulberry32 algorithm.
+   */
+  private createSeededRandom(seed: number): () => number {
+    let state = seed;
+    return () => {
+      state |= 0;
+      state = (state + 0x6d2b79f5) | 0;
+      let t = Math.imul(state ^ (state >>> 15), 1 | state);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /**
+   * Get the terrain elevation at a given world tile position.
+   * Used for side-view rendering to place entities on the correct ground level.
+   *
+   * @param worldTileX - X coordinate in tile space
+   * @param worldTileY - Y coordinate in tile space (depth row in side-view)
+   * @returns Tile elevation (0 = sea level), or 0 if tile not found
+   */
+  private getTerrainElevationAt(worldTileX: number, worldTileY: number): number {
+    const chunkX = Math.floor(worldTileX / CHUNK_SIZE);
+    const chunkY = Math.floor(worldTileY / CHUNK_SIZE);
+
+    if (!this.chunkManager.hasChunk(chunkX, chunkY)) {
+      return 0;
+    }
+
+    const chunk = this.chunkManager.getChunk(chunkX, chunkY);
+    const localX = worldTileX - chunkX * CHUNK_SIZE;
+    const localY = worldTileY - chunkY * CHUNK_SIZE;
+
+    if (localX < 0 || localX >= CHUNK_SIZE || localY < 0 || localY >= CHUNK_SIZE) {
+      return 0;
+    }
+
+    const tile = chunk.tiles[localY * CHUNK_SIZE + localX];
+    if (!tile) {
+      return 0;
+    }
+
+    return (tile as any).elevation ?? 0;
+  }
+
+  /**
+   * Draw z-depth indicator for side-view mode.
+   */
+  private drawDepthIndicator(): void {
+    const z = this.camera.z;
+    const maxZ = this.camera.parallaxConfig.maxZDistance;
+
+    // Position in bottom-right corner
+    const x = this.camera.viewportWidth - 120;
+    const y = this.camera.viewportHeight - 40;
+
+    // Background
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    this.ctx.fillRect(x - 10, y - 20, 120, 50);
+
+    // Label
+    this.ctx.fillStyle = '#00CED1';
+    this.ctx.font = 'bold 12px monospace';
+    this.ctx.textAlign = 'left';
+    this.ctx.fillText(`Depth: ${z.toFixed(1)}`, x, y);
+
+    // Progress bar showing z position
+    const barWidth = 100;
+    const barHeight = 8;
+    const barY = y + 10;
+
+    // Bar background
+    this.ctx.fillStyle = '#333';
+    this.ctx.fillRect(x, barY, barWidth, barHeight);
+
+    // Bar fill (center is 0, left is -max, right is +max)
+    const normalized = (z + maxZ) / (2 * maxZ); // 0-1 range
+    const fillWidth = normalized * barWidth;
+
+    // Color based on direction
+    if (z < 0) {
+      this.ctx.fillStyle = '#4FC3F7'; // Blue for background
+    } else if (z > 0) {
+      this.ctx.fillStyle = '#FFB74D'; // Orange for foreground
+    } else {
+      this.ctx.fillStyle = '#81C784'; // Green for focus
+    }
+    this.ctx.fillRect(x, barY, fillWidth, barHeight);
+
+    // Center line (focus point)
+    this.ctx.strokeStyle = '#FFF';
+    this.ctx.lineWidth = 2;
+    this.ctx.beginPath();
+    this.ctx.moveTo(x + barWidth / 2, barY - 2);
+    this.ctx.lineTo(x + barWidth / 2, barY + barHeight + 2);
+    this.ctx.stroke();
+
+    this.ctx.textAlign = 'left';
+  }
+
+  /**
+   * Draw a procedural tree in side-view mode.
+   * Creates a trunk with layered canopy that looks like a real tree.
+   */
+  private drawProceduralTree(
+    centerX: number,
+    groundY: number,
+    trunkWidth: number,
+    totalHeight: number,
+    canopyWidth: number,
+    opacity: number,
+    seed: number
+  ): void {
+    this.ctx.globalAlpha = opacity;
+    const random = this.createSeededRandom(seed);
+
+    const trunkHeight = totalHeight * 0.4; // Trunk is 40% of height
+    const canopyHeight = totalHeight * 0.7; // Canopy overlaps trunk
+
+    // Draw trunk
+    const trunkX = centerX - trunkWidth / 2;
+    const trunkY = groundY - trunkHeight;
+
+    // Trunk gradient (lighter in middle)
+    const trunkGradient = this.ctx.createLinearGradient(trunkX, 0, trunkX + trunkWidth, 0);
+    trunkGradient.addColorStop(0, '#4A3728');
+    trunkGradient.addColorStop(0.3, '#6B4423');
+    trunkGradient.addColorStop(0.7, '#6B4423');
+    trunkGradient.addColorStop(1, '#4A3728');
+
+    this.ctx.fillStyle = trunkGradient;
+    this.ctx.fillRect(trunkX, trunkY, trunkWidth, trunkHeight);
+
+    // Trunk texture (bark lines)
+    this.ctx.strokeStyle = '#3E2723';
+    this.ctx.lineWidth = 1;
+    for (let i = 0; i < trunkHeight; i += 6) {
+      const offset = (i % 12 < 6) ? 1 : -1;
+      this.ctx.beginPath();
+      this.ctx.moveTo(trunkX + 2, trunkY + i);
+      this.ctx.lineTo(trunkX + trunkWidth / 2 + offset * 2, trunkY + i + 3);
+      this.ctx.lineTo(trunkX + trunkWidth - 2, trunkY + i + 1);
+      this.ctx.stroke();
+    }
+
+    // Draw canopy as layered circles/ellipses
+    const canopyY = groundY - totalHeight;
+    const numLayers = 4;
+
+    for (let layer = 0; layer < numLayers; layer++) {
+      const layerRatio = layer / numLayers;
+      const layerY = canopyY + canopyHeight * layerRatio * 0.6;
+      const layerWidth = canopyWidth * (1 - layerRatio * 0.3);
+      const layerHeight = canopyHeight * 0.35;
+
+      // Color gets lighter towards top (use seeded random for variation)
+      const greenBase = 40 + layer * 15;
+      const greenHigh = 100 + layer * 20;
+      this.ctx.fillStyle = `rgb(${30 + layer * 10}, ${greenBase + Math.floor(random() * 20)}, ${20 + layer * 5})`;
+
+      // Draw ellipse for this layer
+      this.ctx.beginPath();
+      this.ctx.ellipse(centerX, layerY + layerHeight / 2, layerWidth / 2, layerHeight / 2, 0, 0, Math.PI * 2);
+      this.ctx.fill();
+
+      // Add some texture dots
+      this.ctx.fillStyle = `rgb(${50 + layer * 15}, ${greenHigh}, ${30 + layer * 10})`;
+      for (let dot = 0; dot < 5; dot++) {
+        const dotX = centerX + (random() - 0.5) * layerWidth * 0.7;
+        const dotY = layerY + random() * layerHeight * 0.8;
+        const dotSize = 2 + random() * 3;
+        this.ctx.beginPath();
+        this.ctx.arc(dotX, dotY, dotSize, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+    }
+  }
+
+  /**
+   * Draw a procedural rock formation in side-view mode.
+   */
+  private drawProceduralRock(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    opacity: number,
+    seed: number
+  ): void {
+    this.ctx.globalAlpha = opacity;
+    const random = this.createSeededRandom(seed);
+
+    // Draw stacked rock shapes
+    const numRocks = Math.max(1, Math.floor(height / (width * 0.6)));
+    const rockHeight = height / numRocks;
+
+    for (let i = 0; i < numRocks; i++) {
+      const rockY = y + i * rockHeight;
+      const rockWidth = width * (0.7 + random() * 0.3);
+      const rockX = x + (width - rockWidth) / 2 + (random() - 0.5) * width * 0.2;
+
+      // Rock color (gray with variation)
+      const grayBase = 80 + Math.floor(random() * 40);
+      this.ctx.fillStyle = `rgb(${grayBase}, ${grayBase - 5}, ${grayBase - 10})`;
+
+      // Draw rock as polygon
+      this.ctx.beginPath();
+      this.ctx.moveTo(rockX + rockWidth * 0.1, rockY + rockHeight);
+      this.ctx.lineTo(rockX, rockY + rockHeight * 0.3);
+      this.ctx.lineTo(rockX + rockWidth * 0.3, rockY);
+      this.ctx.lineTo(rockX + rockWidth * 0.7, rockY + rockHeight * 0.1);
+      this.ctx.lineTo(rockX + rockWidth, rockY + rockHeight * 0.4);
+      this.ctx.lineTo(rockX + rockWidth * 0.9, rockY + rockHeight);
+      this.ctx.closePath();
+      this.ctx.fill();
+
+      // Add highlight
+      this.ctx.fillStyle = `rgba(255, 255, 255, 0.15)`;
+      this.ctx.beginPath();
+      this.ctx.moveTo(rockX + rockWidth * 0.2, rockY + rockHeight * 0.2);
+      this.ctx.lineTo(rockX + rockWidth * 0.4, rockY + rockHeight * 0.1);
+      this.ctx.lineTo(rockX + rockWidth * 0.5, rockY + rockHeight * 0.3);
+      this.ctx.closePath();
+      this.ctx.fill();
+
+      // Add shadow
+      this.ctx.fillStyle = `rgba(0, 0, 0, 0.2)`;
+      this.ctx.beginPath();
+      this.ctx.moveTo(rockX + rockWidth * 0.6, rockY + rockHeight * 0.7);
+      this.ctx.lineTo(rockX + rockWidth * 0.9, rockY + rockHeight * 0.5);
+      this.ctx.lineTo(rockX + rockWidth * 0.85, rockY + rockHeight);
+      this.ctx.closePath();
+      this.ctx.fill();
+    }
+  }
+
+  /**
+   * Draw a procedural mountain in side-view mode.
+   * Creates a triangular peak with snow cap and rock texture.
+   */
+  private drawProceduralMountain(
+    centerX: number,
+    groundY: number,
+    baseWidth: number,
+    height: number,
+    opacity: number,
+    seed: number
+  ): void {
+    this.ctx.globalAlpha = opacity;
+    const random = this.createSeededRandom(seed);
+
+    const peakY = groundY - height;
+    const leftX = centerX - baseWidth / 2;
+    const rightX = centerX + baseWidth / 2;
+
+    // Main mountain body - gradient from dark at bottom to lighter at top
+    const mountainGradient = this.ctx.createLinearGradient(0, groundY, 0, peakY);
+    mountainGradient.addColorStop(0, '#4a4a4a'); // Dark gray at base
+    mountainGradient.addColorStop(0.4, '#6b6b6b'); // Medium gray
+    mountainGradient.addColorStop(0.7, '#8a8a8a'); // Light gray
+    mountainGradient.addColorStop(1, '#a0a0a0'); // Lightest at peak
+
+    this.ctx.fillStyle = mountainGradient;
+    this.ctx.beginPath();
+    this.ctx.moveTo(leftX, groundY);
+    this.ctx.lineTo(centerX, peakY);
+    this.ctx.lineTo(rightX, groundY);
+    this.ctx.closePath();
+    this.ctx.fill();
+
+    // Add rocky texture - jagged lines
+    this.ctx.strokeStyle = '#3a3a3a';
+    this.ctx.lineWidth = 1;
+    const numRidges = Math.floor(height / 15);
+    for (let i = 0; i < numRidges; i++) {
+      const ridgeY = groundY - (height * (i + 1)) / (numRidges + 1);
+      const ridgeWidth = baseWidth * (1 - (i + 1) / (numRidges + 2));
+      const ridgeLeftX = centerX - ridgeWidth / 2;
+      const ridgeRightX = centerX + ridgeWidth / 2;
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(ridgeLeftX, ridgeY);
+      // Jagged line across
+      const numJags = 3 + Math.floor(random() * 3);
+      for (let j = 1; j <= numJags; j++) {
+        const jagX = ridgeLeftX + (ridgeWidth * j) / (numJags + 1);
+        const jagY = ridgeY + (random() - 0.5) * 8;
+        this.ctx.lineTo(jagX, jagY);
+      }
+      this.ctx.lineTo(ridgeRightX, ridgeY);
+      this.ctx.stroke();
+    }
+
+    // Snow cap on tall mountains (height > 60px)
+    if (height > 60) {
+      const snowHeight = height * 0.25;
+      const snowY = peakY + snowHeight;
+      const snowWidth = baseWidth * 0.35;
+
+      this.ctx.fillStyle = '#ffffff';
+      this.ctx.beginPath();
+      this.ctx.moveTo(centerX - snowWidth / 2, snowY);
+      this.ctx.lineTo(centerX, peakY);
+      this.ctx.lineTo(centerX + snowWidth / 2, snowY);
+      // Wavy bottom edge for snow
+      this.ctx.quadraticCurveTo(centerX + snowWidth / 4, snowY + 5, centerX, snowY + 3);
+      this.ctx.quadraticCurveTo(centerX - snowWidth / 4, snowY + 5, centerX - snowWidth / 2, snowY);
+      this.ctx.closePath();
+      this.ctx.fill();
+
+      // Snow highlights
+      this.ctx.fillStyle = 'rgba(200, 220, 255, 0.5)';
+      this.ctx.beginPath();
+      this.ctx.moveTo(centerX - snowWidth / 4, snowY - snowHeight * 0.3);
+      this.ctx.lineTo(centerX - snowWidth / 8, peakY + 3);
+      this.ctx.lineTo(centerX, snowY - snowHeight * 0.5);
+      this.ctx.closePath();
+      this.ctx.fill();
+    }
+
+    // Shadow on right side
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    this.ctx.beginPath();
+    this.ctx.moveTo(centerX, peakY);
+    this.ctx.lineTo(rightX, groundY);
+    this.ctx.lineTo(centerX + baseWidth * 0.1, groundY);
+    this.ctx.closePath();
+    this.ctx.fill();
   }
 
   /**
@@ -1220,10 +2065,15 @@ export class Renderer {
       }
     }
 
+    // Build lines array, including view mode info
+    const viewModeStr = this.camera.isSideView() ? 'Side-View' : 'Top-Down';
+    const depthStr = this.camera.isSideView() ? ` Z: ${this.camera.z.toFixed(1)}` : '';
+
     const lines = [
       `Tick: ${world.tick}`,
       `Time: ${timeOfDayStr} (${phaseStr}) Light: ${lightLevelStr}`,
       `Camera: (${this.camera.x.toFixed(1)}, ${this.camera.y.toFixed(1)}) zoom: ${this.camera.zoom.toFixed(2)}`,
+      `View: ${viewModeStr}${depthStr} [V to toggle]`,
       `Chunks: ${this.chunkManager.getChunkCount()}`,
       `Entities: ${world.entities.size}`,
       `Seed: ${this.terrainGenerator.getSeed()}`,

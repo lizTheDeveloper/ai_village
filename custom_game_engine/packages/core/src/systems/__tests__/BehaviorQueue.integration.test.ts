@@ -6,7 +6,7 @@ import { AgentBrainSystem } from '../AgentBrainSystem.js';
 import { createAgentComponent, queueBehavior, type AgentComponent } from '../../components/AgentComponent.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
 import { createMovementComponent } from '../../components/MovementComponent.js';
-import { createNeedsComponent, type NeedsComponent } from '../../components/NeedsComponent.js';
+import { NeedsComponent } from '../../components/NeedsComponent.js';
 import { createCircadianComponent } from '../../components/CircadianComponent.js';
 import { createTemperatureComponent } from '../../components/TemperatureComponent.js';
 
@@ -42,7 +42,13 @@ describe('Behavior Queue System Integration', () => {
     agent.addComponent(createPositionComponent(0, 0, 0));
     agent.addComponent(createMovementComponent(1.0));
     // Set hunger=70 to avoid autonomic seek_food trigger (which happens at < 60)
-    agent.addComponent(createNeedsComponent(70, 70, 100, 37, 100));
+    agent.addComponent(new NeedsComponent({
+    hunger: 0.7,
+    energy: 0.7,
+    health: 1.0,
+    thirst: 0.37,
+    temperature: 1.0,
+  }));
     agent.addComponent(createCircadianComponent());
     agent.addComponent(createTemperatureComponent(20, 15, 25, 10, 30)); // currentTemp=20, comfortMin=15, comfortMax=25, toleranceMin=10, toleranceMax=30
 
@@ -129,10 +135,10 @@ describe('Behavior Queue System Integration', () => {
         };
       });
 
-      // Set critical hunger
+      // Set critical hunger (hunger is 0-1 scale, <0.1 is critical)
       agent.updateComponent<NeedsComponent>('needs', (current) => ({
         ...current,
-        hunger: 5, // Critical!
+        hunger: 0.05, // Critical! (5%)
       }));
 
       // Run update to trigger autonomic interrupt
@@ -302,7 +308,7 @@ describe('Behavior Queue System Integration', () => {
     it('should handle empty queue gracefully', () => {
       // Set up agent with completed queue
       agent.updateComponent<AgentComponent>('agent', (current) => {
-        let updated = queueBehavior(current, 'idle', { priority: 'normal' });
+        const updated = queueBehavior(current, 'idle', { priority: 'normal' });
         return {
           ...updated,
           currentQueueIndex: 1, // Past end of queue
@@ -320,7 +326,7 @@ describe('Behavior Queue System Integration', () => {
     it('should timeout behaviors that run too long', () => {
       // Queue behavior
       agent.updateComponent<AgentComponent>('agent', (current) => {
-        let updated = queueBehavior(current, 'gather', { priority: 'normal' });
+        const updated = queueBehavior(current, 'gather', { priority: 'normal' });
         // Set start time to 6 minutes ago
         return {
           ...updated,
@@ -378,7 +384,13 @@ describe('Behavior Queue System Integration', () => {
       agent2.addComponent(createAgentComponent());
       agent2.addComponent(createPositionComponent(10, 10, 0));
       agent2.addComponent(createMovementComponent(1.0));
-      agent2.addComponent(createNeedsComponent(50, 50, 20, 0.42, 0.5));
+      agent2.addComponent(new NeedsComponent({
+        hunger: 0.5,
+        energy: 0.5,
+        health: 0.2,
+        thirst: 0.42,
+        temperature: 37,
+      }));
       agent2.addComponent(createCircadianComponent());
       agent2.addComponent(createTemperatureComponent(20, 15, 25, 10, 30));
       (world as any)._addEntity(agent2);

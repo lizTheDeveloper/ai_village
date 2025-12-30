@@ -1,5 +1,5 @@
 import { Entity } from '../../ecs/Entity.js';
-import { createNeedsComponent } from '../../components/NeedsComponent.js';
+import { NeedsComponent } from '../../components/NeedsComponent.js';
 import { createCircadianComponent } from '../../components/CircadianComponent.js';
 import { createAgentComponent } from '../../components/AgentComponent.js';
 
@@ -33,13 +33,13 @@ export interface AgentTraits {
 export function applyAgentTraits(entity: Entity, traits: AgentTraits): void {
   // Add needs component
   const needsConfig = traits.needs || {};
-  const needs = createNeedsComponent(
-    needsConfig.hunger ?? 100,
-    needsConfig.energy ?? 100,
-    needsConfig.health ?? 100,
-    needsConfig.thirst ?? 100,
-    needsConfig.warmth ?? 100
-  );
+  const needs = new NeedsComponent({
+    hunger: (needsConfig.hunger ?? 100) / 100,
+    energy: (needsConfig.energy ?? 100) / 100,
+    health: (needsConfig.health ?? 100) / 100,
+    thirst: (needsConfig.thirst ?? 100) / 100,
+    temperature: (needsConfig.warmth ?? 100) / 100,
+  });
   entity.addComponent(needs);
 
   // Add circadian component

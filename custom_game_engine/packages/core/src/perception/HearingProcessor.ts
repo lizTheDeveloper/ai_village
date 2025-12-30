@@ -12,6 +12,7 @@ import type { World } from '../ecs/World.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { VisionComponent } from '../components/VisionComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
+import { ComponentType } from '../types/ComponentType.js';
 
 /**
  * Heard speech entry
@@ -57,12 +58,12 @@ export class HearingProcessor {
    * Process hearing for an entity, collecting nearby speech.
    */
   process(entity: EntityImpl, world: World): HearingResult {
-    const vision = entity.getComponent<VisionComponent>('vision');
+    const vision = entity.getComponent<VisionComponent>(ComponentType.Vision);
     if (!vision) {
       return { heardSpeech: [] };
     }
 
-    const position = entity.getComponent<PositionComponent>('position');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) {
       return { heardSpeech: [] };
     }
@@ -70,7 +71,7 @@ export class HearingProcessor {
     const heardSpeech = this.collectNearbySpeech(entity, world, position);
 
     // Update vision component with heard speech
-    entity.updateComponent<VisionComponent>('vision', (current) => ({
+    entity.updateComponent<VisionComponent>(ComponentType.Vision, (current) => ({
       ...current,
       heardSpeech,
     }));
@@ -86,15 +87,15 @@ export class HearingProcessor {
     world: World,
     position: PositionComponent
   ): HeardSpeech[] {
-    const agents = world.query().with('agent').with('position').executeEntities();
+    const agents = world.query().with(ComponentType.Agent).with(ComponentType.Position).executeEntities();
     const heardSpeech: HeardSpeech[] = [];
 
     for (const otherAgent of agents) {
       if (otherAgent.id === entity.id) continue;
 
       const otherImpl = otherAgent as EntityImpl;
-      const otherPos = otherImpl.getComponent<PositionComponent>('position');
-      const otherAgentComp = otherImpl.getComponent<AgentComponent>('agent');
+      const otherPos = otherImpl.getComponent<PositionComponent>(ComponentType.Position);
+      const otherAgentComp = otherImpl.getComponent<AgentComponent>(ComponentType.Agent);
 
       if (!otherPos || !otherAgentComp) continue;
 
@@ -102,7 +103,7 @@ export class HearingProcessor {
 
       // Within hearing range and has recent speech
       if (distance <= this.hearingRange && otherAgentComp.recentSpeech) {
-        const identity = otherImpl.getComponent('identity') as any;
+        const identity = otherImpl.getComponent(ComponentType.Identity) as any;
         const speakerName = identity?.name || 'Someone';
 
         heardSpeech.push({
@@ -121,8 +122,8 @@ export class HearingProcessor {
    * Check if entity can hear a specific other entity.
    */
   canHear(entity: EntityImpl, target: EntityImpl): boolean {
-    const position = entity.getComponent<PositionComponent>('position');
-    const targetPos = target.getComponent<PositionComponent>('position');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const targetPos = target.getComponent<PositionComponent>(ComponentType.Position);
 
     if (!position || !targetPos) return false;
 
@@ -134,15 +135,15 @@ export class HearingProcessor {
    * Get all agents within hearing range.
    */
   getAgentsInHearingRange(entity: EntityImpl, world: World): Entity[] {
-    const position = entity.getComponent<PositionComponent>('position');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) return [];
 
-    const agents = world.query().with('agent').with('position').executeEntities();
+    const agents = world.query().with(ComponentType.Agent).with(ComponentType.Position).executeEntities();
 
     return agents.filter((other) => {
       if (other.id === entity.id) return false;
 
-      const otherPos = (other as EntityImpl).getComponent<PositionComponent>('position');
+      const otherPos = (other as EntityImpl).getComponent<PositionComponent>(ComponentType.Position);
       if (!otherPos) return false;
 
       const distance = this.distance(position, otherPos);

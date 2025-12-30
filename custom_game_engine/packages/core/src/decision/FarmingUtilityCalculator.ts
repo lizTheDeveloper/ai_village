@@ -18,6 +18,7 @@ import type { EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
 import type { InventoryComponent } from '../components/InventoryComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
+import { ComponentType } from '../types/ComponentType.js';
 
 /**
  * Farming utility scores for each possible action
@@ -70,8 +71,8 @@ export function calculateFarmingContext(
   entity: EntityImpl,
   world: World
 ): FarmingContext {
-  const position = entity.getComponent<PositionComponent>('position');
-  const inventory = entity.getComponent<InventoryComponent>('inventory');
+  const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+  const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
 
   // Default context if missing components
   if (!position) {
@@ -170,14 +171,14 @@ export function calculateFarmingContext(
   let harvestableCount = 0;
   let seedableCount = 0;
 
-  const plants = world.query().with('plant').with('position').executeEntities();
+  const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
   const PLANT_SEARCH_RADIUS = 15;
   const HARVESTABLE_STAGES = ['mature', 'seeding', 'fruiting'];
 
   for (const plantEntity of plants) {
     const plantImpl = plantEntity as EntityImpl;
-    const plant = plantImpl.getComponent<any>('plant');
-    const plantPos = plantImpl.getComponent<PositionComponent>('position');
+    const plant = plantImpl.getComponent<any>(ComponentType.Plant);
+    const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
 
     if (!plant || !plantPos) continue;
 
@@ -237,10 +238,10 @@ export function calculateFarmingContext(
  * Check if there's a plant at a specific tile
  */
 function hasPlantAt(world: World, x: number, y: number): boolean {
-  const plants = world.query().with('plant').with('position').executeEntities();
+  const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
   for (const plantEntity of plants) {
     const plantImpl = plantEntity as EntityImpl;
-    const plantPos = plantImpl.getComponent<PositionComponent>('position');
+    const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
     if (plantPos && Math.floor(plantPos.x) === x && Math.floor(plantPos.y) === y) {
       return true;
     }

@@ -13,6 +13,7 @@
 
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -42,9 +43,9 @@ import {
  * MoodSystem manages agent emotional states.
  */
 export class MoodSystem implements System {
-  public readonly id: SystemId = 'mood';
+  public readonly id: SystemId = CT.Mood;
   public readonly priority: number = 48; // After NeedsSystem (40), before behavior systems
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = ['agent'];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Agent];
 
   private isInitialized = false;
   private eventBus: EventBus | null = null;
@@ -153,9 +154,9 @@ export class MoodSystem implements System {
     const tick = this.world.tick;
 
     // Get or create preference component
-    let preferences = impl.getComponent<PreferenceComponent>('preference');
+    let preferences = impl.getComponent<PreferenceComponent>(CT.Preference);
     if (!preferences) {
-      const personality = impl.getComponent<PersonalityComponent>('personality');
+      const personality = impl.getComponent<PersonalityComponent>(CT.Personality);
       preferences = createPreferenceComponent({
         openness: personality?.openness,
         neuroticism: personality?.neuroticism,
@@ -164,7 +165,7 @@ export class MoodSystem implements System {
     }
 
     // Get or create mood component
-    let existingMood = impl.getComponent<MoodComponent>('mood');
+    let existingMood = impl.getComponent<MoodComponent>(CT.Mood);
     if (!existingMood) {
       existingMood = this.createMoodForAgent(impl);
       impl.addComponent(existingMood);
@@ -222,7 +223,7 @@ export class MoodSystem implements System {
       withCompanions: isSocialMeal,
     };
     mood = recordMeal(mood, mealRecord, isFavorite, isComfortFood);
-    impl.updateComponent('mood', () => mood);
+    impl.updateComponent(CT.Mood, () => mood);
 
     // Record in preference component
     const experience = satisfaction > 10 ? 'positive' : satisfaction < -10 ? 'negative' : 'neutral';
@@ -240,7 +241,7 @@ export class MoodSystem implements System {
     if (flavors && flavors.length > 0) {
       preferences = updateFlavorPreferences(preferences, flavors, experience, 0.05);
     }
-    impl.updateComponent('preference', () => preferences);
+    impl.updateComponent(CT.Preference, () => preferences);
 
     // Check if this should become a favorite (eaten 5+ times with positive experience)
     const positiveCount = preferences.foodMemories.filter(
@@ -251,7 +252,7 @@ export class MoodSystem implements System {
         ...mood,
         favorites: [...mood.favorites, foodType],
       };
-      impl.updateComponent('mood', () => mood);
+      impl.updateComponent(CT.Mood, () => mood);
     }
   }
 
@@ -261,19 +262,19 @@ export class MoodSystem implements System {
   private detectSocialMeal(agent: EntityImpl): boolean {
     if (!this.world) return false;
 
-    const agentPos = agent.getComponent('position') as { x: number; y: number } | undefined;
+    const agentPos = agent.getComponent(CT.Position) as { x: number; y: number } | undefined;
     if (!agentPos) return false;
 
     // Find other agents with agent component
     const otherAgents = this.world.query()
-      .with('agent')
-      .with('position')
+      .with(CT.Agent)
+      .with(CT.Position)
       .executeEntities();
 
     for (const other of otherAgents) {
       if (other.id === agent.id) continue;
 
-      const otherPos = (other as EntityImpl).getComponent('position') as { x: number; y: number } | undefined;
+      const otherPos = (other as EntityImpl).getComponent(CT.Position) as { x: number; y: number } | undefined;
       if (!otherPos) continue;
 
       const dx = agentPos.x - otherPos.x;
@@ -329,7 +330,7 @@ export class MoodSystem implements System {
       if (!entity) continue;
 
       const impl = entity as EntityImpl;
-      let mood = impl.getComponent<MoodComponent>('mood');
+      let mood = impl.getComponent<MoodComponent>(CT.Mood);
 
       if (!mood) {
         // Create mood component if it doesn't exist
@@ -343,7 +344,7 @@ export class MoodSystem implements System {
         mood = updateMoodFactor(mood, factor as keyof typeof mood.factors, currentValue + amount);
       }
 
-      impl.updateComponent('mood', () => mood);
+      impl.updateComponent(CT.Mood, () => mood);
     }
 
     this.pendingBoosts.clear();
@@ -353,9 +354,9 @@ export class MoodSystem implements System {
    * Update mood for an agent based on current state.
    */
   private updateAgentMood(entity: EntityImpl, world: World): void {
-    let mood = entity.getComponent<MoodComponent>('mood');
-    const needs = entity.getComponent<NeedsComponent>('needs');
-    const relationships = entity.getComponent<RelationshipComponent>('relationship');
+    let mood = entity.getComponent<MoodComponent>(CT.Mood);
+    const needs = entity.getComponent<NeedsComponent>(CT.Needs);
+    const relationships = entity.getComponent<RelationshipComponent>(CT.Relationship);
 
     // Create mood component if it doesn't exist
     if (!mood) {
@@ -387,7 +388,7 @@ export class MoodSystem implements System {
     mood = applyMoodChange(mood, 0, world.tick);
 
     // Update the component
-    entity.updateComponent('mood', () => mood);
+    entity.updateComponent(CT.Mood, () => mood);
 
     // Emit mood changed event if significant change
     this.emitMoodEvent(entity.id, mood);
@@ -397,7 +398,7 @@ export class MoodSystem implements System {
    * Create a mood component for an agent, using personality to set baseline.
    */
   private createMoodForAgent(entity: EntityImpl): MoodComponent {
-    const personality = entity.getComponent<PersonalityComponent>('personality');
+    const personality = entity.getComponent<PersonalityComponent>(CT.Personality);
 
     // Baseline mood influenced by neuroticism (lower = more stable/positive baseline)
     // and extraversion (higher = more positive baseline)
@@ -451,17 +452,17 @@ export class MoodSystem implements System {
     let score = 0;
 
     // Check if indoors/sheltered (near a building)
-    const pos = entity.getComponent('position') as { x: number; y: number } | undefined;
+    const pos = entity.getComponent(CT.Position) as { x: number; y: number } | undefined;
     if (pos) {
       const nearbyBuildings = world.query()
-        .with('building')
-        .with('position')
+        .with(CT.Building)
+        .with(CT.Position)
         .executeEntities();
 
       let isSheltered = false;
       for (const building of nearbyBuildings) {
-        const buildingPos = (building as EntityImpl).getComponent('position') as { x: number; y: number } | undefined;
-        const buildingComp = (building as EntityImpl).getComponent('building') as { isComplete: boolean } | undefined;
+        const buildingPos = (building as EntityImpl).getComponent(CT.Position) as { x: number; y: number } | undefined;
+        const buildingComp = (building as EntityImpl).getComponent(CT.Building) as { isComplete: boolean } | undefined;
         if (buildingPos && buildingComp?.isComplete) {
           const dx = pos.x - buildingPos.x;
           const dy = pos.y - buildingPos.y;
@@ -479,9 +480,9 @@ export class MoodSystem implements System {
     }
 
     // Weather effects (if weather component exists on world)
-    const weatherEntities = world.query().with('weather').executeEntities();
+    const weatherEntities = world.query().with(CT.Weather).executeEntities();
     if (weatherEntities.length > 0) {
-      const weather = (weatherEntities[0] as EntityImpl).getComponent('weather') as { type: string } | undefined;
+      const weather = (weatherEntities[0] as EntityImpl).getComponent(CT.Weather) as { type: string } | undefined;
       if (weather) {
         switch (weather.type) {
           case 'sunny':
@@ -523,7 +524,7 @@ export class MoodSystem implements System {
    * Get mood description for an agent (for LLM context).
    */
   public getMoodContext(entity: EntityImpl): string {
-    const mood = entity.getComponent<MoodComponent>('mood');
+    const mood = entity.getComponent<MoodComponent>(CT.Mood);
     if (!mood) {
       return 'feeling neutral';
     }

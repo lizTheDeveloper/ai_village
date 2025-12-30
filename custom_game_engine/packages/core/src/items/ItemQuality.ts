@@ -13,12 +13,10 @@ import {
   getTotalSynergyQualityBonus,
   getTaskFamiliarityBonus,
 } from '../components/SkillsComponent.js';
+import type { ItemQuality } from '../types/ItemTypes.js';
 
-/**
- * Quality tier enum for categorizing item quality.
- * Maps numeric quality (0-100) to named tiers.
- */
-export type ItemQuality = 'poor' | 'normal' | 'fine' | 'masterwork' | 'legendary';
+// Re-export for backwards compatibility
+export type { ItemQuality };
 
 /**
  * Map numeric quality (0-100) to quality tier.

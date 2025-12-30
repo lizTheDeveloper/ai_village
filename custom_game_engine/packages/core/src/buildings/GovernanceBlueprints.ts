@@ -17,7 +17,7 @@ import type { BuildingBlueprintRegistry } from './BuildingBlueprintRegistry.js';
  */
 export const GOVERNANCE_BLUEPRINTS: BuildingBlueprint[] = [
   {
-    id: 'town_hall',
+    id: 'town-hall',
     name: 'Town Hall',
     description: 'Basic governance building. Tracks population count, agent roster, births, and deaths',
     category: 'community',
@@ -41,7 +41,7 @@ export const GOVERNANCE_BLUEPRINTS: BuildingBlueprint[] = [
     requiresFoundation: false,
   },
   {
-    id: 'census_bureau',
+    id: 'census-bureau',
     name: 'Census Bureau',
     description: 'Demographics and analytics. Tracks age distribution, birth/death rates, and population projections. Requires Town Hall. Must be staffed',
     category: 'community',
@@ -96,7 +96,7 @@ export const GOVERNANCE_BLUEPRINTS: BuildingBlueprint[] = [
     requiresFoundation: false,
   },
   {
-    id: 'weather_station',
+    id: 'weather-station',
     name: 'Weather Station',
     description: 'Environmental monitoring. Provides temperature forecasts and extreme weather warnings. Must be placed in open area',
     category: 'community',
@@ -121,7 +121,7 @@ export const GOVERNANCE_BLUEPRINTS: BuildingBlueprint[] = [
     requiresFoundation: false,
   },
   {
-    id: 'health_clinic',
+    id: 'health-clinic',
     name: 'Health Clinic',
     description: 'Medical tracking. Monitors population health, diseases, malnutrition, and causes of death. Must be staffed by healers',
     category: 'community',
@@ -146,7 +146,7 @@ export const GOVERNANCE_BLUEPRINTS: BuildingBlueprint[] = [
     requiresFoundation: false,
   },
   {
-    id: 'meeting_hall',
+    id: 'meeting-hall',
     name: 'Meeting Hall',
     description: 'Social cohesion tracking. Maps social networks, tracks relationships, detects conflicts, and monitors morale',
     category: 'community',
@@ -200,7 +200,7 @@ export const GOVERNANCE_BLUEPRINTS: BuildingBlueprint[] = [
     requiresFoundation: false,
   },
   {
-    id: 'labor_guild',
+    id: 'labor-guild',
     name: 'Labor Guild',
     description: 'Workforce management. Tracks labor allocation, skill inventory, and identifies bottlenecks. Requires Town Hall',
     category: 'community',

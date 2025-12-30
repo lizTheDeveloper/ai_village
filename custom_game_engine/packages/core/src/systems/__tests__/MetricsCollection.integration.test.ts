@@ -3,7 +3,7 @@ import { IntegrationTestHarness } from '../../__tests__/utils/IntegrationTestHar
 import { createMinimalWorld } from '../../__tests__/fixtures/worldFixtures.js';
 import { MetricsCollectionSystem } from '../MetricsCollectionSystem.js';
 import { createAgentComponent } from '../../components/AgentComponent.js';
-import { createNeedsComponent } from '../../components/NeedsComponent.js';
+import { NeedsComponent } from '../../components/NeedsComponent.js';
 import { createIdentityComponent } from '../../components/IdentityComponent.js';
 
 /**
@@ -175,7 +175,13 @@ describe('MetricsCollectionSystem Integration', () => {
     it('should take periodic snapshots of agent needs', () => {
       const agent = harness.createTestAgent({ x: 10, y: 10 });
       agent.addComponent(createAgentComponent('test-agent', 'wander'));
-      agent.addComponent(createNeedsComponent(80, 70, 60, 90, 85));
+      agent.addComponent(new NeedsComponent({
+    hunger: 0.8,
+    energy: 0.7,
+    health: 0.6,
+    thirst: 0.9,
+    temperature: 0.85,
+  }));
       agent.addComponent(createIdentityComponent('TestAgent'));
 
       // Run system for multiple ticks
@@ -192,12 +198,24 @@ describe('MetricsCollectionSystem Integration', () => {
     it('should sample multiple agents', () => {
       const agent1 = harness.createTestAgent({ x: 10, y: 10 });
       agent1.addComponent(createAgentComponent('agent-1', 'wander'));
-      agent1.addComponent(createNeedsComponent(80, 70, 60, 90, 85));
+      agent1.addComponent(new NeedsComponent({
+    hunger: 0.8,
+    energy: 0.7,
+    health: 0.6,
+    thirst: 0.9,
+    temperature: 0.85,
+  }));
       agent1.addComponent(createIdentityComponent('Agent1'));
 
       const agent2 = harness.createTestAgent({ x: 20, y: 20 });
       agent2.addComponent(createAgentComponent('agent-2', 'gather'));
-      agent2.addComponent(createNeedsComponent(60, 90, 80, 70, 95));
+      agent2.addComponent(new NeedsComponent({
+    hunger: 0.6,
+    energy: 0.9,
+    health: 0.8,
+    thirst: 0.7,
+    temperature: 0.95,
+  }));
       agent2.addComponent(createIdentityComponent('Agent2'));
 
       // Run system to trigger snapshots
@@ -218,7 +236,13 @@ describe('MetricsCollectionSystem Integration', () => {
 
       const agent = harness.createTestAgent({ x: 10, y: 10 });
       agent.addComponent(createAgentComponent('test-agent', 'wander'));
-      agent.addComponent(createNeedsComponent(80, 70, 60, 90, 85));
+      agent.addComponent(new NeedsComponent({
+    hunger: 0.8,
+    energy: 0.7,
+    health: 0.6,
+    thirst: 0.9,
+    temperature: 0.85,
+  }));
       agent.addComponent(createIdentityComponent('TestAgent'));
 
       // Run system for 15 ticks
@@ -387,7 +411,13 @@ describe('MetricsCollectionSystem Integration', () => {
     it('should handle multiple event types in a single run', () => {
       const agent = harness.createTestAgent({ x: 10, y: 10 });
       agent.addComponent(createAgentComponent('test-agent', 'wander'));
-      agent.addComponent(createNeedsComponent(80, 70, 60, 90, 85));
+      agent.addComponent(new NeedsComponent({
+    hunger: 0.8,
+    energy: 0.7,
+    health: 0.6,
+    thirst: 0.9,
+    temperature: 0.85,
+  }));
       agent.addComponent(createIdentityComponent('MultiTasker'));
 
       // Emit various events

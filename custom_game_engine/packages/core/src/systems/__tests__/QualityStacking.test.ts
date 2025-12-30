@@ -152,7 +152,7 @@ describe('Quality-Based Stacking Integration', () => {
     });
 
     it('should remove entire stack when quantity reaches zero', () => {
-      let result = addToInventoryWithQuality(inventory, 'wheat', 5, 70);
+      const result = addToInventoryWithQuality(inventory, 'wheat', 5, 70);
       inventory = result.inventory;
 
       // Remove all wheat

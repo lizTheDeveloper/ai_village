@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -23,11 +24,11 @@ interface BuildingCollisionData {
 }
 
 export class MovementSystem implements System {
-  public readonly id: SystemId = 'movement';
+  public readonly id: SystemId = CT.Movement;
   public readonly priority: number = 20; // Run after AI
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
-    'movement',
-    'position',
+    CT.Movement,
+    CT.Position,
   ];
 
   // Performance: Cache building positions to avoid querying every frame
@@ -64,13 +65,13 @@ export class MovementSystem implements System {
     }
 
     // Rebuild cache
-    const buildings = world.query().with('position').with('building').executeEntities();
+    const buildings = world.query().with(CT.Position).with(CT.Building).executeEntities();
     this.buildingCollisionCache = [];
 
     for (const building of buildings) {
       const impl = building as EntityImpl;
-      const pos = impl.getComponent<PositionComponent>('position');
-      const buildingComp = impl.getComponent<BuildingComponent>('building');
+      const pos = impl.getComponent<PositionComponent>(CT.Position);
+      const buildingComp = impl.getComponent<BuildingComponent>(CT.Building);
 
       if (pos && buildingComp) {
         this.buildingCollisionCache.push({
@@ -89,11 +90,11 @@ export class MovementSystem implements System {
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     // Get time acceleration multiplier from TimeComponent
-    const timeEntities = world.query().with('time').executeEntities();
+    const timeEntities = world.query().with(CT.Time).executeEntities();
     let timeSpeedMultiplier = 1.0;
     if (timeEntities.length > 0) {
       const timeEntity = timeEntities[0] as EntityImpl;
-      const timeComp = timeEntity.getComponent('time') as TimeComponent | undefined;
+      const timeComp = timeEntity.getComponent(CT.Time) as TimeComponent | undefined;
       if (timeComp && timeComp.speedMultiplier) {
         timeSpeedMultiplier = timeComp.speedMultiplier;
       }
@@ -101,32 +102,32 @@ export class MovementSystem implements System {
 
     // Filter entities with required components
     const movementEntities = entities.filter(e =>
-      e.components.has('movement') && e.components.has('position')
+      e.components.has(CT.Movement) && e.components.has(CT.Position)
     );
 
     for (const entity of movementEntities) {
       const impl = entity as EntityImpl;
 
       // Performance: Get all components once at start
-      const movement = impl.getComponent<MovementComponent>('movement')!;
-      const position = impl.getComponent<PositionComponent>('position')!;
-      const velocity = impl.getComponent<VelocityComponent>('velocity');
-      const steering = impl.getComponent('steering') as { behavior?: string } | undefined;
-      const circadian = impl.getComponent<CircadianComponent>('circadian');
-      const needs = impl.getComponent<NeedsComponent>('needs');
+      const movement = impl.getComponent<MovementComponent>(CT.Movement)!;
+      const position = impl.getComponent<PositionComponent>(CT.Position)!;
+      const velocity = impl.getComponent<VelocityComponent>(CT.Velocity);
+      const steering = impl.getComponent(CT.Steering) as { behavior?: string } | undefined;
+      const circadian = impl.getComponent<CircadianComponent>(CT.Circadian);
+      const needs = impl.getComponent<NeedsComponent>(CT.Needs);
 
       // Sync velocity component to movement component (for SteeringSystem integration)
       // Only sync when steering is active - when steering is 'none', behaviors control velocity directly
       const steeringActive = steering && steering.behavior && steering.behavior !== 'none';
 
       if (steeringActive && velocity && (velocity.vx !== undefined || velocity.vy !== undefined)) {
-        impl.updateComponent<MovementComponent>('movement', (current) => ({
+        impl.updateComponent<MovementComponent>(CT.Movement, (current) => ({
           ...current,
           velocityX: velocity.vx ?? current.velocityX,
           velocityY: velocity.vy ?? current.velocityY,
         }));
         // Re-get movement after update
-        const updatedMovement = impl.getComponent<MovementComponent>('movement')!;
+        const updatedMovement = impl.getComponent<MovementComponent>(CT.Movement)!;
         Object.assign(movement, updatedMovement);
       }
 
@@ -134,14 +135,14 @@ export class MovementSystem implements System {
       if (circadian && circadian.isSleeping) {
         // Force velocity to 0 while sleeping
         if (movement.velocityX !== 0 || movement.velocityY !== 0) {
-          impl.updateComponent<MovementComponent>('movement', (current) => ({
+          impl.updateComponent<MovementComponent>(CT.Movement, (current) => ({
             ...current,
             velocityX: 0,
             velocityY: 0,
           }));
           // Also sync to VelocityComponent
           if (velocity) {
-            impl.updateComponent<VelocityComponent>('velocity', (current) => ({
+            impl.updateComponent<VelocityComponent>(CT.Velocity, (current) => ({
               ...current,
               vx: 0,
               vy: 0,
@@ -231,7 +232,7 @@ export class MovementSystem implements System {
   private updatePosition(impl: EntityImpl, x: number, y: number): void {
     const newChunkX = Math.floor(x / 32);
     const newChunkY = Math.floor(y / 32);
-    impl.updateComponent<PositionComponent>('position', (current) => ({
+    impl.updateComponent<PositionComponent>(CT.Position, (current) => ({
       ...current,
       x,
       y,
@@ -241,13 +242,13 @@ export class MovementSystem implements System {
   }
 
   private stopEntity(impl: EntityImpl, velocity: VelocityComponent | undefined): void {
-    impl.updateComponent<MovementComponent>('movement', (current) => ({
+    impl.updateComponent<MovementComponent>(CT.Movement, (current) => ({
       ...current,
       velocityX: 0,
       velocityY: 0,
     }));
     if (velocity) {
-      impl.updateComponent<VelocityComponent>('velocity', (current) => ({
+      impl.updateComponent<VelocityComponent>(CT.Velocity, (current) => ({
         ...current,
         vx: 0,
         vy: 0,
@@ -256,15 +257,53 @@ export class MovementSystem implements System {
   }
 
   /**
-   * Check for hard collisions (buildings) - these block movement completely
+   * Check for hard collisions (buildings, water, and steep elevation changes) - these block movement completely
    * Performance: Uses cached building positions
    */
   private hasHardCollision(
     world: World,
-    _entityId: string,
+    entityId: string,
     x: number,
     y: number
   ): boolean {
+    // Check for water terrain (blocks land-based movement)
+    const worldWithTerrain = world as {
+      getTerrainAt?: (x: number, y: number) => string | null;
+      getTileAt?: (x: number, y: number) => { elevation?: number } | undefined;
+    };
+
+    if (typeof worldWithTerrain.getTerrainAt === 'function') {
+      const terrain = worldWithTerrain.getTerrainAt(Math.floor(x), Math.floor(y));
+      if (terrain === 'water' || terrain === 'deep_water') {
+        return true;
+      }
+    }
+
+    // Check for steep elevation changes - entities cannot climb/fall more than 2 elevation levels
+    if (typeof worldWithTerrain.getTileAt === 'function') {
+      const entity = world.entities.get(entityId);
+      if (entity) {
+        const currentPos = (entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
+        if (currentPos) {
+          const currentTile = worldWithTerrain.getTileAt(Math.floor(currentPos.x), Math.floor(currentPos.y));
+          const targetTile = worldWithTerrain.getTileAt(Math.floor(x), Math.floor(y));
+
+          if (currentTile && targetTile &&
+              currentTile.elevation !== undefined &&
+              targetTile.elevation !== undefined) {
+            const elevationDiff = Math.abs(targetTile.elevation - currentTile.elevation);
+
+            // Block movement if elevation change is too steep (more than 2 levels)
+            // This prevents entities from falling into deep basins or climbing cliffs
+            if (elevationDiff > 2) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+
+    // Check for building collisions
     const buildings = this.getBuildingCollisions(world);
 
     for (const building of buildings) {
@@ -295,7 +334,7 @@ export class MovementSystem implements System {
     x: number,
     y: number
   ): number {
-    const physicsQuery = world.query().with('position').with('physics');
+    const physicsQuery = world.query().with(CT.Position).with(CT.Physics);
     const physicsEntities = physicsQuery.executeEntities();
 
     let penalty = 1.0;
@@ -308,8 +347,8 @@ export class MovementSystem implements System {
       }
 
       const impl = entity as EntityImpl;
-      const pos = impl.getComponent<PositionComponent>('position')!;
-      const physics = impl.getComponent<PhysicsComponent>('physics')!;
+      const pos = impl.getComponent<PositionComponent>(CT.Position)!;
+      const physics = impl.getComponent<PhysicsComponent>(CT.Physics)!;
 
       if (!physics.solid) {
         continue;

@@ -7,7 +7,7 @@ import { NeedsSystem } from '../NeedsSystem.js';
 import { MovementSystem } from '../MovementSystem.js';
 import { PlantSystem } from '../PlantSystem.js';
 import { AnimalSystem } from '../AnimalSystem.js';
-import { createNeedsComponent } from '../../components/NeedsComponent.js';
+import { NeedsComponent } from '../../components/NeedsComponent.js';
 import { createCircadianComponent } from '../../components/CircadianComponent.js';
 import { createAgentComponent } from '../../components/AgentComponent.js';
 import { createMovementComponent } from '../../components/MovementComponent.js';
@@ -44,7 +44,13 @@ describe('Performance Monitoring Integration', () => {
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     agent.addComponent(createAgentComponent('test-agent', 'wander'));
-    agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
     agent.addComponent(createCircadianComponent());
 
     const entities = Array.from(harness.world.entities.values());
@@ -57,9 +63,6 @@ describe('Performance Monitoring Integration', () => {
 
     const endTime = performance.now();
     const duration = endTime - startTime;
-
-    // Report performance stats
-    console.log(`[PERF] Single agent update: ${duration.toFixed(2)}ms (Goal: <100ms)`);
 
     // Basic sanity check - should complete
     expect(duration).toBeGreaterThanOrEqual(0);
@@ -76,7 +79,13 @@ describe('Performance Monitoring Integration', () => {
     for (let i = 0; i < 10; i++) {
       const agent = harness.createTestAgent({ x: i * 2, y: i * 2 });
       agent.addComponent(createAgentComponent(`agent-${i}`, 'wander'));
-      agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
+      agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
       agent.addComponent(createCircadianComponent());
     }
 
@@ -90,9 +99,6 @@ describe('Performance Monitoring Integration', () => {
     const endTime = performance.now();
     const duration = endTime - startTime;
 
-    // Report performance stats
-    console.log(`[PERF] 10 agents update: ${duration.toFixed(2)}ms (Goal: <500ms)`);
-
     // Basic sanity check
     expect(duration).toBeGreaterThanOrEqual(0);
   });
@@ -105,7 +111,13 @@ describe('Performance Monitoring Integration', () => {
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
-    agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
 
     const entities = Array.from(harness.world.entities.values());
 
@@ -127,9 +139,6 @@ describe('Performance Monitoring Integration', () => {
     const maxFrameTime = Math.max(...frameTimings);
     const minFrameTime = Math.min(...frameTimings);
 
-    // Report performance stats
-    console.log(`[PERF] 100 frames - Avg: ${avgFrameTime.toFixed(2)}ms, Min: ${minFrameTime.toFixed(2)}ms, Max: ${maxFrameTime.toFixed(2)}ms (Goal avg: <50ms)`);
-
     // Basic sanity check
     expect(frameTimings.length).toBe(100);
   });
@@ -139,7 +148,13 @@ describe('Performance Monitoring Integration', () => {
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
-    agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
 
     const entities = Array.from(harness.world.entities.values());
 
@@ -152,9 +167,6 @@ describe('Performance Monitoring Integration', () => {
 
     const endTime = performance.now();
     const totalDuration = endTime - startTime;
-
-    // Report performance stats
-    console.log(`[PERF] 1000 iterations: ${totalDuration.toFixed(2)}ms total, ${(totalDuration / 1000).toFixed(2)}ms per iteration`);
 
     // Should complete without crashing
     expect(true).toBe(true);
@@ -173,7 +185,13 @@ describe('Performance Monitoring Integration', () => {
     for (let i = 0; i < 5; i++) {
       const agent = harness.createTestAgent({ x: i, y: 0 });
       agent.addComponent(createAgentComponent(`agent-${i}`, 'wander'));
-      agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
+      agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
       agent.addComponent(createCircadianComponent());
     }
 
@@ -191,9 +209,6 @@ describe('Performance Monitoring Integration', () => {
 
     const endTime = performance.now();
     const duration = endTime - startTime;
-
-    // Report performance stats
-    console.log(`[PERF] Mixed entities (5 agents + 5 animals): ${duration.toFixed(2)}ms (Goal: <500ms)`);
 
     // Basic sanity check
     expect(duration).toBeGreaterThanOrEqual(0);
@@ -222,9 +237,6 @@ describe('Performance Monitoring Integration', () => {
     const endTime = performance.now();
     const duration = endTime - startTime;
 
-    // Report performance stats
-    console.log(`[PERF] Event emit with 10 listeners: ${duration.toFixed(2)}ms (Goal: <50ms)`);
-
     // Cleanup listeners
     listeners.forEach(unsubscribe => unsubscribe());
 
@@ -241,7 +253,13 @@ describe('Performance Monitoring Integration', () => {
       for (let y = 0; y < 5; y++) {
         const agent = harness.createTestAgent({ x, y });
         agent.addComponent(createMovementComponent());
-        agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
+        agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
       }
     }
 
@@ -254,9 +272,6 @@ describe('Performance Monitoring Integration', () => {
     const endTime = performance.now();
     const duration = endTime - startTime;
 
-    // Report performance stats
-    console.log(`[PERF] Movement system with 25 agents: ${duration.toFixed(2)}ms (Goal: <200ms)`);
-
     // Basic sanity check
     expect(duration).toBeGreaterThanOrEqual(0);
   });
@@ -266,7 +281,13 @@ describe('Performance Monitoring Integration', () => {
     harness.registerSystem('NeedsSystem', needsSystem);
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
-    agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
 
     const entities = Array.from(harness.world.entities.values());
 
@@ -285,9 +306,6 @@ describe('Performance Monitoring Integration', () => {
     const variance = timings.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / timings.length;
     const stdDev = Math.sqrt(variance);
 
-    // Report performance stats
-    console.log(`[PERF] 50 updates - Avg: ${avg.toFixed(2)}ms, StdDev: ${stdDev.toFixed(2)}ms (Goal: StdDev < 2x avg)`);
-
     // Basic sanity check
     expect(timings.length).toBe(50);
   });
@@ -298,7 +316,13 @@ describe('Performance Monitoring Integration', () => {
 
     const agent = harness.createTestAgent({ x: 10, y: 10 });
     agent.addComponent(createAgentComponent('test-agent', 'wander'));
-    agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
 
     // Run system
     const entities = Array.from(harness.world.entities.values());

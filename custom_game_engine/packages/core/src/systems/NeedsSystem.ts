@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -13,16 +14,16 @@ import type { TemperatureComponent } from '../components/TemperatureComponent.js
 export class NeedsSystem implements System {
   public readonly id: SystemId = 'needs';
   public readonly priority: number = 15; // Run after AI (10), before Movement (20)
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = ['needs'];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Needs];
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     // Get game time from TimeComponent to calculate game minutes elapsed
-    const timeEntities = world.query().with('time').executeEntities();
+    const timeEntities = world.query().with(CT.Time).executeEntities();
     let gameMinutesElapsed = 0;
 
     if (timeEntities.length > 0) {
       const timeEntity = timeEntities[0] as EntityImpl;
-      const timeComp = timeEntity.getComponent<TimeComponent>('time');
+      const timeComp = timeEntity.getComponent<TimeComponent>(CT.Time);
       if (timeComp) {
         // Calculate effective day length based on speed multiplier
         const effectiveDayLength = timeComp.dayLength / timeComp.speedMultiplier;
@@ -38,62 +39,63 @@ export class NeedsSystem implements System {
     }
     for (const entity of entities) {
       const impl = entity as EntityImpl;
-      const needs = impl.getComponent<NeedsComponent>('needs')!;
+      const needs = impl.getComponent<NeedsComponent>(CT.Needs)!;
 
       if (!needs) {
         throw new Error(`Entity ${entity.id} missing required needs component`);
       }
 
       // Check if agent is sleeping (don't deplete energy while sleeping)
-      const circadian = impl.getComponent<CircadianComponent>('circadian');
+      const circadian = impl.getComponent<CircadianComponent>(CT.Circadian);
       const isSleeping = circadian?.isSleeping || false;
 
       // Decay hunger (paused during sleep to prevent waking agents)
       // Per CLAUDE.md: Don't let hunger wake agents during minimum sleep period
       // Agents need to recover energy more than they need to eat
       // Hunger decay rate is per GAME MINUTE (not real time!)
-      // At 0.08/min, agents drop 50 hunger in 625 game minutes (~10 hours) = ~2-3 meals/day
-      const hungerDecayPerGameMinute = 0.08; // ~2-3 meals per 18-hour waking period
+      // NeedsComponent uses 0-1 scale, so 0.0008/min = agents drop 0.5 (50%) in 625 game minutes (~10 hours)
+      const hungerDecayPerGameMinute = 0.0008; // ~2-3 meals per 18-hour waking period
       const hungerDecay = isSleeping ? 0 : hungerDecayPerGameMinute * gameMinutesElapsed;
 
       // Energy decay based on activity level (per GAME minute, not real time)
+      // NeedsComponent uses 0-1 scale (divide old values by 100)
       // Rates balanced for ~18-hour wake / ~6-hour sleep cycle per game day
       // At these rates, agents can work a full day before needing sleep:
-      // - Idle/Walking: -0.03 energy/minute (~55 hours from 100 to 0)
-      // - Working (gathering, building): -0.08 energy/minute (~21 hours from 100 to 0)
-      // - Running: -0.12 energy/minute (~14 hours from 100 to 0)
-      // - Cold/Hot exposure: -0.02 energy/minute additional
-      // Average day: 8h*0.08 + 10h*0.03 = 38 + 18 = 56 energy used in 18h (sleep once/day)
+      // - Idle/Walking: -0.0003 energy/minute (~55 hours from 1.0 to 0)
+      // - Working (gathering, building): -0.0008 energy/minute (~21 hours from 1.0 to 0)
+      // - Running: -0.0012 energy/minute (~14 hours from 1.0 to 0)
+      // - Cold/Hot exposure: -0.0002 energy/minute additional
 
-      let energyDecayPerGameMinute = 0.03; // Base rate: idle/walking
+      let energyDecayPerGameMinute = 0.0003; // Base rate: idle/walking
 
       if (!isSleeping) {
         // Check agent's current behavior to determine activity level
-        const agent = impl.getComponent<AgentComponent>('agent');
-        const movement = impl.getComponent<MovementComponent>('movement');
+        const agent = impl.getComponent<AgentComponent>(CT.Agent);
+        const movement = impl.getComponent<MovementComponent>(CT.Movement);
 
         if (agent) {
           const behavior = agent.behavior;
           const isMoving = movement && (Math.abs(movement.velocityX) > 0.01 || Math.abs(movement.velocityY) > 0.01);
 
+          // NeedsComponent uses 0-1 scale
           if (behavior === 'gather' || behavior === 'build') {
-            energyDecayPerGameMinute = 0.08; // Working
+            energyDecayPerGameMinute = 0.0008; // Working
           } else if (isMoving && movement.speed > 3.0) {
-            energyDecayPerGameMinute = 0.12; // Running
+            energyDecayPerGameMinute = 0.0012; // Running
           } else if (isMoving) {
-            energyDecayPerGameMinute = 0.03; // Walking
+            energyDecayPerGameMinute = 0.0003; // Walking
           } else {
-            energyDecayPerGameMinute = 0.03; // Idle
+            energyDecayPerGameMinute = 0.0003; // Idle
           }
         }
 
         // Add temperature penalties
-        const temperature = impl.getComponent<TemperatureComponent>('temperature');
+        const temperature = impl.getComponent<TemperatureComponent>(CT.Temperature);
         if (temperature) {
           if (temperature.currentTemp < 10) {
-            energyDecayPerGameMinute += 0.02; // Cold exposure
+            energyDecayPerGameMinute += 0.0002; // Cold exposure
           } else if (temperature.currentTemp > 30) {
-            energyDecayPerGameMinute += 0.02; // Hot exposure
+            energyDecayPerGameMinute += 0.0002; // Hot exposure
           }
         }
       }
@@ -104,17 +106,19 @@ export class NeedsSystem implements System {
       const newEnergy = Math.max(0, needs.energy - energyDecay);
 
       // Check for critical needs transitions (for memory formation)
-      const wasHungerCritical = needs.hunger < 20;
-      const isHungerCritical = newHunger < 20;
-      const wasEnergyCritical = needs.energy < 20;
-      const isEnergyCritical = newEnergy < 20;
+      // NeedsComponent uses 0-1 scale (0.2 = 20%)
+      const wasHungerCritical = needs.hunger < 0.2;
+      const isHungerCritical = newHunger < 0.2;
+      const wasEnergyCritical = needs.energy < 0.2;
+      const isEnergyCritical = newEnergy < 0.2;
 
       // Update needs
-      impl.updateComponent<NeedsComponent>('needs', (current) => ({
-        ...current,
-        hunger: newHunger,
-        energy: newEnergy,
-      }));
+      impl.updateComponent<NeedsComponent>(CT.Needs, (current) => {
+        const updated = current.clone();
+        updated.hunger = newHunger;
+        updated.energy = newEnergy;
+        return updated;
+      });
 
       // Emit events for critical needs transitions (triggers memory formation)
       if (!wasHungerCritical && isHungerCritical) {

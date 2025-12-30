@@ -6,8 +6,11 @@
 export { BuildingBlueprintRegistry } from './BuildingBlueprintRegistry.js';
 
 export * from './PlacementValidator.js';
+export { PlacementValidator } from './PlacementValidator.js';
 export * from './ShopBlueprints.js';
 export * from './GovernanceBlueprints.js';
+export * from './TempleBlueprints.js';
+export * from './FarmBlueprints.js';
 
 // Re-export types explicitly (export * doesn't re-export types)
 export type {

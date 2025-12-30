@@ -11,8 +11,8 @@ import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { VisionComponent } from '../components/VisionComponent.js';
-import {
-  type TargetResult,
+import { ComponentType } from '../types/ComponentType.js';
+import {  type TargetResult,
   getRememberedLocation,
   rememberLocation,
   forgetLocation,
@@ -65,8 +65,8 @@ export class ResourceTargeting {
     world: World,
     options: ResourceTargetingOptions = {}
   ): ResourceTarget | null {
-    const position = entity.getComponent<PositionComponent>('position');
-    const vision = entity.getComponent<VisionComponent>('vision');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const vision = entity.getComponent<VisionComponent>(ComponentType.Vision);
 
     if (!position || !vision) return null;
 
@@ -81,8 +81,8 @@ export class ResourceTargeting {
       if (!resourceEntity) continue;
 
       const impl = resourceEntity as EntityImpl;
-      const resource = impl.getComponent('resource') as any;
-      const resourcePos = impl.getComponent<PositionComponent>('position');
+      const resource = impl.getComponent(ComponentType.Resource) as any;
+      const resourcePos = impl.getComponent<PositionComponent>(ComponentType.Position);
 
       if (!resource || !resourcePos) continue;
 
@@ -136,8 +136,8 @@ export class ResourceTargeting {
     world: World,
     options: ResourceTargetingOptions = {}
   ): ResourceTarget[] {
-    const position = entity.getComponent<PositionComponent>('position');
-    const vision = entity.getComponent<VisionComponent>('vision');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const vision = entity.getComponent<VisionComponent>(ComponentType.Vision);
 
     if (!position || !vision) return [];
 
@@ -151,8 +151,8 @@ export class ResourceTargeting {
       if (!resourceEntity) continue;
 
       const impl = resourceEntity as EntityImpl;
-      const resource = impl.getComponent('resource') as any;
-      const resourcePos = impl.getComponent<PositionComponent>('position');
+      const resource = impl.getComponent(ComponentType.Resource) as any;
+      const resourcePos = impl.getComponent<PositionComponent>(ComponentType.Position);
 
       if (!resource || !resourcePos) continue;
       if (!resource.harvestable || resource.amount <= 0) continue;
@@ -218,7 +218,7 @@ export class ResourceTargeting {
     world: World,
     options: ResourceTargetingOptions = {}
   ): TargetResult {
-    const position = entity.getComponent<PositionComponent>('position');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) return { type: 'unknown' };
 
     // First: Try to find visible resource

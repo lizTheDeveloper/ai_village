@@ -1,4 +1,4 @@
-import type { World, InventoryComponent } from '@ai-village/core';
+import type { World, InventoryComponent, InventorySlot } from '@ai-village/core';
 import { calculateInventoryWeight } from '@ai-village/core';
 import { getQualityTier, getQualityColor } from '@ai-village/core';
 import { DragDropSystem, type SlotReference } from './DragDropSystem.js';
@@ -182,7 +182,7 @@ export class InventoryUI {
       return [];
     }
 
-    return this.playerInventory.slots.map((slot) => ({
+    return this.playerInventory.slots.map((slot: InventorySlot) => ({
       itemId: slot.itemId,
       quantity: slot.quantity,
     }));
@@ -289,7 +289,7 @@ export class InventoryUI {
     }
 
     const slotsUsed = this.playerInventory.slots.filter(
-      (slot) => slot.itemId !== null && slot.quantity > 0
+      (slot: InventorySlot) => slot.itemId !== null && slot.quantity > 0
     ).length;
 
     // CRITICAL FIX: Always recalculate weight from actual slot contents
@@ -805,7 +805,7 @@ export class InventoryUI {
       }
     } catch (error) {
       // Fallback: Show basic item info if ItemTooltip fails
-      const itemName = slot.itemId.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      const itemName = slot.itemId.split('_').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
       lines.push(itemName);
       lines.push(`Quantity: ${slot.quantity}`);
       if (slot.quality !== undefined) {

@@ -1,11 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import type { InventoryComponent, InventorySlot } from '../InventoryComponent';
 
+import { ComponentType } from '../../types/ComponentType.js';
 describe('InventoryComponent', () => {
   describe('Acceptance Criterion 1: InventoryComponent Creation', () => {
     it('should have slots array', () => {
       const inventory: InventoryComponent = {
-        type: 'inventory',
+        type: ComponentType.Inventory,
         version: 1,
         slots: [],
         maxSlots: 10,
@@ -19,7 +20,7 @@ describe('InventoryComponent', () => {
 
     it('should have default maxSlots of 10', () => {
       const inventory: InventoryComponent = {
-        type: 'inventory',
+        type: ComponentType.Inventory,
         version: 1,
         slots: [],
         maxSlots: 10,
@@ -32,7 +33,7 @@ describe('InventoryComponent', () => {
 
     it('should have default maxWeight of 100', () => {
       const inventory: InventoryComponent = {
-        type: 'inventory',
+        type: ComponentType.Inventory,
         version: 1,
         slots: [],
         maxSlots: 10,
@@ -45,7 +46,7 @@ describe('InventoryComponent', () => {
 
     it('should track currentWeight', () => {
       const inventory: InventoryComponent = {
-        type: 'inventory',
+        type: ComponentType.Inventory,
         version: 1,
         slots: [],
         maxSlots: 10,
@@ -58,7 +59,7 @@ describe('InventoryComponent', () => {
 
     it('should have type "inventory"', () => {
       const inventory: InventoryComponent = {
-        type: 'inventory',
+        type: ComponentType.Inventory,
         version: 1,
         slots: [],
         maxSlots: 10,
@@ -114,7 +115,7 @@ describe('InventoryComponent', () => {
       // This will be tested via the inventory management functions
       // For now, we test the type constraint
       const inventory: InventoryComponent = {
-        type: 'inventory',
+        type: ComponentType.Inventory,
         version: 1,
         slots: [],
         maxSlots: 10,
@@ -127,7 +128,7 @@ describe('InventoryComponent', () => {
 
     it('should calculate available weight capacity correctly', () => {
       const inventory: InventoryComponent = {
-        type: 'inventory',
+        type: ComponentType.Inventory,
         version: 1,
         slots: [{ itemId: 'wood', quantity: 40 }], // 40 * 2 = 80 weight
         maxSlots: 10,
@@ -141,7 +142,7 @@ describe('InventoryComponent', () => {
 
     it('should support multiple resource types with different weights', () => {
       const inventory: InventoryComponent = {
-        type: 'inventory',
+        type: ComponentType.Inventory,
         version: 1,
         slots: [
           { itemId: 'wood', quantity: 10 },  // 10 * 2 = 20
@@ -163,7 +164,7 @@ describe('InventoryComponent', () => {
       expect(() => {
         // @ts-expect-error - Testing missing required field
         const invalid: InventoryComponent = {
-          type: 'inventory',
+          type: ComponentType.Inventory,
           version: 1,
           slots: [],
           maxWeight: 100,
@@ -180,7 +181,7 @@ describe('InventoryComponent', () => {
       expect(() => {
         // @ts-expect-error - Testing missing required field
         const invalid: InventoryComponent = {
-          type: 'inventory',
+          type: ComponentType.Inventory,
           version: 1,
           slots: [],
           maxSlots: 10,
@@ -197,7 +198,7 @@ describe('InventoryComponent', () => {
       expect(() => {
         // @ts-expect-error - Testing missing required field
         const invalid: InventoryComponent = {
-          type: 'inventory',
+          type: ComponentType.Inventory,
           version: 1,
           slots: [],
           maxSlots: 10,
@@ -213,7 +214,7 @@ describe('InventoryComponent', () => {
     it('should throw when currentWeight exceeds maxWeight', () => {
       expect(() => {
         const invalid: InventoryComponent = {
-          type: 'inventory',
+          type: ComponentType.Inventory,
           version: 1,
           slots: [],
           maxSlots: 10,

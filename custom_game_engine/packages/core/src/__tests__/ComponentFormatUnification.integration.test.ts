@@ -1,3 +1,4 @@
+import { ComponentType } from '../types/ComponentType.js';
 /**
  * Integration Tests for Component Format Unification
  *
@@ -40,7 +41,7 @@ describe('Component Format Unification - Integration Tests', () => {
       const needs = new NeedsComponent();
       entity.addComponent(needs);
 
-      const retrieved = entity.getComponent('needs') as NeedsComponent;
+      const retrieved = entity.getComponent(ComponentType.Needs) as NeedsComponent;
 
       expect(retrieved).toBeInstanceOf(NeedsComponent);
       expect(retrieved.hunger).toBe(1.0);
@@ -52,7 +53,7 @@ describe('Component Format Unification - Integration Tests', () => {
       const needs = new NeedsComponent();
       entity.addComponent(needs);
 
-      const retrieved = entity.getComponent('needs') as NeedsComponent;
+      const retrieved = entity.getComponent(ComponentType.Needs) as NeedsComponent;
 
       // Should be class instance, not plain object from factory
       expect(retrieved).toBeInstanceOf(NeedsComponent);
@@ -77,7 +78,7 @@ describe('Component Format Unification - Integration Tests', () => {
       needs.energy = 0.25; // 25% - tired
       entity.addComponent(needs);
 
-      const retrieved = entity.getComponent('needs') as NeedsComponent;
+      const retrieved = entity.getComponent(ComponentType.Needs) as NeedsComponent;
 
       expect(isHungry(retrieved)).toBe(true);
       expect(isTired(retrieved)).toBe(true);
@@ -104,7 +105,7 @@ describe('Component Format Unification - Integration Tests', () => {
       });
       entity.addComponent(personality);
 
-      const retrieved = entity.getComponent('personality') as PersonalityComponent;
+      const retrieved = entity.getComponent(ComponentType.Personality) as PersonalityComponent;
 
       expect(retrieved).toBeInstanceOf(PersonalityComponent);
       expect(retrieved.openness).toBe(0.7);
@@ -121,7 +122,7 @@ describe('Component Format Unification - Integration Tests', () => {
       });
       entity.addComponent(personality);
 
-      const retrieved = entity.getComponent('personality') as PersonalityComponent;
+      const retrieved = entity.getComponent(ComponentType.Personality) as PersonalityComponent;
 
       // Should be class instance, not plain object from factory
       expect(retrieved).toBeInstanceOf(PersonalityComponent);
@@ -163,8 +164,8 @@ describe('Component Format Unification - Integration Tests', () => {
       entity.addComponent(needs);
       entity.addComponent(personality);
 
-      const retrievedNeeds = entity.getComponent('needs') as NeedsComponent;
-      const retrievedPersonality = entity.getComponent('personality') as PersonalityComponent;
+      const retrievedNeeds = entity.getComponent(ComponentType.Needs) as NeedsComponent;
+      const retrievedPersonality = entity.getComponent(ComponentType.Personality) as PersonalityComponent;
 
       expect(retrievedNeeds).toBeInstanceOf(NeedsComponent);
       expect(retrievedPersonality).toBeInstanceOf(PersonalityComponent);
@@ -251,7 +252,7 @@ describe('Component Format Unification - Integration Tests', () => {
       // In actual implementation, systems would query entities differently
       const entities = [entity1, entity2, entity3];
       const entitiesWithNeeds = entities.filter(e =>
-        e.hasComponent('needs')
+        e.hasComponent(ComponentType.Needs)
       );
 
       expect(entitiesWithNeeds.length).toBe(2);
@@ -275,7 +276,7 @@ describe('Component Format Unification - Integration Tests', () => {
 
       const entities = [entity1, entity2, entity3];
       const hungryEntities = entities.filter(e => {
-        const needs = e.getComponent('needs') as NeedsComponent | undefined;
+        const needs = e.getComponent(ComponentType.Needs) as NeedsComponent | undefined;
         return needs && isHungry(needs);
       });
 
@@ -319,12 +320,11 @@ describe('Component Format Unification - Integration Tests', () => {
   });
 
   describe('Error Handling in Systems (CLAUDE.md compliance)', () => {
-    it('should throw when system tries to use non-existent factory', () => {
+    it('should throw when helper function receives null/undefined', () => {
       expect(() => {
-        // @ts-expect-error - createNeedsComponent should not exist
-        const module = require('../components/NeedsComponent.js');
-        module.createNeedsComponent(100, 100, 100);
-      }).toThrow();
+        // @ts-expect-error - Testing runtime error
+        isHungry(null);
+      }).toThrow('needs parameter is required');
     });
 
     it('should throw when helper function receives invalid data', () => {
@@ -337,7 +337,7 @@ describe('Component Format Unification - Integration Tests', () => {
     it('should throw when PersonalityComponent created with invalid values', () => {
       expect(() => {
         new PersonalityComponent({
-          openness: 150, // Invalid: should be 0-1
+          openness: 1.5, // Invalid: should be 0-1
           conscientiousness: 0.5,
           extraversion: 0.5,
           agreeableness: 0.5,
@@ -353,7 +353,7 @@ describe('Component Format Unification - Integration Tests', () => {
       entity.addComponent(needs);
 
       // TypeScript should enforce correct type
-      const retrieved = entity.getComponent('needs');
+      const retrieved = entity.getComponent(ComponentType.Needs);
 
       // Runtime check that type is correct
       expect((retrieved as NeedsComponent).type).toBe('needs');

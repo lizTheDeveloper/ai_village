@@ -5,6 +5,7 @@ import { TamingSystem } from '../systems/TamingSystem.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { ANIMAL_SPECIES } from '../data/animalSpecies.js';
 
+import { ComponentType } from '../types/ComponentType.js';
 describe('Taming System', () => {
   let world: WorldImpl;
   let tamingSystem: TamingSystem;
@@ -194,7 +195,7 @@ describe('Taming System', () => {
 
       expect(result.success).toBe(true);
 
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(animal.wild).toBe(false);
       expect(animal.ownerId).toBe('agent-1');
       expect(animal.bondLevel).toBeGreaterThan(0);
@@ -234,7 +235,7 @@ describe('Taming System', () => {
       });
       entity.addComponent(component);
 
-      const initialAnimal = entity.getComponent('animal') as AnimalComponent;
+      const initialAnimal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialTrust = initialAnimal.trustLevel;
 
       // Force taming failure
@@ -249,7 +250,7 @@ describe('Taming System', () => {
 
       expect(result.success).toBe(false);
 
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(animal.wild).toBe(true);
       expect(animal.trustLevel).toBeGreaterThan(initialTrust);
     });
@@ -280,12 +281,12 @@ describe('Taming System', () => {
       });
       entity.addComponent(component);
 
-      const initialAnimal = entity.getComponent('animal') as AnimalComponent;
+      const initialAnimal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialBond = initialAnimal.bondLevel;
 
       tamingSystem.performInteraction(entity.id, 'agent-1', 'feeding');
 
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(animal.bondLevel).toBe(initialBond + 2);
     });
 
@@ -313,12 +314,12 @@ describe('Taming System', () => {
       });
       entity.addComponent(component);
 
-      const initialAnimal = entity.getComponent('animal') as AnimalComponent;
+      const initialAnimal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialBond = initialAnimal.bondLevel;
 
       tamingSystem.performInteraction(entity.id, 'agent-1', 'grooming');
 
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(animal.bondLevel).toBe(initialBond + 3);
     });
 
@@ -346,12 +347,12 @@ describe('Taming System', () => {
       });
       entity.addComponent(component);
 
-      const initialAnimal = entity.getComponent('animal') as AnimalComponent;
+      const initialAnimal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialBond = initialAnimal.bondLevel;
 
       tamingSystem.performInteraction(entity.id, 'agent-1', 'playing');
 
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(animal.bondLevel).toBe(initialBond + 4);
     });
 
@@ -379,12 +380,12 @@ describe('Taming System', () => {
       });
       entity.addComponent(component);
 
-      const initialAnimal = entity.getComponent('animal') as AnimalComponent;
+      const initialAnimal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialBond = initialAnimal.bondLevel;
 
       tamingSystem.performInteraction(entity.id, 'agent-1', 'rescuing');
 
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(animal.bondLevel).toBe(initialBond + 10);
     });
 
@@ -414,7 +415,7 @@ describe('Taming System', () => {
 
       tamingSystem.performInteraction(entity.id, 'agent-1', 'playing'); // +4
 
-      const animal = entity.getComponent('animal') as AnimalComponent;
+      const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       expect(animal.bondLevel).toBe(100); // Capped
     });
 

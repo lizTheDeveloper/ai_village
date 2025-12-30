@@ -6,6 +6,8 @@ import { ResourceGatheringSystem } from '../ResourceGatheringSystem.js';
 import { createInventoryComponent } from '../../components/InventoryComponent.js';
 import { createBuildingComponent } from '../../components/BuildingComponent.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
+import { BuildingType } from '../../types/BuildingType.js';
 /**
  * Integration tests for BuildingSystem + ResourceGatheringSystem + InventorySystem
  *
@@ -43,13 +45,13 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
 
     const entities = Array.from(harness.world.entities.values());
 
-    const initialBuilding = building.getComponent('building') as any;
+    const initialBuilding = building.getComponent(ComponentType.Building) as any;
     const initialProgress = initialBuilding.progress;
 
     // Simulate 30 seconds of construction
     buildingSystem.update(harness.world, entities, 30.0);
 
-    const updatedBuilding = building.getComponent('building') as any;
+    const updatedBuilding = building.getComponent(ComponentType.Building) as any;
 
     // Progress should have increased
     expect(updatedBuilding.progress).toBeGreaterThan(initialProgress);
@@ -106,11 +108,11 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
       source: building.id,
       data: {
         entityId: building.id,
-        buildingType: 'forge',
+        buildingType: BuildingType.Forge,
       },
     });
 
-    const updatedBuilding = building.getComponent('building') as any;
+    const updatedBuilding = building.getComponent(ComponentType.Building) as any;
 
     // Forge should have fuel properties initialized
     if (updatedBuilding.fuelRequired) {
@@ -123,13 +125,13 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     // Create resource node
     const resource = harness.world.createEntity('resource');
     resource.addComponent({
-      type: 'position',
+      type: ComponentType.Position,
       version: 1,
       x: 10,
       y: 10,
     });
     resource.addComponent({
-      type: 'resource',
+      type: ComponentType.Resource,
       version: 1,
       resourceType: 'berry',
       amount: 5, // Current amount
@@ -142,13 +144,13 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
 
     const entities = Array.from(harness.world.entities.values());
 
-    const initialResource = resource.getComponent('resource') as any;
+    const initialResource = resource.getComponent(ComponentType.Resource) as any;
     const initialAmount = initialResource.amount;
 
     // Wait 3 seconds
     resourceSystem.update(harness.world, entities, 3.0);
 
-    const updatedResource = resource.getComponent('resource') as any;
+    const updatedResource = resource.getComponent(ComponentType.Resource) as any;
 
     // Should have regenerated ~3 units
     expect(updatedResource.amount).toBeGreaterThan(initialAmount);
@@ -158,13 +160,13 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
   it('should resources not regenerate beyond max amount', () => {
     const resource = harness.world.createEntity('resource');
     resource.addComponent({
-      type: 'position',
+      type: ComponentType.Position,
       version: 1,
       x: 10,
       y: 10,
     });
     resource.addComponent({
-      type: 'resource',
+      type: ComponentType.Resource,
       version: 1,
       resourceType: 'wood',
       amount: 9,
@@ -180,7 +182,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     // Regenerate for a long time
     resourceSystem.update(harness.world, entities, 10.0);
 
-    const updatedResource = resource.getComponent('resource') as any;
+    const updatedResource = resource.getComponent(ComponentType.Resource) as any;
 
     // Should be capped at maxAmount
     expect(updatedResource.amount).toBe(updatedResource.maxAmount);
@@ -189,13 +191,13 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
   it('should emit resource:regenerated event when fully regenerated', () => {
     const resource = harness.world.createEntity('resource');
     resource.addComponent({
-      type: 'position',
+      type: ComponentType.Position,
       version: 1,
       x: 10,
       y: 10,
     });
     resource.addComponent({
-      type: 'resource',
+      type: ComponentType.Resource,
       version: 1,
       resourceType: 'stone',
       amount: 8,
@@ -223,13 +225,13 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     // Create agent with resources (tent requires 8 wood)
     const agent = harness.world.createEntity('agent');
     agent.addComponent({
-      type: 'position',
+      type: ComponentType.Position,
       version: 1,
       x: 20,
       y: 20,
     });
     agent.addComponent({
-      type: 'agent',
+      type: ComponentType.Agent,
       version: 1,
       name: 'Builder',
     });
@@ -289,7 +291,7 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
     // Simulate 50 seconds (should be 50% complete)
     buildingSystem.update(harness.world, entities, 50.0);
 
-    const updatedBuilding = building.getComponent('building') as any;
+    const updatedBuilding = building.getComponent(ComponentType.Building) as any;
 
     // Progress should be approximately 50% (workshop has 180s build time, so 50s = ~28%)
     // But we manually set buildTime above, so BuildingSystem uses getConstructionTime() which returns 180
@@ -312,11 +314,11 @@ describe('BuildingSystem + ResourceGathering + Inventory Integration', () => {
       source: building.id,
       data: {
         entityId: building.id,
-        buildingType: 'farm_shed',
+        buildingType: BuildingType.FarmShed,
       },
     });
 
-    const updatedBuilding = building.getComponent('building') as any;
+    const updatedBuilding = building.getComponent(ComponentType.Building) as any;
 
     // Farm shed should not require fuel
     expect(updatedBuilding.fuelRequired).toBeFalsy();

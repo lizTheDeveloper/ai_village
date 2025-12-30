@@ -370,7 +370,7 @@ describe('DragDropSystem', () => {
       const sourceSlot: SlotReference = { type: 'backpack', index: 0 };
       dragDrop.startDrag(sourceSlot, inventory);
 
-      const requiresConfirmation = dragDrop.dropToWorld(400, 300); // Outside inventory
+      const requiresConfirmation = dragDrop.dropToWorld(400, 300, inventory); // Outside inventory
 
       expect(requiresConfirmation).toBe(true);
     });
@@ -389,8 +389,8 @@ describe('DragDropSystem', () => {
       };
 
       dragDrop.startDrag({ type: 'backpack', index: 0 }, inventory);
-      dragDrop.dropToWorld(400, 300);
-      dragDrop.confirmDrop();
+      dragDrop.dropToWorld(400, 300, inventory);
+      dragDrop.confirmDrop(inventory);
 
       expect(eventEmitter).toHaveBeenCalledWith('item:dropped', expect.objectContaining({
         itemId: 'wood',
@@ -412,7 +412,7 @@ describe('DragDropSystem', () => {
       };
 
       dragDrop.startDrag({ type: 'backpack', index: 0 }, inventory);
-      const requiresConfirmation = dragDrop.dropToWorld(400, 300);
+      const requiresConfirmation = dragDrop.dropToWorld(400, 300, inventory);
 
       // Wood is not valuable, so it drops immediately without requiring confirmation
       expect(requiresConfirmation).toBe(false);

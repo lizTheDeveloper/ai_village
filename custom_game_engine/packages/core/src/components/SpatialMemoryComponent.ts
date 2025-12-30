@@ -1,83 +1,89 @@
 import { ComponentBase } from '../ecs/Component.js';
-import type { ResourceType } from './ResourceComponent.js';
+import type { Tick, EntityId } from '../types.js';
 
+export type SpatialMemoryType =
+  | 'resource_location'  // Remembered a food/resource spot
+  | 'plant_location'     // Remembered a plant location
+  | 'agent_seen'         // Saw another agent
+  | 'danger'             // Dangerous location/entity
+  | 'home'               // Safe/home location
+  | 'lesson'             // Learned from experience (e.g., "campfire solves cold")
+  | 'success'            // Successfully completed something (e.g., "built workbench")
+  | 'failure'            // Failed attempt to learn from (e.g., "couldn't build - no materials")
+  | 'knowledge'          // Learned from others (e.g., "Finn said gather food first")
+  | 'terrain_landmark';  // Remembered significant terrain feature (peak, cliff, lake, etc.)
+
+export interface SpatialMemory {
+  type: SpatialMemoryType;
+  x: number;
+  y: number;
+  entityId?: EntityId;   // Optional reference to entity
+  strength: number;      // 0-100, higher = stronger memory
+  createdAt: Tick;
+  lastReinforced: Tick;
+  metadata?: Record<string, unknown>; // Additional data
+}
+
+/**
+ * Resource location memory (backwards compatibility)
+ */
 export interface ResourceLocationMemory {
   readonly id: string;
-  readonly resourceType: ResourceType;
+  readonly resourceType: string;
   readonly position: { x: number; y: number };
   readonly tick: number;
   readonly confidence: number; // 0-1, decays over time
 }
 
 /**
- * SpatialMemoryComponent stores and queries resource location memories
- * Extends episodic memory with spatial queries for navigation
+ * Spatial memory component for remembering locations and spatial information
  */
 export class SpatialMemoryComponent extends ComponentBase {
   public readonly type = 'spatial_memory';
+  public memories: SpatialMemory[] = [];
+  public maxMemories: number;
+  public decayRate: number;
   private _resourceMemories: ResourceLocationMemory[] = [];
-  private _maxMemories: number = 500;
   private _memoryCounter: number = 0;
 
-  constructor(data?: { maxMemories?: number }) {
+  constructor(options?: { maxMemories?: number; decayRate?: number }) {
     super();
-    if (data?.maxMemories !== undefined) {
-      if (data.maxMemories < 0) {
-        throw new Error('maxMemories must be non-negative');
-      }
-      this._maxMemories = data.maxMemories;
-    }
+    this.maxMemories = options?.maxMemories ?? 20;
+    this.decayRate = options?.decayRate ?? 1.0;
   }
 
   /**
-   * Record a new resource location memory
-   * @throws Error if required fields missing or invalid
+   * Record a resource location (backwards compatibility)
    */
   recordResourceLocation(
-    resourceType: ResourceType,
+    resourceType: string,
     position: { x: number; y: number },
     tick: number
   ): void {
-    // NO FALLBACKS - validate all inputs per CLAUDE.md
-    if (!resourceType) {
-      throw new Error('SpatialMemory requires valid resource type');
-    }
-    if (position === undefined || position.x === undefined || position.y === undefined) {
-      throw new Error('SpatialMemory requires valid position with x and y coordinates');
-    }
-    if (tick < 0) {
-      throw new Error('SpatialMemory requires non-negative tick value');
-    }
-
     const memory: ResourceLocationMemory = {
       id: `resource_loc_${this._memoryCounter++}`,
       resourceType,
       position: { x: position.x, y: position.y },
       tick,
-      confidence: 1.0, // Fresh memory starts at full confidence
+      confidence: 1.0,
     };
 
     this._resourceMemories.push(memory);
 
     // Trim oldest memories if exceeding limit
-    if (this._resourceMemories.length > this._maxMemories) {
+    if (this._resourceMemories.length > this.maxMemories) {
       this._resourceMemories.shift();
     }
   }
 
   /**
-   * Query resource locations by type with ranking
-   * @param resourceType - Type of resource to find
-   * @param currentTick - Current game tick for confidence decay
-   * @param agentPosition - Optional agent position for distance ranking
-   * @param limit - Maximum number of results
-   * @returns Sorted array of memories (best first)
+   * Query resource locations (backwards compatibility)
    */
   queryResourceLocations(
-    resourceType: ResourceType,
+    resourceType: string,
     currentTick?: number,
     agentPosition?: { x: number; y: number },
-    limit?: number
+    maxResults?: number
   ): ResourceLocationMemory[] {
     if (!resourceType) {
       throw new Error('queryResourceLocations requires resourceType parameter');
@@ -90,86 +96,41 @@ export class SpatialMemoryComponent extends ComponentBase {
 
     // Apply confidence decay if currentTick provided
     if (currentTick !== undefined) {
-      results = results.map((memory) => {
-        const age = currentTick - memory.tick;
-        const confidence = this._calculateConfidence(age);
-        return { ...memory, confidence };
-      });
+      const decayRate = 0.001; // Confidence decays 0.1% per tick
+      results = results.map((m) => ({
+        ...m,
+        confidence: Math.max(0, m.confidence - decayRate * (currentTick - m.tick)),
+      }));
     }
 
-    // Sort: Primary by confidence (higher first), Secondary by recency, Tertiary by distance
+    // Sort by confidence (highest first), then by distance if agent position provided
     if (agentPosition) {
       results.sort((a, b) => {
-        // Primary: Higher confidence wins
-        const confidenceDiff = b.confidence - a.confidence;
-        if (Math.abs(confidenceDiff) > 0.01) {
-          return confidenceDiff;
+        // Primary: confidence
+        if (b.confidence !== a.confidence) {
+          return b.confidence - a.confidence;
         }
-
-        // Secondary: More recent wins
-        if (a.tick !== b.tick) {
-          return b.tick - a.tick;
-        }
-
-        // Tertiary: Closer wins
-        const distA = this._distance(a.position, agentPosition);
-        const distB = this._distance(b.position, agentPosition);
+        // Secondary: distance
+        const distA = Math.sqrt(
+          Math.pow(a.position.x - agentPosition.x, 2) +
+          Math.pow(a.position.y - agentPosition.y, 2)
+        );
+        const distB = Math.sqrt(
+          Math.pow(b.position.x - agentPosition.x, 2) +
+          Math.pow(b.position.y - agentPosition.y, 2)
+        );
         return distA - distB;
       });
     } else {
-      // Sort by confidence first, then recency
-      results.sort((a, b) => {
-        const confidenceDiff = b.confidence - a.confidence;
-        if (Math.abs(confidenceDiff) > 0.01) {
-          return confidenceDiff;
-        }
-        return b.tick - a.tick;
-      });
+      results.sort((a, b) => b.confidence - a.confidence);
     }
 
-    // Apply limit if specified
-    if (limit !== undefined && limit > 0) {
-      results = results.slice(0, limit);
+    // Limit results
+    if (maxResults !== undefined && maxResults > 0) {
+      results = results.slice(0, maxResults);
     }
 
     return results;
-  }
-
-  /**
-   * Calculate confidence based on memory age
-   * Recent memories (< 500 ticks) have confidence > 0.9
-   * Decays after 500 ticks
-   */
-  private _calculateConfidence(age: number): number {
-    if (age < 0) {
-      throw new Error('Age cannot be negative');
-    }
-
-    // Minimal decay for very recent memories (0-50 ticks)
-    if (age <= 50) {
-      return 1.0;
-    }
-
-    // Slow linear decay from 50 to 500 ticks (stays > 0.9)
-    if (age <= 500) {
-      return 1.0 - (age - 50) / 4500; // At 500 ticks: ~0.9
-    }
-
-    // Faster exponential decay after 500 ticks
-    // At 600 ticks (100 past threshold): should be < 0.8
-    // Half-life of ~200 ticks after threshold
-    const excessAge = age - 500;
-    const decayFactor = Math.exp(-0.00347 * excessAge); // ln(2)/200 ≈ 0.00347
-    return Math.max(0.0, 0.9 * decayFactor);
-  }
-
-  /**
-   * Calculate Euclidean distance between two points
-   */
-  private _distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
-    const dx = a.x - b.x;
-    const dy = a.y - b.y;
-    return Math.sqrt(dx * dx + dy * dy);
   }
 
   /**
@@ -178,23 +139,87 @@ export class SpatialMemoryComponent extends ComponentBase {
   get resourceMemories(): readonly ResourceLocationMemory[] {
     return Object.freeze([...this._resourceMemories]);
   }
+}
 
-  /**
-   * Clear all memories (for testing)
-   */
-  clearMemories(): void {
-    this._resourceMemories = [];
-    this._memoryCounter = 0;
+/**
+ * Add or reinforce a spatial memory
+ */
+export function addSpatialMemory(
+  component: SpatialMemoryComponent,
+  memory: Omit<SpatialMemory, 'strength' | 'createdAt' | 'lastReinforced'>,
+  currentTick: Tick,
+  initialStrength: number = 100
+): void {
+  if (!component) {
+    throw new Error('addSpatialMemory: component parameter is required');
   }
 
-  /**
-   * Validate and set confidence value (for testing validation)
-   * @throws Error if confidence out of bounds
-   */
-  // Unused method - kept for potential future testing
-  // private __setConfidence(value: number): void {
-  //   if (value < 0 || value > 1) {
-  //     throw new Error('SpatialMemory confidence must be between 0 and 1');
-  //   }
-  // }
+  // Check if similar memory already exists
+  const existingIndex = component.memories.findIndex(
+    (m) =>
+      m.type === memory.type &&
+      (memory.entityId
+        ? m.entityId === memory.entityId
+        : Math.abs(m.x - memory.x) < 2 && Math.abs(m.y - memory.y) < 2)
+  );
+
+  if (existingIndex >= 0) {
+    // Reinforce existing memory
+    const existing = component.memories[existingIndex]!;
+    existing.strength = Math.min(100, existing.strength + 20);
+    existing.lastReinforced = currentTick;
+    existing.x = memory.x; // Update position
+    existing.y = memory.y;
+  } else {
+    // Add new memory
+    const newMemory: SpatialMemory = {
+      ...memory,
+      strength: initialStrength,
+      createdAt: currentTick,
+      lastReinforced: currentTick,
+    };
+
+    component.memories.push(newMemory);
+
+    // Remove weakest memory if over limit
+    if (component.memories.length > component.maxMemories) {
+      component.memories.sort((a, b) => a.strength - b.strength);
+      component.memories.shift();
+    }
+  }
+}
+
+/**
+ * Get strongest spatial memory of a specific type
+ */
+export function getStrongestSpatialMemory(
+  component: SpatialMemoryComponent,
+  type: SpatialMemoryType
+): SpatialMemory | null {
+  if (!component) {
+    throw new Error('getStrongestSpatialMemory: component parameter is required');
+  }
+
+  const matching = component.memories.filter((m) => m.type === type);
+  if (matching.length === 0) return null;
+
+  return matching.reduce((strongest, current) =>
+    current.strength > strongest.strength ? current : strongest
+  );
+}
+
+/**
+ * Get all spatial memories of a type, sorted by strength
+ */
+export function getSpatialMemoriesByType(
+  component: SpatialMemoryComponent,
+  type: SpatialMemoryType
+): SpatialMemory[] {
+  if (!component) {
+    throw new Error('getSpatialMemoriesByType: component parameter is required');
+  }
+
+  return component.memories
+    .filter((m) => m.type === type)
+    .sort((a, b) => b.strength - a.strength);
 }

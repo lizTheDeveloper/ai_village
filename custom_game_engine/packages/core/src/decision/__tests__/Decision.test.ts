@@ -1,3 +1,4 @@
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Unit tests for Decision Module
  *
@@ -13,7 +14,7 @@ import {
   canInterrupt,
   isCriticalSurvivalBehavior,
 } from '../BehaviorPriority.js';
-import { createNeedsComponent } from '../../components/NeedsComponent.js';
+import { NeedsComponent } from '../../components/NeedsComponent.js';
 import { createCircadianComponent } from '../../components/CircadianComponent.js';
 
 describe('AutonomicSystem', () => {
@@ -25,7 +26,11 @@ describe('AutonomicSystem', () => {
 
   describe('checkNeeds', () => {
     it('returns forced_sleep when energy is 0', () => {
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 0;
 
       const result = autonomicSystem.checkNeeds(needs);
@@ -36,7 +41,11 @@ describe('AutonomicSystem', () => {
     });
 
     it('returns seek_sleep when energy is below 10', () => {
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 5;
 
       const result = autonomicSystem.checkNeeds(needs);
@@ -47,7 +56,11 @@ describe('AutonomicSystem', () => {
     });
 
     it('returns forced_sleep when sleepDrive exceeds 85', () => {
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 50; // Healthy energy
 
       const circadian = createCircadianComponent();
@@ -60,11 +73,15 @@ describe('AutonomicSystem', () => {
     });
 
     it('returns seek_warmth when dangerously cold', () => {
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 50;
 
       const temperature = {
-        type: 'temperature' as const,
+        type: ComponentType.Temperature,
         currentTemp: -5,
         comfortMin: 15,
         comfortMax: 25,
@@ -79,11 +96,15 @@ describe('AutonomicSystem', () => {
     });
 
     it('returns seek_warmth when cold and below comfort threshold', () => {
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 50;
 
       const temperature = {
-        type: 'temperature' as const,
+        type: ComponentType.Temperature,
         currentTemp: 10,
         comfortMin: 15,
         comfortMax: 25,
@@ -98,7 +119,11 @@ describe('AutonomicSystem', () => {
     });
 
     it('returns seek_food when critically hungry', () => {
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 50;
       needs.hunger = 5; // Critical hunger
 
@@ -110,7 +135,11 @@ describe('AutonomicSystem', () => {
     });
 
     it('returns forced_sleep when sleepDrive > 85', () => {
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 50;
 
       const circadian = createCircadianComponent();
@@ -123,7 +152,11 @@ describe('AutonomicSystem', () => {
     });
 
     it('returns seek_food for moderate hunger', () => {
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 50;
       needs.hunger = 40; // Moderate hunger
 
@@ -135,7 +168,11 @@ describe('AutonomicSystem', () => {
     });
 
     it('returns null when no autonomic override needed', () => {
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 80;
       needs.hunger = 80;
 
@@ -174,7 +211,11 @@ describe('AutonomicSystem', () => {
 
     it('returns result when entity has needs and energy is low', () => {
       const entity = new EntityImpl(createEntityId(), 0);
-      const needs = createNeedsComponent();
+      const needs = new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+  });
       needs.energy = 0;
       entity.addComponent(needs);
 
@@ -222,7 +263,7 @@ describe('BehaviorPriority', () => {
 
     it('returns 90 for seek_warmth when dangerously cold', () => {
       const temperature = {
-        type: 'temperature' as const,
+        type: ComponentType.Temperature,
         currentTemp: -5,
         comfortMin: 15,
         comfortMax: 25,
@@ -234,7 +275,7 @@ describe('BehaviorPriority', () => {
 
     it('returns 35 for seek_warmth when just cold', () => {
       const temperature = {
-        type: 'temperature' as const,
+        type: ComponentType.Temperature,
         currentTemp: 12,
         comfortMin: 15,
         comfortMax: 25,

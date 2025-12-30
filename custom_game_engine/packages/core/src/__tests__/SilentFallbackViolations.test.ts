@@ -4,6 +4,7 @@ import { NeedsSystem } from '../systems/NeedsSystem.js';
 import { PlantSystem } from '../systems/PlantSystem.js';
 import { MemoryFormationSystem } from '../systems/MemoryFormationSystem.js';
 import { EventBusImpl } from '../events/EventBus.js';
+import { PlantComponent } from '../components/PlantComponent.js';
 
 /**
  * Tests for silent fallback violations per CLAUDE.md
@@ -72,30 +73,15 @@ describe('Silent Fallback Violations', () => {
 
       // Create plant entity with unknown species
       const entity = world.createEntity();
-      entity.addComponent('plant', {
+      const plant = new PlantComponent({
         speciesId: 'unknown_species_12345',
+        position: { x: 0, y: 0 },
         stage: 'seed',
-        stageProgress: 0,
-        age: 0,
         health: 100,
         hydration: 70,
         nutrition: 80,
-        position: { x: 0, y: 0 },
-        isIndoors: false,
-        flowerCount: 0,
-        fruitCount: 0,
-        seedsProduced: 0,
-        seedsDropped: [],
-        genetics: {
-          growthRate: 1.0,
-          yieldAmount: 1.0,
-          diseaseResistance: 50,
-          droughtTolerance: 50,
-          coldTolerance: 50,
-          flavorProfile: 50,
-          mutations: [],
-        },
       });
+      entity.addComponent(plant);
 
       // DO NOT set speciesLookup - this should cause error
 
@@ -112,30 +98,15 @@ describe('Silent Fallback Violations', () => {
 
       const unknownSpeciesId = 'definitely_not_a_real_species';
       const entity = world.createEntity();
-      entity.addComponent('plant', {
+      const plant = new PlantComponent({
         speciesId: unknownSpeciesId,
+        position: { x: 0, y: 0 },
         stage: 'seed',
-        stageProgress: 0,
-        age: 0,
         health: 100,
         hydration: 70,
         nutrition: 80,
-        position: { x: 0, y: 0 },
-        isIndoors: false,
-        flowerCount: 0,
-        fruitCount: 0,
-        seedsProduced: 0,
-        seedsDropped: [],
-        genetics: {
-          growthRate: 1.0,
-          yieldAmount: 1.0,
-          diseaseResistance: 50,
-          droughtTolerance: 50,
-          coldTolerance: 50,
-          flavorProfile: 50,
-          mutations: [],
-        },
       });
+      entity.addComponent(plant);
 
       // Act & Assert
       try {
@@ -194,30 +165,15 @@ describe('Silent Fallback Violations', () => {
       });
 
       const entity = world.createEntity();
-      entity.addComponent('plant', {
+      const plant = new PlantComponent({
         speciesId: 'unknown_species',
+        position: { x: 0, y: 0 },
         stage: 'seed',
-        stageProgress: 0,
-        age: 0,
         health: 100,
         hydration: 70,
         nutrition: 80,
-        position: { x: 0, y: 0 },
-        isIndoors: false,
-        flowerCount: 0,
-        fruitCount: 0,
-        seedsProduced: 0,
-        seedsDropped: [],
-        genetics: {
-          growthRate: 1.0,
-          yieldAmount: 1.0,
-          diseaseResistance: 50,
-          droughtTolerance: 50,
-          coldTolerance: 50,
-          flavorProfile: 50,
-          mutations: [],
-        },
       });
+      entity.addComponent(plant);
 
       // Act & Assert
       try {
@@ -410,30 +366,15 @@ describe('Silent Fallback Violations', () => {
       const plantSystem = new PlantSystem(eventBus);
 
       const entity = world.createEntity();
-      entity.addComponent('plant', {
+      const plant = new PlantComponent({
         speciesId: 'unknown_species',
+        position: { x: 0, y: 0 },
         stage: 'seed',
-        stageProgress: 0,
-        age: 0,
         health: 100,
         hydration: 70,
         nutrition: 80,
-        position: { x: 0, y: 0 },
-        isIndoors: false,
-        flowerCount: 0,
-        fruitCount: 0,
-        seedsProduced: 0,
-        seedsDropped: [],
-        genetics: {
-          growthRate: 1.0,
-          yieldAmount: 1.0,
-          diseaseResistance: 50,
-          droughtTolerance: 50,
-          coldTolerance: 50,
-          flavorProfile: 50,
-          mutations: [],
-        },
       });
+      entity.addComponent(plant);
 
       // Act & Assert
       try {

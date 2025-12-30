@@ -158,7 +158,7 @@ describe('MetricsDashboard Integration', () => {
             type: 'stockpile:updated',
             timestamp,
             resourceType: resource,
-            amount: Math.random() * 100
+            amount: Math.random()
           });
         });
       });

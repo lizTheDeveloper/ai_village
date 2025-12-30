@@ -1,5 +1,6 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
@@ -22,7 +23,7 @@ interface ProductionState {
 export class AnimalProductionSystem implements System {
   public readonly id: SystemId = 'animal_production';
   public readonly priority: number = 60;
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = ['animal'];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Animal];
 
   // Track production state for each animal
   private productionState: Map<string, ProductionState[]> = new Map();
@@ -38,14 +39,14 @@ export class AnimalProductionSystem implements System {
     const daysPassed = deltaTime / 86400;
 
     for (const entity of entities) {
-      const animal = entity.components.get('animal') as AnimalComponent | undefined;
+      const animal = entity.components.get(CT.Animal) as AnimalComponent | undefined;
       if (!animal) {
         continue;
       }
 
       // Validate required fields per CLAUDE.md - NO SILENT FALLBACKS
       if (animal.health === undefined || animal.health === null) {
-        throw new Error(`Animal ${animal.id} missing required 'health' field`);
+        throw new Error(`Animal ${animal.id} missing required CT.Health field`);
       }
 
       // Get products for this species
@@ -172,7 +173,7 @@ export class AnimalProductionSystem implements System {
       }
       entity = foundEntity;
 
-      const foundAnimal = entity.components.get('animal') as AnimalComponent | undefined;
+      const foundAnimal = entity.components.get(CT.Animal) as AnimalComponent | undefined;
       if (!foundAnimal) {
         return { success: false, reason: 'Entity does not have animal component' };
       }

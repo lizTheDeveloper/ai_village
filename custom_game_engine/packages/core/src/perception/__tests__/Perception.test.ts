@@ -1,3 +1,4 @@
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Unit tests for Perception Module
  *
@@ -10,7 +11,7 @@ import { WorldImpl } from '../../ecs/World.js';
 import { EventBusImpl } from '../../events/EventBus.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
 import { createVisionComponent } from '../../components/VisionComponent.js';
-import { createMemoryComponent } from '../../components/MemoryComponent.js';
+import { SpatialMemoryComponent } from '../../components/SpatialMemoryComponent.js';
 import { VisionProcessor } from '../VisionProcessor.js';
 import { HearingProcessor } from '../HearingProcessor.js';
 import { MeetingDetector, isMeetingCall } from '../MeetingDetector.js';
@@ -58,14 +59,14 @@ describe('VisionProcessor', () => {
       const vision = createVisionComponent(20);
       (vision as any).canSeeResources = true;
       agent.addComponent(vision);
-      agent.addComponent(createMemoryComponent());
+      agent.addComponent(new SpatialMemoryComponent());
       (world as any)._addEntity(agent);
 
       // Create resource within range
       const resource = new EntityImpl(createEntityId(), 0);
       resource.addComponent(createPositionComponent(10, 0));
       resource.addComponent({
-        type: 'resource',
+        type: ComponentType.Resource,
         resourceType: 'wood',
         amount: 50,
         harvestable: true,
@@ -83,14 +84,14 @@ describe('VisionProcessor', () => {
       const vision = createVisionComponent(10);
       (vision as any).canSeeResources = true;
       agent.addComponent(vision);
-      agent.addComponent(createMemoryComponent());
+      agent.addComponent(new SpatialMemoryComponent());
       (world as any)._addEntity(agent);
 
       // Create resource outside range
       const resource = new EntityImpl(createEntityId(), 0);
       resource.addComponent(createPositionComponent(50, 50));
       resource.addComponent({
-        type: 'resource',
+        type: ComponentType.Resource,
         resourceType: 'wood',
         amount: 50,
         harvestable: true,
@@ -106,14 +107,14 @@ describe('VisionProcessor', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       agent.addComponent(createVisionComponent(15));
-      agent.addComponent(createMemoryComponent());
+      agent.addComponent(new SpatialMemoryComponent());
       (world as any)._addEntity(agent);
 
       // Create plant within range
       const plant = new EntityImpl(createEntityId(), 0);
       plant.addComponent(createPositionComponent(5, 5));
       plant.addComponent({
-        type: 'plant',
+        type: ComponentType.Plant,
         speciesId: 'berry-bush',
         stage: 'mature',
         seedsProduced: 3,
@@ -132,14 +133,14 @@ describe('VisionProcessor', () => {
       const vision = createVisionComponent(20);
       (vision as any).canSeeAgents = true;
       agent.addComponent(vision);
-      agent.addComponent(createMemoryComponent());
+      agent.addComponent(new SpatialMemoryComponent());
       (world as any)._addEntity(agent);
 
       // Create other agent within range
       const otherAgent = new EntityImpl(createEntityId(), 0);
       otherAgent.addComponent(createPositionComponent(10, 10));
       otherAgent.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'Bob',
         behavior: 'wander',
       });
@@ -156,9 +157,9 @@ describe('VisionProcessor', () => {
       const vision = createVisionComponent(20);
       (vision as any).canSeeAgents = true;
       agent.addComponent(vision);
-      agent.addComponent(createMemoryComponent());
+      agent.addComponent(new SpatialMemoryComponent());
       agent.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'Alice',
         behavior: 'idle',
       });
@@ -176,14 +177,14 @@ describe('VisionProcessor', () => {
       (vision as any).canSeeAgents = true;
       (vision as any).canSeeResources = true;
       agent.addComponent(vision);
-      agent.addComponent(createMemoryComponent());
+      agent.addComponent(new SpatialMemoryComponent());
       (world as any)._addEntity(agent);
 
       // Create visible entities
       const resource = new EntityImpl(createEntityId(), 0);
       resource.addComponent(createPositionComponent(5, 0));
       resource.addComponent({
-        type: 'resource',
+        type: ComponentType.Resource,
         resourceType: 'stone',
         amount: 100,
         harvestable: true,
@@ -192,7 +193,7 @@ describe('VisionProcessor', () => {
 
       visionProcessor.process(agent, world);
 
-      const updatedVision = agent.getComponent('vision') as any;
+      const updatedVision = agent.getComponent(ComponentType.Vision) as any;
       expect(updatedVision.seenResources).toContain(resource.id);
     });
   });
@@ -230,13 +231,13 @@ describe('HearingProcessor', () => {
       const speaker = new EntityImpl(createEntityId(), 0);
       speaker.addComponent(createPositionComponent(10, 0));
       speaker.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'Bob',
         behavior: 'talk',
         recentSpeech: 'Hello everyone!',
       });
       speaker.addComponent({
-        type: 'identity',
+        type: ComponentType.Identity,
         name: 'Bob',
       });
       (world as any)._addEntity(speaker);
@@ -258,7 +259,7 @@ describe('HearingProcessor', () => {
       const speaker = new EntityImpl(createEntityId(), 0);
       speaker.addComponent(createPositionComponent(100, 100));
       speaker.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'FarAway',
         behavior: 'talk',
         recentSpeech: 'Can you hear me?',
@@ -275,7 +276,7 @@ describe('HearingProcessor', () => {
       agent.addComponent(createPositionComponent(0, 0));
       agent.addComponent(createVisionComponent(20));
       agent.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'Alice',
         behavior: 'talk',
         recentSpeech: 'I am talking',
@@ -296,20 +297,20 @@ describe('HearingProcessor', () => {
       const speaker = new EntityImpl(createEntityId(), 0);
       speaker.addComponent(createPositionComponent(5, 5));
       speaker.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'Carol',
         behavior: 'talk',
         recentSpeech: 'Test message',
       });
       speaker.addComponent({
-        type: 'identity',
+        type: ComponentType.Identity,
         name: 'Carol',
       });
       (world as any)._addEntity(speaker);
 
       hearingProcessor.process(agent, world);
 
-      const updatedVision = agent.getComponent('vision') as any;
+      const updatedVision = agent.getComponent(ComponentType.Vision) as any;
       expect(updatedVision.heardSpeech).toHaveLength(1);
       expect(updatedVision.heardSpeech[0].text).toBe('Test message');
     });
@@ -382,7 +383,7 @@ describe('MeetingDetector', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       agent.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'Alice',
         behavior: 'idle',
       });
@@ -398,7 +399,7 @@ describe('MeetingDetector', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       agent.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'Alice',
         behavior: 'forced_sleep', // Uninterruptible
       });
@@ -416,7 +417,7 @@ describe('MeetingDetector', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       agent.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'Alice',
         behavior: 'attend_meeting', // Already attending
       });
@@ -434,7 +435,7 @@ describe('MeetingDetector', () => {
       const agent = new EntityImpl(createEntityId(), 0);
       agent.addComponent(createPositionComponent(0, 0));
       agent.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'Alice',
         behavior: 'wander',
       });
@@ -447,16 +448,16 @@ describe('MeetingDetector', () => {
       const caller = new EntityImpl(createEntityId(), 0);
       caller.addComponent(createPositionComponent(10, 0));
       caller.addComponent({
-        type: 'agent',
+        type: ComponentType.Agent,
         name: 'Bob',
         behavior: 'call_meeting',
       });
       caller.addComponent({
-        type: 'identity',
+        type: ComponentType.Identity,
         name: 'Bob',
       });
       caller.addComponent({
-        type: 'meeting',
+        type: ComponentType.Meeting,
         active: true,
       });
       (world as any)._addEntity(caller);

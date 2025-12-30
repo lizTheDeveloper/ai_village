@@ -1,3 +1,34 @@
+// ============================================================================
+// Forward-Compatibility: Fluid System
+// Placeholder for future fluid simulation (water, magma, etc.)
+// ============================================================================
+
+/** Types of fluids that can exist on a tile */
+export type FluidType = 'water' | 'magma' | 'blood' | 'oil' | 'acid';
+
+/**
+ * Fluid layer on a tile.
+ * Future: Used by fluid simulation system.
+ */
+export interface FluidLayer {
+  /** Type of fluid */
+  type: FluidType;
+  /** Depth of fluid (0-7, matching Dwarf Fortress scale) */
+  depth: number;
+  /** Pressure level (0-7, affects flow) */
+  pressure: number;
+  /** Temperature of the fluid (affects freezing/boiling) */
+  temperature: number;
+  /** Flow direction vector */
+  flowDirection?: { x: number; y: number };
+  /** Flow velocity (tiles per tick) */
+  flowVelocity?: number;
+  /** Whether fluid is stagnant (not flowing) */
+  stagnant: boolean;
+  /** Game tick of last update */
+  lastUpdate: number;
+}
+
 /**
  * Represents a single tile in the world.
  */
@@ -7,6 +38,9 @@ export interface Tile {
 
   /** Floor/path type (optional) */
   floor?: string;
+
+  /** Elevation/height of this tile (Z-axis). 0 = sea level, positive = above, negative = below */
+  elevation: number;
 
   /** Moisture level (0-100) - affects plant growth */
   moisture: number;
@@ -48,6 +82,41 @@ export interface Tile {
 
   /** Entity ID of plant growing on this tile (if any) */
   plantId: string | null;
+
+  // ============================================================================
+  // Forward-Compatibility: Fluid & Mining Systems (optional)
+  // ============================================================================
+
+  /**
+   * Fluid layer on this tile.
+   * Future: Used by fluid simulation system.
+   * When undefined, tile has no fluid.
+   */
+  fluid?: FluidLayer;
+
+  /**
+   * Whether this tile can be mined/dug.
+   * Future: Used by mining system.
+   */
+  mineable?: boolean;
+
+  /**
+   * What resource is embedded in this tile (ore, gems, etc.)
+   * Future: Used by mining system.
+   */
+  embeddedResource?: string;
+
+  /**
+   * How much of the embedded resource remains (0-100).
+   * Future: Used by mining system.
+   */
+  resourceAmount?: number;
+
+  /**
+   * Whether the ceiling above this tile is supported.
+   * Future: Used for cave-in mechanics.
+   */
+  ceilingSupported?: boolean;
 }
 
 export type TerrainType =
@@ -75,6 +144,7 @@ export function createDefaultTile(): Tile {
   return {
     terrain: 'grass',
     // biome is intentionally undefined - MUST be set by TerrainGenerator
+    elevation: 0,
     moisture: 50,
     fertility: 50,
     tilled: false,

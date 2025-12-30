@@ -64,6 +64,11 @@ const VALID_EVENT_TYPES = new Set([
 ]);
 
 export class MetricsCollector {
+  /** Maximum number of samples to keep in time-series arrays */
+  private static readonly MAX_SAMPLES = 10000;
+  /** Maximum entries in spatial heatmap before pruning */
+  private static readonly MAX_HEATMAP_ENTRIES = 100000;
+
   private sessionId: string;
 
   // Metric stores
@@ -107,6 +112,37 @@ export class MetricsCollector {
    */
   private generateSessionId(): string {
     return `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  /**
+   * Add a sample to an array with bounded size.
+   * Removes oldest entries if array exceeds MAX_SAMPLES.
+   */
+  private addBoundedSample<T>(array: T[], sample: T): void {
+    array.push(sample);
+    if (array.length > MetricsCollector.MAX_SAMPLES) {
+      // Remove oldest entries (shift is O(n), but this only happens occasionally)
+      array.shift();
+    }
+  }
+
+  /**
+   * Prune heatmap if it exceeds MAX_HEATMAP_ENTRIES.
+   * Resets the heatmap to prevent unbounded memory growth.
+   */
+  private pruneHeatmapIfNeeded(): void {
+    let entryCount = 0;
+    for (const x in this.spatialMetrics.heatmap) {
+      const yMap = this.spatialMetrics.heatmap[x];
+      if (yMap) {
+        entryCount += Object.keys(yMap).length;
+      }
+    }
+
+    if (entryCount > MetricsCollector.MAX_HEATMAP_ENTRIES) {
+      // Reset heatmap - could implement smarter pruning in future
+      this.spatialMetrics.heatmap = {};
+    }
   }
 
   /**
@@ -433,6 +469,13 @@ export class MetricsCollector {
     metrics.lifespan = metrics.deathTimestamp - metrics.birthTimestamp;
 
     this.sessionMetrics.totalDeaths++;
+
+    // Clean up dead agent from tracking maps to prevent memory leaks
+    this.agentWealth.delete(agentId);
+    this.agentsWithRelationships.delete(agentId);
+    this.behavioralMetrics.delete(agentId);
+    this.needsMetrics.delete(agentId);
+    delete this.spatialMetrics.agents[agentId];
   }
 
   /**
@@ -531,7 +574,7 @@ export class MetricsCollector {
       this.economicMetrics.stockpiles[resourceType] = [];
     }
 
-    this.economicMetrics.stockpiles[resourceType].push({ timestamp, value: amount });
+    this.addBoundedSample(this.economicMetrics.stockpiles[resourceType], { timestamp, value: amount });
   }
 
   // Wealth tracking for Gini calculation
@@ -673,6 +716,9 @@ export class MetricsCollector {
         y: sumY / visits.length,
       };
     }
+
+    // Prune heatmap if it's grown too large
+    this.pruneHeatmapIfNeeded();
   }
 
   /**
@@ -841,7 +887,7 @@ export class MetricsCollector {
   private handleGameSpeedChanged(event: Record<string, unknown>): void {
     const timestamp = event.timestamp as number;
     const speed = event.speed as number;
-    this.sessionMetrics.gameSpeed.push({ timestamp, value: speed });
+    this.addBoundedSample(this.sessionMetrics.gameSpeed, { timestamp, value: speed });
   }
 
   // Storage for custom analysis events
@@ -856,7 +902,7 @@ export class MetricsCollector {
   private handlePopulationSampled(event: Record<string, unknown>): void {
     const timestamp = event.timestamp as number;
     const population = event.population as number;
-    this.populationSamples.push({ timestamp, population });
+    this.addBoundedSample(this.populationSamples, { timestamp, population });
   }
 
   /**
@@ -866,7 +912,7 @@ export class MetricsCollector {
     const timestamp = event.timestamp as number;
     const generation = event.generation as number;
     const avgIntelligence = event.avgIntelligence as number;
-    this.generationData.push({ timestamp, generation, avgIntelligence });
+    this.addBoundedSample(this.generationData, { timestamp, generation, avgIntelligence });
   }
 
   /**
@@ -876,7 +922,7 @@ export class MetricsCollector {
     const timestamp = event.timestamp as number;
     const rate = event.rate as number;
     const context = event.context as string;
-    this.survivalRateData.push({ timestamp, rate, context });
+    this.addBoundedSample(this.survivalRateData, { timestamp, rate, context });
   }
 
   /**
@@ -890,7 +936,7 @@ export class MetricsCollector {
     if (!this.testMetrics.has(type)) {
       this.testMetrics.set(type, []);
     }
-    this.testMetrics.get(type)!.push({ timestamp, value });
+    this.addBoundedSample(this.testMetrics.get(type)!, { timestamp, value });
   }
 
   /**
@@ -982,14 +1028,14 @@ export class MetricsCollector {
 
     const metrics = this.getOrCreateNeedsMetrics(agentId);
 
-    // Record samples
-    metrics.hunger.push({ timestamp, value: needs.hunger });
-    metrics.thirst.push({ timestamp, value: needs.thirst });
-    metrics.energy.push({ timestamp, value: needs.energy });
-    metrics.temperature.push({ timestamp, value: needs.temperature });
-    metrics.health.push({ timestamp, value: needs.health });
+    // Record samples with bounded arrays
+    this.addBoundedSample(metrics.hunger, { timestamp, value: needs.hunger });
+    this.addBoundedSample(metrics.thirst, { timestamp, value: needs.thirst });
+    this.addBoundedSample(metrics.energy, { timestamp, value: needs.energy });
+    this.addBoundedSample(metrics.temperature, { timestamp, value: needs.temperature });
+    this.addBoundedSample(metrics.health, { timestamp, value: needs.health });
 
-    // Track crisis events
+    // Track crisis events (hunger below 10% triggers crisis)
     if (needs.hunger < 10) {
       metrics.hungerCrisisEvents++;
     }
@@ -1003,9 +1049,9 @@ export class MetricsCollector {
    * Sample performance metrics
    */
   samplePerformance(sample: PerformanceSample, timestamp: number): void {
-    this.performanceMetrics.fps.push({ timestamp, value: sample.fps });
-    this.performanceMetrics.tickDuration.push({ timestamp, value: sample.tickDuration });
-    this.performanceMetrics.memoryUsage.push({ timestamp, value: sample.memoryUsage });
+    this.addBoundedSample(this.performanceMetrics.fps, { timestamp, value: sample.fps });
+    this.addBoundedSample(this.performanceMetrics.tickDuration, { timestamp, value: sample.tickDuration });
+    this.addBoundedSample(this.performanceMetrics.memoryUsage, { timestamp, value: sample.memoryUsage });
 
     // Update aggregates
     const fpsValues = this.performanceMetrics.fps.map(d => d.value);

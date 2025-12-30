@@ -1,3 +1,4 @@
+import { ComponentType } from '../types/ComponentType.js';
 /**
  * Role Specialization - Integration Tests
  *
@@ -34,13 +35,13 @@ describe('Role Specialization Integration', () => {
 
       // Spawn 100 agents with random personalities
       for (let i = 0; i < 100; i++) {
-        const personality = createPersonalityComponent({
-          workEthic: Math.random() * 100,
-          conscientiousness: Math.random() * 100,
-          openness: Math.random() * 100,
-          agreeableness: Math.random() * 100,
-          extraversion: Math.random() * 100,
-          neuroticism: Math.random() * 100,
+        const personality = new PersonalityComponent({
+          workEthic: Math.random(),
+          conscientiousness: Math.random(),
+          openness: Math.random(),
+          agreeableness: Math.random(),
+          extraversion: Math.random(),
+          neuroticism: Math.random(),
         });
 
         const skills = generateRandomStartingSkills(personality);
@@ -53,8 +54,6 @@ describe('Role Specialization Integration', () => {
       }
 
       const percentWithSkills = (agentsWithSkills.length / 100) * 100;
-
-      console.log(`Skill diversity: ${percentWithSkills}% of agents have skills`);
 
       expect(percentWithSkills).toBeGreaterThanOrEqual(80);
     });
@@ -78,13 +77,13 @@ describe('Role Specialization Integration', () => {
 
       // Spawn 100 agents
       for (let i = 0; i < 100; i++) {
-        const personality = createPersonalityComponent({
-          workEthic: Math.random() * 100,
-          conscientiousness: Math.random() * 100,
-          openness: Math.random() * 100,
-          agreeableness: Math.random() * 100,
-          extraversion: Math.random() * 100,
-          neuroticism: Math.random() * 100,
+        const personality = new PersonalityComponent({
+          workEthic: Math.random(),
+          conscientiousness: Math.random(),
+          openness: Math.random(),
+          agreeableness: Math.random(),
+          extraversion: Math.random(),
+          neuroticism: Math.random(),
         });
 
         const skills = generateRandomStartingSkills(personality);
@@ -97,8 +96,7 @@ describe('Role Specialization Integration', () => {
         }
       }
 
-      console.log('Skill distribution:', skillCounts);
-
+      
       // At least 5 different skills should be represented
       const skillsRepresented = Object.values(skillCounts).filter(count => count > 0).length;
       expect(skillsRepresented).toBeGreaterThanOrEqual(5);
@@ -123,7 +121,7 @@ describe('Role Specialization Integration', () => {
         const isBuilder = i < 2;
 
         entity.addComponent('skills', {
-          type: 'skills',
+          type: ComponentType.Skills,
           version: 1,
           levels: {
             building: isBuilder ? 3 : 0,
@@ -143,7 +141,7 @@ describe('Role Specialization Integration', () => {
         });
 
         entity.addComponent('identity', {
-          type: 'identity',
+          type: ComponentType.Identity,
           version: 1,
           name: isBuilder ? `Builder${i}` : `Agent${i}`,
         });
@@ -164,8 +162,8 @@ describe('Role Specialization Integration', () => {
       const buildSuggestionsReceived: string[] = [];
 
       for (const agent of agents) {
-        const skills = agent.getComponent('skills');
-        const identity = agent.getComponent('identity');
+        const skills = agent.getComponent(ComponentType.Skills);
+        const identity = agent.getComponent(ComponentType.Identity);
 
         const instruction = generateStrategicInstruction(
           { skills },
@@ -177,8 +175,7 @@ describe('Role Specialization Integration', () => {
         }
       }
 
-      console.log('Agents receiving build suggestions:', buildSuggestionsReceived);
-
+      
       // At least 60% should be builders
       const builderSuggestions = buildSuggestionsReceived.filter(name =>
         name.startsWith('Builder')
@@ -200,7 +197,7 @@ describe('Role Specialization Integration', () => {
         const role = i < 2 ? 'cook' : i < 4 ? 'farmer' : 'other';
 
         entity.addComponent('skills', {
-          type: 'skills',
+          type: ComponentType.Skills,
           version: 1,
           levels: {
             building: 0,
@@ -220,7 +217,7 @@ describe('Role Specialization Integration', () => {
         });
 
         entity.addComponent('identity', {
-          type: 'identity',
+          type: ComponentType.Identity,
           version: 1,
           name: `${role}${i}`,
         });
@@ -238,8 +235,8 @@ describe('Role Specialization Integration', () => {
       const foodSuggestionsReceived: string[] = [];
 
       for (const agent of agents) {
-        const skills = agent.getComponent('skills');
-        const identity = agent.getComponent('identity');
+        const skills = agent.getComponent(ComponentType.Skills);
+        const identity = agent.getComponent(ComponentType.Identity);
 
         const instruction = generateStrategicInstruction(
           { skills },
@@ -251,8 +248,7 @@ describe('Role Specialization Integration', () => {
         }
       }
 
-      console.log('Agents receiving food suggestions:', foodSuggestionsReceived);
-
+      
       // All food suggestions should go to cooks or farmers
       const foodSpecialistSuggestions = foodSuggestionsReceived.filter(name =>
         name.startsWith('cook') || name.startsWith('farmer')
@@ -312,7 +308,7 @@ describe('Role Specialization Integration', () => {
         const isSkilled = i < 3; // 3 skilled, 7 unskilled
 
         entity.addComponent('skills', {
-          type: 'skills',
+          type: ComponentType.Skills,
           version: 1,
           levels: {
             building: isSkilled ? 3 : 0,
@@ -332,7 +328,7 @@ describe('Role Specialization Integration', () => {
         });
 
         entity.addComponent('identity', {
-          type: 'identity',
+          type: ComponentType.Identity,
           version: 1,
           name: isSkilled ? `Skilled${i}` : `Unskilled${i}`,
         });
@@ -350,8 +346,8 @@ describe('Role Specialization Integration', () => {
       const strategicSuggestionsReceived: string[] = [];
 
       for (const agent of agents) {
-        const skills = agent.getComponent('skills');
-        const identity = agent.getComponent('identity');
+        const skills = agent.getComponent(ComponentType.Skills);
+        const identity = agent.getComponent(ComponentType.Identity);
 
         const instruction = generateStrategicInstruction(
           { skills },
@@ -366,8 +362,7 @@ describe('Role Specialization Integration', () => {
         }
       }
 
-      console.log('Strategic suggestions:', strategicSuggestionsReceived);
-
+      
       // At least 90% should go to skilled agents
       const skilledSuggestions = strategicSuggestionsReceived.filter(name =>
         name.startsWith('Skilled')

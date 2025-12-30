@@ -22,6 +22,9 @@ import type {
   BuildingBlueprintRegistry,
   PlacementValidator,
   PlacementValidationResult,
+  PlacementError,
+  ResourceCost,
+  BuildingFunction,
   UnlockQueryService,
 } from '@ai-village/core';
 import { Camera } from './Camera.js';
@@ -700,8 +703,9 @@ export class BuildingPlacementUI {
         research: 'Rch',
         decoration: 'Dec',
         governance: 'Gov',
+        religious: 'Rel',
       };
-      const label = labelMap[cat];
+      const label = labelMap[cat] ?? cat.substring(0, 3);
       const metrics = ctx.measureText(label);
       ctx.fillText(label, tabX + (tabWidth - metrics.width) / 2, tabY + tabHeight / 2 + 4);
     });
@@ -715,7 +719,7 @@ export class BuildingPlacementUI {
         (this.buildingCardSize + this.buildingCardMargin)
     );
 
-    buildings.forEach((building, i) => {
+    buildings.forEach((building: BuildingBlueprint, i: number) => {
       const row = Math.floor(i / cardsPerRow);
       const col = i % cardsPerRow;
 
@@ -801,7 +805,7 @@ export class BuildingPlacementUI {
     ctx.font = '10px monospace';
     const textWidth = Math.min(
       maxWidth,
-      Math.max(...errors.map((e) => ctx.measureText(e.message).width))
+      Math.max(...errors.map((e: PlacementError) => ctx.measureText(e.message).width))
     );
     const tooltipWidth = textWidth + padding * 2;
     const tooltipHeight = errors.length * lineHeight + padding * 2;
@@ -821,7 +825,7 @@ export class BuildingPlacementUI {
 
     // Error text
     ctx.fillStyle = '#ff6666';
-    errors.forEach((error, i) => {
+    errors.forEach((error: PlacementError, i: number) => {
       const text = error.message.length > 30
         ? error.message.substring(0, 27) + '...'
         : error.message;
@@ -855,7 +859,7 @@ export class BuildingPlacementUI {
     ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
 
     // Border color based on resource availability
-    const hasResourceError = this.state.validationResult?.errors.some(e => e.type === 'resource_missing') ?? false;
+    const hasResourceError = this.state.validationResult?.errors.some((e: PlacementError) => e.type === 'resource_missing') ?? false;
     ctx.strokeStyle = hasResourceError ? '#cc0000' : '#555555';
     ctx.lineWidth = 2;
     ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
@@ -866,14 +870,14 @@ export class BuildingPlacementUI {
     ctx.fillText('Resources Required:', panelX + 5, panelY + 12);
 
     // Get resource availability from validation errors
-    const resourceErrors = this.state.validationResult?.errors.filter(e => e.type === 'resource_missing') ?? [];
+    const resourceErrors = this.state.validationResult?.errors.filter((e: PlacementError) => e.type === 'resource_missing') ?? [];
 
     // Resource list
-    blueprint.resourceCost.forEach((cost, i) => {
+    blueprint.resourceCost.forEach((cost: ResourceCost, i: number) => {
       const y = panelY + 25 + i * 16;
 
       // Check if this resource has an error
-      const error = resourceErrors.find(e => e.message.includes(cost.resourceId));
+      const error = resourceErrors.find((e: PlacementError) => e.message.includes(cost.resourceId));
 
       if (error) {
         // Parse the "have X" from the error message
@@ -971,7 +975,7 @@ export class BuildingPlacementUI {
       currentY += lineHeight;
 
       ctx.font = '9px monospace';
-      blueprint.resourceCost.forEach((cost) => {
+      blueprint.resourceCost.forEach((cost: ResourceCost) => {
         ctx.fillStyle = '#ffcc66';
         ctx.fillText(
           `  ${cost.resourceId}: ${cost.amountRequired}`,
@@ -990,7 +994,7 @@ export class BuildingPlacementUI {
       currentY += lineHeight;
 
       ctx.font = '9px monospace';
-      blueprint.functionality.forEach((func) => {
+      blueprint.functionality.forEach((func: BuildingFunction) => {
         let funcText = '';
         switch (func.type) {
           case 'crafting':

@@ -187,7 +187,7 @@ export class EconomyPanel {
     const items = Array.from(marketState.itemStats.values());
 
     // Sort by total trading activity (sales + purchases)
-    items.sort((a, b) => {
+    items.sort((a: ItemMarketStats, b: ItemMarketStats) => {
       const activityA = a.recentSales + a.recentPurchases;
       const activityB = b.recentSales + b.recentPurchases;
       return activityB - activityA;
@@ -303,7 +303,7 @@ export class EconomyPanel {
     // Compare recent prices to earlier prices
     const recentCount = Math.min(5, stats.priceHistory.length);
     const recentPrices = stats.priceHistory.slice(-recentCount);
-    const recentAvg = recentPrices.reduce((sum, p) => sum + p, 0) / recentCount;
+    const recentAvg = recentPrices.reduce((sum: number, p: number) => sum + p, 0) / recentCount;
 
     const olderCount = Math.min(5, stats.priceHistory.length - recentCount);
     if (olderCount < 2) {
@@ -311,7 +311,7 @@ export class EconomyPanel {
     }
 
     const olderPrices = stats.priceHistory.slice(-(recentCount + olderCount), -recentCount);
-    const olderAvg = olderPrices.reduce((sum, p) => sum + p, 0) / olderCount;
+    const olderAvg = olderPrices.reduce((sum: number, p: number) => sum + p, 0) / olderCount;
 
     const change = (recentAvg - olderAvg) / olderAvg;
 

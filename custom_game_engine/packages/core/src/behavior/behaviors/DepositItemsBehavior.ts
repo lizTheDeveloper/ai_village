@@ -19,15 +19,17 @@ import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { addToInventory, removeFromInventory } from '../../components/InventoryComponent.js';
 import { recordDeposited } from '../../components/GatheringStatsComponent.js';
 import { itemRegistry } from '../../items/index.js';
+import { ComponentType } from '../../types/ComponentType.js';
+import { BuildingType } from '../../types/BuildingType.js';
 
 /**
  * Get the current game day from the world's time entity.
  */
 function getCurrentDay(world: World): number {
-  const timeEntities = world.query().with('time').executeEntities();
+  const timeEntities = world.query().with(ComponentType.Time).executeEntities();
   if (timeEntities.length > 0) {
     const timeEntity = timeEntities[0] as EntityImpl;
-    const timeComp = timeEntity.getComponent('time') as { day?: number } | undefined;
+    const timeComp = timeEntity.getComponent(ComponentType.Time) as { day?: number } | undefined;
     return timeComp?.day ?? 0;
   }
   return 0;
@@ -40,9 +42,9 @@ export class DepositItemsBehavior extends BaseBehavior {
   readonly name = 'deposit_items' as const;
 
   execute(entity: EntityImpl, world: World): BehaviorResult | void {
-    const position = entity.getComponent<PositionComponent>('position')!;
-    const inventory = entity.getComponent<InventoryComponent>('inventory');
-    const agent = entity.getComponent<AgentComponent>('agent')!;
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
 
     // Disable steering system so it doesn't override our deposit movement
     this.disableSteering(entity);
@@ -66,19 +68,19 @@ export class DepositItemsBehavior extends BaseBehavior {
 
     // Find storage buildings with inventory components
     const storageBuildings = world.query()
-      .with('building')
-      .with('inventory')
-      .with('position')
+      .with(ComponentType.Building)
+      .with(ComponentType.Inventory)
+      .with(ComponentType.Position)
       .executeEntities();
 
     // Filter for storage-chest and storage-box types
     const validStorage = storageBuildings.filter(storage => {
       const storageImpl = storage as EntityImpl;
-      const building = storageImpl.getComponent<BuildingComponent>('building');
+      const building = storageImpl.getComponent<BuildingComponent>(ComponentType.Building);
       if (!building) return false;
 
       return (
-        (building.buildingType === 'storage-chest' || building.buildingType === 'storage-box') &&
+        (building.buildingType === BuildingType.StorageChest || building.buildingType === BuildingType.StorageBox) &&
         building.isComplete // Only deposit to completed buildings
       );
     });
@@ -120,7 +122,7 @@ export class DepositItemsBehavior extends BaseBehavior {
     }
 
     const nearestStorageImpl = nearestStorage.entity as EntityImpl;
-    const storagePos = nearestStorageImpl.getComponent<PositionComponent>('position')!;
+    const storagePos = nearestStorageImpl.getComponent<PositionComponent>(ComponentType.Position)!;
 
     // Move toward storage (with arrival slowdown) and check distance
     const distanceToStorage = this.moveToward(entity, storagePos);
@@ -142,8 +144,8 @@ export class DepositItemsBehavior extends BaseBehavior {
 
     for (const storage of storageList) {
       const storageImpl = storage as EntityImpl;
-      const storagePos = storageImpl.getComponent<PositionComponent>('position')!;
-      const storageInventory = storageImpl.getComponent<InventoryComponent>('inventory')!;
+      const storagePos = storageImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+      const storageInventory = storageImpl.getComponent<InventoryComponent>(ComponentType.Inventory)!;
 
       // Skip storage we just used (to avoid infinite loop)
       if (lastStorageId && storage.id === lastStorageId) {
@@ -173,7 +175,7 @@ export class DepositItemsBehavior extends BaseBehavior {
     inventory: InventoryComponent,
     agent: AgentComponent
   ): void {
-    const storageInventory = storageEntity.getComponent<InventoryComponent>('inventory')!;
+    const storageInventory = storageEntity.getComponent<InventoryComponent>(ComponentType.Inventory)!;
     const itemsDeposited: Array<{ itemId: string; amount: number }> = [];
 
     // Create mutable copies of inventories
@@ -220,18 +222,18 @@ export class DepositItemsBehavior extends BaseBehavior {
     }
 
     // Update both entities with new inventories
-    entity.updateComponent<InventoryComponent>('inventory', () => agentInv);
-    storageEntity.updateComponent<InventoryComponent>('inventory', () => storageInv);
+    entity.updateComponent<InventoryComponent>(ComponentType.Inventory, () => agentInv);
+    storageEntity.updateComponent<InventoryComponent>(ComponentType.Inventory, () => storageInv);
 
     // Record deposit stats
     if (itemsDeposited.length > 0) {
-      const gatheringStats = entity.getComponent<GatheringStatsComponent>('gathering_stats');
+      const gatheringStats = entity.getComponent<GatheringStatsComponent>(ComponentType.GatheringStats);
       if (gatheringStats) {
         const currentDay = getCurrentDay(world);
         for (const item of itemsDeposited) {
           recordDeposited(gatheringStats, item.itemId, item.amount, currentDay);
         }
-        entity.updateComponent<GatheringStatsComponent>('gathering_stats', () => gatheringStats);
+        entity.updateComponent<GatheringStatsComponent>(ComponentType.GatheringStats, () => gatheringStats);
       }
     }
 
@@ -269,7 +271,7 @@ export class DepositItemsBehavior extends BaseBehavior {
     agent: AgentComponent
   ): void {
     // Check if remaining items are even depositable
-    const inventory = entity.getComponent<InventoryComponent>('inventory')!;
+    const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory)!;
     const hasDepositableItems = inventory.slots.some(slot => {
       if (!slot.itemId || slot.quantity === 0) return false;
       return itemRegistry.isStorable(slot.itemId);
@@ -301,7 +303,7 @@ export class DepositItemsBehavior extends BaseBehavior {
     } else {
       // Deposited some but not all - need to find another storage
       // Mark the current storage as recently used so we don't immediately try it again
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
         ...current,
         behavior: 'deposit_items',
         behaviorState: {
@@ -319,7 +321,7 @@ export class DepositItemsBehavior extends BaseBehavior {
     const previousBehavior = agent.behaviorState?.previousBehavior as AgentBehavior | undefined;
     const previousState = agent.behaviorState?.previousState as Record<string, unknown> | undefined;
 
-    entity.updateComponent<AgentComponent>('agent', (current) => ({
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
       ...current,
       behavior: previousBehavior || 'wander',
       behaviorState: previousState || {},

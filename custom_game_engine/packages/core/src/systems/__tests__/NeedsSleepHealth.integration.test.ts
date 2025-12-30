@@ -4,9 +4,10 @@ import { createDawnWorld } from '../../__tests__/fixtures/worldFixtures.js';
 import { NeedsSystem } from '../NeedsSystem.js';
 import { SleepSystem } from '../SleepSystem.js';
 import { TemperatureSystem } from '../TemperatureSystem.js';
-import { createNeedsComponent } from '../../components/NeedsComponent.js';
+import { NeedsComponent } from '../../components/NeedsComponent.js';
 import { createCircadianComponent } from '../../components/CircadianComponent.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Integration tests for NeedsSystem + SleepSystem + TemperatureSystem
  *
@@ -30,7 +31,13 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     const agent = harness.createTestAgent({ x: 10, y: 10 });
 
     agent.addComponent(createCircadianComponent());
-    agent.addComponent(createNeedsComponent(100, 25, 100, 100, 100)); // Low energy (25)
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 0.25,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  })); // Low energy (25)
 
     const sleepSystem = new SleepSystem();
     harness.registerSystem('SleepSystem', sleepSystem);
@@ -42,7 +49,7 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
       sleepSystem.update(harness.world, entities, 2.4); // 2.4s = ~1 game hour
     }
 
-    const circadian = agent.getComponent('circadian') as any;
+    const circadian = agent.getComponent(ComponentType.Circadian) as any;
 
     // Sleep drive should be high due to low energy
     expect(circadian.sleepDrive).toBeGreaterThan(70);
@@ -57,14 +64,20 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     (circadian as any).sleepQuality = 0.5; // Ground sleep
 
     agent.addComponent(circadian);
-    agent.addComponent(createNeedsComponent(100, 20, 100, 100, 100)); // Low energy
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 0.2,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  })); // Low energy
 
     const sleepSystem = new SleepSystem();
     harness.registerSystem('SleepSystem', sleepSystem);
 
     const entities = Array.from(harness.world.entities.values());
 
-    const initialNeeds = agent.getComponent('needs') as any;
+    const initialNeeds = agent.getComponent(ComponentType.Needs) as any;
     const initialEnergy = initialNeeds.energy;
 
     // Sleep for several hours
@@ -72,7 +85,7 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
       sleepSystem.update(harness.world, entities, 2.0); // ~1 hour each
     }
 
-    const finalNeeds = agent.getComponent('needs') as any;
+    const finalNeeds = agent.getComponent(ComponentType.Needs) as any;
 
     // Energy should have increased during sleep
     expect(finalNeeds.energy).toBeGreaterThan(initialEnergy);
@@ -87,25 +100,32 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     (circadian as any).sleepQuality = 0.5;
 
     agent.addComponent(circadian);
-    agent.addComponent(createNeedsComponent(80, 50, 100, 100, 100)); // 80 hunger
+    agent.addComponent(new NeedsComponent({
+    hunger: 0.8,
+    energy: 0.5,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  })); // 80 hunger
 
     const needsSystem = new NeedsSystem();
     harness.registerSystem('NeedsSystem', needsSystem);
 
-    const entities = Array.from(harness.world.entities.values());
+    // Only pass entities with 'needs' component to NeedsSystem
+    const entitiesWithNeeds = harness.world.query().with(ComponentType.Needs).executeEntities();
 
-    const initialNeeds = agent.getComponent('needs') as any;
+    const initialNeeds = agent.getComponent(ComponentType.Needs) as any;
     const initialHunger = initialNeeds.hunger;
 
     // Update needs system while sleeping
     for (let i = 0; i < 10; i++) {
-      needsSystem.update(harness.world, entities, 1.0);
+      needsSystem.update(harness.world, entitiesWithNeeds, 1.0);
     }
 
-    const finalNeeds = agent.getComponent('needs') as any;
+    const finalNeeds = agent.getComponent(ComponentType.Needs) as any;
 
-    // Hunger should not have decayed significantly during sleep
-    expect(finalNeeds.hunger).toBeGreaterThanOrEqual(initialHunger - 5); // Allow small decay
+    // Hunger should not have decayed significantly during sleep (0-1 scale)
+    expect(finalNeeds.hunger).toBeGreaterThanOrEqual(initialHunger - 0.05); // Allow small decay
   });
 
   it('should extreme cold temperature damage health', () => {
@@ -114,7 +134,7 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     // Create weather entity with extreme cold
     const weatherEntity = harness.world.createEntity('weather');
     weatherEntity.addComponent({
-      type: 'weather',
+      type: ComponentType.Weather,
       version: 1,
       weatherType: 'snow',
       intensity: 1.0,
@@ -127,7 +147,7 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     // currentTemp: 5, comfortMin: 15, comfortMax: 25, toleranceMin: 10, toleranceMax: 35
     // 5 < 10 (toleranceMin) so state will be 'dangerously_cold'
     agent.addComponent({
-      type: 'temperature',
+      type: ComponentType.Temperature,
       version: 1,
       currentTemp: 5, // Below toleranceMin (10) = dangerously cold
       comfortMin: 15,
@@ -136,14 +156,20 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
       toleranceMax: 35,
       state: 'dangerously_cold',
     });
-    agent.addComponent(createNeedsComponent(100, 100, 100, 100, 37)); // Full health, normal body temp
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 0.37,
+  })); // Full health, normal body temp
 
     const tempSystem = new TemperatureSystem();
     harness.registerSystem('TemperatureSystem', tempSystem);
 
     const entities = Array.from(harness.world.entities.values());
 
-    const initialNeeds = agent.getComponent('needs') as any;
+    const initialNeeds = agent.getComponent(ComponentType.Needs) as any;
     const initialHealth = initialNeeds.health;
 
     // Expose agent to cold for several seconds
@@ -151,7 +177,7 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
       tempSystem.update(harness.world, entities, 1.0);
     }
 
-    const finalNeeds = agent.getComponent('needs') as any;
+    const finalNeeds = agent.getComponent(ComponentType.Needs) as any;
 
     // Health should have decreased due to dangerous temperature
     expect(finalNeeds.health).toBeLessThan(initialHealth);
@@ -173,10 +199,22 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     (circadian2 as any).sleepQuality = 0.3; // Poor sleep (ground)
 
     agent1.addComponent(circadian1);
-    agent1.addComponent(createNeedsComponent(100, 20, 100, 100, 100));
+    agent1.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 0.2,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
 
     agent2.addComponent(circadian2);
-    agent2.addComponent(createNeedsComponent(100, 20, 100, 100, 100));
+    agent2.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 0.2,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
 
     const sleepSystem = new SleepSystem();
     harness.registerSystem('SleepSystem', sleepSystem);
@@ -188,8 +226,8 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
       sleepSystem.update(harness.world, entities, 2.0);
     }
 
-    const needs1 = agent1.getComponent('needs') as any;
-    const needs2 = agent2.getComponent('needs') as any;
+    const needs1 = agent1.getComponent(ComponentType.Needs) as any;
+    const needs2 = agent2.getComponent(ComponentType.Needs) as any;
 
     // Agent with better sleep quality should have recovered more energy
     expect(needs1.energy).toBeGreaterThan(needs2.energy);
@@ -204,23 +242,30 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     (circadian as any).sleepQuality = 1.0; // Good sleep
 
     agent.addComponent(circadian);
-    agent.addComponent(createNeedsComponent(100, 90, 100, 100, 100)); // Almost full energy
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 0.9,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  })); // Almost full energy
 
     const sleepSystem = new SleepSystem();
     harness.registerSystem('SleepSystem', sleepSystem);
 
-    const entities = Array.from(harness.world.entities.values());
+    // Only pass entities with required components
+    const entitiesWithCircadian = harness.world.query().with(ComponentType.Circadian).executeEntities();
 
     // Sleep enough to fully recover
     for (let i = 0; i < 3; i++) {
-      sleepSystem.update(harness.world, entities, 2.0);
+      sleepSystem.update(harness.world, entitiesWithCircadian, 2.0);
     }
 
-    const finalCircadian = agent.getComponent('circadian') as any;
-    const finalNeeds = agent.getComponent('needs') as any;
+    const finalCircadian = agent.getComponent(ComponentType.Circadian) as any;
+    const finalNeeds = agent.getComponent(ComponentType.Needs) as any;
 
-    // Agent should have recovered energy
-    expect(finalNeeds.energy).toBeGreaterThanOrEqual(90);
+    // Agent should have recovered energy (0-1 scale)
+    expect(finalNeeds.energy).toBeGreaterThanOrEqual(0.90);
 
     // Sleep drive should have decreased
     expect(finalCircadian.sleepDrive).toBeLessThan(50);
@@ -232,7 +277,7 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     // Create hot weather
     const weatherEntity = harness.world.createEntity('weather');
     weatherEntity.addComponent({
-      type: 'weather',
+      type: ComponentType.Weather,
       version: 1,
       weatherType: 'clear',
       intensity: 0.5,
@@ -242,13 +287,19 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     });
 
     agent.addComponent({
-      type: 'temperature',
+      type: ComponentType.Temperature,
       version: 1,
       currentTemp: 35, // Hot
       state: 'hot',
     });
     agent.addComponent(createCircadianComponent());
-    agent.addComponent(createNeedsComponent(100, 100, 100, 100, 100));
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 1.0,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
 
     const needsSystem = new NeedsSystem();
     const tempSystem = new TemperatureSystem();
@@ -256,18 +307,20 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     harness.registerSystem('NeedsSystem', needsSystem);
     harness.registerSystem('TemperatureSystem', tempSystem);
 
-    const entities = Array.from(harness.world.entities.values());
+    // Filter entities by required components for each system
+    const entitiesWithTemperature = harness.world.query().with(ComponentType.Temperature).executeEntities();
+    const entitiesWithNeeds = harness.world.query().with(ComponentType.Needs).executeEntities();
 
-    const initialNeeds = agent.getComponent('needs') as any;
+    const initialNeeds = agent.getComponent(ComponentType.Needs) as any;
     const initialEnergy = initialNeeds.energy;
 
     // Update both systems
     for (let i = 0; i < 10; i++) {
-      tempSystem.update(harness.world, entities, 1.0);
-      needsSystem.update(harness.world, entities, 1.0);
+      tempSystem.update(harness.world, entitiesWithTemperature, 1.0);
+      needsSystem.update(harness.world, entitiesWithNeeds, 1.0);
     }
 
-    const finalNeeds = agent.getComponent('needs') as any;
+    const finalNeeds = agent.getComponent(ComponentType.Needs) as any;
 
     // Energy/needs should decay faster in extreme temperatures
     // (Exact values depend on implementation)

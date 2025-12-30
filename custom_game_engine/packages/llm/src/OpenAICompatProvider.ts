@@ -21,6 +21,7 @@ export class OpenAICompatProvider implements LLMProvider {
   private readonly timeout = 30000; // 30 second timeout
   private readonly maxRetries = 3;
   private readonly retryDelayMs = 1000;
+  public customHeaders?: Record<string, string>; // Custom headers for per-agent config
 
   constructor(
     model: string = 'qwen/qwen3-32b',
@@ -230,14 +231,6 @@ export class OpenAICompatProvider implements LLMProvider {
         {
           type: 'function',
           function: {
-            name: 'explore',
-            description: 'Explore unknown areas to find new resources',
-            parameters: { type: 'object', properties: {}, required: [] }
-          }
-        },
-        {
-          type: 'function',
-          function: {
             name: 'till',
             description: 'Prepare soil for planting',
             parameters: { type: 'object', properties: {}, required: [] }
@@ -307,6 +300,11 @@ export class OpenAICompatProvider implements LLMProvider {
         headers['Authorization'] = `Bearer ${this.apiKey}`;
       }
 
+      // Add custom headers if provided
+      if (this.customHeaders) {
+        Object.assign(headers, this.customHeaders);
+      }
+
       // System message to instruct the model on response format
       // Adjust thinking instructions based on model type
       const isQwen = this.model.toLowerCase().includes('qwen');
@@ -355,7 +353,7 @@ Keep speech brief and natural.`
             { role: 'user', content: request.prompt }
           ],
           temperature: request.temperature ?? 0.7,
-          max_tokens: request.maxTokens ?? 2000,
+          max_tokens: request.maxTokens ?? 40960,
           tools: tools,
           tool_choice: 'auto',
         }),
@@ -443,16 +441,6 @@ Keep speech brief and natural.`
         action: action
       });
 
-      console.log('[OpenAICompatProvider] Response:', {
-        model: this.model,
-        action: action || '(no action)',
-        speaking: speech ? speech.slice(0, 60) + '...' : '(silent)',
-        thinking: thinking ? thinking.slice(0, 60) + '...' : '(none)',
-        tokensUsed: data.usage?.total_tokens,
-        hasToolCalls: toolCalls.length > 0,
-        hasReasoning: !!message.reasoning,
-      });
-
       // If no action was called, fall back to text parsing
       const hasAction = action && (typeof action === 'string' ? action.length > 0 : true);
       if (!hasAction) {
@@ -517,7 +505,7 @@ Keep speech brief and natural.`
 Format your response like this:
 ${thoughtFormat}
 Speech: [what you say out loud, or "..." if silent]
-Action: [choose ONE: pick, gather, build, plan_build, talk, follow_agent, explore, till, plant, deposit_items, call_meeting, set_priorities]
+Action: [choose ONE: pick, gather, build, plan_build, talk, follow_agent, wander, till, plant, deposit_items, call_meeting, set_priorities]
 
 Actions can have targets: "gather wood 20" or "build storage-chest" or "talk Haven"
 Use plan_build to queue a building project - you'll automatically gather resources then build it! Example: "plan_build storage-chest"
@@ -534,7 +522,7 @@ Be brief and natural.`
           { role: 'user', content: request.prompt }
         ],
         temperature: request.temperature ?? 0.7,
-        max_tokens: request.maxTokens ?? 200,
+        max_tokens: request.maxTokens ?? 40960,
       }),
     });
 

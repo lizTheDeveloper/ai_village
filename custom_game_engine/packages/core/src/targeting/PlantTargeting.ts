@@ -11,8 +11,8 @@ import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { VisionComponent } from '../components/VisionComponent.js';
-import {
-  type TargetResult,
+import { ComponentType } from '../types/ComponentType.js';
+import {  type TargetResult,
   rememberLocation,
   getRememberedLocation,
   forgetLocation,
@@ -78,8 +78,8 @@ export class PlantTargeting {
     world: World,
     options: PlantTargetingOptions = {}
   ): PlantTarget | null {
-    const position = entity.getComponent<PositionComponent>('position');
-    const vision = entity.getComponent<VisionComponent>('vision');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const vision = entity.getComponent<VisionComponent>(ComponentType.Vision);
 
     if (!position || !vision) return null;
 
@@ -94,8 +94,8 @@ export class PlantTargeting {
       if (!plantEntity) continue;
 
       const impl = plantEntity as EntityImpl;
-      const plant = impl.getComponent('plant') as any;
-      const plantPos = impl.getComponent<PositionComponent>('position');
+      const plant = impl.getComponent(ComponentType.Plant) as any;
+      const plantPos = impl.getComponent<PositionComponent>(ComponentType.Position);
 
       if (!plant || !plantPos) continue;
 
@@ -160,8 +160,8 @@ export class PlantTargeting {
     world: World,
     options: PlantTargetingOptions = {}
   ): PlantTarget[] {
-    const position = entity.getComponent<PositionComponent>('position');
-    const vision = entity.getComponent<VisionComponent>('vision');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
+    const vision = entity.getComponent<VisionComponent>(ComponentType.Vision);
 
     if (!position || !vision) return [];
 
@@ -175,8 +175,8 @@ export class PlantTargeting {
       if (!plantEntity) continue;
 
       const impl = plantEntity as EntityImpl;
-      const plant = impl.getComponent('plant') as any;
-      const plantPos = impl.getComponent<PositionComponent>('position');
+      const plant = impl.getComponent(ComponentType.Plant) as any;
+      const plantPos = impl.getComponent<PositionComponent>(ComponentType.Position);
 
       if (!plant || !plantPos) continue;
 
@@ -284,7 +284,7 @@ export class PlantTargeting {
     world: World,
     options: PlantTargetingOptions = {}
   ): TargetResult {
-    const position = entity.getComponent<PositionComponent>('position');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) return { type: 'unknown' };
 
     // First: Try to find visible plant
@@ -302,7 +302,7 @@ export class PlantTargeting {
       ? 'food'
       : options.hasSeeds
         ? 'seeds'
-        : options.speciesId || 'plant';
+        : options.speciesId || ComponentType.Plant;
 
     const remembered = this.getRemembered(entity, memoryCategory);
     if (remembered) {

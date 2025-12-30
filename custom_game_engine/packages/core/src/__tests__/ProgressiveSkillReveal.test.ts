@@ -1,3 +1,4 @@
+import { ComponentType } from '../types/ComponentType.js';
 /**
  * Progressive Skill Reveal System - Unit Tests
  *
@@ -22,7 +23,7 @@ import {
   getAvailableActions,
   getAvailableBuildings,
 } from '../components/SkillsComponent.js';
-import { type PersonalityComponent, createPersonalityComponent } from '../components/PersonalityComponent.js';
+import { type PersonalityComponent, PersonalityComponent } from '../components/PersonalityComponent.js';
 import { BuildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistry.js';
 import { canAccessBuilding } from '../components/BuildingComponent.js';
 import {
@@ -47,13 +48,13 @@ describe('Random Starting Skills', () => {
     it('should generate 1-3 starting skills based on personality affinities', () => {
       // This function is now imported at the top of the file
 
-      const personality = createPersonalityComponent({
-        workEthic: 80,
-        conscientiousness: 75,
-        openness: 60,
-        agreeableness: 50,
-        extraversion: 40,
-        neuroticism: 30,
+      const personality = new PersonalityComponent({
+        workEthic: 0.8,
+        conscientiousness: 0.75,
+        openness: 0.6,
+        agreeableness: 0.5,
+        extraversion: 0.4,
+        neuroticism: 0.3,
       });
 
       const skills = generateRandomStartingSkills(personality);
@@ -69,10 +70,13 @@ describe('Random Starting Skills', () => {
 
     it('should generate skills at level 1-2 only', () => {
 
-      const personality = createPersonalityComponent({
-        workEthic: 90,
-        conscientiousness: 85,
-        openness: 70,
+      const personality = new PersonalityComponent({
+        workEthic: 0.9,
+        conscientiousness: 0.85,
+        openness: 0.7,
+        agreeableness: 0.5,
+        extraversion: 0.5,
+        neuroticism: 0.3,
       });
 
       const skills = generateRandomStartingSkills(personality);
@@ -89,13 +93,13 @@ describe('Random Starting Skills', () => {
 
     it('should favor skills that match personality affinities (statistical)', () => {
       // High conscientiousness and workEthic should favor building/farming
-      const builderPersonality = createPersonalityComponent({
-        workEthic: 95,
-        conscientiousness: 90,
-        openness: 30,
-        agreeableness: 40,
-        extraversion: 20,
-        neuroticism: 20,
+      const builderPersonality = new PersonalityComponent({
+        workEthic: 0.95,
+        conscientiousness: 0.9,
+        openness: 0.3,
+        agreeableness: 0.4,
+        extraversion: 0.2,
+        neuroticism: 0.2,
       });
 
       // Run 100 times and check distribution
@@ -122,13 +126,13 @@ describe('Random Starting Skills', () => {
 
       for (let i = 0; i < 100; i++) {
         // Generate random personality
-        const personality = createPersonalityComponent({
-          workEthic: Math.random() * 100,
-          conscientiousness: Math.random() * 100,
-          openness: Math.random() * 100,
-          agreeableness: Math.random() * 100,
-          extraversion: Math.random() * 100,
-          neuroticism: Math.random() * 100,
+        const personality = new PersonalityComponent({
+          workEthic: Math.random(),
+          conscientiousness: Math.random(),
+          openness: Math.random(),
+          agreeableness: Math.random(),
+          extraversion: Math.random(),
+          neuroticism: Math.random(),
         });
 
         const skills = generateRandomStartingSkills(personality);
@@ -155,7 +159,13 @@ describe('Random Starting Skills', () => {
 
     it('should return a valid SkillsComponent structure', () => {
 
-      const personality = createPersonalityComponent({});
+      const personality = new PersonalityComponent({
+        openness: 0.5,
+        conscientiousness: 0.5,
+        extraversion: 0.5,
+        agreeableness: 0.5,
+        neuroticism: 0.5,
+      });
       const skills = generateRandomStartingSkills(personality);
 
       expect(skills.type).toBe('skills');
@@ -898,7 +908,7 @@ describe('Building Ownership', () => {
 
       // Check type definition includes ownership fields
       const building: any = {
-        type: 'building',
+        type: ComponentType.Building,
         ownerId: 'oak',
         ownerName: 'Oak',
         accessType: 'personal',

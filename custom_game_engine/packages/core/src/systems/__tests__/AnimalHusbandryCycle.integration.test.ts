@@ -7,6 +7,7 @@ import { AnimalHousingSystem } from '../AnimalHousingSystem.js';
 import { AnimalProductionSystem } from '../AnimalProductionSystem.js';
 import { TimeSystem } from '../TimeSystem.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Integration tests for Complete Animal Husbandry Cycle
  *
@@ -45,7 +46,7 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     }
 
     // Animal should be processed
-    expect(animal.getComponent('animal')).toBeDefined();
+    expect(animal.getComponent(ComponentType.Animal)).toBeDefined();
   });
 
   it('should taming system convert wild to domesticated', () => {
@@ -82,7 +83,7 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     housingSystem.update(harness.world, entities, 1.0);
 
     // Housing system should process
-    expect(coop.getComponent('building')).toBeDefined();
+    expect(coop.getComponent(ComponentType.Building)).toBeDefined();
   });
 
   it('should animals age through life stages', () => {
@@ -255,8 +256,8 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     }
 
     // All systems should integrate successfully
-    expect(animal.getComponent('animal')).toBeDefined();
-    expect(coop.getComponent('building')).toBeDefined();
+    expect(animal.getComponent(ComponentType.Animal)).toBeDefined();
+    expect(coop.getComponent(ComponentType.Building)).toBeDefined();
   });
 
   it('should animal needs decay and require care', () => {
@@ -273,7 +274,7 @@ describe('Complete Animal Husbandry Cycle Integration', () => {
     }
 
     // Animal needs should be tracked
-    expect(animal.getComponent('animal')).toBeDefined();
+    expect(animal.getComponent(ComponentType.Animal)).toBeDefined();
   });
 
   it('should housing capacity limits enforced', () => {

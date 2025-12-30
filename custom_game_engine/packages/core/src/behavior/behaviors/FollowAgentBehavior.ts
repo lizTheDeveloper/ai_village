@@ -13,6 +13,7 @@ import type { MovementComponent } from '../../components/MovementComponent.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
+import { ComponentType } from '../../types/ComponentType.js';
 
 /** Minimum distance to maintain from target */
 const MIN_FOLLOW_DISTANCE = 3;
@@ -33,9 +34,9 @@ export class FollowAgentBehavior extends BaseBehavior {
     // Disable steering system
     this.disableSteering(entity);
 
-    const position = entity.getComponent<PositionComponent>('position')!;
-    const movement = entity.getComponent<MovementComponent>('movement')!;
-    const agent = entity.getComponent<AgentComponent>('agent')!;
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+    const movement = entity.getComponent<MovementComponent>(ComponentType.Movement)!;
+    const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
 
     const targetId = agent.behaviorState?.targetId as string | undefined;
     if (!targetId) {
@@ -52,7 +53,7 @@ export class FollowAgentBehavior extends BaseBehavior {
     }
 
     const targetImpl = targetEntity as EntityImpl;
-    const targetPos = targetImpl.getComponent<PositionComponent>('position');
+    const targetPos = targetImpl.getComponent<PositionComponent>(ComponentType.Position);
     if (!targetPos) {
       return { complete: true, reason: 'Target has no position' };
     }
@@ -63,7 +64,7 @@ export class FollowAgentBehavior extends BaseBehavior {
 
     if (distance < MIN_FOLLOW_DISTANCE) {
       // Too close, stop
-      entity.updateComponent<MovementComponent>('movement', (current) => ({
+      entity.updateComponent<MovementComponent>(ComponentType.Movement, (current) => ({
         ...current,
         velocityX: 0,
         velocityY: 0,
@@ -73,7 +74,7 @@ export class FollowAgentBehavior extends BaseBehavior {
       const velocityX = (dx / distance) * movement.speed * CATCH_UP_SPEED;
       const velocityY = (dy / distance) * movement.speed * CATCH_UP_SPEED;
 
-      entity.updateComponent<MovementComponent>('movement', (current) => ({
+      entity.updateComponent<MovementComponent>(ComponentType.Movement, (current) => ({
         ...current,
         velocityX,
         velocityY,
@@ -83,7 +84,7 @@ export class FollowAgentBehavior extends BaseBehavior {
       const velocityX = (dx / distance) * movement.speed;
       const velocityY = (dy / distance) * movement.speed;
 
-      entity.updateComponent<MovementComponent>('movement', (current) => ({
+      entity.updateComponent<MovementComponent>(ComponentType.Movement, (current) => ({
         ...current,
         velocityX,
         velocityY,

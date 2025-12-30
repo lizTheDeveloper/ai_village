@@ -1,5 +1,7 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
+import { BuildingType as BT } from '../types/BuildingType.js';
 import type { World, WorldMutator } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -36,7 +38,7 @@ import { createHealthClinicComponent } from '../components/HealthClinicComponent
 export class BuildingSystem implements System {
   public readonly id: SystemId = 'building';
   public readonly priority: number = 16; // Run after Needs (15)
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = ['building', 'position'];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Building, CT.Position];
 
   private isInitialized = false;
 
@@ -90,6 +92,21 @@ export class BuildingSystem implements System {
     // that will receive emitted events
     const actualEventBus = world.eventBus;
 
+    // Listen for construction started to track builderId
+    actualEventBus.subscribe('construction:started', (event) => {
+      const data = event.data as { buildingId: string; builderId?: string };
+      if (data.builderId) {
+        // Store builderId in BuildingComponent using ownerId field
+        const entity = world.getEntity(data.buildingId);
+        if (entity) {
+          (entity as EntityImpl).updateComponent(CT.Building, (comp) => ({
+            ...comp,
+            ownerId: data.builderId,
+          }));
+        }
+      }
+    });
+
     // Listen for building placement confirmations
     actualEventBus.subscribe('building:placement:confirmed', (event) => {
       this.handleBuildingPlacement(world, event.data as { blueprintId: string; position: { x: number; y: number }; rotation: number });
@@ -113,7 +130,7 @@ export class BuildingSystem implements System {
     world: World,
     event: GameEvent
   ): void {
-    const data = event.data as { entityId: string; buildingType: string };
+    const data = event.data as { entityId: string; buildingType: string; builderId?: string };
     const { entityId, buildingType } = data;
 
     // Find the entity using world.getEntity
@@ -136,13 +153,16 @@ export class BuildingSystem implements System {
     const shopType = this.SHOP_BUILDING_TYPES[buildingType];
     if (shopType) {
       // Get the building component to find the builder
-      const buildingComp = (entity as EntityImpl).getComponent<BuildingComponent>('building');
+      const buildingComp = (entity as EntityImpl).getComponent<BuildingComponent>(CT.Building);
       if (!buildingComp) {
         throw new Error(`Entity ${entityId} missing BuildingComponent when adding ShopComponent`);
       }
 
-      // TODO: Track builderId in BuildingComponent or pass from event data
-      const builderId = 'system'; // Placeholder until builder tracking is implemented
+      // Use builderId from event data (which comes from BuildingComponent.ownerId)
+      const builderId = data.builderId || buildingComp.ownerId;
+      if (!builderId) {
+        throw new Error(`Building ${entityId} completed without builderId - cannot create shop`);
+      }
       const shopComponent = createShopComponent(shopType, builderId, data.buildingType);
       (entity as EntityImpl).addComponent(shopComponent);
     }
@@ -155,7 +175,7 @@ export class BuildingSystem implements System {
 
     if (fuelConfig.required) {
       // Update building component with fuel properties
-      (entity as EntityImpl).updateComponent('building', (comp) => ({
+      (entity as EntityImpl).updateComponent(CT.Building, (comp) => ({
         ...comp,
         fuelRequired: true,
         currentFuel: fuelConfig.initialFuel,
@@ -256,14 +276,14 @@ export class BuildingSystem implements System {
       'inventors_hall': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
 
       // === Governance Buildings (Phase 11) ===
-      'town_hall': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
-      'census_bureau': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'town-hall': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'census-bureau': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
       'granary': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
-      'weather_station': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
-      'health_clinic': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
-      'meeting_hall': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'weather-station': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'health-clinic': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'meeting-hall': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
       'watchtower': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
-      'labor_guild': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'labor-guild': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
       'archive': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
     };
 
@@ -280,28 +300,28 @@ export class BuildingSystem implements System {
    */
   private addGovernanceComponent(entity: EntityImpl, buildingType: string): void {
     switch (buildingType) {
-      case 'town_hall':
+      case BT.TownHall:
         entity.addComponent(createTownHallComponent());
         break;
 
-      case 'census_bureau':
+      case BT.CensusBureau:
         entity.addComponent(createCensusBureauComponent());
         break;
 
-      case 'granary':
+      case BT.Granary:
         // Granary uses warehouse component with resource tracking
         entity.addComponent(createWarehouseComponent('food'));
         break;
 
-      case 'weather_station':
+      case BT.WeatherStation:
         entity.addComponent(createWeatherStationComponent());
         break;
 
-      case 'health_clinic':
+      case BT.HealthClinic:
         entity.addComponent(createHealthClinicComponent());
         break;
 
-      // Note: Other governance buildings (meeting_hall, watchtower, labor_guild, archive)
+      // Note: Other governance buildings (meeting-hall, watchtower, labor-guild, archive)
       // don't have dedicated components yet. They will be added in future phases.
     }
   }
@@ -401,8 +421,8 @@ export class BuildingSystem implements System {
     // Process all buildings
     for (const entity of entities) {
       const impl = entity as EntityImpl;
-      const building = impl.getComponent<BuildingComponent>('building');
-      const position = impl.getComponent<PositionComponent>('position');
+      const building = impl.getComponent<BuildingComponent>(CT.Building);
+      const position = impl.getComponent<PositionComponent>(CT.Position);
 
       if (!building) {
         throw new Error(`Entity ${entity.id} missing BuildingComponent in BuildingSystem`);
@@ -454,7 +474,7 @@ export class BuildingSystem implements System {
     }
 
     // Update building component
-    entity.updateComponent('building', (comp) => ({
+    entity.updateComponent(CT.Building, (comp) => ({
       ...comp,
       progress: newProgress,
       isComplete: newProgress >= 100,
@@ -470,6 +490,7 @@ export class BuildingSystem implements System {
           entityId: entity.id,
           buildingType: building.buildingType,
           position: { x: position.x, y: position.y },
+          builderId: building.ownerId, // Track which agent built this
         },
       });
     }
@@ -503,7 +524,7 @@ export class BuildingSystem implements System {
     const isNowEmpty = newFuel === 0;
 
     // Update building component
-    entity.updateComponent('building', (comp) => {
+    entity.updateComponent(CT.Building, (comp) => {
       const c = comp as BuildingComponent;
       return {
         ...c,
@@ -549,7 +570,7 @@ export class BuildingSystem implements System {
     position: { x: number; y: number }
   ): Entity | null {
     // Query all agents with inventory
-    const agents = world.query().with('agent').with('inventory').with('position').executeEntities();
+    const agents = world.query().with(CT.Agent).with(CT.Inventory).with(CT.Position).executeEntities();
 
     if (agents.length === 0) {
       return null;
@@ -629,7 +650,7 @@ export class BuildingSystem implements System {
     }
 
     // Update the agent's inventory component (this triggers re-render)
-    (agent as EntityImpl).updateComponent('inventory', (comp) => ({
+    (agent as EntityImpl).updateComponent(CT.Inventory, (comp) => ({
       ...comp,
       slots: [...inventory.slots],
     }));
@@ -649,8 +670,8 @@ export class BuildingSystem implements System {
 
     // Get all storage buildings with inventory (single query)
     const storageBuildings = world.query()
-      .with('building')
-      .with('inventory')
+      .with(CT.Building)
+      .with(CT.Inventory)
       .executeEntities();
 
     // Build resource availability map in single pass
@@ -665,7 +686,7 @@ export class BuildingSystem implements System {
 
       // Only count complete storage buildings
       if (!building?.isComplete) continue;
-      if (building.buildingType !== 'storage-chest' && building.buildingType !== 'storage-box') continue;
+      if (building.buildingType !== BT.StorageChest && building.buildingType !== BT.StorageBox) continue;
 
       if (inventory?.slots) {
         for (let slotIndex = 0; slotIndex < inventory.slots.length; slotIndex++) {
@@ -718,7 +739,7 @@ export class BuildingSystem implements System {
         }
 
         // Update the storage's inventory component
-        (source.storage as EntityImpl).updateComponent('inventory', (comp) => ({
+        (source.storage as EntityImpl).updateComponent(CT.Inventory, (comp) => ({
           ...comp,
           slots: [...inventory!.slots],
         }));

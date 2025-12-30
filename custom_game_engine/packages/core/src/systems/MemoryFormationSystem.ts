@@ -1,18 +1,76 @@
 import type { System } from '../ecs/System.js';
-import type { SystemId, ComponentType } from '../types.js';
+import type { SystemId, ComponentType, EntityId } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
+import type { GameEventMap } from '../events/EventMap.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 
-interface MemoryTriggerEvent {
+/**
+ * Base interface for memory trigger events - fields common to all events.
+ * These are metadata fields that can be attached to any event for memory formation.
+ */
+interface MemoryTriggerEventBase {
   agentId: string;
   emotionalIntensity?: number;
+  emotionalValence?: number;
+  surprise?: number;
   novelty?: number;
   socialSignificance?: number;
   survivalRelevance?: number;
   goalRelevance?: number;
-  [key: string]: any;
+  timestamp?: number;
+}
+
+/**
+ * Union type of all memory-triggering event data types.
+ * Uses actual types from GameEventMap where available.
+ */
+type MemoryTriggerEvent =
+  | (GameEventMap['agent:idle'] & Partial<MemoryTriggerEventBase>)
+  | (GameEventMap['agent:ate'] & Partial<MemoryTriggerEventBase>)
+  | (GameEventMap['conversation:started'] & Partial<MemoryTriggerEventBase>)
+  | (GameEventMap['conversation:ended'] & Partial<MemoryTriggerEventBase>)
+  | (GameEventMap['conversation:utterance'] & Partial<MemoryTriggerEventBase>)
+  | (GameEventMap['agent:harvested'] & Partial<MemoryTriggerEventBase>)
+  | (GameEventMap['resource:gathered'] & Partial<MemoryTriggerEventBase>)
+  | (GameEventMap['resource:depleted'] & Partial<MemoryTriggerEventBase>)
+  | (GameEventMap['construction:failed'] & Partial<MemoryTriggerEventBase>)
+  | (GameEventMap['construction:gathering_resources'] & Partial<MemoryTriggerEventBase>)
+  | (GameEventMap['agent:starved'] & Partial<MemoryTriggerEventBase>)
+  | (GameEventMap['agent:collapsed'] & Partial<MemoryTriggerEventBase>)
+  | (GameEventMap['agent:sleeping'] & Partial<MemoryTriggerEventBase>)
+  | (GameEventMap['agent:sleep_start'] & Partial<MemoryTriggerEventBase>)
+  | (GameEventMap['agent:woke'] & Partial<MemoryTriggerEventBase>)
+  | (GameEventMap['agent:dreamed'] & Partial<MemoryTriggerEventBase> & { dream?: { dreamNarrative?: string; memoryElements?: string[] } })
+  | (GameEventMap['information:shared'] & Partial<MemoryTriggerEventBase>)
+  // Custom events not yet in GameEventMap
+  | (MemoryTriggerEventBase & { eventType?: 'harvest:first'; cropType?: string })
+  | (MemoryTriggerEventBase & { eventType?: 'need:critical'; needType?: string })
+  | (MemoryTriggerEventBase & { eventType?: 'social:conflict'; otherId?: string })
+  | (MemoryTriggerEventBase & { eventType?: 'social:interaction'; otherId?: string })
+  | (MemoryTriggerEventBase & { eventType?: 'discovery:location' })
+  | (MemoryTriggerEventBase & { eventType?: 'event:novel' })
+  | (MemoryTriggerEventBase & { eventType?: 'goal:progress'; goalId?: string })
+  | (MemoryTriggerEventBase & { eventType?: 'action:walk' })
+  | (MemoryTriggerEventBase & { eventType?: 'agent:emotion_peak'; emotion?: string; intensity?: number })
+  | (MemoryTriggerEventBase & { eventType?: 'survival:close_call'; threat?: string })
+  | (MemoryTriggerEventBase & { eventType?: 'items:deposited' })
+  | (MemoryTriggerEventBase & { eventType?: 'inventory:full' })
+  | (MemoryTriggerEventBase & { eventType?: 'storage:full' })
+  | (MemoryTriggerEventBase & { eventType?: 'storage:not_found' })
+  | (MemoryTriggerEventBase & { eventType?: 'agent:sleep_end' })
+  | (MemoryTriggerEventBase & { eventType?: 'test:event'; summary?: string; importance?: number; timestamp?: number; participants?: EntityId[]; location?: { x: number; y: number } });
+
+interface PendingMemory {
+  eventType: string;
+  data: MemoryTriggerEvent;
+}
+
+interface PendingBroadcast {
+  eventType: string;
+  data: GameEventMap['construction:started'];
 }
 
 /**
@@ -24,9 +82,9 @@ export class MemoryFormationSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   private eventBus: EventBus;
-  private pendingMemories: Map<string, any[]> = new Map();
+  private pendingMemories: Map<string, PendingMemory[]> = new Map();
   private requiredAgents: Set<string> = new Set(); // Agents that MUST exist (not from conversation)
-  private pendingBroadcasts: any[] = []; // Events to broadcast to ALL agents
+  private pendingBroadcasts: PendingBroadcast[] = [];
   private pendingError: Error | null = null; // Store errors from event handlers to re-throw in update()
 
   constructor(eventBus: EventBus) {
@@ -35,129 +93,61 @@ export class MemoryFormationSystem implements System {
   }
 
   private _setupEventListeners(): void {
-    // Listen for memory-triggering events
-    // Note: This list is currently unused but kept for reference
-    // The actual event subscriptions are done in validEventTypes below
-    /*
-    const eventTypes = [
-      // Harvesting and resource gathering
-      'harvest:first',
-      'agent:harvested',
-      'resource:gathered',
-      'resource:depleted',
-
-      // Construction and building
-      'construction:failed',
-      'construction:gathering_resources',
-      // Note: building:complete removed - it's a system event without agentId
-      // Buildings complete passively over time, not due to specific agent actions
-
-      // Inventory and storage
-      'items:deposited',
-      'inventory:full',
-      'storage:full',
-      'storage:not_found',
-
-      // Social interactions
-      'social:conflict',
-      'social:interaction',
-      'conversation:utterance',
-      'conversation:started',
-      'information:shared',
-
-      // Needs and survival
-      'need:critical',
-      'agent:starved',
-      'agent:collapsed',
-      'survival:close_call',
-
-      // Sleep and rest
-      'agent:sleeping',
-      'agent:sleep_start',
-      'agent:sleep_end',
-      'agent:dreamed',
-
-      // Exploration and discovery
-      'discovery:location',
-      'event:novel',
-
-      // Goals and actions
-      'goal:progress',
-      'action:walk',
-      'agent:emotion_peak',
-
-      // Testing
-      'test:event',
-    ];
-    */
-
     // Subscribe to all events that can trigger memory formation
-    // This includes both GameEventMap events and test/dynamic events
-    const memoryEventTypes = [
-      // Core game events
+    // Events from GameEventMap
+    const gameEventTypes = [
       'agent:idle',
       'agent:ate',
       'conversation:started',
       'conversation:ended',
       'conversation:utterance',
-      'plant:stageChanged',
-      // Note: building:complete removed - it's a system event without agentId
-
-      // Harvesting and resource events
-      'harvest:first',
       'agent:harvested',
-      // 'resource:gathered' - removed (too spammy)
       'resource:depleted',
-
-      // Construction events
-      // 'construction:failed' - removed (can be spammy when repeatedly failing)
-      // 'construction:gathering_resources' - removed (too routine)
-
-      // Inventory and storage
-      'items:deposited',
-      // 'inventory:full' - removed (too spammy)
-      'storage:full',
-      'storage:not_found',
-
-      // Social interactions
-      'social:conflict',
-      'social:interaction',
+      'resource:gathered',
       'information:shared',
-
-      // Needs and survival
-      'need:critical',
       'agent:starved',
       'agent:collapsed',
-      'survival:close_call',
-
-      // Sleep and rest
       'agent:sleeping',
       'agent:sleep_start',
-      'agent:sleep_end',
+      'agent:woke',
       'agent:dreamed',
+    ] as const;
 
-      // Exploration and discovery
-      'discovery:location',
-      'event:novel',
-
-      // Goals and actions
-      'goal:progress',
-      'action:walk',
-      'agent:emotion_peak',
-
-      // Testing
-      'test:event',
-    ];
-
-    for (const eventType of memoryEventTypes) {
-      this.eventBus.subscribe(eventType as any, (event) => {
-        this._handleMemoryTrigger(eventType as any, event.data as MemoryTriggerEvent);
+    for (const eventType of gameEventTypes) {
+      this.eventBus.subscribe(eventType, (event) => {
+        this._handleMemoryTrigger(eventType, event.data as MemoryTriggerEvent);
       });
     }
 
-    // Subscribe to broadcast events - these create memories for ALL alive agents
+    // Custom events not yet in GameEventMap
+    // Using type assertion because these are runtime event types not in the compile-time GameEventMap
+    const customEventTypes = [
+      'harvest:first',
+      'items:deposited',
+      'storage:full',
+      'storage:not_found',
+      'social:conflict',
+      'social:interaction',
+      'need:critical',
+      'survival:close_call',
+      'agent:sleep_end',
+      'discovery:location',
+      'event:novel',
+      'goal:progress',
+      'action:walk',
+      'agent:emotion_peak',
+      'test:event',
+    ];
+
+    for (const eventType of customEventTypes) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (this.eventBus.subscribe as any)(eventType, (event: any) => {
+        this._handleMemoryTrigger(eventType, event.data as MemoryTriggerEvent);
+      });
+    }
+
+    // Subscribe to broadcast events
     this.eventBus.subscribe('construction:started', (event) => {
-      // Queue for broadcast processing during update()
       this.pendingBroadcasts.push({
         eventType: 'construction:started',
         data: event.data,
@@ -167,63 +157,133 @@ export class MemoryFormationSystem implements System {
 
   private _handleMemoryTrigger(eventType: string, data: MemoryTriggerEvent): void {
     try {
-      // Handle conversation events specially - create memories for both participants
+      // Handle conversation:utterance - create memories for both participants
+      if (eventType === 'conversation:utterance' && 'speaker' in data) {
+        const speakerId = data.speakerId ?? data.speaker;
+        const listenerId = data.listenerId;
+
+        if (!speakerId || !listenerId) {
+          throw new Error(
+            `Invalid conversation:utterance event - missing ${!speakerId ? 'speakerId' : 'listenerId'}. ` +
+            `Event: conversationId=${'conversationId' in data ? data.conversationId : 'unknown'}, ` +
+            `data=${JSON.stringify(data)}`
+          );
+        }
+
+        const participants = [speakerId, listenerId];
+        for (const agentId of participants) {
+          if (!this.pendingMemories.has(agentId)) {
+            this.pendingMemories.set(agentId, []);
+          }
+          this.pendingMemories.get(agentId)!.push({
+            eventType,
+            data: { ...data, agentId },
+          });
+        }
+        return;
+      }
+
+      // Handle conversation:started - requires participants array
+      if (eventType === 'conversation:started') {
+        const participants = (data as any).participants;
+        if (!participants || !Array.isArray(participants) || participants.length < 2) {
+          throw new Error(
+            `Invalid conversation:started event - ${!participants ? 'missing participants array' : `only ${participants.length} participant(s), need at least 2`}. ` +
+            `data=${JSON.stringify(data)}`
+          );
+        }
+
+        for (const agentId of participants) {
+          if (!this.pendingMemories.has(agentId)) {
+            this.pendingMemories.set(agentId, []);
+          }
+          this.pendingMemories.get(agentId)!.push({
+            eventType,
+            data: { ...data, agentId },
+          });
+        }
+        return;
+      }
+
+      // Handle conversation:ended - requires participants array
+      if (eventType === 'conversation:ended') {
+        const participants = (data as any).participants;
+        if (!participants || !Array.isArray(participants) || participants.length < 2) {
+          throw new Error(
+            `Invalid conversation:ended event - ${!participants ? 'missing participants array' : `only ${participants.length} participant(s), need at least 2`}. ` +
+            `data=${JSON.stringify(data)}`
+          );
+        }
+
+        for (const agentId of participants) {
+          if (!this.pendingMemories.has(agentId)) {
+            this.pendingMemories.set(agentId, []);
+          }
+          this.pendingMemories.get(agentId)!.push({
+            eventType,
+            data: { ...data, agentId },
+          });
+        }
+        return;
+      }
+
+      // Handle conversation:utterance - requires both speakerId and listenerId
       if (eventType === 'conversation:utterance') {
-        const convData = data as any;
-        if (!convData.speakerId || !convData.listenerId) {
-          throw new Error(`Invalid conversation:utterance event - missing ${!convData.speakerId ? 'speakerId' : 'listenerId'}. Event: conversationId=${convData.conversationId || 'unknown'}, data=${JSON.stringify(data)}`);
+        const speakerId = (data as any).speakerId;
+        const listenerId = (data as any).listenerId;
+
+        // Per CLAUDE.md: validate both are present, throw if not
+        if (!speakerId) {
+          throw new Error(
+            `conversation:utterance event missing required speakerId. ` +
+            `Event data: ${JSON.stringify(data)}`
+          );
+        }
+        if (!listenerId) {
+          throw new Error(
+            `conversation:utterance event missing required listenerId. ` +
+            `Event data: ${JSON.stringify(data)}`
+          );
         }
 
-      // Queue for both participants
-      // Note: Validation of entity existence happens later in update()
-      const participants = [convData.speakerId, convData.listenerId];
-      for (const agentId of participants) {
-        if (!this.pendingMemories.has(agentId)) {
-          this.pendingMemories.set(agentId, []);
+        // Create memory for speaker
+        if (!this.pendingMemories.has(speakerId)) {
+          this.pendingMemories.set(speakerId, []);
         }
-        this.pendingMemories.get(agentId)!.push({
+        this.pendingMemories.get(speakerId)!.push({
           eventType,
-          data: { ...data, agentId },
+          data: { ...data, agentId: speakerId },
         });
-      }
-      return;
-    }
 
-    // Handle conversation:started specially - uses participants array instead of agentId
-    if (eventType === 'conversation:started') {
-      const convData = data as any;
-      const participants = convData.participants as string[] | undefined;
-      if (!participants || participants.length < 2) {
-        throw new Error(`Invalid conversation:started event - ${!participants ? 'missing participants array' : `only ${participants.length} participant(s), need at least 2`}. Event: conversationId=${convData.conversationId || 'unknown'}, data=${JSON.stringify(data)}`);
-      }
-
-      // Queue memory for all participants
-      for (const agentId of participants) {
-        if (!this.pendingMemories.has(agentId)) {
-          this.pendingMemories.set(agentId, []);
+        // Create memory for listener
+        if (!this.pendingMemories.has(listenerId)) {
+          this.pendingMemories.set(listenerId, []);
         }
-        this.pendingMemories.get(agentId)!.push({
+        this.pendingMemories.get(listenerId)!.push({
           eventType,
-          data: { ...data, agentId },
+          data: { ...data, agentId: listenerId },
         });
+        return;
       }
-      return;
-    }
 
-    // Standard events require agentId
-    if (!data.agentId) {
-      throw new Error(`Event ${eventType} missing required agentId. This is a programming error - the system emitting '${eventType}' events must include agentId in the event data. Event data: ${JSON.stringify(data)}`);
-    }
+      // Standard events require agentId
+      if (!('agentId' in data) || !data.agentId) {
+        throw new Error(
+          `Event ${eventType} missing required agentId. ` +
+          `This is a programming error - the system emitting '${eventType}' events must include agentId in the event data. ` +
+          `Event data: ${JSON.stringify(data)}`
+        );
+      }
 
-    // Queue memory for formation during update
-    if (!this.pendingMemories.has(data.agentId)) {
-      this.pendingMemories.set(data.agentId, []);
-    }
+      // Queue memory for formation during update
+      if (!this.pendingMemories.has(data.agentId)) {
+        this.pendingMemories.set(data.agentId, []);
+      }
 
-    this.pendingMemories.get(data.agentId)!.push({
-      eventType,
-      data,
-    });
+      this.pendingMemories.get(data.agentId)!.push({
+        eventType,
+        data,
+      });
 
       // Mark this agent as required (direct event, not from conversation)
       this.requiredAgents.add(data.agentId);
@@ -234,7 +294,7 @@ export class MemoryFormationSystem implements System {
   }
 
   update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    // Flush event bus first to process any queued events (which may add to pendingMemories)
+    // Flush event bus first to process any queued events
     this.eventBus.flush();
 
     // Re-throw any errors that occurred in event handlers
@@ -252,22 +312,16 @@ export class MemoryFormationSystem implements System {
 
       if (!entity) {
         if (isRequired) {
-          // Direct event for nonexistent agent - programming error
           this.pendingMemories.clear();
           this.requiredAgents.clear();
           throw new Error(`Agent not found: ${agentId}`);
         }
-        // Conversation participant doesn't exist - skip gracefully
         continue;
       }
 
-      const memComp = entity.components.get('episodic_memory') as EpisodicMemoryComponent | undefined;
+      const memComp = entity.components.get(CT.EpisodicMemory) as EpisodicMemoryComponent | undefined;
       if (!memComp) {
-        // Entity exists but doesn't track memories - log components and throw error
         const componentTypes = Array.from(entity.components.keys());
-        console.error(`[MemoryFormation] Agent ${agentId} missing EpisodicMemoryComponent`);
-        console.error(`[MemoryFormation] Agent has components:`, componentTypes);
-        console.error(`[MemoryFormation] Event that triggered memory formation:`, this.pendingMemories.get(agentId));
         this.pendingMemories.clear();
         this.requiredAgents.clear();
         throw new Error(`Agent ${agentId} missing EpisodicMemoryComponent. Has: ${componentTypes.join(', ')}`);
@@ -275,138 +329,113 @@ export class MemoryFormationSystem implements System {
 
       const memories = this.pendingMemories.get(agentId)!;
       for (const { eventType, data } of memories) {
-        // Determine if event is significant enough to form memory
         if (this._shouldFormMemory(eventType, data)) {
           this._formMemory(memComp, eventType, data, world);
         }
       }
     }
 
-    // Clear pending memories and required agents
     this.pendingMemories.clear();
     this.requiredAgents.clear();
 
-    // Process broadcast events - create memories for ALL alive agents
     this._processBroadcasts(world);
-
-    // Flush events emitted during memory formation (memory:formed events)
     this.eventBus.flush();
   }
 
-  /**
-   * Process broadcast events that should create memories for ALL alive agents.
-   * Used for significant world events like construction starting.
-   */
   private _processBroadcasts(world: World): void {
     if (this.pendingBroadcasts.length === 0) {
       return;
     }
 
-    // Get all agents with episodic memory
-    const agents = world.query().with('agent').with('episodic_memory').executeEntities();
+    const agents = world.query().with(CT.Agent).with(CT.EpisodicMemory).executeEntities();
 
     for (const broadcast of this.pendingBroadcasts) {
       const { eventType, data } = broadcast;
-
-      // Generate summary for this broadcast event (pass world for name lookups)
       const summary = this._generateBroadcastSummary(eventType, data, world);
 
       for (const agent of agents) {
-        const memComp = agent.components.get('episodic_memory') as EpisodicMemoryComponent | undefined;
+        const memComp = agent.components.get(CT.EpisodicMemory) as EpisodicMemoryComponent | undefined;
         if (!memComp) continue;
 
-        // Create memory for this agent
         memComp.formMemory({
           eventType,
           summary,
           timestamp: Date.now(),
           location: data.position,
           emotionalIntensity: 0.3,
-          emotionalValence: 0.2, // Slightly positive - new construction
+          emotionalValence: 0.2,
           surprise: 0.4,
           novelty: 0.5,
-          socialSignificance: 0.6, // Building is a community event
+          socialSignificance: 0.6,
           participants: data.builderId ? [data.builderId] : undefined,
         });
       }
     }
 
-    // Clear processed broadcasts
     this.pendingBroadcasts = [];
   }
 
-  /**
-   * Generate summary for broadcast events.
-   */
-  private _generateBroadcastSummary(eventType: string, data: any, world?: World): string {
-    switch (eventType) {
-      case 'construction:started': {
-        const buildingType = data.buildingType || 'building';
-        const builderId = data.builderId;
-        if (builderId && world) {
-          // Try to get builder's name
-          const builderEntity = world.getEntity(builderId);
-          if (builderEntity) {
-            const identity = builderEntity.components.get('identity') as { name?: string } | undefined;
-            const builderName = identity?.name || builderId;
-            return `${builderName} started building a ${buildingType}`;
-          }
+  private _generateBroadcastSummary(eventType: string, data: GameEventMap['construction:started'], world?: World): string {
+    if (eventType === 'construction:started') {
+      const buildingType = data.buildingType || CT.Building;
+      const builderId = data.builderId;
+
+      if (builderId && world) {
+        const builderEntity = world.getEntity(builderId);
+        if (builderEntity) {
+          const identity = builderEntity.components.get(CT.Identity) as { name?: string } | undefined;
+          const builderName = identity?.name || builderId;
+          return `${builderName} started building a ${buildingType}`;
         }
-        if (builderId) {
-          return `${builderId} started building a ${buildingType}`;
-        }
-        return `Construction started on a ${buildingType}`;
       }
-      default:
-        return `World event: ${eventType}`;
+
+      if (builderId) {
+        return `${builderId} started building a ${buildingType}`;
+      }
+      return `Construction started on a ${buildingType}`;
     }
+
+    return `World event: ${eventType}`;
   }
 
   private _shouldFormMemory(eventType: string, data: MemoryTriggerEvent): boolean {
-    // Conversation memories are ALWAYS formed (per spec)
     if (eventType === 'conversation:utterance') {
       return true;
     }
 
-    // Dreams: remember if they contained significant memories OR randomly for trivial dreams
-    if (eventType === 'agent:dreamed') {
-      const dreamData = data as any;
-      const dream = dreamData.dream;
+    // Dreams: remember if significant or with small random chance
+    if (eventType === 'agent:dreamed' && 'dream' in data && data.dream) {
+      const dream = data.dream;
 
-      if (dream && dream.memoryElements && dream.memoryElements.length > 0) {
-        // Check if dream contained significant events (mentioned in memory summaries)
+      if (dream.memoryElements && dream.memoryElements.length > 0) {
         const significantKeywords = [
           'conflict', 'starv', 'collapsed', 'critical', 'died', 'danger',
           'love', 'hate', 'joy', 'fear', 'anger', 'discovered', 'built',
           'failed', 'succeed'
         ];
 
-        const hasSignificantMemory = dream.memoryElements.some((element: string) =>
-          significantKeywords.some(keyword =>
+        const hasSignificantMemory = dream.memoryElements.some((element) =>
+          significantKeywords.some((keyword) =>
             element.toLowerCase().includes(keyword)
           )
         );
 
         if (hasSignificantMemory) {
-          return true; // Always remember intense dreams
+          return true;
         }
       }
 
-      // 0.1% chance to remember trivial dreams (roughly 1 in 1000, based on real memory rates)
       return Math.random() < 0.001;
     }
 
-    // Always form memories for significant game events
+    // Always remember these events
     const alwaysRememberEvents = [
       'need:critical',
       'agent:starved',
       'agent:collapsed',
       'agent:harvested',
-      // 'resource:gathered' - removed (too spammy)
-      // Note: building:complete removed - it's a system event without agentId
-      // 'construction:failed' - removed (can be spammy when repeatedly failing)
+      'resource:gathered',
       'items:deposited',
-      // 'inventory:full' - removed (too spammy)
       'storage:full',
       'conversation:started',
       'information:shared',
@@ -418,28 +447,30 @@ export class MemoryFormationSystem implements System {
       return true;
     }
 
-    // Check if event meets threshold for memory formation
-    // For agent:emotion_peak, map 'intensity' to 'emotionalIntensity'
-    const emotionalIntensity = data.emotionalIntensity ?? (data as any).intensity ?? 0;
+    // Check significance thresholds
+    const emotionalIntensity =
+      data.emotionalIntensity ??
+      ('intensity' in data ? data.intensity : 0) ?? 0;
     const novelty = data.novelty ?? 0;
     const socialSignificance = data.socialSignificance ?? 0;
     const survivalRelevance = data.survivalRelevance ?? 0;
     const goalRelevance = data.goalRelevance ?? 0;
 
-    // Trivial events don't form memories
+    // Skip trivial walk events
     if (eventType === 'action:walk' && emotionalIntensity < 0.1) {
       return false;
     }
 
-    // Check thresholds
     if (emotionalIntensity > 0.6) return true;
     if (novelty > 0.7) return true;
     if (socialSignificance > 0.5) return true;
     if (survivalRelevance > 0.5) return true;
     if (goalRelevance > 0.7) return true;
 
-    // High importance events
-    if ((data as any).importance > 0.5) return true;
+    // Check importance field (test events)
+    if ('importance' in data && data.importance && data.importance > 0.5) {
+      return true;
+    }
 
     return false;
   }
@@ -450,50 +481,55 @@ export class MemoryFormationSystem implements System {
     data: MemoryTriggerEvent,
     world: World
   ): void {
-    // Generate summary from event data
     const summary = this._generateSummary(eventType, data);
 
-    // Log memory formation for debugging
-
     // Handle conversation memories
-    if (eventType === 'conversation:utterance') {
-      const convData = data as any;
+    if (eventType === 'conversation:utterance' && 'message' in data && 'agentId' in data) {
+      const speakerId = 'speakerId' in data ? data.speakerId : ('speaker' in data ? data.speaker : undefined);
+      const listenerId = 'listenerId' in data ? data.listenerId : undefined;
 
-      // Resolve speaker name from identity component instead of using UUID
-      let speakerName = convData.speakerId;
-      if (convData.speakerId !== data.agentId) {
-        const speakerEntity = world.getEntity(convData.speakerId);
+      // Resolve speaker name
+      let speakerName = speakerId || 'unknown';
+      if (speakerId && speakerId !== data.agentId) {
+        const speakerEntity = world.getEntity(speakerId);
         if (speakerEntity) {
-          const identity = speakerEntity.components.get('identity') as { name?: string } | undefined;
-          speakerName = identity?.name || convData.speakerId;
+          const identity = speakerEntity.components.get(CT.Identity) as { name?: string } | undefined;
+          speakerName = identity?.name || speakerId;
         }
       }
 
+      const conversationId = 'conversationId' in data ? data.conversationId : undefined;
+
       memComp.formMemory({
         eventType,
-        summary: convData.speakerId === data.agentId
-          ? `I said: ${convData.message}`
-          : `${speakerName} said: ${convData.message}`,
-        timestamp: convData.timestamp ?? Date.now(),
-        // Conversations are socially significant - higher base importance
+        summary: speakerId === data.agentId
+          ? `I said: ${data.message}`
+          : `${speakerName} said: ${data.message}`,
+        timestamp: Date.now(),
         emotionalIntensity: data.emotionalIntensity ?? 0.5,
-        emotionalValence: data.emotionalValence ?? 0.1, // Slightly positive by default
+        emotionalValence: data.emotionalValence ?? 0.1,
         surprise: data.surprise ?? 0,
-        socialSignificance: data.socialSignificance ?? 0.6, // Conversations are socially important
-        dialogueText: convData.message,
-        conversationId: convData.conversationId,
-        participants: [convData.speakerId, convData.listenerId].filter(
-          (id) => id !== data.agentId
+        socialSignificance: data.socialSignificance ?? 0.6,
+        dialogueText: data.message,
+        conversationId,
+        participants: [speakerId, listenerId].filter((id): id is string =>
+          id !== undefined && id !== data.agentId
         ),
       });
     } else {
       // Standard memory
-      // For agent:emotion_peak, map 'intensity' to 'emotionalIntensity'
-      const emotionalIntensity = data.emotionalIntensity ?? (data as any).intensity ?? 0;
+      const emotionalIntensity =
+        data.emotionalIntensity ??
+        ('intensity' in data ? data.intensity : undefined) ?? 0;
+
+      const timestamp = 'timestamp' in data && data.timestamp ? data.timestamp : Date.now();
+      const participants = 'participants' in data ? data.participants : undefined;
+      const location = 'location' in data ? data.location : undefined;
+
       memComp.formMemory({
         eventType,
         summary,
-        timestamp: (data as any).timestamp ?? Date.now(),
+        timestamp,
         emotionalIntensity,
         emotionalValence: data.emotionalValence ?? 0,
         surprise: data.surprise ?? 0,
@@ -501,29 +537,30 @@ export class MemoryFormationSystem implements System {
         goalRelevance: data.goalRelevance,
         socialSignificance: data.socialSignificance,
         survivalRelevance: data.survivalRelevance,
-        participants: (data as any).participants,
-        location: (data as any).location,
+        participants,
+        location,
       });
     }
 
-    // Calculate importance
+    // Calculate and emit memory:formed event
     const importance = Math.max(
       data.emotionalIntensity ?? 0,
       data.novelty ?? 0,
       data.socialSignificance ?? 0,
       data.survivalRelevance ?? 0,
       data.goalRelevance ?? 0,
-      (data as any).importance ?? 0
+      ('importance' in data && data.importance) ? data.importance : 0
     );
 
-    // Emit memory:formed event
+    const agentId = 'agentId' in data && typeof data.agentId === 'string' ? data.agentId : '';
+
     this.eventBus.emit({
       type: 'memory:formed',
       source: 'memory_formation',
       data: {
-        agentId: data.agentId,
+        agentId,
         memoryType: 'episodic',
-        content: this._generateSummary(eventType, data),
+        content: summary,
         importance,
         eventType,
       },
@@ -531,91 +568,106 @@ export class MemoryFormationSystem implements System {
   }
 
   private _generateSummary(eventType: string, data: MemoryTriggerEvent): string {
-    // Generate human-readable summary based on event type
     switch (eventType) {
-      // Harvesting
       case 'harvest:first':
-        return `Harvested first ${(data as any).cropType || 'crop'}`;
+        return `Harvested first ${'cropType' in data && data.cropType ? data.cropType : 'crop'}`;
+
       case 'agent:harvested':
-        return `Harvested ${(data as any).quantity || ''} ${(data as any).resourceType || 'resource'}`;
-      case 'resource:gathered':
-        return `Gathered ${(data as any).amount || ''} ${(data as any).resourceType || 'resource'}`;
-      case 'resource:depleted':
-        return `Resource depleted: ${(data as any).resourceType || 'resource'}`;
-
-      // Construction
-      case 'construction:failed':
-        return `Failed to build ${(data as any).buildingType || 'building'}: ${(data as any).reason || 'unknown reason'}`;
-      case 'construction:gathering_resources':
-        return `Gathering resources to build ${(data as any).buildingType || 'building'}`;
-      // Note: building:complete removed - it's a system event without agentId
-
-      // Inventory
-      case 'items:deposited':
-        return `Deposited items into storage`;
-      case 'inventory:full':
-        return `My inventory is full`;
-      case 'storage:full':
-        return `Storage is full, couldn't deposit items`;
-      case 'storage:not_found':
-        return `Couldn't find any storage`;
-
-      // Social
-      case 'social:conflict':
-        return `Had a conflict with ${(data as any).otherId || 'someone'}`;
-      case 'social:interaction':
-        return `Interacted with ${(data as any).otherId || 'someone'}`;
-      case 'conversation:started':
-        return `Started conversation with ${(data as any).participants?.join(', ') || 'someone'}`;
-      case 'information:shared':
-        return `Shared information about ${(data as any).topic || 'something'}`;
-
-      // Needs
-      case 'need:critical':
-        return `My ${(data as any).needType || 'need'} became critically low`;
-      case 'agent:starved':
-        return `I'm starving and exhausted`;
-      case 'agent:collapsed':
-        return `I collapsed from exhaustion`;
-
-      // Sleep
-      case 'agent:sleeping':
-        return `Went to sleep to rest`;
-      case 'agent:sleep_start':
-        return `Started sleeping`;
-      case 'agent:sleep_end':
-        return `Woke up from sleep`;
-      case 'agent:dreamed': {
-        const dreamData = data as any;
-        const dream = dreamData.dream;
-        if (dream && dream.dreamNarrative) {
-          return dream.dreamNarrative;
+        if ('harvested' in data && data.harvested) {
+          const items = data.harvested.map(h => `${h.amount} ${h.itemId}`).join(', ');
+          return `Harvested ${items}`;
         }
-        return `Had a strange dream`;
-      }
+        if ('resourceType' in data && 'amount' in data) {
+          return `Harvested ${data.amount} ${data.resourceType}`;
+        }
+        if ('resourceType' in data) {
+          return `Harvested ${data.resourceType}`;
+        }
+        return 'Harvested crops';
 
-      // Discovery
+      case 'resource:gathered':
+        if ('resourceType' in data && 'amount' in data) {
+          return `Gathered ${data.amount} ${data.resourceType}`;
+        }
+        if ('resourceType' in data) {
+          return `Gathered ${data.resourceType}`;
+        }
+        return 'Gathered resources';
+
+      case 'resource:depleted':
+        return `Resource depleted: ${'resourceType' in data && data.resourceType ? data.resourceType : CT.Resource}`;
+
+      case 'construction:failed':
+        if ('buildingId' in data) {
+          const reason = 'reason' in data ? data.reason : 'unknown reason';
+          return `Failed to build: ${reason}`;
+        }
+        return 'Construction failed';
+
+      case 'construction:gathering_resources':
+        return 'Gathering resources for construction';
+
+      case 'items:deposited':
+        return 'Deposited items into storage';
+      case 'inventory:full':
+        return 'My inventory is full';
+      case 'storage:full':
+        return 'Storage is full, couldn\'t deposit items';
+      case 'storage:not_found':
+        return 'Couldn\'t find any storage';
+
+      case 'social:conflict':
+        return `Had a conflict with ${'otherId' in data && data.otherId ? data.otherId : 'someone'}`;
+      case 'social:interaction':
+        return `Interacted with ${'otherId' in data && data.otherId ? data.otherId : 'someone'}`;
+
+      case 'conversation:started':
+        if ('participants' in data && data.participants) {
+          return `Started conversation with ${data.participants.join(', ')}`;
+        }
+        return 'Started a conversation';
+
+      case 'information:shared':
+        return `Shared information about ${'informationType' in data ? data.informationType : 'something'}`;
+
+      case 'need:critical':
+        return `My ${'needType' in data && data.needType ? data.needType : 'need'} became critically low`;
+      case 'agent:starved':
+        return 'I\'m starving and exhausted';
+      case 'agent:collapsed':
+        return 'I collapsed from exhaustion';
+
+      case 'agent:sleeping':
+        return 'Went to sleep to rest';
+      case 'agent:sleep_start':
+        return 'Started sleeping';
+      case 'agent:sleep_end':
+        return 'Woke up from sleep';
+
+      case 'agent:dreamed':
+        if ('dream' in data && data.dream?.dreamNarrative) {
+          return data.dream.dreamNarrative;
+        }
+        return 'Had a strange dream';
+
       case 'discovery:location':
-        return `Discovered a new location`;
+        return 'Discovered a new location';
       case 'event:novel':
-        return `Experienced something completely new`;
+        return 'Experienced something completely new';
 
-      // Goals
       case 'goal:progress':
-        return `Made progress on ${(data as any).goalId || 'goal'}`;
+        return `Made progress on ${'goalId' in data && data.goalId ? data.goalId : 'goal'}`;
       case 'agent:emotion_peak':
-        return `Felt strong ${(data as any).emotion || 'emotion'}`;
+        return `Felt strong ${'emotion' in data && data.emotion ? data.emotion : 'emotion'}`;
 
-      // Survival
       case 'survival:close_call':
-        return `Close call with ${(data as any).threat || 'danger'}`;
+        return `Close call with ${'threat' in data && data.threat ? data.threat : 'danger'}`;
 
-      // Testing
       case 'test:event':
-        return (data as any).summary || 'Test event';
+        return ('summary' in data && data.summary) ? data.summary : 'Test event';
 
       default:
-        return (data as any).summary || `Experienced ${eventType}`;
+        return ('summary' in data && data.summary) ? data.summary : `Experienced ${eventType}`;
     }
   }
 }

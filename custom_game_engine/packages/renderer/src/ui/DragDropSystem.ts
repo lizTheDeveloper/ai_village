@@ -1,4 +1,4 @@
-import type { InventoryComponent } from '@ai-village/core';
+import type { InventoryComponent, InventorySlot } from '@ai-village/core';
 import { itemRegistry } from '@ai-village/core';
 
 export type SlotType = 'backpack' | 'equipment' | 'container' | 'quickbar';
@@ -278,7 +278,7 @@ export class DragDropSystem {
     // Create a copy of inventory for immutable update
     const updatedInventory: InventoryComponent = {
       ...inventory,
-      slots: inventory.slots.map((s) => ({ ...s })),
+      slots: inventory.slots.map((s: InventorySlot) => ({ ...s })),
     };
 
     // Handle equipment slot drops
@@ -318,8 +318,12 @@ export class DragDropSystem {
 
   /**
    * Drop item to world (outside inventory)
+   * @param x - World x coordinate
+   * @param y - World y coordinate
+   * @param inventory - The source inventory (required for immediate drops)
+   * @returns true if confirmation dialog is needed (valuable item), false if dropped immediately
    */
-  public dropToWorld(x: number, y: number): boolean {
+  public dropToWorld(x: number, y: number, inventory: InventoryComponent): boolean {
     if (!this.dragState.isDragging || !this.dragState.item) {
       return false;
     }
@@ -333,20 +337,23 @@ export class DragDropSystem {
       return true;
     }
 
-    // Drop immediately
-    this.confirmDrop();
+    // Drop immediately - non-valuable items don't need confirmation
+    this.pendingDrop = { position: { x, y } };
+    this.confirmDrop(inventory);
     return false;
   }
 
   /**
    * Confirm drop to world
+   * @param inventory - The source inventory to update after dropping
    */
-  public confirmDrop(): DropResult | null {
+  public confirmDrop(inventory: InventoryComponent): DropResult | null {
     if (!this.dragState.item || !this.dragState.sourceSlot) {
       return null;
     }
 
     const item = this.dragState.item;
+    const sourceSlot = this.dragState.sourceSlot;
 
     // Emit drop event
     if (this.eventEmitter) {
@@ -357,21 +364,27 @@ export class DragDropSystem {
       });
     }
 
-    // Remove from source - create dummy inventory for result
-    const dummyInventory: InventoryComponent = {
-      type: 'inventory',
-      version: 1,
-      slots: [{ itemId: null, quantity: 0 }],
-      maxSlots: 1,
-      maxWeight: 0,
-      currentWeight: 0,
+    // Create updated inventory with the source slot cleared
+    const updatedInventory: InventoryComponent = {
+      ...inventory,
+      slots: inventory.slots.map((slot: InventorySlot, index: number) => {
+        // Clear the source slot
+        if (sourceSlot.type === 'backpack' && sourceSlot.index === index) {
+          const newQuantity = slot.quantity - item.quantity;
+          if (newQuantity <= 0) {
+            return { ...slot, itemId: null, quantity: 0 };
+          }
+          return { ...slot, quantity: newQuantity };
+        }
+        return { ...slot };
+      }),
     };
 
     this.cancel();
 
     return {
       success: true,
-      updatedInventory: dummyInventory,
+      updatedInventory,
     };
   }
 
@@ -585,7 +598,7 @@ export class DragDropSystem {
     const currentlyEquipped = this.equippedItems[slotName];
     if (currentlyEquipped) {
       // Find empty backpack slot
-      const emptySlotIndex = inventory.slots.findIndex((s) => !s.itemId || s.quantity === 0);
+      const emptySlotIndex = inventory.slots.findIndex((s: InventorySlot) => !s.itemId || s.quantity === 0);
       if (emptySlotIndex === -1) {
         return { success: false, updatedInventory: inventory, error: 'No space in backpack' };
       }

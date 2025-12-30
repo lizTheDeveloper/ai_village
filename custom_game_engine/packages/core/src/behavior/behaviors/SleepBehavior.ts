@@ -15,6 +15,8 @@ import type { CircadianComponent } from '../../components/CircadianComponent.js'
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { getCircadian, getBuilding, getPosition, getNeeds } from '../../utils/componentHelpers.js';
 import { safeUpdateComponent } from '../../utils/componentUtils.js';
+import { ComponentType } from '../../types/ComponentType.js';
+import { BuildingType } from '../../types/BuildingType.js';
 
 /**
  * SeekSleepBehavior - Find a bed/bedroll and go to sleep
@@ -26,7 +28,7 @@ export class SeekSleepBehavior extends BaseBehavior {
     // Disable steering system
     this.disableSteering(entity);
 
-    const position = entity.getComponent<PositionComponent>('position');
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     const circadian = getCircadian(entity);
 
     if (!position) {
@@ -49,7 +51,7 @@ export class SeekSleepBehavior extends BaseBehavior {
     const sleepLocation = this.findNearestBed(world, position);
 
     if (sleepLocation) {
-      const bedPos = (sleepLocation as EntityImpl).getComponent<PositionComponent>('position')!;
+      const bedPos = (sleepLocation as EntityImpl).getComponent<PositionComponent>(ComponentType.Position)!;
 
       // Move toward bed (with arrival slowdown)
       const distance = this.moveToward(entity, bedPos);
@@ -68,7 +70,7 @@ export class SeekSleepBehavior extends BaseBehavior {
   }
 
   private findNearestBed(world: World, position: PositionComponent): Entity | null {
-    const beds = world.query().with('building').with('position').executeEntities();
+    const beds = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
     let nearest: Entity | null = null;
     let nearestDist = Infinity;
 
@@ -78,7 +80,7 @@ export class SeekSleepBehavior extends BaseBehavior {
 
       if (!building || !bedPos) continue;
 
-      if (building.buildingType === 'bed' || building.buildingType === 'bedroll') {
+      if (building.buildingType === BuildingType.Bed || building.buildingType === BuildingType.Bedroll) {
         const dist = this.distance(position, bedPos);
         if (dist < nearestDist) {
           nearestDist = dist;
@@ -91,11 +93,11 @@ export class SeekSleepBehavior extends BaseBehavior {
   }
 
   private startSleeping(entity: EntityImpl, world: World, location: Entity | null): void {
-    const position = entity.getComponent<PositionComponent>('position')!;
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
     const quality = this.calculateSleepQuality(location);
 
     // Update circadian component (preserve class methods)
-    safeUpdateComponent<CircadianComponent>(entity, 'circadian', () => ({
+    safeUpdateComponent<CircadianComponent>(entity, ComponentType.Circadian, () => ({
       isSleeping: true,
       sleepStartTime: world.tick,
       sleepLocation: location,
@@ -135,9 +137,9 @@ export class SeekSleepBehavior extends BaseBehavior {
     if (location) {
       const building = getBuilding(location);
       if (building) {
-        if (building.buildingType === 'bed') {
+        if (building.buildingType === BuildingType.Bed) {
           quality += 0.4; // Bed: 0.9 total
-        } else if (building.buildingType === 'bedroll') {
+        } else if (building.buildingType === BuildingType.Bedroll) {
           quality += 0.2; // Bedroll: 0.7 total
         } else {
           quality += 0.1; // Other building: 0.6 total
@@ -173,7 +175,7 @@ export class ForcedSleepBehavior extends BaseBehavior {
       const quality = 0.5; // Poor quality when collapsed
 
       // Update circadian (preserve class methods)
-      safeUpdateComponent<CircadianComponent>(entity, 'circadian', () => ({
+      safeUpdateComponent<CircadianComponent>(entity, ComponentType.Circadian, () => ({
         isSleeping: true,
         sleepStartTime: world.tick,
         sleepLocation: null,
@@ -210,16 +212,17 @@ export class ForcedSleepBehavior extends BaseBehavior {
       const hoursAsleep = circadian.sleepDurationHours;
 
       // Wake conditions (same as SleepSystem.shouldWake):
+      // NeedsComponent uses 0-1 scale (1.0 = 100%, 0.7 = 70%, etc.)
       // 1. Energy fully restored
-      const energyFull = needs.energy >= 100;
+      const energyFull = needs.energy >= 1.0;
       // 2. Urgent hunger
-      const urgentNeed = needs.hunger < 10;
+      const urgentNeed = needs.hunger < 0.1;
       // 3. Well rested with depleted sleep drive
-      const wellRestedAndSatisfied = needs.energy >= 70 && circadian.sleepDrive < 10;
+      const wellRestedAndSatisfied = needs.energy >= 0.7 && circadian.sleepDrive < 10;
       // 4. Maximum sleep duration (12 hours)
       const maxSleepReached = hoursAsleep >= 12;
       // 5. Minimum 4 hours passed with reasonable energy
-      const minimumMetWithEnergy = hoursAsleep >= 4 && needs.energy >= 50;
+      const minimumMetWithEnergy = hoursAsleep >= 4 && needs.energy >= 0.5;
 
       if (energyFull || urgentNeed || wellRestedAndSatisfied || maxSleepReached || minimumMetWithEnergy) {
         // Signal completion - SleepSystem will handle the actual wake transition

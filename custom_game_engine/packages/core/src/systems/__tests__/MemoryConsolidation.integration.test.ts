@@ -4,10 +4,12 @@ import { createDawnWorld } from '../../__tests__/fixtures/worldFixtures.js';
 import { MemoryConsolidationSystem } from '../MemoryConsolidationSystem.js';
 import { SleepSystem } from '../SleepSystem.js';
 import { MemorySystem } from '../MemorySystem.js';
-import { createMemoryComponent } from '../../components/MemoryComponent.js';
+import { MemoryComponent } from '../../components/MemoryComponent.js';
+import { SpatialMemoryComponent } from '../../components/SpatialMemoryComponent.js';
 import { createCircadianComponent } from '../../components/CircadianComponent.js';
-import { createNeedsComponent } from '../../components/NeedsComponent.js';
+import { NeedsComponent } from '../../components/NeedsComponent.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 /**
  * Integration tests for MemoryConsolidationSystem + SleepSystem + MemorySystem
  *
@@ -40,7 +42,7 @@ describe('MemoryConsolidationSystem + SleepSystem + MemorySystem Integration', (
     (circadian as any).isSleeping = true;
     agent.addComponent(circadian);
 
-    agent.addComponent(createMemoryComponent());
+    agent.addComponent(new MemoryComponent(agent.id));
 
     const entities = Array.from(harness.world.entities.values());
 
@@ -63,28 +65,34 @@ describe('MemoryConsolidationSystem + SleepSystem + MemorySystem Integration', (
     (circadian as any).isSleeping = true;
     agent.addComponent(circadian);
 
-    agent.addComponent(createNeedsComponent(100, 50, 100, 100, 100));
-    agent.addComponent({
-      type: 'memory',
-      version: 1,
-      memories: [
-        { id: 'm1', type: 'event', content: {}, timestamp: 0, strength: 100, emotional_intensity: 0.5 },
-      ],
-      decayRate: 5,
-      maxMemories: 100,
+    agent.addComponent(new NeedsComponent({
+    hunger: 1.0,
+    energy: 0.5,
+    health: 1.0,
+    thirst: 1.0,
+    temperature: 1.0,
+  }));
+    const spatialMemory = new SpatialMemoryComponent({ decayRate: 5, maxMemories: 100 });
+    spatialMemory.memories.push({
+      type: 'resource_location',
+      x: 5,
+      y: 5,
+      strength: 100,
+      createdAt: 0,
+      lastReinforced: 0,
     });
+    agent.addComponent(spatialMemory);
 
     // Filter entities to only those with required components for each system
-    const allEntities = Array.from(harness.world.entities.values());
-    const sleepEntities = allEntities.filter(e => e.hasComponent('circadian'));
-    const memoryEntities = allEntities.filter(e => e.hasComponent('memory'));
+    const sleepEntities = harness.world.query().with(ComponentType.Circadian).executeEntities();
+    const memoryEntities = harness.world.query().with(ComponentType.SpatialMemory).executeEntities();
 
     // Update both systems with filtered entities
     sleepSystem.update(harness.world, sleepEntities, 2.0);
     memorySystem.update(harness.world, memoryEntities, 2.0);
 
     // Memory should decay (or potentially consolidate)
-    const memory = agent.getComponent('memory') as any;
+    const memory = agent.getComponent(ComponentType.SpatialMemory) as SpatialMemoryComponent;
     expect(memory.memories.length).toBeGreaterThanOrEqual(0);
   });
 
@@ -101,7 +109,7 @@ describe('MemoryConsolidationSystem + SleepSystem + MemorySystem Integration', (
     (circadian as any).isSleeping = false; // Awake
     agent.addComponent(circadian);
 
-    agent.addComponent(createMemoryComponent());
+    agent.addComponent(new MemoryComponent(agent.id));
 
     const entities = Array.from(harness.world.entities.values());
 

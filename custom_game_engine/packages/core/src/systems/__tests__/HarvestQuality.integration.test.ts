@@ -8,6 +8,7 @@ import { PlantComponent } from '../../components/PlantComponent.js';
 import { createPositionComponent } from '../../components/PositionComponent.js';
 import type { Action } from '../../actions/Action.js';
 
+import { ComponentType } from '../../types/ComponentType.js';
 describe('Harvest Quality Integration', () => {
   let world: WorldImpl;
   let harvestHandler: HarvestActionHandler;
@@ -36,7 +37,7 @@ describe('Harvest Quality Integration', () => {
 
   // Helper to set farming skill level
   const setFarmingSkill = (level: SkillLevel): void => {
-    const skills = agent.getComponent('skills') as SkillsComponent;
+    const skills = agent.getComponent(ComponentType.Skills) as SkillsComponent;
     const updatedSkills = { ...skills, levels: { ...skills.levels, farming: level } };
     agent.addComponent(updatedSkills);
   };
@@ -70,7 +71,7 @@ describe('Harvest Quality Integration', () => {
 
         harvestHandler.execute(createHarvestAction(agent.id, plant.id), world);
 
-        const inventory = agent.getComponent('inventory') as InventoryComponent;
+        const inventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
         const foodSlot = inventory.slots.find(s => s !== null && s.itemId === 'food');
 
         if (foodSlot && foodSlot.quality !== undefined) {
@@ -110,7 +111,7 @@ describe('Harvest Quality Integration', () => {
 
         harvestHandler.execute(createHarvestAction(agent.id, plant.id), world);
 
-        const inventory = agent.getComponent('inventory') as InventoryComponent;
+        const inventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
         const foodSlot = inventory.slots.find(s => s !== null && s.itemId === 'food');
 
         if (foodSlot && foodSlot.quality !== undefined) {
@@ -138,7 +139,7 @@ describe('Harvest Quality Integration', () => {
 
       harvestHandler.execute(createHarvestAction(agent.id, plant.id), world);
 
-      const inventory = agent.getComponent('inventory') as InventoryComponent;
+      const inventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
       const foodSlot = inventory.slots.find(s => s !== null && s.itemId === 'food');
 
       // Lower health should result in lower quality
@@ -159,7 +160,7 @@ describe('Harvest Quality Integration', () => {
 
           harvestHandler.execute(createHarvestAction(agent.id, plant.id), world);
 
-          const inventory = agent.getComponent('inventory') as InventoryComponent;
+          const inventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
           const foodSlot = inventory.slots.find(s => s !== null && s.itemId === 'food');
 
           if (foodSlot && foodSlot.quality !== undefined) {
@@ -194,7 +195,7 @@ describe('Harvest Quality Integration', () => {
       // First harvest - no familiarity
       harvestHandler.execute(createHarvestAction(agent.id, plant.id), world);
 
-      let inventory = agent.getComponent('inventory') as InventoryComponent;
+      let inventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
       const firstSlot = inventory.slots.find(s => s !== null && s.itemId === 'food');
       const firstQuality = firstSlot?.quality ?? 0;
 
@@ -205,7 +206,7 @@ describe('Harvest Quality Integration', () => {
       }
 
       // Increase familiarity by recording 10 completions
-      let skills = agent.getComponent('skills') as SkillsComponent;
+      let skills = agent.getComponent(ComponentType.Skills) as SkillsComponent;
       for (let i = 0; i < 10; i++) {
         skills = recordTaskCompletion(skills, 'farming', 'harvest_wheat', 70, 0);
       }
@@ -215,7 +216,7 @@ describe('Harvest Quality Integration', () => {
       plant = createMaturePlant();
       harvestHandler.execute(createHarvestAction(agent.id, plant.id), world);
 
-      inventory = agent.getComponent('inventory') as InventoryComponent;
+      inventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
       const secondSlot = inventory.slots.find(s => s !== null && s.itemId === 'food');
       const secondQuality = secondSlot?.quality ?? 0;
 
@@ -251,7 +252,7 @@ describe('Harvest Quality Integration', () => {
       expect(result.success).toBe(true);
 
       // Check that items have quality defined
-      const inventory = agent.getComponent('inventory') as InventoryComponent;
+      const inventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
       const foodSlot = inventory.slots.find(s => s !== null && s.itemId === 'food');
       expect(foodSlot?.quality).toBeDefined();
       expect(foodSlot?.quality).toBeGreaterThanOrEqual(0);
@@ -265,7 +266,7 @@ describe('Harvest Quality Integration', () => {
 
       harvestHandler.execute(createHarvestAction(agent.id, plant.id), world);
 
-      const inventory = agent.getComponent('inventory') as InventoryComponent;
+      const inventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
       const foodSlot = inventory.slots.find(s => s !== null && s.itemId === 'food');
 
       expect(foodSlot?.quality).toBeGreaterThanOrEqual(0);
@@ -277,7 +278,7 @@ describe('Harvest Quality Integration', () => {
 
       harvestHandler.execute(createHarvestAction(agent.id, plant.id), world);
 
-      const inventory = agent.getComponent('inventory') as InventoryComponent;
+      const inventory = agent.getComponent(ComponentType.Inventory) as InventoryComponent;
       const foodSlots = inventory.slots.filter(s => s !== null && s.itemId === 'food');
 
       expect(foodSlots.length).toBeGreaterThan(0);

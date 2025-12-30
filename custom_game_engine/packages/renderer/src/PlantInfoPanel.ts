@@ -1,4 +1,4 @@
-import type { Entity } from '@ai-village/core';
+import type { Entity, World, PlantComponent, ResourceComponent } from '@ai-village/core';
 
 /**
  * UI Panel displaying information about a selected plant.
@@ -62,7 +62,7 @@ export class PlantInfoPanel {
    * @param world World instance to look up the selected entity
    * @param _tileInspectorOpen Deprecated - positioning handled by WindowManager
    */
-  render(ctx: CanvasRenderingContext2D, width: number, height: number, world: any, _tileInspectorOpen: boolean = false): void {
+  render(ctx: CanvasRenderingContext2D, width: number, height: number, world: World | undefined, _tileInspectorOpen: boolean = false): void {
     if (!this.selectedEntityId) {
       return; // Nothing to render
     }
@@ -82,7 +82,7 @@ export class PlantInfoPanel {
     }
 
     // Get plant component
-    const plant = selectedEntity.components.get('plant') as any | undefined;
+    const plant = selectedEntity.components.get('plant') as PlantComponent | undefined;
     if (!plant) {
       console.warn('[PlantInfoPanel] Selected entity is not a plant');
       this.selectedEntityId = null;
@@ -238,7 +238,7 @@ export class PlantInfoPanel {
     currentY += 8;
 
     // Contents section - show resource data if entity has resource component
-    const resource = selectedEntity.components.get('resource') as any | undefined;
+    const resource = selectedEntity.components.get('resource') as ResourceComponent | undefined;
     if (resource) {
       drawText('--- Contents ---', '#87CEEB');
 

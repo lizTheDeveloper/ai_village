@@ -14,6 +14,7 @@
 
 import type { System } from '../ecs/System.js';
 import type { SystemId, ComponentType } from '../types.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
@@ -54,7 +55,9 @@ import {
   buildBehavior,
   craftBehavior,
   tradeBehavior,
+  castSpellBehavior,
   seekWarmthBehavior,
+  seekCoolingBehavior,
   navigateBehavior,
   exploreFrontierBehavior,
   exploreSpiralBehavior,
@@ -78,9 +81,9 @@ export class AgentBrainSystem implements System {
   public readonly id: SystemId = 'agent-brain';
   public readonly priority: number = 10;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [
-    'agent',
-    'position',
-    'movement',
+    CT.Agent,
+    CT.Position,
+    CT.Movement,
   ];
 
   private perception: PerceptionProcessor;
@@ -127,7 +130,7 @@ export class AgentBrainSystem implements System {
     // Farm behaviors
     this.behaviors.register('farm', farmBehavior, { description: 'Farm action state' });
     this.behaviors.register('till', tillBehavior, { description: 'Till soil for farming' });
-    this.behaviors.register('plant', plantBehavior, { description: 'Plant seeds in tilled soil' });
+    this.behaviors.register(CT.Plant, plantBehavior, { description: 'Plant seeds in tilled soil' });
     this.behaviors.register('water', waterBehavior, { description: 'Water dry plants' });
 
     // Build behaviors
@@ -139,8 +142,12 @@ export class AgentBrainSystem implements System {
     // Trade behaviors
     this.behaviors.register('trade', tradeBehavior, { description: 'Buy or sell items at shops' });
 
+    // Magic behaviors
+    this.behaviors.register('cast_spell', castSpellBehavior, { description: 'Cast a spell' });
+
     // Survival behaviors
     this.behaviors.register('seek_warmth', seekWarmthBehavior, { description: 'Find heat source' });
+    this.behaviors.register('seek_cooling', seekCoolingBehavior, { description: 'Find cooling/shade' });
 
     // Navigation & Exploration behaviors
     this.behaviors.register('navigate', navigateBehavior, { description: 'Navigate to coordinates' });
@@ -183,7 +190,7 @@ export class AgentBrainSystem implements System {
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     for (const entity of entities) {
       const impl = entity as EntityImpl;
-      let agent = impl.getComponent<AgentComponent>('agent');
+      let agent = impl.getComponent<AgentComponent>(CT.Agent);
 
       if (!agent) continue;
 
@@ -194,7 +201,7 @@ export class AgentBrainSystem implements System {
       this.updateThinkTime(impl, world.tick);
 
       // Re-fetch agent component after updating think time
-      agent = impl.getComponent<AgentComponent>('agent')!;
+      agent = impl.getComponent<AgentComponent>(CT.Agent)!;
 
       // Phase 1: Perception
       this.perception.processAll(impl, world);
@@ -221,7 +228,7 @@ export class AgentBrainSystem implements System {
    * Update agent's last think timestamp.
    */
   private updateThinkTime(entity: EntityImpl, tick: number): void {
-    entity.updateComponent<AgentComponent>('agent', (current) => ({
+    entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
       ...current,
       lastThinkTick: tick,
     }));
@@ -258,7 +265,7 @@ export class AgentBrainSystem implements System {
             },
           });
 
-          entity.updateComponent<AgentComponent>('agent', (current) => ({
+          entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
             ...current,
             behavior: autonomicResult.behavior,
             behaviorState: {},
@@ -266,7 +273,7 @@ export class AgentBrainSystem implements System {
             queueInterruptedBy: autonomicResult.behavior,
           }));
         } else {
-          entity.updateComponent<AgentComponent>('agent', (current) => ({
+          entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
             ...current,
             behavior: autonomicResult.behavior,
             behaviorState: {},
@@ -293,7 +300,7 @@ export class AgentBrainSystem implements System {
 
     // Resume paused queue if autonomic needs are satisfied
     if (agent.queuePaused && !autonomicResult) {
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
         ...current,
         queuePaused: false,
         queueInterruptedBy: undefined,
@@ -329,7 +336,7 @@ export class AgentBrainSystem implements System {
       const fromBehavior = agent.behavior;
       const toBehavior = decisionResult.behavior;
 
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
         ...current,
         behavior: decisionResult.behavior!,
         behaviorState: decisionResult.behaviorState ?? {},
@@ -368,7 +375,7 @@ export class AgentBrainSystem implements System {
 
     if (!currentQueued) {
       // Clear invalid queue
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
         ...current,
         behaviorQueue: undefined,
         currentQueueIndex: undefined,
@@ -380,7 +387,7 @@ export class AgentBrainSystem implements System {
     // Check for timeout
     if (hasQueuedBehaviorTimedOut(agent, world.tick)) {
       const updatedAgent = advanceBehaviorQueue(agent, world.tick);
-      entity.updateComponent<AgentComponent>('agent', () => updatedAgent);
+      entity.updateComponent<AgentComponent>(CT.Agent, () => updatedAgent);
 
       if (!hasBehaviorQueue(updatedAgent)) {
         world.eventBus.emit({
@@ -398,7 +405,7 @@ export class AgentBrainSystem implements System {
 
       if (!hasBehaviorQueue(updatedAgent)) {
         // Queue is complete, clear it and emit event
-        entity.updateComponent<AgentComponent>('agent', () => updatedAgent);
+        entity.updateComponent<AgentComponent>(CT.Agent, () => updatedAgent);
         world.eventBus.emit({
           type: 'agent:queue:completed',
           source: entity.id,
@@ -413,7 +420,7 @@ export class AgentBrainSystem implements System {
         const fromBehavior = agent.behavior;
         const toBehavior = nextQueued.behavior;
 
-        entity.updateComponent<AgentComponent>('agent', () => ({
+        entity.updateComponent<AgentComponent>(CT.Agent, () => ({
           ...updatedAgent,
           behavior: nextQueued.behavior,
           behaviorState: nextQueued.behaviorState ?? {},
@@ -442,7 +449,7 @@ export class AgentBrainSystem implements System {
       const fromBehavior = agent.behavior;
       const toBehavior = currentQueued.behavior;
 
-      entity.updateComponent<AgentComponent>('agent', (current) => ({
+      entity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
         ...current,
         behavior: currentQueued.behavior,
         behaviorState: currentQueued.behaviorState ?? {},
@@ -473,15 +480,15 @@ export class AgentBrainSystem implements System {
     world: World,
     range: number
   ): Entity[] {
-    const position = entity.getComponent('position') as any;
+    const position = entity.getComponent(CT.Position) as any;
     if (!position) return [];
 
-    const agents = world.query().with('agent').with('position').executeEntities();
+    const agents = world.query().with(CT.Agent).with(CT.Position).executeEntities();
 
     return agents.filter((other) => {
       if (other.id === entity.id) return false;
 
-      const otherPos = (other as EntityImpl).getComponent('position') as any;
+      const otherPos = (other as EntityImpl).getComponent(CT.Position) as any;
       if (!otherPos) return false;
 
       const dx = otherPos.x - position.x;

@@ -6,6 +6,7 @@ import { EntityImpl, createEntityId } from '../ecs/Entity.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import type { PlantSpecies } from '../types/PlantSpecies.js';
 
+import { ComponentType } from '../types/ComponentType.js';
 /**
  * Integration test for plant seed production
  * Tests that plants produce seeds correctly when transitioning through stages
@@ -101,8 +102,6 @@ describe('PlantSeedProduction Integration', () => {
     entity.addComponent(plant);
     (world as any)._addEntity(entity);
 
-    console.log(`\nTest: Plant created - stage=${plant.stage}, seedsProduced=${plant.seedsProduced}`);
-
     // Store entity ID on plant for logging
     (plant as any).entityId = entity.id;
 
@@ -110,16 +109,11 @@ describe('PlantSeedProduction Integration', () => {
     plant.stageProgress = 1.0;
 
     // Trigger day changed event to force update (use emitImmediate for synchronous execution)
-    console.log('Emitting time:day_changed event');
     eventBus.emitImmediate({ type: 'time:day_changed', source: 'test', data: {} });
-    console.log(`After emit - daySkipCount should be > 0`);
 
     // Run plant system update
-    const entities = (world as any).query().with('plant').executeEntities();
-    console.log(`Calling plantSystem.update with entities: ${entities.length}`);
+    const entities = (world as any).query().with(ComponentType.Plant).executeEntities();
     plantSystem.update(world, entities, 0.1);
-
-    console.log(`Test: After update - stage=${plant.stage}, seedsProduced=${plant.seedsProduced}`);
 
     // Plant should have transitioned to mature
     expect(plant.stage).toBe('mature');
@@ -146,8 +140,6 @@ describe('PlantSeedProduction Integration', () => {
     entity.addComponent(plant);
     (world as any)._addEntity(entity);
 
-    console.log(`\nTest: Plant created - stage=${plant.stage}, seedsProduced=${plant.seedsProduced}`);
-
     // Store entity ID on plant for logging
     (plant as any).entityId = entity.id;
 
@@ -158,10 +150,8 @@ describe('PlantSeedProduction Integration', () => {
     eventBus.emitImmediate({ type: 'time:day_changed', source: 'test', data: {} });
 
     // Run plant system update
-    const entities = (world as any).query().with('plant').executeEntities();
+    const entities = (world as any).query().with(ComponentType.Plant).executeEntities();
     plantSystem.update(world, entities, 0.1);
-
-    console.log(`Test: After update - stage=${plant.stage}, seedsProduced=${plant.seedsProduced}`);
 
     // Plant should have transitioned to seeding
     expect(plant.stage).toBe('seeding');
@@ -190,28 +180,24 @@ describe('PlantSeedProduction Integration', () => {
     entity.addComponent(plant);
     (world as any)._addEntity(entity);
 
-    console.log(`\nTest: Initial - stage=${plant.stage}, seedsProduced=${plant.seedsProduced}`);
-
     // Store entity ID on plant for logging
     (plant as any).entityId = entity.id;
 
     // TRANSITION 1: vegetative → mature
     plant.stageProgress = 1.0;
     eventBus.emitImmediate({ type: 'time:day_changed', source: 'test', data: {} });
-    let entities = (world as any).query().with('plant').executeEntities();
+    let entities = (world as any).query().with(ComponentType.Plant).executeEntities();
     plantSystem.update(world, entities, 0.1);
 
-    console.log(`Test: After vegetative → mature - stage=${plant.stage}, seedsProduced=${plant.seedsProduced}`);
     expect(plant.stage).toBe('mature');
     expect(plant.seedsProduced).toBe(10);
 
     // TRANSITION 2: mature → seeding
     plant.stageProgress = 1.0;
     eventBus.emitImmediate({ type: 'time:day_changed', source: 'test', data: {} });
-    entities = (world as any).query().with('plant').executeEntities();
+    entities = (world as any).query().with(ComponentType.Plant).executeEntities();
     plantSystem.update(world, entities, 0.1);
 
-    console.log(`Test: After mature → seeding - stage=${plant.stage}, seedsProduced=${plant.seedsProduced}`);
     expect(plant.stage).toBe('seeding');
 
     // Should have 20 seeds total (10 from previous + 10 from this transition)
