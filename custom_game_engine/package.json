@@ -9,14 +9,17 @@
   "scripts": {
     "build": "tsc --build",
     "dev": "tsc --build --watch",
-    "test": "vitest run",
+    "test": "npm run validate-data && vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
+    "test:coverage": "npm run validate-data && vitest run --coverage",
     "test:all": "npm run test --workspaces",
     "lint": "eslint .",
     "clean": "rm -rf packages/*/dist",
     "detect-oscillation": "npx tsx scripts/detect-oscillation.ts",
-    "metrics-server": "npx tsx scripts/metrics-server.ts"
+    "metrics-server": "npx tsx scripts/metrics-server.ts",
+    "validate-data": "npx tsx scripts/validate-all-data.ts",
+    "validate-plants": "npx tsx scripts/validate-plants.ts",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
@@ -26,6 +29,8 @@
     "@typescript-eslint/parser": "^6.13.0",
     "canvas": "^3.2.0",
     "eslint": "^8.54.0",
+    "glob": "^13.0.0",
+    "husky": "^9.1.7",
     "jsdom": "^27.3.0",
     "playwright": "^1.57.0",
     "tsx": "^4.21.0",
