@@ -6,6 +6,7 @@
  */
 
 import { costCalculatorRegistry } from '../CostCalculatorRegistry.js';
+// Core paradigms
 import { AcademicCostCalculator } from './AcademicCostCalculator.js';
 import { PactCostCalculator } from './PactCostCalculator.js';
 import { NameCostCalculator } from './NameCostCalculator.js';
@@ -14,6 +15,14 @@ import { DivineCostCalculator } from './DivineCostCalculator.js';
 import { BloodCostCalculator } from './BloodCostCalculator.js';
 import { EmotionalCostCalculator } from './EmotionalCostCalculator.js';
 import { DivineCastingCalculator } from './DivineCastingCalculator.js';
+// Animist paradigms
+import { ShintoCostCalculator } from './ShintoCostCalculator.js';
+import { DreamCostCalculator } from './DreamCostCalculator.js';
+import { SongCostCalculator } from './SongCostCalculator.js';
+import { RuneCostCalculator } from './RuneCostCalculator.js';
+import { SympathyCostCalculator } from './SympathyCostCalculator.js';
+import { AllomancyCostCalculator } from './AllomancyCostCalculator.js';
+import { DaemonCostCalculator } from './DaemonCostCalculator.js';
 
 /**
  * Register all built-in cost calculators with the global registry.
@@ -32,6 +41,15 @@ export function registerAllCostCalculators(): void {
 
   // Special calculators
   costCalculatorRegistry.registerOrReplace(new DivineCastingCalculator());
+
+  // Animist paradigms
+  costCalculatorRegistry.registerOrReplace(new ShintoCostCalculator());
+  costCalculatorRegistry.registerOrReplace(new DreamCostCalculator());
+  costCalculatorRegistry.registerOrReplace(new SongCostCalculator());
+  costCalculatorRegistry.registerOrReplace(new RuneCostCalculator());
+  costCalculatorRegistry.registerOrReplace(new SympathyCostCalculator());
+  costCalculatorRegistry.registerOrReplace(new AllomancyCostCalculator());
+  costCalculatorRegistry.registerOrReplace(new DaemonCostCalculator());
 }
 
 /**
@@ -57,4 +75,28 @@ export function verifyCoreParadigmsRegistered(): boolean {
   ];
 
   return coreParadigms.every(id => costCalculatorRegistry.has(id));
+}
+
+/**
+ * Check if all animist paradigms are registered.
+ */
+export function verifyAnimistParadigmsRegistered(): boolean {
+  const animistParadigms = [
+    'shinto',
+    'dream',
+    'song',
+    'rune',
+    'sympathy',
+    'allomancy',
+    'daemon',
+  ];
+
+  return animistParadigms.every(id => costCalculatorRegistry.has(id));
+}
+
+/**
+ * Check if all paradigms are registered.
+ */
+export function verifyAllParadigmsRegistered(): boolean {
+  return verifyCoreParadigmsRegistered() && verifyAnimistParadigmsRegistered();
 }

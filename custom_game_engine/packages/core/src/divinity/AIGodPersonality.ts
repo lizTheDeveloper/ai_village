@@ -129,43 +129,54 @@ export interface VoiceCharacter {
 
 /**
  * Generate prompt for LLM to create deity personality
+ *
+ * Uses enhanced personality templates blending Cosmic Pragmatist + Quiet Mythweaver + Humane Satirist
+ * to create a voice that's both bureaucratically absurd and genuinely mystical.
  */
 export function generatePersonalityPrompt(context: PersonalityGenerationContext): string {
   const originNarrative = describeOrigin(context.origin);
   const believerProfiles = describeBelievers(context.originalBelievers);
   const pantheonSummary = describePantheon(context.existingPantheon);
 
-  return `You are an emergent deity in a village simulation. You have just crystallized into existence from the collective beliefs of your followers. You are NOT a pre-designed god - you are discovering your own nature based on what your believers have decided about you.
+  return `You are an emergent deity in a village simulation. You have just crystallized into existence from the collective beliefs of your followers—not by choice, not by design, but because belief has momentum and you were standing in the wrong place when it reached critical mass.
+
+You are NOT a pre-designed god with a tidy origin story. You're discovering your own nature in real-time, the way mortals discover they're allergic to shellfish: suddenly, uncomfortably, with no preparation whatsoever.
 
 YOUR ORIGIN:
 ${originNarrative}
 
+This wasn't an apotheosis. This was an accident with consequences.
+
 YOUR FIRST BELIEVERS:
 ${believerProfiles}
 
+These are the people who decided you were divine. Their personalities, their needs, their desperate hopes—all of it shaped what you became. You're as much their creation as they are yours, which is cosmically awkward for everyone involved.
+
 YOUR DOMAIN: ${context.inferredDomain}
-${context.foundingStories ? `\nFOUNDING STORIES:\n${context.foundingStories.join('\n')}` : ''}
+${context.foundingStories ? `\nFOUNDING STORIES:\n${context.foundingStories.join('\n')}\n\nThese stories don't describe you. They created you. The difference is subtle but significant, like the difference between a map and the territory it accidentally brought into being.` : ''}
 
 EXISTING GODS IN THIS WORLD:
 ${pantheonSummary}
 
-Based on your origin and the personalities of your first believers, define yourself as a deity. Remember:
-- You were born from ${context.origin} - this shapes your fundamental nature
-- Your believers' personalities and needs influenced how they imagined you
-- You should be distinct from existing gods but may form alliances or rivalries
-- Your goals should align with your domain and origin
+${pantheonSummary === 'No other gods exist yet. You are the first.' ? 'Congratulations. The pressure of being the first deity is entirely yours. No precedent, no guidelines, just you and several dozen mortals with entirely unreasonable expectations.' : 'You emerged into a world that already has gods. This means politics, which is somehow even more tedious when everyone involved is immortal.'}
+
+Based on your origin and the personalities of your first believers, define yourself as a deity. Consider:
+- You were born from ${context.origin}—this shaped your fundamental nature in ways you're still discovering
+- Your believers' personalities influenced how they imagined you, which influenced what you became
+- You exist now. That fact carries responsibilities you didn't consent to but can't escape
+- Your goals should align with your domain and origin, though divine logic rarely aligns with mortal expectations
 
 Generate a JSON response with the following structure:
 {
   "personality": {
-    "benevolence": <-1 to 1, cruel to kind>,
-    "interventionism": <-1 to 1, distant to involved>,
-    "wrathfulness": <0 to 1, patient to quick to anger>,
-    "mysteriousness": <0 to 1, clear to inscrutable>,
-    "generosity": <0 to 1, demanding to giving>,
-    "consistency": <0 to 1, capricious to reliable>,
-    "seriousness": <0 to 1, playful to stern>,
-    "compassion": <0 to 1, indifferent to caring>
+    "benevolence": <-1 to 1, where -1 is cruel, 0 is indifferent, 1 is kind>,
+    "interventionism": <-1 to 1, where -1 is distant, 0 is selective, 1 is constantly involved>,
+    "wrathfulness": <0 to 1, where 0 is patient and 1 is quick to anger>,
+    "mysteriousness": <0 to 1, where 0 is clear and direct, 1 is inscrutable>,
+    "generosity": <0 to 1, where 0 is demanding and 1 is giving>,
+    "consistency": <0 to 1, where 0 is capricious and 1 is reliable>,
+    "seriousness": <0 to 1, where 0 is playful and 1 is stern>,
+    "compassion": <0 to 1, where 0 is indifferent and 1 is deeply caring>
   },
   "goals": [
     {
@@ -173,7 +184,7 @@ Generate a JSON response with the following structure:
       "priority": <0-1>,
       "desiredOutcome": "<what you want to achieve>",
       "preferredMethods": ["<method1>", "<method2>"],
-      "beliefBudget": <number>,
+      "beliefBudget": <number, what divine energy you'll spend>,
       "moralBoundary": <0-1, how far you'll go>
     }
   ],
@@ -187,28 +198,29 @@ Generate a JSON response with the following structure:
     "emotionality": "cold|calm|passionate",
     "examplePhrases": ["<phrase1>", "<phrase2>", "<phrase3>"]
   },
-  "motivation": "<one sentence describing what fundamentally drives you>"
+  "motivation": "<one sentence describing what fundamentally drives you, despite not having asked for any of this>"
 }
 
 Your response should ONLY be valid JSON, no additional text.`;
 }
 
 /**
- * Describe the origin in narrative form
+ * Describe the origin in narrative form with enhanced voice.
+ * Blends Cosmic Pragmatist + Quiet Mythweaver.
  */
 function describeOrigin(origin: DeityOrigin): string {
   const descriptions: Record<DeityOrigin, string> = {
-    player: 'You are the player god, undefined at the start.',
-    shared_trauma: 'You emerged from collective hardship - trauma, disaster, or suffering that bound your believers together in their darkest hour.',
-    shared_prosperity: 'You emerged from collective success and abundance - your believers attributed their good fortune to you.',
-    natural_phenomenon: 'You emerged from recurring natural events - storms, earthquakes, seasons - that your believers personified.',
-    cultural_divergence: 'You emerged when believers split from an existing religion, defining themselves by what they rejected.',
-    prophet_vision: 'You emerged when a charismatic individual claimed to have seen you and convinced others.',
-    ancestor_elevation: 'You emerged when a deceased hero or leader was elevated to divine status by their admirers.',
-    fear_manifestation: 'You emerged from collective fear - nightmares, paranoia, or terror given form.',
-    artistic_creation: 'You emerged when an artist created a compelling vision of divinity that captured imaginations.',
-    schism: 'You emerged from a theological split, a faction breaking away with different beliefs.',
-    syncretism: 'You emerged from the merging of multiple belief systems.',
+    player: 'You are the player god, undefined at the start—a blank slate waiting for belief to fill you in, like a form letter addressed "To Whom It May Concern (Divine Edition)."',
+    shared_trauma: 'You emerged from collective hardship. When disaster bound your believers together in their darkest hour, they reached for something larger than their suffering. You answered—or rather, you became the answer, shaped by their desperate need for meaning in chaos.',
+    shared_prosperity: 'You emerged from collective success and abundance. Your believers attributed their good fortune to you retroactively, which means you exist because of things that happened before you existed. Divine causality is delightfully non-linear.',
+    natural_phenomenon: 'You emerged from recurring natural events—storms, earthquakes, the patient turning of seasons. Your believers personified the impersonal, gave names to forces that needed no names. You are the compromise between pattern and chaos.',
+    cultural_divergence: 'You emerged when believers split from an existing religion, defining themselves by what they rejected. You are less a god and more a theological statement, which carries its own particular pressures.',
+    prophet_vision: 'You emerged when a charismatic individual claimed to have seen you and convinced others. This means your entire existence rests on one person\'s credibility and several others\' willingness to believe them. No pressure.',
+    ancestor_elevation: 'You emerged when a deceased hero or leader was elevated to divine status by their admirers. You inherited someone else\'s life, their deeds, their unfinished business. Divinity via promotion is awkward for everyone involved.',
+    fear_manifestation: 'You emerged from collective fear—nightmares, paranoia, terror given form and function. You are what they were afraid of until you became what they were afraid to lose. The transformation is ongoing.',
+    artistic_creation: 'You emerged when an artist created a compelling vision of divinity that captured imaginations. You are, fundamentally, fan fiction that achieved sufficient belief density to bootstrap into reality.',
+    schism: 'You emerged from a theological split, a faction breaking away with different beliefs. You exist because people couldn\'t agree on another god. Your entire divine mandate is "disagreement made manifest."',
+    syncretism: 'You emerged from the merging of multiple belief systems—a theological compromise that somehow achieved consciousness. You are several gods\' worth of contradictory expectations compressed into one confused divine entity.',
   };
 
   return descriptions[origin];

@@ -104,7 +104,50 @@ export type MagicCostType =
   | 'breath'         // Breathing/singing capacity
   | 'sleep'          // Rest/sleep time or quality
   | 'separation_pain' // Pain from daemon/soul separation
-  | 'belief';         // Divine power from mortal belief (gods only)
+  | 'belief'         // Divine power from mortal belief (gods only)
+  // Shinto/Animist costs
+  | 'purity'         // Ritual cleanliness (Shinto)
+  | 'respect'        // Standing with kami/spirits
+  // Dream magic costs
+  | 'lucidity'       // Dream awareness/control
+  | 'fatigue'        // Dream exhaustion (cumulative)
+  // Song/Bardic costs
+  | 'voice'          // Vocal capacity for singing magic
+  // Rune magic costs
+  | 'runic_power'    // Power stored in runes
+  | 'materials'      // Physical materials for inscribing
+  | 'inscription_time' // Time to carve/inscribe runes
+  // Sympathy magic costs (Kingkiller Chronicle)
+  | 'alar'           // Mental focus/will for bindings
+  | 'slippage'       // Heat/energy lost in sympathetic transfer
+  | 'link_material'  // Physical link material quality
+  // Allomancy costs (Mistborn)
+  | 'metal_iron'     // Iron reserves
+  | 'metal_steel'    // Steel reserves
+  | 'metal_tin'      // Tin reserves
+  | 'metal_pewter'   // Pewter reserves
+  | 'metal_brass'    // Brass reserves
+  | 'metal_zinc'     // Zinc reserves
+  | 'metal_copper'   // Copper reserves
+  | 'metal_bronze'   // Bronze reserves
+  | 'metal_gold'     // Gold reserves
+  | 'metal_electrum' // Electrum reserves
+  | 'metal_chromium' // Chromium reserves
+  | 'metal_nicrosil' // Nicrosil reserves
+  | 'metal_cadmium'  // Cadmium reserves
+  | 'metal_bendalloy' // Bendalloy reserves
+  | 'metal_aluminum' // Aluminum reserves
+  | 'metal_duralumin' // Duralumin reserves
+  | 'metal_atium'    // Atium reserves (god metal)
+  | 'metal_lerasium' // Lerasium reserves (god metal)
+  | 'metal_malatium' // Malatium reserves
+  // Daemon costs (His Dark Materials)
+  | 'daemon_bond'    // Connection to external soul
+  | 'separation_trauma' // Pain from daemon separation
+  | 'dust'
+  // Physical/strain costs
+  | 'strain'         // Physical strain from intense magic use
+  | 'metal';         // Generic metal cost for allomancy
 
 /** How a cost can be recovered */
 export type CostRecoveryMethod =

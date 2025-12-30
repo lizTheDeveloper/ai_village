@@ -433,9 +433,73 @@ const item = {
 };
 ```
 
+## Writing Style Guide
+
+This project uses a blended writing style that combines four distinct voices to create entertaining, informative documentation:
+
+**See [WRITER_GUIDELINES.md](./WRITER_GUIDELINES.md) for detailed style guidance.**
+
+The four voices:
+1. **Baroque Encyclopedist** - Playful, detailed, loves footnotes and fake scholarship
+2. **Cosmic Pragmatist** - Dry, cheerfully nihilistic, deadpan about cosmic absurdity
+3. **Humane Satirist** - Expansive, empathetic, satirizes with kindness
+4. **Quiet Mythweaver** - Lyrical, intimate, blurs myth and mundane
+
+These voices blend naturally to create help text that is:
+- **Informative** - Players learn mechanics clearly
+- **Entertaining** - Reading help is enjoyable
+- **Meaningful** - Mechanics connect to themes and emotions
+
+## Documentation Examples
+
+Complete examples demonstrating the blended writing style:
+
+### Magic Systems
+- [documentedMagic.example.ts](./documentedMagic.example.ts) - Magic paradigms
+  - Academic Magic (scholarly mana manipulation)
+  - Blood Magic (power from sacrifice)
+  - True Name Magic (reality editing through language)
+  - Divine Magic (borrowed power from gods)
+  - Pact Magic (contracts with entities)
+
+### Divinity Systems
+- [documentedDivinity.example.ts](./documentedDivinity.example.ts) - Gods and belief
+  - Belief System (how faith creates deities)
+  - Divine Domains (areas of divine influence)
+  - Prayer and Miracles (divine-mortal communication)
+  - Deity Ascension (becoming a god)
+
+### Magical Items
+- [documentedMagicItems.example.ts](./documentedMagicItems.example.ts) - Enchanted items
+  - Wizard's Staff (spell focus and amplification)
+  - Blood Crystal (blood power storage)
+  - Artifact Creation (permanent enchantment)
+
+### Crafting Systems
+- [documentedCrafting.example.ts](./documentedCrafting.example.ts) - Crafting and quality systems
+  - Crafting System Overview (how crafting works)
+  - Quality System (0-100 scale and its effects)
+  - Crafting Stations (workshops and their purposes)
+  - Skill Progression (levels 0-5 and mastery)
+  - Iron Sword Recipe (weapon crafting example)
+  - Healing Potion Recipe (alchemy example)
+  - Bread Recipe (food crafting example)
+
+### Basic Items
+- [documentedItems.example.ts](./documentedItems.example.ts) - Standard items
+  - Iron Ingot (materials)
+  - Healing Potion (consumables)
+  - Iron Pickaxe (tools)
+  - Mana Crystal (magical materials)
+
 ## See Also
 
-- [documentedItems.example.ts](./documentedItems.example.ts) - Full examples
+- [WRITER_GUIDELINES.md](./WRITER_GUIDELINES.md) - Writing style guide
+- [documentedItems.example.ts](./documentedItems.example.ts) - Basic item examples
+- [documentedMagic.example.ts](./documentedMagic.example.ts) - Magic paradigm examples
+- [documentedDivinity.example.ts](./documentedDivinity.example.ts) - Divinity system examples
+- [documentedMagicItems.example.ts](./documentedMagicItems.example.ts) - Magical item examples
+- [documentedCrafting.example.ts](./documentedCrafting.example.ts) - Crafting system examples
 - [WikiGenerator.ts](./WikiGenerator.ts) - Output format customization
 - [HelpRegistry.ts](./HelpRegistry.ts) - Query API details
 - [HelpEntry.ts](./HelpEntry.ts) - Type definitions

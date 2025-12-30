@@ -94,3 +94,5 @@ export * from './PassageSystem.js';
 // Auto-save & Time Travel
 export * from './AutoSaveSystem.js';
 export * from './CheckpointNamingService.js';
+export * from './CanonEventDetector.js';
+export * from './CheckpointRetentionPolicy.js';

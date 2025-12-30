@@ -2,29 +2,63 @@
 
 **Created:** 2025-12-29
 **Updated:** 2025-12-29
-**Status:** Core Infrastructure Implemented
+**Status:** Fully Implemented
 **Related:** `openspec/specs/magic-system/paradigm-spec.md`
 
 ---
 
 ## Implementation Status
 
-### ✅ Completed
+### ✅ Core Infrastructure (Complete)
 - **CostCalculator interface** (`costs/CostCalculator.ts`) - Base interface and `BaseCostCalculator` abstract class
 - **CostCalculatorRegistry** (`costs/CostCalculatorRegistry.ts`) - Singleton registry for paradigm calculators
 - **CostRecoveryManager** (`costs/CostRecoveryManager.ts`) - Recovery methods (rest, ritual, prayer, quest, sacrifice)
 - **SpellEffect types** (`SpellEffect.ts`) - 17 effect categories with scaling and factory functions
 - **SpellEffectRegistry** (`SpellEffectRegistry.ts`) - Central registry with category indexing
 - **SpellEffectExecutor** (`SpellEffectExecutor.ts`) - Execution engine with applier registration
-- **HealingEffectApplier** (`appliers/HealingEffectApplier.ts`) - Example applier implementation
+- **HealingEffectApplier** (`appliers/HealingEffectApplier.ts`) - Healing effect implementation
 
-### 🔄 In Progress
-- Individual paradigm cost calculators (Academic, Pact, Name, Breath, Divine, Blood, Emotional)
+### ✅ All Paradigm Cost Calculators (Complete)
+- **AcademicCostCalculator** (`costs/calculators/AcademicCostCalculator.ts`) - Mana + stamina costs
+- **PactCostCalculator** (`costs/calculators/PactCostCalculator.ts`) - Favor + corruption + soul_fragment costs
+- **NameCostCalculator** (`costs/calculators/NameCostCalculator.ts`) - Time + sanity + attention costs
+- **BreathCostCalculator** (`costs/calculators/BreathCostCalculator.ts`) - BioChromatic Breath costs
+- **DivineCostCalculator** (`costs/calculators/DivineCostCalculator.ts`) - Favor + karma costs
+- **BloodCostCalculator** (`costs/calculators/BloodCostCalculator.ts`) - Blood + health + corruption + lifespan
+- **EmotionalCostCalculator** (`costs/calculators/EmotionalCostCalculator.ts`) - Emotion + sanity costs
+- **DivineCastingCalculator** (`costs/calculators/DivineCastingCalculator.ts`) - God-to-mortal magic conversion
 
-### ⏳ Planned
-- Integration with MagicLawEnforcer (replace placeholder)
-- Terminal effect handlers
-- Game loop integration for passive regeneration
+### ✅ Integration Complete
+- **MagicLawEnforcer** - Uses CostCalculatorRegistry for validation
+- **MagicSystem** - Wired to CostRecoveryManager for passive regeneration
+- **TerminalEffectHandler** (`TerminalEffectHandler.ts`) - Handles death, corruption, soul loss, etc.
+
+### ✅ Effect Appliers (Complete)
+- **HealingEffectApplier** - Restore health/resources
+- **DamageEffectApplier** - Deal damage
+- **ProtectionEffectApplier** - Shields/wards
+- **ControlEffectApplier** - Stun/root/fear
+- **SummonEffectApplier** - Create entities
+- **TransformEffectApplier** - Polymorph effects
+- **BodyTransformEffectApplier** - Physical transformations
+- **BodyHealingEffectApplier** - Body-specific healing
+
+### ✅ Skill Trees (All 14 Complete)
+Each paradigm has a fully populated skill tree with unlock conditions:
+- `AcademicSkillTree.ts` - Schools, metamagic, spell preparation
+- `PactSkillTree.ts` - Patron types, negotiation, breach handling
+- `NameSkillTree.ts` - True name categories, speaking power
+- `BreathSkillTree.ts` - Heightenings, Awakening types
+- `DivineSkillTree.ts` - Domains, clerical ranks, miracles
+- `BloodSkillTree.ts` - Bloodlines, sacrifice scales
+- `EmotionalSkillTree.ts` - Emotion categories, storage methods
+- `AllomancySkillTree.ts` - Metal types, Mistborn abilities
+- `ShintoSkillTree.ts` - Kami types, purity states
+- `SympathySkillTree.ts` - Links, binding principles
+- `DaemonSkillTree.ts` - Forms, Dust interactions
+- `DreamSkillTree.ts` - Realms, time dilation
+- `SongSkillTree.ts` - Song types, harmony
+- `RuneSkillTree.ts` - Carving materials, activation
 
 ---
 

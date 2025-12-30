@@ -746,7 +746,7 @@ These phases extend beyond the core game:
 **Dependencies:** Phase 3 (Agent Needs) ✅, Phase 4 (Memory & Social) ✅, Phase 5 (Communication) ✅, Phase 8 (Circadian/Sleep) ✅
 **Parallel Work:** 🔀 Can run parallel with Phase 7-11, 22-26
 **Estimated LOC:** ~4,000
-**Spec:** [divine-communication-system.md](custom_game_engine/specs/divine-communication-system.md)
+**Spec:** [divine-communication-system.md](openspec/specs/divinity-system/divine-communication-system.md)
 
 **Work Order:** [agents/autonomous-dev/work-orders/divine-communication-system/work-order.md](agents/autonomous-dev/work-orders/divine-communication-system/work-order.md)
 
@@ -764,16 +764,16 @@ These phases extend beyond the core game:
 
 | Task | Status | Spec | Parallel? |
 |------|--------|------|-----------|
-| PrayerComponent & System | ⏳ | [Section 2](custom_game_engine/specs/divine-communication-system.md#2-prayer-system) | - |
-| Prayer triggers and generation | ⏳ | [Section 2.2-2.3](custom_game_engine/specs/divine-communication-system.md#22-prayer-behavior) | 🔀 |
-| SpiritualComponent | ⏳ | [Section 3.1](custom_game_engine/specs/divine-communication-system.md#31-spiritual-component) | 🔀 |
-| MeditateAction behavior | ⏳ | [Section 3.2](custom_game_engine/specs/divine-communication-system.md#32-meditation-behavior) | - |
-| Vision generation with LLM | ⏳ | [Section 4.2](custom_game_engine/specs/divine-communication-system.md#42-vision-generation) | - |
-| Player vision sending UI | ⏳ | [UI Spec](custom_game_engine/specs/divine-systems-ui.md) | 🔀 |
-| Sacred site discovery | ⏳ | [Section 5](custom_game_engine/specs/divine-communication-system.md#5-sacred-locations) | 🔀 |
-| Faith system | ⏳ | [Section 7](custom_game_engine/specs/divine-communication-system.md#7-faith--doubt-mechanics) | - |
-| Group prayer & rituals | ⏳ | [Section 6](custom_game_engine/specs/divine-communication-system.md#6-group-prayer--rituals) | 🔀 |
-| Integration with Dreams | ⏳ | [Section 9.1](custom_game_engine/specs/divine-communication-system.md#91-with-circadiandreams-system) | - |
+| PrayerComponent & System | ⏳ | [Section 2](openspec/specs/divinity-system/divine-communication-system.md#2-prayer-system) | - |
+| Prayer triggers and generation | ⏳ | [Section 2.2-2.3](openspec/specs/divinity-system/divine-communication-system.md#22-prayer-behavior) | 🔀 |
+| SpiritualComponent | ⏳ | [Section 3.1](openspec/specs/divinity-system/divine-communication-system.md#31-spiritual-component) | 🔀 |
+| MeditateAction behavior | ⏳ | [Section 3.2](openspec/specs/divinity-system/divine-communication-system.md#32-meditation-behavior) | - |
+| Vision generation with LLM | ⏳ | [Section 4.2](openspec/specs/divinity-system/divine-communication-system.md#42-vision-generation) | - |
+| Player vision sending UI | ⏳ | [UI Spec](openspec/specs/divinity-system/divine-systems-ui.md) | 🔀 |
+| Sacred site discovery | ⏳ | [Section 5](openspec/specs/divinity-system/divine-communication-system.md#5-sacred-locations) | 🔀 |
+| Faith system | ⏳ | [Section 7](openspec/specs/divinity-system/divine-communication-system.md#7-faith--doubt-mechanics) | - |
+| Group prayer & rituals | ⏳ | [Section 6](openspec/specs/divinity-system/divine-communication-system.md#6-group-prayer--rituals) | 🔀 |
+| Integration with Dreams | ⏳ | [Section 9.1](openspec/specs/divinity-system/divine-communication-system.md#91-with-circadiandreams-system) | - |
 
 **Implementation:**
 - `packages/core/src/components/PrayerComponent.ts`
@@ -1052,20 +1052,20 @@ These phases extend beyond the core game:
 **Dependencies:** Phase 27 (Divine Communication)
 **Parallel Work:** Tasks within phase can be parallelized
 **Estimated LOC:** ~4,000
-**Spec:** [angel-delegation-system.md](custom_game_engine/specs/angel-delegation-system.md)
+**Spec:** [angel-delegation-system.md](openspec/specs/divinity-system/angel-delegation-system.md)
 
 | Task | Status | Spec | Parallel? |
 |------|--------|------|-----------|
-| AngelComponent & types | 🔒 Blocked | [Section 2](custom_game_engine/specs/angel-delegation-system.md#2-angel-types--components) | - |
-| Angel AI system (prayer assignment) | 🔒 Blocked | [Section 3.1](custom_game_engine/specs/angel-delegation-system.md#31-prayer-assignment) | - |
-| Angel response generation (LLM) | 🔒 Blocked | [Section 3.2](custom_game_engine/specs/angel-delegation-system.md#32-prayer-response-generation) | - |
-| Angel creation system | 🔒 Blocked | [Section 4.1](custom_game_engine/specs/angel-delegation-system.md#41-angel-creation) | 🔀 |
-| Divine resource management | 🔒 Blocked | [Section 8](custom_game_engine/specs/angel-delegation-system.md#8-divine-resources) | - |
-| Angel management UI | 🔒 Blocked | [UI Spec](custom_game_engine/specs/divine-systems-ui.md) | 🔀 |
-| Angel progression & leveling | 🔒 Blocked | [Section 6.1](custom_game_engine/specs/angel-delegation-system.md#61-leveling-system) | - |
-| Archangel hierarchy | 🔒 Blocked | [Section 5](custom_game_engine/specs/angel-delegation-system.md#5-angel-hierarchy) | 🔀 |
-| Angel failure & corruption | 🔒 Blocked | [Section 7](custom_game_engine/specs/angel-delegation-system.md#7-angel-failure--corruption) | 🔀 |
-| Outcome tracking | 🔒 Blocked | [Section 7.1](custom_game_engine/specs/angel-delegation-system.md#71-tracking-outcomes) | - |
+| AngelComponent & types | 🔒 Blocked | [Section 2](openspec/specs/divinity-system/angel-delegation-system.md#2-angel-types--components) | - |
+| Angel AI system (prayer assignment) | 🔒 Blocked | [Section 3.1](openspec/specs/divinity-system/angel-delegation-system.md#31-prayer-assignment) | - |
+| Angel response generation (LLM) | 🔒 Blocked | [Section 3.2](openspec/specs/divinity-system/angel-delegation-system.md#32-prayer-response-generation) | - |
+| Angel creation system | 🔒 Blocked | [Section 4.1](openspec/specs/divinity-system/angel-delegation-system.md#41-angel-creation) | 🔀 |
+| Divine resource management | 🔒 Blocked | [Section 8](openspec/specs/divinity-system/angel-delegation-system.md#8-divine-resources) | - |
+| Angel management UI | 🔒 Blocked | [UI Spec](openspec/specs/divinity-system/divine-systems-ui.md) | 🔀 |
+| Angel progression & leveling | 🔒 Blocked | [Section 6.1](openspec/specs/divinity-system/angel-delegation-system.md#61-leveling-system) | - |
+| Archangel hierarchy | 🔒 Blocked | [Section 5](openspec/specs/divinity-system/angel-delegation-system.md#5-angel-hierarchy) | 🔀 |
+| Angel failure & corruption | 🔒 Blocked | [Section 7](openspec/specs/divinity-system/angel-delegation-system.md#7-angel-failure--corruption) | 🔀 |
+| Outcome tracking | 🔒 Blocked | [Section 7.1](openspec/specs/divinity-system/angel-delegation-system.md#71-tracking-outcomes) | - |
 
 **Implementation:**
 - `packages/core/src/components/AngelComponent.ts`
@@ -1244,9 +1244,9 @@ All specifications linked for easy access:
 ### Divine Systems
 | Spec | Path | Phase |
 |------|------|-------|
-| Divine Communication System | [custom_game_engine/specs/divine-communication-system.md](custom_game_engine/specs/divine-communication-system.md) | 27 |
-| Angel Delegation System | [custom_game_engine/specs/angel-delegation-system.md](custom_game_engine/specs/angel-delegation-system.md) | 28 |
-| Divine Systems Integration | [custom_game_engine/specs/divine-systems-integration.md](custom_game_engine/specs/divine-systems-integration.md) | 27-28 |
+| Divine Communication System | [openspec/specs/divinity-system/divine-communication-system.md](openspec/specs/divinity-system/divine-communication-system.md) | 27 |
+| Angel Delegation System | [openspec/specs/divinity-system/angel-delegation-system.md](openspec/specs/divinity-system/angel-delegation-system.md) | 28 |
+| Divine Systems Integration | [openspec/specs/divinity-system/divine-systems-integration.md](openspec/specs/divinity-system/divine-systems-integration.md) | 27-28 |
 
 ### UI Specs
 | Spec | Path | Phase |

@@ -8,6 +8,7 @@
 import type { MagicCostType, MagicCost, MagicParadigm } from '../MagicParadigm.js';
 import type { ComposedSpell, MagicComponent, ResourcePool } from '../../components/MagicComponent.js';
 import type { BodyComponent } from '../../components/BodyComponent.js';
+import type { SpiritualComponent } from '../../components/SpiritualComponent.js';
 
 // ============================================================================
 // Context for Cost Calculation
@@ -49,6 +50,12 @@ export interface CastingContext {
 
   /** Caster's body component (for physical cost effects like blood loss) */
   bodyComponent?: BodyComponent;
+
+  /** Caster's spiritual component (for faith-based magic) */
+  spiritualComponent?: SpiritualComponent;
+
+  /** Paradigm-specific custom context data */
+  custom?: Record<string, unknown>;
 }
 
 /**
@@ -114,7 +121,33 @@ export type TerminalEffect =
   | { type: 'drab'; breathsRemaining: 0 }
   | { type: 'forsaken'; deityId: string }
   | { type: 'emotional_burnout'; dominantEmotion: string }
-  | { type: 'mutation'; mutationType: string };
+  | { type: 'mutation'; mutationType: string }
+  // Shinto/Animist terminal effects
+  | { type: 'purity_zero'; pollution: string; effectDescription?: string }
+  | { type: 'respect_zero'; offendedKami: string; effectDescription?: string }
+  // Dream magic terminal effects
+  | { type: 'lucidity_zero'; trappedInDream: boolean; effectDescription?: string }
+  | { type: 'fatigue_max'; comatose: boolean }
+  | { type: 'exhaustion'; cause: string }
+  | { type: 'madness'; madnessType: string }
+  // Song/Bardic terminal effects
+  | { type: 'voice_zero'; silenced: boolean; effectDescription?: string }
+  // Rune magic terminal effects
+  | { type: 'runic_zero'; runesDepleted: boolean }
+  | { type: 'runic_exhaustion'; cause: string }
+  | { type: 'material_shortage'; materialType: string }
+  // Sympathy terminal effects
+  | { type: 'alar_zero'; bindingsLost: boolean }
+  | { type: 'slippage_max'; burnedOut: boolean }
+  | { type: 'alar_break'; cause: string }
+  | { type: 'slippage_burn'; severity: string }
+  // Allomancy terminal effects
+  | { type: 'metal_depleted'; metalType: string; effectDescription?: string }
+  | { type: 'atium_gone'; visionLost: boolean }
+  | { type: 'pewter_collapse'; cause: string }
+  // Daemon terminal effects
+  | { type: 'bond_severed'; daemonLost: boolean; effectDescription?: string }
+  | { type: 'dust_depleted'; connectionLost: boolean; effectDescription?: string };
 
 /**
  * Result of deducting costs from a caster.

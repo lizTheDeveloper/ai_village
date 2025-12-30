@@ -725,3 +725,11 @@ export {
   TerminalEffectHandler,
   createTerminalEffectHandler,
 } from './TerminalEffectHandler.js';
+
+// ============================================================================
+// Magic System Initialization
+// ============================================================================
+
+export {
+  initializeMagicSystem,
+} from './InitializeMagicSystem.js';

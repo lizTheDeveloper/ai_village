@@ -83,18 +83,36 @@ export class DivineCostCalculator extends BaseCostCalculator {
   calculateCosts(
     spell: ComposedSpell,
     caster: MagicComponent,
-    _context: CastingContext
+    context: CastingContext
   ): SpellCost[] {
     const costs: SpellCost[] = [];
     const state = caster.paradigmState?.divine;
     const deityType = this.getDeityType(state?.deityId as string | undefined);
     const alignment = DEFAULT_DEITY_ALIGNMENTS[deityType] ?? DEFAULT_DEITY_ALIGNMENTS.life;
 
+    // Get faith level from SpiritualComponent if available
+    const spiritual = context.spiritualComponent;
+    const faithLevel = spiritual?.faith ?? 0.5; // Default to neutral faith
+
     // =========================================================================
     // Favor Cost (Primary)
     // =========================================================================
 
     let favorCost = Math.ceil(spell.manaCost * 0.3);
+
+    // High faith reduces favor costs, low faith increases them
+    // Faith 0.0 = +50% cost, Faith 0.5 = neutral, Faith 1.0 = -30% cost
+    const faithModifier = 1.5 - (faithLevel * 0.8);
+    favorCost = Math.ceil(favorCost * faithModifier);
+
+    // Recent prayer reduces costs (spiritual connection)
+    if (spiritual && spiritual.lastPrayerTime !== undefined) {
+      const timeSinceLastPrayer = context.tick - spiritual.lastPrayerTime;
+      // Within last minute (1200 ticks) = bonus
+      if (timeSinceLastPrayer < 1200) {
+        favorCost = Math.ceil(favorCost * 0.8);
+      }
+    }
 
     // Aligned spells cost less - or even gain favor!
     if (!alignment) {
@@ -142,6 +160,34 @@ export class DivineCostCalculator extends BaseCostCalculator {
         amount: extraFavorCost,
         source: 'forbidden_magic_penalty',
         terminal: true,
+      });
+    }
+
+    // =========================================================================
+    // Crisis of Faith Penalty
+    // =========================================================================
+
+    if (spiritual?.crisisOfFaith) {
+      // Divine magic is severely impaired during crisis of faith
+      costs.push({
+        type: 'favor',
+        amount: Math.ceil(spell.manaCost * 0.5),
+        source: 'crisis_of_faith_penalty',
+        terminal: true,
+      });
+    }
+
+    // =========================================================================
+    // Vision Bonus
+    // =========================================================================
+
+    if (spiritual?.hasReceivedVision && isAligned) {
+      // Agents who have received visions are more connected
+      // Refund some favor for aligned spells
+      costs.push({
+        type: 'favor',
+        amount: -Math.ceil(spell.manaCost * 0.1),
+        source: 'divine_vision_connection',
       });
     }
 

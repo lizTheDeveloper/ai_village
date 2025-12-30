@@ -104,12 +104,19 @@ import {
   registerDefaultResearch,
   // Phase 30: Magic System
   MagicSystem,
+  initializeMagicSystem,
+  SpellRegistry,
   // Metrics Collection System (with streaming support)
   MetricsCollectionSystem,
   // Live Entity API for dashboard queries
   LiveEntityAPI,
   // Governance Data System (Phase 11)
   GovernanceDataSystem,
+  // Auto-save & Time Travel
+  AutoSaveSystem,
+  CheckpointNamingService,
+  checkpointNamingService,
+  saveLoadService,
 } from '@ai-village/core';
 import {
   Renderer,
@@ -147,6 +154,8 @@ import {
   ShopPanel,
   createShopPanelAdapter,
   GovernanceDashboardPanel,
+  TimelinePanel,
+  UniverseConfigScreen,
   createGovernanceDashboardPanelAdapter,
   // Magic and Divine panels
   DivinePowersPanel,
@@ -628,6 +637,11 @@ async function registerAllSystems(
     liveEntityAPI.attach(streamClient);
     console.log('[Demo] Live Entity API attached for dashboard queries');
   }
+
+  // Auto-save & Time Travel system
+  const autoSaveSystem = new AutoSaveSystem();
+  gameLoop.systemRegistry.register(autoSaveSystem);
+  console.log('[Demo] AutoSaveSystem registered - checkpoints will be created at midnight');
 
   return {
     soilSystem,
@@ -2508,14 +2522,87 @@ async function main() {
   if (isLLMAvailable) {
     llmQueue = new LLMDecisionQueue(llmProvider, 1);
     promptBuilder = new StructuredPromptBuilder();
+
+    // Wire up checkpoint naming service with LLM
+    checkpointNamingService.setProvider(llmProvider);
+    console.log('[DEMO] Checkpoint naming service configured with LLM');
   } else {
     console.warn(`[DEMO] LLM not available at ${settings.llm.baseUrl}`);
     console.warn('[DEMO] Press ESC to open settings and configure LLM provider');
+    console.warn('[DEMO] Checkpoints will use default names (e.g., "Day 5")');
   }
 
   settingsPanel.setOnSettingsChange(() => {
     window.location.reload();
   });
+
+  // Initialize storage backend for save/load system
+  const { IndexedDBStorage } = await import('@ai-village/core');
+  const storage = new IndexedDBStorage('ai-village-saves');
+  saveLoadService.setStorage(storage);
+
+  // Check for existing checkpoints and show universe selection or timeline
+  const existingSaves = await saveLoadService.listSaves();
+  const hasCheckpoints = existingSaves.length > 0;
+
+  // Show universe selection screen or timeline
+  const universeSelection = await new Promise<{ type: 'new' | 'load'; magicParadigm?: string; checkpointKey?: string }>((resolve) => {
+    if (!hasCheckpoints) {
+      // No checkpoints - show universe creation screen
+      const universeConfigScreen = new UniverseConfigScreen();
+      universeConfigScreen.show((selectedParadigm) => {
+        resolve({ type: 'new', magicParadigm: selectedParadigm });
+      });
+    } else {
+      // Has checkpoints - show timeline browser with "New Universe" option
+      const timelinePanel = new TimelinePanel();
+
+      // Convert saves to checkpoints
+      const checkpoints = existingSaves.map(save => ({
+        key: save.key,
+        name: save.name,
+        day: (save as any).day || 0,
+        tick: (save as any).tick || 0,
+        timestamp: save.timestamp,
+        universeId: (save as any).universeId || 'unknown',
+        magicLawsHash: (save as any).magicLawsHash || 'base',
+      }));
+
+      timelinePanel.setTimelines(checkpoints);
+
+      // Add "New Universe" button to timeline panel
+      // TODO: Enhance TimelinePanel to support "New Universe" button
+      // For now, user can close the timeline to create new universe
+
+      timelinePanel.show(async (checkpointKey) => {
+        if (checkpointKey === 'new_universe') {
+          // User wants to create new universe
+          timelinePanel.hide();
+          const universeConfigScreen = new UniverseConfigScreen();
+          universeConfigScreen.show((selectedParadigm) => {
+            resolve({ type: 'new', magicParadigm: selectedParadigm });
+          });
+        } else {
+          // User selected existing checkpoint
+          resolve({ type: 'load', checkpointKey });
+        }
+      });
+    }
+  });
+
+  // If loading existing checkpoint, load it now before world creation
+  let loadedCheckpoint = false;
+  if (universeSelection.type === 'load' && universeSelection.checkpointKey) {
+    const result = await saveLoadService.load(universeSelection.checkpointKey, gameLoop.world);
+    if (result.success) {
+      console.log(`[Demo] Loaded checkpoint: ${result.metadata.name}`);
+      loadedCheckpoint = true;
+      // Skip world initialization since we loaded from checkpoint
+    } else {
+      console.error(`[Demo] Failed to load checkpoint: ${result.error}`);
+      // Fall back to new game
+    }
+  }
 
   // Register all systems
   const systemsResult = await registerAllSystems(gameLoop, llmQueue, promptBuilder);
@@ -2561,6 +2648,49 @@ async function main() {
       };
       const modeName = modeNames[newMode] ?? newMode;
       showNotification(`View: ${modeName}`, '#00CED1');
+      return true;
+    },
+  });
+
+  // Register timeline panel shortcut (Shift+L)
+  keyboardRegistry.register('open_timeline', {
+    key: 'L',
+    shift: true,
+    description: 'Open timeline/checkpoint browser',
+    category: 'Time Travel',
+    handler: () => {
+      const timelinePanel = new TimelinePanel();
+
+      // Get all checkpoints from save files
+      saveLoadService.listSaves().then(saves => {
+        // Convert save metadata to checkpoints
+        const checkpoints = saves.map(save => ({
+          key: save.key,
+          name: save.name,
+          day: (save as any).day || 0,  // TODO: Add day to save metadata
+          tick: (save as any).tick || 0,
+          timestamp: save.timestamp,
+          universeId: (save as any).universeId || 'unknown',
+          magicLawsHash: (save as any).magicLawsHash || 'base',
+        }));
+
+        timelinePanel.setTimelines(checkpoints);
+        timelinePanel.show(async (checkpointKey) => {
+          try {
+            const result = await saveLoadService.load(checkpointKey, gameLoop.world);
+            if (result.success) {
+              showNotification(`Loaded: ${result.metadata.name}`, '#4CAF50');
+            } else {
+              showNotification(`Failed to load: ${result.error}`, '#f44336');
+            }
+          } catch (error) {
+            showNotification(`Error loading checkpoint: ${error}`, '#f44336');
+          }
+        });
+
+        showNotification('Timeline browser opened', '#64B5F6');
+      });
+
       return true;
     },
   });
@@ -2740,44 +2870,85 @@ async function main() {
 
   setInterval(updateStatus, 100);
 
-  // Create world entity
-  const worldEntity = gameLoop.world.createEntity();
-  const initialWeather = createWeatherComponent('clear', 0, 120);
-  (worldEntity as any).addComponent(initialWeather);
+  // Only initialize new world if we didn't load a checkpoint
+  if (!loadedCheckpoint) {
+    console.log(`[Demo] Creating new world with magic paradigm: ${universeSelection.magicParadigm || 'none'}`);
 
-  const initialTime = createTimeComponent(6, 600);
-  (worldEntity as any).addComponent(initialTime);
+    // Create world entity
+    const worldEntity = gameLoop.world.createEntity();
+    const initialWeather = createWeatherComponent('clear', 0, 120);
+    (worldEntity as any).addComponent(initialWeather);
 
-  // Initialize named landmarks registry
-  const namedLandmarksComponent = createNamedLandmarksComponent();
-  (worldEntity as any).addComponent(namedLandmarksComponent);
+    const initialTime = createTimeComponent(6, 600);
+    (worldEntity as any).addComponent(initialTime);
 
-  // Create initial entities
-  createInitialBuildings(gameLoop.world);
-  createInitialAgents(gameLoop.world, settings.dungeonMasterPrompt);
-  const playerDeityId = await createPlayerDeity(gameLoop.world); // Create player deity for belief system
+    // Initialize named landmarks registry
+    const namedLandmarksComponent = createNamedLandmarksComponent();
+    (worldEntity as any).addComponent(namedLandmarksComponent);
 
-  // Set all agents to believe in the player deity
-  const agents = gameLoop.world.query().with('agent').executeEntities();
-  for (const agent of agents) {
-    const spiritual = agent.components.get('spiritual');
-    if (spiritual) {
-      (spiritual as any).believedDeity = playerDeityId;
+    // Initialize magic system based on selected paradigm
+    const selectedParadigm = universeSelection.magicParadigm || 'none';
+    initializeMagicSystem(gameLoop.world);
+
+    if (selectedParadigm !== 'none') {
+      console.log(`[Demo] Enabling magic paradigm: ${selectedParadigm}`);
+
+      // Map UI paradigm IDs to spell paradigm IDs
+      const paradigmMapping: Record<string, string[]> = {
+        'elemental': ['academic'], // Elemental = Academic magic with elemental spells
+        'divine': ['divine'],       // Divine = Divine/Priest magic
+        'blood': ['blood'],         // Blood = Blood magic (if spells exist)
+        'knowledge': ['academic'],  // Knowledge = Academic magic (true names)
+      };
+
+      const enabledParadigms = paradigmMapping[selectedParadigm] || [];
+
+      // Enable spells for the selected paradigm(s)
+      const spellRegistry = SpellRegistry.getInstance();
+      const allSpells = spellRegistry.getAllSpells();
+
+      // Unlock spells that match the enabled paradigm(s)
+      for (const spell of allSpells) {
+        if (enabledParadigms.includes(spell.paradigmId)) {
+          spellRegistry.unlockSpell(spell.id);
+          console.log(`[Demo] Unlocked spell: ${spell.name} (${spell.id})`);
+        }
+      }
+
+      console.log(`[Demo] Magic system configured with ${selectedParadigm} paradigm`);
+    } else {
+      console.log('[Demo] Magic system disabled (The First World)');
     }
+
+    // Create initial entities
+    createInitialBuildings(gameLoop.world);
+    createInitialAgents(gameLoop.world, settings.dungeonMasterPrompt);
+    const playerDeityId = await createPlayerDeity(gameLoop.world); // Create player deity for belief system
+
+    // Set all agents to believe in the player deity
+    const agents = gameLoop.world.query().with('agent').executeEntities();
+    for (const agent of agents) {
+      const spiritual = agent.components.get('spiritual');
+      if (spiritual) {
+        (spiritual as any).believedDeity = playerDeityId;
+      }
+    }
+
+    await createInitialPlants(gameLoop.world);
+    await createInitialAnimals(gameLoop.world, systemsResult.wildAnimalSpawning);
+
+    // Spawn berry bushes
+    const berryPositions = [
+      { x: 6, y: 4 }, { x: -7, y: 5 }, { x: 8, y: -3 },
+      { x: -6, y: -4 }, { x: 5, y: 7 }, { x: -8, y: 6 },
+      { x: 7, y: -6 }, { x: -5, y: -7 }, { x: 9, y: 2 },
+      { x: -9, y: -2 }, { x: 4, y: -8 }, { x: -4, y: 8 },
+      { x: 10, y: 0 }, { x: -10, y: 1 }, { x: 0, y: 10 },
+    ];
+    berryPositions.forEach(pos => createBerryBush(gameLoop.world, pos.x, pos.y));
+  } else {
+    console.log('[Demo] Skipping world initialization - loaded from checkpoint');
   }
-
-  await createInitialPlants(gameLoop.world);
-  await createInitialAnimals(gameLoop.world, systemsResult.wildAnimalSpawning);
-
-  // Spawn berry bushes
-  const berryPositions = [
-    { x: 6, y: 4 }, { x: -7, y: 5 }, { x: 8, y: -3 },
-    { x: -6, y: -4 }, { x: 5, y: 7 }, { x: -8, y: 6 },
-    { x: 7, y: -6 }, { x: -5, y: -7 }, { x: 9, y: 2 },
-    { x: -9, y: -2 }, { x: 4, y: -8 }, { x: -4, y: 8 },
-    { x: 10, y: 0 }, { x: -10, y: 1 }, { x: 0, y: 10 },
-  ];
-  berryPositions.forEach(pos => createBerryBush(gameLoop.world, pos.x, pos.y));
 
   // Farming action handler
   gameLoop.world.eventBus.subscribe('action:requested', (event: any) => {

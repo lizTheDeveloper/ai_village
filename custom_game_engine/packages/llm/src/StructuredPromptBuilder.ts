@@ -26,6 +26,7 @@ import {
   isEntityVisibleWithSkill,
   ALL_SKILL_IDS,
 } from '@ai-village/core';
+import { generatePersonalityPrompt } from './PersonalityPromptTemplates.js';
 
 /**
  * Structured prompt following agent-system/spec.md REQ-AGT-002
@@ -64,7 +65,7 @@ export class StructuredPromptBuilder {
     const skills = agent.components.get('skills') as SkillsComponent | undefined;
 
     // System Prompt: Role and personality (who you are)
-    const systemPrompt = this.buildSystemPrompt(identity?.name || 'Agent', personality);
+    const systemPrompt = this.buildSystemPrompt(identity?.name || 'Agent', personality, agent.id);
 
     // Skills: What you're good at
     const skillsText = this.buildSkillsSection(skills);
@@ -159,55 +160,17 @@ export class StructuredPromptBuilder {
 
   /**
    * Build system prompt with role and personality.
+   * Uses enhanced personality templates that blend multiple writer voices.
    * Just identity and personality traits - who you are at your core.
    */
-  private buildSystemPrompt(name: string, personality: PersonalityComponent | undefined): string {
-    // Base prompt - identity first
-    let prompt = `You are ${name}, a villager in a forest village.\n\n`;
-
-    // Personality comes next - this is core to who you are
-    if (personality) {
-      prompt += 'Your Personality:\n';
-
-    // Describe personality based on Big Five
-    if (personality.openness > 0.7) {
-      prompt += '- You are curious and adventurous\n';
-    } else if (personality.openness < 0.3) {
-      prompt += '- You are cautious and traditional\n';
+  private buildSystemPrompt(name: string, personality: PersonalityComponent | undefined, entityId?: string): string {
+    // If no personality component, use basic identity
+    if (!personality) {
+      return `You are ${name}, a villager in a forest village.\n\n`;
     }
 
-    if (personality.extraversion > 0.7) {
-      prompt += '- You are outgoing and social\n';
-    } else if (personality.extraversion < 0.3) {
-      prompt += '- You are quiet and introspective\n';
-    }
-
-    if (personality.agreeableness > 0.7) {
-      prompt += '- You love helping others\n';
-    } else if (personality.agreeableness < 0.3) {
-      prompt += '- You prefer to focus on your own goals\n';
-    }
-
-    if (personality.workEthic > 0.7) {
-      prompt += '- You are hardworking and dedicated\n';
-    } else if (personality.workEthic < 0.3) {
-      prompt += '- You prefer to take life easy\n';
-    }
-
-    if (personality.leadership > 0.7) {
-      prompt += '- You have a natural gift for bringing people together\n';
-      prompt += '- You care about understanding who your fellow villagers are - their skills, interests, and needs\n';
-      prompt += '- You enjoy helping people coordinate by connecting the right people to the right tasks\n';
-      prompt += '- You notice when someone needs help and when the village needs something done\n';
-      prompt += '- You lead through relationships, not commands\n';
-    } else if (personality.leadership < 0.3) {
-      prompt += '- You prefer to follow others and take direction\n';
-    }
-
-      prompt += '\n';
-    }
-
-    return prompt;
+    // Use enhanced personality prompt templates with entityId for consistent variations
+    return generatePersonalityPrompt({ name, personality, entityId });
   }
 
   /**

@@ -26,10 +26,14 @@ import { getAvailableMana, canCastSpell } from '../components/MagicComponent.js'
 import type { EventBus } from '../events/EventBus.js';
 import { SpellEffectExecutor } from '../magic/SpellEffectExecutor.js';
 import { SpellRegistry, type SpellDefinition } from '../magic/SpellRegistry.js';
-import { initializeMagicSystem as initMagicInfrastructure } from '../magic/InitializeMagicSystem.js';
+import { initializeMagicSystem as initMagicInfrastructure, getTerminalEffectHandler } from '../magic/InitializeMagicSystem.js';
 import { costCalculatorRegistry } from '../magic/costs/CostCalculatorRegistry.js';
 import { createDefaultContext, type CastingContext } from '../magic/costs/CostCalculator.js';
 import { costRecoveryManager } from '../magic/costs/CostRecoveryManager.js';
+import { MagicSkillTreeRegistry } from '../magic/MagicSkillTreeRegistry.js';
+import { evaluateNode, type EvaluationContext } from '../magic/MagicSkillTreeEvaluator.js';
+import type { SpiritualComponent } from '../components/SpiritualComponent.js';
+import type { BodyComponent } from '../components/BodyComponent.js';
 
 /**
  * MagicSystem - Process magic casting and effects
@@ -50,14 +54,25 @@ export class MagicSystem implements System {
   // Effect executor for applying spell effects
   private effectExecutor: SpellEffectExecutor | null = null;
 
-  initialize(world: World, _eventBus: EventBus): void {
+  // Skill tree registry for progression-gated spells
+  private skillTreeRegistry: MagicSkillTreeRegistry | null = null;
+
+  initialize(world: World, eventBus: EventBus): void {
     this.world = world;
 
     // Initialize magic infrastructure (effect appliers, registries, etc.)
     if (!this.initialized) {
-      initMagicInfrastructure();
+      // Pass world to enable terminal effect handling
+      initMagicInfrastructure(world);
       this.effectExecutor = SpellEffectExecutor.getInstance();
+      this.skillTreeRegistry = MagicSkillTreeRegistry.getInstance();
       this.initialized = true;
+
+      // Initialize terminal effect handler with event bus
+      const terminalHandler = getTerminalEffectHandler();
+      if (terminalHandler) {
+        terminalHandler.initialize(eventBus);
+      }
     }
 
     // Subscribe to spell learning events
@@ -76,6 +91,68 @@ export class MagicSystem implements System {
       if (entity) {
         this.grantMana(entity as EntityImpl, source, amount);
       }
+    });
+
+    // Subscribe to skill tree node unlock events (custom event type)
+    (world.eventBus as any).subscribe('magic:skill_node_unlocked', (event: any) => {
+      const { entityId, paradigmId, nodeId } = event.data;
+      const entity = world.getEntity(entityId);
+      if (entity) {
+        this.handleSkillNodeUnlocked(entity as EntityImpl, paradigmId, nodeId);
+      }
+    });
+
+    // Subscribe to skill tree XP grant events (custom event type)
+    (world.eventBus as any).subscribe('magic:grant_skill_xp', (event: any) => {
+      const { entityId, paradigmId, xpAmount } = event.data;
+      const entity = world.getEntity(entityId);
+      if (entity) {
+        this.grantSkillXP(entity as EntityImpl, paradigmId, xpAmount);
+      }
+    });
+
+    // Subscribe to spell_cast events for XP tracking and statistics
+    world.eventBus.subscribe('magic:spell_cast', (event) => {
+      // Get the caster entity from the event source
+      const casterId = event.source;
+      if (typeof casterId !== 'string') return;
+
+      const caster = world.getEntity(casterId);
+      if (!caster) return;
+
+      const { paradigm, manaCost } = event.data;
+      const paradigmId = paradigm ?? 'academic';
+
+      // Grant skill tree XP based on spell cost
+      const xpGained = Math.ceil((manaCost ?? 10) * 0.1);
+      this.grantSkillXP(caster as EntityImpl, paradigmId, xpGained);
+
+      // Update spell proficiency
+      this.incrementSpellProficiency(caster as EntityImpl, event.data.spellId);
+    });
+  }
+
+  /**
+   * Increment proficiency for a spell after casting.
+   */
+  private incrementSpellProficiency(entity: EntityImpl, spellId: string): void {
+    entity.updateComponent<MagicComponent>(CT.Magic, (current) => {
+      const knownSpells = current.knownSpells.map(spell => {
+        if (spell.spellId === spellId) {
+          return {
+            ...spell,
+            timesCast: spell.timesCast + 1,
+            proficiency: Math.min(100, spell.proficiency + 0.5), // Slow increase
+            lastCast: this.world?.tick,
+          };
+        }
+        return spell;
+      });
+      return {
+        ...current,
+        knownSpells,
+        totalSpellsCast: current.totalSpellsCast + 1,
+      };
     });
   }
 
@@ -103,6 +180,70 @@ export class MagicSystem implements System {
 
     // Use CostRecoveryManager for all resource regeneration
     this.applyMagicRegeneration(entity, magic, deltaTime);
+
+    // Sync faith/favor between SpiritualComponent and MagicComponent
+    this.syncFaithAndFavor(entity, magic);
+  }
+
+  /**
+   * Synchronize faith (SpiritualComponent) with divine favor (MagicComponent).
+   * This ensures bidirectional consistency:
+   * - Changes to divine favor affect agent's faith
+   * - Changes to faith affect divine magic costs
+   */
+  private syncFaithAndFavor(entity: EntityImpl, magic: MagicComponent): void {
+    // Only sync for divine paradigm users
+    if (magic.activeParadigmId !== 'divine' && !magic.knownParadigmIds.includes('divine')) {
+      return;
+    }
+
+    const spiritual = entity.getComponent<SpiritualComponent>(CT.Spiritual);
+    if (!spiritual) return;
+
+    const favorPool = magic.resourcePools.favor;
+    if (!favorPool) return;
+
+    // Calculate normalized favor (0-1)
+    const normalizedFavor = favorPool.maximum > 0 ? favorPool.current / favorPool.maximum : 0;
+
+    // Calculate expected faith based on favor (with some tolerance)
+    // High favor = high faith, but not 1:1 (favor can be higher with more experience)
+    const expectedFaith = Math.min(1.0, normalizedFavor * 0.8 + 0.1);
+
+    // If faith and favor are significantly different, sync them
+    const faithDiff = Math.abs(spiritual.faith - expectedFaith);
+    const favorDiff = Math.abs(normalizedFavor - spiritual.faith);
+
+    if (faithDiff > 0.1 || favorDiff > 0.1) {
+      // Average the two to create smooth sync (neither dominates)
+      const syncedValue = (spiritual.faith + expectedFaith) / 2;
+
+      // Update spiritual component if faith changed
+      if (Math.abs(spiritual.faith - syncedValue) > 0.01) {
+        entity.updateComponent<SpiritualComponent>(CT.Spiritual, (current) => ({
+          ...current,
+          faith: Math.max(0, Math.min(1.0, syncedValue)),
+        }));
+      }
+
+      // Update magic component if favor needs adjustment
+      const targetFavor = syncedValue * favorPool.maximum;
+      if (Math.abs(favorPool.current - targetFavor) > 1) {
+        entity.updateComponent<MagicComponent>(CT.Magic, (current) => {
+          const updatedPools = { ...current.resourcePools };
+          if (updatedPools.favor) {
+            updatedPools.favor = {
+              ...updatedPools.favor,
+              current: targetFavor,
+            };
+          }
+          return {
+            ...current,
+            resourcePools: updatedPools,
+          };
+        });
+      }
+    }
   }
 
   /**
@@ -199,10 +340,12 @@ export class MagicSystem implements System {
     let terminal = false;
 
     if (costCalculatorRegistry.has(paradigmId)) {
-      // Create casting context
+      // Create casting context with spiritual and body components
       const context: CastingContext = createDefaultContext(world.tick);
       context.casterId = caster.id;
       context.targetId = targetEntityId;
+      context.spiritualComponent = caster.getComponent<SpiritualComponent>(CT.Spiritual);
+      context.bodyComponent = caster.getComponent<BodyComponent>(CT.Body);
 
       try {
         const calculator = costCalculatorRegistry.get(paradigmId);
@@ -302,6 +445,10 @@ export class MagicSystem implements System {
       ...current,
       totalSpellsCast: current.totalSpellsCast + 1,
     }));
+
+    // Grant skill tree XP for casting (based on mana cost)
+    const xpGained = Math.ceil(spell.manaCost * 0.1); // 10% of mana cost as XP
+    this.grantSkillXP(caster, paradigmId, xpGained);
 
     return true;
   }
@@ -441,6 +588,11 @@ export class MagicSystem implements System {
       return false;
     }
 
+    // Get spell info from registry for the event
+    const spellRegistry = SpellRegistry.getInstance();
+    const spellDef = spellRegistry.getSpell(spellId);
+    const paradigmId = spellDef?.paradigmId ?? magic.activeParadigmId ?? 'academic';
+
     // Add to known spells
     entity.updateComponent<MagicComponent>(CT.Magic, (current) => ({
       ...current,
@@ -453,6 +605,20 @@ export class MagicSystem implements System {
         },
       ],
     }));
+
+    // Emit spell learned confirmation event
+    // (Using generic emit since magic:spell_learned_confirmed not in GameEventMap)
+    (this.world?.eventBus as any)?.emit({
+      type: 'magic:spell_learned_confirmed',
+      source: entity.id,
+      data: {
+        entityId: entity.id,
+        spellId,
+        spellName: spellDef?.name ?? spellId,
+        paradigmId,
+        initialProficiency,
+      },
+    });
 
     return true;
   }
@@ -513,5 +679,306 @@ export class MagicSystem implements System {
   dispelEffect(entityId: string, effectInstanceId: string, dispellerId: string): boolean {
     if (!this.effectExecutor || !this.world) return false;
     return this.effectExecutor.dispelEffect(entityId, effectInstanceId, dispellerId, this.world);
+  }
+
+  // =========================================================================
+  // Skill Tree Integration
+  // =========================================================================
+
+  /**
+   * Handle when a skill node is unlocked.
+   * Checks if the node grants spells and auto-learns them.
+   */
+  private handleSkillNodeUnlocked(entity: EntityImpl, paradigmId: string, nodeId: string): void {
+    if (!this.skillTreeRegistry) return;
+
+    const node = this.skillTreeRegistry.getNode(paradigmId, nodeId);
+    if (!node) return;
+
+    // Check node effects for spell unlocks
+    for (const effect of node.effects) {
+      const spellId = effect.target?.spellId;
+      if (effect.type === 'unlock_spell' && spellId) {
+        // Auto-learn the unlocked spell
+        this.learnSpell(entity, spellId, effect.baseValue ?? 0);
+
+        // Emit event (using type assertion for custom event)
+        (this.world?.eventBus as any)?.emit({
+          type: 'magic:spell_unlocked_from_skill_tree',
+          source: entity.id,
+          data: {
+            spellId,
+            paradigmId,
+            nodeId,
+            initialProficiency: effect.baseValue ?? 0,
+          },
+        });
+      }
+    }
+  }
+
+  /**
+   * Build an EvaluationContext for skill tree evaluation.
+   */
+  private buildEvaluationContext(
+    entity: EntityImpl,
+    paradigmId: string,
+    state: { xp: number; unlockedNodes: string[]; nodeProgress: Record<string, number> }
+  ): EvaluationContext | undefined {
+    if (!this.world) return undefined;
+
+    const magic = entity.getComponent<MagicComponent>(CT.Magic);
+
+    // Build MagicSkillProgress from the state
+    const progress = {
+      paradigmId,
+      treeVersion: 1,
+      unlockedNodes: state.unlockedNodes.reduce((acc, nodeId) => {
+        acc[nodeId] = 1; // Level 1 for unlocked nodes
+        return acc;
+      }, {} as Record<string, number>),
+      totalXpEarned: state.xp,
+      availableXp: state.xp,
+      discoveries: {},
+      relationships: {},
+      milestones: {},
+    };
+
+    return {
+      world: this.world,
+      agentId: entity.id,
+      progress,
+      magicComponent: magic ? {
+        paradigmState: magic.paradigmState as Record<string, unknown>,
+        techniqueProficiency: magic.techniqueProficiency as Record<string, number>,
+        formProficiency: magic.formProficiency as Record<string, number>,
+        corruption: magic.corruption,
+        favorLevel: magic.favorLevel,
+        manaPools: magic.manaPools.map(p => ({
+          source: p.source,
+          current: p.current,
+          maximum: p.maximum,
+        })),
+        resourcePools: Object.fromEntries(
+          Object.entries(magic.resourcePools).map(([key, pool]) => [
+            key,
+            { current: pool?.current ?? 0, maximum: pool?.maximum ?? 100 },
+          ])
+        ),
+      } : undefined,
+    };
+  }
+
+  /**
+   * Grant skill XP to an entity for a specific paradigm.
+   */
+  grantSkillXP(entity: EntityImpl, paradigmId: string, xpAmount: number): void {
+    const magic = entity.getComponent<MagicComponent>(CT.Magic);
+    if (!magic) return;
+
+    // Update skill tree state in magic component
+    entity.updateComponent<MagicComponent>(CT.Magic, (current) => {
+      const skillTreeState = current.skillTreeState ?? {};
+      const paradigmState = skillTreeState[paradigmId] ?? { xp: 0, unlockedNodes: [], nodeProgress: {} };
+
+      return {
+        ...current,
+        skillTreeState: {
+          ...skillTreeState,
+          [paradigmId]: {
+            ...paradigmState,
+            xp: paradigmState.xp + xpAmount,
+          },
+        },
+      };
+    });
+
+    // Check for newly unlockable nodes
+    this.checkSkillTreeUnlocks(entity, paradigmId);
+  }
+
+  /**
+   * Check if any skill tree nodes can be unlocked with current XP.
+   */
+  private checkSkillTreeUnlocks(entity: EntityImpl, paradigmId: string): void {
+    if (!this.skillTreeRegistry || !this.world) return;
+
+    const tree = this.skillTreeRegistry.getTree(paradigmId);
+    if (!tree) return;
+
+    const magic = entity.getComponent<MagicComponent>(CT.Magic);
+    if (!magic?.skillTreeState?.[paradigmId]) return;
+
+    const state = magic.skillTreeState[paradigmId];
+    if (!state) return;
+
+    // Build evaluation context
+    const evalContext = this.buildEvaluationContext(entity, paradigmId, state);
+    if (!evalContext) return;
+
+    // Check each node for unlockability
+    for (const node of tree.nodes) {
+      // Skip already unlocked nodes
+      if (state.unlockedNodes.includes(node.id)) continue;
+
+      // Check if node can be unlocked
+      const evaluation = evaluateNode(node, tree, evalContext);
+
+      if (evaluation.canPurchase && evaluation.visible) {
+        // Check if have enough XP
+        if (state.xp >= node.xpCost) {
+          // Auto-unlock available nodes (or could require player action)
+          this.unlockSkillNode(entity, paradigmId, node.id, node.xpCost);
+        }
+      }
+    }
+  }
+
+  /**
+   * Unlock a skill tree node for an entity.
+   */
+  unlockSkillNode(entity: EntityImpl, paradigmId: string, nodeId: string, xpCost: number): boolean {
+    const magic = entity.getComponent<MagicComponent>(CT.Magic);
+    if (!magic?.skillTreeState?.[paradigmId]) return false;
+
+    const state = magic.skillTreeState[paradigmId];
+    if (!state || state.xp < xpCost) return false;
+    if (state.unlockedNodes.includes(nodeId)) return false;
+
+    // Deduct XP and add node to unlocked list
+    entity.updateComponent<MagicComponent>(CT.Magic, (current) => {
+      const skillTreeState = current.skillTreeState ?? {};
+      const paradigmState = skillTreeState[paradigmId] ?? { xp: 0, unlockedNodes: [], nodeProgress: {} };
+
+      return {
+        ...current,
+        skillTreeState: {
+          ...skillTreeState,
+          [paradigmId]: {
+            ...paradigmState,
+            xp: paradigmState.xp - xpCost,
+            unlockedNodes: [...paradigmState.unlockedNodes, nodeId],
+          },
+        },
+      };
+    });
+
+    // Emit unlock event (triggers handleSkillNodeUnlocked)
+    // Using generic emit for events not in GameEventMap
+    (this.world?.eventBus as unknown as { emit: (e: Record<string, unknown>) => void })?.emit({
+      type: 'magic:skill_node_unlocked',
+      source: entity.id,
+      data: {
+        entityId: entity.id,
+        paradigmId,
+        nodeId,
+        xpSpent: xpCost,
+      },
+    });
+
+    return true;
+  }
+
+  /**
+   * Check if an entity meets skill tree requirements for a spell.
+   */
+  checkSkillTreeRequirements(entity: EntityImpl, spellId: string): boolean {
+    if (!this.skillTreeRegistry) return true; // No registry = no requirements
+
+    const spellRegistry = SpellRegistry.getInstance();
+    const spell = spellRegistry.getSpell(spellId);
+    if (!spell) return false;
+
+    // Check if spell has skill tree requirements
+    const paradigmId = spell.paradigmId ?? 'academic';
+    const tree = this.skillTreeRegistry.getTree(paradigmId);
+    if (!tree) return true; // No tree = no requirements
+
+    // Find nodes that unlock this spell
+    const unlockingNodes = tree.nodes.filter(node =>
+      node.effects.some(e => e.type === 'unlock_spell' && e.target?.spellId === spellId)
+    );
+
+    if (unlockingNodes.length === 0) return true; // Spell not gated by skill tree
+
+    // Check if entity has unlocked any of these nodes
+    const magic = entity.getComponent<MagicComponent>(CT.Magic);
+    if (!magic?.skillTreeState?.[paradigmId]) return false;
+
+    const state = magic.skillTreeState[paradigmId];
+    return unlockingNodes.some(node => state?.unlockedNodes.includes(node.id));
+  }
+
+  /**
+   * Get unlocked spells for an entity from skill trees.
+   */
+  getUnlockedSpellsFromSkillTrees(entity: EntityImpl): string[] {
+    if (!this.skillTreeRegistry) return [];
+
+    const magic = entity.getComponent<MagicComponent>(CT.Magic);
+    if (!magic?.skillTreeState) return [];
+
+    const unlockedSpells: string[] = [];
+
+    for (const [paradigmId, state] of Object.entries(magic.skillTreeState)) {
+      if (!state) continue;
+
+      const tree = this.skillTreeRegistry.getTree(paradigmId);
+      if (!tree) continue;
+
+      for (const nodeId of state.unlockedNodes) {
+        const node = tree.nodes.find(n => n.id === nodeId);
+        if (!node) continue;
+
+        for (const effect of node.effects) {
+          const spellId = effect.target?.spellId;
+          if (effect.type === 'unlock_spell' && spellId) {
+            unlockedSpells.push(spellId);
+          }
+        }
+      }
+    }
+
+    return unlockedSpells;
+  }
+
+  /**
+   * Get skill tree progression for an entity.
+   */
+  getSkillTreeProgress(entity: EntityImpl, paradigmId: string): {
+    xp: number;
+    unlockedNodes: string[];
+    availableNodes: string[];
+    totalNodes: number;
+  } | undefined {
+    if (!this.skillTreeRegistry || !this.world) return undefined;
+
+    const tree = this.skillTreeRegistry.getTree(paradigmId);
+    if (!tree) return undefined;
+
+    const magic = entity.getComponent<MagicComponent>(CT.Magic);
+    const state = magic?.skillTreeState?.[paradigmId] ?? { xp: 0, unlockedNodes: [], nodeProgress: {} };
+
+    // Build evaluation context
+    const evalContext = this.buildEvaluationContext(entity, paradigmId, state);
+    if (!evalContext) return undefined;
+
+    // Find available nodes
+    const availableNodes: string[] = [];
+    for (const node of tree.nodes) {
+      if (state.unlockedNodes.includes(node.id)) continue;
+
+      const evaluation = evaluateNode(node, tree, evalContext);
+      if (evaluation.canPurchase && evaluation.visible && state.xp >= node.xpCost) {
+        availableNodes.push(node.id);
+      }
+    }
+
+    return {
+      xp: state.xp,
+      unlockedNodes: state.unlockedNodes,
+      availableNodes,
+      totalNodes: tree.nodes.length,
+    };
   }
 }

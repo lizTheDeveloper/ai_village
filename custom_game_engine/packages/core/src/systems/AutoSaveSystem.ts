@@ -6,9 +6,10 @@
  *
  * Features:
  * - Saves at midnight every game day
- * - Keeps last 5 checkpoints (rolling window)
+ * - Smart retention policy (first 90 days: all, after: first 10, milestones, canon events)
  * - LLM-generated poetic names for each checkpoint
  * - Universe identity based on magic law configuration
+ * - Canon event detection (deaths, births, marriages, first achievements)
  */
 
 import type { System } from '../ecs/System.js';
@@ -18,6 +19,8 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import { saveLoadService } from '../persistence/SaveLoadService.js';
+import { canonEventDetector } from './CanonEventDetector.js';
+import { checkpointRetentionPolicy } from './CheckpointRetentionPolicy.js';
 
 /** Time component shape for duck typing */
 interface TimeData {
@@ -42,8 +45,8 @@ export class AutoSaveSystem implements System {
 
   private lastSaveDay: number = -1;
   private checkpoints: Checkpoint[] = [];
-  private readonly maxCheckpoints = 5;
   private nameGenerationPending: boolean = false;
+  private canonEventDetectorAttached: boolean = false;
 
   /**
    * Emit a generic event (checkpoint events aren't in GameEventMap yet)
@@ -57,6 +60,12 @@ export class AutoSaveSystem implements System {
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+    // Attach canon event detector on first update
+    if (!this.canonEventDetectorAttached) {
+      canonEventDetector.attachToWorld(world);
+      this.canonEventDetectorAttached = true;
+    }
+
     // Find time entity
     const timeEntity = entities[0];
     if (!timeEntity) return;
@@ -71,6 +80,11 @@ export class AutoSaveSystem implements System {
     // Save at midnight (when day changes)
     if (currentDay > this.lastSaveDay && this.lastSaveDay >= 0) {
       this.createCheckpoint(world, currentDay);
+
+      // Check if we need to prune old checkpoints (at end of month)
+      if (currentDay % 30 === 0) {
+        this.pruneOldCheckpoints(currentDay);
+      }
     }
 
     this.lastSaveDay = currentDay;
@@ -120,15 +134,6 @@ export class AutoSaveSystem implements System {
       // Add to checkpoints list
       this.checkpoints.push(checkpoint);
 
-      // Trim to max checkpoints (keep most recent 5)
-      if (this.checkpoints.length > this.maxCheckpoints) {
-        const oldCheckpoint = this.checkpoints.shift();
-        if (oldCheckpoint) {
-          // Delete the old checkpoint
-          await saveLoadService.deleteSave(oldCheckpoint.key);
-        }
-      }
-
       console.log(`[AutoSave] Checkpoint created: ${checkpointName} (${key})`);
 
       // Emit event for name generation
@@ -141,6 +146,44 @@ export class AutoSaveSystem implements System {
     } finally {
       this.nameGenerationPending = false;
     }
+  }
+
+  /**
+   * Prune old checkpoints based on retention policy.
+   * Called at the end of each month.
+   */
+  private async pruneOldCheckpoints(currentDay: number): Promise<void> {
+    const canonEvents = [...canonEventDetector.getCanonEvents()];
+
+    // Get checkpoints that should be deleted
+    const toDelete = checkpointRetentionPolicy.getCheckpointsToDelete(
+      this.checkpoints,
+      currentDay,
+      canonEvents
+    );
+
+    if (toDelete.length === 0) {
+      console.log(`[AutoSave] Retention check: All ${this.checkpoints.length} checkpoints kept`);
+      return;
+    }
+
+    console.log(`[AutoSave] Pruning ${toDelete.length} old checkpoints (keeping ${this.checkpoints.length - toDelete.length})`);
+
+    // Delete checkpoints
+    for (const checkpoint of toDelete) {
+      try {
+        await saveLoadService.deleteSave(checkpoint.key);
+        console.log(`[AutoSave] Deleted checkpoint: ${checkpoint.name} (day ${checkpoint.day})`);
+      } catch (error) {
+        console.error(`[AutoSave] Failed to delete checkpoint ${checkpoint.key}:`, error);
+      }
+    }
+
+    // Remove from in-memory list
+    const deletedKeys = new Set(toDelete.map(c => c.key));
+    this.checkpoints = this.checkpoints.filter(c => !deletedKeys.has(c.key));
+
+    console.log(`[AutoSave] Retention policy applied: ${this.checkpoints.length} checkpoints remaining`);
   }
 
   /**

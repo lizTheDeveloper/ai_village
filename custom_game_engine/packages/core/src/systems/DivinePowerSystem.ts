@@ -27,6 +27,8 @@ import {
 import type { PositionComponent } from '../components/PositionComponent.js';
 import { DivineCastingCalculator, createDivineCastingContext } from '../magic/costs/calculators/DivineCastingCalculator.js';
 import type { ComposedSpell } from '../components/MagicComponent.js';
+import { SpellRegistry } from '../magic/SpellRegistry.js';
+import { SpellEffectExecutor } from '../magic/SpellEffectExecutor.js';
 
 /**
  * Simplified presence data for crossing calculations.
@@ -222,6 +224,10 @@ export class DivinePowerSystem implements System {
 
       case 'divine_projection':
         this._executeDivineProjection(world, deityComp, deityEntity as EntityImpl, request, currentTick);
+        break;
+
+      case 'cast_divine_spell':
+        this._executeDivineSpell(world, deityComp, deityEntity as EntityImpl, request, currentTick);
         break;
 
       default:
@@ -895,6 +901,155 @@ export class DivinePowerSystem implements System {
       projection: projectionData,
       beliefCost: actualCost,
     });
+  }
+
+  /**
+   * Execute: Cast Divine Spell - Cast a spell from the divine paradigm
+   * Requires:
+   *   params.spellId: string (spell ID from SpellRegistry)
+   *   targetId?: string (optional target)
+   *   targetPosition?: { x: number; y: number } (optional position)
+   */
+  private _executeDivineSpell(
+    world: World,
+    deityComp: DeityComponent,
+    deityEntity: EntityImpl,
+    request: DivinePowerRequest,
+    currentTick: number
+  ): void {
+    const { spellId } = request.params ?? {};
+
+    if (!spellId) {
+      throw new Error('Cast divine spell requires spellId');
+    }
+
+    // Get the spell from registry
+    const spellRegistry = SpellRegistry.getInstance();
+    const spellDef = spellRegistry.getSpell(spellId);
+    if (!spellDef) {
+      throw new Error(`Divine spell ${spellId} not found in registry`);
+    }
+
+    // Verify it's a divine paradigm spell
+    if (spellDef.paradigmId !== 'divine') {
+      throw new Error(`Spell ${spellId} is not a divine paradigm spell`);
+    }
+
+    // Find witnesses for casting calculation
+    const witnessIds: string[] = [];
+    const witnessDevotions: number[] = [];
+
+    if (request.targetId) {
+      const target = world.getEntity(request.targetId);
+      if (target) {
+        const pos = target.components.get(CT.Position) as PositionComponent | undefined;
+        if (pos) {
+          // Find all agents near the spell target
+          const allEntities = world.query().with(CT.Agent).with(CT.Position).with(CT.Spiritual).executeEntities();
+          for (const entity of allEntities) {
+            const entityPos = entity.components.get(CT.Position) as PositionComponent;
+            if (entityPos) {
+              const dx = entityPos.x - pos.x;
+              const dy = entityPos.y - pos.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              if (distance <= spellDef.range) {
+                witnessIds.push(entity.id);
+                const spiritual = entity.components.get(CT.Spiritual) as SpiritualComponent | undefined;
+                witnessDevotions.push(spiritual?.faith ?? 0.1);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Create divine casting context
+    const context = createDivineCastingContext(
+      currentTick,
+      deityEntity.id,
+      witnessIds,
+      witnessDevotions
+    );
+
+    // Calculate costs using divine calculator
+    const calculator = new DivineCastingCalculator();
+    const spellResult = calculator.calculateMiracleResult(spellDef, context);
+
+    // Check belief cost
+    if (!deityComp.spendBelief(spellResult.beliefSpent)) {
+      throw new Error(`Insufficient belief. Need: ${spellResult.beliefSpent}, Have: ${deityComp.belief.currentBelief}`);
+    }
+
+    // Apply spell effect using SpellEffectExecutor
+    const effectExecutor = SpellEffectExecutor.getInstance();
+    if (spellDef.effectId && effectExecutor) {
+      // Get target entity if there is one
+      const targetEntity = request.targetId ? world.getEntity(request.targetId) : null;
+
+      // Apply the spell effect (deity is caster, target is the entity if exists)
+      if (targetEntity) {
+        effectExecutor.executeEffect(
+          spellDef.effectId,
+          deityEntity,
+          targetEntity,
+          spellDef,
+          world,
+          currentTick,
+          1.0 // Power multiplier
+        );
+      }
+    }
+
+    // Gain belief from witnesses
+    if (spellResult.beliefGained > 0) {
+      deityComp.belief.currentBelief += spellResult.beliefGained;
+    }
+
+    // Increase faith of believing witnesses
+    if (spellResult.wasWitnessed) {
+      for (const witnessId of witnessIds) {
+        const witness = world.getEntity(witnessId);
+        if (witness) {
+          const spiritual = witness.components.get(CT.Spiritual) as SpiritualComponent | undefined;
+          if (spiritual && spiritual.believedDeity === deityEntity.id) {
+            const updatedSpiritual: SpiritualComponent = {
+              ...spiritual,
+              faith: Math.min(1.0, spiritual.faith + 0.05),
+            };
+            (witness as EntityImpl).addComponent(updatedSpiritual);
+          }
+        }
+      }
+    }
+
+    // Emit event
+    this.emitGeneric('divine_power:spell_cast', 'divine_power', {
+      deityId: request.deityId,
+      spellId,
+      spellName: spellDef.name,
+      targetId: request.targetId,
+      beliefSpent: spellResult.beliefSpent,
+      beliefGained: spellResult.beliefGained,
+      wasWitnessed: spellResult.wasWitnessed,
+    });
+
+    // Also emit standard magic:spell_cast event for tracking
+    if (this.eventBus) {
+      this.eventBus.emit({
+        type: 'magic:spell_cast',
+        source: deityEntity.id,
+        data: {
+          spellId,
+          spell: spellDef.name,
+          technique: spellDef.technique,
+          form: spellDef.form,
+          paradigm: 'divine',
+          manaCost: spellResult.beliefSpent,
+          targetId: request.targetId,
+          success: true,
+        },
+      });
+    }
   }
 
   /**

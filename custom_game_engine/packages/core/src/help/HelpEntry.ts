@@ -219,22 +219,45 @@ export function createItemHelp(
 
 /**
  * Helper to create an effect help entry
+ * Supports both positional args and object-style args
  */
+export function createEffectHelp(
+  id: string,
+  data: Omit<EffectHelpEntry, 'id' | 'category'> & { category?: string }
+): EffectHelpEntry;
 export function createEffectHelp(
   id: string,
   summary: string,
   description: string,
   effectCategory: string,
   targetType: string,
+  tags?: string[]
+): EffectHelpEntry;
+export function createEffectHelp(
+  id: string,
+  summaryOrData: string | (Omit<EffectHelpEntry, 'id' | 'category'> & { category?: string }),
+  description?: string,
+  effectCategory?: string,
+  targetType?: string,
   tags: string[] = []
 ): EffectHelpEntry {
+  // Object-style call
+  if (typeof summaryOrData === 'object') {
+    return {
+      ...summaryOrData,
+      id,
+      category: summaryOrData.category || 'magic',
+    } as EffectHelpEntry;
+  }
+
+  // Positional args call
   return {
     id,
-    summary,
-    description,
+    summary: summaryOrData,
+    description: description!,
     category: 'magic',
-    effectCategory,
-    targetType,
+    effectCategory: effectCategory!,
+    targetType: targetType!,
     tags,
   };
 }

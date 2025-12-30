@@ -157,6 +157,13 @@ export interface MagicComponent extends Component {
   formProficiency: Partial<Record<MagicForm, number>>;
 
   // =========================================================================
+  // Skill Tree State
+  // =========================================================================
+
+  /** Skill tree progression per paradigm */
+  skillTreeState?: Partial<Record<string, SkillTreeParadigmState>>;
+
+  // =========================================================================
   // Casting State
   // =========================================================================
 
@@ -237,8 +244,159 @@ export interface ParadigmSpecificState {
   /** For emotional magic: emotional stability */
   emotionalStability?: number;
 
+  // =========================================================================
+  // Shinto/Animist paradigm state
+  // =========================================================================
+
+  /** For Shinto magic: currently active kami ID */
+  activeKamiId?: string;
+
+  /** For Shinto magic: accumulated spiritual pollution */
+  pollution?: number;
+
+  /** For Shinto magic: sources of pollution */
+  pollutionSources?: string[];
+
+  /** For Shinto magic: when was the last purification ritual */
+  lastPurificationRitual?: number;
+
+  // =========================================================================
+  // Dream paradigm state
+  // =========================================================================
+
+  /** For dream magic: is the caster currently sleeping/dreaming */
+  sleeping?: boolean;
+
+  /** For dream magic: is the caster in a nightmare */
+  inNightmare?: boolean;
+
+  /** For dream magic: current depth in dream layers */
+  currentDreamDepth?: number;
+
+  /** For dream magic: when did the caster start sleeping */
+  lastSleepStart?: number;
+
+  // =========================================================================
+  // Song/Bardic paradigm state
+  // =========================================================================
+
+  /** For song magic: does caster have an instrument equipped */
+  hasInstrument?: boolean;
+
+  /** For song magic: type of instrument */
+  instrumentType?: string;
+
+  /** For song magic: is this a choir/group performance */
+  inChoir?: boolean;
+
+  /** For song magic: number of choir members */
+  choirSize?: number;
+
+  /** For song magic: currently active song */
+  currentSong?: string;
+
+  // =========================================================================
+  // Rune paradigm state
+  // =========================================================================
+
+  /** For rune magic: array of prepared rune/spell IDs */
+  preparedRunes?: string[];
+
+  /** For rune magic: number of active bindrunes */
+  activeBindrunes?: number;
+
+  /** For rune magic: array of known rune symbols */
+  knownRunes?: string[];
+
+  /** For rune magic: preferred carving material */
+  preferredMaterial?: string;
+
+  // =========================================================================
+  // Sympathy paradigm state (Kingkiller Chronicle)
+  // =========================================================================
+
+  /** For sympathy magic: quality of sympathetic link (0-1) */
+  linkQuality?: number;
+
+  /** For sympathy magic: current alar split count */
+  alarSplits?: number;
+
+  /** For sympathy magic: temperature differential for heat transfer */
+  temperatureDifferential?: number;
+
+  /** For sympathy magic: currently active bindings */
+  activeBindings?: number;
+
+  /** For sympathy magic: current link IDs */
+  currentLinks?: string[];
+
+  // =========================================================================
+  // Allomancy paradigm state (Mistborn)
+  // =========================================================================
+
+  /** For allomancy: current burn rate */
+  burnRate?: 'gentle' | 'normal' | 'flared' | 'duralumin_boosted';
+
+  /** For allomancy: is savant (addicted to specific metal) */
+  isSavant?: boolean;
+
+  /** For allomancy: which metal is savant for */
+  savantMetal?: string;
+
+  /** For allomancy: metal reserves (type -> amount) */
+  metalReserves?: Record<string, number>;
+
+  /** For allomancy: type of misting (single metal allomancer) */
+  mistingType?: string;
+
+  /** For allomancy: savant level per metal (addiction level) */
+  savantLevels?: Record<string, number>;
+
+  // =========================================================================
+  // Daemon paradigm state (His Dark Materials)
+  // =========================================================================
+
+  /** For daemon magic: daemon entity ID */
+  daemonId?: string;
+
+  /** For daemon magic: has daemon settled (fixed form) */
+  daemonSettled?: boolean;
+
+  /** For daemon magic: distance from daemon */
+  daemonDistance?: number;
+
+  /** For daemon magic: is witch (can separate from daemon) */
+  isWitch?: boolean;
+
+  /** For daemon magic: daemon's name */
+  daemonName?: string;
+
+  /** For daemon magic: daemon's current form */
+  daemonForm?: string;
+
+  /** For daemon magic: settlement status */
+  settlementStatus?: 'unsettled' | 'settling' | 'settled' | 'severed';
+
   /** Generic key-value storage */
   custom?: Record<string, unknown>;
+}
+
+// ============================================================================
+// Skill Tree Paradigm State
+// ============================================================================
+
+/**
+ * State for tracking skill tree progression in a specific paradigm.
+ */
+export interface SkillTreeParadigmState {
+  /** Current available XP in this paradigm */
+  xp: number;
+
+  /** List of unlocked node IDs */
+  unlockedNodes: string[];
+
+  /** Progress toward each node (node ID -> progress value) */
+  nodeProgress: Record<string, number>;
 }
 
 // ============================================================================

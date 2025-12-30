@@ -27,7 +27,8 @@ export * from './ConversationComponent.js';
 export { createConversationComponent } from './ConversationComponent.js';
 export type { ConversationComponent } from './ConversationComponent.js';
 export * from './RelationshipComponent.js';
-export { createRelationshipComponent, RelationshipComponent } from './RelationshipComponent.js';
+export { createRelationshipComponent } from './RelationshipComponent.js';
+export type { RelationshipComponent } from './RelationshipComponent.js';
 export * from './PersonalityComponent.js';
 export { PersonalityComponent } from './PersonalityComponent.js';
 export * from './IdentityComponent.js';
@@ -106,8 +107,8 @@ export {
   getFoodStorageInfo,
   getVillageInfo,
   getAvailableBuildings,
-  SkillsComponent,
 } from './SkillsComponent.js';
+export type { SkillsComponent } from './SkillsComponent.js';
 // Personal goals
 export * from './GoalsComponent.js';
 export { createGoalsComponent, formatGoalsForPrompt, type GoalsComponent } from './GoalsComponent.js';

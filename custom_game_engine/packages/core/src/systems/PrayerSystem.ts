@@ -10,6 +10,9 @@ import { recordPrayer } from '../components/SpiritualComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { MoodComponent } from '../components/MoodComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
+import { resolvePrayer } from '../divinity/CosmologyInteraction.js';
+import type { Spirit } from '../divinity/AnimistTypes.js';
+import type { Deity } from '../divinity/DeityTypes.js';
 
 /**
  * PrayerSystem - Generates prayers from agents to deities
@@ -58,11 +61,8 @@ export class PrayerSystem implements System {
 
     if (!spiritual || !personality) return;
 
-    // Skip if no deity
-    if (!spiritual.believedDeity) return;
-
     // Skip if faith is too low (< 0.1)
-    if (spiritual.faith < 0.1) return;
+    if (spiritual.faith < 0.1 && !spiritual.believedDeity) return;
 
     // Check if it's time to pray based on prayer frequency
     const timeSinceLastPrayer = currentTick - (spiritual.lastPrayerTime ?? 0);
@@ -76,6 +76,14 @@ export class PrayerSystem implements System {
 
     // Update component
     (entity as EntityImpl).addComponent(updatedSpiritual);
+
+    // Handle prayer routing based on whether agent has a specific deity
+    if (!spiritual.believedDeity || this._isPrayerToSpirit(prayer)) {
+      // Use CosmologyInteraction to resolve ambiguous prayer
+      // This handles prayers to spirits, proto-deities, or unknown divine entities
+      this._resolveAmbiguousPrayer(entity, prayer, deities, currentTick);
+      return;
+    }
 
     // Add prayer to deity's queue
     const deity = deities.find(d => d.id === spiritual.believedDeity);
@@ -97,6 +105,107 @@ export class PrayerSystem implements System {
           prayerType: prayer.type,
           urgency: prayer.urgency,
           prayerId: prayer.id,
+        },
+      });
+    }
+  }
+
+  /**
+   * Check if a prayer is directed at a spirit rather than a deity.
+   */
+  private _isPrayerToSpirit(prayer: Prayer): boolean {
+    const content = prayer.content.toLowerCase();
+    // Keywords that indicate prayer to a spirit rather than a deity
+    const spiritKeywords = ['spirit', 'kami', 'ancestor', 'essence', 'guardian of'];
+    return spiritKeywords.some(keyword => content.includes(keyword));
+  }
+
+  /**
+   * Handle prayers to spirits or unknown entities using CosmologyInteraction.
+   * Called when prayer target is ambiguous (e.g., "the river spirit", "the forest god").
+   */
+  private _resolveAmbiguousPrayer(
+    entity: Entity,
+    prayer: Prayer,
+    nearbyEntities: ReadonlyArray<Entity>,
+    currentTick: number
+  ): void {
+    // Extract nearby spirits and deities for cosmology resolution
+    // NOTE: Spirit component not yet implemented - using empty array for now
+    const nearbySpirits: Spirit[] = [];
+    // TODO: Uncomment when Spirit component is added to ComponentType enum
+    // const nearbySpirits: Spirit[] = nearbyEntities
+    //   .filter(e => e.components.has(CT.Spirit))
+    //   .map(e => {
+    //     const spiritComp = e.components.get(CT.Spirit) as any;
+    //     return {
+    //       id: e.id,
+    //       magnitude: spiritComp?.magnitude ?? 'minor',
+    //       totalRespect: spiritComp?.totalRespect ?? 0,
+    //       ...spiritComp,
+    //     } as Spirit;
+    //   });
+
+    const nearbyDeities: Deity[] = nearbyEntities
+      .filter(e => e.components.has(CT.Deity))
+      .map(e => {
+        const deityComp = e.components.get(CT.Deity) as any;
+        return {
+          id: e.id,
+          ...deityComp,
+        } as Deity;
+      });
+
+    // Use cosmology to resolve where this prayer should go
+    const resolution = resolvePrayer(
+      entity.id,
+      prayer.content,
+      nearbySpirits,
+      nearbyDeities
+    );
+
+    // Emit resolution event (using generic emit for events not in GameEventMap)
+    if (this.eventBus) {
+      (this.eventBus as unknown as { emit: (e: Record<string, unknown>) => void }).emit({
+        type: 'prayer:resolved',
+        source: 'prayer',
+        data: {
+          agentId: entity.id,
+          prayerId: prayer.id,
+          resolutionType: resolution.type,
+          targetId: resolution.targetId,
+          beliefGenerated: resolution.beliefGenerated,
+          respectGenerated: resolution.respectGenerated,
+          couldCreateDeity: resolution.couldCreateDeity,
+          timestamp: currentTick,
+        },
+      });
+    }
+
+    // Handle spirit prayer
+    // TODO: Uncomment when Spirit component is implemented
+    // if (resolution.type === 'spirit' && resolution.targetId) {
+    //   const spirit = nearbyEntities.find(e => e.id === resolution.targetId);
+    //   if (spirit) {
+    //     const spiritComp = spirit.components.get(CT.Spirit) as any;
+    //     if (spiritComp) {
+    //       // Add respect to spirit
+    //       spiritComp.totalRespect = (spiritComp.totalRespect ?? 0) + resolution.respectGenerated;
+    //       (spirit as EntityImpl).addComponent(spiritComp);
+    //     }
+    //   }
+    // }
+
+    // Handle unresolved prayer (potential deity emergence)
+    if (resolution.type === 'unresolved' && resolution.couldCreateDeity) {
+      (this.eventBus as unknown as { emit: (e: Record<string, unknown>) => void })?.emit({
+        type: 'divinity:proto_deity_belief',
+        source: 'prayer',
+        data: {
+          agentId: entity.id,
+          prayerContent: prayer.content,
+          beliefContributed: resolution.beliefGenerated,
+          timestamp: currentTick,
         },
       });
     }
