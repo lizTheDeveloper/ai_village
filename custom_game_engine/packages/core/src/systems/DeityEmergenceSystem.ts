@@ -13,6 +13,7 @@
 import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import type { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
@@ -21,6 +22,14 @@ import type {
   DeityOrigin,
   PerceivedPersonality
 } from '../divinity/DeityTypes.js';
+
+/** Tracked belief contribution from proto_deity_belief events */
+interface ProtoDeityBelief {
+  concept: DivineDomain | null;
+  totalBelief: number;
+  contributors: Set<string>;
+  lastContribution: number;
+}
 
 // ============================================================================
 // Emergence Detection
@@ -106,9 +115,61 @@ export class DeityEmergenceSystem implements System {
 
   private config: EmergenceConfig;
   private lastCheck: number = 0;
+  // Stored for future event emission (deity_emerged event)
+  // TODO: Use this to emit deity_emerged events when deities are created
+  // private _eventBus?: EventBus;
+
+  // Track belief contributions from proto_deity_belief events
+  // Key is inferred concept (or 'unknown' if no concept detected)
+  private protoDeityBeliefs: Map<string, ProtoDeityBelief> = new Map();
 
   constructor(config: Partial<EmergenceConfig> = {}) {
     this.config = { ...DEFAULT_EMERGENCE_CONFIG, ...config };
+  }
+
+  initialize(_world: World, eventBus: EventBus): void {
+    // Subscribe to proto_deity_belief events from PrayerSystem
+    // These are emitted when prayers cannot be routed to an existing deity
+    // and might contribute to emerging a new one
+    (eventBus.subscribe as any)('divinity:proto_deity_belief', (event: any) => {
+      const data = event.data as {
+        agentId: string;
+        prayerContent: string;
+        beliefContributed: number;
+        timestamp: number;
+        concept?: string;
+      };
+
+      this.trackProtoDeityBelief(data);
+    });
+  }
+
+  /**
+   * Track belief contributed by a prayer that might spawn a new deity
+   */
+  private trackProtoDeityBelief(data: {
+    agentId: string;
+    prayerContent: string;
+    beliefContributed: number;
+    timestamp: number;
+    concept?: string;
+  }): void {
+    // Infer concept from prayer content if not provided
+    const concept = data.concept || this.inferDomainFromPrayer(data.prayerContent) || 'unknown';
+
+    if (!this.protoDeityBeliefs.has(concept)) {
+      this.protoDeityBeliefs.set(concept, {
+        concept: concept === 'unknown' ? null : concept as DivineDomain,
+        totalBelief: 0,
+        contributors: new Set(),
+        lastContribution: data.timestamp,
+      });
+    }
+
+    const tracked = this.protoDeityBeliefs.get(concept)!;
+    tracked.totalBelief += data.beliefContributed;
+    tracked.contributors.add(data.agentId);
+    tracked.lastContribution = data.timestamp;
   }
 
   update(world: World): void {
@@ -121,13 +182,74 @@ export class DeityEmergenceSystem implements System {
 
     this.lastCheck = currentTick;
 
-    // Scan for belief patterns
+    // First, check if any proto_deity_beliefs have accumulated enough to trigger emergence
+    this.checkProtoDeityEmergence(world, currentTick);
+
+    // Scan for belief patterns from agent data
     const patterns = this.detectBeliefPatterns(world);
+
+    // Incorporate tracked proto_deity_belief data into patterns
+    for (const pattern of patterns) {
+      const tracked = this.protoDeityBeliefs.get(pattern.concept);
+      if (tracked) {
+        // Add accumulated belief from events to pattern total
+        pattern.totalBelief += tracked.totalBelief;
+        // Merge contributors
+        for (const contributor of tracked.contributors) {
+          if (!pattern.agentIds.includes(contributor)) {
+            pattern.agentIds.push(contributor);
+          }
+        }
+      }
+    }
 
     // Check if any patterns meet emergence threshold
     for (const pattern of patterns) {
       if (this.shouldEmerge(pattern)) {
         this.emergeDeity(world, pattern, currentTick);
+        // Clear tracked data for this concept after emergence
+        this.protoDeityBeliefs.delete(pattern.concept);
+      }
+    }
+
+    // Clean up stale proto-deity beliefs (older than 10 minutes at 20 TPS)
+    const staleThreshold = currentTick - 12000;
+    for (const [concept, tracked] of this.protoDeityBeliefs) {
+      if (tracked.lastContribution < staleThreshold) {
+        this.protoDeityBeliefs.delete(concept);
+      }
+    }
+  }
+
+  /**
+   * Check if any proto_deity_beliefs have accumulated enough for emergence
+   * This provides faster emergence when many prayers target the same concept
+   */
+  private checkProtoDeityEmergence(world: World, currentTick: number): void {
+    for (const [conceptKey, tracked] of this.protoDeityBeliefs) {
+      // Skip if not enough belief accumulated
+      if (tracked.totalBelief < this.config.minBeliefPoints) continue;
+      // Skip if not enough contributors
+      if (tracked.contributors.size < this.config.minBelievers) continue;
+
+      // Skip unknown concepts
+      if (!tracked.concept) continue;
+
+      // Create a pattern from tracked data
+      const agentIds = Array.from(tracked.contributors);
+      const pattern: BeliefPattern = {
+        concept: tracked.concept,
+        agentIds,
+        averageStrength: tracked.totalBelief / agentIds.length / 10, // Estimate
+        cohesion: 0.8, // Assume high cohesion for event-driven data
+        totalBelief: tracked.totalBelief,
+        trigger: this.determineTrigger(world, agentIds, tracked.concept),
+        firstDetected: tracked.lastContribution,
+      };
+
+      if (this.shouldEmerge(pattern)) {
+        this.emergeDeity(world, pattern, currentTick);
+        this.protoDeityBeliefs.delete(conceptKey);
       }
     }
   }

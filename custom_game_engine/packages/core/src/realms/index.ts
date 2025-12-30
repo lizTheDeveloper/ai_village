@@ -27,3 +27,10 @@ export {
   getRealmDefinition,
   getAllRealmDefinitions,
 } from './RealmDefinitions.js';
+
+// Transition logic
+export * from './RealmTransition.js';
+export {
+  transitionToRealm,
+  returnToMortalWorld,
+} from './RealmTransition.js';

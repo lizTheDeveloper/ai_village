@@ -93,6 +93,7 @@ export * from './MassEventSystem.js';
 export * from './PassageSystem.js';
 // Realm System - Mythological pocket dimensions
 export * from './RealmManager.js';
+export * from './PortalSystem.js';
 // Auto-save & Time Travel
 export * from './AutoSaveSystem.js';
 export * from './CheckpointNamingService.js';
