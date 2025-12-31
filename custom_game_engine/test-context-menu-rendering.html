@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Context Menu Rendering Test</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #1a1a1a;
+      color: white;
+      font-family: monospace;
+    }
+    canvas {
+      border: 2px solid #333;
+      display: block;
+      margin: 20px 0;
+    }
+    .info {
+      background: #333;
+      padding: 10px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Context Menu Rendering Test</h1>
+  <div class="info">
+    <p><strong>Instructions:</strong> Right-click on the canvas to open the context menu.</p>
+    <p><strong>Expected:</strong> A radial menu should appear at the cursor position.</p>
+  </div>
+
+  <canvas id="testCanvas" width="800" height="600"></canvas>
+
+  <div class="info">
+    <p id="status">Status: Waiting for right-click...</p>
+    <p id="debug"></p>
+  </div>
+
+  <script type="module">
+    const canvas = document.getElementById('testCanvas');
+    const ctx = canvas.getContext('2d');
+    const statusEl = document.getElementById('status');
+    const debugEl = document.getElementById('debug');
+
+    // Simple radial menu renderer (standalone test)
+    class TestRadialMenuRenderer {
+      constructor(ctx) {
+        this.ctx = ctx;
+      }
+
+      render(items, centerX, centerY) {
+        console.log('[TestRenderer] Rendering', items.length, 'items at', centerX, centerY);
+
+        this.ctx.save();
+
+        const innerRadius = 30;
+        const outerRadius = 100;
+
+        // Draw menu background circle
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, outerRadius, 0, Math.PI * 2);
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        this.ctx.fill();
+
+        // Draw menu border
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
+
+        // Draw inner circle (dead zone)
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+        this.ctx.fill();
+
+        // Draw items
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          this.renderItem(item, centerX, centerY, innerRadius, outerRadius);
+        }
+
+        this.ctx.restore();
+        console.log('[TestRenderer] Render complete');
+      }
+
+      renderItem(item, centerX, centerY, innerRadius, outerRadius) {
+        this.ctx.save();
+        this.ctx.translate(centerX, centerY);
+
+        // Draw arc segment
+        const startRad = (item.startAngle * Math.PI) / 180;
+        const endRad = (item.endAngle * Math.PI) / 180;
+
+        // Background
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, outerRadius, startRad, endRad);
+        this.ctx.arc(0, 0, innerRadius, endRad, startRad, true);
+        this.ctx.closePath();
+
+        // Fill color
+        this.ctx.fillStyle = '#FFD700';  // Gold
+        this.ctx.fill();
+
+        // Border
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
+
+        // Label
+        const midAngle = (item.startAngle + item.endAngle) / 2;
+        const midRadius = (innerRadius + outerRadius) / 2;
+        const labelX = midRadius * Math.cos((midAngle * Math.PI) / 180);
+        const labelY = midRadius * Math.sin((midAngle * Math.PI) / 180);
+
+        this.ctx.fillStyle = '#000000';
+        this.ctx.font = '12px monospace';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(item.label, labelX, labelY);
+
+        this.ctx.restore();
+      }
+    }
+
+    // Test menu items
+    function createTestItems() {
+      const items = [
+        { id: '1', label: 'Action 1' },
+        { id: '2', label: 'Action 2' },
+        { id: '3', label: 'Action 3' },
+        { id: '4', label: 'Action 4' }
+      ];
+
+      // Calculate arc angles
+      const itemCount = items.length;
+      const gap = 3;
+      const arcPerItem = (360 - gap * itemCount) / itemCount;
+
+      return items.map((item, index) => ({
+        ...item,
+        startAngle: index * (arcPerItem + gap),
+        endAngle: index * (arcPerItem + gap) + arcPerItem
+      }));
+    }
+
+    const renderer = new TestRadialMenuRenderer(ctx);
+    let menuOpen = false;
+    let menuX = 0;
+    let menuY = 0;
+    const items = createTestItems();
+
+    // Clear canvas (game background)
+    function clearCanvas() {
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Render loop
+    function render() {
+      clearCanvas();
+
+      if (menuOpen) {
+        renderer.render(items, menuX, menuY);
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    // Handle right-click
+    canvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+
+      const rect = canvas.getBoundingClientRect();
+      menuX = e.clientX - rect.left;
+      menuY = e.clientY - rect.top;
+
+      console.log('[Test] Right-click at', menuX, menuY);
+      statusEl.textContent = `Status: Menu opened at (${menuX.toFixed(0)}, ${menuY.toFixed(0)})`;
+      debugEl.textContent = `Debug: ${items.length} items, rendering at cursor position`;
+
+      menuOpen = true;
+    });
+
+    // Handle left-click to close
+    canvas.addEventListener('click', (e) => {
+      if (menuOpen) {
+        console.log('[Test] Left-click - closing menu');
+        statusEl.textContent = 'Status: Menu closed. Right-click to reopen.';
+        menuOpen = false;
+      }
+    });
+
+    // Start render loop
+    console.log('[Test] Starting render loop');
+    render();
+    console.log('[Test] Ready for interaction');
+  </script>
+</body>
+</html>
