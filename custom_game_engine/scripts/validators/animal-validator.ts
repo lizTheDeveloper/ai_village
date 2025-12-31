@@ -44,7 +44,7 @@ export class AnimalValidator {
 
     // Temperament validation
     const validTemperaments = [
-      'docile', 'neutral', 'aggressive', 'skittish', 'curious', 'territorial'
+      'docile', 'skittish', 'aggressive', 'friendly', 'neutral'
     ];
     if (animal.temperament && !validTemperaments.includes(animal.temperament)) {
       this.addError(fileName, animal.id, 'temperament',

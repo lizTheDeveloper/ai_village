@@ -4,7 +4,16 @@
 
 import { componentSerializerRegistry } from '../ComponentSerializerRegistry.js';
 import { PositionSerializer } from './PositionSerializer.js';
+import { TrustNetworkSerializer } from './TrustNetworkSerializer.js';
 import { createGenericSerializer } from './GenericSerializer.js';
+import { ConflictSerializer } from './ConflictSerializer.js';
+import { InjurySerializer } from './InjurySerializer.js';
+import { GuardDutySerializer } from './GuardDutySerializer.js';
+import { CombatStatsSerializer } from './CombatStatsSerializer.js';
+import { DominanceRankSerializer } from './DominanceRankSerializer.js';
+import { PackCombatSerializer } from './PackCombatSerializer.js';
+import { HiveCombatSerializer } from './HiveCombatSerializer.js';
+import { ManchiSerializer } from './ManchiSerializer.js';
 
 /**
  * Register all component serializers.
@@ -13,6 +22,17 @@ import { createGenericSerializer } from './GenericSerializer.js';
 export function registerAllSerializers(): void {
   // Register specific serializers
   componentSerializerRegistry.register('position', new PositionSerializer());
+  componentSerializerRegistry.register('trust_network', new TrustNetworkSerializer());
+
+  // Register conflict component serializers
+  componentSerializerRegistry.register('conflict', new ConflictSerializer());
+  componentSerializerRegistry.register('injury', new InjurySerializer());
+  componentSerializerRegistry.register('guard_duty', new GuardDutySerializer());
+  componentSerializerRegistry.register('combat_stats', new CombatStatsSerializer());
+  componentSerializerRegistry.register('dominance_rank', new DominanceRankSerializer());
+  componentSerializerRegistry.register('pack_combat', new PackCombatSerializer());
+  componentSerializerRegistry.register('hive_combat', new HiveCombatSerializer());
+  componentSerializerRegistry.register('manchi', new ManchiSerializer());
 
   // Register generic serializers for all other components
   // These can be replaced with specific serializers later
@@ -65,7 +85,7 @@ export function registerAllSerializers(): void {
   }
 
   console.log(
-    `[Persistence] Registered ${genericComponents.length + 1} component serializers`
+    `[Persistence] Registered ${genericComponents.length + 10} component serializers`
   );
 }
 

@@ -378,7 +378,7 @@ describe('CraftingStations Integration Tests', () => {
       });
 
       // Verify entity is still deleted (not re-created by error)
-      expect(harness.world.getEntity(buildingId)).toBeUndefined();
+      expect(harness.world.getEntity(buildingId)).toBeNull();
     });
 
     it('should handle unknown building type in fuel config', () => {

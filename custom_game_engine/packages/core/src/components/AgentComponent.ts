@@ -49,6 +49,13 @@ export type AgentBehavior =
   | 'trade'
   // Magic (Phase 30)
   | 'cast_spell'
+  // Divine Communication (Phase 27)
+  | 'pray'
+  | 'meditate'
+  | 'group_pray'
+  // Building Maintenance (Phase 41)
+  | 'repair'
+  | 'upgrade'
   // Self-management
   | 'set_priorities';
 

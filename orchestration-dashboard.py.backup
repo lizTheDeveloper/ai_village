@@ -1,0 +1,561 @@
+#!/usr/bin/env python3
+"""
+Orchestration Dashboard - Development Progress Viewer
+Displays implementation roadmap and OpenSpec phases on port 3030
+"""
+
+import http.server
+import socketserver
+import json
+import re
+from pathlib import Path
+from urllib.parse import parse_qs, urlparse
+from datetime import datetime
+
+PORT = 3030
+BASE_DIR = Path(__file__).parent
+
+
+def parse_roadmap():
+    """Parse IMPLEMENTATION_ROADMAP.md to extract phases and completion status"""
+    roadmap_path = BASE_DIR / "architecture" / "IMPLEMENTATION_ROADMAP.md"
+
+    if not roadmap_path.exists():
+        return {"error": "IMPLEMENTATION_ROADMAP.md not found"}
+
+    content = roadmap_path.read_text()
+
+    phases = []
+    current_phase = None
+
+    # Extract phases
+    phase_pattern = r'##\s+(✅\s+)?Phase\s+(\d+|[A-Z]+\d+):\s+(.+?)(?:\s+\(COMPLETED\))?$'
+
+    for line in content.split('\n'):
+        match = re.match(phase_pattern, line)
+        if match:
+            completed = match.group(1) is not None
+            phase_num = match.group(2)
+            phase_name = match.group(3)
+
+            current_phase = {
+                "number": phase_num,
+                "name": phase_name,
+                "completed": completed,
+                "tasks": []
+            }
+            phases.append(current_phase)
+        elif current_phase and line.strip().startswith('✅'):
+            # Count completed tasks
+            current_phase["tasks"].append({"completed": True, "name": line.strip()})
+        elif current_phase and line.strip().startswith('□'):
+            # Count incomplete tasks
+            current_phase["tasks"].append({"completed": False, "name": line.strip()})
+
+    return phases
+
+
+def parse_openspec_specs():
+    """Parse OpenSpec documents from architecture folder"""
+    arch_dir = BASE_DIR / "architecture"
+
+    if not arch_dir.exists():
+        return []
+
+    specs = []
+    spec_files = [
+        "AUTOMATION_LOGISTICS_SPEC.md",
+        "HERBAL_BOTANY_SPEC.md",
+        "LITERARY_SURREALISM_SPEC.md",
+        "GENERATIVE_CITIES_SPEC.md",
+        "IMAJICA_DIMENSIONAL_DESIGN.md",
+        "VOXEL_BUILDING_SPEC.md",
+        "MAGIC_SKILL_TREE_SPEC.md",
+        "RESEARCH_DISCOVERY_SPEC.md",
+        "AUTONOMOUS_BUILDING_SPEC.md",
+        "DIVINE_PROGRESSION_SPEC.md",
+        "PLAYER_PATHS_SPEC.md",
+        "ITEM_MAGIC_PERSISTENCE_SPEC.md",
+        "PERSISTENCE_MULTIVERSE_SPEC.md"
+    ]
+
+    for spec_file in spec_files:
+        spec_path = arch_dir / spec_file
+        if spec_path.exists():
+            content = spec_path.read_text()
+
+            # Extract phase count
+            phase_count = len(re.findall(r'###?\s+Phase\s+[A-Z]+\d+:', content))
+
+            # Extract dependencies
+            deps_section = re.search(r'##\s+Dependencies & Integration(.*?)(?=##|\Z)', content, re.DOTALL)
+            dependencies = []
+            if deps_section:
+                depends_on = re.findall(r'-\s+\*\*(.+?)\*\*\s+-', deps_section.group(1))
+                dependencies = depends_on[:5]  # Limit to 5 for display
+
+            specs.append({
+                "name": spec_file.replace("_", " ").replace(".md", ""),
+                "file": spec_file,
+                "phases": phase_count,
+                "dependencies": dependencies
+            })
+
+    return specs
+
+
+def parse_work_orders():
+    """Parse work orders from custom_game_engine/agents/autonomous-dev/work-orders"""
+    work_orders_dir = BASE_DIR / "custom_game_engine" / "agents" / "autonomous-dev" / "work-orders"
+
+    if not work_orders_dir.exists():
+        return []
+
+    work_orders = []
+
+    # Find all work-order.md files
+    for work_order_path in work_orders_dir.rglob("work-order.md"):
+        if work_order_path.parent.name == "work-orders":
+            continue  # Skip files directly in work-orders/ (like README, TEMPLATE)
+
+        content = work_order_path.read_text()
+
+        # Extract metadata
+        title_match = re.search(r'^#\s+Work Order:\s+(.+)$', content, re.MULTILINE)
+        status_match = re.search(r'^\*\*Status:\*\*\s+(.+)$', content, re.MULTILINE)
+        phase_match = re.search(r'^\*\*Phase:\*\*\s+(.+)$', content, re.MULTILINE)
+
+        title = title_match.group(1) if title_match else work_order_path.parent.name
+        status = status_match.group(1) if status_match else "UNKNOWN"
+        phase = phase_match.group(1) if phase_match else "Unknown"
+
+        # Extract user notes if present
+        has_user_notes = "## 💬 User Notes" in content or "## User Notes" in content
+
+        work_orders.append({
+            "title": title,
+            "status": status,
+            "phase": phase,
+            "path": str(work_order_path.relative_to(BASE_DIR)),
+            "folder": work_order_path.parent.name,
+            "has_user_notes": has_user_notes
+        })
+
+    return sorted(work_orders, key=lambda x: x["status"])
+
+
+def generate_html():
+    """Generate HTML dashboard"""
+    phases = parse_roadmap()
+    specs = parse_openspec_specs()
+    work_orders = parse_work_orders()
+
+    # Count stats
+    completed_phases = sum(1 for p in phases if p.get("completed"))
+    total_phases = len(phases)
+    work_order_count = len(work_orders)
+
+    completion_percent = int((completed_phases / total_phases * 100)) if total_phases > 0 else 0
+
+    html = f"""<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Village - Orchestration Dashboard</title>
+    <meta charset="utf-8">
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            background: #0a0e1a;
+            color: #e0e6ed;
+            padding: 20px;
+            line-height: 1.6;
+        }}
+        .header {{
+            border-bottom: 2px solid #2a3f5f;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }}
+        h1 {{
+            color: #4a9eff;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }}
+        .timestamp {{
+            color: #7a8a9a;
+            font-size: 14px;
+        }}
+        .stats {{
+            background: #1a2332;
+            border: 1px solid #2a3f5f;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }}
+        .stat {{
+            text-align: center;
+        }}
+        .stat-value {{
+            font-size: 36px;
+            font-weight: bold;
+            color: #4a9eff;
+        }}
+        .stat-label {{
+            color: #7a8a9a;
+            font-size: 14px;
+            margin-top: 5px;
+        }}
+        .progress-bar {{
+            background: #1a2332;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }}
+        .progress-fill {{
+            background: linear-gradient(90deg, #2a5f9a 0%, #4a9eff 100%);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 0.3s ease;
+        }}
+        .section {{
+            margin-bottom: 40px;
+        }}
+        h2 {{
+            color: #4a9eff;
+            font-size: 20px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #2a3f5f;
+            padding-bottom: 10px;
+        }}
+        .phase {{
+            background: #1a2332;
+            border-left: 4px solid #2a5f9a;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }}
+        .phase.completed {{
+            border-left-color: #2a9a5f;
+            background: #1a2b1f;
+        }}
+        .phase-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }}
+        .phase-title {{
+            font-size: 16px;
+            font-weight: bold;
+            color: #e0e6ed;
+        }}
+        .phase.completed .phase-title {{
+            color: #5afa9a;
+        }}
+        .badge {{
+            background: #2a5f9a;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+        }}
+        .badge.completed {{
+            background: #2a9a5f;
+        }}
+        .task-count {{
+            color: #7a8a9a;
+            font-size: 14px;
+            margin-top: 5px;
+        }}
+        .spec-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }}
+        .spec-card {{
+            background: #1a2332;
+            border: 1px solid #2a3f5f;
+            border-radius: 8px;
+            padding: 20px;
+        }}
+        .spec-name {{
+            font-size: 16px;
+            font-weight: bold;
+            color: #4a9eff;
+            margin-bottom: 10px;
+        }}
+        .spec-info {{
+            color: #7a8a9a;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }}
+        .dependencies {{
+            margin-top: 10px;
+        }}
+        .dep-label {{
+            color: #9aafbf;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }}
+        .dep-item {{
+            background: #0a0e1a;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #7a8a9a;
+            display: inline-block;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎮 AI Village - Orchestration Dashboard</h1>
+        <div class="timestamp">Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</div>
+    </div>
+
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-value">{completed_phases}/{total_phases}</div>
+            <div class="stat-label">Phases Complete</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">{completion_percent}%</div>
+            <div class="stat-label">Overall Progress</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">{len(specs)}</div>
+            <div class="stat-label">OpenSpec Documents</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">{sum(s['phases'] for s in specs)}</div>
+            <div class="stat-label">Total OpenSpec Phases</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">{work_order_count}</div>
+            <div class="stat-label">Active Work Orders</div>
+        </div>
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress-fill" style="width: {completion_percent}%;">
+            {completion_percent}% Complete
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📋 Core Implementation Roadmap (Phases 0-20)</h2>
+"""
+
+    # Add phases
+    for phase in phases[:21]:  # Core phases 0-20
+        completed_badge = 'completed' if phase.get('completed') else ''
+        task_completed = sum(1 for t in phase.get('tasks', []) if t.get('completed'))
+        task_total = len(phase.get('tasks', []))
+
+        html += f"""
+        <div class="phase {completed_badge}">
+            <div class="phase-header">
+                <div class="phase-title">Phase {phase['number']}: {phase['name']}</div>
+                <span class="badge {completed_badge}">{'✅ COMPLETE' if phase.get('completed') else '🚧 IN PROGRESS'}</span>
+            </div>
+            <div class="task-count">{task_completed}/{task_total} tasks complete</div>
+        </div>
+"""
+
+    html += """
+    </div>
+
+    <div class="section">
+        <h2>🎯 OpenSpec Major Feature Expansions</h2>
+        <div class="spec-grid">
+"""
+
+    # Add OpenSpec specs
+    for spec in specs:
+        html += f"""
+            <div class="spec-card">
+                <div class="spec-name">{spec['name']}</div>
+                <div class="spec-info">📦 {spec['phases']} implementation phases</div>
+"""
+        if spec['dependencies']:
+            html += """
+                <div class="dependencies">
+                    <div class="dep-label">Dependencies:</div>
+"""
+            for dep in spec['dependencies']:
+                html += f'                    <span class="dep-item">{dep}</span>\n'
+            html += """
+                </div>
+"""
+        html += """
+            </div>
+"""
+
+    html += """
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📋 Active Work Orders</h2>
+"""
+
+    # Group work orders by status
+    status_order = ["IN_PROGRESS", "READY_FOR_TESTS", "COMPLETE", "BLOCKED", "UNKNOWN"]
+    by_status = {status: [] for status in status_order}
+
+    for wo in work_orders:
+        status = wo['status']
+        if status not in by_status:
+            by_status[status] = []
+        by_status[status].append(wo)
+
+    # Display work orders by status
+    for status in status_order:
+        if by_status[status]:
+            status_emoji = {
+                "IN_PROGRESS": "🚧",
+                "READY_FOR_TESTS": "✅",
+                "COMPLETE": "🎉",
+                "BLOCKED": "🔒",
+                "UNKNOWN": "❓"
+            }.get(status, "📝")
+
+            html += f"""
+        <h3 style="color: #9aafbf; font-size: 14px; margin: 20px 0 10px 0;">{status_emoji} {status}</h3>
+"""
+
+            for wo in by_status[status]:
+                notes_badge = ' <span style="background: #4a9eff; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 8px;">💬 Has User Notes</span>' if wo['has_user_notes'] else ''
+
+                html += f"""
+        <div class="spec-card" style="margin-bottom: 10px;">
+            <div class="spec-name">
+                <a href="/work-order/{wo['folder']}" style="color: #4a9eff; text-decoration: none;">{wo['title']}</a>
+                {notes_badge}
+            </div>
+            <div class="spec-info">📦 Phase: {wo['phase']}</div>
+        </div>
+"""
+
+    html += """
+    </div>
+</body>
+</html>
+"""
+
+    return html
+
+
+class DashboardHandler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == '/' or self.path == '/index.html':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            html = generate_html()
+            self.wfile.write(html.encode())
+        elif self.path.startswith('/work-order/'):
+            # Extract work order folder name
+            folder = self.path.split('/')[-1]
+            work_order_path = BASE_DIR / "custom_game_engine" / "agents" / "autonomous-dev" / "work-orders" / folder / "work-order.md"
+
+            if work_order_path.exists():
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+
+                # Read and render work order as HTML
+                import markdown
+                content = work_order_path.read_text()
+
+                html = f"""<!DOCTYPE html>
+<html>
+<head>
+    <title>Work Order: {folder}</title>
+    <meta charset="utf-8">
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            background: #0a0e1a;
+            color: #e0e6ed;
+            padding: 40px;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+        }}
+        a {{ color: #4a9eff; text-decoration: none; }}
+        a:hover {{ text-decoration: underline; }}
+        h1 {{ color: #4a9eff; margin: 20px 0; }}
+        h2 {{ color: #7a8a9a; margin: 20px 0 10px 0; border-bottom: 1px solid #2a3f5f; padding-bottom: 5px; }}
+        h3 {{ color: #9aafbf; margin: 15px 0 8px 0; }}
+        pre {{ background: #1a2332; padding: 15px; border-radius: 8px; overflow-x: auto; }}
+        code {{ background: #1a2332; padding: 2px 6px; border-radius: 4px; }}
+        table {{ border-collapse: collapse; width: 100%; margin: 15px 0; }}
+        th, td {{ border: 1px solid #2a3f5f; padding: 10px; text-align: left; }}
+        th {{ background: #1a2332; color: #4a9eff; }}
+        blockquote {{ border-left: 4px solid #4a9eff; padding-left: 15px; margin: 15px 0; color: #7a8a9a; }}
+        .back-link {{ display: inline-block; margin-bottom: 20px; padding: 8px 16px; background: #2a3f5f; border-radius: 4px; }}
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">← Back to Dashboard</a>
+    <pre style="white-space: pre-wrap; background: #1a2332; padding: 20px; border-radius: 8px;">{content}</pre>
+</body>
+</html>
+"""
+                self.wfile.write(html.encode())
+            else:
+                self.send_error(404)
+        elif self.path == '/api/phases':
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            phases = parse_roadmap()
+            self.wfile.write(json.dumps(phases, indent=2).encode())
+        elif self.path == '/api/specs':
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            specs = parse_openspec_specs()
+            self.wfile.write(json.dumps(specs, indent=2).encode())
+        elif self.path == '/api/work-orders':
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            work_orders = parse_work_orders()
+            self.wfile.write(json.dumps(work_orders, indent=2).encode())
+        else:
+            self.send_error(404)
+
+    def log_message(self, format, *args):
+        # Custom logging
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] {args[0]}")
+
+
+if __name__ == "__main__":
+    with socketserver.TCPServer(("", PORT), DashboardHandler) as httpd:
+        print(f"""
+====================================
+  Orchestration Dashboard
+====================================
+  URL: http://localhost:{PORT}/
+  API: http://localhost:{PORT}/api/phases
+       http://localhost:{PORT}/api/specs
+====================================
+Press Ctrl+C to stop
+""")
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            print("\n\nShutting down...")

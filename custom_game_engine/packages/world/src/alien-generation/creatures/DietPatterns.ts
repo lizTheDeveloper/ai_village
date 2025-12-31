@@ -1,0 +1,218 @@
+/**
+ * Creature Diet Patterns
+ *
+ * What alien creatures eat and how they process energy.
+ * Because "eating" is a surprisingly flexible concept.
+ */
+
+export interface DietPattern {
+  name: string;
+  primarySource: string;
+  processingMethod: string;
+  efficiency: 'poor' | 'moderate' | 'good' | 'excellent' | 'perfect';
+  byproducts: string[];
+  flavorText: string;
+}
+
+export const DIET_PATTERNS: Record<string, DietPattern> = {
+  'herbivore_standard': {
+    name: 'Plant Matter Consumption',
+    primarySource: 'Plants, vegetation, cellulose',
+    processingMethod: 'Digestive enzymes break down plant cells',
+    efficiency: 'moderate',
+    byproducts: ['Waste matter', 'Methane', 'Fertilizer'],
+    flavorText: 'Eat plants. Lots of plants. Digest slowly. Nutrients extracted. Vegetation everywhere.',
+  },
+  'carnivore_predator': {
+    name: 'Meat Hunter',
+    primarySource: 'Other living creatures',
+    processingMethod: 'Protein digestion, nutrient absorption',
+    efficiency: 'good',
+    byproducts: ['Bones', 'Waste', 'Territory marking'],
+    flavorText: 'Hunt. Kill. Eat. Protein efficient. Other creatures food. Circle of life.',
+  },
+  'photosynthesis': {
+    name: 'Light Feeding',
+    primarySource: 'Stellar radiation',
+    processingMethod: 'Converts light into chemical energy',
+    efficiency: 'excellent',
+    byproducts: ['Oxygen', 'Sugar storage', 'Chlorophyll waste'],
+    flavorText: 'Stand in sun. Absorb light. Make food. No hunting. Peaceful. Slow.',
+  },
+  'lithotroph': {
+    name: 'Rock Eater',
+    primarySource: 'Minerals and rocks',
+    processingMethod: 'Chemical dissolution and mineral extraction',
+    efficiency: 'poor',
+    byproducts: ['Sand', 'Mineral dust', 'Eroded terrain'],
+    flavorText: 'Eat rocks. Digest minerals. Slow process. Patient required. Teeth strong.',
+  },
+  'energy_absorption': {
+    name: 'Pure Energy Feeding',
+    primarySource: 'Ambient electromagnetic energy',
+    processingMethod: 'Direct energy conversion',
+    efficiency: 'excellent',
+    byproducts: ['Heat radiation', 'Electromagnetic interference'],
+    flavorText: 'Absorb energy. Direct conversion. No digestion. Efficient. Power lines tempting.',
+  },
+  'decomposer': {
+    name: 'Decay Processor',
+    primarySource: 'Dead organic matter',
+    processingMethod: 'Enzymatic breakdown of corpses',
+    efficiency: 'good',
+    byproducts: ['Soil nutrients', 'Methane', 'Compost'],
+    flavorText: 'Eat death. Recycle corpses. Ecosystem service. Unappreciated. Essential.',
+  },
+  'filter_feeder': {
+    name: 'Passive Filtering',
+    primarySource: 'Microscopic organisms in fluid',
+    processingMethod: 'Filters large volumes, extracts nutrients',
+    efficiency: 'moderate',
+    byproducts: ['Filtered water', 'Expelled matter', 'Clean environment'],
+    flavorText: 'Open mouth. Water flows. Filter particles. Close mouth. Repeat. Simple.',
+  },
+  'chemosynthesis': {
+    name: 'Chemical Energy Extraction',
+    primarySource: 'Inorganic chemical reactions',
+    processingMethod: 'Oxidizes chemicals for energy',
+    efficiency: 'good',
+    byproducts: ['Chemical waste', 'Heat', 'Unusual compounds'],
+    flavorText: 'Find chemicals. Oxidize. Extract energy. Light unnecessary. Darkness fine.',
+  },
+  'parasitic': {
+    name: 'Host Dependency',
+    primarySource: 'Living host organisms',
+    processingMethod: 'Absorbs nutrients from host',
+    efficiency: 'excellent',
+    byproducts: ['Weakened host', 'Dependency', 'Eventual death'],
+    flavorText: 'Attach to host. Drain slowly. Live free. Host suffers. Symbiosis questionable.',
+  },
+  'emotional_vampirism': {
+    name: 'Feeling Consumption',
+    primarySource: 'Emotional energy from sentient beings',
+    processingMethod: 'Psychic absorption of emotions',
+    efficiency: 'good',
+    byproducts: ['Emotional numbness', 'Depression', 'Therapy bills'],
+    flavorText: 'Feed on feelings. Drain emotions. Leave emptiness. Nourished. Others exhausted.',
+  },
+  'temporal_feeding': {
+    name: 'Time Consumption',
+    primarySource: 'Temporal energy from aging',
+    processingMethod: 'Extracts time itself as nutrient',
+    efficiency: 'excellent',
+    byproducts: ['Accelerated aging', 'Time distortions', 'Premature death'],
+    flavorText: 'Eat time. Steal years. Prey ages. Predator nourished. Cruel. Effective.',
+  },
+  'radiation_metabolizer': {
+    name: 'Radioactive Diet',
+    primarySource: 'Ionizing radiation',
+    processingMethod: 'Converts radiation into usable energy',
+    efficiency: 'good',
+    byproducts: ['Decay products', 'Secondary radiation', 'Glowing'],
+    flavorText: 'Eat radiation. Glow slightly. Healthy. Others avoid. Solitary life.',
+  },
+  'memory_consumption': {
+    name: 'Thought Eating',
+    primarySource: 'Memories and knowledge',
+    processingMethod: 'Absorbs neural patterns as food',
+    efficiency: 'moderate',
+    byproducts: ['Amnesia', 'Confusion', 'Lost skills'],
+    flavorText: 'Eat memories. Drain knowledge. Victims forget. Predator learns. Terrible trade.',
+  },
+  'quantum_sustenance': {
+    name: 'Probability Feeding',
+    primarySource: 'Quantum uncertainty',
+    processingMethod: 'Collapses probability waves for energy',
+    efficiency: 'excellent',
+    byproducts: ['Certainty', 'Collapsed states', 'Determinism'],
+    flavorText: 'Feed on uncertainty. Collapse probability. Energy released. Reality solidifies.',
+  },
+  'sound_digestion': {
+    name: 'Acoustic Nutrition',
+    primarySource: 'Sound vibrations',
+    processingMethod: 'Converts acoustic energy to metabolic fuel',
+    efficiency: 'moderate',
+    byproducts: ['Silence', 'Dampened acoustics', 'Echo absorption'],
+    flavorText: 'Eat sound. Absorb vibrations. Silence grows. Loud environments feast. Quiet starvation.',
+  },
+  'dimensional_scavenging': {
+    name: 'Cross-Dimensional Feeding',
+    primarySource: 'Matter from parallel dimensions',
+    processingMethod: 'Pulls food from alternate realities',
+    efficiency: 'good',
+    byproducts: ['Dimensional instability', 'Portal residue', 'Confused physics'],
+    flavorText: 'Reach elsewhere. Grab food. Pull through. Dimensions leak. Convenient. Destabilizing.',
+  },
+  'symbiotic_farming': {
+    name: 'Internal Agriculture',
+    primarySource: 'Cultivated internal organisms',
+    processingMethod: 'Farms bacteria/algae inside body',
+    efficiency: 'excellent',
+    byproducts: ['Excess organisms', 'Symbiont waste', 'Mutual benefit'],
+    flavorText: 'Farm inside self. Organisms grow. Harvest internally. Mutual benefit. Walking ecosystem.',
+  },
+  'dream_feeding': {
+    name: 'Oneiric Consumption',
+    primarySource: 'Dreams of sleeping beings',
+    processingMethod: 'Absorbs dream energy while prey sleeps',
+    efficiency: 'moderate',
+    byproducts: ['Nightmares', 'Insomnia', 'Dream loss'],
+    flavorText: 'Feed on dreams. Sleeping prey. Drain fantasies. Wake unrested. Dreams eaten.',
+  },
+  'magnetic_digestion': {
+    name: 'Ferrous Diet',
+    primarySource: 'Magnetic metals',
+    processingMethod: 'Metabolizes iron and magnetic materials',
+    efficiency: 'moderate',
+    byproducts: ['Rust', 'Magnetic fields', 'Metal shortage'],
+    flavorText: 'Eat metal. Digest iron. Magnetic attraction. Literal. Tools disappear.',
+  },
+  'stellar_sipping': {
+    name: 'Star Drinking',
+    primarySource: 'Stellar plasma',
+    processingMethod: 'Absorbs energy directly from stars',
+    efficiency: 'perfect',
+    byproducts: ['Heat radiation', 'Stellar wind', 'Dimmed stars'],
+    flavorText: 'Drink from stars. Plasma consumed. Energy infinite. Heat extreme. Casual apocalypse.',
+  },
+  'pain_metabolizer': {
+    name: 'Suffering Sustenance',
+    primarySource: 'Pain and suffering',
+    processingMethod: 'Converts anguish into nutrients',
+    efficiency: 'good',
+    byproducts: ['Increased suffering', 'Torture', 'Cruelty'],
+    flavorText: 'Feed on pain. Cause suffering. Nourished by anguish. Evil. Effective.',
+  },
+  'crystalline_consumption': {
+    name: 'Mineral Lattice Digestion',
+    primarySource: 'Crystalline structures',
+    processingMethod: 'Breaks down crystal lattices',
+    efficiency: 'moderate',
+    byproducts: ['Crystal dust', 'Gem shortage', 'Mineral depletion'],
+    flavorText: 'Eat crystals. Digest gems. Beautiful food. Jewelers weep. Delicious.',
+  },
+  'gravity_feeding': {
+    name: 'Gravitational Consumption',
+    primarySource: 'Gravitational potential energy',
+    processingMethod: 'Extracts energy from mass-warped space',
+    efficiency: 'excellent',
+    byproducts: ['Weakened gravity', 'Orbital changes', 'Physics anomalies'],
+    flavorText: 'Feed on gravity. Reduce mass attraction. Lighter world. Eventually. Problematic.',
+  },
+  'void_consumption': {
+    name: 'Entropy Eating',
+    primarySource: 'Heat death and decay',
+    processingMethod: 'Accelerates entropy, feeds on disorder',
+    efficiency: 'good',
+    byproducts: ['Increased decay', 'Heat death', 'Universal end'],
+    flavorText: 'Eat order. Create chaos. Feed on entropy. Universe decays faster. Thanks.',
+  },
+  'information_digestion': {
+    name: 'Data Consumption',
+    primarySource: 'Information and data',
+    processingMethod: 'Absorbs knowledge as nutrients',
+    efficiency: 'excellent',
+    byproducts: ['Lost data', 'Corrupted files', 'Amnesia'],
+    flavorText: 'Eat information. Digest data. Knowledge consumed. Books blank. Minds empty.',
+  },
+};

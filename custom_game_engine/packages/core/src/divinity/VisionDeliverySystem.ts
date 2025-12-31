@@ -15,6 +15,8 @@ import type { World } from '../ecs/World.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import type { DeityComponent } from '../components/DeityComponent.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
+import type { LLMVisionGenerator } from './LLMVisionGenerator.js';
+import type { Prayer } from '../components/SpiritualComponent.js';
 
 // ============================================================================
 // Vision Types
@@ -162,10 +164,19 @@ export class VisionDeliverySystem {
   private costConfig: VisionCostConfig;
   private pendingVisions: Map<string, DivineVision> = new Map();
   private visionIdCounter = 0;
+  private llmGenerator?: LLMVisionGenerator;
 
-  constructor(world: World, costConfig: VisionCostConfig = DEFAULT_COST_CONFIG) {
+  constructor(world: World, costConfig: VisionCostConfig = DEFAULT_COST_CONFIG, llmGenerator?: LLMVisionGenerator) {
     this.world = world;
     this.costConfig = costConfig;
+    this.llmGenerator = llmGenerator;
+  }
+
+  /**
+   * Set LLM vision generator (for dependency injection)
+   */
+  setLLMGenerator(generator: LLMVisionGenerator): void {
+    this.llmGenerator = generator;
   }
 
   /**
@@ -283,6 +294,99 @@ export class VisionDeliverySystem {
       template.purpose,
       content
     );
+  }
+
+  /**
+   * Queue an LLM-generated vision responding to a prayer
+   */
+  async queueLLMPrayerResponse(
+    deityEntity: EntityImpl,
+    prayer: Prayer,
+    targetId: string,
+    method: VisionDeliveryMethod = 'dream',
+    clarity: VisionClarity = 'clear'
+  ): Promise<{ success: boolean; visionId?: string; error?: string }> {
+    if (!this.llmGenerator) {
+      // Fallback to template
+      return this.queueVisionFromTemplate(deityEntity, targetId, 'guidance', method);
+    }
+
+    try {
+      const visionContent = await this.llmGenerator.generatePrayerResponseVision(
+        prayer,
+        targetId,
+        deityEntity.id,
+        this.world,
+        clarity
+      );
+
+      if (!visionContent) {
+        return { success: false, error: 'Failed to generate LLM vision' };
+      }
+
+      // Map prayer type to purpose
+      const purposeMap: Record<string, VisionPurpose> = {
+        guidance: 'guidance',
+        help: 'blessing',
+        gratitude: 'blessing',
+        question: 'revelation',
+        confession: 'blessing',
+        plea: 'command',
+        praise: 'blessing',
+        mourning: 'blessing',
+      };
+
+      const purpose = purposeMap[prayer.type] || 'guidance';
+
+      return this.queueVision(
+        deityEntity,
+        targetId,
+        method,
+        clarity,
+        purpose,
+        visionContent
+      );
+    } catch (error) {
+      console.error('[VisionDeliverySystem] LLM generation failed:', error);
+      return this.queueVisionFromTemplate(deityEntity, targetId, 'guidance', method);
+    }
+  }
+
+  /**
+   * Queue an LLM-generated meditation vision
+   */
+  async queueLLMMeditationVision(
+    deityEntity: EntityImpl,
+    targetId: string,
+    method: VisionDeliveryMethod = 'meditation'
+  ): Promise<{ success: boolean; visionId?: string; error?: string }> {
+    if (!this.llmGenerator) {
+      return this.queueVisionFromTemplate(deityEntity, targetId, 'guidance', method);
+    }
+
+    try {
+      const visionContent = await this.llmGenerator.generateMeditationVision(
+        targetId,
+        this.world,
+        deityEntity.id
+      );
+
+      if (!visionContent) {
+        return { success: false, error: 'Failed to generate LLM vision' };
+      }
+
+      return this.queueVision(
+        deityEntity,
+        targetId,
+        method,
+        'symbolic',
+        'guidance',
+        visionContent
+      );
+    } catch (error) {
+      console.error('[VisionDeliverySystem] LLM generation failed:', error);
+      return this.queueVisionFromTemplate(deityEntity, targetId, 'guidance', method);
+    }
   }
 
   /**
@@ -510,6 +614,6 @@ export class VisionDeliverySystem {
 /**
  * Create and return a VisionDeliverySystem
  */
-export function createVisionDeliverySystem(world: World): VisionDeliverySystem {
-  return new VisionDeliverySystem(world);
+export function createVisionDeliverySystem(world: World, llmGenerator?: LLMVisionGenerator): VisionDeliverySystem {
+  return new VisionDeliverySystem(world, undefined, llmGenerator);
 }

@@ -512,6 +512,9 @@ export class PlantSystem implements System {
     entityId?: string
   ): number {
     // Find current stage transition
+    if (!species.stageTransitions) {
+      return 0; // No stage transitions defined
+    }
     const transition = species.stageTransitions.find(t => t.from === plant.stage);
     if (!transition) {
       return 0; // No more transitions
@@ -552,7 +555,9 @@ export class PlantSystem implements System {
     species: PlantSpecies,
     temperature: number
   ): number {
-    const [minOptimal, maxOptimal] = species.optimalTemperatureRange;
+    // Default temperature range if not specified
+    const tempRange = species.optimalTemperatureRange ?? [15, 25];
+    const [minOptimal, maxOptimal] = tempRange;
 
     if (temperature < minOptimal - 10 || temperature > maxOptimal + 10) {
       return 0.1; // Very slow growth outside range
@@ -591,6 +596,9 @@ export class PlantSystem implements System {
     world: World,
     entityId: string
   ): void {
+    if (!species.stageTransitions) {
+      return; // No stage transitions defined
+    }
     const transition = species.stageTransitions.find(t => t.from === plant.stage);
 
     if (!transition) {
@@ -691,7 +699,7 @@ export class PlantSystem implements System {
           break;
 
         case 'produce_seeds': {
-          const seedCount = species.seedsPerPlant;
+          const seedCount = species.seedsPerPlant ?? 5; // Default 5 seeds if not specified
           const yieldModifier = applyGenetics(plant, 'yield');
           const calculatedSeeds = Math.floor(seedCount * yieldModifier);
 
@@ -773,10 +781,11 @@ export class PlantSystem implements System {
       return;
     }
 
+    const dispersalRadius = species.seedDispersalRadius ?? 3; // Default 3 tiles dispersal radius
     for (let i = 0; i < seedsToDrop; i++) {
       // Random position near parent
       const angle = Math.random() * Math.PI * 2;
-      const distance = 1 + Math.random() * species.seedDispersalRadius;
+      const distance = 1 + Math.random() * dispersalRadius;
       const dropPos = {
         x: Math.round(plant.position.x + Math.cos(angle) * distance),
         y: Math.round(plant.position.y + Math.sin(angle) * distance)
@@ -1149,10 +1158,11 @@ export class PlantSystem implements System {
 
       // Get species to determine base fruit production
       const species = this.getSpecies(plant.speciesId);
+      const seedsPerPlant = species.seedsPerPlant ?? 5; // Default 5 seeds if not specified
 
       // Calculate fruit regeneration based on health and genetics
       // Base: seedsPerPlant / 3 (fruit is less than seeds typically)
-      const baseFruitCount = Math.max(1, Math.floor(species.seedsPerPlant / 3));
+      const baseFruitCount = Math.max(1, Math.floor(seedsPerPlant / 3));
       const healthModifier = plant.health / 100;
       const yieldModifier = applyGenetics(plant, 'yield');
 
@@ -1160,7 +1170,7 @@ export class PlantSystem implements System {
       const fruitToAdd = Math.max(1, Math.floor(baseFruitCount * healthModifier * yieldModifier));
 
       // Add fruit up to a reasonable maximum (based on species seedsPerPlant)
-      const maxFruit = species.seedsPerPlant * 2;
+      const maxFruit = seedsPerPlant * 2;
       const previousFruit = plant.fruitCount;
       plant.fruitCount = Math.min(maxFruit, plant.fruitCount + fruitToAdd);
 

@@ -1,0 +1,19 @@
+{
+  "id": "human_male_black_light",
+  "name": "Human Male - Black Hair Light Skin",
+  "pixellab_id": "9212db84-63e5-4416-ac69-dc0f8f86c9bc",
+  "species": "human",
+  "gender": "male",
+  "hair_color": "black",
+  "skin_tone": "light",
+  "size": 48,
+  "directions": 8,
+  "view": "high top-down",
+  "style": {
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+  },
+  "rotations": ["south", "south-west", "west", "north-west", "north", "north-east", "east", "south-east"],
+  "animations": {}
+}

@@ -24,8 +24,19 @@ export class WorldSerializer {
   ): Promise<UniverseSnapshot> {
     console.log(`[WorldSerializer] Serializing world for universe: ${universeName}`);
 
+    const allEntities = Array.from(world.entities.values());
+
+    // Log entity census
+    const census = this.generateEntityCensus(allEntities);
+    console.log('[WorldSerializer] Entity Census:');
+    for (const [entityType, count] of Array.from(census.entries()).sort((a, b) => b[1] - a[1])) {
+      if (count > 0) {
+        console.log(`  ${entityType}: ${count}`);
+      }
+    }
+
     // Serialize all entities
-    const entities = await this.serializeEntities(Array.from(world.entities.values()));
+    const entities = await this.serializeEntities(allEntities);
 
     // Serialize world state
     const worldState = this.serializeWorldState(world);
@@ -242,6 +253,44 @@ export class WorldSerializer {
       zones: [],
       buildings: [],
     };
+  }
+
+  /**
+   * Generate census of entity types for debugging
+   */
+  private generateEntityCensus(entities: readonly Entity[]): Map<string, number> {
+    const census = new Map<string, number>();
+
+    for (const entity of entities) {
+      // Categorize entity by primary component type
+      let entityType = 'unknown';
+
+      if (entity.components.has('agent')) {
+        entityType = 'agent';
+      } else if (entity.components.has('plant')) {
+        entityType = 'plant';
+      } else if (entity.components.has('animal')) {
+        entityType = 'animal';
+      } else if (entity.components.has('building')) {
+        entityType = 'building';
+      } else if (entity.components.has('resource')) {
+        entityType = 'resource';
+      } else if (entity.components.has('item')) {
+        entityType = 'item';
+      } else if (entity.components.has('deity')) {
+        entityType = 'deity';
+      } else if (entity.components.has('realm')) {
+        entityType = 'realm';
+      } else if (entity.components.has('weather')) {
+        entityType = 'weather';
+      } else if (entity.components.has('time')) {
+        entityType = 'time';
+      }
+
+      census.set(entityType, (census.get(entityType) ?? 0) + 1);
+    }
+
+    return census;
   }
 }
 

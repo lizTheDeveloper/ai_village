@@ -1,0 +1,279 @@
+{
+  "version": 2,
+  "description": "PixelLab asset generation manifest - matches actual game data files",
+
+  "humanoids": {
+    "description": "Sapient species from SpeciesRegistry.ts (7 species)",
+    "humans": {
+      "bodyPlan": "humanoid_standard",
+      "height": 170,
+      "proportions": {"type": "preset", "name": "default"},
+      "completed": [
+        "human_male_black", "human_male_brown", "human_male_blonde",
+        "human_male_black_light", "human_male_black_medium", "human_male_black_dark",
+        "human_male_blonde_light",
+        "human_female_black_light", "human_female_black_medium", "human_female_black_dark",
+        "human_nonbinary_black"
+      ],
+      "pending": [
+        {"id": "human_female_brown", "desc": "Human female with brown hair, medium skin tone, wearing simple medieval peasant clothing"},
+        {"id": "human_female_blonde", "desc": "Human female with blonde hair, light skin tone, wearing simple medieval peasant clothing"},
+        {"id": "human_female_red", "desc": "Human female with red ginger hair, light skin with freckles, wearing simple medieval peasant clothing"},
+        {"id": "human_male_red", "desc": "Human male with red ginger hair, light skin with freckles, wearing simple medieval peasant clothing"},
+        {"id": "human_nonbinary_brown", "desc": "Human nonbinary person with brown hair, medium skin tone, wearing simple medieval peasant clothing"}
+      ]
+    },
+    "elves": {
+      "bodyPlan": "humanoid_standard",
+      "height": 180,
+      "proportions": {"type": "custom", "head_size": 0.9, "arms_length": 1.1, "legs_length": 1.15, "shoulder_width": 0.85, "hip_width": 0.85},
+      "completed": [],
+      "pending": [
+        {"id": "elf_male_silver", "desc": "Tall elegant elf male with long silver hair, pointed ears, pale ethereal skin, wearing forest green tunic, graceful slender build"},
+        {"id": "elf_male_golden", "desc": "Tall elegant elf male with long golden hair, pointed ears, pale skin, wearing elegant blue robes, slender graceful build"},
+        {"id": "elf_female_silver", "desc": "Tall elegant elf female with long silver hair, pointed ears, pale ethereal skin, wearing forest green dress, slender graceful build"},
+        {"id": "elf_female_golden", "desc": "Tall elegant elf female with long golden hair, pointed ears, pale skin, wearing elegant white robes, slender graceful build"}
+      ]
+    },
+    "dwarves": {
+      "bodyPlan": "humanoid_standard",
+      "height": 140,
+      "proportions": {"type": "custom", "head_size": 1.2, "arms_length": 0.9, "legs_length": 0.7, "shoulder_width": 1.3, "hip_width": 1.1},
+      "completed": [],
+      "pending": [
+        {"id": "dwarf_male_red", "desc": "Short stocky dwarf male with long braided red beard, muscular build, wearing leather armor and mining gear"},
+        {"id": "dwarf_male_brown", "desc": "Short stocky dwarf male with long braided brown beard, muscular build, wearing chainmail armor"},
+        {"id": "dwarf_female_red", "desc": "Short stocky dwarf female with braided red hair, sturdy muscular build, wearing practical leather armor"},
+        {"id": "dwarf_female_brown", "desc": "Short stocky dwarf female with braided brown hair, sturdy muscular build, wearing smith's apron"}
+      ]
+    },
+    "orcs": {
+      "bodyPlan": "humanoid_standard",
+      "height": 190,
+      "proportions": {"type": "preset", "name": "heroic"},
+      "completed": [],
+      "pending": [
+        {"id": "orc_male_green", "desc": "Large muscular orc male with green skin, prominent tusks, black hair in topknot, wearing tribal leather armor"},
+        {"id": "orc_male_gray", "desc": "Large muscular orc male with gray skin, tusks, bald head, wearing bone and leather armor"},
+        {"id": "orc_female_green", "desc": "Large muscular orc female with green skin, small tusks, dark hair, wearing tribal leather armor"},
+        {"id": "orc_female_gray", "desc": "Large muscular orc female with gray skin, small tusks, red hair, wearing warrior's armor"}
+      ]
+    },
+    "thrakeen": {
+      "description": "Four-armed insectoid traders from SpeciesRegistry",
+      "bodyPlan": "insectoid_4arm",
+      "height": 175,
+      "proportions": {"type": "custom", "head_size": 1.1, "arms_length": 1.0, "legs_length": 0.95, "shoulder_width": 1.1, "hip_width": 0.9},
+      "completed": [],
+      "pending": [
+        {"id": "thrakeen_brown", "desc": "Insectoid humanoid with brown chitinous exoskeleton, four arms in pairs, large compound eyes, antennae, wearing cloth wrappings"},
+        {"id": "thrakeen_green", "desc": "Insectoid humanoid with green chitinous exoskeleton, four arms in pairs, large compound eyes, antennae, wearing leaf clothing"},
+        {"id": "thrakeen_black", "desc": "Insectoid humanoid with shiny black chitinous exoskeleton, four arms in pairs, large compound eyes, antennae, minimal clothing"}
+      ]
+    },
+    "celestials": {
+      "description": "Divine winged beings from SpeciesRegistry",
+      "bodyPlan": "celestial_winged",
+      "height": 185,
+      "proportions": {"type": "preset", "name": "stylized"},
+      "completed": [],
+      "pending": [
+        {"id": "celestial_gold", "desc": "Angelic celestial being with radiant golden skin, large white feathered wings on back, flowing white robes, glowing halo above head"},
+        {"id": "celestial_silver", "desc": "Angelic celestial being with pale silver skin, large white feathered wings on back, blue robes, silver halo above head"}
+      ]
+    },
+    "aquatics": {
+      "description": "Water-dwelling merfolk from SpeciesRegistry",
+      "bodyPlan": "aquatic_tentacled",
+      "height": 160,
+      "proportions": {"type": "custom", "head_size": 1.0, "arms_length": 1.0, "legs_length": 1.0, "shoulder_width": 1.0, "hip_width": 0.95},
+      "completed": [],
+      "pending": [
+        {"id": "aquatic_blue", "desc": "Aquatic merfolk humanoid with blue-green scaled skin, webbed hands and feet, gills on neck, fin ears, wearing seaweed clothing"},
+        {"id": "aquatic_purple", "desc": "Aquatic merfolk humanoid with purple iridescent scaled skin, webbed hands, bioluminescent spots on face, coral accessories"},
+        {"id": "aquatic_green", "desc": "Aquatic merfolk humanoid with green scaled skin, webbed hands and feet, large dorsal fin crest on head, wearing kelp clothing"}
+      ]
+    }
+  },
+
+  "animals": {
+    "description": "Animal species from animalSpecies.ts (9 species)",
+    "livestock": {
+      "completed": [],
+      "pending": [
+        {"id": "chicken", "desc": "Small farm chicken, red-brown feathers, red comb, yellow beak, pecking pose, top-down farm animal"},
+        {"id": "cow", "desc": "Large dairy cow, brown and white spotted hide, standing pose, top-down farm animal"},
+        {"id": "sheep", "desc": "Woolly sheep, white fluffy wool coat, black face, standing pose, top-down farm animal"},
+        {"id": "pig", "desc": "Pink farm pig, round body, curly tail, standing pose, top-down farm animal"},
+        {"id": "goat", "desc": "Brown and white goat, short horns, beard, standing pose, top-down farm animal"}
+      ]
+    },
+    "working": {
+      "completed": [],
+      "pending": [
+        {"id": "horse_brown", "desc": "Brown working horse, muscular build, flowing mane and tail, standing pose, top-down"},
+        {"id": "horse_white", "desc": "White horse, elegant build, flowing mane and tail, standing pose, top-down"},
+        {"id": "dog_brown", "desc": "Brown medium-sized dog, friendly appearance, standing pose, top-down"},
+        {"id": "dog_black", "desc": "Black medium-sized dog, alert appearance, standing pose, top-down"}
+      ]
+    },
+    "pets": {
+      "completed": [],
+      "pending": [
+        {"id": "cat_orange", "desc": "Orange tabby cat, striped fur, sitting pose, top-down view"},
+        {"id": "cat_black", "desc": "Black cat, sleek fur, sitting pose, top-down view"},
+        {"id": "cat_white", "desc": "White cat, fluffy fur, sitting pose, top-down view"},
+        {"id": "rabbit_brown", "desc": "Brown rabbit, long ears, fluffy tail, sitting pose, top-down view"},
+        {"id": "rabbit_white", "desc": "White rabbit, long ears, red eyes, sitting pose, top-down view"}
+      ]
+    },
+    "wild": {
+      "completed": [],
+      "pending": [
+        {"id": "deer", "desc": "Brown deer, white spots, antlers (male), standing alert pose, top-down forest animal"}
+      ]
+    }
+  },
+
+  "building_tiles": {
+    "description": "Voxel building tiles from VOXEL_BUILDING_SPEC.md",
+    "walls": {
+      "completed": [],
+      "pending": [
+        {"id": "wall_wood", "desc": "Wooden wall tile, vertical wood planks, top-down isometric view, 32x32"},
+        {"id": "wall_stone", "desc": "Stone wall tile, gray cobblestone blocks, top-down isometric view, 32x32"},
+        {"id": "wall_mud_brick", "desc": "Mud brick wall tile, brown adobe bricks, top-down isometric view, 32x32"},
+        {"id": "wall_ice", "desc": "Ice wall tile, translucent blue ice blocks, top-down isometric view, 32x32"},
+        {"id": "wall_metal", "desc": "Metal wall tile, riveted iron plates, top-down isometric view, 32x32"}
+      ]
+    },
+    "doors": {
+      "completed": [],
+      "pending": [
+        {"id": "door_wood_closed", "desc": "Wooden door, closed state, brown planks with iron hinges, top-down isometric, 32x32"},
+        {"id": "door_wood_open", "desc": "Wooden door, open state, brown planks with iron hinges, top-down isometric, 32x32"},
+        {"id": "door_stone_closed", "desc": "Stone door, closed state, heavy gray stone slab, top-down isometric, 32x32"},
+        {"id": "door_metal_closed", "desc": "Metal door, closed state, iron door with rivets, top-down isometric, 32x32"}
+      ]
+    },
+    "floors": {
+      "completed": [],
+      "pending": [
+        {"id": "floor_wood", "desc": "Wooden floor tile, horizontal planks, top-down view, 32x32"},
+        {"id": "floor_stone", "desc": "Stone floor tile, gray flagstones, top-down view, 32x32"},
+        {"id": "floor_dirt", "desc": "Dirt floor tile, brown packed earth, top-down view, 32x32"}
+      ]
+    },
+    "construction": {
+      "description": "Construction progress overlays",
+      "completed": [],
+      "pending": [
+        {"id": "construction_frame_25", "desc": "Construction scaffolding at 25% progress, wooden frame outline, transparent background"},
+        {"id": "construction_frame_50", "desc": "Construction scaffolding at 50% progress, partial structure visible"},
+        {"id": "construction_frame_75", "desc": "Construction scaffolding at 75% progress, mostly complete structure"}
+      ]
+    }
+  },
+
+  "tilesets": {
+    "description": "Terrain tilesets from TerrainTypes.ts - Wang tile format for autotiling",
+    "terrain_basic": {
+      "completed": [
+        {"id": "sand_beach", "lower": "sand", "upper": "beach with shells and driftwood"}
+      ],
+      "pending": [
+        {"id": "grass_dirt", "lower": "green grass", "upper": "brown dirt path", "transition": "grass tufts and small stones"},
+        {"id": "grass_water", "lower": "green grass", "upper": "clear shallow water", "transition": "muddy shoreline with reeds"},
+        {"id": "sand_water", "lower": "sandy beach", "upper": "ocean water with waves", "transition": "wet sand with foam"},
+        {"id": "grass_stone", "lower": "green grass", "upper": "gray rocky ground", "transition": "scattered pebbles and moss"},
+        {"id": "dirt_stone", "lower": "brown dirt", "upper": "gray cobblestone path", "transition": "scattered pebbles"},
+        {"id": "grass_forest", "lower": "green grass", "upper": "dark forest floor with fallen leaves", "transition": "scattered leaves and twigs"}
+      ]
+    },
+    "terrain_biome": {
+      "description": "Biome-specific terrain from BiomeTypes",
+      "completed": [],
+      "pending": [
+        {"id": "desert_sand", "lower": "rocky desert ground", "upper": "golden sand dunes", "transition": "wind-blown sand"},
+        {"id": "mountain_stone", "lower": "gray stone", "upper": "snowy mountain rock", "transition": "frost and ice patches"},
+        {"id": "swamp_water", "lower": "murky swamp water", "upper": "marshy ground with reeds", "transition": "lily pads and moss"}
+      ]
+    }
+  },
+
+  "plants": {
+    "description": "Plant species from plant-species/*.ts - need 8 growth stages each",
+    "note": "Each plant needs: seed, sprout, vegetative, flowering, fruiting, mature, seeding, withered stages",
+    "common": {
+      "completed": [],
+      "pending": [
+        {"id": "grass", "desc": "Common grass plant, green blades", "stages": 8},
+        {"id": "wildflower", "desc": "Colorful wildflower, purple and yellow petals", "stages": 8},
+        {"id": "berry_bush", "desc": "Berry bush with red berries", "stages": 8},
+        {"id": "tree_oak", "desc": "Oak tree with green leaves", "stages": 8}
+      ]
+    },
+    "medicinal": {
+      "completed": [],
+      "pending": [
+        {"id": "chamomile", "desc": "Chamomile plant with white daisy-like flowers", "stages": 8},
+        {"id": "lavender", "desc": "Lavender plant with purple flower spikes", "stages": 8}
+      ]
+    },
+    "magical": {
+      "completed": [],
+      "pending": [
+        {"id": "moonpetal", "desc": "Magical moonpetal flower, glowing silver-blue petals, ethereal", "stages": 8},
+        {"id": "glowcap", "desc": "Bioluminescent mushroom, soft blue-green glow", "stages": 8}
+      ]
+    }
+  },
+
+  "map_objects": {
+    "description": "Objects to place on maps - trees, rocks, decorations",
+    "completed": [],
+    "pending": [
+      {"id": "tree_oak_large", "desc": "Large oak tree with full green canopy, thick trunk, top-down view", "width": 64, "height": 96},
+      {"id": "tree_pine", "desc": "Tall pine/conifer tree, triangular shape, top-down view", "width": 48, "height": 96},
+      {"id": "rock_boulder", "desc": "Large gray boulder, mossy patches, top-down view", "width": 48, "height": 48},
+      {"id": "bush_berry", "desc": "Green bush with red berries, top-down view", "width": 32, "height": 32},
+      {"id": "chest_wooden", "desc": "Wooden treasure chest with iron bands, top-down view", "width": 32, "height": 32},
+      {"id": "barrel_wooden", "desc": "Wooden barrel with metal bands, top-down view", "width": 32, "height": 32},
+      {"id": "campfire", "desc": "Small campfire with flames and smoke, top-down view", "width": 32, "height": 32},
+      {"id": "well", "desc": "Stone well with wooden bucket, top-down view", "width": 48, "height": 48}
+    ]
+  },
+
+  "items": {
+    "description": "Item sprites from defaultItems.ts - inventory icons",
+    "resources": {
+      "completed": [],
+      "pending": [
+        {"id": "item_wood", "desc": "Stack of wooden logs, inventory icon, 32x32"},
+        {"id": "item_stone", "desc": "Pile of gray stones, inventory icon, 32x32"},
+        {"id": "item_fiber", "desc": "Bundle of plant fibers, inventory icon, 32x32"},
+        {"id": "item_iron_ore", "desc": "Chunk of iron ore, rusty orange color, inventory icon, 32x32"},
+        {"id": "item_gold_ore", "desc": "Chunk of gold ore, shiny yellow, inventory icon, 32x32"}
+      ]
+    },
+    "food": {
+      "completed": [],
+      "pending": [
+        {"id": "item_berry", "desc": "Red berries, inventory icon, 32x32"},
+        {"id": "item_apple", "desc": "Red apple, inventory icon, 32x32"},
+        {"id": "item_bread", "desc": "Loaf of bread, inventory icon, 32x32"},
+        {"id": "item_meat", "desc": "Raw meat steak, inventory icon, 32x32"},
+        {"id": "item_fish", "desc": "Fresh fish, inventory icon, 32x32"}
+      ]
+    },
+    "tools": {
+      "completed": [],
+      "pending": [
+        {"id": "item_axe", "desc": "Iron axe with wooden handle, inventory icon, 32x32"},
+        {"id": "item_pickaxe", "desc": "Iron pickaxe with wooden handle, inventory icon, 32x32"},
+        {"id": "item_hammer", "desc": "Iron hammer with wooden handle, inventory icon, 32x32"},
+        {"id": "item_hoe", "desc": "Iron hoe with wooden handle, inventory icon, 32x32"}
+      ]
+    }
+  }
+}

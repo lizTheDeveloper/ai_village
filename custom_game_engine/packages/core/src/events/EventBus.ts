@@ -73,6 +73,16 @@ export interface EventBus {
 
   /** Set current tick (called by game loop) */
   setCurrentTick(tick: Tick): void;
+
+  /** Alias for subscribe() - compatibility method */
+  on<T extends EventType = EventType>(
+    eventType: T | EventType | EventType[],
+    handler: EventHandler<T>,
+    priority?: EventPriority
+  ): Unsubscribe;
+
+  /** Remove a subscription by handler - compatibility method */
+  off(eventType: EventType | EventType[], handler: EventHandler): void;
 }
 
 interface Subscription {
@@ -108,6 +118,9 @@ export class EventBusImpl implements EventBus {
   // Index: eventType -> subscription IDs
   private typeIndex = new Map<EventType, Set<number>>();
 
+  // Map for tracking subscriptions by handler (for .off() method)
+  private handlerToUnsubscribe = new Map<EventHandler, Unsubscribe>();
+
   subscribe<T extends EventType = EventType>(
     eventType: T | EventType | EventType[],
     handler: EventHandler<T>,
@@ -139,7 +152,31 @@ export class EventBusImpl implements EventBus {
       for (const type of types) {
         this.typeIndex.get(type)?.delete(id);
       }
+      this.handlerToUnsubscribe.delete(handler as EventHandler);
     };
+  }
+
+  /**
+   * Alias for subscribe() - compatibility method.
+   */
+  on<T extends EventType = EventType>(
+    eventType: T | EventType | EventType[],
+    handler: EventHandler<T>,
+    priority: EventPriority = 'normal'
+  ): Unsubscribe {
+    const unsubscribe = this.subscribe(eventType, handler, priority);
+    this.handlerToUnsubscribe.set(handler as EventHandler, unsubscribe);
+    return unsubscribe;
+  }
+
+  /**
+   * Remove a subscription by handler - compatibility method.
+   */
+  off(_eventType: EventType | EventType[], handler: EventHandler): void {
+    const unsubscribe = this.handlerToUnsubscribe.get(handler);
+    if (unsubscribe) {
+      unsubscribe();
+    }
   }
 
   emit<T extends EventType = EventType>(event: Omit<GameEvent<T>, 'tick' | 'timestamp'>): void {

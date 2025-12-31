@@ -26,6 +26,8 @@ export type SkillId =
   | 'social'
   | 'exploration'
   | 'combat'
+  | 'hunting'
+  | 'stealth'
   | 'animal_handling'
   | 'medicine';
 
@@ -70,6 +72,8 @@ export const ALL_SKILL_IDS: readonly SkillId[] = [
   'social',
   'exploration',
   'combat',
+  'hunting',
+  'stealth',
   'animal_handling',
   'medicine',
 ] as const;
@@ -86,6 +90,8 @@ export const SKILL_ICONS: Record<SkillId, string> = {
   social: '💬',
   exploration: '🧭',
   combat: '⚔️',
+  hunting: '🏹',
+  stealth: '🥷',
   animal_handling: '🐾',
   medicine: '💊',
 };
@@ -102,6 +108,8 @@ export const SKILL_NAMES: Record<SkillId, string> = {
   social: 'Social',
   exploration: 'Exploration',
   combat: 'Combat',
+  hunting: 'Hunting',
+  stealth: 'Stealth',
   animal_handling: 'Animal Handling',
   medicine: 'Medicine',
 };
@@ -128,6 +136,8 @@ export const SKILL_PREREQUISITES: Record<SkillId, SkillPrerequisite[]> = {
   farming: [{ skill: 'gathering', level: 1 }],
   building: [{ skill: 'gathering', level: 1 }],
   combat: [{ skill: 'exploration', level: 1 }],
+  hunting: [{ skill: 'exploration', level: 1 }],
+  stealth: [{ skill: 'exploration', level: 1 }],
   animal_handling: [{ skill: 'exploration', level: 1 }],
 
   // Tier 2 (require tier 1)
@@ -229,6 +239,8 @@ function createDefaultLevels(): Record<SkillId, SkillLevel> {
     social: 0,
     exploration: 0,
     combat: 0,
+    hunting: 0,
+    stealth: 0,
     animal_handling: 0,
     medicine: 0,
   };
@@ -247,6 +259,8 @@ function createDefaultExperience(): Record<SkillId, number> {
     social: 0,
     exploration: 0,
     combat: 0,
+    hunting: 0,
+    stealth: 0,
     animal_handling: 0,
     medicine: 0,
   };
@@ -265,6 +279,8 @@ function createDefaultAffinities(): Record<SkillId, number> {
     social: 1.0,
     exploration: 1.0,
     combat: 1.0,
+    hunting: 1.0,
+    stealth: 1.0,
     animal_handling: 1.0,
     medicine: 1.0,
   };
@@ -322,6 +338,10 @@ export function generateAffinitiesFromPersonality(
     exploration: calculateAffinity([personality.openness, personality.extraversion]),
     // Combat: workEthic + stability (assertiveness mapped to workEthic)
     combat: calculateAffinity([personality.workEthic, stability]),
+    // Hunting: exploration + combat - requires patience and combat readiness
+    hunting: calculateAffinity([personality.openness, personality.workEthic, stability]),
+    // Stealth: stability + conscientiousness - requires patience and careful movement
+    stealth: calculateAffinity([stability, personality.conscientiousness]),
     // Animal handling: agreeableness + stability
     animal_handling: calculateAffinity([personality.agreeableness, stability]),
     // Medicine: agreeableness + conscientiousness
@@ -837,6 +857,8 @@ export const SKILL_SPECIALIZATIONS: Record<SkillId, string[]> = {
   social: ['negotiation', 'leadership', 'teaching', 'entertainment'],
   exploration: ['navigation', 'survival', 'cartography', 'climbing'],
   combat: ['melee', 'ranged', 'defense', 'tactics'],
+  hunting: ['tracking', 'archery', 'trapping', 'butchering'],
+  stealth: ['sneaking', 'hiding', 'silent_movement', 'camouflage'],
 };
 
 /**

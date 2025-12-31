@@ -492,6 +492,20 @@ export {
 } from './VisionDeliverySystem.js';
 
 // ============================================================================
+// LLM Vision Generation
+// ============================================================================
+export {
+  // Types
+  type VisionGenerationRequest,
+
+  // Classes
+  LLMVisionGenerator,
+
+  // Functions
+  createLLMVisionGenerator,
+} from './LLMVisionGenerator.js';
+
+// ============================================================================
 // Multiverse Crossing System
 // ============================================================================
 export {

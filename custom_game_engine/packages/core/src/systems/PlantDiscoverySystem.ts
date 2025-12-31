@@ -212,7 +212,7 @@ export class PlantDiscoverySystem implements System {
     const knownMedicinal = existing?.medicinal;
 
     // Chance to discover what ailments it treats
-    if (Math.random() < discoveryChance * 0.7) {
+    if (medicinal.treats && medicinal.treats.length > 0 && Math.random() < discoveryChance * 0.7) {
       // Discover 1-2 ailments it treats
       const unknownAilments = knownMedicinal === 'unknown'
         ? medicinal.treats
@@ -220,7 +220,7 @@ export class PlantDiscoverySystem implements System {
             !(knownMedicinal as any)?.knownTreats?.includes(a)
           );
 
-      if (unknownAilments.length > 0) {
+      if (unknownAilments && unknownAilments.length > 0) {
         const toDiscover = unknownAilments.slice(0, Math.min(2, unknownAilments.length));
         knowledge.discoverProperty(
           plantSpeciesId,
@@ -236,11 +236,12 @@ export class PlantDiscoverySystem implements System {
     }
 
     // Chance to discover preparation methods
-    if (Math.random() < discoveryChance * 0.5) {
+    const preparation = medicinal.preparation;
+    if (preparation && preparation.length > 0 && Math.random() < discoveryChance * 0.5) {
       const currentPrep = knownMedicinal !== 'unknown' && (knownMedicinal as any)?.knownPreparations
         ? (knownMedicinal as any).knownPreparations
         : [];
-      const unknownPrep = medicinal.preparation.filter(p => !currentPrep.includes(p));
+      const unknownPrep = preparation.filter(p => !currentPrep.includes(p));
 
       if (unknownPrep.length > 0) {
         const toDiscover = unknownPrep[0];
@@ -256,11 +257,12 @@ export class PlantDiscoverySystem implements System {
     }
 
     // Apply healing effects
+    const effectiveness = medicinal.effectiveness ?? 0.5;
     effects.push({
       type: 'healing',
       property: 'medicinal',
-      magnitude: medicinal.effectiveness,
-      description: `Medicinal effect (${Math.round(medicinal.effectiveness * 100)}% effective)`
+      magnitude: effectiveness,
+      description: `Medicinal effect (${Math.round(effectiveness * 100)}% effective)`
     });
 
     // Check for side effects
@@ -407,11 +409,13 @@ export class PlantDiscoverySystem implements System {
     const discoveryChance = this.calculateDiscoveryChance(knowledge.herbalistSkill);
 
     // Check if this plant has medicinal properties that work with this application
-    if (props.medicinal && props.medicinal.preparation.includes(applicationMethod as any)) {
+    const medicinalPrep = props.medicinal?.preparation;
+    if (props.medicinal && medicinalPrep?.includes(applicationMethod as any)) {
+      const appEffectiveness = props.medicinal.effectiveness ?? 0.5;
       effects.push({
         type: 'healing',
         property: 'medicinal_application',
-        magnitude: props.medicinal.effectiveness * 1.2, // Applications often more effective
+        magnitude: appEffectiveness * 1.2, // Applications often more effective
         description: `Applied as ${applicationMethod}`
       });
 

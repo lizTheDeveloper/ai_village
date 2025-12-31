@@ -116,6 +116,14 @@ import {
   CheckpointNamingService,
   checkpointNamingService,
   saveLoadService,
+  // Conflict & Combat Systems
+  AgentCombatSystem,
+  DominanceChallengeSystem,
+  GuardDutySystem,
+  HuntingSystem,
+  InjurySystem,
+  PredatorAttackSystem,
+  VillageDefenseSystem,
 } from '@ai-village/core';
 import {
   Renderer,
@@ -179,6 +187,8 @@ import {
   // LLM Config
   LLMConfigPanel,
   createLLMConfigPanelAdapter,
+  // Context Menu System
+  ContextMenuManager,
 } from '@ai-village/renderer';
 import {
   OllamaProvider,
@@ -222,6 +232,7 @@ interface UIContext {
   windowManager: WindowManager;
   menuBar: MenuBar;
   keyboardRegistry: KeyboardRegistry;
+  contextMenuManager: ContextMenuManager;
 }
 
 // ============================================================================
@@ -605,6 +616,15 @@ async function registerAllSystems(
   gameLoop.systemRegistry.register(new ReflectionSystem(gameLoop.world.eventBus));
   gameLoop.systemRegistry.register(new JournalingSystem(gameLoop.world.eventBus));
 
+  // Conflict & Combat Systems
+  gameLoop.systemRegistry.register(new HuntingSystem(gameLoop.world.eventBus));
+  gameLoop.systemRegistry.register(new PredatorAttackSystem(gameLoop.world.eventBus));
+  gameLoop.systemRegistry.register(new AgentCombatSystem(gameLoop.world.eventBus));
+  gameLoop.systemRegistry.register(new DominanceChallengeSystem(gameLoop.world.eventBus));
+  gameLoop.systemRegistry.register(new InjurySystem(gameLoop.world.eventBus));
+  gameLoop.systemRegistry.register(new GuardDutySystem(gameLoop.world.eventBus));
+  gameLoop.systemRegistry.register(new VillageDefenseSystem(gameLoop.world.eventBus));
+
   // Governance data system
   const governanceDataSystem = new GovernanceDataSystem();
   governanceDataSystem.initialize(gameLoop.world, gameLoop.world.eventBus);
@@ -673,6 +693,7 @@ interface UIPanelsResult {
   settingsPanel: SettingsPanel;
   tileInspectorPanel: TileInspectorPanel;
   controlsPanel: ControlsPanel;
+  contextMenuManager: ContextMenuManager;
 }
 
 function createUIPanels(
@@ -751,6 +772,14 @@ function createUIPanels(
     terrainGenerator
   );
 
+  // Create context menu manager
+  const contextMenuManager = new ContextMenuManager(
+    gameLoop.world,
+    gameLoop.world.eventBus,
+    renderer.getCamera(),
+    canvas
+  );
+
   // Create placeholder for controlsPanel - will be initialized after windowManager
   const controlsPanel = null as any;
 
@@ -770,6 +799,7 @@ function createUIPanels(
     settingsPanel,
     tileInspectorPanel,
     controlsPanel,
+    contextMenuManager,
   };
 }
 
@@ -1973,6 +2003,13 @@ function setupInputHandlers(
     },
     onMouseMove: (screenX, screenY) => {
       const rect = canvas.getBoundingClientRect();
+
+      // Context menu has priority for mouse move events when open
+      const { contextMenuManager } = uiContext;
+      if (contextMenuManager.isOpen()) {
+        contextMenuManager.handleMouseMove(screenX, screenY);
+      }
+
       windowManager.handleDrag(screenX, screenY);
       const inventoryHandled = inventoryUI.handleMouseMove(screenX, screenY, rect.width, rect.height);
       if (inventoryHandled) {
@@ -1982,6 +2019,12 @@ function setupInputHandlers(
     },
     onWheel: (screenX, screenY, deltaY) => {
       return windowManager.handleWheel(screenX, screenY, deltaY);
+    },
+    onRightClick: (screenX, screenY) => {
+      const { contextMenuManager } = uiContext;
+
+      // Open context menu with screen coordinates
+      contextMenuManager.open(screenX, screenY);
     },
   });
 }
@@ -1996,7 +2039,7 @@ function handleKeyDown(
   const { gameLoop, renderer, showNotification } = gameContext;
   const {
     agentInfoPanel, tileInspectorPanel, inventoryUI, craftingUI,
-    placementUI, windowManager, keyboardRegistry
+    placementUI, windowManager, keyboardRegistry, contextMenuManager
   } = uiContext;
 
   // Check keyboard registry first
@@ -2004,12 +2047,19 @@ function handleKeyDown(
     return true;
   }
 
-  // ESC handling
+  // ESC handling - check context menu first
   if (key === 'Escape') {
+    // Close context menu if open (highest priority)
+    if (contextMenuManager.isOpen()) {
+      contextMenuManager.handleKeyPress('Escape');
+      return true;
+    }
+    // Close inventory
     if (inventoryUI.isOpen()) {
       windowManager.hideWindow('inventory');
       return true;
     }
+    // Toggle settings as fallback
     windowManager.toggleWindow('settings');
     return true;
   }
@@ -2248,8 +2298,22 @@ function handleMouseClick(
   const {
     agentInfoPanel, animalInfoPanel, plantInfoPanel, tileInspectorPanel,
     memoryPanel, relationshipsPanel, craftingUI, shopPanel,
-    placementUI, windowManager, menuBar
+    placementUI, windowManager, menuBar, contextMenuManager
   } = uiContext;
+
+  // Context menu has highest priority - check if it's open
+  if (contextMenuManager.isOpen()) {
+    if (button === 0) {
+      // Left click while menu is open - either execute action or close menu
+      contextMenuManager.handleClick(screenX, screenY);
+      return true;
+    }
+    if (button === 2) {
+      // Right click while menu is open - close and reopen at new position
+      contextMenuManager.open(screenX, screenY);
+      return true;
+    }
+  }
 
   // Left click - window management and menu bar
   if (button === 0) {
@@ -2279,17 +2343,10 @@ function handleMouseClick(
     }
   }
 
-  // Right click - select tile
+  // Right click - open context menu
   if (button === 2) {
-    const tileData = tileInspectorPanel.findTileAtScreenPosition(screenX, screenY, gameLoop.world);
-    if (tileData) {
-      tileInspectorPanel.setSelectedTile(tileData.tile, tileData.x, tileData.y);
-      windowManager.showWindow('tile-inspector');
-      return true;
-    } else {
-      tileInspectorPanel.setSelectedTile(null);
-      windowManager.hideWindow('tile-inspector');
-    }
+    // Open context menu at click position
+    contextMenuManager.open(screenX, screenY);
     return true;
   }
 
@@ -2767,6 +2824,7 @@ async function main() {
     windowManager,
     menuBar,
     keyboardRegistry,
+    contextMenuManager: panels.contextMenuManager,
   };
 
   // Build game context
@@ -2815,6 +2873,9 @@ async function main() {
     windowManager.render(ctx, gameLoop.world);
     panels.shopPanel.render(ctx, gameLoop.world);
     menuBar.render(ctx);
+
+    // Context menu update (handles rendering internally)
+    panels.contextMenuManager.update();
 
     requestAnimationFrame(renderLoop);
   }
@@ -2939,19 +3000,16 @@ async function main() {
   // Set up periodic auto-saves every minute
   const AUTOSAVE_INTERVAL_MS = 60000; // 1 minute
   setInterval(async () => {
+    console.log('[Demo] Auto-save interval triggered');
     try {
       const timeComp = gameLoop.world.query().with('time').executeEntities()[0]?.getComponent<any>('time');
       const day = timeComp?.day || 0;
       const tick = timeComp?.currentTick || 0;
 
       const saveName = `autosave_day${day}_${new Date().toISOString().split('T')[1].split('.')[0].replace(/:/g, '-')}`;
-      const result = await saveLoadService.save(gameLoop.world, saveName);
-
-      if (result.success) {
-        console.log(`[Demo] Auto-save successful: ${saveName}`);
-      } else {
-        console.error(`[Demo] Auto-save failed: ${result.error}`);
-      }
+      console.log(`[Demo] Calling save with name: ${saveName}`);
+      await saveLoadService.save(gameLoop.world, { name: saveName });
+      console.log(`[Demo] Auto-save successful: ${saveName}`);
     } catch (error) {
       console.error('[Demo] Auto-save error:', error);
     }

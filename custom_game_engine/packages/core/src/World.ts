@@ -12,6 +12,10 @@ import type { Component } from './ecs/Component.js';
 
 // Import component factory functions
 import { createPositionComponent } from './components/PositionComponent.js';
+import { createDominanceRankComponent } from './components/DominanceRankComponent.js';
+import { createCombatStatsComponent } from './components/CombatStatsComponent.js';
+import { createConflictComponent } from './components/ConflictComponent.js';
+import { createGuardDutyComponent } from './components/GuardDutyComponent.js';
 
 // Import navigation component classes
 import { TrustNetworkComponent } from './components/TrustNetworkComponent.js';
@@ -20,6 +24,7 @@ import { ExplorationStateComponent } from './components/ExplorationStateComponen
 import { SpatialMemoryComponent } from './components/SpatialMemoryComponent.js';
 import { BeliefComponent } from './components/BeliefComponent.js';
 import { EpisodicMemoryComponent } from './components/EpisodicMemoryComponent.js';
+import { NeedsComponent } from './components/NeedsComponent.js';
 
 // Type for component factory functions
 type ComponentFactory = (data?: Record<string, unknown>) => Component;
@@ -86,6 +91,106 @@ const componentRegistry: Record<string, ComponentFactory> = {
     return new ExplorationStateComponent();
   },
   'episodic_memory': (data = {}) => new EpisodicMemoryComponent(data),
+  'dominance_rank': (data = {}) => createDominanceRankComponent(data as any),
+  'combat_stats': (data = {}) => createCombatStatsComponent(data as any),
+  'conflict': (data = {}) => createConflictComponent(data as any),
+  'guard_duty': (data = {}) => createGuardDutyComponent(data as any),
+  'skills': (data = {}) => ({
+    type: 'skills' as const,
+    version: 1,
+    ...data,
+  }),
+  'animal': (data = {}) => ({
+    type: 'animal' as const,
+    version: 1,
+    ...data,
+  }),
+  'territory': (data = {}) => ({
+    type: 'territory' as const,
+    version: 1,
+    ...data,
+  }),
+  'injury': (data = {}) => ({
+    type: 'injury' as const,
+    version: 1,
+    ...data,
+  }),
+  'inventory': (data = {}) => ({
+    type: 'inventory' as const,
+    version: 1,
+    items: (data.items as Array<{type: string; quantity: number}>) || [],
+    ...data,
+  }),
+  'relationship': (data = {}) => ({
+    type: 'relationship' as const,
+    version: 1,
+    relationships: (data.relationships as Record<string, {opinion: number}>) || {},
+    ...data,
+  }),
+  'reputation': (data = {}) => ({
+    type: 'reputation' as const,
+    version: 1,
+    honor: (data.honor as number) || 0,
+    violence: (data.violence as number) || 0,
+    ...data,
+  }),
+  'needs': (data = {}) => new NeedsComponent(data),
+  'movement': (data = {}) => ({
+    type: 'movement' as const,
+    version: 1,
+    baseSpeed: (data.baseSpeed as number) || 1.0,
+    currentSpeed: (data.currentSpeed as number) || 1.0,
+    ...data,
+  }),
+  'environment': (data = {}) => ({
+    type: 'environment' as const,
+    version: 1,
+    terrain: (data.terrain as string) || 'plains',
+    weather: (data.weather as string) || 'clear',
+    timeOfDay: (data.timeOfDay as string) || 'noon',
+    ...data,
+  }),
+  'laws': (data = {}) => ({
+    type: 'laws' as const,
+    version: 1,
+    murderIllegal: (data.murderIllegal as boolean) || false,
+    assaultIllegal: (data.assaultIllegal as boolean) || false,
+    selfDefenseLegal: (data.selfDefenseLegal as boolean) || true,
+    ...data,
+  }),
+  'dead': (data = {}) => ({
+    type: 'dead' as const,
+    version: 1,
+    cause: (data.cause as string) || 'unknown',
+    time: (data.time as number) || 0,
+    ...data,
+  }),
+  'pack_member': (data = {}) => ({
+    type: 'pack_member' as const,
+    version: 1,
+    packId: (data.packId as string),
+    ...data,
+  }),
+  'pack_combat': (data = {}) => ({
+    type: 'pack_combat' as const,
+    version: 1,
+    coherence: (data.coherence as number) || 1.0,
+    bodiesInPack: (data.bodiesInPack as string[]) || [],
+    ...data,
+  }),
+  'hive_queen': (data = {}) => ({
+    type: 'hive_queen' as const,
+    version: 1,
+    hiveId: (data.hiveId as string),
+    ...data,
+  }),
+  'hive_combat': (data = {}) => ({
+    type: 'hive_combat' as const,
+    version: 1,
+    queenDead: (data.queenDead as boolean) || false,
+    collapseTriggered: (data.collapseTriggered as boolean) || false,
+    ...data,
+  }),
 
   // Backwards compatibility aliases (PascalCase → lowercase_with_underscores)
   'Velocity': (data) => componentRegistry['velocity']!(data),

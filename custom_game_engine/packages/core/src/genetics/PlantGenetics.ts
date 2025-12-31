@@ -176,16 +176,21 @@ function blendGenetics(
     droughtTolerance: blend(g1.droughtTolerance, g2.droughtTolerance, 'droughtTolerance'),
     coldTolerance: blend(g1.coldTolerance, g2.coldTolerance, 'coldTolerance'),
     flavorProfile: blend(g1.flavorProfile, g2.flavorProfile, 'flavorProfile'),
-    mutations: [...g1.mutations, ...g2.mutations]
+    mutations: [...(g1.mutations ?? []), ...(g2.mutations ?? [])]
   };
+
+  // Initialize mutations array if undefined
+  if (!result.mutations) {
+    result.mutations = [];
+  }
 
   // Record hybridization as a special mutation
   result.mutations.push({
     trait: 'hybrid',
     delta: diversity,
     generation: Math.max(
-      ...g1.mutations.map(m => m.generation),
-      ...g2.mutations.map(m => m.generation),
+      ...(g1.mutations ?? []).map(m => m.generation),
+      ...(g2.mutations ?? []).map(m => m.generation),
       0
     ) + 1
   } as GeneticMutation);
@@ -295,7 +300,7 @@ export function applyMutations(
     droughtTolerance: parentGenetics.droughtTolerance,
     coldTolerance: parentGenetics.coldTolerance,
     flavorProfile: parentGenetics.flavorProfile,
-    mutations: [...parentGenetics.mutations]
+    mutations: [...(parentGenetics.mutations ?? [])]
   };
 
   // Mutation chance: 10% per trait (per spec)
@@ -327,6 +332,11 @@ export function applyMutations(
       }
 
       (result[trait] as number) = newValue;
+
+      // Initialize mutations array if needed
+      if (!result.mutations) {
+        result.mutations = [];
+      }
 
       // Record mutation
       result.mutations.push({

@@ -1,0 +1,217 @@
+/**
+ * Creature Locomotion Methods
+ *
+ * How alien creatures move through their environment.
+ */
+
+export interface LocomotionMethod {
+  name: string;
+  mechanism: string;
+  speed: 'very_slow' | 'slow' | 'moderate' | 'fast' | 'very_fast' | 'teleportation';
+  terrainTypes: string[];
+  energyCost: 'minimal' | 'low' | 'moderate' | 'high' | 'extreme';
+  flavorText: string;
+}
+
+export const LOCOMOTION_METHODS: Record<string, LocomotionMethod> = {
+  'bipedal_walking': {
+    name: 'Bipedal Walking',
+    mechanism: 'Two legs, alternating steps',
+    speed: 'moderate',
+    terrainTypes: ['Flat ground', 'Hills', 'Rocky terrain'],
+    energyCost: 'moderate',
+    flavorText: 'Two legs. Balance required. Falls possible. Works though. Humans do it.',
+  },
+  'quadrupedal_running': {
+    name: 'Quadrupedal Running',
+    mechanism: 'Four legs provide stability and speed',
+    speed: 'fast',
+    terrainTypes: ['Most solid surfaces'],
+    energyCost: 'moderate',
+    flavorText: 'Four legs better than two. Faster. More stable. Mammals figured this out.',
+  },
+  'slithering': {
+    name: 'Serpentine Slither',
+    mechanism: 'Body waves create forward motion',
+    speed: 'moderate',
+    terrainTypes: ['Ground', 'Through vegetation', 'Narrow spaces'],
+    energyCost: 'low',
+    flavorText: 'No legs needed. Waves propagate. Forward motion achieved. Snakes approve.',
+  },
+  'flight_wings': {
+    name: 'Winged Flight',
+    mechanism: 'Wings generate lift and thrust',
+    speed: 'fast',
+    terrainTypes: ['Air', 'Open spaces'],
+    energyCost: 'high',
+    flavorText: 'Wings flap. Lift generated. Gravity defied. Landing tricky. Worth it.',
+  },
+  'jet_propulsion': {
+    name: 'Biological Jet',
+    mechanism: 'Expels fluid/gas forcefully for thrust',
+    speed: 'very_fast',
+    terrainTypes: ['Water', 'Air (if dense enough)'],
+    energyCost: 'high',
+    flavorText: 'Squirt water. Move fast. Physics simple. Efficiency questionable. Fun though.',
+  },
+  'magnetic_levitation': {
+    name: 'Magnetic Hovering',
+    mechanism: 'Manipulates magnetic fields to float',
+    speed: 'moderate',
+    terrainTypes: ['Above magnetic surfaces'],
+    energyCost: 'moderate',
+    flavorText: 'Magnets lift. Hover achieved. Smooth gliding. Limited terrain. Looks cool.',
+  },
+  'rolling': {
+    name: 'Ball Rolling',
+    mechanism: 'Curls into ball, rolls downhill or actively',
+    speed: 'fast',
+    terrainTypes: ['Slopes', 'Smooth surfaces'],
+    energyCost: 'minimal',
+    flavorText: 'Become ball. Roll. Fast downhill. Slower uphill. Dizzy always.',
+  },
+  'teleportation': {
+    name: 'Quantum Jumping',
+    mechanism: 'Disappears and reappears elsewhere',
+    speed: 'teleportation',
+    terrainTypes: ['All - destination must be known'],
+    energyCost: 'extreme',
+    flavorText: 'Here. Then there. Instantly. Physics screams. Works anyway. Nausea common.',
+  },
+  'dimensional_stepping': {
+    name: 'Dimension Hopping',
+    mechanism: 'Steps through higher dimensions to bypass space',
+    speed: 'fast',
+    terrainTypes: ['Any - travels through hyperspace'],
+    energyCost: 'high',
+    flavorText: 'Step sideways. Through dimensions. Emerge elsewhere. Space folded. Mind twisted.',
+  },
+  'burrowing': {
+    name: 'Earth Burrowing',
+    mechanism: 'Digs through soil and rock',
+    speed: 'slow',
+    terrainTypes: ['Underground', 'Soft materials'],
+    energyCost: 'high',
+    flavorText: 'Dig. Always digging. Through dirt. Through rock. Slow. Dark. Safe.',
+  },
+  'swimming': {
+    name: 'Aquatic Swimming',
+    mechanism: 'Fins, tails, or body undulation in water',
+    speed: 'moderate',
+    terrainTypes: ['Water', 'Liquid environments'],
+    energyCost: 'low',
+    flavorText: 'Swim. Glide through water. Efficient. Graceful. Drowning not an issue.',
+  },
+  'climbing': {
+    name: 'Vertical Climbing',
+    mechanism: 'Gripping appendages scale vertical surfaces',
+    speed: 'slow',
+    terrainTypes: ['Walls', 'Trees', 'Cliffs'],
+    energyCost: 'moderate',
+    flavorText: 'Climb up. Stick to surfaces. Grip strong. Falling bad. Don\'t fall.',
+  },
+  'gliding': {
+    name: 'Passive Gliding',
+    mechanism: 'Membranes catch air, controlled descent',
+    speed: 'moderate',
+    terrainTypes: ['Air - requires altitude'],
+    energyCost: 'minimal',
+    flavorText: 'Fall gracefully. Membranes spread. Glide. Control fall. Landing still concerning.',
+  },
+  'gravity_manipulation': {
+    name: 'Gravitational Control',
+    mechanism: 'Alters local gravity to move',
+    speed: 'moderate',
+    terrainTypes: ['Any - gravity-independent'],
+    energyCost: 'extreme',
+    flavorText: 'Bend gravity. Up is down. Down is sideways. Move freely. Physics resigned.',
+  },
+  'tentacle_walking': {
+    name: 'Tentacle Locomotion',
+    mechanism: 'Multiple tentacles grip and pull',
+    speed: 'slow',
+    terrainTypes: ['Most surfaces', 'Irregular terrain excellent'],
+    energyCost: 'moderate',
+    flavorText: 'Tentacles reach. Grip. Pull. Repeat. Slow. Versatile. Creepy.',
+  },
+  'time_dilation': {
+    name: 'Temporal Speed',
+    mechanism: 'Speeds up personal time relative to surroundings',
+    speed: 'very_fast',
+    terrainTypes: ['All'],
+    energyCost: 'extreme',
+    flavorText: 'Time flows faster. For you. Everything slow. You fast. Age faster. Trade-off.',
+  },
+  'phase_shifting': {
+    name: 'Matter Phasing',
+    mechanism: 'Shifts out of phase with matter, passes through',
+    speed: 'moderate',
+    terrainTypes: ['All - walls not an obstacle'],
+    energyCost: 'high',
+    flavorText: 'Become intangible. Walk through walls. Through people. Through everything. Weird feeling.',
+  },
+  'bouncing': {
+    name: 'Spring-Loaded Bouncing',
+    mechanism: 'Powerful legs/springs launch creature',
+    speed: 'fast',
+    terrainTypes: ['Surfaces to bounce off'],
+    energyCost: 'moderate',
+    flavorText: 'Bounce. High. Far. Repeat. Efficient. Disorienting. Landing important.',
+  },
+  'wind_surfing': {
+    name: 'Wind Sailing',
+    mechanism: 'Catches wind with large surface area',
+    speed: 'fast',
+    terrainTypes: ['Open areas with wind'],
+    energyCost: 'minimal',
+    flavorText: 'Wind pushes. Sails catch. Free movement. Wind-dependent. Becalmed problem.',
+  },
+  'inching': {
+    name: 'Caterpillar Inching',
+    mechanism: 'Contracts and extends body segments',
+    speed: 'very_slow',
+    terrainTypes: ['Any surface'],
+    energyCost: 'low',
+    flavorText: 'Inch forward. Slowly. Very slowly. Patient. Methodical. Eventually arrives.',
+  },
+  'rocket_boost': {
+    name: 'Chemical Propulsion',
+    mechanism: 'Combusts chemicals for explosive thrust',
+    speed: 'very_fast',
+    terrainTypes: ['Any - uncontrolled usually'],
+    energyCost: 'extreme',
+    flavorText: 'Chemical reaction. Explosive thrust. Very fast. Little control. Crashes frequent.',
+  },
+  'electromagnetic_rail': {
+    name: 'EM Rail Sliding',
+    mechanism: 'Generates electromagnetic field, rides currents',
+    speed: 'very_fast',
+    terrainTypes: ['Along magnetic field lines'],
+    energyCost: 'high',
+    flavorText: 'Surf electromagnetic fields. Fast. Smooth. Limited paths. Spectacular.',
+  },
+  'crystalline_growth': {
+    name: 'Growth-Based Movement',
+    mechanism: 'Grows new crystals in direction of travel',
+    speed: 'very_slow',
+    terrainTypes: ['Surfaces that accept crystal growth'],
+    energyCost: 'low',
+    flavorText: 'Grow forward. Leave trail. Slow. Permanent path. Movement or building? Both.',
+  },
+  'osmotic_flow': {
+    name: 'Osmotic Propulsion',
+    mechanism: 'Controls fluid flow through membranes',
+    speed: 'slow',
+    terrainTypes: ['Liquid environments'],
+    energyCost: 'minimal',
+    flavorText: 'Water flows. Through membranes. Gentle push. Slow. Silent. Efficient.',
+  },
+  'sound_surfing': {
+    name: 'Acoustic Levitation',
+    mechanism: 'Rides on sound waves',
+    speed: 'moderate',
+    terrainTypes: ['Requires sound-reflective surfaces'],
+    energyCost: 'moderate',
+    flavorText: 'Sound waves lift. Ride vibrations. Noisy. Effective. Ears hurt.',
+  },
+};

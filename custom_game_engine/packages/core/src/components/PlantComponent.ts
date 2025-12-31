@@ -27,7 +27,7 @@ export interface PlantGenetics {
   droughtTolerance: number;   // 0-100
   coldTolerance: number;      // 0-100
   flavorProfile: number;      // Affects food quality (0-100)
-  mutations: GeneticMutation[];
+  mutations?: GeneticMutation[];  // Optional - new plants start without mutations
 }
 
 export interface GeneticMutation {

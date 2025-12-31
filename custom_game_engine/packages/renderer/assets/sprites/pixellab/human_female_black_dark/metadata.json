@@ -1,0 +1,19 @@
+{
+  "id": "human_female_black_dark",
+  "name": "Human Female - Black Hair Dark Skin",
+  "pixellab_id": "d263100b-d684-4a81-9040-496f4741f2d7",
+  "species": "human",
+  "gender": "female",
+  "hair_color": "black",
+  "skin_tone": "dark",
+  "size": 48,
+  "directions": 8,
+  "view": "high top-down",
+  "style": {
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+  },
+  "rotations": ["south", "south-west", "west", "north-west", "north", "north-east", "east", "south-east"],
+  "animations": {}
+}

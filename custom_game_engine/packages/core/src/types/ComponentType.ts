@@ -111,4 +111,15 @@ export enum ComponentType {
   Spiritual = 'spiritual',
   Deity = 'deity',
   Mythology = 'mythology',
+
+  // Divine Rebellion & Cosmic Systems
+  RebellionOutcome = 'rebellion_outcome',
+  LoreFrag = 'lore_frag',
+  RealityAnchor = 'reality_anchor',
+  RebellionThreshold = 'rebellion_threshold',
+  SupremeCreator = 'supreme_creator',
+
+  // Reproduction & Life
+  Pregnancy = 'pregnancy',
+  Labor = 'labor',
 }

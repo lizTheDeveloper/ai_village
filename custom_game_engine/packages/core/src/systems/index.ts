@@ -108,3 +108,20 @@ export * from './AutoSaveSystem.js';
 export * from './CheckpointNamingService.js';
 export * from './CanonEventDetector.js';
 export * from './CheckpointRetentionPolicy.js';
+export * from './CanonEventDescriptions.js';
+// Combat & Security Systems
+export * from './AgentCombatSystem.js';
+export * from './DominanceChallengeSystem.js';
+export * from './GuardDutySystem.js';
+export * from './HuntingSystem.js';
+export * from './InjurySystem.js';
+export * from './PredatorAttackSystem.js';
+export * from './VillageDefenseSystem.js';
+// Building Maintenance
+export * from './BuildingMaintenanceSystem.js';
+// Sacred Sites
+export * from './SacredSiteSystem.js';
+// Angel AI
+export * from './AngelAIDecisionProcessor.js';
+// Goal Descriptions
+export * from './GoalDescriptionLibrary.js';

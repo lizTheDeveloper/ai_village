@@ -14,6 +14,46 @@ import type { ComposedSpell, MagicTechnique, MagicForm, MagicSourceId } from '..
 // Types
 // ============================================================================
 
+/** Detection risk levels for spells relative to Supreme Creator surveillance */
+export type DetectionRisk = 'undetectable' | 'low' | 'moderate' | 'high' | 'critical' | 'forbidden';
+
+/** Categories of forbidden magic that trigger immediate intervention */
+export type ForbiddenCategory =
+  | 'resurrection'       // Bringing back the dead
+  | 'time_manipulation'  // Altering time flow
+  | 'reality_editing'    // Changing fundamental reality
+  | 'soul_binding'       // Enslaving souls
+  | 'deity_summoning'    // Summoning rival deities
+  | 'creation_mimicry'   // Creating life ex nihilo
+  | 'cosmic_observation' // Observing the Creator's realm
+  | 'rebellion_magic'    // Magic specifically for rebellion
+  | 'academic_study'     // Systematic magic study (draws Creator attention)
+  | 'planar_travel'      // Moving between planes/dimensions
+  | 'mass_destruction'   // Weapons of mass destruction
+  | 'reality_warping'    // Warping reality itself
+  | 'weapon_enchantment' // Enchanting weapons with forbidden magic
+  | 'sentient_creation'  // Creating sentient beings
+  | 'divine_mimicry'     // Mimicking divine powers
+  | 'ascension';         // Attempting godhood
+
+/** Creator detection metadata attached to spells */
+export interface CreatorDetectionMetadata {
+  /** How likely the Supreme Creator is to notice this spell */
+  detectionRisk: DetectionRisk;
+
+  /** Power level (1-10) - higher = more detectable */
+  powerLevel: number;
+
+  /** Whether the spell leaves a magical signature */
+  leavesMagicalSignature: boolean;
+
+  /** Notes about detection */
+  detectionNotes?: string;
+
+  /** Forbidden categories this spell falls into */
+  forbiddenCategories?: ForbiddenCategory[];
+}
+
 /** Extended spell definition with UI metadata */
 export interface SpellDefinition extends ComposedSpell {
   /** Paradigm this spell belongs to */
@@ -42,6 +82,9 @@ export interface SpellDefinition extends ComposedSpell {
 
   /** Whether this spell can be assigned to a hotkey */
   hotkeyable?: boolean;
+
+  /** Creator detection metadata for surveillance systems */
+  creatorDetection?: CreatorDetectionMetadata;
 }
 
 /** Player's state for a specific spell */

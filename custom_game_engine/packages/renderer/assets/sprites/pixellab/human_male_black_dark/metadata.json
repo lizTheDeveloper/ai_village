@@ -1,0 +1,19 @@
+{
+  "id": "human_male_black_dark",
+  "name": "Human Male - Black Hair Dark Skin",
+  "pixellab_id": "ae25e95a-b41b-4946-ba48-437afb05a828",
+  "species": "human",
+  "gender": "male",
+  "hair_color": "black",
+  "skin_tone": "dark",
+  "size": 48,
+  "directions": 8,
+  "view": "high top-down",
+  "style": {
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+  },
+  "rotations": ["south", "south-west", "west", "north-west", "north", "north-east", "east", "south-east"],
+  "animations": {}
+}

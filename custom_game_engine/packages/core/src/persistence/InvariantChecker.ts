@@ -98,10 +98,10 @@ function validateComponentData(component: VersionedComponent): void {
     }
   }
 
-  // Check for required type field
-  if (typeof data.type !== 'string') {
+  // Check for required type field (at component level, not in data)
+  if (typeof component.type !== 'string') {
     throw new InvariantViolationError(
-      `Component missing required 'type' field or type is not a string: ${component.type}`
+      `Component missing required 'type' field or type is not a string: ${JSON.stringify(component)}`
     );
   }
 

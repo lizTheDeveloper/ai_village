@@ -93,3 +93,12 @@ export {
   tameAnimalBehavior,
   houseAnimalBehavior,
 } from './AnimalBehaviors.js';
+
+// Spiritual & Prayer behaviors
+export * from './PrayBehavior.js';
+export * from './GroupPrayBehavior.js';
+export * from './MeditateBehavior.js';
+
+// Building maintenance behaviors
+export * from './RepairBehavior.js';
+export * from './UpgradeBehavior.js';

@@ -37,6 +37,9 @@ import {
   createSteeringComponent,
   createVelocityComponent,
   createSpiritualComponent,
+  // Conflict system components
+  createCombatStatsComponent,
+  createDominanceRankComponent,
 } from '@ai-village/core';
 
 /**
@@ -177,6 +180,48 @@ export function createWanderingAgent(
 
   // Personal Goals - track agent's aspirations and progress
   entity.addComponent(createGoalsComponent());
+
+  // Combat stats - basic combat abilities
+  entity.addComponent(createCombatStatsComponent({
+    combatSkill: 0.3 + Math.random() * 0.2, // 30-50% base skill
+    huntingSkill: 0.2 + Math.random() * 0.3, // 20-50% hunting
+    stealthSkill: 0.2 + Math.random() * 0.3, // 20-50% stealth
+  }));
+
+  // Injury tracking - starts with no injuries (using empty component object)
+  entity.addComponent({
+    type: 'injury',
+    version: 1,
+    injuryType: 'laceration', // Required by interface but unused when injuries array is empty
+    severity: 'minor',
+    location: 'torso',
+    injuries: [], // Empty array = no injuries
+    skillPenalties: {},
+    elapsed: 0,
+    treated: false,
+    untreatedDuration: 0,
+  } as any); // Cast needed because interface requires fields even when using injuries array
+
+  // Guard duty - not assigned initially (using minimal object)
+  entity.addComponent({
+    type: 'guard_duty',
+    version: 1,
+    assignmentType: 'location' as const, // Required by interface but unused when no assignment
+    targetLocation: undefined,
+    targetPerson: undefined,
+    patrolRoute: undefined,
+    patrolIndex: 0,
+    alertness: 1.0,
+    responseRadius: 10,
+    lastCheckTime: 0,
+  } as any); // Cast needed for optional fields
+
+  // Dominance rank - neutral rank for non-hierarchical species
+  entity.addComponent(createDominanceRankComponent({
+    rank: 0, // 0 = no rank in hierarchy
+    subordinates: [],
+    canChallengeAbove: false, // Not a dominance-based species
+  }));
 
   // Add to world
   (world as any)._addEntity(entity);
@@ -326,6 +371,48 @@ export function createLLMAgent(
 
   // Personal Goals - track agent's aspirations and progress
   entity.addComponent(createGoalsComponent());
+
+  // Combat stats - basic combat abilities
+  entity.addComponent(createCombatStatsComponent({
+    combatSkill: 0.3 + Math.random() * 0.2, // 30-50% base skill
+    huntingSkill: 0.2 + Math.random() * 0.3, // 20-50% hunting
+    stealthSkill: 0.2 + Math.random() * 0.3, // 20-50% stealth
+  }));
+
+  // Injury tracking - starts with no injuries (using empty component object)
+  entity.addComponent({
+    type: 'injury',
+    version: 1,
+    injuryType: 'laceration', // Required by interface but unused when injuries array is empty
+    severity: 'minor',
+    location: 'torso',
+    injuries: [], // Empty array = no injuries
+    skillPenalties: {},
+    elapsed: 0,
+    treated: false,
+    untreatedDuration: 0,
+  } as any); // Cast needed because interface requires fields even when using injuries array
+
+  // Guard duty - not assigned initially (using minimal object)
+  entity.addComponent({
+    type: 'guard_duty',
+    version: 1,
+    assignmentType: 'location' as const, // Required by interface but unused when no assignment
+    targetLocation: undefined,
+    targetPerson: undefined,
+    patrolRoute: undefined,
+    patrolIndex: 0,
+    alertness: 1.0,
+    responseRadius: 10,
+    lastCheckTime: 0,
+  } as any); // Cast needed for optional fields
+
+  // Dominance rank - neutral rank for non-hierarchical species
+  entity.addComponent(createDominanceRankComponent({
+    rank: 0, // 0 = no rank in hierarchy
+    subordinates: [],
+    canChallengeAbove: false, // Not a dominance-based species
+  }));
 
   // Add initial "waking up" memory from Dungeon Master prompt
   if (dungeonMasterPrompt) {

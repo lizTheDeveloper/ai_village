@@ -1,0 +1,19 @@
+{
+  "id": "human_male_black_medium",
+  "name": "Human Male - Black Hair Medium Skin",
+  "pixellab_id": "a672294a-1747-41b1-b1e7-bfbe21c14b63",
+  "species": "human",
+  "gender": "male",
+  "hair_color": "black",
+  "skin_tone": "medium",
+  "size": 48,
+  "directions": 8,
+  "view": "high top-down",
+  "style": {
+    "outline": "single color black outline",
+    "shading": "basic shading",
+    "detail": "medium detail"
+  },
+  "rotations": ["south", "south-west", "west", "north-west", "north", "north-east", "east", "south-east"],
+  "animations": {}
+}

@@ -49,6 +49,7 @@ export interface InputHandlerCallbacks {
   onMouseClick?: (screenX: number, screenY: number, button: number) => boolean;
   onMouseMove?: (screenX: number, screenY: number) => void;
   onWheel?: (screenX: number, screenY: number, deltaY: number) => boolean;
+  onRightClick?: (screenX: number, screenY: number) => void;
   /** Called when view mode changes */
   onViewModeChange?: (mode: ViewMode) => void;
   /** Called when z-depth changes in side-view */
@@ -82,10 +83,23 @@ export class InputHandler {
     canvasOrWorld: HTMLCanvasElement | any,
     camera?: Camera
   ) {
+    // Per CLAUDE.md: no silent fallbacks - validate inputs
+    if (canvasOrWorld === null || canvasOrWorld === undefined) {
+      throw new Error('InputHandler requires a valid canvas or world');
+    }
+
     if (camera) {
       // Old signature: (canvas, camera)
+      // Validate canvas
+      if (!(canvasOrWorld instanceof HTMLCanvasElement)) {
+        throw new Error('InputHandler requires a valid HTMLCanvasElement');
+      }
       this.canvas = canvasOrWorld;
       this.camera = camera;
+      this.setupEventListeners();
+    } else if (canvasOrWorld instanceof HTMLCanvasElement) {
+      // Canvas-only signature - set up listeners without camera
+      this.canvas = canvasOrWorld;
       this.setupEventListeners();
     } else {
       // New signature: (world) - for testing
@@ -189,8 +203,8 @@ export class InputHandler {
   }
 
   private setupEventListeners(): void {
-    if (!this.canvas || !this.camera) {
-      return; // Don't setup if canvas/camera not available
+    if (!this.canvas) {
+      return; // Don't setup if canvas not available
     }
 
     // Keyboard
@@ -234,9 +248,18 @@ export class InputHandler {
     };
     this.addListener(this.canvas, 'mousedown', handleMouseDown);
 
-    // Prevent context menu on right click
+    // Handle right-click for context menu
     const handleContextMenu = (e: Event) => {
       e.preventDefault();
+      const me = e as MouseEvent;
+      const rect = this.canvas!.getBoundingClientRect();
+      const screenX = me.clientX - rect.left;
+      const screenY = me.clientY - rect.top;
+
+      // Call onRightClick callback if registered
+      if (this.callbacks.onRightClick) {
+        this.callbacks.onRightClick(screenX, screenY);
+      }
     };
     this.addListener(this.canvas, 'contextmenu', handleContextMenu);
 
@@ -257,7 +280,7 @@ export class InputHandler {
       if (this.mouseDown) {
         const dx = me.clientX - this.lastMouseX;
         const dy = me.clientY - this.lastMouseY;
-        this.camera!.pan(-dx, -dy);
+        this.camera?.pan(-dx, -dy);
         this.lastMouseX = me.clientX;
         this.lastMouseY = me.clientY;
       }
@@ -279,16 +302,19 @@ export class InputHandler {
         return;
       }
 
-      // Shift + scroll = change depth slice (Y position for which row we're viewing)
-      if (we.shiftKey) {
-        // Scroll up = move forward (into screen), scroll down = move back
-        const delta = we.deltaY > 0 ? 1 : -1;
-        this.camera!.adjustDepthSlice(delta);
-        this.callbacks.onDepthChange?.(this.camera!.y);
-      } else {
-        // Regular scroll = zoom (both modes)
-        const zoomFactor = we.deltaY > 0 ? 0.9 : 1.1;
-        this.camera!.setZoom(this.camera!.zoom * zoomFactor);
+      // Camera operations only when camera is available
+      if (this.camera) {
+        // Shift + scroll = change depth slice (Y position for which row we're viewing)
+        if (we.shiftKey) {
+          // Scroll up = move forward (into screen), scroll down = move back
+          const delta = we.deltaY > 0 ? 1 : -1;
+          this.camera.adjustDepthSlice(delta);
+          this.callbacks.onDepthChange?.(this.camera.y);
+        } else {
+          // Regular scroll = zoom (both modes)
+          const zoomFactor = we.deltaY > 0 ? 0.9 : 1.1;
+          this.camera.setZoom(this.camera.zoom * zoomFactor);
+        }
       }
     };
     this.addListener(this.canvas, 'wheel', handleWheel);

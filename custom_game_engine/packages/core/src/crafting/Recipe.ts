@@ -57,6 +57,8 @@ export interface Recipe {
   researchRequirements: string[];
   /** Optional icon path */
   icon?: string;
+  /** Tool types required for crafting (e.g., ['hammer', 'saw']) */
+  requiredTools?: string[];
 }
 
 /**

@@ -234,9 +234,98 @@ export type {
   ModificationSource,
 } from './GeneticComponent.js';
 // Realm system components
-export { RealmComponent } from './RealmComponent.js';
-export type { RealmComponent as RealmComponentType } from './RealmComponent.js';
-export { PortalComponent } from './PortalComponent.js';
-export type { PortalComponent as PortalComponentType } from './PortalComponent.js';
-export { RealmLocationComponent } from './RealmLocationComponent.js';
-export type { RealmLocationComponent as RealmLocationComponentType } from './RealmLocationComponent.js';
+export type { RealmComponent } from './RealmComponent.js';
+export { createRealmComponent } from './RealmComponent.js';
+export type { PortalComponent } from './PortalComponent.js';
+export { createPortalComponent } from './PortalComponent.js';
+export type { RealmLocationComponent } from './RealmLocationComponent.js';
+export { createRealmLocationComponent } from './RealmLocationComponent.js';
+
+// Cosmic Rebellion system components
+export * from './CosmicRebellionOutcome.js';
+export {
+  createCosmicRebellionOutcome,
+  checkOutcomeConditions,
+  determineOutcome,
+  getOutcomeNarrative,
+  OUTCOME_CONDITIONS,
+} from './CosmicRebellionOutcome.js';
+export type {
+  CosmicRebellionOutcome,
+  BattleStatus,
+  RebellionOutcome,
+  ConflictChoice,
+  OutcomeConditions,
+} from './CosmicRebellionOutcome.js';
+
+// Lore fragment system
+export * from './LoreFragmentComponent.js';
+export {
+  createLoreFragment,
+  getFragmentsByCategory,
+  getFragmentsByImportance,
+  getFragmentsByTag,
+  LORE_FRAGMENTS,
+} from './LoreFragmentComponent.js';
+export type {
+  LoreFragmentComponent,
+  LoreCategory,
+  LoreImportance,
+} from './LoreFragmentComponent.js';
+
+// Reality Anchor (tech path endgame)
+export * from './RealityAnchorComponent.js';
+export {
+  createRealityAnchor,
+  canBuildRealityAnchor,
+  REALITY_ANCHOR_REQUIREMENTS,
+} from './RealityAnchorComponent.js';
+export type {
+  RealityAnchorComponent,
+  RealityAnchorStatus,
+  RealityAnchorRequirements,
+} from './RealityAnchorComponent.js';
+
+// Rebellion threshold tracking
+export * from './RebellionThresholdComponent.js';
+export {
+  createRebellionThreshold,
+  checkRebellionThresholds,
+  calculateRebellionReadiness,
+  FAITH_REBELLION_THRESHOLDS,
+  TECH_REBELLION_THRESHOLDS,
+} from './RebellionThresholdComponent.js';
+export type {
+  RebellionThresholdComponent,
+  RebellionStatus,
+  RebellionPath,
+  RebellionThresholds,
+} from './RebellionThresholdComponent.js';
+
+// Combat & Conflict Components
+export * from './AppearanceComponent.js';
+export * from './CombatStatsComponent.js';
+export { createCombatStatsComponent } from './CombatStatsComponent.js';
+export * from './ConflictComponent.js';
+export * from './DominanceRankComponent.js';
+export { createDominanceRankComponent } from './DominanceRankComponent.js';
+export * from './GuardDutyComponent.js';
+export { createGuardDutyComponent } from './GuardDutyComponent.js';
+export * from './HiveCombatComponent.js';
+export * from './InjuryComponent.js';
+export { createInjuryComponent } from './InjuryComponent.js';
+export * from './ManchiComponent.js';
+export * from './PackCombatComponent.js';
+export * from './SupremeCreatorComponent.js';
+
+// Building-specific Components
+export * from './CensusBureauComponent.js';
+export * from './HealthClinicComponent.js';
+export * from './TownHallComponent.js';
+export * from './WarehouseComponent.js';
+export * from './WeatherStationComponent.js';
+
+// Realm Components (full exports)
+export * from './RealmComponent.js';
+export * from './PortalComponent.js';
+export * from './RealmLocationComponent.js';

@@ -59,3 +59,18 @@ export { createLLMConfigPanelAdapter } from './adapters/index.js';
 
 // Divine UI components (god-mode interface)
 export * from './divine/index.js';
+
+// Context Menu System
+export * from './ContextMenuManager.js';
+export * from './ContextMenuRenderer.js';
+export * from './context-menu/types.js';
+export * from './context-menu/MenuContext.js';
+export * from './context-menu/ContextActionRegistry.js';
+
+// Combat & Conflict UI
+export * from './CombatHUDPanel.js';
+export * from './CombatLogPanel.js';
+export * from './CombatUnitPanel.js';
+export * from './HealthBarRenderer.js';
+export * from './StanceControls.js';
+export * from './ThreatIndicatorRenderer.js';

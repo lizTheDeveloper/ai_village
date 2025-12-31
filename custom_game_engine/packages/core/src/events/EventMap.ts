@@ -1803,6 +1803,380 @@ export interface GameEventMap {
     toolType: string;
     agentId?: string;
   };
+
+  // ============================================================================
+  // Divine Communication Events (Phase 27)
+  // ============================================================================
+
+  /** Agent received a vision */
+  'vision:received': {
+    agentId: EntityId;
+    deityId?: EntityId;
+    visionType?: string;
+    content?: string;
+    clarity?: number;
+    position?: { x: number; y: number };
+    vision?: string;
+  };
+
+  /** Sacred site was named */
+  'sacred_site:named': {
+    siteId: string;
+    name: string;
+    namedBy: string;
+  };
+
+  /** Sacred site was created (built) */
+  'sacred_site:created': {
+    siteId: string;
+    type: 'natural' | 'built' | 'emergent';
+    position: { x: number; y: number };
+    buildingId?: string;
+    buildingType?: string;
+  };
+
+  /** Sacred site was discovered (emergent) */
+  'sacred_site:discovered': {
+    siteId: string;
+    type: 'natural' | 'built' | 'emergent';
+    position: { x: number; y: number };
+    discoveredBy?: string;
+    answerRate?: number;
+  };
+
+  // ============================================================================
+  // Group Prayer Events
+  // ============================================================================
+
+  /** Agent calls for group prayer */
+  'group_prayer:call': {
+    leaderId: string;
+    location: { x: number; y: number };
+    message?: string;
+    tick: number;
+    deityId?: string;
+  };
+
+  /** Agent joins a group prayer */
+  'group_prayer:joined': {
+    participantId: string;
+    leaderId: string;
+    tick: number;
+  };
+
+  /** Group prayer completed */
+  'group_prayer:complete': {
+    leaderId: string;
+    participants: string[];
+    tick: number;
+    duration: number;
+    deityId?: string;
+    answered: boolean;
+    prayerPower: number;
+  };
+
+  /** Group vision received */
+  'group_vision:received': {
+    participants: string[];
+    deityId?: string;
+    clarity: number;
+    prayerPower: number;
+  };
+
+  // ============================================================================
+  // Agent Social Events
+  // ============================================================================
+
+  /** Agent speaks (prayer, conversation, etc.) */
+  'agent:speak': {
+    agentId: string;
+    text: string;
+    category: 'prayer' | 'conversation' | 'monologue' | 'announcement';
+    tick: number;
+  };
+
+  /** Relationship improved between agents */
+  'relationship:improved': {
+    agentId: EntityId;
+    targetId: EntityId;
+    amount?: number;
+    reason?: string;
+  };
+
+  // ============================================================================
+  // Meditation Events
+  // ============================================================================
+
+  /** Agent started meditation */
+  'agent:meditation_started': {
+    agentId: EntityId;
+    position?: { x: number; y: number };
+  };
+
+  /** Agent completed meditation */
+  'agent:meditation_complete': {
+    agentId: EntityId;
+    visionReceived: boolean;
+    duration: number;
+  };
+
+  // ============================================================================
+  // Prayer Complete Event
+  // ============================================================================
+
+  /** Prayer ritual completed */
+  'prayer:complete': {
+    agentId: EntityId;
+    deityId: EntityId;
+    prayerType?: string;
+    prayerId?: string;
+    answered: boolean;
+    duration?: number;
+  };
+
+  // ============================================================================
+  // Angel Events
+  // ============================================================================
+
+  /** Angel answered a prayer */
+  'angel:answered_prayer': {
+    angelId: string;
+    deityId: string;
+    agentId: string;
+    prayerId: string;
+    tone: 'gentle' | 'firm' | 'urgent' | 'encouraging';
+    response?: string;
+  };
+
+  /** Angel completed a task */
+  'angel:task_completed': {
+    angelId: string;
+    taskType: string;
+    targetId?: string;
+  };
+
+  // === Conflict System Events ===
+  /** Conflict started (hunting, combat, dominance, etc.) */
+  'conflict:started': {
+    conflictId: string;
+    conflictType: 'hunting' | 'predator_attack' | 'agent_combat' | 'dominance_challenge';
+    initiator: string;
+    target: string;
+    location: { x: number; y: number; z: number };
+  };
+
+  /** Conflict resolved with outcome */
+  'conflict:resolved': {
+    conflictId: string;
+    conflictType: string;
+    outcome: string;
+    participants: string[];
+    narrative?: string;
+  };
+
+  /** Hunt started */
+  'hunt:started': {
+    hunterId: string;
+    preyId: string;
+    huntingSkill: number;
+  };
+
+  /** Hunt successful */
+  'hunt:success': {
+    hunterId: string;
+    preyId: string;
+    resourcesGained: string[];
+  };
+
+  /** Hunt failed */
+  'hunt:failed': {
+    hunterId: string;
+    preyId: string;
+    reason: string;
+  };
+
+  /** Hunter injured by dangerous prey */
+  'hunt:injured': {
+    hunterId: string;
+    preyId: string;
+    injuryType: string;
+    severity: string;
+  };
+
+  /** Predator attacks agent */
+  'predator:attack': {
+    predatorId: string;
+    targetId: string;
+    predatorType: string;
+  };
+
+  /** Agent successfully defended against predator */
+  'predator:repelled': {
+    predatorId: string;
+    defenderId: string;
+  };
+
+  /** Dominance challenge issued */
+  'dominance:challenge': {
+    challengerId: string;
+    challengedId: string;
+    method: string;
+  };
+
+  /** Dominance challenge resolved */
+  'dominance:resolved': {
+    challengerId: string;
+    challengedId: string;
+    winner: string;
+    hierarchyChanged: boolean;
+  };
+
+  /** Dominance cascade effect triggered */
+  'dominance:cascade': {
+    triggeredBy: string;
+    affectedAgents: string[];
+  };
+
+  /** Injury inflicted on entity */
+  'injury:inflicted': {
+    entityId: string;
+    injuryType: string;
+    severity: 'minor' | 'major' | 'critical';
+    location: string;
+    cause: string;
+  };
+
+  /** Injury fully healed */
+  'injury:healed': {
+    entityId: string;
+    injuryType: string;
+  };
+
+  /** Agent died */
+  'death:occurred': {
+    entityId: string;
+    cause: string;
+    location: { x: number; y: number; z: number };
+    time: number;
+  };
+
+  /** Agent witnessed a death */
+  'death:witnessed': {
+    witnessId: string;
+    deceasedId: string;
+    traumatic: boolean;
+  };
+
+  /** Village under attack */
+  'village:under_attack': {
+    villageId?: string;
+    attackerIds: string[];
+    threatLevel: number;
+  };
+
+  /** Village successfully defended */
+  'village:defended': {
+    villageId?: string;
+    defendersCount: number;
+    attackersRepelled: number;
+  };
+
+  // === Guard Duty Events ===
+  /** Guard alertness dropped below threshold */
+  'guard:alertness_low': {
+    guardId: string;
+    alertness: number;
+  };
+
+  /** Guard detected a threat */
+  'guard:threat_detected': {
+    guardId: string;
+    threatId: string;
+    threatLevel: number;
+    distance: number;
+    location: { x: number; y: number; z: number };
+    threatType?: string;
+  };
+
+  /** Guard responding to threat */
+  'guard:response': {
+    guardId: string;
+    threatId: string;
+    response: 'alert_others' | 'intercept' | 'observe' | 'flee';
+  };
+
+  // ============================================================================
+  // Input Events
+  // ============================================================================
+
+  /** Right-click input event */
+  'input:rightclick': {
+    x: number;
+    y: number;
+    worldX?: number;
+    worldY?: number;
+  };
+
+  // ============================================================================
+  // Context Menu Events
+  // ============================================================================
+
+  /** Context menu opened */
+  'ui:contextmenu:opened': {
+    position: { x: number; y: number };
+    context: unknown;
+  };
+
+  /** Context menu closed */
+  'ui:contextmenu:closed': Record<string, never>;
+
+  /** Context menu animation started */
+  'ui:contextmenu:animation_start': {
+    type: 'open' | 'close';
+    style: string;
+  };
+
+  /** Context menu action selected */
+  'ui:contextmenu:action_selected': {
+    actionId?: string;
+    itemId: string;
+    context: unknown;
+  };
+
+  /** Context menu action executed */
+  'ui:contextmenu:action_executed': {
+    actionId: string;
+    success: boolean;
+    error?: string;
+  };
+
+  /** Entity selected in UI */
+  'ui:entity:selected': {
+    entityId: string;
+  };
+
+  // ============================================================================
+  // Confirmation Dialog Events
+  // ============================================================================
+
+  /** Show confirmation dialog */
+  'ui:confirmation:show': {
+    actionId: string;
+    message: string;
+    consequences: string[];
+    context: unknown;
+  };
+
+  /** Confirmation dialog confirmed */
+  'ui:confirmation:confirmed': {
+    actionId: string;
+    context: unknown;
+  };
+
+  /** Confirmation dialog cancelled */
+  'ui:confirmation:cancelled': {
+    actionId: string;
+  };
 }
 
 /**

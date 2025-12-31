@@ -11,7 +11,15 @@ export type PlantCategory =
   | 'weed'
   | 'vine'
   | 'aquatic'
-  | 'succulent';
+  | 'succulent'
+  | 'lichen'
+  | 'moss'
+  | 'carnivorous'
+  | 'reed'
+  | 'shrub'
+  | 'grain'
+  | 'fern'
+  | 'cactus';
 
 // ============================================
 // Taste Profile
@@ -63,25 +71,54 @@ export interface SideEffect {
   severity?: 'mild' | 'moderate' | 'severe';
 }
 
+/** Active compound in a medicinal plant */
+export interface ActiveCompound {
+  name: string;
+  concentration: number;  // 0-1
+  effect: string;
+}
+
+/** Medicinal effect */
+export interface MedicinalEffect {
+  /** Type of medicinal effect (optional, can be inferred from condition) */
+  type?: string;
+  strength?: number;  // 0-1 (legacy)
+  /** Efficacy of the treatment (0-1) */
+  efficacy?: number;  // 0-1
+  duration?: number; // Hours
+  /** Condition this effect treats */
+  condition?: string;
+  /** Preparation method for this effect */
+  preparation?: PreparationType;
+}
+
 export interface MedicinalProperties {
   /** What ailments this plant treats */
-  treats: Ailment[];
+  treats?: Ailment[];
   /** Effectiveness (0-1) */
-  effectiveness: number;
+  effectiveness?: number;
   /** How the plant must be prepared to use */
-  preparation: PreparationType[];
+  preparation?: PreparationType[];
   /** Dosage size */
-  dosage: 'small' | 'medium' | 'large';
+  dosage?: 'small' | 'medium' | 'large';
   /** Potential side effects */
   sideEffects?: SideEffect[];
   /** Whether overuse is toxic */
-  toxicIfOverused: boolean;
+  toxicIfOverused?: boolean;
   /** Doses per day before toxicity */
   toxicityThreshold?: number;
   /** Plants that enhance effects when combined */
   synergiesWith?: string[];
   /** Plants that conflict/cancel effects */
   conflictsWith?: string[];
+  /** Active chemical compounds (can be detailed objects or simple strings) */
+  activeCompounds?: (ActiveCompound | string)[];
+  /** Medicinal effects */
+  effects?: MedicinalEffect[];
+  /** Toxicity level (0-1 for numeric, or description string) */
+  toxicity?: number | string;
+  /** Usage warnings (single string or array) */
+  warnings?: string | string[];
 }
 
 // ============================================
@@ -99,7 +136,25 @@ export type MagicType =
   | 'entropy'         // Decay, chaos
   | 'nature'          // Plants, animals
   | 'shadow'          // Darkness, stealth
-  | 'light';          // Illumination, truth
+  | 'light'           // Illumination, truth
+  // Extended magic types for exotic plants
+  | 'purity'          // Cleansing, purification
+  | 'timing'          // Temporal manipulation
+  | 'adhesion'        // Binding, sticking
+  | 'clarity'         // Mental clarity, focus
+  | 'preservation'    // Keeping things unchanged
+  | 'endurance'       // Stamina, persistence
+  | 'sound'           // Audio, resonance
+  | 'binding'         // Connecting, constraining
+  | 'movement'        // Motion, speed
+  | 'poison'          // Toxins, venom
+  | 'dream'           // Sleep, visions
+  | 'purification'    // Cleansing (synonym)
+  | 'consumption'     // Absorbing, devouring
+  | 'reflex'          // Quick reactions
+  | 'cooling'         // Temperature reduction
+  | 'illusion'        // Deception, misdirection
+  | 'memory';         // Recollection, recording
 
 export type MoonPhase = 'new' | 'waxing' | 'full' | 'waning';
 export type TimeOfDay = 'dawn' | 'day' | 'dusk' | 'night';
@@ -110,7 +165,7 @@ export interface MagicalEffect {
   type: string;
   magnitude: number;    // 0-1
   duration: number;     // Game hours
-  trigger: 'consume' | 'touch' | 'proximity' | 'ritual';
+  trigger: string;      // 'consume' | 'touch' | 'proximity' | 'ritual' | custom
   description: string;  // For LLM context
 }
 
@@ -119,6 +174,8 @@ export interface MagicalHarvestConditions {
   timeOfDay?: TimeOfDay;
   weather?: HarvestWeatherCondition;
   ritual?: string;
+  /** Custom harvest conditions for exotic plants */
+  [key: string]: unknown;
 }
 
 export interface MagicalProperties {
@@ -315,10 +372,18 @@ export interface PlantSprites {
   withered: string;
 }
 
+/** Extended edible information */
+export interface EdibleProperties {
+  nutrition: number;
+  taste: string;
+  cookingRequired: boolean;
+  shelfLife?: number;  // Days
+}
+
 export interface PlantProperties {
   // Basic consumption properties
-  /** Whether the plant can be eaten */
-  edible?: boolean;
+  /** Whether the plant can be eaten (boolean or detailed object) */
+  edible?: boolean | EdibleProperties;
   /** Nutrition value when eaten (0-100) */
   nutritionValue?: number;
   /** Taste profile for cooking/eating */
@@ -339,6 +404,80 @@ export interface PlantProperties {
   environmental?: EnvironmentalProperties;
   /** Special unique properties (luminescent, sentient, etc.) */
   special?: SpecialProperty[];
+  /** Utility/crafting uses for this plant */
+  utility?: Record<string, unknown>;
+}
+
+/** Harvest yield range */
+export interface HarvestYield {
+  min: number;
+  max: number;
+}
+
+/** Lifecycle stage for extended plant format */
+export interface LifecycleStage {
+  name: string;
+  duration: number;  // Days
+  /** Flexible growth conditions (altitude, cold, uvHigh, etc.) */
+  growthConditions?: Record<string, unknown>;
+  /** Yield when harvested at this stage */
+  harvestYield?: HarvestYield;
+  /** Description of this lifecycle stage */
+  description?: string;
+  conditions?: TransitionConditions;
+  outputs?: Record<string, unknown>;
+}
+
+/** Extended lifecycle format used by some plant files */
+export interface PlantLifecycle {
+  stages: LifecycleStage[];
+  /** Total days to maturity */
+  maturityTime?: number;
+  /** Temperature range [min, max] in Celsius */
+  optimalTemperatureRange?: [number, number];
+  /** Moisture range [min, max] as percentage */
+  optimalMoistureRange?: [number, number];
+  /** Whether plant regrows each year */
+  perennial?: boolean;
+  /** Lifespan in years for perennials */
+  lifespan?: number;
+  // Special lifecycle requirements
+  /** Is this a parasitic plant? */
+  parasitic?: boolean;
+  /** Does this plant require a host? */
+  requiresHost?: boolean;
+  /** Does this plant require water/wetland? */
+  requiresWater?: boolean;
+  /** Does this plant require decaying matter? */
+  requiresDecay?: boolean;
+  /** Does this plant require low nitrogen soil? */
+  requiresLowNitrogen?: boolean;
+}
+
+/** Environmental interactions and planting companions */
+export interface EnvironmentalInteractions {
+  /** Preferred soil types */
+  soilPreference?: string[];
+  /** Plant species that benefit this plant when nearby */
+  companions?: string[];
+  /** Plant species this plant inhibits when nearby */
+  inhibits?: string[];
+  /** Special environmental properties */
+  specialProperties?: string[];
+  /** Does this plant require a host (for parasitic plants)? */
+  requiresHost?: boolean;
+}
+
+/** Sprite mapping for different plant stages */
+export interface SpriteMapping {
+  seed?: string;
+  seedling?: string;
+  vegetative?: string;
+  flowering?: string;
+  fruiting?: string;
+  mature?: string;
+  harvest?: string;
+  withered?: string;
 }
 
 export interface PlantSpecies {
@@ -346,31 +485,46 @@ export interface PlantSpecies {
   name: string;
   category: PlantCategory;
 
+  // Extended metadata
+  scientificName?: string;
+  description?: string;
+  lore?: string;
+
   // Where it grows naturally
   biomes: string[];
   rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
 
-  // Lifecycle configuration
-  stageTransitions: StageTransition[];
+  // Geographic constraints
+  latitudeRange?: [number, number];
+  elevationRange?: [number, number];
 
-  // Base genetics
-  baseGenetics: PlantGenetics;
+  // Lifecycle configuration (one of these is required)
+  stageTransitions?: StageTransition[];
+  lifecycle?: PlantLifecycle;
+
+  // Base genetics (one of these is required)
+  baseGenetics?: PlantGenetics;
+  genetics?: PlantGenetics;
 
   // Seed production
-  seedsPerPlant: number;
-  seedDispersalRadius: number;
-  requiresDormancy: boolean;
+  seedsPerPlant?: number;
+  seedDispersalRadius?: number;
+  requiresDormancy?: boolean;
 
   // Environmental preferences
-  optimalTemperatureRange: [number, number];
-  optimalMoistureRange: [number, number];
-  preferredSeasons: string[];
+  optimalTemperatureRange?: [number, number];
+  optimalMoistureRange?: [number, number];
+  preferredSeasons?: string[];
 
   // Properties
   properties: PlantProperties;
 
   // Visual
-  sprites: PlantSprites;
+  sprites?: PlantSprites;
+  spriteMapping?: SpriteMapping;
+
+  // Environmental interactions
+  environmentalInteractions?: EnvironmentalInteractions;
 
   // Harvest behavior
   // If true (default), plant is destroyed when harvested (e.g., carrots, wheat)
