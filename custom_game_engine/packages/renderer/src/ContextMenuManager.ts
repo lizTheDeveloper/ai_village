@@ -117,6 +117,8 @@ export class ContextMenuManager {
    */
   public open(screenX: number, screenY: number): void {
     try {
+      console.log('[ContextMenuManager] open() called at:', screenX, screenY);
+
       // Close existing menu if open (which will schedule cleanup)
       if (this.state.isOpen) {
         this.close();
@@ -140,20 +142,34 @@ export class ContextMenuManager {
         rect.height
       );
 
+      console.log('[ContextMenuManager] Adjusted position:', adjustedPos);
+
       // Create context
       const context = MenuContext.fromClick(this.world, this.camera, screenX, screenY);
+      console.log('[ContextMenuManager] Context created:', {
+        targetType: context.targetType,
+        targetEntity: context.targetEntity,
+        worldPosition: context.worldPosition,
+        isWalkable: context.isWalkable,
+        isBuildable: context.isBuildable,
+        hasSelection: context.hasSelection(),
+        selectedCount: context.getSelectedCount()
+      });
 
       // Get applicable actions
       const applicableActions = this.registry.getApplicableActions(context);
+      console.log('[ContextMenuManager] Applicable actions:', applicableActions.length, applicableActions.map(a => a.id));
 
       // Convert to menu items
       const items = this.actionsToMenuItems(applicableActions, context);
+      console.log('[ContextMenuManager] Menu items created:', items.length);
 
       // Don't open menu if there are no items
       if (items.length === 0) {
-        console.error('[ContextMenu] No menu items found. Actions:', applicableActions.length, 'Context:', context.targetType);
+        console.warn('[ContextMenuManager] No menu items available - menu will not open');
         return;
       }
+
 
     // Calculate arc angles
     const itemsWithAngles = this.renderer.calculateArcAngles(
@@ -213,6 +229,9 @@ export class ContextMenuManager {
       source: 'world',
       data: { type: 'open', style: this.config.openAnimation }
     });
+
+    // Debug: Log menu opening
+    console.log('[ContextMenuManager] Menu opened at:', adjustedPos, 'items:', items.length);
     } catch (error) {
       console.error('[ContextMenu] Error during open:', error);
       throw error;
@@ -603,9 +622,12 @@ export class ContextMenuManager {
    * Update and render menu (call each frame).
    */
   public update(): void {
-    if (!this.state.isOpen) {
+    // Don't render if menu is closed AND not animating
+    if (!this.state.isOpen && !this.state.isAnimating) {
       return;
     }
+
+    console.log('[ContextMenuManager] update() called - isOpen:', this.state.isOpen, 'isAnimating:', this.state.isAnimating, 'progress:', this.state.animationProgress);
 
     // Update animation
     if (this.state.isAnimating) {
@@ -644,15 +666,28 @@ export class ContextMenuManager {
 
     // Render menu with animation if needed
     if (this.state.isAnimating) {
-      // TODO: Determine if opening or closing based on state
-      this.renderer.renderOpenAnimation(
-        this.currentItems,
-        this.state.position.x,
-        this.state.position.y,
-        this.config.openAnimation,
-        this.state.animationProgress
-      );
-    } else {
+      // Determine if opening or closing based on state.isOpen
+      if (this.state.isOpen) {
+        // Opening animation
+        this.renderer.renderOpenAnimation(
+          this.currentItems,
+          this.state.position.x,
+          this.state.position.y,
+          this.config.openAnimation,
+          this.state.animationProgress
+        );
+      } else {
+        // Closing animation
+        this.renderer.renderCloseAnimation(
+          this.currentItems,
+          this.state.position.x,
+          this.state.position.y,
+          this.config.closeAnimation,
+          this.state.animationProgress
+        );
+      }
+    } else if (this.state.isOpen) {
+      // Static render (only if open)
       this.renderer.render(
         this.currentItems,
         this.state.position.x,
@@ -716,15 +751,21 @@ export class ContextMenuManager {
    * Setup event listeners.
    */
   private setupEventListeners(): void {
+    console.log('[ContextMenuManager] Setting up event listeners');
+
     // Listen for right-click events
     const rightClickHandler = (event: { data: { x: number; y: number } }) => {
+      console.log('[ContextMenuManager] Received input:rightclick event:', event.data);
       if (event.data && typeof event.data.x === 'number' && typeof event.data.y === 'number') {
         this.open(event.data.x, event.data.y);
+      } else {
+        console.error('[ContextMenuManager] Invalid event data:', event.data);
       }
     };
 
     this.eventBus.on('input:rightclick', rightClickHandler);
     this.eventListeners.push({ event: 'input:rightclick', handler: rightClickHandler });
+    console.log('[ContextMenuManager] Registered rightClickHandler for input:rightclick');
 
     // Listen for confirmation results
     const confirmHandler = (event: any) => {

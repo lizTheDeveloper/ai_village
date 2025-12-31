@@ -62,6 +62,8 @@ export class ContextMenuRenderer {
     centerX: number,
     centerY: number
   ): void {
+    console.log('[ContextMenuRenderer] Rendering menu at:', centerX, centerY, 'items:', items.length);
+
     if (items.length === 0) {
       return;
     }

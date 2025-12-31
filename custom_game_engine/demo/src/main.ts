@@ -2021,10 +2021,14 @@ function setupInputHandlers(
       return windowManager.handleWheel(screenX, screenY, deltaY);
     },
     onRightClick: (screenX, screenY) => {
-      const { contextMenuManager } = uiContext;
-
-      // Open context menu with screen coordinates
-      contextMenuManager.open(screenX, screenY);
+      // Emit event for context menu manager to handle
+      console.log('[InputHandler] Emitting input:rightclick event at:', screenX, screenY);
+      gameLoop.world.eventBus.emit({
+        type: 'input:rightclick' as any,
+        source: 'world',
+        data: { x: screenX, y: screenY }
+      });
+      console.log('[InputHandler] Event emitted, queue size:', (gameLoop.world.eventBus as any).eventQueue?.length);
     },
   });
 }

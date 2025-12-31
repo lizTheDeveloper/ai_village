@@ -467,7 +467,7 @@ describe('ContextActionRegistry', () => {
     it('should include Tile Info action', () => {
       const action = registry.get('tile_info');
       expect(action).toBeDefined();
-      expect(action?.label).toContain('Info');
+      expect(action?.label).toBe('Inspect Position');
     });
   });
 

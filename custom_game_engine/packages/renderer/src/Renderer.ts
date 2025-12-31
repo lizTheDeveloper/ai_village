@@ -94,6 +94,9 @@ export class Renderer {
 
     this.canvas.width = rect.width * dpr;
     this.canvas.height = rect.height * dpr;
+
+    // Reset transform before scaling to avoid compounding
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     this.ctx.scale(dpr, dpr);
 
     this.camera.setViewportSize(rect.width, rect.height);
