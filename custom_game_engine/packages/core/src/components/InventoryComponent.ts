@@ -21,6 +21,8 @@ export interface InventorySlot {
   quantity: number;
   /** Optional quality rating (for Phase 10+) */
   quality?: number;
+  /** Optional unique instance ID for legendary/unique items */
+  instanceId?: string;
 }
 
 /**
@@ -288,6 +290,59 @@ export function addToInventoryWithQuality(
 }
 
 /**
+ * Add a unique/legendary item to inventory.
+ * Legendary items don't stack - each gets its own slot with an instanceId.
+ * @throws If inventory is full or weight limit exceeded
+ */
+export function addLegendaryItemToInventory(
+  inventory: InventoryComponent,
+  itemId: string,
+  quality: number,
+  instanceId: string
+): { inventory: InventoryComponent; slotIndex: number } {
+  // Use ItemRegistry for weight
+  const unitWeight = itemRegistry.getWeight(itemId);
+
+  // Check weight capacity
+  const weightAvailable = inventory.maxWeight - inventory.currentWeight;
+  if (unitWeight > weightAvailable) {
+    throw new Error(`Inventory weight limit exceeded. Cannot add legendary ${itemId}.`);
+  }
+
+  // Find an empty slot (legendary items always get their own slot)
+  const slotIndex = inventory.slots.findIndex(
+    slot => slot.itemId === null || slot.quantity === 0
+  );
+
+  if (slotIndex === -1) {
+    throw new Error(`Inventory full. Cannot add legendary ${itemId}.`);
+  }
+
+  // Create new slots array with the legendary item
+  const newSlots = [...inventory.slots];
+  newSlots[slotIndex] = {
+    itemId,
+    quantity: 1,
+    quality,
+    instanceId,
+  };
+
+  const actualWeight = calculateInventoryWeight({
+    ...inventory,
+    slots: newSlots,
+  } as InventoryComponent);
+
+  return {
+    inventory: {
+      ...inventory,
+      slots: newSlots,
+      currentWeight: actualWeight,
+    },
+    slotIndex,
+  };
+}
+
+/**
  * Remove items from inventory. Returns the amount actually removed.
  * Throws if not enough items available.
  */
@@ -393,4 +448,78 @@ export function inventoryToResourceMap(inventory: InventoryComponent): Record<st
   }
 
   return map;
+}
+
+/**
+ * Get all working (non-broken) tools of a specific type from inventory.
+ * Requires ItemInstance to check condition.
+ *
+ * @param inventory - The inventory to search
+ * @param toolType - Type of tool to find (e.g., 'hammer', 'axe')
+ * @returns Array of working tool instances with their slot information
+ */
+export function getWorkingTools(
+  inventory: InventoryComponent,
+  toolType: string
+): Array<{ slotIndex: number; instanceId: string; itemId: string; condition: number }> {
+  const { itemInstanceRegistry } = require('../items/ItemInstanceRegistry.js');
+  const { itemRegistry } = require('../items/ItemRegistry.js');
+
+  const workingTools: Array<{ slotIndex: number; instanceId: string; itemId: string; condition: number }> = [];
+
+  for (let i = 0; i < inventory.slots.length; i++) {
+    const slot = inventory.slots[i];
+    if (!slot || !slot.itemId || !slot.instanceId) continue;
+
+    // Get item definition to check if it's a tool
+    const definition = itemRegistry.get(slot.itemId);
+    if (!definition || !definition.traits?.tool) continue;
+
+    // Check if tool type matches
+    const toolTrait = definition.traits.tool;
+    if (toolTrait.toolType !== toolType) continue;
+
+    // Check tool condition
+    try {
+      const instance = itemInstanceRegistry.get(slot.instanceId);
+      if (instance.condition > 0) {
+        workingTools.push({
+          slotIndex: i,
+          instanceId: slot.instanceId,
+          itemId: slot.itemId,
+          condition: instance.condition,
+        });
+      }
+    } catch {
+      // Instance not found, skip
+      continue;
+    }
+  }
+
+  return workingTools;
+}
+
+/**
+ * Get a working tool of the specified type or throw an error.
+ * Convenience wrapper around getWorkingTools for cases where a tool is required.
+ *
+ * @param inventory - The inventory to search
+ * @param toolType - Type of tool required (e.g., 'hammer', 'axe')
+ * @returns First working tool found
+ * @throws Error if no working tools of the specified type are available
+ */
+export function getWorkingToolOrThrow(
+  inventory: InventoryComponent,
+  toolType: string
+): { slotIndex: number; instanceId: string; itemId: string; condition: number } {
+  const workingTools = getWorkingTools(inventory, toolType);
+
+  if (workingTools.length === 0) {
+    throw new Error(
+      `No working ${toolType} available. All ${toolType} tools are broken (0 condition). ` +
+      `Repair or craft new ${toolType} tools.`
+    );
+  }
+
+  return workingTools[0]!;
 }

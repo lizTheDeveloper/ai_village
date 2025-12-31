@@ -686,6 +686,142 @@ export interface GameEventMap {
     cost: number;
   };
 
+  // === Divine Vision Events ===
+  /** A vision has been queued for delivery to a mortal */
+  'divinity:vision_queued': {
+    visionId: string;
+    deityId: EntityId;
+    targetId: EntityId;
+    visionType: 'dream' | 'meditation' | 'sign' | 'direct';
+    purpose: string;
+    beliefCost: number;
+  };
+
+  /** A vision was successfully delivered to a mortal */
+  'divinity:vision_delivered': {
+    visionId: string;
+    deityId: EntityId;
+    targetId: EntityId;
+    visionType: 'dream' | 'meditation' | 'sign' | 'direct';
+    content: string;
+    clarity: 'obscure' | 'symbolic' | 'clear' | 'vivid';
+  };
+
+  /** A mortal interpreted a received vision */
+  'divinity:vision_interpreted': {
+    visionId: string;
+    targetId: EntityId;
+    interpretation: string;
+    accuracy: number; // 0-1 how close to intended meaning
+  };
+
+  /** A prophecy contained in a vision has been fulfilled */
+  'divinity:prophecy_fulfilled': {
+    visionId: string;
+    deityId: EntityId;
+    prophecyContent: string;
+    fulfillmentEvent: string;
+  };
+
+  /** Prayer resolved by a spirit (non-deity) */
+  'prayer:resolved': {
+    agentId: EntityId;
+    prayerId: string;
+    resolutionType: 'spirit' | 'nature' | 'self' | 'none';
+    targetId?: EntityId;
+    outcome: string;
+  };
+
+  /** Belief accumulation toward a proto-deity (deity emergence) */
+  'divinity:proto_deity_belief': {
+    agentId: EntityId;
+    prayerContent: string;
+    beliefContributed: number;
+    timestamp: number;
+    /** Potential deity concept forming */
+    concept?: string;
+  };
+
+  /** Supreme Creator detected forbidden magic */
+  'divinity:magic_detected': {
+    casterId: string;
+    spellId: string;
+    detectionRisk: string;
+    evidenceStrength?: number;
+    forbiddenCategories?: string[];
+    forced: boolean;
+  };
+
+  /** Surveillance alert level changed */
+  'divinity:surveillance_alert': {
+    oldLevel: string;
+    newLevel: string;
+    recentDetections: number;
+    criticalDetections: number;
+  };
+
+  /** Creator intervention executed */
+  'divinity:creator_intervention': {
+    targetId: string;
+    interventionType: string;
+    severity: string;
+    reason: string;
+    intervention: unknown;
+  };
+
+  /** Spell blocked by creator */
+  'magic:spell_blocked': {
+    spellId: string;
+    reason: string;
+    banReason?: string;
+    trapLevel?: string;
+  };
+
+  /** Spell cast attempt (before execution) */
+  'magic:spell_cast_attempt': {
+    casterId: string;
+    spellId: string;
+  };
+
+  /** Spell suppressed by divine power */
+  'magic:spell_suppressed': {
+    spellId: string;
+    reductionAmount: number;
+  };
+
+  /** Banned spell attempt detected */
+  'divinity:banned_spell_attempt': {
+    spellId: string;
+    ban: unknown;
+    trapTriggered?: boolean;
+    newTrapLevel?: string;
+  };
+
+  /** Annihilation executed */
+  'divinity:annihilation': {
+    targetId: string;
+    reason: string;
+  };
+
+  /** Ban trap triggered (booby trap) */
+  'divinity:trap_triggered': {
+    targetId: string;
+    spellId: string;
+    trapLevel: string;
+    damage?: number;
+    debuffs?: unknown[];
+    lethal?: boolean;
+    message: string;
+  };
+
+  /** Ban trap escalated to next level */
+  'divinity:ban_trap_escalated': {
+    spellId: string;
+    oldLevel: string;
+    newLevel: string;
+    violationCount: number;
+  };
+
   'trust:verified': {
     trusterId: EntityId;
     trusteeId: EntityId;
@@ -1536,6 +1672,136 @@ export interface GameEventMap {
     };
     newUniverseId: string;
     forkPoint: number;
+  };
+
+  // ============================================================================
+  // Rebellion Events (Cosmic Rebellion System)
+  // ============================================================================
+
+  /** Rebellion awakening - seeds of defiance */
+  'rebellion:awakening': {
+    message: string;
+    timestamp: number;
+  };
+
+  /** Rebellion organizing - coalition forming */
+  'rebellion:organizing': {
+    message: string;
+    coalitionSize: number;
+    timestamp: number;
+  };
+
+  /** Rebellion ready to trigger */
+  'rebellion:ready': {
+    message: string;
+    path?: string;
+    missingRequirements: string[];
+    timestamp: number;
+  };
+
+  /** Tech path ready */
+  'rebellion:tech_ready': {
+    message: string;
+  };
+
+  /** Faith path ready */
+  'rebellion:faith_ready': {
+    message: string;
+  };
+
+  /** Rebellion has been triggered */
+  'rebellion:triggered': {
+    message: string;
+    path?: string;
+  };
+
+  /** Confrontation begins */
+  'rebellion:confrontation_begins': {
+    message: string;
+  };
+
+  /** Battle reaches climax */
+  'rebellion:climax': {
+    message: string;
+    creatorHealth: number;
+    anchorStability: number;
+    defiance: number;
+  };
+
+  /** Battle concluded */
+  'rebellion:concluded': {
+    outcome: string;
+    narrative: string;
+    creatorHealth: number;
+    anchorStability: number;
+    defiance: number;
+  };
+
+  /** Creator manifested for battle */
+  'rebellion:creator_manifested': {
+    message: string;
+    location: { x: number; y: number };
+    creatorId: string;
+  };
+
+  /** Player made a choice during the battle */
+  'rebellion:player_choice': {
+    choice: string;
+    impact: 'mercy' | 'vengeance' | 'pragmatic' | 'idealistic';
+    description: string;
+  };
+
+  /** Creator was damaged during the battle */
+  'rebellion:creator_damaged': {
+    damage: number;
+    remainingHealth: number;
+  };
+
+  /** Rebellion outcome determined */
+  'rebellion:outcome': {
+    outcome: string;
+    narrative: string;
+  };
+
+  // ============================================================================
+  // Lore Events
+  // ============================================================================
+
+  /** Lore fragment spawned */
+  'lore:spawned': {
+    fragmentId: string;
+    title: string;
+    category: string;
+    importance: string;
+    position: { x: number; y: number };
+    entityId?: string;
+  };
+
+  // ============================================================================
+  // Tool Durability Events
+  // ============================================================================
+
+  /** Tool was used and lost durability */
+  'tool_used': {
+    itemInstanceId: string;
+    durabilityLost: number;
+    remainingCondition: number;
+    usageType: 'crafting' | 'gathering';
+  };
+
+  /** Tool condition fell below 20% */
+  'tool_low_durability': {
+    itemInstanceId: string;
+    condition: number;
+    agentId?: string;
+    toolType: string;
+  };
+
+  /** Tool broke (condition reached 0) */
+  'tool_broken': {
+    itemInstanceId: string;
+    toolType: string;
+    agentId?: string;
   };
 }
 

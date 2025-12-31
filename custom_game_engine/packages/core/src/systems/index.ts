@@ -57,6 +57,8 @@ export * from './MoodSystem.js';
 export * from './CookingSystem.js';
 // Skills System
 export * from './SkillSystem.js';
+// Durability System - tool wear and breaking
+export * from './DurabilitySystem.js';
 // Body Parts System - extensible for multiple species
 export * from './BodySystem.js';
 // Species and Genetics
@@ -69,6 +71,11 @@ export * from './DeityEmergenceSystem.js';
 export * from './AIGodBehaviorSystem.js';
 export * from './DivinePowerSystem.js';
 export * from './FaithMechanicsSystem.js';
+export * from './CreatorSurveillanceSystem.js';
+export * from './CreatorInterventionSystem.js';
+export * from './LoreSpawnSystem.js';
+export * from './RealityAnchorSystem.js';
+export * from './RebellionEventSystem.js';
 // Phase 5: Religious Institutions
 export * from './TempleSystem.js';
 export * from './PriesthoodSystem.js';

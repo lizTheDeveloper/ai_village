@@ -10,7 +10,12 @@ import {
   hasItem,
   removeFromInventory,
   addToInventoryWithQuality,
+  addLegendaryItemToInventory,
 } from '../components/InventoryComponent.js';
+import { itemInstanceRegistry } from '../items/ItemInstanceRegistry.js';
+import { itemRegistry } from '../items/ItemRegistry.js';
+import { getQualityTier } from '../items/ItemInstance.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
 import type { SkillsComponent } from '../components/SkillsComponent.js';
 import {
   recordTaskCompletion,
@@ -56,6 +61,7 @@ export class CraftingSystem implements System {
   private queues: Map<EntityId, AgentCraftingQueue> = new Map();
   private readonly MAX_QUEUE_SIZE = 10;
   private recipeRegistry: RecipeRegistry | null = null;
+  private durabilitySystem: any | null = null; // DurabilitySystem reference (optional dependency)
 
   /**
    * Set the recipe registry for looking up recipes.
@@ -73,6 +79,14 @@ export class CraftingSystem implements System {
       throw new Error('Recipe registry not set. Call setRecipeRegistry() first.');
     }
     return this.recipeRegistry;
+  }
+
+  /**
+   * Set the durability system for tool wear tracking.
+   * Optional - if not set, tools won't lose durability.
+   */
+  setDurabilitySystem(durabilitySystem: any): void {
+    this.durabilitySystem = durabilitySystem;
   }
 
   /**
@@ -434,10 +448,39 @@ export class CraftingSystem implements System {
     // Add crafted items to inventory with quality
     const outputQuantity = recipe.output.quantity * job.quantity;
     let currentInventory = inventory;
+    const isLegendary = getQualityTier(quality) === 'legendary';
 
     try {
-      const result = addToInventoryWithQuality(currentInventory, recipe.output.itemId, outputQuantity, quality);
-      currentInventory = result.inventory;
+      if (isLegendary) {
+        // Legendary items are unique - each gets its own ItemInstance
+        const identity = entity.components.get('identity') as IdentityComponent | undefined;
+        const creatorName = identity?.name;
+
+        for (let i = 0; i < outputQuantity; i++) {
+          // Create unique instance in registry
+          const instance = itemInstanceRegistry.createInstance({
+            definitionId: recipe.output.itemId,
+            quality,
+            condition: 100, // New items are pristine
+            creator: job.agentId,
+            createdAt: world.tick,
+            customName: creatorName ? `${creatorName}'s ${recipe.output.itemId}` : undefined,
+          });
+
+          // Add to inventory with instanceId
+          const result = addLegendaryItemToInventory(
+            currentInventory,
+            recipe.output.itemId,
+            quality,
+            instance.instanceId
+          );
+          currentInventory = result.inventory;
+        }
+      } else {
+        // Normal items stack by quality tier
+        const result = addToInventoryWithQuality(currentInventory, recipe.output.itemId, outputQuantity, quality);
+        currentInventory = result.inventory;
+      }
       job.completedCount = job.quantity;
     } catch (error) {
       // Inventory full - throw per CLAUDE.md guidelines
@@ -487,7 +530,74 @@ export class CraftingSystem implements System {
       }
     });
 
+    // Apply tool wear if recipe requires tools
+    this.applyToolWear(world, recipe, inventory, job.agentId);
+
     // Note: XP granting is handled by SkillSystem listening to crafting:completed
+  }
+
+  /**
+   * Apply durability loss to tools used in crafting.
+   * Called after successful job completion.
+   */
+  private applyToolWear(
+    world: World,
+    recipe: Recipe,
+    inventory: InventoryComponent,
+    agentId: EntityId
+  ): void {
+    // Skip if no durability system or no tools required
+    if (!this.durabilitySystem || !recipe.requiredTools || recipe.requiredTools.length === 0) {
+      return;
+    }
+
+    // For each required tool type, find a working tool instance and apply wear
+    for (const toolType of recipe.requiredTools) {
+      // Find a working tool of this type in inventory
+      const toolSlot = inventory.slots.find(slot => {
+        if (!slot.itemId || !slot.instanceId) return false;
+
+        // Get item definition to check if it's the right tool type
+        const definition = itemRegistry.get(slot.itemId);
+        if (!definition || !definition.traits?.tool) return false;
+
+        // Check if tool type matches and tool is not broken
+        const toolTrait = definition.traits.tool;
+        if (toolTrait.toolType !== toolType) return false;
+
+        // Check if tool is broken
+        try {
+          const isBroken = this.durabilitySystem.isToolBroken(slot.instanceId);
+          return !isBroken;
+        } catch {
+          // If instance doesn't exist, skip this slot
+          return false;
+        }
+      });
+
+      if (!toolSlot || !toolSlot.instanceId) {
+        throw new Error(
+          `No working ${toolType} found in inventory. Recipe '${recipe.id}' requires ${toolType}. ` +
+          `All ${toolType} tools may be broken (0 condition). Repair or craft new tools.`
+        );
+      }
+
+      // Apply wear to the tool
+      try {
+        this.durabilitySystem.applyToolWear(toolSlot.instanceId, 'crafting', agentId);
+      } catch (error) {
+        // If tool breaks or other error occurs, log and continue
+        // (job has already completed successfully)
+        world.eventBus.emit({
+          type: 'notification:show',
+          source: 'crafting-system',
+          data: {
+            message: `Tool wear error: ${(error as Error).message}`,
+            type: 'warning',
+          }
+        });
+      }
+    }
   }
 
   /**
