@@ -62,8 +62,34 @@ export class ContextMenuRenderer {
     centerX: number,
     centerY: number
   ): void {
+    if (items.length === 0) {
+      return;
+    }
+
     this.ctx.save();
 
+    // Get radii from first item (all items should have same radii)
+    const innerRadius = items[0]?.innerRadius ?? 30;
+    const outerRadius = items[0]?.outerRadius ?? 100;
+
+    // Draw menu background circle
+    this.ctx.beginPath();
+    this.ctx.arc(centerX, centerY, outerRadius, 0, Math.PI * 2);
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';  // Semi-transparent dark
+    this.ctx.fill();
+
+    // Draw menu border
+    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';  // White border
+    this.ctx.lineWidth = 2;
+    this.ctx.stroke();
+
+    // Draw inner circle (dead zone)
+    this.ctx.beginPath();
+    this.ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';  // Darker center
+    this.ctx.fill();
+
+    // Draw items
     for (const item of items) {
       this.renderItem(item, centerX, centerY);
     }

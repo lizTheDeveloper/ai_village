@@ -50,6 +50,9 @@ export class ContextMenuManager {
   // Animation state
   private animationStartTime: number = 0;
 
+  // Cleanup timeout ID (to cancel pending cleanup when reopening)
+  private cleanupTimeoutId: number | null = null;
+
   constructor(
     world: World,
     eventBus: EventBus,
@@ -113,36 +116,44 @@ export class ContextMenuManager {
    * Open the context menu at screen coordinates.
    */
   public open(screenX: number, screenY: number): void {
-    // Close existing menu if open
-    if (this.state.isOpen) {
-      this.close();
-    }
+    try {
+      // Close existing menu if open (which will schedule cleanup)
+      if (this.state.isOpen) {
+        this.close();
+      }
 
-    // Adjust position for screen boundaries
-    // Use logical canvas dimensions (getBoundingClientRect), not physical (canvas.width/height)
-    // because input coordinates are in logical space
-    const rect = this.canvas.getBoundingClientRect();
-    const adjustedPos = this.renderer.adjustPositionForScreen(
-      screenX,
-      screenY,
-      this.config.outerRadius,
-      rect.width,
-      rect.height
-    );
+      // Cancel any pending cleanup from previous menu (including the one we just scheduled)
+      if (this.cleanupTimeoutId !== null) {
+        clearTimeout(this.cleanupTimeoutId);
+        this.cleanupTimeoutId = null;
+      }
 
-    // Create context
-    const context = MenuContext.fromClick(this.world, this.camera, screenX, screenY);
+      // Adjust position for screen boundaries
+      // Use logical canvas dimensions (getBoundingClientRect), not physical (canvas.width/height)
+      // because input coordinates are in logical space
+      const rect = this.canvas.getBoundingClientRect();
+      const adjustedPos = this.renderer.adjustPositionForScreen(
+        screenX,
+        screenY,
+        this.config.outerRadius,
+        rect.width,
+        rect.height
+      );
 
-    // Get applicable actions
-    const applicableActions = this.registry.getApplicableActions(context);
+      // Create context
+      const context = MenuContext.fromClick(this.world, this.camera, screenX, screenY);
 
-    // Convert to menu items
-    const items = this.actionsToMenuItems(applicableActions, context);
+      // Get applicable actions
+      const applicableActions = this.registry.getApplicableActions(context);
 
-    // Don't open menu if there are no items
-    if (items.length === 0) {
-      return;
-    }
+      // Convert to menu items
+      const items = this.actionsToMenuItems(applicableActions, context);
+
+      // Don't open menu if there are no items
+      if (items.length === 0) {
+        console.error('[ContextMenu] No menu items found. Actions:', applicableActions.length, 'Context:', context.targetType);
+        return;
+      }
 
     // Calculate arc angles
     const itemsWithAngles = this.renderer.calculateArcAngles(
@@ -188,6 +199,7 @@ export class ContextMenuManager {
     // Start animation
     this.animationStartTime = Date.now();
 
+
     // Emit opened event
     this.eventBus.emit({
       type: 'ui:contextmenu:opened',
@@ -201,13 +213,19 @@ export class ContextMenuManager {
       source: 'world',
       data: { type: 'open', style: this.config.openAnimation }
     });
+    } catch (error) {
+      console.error('[ContextMenu] Error during open:', error);
+      throw error;
+    }
   }
 
   /**
    * Close the context menu.
    */
   public close(): void {
-    if (!this.state.isOpen) return;
+    if (!this.state.isOpen) {
+      return;
+    }
 
     // Close immediately (don't wait for animation)
     this.state.isOpen = false;
@@ -225,7 +243,7 @@ export class ContextMenuManager {
 
     // Schedule cleanup after animation
     // NOTE: Don't clear context here - it's needed for confirmation dialogs
-    setTimeout(() => {
+    this.cleanupTimeoutId = setTimeout(() => {
       this.state.hoveredItemId = null;
       this.currentItems = [];
       this.menuStack = [];
@@ -236,7 +254,9 @@ export class ContextMenuManager {
 
       // Emit closed event
       this.eventBus.emit({ type: 'ui:contextmenu:closed', source: 'world', data: {} });
-    }, this.config.animationDuration);
+
+      this.cleanupTimeoutId = null;
+    }, this.config.animationDuration) as unknown as number;
   }
 
   /**
@@ -583,7 +603,9 @@ export class ContextMenuManager {
    * Update and render menu (call each frame).
    */
   public update(): void {
-    if (!this.state.isOpen) return;
+    if (!this.state.isOpen) {
+      return;
+    }
 
     // Update animation
     if (this.state.isAnimating) {
@@ -598,7 +620,12 @@ export class ContextMenuManager {
     }
 
     // Render
-    this.render();
+    try {
+      this.render();
+    } catch (error) {
+      console.error('[ContextMenuManager] Render error:', error);
+      throw error;
+    }
   }
 
   /**
