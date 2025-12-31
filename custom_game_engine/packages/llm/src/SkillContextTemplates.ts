@@ -249,6 +249,56 @@ You can defend the village and train warriors.`,
 You can breed superior animals and train handlers.`,
   },
 
+  hunting: {
+    0: null,
+    1: 'You know basics of hunting. Animals can be tracked and hunted for food.',
+    2: `You understand hunting fundamentals:
+- Animal tracks indicate recent passage
+- Wind direction affects detection
+- Different animals have different behaviors`,
+    3: `Your hunting knowledge includes:
+- Tracking techniques in various terrain
+- Prey behavior patterns
+- Optimal hunting times
+- Basic butchering methods`,
+    4: `As an expert hunter, you know:
+- Advanced tracking across all terrain
+- Predicting animal movements
+- Dangerous prey handling
+- Efficient resource extraction`,
+    5: `As a master hunter, you understand:
+- Ecosystem balance and sustainable hunting
+- Training others in hunting techniques
+- Tracking in any conditions
+- Hunting legendary beasts
+You can track prey others cannot find.`,
+  },
+
+  stealth: {
+    0: null,
+    1: 'You know basics of stealth. Moving quietly helps avoid detection.',
+    2: `You understand stealth fundamentals:
+- Terrain affects noise and visibility
+- Timing movement with distractions
+- Staying downwind of targets`,
+    3: `Your stealth knowledge includes:
+- Silent movement techniques
+- Using shadows and cover
+- Minimizing visual profile
+- Reading patrol patterns`,
+    4: `As a stealth expert, you know:
+- Advanced concealment methods
+- Blending into environments
+- Precise timing for movements
+- Evading pursuit`,
+    5: `As a master of stealth, you understand:
+- Becoming invisible in plain sight
+- Teaching stealth techniques
+- Infiltration planning
+- Counter-detection methods
+You can move unseen through any environment.`,
+  },
+
   medicine: {
     0: null,
     1: 'You know basic first aid. Rest and clean water help healing.',

@@ -1,8 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WorldImpl, type World } from '../ecs/World';
-import { EventBusImpl } from '../events/EventBus';
+import { World } from '../World';
 import { AgentCombatSystem } from '../systems/AgentCombatSystem';
-import { Entity } from '../ecs/Entity';
+import type { Entity } from '../ecs/Entity';
 
 /**
  * Tests for AgentCombatSystem - Acceptance Criterion 3
@@ -26,15 +25,14 @@ describe('AgentCombatSystem', () => {
   let mockLLM: any;
 
   beforeEach(() => {
-    const eventBus = new EventBusImpl();
-    world = new WorldImpl(eventBus);
+    world = new World();
     mockLLM = {
       generateNarrative: vi.fn().mockResolvedValue({
         narrative: 'The two fighters clashed. After a brief struggle, one emerged victorious.',
         memorable_details: ['clashed', 'brief struggle', 'victorious'],
       }),
     };
-    system = new AgentCombatSystem(mockLLM, eventBus);
+    system = new AgentCombatSystem(mockLLM, world.eventBus);
 
     // Create attacker
     attacker = world.createEntity();
@@ -162,7 +160,7 @@ describe('AgentCombatSystem', () => {
 
     it('should apply injury modifier to injured combatant', () => {
       attacker.addComponent('injury', {
-        type: 'laceration',
+        injuryType: 'laceration',
         severity: 'major',
         location: 'arms',
         skillPenalties: { combat: -2 },

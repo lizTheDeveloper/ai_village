@@ -172,7 +172,8 @@ export function createWanderingAgent(
 
   // Skills - personality-based starting skills for role diversity
   const personalityWander = entity.getComponent('personality') as any;
-  entity.addComponent(generateRandomStartingSkills(personalityWander));
+  const skillsComponent = generateRandomStartingSkills(personalityWander);
+  entity.addComponent(skillsComponent);
 
   // Spiritual component - faith and divine connection based on personality
   const spiritualityTrait = personalityWander?.spirituality ?? 0.5;
@@ -181,11 +182,13 @@ export function createWanderingAgent(
   // Personal Goals - track agent's aspirations and progress
   entity.addComponent(createGoalsComponent());
 
-  // Combat stats - basic combat abilities
+  // Combat stats - copy skills from SkillsComponent to CombatStatsComponent
+  // Note: CombatStatsComponent tracks combat-specific skills for backwards compatibility
+  // but SkillsComponent is the source of truth
   entity.addComponent(createCombatStatsComponent({
-    combatSkill: 0.3 + Math.random() * 0.2, // 30-50% base skill
-    huntingSkill: 0.2 + Math.random() * 0.3, // 20-50% hunting
-    stealthSkill: 0.2 + Math.random() * 0.3, // 20-50% stealth
+    combatSkill: (skillsComponent.levels.combat || 0) / 5, // Convert level (0-5) to 0-1 scale
+    huntingSkill: (skillsComponent.levels.hunting || 0) / 5, // Convert level (0-5) to 0-1 scale
+    stealthSkill: (skillsComponent.levels.stealth || 0) / 5, // Convert level (0-5) to 0-1 scale
   }));
 
   // Injury tracking - starts with no injuries (using empty component object)
@@ -363,7 +366,8 @@ export function createLLMAgent(
 
   // Skills - personality-based starting skills for role diversity
   const personalityLLM = entity.getComponent('personality') as any;
-  entity.addComponent(generateRandomStartingSkills(personalityLLM));
+  const skillsComponentLLM = generateRandomStartingSkills(personalityLLM);
+  entity.addComponent(skillsComponentLLM);
 
   // Spiritual component - faith and divine connection based on personality
   const spiritualityTrait = personalityLLM?.spirituality ?? 0.5;
@@ -372,11 +376,13 @@ export function createLLMAgent(
   // Personal Goals - track agent's aspirations and progress
   entity.addComponent(createGoalsComponent());
 
-  // Combat stats - basic combat abilities
+  // Combat stats - copy skills from SkillsComponent to CombatStatsComponent
+  // Note: CombatStatsComponent tracks combat-specific skills for backwards compatibility
+  // but SkillsComponent is the source of truth
   entity.addComponent(createCombatStatsComponent({
-    combatSkill: 0.3 + Math.random() * 0.2, // 30-50% base skill
-    huntingSkill: 0.2 + Math.random() * 0.3, // 20-50% hunting
-    stealthSkill: 0.2 + Math.random() * 0.3, // 20-50% stealth
+    combatSkill: (skillsComponentLLM.levels.combat || 0) / 5, // Convert level (0-5) to 0-1 scale
+    huntingSkill: (skillsComponentLLM.levels.hunting || 0) / 5, // Convert level (0-5) to 0-1 scale
+    stealthSkill: (skillsComponentLLM.levels.stealth || 0) / 5, // Convert level (0-5) to 0-1 scale
   }));
 
   // Injury tracking - starts with no injuries (using empty component object)

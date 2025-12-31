@@ -947,6 +947,8 @@ export class StructuredPromptBuilder {
       social: 'seems friendly and talkative',
       exploration: 'seems adventurous',
       combat: 'seems capable in a fight',
+      hunting: 'seems experienced with tracking prey',
+      stealth: 'seems to move quietly and carefully',
       animal_handling: 'seems good with animals',
       medicine: 'seems knowledgeable about healing',
     };
@@ -966,6 +968,8 @@ export class StructuredPromptBuilder {
       social: 'can coordinate village efforts',
       exploration: 'can scout distant areas',
       combat: 'can defend the village',
+      hunting: 'can track and hunt dangerous prey',
+      stealth: 'can move undetected through dangerous areas',
       animal_handling: 'can tame and care for animals',
       medicine: 'can treat injuries and illnesses',
     };

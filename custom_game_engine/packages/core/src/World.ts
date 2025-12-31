@@ -16,6 +16,7 @@ import { createDominanceRankComponent } from './components/DominanceRankComponen
 import { createCombatStatsComponent } from './components/CombatStatsComponent.js';
 import { createConflictComponent } from './components/ConflictComponent.js';
 import { createGuardDutyComponent } from './components/GuardDutyComponent.js';
+import { createInjuryComponent } from './components/InjuryComponent.js';
 
 // Import navigation component classes
 import { TrustNetworkComponent } from './components/TrustNetworkComponent.js';
@@ -110,11 +111,7 @@ const componentRegistry: Record<string, ComponentFactory> = {
     version: 1,
     ...data,
   }),
-  'injury': (data = {}) => ({
-    type: 'injury' as const,
-    version: 1,
-    ...data,
-  }),
+  'injury': (data = {}) => createInjuryComponent(data as any),
   'inventory': (data = {}) => ({
     type: 'inventory' as const,
     version: 1,
