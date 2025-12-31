@@ -2849,7 +2849,6 @@ async function main() {
     const selectedEntity = panels.agentInfoPanel.getSelectedEntity() || panels.animalInfoPanel.getSelectedEntity();
     renderer.render(gameLoop.world, selectedEntity);
     placementUI.render(renderer.getContext());
-    panels.contextMenuManager.update();
 
     const selectedAgentId = panels.agentInfoPanel.getSelectedEntityId();
     if (selectedAgentId) {
@@ -2875,7 +2874,7 @@ async function main() {
     panels.shopPanel.render(ctx, gameLoop.world);
     menuBar.render(ctx);
 
-    // Context menu update (handles rendering internally)
+    // Context menu update (handles rendering internally) - MUST be last to render on top
     panels.contextMenuManager.update();
 
     requestAnimationFrame(renderLoop);
