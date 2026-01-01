@@ -235,6 +235,7 @@ export class VillageInfoBuilder {
   getSkillImpression(skillId: SkillId): string {
     const impressions: Record<SkillId, string> = {
       building: 'seems handy with tools',
+      architecture: 'seems attuned to the energy of spaces',
       cooking: 'seems interested in food',
       farming: 'seems to like working with plants',
       crafting: 'seems good at making things',
@@ -246,6 +247,7 @@ export class VillageInfoBuilder {
       stealth: 'seems to move quietly and carefully',
       animal_handling: 'seems good with animals',
       medicine: 'seems knowledgeable about healing',
+      research: 'seems curious and thoughtful',
     };
     return impressions[skillId] || 'seems skilled at something';
   }
@@ -256,6 +258,7 @@ export class VillageInfoBuilder {
   getSkillExamples(skillId: SkillId): string {
     const examples: Record<SkillId, string> = {
       building: 'can construct complex buildings',
+      architecture: 'can design harmonious spaces with good chi flow',
       cooking: 'can prepare preserved food',
       farming: 'can grow high-quality crops',
       crafting: 'can create advanced items',
@@ -267,6 +270,7 @@ export class VillageInfoBuilder {
       stealth: 'can move undetected through dangerous areas',
       animal_handling: 'can tame and care for animals',
       medicine: 'can treat injuries and illnesses',
+      research: 'can advance technology and discover new knowledge',
     };
     return examples[skillId] || '';
   }

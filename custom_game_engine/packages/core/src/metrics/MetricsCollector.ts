@@ -49,6 +49,10 @@ const VALID_EVENT_TYPES = new Set([
   'task:completed',
   'task:abandoned',
   'llm:call',
+  'llm:request',
+  'llm:decision',
+  'llm:error',
+  'agent:llm_context',
   'plan:created',
   'plan:completed',
   'system:tick',
@@ -336,6 +340,13 @@ export class MetricsCollector {
         break;
       case 'llm:call':
         this.handleLLMCall(event);
+        break;
+      case 'llm:request':
+      case 'llm:decision':
+      case 'llm:error':
+      case 'agent:llm_context':
+        // LLM events - handled by MetricsCollectionSystem for streaming
+        // No additional aggregation needed here
         break;
       case 'plan:created':
       case 'plan:completed':

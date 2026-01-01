@@ -266,6 +266,29 @@ export class MemoryFormationSystem implements System {
         return;
       }
 
+      // Handle information:shared - has 'from' and 'to' instead of agentId
+      if (eventType === 'information:shared') {
+        const fromId = (data as any).from;
+        const toId = (data as any).to;
+
+        if (!fromId || !toId) {
+          throw new Error(
+            `Invalid information:shared event - missing ${!fromId ? 'from' : 'to'} field. ` +
+            `Event data: ${JSON.stringify(data)}`
+          );
+        }
+
+        // Create memory for the receiver (the one who learned new information)
+        if (!this.pendingMemories.has(toId)) {
+          this.pendingMemories.set(toId, []);
+        }
+        this.pendingMemories.get(toId)!.push({
+          eventType,
+          data: { ...data, agentId: toId },
+        });
+        return;
+      }
+
       // Standard events require agentId
       if (!('agentId' in data) || !data.agentId) {
         throw new Error(

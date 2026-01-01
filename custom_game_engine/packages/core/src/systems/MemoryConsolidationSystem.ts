@@ -50,6 +50,11 @@ export class MemoryConsolidationSystem implements System {
   private eventBus: EventBus | null = null;
   private consolidationTriggers: Set<string> = new Set();
   private recallEvents: Array<{ agentId: string; memoryId: string }> = [];
+  /**
+   * Pending game days that passed (for decay at midnight).
+   * Each time:day_changed event adds 1 to this counter.
+   */
+  private pendingGameDays: number = 0;
 
   constructor(eventBus?: EventBus) {
     if (eventBus) {
@@ -104,18 +109,38 @@ export class MemoryConsolidationSystem implements System {
         memoryId: data.memoryId,
       });
     });
+
+    // Listen for midnight (day change) - triggers daily memory cleanup
+    // This is the primary mechanism for memory decay in accelerated simulations
+    this.eventBus.subscribe('time:day_changed', (_event) => {
+      // Each day change = 1 game day of decay
+      this.pendingGameDays += 1;
+    });
   }
 
   update(world: World, deltaTimeOrEntities: number | ReadonlyArray<Entity>, deltaTime?: number): void {
     // Handle both calling conventions: (world, deltaTime) and (world, entities, deltaTime)
     const actualDeltaTime = typeof deltaTimeOrEntities === 'number' ? deltaTimeOrEntities : deltaTime!;
-    const daysElapsed = actualDeltaTime / SECONDS_PER_DAY;
 
     // Flush event bus first to process consolidation triggers and recall events
     if (!this.eventBus) {
       throw new Error('EventBus not initialized in MemoryConsolidationSystem.update');
     }
     this.eventBus.flush();
+
+    // Calculate days elapsed for decay:
+    // - Primary: Use pendingGameDays from time:day_changed events (accurate for game time)
+    // - Fallback: Use a small real-time delta for sub-day decay (minimal impact)
+    // This ensures decay happens correctly in both accelerated simulations and real-time play
+    const gameDaysElapsed = this.pendingGameDays;
+    const realTimeDaysElapsed = actualDeltaTime / SECONDS_PER_DAY;
+
+    // Use game days if available, otherwise use minimal real-time decay
+    // The game day decay is the primary mechanism; real-time is just for smooth sub-day decay
+    const daysElapsed = gameDaysElapsed > 0 ? gameDaysElapsed : realTimeDaysElapsed;
+
+    // Reset the pending game days counter
+    this.pendingGameDays = 0;
 
     // Get all entities with episodic memory
     const memoryEntities = world.query().executeEntities();

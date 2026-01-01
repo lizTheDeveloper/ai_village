@@ -587,7 +587,7 @@ export function castSpell(
   return SpellCastingService.getInstance().castSpell(spellId, caster, world, tick, options);
 }
 
-export function canCastSpell(
+export function canCastSpellById(
   spellId: string,
   caster: Entity,
   options?: CastOptions

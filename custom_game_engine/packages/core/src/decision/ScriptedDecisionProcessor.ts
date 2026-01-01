@@ -123,14 +123,16 @@ export class ScriptedDecisionProcessor {
     }
     // PRIORITY-BASED BEHAVIOR SELECTION
     // If agent has strategic priorities set, use highest priority behavior
+    // For city-influenced autonomic NPCs, use effectivePriorities (blended city + skill priorities)
     // Allow re-evaluation from exploration/social behaviors so agents can switch to gathering when resources appear
     const interruptibleBehaviors = ['wander', 'rest', 'idle', 'explore', 'explore_frontier', 'explore_spiral'];
-    if (agent.priorities && interruptibleBehaviors.includes(currentBehavior)) {
-      const result = this.selectPriorityBasedBehavior(entity, world, agent.priorities, getNearbyAgents);
+    const activePriorities = agent.effectivePriorities ?? agent.priorities;
+    if (activePriorities && interruptibleBehaviors.includes(currentBehavior)) {
+      const result = this.selectPriorityBasedBehavior(entity, world, activePriorities, getNearbyAgents);
       if (result) return result;
     }
     // Autonomic resource gathering when wandering/resting/idle (fallback if no priorities)
-    if ((currentBehavior === 'wander' || currentBehavior === 'rest' || currentBehavior === 'idle') && inventory && !agent.priorities) {
+    if ((currentBehavior === 'wander' || currentBehavior === 'rest' || currentBehavior === 'idle') && inventory && !activePriorities) {
       const result = this.checkResourceGathering(entity, world, inventory);
       if (result) return result;
     }
@@ -221,45 +223,53 @@ export class ScriptedDecisionProcessor {
     hasStone: boolean
   ): { food: ResourceTarget | null; wood: ResourceTarget | null; stone: ResourceTarget | null } {
     const result = { food: null as ResourceTarget | null, wood: null as ResourceTarget | null, stone: null as ResourceTarget | null };
-    // Check resources
+    // Check resources - optimized to check distance first to avoid processing faraway resources
     const resources = world.query().with(ComponentType.Resource).with(ComponentType.Position).executeEntities();
     for (const resource of resources) {
       const resourceImpl = resource as EntityImpl;
-      const resourceComp = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource);
       const resourcePos = resourceImpl.getComponent<PositionComponent>(ComponentType.Position);
-      if (!resourceComp || !resourcePos) continue;
-      if (!resourceComp.harvestable || resourceComp.amount <= 0) continue;
+
+      // Early distance check - skip faraway resources immediately
+      if (!resourcePos) continue;
+      const distance = this.distance(position, resourcePos);
+      if (distance > DETECTION_RANGE) continue;
+
+      const resourceComp = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource);
+      if (!resourceComp || !resourceComp.harvestable || resourceComp.amount <= 0) continue;
+
       // Only consider resources we need
       if (resourceComp.resourceType === 'wood' && hasWood) continue;
       if (resourceComp.resourceType === 'stone' && hasStone) continue;
       if (resourceComp.resourceType === 'food' && hasFood) continue;
-      const distance = this.distance(position, resourcePos);
-      if (distance <= DETECTION_RANGE) {
-        if (resourceComp.resourceType === 'food' && (!result.food || distance < result.food.distance)) {
-          result.food = { type: 'food', distance, isPlant: false };
-        } else if (resourceComp.resourceType === 'wood' && (!result.wood || distance < result.wood.distance)) {
-          result.wood = { type: 'wood', distance };
-        } else if (resourceComp.resourceType === 'stone' && (!result.stone || distance < result.stone.distance)) {
-          result.stone = { type: 'stone', distance };
-        }
+
+      if (resourceComp.resourceType === 'food' && (!result.food || distance < result.food.distance)) {
+        result.food = { type: 'food', distance, isPlant: false };
+      } else if (resourceComp.resourceType === 'wood' && (!result.wood || distance < result.wood.distance)) {
+        result.wood = { type: 'wood', distance };
+      } else if (resourceComp.resourceType === 'stone' && (!result.stone || distance < result.stone.distance)) {
+        result.stone = { type: 'stone', distance };
       }
     }
-    // Also search for edible plants with fruit
+    // Also search for edible plants with fruit - check distance first
     if (!hasFood) {
       const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
       for (const plant of plants) {
         const plantImpl = plant as EntityImpl;
-        const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
         const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
-        if (!plantComp || !plantPos) continue;
+
+        // Early distance check - skip faraway plants immediately
+        if (!plantPos) continue;
+        const distance = this.distance(position, plantPos);
+        if (distance > DETECTION_RANGE) continue;
+
+        const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+        if (!plantComp) continue;
+
         const isEdible = EDIBLE_SPECIES.includes(plantComp.speciesId);
         const hasFruit = plantComp.fruitCount > 0;
         const isHarvestable = ['fruiting', 'mature', 'seeding'].includes(plantComp.stage);
-        if (isEdible && hasFruit && isHarvestable) {
-          const distance = this.distance(position, plantPos);
-          if (distance <= DETECTION_RANGE && (!result.food || distance < result.food.distance)) {
-            result.food = { type: 'food', distance, isPlant: true };
-          }
+        if (isEdible && hasFruit && isHarvestable && (!result.food || distance < result.food.distance)) {
+          result.food = { type: 'food', distance, isPlant: true };
         }
       }
     }

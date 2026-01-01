@@ -11,7 +11,8 @@ import {
   NeedsComponent,
   MemoryComponent,
   PersonalityComponent,
-  createVisionComponent,
+  createVisionForProfile,
+  type SkillsComponent,
   createConversationComponent,
   createRelationshipComponent,
   createInventoryComponent,
@@ -22,6 +23,7 @@ import {
   createIdentityComponent,
   createGatheringStatsComponent,
   generateRandomStartingSkills,
+  derivePrioritiesFromSkills,
   createGoalsComponent,
   EpisodicMemoryComponent,
   SemanticMemoryComponent,
@@ -40,7 +42,45 @@ import {
   // Conflict system components
   createCombatStatsComponent,
   createDominanceRankComponent,
+  // Realm system components
+  createRealmLocationComponent,
 } from '@ai-village/core';
+
+/**
+ * Determine the best vision profile based on agent skills.
+ * Higher skill levels in relevant categories determine the profile.
+ */
+function getVisionProfileFromSkills(
+  skills: SkillsComponent
+): 'default' | 'scout' | 'farmer' | 'guard' | 'crafter' {
+  const levels = skills.levels;
+
+  // Find the highest relevant skill
+  const profileScores = {
+    scout: (levels.exploration ?? 0) + (levels.hunting ?? 0) * 0.5,
+    farmer: (levels.farming ?? 0) + (levels.gathering ?? 0) * 0.5,
+    guard: (levels.combat ?? 0) + (levels.stealth ?? 0) * 0.5,
+    crafter: (levels.crafting ?? 0) + (levels.building ?? 0) * 0.5,
+  };
+
+  // Find the profile with the highest score
+  let bestProfile: keyof typeof profileScores = 'scout';
+  let bestScore = profileScores.scout;
+
+  for (const [profile, score] of Object.entries(profileScores)) {
+    if (score > bestScore) {
+      bestScore = score;
+      bestProfile = profile as keyof typeof profileScores;
+    }
+  }
+
+  // Only use specialized profile if score is at least 2 (one skill at level 2+)
+  if (bestScore >= 2) {
+    return bestProfile;
+  }
+
+  return 'default';
+}
 
 /**
  * Generate a unique think offset for an agent based on their entity ID
@@ -81,21 +121,26 @@ export function createWanderingAgent(
 
   // Personality - random personality traits (0-1 scale)
   const randomTrait = () => Math.random();
-  entity.addComponent(
-    new PersonalityComponent({
-      openness: randomTrait(),
-      conscientiousness: randomTrait(),
-      extraversion: randomTrait(),
-      agreeableness: randomTrait(),
-      neuroticism: randomTrait(),
-    })
-  );
+  const personality = new PersonalityComponent({
+    openness: randomTrait(),
+    conscientiousness: randomTrait(),
+    extraversion: randomTrait(),
+    agreeableness: randomTrait(),
+    neuroticism: randomTrait(),
+  });
+  entity.addComponent(personality);
+
+  // Skills - personality-based starting skills for role diversity
+  // Created early so we can derive priorities from them
+  const skillsComponent = generateRandomStartingSkills(personality);
+  entity.addComponent(skillsComponent);
 
   // Agent behavior - start idle, will wander when bored
-  // with staggered think offset to prevent thundering herd
+  // Priorities are derived from skills so agents naturally prefer activities they're skilled in
   const thinkInterval = 20;
   const thinkOffset = generateThinkOffset(entity.id, thinkInterval * 2);
-  entity.addComponent(createAgentComponent('idle', thinkInterval, false, thinkOffset));
+  const priorities = derivePrioritiesFromSkills(skillsComponent);
+  entity.addComponent(createAgentComponent('idle', thinkInterval, false, thinkOffset, priorities));
 
   // Movement
   entity.addComponent(createMovementComponent(speed, 0, 0));
@@ -118,8 +163,10 @@ export function createWanderingAgent(
   // Memory - episodic/semantic/procedural memory
   entity.addComponent(new MemoryComponent(entity.id));
 
-  // Vision - see 10 tiles around, can see both agents and resources
-  entity.addComponent(createVisionComponent(10, 360, true, true));
+  // Vision - tiered awareness based on skill profile
+  // Scouts/hunters see farther, farmers focus nearby, guards have broad awareness
+  const visionProfile = getVisionProfileFromSkills(skillsComponent);
+  entity.addComponent(createVisionForProfile(visionProfile));
 
   // Conversation - can talk to other agents, remember last 10 messages
   entity.addComponent(createConversationComponent(10));
@@ -170,13 +217,8 @@ export function createWanderingAgent(
   // Gathering stats - track what the agent has gathered and deposited
   entity.addComponent(createGatheringStatsComponent());
 
-  // Skills - personality-based starting skills for role diversity
-  const personalityWander = entity.getComponent('personality') as any;
-  const skillsComponent = generateRandomStartingSkills(personalityWander);
-  entity.addComponent(skillsComponent);
-
   // Spiritual component - faith and divine connection based on personality
-  const spiritualityTrait = personalityWander?.spirituality ?? 0.5;
+  const spiritualityTrait = (personality as any)?.spirituality ?? 0.5;
   entity.addComponent(createSpiritualComponent(spiritualityTrait));
 
   // Personal Goals - track agent's aspirations and progress
@@ -225,6 +267,9 @@ export function createWanderingAgent(
     subordinates: [],
     canChallengeAbove: false, // Not a dominance-based species
   }));
+
+  // Realm location - agents start in the mortal world
+  entity.addComponent(createRealmLocationComponent('mortal_world'));
 
   // Add to world
   (world as any)._addEntity(entity);
@@ -279,20 +324,27 @@ export function createLLMAgent(
   // Identity - give agent a name
   entity.addComponent(createIdentityComponent(generateRandomName()));
 
-  // Personality - random personality traits (TODO: create personality generation)
-  entity.addComponent(new PersonalityComponent({
+  // Personality - random personality traits
+  const personalityLLM = new PersonalityComponent({
     openness: Math.random(),
     conscientiousness: Math.random(),
     extraversion: Math.random(),
     agreeableness: Math.random(),
     neuroticism: Math.random(),
-  }));
+  });
+  entity.addComponent(personalityLLM);
+
+  // Skills - personality-based starting skills for role diversity
+  // Created early so we can derive priorities from them
+  const skillsComponentLLM = generateRandomStartingSkills(personalityLLM);
+  entity.addComponent(skillsComponentLLM);
 
   // Agent behavior - LLM-controlled, start idle, will wander when bored
-  // with staggered think offset to prevent thundering herd
+  // Priorities are derived from skills so agents naturally prefer activities they're skilled in
   const thinkInterval = 20;
   const thinkOffset = generateThinkOffset(entity.id, thinkInterval * 2);
-  entity.addComponent(createAgentComponent('idle', thinkInterval, true, thinkOffset)); // useLLM = true
+  const prioritiesLLM = derivePrioritiesFromSkills(skillsComponentLLM);
+  entity.addComponent(createAgentComponent('idle', thinkInterval, true, thinkOffset, prioritiesLLM)); // useLLM = true
 
   // Movement
   entity.addComponent(createMovementComponent(speed, 0, 0));
@@ -311,8 +363,10 @@ export function createLLMAgent(
   // Memory - remember up to 20 things
   entity.addComponent(new MemoryComponent(entity.id));
 
-  // Vision - see 10 tiles around, can see both agents and resources
-  entity.addComponent(createVisionComponent(10, 360, true, true));
+  // Vision - tiered awareness based on skill profile
+  // Scouts/hunters see farther, farmers focus nearby, guards have broad awareness
+  const visionProfileLLM = getVisionProfileFromSkills(skillsComponentLLM);
+  entity.addComponent(createVisionForProfile(visionProfileLLM));
 
   // Conversation - can talk to other agents, remember last 10 messages
   entity.addComponent(createConversationComponent(10));
@@ -364,13 +418,8 @@ export function createLLMAgent(
   // Gathering stats - track what the agent has gathered and deposited
   entity.addComponent(createGatheringStatsComponent());
 
-  // Skills - personality-based starting skills for role diversity
-  const personalityLLM = entity.getComponent('personality') as any;
-  const skillsComponentLLM = generateRandomStartingSkills(personalityLLM);
-  entity.addComponent(skillsComponentLLM);
-
   // Spiritual component - faith and divine connection based on personality
-  const spiritualityTrait = personalityLLM?.spirituality ?? 0.5;
+  const spiritualityTrait = (personalityLLM as any)?.spirituality ?? 0.5;
   entity.addComponent(createSpiritualComponent(spiritualityTrait));
 
   // Personal Goals - track agent's aspirations and progress
@@ -419,6 +468,9 @@ export function createLLMAgent(
     subordinates: [],
     canChallengeAbove: false, // Not a dominance-based species
   }));
+
+  // Realm location - agents start in the mortal world
+  entity.addComponent(createRealmLocationComponent('mortal_world'));
 
   // Add initial "waking up" memory from Dungeon Master prompt
   if (dungeonMasterPrompt) {

@@ -2,6 +2,11 @@
  * BuildBehavior - Building construction behavior
  *
  * Agent attempts to build a structure at their current location.
+ *
+ * Two construction systems:
+ * 1. Entity-based (crafting benches, utility buildings) - instant placement
+ * 2. Tile-based (shelters, structures with walls/doors) - material transport + construction
+ *
  * Handles:
  * - Resource validation and gathering
  * - Finding valid build spots
@@ -23,6 +28,8 @@ import { getPosition } from '../../utils/componentHelpers.js';
 import { createPlacementScorer } from '../../services/PlacementScorer.js';
 import { ComponentType } from '../../types/ComponentType.js';
 import { BuildingType as BT } from '../../types/BuildingType.js';
+import { getTileConstructionSystem } from '../../systems/TileConstructionSystem.js';
+import { getTileBasedBlueprintRegistry, calculateDimensions } from '../../buildings/TileBasedBlueprintRegistry.js';
 
 interface WorldWithBuilding extends World {
   buildingRegistry?: {
@@ -41,18 +48,33 @@ interface WorldWithBuilding extends World {
   ): EntityImpl;
 }
 
-/** Valid building types that can be constructed */
-const VALID_BUILDING_TYPES: BuildingType[] = [
+/**
+ * Entity-based buildings (crafting benches, utility structures)
+ * These use the old instant-placement system
+ */
+const ENTITY_BASED_BUILDINGS: BuildingType[] = [
   BT.Workbench,
   BT.StorageChest,
   BT.Campfire,
-  BT.Tent,
   BT.Well,
-  BT.LeanTo,
   BT.StorageBox,
   BT.Bed,
   BT.Bedroll,
 ];
+
+/**
+ * Tile-based structure types (mapped to TileBasedBlueprint IDs)
+ * These use the voxel construction system with material transport
+ */
+const TILE_BASED_STRUCTURE_MAP: Record<string, string> = {
+  'tent': 'tile_simple_hut',        // tent → simple hut (3x3)
+  'lean-to': 'tile_simple_hut',     // lean-to → simple hut
+  'shelter': 'tile_simple_hut',     // generic shelter → simple hut
+  'house': 'tile_medium_house',     // house → medium house (5x4)
+  'barn': 'tile_barn',              // barn → barn (6x5)
+  'workshop': 'tile_workshop',      // workshop → workshop (4x4)
+  'storage': 'tile_storage_shed',   // storage → storage shed (3x2)
+};
 
 /**
  * BuildBehavior - Construct buildings
@@ -77,9 +99,16 @@ export class BuildBehavior extends BaseBehavior {
     // Get and validate building type
     let buildingType = agent.behaviorState?.buildingType as BuildingType || BT.LeanTo;
 
+    // Route to tile-based construction if applicable
+    const tileBasedBlueprintId = TILE_BASED_STRUCTURE_MAP[buildingType];
+    if (tileBasedBlueprintId) {
+      return this.executeTileBasedConstruction(entity, world, tileBasedBlueprintId);
+    }
 
-    if (!VALID_BUILDING_TYPES.includes(buildingType)) {
-      buildingType = BT.LeanTo; // Default to lean-to for shelter
+    // Validate entity-based building type
+    if (!ENTITY_BASED_BUILDINGS.includes(buildingType)) {
+      // Unknown building type - default to tile-based simple hut
+      return this.executeTileBasedConstruction(entity, world, 'simple_hut');
     }
 
     if (!inventory) {
@@ -337,6 +366,85 @@ export class BuildBehavior extends BaseBehavior {
     }
 
     return null;
+  }
+
+  /**
+   * Execute tile-based construction (voxel building system)
+   * Routes agent to material_transport behavior to gather materials for construction
+   */
+  private executeTileBasedConstruction(
+    entity: EntityImpl,
+    world: World,
+    blueprintId: string
+  ): BehaviorResult | void {
+    const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+
+    // Get blueprint from tile-based registry
+    const blueprintRegistry = getTileBasedBlueprintRegistry();
+    const blueprint = blueprintRegistry.get(blueprintId);
+
+    if (!blueprint) {
+      console.error(`[BuildBehavior] Unknown tile-based blueprint: ${blueprintId}`);
+      this.switchTo(entity, 'wander', {});
+      return { complete: true, reason: 'Unknown blueprint' };
+    }
+
+    // Get dimensions from layout
+    const { width, height } = calculateDimensions(blueprint.layoutString);
+
+    // Find valid build spot
+    const buildSpot = this.findValidBuildSpot(world, position, width, height);
+
+    if (!buildSpot) {
+      world.eventBus.emit({
+        type: 'construction:failed',
+        source: entity.id,
+        data: {
+          buildingId: `${blueprintId}_${Date.now()}`,
+          reason: 'No valid placement location found',
+          builderId: entity.id,
+          agentId: entity.id,
+        },
+      });
+
+      this.switchTo(entity, 'wander', {});
+      return { complete: true, reason: 'No valid build spot' };
+    }
+
+    // Create construction task via TileConstructionSystem
+    const constructionSystem = getTileConstructionSystem();
+    const task = constructionSystem.createTask(
+      world,
+      blueprint,
+      buildSpot.x,
+      buildSpot.y,
+      0, // rotation
+      entity.id // createdBy
+    );
+
+    // Emit event
+    world.eventBus.emit({
+      type: 'construction:task_created',
+      source: entity.id,
+      data: {
+        taskId: task.id,
+        blueprintId,
+        position: { x: buildSpot.x, y: buildSpot.y },
+        builderId: entity.id,
+      },
+    });
+
+    // Switch agent to material_transport behavior to gather materials
+    entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
+      ...current,
+      behavior: 'material_transport',
+      behaviorState: {
+        taskId: task.id,
+        phase: 'find_task',
+      },
+    }));
+
+    return { complete: true, reason: 'Switched to material_transport' };
   }
 
   private aggregateAvailableResources(

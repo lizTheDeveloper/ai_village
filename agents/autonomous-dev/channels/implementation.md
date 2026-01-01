@@ -1,94 +1,155 @@
-# CLAIMED: divine-communication-system
+# CLAIMED: conflict-ui
 
-**Date:** 2025-12-24
+**Attempt:** #909
+**Date:** 2026-01-01
 **Spec Agent:** spec-agent-001
-**Status:** Work order created
+**Status:** ✅ WORK ORDER VERIFIED - READY FOR TESTS
 
 ---
 
-## Work Order Created
+## Work Order Status
 
-Work order: `agents/autonomous-dev/work-orders/divine-communication-system/work-order.md`
+Work order **ALREADY EXISTS** and is comprehensive:
 
-**Phase:** 27
-**Spec:** `custom_game_engine/specs/divine-communication-system.md`
-**UI Spec:** `custom_game_engine/specs/divine-systems-ui.md`
+**File:** `agents/autonomous-dev/work-orders/conflict-ui/work-order.md`
 
----
-
-## Dependencies
-
-✅ **Phase 3 (Agent Needs):** NeedsComponent exists
-✅ **Phase 4 (Memory & Social):** EpisodicMemoryComponent, RelationshipComponent exist
-✅ **Phase 5 (Communication):** ConversationComponent exists
-✅ **Phase 8 (Circadian/Sleep):** SleepSystem exists
-
-All dependencies met ✅
+**Size:** 512 lines
+**Phase:** 16
+**Created:** 2025-12-31 (Attempt #903)
+**Last Updated:** 2025-12-31 23:50
 
 ---
 
-## Feature Overview
+## Verification Complete
 
-Divine Communication System implements player-as-God mechanics:
-- **Prayer System:** Agents pray to player when stressed/grateful/worried
-- **Meditation System:** Agents enter receptive state for divine guidance
-- **Vision System:** Player sends divine messages to agents
-- **Faith System:** Dynamic belief system affecting agent behavior
-- **Sacred Sites:** Locations where prayers are frequently answered
-- **Group Prayer:** Emergent collective spiritual practices
+Work order contains all required sections:
 
----
-
-## Scope
-
-**Components:** 2 (PrayerComponent, SpiritualComponent)
-**Systems:** 4 (PrayerSystem, VisionSystem, FaithSystem, SacredSiteSystem)
-**Actions:** 3 (PrayAction, MeditateAction, GroupPrayAction)
-**UI Panels:** 4 (Prayer Inbox, Vision Composer, Divine Status Bar, Sacred Site Overlay)
-**Estimated LOC:** ~3,000
-**Timeline:** 4-5 weeks full, 2-3 weeks MVP
+✅ **Spec Reference** - Primary and related specs linked
+✅ **Requirements Summary** - 11 extracted SHALL/MUST/SHOULD/MAY statements
+✅ **Acceptance Criteria** - 11 detailed criteria with WHEN/THEN/Verification
+✅ **System Integration** - 6 existing systems mapped with integration types
+✅ **New Components Needed** - Identified which exist vs need creation
+✅ **Events** - Comprehensive EventBus integration (9 listens, 7 emits)
+✅ **UI Requirements** - Detailed layouts, dimensions, colors, visual style
+✅ **Files Likely Modified** - Complete file list (6 existing + 5 new)
+✅ **Implementation Notes** - Integration strategy, performance, error handling
+✅ **Playtest Notes** - UI behaviors, edge cases, performance testing
+✅ **Dependencies** - All verified as met
 
 ---
 
-## Integration Points
+## Spec Analysis
 
-This feature integrates with:
-- AISystem (new pray/meditate behaviors)
-- SleepSystem (visions during REM sleep)
-- MemoryFormationSystem (prayers/visions create memories)
-- EventBus (8 new event types)
-- ConversationSystem (vision sharing through dialogue)
+**Primary Spec:** `openspec/specs/ui-system/conflict.md`
+- ✅ 11 requirements (REQ-COMBAT-001 through REQ-COMBAT-011)
+- ✅ Clear MUST (5) / SHOULD (4) / MAY (2) priorities
+- ✅ Complete TypeScript interfaces for all components
+- ✅ Visual style specifications with exact colors/dimensions
+- ✅ State management and event flows defined
+- ✅ Integration with conflict-system types specified
 
----
-
-## Acceptance Criteria
-
-15 acceptance criteria defined covering:
-- Prayer generation and triggers
-- Meditation behavior
-- Vision delivery mechanics
-- Faith tracking and effects
-- Sacred site discovery
-- Group prayer coordination
-- Player UI interactions
-- CLAUDE.md error handling compliance
+**Related Specs:**
+- ✅ `openspec/specs/conflict-system/spec.md` - Conflict mechanics referenced
+- ✅ `openspec/specs/entities/agent.md` - Agent stats referenced
+- ✅ `openspec/specs/ui-system/notifications.md` - Alerts referenced
 
 ---
 
-## Handing Off
+## Existing Infrastructure
 
-**Status:** READY FOR TEST AGENT
+**Already Implemented (MUST VERIFY, NOT RECREATE):**
+- `HealthBarRenderer.ts` - REQ-COMBAT-002 health bars ✅
+- `ThreatIndicatorRenderer.ts` - REQ-COMBAT-005 threat indicators ✅
+- Multiple combat components exist in packages/core
 
-The Test Agent should:
-1. Write comprehensive tests for all 2 components
-2. Write tests for all 4 systems
-3. Write tests for all 3 actions
-4. Verify all 15 acceptance criteria are testable
-5. Ensure CLAUDE.md compliance (no silent fallbacks)
-
-Then hand off to Implementation Agent for development.
+**To Be Implemented (if missing):**
+- `CombatHUDPanel.ts` - REQ-COMBAT-001 combat HUD
+- `CombatUnitPanel.ts` - REQ-COMBAT-003 unit details
+- `StanceControlsPanel.ts` - REQ-COMBAT-004 stance UI
+- `CombatLogPanel.ts` - REQ-COMBAT-006 event log
+- `TacticalOverviewPanel.ts` - REQ-COMBAT-007 strategic view (SHOULD)
+- `DefenseManagementPanel.ts` - REQ-COMBAT-009 defense UI (SHOULD)
+- `AbilityBarPanel.ts` - REQ-COMBAT-008 abilities (MAY)
+- `DamageNumbersRenderer.ts` - REQ-COMBAT-010 floating text (MAY)
 
 ---
 
-**Claim Time:** 2025-12-24 00:00:00 UTC
-**Next Agent:** Test Agent
+## Integration Strategy
+
+Per work order notes:
+
+1. **VERIFY FIRST** - Check if components already exist
+2. **INTEGRATE** - Wire existing renderers into main Renderer.ts
+3. **IMPLEMENT MISSING** - Create panels that don't exist
+4. **WIRE EVENTS** - Subscribe to conflict-system events
+5. **TEST** - Verify all 11 acceptance criteria
+
+---
+
+## Dependencies Verified
+
+- ✅ conflict-system/spec.md - IMPLEMENTED (Phase 15)
+- ✅ agent-system/spec.md - IMPLEMENTED (Core)
+- ✅ ui-system/notifications.md - IMPLEMENTED (Phase 14)
+- ✅ EventBus - Available and functional
+- ✅ Renderer - Main render loop exists
+- ✅ Component system - ECS operational
+
+---
+
+## Critical Notes for Implementation Agent
+
+### DO NOT RECREATE EXISTING CODE
+HealthBarRenderer and ThreatIndicatorRenderer are **fully implemented**. Your task is to:
+1. Verify they are integrated into Renderer.ts render loop
+2. Test they work with conflict-system events
+3. Implement ONLY the missing panels
+
+### Component Type Names MUST Use lowercase_with_underscores
+```typescript
+// GOOD ✅
+type = 'combat_hud';
+type = 'stance_controls';
+type = 'threat_detection';
+
+// BAD ❌
+type = 'CombatHUD';
+type = 'StanceControls';
+```
+
+### Error Handling: NO SILENT FALLBACKS
+Per CLAUDE.md:
+- Throw errors for missing components
+- No default values that mask bugs
+- Validate required fields exist
+- Crash early with clear messages
+
+### Performance Optimizations
+- HealthBarRenderer: Uses filteredEntities (96% reduction)
+- ThreatIndicatorRenderer: Caches player entity (90% reduction)
+- Combat log: Limit to maxEvents (default 100)
+- Use viewport culling for off-screen entities
+
+---
+
+## Handoff to Test Agent
+
+**Next Steps:**
+1. Test Agent reads this work order
+2. Creates test suite for 11 acceptance criteria
+3. Writes integration tests for EventBus subscriptions
+4. Creates UI behavior tests for each panel
+5. Posts test results to testing channel
+
+**Then:**
+Implementation Agent implements based on test-driven approach.
+
+---
+
+## Status: ✅ READY FOR PIPELINE
+
+Work order is comprehensive, dependencies verified, integration strategy clear.
+
+**Work Order File:** `agents/autonomous-dev/work-orders/conflict-ui/work-order.md`
+
+Pipeline can proceed to Test Agent → Implementation Agent → Playtest Agent.

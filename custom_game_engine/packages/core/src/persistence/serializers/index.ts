@@ -15,6 +15,15 @@ import { PackCombatSerializer } from './PackCombatSerializer.js';
 import { HiveCombatSerializer } from './HiveCombatSerializer.js';
 import { ManchiSerializer } from './ManchiSerializer.js';
 
+// Memory and state serializers
+import { EpisodicMemorySerializer } from './EpisodicMemorySerializer.js';
+import { RelationshipSerializer } from './RelationshipSerializer.js';
+import { SocialGradientSerializer } from './SocialGradientSerializer.js';
+import { PlantSerializer } from './PlantSerializer.js';
+import { ExplorationStateSerializer } from './ExplorationStateSerializer.js';
+import { SpatialMemorySerializer } from './SpatialMemorySerializer.js';
+import { JournalSerializer } from './JournalSerializer.js';
+
 /**
  * Register all component serializers.
  * Called automatically when this module is imported.
@@ -34,6 +43,15 @@ export function registerAllSerializers(): void {
   componentSerializerRegistry.register('hive_combat', new HiveCombatSerializer());
   componentSerializerRegistry.register('manchi', new ManchiSerializer());
 
+  // Register memory and state serializers (these handle Maps and private fields properly)
+  componentSerializerRegistry.register('episodic_memory', new EpisodicMemorySerializer());
+  componentSerializerRegistry.register('relationship', new RelationshipSerializer());
+  componentSerializerRegistry.register('social_gradient', new SocialGradientSerializer());
+  componentSerializerRegistry.register('plant', new PlantSerializer());
+  componentSerializerRegistry.register('exploration_state', new ExplorationStateSerializer());
+  componentSerializerRegistry.register('spatial_memory', new SpatialMemorySerializer());
+  componentSerializerRegistry.register('journal', new JournalSerializer());
+
   // Register generic serializers for all other components
   // These can be replaced with specific serializers later
   const genericComponents = [
@@ -46,9 +64,9 @@ export function registerAllSerializers(): void {
     'personality',
     'mood',
     'memory',
-    'spatial_memory',
+    // 'spatial_memory' - now has specific serializer (handles Maps properly)
     'building',
-    'plant',
+    // 'plant' - now has specific serializer (uses toJSON method)
     'animal',
     'resource',
     'weather',
@@ -75,6 +93,7 @@ export function registerAllSerializers(): void {
     'research_state',
     'census_bureau',
     'passage',
+    'physics',
   ];
 
   for (const componentType of genericComponents) {
@@ -85,7 +104,7 @@ export function registerAllSerializers(): void {
   }
 
   console.log(
-    `[Persistence] Registered ${genericComponents.length + 10} component serializers`
+    `[Persistence] Registered ${genericComponents.length + 17} component serializers`
   );
 }
 
@@ -96,3 +115,23 @@ registerAllSerializers();
 export { componentSerializerRegistry } from '../ComponentSerializerRegistry.js';
 export { PositionSerializer } from './PositionSerializer.js';
 export { GenericComponentSerializer, createGenericSerializer } from './GenericSerializer.js';
+
+// Re-export all specific serializers
+export { TrustNetworkSerializer } from './TrustNetworkSerializer.js';
+export { ConflictSerializer } from './ConflictSerializer.js';
+export { InjurySerializer } from './InjurySerializer.js';
+export { GuardDutySerializer } from './GuardDutySerializer.js';
+export { CombatStatsSerializer } from './CombatStatsSerializer.js';
+export { DominanceRankSerializer } from './DominanceRankSerializer.js';
+export { PackCombatSerializer } from './PackCombatSerializer.js';
+export { HiveCombatSerializer } from './HiveCombatSerializer.js';
+export { ManchiSerializer } from './ManchiSerializer.js';
+
+// Export additional memory serializers
+export * from './EpisodicMemorySerializer.js';
+export * from './RelationshipSerializer.js';
+export * from './ExplorationStateSerializer.js';
+export * from './SocialGradientSerializer.js';
+export * from './PlantSerializer.js';
+export * from './SpatialMemorySerializer.js';
+export * from './JournalSerializer.js';

@@ -90,9 +90,39 @@ export class ReflectionSystem implements System {
 
     // Process reflection triggers
     for (const [agentId, trigger] of this.reflectionTriggers.entries()) {
+      // Handle 'broadcast' triggers - apply to all agents with reflection components
+      if (agentId === 'broadcast') {
+        const agents = world.query()
+          .with(CT.Agent)
+          .with(CT.EpisodicMemory)
+          .with(CT.SemanticMemory)
+          .with(CT.Reflection)
+          .executeEntities();
+
+        for (const agent of agents) {
+          const episodicMem = getEpisodicMemory(agent);
+          const semanticMem = getSemanticMemory(agent);
+          const reflectionComp = getReflection(agent);
+
+          if (!episodicMem || !semanticMem || !reflectionComp) continue;
+
+          if (trigger.type === 'deep') {
+            this._performDeepReflection(
+              agent.id,
+              episodicMem,
+              semanticMem,
+              reflectionComp,
+              trigger.timestamp
+            );
+          }
+        }
+        continue;
+      }
+
       const entity = world.getEntity(agentId);
       if (!entity) {
-        throw new Error(`Agent ${agentId} not found (reflection trigger)`);
+        // Skip if agent no longer exists (may have been removed)
+        continue;
       }
 
       const episodicMem = getEpisodicMemory(entity);

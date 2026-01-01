@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Context Menu Test</title>
+  <style>
+    body { margin: 0; padding: 20px; background: #333; }
+    canvas { border: 2px solid #fff; background: #1a1a1a; }
+  </style>
+</head>
+<body>
+  <h1 style="color: #fff;">Context Menu Rendering Test</h1>
+  <p style="color: #ccc;">Click anywhere on the canvas to render a test menu</p>
+  <canvas id="testCanvas" width="800" height="600"></canvas>
+
+  <script type="module">
+    const canvas = document.getElementById('testCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function drawTestMenu(x, y) {
+      console.log('[Test] Drawing menu at', x, y);
+
+      ctx.save();
+
+      // Clear canvas first
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const innerRadius = 30;
+      const outerRadius = 100;
+
+      // Draw menu background circle
+      ctx.beginPath();
+      ctx.arc(x, y, outerRadius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fill();
+
+      // Draw menu border
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Draw inner circle (dead zone)
+      ctx.beginPath();
+      ctx.arc(x, y, innerRadius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+      ctx.fill();
+
+      // Draw 4 test items
+      const itemCount = 4;
+      const gap = 3;
+      const arcPerItem = (360 - (gap * itemCount)) / itemCount;
+
+      for (let i = 0; i < itemCount; i++) {
+        const startAngle = i * (arcPerItem + gap);
+        const endAngle = startAngle + arcPerItem;
+        const startRad = (startAngle * Math.PI) / 180;
+        const endRad = (endAngle * Math.PI) / 180;
+
+        ctx.save();
+        ctx.translate(x, y);
+
+        // Draw arc segment
+        ctx.beginPath();
+        ctx.arc(0, 0, outerRadius, startRad, endRad);
+        ctx.arc(0, 0, innerRadius, endRad, startRad, true);
+        ctx.closePath();
+
+        // Fill
+        ctx.fillStyle = '#FFD700';
+        ctx.fill();
+
+        // Border
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Label
+        const midAngle = (startAngle + endAngle) / 2;
+        const midRadius = (innerRadius + outerRadius) / 2;
+        const labelX = midRadius * Math.cos((midAngle * Math.PI) / 180);
+        const labelY = midRadius * Math.sin((midAngle * Math.PI) / 180);
+
+        ctx.fillStyle = '#000';
+        ctx.font = '12px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`Item ${i+1}`, labelX, labelY);
+
+        ctx.restore();
+      }
+
+      ctx.restore();
+
+      console.log('[Test] Menu drawn successfully');
+    }
+
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      drawTestMenu(x, y);
+    });
+
+    // Draw initial menu in center
+    drawTestMenu(400, 300);
+  </script>
+</body>
+</html>

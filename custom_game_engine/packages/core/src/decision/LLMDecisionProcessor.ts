@@ -8,8 +8,15 @@
  */
 import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
-import type { AgentComponent, AgentBehavior, QueuedBehavior, StrategicPriorities, PlannedBuild } from '../components/AgentComponent.js';
-import { PLANNED_BUILD_REACH } from '../components/AgentComponent.js';
+import type { AgentComponent, AgentBehavior, QueuedBehavior, StrategicPriorities, PlannedBuild, AgentTier } from '../components/AgentComponent.js';
+import { PLANNED_BUILD_REACH, AGENT_TIER_CONFIG, shouldUseLLM, disableInteractionLLM } from '../components/AgentComponent.js';
+
+/**
+ * Duration (in ticks) that interaction-triggered LLM remains active.
+ * After this, autonomic NPCs return to scripted behavior.
+ * 60 seconds at 20 TPS = 1200 ticks
+ */
+const INTERACTION_LLM_TIMEOUT_TICKS = 1200;
 import type { InventoryComponent } from '../components/InventoryComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import { parseAction, actionToBehavior } from '../actions/AgentAction.js';
@@ -93,6 +100,12 @@ function actionObjectToBehavior(action: ParsedAction): { behavior: AgentBehavior
       return { behavior: 'explore', behaviorState };
     case 'deposit_items':
       return { behavior: 'deposit_items', behaviorState };
+    case 'research':
+      // Optional: specify research ID if the action includes it
+      if (action.target) {
+        behaviorState.researchId = action.target;
+      }
+      return { behavior: 'research', behaviorState };
     case 'trade':
     case 'buy':
     case 'sell':
@@ -146,6 +159,8 @@ function generateBehaviorLabel(action: ParsedAction): string {
       return 'Explore area';
     case 'deposit_items':
       return 'Store items';
+    case 'research':
+      return action.target ? `Research ${action.target}` : 'Conduct research';
     case 'trade':
     case 'buy':
       return `Buy ${action.amount || 1} ${action.recipe || action.building || 'items'}`;
@@ -339,29 +354,48 @@ export class LLMDecisionProcessor {
   }
   /**
    * Check if agent should call LLM (smart calling).
+   * Respects agent tier configuration for different LLM usage patterns.
    */
   private shouldCallLLM(agent: AgentComponent): boolean {
     // Master toggle - if LLM agents disabled, never call
     if (!this.config.enableLLMAgents) {
       return false;
     }
+
+    // Check if this agent should use LLM based on tier and interaction state
+    if (!shouldUseLLM(agent)) {
+      return false;
+    }
+
+    // Get tier configuration
+    const tier: AgentTier = agent.tier ?? (agent.useLLM ? 'full' : 'autonomic');
+    const tierConfig = AGENT_TIER_CONFIG[tier];
+
     const now = Date.now();
-    // Always call if task just completed
-    if (agent.behaviorCompleted) {
+
+    // Task completion trigger (if tier supports it)
+    if (agent.behaviorCompleted && tierConfig.thinkOnTaskComplete) {
       return true;
     }
-    // Call if no work and idle (with short delay)
-    if (!this.hasActiveWork(agent) && ['idle', 'wander', 'rest'].includes(agent.behavior)) {
+
+    // Idle thinking (if tier supports it)
+    if (tierConfig.idleThinkDelaySec !== null) {
+      if (!this.hasActiveWork(agent) && ['idle', 'wander', 'rest'].includes(agent.behavior)) {
+        const secondsSinceLastCall = (now - this.lastLLMRequestTime) / 1000;
+        if (secondsSinceLastCall >= tierConfig.idleThinkDelaySec) {
+          return true;
+        }
+      }
+    }
+
+    // Periodic thinking (if tier supports it)
+    if (tierConfig.periodicThinkSec !== null) {
       const secondsSinceLastCall = (now - this.lastLLMRequestTime) / 1000;
-      if (secondsSinceLastCall >= this.config.idleThinkDelaySeconds) {
+      if (secondsSinceLastCall >= tierConfig.periodicThinkSec) {
         return true;
       }
     }
-    // Minimum cadence - call even if busy, but much less frequently (real time)
-    const secondsSinceLastCall = (now - this.lastLLMRequestTime) / 1000;
-    if (secondsSinceLastCall >= this.config.minThinkCadenceSeconds) {
-      return true;
-    }
+
     return false;
   }
   /**
@@ -373,6 +407,18 @@ export class LLMDecisionProcessor {
     agent: AgentComponent,
     getNearbyAgents: (entity: EntityImpl, world: World, range: number) => Entity[]
   ): LLMDecisionResult {
+    // Check for interaction-triggered LLM timeout (for autonomic agents)
+    if (agent.tier === 'autonomic' && agent.interactionTriggeredLLM && agent.interactionLLMStartTick !== undefined) {
+      const ticksElapsed = world.tick - agent.interactionLLMStartTick;
+      if (ticksElapsed >= INTERACTION_LLM_TIMEOUT_TICKS) {
+        // Interaction window expired - disable LLM and return to scripted behavior
+        entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) =>
+          disableInteractionLLM(current)
+        );
+        return { changed: false, source: 'llm' };
+      }
+    }
+
     // Decrement cooldown
     if (agent.llmCooldown > 0) {
       entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({

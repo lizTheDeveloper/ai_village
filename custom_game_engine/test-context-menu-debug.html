@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Context Menu Debug Test</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #fff;
+      font-family: monospace;
+    }
+    #canvas {
+      border: 2px solid #fff;
+      display: block;
+      image-rendering: pixelated;
+    }
+    #info {
+      margin-top: 10px;
+      padding: 10px;
+      background: #2a2a2a;
+      border: 1px solid #444;
+    }
+  </style>
+</head>
+<body>
+  <h1>Context Menu Rendering Debug</h1>
+  <canvas id="canvas" width="800" height="600"></canvas>
+  <div id="info">
+    <p>Status: <span id="status">Initializing...</span></p>
+    <p>Menu State: <span id="menu-state">Closed</span></p>
+    <p>Last Right-Click: <span id="last-click">None</span></p>
+    <p>Render Calls: <span id="render-count">0</span></p>
+  </div>
+
+  <script type="module">
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const statusEl = document.getElementById('status');
+    const menuStateEl = document.getElementById('menu-state');
+    const lastClickEl = document.getElementById('last-click');
+    const renderCountEl = document.getElementById('render-count');
+
+    let renderCount = 0;
+    let isMenuOpen = false;
+    let menuX = 0;
+    let menuY = 0;
+
+    // Simple menu rendering test
+    function renderMenu(x, y) {
+      renderCount++;
+      renderCountEl.textContent = renderCount;
+
+      // Draw menu background circle
+      ctx.save();
+
+      // Outer circle
+      ctx.beginPath();
+      ctx.arc(x, y, 100, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Inner circle (dead zone)
+      ctx.beginPath();
+      ctx.arc(x, y, 30, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+      ctx.fill();
+
+      // Draw 4 menu items
+      const items = [
+        { label: 'Move', angle: 0 },
+        { label: 'Build', angle: 90 },
+        { label: 'Info', angle: 180 },
+        { label: 'Cancel', angle: 270 }
+      ];
+
+      for (const item of items) {
+        const radians = (item.angle * Math.PI) / 180;
+        const textX = x + 65 * Math.cos(radians);
+        const textY = y + 65 * Math.sin(radians);
+
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '12px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(item.label, textX, textY);
+      }
+
+      ctx.restore();
+    }
+
+    // Clear canvas
+    function clear() {
+      ctx.fillStyle = '#333';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Render loop
+    function render() {
+      clear();
+
+      if (isMenuOpen) {
+        renderMenu(menuX, menuY);
+        menuStateEl.textContent = `Open at (${menuX}, ${menuY})`;
+      } else {
+        menuStateEl.textContent = 'Closed';
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    // Right-click handler
+    canvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      menuX = e.clientX - rect.left;
+      menuY = e.clientY - rect.top;
+      isMenuOpen = true;
+      lastClickEl.textContent = `(${menuX.toFixed(0)}, ${menuY.toFixed(0)})`;
+      console.log('[Debug] Right-click at:', menuX, menuY);
+    });
+
+    // Click to close
+    canvas.addEventListener('click', () => {
+      if (isMenuOpen) {
+        isMenuOpen = false;
+        console.log('[Debug] Menu closed');
+      }
+    });
+
+    // Start
+    statusEl.textContent = 'Ready - Right-click to open menu';
+    render();
+  </script>
+</body>
+</html>

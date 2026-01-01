@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Context Menu Trace Test</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #1a1a1a;
+    }
+    canvas {
+      display: block;
+      border: 2px solid #333;
+    }
+    #log {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 400px;
+      max-height: 90vh;
+      background: rgba(0, 0, 0, 0.9);
+      color: #0f0;
+      font-family: monospace;
+      font-size: 12px;
+      padding: 10px;
+      overflow-y: auto;
+      border: 1px solid #0f0;
+    }
+    .log-entry {
+      margin: 2px 0;
+    }
+    .log-error {
+      color: #f00;
+    }
+    .log-warn {
+      color: #ff0;
+    }
+    .log-info {
+      color: #0ff;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" width="800" height="600"></canvas>
+  <div id="log">
+    <div class="log-info">Context Menu Trace Test</div>
+    <div class="log-info">Right-click anywhere on canvas to test</div>
+    <div class="log-info">---</div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const logEl = document.getElementById('log');
+
+    function log(message, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = `log-entry log-${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logEl.appendChild(entry);
+      logEl.scrollTop = logEl.scrollHeight;
+      console.log(message);
+    }
+
+    // Override console methods to capture logs
+    const originalConsoleLog = console.log;
+    const originalConsoleError = console.error;
+    const originalConsoleWarn = console.warn;
+
+    console.log = (...args) => {
+      log(args.join(' '), 'info');
+      originalConsoleLog.apply(console, args);
+    };
+
+    console.error = (...args) => {
+      log(args.join(' '), 'error');
+      originalConsoleError.apply(console, args);
+    };
+
+    console.warn = (...args) => {
+      log(args.join(' '), 'warn');
+      originalConsoleWarn.apply(console, args);
+    };
+
+    log('Initializing context menu test...', 'info');
+
+    // Test 1: Basic canvas rendering
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    log('Canvas cleared', 'info');
+
+    // Test 2: Draw a test circle to verify rendering works
+    ctx.beginPath();
+    ctx.arc(400, 300, 50, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    log('Test circle drawn at center (should be visible)', 'info');
+
+    // Test 3: Simulate context menu rendering
+    function renderTestMenu(x, y) {
+      log(`Attempting to render menu at (${x}, ${y})`, 'info');
+
+      ctx.save();
+
+      // Draw menu background circle
+      ctx.beginPath();
+      ctx.arc(x, y, 100, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fill();
+
+      // Draw menu border
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Draw inner circle (dead zone)
+      ctx.beginPath();
+      ctx.arc(x, y, 30, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+      ctx.fill();
+
+      // Draw a test item arc
+      const startRad = 0;
+      const endRad = (60 * Math.PI) / 180;
+
+      ctx.beginPath();
+      ctx.arc(x, y, 100, startRad, endRad);
+      ctx.arc(x, y, 30, endRad, startRad, true);
+      ctx.closePath();
+
+      ctx.fillStyle = '#FFD700';
+      ctx.fill();
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Draw label
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '12px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const labelX = 65 * Math.cos(30 * Math.PI / 180);
+      const labelY = 65 * Math.sin(30 * Math.PI / 180);
+      ctx.fillText('Test', x + labelX, y + labelY);
+
+      ctx.restore();
+
+      log('Menu rendered successfully', 'info');
+    }
+
+    // Test 4: Right-click handler
+    canvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      log(`Right-click detected at (${x}, ${y})`, 'info');
+
+      // Clear canvas
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Render test menu
+      renderTestMenu(x, y);
+    });
+
+    log('Test initialized. Right-click on canvas to test rendering.', 'info');
+  </script>
+</body>
+</html>

@@ -9,6 +9,7 @@ export { WorldContextBuilder } from './WorldContextBuilder.js';
 export { VillageInfoBuilder } from './VillageInfoBuilder.js';
 export { MemoryBuilder } from './MemoryBuilder.js';
 export { ActionBuilder } from './ActionBuilder.js';
+export { HarmonyContextBuilder } from './HarmonyContextBuilder.js';
 
 // Utility functions
 export {

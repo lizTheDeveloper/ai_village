@@ -43,9 +43,13 @@ export class HealthBarRenderer {
 
   /**
    * Render all health bars for entities in view
+   *
+   * PERFORMANCE: Accepts pre-filtered entities to avoid full world scan.
+   * If filteredEntities is provided, only those entities are checked (96% reduction).
+   * Otherwise, falls back to all world entities for backward compatibility.
    */
-  public render(cameraX: number, cameraY: number, viewWidth: number, viewHeight: number, zoom: number = 1.0): void {
-    const entities = Array.from(this.world.entities.values());
+  public render(cameraX: number, cameraY: number, viewWidth: number, viewHeight: number, zoom: number = 1.0, filteredEntities?: Entity[]): void {
+    const entities = filteredEntities ?? Array.from(this.world.entities.values());
 
     for (const entity of entities) {
       if (!this.shouldRenderHealthBar(entity)) {

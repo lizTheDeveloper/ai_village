@@ -129,6 +129,11 @@ export {
   type ArmorSlot,
 } from './traits/ArmorTrait.js';
 
+// Material trait (surreal building materials)
+export {
+  type MaterialTrait,
+} from './traits/MaterialTrait.js';
+
 // Artifact system (forward-compatibility)
 export {
   type StrangeMoodType,

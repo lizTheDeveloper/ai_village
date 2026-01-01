@@ -5,6 +5,7 @@ import type { Entity } from '../ecs/Entity.js';
 import type { RealmComponent } from '../components/RealmComponent.js';
 import type { RealmLocationComponent } from '../components/RealmLocationComponent.js';
 import type { RealmProperties } from '../realms/RealmTypes.js';
+import type { AgentComponent } from '../components/AgentComponent.js';
 
 /**
  * RealmManager - Manages all active realms
@@ -31,6 +32,12 @@ export class RealmManager implements System {
 
       const realm = entity.components.get('realm') as RealmComponent | undefined;
       if (!realm || !realm.active) continue;
+
+      // Skip processing uninhabited realms (performance optimization)
+      // Realms only matter when entities are in them
+      if (realm.inhabitants.length === 0) {
+        continue;
+      }
 
       // Calculate realm-specific delta based on time dilation
       const realmDelta = deltaTime * realm.properties.timeRatio;
@@ -172,5 +179,46 @@ export class RealmManager implements System {
    */
   getActiveRealms(): string[] {
     return Array.from(this.realms.keys());
+  }
+
+  /**
+   * Check if realm has any LLM-controlled agents
+   */
+  hasLLMAgents(realmId: string, world: World): boolean {
+    const realm = this.getRealm(realmId, world);
+    if (!realm) return false;
+
+    for (const inhabitantId of realm.inhabitants) {
+      const entity = world.getEntity(inhabitantId);
+      if (!entity) continue;
+
+      const agent = entity.components.get('agent') as AgentComponent | undefined;
+      if (agent?.useLLM) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Get count of LLM agents in a realm
+   */
+  getLLMAgentCount(realmId: string, world: World): number {
+    const realm = this.getRealm(realmId, world);
+    if (!realm) return 0;
+
+    let count = 0;
+    for (const inhabitantId of realm.inhabitants) {
+      const entity = world.getEntity(inhabitantId);
+      if (!entity) continue;
+
+      const agent = entity.components.get('agent') as AgentComponent | undefined;
+      if (agent?.useLLM) {
+        count++;
+      }
+    }
+
+    return count;
   }
 }

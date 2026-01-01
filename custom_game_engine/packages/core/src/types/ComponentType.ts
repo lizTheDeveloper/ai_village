@@ -23,6 +23,8 @@ export enum ComponentType {
   Inventory = 'inventory',
   Item = 'item',
   Resource = 'resource',
+  VoxelResource = 'voxel_resource',
+  EquipmentSlots = 'equipment_slots',
 
   // Needs & Status
   Needs = 'needs',
@@ -61,12 +63,16 @@ export enum ComponentType {
 
   // Buildings & Structures
   Building = 'building',
+  BuildingHarmony = 'building_harmony',
   TownHall = 'town_hall',
   CensusBureau = 'census_bureau',
   HealthClinic = 'health_clinic',
   WeatherStation = 'weather_station',
   Shop = 'shop',
   Warehouse = 'warehouse',
+
+  // City Management
+  CityDirector = 'city_director',
 
   // Economy & Trade
   Currency = 'currency',

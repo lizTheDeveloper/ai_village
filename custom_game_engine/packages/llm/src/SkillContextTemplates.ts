@@ -46,6 +46,37 @@ You can plan complex multi-stage construction projects.`,
 You can design structures that will last generations and train others.`,
   },
 
+  architecture: {
+    0: null,
+    1: 'You notice some buildings feel more comfortable than others.',
+    2: `You're learning spatial harmony (Feng Shui):
+- Energy (chi) should flow smoothly through spaces
+- Avoid long straight lines from entrances (creates Sha Qi - killing breath)
+- Stagnant corners collect negative energy
+- Room proportions affect how people feel`,
+    3: `Your spatial harmony skills include:
+- Detecting chi flow problems in buildings
+- Understanding the five element balance (wood, fire, earth, metal, water)
+- Knowing that beds and desks need "commanding positions" (wall behind, view of door)
+- Recognizing proportions near the golden ratio (1.618) as most pleasing
+- Identifying clashing vs harmonious district adjacencies`,
+    4: `As an architecture expert, you understand:
+- Full Feng Shui analysis of any building
+- How to improve harmony through furniture placement
+- Element balance at both building and city scale
+- Design principles that make occupants happier and more productive
+- Ming Tang (bright hall) central plaza design for cities
+- Dragon vein chi flow through urban layouts`,
+    5: `As a master architect, you can:
+- Design buildings with sublime harmony (90+ score)
+- Plan cities with optimal chi circulation
+- Balance the five elements across settlements
+- Create spaces that heal and inspire
+- Teach spatial harmony principles to others
+- Sense energy imbalances instantly from afar
+You can design legendary structures that become places of pilgrimage.`,
+  },
+
   farming: {
     0: null,
     1: 'You know the basics of farming. Plants need water and sunlight to grow.',
@@ -322,6 +353,31 @@ You can move unseen through any environment.`,
 - Community health management
 - Rare treatment methods
 You can cure the incurable and train physicians.`,
+  },
+
+  research: {
+    0: null,
+    1: 'You understand that careful study can lead to new discoveries. Observation and experimentation matter.',
+    2: `You grasp research fundamentals:
+- Systematic observation techniques
+- Recording and comparing results
+- Building on existing knowledge`,
+    3: `Your research skills include:
+- Hypothesis formation and testing
+- Identifying patterns in data
+- Connecting disparate ideas
+- Research methodology`,
+    4: `As a research expert, you know:
+- Advanced experimental design
+- Knowledge synthesis across domains
+- Innovation through systematic exploration
+- Research project management`,
+    5: `As a master researcher, you possess:
+- Groundbreaking discovery methods
+- Teaching research techniques
+- Building research institutions
+- Pushing the boundaries of knowledge
+You can unlock transformative technologies and mentor future scholars.`,
   },
 };
 

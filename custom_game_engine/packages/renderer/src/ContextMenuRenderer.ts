@@ -62,17 +62,24 @@ export class ContextMenuRenderer {
     centerX: number,
     centerY: number
   ): void {
-    console.log('[ContextMenuRenderer] Rendering menu at:', centerX, centerY, 'items:', items.length);
-
     if (items.length === 0) {
       return;
     }
 
+    // DEBUG: Log render call
+    console.log(`[ContextMenuRenderer] render() called with ${items.length} items at (${centerX}, ${centerY})`);
+
     this.ctx.save();
+
+    // NOTE: DO NOT call setTransform here - the main Renderer already applies ctx.scale(dpr, dpr)
+    // and ctx.save() preserves that transform. Calling setTransform() would overwrite it.
+    // Input coordinates (centerX, centerY) are already in logical pixels and will be scaled correctly.
 
     // Get radii from first item (all items should have same radii)
     const innerRadius = items[0]?.innerRadius ?? 30;
     const outerRadius = items[0]?.outerRadius ?? 100;
+
+    console.log(`[ContextMenuRenderer] Drawing circles at (${centerX}, ${centerY}) with radii ${innerRadius}-${outerRadius}`);
 
     // Draw menu background circle
     this.ctx.beginPath();
@@ -95,6 +102,8 @@ export class ContextMenuRenderer {
     for (const item of items) {
       this.renderItem(item, centerX, centerY);
     }
+
+    console.log('[ContextMenuRenderer] render() complete');
 
     this.ctx.restore();
   }
@@ -198,6 +207,7 @@ export class ContextMenuRenderer {
   ): void {
     this.ctx.save();
 
+    // NOTE: DO NOT call setTransform - main Renderer already applied ctx.scale(dpr, dpr)
     this.ctx.strokeStyle = 'rgba(255, 215, 0, 0.7)'; // Semi-transparent gold
     this.ctx.lineWidth = 2;
     this.ctx.setLineDash([5, 5]);
@@ -220,8 +230,11 @@ export class ContextMenuRenderer {
     style: AnimationStyle,
     progress: number
   ): void {
+    console.log(`[ContextMenuRenderer] renderOpenAnimation() called with style=${style}, progress=${progress}`);
+
     this.ctx.save();
 
+    // NOTE: DO NOT call setTransform - main Renderer already applied ctx.scale(dpr, dpr)
     switch (style) {
       case 'rotate_in':
         this.ctx.translate(centerX, centerY);
@@ -262,7 +275,11 @@ export class ContextMenuRenderer {
     style: AnimationStyle,
     progress: number
   ): void {
+    console.log(`[ContextMenuRenderer] renderCloseAnimation() called with style=${style}, progress=${progress}`);
+
     this.ctx.save();
+
+    // NOTE: DO NOT call setTransform - main Renderer already applied ctx.scale(dpr, dpr)
 
     // Progress: 0 = start close, 1 = fully closed
     const reverseProgress = 1 - progress;

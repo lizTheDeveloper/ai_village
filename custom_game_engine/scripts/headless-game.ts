@@ -518,7 +518,7 @@ async function setupLLMProvider(): Promise<{
           baseUrl: 'http://localhost:8080',
           model: 'mlx-community/Qwen3-4B-Instruct-4bit',
         });
-        const queue = new LLMDecisionQueue(provider, { maxConcurrent: 3 });
+        const queue = new LLMDecisionQueue(provider, 3);
         const promptBuilder = new StructuredPromptBuilder();
         return { provider, queue, promptBuilder };
       }
@@ -533,7 +533,7 @@ async function setupLLMProvider(): Promise<{
     if (response.ok) {
       console.log('[HeadlessGame] Using Ollama');
       const provider = new OllamaProvider({ model: 'qwen3:1.7b' });
-      const queue = new LLMDecisionQueue(provider, { maxConcurrent: 3 });
+      const queue = new LLMDecisionQueue(provider, 3);
       const promptBuilder = new StructuredPromptBuilder();
       return { provider, queue, promptBuilder };
     }
@@ -577,8 +577,8 @@ async function main() {
   const baseGameLoop = new GameLoop();
   const headlessLoop = new HeadlessGameLoop(baseGameLoop);
 
-  // Register building blueprints
-  registerShopBlueprints(BuildingBlueprintRegistry.getInstance());
+  // Building blueprints are auto-registered by World when needed
+  // No need to manually register here
 
   // Set up world entity
   const worldEntity = new EntityImpl(createEntityId(), baseGameLoop.world.tick);

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Context Menu Minimal Test</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #1a1a1a;
+      color: white;
+      font-family: monospace;
+    }
+    #canvas {
+      border: 2px solid #4CAF50;
+      display: block;
+      margin: 20px auto;
+      background: #2a2a2a;
+    }
+    #status {
+      text-align: center;
+      margin: 10px;
+      padding: 10px;
+      background: #333;
+      border-radius: 4px;
+    }
+    .success { color: #4CAF50; }
+    .error { color: #f44336; }
+    .info { color: #2196F3; }
+  </style>
+</head>
+<body>
+  <div id="status" class="info">
+    Right-click on the canvas to open context menu
+  </div>
+  <canvas id="canvas" width="800" height="600"></canvas>
+
+  <script type="module">
+    // Minimal test - directly draw radial menu on right-click
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const status = document.getElementById('status');
+
+    let menuOpen = false;
+    let menuX = 0;
+    let menuY = 0;
+
+    // Menu configuration
+    const innerRadius = 30;
+    const outerRadius = 100;
+    const items = [
+      { label: 'Move', color: '#4CAF50' },
+      { label: 'Attack', color: '#f44336' },
+      { label: 'Inspect', color: '#2196F3' },
+      { label: 'Trade', color: '#FF9800' },
+    ];
+
+    function drawMenu(x, y) {
+      // Save context
+      ctx.save();
+
+      // CRITICAL: Reset transform to identity for UI rendering
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+      // Draw background circle
+      ctx.beginPath();
+      ctx.arc(x, y, outerRadius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Draw inner circle
+      ctx.beginPath();
+      ctx.arc(x, y, innerRadius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+      ctx.fill();
+
+      // Draw items
+      const arcPerItem = 360 / items.length;
+      const gap = 3;
+
+      items.forEach((item, index) => {
+        const startAngle = index * arcPerItem;
+        const endAngle = startAngle + arcPerItem - gap;
+        const startRad = (startAngle * Math.PI) / 180;
+        const endRad = (endAngle * Math.PI) / 180;
+
+        // Draw arc segment
+        ctx.save();
+        ctx.translate(x, y);
+
+        ctx.beginPath();
+        ctx.arc(0, 0, outerRadius, startRad, endRad);
+        ctx.arc(0, 0, innerRadius, endRad, startRad, true);
+        ctx.closePath();
+
+        ctx.fillStyle = item.color;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Draw label
+        const midAngle = (startAngle + endAngle) / 2;
+        const midRadius = (innerRadius + outerRadius) / 2;
+        const labelX = midRadius * Math.cos((midAngle * Math.PI) / 180);
+        const labelY = midRadius * Math.sin((midAngle * Math.PI) / 180);
+
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '14px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(item.label, labelX, labelY);
+
+        ctx.restore();
+      });
+
+      // Restore context
+      ctx.restore();
+
+      status.textContent = `Menu rendered at (${x}, ${y})`;
+      status.className = 'success';
+    }
+
+    function clearCanvas() {
+      ctx.fillStyle = '#2a2a2a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function render() {
+      clearCanvas();
+      if (menuOpen) {
+        drawMenu(menuX, menuY);
+      }
+      requestAnimationFrame(render);
+    }
+
+    // Handle right-click
+    canvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      menuX = e.clientX - rect.left;
+      menuY = e.clientY - rect.top;
+      menuOpen = true;
+      status.textContent = `Right-click detected at (${menuX}, ${menuY})`;
+      status.className = 'info';
+    });
+
+    // Handle click to close
+    canvas.addEventListener('click', (e) => {
+      if (menuOpen) {
+        menuOpen = false;
+        status.textContent = 'Menu closed';
+        status.className = 'info';
+      }
+    });
+
+    // Start render loop
+    render();
+
+    console.log('[Test] Context menu minimal test initialized');
+    console.log('[Test] Right-click on canvas to open menu');
+  </script>
+</body>
+</html>

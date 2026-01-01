@@ -10,6 +10,7 @@ export * from './System.js';
 export * from './SystemRegistry.js';
 export * from './QueryBuilder.js';
 export * from './World.js';
+export * from './SimulationScheduler.js';
 
 // Re-export types explicitly (export * doesn't re-export types)
 // Note: BiomeType is also exported from SoilSystem.ts - avoid duplicate exports

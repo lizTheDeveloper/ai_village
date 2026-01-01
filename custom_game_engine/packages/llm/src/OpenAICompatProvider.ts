@@ -137,8 +137,11 @@ export class OpenAICompatProvider implements LLMProvider {
 
   async generate(request: LLMRequest): Promise<LLMResponse> {
     try {
-      // const _isQwen = this.isQwenModel();
-      // const _isLlama = this.isLlamaModel();
+      // If the prompt already asks for JSON output, use text-based generation
+      // to avoid conflicting instructions (JSON format vs tool calling)
+      if (request.prompt.includes('RESPOND IN JSON') || request.prompt.includes('respond in JSON')) {
+        return this.generateWithoutTools(request);
+      }
 
       // Define action tools - matches ActionDefinitions.ts
       // NOTE: Autonomic behaviors (wander, rest, idle) are NOT included
@@ -353,7 +356,7 @@ Keep speech brief and natural.`
             { role: 'user', content: request.prompt }
           ],
           temperature: request.temperature ?? 0.7,
-          max_tokens: request.maxTokens ?? 40960,
+          max_tokens: request.maxTokens ?? 32768,
           tools: tools,
           tool_choice: 'auto',
         }),
@@ -486,21 +489,33 @@ Keep speech brief and natural.`
       headers['Authorization'] = `Bearer ${this.apiKey}`;
     }
 
-    // System message for text-based responses
-    // Model-specific thinking format
-    const isQwen = this.model.toLowerCase().includes('qwen');
-    const isDeepseek = this.model.toLowerCase().includes('deepseek');
+    // Check if prompt already contains JSON format instructions
+    const promptExpectsJson = request.prompt.includes('RESPOND IN JSON') ||
+                              request.prompt.includes('respond in JSON');
 
-    let thoughtFormat: string;
-    if (isQwen || isDeepseek) {
-      thoughtFormat = `<think>[your reasoning]</think>`;
+    let messages: Array<{ role: string; content: string }>;
+
+    if (promptExpectsJson) {
+      // Prompt already has its own instructions - just pass it through as user message
+      // The LLM will follow the embedded JSON format instructions
+      messages = [
+        { role: 'user', content: request.prompt }
+      ];
     } else {
-      thoughtFormat = `Thought: [your reasoning]`;
-    }
+      // No JSON instructions in prompt - add our own system message
+      const isQwen = this.model.toLowerCase().includes('qwen');
+      const isDeepseek = this.model.toLowerCase().includes('deepseek');
 
-    const systemMessage = {
-      role: 'system',
-      content: `You are an AI controlling a village character.
+      let thoughtFormat: string;
+      if (isQwen || isDeepseek) {
+        thoughtFormat = `<think>[your reasoning]</think>`;
+      } else {
+        thoughtFormat = `Thought: [your reasoning]`;
+      }
+
+      const systemMessage = {
+        role: 'system',
+        content: `You are an AI controlling a village character.
 
 Format your response like this:
 ${thoughtFormat}
@@ -511,18 +526,18 @@ Actions can have targets: "gather wood 20" or "build storage-chest" or "talk Hav
 Use plan_build to queue a building project - you'll automatically gather resources then build it! Example: "plan_build storage-chest"
 
 Be brief and natural.`
-    };
+      };
+      messages = [systemMessage, { role: 'user', content: request.prompt }];
+    }
+
     const response = await this.fetchWithRetry(`${this.baseUrl}/chat/completions`, {
       method: 'POST',
       headers,
       body: JSON.stringify({
         model: this.model,
-        messages: [
-          systemMessage,
-          { role: 'user', content: request.prompt }
-        ],
+        messages,
         temperature: request.temperature ?? 0.7,
-        max_tokens: request.maxTokens ?? 40960,
+        max_tokens: request.maxTokens ?? 32768,
       }),
     });
 
@@ -533,6 +548,31 @@ Be brief and natural.`
     }
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || '';
+
+    // If prompt expected JSON, try to parse it directly
+    if (promptExpectsJson) {
+      // The LLM should have returned JSON. Try to extract it.
+      // Look for JSON object in the response (may have extra text around it)
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        try {
+          const parsed = JSON.parse(jsonMatch[0]);
+          // Normalize to expected format: {thinking, speaking, action}
+          const responseText = JSON.stringify({
+            thinking: '', // StructuredPromptBuilder doesn't ask for thinking
+            speaking: parsed.speaking || '',
+            action: parsed.action || 'wander'
+          });
+          return {
+            text: responseText,
+            stopReason: data.choices?.[0]?.finish_reason,
+            tokensUsed: data.usage?.total_tokens,
+          };
+        } catch {
+          // JSON parse failed, fall through to text parsing
+        }
+      }
+    }
 
     // Parse the structured text response
     // Support both <think> tags (Qwen/DeepSeek) and "Thought:" prefix
@@ -570,7 +610,6 @@ Be brief and natural.`
       speaking: speech === '...' ? '' : speech,
       action: action
     });
-
 
     return {
       text: responseText,

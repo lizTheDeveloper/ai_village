@@ -139,7 +139,7 @@ export class ContextActionRegistry {
    * Find a submenu action by ID.
    */
   private findSubmenuAction(actionId: string): ContextAction | null {
-    for (const action of this.actions.values()) {
+    for (const action of Array.from(this.actions.values())) {
       if (action.submenu) {
         const submenuAction = action.submenu.find(a => a.id === actionId);
         if (submenuAction) return submenuAction;

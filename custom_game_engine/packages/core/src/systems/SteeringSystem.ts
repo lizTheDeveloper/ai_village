@@ -30,7 +30,12 @@ export class SteeringSystem implements System {
   private stuckTracker: Map<string, { lastPos: Vector2; stuckTime: number; target: Vector2 }> = new Map();
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+    // Update agent positions in scheduler
+    world.simulationScheduler.updateAgentPositions(world);
+
     // Get entities with steering component
+    // NOTE: We don't filter steering entities themselves (agents always need to steer)
+    // but obstacle filtering happens in _avoidObstacles using spatial queries
     const steeringEntities = entities.filter(e => e.components.has(CT.Steering));
 
     for (const entity of steeringEntities) {
@@ -93,6 +98,15 @@ export class SteeringSystem implements System {
       case 'combined':
         steeringForce = this._combined(entity, position, velocity, steering, world);
         break;
+    }
+
+    // Add containment force if bounds are set (applies to ALL behaviors)
+    if (steering.containmentBounds) {
+      const containmentForce = this._containment(position, velocity, steering);
+      steeringForce = {
+        x: steeringForce.x + containmentForce.x,
+        y: steeringForce.y + containmentForce.y,
+      };
     }
 
     // Apply steering force (clamped to maxForce)
@@ -253,9 +267,11 @@ export class SteeringSystem implements System {
       y: position.y + (velocity.vy / speed) * lookAheadDistance,
     };
 
-    // OPTIMIZATION: Only check obstacles within a small radius (3 tiles) instead of all entities
+    // OPTIMIZATION: Use SimulationScheduler to filter obstacles to only visible entities
+    // Buildings and agents are always checked (not filtered), but other obstacles are filtered
     const checkRadius = 3.0;
-    const obstacles = Array.from(world.entities.values()).filter((e: Entity) => {
+    const allEntities = Array.from(world.entities.values());
+    const obstacles = allEntities.filter((e: Entity) => {
       if (e.id === entity.id) return false;
       if (!e.components.has('collision')) return false;
 
@@ -324,6 +340,7 @@ export class SteeringSystem implements System {
 
   /**
    * Wander behavior - random but coherent movement
+   * Note: Containment is now applied globally after all steering behaviors
    */
   private _wander(position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent): Vector2 {
     const wanderRadius = steering.wanderRadius ?? 2.0;
@@ -357,8 +374,61 @@ export class SteeringSystem implements System {
       y: circleCenter.y + Math.sin(steering.wanderAngle) * wanderRadius,
     };
 
-    // Seek to target
     return this._seek(position, velocity, { ...steering, target });
+  }
+
+  /**
+   * Containment behavior - steer back toward bounds center when near edges
+   */
+  private _containment(position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent): Vector2 {
+    const bounds = steering.containmentBounds;
+    if (!bounds) return { x: 0, y: 0 };
+
+    const margin = steering.containmentMargin;
+    let forceX = 0;
+    let forceY = 0;
+
+    // Calculate distance to each boundary
+    const distToMinX = position.x - bounds.minX;
+    const distToMaxX = bounds.maxX - position.x;
+    const distToMinY = position.y - bounds.minY;
+    const distToMaxY = bounds.maxY - position.y;
+
+    // Calculate center of bounds
+    const centerX = (bounds.minX + bounds.maxX) / 2;
+    const centerY = (bounds.minY + bounds.maxY) / 2;
+
+    // Apply force proportional to how close agent is to boundary
+    // Force increases as agent gets closer to edge
+    if (distToMinX < margin) {
+      // Near left edge - steer right (toward center)
+      const urgency = 1 - (distToMinX / margin);
+      forceX += steering.maxForce * urgency;
+    }
+    if (distToMaxX < margin) {
+      // Near right edge - steer left (toward center)
+      const urgency = 1 - (distToMaxX / margin);
+      forceX -= steering.maxForce * urgency;
+    }
+    if (distToMinY < margin) {
+      // Near bottom edge - steer up (toward center)
+      const urgency = 1 - (distToMinY / margin);
+      forceY += steering.maxForce * urgency;
+    }
+    if (distToMaxY < margin) {
+      // Near top edge - steer down (toward center)
+      const urgency = 1 - (distToMaxY / margin);
+      forceY -= steering.maxForce * urgency;
+    }
+
+    // If completely outside bounds, seek center strongly
+    if (position.x < bounds.minX || position.x > bounds.maxX ||
+        position.y < bounds.minY || position.y > bounds.maxY) {
+      const seekTarget = { x: centerX, y: centerY };
+      return this._seek(position, velocity, { ...steering, target: seekTarget });
+    }
+
+    return { x: forceX, y: forceY };
   }
 
   /**

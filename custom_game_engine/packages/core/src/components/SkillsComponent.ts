@@ -19,6 +19,7 @@ import type { MagicSkillProgress } from '../magic/MagicSkillTree.js';
  */
 export type SkillId =
   | 'building'
+  | 'architecture'
   | 'farming'
   | 'gathering'
   | 'cooking'
@@ -29,7 +30,8 @@ export type SkillId =
   | 'hunting'
   | 'stealth'
   | 'animal_handling'
-  | 'medicine';
+  | 'medicine'
+  | 'research';
 
 /**
  * Skill levels from untrained to master.
@@ -65,6 +67,7 @@ export const XP_PER_LEVEL: Record<SkillLevel, number> = {
  */
 export const ALL_SKILL_IDS: readonly SkillId[] = [
   'building',
+  'architecture',
   'farming',
   'gathering',
   'cooking',
@@ -76,6 +79,7 @@ export const ALL_SKILL_IDS: readonly SkillId[] = [
   'stealth',
   'animal_handling',
   'medicine',
+  'research',
 ] as const;
 
 /**
@@ -83,6 +87,7 @@ export const ALL_SKILL_IDS: readonly SkillId[] = [
  */
 export const SKILL_ICONS: Record<SkillId, string> = {
   building: '🏗️',
+  architecture: '🏛️',
   farming: '🌾',
   gathering: '🪓',
   cooking: '🍳',
@@ -94,6 +99,7 @@ export const SKILL_ICONS: Record<SkillId, string> = {
   stealth: '🥷',
   animal_handling: '🐾',
   medicine: '💊',
+  research: '📚',
 };
 
 /**
@@ -101,6 +107,7 @@ export const SKILL_ICONS: Record<SkillId, string> = {
  */
 export const SKILL_NAMES: Record<SkillId, string> = {
   building: 'Building',
+  architecture: 'Architecture',
   farming: 'Farming',
   gathering: 'Gathering',
   cooking: 'Cooking',
@@ -112,6 +119,7 @@ export const SKILL_NAMES: Record<SkillId, string> = {
   stealth: 'Stealth',
   animal_handling: 'Animal Handling',
   medicine: 'Medicine',
+  research: 'Research',
 };
 
 /**
@@ -139,6 +147,7 @@ export const SKILL_PREREQUISITES: Record<SkillId, SkillPrerequisite[]> = {
   hunting: [{ skill: 'exploration', level: 1 }],
   stealth: [{ skill: 'exploration', level: 1 }],
   animal_handling: [{ skill: 'exploration', level: 1 }],
+  research: [{ skill: 'social', level: 1 }], // Research requires social skills (learning from others)
 
   // Tier 2 (require tier 1)
   cooking: [
@@ -152,6 +161,9 @@ export const SKILL_PREREQUISITES: Record<SkillId, SkillPrerequisite[]> = {
   medicine: [
     { skill: 'gathering', level: 2 },
     { skill: 'farming', level: 1 },
+  ],
+  architecture: [
+    { skill: 'building', level: 2 }, // Need solid building foundation before learning harmony
   ],
 };
 
@@ -232,6 +244,7 @@ export interface SkillsComponent extends Component {
 function createDefaultLevels(): Record<SkillId, SkillLevel> {
   return {
     building: 0,
+    architecture: 0,
     farming: 0,
     gathering: 0,
     cooking: 0,
@@ -243,6 +256,7 @@ function createDefaultLevels(): Record<SkillId, SkillLevel> {
     stealth: 0,
     animal_handling: 0,
     medicine: 0,
+    research: 0,
   };
 }
 
@@ -252,6 +266,7 @@ function createDefaultLevels(): Record<SkillId, SkillLevel> {
 function createDefaultExperience(): Record<SkillId, number> {
   return {
     building: 0,
+    architecture: 0,
     farming: 0,
     gathering: 0,
     cooking: 0,
@@ -263,6 +278,7 @@ function createDefaultExperience(): Record<SkillId, number> {
     stealth: 0,
     animal_handling: 0,
     medicine: 0,
+    research: 0,
   };
 }
 
@@ -272,6 +288,7 @@ function createDefaultExperience(): Record<SkillId, number> {
 function createDefaultAffinities(): Record<SkillId, number> {
   return {
     building: 1.0,
+    architecture: 1.0,
     farming: 1.0,
     gathering: 1.0,
     cooking: 1.0,
@@ -283,6 +300,7 @@ function createDefaultAffinities(): Record<SkillId, number> {
     stealth: 1.0,
     animal_handling: 1.0,
     medicine: 1.0,
+    research: 1.0,
   };
 }
 
@@ -324,6 +342,8 @@ export function generateAffinitiesFromPersonality(
   return {
     // Building: workEthic + conscientiousness
     building: calculateAffinity([personality.workEthic, personality.conscientiousness]),
+    // Architecture: openness + conscientiousness - creative thinking + attention to detail
+    architecture: calculateAffinity([personality.openness, personality.conscientiousness]),
     // Farming: conscientiousness + stability
     farming: calculateAffinity([personality.conscientiousness, stability]),
     // Gathering: workEthic
@@ -346,6 +366,8 @@ export function generateAffinitiesFromPersonality(
     animal_handling: calculateAffinity([personality.agreeableness, stability]),
     // Medicine: agreeableness + conscientiousness
     medicine: calculateAffinity([personality.agreeableness, personality.conscientiousness]),
+    // Research: openness + conscientiousness - curiosity + dedication to learning
+    research: calculateAffinity([personality.openness, personality.conscientiousness]),
   };
 }
 
@@ -850,6 +872,7 @@ export const SKILL_SPECIALIZATIONS: Record<SkillId, string[]> = {
   cooking: ['baking', 'grilling', 'stewing', 'preservation'],
   crafting: ['woodworking', 'smithing', 'leatherworking', 'weaving'],
   building: ['masonry', 'carpentry', 'thatching', 'plumbing'],
+  architecture: ['feng_shui', 'layout_planning', 'proportion_design', 'element_balance'],
   farming: ['irrigation', 'composting', 'seed_selection', 'greenhouse'],
   gathering: ['foraging', 'mining', 'logging', 'fishing'],
   animal_handling: ['taming', 'training', 'breeding', 'veterinary'],
@@ -859,6 +882,7 @@ export const SKILL_SPECIALIZATIONS: Record<SkillId, string[]> = {
   combat: ['melee', 'ranged', 'defense', 'tactics'],
   hunting: ['tracking', 'archery', 'trapping', 'butchering'],
   stealth: ['sneaking', 'hiding', 'silent_movement', 'camouflage'],
+  research: ['theory', 'experimentation', 'documentation', 'analysis'],
 };
 
 /**

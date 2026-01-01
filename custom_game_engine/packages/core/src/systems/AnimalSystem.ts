@@ -21,7 +21,16 @@ export class AnimalSystem implements System {
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    for (const entity of entities) {
+    // Update agent positions in scheduler
+    world.simulationScheduler.updateAgentPositions(world);
+
+    // Filter to only visible entities
+    const activeEntities = world.simulationScheduler.filterActiveEntities(
+      entities as Entity[],
+      world.tick
+    );
+
+    for (const entity of activeEntities) {
       const animal = entity.components.get(CT.Animal) as AnimalComponent | undefined;
       if (!animal) {
         continue;

@@ -11,6 +11,7 @@ import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { VelocityComponent } from '../components/VelocityComponent.js';
 import type { CircadianComponent } from '../components/CircadianComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
+import type { SteeringComponent } from '../components/SteeringComponent.js';
 import type { EventBus } from '../events/EventBus.js';
 
 interface TimeComponent {
@@ -230,12 +231,23 @@ export class MovementSystem implements System {
   }
 
   private updatePosition(impl: EntityImpl, x: number, y: number): void {
-    const newChunkX = Math.floor(x / 32);
-    const newChunkY = Math.floor(y / 32);
+    // Check for containment bounds and clamp position if necessary
+    const steering = impl.getComponent<SteeringComponent>(CT.Steering);
+    let clampedX = x;
+    let clampedY = y;
+
+    if (steering?.containmentBounds) {
+      const bounds = steering.containmentBounds;
+      clampedX = Math.max(bounds.minX, Math.min(bounds.maxX, x));
+      clampedY = Math.max(bounds.minY, Math.min(bounds.maxY, y));
+    }
+
+    const newChunkX = Math.floor(clampedX / 32);
+    const newChunkY = Math.floor(clampedY / 32);
     impl.updateComponent<PositionComponent>(CT.Position, (current) => ({
       ...current,
-      x,
-      y,
+      x: clampedX,
+      y: clampedY,
       chunkX: newChunkX,
       chunkY: newChunkY,
     }));
@@ -257,7 +269,7 @@ export class MovementSystem implements System {
   }
 
   /**
-   * Check for hard collisions (buildings, water, and steep elevation changes) - these block movement completely
+   * Check for hard collisions (buildings, water, steep elevation changes, and tile walls/doors) - these block movement completely
    * Performance: Uses cached building positions
    */
   private hasHardCollision(
@@ -266,12 +278,18 @@ export class MovementSystem implements System {
     x: number,
     y: number
   ): boolean {
-    // Check for water terrain (blocks land-based movement)
+    // Extended world interface with tile access
     const worldWithTerrain = world as {
       getTerrainAt?: (x: number, y: number) => string | null;
-      getTileAt?: (x: number, y: number) => { elevation?: number } | undefined;
+      getTileAt?: (x: number, y: number) => {
+        elevation?: number;
+        wall?: { constructionProgress?: number };
+        door?: { state: 'open' | 'closed' | 'locked'; constructionProgress?: number };
+        window?: { constructionProgress?: number };
+      } | undefined;
     };
 
+    // Check for water terrain (blocks land-based movement)
     if (typeof worldWithTerrain.getTerrainAt === 'function') {
       const terrain = worldWithTerrain.getTerrainAt(Math.floor(x), Math.floor(y));
       if (terrain === 'water' || terrain === 'deep_water') {
@@ -279,14 +297,45 @@ export class MovementSystem implements System {
       }
     }
 
-    // Check for steep elevation changes - entities cannot climb/fall more than 2 elevation levels
+    // Check tile-based walls, doors, and windows
     if (typeof worldWithTerrain.getTileAt === 'function') {
+      const targetTile = worldWithTerrain.getTileAt(Math.floor(x), Math.floor(y));
+
+      if (targetTile) {
+        // Check for walls - block if construction >= 50% (per VOXEL_BUILDING_SPEC.md)
+        if (targetTile.wall) {
+          const progress = targetTile.wall.constructionProgress ?? 100;
+          if (progress >= 50) {
+            return true;
+          }
+        }
+
+        // Check for windows - always block movement (even partially built)
+        if (targetTile.window) {
+          const progress = targetTile.window.constructionProgress ?? 100;
+          if (progress >= 50) {
+            return true;
+          }
+        }
+
+        // Check for doors - block if closed or locked (open doors allow passage)
+        if (targetTile.door) {
+          const progress = targetTile.door.constructionProgress ?? 100;
+          if (progress >= 50) {
+            if (targetTile.door.state === 'closed' || targetTile.door.state === 'locked') {
+              return true;
+            }
+            // Open doors allow passage
+          }
+        }
+      }
+
+      // Check for steep elevation changes - entities cannot climb/fall more than 2 elevation levels
       const entity = world.entities.get(entityId);
       if (entity) {
         const currentPos = (entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
         if (currentPos) {
           const currentTile = worldWithTerrain.getTileAt(Math.floor(currentPos.x), Math.floor(currentPos.y));
-          const targetTile = worldWithTerrain.getTileAt(Math.floor(x), Math.floor(y));
 
           if (currentTile && targetTile &&
               currentTile.elevation !== undefined &&
@@ -303,7 +352,7 @@ export class MovementSystem implements System {
       }
     }
 
-    // Check for building collisions
+    // Check for building collisions (legacy entity-based buildings)
     const buildings = this.getBuildingCollisions(world);
 
     for (const building of buildings) {

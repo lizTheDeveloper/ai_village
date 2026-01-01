@@ -63,6 +63,20 @@ export const DEFAULT_MATERIALS: MaterialTemplate[] = [
 
   // Wood
   {
+    id: 'wood',
+    name: 'Wood',
+    description: 'Generic wood, average properties',
+    categories: ['wood', 'organic'],
+    density: 550,
+    hardness: 25,
+    flexibility: 55,
+    ignitePoint: 280,
+    heatConductivity: 9,
+    magicAffinity: 35,
+    resonantForms: ['nature', 'growth'],
+    valueMultiplier: 0.25,
+  },
+  {
     id: 'oak',
     name: 'Oak',
     description: 'Strong hardwood, good for tools and construction',
@@ -105,6 +119,18 @@ export const DEFAULT_MATERIALS: MaterialTemplate[] = [
   },
 
   // Stone
+  {
+    id: 'stone',
+    name: 'Stone',
+    description: 'Generic stone, average properties',
+    categories: ['stone'],
+    density: 2500,
+    hardness: 60,
+    flexibility: 5,
+    heatConductivity: 25,
+    magicAffinity: 15,
+    valueMultiplier: 0.4,
+  },
   {
     id: 'granite',
     name: 'Granite',

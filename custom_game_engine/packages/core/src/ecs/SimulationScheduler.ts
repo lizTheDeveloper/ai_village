@@ -1,0 +1,342 @@
+/**
+ * SimulationScheduler - Dwarf Fortress-style entity simulation management
+ *
+ * Manages which entities are actively simulated based on:
+ * - Simulation mode (ALWAYS, PROXIMITY, PASSIVE)
+ * - Distance from agents/camera
+ * - Update frequency throttling
+ *
+ * This dramatically reduces per-tick processing by:
+ * - Freezing off-screen entities (plants, wild animals)
+ * - Making resources event-driven only (no per-tick cost)
+ * - Only simulating ~50-100 entities instead of 4,000+
+ */
+
+import type { Entity } from './Entity.js';
+import type { World } from './World.js';
+import type { ComponentType } from '../types/ComponentType.js';
+
+/**
+ * Simulation modes determine when an entity is updated
+ */
+export enum SimulationMode {
+  /**
+   * ALWAYS - Critical entities that must always simulate
+   * Examples: agents, buildings, tame animals, quest items
+   */
+  ALWAYS = 'always',
+
+  /**
+   * PROXIMITY - Only simulate when near agents (on-screen)
+   * Examples: wild animals, plants
+   * Freezes when off-screen to save processing
+   */
+  PROXIMITY = 'proximity',
+
+  /**
+   * PASSIVE - Never in update loops, only react to events
+   * Examples: resources, items, corpses
+   * Zero per-tick cost - only process when interacted with
+   */
+  PASSIVE = 'passive',
+}
+
+/**
+ * Configuration for how a component type should be simulated
+ */
+export interface ComponentSimulationConfig {
+  /** Simulation mode */
+  mode: SimulationMode;
+
+  /** For PROXIMITY mode: range in tiles to check (default: 15) */
+  range?: number;
+
+  /** Update frequency in ticks when active (default: every tick) */
+  updateFrequency?: number;
+
+  /** If true, always simulate even when far from agents */
+  essential?: boolean;
+}
+
+/**
+ * Default simulation configurations for component types
+ *
+ * These define the performance characteristics of the game:
+ * - ALWAYS: ~20 entities (agents, buildings)
+ * - PROXIMITY: ~100 entities (visible plants/animals)
+ * - PASSIVE: ~3,500 entities (resources, zero cost)
+ */
+export const SIMULATION_CONFIGS: Record<string, ComponentSimulationConfig> = {
+  // ============================================================================
+  // ALWAYS - Critical entities (always simulate)
+  // ============================================================================
+
+  agent: { mode: SimulationMode.ALWAYS },
+  building: { mode: SimulationMode.ALWAYS },
+  deity: { mode: SimulationMode.ALWAYS },
+  avatar: { mode: SimulationMode.ALWAYS },
+  angel: { mode: SimulationMode.ALWAYS },
+
+  // Tame animals always simulate (player investment)
+  // Wild animals handled separately with 'animal' component
+
+  // ============================================================================
+  // PROXIMITY - Only when on-screen (near agents)
+  // ============================================================================
+
+  /** Plants only grow when visible */
+  plant: {
+    mode: SimulationMode.PROXIMITY,
+    range: 15,
+    updateFrequency: 86400, // Daily updates when visible
+  },
+
+  /** Wild animals freeze when off-screen */
+  animal: {
+    mode: SimulationMode.PROXIMITY,
+    range: 15,
+  },
+
+  /** Seeds only germinate when visible */
+  seed: {
+    mode: SimulationMode.PROXIMITY,
+    range: 15,
+  },
+
+  // ============================================================================
+  // PASSIVE - Event-driven only (zero per-tick cost)
+  // ============================================================================
+
+  /** Resources never update, only react to harvest events */
+  resource: { mode: SimulationMode.PASSIVE },
+
+  /** Items are passive until picked up */
+  inventory: { mode: SimulationMode.PASSIVE },
+
+  // ============================================================================
+  // Special cases - can override based on entity tags
+  // ============================================================================
+
+  // Default to PROXIMITY for unlisted components
+};
+
+/**
+ * Get simulation config for a component type
+ */
+export function getSimulationConfig(componentType: ComponentType): ComponentSimulationConfig {
+  return SIMULATION_CONFIGS[componentType] || {
+    mode: SimulationMode.PROXIMITY,
+    range: 15,
+  };
+}
+
+/**
+ * Check if an entity has any ALWAYS components
+ */
+export function isAlwaysActive(entity: Entity): boolean {
+  for (const [componentType] of entity.components.entries()) {
+    const config = getSimulationConfig(componentType as ComponentType);
+    if (config.mode === SimulationMode.ALWAYS) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Check if an entity should be simulated based on proximity to agents
+ */
+export function isInSimulationRange(
+  entity: Entity,
+  agentPositions: Array<{ x: number; y: number }>,
+  range: number = 15
+): boolean {
+  // Get entity position
+  const position = entity.components.get('position') as { x: number; y: number } | undefined;
+  if (!position) return false;
+
+  // Check if within range of any agent
+  for (const agentPos of agentPositions) {
+    const dx = position.x - agentPos.x;
+    const dy = position.y - agentPos.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance <= range) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * SimulationScheduler manages which entities are actively simulated
+ */
+export class SimulationScheduler {
+  /** Cache of agent positions for proximity checks */
+  private agentPositions: Array<{ x: number; y: number }> = [];
+
+  /** Last update tick per entity (for frequency throttling) */
+  private lastUpdateTick: Map<string, number> = new Map();
+
+  /**
+   * Update agent position cache
+   * Called once per tick before filtering entities
+   */
+  updateAgentPositions(world: World): void {
+    this.agentPositions = [];
+
+    const agents = world.query().with('agent' as ComponentType).with('position' as ComponentType).executeEntities();
+    for (const agent of agents) {
+      const position = agent.components.get('position') as { x: number; y: number } | undefined;
+      if (position) {
+        this.agentPositions.push({ x: position.x, y: position.y });
+      }
+    }
+  }
+
+  /**
+   * Filter entities for a system based on simulation rules
+   *
+   * @param entities - All entities with required components
+   * @param currentTick - Current world tick
+   * @returns Filtered entities that should be simulated this tick
+   */
+  filterActiveEntities(entities: readonly Entity[], currentTick: number): Entity[] {
+    const activeEntities: Entity[] = [];
+
+    for (const entity of entities) {
+      // Check if entity should be simulated
+      if (this.shouldSimulate(entity, currentTick)) {
+        activeEntities.push(entity);
+      }
+    }
+
+    return activeEntities;
+  }
+
+  /**
+   * Check if an entity should be simulated this tick
+   */
+  private shouldSimulate(entity: Entity, currentTick: number): boolean {
+    // Determine simulation mode based on components
+    let mode = SimulationMode.PASSIVE;
+    let range = 15;
+    let updateFrequency = 1;
+    // let isEssential = false;  // TODO: implement essential entity tracking
+
+    // Check all components to find the most permissive simulation mode
+    for (const [componentType] of entity.components.entries()) {
+      const config = getSimulationConfig(componentType as ComponentType);
+
+      // ALWAYS takes precedence
+      if (config.mode === SimulationMode.ALWAYS || config.essential) {
+        mode = SimulationMode.ALWAYS;
+        // isEssential = true;  // TODO: implement essential entity tracking
+        break;
+      }
+
+      // PROXIMITY takes precedence over PASSIVE
+      if (config.mode === SimulationMode.PROXIMITY && mode === SimulationMode.PASSIVE) {
+        mode = SimulationMode.PROXIMITY;
+        range = config.range || 15;
+        updateFrequency = config.updateFrequency || 1;
+      }
+    }
+
+    // ALWAYS entities always simulate
+    if (mode === SimulationMode.ALWAYS) {
+      return this.checkUpdateFrequency(entity.id, currentTick, updateFrequency);
+    }
+
+    // PASSIVE entities never simulate (event-driven only)
+    if (mode === SimulationMode.PASSIVE) {
+      return false;
+    }
+
+    // PROXIMITY entities only simulate when near agents
+    if (mode === SimulationMode.PROXIMITY) {
+      if (!isInSimulationRange(entity, this.agentPositions, range)) {
+        return false; // Off-screen, freeze simulation
+      }
+
+      return this.checkUpdateFrequency(entity.id, currentTick, updateFrequency);
+    }
+
+    return false;
+  }
+
+  /**
+   * Check if entity is due for update based on frequency throttling
+   */
+  private checkUpdateFrequency(entityId: string, currentTick: number, frequency: number): boolean {
+    if (frequency <= 1) return true; // Update every tick
+
+    const lastTick = this.lastUpdateTick.get(entityId) || 0;
+    const ticksSinceUpdate = currentTick - lastTick;
+
+    if (ticksSinceUpdate >= frequency) {
+      this.lastUpdateTick.set(entityId, currentTick);
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Mark entity as updated (for manual frequency tracking)
+   */
+  markUpdated(entityId: string, currentTick: number): void {
+    this.lastUpdateTick.set(entityId, currentTick);
+  }
+
+  /**
+   * Get stats for debugging/monitoring
+   */
+  getStats(world: World): {
+    alwaysCount: number;
+    proximityActiveCount: number;
+    proximityFrozenCount: number;
+    passiveCount: number;
+    totalEntities: number;
+  } {
+    let alwaysCount = 0;
+    let proximityActiveCount = 0;
+    let proximityFrozenCount = 0;
+    let passiveCount = 0;
+
+    for (const entity of world.entities.values()) {
+      if (isAlwaysActive(entity)) {
+        alwaysCount++;
+      } else {
+        // Check dominant mode
+        let hasProximity = false;
+        let hasPassive = false;
+
+        for (const [componentType] of entity.components.entries()) {
+          const config = getSimulationConfig(componentType as ComponentType);
+          if (config.mode === SimulationMode.PROXIMITY) hasProximity = true;
+          if (config.mode === SimulationMode.PASSIVE) hasPassive = true;
+        }
+
+        if (hasProximity) {
+          if (isInSimulationRange(entity, this.agentPositions)) {
+            proximityActiveCount++;
+          } else {
+            proximityFrozenCount++;
+          }
+        } else if (hasPassive) {
+          passiveCount++;
+        }
+      }
+    }
+
+    return {
+      alwaysCount,
+      proximityActiveCount,
+      proximityFrozenCount,
+      passiveCount,
+      totalEntities: world.entities.size,
+    };
+  }
+}

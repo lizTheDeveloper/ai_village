@@ -63,6 +63,8 @@ import {
   SKILL_NAMES,
 } from '../components/SkillsComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
+import type { AgentComponent } from '../components/AgentComponent.js';
+import { syncPrioritiesWithSkills } from '../components/AgentComponent.js';
 
 /**
  * SkillSystem manages skill progression through XP gain.
@@ -329,6 +331,17 @@ export class SkillSystem implements System {
           newLevel: result.newLevel,
         },
       });
+
+      // Sync agent priorities with new skill levels
+      // This ensures agents naturally prefer activities they're skilled in
+      const entityImpl = entity as EntityImpl;
+      const agent = entityImpl.getComponent<AgentComponent>(CT.Agent);
+      if (agent) {
+        entityImpl.updateComponent<AgentComponent>(
+          CT.Agent,
+          (current) => syncPrioritiesWithSkills(current, result.component)
+        );
+      }
 
       // Show notification
       this.world.eventBus.emitImmediate({

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Context Menu Render Debug</title>
+  <style>
+    body { margin: 0; padding: 20px; background: #111; color: #fff; font-family: monospace; }
+    canvas { border: 2px solid #fff; display: block; margin: 20px 0; }
+    #log { background: #222; padding: 10px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Context Menu Rendering Debug</h1>
+  <p>Testing if ContextMenuRenderer can draw to canvas.</p>
+
+  <canvas id="canvas" width="800" height="600"></canvas>
+
+  <div id="log"></div>
+
+  <script type="module">
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const log = document.getElementById('log');
+
+    function logMsg(msg) {
+      const p = document.createElement('p');
+      p.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      log.appendChild(p);
+      console.log(msg);
+    }
+
+    logMsg('Starting render test...');
+
+    // Import ContextMenuRenderer
+    try {
+      const { ContextMenuRenderer } = await import('./packages/renderer/src/ContextMenuRenderer.js');
+      logMsg('✓ ContextMenuRenderer imported');
+
+      const renderer = new ContextMenuRenderer(ctx);
+      logMsg('✓ ContextMenuRenderer created');
+
+      // Create test menu items
+      const items = [
+        {
+          id: 'item1',
+          label: 'Action 1',
+          actionId: 'action1',
+          enabled: true,
+          hasSubmenu: false,
+          hovered: false
+        },
+        {
+          id: 'item2',
+          label: 'Action 2',
+          actionId: 'action2',
+          enabled: true,
+          hasSubmenu: false,
+          hovered: false
+        },
+        {
+          id: 'item3',
+          label: 'Action 3',
+          actionId: 'action3',
+          enabled: true,
+          hasSubmenu: false,
+          hovered: false
+        }
+      ];
+
+      logMsg('✓ Test items created');
+
+      // Calculate arc angles
+      const itemsWithAngles = renderer.calculateArcAngles(items, 30, 100, 3);
+      logMsg(`✓ Arc angles calculated: ${itemsWithAngles.length} items`);
+
+      // Clear canvas
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      logMsg('✓ Canvas cleared');
+
+      // Render menu at center
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+
+      logMsg(`Rendering menu at (${centerX}, ${centerY})...`);
+      renderer.render(itemsWithAngles, centerX, centerY);
+      logMsg('✓ render() called successfully');
+
+      // Check if anything was drawn
+      const imageData = ctx.getImageData(centerX - 50, centerY - 50, 100, 100);
+      const pixels = imageData.data;
+      let hasNonBlackPixels = false;
+      for (let i = 0; i < pixels.length; i += 4) {
+        if (pixels[i] !== 26 || pixels[i+1] !== 26 || pixels[i+2] !== 26) {
+          hasNonBlackPixels = true;
+          break;
+        }
+      }
+
+      if (hasNonBlackPixels) {
+        logMsg('✓ SUCCESS: Menu rendered to canvas (detected non-black pixels)');
+      } else {
+        logMsg('✗ FAILURE: No visible pixels drawn (all black)');
+      }
+
+    } catch (error) {
+      logMsg(`✗ ERROR: ${error.message}`);
+      logMsg(`Stack: ${error.stack}`);
+    }
+  </script>
+</body>
+</html>

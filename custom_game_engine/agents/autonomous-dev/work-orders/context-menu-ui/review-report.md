@@ -2,151 +2,111 @@
 
 **Feature:** context-menu-ui
 **Reviewer:** Review Agent
-**Date:** 2025-12-31 (Re-review)
-**Status:** NEEDS_FIXES
-
----
-
-## Executive Summary
-
-The context menu UI implementation has **good architecture and separation of concerns**. Build passes successfully. However, there are **critical CLAUDE.md violations** that must be fixed before approval:
-
-1. **Excessive use of `as any` type assertions** (50+ instances) bypassing type safety
-2. **Debug console.error statements** violating the "No Debug Output" policy
-3. **Error swallowing** with silent fallbacks (line 154 returns instead of throwing)
-4. **Missing test coverage** - zero automated tests found
+**Date:** 2026-01-01
 
 ---
 
 ## Files Reviewed
 
-### New Files Created
-- `packages/renderer/src/ContextMenuManager.ts` (766 lines)
-- `packages/renderer/src/ContextMenuRenderer.ts` (370 lines)
-- `packages/renderer/src/context-menu/ContextActionRegistry.ts` (~700 lines estimated)
-- `packages/renderer/src/context-menu/MenuContext.ts` (309 lines)
-- `packages/renderer/src/context-menu/types.ts` (239 lines)
-
-### Test Files
-- ❌ No test files found
-- ❌ Required: `packages/renderer/src/__tests__/ContextMenuManager.test.ts`
-- ❌ Required: `packages/renderer/src/__tests__/ContextMenuRenderer.test.ts`
-- ❌ Required: `packages/renderer/src/__tests__/context-menu/MenuContext.test.ts`
-- ❌ Required: `packages/renderer/src/__tests__/context-menu/ContextActionRegistry.test.ts`
+- `packages/renderer/src/ContextMenuManager.ts` (784 lines) - new
+- `packages/renderer/src/ContextMenuRenderer.ts` (378 lines) - new
+- `packages/renderer/src/context-menu/ContextActionRegistry.ts` (677 lines) - new
+- `packages/renderer/src/context-menu/MenuContext.ts` (309 lines) - new
+- `packages/renderer/src/context-menu/types.ts` (239 lines) - new
 
 ---
 
 ## Critical Issues (Must Fix)
 
-### 1. Excessive `as any` Type Assertions (CRITICAL)
+### 0. DEBUG LOGGING VIOLATES CLAUDE.md - REMOVE IMMEDIATELY ⚠️
 
-**VIOLATION:** 50+ instances of `as any` bypass TypeScript type safety, making bugs undetectable at compile time.
+**CLAUDE.md EXPLICITLY PROHIBITS debug print statements.**
 
-**Impact:** Severe - this defeats the entire purpose of using TypeScript. Runtime errors that should be caught at compile time will slip through.
+This is the **MOST CRITICAL** issue found in the review.
 
 #### ContextMenuManager.ts
+**Lines to DELETE:** 630, 636, 653, 663, 674
 
-**Line 44:** Untyped event handler parameters
 ```typescript
-private eventListeners: Array<{ event: string; handler: (...args: any[]) => void }> = [];
-```
-**Required Fix:** Define proper event handler types or use EventBus's native typing.
+// ❌ Line 630
+console.log(`[ContextMenuManager] render() called - isOpen=${this.state.isOpen}, isAnimating=${this.state.isAnimating}, currentItems=${this.currentItems.length}`);
 
-**Line 672:** Untyped actions array parameter
-```typescript
-private actionsToMenuItems(
-  actions: any[], // ❌ CRITICAL: Defeats type checking
-  context: MenuContext
-): RadialMenuItem[] {
-```
-**Required Fix:**
-```typescript
-private actionsToMenuItems(
-  actions: ContextAction[], // ✅ Properly typed
-  context: MenuContext
-): RadialMenuItem[] {
+// ❌ Line 636
+console.log(`[ContextMenuManager] Rendering menu at position (${this.state.position.x}, ${this.state.position.y})`);
+
+// ❌ Line 653
+console.log('[ContextMenuManager] Rendering with OPEN animation');
+
+// ❌ Line 663
+console.log('[ContextMenuManager] Rendering with CLOSE animation');
+
+// ❌ Line 674
+console.log('[ContextMenuManager] Rendering STATIC menu');
 ```
 
-**Lines 682, 686, 690:** Component type assertions bypass safety
-```typescript
-const buildingComp = building ? (building as EntityImpl).getComponent('building') as any : undefined;
-const harvestable = resource ? (resource as EntityImpl).getComponent('harvestable') as any : undefined;
-```
-**Required Fix:** Define component interfaces:
-```typescript
-interface BuildingComponent {
-  canEnter?: boolean;
-  locked?: boolean;
-  health: number;
-}
+#### ContextMenuRenderer.ts
+**Lines to DELETE:** 70, 82, 106, 233, 278
 
-interface HarvestableComponent {
-  amount: number;
-}
-
-const buildingComp = building?.getComponent<BuildingComponent>('building');
-const harvestable = resource?.getComponent<HarvestableComponent>('harvestable');
-```
-
-**Line 730:** Untyped event handler
 ```typescript
-const confirmHandler = (event: any) => {
-```
-**Required Fix:**
-```typescript
-interface ConfirmationEvent {
-  data: {
-    actionId: string;
-    context: MenuContext;
-  };
-}
+// ❌ Line 70
+console.log(`[ContextMenuRenderer] render() called with ${items.length} items at (${centerX}, ${centerY})`);
 
-const confirmHandler = (event: ConfirmationEvent) => {
+// ❌ Line 82
+console.log(`[ContextMenuRenderer] Drawing circles at (${centerX}, ${centerY}) with radii ${innerRadius}-${outerRadius}`);
+
+// ❌ Line 106
+console.log('[ContextMenuRenderer] render() complete');
+
+// ❌ Line 233
+console.log(`[ContextMenuRenderer] renderOpenAnimation() called with style=${style}, progress=${progress}`);
+
+// ❌ Line 278
+console.log(`[ContextMenuRenderer] renderCloseAnimation() called with style=${style}, progress=${progress}`);
 ```
 
-**Line 751:** Type assertion on event bus
-```typescript
-this.eventBus.off(event as any, handler);
-```
-**Required Fix:** Properly type the event parameter or fix EventBus type definitions.
+**CLAUDE.md Reference:**
+> ### Debug Output Prohibition
+>
+> **NEVER add debug print statements or console.log calls to code.** This includes:
+>
+> ```typescript
+> // ❌ PROHIBITED - Never add these
+> console.log('Debug:', variable);
+> console.debug('State:', state);
+> console.info('Processing:', data);
+>
+> // ✅ ALLOWED - Only for errors
+> console.error('[ComponentName] Critical error:', error);
+> console.warn('[ComponentName] Warning:', issue);
+> ```
+>
+> Reasons:
+> - Debug statements clutter the codebase
+> - They are rarely removed after debugging
+> - They create noise in production
+> - Use the Agent Dashboard for debugging instead
 
-#### MenuContext.ts
+**Required Fix:** DELETE all 10 console.log statements immediately.
 
-**Lines 262, 284:** Component access uses `as any`
-```typescript
-const pos = (entity as EntityImpl).getComponent('position') as any;
-const selectable = (entity as EntityImpl).getComponent('selectable') as any;
-```
-**Required Fix:**
-```typescript
-interface PositionComponent {
-  x: number;
-  y: number;
-}
+---
 
-interface SelectableComponent {
-  selected: boolean;
-}
+### 1. Excessive `as any` Type Assertions - Systemic Type Safety Bypass
 
-const pos = (entity as EntityImpl).getComponent<PositionComponent>('position');
-if (!pos) continue;
+**Multiple Files - Critical Pattern**
 
-const selectable = (entity as EntityImpl).getComponent<SelectableComponent>('selectable');
-```
+The implementation contains **74+ instances** of `as any` type assertions, systematically bypassing TypeScript's type safety. This is a severe CLAUDE.md violation.
 
 #### ContextActionRegistry.ts
-
-**Lines 112, 119, 123, 131, 162, 169, 173, 181, and 40+ more instances:**
+**Pattern:** Every event emission uses `as any` (58 instances)
 ```typescript
-eventBus.emit({
-  type: 'ui:contextmenu:action_executed' as any,
-  source: 'world',
-  data: { ... }
-} as any);
+// Lines 112, 119, 123, 131, 162, 169, 173, 181, 219, 222, etc.
+eventBus.emit({ type: 'ui:contextmenu:action_executed' as any, source: 'world', data: {...} } as any);
 ```
-**Required Fix:** Define proper event types in EventMap:
+
+**Required Fix:** Define proper EventMap types for all emitted events:
+
 ```typescript
-// In EventMap.ts or event types file
+// In EventMap.ts, add:
 interface ContextMenuActionExecutedEvent {
   type: 'ui:contextmenu:action_executed';
   source: 'world';
@@ -158,238 +118,242 @@ interface ContextMenuActionExecutedEvent {
   };
 }
 
-// Usage
-eventBus.emit<ContextMenuActionExecutedEvent>({
+// Then use properly typed emit:
+this.eventBus.emit<ContextMenuActionExecutedEvent>({
   type: 'ui:contextmenu:action_executed',
   source: 'world',
   data: { actionId, success: true, context }
 });
 ```
 
-**All action events (move, follow, harvest, repair, etc.):** Same issue repeated 40+ times.
+**Events requiring type definitions:**
+- `ui:contextmenu:opened`
+- `ui:contextmenu:closed`
+- `ui:contextmenu:action_selected`
+- `ui:contextmenu:action_executed`
+- `ui:contextmenu:animation_start`
+- `ui:confirmation:show`
+- `ui:confirmation:confirmed`
+- `action:move`
+- `action:follow`
+- `conversation:start`
+- `ui:panel:open`
+- `action:enter_building`
+- `action:repair`
+- `action:demolish`
+- `action:harvest`
+- `action:assign_worker`
+- `action:set_priority`
+- `ui:building_placement:open`
+- `action:place_waypoint`
+- `camera:focus`
+- `action:create_group`
+- `action:scatter`
+- `action:set_formation`
 
 ---
 
-### 2. Debug console.error Statements (CRITICAL)
+### 2. Untyped Component Access - Multiple Files
 
-**VIOLATION:** CLAUDE.md explicitly prohibits debug console statements.
-
-> "NEVER add debug print statements or console.log calls to code. This includes console.debug and console.info."
-
-#### ContextMenuManager.ts
-
-**Line 154:** Debug output before silent return
+**ContextMenuManager.ts: Lines 694, 698, 702**
 ```typescript
-console.error('[ContextMenu] No menu items found. Actions:', applicableActions.length, 'Context:', context.targetType);
-return;
+const buildingComp = building ? (building as EntityImpl).getComponent('building') as any : undefined;
+const harvestable = resource ? (resource as EntityImpl).getComponent('harvestable') as any : undefined;
 ```
-**Issues:**
-1. Debug console.error violates CLAUDE.md
-2. Silent return swallows error (caller doesn't know menu failed to open)
 
-**Required Fix:**
+**ContextActionRegistry.ts: Lines 295, 323, 366, 371**
 ```typescript
-if (items.length === 0) {
-  throw new Error(`No menu items for context. Actions: ${applicableActions.length}, Type: ${context.targetType}`);
+const buildingComp = (building as EntityImpl).getComponent('building') as any;
+const harvestable = (resource as EntityImpl).getComponent('harvestable') as any;
+```
+
+**MenuContext.ts: Lines 262, 284**
+```typescript
+const pos = (entity as EntityImpl).getComponent('position') as any;
+const selectable = (entity as EntityImpl).getComponent('selectable') as any;
+```
+
+**Required Fix:** Define component interfaces and use typed getComponent:
+
+```typescript
+// Define interfaces
+interface BuildingComponent {
+  canEnter: boolean;
+  locked: boolean;
+  health: number;
+}
+
+interface HarvestableComponent {
+  amount: number;
+  resourceType: string;
+}
+
+// Use properly typed access
+const buildingComp = building?.getComponent<BuildingComponent>('building');
+if (!buildingComp) {
+  throw new ComponentMissingError('building', building.id);
 }
 ```
 
-**Line 217:** Error logged then re-thrown (ACCEPTABLE pattern)
-```typescript
-console.error('[ContextMenu] Error during open:', error);
-throw error;
-```
-**Status:** ✅ This is acceptable - error is re-thrown after logging for debugging purposes.
+---
 
-**Line 579:** Error logged, menu closed, error re-thrown (ACCEPTABLE)
-```typescript
-console.error(`[ContextMenuManager] Failed to execute action ${item.actionId}:`, error);
-this.close();
-throw error;
-```
-**Status:** ✅ Acceptable - cleanup then re-throw.
+### 3. Untyped Event Handlers
 
-**Line 626:** Error logged then re-thrown (ACCEPTABLE)
+**ContextMenuManager.ts: Lines 44, 748**
 ```typescript
-console.error('[ContextMenuManager] Render error:', error);
-throw error;
+private eventListeners: Array<{ event: string; handler: (...args: any[]) => void }> = [];
+
+const confirmHandler = (event: any) => {
+  // Validate event structure
+  if (!event?.data?.actionId) return;
+  ...
+}
 ```
-**Status:** ✅ Acceptable - error is re-thrown.
+
+**Required Fix:** Use proper event types:
+
+```typescript
+interface EventListener<T extends keyof EventMap> {
+  event: T;
+  handler: (event: EventMap[T]) => void;
+}
+
+private eventListeners: EventListener<any>[] = [];
+
+// Typed handler
+const confirmHandler = (event: ConfirmationConfirmedEvent) => {
+  this.registry.execute(event.data.actionId, event.data.context);
+};
+```
 
 ---
 
-### 3. Missing Test Coverage (CRITICAL)
+### 4. Untyped Function Parameter
 
-**VIOLATION:** Work order spec required comprehensive tests. Zero test files found.
+**ContextMenuManager.ts: Line 684**
+```typescript
+private actionsToMenuItems(
+  actions: any[],  // ❌ Untyped parameter
+  context: MenuContext
+): RadialMenuItem[]
+```
 
-**Impact:** No automated verification that the feature works correctly. Bugs will only be found through manual testing or in production.
-
-**Required Test Files (from work order spec):**
-- `packages/renderer/src/__tests__/ContextMenuManager.test.ts`
-- `packages/renderer/src/__tests__/ContextMenuRenderer.test.ts`
-- `packages/renderer/src/__tests__/context-menu/MenuContext.test.ts`
-- `packages/renderer/src/__tests__/context-menu/ContextActionRegistry.test.ts`
-
-**Minimum Required Coverage:**
-
-1. **MenuContext Tests:**
-   - Context detection for each entity type (agent, building, resource, empty_tile)
-   - Selection state integration
-   - Walkable/buildable detection
-   - Error handling for invalid inputs (null world, NaN coordinates, etc.)
-
-2. **ContextActionRegistry Tests:**
-   - Action registration with validation
-   - Duplicate action rejection
-   - Action filtering by context
-   - Action execution
-   - Error propagation from action.execute()
-
-3. **ContextMenuRenderer Tests:**
-   - Arc angle calculation accuracy
-   - Hit testing (click detection)
-   - Position adjustment for screen boundaries
-   - Animation rendering
-
-4. **ContextMenuManager Tests:**
-   - Menu open/close lifecycle
-   - Event listener cleanup on close
-   - Keyboard shortcut handling
-   - Submenu navigation
-   - Error handling during open/render/execute
-
-**Required Fix:** Implement full test suite before approval.
+**Required Fix:**
+```typescript
+private actionsToMenuItems(
+  actions: ContextAction[],  // ✅ Properly typed
+  context: MenuContext
+): RadialMenuItem[]
+```
 
 ---
 
-### 4. Acceptable Silent Fallbacks (No Fix Required)
+### 5. Silent Fallbacks for Display Values
 
-**ContextMenuManager.ts Lines 549-550:**
+**ContextMenuManager.ts: Lines 548-549**
 ```typescript
 message: item.confirmationMessage || 'Are you sure?',
 consequences: item.consequences || [],
 ```
 
-**Analysis:** These are for **optional display values** in confirmation dialogs.
+**Analysis:** These are display-only values with semantically correct defaults, **NOT** critical game state. Per CLAUDE.md:
+> "Only use `.get()` with defaults for truly optional fields where the default is semantically correct"
 
-**Verdict:** ✅ **ACCEPTABLE** - These are truly optional UI fields where defaults make semantic sense:
-- A generic confirmation message is reasonable fallback for display
-- An empty consequences array is semantically correct for optional data
+**Verdict:** ACCEPTABLE - These are optional UI strings with valid defaults, not game state.
 
-This falls under CLAUDE.md's exception for "truly optional fields where the default is semantically correct."
+---
 
-**ContextMenuRenderer.ts Lines 72-73:**
+**ContextMenuRenderer.ts: Lines 76-77**
 ```typescript
 const innerRadius = items[0]?.innerRadius ?? 30;
 const outerRadius = items[0]?.outerRadius ?? 100;
 ```
 
-**Analysis:** These provide fallback radii if items lack calculated values.
+**Analysis:** Uses fallback when items array might be empty or items might not have radius set.
 
-**Verdict:** ❌ **NOT ACCEPTABLE** - These should ALWAYS be present after `calculateArcAngles()`. Defaulting masks bugs.
-
-**Required Fix:**
+**Required Fix:** Validate items before rendering:
 ```typescript
-const firstItem = items[0];
-if (!firstItem) {
-  throw new Error('render() requires non-empty items array');
-}
-if (firstItem.innerRadius === undefined || firstItem.outerRadius === undefined) {
-  throw new Error('Items missing radii - calculateArcAngles() must be called first');
-}
+public render(items: RadialMenuItem[], centerX: number, centerY: number): void {
+  if (items.length === 0) {
+    return;
+  }
 
-const innerRadius = firstItem.innerRadius;
-const outerRadius = firstItem.outerRadius;
+  if (!items[0].innerRadius || !items[0].outerRadius) {
+    throw new Error('Menu items missing required radius values');
+  }
+
+  const innerRadius = items[0].innerRadius;
+  const outerRadius = items[0].outerRadius;
+  ...
+}
 ```
 
 ---
 
-## High Priority Issues (Should Fix)
+## Build Status
 
-### 5. File Size Warning
-
-**ContextMenuManager.ts:** 766 lines - approaching the 800-line warning threshold.
-
-**Recommendation:** Consider extracting:
-- Event handler setup/cleanup to `ContextMenuEventHandlers.ts`
-- Animation logic to `ContextMenuAnimator.ts`
-- Action-to-menuitem conversion to utility function
-
-**Severity:** Medium - not blocking approval, but makes testing and maintenance harder.
-
-### 6. Magic Numbers
-
-**MenuContext.ts Line 84:**
-```typescript
-const clickRadius = 16; // Detection radius in world units
-```
-**Recommendation:** Extract to named constant:
-```typescript
-const CONTEXT_MENU_CLICK_DETECTION_RADIUS = 16;
-```
-
-**ContextMenuRenderer.ts Lines 159-175:**
-```typescript
-const iconY = labelY - 15;
-this.ctx.arc(iconX, iconY, 8, 0, Math.PI * 2);
-const shortcutY = labelY + 12;
-```
-**Recommendation:** Extract to configuration:
-```typescript
-const ICON_OFFSET_Y = 15;
-const ICON_RADIUS = 8;
-const SHORTCUT_OFFSET_Y = 12;
-```
+✅ **Build passes** - `npm run build` completes successfully with no errors
 
 ---
 
 ## Medium Priority Issues
 
-### 7. TODO Without Implementation
+### 1. File Size - ContextMenuManager.ts
 
-**ContextMenuManager.ts Line 647:**
-```typescript
-// TODO: Determine if opening or closing based on state
-```
-**Issue:** TODO without implementation or issue tracker reference.
-**Required Fix:** Either implement logic or remove comment if current implementation is sufficient.
+**Line Count:** 784 lines
 
-### 8. Component Access Safety
+**Status:** Exceeds 500-line threshold for review
 
-Multiple instances use optional chaining which may mask data integrity issues:
+**Recommendation:** File is well-organized with clear section comments. Current size is acceptable for initial implementation, but consider splitting if complexity increases:
+- Extract `actionsToMenuItems` logic to separate builder
+- Move event listener setup to separate class
+- Consider splitting visual/interaction concerns
 
-**ContextMenuManager.ts:682-696:**
-```typescript
-const buildingComp = building?.getComponent<BuildingComponent>('building');
-isEnabled = buildingComp?.canEnter === true && buildingComp?.locked !== true;
-```
+**Verdict:** ACCEPTABLE for now, monitor for growth
 
-**Issue:** If a building entity exists but has no building component, that's a data integrity bug that should be caught.
+---
 
-**Recommendation:**
-```typescript
-if (building) {
-  const buildingComp = (building as EntityImpl).getComponent<BuildingComponent>('building');
-  if (!buildingComp) {
-    throw new Error(`Entity ${building.id} marked as building lacks building component`);
-  }
-  isEnabled = buildingComp.canEnter === true && buildingComp.locked !== true;
-}
-```
+### 2. File Size - ContextActionRegistry.ts
+
+**Line Count:** 677 lines
+
+**Status:** Approaching 800-line threshold
+
+**Recommendation:** Consider splitting action registration by category:
+- `AgentActionRegistry`
+- `BuildingActionRegistry`
+- `ResourceActionRegistry`
+- `TileActionRegistry`
+- `SelectionActionRegistry`
+
+**Verdict:** ACCEPTABLE for now, flag for future refactoring
 
 ---
 
 ## Passed Checks
 
-- ✅ **Build passes:** TypeScript compilation successful (verified)
-- ✅ **No circular imports:** Import structure is clean
-- ✅ **File structure:** Good separation of concerns (Manager, Renderer, Context, Registry, types)
-- ✅ **Error messages:** Clear, actionable error messages in constructors
-- ✅ **Documentation:** JSDoc comments on public methods
-- ✅ **ContextMenuRenderer.ts:** Clean, no critical violations
-- ✅ **types.ts:** Well-structured, comprehensive type definitions
-- ✅ **Constructor validation:** All constructors validate required parameters
-- ✅ **Error propagation:** Most catch blocks correctly re-throw (3 of 4)
+- [x] **Build passes** - no compilation errors
+- [x] **No `console.warn`** - only `console.error` with proper re-throws
+- [x] **No dead code** - no commented-out blocks or unused code
+- [x] **Proper error propagation** - all catch blocks re-throw
+- [x] **Input validation** - constructor parameters validated with clear errors
+- [x] **No magic numbers** - configuration values in named constants
+- [x] **Clear naming** - functions follow `verbNoun` pattern
+- [x] **Import organization** - clean, no circular dependencies
+
+---
+
+## Summary Statistics
+
+| Metric | Count |
+|--------|-------|
+| **DEBUG console.log statements** | **10** ⚠️ |
+| `as any` instances | 74+ |
+| Untyped component access | 8 |
+| Untyped event handlers | 2 |
+| Untyped function params | 1 |
+| Total files | 5 |
+| Total lines | 2,405 |
 
 ---
 
@@ -397,114 +361,51 @@ if (building) {
 
 **Verdict: NEEDS_FIXES**
 
-**Blocking Issues:** 4 critical categories
+**Blocking Issues:** 6 critical antipatterns
 
-1. **Type Safety Violations:** 50+ instances of `as any` bypassing TypeScript safety
-2. **Missing Test Coverage:** Zero test files, spec required comprehensive tests
-3. **Debug console.error:** Line 154 violates CLAUDE.md "No Debug Output" policy
-4. **Silent Error Swallowing:** Line 154 returns instead of throwing
+**Primary Concerns:**
+1. **10 debug console.log statements violate CLAUDE.md** - MUST be deleted (highest priority)
+2. **Systemic type safety bypass** via 74+ `as any` assertions
 
-**High Priority Issues:** 2 (file size, magic numbers)
-**Medium Priority Issues:** 2 (TODO, component safety)
-
----
-
-## Required Actions for Implementation Agent
-
-### Priority 1: Add Test Coverage (CRITICAL - 3-4 hours)
-
-Create comprehensive test suites:
-1. `packages/renderer/src/__tests__/ContextMenuManager.test.ts`
-2. `packages/renderer/src/__tests__/ContextMenuRenderer.test.ts`
-3. `packages/renderer/src/__tests__/context-menu/MenuContext.test.ts`
-4. `packages/renderer/src/__tests__/context-menu/ContextActionRegistry.test.ts`
-
-See "Minimum Required Coverage" section above for specific test requirements.
-
-### Priority 2: Fix Type Safety (CRITICAL - 2-3 hours)
-
-1. Define component interfaces:
-   ```typescript
-   interface BuildingComponent { canEnter?: boolean; locked?: boolean; health: number; }
-   interface PositionComponent { x: number; y: number; z: number; }
-   interface SelectableComponent { selected: boolean; }
-   interface HarvestableComponent { amount: number; }
-   ```
-
-2. Define event type interfaces for all emitted events
-
-3. Remove ALL `as any` casts (50+ instances):
-   - Change `actions: any[]` to `actions: ContextAction[]`
-   - Type all event handlers properly
-   - Type all component access with generics
-
-### Priority 3: Fix Error Handling (CRITICAL - 10 minutes)
-
-**ContextMenuManager.ts Line 154:**
-```typescript
-// BEFORE (violates CLAUDE.md)
-console.error('[ContextMenu] No menu items found...');
-return;
-
-// AFTER (required)
-throw new Error(`No menu items for context. Actions: ${applicableActions.length}, Type: ${context.targetType}`);
-```
-
-**ContextMenuRenderer.ts Lines 72-73:**
-```typescript
-// BEFORE (silent fallback)
-const innerRadius = items[0]?.innerRadius ?? 30;
-const outerRadius = items[0]?.outerRadius ?? 100;
-
-// AFTER (validate and throw)
-if (!items[0] || items[0].innerRadius === undefined || items[0].outerRadius === undefined) {
-  throw new Error('Items missing radii - calculateArcAngles() must be called first');
-}
-const innerRadius = items[0].innerRadius;
-const outerRadius = items[0].outerRadius;
-```
-
-### Priority 4: Code Cleanup (HIGH - 1 hour)
-
-1. Extract magic numbers to named constants
-2. Implement or remove TODO at line 647
-3. Consider extracting ContextMenuManager into smaller modules (approaching 800 lines)
+The implementation is functionally complete and builds successfully, but contains:
+- **CRITICAL:** Debug logging that explicitly violates project guidelines
+- **HIGH:** Pervasive type safety violations that must be fixed before approval
 
 ---
 
-## Estimated Rework Effort
+## Required Actions
 
-- Test coverage: 3-4 hours (comprehensive test suite)
-- Type safety fixes: 2-3 hours (systematic `as any` removal)
-- Error handling fixes: 10 minutes (2 critical fixes)
-- Code cleanup: 1 hour (constants, TODO, refactoring)
+### Immediate (CRITICAL - 5 minutes)
+1. **DELETE all 10 debug console.log statements** - This is a CLAUDE.md violation
 
-**Total:** ~7-9 hours of work required before approval.
+### High Priority (2-3 hours)
+2. **Add EventMap types** for all 22 emitted event types
+3. **Define component interfaces** (BuildingComponent, HarvestableComponent, etc.)
+4. **Type all event handlers** using proper EventMap types
+5. **Remove all `as any` assertions** (74+ instances)
+6. **Add validation** for menu item radius values instead of fallback
 
----
+**Estimated Fix Time:**
+- Debug logging removal: **5 minutes**
+- Type safety fixes: **2-3 hours**
+- **Total: 2-3 hours**
 
-## Architecture Assessment
-
-**Strengths:**
-- ✅ Excellent separation of concerns (Manager, Renderer, Context, Registry)
-- ✅ Clear responsibility boundaries
-- ✅ Event-driven design is appropriate
-- ✅ Configuration-based approach provides flexibility
-- ✅ Constructor validation catches errors early
-- ✅ Most error handling follows correct patterns (re-throw after logging)
-
-**Weaknesses:**
-- ❌ Type safety compromised by excessive `as any` usage
-- ❌ No automated test coverage
-- ❌ One critical error swallowing instance
-- ⚠️ File size approaching limit
-
-**Overall Assessment:**
-
-The architecture is sound. This is not a design problem - it's an implementation quality issue. The structure and patterns are correct, but type safety has been sacrificed for convenience, and testing was skipped entirely.
-
-Once type safety is restored and tests are added, this will be a solid, maintainable system that follows best practices.
+**Risk:** Currently, type errors will only surface at runtime instead of compile time. This violates CLAUDE.md's "crash early" principle and could hide bugs.
 
 ---
 
-**Next Step:** Return to Implementation Agent for required fixes. After fixes, re-review before proceeding to playtest.
+## Escalation Note
+
+This review identifies **two critical categories of issues**:
+
+1. **CLAUDE.md Violation:** 10 debug console.log statements that explicitly violate project guidelines. These MUST be removed immediately - no exceptions.
+
+2. **Systemic Type Safety Issues:** The implementation bypasses TypeScript's type system in 74+ locations, creating technical debt and runtime error risk.
+
+While the code functions correctly and the rendering bug has been fixed, these violations prevent approval.
+
+**Recommendation:** Return to Implementation Agent for:
+1. **Immediate removal** of debug logging (5 minutes)
+2. **Type safety fixes** (2-3 hours)
+
+Once fixed, proceed to playtest.

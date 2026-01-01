@@ -81,3 +81,7 @@ export {
   type PlacementConstraint,
   type PlacementWeights,
 } from './PlacementScorer.js';
+
+// Feng Shui Analyzers - Spatial harmony analysis
+export { fengShuiAnalyzer, FengShuiAnalyzer } from './FengShuiAnalyzer.js';
+export { aerialFengShuiAnalyzer, AerialFengShuiAnalyzer } from './AerialFengShuiAnalyzer.js';

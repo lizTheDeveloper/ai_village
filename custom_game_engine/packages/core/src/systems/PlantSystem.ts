@@ -49,7 +49,7 @@ export class PlantSystem implements System {
 
   // Time tracking for plant updates
   private accumulatedTime: number = 0;
-  private readonly HOUR_THRESHOLD = 1.0; // Update plants every game hour
+  private readonly HOUR_THRESHOLD = 24.0; // Update plants once per day
   private lastUpdateLog: number = 0;
 
   // Track entity IDs for plants (to avoid using 'as any')
@@ -132,15 +132,8 @@ export class PlantSystem implements System {
     // Clear companion planting cache at start of each update
     this.clearCompanionCache();
 
-    // Get agent positions for proximity-based simulation culling
-    const agentPositions: Array<{ x: number; y: number }> = [];
-    const agentEntities = world.query().with(CT.Agent).with(CT.Position).executeEntities();
-    for (const agentEntity of agentEntities) {
-      const pos = agentEntity.components.get(CT.Position) as { x: number; y: number } | undefined;
-      if (pos) {
-        agentPositions.push({ x: pos.x, y: pos.y });
-      }
-    }
+    // Update agent positions in scheduler for proximity-based simulation culling
+    world.simulationScheduler.updateAgentPositions(world);
 
     // Get time component to calculate game hours elapsed
     const timeEntities = world.query().with(CT.Time).executeEntities();
@@ -206,29 +199,29 @@ export class PlantSystem implements System {
       return;
     }
 
+    // Filter entities using SimulationScheduler - only process visible plants
+    // Note: Planted crops are handled specially below (always simulate)
+    const visibleEntities = world.simulationScheduler.filterActiveEntities(
+      entities as Entity[],
+      world.tick
+    );
+
+    // Build set of visible entity IDs for quick lookup
+    const visibleEntityIds = new Set<string>();
+    for (const entity of visibleEntities) {
+      visibleEntityIds.add(entity.id);
+    }
+
     for (const entity of entities) {
       const impl = entity as EntityImpl;
       const plant = impl.getComponent<PlantComponent>(CT.Plant);
       if (!plant) continue;
 
-      // Simulation culling: Only update wild plants if near agents
-      // Planted crops always simulate (even when agents are far away)
-      if (!plant.planted) {
-        const VISION_RANGE = 15; // tiles - from GameBalance.VISION_RANGE_TILES
-        let nearAgent = false;
-
-        for (const agentPos of agentPositions) {
-          const dx = plant.position.x - agentPos.x;
-          const dy = plant.position.y - agentPos.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          if (distance <= VISION_RANGE) {
-            nearAgent = true;
-            break;
-          }
-        }
-
-        // Skip wild plants that are far from all agents (pause simulation)
-        if (!nearAgent) continue;
+      // Simulation culling: Wild plants only simulate when visible
+      // Planted crops always simulate (player investment requires always-on simulation)
+      const isVisible = visibleEntityIds.has(entity.id);
+      if (!plant.planted && !isVisible) {
+        continue; // Skip wild plants that are off-screen (pause simulation)
       }
 
       // Store entity ID for this plant

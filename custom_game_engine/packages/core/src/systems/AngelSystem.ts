@@ -8,6 +8,8 @@ import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
+import type { SpiritualComponent } from '../components/SpiritualComponent.js';
+import { AngelAIDecisionProcessor } from './AngelAIDecisionProcessor.js';
 
 // ============================================================================
 // Angel Types
@@ -94,9 +96,18 @@ export class AngelSystem implements System {
   private config: AngelConfig;
   private angels: Map<string, AngelData> = new Map();
   private lastUpdate: number = 0;
+  private aiProcessor: AngelAIDecisionProcessor;
 
-  constructor(config: Partial<AngelConfig> = {}) {
+  constructor(config: Partial<AngelConfig> = {}, llmProvider?: unknown) {
     this.config = { ...DEFAULT_ANGEL_CONFIG, ...config };
+    this.aiProcessor = new AngelAIDecisionProcessor(llmProvider as any);
+  }
+
+  /**
+   * Set LLM provider for angel AI (for dependency injection)
+   */
+  setLLMProvider(provider: unknown): void {
+    this.aiProcessor.setLLMProvider(provider as any);
   }
 
   update(world: World): void {
@@ -194,17 +205,141 @@ export class AngelSystem implements System {
   }
 
   /**
-   * Angel AI decision making
+   * Angel AI decision making - handle prayers assigned to this angel
    */
-  private performAngelAI(angel: AngelData, _world: World): void {
-    // Simplified AI - in full implementation would be more complex
-    if (!angel.currentTask) {
-      // Assign task based on purpose
-      angel.currentTask = this.assignTask(angel);
+  private performAngelAI(angel: AngelData, world: World): void {
+    // If already has a task, continue it
+    if (angel.currentTask) {
+      return;
     }
 
-    // Execute task
-    // In full implementation, would actually perform actions
+    // Find deity
+    const deityEntity = world.getEntity(angel.deityId);
+    if (!deityEntity) return;
+
+    const deity = deityEntity.components.get(CT.Deity) as DeityComponent | undefined;
+    if (!deity) return;
+
+    // Get all believers with unanswered prayers
+    const believersWithPrayers = this.getAgentsWithUnansweredPrayers(deity, world);
+    if (believersWithPrayers.length === 0) {
+      // No prayers to handle, assign default task
+      angel.currentTask = this.assignTask(angel);
+      return;
+    }
+
+    // Find best prayer for this angel to handle
+    const bestMatch = this.findBestPrayerForAngel(angel, believersWithPrayers, world);
+    if (!bestMatch) {
+      angel.currentTask = this.assignTask(angel);
+      return;
+    }
+
+    // Answer the prayer using AI processor (async, but we don't await - fires and forgets)
+    this.aiProcessor.answerPrayerWithAngel(angel, bestMatch.prayer, world).then((success) => {
+      if (success) {
+        // Clear current task on success
+        angel.currentTask = undefined;
+
+        // Remove from deity's prayer queue
+        deity.removePrayer(bestMatch.prayer.id);
+      }
+    }).catch((error) => {
+      console.error(`[AngelSystem] Failed to answer prayer: ${error}`);
+      angel.currentTask = undefined;
+    });
+
+    // Mark as busy
+    angel.currentTask = {
+      type: 'deliver_message',
+      targetId: bestMatch.agentId,
+      completionCondition: 'prayer_answered',
+    };
+  }
+
+  /**
+   * Get all agents with unanswered prayers
+   */
+  private getAgentsWithUnansweredPrayers(deity: DeityComponent, world: World): Array<{ agentId: string; spiritual: SpiritualComponent }> {
+    const result: Array<{ agentId: string; spiritual: SpiritualComponent }> = [];
+
+    for (const believerId of deity.believers) {
+      const agent = world.getEntity(believerId);
+      if (!agent) continue;
+
+      const spiritual = agent.components.get(CT.Spiritual) as SpiritualComponent | undefined;
+      if (!spiritual) continue;
+
+      // Check for unanswered prayers
+      const unansweredPrayers = spiritual.prayers.filter(p => !p.answered);
+      if (unansweredPrayers.length > 0) {
+        result.push({ agentId: believerId, spiritual });
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Find the best prayer for this angel to handle
+   */
+  private findBestPrayerForAngel(
+    angel: AngelData,
+    believersWithPrayers: Array<{ agentId: string; spiritual: SpiritualComponent }>,
+    _world: World
+  ): { agentId: string; prayer: any } | null {
+    // Collect all unanswered prayers from all believers
+    const allPrayers: Array<{ agentId: string; prayer: any }> = [];
+
+    for (const { agentId, spiritual } of believersWithPrayers) {
+      const unansweredPrayers = spiritual.prayers.filter(p => !p.answered);
+      for (const prayer of unansweredPrayers) {
+        allPrayers.push({ agentId, prayer });
+      }
+    }
+
+    if (allPrayers.length === 0) return null;
+
+    // Simple scoring to find best match
+    let bestPrayer: { agentId: string; prayer: any } | null = null;
+    let bestScore = -Infinity;
+
+    for (const { agentId, prayer } of allPrayers) {
+      // Simple scoring based on purpose match for now
+      const purposeMatch = this.scorePrayerForAngel(angel, prayer);
+      if (purposeMatch > bestScore) {
+        bestScore = purposeMatch;
+        bestPrayer = { agentId, prayer };
+      }
+    }
+
+    return bestPrayer;
+  }
+
+  /**
+   * Score how well a prayer matches this angel's purpose
+   */
+  private scorePrayerForAngel(angel: AngelData, prayer: any): number {
+    const prayerType = prayer.type;
+
+    // Match prayer type to angel purpose
+    if (prayerType === 'help' || prayerType === 'plea') {
+      if (angel.purpose === 'protect_believers') return 1.0;
+      if (angel.purpose === 'perform_miracles') return 0.8;
+      return 0.3;
+    }
+
+    if (prayerType === 'guidance') {
+      if (angel.purpose === 'deliver_messages') return 1.0;
+      return 0.5;
+    }
+
+    if (prayerType === 'gratitude') {
+      if (angel.purpose === 'gather_souls') return 1.0;
+      return 0.4;
+    }
+
+    return 0.5;
   }
 
   /**

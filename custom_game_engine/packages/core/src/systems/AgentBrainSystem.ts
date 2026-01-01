@@ -54,6 +54,7 @@ import {
   waterBehavior,
   buildBehavior,
   craftBehavior,
+  researchBehavior,
   tradeBehavior,
   castSpellBehavior,
   seekWarmthBehavior,
@@ -139,6 +140,9 @@ export class AgentBrainSystem implements System {
     // Crafting behaviors
     this.behaviors.register('craft', craftBehavior, { description: 'Craft items at stations' });
 
+    // Research behaviors
+    this.behaviors.register('research', researchBehavior, { description: 'Conduct research at research buildings' });
+
     // Trade behaviors
     this.behaviors.register('trade', tradeBehavior, { description: 'Buy or sell items at shops' });
 
@@ -193,6 +197,9 @@ export class AgentBrainSystem implements System {
       let agent = impl.getComponent<AgentComponent>(CT.Agent);
 
       if (!agent) continue;
+
+      // Skip AI processing when agent is player-controlled (Phase 16: Player Avatar System)
+      if (agent.behavior === 'player_controlled') continue;
 
       // Check think interval
       if (!this.shouldThink(agent, world.tick)) continue;

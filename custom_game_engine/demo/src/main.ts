@@ -1,34 +1,12 @@
 import {
   GameLoop,
-  AgentBrainSystem,
-  MovementSystem,
-  NeedsSystem,
-  MemorySystem,
-  MemoryFormationSystem,
-  MemoryConsolidationSystem,
-  ReflectionSystem,
-  JournalingSystem,
-  CommunicationSystem,
-  BuildingSystem,
-  ResourceGatheringSystem,
   BuildingBlueprintRegistry,
   registerShopBlueprints,
   registerFarmBlueprints,
   PlacementValidator,
-  TemperatureSystem,
-  WeatherSystem,
   SoilSystem,
-  PlantSystem,
   PlantComponent,
-  TimeSystem,
-  SleepSystem,
-  AnimalSystem,
-  AnimalProductionSystem,
-  TamingSystem,
   WildAnimalSpawningSystem,
-  AnimalBrainSystem,
-  AnimalHousingSystem,
-  MoodSystem,
   TillActionHandler,
   PlantActionHandler,
   GatherSeedsActionHandler,
@@ -47,64 +25,14 @@ import {
   createEntityId,
   type World,
   type WorldMutator,
-  // Navigation & Exploration systems
-  SteeringSystem,
-  ExplorationSystem,
-  LandmarkNamingSystem,
-  VerificationSystem,
-  SocialGradientSystem,
-  BeliefFormationSystem,
-  BeliefGenerationSystem,
-  PrayerSystem,
-  PrayerAnsweringSystem,
-  MythGenerationSystem,
-  SpatialMemoryQuerySystem,
-  // Divinity Phase 4: Emergent Gods
-  DeityEmergenceSystem,
-  AIGodBehaviorSystem,
-  DivinePowerSystem,
-  // Divinity Phase 5: Religious Institutions
-  TempleSystem,
-  PriesthoodSystem,
-  RitualSystem,
-  HolyTextSystem,
-  // Divinity Phase 6: Avatar System
-  AvatarSystem,
-  // Divinity Phase 7: Angels
-  AngelSystem,
-  // Divinity Phase 8: Advanced Theology
-  SchismSystem,
-  SyncretismSystem,
-  ReligiousCompetitionSystem,
-  ConversionWarfareSystem,
-  // Divinity Phase 4: Faith Mechanics
-  FaithMechanicsSystem,
-  // Divinity Phase 9: World Impact
-  TerrainModificationSystem,
-  SpeciesCreationSystem,
-  DivineWeatherControl,
-  DivineBodyModification,
-  MassEventSystem,
   // Crafting systems (Phase 10)
   CraftingSystem,
   initializeDefaultRecipes,
   globalRecipeRegistry,
   // Skill systems (Phase 4 unified)
-  SkillSystem,
   CookingSystem,
-  // Idle Behaviors & Personal Goals
-  IdleBehaviorSystem,
-  GoalGenerationSystem,
-  // Trading system (Phase 12.7)
-  TradingSystem,
-  // Market Events system (Phase 12.8)
-  MarketEventSystem,
   // Phase 13: Research & Discovery
-  ResearchSystem,
   registerDefaultResearch,
-  // Phase 30: Magic System
-  MagicSystem,
-  SpellRegistry,
   // Metrics Collection System (with streaming support)
   MetricsCollectionSystem,
   // Live Entity API for dashboard queries
@@ -112,18 +40,13 @@ import {
   // Governance Data System (Phase 11)
   GovernanceDataSystem,
   // Auto-save & Time Travel
-  AutoSaveSystem,
-  CheckpointNamingService,
   checkpointNamingService,
   saveLoadService,
-  // Conflict & Combat Systems
-  AgentCombatSystem,
-  DominanceChallengeSystem,
-  GuardDutySystem,
-  HuntingSystem,
-  InjurySystem,
-  PredatorAttackSystem,
-  VillageDefenseSystem,
+  // Centralized system registration
+  registerAllSystems as coreRegisterAllSystems,
+  type SystemRegistrationResult as CoreSystemResult,
+  // Magic system
+  SpellRegistry,
 } from '@ai-village/core';
 import {
   Renderer,
@@ -131,6 +54,7 @@ import {
   KeyboardRegistry,
   BuildingPlacementUI,
   AgentInfoPanel,
+  AgentRosterPanel,
   AnimalInfoPanel,
   TileInspectorPanel,
   PlantInfoPanel,
@@ -142,6 +66,10 @@ import {
   InventoryUI,
   CraftingPanelUI,
   ControlsPanel,
+  TimeControlsPanel,
+  UnifiedHoverInfoPanel,
+  PlayerControlHUD,
+  AgentSelectionPanel,
   EconomyPanel,
   WindowManager,
   MenuBar,
@@ -233,6 +161,7 @@ interface UIContext {
   menuBar: MenuBar;
   keyboardRegistry: KeyboardRegistry;
   contextMenuManager: ContextMenuManager;
+  hoverInfoPanel: UnifiedHoverInfoPanel;
 }
 
 // ============================================================================
@@ -468,12 +397,12 @@ async function createInitialAnimals(world: WorldMutator, spawningSystem: WildAni
 
 interface SystemRegistrationResult {
   soilSystem: SoilSystem;
-  plantSystem: PlantSystem;
   craftingSystem: CraftingSystem;
   wildAnimalSpawning: WildAnimalSpawningSystem;
   governanceDataSystem: GovernanceDataSystem;
   metricsSystem: MetricsCollectionSystem;
   promptBuilder: StructuredPromptBuilder | null;
+  coreResult: CoreSystemResult;
 }
 
 async function registerAllSystems(
@@ -481,195 +410,80 @@ async function registerAllSystems(
   llmQueue: LLMDecisionQueue | null,
   promptBuilder: StructuredPromptBuilder | null
 ): Promise<SystemRegistrationResult> {
-  // Core systems
-  gameLoop.systemRegistry.register(new TimeSystem());
-  gameLoop.systemRegistry.register(new WeatherSystem());
-  gameLoop.systemRegistry.register(new TemperatureSystem());
+  // Register default materials and recipes before system registration
+  const { registerDefaultMaterials } = await import('@ai-village/core');
+  registerDefaultMaterials();
+  initializeDefaultRecipes(globalRecipeRegistry);
+  registerDefaultResearch();
 
-  const soilSystem = new SoilSystem();
-  gameLoop.systemRegistry.register(soilSystem);
+  // Generate session ID for metrics
+  const gameSessionId = `game_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  console.log(`[Demo] Game session ID: ${gameSessionId}`);
 
-  // Action handlers
-  gameLoop.actionRegistry.register(new TillActionHandler(soilSystem));
+  // Use centralized system registration from @ai-village/core
+  const coreResult = coreRegisterAllSystems(gameLoop, {
+    llmQueue: llmQueue || undefined,
+    promptBuilder: promptBuilder || undefined,
+    gameSessionId,
+    metricsServerUrl: 'ws://localhost:8765',
+    enableMetrics: true,
+    enableAutoSave: true,
+  });
+
+  // Set up plant species lookup (injected from @ai-village/world)
+  const { getPlantSpecies } = await import('@ai-village/world');
+  coreResult.plantSystem.setSpeciesLookup(getPlantSpecies);
+
+  // Register action handlers (these are separate from systems)
+  gameLoop.actionRegistry.register(new TillActionHandler(coreResult.soilSystem));
   gameLoop.actionRegistry.register(new PlantActionHandler());
   gameLoop.actionRegistry.register(new GatherSeedsActionHandler());
   gameLoop.actionRegistry.register(new HarvestActionHandler());
   gameLoop.actionRegistry.register(new CraftActionHandler());
   gameLoop.actionRegistry.register(new TradeActionHandler());
 
-  // Plant system
-  const plantSystem = new PlantSystem(gameLoop.world.eventBus);
-  const { getPlantSpecies } = await import('@ai-village/world');
-  plantSystem.setSpeciesLookup(getPlantSpecies);
-  gameLoop.systemRegistry.register(plantSystem);
-
-  // Animal systems
-  gameLoop.systemRegistry.register(new AnimalBrainSystem());
-  gameLoop.systemRegistry.register(new AnimalSystem(gameLoop.world.eventBus));
-  gameLoop.systemRegistry.register(new AnimalProductionSystem(gameLoop.world.eventBus));
-  gameLoop.systemRegistry.register(new AnimalHousingSystem());
-  const wildAnimalSpawning = new WildAnimalSpawningSystem();
-  gameLoop.systemRegistry.register(wildAnimalSpawning);
-
-  // Idle Behaviors & Personal Goals
-  gameLoop.systemRegistry.register(new IdleBehaviorSystem());
-  gameLoop.systemRegistry.register(new GoalGenerationSystem(gameLoop.world.eventBus));
-
-  // AI system
-  gameLoop.systemRegistry.register(new AgentBrainSystem(llmQueue, promptBuilder));
-
-  // Navigation & Exploration systems
-  gameLoop.systemRegistry.register(new SocialGradientSystem());
-  gameLoop.systemRegistry.register(new ExplorationSystem());
-  gameLoop.systemRegistry.register(new LandmarkNamingSystem(llmQueue));
-  gameLoop.systemRegistry.register(new SteeringSystem());
-  gameLoop.systemRegistry.register(new VerificationSystem());
-  gameLoop.systemRegistry.register(new CommunicationSystem());
-  gameLoop.systemRegistry.register(new NeedsSystem());
-  gameLoop.systemRegistry.register(new MoodSystem());
-  gameLoop.systemRegistry.register(new SleepSystem());
-  gameLoop.systemRegistry.register(new TamingSystem());
-  gameLoop.systemRegistry.register(new BuildingSystem());
-
-  // Materials
-  const { registerDefaultMaterials } = await import('@ai-village/core');
-  registerDefaultMaterials();
-
-  // Crafting system
-  initializeDefaultRecipes(globalRecipeRegistry);
+  // Set up crafting system with recipe registry
   const craftingSystem = new CraftingSystem();
   craftingSystem.setRecipeRegistry(globalRecipeRegistry);
   gameLoop.systemRegistry.register(craftingSystem);
   (gameLoop.world as any).craftingSystem = craftingSystem;
 
-  // Skill systems
-  gameLoop.systemRegistry.register(new SkillSystem());
+  // Set up cooking system with recipe registry
   const cookingSystem = new CookingSystem();
   cookingSystem.setRecipeRegistry(globalRecipeRegistry);
-  gameLoop.systemRegistry.register(cookingSystem);
+  // Note: CookingSystem is already registered by coreRegisterAllSystems,
+  // but we need to configure it with the recipe registry
 
-  // Trading system
-  const tradingSystem = new TradingSystem();
-  gameLoop.systemRegistry.register(tradingSystem);
+  // Set up world references for external access
+  (gameLoop.world as any).marketEventSystem = coreResult.marketEventSystem;
 
-  // Market events
-  const marketEventSystem = new MarketEventSystem(gameLoop.world.eventBus);
-  gameLoop.systemRegistry.register(marketEventSystem);
-  (gameLoop.world as any).marketEventSystem = marketEventSystem;
-
-  // Research system
-  const researchSystem = new ResearchSystem();
-  gameLoop.systemRegistry.register(researchSystem);
-  registerDefaultResearch();
-
-  // Magic system (Phase 30)
-  const magicSystem = new MagicSystem();
-  gameLoop.systemRegistry.register(magicSystem);
-
-  // Resource gathering
-  gameLoop.systemRegistry.register(new ResourceGatheringSystem(gameLoop.world.eventBus));
-
-  // Movement and memory
-  gameLoop.systemRegistry.register(new MovementSystem());
-  gameLoop.systemRegistry.register(new MemorySystem());
-  gameLoop.systemRegistry.register(new MemoryFormationSystem(gameLoop.world.eventBus));
-  gameLoop.systemRegistry.register(new SpatialMemoryQuerySystem());
-  gameLoop.systemRegistry.register(new MemoryConsolidationSystem(gameLoop.world.eventBus));
-  gameLoop.systemRegistry.register(new BeliefFormationSystem());
-  gameLoop.systemRegistry.register(new BeliefGenerationSystem()); // Divinity Phase 1
-  gameLoop.systemRegistry.register(new PrayerSystem()); // Divinity Phase 1
-  gameLoop.systemRegistry.register(new PrayerAnsweringSystem()); // Divinity Phase 2
-  gameLoop.systemRegistry.register(new MythGenerationSystem(llmQueue)); // Divinity Phase 3 - LLM-generated myths
-
-  // Divinity Phase 4: Emergent Gods
-  gameLoop.systemRegistry.register(new DeityEmergenceSystem());
-  gameLoop.systemRegistry.register(new AIGodBehaviorSystem());
-  const divinePowerSystem = new DivinePowerSystem();
-  gameLoop.systemRegistry.register(divinePowerSystem);
-  gameLoop.systemRegistry.register(new FaithMechanicsSystem()); // Faith growth and decay mechanics
-
-  // Divinity Phase 5: Religious Institutions
-  gameLoop.systemRegistry.register(new TempleSystem());
-  gameLoop.systemRegistry.register(new PriesthoodSystem());
-  gameLoop.systemRegistry.register(new RitualSystem());
-  gameLoop.systemRegistry.register(new HolyTextSystem());
-
-  // Divinity Phase 6: Avatar System
-  gameLoop.systemRegistry.register(new AvatarSystem());
-
-  // Divinity Phase 7: Angels
-  gameLoop.systemRegistry.register(new AngelSystem());
-
-  // Divinity Phase 8: Advanced Theology
-  gameLoop.systemRegistry.register(new SchismSystem());
-  gameLoop.systemRegistry.register(new SyncretismSystem());
-  gameLoop.systemRegistry.register(new ReligiousCompetitionSystem());
-  gameLoop.systemRegistry.register(new ConversionWarfareSystem());
-
-  // Divinity Phase 9: World Impact
-  gameLoop.systemRegistry.register(new TerrainModificationSystem());
-  gameLoop.systemRegistry.register(new SpeciesCreationSystem());
-  gameLoop.systemRegistry.register(new DivineWeatherControl());
-  gameLoop.systemRegistry.register(new DivineBodyModification()); // Divine healing and transformation powers
-  gameLoop.systemRegistry.register(new MassEventSystem());
-
-  gameLoop.systemRegistry.register(new ReflectionSystem(gameLoop.world.eventBus));
-  gameLoop.systemRegistry.register(new JournalingSystem(gameLoop.world.eventBus));
-
-  // Conflict & Combat Systems
-  gameLoop.systemRegistry.register(new HuntingSystem(gameLoop.world.eventBus));
-  gameLoop.systemRegistry.register(new PredatorAttackSystem(gameLoop.world.eventBus));
-  gameLoop.systemRegistry.register(new AgentCombatSystem(gameLoop.world.eventBus));
-  gameLoop.systemRegistry.register(new DominanceChallengeSystem(gameLoop.world.eventBus));
-  gameLoop.systemRegistry.register(new InjurySystem(gameLoop.world.eventBus));
-  gameLoop.systemRegistry.register(new GuardDutySystem(gameLoop.world.eventBus));
-  gameLoop.systemRegistry.register(new VillageDefenseSystem(gameLoop.world.eventBus));
-
-  // Governance data system
-  const governanceDataSystem = new GovernanceDataSystem();
-  governanceDataSystem.initialize(gameLoop.world, gameLoop.world.eventBus);
-  gameLoop.systemRegistry.register(governanceDataSystem);
-
-  // Metrics system
-  const gameSessionId = `game_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-  console.log(`[Demo] Game session ID: ${gameSessionId}`);
-
-  const metricsSystem = new MetricsCollectionSystem(gameLoop.world, {
-    enabled: true,
-    streaming: true,
-    streamConfig: {
-      serverUrl: 'ws://localhost:8765',
-      batchSize: 10,
-      flushInterval: 5000,
-      gameSessionId,
-    },
-  });
-  gameLoop.systemRegistry.register(metricsSystem);
-
-  // Set up Live Entity API
-  const streamClient = metricsSystem.getStreamClient();
-  if (streamClient) {
-    const liveEntityAPI = new LiveEntityAPI(gameLoop.world);
-    if (promptBuilder) {
-      liveEntityAPI.setPromptBuilder(promptBuilder);
+  // Set up Live Entity API if metrics is enabled
+  const metricsSystem = coreResult.metricsSystem;
+  if (metricsSystem) {
+    const streamClient = metricsSystem.getStreamClient();
+    if (streamClient) {
+      const liveEntityAPI = new LiveEntityAPI(gameLoop.world);
+      if (promptBuilder) {
+        liveEntityAPI.setPromptBuilder(promptBuilder);
+      }
+      liveEntityAPI.attach(streamClient);
+      console.log('[Demo] Live Entity API attached for dashboard queries');
     }
-    liveEntityAPI.attach(streamClient);
-    console.log('[Demo] Live Entity API attached for dashboard queries');
   }
 
-  // Auto-save & Time Travel system
-  const autoSaveSystem = new AutoSaveSystem();
-  gameLoop.systemRegistry.register(autoSaveSystem);
-  console.log('[Demo] AutoSaveSystem registered - checkpoints will be created at midnight');
+  // Initialize governance data system
+  coreResult.governanceDataSystem.initialize(gameLoop.world, gameLoop.world.eventBus);
+
+  console.log('[Demo] All systems registered via centralized registration');
 
   return {
-    soilSystem,
-    plantSystem,
+    soilSystem: coreResult.soilSystem,
     craftingSystem,
-    wildAnimalSpawning,
-    governanceDataSystem,
-    metricsSystem,
+    wildAnimalSpawning: coreResult.wildAnimalSpawning,
+    governanceDataSystem: coreResult.governanceDataSystem,
+    metricsSystem: metricsSystem!,
     promptBuilder,
+    coreResult,
   };
 }
 
@@ -746,6 +560,7 @@ function createUIPanels(
   const shopPanel = new ShopPanel();
   const governancePanel = new GovernanceDashboardPanel();
   const inventoryUI = new InventoryUI(canvas, gameLoop.world);
+  const hoverInfoPanel = new UnifiedHoverInfoPanel();
 
   const craftingUI = new CraftingPanelUI(gameLoop.world, canvas);
   craftingUI.onCraftNow((recipeId: string, quantity: number) => {
@@ -780,6 +595,9 @@ function createUIPanels(
     canvas
   );
 
+  // Register context menu manager with renderer so it gets rendered
+  renderer.setContextMenuManager(contextMenuManager);
+
   // Create placeholder for controlsPanel - will be initialized after windowManager
   const controlsPanel = null as any;
 
@@ -800,6 +618,7 @@ function createUIPanels(
     tileInspectorPanel,
     controlsPanel,
     contextMenuManager,
+    hoverInfoPanel,
   };
 }
 
@@ -1080,6 +899,48 @@ function setupWindowManager(
     showInWindowList: true,
     keyboardShortcut: 'H',
     menuCategory: 'settings',
+  });
+
+  // Time Controls Panel
+  const timeControlsPanel = new TimeControlsPanel();
+  windowManager.registerWindow('time-controls', timeControlsPanel, {
+    defaultX: 10,
+    defaultY: 50,
+    defaultWidth: 220,
+    defaultHeight: 180,
+    isDraggable: true,
+    isResizable: false,
+    showInWindowList: true,
+    keyboardShortcut: 'T',
+    menuCategory: 'settings',
+  });
+
+  // Agent Roster Panel
+  const agentRosterPanel = new AgentRosterPanel();
+  windowManager.registerWindow('agent-roster', agentRosterPanel, {
+    defaultX: 10,
+    defaultY: 250,
+    defaultWidth: 380,
+    defaultHeight: 500,
+    isDraggable: true,
+    isResizable: true,
+    showInWindowList: true,
+    keyboardShortcut: 'R',
+    menuCategory: 'info',
+  });
+
+  // Agent Selection Panel (Jack-In)
+  const agentSelectionPanel = new AgentSelectionPanel();
+  windowManager.registerWindow('agent-selection', agentSelectionPanel, {
+    defaultX: 420,
+    defaultY: 200,
+    defaultWidth: 400,
+    defaultHeight: 500,
+    isDraggable: true,
+    isResizable: true,
+    showInWindowList: true,
+    keyboardShortcut: 'J',
+    menuCategory: 'player',
   });
 
   // ============================================================================
@@ -1985,7 +1846,7 @@ function setupInputHandlers(
   const {
     agentInfoPanel, animalInfoPanel, plantInfoPanel, tileInspectorPanel,
     memoryPanel, relationshipsPanel, inventoryUI, craftingUI, shopPanel,
-    placementUI, windowManager, menuBar, keyboardRegistry
+    placementUI, windowManager, menuBar, keyboardRegistry, hoverInfoPanel, contextMenuManager
   } = uiContext;
 
   inputHandler.setCallbacks({
@@ -2016,19 +1877,21 @@ function setupInputHandlers(
         return;
       }
       placementUI.updateCursorPosition(screenX, screenY, gameLoop.world);
+
+      // Update hover info with entity under cursor
+      const hoveredEntity = renderer.findEntityAtScreenPosition(screenX, screenY, gameLoop.world);
+      hoverInfoPanel.update(hoveredEntity, screenX, screenY);
     },
     onWheel: (screenX, screenY, deltaY) => {
       return windowManager.handleWheel(screenX, screenY, deltaY);
     },
     onRightClick: (screenX, screenY) => {
       // Emit event for context menu manager to handle
-      console.log('[InputHandler] Emitting input:rightclick event at:', screenX, screenY);
       gameLoop.world.eventBus.emit({
-        type: 'input:rightclick' as any,
+        type: 'input:rightclick',
         source: 'world',
         data: { x: screenX, y: screenY }
       });
-      console.log('[InputHandler] Event emitted, queue size:', (gameLoop.world.eventBus as any).eventQueue?.length);
     },
   });
 }
@@ -2622,8 +2485,8 @@ async function main() {
       // Fall back to showing universe creation screen
       universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
         const universeConfigScreen = new UniverseConfigScreen();
-        universeConfigScreen.show((selectedParadigm) => {
-          resolve({ type: 'new', magicParadigm: selectedParadigm });
+        universeConfigScreen.show((config) => {
+          resolve({ type: 'new', magicParadigm: config.magicParadigmId || 'none' });
         });
       });
     }
@@ -2632,8 +2495,8 @@ async function main() {
     console.log('[Demo] No existing saves found - showing universe creation');
     universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
       const universeConfigScreen = new UniverseConfigScreen();
-      universeConfigScreen.show((selectedParadigm) => {
-        resolve({ type: 'new', magicParadigm: selectedParadigm });
+      universeConfigScreen.show((config) => {
+        resolve({ type: 'new', magicParadigm: config.magicParadigmId || 'none' });
       });
     });
   }
@@ -2829,6 +2692,7 @@ async function main() {
     menuBar,
     keyboardRegistry,
     contextMenuManager: panels.contextMenuManager,
+    hoverInfoPanel: panels.hoverInfoPanel,
   };
 
   // Build game context
@@ -2878,8 +2742,12 @@ async function main() {
     panels.shopPanel.render(ctx, gameLoop.world);
     menuBar.render(ctx);
 
-    // Context menu update (handles rendering internally) - MUST be last to render on top
+    // Hover info panel (shows entity tooltips on hover)
+    panels.hoverInfoPanel.render(ctx, canvas.width, canvas.height);
+
+    // Context menu rendering - MUST be last to render on top of all other UI
     panels.contextMenuManager.update();
+    panels.contextMenuManager.render();
 
     requestAnimationFrame(renderLoop);
   }

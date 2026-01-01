@@ -6,6 +6,148 @@
 /** Types of fluids that can exist on a tile */
 export type FluidType = 'water' | 'magma' | 'blood' | 'oil' | 'acid';
 
+// ============================================================================
+// Tile-Based Building System
+// RimWorld/Dwarf Fortress-style construction with walls, doors, and windows
+// as tile properties rather than separate entities.
+// ============================================================================
+
+/** Wall materials with different properties */
+export type WallMaterial = 'wood' | 'stone' | 'mud_brick' | 'ice' | 'metal' | 'glass' | 'thatch';
+
+/** Door materials */
+export type DoorMaterial = 'wood' | 'stone' | 'metal' | 'cloth';
+
+/** Window materials */
+export type WindowMaterial = 'glass' | 'hide' | 'cloth';
+
+/**
+ * Wall tile on a world tile.
+ * Walls block movement and provide insulation.
+ */
+export interface WallTile {
+  /** Material type (affects insulation, durability, appearance) */
+  material: WallMaterial;
+
+  /** Current structural health (0-100) */
+  condition: number;
+
+  /** Insulation value (0-100, derived from material) */
+  insulation: number;
+
+  /** Construction progress (0-100, undefined if complete) */
+  constructionProgress?: number;
+
+  /** Builder entity ID (set during construction) */
+  builderId?: string;
+
+  /** When this wall was constructed (game tick) */
+  constructedAt?: number;
+}
+
+/**
+ * Door tile on a world tile.
+ * Doors can be opened/closed and provide passage through walls.
+ */
+export interface DoorTile {
+  /** Material type */
+  material: DoorMaterial;
+
+  /** Current state */
+  state: 'open' | 'closed' | 'locked';
+
+  /** Game tick when door was last opened (for auto-close) */
+  lastOpened?: number;
+
+  /** Construction progress (0-100, undefined if complete) */
+  constructionProgress?: number;
+
+  /** Builder entity ID */
+  builderId?: string;
+
+  /** When constructed */
+  constructedAt?: number;
+}
+
+/**
+ * Window tile on a world tile.
+ * Windows are placed in walls, block movement but allow light.
+ */
+export interface WindowTile {
+  /** Material type */
+  material: WindowMaterial;
+
+  /** Current health (0-100) */
+  condition: number;
+
+  /** Whether light passes through */
+  lightsThrough: boolean;
+
+  /** Construction progress */
+  constructionProgress?: number;
+
+  /** Builder entity ID */
+  builderId?: string;
+
+  /** When constructed */
+  constructedAt?: number;
+}
+
+/**
+ * Material property lookup table.
+ * Maps wall materials to their physical properties.
+ */
+export const WALL_MATERIAL_PROPERTIES: Record<WallMaterial, {
+  insulation: number;
+  durability: number;
+  difficulty: number;
+  cost: number;
+}> = {
+  wood: { insulation: 50, durability: 40, difficulty: 20, cost: 2 },
+  stone: { insulation: 80, durability: 90, difficulty: 50, cost: 3 },
+  mud_brick: { insulation: 60, durability: 30, difficulty: 30, cost: 2 },
+  ice: { insulation: 30, durability: 20, difficulty: 40, cost: 4 },
+  metal: { insulation: 20, durability: 100, difficulty: 70, cost: 5 },
+  glass: { insulation: 10, durability: 10, difficulty: 60, cost: 4 },
+  thatch: { insulation: 40, durability: 15, difficulty: 10, cost: 1 },
+};
+
+/**
+ * Create a wall tile with default properties based on material.
+ */
+export function createWallTile(material: WallMaterial, tick?: number): WallTile {
+  const props = WALL_MATERIAL_PROPERTIES[material];
+  return {
+    material,
+    condition: 100,
+    insulation: props.insulation,
+    constructedAt: tick,
+  };
+}
+
+/**
+ * Create a door tile.
+ */
+export function createDoorTile(material: DoorMaterial, tick?: number): DoorTile {
+  return {
+    material,
+    state: 'closed',
+    constructedAt: tick,
+  };
+}
+
+/**
+ * Create a window tile.
+ */
+export function createWindowTile(material: WindowMaterial, tick?: number): WindowTile {
+  return {
+    material,
+    condition: 100,
+    lightsThrough: true,
+    constructedAt: tick,
+  };
+}
+
 /**
  * Fluid layer on a tile.
  * Future: Used by fluid simulation system.
@@ -50,6 +192,28 @@ export interface Tile {
 
   /** Biome this tile belongs to */
   biome?: BiomeType;
+
+  // ============================================================================
+  // Tile-Based Building System (Voxel Buildings)
+  // ============================================================================
+
+  /**
+   * Wall on this tile.
+   * Walls block movement and provide insulation.
+   */
+  wall?: WallTile;
+
+  /**
+   * Door on this tile.
+   * Doors can be opened/closed and provide passage through walls.
+   */
+  door?: DoorTile;
+
+  /**
+   * Window on this tile.
+   * Windows are placed in walls, block movement but allow light.
+   */
+  window?: WindowTile;
 
   // Soil management properties (Phase 9)
   /** Whether the tile has been tilled and can be planted */

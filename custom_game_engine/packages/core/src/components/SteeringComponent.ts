@@ -2,6 +2,14 @@ import { ComponentBase } from '../ecs/Component.js';
 
 export type SteeringBehavior = 'seek' | 'arrive' | 'obstacle_avoidance' | 'wander' | 'combined' | 'none';
 
+/** Bounds for containment steering */
+export interface ContainmentBounds {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+}
+
 export interface SteeringComponentData {
   behavior: SteeringBehavior;
   maxSpeed?: number;
@@ -15,6 +23,10 @@ export interface SteeringComponentData {
   wanderRadius?: number;
   wanderDistance?: number;
   wanderJitter?: number;
+  /** Optional bounds to contain the agent within (e.g., city bounds) */
+  containmentBounds?: ContainmentBounds;
+  /** How close to boundary edge before steering back (default: 10) */
+  containmentMargin?: number;
   behaviors?: Array<{
     type: SteeringBehavior;
     weight?: number;
@@ -40,6 +52,8 @@ export class SteeringComponent extends ComponentBase {
   public wanderRadius: number;
   public wanderDistance: number;
   public wanderJitter: number;
+  public containmentBounds?: ContainmentBounds;
+  public containmentMargin: number;
   public behaviors?: Array<{
     type: SteeringBehavior;
     weight?: number;
@@ -67,6 +81,8 @@ export class SteeringComponent extends ComponentBase {
     this.wanderRadius = data.wanderRadius ?? 2.0;
     this.wanderDistance = data.wanderDistance ?? 3.0;
     this.wanderJitter = data.wanderJitter ?? 0.5;
+    this.containmentBounds = data.containmentBounds;
+    this.containmentMargin = data.containmentMargin ?? 10;
     this.behaviors = data.behaviors;
   }
 }

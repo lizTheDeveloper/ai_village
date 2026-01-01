@@ -11,18 +11,22 @@ import {
   type ConversationComponent,
   type MemoryComponent,
   type IdentityComponent,
+  type PositionComponent,
   getFoodStorageInfo,
   getVillageInfo,
   isEntityVisibleWithSkill,
   ALL_SKILL_IDS,
 } from '@ai-village/core';
 import type { BuildingComponent } from '@ai-village/core';
+import { HarmonyContextBuilder } from './HarmonyContextBuilder.js';
 
 /**
  * Builds world context sections for agent prompts.
  * Extracted from StructuredPromptBuilder for better separation of concerns.
  */
 export class WorldContextBuilder {
+  private harmonyBuilder = new HarmonyContextBuilder();
+
   /**
    * Build world context from current situation.
    * Per progressive-skill-reveal-spec.md: Information depth scales with skill level.
@@ -40,6 +44,10 @@ export class WorldContextBuilder {
     const skills = entity?.components.get('skills') as SkillsComponent | undefined;
     const cookingSkill = (skills?.levels.cooking ?? 0) as SkillLevel;
     const buildingSkill = (skills?.levels.building ?? 0) as SkillLevel;
+    const architectureSkill = (skills?.levels.architecture ?? skills?.levels.building ?? 0) as SkillLevel;
+
+    // Get agent position for aerial harmony
+    const position = entity?.components.get('position') as PositionComponent | undefined;
 
     let context = 'Current Situation:\n';
 
@@ -63,6 +71,31 @@ export class WorldContextBuilder {
 
     // Vision - buildings, agents, resources, plants
     context += this.buildVisionContext(vision, world, skills, buildingSkill);
+
+    // Aerial harmony for flying creatures (z > 0)
+    if (position && position.z > 0 && architectureSkill >= 2) {
+      const currentTick = world.tick ?? 0;
+      const aerialContext = this.harmonyBuilder.buildAerialHarmonyContext(
+        world,
+        { x: position.x, y: position.y, z: position.z },
+        architectureSkill,
+        currentTick
+      );
+      if (aerialContext) {
+        context += aerialContext;
+      }
+
+      // Flight path hints for higher skill levels
+      const flightHints = this.harmonyBuilder.buildFlightPathHints(
+        world,
+        { x: position.x, y: position.y, z: position.z },
+        architectureSkill,
+        currentTick
+      );
+      if (flightHints) {
+        context += flightHints;
+      }
+    }
 
     // Memory - known resource locations
     if (memory) {
@@ -184,7 +217,12 @@ export class WorldContextBuilder {
   }
 
   /**
-   * Build vision context section (buildings, agents, resources, plants).
+   * Build vision context section with tiered awareness.
+   *
+   * Tiered Vision (1 tile = 1 meter):
+   * - Close range (~10m): Full detail for nearby entities
+   * - Area range (~50m): Summarized counts
+   * - Distant range (~200m): Landmarks only
    */
   private buildVisionContext(
     vision: VisionComponent | undefined,
@@ -196,40 +234,98 @@ export class WorldContextBuilder {
 
     let context = '';
 
-    // Buildings
+    // Buildings (use seenBuildings for backward compat)
     if (vision.seenBuildings && vision.seenBuildings.length > 0) {
       const buildingInfo = this.getSeenBuildingsInfo(world, vision.seenBuildings, buildingSkill);
       if (buildingInfo) {
         context += buildingInfo;
       }
-    }
 
-    // Agents
-    const agentCount = vision.seenAgents?.length || 0;
-    if (agentCount > 0) {
-      const agentInfo = this.getSeenAgentsInfo(world, vision.seenAgents);
-      if (agentInfo) {
-        context += agentInfo;
-      } else {
-        context += `- You see ${agentCount} other villager${agentCount > 1 ? 's' : ''} nearby\n`;
+      // Add harmony context for architecture-skilled agents
+      const architectureSkill = (skills?.levels.architecture ?? skills?.levels.building ?? 0) as SkillLevel;
+      if (architectureSkill >= 2) {
+        const harmonyContext = this.harmonyBuilder.buildHarmonyContext(
+          world,
+          vision.seenBuildings,
+          architectureSkill
+        );
+        if (harmonyContext) {
+          context += harmonyContext;
+        }
+
+        const placementHints = this.harmonyBuilder.buildPlacementHints(
+          world,
+          vision.seenBuildings,
+          architectureSkill
+        );
+        if (placementHints) {
+          context += placementHints;
+        }
       }
     }
 
-    // Resources
-    const resourceCount = vision.seenResources?.length || 0;
-    if (resourceCount > 0) {
-      context += this.buildResourceContext(vision.seenResources, world);
+    // TIERED AGENT AWARENESS
+    // Close range: detailed info about nearby agents
+    const nearbyAgents = vision.nearbyAgents ?? [];
+    const areaAgents = vision.seenAgents ?? [];
+
+    if (nearbyAgents.length > 0) {
+      // Detailed info for close-range agents
+      const nearbyInfo = this.getSeenAgentsInfo(world, nearbyAgents);
+      if (nearbyInfo) {
+        context += nearbyInfo;
+      }
     }
 
-    // Plants
+    // Area range: just mention count of more distant agents
+    const distantAgentCount = areaAgents.length - nearbyAgents.length;
+    if (distantAgentCount > 0) {
+      context += `- You notice ${distantAgentCount} more villager${distantAgentCount > 1 ? 's' : ''} in the distance\n`;
+    }
+
+    // If no nearby but some in area, show summary
+    if (nearbyAgents.length === 0 && areaAgents.length > 0) {
+      context += `- You see ${areaAgents.length} villager${areaAgents.length > 1 ? 's' : ''} nearby\n`;
+    }
+
+    // TIERED RESOURCE AWARENESS
+    const nearbyResources = vision.nearbyResources ?? [];
+    const areaResources = vision.seenResources ?? [];
+
+    if (nearbyResources.length > 0) {
+      // Detailed for close resources
+      context += this.buildResourceContext(nearbyResources, world);
+    }
+
+    // Summarize distant resources
+    const distantResourceCount = areaResources.length - nearbyResources.length;
+    if (distantResourceCount > 0) {
+      context += `- More resources visible in the area (${distantResourceCount} sources)\n`;
+    }
+
+    // TIERED PLANT AWARENESS
     const seenPlants = vision.seenPlants ?? [];
-    const plantCount = seenPlants.length;
-    if (plantCount > 0) {
+    if (seenPlants.length > 0) {
       context += this.buildPlantContext(seenPlants, world, skills);
     }
 
+    // DISTANT LANDMARKS (for navigation)
+    const landmarks = vision.distantLandmarks ?? [];
+    if (landmarks.length > 0) {
+      const landmarkDescriptions = landmarks.slice(0, 5).map(l => {
+        const parts = l.split('_');
+        const type = parts[0];
+        return type;
+      });
+      const uniqueTypes = [...new Set(landmarkDescriptions)];
+      if (uniqueTypes.length > 0) {
+        context += `- Landmarks visible: ${uniqueTypes.join(', ')} in the distance\n`;
+      }
+    }
+
     // Empty area
-    if (agentCount === 0 && resourceCount === 0 && plantCount === 0) {
+    const totalVisible = areaAgents.length + areaResources.length + seenPlants.length;
+    if (totalVisible === 0) {
       context += '- The area around you is empty\n';
     }
 

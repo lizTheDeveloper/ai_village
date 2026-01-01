@@ -19,6 +19,7 @@ import { BuildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistr
 import { PlacementValidator } from '../buildings/PlacementValidator.js';
 import { resetUsedNames } from '../components/IdentityComponent.js';
 import type { TerrainType, BiomeType } from '../types/TerrainTypes.js';
+import { SimulationScheduler } from './SimulationScheduler.js';
 
 // Re-export for backwards compatibility
 export type { TerrainType, BiomeType };
@@ -52,6 +53,36 @@ export interface ITerrainGenerator {
 }
 
 /**
+ * Wall tile structure for voxel buildings.
+ */
+export interface IWallTile {
+  material: string;
+  condition: number;
+  insulation: number;
+  constructionProgress?: number;
+}
+
+/**
+ * Door tile structure for voxel buildings.
+ */
+export interface IDoorTile {
+  material: string;
+  state: 'open' | 'closed' | 'locked';
+  lastOpened?: number;
+  constructionProgress?: number;
+}
+
+/**
+ * Window tile structure for voxel buildings.
+ */
+export interface IWindowTile {
+  material: string;
+  condition: number;
+  lightsThrough: boolean;
+  constructionProgress?: number;
+}
+
+/**
  * Tile interface for world coordinates.
  * Defined here to avoid circular dependency with world package.
  * Must match the Tile interface in @ai-village/world.
@@ -59,6 +90,7 @@ export interface ITerrainGenerator {
 export interface ITile {
   terrain: TerrainType;
   floor?: string;
+  elevation?: number;
   moisture: number;
   fertility: number;
   biome?: BiomeType;
@@ -75,6 +107,11 @@ export interface ITile {
   lastTilled: number;
   composted: boolean;
   plantId: string | null;
+
+  // Tile-based voxel building support
+  wall?: IWallTile;
+  door?: IDoorTile;
+  window?: IWindowTile;
 }
 
 /**
@@ -128,6 +165,9 @@ export interface World {
 
   /** Check if feature is enabled */
   isFeatureEnabled(feature: string): boolean;
+
+  /** Simulation scheduler for performance optimization */
+  readonly simulationScheduler: SimulationScheduler;
 
   /** Create entity from raw components (for testing) */
   createEntity(archetype?: string): Entity;
@@ -210,6 +250,9 @@ export class WorldImpl implements WorldMutator {
   private _terrainGenerator?: ITerrainGenerator;
   private buildingRegistry?: BuildingBlueprintRegistry;
 
+  // Simulation scheduling for performance optimization
+  private _simulationScheduler = new SimulationScheduler();
+
   // Spatial indices (will be populated as needed)
   private chunkIndex = new Map<string, Set<EntityId>>();
 
@@ -246,6 +289,10 @@ export class WorldImpl implements WorldMutator {
 
   getEventBus(): EventBus {
     return this._eventBus;
+  }
+
+  get simulationScheduler(): SimulationScheduler {
+    return this._simulationScheduler;
   }
 
   get features(): FeatureFlags {

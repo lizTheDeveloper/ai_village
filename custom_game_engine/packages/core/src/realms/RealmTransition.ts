@@ -2,6 +2,8 @@ import type { World } from '../ecs/World.js';
 import type { RealmLocationComponent } from '../components/RealmLocationComponent.js';
 import type { RealmComponent } from '../components/RealmComponent.js';
 import type { AccessMethod, RealmTransitionResult, TransitionEffect as _TransitionEffect } from './RealmTypes.js';
+import { getRealmDefinition } from './RealmDefinitions.js';
+import { createRealmEntity } from './RealmInitializer.js';
 
 // TransitionEffect type used inline in function signatures
 type TransitionEffect = _TransitionEffect;
@@ -43,12 +45,22 @@ export function transitionToRealm(
     };
   }
 
-  // Find target realm entity
-  const realmEntity = findRealmEntity(world, targetRealmId);
+  // Find target realm entity, lazily creating if needed
+  let realmEntity = findRealmEntity(world, targetRealmId);
+
+  // Lazy initialization: if realm doesn't exist but is defined, create it now
+  if (!realmEntity) {
+    const realmDefinition = getRealmDefinition(targetRealmId);
+    if (realmDefinition) {
+      createRealmEntity(world, realmDefinition);
+      realmEntity = findRealmEntity(world, targetRealmId);
+    }
+  }
+
   if (!realmEntity) {
     return {
       success: false,
-      reason: `Realm ${targetRealmId} not found`,
+      reason: `Realm ${targetRealmId} not found and no definition exists`,
     };
   }
 

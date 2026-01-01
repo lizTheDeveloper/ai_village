@@ -3,13 +3,17 @@ import type { PlantSpecies } from '@ai-village/core';
 import { WILD_PLANTS } from './wild-plants.js';
 import { MEDICINAL_PLANTS } from './medicinal-plants.js';
 import { MAGICAL_PLANTS } from './magical-plants.js';
+import { TROPICAL_PLANTS } from './tropical-plants.js';
+import { WETLAND_PLANTS } from './wetland-plants.js';
 
 // All plant species
 const ALL_SPECIES: PlantSpecies[] = [
   /* ...BASE_CROPS, */
   ...WILD_PLANTS,
   ...MEDICINAL_PLANTS,
-  ...MAGICAL_PLANTS
+  ...MAGICAL_PLANTS,
+  ...TROPICAL_PLANTS,
+  ...WETLAND_PLANTS,
 ];
 
 // Species lookup map
@@ -81,8 +85,10 @@ export function getMagicalPlants(): PlantSpecies[] {
 
 // Re-export species arrays
 // export { BASE_CROPS, WILD_PLANTS }; // WIP - BASE_CROPS disabled
-export { WILD_PLANTS, MEDICINAL_PLANTS, MAGICAL_PLANTS };
+export { WILD_PLANTS, MEDICINAL_PLANTS, MAGICAL_PLANTS, TROPICAL_PLANTS, WETLAND_PLANTS };
 // export * from './base-crops.js'; // WIP - disabled
 export * from './wild-plants.js';
 export * from './medicinal-plants.js';
 export * from './magical-plants.js';
+export * from './tropical-plants.js';
+export * from './wetland-plants.js';

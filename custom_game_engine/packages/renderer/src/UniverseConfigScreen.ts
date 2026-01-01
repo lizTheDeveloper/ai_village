@@ -2,7 +2,7 @@
  * UniverseConfigScreen - Configure magic laws and universe settings
  *
  * First screen shown when creating a new universe. Player selects:
- * - Magic paradigm (determines which magic system rules apply)
+ * - Magic paradigm via Spectrum Configuration (determines which magic systems apply)
  * - Universe name (optional, can be LLM-generated)
  * - Other universe-level settings
  *
@@ -10,708 +10,214 @@
  * Universes with identical configurations share the same ID and can
  * have parallel timelines, while different configurations create
  * separate universes that can only connect via portals.
- *
- * Dynamically loads all available paradigms from magic registries.
  */
 
 import {
-  CORE_PARADIGM_REGISTRY,
-  WHIMSICAL_PARADIGM_REGISTRY,
-  NULL_PARADIGM_REGISTRY,
-  ANIMIST_PARADIGM_REGISTRY,
-  DIMENSIONAL_PARADIGM_REGISTRY,
-  type MagicParadigm,
+  // Paradigm Spectrum types and functions for spectrum-based magic selection
+  type MagicSpectrumConfig,
+  type MagicalIntensity,
+  type MagicSourceOrigin,
+  type MagicFormality,
+  type AnimismLevel,
+  type SpectrumEffects,
+  SPECTRUM_PRESETS,
+  getPreset,
+  getPresetNames,
+  resolveSpectrum,
+  CONFIGURATION_QUESTIONS,
 } from '@ai-village/core';
 
 export interface UniverseConfig {
-  magicParadigmId: string | null;  // null = no magic
+  magicParadigmId: string | null;  // null = no magic (legacy, kept for compatibility)
+  magicSpectrum?: MagicSpectrumConfig;  // Full spectrum configuration
+  spectrumEffects?: SpectrumEffects;  // Resolved effects from spectrum
   scenarioPresetId: string;  // The first memory / intro scenario
+  customScenarioText?: string;  // Custom text when scenarioPresetId is 'custom'
   universeName?: string;
   seed?: number;
-  // Future: difficulty, world size, starting conditions, etc.
 }
 
-/**
- * Scenario presets define the "first memory" - the context and tone for the world.
- * These are shown as cards during universe creation.
- */
 export interface ScenarioPreset {
   id: string;
   name: string;
-  description: string;  // The actual DM prompt text
-  preview: string;  // Short flavor for the card
-  category: string;  // For grouping in UI
-  tags: string[];  // For filtering
+  description: string;
+  preview: string;
+  category: string;
+  tags: string[];
 }
 
-/**
- * Expanded scenario presets - more varied starting scenarios.
- */
 export const SCENARIO_PRESETS: ScenarioPreset[] = [
-  // Cooperative / Building scenarios
-  {
-    id: 'cooperative-survival',
-    name: 'The Awakening',
-    description: 'You all just woke up in this place together, with nothing but berries to survive. Work together and make a village!',
-    preview: 'A fresh start. Build from nothing with your companions.',
-    category: 'Cooperative',
-    tags: ['building', 'teamwork', 'classic'],
-  },
-  {
-    id: 'garden-abundance',
-    name: 'Paradise Found',
-    description: 'You awaken in a paradise of endless food, perfect weather, and natural shelter. There is no struggle here, only the question of what to create when survival is already assured.',
-    preview: 'Unlimited resources. What will you build when you don\'t need to survive?',
-    category: 'Cooperative',
-    tags: ['peaceful', 'creative', 'no-conflict'],
-  },
-  {
-    id: 'scientific-expedition',
-    name: 'Research Mission',
-    description: 'Welcome, research team. Your mission: catalog this new biome, establish sustainable operations, and report findings. Remember your training—science and cooperation are humanity\'s greatest tools.',
-    preview: 'A scientific expedition. Methodical exploration and documentation.',
-    category: 'Cooperative',
-    tags: ['science', 'exploration', 'organized'],
-  },
-
-  // Survival / Harsh scenarios
-  {
-    id: 'hostile-wilderness',
-    name: 'The Long Dark',
-    description: 'You wake to find yourself stranded in a dangerous wilderness where the nights are deadly cold and strange creatures watch from the shadows. Trust no one—resources are scarce and winter is coming.',
-    preview: 'Hostile environment. Every decision matters for survival.',
-    category: 'Survival',
-    tags: ['harsh', 'danger', 'scarcity'],
-  },
-  {
-    id: 'last-survivors',
-    name: 'After the Fall',
-    description: 'You are the last humans on Earth. The old world is ash and ruin. You have each other, your wits, and three days of food. Rebuild civilization or die trying.',
-    preview: 'Post-apocalyptic survival. Humanity\'s last hope.',
-    category: 'Survival',
-    tags: ['apocalypse', 'desperate', 'rebuilding'],
-  },
-  {
-    id: 'prison-colony',
-    name: 'Exile\'s Landing',
-    description: 'You were exiled here as punishment, left to survive or perish beyond the gates. The guards are gone now. Freedom is yours—but can you build something better than what you fled?',
-    preview: 'Exiled criminals. Forge a new society from outcasts.',
-    category: 'Survival',
-    tags: ['exile', 'redemption', 'freedom'],
-  },
-  {
-    id: 'shipwrecked',
-    name: 'Cast Ashore',
-    description: 'The storm took everything—your ship, your supplies, your maps. Now you\'re stranded on an unknown shore with only the debris that washed up beside you. The sea is hungry, and so are you.',
-    preview: 'Shipwreck survivors. Salvage what you can from the wreckage.',
-    category: 'Survival',
-    tags: ['shipwreck', 'coastal', 'salvage'],
-  },
-
-  // Mystery / Discovery scenarios
-  {
-    id: 'amnesia-mystery',
-    name: 'Forgotten Selves',
-    description: 'You wake with no memory of who you are or how you got here. Strange artifacts lie scattered around you, and distant ruins hint at a civilization that came before. What happened here?',
-    preview: 'Memory loss. Piece together the mystery of your past.',
-    category: 'Mystery',
-    tags: ['amnesia', 'mystery', 'discovery'],
-  },
-  {
-    id: 'ancient-ruins',
-    name: 'The Lost City',
-    description: 'You\'ve found it—the ruins spoken of only in legend. Overgrown temples, broken machinery, and whispers of those who lived here before. The secrets of the ancients await those brave enough to uncover them.',
-    preview: 'Archaeological discovery. Ancient secrets and forgotten technology.',
-    category: 'Mystery',
-    tags: ['ruins', 'ancient', 'secrets'],
-  },
-  {
-    id: 'dimensional-rift',
-    name: 'Through the Veil',
-    description: 'One moment you were home. The next, you were here. The stars are wrong, the plants unfamiliar, and sometimes the shadows move on their own. You must survive in this strange place until you find a way back—if there is one.',
-    preview: 'Displaced to another world. Everything is unfamiliar.',
-    category: 'Mystery',
-    tags: ['dimensional', 'alien', 'otherworldly'],
-  },
-
-  // Divine / Spiritual scenarios
-  {
-    id: 'divine-experiment',
-    name: 'The Garden',
-    description: 'You awaken in the Garden, placed here by forces you don\'t understand. You have been given free will, intelligence, and a world to shape. What will you make of this gift?',
-    preview: 'Created by divine beings. Your choices define everything.',
-    category: 'Divine',
-    tags: ['divine', 'creation', 'purpose'],
-  },
-  {
-    id: 'prophecy',
-    name: 'The Chosen Ones',
-    description: 'The old texts spoke of this day—when the chosen ones would awaken in the sacred valley and fulfill an ancient purpose. You are those ones. But the prophecy never said what you\'re meant to do.',
-    preview: 'Prophesied destiny. But what does the prophecy actually mean?',
-    category: 'Divine',
-    tags: ['prophecy', 'destiny', 'meaning'],
-  },
-  {
-    id: 'fallen-angels',
-    name: 'Cast from Heaven',
-    description: 'Once you dwelled among the celestial. Now you wake in flesh, bound to earth, your memories of paradise fading like morning mist. Was this punishment, or something else entirely?',
-    preview: 'Former celestials now mortal. Exile from paradise.',
-    category: 'Divine',
-    tags: ['angels', 'fallen', 'divine-exile'],
-  },
-  {
-    id: 'spirits-awakened',
-    name: 'Vessels of Spirit',
-    description: 'The land itself chose you. Ancient spirits have awakened within each of you, granting glimpses of memories that aren\'t your own. The world is alive, and it has plans for you.',
-    preview: 'Chosen by nature spirits. Connected to the land itself.',
-    category: 'Divine',
-    tags: ['spirits', 'nature', 'chosen'],
-  },
-
-  // Social / Experimental scenarios
-  {
-    id: 'social-experiment',
-    name: 'Under Observation',
-    description: 'You are participants in the greatest social experiment ever conducted. Observers are watching, recording everything. Build a society worthy of study. Or don\'t. The choice—and the consequences—are yours.',
-    preview: 'You\'re being watched. Every action is being recorded.',
-    category: 'Social',
-    tags: ['experiment', 'observation', 'society'],
-  },
-  {
-    id: 'utopia-project',
-    name: 'Perfect Society',
-    description: 'You\'ve been selected for your skills, your wisdom, your vision. Your mission: build the perfect society. No old prejudices, no inherited conflicts—just the opportunity to get it right this time.',
-    preview: 'Hand-picked colonists. Design an ideal civilization.',
-    category: 'Social',
-    tags: ['utopia', 'idealism', 'selection'],
-  },
-  {
-    id: 'family-legacy',
-    name: 'Founders\' Blood',
-    description: 'Your grandparents settled this land. Your parents worked it. Now it falls to you to carry on their legacy—or forge your own path. The family farm awaits, but so do dreams of something more.',
-    preview: 'Multi-generational story. Honor tradition or break free.',
-    category: 'Social',
-    tags: ['family', 'legacy', 'tradition'],
-  },
-
-  // Competition / Conflict scenarios
-  {
-    id: 'resource-rush',
-    name: 'Gold in the Hills',
-    description: 'They say there\'s gold in these hills, ancient technology in those ruins, and rare plants in that forest. You all got here first. The question is: will you share the wealth, or fight for it?',
-    preview: 'Resource competition. Cooperate or compete for riches.',
-    category: 'Competition',
-    tags: ['competition', 'resources', 'conflict'],
-  },
-  {
-    id: 'tribal-lands',
-    name: 'Contested Territory',
-    description: 'Your people have claimed this valley. But others have come—strangers with their own customs, their own gods, their own claims to the land. Peace or war, the choice must be made.',
-    preview: 'Territorial conflict. Different groups, different values.',
-    category: 'Competition',
-    tags: ['tribal', 'territory', 'diplomacy'],
-  },
-  {
-    id: 'rebellion',
-    name: 'The Uprising',
-    description: 'You were slaves. Now you are free—for the moment. The masters will send hunters, soldiers, perhaps worse. You have a head start. Use it wisely.',
-    preview: 'Escaped slaves. Build a life while evading pursuit.',
-    category: 'Competition',
-    tags: ['rebellion', 'freedom', 'pursuit'],
-  },
-
-  // Weird / Surreal scenarios
-  {
-    id: 'dream-realm',
-    name: 'The Dreaming',
-    description: 'Is this real? The colors are too vivid, the physics too loose, and sometimes you wake up somewhere you don\'t remember going. Perhaps you\'re all sharing the same dream. Perhaps you never wake up.',
-    preview: 'Reality is uncertain. Dreams blur with waking.',
-    category: 'Surreal',
-    tags: ['dream', 'surreal', 'uncertain'],
-  },
-  {
-    id: 'simulation-theory',
-    name: 'The Construct',
-    description: 'There are glitches. Small things at first—objects in impossible places, memories that don\'t quite fit. You\'re beginning to suspect this world isn\'t what it seems. But who built it, and why?',
-    preview: 'Something is wrong with reality. Investigate the glitches.',
-    category: 'Surreal',
-    tags: ['simulation', 'glitch', 'meta'],
-  },
-  {
-    id: 'reincarnation-cycle',
-    name: 'The Eternal Return',
-    description: 'You\'ve been here before. All of you. Again and again. Each time you build, each time you fall, each time you forget and start anew. But this time, some of you remember fragments...',
-    preview: 'Trapped in a cycle. Break free or repeat forever.',
-    category: 'Surreal',
-    tags: ['reincarnation', 'cycle', 'memory'],
-  },
-  {
-    id: 'time-displaced',
-    name: 'Out of Time',
-    description: 'Each of you comes from a different era—ancient past, distant future, alternate present. Now you\'re all here, stranded together in a time that belongs to none of you. Build a future from fragments of many timelines.',
-    preview: 'Time travelers from different eras. Forge a new timeline together.',
-    category: 'Surreal',
-    tags: ['time-travel', 'displaced', 'fusion'],
-  },
+  { id: 'cooperative-survival', name: 'The Awakening', description: 'You all just woke up in this place together, with nothing but berries to survive. Work together and make a village!', preview: 'A fresh start. Build from nothing with your companions.', category: 'Cooperative', tags: ['building', 'teamwork', 'classic'] },
+  { id: 'garden-abundance', name: 'Paradise Found', description: 'You awaken in a paradise of endless food, perfect weather, and natural shelter. There is no struggle here, only the question of what to create when survival is already assured.', preview: 'Unlimited resources. What will you build when you don\'t need to survive?', category: 'Cooperative', tags: ['peaceful', 'creative', 'no-conflict'] },
+  { id: 'scientific-expedition', name: 'Research Mission', description: 'Welcome, research team. Your mission: catalog this new biome, establish sustainable operations, and report findings.', preview: 'A scientific expedition. Methodical exploration and documentation.', category: 'Cooperative', tags: ['science', 'exploration', 'organized'] },
+  { id: 'hostile-wilderness', name: 'The Long Dark', description: 'You wake to find yourself stranded in a dangerous wilderness where the nights are deadly cold and strange creatures watch from the shadows.', preview: 'Hostile environment. Every decision matters for survival.', category: 'Survival', tags: ['harsh', 'danger', 'scarcity'] },
+  { id: 'last-survivors', name: 'After the Fall', description: 'You are the last humans on Earth. The old world is ash and ruin. You have each other, your wits, and three days of food.', preview: 'Post-apocalyptic survival. Humanity\'s last hope.', category: 'Survival', tags: ['apocalypse', 'desperate', 'rebuilding'] },
+  { id: 'amnesia-mystery', name: 'Forgotten Selves', description: 'You wake with no memory of who you are or how you got here. Strange artifacts lie scattered around you.', preview: 'Memory loss. Piece together the mystery of your past.', category: 'Mystery', tags: ['amnesia', 'mystery', 'discovery'] },
+  { id: 'divine-experiment', name: 'The Garden', description: 'You awaken in the Garden, placed here by forces you don\'t understand. You have been given free will, intelligence, and a world to shape.', preview: 'Created by divine beings. Your choices define everything.', category: 'Divine', tags: ['divine', 'creation', 'purpose'] },
+  { id: 'dream-realm', name: 'The Dreaming', description: 'Is this real? The colors are too vivid, the physics too loose, and sometimes you wake up somewhere you don\'t remember going.', preview: 'Reality is uncertain. Dreams blur with waking.', category: 'Surreal', tags: ['dream', 'surreal', 'uncertain'] },
 ];
 
+// PresetParadigm interface kept for potential future use with individual paradigm selection
 export interface PresetParadigm {
   id: string;
   name: string;
   description: string;
-  preview: string;  // Short flavor text
-  category: string;  // Group for UI organization
+  preview: string;
+  category: string;
 }
 
 export class UniverseConfigScreen {
   private container: HTMLElement;
-  private selectedParadigm: string | null = null;
-  private selectedScenario: string = 'cooperative-survival';  // Default scenario
-  private currentStep: 'scenario' | 'magic' = 'scenario';  // Two-step selection
+  private selectedScenario: string = 'cooperative-survival';
+  private customScenarioText: string = '';
+  private currentStep: 'magic' | 'scenario' = 'magic';  // Magic first, then scenario
   private onCreate: ((config: UniverseConfig) => void) | null = null;
-  private presets: PresetParadigm[] = [];
 
-  /**
-   * Build preset list from all magic paradigm registries.
-   */
-  private buildPresets(): PresetParadigm[] {
-    const presets: PresetParadigm[] = [];
+  // Spectrum configuration state
+  private selectedSpectrumPreset: string = 'ai_village';
+  private showAdvancedSpectrum: boolean = false;
+  private customIntensity: MagicalIntensity = 'high';
+  private customSources: MagicSourceOrigin[] = ['internal', 'divine', 'knowledge'];
+  private customFormality: MagicFormality = 'trained';
+  private customAnimism: AnimismLevel = 'elemental';
 
-    // Add "No Magic" option
-    presets.push({
-      id: 'none',
-      name: 'The First World',
-      description: 'A world without magic. Pure survival, technology, and human ingenuity.',
-      preview: 'Build from nothing. No supernatural forces, only what you can craft.',
-      category: 'No Magic',
-    });
-
-    // Helper to add paradigms from a registry
-    const addFromRegistry = (
-      registry: Record<string, MagicParadigm>,
-      category: string
-    ) => {
-      for (const [id, paradigm] of Object.entries(registry)) {
-        presets.push({
-          id,
-          name: paradigm.name,
-          description: paradigm.description,
-          preview: this.extractFirstSentence(paradigm.lore || paradigm.description),
-          category,
-        });
-      }
-    };
-
-    // Load from all paradigm registries
-    addFromRegistry(CORE_PARADIGM_REGISTRY, 'Core Magic');
-    addFromRegistry(WHIMSICAL_PARADIGM_REGISTRY, 'Whimsical Magic');
-    addFromRegistry(NULL_PARADIGM_REGISTRY, 'Magic Negation');
-    addFromRegistry(ANIMIST_PARADIGM_REGISTRY, 'Animist Magic');
-    addFromRegistry(DIMENSIONAL_PARADIGM_REGISTRY, 'Dimensional Magic');
-
-    return presets;
+  private getCurrentSpectrum(): MagicSpectrumConfig {
+    if (this.showAdvancedSpectrum) {
+      return { intensity: this.customIntensity, sources: this.customSources, formality: this.customFormality, animism: this.customAnimism };
+    }
+    return getPreset(this.selectedSpectrumPreset as keyof typeof SPECTRUM_PRESETS);
   }
 
-  /**
-   * Extract first sentence from lore text for preview.
-   */
-  private extractFirstSentence(text: string): string {
-    const match = text.match(/^[^.!?]+[.!?]/);
-    if (match) {
-      return match[0].trim();
-    }
-    // Fallback: take first 100 chars
-    return text.substring(0, 100).trim() + (text.length > 100 ? '...' : '');
+  private getSpectrumPresetInfo(presetId: string): { name: string; description: string; icon: string } {
+    const meta: Record<string, { name: string; description: string; icon: string }> = {
+      mundane: { name: 'Mundane World', description: 'No magic exists. Pure technology and science.', icon: '🌍' },
+      low_fantasy: { name: 'Low Fantasy', description: 'Magic is rare and subtle. (Game of Thrones)', icon: '🌙' },
+      classic_fantasy: { name: 'Classic Fantasy', description: 'Multiple magic traditions flourish. (D&D)', icon: '⚔️' },
+      mythic: { name: 'Mythic', description: 'Gods walk among mortals. (Greek Mythology)', icon: '⚡' },
+      shinto_animism: { name: 'Shinto Animism', description: 'Everything has a spirit. Kami everywhere.', icon: '🌸' },
+      hard_magic: { name: 'Hard Magic', description: 'Magic follows strict rules like science. (Mistborn)', icon: '⚙️' },
+      literary_surrealism: { name: 'Literary Surrealism', description: 'Words have weight. Metaphors become real.', icon: '📚' },
+      wild_magic: { name: 'Wild Magic', description: 'Chaotic and unpredictable. Reality is unstable.', icon: '🌀' },
+      dead_magic: { name: 'Dead Magic', description: 'Magic once existed but is gone.', icon: '💀' },
+      ai_village: { name: 'AI Village', description: 'Rich magic with multiple traditions. Balanced for gameplay.', icon: '🏘️' },
+    };
+    return meta[presetId] || { name: presetId, description: '', icon: '✨' };
   }
 
   constructor(containerId: string = 'universe-config-screen') {
-    // Build paradigm list from registries
-    this.presets = this.buildPresets();
-
     const existing = document.getElementById(containerId);
     if (existing) {
       this.container = existing;
     } else {
       this.container = document.createElement('div');
       this.container.id = containerId;
-      this.container.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        display: none;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        padding: 40px;
-        box-sizing: border-box;
-        z-index: 10001;
-        font-family: monospace;
-        color: #e0e0e0;
-        overflow-y: auto;
-      `;
+      this.container.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 40px; box-sizing: border-box; z-index: 10001; font-family: monospace; color: #e0e0e0; overflow-y: auto;`;
       document.body.appendChild(this.container);
     }
-
     this.render();
   }
 
-  /**
-   * Show the config screen.
-   */
   show(onCreateCallback: (config: UniverseConfig) => void): void {
     this.onCreate = onCreateCallback;
     this.container.style.display = 'flex';
   }
 
-  /**
-   * Hide the config screen.
-   */
   hide(): void {
     this.container.style.display = 'none';
-    this.selectedParadigm = null;
   }
 
-  /**
-   * Render the configuration interface.
-   * Two-step process: 1) Select scenario, 2) Select magic paradigm
-   */
   private render(): void {
     this.container.innerHTML = '';
 
     // Step indicator
     const stepIndicator = document.createElement('div');
-    stepIndicator.style.cssText = `
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      margin-bottom: 20px;
-    `;
+    stepIndicator.style.cssText = 'display: flex; gap: 20px; justify-content: center; margin-bottom: 20px;';
 
     const step1 = document.createElement('div');
-    step1.textContent = '1. Choose Your Story';
-    step1.style.cssText = `
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      background: ${this.currentStep === 'scenario' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'};
-      color: ${this.currentStep === 'scenario' ? '#fff' : '#888'};
-      cursor: pointer;
-    `;
-    step1.onclick = () => {
-      this.currentStep = 'scenario';
-      this.render();
-    };
+    step1.textContent = '1. Choose Magic System';
+    step1.style.cssText = `padding: 8px 16px; border-radius: 20px; font-size: 14px; cursor: pointer; background: ${this.currentStep === 'magic' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${this.currentStep === 'magic' ? '#fff' : '#888'};`;
+    step1.onclick = () => { this.currentStep = 'magic'; this.render(); };
 
     const step2 = document.createElement('div');
-    step2.textContent = '2. Choose Magic System';
-    step2.style.cssText = `
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      background: ${this.currentStep === 'magic' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'};
-      color: ${this.currentStep === 'magic' ? '#fff' : '#888'};
-      cursor: pointer;
-    `;
-    step2.onclick = () => {
-      this.currentStep = 'magic';
-      this.render();
-    };
+    step2.textContent = '2. Choose Your Story';
+    step2.style.cssText = `padding: 8px 16px; border-radius: 20px; font-size: 14px; cursor: pointer; background: ${this.currentStep === 'scenario' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${this.currentStep === 'scenario' ? '#fff' : '#888'};`;
+    step2.onclick = () => { this.currentStep = 'scenario'; this.render(); };
 
     stepIndicator.appendChild(step1);
     stepIndicator.appendChild(step2);
     this.container.appendChild(stepIndicator);
 
-    // Title
     const title = document.createElement('h1');
     title.textContent = 'Create New Universe';
-    title.style.cssText = `
-      margin: 0 0 20px 0;
-      font-size: 36px;
-      text-align: center;
-      color: #ffffff;
-      text-shadow: 0 0 20px rgba(100, 200, 255, 0.5);
-    `;
+    title.style.cssText = 'margin: 0 0 20px 0; font-size: 36px; text-align: center; color: #ffffff; text-shadow: 0 0 20px rgba(100, 200, 255, 0.5);';
     this.container.appendChild(title);
 
-    if (this.currentStep === 'scenario') {
-      this.renderScenarioStep();
-    } else {
+    if (this.currentStep === 'magic') {
       this.renderMagicStep();
+    } else {
+      this.renderScenarioStep();
     }
   }
 
-  /**
-   * Render the scenario selection step.
-   */
   private renderScenarioStep(): void {
-    // Subtitle
-    const subtitle = document.createElement('p');
-    subtitle.textContent = `Choose the first memory - how your world begins (${SCENARIO_PRESETS.length} scenarios available)`;
-    subtitle.style.cssText = `
-      margin: 0 0 40px 0;
-      font-size: 14px;
-      text-align: center;
-      color: #aaa;
+    // Show selected magic summary
+    const spectrum = this.getCurrentSpectrum();
+    const effects = resolveSpectrum(spectrum);
+    const presetInfo = this.getSpectrumPresetInfo(this.selectedSpectrumPreset);
+
+    const magicSummary = document.createElement('div');
+    magicSummary.style.cssText = 'background: rgba(76, 175, 80, 0.1); border: 1px solid #4CAF50; border-radius: 8px; padding: 15px; max-width: 800px; margin-bottom: 20px;';
+    magicSummary.innerHTML = `
+      <div style="color: #4CAF50; font-size: 12px; margin-bottom: 5px;">MAGIC SYSTEM</div>
+      <div style="color: #fff; font-size: 16px; font-weight: bold;">${this.showAdvancedSpectrum ? 'Custom Configuration' : presetInfo.icon + ' ' + presetInfo.name}</div>
+      <div style="color: #aaa; font-size: 13px; margin-top: 5px;">${effects.enabledParadigms.length} paradigms enabled | ${effects.availableEntities.length} entity types</div>
     `;
+    this.container.appendChild(magicSummary);
+
+    const subtitle = document.createElement('p');
+    subtitle.textContent = `Choose the first memory - how your world begins (${SCENARIO_PRESETS.length} scenarios)`;
+    subtitle.style.cssText = 'margin: 0 0 40px 0; font-size: 14px; text-align: center; color: #aaa;';
     this.container.appendChild(subtitle);
 
-    // Group scenarios by category
-    const categorized = new Map<string, ScenarioPreset[]>();
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; width: 100%;';
+
     for (const preset of SCENARIO_PRESETS) {
-      const category = preset.category;
-      if (!categorized.has(category)) {
-        categorized.set(category, []);
-      }
-      categorized.get(category)!.push(preset);
+      const isSelected = this.selectedScenario === preset.id;
+      const card = document.createElement('div');
+      card.style.cssText = `background: ${isSelected ? 'linear-gradient(135deg, #4a3a2a 0%, #3a2a1a 100%)' : 'rgba(30, 30, 50, 0.8)'}; border: 2px solid ${isSelected ? '#ff9800' : '#3a3a5a'}; border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s; position: relative;`;
+      card.onclick = () => { this.selectedScenario = preset.id; this.render(); };
+      card.innerHTML = `<h3 style="margin: 0 0 10px 0; font-size: 20px; color: ${isSelected ? '#ff9800' : '#fff'};">${preset.name}</h3><p style="margin: 0; font-size: 13px; color: #bbb;">${preset.preview}</p>`;
+      if (isSelected) card.innerHTML += '<div style="position: absolute; top: 10px; right: 10px; background: #ff9800; color: #000; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: bold;">Selected</div>';
+      grid.appendChild(card);
     }
+    this.container.appendChild(grid);
 
-    // Render each category
-    const categoryOrder = [
-      'Cooperative',
-      'Survival',
-      'Mystery',
-      'Divine',
-      'Social',
-      'Competition',
-      'Surreal',
-    ];
-
-    for (const category of categoryOrder) {
-      const presetsInCategory = categorized.get(category);
-      if (!presetsInCategory || presetsInCategory.length === 0) continue;
-
-      // Category header
-      const categoryHeader = document.createElement('h2');
-      categoryHeader.textContent = `${category} (${presetsInCategory.length})`;
-      categoryHeader.style.cssText = `
-        margin: 30px 0 15px 0;
-        font-size: 20px;
-        color: #ff9800;
-        text-align: left;
-        max-width: 1200px;
-        width: 100%;
-      `;
-      this.container.appendChild(categoryHeader);
-
-      // Scenario cards grid for this category
-      const grid = document.createElement('div');
-      grid.style.cssText = `
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 20px;
-        max-width: 1200px;
-        width: 100%;
-        margin-bottom: 20px;
-      `;
-
-      for (const preset of presetsInCategory) {
-        const card = this.renderScenarioCard(preset);
-        grid.appendChild(card);
-      }
-
-      this.container.appendChild(grid);
-    }
-
-    // Next button
-    const nextButton = document.createElement('button');
-    nextButton.textContent = 'Next: Choose Magic System';
-    nextButton.style.cssText = `
-      padding: 15px 40px;
-      font-size: 18px;
-      font-family: monospace;
-      font-weight: bold;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-      margin-top: 20px;
-    `;
-
-    nextButton.onmouseover = () => {
-      nextButton.style.transform = 'translateY(-2px)';
-      nextButton.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)';
-    };
-    nextButton.onmouseout = () => {
-      nextButton.style.transform = 'translateY(0)';
-      nextButton.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
-    };
-
-    nextButton.onclick = () => {
-      this.currentStep = 'magic';
-      this.render();
-    };
-
-    this.container.appendChild(nextButton);
-  }
-
-  /**
-   * Render the magic paradigm selection step.
-   */
-  private renderMagicStep(): void {
-    // Show selected scenario summary
-    const selectedScenario = SCENARIO_PRESETS.find(s => s.id === this.selectedScenario);
-    if (selectedScenario) {
-      const scenarioSummary = document.createElement('div');
-      scenarioSummary.style.cssText = `
-        background: rgba(255, 152, 0, 0.1);
-        border: 1px solid #ff9800;
-        border-radius: 8px;
-        padding: 15px;
-        max-width: 800px;
-        margin-bottom: 20px;
-      `;
-      scenarioSummary.innerHTML = `
-        <div style="color: #ff9800; font-size: 12px; margin-bottom: 5px;">SELECTED SCENARIO</div>
-        <div style="color: #fff; font-size: 16px; font-weight: bold;">${selectedScenario.name}</div>
-        <div style="color: #aaa; font-size: 13px; margin-top: 5px;">${selectedScenario.preview}</div>
-      `;
-      this.container.appendChild(scenarioSummary);
-    }
-
-    // Subtitle
-    const subtitle = document.createElement('p');
-    subtitle.textContent = `Choose the laws of magic that will govern this reality (${this.presets.length} paradigms available)`;
-    subtitle.style.cssText = `
-      margin: 0 0 40px 0;
-      font-size: 14px;
-      text-align: center;
-      color: #aaa;
-    `;
-    this.container.appendChild(subtitle);
-
-    // Group paradigms by category
-    const categorized = new Map<string, PresetParadigm[]>();
-    for (const preset of this.presets) {
-      const category = preset.category;
-      if (!categorized.has(category)) {
-        categorized.set(category, []);
-      }
-      categorized.get(category)!.push(preset);
-    }
-
-    // Render each category
-    const categoryOrder = [
-      'No Magic',
-      'Core Magic',
-      'Animist Magic',
-      'Whimsical Magic',
-      'Dimensional Magic',
-      'Magic Negation',
-    ];
-
-    for (const category of categoryOrder) {
-      const presetsInCategory = categorized.get(category);
-      if (!presetsInCategory || presetsInCategory.length === 0) continue;
-
-      // Category header
-      const categoryHeader = document.createElement('h2');
-      categoryHeader.textContent = `${category} (${presetsInCategory.length})`;
-      categoryHeader.style.cssText = `
-        margin: 30px 0 15px 0;
-        font-size: 20px;
-        color: #64b5f6;
-        text-align: left;
-        max-width: 1200px;
-        width: 100%;
-      `;
-      this.container.appendChild(categoryHeader);
-
-      // Paradigm cards grid for this category
-      const grid = document.createElement('div');
-      grid.style.cssText = `
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 20px;
-        max-width: 1200px;
-        width: 100%;
-        margin-bottom: 20px;
-      `;
-
-      for (const preset of presetsInCategory) {
-        const card = this.renderParadigmCard(preset);
-        grid.appendChild(card);
-      }
-
-      this.container.appendChild(grid);
-    }
-
-    // Button container
+    // Buttons
     const buttonContainer = document.createElement('div');
-    buttonContainer.style.cssText = `
-      display: flex;
-      gap: 20px;
-      margin-top: 20px;
-    `;
+    buttonContainer.style.cssText = 'display: flex; gap: 20px; margin-top: 20px;';
 
-    // Back button
     const backButton = document.createElement('button');
-    backButton.textContent = 'Back to Scenario';
-    backButton.style.cssText = `
-      padding: 15px 30px;
-      font-size: 16px;
-      font-family: monospace;
-      background: #333;
-      color: #aaa;
-      border: 1px solid #555;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s;
-    `;
-    backButton.onmouseover = () => {
-      backButton.style.borderColor = '#888';
-      backButton.style.color = '#fff';
-    };
-    backButton.onmouseout = () => {
-      backButton.style.borderColor = '#555';
-      backButton.style.color = '#aaa';
-    };
-    backButton.onclick = () => {
-      this.currentStep = 'scenario';
-      this.render();
-    };
+    backButton.textContent = 'Back to Magic System';
+    backButton.style.cssText = 'padding: 15px 30px; font-size: 16px; font-family: monospace; background: #333; color: #aaa; border: 1px solid #555; border-radius: 8px; cursor: pointer;';
+    backButton.onclick = () => { this.currentStep = 'magic'; this.render(); };
 
-    // Create button
     const createButton = document.createElement('button');
     createButton.textContent = 'Create Universe';
-    createButton.disabled = !this.selectedParadigm;
-    createButton.style.cssText = `
-      padding: 15px 40px;
-      font-size: 18px;
-      font-family: monospace;
-      font-weight: bold;
-      background: ${this.selectedParadigm ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#333'};
-      color: ${this.selectedParadigm ? '#fff' : '#666'};
-      border: none;
-      border-radius: 8px;
-      cursor: ${this.selectedParadigm ? 'pointer' : 'not-allowed'};
-      transition: all 0.3s;
-      box-shadow: ${this.selectedParadigm ? '0 4px 15px rgba(102, 126, 234, 0.4)' : 'none'};
-    `;
-
-    if (this.selectedParadigm) {
-      createButton.onmouseover = () => {
-        createButton.style.transform = 'translateY(-2px)';
-        createButton.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)';
-      };
-      createButton.onmouseout = () => {
-        createButton.style.transform = 'translateY(0)';
-        createButton.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
-      };
-    }
-
+    createButton.style.cssText = 'padding: 15px 40px; font-size: 18px; font-family: monospace; font-weight: bold; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 8px; cursor: pointer;';
     createButton.onclick = () => {
-      if (this.selectedParadigm && this.onCreate) {
+      if (this.onCreate) {
+        const firstParadigm = effects.enabledParadigms[0];
         const config: UniverseConfig = {
-          magicParadigmId: this.selectedParadigm === 'none' ? null : this.selectedParadigm,
+          magicParadigmId: firstParadigm ?? null,
+          magicSpectrum: spectrum,
+          spectrumEffects: effects,
           scenarioPresetId: this.selectedScenario,
           seed: Date.now(),
         };
+        if (this.selectedScenario === 'custom') {
+          config.customScenarioText = this.customScenarioText;
+        }
         this.onCreate(config);
         this.hide();
       }
@@ -722,219 +228,254 @@ export class UniverseConfigScreen {
     this.container.appendChild(buttonContainer);
   }
 
-  /**
-   * Render a single scenario selection card.
-   */
-  private renderScenarioCard(preset: ScenarioPreset): HTMLElement {
-    const isSelected = this.selectedScenario === preset.id;
+  private renderMagicStep(): void {
+    const subtitle = document.createElement('p');
+    subtitle.textContent = 'Configure the magical laws that will govern this reality';
+    subtitle.style.cssText = 'margin: 0 0 30px 0; font-size: 14px; text-align: center; color: #aaa;';
+    this.container.appendChild(subtitle);
 
-    const card = document.createElement('div');
-    card.style.cssText = `
-      background: ${isSelected ? 'linear-gradient(135deg, #4a3a2a 0%, #3a2a1a 100%)' : 'rgba(30, 30, 50, 0.8)'};
-      border: 2px solid ${isSelected ? '#ff9800' : '#3a3a5a'};
-      border-radius: 12px;
-      padding: 20px;
-      cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: ${isSelected ? '0 0 20px rgba(255, 152, 0, 0.4)' : '0 4px 8px rgba(0,0,0,0.2)'};
-      position: relative;
-    `;
+    // Mode toggle
+    const modeToggle = document.createElement('div');
+    modeToggle.style.cssText = 'display: flex; gap: 10px; justify-content: center; margin-bottom: 30px;';
 
-    card.onmouseover = () => {
-      if (!isSelected) {
-        card.style.borderColor = '#5a5a7a';
-        card.style.transform = 'translateY(-4px)';
-        card.style.boxShadow = '0 8px 16px rgba(0,0,0,0.3)';
-      }
-    };
+    const presetBtn = document.createElement('button');
+    presetBtn.textContent = 'Presets';
+    presetBtn.style.cssText = `padding: 10px 25px; font-size: 14px; font-family: monospace; background: ${!this.showAdvancedSpectrum ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${!this.showAdvancedSpectrum ? '#fff' : '#888'}; border: none; border-radius: 20px; cursor: pointer;`;
+    presetBtn.onclick = () => { this.showAdvancedSpectrum = false; this.render(); };
 
-    card.onmouseout = () => {
-      if (!isSelected) {
-        card.style.borderColor = '#3a3a5a';
-        card.style.transform = 'translateY(0)';
-        card.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-      }
-    };
+    const advancedBtn = document.createElement('button');
+    advancedBtn.textContent = 'Advanced (Custom Axes)';
+    advancedBtn.style.cssText = `padding: 10px 25px; font-size: 14px; font-family: monospace; background: ${this.showAdvancedSpectrum ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${this.showAdvancedSpectrum ? '#fff' : '#888'}; border: none; border-radius: 20px; cursor: pointer;`;
+    advancedBtn.onclick = () => { this.showAdvancedSpectrum = true; this.render(); };
 
-    card.onclick = () => {
-      this.selectedScenario = preset.id;
-      this.render();
-    };
+    modeToggle.appendChild(presetBtn);
+    modeToggle.appendChild(advancedBtn);
+    this.container.appendChild(modeToggle);
 
-    // Name
-    const name = document.createElement('h3');
-    name.textContent = preset.name;
-    name.style.cssText = `
-      margin: 0 0 10px 0;
-      font-size: 20px;
-      color: ${isSelected ? '#ff9800' : '#fff'};
-    `;
-    card.appendChild(name);
-
-    // Preview
-    const preview = document.createElement('p');
-    preview.textContent = preset.preview;
-    preview.style.cssText = `
-      margin: 0 0 15px 0;
-      font-size: 13px;
-      line-height: 1.5;
-      color: #bbb;
-    `;
-    card.appendChild(preview);
-
-    // Description (first memory text)
-    const description = document.createElement('p');
-    description.textContent = `"${this.extractFirstSentence(preset.description)}"`;
-    description.style.cssText = `
-      margin: 0;
-      font-size: 12px;
-      font-style: italic;
-      color: #888;
-      border-top: 1px solid #3a3a5a;
-      padding-top: 15px;
-    `;
-    card.appendChild(description);
-
-    // Tags
-    const tagsContainer = document.createElement('div');
-    tagsContainer.style.cssText = `
-      display: flex;
-      gap: 5px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    `;
-    for (const tag of preset.tags.slice(0, 3)) {
-      const tagEl = document.createElement('span');
-      tagEl.textContent = tag;
-      tagEl.style.cssText = `
-        font-size: 10px;
-        padding: 2px 8px;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.1);
-        color: #888;
-      `;
-      tagsContainer.appendChild(tagEl);
-    }
-    card.appendChild(tagsContainer);
-
-    // Selection indicator
-    if (isSelected) {
-      const indicator = document.createElement('div');
-      indicator.textContent = 'Selected';
-      indicator.style.cssText = `
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: #ff9800;
-        color: #000;
-        padding: 4px 12px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: bold;
-      `;
-      card.appendChild(indicator);
+    if (this.showAdvancedSpectrum) {
+      this.renderAdvancedSpectrumConfig();
+    } else {
+      this.renderSpectrumPresets();
     }
 
-    return card;
+    // Enabled paradigms display
+    this.renderEnabledParadigms();
+
+    // Next button
+    const nextButton = document.createElement('button');
+    nextButton.textContent = 'Next: Choose Your Story';
+    nextButton.style.cssText = 'padding: 15px 40px; font-size: 18px; font-family: monospace; font-weight: bold; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 8px; cursor: pointer; margin-top: 30px;';
+    nextButton.onclick = () => { this.currentStep = 'scenario'; this.render(); };
+    this.container.appendChild(nextButton);
   }
 
-  /**
-   * Render a single paradigm selection card.
-   */
-  private renderParadigmCard(preset: PresetParadigm): HTMLElement {
-    const isSelected = this.selectedParadigm === preset.id;
+  private renderSpectrumPresets(): void {
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; width: 100%; margin-bottom: 20px;';
 
-    const card = document.createElement('div');
-    card.style.cssText = `
-      background: ${isSelected ? 'linear-gradient(135deg, #2a4a4a 0%, #1e3a3a 100%)' : 'rgba(30, 30, 50, 0.8)'};
-      border: 2px solid ${isSelected ? '#4CAF50' : '#3a3a5a'};
-      border-radius: 12px;
-      padding: 20px;
-      cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: ${isSelected ? '0 0 20px rgba(76, 175, 80, 0.4)' : '0 4px 8px rgba(0,0,0,0.2)'};
-    `;
+    for (const presetId of getPresetNames()) {
+      const info = this.getSpectrumPresetInfo(presetId);
+      const isSelected = this.selectedSpectrumPreset === presetId;
+      const preset = getPreset(presetId as keyof typeof SPECTRUM_PRESETS);
 
-    card.onmouseover = () => {
-      if (!isSelected) {
-        card.style.borderColor = '#5a5a7a';
-        card.style.transform = 'translateY(-4px)';
-        card.style.boxShadow = '0 8px 16px rgba(0,0,0,0.3)';
-      }
-    };
+      const card = document.createElement('div');
+      card.style.cssText = `background: ${isSelected ? 'linear-gradient(135deg, #2a4a4a 0%, #1e3a3a 100%)' : 'rgba(30, 30, 50, 0.8)'}; border: 2px solid ${isSelected ? '#4CAF50' : '#3a3a5a'}; border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s; position: relative;`;
+      card.onclick = () => { this.selectedSpectrumPreset = presetId; this.render(); };
 
-    card.onmouseout = () => {
-      if (!isSelected) {
-        card.style.borderColor = '#3a3a5a';
-        card.style.transform = 'translateY(0)';
-        card.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-      }
-    };
-
-    card.onclick = () => {
-      this.selectedParadigm = preset.id;
-      this.render();
-    };
-
-    // Name
-    const name = document.createElement('h3');
-    name.textContent = preset.name;
-    name.style.cssText = `
-      margin: 0 0 10px 0;
-      font-size: 20px;
-      color: ${isSelected ? '#4CAF50' : '#fff'};
-    `;
-    card.appendChild(name);
-
-    // Description
-    const description = document.createElement('p');
-    description.textContent = preset.description;
-    description.style.cssText = `
-      margin: 0 0 15px 0;
-      font-size: 13px;
-      line-height: 1.5;
-      color: #bbb;
-    `;
-    card.appendChild(description);
-
-    // Preview
-    const preview = document.createElement('p');
-    preview.textContent = preset.preview;
-    preview.style.cssText = `
-      margin: 0;
-      font-size: 12px;
-      font-style: italic;
-      color: #888;
-      border-top: 1px solid #3a3a5a;
-      padding-top: 15px;
-    `;
-    card.appendChild(preview);
-
-    // Selection indicator
-    if (isSelected) {
-      const indicator = document.createElement('div');
-      indicator.textContent = '✓ Selected';
-      indicator.style.cssText = `
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: #4CAF50;
-        color: #fff;
-        padding: 4px 12px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: bold;
+      card.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+          <span style="font-size: 28px;">${info.icon}</span>
+          <h3 style="margin: 0; font-size: 18px; color: ${isSelected ? '#4CAF50' : '#fff'};">${info.name}</h3>
+        </div>
+        <p style="margin: 0 0 15px 0; font-size: 13px; line-height: 1.5; color: #bbb;">${info.description}</p>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <span style="font-size: 10px; padding: 3px 8px; border-radius: 10px; background: rgba(102, 126, 234, 0.3); color: #8fa8ff;">${preset.intensity.replace('_', ' ')}</span>
+          <span style="font-size: 10px; padding: 3px 8px; border-radius: 10px; background: rgba(76, 175, 80, 0.3); color: #8fdf8f;">${preset.animism.replace('_', ' ')}</span>
+          <span style="font-size: 10px; padding: 3px 8px; border-radius: 10px; background: rgba(255, 152, 0, 0.3); color: #ffb84d;">${preset.formality}</span>
+        </div>
+        ${isSelected ? '<div style="position: absolute; top: 10px; right: 10px; background: #4CAF50; color: #fff; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: bold;">✓ Selected</div>' : ''}
       `;
-      card.style.position = 'relative';
-      card.appendChild(indicator);
+
+      grid.appendChild(card);
     }
 
-    return card;
+    this.container.appendChild(grid);
   }
 
-  /**
-   * Destroy the config screen.
-   */
+  private renderAdvancedSpectrumConfig(): void {
+    const configContainer = document.createElement('div');
+    configContainer.style.cssText = 'max-width: 800px; width: 100%; background: rgba(30, 30, 50, 0.8); border: 1px solid #3a3a5a; border-radius: 12px; padding: 30px; margin-bottom: 20px;';
+
+    // Intensity
+    configContainer.appendChild(this.renderAxisSelector(
+      CONFIGURATION_QUESTIONS.intensity.question,
+      CONFIGURATION_QUESTIONS.intensity.options,
+      this.customIntensity,
+      (v) => { this.customIntensity = v as MagicalIntensity; this.render(); }
+    ));
+
+    // Formality
+    configContainer.appendChild(this.renderAxisSelector(
+      CONFIGURATION_QUESTIONS.formality.question,
+      CONFIGURATION_QUESTIONS.formality.options,
+      this.customFormality,
+      (v) => { this.customFormality = v as MagicFormality; this.render(); }
+    ));
+
+    // Animism
+    configContainer.appendChild(this.renderAxisSelector(
+      CONFIGURATION_QUESTIONS.animism.question,
+      CONFIGURATION_QUESTIONS.animism.options,
+      this.customAnimism,
+      (v) => { this.customAnimism = v as AnimismLevel; this.render(); }
+    ));
+
+    // Sources (multi-select)
+    configContainer.appendChild(this.renderSourcesSelector());
+
+    this.container.appendChild(configContainer);
+  }
+
+  private renderAxisSelector(question: string, options: Array<{ value: string; label: string; description: string }>, currentValue: string, onChange: (v: string) => void): HTMLElement {
+    const container = document.createElement('div');
+    container.style.cssText = 'margin-bottom: 25px;';
+
+    const questionEl = document.createElement('div');
+    questionEl.textContent = question;
+    questionEl.style.cssText = 'font-size: 16px; color: #fff; margin-bottom: 15px; font-weight: bold;';
+    container.appendChild(questionEl);
+
+    const optionsContainer = document.createElement('div');
+    optionsContainer.style.cssText = 'display: flex; flex-wrap: wrap; gap: 8px;';
+
+    for (const opt of options) {
+      const isSelected = currentValue === opt.value;
+      const btn = document.createElement('button');
+      btn.style.cssText = `padding: 8px 16px; font-size: 12px; font-family: monospace; background: ${isSelected ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${isSelected ? '#fff' : '#aaa'}; border: 1px solid ${isSelected ? '#667eea' : '#3a3a5a'}; border-radius: 6px; cursor: pointer;`;
+      btn.textContent = opt.label;
+      btn.title = opt.description;
+      btn.onclick = () => onChange(opt.value);
+      optionsContainer.appendChild(btn);
+    }
+    container.appendChild(optionsContainer);
+
+    const selected = options.find(o => o.value === currentValue);
+    if (selected) {
+      const desc = document.createElement('div');
+      desc.textContent = selected.description;
+      desc.style.cssText = 'margin-top: 10px; font-size: 12px; color: #888; font-style: italic;';
+      container.appendChild(desc);
+    }
+
+    return container;
+  }
+
+  private renderSourcesSelector(): HTMLElement {
+    const container = document.createElement('div');
+    container.style.cssText = 'margin-bottom: 25px;';
+
+    const questionEl = document.createElement('div');
+    questionEl.textContent = CONFIGURATION_QUESTIONS.source.question;
+    questionEl.style.cssText = 'font-size: 16px; color: #fff; margin-bottom: 15px; font-weight: bold;';
+    container.appendChild(questionEl);
+
+    const optionsContainer = document.createElement('div');
+    optionsContainer.style.cssText = 'display: flex; flex-wrap: wrap; gap: 8px;';
+
+    for (const opt of CONFIGURATION_QUESTIONS.source.options) {
+      const isSelected = this.customSources.includes(opt.value as MagicSourceOrigin);
+      const btn = document.createElement('button');
+      btn.style.cssText = `padding: 8px 16px; font-size: 12px; font-family: monospace; background: ${isSelected ? 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)' : '#2a2a4a'}; color: ${isSelected ? '#fff' : '#aaa'}; border: 1px solid ${isSelected ? '#4CAF50' : '#3a3a5a'}; border-radius: 6px; cursor: pointer;`;
+      btn.textContent = opt.label;
+      btn.title = opt.description;
+      btn.onclick = () => {
+        const source = opt.value as MagicSourceOrigin;
+        if (isSelected) {
+          this.customSources = this.customSources.filter(s => s !== source);
+        } else {
+          this.customSources = [...this.customSources, source];
+        }
+        if (this.customSources.length === 0) this.customSources = ['internal'];
+        this.render();
+      };
+      optionsContainer.appendChild(btn);
+    }
+    container.appendChild(optionsContainer);
+
+    const selectedList = document.createElement('div');
+    selectedList.textContent = `Selected: ${this.customSources.join(', ')}`;
+    selectedList.style.cssText = 'margin-top: 10px; font-size: 12px; color: #888;';
+    container.appendChild(selectedList);
+
+    return container;
+  }
+
+  private renderEnabledParadigms(): void {
+    const spectrum = this.getCurrentSpectrum();
+    const effects = resolveSpectrum(spectrum);
+
+    const container = document.createElement('div');
+    container.style.cssText = 'max-width: 1200px; width: 100%; background: rgba(20, 30, 20, 0.8); border: 1px solid #4CAF50; border-radius: 12px; padding: 20px; margin-top: 20px;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;';
+    header.innerHTML = `
+      <h3 style="margin: 0; font-size: 16px; color: #4CAF50;">Enabled Magic Systems</h3>
+      <span style="font-size: 12px; color: #888;">Power: ${(effects.powerMultiplier * 100).toFixed(0)}% | Cost: ${effects.costMultiplier === Infinity ? '∞' : (effects.costMultiplier * 100).toFixed(0)}%</span>
+    `;
+    container.appendChild(header);
+
+    const descEl = document.createElement('p');
+    descEl.textContent = effects.description;
+    descEl.style.cssText = 'margin: 0 0 15px 0; font-size: 13px; color: #aaa; line-height: 1.5;';
+    container.appendChild(descEl);
+
+    if (effects.enabledParadigms.length > 0 && !effects.disabledParadigms.includes('all')) {
+      // Enabled paradigms
+      const enabledSection = document.createElement('div');
+      enabledSection.style.cssText = 'margin-bottom: 15px;';
+      enabledSection.innerHTML = `<div style="font-size: 12px; color: #4CAF50; margin-bottom: 8px; font-weight: bold;">✓ Enabled (${effects.enabledParadigms.length})</div>`;
+      const enabledTags = document.createElement('div');
+      enabledTags.style.cssText = 'display: flex; flex-wrap: wrap; gap: 6px;';
+      for (const p of effects.enabledParadigms) {
+        enabledTags.innerHTML += `<span style="font-size: 11px; padding: 4px 10px; border-radius: 12px; background: rgba(76, 175, 80, 0.2); color: #8fdf8f; text-transform: capitalize;">${p}</span>`;
+      }
+      enabledSection.appendChild(enabledTags);
+      container.appendChild(enabledSection);
+
+      // Weakened paradigms
+      if (effects.weakenedParadigms.length > 0) {
+        const weakenedSection = document.createElement('div');
+        weakenedSection.style.cssText = 'margin-bottom: 15px;';
+        weakenedSection.innerHTML = `<div style="font-size: 12px; color: #ff9800; margin-bottom: 8px; font-weight: bold;">~ Weakened (${effects.weakenedParadigms.length})</div>`;
+        const weakenedTags = document.createElement('div');
+        weakenedTags.style.cssText = 'display: flex; flex-wrap: wrap; gap: 6px;';
+        for (const p of effects.weakenedParadigms) {
+          weakenedTags.innerHTML += `<span style="font-size: 11px; padding: 4px 10px; border-radius: 12px; background: rgba(255, 152, 0, 0.2); color: #ffb84d; text-transform: capitalize;">${p}</span>`;
+        }
+        weakenedSection.appendChild(weakenedTags);
+        container.appendChild(weakenedSection);
+      }
+
+      // Available entities
+      if (effects.availableEntities.length > 0) {
+        const entitiesSection = document.createElement('div');
+        entitiesSection.innerHTML = `
+          <div style="font-size: 12px; color: #9c27b0; margin-bottom: 8px; font-weight: bold;">Entities in this world:</div>
+          <div style="font-size: 11px; color: #b388ff; line-height: 1.5;">${effects.availableEntities.map(e => e.replace(/_/g, ' ')).join(', ')}</div>
+        `;
+        container.appendChild(entitiesSection);
+      }
+    } else {
+      const noMagic = document.createElement('div');
+      noMagic.textContent = 'No magic systems are enabled in this configuration.';
+      noMagic.style.cssText = 'font-size: 14px; color: #888; font-style: italic;';
+      container.appendChild(noMagic);
+    }
+
+    this.container.appendChild(container);
+  }
+
   destroy(): void {
     this.container.remove();
   }

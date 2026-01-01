@@ -11,7 +11,7 @@ import type { RealmProperties } from './RealmTypes.js';
  *
  * Simplest realm to implement first:
  * - Accessed by death (automatic) or ritual (advanced)
- * - Time flows normally
+ * - Time crawls slowly (4x slower than mortal world)
  * - Dead cannot leave without permission
  */
 export const UnderworldRealm: RealmProperties = {
@@ -21,8 +21,8 @@ export const UnderworldRealm: RealmProperties = {
   parentUniverseId: 'main',
   size: 'infinite',
   topology: 'underground_cavern',
-  timeFlow: 'normal',
-  timeRatio: 1.0,
+  timeFlow: 'slow',
+  timeRatio: 0.25,  // Time crawls in the land of the dead (4x slower)
   environment: 'eternal_twilight',
   stability: 0.99,
   accessMethods: ['death', 'ritual'],

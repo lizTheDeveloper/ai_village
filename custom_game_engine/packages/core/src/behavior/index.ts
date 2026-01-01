@@ -32,3 +32,6 @@ export {
   type BehaviorRegistry as AnimalBehaviorRegistry,
   createAnimalBrainSystem,
 } from './animal-behaviors/index.js';
+
+// Agent Behaviors - all behavior implementations
+export * from './behaviors/index.js';

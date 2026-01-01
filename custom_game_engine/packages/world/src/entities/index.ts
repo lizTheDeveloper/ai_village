@@ -3,6 +3,7 @@
  */
 
 export * from './TreeEntity.js';
+export { createTree, createVoxelTree } from './TreeEntity.js';
 export * from './RockEntity.js';
 export * from './MountainEntity.js';
 export * from './LeafPileEntity.js';

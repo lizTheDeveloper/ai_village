@@ -44,3 +44,18 @@ export {
   initializeDreamRealm,
   initializeAllRealms,
 } from './RealmInitializer.js';
+
+// Soul routing (afterlife destination)
+export * from './SoulRoutingService.js';
+export {
+  routeSoulToAfterlife,
+  findDeityAfterlifeRealm,
+  registerDeityAfterlife,
+  isAfterlifeRealm,
+  filterAfterlifeRealms,
+  DEFAULT_AFTERLIFE_REALM,
+} from './SoulRoutingService.js';
+export type {
+  SoulRoutingResult,
+  SoulRoutingReason,
+} from './SoulRoutingService.js';

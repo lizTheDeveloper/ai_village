@@ -11,6 +11,8 @@ import type { AgentComponent } from '../components/AgentComponent.js';
 import type { TimeComponent } from './TimeSystem.js';
 import type { EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
 import { getAgent, getNeeds, getCircadian, getEpisodicMemory, getBuilding } from '../utils/componentHelpers.js';
+import type { BuildingHarmonyComponent } from '../components/BuildingHarmonyComponent.js';
+import { getHarmonyRestModifier } from '../components/BuildingHarmonyComponent.js';
 
 /**
  * Weird/surreal elements that can appear in dreams
@@ -173,7 +175,8 @@ export class SleepSystem implements System {
   }
 
   /**
-   * Calculate sleep quality based on location and environmental conditions
+   * Calculate sleep quality based on location, building harmony, and environment.
+   * Harmonious buildings provide better rest quality.
    */
   private calculateSleepQuality(
     entity: EntityImpl,
@@ -183,7 +186,7 @@ export class SleepSystem implements System {
 
     // Location bonuses
     if (circadian.sleepLocation) {
-      // Check if sleeping in a bed
+      // Check if sleeping in a bed or building
       const buildingComp = getBuilding(circadian.sleepLocation);
       if (buildingComp) {
         if (buildingComp.buildingType === BT.Bed) {
@@ -192,6 +195,20 @@ export class SleepSystem implements System {
           quality += 0.2; // Bedroll: 0.7 total
         } else {
           quality += 0.1; // Other building: 0.6 total
+        }
+
+        // Building harmony affects rest quality
+        // A harmonious space improves sleep, a discordant one disrupts it
+        // sleepLocation is already an Entity, not an EntityId
+        const sleepBuilding = circadian.sleepLocation as EntityImpl | null;
+        if (sleepBuilding) {
+          const harmony = sleepBuilding.getComponent<BuildingHarmonyComponent>(CT.BuildingHarmony);
+          if (harmony) {
+            // getHarmonyRestModifier returns -0.75 to +0.75
+            // Scale it down to -0.3 to +0.3 for sleep quality impact
+            const harmonyBonus = getHarmonyRestModifier(harmony.harmonyScore) * 0.4;
+            quality += harmonyBonus;
+          }
         }
       }
     }

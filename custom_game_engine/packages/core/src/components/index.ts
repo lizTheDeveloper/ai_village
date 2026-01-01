@@ -21,7 +21,12 @@ export { createResourceComponent, type ResourceComponent } from './ResourceCompo
 export * from './MemoryComponent.js';
 export { MemoryComponent } from './MemoryComponent.js';
 export * from './VisionComponent.js';
-export { createVisionComponent } from './VisionComponent.js';
+export {
+  createVisionComponent,
+  createVisionForProfile,
+  VISION_TIERS,
+  VISION_PROFILES,
+} from './VisionComponent.js';
 export type { VisionComponent } from './VisionComponent.js';
 export * from './ConversationComponent.js';
 export { createConversationComponent } from './ConversationComponent.js';
@@ -121,6 +126,9 @@ export * from './SpiritualComponent.js';
 export { createSpiritualComponent } from './SpiritualComponent.js';
 // Deity/divinity system (forward-compatibility - Phase 27)
 export * from './DeityComponent.js';
+// Player control/possession system (Phase 16: Polish & Player)
+export * from './PlayerControlComponent.js';
+export { createPlayerControlComponent, type PlayerControlComponent, calculatePossessionCost, shouldEndPossession } from './PlayerControlComponent.js';
 // Mythology system (Phase 3: Myth Generation)
 export * from './MythComponent.js';
 // Military system (forward-compatibility)
@@ -325,7 +333,122 @@ export * from './TownHallComponent.js';
 export * from './WarehouseComponent.js';
 export * from './WeatherStationComponent.js';
 
+// City Director Component (City-level strategic management)
+export * from './CityDirectorComponent.js';
+export {
+  createCityDirectorComponent,
+  blendPriorities,
+  getPrioritiesForFocus,
+  inferFocusFromStats,
+  isAgentInCity,
+  DEFAULT_CITY_PRIORITIES,
+} from './CityDirectorComponent.js';
+export type {
+  CityDirectorComponent,
+  CityStats,
+  CityFocus,
+  DirectorReasoning,
+} from './CityDirectorComponent.js';
+
 // Realm Components (full exports)
 export * from './RealmComponent.js';
 export * from './PortalComponent.js';
 export * from './RealmLocationComponent.js';
+
+// Afterlife system (souls in the Underworld)
+export * from './AfterlifeComponent.js';
+export {
+  createAfterlifeComponent,
+  recordRemembrance,
+  recordVisit,
+  resolveGoal,
+  canBecomeAncestorKami,
+  getSoulState,
+  getStartingPeace,
+} from './AfterlifeComponent.js';
+export type {
+  AfterlifeComponent,
+  AfterlifeComponentOptions,
+  CauseOfDeath,
+} from './AfterlifeComponent.js';
+
+// Deed Ledger (neutral action tracking for afterlife judgment)
+export * from './DeedLedgerComponent.js';
+export {
+  createDeedLedgerComponent,
+  recordDeed,
+  recordOathSworn,
+  recordOathKept,
+  recordOathBroken,
+  recordKinslaying,
+  recordBetrayal,
+  recordLoyalty,
+  recordDeathCircumstances,
+  calculateDeedScore,
+  getJudgmentTier,
+  getLedgerSummary,
+} from './DeedLedgerComponent.js';
+export type {
+  DeedEntry,
+  DeedCounts,
+  CustomDeedCounts,
+  DeedLedgerComponent,
+} from './DeedLedgerComponent.js';
+
+// Building Harmony (Feng Shui analysis)
+export * from './BuildingHarmonyComponent.js';
+export {
+  createBuildingHarmonyComponent,
+  createDefaultHarmonyComponent,
+  getHarmonyLevelFromScore,
+  getHarmonyMoodModifier,
+  getHarmonyProductivityModifier,
+  getHarmonyRestModifier,
+} from './BuildingHarmonyComponent.js';
+export type {
+  BuildingHarmonyComponent,
+  HarmonyLevel,
+  HarmonyIssue,
+  ChiFlowAnalysis,
+  ProportionAnalysis,
+  CommandingPositionAnalysis,
+  ElementBalance,
+  GridPosition,
+} from './BuildingHarmonyComponent.js';
+
+// Aerial Harmony (3D Feng Shui for flying creatures)
+export * from './AerialHarmonyComponent.js';
+export {
+  createAerialHarmonyComponent,
+  createDefaultAerialHarmonyComponent,
+  getAerialHarmonyLevel,
+  getElementImbalances,
+} from './AerialHarmonyComponent.js';
+export type {
+  AerialHarmonyComponent,
+  AerialHarmonyLevel,
+  AerialHarmonyIssue,
+  AerialPosition,
+  ThermalZone,
+  WindCorridor,
+  AerialShaQi,
+  PerchingSpot,
+  VolumetricElementBalance,
+  ElementDistribution,
+} from './AerialHarmonyComponent.js';
+
+// Voxel Resource System (height-based harvesting for trees, rocks, etc.)
+export * from './VoxelResourceComponent.js';
+export {
+  createVoxelResourceComponent,
+  createTreeVoxelResource,
+  createRockVoxelResource,
+  createOreVeinVoxelResource,
+  calculateTotalResources,
+  isVoxelDepleted,
+  isVoxelUnstable,
+} from './VoxelResourceComponent.js';
+export type {
+  VoxelResourceComponent,
+  VoxelResourceType,
+} from './VoxelResourceComponent.js';

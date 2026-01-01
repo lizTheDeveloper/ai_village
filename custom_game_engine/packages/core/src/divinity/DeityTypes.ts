@@ -6,6 +6,7 @@
  */
 
 import type { DeityBeliefState } from './BeliefTypes.js';
+import type { AfterlifePolicy } from './AfterlifePolicy.js';
 
 // ============================================================================
 // Divine Domains
@@ -240,6 +241,16 @@ export interface Deity {
   // ========================================
   templeIds: string[];              // Building IDs of temples
   sacredSiteIds: string[];          // Location IDs of sacred sites
+
+  // ========================================
+  // Ruled Realms
+  // ========================================
+  ruledRealmIds: string[];          // Realm IDs this deity controls (e.g., their afterlife)
+
+  // ========================================
+  // Afterlife Policy
+  // ========================================
+  afterlifePolicy?: AfterlifePolicy;  // How this deity handles deceased believers
 
   // ========================================
   // Mythology

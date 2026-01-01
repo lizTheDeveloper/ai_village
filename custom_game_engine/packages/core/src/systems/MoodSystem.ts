@@ -30,6 +30,9 @@ import {
   getMoodDescription,
   recordMeal,
 } from '../components/MoodComponent.js';
+import type { BuildingComponent } from '../components/BuildingComponent.js';
+import type { BuildingHarmonyComponent } from '../components/BuildingHarmonyComponent.js';
+import { getHarmonyMoodModifier } from '../components/BuildingHarmonyComponent.js';
 import {
   type PreferenceComponent,
   type FlavorType,
@@ -446,58 +449,90 @@ export class MoodSystem implements System {
   }
 
   /**
-   * Calculate environment score based on weather and shelter.
+   * Calculate environment score based on weather, shelter, and building harmony.
+   * Agents must be INSIDE a building (within its interior radius) to be sheltered.
+   * Harmonious buildings provide additional mood benefits.
    */
   private calculateEnvironmentScore(entity: EntityImpl, world: World): number {
     let score = 0;
+    let isSheltered = false;
+    let currentBuildingHarmony = 0;
 
-    // Check if indoors/sheltered (near a building)
+    // Check if inside a building (within its interior radius)
     const pos = entity.getComponent(CT.Position) as { x: number; y: number } | undefined;
     if (pos) {
-      const nearbyBuildings = world.query()
+      const buildings = world.query()
         .with(CT.Building)
         .with(CT.Position)
         .executeEntities();
 
-      let isSheltered = false;
-      for (const building of nearbyBuildings) {
-        const buildingPos = (building as EntityImpl).getComponent(CT.Position) as { x: number; y: number } | undefined;
-        const buildingComp = (building as EntityImpl).getComponent(CT.Building) as { isComplete: boolean } | undefined;
-        if (buildingPos && buildingComp?.isComplete) {
-          const dx = pos.x - buildingPos.x;
-          const dy = pos.y - buildingPos.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          if (distance < 3) {
-            isSheltered = true;
-            break;
-          }
-        }
-      }
+      for (const building of buildings) {
+        const buildingImpl = building as EntityImpl;
+        const buildingPos = buildingImpl.getComponent(CT.Position) as { x: number; y: number } | undefined;
+        const buildingComp = buildingImpl.getComponent<BuildingComponent>(CT.Building);
 
-      if (isSheltered) {
-        score += 20; // Shelter bonus
+        if (!buildingPos || !buildingComp?.isComplete) continue;
+
+        // Must have an interior to provide shelter
+        if (!buildingComp.interior || buildingComp.interiorRadius <= 0) continue;
+
+        const dx = pos.x - buildingPos.x;
+        const dy = pos.y - buildingPos.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        // Agent must be within the building's interior radius
+        if (distance <= buildingComp.interiorRadius) {
+          isSheltered = true;
+
+          // Check building harmony for aesthetic mood bonus
+          const harmony = buildingImpl.getComponent<BuildingHarmonyComponent>(CT.BuildingHarmony);
+          if (harmony) {
+            currentBuildingHarmony = harmony.harmonyScore;
+          }
+          break; // Found our building, no need to check others
+        }
       }
     }
 
+    if (isSheltered) {
+      // Base shelter bonus
+      score += 15;
+
+      // Harmony modifier: -0.5 to +0.5 scaled to -25 to +25 mood points
+      // A perfectly harmonious building (score 100) gives +25 bonus
+      // A discordant building (score 0) gives -25 penalty
+      // An average building (score 50) gives 0 additional bonus
+      const harmonyModifier = getHarmonyMoodModifier(currentBuildingHarmony);
+      score += harmonyModifier * 50; // Scale from -0.5..+0.5 to -25..+25
+    }
+
     // Weather effects (if weather component exists on world)
+    // Being sheltered reduces weather impact
     const weatherEntities = world.query().with(CT.Weather).executeEntities();
     if (weatherEntities.length > 0) {
       const weather = (weatherEntities[0] as EntityImpl).getComponent(CT.Weather) as { type: string } | undefined;
       if (weather) {
+        let weatherImpact = 0;
         switch (weather.type) {
           case 'sunny':
-            score += 10;
+            weatherImpact = 10;
             break;
           case 'cloudy':
-            score += 0;
+            weatherImpact = 0;
             break;
           case 'rainy':
-            score -= 10;
+            weatherImpact = -15;
             break;
           case 'stormy':
-            score -= 30;
+            weatherImpact = -35;
             break;
         }
+
+        // Sheltered agents are protected from negative weather
+        if (isSheltered && weatherImpact < 0) {
+          weatherImpact *= 0.2; // Only 20% of bad weather affects sheltered agents
+        }
+        score += weatherImpact;
       }
     }
 

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Context Menu Standalone Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        canvas {
+            border: 2px solid #333;
+            background: #0a0a0a;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-family: monospace;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <div>Right-click on the canvas to test the context menu.</div>
+        <div id="status">Status: Waiting for right-click...</div>
+        <div id="coords">Coordinates: -</div>
+    </div>
+    <canvas id="testCanvas" width="800" height="600"></canvas>
+
+    <script type="module">
+        const canvas = document.getElementById('testCanvas');
+        const ctx = canvas.getContext('2d');
+        const statusDiv = document.getElementById('status');
+        const coordsDiv = document.getElementById('coords');
+
+        // Draw a simple background
+        ctx.fillStyle = '#0a0a0a';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw grid for reference
+        ctx.strokeStyle = '#222';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < canvas.width; x += 50) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
+            ctx.stroke();
+        }
+        for (let y = 0; y < canvas.height; y += 50) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+        }
+
+        // Test radial menu rendering directly
+        function renderTestMenu(x, y) {
+            console.log('[TEST] Rendering menu at', x, y);
+            statusDiv.textContent = `Status: Rendering menu at (${x}, ${y})`;
+            coordsDiv.textContent = `Coordinates: ${x}, ${y}`;
+
+            ctx.save();
+
+            const innerRadius = 30;
+            const outerRadius = 100;
+
+            // Draw menu background circle
+            ctx.beginPath();
+            ctx.arc(x, y, outerRadius, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fill();
+
+            // Draw menu border
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw inner circle (dead zone)
+            ctx.beginPath();
+            ctx.arc(x, y, innerRadius, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+            ctx.fill();
+
+            // Draw 4 test items
+            const items = [
+                { label: 'Move Here', startAngle: 0, endAngle: 85 },
+                { label: 'Build', startAngle: 90, endAngle: 175 },
+                { label: 'Inspect', startAngle: 180, endAngle: 265 },
+                { label: 'Cancel', startAngle: 270, endAngle: 355 }
+            ];
+
+            for (const item of items) {
+                const startRad = (item.startAngle * Math.PI) / 180;
+                const endRad = (item.endAngle * Math.PI) / 180;
+
+                // Draw arc segment
+                ctx.beginPath();
+                ctx.arc(x, y, outerRadius, startRad, endRad);
+                ctx.arc(x, y, innerRadius, endRad, startRad, true);
+                ctx.closePath();
+
+                ctx.fillStyle = 'rgba(50, 50, 150, 0.5)';
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // Draw label
+                const midAngle = (item.startAngle + item.endAngle) / 2;
+                const midRadius = (innerRadius + outerRadius) / 2;
+                const labelX = x + midRadius * Math.cos((midAngle * Math.PI) / 180);
+                const labelY = y + midRadius * Math.sin((midAngle * Math.PI) / 180);
+
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = '12px monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(item.label, labelX, labelY);
+            }
+
+            ctx.restore();
+
+            console.log('[TEST] Menu rendered successfully');
+        }
+
+        // Handle right-click
+        canvas.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            console.log('[TEST] Right-click at', x, y);
+
+            // Clear canvas
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Redraw grid
+            ctx.strokeStyle = '#222';
+            ctx.lineWidth = 1;
+            for (let gx = 0; gx < canvas.width; gx += 50) {
+                ctx.beginPath();
+                ctx.moveTo(gx, 0);
+                ctx.lineTo(gx, canvas.height);
+                ctx.stroke();
+            }
+            for (let gy = 0; gy < canvas.height; gy += 50) {
+                ctx.beginPath();
+                ctx.moveTo(0, gy);
+                ctx.lineTo(canvas.width, gy);
+                ctx.stroke();
+            }
+
+            // Render menu
+            renderTestMenu(x, y);
+        });
+
+        // Draw initial test menu in center
+        renderTestMenu(400, 300);
+
+        console.log('[TEST] Standalone test ready. Canvas size:', canvas.width, canvas.height);
+    </script>
+</body>
+</html>

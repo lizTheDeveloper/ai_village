@@ -44,6 +44,10 @@ export * from './SpatialMemoryQuerySystem.js';
 export * from './MetricsCollectionSystem.js';
 // Governance & Information Infrastructure
 export * from './GovernanceDataSystem.js';
+// City Director System (City-level strategic management)
+export * from './CityDirectorSystem.js';
+export { CityDirectorSystem, DEFAULT_CITY_DIRECTOR_CONFIG } from './CityDirectorSystem.js';
+export type { CityDirectorSystemConfig } from './CityDirectorSystem.js';
 // Economy & Trading
 export * from './TradingSystem.js';
 export * from './MarketEventSystem.js';
@@ -83,6 +87,9 @@ export * from './RitualSystem.js';
 export * from './HolyTextSystem.js';
 // Phase 6: Avatar System
 export * from './AvatarSystem.js';
+// Phase 16: Player Avatar System (Player Control)
+export * from './PossessionSystem.js';
+export * from './PlayerInputSystem.js';
 // Phase 7: Angels
 export * from './AngelSystem.js';
 // Phase 8: Advanced Theology
@@ -103,6 +110,7 @@ export * from './RealmManager.js';
 export * from './PortalSystem.js';
 export * from './RealmTimeSystem.js';
 export * from './DeathTransitionSystem.js';
+export * from './ReincarnationSystem.js';
 // Auto-save & Time Travel
 export * from './AutoSaveSystem.js';
 export * from './CheckpointNamingService.js';
@@ -119,9 +127,38 @@ export * from './PredatorAttackSystem.js';
 export * from './VillageDefenseSystem.js';
 // Building Maintenance
 export * from './BuildingMaintenanceSystem.js';
+// Building Spatial Analysis (Feng Shui)
+export * from './BuildingSpatialAnalysisSystem.js';
 // Sacred Sites
 export * from './SacredSiteSystem.js';
 // Angel AI
 export * from './AngelAIDecisionProcessor.js';
 // Goal Descriptions
 export * from './GoalDescriptionLibrary.js';
+
+// Voxel Building System - Tree Felling Physics
+export * from './TreeFellingSystem.js';
+export { TreeFellingSystem, reduceStabilityFromHarvest, wouldCauseFall, getMaterialHardness } from './TreeFellingSystem.js';
+
+// Voxel Building System - Tile Construction (Phase 4)
+export * from './TileConstructionSystem.js';
+export {
+  TileConstructionSystem,
+  getTileConstructionSystem,
+} from './TileConstructionSystem.js';
+export type {
+  TileConstructionStatus,
+  ConstructionTile,
+  ConstructionTaskState,
+  ConstructionTask,
+} from './TileConstructionSystem.js';
+
+// Tile-Based Building - Door System
+export * from './DoorSystem.js';
+
+// Centralized system registration
+export {
+  registerAllSystems,
+  type SystemRegistrationConfig,
+  type SystemRegistrationResult,
+} from './registerAllSystems.js';

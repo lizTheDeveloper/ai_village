@@ -217,6 +217,20 @@ export {
   type PlacementWeights,
 } from './services/PlacementScorer.js';
 
+// Feng Shui Analyzer - Building spatial harmony analysis
+export {
+  FengShuiAnalyzer,
+  fengShuiAnalyzer,
+  type BuildingLayout,
+  TILE_SYMBOLS,
+} from './services/FengShuiAnalyzer.js';
+
+// Aerial Feng Shui Analyzer - 3D spatial harmony for flying creatures
+export {
+  AerialFengShuiAnalyzer,
+  aerialFengShuiAnalyzer,
+} from './services/AerialFengShuiAnalyzer.js';
+
 // Note: MovementAPI, TargetingAPI, InteractionAPI are re-exported
 // with conflicts from components. Import from @ai-village/core/services
 // if you need those specific APIs.
@@ -656,3 +670,261 @@ export {
   defaultTheme,
   viewRegistry,
 } from './dashboard/index.js';
+
+// Reproduction System - Mating paradigms, sexuality, midwifery
+export * from './reproduction/index.js';
+export {
+  // Mating paradigms
+  HUMAN_PARADIGM,
+  KEMMER_PARADIGM,
+  HIVE_PARADIGM,
+  HIVEMIND_PARADIGM,
+  PARASITIC_HIVEMIND_PARADIGM,
+  SYMBIOTIC_PARADIGM,
+  POLYAMOROUS_PARADIGM,
+  THREE_SEX_PARADIGM,
+  OPPORTUNISTIC_PARADIGM,
+  MYSTIF_PARADIGM,
+  QUANTUM_PARADIGM,
+  TEMPORAL_PARADIGM,
+  ASEXUAL_PARADIGM,
+  MATING_PARADIGMS,
+  getMatingParadigm,
+  getParadigmForSpecies,
+  canSpeciesMate,
+  registerMatingParadigm,
+  // Sexuality
+  SexualityComponent,
+  createSexualityComponent,
+  // Reproductive morphs
+  ReproductiveMorphComponent,
+  createReproductiveMorphComponent,
+  // Parasitic subsystem
+  ParasiticColonizationComponent,
+  CollectiveMindComponent,
+  ParasiticReproductionSystem,
+  ColonizationSystem,
+  // Midwifery subsystem
+  PregnancyComponent,
+  LaborComponent,
+  PostpartumComponent,
+  InfantComponent,
+  NursingComponent,
+  MidwiferySystem,
+} from './reproduction/index.js';
+
+// Behavior module - BehaviorRegistry and handlers
+// Note: BehaviorRegistry class - the animal BehaviorRegistry type alias is exported above
+export {
+  BehaviorRegistry as AgentBehaviorRegistry,
+  getBehaviorRegistry,
+  initBehaviorRegistry,
+  registerBehavior,
+  executeBehavior,
+  type BehaviorHandler,
+  type BehaviorMeta,
+} from './behavior/index.js';
+
+// Behaviors module - Extracted behavior implementations
+export {
+  navigateBehavior,
+  exploreFrontierBehavior,
+  exploreSpiralBehavior,
+  followGradientBehavior,
+} from './behaviors/index.js';
+
+// Constants module - selective exports to avoid TICKS_PER_SECOND conflict with types.js
+export {
+  // TimeConstants (TICKS_PER_SECOND already in types.js)
+  GAME_DAY_SECONDS,
+  TICKS_PER_HOUR,
+  TICKS_PER_DAY,
+  DAWN_START_HOUR,
+  DAY_START_HOUR,
+  DUSK_START_HOUR,
+  NIGHT_START_HOUR,
+  LIGHT_LEVEL_NIGHT,
+  LIGHT_LEVEL_DAWN_DUSK,
+  LIGHT_LEVEL_DAY,
+  TILL_DURATION_WITH_HOE,
+  TILL_DURATION_WITH_SHOVEL,
+  TILL_DURATION_BY_HAND,
+  HARVEST_DURATION_BASE,
+  GATHER_SEEDS_DURATION,
+  TRADE_DURATION,
+  GATHER_RESOURCE_BASE_TICKS,
+  GATHER_SPEED_PER_SKILL_LEVEL,
+  MONOLOGUE_INTERVAL,
+  OBSERVE_MAX_DURATION,
+  PRACTICE_MAX_DURATION,
+  REFLECT_MAX_DURATION,
+  SLEEP_MIN_HOURS,
+  SLEEP_MAX_HOURS,
+  MARKET_EVENT_CHECK_INTERVAL,
+  CLEANLINESS_UPDATE_INTERVAL,
+} from './constants/TimeConstants.js';
+export * from './constants/SpatialConstants.js';
+export * from './constants/NeedsConstants.js';
+export * from './constants/GameplayConstants.js';
+
+// Decision module - Agent decision processors
+export {
+  // Orchestrator
+  DecisionProcessor,
+  type DecisionResult,
+  // Autonomic
+  AutonomicSystem,
+  checkAutonomicNeeds,
+  isCriticalBehavior,
+  type AutonomicResult,
+  // Behavior priority
+  getBehaviorPriority,
+  getBehaviorPriorityConfig,
+  canInterrupt,
+  isCriticalSurvivalBehavior,
+  getSortedBehaviors,
+  type BehaviorPriorityConfig,
+  // LLM decisions
+  LLMDecisionProcessor,
+  initLLMDecisionProcessor,
+  getLLMDecisionProcessor,
+  type LLMDecisionResult,
+  type LLMDecisionQueue,
+  // Scripted decisions
+  ScriptedDecisionProcessor,
+  processScriptedDecision,
+  type ScriptedDecisionResult,
+  // Spell utility
+  SpellUtilityCalculator,
+  suggestSpells,
+  type SpellSuggestion,
+  type SpellUtilityContext,
+} from './decision/index.js';
+
+// Help module - Self-documenting wiki system
+export {
+  type HelpEntry,
+  type ItemHelpEntry,
+  type EffectHelpEntry,
+  type BuildingHelpEntry,
+  type HelpExample,
+  type HelpMechanics,
+  HelpRegistry,
+  helpRegistry,
+  type HelpQuery,
+  MarkdownWikiGenerator,
+  JsonWikiGenerator,
+  type WikiOptions,
+  createHelpEntry,
+  createItemHelp,
+  createEffectHelp,
+} from './help/index.js';
+
+// Perception module - Vision, hearing, meeting detection
+export {
+  PerceptionProcessor,
+  VisionProcessor,
+  processVision,
+  type VisionResult,
+  HearingProcessor,
+  processHearing,
+  canHear,
+  getAgentsInHearingRange,
+  type HeardSpeech,
+  type HearingResult,
+  MeetingDetector,
+  processMeetingCalls,
+  isMeetingCall,
+  type MeetingDetectionResult,
+} from './perception/index.js';
+
+// Realms module - Mythological pocket dimensions
+// Selective exports to avoid TransitionEffect conflict with PlantSpecies
+export {
+  // Types
+  type RealmCategory,
+  type RealmSize,
+  type TimeFlowType,
+  type AccessMethod,
+  type AccessRestriction,
+  type RealmLaw,
+  type RealmProperties,
+  type RealmTransitionResult,
+  // TransitionEffect conflicts with PlantSpecies - skipped
+  type RealmInhabitant,
+  // Definitions
+  UnderworldRealm,
+  CelestialRealm,
+  DreamRealm,
+  REALM_REGISTRY,
+  getRealmDefinition,
+  getAllRealmDefinitions,
+  // Transitions
+  transitionToRealm,
+  returnToMortalWorld,
+  // Initialization
+  createRealmEntity,
+  initializeUnderworld,
+  initializeCelestialRealm,
+  initializeDreamRealm,
+  initializeAllRealms,
+} from './realms/index.js';
+
+// Targeting module - Domain-specific targeting
+export {
+  ResourceTargeting,
+  type ResourceTargetingOptions,
+  PlantTargeting,
+  type PlantTargetingOptions,
+  BuildingTargeting,
+  type BuildingTargetingOptions,
+  AgentTargeting,
+  type AgentTargetingOptions,
+  ThreatTargeting,
+  type ThreatTargetingOptions,
+} from './targeting/index.js';
+
+// Component utilities
+export {
+  safeUpdateComponent,
+  setComponentProperty,
+  setComponentProperties,
+} from './utils/componentUtils.js';
+
+export {
+  // Typed component getters
+  getAgent,
+  getPosition,
+  getMovement,
+  getNeeds,
+  getInventory,
+  getVision,
+  getMemory,
+  getSpatialMemory,
+  getEpisodicMemory,
+  getSemanticMemory,
+  getReflection,
+  getConversation,
+  getSocialGradient,
+  getTrustNetwork,
+  getBelief,
+  getRelationship,
+  getSteering,
+  getVelocity,
+  getCircadian,
+  getTemperature,
+  getIdentity,
+  getPersonality,
+  getPlant,
+  getAnimal,
+  getBuilding,
+  getResource,
+  // Utilities
+  hasComponents,
+  requireAgent,
+  requirePosition,
+  requireNeeds,
+  requireInventory,
+  requireSteering,
+  requireVelocity,
+} from './utils/componentHelpers.js';

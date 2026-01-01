@@ -10,6 +10,7 @@ import type { CircadianComponent } from '../components/CircadianComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { MovementComponent } from '../components/MovementComponent.js';
 import type { TemperatureComponent } from '../components/TemperatureComponent.js';
+import type { RealmLocationComponent } from '../components/RealmLocationComponent.js';
 
 export class NeedsSystem implements System {
   public readonly id: SystemId = 'needs';
@@ -43,6 +44,13 @@ export class NeedsSystem implements System {
 
       if (!needs) {
         throw new Error(`Entity ${entity.id} missing required needs component`);
+      }
+
+      // Dead entities don't have physical needs - skip decay entirely
+      // They may still have social/spiritual needs, but not hunger/energy/thirst
+      const realmLocation = impl.getComponent<RealmLocationComponent>('realm_location');
+      if (realmLocation?.transformations.includes('dead')) {
+        continue;
       }
 
       // Check if agent is sleeping (don't deplete energy while sleeping)

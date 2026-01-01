@@ -8,33 +8,16 @@
  *   npx tsx demo/headless.ts --session-id=my_session_123
  */
 
+// Load environment variables from .env file
+import dotenv from 'dotenv';
+dotenv.config();
+
 import {
   GameLoop,
-  AgentBrainSystem,
-  MovementSystem,
-  NeedsSystem,
-  MemorySystem,
-  MemoryFormationSystem,
-  MemoryConsolidationSystem,
-  ReflectionSystem,
-  JournalingSystem,
-  CommunicationSystem,
-  BuildingSystem,
-  ResourceGatheringSystem,
   BuildingBlueprintRegistry,
   registerShopBlueprints,
-  TemperatureSystem,
-  WeatherSystem,
   SoilSystem,
-  PlantSystem,
   PlantComponent,
-  TimeSystem,
-  SleepSystem,
-  AnimalSystem,
-  AnimalProductionSystem,
-  TamingSystem,
-  WildAnimalSpawningSystem,
-  AnimalBrainSystem,
   TillActionHandler,
   PlantActionHandler,
   GatherSeedsActionHandler,
@@ -50,48 +33,16 @@ import {
   createEntityId,
   type World,
   type WorldMutator,
-  SteeringSystem,
-  ExplorationSystem,
-  LandmarkNamingSystem,
-  VerificationSystem,
-  SocialGradientSystem,
-  BeliefFormationSystem,
-  BeliefGenerationSystem,
-  PrayerSystem,
-  PrayerAnsweringSystem,
-  MythGenerationSystem,
-  SpatialMemoryQuerySystem,
-  DeityEmergenceSystem,
-  AIGodBehaviorSystem,
-  TempleSystem,
-  PriesthoodSystem,
-  RitualSystem,
-  HolyTextSystem,
-  AvatarSystem,
-  AngelSystem,
-  SchismSystem,
-  SyncretismSystem,
-  ReligiousCompetitionSystem,
-  ConversionWarfareSystem,
-  TerrainModificationSystem,
-  SpeciesCreationSystem,
-  DivineWeatherControl,
-  MassEventSystem,
   CraftingSystem,
   initializeDefaultRecipes,
   globalRecipeRegistry,
-  SkillSystem,
   CookingSystem,
-  IdleBehaviorSystem,
-  GoalGenerationSystem,
-  TradingSystem,
-  MarketEventSystem,
-  ResearchSystem,
   registerDefaultResearch,
   MetricsCollectionSystem,
   LiveEntityAPI,
-  GovernanceDataSystem,
   registerDefaultMaterials,
+  registerAllSystems,
+  type SystemRegistrationResult,
 } from '../packages/core/src/index.ts';
 
 import {
@@ -174,153 +125,75 @@ class HeadlessGameLoop {
 // SYSTEM REGISTRATION
 // ============================================================================
 
-async function registerAllSystems(
+async function setupGameSystems(
   gameLoop: GameLoop,
   llmQueue: LLMDecisionQueue | null,
   promptBuilder: StructuredPromptBuilder | null,
   sessionId: string
 ): Promise<{
   soilSystem: SoilSystem;
-  plantSystem: PlantSystem;
   craftingSystem: CraftingSystem;
-  wildAnimalSpawning: WildAnimalSpawningSystem;
+  result: SystemRegistrationResult;
   metricsSystem: MetricsCollectionSystem;
 }> {
-  // Core systems
-  gameLoop.systemRegistry.register(new TimeSystem());
-  gameLoop.systemRegistry.register(new WeatherSystem());
-  gameLoop.systemRegistry.register(new TemperatureSystem());
+  // Register default materials and recipes before system registration
+  registerDefaultMaterials();
+  initializeDefaultRecipes(globalRecipeRegistry);
+  registerDefaultResearch();
 
-  const soilSystem = new SoilSystem();
-  gameLoop.systemRegistry.register(soilSystem);
+  // Use centralized system registration
+  const result = registerAllSystems(gameLoop, {
+    llmQueue: llmQueue || undefined,
+    promptBuilder: promptBuilder || undefined,
+    gameSessionId: sessionId,
+    metricsServerUrl: 'ws://localhost:8765',
+    enableMetrics: true,
+    enableAutoSave: false, // Headless doesn't need auto-save
+  });
 
-  // Action handlers
-  gameLoop.actionRegistry.register(new TillActionHandler(soilSystem));
+  // Set up plant species lookup (injected from world package)
+  result.plantSystem.setSpeciesLookup(getPlantSpecies);
+
+  // Register action handlers (these are separate from systems)
+  gameLoop.actionRegistry.register(new TillActionHandler(result.soilSystem));
   gameLoop.actionRegistry.register(new PlantActionHandler());
   gameLoop.actionRegistry.register(new GatherSeedsActionHandler());
   gameLoop.actionRegistry.register(new HarvestActionHandler());
 
-  // Plant system
-  const plantSystem = new PlantSystem(gameLoop.world.eventBus);
-  plantSystem.setSpeciesLookup(getPlantSpecies);
-  gameLoop.systemRegistry.register(plantSystem);
-
-  // Animal systems
-  gameLoop.systemRegistry.register(new AnimalBrainSystem());
-  gameLoop.systemRegistry.register(new AnimalSystem(gameLoop.world.eventBus));
-  gameLoop.systemRegistry.register(new AnimalProductionSystem(gameLoop.world.eventBus));
-  const wildAnimalSpawning = new WildAnimalSpawningSystem();
-  gameLoop.systemRegistry.register(wildAnimalSpawning);
-
-  // Idle Behaviors & Goals
-  gameLoop.systemRegistry.register(new IdleBehaviorSystem());
-  gameLoop.systemRegistry.register(new GoalGenerationSystem(gameLoop.world.eventBus));
-
-  // AI system
-  gameLoop.systemRegistry.register(new AgentBrainSystem(llmQueue, promptBuilder));
-
-  // Navigation & Exploration
-  gameLoop.systemRegistry.register(new SocialGradientSystem());
-  gameLoop.systemRegistry.register(new ExplorationSystem());
-  gameLoop.systemRegistry.register(new LandmarkNamingSystem(llmQueue));
-  gameLoop.systemRegistry.register(new SteeringSystem());
-  gameLoop.systemRegistry.register(new VerificationSystem());
-  gameLoop.systemRegistry.register(new CommunicationSystem());
-  gameLoop.systemRegistry.register(new NeedsSystem());
-  gameLoop.systemRegistry.register(new SleepSystem());
-  gameLoop.systemRegistry.register(new TamingSystem());
-  gameLoop.systemRegistry.register(new BuildingSystem());
-
-  // Materials & Crafting
-  registerDefaultMaterials();
-  initializeDefaultRecipes(globalRecipeRegistry);
+  // Set up crafting system with recipe registry
   const craftingSystem = new CraftingSystem();
   craftingSystem.setRecipeRegistry(globalRecipeRegistry);
   gameLoop.systemRegistry.register(craftingSystem);
 
-  // Skill systems
-  gameLoop.systemRegistry.register(new SkillSystem());
+  // Set up cooking system with recipe registry
   const cookingSystem = new CookingSystem();
   cookingSystem.setRecipeRegistry(globalRecipeRegistry);
-  gameLoop.systemRegistry.register(cookingSystem);
+  // Note: CookingSystem is already registered by registerAllSystems,
+  // but we need to configure it with the recipe registry
 
-  // Trading & Market
-  gameLoop.systemRegistry.register(new TradingSystem());
-  const marketEventSystem = new MarketEventSystem(gameLoop.world.eventBus);
-  gameLoop.systemRegistry.register(marketEventSystem);
-
-  // Research
-  const researchSystem = new ResearchSystem();
-  gameLoop.systemRegistry.register(researchSystem);
-  registerDefaultResearch();
-
-  // Resource gathering & Movement
-  gameLoop.systemRegistry.register(new ResourceGatheringSystem(gameLoop.world.eventBus));
-  gameLoop.systemRegistry.register(new MovementSystem());
-
-  // Memory systems
-  gameLoop.systemRegistry.register(new MemorySystem());
-  gameLoop.systemRegistry.register(new MemoryFormationSystem(gameLoop.world.eventBus));
-  gameLoop.systemRegistry.register(new SpatialMemoryQuerySystem());
-  gameLoop.systemRegistry.register(new MemoryConsolidationSystem(gameLoop.world.eventBus));
-
-  // Belief & Divinity
-  gameLoop.systemRegistry.register(new BeliefFormationSystem());
-  gameLoop.systemRegistry.register(new BeliefGenerationSystem());
-  gameLoop.systemRegistry.register(new PrayerSystem());
-  gameLoop.systemRegistry.register(new PrayerAnsweringSystem());
-  gameLoop.systemRegistry.register(new MythGenerationSystem());
-  gameLoop.systemRegistry.register(new DeityEmergenceSystem());
-  gameLoop.systemRegistry.register(new AIGodBehaviorSystem());
-  gameLoop.systemRegistry.register(new TempleSystem());
-  gameLoop.systemRegistry.register(new PriesthoodSystem());
-  gameLoop.systemRegistry.register(new RitualSystem());
-  gameLoop.systemRegistry.register(new HolyTextSystem());
-  gameLoop.systemRegistry.register(new AvatarSystem());
-  gameLoop.systemRegistry.register(new AngelSystem());
-  gameLoop.systemRegistry.register(new SchismSystem());
-  gameLoop.systemRegistry.register(new SyncretismSystem());
-  gameLoop.systemRegistry.register(new ReligiousCompetitionSystem());
-  gameLoop.systemRegistry.register(new ConversionWarfareSystem());
-  gameLoop.systemRegistry.register(new TerrainModificationSystem());
-  gameLoop.systemRegistry.register(new SpeciesCreationSystem());
-  gameLoop.systemRegistry.register(new DivineWeatherControl());
-  gameLoop.systemRegistry.register(new MassEventSystem());
-
-  // Reflection & Journaling
-  gameLoop.systemRegistry.register(new ReflectionSystem(gameLoop.world.eventBus));
-  gameLoop.systemRegistry.register(new JournalingSystem(gameLoop.world.eventBus));
-
-  // Governance
-  const governanceDataSystem = new GovernanceDataSystem();
-  governanceDataSystem.initialize(gameLoop.world, gameLoop.world.eventBus);
-  gameLoop.systemRegistry.register(governanceDataSystem);
-
-  // Metrics system with provided session ID
-  const metricsSystem = new MetricsCollectionSystem(gameLoop.world, {
-    enabled: true,
-    streaming: true,
-    streamConfig: {
-      serverUrl: 'ws://localhost:8765',
-      batchSize: 10,
-      flushInterval: 5000,
-      gameSessionId: sessionId,
-    },
-  });
-  gameLoop.systemRegistry.register(metricsSystem);
-
-  // Live Entity API
-  const streamClient = metricsSystem.getStreamClient();
-  if (streamClient) {
-    const liveEntityAPI = new LiveEntityAPI(gameLoop.world);
-    if (promptBuilder) {
-      liveEntityAPI.setPromptBuilder(promptBuilder);
+  // Set up Live Entity API if metrics is enabled
+  const metricsSystem = result.metricsSystem;
+  if (metricsSystem) {
+    const streamClient = metricsSystem.getStreamClient();
+    if (streamClient) {
+      const liveEntityAPI = new LiveEntityAPI(gameLoop.world);
+      if (promptBuilder) {
+        liveEntityAPI.setPromptBuilder(promptBuilder);
+      }
+      liveEntityAPI.attach(streamClient);
+      console.log('[HeadlessGame] Live Entity API attached');
     }
-    liveEntityAPI.attach(streamClient);
-    console.log('[HeadlessGame] Live Entity API attached');
   }
 
-  return { soilSystem, plantSystem, craftingSystem, wildAnimalSpawning, metricsSystem };
+  // Initialize governance data system
+  result.governanceDataSystem.initialize(gameLoop.world, gameLoop.world.eventBus);
+
+  return {
+    soilSystem: result.soilSystem,
+    craftingSystem,
+    result,
+    metricsSystem: metricsSystem!,
+  };
 }
 
 // ============================================================================
@@ -416,6 +289,28 @@ async function setupLLMProvider(): Promise<{
   queue: LLMDecisionQueue | null;
   promptBuilder: StructuredPromptBuilder | null;
 }> {
+  // Check for Groq API key first (preferred for headless)
+  const groqApiKey = process.env.GROQ_API_KEY;
+  const groqModel = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+
+  if (groqApiKey) {
+    try {
+      console.log(`[HeadlessGame] Using Groq API with model: ${groqModel}`);
+      const provider = new OpenAICompatProvider(
+        groqModel,
+        'https://api.groq.com/openai/v1',
+        groqApiKey
+      );
+      return {
+        provider,
+        queue: new LLMDecisionQueue(provider, 3),
+        promptBuilder: new StructuredPromptBuilder(),
+      };
+    } catch (e) {
+      console.error('[HeadlessGame] Groq setup failed:', e);
+    }
+  }
+
   const isMac = process.platform === 'darwin';
 
   if (isMac) {
@@ -423,13 +318,13 @@ async function setupLLMProvider(): Promise<{
       const resp = await fetch('http://localhost:8080/v1/models');
       if (resp.ok) {
         console.log('[HeadlessGame] Using MLX server');
-        const provider = new OpenAICompatProvider({
-          baseUrl: 'http://localhost:8080',
-          model: 'mlx-community/Qwen3-4B-Instruct-4bit',
-        });
+        const provider = new OpenAICompatProvider(
+          'mlx-community/Qwen3-4B-Instruct-4bit',
+          'http://localhost:8080'
+        );
         return {
           provider,
-          queue: new LLMDecisionQueue(provider, { maxConcurrent: 3 }),
+          queue: new LLMDecisionQueue(provider, 3),
           promptBuilder: new StructuredPromptBuilder(),
         };
       }
@@ -445,7 +340,7 @@ async function setupLLMProvider(): Promise<{
       const provider = new OllamaProvider({ model: 'qwen3:1.7b' });
       return {
         provider,
-        queue: new LLMDecisionQueue(provider, { maxConcurrent: 3 }),
+        queue: new LLMDecisionQueue(provider, 3),
         promptBuilder: new StructuredPromptBuilder(),
       };
     }
@@ -498,7 +393,8 @@ async function main() {
   (baseGameLoop.world as any)._worldEntityId = worldEntity.id;
 
   console.log('[HeadlessGame] Registering systems...');
-  const { wildAnimalSpawning } = await registerAllSystems(baseGameLoop, queue, promptBuilder, sessionId);
+  const { result } = await setupGameSystems(baseGameLoop, queue, promptBuilder, sessionId);
+  const wildAnimalSpawning = result.wildAnimalSpawning;
 
   console.log('[HeadlessGame] Creating entities...');
   createInitialBuildings(baseGameLoop.world);

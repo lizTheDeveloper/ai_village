@@ -60,8 +60,8 @@ export class GuardDutySystem implements System {
       const duty = world.getComponent<GuardDutyComponent>(entity.id, 'guard_duty');
       if (!duty) continue;
 
-      // Validate assignment
-      this.validateAssignment(duty);
+      // Validate assignment - skip if invalid
+      if (!this.validateAssignment(duty)) continue;
 
       // Decay alertness
       this.decayAlertness(entity, duty, deltaTime);
@@ -76,28 +76,32 @@ export class GuardDutySystem implements System {
     }
   }
 
-  private validateAssignment(duty: GuardDutyComponent): void {
+  /**
+   * Validate guard assignment. Returns false if invalid (skip processing).
+   */
+  private validateAssignment(duty: GuardDutyComponent): boolean {
     if (!duty.assignmentType) {
-      throw new Error('Guard assignment type is required');
+      return false; // No assignment type - skip
     }
 
     switch (duty.assignmentType) {
       case 'location':
         if (!duty.targetLocation) {
-          throw new Error('Location guard assignment requires targetLocation');
+          return false; // Invalid location guard - skip
         }
         break;
       case 'person':
         if (!duty.targetPerson) {
-          throw new Error('Person guard assignment requires targetPerson');
+          return false; // Invalid person guard - skip
         }
         break;
       case 'patrol':
         if (!duty.patrolRoute || duty.patrolRoute.length === 0) {
-          throw new Error('Patrol assignment requires patrolRoute');
+          return false; // Invalid patrol - skip
         }
         break;
     }
+    return true;
   }
 
   private decayAlertness(entity: Entity, duty: GuardDutyComponent, deltaTime: number): void {

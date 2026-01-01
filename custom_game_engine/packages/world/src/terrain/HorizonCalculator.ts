@@ -12,7 +12,12 @@
  */
 
 export interface PlanetParameters {
-  /** Planet radius in tiles (Earth ≈ 40,000km = ~40,000 tiles at 1km/tile) */
+  /**
+   * Planet radius in tiles.
+   * With 1 tile = 1 meter scale (humans are 2 tiles tall):
+   * - Earth radius: 6,371 km = 6,371,000 tiles
+   * - Moon radius: 1,737 km = 1,737,000 tiles
+   */
   radius: number;
 
   /** Planet name for debugging */
@@ -21,33 +26,52 @@ export interface PlanetParameters {
 
 /**
  * Pre-configured planet parameters for different world sizes.
+ * All values in tiles where 1 tile = 1 meter.
  */
 export const PLANET_PRESETS: Record<string, PlanetParameters> = {
   /** Earth-like planet (realistic curvature) */
   earth: {
-    radius: 40000, // ~40k tiles radius (Earth is ~6,371km radius = ~40k circumference)
+    radius: 6_371_000, // 6,371 km radius = 6.371 million tiles
     name: 'Earth',
   },
 
-  /** Smaller planet (more dramatic curvature, horizon closer) */
-  small: {
-    radius: 10000,
-    name: 'Small Planet',
-  },
-
-  /** Tiny moon (very close horizon) */
+  /** Earth's moon */
   moon: {
-    radius: 2000,
+    radius: 1_737_000, // 1,737 km radius
     name: 'Moon',
   },
 
-  /** Huge planet (almost flat horizon) */
-  giant: {
-    radius: 100000,
-    name: 'Gas Giant',
+  /** Mars-like planet */
+  mars: {
+    radius: 3_390_000, // 3,390 km radius
+    name: 'Mars',
   },
 
-  /** Flat world (no curvature, Minecraft-style) */
+  /** Small fantasy world (more dramatic curvature, closer horizon) */
+  small_world: {
+    radius: 500_000, // 500 km radius - small asteroid/fantasy world
+    name: 'Small World',
+  },
+
+  /** Tiny planetoid (very close horizon, can see curvature) */
+  planetoid: {
+    radius: 50_000, // 50 km radius - small asteroid
+    name: 'Planetoid',
+  },
+
+  /** Huge super-earth (almost flat horizon) */
+  super_earth: {
+    radius: 12_000_000, // 12,000 km radius - double Earth
+    name: 'Super Earth',
+  },
+
+  /** Gas giant moon (like Titan) */
+  titan: {
+    radius: 2_575_000, // 2,575 km radius
+    name: 'Titan',
+  },
+
+  /** Flat world (no curvature, infinite plane) */
   flat: {
     radius: Infinity,
     name: 'Flat World',

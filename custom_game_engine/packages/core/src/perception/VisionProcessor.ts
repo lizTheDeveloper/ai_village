@@ -4,7 +4,14 @@
  * This processor detects nearby entities (resources, plants, agents) within
  * an agent's vision range and updates the VisionComponent and MemoryComponent.
  *
- * Enhanced with terrain feature detection based on geomorphometry research.
+ * Enhanced with:
+ * - Tiered vision system (close/area/distant) to manage context size
+ * - Terrain feature detection based on geomorphometry research
+ *
+ * Tiered Vision (1 tile = 1 meter, humans = 2 tiles tall):
+ * - Close range (~10m): Detailed perception, full context in prompts
+ * - Area range (~50m): Entity detection, summarized in prompts
+ * - Distant range (~200m): Landmarks only, navigation context
  *
  * Part of Phase 3 of the AISystem decomposition (work-order: ai-system-refactor)
  */
@@ -13,6 +20,7 @@ import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { VisionComponent } from '../components/VisionComponent.js';
+import { VISION_TIERS } from '../components/VisionComponent.js';
 import type { ResourceComponent } from '../components/ResourceComponent.js';
 import type { PlantComponent } from '../components/PlantComponent.js';
 import { SpatialMemoryComponent, addSpatialMemory } from '../components/SpatialMemoryComponent.js';
@@ -23,6 +31,19 @@ import type {
   TerrainCache,
   TerrainDescriptionCacheStatic,
 } from '../types/TerrainTypes.js';
+
+/**
+ * Limits for entities per tier to prevent context bloat.
+ * These determine max entities included in agent prompts.
+ */
+const TIER_LIMITS = {
+  /** Max entities in close range (detailed in prompt) */
+  CLOSE: 10,
+  /** Max entities in area range (summarized in prompt) */
+  AREA: 50,
+  /** Max landmarks in distant range */
+  DISTANT: 20,
+} as const;
 
 /**
  * Terrain services injected at runtime from @ai-village/world.
@@ -47,12 +68,42 @@ export function injectTerrainServices(
 }
 
 /**
- * Vision processing result
+ * Entity seen at a specific distance tier.
+ */
+export interface TieredEntity {
+  id: string;
+  distance: number;
+  tier: 'close' | 'area' | 'distant';
+}
+
+/**
+ * Vision processing result with tiered awareness.
  */
 export interface VisionResult {
+  // Close range - detailed perception (for context)
+  nearbyResources: TieredEntity[];
+  nearbyPlants: TieredEntity[];
+  nearbyAgents: TieredEntity[];
+
+  // Area range - tactical awareness (counts for context)
   seenResources: string[];
   seenPlants: string[];
   seenAgents: string[];
+
+  // Distant range - landmarks only
+  distantLandmarks: string[];
+
+  // Summary counts for efficient context building
+  counts: {
+    closeResources: number;
+    closeAgents: number;
+    closePlants: number;
+    areaResources: number;
+    areaAgents: number;
+    areaPlants: number;
+    distantLandmarks: number;
+  };
+
   /** Natural language description of nearby terrain features */
   terrainDescription: string;
   /** Detected terrain features (peaks, cliffs, lakes, etc.) */
@@ -72,85 +123,147 @@ export interface VisionResult {
  */
 export class VisionProcessor {
   /**
-   * Process vision for an entity, detecting nearby entities and updating components.
+   * Process vision for an entity with tiered awareness.
+   *
+   * Tiers:
+   * - Close range (closeRange, default 10m): Full detail, included in prompt
+   * - Area range (range, default 50m): Detected, summarized in prompt
+   * - Distant range (distantRange, default 200m): Landmarks only
    */
   process(entity: EntityImpl, world: World): VisionResult {
     const vision = entity.getComponent<VisionComponent>(ComponentType.Vision);
     const spatialMemory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
 
+    const emptyResult: VisionResult = {
+      nearbyResources: [],
+      nearbyPlants: [],
+      nearbyAgents: [],
+      seenResources: [],
+      seenPlants: [],
+      seenAgents: [],
+      distantLandmarks: [],
+      counts: {
+        closeResources: 0,
+        closeAgents: 0,
+        closePlants: 0,
+        areaResources: 0,
+        areaAgents: 0,
+        areaPlants: 0,
+        distantLandmarks: 0,
+      },
+      terrainDescription: '',
+      terrainFeatures: [],
+    };
+
     if (!vision || !spatialMemory) {
-      return {
-        seenResources: [],
-        seenPlants: [],
-        seenAgents: [],
-        terrainDescription: '',
-        terrainFeatures: [],
-      };
+      return emptyResult;
     }
 
     const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) {
-      return {
-        seenResources: [],
-        seenPlants: [],
-        seenAgents: [],
-        terrainDescription: '',
-        terrainFeatures: [],
-      };
+      return emptyResult;
     }
 
+    // Get vision ranges (with defaults)
+    const closeRange = vision.closeRange ?? VISION_TIERS.CLOSE;
+    const areaRange = vision.range ?? VISION_TIERS.AREA;
+    const distantRange = vision.distantRange ?? VISION_TIERS.DISTANT;
+
+    // Tiered detection results
+    const nearbyResources: TieredEntity[] = [];
+    const nearbyPlants: TieredEntity[] = [];
+    const nearbyAgents: TieredEntity[] = [];
     const seenResourceIds: string[] = [];
     const seenAgentIds: string[] = [];
     const seenPlantIds: string[] = [];
+    const distantLandmarks: string[] = [];
 
-    // Detect nearby resources (mutates spatialMemory in place)
+    // Detect resources with tiered awareness
     if (vision.canSeeResources) {
-      this.detectResources(world, position, vision, spatialMemory, seenResourceIds);
+      this.detectResourcesTiered(
+        world, position, spatialMemory,
+        closeRange, areaRange,
+        nearbyResources, seenResourceIds
+      );
     }
 
-    // Detect nearby plants (mutates spatialMemory in place)
-    this.detectPlants(world, position, vision, spatialMemory, seenPlantIds);
+    // Detect plants with tiered awareness
+    this.detectPlantsTiered(
+      world, position, spatialMemory,
+      closeRange, areaRange,
+      nearbyPlants, seenPlantIds
+    );
 
-    // Detect nearby agents (mutates spatialMemory in place)
+    // Detect agents with tiered awareness
     if (vision.canSeeAgents) {
-      this.detectAgents(entity, world, position, vision, spatialMemory, seenAgentIds);
+      this.detectAgentsTiered(
+        entity, world, position, spatialMemory,
+        closeRange, areaRange,
+        nearbyAgents, seenAgentIds
+      );
     }
 
-    // Detect terrain features (peaks, cliffs, lakes, etc.)
+    // Detect terrain features using distant range
     const { features, description } = this.detectTerrainFeatures(
       world,
       position,
-      vision,
+      { ...vision, range: distantRange }, // Use distant range for terrain
       spatialMemory
     );
 
-    // Update vision component with currently seen entities and terrain
+    // Extract landmark IDs from terrain features
+    for (const feature of features.slice(0, TIER_LIMITS.DISTANT)) {
+      if (feature.type === 'peak' || feature.type === 'cliff' || feature.type === 'lake') {
+        distantLandmarks.push(`${feature.type}_${Math.floor(feature.x)}_${Math.floor(feature.y)}`);
+      }
+    }
+
+    // Update vision component with tiered results
     entity.updateComponent<VisionComponent>(ComponentType.Vision, (current) => ({
       ...current,
-      seenAgents: seenAgentIds,
-      seenResources: seenResourceIds,
-      seenPlants: seenPlantIds,
+      seenAgents: seenAgentIds.slice(0, TIER_LIMITS.AREA),
+      seenResources: seenResourceIds.slice(0, TIER_LIMITS.AREA),
+      seenPlants: seenPlantIds.slice(0, TIER_LIMITS.AREA),
+      nearbyAgents: nearbyAgents.slice(0, TIER_LIMITS.CLOSE).map(e => e.id),
+      nearbyResources: nearbyResources.slice(0, TIER_LIMITS.CLOSE).map(e => e.id),
+      distantLandmarks: distantLandmarks.slice(0, TIER_LIMITS.DISTANT),
       terrainDescription: description,
     }));
 
     return {
-      seenResources: seenResourceIds,
-      seenPlants: seenPlantIds,
-      seenAgents: seenAgentIds,
+      nearbyResources: nearbyResources.slice(0, TIER_LIMITS.CLOSE),
+      nearbyPlants: nearbyPlants.slice(0, TIER_LIMITS.CLOSE),
+      nearbyAgents: nearbyAgents.slice(0, TIER_LIMITS.CLOSE),
+      seenResources: seenResourceIds.slice(0, TIER_LIMITS.AREA),
+      seenPlants: seenPlantIds.slice(0, TIER_LIMITS.AREA),
+      seenAgents: seenAgentIds.slice(0, TIER_LIMITS.AREA),
+      distantLandmarks: distantLandmarks.slice(0, TIER_LIMITS.DISTANT),
+      counts: {
+        closeResources: nearbyResources.length,
+        closeAgents: nearbyAgents.length,
+        closePlants: nearbyPlants.length,
+        areaResources: seenResourceIds.length,
+        areaAgents: seenAgentIds.length,
+        areaPlants: seenPlantIds.length,
+        distantLandmarks: distantLandmarks.length,
+      },
       terrainDescription: description,
       terrainFeatures: features,
     };
   }
 
   /**
-   * Detect nearby resources within vision range.
-   * Mutates spatialMemory in place.
+   * Detect resources with tiered awareness.
+   * Close range: detailed, for prompt context
+   * Area range: detected, for summaries
    */
-  private detectResources(
+  private detectResourcesTiered(
     world: World,
     position: PositionComponent,
-    vision: VisionComponent,
     spatialMemory: SpatialMemoryComponent,
+    closeRange: number,
+    areaRange: number,
+    nearbyResources: TieredEntity[],
     seenResourceIds: string[]
   ): void {
     const resources = world.query().with(ComponentType.Resource).with(ComponentType.Position).executeEntities();
@@ -160,15 +273,32 @@ export class VisionProcessor {
       const resourcePos = resourceImpl.getComponent<PositionComponent>(ComponentType.Position);
       const resourceComp = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource);
 
-      if (!resourcePos || !resourceComp) continue;
+      if (!resourcePos || !resourceComp || resourceComp.amount <= 0) continue;
 
       const distance = this.distance(position, resourcePos);
 
-      if (distance <= vision.range && resourceComp.amount > 0) {
-        // Track this resource in vision
+      if (distance <= closeRange) {
+        // Close range - detailed awareness
+        nearbyResources.push({ id: resource.id, distance, tier: 'close' });
         seenResourceIds.push(resource.id);
 
-        // Remember this resource location
+        // Higher importance memory for close resources
+        addSpatialMemory(
+          spatialMemory,
+          {
+            type: 'resource_location',
+            x: resourcePos.x,
+            y: resourcePos.y,
+            entityId: resource.id,
+            metadata: { resourceType: resourceComp.resourceType, amount: resourceComp.amount },
+          },
+          world.tick,
+          100 // Higher importance for close items
+        );
+      } else if (distance <= areaRange) {
+        // Area range - tactical awareness
+        seenResourceIds.push(resource.id);
+
         addSpatialMemory(
           spatialMemory,
           {
@@ -179,21 +309,25 @@ export class VisionProcessor {
             metadata: { resourceType: resourceComp.resourceType },
           },
           world.tick,
-          80
+          60
         );
       }
     }
+
+    // Sort by distance for priority
+    nearbyResources.sort((a, b) => a.distance - b.distance);
   }
 
   /**
-   * Detect nearby plants within vision range.
-   * Mutates spatialMemory in place.
+   * Detect plants with tiered awareness.
    */
-  private detectPlants(
+  private detectPlantsTiered(
     world: World,
     position: PositionComponent,
-    vision: VisionComponent,
     spatialMemory: SpatialMemoryComponent,
+    closeRange: number,
+    areaRange: number,
+    nearbyPlants: TieredEntity[],
     seenPlantIds: string[]
   ): void {
     const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
@@ -207,11 +341,11 @@ export class VisionProcessor {
 
       const distance = this.distance(position, plantPos);
 
-      if (distance <= vision.range) {
-        // Track this plant in vision
+      if (distance <= closeRange) {
+        // Close range - detailed awareness
+        nearbyPlants.push({ id: plantEntity.id, distance, tier: 'close' });
         seenPlantIds.push(plantEntity.id);
 
-        // Remember this plant location
         addSpatialMemory(
           spatialMemory,
           {
@@ -227,22 +361,41 @@ export class VisionProcessor {
             },
           },
           world.tick,
-          80
+          100
+        );
+      } else if (distance <= areaRange) {
+        // Area range - tactical awareness
+        seenPlantIds.push(plantEntity.id);
+
+        addSpatialMemory(
+          spatialMemory,
+          {
+            type: 'plant_location',
+            x: plantPos.x,
+            y: plantPos.y,
+            entityId: plantEntity.id,
+            metadata: { speciesId: plant.speciesId, stage: plant.stage },
+          },
+          world.tick,
+          60
         );
       }
     }
+
+    nearbyPlants.sort((a, b) => a.distance - b.distance);
   }
 
   /**
-   * Detect nearby agents within vision range.
-   * Mutates spatialMemory in place.
+   * Detect agents with tiered awareness.
    */
-  private detectAgents(
+  private detectAgentsTiered(
     entity: EntityImpl,
     world: World,
     position: PositionComponent,
-    vision: VisionComponent,
     spatialMemory: SpatialMemoryComponent,
+    closeRange: number,
+    areaRange: number,
+    nearbyAgents: TieredEntity[],
     seenAgentIds: string[]
   ): void {
     const agents = world.query().with(ComponentType.Agent).with(ComponentType.Position).executeEntities();
@@ -255,11 +408,11 @@ export class VisionProcessor {
 
       const distance = this.distance(position, otherPos);
 
-      if (distance <= vision.range) {
-        // Track this agent in vision
+      if (distance <= closeRange) {
+        // Close range - can interact, full detail in context
+        nearbyAgents.push({ id: otherAgent.id, distance, tier: 'close' });
         seenAgentIds.push(otherAgent.id);
 
-        // Remember this agent sighting
         addSpatialMemory(
           spatialMemory,
           {
@@ -269,10 +422,27 @@ export class VisionProcessor {
             entityId: otherAgent.id,
           },
           world.tick,
-          60
+          100
+        );
+      } else if (distance <= areaRange) {
+        // Area range - can see, summarized in context
+        seenAgentIds.push(otherAgent.id);
+
+        addSpatialMemory(
+          spatialMemory,
+          {
+            type: 'agent_seen',
+            x: otherPos.x,
+            y: otherPos.y,
+            entityId: otherAgent.id,
+          },
+          world.tick,
+          40
         );
       }
     }
+
+    nearbyAgents.sort((a, b) => a.distance - b.distance);
   }
 
   /**

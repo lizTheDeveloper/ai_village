@@ -169,10 +169,19 @@ export class PlantDiseaseSystem implements System {
     }
     this.accumulatedTime = 0;
 
+    // Update agent positions in scheduler
+    world.simulationScheduler.updateAgentPositions(world);
+
+    // Filter to only visible entities
+    const activeEntities = world.simulationScheduler.filterActiveEntities(
+      entities as Entity[],
+      world.tick
+    );
+
     // Get current game day for tracking
     const gameDay = this.getCurrentGameDay(world);
 
-    for (const entity of entities) {
+    for (const entity of activeEntities) {
       const impl = entity as EntityImpl;
       const plant = impl.getComponent<PlantComponent>(CT.Plant);
 
@@ -197,11 +206,11 @@ export class PlantDiseaseSystem implements System {
 
       // Disease spread
       if (this.config.enableSpread) {
-        this.spreadDiseases(plant, entityId, world, gameDay);
+        this.spreadDiseases(plant, entityId, world, gameDay, activeEntities);
       }
 
       // Pest migration
-      this.migratePests(plant, entityId, world, gameDay);
+      this.migratePests(plant, entityId, world, gameDay, activeEntities);
     }
   }
 
@@ -572,13 +581,15 @@ export class PlantDiseaseSystem implements System {
   private spreadDiseases(
     plant: PlantComponent,
     entityId: string,
-    world: World,
-    gameDay: number
+    _world: World,
+    gameDay: number,
+    activeEntities: ReadonlyArray<Entity>
   ): void {
     const spreadingDiseases = plant.diseases.filter(d => d.spreading);
     if (spreadingDiseases.length === 0) return;
 
-    const nearbyPlants = world.query().with(CT.Plant).executeEntities();
+    // Use filtered activeEntities instead of querying all plants
+    const nearbyPlants = activeEntities;
 
     for (const diseaseState of spreadingDiseases) {
       const disease = this.diseases.get(diseaseState.diseaseId);
@@ -647,7 +658,8 @@ export class PlantDiseaseSystem implements System {
     plant: PlantComponent,
     entityId: string,
     world: World,
-    gameDay: number
+    gameDay: number,
+    activeEntities: ReadonlyArray<Entity>
   ): void {
     if (plant.pests.length === 0) return;
 
@@ -658,7 +670,8 @@ export class PlantDiseaseSystem implements System {
       if (Math.random() > pest.migrationChance) continue;
       if (pestState.population < pest.minPopulation * 2) continue; // Need surplus to migrate
 
-      const nearbyPlants = world.query().with(CT.Plant).executeEntities();
+      // Use filtered activeEntities instead of querying all plants
+      const nearbyPlants = activeEntities;
 
       for (const entity of nearbyPlants) {
         const impl = entity as EntityImpl;

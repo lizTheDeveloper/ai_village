@@ -14,6 +14,7 @@
 import type { EntityImpl } from '../../ecs/Entity.js';
 import type { World } from '../../ecs/World.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
+import { enableInteractionLLM } from '../../components/AgentComponent.js';
 import type { ConversationComponent } from '../../components/ConversationComponent.js';
 import type { RelationshipComponent } from '../../components/RelationshipComponent.js';
 import type { SocialMemoryComponent } from '../../components/SocialMemoryComponent.js';
@@ -114,6 +115,21 @@ export class TalkBehavior extends BaseBehavior {
           (partner as EntityImpl).updateComponent<ConversationComponent>(ComponentType.Conversation, (current) =>
             startConversation(current, entity.id, world.tick)
           );
+
+          // Enable interaction-triggered LLM for autonomic agents in conversation
+          // This allows NPCs who normally use scripted behavior to use LLM during social interactions
+          entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => {
+            if (current.tier === 'autonomic') {
+              return enableInteractionLLM(current, world.tick);
+            }
+            return current;
+          });
+          (partner as EntityImpl).updateComponent<AgentComponent>(ComponentType.Agent, (current) => {
+            if (current.tier === 'autonomic') {
+              return enableInteractionLLM(current, world.tick);
+            }
+            return current;
+          });
 
           // Set partner to talk behavior too
           (partner as EntityImpl).updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({

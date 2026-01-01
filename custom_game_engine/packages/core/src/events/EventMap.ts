@@ -491,6 +491,76 @@ export interface GameEventMap {
     agentId: EntityId;
   };
 
+  // === Tile Construction Events (Voxel Building System) ===
+  'construction:task_created': {
+    taskId: string;
+    blueprintId?: string;
+    position?: { x: number; y: number };
+    builderId?: EntityId;
+  };
+  'construction:task_started': {
+    taskId: string;
+    blueprintId?: string;
+  };
+  'construction:task_cancelled': {
+    taskId: string;
+    reason?: string;
+  };
+  'construction:task_completed': {
+    taskId: string;
+    blueprintId?: string;
+    position?: { x: number; y: number };
+  };
+  'construction:material_delivered': {
+    taskId: string;
+    tilePosition?: { x: number; y: number };
+    materialId?: string;
+    builderId?: string;
+  };
+  'construction:tile_placed': {
+    taskId: string;
+    tilePosition?: { x: number; y: number };
+    tileType?: string;
+    materialId?: string;
+    builderId?: string;
+    collaborators?: string[];
+  };
+
+  // === Door Events (Tile-Based Buildings) ===
+  'door:opened': {
+    x: number;
+    y: number;
+    tick: number;
+  };
+  'door:closed': {
+    x: number;
+    y: number;
+    tick: number;
+  };
+
+  // === Demolition Events (Tile-Based Buildings) ===
+  'construction:tile_demolished': {
+    x: number;
+    y: number;
+    tileType: 'wall' | 'door' | 'window';
+    material: string;
+  };
+
+  // === Progression Events ===
+  'progression:xp_gained': {
+    skill: string;
+    amount: number;
+    builderId?: string;
+    xpGained?: number;
+  };
+
+  // === Relationship Events ===
+  'relationship:improved': {
+    targetAgent: string;
+    reason: string;
+    amount: number;
+  };
+
   // === Zone Events ===
   'zone:menu:opened': Record<string, never>;
   'zone:menu:closed': Record<string, never>;
@@ -1804,6 +1874,13 @@ export interface GameEventMap {
     agentId?: string;
   };
 
+  /** Error occurred while applying tool wear during gathering */
+  'gathering:tool_error': {
+    agentId: string;
+    toolId: string;
+    error: string;
+  };
+
   // ============================================================================
   // Divine Communication Events (Phase 27)
   // ============================================================================
@@ -1895,13 +1972,7 @@ export interface GameEventMap {
     tick: number;
   };
 
-  /** Relationship improved between agents */
-  'relationship:improved': {
-    agentId: EntityId;
-    targetId: EntityId;
-    amount?: number;
-    reason?: string;
-  };
+  // NOTE: 'relationship:improved' is defined above in the Relationship Events section
 
   // ============================================================================
   // Meditation Events
@@ -2156,6 +2227,90 @@ export interface GameEventMap {
   };
 
   // ============================================================================
+  // Afterlife/Soul Events
+  // ============================================================================
+
+  /** Agent died and transitioned to afterlife realm */
+  'agent:died': {
+    entityId: string;
+    name: string;
+    causeOfDeath: string;
+    /** Which realm the soul was routed to */
+    destinationRealm: string;
+    /** Why this realm was chosen (deity_afterlife, no_deity, etc.) */
+    routingReason: string;
+    /** Deity ID if routing was based on deity worship */
+    routingDeity?: string;
+  };
+
+  /** Soul became a shade (lost identity) */
+  'soul:became_shade': {
+    entityId: string;
+    timeSinceDeath: number;
+  };
+
+  /** Soul peacefully passed on */
+  'soul:passed_on': {
+    entityId: string;
+    timeSinceDeath: number;
+    wasAncestorKami: boolean;
+  };
+
+  /** Soul became restless */
+  'soul:became_restless': {
+    entityId: string;
+    unfinishedGoals: string[];
+  };
+
+  /** Soul transformed into Ancestor Kami */
+  'soul:became_ancestor_kami': {
+    entityId: string;
+    kamiRank: 'minor' | 'local' | 'regional';
+    blessings: string[];
+    curses: string[];
+    descendants: string[];
+    familyName?: string;
+  };
+
+  /** Soul annihilated by deity policy */
+  'soul:annihilated': {
+    entityId: string;
+    deityId?: string;
+    context?: string;
+  };
+
+  /** Soul queued for reincarnation */
+  'soul:reincarnation_queued': {
+    entityId: string;
+    deityId?: string;
+    target: 'same_world' | 'same_universe' | 'any_universe' | 'specific';
+    memoryRetention: 'full' | 'fragments' | 'dreams' | 'talents' | 'none';
+    speciesConstraint: 'same' | 'similar' | 'any' | 'karmic';
+    minimumDelay: number;
+    maximumDelay: number;
+  };
+
+  /** Soul successfully reincarnated into new entity */
+  'soul:reincarnated': {
+    /** Original entity ID that died */
+    originalEntityId: string;
+    /** New entity ID that was created */
+    newEntityId: string;
+    /** Deity that facilitated the reincarnation */
+    deityId?: string;
+    /** How much memory was retained */
+    memoryRetention: 'full' | 'fragments' | 'dreams' | 'talents' | 'none';
+    /** What species constraint was used */
+    speciesConstraint: 'same' | 'similar' | 'any' | 'karmic';
+    /** Number of memories preserved from past life */
+    preservedMemoryCount: number;
+    /** Name in previous life */
+    previousName?: string;
+    /** Name in new life */
+    newName: string;
+  };
+
+  // ============================================================================
   // Confirmation Dialog Events
   // ============================================================================
 
@@ -2176,6 +2331,73 @@ export interface GameEventMap {
   /** Confirmation dialog cancelled */
   'ui:confirmation:cancelled': {
     actionId: string;
+  };
+
+  // ============================================================================
+  // Player Possession Events (Phase 16)
+  // ============================================================================
+
+  /** Player possession tick update */
+  'possession:tick': {
+    agentId: string;
+    beliefSpent: number;
+    beliefRemaining: number;
+    ticksRemaining: number;
+  };
+
+  /** Player possessed an agent */
+  'possession:jack_in': {
+    agentId: string;
+    initialCost: number;
+    beliefRemaining: number;
+  };
+
+  /** Player released an agent */
+  'possession:jack_out': {
+    agentId: string | null;
+    totalBeliefSpent: number;
+    reason: string;
+  };
+
+  // ============================================================================
+  // Voxel Resource Events (Tree Felling, etc.)
+  // ============================================================================
+
+  /** Voxel resource started falling */
+  'voxel_resource:falling_started': {
+    entityId: string;
+    resourceType: string;
+    position: { x: number; y: number };
+    height: number;
+    fallDirection: { x: number; y: number };
+  };
+
+  /** Voxel resource fell and dropped resources */
+  'voxel_resource:fell': {
+    entityId: string;
+    resourceType: string;
+    material: string;
+    originalPosition: { x: number; y: number };
+    fallPosition: { x: number; y: number };
+    resourcesDropped: number;
+    height: number;
+  };
+
+  /** Item dropped on ground (from tree fall, etc.) */
+  'item:dropped': {
+    entityId: string;
+    material: string;
+    amount: number;
+    position: { x: number; y: number };
+  };
+
+  /** Animation created (for visual effects) */
+  'animation:created': {
+    animationType: string;
+    duration: number;
+    entityId: string;
+    startPosition: { x: number; y: number };
+    endPosition: { x: number; y: number };
   };
 }
 

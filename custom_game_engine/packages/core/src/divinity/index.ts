@@ -568,3 +568,146 @@ export {
   createDivineProjection,
   calculateCollectiveContributions,
 } from './MultiverseCrossing.js';
+
+// ============================================================================
+// Race Templates (Organized by Pantheon)
+// ============================================================================
+export {
+  // Common traits
+  COMMON_TRAITS,
+
+  // Greek/Olympian races
+  OLYMPIAN_RACE,
+  DEMIGOD_RACE,
+  NYMPH_RACE,
+  SATYR_RACE,
+
+  // Celtic Fey races
+  SIDHE_RACE,
+  PIXIE_RACE,
+  REDCAP_RACE,
+
+  // Underworld races
+  SHADE_RACE,
+  FURY_RACE,
+
+  // Norse races
+  AESIR_RACE,
+  VALKYRIE_RACE,
+  EINHERJAR_RACE,
+
+  // Celestial races
+  SERAPH_RACE,
+  ANGEL_RACE,
+
+  // Dream Realm races
+  ONEIROI_RACE,
+  NIGHTMARE_RACE,
+
+  // Elemental races
+  EFREET_RACE,
+
+  // Pantheon groupings
+  GREEK_RACES,
+  CELTIC_RACES,
+  UNDERWORLD_RACES,
+  NORSE_RACES,
+  CELESTIAL_RACES,
+  DREAM_RACES,
+  ELEMENTAL_RACES,
+  ALL_RACES,
+
+  // Pantheon metadata
+  PANTHEONS,
+  // Note: type Pantheon conflicts with PantheonTypes.Pantheon - use races/index.js directly if needed
+} from './races/index.js';
+
+// ============================================================================
+// Afterlife Policy System
+// ============================================================================
+export {
+  // Types
+  type AfterlifePolicyType,
+  type JudgmentCriteria,
+  type JudgmentTier,
+  type ReincarnationTarget,
+  type MemoryRetention,
+  type SpeciesConstraint,
+  type ReincarnationConfig,
+  type TransformationType,
+  type TransformationConfig,
+  type DeedCategory,
+  type DeedWeight,
+  type AfterlifePolicy,
+
+  // Factory Functions
+  createJudgmentPolicy,
+  createReincarnationPolicy,
+  createUnconditionalPolicy,
+  createAnnihilationPolicy,
+  createTransformationPolicy,
+
+  // Example Policies
+  WAR_GOD_POLICY,
+  NATURE_DEITY_POLICY,
+  MYSTERY_GOD_POLICY,
+  COSMIC_HORROR_POLICY,
+} from './AfterlifePolicy.js';
+
+// ============================================================================
+// Underworld Deity (Death Domain Primordial)
+// ============================================================================
+export {
+  // Constants
+  UNDERWORLD_PERSONALITY,
+  UNDERWORLD_FORMS,
+  UNDERWORLD_SACRED_ANIMALS,
+  UNDERWORLD_SACRED_PLANTS,
+  UNDERWORLD_SYMBOLS,
+  UNDERWORLD_COLORS,
+  UNDERWORLD_SACRED_PLACES,
+  UNDERWORLD_EPITHETS,
+  UNDERWORLD_NAMES,
+  UNDERWORLD_BLESSINGS,
+  UNDERWORLD_CURSES,
+  UNDERWORLD_TABOOS,
+
+  // Functions
+  createUnderworldIdentity,
+  createUnderworldDeity,
+  getUnderworldOfferings,
+  getUnderworldPrayerTypes,
+  isUnderworldTaboo,
+  getContextualEpithet,
+} from './UnderworldDeity.js';
+
+// ============================================================================
+// Attribution System (Divine Misattribution)
+// ============================================================================
+export {
+  // Types
+  type TrueSourceType,
+  type TrueSource,
+  type ObservableEffect,
+  type EffectCategory,
+  type EffectCharacteristics,
+  type AttributionFactors,
+  type AttributionResult,
+  type AttributedSource,
+  type AttributionReasoning,
+  type AttributionReason,
+  type AttributableEvent,
+  type AttributionStatistics,
+
+  // Constants
+  EFFECT_DOMAIN_MAPPING,
+
+  // Functions
+  calculateAttribution,
+  createAttributableEvent,
+  processWitnessAttribution,
+  createCreatorInterventionSource,
+  createSmiteEffect,
+  createAttributionStatistics,
+  updateAttributionStatistics,
+} from './AttributionSystem.js';

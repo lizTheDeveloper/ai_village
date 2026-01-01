@@ -34,6 +34,8 @@ export const BEHAVIOR_PRIORITIES = {
 
 /**
  * AI system configuration
+ *
+ * Scale: 1 tile = 1 meter, humans are 2 tiles tall
  */
 export const AI_CONFIG = {
   /** Cooldown between LLM requests in ticks (at 20 TPS = 60 seconds) */
@@ -42,13 +44,13 @@ export const AI_CONFIG = {
   /** Base think interval for agents in ticks */
   DEFAULT_THINK_INTERVAL: 20,
 
-  /** Vision range in tiles */
-  VISION_RANGE_TILES: 15,
+  /** Vision range in tiles (clear day, open terrain: ~500m; forest/fog: less) */
+  VISION_RANGE_TILES: 500,
 
-  /** Hearing range in tiles */
-  HEARING_RANGE_TILES: 10,
+  /** Hearing range in tiles (normal sounds: ~50m; loud sounds detected further) */
+  HEARING_RANGE_TILES: 50,
 
-  /** Interaction range in tiles (for actions requiring proximity) */
+  /** Interaction range in tiles (arm's reach: ~2m) */
   INTERACTION_RANGE_TILES: 2.0,
 
   /** Probability of random gathering behavior */
@@ -71,16 +73,24 @@ export const SLEEP_THRESHOLDS = {
 
 /**
  * Social interaction configuration
+ *
+ * Scale: 1 tile = 1 meter
  */
 export const SOCIAL_CONFIG = {
-  /** Distance in tiles for detecting nearby agents for social interactions */
-  NEARBY_AGENT_RANGE: 15,
+  /** Distance in tiles for detecting nearby agents for social interactions (~30m) */
+  NEARBY_AGENT_RANGE: 30,
 
   /** Maximum number of agents in a meeting */
   MAX_MEETING_SIZE: 6,
 
   /** Minimum trust level for sharing information */
   MIN_TRUST_FOR_SHARING: 0.3,
+
+  /** Shouting/calling range (~100m) */
+  SHOUT_RANGE: 100,
+
+  /** Conversation range (close enough to talk: ~5m) */
+  CONVERSATION_RANGE: 5,
 } as const;
 
 /**
@@ -129,14 +139,48 @@ export const TIME_CONFIG = {
 
 /**
  * Movement and pathfinding
+ *
+ * Scale: 1 tile = 1 meter, humans are 2 tiles tall
+ * Time: 1 game hour = 60 real seconds (1200 ticks)
+ *
+ * To travel realistic distances in game time:
+ * - Walking 5 km/game-hour = 83 tiles/real-second
+ * - Running 15 km/game-hour = 250 tiles/real-second
+ * - Horse 40 km/game-hour = 667 tiles/real-second
+ *
+ * These speeds look fast visually but make game time meaningful.
  */
 export const MOVEMENT_CONFIG = {
-  /** Default agent movement speed in tiles per second */
-  DEFAULT_MOVE_SPEED: 2.0,
+  /** Slow walk speed in tiles per second (strolling, sneaking: ~2 km/game-hour) */
+  SLOW_WALK_SPEED: 33,
 
-  /** Minimum distance to consider destination reached */
-  DESTINATION_THRESHOLD: 0.5,
+  /** Default walking speed in tiles per second (~5 km/game-hour) */
+  DEFAULT_MOVE_SPEED: 83,
 
-  /** Maximum pathfinding search radius */
-  MAX_PATHFINDING_RADIUS: 50,
+  /** Brisk walk / jog speed in tiles per second (~8 km/game-hour) */
+  BRISK_WALK_SPEED: 133,
+
+  /** Running speed in tiles per second (~15 km/game-hour) */
+  RUN_SPEED: 250,
+
+  /** Sprint speed in tiles per second (~25 km/game-hour, exhausting) */
+  SPRINT_SPEED: 417,
+
+  /** Horse walking speed in tiles per second (~6 km/game-hour) */
+  HORSE_WALK_SPEED: 100,
+
+  /** Horse trotting speed in tiles per second (~15 km/game-hour) */
+  HORSE_TROT_SPEED: 250,
+
+  /** Horse galloping speed in tiles per second (~40 km/game-hour) */
+  HORSE_GALLOP_SPEED: 667,
+
+  /** Minimum distance to consider destination reached (2m) */
+  DESTINATION_THRESHOLD: 2.0,
+
+  /** Maximum pathfinding search radius (5km - can path across a city) */
+  MAX_PATHFINDING_RADIUS: 5000,
+
+  /** Local pathfinding chunk (for immediate navigation: 500m) */
+  LOCAL_PATHFINDING_RADIUS: 500,
 } as const;

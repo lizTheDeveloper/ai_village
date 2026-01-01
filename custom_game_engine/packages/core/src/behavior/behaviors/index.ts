@@ -64,6 +64,9 @@ export { BuildBehavior, buildBehavior } from './BuildBehavior.js';
 // Crafting behaviors
 export { CraftBehavior, craftBehavior } from './CraftBehavior.js';
 
+// Research behaviors
+export { ResearchBehavior, researchBehavior } from './ResearchBehavior.js';
+
 // Trade behaviors
 export { TradeBehavior, tradeBehavior } from './TradeBehavior.js';
 
@@ -102,3 +105,7 @@ export * from './MeditateBehavior.js';
 // Building maintenance behaviors
 export * from './RepairBehavior.js';
 export * from './UpgradeBehavior.js';
+
+// Tile-Based Voxel Building Behaviors (Phase 4)
+export { MaterialTransportBehavior, materialTransportBehavior } from './MaterialTransportBehavior.js';
+export { TileBuildBehavior, tileBuildBehavior } from './TileBuildBehavior.js';

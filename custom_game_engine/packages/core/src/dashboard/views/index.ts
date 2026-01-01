@@ -40,6 +40,9 @@ export { MythologyView, type MythologyViewData } from './MythologyView.js';
 export { PantheonView, type PantheonViewData } from './PantheonView.js';
 export { DeityIdentityView, type DeityIdentityViewData } from './DeityIdentityView.js';
 
+// Parasitic/Hive views
+export { ParasiticHiveMindView, type ParasiticHiveMindViewData } from './ParasiticHiveMindView.js';
+
 // Settings and dev views
 export { ControlsView, type ControlsViewData } from './ControlsView.js';
 export { SettingsView, type SettingsViewData } from './SettingsView.js';
@@ -75,6 +78,7 @@ import { DeityIdentityView } from './DeityIdentityView.js';
 import { ControlsView } from './ControlsView.js';
 import { SettingsView } from './SettingsView.js';
 import { DevView } from './DevView.js';
+import { ParasiticHiveMindView } from './ParasiticHiveMindView.js';
 
 /**
  * All built-in views for registration.
@@ -109,6 +113,8 @@ export const builtInViews: readonly DashboardView<ViewData>[] = [
   MythologyView as unknown as DashboardView<ViewData>,
   PantheonView as unknown as DashboardView<ViewData>,
   DeityIdentityView as unknown as DashboardView<ViewData>,
+  // Parasitic/Hive
+  ParasiticHiveMindView as unknown as DashboardView<ViewData>,
   // Settings/Dev
   ControlsView as unknown as DashboardView<ViewData>,
   SettingsView as unknown as DashboardView<ViewData>,
@@ -126,6 +132,7 @@ export const viewsByCategory = {
   animals: ['animal-info'],
   magic: ['magic-systems', 'spellbook'],
   divinity: ['divine-powers', 'deity-identity', 'prayers', 'vision-composer', 'angels', 'mythology', 'pantheon'],
+  parasitic: ['parasitic-hivemind'],
   environment: ['weather'],
   settings: ['settings', 'controls'],
   dev: ['dev'],

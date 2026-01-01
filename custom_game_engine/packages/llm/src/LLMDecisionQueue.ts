@@ -33,7 +33,7 @@ export class LLMDecisionQueue {
   private maxConcurrent: number;
   private activeRequests = 0;
   private decisions: Map<string, string> = new Map();
-  private configuredMaxTokens: number = 40960;
+  private configuredMaxTokens: number = 4096; // Reasonable default for agent decisions
 
   constructor(provider: LLMProvider, maxConcurrent: number = 2) {
     this.provider = provider;
@@ -110,9 +110,10 @@ export class LLMDecisionQueue {
   private async processRequest(request: DecisionRequest): Promise<void> {
     try {
       // Calculate max tokens: at least 3x estimated prompt tokens, but respect configured max
+      // Cap at 8192 to stay within model limits (Groq limits to 32768, but we don't need that much)
       const estimatedPromptTokens = Math.ceil(request.prompt.length / 4);
       const minTokens = estimatedPromptTokens * 3;
-      const maxTokens = Math.max(minTokens, this.configuredMaxTokens);
+      const maxTokens = Math.min(8192, Math.max(minTokens, this.configuredMaxTokens));
 
       const llmRequest: LLMRequest = {
         prompt: request.prompt,

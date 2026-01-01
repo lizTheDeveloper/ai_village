@@ -43,6 +43,7 @@
     const debugEl = document.getElementById('debug');
 
     // Simple radial menu renderer (standalone test)
+    // This EXACTLY matches the ContextMenuRenderer implementation
     class TestRadialMenuRenderer {
       constructor(ctx) {
         this.ctx = ctx;
@@ -52,6 +53,12 @@
         console.log('[TestRenderer] Rendering', items.length, 'items at', centerX, centerY);
 
         this.ctx.save();
+
+        // CRITICAL: Match ContextMenuRenderer's DPR handling
+        const dpr = window.devicePixelRatio || 1;
+        console.log('[TestRenderer] DPR:', dpr);
+        console.log('[TestRenderer] Setting transform to:', dpr, 0, 0, dpr, 0, 0);
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
         const innerRadius = 30;
         const outerRadius = 100;
@@ -149,6 +156,26 @@
     let menuY = 0;
     const items = createTestItems();
 
+    // Setup canvas with DPR (match main game setup)
+    function setupCanvasWithDPR() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+
+      console.log('[Setup] Canvas CSS size:', rect.width, 'x', rect.height);
+      console.log('[Setup] DPR:', dpr);
+
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+
+      console.log('[Setup] Canvas physical size:', canvas.width, 'x', canvas.height);
+
+      // Match main Renderer setup
+      ctx.setTransform(1, 0, 0, 1, 0, 0);  // Reset
+      ctx.scale(dpr, dpr);  // Scale
+
+      console.log('[Setup] Transform set to scale(', dpr, ',', dpr, ')');
+    }
+
     // Clear canvas (game background)
     function clearCanvas() {
       ctx.fillStyle = '#1a1a1a';
@@ -189,6 +216,9 @@
         menuOpen = false;
       }
     });
+
+    // Initialize canvas with DPR
+    setupCanvasWithDPR();
 
     // Start render loop
     console.log('[Test] Starting render loop');

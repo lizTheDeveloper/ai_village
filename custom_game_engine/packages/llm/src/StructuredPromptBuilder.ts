@@ -25,8 +25,13 @@ import {
   getAvailableBuildings,
   isEntityVisibleWithSkill,
   ALL_SKILL_IDS,
+  getTileConstructionSystem,
+  type ConstructionTask,
+  getTileBasedBlueprintRegistry,
+  calculateDimensions,
 } from '@ai-village/core';
 import { generatePersonalityPrompt } from './PersonalityPromptTemplates.js';
+import { promptCache } from './PromptCacheManager.js';
 
 /**
  * Structured prompt following agent-system/spec.md REQ-AGT-002
@@ -53,6 +58,9 @@ export class StructuredPromptBuilder {
    * Build a complete structured prompt for an agent.
    */
   buildPrompt(agent: Entity, world: World): string {
+    // Initialize frame-level cache (ensures queries are shared across agents in same tick)
+    promptCache.startFrame(world.tick);
+
     const identity = agent.components.get('identity') as IdentityComponent | undefined;
     const personality = agent.components.get('personality') as PersonalityComponent | undefined;
     const needs = agent.components.get('needs') as NeedsComponent | undefined;
@@ -258,22 +266,13 @@ export class StructuredPromptBuilder {
       return '';
     }
 
-    // Get existing buildings to filter out ones we already have
-    const existingBuildings = world.query()?.with?.('building')?.executeEntities?.() ?? [];
-    const existingBuildingTypes = new Set<string>();
-    const existingBuildingCounts: Record<string, number> = {};
-
-    for (const buildingEntity of existingBuildings) {
-      const building = buildingEntity.components.get('building') as BuildingComponent | undefined;
-      if (building?.isComplete) {
-        const buildingType = building.buildingType;
-        existingBuildingTypes.add(buildingType);
-        existingBuildingCounts[buildingType] = (existingBuildingCounts[buildingType] || 0) + 1;
-      }
-    }
+    // Get existing buildings to filter out ones we already have (cached per frame)
+    const buildingCounts = promptCache.getBuildingCounts(world);
+    const existingBuildingTypes = new Set<string>(Object.keys(buildingCounts.byType));
 
     // Filter out buildings we already have (unless they're capacity buildings like storage)
-    const capacityBuildings = new Set(['storage-chest', 'storage-box', 'tent', 'bed', 'bedroll']);
+    // Note: tent is now tile-based, not an entity building
+    const capacityBuildings = new Set(['storage-chest', 'storage-box', 'bed', 'bedroll']);
     const filteredBuildings = buildings.filter((building) => {
       const buildingType = building.name;
 
@@ -310,6 +309,52 @@ export class StructuredPromptBuilder {
       }
 
       result += `- ${building.name} (${costs})${stockStatus}: ${building.description}\n`;
+    }
+
+    // Add tile-based structures section
+    const tileBasedSection = this.buildTileBasedStructuresSection(inventory);
+    if (tileBasedSection) {
+      result += '\n' + tileBasedSection;
+    }
+
+    return result;
+  }
+
+  /**
+   * Build tile-based structures section.
+   * Shows voxel construction options (walls, doors, structures).
+   */
+  private buildTileBasedStructuresSection(inventory: InventoryComponent | undefined): string {
+    const blueprintRegistry = getTileBasedBlueprintRegistry();
+    const blueprints = blueprintRegistry.getAll();
+
+    if (blueprints.length === 0) {
+      return '';
+    }
+
+    let result = 'Tile-Based Structures (use plan_build with type: tent/house/barn/shelter):\n';
+    result += 'These structures are built tile-by-tile with walls and doors. Use material_transport to gather materials.\n';
+
+    for (const blueprint of blueprints) {
+      const costs = blueprint.resourceCost
+        .map((c: ResourceCost) => `${c.amountRequired} ${c.resourceId}`)
+        .join(' + ');
+
+      // Check if agent has materials
+      let stockStatus = '';
+      if (inventory && inventory.slots) {
+        const hasAllResources = blueprint.resourceCost.every((cost: ResourceCost) => {
+          const total = inventory.slots
+            .filter((s: InventorySlot) => s.itemId === cost.resourceId)
+            .reduce((sum: number, s: InventorySlot) => sum + s.quantity, 0);
+          return total >= cost.amountRequired;
+        });
+        stockStatus = hasAllResources ? ' ✅ READY' : '';
+      }
+
+      // Show layout preview
+      const { width, height } = calculateDimensions(blueprint.layoutString);
+      result += `- ${blueprint.name} (${costs})${stockStatus}: ${width}x${height} ${blueprint.category}\n`;
     }
 
     return result;
@@ -429,64 +474,97 @@ export class StructuredPromptBuilder {
         }
       }
 
-      const agentCount = vision.seenAgents?.length || 0;
-      const resourceCount = vision.seenResources?.length || 0;
+      // TIERED AGENT AWARENESS
+      // Close range: detailed info about nearby agents (10m)
+      // Area range: just mention count (50m)
+      const nearbyAgents = vision.nearbyAgents ?? [];
+      const areaAgents = vision.seenAgents ?? [];
 
-      if (agentCount > 0) {
-        // Show detailed information about nearby agents
-        const agentInfo = this.getSeenAgentsInfo(world, vision.seenAgents);
+      if (nearbyAgents.length > 0) {
+        // Show detailed information about close-range agents
+        const agentInfo = this.getSeenAgentsInfo(world, nearbyAgents);
         if (agentInfo) {
           context += agentInfo;
-        } else {
-          // Fallback if we can't get details
-          context += `- You see ${agentCount} other villager${agentCount > 1 ? 's' : ''} nearby\n`;
         }
       }
 
-      if (resourceCount > 0) {
-        // Describe what types of resources are visible
-        const resourceTypes: Record<string, number> = {};
-        for (const resourceId of vision.seenResources) {
-          const resource = world.getEntity(resourceId);
-          if (resource) {
-            const resourceComp = resource.components.get('resource') as (Component & { resourceType: string }) | undefined;
-            if (resourceComp) {
-              const type = resourceComp.resourceType;
-              resourceTypes[type] = (resourceTypes[type] || 0) + 1;
-            }
+      // Mention additional agents in area range
+      const distantAgentCount = areaAgents.length - nearbyAgents.length;
+      if (distantAgentCount > 0) {
+        context += `- You notice ${distantAgentCount} more villager${distantAgentCount > 1 ? 's' : ''} in the distance\n`;
+      }
+
+      // If no nearby but some in area, show summary
+      if (nearbyAgents.length === 0 && areaAgents.length > 0) {
+        context += `- You see ${areaAgents.length} villager${areaAgents.length > 1 ? 's' : ''} nearby\n`;
+      }
+
+      // TIERED RESOURCE AWARENESS
+      // Close range: detailed info about nearby resources (10m)
+      // Area range: summarized count (50m)
+      const nearbyResources = vision.nearbyResources ?? [];
+      const areaResources = vision.seenResources ?? [];
+
+      // Build resource type counts from close-range resources
+      const resourceTypes: Record<string, number> = {};
+      for (const resourceId of nearbyResources) {
+        const resource = world.getEntity(resourceId);
+        if (resource) {
+          const resourceComp = resource.components.get('resource') as (Component & { resourceType: string }) | undefined;
+          if (resourceComp) {
+            const type = resourceComp.resourceType;
+            resourceTypes[type] = (resourceTypes[type] || 0) + 1;
           }
         }
+      }
 
-        const descriptions: string[] = [];
+      const descriptions: string[] = [];
 
-        // Always show food first if visible (highest priority)
+      // Always show food first if visible (highest priority)
+      if (resourceTypes.food) {
+        descriptions.push(`${resourceTypes.food} food source${resourceTypes.food > 1 ? 's' : ''}`);
+      }
+
+      // Show wood (essential for early building)
+      if (resourceTypes.wood) {
+        descriptions.push(`${resourceTypes.wood} tree${resourceTypes.wood > 1 ? 's' : ''}`);
+      }
+
+      // De-emphasize stone by only mentioning if there are few stones (< 5)
+      if (resourceTypes.stone && resourceTypes.stone < 5) {
+        descriptions.push(`${resourceTypes.stone} rock${resourceTypes.stone > 1 ? 's' : ''}`);
+      } else if (resourceTypes.stone) {
+        descriptions.push('some rocks');
+      }
+
+      if (descriptions.length > 0) {
+        context += `- You see ${descriptions.join(', ')} nearby`;
+
+        // Emphasize food gathering if food sources are visible
         if (resourceTypes.food) {
-          descriptions.push(`${resourceTypes.food} food source${resourceTypes.food > 1 ? 's' : ''} 🍎`);
+          context += ` (food is essential for survival!)`;
+        } else if (resourceTypes.wood) {
+          context += ` (wood is essential for building)`;
         }
+        context += `\n`;
+      }
 
-        // Show wood (essential for early building)
-        if (resourceTypes.wood) {
-          descriptions.push(`${resourceTypes.wood} tree${resourceTypes.wood > 1 ? 's' : ''}`);
-        }
+      // Summarize distant resources
+      const distantResourceCount = areaResources.length - nearbyResources.length;
+      if (distantResourceCount > 0) {
+        context += `- More resources visible in the area (${distantResourceCount} sources)\n`;
+      }
 
-        // De-emphasize stone by only mentioning if there are few stones (< 5)
-        // This prevents "20 rocks nearby" from dominating the context
-        if (resourceTypes.stone && resourceTypes.stone < 5) {
-          descriptions.push(`${resourceTypes.stone} rock${resourceTypes.stone > 1 ? 's' : ''}`);
-        } else if (resourceTypes.stone) {
-          descriptions.push('some rocks');
-        }
-
-        if (descriptions.length > 0) {
-          context += `- You see ${descriptions.join(', ')} nearby`;
-
-          // Emphasize food gathering if food sources are visible
-          if (resourceTypes.food) {
-            context += ` (food is essential for survival!)`;
-          } else if (resourceTypes.wood) {
-            context += ` (wood is essential for building)`;
-          }
-          context += `\n`;
+      // DISTANT LANDMARKS (for navigation)
+      const landmarks = vision.distantLandmarks ?? [];
+      if (landmarks.length > 0) {
+        const landmarkDescriptions = landmarks.slice(0, 5).map(l => {
+          const parts = l.split('_');
+          return parts[0];
+        });
+        const uniqueTypes = [...new Set(landmarkDescriptions)];
+        if (uniqueTypes.length > 0) {
+          context += `- Landmarks visible: ${uniqueTypes.join(', ')} in the distance\n`;
         }
       }
 
@@ -581,7 +659,9 @@ export class StructuredPromptBuilder {
         }
       }
 
-      if (agentCount === 0 && resourceCount === 0 && plantCount === 0) {
+      // Check if area is empty
+      const totalVisible = areaAgents.length + areaResources.length + plantCount;
+      if (totalVisible === 0) {
         context += '- The area around you is empty\n';
       }
 
@@ -940,6 +1020,7 @@ export class StructuredPromptBuilder {
   private getSkillImpression(skillId: SkillId): string {
     const impressions: Record<SkillId, string> = {
       building: 'seems handy with tools',
+      architecture: 'seems attuned to the energy of spaces',
       cooking: 'seems interested in food',
       farming: 'seems to like working with plants',
       crafting: 'seems good at making things',
@@ -951,6 +1032,7 @@ export class StructuredPromptBuilder {
       stealth: 'seems to move quietly and carefully',
       animal_handling: 'seems good with animals',
       medicine: 'seems knowledgeable about healing',
+      research: 'seems curious and thoughtful',
     };
     return impressions[skillId] || 'seems skilled at something';
   }
@@ -961,6 +1043,7 @@ export class StructuredPromptBuilder {
   private getSkillExamples(skillId: SkillId): string {
     const examples: Record<SkillId, string> = {
       building: 'can construct complex buildings',
+      architecture: 'can design harmonious spaces with good chi flow',
       cooking: 'can prepare preserved food',
       farming: 'can grow high-quality crops',
       crafting: 'can create advanced items',
@@ -972,6 +1055,7 @@ export class StructuredPromptBuilder {
       stealth: 'can move undetected through dangerous areas',
       animal_handling: 'can tame and care for animals',
       medicine: 'can treat injuries and illnesses',
+      research: 'can advance technology and discover new knowledge',
     };
     return examples[skillId] || '';
   }
@@ -1110,37 +1194,17 @@ export class StructuredPromptBuilder {
       return null;
     }
 
-    // Find all storage buildings
-    const storageBuildings = world.query()
-      .with('building')
-      .with('inventory')
-      .executeEntities();
+    // Use cached storage summary (invalidated on inventory changes)
+    const storageSummary = promptCache.getStorageSummary(world);
+    const agentSummary = promptCache.getAgentSummary(world);
 
-    if (storageBuildings.length === 0) {
+    if (storageSummary.totalSlots === 0) {
       return null; // No storage buildings exist yet
     }
 
-    // Aggregate all items in storage
-    const totalStorage: Record<string, number> = {};
-
-    for (const storage of storageBuildings) {
-      const building = storage.components.get('building') as BuildingComponent | undefined;
-      const inventory = storage.components.get('inventory') as InventoryComponent | undefined;
-
-      // Only count complete storage buildings
-      if (!building?.isComplete) continue;
-      if (building.buildingType !== 'storage-chest' && building.buildingType !== 'storage-box' && building.buildingType !== 'warehouse') continue;
-
-      if (inventory?.slots) {
-        for (const slot of inventory.slots) {
-          if (slot.itemId && slot.quantity > 0) {
-            totalStorage[slot.itemId] = (totalStorage[slot.itemId] || 0) + slot.quantity;
-          }
-        }
-      }
-    }
-
-    const agentCount = world.query().with('agent').executeEntities().length;
+    // Use cached totals
+    const totalStorage = storageSummary.byItemType;
+    const agentCount = agentSummary.total;
     const consumptionRate = agentCount * 2.5; // 2.5 food per agent per day
 
     // Use skill-gated food info from SkillsComponent
@@ -1164,8 +1228,8 @@ export class StructuredPromptBuilder {
 
     let status = '\nVillage Status:\n';
 
-    // Get all agents
-    const allAgents = world.query().with('agent').with('identity').executeEntities();
+    // Get all agents (cached per frame)
+    const allAgents = promptCache.getAllAgents(world);
     const otherAgents = allAgents.filter(a => a.id !== currentAgentId);
 
     if (otherAgents.length > 0) {
@@ -1186,19 +1250,17 @@ export class StructuredPromptBuilder {
       }
     }
 
-    // Check for critical buildings
-    const allBuildings = world.query().with('building').executeEntities();
-    const buildingTypes = new Set<string>();
-    const incomplete: string[] = [];
+    // Check for critical buildings (using cached counts)
+    const buildingCounts = promptCache.getBuildingCounts(world);
+    const buildingTypes = new Set<string>(Object.keys(buildingCounts.byType));
 
+    // Need to check incomplete separately - get from cached buildings
+    const allBuildings = promptCache.getAllBuildings(world);
+    const incomplete: string[] = [];
     for (const b of allBuildings) {
       const building = b.components.get('building') as BuildingComponent | undefined;
-      if (building) {
-        if (building.isComplete) {
-          buildingTypes.add(building.buildingType);
-        } else {
-          incomplete.push(building.buildingType);
-        }
+      if (building && !building.isComplete) {
+        incomplete.push(building.buildingType);
       }
     }
 
@@ -1217,6 +1279,28 @@ export class StructuredPromptBuilder {
 
     if (incomplete.length > 0) {
       status += `- Under construction (resources COMMITTED): ${incomplete.join(', ')} - materials are already allocated, don't gather more!\n`;
+    }
+
+    // Check for tile-based construction tasks
+    const constructionSystem = getTileConstructionSystem();
+    const activeTasks = constructionSystem.getActiveTasks();
+    if (activeTasks.length > 0) {
+      const taskDescriptions = activeTasks.slice(0, 3).map((task: ConstructionTask) => {
+        const tilesNeeding = task.tiles.filter(t => t.status === 'materials_needed').length;
+        const tilesReady = task.tiles.filter(t => t.materialsDelivered >= t.materialsRequired && t.status !== 'placed').length;
+        const tilesPlaced = task.tiles.filter(t => t.status === 'placed').length;
+        const total = task.tiles.length;
+
+        if (tilesNeeding > 0) {
+          return `${task.blueprintId} (needs materials for ${tilesNeeding}/${total} tiles)`;
+        } else if (tilesReady > 0) {
+          return `${task.blueprintId} (${tilesReady}/${total} tiles ready to build!)`;
+        } else {
+          return `${task.blueprintId} (${tilesPlaced}/${total} tiles complete)`;
+        }
+      });
+      status += `- TILE CONSTRUCTION SITES: ${taskDescriptions.join(', ')}\n`;
+      status += `  → Use 'material_transport' to deliver materials, 'tile_build' to construct!\n`;
     }
 
     return status;
@@ -1371,6 +1455,7 @@ export class StructuredPromptBuilder {
     const farming: string[] = [];
     const social: string[] = [];
     const exploration: string[] = [];
+    const knowledge: string[] = [];
     const priority: string[] = [];
 
     // Get agent context for contextual actions
@@ -1397,6 +1482,7 @@ export class StructuredPromptBuilder {
     const cookingSkill = skillLevels.cooking ?? 0;
     const animalHandlingSkill = skillLevels.animal_handling ?? 0;
     const medicineSkill = skillLevels.medicine ?? 0;
+    const researchSkill = skillLevels.research ?? 0;
 
     // PRIORITY 1: Urgent building hints (when agent has pressing needs)
     // These are just hints - the actual action is plan_build (shown later)
@@ -1466,6 +1552,36 @@ export class StructuredPromptBuilder {
     // The agent just decides what to build, the system handles getting resources
     building.push('plan_build - Plan a building project: queues the build and you\'ll automatically gather resources then construct it. Just say what building you want! (Examples: "plan_build storage-chest", "plan_build campfire", "plan_build tent")');
 
+    // Check for active tile-based construction tasks
+    const constructionSystem = getTileConstructionSystem();
+    const activeTasks = constructionSystem.getActiveTasks();
+    const tasksNeedingMaterials = activeTasks.filter((task: ConstructionTask) => {
+      // Task needs materials if any tile is in 'materials_needed' status
+      return task.tiles.some(tile => tile.status === 'materials_needed');
+    });
+    const tasksReadyToBuild = activeTasks.filter((task: ConstructionTask) => {
+      // Task is ready to build if any tile has materials but isn't placed yet
+      return task.tiles.some(tile =>
+        tile.materialsDelivered >= tile.materialsRequired &&
+        tile.status !== 'placed'
+      );
+    });
+
+    // MATERIAL_TRANSPORT - Carry materials to construction sites (when construction exists)
+    if (tasksNeedingMaterials.length > 0) {
+      const taskSummary = tasksNeedingMaterials.slice(0, 2).map((t: ConstructionTask) => t.blueprintId).join(', ');
+      building.push(`material_transport - Carry building materials to construction site(s): ${taskSummary}. Pick up materials and deliver them to the build location.`);
+    }
+
+    // TILE_BUILD - Build tiles at construction sites (when materials are placed)
+    if (tasksReadyToBuild.length > 0) {
+      const buildingSkill = skillLevels.building ?? 0;
+      if (buildingSkill >= 1) {
+        const taskSummary = tasksReadyToBuild.slice(0, 2).map((t: ConstructionTask) => t.blueprintId).join(', ');
+        building.push(`tile_build - Build tiles at construction site(s): ${taskSummary}. Materials are placed and ready for construction!`);
+      }
+    }
+
     // EXPLORATION
     exploration.push('explore - Systematically explore unknown areas to find new resources');
     exploration.push('navigate - Go to specific coordinates (say "navigate to x,y" or "go to 10,20")');
@@ -1496,6 +1612,11 @@ export class StructuredPromptBuilder {
     // Medicine action - Per progressive-skill-reveal-spec.md: requires medicine skill 2+
     if (medicineSkill >= 2) {
       social.push('heal - Heal an injured agent');
+    }
+
+    // Research action - Per progressive-skill-reveal-spec.md: requires research skill 1+
+    if (researchSkill >= 1) {
+      knowledge.push('research - Conduct research at a research building to advance technology');
     }
 
     // Combine all categories with headers
@@ -1534,6 +1655,12 @@ export class StructuredPromptBuilder {
       actions.push('');
       actions.push('EXPLORATION & NAVIGATION:');
       actions.push(...exploration.map(a => `  ${a}`));
+    }
+
+    if (knowledge.length > 0) {
+      actions.push('');
+      actions.push('KNOWLEDGE & RESEARCH:');
+      actions.push(...knowledge.map(a => `  ${a}`));
     }
 
     return actions;

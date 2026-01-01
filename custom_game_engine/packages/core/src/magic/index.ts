@@ -538,6 +538,155 @@ export {
   getResearchTime,
 } from './skillTrees/AcademicSkillTree.js';
 
+// Bureaucratic (Paperwork and stamps)
+export {
+  BUREAUCRATIC_SKILL_TREE,
+  FORM_TYPES,
+  STAMP_TYPES,
+  BUREAUCRATIC_RANKS,
+  getAvailableFormTypes,
+  getAvailableStampTypes,
+  getBureaucraticRank,
+  isBusinessHours,
+  getProcessingTimeMultiplier,
+} from './skillTrees/BureaucraticSkillTree.js';
+
+// Debt (Fae-style favors and obligations)
+export {
+  DEBT_SKILL_TREE,
+  DEBT_TYPES,
+  DEBT_CREATION,
+  INTEREST_RATES,
+  calculateDebtPower,
+  canDissolveDebt,
+  getInterestRate,
+  getDebtTradingEfficiency,
+} from './skillTrees/DebtSkillTree.js';
+
+// Luck (Probability manipulation)
+export {
+  LUCK_SKILL_TREE,
+  LUCK_TYPES,
+  PROBABILITY_TIERS,
+  KARMA_LEVELS,
+  getKarmaLevel,
+  getProbabilityAdjustment,
+  getBorrowingCapacity,
+  getKarmaInterestRate,
+  getCharmCapacity,
+} from './skillTrees/LuckSkillTree.js';
+
+// Paradox (Logical contradictions)
+export {
+  PARADOX_SKILL_TREE,
+  PARADOX_TYPES,
+  REALITY_STABILITY,
+  SANITY_COSTS,
+  calculateSanityCost,
+  getRealityStability,
+  canSafelyInvoke,
+  getAvailableParadoxes,
+} from './skillTrees/ParadoxSkillTree.js';
+
+// Game (Wagers and challenges)
+export {
+  GAME_SKILL_TREE,
+  GAME_TYPES,
+  STAKE_TYPES,
+  VICTORY_MULTIPLIERS,
+  calculateStakePower,
+  getVictoryMultiplier,
+  canDeclineChallenge,
+  getAvailableGameTypes,
+  getStreakBonus,
+} from './skillTrees/GameSkillTree.js';
+
+// Echo (Memories and past events)
+export {
+  ECHO_SKILL_TREE,
+  ECHO_TYPES,
+  TIME_DEPTHS,
+  ECHO_CLARITY,
+  getEchoClarity,
+  getAccessibleTimeDepth,
+  calculateMemoryCost,
+  getAvailableEchoTypes,
+} from './skillTrees/EchoSkillTree.js';
+
+// Threshold (Boundaries and liminal spaces)
+export {
+  THRESHOLD_SKILL_TREE,
+  THRESHOLD_TYPES,
+  LIMINAL_STATES,
+  INVITATION_LEVELS,
+  isLiminalTime,
+  getLiminalBonus,
+  getRequiredInvitationLevel,
+  getGatewayRange,
+} from './skillTrees/ThresholdSkillTree.js';
+
+// Belief (Faith and reality consensus)
+export {
+  BELIEF_SKILL_TREE,
+  BELIEF_TYPES,
+  BELIEF_INTENSITY,
+  BELIEF_ENTITIES,
+  calculateBeliefPower,
+  getManifestationDifficulty,
+  getEntityComplexity,
+  hasSufficientFaith,
+} from './skillTrees/BeliefSkillTree.js';
+
+// Commerce (Trade and contracts)
+export {
+  COMMERCE_SKILL_TREE,
+  TRADE_TYPES,
+  CURRENCY_TYPES,
+  CONTRACT_LEVELS,
+  calculateTradePower,
+  getContractStrength,
+  getCurrencyConversionRate,
+  getGuildBonus,
+} from './skillTrees/CommerceSkillTree.js';
+
+// Feng Shui (Spatial harmony magic)
+export {
+  FENG_SHUI_SKILL_TREE,
+  FENG_SHUI_ELEMENTS,
+  CHI_FLOW_STATES,
+  HARMONY_LEVELS,
+  COMMANDING_POSITIONS,
+  getHarmonyLevel,
+  getChiPerceptionRange,
+  getMostNeededElement,
+  isCommandingPosition,
+  getGeneratingElement,
+  getControllingElement,
+  calculateSpaceEffect,
+  hasGoldenProportions,
+} from './skillTrees/FengShuiSkillTree.js';
+
+// Architecture (Building design and construction)
+export {
+  ARCHITECTURE_SKILL_TREE,
+  BUILDING_TIERS,
+  BUILDING_CATEGORIES,
+  DESIGN_PRINCIPLES,
+  MATERIAL_PROPERTIES,
+  getBuildingTierForSkillLevel,
+  canBuildTier,
+  getConstructionSpeedMultiplier,
+  getMaterialEfficiency,
+  getArchitectureQualityBonus,
+  getUnlockedCategories,
+  getMaxBuildingSize,
+  hasUnlockedBuildingDesigner,
+  // Spatial Harmony (Feng Shui for architects)
+  canAnalyzeHarmony,
+  hasSpatialHarmonyMastery,
+  getDesignHarmonyBonus,
+} from './skillTrees/ArchitectureSkillTree.js';
+
 // ============================================================================
 // Magic Source Generation
 // ============================================================================
@@ -733,3 +882,204 @@ export {
 export {
   initializeMagicSystem,
 } from './InitializeMagicSystem.js';
+
+// ============================================================================
+// Spell Effects System
+// ============================================================================
+
+export * from './SpellEffect.js';
+export * from './SpellEffectExecutor.js';
+export * from './SpellEffectRegistry.js';
+export * from './EffectAppliers.js';
+
+// ============================================================================
+// Spell Casting Service
+// ============================================================================
+
+export * from './SpellCastingService.js';
+
+// ============================================================================
+// Combo System
+// ============================================================================
+
+export * from './ComboDetector.js';
+
+// ============================================================================
+// Expanded Spells & Entities
+// ============================================================================
+
+export * from './ExpandedSpells.js';
+export * from './MaterialCreationSpells.js';
+export * from './TileConstructionSpells.js';
+export * from './SummonableEntities.js';
+
+// ============================================================================
+// Magic Detection
+// ============================================================================
+
+export * from './MagicDetectionSystem.js';
+
+// ============================================================================
+// Organized Submodules (additional groupings and metadata)
+// ============================================================================
+
+// Paradigm organization - categories, combined lists
+export {
+  DIMENSIONAL_PARADIGMS,
+  CREATIVE_PARADIGMS,
+  ANIMIST_PARADIGMS,
+  ALL_PARADIGMS,
+  ALL_PARADIGM_REGISTRIES,
+  PARADIGM_CATEGORIES,
+  type ParadigmCategory,
+} from './paradigms/index.js';
+
+// Spell organization - schools, combined lists
+export {
+  ALL_EXPANDED_SPELLS,
+  SPELL_SCHOOLS,
+  type SpellSchool,
+} from './spells/index.js';
+
+// Note: summoning/index.ts provides organizational views but is intentionally not
+// exported here to avoid duplicates with SummonableEntities.js
+
+// ============================================================================
+// Magic Academies (Multi-Paradigm Institutions)
+// ============================================================================
+
+export type {
+  AcademyType,
+  TeachingMethod,
+  AcademyAdmissionRequirement,
+  AcademyRank,
+  TutoringRelationship,
+  TutoringSession,
+  TutoringResult,
+  MagicAcademy,
+  AcademySkillNode,
+  AcademyMembership,
+} from './MagicAcademy.js';
+
+export {
+  // Pre-defined academies
+  ACADEMY_OF_FORMAL_ARTS,
+  CONSERVATORY_OF_EXPRESSION,
+  TEMPLE_OF_RELATIONSHIPS,
+  GUILD_OF_VITALITY,
+  CIRCLE_OF_DREAMS,
+
+  // Registry
+  MAGIC_ACADEMY_REGISTRY,
+  getAcademy,
+  getAcademiesForParadigm,
+  getAcademiesForParadigmCombination,
+
+  // Tutoring functions
+  calculateTutoringMultiplier,
+  conductTutoringSession,
+  createTutoringRelationship,
+  createAcademyMembership,
+} from './MagicAcademy.js';
+
+// ============================================================================
+// Literary Surrealism (Poetic Magic, Word Physics, Metaphor Literalization)
+// ============================================================================
+
+export type {
+  WordPhysics,
+  Metaphor,
+  MetaphorEffect,
+  MagicalPunctuation,
+  EmotionalEntity,
+  ConceptBeing,
+} from './LiterarySurrealismParadigm.js';
+
+export {
+  // Word Physics
+  WORD_MASS_CATEGORIES,
+  EXAMPLE_WORD_MASSES,
+  calculateWordMass,
+
+  // Metaphor Literalization
+  COMMON_METAPHORS,
+
+  // Punctuation Magic
+  PUNCTUATION_MAGIC,
+
+  // Poetic Meter and Rhyme
+  RHYME_SCHEME_POWER,
+  POETIC_METERS,
+
+  // The Poetic Paradigm
+  POETIC_PARADIGM,
+  POETIC_SKILL_TREE,
+
+  // Living Abstractions
+  EMOTIONAL_ENTITIES,
+  CONCEPT_BEINGS,
+} from './LiterarySurrealismParadigm.js';
+
+// ============================================================================
+// Paradigm Spectrum (Universe Magic Configuration)
+// ============================================================================
+
+export type {
+  MagicalIntensity,
+  MagicSourceOrigin,
+  MagicFormality,
+  AnimismLevel,
+  MagicSpectrumConfig,
+  SpectrumEffects,
+} from './ParadigmSpectrum.js';
+
+export {
+  // Presets
+  SPECTRUM_PRESETS,
+  getPreset,
+  getPresetNames,
+
+  // Resolution
+  resolveSpectrum,
+
+  // Configuration questions for UI
+  CONFIGURATION_QUESTIONS,
+} from './ParadigmSpectrum.js';
+
+// ============================================================================
+// Magic Cost System
+// ============================================================================
+export {
+  // Types (SpellCost already exported from MagicLawEnforcer)
+  type ParadigmCostCalculator,
+  type CastingContext,
+  type AffordabilityResult,
+  type DeductionResult,
+  type TerminalEffect,
+  type ResourceInitOptions,
+
+  // Base classes
+  BaseCostCalculator,
+  createDefaultContext,
+
+  // Registry
+  CostCalculatorRegistry,
+  costCalculatorRegistry,
+
+  // Recovery
+  CostRecoveryManager,
+  costRecoveryManager,
+
+  // Paradigm-specific calculators
+  AcademicCostCalculator,
+  PactCostCalculator,
+  NameCostCalculator,
+  BreathCostCalculator,
+  DivineCostCalculator,
+  BloodCostCalculator,
+  EmotionalCostCalculator,
+  DivineCastingCalculator,
+
+  // Registration
+  registerAllCostCalculators,
+} from './costs/index.js';

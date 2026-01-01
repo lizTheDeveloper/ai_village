@@ -28,6 +28,7 @@ import { renderSprite } from './SpriteRenderer.js';
 import { FloatingTextRenderer } from './FloatingTextRenderer.js';
 import { SpeechBubbleRenderer } from './SpeechBubbleRenderer.js';
 import { ParticleRenderer } from './ParticleRenderer.js';
+import type { ContextMenuManager } from './ContextMenuManager.js';
 
 /**
  * 2D renderer using Canvas.
@@ -132,6 +133,16 @@ export class Renderer {
    */
   getParticleRenderer(): ParticleRenderer {
     return this.particleRenderer;
+  }
+
+  /**
+   * Set the context menu manager (called after creation).
+   * NOTE: Context menu is now rendered directly in main.ts render loop,
+   * not by the Renderer class. This method is kept for backwards compatibility
+   * but doesn't do anything.
+   */
+  setContextMenuManager(_manager: ContextMenuManager): void {
+    // Context menu is rendered separately in main.ts - no need to store reference
   }
 
   /**
@@ -767,6 +778,10 @@ export class Renderer {
     // Update and render speech bubbles
     this.speechBubbleRenderer.update();
     this.renderSpeechBubbles(world);
+
+    // NOTE: Context menu is rendered separately in main.ts render loop
+    // after all other UI panels, to ensure it appears on top.
+    // Do NOT render it here or it will be covered by UI panels.
 
     // Draw debug info
     this.drawDebugInfo(world);
@@ -1507,6 +1522,127 @@ export class Renderer {
           this.ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)'; // Gold
           this.ctx.lineWidth = Math.max(1, this.camera.zoom);
           this.ctx.strokeRect(screen.x, screen.y, tilePixelSize, tilePixelSize);
+        }
+
+        // ====================================================================
+        // TILE-BASED VOXEL BUILDING RENDERING (walls, doors, windows)
+        // ====================================================================
+        const tileWithBuilding = tile as typeof tile & {
+          wall?: { material: string; condition: number; constructionProgress?: number };
+          door?: { material: string; state: 'open' | 'closed' | 'locked'; constructionProgress?: number };
+          window?: { material: string; condition: number; constructionProgress?: number };
+        };
+
+        // Render wall tiles
+        if (tileWithBuilding.wall) {
+          const wall = tileWithBuilding.wall;
+          const progress = wall.constructionProgress ?? 100;
+          const alpha = progress >= 100 ? 1.0 : 0.4 + (progress / 100) * 0.4;
+
+          // Material-based colors
+          const wallColors: Record<string, string> = {
+            wood: '#8B7355',
+            stone: '#6B6B6B',
+            mud_brick: '#A0826D',
+            ice: '#B8E6FF',
+            metal: '#4A4A4A',
+            glass: '#87CEEB',
+            thatch: '#D4B896',
+          };
+          const wallColor = wallColors[wall.material] ?? '#6B6B6B';
+
+          // Fill wall tile
+          this.ctx.fillStyle = `rgba(${parseInt(wallColor.slice(1, 3), 16)}, ${parseInt(wallColor.slice(3, 5), 16)}, ${parseInt(wallColor.slice(5, 7), 16)}, ${alpha})`;
+          this.ctx.fillRect(screen.x, screen.y, tilePixelSize, tilePixelSize);
+
+          // Add border for wall definition
+          this.ctx.strokeStyle = `rgba(40, 40, 40, ${alpha * 0.8})`;
+          this.ctx.lineWidth = Math.max(1, this.camera.zoom * 0.5);
+          this.ctx.strokeRect(screen.x + 1, screen.y + 1, tilePixelSize - 2, tilePixelSize - 2);
+
+          // Show construction progress if incomplete
+          if (progress < 100) {
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            this.ctx.font = `${Math.max(8, this.camera.zoom * 6)}px sans-serif`;
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillText(`${Math.round(progress)}%`, screen.x + tilePixelSize / 2, screen.y + tilePixelSize / 2);
+            this.ctx.textAlign = 'left';
+            this.ctx.textBaseline = 'alphabetic';
+          }
+        }
+
+        // Render door tiles
+        if (tileWithBuilding.door) {
+          const door = tileWithBuilding.door;
+          const progress = door.constructionProgress ?? 100;
+          const alpha = progress >= 100 ? 1.0 : 0.4 + (progress / 100) * 0.4;
+
+          // Material-based colors
+          const doorColors: Record<string, string> = {
+            wood: '#654321',
+            stone: '#505050',
+            metal: '#383838',
+            cloth: '#8B4513',
+          };
+          const doorColor = doorColors[door.material] ?? '#654321';
+
+          if (door.state === 'open') {
+            // Open door: render as thin outline (passable)
+            this.ctx.strokeStyle = `rgba(${parseInt(doorColor.slice(1, 3), 16)}, ${parseInt(doorColor.slice(3, 5), 16)}, ${parseInt(doorColor.slice(5, 7), 16)}, ${alpha})`;
+            this.ctx.lineWidth = Math.max(2, this.camera.zoom);
+            this.ctx.strokeRect(screen.x + 2, screen.y + 2, tilePixelSize - 4, tilePixelSize - 4);
+            // Add dashed pattern to indicate open
+            this.ctx.setLineDash([3, 3]);
+            this.ctx.strokeRect(screen.x + 4, screen.y + 4, tilePixelSize - 8, tilePixelSize - 8);
+            this.ctx.setLineDash([]);
+          } else {
+            // Closed/locked door: render as solid with handle
+            this.ctx.fillStyle = `rgba(${parseInt(doorColor.slice(1, 3), 16)}, ${parseInt(doorColor.slice(3, 5), 16)}, ${parseInt(doorColor.slice(5, 7), 16)}, ${alpha})`;
+            this.ctx.fillRect(screen.x, screen.y, tilePixelSize, tilePixelSize);
+
+            // Door frame (lighter)
+            this.ctx.strokeStyle = `rgba(160, 120, 80, ${alpha})`;
+            this.ctx.lineWidth = Math.max(1, this.camera.zoom * 0.3);
+            this.ctx.strokeRect(screen.x + 1, screen.y + 1, tilePixelSize - 2, tilePixelSize - 2);
+
+            // Door handle (small circle on right side)
+            this.ctx.fillStyle = door.state === 'locked' ? 'rgba(200, 200, 80, 0.9)' : 'rgba(180, 140, 100, 0.9)';
+            this.ctx.beginPath();
+            this.ctx.arc(screen.x + tilePixelSize * 0.75, screen.y + tilePixelSize * 0.5, Math.max(2, this.camera.zoom), 0, Math.PI * 2);
+            this.ctx.fill();
+
+            // Lock indicator for locked doors
+            if (door.state === 'locked') {
+              this.ctx.strokeStyle = 'rgba(200, 200, 80, 0.9)';
+              this.ctx.lineWidth = Math.max(1, this.camera.zoom * 0.5);
+              this.ctx.strokeRect(screen.x + tilePixelSize * 0.7, screen.y + tilePixelSize * 0.35, tilePixelSize * 0.1, tilePixelSize * 0.15);
+            }
+          }
+        }
+
+        // Render window tiles
+        if (tileWithBuilding.window) {
+          const window = tileWithBuilding.window;
+          const progress = window.constructionProgress ?? 100;
+          const alpha = progress >= 100 ? 0.6 : 0.3 + (progress / 100) * 0.3;
+
+          // Semi-transparent glass effect
+          this.ctx.fillStyle = `rgba(135, 206, 235, ${alpha})`; // Sky blue glass
+          this.ctx.fillRect(screen.x, screen.y, tilePixelSize, tilePixelSize);
+
+          // Window frame (dark border)
+          this.ctx.strokeStyle = `rgba(60, 40, 30, ${alpha + 0.2})`;
+          this.ctx.lineWidth = Math.max(2, this.camera.zoom * 0.7);
+          this.ctx.strokeRect(screen.x + 2, screen.y + 2, tilePixelSize - 4, tilePixelSize - 4);
+
+          // Cross pattern for window panes
+          this.ctx.beginPath();
+          this.ctx.moveTo(screen.x + tilePixelSize / 2, screen.y + 2);
+          this.ctx.lineTo(screen.x + tilePixelSize / 2, screen.y + tilePixelSize - 2);
+          this.ctx.moveTo(screen.x + 2, screen.y + tilePixelSize / 2);
+          this.ctx.lineTo(screen.x + tilePixelSize - 2, screen.y + tilePixelSize / 2);
+          this.ctx.stroke();
         }
 
         // Draw temperature overlay (debug feature)

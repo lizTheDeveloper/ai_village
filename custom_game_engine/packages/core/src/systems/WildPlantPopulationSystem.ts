@@ -218,7 +218,10 @@ export class WildPlantPopulationSystem implements System {
     }
     this.accumulatedTime = 0;
 
-    // Update plant counts per chunk
+    // Update agent positions in scheduler for proximity-based filtering
+    world.simulationScheduler.updateAgentPositions(world);
+
+    // Update plant counts per chunk (only for visible chunks)
     this.updateChunkCounts(world);
 
     // Age seed bank entries
@@ -232,14 +235,20 @@ export class WildPlantPopulationSystem implements System {
   }
 
   /**
-   * Update plant counts per chunk
+   * Update plant counts per chunk (only for visible chunks near agents)
    */
   private updateChunkCounts(world: World): void {
     this.chunkPlantCounts.clear();
 
     const plants = world.query().with(CT.Plant).executeEntities();
 
-    for (const entity of plants) {
+    // Filter to only visible plants (near agents) using SimulationScheduler
+    const visiblePlants = world.simulationScheduler.filterActiveEntities(
+      plants as Entity[],
+      world.tick
+    );
+
+    for (const entity of visiblePlants) {
       const impl = entity as EntityImpl;
       const plant = impl.getComponent<PlantComponent>(CT.Plant);
       if (!plant || !plant.position) continue;

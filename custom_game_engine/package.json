@@ -37,5 +37,8 @@
     "typescript": "^5.3.3",
     "vitest": "^1.0.4",
     "ws": "^8.18.3"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3"
   }
 }

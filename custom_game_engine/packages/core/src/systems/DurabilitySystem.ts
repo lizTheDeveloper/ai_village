@@ -12,6 +12,23 @@ import type { EventBus } from '../events/EventBus.js';
 export type UsageType = 'crafting' | 'gathering';
 
 /**
+ * Options for applying tool wear.
+ */
+export interface ToolWearOptions {
+  /** Agent ID for event payloads */
+  agentId?: string;
+  /**
+   * Material hardness (0-100) of the material being worked.
+   * Harder materials cause more tool wear:
+   * - Hardness 25 (wood): 0.75x wear
+   * - Hardness 50 (baseline): 1.0x wear
+   * - Hardness 70 (granite): 1.4x wear
+   * - Hardness 100: 2.0x wear
+   */
+  materialHardness?: number;
+}
+
+/**
  * System for managing tool durability and wear.
  *
  * Responsibilities:
@@ -57,12 +74,22 @@ export class DurabilitySystem implements System {
    *
    * @param itemInstanceId - Instance ID of the tool
    * @param usageType - Type of usage (crafting, gathering)
-   * @param agentId - Optional agent ID for event payloads
+   * @param optionsOrAgentId - Options object or legacy agentId string for backwards compatibility
    * @throws If instance not found
    * @throws If item is not a tool
    * @throws If tool is already broken (condition <= 0)
    */
-  applyToolWear(itemInstanceId: string, usageType: UsageType, agentId?: string): void {
+  applyToolWear(
+    itemInstanceId: string,
+    usageType: UsageType,
+    optionsOrAgentId?: ToolWearOptions | string
+  ): void {
+    // Handle backwards compatibility - if string passed, treat as agentId
+    const options: ToolWearOptions = typeof optionsOrAgentId === 'string'
+      ? { agentId: optionsOrAgentId }
+      : (optionsOrAgentId ?? {});
+
+    const { agentId, materialHardness } = options;
     // Get instance (throws if not found)
     const instance = itemInstanceRegistry.get(itemInstanceId);
 
@@ -90,8 +117,8 @@ export class DurabilitySystem implements System {
       );
     }
 
-    // Calculate durability loss with quality scaling
-    const durabilityLoss = this.calculateDurabilityLoss(toolTrait, instance.quality);
+    // Calculate durability loss with quality and material hardness scaling
+    const durabilityLoss = this.calculateDurabilityLoss(toolTrait, instance.quality, materialHardness);
 
     // Store previous condition for event
     const previousCondition = instance.condition;
@@ -151,11 +178,12 @@ export class DurabilitySystem implements System {
   }
 
   /**
-   * Calculate durability loss combining tool trait and item quality.
+   * Calculate durability loss combining tool trait, item quality, and material hardness.
    *
    * Formula:
    * - Base loss from tool trait (0-1 scale, converted to 0-100)
    * - Quality factor reduces wear for high quality, increases for poor quality
+   * - Material hardness increases wear for harder materials
    *
    * Quality tiers:
    * - Poor (0-39): 1.5x wear (wears faster)
@@ -164,14 +192,39 @@ export class DurabilitySystem implements System {
    * - Masterwork (85-94): 0.6x wear (lasts much longer)
    * - Legendary (95-100): 0.4x wear (lasts 2.5x longer than normal)
    *
+   * Material hardness tiers:
+   * - Soft (0-25, wood): 0.75x wear (gentle on tools)
+   * - Medium (26-50): 1.0x wear (standard)
+   * - Hard (51-75, stone): 1.5x wear (wears tools faster)
+   * - Very hard (76-100, metal/crystal): 2.0x wear (harsh on tools)
+   *
    * @param toolTrait - Tool trait from item definition
    * @param quality - Quality value (0-100)
+   * @param materialHardness - Material hardness (0-100), undefined = no modifier
    * @returns Durability loss (0-100 scale)
    */
-  private calculateDurabilityLoss(toolTrait: ToolTrait, quality: number): number {
+  private calculateDurabilityLoss(toolTrait: ToolTrait, quality: number, materialHardness?: number): number {
     const baseLoss = toolTrait.durabilityLoss * 100; // Convert 0-1 to 0-100
     const qualityFactor = this.getQualityWearFactor(quality);
-    return baseLoss * qualityFactor;
+    const hardnessFactor = this.getMaterialHardnessWearFactor(materialHardness);
+    return baseLoss * qualityFactor * hardnessFactor;
+  }
+
+  /**
+   * Get material hardness wear factor.
+   * Harder materials cause more wear on tools.
+   *
+   * - Hardness 0-25 (wood): 0.75x wear
+   * - Hardness 26-50: 1.0x wear
+   * - Hardness 51-75 (stone): 1.5x wear
+   * - Hardness 76-100 (metal): 2.0x wear
+   */
+  private getMaterialHardnessWearFactor(hardness?: number): number {
+    if (hardness === undefined) return 1.0; // No hardness specified, no modifier
+    if (hardness <= 25) return 0.75;  // Soft materials like wood
+    if (hardness <= 50) return 1.0;   // Medium hardness
+    if (hardness <= 75) return 1.5;   // Hard materials like stone
+    return 2.0;                        // Very hard materials like metal ore
   }
 
   /**
@@ -253,4 +306,34 @@ export class DurabilitySystem implements System {
   resetWarnings(): void {
     this.lowDurabilityWarningsEmitted.clear();
   }
+}
+
+// ============================================================================
+// Singleton accessor for use by behaviors and other non-system code
+// ============================================================================
+
+let durabilitySystemInstance: DurabilitySystem | null = null;
+
+/**
+ * Get the global DurabilitySystem instance.
+ * Creates one if it doesn't exist.
+ *
+ * Note: The event bus should be set via setEventBus() after getting the instance
+ * if you want tool_used/tool_broken events to be emitted.
+ */
+export function getDurabilitySystem(): DurabilitySystem {
+  if (!durabilitySystemInstance) {
+    durabilitySystemInstance = new DurabilitySystem();
+  }
+  return durabilitySystemInstance;
+}
+
+/**
+ * Reset the singleton (for testing).
+ */
+export function resetDurabilitySystem(): void {
+  if (durabilitySystemInstance) {
+    durabilitySystemInstance.resetWarnings();
+  }
+  durabilitySystemInstance = null;
 }

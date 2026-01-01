@@ -23,6 +23,11 @@ import type { PlantComponent } from '../../components/PlantComponent.js';
 import type { BuildingType } from '../../components/BuildingComponent.js';
 import type { ResourceCost } from '../../buildings/BuildingBlueprintRegistry.js';
 import type { GatheringStatsComponent } from '../../components/GatheringStatsComponent.js';
+import type { VoxelResourceComponent } from '../../components/VoxelResourceComponent.js';
+import type { EquipmentSlotsComponent } from '../../components/EquipmentSlotsComponent.js';
+import { getEquippedItem } from '../../components/EquipmentSlotsComponent.js';
+import { reduceStabilityFromHarvest, getMaterialHardness } from '../../systems/TreeFellingSystem.js';
+import { getDurabilitySystem } from '../../systems/DurabilitySystem.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { addToInventoryWithQuality } from '../../components/InventoryComponent.js';
 import { SpatialMemoryComponent, addSpatialMemory } from '../../components/SpatialMemoryComponent.js';
@@ -158,7 +163,14 @@ export class GatherBehavior extends BaseBehavior {
       }
 
       if (target.type === 'resource') {
-        this.handleResourceGathering(entity, target.entity, world, inventory, agent);
+        // Check if this is a voxel resource (trees, rocks with height-based harvesting)
+        const targetImpl = target.entity as EntityImpl;
+        const voxelComp = targetImpl.getComponent<VoxelResourceComponent>(ComponentType.VoxelResource);
+        if (voxelComp) {
+          this.handleVoxelResourceGathering(entity, target.entity, world, inventory, agent);
+        } else {
+          this.handleResourceGathering(entity, target.entity, world, inventory, agent);
+        }
       } else if (target.subtype === 'fruit') {
         this.gatherFruit(entity, target.entity, world, inventory, targetPos, workSpeedMultiplier);
       } else {
@@ -220,6 +232,233 @@ export class GatherBehavior extends BaseBehavior {
           gatherDurationTicks: durationTicks,
         },
       }));
+    }
+  }
+
+  /**
+   * Handle voxel resource gathering (trees, rocks with height-based harvesting).
+   * Agents can only cut from the base since they can't reach the top.
+   * Harvesting reduces stability and may cause the structure to fall.
+   */
+  private handleVoxelResourceGathering(
+    entity: EntityImpl,
+    resourceEntity: Entity,
+    world: World,
+    inventory: InventoryComponent,
+    agent: AgentComponent
+  ): void {
+    const state = agent.behaviorState as GatherBehaviorState;
+    const resourceImpl = resourceEntity as EntityImpl;
+    const voxelComp = resourceImpl.getComponent<VoxelResourceComponent>(ComponentType.VoxelResource)!;
+    const agentPos = entity.getComponent<PositionComponent>(ComponentType.Position)!;
+
+    // Skip depleted or falling resources
+    if (voxelComp.height <= 0 || voxelComp.isFalling || !voxelComp.harvestable) {
+      this.clearGatherState(entity);
+      return;
+    }
+
+    // Track harvester position for directional falling (tree falls away from harvester)
+    resourceImpl.updateComponent<VoxelResourceComponent>(ComponentType.VoxelResource, (current) => ({
+      ...current,
+      lastHarvesterPosition: { x: agentPos.x, y: agentPos.y },
+    }));
+
+    // Get gathering skill level
+    const skillsComp = entity.getComponent<SkillsComponent>(ComponentType.Skills);
+    const gatheringLevel = skillsComp?.levels.gathering ?? 0;
+
+    // Check if we're already gathering this resource
+    if (state.gatherTargetId === resourceEntity.id && state.gatherStartTick !== undefined) {
+      // Continue gathering - check if enough time has passed
+      const elapsedTicks = world.tick - state.gatherStartTick;
+      const requiredTicks = state.gatherDurationTicks ?? GATHER_RESOURCE_BASE_TICKS;
+
+      if (elapsedTicks >= requiredTicks) {
+        // Gathering complete! Harvest one level from base
+        this.completeVoxelHarvest(entity, resourceEntity, world, inventory, agent, gatheringLevel);
+        // Clear gather state to allow gathering again
+        this.clearGatherState(entity);
+      }
+      // Still gathering - wait for next tick
+    } else {
+      // Start gathering this resource
+      // Factor in both gatherDifficulty and material hardness
+      const gatherDifficulty = voxelComp.gatherDifficulty ?? 1.0;
+      const hardness = getMaterialHardness(voxelComp.material);
+
+      // Hardness modifier for duration:
+      // - Hardness 25 (wood): 0.75x duration (easier to cut)
+      // - Hardness 50: 1.0x duration (baseline)
+      // - Hardness 70 (granite): 1.4x duration (harder to cut)
+      const hardnessModifier = 0.5 + hardness / 100;
+
+      const baseDuration = calculateGatherDuration(gatheringLevel, gatherDifficulty);
+      const durationTicks = Math.ceil(baseDuration * hardnessModifier);
+
+      entity.updateComponent<AgentComponent>(ComponentType.Agent, (current) => ({
+        ...current,
+        behaviorState: {
+          ...current.behaviorState,
+          gatherTargetId: resourceEntity.id,
+          gatherStartTick: world.tick,
+          gatherDurationTicks: durationTicks,
+        },
+      }));
+    }
+  }
+
+  /**
+   * Complete harvesting one level of a voxel resource from the base.
+   * Reduces stability and may trigger falling if base is weakened enough.
+   */
+  private completeVoxelHarvest(
+    entity: EntityImpl,
+    resourceEntity: Entity,
+    world: World,
+    inventory: InventoryComponent,
+    agent: AgentComponent,
+    gatheringLevel: number
+  ): void {
+    const resourceImpl = resourceEntity as EntityImpl;
+    const voxelComp = resourceImpl.getComponent<VoxelResourceComponent>(ComponentType.VoxelResource)!;
+    const resourcePos = resourceImpl.getComponent<PositionComponent>(ComponentType.Position);
+
+    // Double-check resource is still harvestable
+    if (voxelComp.height <= 0 || voxelComp.isFalling) {
+      return;
+    }
+
+    // Get material hardness for tool wear and stability calculations
+    const material = voxelComp.material;
+    const hardness = getMaterialHardness(material);
+
+    // Harvest from base (level 0) - reduces stability significantly
+    // Hardness affects stability: harder materials are more stable
+    const harvestedLevel = 0; // Always harvest from base since agents can't reach top
+    const newStability = reduceStabilityFromHarvest(voxelComp, harvestedLevel, hardness);
+
+    // Resources dropped = blocksPerLevel
+    const harvestAmount = voxelComp.blocksPerLevel;
+
+    // Apply tool wear - harder materials wear tools faster
+    this.applyToolWearFromGathering(entity, world, hardness);
+
+    // Update voxel component: reduce height by 1 and update stability
+    resourceImpl.updateComponent<VoxelResourceComponent>(ComponentType.VoxelResource, (current) => ({
+      ...current,
+      height: current.height - 1,
+      stability: newStability,
+      lastHarvestTick: world.tick,
+    }));
+
+    // Calculate quality based on gathering skill
+    const gatherQuality = calculateGatheringQuality(gatheringLevel, material);
+
+    // Add to inventory
+    try {
+      const result = addToInventoryWithQuality(inventory, material, harvestAmount, gatherQuality);
+      entity.updateComponent<InventoryComponent>(ComponentType.Inventory, () => result.inventory);
+
+      // Record gathering stats
+      const gatheringStats = entity.getComponent<GatheringStatsComponent>(ComponentType.GatheringStats);
+      if (gatheringStats) {
+        const currentDay = getCurrentDay(world);
+        recordGathered(gatheringStats, material, result.amountAdded, currentDay);
+        entity.updateComponent<GatheringStatsComponent>(ComponentType.GatheringStats, () => gatheringStats);
+      }
+
+      // Award gathering XP (higher XP for voxel resources due to difficulty)
+      const skillsComp = entity.getComponent<SkillsComponent>(ComponentType.Skills);
+      if (skillsComp) {
+        const baseXP = 10 * result.amountAdded; // 10 XP per resource from voxels
+        const oldLevel = skillsComp.levels.gathering;
+        const xpResult = addSkillXP(skillsComp, 'gathering', baseXP);
+        entity.updateComponent<SkillsComponent>(ComponentType.Skills, () => xpResult.component);
+
+        world.eventBus.emit({
+          type: 'skill:xp_gain',
+          source: entity.id,
+          data: {
+            agentId: entity.id,
+            skillId: 'gathering',
+            amount: baseXP,
+            source: 'voxel_gathering',
+          },
+        });
+
+        if (xpResult.leveledUp) {
+          world.eventBus.emit({
+            type: 'skill:level_up',
+            source: entity.id,
+            data: {
+              agentId: entity.id,
+              skillId: 'gathering',
+              oldLevel,
+              newLevel: xpResult.newLevel,
+            },
+          });
+        }
+      }
+
+      // Emit resource gathered event
+      world.eventBus.emit({
+        type: 'resource:gathered',
+        source: entity.id,
+        data: {
+          agentId: entity.id,
+          resourceType: material,
+          amount: result.amountAdded,
+          position: resourcePos ? { x: resourcePos.x, y: resourcePos.y } : { x: 0, y: 0 },
+          sourceEntityId: resourceEntity.id,
+        },
+      });
+
+      // Check if inventory is now full
+      if (result.inventory.currentWeight >= result.inventory.maxWeight) {
+        this.handleInventoryFull(entity, world, agent);
+        return;
+      }
+
+      // Check if we're gathering for a building
+      if (agent.behaviorState?.returnToBuild) {
+        this.checkBuildProgress(entity, world, result.inventory, agent);
+        return;
+      }
+
+      // Reinforce memory of this resource location
+      const spatialMemory = entity.getComponent<SpatialMemoryComponent>(ComponentType.SpatialMemory);
+      if (spatialMemory && resourcePos) {
+        addSpatialMemory(
+          spatialMemory,
+          {
+            type: 'resource_location',
+            x: resourcePos.x,
+            y: resourcePos.y,
+            entityId: resourceEntity.id,
+            metadata: { resourceType: material, isVoxel: true },
+          },
+          world.tick,
+          100
+        );
+      }
+
+      // Check if resource is depleted (height <= 0)
+      const updatedVoxel = resourceImpl.getComponent<VoxelResourceComponent>(ComponentType.VoxelResource);
+      if (updatedVoxel && updatedVoxel.height <= 0) {
+        world.eventBus.emit({
+          type: 'resource:depleted',
+          source: resourceEntity.id,
+          data: {
+            resourceId: resourceEntity.id,
+            resourceType: material,
+            agentId: entity.id,
+          },
+        });
+      }
+    } catch (error) {
+      // Inventory full or weight limit exceeded
+      this.handleInventoryFull(entity, world, agent);
     }
   }
 
@@ -436,16 +675,17 @@ export class GatherBehavior extends BaseBehavior {
     position: PositionComponent,
     preferredType: string | undefined
   ): { entity: Entity; position: { x: number; y: number }; distance: number } | null {
+    let bestScore = Infinity;
+    let bestResource: Entity | null = null;
+    let bestPosition: { x: number; y: number } | null = null;
+    let bestDistance = Infinity;
+
+    // Search regular resource entities
     const resources = world
       .query()
       .with(ComponentType.Resource)
       .with(ComponentType.Position)
       .executeEntities();
-
-    let bestScore = Infinity;
-    let bestResource: Entity | null = null;
-    let bestPosition: { x: number; y: number } | null = null;
-    let bestDistance = Infinity;
 
     for (const resource of resources) {
       const resourceImpl = resource as EntityImpl;
@@ -479,6 +719,50 @@ export class GatherBehavior extends BaseBehavior {
         bestScore = score;
         bestResource = resource;
         bestPosition = { x: resourcePos.x, y: resourcePos.y };
+        bestDistance = distanceToAgent;
+      }
+    }
+
+    // Also search voxel resources (trees, rocks with height-based harvesting)
+    const voxelResources = world
+      .query()
+      .with(ComponentType.VoxelResource)
+      .with(ComponentType.Position)
+      .executeEntities();
+
+    for (const voxelResource of voxelResources) {
+      const voxelImpl = voxelResource as EntityImpl;
+      const voxelComp = voxelImpl.getComponent<VoxelResourceComponent>(ComponentType.VoxelResource)!;
+      const voxelPos = voxelImpl.getComponent<PositionComponent>(ComponentType.Position)!;
+
+      // Skip non-harvestable, depleted, or falling resources
+      if (!voxelComp.harvestable) continue;
+      if (voxelComp.height <= 0) continue;
+      if (voxelComp.isFalling) continue;
+
+      // If preferred type specified, check if material matches
+      if (preferredType && voxelComp.material !== preferredType) continue;
+
+      // Distance from agent to resource
+      const distanceToAgent = this.distance(position, voxelPos);
+
+      // Only consider resources within max gather range
+      if (distanceToAgent > GATHER_MAX_RANGE) continue;
+
+      // Distance from resource to home (0, 0)
+      const distanceToHome = Math.sqrt(voxelPos.x * voxelPos.x + voxelPos.y * voxelPos.y);
+
+      // Scoring: prefer resources near home AND near agent
+      let score = distanceToAgent;
+      if (distanceToHome > HOME_RADIUS) {
+        // Penalize resources far from home (add 2x the excess distance)
+        score += (distanceToHome - HOME_RADIUS) * 2.0;
+      }
+
+      if (score < bestScore) {
+        bestScore = score;
+        bestResource = voxelResource;
+        bestPosition = { x: voxelPos.x, y: voxelPos.y };
         bestDistance = distanceToAgent;
       }
     }
@@ -937,6 +1221,55 @@ export class GatherBehavior extends BaseBehavior {
     }
 
     return missing;
+  }
+
+  /**
+   * Apply tool wear when harvesting a resource.
+   * Checks if agent has a tool equipped in main_hand and applies durability loss.
+   *
+   * @param entity - The agent entity
+   * @param world - The world for event emission
+   * @param materialHardness - Hardness of material being harvested (0-100)
+   */
+  private applyToolWearFromGathering(
+    entity: EntityImpl,
+    world: World,
+    materialHardness: number
+  ): void {
+    // Check if agent has equipment slots
+    const equipment = entity.getComponent<EquipmentSlotsComponent>(ComponentType.EquipmentSlots);
+    if (!equipment) {
+      return; // No equipment system, skip tool wear
+    }
+
+    // Check for equipped tool in main hand
+    const equippedTool = getEquippedItem(equipment, 'main_hand');
+    if (!equippedTool) {
+      return; // No tool equipped, skip wear
+    }
+
+    // Apply tool wear with material hardness
+    try {
+      const durabilitySystem = getDurabilitySystem();
+      // Set event bus if available (for tool_broken events)
+      durabilitySystem.setEventBus(world.eventBus);
+
+      durabilitySystem.applyToolWear(equippedTool.itemId, 'gathering', {
+        agentId: entity.id,
+        materialHardness,
+      });
+    } catch (error) {
+      // Tool might be broken or not a valid tool - emit event and continue
+      world.eventBus.emit({
+        type: 'gathering:tool_error',
+        source: entity.id,
+        data: {
+          agentId: entity.id,
+          toolId: equippedTool.itemId,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        },
+      });
+    }
   }
 }
 

@@ -16,6 +16,7 @@ export * from './BuildingPlacementUI.js';
 export * from './ZonePainterUI.js';
 export * from './GhostRenderer.js';
 export * from './AgentInfoPanel.js';
+export * from './AgentRosterPanel.js';
 export * from './AnimalInfoPanel.js';
 export * from './TileInspectorPanel.js';
 export * from './PlantInfoPanel.js';
@@ -26,6 +27,10 @@ export * from './MemoryPanel.js';
 export * from './RelationshipsPanel.js';
 export * from './NotificationsPanel.js';
 export * from './ControlsPanel.js';
+export * from './TimeControlsPanel.js';
+export * from './UnifiedHoverInfoPanel.js';
+export * from './PlayerControlHUD.js';
+export * from './AgentSelectionPanel.js';
 export * from './EconomyPanel.js';
 export * from './ShopPanel.js';
 export * from './TimelinePanel.js';
@@ -74,3 +79,13 @@ export * from './CombatUnitPanel.js';
 export * from './HealthBarRenderer.js';
 export * from './StanceControls.js';
 export * from './ThreatIndicatorRenderer.js';
+
+// Utility renderers
+export * from './LoadingText.js';
+export * from './ProceduralShapeRenderer.js';
+
+// Sprite system (LPC and PixelLab)
+export * from './sprites/index.js';
+
+// Agent info panel sections
+export * from './panels/agent-info/index.js';

@@ -1,0 +1,24 @@
+{
+  "name": "@ai-village/llm-building-designer",
+  "version": "0.1.0",
+  "description": "LLM interface for designing voxel-based buildings with validation",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "npx ts-node src/test.ts",
+    "demo": "npx ts-node src/test.ts --demo",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "llm",
+    "building",
+    "voxel",
+    "validation",
+    "game"
+  ],
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
+  }
+}

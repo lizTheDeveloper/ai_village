@@ -259,37 +259,52 @@ export class TerrainGenerator {
 
   /**
    * Generate a single tile at world coordinates.
+   *
+   * Scale notes (1 tile = 1 meter, humans are 2 tiles tall):
+   * - Local terrain features (hills, groves): 100-500m = scale 0.002-0.01
+   * - Regional features (forests, valleys): 1-5km = scale 0.0002-0.001
+   * - Biome-scale features (climate zones): 10-50km = scale 0.00002-0.0001
+   * - Continental features (land masses): 100-500km = scale 0.000002-0.00001
    */
   private generateTile(worldX: number, worldY: number): Tile {
-    // Scale for noise (smaller = more zoomed out)
-    const scale = 0.015; // Slightly larger features
+    // Terrain detail scale (local hills, rocks, small features: ~200m)
+    const detailScale = 0.005;
+
+    // Regional scale (forests, valleys, rivers: ~2km)
+    const regionalScale = 0.0005;
+
+    // Biome scale (climate zones, large biomes: ~20km)
+    const biomeScale = 0.00005;
+
+    // Continental scale (land masses, oceans: ~200km)
+    const continentalScale = 0.000005;
 
     // Multi-octave noise for base elevation (smooth rolling terrain)
     // Using 6 octaves with persistence 0.5 for natural fractal detail
-    const baseElevation = this.elevationNoise.octaveNoise(worldX * scale, worldY * scale, 6, 0.5);
+    const baseElevation = this.elevationNoise.octaveNoise(worldX * detailScale, worldY * detailScale, 6, 0.5);
 
     // Continentalness - determines if area is ocean/land/mountains (large scale)
     const continentalness = this.elevationNoise.octaveNoise(
-      worldX * scale * 0.3,
-      worldY * scale * 0.3,
+      worldX * continentalScale,
+      worldY * continentalScale,
       3,
       0.6
     );
 
     // Ridged noise for sharp mountain peaks and cliffs (abs value creates ridges)
-    const ridgedNoise = this.ridgedNoise(worldX * scale * 2, worldY * scale * 2);
+    const ridgedNoise = this.ridgedNoise(worldX * regionalScale * 2, worldY * regionalScale * 2);
 
     // Erosion factor - flatter areas vs rough terrain
     const erosion = this.moistureNoise.octaveNoise(
-      worldX * scale * 0.8,
-      worldY * scale * 0.8,
+      worldX * regionalScale,
+      worldY * regionalScale,
       4,
       0.5
     );
 
-    // Flatten spawn area (within 20 tiles of origin for gentler starting terrain)
+    // Flatten spawn area (within 500 tiles / 500m of origin for gentler starting terrain)
     const distanceFromSpawn = Math.sqrt(worldX * worldX + worldY * worldY);
-    const spawnFlatten = Math.max(0, 1 - distanceFromSpawn / 20); // 1.0 at origin, 0.0 at distance 20+
+    const spawnFlatten = Math.max(0, 1 - distanceFromSpawn / 500); // 1.0 at origin, 0.0 at distance 500+
 
     // Blend elevation based on continentalness and erosion
     let elevation = baseElevation * 0.6 + continentalness * 0.4;
@@ -303,15 +318,17 @@ export class TerrainGenerator {
     // Flatten spawn area - lerp toward 0 elevation
     elevation = elevation * (1 - spawnFlatten * 0.8);
 
+    // Moisture uses biome scale for climate zones (~20km patterns)
     const moisture = this.moistureNoise.octaveNoise(
-      worldX * scale * 1.3,
-      worldY * scale * 1.3,
+      worldX * biomeScale,
+      worldY * biomeScale,
       3,
       0.5
     );
+    // Temperature uses continental scale for large climate bands (~200km patterns)
     const temperature = this.temperatureNoise.octaveNoise(
-      worldX * scale * 0.8,
-      worldY * scale * 0.8,
+      worldX * continentalScale * 2,
+      worldY * continentalScale * 2,
       2,
       0.5
     );
