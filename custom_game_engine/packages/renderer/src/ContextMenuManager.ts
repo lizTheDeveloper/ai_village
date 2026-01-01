@@ -144,35 +144,17 @@ export class ContextMenuManager {
       // Create context
       const context = MenuContext.fromClick(this.world, this.camera, screenX, screenY);
 
-      // DEBUG: Log context
-      console.log('[ContextMenuManager] Context:', {
-        targetType: context.targetType,
-        targetEntity: context.targetEntity,
-        hasSelection: context.hasSelection(),
-        isWalkable: context.isWalkable,
-        worldPosition: context.worldPosition,
-        screenPosition: context.screenPosition
-      });
-
       // Get applicable actions
       const applicableActions = this.registry.getApplicableActions(context);
-
-      // DEBUG: Log applicable actions
-      console.log('[ContextMenuManager] Applicable actions:', applicableActions.map(a => a.id));
 
       // Convert to menu items
       const items = this.actionsToMenuItems(applicableActions, context);
 
-      // DEBUG: Log menu items
-      console.log('[ContextMenuManager] Menu items:', items.length);
-
-      // Don't open menu if there are no items
+      // Don't open menu if there are no items (this should NEVER happen due to "tile_info" always being applicable)
       if (items.length === 0) {
-        console.warn('[ContextMenuManager] No menu items - menu will not open');
+        console.error('[ContextMenuManager] No menu items returned - this should never happen. Registered actions:', this.registry.getAll().length);
         return;
       }
-
-      console.log('[ContextMenuManager] Opening menu with', items.length, 'items');
 
     // Calculate arc angles
     const itemsWithAngles = this.menuRenderer.calculateArcAngles(
@@ -651,7 +633,9 @@ export class ContextMenuManager {
       return;
     }
 
-    console.log('[ContextMenuManager] render() called - isOpen:', this.state.isOpen, 'isAnimating:', this.state.isAnimating, 'items:', this.currentItems.length);
+    if (this.currentItems.length === 0) {
+      return;
+    }
 
     // Use provided context or fall back to internal renderer
     const renderer = ctx ? new ContextMenuRenderer(ctx) : this.menuRenderer;

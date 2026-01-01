@@ -66,39 +66,44 @@ export class ContextMenuRenderer {
       return;
     }
 
-    this.ctx.save();
+    try {
+      this.ctx.save();
 
-    // NOTE: DO NOT call setTransform here - the main Renderer already applies ctx.scale(dpr, dpr)
-    // and ctx.save() preserves that transform. Calling setTransform() would overwrite it.
-    // Input coordinates (centerX, centerY) are already in logical pixels and will be scaled correctly.
+      // NOTE: DO NOT call setTransform here - the main Renderer already applies ctx.scale(dpr, dpr)
+      // and ctx.save() preserves that transform. Calling setTransform() would overwrite it.
+      // Input coordinates (centerX, centerY) are already in logical pixels and will be scaled correctly.
 
-    // Get radii from first item (all items should have same radii)
-    const innerRadius = items[0]?.innerRadius ?? 30;
-    const outerRadius = items[0]?.outerRadius ?? 100;
+      // Get radii from first item (all items should have same radii)
+      const innerRadius = items[0]?.innerRadius ?? 30;
+      const outerRadius = items[0]?.outerRadius ?? 100;
 
-    // Draw menu background circle
-    this.ctx.beginPath();
-    this.ctx.arc(centerX, centerY, outerRadius, 0, Math.PI * 2);
-    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';  // Semi-transparent dark
-    this.ctx.fill();
+      // Draw menu background circle
+      this.ctx.beginPath();
+      this.ctx.arc(centerX, centerY, outerRadius, 0, Math.PI * 2);
+      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';  // Semi-transparent dark
+      this.ctx.fill();
 
-    // Draw menu border
-    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';  // White border
-    this.ctx.lineWidth = 2;
-    this.ctx.stroke();
+      // Draw menu border
+      this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';  // White border
+      this.ctx.lineWidth = 2;
+      this.ctx.stroke();
 
-    // Draw inner circle (dead zone)
-    this.ctx.beginPath();
-    this.ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
-    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';  // Darker center
-    this.ctx.fill();
+      // Draw inner circle (dead zone)
+      this.ctx.beginPath();
+      this.ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
+      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';  // Darker center
+      this.ctx.fill();
 
-    // Draw items
-    for (const item of items) {
-      this.renderItem(item, centerX, centerY);
+      // Draw items
+      for (const item of items) {
+        this.renderItem(item, centerX, centerY);
+      }
+
+      this.ctx.restore();
+    } catch (error) {
+      console.error('[ContextMenuRenderer] Exception during render:', error);
+      throw error;
     }
-
-    this.ctx.restore();
   }
 
   /**
