@@ -1886,8 +1886,10 @@ function setupInputHandlers(
       return windowManager.handleWheel(screenX, screenY, deltaY);
     },
     onRightClick: (screenX, screenY) => {
-      // Emit event for context menu manager to handle
-      gameLoop.world.eventBus.emit({
+      // Emit event IMMEDIATELY for context menu manager to handle
+      // NOTE: Must use emitImmediate() because UI events need immediate processing
+      // and the game loop doesn't call flush() - events would otherwise be queued forever
+      gameLoop.world.eventBus.emitImmediate({
         type: 'input:rightclick',
         source: 'world',
         data: { x: screenX, y: screenY }
