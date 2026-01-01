@@ -12,6 +12,16 @@ describe('ContextMenu Integration', () => {
   let contextMenu: ContextMenuManager;
   let inputHandler: InputHandler;
 
+
+  // Helper: Convert tile coordinates to screen coordinates
+  // Entities use tile coordinates, but worldToScreen expects world pixels
+  const TILE_SIZE = 16;
+  function tileToScreen(tileX: number, tileY: number): { x: number; y: number } {
+    const worldPixelX = tileX * TILE_SIZE;
+    const worldPixelY = tileY * TILE_SIZE;
+    return camera.worldToScreen(worldPixelX, worldPixelY);
+  }
+
   beforeEach(() => {
     vi.useFakeTimers();
     world = new WorldImpl();
@@ -53,7 +63,7 @@ describe('ContextMenu Integration', () => {
       targetAgent.addComponent({ type: 'agent', version: 1, name: 'Leader' });
 
       // Step 1: Right-click on target agent
-      const screenPos = camera.worldToScreen(100, 100);
+      const screenPos = tileToScreen(100, 100);
       contextMenu.open(screenPos.x, screenPos.y);
 
       expect(contextMenu.isOpen()).toBe(true);
@@ -95,7 +105,7 @@ describe('ContextMenu Integration', () => {
       agent2.addComponent({ type: 'position', version: 1, x: 50, y: 50 });
       agent2.addComponent({ type: 'agent', version: 1, name: 'Agent 2' });
 
-      const screenPos = camera.worldToScreen(50, 50);
+      const screenPos = tileToScreen(50, 50);
       contextMenu.open(screenPos.x, screenPos.y);
 
       const talkAction = contextMenu.getVisibleItems().find(a => a.actionId === 'talk_to');
@@ -116,7 +126,7 @@ describe('ContextMenu Integration', () => {
       agent.addComponent({ type: 'position', version: 1, x: 75, y: 75 });
       agent.addComponent({ type: 'agent', version: 1, name: 'Test Agent', health: 100 });
 
-      const screenPos = camera.worldToScreen(75, 75);
+      const screenPos = tileToScreen(75, 75);
       contextMenu.open(screenPos.x, screenPos.y);
 
       const inspectAction = contextMenu.getVisibleItems().find(a => a.actionId === 'inspect');
@@ -148,7 +158,7 @@ describe('ContextMenu Integration', () => {
         canEnter: false,
         locked: false });
 
-      const screenPos = camera.worldToScreen(150, 150);
+      const screenPos = tileToScreen(150, 150);
       contextMenu.open(screenPos.x, screenPos.y);
 
       const demolishAction = contextMenu.getVisibleItems().find(a => a.actionId === 'demolish');
@@ -201,7 +211,7 @@ describe('ContextMenu Integration', () => {
         canEnter: false,
         locked: false });
 
-      const screenPos = camera.worldToScreen(150, 150);
+      const screenPos = tileToScreen(150, 150);
       contextMenu.open(screenPos.x, screenPos.y);
 
       const repairAction = contextMenu.getVisibleItems().find(a => a.actionId === 'repair');
@@ -235,7 +245,7 @@ describe('ContextMenu Integration', () => {
       agent.addComponent({ type: 'agent', version: 1, name: 'Agent' });
       agent.addComponent({ type: 'selectable', version: 1, selected: true });
 
-      const screenPos = camera.worldToScreen(150, 150);
+      const screenPos = tileToScreen(150, 150);
       contextMenu.open(screenPos.x, screenPos.y);
 
       const enterAction = contextMenu.getVisibleItems().find(a => a.actionId === 'enter');
@@ -267,7 +277,7 @@ describe('ContextMenu Integration', () => {
         amount: 15,
         maxAmount: 20 });
 
-      const screenPos = camera.worldToScreen(200, 200);
+      const screenPos = tileToScreen(200, 200);
       contextMenu.open(screenPos.x, screenPos.y);
 
       const harvestAction = contextMenu.getVisibleItems().find(a => a.actionId === 'harvest');
@@ -300,7 +310,7 @@ describe('ContextMenu Integration', () => {
       worker.addComponent({ type: 'agent', version: 1, name: 'Worker' });
       worker.addComponent({ type: 'selectable', version: 1, selected: true });
 
-      const screenPos = camera.worldToScreen(200, 200);
+      const screenPos = tileToScreen(200, 200);
       contextMenu.open(screenPos.x, screenPos.y);
 
       const assignAction = contextMenu.getVisibleItems().find(a => a.actionId === 'assign_worker');
@@ -328,7 +338,7 @@ describe('ContextMenu Integration', () => {
       resource.addComponent({ type: 'position', version: 1, x: 200, y: 200 });
       resource.addComponent({ type: 'harvestable', version: 1, resourceType: 'stone', amount: 5 });
 
-      const screenPos = camera.worldToScreen(200, 200);
+      const screenPos = tileToScreen(200, 200);
       contextMenu.open(screenPos.x, screenPos.y);
 
       const priorityAction = contextMenu.getVisibleItems().find(a => a.actionId === 'prioritize');
@@ -565,7 +575,7 @@ describe('ContextMenu Integration', () => {
       agent.addComponent({ type: 'position', version: 1, x: 50, y: 50 });
       agent.addComponent({ type: 'agent', version: 1, name: 'Agent' });
 
-      const screenPos = camera.worldToScreen(50, 50);
+      const screenPos = tileToScreen(50, 50);
       contextMenu.open(screenPos.x, screenPos.y);
 
       const inspectAction = contextMenu.getVisibleItems().find(a => a.actionId === 'inspect');

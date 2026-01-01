@@ -9,6 +9,16 @@ describe.skip('MenuContext', () => {
   let camera: Camera;
   let canvas: HTMLCanvasElement;
 
+
+  // Helper: Convert tile coordinates to screen coordinates
+  // Entities use tile coordinates, but worldToScreen expects world pixels
+  const TILE_SIZE = 16;
+  function tileToScreen(tileX: number, tileY: number): { x: number; y: number } {
+    const worldPixelX = tileX * TILE_SIZE;
+    const worldPixelY = tileY * TILE_SIZE;
+    return camera.worldToScreen(worldPixelX, worldPixelY);
+  }
+
   beforeEach(() => {
     world = new World();
     canvas = document.createElement('canvas');
@@ -38,7 +48,7 @@ describe.skip('MenuContext', () => {
       agent.addComponent('position', { x: 50, y: 50 });
       agent.addComponent('agent', { name: 'Test Agent' });
 
-      const screenPos = camera.worldToScreen(50, 50);
+      const screenPos = tileToScreen(50, 50);
       const context = MenuContext.fromClick(world, camera, screenPos.x, screenPos.y);
 
       expect(context.targetType).toBe('agent');
@@ -50,7 +60,7 @@ describe.skip('MenuContext', () => {
       building.addComponent('position', { x: 100, y: 100 });
       building.addComponent('building', { type: 'house', health: 1.0 });
 
-      const screenPos = camera.worldToScreen(100, 100);
+      const screenPos = tileToScreen(100, 100);
       const context = MenuContext.fromClick(world, camera, screenPos.x, screenPos.y);
 
       expect(context.targetType).toBe('building');
@@ -62,7 +72,7 @@ describe.skip('MenuContext', () => {
       resource.addComponent('position', { x: 75, y: 75 });
       resource.addComponent('harvestable', { resourceType: 'berries', amount: 10 });
 
-      const screenPos = camera.worldToScreen(75, 75);
+      const screenPos = tileToScreen(75, 75);
       const context = MenuContext.fromClick(world, camera, screenPos.x, screenPos.y);
 
       expect(context.targetType).toBe('resource');
@@ -78,7 +88,7 @@ describe.skip('MenuContext', () => {
       agent.addComponent('position', { x: 50, y: 50 });
       agent.addComponent('agent', { name: 'Agent' });
 
-      const screenPos = camera.worldToScreen(50, 50);
+      const screenPos = tileToScreen(50, 50);
       const context = MenuContext.fromClick(world, camera, screenPos.x, screenPos.y);
 
       expect(context.targetType).toBe('agent');
@@ -94,7 +104,7 @@ describe.skip('MenuContext', () => {
       building.addComponent('position', { x: 75, y: 75 });
       building.addComponent('building', { type: 'storage', health: 1.0 });
 
-      const screenPos = camera.worldToScreen(75, 75);
+      const screenPos = tileToScreen(75, 75);
       const context = MenuContext.fromClick(world, camera, screenPos.x, screenPos.y);
 
       expect(context.targetType).toBe('building');
@@ -210,7 +220,7 @@ describe.skip('MenuContext', () => {
       agent.addComponent('position', { x: 50, y: 50 });
       agent.addComponent('agent', { name: 'Target' });
 
-      const screenPos = camera.worldToScreen(50, 50);
+      const screenPos = tileToScreen(50, 50);
       const context = MenuContext.fromClick(world, camera, screenPos.x, screenPos.y);
 
       const targetEntity = context.getTargetEntity(world);
@@ -273,7 +283,7 @@ describe.skip('MenuContext', () => {
       targetAgent.addComponent('position', { x: 50, y: 50 });
       targetAgent.addComponent('agent', { name: 'Target' });
 
-      const screenPos = camera.worldToScreen(50, 50);
+      const screenPos = tileToScreen(50, 50);
       const context = MenuContext.fromClick(world, camera, screenPos.x, screenPos.y);
 
       expect(context.isActionApplicable('follow')).toBe(true);
@@ -284,7 +294,7 @@ describe.skip('MenuContext', () => {
       targetAgent.addComponent('position', { x: 50, y: 50 });
       targetAgent.addComponent('agent', { name: 'Target' });
 
-      const screenPos = camera.worldToScreen(50, 50);
+      const screenPos = tileToScreen(50, 50);
       const context = MenuContext.fromClick(world, camera, screenPos.x, screenPos.y);
 
       expect(context.isActionApplicable('follow')).toBe(false);
@@ -295,7 +305,7 @@ describe.skip('MenuContext', () => {
       resource.addComponent('position', { x: 75, y: 75 });
       resource.addComponent('harvestable', { resourceType: 'berries', amount: 10 });
 
-      const screenPos = camera.worldToScreen(75, 75);
+      const screenPos = tileToScreen(75, 75);
       const context = MenuContext.fromClick(world, camera, screenPos.x, screenPos.y);
 
       expect(context.isActionApplicable('harvest')).toBe(true);
@@ -306,7 +316,7 @@ describe.skip('MenuContext', () => {
       resource.addComponent('position', { x: 75, y: 75 });
       resource.addComponent('harvestable', { resourceType: 'berries', amount: 0 });
 
-      const screenPos = camera.worldToScreen(75, 75);
+      const screenPos = tileToScreen(75, 75);
       const context = MenuContext.fromClick(world, camera, screenPos.x, screenPos.y);
 
       expect(context.isActionApplicable('harvest')).toBe(false);
@@ -317,7 +327,7 @@ describe.skip('MenuContext', () => {
       building.addComponent('position', { x: 100, y: 100 });
       building.addComponent('building', { type: 'house', health: 0.5 });
 
-      const screenPos = camera.worldToScreen(100, 100);
+      const screenPos = tileToScreen(100, 100);
       const context = MenuContext.fromClick(world, camera, screenPos.x, screenPos.y);
 
       expect(context.isActionApplicable('repair')).toBe(true);
@@ -328,7 +338,7 @@ describe.skip('MenuContext', () => {
       building.addComponent('position', { x: 100, y: 100 });
       building.addComponent('building', { type: 'house', health: 1.0 });
 
-      const screenPos = camera.worldToScreen(100, 100);
+      const screenPos = tileToScreen(100, 100);
       const context = MenuContext.fromClick(world, camera, screenPos.x, screenPos.y);
 
       expect(context.isActionApplicable('repair')).toBe(false);

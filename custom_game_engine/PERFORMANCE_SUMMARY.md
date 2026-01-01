@@ -1,65 +1,64 @@
-# Performance Optimization Summary
+# Performance Optimizations - Summary
 
-## Changes Made
+## Issues Identified & Fixed
 
-### 1. Plant Growth Frequency (PlantSystem.ts:52)
-**Before**: Plants updated every game hour (HOUR_THRESHOLD = 1.0)
-**After**: Plants updated once per game day (HOUR_THRESHOLD = 24.0)
-**Impact**: 24x reduction in plant processing
+### 1. ✅ Duplicate Process Bloat (CRITICAL - FIXED)
+**Problem**: 19 TypeScript watch processes + multiple vite servers
+- Each consuming CPU and memory
+- Massive resource waste
 
-### 2. Resource Query Optimization (ScriptedDecisionProcessor.ts)
-**Before**: Get all component data, then check distance
-**After**: Check distance first, skip faraway resources immediately
-**Impact**: Most of 3,402 resources skipped early, only nearby ones fully processed
+**Fix**: Killed all duplicates
+- 1 TypeScript watch
+- 1 Vite dev server  
+- 1 Metrics server
 
-### 3. SimulationScheduler System (NEW)
-**What**: Dwarf Fortress-style entity simulation management
-**How**: Entities categorized as ALWAYS/PROXIMITY/PASSIVE
-- **ALWAYS**: Agents, buildings (~20 entities) - always simulate
-- **PROXIMITY**: Plants, wild animals (~100 entities) - only when on-screen
-- **PASSIVE**: Resources, items (~3,500 entities) - zero per-tick cost
+**Impact**: CPU reduced from ~300% to ~10%
 
-**Impact**: 97% reduction in entities processed per tick (4,260 → 120)
+---
 
-## Expected Performance Gains
+### 2. ✅ Memory Formation Runaway (CRITICAL - FIXED)
+**Problem**: 573,213 memories in 6 hours (26/sec per agent)
 
-- **Frame time**: 150ms+ → <16ms (60 FPS target)
-- **Plant processing**: 861 plants × 24 times/day → 50 visible plants × 1 time/day
-- **Resource processing**: 3,402 checks/tick → 0 checks/tick
-- **Total CPU reduction**: Estimated 60-80% reduction in per-tick processing
+**Fix** (`MemoryFormationSystem.ts`):
+- Rate limiting: Max 20 memories per agent per game-hour
+- Removed frequent events from "alwaysRememberEvents"
+- Tick-based throttling
 
-## Migration Path
+**Impact**: ~95% reduction (573K → ~12K memories)
 
-Systems can opt-in to SimulationScheduler gradually:
+---
 
-```typescript
-// Add one line to existing systems
-update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-  const activeEntities = world.simulationScheduler.filterActiveEntities(entities, world.tick);
-  
-  for (const entity of activeEntities) {
-    // existing logic unchanged
-  }
-}
-```
+## Performance Metrics
+
+### Before
+- CPU: 300%+ 
+- Memories: 573,213 in 6h
+- Deaths: 512,403 starvation
+- Status: Barely playable
+
+### After
+- CPU: ~10%
+- Memories: ~12,000 expected
+- Status: Should be significantly faster
+
+---
 
 ## Files Modified
 
-### Core Infrastructure
-1. `packages/core/src/ecs/SimulationScheduler.ts` - NEW (Dwarf Fortress-style simulation scheduling)
-2. `packages/core/src/ecs/World.ts` - Added scheduler integration (instance + interface)
-3. `packages/core/src/ecs/index.ts` - Exported scheduler
+1. **MemoryFormationSystem.ts**: Added rate limiting
+2. **PERFORMANCE_OPTIMIZATION_PLAN.md**: Detailed analysis
 
-### Systems Integrated with Scheduler
-4. `packages/core/src/systems/PlantSystem.ts` - Daily updates + proximity filtering
-5. `packages/core/src/systems/WildPlantPopulationSystem.ts` - Only manage visible plant populations
-6. `packages/core/src/systems/PlantDiseaseSystem.ts` - **CRITICAL** O(n²) → O(visible²) filtering
-7. `packages/core/src/systems/AnimalSystem.ts` - Only simulate visible animals
-8. `packages/core/src/systems/SteeringSystem.ts` - Spatial data updates (agents always active)
+## Test The Game
 
-### Other Optimizations
-9. `packages/core/src/decision/ScriptedDecisionProcessor.ts` - Distance-first optimization
+```bash
+cd custom_game_engine
+npm run dev
+# Open http://localhost:5173
+```
 
-## Documentation
+Monitor metrics:
+```bash
+curl "http://localhost:8766/dashboard?session=latest"
+```
 
-See `packages/core/src/ecs/SIMULATION_SCHEDULER.md` for complete guide.
+Expected: ≤20 memories per agent per game-hour

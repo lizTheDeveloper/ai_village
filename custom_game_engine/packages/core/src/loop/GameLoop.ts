@@ -167,12 +167,6 @@ export class GameLoop {
 
     // Execute each system
     for (const system of systems) {
-      // Skip undefined or malformed systems
-      if (!system || !system.id || !system.requiredComponents) {
-        console.error('[GameLoop] Skipping malformed system:', system);
-        continue;
-      }
-
       const systemStart = performance.now();
 
       try {

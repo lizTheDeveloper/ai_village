@@ -18,6 +18,9 @@ export class NeedsSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Needs];
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+    // Use SimulationScheduler to only process active entities
+    const activeEntities = world.simulationScheduler.filterActiveEntities(entities, world.tick);
+
     // Get game time from TimeComponent to calculate game minutes elapsed
     const timeEntities = world.query().with(CT.Time).executeEntities();
     let gameMinutesElapsed = 0;
@@ -38,7 +41,7 @@ export class NeedsSystem implements System {
     if (gameMinutesElapsed === 0) {
       gameMinutesElapsed = deltaTime / 60;
     }
-    for (const entity of entities) {
+    for (const entity of activeEntities) {
       const impl = entity as EntityImpl;
       const needs = impl.getComponent<NeedsComponent>(CT.Needs)!;
 

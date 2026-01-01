@@ -66,9 +66,6 @@ export class ContextMenuRenderer {
       return;
     }
 
-    // DEBUG: Log render call
-    console.log(`[ContextMenuRenderer] render() called with ${items.length} items at (${centerX}, ${centerY})`);
-
     this.ctx.save();
 
     // NOTE: DO NOT call setTransform here - the main Renderer already applies ctx.scale(dpr, dpr)
@@ -78,8 +75,6 @@ export class ContextMenuRenderer {
     // Get radii from first item (all items should have same radii)
     const innerRadius = items[0]?.innerRadius ?? 30;
     const outerRadius = items[0]?.outerRadius ?? 100;
-
-    console.log(`[ContextMenuRenderer] Drawing circles at (${centerX}, ${centerY}) with radii ${innerRadius}-${outerRadius}`);
 
     // Draw menu background circle
     this.ctx.beginPath();
@@ -102,8 +97,6 @@ export class ContextMenuRenderer {
     for (const item of items) {
       this.renderItem(item, centerX, centerY);
     }
-
-    console.log('[ContextMenuRenderer] render() complete');
 
     this.ctx.restore();
   }
@@ -230,8 +223,6 @@ export class ContextMenuRenderer {
     style: AnimationStyle,
     progress: number
   ): void {
-    console.log(`[ContextMenuRenderer] renderOpenAnimation() called with style=${style}, progress=${progress}`);
-
     this.ctx.save();
 
     // NOTE: DO NOT call setTransform - main Renderer already applied ctx.scale(dpr, dpr)
@@ -275,8 +266,6 @@ export class ContextMenuRenderer {
     style: AnimationStyle,
     progress: number
   ): void {
-    console.log(`[ContextMenuRenderer] renderCloseAnimation() called with style=${style}, progress=${progress}`);
-
     this.ctx.save();
 
     // NOTE: DO NOT call setTransform - main Renderer already applied ctx.scale(dpr, dpr)

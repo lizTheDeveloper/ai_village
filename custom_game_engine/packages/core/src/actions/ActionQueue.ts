@@ -43,6 +43,9 @@ export class ActionQueue implements IActionQueue {
     { remainingTicks: number }
   >();
 
+  // Performance: Cache time entity to avoid querying every tick
+  private timeEntityId: string | null = null;
+
   constructor(
     private registry: IActionRegistry,
     private getCurrentTick: () => Tick
@@ -266,17 +269,26 @@ export class ActionQueue implements IActionQueue {
   /**
    * Get the current speed multiplier from the world's time component.
    * Returns 1 (normal speed) if no time component exists.
+   * Performance: Caches time entity to avoid querying every tick.
    */
   private getSpeedMultiplier(world: WorldMutator): number {
-    const timeEntities = world.query().with(ComponentType.Time).executeEntities();
-    const timeEntity = timeEntities[0];
-
-    if (!timeEntity) {
-      return 1; // Default to 1x speed if no time entity
+    if (!this.timeEntityId) {
+      const timeEntities = world.query().with(ComponentType.Time).executeEntities();
+      if (timeEntities.length > 0) {
+        this.timeEntityId = timeEntities[0]!.id;
+      }
     }
 
-    const timeComponent = timeEntity.components.get(ComponentType.Time) as { speedMultiplier: number } | undefined;
+    if (this.timeEntityId) {
+      const timeEntity = world.getEntity(this.timeEntityId);
+      if (timeEntity) {
+        const timeComponent = timeEntity.components.get(ComponentType.Time) as { speedMultiplier: number } | undefined;
+        return timeComponent?.speedMultiplier ?? 1;
+      } else {
+        this.timeEntityId = null;
+      }
+    }
 
-    return timeComponent?.speedMultiplier ?? 1;
+    return 1;
   }
 }

@@ -77,16 +77,26 @@ export class MenuContext {
       throw new Error('MenuContext.fromClick requires non-negative screen coordinates');
     }
 
-    // Convert screen to world coordinates
-    const worldPos = camera.screenToWorld(screenX, screenY);
+    // Convert screen to world coordinates (in pixels)
+    const worldPosPixels = camera.screenToWorld(screenX, screenY);
+
+    // Convert world pixels to tile coordinates
+    // NOTE: Tile size is 16 pixels (from Renderer.tileSize)
+    const TILE_SIZE = 16;
+    const worldPosTiles = {
+      x: worldPosPixels.x / TILE_SIZE,
+      y: worldPosPixels.y / TILE_SIZE,
+      z: worldPosPixels.z
+    };
 
     // Find entities at this position
-    const clickRadius = 16; // Detection radius in world units
+    // Click radius in TILES (was in pixels before, which was too small)
+    const clickRadiusTiles = 1.5; // 1.5 tiles = reasonable click tolerance
     const entitiesAtPosition = this.getEntitiesNearPosition(
       world,
-      worldPos.x,
-      worldPos.y,
-      clickRadius
+      worldPosTiles.x,
+      worldPosTiles.y,
+      clickRadiusTiles
     );
 
     // Determine target type and entity with priority order: agent > building > resource
@@ -118,12 +128,13 @@ export class MenuContext {
     const selectedEntities = this.getSelectedEntityIds(world);
 
     // Check if tile is walkable and buildable (for empty tiles)
-    const isWalkable = this.checkWalkable(world, worldPos.x, worldPos.y);
-    const isBuildable = this.checkBuildable(world, worldPos.x, worldPos.y);
+    // Use TILE coordinates for these checks
+    const isWalkable = this.checkWalkable(world, worldPosTiles.x, worldPosTiles.y);
+    const isBuildable = this.checkBuildable(world, worldPosTiles.x, worldPosTiles.y);
 
     return new MenuContext(
       { x: screenX, y: screenY },
-      worldPos,
+      worldPosTiles, // Use tile coordinates for world position
       targetType,
       targetEntity,
       selectedEntities,
@@ -247,6 +258,9 @@ export class MenuContext {
 
   /**
    * Get entities near a world position.
+   * @param x - X coordinate in TILE units (not pixels)
+   * @param y - Y coordinate in TILE units (not pixels)
+   * @param radius - Detection radius in TILE units
    */
   private static getEntitiesNearPosition(
     world: World,
@@ -258,6 +272,7 @@ export class MenuContext {
     const radiusSquared = radius * radius;
 
     // Query all entities with position components
+    // NOTE: Entity positions are stored in TILE coordinates
     for (const entity of Array.from(world.entities.values())) {
       const pos = (entity as EntityImpl).getComponent('position') as any;
       if (!pos) continue;

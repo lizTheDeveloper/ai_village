@@ -319,7 +319,10 @@ export class MoodSystem implements System {
       return;
     }
 
-    for (const entity of entities) {
+    // Use SimulationScheduler to only process active entities
+    const activeEntities = world.simulationScheduler.filterActiveEntities(entities, world.tick);
+
+    for (const entity of activeEntities) {
       this.updateAgentMood(entity as EntityImpl, world);
     }
   }

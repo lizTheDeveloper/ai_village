@@ -155,13 +155,14 @@ export function isInSimulationRange(
   const position = entity.components.get('position') as { x: number; y: number } | undefined;
   if (!position) return false;
 
-  // Check if within range of any agent
+  // Check if within range of any agent (using squared distance to avoid sqrt)
+  const rangeSquared = range * range;
   for (const agentPos of agentPositions) {
     const dx = position.x - agentPos.x;
     const dy = position.y - agentPos.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const distanceSquared = dx * dx + dy * dy;
 
-    if (distance <= range) {
+    if (distanceSquared <= rangeSquared) {
       return true;
     }
   }

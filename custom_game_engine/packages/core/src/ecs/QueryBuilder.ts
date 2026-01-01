@@ -76,33 +76,40 @@ export class QueryBuilder implements IQueryBuilder {
   }
 
   executeEntities(): ReadonlyArray<Entity> {
-    let entities = Array.from(this.world.entities.values());
+    const result: Entity[] = [];
 
-    for (const filter of this.filters) {
-      entities = this.applyFilter(entities, filter);
+    for (const entity of this.world.entities.values()) {
+      if (this.matchesAllFilters(entity)) {
+        result.push(entity);
+      }
     }
 
-    return entities;
+    return result;
   }
 
-  private applyFilter(entities: Entity[], filter: QueryFilter): Entity[] {
+  private matchesAllFilters(entity: Entity): boolean {
+    for (const filter of this.filters) {
+      if (!this.matchesFilter(entity, filter)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private matchesFilter(entity: Entity, filter: QueryFilter): boolean {
     switch (filter.type) {
       case 'components': {
         const components = filter.data as ComponentType[];
-        return entities.filter((e) =>
-          components.every((c) => e.components.has(c))
-        );
+        return components.every((c) => entity.components.has(c));
       }
 
       case 'tags': {
         const tags = filter.data as string[];
-        return entities.filter((e) => {
-          const tagsComp = e.components.get('tags') as
-            | { tags: string[] }
-            | undefined;
-          if (!tagsComp) return false;
-          return tags.some((t) => tagsComp.tags.includes(t));
-        });
+        const tagsComp = entity.components.get('tags') as
+          | { tags: string[] }
+          | undefined;
+        if (!tagsComp) return false;
+        return tags.some((t) => tagsComp.tags.includes(t));
       }
 
       case 'rect': {
@@ -112,18 +119,16 @@ export class QueryBuilder implements IQueryBuilder {
           width: number;
           height: number;
         };
-        return entities.filter((e) => {
-          const pos = e.components.get('position') as
-            | { x: number; y: number }
-            | undefined;
-          if (!pos) return false;
-          return (
-            pos.x >= x &&
-            pos.x < x + width &&
-            pos.y >= y &&
-            pos.y < y + height
-          );
-        });
+        const pos = entity.components.get('position') as
+          | { x: number; y: number }
+          | undefined;
+        if (!pos) return false;
+        return (
+          pos.x >= x &&
+          pos.x < x + width &&
+          pos.y >= y &&
+          pos.y < y + height
+        );
       }
 
       case 'chunk': {
@@ -131,13 +136,11 @@ export class QueryBuilder implements IQueryBuilder {
           chunkX: number;
           chunkY: number;
         };
-        return entities.filter((e) => {
-          const pos = e.components.get('position') as
-            | { chunkX: number; chunkY: number }
-            | undefined;
-          if (!pos) return false;
-          return pos.chunkX === chunkX && pos.chunkY === chunkY;
-        });
+        const pos = entity.components.get('position') as
+          | { chunkX: number; chunkY: number }
+          | undefined;
+        if (!pos) return false;
+        return pos.chunkX === chunkX && pos.chunkY === chunkY;
       }
 
       case 'near': {
@@ -145,30 +148,30 @@ export class QueryBuilder implements IQueryBuilder {
           entityId: EntityId;
           radius: number;
         };
+        if (entity.id === entityId) return false;
+
         const targetEntity = this.world.getEntity(entityId);
-        if (!targetEntity) return [];
+        if (!targetEntity) return false;
 
         const targetPos = targetEntity.components.get('position') as
           | { x: number; y: number }
           | undefined;
-        if (!targetPos) return [];
+        if (!targetPos) return false;
 
-        return entities.filter((e) => {
-          if (e.id === entityId) return false;
-          const pos = e.components.get('position') as
-            | { x: number; y: number }
-            | undefined;
-          if (!pos) return false;
+        const pos = entity.components.get('position') as
+          | { x: number; y: number }
+          | undefined;
+        if (!pos) return false;
 
-          const dx = pos.x - targetPos.x;
-          const dy = pos.y - targetPos.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          return distance <= radius;
-        });
+        const dx = pos.x - targetPos.x;
+        const dy = pos.y - targetPos.y;
+        const distanceSquared = dx * dx + dy * dy;
+        return distanceSquared <= radius * radius;
       }
 
       default:
-        return entities;
+        return true;
     }
   }
+
 }

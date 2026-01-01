@@ -245,6 +245,7 @@ export class WorldImpl implements WorldMutator {
   private _gameTime: GameTime;
   private _entities = new Map<EntityId, Entity>();
   private _features: Map<string, boolean> = new Map();
+  private _featuresCache: FeatureFlags | null = null;
   private _eventBus: EventBus;
   private _chunkManager?: IChunkManager;
   private _terrainGenerator?: ITerrainGenerator;
@@ -296,11 +297,14 @@ export class WorldImpl implements WorldMutator {
   }
 
   get features(): FeatureFlags {
-    const flags: Record<string, boolean> = {};
-    for (const [key, value] of this._features) {
-      flags[key] = value;
+    if (!this._featuresCache) {
+      const flags: Record<string, boolean> = {};
+      for (const [key, value] of this._features) {
+        flags[key] = value;
+      }
+      this._featuresCache = flags;
     }
-    return flags;
+    return this._featuresCache;
   }
 
   query(): IQueryBuilder {
@@ -458,6 +462,7 @@ export class WorldImpl implements WorldMutator {
 
   setFeature(feature: string, enabled: boolean): void {
     this._features.set(feature, enabled);
+    this._featuresCache = null;
   }
 
   private calculateGameTime(tick: Tick): GameTime {
@@ -506,8 +511,12 @@ export class WorldImpl implements WorldMutator {
     const CHUNK_SIZE = 32; // Must match value in world package
     const chunkX = Math.floor(x / CHUNK_SIZE);
     const chunkY = Math.floor(y / CHUNK_SIZE);
-    const localX = ((x % CHUNK_SIZE) + CHUNK_SIZE) % CHUNK_SIZE;
-    const localY = ((y % CHUNK_SIZE) + CHUNK_SIZE) % CHUNK_SIZE;
+
+    // Optimize modulo for common case (positive coordinates)
+    let localX = x % CHUNK_SIZE;
+    if (localX < 0) localX += CHUNK_SIZE;
+    let localY = y % CHUNK_SIZE;
+    if (localY < 0) localY += CHUNK_SIZE;
 
     // Get chunk (creates if doesn't exist)
     const chunk = this._chunkManager.getChunk(chunkX, chunkY);

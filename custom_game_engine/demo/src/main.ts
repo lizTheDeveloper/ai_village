@@ -2747,7 +2747,7 @@ async function main() {
 
     // Context menu rendering - MUST be last to render on top of all other UI
     panels.contextMenuManager.update();
-    panels.contextMenuManager.render();
+    panels.contextMenuManager.render(ctx);
 
     requestAnimationFrame(renderLoop);
   }

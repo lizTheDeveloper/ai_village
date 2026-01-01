@@ -376,6 +376,9 @@ export class MovementSystem implements System {
    * Calculate soft collision penalty from nearby agents/physics entities.
    * Returns a multiplier between 0.2 (very crowded) and 1.0 (no collision).
    * Agents can push through each other but move slower when overlapping.
+   *
+   * Performance: Uses chunk-based spatial lookup instead of querying all physics entities.
+   * Only checks entities in current and adjacent chunks (9 chunks max).
    */
   private getSoftCollisionPenalty(
     world: World,
@@ -383,36 +386,54 @@ export class MovementSystem implements System {
     x: number,
     y: number
   ): number {
-    const physicsQuery = world.query().with(CT.Position).with(CT.Physics);
-    const physicsEntities = physicsQuery.executeEntities();
-
     let penalty = 1.0;
     const softCollisionRadius = 0.8; // Start slowing at this distance
     const minPenalty = 0.2; // Never slow below 20% speed
+    const CHUNK_SIZE = 32;
 
-    for (const entity of physicsEntities) {
-      if (entity.id === entityId) {
-        continue;
-      }
+    // Calculate current chunk
+    const chunkX = Math.floor(x / CHUNK_SIZE);
+    const chunkY = Math.floor(y / CHUNK_SIZE);
 
-      const impl = entity as EntityImpl;
-      const pos = impl.getComponent<PositionComponent>(CT.Position)!;
-      const physics = impl.getComponent<PhysicsComponent>(CT.Physics)!;
+    // Check current chunk and adjacent chunks (3x3 grid = 9 chunks)
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dy = -1; dy <= 1; dy++) {
+        const nearbyEntityIds = world.getEntitiesInChunk(chunkX + dx, chunkY + dy);
 
-      if (!physics.solid) {
-        continue;
-      }
+        for (const nearbyId of nearbyEntityIds) {
+          if (nearbyId === entityId) {
+            continue;
+          }
 
-      const distance = Math.sqrt(
-        Math.pow(pos.x - x, 2) + Math.pow(pos.y - y, 2)
-      );
+          const nearbyEntity = world.entities.get(nearbyId);
+          if (!nearbyEntity) continue;
 
-      // Apply graduated slowdown based on proximity
-      if (distance < softCollisionRadius) {
-        // Linear interpolation: at distance 0 -> minPenalty, at softCollisionRadius -> 1.0
-        const proximityFactor = distance / softCollisionRadius;
-        const thisPenalty = minPenalty + (1 - minPenalty) * proximityFactor;
-        penalty = Math.min(penalty, thisPenalty);
+          const impl = nearbyEntity as EntityImpl;
+          const pos = impl.getComponent<PositionComponent>(CT.Position);
+          const physics = impl.getComponent<PhysicsComponent>(CT.Physics);
+
+          if (!pos || !physics || !physics.solid) {
+            continue;
+          }
+
+          // Manhattan distance early exit (fast)
+          const manhattanDist = Math.abs(pos.x - x) + Math.abs(pos.y - y);
+          if (manhattanDist > softCollisionRadius * 2) {
+            continue;
+          }
+
+          // Euclidean distance for precision
+          const distance = Math.sqrt(
+            Math.pow(pos.x - x, 2) + Math.pow(pos.y - y, 2)
+          );
+
+          // Apply graduated slowdown based on proximity
+          if (distance < softCollisionRadius) {
+            const proximityFactor = distance / softCollisionRadius;
+            const thisPenalty = minPenalty + (1 - minPenalty) * proximityFactor;
+            penalty = Math.min(penalty, thisPenalty);
+          }
+        }
       }
     }
 

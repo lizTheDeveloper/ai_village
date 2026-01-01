@@ -81,11 +81,18 @@ export class MemoryFormationSystem implements System {
   public readonly priority: number = 100;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
+  // Performance optimization: rate limit memory formation
+  private static readonly MAX_MEMORIES_PER_AGENT_PER_GAME_HOUR = 20;
+  private static readonly TICKS_PER_GAME_HOUR = 600; // 10 ticks/min * 60 min
+
   private eventBus: EventBus;
   private pendingMemories: Map<string, PendingMemory[]> = new Map();
   private requiredAgents: Set<string> = new Set(); // Agents that MUST exist (not from conversation)
   private pendingBroadcasts: PendingBroadcast[] = [];
   private pendingError: Error | null = null; // Store errors from event handlers to re-throw in update()
+
+  // Track memory formation rate per agent
+  private memoryFormationTimes: Map<string, number[]> = new Map();
 
   constructor(eventBus: EventBus) {
     this.eventBus = eventBus;
@@ -351,9 +358,19 @@ export class MemoryFormationSystem implements System {
       }
 
       const memories = this.pendingMemories.get(agentId)!;
+      const currentTick = world.tick;
+
       for (const { eventType, data } of memories) {
+        // PERFORMANCE FIX: Check rate limiting before forming memory
+        if (this._isMemoryRateLimited(agentId, currentTick)) {
+          // Skip this memory due to rate limiting
+          continue;
+        }
+
         if (this._shouldFormMemory(eventType, data)) {
           this._formMemory(memComp, eventType, data, world);
+          // Record memory formation for rate limiting
+          this._recordMemoryFormation(agentId, currentTick);
         }
       }
     }
@@ -421,7 +438,38 @@ export class MemoryFormationSystem implements System {
     return `World event: ${eventType}`;
   }
 
+  /**
+   * Check if memory formation should be throttled for this agent
+   * Performance optimization: prevents memory bloat from excessive event formation
+   */
+  private _isMemoryRateLimited(agentId: string, currentTick: number): boolean {
+    if (!this.memoryFormationTimes.has(agentId)) {
+      this.memoryFormationTimes.set(agentId, []);
+    }
+
+    const times = this.memoryFormationTimes.get(agentId)!;
+
+    // Remove entries older than 1 game hour
+    const cutoffTick = currentTick - MemoryFormationSystem.TICKS_PER_GAME_HOUR;
+    const recentTimes = times.filter(t => t > cutoffTick);
+    this.memoryFormationTimes.set(agentId, recentTimes);
+
+    // Check if rate limit exceeded
+    return recentTimes.length >= MemoryFormationSystem.MAX_MEMORIES_PER_AGENT_PER_GAME_HOUR;
+  }
+
+  /**
+   * Record that a memory was formed for rate limiting
+   */
+  private _recordMemoryFormation(agentId: string, currentTick: number): void {
+    if (!this.memoryFormationTimes.has(agentId)) {
+      this.memoryFormationTimes.set(agentId, []);
+    }
+    this.memoryFormationTimes.get(agentId)!.push(currentTick);
+  }
+
   private _shouldFormMemory(eventType: string, data: MemoryTriggerEvent): boolean {
+    // Conversations always remembered (social interactions are important)
     if (eventType === 'conversation:utterance') {
       return true;
     }
@@ -451,14 +499,13 @@ export class MemoryFormationSystem implements System {
       return Math.random() < 0.001;
     }
 
-    // Always remember these events
+    // PERFORMANCE FIX: Reduced "alwaysRememberEvents" to only truly critical events
+    // Removed frequent events: agent:harvested, resource:gathered, items:deposited
+    // These will still be remembered if they meet importance thresholds below
     const alwaysRememberEvents = [
       'need:critical',
       'agent:starved',
       'agent:collapsed',
-      'agent:harvested',
-      'resource:gathered',
-      'items:deposited',
       'storage:full',
       'conversation:started',
       'information:shared',

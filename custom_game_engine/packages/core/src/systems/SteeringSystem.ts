@@ -254,6 +254,7 @@ export class SteeringSystem implements System {
 
   /**
    * Obstacle avoidance - check only immediate nearby tiles (simplified for performance)
+   * Performance: Uses chunk-based spatial lookup instead of scanning all entities.
    */
   private _avoidObstacles(entity: Entity, position: PositionComponent, velocity: VelocityComponent, steering: SteeringComponent, world: World): Vector2 {
     const lookAheadDistance = steering.lookAheadDistance ?? 2.0; // Reduced from 5.0 to 2.0
@@ -267,26 +268,39 @@ export class SteeringSystem implements System {
       y: position.y + (velocity.vy / speed) * lookAheadDistance,
     };
 
-    // OPTIMIZATION: Use SimulationScheduler to filter obstacles to only visible entities
-    // Buildings and agents are always checked (not filtered), but other obstacles are filtered
+    // OPTIMIZATION: Use chunk-based spatial index for nearby entity lookup
     const checkRadius = 3.0;
-    const allEntities = Array.from(world.entities.values());
-    const obstacles = allEntities.filter((e: Entity) => {
-      if (e.id === entity.id) return false;
-      if (!e.components.has('collision')) return false;
+    const CHUNK_SIZE = 32;
+    const chunkX = Math.floor(position.x / CHUNK_SIZE);
+    const chunkY = Math.floor(position.y / CHUNK_SIZE);
 
-      const obstaclePos = getPosition(e);
-      const collision = e.components.get('collision') as unknown as { radius: number } | undefined;
-      if (!obstaclePos || !collision) return false;
+    // Collect obstacles from nearby chunks
+    const obstacles: Entity[] = [];
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dy = -1; dy <= 1; dy++) {
+        const nearbyEntityIds = world.getEntitiesInChunk(chunkX + dx, chunkY + dy);
+        for (const nearbyId of nearbyEntityIds) {
+          if (nearbyId === entity.id) continue;
 
-      // Quick distance check to filter out far obstacles BEFORE detailed checks
-      const quickDist = Math.abs(obstaclePos.x - position.x) + Math.abs(obstaclePos.y - position.y);
-      if (quickDist > checkRadius * 2) return false; // Manhattan distance early exit
+          const e = world.entities.get(nearbyId);
+          if (!e || !e.components.has('collision')) continue;
 
-      // Check if obstacle is in path
-      const dist = this._distance(ahead, obstaclePos);
-      return dist <= collision.radius + 1.0;
-    });
+          const obstaclePos = getPosition(e);
+          const collision = e.components.get('collision') as unknown as { radius: number } | undefined;
+          if (!obstaclePos || !collision) continue;
+
+          // Quick distance check to filter out far obstacles BEFORE detailed checks
+          const quickDist = Math.abs(obstaclePos.x - position.x) + Math.abs(obstaclePos.y - position.y);
+          if (quickDist > checkRadius * 2) continue; // Manhattan distance early exit
+
+          // Check if obstacle is in path
+          const dist = this._distance(ahead, obstaclePos);
+          if (dist <= collision.radius + 1.0) {
+            obstacles.push(e);
+          }
+        }
+      }
+    }
 
     if (obstacles.length === 0) {
       return { x: 0, y: 0 };

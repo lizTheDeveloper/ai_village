@@ -11,6 +11,15 @@ describe('ContextMenuManager', () => {
   let camera: Camera;
   let canvas: HTMLCanvasElement;
 
+  // Helper: Convert tile coordinates to screen coordinates
+  // Entities use tile coordinates, but worldToScreen expects world pixels
+  const TILE_SIZE = 16;
+  function tileToScreen(tileX: number, tileY: number): { x: number; y: number } {
+    const worldPixelX = tileX * TILE_SIZE;
+    const worldPixelY = tileY * TILE_SIZE;
+    return camera.worldToScreen(worldPixelX, worldPixelY);
+  }
+
   beforeEach(() => {
     vi.useFakeTimers();
     world = new WorldImpl();
@@ -188,7 +197,7 @@ describe('ContextMenuManager', () => {
       agent.addComponent({ type: 'agent', version: 1, name: 'Test Agent' });
 
       // Click on agent position
-      const screenPos = camera.worldToScreen(50, 50);
+      const screenPos = tileToScreen(50, 50);
       manager.open(screenPos.x, screenPos.y);
 
       const context = manager.getContext();
@@ -206,7 +215,7 @@ describe('ContextMenuManager', () => {
         locked: false
       });
 
-      const screenPos = camera.worldToScreen(100, 100);
+      const screenPos = tileToScreen(100, 100);
       manager.open(screenPos.x, screenPos.y);
 
       const context = manager.getContext();
@@ -219,7 +228,7 @@ describe('ContextMenuManager', () => {
       resource.addComponent({ type: 'position', version: 1, x: 75, y: 75 });
       resource.addComponent({ type: 'harvestable', version: 1, resourceType: 'berries', amount: 10 });
 
-      const screenPos = camera.worldToScreen(75, 75);
+      const screenPos = tileToScreen(75, 75);
       manager.open(screenPos.x, screenPos.y);
 
       const context = manager.getContext();
@@ -255,7 +264,7 @@ describe('ContextMenuManager', () => {
       const agent = world.createEntity();
       agent.addComponent({ type: 'position', version: 1, x: 50, y: 50 });
       agent.addComponent({ type: 'agent', version: 1, name: 'Test' });
-      const screenPos = camera.worldToScreen(50, 50);
+      const screenPos = tileToScreen(50, 50);
       manager.close();
       manager.open(screenPos.x, screenPos.y);
       const agentActions = manager.getVisibleItems().map(item => item.actionId);
@@ -281,7 +290,7 @@ describe('ContextMenuManager', () => {
     });
 
     it('should include "Move Here" when agent is selected', () => {
-      const screenPos = camera.worldToScreen(100, 100);
+      const screenPos = tileToScreen(100, 100);
       manager.open(screenPos.x, screenPos.y);
 
       const actions = manager.getVisibleItems();
@@ -290,7 +299,7 @@ describe('ContextMenuManager', () => {
     });
 
     it('should include "Follow" action for agent target', () => {
-      const screenPos = camera.worldToScreen(100, 100);
+      const screenPos = tileToScreen(100, 100);
       manager.open(screenPos.x, screenPos.y);
 
       const actions = manager.getVisibleItems();
@@ -299,7 +308,7 @@ describe('ContextMenuManager', () => {
     });
 
     it('should include "Talk To" action for agent target', () => {
-      const screenPos = camera.worldToScreen(100, 100);
+      const screenPos = tileToScreen(100, 100);
       manager.open(screenPos.x, screenPos.y);
 
       const actions = manager.getVisibleItems();
@@ -308,7 +317,7 @@ describe('ContextMenuManager', () => {
     });
 
     it('should include "Inspect" action for agent target', () => {
-      const screenPos = camera.worldToScreen(100, 100);
+      const screenPos = tileToScreen(100, 100);
       manager.open(screenPos.x, screenPos.y);
 
       const actions = manager.getVisibleItems();
@@ -319,7 +328,7 @@ describe('ContextMenuManager', () => {
     it('should disable "Follow" when no agent is selected', () => {
       selectedAgent.removeComponent('selectable');
 
-      const screenPos = camera.worldToScreen(100, 100);
+      const screenPos = tileToScreen(100, 100);
       manager.open(screenPos.x, screenPos.y);
 
       const actions = manager.getVisibleItems();
@@ -332,7 +341,7 @@ describe('ContextMenuManager', () => {
       const handler = vi.fn();
       eventBus.on('ui:contextmenu:action_executed', handler);
 
-      const screenPos = camera.worldToScreen(100, 100);
+      const screenPos = tileToScreen(100, 100);
       manager.open(screenPos.x, screenPos.y);
       eventBus.flush(); // Flush open events
 
@@ -373,7 +382,7 @@ describe('ContextMenuManager', () => {
     });
 
     it('should include "Enter" when building is enterable', () => {
-      const screenPos = camera.worldToScreen(150, 150);
+      const screenPos = tileToScreen(150, 150);
       manager.open(screenPos.x, screenPos.y);
 
       const actions = manager.getVisibleItems();
@@ -388,7 +397,7 @@ describe('ContextMenuManager', () => {
         locked: true
       }));
 
-      const screenPos = camera.worldToScreen(150, 150);
+      const screenPos = tileToScreen(150, 150);
       manager.open(screenPos.x, screenPos.y);
 
       const actions = manager.getVisibleItems();
@@ -398,7 +407,7 @@ describe('ContextMenuManager', () => {
     });
 
     it('should include "Repair" when health < 100%', () => {
-      const screenPos = camera.worldToScreen(150, 150);
+      const screenPos = tileToScreen(150, 150);
       manager.open(screenPos.x, screenPos.y);
 
       const actions = manager.getVisibleItems();
@@ -412,7 +421,7 @@ describe('ContextMenuManager', () => {
         health: 1.0
       }));
 
-      const screenPos = camera.worldToScreen(150, 150);
+      const screenPos = tileToScreen(150, 150);
       manager.open(screenPos.x, screenPos.y);
 
       const actions = manager.getVisibleItems();
@@ -421,7 +430,7 @@ describe('ContextMenuManager', () => {
     });
 
     it('should include "Demolish" action', () => {
-      const screenPos = camera.worldToScreen(150, 150);
+      const screenPos = tileToScreen(150, 150);
       manager.open(screenPos.x, screenPos.y);
 
       const actions = manager.getVisibleItems();
@@ -430,7 +439,7 @@ describe('ContextMenuManager', () => {
     });
 
     it('should include "Inspect" action', () => {
-      const screenPos = camera.worldToScreen(150, 150);
+      const screenPos = tileToScreen(150, 150);
       manager.open(screenPos.x, screenPos.y);
 
       const actions = manager.getVisibleItems();
@@ -439,7 +448,7 @@ describe('ContextMenuManager', () => {
     });
 
     it('should mark "Demolish" as requiring confirmation', () => {
-      const screenPos = camera.worldToScreen(150, 150);
+      const screenPos = tileToScreen(150, 150);
       manager.open(screenPos.x, screenPos.y);
 
       const actions = manager.getVisibleItems();
@@ -591,7 +600,7 @@ describe('ContextMenuManager', () => {
     });
 
     it('should include "Harvest" action when amount > 0', () => {
-      const screenPos = camera.worldToScreen(200, 200);
+      const screenPos = tileToScreen(200, 200);
       manager.open(screenPos.x, screenPos.y);
 
       const actions = manager.getVisibleItems();
@@ -606,7 +615,7 @@ describe('ContextMenuManager', () => {
         amount: 0
       }));
 
-      const screenPos = camera.worldToScreen(200, 200);
+      const screenPos = tileToScreen(200, 200);
       manager.open(screenPos.x, screenPos.y);
 
       const actions = manager.getVisibleItems();
@@ -621,7 +630,7 @@ describe('ContextMenuManager', () => {
       agent.addComponent({ type: 'agent', version: 1, name: 'Worker' });
       agent.addComponent({ type: 'selectable', version: 1, selected: true });
 
-      const screenPos = camera.worldToScreen(200, 200);
+      const screenPos = tileToScreen(200, 200);
       manager.open(screenPos.x, screenPos.y);
 
       const actions = manager.getVisibleItems();
@@ -631,7 +640,7 @@ describe('ContextMenuManager', () => {
     });
 
     it('should include "Prioritize" submenu with priority options', () => {
-      const screenPos = camera.worldToScreen(200, 200);
+      const screenPos = tileToScreen(200, 200);
       manager.open(screenPos.x, screenPos.y);
 
       const actions = manager.getVisibleItems();
@@ -649,7 +658,7 @@ describe('ContextMenuManager', () => {
     });
 
     it('should include "Info" action to show resource details', () => {
-      const screenPos = camera.worldToScreen(200, 200);
+      const screenPos = tileToScreen(200, 200);
       manager.open(screenPos.x, screenPos.y);
 
       const actions = manager.getVisibleItems();
@@ -793,7 +802,7 @@ describe('ContextMenuManager', () => {
         canEnter: false,
         locked: false });
 
-      const screenPos = camera.worldToScreen(150, 150);
+      const screenPos = tileToScreen(150, 150);
       manager.open(screenPos.x, screenPos.y);
       eventBus.flush(); // Flush open event
 
@@ -825,7 +834,7 @@ describe('ContextMenuManager', () => {
         canEnter: false,
         locked: false });
 
-      const screenPos = camera.worldToScreen(150, 150);
+      const screenPos = tileToScreen(150, 150);
       manager.open(screenPos.x, screenPos.y);
       eventBus.flush(); // Flush open event
 
@@ -850,7 +859,7 @@ describe('ContextMenuManager', () => {
         canEnter: false,
         locked: false });
 
-      const screenPos = camera.worldToScreen(150, 150);
+      const screenPos = tileToScreen(150, 150);
       const context = MenuContext.fromClick(world, camera, screenPos.x, screenPos.y);
 
       const actionHandler = vi.fn();
@@ -962,7 +971,7 @@ describe('ContextMenuManager', () => {
       agent.addComponent({ type: 'position', version: 1, x: 100, y: 100 });
       agent.addComponent({ type: 'agent', version: 1, name: 'Test' });
 
-      const screenPos = camera.worldToScreen(100, 100);
+      const screenPos = tileToScreen(100, 100);
       manager.open(screenPos.x, screenPos.y);
 
       const context = manager.getContext();

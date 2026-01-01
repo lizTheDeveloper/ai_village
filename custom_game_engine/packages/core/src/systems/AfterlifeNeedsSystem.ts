@@ -35,6 +35,9 @@ export class AfterlifeNeedsSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['afterlife', 'realm_location'];
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+    // Use SimulationScheduler to only process active entities
+    const activeEntities = world.simulationScheduler.filterActiveEntities(entities, world.tick);
+
     // Get current game tick for forgotten calculation
     const currentTick = world.tick;
     let gameMinutesElapsed = 0;
@@ -57,7 +60,7 @@ export class AfterlifeNeedsSystem implements System {
       gameMinutesElapsed = deltaTime / 60;
     }
 
-    for (const entity of entities) {
+    for (const entity of activeEntities) {
       const impl = entity as EntityImpl;
       const afterlife = impl.getComponent<AfterlifeComponent>('afterlife');
       const realmLocation = impl.getComponent<RealmLocationComponent>('realm_location');
