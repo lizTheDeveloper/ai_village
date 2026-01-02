@@ -346,6 +346,7 @@ export class InteractionAPI {
   /**
    * Eat fruit directly from a plant (e.g., berry bush).
    * Use this when agent's inventory is full but they need to eat.
+   * CRITICAL: Handles harvestResetStage to enable berry regrowth.
    */
   eatFromPlant(
     agent: EntityImpl,
@@ -361,6 +362,7 @@ export class InteractionAPI {
     const plant = plantImpl.getComponent(ComponentType.Plant) as {
       speciesId: string;
       fruitCount: number;
+      stage: string;
     } | undefined;
 
     if (!plant) {
@@ -371,11 +373,25 @@ export class InteractionAPI {
       return { success: false, message: 'Plant has no fruit' };
     }
 
+    // Get species definition to check for harvestResetStage
+    const species = (world as any).plantSpeciesLookup?.(plant.speciesId);
+    const newFruitCount = Math.max(0, plant.fruitCount - 1);
+
     // Consume one fruit from the plant
-    plantImpl.updateComponent(ComponentType.Plant, (current: any) => ({
-      ...current,
-      fruitCount: Math.max(0, current.fruitCount - 1),
-    }));
+    // CRITICAL FIX: If all fruit consumed AND species has harvestResetStage, reset plant stage to allow regrowth
+    plantImpl.updateComponent(ComponentType.Plant, (current: any) => {
+      const updated = {
+        ...current,
+        fruitCount: newFruitCount,
+      };
+
+      // If all fruit harvested and species supports regrowth, reset stage
+      if (newFruitCount === 0 && species?.harvestResetStage && !species.harvestDestroysPlant) {
+        updated.stage = species.harvestResetStage;
+      }
+
+      return updated;
+    });
 
     // Determine food type from species (e.g., berry-bush -> berry)
     const foodType = this.getFoodTypeFromSpecies(plant.speciesId);

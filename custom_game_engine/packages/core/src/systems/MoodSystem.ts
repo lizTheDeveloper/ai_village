@@ -63,6 +63,14 @@ export class MoodSystem implements System {
   /** Distance threshold for detecting social meals */
   private readonly SOCIAL_MEAL_DISTANCE = 5;
 
+  /** Performance: Cache weather entity to avoid querying every update */
+  private weatherEntityId: string | null = null;
+
+  /** Performance: Cache building list with invalidation */
+  private buildingCache: ReadonlyArray<Entity> | null = null;
+  private buildingCacheValidUntil = 0;
+  private readonly BUILDING_CACHE_DURATION = 60; // 1 second at 60 TPS
+
   /**
    * Initialize the system.
    */
@@ -96,11 +104,44 @@ export class MoodSystem implements System {
       this.handleAteEvent(data.agentId, data.foodType, data.hungerRestored, data.quality, data.flavors);
     });
 
-    // Conversation events boost social mood
+    // Conversation started - small initial boost for social contact
     eventBus.subscribe('conversation:started', (event) => {
       const data = event.data as { participants: string[] };
       for (const agentId of data.participants) {
-        this.applyMoodBoost(agentId, 'social', 5);
+        this.applyMoodBoost(agentId, 'social', 3);
+      }
+    });
+
+    // Conversation ended - quality-based mood impact
+    eventBus.subscribe('conversation:ended', (event) => {
+      const data = event.data as {
+        participants: string[];
+        quality?: number;
+        depth?: number;
+        topics?: string[];
+      };
+
+      // Calculate mood boost based on conversation quality
+      // Base mood boost for any conversation
+      const baseMood = 3;
+
+      // Quality bonus (0-7 additional mood based on 0-1 quality)
+      const qualityBonus = (data.quality ?? 0.5) * 7;
+
+      // Depth bonus - deep conversations are fulfilling
+      const depthBonus = (data.depth ?? 0.5) * 3;
+
+      // Total mood
+      const totalMood = baseMood + qualityBonus + depthBonus;
+
+      // Apply to all participants
+      for (const agentId of data.participants) {
+        this.applyMoodBoost(agentId, 'social', totalMood);
+
+        // Extra fulfillment boost for deep conversations
+        if ((data.depth ?? 0) > 0.7) {
+          this.applyMoodBoost(agentId, 'achievement', 5);
+        }
       }
     });
 
@@ -110,6 +151,17 @@ export class MoodSystem implements System {
       if (data.builderId) {
         this.applyMoodBoost(data.builderId, 'achievement', 15);
       }
+      // Invalidate building cache
+      this.buildingCache = null;
+    });
+
+    // Invalidate building cache on building changes
+    eventBus.subscribe('building:destroyed', () => {
+      this.buildingCache = null;
+    });
+
+    eventBus.subscribe('building:placement:confirmed', () => {
+      this.buildingCache = null;
     });
 
     // Research completion boosts achievement mood
@@ -461,15 +513,19 @@ export class MoodSystem implements System {
     let isSheltered = false;
     let currentBuildingHarmony = 0;
 
-    // Check if inside a building (within its interior radius)
+    // Check if inside a building (within its interior radius) - cached lookup
     const pos = entity.getComponent(CT.Position) as { x: number; y: number } | undefined;
     if (pos) {
-      const buildings = world.query()
-        .with(CT.Building)
-        .with(CT.Position)
-        .executeEntities();
+      // Get cached buildings or query if cache expired
+      if (!this.buildingCache || world.tick >= this.buildingCacheValidUntil) {
+        this.buildingCache = world.query()
+          .with(CT.Building)
+          .with(CT.Position)
+          .executeEntities();
+        this.buildingCacheValidUntil = world.tick + this.BUILDING_CACHE_DURATION;
+      }
 
-      for (const building of buildings) {
+      for (const building of this.buildingCache) {
         const buildingImpl = building as EntityImpl;
         const buildingPos = buildingImpl.getComponent(CT.Position) as { x: number; y: number } | undefined;
         const buildingComp = buildingImpl.getComponent<BuildingComponent>(CT.Building);
@@ -481,10 +537,11 @@ export class MoodSystem implements System {
 
         const dx = pos.x - buildingPos.x;
         const dy = pos.y - buildingPos.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        const distanceSquared = dx * dx + dy * dy;
+        const radiusSquared = buildingComp.interiorRadius * buildingComp.interiorRadius;
 
-        // Agent must be within the building's interior radius
-        if (distance <= buildingComp.interiorRadius) {
+        // Agent must be within the building's interior radius (using squared distance)
+        if (distanceSquared <= radiusSquared) {
           isSheltered = true;
 
           // Check building harmony for aesthetic mood bonus
@@ -509,12 +566,20 @@ export class MoodSystem implements System {
       score += harmonyModifier * 50; // Scale from -0.5..+0.5 to -25..+25
     }
 
-    // Weather effects (if weather component exists on world)
+    // Weather effects (if weather component exists on world) - cached lookup
     // Being sheltered reduces weather impact
-    const weatherEntities = world.query().with(CT.Weather).executeEntities();
-    if (weatherEntities.length > 0) {
-      const weather = (weatherEntities[0] as EntityImpl).getComponent(CT.Weather) as { type: string } | undefined;
-      if (weather) {
+    if (!this.weatherEntityId) {
+      const weatherEntities = world.query().with(CT.Weather).executeEntities();
+      if (weatherEntities.length > 0) {
+        this.weatherEntityId = weatherEntities[0]!.id;
+      }
+    }
+
+    if (this.weatherEntityId) {
+      const weatherEntity = world.getEntity(this.weatherEntityId);
+      if (weatherEntity) {
+        const weather = (weatherEntity as EntityImpl).getComponent(CT.Weather) as { type: string } | undefined;
+        if (weather) {
         let weatherImpact = 0;
         switch (weather.type) {
           case 'sunny':
@@ -531,11 +596,15 @@ export class MoodSystem implements System {
             break;
         }
 
-        // Sheltered agents are protected from negative weather
-        if (isSheltered && weatherImpact < 0) {
-          weatherImpact *= 0.2; // Only 20% of bad weather affects sheltered agents
+          // Sheltered agents are protected from negative weather
+          if (isSheltered && weatherImpact < 0) {
+            weatherImpact *= 0.2; // Only 20% of bad weather affects sheltered agents
+          }
+          score += weatherImpact;
         }
-        score += weatherImpact;
+      } else {
+        // Weather entity was destroyed, reset cache
+        this.weatherEntityId = null;
       }
     }
 

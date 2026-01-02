@@ -47,6 +47,13 @@ export const OBSERVE_MAX_DURATION = 400;        // 20 seconds
 export const PRACTICE_MAX_DURATION = 500;       // 25 seconds
 export const REFLECT_MAX_DURATION = 200;        // 10 seconds
 
+// Combat durations (in ticks)
+// Duration scales based on power difference and lethality
+export const COMBAT_DURATION_MIN = 300;         // 15 seconds (quick skirmish)
+export const COMBAT_DURATION_BASE = 500;        // 25 seconds (normal fight)
+export const COMBAT_DURATION_EXTENDED = 700;    // 35 seconds (extended combat)
+export const COMBAT_DURATION_LETHAL = 900;      // 45 seconds (lethal/brutal fight)
+
 // Sleep durations (in game hours)
 export const SLEEP_MIN_HOURS = 4;
 export const SLEEP_MAX_HOURS = 12;

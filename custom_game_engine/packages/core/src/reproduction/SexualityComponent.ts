@@ -211,6 +211,23 @@ export class SexualityComponent extends ComponentBase {
   public activelySeeking: boolean = false;
 
   /**
+   * Jealousy intensity (0-1).
+   *
+   * Varies by species and individual:
+   * - 0.0 = No jealousy (polyamorous species, extra-temporal beings, hive minds)
+   * - 0.3 = Low jealousy (long-lived species, secure attachments)
+   * - 0.5 = Moderate jealousy (typical humans)
+   * - 0.7 = High jealousy (monogamous species, anxious attachments)
+   * - 1.0 = Extreme jealousy (possessive species, short-lived species)
+   *
+   * This is BASE jealousy - actual response is modulated by:
+   * - personality.neuroticism (multiplies intensity)
+   * - relationship strength (stronger bonds = more jealousy)
+   * - cultural norms (species mating paradigm)
+   */
+  public jealousyIntensity: number = 0.5;
+
+  /**
    * Entities this entity has rejected or been rejected by.
    */
   public rejections: Array<{

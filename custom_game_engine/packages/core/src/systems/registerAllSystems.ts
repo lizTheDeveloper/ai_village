@@ -49,6 +49,11 @@ import { BeliefGenerationSystem } from './BeliefGenerationSystem.js';
 import { CommunicationSystem } from './CommunicationSystem.js';
 import { SocialGradientSystem } from './SocialGradientSystem.js';
 import { VerificationSystem } from './VerificationSystem.js';
+import { InterestsSystem } from './InterestsSystem.js';
+// TODO: Fix incomplete implementations before enabling
+// import { RelationshipConversationSystem } from './RelationshipConversationSystem.js';
+// import { FriendshipSystem } from './FriendshipSystem.js';
+// import { InterestEvolutionSystem } from './InterestEvolutionSystem.js';
 
 // Exploration & Navigation
 import { ExplorationSystem } from './ExplorationSystem.js';
@@ -64,6 +69,14 @@ import { ResourceGatheringSystem } from './ResourceGatheringSystem.js';
 import { TreeFellingSystem } from './TreeFellingSystem.js';
 import { getTileConstructionSystem } from './TileConstructionSystem.js';
 import { DoorSystem } from './DoorSystem.js';
+
+// Automation & Production (Phase 38)
+import { PowerGridSystem } from './PowerGridSystem.js';
+import { BeltSystem } from './BeltSystem.js';
+import { DirectConnectionSystem } from './DirectConnectionSystem.js';
+import { AssemblyMachineSystem } from './AssemblyMachineSystem.js';
+import { FactoryAISystem } from './FactoryAISystem.js';
+import { OffScreenProductionSystem } from './OffScreenProductionSystem.js';
 
 // Economy & Trade
 import { TradingSystem } from './TradingSystem.js';
@@ -92,6 +105,8 @@ import { FaithMechanicsSystem } from './FaithMechanicsSystem.js';
 import { PrayerSystem } from './PrayerSystem.js';
 import { PrayerAnsweringSystem } from './PrayerAnsweringSystem.js';
 import { MythGenerationSystem } from './MythGenerationSystem.js';
+import { DivineChatSystem } from './DivineChatSystem.js';
+import { ChatRoomSystem } from '../communication/ChatRoomSystem.js';
 
 // Divinity - Institutions
 import { TempleSystem } from './TempleSystem.js';
@@ -128,7 +143,13 @@ import { RebellionEventSystem } from './RebellionEventSystem.js';
 
 // Body & Reproduction
 import { BodySystem } from './BodySystem.js';
+import { EquipmentSystem } from './EquipmentSystem.js';
 import { ReproductionSystem } from './ReproductionSystem.js';
+import { CourtshipSystem } from './CourtshipSystem.js';
+import { MidwiferySystem } from '../reproduction/midwifery/MidwiferySystem.js';
+import { ParentingSystem } from './ParentingSystem.js';
+// TODO: Fix incomplete implementation before enabling
+// import { JealousySystem } from './JealousySystem.js';
 
 // Combat & Security
 import { AgentCombatSystem } from './AgentCombatSystem.js';
@@ -143,11 +164,15 @@ import { VillageDefenseSystem } from './VillageDefenseSystem.js';
 import { PassageSystem } from './PassageSystem.js';
 import { PortalSystem } from './PortalSystem.js';
 import { RealmTimeSystem } from './RealmTimeSystem.js';
-import { DeathTransitionSystem } from './DeathTransitionSystem.js';
+import { DeathJudgmentSystem } from './DeathJudgmentSystem.js';
+// import { DeathBargainSystem } from './DeathBargainSystem.js'; // Temporarily disabled - incomplete implementation
+// import { DeathTransitionSystem } from './DeathTransitionSystem.js'; // Temporarily disabled - incomplete implementation
+import { AfterlifeMemoryFadingSystem } from './AfterlifeMemoryFadingSystem.js';
 import { RealmManager } from './RealmManager.js';
 import { AfterlifeNeedsSystem } from './AfterlifeNeedsSystem.js';
 import { AncestorTransformationSystem } from './AncestorTransformationSystem.js';
 import { ReincarnationSystem } from './ReincarnationSystem.js';
+// import { SoulCreationSystem } from './SoulCreationSystem.js'; // Temporarily disabled due to circular dependency
 
 // Governance & Metrics
 import { GovernanceDataSystem } from './GovernanceDataSystem.js';
@@ -276,6 +301,16 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new CommunicationSystem());
   gameLoop.systemRegistry.register(new SocialGradientSystem());
   gameLoop.systemRegistry.register(new VerificationSystem());
+  gameLoop.systemRegistry.register(new InterestsSystem());
+
+  // Deep Conversation System - Phase 6: Emergent Social Dynamics
+  // TODO: Fix incomplete implementations before enabling
+  // gameLoop.systemRegistry.register(new RelationshipConversationSystem());
+  // gameLoop.systemRegistry.register(new FriendshipSystem());
+
+  // Deep Conversation System - Phase 7.1: Interest Evolution
+  // TODO: Fix incomplete implementations before enabling
+  // gameLoop.systemRegistry.register(new InterestEvolutionSystem());
 
   // ============================================================================
   // EXPLORATION & NAVIGATION
@@ -299,6 +334,19 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(getTileConstructionSystem());
   // Door system for auto-open/close mechanics
   gameLoop.systemRegistry.register(new DoorSystem());
+
+  // ============================================================================
+  // AUTOMATION & PRODUCTION (Phase 38)
+  // ============================================================================
+  // Factory AI (priority 48 - autonomous management)
+  gameLoop.systemRegistry.register(new FactoryAISystem());
+  // Off-screen optimization (priority 49 - runs before full simulation)
+  gameLoop.systemRegistry.register(new OffScreenProductionSystem());
+  // Full simulation systems (priority 50+)
+  gameLoop.systemRegistry.register(new PowerGridSystem());
+  gameLoop.systemRegistry.register(new DirectConnectionSystem());
+  gameLoop.systemRegistry.register(new BeltSystem());
+  gameLoop.systemRegistry.register(new AssemblyMachineSystem());
 
   // ============================================================================
   // ECONOMY & TRADE
@@ -330,7 +378,13 @@ export function registerAllSystems(
   // BODY & REPRODUCTION
   // ============================================================================
   gameLoop.systemRegistry.register(new BodySystem());
+  gameLoop.systemRegistry.register(new EquipmentSystem());
   gameLoop.systemRegistry.register(new ReproductionSystem());
+  gameLoop.systemRegistry.register(new CourtshipSystem());
+  gameLoop.systemRegistry.register(new MidwiferySystem());
+  gameLoop.systemRegistry.register(new ParentingSystem());
+  // TODO: Fix incomplete implementation before enabling
+  // gameLoop.systemRegistry.register(new JealousySystem());
 
   // ============================================================================
   // DIVINITY - CORE
@@ -346,6 +400,13 @@ export function registerAllSystems(
     gameLoop.systemRegistry.register(new MythGenerationSystem(llmQueue as any));
   }
   // MythGenerationSystem requires llmQueue, so skip if not provided
+
+  // Chat Rooms - General chat system (DMs, group chats, divine chat, etc.)
+  gameLoop.systemRegistry.register(new ChatRoomSystem());
+
+  // Divine Chat - DEPRECATED: Wrapper for backwards compatibility
+  // TODO: Remove once all consumers migrate to ChatRoomSystem
+  gameLoop.systemRegistry.register(new DivineChatSystem());
 
   // ============================================================================
   // DIVINITY - INSTITUTIONS
@@ -412,14 +473,47 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new PassageSystem());
   gameLoop.systemRegistry.register(new PortalSystem());
   gameLoop.systemRegistry.register(new RealmTimeSystem());
-  gameLoop.systemRegistry.register(new DeathTransitionSystem());
+  gameLoop.systemRegistry.register(new DeathJudgmentSystem());
+
+  // Death Bargain System - hero challenges to cheat death
+  // Temporarily disabled - incomplete implementation
+  // const deathBargainSystem = new DeathBargainSystem();
+  // gameLoop.systemRegistry.register(deathBargainSystem);
+
+  // Death Transition System - handles moving dead entities to afterlife
+  // Temporarily disabled - incomplete implementation
+  // const deathTransitionSystem = new DeathTransitionSystem();
+  // deathTransitionSystem.setDeathBargainSystem(deathBargainSystem);
+  // gameLoop.systemRegistry.register(deathTransitionSystem);
+
   const realmManager = new RealmManager();
   gameLoop.systemRegistry.register(realmManager);
+
+  // Soul Creation (divine ceremony for creating new souls)
+  // gameLoop.systemRegistry.register(new SoulCreationSystem()); // Temporarily disabled due to circular dependency
 
   // Afterlife systems (process souls in the Underworld)
   gameLoop.systemRegistry.register(new AfterlifeNeedsSystem());
   gameLoop.systemRegistry.register(new AncestorTransformationSystem());
   gameLoop.systemRegistry.register(new ReincarnationSystem());
+  gameLoop.systemRegistry.register(new AfterlifeMemoryFadingSystem());
+
+  // ============================================================================
+  // AUTOMATION & FACTORIES (Phase 38)
+  // ============================================================================
+  // Factory automation systems for Dyson Swarm construction
+  // Priority order: PowerGrid (51) → Belt (53) → DirectConnection (54) → Assembly (54) → FactoryAI (48) → OffScreen (49)
+
+  gameLoop.systemRegistry.register(new PowerGridSystem());
+  gameLoop.systemRegistry.register(new BeltSystem());
+  gameLoop.systemRegistry.register(new DirectConnectionSystem());
+  gameLoop.systemRegistry.register(new AssemblyMachineSystem());
+
+  // Factory AI - Autonomous factory management (priority 48)
+  gameLoop.systemRegistry.register(new FactoryAISystem());
+
+  // Off-Screen Production - Performance optimization (priority 49)
+  gameLoop.systemRegistry.register(new OffScreenProductionSystem());
 
   // ============================================================================
   // GOVERNANCE

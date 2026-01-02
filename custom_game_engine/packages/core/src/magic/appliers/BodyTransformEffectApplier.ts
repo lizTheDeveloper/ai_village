@@ -36,6 +36,8 @@ import type {
   ActiveEffect,
 } from '../SpellEffect.js';
 import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import { registerEffectApplier } from '../SpellEffectExecutor.js';
+import { SpellEffectRegistry } from '../SpellEffectRegistry.js';
 
 // ============================================================================
 // Extended Transform Effect for Body Parts
@@ -509,12 +511,11 @@ export const polymorphEffect: BodyTransformEffect = {
 export const bodyTransformEffectApplier = new BodyTransformEffectApplier();
 
 export function registerBodyTransformEffectApplier(): void {
-  const { registerEffectApplier } = require('../SpellEffectExecutor.js');
   registerEffectApplier(bodyTransformEffectApplier);
 }
 
 export function registerBuiltInBodyTransformEffects(): void {
-  const registry = require('../SpellEffectRegistry.js').SpellEffectRegistry.getInstance();
+  const registry = SpellEffectRegistry.getInstance();
 
   registry.register(growWingsEffect);
   registry.register(extraArmsEffect);

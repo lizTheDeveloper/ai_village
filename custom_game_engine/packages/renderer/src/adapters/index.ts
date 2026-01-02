@@ -24,6 +24,7 @@ import type { TileInspectorPanel } from '../TileInspectorPanel.js';
 import type { MagicSystemsPanel } from '../MagicSystemsPanel.js';
 import type { SpellbookPanel } from '../SpellbookPanel.js';
 import type { DivinePowersPanel } from '../DivinePowersPanel.js';
+import type { DivineChatPanel } from '../DivineChatPanel.js';
 import type { VisionComposerPanel } from '../VisionComposerPanel.js';
 import type { DevPanel } from '../DevPanel.js';
 import type { FarmManagementPanel } from '../FarmManagementPanel.js';
@@ -716,6 +717,43 @@ export const DIVINE_POWERS_PANEL_CONFIG: PanelConfig<DivinePowersPanel> = {
  */
 export function createDivinePowersPanelAdapter(panel: DivinePowersPanel): PanelAdapter<DivinePowersPanel> {
   return new PanelAdapter(panel, DIVINE_POWERS_PANEL_CONFIG);
+}
+
+/**
+ * Configuration for DivineChatPanel adapter.
+ * Pattern: Delegate visibility - panel has isVisible/show/hide methods
+ */
+export const DIVINE_CHAT_PANEL_CONFIG: PanelConfig<DivineChatPanel> = {
+  id: 'divine-chat',
+  title: 'Divine Chat',
+  defaultWidth: 400,
+  defaultHeight: 600,
+  menuCategory: 'divinity',
+  getVisible: (panel) => panel.isVisible(),
+  setVisible: (panel, visible) => {
+    if (visible) {
+      panel.show();
+    } else {
+      panel.hide();
+    }
+  },
+  renderMethod: (panel, ctx, _x, _y, width, height, world) => {
+    panel.render(ctx, width, height, world);
+  },
+  handleScroll: (panel, deltaY, _contentHeight) => {
+    panel.handleWheel(deltaY);
+    return true;
+  },
+  handleContentClick: (panel, x, y, width, height) => {
+    return panel.handleClick(x, y, width, height);
+  },
+};
+
+/**
+ * Create a DivineChatPanel adapter
+ */
+export function createDivineChatPanelAdapter(panel: DivineChatPanel): PanelAdapter<DivineChatPanel> {
+  return new PanelAdapter(panel, DIVINE_CHAT_PANEL_CONFIG);
 }
 
 /**

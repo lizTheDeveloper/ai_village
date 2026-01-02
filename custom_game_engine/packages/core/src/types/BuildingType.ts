@@ -22,6 +22,7 @@ export enum BuildingType {
 
   // Tier 2 Crafting Stations
   Forge = 'forge',
+  ButcheringTable = 'butchering_table',
   FarmShed = 'farm_shed',
   MarketStall = 'market_stall',
   Windmill = 'windmill',

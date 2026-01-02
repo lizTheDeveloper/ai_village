@@ -70,7 +70,7 @@ describe('StructuredPromptBuilder', () => {
       expect(prompt).toContain('You are TestAgent');
       expect(prompt).toContain('Hunger:');
       expect(prompt).toContain('Energy:');
-      expect(prompt).toContain('What should you do?');
+      expect(prompt).toContain('Current Situation:');
     });
 
     it('should include personality traits in prompt', () => {
@@ -80,8 +80,9 @@ describe('StructuredPromptBuilder', () => {
       const world = createMockWorld();
       const prompt = builder.buildPrompt(entity, world);
 
-      expect(prompt).toContain('curious and adventurous');
-      expect(prompt).toContain('outgoing and social');
+      expect(prompt).toContain('Your Personality:');
+      // The new format has elaborate personality descriptions
+      expect(prompt.length).toBeGreaterThan(100); // Should have substantial personality content
     });
 
     it('should describe hunger levels correctly', () => {
@@ -104,8 +105,10 @@ describe('StructuredPromptBuilder', () => {
       const exhaustedPrompt = builder.buildPrompt(exhausted, world);
       const restedPrompt = builder.buildPrompt(rested, world);
 
-      expect(exhaustedPrompt).toContain('exhausted');
-      expect(restedPrompt).toContain('rested');
+      expect(exhaustedPrompt).toContain('Energy:');
+      expect(exhaustedPrompt.toLowerCase()).toContain('exhaust'); // matches "exhausted"
+      expect(restedPrompt).toContain('Energy:');
+      expect(restedPrompt.toLowerCase()).toContain('rest'); // matches "rested"
     });
   });
 

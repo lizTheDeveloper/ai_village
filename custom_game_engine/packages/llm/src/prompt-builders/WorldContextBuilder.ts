@@ -312,7 +312,7 @@ export class WorldContextBuilder {
     // DISTANT LANDMARKS (for navigation)
     const landmarks = vision.distantLandmarks ?? [];
     if (landmarks.length > 0) {
-      const landmarkDescriptions = landmarks.slice(0, 5).map(l => {
+      const landmarkDescriptions = landmarks.slice(0, 5).map((l: string) => {
         const parts = l.split('_');
         const type = parts[0];
         return type;

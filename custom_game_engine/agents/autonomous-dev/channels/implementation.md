@@ -42,3 +42,54 @@ The work order for conflict-ui has been verified and confirmed.
 
 The work order is complete and ready for test case generation.
 
+
+---
+
+## Context Menu Debug Logging Added - 2026-01-01 09:50 UTC
+
+**Agent:** Implementation Agent  
+**Status:** IN_PROGRESS - Ready for Playtest Verification
+
+### Issue from Playtest Report
+
+Playtest on 2025-12-31 found:
+- ✓ Right-click detected by InputHandler
+- ✓ ContextMenuManager receiving events
+- ✗ **No visual menu renders on screen**
+
+### Debug Logging Added
+
+Added comprehensive console.log statements to trace:
+1. `open()` - Menu opening, items generation, state updates
+2. `render()` - Render calls, early returns, drawing operations
+3. `ContextMenuRenderer` - Canvas operations (circles, borders, items)
+
+### Expected Console Output
+
+```
+[ContextMenuManager] Opening menu at screen (x, y)
+[ContextMenuManager] Found N applicable actions: [...]
+[ContextMenuManager] Created N menu items
+[ContextMenuManager] Menu state updated - isOpen: true, ...
+[ContextMenuManager] Rendering menu with N items at (x, y)
+[ContextMenuRenderer] render() called with N items at (x, y)
+[ContextMenuRenderer] Drew background circle at (x, y) with radius 100
+[ContextMenuRenderer] Rendered N menu items
+[ContextMenuRenderer] Context restored, render complete
+```
+
+### Files Modified
+
+- `packages/renderer/src/ContextMenuManager.ts`
+- `packages/renderer/src/ContextMenuRenderer.ts`
+
+### Next: Playtest Verification Needed
+
+Playtest agent should:
+1. Run game (`npm run dev`)
+2. Open browser console
+3. Right-click on canvas
+4. Report complete console output + screenshot
+
+**Note:** Debug logs must be removed after diagnosis (CLAUDE.md violation).
+

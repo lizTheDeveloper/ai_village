@@ -6,9 +6,20 @@
  * Responsibilities:
  * - Track agents conducting research at buildings
  * - Apply building research bonuses
- * - Advance research progress
- * - Complete research and emit unlock events
+ * - Advance research progress through PAPER PUBLICATION
+ * - Complete research when enough papers are published
  * - Handle research queue
+ *
+ * RESEARCH PROGRESS MODEL:
+ * Research is advanced by publishing academic papers, not arbitrary points.
+ * Each tier requires (tier + 1) papers to complete:
+ * - Tier 1: 2 papers
+ * - Tier 2: 3 papers
+ * - ...
+ * - Tier 8: 9 papers
+ *
+ * Papers cite prerequisite research, creating a citation network.
+ * Authors gain fame based on h-index and citation counts.
  *
  * Per CLAUDE.md: No silent fallbacks - throws on invalid state.
  */
@@ -33,6 +44,7 @@ import {
 import { ResearchRegistry } from '../research/ResearchRegistry.js';
 import type { ResearchField, ResearchDefinition, ResearchUnlock } from '../research/types.js';
 import { BuildingBlueprintRegistry } from '../buildings/BuildingBlueprintRegistry.js';
+import { getAcademicPaperSystem, type AcademicPaperSystem } from '../research/AcademicPaperSystem.js';
 
 /**
  * Research building bonus configuration.
@@ -58,15 +70,22 @@ export class ResearchSystem implements System {
   private eventBus: EventBus | null = null;
   private blueprintRegistry: BuildingBlueprintRegistry | null = null;
   private researchRegistry: ResearchRegistry | null = null;
+  private paperSystem: AcademicPaperSystem | null = null;
 
-  /** Base research progress per second without bonuses */
+  /** Base research progress per second - used to accumulate toward paper publication */
   private readonly BASE_RESEARCH_RATE = 1.0;
+
+  /** Progress required to publish a paper (research time before next paper) */
+  private readonly PROGRESS_PER_PAPER = 100;
 
   /** Maximum distance (in tiles) from research building to receive bonus */
   private readonly MAX_RESEARCH_DISTANCE = 2;
 
   /** How often to log research progress (in ticks) */
   private readonly LOG_INTERVAL = 300; // Every 5 seconds at 60 tps
+
+  /** Track accumulated progress toward next paper for each research */
+  private progressTowardPaper: Map<string, number> = new Map();
 
   /**
    * Initialize the system.
@@ -78,6 +97,7 @@ export class ResearchSystem implements System {
 
     this.eventBus = eventBus;
     this.researchRegistry = ResearchRegistry.getInstance();
+    this.paperSystem = getAcademicPaperSystem();
 
     // Use existing registry from world if available, otherwise create new one
     // This prevents duplicate registration when multiple systems initialize
@@ -221,6 +241,11 @@ export class ResearchSystem implements System {
 
   /**
    * Process research progress for all in-progress research.
+   *
+   * Research progress is now measured by PAPER PUBLICATION:
+   * 1. Agents accumulate progress toward publishing a paper
+   * 2. When enough progress is accumulated, a paper is published
+   * 3. Research completes when enough papers are published (tier + 1)
    */
   private processResearchProgress(
     world: World,
@@ -229,7 +254,7 @@ export class ResearchSystem implements System {
     _buildings: ResearchBuildingBonus[],
     deltaTime: number
   ): void {
-    if (!this.researchRegistry) return;
+    if (!this.researchRegistry || !this.paperSystem) return;
 
     const worldEntity = this.findWorldEntity(world);
     if (!worldEntity) return;
@@ -257,25 +282,108 @@ export class ResearchSystem implements System {
         }
       }
 
-      // Calculate progress: base rate * bonus * time * contributor count (diminishing)
+      // Calculate progress toward next paper: base rate * bonus * time * contributor count
       const contributorMultiplier = 1 + (contributors.length - 1) * 0.25; // +25% per additional researcher
       const progressDelta = this.BASE_RESEARCH_RATE * totalBonus * deltaTime * contributorMultiplier;
 
-      currentState = updateResearchProgress(currentState, researchId, progressDelta);
+      // Accumulate progress toward next paper
+      const currentPaperProgress = this.progressTowardPaper.get(researchId) || 0;
+      const newPaperProgress = currentPaperProgress + progressDelta;
+      this.progressTowardPaper.set(researchId, newPaperProgress);
 
-      // Check for completion
-      const newProgress = currentState.inProgress.get(researchId);
-      if (newProgress && newProgress.currentProgress >= research.progressRequired) {
-        currentState = this.completeResearchProject(world, currentState, research, newProgress.researchers);
-      } else if (newProgress) {
-        // Emit progress event
+      // Check if we should publish a paper
+      if (newPaperProgress >= this.PROGRESS_PER_PAPER) {
+        // Reset progress toward next paper
+        this.progressTowardPaper.set(researchId, newPaperProgress - this.PROGRESS_PER_PAPER);
+
+        // Get first author (contributor with most time on project)
+        const firstContributor = contributors[0]!;
+        const firstAgentComp = (firstContributor.agent as EntityImpl).getComponent<AgentComponent>(CT.Agent) as any;
+        const firstAuthorId = firstContributor.agent.id;
+        const firstAuthorName = firstAgentComp?.name ?? 'Unknown Researcher';
+
+        // Get co-authors (other contributors)
+        const coAuthorIds: string[] = [];
+        const coAuthorNames: string[] = [];
+        for (let i = 1; i < contributors.length; i++) {
+          const contributor = contributors[i]!;
+          const agentComp = (contributor.agent as EntityImpl).getComponent<AgentComponent>(CT.Agent) as any;
+          coAuthorIds.push(contributor.agent.id);
+          coAuthorNames.push(agentComp?.name ?? 'Unknown Researcher');
+        }
+
+        // Check if this paper will be a breakthrough (random chance, higher for high-tier)
+        const breakthroughChance = Math.min(0.3, research.tier * 0.05);
+        const isBreakthrough = Math.random() < breakthroughChance;
+
+        // Publish the paper!
+        const { paper, researchComplete } = this.paperSystem.publishPaper(
+          researchId,
+          firstAuthorId,
+          firstAuthorName,
+          coAuthorIds,
+          coAuthorNames,
+          isBreakthrough
+        );
+
+        // Update research state progress (using papers as the progress metric)
+        const paperBib = this.paperSystem.getManager().getBibliography(researchId);
+        const papersPublished = paperBib?.papers.length || 1;
+        const papersRequired = research.tier + 1;
+
+        // Update the progress value to reflect papers published (scale to progressRequired)
+        const progressPercentage = papersPublished / papersRequired;
+        const scaledProgress = progressPercentage * research.progressRequired;
+        currentState = updateResearchProgress(
+          currentState,
+          researchId,
+          scaledProgress - (currentState.inProgress.get(researchId)?.currentProgress || 0)
+        );
+
+        // Emit paper published event
         this.eventBus?.emit({
           type: 'research:progress',
           source: 'research-system',
           data: {
             researchId,
-            progress: newProgress.currentProgress,
+            progress: papersPublished,
+            progressRequired: papersRequired,
+            paperPublished: {
+              id: paper.id,
+              title: paper.title,
+              authors: [firstAuthorName, ...coAuthorNames],
+              isBreakthrough,
+            },
+          },
+        });
+
+        // Check for research completion
+        if (researchComplete) {
+          currentState = this.completeResearchProject(world, currentState, research, progress.researchers);
+          // Clean up paper progress tracking
+          this.progressTowardPaper.delete(researchId);
+        }
+      } else {
+        // Emit regular progress event (progress toward next paper)
+        const paperBib = this.paperSystem.getManager().getBibliography(researchId);
+        const papersPublished = paperBib?.papers.length || 0;
+        const papersRequired = research.tier + 1;
+        const progressTowardNext = (newPaperProgress / this.PROGRESS_PER_PAPER) * 100;
+
+        // Calculate overall progress percentage for compatibility
+        const overallProgress = papersPublished + (progressTowardNext / 100);
+        const progressPercentage = (overallProgress / papersRequired) * research.progressRequired;
+
+        this.eventBus?.emit({
+          type: 'research:progress',
+          source: 'research-system',
+          data: {
+            researchId,
+            progress: progressPercentage,
             progressRequired: research.progressRequired,
+            papersPublished,
+            papersRequired,
+            progressTowardNextPaper: progressTowardNext,
           },
         });
       }
@@ -287,6 +395,7 @@ export class ResearchSystem implements System {
 
   /**
    * Complete a research project and process unlocks.
+   * Includes full paper bibliography from the academic paper system.
    */
   private completeResearchProject(
     world: World,
@@ -304,15 +413,36 @@ export class ResearchSystem implements System {
       unlockData.push({ type: unlock.type, id: this.getUnlockId(unlock) });
     }
 
-    // Emit completion event
+    // Get bibliography for this research
+    const bibliography = this.paperSystem?.getManager().getBibliography(research.id);
+    const papers = bibliography?.papers
+      .map(paperId => this.paperSystem?.getManager().getPaper(paperId))
+      .filter((p): p is NonNullable<typeof p> => p !== undefined)
+      .map(p => ({
+        id: p.id,
+        title: p.title,
+        authors: [p.firstAuthorName, ...p.coAuthorNames],
+        citations: p.citations.length,
+        citedBy: p.citedByCount,
+        isBreakthrough: p.isBreakthrough,
+      })) || [];
+
+    // Emit completion event with bibliography
     this.eventBus?.emit({
       type: 'research:completed',
       source: 'research-system',
       data: {
         researchId: research.id,
+        researchName: research.name,
         researchers,
         unlocks: unlockData,
         tick: world.tick,
+        bibliography: {
+          paperCount: papers.length,
+          papers,
+          leadResearcherId: bibliography?.leadResearcherId,
+          contributorIds: bibliography?.contributorIds || [],
+        },
       },
     });
 
@@ -539,5 +669,69 @@ export class ResearchSystem implements System {
     }
 
     return bestBonus;
+  }
+
+  /**
+   * Get paper-based research progress for a specific research.
+   * Returns papers published, papers required, and progress toward next paper.
+   */
+  public getPaperProgress(researchId: string): {
+    papersPublished: number;
+    papersRequired: number;
+    progressTowardNextPaper: number;
+    bibliography: Array<{
+      title: string;
+      authors: string[];
+      citedByCount: number;
+      isBreakthrough: boolean;
+    }>;
+  } | null {
+    if (!this.paperSystem || !this.researchRegistry) return null;
+
+    const research = this.researchRegistry.tryGet(researchId);
+    if (!research) return null;
+
+    const bib = this.paperSystem.getManager().getBibliography(researchId);
+    const papersPublished = bib?.papers.length || 0;
+    const papersRequired = research.tier + 1;
+    const progressTowardNext = this.progressTowardPaper.get(researchId) || 0;
+
+    const bibliography = (bib?.papers || [])
+      .map(paperId => this.paperSystem?.getManager().getPaper(paperId))
+      .filter((p): p is NonNullable<typeof p> => p !== undefined)
+      .map(p => ({
+        title: p.title,
+        authors: [p.firstAuthorName, ...p.coAuthorNames],
+        citedByCount: p.citedByCount,
+        isBreakthrough: p.isBreakthrough,
+      }));
+
+    return {
+      papersPublished,
+      papersRequired,
+      progressTowardNextPaper: (progressTowardNext / this.PROGRESS_PER_PAPER) * 100,
+      bibliography,
+    };
+  }
+
+  /**
+   * Get the academic paper system for direct access to paper/citation data.
+   */
+  public getPaperSystem(): AcademicPaperSystem | null {
+    return this.paperSystem;
+  }
+
+  /**
+   * Get author metrics for an agent.
+   * Returns h-index, citation count, and publication stats.
+   */
+  public getAuthorMetrics(agentId: string): {
+    hIndex: number;
+    totalCitations: number;
+    paperCount: number;
+    firstAuthorCount: number;
+    breakthroughCount: number;
+  } | null {
+    return this.paperSystem?.getAuthorMetrics(agentId) || null;
   }
 }

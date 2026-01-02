@@ -522,7 +522,7 @@ describe('Myth Contradictions and Propagation', () => {
     };
 
     // Myth mutates through retelling
-    const mutatedMyth = mutateMythThrough Retelling(originalMyth, 100); // 100 retellings
+    const mutatedMyth = mutateMythThroughRetelling(originalMyth, 100); // 100 retellings
 
     // Mutation might create absurd domains
     const absurdDomains = Object.entries(mutatedMyth.implications.domains).filter(

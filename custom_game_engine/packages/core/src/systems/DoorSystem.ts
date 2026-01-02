@@ -41,6 +41,12 @@ export class DoorSystem implements System {
    */
   private openDoors: Map<string, number> = new Map();
 
+  /**
+   * Performance: Cache agent positions for current tick to avoid repeated queries
+   */
+  private cachedAgentPositions: Array<{ x: number; y: number }> | null = null;
+  private cachedAgentTick = -1;
+
   initialize(_world: World, eventBus: EventBus): void {
     this.eventBus = eventBus;
   }
@@ -51,6 +57,20 @@ export class DoorSystem implements System {
     // Skip if world doesn't support tile access
     if (typeof worldWithTiles.getTileAt !== 'function') {
       return;
+    }
+
+    // Cache agent positions for this tick
+    if (this.cachedAgentTick !== world.tick) {
+      this.cachedAgentPositions = [];
+      const agents = world.query().with(CT.Position).with(CT.Agent).executeEntities();
+      for (const agent of agents) {
+        const impl = agent as EntityImpl;
+        const pos = impl.getComponent<PositionComponent>(CT.Position);
+        if (pos) {
+          this.cachedAgentPositions.push({ x: pos.x, y: pos.y });
+        }
+      }
+      this.cachedAgentTick = world.tick;
     }
 
     // Process auto-closing of doors that have been open too long
@@ -79,18 +99,19 @@ export class DoorSystem implements System {
   ): void {
     // Check a small radius around the agent
     const checkRadius = Math.ceil(DOOR_TRIGGER_DISTANCE);
+    const triggerDistanceSquared = DOOR_TRIGGER_DISTANCE * DOOR_TRIGGER_DISTANCE;
 
     for (let dx = -checkRadius; dx <= checkRadius; dx++) {
       for (let dy = -checkRadius; dy <= checkRadius; dy++) {
         const tileX = Math.floor(agentX) + dx;
         const tileY = Math.floor(agentY) + dy;
 
-        // Calculate distance to tile center
-        const distance = Math.sqrt(
-          Math.pow(tileX + 0.5 - agentX, 2) + Math.pow(tileY + 0.5 - agentY, 2)
-        );
+        // Calculate squared distance to tile center
+        const deltaX = tileX + 0.5 - agentX;
+        const deltaY = tileY + 0.5 - agentY;
+        const distanceSquared = deltaX * deltaX + deltaY * deltaY;
 
-        if (distance > DOOR_TRIGGER_DISTANCE) continue;
+        if (distanceSquared > triggerDistanceSquared) continue;
 
         const tile = world.getTileAt(tileX, tileY);
         if (!tile?.door) continue;
@@ -187,21 +208,23 @@ export class DoorSystem implements System {
   }
 
   /**
-   * Check if any agent is near a door position.
+   * Check if any agent is near a door position (using cached positions and squared distance).
    */
-  private isAgentNearDoor(world: World, doorX: number, doorY: number): boolean {
-    const agents = world.query().with(CT.Position).with(CT.Agent).executeEntities();
+  private isAgentNearDoor(_world: World, doorX: number, doorY: number): boolean {
+    if (!this.cachedAgentPositions) {
+      return false;
+    }
 
-    for (const agent of agents) {
-      const impl = agent as EntityImpl;
-      const pos = impl.getComponent<PositionComponent>(CT.Position);
-      if (!pos) continue;
+    const doorCenterX = doorX + 0.5;
+    const doorCenterY = doorY + 0.5;
+    const triggerDistanceSquared = DOOR_TRIGGER_DISTANCE * DOOR_TRIGGER_DISTANCE;
 
-      const distance = Math.sqrt(
-        Math.pow(doorX + 0.5 - pos.x, 2) + Math.pow(doorY + 0.5 - pos.y, 2)
-      );
+    for (const pos of this.cachedAgentPositions) {
+      const dx = doorCenterX - pos.x;
+      const dy = doorCenterY - pos.y;
+      const distanceSquared = dx * dx + dy * dy;
 
-      if (distance <= DOOR_TRIGGER_DISTANCE) {
+      if (distanceSquared <= triggerDistanceSquared) {
         return true;
       }
     }

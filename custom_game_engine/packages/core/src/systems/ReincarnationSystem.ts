@@ -67,6 +67,12 @@ import { ExplorationStateComponent } from '../components/ExplorationStateCompone
 import { generateRandomStartingSkills } from '../components/SkillsComponent.js';
 import { calculateDeedScore } from '../components/DeedLedgerComponent.js';
 import type { ReincarnationTarget } from '../divinity/AfterlifePolicy.js';
+import { createAfterlifeMemoryComponent } from '../components/AfterlifeMemoryComponent.js';
+import type { SoulWisdomComponent } from '../components/SoulWisdomComponent.js';
+import {
+  createSoulWisdomComponent,
+  createReincarnatedSoulWisdomComponent,
+} from '../components/SoulWisdomComponent.js';
 
 /** Event data for soul:reincarnation_queued */
 interface ReincarnationQueuedEventData {
@@ -102,6 +108,8 @@ interface QueuedSoul {
     personality?: PersonalityComponent;
     skills?: SkillsComponent;
     memories?: EpisodicMemory[];
+    suppressedMemories?: EpisodicMemory[]; // Accumulated across reincarnations for wisdom
+    soulWisdom?: SoulWisdomComponent; // Soul wisdom tracker (path to godhood)
     species?: string;
     deedScore?: number;
     deathLocation?: { x: number; y: number };
@@ -193,7 +201,7 @@ export class ReincarnationSystem implements System {
     const currentTick = world.tick;
 
     // Preserve relevant data based on memory retention
-    const preserved = this.preserveEntityData(entity, memoryRetention, speciesConstraint);
+    const preserved = this.preserveEntityData(entity, memoryRetention, speciesConstraint, currentTick);
 
     // Create reincarnation config from event data
     const config: ReincarnationConfig = {
@@ -223,7 +231,8 @@ export class ReincarnationSystem implements System {
   private preserveEntityData(
     entity: Entity,
     memoryRetention: MemoryRetention,
-    speciesConstraint: SpeciesConstraint
+    speciesConstraint: SpeciesConstraint,
+    currentTick: number
   ): QueuedSoul['preserved'] {
     const preserved: QueuedSoul['preserved'] = {};
 
@@ -252,6 +261,24 @@ export class ReincarnationSystem implements System {
     const identity = entity.components.get('identity') as IdentityComponent | undefined;
     if (identity) {
       preserved.name = identity.name;
+    }
+
+    // ALWAYS preserve suppressed memories (soul wisdom accumulation)
+    // These persist across ALL reincarnations regardless of memory retention policy
+    // The God of Death can see these when evaluating souls for ascension to angelhood
+    const episodicMemory = entity.components.get('episodic_memory') as EpisodicMemoryComponent | undefined;
+    if (episodicMemory?.suppressedMemories && episodicMemory.suppressedMemories.length > 0) {
+      preserved.suppressedMemories = [...episodicMemory.suppressedMemories];
+    }
+
+    // ALWAYS preserve soul wisdom (tracks reincarnation count and path to godhood)
+    // If entity doesn't have SoulWisdomComponent, create one (first death)
+    const soulWisdom = entity.components.get('soul_wisdom') as SoulWisdomComponent | undefined;
+    if (soulWisdom) {
+      preserved.soulWisdom = { ...soulWisdom };
+    } else {
+      // First death - create initial soul wisdom component
+      preserved.soulWisdom = createSoulWisdomComponent(currentTick);
     }
 
     // Preserve based on memory retention
@@ -393,10 +420,12 @@ export class ReincarnationSystem implements System {
 
     // Episodic memory - with past life memories if retained
     const episodicMemory = new EpisodicMemoryComponentClass({ maxMemories: 1000 });
+    const afterlifeMemoryIds = new Set<string>();
+
     if (soul.preserved.memories && soul.preserved.memories.length > 0) {
       // Add past life memories as dream-like fragments via formMemory
       for (const memory of soul.preserved.memories) {
-        episodicMemory.formMemory({
+        const newMemory = episodicMemory.formMemory({
           eventType: `past_life:${memory.eventType}`,
           summary: `[Past life memory] ${memory.summary}`,
           timestamp: world.tick, // New timestamp in this life
@@ -407,9 +436,47 @@ export class ReincarnationSystem implements System {
           surprise: memory.surprise,
           importance: memory.importance * 0.5, // Reduced importance
         });
+
+        // Track afterlife memories (death-related events from previous life)
+        // These include psychopomp conversations, judgment, realm transitions
+        if (memory.eventType.startsWith('death:') ||
+            memory.eventType.startsWith('realm:') ||
+            memory.eventType === 'psychopomp:exchange' ||
+            memory.eventType === 'psychopomp:judgment') {
+          afterlifeMemoryIds.add(newMemory.id);
+        }
       }
     }
     newEntity.addComponent(episodicMemory);
+
+    // Restore suppressed memories from previous lives (soul wisdom accumulation)
+    // These memories persist across ALL reincarnations, contributing to the soul's wisdom
+    // The God of Death can see these when evaluating for ascension to angelhood
+    if (soul.preserved.suppressedMemories && soul.preserved.suppressedMemories.length > 0) {
+      for (const suppressedMemory of soul.preserved.suppressedMemories) {
+        // Add directly to suppressed storage (bypassing active memory)
+        (episodicMemory as any)._suppressedMemories.push(suppressedMemory);
+      }
+    }
+
+    // Add AfterlifeMemoryComponent if any afterlife memories were transferred
+    if (afterlifeMemoryIds.size > 0) {
+      newEntity.addComponent(createAfterlifeMemoryComponent(afterlifeMemoryIds));
+    }
+
+    // Add/Update SoulWisdomComponent (tracks reincarnation count and path to godhood)
+    if (soul.preserved.soulWisdom) {
+      const suppressedCount = soul.preserved.suppressedMemories?.length ?? 0;
+      const updatedWisdom = createReincarnatedSoulWisdomComponent(
+        soul.preserved.soulWisdom,
+        suppressedCount,
+        world.tick
+      );
+      newEntity.addComponent(updatedWisdom);
+    } else {
+      // Shouldn't happen (created in preserveEntityData), but handle gracefully
+      newEntity.addComponent(createSoulWisdomComponent(world.tick));
+    }
 
     // Other memory components
     newEntity.addComponent(new SemanticMemoryComponent());

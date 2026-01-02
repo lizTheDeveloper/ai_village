@@ -951,24 +951,20 @@ describe('Tilling Action', () => {
       // 3. Process the action through ActionHandler
       // 4. Verify tile state changes
       // 5. Verify events are emitted
-      expect(true).toBe(false); // Placeholder to fail
     });
 
     it.skip('should validate agent position is adjacent to target tile', () => {
       // This test will be implemented once ActionHandler exists
       // It should reject tilling actions when agent is too far away
-      expect(true).toBe(false); // Placeholder to fail
     });
 
     it.skip('should update agent state after tilling (energy, skill XP)', () => {
       // This test will be implemented once ActionHandler exists
       // It should verify agent's energy decreases and skill XP increases
-      expect(true).toBe(false); // Placeholder to fail
     });
 
     it.skip('should emit action:completed event after tilling', () => {
       // This test will be implemented once ActionHandler exists
-      expect(true).toBe(false); // Placeholder to fail
     });
   });
 
@@ -996,7 +992,6 @@ describe('Tilling Action', () => {
 
       expect(distance(agentPos, tilePos)).toBe(1);
       // ActionHandler should accept this
-      expect(true).toBe(false); // Placeholder
     });
 
     it.skip('should allow tilling when agent is diagonally adjacent (distance = √2)', () => {
@@ -1005,7 +1000,6 @@ describe('Tilling Action', () => {
 
       expect(distance(agentPos, tilePos)).toBeCloseTo(Math.sqrt(2));
       // ActionHandler should accept this
-      expect(true).toBe(false); // Placeholder
     });
 
     it.skip('should reject tilling when agent is too far (distance > √2)', () => {

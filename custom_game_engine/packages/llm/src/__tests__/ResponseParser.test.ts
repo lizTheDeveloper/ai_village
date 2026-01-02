@@ -113,7 +113,7 @@ describe('ResponseParser', () => {
     });
 
     it('should work with text response', () => {
-      const response = 'I should explore and pick berries';
+      const response = 'I should explore the area';
 
       const behavior = parser.parseBehavior(response);
 

@@ -10,6 +10,7 @@
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { MetricsStreamClient, QueryRequest, QueryResponse, ActionRequest, ActionResponse } from './MetricsStreamClient.js';
+import { pendingApprovalRegistry } from '../crafting/PendingApprovalRegistry.js';
 
 /**
  * Interface for the prompt builder (from @ai-village/llm)
@@ -81,6 +82,8 @@ export class LiveEntityAPI {
         return this.handleMagicQuery(query);
       case 'divinity':
         return this.handleDivinityQuery(query);
+      case 'pending_approvals':
+        return this.handlePendingApprovalsQuery(query);
       default:
         return {
           requestId: query.requestId,
@@ -97,6 +100,10 @@ export class LiveEntityAPI {
     switch (action.action) {
       case 'set-llm-config':
         return this.handleSetLLMConfig(action);
+      case 'approve-creation':
+        return this.handleApproveCreation(action);
+      case 'reject-creation':
+        return this.handleRejectCreation(action);
       default:
         return {
           requestId: action.requestId,
@@ -816,5 +823,115 @@ export class LiveEntityAPI {
         error: err instanceof Error ? err.message : 'Failed to query divinity info',
       };
     }
+  }
+
+  /**
+   * Get pending creations awaiting divine approval
+   */
+  private handlePendingApprovalsQuery(query: QueryRequest): QueryResponse {
+    try {
+      const pending = pendingApprovalRegistry.getAll();
+
+      const creations = pending.map(creation => ({
+        id: creation.id,
+        itemName: creation.item.displayName,
+        itemCategory: creation.item.category,
+        recipeType: creation.recipeType,
+        creatorId: creation.creatorId,
+        creatorName: creation.creatorName,
+        creationMessage: creation.creationMessage,
+        creativityScore: creation.creativityScore,
+        ingredients: creation.ingredients.map(i => ({
+          itemId: i.itemId,
+          quantity: i.quantity,
+        })),
+        createdAt: creation.createdAt,
+        giftRecipient: creation.giftRecipient,
+      }));
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: {
+          count: creations.length,
+          creations,
+        },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query pending approvals',
+      };
+    }
+  }
+
+  /**
+   * Approve a pending creation
+   */
+  private handleApproveCreation(action: ActionRequest): ActionResponse {
+    const { creationId } = action.params;
+
+    if (!creationId || typeof creationId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid creationId parameter',
+      };
+    }
+
+    const result = pendingApprovalRegistry.approve(creationId);
+
+    if (!result.success) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: result.error || 'Failed to approve creation',
+      };
+    }
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        approved: true,
+        itemName: result.creation?.item.displayName,
+        recipeId: result.creation?.recipe.id,
+      },
+    };
+  }
+
+  /**
+   * Reject a pending creation
+   */
+  private handleRejectCreation(action: ActionRequest): ActionResponse {
+    const { creationId } = action.params;
+
+    if (!creationId || typeof creationId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid creationId parameter',
+      };
+    }
+
+    const result = pendingApprovalRegistry.reject(creationId);
+
+    if (!result.success) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: result.error || 'Failed to reject creation',
+      };
+    }
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        rejected: true,
+        itemName: result.creation?.item.displayName,
+      },
+    };
   }
 }

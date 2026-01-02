@@ -131,20 +131,18 @@ export class PrayerSystem implements System {
     currentTick: number
   ): void {
     // Extract nearby spirits and deities for cosmology resolution
-    // NOTE: Spirit component not yet implemented - using empty array for now
-    const nearbySpirits: Spirit[] = [];
-    // TODO: Uncomment when Spirit component is added to ComponentType enum
-    // const nearbySpirits: Spirit[] = nearbyEntities
-    //   .filter(e => e.components.has(CT.Spirit))
-    //   .map(e => {
-    //     const spiritComp = e.components.get(CT.Spirit) as any;
-    //     return {
-    //       id: e.id,
-    //       magnitude: spiritComp?.magnitude ?? 'minor',
-    //       totalRespect: spiritComp?.totalRespect ?? 0,
-    //       ...spiritComp,
-    //     } as Spirit;
-    //   });
+    const nearbySpirits: Spirit[] = nearbyEntities
+      .filter(e => e.components.has(CT.Spirit))
+      .map(e => {
+        const spiritComp = e.components.get(CT.Spirit) as any;
+        return {
+          id: e.id,
+          entityType: 'spirit' as const,
+          magnitude: spiritComp?.magnitude ?? 'minor',
+          totalRespect: spiritComp?.totalRespect ?? 0,
+          ...spiritComp,
+        } as Spirit;
+      });
 
     const nearbyDeities: Deity[] = nearbyEntities
       .filter(e => e.components.has(CT.Deity))
@@ -183,18 +181,17 @@ export class PrayerSystem implements System {
     }
 
     // Handle spirit prayer
-    // TODO: Uncomment when Spirit component is implemented
-    // if (resolution.type === 'spirit' && resolution.targetId) {
-    //   const spirit = nearbyEntities.find(e => e.id === resolution.targetId);
-    //   if (spirit) {
-    //     const spiritComp = spirit.components.get(CT.Spirit) as any;
-    //     if (spiritComp) {
-    //       // Add respect to spirit
-    //       spiritComp.totalRespect = (spiritComp.totalRespect ?? 0) + resolution.respectGenerated;
-    //       (spirit as EntityImpl).addComponent(spiritComp);
-    //     }
-    //   }
-    // }
+    if (resolution.type === 'spirit' && resolution.targetId) {
+      const spirit = nearbyEntities.find(e => e.id === resolution.targetId);
+      if (spirit) {
+        const spiritComp = spirit.components.get(CT.Spirit) as any;
+        if (spiritComp) {
+          // Add respect to spirit
+          spiritComp.totalRespect = (spiritComp.totalRespect ?? 0) + resolution.respectGenerated;
+          (spirit as EntityImpl).addComponent(spiritComp);
+        }
+      }
+    }
 
     // Handle unresolved prayer (potential deity emergence)
     if (resolution.type === 'unresolved' && resolution.couldCreateDeity) {

@@ -460,7 +460,7 @@ export class HarmonyContextBuilder {
     }
 
     // Warning about nearby Sha Qi
-    const nearbyDangers = harmony.aerialShaQi.filter(shaQi => {
+    const nearbyDangers = harmony.aerialShaQi.filter((shaQi: any) => {
       const midX = (shaQi.from.x + shaQi.to.x) / 2;
       const midY = (shaQi.from.y + shaQi.to.y) / 2;
       const dist = Math.sqrt(
@@ -478,7 +478,7 @@ export class HarmonyContextBuilder {
     }
 
     // Nearby thermals for energy-efficient flight
-    const nearbyThermals = harmony.thermals.filter(t => {
+    const nearbyThermals = harmony.thermals.filter((t: any) => {
       const dist = Math.sqrt(
         Math.pow(t.center.x - agentPosition.x, 2) +
         Math.pow(t.center.y - agentPosition.y, 2)

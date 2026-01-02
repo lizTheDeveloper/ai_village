@@ -37,6 +37,7 @@ const BUILDING_COSTS: Record<string, Record<string, number>> = {
   'bed': { wood: 10, plant_fiber: 15 },
   'well': { stone: 20, wood: 5 },
   'forge': { stone: 25, wood: 10 },
+  'butchering_table': { wood: 25, stone: 10 }, // Match BuildingBlueprintRegistry
 };
 /**
  * Condition for completing a goal/action
@@ -58,6 +59,10 @@ interface ParsedAction {
   seed?: string;
   amount?: number;
   until?: GoalCondition;  // Condition to complete this action
+  cause?: string;     // For combat actions - reason for combat
+  lethal?: boolean;   // For combat actions - lethal combat?
+  surprise?: boolean; // For combat actions - surprise attack?
+  reason?: string;    // For hunt/butcher actions - reason for action
 }
 /**
  * Convert a parsed action object to behavior + behaviorState
@@ -89,6 +94,27 @@ function actionObjectToBehavior(action: ParsedAction): { behavior: AgentBehavior
     case 'follow':
       behaviorState.targetId = action.target || 'nearest';
       return { behavior: 'follow_agent', behaviorState };
+    case 'fight':
+    case 'attack':
+    case 'challenge':
+    case 'confront':
+      // Combat actions - target is required
+      behaviorState.targetId = action.target;
+      behaviorState.cause = action.cause || 'challenge';
+      behaviorState.lethal = action.lethal ?? false;
+      behaviorState.surprise = action.surprise ?? false;
+      return { behavior: 'initiate_combat', behaviorState };
+    case 'hunt':
+      // Hunting actions - target animal is required
+      behaviorState.targetId = action.target;
+      behaviorState.reason = action.reason || 'food';
+      return { behavior: 'hunt', behaviorState };
+    case 'butcher':
+    case 'slaughter':
+      // Butchering actions - target tame animal is required
+      behaviorState.targetId = action.target;
+      behaviorState.reason = action.reason || 'food';
+      return { behavior: 'butcher', behaviorState };
     case ComponentType.Plant:
       behaviorState.seedType = action.seed || 'wheat';
       return { behavior: ComponentType.Plant, behaviorState };

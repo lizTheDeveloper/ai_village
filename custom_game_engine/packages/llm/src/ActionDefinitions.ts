@@ -70,6 +70,13 @@ export const ACTION_DEFINITIONS: ActionDefinition[] = [
   { behavior: 'tame_animal', description: 'Approach and tame a wild animal', alwaysAvailable: true, category: 'animal', skillRequired: { skill: 'animal_handling', level: 2 } },
   { behavior: 'house_animal', description: 'Lead a tamed animal to its housing', alwaysAvailable: true, category: 'animal', skillRequired: { skill: 'animal_handling', level: 2 } },
 
+  // Hunting & Butchering - agent hunts wild animals or processes tame animals
+  { behavior: 'hunt', description: 'Hunt a wild animal for meat and resources', alwaysAvailable: false, category: 'animal', skillRequired: { skill: 'combat', level: 1 } },
+  { behavior: 'butcher', description: 'Butcher a tame animal at butchering table (requires cooking level 1)', alwaysAvailable: false, category: 'animal', skillRequired: { skill: 'cooking', level: 1 } },
+
+  // Combat - agent initiates combat with another agent
+  { behavior: 'initiate_combat', description: 'Challenge another agent to combat (lethal or non-lethal)', alwaysAvailable: false, category: 'social', skillRequired: { skill: 'combat', level: 1 } },
+
   // Priority Management - agent decides what to focus on
   { behavior: 'set_priorities', description: 'Set task priorities (gathering, building, farming, social)', alwaysAvailable: true, category: 'priority' },
 ];
@@ -151,6 +158,21 @@ export const BEHAVIOR_SYNONYMS: Record<string, AgentBehavior> = {
   'befriend': 'tame_animal',
   'house': 'house_animal',
   'shelter_animal': 'house_animal',
+
+  // Hunting & Butchering synonyms
+  'track': 'hunt',
+  'stalk': 'hunt',
+  'kill': 'hunt',
+  'slaughter': 'butcher',
+  'process_animal': 'butcher',
+
+  // Combat synonyms
+  'fight': 'initiate_combat',
+  'attack': 'initiate_combat',
+  'challenge': 'initiate_combat',
+  'confront': 'initiate_combat',
+  'duel': 'initiate_combat',
+  'combat': 'initiate_combat',
 
   // Priority synonyms
   'prioritize': 'set_priorities',

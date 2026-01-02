@@ -227,9 +227,9 @@ describe('OllamaProvider', () => {
       const requestBody = JSON.parse(fetchCall[1].body);
 
       expect(requestBody.model).toBe('qwen3:4b');
-      expect(requestBody.messages).toEqual([
-        { role: 'user', content: 'What to do?' }
-      ]);
+      expect(requestBody.messages.length).toBe(2);
+      expect(requestBody.messages[0].role).toBe('system');
+      expect(requestBody.messages[1]).toEqual({ role: 'user', content: 'What to do?' });
       expect(requestBody.stream).toBe(false);
       expect(requestBody.tools).toBeDefined();
       expect(requestBody.options.temperature).toBe(0.8);
@@ -252,7 +252,7 @@ describe('OllamaProvider', () => {
       const requestBody = JSON.parse(fetchCall[1].body);
 
       expect(requestBody.options.temperature).toBe(0.7);
-      expect(requestBody.options.num_predict).toBe(2000);
+      expect(requestBody.options.num_predict).toBe(40960);
     });
   });
 
@@ -300,41 +300,8 @@ describe('OllamaProvider', () => {
     });
   });
 
-  describe('Logging', () => {
-    it('should log structured responses', async () => {
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-
-      const mockResponse = {
-        ok: true,
-        json: async () => ({
-          message: {
-            thinking: 'Test thinking',
-            content: 'Test speaking',
-            tool_calls: [{
-              function: { name: 'talk', arguments: {} }
-            }]
-          },
-          eval_count: 100
-        })
-      };
-
-      (global.fetch as any).mockResolvedValueOnce(mockResponse);
-
-      await provider.generate({ prompt: 'test' });
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[OllamaProvider] Response:'),
-        expect.objectContaining({
-          action: 'talk',
-          thinking: expect.any(String),
-          speaking: 'Test speaking',
-          tokensUsed: 100
-        })
-      );
-
-      consoleSpy.mockRestore();
-    });
-  });
+  // Logging test removed: Per CLAUDE.md, console.log statements are prohibited.
+  // Only console.error for actual errors and console.warn for warnings are allowed.
 
   describe('Availability Check', () => {
     it('should check server availability', async () => {

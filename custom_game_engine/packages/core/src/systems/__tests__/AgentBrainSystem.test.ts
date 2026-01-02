@@ -170,7 +170,7 @@ describe('AgentBrainSystem', () => {
     energy: 1.0,
     health: 1.0,
   });
-      needs.energy = 5; // Critical
+      needs.energy = 0.2; // Critical (below 0.3 threshold)
       entity.addComponent(needs);
 
       const world = createMockWorld(100);
@@ -235,7 +235,7 @@ describe('AgentBrainSystem', () => {
     energy: 1.0,
     health: 1.0,
   });
-      needs.energy = 5;
+      needs.energy = 0.2;
       entity.addComponent(needs);
 
       const world = createMockWorld(100);

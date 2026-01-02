@@ -11,7 +11,7 @@ export { createRenderableComponent, type RenderableComponent } from './Renderabl
 export * from './TagsComponent.js';
 export { createTagsComponent } from './TagsComponent.js';
 export * from './AgentComponent.js';
-export { createAgentComponent, type AgentComponent } from './AgentComponent.js';
+export { createAgentComponent, derivePrioritiesFromSkills, type AgentComponent } from './AgentComponent.js';
 export * from './MovementComponent.js';
 export { createMovementComponent } from './MovementComponent.js';
 export * from './NeedsComponent.js';
@@ -34,6 +34,9 @@ export type { ConversationComponent } from './ConversationComponent.js';
 export * from './RelationshipComponent.js';
 export { createRelationshipComponent } from './RelationshipComponent.js';
 export type { RelationshipComponent } from './RelationshipComponent.js';
+export * from './JealousyComponent.js';
+export { createJealousyComponent, JealousyComponent } from './JealousyComponent.js';
+export type { JealousyTrigger, JealousyType } from './JealousyComponent.js';
 export * from './PersonalityComponent.js';
 export { PersonalityComponent } from './PersonalityComponent.js';
 export * from './IdentityComponent.js';
@@ -43,6 +46,8 @@ export { BuildingType, type BuildingComponent, createBuildingComponent, canAcces
 export * from './InventoryComponent.js';
 export { calculateInventoryWeight, createInventoryComponent } from './InventoryComponent.js';
 export type { InventoryComponent } from './InventoryComponent.js';
+// Equipment system (Phase 36)
+export * from './EquipmentComponent.js';
 export * from './TemperatureComponent.js';
 export { createTemperatureComponent, type TemperatureComponent } from './TemperatureComponent.js';
 export * from './WeatherComponent.js';
@@ -96,12 +101,53 @@ export type { MarketStateComponent, ItemMarketStats } from './MarketStateCompone
 export * from './ResearchStateComponent.js';
 // Mood system
 export * from './MoodComponent.js';
+// Automation system (Phase 38)
+export * from './PowerComponent.js';
+export { createPowerComponent, createPowerProducer, createPowerConsumer, createPowerStorage } from './PowerComponent.js';
+export type { PowerComponent, PowerType, PowerRole } from './PowerComponent.js';
+export * from './BeltComponent.js';
+export { createBeltComponent, addItemsToBelt, removeItemsFromBelt, canAcceptItems, BELT_SPEEDS } from './BeltComponent.js';
+export type { BeltComponent, BeltDirection, BeltTier } from './BeltComponent.js';
+export * from './AssemblyMachineComponent.js';
+export { createAssemblyMachineComponent, installModule, calculateEffectiveSpeed, calculatePowerConsumption } from './AssemblyMachineComponent.js';
+export type { AssemblyMachineComponent, ModuleInstance, ModuleType } from './AssemblyMachineComponent.js';
+export * from './MachineConnectionComponent.js';
+export { createMachineConnectionComponent, createCustomConnection, hasInputSpace, addToSlot, removeFromSlot, countItemsInSlots } from './MachineConnectionComponent.js';
+export type { MachineConnectionComponent, MachineSlot } from './MachineConnectionComponent.js';
+export * from './MachinePlacementComponent.js';
+export { createMachinePlacementComponent, isValidPlacement, rotateMachine } from './MachinePlacementComponent.js';
+export type { MachinePlacementComponent, PlacementRequirement } from './MachinePlacementComponent.js';
+export * from './ChunkProductionStateComponent.js';
+export { createChunkProductionState, getTotalProductionRate, getTotalConsumptionRate, canProduce, fastForwardProduction } from './ChunkProductionStateComponent.js';
+export type { ChunkProductionStateComponent, ProductionRate } from './ChunkProductionStateComponent.js';
+export * from './FactoryAIComponent.js';
+export { createFactoryAI, recordDecision, requestResource, fulfillRequest, detectBottleneck, clearResolvedBottlenecks, calculateFactoryHealth, getAIStatusSummary } from './FactoryAIComponent.js';
+export type { FactoryAIComponent, FactoryGoal, FactoryHealth, ProductionBottleneck, FactoryStats, FactoryDecision, ResourceRequest } from './FactoryAIComponent.js';
 export type { MoodComponent } from './MoodComponent.js';
 // Food preferences
 export * from './PreferenceComponent.js';
 export type { PreferenceComponent } from './PreferenceComponent.js';
 // Cooking skill
 export * from './CookingSkillComponent.js';
+// Recipe discovery (LLM-generated recipes)
+export * from './RecipeDiscoveryComponent.js';
+export {
+  createRecipeDiscoveryComponent,
+  recordExperiment,
+  canExperiment,
+  decreaseCooldown,
+  wasAlreadyTried,
+  getSpecializationBonus,
+  getDiscoveryDescription,
+  getNotableDiscoveries,
+  hashIngredients,
+  recordDiscoveryCrafted,
+} from './RecipeDiscoveryComponent.js';
+export type {
+  RecipeDiscoveryComponent,
+  ExperimentAttempt,
+  DiscoveredRecipe,
+} from './RecipeDiscoveryComponent.js';
 // Skills system
 export * from './SkillsComponent.js';
 export * from './SkillConstants.js';
@@ -118,12 +164,17 @@ export type { SkillsComponent } from './SkillsComponent.js';
 export * from './GoalsComponent.js';
 export { createGoalsComponent, formatGoalsForPrompt, type GoalsComponent } from './GoalsComponent.js';
 // Equipment system (forward-compatibility)
-export * from './EquipmentSlotsComponent.js';
+// NOTE: EquipmentSlotsComponent export commented out to avoid conflicts with EquipmentComponent
+// Files using EquipmentSlotsComponent should import it directly from './EquipmentSlotsComponent.js'
+// export * from './EquipmentSlotsComponent.js';
 // Magic system (forward-compatibility - Phase 30)
 export * from './MagicComponent.js';
 // Spiritual/prayer system (forward-compatibility - Phase 27)
 export * from './SpiritualComponent.js';
 export { createSpiritualComponent } from './SpiritualComponent.js';
+// Spirit entities (animist spirits/kami - Phase 27)
+export * from './SpiritComponent.js';
+export { createPlaceSpiritComponent, createAncestorSpiritComponent, createObjectSpiritComponent } from './SpiritComponent.js';
 // Deity/divinity system (forward-compatibility - Phase 27)
 export * from './DeityComponent.js';
 // Player control/possession system (Phase 16: Polish & Player)
@@ -395,6 +446,122 @@ export type {
   DeedLedgerComponent,
 } from './DeedLedgerComponent.js';
 
+// Death judgment (psychopomp conversations at time of death)
+export * from './DeathJudgmentComponent.js';
+export {
+  createDeathJudgmentComponent,
+  addConversationExchange,
+  calculateInitialPeace,
+  calculateInitialTether,
+  getAgeCategory,
+  getJudgmentSummary,
+} from './DeathJudgmentComponent.js';
+export type {
+  DeathJudgmentComponent,
+  JudgmentStage,
+  ConversationExchange,
+} from './DeathJudgmentComponent.js';
+
+// Death bargains (hero challenges to cheat death)
+export * from './DeathBargainComponent.js';
+export {
+  createDeathBargainComponent,
+  MYTHIC_RIDDLES,
+} from './DeathBargainComponent.js';
+export type {
+  DeathBargainComponent,
+  ChallengeType,
+  BargainStatus,
+  ResurrectionConditions,
+} from './DeathBargainComponent.js';
+
+// Afterlife memory fading (reincarnation with memory loss)
+export * from './AfterlifeMemoryComponent.js';
+export {
+  createAfterlifeMemoryComponent,
+  calculateMemoryClarity,
+  hasAfterlifeMemories,
+  getMemoryStateDescription,
+} from './AfterlifeMemoryComponent.js';
+export type {
+  AfterlifeMemoryComponent,
+} from './AfterlifeMemoryComponent.js';
+
+// Soul wisdom accumulation across reincarnations (path to godhood)
+export * from './SoulWisdomComponent.js';
+export {
+  createSoulWisdomComponent,
+  createReincarnatedSoulWisdomComponent,
+  calculateWisdomLevel,
+  getWisdomDescription,
+  getWisdomModifier,
+  updatePeakSkills,
+} from './SoulWisdomComponent.js';
+export type {
+  SoulWisdomComponent,
+} from './SoulWisdomComponent.js';
+
+// Soul-Body Separation Architecture
+export * from './SoulIdentityComponent.js';
+export {
+  createSoulIdentityComponent,
+  getDefaultInterestsForArchetype,
+  evaluatePurposeFulfillment,
+  getSoulNarrative,
+} from './SoulIdentityComponent.js';
+export type {
+  SoulIdentityComponent,
+} from './SoulIdentityComponent.js';
+
+export * from './IncarnationComponent.js';
+export {
+  createIncarnationComponent,
+  incarnateIntoBody,
+  endIncarnation,
+  bindToPhylactery,
+  beginAstralProjection,
+  endAstralProjection,
+  getLivesLived,
+  getPrimaryBodyId,
+  isIncarnated,
+} from './IncarnationComponent.js';
+export type {
+  IncarnationComponent,
+  IncarnationRecord,
+  SoulBindingType,
+  SoulBinding,
+} from './IncarnationComponent.js';
+
+export * from './SoulLinkComponent.js';
+export {
+  createSoulLinkComponent,
+  weakenSoulLink,
+  strengthenSoulLink,
+  enableAstralProjection as enableSoulLinkAstralProjection,
+  bindToPhylactery as bindSoulLinkToPhylactery,
+  isLinkBreaking,
+  getSoulInfluenceDescription,
+} from './SoulLinkComponent.js';
+export type {
+  SoulLinkComponent,
+} from './SoulLinkComponent.js';
+
+export * from './SoulCreationEventComponent.js';
+export {
+  createSoulCreationEventComponent,
+  addFateStatement,
+  completeSoulCreation,
+  getSoulCreationNarrative,
+  wasCreationConflicted,
+  getCreationTheme,
+} from './SoulCreationEventComponent.js';
+export type {
+  SoulCreationEventComponent,
+  SoulCreationDebate,
+  FateStatement,
+  FateName,
+} from './SoulCreationEventComponent.js';
+
 // Building Harmony (Feng Shui analysis)
 export * from './BuildingHarmonyComponent.js';
 export {
@@ -452,3 +619,19 @@ export type {
   VoxelResourceComponent,
   VoxelResourceType,
 } from './VoxelResourceComponent.js';
+
+// Interests system (Deep Conversation - Phase 1)
+export * from './InterestsComponent.js';
+export {
+  InterestsComponent,
+  getInterestsDescription,
+  formatTopicName,
+  getTopicCategory,
+} from './InterestsComponent.js';
+export type {
+  Interest,
+  TopicId,
+  TopicCategory,
+  InterestSource,
+  InterestsComponentData,
+} from './InterestsComponent.js';

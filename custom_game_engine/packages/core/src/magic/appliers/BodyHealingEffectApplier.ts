@@ -25,6 +25,7 @@ import type {
   ActiveEffect,
 } from '../SpellEffect.js';
 import type { EffectApplier, EffectContext } from '../SpellEffectExecutor.js';
+import { registerEffectApplier } from '../SpellEffectExecutor.js';
 import { createHealingEffect } from '../SpellEffect.js';
 import { SpellEffectRegistry } from '../SpellEffectRegistry.js';
 
@@ -459,7 +460,6 @@ healLegEffect.stopsBleeding = true;
 export const bodyHealingEffectApplier = new BodyHealingEffectApplier();
 
 export function registerBodyHealingEffectApplier(): void {
-  const { registerEffectApplier } = require('../SpellEffectExecutor.js');
   registerEffectApplier(bodyHealingEffectApplier);
 }
 

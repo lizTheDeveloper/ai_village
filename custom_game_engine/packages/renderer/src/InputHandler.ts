@@ -233,6 +233,13 @@ export class InputHandler {
       const x = me.clientX - rect.left;
       const y = me.clientY - rect.top;
 
+      // Handle right-click (button 2) for context menu
+      if (me.button === 2 && this.callbacks.onRightClick) {
+        me.preventDefault();
+        this.callbacks.onRightClick(x, y);
+        return;
+      }
+
       const handled = this.callbacks.onMouseClick?.(x, y, me.button);
 
       if (handled) {

@@ -50,8 +50,8 @@ import type { ReproductiveMorphComponent } from '../ReproductiveMorphComponent.j
 // Configuration
 // ============================================================================
 
-/** Default gestation length in ticks (270 days at 20 TPS, 60 ticks/min) */
-const DEFAULT_GESTATION_TICKS = 270 * 20 * 60;
+/** Default gestation length in ticks (5 minutes at 20 TPS for testing - was 270 days) */
+const DEFAULT_GESTATION_TICKS = 5 * 20 * 60; // 6000 ticks = 5 minutes real time
 
 /** Base complication rate for unassisted births */
 const BASE_COMPLICATION_RATE = 0.15; // 15%
@@ -121,16 +121,25 @@ export class MidwiferySystem implements System {
   private lastUpdateTick: Tick = 0;
 
   public initialize(world: World, eventBus: EventBus): void {
+    console.log('[MidwiferySystem] Initializing...');
     this.world = world;
     this.eventBus = eventBus;
 
     // Get reference to ReproductionSystem for creating offspring with proper genetics
-    this.reproductionSystem = (world as any).getSystem('ReproductionSystem') as ReproductionSystem | null;
+    // Note: world.getSystem may not be available in all contexts (e.g., tests)
+    try {
+      this.reproductionSystem = (world as any).getSystem?.('ReproductionSystem') as ReproductionSystem | null;
+    } catch {
+      this.reproductionSystem = null;
+    }
 
     // Subscribe to conception events
-    this.eventBus.subscribe('reproduction:conception' as any, (event: any) => {
+    console.log('[MidwiferySystem] Subscribing to conception events...');
+    this.eventBus.subscribe('conception' as any, (event: any) => {
+      console.log('[MidwiferySystem] Received conception event!', event);
       this.handleConception(event.data);
     });
+    console.log('[MidwiferySystem] Ready!');
   }
 
   public update(world: World): void {
@@ -164,14 +173,14 @@ export class MidwiferySystem implements System {
    * Handle conception event - create PregnancyComponent
    */
   private handleConception(data: {
-    motherId: string;
-    fatherId: string;
+    pregnantAgentId: string;
+    otherParentId: string;
     conceptionTick: Tick;
     expectedOffspringCount?: number;
   }): void {
     if (!this.world) return;
 
-    const mother = this.world.getEntity(data.motherId);
+    const mother = this.world.getEntity(data.pregnantAgentId);
     if (!mother) return;
 
     const impl = mother as EntityImpl;
@@ -181,7 +190,7 @@ export class MidwiferySystem implements System {
 
     // Create pregnancy component
     const pregnancy = createPregnancyComponent(
-      data.fatherId,
+      data.otherParentId,
       data.conceptionTick,
       DEFAULT_GESTATION_TICKS
     );
@@ -211,10 +220,10 @@ export class MidwiferySystem implements System {
 
     this.eventBus?.emit({
       type: 'midwifery:pregnancy_started',
-      source: data.motherId,
+      source: data.pregnantAgentId,
       data: {
-        motherId: data.motherId,
-        fatherId: data.fatherId,
+        motherId: data.pregnantAgentId,
+        fatherId: data.otherParentId,
         expectedDueDate: pregnancy.expectedDueDate,
         riskFactors: pregnancy.riskFactors,
       },

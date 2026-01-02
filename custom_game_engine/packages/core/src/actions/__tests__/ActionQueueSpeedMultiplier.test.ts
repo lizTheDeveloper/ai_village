@@ -61,6 +61,7 @@ describe('ActionQueue Speed Multiplier', () => {
             executeEntities: vi.fn().mockReturnValue([timeEntity]),
           }),
         }),
+        getEntity: vi.fn((id: string) => id === 'time-entity' ? timeEntity : undefined),
         eventBus: { emit: vi.fn() },
       } as unknown as WorldMutator;
 
@@ -100,6 +101,7 @@ describe('ActionQueue Speed Multiplier', () => {
             executeEntities: vi.fn().mockReturnValue([timeEntity]),
           }),
         }),
+        getEntity: vi.fn((id: string) => id === 'time-entity' ? timeEntity : undefined),
         eventBus: { emit: vi.fn() },
       } as unknown as WorldMutator;
 
@@ -138,6 +140,7 @@ describe('ActionQueue Speed Multiplier', () => {
             executeEntities: vi.fn().mockReturnValue([timeEntity]),
           }),
         }),
+        getEntity: vi.fn((id: string) => id === 'time-entity' ? timeEntity : undefined),
         eventBus: { emit: vi.fn() },
       } as unknown as WorldMutator;
 
@@ -171,6 +174,7 @@ describe('ActionQueue Speed Multiplier', () => {
             executeEntities: vi.fn().mockReturnValue([timeEntity]),
           }),
         }),
+        getEntity: vi.fn((id: string) => id === 'time-entity' ? timeEntity : undefined),
         eventBus: { emit: vi.fn() },
       } as unknown as WorldMutator;
 
@@ -205,6 +209,7 @@ describe('ActionQueue Speed Multiplier', () => {
             executeEntities: vi.fn().mockReturnValue([]), // No time entity
           }),
         }),
+        getEntity: vi.fn(() => undefined), // No time entity
         eventBus: { emit: vi.fn() },
       } as unknown as WorldMutator;
 
@@ -259,6 +264,7 @@ describe('ActionQueue Speed Multiplier', () => {
             executeEntities: vi.fn().mockReturnValue([timeEntity]),
           }),
         }),
+        getEntity: vi.fn((id: string) => id === 'time-entity' ? timeEntity : undefined),
         eventBus: { emit: vi.fn() },
       } as unknown as WorldMutator;
 
@@ -301,6 +307,7 @@ describe('ActionQueue Speed Multiplier', () => {
             executeEntities: vi.fn().mockReturnValue([timeEntity]),
           }),
         }),
+        getEntity: vi.fn((id: string) => id === 'time-entity' ? timeEntity : undefined),
         eventBus: { emit: vi.fn() },
       } as unknown as WorldMutator;
 

@@ -606,6 +606,16 @@ export const SKILL_SYNERGIES: SkillSynergy[] = [
     xpSharing: 0.1,
     speedBonus: 0,
   },
+  // Hunter chain - combat + cooking + hunting for superior butchering
+  {
+    id: 'hunter',
+    name: 'Hunter',
+    skills: ['combat', 'cooking', 'hunting'],
+    description: 'Expert butchering and meat processing, +15% hunting/butchering quality',
+    qualityBonus: 0.15,
+    xpSharing: 0.1,
+    speedBonus: 0.1,
+  },
   // Wanderer chain
   {
     id: 'wandering_healer',

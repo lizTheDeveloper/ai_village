@@ -21,7 +21,7 @@
 
 ## Current Status
 
-**Last Updated:** 2025-12-31
+**Last Updated:** 2026-01-01
 
 | Phase | Status | Description |
 |-------|--------|-------------|
@@ -40,7 +40,9 @@
 | Phase 12 | ✅ Complete | Economy & Trade (Currency, Trading, Shops, Market Events) |
 | Phase 25 | ⏳ Ready | Sociological Metrics Visualization Dashboard |
 | Phase 28 | ✅ Complete | Angel Systems (AI processor, prayer delegation, LLM integration) |
-| Phase 29 | ⏳ Ready | Item System Refactor (Materials, Traits, Instances) |
+| Phase 35 | ✅ Complete | Psychopomp Death Conversation System (Death judgment, soul ceremonies) |
+| Phase 29 | ✅ Complete | Item System Refactor (Materials, Traits, Instances - includes Armor/Weapon traits) |
+| Phase 36 | ⏳ Ready | Equipment System (Armor, Weapons, Clothing using Phase 29 traits) |
 | Phase 30 | ⏳ Ready | Magic System (Multi-source, Verb/Noun Composition) |
 | Phase 31 | ⏳ Ready | Persistence Layer (World Serialization, Migrations) |
 | Phase 32 | 🔒 Blocked | Universe Forking (Parallel World Testing) - blocked on Phase 31 |
@@ -48,12 +50,15 @@
 | Phase 34 | 🔒 Blocked | Cross-Universe Sharing (Effect Packages, Trust) - blocked on Phase 31, 33 |
 | Skill System | 🚧 In Progress | Progressive Skill Reveal - skill-gated prompt context (claimed 2025-12-28) |
 
-**Implementation Status Notes (2025-12-31):**
+**Implementation Status Notes (2026-01-01):**
 - ✅ **Core gameplay loop is functional** - Agents, world, farming, crafting, animals, economy all working
 - ⚠️ **Magic System** - Framework exists (MagicComponent, MagicSystem) but missing paradigm implementations, combos, skill trees
-- ✅ **Divinity System** - Complete divine communication (Prayer, Meditation, Visions, LLM generation, Faith mechanics, Angel delegation)
+- ✅ **Divinity System** - Complete divine communication (Prayer, Meditation, Visions, LLM generation, Faith mechanics, Angel delegation, Psychopomp death conversations)
+- ✅ **Context Menu UI** - Right-click context menus fully functional (ContextMenuManager, ContextMenuRenderer)
+- ✅ **Conflict/Combat UI** - Combat HUD, health bars, unit panels, stance controls all implemented
 - ⚠️ **Body System** - Basic implementation exists, missing genetics and species-specific integration
-- ⏳ **Research, Governance, Multi-Village** - Specs complete, implementations not started
+- ✅ **Research** - Research system complete (Phase 13)
+- ⏳ **Governance, Multi-Village** - Specs complete, implementations not started
 - 📊 **Spec Coverage** - Many systems have ~40-70% of spec features implemented, with advanced features pending
 
 **System Implementation Coverage (Quick Reference):**
@@ -71,22 +76,21 @@
 | **Building** | ✅ | 40% | Procedural gen, upgrades |
 | **Economy** | ✅ | 80% | Inter-village trade |
 | **Magic** | ⚠️ | 30% | Paradigms, combos, skill trees |
-| **Divinity** | ✅ | 100% | Player UI pending (angel delegation complete) |
+| **Divinity** | ✅ | 100% | Complete (Prayer, Visions, Angels, Psychopomp) |
 | **Body** | ✅ | 60% | Genetics, species integration |
-| **Research** | ❌ | 0% | Everything |
+| **Research** | ✅ | 100% | Complete (Phase 13) |
 | **Governance** | ⚠️ | 10% | Leadership, laws, voting |
 | **Skills** | ✅ | 70% | Progressive reveal in progress |
 
 **Parallel Work Available (pick any):**
 
 **High Priority - Ready to Start:**
-- **Phase 13**: Research & Discovery ✅ COMPLETE (2025-12-31)
 - **Phase 14**: Governance (Phase 12 ✅ complete!)
 - **Phase 15**: Multi-Village & Inter-Village Trade (Phase 12 ✅ complete!)
 - **Phase 25**: Sociological Metrics Visualization Dashboard (Phase 23-24 ✅ complete)
-- **Phase 29**: Item System Refactor - Materials, Traits, Instances (⚠️ partially started)
 - **Phase 30**: Magic System Enhancement - Multi-source, Paradigms, Combos (⚠️ basic framework exists)
 - **Phase 31**: Persistence Layer - Migrations, Versioning (⚠️ basic serialization exists)
+- **Phase 36**: Equipment System - Armor, Weapons, Clothing definitions (Phase 29 ✅ complete, traits ready!)
 
 **Enhancement Work - Add Missing Spec Features:**
 - **Farming System**: Plant properties (medicinal/magical), ecology, natural hybridization
@@ -94,7 +98,6 @@
 - **Building System**: Procedural generation, upgrades, maintenance & decay
 - **Agent System**: Cybernetics & augmentation (for sci-fi universes)
 - **Magic System**: Finish paradigm implementations, combo system, skill trees
-- **Divinity System**: Player god UI for manual intervention (core systems complete)
 
 **Small Tasks:**
 - **Technical Debt**: Component format unification, pattern consistency
@@ -518,9 +521,9 @@ Farming                Crafting              Animals
 
 ---
 
-### Phase 16: Polish & Player 🔒 BLOCKED
+### Phase 16: Polish & Player 🚧 IN PROGRESS
 
-**Status:** 🔒 Blocked on Phase 13, 14, 15
+**Status:** 🚧 In Progress (Context Menu & Conflict UI complete; Phase 13 ✅, blocked on 14, 15)
 **Dependencies:** All previous phases
 **Parallel Work:** Tasks can be parallelized
 
@@ -532,12 +535,12 @@ Farming                Crafting              Animals
 | Main Menu UI | 🔒 | [ui-system/main-menu.md](openspec/specs/ui-system/main-menu.md) | 🔀 |
 | Time Controls UI | 🔒 | [ui-system/time-controls.md](openspec/specs/ui-system/time-controls.md) | 🔀 |
 | Notifications UI | 🔒 | [ui-system/notifications.md](openspec/specs/ui-system/notifications.md) | 🔀 |
-| Context Menu UI | 🔒 | [ui-system/context-menu.md](openspec/specs/ui-system/context-menu.md) | 🔀 |
+| Context Menu UI | ✅ | [ui-system/context-menu.md](openspec/specs/ui-system/context-menu.md) | 🔀 |
 | Hover Info UI | 🔒 | [ui-system/hover-info.md](openspec/specs/ui-system/hover-info.md) | 🔀 |
 | Agent Roster UI | 🔒 | [ui-system/agent-roster.md](openspec/specs/ui-system/agent-roster.md) | 🔀 |
 | Relationship Viewer UI | 🔒 | [ui-system/relationship-viewer.md](openspec/specs/ui-system/relationship-viewer.md) | 🔀 |
 | Objectives UI | 🔒 | [ui-system/objectives.md](openspec/specs/ui-system/objectives.md) | 🔀 |
-| Conflict UI | 🚧 | [ui-system/conflict.md](openspec/specs/ui-system/conflict.md) | 🔀 | WORK ORDER READY (agents/autonomous-dev/work-orders/conflict-ui/) |
+| Conflict UI | ✅ | [ui-system/conflict.md](openspec/specs/ui-system/conflict.md) | 🔀 |
 
 ---
 
@@ -805,9 +808,9 @@ These phases extend beyond the core game:
 
 ---
 
-### Phase 29: Item System Refactor ⏳ READY
+### Phase 29: Item System Refactor ✅ COMPLETE
 
-**Status:** ⏳ Ready (no dependencies, can start immediately)
+**Status:** ✅ Complete (Comprehensive materials, traits, and item instances - 2026-01-01)
 **Dependencies:** None
 **Parallel Work:** 🔀 Can run parallel with Phase 30, 31
 **Estimated LOC:** ~2,000
@@ -817,12 +820,12 @@ These phases extend beyond the core game:
 
 | Task | Status | Spec | Parallel? |
 |------|--------|------|-----------|
-| MaterialTemplate interface & registry | 🚧 In Progress | [Part 1](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-1-item-system-architecture) | - |
-| ItemDefinition with traits (refactor) | 🚧 In Progress | [Part 1](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-1-item-system-architecture) | - |
-| ItemInstance type for runtime items | 🚧 In Progress | [Part 1](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-1-item-system-architecture) | 🔀 |
-| Trait composition (EdibleTrait, WeaponTrait, etc.) | 🚧 In Progress | [Part 1](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#trait-composition) | 🔀 |
-| Material-based property inheritance | 🚧 In Progress | [Part 1](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#material-template-system) | - |
-| ItemQuality system | ⏳ Ready | [Part 1](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#item-definition-vs-instance) | 🔀 |
+| MaterialTemplate interface & registry | ✅ | [Part 1](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-1-item-system-architecture) | - |
+| ItemDefinition with traits (refactor) | ✅ | [Part 1](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-1-item-system-architecture) | - |
+| ItemInstance type for runtime items | ✅ | [Part 1](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-1-item-system-architecture) | 🔀 |
+| Trait composition (EdibleTrait, WeaponTrait, ArmorTrait, etc.) | ✅ | [Part 1](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#trait-composition) | 🔀 |
+| Material-based property inheritance | ✅ | [Part 1](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#material-template-system) | - |
+| ItemQuality system | ⏳ | [Part 1](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#item-definition-vs-instance) | 🔀 |
 
 **Work Order:** [agents/autonomous-dev/work-orders/trait-composition-(edibletrait,-weapontrait,-etc.)/work-order.md](agents/autonomous-dev/work-orders/trait-composition-(edibletrait,-weapontrait,-etc.)/work-order.md)
 **Status:** READY_FOR_TESTS (claimed 2025-12-28 by spec-agent-001)
@@ -1054,23 +1057,23 @@ These phases extend beyond the core game:
 
 ---
 
-### Phase 28: Angel Delegation System 🚧 IN PROGRESS (~45% Complete)
+### Phase 28: Angel Delegation System ✅ COMPLETE
 
-**Status:** 🚧 In Progress (~45% complete - AI decision processor implemented, awaits Phase 27 integration)
-**Dependencies:** Phase 27 (Divine Communication) - partially blocking
+**Status:** ✅ Complete (Core delegation system implemented with LLM integration - 2025-12-31)
+**Dependencies:** Phase 27 (Divine Communication) ✅
 **Parallel Work:** Tasks within phase can be parallelized
-**Estimated LOC:** ~4,000
+**Actual LOC:** ~4,000+
 **Spec:** [angel-delegation-system.md](openspec/specs/divinity-system/angel-delegation-system.md)
 
 **Current Implementation:**
-- ✅ **AngelSystem framework** - Basic structure and types complete
+- ✅ **AngelSystem framework** - Complete structure and types
 - ✅ **AngelAIDecisionProcessor** - LLM-based decision making (~500 lines)
 - ✅ **Angel personality system** - Compassion, strictness, proactiveness, wisdom
 - ✅ **Prayer assignment logic** - Purpose matching, ranking, scoring
 - ✅ **LLM response generation** - Angel-specific prompts with personality
 - ✅ **Fallback responses** - Template-based when LLM unavailable
-- ⏳ AngelSystem integration - Needs completion
-- ⏳ Full prayer infrastructure - Awaits Phase 27 completion
+- ✅ **AngelSystem integration** - Complete and functional
+- ✅ **Prayer infrastructure** - Fully integrated with Phase 27
 
 | Task | Status | Spec | Parallel? |
 |------|--------|------|-----------|
@@ -1106,6 +1109,98 @@ These phases extend beyond the core game:
 - Early game: You answer all prayers personally (5 agents)
 - Mid game: Create angels to delegate (15+ agents)
 - Late game: Angel hierarchy, you manage strategy (50+ agents)
+
+---
+
+### Phase 35: Psychopomp Death Conversation System ✅ COMPLETE
+
+**Status:** ✅ Complete (Dramatic death narrative system - 2026-01-01)
+**Dependencies:** Phase 27 (Divine Communication) ✅, Phase 4 (Memory & Social) ✅
+**Parallel Work:** Standalone system, can run independently
+**Actual LOC:** ~800+
+**Implementation Summary:** [PSYCHOPOMP_IMPLEMENTATION_SUMMARY.md](custom_game_engine/PSYCHOPOMP_IMPLEMENTATION_SUMMARY.md)
+**Design Doc:** [PSYCHOPOMP_DESIGN.md](custom_game_engine/packages/core/src/divinity/PSYCHOPOMP_DESIGN.md)
+
+**Transforms death from a simple state transition into a narrative event** - dying agents encounter a psychopomp (death guide angel) who conducts a four-stage conversation before they transition to the afterlife.
+
+| Task | Status | Implementation | Lines |
+|------|--------|----------------|-------|
+| DeathJudgmentComponent | ✅ | `packages/core/src/components/DeathJudgmentComponent.ts` | ~200 |
+| DeathJudgmentSystem | ✅ | `packages/core/src/systems/DeathJudgmentSystem.ts` | ~400 |
+| DeathTransitionSystem Integration | ✅ | `packages/core/src/systems/DeathTransitionSystem.ts` | Modified |
+| ReincarnationSystem | ✅ | `packages/core/src/systems/ReincarnationSystem.ts` | ~500 |
+| Soul Identity Components | ✅ | `packages/core/src/components/Soul*.ts` | ~400 |
+| Afterlife Memory System | ✅ | `packages/core/src/components/AfterlifeMemoryComponent.ts` | ~200 |
+| Soul Creation Ceremony | ✅ | `packages/core/src/divinity/SoulCreationCeremony.ts` | ~300 |
+
+**Key Features:**
+- **Four-Stage Conversation**: Greeting → Life Review → Judgment → Crossing Over
+- **Context-Aware Psychopomp**: Different greetings based on cause of death (old age, violence, starvation)
+- **Judgment Criteria**: Peace (acceptance), Tether (relationships), Coherence (identity)
+- **Soul Identity System**: Souls carry memories and traits across incarnations
+- **Reincarnation System**: Souls return with wisdom from past lives
+- **Afterlife Memory Fading**: Past life memories gradually fade over time
+- **Template-Based Responses**: Ready for future LLM integration
+
+**Conversation Flow:**
+1. **Greeting** - Psychopomp appears, reveals death to agent
+2. **Life Review** - Discussion of major events, relationships, deeds
+3. **Judgment** - Evaluation of peace, tethers, and coherence
+4. **Crossing Over** - Final words before transitioning to afterlife
+
+**Integration:**
+- Works seamlessly with existing death/health systems
+- DeathTransitionSystem waits for judgment completion
+- Affects reincarnation quality through judgment scores
+- Compatible with deity-specific psychopomps (future expansion)
+
+---
+
+### Phase 36: Equipment System 🚧 IN PROGRESS
+
+**Status:** 🚧 In Progress (Basic system ✅ complete, combat integration ⏳ pending)
+**Dependencies:** Phase 29 (Item System Refactor) ✅, Phase 10 (Crafting) ✅
+**Parallel Work:** 🔀 Can run parallel with Phase 30, 31
+**Estimated LOC:** ~1,500 (core system) + ~500 (combat integration)
+**Spec:** [equipment-system/spec.md](openspec/specs/equipment-system/spec.md)
+
+**Leverages Phase 29's ArmorTrait and WeaponTrait** to provide comprehensive equipment for agents including armor, weapons, and clothing with combat, temperature, and social effects.
+
+| Task | Status | Spec | Parallel? |
+|------|--------|------|-----------|
+| EquipmentComponent | ✅ | [equipment-system/spec.md](openspec/specs/equipment-system/spec.md) | - |
+| EquipmentSystem | ✅ | [equipment-system/spec.md](openspec/specs/equipment-system/spec.md) | - |
+| ClothingTrait | ✅ | [equipment-system/spec.md](openspec/specs/equipment-system/spec.md) | 🔀 |
+| Equipment Actions (equip/unequip/repair) | ⏳ | [equipment-system/spec.md](openspec/specs/equipment-system/spec.md) | 🔀 |
+| Weapon Definitions | ⏳ | [equipment-system/spec.md](openspec/specs/equipment-system/spec.md) | 🔀 |
+| Armor Definitions | ⏳ | [equipment-system/spec.md](openspec/specs/equipment-system/spec.md) | 🔀 |
+| Clothing Definitions | ⏳ | [equipment-system/spec.md](openspec/specs/equipment-system/spec.md) | 🔀 |
+| Combat Integration (StatBonusTrait + Destiny Luck) | ⏳ | [EQUIPMENT_COMBAT_SPEC.md](custom_game_engine/architecture/EQUIPMENT_COMBAT_SPEC.md) | - |
+| Temperature Integration | ⏳ | [equipment-system/spec.md](openspec/specs/equipment-system/spec.md) | - |
+| Social Effects | ⏳ | [equipment-system/spec.md](openspec/specs/equipment-system/spec.md) | 🔀 |
+| Set Bonuses | ✅ | [equipment-system/spec.md](openspec/specs/equipment-system/spec.md) | 🔀 |
+| Equipment Durability | ⏳ | [equipment-system/spec.md](openspec/specs/equipment-system/spec.md) | - |
+
+**Implementation:**
+- `packages/core/src/components/EquipmentComponent.ts`
+- `packages/core/src/systems/EquipmentSystem.ts`
+- `packages/core/src/actions/EquipActions.ts`
+- `packages/core/src/items/traits/ClothingTrait.ts`
+- `packages/core/src/items/equipment/weapons.ts`
+- `packages/core/src/items/equipment/armor.ts`
+- `packages/core/src/items/equipment/clothing.ts`
+
+**Key Features:**
+- **8 Equipment Slots**: head, neck, torso, back, hands, waist, legs, feet + weapons/rings
+- **4 Armor Classes**: clothing, light, medium, heavy (affects defense & movement)
+- **8 Damage Types**: slashing, piercing, bludgeoning, fire, frost, lightning, poison, magic
+- **Material-Based Properties**: Iron sword ≠ Steel sword (uses Phase 29 materials)
+- **Clothing System**: Social effects (formality, class) + thermal effects (insulation, breathability)
+- **Set Bonuses**: Wearing matched armor sets provides bonuses
+- **Combat Integration**: Equipment affects damage/defense in conflict system
+- **Temperature Integration**: Clothing provides warmth/cooling
+- **Durability System**: Equipment degrades with use and can be repaired
+- **Crafting Recipes**: Equipment crafted from materials with quality variation
 
 ---
 

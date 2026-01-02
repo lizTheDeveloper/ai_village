@@ -13,6 +13,7 @@ export { MetricsStorage, type StoredMetric, type SessionData, type QueryOptions,
 export { MetricsAnalysis, type Insight, type InsightSeverity, type Anomaly, type CorrelationResult, type TrendType, type TrendData, type RecognizedPattern, type PerformanceBottleneck, type OptimizationSuggestion } from './MetricsAnalysis.js';
 export { MetricsDashboard, type LiveMetrics, type ChartType, type ChartData, type AlertType, type DashboardAlert, type DashboardState } from './MetricsDashboard.js';
 export { RingBuffer } from './RingBuffer.js';
+export { CanonEventRecorder, type CanonEvent, type CanonEventType, type CanonEventConfig, type RuntimeDefinitions, type GenealogicalContext } from './CanonEventRecorder.js';
 
 // Streaming and live API
 export {

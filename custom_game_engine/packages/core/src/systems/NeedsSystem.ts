@@ -17,23 +17,36 @@ export class NeedsSystem implements System {
   public readonly priority: number = 15; // Run after AI (10), before Movement (20)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Needs];
 
+  // Performance: Cache time entity to avoid querying every tick
+  private timeEntityId: string | null = null;
+
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     // Use SimulationScheduler to only process active entities
     const activeEntities = world.simulationScheduler.filterActiveEntities(entities, world.tick);
 
-    // Get game time from TimeComponent to calculate game minutes elapsed
-    const timeEntities = world.query().with(CT.Time).executeEntities();
+    // Get game time from TimeComponent to calculate game minutes elapsed (cached)
     let gameMinutesElapsed = 0;
 
-    if (timeEntities.length > 0) {
-      const timeEntity = timeEntities[0] as EntityImpl;
-      const timeComp = timeEntity.getComponent<TimeComponent>(CT.Time);
-      if (timeComp) {
-        // Calculate effective day length based on speed multiplier
-        const effectiveDayLength = timeComp.dayLength / timeComp.speedMultiplier;
-        // Calculate game hours elapsed, then convert to minutes
-        const hoursElapsed = (deltaTime / effectiveDayLength) * 24;
-        gameMinutesElapsed = hoursElapsed * 60;
+    if (!this.timeEntityId) {
+      const timeEntities = world.query().with(CT.Time).executeEntities();
+      if (timeEntities.length > 0) {
+        this.timeEntityId = timeEntities[0]!.id;
+      }
+    }
+
+    if (this.timeEntityId) {
+      const timeEntity = world.getEntity(this.timeEntityId);
+      if (timeEntity) {
+        const timeComp = (timeEntity as EntityImpl).getComponent<TimeComponent>(CT.Time);
+        if (timeComp) {
+          // Calculate effective day length based on speed multiplier
+          const effectiveDayLength = timeComp.dayLength / timeComp.speedMultiplier;
+          // Calculate game hours elapsed, then convert to minutes
+          const hoursElapsed = (deltaTime / effectiveDayLength) * 24;
+          gameMinutesElapsed = hoursElapsed * 60;
+        }
+      } else {
+        this.timeEntityId = null;
       }
     }
 

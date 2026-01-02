@@ -49,6 +49,7 @@ export class OpenAICompatProvider implements LLMProvider {
 
   /**
    * Fetch with timeout and retry logic for transient failures
+   * Uses Promise.race for timeout to avoid AbortSignal compatibility issues in test environments
    */
   private async fetchWithRetry(
     url: string,
@@ -58,23 +59,22 @@ export class OpenAICompatProvider implements LLMProvider {
     let lastError: Error | undefined;
 
     for (let attempt = 0; attempt <= retries; attempt++) {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-
       try {
-        const response = await fetch(url, {
-          ...options,
-          signal: controller.signal,
+        // Use Promise.race for timeout (more compatible than AbortSignal in test environments)
+        const fetchPromise = fetch(url, options);
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error('Request timeout')), this.timeout);
         });
-        clearTimeout(timeoutId);
+
+        const response = await Promise.race([fetchPromise, timeoutPromise]);
         return response;
       } catch (error) {
-        clearTimeout(timeoutId);
         lastError = error instanceof Error ? error : new Error(String(error));
 
         // Check if it's a retryable error (network issues, timeout)
         const isRetryable =
           lastError.name === 'AbortError' ||
+          lastError.message.includes('timeout') ||
           lastError.message.includes('Failed to fetch') ||
           lastError.message.includes('network') ||
           lastError.message.includes('ECONNRESET');
@@ -394,7 +394,11 @@ Keep speech brief and natural.`
         // Parse arguments if present
         try {
           if (toolCall.function.arguments) {
-            actionArgs = JSON.parse(toolCall.function.arguments);
+            const parsed = JSON.parse(toolCall.function.arguments);
+            // Ensure we always have an object, not null or a primitive
+            if (parsed && typeof parsed === 'object') {
+              actionArgs = parsed;
+            }
           }
         } catch {
           // Arguments parsing failed, use empty object

@@ -10,7 +10,8 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../ecs/World.js';
+import { WorldImpl } from '../ecs/World.js';
+import { EventBusImpl } from '../events/EventBus.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
@@ -20,8 +21,12 @@ import { DivineBodyModification } from '../systems/DivineBodyModification.js';
 import { registerBodyHealingEffectApplier } from '../magic/appliers/BodyHealingEffectApplier.js';
 import { registerBodyTransformEffectApplier } from '../magic/appliers/BodyTransformEffectApplier.js';
 
+// Register effect appliers once for all tests
+registerBodyHealingEffectApplier();
+registerBodyTransformEffectApplier();
+
 describe('Divinity + Body Parts Integration', () => {
-  let world: World;
+  let world: WorldImpl;
   let divineBodySystem: DivineBodyModification;
   let deity: EntityImpl;
   let deityComp: DeityComponent;
@@ -29,11 +34,8 @@ describe('Divinity + Body Parts Integration', () => {
   let believerBody: BodyComponent;
 
   beforeEach(() => {
-    world = new World();
-
-    // Register effect appliers
-    registerBodyHealingEffectApplier();
-    registerBodyTransformEffectApplier();
+    const eventBus = new EventBusImpl();
+    world = new WorldImpl(eventBus);
 
     // Create divine body modification system
     divineBodySystem = new DivineBodyModification({
@@ -47,13 +49,13 @@ describe('Divinity + Body Parts Integration', () => {
     deityComp.identity.domain = 'healing';
     deityComp.belief.currentBelief = 5000; // Lots of belief to spend
     deity.addComponent(deityComp);
-    world.addEntity(deity);
+    (world as any)._addEntity(deity);
 
     // Create believer entity with body
     believer = new EntityImpl('believer_1');
     believerBody = createBodyComponentFromPlan('humanoid_standard', 'human');
     believer.addComponent(believerBody);
-    world.addEntity(believer);
+    (world as any)._addEntity(believer);
 
     // Make believer believe in deity
     deityComp.addBeliever(believer.id);
@@ -62,7 +64,7 @@ describe('Divinity + Body Parts Integration', () => {
   describe('Divine Healing Powers', () => {
     it('should heal wounds on a believer', () => {
       // Injure the believer's arm
-      const arm = believerBody.parts.left_arm_1;
+      const arm = believerBody.parts.left_arm;
       if (!arm) throw new Error('No left arm found');
 
       arm.health = 30;
@@ -90,7 +92,7 @@ describe('Divinity + Body Parts Integration', () => {
       expect(result?.category).toBe('healing');
 
       // Check that bleeding stopped
-      const updatedArm = believerBody.parts.left_arm_1;
+      const updatedArm = believerBody.parts.left_arm;
       if (!updatedArm) throw new Error('Arm disappeared');
 
       const bleedingInjuries = updatedArm.injuries.filter(i => i.bleedRate > 0);
@@ -102,7 +104,7 @@ describe('Divinity + Body Parts Integration', () => {
 
     it('should cure infections on believer', () => {
       // Infect the believer's leg
-      const leg = believerBody.parts.left_leg_1;
+      const leg = believerBody.parts.left_leg;
       if (!leg) throw new Error('No left leg found');
 
       leg.infected = true;
@@ -120,14 +122,14 @@ describe('Divinity + Body Parts Integration', () => {
       expect(result?.result).toBe('success');
 
       // Check infection cured
-      const updatedLeg = believerBody.parts.left_leg_1;
+      const updatedLeg = believerBody.parts.left_leg;
       if (!updatedLeg) throw new Error('Leg disappeared');
       expect(updatedLeg.infected).toBe(false);
     });
 
     it('should mend fractures on believer', () => {
       // Fracture the believer's arm
-      const arm = believerBody.parts.right_arm_1;
+      const arm = believerBody.parts.right_arm;
       if (!arm) throw new Error('No right arm found');
 
       const fracture: Injury = {
@@ -154,7 +156,7 @@ describe('Divinity + Body Parts Integration', () => {
       expect(result?.result).toBe('success');
 
       // Check fracture healed
-      const updatedArm = believerBody.parts.right_arm_1;
+      const updatedArm = believerBody.parts.right_arm;
       if (!updatedArm) throw new Error('Arm disappeared');
 
       const fractures = updatedArm.injuries.filter(i => i.type === 'fracture');
@@ -165,7 +167,7 @@ describe('Divinity + Body Parts Integration', () => {
 
     it('should restore a lost limb (very powerful)', () => {
       // Remove the believer's arm (simulate amputation)
-      delete believerBody.parts.right_arm_1;
+      delete believerBody.parts.right_arm;
 
       const armsBefore = Object.values(believerBody.parts).filter(
         p => p.type === 'arm'
@@ -222,7 +224,7 @@ describe('Divinity + Body Parts Integration', () => {
       const nonBeliever = new EntityImpl('non_believer');
       const nonBelieverBody = createBodyComponentFromPlan('humanoid_standard', 'human');
       nonBeliever.addComponent(nonBelieverBody);
-      world.addEntity(nonBeliever);
+      (world as any)._addEntity(nonBeliever);
 
       // Try to heal non-believer
       const result = divineBodySystem.mendAllWounds(
@@ -317,7 +319,7 @@ describe('Divinity + Body Parts Integration', () => {
     });
 
     it('should enhance existing arms', () => {
-      const arm = believerBody.parts.left_arm_1;
+      const arm = believerBody.parts.left_arm;
       if (!arm) throw new Error('No left arm found');
 
       const originalMaxHealth = arm.maxHealth;
@@ -336,7 +338,7 @@ describe('Divinity + Body Parts Integration', () => {
       expect(result?.result).toBe('success');
 
       // Check arm was enhanced
-      const enhancedArm = believerBody.parts.left_arm_1;
+      const enhancedArm = believerBody.parts.left_arm;
       if (!enhancedArm) throw new Error('Arm disappeared');
 
       expect(enhancedArm.maxHealth).toBeGreaterThan(originalMaxHealth);
@@ -474,7 +476,7 @@ describe('Divinity + Body Parts Integration', () => {
       const believer2 = new EntityImpl('believer_2');
       const believer2Body = createBodyComponentFromPlan('humanoid_standard', 'human');
       believer2.addComponent(believer2Body);
-      world.addEntity(believer2);
+      (world as any)._addEntity(believer2);
       deityComp.addBeliever(believer2.id);
 
       // Modify both believers
@@ -516,7 +518,7 @@ describe('Divinity + Body Parts Integration', () => {
       const insectoid = new EntityImpl('insectoid_1');
       const insectoidBody = createBodyComponentFromPlan('insectoid_4arm', 'insectoid');
       insectoid.addComponent(insectoidBody);
-      world.addEntity(insectoid);
+      (world as any)._addEntity(insectoid);
       deityComp.addBeliever(insectoid.id);
 
       const armsBefore = Object.values(insectoidBody.parts).filter(
@@ -547,7 +549,7 @@ describe('Divinity + Body Parts Integration', () => {
       const aquatic = new EntityImpl('aquatic_1');
       const aquaticBody = createBodyComponentFromPlan('aquatic_tentacled', 'alien');
       aquatic.addComponent(aquaticBody);
-      world.addEntity(aquatic);
+      (world as any)._addEntity(aquatic);
       deityComp.addBeliever(aquatic.id);
 
       // Heal aquatic (should work despite different body plan)

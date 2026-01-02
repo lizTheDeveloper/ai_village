@@ -71,3 +71,84 @@ export {
   TIER_4_RESEARCH,
   TIER_5_RESEARCH,
 } from './defaultResearch.js';
+
+// === Clarketech Research (Tier 6-8) ===
+export {
+  CLARKETECH_RESEARCH,
+  registerClarketechResearch,
+  getClarketechTierLabel,
+  isClarketechResearch,
+  getClarketechTier,
+} from './clarketechResearch.js';
+
+// === Academic Paper System ===
+export {
+  AcademicPaperSystem,
+  AcademicPaperManager,
+  getAcademicPaperSystem,
+  resetAcademicPaperSystem,
+  type AcademicPaper,
+  type Author,
+  type ResearchBibliography,
+  type CitationEvent,
+} from './AcademicPaperSystem.js';
+
+// === Inventor Fame System ===
+export {
+  InventorFameSystem,
+  InventorFameManager,
+  getInventorFameSystem,
+  resetInventorFameSystem,
+  type Inventor,
+  type DiscoveryCredit,
+  type InventorTitle,
+  type TitleRequirement,
+  type FameTier,
+  type NewsAnnouncement,
+} from './InventorFameSystem.js';
+
+// === Publication System (Writing Technology) ===
+export {
+  PublicationSystem,
+  PublicationManager,
+  getPublicationSystem,
+  resetPublicationSystem,
+  WritingTechLevel,
+  getWritingTechName,
+  getRequiredTechLevel,
+  generatePublicationTitle,
+  type Publication,
+  type PublicationType,
+  type PublicationCategory,
+  type RecipePublication,
+  type BotanicalPublication,
+  type ChroniclePublication,
+} from './PublicationSystem.js';
+
+// === Herbalist Discovery System ===
+export {
+  HerbalistDiscoverySystem,
+  getHerbalistDiscoverySystem,
+  resetHerbalistDiscoverySystem,
+  generateBotanicalPaper,
+  type PlantDiscovery,
+  type HerbalistDiscoveryComponent,
+} from './HerbalistDiscoverySystem.js';
+
+// === Cook Influencer System ===
+export {
+  CookInfluencerSystem,
+  getCookInfluencerSystem,
+  resetCookInfluencerSystem,
+  type CookPublicationComponent,
+} from './CookInfluencerSystem.js';
+
+// === Chronicler System ===
+export {
+  ChroniclerSystem,
+  getChroniclerSystem,
+  resetChroniclerSystem,
+  type HistoricalEventType,
+  type HistoricalEvent,
+  type ChroniclerComponent,
+} from './ChroniclerSystem.js';

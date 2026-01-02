@@ -52,3 +52,7 @@ export type {
   PlacementWarning,
   PlacementValidationResult
 } from './PlacementValidator.js';
+
+// Automation Buildings (Phase 38)
+export * from './AutomationBuildings.js';
+export type { BuildingDefinition } from './AutomationBuildings.js';

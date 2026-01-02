@@ -208,3 +208,63 @@ export type {
   // Config types
   MidwiferyConfig,
 } from './midwifery/index.js';
+
+// Parenting subsystem
+export { ParentingComponent, createParentingComponent } from '../components/ParentingComponent.js';
+export type { ParentingResponsibility, ParentingDriveLevel, ParentingReputation } from '../components/ParentingComponent.js';
+export { getParentingActionsForCareType, getParentingActionsForAgent, isActionValidForCareType } from './ParentingActions.js';
+export type { ParentingAction } from './ParentingActions.js';
+
+// Courtship subsystem
+export * from './courtship/index.js';
+export {
+  // Component
+  CourtshipComponent,
+  createCourtshipComponent,
+  // Tactics
+  UNIVERSAL_TACTICS,
+  DWARF_TACTICS,
+  BIRD_FOLK_TACTICS,
+  MYSTIF_TACTICS,
+  NEGATIVE_TACTICS,
+  ALL_TACTICS,
+  TACTICS_BY_ID,
+  getTactic,
+  getTacticsByCategory,
+  getTacticsForSpecies,
+  // Paradigms
+  HUMAN_COURTSHIP_PARADIGM,
+  DWARF_COURTSHIP_PARADIGM,
+  BIRD_FOLK_COURTSHIP_PARADIGM,
+  MYSTIF_COURTSHIP_PARADIGM,
+  ELF_COURTSHIP_PARADIGM,
+  DEFAULT_COURTSHIP_PARADIGM,
+  PARADIGMS_BY_SPECIES,
+  getCourtshipParadigm,
+  createCourtshipParadigmForSpecies,
+  // Compatibility
+  calculateSexualCompatibility,
+  calculatePersonalityMesh,
+  calculateSharedInterests,
+  calculateRelationshipStrength,
+  calculateCompatibility,
+  calculateConceptionProbability,
+  calculateBondStrength,
+  attemptConception,
+  // State Machine
+  CourtshipStateMachine,
+} from './courtship/index.js';
+
+export type {
+  // Courtship types
+  CourtshipParadigm,
+  CourtshipState,
+  CourtshipStyle,
+  CourtshipTactic,
+  TacticCategory,
+  LocationRequirement,
+  MatingBehavior,
+  ActiveCourtship,
+  ReceivedCourtship,
+  PastCourtship,
+} from './courtship/index.js';

@@ -298,8 +298,9 @@ export class AgentRosterPanel implements IWindowPanel {
     let topLevel = 0;
 
     for (const [skill, level] of Object.entries(skillLevels)) {
-      if (level > topLevel) {
-        topLevel = level;
+      const levelNum = level as number;
+      if (levelNum > topLevel) {
+        topLevel = levelNum;
         topSkill = skill;
       }
     }

@@ -11,14 +11,30 @@
 export * from './types.js';
 export type { EntityId, SystemId } from './types.js';
 export * from './ecs/index.js';
+// Explicit ECS type re-exports for renderer package
+export type { World, WorldMutator, Entity, ITile, TerrainType, Component } from './ecs/index.js';
+export { EntityImpl, createEntityId } from './ecs/index.js';
 export * from './events/index.js';
+// Explicit EventBus type re-export
+export type { EventBus } from './events/index.js';
 export * from './actions/index.js';
 export * from './serialization/index.js';
 export * from './loop/index.js';
 export * from './components/index.js';
+// Explicit component type and value re-exports for renderer and world packages
+export type { Relationship, RelationshipComponent } from './components/index.js';
+export {
+  DeityComponent,
+  PlantComponent,
+  derivePrioritiesFromSkills
+} from './components/index.js';
 export * from './systems/index.js';
 export { WildAnimalSpawningSystem } from './systems/index.js';
+// Explicit system type re-exports
+export type { PossessionStatus } from './systems/PossessionSystem.js';
+export * from './factories/index.js';
 export * from './species/index.js';
+export * from './skills/index.js';
 export * from './buildings/index.js';
 export {
   type BuildingBlueprint,
@@ -29,6 +45,8 @@ export {
   type PlacementValidationResult,
   type PlacementError,
   type ResourceCost,
+  getTileBasedBlueprintRegistry,
+  calculateDimensions,
 } from './buildings/index.js';
 export * from './archetypes/index.js';
 export * from './types/PlantSpecies.js';
@@ -328,6 +346,19 @@ export {
   WHIMSICAL_PARADIGM_REGISTRY,
   NULL_PARADIGM_REGISTRY,
   DIMENSIONAL_PARADIGM_REGISTRY,
+  HYBRID_PARADIGM_REGISTRY,
+  // Paradigm Spectrum (Universe Magic Configuration)
+  type MagicSpectrumConfig,
+  type MagicalIntensity,
+  type MagicSourceOrigin,
+  type MagicFormality,
+  type AnimismLevel,
+  type SpectrumEffects,
+  SPECTRUM_PRESETS,
+  getPreset,
+  getPresetNames,
+  resolveSpectrum,
+  CONFIGURATION_QUESTIONS,
 } from './magic/index.js';
 
 // Divinity system (forward-compatibility - Phase 31)
@@ -711,7 +742,49 @@ export {
   InfantComponent,
   NursingComponent,
   MidwiferySystem,
+  // Parenting subsystem
+  ParentingComponent,
+  createParentingComponent,
+  // Courtship subsystem
+  CourtshipComponent,
+  createCourtshipComponent,
+  CourtshipStateMachine,
 } from './reproduction/index.js';
+
+// Conversation System - Deep conversation with quality metrics, partner selection, age-based styles
+export * from './conversation/index.js';
+export {
+  // Quality metrics
+  calculateConversationQuality,
+  analyzeDepth,
+  extractTopicsFromMessages,
+  findSharedInterests,
+  calculateTopicOverlap,
+  analyzeInformationExchange,
+  analyzeEmotionalContent,
+  describeQuality,
+  describeDepth,
+  // Partner selection
+  scorePartners,
+  selectPartner,
+  findBestPartnerInRange,
+  calculateSharedInterestScore,
+  calculateComplementaryScore,
+  calculateAgeCompatibility,
+  describePartnerSelection,
+  // Conversation styles
+  getConversationStyle,
+  getDepthCapacity,
+  getTopicPreferences,
+  getTopicWeight,
+  generateConversationStarter,
+  generateQuestionPattern,
+  calculateStyleCompatibility,
+  describeConversationStyle,
+  describeConversationDynamic,
+  calculateAgeCategory,
+  calculateAgeCategoryFromTick,
+} from './conversation/index.js';
 
 // Behavior module - BehaviorRegistry and handlers
 // Note: BehaviorRegistry class - the animal BehaviorRegistry type alias is exported above
@@ -928,3 +1001,9 @@ export {
   requireSteering,
   requireVelocity,
 } from './utils/componentHelpers.js';
+
+// Communication module (chat rooms, DMs, groups)
+export * from './communication/index.js';
+
+// Television module (TV stations, shows, broadcasting)
+export * from './television/index.js';

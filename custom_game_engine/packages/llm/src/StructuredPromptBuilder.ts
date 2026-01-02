@@ -19,6 +19,11 @@ import {
   type BuildingComponent,
   type ResourceCost,
   type AgentComponent,
+  type InterestsComponent,
+  type RelationshipComponent,
+  type Relationship,
+  type TopicId,
+  type JealousyComponent,
   getFoodStorageInfo,
   getVillageInfo,
   formatGoalsForPrompt,
@@ -29,6 +34,8 @@ import {
   type ConstructionTask,
   getTileBasedBlueprintRegistry,
   calculateDimensions,
+  getConversationStyle,
+  findSharedInterests,
 } from '@ai-village/core';
 import { generatePersonalityPrompt } from './PersonalityPromptTemplates.js';
 import { promptCache } from './PromptCacheManager.js';
@@ -42,6 +49,8 @@ export interface AgentPrompt {
   priorities?: string;         // Current strategic priorities (optional)
   goals?: string;              // Personal goals (optional)
   memories: string;            // Relevant memories
+  jealousy?: string;           // Romantic jealousy context (optional)
+  hunting?: string;            // Nearby animals and hunting opportunities (optional)
   worldContext: string;        // Current situation
   villageStatus?: string;      // Village coordination context (optional)
   buildings: string;           // Buildings they can construct
@@ -71,6 +80,7 @@ export class StructuredPromptBuilder {
     const temperature = agent.components.get('temperature') as TemperatureComponent | undefined;
     const conversation = agent.components.get('conversation') as ConversationComponent | undefined;
     const skills = agent.components.get('skills') as SkillsComponent | undefined;
+    const jealousy = agent.components.get('jealousy') as JealousyComponent | undefined;
 
     // System Prompt: Role and personality (who you are)
     const systemPrompt = this.buildSystemPrompt(identity?.name || 'Agent', personality, agent.id);
@@ -87,6 +97,12 @@ export class StructuredPromptBuilder {
 
     // Memories: Relevant recent memories (what you remember)
     const memoriesText = this.buildEpisodicMemories(episodicMemory, world);
+
+    // Jealousy Context: Romantic jealousies and confrontations (emotional state)
+    const jealousyText = this.buildJealousyContext(jealousy, personality, world);
+
+    // Hunting Context: Nearby animals and hunger motivation
+    const huntingText = this.buildHuntingContext(needs, vision, inventory, skills, world);
 
     // World Context: Current situation (what's happening now)
     const worldContext = this.buildWorldContext(needs, vision, inventory, world, temperature, legacyMemory, conversation, agent);
@@ -158,6 +174,8 @@ export class StructuredPromptBuilder {
       priorities: prioritiesText,
       goals: goalsText,
       memories: memoriesText,
+      jealousy: jealousyText,
+      hunting: huntingText,
       worldContext,
       villageStatus,
       buildings: buildingsText,
@@ -193,8 +211,8 @@ export class StructuredPromptBuilder {
 
     const priorities = agentComp.priorities;
     const sortedPriorities = Object.entries(priorities)
-      .filter(([_, value]) => value > 0)
-      .sort((a, b) => b[1] - a[1])
+      .filter(([_, value]) => (value as number) > 0)
+      .sort((a, b) => (b[1] as number) - (a[1] as number))
       .slice(0, 2); // Show top 2 priorities
 
     if (sortedPriorities.length === 0) {
@@ -202,11 +220,169 @@ export class StructuredPromptBuilder {
     }
 
     const priorityDescriptions = sortedPriorities.map(([category, value]) => {
-      const percentage = Math.round(value * 100);
+      const percentage = Math.round((value as number) * 100);
       return `${category} (${percentage}%)`;
     });
 
     return `Your Current Focus:\nYou're prioritizing ${priorityDescriptions.join(' and ')} right now.\n`;
+  }
+
+  /**
+   * Build jealousy context showing active romantic jealousies.
+   * Informs agents about romantic competition and potential confrontations.
+   */
+  private buildJealousyContext(
+    jealousy: JealousyComponent | undefined,
+    personality: PersonalityComponent | undefined,
+    world: World
+  ): string {
+    if (!jealousy || jealousy.activeJealousies.length === 0) {
+      return '';
+    }
+
+    const jealousyDescriptions: string[] = [];
+
+    for (const j of jealousy.activeJealousies) {
+      const rival = world.getEntity(j.rivalId);
+      const desired = world.getEntity(j.desiredId);
+
+      if (!rival || !desired) continue;
+
+      const rivalIdentity = rival.components.get('identity') as IdentityComponent | undefined;
+      const desiredIdentity = desired.components.get('identity') as IdentityComponent | undefined;
+
+      const rivalName = rivalIdentity?.name || 'someone';
+      const desiredName = desiredIdentity?.name || 'someone';
+
+      let description = '';
+      switch (j.type) {
+        case 'rival_affection':
+          description = `You are jealous that ${rivalName} is courting ${desiredName} (you want ${desiredName} for yourself)`;
+          break;
+        case 'mate_infidelity':
+          description = `You are jealous that your mate ${desiredName} is showing affection to ${rivalName}`;
+          break;
+        case 'ex_moved_on':
+          description = `You are jealous that your ex-lover ${desiredName} has moved on with ${rivalName}`;
+          break;
+        case 'mate_attention':
+          description = `You are competing with ${rivalName} for ${desiredName}'s attention`;
+          break;
+      }
+
+      if (j.intensity > 0.7) {
+        description += ' (INTENSE jealousy)';
+      } else if (j.intensity > 0.4) {
+        description += ' (strong jealousy)';
+      }
+
+      jealousyDescriptions.push(description);
+    }
+
+    if (jealousyDescriptions.length === 0) {
+      return '';
+    }
+
+    let emotionalContext = '\n\nEmotional State:\n' + jealousyDescriptions.map(d => `- ${d}`).join('\n');
+
+    // Add personality-based guidance
+    if (personality) {
+      const neuroticism = personality.neuroticism;
+      if (neuroticism > 0.7) {
+        emotionalContext += '\n\nYour neurotic personality makes you very obsessive about these jealousies. You are likely to confront your rivals.';
+      } else if (neuroticism > 0.4) {
+        emotionalContext += '\n\nYour personality makes you somewhat jealous. You might consider confronting your rivals.';
+      } else {
+        emotionalContext += '\n\nYou are relatively calm about romantic competition, but you still feel these jealousies.';
+      }
+    }
+
+    // Add available combat actions
+    emotionalContext += '\n\nAvailable actions to address jealousy: fight, challenge, confront (these will initiate combat with your rival)';
+
+    return emotionalContext;
+  }
+
+  /**
+   * Build hunting context showing nearby animals and hunting opportunities.
+   * Suggests hunting when agent is hungry or needs resources.
+   */
+  private buildHuntingContext(
+    needs: NeedsComponent | undefined,
+    vision: VisionComponent | undefined,
+    inventory: InventoryComponent | undefined,
+    skills: SkillsComponent | undefined,
+    world: World
+  ): string {
+    const visibleIds = vision?.seenAgents || [];
+    if (visibleIds.length === 0) {
+      return '';
+    }
+
+    // Find visible animals
+    const visibleAnimals: Array<{ id: string; species: string; distance: number }> = [];
+
+    for (const entityId of visibleIds) {
+      const entity = world.getEntity(entityId);
+      if (!entity) continue;
+
+      const animal = entity.components.get('animal') as any;
+      if (animal) {
+        // Calculate distance (simplified - assume we have position)
+        visibleAnimals.push({
+          id: entityId,
+          species: animal.species || 'animal',
+          distance: 0, // TODO: calculate actual distance
+        });
+      }
+    }
+
+    if (visibleAnimals.length === 0) {
+      return '';
+    }
+
+    // Check if agent is hungry
+    const isHungry = needs && needs.hunger !== undefined && needs.hunger < 0.3;
+
+    // Check food in inventory
+    const hasMeat = inventory?.slots.some((s: any) => s.itemId === 'meat') ?? false;
+    const hasFood = inventory?.slots.some((s: any) =>
+      s.itemId === 'meat' || s.itemId === 'berries' || s.itemId === 'bread'
+    ) ?? false;
+
+    // Get hunting skill
+    const huntingSkill = (skills?.levels.hunting ?? 0) as number;
+
+    let huntingContext = '\n\nHunting Opportunities:\n';
+
+    // List visible animals
+    if (visibleAnimals.length === 1) {
+      huntingContext += `- You can see a ${visibleAnimals[0]!.species} nearby\n`;
+    } else {
+      huntingContext += `- You can see ${visibleAnimals.length} animals nearby: ${visibleAnimals.map(a => a.species).join(', ')}\n`;
+    }
+
+    // Add motivation context
+    if (isHungry && !hasFood) {
+      huntingContext += '\n**You are HUNGRY and have no food!** Hunting would provide meat to eat.\n';
+    } else if (isHungry && !hasMeat) {
+      huntingContext += '\nYou are hungry. Hunting would provide fresh meat.\n';
+    } else if (!hasMeat) {
+      huntingContext += '\nHunting would provide meat, hide, and bones for resources.\n';
+    }
+
+    // Add skill context
+    if (huntingSkill > 0) {
+      const skillLevel = huntingSkill >= 3 ? 'experienced' : huntingSkill >= 1 ? 'competent' : 'novice';
+      huntingContext += `\nYour hunting skill: ${skillLevel} (level ${huntingSkill})\n`;
+    } else {
+      huntingContext += '\nYou are unskilled at hunting, but can try to learn.\n';
+    }
+
+    // Add available action
+    huntingContext += '\nAvailable action: hunt (use {"type": "hunt", "target": "animal_species"} to hunt an animal)\n';
+
+    return huntingContext;
   }
 
   /**
@@ -222,10 +398,11 @@ export class StructuredPromptBuilder {
     const levelNames = ['Novice', 'Apprentice', 'Journeyman', 'Expert', 'Master'];
 
     for (const [skillId, level] of Object.entries(skills.levels)) {
-      if (level > 0 && level <= 5) {
-        const levelName = levelNames[level - 1] || 'Novice';
+      const levelNum = level as number;
+      if (levelNum > 0 && levelNum <= 5) {
+        const levelName = levelNames[levelNum - 1] || 'Novice';
         const skillName = skillId.replace(/_/g, ' ');
-        skillDescriptions.push(`- ${skillName}: ${levelName} (level ${level})`);
+        skillDescriptions.push(`- ${skillName}: ${levelName} (level ${levelNum})`);
       }
     }
 
@@ -273,7 +450,7 @@ export class StructuredPromptBuilder {
     // Filter out buildings we already have (unless they're capacity buildings like storage)
     // Note: tent is now tile-based, not an entity building
     const capacityBuildings = new Set(['storage-chest', 'storage-box', 'bed', 'bedroll']);
-    const filteredBuildings = buildings.filter((building) => {
+    const filteredBuildings = buildings.filter((building: { name: string; category: string }) => {
       const buildingType = building.name;
 
       // If it's a capacity building (can have multiples), always show it
@@ -381,39 +558,13 @@ export class StructuredPromptBuilder {
 
     let context = 'Current Situation:\n';
 
-    // PRIORITY: Show active conversation history first
-    if (conversation?.isActive && conversation?.messages && conversation.messages.length > 0) {
-      context += '\n--- ACTIVE CONVERSATION ---\n';
-
-      // Get partner name
-      let partnerName = 'someone';
-      if (conversation.partnerId && world) {
-        const partner = world.getEntity(conversation.partnerId);
-        const partnerIdentity = partner?.components.get('identity') as IdentityComponent | undefined;
-        if (partnerIdentity?.name) {
-          partnerName = partnerIdentity.name;
-        }
+    // PRIORITY: Show active conversation with enhanced context
+    if (conversation?.isActive && conversation?.partnerId && entity) {
+      const partner = world.getEntity(conversation.partnerId);
+      if (partner) {
+        context += this.buildActiveConversationSection(conversation, partner, entity, world);
+        context += '\n';
       }
-
-      context += `You are currently talking with ${partnerName}.\n\nConversation history:\n`;
-
-      // Show last 5 messages for context
-      const recentMessages = conversation.messages.slice(-5);
-      for (const msg of recentMessages) {
-        // Look up speaker name
-        let speakerName = 'Unknown';
-        if (msg.speakerId && world) {
-          const speaker = world.getEntity(msg.speakerId);
-          const speakerIdentity = speaker?.components.get('identity') as IdentityComponent | undefined;
-          if (speakerIdentity?.name) {
-            speakerName = speakerIdentity.name;
-          }
-        }
-
-        context += `- ${speakerName}: "${msg.message}"\n`;
-      }
-
-      context += '\n';
     }
 
     // Needs (NeedsComponent uses 0-1 scale, convert to 0-100 for display)
@@ -558,7 +709,7 @@ export class StructuredPromptBuilder {
       // DISTANT LANDMARKS (for navigation)
       const landmarks = vision.distantLandmarks ?? [];
       if (landmarks.length > 0) {
-        const landmarkDescriptions = landmarks.slice(0, 5).map(l => {
+        const landmarkDescriptions = landmarks.slice(0, 5).map((l: string) => {
           const parts = l.split('_');
           return parts[0];
         });
@@ -879,7 +1030,7 @@ export class StructuredPromptBuilder {
       let highestSkill: SkillId | null = null;
       let highestLevel: SkillLevel = 0;
       for (const [skillId, level] of Object.entries(skills.levels)) {
-        if (level >= 2 && level > highestLevel) {
+        if ((level as number) >= 2 && (level as number) > highestLevel) {
           highestLevel = level as SkillLevel;
           highestSkill = skillId as SkillId;
         }
@@ -997,6 +1148,7 @@ export class StructuredPromptBuilder {
       'well': 'water source',
       'garden_fence': 'decoration',
       'forge': 'metalworking',
+      'butchering_table': 'process animals for meat (requires cooking skill)',
       'farm_shed': 'farming storage',
       'market_stall': 'trading',
       'windmill': 'grain processing',
@@ -1286,9 +1438,9 @@ export class StructuredPromptBuilder {
     const activeTasks = constructionSystem.getActiveTasks();
     if (activeTasks.length > 0) {
       const taskDescriptions = activeTasks.slice(0, 3).map((task: ConstructionTask) => {
-        const tilesNeeding = task.tiles.filter(t => t.status === 'materials_needed').length;
-        const tilesReady = task.tiles.filter(t => t.materialsDelivered >= t.materialsRequired && t.status !== 'placed').length;
-        const tilesPlaced = task.tiles.filter(t => t.status === 'placed').length;
+        const tilesNeeding = task.tiles.filter((t: any) => t.status === 'materials_needed').length;
+        const tilesReady = task.tiles.filter((t: any) => t.materialsDelivered >= t.materialsRequired && t.status !== 'placed').length;
+        const tilesPlaced = task.tiles.filter((t: any) => t.status === 'placed').length;
         const total = task.tiles.length;
 
         if (tilesNeeding > 0) {
@@ -1557,11 +1709,11 @@ export class StructuredPromptBuilder {
     const activeTasks = constructionSystem.getActiveTasks();
     const tasksNeedingMaterials = activeTasks.filter((task: ConstructionTask) => {
       // Task needs materials if any tile is in 'materials_needed' status
-      return task.tiles.some(tile => tile.status === 'materials_needed');
+      return task.tiles.some((tile: any) => tile.status === 'materials_needed');
     });
     const tasksReadyToBuild = activeTasks.filter((task: ConstructionTask) => {
       // Task is ready to build if any tile has materials but isn't placed yet
-      return task.tiles.some(tile =>
+      return task.tiles.some((tile: any) =>
         tile.materialsDelivered >= tile.materialsRequired &&
         tile.status !== 'placed'
       );
@@ -1721,7 +1873,7 @@ export class StructuredPromptBuilder {
         return building?.isComplete;
       })
       .map((b: Entity) => b.components.get('inventory') as InventoryComponent | undefined)
-      .filter((inv): inv is InventoryComponent => inv !== undefined);
+      .filter((inv: InventoryComponent | undefined): inv is InventoryComponent => inv !== undefined);
 
     let totalFood = 0;
     for (const inv of allStorageInventories) {
@@ -1903,6 +2055,16 @@ export class StructuredPromptBuilder {
       sections.push(prompt.memories);
     }
 
+    // Jealousy - romantic competition and emotional state
+    if (prompt.jealousy && prompt.jealousy.trim()) {
+      sections.push(prompt.jealousy);
+    }
+
+    // Hunting - nearby animals and hunting opportunities
+    if (prompt.hunting && prompt.hunting.trim()) {
+      sections.push(prompt.hunting);
+    }
+
     // Current situation - what's happening right now
     if (prompt.worldContext && prompt.worldContext.trim()) {
       sections.push(prompt.worldContext);
@@ -1948,6 +2110,180 @@ Example responses:
     sections.push(responseFormat);
 
     return sections.join('\n\n');
+  }
+
+  /**
+   * Build enhanced conversation context with age-based styles and interests.
+   * Phase 5: LLM Prompt Integration
+   */
+  private buildActiveConversationSection(
+    conversation: ConversationComponent,
+    partner: Entity,
+    self: Entity,
+    world: World
+  ): string {
+    const sections: string[] = [];
+
+    const partnerAgent = partner.components.get('agent') as AgentComponent | undefined;
+    const partnerInterests = partner.components.get('interests') as InterestsComponent | undefined;
+    const partnerIdentity = partner.components.get('identity') as IdentityComponent | undefined;
+    const selfInterests = self.components.get('interests') as InterestsComponent | undefined;
+    const selfAgent = self.components.get('agent') as AgentComponent | undefined;
+    const selfRelationship = self.components.get('relationship') as RelationshipComponent | undefined;
+    const relationship = selfRelationship?.relationships?.get(partner.id);
+
+    // 1. Basic partner info
+    const partnerName = partnerIdentity?.name ?? 'Someone';
+    sections.push(`\n--- ACTIVE CONVERSATION with ${partnerName} ---`);
+
+    // 2. Age-appropriate guidance
+    if (selfAgent?.ageCategory) {
+      const style = getConversationStyle(selfAgent.ageCategory);
+      sections.push(`\nYour Conversation Style (${selfAgent.ageCategory}):`);
+      sections.push(style.description);
+
+      // Add mode-specific guidance
+      if (style.mode === 'questioning') {
+        sections.push(`You're curious and ask lots of questions. You want to learn from others.`);
+      } else if (style.mode === 'exploratory') {
+        sections.push(`You're exploring ideas and testing your own views. You might challenge or debate.`);
+      } else if (style.mode === 'sharing') {
+        sections.push(`You share knowledge and experiences. You can both teach and learn.`);
+      } else if (style.mode === 'reflective') {
+        sections.push(`You reflect on life's deeper meanings. You draw on your wisdom and experience.`);
+      }
+    }
+
+    // 3. Partner context (who you're talking to)
+    sections.push(`\nAbout ${partnerName}:`);
+
+    if (partnerAgent?.ageCategory) {
+      sections.push(`- Age: ${partnerAgent.ageCategory}`);
+    }
+
+    // Relationship context
+    if (relationship) {
+      const relationshipDesc = this.describeRelationship(relationship);
+      sections.push(`- Your relationship: ${relationshipDesc}`);
+    } else {
+      sections.push(`- You don't know them well yet`);
+    }
+
+    // Partner's interests (what they like to talk about)
+    if (partnerInterests && partnerInterests.interests.length > 0) {
+      const topInterests = partnerInterests.interests
+        .sort((a: any, b: any) => b.intensity - a.intensity)
+        .slice(0, 3);
+      const interestNames = topInterests.map((i: any) =>
+        this.formatTopicName(i.topic)).join(', ');
+      sections.push(`- They're interested in: ${interestNames}`);
+    }
+
+    // 4. Shared interests (conversation hooks)
+    if (selfInterests && partnerInterests) {
+      const shared = findSharedInterests(
+        selfInterests.interests,
+        partnerInterests.interests
+      );
+      if (shared.length > 0) {
+        sections.push(`\nShared Interests:`);
+        sections.push(`You both care about: ${shared.map((t: any) => this.formatTopicName(t)).join(', ')}`);
+      }
+    }
+
+    // 5. Your conversational desires
+    if (selfInterests) {
+      const hungryTopics = selfInterests.interests
+        .filter((i: any) => i.discussionHunger > 0.5)
+        .sort((a: any, b: any) => b.discussionHunger - a.discussionHunger)
+        .slice(0, 2);
+
+      if (hungryTopics.length > 0) {
+        sections.push(`\nWhat You'd Like to Discuss:`);
+        for (const topic of hungryTopics) {
+          if (topic.source === 'question' && topic.question) {
+            sections.push(`- You've been wondering: "${topic.question}"`);
+          } else {
+            sections.push(`- You'd like to talk about ${this.formatTopicName(topic.topic)}`);
+          }
+        }
+      }
+
+      // Depth hunger
+      if (selfInterests.depthHunger > 0.6) {
+        sections.push(`\nYou're craving a meaningful conversation, not just small talk.`);
+      }
+    }
+
+    // 6. Conversation history
+    sections.push(`\nConversation So Far:`);
+    const recentMessages = conversation.messages.slice(-5);
+    for (const msg of recentMessages) {
+      const speaker = world.getEntity(msg.speakerId);
+      const speakerIdentity = speaker?.components.get('identity') as IdentityComponent | undefined;
+      const speakerName = speakerIdentity?.name ?? (msg.speakerId === self.id ? 'You' : partnerName);
+      sections.push(`${speakerName}: "${msg.message}"`);
+    }
+
+    // 7. Response instruction
+    sections.push(`\nWhat do you say next?`);
+    sections.push(`Respond naturally as your character would. Consider your age, interests, and what ${partnerName} has said. Keep your response to 1-2 sentences.`);
+
+    return sections.join('\n');
+  }
+
+  /**
+   * Describe a relationship in natural language.
+   */
+  private describeRelationship(relationship: Relationship): string {
+    const parts: string[] = [];
+
+    // Familiarity
+    if (relationship.familiarity > 80) {
+      parts.push('close');
+    } else if (relationship.familiarity > 50) {
+      parts.push('familiar');
+    } else if (relationship.familiarity > 20) {
+      parts.push('acquaintance');
+    } else {
+      parts.push('stranger');
+    }
+
+    // Affinity
+    if (relationship.affinity > 50) {
+      parts.push('friend');
+    } else if (relationship.affinity > 20) {
+      parts.push('liked');
+    } else if (relationship.affinity < -20) {
+      parts.push('disliked');
+    } else if (relationship.affinity < -50) {
+      parts.push('enemy');
+    }
+
+    // Trust
+    if (relationship.trust > 70) {
+      parts.push('trusted');
+    } else if (relationship.trust < 30) {
+      parts.push('untrusted');
+    }
+
+    // Interaction count
+    if (relationship.interactionCount > 20) {
+      parts.push(`talked many times (${relationship.interactionCount})`);
+    } else if (relationship.interactionCount > 5) {
+      parts.push(`talked several times`);
+    } else if (relationship.interactionCount > 0) {
+      parts.push(`talked a few times`);
+    }
+
+    return parts.join(', ') || 'neutral';
+  }
+
+  /**
+   * Format topic ID to human-readable name.
+   */
+  private formatTopicName(topic: TopicId): string {
+    return topic.replace(/_/g, ' ');
   }
 }
 

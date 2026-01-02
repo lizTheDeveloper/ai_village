@@ -102,6 +102,23 @@ export const TIER_1_RESEARCH: ResearchDefinition[] = [
       ],
     }
   ),
+
+  // === Writing & Communication ===
+  defineResearch(
+    'pictographic_writing',
+    'Pictographic Writing',
+    'Develop symbols scratched in clay or carved in stone. Not quite words, but better than pointing at things.',
+    'society',
+    1,
+    {
+      progressRequired: 75,
+      unlocks: [
+        { type: 'ability', abilityId: 'create_clay_tablet' },
+        { type: 'ability', abilityId: 'record_recipe_tablet' },
+        { type: 'knowledge', knowledgeId: 'basic_symbols' },
+      ],
+    }
+  ),
 ];
 
 // ============================================================================
@@ -205,6 +222,26 @@ export const TIER_2_RESEARCH: ResearchDefinition[] = [
       unlocks: [
         { type: 'building', buildingId: 'market_stall' },
         { type: 'ability', abilityId: 'trade' },
+      ],
+    }
+  ),
+
+  // === Writing & Communication Tier 2 ===
+  defineResearch(
+    'scrolls_and_ink',
+    'Scrolls and Ink',
+    'Develop papyrus, parchment, and proper writing implements. Finally, recipes longer than "cook until done."',
+    'society',
+    2,
+    {
+      progressRequired: 150,
+      prerequisites: ['pictographic_writing', 'textiles_i'],
+      unlocks: [
+        { type: 'ability', abilityId: 'create_scroll' },
+        { type: 'ability', abilityId: 'write_treatise' },
+        { type: 'recipe', recipeId: 'ink' },
+        { type: 'recipe', recipeId: 'parchment' },
+        { type: 'building', buildingId: 'scriptorium' },
       ],
     }
   ),
@@ -316,6 +353,26 @@ export const TIER_3_RESEARCH: ResearchDefinition[] = [
       ],
     }
   ),
+
+  // === Writing & Communication Tier 3 ===
+  defineResearch(
+    'bookbinding',
+    'Bookbinding',
+    'The art of binding pages into codices. Now your recipes can have chapters, indexes, and that new book smell.',
+    'society',
+    3,
+    {
+      progressRequired: 250,
+      prerequisites: ['scrolls_and_ink', 'construction_ii'],
+      unlocks: [
+        { type: 'ability', abilityId: 'create_book' },
+        { type: 'ability', abilityId: 'write_cookbook' },
+        { type: 'ability', abilityId: 'write_chronicle' },
+        { type: 'building', buildingId: 'library' },
+        { type: 'recipe', recipeId: 'leather_binding' },
+      ],
+    }
+  ),
 ];
 
 // ============================================================================
@@ -405,6 +462,25 @@ export const TIER_4_RESEARCH: ResearchDefinition[] = [
         { type: 'ability', abilityId: 'selective_breeding' },
         { type: 'ability', abilityId: 'trait_selection' },
         { type: 'knowledge', knowledgeId: 'pedigree_analysis' },
+      ],
+    }
+  ),
+
+  // === Writing & Communication Tier 4 ===
+  defineResearch(
+    'printing_press',
+    'Printing Press',
+    'Mass produce written works. Every cook can now be a published author. The world trembles.',
+    'machinery',
+    4,
+    {
+      progressRequired: 450,
+      prerequisites: ['bookbinding', 'machinery_i', 'metallurgy_ii'],
+      unlocks: [
+        { type: 'building', buildingId: 'printing_press' },
+        { type: 'ability', abilityId: 'mass_print' },
+        { type: 'ability', abilityId: 'publish_newspaper' },
+        { type: 'ability', abilityId: 'print_pamphlet' },
       ],
     }
   ),
@@ -574,6 +650,27 @@ export const TIER_5_RESEARCH: ResearchDefinition[] = [
         { type: 'ability', abilityId: 'choose_traits' },
         { type: 'ability', abilityId: 'genetic_expression_control' },
         { type: 'knowledge', knowledgeId: 'autonomous_genetics' },
+      ],
+    }
+  ),
+
+  // === Writing & Communication Tier 5 ===
+  defineResearch(
+    'digital_networks',
+    'Digital Networks',
+    'Electronic communication and publishing. Food blogs become possible. History will not forgive us.',
+    'experimental',
+    5,
+    {
+      progressRequired: 800,
+      prerequisites: ['printing_press', 'machinery_ii'],
+      requiredBuilding: 'inventors_hall',
+      unlocks: [
+        { type: 'building', buildingId: 'server_room' },
+        { type: 'ability', abilityId: 'create_blog' },
+        { type: 'ability', abilityId: 'stream_content' },
+        { type: 'ability', abilityId: 'post_video' },
+        { type: 'knowledge', knowledgeId: 'digital_literacy' },
       ],
     }
   ),

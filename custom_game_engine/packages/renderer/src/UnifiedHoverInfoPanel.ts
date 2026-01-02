@@ -266,7 +266,7 @@ export class UnifiedHoverInfoPanel {
 
     // Shop-specific info
     if (shop) {
-      const itemCount = inventory?.slots?.filter(slot => slot.itemId !== null).length ?? 0;
+      const itemCount = inventory?.slots?.filter((slot: any) => slot.itemId !== null).length ?? 0;
       lines.push({ text: `Items: ${itemCount}`, color: '#FFD700' });
     }
 

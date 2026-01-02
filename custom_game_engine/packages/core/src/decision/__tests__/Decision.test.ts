@@ -40,13 +40,13 @@ describe('AutonomicSystem', () => {
       expect(result!.priority).toBe(100);
     });
 
-    it('returns seek_sleep when energy is below 10', () => {
+    it('returns seek_sleep when energy is below 0.3 (30%)', () => {
       const needs = new NeedsComponent({
     hunger: 1.0,
     energy: 1.0,
     health: 1.0,
   });
-      needs.energy = 5;
+      needs.energy = 0.2; // Below 0.3 threshold
 
       const result = autonomicSystem.checkNeeds(needs);
 
@@ -61,7 +61,7 @@ describe('AutonomicSystem', () => {
     energy: 1.0,
     health: 1.0,
   });
-      needs.energy = 50; // Healthy energy
+      needs.energy = 0.50; // Healthy energy
 
       const circadian = createCircadianComponent();
       circadian.sleepDrive = 90;
@@ -78,7 +78,7 @@ describe('AutonomicSystem', () => {
     energy: 1.0,
     health: 1.0,
   });
-      needs.energy = 50;
+      needs.energy = 0.50;
 
       const temperature = {
         type: ComponentType.Temperature,
@@ -101,7 +101,7 @@ describe('AutonomicSystem', () => {
     energy: 1.0,
     health: 1.0,
   });
-      needs.energy = 50;
+      needs.energy = 0.50;
 
       const temperature = {
         type: ComponentType.Temperature,
@@ -124,8 +124,8 @@ describe('AutonomicSystem', () => {
     energy: 1.0,
     health: 1.0,
   });
-      needs.energy = 50;
-      needs.hunger = 5; // Critical hunger
+      needs.energy = 0.50;
+      needs.hunger = 0.05; // Critical hunger (< 0.1 threshold)
 
       const result = autonomicSystem.checkNeeds(needs);
 
@@ -140,7 +140,7 @@ describe('AutonomicSystem', () => {
     energy: 1.0,
     health: 1.0,
   });
-      needs.energy = 50;
+      needs.energy = 0.50;
 
       const circadian = createCircadianComponent();
       circadian.sleepDrive = 90; // Above 85 threshold
@@ -157,8 +157,8 @@ describe('AutonomicSystem', () => {
     energy: 1.0,
     health: 1.0,
   });
-      needs.energy = 50;
-      needs.hunger = 40; // Moderate hunger
+      needs.energy = 0.50;
+      needs.hunger = 0.40; // Moderate hunger (< 0.6 threshold)
 
       const result = autonomicSystem.checkNeeds(needs);
 
@@ -173,8 +173,8 @@ describe('AutonomicSystem', () => {
     energy: 1.0,
     health: 1.0,
   });
-      needs.energy = 80;
-      needs.hunger = 80;
+      needs.energy = 0.80; // Above 0.3 threshold
+      needs.hunger = 0.80; // Above 0.6 threshold
 
       const result = autonomicSystem.checkNeeds(needs);
 

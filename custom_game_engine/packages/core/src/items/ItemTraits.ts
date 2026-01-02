@@ -4,6 +4,7 @@ import { MagicalTrait } from './traits/MagicalTrait';
 import { ContainerTrait } from './traits/ContainerTrait';
 import { ToolTrait } from './traits/ToolTrait';
 import { ArmorTrait } from './traits/ArmorTrait';
+import { StatBonusTrait } from './traits/StatBonusTrait';
 
 /**
  * Compositional trait bag for items.
@@ -35,4 +36,7 @@ export interface ItemTraits {
 
   /** Item provides protection when equipped (armor, shields, etc.) */
   armor?: ArmorTrait;
+
+  /** Item provides skill/stat bonuses when equipped (Phase 36: Combat Integration) */
+  statBonus?: StatBonusTrait;
 }

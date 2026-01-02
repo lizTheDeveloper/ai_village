@@ -296,9 +296,10 @@ export class MenuContext {
     const selected: string[] = [];
 
     for (const entity of Array.from(world.entities.values())) {
-      const selectable = (entity as EntityImpl).getComponent('selectable') as any;
+      const entityImpl = entity as EntityImpl;
+      const selectable = entityImpl.getComponent('selectable') as any;
       if (selectable && selectable.selected === true) {
-        selected.push(entity.id);
+        selected.push(entityImpl.id);
       }
     }
 

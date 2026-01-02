@@ -257,6 +257,12 @@ export class SimulationScheduler {
 
     // PROXIMITY entities only simulate when near agents
     if (mode === SimulationMode.PROXIMITY) {
+      // If no agents exist (e.g., in tests), simulate all PROXIMITY entities
+      // In production, agentPositions will always have at least one agent
+      if (this.agentPositions.length === 0) {
+        return this.checkUpdateFrequency(entity.id, currentTick, updateFrequency);
+      }
+
       if (!isInSimulationRange(entity, this.agentPositions, range)) {
         return false; // Off-screen, freeze simulation
       }

@@ -1,12 +1,12 @@
 /**
- * PreferenceComponent - Tracks agent food preferences and taste profiles
+ * PreferenceComponent - Tracks agent preferences across all domains
  *
- * Each agent develops unique food preferences based on:
- * - Innate flavor preferences (personality-based)
- * - Learned preferences from eating experiences
+ * Each agent develops unique preferences based on:
+ * - Innate preferences (personality-based)
+ * - Learned preferences from experiences
  * - Cultural/community influences
  *
- * Part of Phase 3: Food Depth
+ * Covers: food flavors, clothing materials, armor, weapons, metals, plants, etc.
  */
 
 import type { Component } from '../ecs/Component.js';
@@ -26,6 +26,102 @@ export const ALL_FLAVORS: readonly FlavorType[] = [
   'sour',
   'umami',
 ] as const;
+
+// ============================================
+// MATERIAL PREFERENCE CATEGORIES
+// ============================================
+
+/**
+ * Clothing material options
+ */
+export const CLOTHING_MATERIALS = [
+  'cotton', 'linen', 'wool', 'silk', 'leather', 'fur', 'velvet', 'canvas',
+] as const;
+export type ClothingMaterial = typeof CLOTHING_MATERIALS[number];
+
+/**
+ * Armor material options
+ */
+export const ARMOR_MATERIALS = [
+  'leather', 'padded', 'chainmail', 'iron', 'steel', 'bronze', 'plate',
+] as const;
+export type ArmorMaterial = typeof ARMOR_MATERIALS[number];
+
+/**
+ * Weapon type options
+ */
+export const WEAPON_TYPES = [
+  'sword', 'axe', 'mace', 'spear', 'bow', 'crossbow', 'dagger', 'staff', 'hammer',
+] as const;
+export type WeaponType = typeof WEAPON_TYPES[number];
+
+/**
+ * Metal options
+ */
+export const METALS = [
+  'iron', 'copper', 'bronze', 'steel', 'gold', 'silver', 'titanium',
+] as const;
+export type MetalType = typeof METALS[number];
+
+/**
+ * Wood type options
+ */
+export const WOOD_TYPES = [
+  'oak', 'pine', 'birch', 'maple', 'cherry', 'walnut', 'cedar', 'ash',
+] as const;
+export type WoodType = typeof WOOD_TYPES[number];
+
+/**
+ * Plant/flower options
+ */
+export const PLANTS = [
+  'rose', 'lavender', 'sunflower', 'tulip', 'daisy', 'lily', 'orchid',
+  'mint', 'basil', 'rosemary', 'thyme', 'sage',
+] as const;
+export type PlantType = typeof PLANTS[number];
+
+/**
+ * Gemstone options
+ */
+export const GEMSTONES = [
+  'ruby', 'emerald', 'sapphire', 'diamond', 'amethyst', 'topaz', 'opal', 'pearl',
+] as const;
+export type GemstoneType = typeof GEMSTONES[number];
+
+/**
+ * Color preferences
+ */
+export const COLORS = [
+  'red', 'blue', 'green', 'yellow', 'purple', 'orange', 'black', 'white',
+  'brown', 'pink', 'gold', 'silver', 'teal', 'crimson',
+] as const;
+export type ColorType = typeof COLORS[number];
+
+/**
+ * A preference entry with favorite and disliked
+ */
+export interface CategoryPreference<T extends string> {
+  /** Most preferred item in this category */
+  favorite: T;
+  /** Most disliked item in this category */
+  disliked: T;
+  /** Affinity scores for each item (-1 to 1) */
+  affinities: Partial<Record<T, number>>;
+}
+
+/**
+ * All material/item preferences
+ */
+export interface MaterialPreferences {
+  clothing: CategoryPreference<ClothingMaterial>;
+  armor: CategoryPreference<ArmorMaterial>;
+  weapon: CategoryPreference<WeaponType>;
+  metal: CategoryPreference<MetalType>;
+  wood: CategoryPreference<WoodType>;
+  plant: CategoryPreference<PlantType>;
+  gemstone: CategoryPreference<GemstoneType>;
+  color: CategoryPreference<ColorType>;
+}
 
 /**
  * A food memory entry tracking an eating experience.
@@ -61,7 +157,7 @@ export interface FlavorPreferences {
 }
 
 /**
- * PreferenceComponent tracks an agent's food preferences.
+ * PreferenceComponent tracks an agent's preferences across all domains.
  */
 export interface PreferenceComponent extends Component {
   type: 'preference';
@@ -71,6 +167,11 @@ export interface PreferenceComponent extends Component {
    * These are initially set based on personality and evolve with experience.
    */
   flavorPreferences: FlavorPreferences;
+
+  /**
+   * Material and item preferences (clothing, weapons, colors, etc.)
+   */
+  materialPreferences: MaterialPreferences;
 
   /**
    * History of food experiences that shape preferences.
@@ -103,10 +204,14 @@ export function createPreferenceComponent(
   personalityFactors?: {
     openness?: number; // Higher = more accepting of new/exotic flavors
     neuroticism?: number; // Higher = more sensitive to bitter/sour
+    extraversion?: number; // Higher = bolder color/style preferences
+    conscientiousness?: number; // Higher = practical material preferences
   }
 ): PreferenceComponent {
   const openness = personalityFactors?.openness ?? 0.5;
   const neuroticism = personalityFactors?.neuroticism ?? 0.5;
+  const extraversion = personalityFactors?.extraversion ?? 0.5;
+  const conscientiousness = personalityFactors?.conscientiousness ?? 0.5;
 
   // Generate flavor preferences based on personality
   // Higher openness = more positive toward unusual flavors
@@ -123,6 +228,11 @@ export function createPreferenceComponent(
       sour: randomPreference(0, 0.3), // Neutral baseline
       umami: randomPreference(0.2, 0.2), // Generally liked
     },
+    materialPreferences: generateMaterialPreferences({
+      openness,
+      extraversion,
+      conscientiousness,
+    }),
     foodMemories: [],
     avoids: [],
     foodFrequency: {},
@@ -136,6 +246,104 @@ export function createPreferenceComponent(
 function randomPreference(bias: number, variance: number): number {
   const value = bias + (Math.random() - 0.5) * variance * 2;
   return Math.max(-1, Math.min(1, value));
+}
+
+/**
+ * Generate random material preferences based on personality.
+ */
+function generateMaterialPreferences(factors: {
+  openness: number;
+  extraversion: number;
+  conscientiousness: number;
+}): MaterialPreferences {
+  return {
+    clothing: generateCategoryPreference(CLOTHING_MATERIALS, factors),
+    armor: generateCategoryPreference(ARMOR_MATERIALS, factors),
+    weapon: generateCategoryPreference(WEAPON_TYPES, factors),
+    metal: generateCategoryPreference(METALS, factors),
+    wood: generateCategoryPreference(WOOD_TYPES, factors),
+    plant: generateCategoryPreference(PLANTS, factors),
+    gemstone: generateCategoryPreference(GEMSTONES, factors),
+    color: generateColorPreference(factors),
+  };
+}
+
+/**
+ * Generate a category preference with random favorite and disliked.
+ */
+function generateCategoryPreference<T extends string>(
+  options: readonly T[],
+  _factors: { openness: number; extraversion: number; conscientiousness: number }
+): CategoryPreference<T> {
+  // Pick random favorite and disliked (must be different)
+  const shuffled = [...options].sort(() => Math.random() - 0.5);
+  const favorite = shuffled[0] as T;
+  const disliked = shuffled[shuffled.length - 1] as T;
+
+  // Generate affinities for each option
+  const affinities: Partial<Record<T, number>> = {};
+  for (const option of options) {
+    if (option === favorite) {
+      affinities[option] = 0.7 + Math.random() * 0.3; // 0.7 to 1.0
+    } else if (option === disliked) {
+      affinities[option] = -0.7 - Math.random() * 0.3; // -1.0 to -0.7
+    } else {
+      affinities[option] = (Math.random() - 0.5) * 0.8; // -0.4 to 0.4
+    }
+  }
+
+  return { favorite, disliked, affinities };
+}
+
+/**
+ * Generate color preferences influenced by personality.
+ * Extraverts prefer bolder colors, introverts prefer muted.
+ */
+function generateColorPreference(factors: {
+  openness: number;
+  extraversion: number;
+  conscientiousness: number;
+}): CategoryPreference<ColorType> {
+  // Bold colors for extraverts
+  const boldColors: ColorType[] = ['red', 'purple', 'orange', 'gold', 'crimson'];
+  const mutedColors: ColorType[] = ['brown', 'black', 'white', 'silver', 'teal'];
+  const neutralColors: ColorType[] = ['blue', 'green', 'yellow', 'pink'];
+
+  // Higher extraversion = prefer bold, lower = prefer muted
+  let favoritePool: ColorType[];
+  let dislikedPool: ColorType[];
+
+  if (factors.extraversion > 0.6) {
+    favoritePool = boldColors;
+    dislikedPool = mutedColors;
+  } else if (factors.extraversion < 0.4) {
+    favoritePool = mutedColors;
+    dislikedPool = boldColors;
+  } else {
+    favoritePool = neutralColors;
+    dislikedPool = [...boldColors, ...mutedColors];
+  }
+
+  const favorite = favoritePool[Math.floor(Math.random() * favoritePool.length)] as ColorType;
+  const disliked = dislikedPool[Math.floor(Math.random() * dislikedPool.length)] as ColorType;
+
+  // Generate affinities
+  const affinities: Partial<Record<ColorType, number>> = {};
+  for (const color of COLORS) {
+    if (color === favorite) {
+      affinities[color] = 0.7 + Math.random() * 0.3;
+    } else if (color === disliked) {
+      affinities[color] = -0.7 - Math.random() * 0.3;
+    } else if (boldColors.includes(color)) {
+      affinities[color] = (factors.extraversion - 0.5) * 0.6 + (Math.random() - 0.5) * 0.3;
+    } else if (mutedColors.includes(color)) {
+      affinities[color] = (0.5 - factors.extraversion) * 0.6 + (Math.random() - 0.5) * 0.3;
+    } else {
+      affinities[color] = (Math.random() - 0.5) * 0.5;
+    }
+  }
+
+  return { favorite, disliked, affinities };
 }
 
 /**
@@ -284,4 +492,168 @@ export function getPreferenceDescription(component: PreferenceComponent): string
   }
 
   return parts.length > 0 ? parts.join('; ') : 'has no strong food preferences';
+}
+
+/**
+ * Get a complete description of all preferences for LLM context.
+ * Useful for gods/telepaths who can read minds.
+ */
+export function getFullPreferenceDescription(component: PreferenceComponent): string {
+  const mp = component.materialPreferences;
+
+  const parts: string[] = [];
+
+  // Flavor preferences
+  parts.push(`Food: ${getPreferenceDescription(component)}`);
+
+  // Material preferences
+  parts.push(`Favorite color: ${mp.color.favorite}, hates ${mp.color.disliked}`);
+  parts.push(`Clothing: loves ${mp.clothing.favorite}, hates ${mp.clothing.disliked}`);
+  parts.push(`Weapons: prefers ${mp.weapon.favorite}, dislikes ${mp.weapon.disliked}`);
+  parts.push(`Armor: prefers ${mp.armor.favorite}, dislikes ${mp.armor.disliked}`);
+  parts.push(`Metals: loves ${mp.metal.favorite}, hates ${mp.metal.disliked}`);
+  parts.push(`Wood: prefers ${mp.wood.favorite}, dislikes ${mp.wood.disliked}`);
+  parts.push(`Plants/flowers: loves ${mp.plant.favorite}, dislikes ${mp.plant.disliked}`);
+  parts.push(`Gemstones: loves ${mp.gemstone.favorite}, dislikes ${mp.gemstone.disliked}`);
+
+  return parts.join('\n');
+}
+
+/**
+ * Get preferences relevant for a specific craft type.
+ * Used by the recipe system to suggest materials.
+ */
+export function getPreferencesForCraft(
+  component: PreferenceComponent,
+  craftType: 'food' | 'clothing' | 'armor' | 'weapon' | 'tool' | 'decoration' | 'potion'
+): { favorites: string[]; dislikes: string[] } {
+  const mp = component.materialPreferences;
+
+  switch (craftType) {
+    case 'food':
+      return {
+        favorites: Object.entries(component.flavorPreferences)
+          .filter(([, v]) => v > 0.3)
+          .map(([k]) => k),
+        dislikes: Object.entries(component.flavorPreferences)
+          .filter(([, v]) => v < -0.3)
+          .map(([k]) => k),
+      };
+
+    case 'clothing':
+      return {
+        favorites: [mp.clothing.favorite, mp.color.favorite],
+        dislikes: [mp.clothing.disliked, mp.color.disliked],
+      };
+
+    case 'armor':
+      return {
+        favorites: [mp.armor.favorite, mp.metal.favorite],
+        dislikes: [mp.armor.disliked, mp.metal.disliked],
+      };
+
+    case 'weapon':
+      return {
+        favorites: [mp.weapon.favorite, mp.metal.favorite, mp.wood.favorite],
+        dislikes: [mp.weapon.disliked, mp.metal.disliked],
+      };
+
+    case 'tool':
+      return {
+        favorites: [mp.wood.favorite, mp.metal.favorite],
+        dislikes: [mp.wood.disliked, mp.metal.disliked],
+      };
+
+    case 'decoration':
+      return {
+        favorites: [mp.color.favorite, mp.gemstone.favorite, mp.plant.favorite],
+        dislikes: [mp.color.disliked, mp.gemstone.disliked],
+      };
+
+    case 'potion':
+      return {
+        favorites: [mp.plant.favorite],
+        dislikes: [mp.plant.disliked],
+      };
+
+    default:
+      return { favorites: [], dislikes: [] };
+  }
+}
+
+/**
+ * Check if an agent would like a gift based on its properties.
+ * Returns affinity score from -1 (hate) to 1 (love).
+ */
+export function calculateGiftAffinity(
+  component: PreferenceComponent,
+  giftProperties: {
+    material?: string;
+    color?: string;
+    woodType?: string;
+    metalType?: string;
+    gemstone?: string;
+    plant?: string;
+  }
+): number {
+  const mp = component.materialPreferences;
+  let totalAffinity = 0;
+  let count = 0;
+
+  // Check each property against preferences
+  if (giftProperties.material) {
+    const material = giftProperties.material.toLowerCase();
+    // Check clothing materials
+    if (CLOTHING_MATERIALS.includes(material as ClothingMaterial)) {
+      totalAffinity += mp.clothing.affinities[material as ClothingMaterial] ?? 0;
+      count++;
+    }
+    // Check armor materials
+    if (ARMOR_MATERIALS.includes(material as ArmorMaterial)) {
+      totalAffinity += mp.armor.affinities[material as ArmorMaterial] ?? 0;
+      count++;
+    }
+  }
+
+  if (giftProperties.color) {
+    const color = giftProperties.color.toLowerCase() as ColorType;
+    if (mp.color.affinities[color] !== undefined) {
+      totalAffinity += mp.color.affinities[color] ?? 0;
+      count++;
+    }
+  }
+
+  if (giftProperties.woodType) {
+    const wood = giftProperties.woodType.toLowerCase() as WoodType;
+    if (mp.wood.affinities[wood] !== undefined) {
+      totalAffinity += mp.wood.affinities[wood] ?? 0;
+      count++;
+    }
+  }
+
+  if (giftProperties.metalType) {
+    const metal = giftProperties.metalType.toLowerCase() as MetalType;
+    if (mp.metal.affinities[metal] !== undefined) {
+      totalAffinity += mp.metal.affinities[metal] ?? 0;
+      count++;
+    }
+  }
+
+  if (giftProperties.gemstone) {
+    const gem = giftProperties.gemstone.toLowerCase() as GemstoneType;
+    if (mp.gemstone.affinities[gem] !== undefined) {
+      totalAffinity += mp.gemstone.affinities[gem] ?? 0;
+      count++;
+    }
+  }
+
+  if (giftProperties.plant) {
+    const plant = giftProperties.plant.toLowerCase() as PlantType;
+    if (mp.plant.affinities[plant] !== undefined) {
+      totalAffinity += mp.plant.affinities[plant] ?? 0;
+      count++;
+    }
+  }
+
+  return count > 0 ? totalAffinity / count : 0;
 }

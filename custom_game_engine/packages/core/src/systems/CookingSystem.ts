@@ -47,6 +47,7 @@ const STATION_SPECIALIZATIONS: Record<string, string> = {
   'pot': 'stewing',
   'smoker': 'preservation',
   'drying_rack': 'preservation',
+  'butchering_table': 'butchering',
 };
 
 /**

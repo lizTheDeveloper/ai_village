@@ -19,16 +19,18 @@
 - Limit memory formation rate per agent (max N per game-hour)
 - Add memory pruning (delete old low-importance memories)
 
-### 3. Death/Starvation Loop
+### 3. Death/Starvation Loop (FIXED)
 **Problem**: 512,403 deaths from starvation in 6 hours
 - All 5 agents died repeatedly and respawned
 - Only 48 berries gathered vs 108 consumed = unsustainable
 - Agents not gathering enough food
 
-**Solution needed**:
-- Fix gather behavior prioritization (starving agents should gather food first)
-- Balance food consumption rates
-- Add starvation warning behavior (gather food when hunger < 30%)
+**Solution implemented**:
+- ✅ Fixed GatherBehavior to check hunger levels before deciding what to gather
+- ✅ When hunger < 30: override all tasks to gather food (starvation mode)
+- ✅ When hunger < 50: prefer food unless gathering for construction
+- ✅ Modified findGatherTarget() to prioritize edible fruit when starving
+- ✅ Emit need:critical event when hunger < 15 for metrics
 
 ### 4. Too Many Systems Running
 **Problem**: 66 systems update every tick
@@ -110,8 +112,8 @@ processEvents() {
 ## Implementation Priority
 
 1. ✅ Fix duplicate processes (DONE)
-2. ⏳ Add memory formation throttling
-3. ⏳ Fix starvation loop (gather behavior)
+2. ✅ Add memory formation throttling (DONE)
+3. ✅ Fix starvation loop (gather behavior) (DONE)
 4. ⏳ Optimize system update frequencies
 5. ⏳ Add memory pruning
 6. ⏳ Profile with Chrome DevTools to find remaining bottlenecks

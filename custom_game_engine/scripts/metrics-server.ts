@@ -17,6 +17,13 @@
  *   GET /metrics/building    - Building-related metrics
  *   GET /metrics/summary     - Summary statistics
  *
+ * Save/Load/Fork API (Time Manipulation Dev Tools):
+ *   GET    /api/saves?session=<id>     - List saves for a session
+ *   POST   /api/load                   - Load a save (rewind)
+ *   POST   /api/fork                   - Fork a new universe from a save
+ *   DELETE /api/save?session=<id>&save=<name> - Delete a save
+ *   GET    /api/save-load              - API help and documentation
+ *
  * Unified Dashboard Views (shared with Player UI):
  *   GET /views               - List all available views
  *   GET /view/:id            - Get view data as formatted text
@@ -31,6 +38,9 @@
  *   POST /api/live/set-llm     - Set custom LLM config for agent (live)
  *   GET  /api/live/universe    - Get universe configuration (dimensions, laws, etc.)
  *   GET  /api/live/magic       - Get magic system info (enabled paradigms, etc.)
+ *   GET  /api/live/pending-approvals - Get pending creations awaiting divine approval
+ *   POST /api/live/approve-creation?id=<id> - Approve a pending creation
+ *   POST /api/live/reject-creation?id=<id>  - Reject a pending creation
  *   GET  /api/live/divinity    - Get divinity info (gods, belief, pantheons, etc.)
  */
 
@@ -39,8 +49,15 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'http';
 import { spawn, type ChildProcess } from 'child_process';
 import { MetricsStorage, type StoredMetric } from '../packages/core/src/metrics/MetricsStorage.js';
 import { viewRegistry, registerBuiltInViews, hasTextFormatter, type ViewContext } from '../packages/core/src/dashboard/index.js';
+import type { CanonEvent } from '../packages/core/src/metrics/CanonEventRecorder.js';
+import { SaveStateManager } from '../packages/core/src/persistence/SaveStateManager.js';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as zlib from 'zlib';
+import { promisify } from 'util';
+
+const gzip = promisify(zlib.gzip);
+const gunzip = promisify(zlib.gunzip);
 
 // ============================================================================
 // HEADLESS GAME PROCESS MANAGEMENT
@@ -150,14 +167,23 @@ function listHeadlessGames(): Array<{
 
 const PORT = 8765;
 const DATA_DIR = path.join(process.cwd(), 'metrics-data');
+const SAVES_DIR = path.join(process.cwd(), 'saves');
 
 // Ensure data directory exists
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
+// Ensure saves directory exists
+if (!fs.existsSync(SAVES_DIR)) {
+  fs.mkdirSync(SAVES_DIR, { recursive: true });
+}
+
 // Initialize storage
 const storage = new MetricsStorage(DATA_DIR);
+
+// Initialize save state manager
+const saveStateManager = new SaveStateManager(SAVES_DIR);
 
 // Register dashboard views
 registerBuiltInViews();
@@ -188,6 +214,19 @@ interface GameSession {
 // Track all game sessions and their metrics
 const gameSessions = new Map<string, GameSession>();
 const sessionMetrics = new Map<string, StoredMetric[]>();
+
+// ============================================================
+// Canon Event System - Multiverse Bridges
+// ============================================================
+
+// Track canon events per session
+const sessionCanonEvents = new Map<string, CanonEvent[]>();
+
+// Canon events directory
+const CANON_DIR = path.join(DATA_DIR, 'canon-events');
+if (!fs.existsSync(CANON_DIR)) {
+  fs.mkdirSync(CANON_DIR, { recursive: true });
+}
 
 // ============================================================
 // Live Query System
@@ -856,6 +895,185 @@ function saveAllSessionsToDisk(): void {
 
 // Load existing sessions on startup
 loadAllSessionsFromDisk();
+
+// ============================================================
+// Canon Event Management - Multiverse Bridge Infrastructure
+// ============================================================
+
+/**
+ * Save a canon event to disk with compression
+ */
+async function saveCanonEventToDisk(sessionId: string, event: CanonEvent): Promise<void> {
+  const sessionDir = path.join(CANON_DIR, sessionId);
+  if (!fs.existsSync(sessionDir)) {
+    fs.mkdirSync(sessionDir, { recursive: true });
+  }
+
+  // Save metadata (small, uncompressed for quick access)
+  const metadataFile = path.join(sessionDir, `${event.id}_metadata.json`);
+  const metadata = {
+    id: event.id,
+    type: event.type,
+    timestamp: event.timestamp,
+    tick: event.tick,
+    day: event.day,
+    description: event.description,
+    agentIds: event.agentIds,
+    agentNames: event.agentNames,
+    eventData: event.eventData,
+    genealogy: event.genealogy,
+  };
+  await fs.promises.writeFile(metadataFile, JSON.stringify(metadata, null, 2));
+
+  // Save full snapshot (compressed)
+  const snapshotFile = path.join(sessionDir, `${event.id}_snapshot.json.gz`);
+  const snapshotJson = JSON.stringify(event.snapshot);
+  const compressed = await gzip(Buffer.from(snapshotJson));
+  await fs.promises.writeFile(snapshotFile, compressed);
+
+  // Save runtime definitions
+  const runtimeFile = path.join(sessionDir, `${event.id}_runtime.json`);
+  await fs.promises.writeFile(runtimeFile, JSON.stringify(event.runtimeDefinitions, null, 2));
+
+  console.log(`[Canon] Saved event ${event.id} for session ${sessionId}`);
+}
+
+/**
+ * Load a canon event from disk
+ */
+async function loadCanonEventFromDisk(sessionId: string, eventId: string): Promise<CanonEvent | null> {
+  const sessionDir = path.join(CANON_DIR, sessionId);
+  const metadataFile = path.join(sessionDir, `${eventId}_metadata.json`);
+  const snapshotFile = path.join(sessionDir, `${eventId}_snapshot.json.gz`);
+  const runtimeFile = path.join(sessionDir, `${eventId}_runtime.json`);
+
+  if (!fs.existsSync(metadataFile) || !fs.existsSync(snapshotFile)) {
+    return null;
+  }
+
+  try {
+    // Load metadata
+    const metadataJson = await fs.promises.readFile(metadataFile, 'utf-8');
+    const metadata = JSON.parse(metadataJson);
+
+    // Load compressed snapshot
+    const compressed = await fs.promises.readFile(snapshotFile);
+    const decompressed = await gunzip(compressed);
+    const snapshot = JSON.parse(decompressed.toString());
+
+    // Load runtime definitions
+    let runtimeDefinitions = {
+      recipes: [],
+      items: [],
+      sacredSites: [],
+      landmarks: [],
+      culturalBeliefs: [],
+      customBuildings: [],
+    };
+    if (fs.existsSync(runtimeFile)) {
+      const runtimeJson = await fs.promises.readFile(runtimeFile, 'utf-8');
+      runtimeDefinitions = JSON.parse(runtimeJson);
+    }
+
+    return {
+      ...metadata,
+      snapshot,
+      runtimeDefinitions,
+    };
+  } catch (error) {
+    console.error(`[Canon] Failed to load event ${eventId}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Get all canon events for a session
+ */
+function getCanonEventsForSession(sessionId: string): CanonEvent[] {
+  return sessionCanonEvents.get(sessionId) || [];
+}
+
+/**
+ * Add a canon event (from WebSocket stream)
+ */
+async function addCanonEvent(sessionId: string, event: CanonEvent): Promise<void> {
+  // Add to in-memory store
+  if (!sessionCanonEvents.has(sessionId)) {
+    sessionCanonEvents.set(sessionId, []);
+  }
+  sessionCanonEvents.get(sessionId)!.push(event);
+
+  // Save to disk
+  await saveCanonEventToDisk(sessionId, event);
+}
+
+/**
+ * Load all canon events for a session from disk
+ */
+async function loadCanonEventsForSession(sessionId: string): Promise<void> {
+  const sessionDir = path.join(CANON_DIR, sessionId);
+  if (!fs.existsSync(sessionDir)) {
+    return;
+  }
+
+  const files = await fs.promises.readdir(sessionDir);
+  const metadataFiles = files.filter(f => f.endsWith('_metadata.json'));
+
+  const events: CanonEvent[] = [];
+  for (const file of metadataFiles) {
+    const eventId = file.replace('_metadata.json', '');
+    const event = await loadCanonEventFromDisk(sessionId, eventId);
+    if (event) {
+      events.push(event);
+    }
+  }
+
+  // Sort by timestamp
+  events.sort((a, b) => a.timestamp - b.timestamp);
+  sessionCanonEvents.set(sessionId, events);
+
+  console.log(`[Canon] Loaded ${events.length} canon events for session ${sessionId}`);
+}
+
+/**
+ * Create export package for a canon event
+ */
+async function exportCanonEventPackage(sessionId: string, eventId: string): Promise<Buffer | null> {
+  const event = await loadCanonEventFromDisk(sessionId, eventId);
+  if (!event) {
+    return null;
+  }
+
+  // Create package metadata
+  const packageData = {
+    version: 1,
+    exportedAt: Date.now(),
+    sourceSession: sessionId,
+    event: {
+      id: event.id,
+      type: event.type,
+      timestamp: event.timestamp,
+      tick: event.tick,
+      day: event.day,
+      description: event.description,
+      agentIds: event.agentIds,
+      agentNames: event.agentNames,
+    },
+    snapshot: event.snapshot,
+    runtimeDefinitions: event.runtimeDefinitions,
+    genealogy: event.genealogy,
+    bridgeMetadata: {
+      multiverseId: sessionId,
+      allowsTravel: true,
+      believerThreshold: 5,
+      restrictions: ['ensouled_only'],
+    },
+  };
+
+  // Compress entire package
+  const json = JSON.stringify(packageData, null, 2);
+  return await gzip(Buffer.from(json));
+}
 
 // ============================================================
 // LLM Dashboard Generation Functions
@@ -3569,6 +3787,267 @@ Available agents:
     return;
   }
 
+  // === Pending Approvals API ===
+
+  if (pathname === '/api/live/pending-approvals') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const gameClient = getActiveGameClient();
+    if (!gameClient) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({ error: 'No game client connected', connected: false }));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'pending_approvals');
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
+  if (pathname === '/api/live/approve-creation' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const gameClient = getActiveGameClient();
+    if (!gameClient) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({ error: 'No game client connected', connected: false }));
+      return;
+    }
+
+    const creationId = url.searchParams.get('id');
+    if (!creationId) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: 'Missing id parameter' }));
+      return;
+    }
+
+    try {
+      const result = await sendActionToGame(gameClient, 'approve-creation', { creationId });
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Action failed' }));
+    }
+    return;
+  }
+
+  if (pathname === '/api/live/reject-creation' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const gameClient = getActiveGameClient();
+    if (!gameClient) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({ error: 'No game client connected', connected: false }));
+      return;
+    }
+
+    const creationId = url.searchParams.get('id');
+    if (!creationId) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: 'Missing id parameter' }));
+      return;
+    }
+
+    try {
+      const result = await sendActionToGame(gameClient, 'reject-creation', { creationId });
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Action failed' }));
+    }
+    return;
+  }
+
+  // ============================================================
+  // Canon Events API - Multiverse Bridge Endpoints
+  // ============================================================
+
+  // List canon events for a session
+  if (pathname === '/api/canon/events') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const sessionId = url.searchParams.get('session') || 'latest';
+    const typeFilter = url.searchParams.get('type');
+
+    let events = getCanonEventsForSession(sessionId);
+
+    // Filter by type if specified
+    if (typeFilter) {
+      events = events.filter(e => e.type === typeFilter);
+    }
+
+    // Return metadata only (no full snapshots)
+    const metadata = events.map(e => ({
+      id: e.id,
+      type: e.type,
+      timestamp: e.timestamp,
+      tick: e.tick,
+      day: e.day,
+      description: e.description,
+      agentIds: e.agentIds,
+      agentNames: e.agentNames,
+      genealogy: e.genealogy,
+    }));
+
+    res.end(JSON.stringify(metadata, null, 2));
+    return;
+  }
+
+  // Get specific canon event with full snapshot
+  if (pathname.startsWith('/api/canon/event/')) {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const eventId = pathname.replace('/api/canon/event/', '');
+    const sessionId = url.searchParams.get('session') || 'latest';
+
+    try {
+      const event = await loadCanonEventFromDisk(sessionId, eventId);
+      if (!event) {
+        res.statusCode = 404;
+        res.end(JSON.stringify({ error: 'Canon event not found' }));
+        return;
+      }
+
+      res.end(JSON.stringify(event, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to load event' }));
+    }
+    return;
+  }
+
+  // Export canon event package
+  if (pathname.startsWith('/api/canon/export/')) {
+    res.setHeader('Content-Type', 'application/gzip');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const eventId = pathname.replace('/api/canon/export/', '');
+    const sessionId = url.searchParams.get('session') || 'latest';
+
+    try {
+      const packageData = await exportCanonEventPackage(sessionId, eventId);
+      if (!packageData) {
+        res.statusCode = 404;
+        res.end(JSON.stringify({ error: 'Canon event not found' }));
+        return;
+      }
+
+      res.setHeader('Content-Disposition', `attachment; filename="canon_${eventId}.gz"`);
+      res.end(packageData);
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to export' }));
+    }
+    return;
+  }
+
+  // Import canon event package (multipart upload)
+  if (pathname === '/api/canon/import' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    // TODO: Implement multipart file upload handler
+    // For now, return placeholder
+    res.statusCode = 501;
+    res.end(JSON.stringify({
+      error: 'Import endpoint not yet implemented',
+      note: 'Use file upload with multipart/form-data'
+    }));
+    return;
+  }
+
+  // ============================================================
+  // Canon Timeline Dashboard
+  // ============================================================
+
+  if (pathname === '/dashboard/canon') {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const sessionId = url.searchParams.get('session') || 'latest';
+    const events = getCanonEventsForSession(sessionId);
+
+    let output = `CANON EVENTS TIMELINE - ${sessionId}\n`;
+    output += `═══════════════════════════════════════════════════\n\n`;
+
+    if (events.length === 0) {
+      output += 'No canon events recorded yet.\n\n';
+      output += 'Canon events are automatically recorded for:\n';
+      output += '  - Soul creation ceremonies (ensoulment)\n';
+      output += '  - Births of ensouled beings\n';
+      output += '  - Deaths of ensouled beings\n';
+      output += '  - Unions/marriages (when both ensouled)\n';
+      output += '  - Reincarnations\n';
+      output += '  - Time milestones (1 month, 3 months, 6 months, 1 year, 2 years)\n';
+      output += '  - Sacred site creation\n';
+      output += '  - Major crises (rebellions)\n';
+    } else {
+      for (const event of events) {
+        const date = new Date(event.timestamp).toISOString();
+        output += `[Day ${event.day}, Tick ${event.tick}] ${event.type.toUpperCase().replace(':', ':')}\n`;
+        output += `  ${event.description}\n`;
+
+        if (event.agentNames.length > 0) {
+          output += `  Agents: ${event.agentNames.join(', ')}\n`;
+        }
+
+        if (event.genealogy) {
+          if (event.type === 'time:milestone') {
+            output += `  Population: ${event.genealogy.livingEnsouled} ensouled beings\n`;
+            output += `  Unions: ${event.genealogy.totalUnions}, Deaths: ${event.genealogy.totalDeaths}\n`;
+          }
+        }
+
+        output += `  Timestamp: ${date}\n`;
+        output += `  Export: curl "http://localhost:${HTTP_PORT}/api/canon/export/${event.id}?session=${sessionId}" --output ${event.id}.gz\n`;
+        output += '\n';
+      }
+
+      // Genealogy summary
+      if (events.length > 0) {
+        const latest = events[events.length - 1]!;
+        if (latest.genealogy) {
+          output += '\nGENEALOGY SUMMARY\n';
+          output += '─────────────────\n';
+          output += `Total souls created: ${latest.genealogy.totalSoulsCreated}\n`;
+          output += `Living ensouled: ${latest.genealogy.livingEnsouled}\n`;
+          output += `Total births: ${latest.genealogy.totalBirths}\n`;
+          output += `Total deaths: ${latest.genealogy.totalDeaths}\n`;
+          output += `Total unions: ${latest.genealogy.totalUnions}\n`;
+          output += `Active lineages: ${latest.genealogy.lineages.length}\n`;
+
+          if (latest.genealogy.reincarnationChains.length > 0) {
+            output += '\nREINCARNATION CHAINS\n';
+            output += '────────────────────\n';
+            for (const chain of latest.genealogy.reincarnationChains) {
+              const names = chain.incarnations.map(i => i.name).join(' → ');
+              output += `${names} (${chain.incarnations.length} lives)\n`;
+            }
+          }
+        }
+      }
+
+      output += '\nMULTIVERSE BRIDGE POINTS\n';
+      output += '─────────────────────────\n';
+      output += `Total bridge points: ${events.length}\n`;
+      output += '\nEach canon event can be exported and imported into another\n';
+      output += 'player\'s universe to create a multiverse bridge.\n';
+    }
+
+    res.end(output);
+    return;
+  }
+
   // === Dev Actions API (LLM-accessible dev tools) ===
   if (pathname === '/api/actions' && req.method === 'GET') {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
@@ -3951,6 +4430,239 @@ ${listHeadlessGames().map(g => `  ${g.sessionId}: ${g.status} (${g.agentCount} a
     return;
   }
 
+  // === Save/Load/Fork API (Time Manipulation Dev Tools) ===
+
+  // List all saves for a session
+  if (pathname === '/api/saves' && req.method === 'GET') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const sessionId = url.searchParams.get('session');
+    if (!sessionId) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: 'session parameter is required' }));
+      return;
+    }
+
+    try {
+      const saves = await saveStateManager.listSaves(sessionId);
+      res.end(JSON.stringify({ success: true, sessionId, saves }, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to list saves' }));
+    }
+    return;
+  }
+
+  // Save current game state
+  if (pathname === '/api/save' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    let body = '';
+    req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+    req.on('end', async () => {
+      try {
+        const params = body ? JSON.parse(body) : {};
+        const sessionId = params.sessionId;
+        const saveName = params.saveName;
+        const description = params.description;
+
+        if (!sessionId) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ error: 'sessionId is required' }));
+          return;
+        }
+
+        // Get the world from the active WebSocket connection
+        // For now, this endpoint requires integration with the running game
+        // The game needs to send its World instance via WebSocket when requested
+
+        res.statusCode = 501;
+        res.end(JSON.stringify({
+          error: 'Save endpoint not yet integrated with running game',
+          note: 'This endpoint requires the game to send its World instance via WebSocket. Use SaveStateManager directly in headless scripts for now.'
+        }));
+      } catch (err) {
+        res.statusCode = 400;
+        res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Invalid request' }));
+      }
+    });
+    return;
+  }
+
+  // Load a save (rewind)
+  if (pathname === '/api/load' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    let body = '';
+    req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+    req.on('end', async () => {
+      try {
+        const params = body ? JSON.parse(body) : {};
+        const sessionId = params.sessionId;
+        const saveName = params.saveName;
+
+        if (!sessionId || !saveName) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ error: 'sessionId and saveName are required' }));
+          return;
+        }
+
+        const saveState = await saveStateManager.loadState(sessionId, saveName);
+        res.end(JSON.stringify({
+          success: true,
+          sessionId,
+          saveName,
+          metadata: saveState.metadata,
+          note: 'Snapshot loaded. Use WorldSerializer.deserializeWorld() to restore the world in your game.'
+        }, null, 2));
+      } catch (err) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to load save' }));
+      }
+    });
+    return;
+  }
+
+  // Fork a new universe from a save
+  if (pathname === '/api/fork' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    let body = '';
+    req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+    req.on('end', async () => {
+      try {
+        const params = body ? JSON.parse(body) : {};
+        const sourceSession = params.sourceSession;
+        const saveName = params.saveName;
+        const newSession = params.newSession;
+        const description = params.description;
+
+        if (!sourceSession || !saveName || !newSession) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ error: 'sourceSession, saveName, and newSession are required' }));
+          return;
+        }
+
+        const forkedMetadata = await saveStateManager.forkState(
+          sourceSession,
+          saveName,
+          newSession,
+          description
+        );
+
+        res.end(JSON.stringify({
+          success: true,
+          sourceSession,
+          saveName,
+          newSession,
+          metadata: forkedMetadata,
+          dashboardUrl: `http://localhost:${HTTP_PORT}/dashboard?session=${newSession}`
+        }, null, 2));
+      } catch (err) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to fork save' }));
+      }
+    });
+    return;
+  }
+
+  // Delete a save
+  if (pathname === '/api/save' && req.method === 'DELETE') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const sessionId = url.searchParams.get('session');
+    const saveName = url.searchParams.get('save');
+
+    if (!sessionId || !saveName) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: 'session and save parameters are required' }));
+      return;
+    }
+
+    try {
+      await saveStateManager.deleteSave(sessionId, saveName);
+      res.end(JSON.stringify({ success: true, sessionId, saveName }));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to delete save' }));
+    }
+    return;
+  }
+
+  // Save/Load API help endpoint
+  if (pathname === '/api/save-load' || pathname === '/api/save-load/') {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const helpText = `================================================================================
+SAVE/LOAD/FORK API - Time Manipulation Dev Tools
+================================================================================
+Manual save, rewind, fork, and load capabilities for headless games.
+
+ENDPOINTS:
+--------------------------------------------------------------------------------
+
+1. LIST SAVES FOR SESSION
+   curl "http://localhost:${HTTP_PORT}/api/saves?session=my_game"
+
+   Parameters:
+     - session (string, required): Session ID
+
+   Returns: Array of save metadata with timestamps, days, agent counts
+
+2. LOAD A SAVE (REWIND)
+   curl -X POST http://localhost:${HTTP_PORT}/api/load \\
+     -H "Content-Type: application/json" \\
+     -d '{"sessionId": "my_game", "saveName": "save_001"}'
+
+   Parameters:
+     - sessionId (string, required): Session ID
+     - saveName (string, required): Save name to load
+
+   Returns: Save metadata and snapshot
+
+3. FORK A NEW UNIVERSE
+   curl -X POST http://localhost:${HTTP_PORT}/api/fork \\
+     -H "Content-Type: application/json" \\
+     -d '{"sourceSession": "my_game", "saveName": "save_001", "newSession": "experiment_1", "description": "Testing alternate timeline"}'
+
+   Parameters:
+     - sourceSession (string, required): Source session ID
+     - saveName (string, required): Save to fork from
+     - newSession (string, required): New session ID
+     - description (string, optional): Description of the fork
+
+   Returns: Forked save metadata and dashboard URL
+
+4. DELETE A SAVE
+   curl -X DELETE "http://localhost:${HTTP_PORT}/api/save?session=my_game&save=save_001"
+
+   Parameters:
+     - session (string, required): Session ID
+     - save (string, required): Save name to delete
+
+   Returns: Success confirmation
+
+NOTE: The POST /api/save endpoint for creating saves is not yet integrated with
+      running games. Use SaveStateManager directly in headless scripts for now:
+
+      import { SaveStateManager } from '@ai-village/core';
+      const saveManager = new SaveStateManager('saves');
+      await saveManager.saveState(world, sessionId, { description: 'Checkpoint' });
+
+================================================================================
+See TIME_MANIPULATION_DEVTOOLS.md for more details
+================================================================================
+`;
+    res.end(helpText);
+    return;
+  }
+
   // === JSON Endpoints ===
   res.setHeader('Content-Type', 'application/json');
 
@@ -4134,6 +4846,14 @@ wss.on('connection', (ws: WebSocket) => {
 
         case 'batch':
           await handleBatch(wsSessions.get(ws) || sessionId, message.data);
+          break;
+
+        case 'canon_event':
+          // Handle canon event from game client
+          const currentSessionId = wsSessions.get(ws) || sessionId;
+          const canonEvent: CanonEvent = message.event;
+          await addCanonEvent(currentSessionId, canonEvent);
+          console.log(`[${new Date().toISOString()}] Canon event recorded: ${canonEvent.type} (${canonEvent.id})`);
           break;
 
         case 'ping':

@@ -12,7 +12,7 @@ import type { StoredMetric } from './MetricsStorage.js';
  */
 export interface QueryRequest {
   requestId: string;
-  queryType: 'entities' | 'entity' | 'entity_prompt' | 'universe' | 'magic' | 'divinity';
+  queryType: 'entities' | 'entity' | 'entity_prompt' | 'universe' | 'magic' | 'divinity' | 'pending_approvals';
   entityId?: string;
 }
 
@@ -319,6 +319,22 @@ export class MetricsStreamClient {
     // Send immediately if we have enough
     if (this.buffer.length >= this.config.batchSize && this.isConnected()) {
       this.flush();
+    }
+  }
+
+  /**
+   * Send a raw message (for special message types like canon events)
+   */
+  sendMessage(message: Record<string, unknown>): void {
+    if (!this.isConnected()) {
+      console.warn('[MetricsStreamClient] Cannot send message - not connected');
+      return;
+    }
+
+    try {
+      this.ws!.send(JSON.stringify(message));
+    } catch (err) {
+      console.error('[MetricsStreamClient] Failed to send message:', err);
     }
   }
 

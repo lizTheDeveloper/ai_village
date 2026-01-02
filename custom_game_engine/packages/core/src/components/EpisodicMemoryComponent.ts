@@ -60,12 +60,17 @@ interface RetrievalContext {
 export class EpisodicMemoryComponent extends ComponentBase {
   public readonly type = 'episodic_memory';
   private _episodicMemories: EpisodicMemory[] = [];
+  private _suppressedMemories: EpisodicMemory[] = [];
   private readonly _maxMemories: number = 1000;
+  private readonly _maxSuppressedMemories: number = 500;
 
-  constructor(data?: { maxMemories?: number }) {
+  constructor(data?: { maxMemories?: number; maxSuppressedMemories?: number }) {
     super();
     if (data?.maxMemories !== undefined) {
       this._maxMemories = data.maxMemories;
+    }
+    if (data?.maxSuppressedMemories !== undefined) {
+      this._maxSuppressedMemories = data.maxSuppressedMemories;
     }
   }
 
@@ -75,6 +80,15 @@ export class EpisodicMemoryComponent extends ComponentBase {
   get episodicMemories(): readonly EpisodicMemory[] {
     // Return a frozen array to prevent modification
     return Object.freeze([...this._episodicMemories]);
+  }
+
+  /**
+   * Get all suppressed memories (readonly)
+   * These are memories that have faded from consciousness but remain in the unconscious.
+   * They can resurface in dreams, meditation, trauma, or near-death experiences.
+   */
+  get suppressedMemories(): readonly EpisodicMemory[] {
+    return Object.freeze([...this._suppressedMemories]);
   }
 
   /**
@@ -338,6 +352,155 @@ export class EpisodicMemoryComponent extends ComponentBase {
       (m) => m.clarity >= 0.1
     );
     return forgotten;
+  }
+
+  /**
+   * Suppress a memory - move it from active to unconscious storage
+   * Suppressed memories can resurface in dreams, meditation, trauma, or near-death experiences.
+   * They also accumulate across reincarnations, contributing to soul wisdom.
+   *
+   * @param memoryId - ID of the memory to suppress
+   * @returns true if memory was suppressed, false if not found
+   */
+  suppressMemory(memoryId: string): boolean {
+    const index = this._episodicMemories.findIndex((m) => m.id === memoryId);
+    if (index < 0) return false;
+
+    const memory = this._episodicMemories[index];
+    if (!memory) return false;
+
+    // Move to suppressed
+    this._suppressedMemories.push(memory);
+    this._episodicMemories.splice(index, 1);
+
+    // Enforce suppressed memory limit (keep most important)
+    if (this._suppressedMemories.length > this._maxSuppressedMemories) {
+      this._suppressedMemories.sort((a, b) => {
+        // Prioritize: importance > emotional intensity > recency
+        const importanceDiff = b.importance - a.importance;
+        if (Math.abs(importanceDiff) > 0.01) return importanceDiff;
+
+        const emotionDiff = b.emotionalIntensity - a.emotionalIntensity;
+        if (Math.abs(emotionDiff) > 0.01) return emotionDiff;
+
+        return b.timestamp - a.timestamp;
+      });
+      this._suppressedMemories = this._suppressedMemories.slice(0, this._maxSuppressedMemories);
+    }
+
+    return true;
+  }
+
+  /**
+   * Suppress multiple memories at once (batch operation)
+   * @param memoryIds - Array of memory IDs to suppress
+   * @returns Number of memories successfully suppressed
+   */
+  suppressMemories(memoryIds: string[]): number {
+    let count = 0;
+    for (const id of memoryIds) {
+      if (this.suppressMemory(id)) count++;
+    }
+    return count;
+  }
+
+  /**
+   * Resurface a suppressed memory back into consciousness
+   * Used for dreams, meditation, trauma responses, near-death experiences.
+   *
+   * @param memoryId - ID of suppressed memory to resurface
+   * @param newClarity - Clarity level when resurfacing (default: 0.3, hazy)
+   * @returns true if memory was resurfaced, false if not found
+   */
+  resurfaceMemory(memoryId: string, newClarity: number = 0.3): boolean {
+    const index = this._suppressedMemories.findIndex((m) => m.id === memoryId);
+    if (index < 0) return false;
+
+    const memory = this._suppressedMemories[index];
+    if (!memory) return false;
+
+    // Update clarity and move back to active memories
+    const resurfaced = Object.freeze({
+      ...memory,
+      clarity: this._clamp(newClarity, 0, 1),
+      timesRecalled: memory.timesRecalled + 1,
+    });
+
+    this._episodicMemories.push(resurfaced);
+    this._suppressedMemories.splice(index, 1);
+
+    return true;
+  }
+
+  /**
+   * Get suppressed memories that might resurface based on context
+   * Used by dream systems, meditation, trauma triggers, etc.
+   *
+   * @param context - Context for memory retrieval
+   * @returns Most relevant suppressed memories that could resurface
+   */
+  getSuppressedForResurfacing(context: RetrievalContext): EpisodicMemory[] {
+    const limit = context.limit ?? 3; // Fewer than active memory retrieval
+
+    // Score suppressed memories for resurfacing potential
+    const scored = this._suppressedMemories.map((memory) => {
+      let score = 0;
+
+      // High importance memories more likely to resurface (40% weight)
+      score += memory.importance * 0.4;
+
+      // High emotion memories more likely to resurface (30% weight)
+      score += memory.emotionalIntensity * 0.3;
+
+      // Contextual similarity (30% weight)
+      let contextScore = 0;
+
+      if (context.participants && memory.participants) {
+        const overlap = context.participants.filter((p) =>
+          memory.participants!.includes(p)
+        ).length;
+        const maxOverlap = Math.max(
+          context.participants.length,
+          memory.participants.length
+        );
+        if (maxOverlap > 0) {
+          contextScore += (overlap / maxOverlap) * 0.67;
+        }
+      }
+
+      if (context.location && memory.location) {
+        const dx = context.location.x - memory.location.x;
+        const dy = context.location.y - memory.location.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const proximityScore = Math.exp(-distance / 10);
+        contextScore += proximityScore * 0.33;
+      }
+
+      score += contextScore * 0.3;
+
+      return { memory, score };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+    return scored.slice(0, limit).map((s) => s.memory);
+  }
+
+  /**
+   * Count total suppressed memories (for wisdom/soul age tracking)
+   * More suppressed memories (especially from past lives) = wiser soul
+   */
+  getSuppressedCount(): number {
+    return this._suppressedMemories.length;
+  }
+
+  /**
+   * Get count of suppressed past-life memories (for reincarnation wisdom tracking)
+   * These contribute to soul wisdom that can lead to eventual godhood
+   */
+  getPastLifeSuppressedCount(): number {
+    return this._suppressedMemories.filter(
+      (m) => m.eventType.startsWith('past_life:')
+    ).length;
   }
 
   /**

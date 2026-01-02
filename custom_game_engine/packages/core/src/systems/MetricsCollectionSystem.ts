@@ -16,6 +16,7 @@ import type { EventBus } from '../events/EventBus.js';
 import { MetricsCollector } from '../metrics/MetricsCollector.js';
 import { MetricsStreamClient, type MetricsStreamConfig } from '../metrics/MetricsStreamClient.js';
 import type { StoredMetric } from '../metrics/MetricsStorage.js';
+import { CanonEventRecorder, type CanonEventConfig } from '../metrics/CanonEventRecorder.js';
 
 interface MetricsCollectionConfig {
   enabled: boolean;
@@ -25,6 +26,8 @@ interface MetricsCollectionConfig {
   streaming?: boolean;
   /** Streaming configuration */
   streamConfig?: MetricsStreamConfig;
+  /** Canon event recording configuration */
+  canonEvents?: Partial<CanonEventConfig>;
 }
 
 const DEFAULT_CONFIG: MetricsCollectionConfig = {
@@ -44,10 +47,14 @@ export class MetricsCollectionSystem implements System {
   private tickCount = 0;
   private lastSnapshotTick = 0;
   private streamClient: MetricsStreamClient | null = null;
+  private canonRecorder: CanonEventRecorder;
+  private world: World;
 
   constructor(world: World, config: Partial<MetricsCollectionConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
+    this.world = world;
     this.collector = new MetricsCollector(world);
+    this.canonRecorder = new CanonEventRecorder(this.config.canonEvents);
     this.setupEventListeners(world.eventBus);
 
     // Initialize streaming if enabled
@@ -633,6 +640,181 @@ export class MetricsCollectionSystem implements System {
         items: data.items,
       });
     });
+
+    // ============================================================================
+    // CANON EVENTS - Full universe snapshots for multiverse reconstruction
+    // ============================================================================
+
+    // Soul creation ceremony (ensoulment)
+    eventBus.subscribe('soul:ceremony_complete', (event) => {
+      const data = event.data;
+      this.canonRecorder.recordEvent('soul:created', this.world, {
+        description: `Soul created: ${data.purpose}`,
+        agentIds: [data.soulId],
+        eventData: {
+          soulId: data.soulId,
+          purpose: data.purpose,
+          interests: data.interests,
+          archetype: data.archetype,
+          destiny: data.destiny,
+          transcript: data.transcript,
+        },
+      }).then((canonEvent) => {
+        this.streamClient?.sendMessage({ type: 'canon_event', event: canonEvent });
+      }).catch((error) => {
+        console.error('[MetricsCollection] Failed to record soul creation canon event:', error);
+      });
+    });
+
+    // Birth of ensouled being
+    eventBus.subscribe('agent:birth', (event) => {
+      const data = event.data;
+      // Only record if ensouled
+      const entity = this.world.getEntity(data.agentId);
+      if (entity?.hasComponent(CT.SoulIdentity)) {
+        this.canonRecorder.recordEvent('agent:born', this.world, {
+          description: `${data.name} was born`,
+          agentIds: [data.agentId],
+          eventData: {
+            name: data.name,
+            generation: data.generation,
+            parents: data.parents,
+            useLLM: data.useLLM,
+          },
+        }).then((canonEvent) => {
+          // Send canon event to metrics server
+          if (this.streamClient) {
+            this.streamClient.send({
+              type: 'canon_event',
+              timestamp: canonEvent.timestamp,
+              agentId: canonEvent.agentIds[0],
+              data: canonEvent as any,
+              category: 'canon',
+            });
+          }
+        }).catch((error) => {
+          console.error('[MetricsCollection] Failed to record birth canon event:', error);
+        });
+      }
+    });
+
+    // Death of ensouled being
+    eventBus.subscribe('death:occurred', (event) => {
+      const data = event.data;
+      const entity = this.world.getEntity(data.entityId);
+      if (entity?.hasComponent(CT.SoulIdentity)) {
+        const agentComp = entity.getComponent(CT.Agent) as any;
+        this.canonRecorder.recordEvent('agent:died', this.world, {
+          description: `${agentComp?.name ?? 'Unknown'} died from ${data.cause}`,
+          agentIds: [data.entityId],
+          eventData: {
+            cause: data.cause,
+            location: data.location,
+          },
+        }).then((canonEvent) => {
+          if (this.streamClient) {
+            this.streamClient.send({
+              type: 'canon_event',
+              timestamp: canonEvent.timestamp,
+              agentId: canonEvent.agentIds[0],
+              data: canonEvent as any,
+              category: 'canon',
+            });
+          }
+        }).catch((error) => {
+          console.error('[MetricsCollection] Failed to record death canon event:', error);
+        });
+      }
+    });
+
+    // Union/Marriage
+    eventBus.subscribe('courtship:consent', (event) => {
+      const data = event.data;
+      // Check if both are ensouled
+      const agent1 = this.world.getEntity(data.agent1);
+      const agent2 = this.world.getEntity(data.agent2);
+      if (agent1?.hasComponent(CT.SoulIdentity) && agent2?.hasComponent(CT.SoulIdentity)) {
+        const agent1Comp = agent1.getComponent(CT.Agent) as any;
+        const agent2Comp = agent2.getComponent(CT.Agent) as any;
+        this.canonRecorder.recordEvent('union:formed', this.world, {
+          description: `${agent1Comp?.name ?? 'Unknown'} and ${agent2Comp?.name ?? 'Unknown'} formed a union`,
+          agentIds: [data.agent1, data.agent2],
+          eventData: {
+            agent1: data.agent1,
+            agent2: data.agent2,
+          },
+        }).then((canonEvent) => {
+          if (this.streamClient) {
+            this.streamClient.send({
+              type: 'canon_event',
+              timestamp: canonEvent.timestamp,
+              agentId: canonEvent.agentIds[0],
+              data: canonEvent as any,
+              category: 'canon',
+            });
+          }
+        }).catch((error) => {
+          console.error('[MetricsCollection] Failed to record union canon event:', error);
+        });
+      }
+    });
+
+    // Reincarnation
+    eventBus.subscribe('soul:reincarnated', (event) => {
+      const data = event.data;
+      const entity = this.world.getEntity(data.newEntityId);
+      const agentComp = entity?.getComponent(CT.Agent) as any;
+      this.canonRecorder.recordEvent('soul:reincarnated', this.world, {
+        description: `Soul reincarnated as ${agentComp?.name ?? 'Unknown'}`,
+        agentIds: [data.newEntityId],
+        eventData: {
+          originalEntityId: data.originalEntityId,
+          newEntityId: data.newEntityId,
+          memoryRetention: data.memoryRetention,
+          deityId: data.deityId,
+        },
+      }).then((canonEvent) => {
+        this.streamClient?.sendMessage({ type: 'canon_event', event: canonEvent });
+      }).catch((error) => {
+        console.error('[MetricsCollection] Failed to record reincarnation canon event:', error);
+      });
+    });
+
+    // Sacred site creation (cultural emergence)
+    eventBus.subscribe('sacred_site:created', (event) => {
+      const data = event.data;
+      this.canonRecorder.recordEvent('culture:emerged', this.world, {
+        description: `Sacred site created at (${data.position.x}, ${data.position.y})`,
+        agentIds: [],
+        eventData: {
+          siteId: data.siteId,
+          type: data.type,
+          position: data.position,
+        },
+      }).then((canonEvent) => {
+        this.streamClient?.sendMessage({ type: 'canon_event', event: canonEvent });
+      }).catch((error) => {
+        console.error('[MetricsCollection] Failed to record sacred site canon event:', error);
+      });
+    });
+
+    // Rebellion (major crisis)
+    eventBus.subscribe('rebellion:triggered', (event) => {
+      const data = event.data;
+      this.canonRecorder.recordEvent('crisis:occurred', this.world, {
+        description: data.message || 'Rebellion triggered against the Creator',
+        agentIds: [],
+        eventData: {
+          type: 'rebellion',
+          message: data.message,
+          path: data.path,
+        },
+      }).then((canonEvent) => {
+        this.streamClient?.sendMessage({ type: 'canon_event', event: canonEvent });
+      }).catch((error) => {
+        console.error('[MetricsCollection] Failed to record rebellion canon event:', error);
+      });
+    });
   }
 
   /**
@@ -686,6 +868,35 @@ export class MetricsCollectionSystem implements System {
       this.takeSnapshot(world);
       this.lastSnapshotTick = this.tickCount;
     }
+
+    // Check for time milestones (canon events)
+    this.checkTimeMilestones(world);
+  }
+
+  /**
+   * Check if current day is a time milestone and record canon event
+   */
+  private checkTimeMilestones(world: World): void {
+    const timeEntities = world.query().with(CT.Time).execute();
+    if (timeEntities.length === 0) return;
+
+    const timeComp = world.getComponent(timeEntities[0]!, CT.Time) as any;
+    const currentDay = timeComp?.day ?? 1;
+
+    if (this.canonRecorder.shouldRecordTimeMilestone(currentDay)) {
+      this.canonRecorder.recordEvent('time:milestone', world, {
+        description: `Day ${currentDay} reached`,
+        agentIds: [],
+        eventData: {
+          day: currentDay,
+          tick: timeComp?.tick ?? 0,
+          phase: timeComp?.phase,
+          season: timeComp?.season,
+        },
+      }).catch((error) => {
+        console.error('[MetricsCollection] Failed to record time milestone canon event:', error);
+      });
+    }
   }
 
   /**
@@ -733,6 +944,13 @@ export class MetricsCollectionSystem implements System {
    */
   getCollector(): MetricsCollector {
     return this.collector;
+  }
+
+  /**
+   * Get the canon event recorder for external access
+   */
+  getCanonRecorder(): CanonEventRecorder {
+    return this.canonRecorder;
   }
 
   /**

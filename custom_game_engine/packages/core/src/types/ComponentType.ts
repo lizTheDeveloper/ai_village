@@ -24,6 +24,7 @@ export enum ComponentType {
   Item = 'item',
   Resource = 'resource',
   VoxelResource = 'voxel_resource',
+  Equipment = 'equipment',  // Phase 36: Body-based equipment system
   EquipmentSlots = 'equipment_slots',
 
   // Needs & Status
@@ -57,6 +58,7 @@ export enum ComponentType {
   Preference = 'preference',
   Conversation = 'conversation',
   Meeting = 'meeting',
+  Interests = 'interests',
 
   // Exploration
   ExplorationState = 'exploration_state',
@@ -71,6 +73,18 @@ export enum ComponentType {
   Shop = 'shop',
   Warehouse = 'warehouse',
 
+  // Automation & Production
+  Power = 'power',
+  Belt = 'belt',
+  AssemblyMachine = 'assembly_machine',
+  MachineConnection = 'machine_connection',
+  MachinePlacement = 'machine_placement',
+  Roboport = 'roboport',
+  Robot = 'robot',
+  LogisticsChest = 'logistics_chest',
+  ChunkProductionState = 'chunk_production_state',
+  FactoryAI = 'factory_ai',
+
   // City Management
   CityDirector = 'city_director',
 
@@ -84,6 +98,7 @@ export enum ComponentType {
   // Skills & Crafting
   CookingSkill = 'cooking_skill',
   GatheringStats = 'gathering_stats',
+  RecipeDiscovery = 'recipe_discovery',
 
   // Plants & Nature
   Plant = 'plant',
@@ -115,8 +130,11 @@ export enum ComponentType {
 
   // Divinity & Religion
   Spiritual = 'spiritual',
+  Spirit = 'spirit',
   Deity = 'deity',
   Mythology = 'mythology',
+  DivineChat = 'divine_chat',
+  ChatRoom = 'chat_room',
 
   // Divine Rebellion & Cosmic Systems
   RebellionOutcome = 'rebellion_outcome',
@@ -125,7 +143,33 @@ export enum ComponentType {
   RebellionThreshold = 'rebellion_threshold',
   SupremeCreator = 'supreme_creator',
 
+  // Combat
+  Conflict = 'conflict',
+  CombatStats = 'combat_stats',
+  ThreatDetection = 'threat_detection',
+
   // Reproduction & Life
+  Sexuality = 'sexuality',
+  Courtship = 'courtship',
+  Parenting = 'parenting',
+  Jealousy = 'jealousy',
   Pregnancy = 'pregnancy',
   Labor = 'labor',
+
+  // Death, Afterlife & Souls
+  DeathJudgment = 'death_judgment',
+  DeathBargain = 'death_bargain',
+  AfterlifeMemory = 'afterlife_memory',
+  SoulWisdom = 'soul_wisdom',
+  SoulIdentity = 'soul_identity',
+  Incarnation = 'incarnation',
+  SoulLink = 'soul_link',
+  SoulCreationEvent = 'soul_creation_event',
+  RealmLocation = 'realm_location',
+
+  // Television & Broadcasting
+  TVContent = 'tv_content',
+  TVStation = 'tv_station',
+  TVShow = 'tv_show',
+  TVBroadcast = 'tv_broadcast',
 }

@@ -48,6 +48,10 @@ export type AgentBehavior =
   | 'house_animal'
   // Economy
   | 'trade'
+  // Combat & Hunting
+  | 'initiate_combat'
+  | 'hunt'
+  | 'butcher'
   // Magic (Phase 30)
   | 'cast_spell'
   // Divine Communication (Phase 27)
@@ -92,6 +96,23 @@ export interface SpeechHistoryEntry {
  *   - Performance cost: LOW (only when interacted with)
  */
 export type AgentTier = 'full' | 'reduced' | 'autonomic';
+
+/**
+ * Age categories for agents.
+ * Affects conversation patterns, topic preferences, and social dynamics.
+ */
+export type AgeCategory = 'child' | 'teen' | 'adult' | 'elder';
+
+/**
+ * Age thresholds in game years.
+ * Used to calculate age category from birth tick.
+ */
+export const AGE_THRESHOLDS = {
+  child: 0,    // 0-12 years
+  teen: 13,    // 13-19 years
+  adult: 20,   // 20-59 years
+  elder: 60,   // 60+ years
+} as const;
 
 /**
  * Configuration for each agent tier
@@ -328,6 +349,58 @@ export interface AgentComponent extends Component {
    * Future: Affects trading, trust, and access.
    */
   reputation?: Record<string, number>;
+
+  // ============================================================================
+  // Location Memory & Assignments
+  // ============================================================================
+
+  /**
+   * Entity ID of the bed this agent has claimed.
+   * Agent will navigate to this bed when tired instead of finding nearest.
+   * Set when agent first sleeps in an unclaimed bed.
+   */
+  assignedBed?: string;
+
+  /**
+   * Dictionary of frequently-visited or assigned locations.
+   * Keys: location type ('home', 'work', 'food_storage', 'workshop', etc.)
+   * Values: Location info with optional entity ID for quick routing.
+   *
+   * This enables O(1) lookup of common destinations instead of querying.
+   */
+  assignedLocations?: Record<string, AssignedLocation>;
+
+  // ============================================================================
+  // Age & Lifecycle
+  // ============================================================================
+
+  /**
+   * Game tick when this agent was born/created.
+   * Used to calculate age for age-based conversation patterns.
+   */
+  birthTick?: number;
+
+  /**
+   * Current age category of the agent.
+   * Affects conversation patterns, topic preferences, and social dynamics.
+   * Cached value - updated periodically from birthTick.
+   */
+  ageCategory?: AgeCategory;
+}
+
+/**
+ * A location that an agent has memorized for quick routing.
+ */
+export interface AssignedLocation {
+  /** Entity ID if location is tied to a specific entity (bed, workstation) */
+  entityId?: string;
+  /** World coordinates */
+  x: number;
+  y: number;
+  /** When this location was last visited (game tick) */
+  lastVisited?: number;
+  /** How many times the agent has visited this location */
+  visitCount?: number;
 }
 
 /**
@@ -739,4 +812,170 @@ export function hasQueuedBehaviorTimedOut(agent: AgentComponent, currentTick: nu
 
   const ticksElapsed = currentTick - currentBehavior.startedAt;
   return ticksElapsed > BEHAVIOR_TIMEOUT_TICKS;
+}
+
+// ============================================================================
+// Location Memory Helper Functions
+// ============================================================================
+
+/**
+ * Common location types for assigned locations.
+ * Use these constants for type safety.
+ */
+export const LocationType = {
+  BED: 'bed',
+  HOME: 'home',
+  WORK: 'work',
+  FOOD_STORAGE: 'food_storage',
+  WORKSHOP: 'workshop',
+  FARM_PLOT: 'farm_plot',
+  GATHERING_SPOT: 'gathering_spot',
+  SOCIAL_AREA: 'social_area',
+} as const;
+
+export type LocationTypeKey = (typeof LocationType)[keyof typeof LocationType];
+
+/**
+ * Assign a bed to an agent.
+ * Also updates the 'bed' location in assignedLocations.
+ */
+export function assignBed(
+  agent: AgentComponent,
+  bedEntityId: string,
+  x: number,
+  y: number,
+  currentTick: number
+): AgentComponent {
+  const locations = agent.assignedLocations ?? {};
+
+  return {
+    ...agent,
+    assignedBed: bedEntityId,
+    assignedLocations: {
+      ...locations,
+      [LocationType.BED]: {
+        entityId: bedEntityId,
+        x,
+        y,
+        lastVisited: currentTick,
+        visitCount: (locations[LocationType.BED]?.visitCount ?? 0) + 1,
+      },
+    },
+  };
+}
+
+/**
+ * Clear an agent's bed assignment (e.g., when bed is destroyed).
+ */
+export function clearBedAssignment(agent: AgentComponent): AgentComponent {
+  const locations = { ...agent.assignedLocations };
+  delete locations[LocationType.BED];
+
+  return {
+    ...agent,
+    assignedBed: undefined,
+    assignedLocations: Object.keys(locations).length > 0 ? locations : undefined,
+  };
+}
+
+/**
+ * Assign or update a location in the agent's memory.
+ */
+export function assignLocation(
+  agent: AgentComponent,
+  locationType: string,
+  x: number,
+  y: number,
+  currentTick: number,
+  entityId?: string
+): AgentComponent {
+  const locations = agent.assignedLocations ?? {};
+  const existing = locations[locationType];
+
+  return {
+    ...agent,
+    assignedLocations: {
+      ...locations,
+      [locationType]: {
+        entityId,
+        x,
+        y,
+        lastVisited: currentTick,
+        visitCount: (existing?.visitCount ?? 0) + 1,
+      },
+    },
+  };
+}
+
+/**
+ * Update visit count and timestamp for an existing location.
+ * Does nothing if location doesn't exist.
+ */
+export function visitLocation(
+  agent: AgentComponent,
+  locationType: string,
+  currentTick: number
+): AgentComponent {
+  const locations = agent.assignedLocations;
+  if (!locations || !locations[locationType]) {
+    return agent;
+  }
+
+  const existing = locations[locationType];
+  return {
+    ...agent,
+    assignedLocations: {
+      ...locations,
+      [locationType]: {
+        ...existing,
+        lastVisited: currentTick,
+        visitCount: (existing.visitCount ?? 0) + 1,
+      },
+    },
+  };
+}
+
+/**
+ * Get an assigned location by type.
+ */
+export function getAssignedLocation(
+  agent: AgentComponent,
+  locationType: string
+): AssignedLocation | undefined {
+  return agent.assignedLocations?.[locationType];
+}
+
+/**
+ * Check if agent has an assigned location of a given type.
+ */
+export function hasAssignedLocation(
+  agent: AgentComponent,
+  locationType: string
+): boolean {
+  return agent.assignedLocations?.[locationType] !== undefined;
+}
+
+/**
+ * Remove an assigned location.
+ */
+export function clearLocation(
+  agent: AgentComponent,
+  locationType: string
+): AgentComponent {
+  const locations = { ...agent.assignedLocations };
+  delete locations[locationType];
+
+  // Also clear assignedBed if clearing the bed location
+  const updates: Partial<AgentComponent> = {
+    assignedLocations: Object.keys(locations).length > 0 ? locations : undefined,
+  };
+
+  if (locationType === LocationType.BED) {
+    updates.assignedBed = undefined;
+  }
+
+  return {
+    ...agent,
+    ...updates,
+  };
 }

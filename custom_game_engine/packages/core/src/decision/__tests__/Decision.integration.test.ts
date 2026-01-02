@@ -62,8 +62,8 @@ describe('Decision Integration Tests', () => {
     energy: 1.0,
     health: 1.0,
   });
-      needs.energy = 5; // Low energy
-      needs.hunger = 5; // Critical hunger
+      needs.energy = 0.2; // Low energy (below 0.3 threshold)
+      needs.hunger = 0.05; // Critical hunger (below 0.1 threshold)
       agent.addComponent(needs);
       agent.addComponent({
         type: ComponentType.Agent,
@@ -92,8 +92,8 @@ describe('Decision Integration Tests', () => {
     energy: 1.0,
     health: 1.0,
   });
-      needs.energy = 50; // Healthy energy
-      needs.hunger = 80; // Not hungry
+      needs.energy = 0.50; // Healthy energy
+      needs.hunger = 0.80; // Not hungry
       agent.addComponent(needs);
       const circadian = createCircadianComponent();
       circadian.sleepDrive = 90; // Above 85 threshold triggers forced_sleep
@@ -161,8 +161,8 @@ describe('Decision Integration Tests', () => {
     energy: 1.0,
     health: 1.0,
   });
-      needs.energy = 80;
-      needs.hunger = 80; // Full
+      needs.energy = 0.80;
+      needs.hunger = 0.80; // Full
       agent.addComponent(needs);
       agent.addComponent({
         type: ComponentType.Agent,
@@ -201,8 +201,8 @@ describe('Decision Integration Tests', () => {
     energy: 1.0,
     health: 1.0,
   });
-      needs.energy = 80;
-      needs.hunger = 80;
+      needs.energy = 0.80;
+      needs.hunger = 0.80;
       agent.addComponent(needs);
       agent.addComponent({
         type: ComponentType.Temperature,
@@ -238,8 +238,8 @@ describe('Decision Integration Tests', () => {
     energy: 1.0,
     health: 1.0,
   });
-      needsCritical.energy = 50;
-      needsCritical.hunger = 5;
+      needsCritical.energy = 0.50;
+      needsCritical.hunger = 0.05; // Critical hunger (< 0.1 threshold)
       agentCritical.addComponent(needsCritical);
 
       const resultCritical = autonomic.check(agentCritical);
@@ -252,8 +252,8 @@ describe('Decision Integration Tests', () => {
     energy: 1.0,
     health: 1.0,
   });
-      needsModerate.energy = 50;
-      needsModerate.hunger = 40;
+      needsModerate.energy = 0.50;
+      needsModerate.hunger = 0.40; // Moderate hunger (< 0.6 threshold)
       agentModerate.addComponent(needsModerate);
 
       const resultModerate = autonomic.check(agentModerate);

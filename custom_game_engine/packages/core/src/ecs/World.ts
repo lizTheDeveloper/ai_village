@@ -173,6 +173,18 @@ export interface World {
   createEntity(archetype?: string): Entity;
 
   /**
+   * Crafting system for recipe access.
+   * Exposed for automation systems (AssemblyMachineSystem) to look up recipes.
+   */
+  readonly craftingSystem?: import('../crafting/CraftingSystem.js').CraftingSystem;
+
+  /**
+   * Item instance registry for creating unique item instances.
+   * Exposed for automation systems to generate items with quality/condition.
+   */
+  readonly itemInstanceRegistry?: import('../items/ItemInstanceRegistry.js').ItemInstanceRegistry;
+
+  /**
    * Initiate construction of a building.
    * Validates placement, deducts resources, creates construction site.
    * @param builderId - Optional ID of the agent who initiated construction
@@ -250,6 +262,8 @@ export class WorldImpl implements WorldMutator {
   private _chunkManager?: IChunkManager;
   private _terrainGenerator?: ITerrainGenerator;
   private buildingRegistry?: BuildingBlueprintRegistry;
+  private _craftingSystem?: import('../crafting/CraftingSystem.js').CraftingSystem;
+  private _itemInstanceRegistry?: import('../items/ItemInstanceRegistry.js').ItemInstanceRegistry;
 
   // Simulation scheduling for performance optimization
   private _simulationScheduler = new SimulationScheduler();
@@ -294,6 +308,14 @@ export class WorldImpl implements WorldMutator {
 
   get simulationScheduler(): SimulationScheduler {
     return this._simulationScheduler;
+  }
+
+  get craftingSystem(): import('../crafting/CraftingSystem.js').CraftingSystem | undefined {
+    return this._craftingSystem;
+  }
+
+  get itemInstanceRegistry(): import('../items/ItemInstanceRegistry.js').ItemInstanceRegistry | undefined {
+    return this._itemInstanceRegistry;
   }
 
   get features(): FeatureFlags {
@@ -492,6 +514,19 @@ export class WorldImpl implements WorldMutator {
   // For testing/debugging
   _addEntity(entity: Entity): void {
     this._entities.set(entity.id, entity);
+
+    // CRITICAL FIX: Update spatial chunk index if entity has position component
+    // Without this, findNearestResources() returns empty arrays and NPCs can't find food
+    const pos = entity.components.get('position') as
+      | { chunkX: number; chunkY: number }
+      | undefined;
+    if (pos) {
+      const key = `${pos.chunkX},${pos.chunkY}`;
+      if (!this.chunkIndex.has(key)) {
+        this.chunkIndex.set(key, new Set());
+      }
+      this.chunkIndex.get(key)!.add(entity.id);
+    }
   }
 
   /**
@@ -552,6 +587,24 @@ export class WorldImpl implements WorldMutator {
    */
   setTerrainGenerator(terrainGenerator: ITerrainGenerator): void {
     this._terrainGenerator = terrainGenerator;
+  }
+
+  /**
+   * Set CraftingSystem for recipe access.
+   * Called by game initialization after CraftingSystem is registered.
+   * This enables automation systems (AssemblyMachineSystem) to look up recipes.
+   */
+  setCraftingSystem(craftingSystem: import('../crafting/CraftingSystem.js').CraftingSystem): void {
+    this._craftingSystem = craftingSystem;
+  }
+
+  /**
+   * Set ItemInstanceRegistry for item creation.
+   * Called by game initialization after ItemInstanceRegistry is created.
+   * This enables automation systems to create item instances with quality/condition.
+   */
+  setItemInstanceRegistry(registry: import('../items/ItemInstanceRegistry.js').ItemInstanceRegistry): void {
+    this._itemInstanceRegistry = registry;
   }
 
   /**

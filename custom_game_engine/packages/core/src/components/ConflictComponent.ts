@@ -22,6 +22,9 @@ export interface ConflictComponent extends Component {
   /** When the conflict started (tick) */
   startTime: number;
 
+  /** When the conflict should end (tick) - used for time-based combat progression */
+  endTime?: number;
+
   /** Hunting specific fields */
   huntingState?: 'tracking' | 'stalking' | 'kill_success' | 'failed' | 'lost' | 'escape';
 
@@ -53,6 +56,7 @@ export function createConflictComponent(data: {
   target: EntityId;
   state: string;
   startTime: number;
+  endTime?: number;
   huntingState?: ConflictComponent['huntingState'];
   cause?: string;
   surprise?: boolean;
@@ -89,6 +93,7 @@ export function createConflictComponent(data: {
     target: data.target,
     state: data.state,
     startTime: data.startTime,
+    endTime: data.endTime,
     huntingState: data.huntingState,
     cause: data.cause,
     surprise: data.surprise,

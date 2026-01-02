@@ -44,6 +44,13 @@ export {
   attendMeetingBehavior,
 } from './MeetingBehaviors.js';
 
+// Combat behaviors
+export { InitiateCombatBehavior, initiateCombatBehavior } from './InitiateCombatBehavior.js';
+
+// Hunting behaviors
+export { InitiateHuntBehavior, initiateHuntBehavior } from './InitiateHuntBehavior.js';
+export { ButcherBehavior, butcherBehavior } from './ButcherBehavior.js';
+
 // Farm behaviors
 export {
   FarmBehavior,

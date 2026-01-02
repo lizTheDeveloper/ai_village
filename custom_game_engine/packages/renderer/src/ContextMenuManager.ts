@@ -17,7 +17,8 @@ import type {
   VisualState,
   ItemRenderState,
   MenuStackEntry,
-  RadialMenuConfig
+  RadialMenuConfig,
+  ContextAction
 } from './context-menu/types.js';
 import { DEFAULT_RADIAL_MENU_CONFIG } from './context-menu/types.js';
 
@@ -152,7 +153,6 @@ export class ContextMenuManager {
 
       // Don't open menu if there are no items (this should NEVER happen due to "tile_info" always being applicable)
       if (items.length === 0) {
-        console.error('[ContextMenuManager] No menu items returned - this should never happen. Registered actions:', this.registry.getAll().length);
         return;
       }
 
@@ -479,12 +479,8 @@ export class ContextMenuManager {
     const parentItem = this.currentItems.find(i => i.id === parentId);
     if (!parentItem || !parentItem.submenu) return null;
 
-    // Convert submenu to menu items
-    const context = this.state.context;
-    if (!context) return null;
-
-    // Convert submenu actions to menu items
-    const submenuItems = this.actionsToMenuItems(parentItem.submenu, context);
+    // Submenu is already converted to RadialMenuItem[]
+    const submenuItems = parentItem.submenu;
 
     const itemsWithAngles = this.menuRenderer.calculateArcAngles(
       submenuItems,
@@ -690,7 +686,7 @@ export class ContextMenuManager {
    * Convert actions to menu items.
    */
   private actionsToMenuItems(
-    actions: any[],
+    actions: ContextAction[],
     context: MenuContext
   ): RadialMenuItem[] {
     return actions.map((action, index) => {
@@ -724,7 +720,7 @@ export class ContextMenuManager {
         shortcut: action.shortcut,
         enabled: isEnabled,
         hasSubmenu: action.hasSubmenu ?? false,
-        submenu: action.submenu,
+        submenu: action.submenu ? this.actionsToMenuItems(action.submenu, context) : undefined,
         requiresConfirmation: action.requiresConfirmation ?? false,
         confirmationMessage: action.confirmationMessage,
         consequences: action.consequences,

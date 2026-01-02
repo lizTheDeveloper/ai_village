@@ -101,37 +101,37 @@ describe('Behavior Completion Signaling', () => {
 
   describe('Acceptance Criterion 11: Behavior Completion Signaling', () => {
     describe('seek_food behavior', () => {
-      it('should set behaviorCompleted = true when hunger > 40', () => {
+      it('should set behaviorCompleted = true when hunger > 0.4 (40%)', () => {
         agent.behavior = 'seek_food';
-        needs.hunger = 30;
+        needs.hunger = 0.30;
 
         // Simulate eating
-        needs.hunger = 50;
+        needs.hunger = 0.50;
 
         // Behavior should detect completion
-        if (needs.hunger > 40) {
+        if (needs.hunger > 0.4) {
           agent.behaviorCompleted = true;
         }
 
         expect(agent.behaviorCompleted).toBe(true);
       });
 
-      it('should NOT complete when hunger <= 40', () => {
+      it('should NOT complete when hunger <= 0.4 (40%)', () => {
         agent.behavior = 'seek_food';
-        needs.hunger = 40;
+        needs.hunger = 0.40;
 
-        if (needs.hunger > 40) {
+        if (needs.hunger > 0.4) {
           agent.behaviorCompleted = true;
         }
 
         expect(agent.behaviorCompleted).toBe(false);
       });
 
-      it('should complete immediately if hunger already > 40', () => {
+      it('should complete immediately if hunger already > 0.4 (40%)', () => {
         agent.behavior = 'seek_food';
-        needs.hunger = 60;
+        needs.hunger = 0.60;
 
-        if (needs.hunger > 40) {
+        if (needs.hunger > 0.4) {
           agent.behaviorCompleted = true;
         }
 
@@ -140,14 +140,14 @@ describe('Behavior Completion Signaling', () => {
     });
 
     describe('seek_sleep behavior', () => {
-      it('should set behaviorCompleted = true when energy > 70', () => {
+      it('should set behaviorCompleted = true when energy > 0.7 (70%)', () => {
         agent.behavior = 'seek_sleep';
-        needs.energy = 50;
+        needs.energy = 0.50;
 
         // Simulate sleeping/resting
-        needs.energy = 80;
+        needs.energy = 0.80;
 
-        if (needs.energy > 70) {
+        if (needs.energy > 0.7) {
           agent.behaviorCompleted = true;
         }
 
@@ -168,12 +168,12 @@ describe('Behavior Completion Signaling', () => {
         expect(agent.behaviorCompleted).toBe(true);
       });
 
-      it('should NOT complete when energy <= 70 and not sleeping', () => {
+      it('should NOT complete when energy <= 0.7 (70%) and not sleeping', () => {
         agent.behavior = 'seek_sleep';
-        needs.energy = 60;
+        needs.energy = 0.60;
         sleep.sleeping = false;
 
-        if (needs.energy > 70 || sleep.sleeping) {
+        if (needs.energy > 0.7 || sleep.sleeping) {
           agent.behaviorCompleted = true;
         }
 

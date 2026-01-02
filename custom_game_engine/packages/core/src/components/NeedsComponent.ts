@@ -122,8 +122,36 @@ export class NeedsComponent extends ComponentBase {
   /** Body temperature in Celsius */
   public temperature: number;
 
-  /** Social need: 0 = lonely, 1 = satisfied */
+  /**
+   * Composite social need: 0 = lonely, 1 = satisfied
+   * This is the weighted average of socialContact, socialDepth, socialBelonging.
+   * Kept for backwards compatibility with existing systems.
+   */
   public social: number;
+
+  /**
+   * Need for social contact: "I want to talk to someone"
+   * Satisfied by any conversation, regardless of quality.
+   * 0 = desperate for any interaction
+   * 1 = fully satisfied
+   */
+  public socialContact: number;
+
+  /**
+   * Need for meaningful conversation: "I want a meaningful conversation"
+   * Satisfied by conversation quality and depth.
+   * 0 = starving for depth
+   * 1 = fully satisfied
+   */
+  public socialDepth: number;
+
+  /**
+   * Need for belonging: "I feel part of the community"
+   * Satisfied by group activities and shared interests.
+   * 0 = isolated and disconnected
+   * 1 = fully belonging
+   */
+  public socialBelonging: number;
 
   /** Mental stimulation: 0 = bored, 1 = engaged */
   public stimulation: number;
@@ -154,6 +182,9 @@ export class NeedsComponent extends ComponentBase {
     this.thirst = 1.0;
     this.temperature = 37; // Normal body temp
     this.social = 0.5;
+    this.socialContact = 0.5;
+    this.socialDepth = 0.5;
+    this.socialBelonging = 0.5;
     this.stimulation = 0.5;
     this.hungerDecayRate = 0.001;
     this.energyDecayRate = 0.0005;
@@ -261,13 +292,61 @@ export function isDying(needs: NeedsComponent): boolean {
 }
 
 /**
- * Check if agent is lonely (below 30%)
+ * Check if agent is lonely (below 30% social contact)
  */
 export function isLonely(needs: NeedsComponent): boolean {
   if (!needs) {
     throw new Error('isLonely: needs parameter is required');
   }
-  return needs.social < 0.3;
+  // Use socialContact if available, fallback to social for backwards compatibility
+  return (needs.socialContact ?? needs.social) < 0.3;
+}
+
+/**
+ * Check if agent craves deep conversation (below 40% social depth)
+ */
+export function cravesDepth(needs: NeedsComponent): boolean {
+  if (!needs) {
+    throw new Error('cravesDepth: needs parameter is required');
+  }
+  return (needs.socialDepth ?? needs.social) < 0.4;
+}
+
+/**
+ * Check if agent feels isolated from community (below 30% social belonging)
+ */
+export function feelsIsolated(needs: NeedsComponent): boolean {
+  if (!needs) {
+    throw new Error('feelsIsolated: needs parameter is required');
+  }
+  return (needs.socialBelonging ?? needs.social) < 0.3;
+}
+
+/**
+ * Calculate composite social need from sub-needs.
+ * Used for backwards compatibility and overall social assessment.
+ */
+export function calculateSocialNeed(needs: NeedsComponent): number {
+  if (!needs) {
+    throw new Error('calculateSocialNeed: needs parameter is required');
+  }
+  // If sub-needs exist, calculate weighted average
+  if (needs.socialContact !== undefined && needs.socialDepth !== undefined && needs.socialBelonging !== undefined) {
+    return (needs.socialContact + needs.socialDepth + needs.socialBelonging) / 3;
+  }
+  // Fallback to existing social value
+  return needs.social;
+}
+
+/**
+ * Update composite social need from sub-needs.
+ * Call this after modifying any social sub-need to keep .social in sync.
+ */
+export function updateCompositeSocial(needs: NeedsComponent): void {
+  if (!needs) {
+    throw new Error('updateCompositeSocial: needs parameter is required');
+  }
+  needs.social = calculateSocialNeed(needs);
 }
 
 /**
@@ -294,6 +373,9 @@ export function migrateNeedsComponent(data: any): NeedsComponent {
     (data.energy !== undefined && data.energy > 1.0) ||
     (data.health !== undefined && data.health > 1.0);
 
+  // Get social value (either existing or default)
+  const socialValue = data.social ?? 0.5;
+
   if (isLegacy) {
     return new NeedsComponent({
       hunger: (data.hunger ?? 100) / 100,
@@ -301,13 +383,30 @@ export function migrateNeedsComponent(data: any): NeedsComponent {
       health: (data.health ?? 100) / 100,
       thirst: (data.thirst ?? 100) / 100,
       temperature: data.temperature ?? 37,
-      social: data.social ?? 0.5,
+      social: socialValue,
+      // Initialize sub-needs from social if not present
+      socialContact: data.socialContact ?? socialValue,
+      socialDepth: data.socialDepth ?? socialValue,
+      socialBelonging: data.socialBelonging ?? socialValue,
       stimulation: data.stimulation ?? 0.5,
       hungerDecayRate: data.hungerDecayRate ? data.hungerDecayRate / 100 : 0.001,
       energyDecayRate: data.energyDecayRate ? data.energyDecayRate / 100 : 0.0005,
     });
   }
 
-  // Already in new format
-  return new NeedsComponent(data);
+  // New format - ensure social sub-needs exist
+  const needs = new NeedsComponent(data);
+
+  // If sub-needs not present, initialize from composite social
+  if (data.socialContact === undefined) {
+    needs.socialContact = needs.social;
+  }
+  if (data.socialDepth === undefined) {
+    needs.socialDepth = needs.social;
+  }
+  if (data.socialBelonging === undefined) {
+    needs.socialBelonging = needs.social;
+  }
+
+  return needs;
 }

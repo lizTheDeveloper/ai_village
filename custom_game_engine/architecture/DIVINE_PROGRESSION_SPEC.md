@@ -318,11 +318,21 @@ The climactic confrontation with the Supreme Creator. When enough lore is discov
 Ultra-advanced Clarke Tech device that creates a field nullifying divine power. Within the field, gods become mortal and can be killed.
 
 **Requirements:**
-- Research tier: `clarke_tech` (very late game)
+- Research tier: `stellar_engineering` (Tier 8 - God-Killing Tech)
 - Resources: 1000 exotic matter, 100 quantum processors, 50 dimensional crystals, 10 alien tech fragments
 - Lore: bunker_database, tech_rebellion_plan, alien_data_fragment
 - Research points: 100,000
 - Construction time: 72,000 ticks (1 hour at 20 TPS)
+- **Power Requirements**: 50 GW (50,000 MW) continuous - requires Dyson Sphere (see [POWER_GRID_SPEC.md](./POWER_GRID_SPEC.md))
+
+**Power Infrastructure Prerequisites:**
+- **1,000 Solar Satellites** in orbital Dyson Swarm (100 GW output)
+- **Solar Satellite Factory** to manufacture satellites
+- **Mass Driver** to launch satellites into orbit
+- **Stellar Relay** to beam power from orbit to planetary surface
+- **Supercapacitor Banks** for 30-second backup power
+- Construction time: ~1 day of automated production + launches
+- Alternative: 500× Zero-Point Extractors (not recommended - high vacuum decay risk)
 
 **Field Mechanics:**
 - Radius: 100 world units
@@ -422,6 +432,11 @@ Based on battle state when climax reached:
 - **Thermodynamic Limits**: Creator can be exhausted, overextended, or mortalized
 
 **Next Steps (TODO):**
+- [ ] Implement power grid system (see [POWER_GRID_SPEC.md](./POWER_GRID_SPEC.md))
+  - [ ] PowerGeneratorComponent, PowerStorageComponent, PowerGridComponent, PowerConsumerComponent
+  - [ ] PowerGridSystem for energy distribution
+  - [ ] Connect Reality Anchor as critical power consumer (50 EP/tick)
+  - [ ] Field collapse on power loss mechanics
 - [ ] Add reality anchor to research tree (Clarke Tech tier)
 - [ ] Update AvatarSystem to handle mortality in anchor field
 - [ ] Integrate with combat system for Creator damage mechanics

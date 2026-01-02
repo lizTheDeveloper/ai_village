@@ -85,7 +85,7 @@ export class AgentSelectionPanel implements IWindowPanel {
       .executeEntities();
 
     // Filter to living agents only
-    const livingAgents = agents.filter((entity) => {
+    const livingAgents = agents.filter((entity: Entity) => {
       const needs = entity.components.get('needs') as NeedsComponent;
       return needs.health > 0;
     });
@@ -285,7 +285,7 @@ export class AgentSelectionPanel implements IWindowPanel {
       .with('agent', 'identity', 'needs')
       .executeEntities();
 
-    const livingAgents = agents.filter((entity) => {
+    const livingAgents = agents.filter((entity: Entity) => {
       const needs = entity.components.get('needs') as NeedsComponent;
       return needs.health > 0;
     });

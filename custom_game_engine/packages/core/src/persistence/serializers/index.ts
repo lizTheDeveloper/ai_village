@@ -14,6 +14,7 @@ import { DominanceRankSerializer } from './DominanceRankSerializer.js';
 import { PackCombatSerializer } from './PackCombatSerializer.js';
 import { HiveCombatSerializer } from './HiveCombatSerializer.js';
 import { ManchiSerializer } from './ManchiSerializer.js';
+import { EquipmentSerializer } from './EquipmentSerializer.js';
 
 // Memory and state serializers
 import { EpisodicMemorySerializer } from './EpisodicMemorySerializer.js';
@@ -42,6 +43,7 @@ export function registerAllSerializers(): void {
   componentSerializerRegistry.register('pack_combat', new PackCombatSerializer());
   componentSerializerRegistry.register('hive_combat', new HiveCombatSerializer());
   componentSerializerRegistry.register('manchi', new ManchiSerializer());
+  componentSerializerRegistry.register('equipment', new EquipmentSerializer());
 
   // Register memory and state serializers (these handle Maps and private fields properly)
   componentSerializerRegistry.register('episodic_memory', new EpisodicMemorySerializer());
@@ -104,7 +106,7 @@ export function registerAllSerializers(): void {
   }
 
   console.log(
-    `[Persistence] Registered ${genericComponents.length + 17} component serializers`
+    `[Persistence] Registered ${genericComponents.length + 18} component serializers`
   );
 }
 
@@ -126,6 +128,7 @@ export { DominanceRankSerializer } from './DominanceRankSerializer.js';
 export { PackCombatSerializer } from './PackCombatSerializer.js';
 export { HiveCombatSerializer } from './HiveCombatSerializer.js';
 export { ManchiSerializer } from './ManchiSerializer.js';
+export { EquipmentSerializer } from './EquipmentSerializer.js';
 
 // Export additional memory serializers
 export * from './EpisodicMemorySerializer.js';

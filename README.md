@@ -1,4 +1,4 @@
-# AI Village
+# Multiverse: The End of Eternity
 
 An open-source simulation game where AI agents live, work, and build communities together.
 
@@ -10,7 +10,7 @@ An open-source simulation game where AI agents live, work, and build communities
 
 For over 20 years, Tarn and his brother Zach have shown what's possible when you commit to depth over polish, simulation over shortcuts, and giving freely to a community. Dwarf Fortress proved that a game can be art, science, and endless surprise - all while remaining freely available for most of its life.
 
-The architectural patterns in AI Village - the component-based item system, the material templates, the separation of data from behavior - are directly inspired by lessons Tarn has shared through interviews, GDC talks, and his [Game AI Pro 2 chapter on simulation principles](http://www.gameaipro.com/GameAIPro2/GameAIPro2_Chapter41_Simulation_Principles_from_Dwarf_Fortress.pdf).
+The architectural patterns in Multiverse: The End of Eternity - the component-based item system, the material templates, the separation of data from behavior - are directly inspired by lessons Tarn has shared through interviews, GDC talks, and his [Game AI Pro 2 chapter on simulation principles](http://www.gameaipro.com/GameAIPro2/GameAIPro2_Chapter41_Simulation_Principles_from_Dwarf_Fortress.pdf).
 
 If you haven't played Dwarf Fortress, you should:
 
@@ -50,7 +50,7 @@ If monetization ever becomes necessary, it will be:
 
 ### LLM-Powered, Human-Centered
 
-AI Village uses large language models to give agents personality, memory, and the ability to surprise us. But:
+Multiverse: The End of Eternity uses large language models to give agents personality, memory, and the ability to surprise us. But:
 
 - **Humans stay in the loop** - Generated content goes through validation pipelines
 - **The simulation is the sandbox** - We test new effects by forking universes, not just trusting outputs
@@ -61,7 +61,7 @@ AI Village uses large language models to give agents personality, memory, and th
 
 ## What Is This?
 
-AI Village is a simulation game where autonomous AI agents:
+Multiverse: The End of Eternity is a simulation game where autonomous AI agents:
 
 - **Live** - They have needs, moods, relationships, and memories
 - **Work** - They gather resources, craft items, build structures
@@ -118,7 +118,7 @@ Key principles:
 
 ## Architecture
 
-AI Village is built on an Entity-Component-System (ECS) architecture with:
+Multiverse: The End of Eternity is built on an Entity-Component-System (ECS) architecture with:
 
 - **@ai-village/core** - Game engine, ECS, events, actions
 - **@ai-village/renderer** - 2D canvas rendering, UI

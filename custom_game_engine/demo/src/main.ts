@@ -47,6 +47,11 @@ import {
   type SystemRegistrationResult as CoreSystemResult,
   // Magic system
   SpellRegistry,
+  // Soul creation system
+  SoulCreationSystem,
+  createSoulLinkComponent,
+  type SoulCreationContext,
+  type IncarnationComponent,
 } from '@ai-village/core';
 import {
   Renderer,
@@ -95,6 +100,8 @@ import {
   // Magic and Divine panels
   DivinePowersPanel,
   createDivinePowersPanelAdapter,
+  DivineChatPanel,
+  createDivineChatPanelAdapter,
   VisionComposerPanel,
   createVisionComposerPanelAdapter,
   MagicSystemsPanel,
@@ -230,7 +237,7 @@ function createInitialBuildings(world: WorldMutator) {
   (world as any)._addEntity(constructionEntity);
 }
 
-function createInitialAgents(world: WorldMutator, dungeonMasterPrompt?: string) {
+function createInitialAgents(world: WorldMutator, dungeonMasterPrompt?: string): string[] {
   const agentCount = 5;
   const centerX = 0;
   const centerY = 0;
@@ -280,6 +287,87 @@ function createInitialAgents(world: WorldMutator, dungeonMasterPrompt?: string) 
       }));
     }
   }
+
+  return agentIds;
+}
+
+/**
+ * Create souls for initial agents (adults spawned at game start)
+ * These are not newborns, but mature individuals who need souls appropriate for their age
+ */
+async function createSoulsForInitialAgents(
+  world: WorldMutator,
+  agentIds: string[],
+  llmProvider: LLMProvider
+): Promise<void> {
+  const soulSystem = world.getSystem('soul_creation') as SoulCreationSystem;
+  if (!soulSystem) {
+    console.warn('[Demo] SoulCreationSystem not found, skipping soul creation');
+    return;
+  }
+
+  // Set the LLM provider for the Fates to use
+  soulSystem.setLLMProvider(llmProvider);
+
+  console.log(`[Demo] Creating souls for ${agentIds.length} initial agents...`);
+
+  // Create a soul for each agent
+  const soulPromises = agentIds.map((agentId, index) => {
+    return new Promise<void>((resolve) => {
+      const agent = world.getEntity(agentId);
+      if (!agent) {
+        resolve();
+        return;
+      }
+
+      const identity = agent.components.get('identity') as any;
+      const name = identity?.name ?? 'Unknown';
+
+      // Context for adult soul creation (not a newborn)
+      const context: SoulCreationContext = {
+        culture: 'The First Village',
+        cosmicAlignment: 0.5 + (Math.random() - 0.5) * 0.3, // Slightly positive alignment
+        isReforging: false,
+        ceremonyRealm: 'tapestry_of_fate',
+        worldEvents: ['The first village is being founded'],
+      };
+
+      // Request soul creation
+      soulSystem.requestSoulCreation(
+        context,
+        (soulEntityId: string) => {
+          console.log(`[Demo] Soul created for ${name} (${index + 1}/${agentIds.length})`);
+
+          // Link soul to agent
+          const soulLink = createSoulLinkComponent(soulEntityId, world.tick, true);
+          (agent as any).addComponent(soulLink);
+
+          // Update soul's incarnation status
+          const soulEntity = world.getEntity(soulEntityId);
+          if (soulEntity) {
+            const incarnation = soulEntity.components.get('incarnation') as IncarnationComponent | undefined;
+            if (incarnation) {
+              incarnation.currentBindings.push({
+                targetId: agentId,
+                bindingType: 'incarnated',
+                bindingStrength: 1.0,
+                createdTick: world.tick,
+                isPrimary: true,
+              });
+              incarnation.state = 'incarnated';
+              incarnation.primaryBindingId = agentId;
+            }
+          }
+
+          resolve();
+        }
+      );
+    });
+  });
+
+  // Wait for all souls to be created
+  await Promise.all(soulPromises);
+  console.log(`[Demo] All souls created successfully`);
 }
 
 async function createPlayerDeity(world: WorldMutator): Promise<string> {
@@ -987,6 +1075,22 @@ function setupWindowManager(
     defaultY: 80,
     defaultWidth: 400,
     defaultHeight: 550,
+    isDraggable: true,
+    isResizable: true,
+    minWidth: 350,
+    minHeight: 400,
+    showInWindowList: true,
+    menuCategory: 'divinity',
+  });
+
+  // Divine Chat Panel
+  const divineChatPanel = new DivineChatPanel();
+  const divineChatAdapter = createDivineChatPanelAdapter(divineChatPanel);
+  windowManager.registerWindow('divine-chat', divineChatAdapter, {
+    defaultX: 520,
+    defaultY: 80,
+    defaultWidth: 400,
+    defaultHeight: 600,
     isDraggable: true,
     isResizable: true,
     minWidth: 350,
@@ -2822,7 +2926,11 @@ async function main() {
 
     // Create initial entities
     createInitialBuildings(gameLoop.world);
-    createInitialAgents(gameLoop.world, settings.dungeonMasterPrompt);
+    const agentIds = createInitialAgents(gameLoop.world, settings.dungeonMasterPrompt);
+
+    // Create souls for the initial agents
+    await createSoulsForInitialAgents(gameLoop.world, agentIds, llmProvider);
+
     const playerDeityId = await createPlayerDeity(gameLoop.world); // Create player deity for belief system
 
     // Set all agents to believe in the player deity

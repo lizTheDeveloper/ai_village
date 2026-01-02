@@ -14,6 +14,7 @@ import type { AgentComponent, AgentTier } from '../components/AgentComponent.js'
 import { transitionToRealm } from '../realms/RealmTransition.js';
 import { routeSoulToAfterlife } from '../realms/SoulRoutingService.js';
 import { createAfterlifeComponent, type CauseOfDeath } from '../components/AfterlifeComponent.js';
+import { DeathBargainSystem } from './DeathBargainSystem.js';
 
 /** Agent tiers that get full afterlife experience */
 const AFTERLIFE_ELIGIBLE_TIERS: AgentTier[] = ['full', 'reduced'];
@@ -35,6 +36,14 @@ export class DeathTransitionSystem implements System {
   readonly requiredComponents = ['needs', 'realm_location'] as const;
 
   private processedDeaths: Set<string> = new Set();
+  private deathBargainSystem?: DeathBargainSystem;
+
+  /**
+   * Set the death bargain system for hero resurrection challenges
+   */
+  setDeathBargainSystem(system: DeathBargainSystem): void {
+    this.deathBargainSystem = system;
+  }
 
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     // Check for newly dead entities
@@ -48,7 +57,11 @@ export class DeathTransitionSystem implements System {
       const isDead = needs.health <= 0;
       const alreadyProcessed = this.processedDeaths.has(entity.id);
 
-      if (isDead && !alreadyProcessed) {
+      // Check if death judgment is in progress
+      const deathJudgment = entity.components.get('death_judgment') as any;
+      const judgmentInProgress = deathJudgment && deathJudgment.stage !== 'crossing_over';
+
+      if (isDead && !alreadyProcessed && !judgmentInProgress) {
         this.handleDeath(world, entity.id, realmLocation);
         this.processedDeaths.add(entity.id);
       }
@@ -109,6 +122,18 @@ export class DeathTransitionSystem implements System {
 
     // Skip if already in an afterlife realm
     if (realmLocation.currentRealmId === targetRealm) {
+      return;
+    }
+
+    // Check if hero qualifies for death bargain (chance to cheat death)
+    if (this.deathBargainSystem && this.deathBargainSystem.qualifiesForDeathBargain(entity)) {
+      const position = entity.components.get('position') as PositionComponent | undefined;
+      const deathLocation = position ? { x: position.x, y: position.y } : { x: 0, y: 0 };
+      const causeOfDeath = this.determineCauseOfDeath(entity);
+
+      this.deathBargainSystem.offerDeathBargain(world, entity, deathLocation, causeOfDeath);
+
+      // Don't transition to afterlife yet - wait for bargain resolution
       return;
     }
 

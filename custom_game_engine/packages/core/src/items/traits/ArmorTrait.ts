@@ -1,18 +1,23 @@
 /**
  * ArmorTrait - Defines protective properties for wearable items
  *
- * Forward-compatibility trait for future combat/defense systems.
- * Items with this trait can be equipped to provide damage reduction.
+ * **BODY-BASED EQUIPMENT SYSTEM**
+ * Equipment adapts to different species via dynamic body part targeting.
+ * Supports humanoids, angels with wings, tentacled aliens, multi-armed insectoids, etc.
  *
- * Part of Forward-Compatibility Phase
+ * Part of Phase 36: Equipment System
  */
 
 import type { DamageType } from './WeaponTrait.js';
+import type { BodyPartType, BodyPartFunction } from '../../components/BodyComponent.js';
 
 /** Armor weight classes affecting movement and stamina */
 export type ArmorClass = 'clothing' | 'light' | 'medium' | 'heavy';
 
-/** Equipment slots that armor can occupy */
+/**
+ * @deprecated Use EquipmentTarget instead for body-based equipment
+ * Legacy equipment slots (humanoid-only)
+ */
 export type ArmorSlot =
   | 'head'
   | 'neck'
@@ -24,17 +29,59 @@ export type ArmorSlot =
   | 'feet';
 
 /**
+ * Equipment targeting - maps items to body parts dynamically.
+ * Supports multi-species equipment (angels, aliens, insectoids).
+ */
+export interface EquipmentTarget {
+  /** Target by body part type (e.g., 'wing', 'tentacle', 'thorax') */
+  bodyPartType?: BodyPartType;
+
+  /** Target by body part function (e.g., 'manipulation', 'flight') */
+  bodyPartFunction?: BodyPartFunction;
+
+  /** Equip on ALL matching body parts (e.g., all 6 tentacles) */
+  multiSlot?: boolean;
+
+  /** Weight limit for this slot (kg) - critical for flying creatures */
+  maxWeight?: number;
+}
+
+/**
  * ArmorTrait defines the protective properties of an item.
+ *
+ * **NEW: Body-based targeting system**
  *
  * Example usage:
  * ```typescript
- * const leatherArmor: ItemTraits = {
+ * // Wing armor for angels
+ * const wingGuards: ItemTraits = {
  *   armor: {
- *     defense: 5,
+ *     defense: 3,
  *     armorClass: 'light',
- *     slot: 'torso',
+ *     target: {
+ *       bodyPartType: 'wing',
+ *       multiSlot: true,
+ *       maxWeight: 2.0
+ *     },
+ *     weight: 1.5,
  *     durability: 1.0,
- *     movementPenalty: 0.05,
+ *     movementPenalty: 0.02,
+ *     flightSpeedPenalty: 0.01,
+ *   }
+ * };
+ *
+ * // Tentacle wraps for cephaloids
+ * const tentacleWraps: ItemTraits = {
+ *   armor: {
+ *     defense: 4,
+ *     armorClass: 'light',
+ *     target: {
+ *       bodyPartType: 'tentacle',
+ *       multiSlot: true
+ *     },
+ *     weight: 0.5,
+ *     durability: 1.0,
+ *     movementPenalty: 0.0,
  *   }
  * };
  * ```
@@ -46,8 +93,11 @@ export interface ArmorTrait {
   /** Armor weight class */
   armorClass: ArmorClass;
 
-  /** Which equipment slot this armor occupies */
-  slot: ArmorSlot;
+  /** Body-based equipment targeting (NEW) */
+  target: EquipmentTarget;
+
+  /** Weight in kilograms (NEW - critical for flying creatures) */
+  weight: number;
 
   /** Current durability (0-1, where 1 is pristine) */
   durability: number;
@@ -57,6 +107,9 @@ export interface ArmorTrait {
 
   /** Movement speed penalty (0-1, where 0.2 = 20% slower) */
   movementPenalty: number;
+
+  /** Flight speed penalty for wing armor (0-1, NEW) */
+  flightSpeedPenalty?: number;
 
   /** Stamina/energy drain multiplier (1.0 = normal, 1.5 = 50% more drain) */
   staminaDrainMultiplier?: number;

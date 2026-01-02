@@ -10,6 +10,7 @@ import { applyGenetics, canGerminate, createSeedFromPlant } from '../genetics/Pl
 import type { PlantSpecies, StageTransition } from '../types/PlantSpecies.js';
 
 import type { EventBus as CoreEventBus } from '../events/EventBus.js';
+import { BugReporter } from '../utils/BugReporter.js';
 
 /**
  * Soil state interface for planting validation
@@ -182,14 +183,42 @@ export class PlantSystem implements System {
       if (!plant) continue;
 
       // Validate position exists on plant component
+      // If missing, skip this plant (don't crash whole system)
       if (!plant.position) {
-        throw new Error(`Plant entity ${entity.id} missing required position field in PlantComponent`);
+        console.error(`[PlantSystem] Plant entity ${entity.id} missing required position field - skipping`);
+        BugReporter.reportCorruptedPlant({
+          entityId: entity.id,
+          reason: 'Missing position field',
+          plantData: {
+            speciesId: plant.speciesId,
+            stage: plant.stage,
+            health: plant.health
+          }
+        });
+        continue;
       }
 
       // Validate required fields
-      this.validatePlant(plant);
+      try {
+        this.validatePlant(plant);
+      } catch (error) {
+        console.error(`[PlantSystem] Plant entity ${entity.id} failed validation: ${error} - skipping`);
+        BugReporter.reportCorruptedPlant({
+          entityId: entity.id,
+          reason: `Validation failed: ${error}`,
+          plantData: {
+            speciesId: plant.speciesId,
+            stage: plant.stage,
+            health: plant.health,
+            hydration: plant.hydration,
+            nutrition: plant.nutrition,
+            position: plant.position
+          }
+        });
+        continue;
+      }
 
-      // Validate species exists (throws if lookup not configured or species unknown)
+      // Validate species exists (per CLAUDE.md: throw instead of silent fallback)
       const species = this.getSpecies(plant.speciesId);
       void species; // Use species to prevent unused variable warning
     }
@@ -216,6 +245,11 @@ export class PlantSystem implements System {
       const impl = entity as EntityImpl;
       const plant = impl.getComponent<PlantComponent>(CT.Plant);
       if (!plant) continue;
+
+      // Skip plants missing critical data (validated above, but double-check)
+      if (!plant.position) {
+        continue;
+      }
 
       // Simulation culling: Wild plants only simulate when visible
       // Planted crops always simulate (player investment requires always-on simulation)
@@ -1142,6 +1176,11 @@ export class PlantSystem implements System {
       const plant = impl.getComponent<PlantComponent>(CT.Plant);
       if (!plant) continue;
 
+      // Skip plants missing critical data
+      if (!plant.position) {
+        continue;
+      }
+
       // Only regenerate for plants in appropriate stages
       const canRegenerate = ['mature', 'fruiting'].includes(plant.stage);
       if (!canRegenerate) continue;
@@ -1150,7 +1189,8 @@ export class PlantSystem implements System {
       if (plant.health < 50) continue;
 
       // Get species to determine base fruit production
-      const species = this.getSpecies(plant.speciesId);
+      try {
+        const species = this.getSpecies(plant.speciesId);
       const seedsPerPlant = species.seedsPerPlant ?? 5; // Default 5 seeds if not specified
 
       // Calculate fruit regeneration based on health and genetics
@@ -1182,6 +1222,21 @@ export class PlantSystem implements System {
             position: plant.position
           }
         });
+      }
+      } catch (error) {
+        // Skip plants with invalid species or other errors
+        BugReporter.reportCorruptedPlant({
+          entityId: entity.id,
+          reason: `Fruit regeneration failed: ${error}`,
+          plantData: {
+            speciesId: plant.speciesId,
+            stage: plant.stage,
+            health: plant.health,
+            position: plant.position
+          },
+          stackTrace: error instanceof Error ? error.stack : undefined
+        });
+        continue;
       }
     }
   }

@@ -275,9 +275,11 @@ class PowerGridSystem implements System {
 
     // Calculate availability (what % of power demand is met)
     if (network.totalConsumption > 0) {
-      network.availability = Math.min(1.0, network.totalGeneration / network.totalConsumption);
+      const ratio = network.totalGeneration / network.totalConsumption;
+      // Explicit cap at 100% (excess generation doesn't increase availability past 100%)
+      network.availability = (ratio > 1.0) ? 1.0 : ratio;
     } else {
-      network.availability = 1.0;
+      network.availability = 1.0;  // No consumers = 100% availability
     }
   }
 
@@ -470,10 +472,9 @@ function updateArcanePowerGeneration(
     }
 
     // Generate 10 kW per mana consumed
-    const manaToConsume = Math.min(
-      source.manaPerTick ?? 1,
-      totalManaAvailable
-    );
+    // Explicit bounded allocation: consume what's requested OR what's available, whichever is smaller
+    const requested = source.manaPerTick ?? 1;
+    const manaToConsume = (totalManaAvailable >= requested) ? requested : totalManaAvailable;
 
     source.generation = manaToConsume * 10;
 
@@ -483,7 +484,8 @@ function updateArcanePowerGeneration(
       if (remaining <= 0) break;
 
       const magicUser = mage.getComponent<MagicUserComponent>(CT.MagicUser);
-      const consumed = Math.min(remaining, magicUser.currentMana);
+      // Allocate from this mage: take what we need OR what they have, whichever is smaller
+      const consumed = (magicUser.currentMana >= remaining) ? remaining : magicUser.currentMana;
       magicUser.currentMana -= consumed;
       remaining -= consumed;
     }
@@ -762,7 +764,8 @@ class TeleportationSystem implements System {
       if (remaining <= 0) break;
 
       const magicUser = mage.getComponent<MagicUserComponent>(CT.MagicUser);
-      const consumed = Math.min(remaining, magicUser.currentMana);
+      // Allocate from this mage: take what we need OR what they have, whichever is smaller
+      const consumed = (magicUser.currentMana >= remaining) ? remaining : magicUser.currentMana;
       magicUser.currentMana -= consumed;
       remaining -= consumed;
     }
@@ -1049,7 +1052,9 @@ function calculateDivineFavorBonus(world: World, settlementId: string): number {
         return belief.primaryDeity === deityId;
       });
 
-    const favor = Math.min(100, followers.length * 10); // 10 favor per follower
+    // Calculate favor: 10 per follower, capped at 100 (max 10 followers counted)
+    const rawFavor = followers.length * 10;
+    const favor = (rawFavor > 100) ? 100 : rawFavor;
 
     // Check domain alignment
     let domainBonus = 0;
@@ -3112,139 +3117,193 @@ const FAE_COURT: PostTemporalSociety = {
 
 ## Part 3: Belt Logistics System
 
+**Design Philosophy: "Factorio-ish, not Full Factorio"**
+
+For performance, belts use **count-based tracking** instead of individual item entities. Each belt segment holds a single resource type and tracks how many items are on it. This is much faster than tracking thousands of individual item positions.
+
 ### Belt Component
 
 ```typescript
 /**
  * Conveyor belt - moves items in one direction
+ *
+ * SIMPLIFIED FOR PERFORMANCE:
+ * - Tracks item COUNT, not individual positions
+ * - Single resource type per belt (no splitters/combiners)
+ * - Items propagate when transfer progress reaches 1.0
+ * - Abstracted for performance - many systems coexist here
  */
 interface BeltComponent extends Component {
   readonly type: 'belt';
 
   /** Direction belt moves items */
-  direction: Direction;
+  direction: 'north' | 'south' | 'east' | 'west';
 
   /** Belt tier (affects speed) */
   tier: 1 | 2 | 3;
 
-  /** Items currently on this belt segment */
-  items: BeltItem[];
+  /** Item type currently on this belt (null if empty) */
+  itemId: string | null;
+
+  /** Number of items on this belt segment */
+  count: number;
 
   /** Maximum items per belt segment */
   capacity: number;
+
+  /** Accumulated transfer progress (0.0 - 1.0) */
+  transferProgress: number;
 }
 
-interface BeltItem {
-  itemId: string;
-  instanceId: string;
-  /** Position on belt (0.0 = input, 1.0 = output) */
-  progress: number;
-}
-
-type Direction = 'north' | 'south' | 'east' | 'west';
+/**
+ * Belt speeds by tier (tiles per tick)
+ */
+const BELT_SPEEDS = {
+  1: 0.05,   // Wooden belt
+  2: 0.15,   // Electric belt (3x faster)
+  3: 0.30,   // Advanced belt (6x faster)
+};
 ```
 
 ### BeltSystem
 
 ```typescript
 /**
- * BeltSystem - Moves items along conveyors
+ * BeltSystem - Moves items along conveyors (count-based for performance)
+ *
+ * SIMPLIFIED APPROACH:
+ * - Accumulates transfer progress based on belt tier speed
+ * - When progress >= 1.0, transfers ONE item to next belt/machine
+ * - Belts can only hold one resource type (no mixing)
+ * - Much faster than tracking individual item positions
  */
 class BeltSystem implements System {
   public readonly id: SystemId = 'belt';
   public readonly priority: number = 53;  // After PowerGridSystem
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Belt, CT.Position];
 
-  private readonly TIER_SPEEDS = {
-    1: 0.05,   // Wooden belt: 0.05 tiles/tick
-    2: 0.15,   // Electric belt: 3x faster
-    3: 0.30,   // Advanced belt: 6x faster
-  };
-
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+    // Step 1: Accumulate transfer progress
+    for (const entity of entities) {
+      const belt = (entity as EntityImpl).getComponent<BeltComponent>(CT.Belt);
+
+      if (!belt || belt.count === 0) continue;
+
+      const speed = BELT_SPEEDS[belt.tier] * deltaTime;
+      belt.transferProgress += speed;
+    }
+
+    // Step 2: Transfer items to adjacent belts/machines
     for (const entity of entities) {
       const belt = (entity as EntityImpl).getComponent<BeltComponent>(CT.Belt);
       const pos = (entity as EntityImpl).getComponent<PositionComponent>(CT.Position);
 
       if (!belt || !pos) continue;
+      if (belt.count === 0 || belt.transferProgress < 1.0) continue;
 
-      this.moveBeltItems(belt, pos, world, deltaTime);
-      this.transferItemsToNextBelt(belt, pos, world);
+      this.transferItems(belt, pos, world);
     }
   }
 
   /**
-   * Move items along belt based on speed
+   * Transfer items to next belt/machine when progress >= 1.0
    */
-  private moveBeltItems(
-    belt: BeltComponent,
-    _pos: PositionComponent,
-    _world: World,
-    deltaTime: number
-  ): void {
-    const speed = this.TIER_SPEEDS[belt.tier] * deltaTime;
-
-    for (const item of belt.items) {
-      item.progress += speed;
-    }
-  }
-
-  /**
-   * Transfer items that reached the end to next belt/machine
-   */
-  private transferItemsToNextBelt(
+  private transferItems(
     belt: BeltComponent,
     pos: PositionComponent,
     world: World
   ): void {
-    // Find items ready to transfer (progress >= 1.0)
-    const readyItems = belt.items.filter(item => item.progress >= 1.0);
-
-    if (readyItems.length === 0) return;
+    if (!belt.itemId) return;
 
     // Find next belt/machine in direction
     const nextPos = this.getNextPosition(pos, belt.direction);
     const nextEntity = this.getEntityAt(world, nextPos);
 
     if (!nextEntity) {
-      // No output - items pile up
+      // No output - belt backs up (progress stays at 1.0)
       return;
     }
 
     // Try to transfer to next belt
     const nextBelt = (nextEntity as EntityImpl).getComponent<BeltComponent>(CT.Belt);
-
     if (nextBelt) {
-      // Transfer to next belt if not full
-      for (const item of readyItems) {
-        if (nextBelt.items.length < nextBelt.capacity) {
-          nextBelt.items.push({ ...item, progress: 0.0 });
-          belt.items = belt.items.filter(i => i.instanceId !== item.instanceId);
-        }
+      // Check if target can accept this resource type
+      if (nextBelt.itemId !== null && nextBelt.itemId !== belt.itemId) {
+        return; // Wrong resource type - belt backs up
       }
+
+      if (nextBelt.count >= nextBelt.capacity) {
+        return; // Full - belt backs up
+      }
+
+      // Transfer 1 item
+      belt.count--;
+      if (belt.count === 0) {
+        belt.itemId = null;
+      }
+
+      if (nextBelt.itemId === null) {
+        nextBelt.itemId = belt.itemId;
+      }
+      nextBelt.count++;
+
+      // Reset transfer progress
+      belt.transferProgress = 0.0;
+      return;
     }
 
-    // Try to transfer to machine (handled by machine system)
+    // Try to transfer to machine input (handled by machine system integration)
+    const machineConnection = (nextEntity as EntityImpl).getComponent<MachineConnectionComponent>(
+      CT.MachineConnection
+    );
+    if (machineConnection) {
+      // Find matching input slot (simplified - full implementation in code)
+      // ...transfer logic...
+      belt.transferProgress = 0.0;
+    }
   }
 
-  private getNextPosition(pos: PositionComponent, dir: Direction): { x: number; y: number } {
+  private getNextPosition(pos: PositionComponent, dir: string): { x: number; y: number } {
     switch (dir) {
       case 'north': return { x: pos.x, y: pos.y - 1 };
       case 'south': return { x: pos.x, y: pos.y + 1 };
       case 'east':  return { x: pos.x + 1, y: pos.y };
       case 'west':  return { x: pos.x - 1, y: pos.y };
+      default: return pos;
     }
   }
 
   private getEntityAt(world: World, pos: { x: number; y: number }): Entity | null {
-    const entities = world.query()
-      .with(CT.Position)
-      .executeEntities();
-
+    const entities = world.query().with(CT.Position).executeEntities();
     return entities.find(e => {
       const p = (e as EntityImpl).getComponent<PositionComponent>(CT.Position);
-      return p && p.x === pos.x && p.y === pos.y;
+      return p && Math.floor(p.x) === Math.floor(pos.x) && Math.floor(p.y) === Math.floor(pos.y);
     }) ?? null;
+  }
+}
+```
+
+### Belt Rendering (Visual Only)
+
+Belts are **rendered** as having items on them for visual feedback, but the actual game logic only tracks counts. The renderer shows items flowing based on the `count` and `transferProgress` fields:
+
+```typescript
+/**
+ * Renderer shows items on belts for visual feedback
+ * This is PURELY COSMETIC - game logic uses counts only
+ */
+function renderBelt(belt: BeltComponent, pos: PositionComponent, ctx: CanvasRenderingContext2D): void {
+  if (belt.count === 0 || !belt.itemId) return;
+
+  // Visual only: distribute items evenly on belt
+  const spacing = 1.0 / (belt.count + 1);
+  for (let i = 0; i < belt.count; i++) {
+    const visualProgress = (i + 1) * spacing;
+    const offsetX = pos.x + (belt.direction === 'east' ? visualProgress : 0);
+    const offsetY = pos.y + (belt.direction === 'south' ? visualProgress : 0);
+
+    // Draw item sprite at position
+    drawItemSprite(belt.itemId, offsetX, offsetY, ctx);
   }
 }
 ```
@@ -3522,174 +3581,315 @@ class AssemblyMachineSystem implements System {
 
 ---
 
-## Part 5: Robot Logistics (Tier 4)
+## Part 5: Abstracted Logistics Network (Tier 4)
 
-### Roboport & Robot Components
+**Design Philosophy: Performance Over Realism**
+
+Factorio suffered from "flying robot syndrome" - tracking thousands of individual robot entities was expensive and allowed players to shoot them down. For performance in a game with many coexisting systems, we use **abstracted "in transit" tracking** instead.
+
+Logistics drones are **too fast to see** - they're assumed to exist but not simulated as entities. Items have an "in transit" status with a calculated delivery time based on distance, weight, and network upgrades.
+
+**Key Benefits:**
+- No individual robot entities to track (massive performance gain)
+- Agents can't shoot down logistics (keeps it simple)
+- Works for both ground-based and flying agents
+- Upgrades affect transit time calculations, not physical speed
+
+**Agent Accessibility:**
+- Most agents **can't fly**, so they need ground-accessible logistics
+- Factory layouts must consider agent movement and reachability
+- Flying agents (if they exist) would have different factory layouts with aerial connections
+
+### Logistics Network Components
 
 ```typescript
 /**
- * Roboport - hub for construction and logistics robots
+ * LogisticsHub - Manages logistics network and transit calculations
+ * Replaces roboports + individual robot tracking
  */
-interface RoboportComponent extends Component {
-  readonly type: 'roboport';
+interface LogisticsHubComponent extends Component {
+  readonly type: 'logistics_hub';
 
   /** Logistics coverage radius */
   range: number;
 
-  /** Robots stored in this port */
-  robots: RobotInstance[];
+  /** Network tier (affects transit speed) */
+  tier: 1 | 2 | 3;
 
-  /** Max robot capacity */
-  capacity: number;
+  /** Power consumption (kW) */
+  powerConsumption: number;
 
-  /** Recharge rate (robots per tick) */
-  rechargeRate: number;
+  /** Is hub powered and active */
+  isActive: boolean;
 
-  /** Task queue for robots */
-  taskQueue: RobotTask[];
-}
-
-interface RobotInstance {
-  instanceId: string;
-  type: 'construction' | 'logistics';
-  status: 'idle' | 'working' | 'charging';
-  battery: number;  // 0-100
-  currentTask?: RobotTask;
-}
-
-interface RobotTask {
-  type: 'construct' | 'deliver' | 'fetch';
-  priority: number;
-
-  // For construction
-  buildingBlueprint?: string;
-  targetPosition?: { x: number; y: number };
-
-  // For logistics
-  itemId?: string;
-  amount?: number;
-  from?: EntityId;
-  to?: EntityId;
+  /** Logistics network ID (connected hubs share network) */
+  networkId: string;
 }
 
 /**
- * LogisticsChest - requester/provider/storage
+ * LogisticsChest - Request, provide, or store items
+ * NO ROBOT ENTITIES - items are marked "in transit" with calculated delivery time
  */
 interface LogisticsChestComponent extends Component {
   readonly type: 'logistics_chest';
 
-  chestType: 'provider' | 'requester' | 'storage';
+  chestType: 'provider' | 'requester' | 'storage' | 'buffer';
 
-  /** For requester chests */
-  requests?: Map<string, number>;  // itemId → amount
-
-  /** Items in chest */
+  /** Items currently in chest */
   inventory: InventoryComponent;
+
+  /** For requester chests: what items to request */
+  requests?: Map<string, number>;  // itemId → desired amount
+
+  /** Items in transit TO this chest */
+  incomingTransit: TransitItem[];
+
+  /** Items in transit FROM this chest */
+  outgoingTransit: TransitItem[];
+
+  /** Logistics network this chest belongs to */
+  networkId?: string;
+}
+
+/**
+ * Items "in transit" - abstracted delivery without robot entities
+ */
+interface TransitItem {
+  /** What item is being delivered */
+  itemId: string;
+
+  /** How many items */
+  amount: number;
+
+  /** Source chest entity ID */
+  fromChestId: string;
+
+  /** Destination chest entity ID */
+  toChestId: string;
+
+  /** When will delivery complete (game tick) */
+  arrivalTick: number;
+
+  /** Priority (higher = delivered first) */
+  priority: number;
 }
 ```
 
-### RoboticLogisticsSystem
+### AbstractedLogisticsSystem
 
 ```typescript
 /**
- * RoboticLogisticsSystem - Manages robot task assignment and execution
- * This is where belt logistics gets REPLACED by robots
+ * AbstractedLogisticsSystem - Manages "in transit" items without robot entities
+ *
+ * SIMPLIFIED FOR PERFORMANCE:
+ * - No individual robot entities to track
+ * - Items are marked "in transit" with calculated delivery time
+ * - Transit time based on distance, item weight, and network tier
+ * - Agents can't interact with logistics (too fast to see)
  */
-class RoboticLogisticsSystem implements System {
-  public readonly id: SystemId = 'robotic_logistics';
+class AbstractedLogisticsSystem implements System {
+  public readonly id: SystemId = 'abstracted_logistics';
   public readonly priority: number = 55;  // After assembly machines
 
-  update(world: World, _entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    const roboports = world.query()
-      .with(CT.Roboport)
-      .with(CT.Position)
-      .executeEntities();
+  // Transit speed by network tier (tiles per second)
+  private readonly TRANSIT_SPEEDS = {
+    1: 10,   // Basic logistics: 10 tiles/sec
+    2: 25,   // Advanced logistics: 25 tiles/sec (2.5x faster)
+    3: 50,   // Quantum logistics: 50 tiles/sec (5x faster)
+  };
 
-    for (const port of roboports) {
-      const roboport = (port as EntityImpl).getComponent<RoboportComponent>(CT.Roboport);
-      const pos = (port as EntityImpl).getComponent<PositionComponent>(CT.Position);
+  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+    // Step 1: Process arrivals (items that reached destination)
+    this.processArrivals(world);
 
-      if (!roboport || !pos) continue;
-
-      // 1. Generate tasks from logistics network
-      this.generateLogisticsTasks(roboport, pos, world);
-
-      // 2. Assign tasks to idle robots
-      this.assignTasks(roboport);
-
-      // 3. Execute robot tasks
-      this.executeRobotTasks(roboport, world, deltaTime);
-
-      // 4. Recharge robots
-      this.rechargeRobots(roboport, deltaTime);
-    }
+    // Step 2: Generate new delivery requests
+    this.generateDeliveries(world);
   }
 
   /**
-   * Scan logistics network and generate delivery tasks
+   * Process items that have arrived at their destination
    */
-  private generateLogisticsTasks(
-    roboport: RoboportComponent,
-    portPos: PositionComponent,
-    world: World
-  ): void {
-    // Find all logistics chests in range
+  private processArrivals(world: World): void {
     const chests = world.query()
       .with(CT.LogisticsChest)
-      .with(CT.Position)
       .executeEntities();
 
-    const nearbyChests = chests.filter(chest => {
-      const chestPos = (chest as EntityImpl).getComponent<PositionComponent>(CT.Position);
-      if (!chestPos) return false;
+    const currentTick = world.getCurrentTick();
 
-      const dx = portPos.x - chestPos.x;
-      const dy = portPos.y - chestPos.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+    for (const chest of chests) {
+      const logistics = (chest as EntityImpl).getComponent<LogisticsChestComponent>(CT.LogisticsChest);
+      if (!logistics) continue;
 
-      return dist <= roboport.range;
-    });
-
-    // Find requesters that need items
-    for (const requester of nearbyChests) {
-      const chest = (requester as EntityImpl).getComponent<LogisticsChestComponent>(
-        CT.LogisticsChest
+      // Find items that have arrived
+      const arrivedItems = logistics.incomingTransit.filter(
+        transit => transit.arrivalTick <= currentTick
       );
 
-      if (!chest || chest.chestType !== 'requester') continue;
-      if (!chest.requests) continue;
+      for (const transit of arrivedItems) {
+        // Add items to chest inventory
+        addToInventory(logistics.inventory, transit.itemId, transit.amount);
 
-      for (const [itemId, requested] of chest.requests) {
-        const currentAmount = getItemCount(chest.inventory, itemId);
-        const needed = requested - currentAmount;
-
-        if (needed <= 0) continue;
-
-        // Find provider with this item
-        const provider = this.findProvider(nearbyChests, itemId);
-        if (!provider) continue;
-
-        // Create delivery task
-        roboport.taskQueue.push({
-          type: 'deliver',
-          priority: 10,
-          itemId,
-          amount: Math.min(needed, 50),  // Max 50 per trip
-          from: provider.id,
-          to: requester.id,
-        });
+        // Remove from transit
+        logistics.incomingTransit = logistics.incomingTransit.filter(
+          t => t !== transit
+        );
       }
     }
   }
 
   /**
-   * Find provider chest with available item
+   * Generate new delivery requests based on requester/provider chests
+   */
+  private generateDeliveries(world: World): void {
+    // Build logistics networks (hubs with overlapping range)
+    const networks = this.buildLogisticsNetworks(world);
+
+    for (const network of networks) {
+      this.processNetwork(network, world);
+    }
+  }
+
+  /**
+   * Process a single logistics network
+   */
+  private processNetwork(network: LogisticsNetwork, world: World): void {
+    // Find all requesters that need items
+    for (const requesterEntity of network.chests) {
+      const requester = (requesterEntity as EntityImpl).getComponent<LogisticsChestComponent>(
+        CT.LogisticsChest
+      );
+
+      if (!requester || requester.chestType !== 'requester') continue;
+      if (!requester.requests) continue;
+
+      for (const [itemId, requestedAmount] of requester.requests) {
+        const currentAmount = getItemCount(requester.inventory, itemId);
+        const inTransit = this.getInTransitAmount(requester.incomingTransit, itemId);
+        const needed = requestedAmount - currentAmount - inTransit;
+
+        if (needed <= 0) continue;
+
+        // Find provider with this item
+        const provider = this.findProvider(network, itemId, world);
+        if (!provider) continue;
+
+        // Calculate transit time
+        const requesterPos = (requesterEntity as EntityImpl).getComponent<PositionComponent>(CT.Position);
+        const providerEntity = world.getEntity(provider.entityId);
+        const providerPos = (providerEntity as EntityImpl).getComponent<PositionComponent>(CT.Position);
+
+        if (!requesterPos || !providerPos) continue;
+
+        const distance = Math.sqrt(
+          (requesterPos.x - providerPos.x) ** 2 +
+          (requesterPos.y - providerPos.y) ** 2
+        );
+
+        // Calculate delivery time based on network tier
+        const transitSpeed = this.TRANSIT_SPEEDS[network.tier];
+        const transitTimeSeconds = distance / transitSpeed;
+        const transitTimeTicks = Math.ceil(transitTimeSeconds * 20); // 20 ticks/sec
+
+        // Item weight affects transit time (optional enhancement)
+        const itemWeight = world.itemRegistry.getWeight(itemId) ?? 1.0;
+        const weightModifier = 1.0 + (itemWeight - 1.0) * 0.5; // Heavier = slower
+        const finalTransitTicks = Math.ceil(transitTimeTicks * weightModifier);
+
+        // Create transit entry
+        const transit: TransitItem = {
+          itemId,
+          amount: Math.min(needed, provider.available),
+          fromChestId: provider.entityId,
+          toChestId: requesterEntity.id,
+          arrivalTick: world.getCurrentTick() + finalTransitTicks,
+          priority: 0,
+        };
+
+        // Remove from provider inventory
+        removeFromInventory(provider.chest.inventory, itemId, transit.amount);
+
+        // Add to transit tracking
+        provider.chest.outgoingTransit.push(transit);
+        requester.incomingTransit.push(transit);
+      }
+    }
+  }
+
+  /**
+   * Build logistics networks from connected hubs
+   */
+  private buildLogisticsNetworks(world: World): LogisticsNetwork[] {
+    const hubs = world.query()
+      .with(CT.LogisticsHub)
+      .with(CT.Position)
+      .executeEntities();
+
+    const networks: LogisticsNetwork[] = [];
+    const networkMap = new Map<string, LogisticsNetwork>();
+
+    for (const hub of hubs) {
+      const hubComponent = (hub as EntityImpl).getComponent<LogisticsHubComponent>(CT.LogisticsHub);
+      const pos = (hub as EntityImpl).getComponent<PositionComponent>(CT.Position);
+
+      if (!hubComponent || !pos || !hubComponent.isActive) continue;
+
+      // Get or create network
+      let network = networkMap.get(hubComponent.networkId);
+      if (!network) {
+        network = {
+          id: hubComponent.networkId,
+          tier: hubComponent.tier,
+          hubs: [],
+          chests: [],
+        };
+        networkMap.set(hubComponent.networkId, network);
+        networks.push(network);
+      }
+
+      network.hubs.push(hub);
+
+      // Find chests in range of this hub
+      const chests = world.query()
+        .with(CT.LogisticsChest)
+        .with(CT.Position)
+        .executeEntities();
+
+      for (const chest of chests) {
+        const chestPos = (chest as EntityImpl).getComponent<PositionComponent>(CT.Position);
+        if (!chestPos) continue;
+
+        const dx = pos.x - chestPos.x;
+        const dy = pos.y - chestPos.y;
+        const distSq = dx * dx + dy * dy;
+
+        if (distSq <= hubComponent.range * hubComponent.range) {
+          // Mark chest as part of this network
+          const chestComponent = (chest as EntityImpl).getComponent<LogisticsChestComponent>(
+            CT.LogisticsChest
+          );
+          if (chestComponent) {
+            chestComponent.networkId = hubComponent.networkId;
+          }
+
+          if (!network.chests.includes(chest)) {
+            network.chests.push(chest);
+          }
+        }
+      }
+    }
+
+    return networks;
+  }
+
+  /**
+   * Find provider chest with available item in network
    */
   private findProvider(
-    chests: ReadonlyArray<Entity>,
-    itemId: string
-  ): Entity | null {
-    for (const chest of chests) {
+    network: LogisticsNetwork,
+    itemId: string,
+    world: World
+  ): { entityId: string; chest: LogisticsChestComponent; available: number } | null {
+    for (const chest of network.chests) {
       const logistics = (chest as EntityImpl).getComponent<LogisticsChestComponent>(
         CT.LogisticsChest
       );
@@ -3698,136 +3898,56 @@ class RoboticLogisticsSystem implements System {
       if (logistics.chestType !== 'provider' && logistics.chestType !== 'storage') continue;
 
       const available = getItemCount(logistics.inventory, itemId);
-      if (available > 0) return chest;
+      if (available > 0) {
+        return {
+          entityId: chest.id,
+          chest: logistics,
+          available,
+        };
+      }
     }
 
     return null;
   }
 
   /**
-   * Assign queued tasks to idle robots
+   * Get amount of items in transit to chest
    */
-  private assignTasks(roboport: RoboportComponent): void {
-    // Sort tasks by priority
-    roboport.taskQueue.sort((a, b) => b.priority - a.priority);
-
-    // Assign to idle robots
-    for (const robot of roboport.robots) {
-      if (robot.status !== 'idle') continue;
-      if (robot.battery < 20) continue;  // Need charge
-
-      const task = roboport.taskQueue.shift();
-      if (!task) break;
-
-      robot.currentTask = task;
-      robot.status = 'working';
-    }
-  }
-
-  /**
-   * Execute robot tasks (simplified - just instant transfer for now)
-   */
-  private executeRobotTasks(
-    roboport: RoboportComponent,
-    world: World,
-    _deltaTime: number
-  ): void {
-    for (const robot of roboport.robots) {
-      if (robot.status !== 'working') continue;
-      if (!robot.currentTask) continue;
-
-      const task = robot.currentTask;
-
-      if (task.type === 'deliver' && task.from && task.to && task.itemId && task.amount) {
-        const from = world.getEntity(task.from);
-        const to = world.getEntity(task.to);
-
-        if (!from || !to) {
-          robot.currentTask = undefined;
-          robot.status = 'idle';
-          continue;
-        }
-
-        const fromChest = (from as EntityImpl).getComponent<LogisticsChestComponent>(
-          CT.LogisticsChest
-        );
-        const toChest = (to as EntityImpl).getComponent<LogisticsChestComponent>(
-          CT.LogisticsChest
-        );
-
-        if (!fromChest || !toChest) {
-          robot.currentTask = undefined;
-          robot.status = 'idle';
-          continue;
-        }
-
-        // Transfer item (simplified - instant)
-        const transferred = this.transferItems(
-          fromChest.inventory,
-          toChest.inventory,
-          task.itemId,
-          task.amount
-        );
-
-        if (transferred > 0) {
-          robot.battery -= 5;  // Consume battery
-        }
-
-        robot.currentTask = undefined;
-        robot.status = 'idle';
-      }
-    }
-  }
-
-  /**
-   * Transfer items between inventories
-   */
-  private transferItems(
-    from: InventoryComponent,
-    to: InventoryComponent,
-    itemId: string,
-    amount: number
-  ): number {
-    let transferred = 0;
-
-    for (let i = 0; i < amount; i++) {
-      if (!hasItem(from, itemId)) break;
-
-      const item = from.items.find(slot => slot.some(inst => inst.definitionId === itemId));
-      if (!item) break;
-
-      const instance = item.find(inst => inst.definitionId === itemId);
-      if (!instance) break;
-
-      removeFromInventory(from, itemId, 1);
-      addToInventoryWithQuality(to, itemId, 1, instance.quality);
-      transferred++;
-    }
-
-    return transferred;
-  }
-
-  /**
-   * Recharge robots at roboport
-   */
-  private rechargeRobots(roboport: RoboportComponent, deltaTime: number): void {
-    const rechargeAmount = roboport.rechargeRate * deltaTime;
-
-    for (const robot of roboport.robots) {
-      if (robot.battery < 100) {
-        robot.battery = Math.min(100, robot.battery + rechargeAmount);
-
-        if (robot.battery >= 20 && robot.status === 'charging') {
-          robot.status = 'idle';
-        }
-      }
-
-      if (robot.battery < 20 && robot.status === 'idle') {
-        robot.status = 'charging';
-      }
-    }
+  private getInTransitAmount(transitItems: TransitItem[], itemId: string): number {
+    return transitItems
+      .filter(t => t.itemId === itemId)
+      .reduce((sum, t) => sum + t.amount, 0);
   }
 }
+
+interface LogisticsNetwork {
+  id: string;
+  tier: 1 | 2 | 3;
+  hubs: Entity[];
+  chests: Entity[];
+}
+```
+
+### Example: Transit Time Calculation
+
+```typescript
+/**
+ * Example: Requester chest wants 500 iron ore
+ *
+ * Instead of spawning robots:
+ * 1. Find provider with iron ore
+ * 2. Calculate distance: 50 tiles
+ * 3. Network tier 2: 25 tiles/sec
+ * 4. Transit time: 50 / 25 = 2 seconds = 40 ticks
+ * 5. Iron ore weight: 2.0 (heavy)
+ * 6. Weight modifier: 1.0 + (2.0 - 1.0) * 0.5 = 1.5x
+ * 7. Final transit time: 40 * 1.5 = 60 ticks
+ * 8. Create TransitItem with arrivalTick = currentTick + 60
+ * 9. Remove 500 iron from provider inventory
+ * 10. After 60 ticks, add 500 iron to requester inventory
+ *
+ * NO ROBOTS SIMULATED! Just math and timers.
+ */
 ```
 
 ---
@@ -4793,6 +4913,709 @@ These systems build on top of this spec:
 - **Fully Automated Production Chains** - Complex multi-stage manufacturing without manual intervention
 - **Robot Workforce** - Autonomous agents that handle logistics and production tasks
 - **Post-Scarcity Economy** - Clarke Tech level automation enabling abundance
+
+---
+
+## Part 10: Voxel Building Integration - Emergent Factory Composition
+
+> *"Buildings are not objects—they are spaces. Factories are not single entities—they are collections of machines within spaces."*
+
+This section defines how the automation system integrates with the voxel building system to enable emergent factory composition. Instead of monolithic "factory buildings," players build rooms and place machines inside them, creating organic, modular production facilities.
+
+### Design Philosophy
+
+**Factories emerge from composition, not templates:**
+- A **forge** is not a building—it's a machine placed inside a stone workshop
+- A **factory** is not a blueprint—it's a collection of machines connected by belts in a room
+- **Modular expansion** - Add more machines to existing buildings rather than build new factories
+- **Organic growth** - Factories start small and grow as production needs increase
+
+### Machine Placement in Voxel Buildings
+
+Machines can be placed on floor tiles inside enclosed rooms. They occupy a single tile but can have multi-tile footprints for larger machines.
+
+```typescript
+/**
+ * Machine Placement Component
+ * Machines exist on floor tiles, can be inside buildings
+ */
+interface MachinePlacementComponent extends Component {
+  readonly type: 'machine_placement';
+
+  /** Is this machine indoors (inside a room)? */
+  isIndoors: boolean;
+
+  /** Room ID if indoors (from RoomDetectionSystem) */
+  roomId?: string;
+
+  /** Does this machine require shelter? */
+  requiresShelter: boolean;
+
+  /** Does this machine require power connection? */
+  requiresPower: boolean;
+
+  /** Footprint size (1x1, 2x2, 3x3, etc.) */
+  footprint: { width: number; height: number };
+
+  /** Adjacent tiles this machine blocks */
+  blockedTiles: { x: number; y: number }[];
+}
+
+/**
+ * MachineItem - Machines as placeable items
+ * Like voxel building materials, machines are items that can be placed
+ */
+interface MachineItem extends ItemDefinition {
+  /** Machine type identifier */
+  machineType: string;
+
+  /** Building requirement */
+  placementRequirement: 'anywhere' | 'indoors' | 'outdoors' | 'on_power';
+
+  /** Power consumption */
+  powerConsumption: number;
+
+  /** Footprint */
+  footprint: { width: number; height: number };
+}
+
+// Example: Assembly Machine I as a placeable item
+export const ASSEMBLY_MACHINE_I_ITEM = defineItem(
+  'assembly_machine_i',
+  'Assembly Machine I',
+  'machine',
+  {
+    weight: 100,
+    stackSize: 1,
+    baseMaterial: 'iron',
+    craftedFrom: [
+      { itemId: 'iron_ingot', amount: 20 },
+      { itemId: 'copper_wire', amount: 15 },
+      { itemId: 'gear_assembly', amount: 10 },
+    ],
+    baseValue: 500,
+    rarity: 'rare',
+    machineType: 'assembly_machine',
+    placementRequirement: 'indoors', // Must be inside a building
+    powerConsumption: 100, // 100 kW
+    footprint: { width: 2, height: 2 }, // 2x2 tiles
+    help: {
+      summary: 'Automated crafting machine. Place inside a building.',
+      description: 'Assembly Machine I automatically crafts recipes when powered and supplied with ingredients. Requires shelter from weather. Place inside a workshop or factory building.',
+    },
+  }
+);
+```
+
+### Room-Based Factories
+
+Rooms detected by the voxel building system become factory spaces. Machines placed in rooms benefit from:
+- **Weather protection** - Machines indoors don't suffer weather penalties
+- **Power efficiency** - Insulation reduces power loss
+- **Organization** - Rooms provide natural factory segmentation
+
+```typescript
+/**
+ * Factory Room Extension
+ * Extends Room interface from voxel building system
+ */
+interface FactoryRoom extends Room {
+  /** Machines in this room */
+  machines: Entity[];
+
+  /** Power lines running through this room */
+  powerLines: PowerLineSegment[];
+
+  /** Belt segments in this room */
+  belts: Entity[];
+
+  /** Production efficiency (affected by room harmony) */
+  productionEfficiency: number;
+
+  /** Room purpose classification */
+  purpose?: 'smelting' | 'assembly' | 'storage' | 'power_gen' | 'mixed';
+}
+
+/**
+ * FactoryRoomAnalyzer - Classifies rooms based on machines
+ */
+class FactoryRoomAnalyzer {
+  /**
+   * Analyze a room and determine its factory purpose
+   */
+  analyzeRoom(room: Room, world: World): FactoryRoom {
+    const machines = this.getMachinesInRoom(room, world);
+    const belts = this.getBeltsInRoom(room, world);
+    const powerLines = this.getPowerLinesInRoom(room, world);
+
+    // Classify based on machine types
+    const machineTypes = machines.map(m =>
+      m.getComponent<AssemblyMachineComponent>('assembly_machine')?.machineType
+    );
+
+    let purpose: FactoryRoom['purpose'];
+    if (machineTypes.every(t => t === 'furnace')) {
+      purpose = 'smelting';
+    } else if (machineTypes.every(t => t === 'assembly_machine')) {
+      purpose = 'assembly';
+    } else if (machines.length === 0 && belts.length > 0) {
+      purpose = 'storage';
+    } else {
+      purpose = 'mixed';
+    }
+
+    // Calculate production efficiency from room harmony
+    const harmony = this.getRoomHarmony(room, world);
+    const productionEfficiency = 0.8 + (harmony.chiFlow * 0.2); // 80-100% based on feng shui
+
+    return {
+      ...room,
+      machines,
+      belts,
+      powerLines,
+      productionEfficiency,
+      purpose,
+    };
+  }
+
+  private getRoomHarmony(room: Room, world: World): any {
+    // Integration with BuildingSpatialAnalysisSystem
+    // Rooms with good feng shui have higher production efficiency
+    const buildings = world.query().with('building_harmony').executeEntities();
+    for (const building of buildings) {
+      const harmony = building.getComponent('building_harmony');
+      if (harmony?.rooms?.some(r => r.id === room.id)) {
+        return harmony;
+      }
+    }
+    return { chiFlow: 0.5 }; // Default moderate efficiency
+  }
+}
+```
+
+### Power Routing Through Buildings
+
+Power lines can route through walls and floors using conduits:
+
+```typescript
+/**
+ * Power Conduit - Routes power through walls/floors
+ */
+interface PowerConduitTile {
+  /** Tile type */
+  conduit: {
+    /** Power type this conduit carries */
+    powerType: PowerType;
+
+    /** Current power flow (kW) */
+    currentFlow: number;
+
+    /** Maximum capacity (kW) */
+    capacity: number;
+
+    /** Connection points (which sides connect) */
+    connections: Set<Direction>;
+  };
+}
+
+/**
+ * Extend Tile interface to include conduits
+ */
+interface TileWithConduit extends Tile {
+  conduit?: PowerConduitTile['conduit'];
+}
+
+/**
+ * Power routing through walls
+ * Agents can place conduits to route power through walls without ugly exposed wires
+ */
+function placePowerConduit(
+  pos: { x: number; y: number },
+  direction: Direction,
+  world: World
+): void {
+  const chunk = world.getChunkAt(pos.x, pos.y);
+  const tile = chunk.getTile(pos.x % chunk.width, pos.y % chunk.height);
+
+  if (!tile.wall && !tile.floor) {
+    throw new Error('Conduits must be placed on walls or floors');
+  }
+
+  tile.conduit = {
+    powerType: 'electrical',
+    currentFlow: 0,
+    capacity: 1000, // 1000 kW capacity
+    connections: new Set([direction]),
+  };
+}
+```
+
+### Multi-Tile Factory Blueprints
+
+Factory blueprints combine voxel building construction with machine placement:
+
+```typescript
+/**
+ * Factory Blueprint - Combines voxel building + machines
+ * Extends TileBasedBlueprint from voxel system
+ */
+interface FactoryBlueprint extends TileBasedBlueprint {
+  /** Machines to place inside the building */
+  machines: FactoryMachinePlacement[];
+
+  /** Power conduits to route through walls */
+  powerConduits: PowerConduitPlacement[];
+
+  /** Belt layout inside the factory */
+  beltLayout?: BeltPlacement[];
+
+  /** Production purpose */
+  productionType: 'smelting' | 'assembly' | 'mixed' | 'storage';
+}
+
+interface FactoryMachinePlacement {
+  /** Machine item ID */
+  machineItemId: string;
+
+  /** Position relative to building origin */
+  offset: { x: number; y: number };
+
+  /** Initial recipe configuration (optional) */
+  initialRecipe?: string;
+
+  /** Rotation */
+  rotation: 0 | 90 | 180 | 270;
+}
+
+interface PowerConduitPlacement {
+  /** Tile position relative to building */
+  offset: { x: number; y: number };
+
+  /** Power type */
+  powerType: PowerType;
+}
+
+interface BeltPlacement {
+  /** Belt position */
+  offset: { x: number; y: number };
+
+  /** Belt direction */
+  direction: Direction;
+
+  /** Belt tier */
+  tier: 1 | 2 | 3;
+}
+
+// Example: Smelting Factory Blueprint
+export const SMELTING_FACTORY: FactoryBlueprint = {
+  id: 'smelting_factory',
+  name: 'Smelting Factory',
+
+  // Building shell (from voxel system)
+  layoutString: [
+    "###########",
+    "#.........#",
+    "#.........#",
+    "#.........#",
+    "#.........D",  // Door on right
+    "#.........#",
+    "#.........#",
+    "#.........#",
+    "###########",
+  ],
+
+  resourceCost: [
+    { resourceId: 'stone', amountRequired: 100 },
+    { resourceId: 'wood', amountRequired: 50 },
+    { resourceId: 'iron_ingot', amountRequired: 30 },
+  ],
+
+  wallMaterial: 'stone',
+  floorMaterial: 'stone',
+  doorMaterial: 'wood',
+  category: 'crafting',
+  provides: ['shelter', 'smelting'],
+
+  // Factory-specific additions
+  productionType: 'smelting',
+
+  // Machine placements (4 furnaces in a row)
+  machines: [
+    {
+      machineItemId: 'electric_furnace',
+      offset: { x: 2, y: 2 },
+      rotation: 0,
+    },
+    {
+      machineItemId: 'electric_furnace',
+      offset: { x: 5, y: 2 },
+      rotation: 0,
+    },
+    {
+      machineItemId: 'electric_furnace',
+      offset: { x: 2, y: 5 },
+      rotation: 0,
+    },
+    {
+      machineItemId: 'electric_furnace',
+      offset: { x: 5, y: 5 },
+      rotation: 0,
+    },
+  ],
+
+  // Power conduits through north wall
+  powerConduits: [
+    { offset: { x: 5, y: 0 }, powerType: 'electrical' },
+  ],
+
+  // Belt layout (input belt, output belts)
+  beltLayout: [
+    // Input belt from west
+    { offset: { x: 1, y: 3 }, direction: 'east', tier: 1 },
+    { offset: { x: 2, y: 3 }, direction: 'east', tier: 1 },
+    { offset: { x: 3, y: 3 }, direction: 'east', tier: 1 },
+
+    // Output belt to east
+    { offset: { x: 7, y: 3 }, direction: 'east', tier: 1 },
+    { offset: { x: 8, y: 3 }, direction: 'east', tier: 1 },
+    { offset: { x: 9, y: 3 }, direction: 'east', tier: 1 },
+  ],
+};
+```
+
+### Emergent Factory Composition
+
+Factories grow organically as agents add machines to existing buildings:
+
+```typescript
+/**
+ * FactoryExpansionBehavior - Agents can expand factories
+ * Instead of "build a new factory", agents "add a machine to the workshop"
+ */
+class FactoryExpansionBehavior implements BehaviorHandler {
+  async execute(agent: Entity, params: any, world: World): Promise<BehaviorResult> {
+    const { machineType, targetRoomId } = params;
+
+    // Find the room
+    const room = world.roomDetectionSystem.getRoom(targetRoomId);
+    if (!room) {
+      return { completed: true, result: 'failure', reason: 'Room not found' };
+    }
+
+    // Find empty floor tile in room
+    const emptyTile = this.findEmptyFloorTile(room, world);
+    if (!emptyTile) {
+      return { completed: true, result: 'failure', reason: 'Room is full' };
+    }
+
+    // Check if agent has machine item
+    const machineItem = `${machineType}_i`; // e.g., 'assembly_machine_i'
+    if (!hasItem(agent.inventory, machineItem)) {
+      return { completed: true, result: 'failure', reason: 'No machine item' };
+    }
+
+    // Place machine
+    this.placeMachine(machineItem, emptyTile, world);
+    removeFromInventory(agent.inventory, machineItem, 1);
+
+    // Record memory
+    agent.episodicMemory.record({
+      type: 'factory_expansion',
+      summary: `Added ${machineType} to ${room.category} room`,
+      emotionalImpact: 0.6,
+      tags: ['automation', 'building', 'expansion'],
+    });
+
+    return { completed: true, result: 'success' };
+  }
+
+  private findEmptyFloorTile(room: Room, world: World): { x: number; y: number } | null {
+    for (const { x, y } of room.tiles) {
+      const entities = world.getEntitiesAt(x, y);
+      const hasObstacle = entities.some(e =>
+        e.hasComponent('machine_placement') ||
+        e.hasComponent('belt')
+      );
+
+      if (!hasObstacle) {
+        return { x, y };
+      }
+    }
+    return null;
+  }
+}
+```
+
+### Modular Production Chains
+
+Factories can be chained by connecting rooms with belts:
+
+```text
+[Input Storage]  →  [Smelting Room]  →  [Assembly Room]  →  [Output Storage]
+     (Room 1)            (Room 2)            (Room 3)            (Room 4)
+       ↓                    ↓                   ↓                   ↓
+    Provider            4 Furnaces         6 Assemblers         Requester
+     Chest                  ↓                   ↓                  Chest
+                       Belts carry         Belts carry
+                       ore → ingots       ingots → products
+```
+
+Each room is a modular unit that can be expanded independently. Agents can:
+- **Add more furnaces** to Room 2 if smelting is the bottleneck
+- **Build another assembly room** (Room 5) if assembly capacity is needed
+- **Connect rooms** with underground belts or robot logistics
+
+### Integration with Tile Construction System
+
+Factory construction uses the existing `TileConstructionSystem`:
+
+```typescript
+/**
+ * Factory Construction Workflow
+ * 1. Build voxel building shell (walls, floor, door)
+ * 2. Route power conduits through walls
+ * 3. Place machines on floor tiles
+ * 4. Connect machines with belts
+ * 5. Configure machine recipes
+ */
+async function constructFactory(
+  blueprint: FactoryBlueprint,
+  origin: { x: number; y: number },
+  world: World
+): Promise<void> {
+  // Step 1: Create voxel building construction task
+  const buildingTask = world.tileConstructionSystem.createConstructionTask(
+    blueprint.id, // Uses blueprint as building blueprint
+    origin,
+    world
+  );
+
+  // Wait for building completion...
+  // (Agents deliver materials, build tiles)
+
+  // Step 2: Place power conduits
+  for (const conduit of blueprint.powerConduits) {
+    const pos = {
+      x: origin.x + conduit.offset.x,
+      y: origin.y + conduit.offset.y,
+    };
+    placePowerConduit(pos, 'east', world);
+  }
+
+  // Step 3: Place machines
+  for (const machine of blueprint.machines) {
+    const pos = {
+      x: origin.x + machine.offset.x,
+      y: origin.y + machine.offset.y,
+    };
+
+    createMachineEntity(machine.machineItemId, pos, world);
+  }
+
+  // Step 4: Place belts
+  for (const belt of blueprint.beltLayout ?? []) {
+    const pos = {
+      x: origin.x + belt.offset.x,
+      y: origin.y + belt.offset.y,
+    };
+
+    createBeltEntity(belt.tier, belt.direction, pos, world);
+  }
+
+  // Step 5: Agent configures recipes (not automated)
+}
+```
+
+### Benefits of Voxel Integration
+
+1. **Emergent Complexity** - Factories emerge from simple rules (place machines in rooms)
+2. **Modular Design** - Rooms are natural factory modules
+3. **Organic Growth** - Expand factories by adding machines, not rebuilding
+4. **Spatial Awareness** - Feng shui and room harmony affect production efficiency
+5. **Visual Clarity** - Walls provide visual boundaries for factory organization
+6. **Realistic Logistics** - Belts route through doorways, power through conduits
+
+### Implementation Notes
+
+- **Backwards Compatibility**: Monolithic factory buildings can coexist with voxel factories
+- **Migration Path**: Old "forge" buildings → forge machine inside stone workshop
+- **Performance**: Room-based queries optimize machine updates
+- **UI/UX**: Building placement UI shows footprint, power/belt connections
+
+### Building Designer / Evolver
+
+**Purpose:** Automatically generate and optimize factory building layouts using spatial awareness and genetic algorithms.
+
+**Key Feature:** Unlike blind procedural generation, the designer/evolver is **spatially aware** - it understands machine connections, power flow, belt routing, and agent pathfinding.
+
+```typescript
+/**
+ * Building Designer - Generates factory layouts from production requirements
+ */
+interface FactoryDesigner {
+  /**
+   * Generate factory layout for a production goal
+   *
+   * @param productionGoal - What to produce (e.g., "100 iron plates per minute")
+   * @param constraints - Space, power, agent accessibility requirements
+   * @returns Optimized factory blueprint
+   */
+  generateFactory(
+    productionGoal: ProductionGoal,
+    constraints: FactoryConstraints
+  ): FactoryBlueprint;
+
+  /**
+   * Evolve existing factory to improve efficiency
+   *
+   * @param currentBlueprint - Existing factory layout
+   * @param metrics - Current performance (throughput, power usage, bottlenecks)
+   * @param generations - How many evolution cycles to run
+   * @returns Improved factory blueprint
+   */
+  evolveFactory(
+    currentBlueprint: FactoryBlueprint,
+    metrics: FactoryMetrics,
+    generations: number
+  ): FactoryBlueprint;
+}
+
+/**
+ * Production goal specification
+ */
+interface ProductionGoal {
+  /** Target item to produce */
+  outputItemId: string;
+
+  /** Target production rate (items per minute) */
+  targetRate: number;
+
+  /** Available input items (e.g., raw materials from mining) */
+  availableInputs: string[];
+
+  /** Maximum power budget (kW) */
+  maxPower: number;
+}
+
+/**
+ * Factory constraints for generation
+ */
+interface FactoryConstraints {
+  /** Maximum building size (tiles) */
+  maxSize: { width: number; height: number };
+
+  /** Agent accessibility requirement */
+  agentType: 'ground' | 'flying';
+
+  /** Building type (affects available materials) */
+  buildingMaterial: 'wood' | 'stone' | 'metal';
+
+  /** Must include specific features */
+  requiredFeatures?: ('storage' | 'power_backup' | 'logistics_hub')[];
+}
+
+/**
+ * Factory performance metrics for evolution
+ */
+interface FactoryMetrics {
+  /** Actual throughput (items per minute) */
+  actualThroughput: number;
+
+  /** Power consumption (kW) */
+  powerUsage: number;
+
+  /** Bottlenecks detected */
+  bottlenecks: string[];
+
+  /** Agent pathfinding efficiency (0-1) */
+  agentAccessibility: number;
+
+  /** Belt utilization (0-1) */
+  beltUtilization: number;
+}
+```
+
+**Spatial Awareness Features:**
+
+1. **Agent Pathfinding Aware**
+   - Ground agents: Ensures corridors and access paths exist
+   - Flying agents: Can use vertical stacking and aerial connections
+   - Layouts vary based on agent type: ground-based factories have wide corridors, flying factories are more compact
+
+2. **Connection Topology**
+   - Understands machine input/output slots
+   - Routes belts to minimize crossing and backtracking
+   - Places power conduits optimally to minimize cable length
+
+3. **Room Efficiency**
+   - Analyzes feng shui impact of machine placement
+   - Groups machines by production stage for organization
+   - Balances room harmony for production bonuses
+
+4. **Evolution Strategies**
+   - **Mutation**: Randomly adjust machine positions, belt routes
+   - **Crossover**: Combine successful layouts from different blueprints
+   - **Selection**: Keep layouts with best throughput/power ratio
+   - **Spatial Fitness**: Penalize layouts with poor agent access or belt spaghetti
+
+```typescript
+/**
+ * Example: Generate iron plate factory
+ */
+const designer = new FactoryDesigner();
+
+const goal: ProductionGoal = {
+  outputItemId: 'iron_plate',
+  targetRate: 100, // 100 plates per minute
+  availableInputs: ['iron_ore'],
+  maxPower: 500, // 500 kW
+};
+
+const constraints: FactoryConstraints = {
+  maxSize: { width: 20, height: 20 },
+  agentType: 'ground', // Most agents can't fly
+  buildingMaterial: 'stone',
+  requiredFeatures: ['storage'],
+};
+
+// Generate initial factory layout
+const blueprint = designer.generateFactory(goal, constraints);
+
+// After running for a while, evolve the factory
+const metrics: FactoryMetrics = {
+  actualThroughput: 85, // Only 85 plates/min (target was 100)
+  powerUsage: 450,
+  bottlenecks: ['smelting'], // Smelters are bottleneck
+  agentAccessibility: 0.9, // Good agent access
+  beltUtilization: 0.7, // Belts 70% utilized
+};
+
+// Evolve factory to fix bottleneck
+const improvedBlueprint = designer.evolveFactory(blueprint, metrics, 10);
+// After 10 generations: adds more smelters, improves belt routing
+```
+
+**Flying vs Ground Agent Layouts:**
+
+```typescript
+// Ground agent factory: Wide corridors, single-level
+const groundFactory = {
+  corridorWidth: 2, // 2 tiles wide for agent movement
+  verticalLevels: 1, // Single floor
+  machineSpacing: 3, // Space between machines for pathfinding
+  doorways: true, // Explicit doorways for access
+};
+
+// Flying agent factory: Compact, multi-level
+const flyingFactory = {
+  corridorWidth: 0, // No corridors needed
+  verticalLevels: 3, // Stack machines vertically
+  machineSpacing: 1, // Tight packing
+  aerialConnections: true, // Belts can cross over obstacles
+};
+```
+
+This ensures factory layouts adapt to the agents that will use them, with ground-based agents requiring accessible, navigable spaces while flying agents enable more compact, efficient designs.
 
 ---
 

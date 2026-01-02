@@ -93,6 +93,8 @@ import {
   LiveEntityAPI,
   GovernanceDataSystem,
   registerDefaultMaterials,
+  CourtshipSystem,
+  ReproductionSystem,
 } from '../packages/core/src/index.js';
 
 import {
@@ -102,6 +104,12 @@ import {
   StructuredPromptBuilder,
   type LLMProvider,
 } from '../packages/llm/src/index.js';
+
+import {
+  derivePrioritiesFromSkills,
+  generateRandomName,
+  generateRandomStartingSkills,
+} from '../packages/core/src/components/index.js';
 
 import {
   TerrainGenerator,
@@ -254,7 +262,7 @@ async function registerAllSystems(
   const craftingSystem = new CraftingSystem();
   craftingSystem.setRecipeRegistry(globalRecipeRegistry);
   gameLoop.systemRegistry.register(craftingSystem);
-  (gameLoop.world as any).craftingSystem = craftingSystem;
+  // Note: craftingSystem is accessible via systemRegistry, not directly on world
 
   // Skill systems
   gameLoop.systemRegistry.register(new SkillSystem());
@@ -269,7 +277,7 @@ async function registerAllSystems(
   // Market events
   const marketEventSystem = new MarketEventSystem(gameLoop.world.eventBus);
   gameLoop.systemRegistry.register(marketEventSystem);
-  (gameLoop.world as any).marketEventSystem = marketEventSystem;
+  // Note: marketEventSystem is accessible via systemRegistry, not directly on world
 
   // Research system
   const researchSystem = new ResearchSystem();
@@ -321,6 +329,10 @@ async function registerAllSystems(
 
   gameLoop.systemRegistry.register(new ReflectionSystem(gameLoop.world.eventBus));
   gameLoop.systemRegistry.register(new JournalingSystem(gameLoop.world.eventBus));
+
+  // Romance & Reproduction systems
+  gameLoop.systemRegistry.register(new CourtshipSystem());
+  gameLoop.systemRegistry.register(new ReproductionSystem());
 
   // Governance data system
   const governanceDataSystem = new GovernanceDataSystem();
@@ -403,7 +415,53 @@ function createInitialAgents(world: WorldMutator, agentCount: number = 5) {
     const x = centerX + offsetX * spread + Math.random() * 0.5;
     const y = centerY + offsetY * spread + Math.random() * 0.5;
 
+    // Create NPC agent with farming skills (not LLM agent)
     const agentId = createLLMAgent(world, x, y, 2.0);
+    const entity = world.getEntity(agentId);
+
+    if (entity) {
+      const agentEntity = entity as EntityImpl;
+
+      // Get personality component (created by createLLMAgent)
+      const personality = agentEntity.getComponent('personality');
+      if (!personality) {
+        throw new Error(`Agent ${agentId} missing personality component`);
+      }
+
+      // Generate farming-focused skills based on personality
+      const skills = generateRandomStartingSkills(personality);
+      skills.levels.farming = 3 + Math.floor(Math.random() * 2); // 3-4 farming skill
+      skills.levels.gathering = 2 + Math.floor(Math.random() * 2); // 2-3 gathering skill
+      skills.levels.building = 1 + Math.floor(Math.random() * 2); // 1-2 building skill
+
+      // Update skills component
+      agentEntity.updateComponent('skills', () => skills);
+
+      // Derive priorities from farming skills (gives high farming priority)
+      const priorities = derivePrioritiesFromSkills(skills);
+
+      // Convert to NPC (scripted) agent with farming priorities
+      agentEntity.updateComponent('agent', (current: any) => ({
+        ...current,
+        useLLM: false, // Use scripted behaviors only
+        tier: 'autonomic', // Autonomic tier = fully scripted
+        priorities, // Farming will be high priority
+        thinkInterval: 40, // Think every 2 seconds
+      }));
+
+      // Give starting seeds to kickstart farming
+      agentEntity.updateComponent('inventory', (inv: any) => {
+        const inventory = { ...inv };
+        // Add berry seeds
+        const seedSlot = inventory.slots.find((s: any) => !s.itemId);
+        if (seedSlot) {
+          seedSlot.itemId = 'seed:berry-bush';
+          seedSlot.quantity = 5;
+        }
+        return inventory;
+      });
+    }
+
     agentIds.push(agentId);
   }
 
@@ -423,14 +481,25 @@ function createInitialAgents(world: WorldMutator, agentCount: number = 5) {
   return agentIds;
 }
 
-function createInitialPlants(world: WorldMutator) {
+function createInitialPlants(world: WorldMutator, agentCount: number = 5) {
   const wildSpecies = getWildSpawnableSpecies();
-  const plantCount = 25;
+  // Scale berry bushes with NPC count: 4 berry bushes per NPC + some variety plants
+  const berryBushCount = agentCount * 4;
+  const varietyPlantCount = Math.floor(agentCount * 0.5);
+  const plantCount = berryBushCount + varietyPlantCount;
 
   for (let i = 0; i < plantCount; i++) {
     const x = -15 + Math.random() * 30;
     const y = -15 + Math.random() * 30;
-    const species = wildSpecies[Math.floor(Math.random() * wildSpecies.length)]!;
+
+    // First 80% of plants are berry bushes, rest are variety
+    const forceBerryBush = i < berryBushCount;
+    let species;
+    if (forceBerryBush) {
+      species = wildSpecies.find(s => s.id === 'berry-bush')!;
+    } else {
+      species = wildSpecies[Math.floor(Math.random() * wildSpecies.length)]!;
+    }
     const isEdibleSpecies = species.id === 'berry-bush';
 
     let stage: 'sprout' | 'vegetative' | 'mature' | 'seeding' = 'mature';
@@ -454,7 +523,8 @@ function createInitialPlants(world: WorldMutator) {
       ? Math.floor(species.seedsPerPlant * yieldAmount * 2)
       : (stage === 'mature' ? Math.floor(species.seedsPerPlant * yieldAmount) : 0);
 
-    const initialFruit = (stage === 'mature' && isEdibleSpecies) ? 6 + Math.floor(Math.random() * 7) : 0;
+    // Start berry bushes with LOTS of fruit to sustain NPCs while planted crops grow
+    const initialFruit = (stage === 'mature' && isEdibleSpecies) ? 20 + Math.floor(Math.random() * 20) : 0;
 
     const plantEntity = new EntityImpl(createEntityId(), (world as any)._tick);
     const plantComponent = new PlantComponent({
@@ -497,6 +567,69 @@ function createInitialAnimals(world: WorldMutator, spawningSystem: WildAnimalSpa
   }
 }
 
+/**
+ * Create pregenerated farms for larger settlements
+ * Organized rows of mature berry bushes to sustain NPCs
+ */
+function createPregeneratedFarms(world: WorldMutator, agentCount: number = 5) {
+  const wildSpecies = getWildSpawnableSpecies();
+  const berryBushSpecies = wildSpecies.find(s => s.id === 'berry-bush');
+  if (!berryBushSpecies) {
+    throw new Error('Berry bush species not found');
+  }
+
+  // Scale farm size: 10 berry bushes per NPC for sustainable food production
+  const bushesPerNPC = 10;
+  const totalBushes = agentCount * bushesPerNPC;
+
+  // Organize bushes in rows (grid layout like a real farm)
+  const bushesPerRow = Math.ceil(Math.sqrt(totalBushes));
+  const farmOriginX = 1; // Farm RIGHT AT SPAWN for immediate access
+  const farmOriginY = 1;
+  const spacing = 2.0; // Tighter spacing for dense farm
+
+  let bushesCreated = 0;
+  for (let row = 0; row < bushesPerRow && bushesCreated < totalBushes; row++) {
+    for (let col = 0; col < bushesPerRow && bushesCreated < totalBushes; col++) {
+      const x = farmOriginX + (col * spacing);
+      const y = farmOriginY + (row * spacing);
+
+      // All bushes are mature with abundant fruit
+      const initialFruit = 40 + Math.floor(Math.random() * 21); // 40-60 berries per bush
+
+      const plantEntity = new EntityImpl(createEntityId(), (world as any)._tick);
+      const plantComponent = new PlantComponent({
+        speciesId: 'berry-bush',
+        position: { x, y },
+        stage: 'mature',
+        stageProgress: 0.8 + Math.random() * 0.2,
+        age: 20 + Math.floor(Math.random() * 10),
+        generation: 0,
+        health: 90 + Math.random() * 10,
+        hydration: 70 + Math.random() * 20,
+        nutrition: 70 + Math.random() * 20,
+        genetics: { ...berryBushSpecies.baseGenetics },
+        seedsProduced: Math.floor(berryBushSpecies.seedsPerPlant * berryBushSpecies.baseGenetics.yieldAmount),
+        fruitCount: initialFruit,
+      });
+
+      (plantComponent as any).entityId = plantEntity.id;
+      plantEntity.addComponent(plantComponent);
+      plantEntity.addComponent(createPositionComponent(x, y));
+      plantEntity.addComponent(createRenderableComponent('berry-bush', 'plant'));
+      (world as any)._addEntity(plantEntity);
+
+      bushesCreated++;
+    }
+  }
+
+  return {
+    totalBushes: bushesCreated,
+    estimatedBerries: bushesCreated * 50, // Average 50 berries per bush
+    farmArea: { x: farmOriginX, y: farmOriginY, width: bushesPerRow * spacing, height: bushesPerRow * spacing },
+  };
+}
+
 // ============================================================================
 // LLM PROVIDER SETUP
 // ============================================================================
@@ -508,16 +641,37 @@ async function setupLLMProvider(): Promise<{
 }> {
   const isMac = process.platform === 'darwin';
 
-  // Try MLX first on macOS, then Ollama
+  // Try Groq first (from .env file)
+  const groqApiKey = process.env.GROQ_API_KEY;
+  const groqModel = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+
+  if (groqApiKey) {
+    try {
+      console.log(`[HeadlessGame] Using Groq API with model: ${groqModel}`);
+      const provider = new OpenAICompatProvider(
+        groqModel,
+        'https://api.groq.com/openai/v1',
+        groqApiKey
+      );
+      const queue = new LLMDecisionQueue(provider, 3);
+      const promptBuilder = new StructuredPromptBuilder();
+      return { provider, queue, promptBuilder };
+    } catch (error) {
+      console.error('[HeadlessGame] Groq setup failed:', error);
+    }
+  }
+
+  // Try MLX on macOS
   if (isMac) {
     try {
       const response = await fetch('http://localhost:8080/v1/models', { method: 'GET' });
       if (response.ok) {
         console.log('[HeadlessGame] Using MLX server');
-        const provider = new OpenAICompatProvider({
-          baseUrl: 'http://localhost:8080',
-          model: 'mlx-community/Qwen3-4B-Instruct-4bit',
-        });
+        const provider = new OpenAICompatProvider(
+          'mlx-community/Qwen3-4B-Instruct-4bit',
+          'http://localhost:8080',
+          '' // No API key for local MLX
+        );
         const queue = new LLMDecisionQueue(provider, 3);
         const promptBuilder = new StructuredPromptBuilder();
         return { provider, queue, promptBuilder };
@@ -580,10 +734,33 @@ async function main() {
   // Building blueprints are auto-registered by World when needed
   // No need to manually register here
 
+  // Generate terrain (required for farming system to calculate tillable tiles)
+  console.log('[HeadlessGame] Generating terrain...');
+  const terrainGenerator = new TerrainGenerator('headless-farming-sim');
+  const chunkManager = new ChunkManager(3); // Render distance 3
+
+  // Generate initial 3x3 chunk grid around spawn
+  for (let cy = -1; cy <= 1; cy++) {
+    for (let cx = -1; cx <= 1; cx++) {
+      const chunk = chunkManager.getChunk(cx, cy);
+      terrainGenerator.generateChunk(chunk, baseGameLoop.world);
+    }
+  }
+
+  // Attach terrain to world (enables world.getTileAt())
+  (baseGameLoop.world as any).setChunkManager(chunkManager);
+  (baseGameLoop.world as any).setTerrainGenerator(terrainGenerator);
+  console.log('[HeadlessGame] Terrain ready - farming utilities can now detect tillable grass');
+
+  // Set up building registry (for building placement/validation)
+  const blueprintRegistry = new BuildingBlueprintRegistry();
+  registerShopBlueprints(blueprintRegistry);
+  (baseGameLoop.world as any).buildingRegistry = blueprintRegistry;
+
   // Set up world entity
   const worldEntity = new EntityImpl(createEntityId(), baseGameLoop.world.tick);
   worldEntity.addComponent(createTimeComponent());
-  worldEntity.addComponent(createWeatherComponent());
+  worldEntity.addComponent(createWeatherComponent('clear', 0, 0)); // Start with clear weather
   worldEntity.addComponent(createNamedLandmarksComponent());
   (baseGameLoop.world as any)._addEntity(worldEntity);
   (baseGameLoop.world as any)._worldEntityId = worldEntity.id;
@@ -601,8 +778,21 @@ async function main() {
   console.log('[HeadlessGame] Creating initial entities...');
   createInitialBuildings(baseGameLoop.world);
   createInitialAgents(baseGameLoop.world, agentCount);
-  createInitialPlants(baseGameLoop.world);
+  createInitialPlants(baseGameLoop.world, agentCount);
+
+  // Create pregenerated farms for larger settlements
+  const farmStats = createPregeneratedFarms(baseGameLoop.world, agentCount);
+  console.log(`[HeadlessGame] Created pregenerated farm: ${farmStats.totalBushes} berry bushes (~${farmStats.estimatedBerries} berries)`);
+
   createInitialAnimals(baseGameLoop.world, wildAnimalSpawning);
+
+  // Validate and fix broken plants
+  console.log('[HeadlessGame] Validating plants...');
+  const { validateAndFixPlants } = await import('./fix-broken-plants.js');
+  const plantValidation = validateAndFixPlants(baseGameLoop.world);
+  if (plantValidation.broken > 0) {
+    console.log(`[HeadlessGame] Removed ${plantValidation.broken} broken plants`);
+  }
 
   // Start the game
   console.log('[HeadlessGame] Starting game loop...');

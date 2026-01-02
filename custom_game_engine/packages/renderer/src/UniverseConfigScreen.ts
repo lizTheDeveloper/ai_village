@@ -462,7 +462,7 @@ export class UniverseConfigScreen {
         const entitiesSection = document.createElement('div');
         entitiesSection.innerHTML = `
           <div style="font-size: 12px; color: #9c27b0; margin-bottom: 8px; font-weight: bold;">Entities in this world:</div>
-          <div style="font-size: 11px; color: #b388ff; line-height: 1.5;">${effects.availableEntities.map(e => e.replace(/_/g, ' ')).join(', ')}</div>
+          <div style="font-size: 11px; color: #b388ff; line-height: 1.5;">${effects.availableEntities.map((e: any) => e.replace(/_/g, ' ')).join(', ')}</div>
         `;
         container.appendChild(entitiesSection);
       }

@@ -18,6 +18,12 @@ export interface Entity {
 
   /** All components attached to this entity */
   readonly components: ReadonlyMap<ComponentType, Component>;
+
+  /** Check if entity has a component */
+  hasComponent(type: ComponentType): boolean;
+
+  /** Get a component by type */
+  getComponent<T extends Component>(type: ComponentType): T | undefined;
 }
 
 /**

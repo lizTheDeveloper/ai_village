@@ -132,11 +132,12 @@ You can locate resources others cannot find.`,
 
   cooking: {
     0: null,
-    1: 'You can prepare basic food. Cooking makes food safer and more nutritious.',
+    1: 'You can prepare basic food and butcher animals at a butchering table. Cooking makes food safer and more nutritious.',
     2: `You understand cooking basics:
 - Heat control affects results
 - Ingredient combinations matter
-- Timing is important for texture`,
+- Timing is important for texture
+- Butchering technique affects meat yield`,
     3: `Your cooking knowledge includes:
 - Recipe modification techniques
 - Flavor balancing principles

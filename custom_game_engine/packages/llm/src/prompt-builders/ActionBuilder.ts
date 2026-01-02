@@ -135,6 +135,68 @@ export class ActionBuilder {
       gathering.push('cook - Cook food at a campfire or oven');
     }
 
+    // Hunting (requires combat skill)
+    const combatSkill = skillLevels.combat ?? 0;
+
+    if (combatSkill >= 1 && world && entity) {
+      // Check if there are wild (untamed) animals nearby
+      const allAnimals = world.query()?.with?.('animal')?.executeEntities?.() ?? [];
+      const entityPos = entity.components.get('position') as (Component & { x: number; y: number }) | undefined;
+
+      if (entityPos && allAnimals.length > 0) {
+        const hasWildAnimals = allAnimals.some((animal: Entity) => {
+          const animalComp = animal.components.get('animal') as (Component & { tamed?: boolean }) | undefined;
+          const animalPos = animal.components.get('position') as (Component & { x: number; y: number }) | undefined;
+
+          if (!animalComp || !animalPos || animalComp.tamed) return false;
+
+          // Check if within reasonable distance (20 tiles)
+          const dx = animalPos.x - entityPos.x;
+          const dy = animalPos.y - entityPos.y;
+          const distSq = dx * dx + dy * dy;
+          return distSq < 400; // 20 * 20
+        });
+
+        if (hasWildAnimals) {
+          gathering.push('hunt - Hunt a wild animal for meat and resources (requires combat skill)');
+        }
+      }
+    }
+
+    // Butchering (requires cooking skill and butchering table)
+    if (cookingSkill >= 1 && world && entity) {
+      const entityPos = entity.components.get('position') as (Component & { x: number; y: number }) | undefined;
+
+      if (entityPos) {
+        // Check if there's a butchering table nearby
+        const hasButcheringTable = vision?.seenBuildings?.some((buildingId: string) => {
+          const building = world.getEntity(buildingId);
+          if (!building) return false;
+          const buildingComp = building.components.get('building') as (Component & { buildingType?: string; isComplete?: boolean }) | undefined;
+          return buildingComp?.buildingType === 'butchering_table' && buildingComp.isComplete;
+        });
+
+        // Check if there are tame animals nearby
+        const allAnimals = world.query()?.with?.('animal')?.executeEntities?.() ?? [];
+        const hasTameAnimals = allAnimals.some((animal: Entity) => {
+          const animalComp = animal.components.get('animal') as (Component & { tamed?: boolean }) | undefined;
+          const animalPos = animal.components.get('position') as (Component & { x: number; y: number }) | undefined;
+
+          if (!animalComp || !animalPos || !animalComp.tamed) return false;
+
+          // Check if within reasonable distance (20 tiles)
+          const dx = animalPos.x - entityPos.x;
+          const dy = animalPos.y - entityPos.y;
+          const distSq = dx * dx + dy * dy;
+          return distSq < 400; // 20 * 20
+        });
+
+        if (hasButcheringTable && hasTameAnimals) {
+          gathering.push('butcher - Butcher a tame animal at butchering table for meat, hide, and bones (requires cooking skill)');
+        }
+      }
+    }
+
     // Animal handling
     if (animalHandlingSkill >= 2) {
       social.push('tame - Tame a wild animal');
@@ -236,7 +298,7 @@ export class ActionBuilder {
         return building?.isComplete;
       })
       .map((b: Entity) => b.components.get('inventory') as InventoryComponent | undefined)
-      .filter((inv): inv is InventoryComponent => inv !== undefined);
+      .filter((inv: InventoryComponent | undefined): inv is InventoryComponent => inv !== undefined);
 
     let totalFood = 0;
     for (const inv of allStorageInventories) {

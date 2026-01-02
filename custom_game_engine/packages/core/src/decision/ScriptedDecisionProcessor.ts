@@ -214,6 +214,9 @@ export class ScriptedDecisionProcessor {
   }
   /**
    * Find nearest resources of each type within detection range.
+   *
+   * Performance: Uses chunk-based spatial lookup instead of querying all entities.
+   * Only checks entities in nearby chunks based on DETECTION_RANGE.
    */
   private findNearestResources(
     world: World,
@@ -223,53 +226,66 @@ export class ScriptedDecisionProcessor {
     hasStone: boolean
   ): { food: ResourceTarget | null; wood: ResourceTarget | null; stone: ResourceTarget | null } {
     const result = { food: null as ResourceTarget | null, wood: null as ResourceTarget | null, stone: null as ResourceTarget | null };
-    // Check resources - optimized to check distance first to avoid processing faraway resources
-    const resources = world.query().with(ComponentType.Resource).with(ComponentType.Position).executeEntities();
-    for (const resource of resources) {
-      const resourceImpl = resource as EntityImpl;
-      const resourcePos = resourceImpl.getComponent<PositionComponent>(ComponentType.Position);
 
-      // Early distance check - skip faraway resources immediately
-      if (!resourcePos) continue;
-      const distance = this.distance(position, resourcePos);
-      if (distance > DETECTION_RANGE) continue;
+    const CHUNK_SIZE = 32;
+    const chunkX = Math.floor(position.x / CHUNK_SIZE);
+    const chunkY = Math.floor(position.y / CHUNK_SIZE);
+    const chunkRange = Math.ceil(DETECTION_RANGE / CHUNK_SIZE);
 
-      const resourceComp = resourceImpl.getComponent<ResourceComponent>(ComponentType.Resource);
-      if (!resourceComp || !resourceComp.harvestable || resourceComp.amount <= 0) continue;
+    // Check entities in nearby chunks
+    for (let dx = -chunkRange; dx <= chunkRange; dx++) {
+      for (let dy = -chunkRange; dy <= chunkRange; dy++) {
+        const nearbyEntityIds = world.getEntitiesInChunk(chunkX + dx, chunkY + dy);
 
-      // Only consider resources we need
-      if (resourceComp.resourceType === 'wood' && hasWood) continue;
-      if (resourceComp.resourceType === 'stone' && hasStone) continue;
-      if (resourceComp.resourceType === 'food' && hasFood) continue;
+        for (const entityId of nearbyEntityIds) {
+          const entity = world.entities.get(entityId);
+          if (!entity) continue;
 
-      if (resourceComp.resourceType === 'food' && (!result.food || distance < result.food.distance)) {
-        result.food = { type: 'food', distance, isPlant: false };
-      } else if (resourceComp.resourceType === 'wood' && (!result.wood || distance < result.wood.distance)) {
-        result.wood = { type: 'wood', distance };
-      } else if (resourceComp.resourceType === 'stone' && (!result.stone || distance < result.stone.distance)) {
-        result.stone = { type: 'stone', distance };
-      }
-    }
-    // Also search for edible plants with fruit - check distance first
-    if (!hasFood) {
-      const plants = world.query().with(ComponentType.Plant).with(ComponentType.Position).executeEntities();
-      for (const plant of plants) {
-        const plantImpl = plant as EntityImpl;
-        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+          const entityImpl = entity as EntityImpl;
+          const entityPos = entityImpl.getComponent<PositionComponent>(ComponentType.Position);
+          if (!entityPos) continue;
 
-        // Early distance check - skip faraway plants immediately
-        if (!plantPos) continue;
-        const distance = this.distance(position, plantPos);
-        if (distance > DETECTION_RANGE) continue;
+          // Manhattan distance early exit
+          const manhattanDist = Math.abs(entityPos.x - position.x) + Math.abs(entityPos.y - position.y);
+          if (manhattanDist > DETECTION_RANGE * 1.5) continue;
 
-        const plantComp = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
-        if (!plantComp) continue;
+          // Check if it's a Resource
+          const resourceComp = entityImpl.getComponent<ResourceComponent>(ComponentType.Resource);
+          if (resourceComp && resourceComp.harvestable && resourceComp.amount > 0) {
+            // Only consider resources we need
+            if (resourceComp.resourceType === 'wood' && hasWood) continue;
+            if (resourceComp.resourceType === 'stone' && hasStone) continue;
+            if (resourceComp.resourceType === 'food' && hasFood) continue;
 
-        const isEdible = EDIBLE_SPECIES.includes(plantComp.speciesId);
-        const hasFruit = plantComp.fruitCount > 0;
-        const isHarvestable = ['fruiting', 'mature', 'seeding'].includes(plantComp.stage);
-        if (isEdible && hasFruit && isHarvestable && (!result.food || distance < result.food.distance)) {
-          result.food = { type: 'food', distance, isPlant: true };
+            const distance = this.distance(position, entityPos);
+            if (distance > DETECTION_RANGE) continue;
+
+            if (resourceComp.resourceType === 'food' && (!result.food || distance < result.food.distance)) {
+              result.food = { type: 'food', distance, isPlant: false };
+            } else if (resourceComp.resourceType === 'wood' && (!result.wood || distance < result.wood.distance)) {
+              result.wood = { type: 'wood', distance };
+            } else if (resourceComp.resourceType === 'stone' && (!result.stone || distance < result.stone.distance)) {
+              result.stone = { type: 'stone', distance };
+            }
+            continue;
+          }
+
+          // Check if it's an edible Plant with fruit
+          if (!hasFood) {
+            const plantComp = entityImpl.getComponent<PlantComponent>(ComponentType.Plant);
+            if (plantComp) {
+              const isEdible = EDIBLE_SPECIES.includes(plantComp.speciesId);
+              const hasFruit = plantComp.fruitCount > 0;
+              const isHarvestable = ['fruiting', 'mature', 'seeding'].includes(plantComp.stage);
+
+              if (isEdible && hasFruit && isHarvestable) {
+                const distance = this.distance(position, entityPos);
+                if (distance <= DETECTION_RANGE && (!result.food || distance < result.food.distance)) {
+                  result.food = { type: 'food', distance, isPlant: true };
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -368,6 +384,8 @@ export class ScriptedDecisionProcessor {
   }
   /**
    * Check if agent should gather seeds from nearby plants.
+   *
+   * Performance: Uses chunk-based spatial lookup instead of querying all plants.
    */
   private checkSeedGathering(
     entity: EntityImpl,
@@ -375,25 +393,47 @@ export class ScriptedDecisionProcessor {
   ): ScriptedDecisionResult | null {
     const position = entity.getComponent<PositionComponent>(ComponentType.Position);
     if (!position) return null;
-    // Find nearby plants with seeds
-    const plantsWithSeeds = world
-      .query()
-      .with(ComponentType.Plant)
-      .with(ComponentType.Position)
-      .executeEntities()
-      .filter((plantEntity) => {
-        const plantImpl = plantEntity as EntityImpl;
-        const plant = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
-        const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
-        if (!plant || !plantPos) return false;
-        // Check if plant has seeds and is at a valid stage
-        const validStages = ['mature', 'seeding', 'senescence'];
-        if (!validStages.includes(plant.stage)) return false;
-        if (plant.seedsProduced <= 0) return false;
-        // Check distance
-        const distance = this.distance(position, plantPos);
-        return distance <= DETECTION_RANGE;
-      });
+
+    const CHUNK_SIZE = 32;
+    const chunkX = Math.floor(position.x / CHUNK_SIZE);
+    const chunkY = Math.floor(position.y / CHUNK_SIZE);
+    const chunkRange = Math.ceil(DETECTION_RANGE / CHUNK_SIZE);
+
+    const plantsWithSeeds: Entity[] = [];
+    const validStages = ['mature', 'seeding', 'senescence'];
+
+    // Check entities in nearby chunks
+    for (let dx = -chunkRange; dx <= chunkRange; dx++) {
+      for (let dy = -chunkRange; dy <= chunkRange; dy++) {
+        const nearbyEntityIds = world.getEntitiesInChunk(chunkX + dx, chunkY + dy);
+
+        for (const entityId of nearbyEntityIds) {
+          const nearbyEntity = world.entities.get(entityId);
+          if (!nearbyEntity) continue;
+
+          const plantImpl = nearbyEntity as EntityImpl;
+          const plant = plantImpl.getComponent<PlantComponent>(ComponentType.Plant);
+          if (!plant) continue;
+
+          // Check if plant has seeds and is at a valid stage
+          if (!validStages.includes(plant.stage)) continue;
+          if (plant.seedsProduced <= 0) continue;
+
+          const plantPos = plantImpl.getComponent<PositionComponent>(ComponentType.Position);
+          if (!plantPos) continue;
+
+          // Manhattan distance early exit
+          const manhattanDist = Math.abs(plantPos.x - position.x) + Math.abs(plantPos.y - position.y);
+          if (manhattanDist > DETECTION_RANGE * 1.5) continue;
+
+          const distance = this.distance(position, plantPos);
+          if (distance <= DETECTION_RANGE) {
+            plantsWithSeeds.push(nearbyEntity);
+          }
+        }
+      }
+    }
+
     if (plantsWithSeeds.length === 0) return null;
     // Choose a random plant to gather from
     const targetPlant = plantsWithSeeds[Math.floor(Math.random() * plantsWithSeeds.length)]!;

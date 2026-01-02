@@ -2,6 +2,10 @@
 
 > *This project is dedicated to Tarn Adams and Dwarf Fortress. See [README.md](./README.md) for our philosophy on open source, monetization, and the inspirations behind this project.*
 
+## Project Roadmap
+
+The master development roadmap is located at [MASTER_ROADMAP.md](../MASTER_ROADMAP.md) in the project root. This document outlines the project's development phases, completed features, and planned work.
+
 ## Help System
 
 Items/effects embed documentation via `help` field. Wiki auto-generates from definitions. See `packages/core/src/help/README.md` and `documentedItems.example.ts`.
@@ -101,6 +105,169 @@ tags = data.get("tags", [])
 health = data.get("health", 100)  # WRONG - masks missing data
 ```
 
+## Value Normalization: Softmax Over Clamp
+
+**NEVER use clamping (Math.min/Math.max) to force values into valid ranges.** Clamping hides the root cause of out-of-range values. Instead, use proper mathematical normalization that preserves distribution and signals problems.
+
+### Prohibited Patterns
+
+```typescript
+// ❌ BAD: Clamping hides the problem
+efficiency = Math.min(1.0, Math.max(0.0, rawEfficiency));
+paranoia = Math.min(1.0, paranoia + 0.1);  // What if paranoia was already 0.95?
+
+// ❌ BAD: "Clamp and pray" - value out of range is a bug
+health = Math.max(0, health - damage);  // Why would health go negative? Fix the cause!
+
+// ❌ BAD: Silent normalization masks invalid state
+const total = values.reduce((sum, v) => sum + v, 0);
+const normalized = values.map(v => v / total || 0);  // Hides division by zero
+```
+
+### Required Patterns
+
+```typescript
+// ✅ GOOD: Throw if value is out of expected range
+if (efficiency < 0 || efficiency > 1) {
+  throw new RangeError(`Efficiency ${efficiency} out of valid range [0, 1]`);
+}
+
+// ✅ GOOD: Use softmax for probability distributions
+function softmax(values: number[]): number[] {
+  const max = Math.max(...values);
+  const exps = values.map(v => Math.exp(v - max));  // Subtract max for numerical stability
+  const sum = exps.reduce((a, b) => a + b, 0);
+
+  if (sum === 0) {
+    throw new Error('Softmax encountered zero sum - input values too small');
+  }
+
+  return exps.map(e => e / sum);
+}
+
+// ✅ GOOD: Use sigmoid for smooth [0,1] mapping
+function sigmoid(x: number): number {
+  return 1 / (1 + Math.exp(-x));
+}
+
+// ✅ GOOD: Explicit saturation with bounds checking
+function saturate(value: number, min: number, max: number): number {
+  if (value < min) {
+    console.warn(`Value ${value} below minimum ${min}, saturating`);
+    return min;
+  }
+  if (value > max) {
+    console.warn(`Value ${value} above maximum ${max}, saturating`);
+    return max;
+  }
+  return value;
+}
+
+// ✅ GOOD: Normalize with validation
+function normalizeWeights(weights: number[]): number[] {
+  const sum = weights.reduce((a, b) => a + b, 0);
+
+  if (sum <= 0) {
+    throw new Error(`Cannot normalize weights with sum ${sum}`);
+  }
+
+  if (weights.some(w => w < 0)) {
+    throw new Error(`Negative weight found: ${weights}`);
+  }
+
+  return weights.map(w => w / sum);
+}
+```
+
+### When Saturation is OK
+
+Saturation (limiting to a range) is acceptable when:
+1. **You explicitly document why** the value might exceed bounds
+2. **You log a warning** so the issue is visible
+3. **The saturation is the intended behavior**, not a bug fix
+
+```typescript
+// ✅ GOOD: Documented saturation with logging
+/**
+ * Apply damage to entity health.
+ * Health is saturated to [0, maxHealth] range.
+ */
+function applyDamage(entity: Entity, damage: number): void {
+  const health = entity.health - damage;
+
+  if (health > entity.maxHealth) {
+    // This shouldn't happen, but clamp to max if healing overflow occurs
+    console.warn(`[${entity.id}] Health ${health} exceeds max ${entity.maxHealth}, clamping`);
+    entity.health = entity.maxHealth;
+  } else if (health < 0) {
+    // Death - health goes to exactly 0
+    entity.health = 0;
+    entity.triggerDeath();
+  } else {
+    entity.health = health;
+  }
+}
+```
+
+### Helper Functions
+
+Create reusable normalization utilities:
+
+```typescript
+// packages/core/src/utils/math.ts
+
+/**
+ * Softmax - converts values to probability distribution
+ * Use for: AI decision weights, priority distributions
+ */
+export function softmax(values: number[]): number[] {
+  if (values.length === 0) {
+    throw new Error('Softmax requires non-empty array');
+  }
+
+  const max = Math.max(...values);
+  const exps = values.map(v => Math.exp(v - max));
+  const sum = exps.reduce((a, b) => a + b, 0);
+
+  if (sum === 0) {
+    throw new Error(`Softmax sum is zero for values: ${values}`);
+  }
+
+  return exps.map(e => e / sum);
+}
+
+/**
+ * Sigmoid - smooth [0,1] mapping
+ * Use for: Efficiency curves, gradual effects
+ */
+export function sigmoid(x: number, steepness: number = 1): number {
+  return 1 / (1 + Math.exp(-steepness * x));
+}
+
+/**
+ * Linear interpolation with bounds checking
+ */
+export function lerp(a: number, b: number, t: number): number {
+  if (t < 0 || t > 1) {
+    throw new RangeError(`lerp t=${t} must be in [0, 1]`);
+  }
+  return a + (b - a) * t;
+}
+
+/**
+ * Normalize array to sum to 1.0
+ */
+export function normalize(values: number[]): number[] {
+  const sum = values.reduce((a, b) => a + b, 0);
+
+  if (sum <= 0) {
+    throw new Error(`Cannot normalize values with sum ${sum}: ${values}`);
+  }
+
+  return values.map(v => v / sum);
+}
+```
+
 ## Type Safety
 
 1. **Always validate data at system boundaries** (API responses, file reads, user input)
@@ -162,6 +329,85 @@ return fallback;
 // GOOD: Throw with context
 throw new ParseError(`Could not parse: ${text}. Valid options: ${validOptions}`);
 ```
+
+## Performance Guidelines
+
+**See [PERFORMANCE.md](custom_game_engine/PERFORMANCE.md) for comprehensive performance guide.**
+
+This game is an Entity Component System (ECS) running at 20 ticks per second. Performance is critical.
+
+### Critical Rules for AI Agents
+
+1. **Never call `world.query()` inside loops** - Cache the result before the loop
+2. **Use squared distance comparisons** - Avoid `Math.sqrt()` in hot paths
+3. **Use `x * x` instead of `Math.pow(x, 2)`** - Direct multiplication is faster
+4. **Cache singleton entities** - Time, weather entities rarely change
+5. **Throttle non-critical systems** - Add `UPDATE_INTERVAL` if not needed every tick
+6. **No console.log in systems** - Use only `console.error` for actual errors
+
+### Quick Examples
+
+```typescript
+// ❌ BAD: Query in loop
+for (const entity of entities) {
+  const others = world.query().with(CT.Position).executeEntities();
+}
+
+// ✅ GOOD: Cache before loop
+const others = world.query().with(CT.Position).executeEntities();
+for (const entity of entities) {
+  // ... use others
+}
+
+// ❌ BAD: Math.sqrt for comparison
+if (Math.sqrt(dx * dx + dy * dy) < radius) { }
+
+// ✅ GOOD: Squared distance
+if (dx * dx + dy * dy < radius * radius) { }
+
+// ❌ BAD: Repeated singleton query
+update(world: World) {
+  const time = world.query().with(CT.Time).executeEntities()[0];
+}
+
+// ✅ GOOD: Cache singleton entity ID
+private timeEntityId: string | null = null;
+update(world: World) {
+  if (!this.timeEntityId) {
+    const entities = world.query().with(CT.Time).executeEntities();
+    if (entities.length > 0) {
+      this.timeEntityId = entities[0]!.id;
+    }
+  }
+  const time = this.timeEntityId ? world.getEntity(this.timeEntityId) : null;
+}
+```
+
+### Helper Utilities
+
+Use helpers from `packages/core/src/utils/performance.ts`:
+
+```typescript
+import { distanceSquared, isWithinRadius, CachedQuery, SingletonCache } from '../utils/performance.js';
+
+// Distance helpers
+if (isWithinRadius(pos1, pos2, 5)) { /* ... */ }
+
+// Auto-caching queries
+export class MySystem implements System {
+  private agents = new CachedQuery('agent', 'position');
+  private timeEntity = new SingletonCache(CT.Time);
+
+  update(world: World) {
+    const agents = this.agents.get(world); // Caches per tick
+    const time = this.timeEntity.get(world); // Caches forever
+  }
+}
+```
+
+### Automatic Linting
+
+ESLint will catch common performance issues. See `.eslintrc.performance.json` for rules.
 
 ## Running the Game
 

@@ -121,6 +121,7 @@ export class GatherBehavior extends BaseBehavior {
     const position = entity.getComponent<PositionComponent>(ComponentType.Position)!;
     const inventory = entity.getComponent<InventoryComponent>(ComponentType.Inventory);
     const agent = entity.getComponent<AgentComponent>(ComponentType.Agent)!;
+    const needs = entity.getComponent<NeedsComponent>(ComponentType.Needs);
 
     // Disable steering system so it doesn't override our gather movement
     this.disableSteering(entity);
@@ -132,11 +133,45 @@ export class GatherBehavior extends BaseBehavior {
       return;
     }
 
-    // Determine preferred resource type from behaviorState
-    const preferredType = agent.behaviorState?.resourceType as string | undefined;
+    // STARVATION PREVENTION: Check hunger and override resource preference if starving
+    let preferredType = agent.behaviorState?.resourceType as string | undefined;
+    let isStarvingMode = false;
+
+    if (needs) {
+      const hunger = needs.hunger;
+
+      // If critically hungry (< 30), force food gathering
+      if (hunger < 30) {
+        // Override any other gathering task - survival comes first
+        // Don't specify a type - this will make findGatherTarget prioritize ANY food
+        preferredType = undefined;
+        isStarvingMode = true;
+
+        // Emit critical need event for metrics tracking
+        if (hunger < 15) {
+          world.eventBus.emit({
+            type: 'need:critical',
+            source: entity.id,
+            data: {
+              agentId: entity.id,
+              entityId: entity.id,
+              needType: 'hunger',
+              value: hunger,
+              survivalRelevance: 100, // Starvation is critical for survival
+            },
+          });
+        }
+      }
+      // If moderately hungry (< 50), prefer food but don't override critical tasks
+      else if (hunger < 50 && !agent.behaviorState?.returnToBuild) {
+        preferredType = undefined;
+        isStarvingMode = true;
+      }
+    }
 
     // Find target (resource or plant with seeds)
-    const target = this.findGatherTarget(world, position, preferredType, inventory);
+    // In starvation mode, prioritize food over any other resource
+    const target = this.findGatherTarget(world, position, preferredType, inventory, isStarvingMode);
 
     if (!target) {
       // No resources or seed-producing plants found, execute wander logic without changing behavior
@@ -623,8 +658,21 @@ export class GatherBehavior extends BaseBehavior {
     world: World,
     position: PositionComponent,
     preferredType: string | undefined,
-    _inventory: InventoryComponent
+    _inventory: InventoryComponent,
+    isStarvingMode: boolean = false
   ): { type: 'resource' | 'plant'; subtype?: 'fruit' | 'seeds'; entity: Entity; position: { x: number; y: number }; distance: number } | null {
+    // STARVATION MODE: Prioritize food gathering above all else
+    // When starving, search for edible fruit first regardless of other preferences
+    if (isStarvingMode) {
+      const fruitTarget = this.findNearestPlantWithFruit(world, position);
+      if (fruitTarget) {
+        return { type: 'plant', subtype: 'fruit', entity: fruitTarget.entity, position: fruitTarget.position, distance: fruitTarget.distance };
+      }
+      // No fruit found - starving agents will wander to find food
+      // Don't fallback to other resources when starving
+      return null;
+    }
+
     const isSeekingSeeds = preferredType === 'seeds';
     const isSeekingPlantFruit = preferredType && PLANT_FRUIT_TYPES.has(preferredType.toLowerCase());
 
@@ -1097,10 +1145,20 @@ export class GatherBehavior extends BaseBehavior {
       }
 
       // Update plant - reduce fruitCount
+      // CRITICAL FIX: Reset stage if all fruit harvested to enable regrowth
+      const species = (world as any).plantSpeciesLookup?.(plantComp.speciesId);
+      const newFruitCount = Math.max(0, (plantComp.fruitCount ?? 0) - result.amountAdded);
+
       plantImpl.updateComponent<PlantComponent>(ComponentType.Plant, (current) => {
         const updated = Object.create(Object.getPrototypeOf(current));
         Object.assign(updated, current);
-        updated.fruitCount = Math.max(0, (current.fruitCount ?? 0) - result.amountAdded);
+        updated.fruitCount = newFruitCount;
+
+        // If all fruit harvested and species supports regrowth, reset stage
+        if (newFruitCount === 0 && species?.harvestResetStage && !species.harvestDestroysPlant) {
+          updated.stage = species.harvestResetStage;
+        }
+
         return updated;
       });
 

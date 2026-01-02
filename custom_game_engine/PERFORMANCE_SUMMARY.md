@@ -9,7 +9,7 @@
 
 **Fix**: Killed all duplicates
 - 1 TypeScript watch
-- 1 Vite dev server  
+- 1 Vite dev server
 - 1 Metrics server
 
 **Impact**: CPU reduced from ~300% to ~10%
@@ -25,6 +25,22 @@
 - Tick-based throttling
 
 **Impact**: ~95% reduction (573K → ~12K memories)
+
+---
+
+### 3. ✅ Starvation Death Loop (CRITICAL - FIXED)
+**Problem**: 512,403 deaths from starvation in 6 hours
+- Agents gathered only 48 berries vs 108 consumed
+- GatherBehavior not prioritizing food when hungry
+
+**Fix** (`GatherBehavior.ts`):
+- Added hunger check in execute() method
+- When hunger < 30: override all tasks to gather food (starvation mode)
+- When hunger < 50: prefer food unless gathering for construction
+- Modified findGatherTarget() to prioritize edible fruit first when starving
+- Emit need:critical event when hunger < 15 for metrics tracking
+
+**Impact**: Agents now prioritize survival over other tasks
 
 ---
 

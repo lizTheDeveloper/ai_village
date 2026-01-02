@@ -469,6 +469,12 @@ export interface GameEventMap {
   'building:destroyed': {
     buildingId: EntityId;
   };
+  'building:claimed': {
+    agentId: EntityId;
+    buildingId: EntityId;
+    buildingType: string;
+    timestamp: number;
+  };
   'building:menu:opened': Record<string, never>;
   'building:menu:closed': Record<string, never>;
   'construction:started': {
@@ -639,6 +645,21 @@ export interface GameEventMap {
     duration: number;
     agent1?: EntityId;
     agent2?: EntityId;
+    /** Topics discussed in this conversation (Deep Conversation System) */
+    topics?: string[];
+    /** Conversation depth 0-1 (Deep Conversation System) */
+    depth?: number;
+    /** Message count in this conversation */
+    messageCount?: number;
+    /** Overall quality score 0-1 (Deep Conversation System) */
+    quality?: number;
+  };
+  /** A topic was shared during conversation (Deep Conversation System) */
+  'conversation:topic_shared': {
+    speakerId: EntityId;
+    listenerId: EntityId;
+    topic: string;
+    conversationId?: string;
   };
   'information:shared': {
     from: EntityId;
@@ -646,6 +667,57 @@ export interface GameEventMap {
     informationType: string;
     content: unknown;
     memoryType?: string;
+  };
+
+  // === Interest Evolution Events (Deep Conversation System - Phase 7.1) ===
+  /** A new interest emerged (from experience, skill, or conversation) */
+  'interest:emerged': {
+    agentId: EntityId;
+    agentName: string;
+    topic: string;
+    newIntensity: number;
+    source: string; // InterestSource
+    trigger?: string; // What caused it (e.g., 'skill:farming', 'agent:death', teacher name)
+  };
+  /** An interest strengthened significantly */
+  'interest:strengthened': {
+    agentId: EntityId;
+    agentName: string;
+    topic: string;
+    oldIntensity: number;
+    newIntensity: number;
+    source: string; // InterestSource
+    trigger?: string;
+  };
+  /** An interest weakened significantly */
+  'interest:weakened': {
+    agentId: EntityId;
+    agentName: string;
+    topic: string;
+    oldIntensity: number;
+    newIntensity: number;
+    source: string; // InterestSource
+    trigger?: string;
+  };
+  /** An interest was lost (decayed below threshold) */
+  'interest:lost': {
+    agentId: EntityId;
+    agentName: string;
+    topic: string;
+    oldIntensity: number;
+    newIntensity: number;
+    source: string; // InterestSource
+    trigger?: string;
+  };
+  /** An interest was transferred from teacher to student */
+  'interest:transferred': {
+    agentId: EntityId;
+    agentName: string;
+    topic: string;
+    oldIntensity?: number;
+    newIntensity: number;
+    source: string; // InterestSource (will be 'learned')
+    trigger?: string; // Teacher name
   };
 
   // === Memory Events ===
@@ -1212,12 +1284,37 @@ export interface GameEventMap {
     progress: number;
     progressRequired: number;
     agentId?: EntityId;
+    // Paper-based progress fields (Phase 13.1)
+    papersPublished?: number;
+    papersRequired?: number;
+    progressTowardNextPaper?: number;
+    paperPublished?: {
+      id: string;
+      title: string;
+      authors: string[];
+      isBreakthrough: boolean;
+    };
   };
   'research:completed': {
     researchId: string;
+    researchName?: string;
     researchers: EntityId[];
     unlocks: Array<{ type: string; id: string }>;
     tick: number;
+    // Paper bibliography (Phase 13.1)
+    bibliography?: {
+      paperCount: number;
+      papers: Array<{
+        id: string;
+        title: string;
+        authors: string[];
+        citations: number;
+        citedBy: number;
+        isBreakthrough: boolean;
+      }>;
+      leadResearcherId?: string;
+      contributorIds: string[];
+    };
   };
   'research:failed': {
     researchId: string;
@@ -1230,6 +1327,23 @@ export interface GameEventMap {
     insightId: string;
     content: string;
     breakthroughBonus: number;
+  };
+  // Paper publication events (Phase 13.1 - Academic Paper System)
+  'paper:published': {
+    paperId: string;
+    title: string;
+    firstAuthor: string;
+    coAuthors: string[];
+    researchId: string;
+    tier: number;
+    citationCount: number;
+    isBreakthrough: boolean;
+  };
+  'paper:cited': {
+    citingPaperId: string;
+    citedPaperId: string;
+    citedAuthorId: string;
+    citedAuthorName: string;
   };
   'discovery:created': {
     discoveryType: 'item' | 'recipe' | 'building' | 'research';
@@ -1246,6 +1360,43 @@ export interface GameEventMap {
     description: string;
   };
 
+  // === Experimentation & Recipe Discovery Events ===
+  'experiment:requested': {
+    agentId: EntityId;
+    ingredients: Array<{ itemId: string; quantity: number }>;
+    recipeType: string;
+  };
+  'experiment:success': {
+    recipeId: string;
+    itemId: string;
+    displayName: string;
+    message: string;
+    creativityScore: number;
+    autoApproved?: boolean;
+  };
+  'experiment:failed': {
+    reason: string;
+    message: string;
+    creativityScore?: number;
+  };
+  'experiment:pending_approval': {
+    pendingId: string;
+    itemId: string;
+    displayName: string;
+    message: string;
+    creativityScore: number;
+  };
+  'experiment:rejected': {
+    itemId: string;
+    displayName: string;
+    message: string;
+  };
+  'recipe:discovered': {
+    recipeId: string;
+    discoverer: string;
+    recipeType: string;
+  };
+
   // === Agent Lifecycle Events ===
   'agent:birth': {
     agentId: EntityId;
@@ -1260,12 +1411,94 @@ export interface GameEventMap {
     };
   };
 
+  // === Courtship & Reproduction Events ===
+  'courtship:interested': {
+    agentId: string;
+    targetId: string;
+    tick: number;
+  };
+
+  'courtship:initiated': {
+    initiatorId: string;
+    targetId: string;
+    tick: number;
+  };
+
+  'courtship:rejected': {
+    rejecterId: string;
+    initiatorId: string;
+    tick: number;
+  };
+
+  'courtship:consent': {
+    agent1: string;
+    agent2: string;
+    tick: number;
+    agent1Id?: string;
+    agent2Id?: string;
+    matingBehavior?: string;
+  };
+
+  'conception': {
+    pregnantAgentId: string;
+    otherParentId: string;
+    conceptionTick: number;
+  };
+
+  'parenting:assigned': {
+    parentId: string;
+    childId: string;
+    isPrimaryCaregiver: boolean;
+    careType: string;
+  };
+
+  'parenting:action': {
+    parentId: string;
+    childId: string;
+    quality: number;
+    skill: number;
+  };
+
+  'parenting:neglect': {
+    parentId: string;
+    childId: string;
+    wellbeing: number;
+    warnings: number;
+  };
+
+  'parenting:concern': {
+    parentId: string;
+    childId: string;
+    wellbeing: number;
+  };
+
+  'parenting:success': {
+    parentId: string;
+    childId: string;
+    wellbeing: number;
+  };
+
+  'parenting:ended': {
+    parentId: string;
+    childId: string;
+  };
+
   // === Mood Events ===
   'mood:changed': {
     agentId: EntityId;
     currentMood: number;
     emotionalState: string;
     description: string;
+  };
+
+  // === Interest Events (Deep Conversation System) ===
+  /** Agent has interests they strongly want to discuss */
+  'interest:hungry': {
+    agentId: EntityId;
+    /** Topics with high discussion hunger */
+    topics: string[];
+    /** Agent's depth hunger level 0-1 */
+    depthHunger: number;
   };
 
   // === Behavior Goal Events ===
@@ -1496,6 +1729,16 @@ export interface GameEventMap {
     bodyPart: string;
     injuryType: 'cut' | 'bruise' | 'fracture' | 'burn' | 'puncture';
     severity: 'minor' | 'moderate' | 'severe' | 'critical';
+  };
+
+  /** Destiny affected combat outcome (Phase 36: Hero Protection) */
+  'combat:destiny_intervention': {
+    agentId: EntityId;
+    luckModifier: number;
+    attackerLuck: number;
+    defenderLuck: number;
+    narrative: string;
+    survived?: boolean;
   };
 
   // ============================================================================
@@ -2177,6 +2420,45 @@ export interface GameEventMap {
   };
 
   // ============================================================================
+  // Soul Creation Events
+  // ============================================================================
+
+  /** Soul creation ceremony started */
+  'soul:ceremony_started': {
+    context: {
+      parentSouls?: string[];
+      culture?: string;
+      cosmicAlignment: number;
+      isReforging?: boolean;
+      previousWisdom?: number;
+      previousLives?: number;
+    };
+    observers?: string[];
+  };
+
+  /** One of the Fates speaks during ceremony */
+  'soul:fate_speaks': {
+    speaker: 'weaver' | 'spinner' | 'cutter';
+    text: string;
+    topic: 'examination' | 'purpose' | 'interests' | 'destiny' | 'debate' | 'blessing' | 'curse' | 'finalization';
+  };
+
+  /** Soul creation ceremony completed */
+  'soul:ceremony_complete': {
+    soulId: string;
+    purpose: string;
+    interests: string[];
+    destiny?: string;
+    archetype: string;
+    transcript: Array<{
+      speaker: 'weaver' | 'spinner' | 'cutter' | 'soul' | 'chorus';
+      text: string;
+      tick: number;
+      topic: 'examination' | 'purpose' | 'interests' | 'destiny' | 'debate' | 'blessing' | 'curse' | 'finalization';
+    }>;
+  };
+
+  // ============================================================================
   // Input Events
   // ============================================================================
 
@@ -2241,6 +2523,34 @@ export interface GameEventMap {
     routingReason: string;
     /** Deity ID if routing was based on deity worship */
     routingDeity?: string;
+  };
+
+  /** Death judgment conversation started with psychopomp */
+  'death:judgment_started': {
+    entityId: string;
+    psychopompName: string;
+    causeOfDeath: string;
+  };
+
+  /** Exchange in death judgment conversation */
+  'death:exchange': {
+    entityId: string;
+    speaker: 'psychopomp' | 'soul';
+    text: string;
+    exchangeIndex: number;
+  };
+
+  /** Judgment delivered by psychopomp */
+  'death:judgment_delivered': {
+    entityId: string;
+    peace: number;
+    tether: number;
+    coherenceModifier: number;
+  };
+
+  /** Soul ready to cross over to afterlife */
+  'death:crossing_over': {
+    entityId: string;
   };
 
   /** Soul became a shade (lost identity) */
@@ -2308,6 +2618,53 @@ export interface GameEventMap {
     previousName?: string;
     /** Name in new life */
     newName: string;
+  };
+
+  // ============================================================================
+  // Death Bargain Events (Psychopomp Challenge System)
+  // ============================================================================
+
+  /** Psychopomp offers bargain to dying soul */
+  'death:bargain_offered': {
+    entityId: string;
+    psychopompName: string;
+    challengeType: 'riddle' | 'memory' | 'knowledge' | 'philosophy';
+    challenge?: string;
+  };
+
+  /** Death challenge started */
+  'death:challenge_started': {
+    entityId: string;
+    psychopompName: string;
+    challenge: string;
+  };
+
+  /** Death challenge succeeded - soul may bargain for life */
+  'death:challenge_succeeded': {
+    entityId: string;
+    psychopompName: string;
+    attempts: number;
+  };
+
+  /** Death challenge failed - soul must die */
+  'death:challenge_failed': {
+    entityId: string;
+    psychopompName: string;
+    attempts: number;
+  };
+
+  /** Soul resurrected after successful bargain */
+  'agent:resurrected': {
+    entityId: string;
+    psychopompName: string;
+    conditions?: unknown;
+  };
+
+  /** Final death - no more bargaining */
+  'death:final': {
+    entityId: string;
+    psychopompName: string;
+    challengeType: string;
   };
 
   // ============================================================================
@@ -2398,6 +2755,324 @@ export interface GameEventMap {
     entityId: string;
     startPosition: { x: number; y: number };
     endPosition: { x: number; y: number };
+  };
+
+  // === Television & Broadcasting Events ===
+
+  /** Episode started broadcasting */
+  'tv:broadcast:started': {
+    stationId: string;
+    channelNumber: number;
+    contentId: string;
+    showId: string;
+    isLive: boolean;
+  };
+
+  /** Episode finished broadcasting */
+  'tv:broadcast:ended': {
+    stationId: string;
+    channelNumber: number;
+    contentId: string;
+    showId: string;
+    peakViewers: number;
+    totalViewers: number;
+    averageRating: number;
+  };
+
+  /** Viewer tuned into a channel */
+  'tv:viewer:tuned_in': {
+    viewerId: string;
+    stationId: string;
+    channelNumber: number;
+    contentId: string;
+  };
+
+  /** Viewer changed channel or stopped watching */
+  'tv:viewer:tuned_out': {
+    viewerId: string;
+    stationId: string;
+    channelNumber: number;
+    watchDuration: number;
+  };
+
+  /** Viewer rated content after watching */
+  'tv:viewer:rated': {
+    viewerId: string;
+    contentId: string;
+    showId: string;
+    rating: number;
+    willWatchNext: boolean;
+  };
+
+  /** Show renewed for another season */
+  'tv:show:renewed': {
+    showId: string;
+    stationId: string;
+    newSeason: number;
+  };
+
+  /** Show cancelled */
+  'tv:show:cancelled': {
+    showId: string;
+    stationId: string;
+    finalSeason: number;
+    totalEpisodes: number;
+  };
+
+  /** Episode completed production */
+  'tv:episode:completed': {
+    contentId: string;
+    showId: string;
+    season: number;
+    episode: number;
+    qualityScore: number;
+  };
+
+  /** Catchphrase learned by viewer */
+  'tv:catchphrase:learned': {
+    viewerId: string;
+    showId: string;
+    characterName: string;
+    catchphrase: string;
+  };
+
+  // === Television Development & Writing Events ===
+
+  /** Show pitch submitted to station */
+  'tv:pitch:submitted': {
+    pitchId: string;
+    stationId: string;
+    writerId: string;
+    title: string;
+    format: string;
+  };
+
+  /** Show greenlit for production */
+  'tv:show:greenlit': {
+    pitchId: string;
+    showId: string;
+    stationId: string;
+    title: string;
+    format: string;
+    budget: number;
+  };
+
+  /** Show pitch rejected */
+  'tv:show:rejected': {
+    pitchId: string;
+    stationId: string;
+    title: string;
+    reason: string;
+  };
+
+  /** Script draft completed */
+  'tv:script:draft_completed': {
+    scriptId: string;
+    showId: string;
+    writerId: string;
+  };
+
+  /** Script revised */
+  'tv:script:revised': {
+    scriptId: string;
+    showId: string;
+    revisionNumber: number;
+  };
+
+  /** Script ready for filming after table read */
+  'tv:script:ready_to_film': {
+    scriptId: string;
+    showId: string;
+    contentId: string;
+  };
+
+  /** New storyline started in a show */
+  'tv:storyline:started': {
+    showId: string;
+    storylineId: string;
+    title: string;
+    characters: string[];
+  };
+
+  /** Storyline resolved or ended */
+  'tv:storyline:ended': {
+    showId: string;
+    storylineId: string;
+    resolution: 'resolved' | 'cliffhanger';
+  };
+
+  // === Television Production Events ===
+
+  /** Scene filming started */
+  'tv:production:scene_started': {
+    productionId: string;
+    showId: string;
+    sceneNumber: number;
+    director: string;
+    actors: string[];
+  };
+
+  /** Take completed for a scene */
+  'tv:production:take_completed': {
+    productionId: string;
+    showId: string;
+    sceneNumber: number;
+    takeNumber: number;
+    qualityScore: number;
+    isBest: boolean;
+  };
+
+  /** Scene wrapped (filming complete) */
+  'tv:production:scene_wrapped': {
+    productionId: string;
+    showId: string;
+    sceneNumber: number;
+    totalTakes: number;
+    averageQuality: number;
+  };
+
+  /** Production day wrapped */
+  'tv:production:day_wrapped': {
+    productionId: string;
+    showId: string;
+    scenesCompleted: number;
+    totalScenes: number;
+  };
+
+  /** Live recording started */
+  'tv:production:live_started': {
+    productionId: string;
+    showId: string;
+    contentId: string;
+  };
+
+  /** Live recording ended */
+  'tv:production:live_ended': {
+    productionId: string;
+    showId: string;
+    contentId: string;
+    duration: number;
+  };
+
+  // === Television Post-Production Events ===
+
+  /** Post-production job started */
+  'tv:postproduction:started': {
+    jobId: string;
+    contentId: string;
+    showId: string;
+    scenesCount: number;
+  };
+
+  /** Post-production phase completed */
+  'tv:postproduction:phase_completed': {
+    jobId: string;
+    contentId: string;
+    phase: 'editing' | 'sound' | 'vfx' | 'color' | 'final_review';
+    nextPhase: string;
+  };
+
+  /** Post-production finalized - episode ready */
+  'tv:postproduction:finalized': {
+    contentId: string;
+    showId: string;
+    finalQuality: number;
+    runtime: number;
+  };
+
+  // === Television Casting Events ===
+
+  /** Casting call opened */
+  'tv:casting:call_opened': {
+    callId: string;
+    showId: string;
+    characterName: string;
+    roleType: 'lead' | 'supporting' | 'recurring' | 'guest' | 'extra';
+  };
+
+  /** Audition submitted */
+  'tv:casting:audition_submitted': {
+    auditionId: string;
+    callId: string;
+    showId: string;
+    characterName: string;
+  };
+
+  /** Role cast (actor selected) */
+  'tv:casting:role_cast': {
+    callId: string;
+    showId: string;
+    characterName: string;
+    agentId: string;
+    agentName: string;
+    roleType: 'lead' | 'supporting' | 'recurring' | 'guest' | 'extra';
+  };
+
+  /** Contract signed */
+  'tv:contract:signed': {
+    contractId: string;
+    agentId: string;
+    showId: string;
+    characterName: string;
+    role: 'lead' | 'supporting' | 'recurring' | 'guest';
+    compensation: number;
+  };
+
+  /** Contract renewed */
+  'tv:contract:renewed': {
+    contractId: string;
+    agentId: string;
+    newSeason: number;
+    newCompensation: number;
+  };
+
+  /** Contract terminated */
+  'tv:contract:terminated': {
+    contractId: string;
+    agentId: string;
+    showId: string;
+    characterName: string;
+    reason: string;
+  };
+
+  // === Television Schedule Events ===
+
+  /** Production schedule created */
+  'tv:schedule:created': {
+    scheduleId: string;
+    showId: string;
+    productionId: string;
+    plannedStartTick: number;
+    plannedEndTick: number;
+  };
+
+  /** Production schedule confirmed */
+  'tv:schedule:confirmed': {
+    scheduleId: string;
+    productionId: string;
+  };
+
+  /** Production started per schedule */
+  'tv:schedule:started': {
+    scheduleId: string;
+    productionId: string;
+    actualStartTick: number;
+  };
+
+  /** Production completed */
+  'tv:schedule:completed': {
+    scheduleId: string;
+    productionId: string;
+    actualEndTick: number;
+    onSchedule: boolean;
+  };
+
+  /** Milestone completed */
+  'tv:milestone:completed': {
+    productionId: string;
+    milestoneType: 'script_lock' | 'table_read' | 'first_day' | 'wrap' | 'rough_cut' | 'final_delivery';
+    name: string;
+    onTime: boolean;
   };
 }
 

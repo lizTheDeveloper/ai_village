@@ -18,85 +18,80 @@ export class OllamaProvider implements LLMProvider {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout for local LLM
 
-      // Define action tools - simple, no parameters
+      // Define action tools - matches ActionDefinitions.ts (16 tools)
+      // NOTE: Autonomic behaviors (wander, idle, rest, seek_sleep, seek_warmth) are NOT included
       const tools = [
         {
           type: 'function',
           function: {
-            name: 'wander',
-            description: 'Explore the area, move around randomly',
-            parameters: { type: 'object', properties: {} }
-          }
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'idle',
-            description: 'Do nothing, rest and recover energy',
-            parameters: { type: 'object', properties: {} }
-          }
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'seek_food',
-            description: 'Find and eat food to satisfy hunger',
-            parameters: { type: 'object', properties: {} }
-          }
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'follow_agent',
-            description: 'Follow another agent you see nearby',
-            parameters: { type: 'object', properties: {} }
-          }
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'talk',
-            description: 'Start a conversation with a nearby agent',
-            parameters: { type: 'object', properties: {} }
+            name: 'pick',
+            description: 'Pick up a single item nearby',
+            parameters: {
+              type: 'object',
+              properties: {
+                target: { type: 'string', description: 'What to pick: wood, stone, berry, etc.' }
+              }
+            }
           }
         },
         {
           type: 'function',
           function: {
             name: 'gather',
-            description: 'Gather resources from the environment (forage, collect items)',
-            parameters: { type: 'object', properties: {} }
+            description: 'Stockpile resources - gather a specified amount and store in chest',
+            parameters: {
+              type: 'object',
+              properties: {
+                target: { type: 'string', description: 'Resource type: wood, stone, berry, etc.' },
+                amount: { type: 'number', description: 'How many to gather' }
+              }
+            }
           }
         },
         {
           type: 'function',
           function: {
-            name: 'approach',
-            description: 'Move toward a nearby agent or location',
-            parameters: { type: 'object', properties: {} }
+            name: 'talk',
+            description: 'Have a conversation with someone nearby',
+            parameters: {
+              type: 'object',
+              properties: {
+                target: { type: 'string', description: 'Name of agent to talk to' }
+              }
+            }
           }
         },
         {
           type: 'function',
           function: {
-            name: 'observe',
-            description: 'Watch and pay attention to surroundings or someone nearby',
-            parameters: { type: 'object', properties: {} }
+            name: 'follow_agent',
+            description: 'Follow another agent',
+            parameters: {
+              type: 'object',
+              properties: {
+                target: { type: 'string', description: 'Name of agent to follow' }
+              }
+            }
           }
         },
         {
           type: 'function',
           function: {
-            name: 'rest',
-            description: 'Sit down and rest to recover energy',
-            parameters: { type: 'object', properties: {} }
+            name: 'call_meeting',
+            description: 'Call a meeting to discuss something',
+            parameters: {
+              type: 'object',
+              properties: {
+                topic: { type: 'string', description: 'What to discuss' }
+              }
+            }
           }
         },
         {
           type: 'function',
           function: {
-            name: 'work',
-            description: 'Do productive work (farm, craft, build)',
+            name: 'attend_meeting',
+            description: 'Attend an ongoing meeting',
             parameters: { type: 'object', properties: {} }
           }
         },
@@ -104,23 +99,24 @@ export class OllamaProvider implements LLMProvider {
           type: 'function',
           function: {
             name: 'help',
-            description: 'Help a nearby agent with their task',
-            parameters: { type: 'object', properties: {} }
+            description: 'Help another agent with their task',
+            parameters: {
+              type: 'object',
+              properties: {
+                target: { type: 'string', description: 'Name of agent to help' }
+              }
+            }
           }
         },
         {
           type: 'function',
           function: {
             name: 'build',
-            description: 'Build a structure (campfire, workbench, storage-chest, tent, bed, farm-shed)',
+            description: 'Construct a building (requires materials in inventory)',
             parameters: {
               type: 'object',
               properties: {
-                building: {
-                  type: 'string',
-                  description: 'Type of building to construct',
-                  enum: ['campfire', 'workbench', 'storage-chest', 'tent', 'bed', 'farm-shed', 'lean-to', 'well']
-                }
+                building: { type: 'string', description: 'Building type: campfire, tent, storage-chest, etc.' }
               },
               required: ['building']
             }
@@ -130,15 +126,11 @@ export class OllamaProvider implements LLMProvider {
           type: 'function',
           function: {
             name: 'plan_build',
-            description: 'Plan to build something - your character will automatically gather materials and build it',
+            description: 'Plan a building project - automatically gathers resources then builds',
             parameters: {
               type: 'object',
               properties: {
-                building: {
-                  type: 'string',
-                  description: 'Type of building to plan',
-                  enum: ['campfire', 'workbench', 'storage-chest', 'tent', 'bed', 'farm-shed', 'lean-to', 'well', 'forge']
-                }
+                building: { type: 'string', description: 'Building type: storage-chest, campfire, tent, etc.' }
               },
               required: ['building']
             }
@@ -147,17 +139,78 @@ export class OllamaProvider implements LLMProvider {
         {
           type: 'function',
           function: {
-            name: 'set_priorities',
-            description: 'Set your strategic priorities (0-1 weights) to guide your behavior',
+            name: 'till',
+            description: 'Prepare soil for planting',
+            parameters: { type: 'object', properties: {} }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'farm',
+            description: 'Work on farming tasks (water, fertilize, tend crops)',
+            parameters: { type: 'object', properties: {} }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'plant',
+            description: 'Plant seeds in tilled soil',
             parameters: {
               type: 'object',
               properties: {
-                gathering: { type: 'number', description: 'Priority for gathering wood, stone, food (0-1)' },
-                building: { type: 'number', description: 'Priority for construction (0-1)' },
-                farming: { type: 'number', description: 'Priority for farming (0-1)' },
-                social: { type: 'number', description: 'Priority for talking/helping (0-1)' },
-                exploration: { type: 'number', description: 'Priority for exploring (0-1)' },
-                rest: { type: 'number', description: 'Priority for resting (0-1)' }
+                seed: { type: 'string', description: 'Seed type: wheat, carrot, etc.' }
+              }
+            }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'explore',
+            description: 'Systematically explore unknown areas to find new resources',
+            parameters: { type: 'object', properties: {} }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'tame_animal',
+            description: 'Approach and tame a wild animal',
+            parameters: {
+              type: 'object',
+              properties: {
+                target: { type: 'string', description: 'Animal to tame' }
+              }
+            }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'house_animal',
+            description: 'Lead a tamed animal to its housing',
+            parameters: {
+              type: 'object',
+              properties: {
+                target: { type: 'string', description: 'Animal to house' }
+              }
+            }
+          }
+        },
+        {
+          type: 'function',
+          function: {
+            name: 'set_priorities',
+            description: 'Set task priorities (gathering, building, farming, social)',
+            parameters: {
+              type: 'object',
+              properties: {
+                gathering: { type: 'number', description: 'Priority 0-100' },
+                building: { type: 'number', description: 'Priority 0-100' },
+                farming: { type: 'number', description: 'Priority 0-100' },
+                social: { type: 'number', description: 'Priority 0-100' }
               }
             }
           }
@@ -168,9 +221,14 @@ export class OllamaProvider implements LLMProvider {
       const systemMessage = `You are a character in a village survival simulation. You MUST respond by calling exactly ONE of the available tools/functions. Do NOT respond with text - only use function calls.
 
 When you decide what to do, call the appropriate function:
-- To build something: call plan_build with the building type (workbench, campfire, storage-chest, tent, forge, etc.)
-- To set your priorities: call set_priorities with your priority weights (0-1)
-- For simple actions: call wander, rest, gather, idle, explore, talk, or work
+- To build something: call plan_build with the building type (storage-chest, campfire, tent, etc.)
+- To gather resources: call gather with resource type and amount (e.g., gather wood 20)
+- For social actions: call talk, follow_agent, call_meeting, attend_meeting, or help
+- For farming: call till, plant, or farm
+- For exploration: call explore
+- For animals: call tame_animal or house_animal
+- To pick up items: call pick
+- To set priorities: call set_priorities
 
 IMPORTANT: You MUST use a tool call. Text responses will be ignored.`;
 

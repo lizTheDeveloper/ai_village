@@ -13,12 +13,15 @@
     "test:watch": "vitest",
     "test:coverage": "npm run validate-data && vitest run --coverage",
     "test:all": "npm run test --workspaces",
+    "bench": "vitest bench --run",
+    "bench:watch": "vitest bench",
     "lint": "eslint .",
     "clean": "rm -rf packages/*/dist",
     "detect-oscillation": "npx tsx scripts/detect-oscillation.ts",
     "metrics-server": "npx tsx scripts/metrics-server.ts",
     "validate-data": "npx tsx scripts/validate-all-data.ts",
     "validate-plants": "npx tsx scripts/validate-plants.ts",
+    "test:riddles": "npx tsx scripts/test-riddle-generation.ts",
     "prepare": "husky"
   },
   "devDependencies": {

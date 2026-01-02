@@ -422,13 +422,16 @@ export class MovementSystem implements System {
             continue;
           }
 
-          // Euclidean distance for precision
-          const distance = Math.sqrt(
-            Math.pow(pos.x - x, 2) + Math.pow(pos.y - y, 2)
-          );
+          // Squared distance for precision (avoid sqrt)
+          const dx = pos.x - x;
+          const dy = pos.y - y;
+          const distanceSquared = dx * dx + dy * dy;
+          const radiusSquared = softCollisionRadius * softCollisionRadius;
 
           // Apply graduated slowdown based on proximity
-          if (distance < softCollisionRadius) {
+          if (distanceSquared < radiusSquared) {
+            // Only compute sqrt when we need the actual distance for interpolation
+            const distance = Math.sqrt(distanceSquared);
             const proximityFactor = distance / softCollisionRadius;
             const thisPenalty = minPenalty + (1 - minPenalty) * proximityFactor;
             penalty = Math.min(penalty, thisPenalty);

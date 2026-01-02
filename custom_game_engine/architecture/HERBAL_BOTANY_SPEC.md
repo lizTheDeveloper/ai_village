@@ -922,7 +922,14 @@ export class AquaticOxygenSystem implements System {
       const maturityMod = plant.growthStage === 'mature' ? 1.0 : 0.5;
       const oxygenAdded = species.oxygenProduction * healthMod * maturityMod * deltaTime;
 
-      waterTile.oxygenSaturation = Math.min(200, waterTile.oxygenSaturation + oxygenAdded);
+      // Explicit saturation at physical maximum (200% = super-saturated water)
+      const newSaturation = waterTile.oxygenSaturation + oxygenAdded;
+      if (newSaturation > 200) {
+        waterTile.oxygenSaturation = 200;  // Physical maximum
+        // Excess oxygen bubbles out (could emit event for visual effect)
+      } else {
+        waterTile.oxygenSaturation = newSaturation;
+      }
     }
 
     // Oxygen naturally diffuses and depletes

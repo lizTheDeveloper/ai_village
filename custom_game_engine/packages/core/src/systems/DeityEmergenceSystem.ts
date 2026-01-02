@@ -22,6 +22,7 @@ import type {
   DeityOrigin,
   PerceivedPersonality
 } from '../divinity/DeityTypes.js';
+import { pendingApprovalRegistry } from '../crafting/PendingApprovalRegistry.js';
 
 /** Tracked belief contribution from proto_deity_belief events */
 interface ProtoDeityBelief {
@@ -550,6 +551,18 @@ export class DeityEmergenceSystem implements System {
     // Add component to entity
     (deityEntity as any).addComponent(deityComponent);
 
+    // Register AI deity for auto-approval of believer creations
+    // AI gods automatically scrutinize and approve their believers' inventions
+    const personalityDesc = this.describePersonalityForScrutiny(identity.personality, pattern.concept);
+    pendingApprovalRegistry.configureAIDeity({
+      deityId: deityEntity.id,
+      autoApproves: true,
+      requireNovelty: true,
+      requireCoherence: true,
+      useLLM: true, // Use LLM for intelligent scrutiny
+      deityPersonality: personalityDesc,
+    });
+
     // Note: Event emission commented out until event types are updated
     // world.eventBus.emit({
     //   type: 'deity_emerged',
@@ -560,6 +573,54 @@ export class DeityEmergenceSystem implements System {
     //   believerCount: pattern.agentIds.length,
     //   tick: currentTick,
     // });
+  }
+
+  /**
+   * Generate a personality description for LLM scrutiny prompts
+   */
+  private describePersonalityForScrutiny(
+    personality: PerceivedPersonality,
+    domain: DivineDomain
+  ): string {
+    const traits: string[] = [];
+
+    // Benevolence
+    if (personality.benevolence > 0.5) {
+      traits.push('kind and nurturing');
+    } else if (personality.benevolence < -0.5) {
+      traits.push('harsh and demanding');
+    }
+
+    // Interventionism
+    if (personality.interventionism > 0.5) {
+      traits.push('actively involved in mortal affairs');
+    } else if (personality.interventionism < -0.5) {
+      traits.push('distant and mysterious');
+    }
+
+    // Wrathfulness
+    if (personality.wrathfulness > 0.7) {
+      traits.push('quick to anger');
+    } else if (personality.wrathfulness < 0.3) {
+      traits.push('patient and forgiving');
+    }
+
+    // Consistency
+    if (personality.consistency > 0.7) {
+      traits.push('predictable and fair');
+    } else if (personality.consistency < 0.3) {
+      traits.push('capricious and unpredictable');
+    }
+
+    // Generosity
+    if (personality.generosity > 0.7) {
+      traits.push('generous with blessings');
+    } else if (personality.generosity < 0.3) {
+      traits.push('expects much in return');
+    }
+
+    const traitStr = traits.length > 0 ? traits.join(', ') : 'inscrutable';
+    return `a ${domain} deity who is ${traitStr}`;
   }
 
   /**

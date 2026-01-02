@@ -25,12 +25,12 @@ export class VillageInfoBuilder {
 
     // Get all agents
     const allAgents = world.query().with('agent').with('identity').executeEntities();
-    const otherAgents = allAgents.filter(a => a.id !== currentAgentId);
+    const otherAgents = allAgents.filter((a: Entity) => a.id !== currentAgentId);
 
     if (otherAgents.length > 0) {
       status += `- ${otherAgents.length} other villager${otherAgents.length > 1 ? 's are' : ' is'} in the village\n`;
 
-      const names = otherAgents.slice(0, 3).map(a => {
+      const names = otherAgents.slice(0, 3).map((a: Entity) => {
         const identity = a.components.get('identity') as IdentityComponent | undefined;
         return identity?.name || 'Unknown';
       });
@@ -109,8 +109,9 @@ export class VillageInfoBuilder {
       let highestSkill: SkillId | null = null;
       let highestLevel: SkillLevel = 0;
       for (const [skillId, level] of Object.entries(skills.levels)) {
-        if (level >= 2 && level > highestLevel) {
-          highestLevel = level as SkillLevel;
+        const levelNum = level as SkillLevel;
+        if (levelNum >= 2 && levelNum > highestLevel) {
+          highestLevel = levelNum;
           highestSkill = skillId as SkillId;
         }
       }

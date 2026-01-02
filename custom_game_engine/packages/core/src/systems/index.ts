@@ -57,6 +57,14 @@ export * from './MagicSystem.js';
 export * from './ResearchSystem.js';
 // Mood System
 export * from './MoodSystem.js';
+// Deep Conversation System - Phase 1-6
+export * from './InterestsSystem.js';
+// TODO: Fix incomplete implementations before enabling
+// export * from './RelationshipConversationSystem.js';
+// export * from './FriendshipSystem.js';
+// Deep Conversation System - Phase 7.1
+// TODO: Fix incomplete implementations before enabling
+// export * from './InterestEvolutionSystem.js';
 // Cooking System
 export * from './CookingSystem.js';
 // Skills System
@@ -65,8 +73,13 @@ export * from './SkillSystem.js';
 export * from './DurabilitySystem.js';
 // Body Parts System - extensible for multiple species
 export * from './BodySystem.js';
+// Phase 36: Equipment System - body-based equipment for all species
+// TODO: Fix EquipmentSystem errors before re-enabling
+// export * from './EquipmentSystem.js';
 // Species and Genetics
 export * from './ReproductionSystem.js';
+// Courtship System - agent courtship and mating
+export * from './CourtshipSystem.js';
 // Idle Behaviors & Personal Goals
 export * from './IdleBehaviorSystem.js';
 export * from './GoalGenerationSystem.js';
@@ -109,8 +122,12 @@ export * from './PassageSystem.js';
 export * from './RealmManager.js';
 export * from './PortalSystem.js';
 export * from './RealmTimeSystem.js';
-export * from './DeathTransitionSystem.js';
+export * from './DeathJudgmentSystem.js';
+// export * from './DeathBargainSystem.js'; // Temporarily disabled - incomplete implementation
+// export * from './DeathTransitionSystem.js'; // Temporarily disabled - incomplete implementation
+export * from './AfterlifeMemoryFadingSystem.js';
 export * from './ReincarnationSystem.js';
+// export * from './SoulCreationSystem.js'; // Temporarily disabled due to circular dependency with @ai-village/llm
 // Auto-save & Time Travel
 export * from './AutoSaveSystem.js';
 export * from './CheckpointNamingService.js';
@@ -155,6 +172,25 @@ export type {
 
 // Tile-Based Building - Door System
 export * from './DoorSystem.js';
+
+// Automation & Production Systems (Phase 38)
+export * from './PowerGridSystem.js';
+export { PowerGridSystem } from './PowerGridSystem.js';
+export type { PowerNetwork } from './PowerGridSystem.js';
+export * from './BeltSystem.js';
+export { BeltSystem } from './BeltSystem.js';
+export * from './DirectConnectionSystem.js';
+export { DirectConnectionSystem } from './DirectConnectionSystem.js';
+export * from './AssemblyMachineSystem.js';
+export { AssemblyMachineSystem } from './AssemblyMachineSystem.js';
+export * from './FactoryAISystem.js';
+export { FactoryAISystem } from './FactoryAISystem.js';
+export * from './OffScreenProductionSystem.js';
+export { OffScreenProductionSystem } from './OffScreenProductionSystem.js';
+
+// Chat & Communication
+export * from './DivineChatSystem.js';
+export { DivineChatSystem } from './DivineChatSystem.js';
 
 // Centralized system registration
 export {

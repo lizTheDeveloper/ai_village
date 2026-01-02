@@ -12,6 +12,10 @@
 export { SaveLoadService, saveLoadService } from './SaveLoadService.js';
 export type { SaveOptions, LoadResult } from './SaveLoadService.js';
 
+// Save state management (for dev tools: save/load/fork/rewind)
+export { SaveStateManager } from './SaveStateManager.js';
+export type { SaveMetadata as SaveStateMetadata, SaveState, SaveListEntry } from './SaveStateManager.js';
+
 // Storage backends
 export { IndexedDBStorage } from './storage/IndexedDBStorage.js';
 export { MemoryStorage } from './storage/MemoryStorage.js';

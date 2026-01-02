@@ -15,6 +15,7 @@ import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { VisionComponent } from '../components/VisionComponent.js';
 import type { SpatialMemoryComponent, SpatialMemory } from '../components/SpatialMemoryComponent.js';
+import { getSpatialMemoriesByType } from '../components/SpatialMemoryComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
 import type { MemoryComponent } from '../components/MemoryComponent.js';
 import { NamedLandmarksComponent } from '../components/NamedLandmarksComponent.js';
@@ -178,9 +179,7 @@ export class LandmarkNamingSystem implements System {
    * Get recent terrain landmarks from spatial memory.
    */
   private getRecentTerrainLandmarks(spatialMemory: SpatialMemoryComponent, currentTick: number): SpatialMemory[] {
-    // TODO: Implement getMemoriesByType method in SpatialMemoryComponent
-    // const memories = spatialMemory.getMemoriesByType('terrain_landmark');
-    const memories = spatialMemory.memories.filter((m: SpatialMemory) => m.type === 'terrain_landmark');
+    const memories = getSpatialMemoriesByType(spatialMemory, 'terrain_landmark');
     // Only consider landmarks seen in the last 100 ticks (5 seconds at 20 TPS)
     return memories.filter((m: SpatialMemory) => currentTick - m.createdAt < 100);
   }
@@ -189,9 +188,7 @@ export class LandmarkNamingSystem implements System {
    * Check if agent has already named a landmark at this position.
    */
   private hasAgentNamedLandmark(spatialMemory: SpatialMemoryComponent, x: number, y: number): boolean {
-    // TODO: Implement getMemoriesByType method in SpatialMemoryComponent
-    // const memories = spatialMemory.getMemoriesByType('terrain_landmark');
-    const memories = spatialMemory.memories.filter((m: SpatialMemory) => m.type === 'terrain_landmark');
+    const memories = getSpatialMemoriesByType(spatialMemory, 'terrain_landmark');
     return memories.some((m: SpatialMemory) =>
       Math.floor(m.x) === Math.floor(x) &&
       Math.floor(m.y) === Math.floor(y) &&
@@ -394,8 +391,7 @@ export class LandmarkNamingSystem implements System {
     currentTick: number
   ): void {
     // Find the landmark memory
-    // TODO: Implement getMemoriesByType method in SpatialMemoryComponent
-    const memories = spatialMemory.memories.filter((m: SpatialMemory) => m.type === 'terrain_landmark');
+    const memories = getSpatialMemoriesByType(spatialMemory, 'terrain_landmark');
     for (const mem of memories) {
       if (Math.floor(mem.x) === Math.floor(x) && Math.floor(mem.y) === Math.floor(y)) {
         // Update metadata

@@ -217,6 +217,17 @@ export {
   formatNotification,
 } from './DivineChatTypes.js';
 
+export {
+  // Component
+  type DivineChatComponent,
+  createDivineChatComponent,
+} from '../components/DivineChatComponent.js';
+
+export {
+  // System
+  DivineChatSystem,
+} from '../systems/DivineChatSystem.js';
+
 // ============================================================================
 // Avatar System
 // ============================================================================
@@ -711,3 +722,26 @@ export {
   createAttributionStatistics,
   updateAttributionStatistics,
 } from './AttributionSystem.js';
+
+// ============================================================================
+// God of Death Entity
+// ============================================================================
+export {
+  // Functions
+  createGodOfDeath,
+  findGodOfDeath,
+  moveGodOfDeath,
+  isGodOfDeath,
+} from './GodOfDeathEntity.js';
+
+// ============================================================================
+// Riddle Generation System
+// ============================================================================
+export {
+  // Types
+  type GeneratedRiddle,
+  type HeroContext,
+
+  // Class
+  RiddleGenerator,
+} from './RiddleGenerator.js';

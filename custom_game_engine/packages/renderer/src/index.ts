@@ -39,7 +39,9 @@ export * from './GovernanceDashboardPanel.js';
 export * from './MagicSystemsPanel.js';
 export * from './SpellbookPanel.js';
 export * from './DivinePowersPanel.js';
+export * from './DivineChatPanel.js';
 export * from './VisionComposerPanel.js';
+export * from './PendingApprovalsPanel.js';
 export * from './DevPanel.js';
 export * from './FarmManagementPanel.js';
 

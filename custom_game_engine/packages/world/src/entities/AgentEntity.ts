@@ -44,6 +44,11 @@ import {
   createDominanceRankComponent,
   // Realm system components
   createRealmLocationComponent,
+  // Reproduction system components
+  createSexualityComponent,
+  createCourtshipComponent,
+  createParentingComponent,
+  SpeciesComponent,
 } from '@ai-village/core';
 
 /**
@@ -271,6 +276,19 @@ export function createWanderingAgent(
   // Realm location - agents start in the mortal world
   entity.addComponent(createRealmLocationComponent('mortal_world'));
 
+  // Reproduction - sexuality, courtship, and parenting components
+  // Default to human paradigm (can be customized per species later)
+  const sexuality = createSexualityComponent({
+    relationshipStyle: 'monogamous', // Default for humans
+  });
+  sexuality.activelySeeking = Math.random() > 0.3; // 70% chance of being open to romance
+  entity.addComponent(sexuality);
+  entity.addComponent(createCourtshipComponent('human'));
+  entity.addComponent(createParentingComponent('both_parents')); // Human parental care
+
+  // Species - all agents default to human species
+  entity.addComponent(new SpeciesComponent('human', 'Human', 'humanoid_biped'));
+
   // Add to world
   (world as any)._addEntity(entity);
 
@@ -471,6 +489,19 @@ export function createLLMAgent(
 
   // Realm location - agents start in the mortal world
   entity.addComponent(createRealmLocationComponent('mortal_world'));
+
+  // Reproduction - sexuality, courtship, and parenting components
+  // Default to human paradigm (can be customized per species later)
+  const sexuality2 = createSexualityComponent({
+    relationshipStyle: 'monogamous', // Default for humans
+  });
+  sexuality2.activelySeeking = Math.random() > 0.3; // 70% chance of being open to romance
+  entity.addComponent(sexuality2);
+  entity.addComponent(createCourtshipComponent('human'));
+  entity.addComponent(createParentingComponent('both_parents')); // Human parental care
+
+  // Species - all agents default to human species
+  entity.addComponent(new SpeciesComponent('human', 'Human', 'humanoid_biped'));
 
   // Add initial "waking up" memory from Dungeon Master prompt
   if (dungeonMasterPrompt) {

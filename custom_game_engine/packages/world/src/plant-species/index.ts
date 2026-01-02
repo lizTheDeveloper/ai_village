@@ -5,11 +5,13 @@ import { MEDICINAL_PLANTS } from './medicinal-plants.js';
 import { MAGICAL_PLANTS } from './magical-plants.js';
 import { TROPICAL_PLANTS } from './tropical-plants.js';
 import { WETLAND_PLANTS } from './wetland-plants.js';
+import { CULTIVATED_CROPS } from './cultivated-crops.js';
 
 // All plant species
 const ALL_SPECIES: PlantSpecies[] = [
   /* ...BASE_CROPS, */
   ...WILD_PLANTS,
+  ...CULTIVATED_CROPS,
   ...MEDICINAL_PLANTS,
   ...MAGICAL_PLANTS,
   ...TROPICAL_PLANTS,
@@ -83,11 +85,19 @@ export function getMagicalPlants(): PlantSpecies[] {
   return ALL_SPECIES.filter(s => s.properties?.magical);
 }
 
+/**
+ * Get cultivated crops suitable for farming
+ */
+export function getCultivatedCrops(): PlantSpecies[] {
+  return CULTIVATED_CROPS;
+}
+
 // Re-export species arrays
 // export { BASE_CROPS, WILD_PLANTS }; // WIP - BASE_CROPS disabled
-export { WILD_PLANTS, MEDICINAL_PLANTS, MAGICAL_PLANTS, TROPICAL_PLANTS, WETLAND_PLANTS };
+export { WILD_PLANTS, CULTIVATED_CROPS, MEDICINAL_PLANTS, MAGICAL_PLANTS, TROPICAL_PLANTS, WETLAND_PLANTS };
 // export * from './base-crops.js'; // WIP - disabled
 export * from './wild-plants.js';
+export * from './cultivated-crops.js';
 export * from './medicinal-plants.js';
 export * from './magical-plants.js';
 export * from './tropical-plants.js';

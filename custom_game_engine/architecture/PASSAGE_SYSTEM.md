@@ -391,11 +391,16 @@ function calculateCompatibility(
     (universeA.coreParams?.divineTimeScale ?? 1.0) -
     (universeB.coreParams?.divineTimeScale ?? 1.0)
   );
+  // Normalize time scale difference to [0, 1] using sigmoid for smooth scaling
+  // Small differences (< 5) scale linearly, large differences (> 10) asymptotically approach 1.0
+  const timeScaleNormalized = timeScaleDiff < 10
+    ? timeScaleDiff / 10
+    : 1.0 / (1.0 + Math.exp(-(timeScaleDiff - 10)));
   factors.push({
     name: 'Time Scale Difference',
     weight: 0.5,
-    value: Math.min(timeScaleDiff / 10, 1.0),
-    contribution: Math.min(timeScaleDiff / 10, 1.0) * 0.5,
+    value: timeScaleNormalized,
+    contribution: timeScaleNormalized * 0.5,
   });
 
   // Belief economy compatibility
@@ -403,11 +408,16 @@ function calculateCompatibility(
     (universeA.beliefEconomy?.generationMultiplier ?? 1.0) -
     (universeB.beliefEconomy?.generationMultiplier ?? 1.0)
   );
+  // Normalize belief difference to [0, 1] - differences > 1.0 indicate major incompatibility
+  // Use sigmoid for smooth transition: small differences linear, large differences saturate
+  const beliefNormalized = beliefDiff < 1.0
+    ? beliefDiff
+    : 1.0 / (1.0 + Math.exp(-(beliefDiff - 1.0)));
   factors.push({
     name: 'Belief Economy Alignment',
     weight: 0.3,
-    value: Math.min(beliefDiff, 1.0),
-    contribution: Math.min(beliefDiff, 1.0) * 0.3,
+    value: beliefNormalized,
+    contribution: beliefNormalized * 0.3,
   });
 
   // Total score
@@ -824,7 +834,14 @@ class PassageMaintenanceSystem {
 
       // Apply decay
       const decayAmount = passage.decayRate * deltaTime;
-      passage.health = Math.max(0, passage.health - decayAmount);
+      const newHealth = passage.health - decayAmount;
+
+      // Explicit floor at 0 (health cannot be negative)
+      if (newHealth < 0) {
+        passage.health = 0;  // Passage has collapsed
+      } else {
+        passage.health = newHealth;
+      }
 
       // Check if collapsed
       if (passage.health <= 0) {

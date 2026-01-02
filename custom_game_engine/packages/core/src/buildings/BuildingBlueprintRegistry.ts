@@ -494,6 +494,38 @@ export class BuildingBlueprintRegistry {
       requiresFoundation: false,
     });
 
+    // Butchering Table - Process animals for meat (2x2, 25 Wood + 10 Stone)
+    this.register({
+      id: 'butchering_table',
+      name: 'Butchering Table',
+      description: 'A sturdy table for processing hunted animals and butchering livestock',
+      category: 'production',
+      width: 2,
+      height: 2,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 25 },
+        { resourceId: 'stone', amountRequired: 10 },
+      ],
+      techRequired: [],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'cooking', level: 1 },
+      unlocked: true,
+      buildTime: 60,
+      tier: 2,
+      functionality: [
+        {
+          type: 'crafting',
+          recipes: [], // Butchering uses behavior system, not recipes
+          speed: 1.0,
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: false,
+    });
+
     // Farm Shed - Seed/tool storage (3x2, 30 Wood)
     this.register({
       id: 'farm_shed',

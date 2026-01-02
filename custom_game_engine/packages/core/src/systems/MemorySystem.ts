@@ -27,14 +27,20 @@ export class MemorySystem implements System {
         );
       }
 
-      // Decay memories over time
+      // Decay memories over time and remove forgotten ones in-place
+      // Performance: Avoids creating new array every tick with filter()
       const decayAmount = memory.decayRate * deltaTime;
-      for (const m of memory.memories) {
+      let writeIndex = 0;
+      for (let i = 0; i < memory.memories.length; i++) {
+        const m = memory.memories[i]!;
         m.strength = Math.max(0, m.strength - decayAmount);
+        if (m.strength > 0) {
+          memory.memories[writeIndex] = m;
+          writeIndex++;
+        }
       }
-
-      // Remove fully forgotten memories (strength reached 0)
-      memory.memories = memory.memories.filter((m) => m.strength > 0);
+      // Truncate array to remove forgotten memories
+      memory.memories.length = writeIndex;
     }
   }
 }

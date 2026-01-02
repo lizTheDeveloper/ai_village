@@ -256,7 +256,10 @@ export class LaborComponent extends ComponentBase {
    */
   public update(deltaTicks: number): void {
     // Calculate progress rate
-    const baseProgressRate = 0.0001; // Per tick
+    // Target: ~500-1000 ticks total for labor (25-50 seconds at 20 TPS)
+    // 4 stages (early, active, transition, delivery) + delivery needs 80% progress
+    // So roughly 0.01 per tick = 100 ticks per stage = 400 ticks total
+    const baseProgressRate = 0.01; // Per tick (was 0.0001, now 100x faster)
     const adjustedRate = baseProgressRate * this.progressRate;
 
     // Update stage progress

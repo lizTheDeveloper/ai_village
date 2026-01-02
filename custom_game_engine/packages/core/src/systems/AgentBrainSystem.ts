@@ -48,6 +48,9 @@ import {
   talkBehavior,
   callMeetingBehavior,
   attendMeetingBehavior,
+  initiateCombatBehavior,
+  initiateHuntBehavior,
+  butcherBehavior,
   farmBehavior,
   tillBehavior,
   plantBehavior,
@@ -127,6 +130,13 @@ export class AgentBrainSystem implements System {
     this.behaviors.register('talk', talkBehavior, { description: 'Engage in conversation' });
     this.behaviors.register('call_meeting', callMeetingBehavior, { description: 'Call a meeting' });
     this.behaviors.register('attend_meeting', attendMeetingBehavior, { description: 'Attend a meeting' });
+
+    // Combat behaviors
+    this.behaviors.register('initiate_combat', initiateCombatBehavior, { description: 'Initiate combat with target' });
+
+    // Hunting behaviors
+    this.behaviors.register('hunt', initiateHuntBehavior, { description: 'Hunt wild animals for food and resources' });
+    this.behaviors.register('butcher', butcherBehavior, { description: 'Butcher tame animals for meat and resources' });
 
     // Farm behaviors
     this.behaviors.register('farm', farmBehavior, { description: 'Farm action state' });
@@ -481,6 +491,9 @@ export class AgentBrainSystem implements System {
 
   /**
    * Get nearby agents for social behaviors.
+   *
+   * Performance: Uses chunk-based spatial lookup instead of querying all agents.
+   * Only checks entities in nearby chunks based on range.
    */
   private getNearbyAgents(
     entity: EntityImpl,
@@ -490,20 +503,51 @@ export class AgentBrainSystem implements System {
     const position = entity.getComponent(CT.Position) as any;
     if (!position) return [];
 
-    const agents = world.query().with(CT.Agent).with(CT.Position).executeEntities();
+    const CHUNK_SIZE = 32;
+    const chunkX = Math.floor(position.x / CHUNK_SIZE);
+    const chunkY = Math.floor(position.y / CHUNK_SIZE);
 
-    return agents.filter((other) => {
-      if (other.id === entity.id) return false;
+    // Calculate how many chunks we need to check based on range
+    const chunkRange = Math.ceil(range / CHUNK_SIZE);
 
-      const otherPos = (other as EntityImpl).getComponent(CT.Position) as any;
-      if (!otherPos) return false;
+    const result: Entity[] = [];
 
-      const dx = otherPos.x - position.x;
-      const dy = otherPos.y - position.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+    // Check chunks within range
+    for (let dx = -chunkRange; dx <= chunkRange; dx++) {
+      for (let dy = -chunkRange; dy <= chunkRange; dy++) {
+        const nearbyEntityIds = world.getEntitiesInChunk(chunkX + dx, chunkY + dy);
 
-      return dist <= range;
-    });
+        for (const nearbyId of nearbyEntityIds) {
+          if (nearbyId === entity.id) continue;
+
+          const nearbyEntity = world.entities.get(nearbyId);
+          if (!nearbyEntity) continue;
+
+          const impl = nearbyEntity as EntityImpl;
+
+          // Must have Agent component
+          if (!impl.components.has(CT.Agent)) continue;
+
+          const otherPos = impl.getComponent(CT.Position) as any;
+          if (!otherPos) continue;
+
+          // Manhattan distance early exit
+          const manhattanDist = Math.abs(otherPos.x - position.x) + Math.abs(otherPos.y - position.y);
+          if (manhattanDist > range * 1.5) continue;
+
+          // Euclidean distance check
+          const dx2 = otherPos.x - position.x;
+          const dy2 = otherPos.y - position.y;
+          const dist = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+
+          if (dist <= range) {
+            result.push(nearbyEntity);
+          }
+        }
+      }
+    }
+
+    return result;
   }
 }
 
