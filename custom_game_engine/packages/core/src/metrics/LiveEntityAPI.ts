@@ -834,9 +834,19 @@ export class LiveEntityAPI {
 
       const creations = pending.map(creation => ({
         id: creation.id,
-        itemName: creation.item.displayName,
-        itemCategory: creation.item.category,
+        creationType: creation.creationType,
+        // Recipe-specific
+        itemName: creation.item?.displayName,
+        itemCategory: creation.item?.category,
         recipeType: creation.recipeType,
+        // Technology-specific
+        technologyName: creation.technology?.name,
+        researchField: creation.researchField,
+        // Effect-specific
+        spellName: creation.spell?.name,
+        paradigmId: creation.paradigmId,
+        discoveryType: creation.discoveryType,
+        // Common
         creatorId: creation.creatorId,
         creatorName: creation.creatorName,
         creationMessage: creation.creationMessage,
@@ -890,14 +900,28 @@ export class LiveEntityAPI {
       };
     }
 
+    // Build response data based on creation type
+    const creation = result.creation;
+    const responseData: Record<string, unknown> = {
+      approved: true,
+      creationType: creation?.creationType,
+    };
+
+    if (creation?.creationType === 'recipe') {
+      responseData.itemName = creation.item?.displayName;
+      responseData.recipeId = creation.recipe?.id;
+    } else if (creation?.creationType === 'technology') {
+      responseData.technologyName = creation.technology?.name;
+      responseData.researchField = creation.researchField;
+    } else if (creation?.creationType === 'effect') {
+      responseData.spellName = creation.spell?.name;
+      responseData.paradigmId = creation.paradigmId;
+    }
+
     return {
       requestId: action.requestId,
       success: true,
-      data: {
-        approved: true,
-        itemName: result.creation?.item.displayName,
-        recipeId: result.creation?.recipe.id,
-      },
+      data: responseData,
     };
   }
 
@@ -925,13 +949,25 @@ export class LiveEntityAPI {
       };
     }
 
+    // Build response data based on creation type
+    const creation = result.creation;
+    const responseData: Record<string, unknown> = {
+      rejected: true,
+      creationType: creation?.creationType,
+    };
+
+    if (creation?.creationType === 'recipe') {
+      responseData.itemName = creation.item?.displayName;
+    } else if (creation?.creationType === 'technology') {
+      responseData.technologyName = creation.technology?.name;
+    } else if (creation?.creationType === 'effect') {
+      responseData.spellName = creation.spell?.name;
+    }
+
     return {
       requestId: action.requestId,
       success: true,
-      data: {
-        rejected: true,
-        itemName: result.creation?.item.displayName,
-      },
+      data: responseData,
     };
   }
 }

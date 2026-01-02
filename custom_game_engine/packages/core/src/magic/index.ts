@@ -1047,6 +1047,21 @@ export {
 } from './ParadigmSpectrum.js';
 
 // ============================================================================
+// LLM Effect Generator (Magic Discovery)
+// ============================================================================
+
+export type {
+  EffectLLMProvider,
+  MagicExperimentContext,
+  MagicExperimentResult,
+} from './LLMEffectGenerator.js';
+
+export {
+  llmEffectGenerator,
+  getEffectGenerator,
+} from './LLMEffectGenerator.js';
+
+// ============================================================================
 // Magic Cost System
 // ============================================================================
 export {

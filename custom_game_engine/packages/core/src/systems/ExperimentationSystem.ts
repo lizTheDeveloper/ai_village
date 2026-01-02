@@ -578,10 +578,17 @@ export class ExperimentationSystem implements System {
 
   /**
    * Register an approved creation (called after divine blessing).
+   * Only handles recipe creations - technology and effect creations
+   * are handled by their respective systems.
    */
   private registerApprovedCreation(
-    creation: { recipe: any; item: any }
+    creation: PendingCreation
   ): void {
+    // Only handle recipe creations
+    if (creation.creationType !== 'recipe' || !creation.recipe || !creation.item) {
+      return;
+    }
+
     // Register the new item to global registry
     if (!itemRegistry.has(creation.item.id)) {
       itemRegistry.register(creation.item);
