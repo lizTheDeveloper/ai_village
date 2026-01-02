@@ -1,0 +1,230 @@
+/**
+ * RelationshipConversationSystem
+ *
+ * Deep Conversation System - Phase 6: Emergent Social Dynamics
+ *
+ * Updates relationships based on conversation quality:
+ * - Builds familiarity, affinity, and trust through conversations
+ * - Records known enthusiasts for topics
+ * - Helps agents learn about each other's interests
+ */
+
+import type { System } from '../ecs/System.js';
+import type { World } from '../ecs/World.js';
+import type { Entity } from '../ecs/Entity.js';
+import { EntityImpl } from '../ecs/Entity.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
+import type { SystemId } from '../types.js';
+import type { RelationshipComponent, Relationship } from '../components/RelationshipComponent.js';
+import type { InterestsComponent } from '../components/InterestsComponent.js';
+import type { SocialMemoryComponent, SocialMemory, KnownFact } from '../components/SocialMemoryComponent.js';
+import type { IdentityComponent } from '../components/IdentityComponent.js';
+import type { ConversationQuality } from '../conversation/ConversationQuality.js';
+import type { TopicId } from '../components/InterestsComponent.js';
+
+/**
+ * Event data for conversation:ended events.
+ */
+interface ConversationEndedEventData {
+  conversationId?: string;
+  participants?: string[];
+  agent1: string;
+  agent2: string;
+  duration?: number;
+  topics?: TopicId[];
+  topicsDiscussed?: TopicId[];
+  depth?: number;
+  messageCount?: number;
+  quality?: number;
+  overallQuality?: number;
+}
+
+export class RelationshipConversationSystem implements System {
+  public readonly id: SystemId = 'relationship_conversation';
+  public readonly priority: number = 16; // After CommunicationSystem (15)
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+
+  private world: World | null = null;
+
+  init(world: World): void {
+    this.world = world;
+
+    // Listen for conversation:ended events
+    world.eventBus.on('conversation:ended', (event: any) => {
+      this.handleConversationEnded(event.data);
+    });
+  }
+
+  update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+    // This system is event-driven, no per-tick updates needed
+  }
+
+  private handleConversationEnded(data: ConversationEndedEventData): void {
+    if (!this.world) return;
+
+    const agent1Id = data.agent1;
+    const agent2Id = data.agent2;
+    const topics = data.topicsDiscussed ?? data.topics ?? [];
+    const qualityScore = data.overallQuality ?? data.quality ?? 0.5;
+    const depth = data.depth ?? 0.5;
+
+    const entity1 = this.world.getEntity(agent1Id);
+    const entity2 = this.world.getEntity(agent2Id);
+
+    if (!entity1 || !entity2) return;
+
+    // Construct a ConversationQuality-like object from event data
+    const quality: ConversationQuality = {
+      depth,
+      // Topic resonance scales with quality: low quality (0.2) → 0.36, high quality (0.8) → 0.84
+      topicResonance: topics.length > 0 ? qualityScore * 0.8 + 0.2 : 0.3,
+      informationExchange: qualityScore > 0.6 ? 0.7 : 0.4,
+      emotionalConnection: qualityScore > 0.7 ? 0.8 : 0.5,
+      durationFactor: 0.7,
+      topicsDiscussed: topics,
+      overallQuality: qualityScore,
+    };
+
+    // Update relationships bidirectionally
+    this.updateRelationship(entity1 as EntityImpl, entity2 as EntityImpl, quality);
+    this.updateRelationship(entity2 as EntityImpl, entity1 as EntityImpl, quality);
+
+    // Record known enthusiasts for discussed topics
+    this.recordEnthusiasts(entity1 as EntityImpl, entity2 as EntityImpl, topics, quality);
+    this.recordEnthusiasts(entity2 as EntityImpl, entity1 as EntityImpl, topics, quality);
+
+    // Learn about partner's interests
+    this.learnInterests(entity1 as EntityImpl, entity2 as EntityImpl, topics);
+    this.learnInterests(entity2 as EntityImpl, entity1 as EntityImpl, topics);
+  }
+
+  private updateRelationship(
+    self: EntityImpl,
+    partner: EntityImpl,
+    quality: ConversationQuality
+  ): void {
+    const relationshipComp = self.getComponent<RelationshipComponent>(CT.Relationship);
+    if (!relationshipComp) return;
+
+    let relationship = relationshipComp.relationships.get(partner.id);
+
+    if (!relationship) {
+      // Create new relationship
+      relationship = {
+        targetId: partner.id,
+        familiarity: 0,
+        affinity: 0,
+        trust: 50,
+        lastInteraction: this.world!.tick,
+        interactionCount: 0,
+        sharedMemories: 0,
+        sharedMeals: 0,
+        perceivedSkills: [],
+      };
+      relationshipComp.relationships.set(partner.id, relationship);
+    }
+
+    // Update based on conversation quality
+    relationship.lastInteraction = this.world!.tick;
+    relationship.interactionCount++;
+
+    // Familiarity always increases
+    const familiarityGain = 2 + quality.overallQuality * 3;
+    relationship.familiarity = Math.min(100, relationship.familiarity + familiarityGain);
+
+    // Affinity increases with good conversations
+    if (quality.overallQuality > 0.5) {
+      const affinityGain = (quality.overallQuality - 0.3) * 5;
+      relationship.affinity = Math.min(100, Math.max(-100, relationship.affinity + affinityGain));
+    }
+
+    // Trust grows with emotional connection
+    if (quality.emotionalConnection > 0.5) {
+      const trustGain = quality.emotionalConnection * 3;
+      relationship.trust = Math.min(100, relationship.trust + trustGain);
+    }
+
+    // Shared information counts as shared memories
+    if (quality.informationExchange > 0.3) {
+      relationship.sharedMemories++;
+    }
+  }
+
+  private recordEnthusiasts(
+    self: EntityImpl,
+    partner: EntityImpl,
+    topics: TopicId[],
+    quality: ConversationQuality
+  ): void {
+    const interests = self.getComponent<InterestsComponent>(CT.Interests);
+    if (!interests) return;
+
+    // Only record if conversation was good
+    if (quality.topicResonance < 0.4) return;
+
+    for (const interest of interests.interests) {
+      if (topics.includes(interest.topic)) {
+        // This person is good to talk to about this topic
+        if (!interest.knownEnthusiasts.includes(partner.id)) {
+          interest.knownEnthusiasts.push(partner.id);
+
+          // Limit to prevent unbounded growth
+          if (interest.knownEnthusiasts.length > 5) {
+            interest.knownEnthusiasts.shift();
+          }
+        }
+      }
+    }
+  }
+
+  private learnInterests(
+    learner: EntityImpl,
+    teacher: EntityImpl,
+    topicsDiscussed: TopicId[]
+  ): void {
+    const socialMemory = learner.getComponent<SocialMemoryComponent>(CT.SocialMemory);
+    if (!socialMemory) return;
+
+    let memory = socialMemory.memories.get(teacher.id);
+    if (!memory) {
+      memory = this.createEmptySocialMemory(teacher.id);
+      socialMemory.memories.set(teacher.id, memory);
+    }
+
+    // Add known facts about partner's interests
+    for (const topic of topicsDiscussed) {
+      const fact: KnownFact = {
+        type: 'interest',
+        value: topic,
+        learnedAt: this.world!.tick,
+        confidence: 0.7,
+      };
+
+      // Don't duplicate facts
+      const existing = memory.knownFacts.find((f: any) =>
+        f.type === 'interest' && f.value === topic);
+
+      if (!existing) {
+        memory.knownFacts.push(fact);
+      } else {
+        // Reinforce existing knowledge
+        existing.confidence = Math.min(1.0, existing.confidence + 0.1);
+      }
+    }
+  }
+
+  private createEmptySocialMemory(agentId: string): SocialMemory {
+    const teacherIdentity = this.world!.getEntity(agentId)?.components.get(CT.Identity) as IdentityComponent | undefined;
+
+    return {
+      agentId,
+      agentName: teacherIdentity?.name ?? 'Unknown',
+      overallSentiment: 0,
+      trust: 0.5,
+      impressions: [],
+      significantMemories: [],
+      relationshipType: 'stranger',
+      knownFacts: [],
+    };
+  }
+}

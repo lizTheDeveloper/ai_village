@@ -1,0 +1,195 @@
+import type { System } from '../ecs/System.js';
+import type { SystemId } from '../types.js';
+import type { World } from '../ecs/World.js';
+import type { Entity } from '../ecs/Entity.js';
+import { EntityImpl } from '../ecs/Entity.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
+import type { AssemblyMachineComponent } from '../components/AssemblyMachineComponent.js';
+import type { MachineConnectionComponent, MachineSlot } from '../components/MachineConnectionComponent.js';
+import type { PowerComponent } from '../components/PowerComponent.js';
+import { calculateEffectiveSpeed } from '../components/AssemblyMachineComponent.js';
+
+/**
+ * AssemblyMachineSystem - Auto-crafts recipes using machine inputs
+ *
+ * Responsibilities:
+ * - Check if machine has recipe configured
+ * - Verify ingredients are available in input slots
+ * - Progress crafting based on power and speed
+ * - Consume ingredients and produce outputs
+ *
+ * Part of automation system (AUTOMATION_LOGISTICS_SPEC.md Part 4)
+ */
+export class AssemblyMachineSystem implements System {
+  public readonly id: SystemId = 'assembly_machine';
+  public readonly priority: number = 54; // After belt/power systems
+  public readonly requiredComponents = [CT.AssemblyMachine, CT.MachineConnection] as const;
+
+  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+    for (const entity of entities) {
+      const machine = (entity as EntityImpl).getComponent<AssemblyMachineComponent>(CT.AssemblyMachine);
+      const connection = (entity as EntityImpl).getComponent<MachineConnectionComponent>(CT.MachineConnection);
+      const power = (entity as EntityImpl).getComponent<PowerComponent>(CT.Power);
+
+      if (!machine || !connection) continue;
+
+      // Skip if not powered
+      if (power && !power.isPowered) {
+        continue;
+      }
+
+      // If no recipe set, agent needs to configure
+      if (!machine.currentRecipe) {
+        continue;
+      }
+
+      // Get recipe from world's crafting system
+      if (!world.craftingSystem) {
+        // Crafting system not registered yet - skip
+        continue;
+      }
+
+      const recipeRegistry = world.craftingSystem.getRecipeRegistry();
+      const recipe = recipeRegistry.getRecipe(machine.currentRecipe);
+      if (!recipe) {
+        // Recipe not found - configuration error
+        console.error(`[AssemblyMachineSystem] Recipe ${machine.currentRecipe} not found`);
+        continue;
+      }
+
+      // Check if we have ingredients
+      const hasIngredients = this.checkIngredients(recipe, connection.inputs);
+      if (!hasIngredients) {
+        continue;
+      }
+
+      // Apply power efficiency to speed
+      const efficiencyMod = power?.efficiency ?? 1.0;
+      const speedMod = calculateEffectiveSpeed(machine);
+
+      // Calculate progress delta
+      const progressDelta = (deltaTime / recipe.craftingTime) * speedMod * efficiencyMod;
+      machine.progress += progressDelta * 100;
+
+      // Check if crafting is complete
+      if (machine.progress >= 100) {
+        // Consume ingredients
+        this.consumeIngredients(recipe, connection.inputs);
+
+        // Produce output
+        const success = this.produceOutput(recipe, connection.outputs, world);
+
+        if (success) {
+          // Reset progress
+          machine.progress = 0;
+        } else {
+          // Output blocked - halt production
+          machine.progress = 100;
+        }
+      }
+    }
+  }
+
+  /**
+   * Check if all recipe ingredients are available
+   */
+  private checkIngredients(recipe: any, inputs: MachineSlot[]): boolean {
+    for (const ingredient of recipe.inputs) {
+      const totalAvailable = inputs.reduce((sum, slot) => {
+        return sum + slot.items.filter(i => i.definitionId === ingredient.itemId).length;
+      }, 0);
+
+      if (totalAvailable < ingredient.amount) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Consume ingredients from input slots
+   */
+  private consumeIngredients(recipe: any, inputs: MachineSlot[]): void {
+    for (const ingredient of recipe.inputs) {
+      let remaining = ingredient.amount;
+
+      for (const slot of inputs) {
+        while (remaining > 0 && slot.items.length > 0) {
+          const item = slot.items.find(i => i.definitionId === ingredient.itemId);
+          if (!item) continue;
+
+          slot.items = slot.items.filter(i => i.instanceId !== item.instanceId);
+          remaining--;
+        }
+
+        if (remaining === 0) break;
+      }
+
+      if (remaining > 0) {
+        throw new Error(`Failed to consume all ingredients for ${recipe.id}`);
+      }
+    }
+  }
+
+  /**
+   * Produce output items to output slots
+   */
+  private produceOutput(recipe: any, outputs: MachineSlot[], world: World): boolean {
+    // Check if we have space for all outputs
+    for (const output of recipe.output ? [recipe.output] : recipe.outputs || []) {
+      const amount = output.quantity ?? output.amount ?? 1;
+      const availableSpace = outputs.reduce((sum, slot) => {
+        return sum + (slot.capacity - slot.items.length);
+      }, 0);
+
+      if (availableSpace < amount) {
+        return false; // Output blocked
+      }
+    }
+
+    // Produce outputs
+    const outputList = recipe.output ? [recipe.output] : recipe.outputs || [];
+    for (const output of outputList) {
+      const amount = output.quantity ?? output.amount ?? 1;
+      for (let i = 0; i < amount; i++) {
+        let item: any;
+
+        // Create item instance using world's item registry if available
+        if (world.itemInstanceRegistry) {
+          const instance = world.itemInstanceRegistry.createInstance({
+            definitionId: output.itemId,
+            quality: 50, // Normal quality for automated production
+            condition: 100, // Brand new
+            createdAt: world.tick,
+          });
+          item = {
+            instanceId: instance.instanceId,
+            definitionId: instance.definitionId,
+            quality: instance.quality,
+            condition: instance.condition,
+          };
+        } else {
+          // Fallback if registry not available
+          item = {
+            instanceId: `assembly_${world.tick}_${i}`,
+            definitionId: output.itemId,
+            quality: 50,
+            condition: 100,
+          };
+        }
+
+        // Find available output slot
+        const slot = outputs.find(s => s.items.length < s.capacity);
+        if (!slot) {
+          console.error('[AssemblyMachineSystem] Output slot full despite space check');
+          return false;
+        }
+
+        slot.items.push(item);
+      }
+    }
+
+    return true;
+  }
+}

@@ -1,0 +1,285 @@
+/**
+ * JealousySystem - Detects romantic jealousy triggers
+ *
+ * Complex Systems Approach:
+ * - NOT all species experience jealousy (polyamorous species, hive minds, extra-temporal beings)
+ * - NOT all individuals within jealousy-capable species feel it equally
+ * - Long-lived species may not care about short romantic "detours"
+ * - Jealousy intensity is: baseIntensity × neuroticism × bondStrength
+ *
+ * Detection:
+ * 1. Ex-lover moved on (has new partner)
+ * 2. Current mate showing affection to others (potential infidelity)
+ * 3. Rival courting desired person (romantic competition)
+ * 4. Mate giving attention to rival (competing for affection)
+ */
+
+import type { System } from '../ecs/System.js';
+import type { SystemId, ComponentType } from '../types.js';
+import type { World } from '../ecs/World.js';
+import type { Entity } from '../ecs/Entity.js';
+import { EntityImpl } from '../ecs/Entity.js';
+import type { JealousyComponent, JealousyType } from '../components/JealousyComponent.js';
+import { createJealousyComponent } from '../components/JealousyComponent.js';
+import type { SexualityComponent } from '../reproduction/SexualityComponent.js';
+import type { PersonalityComponent } from '../components/PersonalityComponent.js';
+import type { RelationshipComponent, Relationship } from '../components/RelationshipComponent.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
+
+/**
+ * Minimum jealousy intensity to create a trigger (avoid noise)
+ */
+const MIN_JEALOUSY_THRESHOLD = 0.2;
+
+/**
+ * Affinity threshold to consider "showing affection" (0-100 scale)
+ */
+const AFFECTION_THRESHOLD = 70;
+
+/**
+ * How often to check for jealousy triggers (throttle for performance)
+ * Every 100 ticks = every 5 seconds at 20 TPS
+ */
+const UPDATE_INTERVAL = 100;
+
+export class JealousySystem implements System {
+  public readonly id: SystemId = 'jealousy';
+  public readonly priority: number = 19; // After courtship (18), before movement (20)
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Sexuality];
+
+  private tickCounter = 0;
+
+  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+    // Throttle: only check every UPDATE_INTERVAL ticks
+    this.tickCounter++;
+    if (this.tickCounter % UPDATE_INTERVAL !== 0) {
+      return;
+    }
+
+    for (const entity of entities) {
+      const impl = entity as EntityImpl;
+      const sexuality = impl.getComponent<SexualityComponent>(CT.Sexuality);
+      const personality = impl.getComponent<PersonalityComponent>(CT.Personality);
+
+      if (!sexuality) continue;
+
+      // Check if this entity can experience jealousy
+      if (sexuality.jealousyIntensity === 0) {
+        // Species/individual incapable of jealousy (polyamorous, extra-temporal, etc.)
+        continue;
+      }
+
+      // Get or create jealousy component
+      let jealousy = impl.getComponent<JealousyComponent>(CT.Jealousy);
+      if (!jealousy) {
+        jealousy = createJealousyComponent();
+        impl.addComponent(jealousy);
+      }
+
+      // Check all jealousy trigger types
+      this.checkExMovedOn(impl, sexuality, personality || null, jealousy, world);
+      this.checkMateInfidelity(impl, sexuality, personality || null, jealousy, world);
+      this.checkRivalAffection(impl, sexuality, personality || null, jealousy, world);
+    }
+  }
+
+  /**
+   * Check if ex-lovers have moved on to new partners
+   */
+  private checkExMovedOn(
+    entity: EntityImpl,
+    sexuality: SexualityComponent,
+    personality: PersonalityComponent | null,
+    jealousy: JealousyComponent,
+    world: World
+  ): void {
+    for (const pastMate of sexuality.pastMates) {
+      // Get ex-partner
+      const ex = world.getEntity(pastMate.entityId);
+      if (!ex) continue;
+
+      const exSexuality = world.getComponent<SexualityComponent>(ex.id, CT.Sexuality);
+      if (!exSexuality) continue;
+
+      // Do they have a new partner?
+      if (exSexuality.currentMates.length > 0) {
+        for (const newMate of exSexuality.currentMates) {
+          // Calculate jealousy intensity
+          const intensity = this.calculateJealousyIntensity(
+            sexuality.jealousyIntensity,
+            personality,
+            0.5 // Ex-relationships have lower intensity than current mates
+          );
+
+          if (intensity >= MIN_JEALOUSY_THRESHOLD) {
+            jealousy.addJealousy({
+              type: 'ex_moved_on',
+              rivalId: newMate.entityId,
+              desiredId: pastMate.entityId,
+              intensity,
+              discoveredAt: world.tick,
+              notes: `${pastMate.entityId} moved on to ${newMate.entityId}`,
+            });
+
+            // Emit event for narrative/logging
+            world.eventBus.emit({
+              type: 'jealousy:ex_moved_on',
+              source: entity.id,
+              data: {
+                exId: pastMate.entityId,
+                newPartnerId: newMate.entityId,
+                intensity,
+              },
+            });
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Check if current mates are showing affection to others (infidelity)
+   */
+  private checkMateInfidelity(
+    entity: EntityImpl,
+    sexuality: SexualityComponent,
+    personality: PersonalityComponent | null,
+    jealousy: JealousyComponent,
+    world: World
+  ): void {
+    for (const mate of sexuality.currentMates) {
+      const partner = world.getEntity(mate.entityId);
+      if (!partner) continue;
+
+      const partnerRel = world.getComponent<RelationshipComponent>(partner.id, CT.Relationship);
+      if (!partnerRel) continue;
+
+      // Check partner's relationships with others
+      for (const [otherId, rel] of partnerRel.relationships.entries()) {
+        // Skip self
+        if (otherId === entity.id) continue;
+
+        // Is partner showing high affection to someone else?
+        if (rel.affinity >= AFFECTION_THRESHOLD) {
+          // Calculate jealousy intensity (current mates = high intensity)
+          const intensity = this.calculateJealousyIntensity(
+            sexuality.jealousyIntensity,
+            personality,
+            mate.bondStrength // Stronger bonds = more jealousy
+          );
+
+          if (intensity >= MIN_JEALOUSY_THRESHOLD) {
+            jealousy.addJealousy({
+              type: 'mate_infidelity',
+              rivalId: otherId,
+              desiredId: mate.entityId,
+              intensity,
+              discoveredAt: world.tick,
+              notes: `${mate.entityId} showing affection (${rel.affinity}) to ${otherId}`,
+            });
+
+            // Emit event
+            world.eventBus.emit({
+              type: 'jealousy:mate_infidelity',
+              source: entity.id,
+              data: {
+                mateId: mate.entityId,
+                rivalId: otherId,
+                affinity: rel.affinity,
+                intensity,
+              },
+            });
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Check if rivals are courting desired persons
+   */
+  private checkRivalAffection(
+    entity: EntityImpl,
+    sexuality: SexualityComponent,
+    personality: PersonalityComponent | null,
+    jealousy: JealousyComponent,
+    world: World
+  ): void {
+    // Check active attractions (people I'm interested in but not yet with)
+    for (const attraction of sexuality.activeAttractions) {
+      // If attraction is reciprocated, they become mates, not rivals
+      if (attraction.reciprocated === 'yes') continue;
+
+      const desired = world.getEntity(attraction.targetId);
+      if (!desired) continue;
+
+      const desiredSexuality = world.getComponent<SexualityComponent>(desired.id, CT.Sexuality);
+      if (!desiredSexuality) continue;
+
+      // Check if desired person is courting/with someone else
+      if (desiredSexuality.currentMates.length > 0) {
+        for (const mate of desiredSexuality.currentMates) {
+          // Calculate jealousy intensity (unrequited love = moderate intensity)
+          const intensity = this.calculateJealousyIntensity(
+            sexuality.jealousyIntensity,
+            personality,
+            attraction.currentIntensity // Intensity of my attraction
+          );
+
+          if (intensity >= MIN_JEALOUSY_THRESHOLD) {
+            jealousy.addJealousy({
+              type: 'rival_affection',
+              rivalId: mate.entityId,
+              desiredId: attraction.targetId,
+              intensity,
+              discoveredAt: world.tick,
+              notes: `Rival ${mate.entityId} is with my desired ${attraction.targetId}`,
+            });
+
+            // Emit event
+            world.eventBus.emit({
+              type: 'jealousy:rival_affection',
+              source: entity.id,
+              data: {
+                desiredId: attraction.targetId,
+                rivalId: mate.entityId,
+                intensity,
+              },
+            });
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Calculate final jealousy intensity
+   *
+   * Formula: baseIntensity × neuroticism × bondStrength
+   * - baseIntensity: from SexualityComponent (species/individual variation)
+   * - neuroticism: from PersonalityComponent (emotional reactivity)
+   * - bondStrength: strength of relationship (0-1)
+   */
+  private calculateJealousyIntensity(
+    baseIntensity: number,
+    personality: PersonalityComponent | null,
+    bondStrength: number
+  ): number {
+    // Base intensity from sexuality (species/individual variation)
+    let intensity = baseIntensity;
+
+    // Modulate by neuroticism (if personality exists)
+    if (personality) {
+      // High neuroticism (>0.7) amplifies jealousy
+      // Low neuroticism (<0.3) dampens it
+      const neuroticismMultiplier = 0.5 + personality.neuroticism;
+      intensity *= neuroticismMultiplier;
+    }
+
+    // Modulate by bond strength (stronger bonds = more jealousy)
+    intensity *= bondStrength;
+
+    // Clamp to [0, 1]
+    return Math.max(0, Math.min(1, intensity));
+  }
+}
