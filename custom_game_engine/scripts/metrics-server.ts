@@ -893,6 +893,122 @@ function saveAllSessionsToDisk(): void {
   }
 }
 
+/**
+ * Clean up old session files to prevent disk space bloat
+ * Only removes very old temporary/test sessions
+ */
+function cleanupOldSessions(): void {
+  if (!fs.existsSync(SESSIONS_DIR)) return;
+
+  const MAX_SESSION_FILES = 200; // Keep last 200 sessions (much more generous)
+  const MAX_FILE_SIZE_MB = 500; // Only delete truly massive files over 500MB
+  const MAX_AGE_DAYS = 90; // Delete files older than 90 days (3 months)
+
+  try {
+    const files = fs.readdirSync(SESSIONS_DIR)
+      .filter(f => f.endsWith('.json'))
+      .map(f => {
+        const filePath = path.join(SESSIONS_DIR, f);
+        const stats = fs.statSync(filePath);
+        return {
+          name: f,
+          path: filePath,
+          mtime: stats.mtime,
+          size: stats.size,
+        };
+      })
+      .sort((a, b) => b.mtime.getTime() - a.mtime.getTime()); // Sort newest first
+
+    let deletedCount = 0;
+    let freedBytes = 0;
+
+    // Delete files older than MAX_AGE_DAYS
+    const cutoffDate = new Date(Date.now() - MAX_AGE_DAYS * 24 * 60 * 60 * 1000);
+    for (const file of files) {
+      if (file.mtime < cutoffDate) {
+        fs.unlinkSync(file.path);
+        deletedCount++;
+        freedBytes += file.size;
+      }
+    }
+
+    // Delete files larger than MAX_FILE_SIZE_MB
+    for (const file of files) {
+      const sizeMB = file.size / (1024 * 1024);
+      if (sizeMB > MAX_FILE_SIZE_MB && fs.existsSync(file.path)) {
+        fs.unlinkSync(file.path);
+        deletedCount++;
+        freedBytes += file.size;
+      }
+    }
+
+    // Keep only the most recent MAX_SESSION_FILES
+    const filesToDelete = files.slice(MAX_SESSION_FILES);
+    for (const file of filesToDelete) {
+      if (fs.existsSync(file.path)) {
+        fs.unlinkSync(file.path);
+        deletedCount++;
+        freedBytes += file.size;
+      }
+    }
+
+    if (deletedCount > 0) {
+      const freedMB = (freedBytes / (1024 * 1024)).toFixed(2);
+      console.log(`[Cleanup] Deleted ${deletedCount} old session files, freed ${freedMB} MB`);
+    }
+  } catch (err) {
+    console.error('Failed to cleanup old sessions:', err);
+  }
+}
+
+/**
+ * Clean up old canon event files
+ */
+function cleanupOldCanonEvents(): void {
+  if (!fs.existsSync(CANON_DIR)) return;
+
+  const MAX_CANON_AGE_DAYS = 180; // Keep canon events for 180 days (6 months)
+
+  try {
+    const sessionDirs = fs.readdirSync(CANON_DIR).filter(f => {
+      const fullPath = path.join(CANON_DIR, f);
+      return fs.statSync(fullPath).isDirectory();
+    });
+
+    let deletedFiles = 0;
+    let freedBytes = 0;
+    const cutoffDate = new Date(Date.now() - MAX_CANON_AGE_DAYS * 24 * 60 * 60 * 1000);
+
+    for (const sessionDir of sessionDirs) {
+      const sessionPath = path.join(CANON_DIR, sessionDir);
+      const files = fs.readdirSync(sessionPath);
+
+      for (const file of files) {
+        const filePath = path.join(sessionPath, file);
+        const stats = fs.statSync(filePath);
+
+        if (stats.mtime < cutoffDate) {
+          freedBytes += stats.size;
+          fs.unlinkSync(filePath);
+          deletedFiles++;
+        }
+      }
+
+      // Remove empty directories
+      if (fs.readdirSync(sessionPath).length === 0) {
+        fs.rmdirSync(sessionPath);
+      }
+    }
+
+    if (deletedFiles > 0) {
+      const freedMB = (freedBytes / (1024 * 1024)).toFixed(2);
+      console.log(`[Cleanup] Deleted ${deletedFiles} old canon event files, freed ${freedMB} MB`);
+    }
+  } catch (err) {
+    console.error('Failed to cleanup old canon events:', err);
+  }
+}
+
 // Load existing sessions on startup
 loadAllSessionsFromDisk();
 
@@ -4917,6 +5033,16 @@ setInterval(() => {
     saveAllSessionsToDisk();
   }
 }, 30000);
+
+// Cleanup old sessions and canon events periodically (once per day)
+setInterval(() => {
+  cleanupOldSessions();
+  cleanupOldCanonEvents();
+}, 24 * 60 * 60 * 1000); // 24 hours
+
+// Run initial cleanup on startup
+cleanupOldSessions();
+cleanupOldCanonEvents();
 
 // Handle shutdown gracefully
 process.on('SIGINT', async () => {
