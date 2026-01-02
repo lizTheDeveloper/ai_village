@@ -152,3 +152,12 @@ export {
   type HistoricalEvent,
   type ChroniclerComponent,
 } from './ChroniclerSystem.js';
+
+// === LLM Technology Generator ===
+export {
+  llmTechnologyGenerator,
+  getTechnologyGenerator,
+  type TechnologyLLMProvider,
+  type TechnologyInventionContext,
+  type TechnologyInventionResult,
+} from './LLMTechnologyGenerator.js';
