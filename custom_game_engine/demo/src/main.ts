@@ -296,12 +296,11 @@ function createInitialAgents(world: WorldMutator, dungeonMasterPrompt?: string):
  * These are not newborns, but mature individuals who need souls appropriate for their age
  */
 async function createSoulsForInitialAgents(
-  world: WorldMutator,
+  gameLoop: GameLoop,
   agentIds: string[],
   llmProvider: LLMProvider
 ): Promise<void> {
-  console.log('[createSoulsForInitialAgents] world:', world, 'getSystem:', typeof world.getSystem);
-  const soulSystem = world.getSystem('soul_creation') as SoulCreationSystem;
+  const soulSystem = gameLoop.systemRegistry.get('soul_creation') as SoulCreationSystem;
   if (!soulSystem) {
     console.warn('[Demo] SoulCreationSystem not found, skipping soul creation');
     return;
@@ -315,7 +314,7 @@ async function createSoulsForInitialAgents(
   // Create a soul for each agent
   const soulPromises = agentIds.map((agentId, index) => {
     return new Promise<void>((resolve) => {
-      const agent = world.getEntity(agentId);
+      const agent = gameLoop.world.getEntity(agentId);
       if (!agent) {
         resolve();
         return;
@@ -340,11 +339,11 @@ async function createSoulsForInitialAgents(
           console.log(`[Demo] Soul created for ${name} (${index + 1}/${agentIds.length})`);
 
           // Link soul to agent
-          const soulLink = createSoulLinkComponent(soulEntityId, world.tick, true);
+          const soulLink = createSoulLinkComponent(soulEntityId, gameLoop.world.tick, true);
           (agent as any).addComponent(soulLink);
 
           // Update soul's incarnation status
-          const soulEntity = world.getEntity(soulEntityId);
+          const soulEntity = gameLoop.world.getEntity(soulEntityId);
           if (soulEntity) {
             const incarnation = soulEntity.components.get('incarnation') as IncarnationComponent | undefined;
             if (incarnation) {
@@ -352,7 +351,7 @@ async function createSoulsForInitialAgents(
                 targetId: agentId,
                 bindingType: 'incarnated',
                 bindingStrength: 1.0,
-                createdTick: world.tick,
+                createdTick: gameLoop.world.tick,
                 isPrimary: true,
               });
               incarnation.state = 'incarnated';
@@ -2930,7 +2929,7 @@ async function main() {
     const agentIds = createInitialAgents(gameLoop.world, settings.dungeonMasterPrompt);
 
     // Create souls for the initial agents
-    await createSoulsForInitialAgents(gameLoop.world, agentIds, llmProvider);
+    await createSoulsForInitialAgents(gameLoop, agentIds, llmProvider);
 
     const playerDeityId = await createPlayerDeity(gameLoop.world); // Create player deity for belief system
 
