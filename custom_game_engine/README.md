@@ -4,6 +4,16 @@ A custom TypeScript game engine built for the AI Village simulation project.
 
 > *This project is dedicated to Tarn Adams and Dwarf Fortress. See the [project README](../README.md) for our philosophy and inspirations.*
 
+## 🌐 Live Deployment
+
+**VM IP Address:** `34.44.162.194`
+
+- **Game:** http://34.44.162.194:5173
+- **Metrics Dashboard:** http://34.44.162.194:8766
+- **Metrics WebSocket:** ws://34.44.162.194:8765
+
+Deployed on Google Cloud Platform (us-central1-a) with Groq API integration.
+
 ## Phase 0: Foundation ✅ COMPLETE
 
 All core systems are implemented and building successfully.
