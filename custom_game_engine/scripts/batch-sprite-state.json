@@ -51,8 +51,12 @@
     "tusked_default",
     "four_arms_default",
     "compound_eyes_default",
-    "chitinous_armor_default"
+    "chitinous_armor_default",
+    "divine_wings_default",
+    "holy_aura_default",
+    "aquatic_breathing_default",
+    "tentacles_default"
   ],
   "failed": [],
-  "lastUpdate": "2026-01-03T22:09:46.244Z"
+  "lastUpdate": "2026-01-03T22:10:47.212Z"
 }

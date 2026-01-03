@@ -14,6 +14,7 @@ import {
   CraftActionHandler,
   TradeActionHandler,
   createTimeComponent,
+  createResearchStateComponent,
   FERTILIZERS,
   createBuildingComponent,
   createPositionComponent,
@@ -2738,6 +2739,7 @@ async function main() {
 
   // Check for existing saves and auto-load the most recent one
   const existingSaves = await saveLoadService.listSaves();
+  console.log(`[Demo] Found ${existingSaves.length} existing saves`);
   let loadedCheckpoint = false;
   let universeSelection: { type: 'new' | 'load'; magicParadigm?: string; checkpointKey?: string };
   let universeConfigScreen: UniverseConfigScreen | null = null;
@@ -3097,6 +3099,29 @@ async function main() {
     // Initialize named landmarks registry
     const namedLandmarksComponent = createNamedLandmarksComponent();
     (worldEntity as any).addComponent(namedLandmarksComponent);
+
+    // Initialize research state with some discovered papers for demo
+    const researchState = createResearchStateComponent();
+    // Add some completed beginner papers from herbal cultivation
+    researchState.completed.add('herb_garden_planning');
+    researchState.completed.add('soil_for_medicinal_plants');
+    researchState.completed.add('herb_seed_selection');
+    // Add some in-progress papers
+    researchState.inProgress.set('perennial_herb_cultivation', {
+      researchId: 'perennial_herb_cultivation',
+      totalRequired: 100,
+      currentProgress: 0.35, // 35% complete
+      assignedAgents: [],
+      startedAt: 0,
+    });
+    researchState.inProgress.set('wood_properties_construction', {
+      researchId: 'wood_properties_construction',
+      totalRequired: 100,
+      currentProgress: 0.62, // 62% complete
+      assignedAgents: [],
+      startedAt: 0,
+    });
+    (worldEntity as any).addComponent(researchState);
 
     // Note: Magic system is automatically initialized by MagicSystem.initialize()
     // We just need to unlock spells for the selected paradigm

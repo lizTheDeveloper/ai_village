@@ -72,6 +72,14 @@ export interface SoulIdentityComponent extends Component {
   soulOriginCulture: SoulCulture;
 
   /**
+   * The species of the soul's FIRST incarnation body
+   * This is what the soul was "born" as originally
+   * Used for PixelLab sprite generation and soul identity
+   * Example: A soul first created as an elf has soulOriginSpecies: 'elf'
+   */
+  soulOriginSpecies: string;
+
+  /**
    * Whether this soul is reincarnated (vs newly created)
    */
   isReincarnated: boolean;
@@ -160,6 +168,7 @@ export interface SoulIdentityComponent extends Component {
 export function createSoulIdentityComponent(data: {
   soulName: string;
   soulOriginCulture: SoulCulture;
+  soulOriginSpecies: string;
   isReincarnated: boolean;
   purpose: string;
   destiny?: string;
@@ -174,6 +183,7 @@ export function createSoulIdentityComponent(data: {
     version: 1,
     soulName: data.soulName,
     soulOriginCulture: data.soulOriginCulture,
+    soulOriginSpecies: data.soulOriginSpecies,
     isReincarnated: data.isReincarnated,
     incarnationHistory: data.incarnationHistory ?? [],
     purpose: data.purpose,
@@ -208,6 +218,23 @@ export function getDefaultInterestsForArchetype(archetype: string): string[] {
   };
 
   return archetypeInterests[archetype] ?? ['exploration', 'knowledge', 'social'];
+}
+
+/**
+ * Get the default species for a soul culture
+ * Maps cultural naming convention to physical species
+ */
+export function getDefaultSpeciesForCulture(culture: SoulCulture): string {
+  const cultureSpeciesMap: Record<SoulCulture, string> = {
+    human: 'human',
+    elven: 'elf',
+    dwarven: 'dwarf',
+    orcish: 'orc',
+    thrakeen: 'thrakeen',
+    exotic: 'alien', // Will need more specific alien species selection
+  };
+
+  return cultureSpeciesMap[culture] ?? 'human';
 }
 
 /**

@@ -1,0 +1,16 @@
+{
+  "id": "horse",
+  "name": "horse",
+  "size": 64,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-03T23:30:01.029Z"
+}

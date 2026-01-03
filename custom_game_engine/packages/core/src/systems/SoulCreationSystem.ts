@@ -35,6 +35,7 @@ import type { LLMProvider } from '@ai-village/llm';
 import {
   createSoulIdentityComponent,
   getDefaultInterestsForArchetype,
+  getDefaultSpeciesForCulture,
   type SoulCulture,
 } from '../components/SoulIdentityComponent.js';
 import { createIncarnationComponent } from '../components/IncarnationComponent.js';
@@ -401,10 +402,14 @@ export class SoulCreationSystem implements System {
     // Generate unique soul name
     const generatedName = await soulNameGenerator.generateNewSoulName(world.tick);
 
+    // Determine soul's original species (what body it's "born" into)
+    const soulOriginSpecies = getDefaultSpeciesForCulture(generatedName.culture as SoulCulture);
+
     // Soul Identity Component
     const soulIdentity = createSoulIdentityComponent({
       soulName: generatedName.name,
       soulOriginCulture: generatedName.culture as SoulCulture,
+      soulOriginSpecies: soulOriginSpecies,
       isReincarnated: context.isReforging ?? false,
       purpose: parsed.purpose ?? 'To find their place in the world',
       destiny: parsed.destiny,

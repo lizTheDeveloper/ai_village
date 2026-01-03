@@ -14,6 +14,14 @@ export * from './AlienCreatureComponents.js';
 export * from './AlienPlantComponents.js';
 export * from './WeatherPhenomenaComponents.js';
 
+// Alien species generator (LLM-powered procedural generation)
+export {
+  type AlienGenerationConstraints,
+  type GeneratedAlienSpecies,
+  AlienSpeciesGenerator,
+  createAlienSpeciesGenerator,
+} from './AlienSpeciesGenerator.js';
+
 // Granular creature components
 export {
   BODY_PLANS,

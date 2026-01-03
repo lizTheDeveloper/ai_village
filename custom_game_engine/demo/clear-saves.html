@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear AI Village Saves</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #fff;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 10px;
+            background: #16213e;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Clear AI Village Saves</h1>
+    <button onclick="checkSaves()">Check Existing Saves</button>
+    <button onclick="clearSaves()">Clear All Saves</button>
+    <div id="status"></div>
+
+    <script>
+        const DB_NAME = 'ai-village-saves';
+
+        async function checkSaves() {
+            const status = document.getElementById('status');
+            try {
+                const db = await openDB();
+                const transaction = db.transaction(['saves'], 'readonly');
+                const store = transaction.objectStore('saves');
+                const request = store.getAllKeys();
+
+                request.onsuccess = () => {
+                    const keys = request.result;
+                    status.innerHTML = `<strong>Found ${keys.length} saves:</strong><br>` +
+                        keys.map(k => `- ${k}`).join('<br>');
+                };
+
+                request.onerror = () => {
+                    status.innerHTML = 'Error reading saves';
+                };
+            } catch (e) {
+                status.innerHTML = `No existing database found (this is OK)`;
+            }
+        }
+
+        async function clearSaves() {
+            const status = document.getElementById('status');
+            try {
+                await new Promise((resolve, reject) => {
+                    const request = indexedDB.deleteDatabase(DB_NAME);
+                    request.onsuccess = resolve;
+                    request.onerror = reject;
+                });
+                status.innerHTML = '<strong style="color: #0f0;">✓ All saves cleared! Reload the game to see Universe Creation Screen.</strong>';
+            } catch (e) {
+                status.innerHTML = `<strong style="color: #f00;">Error: ${e.message}</strong>`;
+            }
+        }
+
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // Auto-check on load
+        checkSaves();
+    </script>
+</body>
+</html>
