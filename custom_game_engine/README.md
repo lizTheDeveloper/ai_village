@@ -6,11 +6,11 @@ A custom TypeScript game engine built for the AI Village simulation project.
 
 ## 🌐 Live Deployment
 
-**VM IP Address:** `34.44.162.194`
+**VM IP Address:** `34.32.58.93`
 
-- **Game:** http://34.44.162.194:3000
+- **Game:** http://34.32.58.93:3000
 
-Deployed on Google Cloud Platform (us-central1-a) with Groq API integration.
+Deployed on Google Cloud Platform (europe-west10-a) with Groq API integration.
 
 **Note:** The metrics dashboard (port 8766) is for internal use only and not exposed publicly.
 
