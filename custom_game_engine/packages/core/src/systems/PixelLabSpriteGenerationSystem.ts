@@ -2,7 +2,7 @@
  * PixelLabSpriteGenerationSystem
  *
  * Automatically generates PixelLab sprites for newly created souls.
- * Listens for soul:ceremony_complete events and enqueues sprite generation jobs.
+ * Listens for soul:created events and enqueues sprite generation jobs.
  */
 
 import type { System } from '../ecs/System.js';
@@ -39,7 +39,7 @@ export class PixelLabSpriteGenerationSystem implements System {
 
   onInit(world: World): void {
     // Subscribe to soul creation events
-    world.eventBus.subscribe('soul:ceremony_complete', (event: any) => {
+    world.eventBus.subscribe('soul:created', (event: any) => {
       this.enqueueSpriteGeneration(world, event.data);
     });
   }
