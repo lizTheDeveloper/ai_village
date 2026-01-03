@@ -251,9 +251,9 @@ Return ONLY valid JSON in this exact format:
     const prompt = `You are naming a newly discovered alien species.
 
 Traits:
-- Body Plan: ${bodyPlan?.name} - ${bodyPlan?.description}
-- Movement: ${locomotion?.name} - ${locomotion?.description}
-- Senses: ${sensory?.name} - ${sensory?.description}
+- Body Plan: ${bodyPlan?.name} - ${bodyPlan?.flavorText}
+- Movement: ${locomotion?.name} - ${locomotion?.flavorText}
+- Senses: ${sensory?.name} - ${sensory?.flavorText}
 - Diet: ${traits.diet.replace(/_/g, ' ')}
 - Social: ${traits.socialStructure.replace(/_/g, ' ')}
 - Intelligence: ${traits.intelligence.replace(/_/g, ' ')}
@@ -324,7 +324,6 @@ Return ONLY valid JSON:
     const bodyPlan = BODY_PLANS[traits.bodyPlan];
     const locomotion = LOCOMOTION_METHODS[traits.locomotion];
     const sensory = SENSORY_SYSTEMS[traits.sensorySystem];
-    const defense = DEFENSIVE_SYSTEMS[traits.defense];
 
     // Generate unique ID
     const id = `alien_${naming.scientificName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`;

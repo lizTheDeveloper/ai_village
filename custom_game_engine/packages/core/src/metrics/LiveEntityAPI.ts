@@ -84,6 +84,8 @@ export class LiveEntityAPI {
         return this.handleDivinityQuery(query);
       case 'pending_approvals':
         return this.handlePendingApprovalsQuery(query);
+      case 'research':
+        return this.handleResearchQuery(query);
       default:
         return {
           requestId: query.requestId,
@@ -821,6 +823,82 @@ export class LiveEntityAPI {
         requestId: query.requestId,
         success: false,
         error: err instanceof Error ? err.message : 'Failed to query divinity info',
+      };
+    }
+  }
+
+  /**
+   * Get research information (discovered papers, in-progress, completed)
+   */
+  private handleResearchQuery(query: QueryRequest): QueryResponse {
+    try {
+      // Get world entity with research state
+      const worldEntity = this.world.query().with('time').executeEntities()[0];
+      if (!worldEntity) {
+        return {
+          requestId: query.requestId,
+          success: false,
+          error: 'World entity not found',
+        };
+      }
+
+      const researchState = worldEntity.components.get('research_state') as unknown as {
+        completed?: Set<string>;
+        inProgress?: Map<string, {
+          researchId: string;
+          totalRequired: number;
+          currentProgress: number;
+          assignedAgents: string[];
+          startedAt: number;
+          researchers?: string[];
+          insights?: Array<{ agentId: string; contribution: number }>;
+        }>;
+      } | undefined;
+
+      if (!researchState) {
+        return {
+          requestId: query.requestId,
+          success: true,
+          data: {
+            totalDiscovered: 0,
+            completed: [],
+            inProgress: [],
+          },
+        };
+      }
+
+      // Get completed papers
+      const completedPapers = Array.from(researchState.completed || []);
+
+      // Get in-progress papers
+      const inProgressPapers = Array.from(researchState.inProgress || []).map(([paperId, progress]) => ({
+        paperId,
+        progress: Math.round(progress.currentProgress * 100), // Convert to percentage
+        totalRequired: progress.totalRequired,
+        assignedAgents: progress.assignedAgents || [],
+        researchers: progress.researchers || [],
+        insights: progress.insights || [],
+        startedAt: progress.startedAt,
+      }));
+
+      const researchInfo = {
+        totalDiscovered: completedPapers.length + inProgressPapers.length,
+        completed: completedPapers,
+        completedCount: completedPapers.length,
+        inProgress: inProgressPapers,
+        inProgressCount: inProgressPapers.length,
+      };
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: researchInfo,
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query research info',
       };
     }
   }

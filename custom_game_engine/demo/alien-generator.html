@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alien Species Generator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      color: #fff;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 2px solid #333;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: #888;
+      font-size: 1rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: #16213e;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .panel h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      color: #667eea;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      color: #aaa;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 0.75rem;
+      background: #0a0a0a;
+      border: 1px solid #333;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.875rem;
+    }
+
+    select:focus, input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+    }
+
+    button {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-top: 1rem;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+      color: #667eea;
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .spinner {
+      border: 3px solid #333;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .result {
+      display: none;
+    }
+
+    .result.active {
+      display: block;
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+
+    .result-title {
+      flex: 1;
+    }
+
+    .result-title h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .result-title .scientific-name {
+      font-style: italic;
+      color: #888;
+      font-size: 0.875rem;
+    }
+
+    .copy-btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      width: auto;
+      margin: 0;
+    }
+
+    .result-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .result-section h4 {
+      color: #667eea;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .result-section p {
+      line-height: 1.6;
+      color: #ccc;
+    }
+
+    .traits-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .trait-item {
+      background: #0a0a0a;
+      padding: 0.75rem;
+      border-radius: 6px;
+      border-left: 3px solid #667eea;
+    }
+
+    .trait-label {
+      font-size: 0.75rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+    }
+
+    .trait-value {
+      color: #fff;
+      font-size: 0.875rem;
+    }
+
+    .sprite-prompt {
+      background: #0a0a0a;
+      padding: 1rem;
+      border-radius: 6px;
+      border: 1px solid #333;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: #4ade80;
+    }
+
+    .error {
+      background: #ff0000;
+      color: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .error.active {
+      display: block;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid #333;
+    }
+
+    .back-link a {
+      color: #667eea;
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🛸 Alien Species Generator</h1>
+      <p class="subtitle">Create unique, biologically coherent alien species with LLM-guided trait selection</p>
+    </header>
+
+    <div class="error" id="error"></div>
+
+    <div class="grid">
+      <div class="panel">
+        <h2>Generation Constraints</h2>
+        <form id="constraintsForm">
+          <div class="form-group">
+            <label for="intelligence">Intelligence Level</label>
+            <select id="intelligence">
+              <option value="">Any</option>
+              <option value="instinctual_only">Instinctual Only</option>
+              <option value="basic_learning">Basic Learning</option>
+              <option value="problem_solver">Problem Solver</option>
+              <option value="proto_sapient">Proto-Sapient</option>
+              <option value="fully_sapient">Fully Sapient</option>
+              <option value="hive_intelligence">Hive Intelligence</option>
+              <option value="incomprehensible_mind">Incomprehensible Mind</option>
+            </select>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="requireSapient">
+            <label for="requireSapient" style="margin-bottom: 0;">Require Sapient (Soul-capable)</label>
+          </div>
+
+          <div class="form-group">
+            <label for="dangerLevel">Danger Level</label>
+            <select id="dangerLevel">
+              <option value="">Any</option>
+              <option value="harmless">Harmless</option>
+              <option value="minor">Minor</option>
+              <option value="moderate">Moderate</option>
+              <option value="severe">Severe</option>
+              <option value="extinction_level">Extinction Level</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="domesticationPotential">Domestication Potential</label>
+            <select id="domesticationPotential">
+              <option value="">Any</option>
+              <option value="none">None</option>
+              <option value="poor">Poor</option>
+              <option value="moderate">Moderate</option>
+              <option value="good">Good</option>
+              <option value="excellent">Excellent</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="environment">Environment</label>
+            <select id="environment">
+              <option value="">Any</option>
+              <option value="terrestrial">Terrestrial</option>
+              <option value="aquatic">Aquatic</option>
+              <option value="aerial">Aerial</option>
+              <option value="subterranean">Subterranean</option>
+              <option value="vacuum">Vacuum</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="nativeWorld">Native World (Optional)</label>
+            <input type="text" id="nativeWorld" placeholder="e.g., Kepler-442b">
+          </div>
+
+          <button type="submit" id="generateBtn">Generate Alien Species</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Generated Species</h2>
+
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <p>Generating alien species...</p>
+          <p style="font-size: 0.875rem; color: #666; margin-top: 0.5rem;">This may take a few seconds</p>
+        </div>
+
+        <div class="result" id="result">
+          <div class="result-header">
+            <div class="result-title">
+              <h3 id="speciesName"></h3>
+              <p class="scientific-name" id="scientificName"></p>
+            </div>
+            <button class="copy-btn" onclick="copyJSON()">Copy JSON</button>
+          </div>
+
+          <div class="result-section">
+            <h4>Description</h4>
+            <p id="description"></p>
+          </div>
+
+          <div class="result-section">
+            <h4>Biological Traits</h4>
+            <div class="traits-grid" id="traitsGrid"></div>
+          </div>
+
+          <div class="result-section">
+            <h4>Metadata</h4>
+            <div class="traits-grid" id="metadataGrid"></div>
+          </div>
+
+          <div class="result-section">
+            <h4>PixelLab Sprite Prompt</h4>
+            <div class="sprite-prompt" id="spritePrompt"></div>
+          </div>
+
+          <div class="result-section" id="biologyNotesSection" style="display: none;">
+            <h4>Biology Notes</h4>
+            <p id="biologyNotes"></p>
+          </div>
+
+          <div class="result-section" id="behaviorNotesSection" style="display: none;">
+            <h4>Behavior Notes</h4>
+            <p id="behaviorNotes"></p>
+          </div>
+
+          <div class="result-section" id="culturalNotesSection" style="display: none;">
+            <h4>Cultural Notes (Sapient Species)</h4>
+            <p id="culturalNotes"></p>
+          </div>
+        </div>
+
+        <p id="placeholder" style="color: #666; text-align: center; padding: 2rem;">
+          Configure constraints and click "Generate" to create a new alien species
+        </p>
+      </div>
+    </div>
+
+    <div class="back-link">
+      <a href="/">&larr; Back to Game</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { AlienSpeciesGenerator } from '../packages/world/dist/alien-generation/AlienSpeciesGenerator.js';
+
+    let currentSpecies = null;
+
+    // Initialize generator (no LLM provider for now - will use random generation)
+    const generator = new AlienSpeciesGenerator();
+
+    const form = document.getElementById('constraintsForm');
+    const loading = document.getElementById('loading');
+    const result = document.getElementById('result');
+    const placeholder = document.getElementById('placeholder');
+    const errorDiv = document.getElementById('error');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Hide error
+      errorDiv.classList.remove('active');
+
+      // Gather constraints
+      const constraints = {};
+
+      const intelligence = document.getElementById('intelligence').value;
+      if (intelligence) constraints.intelligence = intelligence;
+
+      const requireSapient = document.getElementById('requireSapient').checked;
+      if (requireSapient) constraints.requireSapient = true;
+
+      const dangerLevel = document.getElementById('dangerLevel').value;
+      if (dangerLevel) constraints.dangerLevel = dangerLevel;
+
+      const domesticationPotential = document.getElementById('domesticationPotential').value;
+      if (domesticationPotential) constraints.domesticationPotential = domesticationPotential;
+
+      const environment = document.getElementById('environment').value;
+      if (environment) constraints.environment = environment;
+
+      const nativeWorld = document.getElementById('nativeWorld').value.trim();
+      if (nativeWorld) constraints.nativeWorld = nativeWorld;
+
+      // Show loading
+      placeholder.style.display = 'none';
+      result.classList.remove('active');
+      loading.classList.add('active');
+
+      try {
+        // Generate species
+        currentSpecies = await generator.generateAlienSpecies(constraints);
+
+        // Display results
+        displaySpecies(currentSpecies);
+
+        // Hide loading, show result
+        loading.classList.remove('active');
+        result.classList.add('active');
+      } catch (error) {
+        console.error('Generation error:', error);
+        errorDiv.textContent = `Error: ${error.message}`;
+        errorDiv.classList.add('active');
+        loading.classList.remove('active');
+        placeholder.style.display = 'block';
+      }
+    });
+
+    function displaySpecies(species) {
+      // Header
+      document.getElementById('speciesName').textContent = species.name;
+      document.getElementById('scientificName').textContent = species.scientificName;
+
+      // Description
+      document.getElementById('description').textContent = species.description;
+
+      // Traits
+      const traitsGrid = document.getElementById('traitsGrid');
+      traitsGrid.innerHTML = '';
+
+      const traits = [
+        { label: 'Body Plan', value: formatTrait(species.bodyPlan) },
+        { label: 'Locomotion', value: formatTrait(species.locomotion) },
+        { label: 'Sensory System', value: formatTrait(species.sensorySystem) },
+        { label: 'Diet', value: formatTrait(species.diet) },
+        { label: 'Social Structure', value: formatTrait(species.socialStructure) },
+        { label: 'Defense', value: formatTrait(species.defense) },
+        { label: 'Reproduction', value: formatTrait(species.reproduction) },
+        { label: 'Intelligence', value: formatTrait(species.intelligence) },
+      ];
+
+      traits.forEach(trait => {
+        const div = document.createElement('div');
+        div.className = 'trait-item';
+        div.innerHTML = `
+          <div class="trait-label">${trait.label}</div>
+          <div class="trait-value">${trait.value}</div>
+        `;
+        traitsGrid.appendChild(div);
+      });
+
+      // Metadata
+      const metadataGrid = document.getElementById('metadataGrid');
+      metadataGrid.innerHTML = '';
+
+      const metadata = [
+        { label: 'Native World', value: species.nativeWorld },
+        { label: 'Danger Level', value: formatTrait(species.dangerLevel) },
+        { label: 'Domestication', value: formatTrait(species.domesticationPotential) },
+        { label: 'Discovered', value: new Date(species.discovered).toLocaleString() },
+      ];
+
+      metadata.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'trait-item';
+        div.innerHTML = `
+          <div class="trait-label">${item.label}</div>
+          <div class="trait-value">${item.value}</div>
+        `;
+        metadataGrid.appendChild(div);
+      });
+
+      // Sprite prompt
+      document.getElementById('spritePrompt').textContent = species.spritePrompt;
+
+      // Optional sections
+      if (species.biologyNotes) {
+        document.getElementById('biologyNotes').textContent = species.biologyNotes;
+        document.getElementById('biologyNotesSection').style.display = 'block';
+      } else {
+        document.getElementById('biologyNotesSection').style.display = 'none';
+      }
+
+      if (species.behaviorNotes) {
+        document.getElementById('behaviorNotes').textContent = species.behaviorNotes;
+        document.getElementById('behaviorNotesSection').style.display = 'block';
+      } else {
+        document.getElementById('behaviorNotesSection').style.display = 'none';
+      }
+
+      if (species.culturalNotes) {
+        document.getElementById('culturalNotes').textContent = species.culturalNotes;
+        document.getElementById('culturalNotesSection').style.display = 'block';
+      } else {
+        document.getElementById('culturalNotesSection').style.display = 'none';
+      }
+    }
+
+    function formatTrait(trait) {
+      return trait.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
+
+    window.copyJSON = function() {
+      if (currentSpecies) {
+        navigator.clipboard.writeText(JSON.stringify(currentSpecies, null, 2));
+        const btn = document.querySelector('.copy-btn');
+        const originalText = btn.textContent;
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => {
+          btn.textContent = originalText;
+        }, 2000);
+      }
+    };
+  </script>
+</body>
+</html>

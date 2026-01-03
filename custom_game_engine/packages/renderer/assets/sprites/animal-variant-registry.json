@@ -1,0 +1,221 @@
+{
+  "version": "1.0.0",
+  "animals": {
+    "chicken": {
+      "base_id": "chicken",
+      "variants": [
+        {
+          "id": "chicken_white",
+          "variant": "white",
+          "description": "white feathered chicken"
+        },
+        {
+          "id": "chicken_brown",
+          "variant": "brown",
+          "description": "brown feathered chicken"
+        },
+        {
+          "id": "chicken_black",
+          "variant": "black",
+          "description": "black feathered chicken"
+        }
+      ],
+      "variant_count": 3
+    },
+    "cow": {
+      "base_id": "cow",
+      "variants": [
+        {
+          "id": "cow_black_white",
+          "variant": "black_white",
+          "description": "black and white spotted cow"
+        },
+        {
+          "id": "cow_brown",
+          "variant": "brown",
+          "description": "brown cow"
+        },
+        {
+          "id": "cow_brown_white",
+          "variant": "brown_white",
+          "description": "brown and white spotted cow"
+        }
+      ],
+      "variant_count": 3
+    },
+    "sheep": {
+      "base_id": "sheep",
+      "variants": [
+        {
+          "id": "sheep_white",
+          "variant": "white",
+          "description": "white woolly sheep"
+        },
+        {
+          "id": "sheep_black",
+          "variant": "black",
+          "description": "black sheep"
+        },
+        {
+          "id": "sheep_grey",
+          "variant": "grey",
+          "description": "grey woolly sheep"
+        }
+      ],
+      "variant_count": 3
+    },
+    "horse": {
+      "base_id": "horse",
+      "variants": [
+        {
+          "id": "horse_brown",
+          "variant": "brown",
+          "description": "brown horse"
+        },
+        {
+          "id": "horse_black",
+          "variant": "black",
+          "description": "black horse"
+        },
+        {
+          "id": "horse_white",
+          "variant": "white",
+          "description": "white horse"
+        },
+        {
+          "id": "horse_chestnut",
+          "variant": "chestnut",
+          "description": "chestnut brown horse"
+        }
+      ],
+      "variant_count": 4
+    },
+    "dog": {
+      "base_id": "dog",
+      "variants": [
+        {
+          "id": "dog_brown",
+          "variant": "brown",
+          "description": "brown dog"
+        },
+        {
+          "id": "dog_black",
+          "variant": "black",
+          "description": "black dog"
+        },
+        {
+          "id": "dog_white",
+          "variant": "white",
+          "description": "white dog"
+        },
+        {
+          "id": "dog_spotted",
+          "variant": "spotted",
+          "description": "spotted dog"
+        }
+      ],
+      "variant_count": 4
+    },
+    "cat": {
+      "base_id": "cat",
+      "variants": [
+        {
+          "id": "cat_orange",
+          "variant": "orange_tabby",
+          "description": "orange tabby cat"
+        },
+        {
+          "id": "cat_grey",
+          "variant": "grey_tabby",
+          "description": "grey tabby cat"
+        },
+        {
+          "id": "cat_black",
+          "variant": "black",
+          "description": "black cat"
+        },
+        {
+          "id": "cat_white",
+          "variant": "white",
+          "description": "white cat"
+        }
+      ],
+      "variant_count": 4
+    },
+    "rabbit": {
+      "base_id": "rabbit",
+      "variants": [
+        {
+          "id": "rabbit_white",
+          "variant": "white",
+          "description": "white rabbit"
+        },
+        {
+          "id": "rabbit_brown",
+          "variant": "brown",
+          "description": "brown rabbit"
+        },
+        {
+          "id": "rabbit_grey",
+          "variant": "grey",
+          "description": "grey rabbit"
+        }
+      ],
+      "variant_count": 3
+    },
+    "deer": {
+      "base_id": "deer",
+      "variants": [
+        {
+          "id": "deer_brown",
+          "variant": "brown",
+          "description": "brown deer"
+        },
+        {
+          "id": "deer_spotted",
+          "variant": "spotted",
+          "description": "spotted fawn"
+        }
+      ],
+      "variant_count": 2
+    },
+    "pig": {
+      "base_id": "pig",
+      "variants": [
+        {
+          "id": "pig_pink",
+          "variant": "pink",
+          "description": "pink pig"
+        },
+        {
+          "id": "pig_black",
+          "variant": "black",
+          "description": "black pig"
+        }
+      ],
+      "variant_count": 2
+    },
+    "goat": {
+      "base_id": "goat",
+      "variants": [
+        {
+          "id": "goat_white",
+          "variant": "white",
+          "description": "white goat"
+        },
+        {
+          "id": "goat_brown",
+          "variant": "brown",
+          "description": "brown goat"
+        },
+        {
+          "id": "goat_black",
+          "variant": "black",
+          "description": "black goat"
+        }
+      ],
+      "variant_count": 3
+    }
+  },
+  "variant_count": 31
+}

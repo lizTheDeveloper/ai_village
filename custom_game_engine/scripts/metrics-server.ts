@@ -47,6 +47,7 @@
  *   POST /api/live/approve-creation?id=<id> - Approve a pending creation
  *   POST /api/live/reject-creation?id=<id>  - Reject a pending creation
  *   GET  /api/live/divinity    - Get divinity info (gods, belief, pantheons, etc.)
+ *   GET  /api/live/research    - Get research info (discovered papers, in-progress, completed)
  *
  * LLM Proxy API (server-side LLM with rate limiting):
  *   POST /api/llm/generate     - Generate LLM response (server-side, rate-limited)
@@ -4083,6 +4084,27 @@ Available agents:
     return;
   }
 
+  if (pathname === '/api/live/research') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const gameClient = getActiveGameClient();
+    if (!gameClient) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({ error: 'No game client connected', connected: false }));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'research');
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
   // === Pending Approvals API ===
 
   if (pathname === '/api/live/pending-approvals') {
@@ -5219,6 +5241,7 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
           '/api/live/universe - Get universe configuration (dimensions, laws, etc.)',
           '/api/live/magic - Get magic system info (enabled paradigms, etc.)',
           '/api/live/divinity - Get divinity info (gods, belief, pantheons, etc.)',
+          '/api/live/research - Get research info (discovered papers, in-progress, completed)',
         ],
         actions_api: [
           '/api/actions - List all available dev actions (LLM dev tools)',

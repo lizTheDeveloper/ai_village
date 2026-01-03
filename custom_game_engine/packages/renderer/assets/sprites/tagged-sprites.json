@@ -1,0 +1,82 @@
+{
+  "chicken": {
+    "base_species": "chicken",
+    "current_variant_id": "chicken_white",
+    "variant": "white",
+    "has_8_directions": true,
+    "directions": [
+      "south",
+      "southwest",
+      "west",
+      "northwest",
+      "north",
+      "northeast",
+      "east",
+      "southeast"
+    ]
+  },
+  "cow": {
+    "base_species": "cow",
+    "current_variant_id": "cow_black_white",
+    "variant": "black_white",
+    "has_8_directions": true,
+    "directions": [
+      "south",
+      "southwest",
+      "west",
+      "northwest",
+      "north",
+      "northeast",
+      "east",
+      "southeast"
+    ]
+  },
+  "sheep": {
+    "base_species": "sheep",
+    "current_variant_id": "sheep_white",
+    "variant": "white",
+    "has_8_directions": true,
+    "directions": [
+      "south",
+      "southwest",
+      "west",
+      "northwest",
+      "north",
+      "northeast",
+      "east",
+      "southeast"
+    ]
+  },
+  "horse": {
+    "base_species": "horse",
+    "current_variant_id": "horse_brown",
+    "variant": "brown",
+    "has_8_directions": true,
+    "directions": [
+      "south",
+      "southwest",
+      "west",
+      "northwest",
+      "north",
+      "northeast",
+      "east",
+      "southeast"
+    ]
+  },
+  "dog": {
+    "base_species": "dog",
+    "current_variant_id": "dog_brown",
+    "variant": "brown",
+    "has_8_directions": true,
+    "directions": [
+      "south",
+      "southwest",
+      "west",
+      "northwest",
+      "north",
+      "northeast",
+      "east",
+      "southeast"
+    ]
+  }
+}
