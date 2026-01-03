@@ -58,6 +58,9 @@ export { TradeAgreementSystem } from './TradeAgreementSystem.js';
 export * from './MagicSystem.js';
 // Phase 13: Research & Discovery
 export * from './ResearchSystem.js';
+// University Research System
+export * from './UniversitySystem.js';
+export * from './UniversityResearchManagementSystem.js';
 // Mood System
 export * from './MoodSystem.js';
 // Deep Conversation System - Phase 1-6

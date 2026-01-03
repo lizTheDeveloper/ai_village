@@ -96,6 +96,7 @@ import { ResearchSystem } from './ResearchSystem.js';
 import { LibrarySystem } from './LibrarySystem.js';
 import { BookstoreSystem } from './BookstoreSystem.js';
 import { UniversitySystem } from './UniversitySystem.js';
+import { UniversityResearchManagementSystem } from './UniversityResearchManagementSystem.js';
 import { PublishingProductionSystem } from './PublishingProductionSystem.js';
 import { PublishingUnlockSystem } from './PublishingUnlockSystem.js';
 import { TechnologyUnlockSystem } from './TechnologyUnlockSystem.js';
@@ -411,6 +412,10 @@ export function registerAllSystems(
 
   const universitySystem = new UniversitySystem(eventBus);
   gameLoop.systemRegistry.register(universitySystem);
+
+  const universityResearchManagementSystem = new UniversityResearchManagementSystem();
+  universityResearchManagementSystem.setUniversitySystem(universitySystem);
+  gameLoop.systemRegistry.register(universityResearchManagementSystem);
 
   // ============================================================================
   // MAGIC
