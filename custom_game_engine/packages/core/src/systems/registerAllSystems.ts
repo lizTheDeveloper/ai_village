@@ -91,6 +91,7 @@ import { DurabilitySystem } from './DurabilitySystem.js';
 
 // Research
 import { ResearchSystem } from './ResearchSystem.js';
+import { AcademicPaperSystem } from '../research/AcademicPaperSystem.js';
 
 // Publishing & Knowledge Infrastructure
 import { LibrarySystem } from './LibrarySystem.js';
@@ -388,6 +389,10 @@ export function registerAllSystems(
   // ============================================================================
   const researchSystem = new ResearchSystem();
   gameLoop.systemRegistry.register(researchSystem);
+
+  const academicPaperSystem = new AcademicPaperSystem();
+  academicPaperSystem.initialize(gameLoop.world, eventBus);
+  gameLoop.systemRegistry.register(academicPaperSystem);
 
   // ============================================================================
   // PUBLISHING & KNOWLEDGE INFRASTRUCTURE

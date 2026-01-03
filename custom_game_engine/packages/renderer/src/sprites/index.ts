@@ -120,6 +120,13 @@ export type {
   LoadedPixelLabCharacter,
 } from './PixelLabSpriteLoader';
 
+// Sprite Cache - Persistent browser storage for sprites
+export {
+  SpriteCache,
+  getSpriteCache,
+  resetSpriteCache,
+} from './SpriteCache';
+
 // Sprite Registry - Maps game traits to sprite folders
 export {
   findSprite,

@@ -11,6 +11,7 @@ import {
   PIXELLAB_DEFAULT_SIZE,
   angleToPixelLabDirection,
 } from './PixelLabSpriteDefs';
+import { getSpriteCache } from './SpriteCache';
 
 /** Metadata format from PixelLab (nested format) */
 interface PixelLabMetadataNested {
@@ -117,13 +118,22 @@ export class PixelLabSpriteLoader {
 
   private async doLoadCharacter(folderId: string): Promise<LoadedPixelLabCharacter> {
     const folderPath = `${this.basePath}/${folderId}`;
+    const cache = getSpriteCache();
 
-    // Load metadata
-    const metadataResponse = await fetch(`${folderPath}/metadata.json`);
-    if (!metadataResponse.ok) {
-      throw new Error(`Failed to load metadata for ${folderId}`);
+    // Try to get metadata from cache first
+    let metadata: PixelLabMetadata = (await cache.getMetadata(folderId)) as PixelLabMetadata;
+
+    if (!metadata) {
+      // Load metadata from network
+      const metadataResponse = await fetch(`${folderPath}/metadata.json`);
+      if (!metadataResponse.ok) {
+        throw new Error(`Failed to load metadata for ${folderId}`);
+      }
+      metadata = await metadataResponse.json();
+
+      // Cache for next time
+      await cache.cacheMetadata(folderId, metadata);
     }
-    const metadata: PixelLabMetadata = await metadataResponse.json();
 
     const rotations = new Map<string, HTMLImageElement>();
     const animations = new Map<string, Map<string, HTMLImageElement[]>>();
@@ -134,7 +144,7 @@ export class PixelLabSpriteLoader {
       const rotationPromises = metadata.rotations.map(async (dirName) => {
         const imgPath = `${folderPath}/rotations/${dirName}.png`;
         try {
-          const img = await this.loadImage(imgPath);
+          const img = await this.loadImage(imgPath, metadata.id);
           rotations.set(dirName, img);
         } catch {
           // Skip failed loads silently
@@ -159,7 +169,7 @@ export class PixelLabSpriteLoader {
     const rotationPromises = Object.entries(metadata.frames.rotations).map(
       async ([dirName, path]) => {
         try {
-          const img = await this.loadImage(`${folderPath}/${path}`);
+          const img = await this.loadImage(`${folderPath}/${path}`, metadata.character.id);
           rotations.set(dirName, img);
         } catch {
           // Skip failed loads
@@ -179,7 +189,7 @@ export class PixelLabSpriteLoader {
         // Load all frames for this direction
         for (const framePath of framePaths) {
           try {
-            const img = await this.loadImage(`${folderPath}/${framePath}`);
+            const img = await this.loadImage(`${folderPath}/${framePath}`, metadata.character.id);
             frames.push(img);
           } catch {
             // Skip failed frame
@@ -208,10 +218,22 @@ export class PixelLabSpriteLoader {
     };
   }
 
-  private loadImage(path: string): Promise<HTMLImageElement> {
+  private async loadImage(path: string, characterId?: string): Promise<HTMLImageElement> {
+    // Check cache first
+    const cache = getSpriteCache();
+    const cached = await cache.getSprite(path);
+    if (cached) {
+      return cached;
+    }
+
+    // Load from network
     return new Promise((resolve, reject) => {
       const img = new Image();
-      img.onload = () => resolve(img);
+      img.onload = async () => {
+        // Cache for next time
+        await cache.cacheSprite(path, img, characterId);
+        resolve(img);
+      };
       img.onerror = () => reject(new Error(`Failed to load image: ${path}`));
       img.src = path;
     });

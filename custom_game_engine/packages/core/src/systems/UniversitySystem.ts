@@ -25,6 +25,63 @@ import type { UniversityComponent, ResearchProject } from '../components/Univers
 import { startResearch, completeResearch, proposeResearch } from '../components/UniversityComponent.js';
 import type { TechnologyUnlockComponent } from '../components/TechnologyUnlockComponent.js';
 import { getResearchMultiplier } from '../components/TechnologyUnlockComponent.js';
+import { getAcademicPaperSystem } from '../research/AcademicPaperSystem.js';
+import { ResearchRegistry } from '../research/ResearchRegistry.js';
+import type { ResearchField } from '../research/types.js';
+
+/**
+ * Map university research topics to research fields
+ */
+function mapResearchTopicToField(topic: string): ResearchField {
+  const topicLower = topic.toLowerCase();
+
+  if (topicLower.includes('agricult') || topicLower.includes('farm') || topicLower.includes('crop')) {
+    return 'agriculture';
+  }
+  if (topicLower.includes('construct') || topicLower.includes('architect') || topicLower.includes('building')) {
+    return 'construction';
+  }
+  if (topicLower.includes('craft') || topicLower.includes('tool') || topicLower.includes('weapon')) {
+    return 'crafting';
+  }
+  if (topicLower.includes('metal') || topicLower.includes('smith') || topicLower.includes('alloy')) {
+    return 'metallurgy';
+  }
+  if (topicLower.includes('alche') || topicLower.includes('potion') || topicLower.includes('transmut')) {
+    return 'alchemy';
+  }
+  if (topicLower.includes('textile') || topicLower.includes('fabric') || topicLower.includes('weav')) {
+    return 'textiles';
+  }
+  if (topicLower.includes('food') || topicLower.includes('cook') || topicLower.includes('cuisine') || topicLower.includes('brew')) {
+    return 'cuisine';
+  }
+  if (topicLower.includes('machine') || topicLower.includes('automat') || topicLower.includes('engine')) {
+    return 'machinery';
+  }
+  if (topicLower.includes('nature') || topicLower.includes('animal') || topicLower.includes('conserv') || topicLower.includes('environment')) {
+    return 'nature';
+  }
+  if (topicLower.includes('social') || topicLower.includes('community') || topicLower.includes('govern') || topicLower.includes('econom') || topicLower.includes('writing') || topicLower.includes('record') || topicLower.includes('mathemat')) {
+    return 'society';
+  }
+  if (topicLower.includes('arcane') || topicLower.includes('magic') || topicLower.includes('spell')) {
+    return 'arcane';
+  }
+  if (topicLower.includes('gene') || topicLower.includes('heredit') || topicLower.includes('dna')) {
+    return 'genetics';
+  }
+
+  // Default to experimental for novel topics
+  return 'experimental';
+}
+
+/**
+ * Convert research topic to a research ID
+ */
+function topicToResearchId(topic: string): string {
+  return 'university_' + topic.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+}
 
 /**
  * UniversitySystem manages university operations
@@ -111,37 +168,93 @@ export class UniversitySystem implements System {
    * Complete a research project
    */
   private completeProject(
-    _world: World,
+    world: World,
     entity: EntityImpl,
     university: UniversityComponent,
     project: ResearchProject,
     currentTick: number
   ): void {
-    // Generate paper ID
-    const paperId = `paper_${entity.id}_${project.id}_${currentTick}`;
+    // Map research topic to field and ID
+    const researchField = mapResearchTopicToField(project.title);
+    const researchId = topicToResearchId(project.title);
 
-    // Mark project as completed
-    completeResearch(university, project.id, paperId, currentTick);
+    // Register research in ResearchRegistry if it doesn't exist
+    const registry = ResearchRegistry.getInstance();
+    if (!registry.tryGet(researchId)) {
+      registry.register({
+        id: researchId,
+        name: project.title,
+        description: `University research project: ${project.title}`,
+        field: researchField,
+        tier: 2, // University research is tier 2
+        type: 'predefined',
+        progressRequired: 100,
+        prerequisites: [],
+        unlocks: [],
+      });
+    }
 
-    // Emit research completed event
-    this.eventBus.emit({
-      type: 'university:research_completed',
-      source: this.id,
-      data: {
-        universityId: entity.id,
-        projectId: project.id,
-        paperId,
-        title: project.title,
-        researchers: project.researchers,
-        quality: project.quality,
-        novelty: project.novelty,
-        tick: currentTick,
-      },
-    });
+    // Get researcher names from IDs
+    const getAgentName = (agentId: string): string => {
+      const agentEntity = world.getEntity(agentId);
+      if (agentEntity) {
+        const agentComp = (agentEntity as EntityImpl).getComponent<any>(CT.Agent);
+        return agentComp?.name || agentId;
+      }
+      return agentId;
+    };
 
-    console.log(
-      `[UniversitySystem] Research completed: "${project.title}" at university ${entity.id}`
-    );
+    const piName = getAgentName(project.principalInvestigator);
+    const coAuthorNames = project.researchers.map(getAgentName);
+
+    // Publish academic paper via AcademicPaperSystem
+    try {
+      const paperSystem = getAcademicPaperSystem();
+      const { paper, researchComplete } = paperSystem.publishPaper(
+        researchId,
+        project.principalInvestigator,
+        piName,
+        project.researchers,
+        coAuthorNames,
+        project.quality >= 80 // High quality = breakthrough
+      );
+
+      console.log(
+        `[UniversitySystem] 📄 Published paper: "${paper.title}" (${paper.citationCount} citations)`
+      );
+
+      // Mark project as completed
+      completeResearch(university, project.id, paper.id, currentTick);
+
+      // Emit research completed event
+      this.eventBus.emit({
+        type: 'university:research_completed',
+        source: this.id,
+        data: {
+          universityId: entity.id,
+          projectId: project.id,
+          paperId: paper.id,
+          title: project.title,
+          researchers: project.researchers,
+          quality: project.quality,
+          novelty: project.novelty,
+          tick: currentTick,
+          researchComplete, // Did this complete the overall research?
+        },
+      });
+
+      if (researchComplete) {
+        console.log(
+          `[UniversitySystem] 🎓 Research COMPLETE: "${project.title}" at ${university.universityName}`
+        );
+      }
+    } catch (error) {
+      console.error(`[UniversitySystem] Failed to publish paper for "${project.title}":`, error);
+
+      // Fallback: mark complete without paper
+      const paperId = `paper_${entity.id}_${project.id}_${currentTick}`;
+      completeResearch(university, project.id, paperId, currentTick);
+    }
   }
 
   /**
