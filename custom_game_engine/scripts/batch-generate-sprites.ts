@@ -3,14 +3,13 @@
  * Automated PixelLab Sprite Batch Generator
  *
  * Reads the manifest from auto-queue-sprites.ts and automatically:
- * 1. Queues all sprites via the PixelLab API
- * 2. Respects rate limits (5 second delay between jobs)
- * 3. Polls for completion
- * 4. Downloads and saves completed sprites
+ * 1. Generates sprites via the PixelLab API (synchronous)
+ * 2. Saves sprites immediately
+ * 3. Respects rate limits (5 second delay between jobs)
  *
  * Usage:
  *   export PIXELLAB_API_KEY="your-key-here"
- *   npx ts-node scripts/batch-generate-sprites.ts [--batch-size N]
+ *   npx ts-node scripts/batch-generate-sprites.ts
  */
 
 import * as fs from 'fs';
@@ -40,7 +39,6 @@ const SPRITES_DIR = path.join(__dirname, '../packages/renderer/assets/sprites/pi
 
 // Rate limiting
 const DELAY_BETWEEN_JOBS_MS = 5000; // 5 seconds between submissions
-const POLL_INTERVAL_MS = 30000; // 30 seconds between status checks
 
 interface SpriteQueueItem {
   id: string;
@@ -50,8 +48,7 @@ interface SpriteQueueItem {
   category: string;
 }
 
-interface JobState {
-  pending: Record<string, { jobId: string; item: SpriteQueueItem; queuedAt: string }>;
+interface SimpleState {
   completed: string[];
   failed: string[];
   lastUpdate: string;
@@ -66,19 +63,18 @@ function loadManifest(): SpriteQueueItem[] {
   return JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf-8'));
 }
 
-function loadState(): JobState {
+function loadState(): SimpleState {
   if (fs.existsSync(STATE_PATH)) {
     return JSON.parse(fs.readFileSync(STATE_PATH, 'utf-8'));
   }
   return {
-    pending: {},
     completed: [],
     failed: [],
     lastUpdate: new Date().toISOString(),
   };
 }
 
-function saveState(state: JobState): void {
+function saveState(state: SimpleState): void {
   state.lastUpdate = new Date().toISOString();
   fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2));
 }
@@ -111,7 +107,12 @@ async function apiRequest(endpoint: string, method: string = 'GET', body?: any):
   return response.json();
 }
 
-async function queueSprite(item: SpriteQueueItem): Promise<string> {
+async function generateAndSaveSprite(item: SpriteQueueItem): Promise<void> {
+  console.log(`\n[${item.category}] ${item.id}`);
+  console.log(`  Description: ${item.description}`);
+  console.log(`  Size: ${item.size}x${item.size}`);
+
+  // Call API (synchronous - returns image immediately)
   const response = await apiRequest('/generate-image-pixflux', 'POST', {
     description: item.description,
     image_size: {
@@ -121,62 +122,75 @@ async function queueSprite(item: SpriteQueueItem): Promise<string> {
     no_background: true,
   });
 
-  return response.job_id || response.id;
-}
-
-async function checkJobStatus(jobId: string): Promise<any> {
-  return await apiRequest(`/jobs/${jobId}`);
-}
-
-async function downloadImage(url: string, destPath: string): Promise<void> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Download failed: ${response.status}`);
+  if (!response.image || !response.image.base64) {
+    throw new Error('No image in API response');
   }
-  const buffer = await response.arrayBuffer();
-  fs.writeFileSync(destPath, Buffer.from(buffer));
+
+  // Create directory
+  const spriteDir = path.join(SPRITES_DIR, item.id);
+  fs.mkdirSync(spriteDir, { recursive: true });
+
+  // Save image from base64
+  const imageBuffer = Buffer.from(response.image.base64, 'base64');
+  fs.writeFileSync(path.join(spriteDir, 'sprite.png'), imageBuffer);
+  console.log(`  ✓ Saved sprite.png`);
+
+  // Save metadata
+  fs.writeFileSync(
+    path.join(spriteDir, 'metadata.json'),
+    JSON.stringify({
+      id: item.id,
+      category: item.category,
+      type: item.type,
+      size: item.size,
+      description: item.description,
+      generated_at: new Date().toISOString(),
+      usage_usd: response.usage?.usd || 0,
+    }, null, 2)
+  );
+
+  console.log(`  ✓ Saved to ${spriteDir}`);
 }
 
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function queueBatch(manifest: SpriteQueueItem[], state: JobState, batchSize: number): Promise<void> {
-  console.log('\n=== Queueing Sprites ===\n');
+async function runBatch(): Promise<void> {
+  console.log('\n🚀 Starting Automated Sprite Generation\n');
 
-  const toQueue = manifest.filter(item =>
+  const manifest = loadManifest();
+  const state = loadState();
+
+  // Filter to remaining items
+  const remaining = manifest.filter(item =>
     !state.completed.includes(item.id) &&
-    !state.failed.includes(item.id) &&
-    !state.pending[item.id]
+    !state.failed.includes(item.id)
   );
 
-  const batch = toQueue.slice(0, batchSize);
-
-  if (batch.length === 0) {
-    console.log('No sprites to queue. All done or in progress.');
+  if (remaining.length === 0) {
+    console.log('✅ All sprites already generated!');
+    console.log(`Total: ${state.completed.length} completed, ${state.failed.length} failed`);
     return;
   }
 
-  console.log(`Queueing ${batch.length} sprites...`);
+  console.log('=== Status ===');
+  console.log(`Total in manifest: ${manifest.length}`);
+  console.log(`Completed: ${state.completed.length}`);
+  console.log(`Failed: ${state.failed.length}`);
+  console.log(`Remaining: ${remaining.length}\n`);
 
-  for (const item of batch) {
+  // Process each sprite
+  for (let i = 0; i < remaining.length; i++) {
+    const item = remaining[i];
+
     try {
-      console.log(`\n[${item.category}] ${item.id}`);
-      console.log(`  Description: ${item.description}`);
-
-      const jobId = await queueSprite(item);
-
-      state.pending[item.id] = {
-        jobId,
-        item,
-        queuedAt: new Date().toISOString(),
-      };
-
-      console.log(`  ✓ Queued: ${jobId}`);
+      await generateAndSaveSprite(item);
+      state.completed.push(item.id);
       saveState(state);
 
-      // Rate limiting
-      if (batch.indexOf(item) < batch.length - 1) {
+      // Rate limiting (except for last item)
+      if (i < remaining.length - 1) {
         console.log(`  Waiting ${DELAY_BETWEEN_JOBS_MS / 1000}s...`);
         await sleep(DELAY_BETWEEN_JOBS_MS);
       }
@@ -184,133 +198,21 @@ async function queueBatch(manifest: SpriteQueueItem[], state: JobState, batchSiz
       console.log(`  ✗ Failed: ${err.message}`);
       state.failed.push(item.id);
       saveState(state);
-    }
-  }
 
-  console.log(`\n✓ Queued ${batch.length} sprites`);
-}
-
-async function pollAndDownload(state: JobState): Promise<void> {
-  console.log('\n=== Checking Pending Jobs ===\n');
-
-  const pendingIds = Object.keys(state.pending);
-
-  if (pendingIds.length === 0) {
-    console.log('No pending jobs.');
-    return;
-  }
-
-  console.log(`Checking ${pendingIds.length} pending jobs...`);
-
-  for (const spriteId of pendingIds) {
-    const { jobId, item } = state.pending[spriteId];
-
-    try {
-      console.log(`\n[${item.category}] ${spriteId}`);
-
-      const job = await checkJobStatus(jobId);
-
-      if (job.status === 'completed' || job.image_url) {
-        console.log(`  ✓ Completed! Downloading...`);
-
-        // Create directory
-        const spriteDir = path.join(SPRITES_DIR, spriteId);
-        fs.mkdirSync(spriteDir, { recursive: true });
-
-        // Download image
-        const imageUrl = job.image_url || job.result?.image_url;
-        if (imageUrl) {
-          await downloadImage(imageUrl, path.join(spriteDir, 'sprite.png'));
-          console.log(`    Downloaded sprite.png`);
-        }
-
-        // Save metadata
-        fs.writeFileSync(
-          path.join(spriteDir, 'metadata.json'),
-          JSON.stringify({
-            id: spriteId,
-            category: item.category,
-            type: item.type,
-            size: item.size,
-            description: item.description,
-            pixellab_job_id: jobId,
-            generated_at: new Date().toISOString(),
-          }, null, 2)
-        );
-
-        // Move to completed
-        delete state.pending[spriteId];
-        state.completed.push(spriteId);
-        console.log(`  ✓ Saved to ${spriteDir}`);
-
-      } else if (job.status === 'processing' || job.status === 'queued') {
-        console.log(`  ⏳ Status: ${job.status}`);
-      } else if (job.status === 'failed') {
-        console.log(`  ✗ Failed`);
-        delete state.pending[spriteId];
-        state.failed.push(spriteId);
-      } else {
-        console.log(`  ? Unknown status: ${job.status}`);
+      // Continue with rate limiting
+      if (i < remaining.length - 1) {
+        console.log(`  Waiting ${DELAY_BETWEEN_JOBS_MS / 1000}s...`);
+        await sleep(DELAY_BETWEEN_JOBS_MS);
       }
-
-      saveState(state);
-      await sleep(1000); // Small delay between checks
-    } catch (err: any) {
-      console.log(`  ✗ Error checking: ${err.message}`);
     }
   }
-}
 
-async function runContinuous(batchSize: number): Promise<void> {
-  console.log('\n🚀 Starting Automated Sprite Generation');
-  console.log('Press Ctrl+C to stop\n');
-
-  while (true) {
-    const manifest = loadManifest();
-    const state = loadState();
-
-    // Show status
-    console.log('\n=== Status ===');
-    console.log(`Total in manifest: ${manifest.length}`);
-    console.log(`Completed: ${state.completed.length}`);
-    console.log(`Pending: ${Object.keys(state.pending).length}`);
-    console.log(`Failed: ${state.failed.length}`);
-    console.log(`Remaining: ${manifest.length - state.completed.length - state.failed.length - Object.keys(state.pending).length}`);
-
-    // Queue new batch if needed
-    if (Object.keys(state.pending).length < batchSize) {
-      await queueBatch(manifest, state, batchSize - Object.keys(state.pending).length);
-    }
-
-    // Check and download
-    await pollAndDownload(state);
-
-    // Check if done
-    const remaining = manifest.length - state.completed.length - state.failed.length;
-    if (remaining === 0 && Object.keys(state.pending).length === 0) {
-      console.log('\n✅ All sprites generated!');
-      console.log(`Completed: ${state.completed.length}`);
-      console.log(`Failed: ${state.failed.length}`);
-      break;
-    }
-
-    // Wait before next poll
-    console.log(`\n⏳ Waiting ${POLL_INTERVAL_MS / 1000}s before next check...`);
-    await sleep(POLL_INTERVAL_MS);
-  }
+  console.log('\n✅ Batch complete!');
+  console.log(`Completed: ${state.completed.length}`);
+  console.log(`Failed: ${state.failed.length}`);
 }
 
 async function main(): Promise<void> {
-  const args = process.argv.slice(2);
-  let batchSize = 5; // Default: 5 concurrent jobs
-
-  for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--batch-size' && args[i + 1]) {
-      batchSize = parseInt(args[i + 1], 10);
-      i++;
-    }
-  }
-
   if (!API_KEY) {
     console.error('\n❌ Error: PIXELLAB_API_KEY not set');
     console.log('\nSet your API key:');
@@ -319,7 +221,7 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  await runContinuous(batchSize);
+  await runBatch();
 }
 
 main().catch(console.error);

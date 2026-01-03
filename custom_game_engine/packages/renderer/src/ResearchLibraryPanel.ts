@@ -236,8 +236,8 @@ export class ResearchLibraryPanel implements IWindowPanel {
    */
   render(
     ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
+    _x: number,
+    _y: number,
     width: number,
     height: number,
     world?: World
@@ -269,7 +269,8 @@ export class ResearchLibraryPanel implements IWindowPanel {
     ctx.font = '10px Arial';
     ctx.fillText('Sort:', this.padding, currentY + 10);
 
-    const sortOptions: Array<{ key: typeof this.sortBy; label: string }> = [
+    type SortBy = typeof this.sortBy;
+    const sortOptions: Array<{ key: SortBy; label: string }> = [
       { key: 'field', label: 'Field' },
       { key: 'complexity', label: 'Complexity' },
       { key: 'recent', label: 'Recent' },

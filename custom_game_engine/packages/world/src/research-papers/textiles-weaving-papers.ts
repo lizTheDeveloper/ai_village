@@ -9,7 +9,7 @@ import type { ResearchPaper } from './types.js';
 export const FIBER_PREPARATION: ResearchPaper = {
   paperId: 'fiber_preparation',
   title: 'From Fleece to Thread: Preparing Fibers for Spinning',
-  field: 'crafting',
+  field: 'textiles',
   paperSets: ['textile_fundamentals'],
   prerequisitePapers: [],
   complexity: 2,
@@ -81,7 +81,7 @@ The importance of thorough preparation cannot be overstated: dirty fleece produc
 export const SPINNING_FUNDAMENTALS: ResearchPaper = {
   paperId: 'spinning_fundamentals',
   title: 'The Twist of Fate: Basic Principles of Spinning Thread',
-  field: 'crafting',
+  field: 'textiles',
   paperSets: ['textile_fundamentals'],
   prerequisitePapers: ['fiber_preparation'],
   complexity: 3,
@@ -132,7 +132,7 @@ The relationship between twist and strength follows mathematical principles that
 export const LOOM_CONSTRUCTION: ResearchPaper = {
   paperId: 'loom_construction',
   title: 'Building the Frame: Loom Construction and Operation',
-  field: 'crafting',
+  field: 'textiles',
   paperSets: ['textile_fundamentals'],
   prerequisitePapers: ['spinning_fundamentals'],
   complexity: 5,
@@ -199,7 +199,7 @@ The operation of a completed loom requires a meditative state wherein the weaver
 export const WEAVING_PATTERNS: ResearchPaper = {
   paperId: 'weaving_patterns',
   title: 'Beyond Plain Weave: Complex Weaving Patterns and Techniques',
-  field: 'crafting',
+  field: 'textiles',
   paperSets: ['textile_fundamentals'],
   prerequisitePapers: ['loom_construction'],
   complexity: 6,
@@ -274,7 +274,7 @@ The precision required for these patterns cannot be overstated: a single threadi
 export const NATURAL_DYES: ResearchPaper = {
   paperId: 'natural_dyes',
   title: 'Colors from Nature: Plant-Based Textile Dyes',
-  field: 'crafting',
+  field: 'textiles',
   paperSets: ['textile_fundamentals'],
   prerequisitePapers: ['spinning_fundamentals'],
   complexity: 4,

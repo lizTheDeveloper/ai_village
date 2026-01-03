@@ -304,6 +304,18 @@ researchSpeed = baseSpeed
 - **Caching**: Cache paper details to avoid re-fetching
 - **Pagination**: Load papers in chunks if > 100 in view
 
+## Research Strategy
+
+For detailed strategic analysis and optimization guidance, see:
+- **[Research Strategy Guide](../research/research-strategy-guide.md)** - Comprehensive analysis of research development paths, strategic archetypes ("Build Schools First" vs "Hire Researchers Fast"), optimization priorities, and mathematical modeling of completion times
+
+Key strategic insights:
+- Researchers scale linearly with **no diminishing returns** (20 researchers = 20× speed)
+- Building bonuses multiply everything (Research Institute = 2× speed boost)
+- Focus multiplier can provide 3× speed (dedicated vs distracted researchers)
+- Optimal strategy: "Elite Academy" (5 master researchers, Research Institute, 1.5× focus) = 21 days
+- Natural progression: 3 → 10 researchers over time = 20 days
+
 ## Future Enhancements
 
 1. **Research Teams**: Multiple agents collaborating on one paper

@@ -207,7 +207,7 @@ FOOTNOTES
 
 export const ANTIMICROBIAL_PLANTS: ResearchPaper = {
   paperId: 'antimicrobial_plants',
-  title: 'Nature's Antibiotics: Plants That Fight Infection',
+  title: 'Nature\'s Antibiotics: Plants That Fight Infection',
   field: 'nature',
   paperSets: ['herbalism_fundamentals'],
   prerequisitePapers: ['herb_identification', 'extraction_methods'],

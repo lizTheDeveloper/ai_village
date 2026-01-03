@@ -120,7 +120,7 @@ The practitioner is therefore advised to approach blood regeneration with the sa
 ††††††Professor Vorpal-Schnauzenfeinstein (1842-1921) held the Grünwald Chair of Pessimistic Mathematics at the University of Hoffenholm, where he specialized in calculating exactly how impossible things were. His seventeen-volume work "No, Actually: A Comprehensive Rejection of Optimistic Numerology" remains the definitive text on mathematical disappointment. He died doing what he loved: proving it couldn't be done.
 
 ‡‡‡‡The Great Limb Question has spawned no fewer than forty-seven separate academic journals, two international conferences (one of which is specifically about why the other conference is wrong), an`,
-  abstract: 'Research paper on Using one's own blood to fuel rapid tissue regeneration',
+  abstract: 'Research paper on Using one\'s own blood to fuel rapid tissue regeneration',
   published: false
 };
 

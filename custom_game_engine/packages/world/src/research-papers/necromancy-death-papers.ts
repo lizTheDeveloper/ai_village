@@ -141,7 +141,7 @@ For necromancers and other professionals in the death-adjacent industries, under
 
 export const CORPSE_PRESERVATION: ResearchPaper = {
   paperId: 'corpse_preservation',
-  title: 'Preventing Decay: The Necromancer's Guide to Corpse Maintenance',
+  title: 'Preventing Decay: The Necromancer\'s Guide to Corpse Maintenance',
   field: 'arcane',
   paperSets: ['necromancy_fundamentals'],
   prerequisitePapers: ['death_detection'],

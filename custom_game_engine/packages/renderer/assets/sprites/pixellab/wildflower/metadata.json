@@ -1,0 +1,9 @@
+{
+  "id": "wildflower",
+  "category": "plants",
+  "type": "map_object",
+  "size": 32,
+  "description": "Wildflower plant, pixel art, top-down view",
+  "generated_at": "2026-01-03T21:55:53.359Z",
+  "usage_usd": 0
+}

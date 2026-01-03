@@ -8,7 +8,7 @@ import type { ResearchPaper } from './types.js';
 
 export const ORE_IDENTIFICATION: ResearchPaper = {
   paperId: 'ore_identification',
-  title: 'Rocks That Aren't Just Rocks: Identifying Metal-Bearing Ores',
+  title: 'Rocks That Aren\'t Just Rocks: Identifying Metal-Bearing Ores',
   field: 'metallurgy',
   paperSets: ['metallurgy_fundamentals'],
   prerequisitePapers: [],
