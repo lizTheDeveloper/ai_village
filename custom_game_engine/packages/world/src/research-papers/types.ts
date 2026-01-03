@@ -12,6 +12,7 @@ export type ResearchField =
   | 'textiles'
   | 'cuisine'
   | 'construction'
+  | 'crafting'
   | 'nature'
   | 'arcane'
   | 'machinery'

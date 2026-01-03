@@ -1,422 +1,481 @@
-import type { IWindowPanel } from './types/WindowTypes.js';
-import type { World, Entity } from '@ai-village/core';
-import type {
-  AgentComponent,
-  IdentityComponent,
-  NeedsComponent,
-  SkillsComponent,
-  MoodComponent,
-  PositionComponent,
-} from '@ai-village/core';
-
 /**
- * AgentRosterPanel - Shows a sortable list of all agents with their status
+ * AgentRosterPanel - Persistent panel showing agent portraits for quick access
  *
- * Displays:
- * - Agent name and current behavior
- * - Health, hunger, energy indicators (color-coded)
- * - Mood and position
- * - Sortable by name, behavior, health, etc.
+ * Features:
+ * - Shows all agents when < 20
+ * - Shows 9 most recently interacted + "All Agents" button when >= 20
+ * - Click agent portrait to focus camera on them
+ * - "All Agents" button opens full roster modal
  */
-export class AgentRosterPanel implements IWindowPanel {
-  private visible: boolean = false;
-  private scrollOffset: number = 0;
-  private sortBy: 'name' | 'behavior' | 'health' | 'hunger' = 'name';
-  private selectedAgentId: string | null = null;
-  private readonly padding = 12;
-  private readonly rowHeight = 60; // Height per agent row
 
-  constructor() {}
+import { PixelLabSpriteLoader } from './sprites/PixelLabSpriteLoader.js';
+import type { World } from '@ai-village/core';
 
-  getId(): string {
-    return 'agent-roster';
+interface AgentInfo {
+  id: string;
+  name: string;
+  spriteFolder: string;
+  lastInteractionTime: number;
+}
+
+export class AgentRosterPanel {
+  private container: HTMLDivElement;
+  private rosterContainer: HTMLDivElement;
+  private agents: Map<string, AgentInfo> = new Map();
+  private spriteLoader: PixelLabSpriteLoader;
+  private onAgentClickCallback: ((agentId: string) => void) | null = null;
+
+  constructor(spriteLoader: PixelLabSpriteLoader) {
+    this.spriteLoader = spriteLoader;
+    this.container = document.createElement('div');
+    this.setupStyles();
+    this.rosterContainer = this.createRosterContainer();
+    this.container.appendChild(this.rosterContainer);
+    document.body.appendChild(this.container);
   }
 
-  getTitle(): string {
-    return 'Agent Roster';
+  private setupStyles(): void {
+    this.container.style.cssText = `
+      position: fixed;
+      top: 60px;
+      right: 20px;
+      width: 80px;
+      max-height: calc(100vh - 80px);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 1000;
+      pointer-events: none;
+    `;
   }
 
-  getDefaultWidth(): number {
-    return 380;
+  private createRosterContainer(): HTMLDivElement {
+    const roster = document.createElement('div');
+    roster.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+      pointer-events: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 215, 0, 0.3) transparent;
+    `;
+    roster.style.setProperty('scrollbar-width', 'thin');
+    return roster;
   }
 
-  getDefaultHeight(): number {
-    return 500;
+  /**
+   * Set callback for when an agent portrait is clicked
+   */
+  setOnAgentClick(callback: (agentId: string) => void): void {
+    this.onAgentClickCallback = callback;
   }
 
-  isVisible(): boolean {
-    return this.visible;
+  /**
+   * Add or update an agent in the roster
+   */
+  addAgent(id: string, name: string, spriteFolder: string): void {
+    if (!this.agents.has(id)) {
+      this.agents.set(id, {
+        id,
+        name,
+        spriteFolder,
+        lastInteractionTime: Date.now(),
+      });
+      this.render();
+    }
   }
 
-  setVisible(visible: boolean): void {
-    this.visible = visible;
+  /**
+   * Remove an agent from the roster (e.g., when they die)
+   */
+  removeAgent(id: string): void {
+    this.agents.delete(id);
+    this.render();
   }
 
-  render(
-    ctx: CanvasRenderingContext2D,
-    _x: number,
-    _y: number,
-    width: number,
-    height: number,
-    world?: World
-  ): void {
-    if (!this.visible || !world) {
-      return;
+  /**
+   * Mark an agent as recently interacted with
+   */
+  touchAgent(id: string): void {
+    const agent = this.agents.get(id);
+    if (agent) {
+      agent.lastInteractionTime = Date.now();
+      this.render();
+    }
+  }
+
+  /**
+   * Update the roster display
+   */
+  updateFromWorld(world: World): void {
+    // Get all agents from the world
+    const agentEntities = world.query().with('agent', 'identity', 'appearance').executeEntities();
+
+    for (const entity of agentEntities) {
+      const identity = entity.components.get('identity') as any;
+      const appearance = entity.components.get('appearance') as any;
+
+      if (identity && appearance) {
+        const name = identity.name || 'Unknown';
+        const spriteFolder = appearance.spriteFolder || 'villager';
+
+        if (!this.agents.has(entity.id)) {
+          this.addAgent(entity.id, name, spriteFolder);
+        }
+      }
     }
 
-    // Query all agents
-    const agents = world.query().with('agent', 'identity').executeEntities();
+    // Remove agents that no longer exist
+    const existingIds = new Set(agentEntities.map(e => e.id));
+    for (const id of this.agents.keys()) {
+      if (!existingIds.has(id)) {
+        this.removeAgent(id);
+      }
+    }
+  }
 
-    if (agents.length === 0) {
-      ctx.fillStyle = '#999';
-      ctx.font = '12px monospace';
-      ctx.fillText('No agents found', this.padding, 30);
-      return;
+  private render(): void {
+    const agentCount = this.agents.size;
+    const showAllButton = agentCount >= 20;
+    const maxVisible = showAllButton ? 9 : 20;
+
+    // Get agents sorted by last interaction time
+    const sortedAgents = Array.from(this.agents.values())
+      .sort((a, b) => b.lastInteractionTime - a.lastInteractionTime)
+      .slice(0, maxVisible);
+
+    // Clear container
+    this.rosterContainer.innerHTML = '';
+
+    // Add agent portraits
+    for (const agent of sortedAgents) {
+      const portrait = this.createAgentPortrait(agent);
+      this.rosterContainer.appendChild(portrait);
     }
 
-    // Sort agents
-    const sortedAgents = this.sortAgents(agents);
+    // Add "All Agents" button if needed
+    if (showAllButton) {
+      const allButton = this.createAllAgentsButton();
+      this.rosterContainer.appendChild(allButton);
+    }
+  }
 
-    let y = this.padding;
+  private createAgentPortrait(agent: AgentInfo): HTMLDivElement {
+    const portrait = document.createElement('div');
+    portrait.style.cssText = `
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, rgba(30, 30, 50, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%);
+      border: 2px solid #ffd700;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    `;
 
-    // Header with sort controls
-    ctx.fillStyle = '#00CED1';
-    ctx.font = 'bold 12px monospace';
-    ctx.fillText(`Agents: ${agents.length}`, this.padding, y);
-    y += 18;
+    // Sprite canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 64;
+    canvas.style.cssText = `
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+    `;
 
-    // Sort buttons
-    const sortOptions: Array<{ key: 'name' | 'behavior' | 'health' | 'hunger'; label: string }> = [
-      { key: 'name', label: 'Name' },
-      { key: 'behavior', label: 'Behavior' },
-      { key: 'health', label: 'Health' },
-      { key: 'hunger', label: 'Hunger' },
-    ];
+    // Load sprite
+    this.loadAgentSprite(canvas, agent.spriteFolder);
 
-    ctx.font = '10px monospace';
-    let sortX = this.padding;
-    sortOptions.forEach(opt => {
-      const isActive = this.sortBy === opt.key;
-      ctx.fillStyle = isActive ? '#FFD700' : '#666';
-      ctx.fillText(opt.label, sortX, y);
-      sortX += 70;
+    // Name tooltip
+    portrait.title = agent.name;
+
+    // Hover effects
+    portrait.addEventListener('mouseenter', () => {
+      portrait.style.transform = 'scale(1.1)';
+      portrait.style.boxShadow = '0 0 15px rgba(255, 215, 0, 0.6)';
+      portrait.style.borderColor = '#ffed4e';
     });
-    y += 16;
 
-    // Divider
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 1;
+    portrait.addEventListener('mouseleave', () => {
+      portrait.style.transform = 'scale(1)';
+      portrait.style.boxShadow = 'none';
+      portrait.style.borderColor = '#ffd700';
+    });
+
+    // Click to focus
+    portrait.addEventListener('click', () => {
+      this.touchAgent(agent.id);
+      if (this.onAgentClickCallback) {
+        this.onAgentClickCallback(agent.id);
+      }
+    });
+
+    portrait.appendChild(canvas);
+    return portrait;
+  }
+
+  private createAllAgentsButton(): HTMLDivElement {
+    const button = document.createElement('div');
+    button.style.cssText = `
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, rgba(50, 50, 70, 0.95) 0%, rgba(40, 40, 60, 0.95) 100%);
+      border: 2px solid #87CEEB;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: bold;
+      color: #87CEEB;
+      text-align: center;
+      padding: 5px;
+    `;
+
+    button.innerHTML = `
+      <div style="font-size: 20px; margin-bottom: 2px;">👥</div>
+      <div>All<br/>Agents</div>
+    `;
+
+    button.title = `View all ${this.agents.size} agents`;
+
+    // Hover effects
+    button.addEventListener('mouseenter', () => {
+      button.style.transform = 'scale(1.1)';
+      button.style.boxShadow = '0 0 15px rgba(135, 206, 235, 0.6)';
+      button.style.borderColor = '#ADD8E6';
+    });
+
+    button.addEventListener('mouseleave', () => {
+      button.style.transform = 'scale(1)';
+      button.style.boxShadow = 'none';
+      button.style.borderColor = '#87CEEB';
+    });
+
+    // Click to open all agents modal
+    button.addEventListener('click', () => {
+      this.showAllAgentsModal();
+    });
+
+    return button;
+  }
+
+  private async loadAgentSprite(canvas: HTMLCanvasElement, spriteFolder: string): Promise<void> {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    try {
+      const character = await this.spriteLoader.loadCharacter(spriteFolder);
+      const southImage = character.rotations.get('south');
+
+      if (southImage) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const scale = Math.min(
+          canvas.width / southImage.width,
+          canvas.height / southImage.height
+        );
+        const x = (canvas.width - southImage.width * scale) / 2;
+        const y = (canvas.height - southImage.height * scale) / 2;
+
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(
+          southImage,
+          x, y,
+          southImage.width * scale,
+          southImage.height * scale
+        );
+      } else {
+        this.drawPlaceholder(ctx, canvas.width, canvas.height);
+      }
+    } catch (error) {
+      console.warn(`[AgentRoster] Failed to load sprite ${spriteFolder}:`, error);
+      this.drawPlaceholder(ctx, canvas.width, canvas.height);
+    }
+  }
+
+  private drawPlaceholder(ctx: CanvasRenderingContext2D, width: number, height: number): void {
+    ctx.fillStyle = '#666';
     ctx.beginPath();
-    ctx.moveTo(this.padding, y);
-    ctx.lineTo(width - this.padding, y);
-    ctx.stroke();
-    y += 8;
-
-    // Calculate visible agents (with scrolling)
-    const visibleAreaHeight = height - y;
-    const maxVisibleAgents = Math.floor(visibleAreaHeight / this.rowHeight);
-    const startIdx = Math.floor(this.scrollOffset);
-    const endIdx = Math.min(startIdx + maxVisibleAgents, sortedAgents.length);
-
-    // Render visible agents
-    for (let i = startIdx; i < endIdx; i++) {
-      const agent = sortedAgents[i];
-      if (!agent) continue;
-
-      const rowY = y + ((i - startIdx) * this.rowHeight);
-      this.renderAgentRow(ctx, agent, this.padding, rowY, width - this.padding * 2);
-    }
-
-    // Scroll indicator
-    if (sortedAgents.length > maxVisibleAgents) {
-      const scrollbarHeight = 60;
-      const scrollbarY = y + ((this.scrollOffset / sortedAgents.length) * (visibleAreaHeight - scrollbarHeight));
-      ctx.fillStyle = '#555';
-      ctx.fillRect(width - 8, scrollbarY, 4, scrollbarHeight);
-    }
+    ctx.arc(width / 2, height / 3, width / 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillRect(width / 2 - width / 8, height / 2, width / 4, height / 3);
   }
 
-  /**
-   * Render a single agent row with key information
-   */
-  private renderAgentRow(
-    ctx: CanvasRenderingContext2D,
-    agent: Entity,
-    x: number,
-    y: number,
-    width: number
-  ): void {
-    const identity = agent.components.get('identity') as IdentityComponent | undefined;
-    const agentComp = agent.components.get('agent') as AgentComponent | undefined;
-    const needs = agent.components.get('needs') as NeedsComponent | undefined;
-    const mood = agent.components.get('mood') as MoodComponent | undefined;
-    const position = agent.components.get('position') as PositionComponent | undefined;
-    const skills = agent.components.get('skills') as SkillsComponent | undefined;
+  private showAllAgentsModal(): void {
+    // Create modal backdrop
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10001;
+    `;
 
-    const name = identity?.name ?? 'Unknown';
-    const behavior = agentComp?.behavior ?? 'idle';
-    const isSelected = agent.id === this.selectedAgentId;
+    // Create modal content
+    const content = document.createElement('div');
+    content.style.cssText = `
+      width: 90%;
+      max-width: 800px;
+      max-height: 80vh;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      border: 2px solid #ffd700;
+      border-radius: 12px;
+      padding: 20px;
+      overflow-y: auto;
+    `;
 
-    // Background for selected agent
-    if (isSelected) {
-      ctx.fillStyle = 'rgba(0, 206, 209, 0.1)';
-      ctx.fillRect(x - 4, y - 2, width + 8, this.rowHeight - 4);
+    // Header
+    const header = document.createElement('div');
+    header.style.cssText = `
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+    `;
+
+    const title = document.createElement('h2');
+    title.textContent = `All Agents (${this.agents.size})`;
+    title.style.cssText = `
+      color: #ffd700;
+      margin: 0;
+      font-size: 24px;
+    `;
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '×';
+    closeBtn.style.cssText = `
+      background: transparent;
+      border: 2px solid #ffd700;
+      color: #ffd700;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 24px;
+      line-height: 1;
+      transition: all 0.2s;
+    `;
+    closeBtn.addEventListener('click', () => modal.remove());
+
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+
+    // Agent grid
+    const grid = document.createElement('div');
+    grid.style.cssText = `
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 15px;
+    `;
+
+    // Sort agents alphabetically
+    const sortedAgents = Array.from(this.agents.values())
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    for (const agent of sortedAgents) {
+      const card = this.createModalAgentCard(agent, modal);
+      grid.appendChild(card);
     }
 
-    // Row border
-    ctx.strokeStyle = isSelected ? '#00CED1' : '#333';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x - 2, y - 2, width + 4, this.rowHeight - 4);
+    content.appendChild(header);
+    content.appendChild(grid);
+    modal.appendChild(content);
+    document.body.appendChild(modal);
 
-    let currentY = y;
-
-    // Line 1: Name and Behavior
-    ctx.fillStyle = '#FFD700';
-    ctx.font = 'bold 12px monospace';
-    ctx.fillText(name, x, currentY);
-    currentY += 14;
-
-    ctx.fillStyle = '#AAA';
-    ctx.font = '10px monospace';
-    const behaviorText = this.formatBehavior(behavior);
-    ctx.fillText(behaviorText, x, currentY);
-    currentY += 12;
-
-    // Line 2: Health, Hunger, Energy bars
-    if (needs) {
-      const barWidth = (width - 20) / 3;
-      const barHeight = 8;
-      const barY = currentY;
-
-      // Health bar
-      this.renderNeedBar(ctx, x, barY, barWidth, barHeight, needs.health, 'Health');
-
-      // Hunger bar (inverted - low hunger is bad)
-      this.renderNeedBar(
-        ctx,
-        x + barWidth + 5,
-        barY,
-        barWidth,
-        barHeight,
-        1 - needs.hunger,
-        'Hunger'
-      );
-
-      // Energy bar
-      this.renderNeedBar(
-        ctx,
-        x + (barWidth + 5) * 2,
-        barY,
-        barWidth,
-        barHeight,
-        needs.energy,
-        'Energy'
-      );
-
-      currentY += barHeight + 10;
-    }
-
-    // Line 3: Mood and Position
-    let line3 = '';
-    if (mood) {
-      line3 += `Mood: ${mood.emotionalState}`;
-    }
-    if (position) {
-      if (line3) line3 += ' | ';
-      line3 += `Pos: (${Math.floor(position.x)}, ${Math.floor(position.y)})`;
-    }
-    if (skills) {
-      const topSkill = this.getTopSkill(skills);
-      if (topSkill && line3) line3 += ' | ';
-      if (topSkill) line3 += `${topSkill}`;
-    }
-
-    ctx.fillStyle = '#888';
-    ctx.font = '9px monospace';
-    ctx.fillText(line3, x, currentY);
-  }
-
-  /**
-   * Render a colored bar for a need (0.0 - 1.0)
-   */
-  private renderNeedBar(
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    value: number,
-    label: string
-  ): void {
-    // Background
-    ctx.fillStyle = '#222';
-    ctx.fillRect(x, y, width, height);
-
-    // Value bar (color-coded)
-    const fillWidth = width * Math.max(0, Math.min(1, value));
-    let color = '#00FF00'; // Green (good)
-    if (value < 0.3) {
-      color = '#FF0000'; // Red (critical)
-    } else if (value < 0.6) {
-      color = '#FF8C00'; // Orange (warning)
-    } else if (value < 0.8) {
-      color = '#FFFF00'; // Yellow (ok)
-    }
-
-    ctx.fillStyle = color;
-    ctx.fillRect(x, y, fillWidth, height);
-
-    // Border
-    ctx.strokeStyle = '#555';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x, y, width, height);
-
-    // Label
-    ctx.fillStyle = '#CCC';
-    ctx.font = '7px monospace';
-    const labelText = `${label[0]}${label[1]}`; // First two letters
-    ctx.fillText(labelText, x + 2, y - 1);
-  }
-
-  /**
-   * Format behavior for display
-   */
-  private formatBehavior(behavior: string): string {
-    // Convert snake_case to Title Case
-    return behavior
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  }
-
-  /**
-   * Get the agent's highest skill
-   */
-  private getTopSkill(skills: SkillsComponent): string | null {
-    const skillLevels = skills.levels;
-    let topSkill: string | null = null;
-    let topLevel = 0;
-
-    for (const [skill, level] of Object.entries(skillLevels)) {
-      const levelNum = level as number;
-      if (levelNum > topLevel) {
-        topLevel = levelNum;
-        topSkill = skill;
-      }
-    }
-
-    if (topSkill && topLevel > 0) {
-      return `${topSkill.charAt(0).toUpperCase()}${topSkill.slice(1)}:${topLevel}`;
-    }
-
-    return null;
-  }
-
-  /**
-   * Sort agents based on current sort mode
-   */
-  private sortAgents(agents: readonly Entity[]): Entity[] {
-    const sorted = [...agents];
-
-    sorted.sort((a, b) => {
-      switch (this.sortBy) {
-        case 'name': {
-          const nameA = (a.components.get('identity') as IdentityComponent | undefined)?.name ?? '';
-          const nameB = (b.components.get('identity') as IdentityComponent | undefined)?.name ?? '';
-          return nameA.localeCompare(nameB);
-        }
-
-        case 'behavior': {
-          const behaviorA = (a.components.get('agent') as AgentComponent | undefined)?.behavior ?? '';
-          const behaviorB = (b.components.get('agent') as AgentComponent | undefined)?.behavior ?? '';
-          return behaviorA.localeCompare(behaviorB);
-        }
-
-        case 'health': {
-          const healthA = (a.components.get('needs') as NeedsComponent | undefined)?.health ?? 0;
-          const healthB = (b.components.get('needs') as NeedsComponent | undefined)?.health ?? 0;
-          return healthB - healthA; // Descending (highest first)
-        }
-
-        case 'hunger': {
-          const hungerA = (a.components.get('needs') as NeedsComponent | undefined)?.hunger ?? 1;
-          const hungerB = (b.components.get('needs') as NeedsComponent | undefined)?.hunger ?? 1;
-          return hungerA - hungerB; // Ascending (most hungry first)
-        }
-
-        default:
-          return 0;
+    // Click outside to close
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.remove();
       }
     });
 
-    return sorted;
+    // Store modal reference for future use if needed
+    // this.allAgentsModal = modal;
+  }
+
+  private createModalAgentCard(agent: AgentInfo, modal: HTMLDivElement): HTMLDivElement {
+    const card = document.createElement('div');
+    card.style.cssText = `
+      background: linear-gradient(135deg, rgba(30, 30, 50, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%);
+      border: 2px solid #ffd700;
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    `;
+
+    // Sprite
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 64;
+    canvas.style.cssText = `
+      width: 100%;
+      height: 100px;
+      image-rendering: pixelated;
+      margin-bottom: 8px;
+    `;
+    this.loadAgentSprite(canvas, agent.spriteFolder);
+
+    // Name
+    const name = document.createElement('div');
+    name.textContent = agent.name;
+    name.style.cssText = `
+      color: #ffd700;
+      font-size: 13px;
+      font-weight: bold;
+      word-wrap: break-word;
+    `;
+
+    // Hover effects
+    card.addEventListener('mouseenter', () => {
+      card.style.transform = 'translateY(-5px)';
+      card.style.boxShadow = '0 5px 20px rgba(255, 215, 0, 0.4)';
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'translateY(0)';
+      card.style.boxShadow = 'none';
+    });
+
+    // Click to focus and close modal
+    card.addEventListener('click', () => {
+      this.touchAgent(agent.id);
+      if (this.onAgentClickCallback) {
+        this.onAgentClickCallback(agent.id);
+      }
+      modal.remove();
+    });
+
+    card.appendChild(canvas);
+    card.appendChild(name);
+    return card;
   }
 
   /**
-   * Handle clicks on sort buttons or agent rows
+   * Show the roster panel
    */
-  handleContentClick(x: number, y: number, _width: number, height: number, world?: World): boolean {
-    if (!this.visible || !world) {
-      return false;
-    }
-
-    const agents = world.query().with('agent', 'identity').executeEntities();
-    if (agents.length === 0) {
-      return false;
-    }
-
-    // Check sort button clicks
-    const sortButtonY = this.padding + 18;
-    if (y >= sortButtonY && y <= sortButtonY + 16) {
-      const sortOptions: Array<'name' | 'behavior' | 'health' | 'hunger'> = ['name', 'behavior', 'health', 'hunger'];
-      const buttonWidth = 70;
-
-      for (let i = 0; i < sortOptions.length; i++) {
-        const btnX = this.padding + (i * buttonWidth);
-        if (x >= btnX && x <= btnX + buttonWidth) {
-          const selectedSort = sortOptions[i];
-          if (selectedSort) {
-            this.sortBy = selectedSort;
-            return true;
-          }
-        }
-      }
-    }
-
-    // Check agent row clicks
-    const listStartY = this.padding + 18 + 16 + 8 + 8;
-    const visibleAreaHeight = height - listStartY;
-    const maxVisibleAgents = Math.floor(visibleAreaHeight / this.rowHeight);
-    const startIdx = Math.floor(this.scrollOffset);
-    const sortedAgents = this.sortAgents(agents);
-
-    for (let i = startIdx; i < Math.min(startIdx + maxVisibleAgents, sortedAgents.length); i++) {
-      const rowY = listStartY + ((i - startIdx) * this.rowHeight);
-      if (y >= rowY && y <= rowY + this.rowHeight) {
-        const agent = sortedAgents[i];
-        if (agent) {
-          this.selectedAgentId = agent.id;
-          return true;
-        }
-      }
-    }
-
-    return false;
+  show(): void {
+    this.container.style.display = 'flex';
   }
 
   /**
-   * Handle scroll events for the agent list
+   * Hide the roster panel
    */
-  handleScroll(deltaY: number, contentHeight: number): boolean {
-    if (!this.visible) {
-      return false;
-    }
-
-    // Estimate max scroll based on content height
-    const maxVisibleAgents = Math.floor(contentHeight / this.rowHeight);
-    const maxScroll = Math.max(0, 20 - maxVisibleAgents); // Assume max 20 agents for scrolling
-
-    this.scrollOffset = Math.max(0, Math.min(maxScroll, this.scrollOffset + deltaY * 0.1));
-    return true;
+  hide(): void {
+    this.container.style.display = 'none';
   }
 }

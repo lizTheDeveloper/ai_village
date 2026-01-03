@@ -687,6 +687,7 @@ async function registerAllSystems(
 
 interface UIPanelsResult {
   agentInfoPanel: AgentInfoPanel;
+  agentRosterPanel: AgentRosterPanel;
   animalInfoPanel: AnimalInfoPanel;
   plantInfoPanel: PlantInfoPanel;
   resourcesPanel: ResourcesPanel;
@@ -742,6 +743,8 @@ function createUIPanels(
       },
     }));
   });
+
+  const agentRosterPanel = new AgentRosterPanel(renderer.pixelLabLoader);
 
   const animalInfoPanel = new AnimalInfoPanel();
   const plantInfoPanel = new PlantInfoPanel();
