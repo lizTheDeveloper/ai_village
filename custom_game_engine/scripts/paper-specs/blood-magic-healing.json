@@ -1,0 +1,106 @@
+[
+  {
+    "paperId": "blood_transfusion_magic",
+    "title": "Life Transfer: Magical Blood Transfusion Techniques",
+    "field": "arcane",
+    "paperSets": ["blood_magic_healing"],
+    "prerequisitePapers": ["blood_type_affinity", "blood_preservation"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "blood_magic": 16, "medicine": 12 },
+    "contributesTo": [
+      { "type": "spell", "id": "blood_transfusion" }
+    ],
+    "topicDescription": "Using magic to transfer blood safely between individuals",
+    "keyPoints": [
+      "Blood type compatibility is still required",
+      "Magical purification removes diseases",
+      "Volume limits and blood loss recovery",
+      "Why magical transfusion is faster than mundane"
+    ]
+  },
+  {
+    "paperId": "regeneration_through_blood",
+    "title": "Sanguine Vitality: Accelerated Healing via Blood Magic",
+    "field": "arcane",
+    "paperSets": ["blood_magic_healing"],
+    "prerequisitePapers": ["hemomantic_efficiency"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "minimumSkills": { "blood_magic": 20, "medicine": 10 },
+    "skillGrants": { "blood_magic": 20, "medicine": 14 },
+    "contributesTo": [
+      { "type": "spell", "id": "blood_regeneration" }
+    ],
+    "topicDescription": "Using one's own blood to fuel rapid tissue regeneration",
+    "keyPoints": [
+      "Converting blood into healing energy",
+      "Trade-off: blood loss for wound closure",
+      "Why it can't regrow lost limbs (yet)",
+      "The danger of over-healing and scar tissue"
+    ]
+  },
+  {
+    "paperId": "blood_disease_purging",
+    "title": "Cleansing the Crimson: Purifying Blood of Disease and Poison",
+    "field": "arcane",
+    "paperSets": ["blood_magic_healing"],
+    "prerequisitePapers": ["blood_transfusion_magic"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "minimumSkills": { "blood_magic": 25, "medicine": 15 },
+    "skillGrants": { "blood_magic": 22, "medicine": 16 },
+    "contributesTo": [
+      { "type": "spell", "id": "purge_blood" }
+    ],
+    "topicDescription": "Removing toxins, diseases, and curses from blood",
+    "keyPoints": [
+      "Filtering blood through magical matrices",
+      "Why some diseases resist purging",
+      "The exhaustion cost of full purification",
+      "Combining with transfusion for maximum effect"
+    ]
+  },
+  {
+    "paperId": "life_extension_blood",
+    "title": "The Sanguine Elixir: Blood Magic and Life Extension",
+    "field": "arcane",
+    "paperSets": ["blood_magic_healing"],
+    "prerequisitePapers": ["regeneration_through_blood", "blood_disease_purging"],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "minimumSkills": { "blood_magic": 30, "medicine": 20 },
+    "skillGrants": { "blood_magic": 25, "medicine": 18 },
+    "contributesTo": [
+      { "type": "spell", "id": "extend_lifespan" }
+    ],
+    "topicDescription": "Using blood magic to slow aging and extend natural lifespan",
+    "keyPoints": [
+      "Regular blood renewal slows cellular aging",
+      "The diminishing returns problem",
+      "Why vampirism is different (and worse)",
+      "Ethical considerations of immortality pursuit"
+    ]
+  },
+  {
+    "paperId": "resurrection_blood_magic",
+    "title": "The Final Barrier: Blood Magic and True Resurrection",
+    "field": "arcane",
+    "paperSets": ["blood_magic_healing"],
+    "prerequisitePapers": ["life_extension_blood"],
+    "complexity": 10,
+    "minimumAge": "elder",
+    "minimumSkills": { "blood_magic": 35, "necromancy": 20 },
+    "skillGrants": { "blood_magic": 30, "necromancy": 15 },
+    "contributesTo": [
+      { "type": "spell", "id": "blood_resurrection" }
+    ],
+    "topicDescription": "The theoretical and practical limits of bringing the dead back to life",
+    "keyPoints": [
+      "Requires massive blood sacrifice",
+      "Time limit: hours, not days",
+      "The soul must be willing to return",
+      "Why most attempts create undead instead"
+    ]
+  }
+]

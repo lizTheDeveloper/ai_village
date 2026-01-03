@@ -99,8 +99,9 @@ export class UniversitySystem implements System {
       const progressGain = this.RESEARCH_PROGRESS_PER_TICK * university.researchMultiplier;
       project.progress = Math.min(100, project.progress + progressGain);
 
-      // Complete project when progress reaches 100%
-      if (project.progress >= 100) {
+      // Complete project when progress reaches 100% (use 99.99 to handle floating point precision)
+      if (project.progress >= 99.99) {
+        project.progress = 100; // Ensure exactly 100%
         this.completeProject(world, entity, university, project, currentTick);
       }
     }

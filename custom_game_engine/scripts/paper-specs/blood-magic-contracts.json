@@ -1,0 +1,105 @@
+[
+  {
+    "paperId": "blood_oath_basics",
+    "title": "Binding Words in Blood: The Fundamentals of Blood Oaths",
+    "field": "arcane",
+    "paperSets": ["blood_magic_contracts"],
+    "prerequisitePapers": ["blood_as_mana"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "blood_magic": 14, "arcane": 8 },
+    "contributesTo": [
+      { "type": "spell", "id": "blood_oath" }
+    ],
+    "topicDescription": "Using blood to create magically enforced agreements",
+    "keyPoints": [
+      "Blood signatures create unbreakable magical contracts",
+      "The price of breaking a blood oath",
+      "Why witnesses strengthen the binding",
+      "Loopholes and exact wording matter"
+    ]
+  },
+  {
+    "paperId": "blood_pact_demons",
+    "title": "Infernal Agreements: Blood Pacts with Otherworldly Entities",
+    "field": "arcane",
+    "paperSets": ["blood_magic_contracts"],
+    "prerequisitePapers": ["blood_oath_basics"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "minimumSkills": { "blood_magic": 25, "arcane": 20 },
+    "skillGrants": { "blood_magic": 22, "arcane": 15 },
+    "contributesTo": [
+      { "type": "spell", "id": "demonic_pact" }
+    ],
+    "topicDescription": "Creating binding contracts with demons using blood as currency",
+    "keyPoints": [
+      "Demons value blood more than gold",
+      "The importance of reading the fine print",
+      "Why you should never sign in your own blood",
+      "Historical examples of pacts gone wrong"
+    ]
+  },
+  {
+    "paperId": "blood_curse_casting",
+    "title": "Malevolent Bindings: Blood Curses and Their Mechanics",
+    "field": "arcane",
+    "paperSets": ["blood_magic_contracts"],
+    "prerequisitePapers": ["blood_oath_basics", "blood_type_affinity"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "minimumSkills": { "blood_magic": 20 },
+    "skillGrants": { "blood_magic": 20, "arcane": 12 },
+    "contributesTo": [
+      { "type": "spell", "id": "blood_curse" }
+    ],
+    "topicDescription": "Using blood to place long-lasting curses on targets",
+    "keyPoints": [
+      "Requires blood from the target or bloodline member",
+      "Curses persist until conditions are met",
+      "The karmic backlash of curse casting",
+      "Breaking curses requires specific countermeasures"
+    ]
+  },
+  {
+    "paperId": "blood_tracking",
+    "title": "Sanguine Sympathies: Tracking Through Blood Connections",
+    "field": "arcane",
+    "paperSets": ["blood_magic_contracts"],
+    "prerequisitePapers": ["blood_type_affinity"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "blood_magic": 16, "arcane": 10 },
+    "contributesTo": [
+      { "type": "spell", "id": "blood_tracking" }
+    ],
+    "topicDescription": "Using blood samples to locate and track individuals",
+    "keyPoints": [
+      "Blood maintains connection to its source",
+      "Range limitations based on blood freshness",
+      "Why family members can track each other",
+      "Privacy implications and countermeasures"
+    ]
+  },
+  {
+    "paperId": "blood_inheritance_magic",
+    "title": "Bloodline Powers: Inherited Magical Traits Through Blood",
+    "field": "arcane",
+    "paperSets": ["blood_magic_contracts"],
+    "prerequisitePapers": ["blood_type_affinity"],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "minimumSkills": { "blood_magic": 30, "arcane": 25 },
+    "skillGrants": { "blood_magic": 25, "arcane": 20 },
+    "contributesTo": [
+      { "type": "ability", "id": "bloodline_magic" }
+    ],
+    "topicDescription": "How magical abilities pass through bloodlines and can be awakened",
+    "keyPoints": [
+      "Recessive magical genes skip generations",
+      "Pure bloodlines vs. mixed heritage",
+      "Awakening dormant bloodline powers",
+      "Why inbreeding reduces magical potency over time"
+    ]
+  }
+]

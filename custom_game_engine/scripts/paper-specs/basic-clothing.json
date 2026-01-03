@@ -1,0 +1,44 @@
+[
+  {
+    "paperId": "simple_garments",
+    "title": "Covering the Body: Simple Clothing from Hides and Cloth",
+    "field": "crafting",
+    "paperSets": ["starting_knowledge"],
+    "prerequisitePapers": ["hide_tanning_basic"],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "crafting": 6, "textiles": 4 },
+    "contributesTo": [
+      { "type": "item", "id": "simple_tunic" },
+      { "type": "item", "id": "hide_pants" }
+    ],
+    "topicDescription": "Creating basic clothing for warmth and protection",
+    "keyPoints": [
+      "Wrapping vs. tailored garments",
+      "Cutting and punching holes in leather",
+      "Bone needles and sinew thread",
+      "Why loose-fitting clothes allow movement"
+    ]
+  },
+  {
+    "paperId": "footwear_basic",
+    "title": "Protected Feet: Making Simple Shoes and Sandals",
+    "field": "crafting",
+    "paperSets": ["starting_knowledge"],
+    "prerequisitePapers": ["hide_tanning_basic", "cordage_making"],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "crafting": 7 },
+    "contributesTo": [
+      { "type": "item", "id": "leather_sandals" },
+      { "type": "item", "id": "simple_shoes" }
+    ],
+    "topicDescription": "Creating foot protection from available materials",
+    "keyPoints": [
+      "Sole thickness protects from rocks and thorns",
+      "Strapping systems to keep shoes on",
+      "Why bare feet get injured easily",
+      "Trade-off between protection and mobility"
+    ]
+  }
+]

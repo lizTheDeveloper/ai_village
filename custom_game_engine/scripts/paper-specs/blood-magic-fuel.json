@@ -1,0 +1,104 @@
+[
+  {
+    "paperId": "blood_as_mana",
+    "title": "On the Energetic Properties of Vital Fluids: Blood as Arcane Fuel",
+    "field": "arcane",
+    "paperSets": ["blood_magic_fundamentals"],
+    "prerequisitePapers": [],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": { "blood_magic": 10, "arcane": 5 },
+    "contributesTo": [
+      { "type": "spell", "id": "blood_bolt" }
+    ],
+    "topicDescription": "Discovery that blood contains magical energy that can be harnessed for spellcasting",
+    "keyPoints": [
+      "Blood carries life force that can be converted to magical energy",
+      "Self-harm vs. sacrifice of others - ethical considerations",
+      "Volume of blood required for basic spells",
+      "The connection between vitality and magical potency"
+    ]
+  },
+  {
+    "paperId": "hemomantic_efficiency",
+    "title": "Measuring the Mana-Blood Conversion Ratio: A Quantitative Analysis",
+    "field": "arcane",
+    "paperSets": ["blood_magic_fundamentals"],
+    "prerequisitePapers": ["blood_as_mana"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "blood_magic": 15, "mathematics": 5 },
+    "contributesTo": [
+      { "type": "ability", "id": "efficient_blood_casting" }
+    ],
+    "topicDescription": "Precise measurements of how much magical energy can be extracted per unit of blood",
+    "keyPoints": [
+      "The standard unit: 1 pint = approximately 47 mana points",
+      "Individual variation based on health and magical aptitude",
+      "Diminishing returns - why you can't just drain everything",
+      "The death threshold and why crossing it is inadvisable"
+    ]
+  },
+  {
+    "paperId": "blood_type_affinity",
+    "title": "A Sanguine Study: Blood Types and Their Magical Properties",
+    "field": "arcane",
+    "paperSets": ["blood_magic_fundamentals"],
+    "prerequisitePapers": ["blood_as_mana"],
+    "complexity": 4,
+    "minimumAge": "teen",
+    "skillGrants": { "blood_magic": 12, "nature": 8 },
+    "contributesTo": [
+      { "type": "ability", "id": "blood_type_detection" }
+    ],
+    "topicDescription": "Different blood types produce different magical effects and efficiencies",
+    "keyPoints": [
+      "Type O: Universal donor, consistent but unremarkable magical output",
+      "Type AB: Rare, volatile, produces unusual effects",
+      "The myth of 'royal blood' having superior properties",
+      "Why mixing blood types in rituals causes catastrophic failures"
+    ]
+  },
+  {
+    "paperId": "voluntary_vs_forced",
+    "title": "The Consent Paradox: Voluntary Blood and Magical Potency",
+    "field": "arcane",
+    "paperSets": ["blood_magic_fundamentals", "blood_magic_ethics"],
+    "prerequisitePapers": ["blood_as_mana"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "minimumSkills": { "blood_magic": 15 },
+    "skillGrants": { "blood_magic": 18, "arcane": 10 },
+    "contributesTo": [
+      { "type": "spell", "id": "consensual_blood_ritual" }
+    ],
+    "topicDescription": "Voluntary blood donation produces more stable magical energy than forced extraction",
+    "keyPoints": [
+      "Willing sacrifice amplifies magical output by 200-300%",
+      "The psychological component of blood magic",
+      "Why torture doesn't improve yield (despite common belief)",
+      "Historical cases of blood cults vs. blood cooperatives"
+    ]
+  },
+  {
+    "paperId": "blood_preservation",
+    "title": "Temporal Degradation of Sanguine Mana: A Study in Blood Storage",
+    "field": "arcane",
+    "paperSets": ["blood_magic_fundamentals"],
+    "prerequisitePapers": ["hemomantic_efficiency"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "blood_magic": 14, "chemistry": 8 },
+    "contributesTo": [
+      { "type": "building", "id": "blood_bank" },
+      { "type": "item", "id": "preserved_blood_vial" }
+    ],
+    "topicDescription": "How to store blood for later magical use and prevent magical degradation",
+    "keyPoints": [
+      "Fresh blood loses 10% potency per hour at room temperature",
+      "Refrigeration extends usability to 72 hours",
+      "Magical preservation techniques using salt and silver",
+      "Why frozen blood doesn't work (ice crystals disrupt mana bonds)"
+    ]
+  }
+]

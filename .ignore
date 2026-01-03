@@ -1,0 +1,12 @@
+node_modules/
+.git/
+.playwright-mcp/
+*.png
+*.jpg
+*.jpeg
+OpenStarbound/
+dist/
+*.tsbuildinfo
+package-lock.json
+agents/autonomous-dev/channels/testing/
+*.lock

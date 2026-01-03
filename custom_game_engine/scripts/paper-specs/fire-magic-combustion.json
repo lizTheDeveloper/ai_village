@@ -1,0 +1,107 @@
+[
+  {
+    "paperId": "explosive_fire_magic",
+    "title": "Contained Fury: Creating Explosive Fire Effects",
+    "field": "arcane",
+    "paperSets": ["fire_magic_advanced"],
+    "prerequisitePapers": ["combustion_magic", "fire_control"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "minimumSkills": { "fire_magic": 20 },
+    "skillGrants": { "fire_magic": 20, "arcane": 12 },
+    "contributesTo": [
+      { "type": "spell", "id": "fireball" }
+    ],
+    "topicDescription": "Compressing fire magic to create explosions",
+    "keyPoints": [
+      "Rapid expansion creates explosive force",
+      "Shaping the blast radius",
+      "Why premature detonation is common",
+      "The importance of aim and distance"
+    ]
+  },
+  {
+    "paperId": "persistent_flames",
+    "title": "Eternal Burning: Creating Self-Sustaining Magical Flames",
+    "field": "arcane",
+    "paperSets": ["fire_magic_advanced"],
+    "prerequisitePapers": ["flame_generation", "fire_control"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "minimumSkills": { "fire_magic": 25 },
+    "skillGrants": { "fire_magic": 22, "arcane": 15 },
+    "contributesTo": [
+      { "type": "spell", "id": "eternal_flame" }
+    ],
+    "topicDescription": "Flames that burn indefinitely without fuel or mana input",
+    "keyPoints": [
+      "Drawing energy from ambient mana",
+      "Why magical flames are more efficient than physical",
+      "Applications: lighthouses, eternal torches, forge fires",
+      "The difficulty of extinguishing them"
+    ]
+  },
+  {
+    "paperId": "fire_elemental_summoning",
+    "title": "Calling Living Flame: Summoning Fire Elementals",
+    "field": "arcane",
+    "paperSets": ["fire_magic_advanced"],
+    "prerequisitePapers": ["flame_generation", "fire_control"],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "minimumSkills": { "fire_magic": 30, "arcane": 25 },
+    "skillGrants": { "fire_magic": 25, "arcane": 20 },
+    "contributesTo": [
+      { "type": "spell", "id": "summon_fire_elemental" }
+    ],
+    "topicDescription": "Bringing sentient fire beings from the elemental planes",
+    "keyPoints": [
+      "Elementals are intelligent and temperamental",
+      "Binding vs. negotiating for service",
+      "Fire elementals consume combustibles voraciously",
+      "Dismissing them before they burn everything"
+    ]
+  },
+  {
+    "paperId": "plasma_state_magic",
+    "title": "Beyond Flame: Creating and Controlling Plasma",
+    "field": "arcane",
+    "paperSets": ["fire_magic_advanced"],
+    "prerequisitePapers": ["temperature_variation"],
+    "complexity": 10,
+    "minimumAge": "elder",
+    "minimumSkills": { "fire_magic": 35, "arcane": 30 },
+    "skillGrants": { "fire_magic": 28, "arcane": 22 },
+    "contributesTo": [
+      { "type": "spell", "id": "plasma_bolt" }
+    ],
+    "topicDescription": "Heating matter to the fourth state: ionized plasma",
+    "keyPoints": [
+      "Requires extreme temperatures (10,000°C+)",
+      "Plasma cuts through almost anything",
+      "Electromagnetic containment necessary",
+      "Why this is the pinnacle of fire magic"
+    ]
+  },
+  {
+    "paperId": "phoenix_transformation",
+    "title": "Rebirth in Flame: The Phoenix Transformation",
+    "field": "arcane",
+    "paperSets": ["fire_magic_advanced"],
+    "prerequisitePapers": ["fire_immunity", "persistent_flames"],
+    "complexity": 10,
+    "minimumAge": "elder",
+    "minimumSkills": { "fire_magic": 40, "arcane": 35 },
+    "skillGrants": { "fire_magic": 30, "arcane": 25 },
+    "contributesTo": [
+      { "type": "spell", "id": "phoenix_rebirth" }
+    ],
+    "topicDescription": "The ultimate fire magic: resurrection through flames",
+    "keyPoints": [
+      "Requires dying in fire to trigger",
+      "One-time use per casting (then must be relearned)",
+      "Reformed body is younger than death age",
+      "The theoretical limit: can you cast it on yourself while alive?"
+    ]
+  }
+]

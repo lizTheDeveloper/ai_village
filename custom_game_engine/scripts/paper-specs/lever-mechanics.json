@@ -1,0 +1,22 @@
+[
+  {
+    "paperId": "lever_principle",
+    "title": "Give Me a Fulcrum: The Mechanical Advantage of Levers",
+    "field": "engineering",
+    "paperSets": ["simple_machines"],
+    "prerequisitePapers": [],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "engineering": 8, "mathematics": 5 },
+    "contributesTo": [
+      { "type": "ability", "id": "use_levers" }
+    ],
+    "topicDescription": "How levers multiply force through distance",
+    "keyPoints": [
+      "Fulcrum, effort, and load relationship",
+      "Mechanical advantage formula",
+      "Why longer lever arms provide more force",
+      "Applications: crowbars, seesaws, wheelbarrows"
+    ]
+  }
+]

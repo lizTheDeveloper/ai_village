@@ -1,0 +1,208 @@
+[
+  {
+    "paperId": "fire_creation",
+    "title": "The First Flame: Creating Fire Through Friction",
+    "field": "survival",
+    "paperSets": ["starting_knowledge"],
+    "prerequisitePapers": [],
+    "complexity": 1,
+    "minimumAge": "child",
+    "skillGrants": { "survival": 5 },
+    "contributesTo": [
+      { "type": "ability", "id": "make_fire" },
+      { "type": "building", "id": "campfire" }
+    ],
+    "topicDescription": "The fundamental survival skill: creating fire without magical assistance",
+    "keyPoints": [
+      "Friction generates heat through rapid movement",
+      "Tinder, kindling, and fuel wood hierarchy",
+      "The bow drill method vs. hand drill",
+      "Why dry materials are essential"
+    ]
+  },
+  {
+    "paperId": "basic_shelter",
+    "title": "Roof Over Head: Elementary Shelter Construction",
+    "field": "construction",
+    "paperSets": ["starting_knowledge"],
+    "prerequisitePapers": [],
+    "complexity": 1,
+    "minimumAge": "child",
+    "skillGrants": { "construction": 5, "survival": 3 },
+    "contributesTo": [
+      { "type": "building", "id": "lean_to" },
+      { "type": "building", "id": "simple_hut" }
+    ],
+    "topicDescription": "Building basic weather protection using available materials",
+    "keyPoints": [
+      "Lean-to shelters against trees or rocks",
+      "Branch framework covered with leaves or hides",
+      "Importance of drainage and location",
+      "Why insulation from ground matters"
+    ]
+  },
+  {
+    "paperId": "stone_knapping",
+    "title": "The Art of Breaking Rocks: Flint Knapping Basics",
+    "field": "crafting",
+    "paperSets": ["starting_knowledge"],
+    "prerequisitePapers": [],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "crafting": 8, "geology": 3 },
+    "contributesTo": [
+      { "type": "item", "id": "stone_axe" },
+      { "type": "item", "id": "stone_knife" },
+      { "type": "item", "id": "stone_spear" }
+    ],
+    "topicDescription": "Creating sharp tools by fracturing stone in controlled ways",
+    "keyPoints": [
+      "Conchoidal fracture in flint and obsidian",
+      "Striking angle and force control",
+      "Pressure flaking for fine edges",
+      "Why some rocks work and others don't"
+    ]
+  },
+  {
+    "paperId": "water_purification_basic",
+    "title": "Clear Water: Basic Purification Through Boiling",
+    "field": "survival",
+    "paperSets": ["starting_knowledge"],
+    "prerequisitePapers": ["fire_creation"],
+    "complexity": 1,
+    "minimumAge": "child",
+    "skillGrants": { "survival": 6 },
+    "contributesTo": [
+      { "type": "ability", "id": "purify_water" }
+    ],
+    "topicDescription": "Making water safe to drink by heating it",
+    "keyPoints": [
+      "Heat kills most dangerous organisms",
+      "Boiling point: 100°C at sea level",
+      "Why standing water is dangerous",
+      "Container options: pottery, hide, or hot stones in wood"
+    ]
+  },
+  {
+    "paperId": "cordage_making",
+    "title": "Twisted Strength: Making Rope from Plant Fibers",
+    "field": "crafting",
+    "paperSets": ["starting_knowledge"],
+    "prerequisitePapers": [],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "crafting": 7, "nature": 4 },
+    "contributesTo": [
+      { "type": "item", "id": "plant_fiber_rope" }
+    ],
+    "topicDescription": "Creating strong cordage by twisting plant fibers together",
+    "keyPoints": [
+      "Fiber sources: bark, grasses, vines, animal sinew",
+      "The S-twist and Z-twist technique",
+      "Why twisted strands are stronger than individual fibers",
+      "Applications: binding, snares, nets, clothing"
+    ]
+  },
+  {
+    "paperId": "food_drying",
+    "title": "Preservation by Dehydration: Drying Food for Storage",
+    "field": "survival",
+    "paperSets": ["starting_knowledge"],
+    "prerequisitePapers": ["fire_creation"],
+    "complexity": 1,
+    "minimumAge": "child",
+    "skillGrants": { "survival": 5, "cooking": 3 },
+    "contributesTo": [
+      { "type": "ability", "id": "dry_food" },
+      { "type": "building", "id": "drying_rack" }
+    ],
+    "topicDescription": "Removing water from food to prevent spoilage",
+    "keyPoints": [
+      "Bacteria need water to grow",
+      "Sun drying vs. smoke drying",
+      "Thinly sliced food dries faster",
+      "Why dried food is lighter for travel"
+    ]
+  },
+  {
+    "paperId": "simple_cooking",
+    "title": "From Raw to Edible: Basic Cooking Methods",
+    "field": "cooking",
+    "paperSets": ["starting_knowledge"],
+    "prerequisitePapers": ["fire_creation"],
+    "complexity": 1,
+    "minimumAge": "child",
+    "skillGrants": { "cooking": 5 },
+    "contributesTo": [
+      { "type": "ability", "id": "cook_food" }
+    ],
+    "topicDescription": "Applying heat to make food safer and more digestible",
+    "keyPoints": [
+      "Cooking kills parasites and bacteria",
+      "Heat breaks down tough fibers",
+      "Roasting on sticks or stones",
+      "Why cooked food provides more nutrition"
+    ]
+  },
+  {
+    "paperId": "basket_weaving_basic",
+    "title": "Woven Containers: Elementary Basket Making",
+    "field": "crafting",
+    "paperSets": ["starting_knowledge"],
+    "prerequisitePapers": [],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "crafting": 6 },
+    "contributesTo": [
+      { "type": "item", "id": "woven_basket" }
+    ],
+    "topicDescription": "Creating containers by weaving flexible plant materials",
+    "keyPoints": [
+      "Over-under weaving pattern",
+      "Willow, reed, and grass materials",
+      "Frame construction and filling",
+      "Tight weaving can hold water"
+    ]
+  },
+  {
+    "paperId": "simple_traps",
+    "title": "Passive Hunting: Constructing Basic Snares and Traps",
+    "field": "survival",
+    "paperSets": ["starting_knowledge"],
+    "prerequisitePapers": ["cordage_making"],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "survival": 8, "hunting": 5 },
+    "contributesTo": [
+      { "type": "ability", "id": "set_snare" }
+    ],
+    "topicDescription": "Creating devices that catch animals without active hunting",
+    "keyPoints": [
+      "Snare loops tighten when animal passes through",
+      "Placement on game trails",
+      "Trigger mechanisms using bent saplings",
+      "Why traps allow hunting while doing other tasks"
+    ]
+  },
+  {
+    "paperId": "hide_tanning_basic",
+    "title": "From Skin to Leather: Simple Hide Processing",
+    "field": "crafting",
+    "paperSets": ["starting_knowledge"],
+    "prerequisitePapers": ["stone_knapping"],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": { "crafting": 10, "survival": 5 },
+    "contributesTo": [
+      { "type": "item", "id": "leather" },
+      { "type": "ability", "id": "tan_hides" }
+    ],
+    "topicDescription": "Processing animal hides into durable leather",
+    "keyPoints": [
+      "Scraping away flesh and fat",
+      "Brain tanning using the animal's own brain",
+      "Smoking for waterproofing",
+      "Why untanned hides rot and smell terrible"
+    ]
+  }
+]

@@ -1,0 +1,63 @@
+[
+  {
+    "paperId": "edible_plant_identification",
+    "title": "Food or Poison: Identifying Safe Wild Plants",
+    "field": "survival",
+    "paperSets": ["starting_knowledge"],
+    "prerequisitePapers": [],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "survival": 8, "nature": 6 },
+    "contributesTo": [
+      { "type": "ability", "id": "forage_plants" }
+    ],
+    "topicDescription": "Learning which wild plants are safe to eat",
+    "keyPoints": [
+      "Many edible plants have poisonous look-alikes",
+      "Universal edibility test (last resort only)",
+      "Berries, nuts, roots, and greens",
+      "Why knowledge from elders is crucial"
+    ]
+  },
+  {
+    "paperId": "fishing_basics",
+    "title": "From Water to Table: Elementary Fishing Techniques",
+    "field": "survival",
+    "paperSets": ["starting_knowledge"],
+    "prerequisitePapers": ["cordage_making"],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "survival": 7, "fishing": 8 },
+    "contributesTo": [
+      { "type": "ability", "id": "fish" },
+      { "type": "item", "id": "fishing_line" }
+    ],
+    "topicDescription": "Catching fish using line, hooks, and traps",
+    "keyPoints": [
+      "Bone or thorn hooks",
+      "Bait selection based on local fish",
+      "Weir traps in streams",
+      "Why fishing provides consistent protein"
+    ]
+  },
+  {
+    "paperId": "basic_hunting",
+    "title": "The Hunt: Tracking and Killing Game Animals",
+    "field": "survival",
+    "paperSets": ["starting_knowledge"],
+    "prerequisitePapers": ["stone_knapping"],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": { "survival": 10, "hunting": 12 },
+    "contributesTo": [
+      { "type": "ability", "id": "hunt" }
+    ],
+    "topicDescription": "Actively pursuing and killing animals for food",
+    "keyPoints": [
+      "Reading tracks and animal signs",
+      "Approaching downwind to avoid detection",
+      "Spear throwing vs. bow hunting",
+      "Why persistence hunting works for humans"
+    ]
+  }
+]

@@ -8,6 +8,8 @@ import { TechnologyUnlockSystem } from '../TechnologyUnlockSystem.js';
 import { createBuildingComponent } from '../../components/BuildingComponent.js';
 import { createUniversityComponent } from '../../components/UniversityComponent.js';
 import { createTechnologyUnlockComponent } from '../../components/TechnologyUnlockComponent.js';
+import { createCityDirectorComponent } from '../../components/CityDirectorComponent.js';
+import { createPositionComponent } from '../../components/PositionComponent.js';
 import type { UniversityComponent } from '../../components/UniversityComponent.js';
 import type { TechnologyUnlockComponent } from '../../components/TechnologyUnlockComponent.js';
 import type { GameEvent } from '../../events/EventMap.js';
@@ -29,9 +31,8 @@ describe('University Research Integration', () => {
     buildingSystem = new BuildingSystem();
     techSystem = new TechnologyUnlockSystem(eventBus);
 
-    universitySystem.initialize(world, eventBus);
+    // Only BuildingSystem has initialize method
     buildingSystem.initialize(world, eventBus);
-    techSystem.initialize(world, eventBus);
   });
 
   describe('Building construction to component attachment', () => {
@@ -42,7 +43,7 @@ describe('University Research Integration', () => {
       (world as any)._addEntity(university);
 
       // Emit building complete event
-      eventBus.emit({
+      eventBus.emitImmediate({
         type: 'building:complete',
         source: 'test',
         data: {
@@ -87,7 +88,7 @@ describe('University Research Integration', () => {
 
       // Run system for 10 ticks
       for (let i = 0; i < 10; i++) {
-        world.tick++;
+        (world as any)._tick++;
         universitySystem.update(world, [university], 0);
       }
 
@@ -111,6 +112,9 @@ describe('University Research Integration', () => {
         'agent-123',
         ['agent-456', 'agent-789']
       );
+
+      // Flush queued events
+      eventBus.flush();
 
       expect(events).toHaveLength(1);
       expect(events[0].data.title).toBe('Revolutionary Physics');
@@ -140,15 +144,19 @@ describe('University Research Integration', () => {
 
       // Run system until completion (1000 ticks to reach 100% at 0.1 per tick)
       for (let i = 0; i < 1000; i++) {
-        world.tick++;
+        (world as any)._tick++;
         universitySystem.update(world, [university], 0);
       }
 
-      // Verify project completed
-      const project = universityComp.activeProjects[0];
-      expect(project.progress).toBe(100);
-      expect(project.status).toBe('published');
-      expect(project.paperId).toBeDefined();
+      // Verify project completed and moved to completedProjects
+      expect(universityComp.completedProjects).toHaveLength(1);
+      const completedProject = universityComp.completedProjects[0];
+      expect(completedProject.progress).toBe(100);
+      expect(completedProject.status).toBe('published');
+      expect(completedProject.paperId).toBeDefined();
+
+      // Flush queued events
+      eventBus.flush();
 
       // Verify completion event
       expect(completionEvents).toHaveLength(1);
@@ -163,16 +171,30 @@ describe('University Research Integration', () => {
       // Create technology unlock component
       const techUnlockEntity = new EntityImpl(createEntityId(), 0);
       const techUnlock = createTechnologyUnlockComponent();
+      techUnlock.playerCityId = 'test-city';
       techUnlockEntity.addComponent(techUnlock);
       (world as any)._addEntity(techUnlockEntity);
 
-      // Create university building
+      // Create a player city
+      const cityEntity = new EntityImpl(createEntityId(), 0);
+      const cityDirector = createCityDirectorComponent(
+        'test-city',
+        'Test City',
+        { minX: 0, maxX: 200, minY: 0, maxY: 200 },
+        false
+      );
+      cityEntity.addComponent(cityDirector);
+      cityEntity.addComponent(createPositionComponent(100, 100));
+      (world as any)._addEntity(cityEntity);
+
+      // Create university building in player city
       const university = new EntityImpl(createEntityId(), 0);
       university.addComponent(createBuildingComponent(BuildingType.University, 1, 100));
+      university.addComponent(createPositionComponent(110, 110));
       (world as any)._addEntity(university);
 
       // Emit building complete event
-      eventBus.emit({
+      eventBus.emitImmediate({
         type: 'building:complete',
         source: 'test',
         data: {
@@ -181,6 +203,9 @@ describe('University Research Integration', () => {
           tick: 1000,
         },
       });
+
+      // Advance tick to trigger TechnologyUnlockSystem scan (scans every 100 ticks)
+      (world as any)._tick = 100;
 
       // Run tech system to detect university
       techSystem.update(world, [], 0);
@@ -214,7 +239,7 @@ describe('University Research Integration', () => {
 
       // Run system for 10 ticks
       for (let i = 0; i < 10; i++) {
-        world.tick++;
+        (world as any)._tick++;
         universitySystem.update(world, [university], 0);
       }
 
@@ -250,7 +275,7 @@ describe('University Research Integration', () => {
 
       // Run system for 10 ticks
       for (let i = 0; i < 10; i++) {
-        world.tick++;
+        (world as any)._tick++;
         universitySystem.update(world, [university], 0);
       }
 
@@ -282,9 +307,12 @@ describe('University Research Integration', () => {
 
       // Run for 200 ticks
       for (let i = 0; i < 200; i++) {
-        world.tick++;
+        (world as any)._tick++;
         universitySystem.update(world, [university], 0);
       }
+
+      // Flush queued events
+      eventBus.flush();
 
       // Should have emitted one stats event
       expect(statsEvents).toHaveLength(1);
@@ -313,7 +341,7 @@ describe('University Research Integration', () => {
 
       // Run system for 10 ticks
       for (let i = 0; i < 10; i++) {
-        world.tick++;
+        (world as any)._tick++;
         universitySystem.update(world, [uni1, uni2], 0);
       }
 

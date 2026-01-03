@@ -1,0 +1,104 @@
+[
+  {
+    "paperId": "mana_infusion",
+    "title": "Imbuing Objects with Power: The Fundamentals of Mana Infusion",
+    "field": "arcane",
+    "paperSets": ["enchanting_fundamentals"],
+    "prerequisitePapers": [],
+    "complexity": 4,
+    "minimumAge": "teen",
+    "skillGrants": { "enchanting": 12, "arcane": 8 },
+    "contributesTo": [
+      { "type": "ability", "id": "basic_enchanting" }
+    ],
+    "topicDescription": "How to transfer magical energy into inanimate objects",
+    "keyPoints": [
+      "Objects as mana batteries",
+      "Why some materials hold enchantments better than others",
+      "The gradual fade of enchantments over time",
+      "Why living things can't be permanently enchanted"
+    ]
+  },
+  {
+    "paperId": "material_affinity",
+    "title": "Receptive Substances: Materials and Their Enchantment Affinities",
+    "field": "arcane",
+    "paperSets": ["enchanting_fundamentals"],
+    "prerequisitePapers": ["mana_infusion"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "enchanting": 14, "metallurgy": 6 },
+    "contributesTo": [
+      { "type": "ability", "id": "material_selection" }
+    ],
+    "topicDescription": "Different materials have different capacities for holding enchantments",
+    "keyPoints": [
+      "Gemstones: excellent for focused enchantments",
+      "Metals: good conductors, poor retainers",
+      "Wood: moderate capacity, but decays over time",
+      "Crystal: best overall, but brittle"
+    ]
+  },
+  {
+    "paperId": "sharpness_enchantment",
+    "title": "The Eternal Edge: Enchanting Weapons for Sharpness",
+    "field": "arcane",
+    "paperSets": ["enchanting_fundamentals"],
+    "prerequisitePapers": ["mana_infusion", "material_affinity"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "enchanting": 16, "metallurgy": 8 },
+    "contributesTo": [
+      { "type": "spell", "id": "enchant_weapon_sharpness" }
+    ],
+    "topicDescription": "Creating weapons that never dull and cut better than physics allows",
+    "keyPoints": [
+      "Mana-reinforced molecular edges",
+      "Why enchanted blades cut through normal metal",
+      "Maintenance: refreshing fading enchantments",
+      "The limits: can't cut through everything"
+    ]
+  },
+  {
+    "paperId": "durability_enchantment",
+    "title": "Unbreakable Objects: Enchantments of Durability and Resistance",
+    "field": "arcane",
+    "paperSets": ["enchanting_fundamentals"],
+    "prerequisitePapers": ["material_affinity"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "enchanting": 16, "arcane": 10 },
+    "contributesTo": [
+      { "type": "spell", "id": "enchant_durability" }
+    ],
+    "topicDescription": "Making objects resistant to wear, damage, and breaking",
+    "keyPoints": [
+      "Reinforcing molecular bonds with mana",
+      "Why 'unbreakable' is theoretical, not practical",
+      "Layered enchantments for maximum protection",
+      "Cost scales exponentially with desired durability"
+    ]
+  },
+  {
+    "paperId": "elemental_weapon_enchantments",
+    "title": "Flaming Swords and Frozen Arrows: Elemental Weapon Enchantments",
+    "field": "arcane",
+    "paperSets": ["enchanting_fundamentals"],
+    "prerequisitePapers": ["sharpness_enchantment"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "minimumSkills": { "enchanting": 20, "fire_magic": 10 },
+    "skillGrants": { "enchanting": 18, "arcane": 12 },
+    "contributesTo": [
+      { "type": "spell", "id": "enchant_weapon_fire" },
+      { "type": "spell", "id": "enchant_weapon_ice" }
+    ],
+    "topicDescription": "Imbuing weapons with elemental effects like fire or ice",
+    "keyPoints": [
+      "Continuous mana draw to maintain elemental effect",
+      "Why the wielder doesn't get burned/frozen",
+      "Combining elemental and sharpness enchantments",
+      "The instability of opposing elements on the same item"
+    ]
+  }
+]

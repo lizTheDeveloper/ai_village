@@ -1,0 +1,107 @@
+[
+  {
+    "paperId": "soul_binding_basics",
+    "title": "Chains of the Spirit: Binding Souls to the Material Plane",
+    "field": "arcane",
+    "paperSets": ["necromancy_souls"],
+    "prerequisitePapers": ["soul_departure_mechanics"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "necromancy": 16, "arcane": 10 },
+    "contributesTo": [
+      { "type": "spell", "id": "bind_soul" }
+    ],
+    "topicDescription": "Preventing souls from departing to the afterlife",
+    "keyPoints": [
+      "The window of opportunity after death",
+      "Anchoring souls to objects or locations",
+      "Why unwilling souls resist binding",
+      "The ethics of soul imprisonment"
+    ]
+  },
+  {
+    "paperId": "soul_jar_creation",
+    "title": "Vessels of the Departed: Creating Phylacteries and Soul Jars",
+    "field": "arcane",
+    "paperSets": ["necromancy_souls"],
+    "prerequisitePapers": ["soul_binding_basics"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "minimumSkills": { "necromancy": 25, "enchanting": 15 },
+    "skillGrants": { "necromancy": 22, "enchanting": 12 },
+    "contributesTo": [
+      { "type": "spell", "id": "create_phylactery" },
+      { "type": "item", "id": "soul_jar" }
+    ],
+    "topicDescription": "Crafting containers capable of holding disembodied souls",
+    "keyPoints": [
+      "Material requirements: crystal, gemstones, or precious metals",
+      "Binding runes and preservation enchantments",
+      "One soul per jar (usually)",
+      "What happens if the jar breaks"
+    ]
+  },
+  {
+    "paperId": "soul_interrogation",
+    "title": "Speaking with the Dead: Interrogating Captured Souls",
+    "field": "arcane",
+    "paperSets": ["necromancy_souls"],
+    "prerequisitePapers": ["soul_binding_basics"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "minimumSkills": { "necromancy": 20 },
+    "skillGrants": { "necromancy": 18, "arcane": 12 },
+    "contributesTo": [
+      { "type": "spell", "id": "speak_with_dead" }
+    ],
+    "topicDescription": "Extracting information from the souls of the deceased",
+    "keyPoints": [
+      "Fresh deaths provide clearer answers",
+      "Souls can lie or refuse to answer",
+      "Memory degradation in long-dead souls",
+      "Why this is considered extremely unethical"
+    ]
+  },
+  {
+    "paperId": "soul_consumption",
+    "title": "The Ultimate Price: Consuming Souls for Power",
+    "field": "arcane",
+    "paperSets": ["necromancy_souls"],
+    "prerequisitePapers": ["soul_jar_creation"],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "minimumSkills": { "necromancy": 30, "arcane": 25 },
+    "skillGrants": { "necromancy": 25, "arcane": 20 },
+    "contributesTo": [
+      { "type": "spell", "id": "consume_soul" }
+    ],
+    "topicDescription": "Destroying souls to absorb their life force and knowledge",
+    "keyPoints": [
+      "Massive power gain but permanent soul destruction",
+      "Absorbing memories and skills from consumed souls",
+      "The corruption cost: moral and magical",
+      "Why this is universally forbidden"
+    ]
+  },
+  {
+    "paperId": "soul_transplantation",
+    "title": "A New Vessel: Transplanting Souls Between Bodies",
+    "field": "arcane",
+    "paperSets": ["necromancy_souls"],
+    "prerequisitePapers": ["soul_binding_basics", "soul_jar_creation"],
+    "complexity": 10,
+    "minimumAge": "elder",
+    "minimumSkills": { "necromancy": 35, "arcane": 30 },
+    "skillGrants": { "necromancy": 30, "arcane": 25 },
+    "contributesTo": [
+      { "type": "spell", "id": "soul_transfer" }
+    ],
+    "topicDescription": "Moving souls from one body to another",
+    "keyPoints": [
+      "Evicting the original soul (murder)",
+      "Body-soul compatibility issues",
+      "Memory and personality retention",
+      "The path to lichdom and body-hopping"
+    ]
+  }
+]

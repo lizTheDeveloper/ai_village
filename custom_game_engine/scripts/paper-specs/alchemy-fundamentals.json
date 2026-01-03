@@ -1,0 +1,104 @@
+[
+  {
+    "paperId": "four_elements_theory",
+    "title": "Earth, Air, Fire, Water: The Foundation of Alchemical Thought",
+    "field": "alchemy",
+    "paperSets": ["alchemy_fundamentals"],
+    "prerequisitePapers": [],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "alchemy": 8, "arcane": 5 },
+    "contributesTo": [
+      { "type": "ability", "id": "elemental_analysis" }
+    ],
+    "topicDescription": "The classical four elements as the basis of all matter",
+    "keyPoints": [
+      "All matter composed of combinations of four elements",
+      "Hot and dry = Fire, Cold and wet = Water",
+      "How to identify dominant elements in substances",
+      "Why this theory is wrong but still useful"
+    ]
+  },
+  {
+    "paperId": "dissolution_basics",
+    "title": "Breaking Things Down: The Art of Dissolution",
+    "field": "alchemy",
+    "paperSets": ["alchemy_fundamentals"],
+    "prerequisitePapers": ["four_elements_theory"],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": { "alchemy": 10, "chemistry": 6 },
+    "contributesTo": [
+      { "type": "ability", "id": "basic_dissolution" }
+    ],
+    "topicDescription": "How to break down substances into their component parts using solvents",
+    "keyPoints": [
+      "Water dissolves salts and sugars",
+      "Alcohol dissolves oils and resins",
+      "Acids dissolve metals and minerals",
+      "The principle of 'like dissolves like'"
+    ]
+  },
+  {
+    "paperId": "distillation_process",
+    "title": "Separating the Pure from the Impure: The Art of Distillation",
+    "field": "alchemy",
+    "paperSets": ["alchemy_fundamentals"],
+    "prerequisitePapers": ["dissolution_basics"],
+    "complexity": 4,
+    "minimumAge": "teen",
+    "skillGrants": { "alchemy": 12, "chemistry": 8 },
+    "contributesTo": [
+      { "type": "building", "id": "alembic" },
+      { "type": "ability", "id": "distillation" }
+    ],
+    "topicDescription": "Using heat to separate substances by boiling point",
+    "keyPoints": [
+      "The alembic: vessel, condensing tube, and collection flask",
+      "Water boils at 100°C, alcohol at 78°C",
+      "Why you can't distill wine into pure alcohol",
+      "Common explosions and how to avoid them"
+    ]
+  },
+  {
+    "paperId": "calcination",
+    "title": "Reduction by Fire: The Process of Calcination",
+    "field": "alchemy",
+    "paperSets": ["alchemy_fundamentals"],
+    "prerequisitePapers": ["four_elements_theory"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "alchemy": 14, "fire_magic": 6 },
+    "contributesTo": [
+      { "type": "ability", "id": "calcination" }
+    ],
+    "topicDescription": "Heating substances to dryness to remove volatile components",
+    "keyPoints": [
+      "Burning away impurities leaves purified ash",
+      "Temperature control is critical",
+      "Metals produce colorful oxides when calcined",
+      "The calx of lead becomes litharge (yellow) or minium (red)"
+    ]
+  },
+  {
+    "paperId": "mercury_sulfur_salt",
+    "title": "The Tria Prima: Mercury, Sulfur, and Salt as Universal Principles",
+    "field": "alchemy",
+    "paperSets": ["alchemy_fundamentals"],
+    "prerequisitePapers": ["four_elements_theory", "dissolution_basics"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "minimumSkills": { "alchemy": 15 },
+    "skillGrants": { "alchemy": 16, "arcane": 10 },
+    "contributesTo": [
+      { "type": "ability", "id": "tria_prima_analysis" }
+    ],
+    "topicDescription": "The three fundamental principles that govern alchemical transformation",
+    "keyPoints": [
+      "Mercury = fluidity, volatility, spirit",
+      "Sulfur = combustibility, soul, activity",
+      "Salt = fixity, body, materiality",
+      "All substances contain varying proportions of these principles"
+    ]
+  }
+]

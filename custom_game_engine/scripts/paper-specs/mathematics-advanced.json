@@ -1,0 +1,63 @@
+[
+  {
+    "paperId": "geometry_basics",
+    "title": "Lines and Angles: Foundational Geometric Principles",
+    "field": "mathematics",
+    "paperSets": ["mathematics_fundamentals"],
+    "prerequisitePapers": [],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "mathematics": 8 },
+    "contributesTo": [
+      { "type": "ability", "id": "geometric_reasoning" }
+    ],
+    "topicDescription": "Basic geometry: points, lines, angles, and shapes",
+    "keyPoints": [
+      "Parallel lines never meet",
+      "Angles in a triangle sum to 180 degrees",
+      "The Pythagorean theorem",
+      "Why circles are special"
+    ]
+  },
+  {
+    "paperId": "algebra_fundamentals",
+    "title": "Unknown Quantities: Introduction to Algebraic Thinking",
+    "field": "mathematics",
+    "paperSets": ["mathematics_fundamentals"],
+    "prerequisitePapers": [],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": { "mathematics": 10 },
+    "contributesTo": [
+      { "type": "ability", "id": "solve_equations" }
+    ],
+    "topicDescription": "Using symbols to represent unknown values and solve for them",
+    "keyPoints": [
+      "Variables represent unknown numbers",
+      "Balance: what you do to one side, do to the other",
+      "Linear equations and their solutions",
+      "Why this is useful for everything"
+    ]
+  },
+  {
+    "paperId": "calculus_introduction",
+    "title": "The Mathematics of Change: Introduction to Calculus",
+    "field": "mathematics",
+    "paperSets": ["mathematics_advanced"],
+    "prerequisitePapers": ["algebra_fundamentals", "geometry_basics"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "minimumSkills": { "mathematics": 20 },
+    "skillGrants": { "mathematics": 22 },
+    "contributesTo": [
+      { "type": "ability", "id": "calculus" }
+    ],
+    "topicDescription": "Understanding rates of change and accumulation",
+    "keyPoints": [
+      "Derivatives measure instantaneous rate of change",
+      "Integrals measure total accumulation",
+      "Applications in physics and engineering",
+      "Why infinitesimals broke philosophers' brains"
+    ]
+  }
+]

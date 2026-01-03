@@ -1,0 +1,103 @@
+[
+  {
+    "paperId": "water_creation",
+    "title": "Conjuring the Waters: Creating Water from Magical Energy",
+    "field": "arcane",
+    "paperSets": ["water_magic_fundamentals"],
+    "prerequisitePapers": [],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "water_magic": 10, "arcane": 5 },
+    "contributesTo": [
+      { "type": "spell", "id": "create_water" }
+    ],
+    "topicDescription": "Magically generating pure water without a source",
+    "keyPoints": [
+      "Converting mana to H₂O molecules",
+      "Why created water is purer than natural water",
+      "Volume limitations based on mana capacity",
+      "The water appears cold (room temperature)"
+    ]
+  },
+  {
+    "paperId": "water_shaping",
+    "title": "Liquid Sculpture: Controlling and Shaping Water",
+    "field": "arcane",
+    "paperSets": ["water_magic_fundamentals"],
+    "prerequisitePapers": ["water_creation"],
+    "complexity": 4,
+    "minimumAge": "teen",
+    "skillGrants": { "water_magic": 12, "arcane": 8 },
+    "contributesTo": [
+      { "type": "spell", "id": "shape_water" }
+    ],
+    "topicDescription": "Directing and shaping water into specific forms",
+    "keyPoints": [
+      "Overcoming gravity and surface tension",
+      "Creating water spheres, walls, and weapons",
+      "Concentration required increases with complexity",
+      "Water returns to normal when concentration breaks"
+    ]
+  },
+  {
+    "paperId": "ice_formation",
+    "title": "Freezing Point Depression: Instant Ice Creation",
+    "field": "arcane",
+    "paperSets": ["water_magic_fundamentals"],
+    "prerequisitePapers": ["water_creation"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "water_magic": 14, "chemistry": 8 },
+    "contributesTo": [
+      { "type": "spell", "id": "freeze_water" }
+    ],
+    "topicDescription": "Rapidly removing heat to freeze water instantly",
+    "keyPoints": [
+      "Extracting thermal energy via mana",
+      "Why flash-freezing creates cloudy ice",
+      "Forming ice weapons and barriers",
+      "Where does the extracted heat go? (thermodynamics isn't optional)"
+    ]
+  },
+  {
+    "paperId": "water_breathing",
+    "title": "Aquatic Adaptation: Magical Underwater Breathing",
+    "field": "arcane",
+    "paperSets": ["water_magic_fundamentals"],
+    "prerequisitePapers": ["water_shaping"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "water_magic": 16, "arcane": 10 },
+    "contributesTo": [
+      { "type": "spell", "id": "water_breathing" }
+    ],
+    "topicDescription": "Creating breathable air pockets underwater or extracting oxygen from water",
+    "keyPoints": [
+      "Air bubble method: simple but limited duration",
+      "Gill simulation: complex but sustainable",
+      "Pressure equalization at depth",
+      "Why you can't just breathe water (even magically)"
+    ]
+  },
+  {
+    "paperId": "healing_waters",
+    "title": "The Restorative Flow: Water Magic for Healing",
+    "field": "arcane",
+    "paperSets": ["water_magic_fundamentals"],
+    "prerequisitePapers": ["water_creation", "water_shaping"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "minimumSkills": { "water_magic": 20 },
+    "skillGrants": { "water_magic": 18, "medicine": 10 },
+    "contributesTo": [
+      { "type": "spell", "id": "healing_waters" }
+    ],
+    "topicDescription": "Using magically enhanced water to accelerate healing",
+    "keyPoints": [
+      "Infusing water with life energy",
+      "Cleaning wounds and preventing infection",
+      "Accelerated tissue regeneration",
+      "Why it can't cure everything (bones, diseases, curses)"
+    ]
+  }
+]

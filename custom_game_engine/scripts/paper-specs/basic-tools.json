@@ -1,0 +1,21 @@
+[
+  {
+    "paperId": "sharp_edge_theory",
+    "title": "The First Technology: Understanding the Sharp Edge",
+    "field": "crafting",
+    "paperSets": ["basic_tools"],
+    "prerequisitePapers": [],
+    "complexity": 1,
+    "minimumAge": "teen",
+    "skillGrants": { "crafting": 5 },
+    "contributesTo": [
+      { "type": "item", "id": "stone_knife" }
+    ],
+    "topicDescription": "The fundamental principle: sharp edges cut better than dull ones",
+    "keyPoints": [
+      "Pressure concentration at thin edges",
+      "Why hard materials make better blades",
+      "The trade-off between sharpness and durability"
+    ]
+  }
+]

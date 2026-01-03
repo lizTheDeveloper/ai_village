@@ -1,0 +1,106 @@
+[
+  {
+    "paperId": "heat_control_cooking",
+    "title": "Mastering the Flame: Temperature Control in Cooking",
+    "field": "cuisine",
+    "paperSets": ["advanced_cooking"],
+    "prerequisitePapers": [],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": { "cooking": 10, "fire_magic": 4 },
+    "contributesTo": [
+      { "type": "ability", "id": "precise_heat_control" }
+    ],
+    "topicDescription": "Understanding and controlling cooking temperatures for optimal results",
+    "keyPoints": [
+      "Low heat for slow cooking and tenderizing",
+      "High heat for searing and browning",
+      "The Maillard reaction: why browning adds flavor",
+      "Common temperature mistakes and their consequences"
+    ]
+  },
+  {
+    "paperId": "knife_skills",
+    "title": "The Edge of Culinary Art: Knife Skills and Precision Cutting",
+    "field": "cuisine",
+    "paperSets": ["advanced_cooking"],
+    "prerequisitePapers": [],
+    "complexity": 4,
+    "minimumAge": "teen",
+    "skillGrants": { "cooking": 12, "dexterity": 6 },
+    "contributesTo": [
+      { "type": "ability", "id": "master_knife_work" }
+    ],
+    "topicDescription": "Proper knife techniques for efficiency and safety",
+    "keyPoints": [
+      "The pinch grip for control",
+      "Different cuts: julienne, brunoise, chiffonade",
+      "Why uniform size matters for even cooking",
+      "Keeping fingers intact: the claw grip"
+    ]
+  },
+  {
+    "paperId": "sauce_emulsification",
+    "title": "Binding the Unbindable: The Science of Emulsified Sauces",
+    "field": "cuisine",
+    "paperSets": ["advanced_cooking"],
+    "prerequisitePapers": ["heat_control_cooking"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "cooking": 16, "chemistry": 8 },
+    "contributesTo": [
+      { "type": "recipe", "id": "hollandaise_sauce" },
+      { "type": "recipe", "id": "mayonnaise" }
+    ],
+    "topicDescription": "Creating stable mixtures of oil and water through emulsification",
+    "keyPoints": [
+      "Egg yolk as an emulsifier",
+      "Why oil and water don't normally mix",
+      "Temperature control prevents breaking",
+      "The tragedy of broken hollandaise and how to save it"
+    ]
+  },
+  {
+    "paperId": "stock_and_broth",
+    "title": "Liquid Gold: The Art of Stock and Broth Making",
+    "field": "cuisine",
+    "paperSets": ["advanced_cooking"],
+    "prerequisitePapers": ["heat_control_cooking"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "cooking": 14, "chemistry": 6 },
+    "contributesTo": [
+      { "type": "recipe", "id": "bone_broth" },
+      { "type": "recipe", "id": "vegetable_stock" }
+    ],
+    "topicDescription": "Extracting flavor and nutrients through long, slow cooking",
+    "keyPoints": [
+      "Collagen breakdown creates gelatin and body",
+      "Roasting bones first deepens flavor",
+      "The importance of not boiling (it clouds the stock)",
+      "Time requirements: 8-24 hours for best results"
+    ]
+  },
+  {
+    "paperId": "pastry_chemistry",
+    "title": "Architecture in Flour: The Science of Pastry",
+    "field": "cuisine",
+    "paperSets": ["advanced_cooking"],
+    "prerequisitePapers": ["heat_control_cooking"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "minimumSkills": { "cooking": 20 },
+    "skillGrants": { "cooking": 18, "chemistry": 10 },
+    "contributesTo": [
+      { "type": "recipe", "id": "puff_pastry" },
+      { "type": "recipe", "id": "croissant" }
+    ],
+    "topicDescription": "Understanding gluten development and fat layering in pastry",
+    "keyPoints": [
+      "Cold butter creates steam layers (puff pastry)",
+      "Minimal gluten development for tender pastry",
+      "Overworking creates tough, chewy results",
+      "The lamination process: hundreds of layers"
+    ]
+  }
+]

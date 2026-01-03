@@ -1,0 +1,45 @@
+// Insert before GRAND_ALCHEMY
+
+export const CRYSTALLIZATION_METHODS: ResearchPaper = {
+  paperId: 'crystallization_methods',
+  title: 'Solid from Solution: The Art of Crystallization',
+  field: 'alchemy',
+  paperSets: ['basic_alchemy'],
+  prerequisitePapers: ['extraction_methods'],
+  complexity: 3,
+  minimumAge: 'teen',
+  skillGrants: { alchemy: 6, nature: 3 },
+  contributesTo: [
+    { type: 'item', itemId: 'salt' },
+    { type: 'item', itemId: 'crystal' }
+  ],
+  published: false,
+  tier: 1,
+  technologyTags: ['basic_alchemy'],
+  description: `Growing crystals from solution is described as "patience incarnate" by the author. Methods for salt, sugar, and various mineral crystals are detailed.`,
+  abstract: 'Techniques for crystallizing substances from saturated solutions.',
+  estimatedReadingTime: 120,
+  authoringDifficulty: 2
+};
+
+export const SUBLIMATION_TECHNIQUES: ResearchPaper = {
+  paperId: 'sublimation_techniques',
+  title: 'Solid to Vapor: Understanding Sublimation',
+  field: 'alchemy',
+  paperSets: ['basic_alchemy'],
+  prerequisitePapers: ['substance_identification'],
+  complexity: 4,
+  minimumAge: 'teen',
+  skillGrants: { alchemy: 7 },
+  contributesTo: [
+    { type: 'ability', abilityId: 'purify_by_sublimation' }
+  ],
+  published: false,
+  tier: 2,
+  technologyTags: ['basic_alchemy'],
+  description: `The peculiar process where substances skip the liquid phase entirely, going from solid directly to vapor, is explored.`,
+  abstract: 'Methods for purifying substances through direct solid-to-vapor phase transition.',
+  estimatedReadingTime: 140,
+  authoringDifficulty: 2
+};
+

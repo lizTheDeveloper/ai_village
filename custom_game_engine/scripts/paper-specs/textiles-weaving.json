@@ -1,0 +1,103 @@
+[
+  {
+    "paperId": "fiber_preparation",
+    "title": "From Fleece to Thread: Preparing Fibers for Spinning",
+    "field": "crafting",
+    "paperSets": ["textile_fundamentals"],
+    "prerequisitePapers": [],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "textiles": 8, "crafting": 5 },
+    "contributesTo": [
+      { "type": "ability", "id": "fiber_processing" }
+    ],
+    "topicDescription": "Cleaning, carding, and preparing raw fibers for spinning",
+    "keyPoints": [
+      "Washing removes lanolin and dirt",
+      "Carding aligns fibers for smooth spinning",
+      "Different fibers: wool, cotton, flax, silk",
+      "Why dirty fleece makes weak thread"
+    ]
+  },
+  {
+    "paperId": "spinning_fundamentals",
+    "title": "The Twist of Fate: Basic Principles of Spinning Thread",
+    "field": "crafting",
+    "paperSets": ["textile_fundamentals"],
+    "prerequisitePapers": ["fiber_preparation"],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": { "textiles": 10, "crafting": 6 },
+    "contributesTo": [
+      { "type": "building", "id": "spinning_wheel" },
+      { "type": "item", "id": "thread" }
+    ],
+    "topicDescription": "Creating thread by twisting fibers together",
+    "keyPoints": [
+      "The drop spindle: ancient and effective",
+      "The spinning wheel: faster production",
+      "S-twist vs. Z-twist direction",
+      "Why more twist makes stronger thread"
+    ]
+  },
+  {
+    "paperId": "loom_construction",
+    "title": "Building the Frame: Loom Construction and Operation",
+    "field": "crafting",
+    "paperSets": ["textile_fundamentals"],
+    "prerequisitePapers": ["spinning_fundamentals"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "textiles": 14, "construction": 8 },
+    "contributesTo": [
+      { "type": "building", "id": "weaving_loom" }
+    ],
+    "topicDescription": "Building and operating a loom for weaving cloth",
+    "keyPoints": [
+      "Warp threads (vertical) and weft threads (horizontal)",
+      "The heddle raises alternate warp threads",
+      "Shuttle carries weft thread through the shed",
+      "Tension is critical for even weaving"
+    ]
+  },
+  {
+    "paperId": "weaving_patterns",
+    "title": "Beyond Plain Weave: Complex Weaving Patterns and Techniques",
+    "field": "crafting",
+    "paperSets": ["textile_fundamentals"],
+    "prerequisitePapers": ["loom_construction"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "textiles": 16, "mathematics": 6 },
+    "contributesTo": [
+      { "type": "ability", "id": "pattern_weaving" }
+    ],
+    "topicDescription": "Creating decorative patterns through varied weaving techniques",
+    "keyPoints": [
+      "Twill weave creates diagonal patterns",
+      "Satin weave for smooth, lustrous fabric",
+      "Damask: pattern woven into the cloth",
+      "Mathematical precision required for complex patterns"
+    ]
+  },
+  {
+    "paperId": "natural_dyes",
+    "title": "Colors from Nature: Plant-Based Textile Dyes",
+    "field": "crafting",
+    "paperSets": ["textile_fundamentals"],
+    "prerequisitePapers": ["spinning_fundamentals"],
+    "complexity": 4,
+    "minimumAge": "teen",
+    "skillGrants": { "textiles": 12, "chemistry": 8 },
+    "contributesTo": [
+      { "type": "ability", "id": "textile_dyeing" }
+    ],
+    "topicDescription": "Extracting and applying natural dyes to fabrics",
+    "keyPoints": [
+      "Mordants fix dyes to fibers",
+      "Indigo for blue, madder for red, weld for yellow",
+      "Why some colors are more expensive (purple from snails)",
+      "Colorfastness and preventing fading"
+    ]
+  }
+]

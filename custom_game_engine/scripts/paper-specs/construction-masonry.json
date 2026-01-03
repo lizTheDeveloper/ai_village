@@ -1,0 +1,103 @@
+[
+  {
+    "paperId": "mortar_composition",
+    "title": "The Binding Force: Mortar Composition and Properties",
+    "field": "construction",
+    "paperSets": ["masonry_fundamentals"],
+    "prerequisitePapers": [],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": { "construction": 10, "chemistry": 5 },
+    "contributesTo": [
+      { "type": "ability", "id": "mortar_mixing" }
+    ],
+    "topicDescription": "How to mix mortar that bonds stones together permanently",
+    "keyPoints": [
+      "Lime, sand, and water in correct proportions",
+      "Why portland cement is stronger than lime mortar",
+      "Curing time: mortar takes weeks to reach full strength",
+      "Too much water weakens the bond"
+    ]
+  },
+  {
+    "paperId": "stone_selection",
+    "title": "Reading the Rock: Selecting Stones for Construction",
+    "field": "construction",
+    "paperSets": ["masonry_fundamentals"],
+    "prerequisitePapers": [],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "construction": 8, "geology": 6 },
+    "contributesTo": [
+      { "type": "ability", "id": "stone_selection" }
+    ],
+    "topicDescription": "Identifying and selecting appropriate stones for building",
+    "keyPoints": [
+      "Granite: hard, durable, difficult to shape",
+      "Limestone: soft, easy to carve, weathers over time",
+      "Sandstone: moderate properties, varies by location",
+      "Testing for structural integrity before use"
+    ]
+  },
+  {
+    "paperId": "arch_construction",
+    "title": "Defying Gravity: The Principles of Arch Construction",
+    "field": "construction",
+    "paperSets": ["masonry_fundamentals"],
+    "prerequisitePapers": ["mortar_composition", "stone_selection"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "construction": 16, "mathematics": 10 },
+    "contributesTo": [
+      { "type": "building", "id": "stone_arch" }
+    ],
+    "topicDescription": "How arches distribute weight and allow wide spans without collapse",
+    "keyPoints": [
+      "The keystone locks the arch in place",
+      "Compression forces instead of tension",
+      "Why arches need support during construction",
+      "Roman innovation: the semicircular arch"
+    ]
+  },
+  {
+    "paperId": "foundation_engineering",
+    "title": "Building on Solid Ground: Foundation Design and Construction",
+    "field": "construction",
+    "paperSets": ["masonry_fundamentals"],
+    "prerequisitePapers": ["mortar_composition"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "construction": 14, "geology": 8 },
+    "contributesTo": [
+      { "type": "ability", "id": "foundation_construction" }
+    ],
+    "topicDescription": "Creating stable foundations that prevent settling and collapse",
+    "keyPoints": [
+      "Bedrock is ideal but often too deep",
+      "Compacted soil and gravel as alternatives",
+      "Drainage prevents water undermining foundations",
+      "Why buildings need to be wider at the base"
+    ]
+  },
+  {
+    "paperId": "dome_construction",
+    "title": "The Heavenly Vault: Engineering Dome Structures",
+    "field": "construction",
+    "paperSets": ["masonry_fundamentals"],
+    "prerequisitePapers": ["arch_construction"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "minimumSkills": { "construction": 25, "mathematics": 15 },
+    "skillGrants": { "construction": 20, "mathematics": 12 },
+    "contributesTo": [
+      { "type": "building", "id": "stone_dome" }
+    ],
+    "topicDescription": "Creating self-supporting hemispherical roofs",
+    "keyPoints": [
+      "A dome is a three-dimensional arch",
+      "The oculus (opening) at top for light",
+      "Buttressing to handle lateral forces",
+      "The Pantheon: standing for 2000 years"
+    ]
+  }
+]

@@ -1,0 +1,106 @@
+[
+  {
+    "paperId": "power_word_theory",
+    "title": "Words of Power: The Linguistic Basis of Runic Magic",
+    "field": "arcane",
+    "paperSets": ["rune_magic_advanced"],
+    "prerequisitePapers": ["symbol_recognition", "rune_binding_theory"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "rune_craft": 16, "linguistics": 10 },
+    "contributesTo": [
+      { "type": "spell", "id": "power_word_rune" }
+    ],
+    "topicDescription": "Certain words when carved as runes carry inherent magical power",
+    "keyPoints": [
+      "The language of creation - ancient words that shaped reality",
+      "Why speaking the words is less powerful than carving them",
+      "The difference between translation and transliteration",
+      "Power words that should never be carved (and what happens when they are)"
+    ]
+  },
+  {
+    "paperId": "animated_runes",
+    "title": "Motion in Stone: Creating Self-Activating Rune Sequences",
+    "field": "arcane",
+    "paperSets": ["rune_magic_advanced"],
+    "prerequisitePapers": ["basic_rune_sequences"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "minimumSkills": { "rune_craft": 20 },
+    "skillGrants": { "rune_craft": 18, "arcane": 12 },
+    "contributesTo": [
+      { "type": "spell", "id": "automated_rune_trigger" }
+    ],
+    "topicDescription": "Runes that activate automatically based on conditions",
+    "keyPoints": [
+      "If-then logic carved in stone",
+      "Proximity triggers vs. temporal triggers",
+      "The mana battery problem - powering long-term runes",
+      "Why complex conditional logic often fails catastrophically"
+    ]
+  },
+  {
+    "paperId": "runic_golems",
+    "title": "Servants of Stone: Animating Constructs with Runes",
+    "field": "arcane",
+    "paperSets": ["rune_magic_advanced"],
+    "prerequisitePapers": ["animated_runes", "rune_binding_theory"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "minimumSkills": { "rune_craft": 25, "arcane": 15 },
+    "skillGrants": { "rune_craft": 20, "arcane": 15 },
+    "contributesTo": [
+      { "type": "spell", "id": "create_runic_golem" }
+    ],
+    "topicDescription": "Creating mobile constructs powered by carved runes",
+    "keyPoints": [
+      "The command rune set: motion, perception, obedience",
+      "Why golems are literal-minded and dangerous",
+      "Power requirements scale with size and complexity",
+      "The shutdown sequence - absolutely critical"
+    ]
+  },
+  {
+    "paperId": "explosive_runes",
+    "title": "Delayed Destruction: The Art of Explosive Runic Traps",
+    "field": "arcane",
+    "paperSets": ["rune_magic_advanced"],
+    "prerequisitePapers": ["animated_runes"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "minimumSkills": { "rune_craft": 20 },
+    "skillGrants": { "rune_craft": 18, "fire_magic": 8 },
+    "contributesTo": [
+      { "type": "spell", "id": "explosive_rune_trap" }
+    ],
+    "topicDescription": "Runes that release stored energy violently when triggered",
+    "keyPoints": [
+      "Storing energy in compressed runic matrices",
+      "Trigger conditions: touch, proximity, time delay",
+      "Blast radius calculations",
+      "Why forgetting where you placed explosive runes is a common cause of death"
+    ]
+  },
+  {
+    "paperId": "master_rune_theory",
+    "title": "The Rune of Runes: Master Runes That Control Others",
+    "field": "arcane",
+    "paperSets": ["rune_magic_advanced"],
+    "prerequisitePapers": ["basic_rune_sequences", "animated_runes"],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "minimumSkills": { "rune_craft": 30 },
+    "skillGrants": { "rune_craft": 25, "arcane": 18 },
+    "contributesTo": [
+      { "type": "spell", "id": "master_rune_control" }
+    ],
+    "topicDescription": "Meta-runes that can activate, deactivate, or modify other runes",
+    "keyPoints": [
+      "The hierarchy of runic command",
+      "Emergency shutdown runes for systems gone wrong",
+      "Modifying existing runes without re-carving",
+      "The theoretical limit: can a master rune control itself?"
+    ]
+  }
+]

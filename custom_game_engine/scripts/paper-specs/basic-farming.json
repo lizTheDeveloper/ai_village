@@ -1,0 +1,62 @@
+[
+  {
+    "paperId": "seed_planting_basics",
+    "title": "Seeds in Soil: The First Principle of Agriculture",
+    "field": "agriculture",
+    "paperSets": ["starting_knowledge"],
+    "prerequisitePapers": [],
+    "complexity": 1,
+    "minimumAge": "child",
+    "skillGrants": { "agriculture": 5 },
+    "contributesTo": [
+      { "type": "ability", "id": "plant_seeds" }
+    ],
+    "topicDescription": "The fundamental discovery: seeds grow into plants when buried in soil",
+    "keyPoints": [
+      "Seeds contain embryonic plants",
+      "Depth matters: too deep and they don't sprout",
+      "Water activates germination",
+      "Why some seeds from eaten fruit can be planted"
+    ]
+  },
+  {
+    "paperId": "weeding_basics",
+    "title": "Unwanted Growth: Understanding and Removing Weeds",
+    "field": "agriculture",
+    "paperSets": ["starting_knowledge"],
+    "prerequisitePapers": ["seed_planting_basics"],
+    "complexity": 1,
+    "minimumAge": "child",
+    "skillGrants": { "agriculture": 4 },
+    "contributesTo": [
+      { "type": "ability", "id": "weed_crops" }
+    ],
+    "topicDescription": "Identifying and removing plants that compete with crops",
+    "keyPoints": [
+      "Weeds steal water and nutrients",
+      "Pull from roots, not just stems",
+      "Regular weeding prevents seed spread",
+      "Why cleared ground stays clear temporarily"
+    ]
+  },
+  {
+    "paperId": "watering_plants",
+    "title": "Artificial Rain: Watering Crops by Hand",
+    "field": "agriculture",
+    "paperSets": ["starting_knowledge"],
+    "prerequisitePapers": ["seed_planting_basics"],
+    "complexity": 1,
+    "minimumAge": "child",
+    "skillGrants": { "agriculture": 4 },
+    "contributesTo": [
+      { "type": "ability", "id": "water_crops" }
+    ],
+    "topicDescription": "Bringing water to plants when rain is insufficient",
+    "keyPoints": [
+      "Plants wilt without adequate water",
+      "Morning watering reduces disease",
+      "Soil should be moist but not waterlogged",
+      "Why carrying water is labor-intensive"
+    ]
+  }
+]

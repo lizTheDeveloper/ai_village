@@ -1,0 +1,103 @@
+[
+  {
+    "paperId": "ore_identification",
+    "title": "Rocks That Aren't Just Rocks: Identifying Metal-Bearing Ores",
+    "field": "metallurgy",
+    "paperSets": ["metallurgy_fundamentals"],
+    "prerequisitePapers": [],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "metallurgy": 8, "geology": 5 },
+    "contributesTo": [
+      { "type": "ability", "id": "ore_identification" }
+    ],
+    "topicDescription": "How to recognize ores and distinguish them from common rock",
+    "keyPoints": [
+      "Visual identification: color, luster, and weight",
+      "Why shiny rocks aren't always valuable",
+      "Common ores: iron oxide, copper carbonate, tin deposits",
+      "The streak test and other field identification methods"
+    ]
+  },
+  {
+    "paperId": "furnace_construction",
+    "title": "Building Heat: The Construction of Smelting Furnaces",
+    "field": "metallurgy",
+    "paperSets": ["metallurgy_fundamentals"],
+    "prerequisitePapers": ["ore_identification"],
+    "complexity": 4,
+    "minimumAge": "teen",
+    "skillGrants": { "metallurgy": 12, "construction": 8 },
+    "contributesTo": [
+      { "type": "building", "id": "basic_furnace" }
+    ],
+    "topicDescription": "How to build furnaces capable of reaching metal-melting temperatures",
+    "keyPoints": [
+      "Clay and stone construction for heat resistance",
+      "The bellows system for forced air",
+      "Why charcoal is better than wood for high temperatures",
+      "Insulation techniques to conserve heat"
+    ]
+  },
+  {
+    "paperId": "iron_smelting",
+    "title": "From Red Rock to Iron: The Smelting Process",
+    "field": "metallurgy",
+    "paperSets": ["metallurgy_fundamentals"],
+    "prerequisitePapers": ["ore_identification", "furnace_construction"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "metallurgy": 15, "chemistry": 8 },
+    "contributesTo": [
+      { "type": "item", "id": "iron_ingot" }
+    ],
+    "topicDescription": "The chemical process of extracting iron from ore using heat and carbon",
+    "keyPoints": [
+      "Iron oxide + carbon → iron + carbon dioxide",
+      "Required temperature: 1,200-1,500°C",
+      "The role of flux in separating slag from metal",
+      "Why early iron was often brittle (too much carbon)"
+    ]
+  },
+  {
+    "paperId": "copper_tin_bronze",
+    "title": "The Fortuitous Mixture: Discovering Bronze",
+    "field": "metallurgy",
+    "paperSets": ["metallurgy_fundamentals"],
+    "prerequisitePapers": ["iron_smelting"],
+    "complexity": 4,
+    "minimumAge": "teen",
+    "skillGrants": { "metallurgy": 14, "chemistry": 6 },
+    "contributesTo": [
+      { "type": "item", "id": "bronze_ingot" }
+    ],
+    "topicDescription": "The discovery that copper and tin create a superior alloy",
+    "keyPoints": [
+      "Bronze is harder than pure copper",
+      "Typical ratio: 90% copper, 10% tin",
+      "Lower melting point than iron (easier to work)",
+      "Historical importance: the Bronze Age"
+    ]
+  },
+  {
+    "paperId": "slag_separation",
+    "title": "Removing Impurities: The Art of Slag Management",
+    "field": "metallurgy",
+    "paperSets": ["metallurgy_fundamentals"],
+    "prerequisitePapers": ["iron_smelting"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "minimumSkills": { "metallurgy": 15 },
+    "skillGrants": { "metallurgy": 16, "chemistry": 10 },
+    "contributesTo": [
+      { "type": "ability", "id": "efficient_smelting" }
+    ],
+    "topicDescription": "Techniques for separating waste material from pure metal",
+    "keyPoints": [
+      "Flux materials: limestone, sand, borax",
+      "Slag floats on molten metal due to lower density",
+      "Tapping the furnace at the right level",
+      "Reprocessing slag for residual metal content"
+    ]
+  }
+]

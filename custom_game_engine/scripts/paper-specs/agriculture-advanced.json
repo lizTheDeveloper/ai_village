@@ -1,0 +1,104 @@
+[
+  {
+    "paperId": "companion_planting",
+    "title": "Plants as Neighbors: The Science of Companion Planting",
+    "field": "agriculture",
+    "paperSets": ["advanced_agriculture"],
+    "prerequisitePapers": ["seed_selection", "crop_rotation"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "agriculture": 14, "nature": 10 },
+    "contributesTo": [
+      { "type": "ability", "id": "companion_planting" }
+    ],
+    "topicDescription": "Certain plants benefit each other when grown together",
+    "keyPoints": [
+      "The 'Three Sisters': corn, beans, and squash",
+      "Tomatoes and basil improve each other's growth",
+      "Marigolds repel pests from vegetables",
+      "Why some plants inhibit each other (allelopathy)"
+    ]
+  },
+  {
+    "paperId": "pest_management",
+    "title": "The War on Insects: Integrated Pest Management Without Poisons",
+    "field": "agriculture",
+    "paperSets": ["advanced_agriculture"],
+    "prerequisitePapers": ["companion_planting"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "agriculture": 16, "nature": 12 },
+    "contributesTo": [
+      { "type": "ability", "id": "natural_pest_control" }
+    ],
+    "topicDescription": "Using natural methods to control crop pests",
+    "keyPoints": [
+      "Beneficial insects: ladybugs eat aphids",
+      "Birds as pest control (if you can keep them from eating crops)",
+      "Neem oil and other botanical pesticides",
+      "Crop rotation disrupts pest lifecycles"
+    ]
+  },
+  {
+    "paperId": "soil_testing",
+    "title": "Reading the Earth: Chemical Analysis of Soil Composition",
+    "field": "agriculture",
+    "paperSets": ["advanced_agriculture"],
+    "prerequisitePapers": ["soil_preparation", "fertilization_theory"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "minimumSkills": { "agriculture": 20 },
+    "skillGrants": { "agriculture": 18, "chemistry": 12 },
+    "contributesTo": [
+      { "type": "ability", "id": "soil_analysis" }
+    ],
+    "topicDescription": "Testing soil to determine nutrient levels and pH",
+    "keyPoints": [
+      "Nitrogen, phosphorus, potassium (N-P-K) - the essential three",
+      "pH testing: acid vs. alkaline soils",
+      "Micronutrients: iron, manganese, zinc",
+      "Adjusting soil chemistry for optimal growth"
+    ]
+  },
+  {
+    "paperId": "grafting",
+    "title": "Surgical Botany: The Art of Plant Grafting",
+    "field": "agriculture",
+    "paperSets": ["advanced_agriculture"],
+    "prerequisitePapers": ["seed_selection"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "agriculture": 16, "nature": 10 },
+    "contributesTo": [
+      { "type": "ability", "id": "plant_grafting" }
+    ],
+    "topicDescription": "Joining parts of different plants to create hybrid growth",
+    "keyPoints": [
+      "The rootstock provides roots, the scion provides fruit",
+      "Why you can't graft any plant to any other",
+      "Cambium layer must align for success",
+      "Creating disease-resistant fruit trees"
+    ]
+  },
+  {
+    "paperId": "greenhouse_theory",
+    "title": "Defying the Seasons: Greenhouse Construction and Climate Control",
+    "field": "agriculture",
+    "paperSets": ["advanced_agriculture"],
+    "prerequisitePapers": ["climate_control", "year_round_growing"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "minimumSkills": { "agriculture": 25, "construction": 15 },
+    "skillGrants": { "agriculture": 20, "construction": 12 },
+    "contributesTo": [
+      { "type": "building", "id": "greenhouse" }
+    ],
+    "topicDescription": "Building structures that trap heat and extend growing seasons",
+    "keyPoints": [
+      "Glass or translucent materials trap solar heat",
+      "Thermal mass: water barrels and stone floors store heat",
+      "Ventilation prevents overheating",
+      "Growing tropical crops in temperate climates"
+    ]
+  }
+]

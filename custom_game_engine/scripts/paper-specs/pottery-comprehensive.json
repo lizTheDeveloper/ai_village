@@ -1,0 +1,165 @@
+[
+  {
+    "paperId": "clay_properties",
+    "title": "Malleable Earth: Understanding Clay and Its Properties",
+    "field": "crafting",
+    "paperSets": ["pottery_fundamentals"],
+    "prerequisitePapers": [],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "pottery": 8, "geology": 4 },
+    "contributesTo": [
+      { "type": "ability", "id": "identify_clay" }
+    ],
+    "topicDescription": "What makes clay special and how to find good deposits",
+    "keyPoints": [
+      "Clay is decomposed feldspar and mica",
+      "Plasticity when wet, hardness when fired",
+      "Testing clay quality",
+      "Why riverbanks are good sources"
+    ]
+  },
+  {
+    "paperId": "hand_building_pottery",
+    "title": "Coils and Pinches: Hand-Building Ceramic Vessels",
+    "field": "crafting",
+    "paperSets": ["pottery_fundamentals"],
+    "prerequisitePapers": ["clay_properties"],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": { "pottery": 10, "crafting": 6 },
+    "contributesTo": [
+      { "type": "item", "id": "clay_pot" }
+    ],
+    "topicDescription": "Creating pottery without a wheel using coils and pinching",
+    "keyPoints": [
+      "Coil method: stacking clay ropes",
+      "Pinch pots for small vessels",
+      "Smoothing and joining techniques",
+      "Why even thickness matters"
+    ]
+  },
+  {
+    "paperId": "pottery_wheel",
+    "title": "Symmetry in Motion: The Potter's Wheel",
+    "field": "crafting",
+    "paperSets": ["pottery_fundamentals"],
+    "prerequisitePapers": ["hand_building_pottery"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "pottery": 14, "engineering": 6 },
+    "contributesTo": [
+      { "type": "building", "id": "pottery_wheel" }
+    ],
+    "topicDescription": "Using centrifugal force to create perfectly round vessels",
+    "keyPoints": [
+      "Centering the clay is the hardest part",
+      "Pulling walls up while maintaining symmetry",
+      "Why the wheel must spin smoothly",
+      "Speed control for different stages"
+    ]
+  },
+  {
+    "paperId": "kiln_firing",
+    "title": "Fire and Transformation: The Art of Kiln Firing",
+    "field": "crafting",
+    "paperSets": ["pottery_fundamentals"],
+    "prerequisitePapers": ["clay_properties", "hand_building_pottery"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "pottery": 16, "fire_magic": 8 },
+    "contributesTo": [
+      { "type": "building", "id": "pottery_kiln" }
+    ],
+    "topicDescription": "Heating clay to permanently harden it through vitrification",
+    "keyPoints": [
+      "Temperature must reach 600-1000°C minimum",
+      "Slow heating prevents cracking",
+      "The chemical changes during firing",
+      "Why rushing causes explosions"
+    ]
+  },
+  {
+    "paperId": "glazing_techniques",
+    "title": "Liquid Glass: Glazes and Surface Treatments",
+    "field": "crafting",
+    "paperSets": ["pottery_fundamentals"],
+    "prerequisitePapers": ["kiln_firing"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "minimumSkills": { "pottery": 15, "chemistry": 10 },
+    "skillGrants": { "pottery": 18, "chemistry": 8 },
+    "contributesTo": [
+      { "type": "ability", "id": "glaze_pottery" }
+    ],
+    "topicDescription": "Applying glass coatings to pottery for waterproofing and decoration",
+    "keyPoints": [
+      "Glazes are ground glass suspended in water",
+      "Different minerals create different colors",
+      "Temperature ranges for different glazes",
+      "Why some glazes are toxic (lead)"
+    ]
+  },
+  {
+    "paperId": "porcelain_creation",
+    "title": "White Gold: The Secret of Porcelain",
+    "field": "crafting",
+    "paperSets": ["pottery_fundamentals"],
+    "prerequisitePapers": ["kiln_firing", "clay_properties"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "minimumSkills": { "pottery": 20, "chemistry": 12 },
+    "skillGrants": { "pottery": 22, "chemistry": 10 },
+    "contributesTo": [
+      { "type": "item", "id": "porcelain" }
+    ],
+    "topicDescription": "Creating the finest ceramic through kaolin clay and high-temperature firing",
+    "keyPoints": [
+      "Requires pure kaolin (china clay)",
+      "Extremely high firing temperature (1300°C+)",
+      "Translucent when thin",
+      "Why it was a closely guarded secret for centuries"
+    ]
+  },
+  {
+    "paperId": "advanced_pottery_forms",
+    "title": "Beyond the Bowl: Complex Pottery Forms and Techniques",
+    "field": "crafting",
+    "paperSets": ["pottery_fundamentals"],
+    "prerequisitePapers": ["pottery_wheel", "hand_building_pottery"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "minimumSkills": { "pottery": 18 },
+    "skillGrants": { "pottery": 20, "crafting": 12 },
+    "contributesTo": [
+      { "type": "ability", "id": "complex_pottery" }
+    ],
+    "topicDescription": "Creating complex shapes: handles, spouts, lids, and assembled pieces",
+    "keyPoints": [
+      "Throwing and attaching handles",
+      "Creating functional spouts",
+      "Lids that fit perfectly",
+      "Multi-part assembly techniques"
+    ]
+  },
+  {
+    "paperId": "ceramic_sculpture",
+    "title": "Clay as Art: Sculptural Ceramics and Figurines",
+    "field": "crafting",
+    "paperSets": ["pottery_fundamentals"],
+    "prerequisitePapers": ["hand_building_pottery", "kiln_firing"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "pottery": 16, "art": 12 },
+    "contributesTo": [
+      { "type": "ability", "id": "ceramic_sculpture" }
+    ],
+    "topicDescription": "Creating three-dimensional art and figurines from clay",
+    "keyPoints": [
+      "Armatures for large sculptures",
+      "Hollow vs. solid construction",
+      "Preventing air bubbles (causes explosions)",
+      "Detailing and surface texture"
+    ]
+  }
+]

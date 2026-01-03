@@ -10,7 +10,6 @@
     "src/**/*.test.ts",
     "src/**/__benchmarks__/**/*",
     "src/**/*.bench.ts",
-    "src/systems/SoulCreationSystem.ts",
     "src/systems/DeathBargainSystem.ts",
     "src/systems/DeathTransitionSystem.ts"
   ]

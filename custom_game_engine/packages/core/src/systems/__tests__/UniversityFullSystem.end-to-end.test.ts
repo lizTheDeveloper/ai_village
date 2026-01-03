@@ -69,11 +69,11 @@ describe('University Research System - Full E2E', () => {
     // ========================================================================
     const playerCityEntity = new EntityImpl(createEntityId(), 0);
     const playerCity = createCityDirectorComponent(
-      'Player City',
-      100, // x
-      100  // y
+      'player-city-1', // cityId
+      'Player City',   // cityName
+      { minX: 50, maxX: 150, minY: 50, maxY: 150 }, // bounds (includes university at 110, 110)
+      false // useLLM
     );
-    playerCity.cityId = 'player-city-1';
     playerCityEntity.addComponent(playerCity);
     playerCityEntity.addComponent(createPositionComponent(100, 100));
     (world as any)._addEntity(playerCityEntity);
@@ -93,8 +93,8 @@ describe('University Research System - Full E2E', () => {
     university1.addComponent(createPositionComponent(110, 110));
     (world as any)._addEntity(university1);
 
-    // Emit building complete event
-    eventBus.emit({
+    // Emit building complete event (immediate so component is attached synchronously)
+    eventBus.emitImmediate({
       type: 'building:complete',
       source: 'test',
       data: {
@@ -108,6 +108,9 @@ describe('University Research System - Full E2E', () => {
 
     // Run systems to process building completion and tech unlock
     buildingSystem.update(world, [], 0);
+
+    // Advance tick to trigger TechnologyUnlockSystem scan (scans every 100 ticks)
+    (world as any)._tick = 100;
     techSystem.update(world, [], 0);
 
     // Verify UniversityComponent was attached
@@ -150,7 +153,7 @@ describe('University Research System - Full E2E', () => {
     console.log('\n=== PHASE 4: Research Progress (30 ticks) ===');
 
     for (let i = 0; i < 30; i++) {
-      world.tick++;
+      (world as any)._tick++;
       universitySystem.update(world, [university1], 0);
     }
 
@@ -177,7 +180,7 @@ describe('University Research System - Full E2E', () => {
 
     // Run a few more ticks to see the boosted progress
     for (let i = 0; i < 20; i++) {
-      world.tick++;
+      (world as any)._tick++;
       universitySystem.update(world, [university1], 0);
     }
 
@@ -201,7 +204,7 @@ describe('University Research System - Full E2E', () => {
     console.log(`  Ticks needed to complete: ${ticksNeeded}`);
 
     for (let i = 0; i < ticksNeeded + 10; i++) {
-      world.tick++;
+      (world as any)._tick++;
       universitySystem.update(world, [university1], 0);
 
       if (project.status === 'published') {
@@ -223,6 +226,9 @@ describe('University Research System - Full E2E', () => {
     // PHASE 7: Verify events were emitted
     // ========================================================================
     console.log('\n=== PHASE 7: Event Verification ===');
+
+    // Flush queued events so they can be captured by listeners
+    eventBus.flush();
 
     const buildingCompleteEvents = events.filter(e => e.type === 'building:complete');
     const techUnlockEvents = events.filter(e => e.type === 'technology:building_unlocked');

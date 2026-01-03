@@ -374,13 +374,20 @@ async function createSoulsForInitialAgents(
           spriteFolder,
         });
 
+        // Extract first memory from ceremony transcript (first meaningful statement)
+        const firstMemory = event.data.transcript && event.data.transcript.length > 0
+          ? event.data.transcript[0].text
+          : undefined;
+
         ceremonyModal.completeCeremony(
           event.data.purpose,
           event.data.interests,
           event.data.destiny,
           event.data.archetype,
+          name,  // Pass the agent's name for personalized title
+          firstMemory,  // First memory from the Fates
           () => {
-            // User clicked continue - clean up and move to next
+            // User accepted this soul - clean up and continue
             if (!resolved) {
               resolved = true;
               startSub();  // Unsubscribe is the function itself
@@ -412,6 +419,32 @@ async function createSoulsForInitialAgents(
 
               resolve();
             }
+          },
+          () => {
+            // User rejected this soul - regenerate a new one
+            console.log('[SoulCreation] Player rejected soul, generating a new one...');
+
+            // Hide modal and reset state
+            ceremonyModal.hide();
+            startSub();
+            thinkingSub();
+            speakSub();
+            completeSub();
+
+            // Trigger a new soul creation ceremony
+            // This will loop back and create a new ceremony for the same agent
+            const context: SoulCreationContext = {
+              culture: 'The First Village',
+              cosmicAlignment: 0.5 + (Math.random() - 0.5) * 0.3,
+              isReforging: false,
+              ceremonyRealm: 'tapestry_of_fate',
+              worldEvents: ['The first village is being founded'],
+            };
+
+            // Re-request soul creation with same agent
+            soulSystem.requestSoulCreation(context, (newSoulId: string) => {
+              // New ceremony will fire events and re-trigger this handler
+            });
           }
         );
       });

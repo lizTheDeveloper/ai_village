@@ -1,0 +1,104 @@
+[
+  {
+    "paperId": "herb_identification",
+    "title": "The Green Pharmacy: Identifying Medicinal Plants in the Wild",
+    "field": "nature",
+    "paperSets": ["herbalism_fundamentals"],
+    "prerequisitePapers": [],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "herbalism": 10, "nature": 8 },
+    "contributesTo": [
+      { "type": "ability", "id": "identify_herbs" }
+    ],
+    "topicDescription": "How to recognize medicinal plants and distinguish them from poisonous look-alikes",
+    "keyPoints": [
+      "Leaf shape, flower structure, and growth patterns",
+      "The deadly similarity between hemlock and wild carrot",
+      "Seasonal variation in appearance",
+      "Why you should never eat something unless you're absolutely certain"
+    ]
+  },
+  {
+    "paperId": "extraction_methods",
+    "title": "From Plant to Potion: Methods of Extracting Medicinal Compounds",
+    "field": "nature",
+    "paperSets": ["herbalism_fundamentals"],
+    "prerequisitePapers": ["herb_identification"],
+    "complexity": 4,
+    "minimumAge": "teen",
+    "skillGrants": { "herbalism": 12, "chemistry": 6 },
+    "contributesTo": [
+      { "type": "ability", "id": "herbal_extraction" }
+    ],
+    "topicDescription": "Different methods for getting medicinal compounds out of plants",
+    "keyPoints": [
+      "Infusion (tea) for water-soluble compounds",
+      "Tincture (alcohol extract) for oils and resins",
+      "Decoction (boiling) for tough roots and bark",
+      "Why some methods destroy the active ingredients"
+    ]
+  },
+  {
+    "paperId": "pain_management_herbs",
+    "title": "Natural Analgesia: Plants That Relieve Pain",
+    "field": "nature",
+    "paperSets": ["herbalism_fundamentals"],
+    "prerequisitePapers": ["herb_identification", "extraction_methods"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "herbalism": 14, "medicine": 8 },
+    "contributesTo": [
+      { "type": "recipe", "id": "willow_bark_tea" },
+      { "type": "item", "id": "pain_relief_poultice" }
+    ],
+    "topicDescription": "Herbs that reduce pain and their mechanisms",
+    "keyPoints": [
+      "Willow bark contains salicylic acid (natural aspirin)",
+      "Poppy sap produces opium - powerful but addictive",
+      "Feverfew for headaches",
+      "Dosage is critical - too much causes problems"
+    ]
+  },
+  {
+    "paperId": "antimicrobial_plants",
+    "title": "Nature's Antibiotics: Plants That Fight Infection",
+    "field": "nature",
+    "paperSets": ["herbalism_fundamentals"],
+    "prerequisitePapers": ["herb_identification", "extraction_methods"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "herbalism": 16, "medicine": 10 },
+    "contributesTo": [
+      { "type": "recipe", "id": "antiseptic_salve" }
+    ],
+    "topicDescription": "Plants with antimicrobial properties that prevent or treat infections",
+    "keyPoints": [
+      "Garlic kills bacteria and fungi",
+      "Honey prevents bacterial growth in wounds",
+      "Tea tree oil as a topical antimicrobial",
+      "Why these aren't as effective as modern antibiotics"
+    ]
+  },
+  {
+    "paperId": "toxic_vs_medicinal",
+    "title": "The Dose Makes the Poison: Toxicity and Therapeutic Windows",
+    "field": "nature",
+    "paperSets": ["herbalism_fundamentals"],
+    "prerequisitePapers": ["pain_management_herbs", "antimicrobial_plants"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "minimumSkills": { "herbalism": 20 },
+    "skillGrants": { "herbalism": 18, "medicine": 12 },
+    "contributesTo": [
+      { "type": "ability", "id": "precise_dosing" }
+    ],
+    "topicDescription": "Understanding the narrow line between medicine and poison",
+    "keyPoints": [
+      "Foxglove: heart medicine in small doses, deadly in large doses",
+      "The therapeutic index - how much room for error",
+      "Why children and elderly need different doses",
+      "Historical cases of accidental poisoning by well-meaning herbalists"
+    ]
+  }
+]

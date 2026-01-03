@@ -1,0 +1,103 @@
+[
+  {
+    "paperId": "flame_generation",
+    "title": "Creating Fire from Nothing: The Fundamentals of Pyromancy",
+    "field": "arcane",
+    "paperSets": ["fire_magic_fundamentals"],
+    "prerequisitePapers": [],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "fire_magic": 10, "arcane": 5 },
+    "contributesTo": [
+      { "type": "spell", "id": "create_flame" }
+    ],
+    "topicDescription": "How to magically generate fire without fuel or spark",
+    "keyPoints": [
+      "Converting mana directly into heat and light",
+      "Why fire magic doesn't violate thermodynamics (it does, actually)",
+      "The minimum temperature for sustained flame",
+      "Common accidents and how to avoid them"
+    ]
+  },
+  {
+    "paperId": "fire_control",
+    "title": "The Art of Not Burning Everything: Fire Control and Direction",
+    "field": "arcane",
+    "paperSets": ["fire_magic_fundamentals"],
+    "prerequisitePapers": ["flame_generation"],
+    "complexity": 4,
+    "minimumAge": "teen",
+    "skillGrants": { "fire_magic": 12, "arcane": 8 },
+    "contributesTo": [
+      { "type": "spell", "id": "control_flames" }
+    ],
+    "topicDescription": "Directing and controlling fire once created",
+    "keyPoints": [
+      "Fire follows mana gradients like water follows gravity",
+      "Why fire 'wants' to spread and how to prevent it",
+      "The concentration required for sustained control",
+      "What happens when you lose focus (hint: bad things)"
+    ]
+  },
+  {
+    "paperId": "temperature_variation",
+    "title": "From Candle to Inferno: Temperature Control in Fire Magic",
+    "field": "arcane",
+    "paperSets": ["fire_magic_fundamentals"],
+    "prerequisitePapers": ["flame_generation"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "fire_magic": 14, "chemistry": 8 },
+    "contributesTo": [
+      { "type": "spell", "id": "variable_heat" }
+    ],
+    "topicDescription": "How to control the temperature of magical flames",
+    "keyPoints": [
+      "Room temperature flames - possible but difficult",
+      "The color spectrum: red (700°C) to blue-white (1400°C+)",
+      "Mana investment scales exponentially with temperature",
+      "Why really cold fire is harder than really hot fire"
+    ]
+  },
+  {
+    "paperId": "fire_immunity",
+    "title": "Walking Through Flames: Personal Fire Protection",
+    "field": "arcane",
+    "paperSets": ["fire_magic_fundamentals"],
+    "prerequisitePapers": ["fire_control", "temperature_variation"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "minimumSkills": { "fire_magic": 15 },
+    "skillGrants": { "fire_magic": 16, "arcane": 10 },
+    "contributesTo": [
+      { "type": "spell", "id": "fire_immunity" }
+    ],
+    "topicDescription": "Creating protective barriers against heat and flame",
+    "keyPoints": [
+      "The thermal shield - redirecting heat around the body",
+      "Why you can still suffocate in a burning building",
+      "Partial immunity: hands and feet vs. full body",
+      "Duration limitations and mana costs"
+    ]
+  },
+  {
+    "paperId": "combustion_magic",
+    "title": "Spontaneous Ignition: Causing Objects to Burn",
+    "field": "arcane",
+    "paperSets": ["fire_magic_fundamentals"],
+    "prerequisitePapers": ["temperature_variation"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "fire_magic": 15, "chemistry": 10 },
+    "contributesTo": [
+      { "type": "spell", "id": "combust_object" }
+    ],
+    "topicDescription": "Making objects catch fire through magical heating",
+    "keyPoints": [
+      "Flash point temperatures for common materials",
+      "Why wet things are harder to ignite",
+      "Metal doesn't burn, but it can melt",
+      "The difficulty of igniting living creatures (high water content)"
+    ]
+  }
+]

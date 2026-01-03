@@ -1,0 +1,104 @@
+[
+  {
+    "paperId": "death_detection",
+    "title": "The Boundary Between: Detecting True Death",
+    "field": "arcane",
+    "paperSets": ["necromancy_fundamentals"],
+    "prerequisitePapers": [],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "necromancy": 8, "nature": 5 },
+    "contributesTo": [
+      { "type": "spell", "id": "detect_death" }
+    ],
+    "topicDescription": "How to magically determine if someone is truly dead vs. unconscious or undead",
+    "keyPoints": [
+      "The soul's departure creates a distinctive magical void",
+      "Brain death vs. soul departure - they don't always align",
+      "Why checking for breath is unreliable",
+      "The 'mostly dead' vs. 'all dead' distinction"
+    ]
+  },
+  {
+    "paperId": "soul_departure_mechanics",
+    "title": "The Moment of Severance: What Happens When Souls Leave Bodies",
+    "field": "arcane",
+    "paperSets": ["necromancy_fundamentals"],
+    "prerequisitePapers": ["death_detection"],
+    "complexity": 4,
+    "minimumAge": "teen",
+    "skillGrants": { "necromancy": 12, "arcane": 8 },
+    "contributesTo": [
+      { "type": "ability", "id": "soul_observation" }
+    ],
+    "topicDescription": "The metaphysical process of souls separating from bodies at death",
+    "keyPoints": [
+      "The 'silver cord' theory - souls remain tethered for 3-7 minutes",
+      "Violent death vs. peaceful death - different departure patterns",
+      "Why some souls linger and become ghosts",
+      "The window of opportunity for necromantic intervention"
+    ]
+  },
+  {
+    "paperId": "corpse_preservation",
+    "title": "Preventing Decay: The Necromancer's Guide to Corpse Maintenance",
+    "field": "arcane",
+    "paperSets": ["necromancy_fundamentals"],
+    "prerequisitePapers": ["death_detection"],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": { "necromancy": 10, "chemistry": 6 },
+    "contributesTo": [
+      { "type": "spell", "id": "preserve_corpse" },
+      { "type": "building", "id": "embalming_chamber" }
+    ],
+    "topicDescription": "Methods to prevent or slow corpse decomposition for necromantic purposes",
+    "keyPoints": [
+      "Magical refrigeration vs. chemical embalming",
+      "Salt, mercury, and arsenic - the traditional preservatives",
+      "Why fresh corpses are easier to animate",
+      "The relationship between decay and magical resistance"
+    ]
+  },
+  {
+    "paperId": "death_energy_harvesting",
+    "title": "The Final Exhalation: Harvesting Energy from the Dying",
+    "field": "arcane",
+    "paperSets": ["necromancy_fundamentals", "death_magic_ethics"],
+    "prerequisitePapers": ["soul_departure_mechanics"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "minimumSkills": { "necromancy": 15 },
+    "skillGrants": { "necromancy": 18, "arcane": 12 },
+    "contributesTo": [
+      { "type": "spell", "id": "death_energy_absorption" }
+    ],
+    "topicDescription": "The moment of death releases energy that can be captured and used",
+    "keyPoints": [
+      "The death burst - a spike of magical energy at the moment of passing",
+      "Why natural death provides less energy than violent death",
+      "Ethical considerations of being present at deaths",
+      "The practice of 'death watching' among necromancers"
+    ]
+  },
+  {
+    "paperId": "undeath_taxonomy",
+    "title": "A Classification of Undead: From Zombies to Liches",
+    "field": "arcane",
+    "paperSets": ["necromancy_fundamentals"],
+    "prerequisitePapers": ["soul_departure_mechanics", "corpse_preservation"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "necromancy": 15, "arcane": 10 },
+    "contributesTo": [
+      { "type": "ability", "id": "undead_identification" }
+    ],
+    "topicDescription": "The different categories of undead and their properties",
+    "keyPoints": [
+      "Body with soul: liches, vampires - intelligent undead",
+      "Body without soul: zombies, skeletons - mindless servants",
+      "Soul without body: ghosts, wraiths - incorporeal undead",
+      "Neither body nor soul: death knights - magical constructs"
+    ]
+  }
+]

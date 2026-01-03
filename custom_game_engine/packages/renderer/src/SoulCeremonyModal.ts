@@ -14,6 +14,9 @@ export interface CeremonyExchange {
 export interface CeremonyContext {
   culture?: string;
   cosmicAlignment: number;
+  parentSouls?: string[];  // Names of parent souls
+  observers?: string[];     // Names of observers present
+  soulName?: string;        // The name being given to this soul
 }
 
 export class SoulCeremonyModal {
@@ -22,6 +25,7 @@ export class SoulCeremonyModal {
   private currentTranscript: CeremonyExchange[] = [];
   private currentContext: CeremonyContext | null = null;
   private onComplete: (() => void) | null = null;
+  private onReject: (() => void) | null = null;
   private thinkingSpeaker: 'weaver' | 'spinner' | 'cutter' | null = null;
 
   constructor() {
@@ -30,6 +34,13 @@ export class SoulCeremonyModal {
     this.contentArea = this.createContentArea();
     this.container.appendChild(this.contentArea);
     document.body.appendChild(this.container);
+
+    // Add ESC key listener to dismiss modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.container.style.display === 'flex') {
+        this.handleClose();
+      }
+    });
   }
 
   private setupStyles(): void {
@@ -95,9 +106,19 @@ export class SoulCeremonyModal {
   /**
    * Complete the current ceremony
    */
-  completeCeremony(purpose: string, interests: string[], destiny: string, archetype: string, onComplete?: () => void): void {
+  completeCeremony(
+    purpose: string,
+    interests: string[],
+    destiny: string,
+    archetype: string,
+    name?: string,
+    firstMemory?: string,
+    onComplete?: () => void,
+    onReject?: () => void
+  ): void {
     this.onComplete = onComplete || null;
-    this.renderCompletion(purpose, interests, destiny, archetype);
+    this.onReject = onReject || null;
+    this.renderCompletion(purpose, interests, destiny, archetype, name, firstMemory);
   }
 
   /**
@@ -108,6 +129,18 @@ export class SoulCeremonyModal {
     this.currentTranscript = [];
     this.currentContext = null;
     this.onComplete = null;
+    this.onReject = null;
+  }
+
+  /**
+   * Handle close button click or ESC key
+   */
+  private handleClose(): void {
+    if (this.onComplete) {
+      this.onComplete();
+    } else {
+      this.hide();
+    }
   }
 
   /**
@@ -117,6 +150,25 @@ export class SoulCeremonyModal {
     if (!this.currentContext) return;
 
     let html = `
+      <div style="position: relative;">
+        <button id="ceremony-close-btn" style="
+          position: absolute;
+          top: -10px;
+          right: -20px;
+          background: transparent;
+          border: 2px solid #ffd700;
+          color: #ffd700;
+          width: 35px;
+          height: 35px;
+          border-radius: 50%;
+          cursor: pointer;
+          font-size: 20px;
+          line-height: 1;
+          transition: all 0.2s;
+          z-index: 10;
+        ">×</button>
+      </div>
+
       <div style="text-align: center; margin-bottom: 25px;">
         <h1 style="color: #ffd700; font-size: 24px; margin: 0; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);">
           ✨ The Tapestry of Fate ✨
@@ -127,12 +179,27 @@ export class SoulCeremonyModal {
       </div>
 
       <div style="margin-bottom: 18px; padding: 12px; background: rgba(255, 215, 0, 0.1); border-left: 3px solid #ffd700;">
+        ${this.currentContext.soulName ? `
+        <p style="color: #ddd; margin: 4px 0; font-size: 13px;">
+          <strong>Soul:</strong> ${this.currentContext.soulName}
+        </p>
+        ` : ''}
         <p style="color: #ddd; margin: 4px 0; font-size: 13px;">
           <strong>Culture:</strong> ${this.currentContext.culture || 'Unknown'}
         </p>
         <p style="color: #ddd; margin: 4px 0; font-size: 13px;">
           <strong>Cosmic Alignment:</strong> ${this.formatAlignment(this.currentContext.cosmicAlignment)}
         </p>
+        ${this.currentContext.parentSouls && this.currentContext.parentSouls.length > 0 ? `
+        <p style="color: #ddd; margin: 4px 0; font-size: 13px;">
+          <strong>Parents:</strong> ${this.currentContext.parentSouls.join(' and ')}
+        </p>
+        ` : ''}
+        ${this.currentContext.observers && this.currentContext.observers.length > 0 ? `
+        <p style="color: #ddd; margin: 4px 0; font-size: 13px;">
+          <strong>Observers:</strong> ${this.currentContext.observers.join(', ')}
+        </p>
+        ` : ''}
       </div>
 
       <div style="margin-top: 25px;">
@@ -177,20 +244,69 @@ export class SoulCeremonyModal {
     html += `</div>`;
 
     this.contentArea.innerHTML = html;
+
+    // Attach close button handler
+    const closeBtn = document.getElementById('ceremony-close-btn');
+    if (closeBtn) {
+      closeBtn.addEventListener('mouseenter', () => {
+        closeBtn.style.background = 'rgba(255, 215, 0, 0.2)';
+        closeBtn.style.transform = 'scale(1.1)';
+      });
+      closeBtn.addEventListener('mouseleave', () => {
+        closeBtn.style.background = 'transparent';
+        closeBtn.style.transform = 'scale(1)';
+      });
+      closeBtn.addEventListener('click', () => this.handleClose());
+    }
   }
 
   /**
    * Render the ceremony completion
    */
-  private renderCompletion(purpose: string, interests: string[], destiny: string, archetype: string): void {
+  private renderCompletion(
+    purpose: string,
+    interests: string[],
+    destiny: string,
+    archetype: string,
+    name?: string,
+    firstMemory?: string
+  ): void {
+    const soulName = name || 'A Soul';
+
     let html = `
+      <div style="position: relative;">
+        <button id="ceremony-close-btn" style="
+          position: absolute;
+          top: -10px;
+          right: -20px;
+          background: transparent;
+          border: 2px solid #ffd700;
+          color: #ffd700;
+          width: 35px;
+          height: 35px;
+          border-radius: 50%;
+          cursor: pointer;
+          font-size: 20px;
+          line-height: 1;
+          transition: all 0.2s;
+          z-index: 10;
+        ">×</button>
+      </div>
+
       <div style="text-align: center; margin-bottom: 25px;">
         <h1 style="color: #ffd700; font-size: 24px; margin: 0; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);">
-          ✨ A Soul Is Born ✨
+          ✨ ${soulName}'s Soul Is Born ✨
         </h1>
       </div>
 
       <div style="margin: 25px 0; padding: 20px; background: rgba(255, 215, 0, 0.15); border-radius: 10px; border: 2px solid #ffd700;">
+        ${firstMemory ? `
+        <div style="margin-bottom: 20px; padding: 15px; background: rgba(0, 0, 0, 0.3); border-radius: 5px; border-left: 4px solid #DDA0DD;">
+          <div style="color: #DDA0DD; font-size: 14px; font-weight: bold; margin-bottom: 8px;">First Memory</div>
+          <div style="color: #e0e0e0; font-size: 13px; line-height: 1.6; font-style: italic;">"${firstMemory}"</div>
+        </div>
+        ` : ''}
+
         <div style="margin-bottom: 16px;">
           <div style="color: #ffd700; font-size: 14px; font-weight: bold; margin-bottom: 6px;">Purpose</div>
           <div style="color: #e0e0e0; font-size: 13px; line-height: 1.5;">${purpose}</div>
@@ -212,9 +328,15 @@ export class SoulCeremonyModal {
         </div>
       </div>
 
-      <div style="text-align: center; margin-top: 25px;">
-        <button id="ceremony-continue-btn" style="
-          padding: 10px 25px;
+      <div style="text-align: center; margin-top: 20px; padding: 15px; background: rgba(135, 206, 235, 0.1); border-radius: 5px; border: 1px solid rgba(135, 206, 235, 0.3);">
+        <p style="color: #87CEEB; font-size: 13px; margin: 0; line-height: 1.5;">
+          If you choose to generate a new soul, this soul will return to the cycle and get another chance at life.
+        </p>
+      </div>
+
+      <div style="text-align: center; margin-top: 25px; display: flex; gap: 15px; justify-content: center;">
+        <button id="ceremony-accept-btn" style="
+          padding: 12px 30px;
           font-size: 14px;
           background: #ffd700;
           color: #1a1a2e;
@@ -225,27 +347,78 @@ export class SoulCeremonyModal {
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
           transition: all 0.2s;
         ">
-          Continue
+          Accept This Soul
+        </button>
+
+        <button id="ceremony-regenerate-btn" style="
+          padding: 12px 30px;
+          font-size: 14px;
+          background: rgba(255, 255, 255, 0.1);
+          color: #ddd;
+          border: 2px solid #666;
+          border-radius: 5px;
+          cursor: pointer;
+          font-weight: bold;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+          transition: all 0.2s;
+        ">
+          Generate New Soul
         </button>
       </div>
     `;
 
     this.contentArea.innerHTML = html;
 
-    // Add click handler for continue button
-    const btn = document.getElementById('ceremony-continue-btn');
-    if (btn) {
-      btn.addEventListener('mouseenter', () => {
-        btn.style.background = '#ffed4e';
-        btn.style.transform = 'translateY(-2px)';
+    // Add click handler for close button
+    const closeBtn = document.getElementById('ceremony-close-btn');
+    if (closeBtn) {
+      closeBtn.addEventListener('mouseenter', () => {
+        closeBtn.style.background = 'rgba(255, 215, 0, 0.2)';
+        closeBtn.style.transform = 'scale(1.1)';
       });
-      btn.addEventListener('mouseleave', () => {
-        btn.style.background = '#ffd700';
-        btn.style.transform = 'translateY(0)';
+      closeBtn.addEventListener('mouseleave', () => {
+        closeBtn.style.background = 'transparent';
+        closeBtn.style.transform = 'scale(1)';
       });
-      btn.addEventListener('click', () => {
+      closeBtn.addEventListener('click', () => this.handleClose());
+    }
+
+    // Add click handler for accept button
+    const acceptBtn = document.getElementById('ceremony-accept-btn');
+    if (acceptBtn) {
+      acceptBtn.addEventListener('mouseenter', () => {
+        acceptBtn.style.background = '#ffed4e';
+        acceptBtn.style.transform = 'translateY(-2px)';
+      });
+      acceptBtn.addEventListener('mouseleave', () => {
+        acceptBtn.style.background = '#ffd700';
+        acceptBtn.style.transform = 'translateY(0)';
+      });
+      acceptBtn.addEventListener('click', () => {
         if (this.onComplete) {
           this.onComplete();
+        } else {
+          this.hide();
+        }
+      });
+    }
+
+    // Add click handler for regenerate button
+    const regenerateBtn = document.getElementById('ceremony-regenerate-btn');
+    if (regenerateBtn) {
+      regenerateBtn.addEventListener('mouseenter', () => {
+        regenerateBtn.style.background = 'rgba(255, 255, 255, 0.2)';
+        regenerateBtn.style.borderColor = '#999';
+        regenerateBtn.style.transform = 'translateY(-2px)';
+      });
+      regenerateBtn.addEventListener('mouseleave', () => {
+        regenerateBtn.style.background = 'rgba(255, 255, 255, 0.1)';
+        regenerateBtn.style.borderColor = '#666';
+        regenerateBtn.style.transform = 'translateY(0)';
+      });
+      regenerateBtn.addEventListener('click', () => {
+        if (this.onReject) {
+          this.onReject();
         } else {
           this.hide();
         }

@@ -1,0 +1,105 @@
+[
+  {
+    "paperId": "zombie_creation_basics",
+    "title": "Mindless Servants: The Art of Zombie Animation",
+    "field": "arcane",
+    "paperSets": ["necromancy_animation"],
+    "prerequisitePapers": ["corpse_preservation", "death_detection"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "necromancy": 14, "arcane": 8 },
+    "contributesTo": [
+      { "type": "spell", "id": "animate_zombie" }
+    ],
+    "topicDescription": "Animating corpses as mindless undead servants",
+    "keyPoints": [
+      "Requires intact nervous system",
+      "Powered by caster's mana, not the soul",
+      "Simple commands only (no intelligence)",
+      "Decay continues during animation"
+    ]
+  },
+  {
+    "paperId": "skeleton_animation",
+    "title": "Beyond Flesh: Animating Skeletal Remains",
+    "field": "arcane",
+    "paperSets": ["necromancy_animation"],
+    "prerequisitePapers": ["zombie_creation_basics"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "necromancy": 16, "arcane": 10 },
+    "contributesTo": [
+      { "type": "spell", "id": "animate_skeleton" }
+    ],
+    "topicDescription": "Creating skeletal undead from bare bones",
+    "keyPoints": [
+      "More difficult than zombies (no muscles)",
+      "Bones held together by necromantic energy",
+      "Faster and more durable than zombies",
+      "Why complete skeletons work better than fragments"
+    ]
+  },
+  {
+    "paperId": "mass_animation",
+    "title": "Armies of the Dead: Mass Undead Animation Techniques",
+    "field": "arcane",
+    "paperSets": ["necromancy_animation"],
+    "prerequisitePapers": ["zombie_creation_basics", "skeleton_animation"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "minimumSkills": { "necromancy": 25, "arcane": 20 },
+    "skillGrants": { "necromancy": 22, "arcane": 16 },
+    "contributesTo": [
+      { "type": "spell", "id": "mass_animate_dead" }
+    ],
+    "topicDescription": "Animating large numbers of undead simultaneously",
+    "keyPoints": [
+      "Mana cost scales with number of undead",
+      "Controlling dozens requires concentration",
+      "Why necromantic armies are strategically powerful",
+      "The fatigue problem: caster exhaustion"
+    ]
+  },
+  {
+    "paperId": "intelligent_undead_creation",
+    "title": "Thinking Dead: Creating Intelligent Undead Servants",
+    "field": "arcane",
+    "paperSets": ["necromancy_animation"],
+    "prerequisitePapers": ["soul_binding_basics", "zombie_creation_basics"],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "minimumSkills": { "necromancy": 30, "arcane": 25 },
+    "skillGrants": { "necromancy": 25, "arcane": 20 },
+    "contributesTo": [
+      { "type": "spell", "id": "create_wight" }
+    ],
+    "topicDescription": "Binding souls back into corpses to create thinking undead",
+    "keyPoints": [
+      "Requires both body and bound soul",
+      "Retains memories and skills from life",
+      "Why most bound souls are hostile to their creator",
+      "The loyalty problem and control measures"
+    ]
+  },
+  {
+    "paperId": "undead_permanence",
+    "title": "Eternal Servitude: Making Undead Self-Sustaining",
+    "field": "arcane",
+    "paperSets": ["necromancy_animation"],
+    "prerequisitePapers": ["mass_animation"],
+    "complexity": 10,
+    "minimumAge": "elder",
+    "minimumSkills": { "necromancy": 35, "arcane": 30 },
+    "skillGrants": { "necromancy": 28, "arcane": 22 },
+    "contributesTo": [
+      { "type": "spell", "id": "permanent_undead" }
+    ],
+    "topicDescription": "Creating undead that persist without constant mana investment",
+    "keyPoints": [
+      "Embedding mana reservoirs in undead",
+      "Drawing ambient energy from the environment",
+      "Why ancient tombs have autonomous undead",
+      "The dangers of losing control permanently"
+    ]
+  }
+]

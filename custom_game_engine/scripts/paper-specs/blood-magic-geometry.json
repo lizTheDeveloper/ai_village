@@ -1,0 +1,104 @@
+[
+  {
+    "paperId": "blood_circle_fundamentals",
+    "title": "Circular Containment: The Geometry of Blood Circles",
+    "field": "arcane",
+    "paperSets": ["blood_magic_geometry"],
+    "prerequisitePapers": ["blood_as_mana"],
+    "complexity": 4,
+    "minimumAge": "teen",
+    "skillGrants": { "blood_magic": 12, "geometry": 8 },
+    "contributesTo": [
+      { "type": "spell", "id": "basic_blood_circle" }
+    ],
+    "topicDescription": "Why circles drawn in blood contain and direct magical energy",
+    "keyPoints": [
+      "The mathematical perfection of circles and magical resonance",
+      "Minimum diameter: 3 feet for basic spells",
+      "Why imperfect circles fail catastrophically",
+      "The role of continuous vs. broken circles"
+    ]
+  },
+  {
+    "paperId": "pentagram_theory",
+    "title": "Five-Pointed Power: The Pentagram in Blood Magic",
+    "field": "arcane",
+    "paperSets": ["blood_magic_geometry"],
+    "prerequisitePapers": ["blood_circle_fundamentals"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "blood_magic": 16, "geometry": 10 },
+    "contributesTo": [
+      { "type": "spell", "id": "blood_pentagram_ritual" }
+    ],
+    "topicDescription": "The pentagram amplifies blood magic through geometric resonance",
+    "keyPoints": [
+      "Five points corresponding to five elements of blood (plasma, red cells, white cells, platelets, spirit)",
+      "Upright vs. inverted pentagrams - different magical directions",
+      "The golden ratio in pentagram construction",
+      "Historical failures due to incorrect angle measurements"
+    ]
+  },
+  {
+    "paperId": "sigil_blood_binding",
+    "title": "Permanent Inscription: Blood-Drawn Sigils and Lasting Effects",
+    "field": "arcane",
+    "paperSets": ["blood_magic_geometry"],
+    "prerequisitePapers": ["blood_circle_fundamentals"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "blood_magic": 14, "rune_craft": 8 },
+    "contributesTo": [
+      { "type": "ability", "id": "blood_sigil_inscription" }
+    ],
+    "topicDescription": "How to create permanent magical marks using blood as ink",
+    "keyPoints": [
+      "Blood sigils bond with surfaces at the molecular level",
+      "Tattooed blood sigils on skin create persistent effects",
+      "The danger of sigil infection and magical corruption",
+      "Why some surfaces reject blood binding"
+    ]
+  },
+  {
+    "paperId": "three_dimensional_arrays",
+    "title": "Beyond the Flat Circle: Three-Dimensional Blood Geometry",
+    "field": "arcane",
+    "paperSets": ["blood_magic_geometry"],
+    "prerequisitePapers": ["pentagram_theory"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "minimumSkills": { "blood_magic": 25, "geometry": 15 },
+    "skillGrants": { "blood_magic": 20, "geometry": 15 },
+    "contributesTo": [
+      { "type": "spell", "id": "blood_sphere_ritual" }
+    ],
+    "topicDescription": "Creating spherical and polyhedron blood constructs in three dimensions",
+    "keyPoints": [
+      "Suspended blood droplets forming 3D geometric patterns",
+      "The icosahedron as optimal blood containment shape",
+      "Levitation magic required to maintain structure",
+      "Power amplification: 3D arrays are 10x more potent than 2D"
+    ]
+  },
+  {
+    "paperId": "fractal_blood_patterns",
+    "title": "Self-Similar Sanguinity: Fractal Patterns in Blood Magic",
+    "field": "arcane",
+    "paperSets": ["blood_magic_geometry"],
+    "prerequisitePapers": ["three_dimensional_arrays"],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "minimumSkills": { "blood_magic": 30, "mathematics": 20 },
+    "skillGrants": { "blood_magic": 25, "mathematics": 18 },
+    "contributesTo": [
+      { "type": "spell", "id": "fractal_blood_amplification" }
+    ],
+    "topicDescription": "Using fractal geometry to create infinitely recursive blood patterns",
+    "keyPoints": [
+      "The Sierpiński triangle drawn in blood creates exponential power growth",
+      "Why perfect fractals are impossible with physical blood",
+      "3-5 iterations is maximum before magical instability",
+      "The Mandelbrot Incident of 1823 and why we don't attempt full fractals"
+    ]
+  }
+]

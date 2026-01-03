@@ -11,11 +11,25 @@ import type { World } from '../ecs/World.js';
 
 interface PendingSpriteJob {
   agentId: string;
-  jobId: string;
-  characterId: string;
+  characterId: string; // Base ID for the character
+  directionJobs: Map<string, string>; // direction -> job_id (only for generated directions)
+  completedDirections: Set<string>; // All 8 directions when complete
+  generatedDirections: Set<string>; // Only the 5 generated ones
   startTime: number;
   name: string;
+  description: string; // Character description for prompts
+  size: number; // Sprite size
 }
+
+// Directions that need to be generated via API (reserved for future use)
+// const GENERATE_DIRECTIONS = ['south', 'east', 'north', 'north-east', 'south-east'] as const;
+
+// Directions created by mirroring (reserved for future use)
+// const MIRROR_MAP: Record<string, string> = {
+//   'west': 'east',           // West = flip East
+//   'north-west': 'north-east', // North-West = flip North-East
+//   'south-west': 'south-east', // South-West = flip South-East
+// };
 
 export class PixelLabSpriteGenerationSystem implements System {
   readonly id: SystemId = 'pixellab_sprite_generation';
@@ -36,43 +50,50 @@ export class PixelLabSpriteGenerationSystem implements System {
   private async enqueueSpriteGeneration(_world: World, soulData: any): Promise<void> {
     const { agentId, name, archetype, purpose, species, interests } = soulData;
 
-    console.log(`[PixelLabSprite] Generating sprite for ${name} (${species}, ${archetype})`);
+    console.log(`[PixelLabSprite] Starting 8-direction sprite generation for ${name} (${species}, ${archetype})`);
 
     try {
       // Build character description based on soul attributes
       const description = this.buildCharacterDescription(species, archetype, purpose, interests);
 
-      // Determine character size and proportions based on species
-      const { size, proportions, view } = this.getSpeciesConfig(species);
+      // Determine character size based on species
+      const { size } = this.getSpeciesConfig(species);
 
-      // Call PixelLab API via environment (this will be replaced with actual MCP call)
+      const characterId = `${species}_${agentId.slice(0, 8)}`;
+      const directionJobs = new Map<string, string>();
+
+      // Step 1: Generate SOUTH (base direction, no reference image)
+      const southPrompt = `${description}, facing south, ${size}x${size} pixel art, top-down view`;
+
       const response = await this.callPixelLabAPI({
-        name: `${species}_${agentId.slice(0, 8)}`,
-        description,
-        n_directions: 8,
-        size,
-        view,
-        outline: 'single color black outline',
-        shading: 'basic shading',
-        detail: 'medium detail',
-        proportions,
-        ai_freedom: 750,
+        prompt: southPrompt,
+        width: size,
+        height: size,
+        steps: 20,
+        guidance_scale: 7.5,
       });
 
-      if (response.character_id) {
-        // Track the job
-        this.pendingJobs.set(agentId, {
-          agentId,
-          jobId: response.job_id,
-          characterId: response.character_id,
-          startTime: Date.now(),
-          name,
-        });
-
-        console.log(`[PixelLabSprite] Job queued for ${name}: ${response.character_id}`);
+      if (response.job_id) {
+        directionJobs.set('south', response.job_id);
+        console.log(`[PixelLabSprite] ✓ Queued south for ${name}: ${response.job_id}`);
       }
+
+      // Track the job with all info needed for sequential generation
+      this.pendingJobs.set(agentId, {
+        agentId,
+        characterId,
+        directionJobs,
+        completedDirections: new Set(),
+        generatedDirections: new Set(),
+        startTime: Date.now(),
+        name,
+        description,
+        size,
+      });
+
+      console.log(`[PixelLabSprite] Started sprite generation for ${name} (1/8 directions queued)`);
     } catch (error) {
-      console.error(`[PixelLabSprite] Failed to enqueue sprite for ${name}:`, error);
+      console.error(`[PixelLabSprite] Failed to start sprite generation for ${name}:`, error);
     }
   }
 
@@ -202,7 +223,7 @@ export class PixelLabSpriteGenerationSystem implements System {
       throw new Error('PIXELLAB_API_KEY not found in environment');
     }
 
-    const response = await fetch('https://api.pixellab.ai/v1/characters', {
+    const response = await fetch('https://api.pixellab.ai/v1/generate-image-pixflux', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -241,10 +262,32 @@ export class PixelLabSpriteGenerationSystem implements System {
 
   private async checkJobStatus(world: World, job: PendingSpriteJob): Promise<void> {
     try {
-      const response = await this.getCharacterStatus(job.characterId);
+      // Check each direction's job status
+      for (const [direction, jobId] of job.directionJobs.entries()) {
+        if (job.completedDirections.has(direction)) {
+          continue; // Already completed
+        }
 
-      if (response.status === 'completed') {
-        console.log(`[PixelLabSprite] ✅ Sprite completed for ${job.name}: ${job.characterId}`);
+        const response = await this.getJobStatus(jobId);
+
+        if (response.status === 'completed') {
+          job.completedDirections.add(direction);
+          console.log(`[PixelLabSprite] ✅ ${direction} completed for ${job.name} (${job.completedDirections.size}/${job.directionJobs.size})`);
+
+          // Download and save the image for this direction
+          if (response.image_url) {
+            await this.downloadDirectionImage(response.image_url, job.characterId, direction);
+          }
+
+        } else if (response.status === 'failed') {
+          console.error(`[PixelLabSprite] ❌ ${direction} failed for ${job.name}`);
+          job.directionJobs.delete(direction);
+        }
+      }
+
+      // Check if all queued directions are complete
+      if (job.completedDirections.size === job.directionJobs.size) {
+        console.log(`[PixelLabSprite] ✅ All directions completed for ${job.name} (${job.completedDirections.size}/${job.directionJobs.size})`);
 
         // Update the agent's appearance component with the new sprite folder
         const agent = world.getEntity(job.agentId);
@@ -269,17 +312,6 @@ export class PixelLabSpriteGenerationSystem implements System {
             name: job.name,
           },
         });
-
-      } else if (response.status === 'failed') {
-        console.error(`[PixelLabSprite] ❌ Sprite generation failed for ${job.name}`);
-        this.pendingJobs.delete(job.agentId);
-
-      } else {
-        // Still processing - log progress if ETA available
-        if (response.eta_seconds) {
-          const elapsed = Math.floor((Date.now() - job.startTime) / 1000);
-          console.log(`[PixelLabSprite] ⏳ ${job.name}: ${response.status} (${elapsed}s elapsed, ${response.eta_seconds}s remaining)`);
-        }
       }
 
     } catch (error) {
@@ -287,14 +319,14 @@ export class PixelLabSpriteGenerationSystem implements System {
     }
   }
 
-  private async getCharacterStatus(characterId: string): Promise<any> {
+  private async getJobStatus(jobId: string): Promise<any> {
     const apiKey = process.env.PIXELLAB_API_KEY;
 
     if (!apiKey) {
       throw new Error('PIXELLAB_API_KEY not found in environment');
     }
 
-    const response = await fetch(`https://api.pixellab.ai/v1/characters/${characterId}`, {
+    const response = await fetch(`https://api.pixellab.ai/v1/jobs/${jobId}`, {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
       },
@@ -306,5 +338,51 @@ export class PixelLabSpriteGenerationSystem implements System {
     }
 
     return await response.json();
+  }
+
+  private async downloadDirectionImage(
+    imageUrl: string,
+    characterId: string,
+    direction: string
+  ): Promise<void> {
+    try {
+      // Download the image
+      const response = await fetch(imageUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to download image: ${response.status}`);
+      }
+
+      const imageBuffer = await response.arrayBuffer();
+
+      // Determine save path (relative to project root)
+      // Save to packages/renderer/assets/sprites/pixellab/{characterId}/rotations/{direction}.png
+      const fs = await import('fs');
+      const path = await import('path');
+      const { fileURLToPath } = await import('url');
+
+      // Get the project root by going up from the core package
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = path.dirname(__filename);
+      const projectRoot = path.resolve(__dirname, '../../../../..');
+
+      const spritesDir = path.join(
+        projectRoot,
+        'packages/renderer/assets/sprites/pixellab',
+        characterId,
+        'rotations'
+      );
+
+      // Create directory if it doesn't exist
+      fs.mkdirSync(spritesDir, { recursive: true });
+
+      // Save the image
+      const filePath = path.join(spritesDir, `${direction}.png`);
+      fs.writeFileSync(filePath, Buffer.from(imageBuffer));
+
+      console.log(`[PixelLabSprite] 💾 Saved ${direction}.png for ${characterId}`);
+    } catch (error) {
+      console.error(`[PixelLabSprite] Failed to download ${direction} image:`, error);
+      throw error;
+    }
   }
 }

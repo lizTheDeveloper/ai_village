@@ -182,7 +182,9 @@ async function showStatus(): Promise<void> {
   let pendingChars = 0, completedChars = 0;
   let pendingTilesets = 0, completedTilesets = 0;
 
-  for (const species of Object.values(manifest.characters) as any[]) {
+  // Support both old 'characters' and new 'humanoids' structure
+  const charSection = manifest.humanoids || manifest.characters || {};
+  for (const species of Object.values(charSection) as any[]) {
     pendingChars += species.pending?.length || 0;
     completedChars += species.completed?.length || 0;
   }
@@ -228,7 +230,8 @@ async function generateAssets(count: number, typeFilter?: string): Promise<void>
   while (generated < count) {
     // Try characters first
     if (!typeFilter || typeFilter === 'character') {
-      for (const [species, data] of Object.entries(manifest.characters) as [string, any][]) {
+      const charSection = manifest.humanoids || manifest.characters || {};
+      for (const [species, data] of Object.entries(charSection) as [string, any][]) {
         if (data.pending && data.pending.length > 0 && generated < count) {
           const char = data.pending[0];
           console.log(`Creating character: ${char.id}`);
@@ -389,7 +392,8 @@ async function checkAndDownload(): Promise<void> {
         const speciesMatch = localId.match(/^([a-z]+)_/);
         if (speciesMatch) {
           const speciesKey = speciesMatch[1] + 's'; // human -> humans
-          const speciesData = manifest.characters[speciesKey];
+          const charSection = manifest.humanoids || manifest.characters || {};
+          const speciesData = charSection[speciesKey];
           if (speciesData && !speciesData.completed.includes(localId)) {
             speciesData.completed.push(localId);
           }

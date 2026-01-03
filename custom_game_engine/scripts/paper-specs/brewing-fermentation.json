@@ -1,0 +1,133 @@
+[
+  {
+    "paperId": "microbial_discovery",
+    "title": "On the Discovery of Invisible Life: Yeast and Other Microscopic Creatures",
+    "field": "cuisine",
+    "paperSets": ["brewing_fermentation", "basic_brewing"],
+    "prerequisitePapers": [],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": { "brewing": 5, "nature": 3 },
+    "contributesTo": [
+      { "type": "recipe", "id": "simple_beer" }
+    ],
+    "topicDescription": "The discovery that invisible organisms (yeast) are responsible for fermentation",
+    "keyPoints": [
+      "Microscopic life exists and cannot be seen with naked eye",
+      "Yeast are living organisms, not magical spirits",
+      "Yeast consume sugar and produce alcohol and CO2",
+      "Different yeast strains exist with different characteristics"
+    ]
+  },
+  {
+    "paperId": "anaerobic_respiration",
+    "title": "Breathing Without Air: The Paradox of Fermentation",
+    "field": "cuisine",
+    "paperSets": ["brewing_fermentation", "advanced_brewing"],
+    "prerequisitePapers": ["microbial_discovery"],
+    "complexity": 4,
+    "minimumAge": "teen",
+    "skillGrants": { "brewing": 10, "chemistry": 5 },
+    "contributesTo": [
+      { "type": "recipe", "id": "lager_beer" }
+    ],
+    "topicDescription": "How yeast produces alcohol through anaerobic respiration without oxygen",
+    "keyPoints": [
+      "Yeast can survive without oxygen through fermentation",
+      "Sugar is broken down into alcohol and carbon dioxide",
+      "The chemical equation of fermentation",
+      "Why oxygen is actually detrimental during fermentation"
+    ]
+  },
+  {
+    "paperId": "fermentation_temperature_control",
+    "title": "Heat and Time: The Critical Balance in Fermentation",
+    "field": "cuisine",
+    "paperSets": ["brewing_fermentation", "advanced_brewing"],
+    "prerequisitePapers": ["anaerobic_respiration"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "brewing": 12, "temperature_control": 8 },
+    "contributesTo": [
+      { "type": "building", "id": "temperature_controlled_fermentation_chamber" },
+      { "type": "recipe", "id": "precise_fermentation_beer" }
+    ],
+    "topicDescription": "How temperature affects fermentation speed, flavor development, and yeast health",
+    "keyPoints": [
+      "Different yeast strains have optimal temperature ranges",
+      "Too hot: off-flavors and stressed yeast",
+      "Too cold: slow or stalled fermentation",
+      "Temperature curves and staged fermentation",
+      "Ale vs lager fermentation temperatures"
+    ]
+  },
+  {
+    "paperId": "wild_vs_cultivated_yeast",
+    "title": "Taming the Wild: A Comparison of Yeast Strains",
+    "field": "cuisine",
+    "paperSets": ["brewing_fermentation", "advanced_brewing"],
+    "prerequisitePapers": ["microbial_discovery", "fermentation_temperature_control"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "minimumSkills": { "brewing": 15 },
+    "skillGrants": { "brewing": 15, "nature": 8 },
+    "contributesTo": [
+      { "type": "recipe", "id": "wild_fermented_beer" },
+      { "type": "recipe", "id": "sour_beer" }
+    ],
+    "topicDescription": "The differences between wild-caught and cultivated yeast, and their effects on beer",
+    "keyPoints": [
+      "Wild yeast capture methods",
+      "Unpredictability vs. consistency",
+      "Sour beer production with wild yeast and bacteria",
+      "Historical spontaneous fermentation",
+      "When wild is better than cultivated"
+    ]
+  },
+  {
+    "paperId": "ph_acidity_management",
+    "title": "The Acid Question: pH Balance in Fermentation",
+    "field": "cuisine",
+    "paperSets": ["brewing_fermentation", "master_brewing"],
+    "prerequisitePapers": ["anaerobic_respiration", "fermentation_temperature_control"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "minimumSkills": { "brewing": 20, "chemistry": 10 },
+    "skillGrants": { "brewing": 18, "chemistry": 10 },
+    "contributesTo": [
+      { "type": "ability", "id": "ph_adjustment" },
+      { "type": "recipe", "id": "perfectly_balanced_beer" }
+    ],
+    "topicDescription": "Understanding and controlling pH levels during mashing and fermentation",
+    "keyPoints": [
+      "What pH is and why it matters",
+      "Optimal pH ranges for mashing (5.2-5.6)",
+      "How pH affects enzyme activity",
+      "pH changes during fermentation",
+      "Methods of pH adjustment (acid additions, alkaline water treatment)"
+    ]
+  },
+  {
+    "paperId": "yeast_strain_genetics",
+    "title": "The Invisible Genealogy: Yeast Strain Selection and Propagation",
+    "field": "cuisine",
+    "paperSets": ["brewing_fermentation", "master_brewing"],
+    "prerequisitePapers": ["wild_vs_cultivated_yeast", "fermentation_temperature_control"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "minimumSkills": { "brewing": 25 },
+    "skillGrants": { "brewing": 20, "genetics": 5 },
+    "contributesTo": [
+      { "type": "ability", "id": "yeast_culturing" },
+      { "type": "building", "id": "yeast_laboratory" }
+    ],
+    "topicDescription": "Advanced yeast strain selection, propagation, and genetic characteristics",
+    "keyPoints": [
+      "Identifying strain characteristics: attenuation, flocculation, flavor profile",
+      "Yeast propagation and banking techniques",
+      "Genetic drift and mutation over generations",
+      "Creating yeast blends for unique characteristics",
+      "Maintaining pure cultures"
+    ]
+  }
+]

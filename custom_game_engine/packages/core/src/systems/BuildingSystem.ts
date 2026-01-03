@@ -286,6 +286,7 @@ export class BuildingSystem implements System {
       'watchtower': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
       'labor-guild': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
       'archive': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
+      'university': { required: false, initialFuel: 0, maxFuel: 0, consumptionRate: 0 },
     };
 
     const config = configs[buildingType];
