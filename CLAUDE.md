@@ -476,15 +476,15 @@ This starts:
 ### 2. Start the Game Dev Server (Terminal 3)
 
 ```bash
-cd custom_game_engine
+cd custom_game_engine/demo
 npm run dev
 ```
 
-This starts Vite dev server on `http://localhost:5173`
+This starts Vite dev server on `http://localhost:3000`
 
 ### 3. Open the Game in Browser
 
-Open `http://localhost:5173` in a browser. The game will:
+Open `http://localhost:3000` in a browser. The game will:
 - Connect to the metrics server automatically
 - Start streaming events to the dashboard
 - Create a new session visible at `http://localhost:8766/`

@@ -8,11 +8,47 @@ A custom TypeScript game engine built for the AI Village simulation project.
 
 **VM IP Address:** `34.44.162.194`
 
-- **Game:** http://34.44.162.194:5173
-- **Metrics Dashboard:** http://34.44.162.194:8766
-- **Metrics WebSocket:** ws://34.44.162.194:8765
+- **Game:** http://34.44.162.194:3000
 
 Deployed on Google Cloud Platform (us-central1-a) with Groq API integration.
+
+**Note:** The metrics dashboard (port 8766) is for internal use only and not exposed publicly.
+
+## 🚀 Quick Start
+
+### One Command to Run Everything
+
+```bash
+./start.sh
+```
+
+This automatically:
+- ✅ Checks for first-time setup
+- ✅ Installs dependencies if needed
+- ✅ Builds TypeScript
+- ✅ Starts metrics server (port 8766)
+- ✅ Starts orchestration dashboard (port 3030)
+- ✅ Starts game dev server (port 5173)
+- ✅ Opens browser
+
+### Different Modes
+
+**Game Host** (default) - Play the game or host for others:
+```bash
+./start.sh gamehost
+```
+
+**Server** - Backend only for AI/autonomous agents:
+```bash
+./start.sh server
+```
+
+**Player** - Open browser to existing server:
+```bash
+./start.sh player
+```
+
+See [scripts/README.md](scripts/README.md) for detailed documentation.
 
 ## Phase 0: Foundation ✅ COMPLETE
 

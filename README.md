@@ -95,10 +95,11 @@ npm install
 npm run build
 
 # Run the game
+cd demo
 npm run dev
 ```
 
-Then open http://localhost:5173
+Then open http://localhost:3000
 
 See [custom_game_engine/README.md](./custom_game_engine/README.md) for detailed setup instructions.
 
