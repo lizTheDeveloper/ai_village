@@ -1,0 +1,147 @@
+[
+  {
+    "paperId": "hanging_gardens_engineering",
+    "title": "Hanging Gardens Engineering",
+    "field": "construction",
+    "paperSets": [
+      "monumental_architecture"
+    ],
+    "prerequisitePapers": [
+      "lighthouse_tower_engineering"
+    ],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_hanging_gardens_engineering"
+      }
+    ],
+    "topicDescription": "Understanding hanging gardens engineering in the context of construction",
+    "keyPoints": [
+      "Basic principles of hanging gardens engineering",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "temple_complex_planning",
+    "title": "Temple Complex Planning",
+    "field": "construction",
+    "paperSets": [
+      "monumental_architecture"
+    ],
+    "prerequisitePapers": [
+      "hanging_gardens_engineering"
+    ],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_temple_complex_planning"
+      }
+    ],
+    "topicDescription": "Understanding temple complex planning in the context of construction",
+    "keyPoints": [
+      "Basic principles of temple complex planning",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "fortress_castle_engineering",
+    "title": "Fortress Castle Engineering",
+    "field": "construction",
+    "paperSets": [
+      "monumental_architecture"
+    ],
+    "prerequisitePapers": [
+      "temple_complex_planning"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_fortress_castle_engineering"
+      }
+    ],
+    "topicDescription": "Understanding fortress castle engineering in the context of construction",
+    "keyPoints": [
+      "Basic principles of fortress castle engineering",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "wonder_durability_preservation",
+    "title": "Wonder Durability Preservation",
+    "field": "construction",
+    "paperSets": [
+      "monumental_architecture"
+    ],
+    "prerequisitePapers": [
+      "fortress_castle_engineering"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_wonder_durability_preservation"
+      }
+    ],
+    "topicDescription": "Understanding wonder durability preservation in the context of construction",
+    "keyPoints": [
+      "Basic principles of wonder durability preservation",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "monument_legacy_planning",
+    "title": "Monument Legacy Planning",
+    "field": "construction",
+    "paperSets": [
+      "monumental_architecture"
+    ],
+    "prerequisitePapers": [
+      "wonder_durability_preservation"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_monument_legacy_planning"
+      }
+    ],
+    "topicDescription": "Understanding monument legacy planning in the context of construction",
+    "keyPoints": [
+      "Basic principles of monument legacy planning",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  }
+]

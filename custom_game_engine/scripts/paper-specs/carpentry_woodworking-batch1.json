@@ -1,0 +1,290 @@
+[
+  {
+    "paperId": "saw_types_techniques",
+    "title": "Saw Types Techniques",
+    "field": "construction",
+    "paperSets": [
+      "carpentry_woodworking"
+    ],
+    "prerequisitePapers": [],
+    "complexity": 1,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_saw_types_techniques"
+      }
+    ],
+    "topicDescription": "Understanding saw types techniques in the context of construction",
+    "keyPoints": [
+      "Basic principles of saw types techniques",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "hand_plane_mastery",
+    "title": "Hand Plane Mastery",
+    "field": "construction",
+    "paperSets": [
+      "carpentry_woodworking"
+    ],
+    "prerequisitePapers": [
+      "saw_types_techniques"
+    ],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_hand_plane_mastery"
+      }
+    ],
+    "topicDescription": "Understanding hand plane mastery in the context of construction",
+    "keyPoints": [
+      "Basic principles of hand plane mastery",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "chisel_techniques",
+    "title": "Chisel Techniques",
+    "field": "construction",
+    "paperSets": [
+      "carpentry_woodworking"
+    ],
+    "prerequisitePapers": [
+      "hand_plane_mastery"
+    ],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_chisel_techniques"
+      }
+    ],
+    "topicDescription": "Understanding chisel techniques in the context of construction",
+    "keyPoints": [
+      "Basic principles of chisel techniques",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "joinery_fundamentals",
+    "title": "Joinery Fundamentals",
+    "field": "construction",
+    "paperSets": [
+      "carpentry_woodworking"
+    ],
+    "prerequisitePapers": [
+      "chisel_techniques"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_joinery_fundamentals"
+      }
+    ],
+    "topicDescription": "Understanding joinery fundamentals in the context of construction",
+    "keyPoints": [
+      "Basic principles of joinery fundamentals",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "mortise_tenon_joints",
+    "title": "Mortise Tenon Joints",
+    "field": "construction",
+    "paperSets": [
+      "carpentry_woodworking"
+    ],
+    "prerequisitePapers": [
+      "joinery_fundamentals"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_mortise_tenon_joints"
+      }
+    ],
+    "topicDescription": "Understanding mortise tenon joints in the context of construction",
+    "keyPoints": [
+      "Basic principles of mortise tenon joints",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "dovetail_joints",
+    "title": "Dovetail Joints",
+    "field": "construction",
+    "paperSets": [
+      "carpentry_woodworking"
+    ],
+    "prerequisitePapers": [
+      "mortise_tenon_joints"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_dovetail_joints"
+      }
+    ],
+    "topicDescription": "Understanding dovetail joints in the context of construction",
+    "keyPoints": [
+      "Basic principles of dovetail joints",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "lap_joints",
+    "title": "Lap Joints",
+    "field": "construction",
+    "paperSets": [
+      "carpentry_woodworking"
+    ],
+    "prerequisitePapers": [
+      "dovetail_joints"
+    ],
+    "complexity": 4,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_lap_joints"
+      }
+    ],
+    "topicDescription": "Understanding lap joints in the context of construction",
+    "keyPoints": [
+      "Basic principles of lap joints",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "wood_glue_adhesives",
+    "title": "Wood Glue Adhesives",
+    "field": "construction",
+    "paperSets": [
+      "carpentry_woodworking"
+    ],
+    "prerequisitePapers": [
+      "lap_joints"
+    ],
+    "complexity": 4,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_wood_glue_adhesives"
+      }
+    ],
+    "topicDescription": "Understanding wood glue adhesives in the context of construction",
+    "keyPoints": [
+      "Basic principles of wood glue adhesives",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "wooden_pegs_fasteners",
+    "title": "Wooden Pegs Fasteners",
+    "field": "construction",
+    "paperSets": [
+      "carpentry_woodworking"
+    ],
+    "prerequisitePapers": [
+      "wood_glue_adhesives"
+    ],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_wooden_pegs_fasteners"
+      }
+    ],
+    "topicDescription": "Understanding wooden pegs fasteners in the context of construction",
+    "keyPoints": [
+      "Basic principles of wooden pegs fasteners",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "timber_framing_basics",
+    "title": "Timber Framing Basics",
+    "field": "construction",
+    "paperSets": [
+      "carpentry_woodworking"
+    ],
+    "prerequisitePapers": [
+      "wooden_pegs_fasteners"
+    ],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_timber_framing_basics"
+      }
+    ],
+    "topicDescription": "Understanding timber framing basics in the context of construction",
+    "keyPoints": [
+      "Basic principles of timber framing basics",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  }
+]

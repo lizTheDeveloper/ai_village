@@ -1,0 +1,290 @@
+[
+  {
+    "paperId": "wound_healing_herbs",
+    "title": "Wound Healing Herbs",
+    "field": "nature",
+    "paperSets": [
+      "medicinal_herbalism"
+    ],
+    "prerequisitePapers": [],
+    "complexity": 1,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_wound_healing_herbs"
+      }
+    ],
+    "topicDescription": "Understanding wound healing herbs in the context of nature",
+    "keyPoints": [
+      "Basic principles of wound healing herbs",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "antiseptic_plant_properties",
+    "title": "Antiseptic Plant Properties",
+    "field": "nature",
+    "paperSets": [
+      "medicinal_herbalism"
+    ],
+    "prerequisitePapers": [
+      "wound_healing_herbs"
+    ],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_antiseptic_plant_properties"
+      }
+    ],
+    "topicDescription": "Understanding antiseptic plant properties in the context of nature",
+    "keyPoints": [
+      "Basic principles of antiseptic plant properties",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "yarrow_for_bleeding",
+    "title": "Yarrow For Bleeding",
+    "field": "nature",
+    "paperSets": [
+      "medicinal_herbalism"
+    ],
+    "prerequisitePapers": [
+      "antiseptic_plant_properties"
+    ],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_yarrow_for_bleeding"
+      }
+    ],
+    "topicDescription": "Understanding yarrow for bleeding in the context of nature",
+    "keyPoints": [
+      "Basic principles of yarrow for bleeding",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "calendula_skin_healing",
+    "title": "Calendula Skin Healing",
+    "field": "nature",
+    "paperSets": [
+      "medicinal_herbalism"
+    ],
+    "prerequisitePapers": [
+      "yarrow_for_bleeding"
+    ],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_calendula_skin_healing"
+      }
+    ],
+    "topicDescription": "Understanding calendula skin healing in the context of nature",
+    "keyPoints": [
+      "Basic principles of calendula skin healing",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "comfrey_bone_knitting",
+    "title": "Comfrey Bone Knitting",
+    "field": "nature",
+    "paperSets": [
+      "medicinal_herbalism"
+    ],
+    "prerequisitePapers": [
+      "calendula_skin_healing"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_comfrey_bone_knitting"
+      }
+    ],
+    "topicDescription": "Understanding comfrey bone knitting in the context of nature",
+    "keyPoints": [
+      "Basic principles of comfrey bone knitting",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "fever_reducing_herbs",
+    "title": "Fever Reducing Herbs",
+    "field": "nature",
+    "paperSets": [
+      "medicinal_herbalism"
+    ],
+    "prerequisitePapers": [
+      "comfrey_bone_knitting"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_fever_reducing_herbs"
+      }
+    ],
+    "topicDescription": "Understanding fever reducing herbs in the context of nature",
+    "keyPoints": [
+      "Basic principles of fever reducing herbs",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "willow_bark_pain_relief",
+    "title": "Willow Bark Pain Relief",
+    "field": "nature",
+    "paperSets": [
+      "medicinal_herbalism"
+    ],
+    "prerequisitePapers": [
+      "fever_reducing_herbs"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_willow_bark_pain_relief"
+      }
+    ],
+    "topicDescription": "Understanding willow bark pain relief in the context of nature",
+    "keyPoints": [
+      "Basic principles of willow bark pain relief",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "elderflower_fever_treatment",
+    "title": "Elderflower Fever Treatment",
+    "field": "nature",
+    "paperSets": [
+      "medicinal_herbalism"
+    ],
+    "prerequisitePapers": [
+      "willow_bark_pain_relief"
+    ],
+    "complexity": 4,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_elderflower_fever_treatment"
+      }
+    ],
+    "topicDescription": "Understanding elderflower fever treatment in the context of nature",
+    "keyPoints": [
+      "Basic principles of elderflower fever treatment",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "digestive_herbs",
+    "title": "Digestive Herbs",
+    "field": "nature",
+    "paperSets": [
+      "medicinal_herbalism"
+    ],
+    "prerequisitePapers": [
+      "elderflower_fever_treatment"
+    ],
+    "complexity": 4,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_digestive_herbs"
+      }
+    ],
+    "topicDescription": "Understanding digestive herbs in the context of nature",
+    "keyPoints": [
+      "Basic principles of digestive herbs",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "peppermint_stomach_soothing",
+    "title": "Peppermint Stomach Soothing",
+    "field": "nature",
+    "paperSets": [
+      "medicinal_herbalism"
+    ],
+    "prerequisitePapers": [
+      "digestive_herbs"
+    ],
+    "complexity": 4,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_peppermint_stomach_soothing"
+      }
+    ],
+    "topicDescription": "Understanding peppermint stomach soothing in the context of nature",
+    "keyPoints": [
+      "Basic principles of peppermint stomach soothing",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  }
+]

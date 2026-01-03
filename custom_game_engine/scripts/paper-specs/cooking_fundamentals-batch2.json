@@ -1,0 +1,302 @@
+[
+  {
+    "paperId": "grilling_basics",
+    "title": "Grilling Basics",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "sauteing_methods"
+    ],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_grilling_basics"
+      }
+    ],
+    "topicDescription": "Understanding grilling basics in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of grilling basics",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "steaming_techniques",
+    "title": "Steaming Techniques",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "grilling_basics"
+    ],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_steaming_techniques"
+      }
+    ],
+    "topicDescription": "Understanding steaming techniques in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of steaming techniques",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "braising_principles",
+    "title": "Braising Principles",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "steaming_techniques"
+    ],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_braising_principles"
+      }
+    ],
+    "topicDescription": "Understanding braising principles in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of braising principles",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "stewing_methods",
+    "title": "Stewing Methods",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "braising_principles"
+    ],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_stewing_methods"
+      }
+    ],
+    "topicDescription": "Understanding stewing methods in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of stewing methods",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "seasoning_fundamentals",
+    "title": "Seasoning Fundamentals",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "stewing_methods"
+    ],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_seasoning_fundamentals"
+      }
+    ],
+    "topicDescription": "Understanding seasoning fundamentals in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of seasoning fundamentals",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "salt_use_timing",
+    "title": "Salt Use Timing",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "seasoning_fundamentals"
+    ],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_salt_use_timing"
+      }
+    ],
+    "topicDescription": "Understanding salt use timing in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of salt use timing",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "herb_spice_combinations",
+    "title": "Herb Spice Combinations",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "salt_use_timing"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_herb_spice_combinations"
+      }
+    ],
+    "topicDescription": "Understanding herb spice combinations in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of herb spice combinations",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "flavor_balancing",
+    "title": "Flavor Balancing",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "herb_spice_combinations"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_flavor_balancing"
+      }
+    ],
+    "topicDescription": "Understanding flavor balancing in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of flavor balancing",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "taste_testing_methods",
+    "title": "Taste Testing Methods",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "flavor_balancing"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_taste_testing_methods"
+      }
+    ],
+    "topicDescription": "Understanding taste testing methods in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of taste testing methods",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "kitchen_safety_hygiene",
+    "title": "Kitchen Safety Hygiene",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "taste_testing_methods"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_kitchen_safety_hygiene"
+      }
+    ],
+    "topicDescription": "Understanding kitchen safety hygiene in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of kitchen safety hygiene",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  }
+]

@@ -1,0 +1,300 @@
+[
+  {
+    "paperId": "cold_infusion_techniques",
+    "title": "Cold Infusion Techniques",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [],
+    "complexity": 1,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_cold_infusion_techniques"
+      }
+    ],
+    "topicDescription": "Understanding cold infusion techniques in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of cold infusion techniques",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "hot_infusion_methods",
+    "title": "Hot Infusion Methods",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "cold_infusion_techniques"
+    ],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_hot_infusion_methods"
+      }
+    ],
+    "topicDescription": "Understanding hot infusion methods in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of hot infusion methods",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "decoction_for_roots_bark",
+    "title": "Decoction For Roots Bark",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "hot_infusion_methods"
+    ],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_decoction_for_roots_bark"
+      }
+    ],
+    "topicDescription": "Understanding decoction for roots bark in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of decoction for roots bark",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "alcohol_extraction_tinctures",
+    "title": "Alcohol Extraction Tinctures",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "decoction_for_roots_bark"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_alcohol_extraction_tinctures"
+      }
+    ],
+    "topicDescription": "Understanding alcohol extraction tinctures in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of alcohol extraction tinctures",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "glycerin_based_extracts",
+    "title": "Glycerin Based Extracts",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "alcohol_extraction_tinctures"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_glycerin_based_extracts"
+      }
+    ],
+    "topicDescription": "Understanding glycerin based extracts in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of glycerin based extracts",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "vinegar_herbal_extraction",
+    "title": "Vinegar Herbal Extraction",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "glycerin_based_extracts"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_vinegar_herbal_extraction"
+      }
+    ],
+    "topicDescription": "Understanding vinegar herbal extraction in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of vinegar herbal extraction",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "oil_infusion_medicinal",
+    "title": "Oil Infusion Medicinal",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "vinegar_herbal_extraction"
+    ],
+    "complexity": 4,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_oil_infusion_medicinal"
+      }
+    ],
+    "topicDescription": "Understanding oil infusion medicinal in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of oil infusion medicinal",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "essential_oil_steam_distillation",
+    "title": "Essential Oil Steam Distillation",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "oil_infusion_medicinal"
+    ],
+    "complexity": 4,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_essential_oil_steam_distillation"
+      }
+    ],
+    "topicDescription": "Understanding essential oil steam distillation in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of essential oil steam distillation",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "hydrosol_production",
+    "title": "Hydrosol Production",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "essential_oil_steam_distillation"
+    ],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_hydrosol_production"
+      }
+    ],
+    "topicDescription": "Understanding hydrosol production in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of hydrosol production",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "double_extraction_mushrooms",
+    "title": "Double Extraction Mushrooms",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "hydrosol_production"
+    ],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_double_extraction_mushrooms"
+      }
+    ],
+    "topicDescription": "Understanding double extraction mushrooms in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of double extraction mushrooms",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  }
+]

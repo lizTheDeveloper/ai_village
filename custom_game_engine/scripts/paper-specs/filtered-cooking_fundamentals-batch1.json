@@ -1,0 +1,300 @@
+[
+  {
+    "paperId": "fire_management_cooking",
+    "title": "Fire Management Cooking",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [],
+    "complexity": 1,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_fire_management_cooking"
+      }
+    ],
+    "topicDescription": "Understanding fire management cooking in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of fire management cooking",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "heat_source_selection",
+    "title": "Heat Source Selection",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "fire_management_cooking"
+    ],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_heat_source_selection"
+      }
+    ],
+    "topicDescription": "Understanding heat source selection in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of heat source selection",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "knife_skills_fundamentals",
+    "title": "Knife Skills Fundamentals",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "heat_source_selection"
+    ],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_knife_skills_fundamentals"
+      }
+    ],
+    "topicDescription": "Understanding knife skills fundamentals in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of knife skills fundamentals",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "chopping_dicing_techniques",
+    "title": "Chopping Dicing Techniques",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "knife_skills_fundamentals"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_chopping_dicing_techniques"
+      }
+    ],
+    "topicDescription": "Understanding chopping dicing techniques in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of chopping dicing techniques",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "ingredient_preparation",
+    "title": "Ingredient Preparation",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "chopping_dicing_techniques"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_ingredient_preparation"
+      }
+    ],
+    "topicDescription": "Understanding ingredient preparation in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of ingredient preparation",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "mise_en_place_organization",
+    "title": "Mise En Place Organization",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "ingredient_preparation"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_mise_en_place_organization"
+      }
+    ],
+    "topicDescription": "Understanding mise en place organization in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of mise en place organization",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "boiling_simmering_basics",
+    "title": "Boiling Simmering Basics",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "mise_en_place_organization"
+    ],
+    "complexity": 4,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_boiling_simmering_basics"
+      }
+    ],
+    "topicDescription": "Understanding boiling simmering basics in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of boiling simmering basics",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "roasting_techniques",
+    "title": "Roasting Techniques",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "boiling_simmering_basics"
+    ],
+    "complexity": 4,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_roasting_techniques"
+      }
+    ],
+    "topicDescription": "Understanding roasting techniques in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of roasting techniques",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "frying_fundamentals",
+    "title": "Frying Fundamentals",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "roasting_techniques"
+    ],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_frying_fundamentals"
+      }
+    ],
+    "topicDescription": "Understanding frying fundamentals in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of frying fundamentals",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "sauteing_methods",
+    "title": "Sauteing Methods",
+    "field": "cuisine",
+    "paperSets": [
+      "cooking_fundamentals"
+    ],
+    "prerequisitePapers": [
+      "frying_fundamentals"
+    ],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_sauteing_methods"
+      }
+    ],
+    "topicDescription": "Understanding sauteing methods in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of sauteing methods",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  }
+]

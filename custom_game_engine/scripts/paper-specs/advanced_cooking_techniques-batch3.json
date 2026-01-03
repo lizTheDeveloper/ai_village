@@ -1,0 +1,152 @@
+[
+  {
+    "paperId": "molecular_gastronomy_introduction",
+    "title": "Molecular Gastronomy Introduction",
+    "field": "cuisine",
+    "paperSets": [
+      "advanced_cooking_techniques"
+    ],
+    "prerequisitePapers": [
+      "sugar_work_fundamentals"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_molecular_gastronomy_introduction"
+      }
+    ],
+    "topicDescription": "Understanding molecular gastronomy introduction in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of molecular gastronomy introduction",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "spherification_techniques",
+    "title": "Spherification Techniques",
+    "field": "cuisine",
+    "paperSets": [
+      "advanced_cooking_techniques"
+    ],
+    "prerequisitePapers": [
+      "molecular_gastronomy_introduction"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_spherification_techniques"
+      }
+    ],
+    "topicDescription": "Understanding spherification techniques in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of spherification techniques",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "foam_creation_methods",
+    "title": "Foam Creation Methods",
+    "field": "cuisine",
+    "paperSets": [
+      "advanced_cooking_techniques"
+    ],
+    "prerequisitePapers": [
+      "spherification_techniques"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_foam_creation_methods"
+      }
+    ],
+    "topicDescription": "Understanding foam creation methods in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of foam creation methods",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "gel_creation_techniques",
+    "title": "Gel Creation Techniques",
+    "field": "cuisine",
+    "paperSets": [
+      "advanced_cooking_techniques"
+    ],
+    "prerequisitePapers": [
+      "foam_creation_methods"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_gel_creation_techniques"
+      }
+    ],
+    "topicDescription": "Understanding gel creation techniques in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of gel creation techniques",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "flavor_pairing_science",
+    "title": "Flavor Pairing Science",
+    "field": "cuisine",
+    "paperSets": [
+      "advanced_cooking_techniques"
+    ],
+    "prerequisitePapers": [
+      "gel_creation_techniques"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_flavor_pairing_science"
+      }
+    ],
+    "topicDescription": "Understanding flavor pairing science in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of flavor pairing science",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  }
+]

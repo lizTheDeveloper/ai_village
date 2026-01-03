@@ -1,0 +1,300 @@
+[
+  {
+    "paperId": "moonlight_herb_charging",
+    "title": "Moonlight Herb Charging",
+    "field": "alchemy",
+    "paperSets": [
+      "magical_herbalism"
+    ],
+    "prerequisitePapers": [],
+    "complexity": 1,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_moonlight_herb_charging"
+      }
+    ],
+    "topicDescription": "Understanding moonlight herb charging in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of moonlight herb charging",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "planetary_herb_correspondences",
+    "title": "Planetary Herb Correspondences",
+    "field": "alchemy",
+    "paperSets": [
+      "magical_herbalism"
+    ],
+    "prerequisitePapers": [
+      "moonlight_herb_charging"
+    ],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_planetary_herb_correspondences"
+      }
+    ],
+    "topicDescription": "Understanding planetary herb correspondences in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of planetary herb correspondences",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "elemental_herb_associations",
+    "title": "Elemental Herb Associations",
+    "field": "alchemy",
+    "paperSets": [
+      "magical_herbalism"
+    ],
+    "prerequisitePapers": [
+      "planetary_herb_correspondences"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_elemental_herb_associations"
+      }
+    ],
+    "topicDescription": "Understanding elemental herb associations in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of elemental herb associations",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "magical_harvest_rituals",
+    "title": "Magical Harvest Rituals",
+    "field": "alchemy",
+    "paperSets": [
+      "magical_herbalism"
+    ],
+    "prerequisitePapers": [
+      "elemental_herb_associations"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_magical_harvest_rituals"
+      }
+    ],
+    "topicDescription": "Understanding magical harvest rituals in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of magical harvest rituals",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "consecration_of_herbs",
+    "title": "Consecration Of Herbs",
+    "field": "alchemy",
+    "paperSets": [
+      "magical_herbalism"
+    ],
+    "prerequisitePapers": [
+      "magical_harvest_rituals"
+    ],
+    "complexity": 4,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_consecration_of_herbs"
+      }
+    ],
+    "topicDescription": "Understanding consecration of herbs in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of consecration of herbs",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "herb_spirit_communication",
+    "title": "Herb Spirit Communication",
+    "field": "alchemy",
+    "paperSets": [
+      "magical_herbalism"
+    ],
+    "prerequisitePapers": [
+      "consecration_of_herbs"
+    ],
+    "complexity": 4,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_herb_spirit_communication"
+      }
+    ],
+    "topicDescription": "Understanding herb spirit communication in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of herb spirit communication",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "enchanted_growing_methods",
+    "title": "Enchanted Growing Methods",
+    "field": "alchemy",
+    "paperSets": [
+      "magical_herbalism"
+    ],
+    "prerequisitePapers": [
+      "herb_spirit_communication"
+    ],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_enchanted_growing_methods"
+      }
+    ],
+    "topicDescription": "Understanding enchanted growing methods in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of enchanted growing methods",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "aetheric_essence_extraction",
+    "title": "Aetheric Essence Extraction",
+    "field": "alchemy",
+    "paperSets": [
+      "magical_herbalism"
+    ],
+    "prerequisitePapers": [
+      "enchanted_growing_methods"
+    ],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_aetheric_essence_extraction"
+      }
+    ],
+    "topicDescription": "Understanding aetheric essence extraction in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of aetheric essence extraction",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "transmutation_of_properties",
+    "title": "Transmutation Of Properties",
+    "field": "alchemy",
+    "paperSets": [
+      "magical_herbalism"
+    ],
+    "prerequisitePapers": [
+      "aetheric_essence_extraction"
+    ],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_transmutation_of_properties"
+      }
+    ],
+    "topicDescription": "Understanding transmutation of properties in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of transmutation of properties",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "philosopher_herb_theory",
+    "title": "Philosopher Herb Theory",
+    "field": "alchemy",
+    "paperSets": [
+      "magical_herbalism"
+    ],
+    "prerequisitePapers": [
+      "transmutation_of_properties"
+    ],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_philosopher_herb_theory"
+      }
+    ],
+    "topicDescription": "Understanding philosopher herb theory in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of philosopher herb theory",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  }
+]

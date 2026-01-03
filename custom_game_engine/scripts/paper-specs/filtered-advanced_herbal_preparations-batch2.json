@@ -1,0 +1,302 @@
+[
+  {
+    "paperId": "percolation_method",
+    "title": "Percolation Method",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "double_extraction_mushrooms"
+    ],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_percolation_method"
+      }
+    ],
+    "topicDescription": "Understanding percolation method in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of percolation method",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "maceration_techniques",
+    "title": "Maceration Techniques",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "percolation_method"
+    ],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_maceration_techniques"
+      }
+    ],
+    "topicDescription": "Understanding maceration techniques in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of maceration techniques",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "pressing_herbal_juices",
+    "title": "Pressing Herbal Juices",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "maceration_techniques"
+    ],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_pressing_herbal_juices"
+      }
+    ],
+    "topicDescription": "Understanding pressing herbal juices in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of pressing herbal juices",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "fermentation_of_herbs",
+    "title": "Fermentation Of Herbs",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "pressing_herbal_juices"
+    ],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_fermentation_of_herbs"
+      }
+    ],
+    "topicDescription": "Understanding fermentation of herbs in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of fermentation of herbs",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "oxidation_prevention",
+    "title": "Oxidation Prevention",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "fermentation_of_herbs"
+    ],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_oxidation_prevention"
+      }
+    ],
+    "topicDescription": "Understanding oxidation prevention in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of oxidation prevention",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "herbal_powder_grinding",
+    "title": "Herbal Powder Grinding",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "oxidation_prevention"
+    ],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_herbal_powder_grinding"
+      }
+    ],
+    "topicDescription": "Understanding herbal powder grinding in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of herbal powder grinding",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "capsule_filling_techniques",
+    "title": "Capsule Filling Techniques",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "herbal_powder_grinding"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_capsule_filling_techniques"
+      }
+    ],
+    "topicDescription": "Understanding capsule filling techniques in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of capsule filling techniques",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "salve_ointment_preparation",
+    "title": "Salve Ointment Preparation",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "capsule_filling_techniques"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_salve_ointment_preparation"
+      }
+    ],
+    "topicDescription": "Understanding salve ointment preparation in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of salve ointment preparation",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "poultice_compress_methods",
+    "title": "Poultice Compress Methods",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "salve_ointment_preparation"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_poultice_compress_methods"
+      }
+    ],
+    "topicDescription": "Understanding poultice compress methods in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of poultice compress methods",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "herbal_smoking_blends",
+    "title": "Herbal Smoking Blends",
+    "field": "alchemy",
+    "paperSets": [
+      "advanced_herbal_preparations"
+    ],
+    "prerequisitePapers": [
+      "poultice_compress_methods"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_herbal_smoking_blends"
+      }
+    ],
+    "topicDescription": "Understanding herbal smoking blends in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of herbal smoking blends",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  }
+]

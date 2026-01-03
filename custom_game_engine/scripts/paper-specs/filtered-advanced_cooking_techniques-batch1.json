@@ -1,0 +1,300 @@
+[
+  {
+    "paperId": "maillard_reaction_understanding",
+    "title": "Maillard Reaction Understanding",
+    "field": "cuisine",
+    "paperSets": [
+      "advanced_cooking_techniques"
+    ],
+    "prerequisitePapers": [],
+    "complexity": 1,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_maillard_reaction_understanding"
+      }
+    ],
+    "topicDescription": "Understanding maillard reaction understanding in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of maillard reaction understanding",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "caramelization_science",
+    "title": "Caramelization Science",
+    "field": "cuisine",
+    "paperSets": [
+      "advanced_cooking_techniques"
+    ],
+    "prerequisitePapers": [
+      "maillard_reaction_understanding"
+    ],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_caramelization_science"
+      }
+    ],
+    "topicDescription": "Understanding caramelization science in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of caramelization science",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "emulsification_techniques",
+    "title": "Emulsification Techniques",
+    "field": "cuisine",
+    "paperSets": [
+      "advanced_cooking_techniques"
+    ],
+    "prerequisitePapers": [
+      "caramelization_science"
+    ],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_emulsification_techniques"
+      }
+    ],
+    "topicDescription": "Understanding emulsification techniques in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of emulsification techniques",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "reduction_sauce_making",
+    "title": "Reduction Sauce Making",
+    "field": "cuisine",
+    "paperSets": [
+      "advanced_cooking_techniques"
+    ],
+    "prerequisitePapers": [
+      "emulsification_techniques"
+    ],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_reduction_sauce_making"
+      }
+    ],
+    "topicDescription": "Understanding reduction sauce making in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of reduction sauce making",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "stock_broth_fundamentals",
+    "title": "Stock Broth Fundamentals",
+    "field": "cuisine",
+    "paperSets": [
+      "advanced_cooking_techniques"
+    ],
+    "prerequisitePapers": [
+      "reduction_sauce_making"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_stock_broth_fundamentals"
+      }
+    ],
+    "topicDescription": "Understanding stock broth fundamentals in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of stock broth fundamentals",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "mother_sauces_five",
+    "title": "Mother Sauces Five",
+    "field": "cuisine",
+    "paperSets": [
+      "advanced_cooking_techniques"
+    ],
+    "prerequisitePapers": [
+      "stock_broth_fundamentals"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_mother_sauces_five"
+      }
+    ],
+    "topicDescription": "Understanding mother sauces five in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of mother sauces five",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "compound_butter_creation",
+    "title": "Compound Butter Creation",
+    "field": "cuisine",
+    "paperSets": [
+      "advanced_cooking_techniques"
+    ],
+    "prerequisitePapers": [
+      "mother_sauces_five"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_compound_butter_creation"
+      }
+    ],
+    "topicDescription": "Understanding compound butter creation in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of compound butter creation",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "temperature_precision_cooking",
+    "title": "Temperature Precision Cooking",
+    "field": "cuisine",
+    "paperSets": [
+      "advanced_cooking_techniques"
+    ],
+    "prerequisitePapers": [
+      "compound_butter_creation"
+    ],
+    "complexity": 4,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_temperature_precision_cooking"
+      }
+    ],
+    "topicDescription": "Understanding temperature precision cooking in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of temperature precision cooking",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "sous_vide_principles",
+    "title": "Sous Vide Principles",
+    "field": "cuisine",
+    "paperSets": [
+      "advanced_cooking_techniques"
+    ],
+    "prerequisitePapers": [
+      "temperature_precision_cooking"
+    ],
+    "complexity": 4,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_sous_vide_principles"
+      }
+    ],
+    "topicDescription": "Understanding sous vide principles in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of sous vide principles",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "confit_preservation_flavor",
+    "title": "Confit Preservation Flavor",
+    "field": "cuisine",
+    "paperSets": [
+      "advanced_cooking_techniques"
+    ],
+    "prerequisitePapers": [
+      "sous_vide_principles"
+    ],
+    "complexity": 4,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_confit_preservation_flavor"
+      }
+    ],
+    "topicDescription": "Understanding confit preservation flavor in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of confit preservation flavor",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  }
+]

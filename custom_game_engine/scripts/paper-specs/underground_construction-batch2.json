@@ -1,0 +1,147 @@
+[
+  {
+    "paperId": "subterranean_city_planning",
+    "title": "Subterranean City Planning",
+    "field": "construction",
+    "paperSets": [
+      "underground_construction"
+    ],
+    "prerequisitePapers": [
+      "cavern_stabilization"
+    ],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_subterranean_city_planning"
+      }
+    ],
+    "topicDescription": "Understanding subterranean city planning in the context of construction",
+    "keyPoints": [
+      "Basic principles of subterranean city planning",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "underground_lighting_systems",
+    "title": "Underground Lighting Systems",
+    "field": "construction",
+    "paperSets": [
+      "underground_construction"
+    ],
+    "prerequisitePapers": [
+      "subterranean_city_planning"
+    ],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_underground_lighting_systems"
+      }
+    ],
+    "topicDescription": "Understanding underground lighting systems in the context of construction",
+    "keyPoints": [
+      "Basic principles of underground lighting systems",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "underground_agriculture_chambers",
+    "title": "Underground Agriculture Chambers",
+    "field": "construction",
+    "paperSets": [
+      "underground_construction"
+    ],
+    "prerequisitePapers": [
+      "underground_lighting_systems"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_underground_agriculture_chambers"
+      }
+    ],
+    "topicDescription": "Understanding underground agriculture chambers in the context of construction",
+    "keyPoints": [
+      "Basic principles of underground agriculture chambers",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "geothermal_heat_utilization",
+    "title": "Geothermal Heat Utilization",
+    "field": "construction",
+    "paperSets": [
+      "underground_construction"
+    ],
+    "prerequisitePapers": [
+      "underground_agriculture_chambers"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_geothermal_heat_utilization"
+      }
+    ],
+    "topicDescription": "Understanding geothermal heat utilization in the context of construction",
+    "keyPoints": [
+      "Basic principles of geothermal heat utilization",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "deep_earth_construction_safety",
+    "title": "Deep Earth Construction Safety",
+    "field": "construction",
+    "paperSets": [
+      "underground_construction"
+    ],
+    "prerequisitePapers": [
+      "geothermal_heat_utilization"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_deep_earth_construction_safety"
+      }
+    ],
+    "topicDescription": "Understanding deep earth construction safety in the context of construction",
+    "keyPoints": [
+      "Basic principles of deep earth construction safety",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  }
+]

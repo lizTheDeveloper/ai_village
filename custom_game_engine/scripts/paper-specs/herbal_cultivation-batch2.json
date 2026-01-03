@@ -1,0 +1,292 @@
+[
+  {
+    "paperId": "morning_dew_collection",
+    "title": "Morning Dew Collection",
+    "field": "nature",
+    "paperSets": [
+      "herbal_cultivation"
+    ],
+    "prerequisitePapers": [
+      "moon_phase_harvesting"
+    ],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_morning_dew_collection"
+      }
+    ],
+    "topicDescription": "Understanding morning dew collection in the context of nature",
+    "keyPoints": [
+      "Basic principles of morning dew collection",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "root_harvest_techniques",
+    "title": "Root Harvest Techniques",
+    "field": "nature",
+    "paperSets": [
+      "herbal_cultivation"
+    ],
+    "prerequisitePapers": [
+      "morning_dew_collection"
+    ],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_root_harvest_techniques"
+      }
+    ],
+    "topicDescription": "Understanding root harvest techniques in the context of nature",
+    "keyPoints": [
+      "Basic principles of root harvest techniques",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "leaf_harvest_methods",
+    "title": "Leaf Harvest Methods",
+    "field": "nature",
+    "paperSets": [
+      "herbal_cultivation"
+    ],
+    "prerequisitePapers": [
+      "root_harvest_techniques"
+    ],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_leaf_harvest_methods"
+      }
+    ],
+    "topicDescription": "Understanding leaf harvest methods in the context of nature",
+    "keyPoints": [
+      "Basic principles of leaf harvest methods",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "flower_harvest_practices",
+    "title": "Flower Harvest Practices",
+    "field": "nature",
+    "paperSets": [
+      "herbal_cultivation"
+    ],
+    "prerequisitePapers": [
+      "leaf_harvest_methods"
+    ],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_flower_harvest_practices"
+      }
+    ],
+    "topicDescription": "Understanding flower harvest practices in the context of nature",
+    "keyPoints": [
+      "Basic principles of flower harvest practices",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "seed_harvest_preservation",
+    "title": "Seed Harvest Preservation",
+    "field": "nature",
+    "paperSets": [
+      "herbal_cultivation"
+    ],
+    "prerequisitePapers": [
+      "flower_harvest_practices"
+    ],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_seed_harvest_preservation"
+      }
+    ],
+    "topicDescription": "Understanding seed harvest preservation in the context of nature",
+    "keyPoints": [
+      "Basic principles of seed harvest preservation",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "herb_drying_fundamentals",
+    "title": "Herb Drying Fundamentals",
+    "field": "nature",
+    "paperSets": [
+      "herbal_cultivation"
+    ],
+    "prerequisitePapers": [
+      "seed_harvest_preservation"
+    ],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_herb_drying_fundamentals"
+      }
+    ],
+    "topicDescription": "Understanding herb drying fundamentals in the context of nature",
+    "keyPoints": [
+      "Basic principles of herb drying fundamentals",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "air_drying_techniques",
+    "title": "Air Drying Techniques",
+    "field": "nature",
+    "paperSets": [
+      "herbal_cultivation"
+    ],
+    "prerequisitePapers": [
+      "herb_drying_fundamentals"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_air_drying_techniques"
+      }
+    ],
+    "topicDescription": "Understanding air drying techniques in the context of nature",
+    "keyPoints": [
+      "Basic principles of air drying techniques",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "bundle_drying_methods",
+    "title": "Bundle Drying Methods",
+    "field": "nature",
+    "paperSets": [
+      "herbal_cultivation"
+    ],
+    "prerequisitePapers": [
+      "air_drying_techniques"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_bundle_drying_methods"
+      }
+    ],
+    "topicDescription": "Understanding bundle drying methods in the context of nature",
+    "keyPoints": [
+      "Basic principles of bundle drying methods",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "herb_storage_containers",
+    "title": "Herb Storage Containers",
+    "field": "nature",
+    "paperSets": [
+      "herbal_cultivation"
+    ],
+    "prerequisitePapers": [
+      "bundle_drying_methods"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_herb_storage_containers"
+      }
+    ],
+    "topicDescription": "Understanding herb storage containers in the context of nature",
+    "keyPoints": [
+      "Basic principles of herb storage containers",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "long_term_herb_preservation",
+    "title": "Long Term Herb Preservation",
+    "field": "nature",
+    "paperSets": [
+      "herbal_cultivation"
+    ],
+    "prerequisitePapers": [
+      "herb_storage_containers"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_long_term_herb_preservation"
+      }
+    ],
+    "topicDescription": "Understanding long term herb preservation in the context of nature",
+    "keyPoints": [
+      "Basic principles of long term herb preservation",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  }
+]

@@ -1,0 +1,152 @@
+[
+  {
+    "paperId": "alcohol_purification",
+    "title": "Alcohol Purification",
+    "field": "alchemy",
+    "paperSets": [
+      "brewing_beverages"
+    ],
+    "prerequisitePapers": [
+      "distillation_spirits"
+    ],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_alcohol_purification"
+      }
+    ],
+    "topicDescription": "Understanding alcohol purification in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of alcohol purification",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "spirit_aging_barrels",
+    "title": "Spirit Aging Barrels",
+    "field": "alchemy",
+    "paperSets": [
+      "brewing_beverages"
+    ],
+    "prerequisitePapers": [
+      "alcohol_purification"
+    ],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_spirit_aging_barrels"
+      }
+    ],
+    "topicDescription": "Understanding spirit aging barrels in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of spirit aging barrels",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "herbal_beverage_infusion",
+    "title": "Herbal Beverage Infusion",
+    "field": "alchemy",
+    "paperSets": [
+      "brewing_beverages"
+    ],
+    "prerequisitePapers": [
+      "spirit_aging_barrels"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_herbal_beverage_infusion"
+      }
+    ],
+    "topicDescription": "Understanding herbal beverage infusion in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of herbal beverage infusion",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "tea_preparation_art",
+    "title": "Tea Preparation Art",
+    "field": "alchemy",
+    "paperSets": [
+      "brewing_beverages"
+    ],
+    "prerequisitePapers": [
+      "herbal_beverage_infusion"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_tea_preparation_art"
+      }
+    ],
+    "topicDescription": "Understanding tea preparation art in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of tea preparation art",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "coffee_roasting_brewing",
+    "title": "Coffee Roasting Brewing",
+    "field": "alchemy",
+    "paperSets": [
+      "brewing_beverages"
+    ],
+    "prerequisitePapers": [
+      "tea_preparation_art"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_coffee_roasting_brewing"
+      }
+    ],
+    "topicDescription": "Understanding coffee roasting brewing in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of coffee roasting brewing",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  }
+]

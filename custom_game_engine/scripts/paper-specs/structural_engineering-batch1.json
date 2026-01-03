@@ -1,0 +1,300 @@
+[
+  {
+    "paperId": "load_bearing_calculations",
+    "title": "Load Bearing Calculations",
+    "field": "engineering",
+    "paperSets": [
+      "structural_engineering"
+    ],
+    "prerequisitePapers": [],
+    "complexity": 1,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "engineering": 10,
+      "construction": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_load_bearing_calculations"
+      }
+    ],
+    "topicDescription": "Understanding load bearing calculations in the context of engineering",
+    "keyPoints": [
+      "Basic principles of load bearing calculations",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "stress_distribution_analysis",
+    "title": "Stress Distribution Analysis",
+    "field": "engineering",
+    "paperSets": [
+      "structural_engineering"
+    ],
+    "prerequisitePapers": [
+      "load_bearing_calculations"
+    ],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "engineering": 10,
+      "construction": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_stress_distribution_analysis"
+      }
+    ],
+    "topicDescription": "Understanding stress distribution analysis in the context of engineering",
+    "keyPoints": [
+      "Basic principles of stress distribution analysis",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "compression_tension_forces",
+    "title": "Compression Tension Forces",
+    "field": "engineering",
+    "paperSets": [
+      "structural_engineering"
+    ],
+    "prerequisitePapers": [
+      "stress_distribution_analysis"
+    ],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "engineering": 10,
+      "construction": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_compression_tension_forces"
+      }
+    ],
+    "topicDescription": "Understanding compression tension forces in the context of engineering",
+    "keyPoints": [
+      "Basic principles of compression tension forces",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "shear_force_understanding",
+    "title": "Shear Force Understanding",
+    "field": "engineering",
+    "paperSets": [
+      "structural_engineering"
+    ],
+    "prerequisitePapers": [
+      "compression_tension_forces"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "engineering": 10,
+      "construction": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_shear_force_understanding"
+      }
+    ],
+    "topicDescription": "Understanding shear force understanding in the context of engineering",
+    "keyPoints": [
+      "Basic principles of shear force understanding",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "moment_force_calculations",
+    "title": "Moment Force Calculations",
+    "field": "engineering",
+    "paperSets": [
+      "structural_engineering"
+    ],
+    "prerequisitePapers": [
+      "shear_force_understanding"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "engineering": 10,
+      "construction": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_moment_force_calculations"
+      }
+    ],
+    "topicDescription": "Understanding moment force calculations in the context of engineering",
+    "keyPoints": [
+      "Basic principles of moment force calculations",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "structural_stability_theory",
+    "title": "Structural Stability Theory",
+    "field": "engineering",
+    "paperSets": [
+      "structural_engineering"
+    ],
+    "prerequisitePapers": [
+      "moment_force_calculations"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "engineering": 10,
+      "construction": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_structural_stability_theory"
+      }
+    ],
+    "topicDescription": "Understanding structural stability theory in the context of engineering",
+    "keyPoints": [
+      "Basic principles of structural stability theory",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "foundation_load_capacity",
+    "title": "Foundation Load Capacity",
+    "field": "engineering",
+    "paperSets": [
+      "structural_engineering"
+    ],
+    "prerequisitePapers": [
+      "structural_stability_theory"
+    ],
+    "complexity": 4,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "engineering": 10,
+      "construction": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_foundation_load_capacity"
+      }
+    ],
+    "topicDescription": "Understanding foundation load capacity in the context of engineering",
+    "keyPoints": [
+      "Basic principles of foundation load capacity",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "soil_mechanics_foundations",
+    "title": "Soil Mechanics Foundations",
+    "field": "engineering",
+    "paperSets": [
+      "structural_engineering"
+    ],
+    "prerequisitePapers": [
+      "foundation_load_capacity"
+    ],
+    "complexity": 4,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "engineering": 10,
+      "construction": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_soil_mechanics_foundations"
+      }
+    ],
+    "topicDescription": "Understanding soil mechanics foundations in the context of engineering",
+    "keyPoints": [
+      "Basic principles of soil mechanics foundations",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "deep_foundation_techniques",
+    "title": "Deep Foundation Techniques",
+    "field": "engineering",
+    "paperSets": [
+      "structural_engineering"
+    ],
+    "prerequisitePapers": [
+      "soil_mechanics_foundations"
+    ],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "engineering": 10,
+      "construction": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_deep_foundation_techniques"
+      }
+    ],
+    "topicDescription": "Understanding deep foundation techniques in the context of engineering",
+    "keyPoints": [
+      "Basic principles of deep foundation techniques",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "cantilever_principles",
+    "title": "Cantilever Principles",
+    "field": "engineering",
+    "paperSets": [
+      "structural_engineering"
+    ],
+    "prerequisitePapers": [
+      "deep_foundation_techniques"
+    ],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "engineering": 10,
+      "construction": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_cantilever_principles"
+      }
+    ],
+    "topicDescription": "Understanding cantilever principles in the context of engineering",
+    "keyPoints": [
+      "Basic principles of cantilever principles",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  }
+]

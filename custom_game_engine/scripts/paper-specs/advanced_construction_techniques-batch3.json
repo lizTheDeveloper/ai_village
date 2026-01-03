@@ -1,0 +1,147 @@
+[
+  {
+    "paperId": "wall_cavity_construction",
+    "title": "Wall Cavity Construction",
+    "field": "construction",
+    "paperSets": [
+      "advanced_construction_techniques"
+    ],
+    "prerequisitePapers": [
+      "flooring_systems"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_wall_cavity_construction"
+      }
+    ],
+    "topicDescription": "Understanding wall cavity construction in the context of construction",
+    "keyPoints": [
+      "Basic principles of wall cavity construction",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "building_ventilation",
+    "title": "Building Ventilation",
+    "field": "construction",
+    "paperSets": [
+      "advanced_construction_techniques"
+    ],
+    "prerequisitePapers": [
+      "wall_cavity_construction"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_building_ventilation"
+      }
+    ],
+    "topicDescription": "Understanding building ventilation in the context of construction",
+    "keyPoints": [
+      "Basic principles of building ventilation",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "chimney_flue_construction",
+    "title": "Chimney Flue Construction",
+    "field": "construction",
+    "paperSets": [
+      "advanced_construction_techniques"
+    ],
+    "prerequisitePapers": [
+      "building_ventilation"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_chimney_flue_construction"
+      }
+    ],
+    "topicDescription": "Understanding chimney flue construction in the context of construction",
+    "keyPoints": [
+      "Basic principles of chimney flue construction",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "plumbing_basics_construction",
+    "title": "Plumbing Basics Construction",
+    "field": "construction",
+    "paperSets": [
+      "advanced_construction_techniques"
+    ],
+    "prerequisitePapers": [
+      "chimney_flue_construction"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_plumbing_basics_construction"
+      }
+    ],
+    "topicDescription": "Understanding plumbing basics construction in the context of construction",
+    "keyPoints": [
+      "Basic principles of plumbing basics construction",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "building_code_principles",
+    "title": "Building Code Principles",
+    "field": "construction",
+    "paperSets": [
+      "advanced_construction_techniques"
+    ],
+    "prerequisitePapers": [
+      "plumbing_basics_construction"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "construction": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_building_code_principles"
+      }
+    ],
+    "topicDescription": "Understanding building code principles in the context of construction",
+    "keyPoints": [
+      "Basic principles of building code principles",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  }
+]

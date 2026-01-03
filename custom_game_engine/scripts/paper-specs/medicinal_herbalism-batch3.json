@@ -1,0 +1,147 @@
+[
+  {
+    "paperId": "nervine_herbs_anxiety",
+    "title": "Nervine Herbs Anxiety",
+    "field": "nature",
+    "paperSets": [
+      "medicinal_herbalism"
+    ],
+    "prerequisitePapers": [
+      "elderberry_antiviral"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_nervine_herbs_anxiety"
+      }
+    ],
+    "topicDescription": "Understanding nervine herbs anxiety in the context of nature",
+    "keyPoints": [
+      "Basic principles of nervine herbs anxiety",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "valerian_sleep_aid",
+    "title": "Valerian Sleep Aid",
+    "field": "nature",
+    "paperSets": [
+      "medicinal_herbalism"
+    ],
+    "prerequisitePapers": [
+      "nervine_herbs_anxiety"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_valerian_sleep_aid"
+      }
+    ],
+    "topicDescription": "Understanding valerian sleep aid in the context of nature",
+    "keyPoints": [
+      "Basic principles of valerian sleep aid",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "lemon_balm_calming",
+    "title": "Lemon Balm Calming",
+    "field": "nature",
+    "paperSets": [
+      "medicinal_herbalism"
+    ],
+    "prerequisitePapers": [
+      "valerian_sleep_aid"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_lemon_balm_calming"
+      }
+    ],
+    "topicDescription": "Understanding lemon balm calming in the context of nature",
+    "keyPoints": [
+      "Basic principles of lemon balm calming",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "skullcap_nervous_tension",
+    "title": "Skullcap Nervous Tension",
+    "field": "nature",
+    "paperSets": [
+      "medicinal_herbalism"
+    ],
+    "prerequisitePapers": [
+      "lemon_balm_calming"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_skullcap_nervous_tension"
+      }
+    ],
+    "topicDescription": "Understanding skullcap nervous tension in the context of nature",
+    "keyPoints": [
+      "Basic principles of skullcap nervous tension",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "herb_dosage_determination",
+    "title": "Herb Dosage Determination",
+    "field": "nature",
+    "paperSets": [
+      "medicinal_herbalism"
+    ],
+    "prerequisitePapers": [
+      "skullcap_nervous_tension"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "herbalism": 10
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_herb_dosage_determination"
+      }
+    ],
+    "topicDescription": "Understanding herb dosage determination in the context of nature",
+    "keyPoints": [
+      "Basic principles of herb dosage determination",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  }
+]

@@ -1,0 +1,300 @@
+[
+  {
+    "paperId": "yeast_fermentation_beverages",
+    "title": "Yeast Fermentation Beverages",
+    "field": "alchemy",
+    "paperSets": [
+      "brewing_beverages"
+    ],
+    "prerequisitePapers": [],
+    "complexity": 1,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_yeast_fermentation_beverages"
+      }
+    ],
+    "topicDescription": "Understanding yeast fermentation beverages in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of yeast fermentation beverages",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "beer_brewing_fundamentals",
+    "title": "Beer Brewing Fundamentals",
+    "field": "alchemy",
+    "paperSets": [
+      "brewing_beverages"
+    ],
+    "prerequisitePapers": [
+      "yeast_fermentation_beverages"
+    ],
+    "complexity": 2,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_beer_brewing_fundamentals"
+      }
+    ],
+    "topicDescription": "Understanding beer brewing fundamentals in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of beer brewing fundamentals",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "malt_preparation",
+    "title": "Malt Preparation",
+    "field": "alchemy",
+    "paperSets": [
+      "brewing_beverages"
+    ],
+    "prerequisitePapers": [
+      "beer_brewing_fundamentals"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_malt_preparation"
+      }
+    ],
+    "topicDescription": "Understanding malt preparation in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of malt preparation",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "hop_selection_preservation",
+    "title": "Hop Selection Preservation",
+    "field": "alchemy",
+    "paperSets": [
+      "brewing_beverages"
+    ],
+    "prerequisitePapers": [
+      "malt_preparation"
+    ],
+    "complexity": 3,
+    "minimumAge": "teen",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_hop_selection_preservation"
+      }
+    ],
+    "topicDescription": "Understanding hop selection preservation in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of hop selection preservation",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "wort_creation",
+    "title": "Wort Creation",
+    "field": "alchemy",
+    "paperSets": [
+      "brewing_beverages"
+    ],
+    "prerequisitePapers": [
+      "hop_selection_preservation"
+    ],
+    "complexity": 4,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_wort_creation"
+      }
+    ],
+    "topicDescription": "Understanding wort creation in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of wort creation",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "fermentation_temperature_control",
+    "title": "Fermentation Temperature Control",
+    "field": "alchemy",
+    "paperSets": [
+      "brewing_beverages"
+    ],
+    "prerequisitePapers": [
+      "wort_creation"
+    ],
+    "complexity": 4,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_fermentation_temperature_control"
+      }
+    ],
+    "topicDescription": "Understanding fermentation temperature control in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of fermentation temperature control",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "wine_making_principles",
+    "title": "Wine Making Principles",
+    "field": "alchemy",
+    "paperSets": [
+      "brewing_beverages"
+    ],
+    "prerequisitePapers": [
+      "fermentation_temperature_control"
+    ],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_wine_making_principles"
+      }
+    ],
+    "topicDescription": "Understanding wine making principles in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of wine making principles",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "grape_juice_fermentation",
+    "title": "Grape Juice Fermentation",
+    "field": "alchemy",
+    "paperSets": [
+      "brewing_beverages"
+    ],
+    "prerequisitePapers": [
+      "wine_making_principles"
+    ],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_grape_juice_fermentation"
+      }
+    ],
+    "topicDescription": "Understanding grape juice fermentation in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of grape juice fermentation",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "wine_aging_techniques",
+    "title": "Wine Aging Techniques",
+    "field": "alchemy",
+    "paperSets": [
+      "brewing_beverages"
+    ],
+    "prerequisitePapers": [
+      "grape_juice_fermentation"
+    ],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_wine_aging_techniques"
+      }
+    ],
+    "topicDescription": "Understanding wine aging techniques in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of wine aging techniques",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "distillation_spirits",
+    "title": "Distillation Spirits",
+    "field": "alchemy",
+    "paperSets": [
+      "brewing_beverages"
+    ],
+    "prerequisitePapers": [
+      "wine_aging_techniques"
+    ],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "alchemy": 10,
+      "herbalism": 5
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_distillation_spirits"
+      }
+    ],
+    "topicDescription": "Understanding distillation spirits in the context of alchemy",
+    "keyPoints": [
+      "Basic principles of distillation spirits",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  }
+]

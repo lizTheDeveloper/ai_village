@@ -1,0 +1,152 @@
+[
+  {
+    "paperId": "vinegar_preservation",
+    "title": "Vinegar Preservation",
+    "field": "cuisine",
+    "paperSets": [
+      "food_preservation"
+    ],
+    "prerequisitePapers": [
+      "pickling_fundamentals"
+    ],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_vinegar_preservation"
+      }
+    ],
+    "topicDescription": "Understanding vinegar preservation in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of vinegar preservation",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "lacto_fermentation",
+    "title": "Lacto Fermentation",
+    "field": "cuisine",
+    "paperSets": [
+      "food_preservation"
+    ],
+    "prerequisitePapers": [
+      "vinegar_preservation"
+    ],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_lacto_fermentation"
+      }
+    ],
+    "topicDescription": "Understanding lacto fermentation in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of lacto fermentation",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "sugar_preservation",
+    "title": "Sugar Preservation",
+    "field": "cuisine",
+    "paperSets": [
+      "food_preservation"
+    ],
+    "prerequisitePapers": [
+      "lacto_fermentation"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_sugar_preservation"
+      }
+    ],
+    "topicDescription": "Understanding sugar preservation in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of sugar preservation",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "jam_jelly_making",
+    "title": "Jam Jelly Making",
+    "field": "cuisine",
+    "paperSets": [
+      "food_preservation"
+    ],
+    "prerequisitePapers": [
+      "sugar_preservation"
+    ],
+    "complexity": 8,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_jam_jelly_making"
+      }
+    ],
+    "topicDescription": "Understanding jam jelly making in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of jam jelly making",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  },
+  {
+    "paperId": "long_term_food_storage",
+    "title": "Long Term Food Storage",
+    "field": "cuisine",
+    "paperSets": [
+      "food_preservation"
+    ],
+    "prerequisitePapers": [
+      "jam_jelly_making"
+    ],
+    "complexity": 9,
+    "minimumAge": "elder",
+    "skillGrants": {
+      "cooking": 10,
+      "nature": 3
+    },
+    "contributesTo": [
+      {
+        "type": "ability",
+        "id": "learn_long_term_food_storage"
+      }
+    ],
+    "topicDescription": "Understanding long term food storage in the context of cuisine",
+    "keyPoints": [
+      "Basic principles of long term food storage",
+      "Practical applications and techniques",
+      "Safety considerations and best practices",
+      "Historical development and modern understanding"
+    ]
+  }
+]
