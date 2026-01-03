@@ -38,8 +38,8 @@ export class PixelLabSpriteGenerationSystem implements System {
   private lastPollTick = 0;
 
   onInit(world: World): void {
-    // Subscribe to soul creation events
-    world.eventBus.subscribe('soul:created', (event: any) => {
+    // Subscribe to soul ceremony completion events
+    world.eventBus.subscribe('soul:ceremony_complete', (event: any) => {
       this.enqueueSpriteGeneration(world, event.data);
     });
   }

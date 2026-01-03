@@ -117,6 +117,73 @@ private timeEntityId: string | null = null;
 
 Use helpers: `distanceSquared()`, `isWithinRadius()`, `CachedQuery`, `SingletonCache`
 
+## Save/Load System (Persistence & Time Travel)
+
+**See [METASYSTEMS_GUIDE.md](custom_game_engine/METASYSTEMS_GUIDE.md#persistence-system) for full details.**
+
+The save system is NOT just persistence - it's the foundation for time travel and multiverse mechanics.
+
+### Core Concepts
+
+**Snapshots = Saves:**
+- Every save is a snapshot that can be used for time travel
+- Universe forking requires snapshot capability
+- Auto-save runs every 60 seconds (configurable)
+
+**Save Service API:**
+```typescript
+import { saveLoadService } from '@ai-village/core';
+
+// Save current world state (creates a snapshot/checkpoint)
+await saveLoadService.save(world, {
+  name: 'my_checkpoint',
+  description: 'Village with 10 agents',
+  screenshot: base64Image  // Optional
+});
+
+// Load a checkpoint (time travel)
+const result = await saveLoadService.load('checkpoint_key', world);
+if (result.success) {
+  console.log('Loaded:', result.metadata.name);
+}
+
+// List all saves/checkpoints
+const saves = await saveLoadService.listSaves();
+```
+
+### When to Save
+
+**Always save before destructive operations:**
+- Settings changes (triggers reload)
+- Major state changes
+- Before experimental features
+
+**Example (from main.ts:2701-2716):**
+```typescript
+settingsPanel.setOnSettingsChange(async () => {
+  // Take snapshot before reload to preserve agents
+  await saveLoadService.save(gameLoop.world, {
+    name: `settings_reload_day${day}`
+  });
+  window.location.reload();
+});
+```
+
+### Storage Backends
+
+- **IndexedDBStorage** (browser): Persistent, 50MB+ capacity
+- **MemoryStorage** (testing): Fast, no persistence
+- **FileStorage** (Node.js): JSON files for debugging
+
+### Critical Rule
+
+**DO NOT re-implement save logic.** Use the existing `saveLoadService` - it handles:
+- Serialization with versioning
+- Checksum validation
+- Component migrations
+- Storage backend abstraction
+- Time travel/multiverse integration
+
 ## Running the Game
 
 ### Quick Start (Single Command)
