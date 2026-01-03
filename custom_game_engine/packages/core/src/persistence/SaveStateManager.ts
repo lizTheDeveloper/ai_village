@@ -3,25 +3,51 @@
  *
  * Provides save/load/fork/rewind capabilities for headless games and dev tools.
  * Integrates with WorldSerializer for complete state snapshots.
+ *
+ * Browser-compatible: Save/load operations are no-ops in browser, only work in Node.js.
  */
 
 import type { World } from '../ecs/World.js';
 import { WorldImpl } from '../ecs/World.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { worldSerializer } from './WorldSerializer.js';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as zlib from 'zlib';
-import { promisify } from 'util';
 
-const gzip = promisify(zlib.gzip);
-const gunzip = promisify(zlib.gunzip);
-const writeFile = promisify(fs.writeFile);
-const readFile = promisify(fs.readFile);
-const mkdir = promisify(fs.mkdir);
-const readdir = promisify(fs.readdir);
-const unlink = promisify(fs.unlink);
-const stat = promisify(fs.stat);
+// Check if running in Node.js
+const isNode = typeof process !== 'undefined' && process.versions?.node;
+
+// Lazy-load Node.js modules only when needed
+let fs: typeof import('fs') | null = null;
+let path: typeof import('path') | null = null;
+let zlib: typeof import('zlib') | null = null;
+let util: typeof import('util') | null = null;
+
+// Promisified functions (initialized when modules are loaded)
+let gzip: ((buffer: string | Buffer) => Promise<Buffer>) | null = null;
+let gunzip: ((buffer: Buffer) => Promise<Buffer>) | null = null;
+let writeFile: ((path: string, data: any) => Promise<void>) | null = null;
+let readFile: ((path: string) => Promise<Buffer>) | null = null;
+let mkdir: ((path: string, options?: any) => Promise<void>) | null = null;
+let readdir: ((path: string) => Promise<string[]>) | null = null;
+let unlink: ((path: string) => Promise<void>) | null = null;
+let stat: ((path: string) => Promise<any>) | null = null;
+
+async function ensureNodeModules(): Promise<void> {
+  if (!isNode || fs) return;
+
+  fs = await import('fs');
+  path = await import('path');
+  zlib = await import('zlib');
+  util = await import('util');
+
+  gzip = util.promisify(zlib.gzip);
+  gunzip = util.promisify(zlib.gunzip);
+  writeFile = util.promisify(fs.writeFile);
+  readFile = util.promisify(fs.readFile);
+  mkdir = util.promisify(fs.mkdir);
+  readdir = util.promisify(fs.readdir);
+  unlink = util.promisify(fs.unlink);
+  stat = util.promisify(fs.stat);
+}
 
 export interface SaveMetadata {
   saveName: string;
@@ -60,6 +86,10 @@ export class SaveStateManager {
    * Initialize saves directory
    */
   async initialize(): Promise<void> {
+    if (!isNode) return;
+    await ensureNodeModules();
+    if (!fs || !mkdir) return;
+
     if (!fs.existsSync(this.savesDir)) {
       await mkdir(this.savesDir, { recursive: true });
     }
@@ -77,6 +107,21 @@ export class SaveStateManager {
       autoIncrement?: boolean;
     } = {}
   ): Promise<SaveMetadata> {
+    // Browser no-op
+    if (!isNode || !fs || !path || !mkdir || !gzip || !writeFile) {
+      console.warn('[SaveStateManager] Save operations not available in browser');
+      return {
+        saveName: options.saveName || 'browser_save',
+        sessionId,
+        timestamp: Date.now(),
+        day: 0,
+        tick: 0,
+        description: options.description,
+        agentCount: 0,
+        compressed: false,
+      };
+    }
+
     await this.initialize();
 
     const sessionDir = path.join(this.savesDir, sessionId);
@@ -149,6 +194,10 @@ export class SaveStateManager {
    * Load a saved state
    */
   async loadState(sessionId: string, saveName: string): Promise<SaveState> {
+    if (!isNode || !fs || !path || !readFile || !gunzip) {
+      throw new Error('Load operations not available in browser');
+    }
+
     const filePath = path.join(this.savesDir, sessionId, `${saveName}.json.gz`);
 
     if (!fs.existsSync(filePath)) {
@@ -168,6 +217,10 @@ export class SaveStateManager {
    * List all saves for a session
    */
   async listSaves(sessionId: string): Promise<SaveListEntry[]> {
+    if (!isNode || !fs || !path || !readdir) {
+      return [];
+    }
+
     const sessionDir = path.join(this.savesDir, sessionId);
 
     if (!fs.existsSync(sessionDir)) {
@@ -210,6 +263,11 @@ export class SaveStateManager {
    * Delete a save
    */
   async deleteSave(sessionId: string, saveName: string): Promise<void> {
+    if (!isNode || !fs || !path || !unlink) {
+      console.warn('[SaveStateManager] Delete operations not available in browser');
+      return;
+    }
+
     const filePath = path.join(this.savesDir, sessionId, `${saveName}.json.gz`);
 
     if (!fs.existsSync(filePath)) {
@@ -229,6 +287,10 @@ export class SaveStateManager {
     newSessionId: string,
     description?: string
   ): Promise<SaveMetadata> {
+    if (!isNode || !fs || !path || !mkdir || !gzip || !writeFile) {
+      throw new Error('Fork operations not available in browser');
+    }
+
     // Load the source save
     const sourceState = await this.loadState(sourceSessionId, saveName);
 
@@ -277,6 +339,7 @@ export class SaveStateManager {
    * Get save file path
    */
   getSavePath(sessionId: string, saveName: string): string {
+    if (!isNode || !path) return '';
     return path.join(this.savesDir, sessionId, `${saveName}.json.gz`);
   }
 
@@ -284,6 +347,7 @@ export class SaveStateManager {
    * Check if a save exists
    */
   saveExists(sessionId: string, saveName: string): boolean {
+    if (!isNode || !fs) return false;
     return fs.existsSync(this.getSavePath(sessionId, saveName));
   }
 
@@ -291,6 +355,10 @@ export class SaveStateManager {
    * Get total size of all saves for a session
    */
   async getSessionSaveSize(sessionId: string): Promise<number> {
+    if (!isNode || !fs || !path || !readdir || !stat) {
+      return 0;
+    }
+
     const sessionDir = path.join(this.savesDir, sessionId);
 
     if (!fs.existsSync(sessionDir)) {
@@ -314,6 +382,10 @@ export class SaveStateManager {
    * Delete all saves for a session
    */
   async deleteAllSaves(sessionId: string): Promise<number> {
+    if (!isNode || !fs || !path || !readdir || !unlink) {
+      return 0;
+    }
+
     const sessionDir = path.join(this.savesDir, sessionId);
 
     if (!fs.existsSync(sessionDir)) {

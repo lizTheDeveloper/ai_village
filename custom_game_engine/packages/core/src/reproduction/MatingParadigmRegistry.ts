@@ -6,7 +6,45 @@
  * humans, Gethenians, hive insects, mystifs, and quantum beings.
  */
 
-import type { MatingParadigm } from './MatingParadigm.js';
+import type { MatingParadigm, TemperamentDefinition } from './MatingParadigm.js';
+
+// ============================================================================
+// Pre-defined Temperaments (The Unraveling)
+// ============================================================================
+
+/** Pre-defined Staid temperament (The Unraveling) */
+export const STAID_TEMPERAMENT: TemperamentDefinition = {
+  id: 'staid',
+  name: 'Staid',
+  description: 'Rational, emotionally controlled, values stability and order. Expected to suppress emotional displays and approach problems logically.',
+  emotionalExpression: 0.2,
+  typicalActivities: ['administration', 'planning', 'arbitration', 'record_keeping', 'logistics'],
+  socialExpectations: [
+    'Maintain emotional composure',
+    'Prioritize reason over feeling',
+    'Provide stability in crises',
+    'Mediate disputes impartially',
+  ],
+  canChangeTo: false, // In The Unraveling, temperament is assigned
+  prevalence: 0.5,
+};
+
+/** Pre-defined Vail temperament (The Unraveling) */
+export const VAIL_TEMPERAMENT: TemperamentDefinition = {
+  id: 'vail',
+  name: 'Vail',
+  description: 'Emotional, expressive, values passion and authenticity. Expected to express feelings openly, engage in art, performance, and emotional labor.',
+  emotionalExpression: 0.9,
+  typicalActivities: ['art', 'dance', 'music', 'emotional_support', 'conflict_expression', 'celebration'],
+  socialExpectations: [
+    'Express emotions authentically',
+    'Create art and beauty',
+    'Handle emotional situations',
+    'Bring passion to endeavors',
+  ],
+  canChangeTo: false,
+  prevalence: 0.5,
+};
 
 // ============================================================================
 // Standard Humanoid Paradigm
@@ -1571,6 +1609,342 @@ export const SYMBIOTIC_PARADIGM: MatingParadigm = {
 };
 
 // ============================================================================
+// Unraveling Paradigm (Benjamin Rosenbaum - Multi-Body Collective)
+// ============================================================================
+
+/**
+ * The Unraveling Mating Paradigm
+ *
+ * Based on Benjamin Rosenbaum's novel "The Unraveling."
+ *
+ * Key features:
+ * - ~30 parents per child (large collective)
+ * - All parents are multi-body pack-minds (no singletons)
+ * - Distributed gestation across 3 carriers
+ * - Offspring born with multiple bodies (typically 3)
+ * - Staid/Vail temperament system (not gender - emotional orientation)
+ * - Council licensing required for reproduction
+ * - Software-layer consciousness (can crash/desync)
+ * - Parent hierarchy spanning generations
+ */
+export const UNRAVELING_PARADIGM: MatingParadigm = {
+  id: 'unraveling',
+  name: 'Unraveling Collective',
+  description: 'Multi-body beings who reproduce collectively with 30+ parents. Children are born with multiple bodies as single consciousnesses. Strict council approval required.',
+  speciesIds: ['unraveling', 'fullbelly', 'staidvail'],
+  lore: 'To create a new life is to weave thirty souls together. Each parent contributes, not genes alone, but intention. The child emerges with three bodies, one consciousness, and the weight of collective hope. The council must approve. The council always has opinions.',
+
+  biologicalSex: {
+    system: 'multi_sex',
+    sexes: [
+      {
+        id: 'carrier',
+        name: 'Carrier',
+        reproductiveRole: 'carrier',
+        prevalence: 0.33,
+        characteristics: ['can_gestate', 'distributed_pregnancy', 'one_body_gestates_at_a_time'],
+      },
+      {
+        id: 'sire',
+        name: 'Sire',
+        reproductiveRole: 'fertilizer',
+        prevalence: 0.33,
+        characteristics: ['genetic_contribution', 'supports_carriers'],
+      },
+      {
+        id: 'weaver',
+        name: 'Weaver',
+        reproductiveRole: 'both',
+        prevalence: 0.34,
+        characteristics: ['coordinates_collective', 'consciousness_shaping'],
+      },
+    ],
+    determination: 'genetic',
+    canChange: false,
+  },
+
+  gender: {
+    system: 'genderless',
+    genders: [
+      { id: 'person', name: 'Person', canChangeTo: false },
+    ],
+    separateFromSex: true,
+    socialSignificance: 'none',
+  },
+
+  // The third axis - Staid/Vail temperament
+  temperament: {
+    system: 'binary_staid_vail',
+    temperaments: [STAID_TEMPERAMENT, VAIL_TEMPERAMENT],
+    separateFromSexGender: true,
+    socialSignificance: 'defining',
+    conformityPressure: 'severe',
+    individualChoice: false,
+    publiclyVisible: true,
+  },
+
+  pairBonding: {
+    type: 'communal',
+    flexibility: 'cultural',
+    bondsBreakable: true,
+    breakageTrauma: 0.3,
+    bondEffects: [
+      { effectType: 'telepathy', intensity: 0.9, requiresProximity: false },
+      { effectType: 'mood_sync', intensity: 0.4, requiresProximity: false },
+    ],
+    description: 'All members of a reproductive collective are bonded. Individual romantic pairs may form within the collective, but reproduction is a group endeavor.',
+  },
+
+  courtship: {
+    type: 'collective_decision',
+    initiator: 'any',
+    duration: 'years',
+    rejectionPossible: true,
+    rejectionConsequence: 'severe_hurt',
+    competitive: true,
+    multipleCourtships: false,
+    stages: [
+      {
+        name: 'coalition_formation',
+        duration: 'months',
+        requirements: ['minimum_30_sponsors', 'all_multi_body'],
+        canFail: true,
+        failureConsequence: 'insufficient_support',
+      },
+      {
+        name: 'council_application',
+        duration: 'months',
+        requirements: ['complete_application', 'resource_verification', 'temperament_balance'],
+        canFail: true,
+        failureConsequence: 'council_rejection',
+      },
+      {
+        name: 'council_review',
+        duration: 'years',
+        requirements: ['council_approval', 'waiting_list_cleared'],
+        canFail: true,
+        failureConsequence: 'application_denied',
+      },
+      {
+        name: 'weaving_ritual',
+        duration: 'weeks',
+        requirements: ['all_parents_present', 'consciousness_sync'],
+        canFail: false,
+      },
+    ],
+    description: 'Reproduction requires forming a coalition of 30+ sponsors, all of whom must be multi-body. The council reviews applications, which can take years. Only approved reproductions proceed.',
+  },
+
+  reproduction: {
+    mechanism: 'resonance_fusion',
+    participantsRequired: 'collective_minimum',
+    frequency: 'triggered',
+    triggers: ['council_approval', 'consent_given', 'ritual_completion'],
+    gestationPeriod: {
+      durationDays: 270,
+      location: 'distributed_carriers',
+      careRequired: 'intensive',
+      carrierCount: 3,
+      carrierDistribution: 'parallel',
+      fatherInvolvement: 3,
+      carriersMustBeMultiBody: true,
+    },
+    offspringCount: {
+      min: 1,
+      max: 1,
+      typical: 1,
+      bodiesPerOffspring: 3,
+      minBodiesViable: 2,
+      maxBodiesPerOffspring: 5,
+      bodyCountDetermination: 'parent_derived',
+    },
+    geneticVariation: 'extreme',
+    requirements: [
+      'council_approval',
+      'minimum_30_parents',
+      'all_parents_multi_body',
+      '3_carriers',
+      '3_sires',
+      'consciousness_weaving_ritual',
+    ],
+    description: 'Three carriers each gestate one body of the same child. Three sires contribute genetic material. The remaining parents contribute to consciousness weaving. The child emerges as one mind with three bodies.',
+  },
+
+  parentalCare: {
+    type: 'communal_care',
+    provider: 'extended_family',
+    duration: 'years',
+    bondContinuesAfter: true,
+    recognizesOffspring: true,
+    description: 'All 30+ parents have ongoing relationships with the child. Parent hierarchy extends multiple generations - grandparents, great-grandparents all remain involved.',
+  },
+
+  mateSelection: {
+    primaryCriteria: ['compatibility', 'genetic_diversity', 'temperament_balance'],
+    secondaryCriteria: ['social_status', 'resources', 'council_standing'],
+    selector: 'collective',
+    choiceLevel: 'limited',
+    preferencesFixed: false,
+    description: 'The coalition self-selects, but the council has final approval. Temperament balance (mix of Staid and Vail) is required.',
+  },
+
+  maturityAge: { min: 25, max: 35, determinedBy: 'social' },
+  reproductiveWindow: { startAge: 35, endAge: 200, canRestart: false },
+
+  attraction: {
+    onset: 'familiarity',
+    fluidity: 'slow_change',
+    dimensions: [
+      { name: 'sexual', exists: true, intensityRange: [0, 1] },
+      { name: 'romantic', exists: true, intensityRange: [0, 1] },
+      { name: 'collective_affinity', exists: true, intensityRange: [0, 1] },
+      { name: 'temperament_complement', exists: true, intensityRange: [0, 1] },
+    ],
+    orientations: [
+      { id: 'staid_preference', name: 'Staid-Seeking', attractedTo: ['staid'], description: 'Prefers calm, rational partners' },
+      { id: 'vail_preference', name: 'Vail-Seeking', attractedTo: ['vail'], description: 'Prefers passionate, expressive partners' },
+      { id: 'balanced', name: 'Temperament-Balanced', attractedTo: ['staid', 'vail'], description: 'Attracted to both temperaments' },
+    ],
+    description: 'Attraction includes temperament preferences. Staid-Vail pairings are culturally encouraged for balance.',
+  },
+
+  emotionalDynamics: {
+    rejectionHurts: true,
+    rejectionIntensity: 0.7,
+    rejectionDecay: 'slow',
+    matingBondsEmotionally: true,
+    bondFormationRate: 'gradual',
+    mateLossGrief: true,
+    griefIntensity: 0.6,
+    griefDuration: 'extended',
+    heartbreakPossible: true,
+    heartbreakTriggers: ['council_rejection', 'coalition_dissolution', 'body_loss'],
+    heartbreakEffects: ['identity_fragmentation', 'temperament_crisis', 'network_desync'],
+  },
+
+  socialRegulation: {
+    regulated: true,
+    regulations: ['council_licensing', 'sponsor_coalition', 'temperament_balance', 'resource_quota'],
+    violationConsequences: ['offspring_unrecognized', 'social_ostracism', 'network_disconnection'],
+  },
+
+  hybridization: {
+    possible: false,
+    offspringViability: 'sterile',
+  },
+
+  paradigmCompatibility: 'isolated',
+
+  // =========================================================================
+  // Unraveling-Specific Extensions
+  // =========================================================================
+
+  collectiveReproduction: {
+    minimumParents: 30,
+    typicalParents: 35,
+    maximumParents: 50,
+    parentsRequireMultiBody: true,
+    parentHierarchy: {
+      generations: 4,
+      generationNames: ['Parents', 'Grandparents', 'Great-Grandparents', 'Ancestors'],
+      ancestorInvolvement: true,
+    },
+    parentOrganization: 'role_based',
+    parentRoles: [
+      {
+        id: 'carrier',
+        name: 'Carrier',
+        description: 'Gestates one of the child\'s bodies',
+        countRequired: 3,
+        responsibilities: ['gestation', 'body_nurturing', 'early_consciousness_imprinting'],
+        postBirthResponsibilities: ['body_care', 'physical_development'],
+      },
+      {
+        id: 'sire',
+        name: 'Sire',
+        description: 'Provides genetic material and supports carriers',
+        countRequired: 3,
+        responsibilities: ['genetic_contribution', 'carrier_support', 'resource_provision'],
+        postBirthResponsibilities: ['education', 'skill_training'],
+      },
+      {
+        id: 'weaver',
+        name: 'Weaver',
+        description: 'Coordinates consciousness formation',
+        countRequired: 6,
+        responsibilities: ['consciousness_shaping', 'network_integration', 'ritual_coordination'],
+        postBirthResponsibilities: ['network_mentorship', 'consciousness_development'],
+      },
+      {
+        id: 'sponsor',
+        name: 'Sponsor',
+        description: 'Supports the reproductive coalition politically and socially',
+        countRequired: 18,
+        responsibilities: ['political_support', 'council_advocacy', 'resource_contribution'],
+        postBirthResponsibilities: ['social_integration', 'extended_family'],
+      },
+    ],
+  },
+
+  multiBodyOffspring: {
+    enabled: true,
+    typicalBodyCount: 3,
+    minimumBodies: 2,
+    maximumBodies: 5,
+    bodyCountDetermination: 'carrier_count',
+    birthTiming: 'distributed',
+    distributedBirth: {
+      bodiesPerCarrier: 1,
+      carrierCount: 3,
+    },
+    consciousnessOnset: 'threshold',
+    consciousnessThreshold: 2,
+  },
+
+  reproductionLicensing: {
+    required: true,
+    approver: 'council',
+    governingBody: 'The Fertility Council',
+    requirements: {
+      minimumSponsors: 30,
+      resourceThreshold: 50000,
+      waitingList: true,
+      populationQuota: true,
+      temperamentBalance: true,
+    },
+    approvalTimeline: 'years',
+    appealable: true,
+    unsanctionedConsequences: [
+      'offspring_unrecognized',
+      'parents_fined',
+      'network_isolation',
+      'social_death',
+    ],
+  },
+
+  consciousnessNetwork: {
+    networked: true,
+    networkType: 'technological',
+    canFail: true,
+    failureCauses: [
+      'solar_flare',
+      'infrastructure_damage',
+      'overload',
+      'targeted_attack',
+    ],
+    failureEffects: {
+      confusion: true,
+      memoryLoss: false,
+      personalityDrift: true,
+      resyncTime: 'hours',
+      experienceLossPercent: 5,
+    },
+    forcedDisconnection: true,
+    disconnectionTrauma: true,
+  },
+};
+
+// ============================================================================
 // Registry
 // ============================================================================
 
@@ -1589,6 +1963,7 @@ export const MATING_PARADIGMS: Record<string, MatingParadigm> = {
   quantum: QUANTUM_PARADIGM,
   temporal: TEMPORAL_PARADIGM,
   asexual: ASEXUAL_PARADIGM,
+  unraveling: UNRAVELING_PARADIGM,
 };
 
 /**

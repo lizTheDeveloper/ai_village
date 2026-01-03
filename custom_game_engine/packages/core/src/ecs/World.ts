@@ -215,6 +215,9 @@ export interface World {
    * Returns null if tile doesn't exist.
    */
   getTileData?(x: number, y: number): { fertility?: number; moisture?: number } | null;
+
+  /** Get a system by ID */
+  getSystem(systemId: string): import('./System.js').System | undefined;
 }
 
 /**
@@ -264,6 +267,7 @@ export class WorldImpl implements WorldMutator {
   private buildingRegistry?: BuildingBlueprintRegistry;
   private _craftingSystem?: import('../crafting/CraftingSystem.js').CraftingSystem;
   private _itemInstanceRegistry?: import('../items/ItemInstanceRegistry.js').ItemInstanceRegistry;
+  private _systemRegistry?: import('./SystemRegistry.js').ISystemRegistry;
 
   // Simulation scheduling for performance optimization
   private _simulationScheduler = new SimulationScheduler();
@@ -271,9 +275,10 @@ export class WorldImpl implements WorldMutator {
   // Spatial indices (will be populated as needed)
   private chunkIndex = new Map<string, Set<EntityId>>();
 
-  constructor(eventBus: EventBus, chunkManager?: IChunkManager) {
+  constructor(eventBus: EventBus, chunkManager?: IChunkManager, systemRegistry?: import('./SystemRegistry.js').ISystemRegistry) {
     this._eventBus = eventBus;
     this._chunkManager = chunkManager;
+    this._systemRegistry = systemRegistry;
     this._gameTime = {
       totalTicks: 0,
       ticksPerHour: 1200, // 1 hour = 1 minute real time at 20 TPS
@@ -485,6 +490,17 @@ export class WorldImpl implements WorldMutator {
   setFeature(feature: string, enabled: boolean): void {
     this._features.set(feature, enabled);
     this._featuresCache = null;
+  }
+
+  getSystem(systemId: string): import('./System.js').System | undefined {
+    console.log('[World.getSystem] Called with systemId:', systemId, 'registry:', this._systemRegistry);
+    if (!this._systemRegistry) {
+      console.warn('[World.getSystem] No systemRegistry!');
+      return undefined;
+    }
+    const system = this._systemRegistry.get(systemId);
+    console.log('[World.getSystem] Found system:', system);
+    return system;
   }
 
   private calculateGameTime(tick: Tick): GameTime {

@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
+// Browser-compatible bug reporter
+// Only uses Node.js APIs when running in Node.js environment
 
 export interface BugReport {
   id: string;
@@ -14,14 +14,35 @@ export interface BugReport {
   stackTrace?: string;
 }
 
+// Check if running in Node.js
+const isNode = typeof process !== 'undefined' && process.versions?.node;
+
+// Lazy-load Node.js modules only when needed
+let fs: typeof import('fs') | null = null;
+let path: typeof import('path') | null = null;
+
+async function ensureNodeModules(): Promise<void> {
+  if (!isNode) return;
+  if (!fs) fs = await import('fs');
+  if (!path) path = await import('path');
+}
+
 export class BugReporter {
-  private static bugReportsDir = path.join(process.cwd(), 'bug-reports', 'active');
-  private static resolvedDir = path.join(process.cwd(), 'bug-reports', 'resolved');
+  private static get bugReportsDir(): string {
+    if (!isNode || !path) return '';
+    return path.join(process.cwd(), 'bug-reports', 'active');
+  }
+
+  private static get resolvedDir(): string {
+    if (!isNode || !path) return '';
+    return path.join(process.cwd(), 'bug-reports', 'resolved');
+  }
 
   /**
    * Ensure bug reports directories exist
    */
   private static ensureDirectories(): void {
+    if (!isNode || !fs) return;
     if (!fs.existsSync(this.bugReportsDir)) {
       fs.mkdirSync(this.bugReportsDir, { recursive: true });
     }
@@ -52,8 +73,6 @@ export class BugReporter {
     details?: Record<string, unknown>;
     stackTrace?: string;
   }): string {
-    this.ensureDirectories();
-
     const bugReport: BugReport = {
       id: this.generateId(),
       timestamp: new Date().toISOString(),
@@ -67,9 +86,15 @@ export class BugReporter {
       stackTrace: options.stackTrace
     };
 
+    // In browser, just log to console
+    if (!isNode || !fs || !path) {
+      console.error('[BugReporter]', bugReport);
+      return bugReport.id;
+    }
+
+    this.ensureDirectories();
     const filename = `${bugReport.id}.json`;
     const filepath = path.join(this.bugReportsDir, filename);
-
     fs.writeFileSync(filepath, JSON.stringify(bugReport, null, 2), 'utf-8');
 
     return bugReport.id;
@@ -124,6 +149,8 @@ export class BugReporter {
    * Move a bug report to resolved
    */
   public static resolveBugReport(bugId: string): void {
+    if (!isNode || !fs || !path) return;
+
     const activeFile = path.join(this.bugReportsDir, `${bugId}.json`);
     const resolvedFile = path.join(this.resolvedDir, `${bugId}.json`);
 
@@ -136,6 +163,8 @@ export class BugReporter {
    * Get all active bug reports
    */
   public static getActiveBugReports(): BugReport[] {
+    if (!isNode || !fs || !path) return [];
+
     this.ensureDirectories();
 
     const files = fs.readdirSync(this.bugReportsDir);

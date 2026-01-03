@@ -2,9 +2,34 @@
 
 > *This project is dedicated to Tarn Adams and Dwarf Fortress. See [README.md](./README.md) for our philosophy on open source, monetization, and the inspirations behind this project.*
 
+## 📚 Architecture Documentation
+
+**Complete architecture documentation is located in `custom_game_engine/`:**
+
+- **[custom_game_engine/ARCHITECTURE_OVERVIEW.md](./custom_game_engine/ARCHITECTURE_OVERVIEW.md)** - Master architecture document (ECS, packages, metasystems, data flow)
+- **[custom_game_engine/SYSTEMS_CATALOG.md](./custom_game_engine/SYSTEMS_CATALOG.md)** - Complete reference of all 212+ systems with priorities, components, and locations
+- **[custom_game_engine/COMPONENTS_REFERENCE.md](./custom_game_engine/COMPONENTS_REFERENCE.md)** - All 125+ component types with data fields and usage examples
+- **[custom_game_engine/METASYSTEMS_GUIDE.md](./custom_game_engine/METASYSTEMS_GUIDE.md)** - Deep dives into major metasystems (Consciousness, Divinity, Reproduction, Multiverse, Magic, Realms, etc.)
+
+**Read these documents first** to understand the codebase architecture before making changes.
+
+## 📋 Feature Specifications & Work Planning
+
+**All feature specifications are in OpenSpec:**
+
+- **[openspec/specs/](./openspec/specs/)** - System specifications organized by domain (communication, automation, building, divinity, magic, etc.)
+- **[openspec/README.md](./openspec/README.md)** - Overview of the OpenSpec workflow
+- **[openspec/AGENTS.md](./openspec/AGENTS.md)** - Detailed guide for agents working with specs
+- **[openspec/changes/](./openspec/changes/)** - Active proposals and work in progress
+
+**When working on new features:**
+1. Check `openspec/specs/[system-name]/` for existing specifications
+2. Create proposals in `openspec/changes/` following the workflow
+3. Never create specs in random locations - use OpenSpec structure
+
 ## Project Roadmap
 
-The master development roadmap is located at [MASTER_ROADMAP.md](../MASTER_ROADMAP.md) in the project root. This document outlines the project's development phases, completed features, and planned work.
+The master development roadmap is located at [MASTER_ROADMAP.md](./MASTER_ROADMAP.md) in the project root. This document outlines the project's development phases, completed features, and planned work.
 
 ## Help System
 
@@ -502,6 +527,45 @@ curl http://localhost:8766/metrics/summary
 - **Resources** - gathered/consumed totals
 - **Conversations** - social interaction count
 - **Issues/Warnings** - stuck agents, duplicate buildings, loops
+
+## Orchestration Dashboard (Autonomous Development)
+
+The orchestration dashboard manages autonomous development agents and work orders.
+
+**Location:** `agents/autonomous-dev/dashboard/`
+**Port:** `http://localhost:3030`
+
+### Starting the Orchestration Dashboard
+
+```bash
+cd agents/autonomous-dev/dashboard
+node server.js
+```
+
+### Using the Orchestration Dashboard
+
+The orchestration dashboard provides:
+- **Work order management** - View, create, assign work orders
+- **Agent coordination** - Track autonomous agent progress
+- **LLM interface** - Submit tasks to autonomous development agents
+- **Build status** - Monitor compilation and test results
+
+### Querying the Orchestration Dashboard
+
+```bash
+# Check dashboard status
+curl http://localhost:3030/
+
+# View work orders
+curl http://localhost:3030/api/work-orders
+
+# Submit a work order (via LLM interface)
+curl -X POST http://localhost:3030/api/submit \
+  -H "Content-Type: application/json" \
+  -d '{"workOrder": "threat-detection-system", "priority": "high"}'
+```
+
+**Note:** The orchestration dashboard (port 3030) is separate from the game metrics dashboard (port 8766).
 
 ## Playwright MCP Usage
 

@@ -229,6 +229,61 @@ export const CLARKETECH_RESEARCH: ResearchDefinition[] = [
       { type: 'building', buildingId: 'teleport_pad' },
       { type: 'ability', abilityId: 'short_range_teleport' },
       { type: 'research', researchId: 'wormhole_gates' },
+      { type: 'research', researchId: 'stable_inter_universe_portals' },
+    ],
+    type: 'predefined',
+  },
+  {
+    id: 'stable_inter_universe_portals',
+    name: 'Stable Inter-Universe Portals',
+    description:
+      'Create permanent gateways between different β-branches. Cross-universe trade and travel become routine. Your timeline is just one of many accessible realities.',
+    field: CLARKETECH_FIELD,
+    tier: 7,
+    progressRequired: 60000,
+    prerequisites: ['local_teleportation'],
+    requiredBuilding: 'teleport_pad',
+    unlocks: [
+      { type: 'building', buildingId: 'inter_universe_portal' },
+      { type: 'ability', abilityId: 'cross_universe_travel' },
+      { type: 'research', researchId: 'cross_realm_messaging' },
+      { type: 'research', researchId: 'stable_inter_multiverse_portals' },
+    ],
+    type: 'predefined',
+  },
+  {
+    id: 'cross_realm_messaging',
+    name: 'Cross-Realm Messaging',
+    description:
+      'Send messages across β-space using quantum entanglement and mana resonance. Text communication that transcends timeline branches. "New message from alternate you" becomes a daily notification.',
+    field: CLARKETECH_FIELD,
+    tier: 7,
+    progressRequired: 35000,
+    prerequisites: ['stable_inter_universe_portals', 'neural_interface'],
+    requiredBuilding: 'inter_universe_portal',
+    unlocks: [
+      { type: 'item', itemId: 'basic_cross_realm_phone' },
+      { type: 'building', buildingId: 'mana_charging_station' },
+      { type: 'research', researchId: 'advanced_cross_realm_communication' },
+    ],
+    type: 'predefined',
+  },
+  {
+    id: 'advanced_cross_realm_communication',
+    name: 'Advanced Cross-Realm Communication',
+    description:
+      'Voice and video calls across universes. See your trading partners in real-time despite being in orthogonal β-branches. Conference calls that span multiple realities.',
+    field: CLARKETECH_FIELD,
+    tier: 7,
+    progressRequired: 45000,
+    prerequisites: ['cross_realm_messaging', 'hive_mind_link'],
+    requiredBuilding: 'inter_universe_portal',
+    unlocks: [
+      { type: 'item', itemId: 'advanced_cross_realm_phone' },
+      { type: 'item', itemId: 'range_boost_rune' },
+      { type: 'item', itemId: 'clarity_rune' },
+      { type: 'item', itemId: 'privacy_rune' },
+      { type: 'item', itemId: 'recording_rune' },
     ],
     type: 'predefined',
   },
@@ -236,6 +291,42 @@ export const CLARKETECH_RESEARCH: ResearchDefinition[] = [
   // ==========================================================================
   // TIER 8 - Transcendent
   // ==========================================================================
+  {
+    id: 'stable_inter_multiverse_portals',
+    name: 'Stable Inter-Multiverse Portals',
+    description:
+      'Bridge entire multiverses. Travel not just between timelines, but between fundamentally different realities. Visit root.digital.*, root.quantum.*, root.transcendent.* - regions of β-space with alien physics.',
+    field: CLARKETECH_FIELD,
+    tier: 8,
+    progressRequired: 250000,
+    prerequisites: ['stable_inter_universe_portals', 'wormhole_gates'],
+    requiredBuilding: 'wormhole_gate',
+    unlocks: [
+      { type: 'building', buildingId: 'inter_multiverse_portal' },
+      { type: 'ability', abilityId: 'cross_multiverse_travel' },
+      { type: 'research', researchId: 'transcendent_communication' },
+    ],
+    type: 'predefined',
+  },
+  {
+    id: 'transcendent_communication',
+    name: 'Transcendent Multiverse Communication',
+    description:
+      'The ultimate communication technology. Contact civilizations in orthogonal β-space. Reach post-temporal hive minds in root.transcendent.*. Send emergency beacons across 100 branch depths. Essential for 10th-dimensional diplomacy.',
+    field: CLARKETECH_FIELD,
+    tier: 8,
+    progressRequired: 300000,
+    prerequisites: ['stable_inter_multiverse_portals', 'advanced_cross_realm_communication', 'mind_upload'],
+    requiredBuilding: 'inter_multiverse_portal',
+    unlocks: [
+      { type: 'item', itemId: 'transcendent_multiverse_phone' },
+      { type: 'item', itemId: 'emergency_beacon_rune' },
+      { type: 'item', itemId: 'multi_party_rune' },
+      { type: 'ability', abilityId: 'contact_orthogonal_civilizations' },
+      { type: 'knowledge', knowledgeId: 'post_temporal_diplomacy' },
+    ],
+    type: 'predefined',
+  },
   {
     id: 'replicator',
     name: 'Replicator',

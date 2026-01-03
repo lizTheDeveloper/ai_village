@@ -24,6 +24,11 @@
  *   DELETE /api/save?session=<id>&save=<name> - Delete a save
  *   GET    /api/save-load              - API help and documentation
  *
+ * Sprite Generation API (On-Demand Asset Creation):
+ *   POST /api/sprites/generate          - Queue sprite generation for missing assets
+ *   GET  /api/sprites/generate/status/:folderId - Check generation status
+ *   GET  /api/sprites/queue              - List pending sprite generation jobs
+ *
  * Unified Dashboard Views (shared with Player UI):
  *   GET /views               - List all available views
  *   GET /view/:id            - Get view data as formatted text
@@ -241,6 +246,116 @@ interface PendingQuery {
 // Track pending queries waiting for responses from game clients
 const pendingQueries = new Map<string, PendingQuery>();
 const QUERY_TIMEOUT_MS = 5000;
+
+// ============================================================
+// Sprite Generation System
+// ============================================================
+
+interface SpriteGenerationJob {
+  folderId: string;
+  characterId: string;
+  status: 'queued' | 'generating' | 'downloading' | 'complete' | 'failed';
+  queuedAt: number;
+  completedAt?: number;
+  error?: string;
+  description: string;
+  traits: {
+    species?: string;
+    gender?: string;
+    hairColor?: string;
+    skinTone?: string;
+  };
+}
+
+// Track sprite generation jobs
+const spriteGenerationJobs = new Map<string, SpriteGenerationJob>();
+const SPRITES_DIR = path.join(process.cwd(), 'packages', 'renderer', 'assets', 'sprites', 'pixellab');
+
+// Ensure sprites directory exists
+if (!fs.existsSync(SPRITES_DIR)) {
+  fs.mkdirSync(SPRITES_DIR, { recursive: true });
+}
+
+/**
+ * Queue a sprite generation request
+ */
+function queueSpriteGeneration(
+  folderId: string,
+  description: string,
+  traits: SpriteGenerationJob['traits']
+): void {
+  // Check if already exists or generating
+  if (spriteGenerationJobs.has(folderId)) {
+    console.log(`[SpriteGen] Already queued/generating: ${folderId}`);
+    return;
+  }
+
+  // Check if sprite already exists on disk
+  const spritePath = path.join(SPRITES_DIR, folderId);
+  if (fs.existsSync(spritePath)) {
+    console.log(`[SpriteGen] Already exists on disk: ${folderId}`);
+    return;
+  }
+
+  // Queue the request (to be processed manually or automatically)
+  const job: SpriteGenerationJob = {
+    folderId,
+    characterId: '', // Will be set when generation starts
+    status: 'queued',
+    queuedAt: Date.now(),
+    description,
+    traits,
+  };
+
+  spriteGenerationJobs.set(folderId, job);
+  console.log(`[SpriteGen] Queued: ${folderId}`);
+  console.log(`[SpriteGen] Description: ${description}`);
+
+  // Save queue to file for Claude to process
+  saveGenerationQueue();
+}
+
+/**
+ * Save generation queue to file for manual processing
+ */
+function saveGenerationQueue(): void {
+  const queueFile = path.join(process.cwd(), 'sprite-generation-queue.json');
+  const queueData = Array.from(spriteGenerationJobs.values()).filter(
+    job => job.status === 'queued' || job.status === 'generating'
+  );
+
+  fs.writeFileSync(queueFile, JSON.stringify(queueData, null, 2));
+  console.log(`[SpriteGen] Saved ${queueData.length} pending jobs to sprite-generation-queue.json`);
+}
+
+/**
+ * Mark sprite generation as complete
+ */
+function markSpriteComplete(folderId: string): void {
+  const job = spriteGenerationJobs.get(folderId);
+  if (!job) return;
+
+  job.status = 'complete';
+  job.completedAt = Date.now();
+
+  console.log(`[SpriteGen] Completed: ${folderId} (took ${job.completedAt - job.queuedAt}ms)`);
+  saveGenerationQueue();
+}
+
+/**
+ * Mark sprite generation as failed
+ */
+function markSpriteFailed(folderId: string, error: string): void {
+  const job = spriteGenerationJobs.get(folderId);
+  if (!job) return;
+
+  job.status = 'failed';
+  job.error = error;
+  job.completedAt = Date.now();
+
+  console.error(`[SpriteGen] Failed: ${folderId} - ${error}`);
+  saveGenerationQueue();
+}
 
 /**
  * Send a query to a connected game client and wait for response
@@ -4776,6 +4891,95 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
 ================================================================================
 `;
     res.end(helpText);
+    return;
+  }
+
+  // === Sprite Generation API ===
+  if (pathname === '/api/sprites/generate' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+
+    req.on('end', () => {
+      try {
+        const { folderId, traits, description } = JSON.parse(body);
+
+        if (!folderId || !description) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ error: 'Missing folderId or description' }));
+          return;
+        }
+
+        // Queue the generation request
+        queueSpriteGeneration(folderId, description, traits || {});
+
+        const job = spriteGenerationJobs.get(folderId);
+        res.end(JSON.stringify({
+          status: job?.status || 'queued',
+          folderId,
+          message: 'Sprite generation queued. Check sprite-generation-queue.json and process with PixelLab MCP tools.',
+        }));
+      } catch (error) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({
+          error: error instanceof Error ? error.message : 'Failed to queue sprite generation',
+        }));
+      }
+    });
+
+    return;
+  }
+
+  if (pathname.startsWith('/api/sprites/generate/status/')) {
+    res.setHeader('Content-Type', 'application/json');
+
+    const folderId = pathname.replace('/api/sprites/generate/status/', '');
+
+    // Check if sprite exists on disk
+    const spritePath = path.join(SPRITES_DIR, folderId);
+    if (fs.existsSync(spritePath)) {
+      res.end(JSON.stringify({ status: 'complete', folderId }));
+      return;
+    }
+
+    // Check generation job status
+    const job = spriteGenerationJobs.get(folderId);
+    if (!job) {
+      res.statusCode = 404;
+      res.end(JSON.stringify({ status: 'not_found', folderId, error: 'No generation job found' }));
+      return;
+    }
+
+    res.end(JSON.stringify({
+      status: job.status,
+      folderId,
+      queuedAt: job.queuedAt,
+      error: job.error,
+    }));
+
+    return;
+  }
+
+  if (pathname === '/api/sprites/queue') {
+    res.setHeader('Content-Type', 'application/json');
+
+    const pending = Array.from(spriteGenerationJobs.values()).filter(
+      job => job.status === 'queued' || job.status === 'generating'
+    );
+
+    res.end(JSON.stringify({
+      pending: pending.length,
+      jobs: pending.map(job => ({
+        folderId: job.folderId,
+        status: job.status,
+        description: job.description,
+        queuedAt: job.queuedAt,
+      })),
+    }));
+
     return;
   }
 

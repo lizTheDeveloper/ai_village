@@ -9,6 +9,7 @@ import type {
 } from '../components/index.js';
 import {
   calculatePossessionCost,
+  calculateCrossUniverseMultiplier,
   shouldEndPossession,
 } from '../components/PlayerControlComponent.js';
 
@@ -94,6 +95,24 @@ export class PossessionSystem implements System {
       return;
     }
 
+    // Calculate cross-universe multiplier if applicable
+    const isCrossUniverse = !!(
+      playerControl.deityUniverseId &&
+      playerControl.possessedUniverseId &&
+      playerControl.deityUniverseId !== playerControl.possessedUniverseId
+    );
+
+    const isSameMultiverse = !!(
+      playerControl.deityMultiverseId &&
+      playerControl.possessedMultiverseId &&
+      playerControl.deityMultiverseId === playerControl.possessedMultiverseId
+    );
+
+    const crossUniverseMultiplier = calculateCrossUniverseMultiplier(
+      isCrossUniverse,
+      isSameMultiverse
+    );
+
     // Calculate and apply belief cost
     const isMoving = playerControl.movementCommand !== null;
     // Combat-like behaviors that increase possession cost
@@ -104,7 +123,8 @@ export class PossessionSystem implements System {
       this.baseCostPerTick,
       isMoving,
       isInCombat,
-      isUsingAbility
+      isUsingAbility,
+      crossUniverseMultiplier
     );
 
     // Apply cost

@@ -60,6 +60,28 @@ export interface PlayerControlComponent extends Component {
    * Used for click-to-interact mechanics
    */
   pendingInteraction: PendingInteraction | null;
+
+  /**
+   * Cross-universe possession tracking
+   * Universe where the deity entity resides (home universe)
+   */
+  deityUniverseId?: string;
+
+  /**
+   * Multiverse where the deity has power
+   */
+  deityMultiverseId?: string;
+
+  /**
+   * Universe where the possessed entity currently resides
+   * If different from deityUniverseId, belief costs are scaled
+   */
+  possessedUniverseId?: string | null;
+
+  /**
+   * Multiverse where the possessed entity currently resides
+   */
+  possessedMultiverseId?: string | null;
 }
 
 /**
@@ -113,6 +135,27 @@ export function createPlayerControlComponent(): PlayerControlComponent {
 }
 
 /**
+ * Calculate cross-universe belief cost multiplier.
+ * Possessing entities in different universes costs more belief.
+ */
+export function calculateCrossUniverseMultiplier(
+  isCrossUniverse: boolean,
+  isSameMultiverse: boolean
+): number {
+  if (!isCrossUniverse) {
+    return 1.0; // Same universe - no multiplier
+  }
+
+  if (isSameMultiverse) {
+    return 2.0; // Different universe, same multiverse - 2x cost
+  }
+
+  // Foreign multiverse - should not happen (auto jack-out)
+  // But if somehow maintained (e.g., avatar), very expensive
+  return 10.0;
+}
+
+/**
  * Calculate belief cost for possession based on activity
  * Higher activity = higher cost
  */
@@ -120,7 +163,8 @@ export function calculatePossessionCost(
   baseRate: number,
   isMoving: boolean,
   isInCombat: boolean,
-  isUsingAbility: boolean
+  isUsingAbility: boolean,
+  crossUniverseMultiplier: number = 1.0
 ): number {
   let cost = baseRate;
 
@@ -135,6 +179,9 @@ export function calculatePossessionCost(
   if (isUsingAbility) {
     cost *= 3.0; // Triple cost when using divine abilities
   }
+
+  // Apply cross-universe multiplier
+  cost *= crossUniverseMultiplier;
 
   return cost;
 }

@@ -14,28 +14,21 @@ import { createRelationshipComponent } from '../components/RelationshipComponent
 import { createEpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 import { createConversationComponent } from '../components/ConversationComponent.js';
 import { createRenderableComponent } from '../components/RenderableComponent.js';
+import {
+  getDeathGodByIndex,
+  getDeathGodSpritePath,
+  type DeathGodConfig,
+} from './DeathGodSpriteRegistry.js';
+
+let deathGodIndex = 0;
 
 /**
- * Default names for the God of Death (cycling through mythological equivalents)
+ * Get the next death god (cycles through registry)
  */
-const DEATH_GOD_NAMES = [
-  'Thanatos',  // Greek
-  'Anubis',    // Egyptian
-  'Hel',       // Norse
-  'Morrigan',  // Celtic
-  'Yama',      // Hindu/Buddhist
-  'Ankou',     // Breton
-];
-
-let deathGodNameIndex = 0;
-
-/**
- * Get the next death god name (cycles through mythology)
- */
-function getNextDeathGodName(): string {
-  const name = DEATH_GOD_NAMES[deathGodNameIndex % DEATH_GOD_NAMES.length] || 'Thanatos';
-  deathGodNameIndex++;
-  return name;
+function getNextDeathGod(): DeathGodConfig {
+  const god = getDeathGodByIndex(deathGodIndex);
+  deathGodIndex++;
+  return god;
 }
 
 /**
@@ -43,21 +36,21 @@ function getNextDeathGodName(): string {
  *
  * @param world - The world to create the entity in
  * @param location - Initial spawn location (typically where first death occurred)
- * @param customName - Optional custom name (defaults to cycling through mythological names)
+ * @param godConfig - Optional specific death god config (defaults to cycling through registry)
  * @returns The created God of Death entity
  */
 export function createGodOfDeath(
   world: World,
   location: { x: number; y: number },
-  customName?: string
+  godConfig?: DeathGodConfig
 ): Entity {
-  const name = customName || getNextDeathGodName();
+  const config = godConfig || getNextDeathGod();
 
   // Create the entity
   const entity = world.createEntity();
 
   // Identity - God of Death
-  const identity = createIdentityComponent(name);
+  const identity = createIdentityComponent(config.name);
   (entity as any).addComponent(identity);
 
   // Position - manifests at death location
@@ -70,13 +63,14 @@ export function createGodOfDeath(
     'immortal',
     'death_god',
     'psychopomp',
-    'conversational' // Can be talked to
+    'conversational', // Can be talked to
+    `origin:${config.origin}` // Track cultural origin
   );
   (entity as any).addComponent(tags);
 
-  // Renderable - visual appearance
-  // TODO: Replace with actual death god sprite when available
-  const renderable = createRenderableComponent('?', 'entity'); // Placeholder sprite
+  // Renderable - PixelLab sprite (8-directional AI-generated character)
+  const spritePath = getDeathGodSpritePath(config);
+  const renderable = createRenderableComponent(spritePath, 'entity');
   (entity as any).addComponent(renderable);
 
   // Episodic Memory - remembers all death bargains and interactions

@@ -1,0 +1,88 @@
+.cultural-view {
+}
+
+.cultural-content {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.cultural-content .chart-card:first-child {
+  grid-column: 1 / -1;
+}
+
+.influencers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.influencer-item {
+  padding: 1rem;
+  background: #2a2a2a;
+  border-radius: 4px;
+  border: 1px solid #333;
+}
+
+.influencer-name {
+  font-weight: bold;
+  color: #646cff;
+  margin-bottom: 0.5rem;
+}
+
+.influencer-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: #888;
+}
+
+.spread-count {
+  color: #4caf50;
+}
+
+.transmission-rates {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.rate-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.behavior-name {
+  min-width: 100px;
+  font-weight: bold;
+}
+
+.rate-bar {
+  flex: 1;
+  height: 20px;
+  background: #333;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.rate-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #646cff, #4caf50);
+  transition: width 0.3s ease;
+}
+
+.rate-value {
+  min-width: 50px;
+  text-align: right;
+}
+
+@media (max-width: 1024px) {
+  .cultural-content {
+    grid-template-columns: 1fr;
+  }
+
+  .cultural-content .chart-card:first-child {
+    grid-column: 1;
+  }
+}

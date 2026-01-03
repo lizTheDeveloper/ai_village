@@ -1,0 +1,30 @@
+.spatial-view {
+}
+
+.layer-toggles {
+  display: flex;
+  gap: 1rem;
+}
+
+.layer-toggles label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.spatial-container {
+  background: #1a1a1a;
+  border-radius: 8px;
+  border: 1px solid #333;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.spatial-container canvas {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}

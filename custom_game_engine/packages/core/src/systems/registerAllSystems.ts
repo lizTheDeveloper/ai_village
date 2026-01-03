@@ -168,6 +168,7 @@ import { DeathJudgmentSystem } from './DeathJudgmentSystem.js';
 // import { DeathBargainSystem } from './DeathBargainSystem.js'; // Temporarily disabled - incomplete implementation
 // import { DeathTransitionSystem } from './DeathTransitionSystem.js'; // Temporarily disabled - incomplete implementation
 import { AfterlifeMemoryFadingSystem } from './AfterlifeMemoryFadingSystem.js';
+import { WisdomGoddessSystem } from './WisdomGoddessSystem.js';
 import { RealmManager } from './RealmManager.js';
 import { AfterlifeNeedsSystem } from './AfterlifeNeedsSystem.js';
 import { AncestorTransformationSystem } from './AncestorTransformationSystem.js';
@@ -402,7 +403,8 @@ export function registerAllSystems(
   // MythGenerationSystem requires llmQueue, so skip if not provided
 
   // Chat Rooms - General chat system (DMs, group chats, divine chat, etc.)
-  gameLoop.systemRegistry.register(new ChatRoomSystem());
+  const chatRoomSystem = new ChatRoomSystem();
+  gameLoop.systemRegistry.register(chatRoomSystem);
 
   // Divine Chat - DEPRECATED: Wrapper for backwards compatibility
   // TODO: Remove once all consumers migrate to ChatRoomSystem
@@ -498,22 +500,16 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new ReincarnationSystem());
   gameLoop.systemRegistry.register(new AfterlifeMemoryFadingSystem());
 
+  // Wisdom Goddess - manifests when pending approvals pile up, posts to divine chat
+  const wisdomGoddessSystem = new WisdomGoddessSystem();
+  wisdomGoddessSystem.setChatRoomSystem(chatRoomSystem);
+  gameLoop.systemRegistry.register(wisdomGoddessSystem);
+
   // ============================================================================
   // AUTOMATION & FACTORIES (Phase 38)
   // ============================================================================
-  // Factory automation systems for Dyson Swarm construction
-  // Priority order: PowerGrid (51) → Belt (53) → DirectConnection (54) → Assembly (54) → FactoryAI (48) → OffScreen (49)
-
-  gameLoop.systemRegistry.register(new PowerGridSystem());
-  gameLoop.systemRegistry.register(new BeltSystem());
-  gameLoop.systemRegistry.register(new DirectConnectionSystem());
-  gameLoop.systemRegistry.register(new AssemblyMachineSystem());
-
-  // Factory AI - Autonomous factory management (priority 48)
-  gameLoop.systemRegistry.register(new FactoryAISystem());
-
-  // Off-Screen Production - Performance optimization (priority 49)
-  gameLoop.systemRegistry.register(new OffScreenProductionSystem());
+  // Factory automation systems already registered above (lines 342-349)
+  // Systems: PowerGrid, Belt, DirectConnection, Assembly, FactoryAI, OffScreen
 
   // ============================================================================
   // GOVERNANCE

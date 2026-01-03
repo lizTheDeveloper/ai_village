@@ -120,23 +120,14 @@ Then open http://localhost:3000
 - Debug info showing tick count, game time, etc.
 - 20 TPS game loop running smoothly
 
-### Next Steps: Phase 1
+### Architecture & Specifications
 
-See `architecture/IMPLEMENTATION_ROADMAP.md` for the full plan.
+All specifications and design documents are in the OpenSpec directory:
+- `../openspec/specs/` - System specifications organized by domain
+- `../openspec/README.md` - Overview of the OpenSpec workflow
+- `../openspec/AGENTS.md` - Guide for agents working with specs
 
-**Phase 1: A World Exists**
-- Chunk system (32x32 tiles)
-- Procedural terrain generation (Perlin noise)
-- Biomes (grass, forest, water, stone, sand)
-- Trees and rocks as first entities
-- Infinite scrolling world
-
-### Architecture
-
-All core interfaces are defined in:
-- `architecture/INTERFACES.ts` - TypeScript contracts
-- `architecture/CORE_ARCHITECTURE.md` - Design patterns
-- `architecture/IMPLEMENTATION_ROADMAP.md` - Phase-by-phase plan
+For implementation details, see the relevant spec in `../openspec/specs/[system-name]/`
 
 ### Key Design Decisions
 

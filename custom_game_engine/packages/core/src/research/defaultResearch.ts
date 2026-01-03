@@ -487,6 +487,324 @@ export const TIER_4_RESEARCH: ResearchDefinition[] = [
 ];
 
 // ============================================================================
+// DISCOVERY NODES - Unlock LLM-generated technologies in sparse fields
+// These allow agents to propose new research in under-developed areas
+// ============================================================================
+
+export const DISCOVERY_NODE_RESEARCH: ResearchDefinition[] = [
+  // Alchemy Discovery Path
+  defineResearch(
+    'alchemy_foundations',
+    'Alchemical Foundations',
+    'Study the fundamental principles of transformation and transmutation, opening paths to new discoveries.',
+    'alchemy',
+    2,
+    {
+      progressRequired: 150,
+      prerequisites: ['nature_i', 'cuisine_i'],
+      unlocks: [
+        { type: 'knowledge', knowledgeId: 'transmutation_theory' },
+        { type: 'generated', generationType: 'alchemy_discovery' },
+      ],
+    }
+  ),
+
+  defineResearch(
+    'alchemy_experimentation',
+    'Alchemical Experimentation',
+    'Master the art of combining reagents to discover new potions and transformations.',
+    'alchemy',
+    4,
+    {
+      progressRequired: 400,
+      prerequisites: ['alchemy_i'],
+      requiredBuilding: 'alchemy_lab',
+      unlocks: [
+        { type: 'ability', abilityId: 'alchemical_experiment' },
+        { type: 'generated', generationType: 'advanced_alchemy' },
+      ],
+    }
+  ),
+
+  // Cuisine Discovery Path
+  defineResearch(
+    'culinary_arts',
+    'Culinary Arts',
+    'Elevate cooking from survival to art. Discover new flavor combinations and preservation techniques.',
+    'cuisine',
+    3,
+    {
+      progressRequired: 200,
+      prerequisites: ['cuisine_i', 'alchemy_i'],
+      unlocks: [
+        { type: 'recipe', recipeId: 'spice_blend' },
+        { type: 'recipe', recipeId: 'preserved_food' },
+        { type: 'generated', generationType: 'cuisine_discovery' },
+      ],
+    }
+  ),
+
+  defineResearch(
+    'fermentation_science',
+    'Fermentation Science',
+    'Harness the power of fermentation to create wines, cheeses, and medicinal cultures.',
+    'cuisine',
+    4,
+    {
+      progressRequired: 350,
+      prerequisites: ['culinary_arts'],
+      unlocks: [
+        { type: 'building', buildingId: 'fermentation_vat' },
+        { type: 'recipe', recipeId: 'wine' },
+        { type: 'recipe', recipeId: 'cheese' },
+        { type: 'generated', generationType: 'fermentation_discovery' },
+      ],
+    }
+  ),
+
+  // Nature/Herbalism Discovery Path
+  defineResearch(
+    'herbalism',
+    'Herbalism',
+    'Study the medicinal and magical properties of plants.',
+    'nature',
+    2,
+    {
+      progressRequired: 120,
+      prerequisites: ['nature_i'],
+      unlocks: [
+        { type: 'knowledge', knowledgeId: 'herb_identification' },
+        { type: 'recipe', recipeId: 'herbal_remedy' },
+        { type: 'generated', generationType: 'herb_discovery' },
+      ],
+    }
+  ),
+
+  defineResearch(
+    'animal_husbandry',
+    'Animal Husbandry',
+    'Learn to breed, train, and care for animals beyond mere hunting.',
+    'nature',
+    3,
+    {
+      progressRequired: 250,
+      prerequisites: ['herbalism', 'agriculture_ii'],
+      unlocks: [
+        { type: 'building', buildingId: 'animal_pen' },
+        { type: 'ability', abilityId: 'tame_animal' },
+        { type: 'generated', generationType: 'animal_discovery' },
+      ],
+    }
+  ),
+
+  defineResearch(
+    'ecology_mastery',
+    'Ecology Mastery',
+    'Understand the interconnected web of life and how to influence it.',
+    'nature',
+    4,
+    {
+      progressRequired: 400,
+      prerequisites: ['animal_husbandry', 'genetics_i'],
+      unlocks: [
+        { type: 'ability', abilityId: 'ecosystem_analysis' },
+        { type: 'generated', generationType: 'ecology_discovery' },
+      ],
+    }
+  ),
+
+  // Crafting Discovery Path
+  defineResearch(
+    'advanced_toolmaking',
+    'Advanced Toolmaking',
+    'Master the craft of creating specialized tools for every profession.',
+    'crafting',
+    2,
+    {
+      progressRequired: 130,
+      prerequisites: ['crafting_i'],
+      unlocks: [
+        { type: 'recipe', recipeId: 'specialized_tools' },
+        { type: 'generated', generationType: 'tool_invention' },
+      ],
+    }
+  ),
+
+  defineResearch(
+    'jewelcraft',
+    'Jewelcraft',
+    'Learn to work precious metals and gems into beautiful and functional items.',
+    'crafting',
+    3,
+    {
+      progressRequired: 280,
+      prerequisites: ['advanced_toolmaking', 'metallurgy_i'],
+      unlocks: [
+        { type: 'building', buildingId: 'jewelers_bench' },
+        { type: 'recipe', recipeId: 'silver_ring' },
+        { type: 'generated', generationType: 'jewelry_discovery' },
+      ],
+    }
+  ),
+
+  defineResearch(
+    'master_craftsmanship',
+    'Master Craftsmanship',
+    'Achieve mastery over material and form, creating items of legendary quality.',
+    'crafting',
+    5,
+    {
+      progressRequired: 600,
+      prerequisites: ['jewelcraft', 'metallurgy_ii'],
+      unlocks: [
+        { type: 'ability', abilityId: 'masterwork_creation' },
+        { type: 'generated', generationType: 'mastercraft_discovery' },
+      ],
+    }
+  ),
+
+  // Arcane Discovery Path (pre-tier-5)
+  defineResearch(
+    'arcane_theory',
+    'Arcane Theory',
+    'Begin to understand the fundamental principles underlying magical phenomena.',
+    'arcane',
+    2,
+    {
+      progressRequired: 180,
+      prerequisites: ['nature_i'],
+      unlocks: [
+        { type: 'knowledge', knowledgeId: 'mana_theory' },
+        { type: 'generated', generationType: 'arcane_insight' },
+      ],
+    }
+  ),
+
+  defineResearch(
+    'runecraft_basics',
+    'Runecraft Basics',
+    'Learn to inscribe magical symbols that store and channel power.',
+    'arcane',
+    3,
+    {
+      progressRequired: 300,
+      prerequisites: ['arcane_theory', 'bookbinding'],
+      unlocks: [
+        { type: 'recipe', recipeId: 'rune_stone' },
+        { type: 'ability', abilityId: 'inscribe_rune' },
+        { type: 'generated', generationType: 'rune_discovery' },
+      ],
+    }
+  ),
+
+  defineResearch(
+    'enchanting_fundamentals',
+    'Enchanting Fundamentals',
+    'Learn to imbue objects with lasting magical properties.',
+    'arcane',
+    4,
+    {
+      progressRequired: 450,
+      prerequisites: ['runecraft_basics', 'alchemy_i'],
+      requiredBuilding: 'alchemy_lab',
+      unlocks: [
+        { type: 'building', buildingId: 'enchanting_circle' },
+        { type: 'ability', abilityId: 'basic_enchantment' },
+        { type: 'generated', generationType: 'enchantment_discovery' },
+      ],
+    }
+  ),
+
+  // Textiles Discovery Path (tier 4-5)
+  defineResearch(
+    'magical_weaving',
+    'Magical Weaving',
+    'Weave enchantments directly into fabric, creating cloth with supernatural properties.',
+    'textiles',
+    4,
+    {
+      progressRequired: 380,
+      prerequisites: ['textiles_ii', 'runecraft_basics'],
+      unlocks: [
+        { type: 'recipe', recipeId: 'enchanted_cloth' },
+        { type: 'generated', generationType: 'magical_textile' },
+      ],
+    }
+  ),
+
+  // Medicine Discovery Path (new sub-field of nature/alchemy)
+  defineResearch(
+    'anatomy_studies',
+    'Anatomy Studies',
+    'Study the structure of living bodies to understand health and illness.',
+    'nature',
+    3,
+    {
+      progressRequired: 250,
+      prerequisites: ['herbalism', 'alchemy_i'],
+      requiredBuilding: 'library',
+      unlocks: [
+        { type: 'knowledge', knowledgeId: 'anatomy_basics' },
+        { type: 'ability', abilityId: 'diagnose_illness' },
+        { type: 'generated', generationType: 'medical_discovery' },
+      ],
+    }
+  ),
+
+  defineResearch(
+    'surgery',
+    'Surgery',
+    'Learn to heal through precise intervention, treating wounds and ailments beyond medicine alone.',
+    'nature',
+    4,
+    {
+      progressRequired: 450,
+      prerequisites: ['anatomy_studies', 'metallurgy_ii'],
+      unlocks: [
+        { type: 'building', buildingId: 'surgery_theater' },
+        { type: 'recipe', recipeId: 'surgical_tools' },
+        { type: 'generated', generationType: 'surgical_discovery' },
+      ],
+    }
+  ),
+
+  // Music/Art Discovery Path (new)
+  defineResearch(
+    'musical_instruments',
+    'Musical Instruments',
+    'Create and master instruments that produce sound and stir the soul.',
+    'crafting',
+    2,
+    {
+      progressRequired: 140,
+      prerequisites: ['crafting_i', 'textiles_i'],
+      unlocks: [
+        { type: 'recipe', recipeId: 'drum' },
+        { type: 'recipe', recipeId: 'flute' },
+        { type: 'generated', generationType: 'instrument_discovery' },
+      ],
+    }
+  ),
+
+  defineResearch(
+    'bardic_tradition',
+    'Bardic Tradition',
+    'Learn the ancient art of weaving magic through song and story.',
+    'arcane',
+    3,
+    {
+      progressRequired: 280,
+      prerequisites: ['musical_instruments', 'arcane_theory'],
+      unlocks: [
+        { type: 'ability', abilityId: 'perform_song' },
+        { type: 'knowledge', knowledgeId: 'song_magic_theory' },
+        { type: 'generated', generationType: 'bardic_discovery' },
+      ],
+    }
+  ),
+];
+
+// ============================================================================
 // TIER 5 - TRANSCENDENCE (requires Tier 4)
 // ============================================================================
 
@@ -686,6 +1004,7 @@ export const DEFAULT_RESEARCH: ResearchDefinition[] = [
   ...TIER_3_RESEARCH,
   ...TIER_4_RESEARCH,
   ...TIER_5_RESEARCH,
+  ...DISCOVERY_NODE_RESEARCH,
 ];
 
 /**

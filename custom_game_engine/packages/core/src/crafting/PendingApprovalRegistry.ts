@@ -28,6 +28,13 @@ import type { SpellDefinition } from '../magic/SpellRegistry.js';
 import { type RecipeType, getRecipeGenerator } from './LLMRecipeGenerator.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
 import { globalRecipeRegistry } from './RecipeRegistry.js';
+import {
+  type ScrutinyStyle,
+  heuristicWisdomScrutiny,
+  buildWisdomScrutinyPrompt,
+  parseWisdomScrutinyResponse,
+  getDefaultScrutinyStyle,
+} from '../divinity/WisdomGoddessScrutiny.js';
 
 /**
  * Type of creation: recipe, technology, or magic effect
@@ -142,6 +149,10 @@ export interface AutoApprovalConfig {
   approvedResearchFields?: string[];
   /** Optional: magic paradigms this deity will approve (for effect creations) */
   approvedParadigms?: string[];
+  /** Name of the Wisdom Goddess to use for tech/effect scrutiny (default: 'Athena') */
+  wisdomGoddessName?: string;
+  /** Scrutiny style for the Wisdom Goddess: 'strict' | 'encouraging' | 'curious' | 'pragmatic' */
+  wisdomGoddessStyle?: ScrutinyStyle;
 }
 
 /**
@@ -1107,6 +1118,117 @@ REASONING: [One sentence explaining your judgment]`;
   }
 
   /**
+   * Scrutinize a creation using the Goddess of Wisdom.
+   * This applies to technologies and effects, providing thematic scrutiny
+   * with a goddess personality affecting the judgment style.
+   *
+   * @param creation - The creation to scrutinize
+   * @param goddessName - Name of the wisdom goddess (affects flavor text)
+   * @param style - Scrutiny style: 'strict' | 'encouraging' | 'curious' | 'pragmatic'
+   * @returns ScrutinyResult with wisdom goddess flavor
+   */
+  public scrutinizeWithWisdomGoddess(
+    creation: PendingCreation,
+    goddessName: string = 'Athena',
+    style?: ScrutinyStyle
+  ): ScrutinyResult {
+    // Only use wisdom goddess for technologies and effects
+    if (creation.creationType === 'recipe') {
+      return this.scrutinize(creation);
+    }
+
+    const effectiveStyle = style || getDefaultScrutinyStyle(creation.creationType);
+    const wisdomResult = heuristicWisdomScrutiny(creation, effectiveStyle, goddessName);
+
+    // Convert WisdomScrutinyResult to ScrutinyResult
+    const reasons: string[] = [];
+
+    if (wisdomResult.approved) {
+      reasons.push(`${goddessName} approves: "${wisdomResult.wisdomComment}"`);
+    } else {
+      reasons.push(`${goddessName} rejects: "${wisdomResult.wisdomComment}"`);
+    }
+
+    reasons.push(wisdomResult.reasoning);
+
+    // Add score breakdown
+    reasons.push(`Balance: ${(wisdomResult.balanceScore * 100).toFixed(0)}%, ` +
+      `Novelty: ${(wisdomResult.noveltyScore * 100).toFixed(0)}%, ` +
+      `Fit: ${(wisdomResult.fitScore * 100).toFixed(0)}%`);
+
+    return {
+      approved: wisdomResult.approved,
+      reasons,
+      isNovel: wisdomResult.noveltyScore >= 0.5,
+      isCoherent: wisdomResult.fitScore >= 0.5,
+      similarityScore: 1 - wisdomResult.noveltyScore,
+    };
+  }
+
+  /**
+   * Scrutinize with LLM using Goddess of Wisdom prompts.
+   * For technologies and effects, uses wisdom goddess-specific prompts.
+   *
+   * @param creation - The creation to scrutinize
+   * @param goddessName - Name of the wisdom goddess
+   * @param style - Scrutiny style
+   */
+  public async scrutinizeWithWisdomGoddessLLM(
+    creation: PendingCreation,
+    goddessName: string = 'Athena',
+    style?: ScrutinyStyle
+  ): Promise<ScrutinyResult> {
+    // Only use wisdom goddess for technologies and effects
+    if (creation.creationType === 'recipe') {
+      return this.scrutinizeWithLLM(creation);
+    }
+
+    const generator = getRecipeGenerator();
+    if (!generator) {
+      return this.scrutinizeWithWisdomGoddess(creation, goddessName, style);
+    }
+
+    const effectiveStyle = style || getDefaultScrutinyStyle(creation.creationType);
+    const prompt = buildWisdomScrutinyPrompt(creation, effectiveStyle, goddessName);
+
+    try {
+      const llmProvider = (generator as any).llmProvider;
+      if (!llmProvider) {
+        return this.scrutinizeWithWisdomGoddess(creation, goddessName, style);
+      }
+
+      const response = await llmProvider.generate({
+        prompt,
+        maxTokens: 400,
+        temperature: 0.4,
+      });
+
+      const wisdomResult = parseWisdomScrutinyResponse(response.text);
+      if (!wisdomResult) {
+        return this.scrutinizeWithWisdomGoddess(creation, goddessName, style);
+      }
+
+      // Convert to ScrutinyResult
+      const reasons: string[] = [];
+      reasons.push(`${goddessName} (${effectiveStyle}): "${wisdomResult.wisdomComment}"`);
+      reasons.push(wisdomResult.reasoning);
+      reasons.push(`Balance: ${(wisdomResult.balanceScore * 100).toFixed(0)}%, ` +
+        `Novelty: ${(wisdomResult.noveltyScore * 100).toFixed(0)}%, ` +
+        `Fit: ${(wisdomResult.fitScore * 100).toFixed(0)}%`);
+
+      return {
+        approved: wisdomResult.approved,
+        reasons,
+        isNovel: wisdomResult.noveltyScore >= 0.5,
+        isCoherent: wisdomResult.fitScore >= 0.5,
+        similarityScore: 1 - wisdomResult.noveltyScore,
+      };
+    } catch {
+      return this.scrutinizeWithWisdomGoddess(creation, goddessName, style);
+    }
+  }
+
+  /**
    * Check if a creation should be auto-approved by an AI deity.
    * AI deities scrutinize creations for novelty and coherence.
    */
@@ -1252,8 +1374,21 @@ REASONING: [One sentence explaining your judgment]`;
     const useLLM = config.useLLM !== false && getRecipeGenerator() !== null;
 
     let scrutiny: ScrutinyResult;
-    if (useLLM) {
-      // Use LLM for intelligent judgment
+
+    // For technologies and effects, use the Goddess of Wisdom
+    // For recipes, use the regular deity scrutiny
+    if (creation.creationType === 'technology' || creation.creationType === 'effect') {
+      // Wisdom goddess handles tech and magic scrutiny
+      const goddessName = config.wisdomGoddessName || 'Athena';
+      const scrutinyStyle = config.wisdomGoddessStyle;
+
+      if (useLLM) {
+        scrutiny = await this.scrutinizeWithWisdomGoddessLLM(creation, goddessName, scrutinyStyle);
+      } else {
+        scrutiny = this.scrutinizeWithWisdomGoddess(creation, goddessName, scrutinyStyle);
+      }
+    } else if (useLLM) {
+      // Use LLM for intelligent judgment on recipes
       scrutiny = await this.scrutinizeWithLLM(creation, config.deityPersonality);
     } else {
       // Fall back to heuristic scrutiny

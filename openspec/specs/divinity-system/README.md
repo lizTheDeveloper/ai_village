@@ -71,6 +71,30 @@ How gods relate to each other:
 - Private DMs between gods
 - Conflict resolution and divine warfare
 
+### [narrative-pressure-system.md](./narrative-pressure-system.md)
+How higher-dimensional beings shape stories through outcome attractors:
+- Outcome attractors (goal-oriented probability fields)
+- Narrative pressure vs fate/destiny/plot
+- Probability biasing mechanisms
+- Path analysis and convergence detection
+- Divine will implementation (gods spending belief to create attractors)
+- Player narrative control
+- Attractor conflicts and interference patterns
+- Integration with events, AI, and combat systems
+- Self-fulfilling prophecies and tragic arcs
+
+### [epistemic-discontinuities.md](./epistemic-discontinuities.md)
+How higher-dimensional beings exhibit knowledge without causal acquisition paths:
+- Information without history (knowledge that was never computed)
+- Timeline selection vs prediction
+- Divine omniscient selection (gods choose timelines where they know things)
+- Player save-scum memory (NPCs remember deleted saves)
+- Adaptive AI (bosses "learn" from previous attempts)
+- Deja vu and timeline bleeding
+- Prophecy without causal paths
+- Ancestral memory and memetic contagion
+- Detection and agent awareness of discontinuities
+
 ## Key Concepts
 
 ### The Fundamental Inversion
@@ -102,6 +126,10 @@ Multiple gods compete for believers, form alliances, merge through syncretism, o
 - Angel entities
 - Temple building type
 - Schism/conversion mechanics
+- Narrative pressure system (outcome attractors)
+- Attractor field simulation
+- Path convergence analysis
+- Probability biasing mechanisms
 
 ## Design Philosophy
 

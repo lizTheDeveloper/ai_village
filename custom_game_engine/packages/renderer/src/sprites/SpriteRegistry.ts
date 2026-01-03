@@ -5,11 +5,15 @@
  * sprite based on an entity's species, gender, hair color, and skin tone.
  */
 
+export type BodyType = 'humanoid' | 'quadruped' | 'avian' | 'serpentine' | 'insectoid';
+
 export interface SpriteTraits {
   species: string;
   gender?: 'male' | 'female' | 'nonbinary';
   hairColor?: string;
   skinTone?: string;
+  bodyType?: BodyType;
+  features?: string; // Additional features for aliens/creatures (e.g., "crystalline scales, bioluminescent eyes")
 }
 
 export interface SpriteMapping {

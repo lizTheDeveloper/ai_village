@@ -39,8 +39,8 @@ export class GameLoop {
 
   constructor() {
     this.eventBus = new EventBusImpl();
-    this._world = new WorldImpl(this.eventBus);
     this._systemRegistry = new SystemRegistry();
+    this._world = new WorldImpl(this.eventBus, undefined, this._systemRegistry);
     this._componentRegistry = new ComponentRegistry();
     this._actionRegistry = new ActionRegistry();
     this._actionQueue = new ActionQueue(

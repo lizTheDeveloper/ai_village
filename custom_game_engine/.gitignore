@@ -1,0 +1,3 @@
+# Bug reports - auto-generated
+bug-reports/active/*.json
+bug-reports/resolved/*.json

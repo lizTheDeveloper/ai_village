@@ -735,6 +735,48 @@ export {
 } from './GodOfDeathEntity.js';
 
 // ============================================================================
+// Goddess of Wisdom Entity
+// ============================================================================
+export {
+  // Functions
+  createGoddessOfWisdom,
+  findGoddessOfWisdom,
+  moveGoddessOfWisdom,
+  isGoddessOfWisdom,
+  getScrutinyStyle,
+} from './GoddessOfWisdomEntity.js';
+
+export {
+  // Types
+  type WisdomGoddessConfig,
+
+  // Constants
+  WISDOM_GODDESS_REGISTRY,
+
+  // Functions
+  getWisdomGoddessByName,
+  getWisdomGoddessByIndex,
+  getRandomWisdomGoddess,
+  getAllWisdomGoddessNames,
+  getWisdomGoddessSpritePath,
+} from './WisdomGoddessSpriteRegistry.js';
+
+export {
+  // Types
+  type ScrutinyStyle,
+  type WisdomScrutinyResult,
+
+  // Constants
+  // (thresholds are internal)
+
+  // Functions
+  heuristicWisdomScrutiny,
+  buildWisdomScrutinyPrompt,
+  parseWisdomScrutinyResponse,
+  getDefaultScrutinyStyle,
+} from './WisdomGoddessScrutiny.js';
+
+// ============================================================================
 // Riddle Generation System
 // ============================================================================
 export {

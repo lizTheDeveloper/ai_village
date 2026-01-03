@@ -20,6 +20,12 @@ export interface UniverseConfig {
   /** Time scale multiplier (1.0 = normal, 2.0 = 2x speed, 0.5 = half speed) */
   timeScale: number;
 
+  /** Multiverse identifier - universes in same multiverse share this ID */
+  multiverseId: string;
+
+  /** Creator identifier - who created this multiverse */
+  creatorId?: string;
+
   /** Parent universe ID (for forked universes) */
   parentId?: string;
 
@@ -228,6 +234,28 @@ export class MultiverseCoordinator {
    */
   getAllPassages(): ReadonlyMap<string, PassageConnection> {
     return this.passages;
+  }
+
+  /**
+   * Check if two universes belong to the same multiverse.
+   */
+  areUniversesInSameMultiverse(universeId1: string, universeId2: string): boolean {
+    const universe1 = this.universes.get(universeId1);
+    const universe2 = this.universes.get(universeId2);
+
+    if (!universe1 || !universe2) {
+      return false;
+    }
+
+    return universe1.config.multiverseId === universe2.config.multiverseId;
+  }
+
+  /**
+   * Get the multiverse ID for a universe.
+   */
+  getMultiverseId(universeId: string): string | undefined {
+    const universe = this.universes.get(universeId);
+    return universe?.config.multiverseId;
   }
 
   /**

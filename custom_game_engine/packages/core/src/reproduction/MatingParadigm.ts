@@ -176,7 +176,10 @@ export type ParticipantRequirement =
   | 'two_plus'   // Two or more
   | 'colony'     // Entire colony
   | 'variable'   // Depends on circumstances
-  | 'zero';      // Spontaneous
+  | 'zero'       // Spontaneous
+  // Extended for collective reproduction (The Unraveling)
+  | 'collective_minimum'    // Requires N+ parents (configurable minimum)
+  | 'multi_body_required';  // All participants must be pack-minds (no singletons)
 
 /** Triggers for reproduction */
 export type ReproductionTrigger =
@@ -201,15 +204,31 @@ export type ReproductionTrigger =
   | 'genetic_diversity_needed'
   | 'expansion_planned'
   | 'suitable_host_available'
-  | 'triad_sync';
+  | 'triad_sync'
+  // Extended for council-regulated reproduction (The Unraveling)
+  | 'council_approval'
+  | 'coalition_formed'
+  | 'license_granted';
 
 /** Gestation configuration */
 export interface GestationConfig {
   durationDays: number;
   location: 'internal' | 'external_egg' | 'nest' | 'host' | 'communal' |
-            'dimensional' | 'dream' | 'crystal' | 'none';
+            'dimensional' | 'dream' | 'crystal' | 'none' |
+            // Extended for distributed gestation (The Unraveling)
+            'distributed_carriers';
   careRequired: 'none' | 'minimal' | 'moderate' | 'intensive';
   risks?: string[];
+
+  // Extended for distributed gestation (The Unraveling style)
+  /** Number of carriers (mothers) if distributed */
+  carrierCount?: number;
+  /** How gestation is distributed */
+  carrierDistribution?: 'single' | 'distributed' | 'sequential' | 'parallel';
+  /** Number of fathers actively involved in gestation support */
+  fatherInvolvement?: number;
+  /** Whether carriers must be pack-minds */
+  carriersMustBeMultiBody?: boolean;
 }
 
 /** Offspring count configuration */
@@ -218,6 +237,16 @@ export interface OffspringCountConfig {
   max: number;
   typical: number;
   modifiers?: Array<{ condition: string; countModifier: number }>;
+
+  // Extended for multi-body offspring (The Unraveling)
+  /** Number of bodies per offspring consciousness - Fift has 3 bodies */
+  bodiesPerOffspring?: number;
+  /** Minimum bodies for offspring to be viable (pack-mind minimum) */
+  minBodiesViable?: number;
+  /** Maximum bodies offspring can have */
+  maxBodiesPerOffspring?: number;
+  /** Whether body count is determined by parent count, genetics, or fixed */
+  bodyCountDetermination?: 'fixed' | 'parent_derived' | 'genetic' | 'random';
 }
 
 /** Definition of reproductive mechanism */
@@ -322,7 +351,13 @@ export type SelectionCriterion =
   | 'strategic_value'
   | 'camouflage_value'
   | 'no_previous_host_connection'
-  | 'emotional_maturity';
+  | 'emotional_maturity'
+  // Extended for collective/council-regulated reproduction (The Unraveling)
+  | 'temperament_balance'       // Balance of Staid/Vail in parent coalition
+  | 'council_standing'          // Standing/reputation with governing body
+  | 'sponsor_network'           // Strength of sponsorship network
+  | 'collective_harmony'        // How well the parent group works together
+  | 'multi_body_fitness';       // Health/capability across all bodies
 
 /** Definition of mate selection */
 export interface MateSelectionConfig {
@@ -401,6 +436,59 @@ export interface GenderConfig {
   separateFromSex: boolean;
   socialSignificance: 'none' | 'low' | 'moderate' | 'high' | 'defining';
 }
+
+// ============================================================================
+// Temperament System Types (The Unraveling - Staid/Vail)
+// ============================================================================
+
+/**
+ * Temperament systems - a third axis beyond sex and gender.
+ * In The Unraveling, Staid/Vail determines emotional expression style,
+ * not reproduction capability or social role in the traditional sense.
+ */
+export type TemperamentSystem =
+  | 'none'                    // No temperament concept
+  | 'binary_staid_vail'       // The Unraveling: Staid (rational) vs Vail (emotional)
+  | 'spectrum'                // Continuous temperament range
+  | 'multi_temperament'       // More than two categories
+  | 'fluid_temperament'       // Can change over time
+  | 'assigned_at_birth'       // Fixed at birth
+  | 'emerges_with_maturity';  // Develops over time
+
+/** Definition of a temperament */
+export interface TemperamentDefinition {
+  id: string;
+  name: string;
+  /** Description of behavioral expectations */
+  description: string;
+  /** Expected emotional expression level (0 = suppressed, 1 = full expression) */
+  emotionalExpression: number;
+  /** Expected activities/roles */
+  typicalActivities: string[];
+  /** Social expectations */
+  socialExpectations: string[];
+  /** Can this temperament change? */
+  canChangeTo: boolean;
+  /** Prevalence in population (0-1) */
+  prevalence: number;
+}
+
+/** Configuration of temperament system */
+export interface TemperamentConfig {
+  system: TemperamentSystem;
+  temperaments: TemperamentDefinition[];
+  /** Whether temperament is separate from sex/gender */
+  separateFromSexGender: boolean;
+  /** How important is temperament socially? */
+  socialSignificance: 'none' | 'low' | 'moderate' | 'high' | 'defining';
+  /** Is there pressure to conform to temperament expectations? */
+  conformityPressure: 'none' | 'mild' | 'moderate' | 'severe';
+  /** Can individuals choose their temperament? */
+  individualChoice: boolean;
+  /** Is temperament visible/obvious to others? */
+  publiclyVisible: boolean;
+}
+
 
 // ============================================================================
 // Attraction Types
@@ -485,7 +573,12 @@ export type SocialRegulationType =
   | 'breeding_rights'
   // Extended for diverse paradigms
   | 'triad_registration'
-  | 'collective_approval_needed';
+  | 'collective_approval_needed'
+  // Extended for The Unraveling style
+  | 'council_licensing'        // Formal council must approve reproduction
+  | 'sponsor_coalition'        // Need N sponsors/parents backing the application
+  | 'resource_quota'           // Population control via resource allocation
+  | 'temperament_balance';     // Must have balance of temperaments (Staid/Vail)
 
 /** Configuration of social mating regulation */
 export interface SocialMatingRegulation {
@@ -562,6 +655,9 @@ export interface MatingParadigm {
   /** How gender works (social) */
   gender: GenderConfig;
 
+  /** How temperament works (third axis - The Unraveling style) */
+  temperament?: TemperamentConfig;
+
   /** How pair bonding works */
   pairBonding: PairBondingConfig;
 
@@ -620,4 +716,174 @@ export interface MatingParadigm {
 
   /** Compatibility with other mating paradigms */
   paradigmCompatibility: 'isolated' | 'compatible' | 'absorbs' | 'transforms' | 'predatory';
+
+  // =========================================================================
+  // Collective Reproduction (The Unraveling style)
+  // =========================================================================
+
+  /** Configuration for collective reproduction (30+ parents) */
+  collectiveReproduction?: CollectiveReproductionConfig;
+
+  /** Configuration for multi-body consciousness offspring */
+  multiBodyOffspring?: MultiBodyOffspringConfig;
+
+  /** Council/licensing system for reproduction approval */
+  reproductionLicensing?: ReproductionLicensingConfig;
+
+  /** Software-layer consciousness configuration (can crash/desync) */
+  consciousnessNetwork?: ConsciousnessNetworkConfig;
+}
+
+// ============================================================================
+// Collective Reproduction Types (The Unraveling)
+// ============================================================================
+
+/**
+ * Configuration for collective reproduction where many parents contribute.
+ * The Unraveling typically has ~30 parents per child.
+ */
+export interface CollectiveReproductionConfig {
+  /** Minimum number of parents required */
+  minimumParents: number;
+  /** Typical/expected number of parents */
+  typicalParents: number;
+  /** Maximum parents that can contribute */
+  maximumParents: number | 'unlimited';
+
+  /** Must all parents be multi-body (pack-minds)? */
+  parentsRequireMultiBody: boolean;
+
+  /** Parent hierarchy generations (like grandparents, great-grandparents) */
+  parentHierarchy: {
+    /** How many generations of parent hierarchy are tracked */
+    generations: number;
+    /** Names for each generation level */
+    generationNames: string[];
+    /** Do ancestors have ongoing relationship with offspring? */
+    ancestorInvolvement: boolean;
+  };
+
+  /** How are the many parents organized? */
+  parentOrganization:
+    | 'flat'           // All equal
+    | 'hierarchical'   // Primary/secondary parents
+    | 'role_based'     // Different roles (carrier, supporter, sponsor)
+    | 'temporal';      // Different phases of involvement
+
+  /** What roles do parents play? */
+  parentRoles?: ParentRole[];
+}
+
+/** Definition of a parent role in collective reproduction */
+export interface ParentRole {
+  id: string;
+  name: string;
+  description: string;
+  /** How many of this role needed */
+  countRequired: number;
+  /** Responsibilities during reproduction */
+  responsibilities: string[];
+  /** Responsibilities after birth */
+  postBirthResponsibilities: string[];
+}
+
+/**
+ * Configuration for offspring born with multiple bodies.
+ * Fift has 3 bodies from birth - they are ONE person, not triplets.
+ */
+export interface MultiBodyOffspringConfig {
+  /** Does this species produce multi-body offspring? */
+  enabled: boolean;
+  /** Number of bodies offspring typically has */
+  typicalBodyCount: number;
+  /** Minimum bodies for consciousness viability */
+  minimumBodies: number;
+  /** Maximum bodies possible */
+  maximumBodies: number;
+  /** How is body count determined? */
+  bodyCountDetermination: 'fixed' | 'parent_count_derived' | 'carrier_count' | 'genetic' | 'random';
+
+  /** Are all bodies born simultaneously or sequentially? */
+  birthTiming: 'simultaneous' | 'sequential' | 'distributed';
+
+  /** If distributed, are bodies born from different carriers? */
+  distributedBirth?: {
+    bodiesPerCarrier: number;
+    carrierCount: number;
+  };
+
+  /** Does the consciousness exist before all bodies are born? */
+  consciousnessOnset: 'first_body' | 'all_bodies' | 'threshold';
+  /** If threshold, how many bodies needed for consciousness */
+  consciousnessThreshold?: number;
+}
+
+/**
+ * Council approval/licensing system for reproduction.
+ * The Unraveling requires formal approval to create new lives.
+ */
+export interface ReproductionLicensingConfig {
+  /** Is formal approval required? */
+  required: boolean;
+  /** Who must approve? */
+  approver: 'council' | 'elders' | 'community' | 'algorithm' | 'lottery';
+  /** What body handles applications? */
+  governingBody: string;
+
+  /** Requirements for approval */
+  requirements: {
+    /** Minimum number of sponsors/parents committed */
+    minimumSponsors: number;
+    /** Resource requirements */
+    resourceThreshold?: number;
+    /** Must waiting list be cleared? */
+    waitingList: boolean;
+    /** Population cap considerations */
+    populationQuota: boolean;
+    /** Must have balance of temperaments? */
+    temperamentBalance: boolean;
+  };
+
+  /** How long does approval process take? */
+  approvalTimeline: 'instant' | 'days' | 'weeks' | 'months' | 'years';
+
+  /** Can approval be appealed? */
+  appealable: boolean;
+
+  /** What happens if reproduction occurs without approval? */
+  unsanctionedConsequences: string[];
+}
+
+/**
+ * Software-layer consciousness networking.
+ * In The Unraveling, the hive-mind is software that can crash.
+ */
+export interface ConsciousnessNetworkConfig {
+  /** Is consciousness networked via technology/software? */
+  networked: boolean;
+  /** What technology enables the network? */
+  networkType: 'biological' | 'technological' | 'magical' | 'quantum';
+
+  /** Can the network go down? */
+  canFail: boolean;
+  /** What causes network failures? */
+  failureCauses?: string[];
+  /** What happens when network fails? */
+  failureEffects: {
+    /** Do bodies become confused? */
+    confusion: boolean;
+    /** Do bodies lose shared memories? */
+    memoryLoss: boolean;
+    /** Do bodies develop individual personalities temporarily? */
+    personalityDrift: boolean;
+    /** How long until resync? */
+    resyncTime: 'instant' | 'minutes' | 'hours' | 'days';
+    /** What percentage of experiences are lost on desync? */
+    experienceLossPercent: number;
+  };
+
+  /** Can individuals be forcibly disconnected? */
+  forcedDisconnection: boolean;
+  /** Is disconnection traumatic? */
+  disconnectionTrauma: boolean;
 }

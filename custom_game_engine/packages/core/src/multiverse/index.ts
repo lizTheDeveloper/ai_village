@@ -12,3 +12,28 @@ export type {
   UniverseInstance,
   PassageConnection,
 } from './MultiverseCoordinator.js';
+
+// Networked multiverse
+export {
+  MultiverseNetworkManager,
+  initializeNetworkManager,
+  getNetworkManager,
+  networkManager,
+} from './MultiverseNetworkManager.js';
+
+export type {
+  RemotePassage,
+  RemotePassageConfig,
+  NetworkMessage,
+  ViewMode,
+  InteractionMode,
+  StreamConfiguration,
+  Bounds,
+  PeerId,
+  PassageId,
+  UniverseId,
+  UniverseSnapshotMessage,
+  UniverseTickUpdate,
+  EntityTransferMessage,
+  EntityTransferAckMessage,
+} from './NetworkProtocol.js';

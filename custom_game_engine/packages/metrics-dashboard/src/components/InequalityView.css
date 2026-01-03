@@ -1,0 +1,59 @@
+.inequality-view {
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.chart-card {
+  background: #1a1a1a;
+  border-radius: 8px;
+  border: 1px solid #333;
+  padding: 1.5rem;
+}
+
+.chart-card h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.mobility-matrix {
+  overflow-x: auto;
+}
+
+.mobility-matrix table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mobility-matrix th,
+.mobility-matrix td {
+  padding: 0.75rem;
+  text-align: center;
+  border: 1px solid #333;
+}
+
+.mobility-matrix th {
+  background: #2a2a2a;
+  font-weight: bold;
+}
+
+.mobility-matrix td.high {
+  background: rgba(76, 175, 80, 0.3);
+}
+
+.mobility-matrix td.medium {
+  background: rgba(255, 152, 0, 0.3);
+}
+
+.mobility-matrix td.low {
+  background: rgba(244, 67, 54, 0.3);
+}
+
+@media (max-width: 1024px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}

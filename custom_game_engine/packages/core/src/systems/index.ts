@@ -51,6 +51,9 @@ export type { CityDirectorSystemConfig } from './CityDirectorSystem.js';
 // Economy & Trading
 export * from './TradingSystem.js';
 export * from './MarketEventSystem.js';
+// Trade Agreements - Cross-universe/multiverse formal trade agreements
+export * from './TradeAgreementSystem.js';
+export { TradeAgreementSystem } from './TradeAgreementSystem.js';
 // Phase 30: Magic System
 export * from './MagicSystem.js';
 // Phase 13: Research & Discovery
@@ -126,6 +129,7 @@ export * from './DeathJudgmentSystem.js';
 // export * from './DeathBargainSystem.js'; // Temporarily disabled - incomplete implementation
 // export * from './DeathTransitionSystem.js'; // Temporarily disabled - incomplete implementation
 export * from './AfterlifeMemoryFadingSystem.js';
+export * from './WisdomGoddessSystem.js';
 export * from './ReincarnationSystem.js';
 // export * from './SoulCreationSystem.js'; // Temporarily disabled due to circular dependency with @ai-village/llm
 // Auto-save & Time Travel
@@ -191,6 +195,9 @@ export { OffScreenProductionSystem } from './OffScreenProductionSystem.js';
 // Chat & Communication
 export * from './DivineChatSystem.js';
 export { DivineChatSystem } from './DivineChatSystem.js';
+export * from './CrossRealmPhoneSystem.js';
+export { CrossRealmPhoneSystem, createCrossRealmPhoneSystem } from './CrossRealmPhoneSystem.js';
+export type { CrossRealmPhoneSystemConfig } from './CrossRealmPhoneSystem.js';
 
 // Centralized system registration
 export {

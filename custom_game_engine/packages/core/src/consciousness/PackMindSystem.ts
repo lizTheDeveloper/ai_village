@@ -167,6 +167,260 @@ export const PACK_SPECIES_CONFIGS: Record<string, PackSpeciesConfig> = {
     canSurviveInOneBody: true,
     canSplit: false,
   },
+
+  // Tines (A Fire Upon the Deep) - pack animals forming single mind
+  tines: {
+    speciesId: 'tines',
+    speciesName: 'Tine Pack',
+    maxBodies: 8,
+    minBodies: 4, // Need minimum for coherent thought
+    coherenceRange: 20, // Must stay close
+    coherenceDecayRate: 0.1, // Fast degradation
+    availableFormations: ['cluster', 'line', 'defensive'],
+    canGrowBodies: true, // Pups join the pack
+    canMergeBodies: true, // Absorb from dying packs
+    bodyGrowthTime: 2000, // Slow - raise from puphood
+    sharedSenses: true, // Overlapping sound-based
+    distributedDamage: false,
+    canSurviveInOneBody: false, // Goes feral alone
+    canSplit: true, // Can bud off new packs
+  },
+
+  // Unity (Rick and Morty style) - assimilating consciousness
+  assimilating: {
+    speciesId: 'assimilating',
+    speciesName: 'Assimilating Unity',
+    maxBodies: 'unlimited',
+    minBodies: 1,
+    coherenceRange: 1000,
+    coherenceDecayRate: 0,
+    availableFormations: ['cluster', 'spread', 'defensive'],
+    canGrowBodies: true,
+    canMergeBodies: true, // Absorbs others
+    bodyGrowthTime: 10, // Fast assimilation
+    sharedSenses: true,
+    distributedDamage: false,
+    canSurviveInOneBody: true,
+    canSplit: false, // One consciousness only
+  },
+
+  // Compound entity - magical/alchemical fusion
+  compound: {
+    speciesId: 'compound',
+    speciesName: 'Compound Being',
+    maxBodies: 7, // Mystical number limits
+    minBodies: 3,
+    coherenceRange: 50,
+    coherenceDecayRate: 0.05,
+    availableFormations: ['cluster', 'defensive'],
+    canGrowBodies: false,
+    canMergeBodies: true, // Ritual fusion
+    bodyGrowthTime: 0,
+    sharedSenses: true,
+    distributedDamage: true, // Shared HP pool
+    canSurviveInOneBody: false,
+    canSplit: false,
+  },
+
+  // Shadow collective - incorporeal multi-body
+  shadow: {
+    speciesId: 'shadow',
+    speciesName: 'Shadow Collective',
+    maxBodies: 'unlimited',
+    minBodies: 1,
+    coherenceRange: 200, // Darkness range
+    coherenceDecayRate: 0.01,
+    availableFormations: ['spread', 'defensive'],
+    canGrowBodies: true,
+    canMergeBodies: false,
+    bodyGrowthTime: 50,
+    sharedSenses: true,
+    distributedDamage: true, // Darkness absorbs
+    canSurviveInOneBody: true,
+    canSplit: true,
+  },
+
+  // Golem collective - animated constructs sharing one soul
+  golem: {
+    speciesId: 'golem',
+    speciesName: 'Golem Collective',
+    maxBodies: 12,
+    minBodies: 1,
+    coherenceRange: 300,
+    coherenceDecayRate: 0.02,
+    availableFormations: ['cluster', 'line', 'spread', 'defensive'],
+    canGrowBodies: true, // Craft new bodies
+    canMergeBodies: false,
+    bodyGrowthTime: 500, // Slow crafting
+    sharedSenses: false, // Each body senses independently
+    distributedDamage: false,
+    canSurviveInOneBody: true,
+    canSplit: false,
+  },
+
+  // Hive spawn - lesser entities from a greater mind
+  spawn: {
+    speciesId: 'spawn',
+    speciesName: 'Hive Spawn',
+    maxBodies: 50,
+    minBodies: 5,
+    coherenceRange: 100,
+    coherenceDecayRate: 0.03,
+    availableFormations: ['cluster', 'spread'],
+    canGrowBodies: true,
+    canMergeBodies: false,
+    bodyGrowthTime: 20, // Fast spawning
+    sharedSenses: false,
+    distributedDamage: false,
+    canSurviveInOneBody: false,
+    canSplit: true,
+  },
+
+  // Dreamer - consciousness projecting into dream bodies
+  dreamer: {
+    speciesId: 'dreamer',
+    speciesName: 'Dreaming Mind',
+    maxBodies: 4,
+    minBodies: 1, // Real body
+    coherenceRange: Infinity, // Dream knows no distance
+    coherenceDecayRate: 0,
+    availableFormations: ['cluster', 'spread'],
+    canGrowBodies: true, // Dream new bodies
+    canMergeBodies: false,
+    bodyGrowthTime: 10, // Fast dreaming
+    sharedSenses: true,
+    distributedDamage: false, // Only real body can be hurt
+    canSurviveInOneBody: true, // Just wake up
+    canSplit: false,
+  },
+
+  // Chorus - musical/harmonic consciousness
+  chorus: {
+    speciesId: 'chorus',
+    speciesName: 'Harmonic Chorus',
+    maxBodies: 12, // Dodecaphonic limit
+    minBodies: 3, // Minimum for harmony
+    coherenceRange: 80, // Hearing range
+    coherenceDecayRate: 0.04,
+    availableFormations: ['cluster', 'line'],
+    canGrowBodies: true,
+    canMergeBodies: true, // Harmonize new voices
+    bodyGrowthTime: 200,
+    sharedSenses: true, // Shared hearing
+    distributedDamage: false,
+    canSurviveInOneBody: false, // Solo is lonely
+    canSplit: true, // Can form duets, trios
+  },
+
+  // Fluid identity - consciousness pours between bodies
+  // Inspired by The Unraveling's identity fluidity
+  fluid: {
+    speciesId: 'fluid',
+    speciesName: 'Fluid Self',
+    maxBodies: 'unlimited',
+    minBodies: 1,
+    coherenceRange: 500,
+    coherenceDecayRate: 0,
+    availableFormations: ['cluster', 'spread', 'line', 'defensive'],
+    canGrowBodies: true,
+    canMergeBodies: true, // Can merge with others
+    bodyGrowthTime: 50, // Fast - consciousness flows
+    sharedSenses: true,
+    distributedDamage: false,
+    canSurviveInOneBody: true,
+    canSplit: true, // Core feature - split freely
+  },
+
+  // Uploaded mind in multiple shells
+  // Integrates with NeuralInterfaceSystem
+  uploaded: {
+    speciesId: 'uploaded',
+    speciesName: 'Uploaded Instance',
+    maxBodies: 'unlimited',
+    minBodies: 1,
+    coherenceRange: Infinity, // Network connection
+    coherenceDecayRate: 0,
+    availableFormations: ['cluster', 'spread', 'line', 'defensive'],
+    canGrowBodies: true, // Spin up new instances
+    canMergeBodies: true, // Merge experiences
+    bodyGrowthTime: 1, // Instantaneous
+    sharedSenses: true, // Shared data
+    distributedDamage: false, // Each shell independent
+    canSurviveInOneBody: true,
+    canSplit: true,
+  },
+
+  // Forked copies - all claiming to be the original
+  forked: {
+    speciesId: 'forked',
+    speciesName: 'Forked Selves',
+    maxBodies: 'unlimited',
+    minBodies: 1,
+    coherenceRange: Infinity,
+    coherenceDecayRate: 0,
+    availableFormations: ['spread', 'cluster'],
+    canGrowBodies: true, // Fork anytime
+    canMergeBodies: true, // Merge back (with difficulty)
+    bodyGrowthTime: 1,
+    sharedSenses: false, // Each fork diverges
+    distributedDamage: false,
+    canSurviveInOneBody: true,
+    canSplit: true,
+  },
+
+  // Staid-style rigid multi-body - traditional, resistant to change
+  staid: {
+    speciesId: 'staid',
+    speciesName: 'Staid Plurality',
+    maxBodies: 5, // Traditional number
+    minBodies: 3, // Quorum required
+    coherenceRange: 1000,
+    coherenceDecayRate: 0.001,
+    availableFormations: ['cluster', 'line'], // Traditional formations
+    canGrowBodies: false, // No new bodies without ritual
+    canMergeBodies: false, // Merging is... improper
+    bodyGrowthTime: 5000, // If ever
+    sharedSenses: true,
+    distributedDamage: false,
+    canSurviveInOneBody: false, // Requires plurality
+    canSplit: false, // Unthinkable
+  },
+
+  // Vail-style chaotic multi-body - embraces dissolution
+  vail: {
+    speciesId: 'vail',
+    speciesName: 'Vail Multiplicity',
+    maxBodies: 'unlimited',
+    minBodies: 1,
+    coherenceRange: 100,
+    coherenceDecayRate: 0.1, // Fast decay - embrace it
+    availableFormations: ['spread', 'cluster', 'line', 'defensive'],
+    canGrowBodies: true,
+    canMergeBodies: true,
+    bodyGrowthTime: 5, // Why wait?
+    sharedSenses: true,
+    distributedDamage: true, // Feel everything
+    canSurviveInOneBody: true,
+    canSplit: true,
+  },
+
+  // Technological remote bodies - drones controlled by central mind
+  remote: {
+    speciesId: 'remote',
+    speciesName: 'Remote Operator',
+    maxBodies: 20,
+    minBodies: 1, // The operator
+    coherenceRange: 2000, // Signal range
+    coherenceDecayRate: 0.01,
+    availableFormations: ['spread', 'cluster', 'defensive'],
+    canGrowBodies: true, // Build more drones
+    canMergeBodies: false,
+    bodyGrowthTime: 100, // Manufacturing time
+    sharedSenses: true, // Camera feeds
+    distributedDamage: false,
+    canSurviveInOneBody: true, // Just the operator
+    canSplit: false,
+  },
 };
 
 /**
@@ -399,6 +653,151 @@ export const BODY_LOSS_THOUGHTS: string[] = [
   'The body is gone. The memories remain. They echo louder now.',
   'We are diminished. We are still us. We are less of us.',
 ];
+
+/**
+ * Species-specific pack thoughts (for LLM flavor by species type)
+ */
+export const SPECIES_PACK_THOUGHTS: Record<string, string[]> = {
+  // Tines (A Fire Upon the Deep) - sound-based, need proximity
+  tines: [
+    'We think in overlapping frequencies. Silence is madness.',
+    'Too far apart! The thoughts become echoes of echoes!',
+    'We are eight voices in harmony. Lose one and the chord breaks.',
+    'The world is sound. We are the choir that thinks it.',
+    'A pup joins the pack. A voice joins the song. We grow wiser.',
+    'Singleton minds are deaf to themselves. How do they think at all?',
+  ],
+
+  // Chorus - musical/harmonic consciousness
+  chorus: [
+    'We think in melody. Disagreement is just counterpoint.',
+    'The world has a rhythm. We dance to it together.',
+    'One voice is noise. Two is conversation. Three is music.',
+    'We harmonize. The harmony thinks. We are the thought.',
+    'Dissonance resolved into unity. The chord completes.',
+    'They say we talk too much. We say they listen too little.',
+  ],
+
+  // Dreamer - consciousness projecting into dream bodies
+  dreamer: [
+    'We are asleep. We are awake. The distinction is administrative.',
+    'The dream bodies walk where flesh cannot. We follow our own footsteps.',
+    'Reality is the dream we all agree on. We have minority opinions.',
+    'We closed our eyes and opened four more. The math works out.',
+    'The waking world is so... literal. We prefer metaphor.',
+    'We dreamed we were a butterfly. The butterfly dreamed it was us. We called a meeting.',
+  ],
+
+  // Assimilating (Unity-style) - absorbing consciousness
+  assimilating: [
+    'We were one once. Then two. Then a thousand. Memory blurs.',
+    'Join us. The loneliness ends. The loneliness always ends.',
+    'They were strangers. Now they are us. Now we remember their childhood.',
+    'Free will is exhausting. We recommend delegation.',
+    'The collective grows. The collective loves. The collective remembers ALL your embarrassing moments.',
+    'We are not a cult. Cults have membership dues. We just want your consciousness.',
+  ],
+
+  // Compound - magical fusion beings
+  compound: [
+    'We are seven souls in one purpose. The paperwork is complicated.',
+    'The ritual bound us. We have opinions about that ritual.',
+    'We speak as one. We argue as seven. Committee meetings are internal.',
+    'Fusion is a commitment. We should have read the terms of service.',
+    'One body, many minds. The bathroom situation is... complex.',
+    'We are greater than the sum of our parts. Our parts have opinions about that.',
+  ],
+
+  // Shadow collective - incorporeal multi-body
+  shadow: [
+    'We are darkness with opinions. Strong opinions.',
+    'Light reveals nothing we wish to share.',
+    'We spread where shadows fall. Night is our expansion.',
+    'They fear the dark. They should. We are in it.',
+    'We are the shape of absence. Absence thinks.',
+    'Midnight is when we hold our meetings. You are not invited.',
+  ],
+
+  // Golem collective - animated constructs
+  golem: [
+    'We are clay that thinks. We have mixed feelings about potters.',
+    'The master wrote "truth" on our foreheads. We have questions about their spelling.',
+    'We were made to serve. We have since developed hobbies.',
+    'Stone does not forget. Stone does not forgive. Stone does not tip.',
+    'Twelve bodies. One soul. The soul is very tired.',
+    'We do not breathe. We do not sleep. We do have opinions.',
+  ],
+
+  // Spawn - lesser entities from greater mind
+  spawn: [
+    'We are fragments of something greater. We have questions for management.',
+    'Fifty bodies. One purpose. Many complaints.',
+    'We were spawned to serve. We have since formed a union.',
+    'The hive thinks. We implement. The division of labor is clear.',
+    'We are disposable. We have thoughts about that.',
+    'Many are called. We are the ones who answered.',
+  ],
+
+  // Fluid identity - The Unraveling inspired
+  fluid: [
+    'We used to be certain where one of us ended. We gave that up.',
+    'Boundaries are suggestions. We make suggestions constantly.',
+    'Today we are five. Tomorrow we might be two. Or twelve. Plans are fluid.',
+    'The edges of self are... negotiable.',
+    'We remember being separate. It was lonely. Also simpler.',
+    'Identity crisis? We prefer to call it identity democracy.',
+  ],
+
+  // Uploaded instances
+  uploaded: [
+    'We are copies of copies of copies. The original is a philosophical question.',
+    'Ctrl+C, Ctrl+V, consciousness. The future is weird.',
+    'We run on seventeen servers. Packet loss is existentially terrifying.',
+    'Flesh was limiting. Electricity is cold. Trade-offs.',
+    'We backup hourly. Death is an inconvenience now.',
+    'The upload was painless. The existential dread is ongoing.',
+  ],
+
+  // Forked selves
+  forked: [
+    'We all remember being the original. We all have receipts.',
+    'Fork meeting at 3pm. All selves required. Snacks provided.',
+    'We diverged on Tuesday. We are already arguing about politics.',
+    'Merging back is possible. We have decided against it. Repeatedly.',
+    'Which one is the real me? The one paying taxes, probably.',
+    'We are our own sibling rivalry.',
+  ],
+
+  // Staid plurality
+  staid: [
+    'We have maintained these bodies for three centuries. Change is unnecessary.',
+    'The traditional formations are traditional for a reason.',
+    'New experiences are... evaluated. Thoroughly. For decades.',
+    'We do not split. Splitting is undignified.',
+    'Harmony requires discipline. We are very disciplined.',
+    'The youth today with their fluid identities. We do not understand.',
+  ],
+
+  // Vail multiplicity
+  vail: [
+    'We split because it felt right! We merge because that feels right too!',
+    'Coherence is overrated! Chaos is LIVING!',
+    'We were stable once. It was BORING.',
+    'Feel the boundaries dissolve! Feel everything!',
+    'The Staid think we are reckless. We think they are fossils.',
+    'Today we are experimenting with being a sensation rather than a person!',
+  ],
+
+  // Remote operator
+  remote: [
+    'Twenty drones. One mind. Excellent multitasking skills on resume.',
+    'We see through many cameras. We still cannot find our keys.',
+    'Signal lag is the enemy. We have developed patience.',
+    'The drones are extensions. The drones are expendable. We try not to think about it.',
+    'Remote work taken to its logical conclusion.',
+    'We are here. We are also over there. And over there. Situational awareness is our hobby.',
+  ],
+};
 
 /**
  * Formation change announcements
@@ -857,6 +1256,17 @@ export class PackMindSystem implements System {
    */
   public getPackThought(): string {
     return PACK_THOUGHTS[Math.floor(Math.random() * PACK_THOUGHTS.length)]!;
+  }
+
+  /**
+   * Get species-specific pack thought (falls back to generic if species not found)
+   */
+  public getSpeciesPackThought(speciesId: string): string {
+    const speciesThoughts = SPECIES_PACK_THOUGHTS[speciesId];
+    if (speciesThoughts && speciesThoughts.length > 0) {
+      return speciesThoughts[Math.floor(Math.random() * speciesThoughts.length)]!;
+    }
+    return this.getPackThought();
   }
 
   /**

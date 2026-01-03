@@ -1,4 +1,4 @@
-import type { World, ShopComponent, EntityId, InventoryComponent, CurrencyComponent, MarketStateComponent } from '@ai-village/core';
+import type { World, ShopComponent, EntityId, InventoryComponent, CurrencyComponent, MarketStateComponent, System } from '@ai-village/core';
 import { EntityImpl } from '@ai-village/core';
 import { itemRegistry, calculateBuyPrice, calculateSellPrice, getQualityTier, getQualityColor, getQualityDisplayName, getQualityPriceMultiplier } from '@ai-village/core';
 
@@ -26,10 +26,10 @@ interface TradingSystemMethods {
 
 /**
  * Extended World interface that includes getSystem method.
- * The public World interface doesn't expose this, but the implementation has it.
+ * The public World interface now exposes this method.
  */
 interface WorldWithSystems extends World {
-  getSystem?(systemId: string): unknown;
+  getSystem(systemId: string): System | undefined;
 }
 
 interface ShopItem {

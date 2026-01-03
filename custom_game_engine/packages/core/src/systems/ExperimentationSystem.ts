@@ -50,7 +50,7 @@ import {
 } from '../crafting/IngredientAwareness.js';
 import type { RecipeRegistry } from '../crafting/RecipeRegistry.js';
 import { itemRegistry } from '../items/ItemRegistry.js';
-import { pendingApprovalRegistry } from '../crafting/PendingApprovalRegistry.js';
+import { pendingApprovalRegistry, type PendingCreation } from '../crafting/PendingApprovalRegistry.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
 
 /**
@@ -620,40 +620,83 @@ export class ExperimentationSystem implements System {
       if (result.success && result.creation) {
         this.registerApprovedCreation(result.creation);
 
-        // Emit success event
-        this.eventBus?.emit({
-          type: 'experiment:success',
-          source: result.creation.creatorId,
-          data: {
-            recipeId: result.creation.recipe.id,
-            itemId: result.creation.item.id,
-            displayName: result.creation.item.displayName,
-            message: 'The gods have blessed your creation!',
-            creativityScore: result.creation.creativityScore,
-          },
-        });
+        // Only emit recipe-specific events for recipe creations
+        if (result.creation.creationType === 'recipe' && result.creation.recipe && result.creation.item) {
+          // Emit success event
+          this.eventBus?.emit({
+            type: 'experiment:success',
+            source: result.creation.creatorId,
+            data: {
+              recipeId: result.creation.recipe.id,
+              itemId: result.creation.item.id,
+              displayName: result.creation.item.displayName,
+              message: 'The gods have blessed your creation!',
+              creativityScore: result.creation.creativityScore,
+            },
+          });
 
-        // Also emit recipe discovered event
-        this.eventBus?.emit({
-          type: 'recipe:discovered',
-          source: result.creation.creatorId,
-          data: {
-            recipeId: result.creation.recipe.id,
-            discoverer: result.creation.creatorName,
-            recipeType: result.creation.recipeType,
-          },
-        });
+          // Also emit recipe discovered event
+          this.eventBus?.emit({
+            type: 'recipe:discovered',
+            source: result.creation.creatorId,
+            data: {
+              recipeId: result.creation.recipe.id,
+              discoverer: result.creation.creatorName,
+              recipeType: result.creation.recipeType || 'recipe',
+            },
+          });
+        } else if (result.creation.creationType === 'technology' && result.creation.technology) {
+          // Emit technology discovered event
+          this.eventBus?.emit({
+            type: 'research:discovered',
+            source: result.creation.creatorId,
+            data: {
+              technologyId: result.creation.technology.id,
+              name: result.creation.technology.name,
+              field: result.creation.researchField,
+              discoverer: result.creation.creatorName,
+              message: 'The gods have blessed your research!',
+            },
+          });
+        } else if (result.creation.creationType === 'effect' && result.creation.spell) {
+          // Emit spell discovered event
+          this.eventBus?.emit({
+            type: 'magic:discovered',
+            source: result.creation.creatorId,
+            data: {
+              spellId: result.creation.spell.id,
+              name: result.creation.spell.name,
+              paradigm: result.creation.paradigmId,
+              discoverer: result.creation.creatorName,
+              message: 'The gods have blessed your magic!',
+            },
+          });
+        }
       }
     } else {
       const result = pendingApprovalRegistry.reject(pendingId);
       if (result.success && result.creation) {
-        // Emit rejection event
+        // Get ID and display name based on creation type
+        let itemId: string;
+        let displayName: string;
+
+        if (result.creation.creationType === 'recipe') {
+          itemId = result.creation.item?.id || 'unknown_item';
+          displayName = result.creation.item?.displayName || 'Unknown creation';
+        } else if (result.creation.creationType === 'technology') {
+          itemId = result.creation.technology?.id || 'unknown_tech';
+          displayName = result.creation.technology?.name || 'Unknown technology';
+        } else {
+          itemId = result.creation.spell?.id || 'unknown_spell';
+          displayName = result.creation.spell?.name || 'Unknown spell';
+        }
+
         this.eventBus?.emit({
           type: 'experiment:rejected',
           source: result.creation.creatorId,
           data: {
-            itemId: result.creation.item.id,
-            displayName: result.creation.item.displayName,
+            itemId,
+            displayName,
             message: 'The gods do not favor this creation.',
           },
         });

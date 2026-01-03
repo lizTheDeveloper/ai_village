@@ -8,7 +8,10 @@
  * - Incoming projectiles (ranged/magic attacks)
  */
 
-import type { Component } from './Component.js';
+export interface Component {
+  readonly type: string;
+}
+
 import type { AttackType } from '../types/CombatTypes.js';
 
 export interface DetectedThreat {

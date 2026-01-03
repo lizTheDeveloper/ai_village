@@ -635,3 +635,21 @@ export type {
   InterestSource,
   InterestsComponentData,
 } from './InterestsComponent.js';
+
+// Trade Agreement system (cross-universe/multiverse trade)
+export * from './TradeAgreementComponent.js';
+export {
+  createTradeAgreementComponent,
+} from './TradeAgreementComponent.js';
+export type {
+  TradeAgreementComponent,
+  EscrowItem,
+  CausalTradeEvent,
+  DiplomaticRelation,
+  DiplomaticIncident,
+} from './TradeAgreementComponent.js';
+
+// Cross-realm phone system (inter-universe communication)
+export * from './CrossRealmPhoneComponent.js';
+export { createCrossRealmPhoneComponent } from './CrossRealmPhoneComponent.js';
+export type { CrossRealmPhoneComponent } from './CrossRealmPhoneComponent.js';

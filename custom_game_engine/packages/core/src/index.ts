@@ -288,6 +288,8 @@ export {
   type StorageBackend,
   type StorageInfo,
   type ComponentSerializer,
+  type VersionedEntity,
+  type VersionedComponent,
 
   // Utilities
   computeChecksum,
@@ -313,6 +315,97 @@ export {
 // Multiverse system - Multiple universes with independent time scales
 export * from './multiverse/index.js';
 export { multiverseCoordinator } from './multiverse/index.js';
+
+// Trade agreement system - Cross-universe/multiverse trade with Hilbert-time
+export * from './trade/TradeAgreementTypes.js';
+export {
+  determineTradeScope,
+  calculateEscrowRequirement,
+  calculateTradeFacilitationCost,
+  estimateDeliveryTime,
+} from './trade/TradeAgreementTypes.js';
+export type {
+  TradeScope,
+  CivilizationIdentity,
+  TradeTerm,
+  TradeAgreement,
+  NegotiationState,
+  CounterOffer,
+  TradeAgreementEvent,
+  AgreementStatus,
+  CrossRealmMetadata,
+} from './trade/TradeAgreementTypes.js';
+
+// Hilbert-time - Multi-dimensional temporal coordinates for causal ordering
+export * from './trade/HilbertTime.js';
+export {
+  compareTimeCoordinates,
+  isBranchAncestor,
+  findCommonBranchAncestor,
+  isCausallyDependent,
+  advanceTime,
+  syncWithUniverse,
+  forkTimeline,
+  detectCausalViolation,
+  createRootTimeCoordinate,
+  serializeTimeCoordinate,
+  deserializeTimeCoordinate,
+} from './trade/HilbertTime.js';
+export type {
+  HilbertTimeCoordinate,
+  CausalReference,
+  TimeOrdering,
+  CausalViolation,
+} from './trade/HilbertTime.js';
+
+// Mayor negotiation - LLM-driven trade agreement negotiation
+export { MayorNegotiator, createCivilizationContext } from './trade/MayorNegotiator.js';
+export type { NegotiationDecision, CivilizationContext } from './trade/MayorNegotiator.js';
+
+// Cross-realm communication - Inter-universe phones (Clarketech tier 7-8)
+export * from './communication/CrossRealmCommunication.js';
+export {
+  createCrossRealmPhone,
+  initiateCall,
+  answerCall,
+  rejectCall,
+  endCall,
+  sendMessage,
+  receiveMessage,
+  addContact,
+  chargePhone,
+  addEnchantment,
+  sendEmergencyBeacon,
+  startConference,
+  calculateSignalQuality,
+  calculateLatency,
+  calculateCallCost,
+} from './communication/CrossRealmCommunication.js';
+export type {
+  CrossRealmPhone,
+  CrossRealmPhoneTier,
+  CrossRealmAddress,
+  CrossRealmContact,
+  PhoneEnchantment,
+  CrossRealmCall,
+  CrossRealmMessage,
+  ConferenceCall,
+} from './communication/CrossRealmCommunication.js';
+
+// Cross-realm phone items
+export { CROSS_REALM_PHONE_ITEMS } from './items/CrossRealmPhones.js';
+export {
+  BASIC_CROSS_REALM_PHONE,
+  ADVANCED_CROSS_REALM_PHONE,
+  TRANSCENDENT_MULTIVERSE_PHONE,
+  RANGE_BOOST_RUNE,
+  CLARITY_RUNE,
+  PRIVACY_RUNE,
+  RECORDING_RUNE,
+  EMERGENCY_BEACON_RUNE,
+  MULTI_PARTY_RUNE,
+  MANA_CHARGING_STATION,
+} from './items/CrossRealmPhones.js';
 
 // Universe identity and provenance (forward-compatibility - Phases 31-34)
 export {

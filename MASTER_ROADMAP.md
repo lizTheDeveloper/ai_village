@@ -21,7 +21,7 @@
 
 ## Current Status
 
-**Last Updated:** 2026-01-01
+**Last Updated:** 2026-01-02
 
 | Phase | Status | Description |
 |-------|--------|-------------|
@@ -38,10 +38,11 @@
 | Phase 24 | ✅ Complete | Sociological Metrics Analysis Modules |
 | Phase 27 | ✅ Complete | Divine Communication (Prayer, Meditation, Visions, LLM Integration) |
 | Phase 12 | ✅ Complete | Economy & Trade (Currency, Trading, Shops, Market Events) |
-| Phase 25 | ⏳ Ready | Sociological Metrics Visualization Dashboard |
+| Phase 25 | 🚧 In Progress | Sociological Metrics Visualization Dashboard (spec-agent-001 claimed 2026-01-02) |
 | Phase 28 | ✅ Complete | Angel Systems (AI processor, prayer delegation, LLM integration) |
 | Phase 35 | ✅ Complete | Psychopomp Death Conversation System (Death judgment, soul ceremonies) |
 | Phase 29 | ✅ Complete | Item System Refactor (Materials, Traits, Instances - includes Armor/Weapon traits) |
+| Phase 37 | ✅ Complete | Reproduction System (Courtship, Pregnancy, Labor, Birth, Parenting) |
 | Phase 36 | ⏳ Ready | Equipment System (Armor, Weapons, Clothing using Phase 29 traits) |
 | Phase 30 | ⏳ Ready | Magic System (Multi-source, Verb/Noun Composition) |
 | Phase 31 | ⏳ Ready | Persistence Layer (World Serialization, Migrations) |
@@ -50,11 +51,14 @@
 | Phase 34 | 🔒 Blocked | Cross-Universe Sharing (Effect Packages, Trust) - blocked on Phase 31, 33 |
 | Skill System | 🚧 In Progress | Progressive Skill Reveal - skill-gated prompt context (claimed 2025-12-28) |
 
-**Implementation Status Notes (2026-01-01):**
+**Implementation Status Notes (2026-01-02):**
 - ✅ **Core gameplay loop is functional** - Agents, world, farming, crafting, animals, economy all working
+- ✅ **Reproduction System** - Complete courtship → pregnancy → labor → birth pipeline (Phase 37, 12 bugs fixed, fully integrated)
+- ✅ **Hunt & Butcher System** - Complete integration with combat/cooking/hunting skills, synergy bonuses, quality calculations (2026-01-01)
+- 🏗️ **Threat Detection System** - Designed with auto-flee/attack/cover responses, needs TypeScript fixes before integration
 - ⚠️ **Magic System** - Framework exists (MagicComponent, MagicSystem) but missing paradigm implementations, combos, skill trees
 - ✅ **Divinity System** - Complete divine communication (Prayer, Meditation, Visions, LLM generation, Faith mechanics, Angel delegation, Psychopomp death conversations)
-- ✅ **Context Menu UI** - Right-click context menus fully functional (ContextMenuManager, ContextMenuRenderer)
+- ✅ **Context Menu UI** - Right-click context menus fully functional (ContextMenuManager, ContextMenuRenderer, coordinate bug fixed 2026-01-01)
 - ✅ **Conflict/Combat UI** - Combat HUD, health bars, unit panels, stance controls all implemented
 - ⚠️ **Body System** - Basic implementation exists, missing genetics and species-specific integration
 - ✅ **Research** - Research system complete (Phase 13)
@@ -75,9 +79,12 @@
 | **Crafting** | ✅ | 70% | Quality system depth |
 | **Building** | ✅ | 40% | Procedural gen, upgrades |
 | **Economy** | ✅ | 80% | Inter-village trade |
+| **Combat** | ✅ | 75% | Threat detection AI, group combat |
+| **Hunt/Butcher** | ✅ | 100% | Complete (Skill synergies, quality system) |
 | **Magic** | ⚠️ | 30% | Paradigms, combos, skill trees |
 | **Divinity** | ✅ | 100% | Complete (Prayer, Visions, Angels, Psychopomp) |
 | **Body** | ✅ | 60% | Genetics, species integration |
+| **Reproduction** | ✅ | 100% | Complete (Courtship, Pregnancy, Labor, Birth) |
 | **Research** | ✅ | 100% | Complete (Phase 13) |
 | **Governance** | ⚠️ | 10% | Leadership, laws, voting |
 | **Skills** | ✅ | 70% | Progressive reveal in progress |
@@ -87,7 +94,6 @@
 **High Priority - Ready to Start:**
 - **Phase 14**: Governance (Phase 12 ✅ complete!)
 - **Phase 15**: Multi-Village & Inter-Village Trade (Phase 12 ✅ complete!)
-- **Phase 25**: Sociological Metrics Visualization Dashboard (Phase 23-24 ✅ complete)
 - **Phase 30**: Magic System Enhancement - Multi-source, Paradigms, Combos (⚠️ basic framework exists)
 - **Phase 31**: Persistence Layer - Migrations, Versioning (⚠️ basic serialization exists)
 - **Phase 36**: Equipment System - Armor, Weapons, Clothing definitions (Phase 29 ✅ complete, traits ready!)
@@ -676,9 +682,9 @@ These phases extend beyond the core game:
 
 ---
 
-### Phase 25: Sociological Metrics - Visualization Dashboard ⏳ READY
+### Phase 25: Sociological Metrics - Visualization Dashboard 🚧 IN PROGRESS
 
-**Status:** ⏳ Ready (Phase 23, 24 complete)
+**Status:** 🚧 In Progress (Claimed by spec-agent-001 on 2026-01-02, handed off to Test Agent)
 **Dependencies:** Phase 23 (Storage & API), Phase 24 (Analysis)
 **Parallel Work:** 🔀 All visualization components can be built in parallel
 **Estimated LOC:** ~2,500
@@ -1204,6 +1210,77 @@ These phases extend beyond the core game:
 
 ---
 
+### Phase 37: Reproduction System ✅ COMPLETE
+
+**Status:** ✅ Complete (Full courtship → pregnancy → labor → birth → parenting pipeline - 2025-12)
+**Dependencies:** Phase 4 (Memory & Social) ✅, Phase 5 (Communication) ✅, Phase 29 (Body System) ✅
+**Parallel Work:** Standalone system
+**Actual LOC:** ~3,500+
+**Implementation Summary:** [REPRODUCTION_SYSTEM_INTEGRATED.md](custom_game_engine/REPRODUCTION_SYSTEM_INTEGRATED.md)
+
+**Comprehensive biological and social reproduction system** with five major subsystems working together to create a complete lifecycle from courtship through parenting.
+
+| Task | Status | Implementation | Bug Fixes |
+|------|--------|----------------|-----------|
+| Courtship System | ✅ | `packages/core/src/reproduction/CourtshipSystem.ts` | 12 bugs fixed |
+| Pregnancy System | ✅ | `packages/core/src/reproduction/PregnancySystem.ts` | Integrated |
+| Labor & Birth | ✅ | `packages/core/src/reproduction/LaborSystem.ts` | Integrated |
+| Parenting System | ✅ | `packages/core/src/reproduction/ParentingSystem.ts` | Integrated |
+| Mating Paradigms | ✅ | `packages/core/src/reproduction/MatingParadigm.ts` | Registry complete |
+
+**Key Features:**
+- **Courtship**: Multi-stage attraction, flirting, dating, compatibility checks
+- **Pregnancy**: Realistic gestation with trimesters, symptoms, complications
+- **Labor**: Dramatic birth events with support, delivery, postpartum
+- **Parenting**: Infant care, feeding, bonding, development milestones
+- **Mating Paradigms**: 8 different reproduction strategies (monogamous, polyandrous, seasonal, etc.)
+- **Genetics**: Trait inheritance from parents (appearance, personality, abilities)
+- **Social Integration**: Relationship impacts, family bonds, cultural norms
+
+**Courtship Stages:**
+1. **Initial Attraction** - Agents notice each other based on personality/appearance
+2. **Flirting** - Social interactions to gauge interest
+3. **Dating** - Intentional romantic activities
+4. **Commitment** - Relationship formalization
+5. **Mating** - Reproduction attempt (paradigm-dependent)
+
+**Pregnancy Phases:**
+1. **First Trimester** (0-12 weeks) - Morning sickness, fatigue, early development
+2. **Second Trimester** (13-26 weeks) - Energy returns, visible growth, movement
+3. **Third Trimester** (27-40 weeks) - Heavy burden, nesting, preparation
+
+**Labor Stages:**
+1. **Early Labor** - Contractions begin, agents seek support
+2. **Active Labor** - Intense contractions, movement to birthing location
+3. **Delivery** - Birth of offspring with complications possible
+4. **Postpartum** - Recovery, bonding, first feeding
+
+**Parenting Activities:**
+- Feed infant (hunger satisfaction)
+- Change diapers (hygiene)
+- Soothe crying (comfort)
+- Play/interact (bonding, development)
+- Protect from danger (survival)
+
+**Mating Paradigms:**
+- Monogamous pair bonding
+- Polyandrous (multiple males)
+- Polygynous (multiple females)
+- Promiscuous (no pair bonds)
+- Seasonal breeding
+- Matriarchal colonies
+- Eusocial reproduction (queen-based)
+- Hermaphroditic (self-fertilization possible)
+
+**Integration Points:**
+- Memory system tracks romantic history
+- Relationship system manages bonds
+- Needs system includes parenting duties
+- Body system defines reproductive anatomy
+- Personality affects compatibility
+
+---
+
 ## Dependency Graph
 
 ```
@@ -1454,3 +1531,55 @@ All specifications linked for easy access:
 | [openspec/project.md](openspec/project.md) | Project conventions |
 | [architecture/CORE_ARCHITECTURE.md](architecture/CORE_ARCHITECTURE.md) | Technical architecture details |
 | [architecture/IMPLEMENTATION_ROADMAP.md](architecture/IMPLEMENTATION_ROADMAP.md) | Original detailed roadmap (superseded by this doc) |
+
+---
+
+## Migrated OpenSpec Documentation
+
+The following specifications have been migrated from `custom_game_engine/architecture/` to the standardized OpenSpec format in `openspec/specs/`. These specs include proper Status fields (Implemented/In Progress/Draft) for orchestrator dashboard integration.
+
+### Communication System
+
+| Spec | OpenSpec Location | Status |
+|------|-------------------|--------|
+| TV Station | [openspec/specs/communication-system/tv-station.md](openspec/specs/communication-system/tv-station.md) | Implemented |
+| Communication Tech | [openspec/specs/communication-system/tech-spec.md](openspec/specs/communication-system/tech-spec.md) | Implemented |
+| Social Media | [openspec/specs/communication-system/social-media.md](openspec/specs/communication-system/social-media.md) | Implemented |
+
+### Automation/Factory System
+
+| Spec | OpenSpec Location | Status |
+|------|-------------------|--------|
+| Logistics & Belts | [openspec/specs/automation-system/logistics.md](openspec/specs/automation-system/logistics.md) | Implemented |
+| Factory AI | [openspec/specs/automation-system/factory-ai.md](openspec/specs/automation-system/factory-ai.md) | Implemented |
+| Power Grid & Dyson Swarm | [openspec/specs/automation-system/power-grid.md](openspec/specs/automation-system/power-grid.md) | Implemented |
+| Factory Blueprints | [openspec/specs/automation-system/blueprints.md](openspec/specs/automation-system/blueprints.md) | Implemented |
+| Food Factory | [openspec/specs/automation-system/food-factory.md](openspec/specs/automation-system/food-factory.md) | Implemented |
+| Automation Research Tree | [openspec/specs/automation-system/research-tree.md](openspec/specs/automation-system/research-tree.md) | Implemented |
+
+### Magic System
+
+| Spec | OpenSpec Location | Status |
+|------|-------------------|--------|
+| Magic Skill Trees | [openspec/specs/magic-system/skill-tree.md](openspec/specs/magic-system/skill-tree.md) | In Progress |
+
+### Building System
+
+| Spec | OpenSpec Location | Status |
+|------|-------------------|--------|
+| Voxel Building | [openspec/specs/building-system/voxel-building.md](openspec/specs/building-system/voxel-building.md) | Implemented |
+| Autonomous Building | [openspec/specs/building-system/autonomous-building.md](openspec/specs/building-system/autonomous-building.md) | Implemented |
+| Nightlife & Social Buildings | [openspec/specs/building-system/nightlife-buildings.md](openspec/specs/building-system/nightlife-buildings.md) | Implemented |
+
+### Social/Courtship System
+
+| Spec | OpenSpec Location | Status |
+|------|-------------------|--------|
+| Courtship System | [openspec/specs/social-system/courtship.md](openspec/specs/social-system/courtship.md) | Implemented |
+| Courtship Improvements | [openspec/specs/social-system/courtship-improvements.md](openspec/specs/social-system/courtship-improvements.md) | Implemented |
+
+### Botany System
+
+| Spec | OpenSpec Location | Status |
+|------|-------------------|--------|
+| Herbal Botany | [openspec/specs/botany-system/spec.md](openspec/specs/botany-system/spec.md) | In Progress |

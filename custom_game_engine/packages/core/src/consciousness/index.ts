@@ -44,6 +44,7 @@ export {
   QUEEN_THOUGHTS,
   WORKER_STATUS_REPORTS,
   CEREBRATE_COMMENTARY,
+  SPECIES_QUEEN_THOUGHTS,
 } from './HiveMindSystem.js';
 
 // Pack Mind System
@@ -70,4 +71,5 @@ export {
   PACK_THOUGHTS,
   BODY_LOSS_THOUGHTS,
   FORMATION_ANNOUNCEMENTS,
+  SPECIES_PACK_THOUGHTS,
 } from './PackMindSystem.js';

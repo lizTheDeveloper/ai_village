@@ -1353,6 +1353,22 @@ export interface GameEventMap {
     generatedBy: EntityId;
     researchContext?: string;
   };
+  /** LLM-generated technology was approved */
+  'research:discovered': {
+    technologyId: string;
+    name: string;
+    field?: string;
+    discoverer: string;
+    message: string;
+  };
+  /** LLM-generated magic effect was approved */
+  'magic:discovered': {
+    spellId: string;
+    name: string;
+    paradigm?: string;
+    discoverer: string;
+    message: string;
+  };
   'capability_gap:detected': {
     gapId: string;
     agentId: EntityId;
@@ -1622,6 +1638,93 @@ export interface GameEventMap {
   'market:event_ended': {
     eventId: string;
     eventType: 'shortage' | 'surplus' | 'festival' | 'merchant_arrival';
+  };
+
+  // === Trade Agreement Events (Cross-Universe/Multiverse) ===
+  'trade_agreement:proposed': {
+    agreementId: string;
+    proposerId: string;
+    targetId: string;
+    scope: string;
+    facilitationCost: number;
+    requiresEscrow: boolean;
+  };
+  'trade_agreement:counter_offered': {
+    agreementId: string;
+    responderId: string;
+    proposerId?: string;
+    reasoning: string;
+  };
+  'trade_agreement:accepted': {
+    agreementId: string;
+    acceptorId: string;
+    proposerId?: string;
+  };
+  'trade_agreement:rejected': {
+    agreementId: string;
+    rejectorId: string;
+    reason?: string;
+  };
+  'trade_agreement:cancelled': {
+    agreementId: string;
+    civId: string;
+    reason: string;
+  };
+  'trade_agreement:delivery_made': {
+    agreementId: string;
+    escrowId?: string;
+    termIndex?: number;
+    itemId: string;
+    quantity: number;
+    from: string;
+    to: string;
+  };
+  'trade_agreement:delivery_failed': {
+    agreementId: string;
+    termIndex: number;
+    reason: string;
+  };
+  'trade_agreement:violated': {
+    agreementId: string;
+    violatorId: string;
+    termIndex: number;
+    reason: string;
+  };
+  'trade_agreement:expired': {
+    agreementId: string;
+  };
+  'trade_agreement:renewed': {
+    agreementId: string;
+  };
+  'trade_agreement:fulfilled': {
+    agreementId: string;
+    totalValueExchanged: number;
+  };
+
+  // === Trade Agreement Cross-Universe Events ===
+  'trade:remote_acceptance': {
+    agreementId: string;
+    fromUniverse: string;
+    tick: bigint;
+  };
+  'trade:remote_cancellation': {
+    agreementId: string;
+    fromUniverse: string;
+    reason?: string;
+    tick: bigint;
+  };
+  'trade:remote_violation': {
+    agreementId: string;
+    fromUniverse: string;
+    reason?: string;
+    tick: bigint;
+  };
+
+  // === Multiverse Timeline Events ===
+  'multiverse:timeline_fork_required': {
+    reason: string;
+    forkAtTick: bigint;
+    causalEvent: unknown;
   };
 
   // === Skill Events ===
@@ -2716,6 +2819,14 @@ export interface GameEventMap {
     reason: string;
   };
 
+  /** Player lost possession due to entity crossing universe boundary */
+  'possession:cross_universe_jackout': {
+    deityId: string;
+    entityId: string;
+    entityName: string;
+    targetUniverseId: string;
+  };
+
   // ============================================================================
   // Voxel Resource Events (Tree Felling, etc.)
   // ============================================================================
@@ -3073,6 +3184,51 @@ export interface GameEventMap {
     milestoneType: 'script_lock' | 'table_read' | 'first_day' | 'wrap' | 'rough_cut' | 'final_delivery';
     name: string;
     onTime: boolean;
+  };
+
+  // === Deity Events ===
+  /** A deity has manifested in the world */
+  'deity:manifested': {
+    deityId: EntityId;
+    deityName: string;
+    deityType: 'death_god' | 'wisdom_goddess';
+    reason: string;
+    location: { x: number; y: number };
+    message: string;
+  };
+
+  /** Wisdom goddess has started scrutinizing a creation */
+  'wisdom:scrutiny_started': {
+    goddessId: EntityId;
+    goddessName: string;
+    creationId: string;
+    creationType: 'recipe' | 'technology' | 'effect';
+    creatorId: EntityId;
+    creatorName: string;
+  };
+
+  /** Wisdom goddess has rendered judgment on a creation */
+  'wisdom:judgment': {
+    goddessId: EntityId;
+    goddessName: string;
+    creationId: string;
+    creationType: 'recipe' | 'technology' | 'effect';
+    creatorId: EntityId;
+    creatorName: string;
+    approved: boolean;
+    wisdomComment: string;
+    balanceScore: number;
+    noveltyScore: number;
+    fitScore: number;
+  };
+
+  /** Wisdom goddess has finished processing the queue */
+  'wisdom:queue_processed': {
+    goddessId: EntityId;
+    goddessName: string;
+    totalProcessed: number;
+    approved: number;
+    rejected: number;
   };
 }
 

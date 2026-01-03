@@ -300,6 +300,7 @@ async function createSoulsForInitialAgents(
   agentIds: string[],
   llmProvider: LLMProvider
 ): Promise<void> {
+  console.log('[createSoulsForInitialAgents] world:', world, 'getSystem:', typeof world.getSystem);
   const soulSystem = world.getSystem('soul_creation') as SoulCreationSystem;
   if (!soulSystem) {
     console.warn('[Demo] SoulCreationSystem not found, skipping soul creation');
@@ -534,7 +535,7 @@ async function registerAllSystems(
   const craftingSystem = new CraftingSystem();
   craftingSystem.setRecipeRegistry(globalRecipeRegistry);
   gameLoop.systemRegistry.register(craftingSystem);
-  (gameLoop.world as any).craftingSystem = craftingSystem;
+  gameLoop.world.setCraftingSystem(craftingSystem);
 
   // Set up cooking system with recipe registry
   const cookingSystem = new CookingSystem();

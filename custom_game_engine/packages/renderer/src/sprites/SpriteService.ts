@@ -136,11 +136,15 @@ function queueSpriteGeneration(folderId: string, traits: SpriteTraits): void {
     queuedAt: Date.now(),
   });
 
-  // Emit event for daemon to pick up
+  // Request generation from server (async, non-blocking)
   if (typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('pixellab:queue-sprite', {
-      detail: { folderId, traits, description },
-    }));
+    import('./SpriteGenerationClient.js').then(({ requestSpriteGeneration }) => {
+      requestSpriteGeneration(folderId, traits, description).catch((error) => {
+        console.error(`Failed to request sprite generation for ${folderId}:`, error);
+        generatingSprites.delete(folderId);
+        spriteStatusCache.set(folderId, 'missing');
+      });
+    });
   }
 }
 
@@ -166,6 +170,17 @@ export function removeFromQueue(folderId: string): void {
  * Build a description for PixelLab sprite generation
  */
 function buildSpriteDescription(_folderId: string, traits: SpriteTraits): string {
+  // Handle quadruped creatures differently - use proven animal body templates
+  if (traits.bodyType === 'quadruped') {
+    return buildQuadrupedDescription(traits);
+  }
+
+  // Handle other non-humanoid body types
+  if (traits.bodyType && traits.bodyType !== 'humanoid') {
+    return buildCreatureDescription(traits);
+  }
+
+  // Default humanoid description
   const parts: string[] = [];
 
   // Species
@@ -198,6 +213,67 @@ function buildSpriteDescription(_folderId: string, traits: SpriteTraits): string
 
   // Common styling
   parts.push('wearing simple medieval peasant clothing');
+
+  return parts.join(', ');
+}
+
+/**
+ * Build description for quadruped creatures using lion/bear body template
+ */
+function buildQuadrupedDescription(traits: SpriteTraits): string {
+  const parts: string[] = [];
+
+  // Base quadruped body structure
+  const bodyTemplates: Record<string, string> = {
+    alien: 'Quadruped alien creature with powerful four-legged stance similar to a large predator',
+    beast: 'Four-legged beast with muscular build and strong limbs',
+    monster: 'Monstrous quadruped with bear-like body structure and imposing presence',
+    dragon: 'Quadruped dragon-like creature with lizard body on four powerful legs',
+    wolf: 'Wolf-like quadruped with sleek muscular body',
+    cat: 'Large feline quadruped with agile predator build',
+  };
+
+  const baseBody = bodyTemplates[traits.species] ||
+    `Quadruped ${traits.species} with powerful four-legged build similar to a lion or bear`;
+
+  parts.push(baseBody);
+
+  // Add distinctive features
+  if (traits.features) {
+    parts.push(traits.features);
+  } else {
+    // Default alien features for quadrupeds
+    const defaultFeatures = [
+      'thick scaled hide',
+      'bioluminescent markings along spine',
+      'powerful clawed feet',
+      'distinctive ridge along back',
+    ];
+    parts.push(defaultFeatures.join(', '));
+  }
+
+  return parts.join('. ');
+}
+
+/**
+ * Build description for other non-humanoid creatures
+ */
+function buildCreatureDescription(traits: SpriteTraits): string {
+  const parts: string[] = [];
+
+  // Body type templates
+  const bodyTypeTemplates: Record<string, string> = {
+    avian: 'Bird-like creature with wings and talons',
+    serpentine: 'Serpentine creature with elongated snake-like body',
+    insectoid: 'Insectoid creature with segmented body and multiple limbs',
+  };
+
+  parts.push(bodyTypeTemplates[traits.bodyType!] || `${traits.bodyType} creature`);
+  parts.push(traits.species);
+
+  if (traits.features) {
+    parts.push(traits.features);
+  }
 
   return parts.join(', ');
 }
@@ -246,6 +322,14 @@ const KNOWN_AVAILABLE_SPRITES = new Set<string>([
   'human_female_black_dark',
   'human_nonbinary_black',
   'villager',
+
+  // Death Gods (AI-generated dynamic character portraits)
+  'death-gods/plague-doctor',
+  'death-gods/day-of-dead-goddess',
+  'death-gods/valraven-goddess',
+  'death-gods/clockwork-reaper',
+  'death-gods/mushroom-druid',
+  'death-gods/cosmic-void-entity',
 ]);
 
 /**

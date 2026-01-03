@@ -14,7 +14,12 @@
  * - Stand ground: Even match + moderate courage
  */
 
-import type { System } from './System.js';
+interface System {
+  readonly id: string;
+  readonly dependencies?: string[];
+  update(world: World): void;
+}
+
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { ThreatDetectionComponent, DetectedThreat, ThreatResponse } from '../components/ThreatDetectionComponent.js';
