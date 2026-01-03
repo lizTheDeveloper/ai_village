@@ -8,10 +8,7 @@
  * - Incoming projectiles (ranged/magic attacks)
  */
 
-export interface Component {
-  readonly type: string;
-}
-
+import type { Component } from '../ecs/Component.js';
 import type { AttackType } from '../types/CombatTypes.js';
 
 export interface DetectedThreat {
@@ -58,7 +55,8 @@ export interface ThreatResponse {
 }
 
 export interface ThreatDetectionComponent extends Component {
-  type: 'threat_detection';
+  readonly type: 'threat_detection';
+  readonly version: 1;
 
   /** Currently detected threats */
   threats: DetectedThreat[];
@@ -82,7 +80,9 @@ export function createThreatDetectionComponent(
 ): ThreatDetectionComponent {
   return {
     type: 'threat_detection',
+    version: 1,
     threats: [],
+    currentResponse: undefined,
     ownPowerLevel,
     lastScanTime: 0,
     scanInterval,
