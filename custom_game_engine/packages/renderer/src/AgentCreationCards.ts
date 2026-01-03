@@ -82,6 +82,21 @@ export class AgentCreationCards {
   }
 
   /**
+   * Remove a specific card by agent ID
+   */
+  removeCard(agentId: string): void {
+    const card = this.cards.get(agentId);
+    if (card) {
+      // Add fade-out animation before removing
+      card.style.animation = 'fadeOut 0.3s ease-out';
+      setTimeout(() => {
+        card.remove();
+        this.cards.delete(agentId);
+      }, 300);
+    }
+  }
+
+  /**
    * Add a new agent card
    */
   addAgentCard(data: AgentCardData): void {
@@ -96,6 +111,7 @@ export class AgentCreationCards {
   private createAgentCard(data: AgentCardData): HTMLDivElement {
     const card = document.createElement('div');
     card.style.cssText = `
+      position: relative;
       background: linear-gradient(135deg, rgba(30, 30, 50, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%);
       border: 2px solid #ffd700;
       border-radius: 12px;
@@ -117,6 +133,16 @@ export class AgentCreationCards {
           to {
             opacity: 1;
             transform: translateX(0);
+          }
+        }
+        @keyframes fadeOut {
+          from {
+            opacity: 1;
+            transform: scale(1);
+          }
+          to {
+            opacity: 0;
+            transform: scale(0.8);
           }
         }
       `;
@@ -177,8 +203,43 @@ export class AgentCreationCards {
     nameContainer.appendChild(nameEl);
     nameContainer.appendChild(archetypeEl);
 
+    // Close button
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '×';
+    closeBtn.style.cssText = `
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: transparent;
+      border: 2px solid #ffd700;
+      color: #ffd700;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    `;
+    closeBtn.addEventListener('mouseenter', () => {
+      closeBtn.style.background = 'rgba(255, 215, 0, 0.2)';
+      closeBtn.style.transform = 'scale(1.1)';
+    });
+    closeBtn.addEventListener('mouseleave', () => {
+      closeBtn.style.background = 'transparent';
+      closeBtn.style.transform = 'scale(1)';
+    });
+    closeBtn.addEventListener('click', () => {
+      this.removeCard(data.agentId);
+    });
+
     header.appendChild(spriteCanvas);
     header.appendChild(nameContainer);
+    card.appendChild(closeBtn);
 
     // Purpose
     const purposeEl = document.createElement('div');

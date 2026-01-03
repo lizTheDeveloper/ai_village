@@ -80,7 +80,7 @@ async function scanPlants(): Promise<SpriteQueueItem[]> {
 // Scan animal species files
 async function scanAnimals(): Promise<SpriteQueueItem[]> {
   const queue: SpriteQueueItem[] = [];
-  const animalFile = path.join(WORLD_DATA_DIR, 'species/animalSpecies.ts');
+  const animalFile = path.join(__dirname, '../packages/core/src/data/animalSpecies.ts');
 
   if (!fs.existsSync(animalFile)) {
     console.warn('Animal species file not found:', animalFile);
@@ -89,17 +89,18 @@ async function scanAnimals(): Promise<SpriteQueueItem[]> {
 
   const content = fs.readFileSync(animalFile, 'utf-8');
 
-  // Extract animal definitions
-  const speciesMatches = content.matchAll(/export const (\w+):\s*AnimalSpecies\s*=\s*{[^}]*id:\s*['"]([^'"]+)['"][^}]*name:\s*['"]([^'"]+)['"]/gs);
+  // Extract animal IDs from the ANIMAL_SPECIES Record object
+  // Format: chicken: { id: 'chicken', name: 'Chicken', ... }
+  const animalMatches = content.matchAll(/(\w+):\s*{\s*id:\s*['"]([^'"]+)['"][,\s]*name:\s*['"]([^'"]+)['"]/g);
 
-  for (const match of speciesMatches) {
+  for (const match of animalMatches) {
     const [, , id, name] = match;
 
     if (!hasSprite(id)) {
       queue.push({
         id,
-        type: 'character',
-        description: `${name}, natural animal pose, top-down view, pixel art`,
+        type: 'map_object',
+        description: `Realistic ${name.toLowerCase()} as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view`,
         size: id.includes('cow') || id.includes('horse') ? 64 : 48,
         category: 'animals'
       });
@@ -112,7 +113,7 @@ async function scanAnimals(): Promise<SpriteQueueItem[]> {
 // Scan humanoid species
 async function scanHumanoids(): Promise<SpriteQueueItem[]> {
   const queue: SpriteQueueItem[] = [];
-  const speciesFile = path.join(WORLD_DATA_DIR, 'species/SpeciesRegistry.ts');
+  const speciesFile = path.join(__dirname, '../packages/core/src/species/SpeciesRegistry.ts');
 
   if (!fs.existsSync(speciesFile)) {
     console.warn('Species registry file not found:', speciesFile);
@@ -144,30 +145,20 @@ async function scanHumanoids(): Promise<SpriteQueueItem[]> {
   return queue;
 }
 
-// Generate MCP command for queueing
-function generateMCPCommand(item: SpriteQueueItem): string {
-  if (item.type === 'character') {
-    return `mcp__pixellab__create_character(
-  description="${item.description}",
-  name="${item.id}",
-  size=${item.size},
-  n_directions=8,
-  view="high top-down",
-  detail="medium detail",
-  outline="single color black outline",
-  shading="basic shading"
-)`;
-  } else {
-    return `mcp__pixellab__create_map_object(
-  description="${item.description}",
-  width=${item.size},
-  height=${item.size},
-  view="high top-down",
-  detail="medium detail",
-  outline="single color outline",
-  shading="medium shading"
-)`;
-  }
+// Generate curl command for queueing via API
+function generateAPICommand(item: SpriteQueueItem): string {
+  return `curl https://api.pixellab.ai/v1/generate-image-pixflux \\
+  --request POST \\
+  --header 'Content-Type: application/json' \\
+  --header 'Authorization: Bearer $PIXELLAB_API_KEY' \\
+  --data '{
+  "description": "${item.description}",
+  "image_size": {
+    "height": ${item.size},
+    "width": ${item.size}
+  },
+  "no_background": true
+}'`;
 }
 
 // Main function
@@ -227,14 +218,18 @@ async function main() {
     console.log('\n🏃 Dry run - no sprites queued');
     console.log('Run without --dry-run to queue sprites');
   } else {
-    console.log('\n📋 MCP Commands to queue (copy to Claude Code):');
+    console.log('\n📋 API curl commands to queue:');
     console.log('=' .repeat(60));
-    for (const item of allQueue.slice(0, 10)) {
-      console.log(generateMCPCommand(item));
+    console.log('# Set your API key first:');
+    console.log('# export PIXELLAB_API_KEY="your-key-here"');
+    console.log('');
+    for (const item of allQueue.slice(0, 5)) {
+      console.log(`# ${item.category}: ${item.id}`);
+      console.log(generateAPICommand(item));
       console.log('');
     }
-    if (allQueue.length > 10) {
-      console.log(`... and ${allQueue.length - 10} more items`);
+    if (allQueue.length > 5) {
+      console.log(`... and ${allQueue.length - 5} more items`);
     }
   }
 

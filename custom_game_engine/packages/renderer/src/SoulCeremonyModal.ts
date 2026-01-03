@@ -150,25 +150,6 @@ export class SoulCeremonyModal {
     if (!this.currentContext) return;
 
     let html = `
-      <div style="position: relative;">
-        <button id="ceremony-close-btn" style="
-          position: absolute;
-          top: -10px;
-          right: -20px;
-          background: transparent;
-          border: 2px solid #ffd700;
-          color: #ffd700;
-          width: 35px;
-          height: 35px;
-          border-radius: 50%;
-          cursor: pointer;
-          font-size: 20px;
-          line-height: 1;
-          transition: all 0.2s;
-          z-index: 10;
-        ">×</button>
-      </div>
-
       <div style="text-align: center; margin-bottom: 25px;">
         <h1 style="color: #ffd700; font-size: 24px; margin: 0; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);">
           ✨ The Tapestry of Fate ✨
@@ -244,20 +225,6 @@ export class SoulCeremonyModal {
     html += `</div>`;
 
     this.contentArea.innerHTML = html;
-
-    // Attach close button handler
-    const closeBtn = document.getElementById('ceremony-close-btn');
-    if (closeBtn) {
-      closeBtn.addEventListener('mouseenter', () => {
-        closeBtn.style.background = 'rgba(255, 215, 0, 0.2)';
-        closeBtn.style.transform = 'scale(1.1)';
-      });
-      closeBtn.addEventListener('mouseleave', () => {
-        closeBtn.style.background = 'transparent';
-        closeBtn.style.transform = 'scale(1)';
-      });
-      closeBtn.addEventListener('click', () => this.handleClose());
-    }
   }
 
   /**
@@ -274,25 +241,6 @@ export class SoulCeremonyModal {
     const soulName = name || 'A Soul';
 
     let html = `
-      <div style="position: relative;">
-        <button id="ceremony-close-btn" style="
-          position: absolute;
-          top: -10px;
-          right: -20px;
-          background: transparent;
-          border: 2px solid #ffd700;
-          color: #ffd700;
-          width: 35px;
-          height: 35px;
-          border-radius: 50%;
-          cursor: pointer;
-          font-size: 20px;
-          line-height: 1;
-          transition: all 0.2s;
-          z-index: 10;
-        ">×</button>
-      </div>
-
       <div style="text-align: center; margin-bottom: 25px;">
         <h1 style="color: #ffd700; font-size: 24px; margin: 0; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);">
           ✨ ${soulName}'s Soul Is Born ✨

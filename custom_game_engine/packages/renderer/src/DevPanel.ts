@@ -25,6 +25,9 @@ import {
   BELIEF_GENERATION_RATES,
   MagicSystemStateManager,
   type ResearchStateComponent,
+  type SkillsComponent,
+  type IdentityComponent,
+  type TagsComponent,
   BuildingType,
   CT,
   EntityImpl,
@@ -40,7 +43,7 @@ import {
 // Types
 // ============================================================================
 
-type DevSection = 'magic' | 'divinity' | 'skills' | 'events' | 'state' | 'research' | 'buildings';
+type DevSection = 'magic' | 'divinity' | 'skills' | 'events' | 'state' | 'research' | 'buildings' | 'agents' | 'world';
 
 interface ResourceSlider {
   id: string;
@@ -58,6 +61,13 @@ interface ActionButton {
   description: string;
   section: DevSection;
   dangerous?: boolean;
+}
+
+/** Handler callbacks for agent spawning (provided by main.ts) */
+export interface AgentSpawnHandler {
+  spawnWanderingAgent: (x: number, y: number) => string;
+  spawnLLMAgent: (x: number, y: number) => string;
+  spawnVillage: (count: number, x: number, y: number) => string[];
 }
 
 interface ClickRegion {
@@ -380,6 +390,7 @@ export class DevPanel {
 
   private actionLog: string[] = [];
   private world: World | null = null;
+  private agentSpawnHandler: AgentSpawnHandler | null = null;
 
   constructor() {
     // Initialize paradigm states
@@ -427,7 +438,7 @@ export class DevPanel {
     const magicManager = MagicSystemStateManager.getInstance();
 
     // Apply magic paradigm state changes
-    for (const [paradigmId, localState] of this.paradigmStates.entries()) {
+    for (const [paradigmId, localState] of Array.from(this.paradigmStates.entries())) {
       const currentState = magicManager.getState(paradigmId);
       const targetState = localState.active ? 'active' : (localState.enabled ? 'enabled' : 'disabled');
       if (currentState !== targetState) {
@@ -452,6 +463,13 @@ export class DevPanel {
 
   hide(): void {
     this.visible = false;
+  }
+
+  /**
+   * Set the agent spawn handler (called from main.ts)
+   */
+  setAgentSpawnHandler(handler: AgentSpawnHandler): void {
+    this.agentSpawnHandler = handler;
   }
 
   // ========== Dev API ==========
@@ -536,6 +554,12 @@ export class DevPanel {
 
     // Section content
     switch (this.activeSection) {
+      case 'agents':
+        y = this.renderAgentsSection(ctx, width, y);
+        break;
+      case 'world':
+        y = this.renderWorldSection(ctx, width, y);
+        break;
       case 'magic':
         y = this.renderMagicSection(ctx, width, y);
         break;
@@ -588,12 +612,13 @@ export class DevPanel {
 
   private renderTabs(ctx: CanvasRenderingContext2D, width: number, y: number): number {
     const sections: Array<{ id: DevSection; label: string }> = [
+      { id: 'agents', label: 'Agents' },
+      { id: 'world', label: 'World' },
       { id: 'magic', label: 'Magic' },
       { id: 'divinity', label: 'Divinity' },
       { id: 'research', label: 'Research' },
       { id: 'buildings', label: 'Buildings' },
       { id: 'skills', label: 'Skills' },
-      { id: 'events', label: 'Events' },
       { id: 'state', label: 'State' },
     ];
 
@@ -720,6 +745,181 @@ export class DevPanel {
     return y + SIZES.padding;
   }
 
+  private renderAgentsSection(ctx: CanvasRenderingContext2D, width: number, y: number): number {
+    if (!this.world) {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '10px monospace';
+      ctx.fillText('No world available', SIZES.padding, y + 8);
+      return y + 30;
+    }
+
+    // Get all agents
+    const agents = this.world.query().with(CT.Agent).with(CT.Identity).executeEntities();
+
+    y = this.renderSectionHeader(ctx, width, y, `AGENTS (${agents.length})`);
+
+    // Show agent list with XP controls
+    if (agents.length === 0) {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '10px monospace';
+      ctx.fillText('No agents in world', SIZES.padding, y + 8);
+      y += 24;
+    } else {
+      // Show first 10 agents
+      const agentsToShow = agents.slice(0, 10);
+      for (const agent of agentsToShow) {
+        const identity = agent.getComponent<IdentityComponent>(CT.Identity);
+        const skills = agent.getComponent<SkillsComponent>(CT.Skills);
+
+        ctx.fillStyle = COLORS.text;
+        ctx.font = '10px monospace';
+        const name = identity?.name || 'Unnamed';
+        ctx.fillText(name, SIZES.padding, y + 6);
+
+        // Show total skill level
+        if (skills) {
+          const totalLevel = Object.values(skills.levels).reduce((sum: number, level) => sum + level, 0);
+          ctx.fillStyle = COLORS.textMuted;
+          ctx.font = '8px monospace';
+          ctx.fillText(`Skills: ${Math.floor(totalLevel)}`, SIZES.padding, y + 20);
+        }
+
+        // XP button
+        const btnX = width - 80;
+        ctx.fillStyle = COLORS.button;
+        ctx.fillRect(btnX, y + 6, 60, 20);
+        ctx.fillStyle = COLORS.text;
+        ctx.font = '8px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('+100 XP', btnX + 30, y + 14);
+        ctx.textAlign = 'left';
+
+        this.clickRegions.push({
+          x: btnX,
+          y: y + 6,
+          width: 60,
+          height: 20,
+          action: 'execute_action',
+          data: `grant_agent_xp_${agent.id}`,
+        });
+
+        y += 32;
+      }
+
+      if (agents.length > 10) {
+        ctx.fillStyle = COLORS.textMuted;
+        ctx.font = '9px monospace';
+        ctx.fillText(`... and ${agents.length - 10} more agents`, SIZES.padding, y + 4);
+        y += 20;
+      }
+    }
+
+    // Spawn controls
+    y = this.renderSectionHeader(ctx, width, y, 'SPAWN AGENTS');
+
+    const spawnButtons = [
+      { label: 'Spawn Wandering Agent', action: 'spawn_wandering_agent' },
+      { label: 'Spawn LLM Agent', action: 'spawn_llm_agent' },
+      { label: 'Spawn Small Village (5)', action: 'spawn_village_5' },
+      { label: 'Spawn Village (10)', action: 'spawn_village_10' },
+      { label: 'Spawn Town (25)', action: 'spawn_town_25' },
+      { label: 'Spawn City (50)', action: 'spawn_city_50' },
+    ];
+
+    for (const btn of spawnButtons) {
+      const btnWidth = width - SIZES.padding * 2;
+
+      ctx.fillStyle = COLORS.button;
+      ctx.beginPath();
+      ctx.roundRect(SIZES.padding, y + 4, btnWidth, SIZES.buttonHeight, 4);
+      ctx.fill();
+
+      ctx.fillStyle = COLORS.text;
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText(btn.label, SIZES.padding + 8, y + 12);
+
+      this.clickRegions.push({
+        x: SIZES.padding,
+        y: y + 4,
+        width: btnWidth,
+        height: SIZES.buttonHeight,
+        action: 'execute_action',
+        data: btn.action,
+      });
+
+      y += SIZES.buttonHeight + 4;
+    }
+
+    return y + SIZES.padding;
+  }
+
+  private renderWorldSection(ctx: CanvasRenderingContext2D, width: number, y: number): number {
+    if (!this.world) {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '10px monospace';
+      ctx.fillText('No world available', SIZES.padding, y + 8);
+      return y + 30;
+    }
+
+    // World stats
+    y = this.renderSectionHeader(ctx, width, y, 'WORLD STATS');
+
+    const allEntities = this.world.query().executeEntities();
+    const agents = this.world.query().with(CT.Agent).executeEntities();
+    const buildings = this.world.query().with(CT.Building).executeEntities();
+
+    const stats = [
+      `Total Entities: ${allEntities.length}`,
+      `Agents: ${agents.length}`,
+      `Buildings: ${buildings.length}`,
+      `Tick: ${this.world.tick}`,
+    ];
+
+    for (const stat of stats) {
+      ctx.fillStyle = COLORS.text;
+      ctx.font = '10px monospace';
+      ctx.fillText(stat, SIZES.padding, y + 4);
+      y += 18;
+    }
+
+    // World controls
+    y = this.renderSectionHeader(ctx, width, y, 'WORLD CONTROLS');
+
+    const worldButtons = [
+      { label: 'Fast Forward (100 ticks)', action: 'fast_forward_100' },
+      { label: 'Fast Forward (1000 ticks)', action: 'fast_forward_1000' },
+      { label: 'Clear All Dead Bodies', action: 'clear_dead_bodies' },
+      { label: 'Heal All Agents', action: 'heal_all_agents' },
+      { label: 'Feed All Agents', action: 'feed_all_agents' },
+    ];
+
+    for (const btn of worldButtons) {
+      const btnWidth = width - SIZES.padding * 2;
+
+      ctx.fillStyle = COLORS.button;
+      ctx.beginPath();
+      ctx.roundRect(SIZES.padding, y + 4, btnWidth, SIZES.buttonHeight, 4);
+      ctx.fill();
+
+      ctx.fillStyle = COLORS.text;
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText(btn.label, SIZES.padding + 8, y + 12);
+
+      this.clickRegions.push({
+        x: SIZES.padding,
+        y: y + 4,
+        width: btnWidth,
+        height: SIZES.buttonHeight,
+        action: 'execute_action',
+        data: btn.action,
+      });
+
+      y += SIZES.buttonHeight + 4;
+    }
+
+    return y + SIZES.padding;
+  }
+
   private renderResearchSection(ctx: CanvasRenderingContext2D, width: number, y: number): number {
     if (!this.world) {
       ctx.fillStyle = COLORS.textDim;
@@ -775,7 +975,7 @@ export class DevPanel {
       ctx.fillText('No research in progress', SIZES.padding, y + 8);
       y += 24;
     } else {
-      for (const [researchId, progress] of researchState.inProgress.entries()) {
+      for (const [researchId, progress] of Array.from(researchState.inProgress.entries())) {
         ctx.fillStyle = COLORS.text;
         ctx.font = '9px monospace';
         ctx.fillText(researchId, SIZES.padding, y + 4);
@@ -1210,6 +1410,26 @@ export class DevPanel {
       return;
     }
 
+    // Handle agent XP granting
+    if (actionId.startsWith('grant_agent_xp_')) {
+      const agentId = actionId.replace('grant_agent_xp_', '');
+      this.grantAgentXP(agentId, 100);
+      return;
+    }
+
+    // Handle agent spawning
+    if (actionId.startsWith('spawn_')) {
+      this.handleSpawnAction(actionId);
+      return;
+    }
+
+    // Handle world control actions
+    if (actionId.startsWith('fast_forward_') || actionId === 'clear_dead_bodies' ||
+        actionId === 'heal_all_agents' || actionId === 'feed_all_agents') {
+      this.handleWorldAction(actionId);
+      return;
+    }
+
     // Handle other actions
     switch (actionId) {
       case 'unlock_all_spells':
@@ -1294,6 +1514,183 @@ export class DevPanel {
       this.log(`Spawned ${buildingType} at (50, 50)`);
     } catch (error) {
       this.log(`ERROR spawning ${buildingType}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  private grantAgentXP(agentId: string, amount: number): void {
+    if (!this.world) {
+      this.log('ERROR: No world available');
+      return;
+    }
+
+    try {
+      const agent = this.world.getEntity(agentId);
+      if (!agent) {
+        this.log(`ERROR: Agent ${agentId} not found`);
+        return;
+      }
+
+      const identity = agent.getComponent<IdentityComponent>(CT.Identity);
+      const skills = agent.getComponent<SkillsComponent>(CT.Skills);
+
+      if (!skills) {
+        this.log(`ERROR: Agent has no skills component`);
+        return;
+      }
+
+      // Grant XP to a random skill
+      const skillNames = Object.keys(skills.levels);
+      if (skillNames.length === 0) {
+        this.log(`ERROR: Agent has no skills`);
+        return;
+      }
+
+      const randomSkill = skillNames[Math.floor(Math.random() * skillNames.length)]!;
+      const currentLevel = (skills.levels as any)[randomSkill] || 0;
+      const newLevel = currentLevel + (amount / 100); // 100 XP = 1 level
+
+      // Update the skill component
+      (this.world as any).updateComponent(agentId, CT.Skills, (current: SkillsComponent) => ({
+        ...current,
+        levels: {
+          ...current.levels,
+          [randomSkill]: newLevel,
+        },
+      }));
+
+      this.log(`Granted ${amount} XP to ${identity?.name || agentId} (${randomSkill}: ${currentLevel.toFixed(1)} → ${newLevel.toFixed(1)})`);
+    } catch (error) {
+      this.log(`ERROR granting XP: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  private handleSpawnAction(actionId: string): void {
+    if (!this.world) {
+      this.log('ERROR: No world available');
+      return;
+    }
+
+    if (!this.agentSpawnHandler) {
+      this.log('ERROR: Agent spawn handler not set. Call setAgentSpawnHandler() from main.ts');
+      return;
+    }
+
+    try {
+      switch (actionId) {
+        case 'spawn_wandering_agent': {
+          const agentId = this.agentSpawnHandler.spawnWanderingAgent(50, 50);
+          this.log(`Spawned wandering agent: ${agentId}`);
+          break;
+        }
+
+        case 'spawn_llm_agent': {
+          const agentId = this.agentSpawnHandler.spawnLLMAgent(50, 50);
+          this.log(`Spawned LLM agent: ${agentId}`);
+          break;
+        }
+
+        case 'spawn_village_5': {
+          const agentIds = this.agentSpawnHandler.spawnVillage(5, 50, 50);
+          this.log(`Spawned village with 5 agents: ${agentIds.length} created`);
+          break;
+        }
+
+        case 'spawn_village_10': {
+          const agentIds = this.agentSpawnHandler.spawnVillage(10, 50, 50);
+          this.log(`Spawned village with 10 agents: ${agentIds.length} created`);
+          break;
+        }
+
+        case 'spawn_town_25': {
+          const agentIds = this.agentSpawnHandler.spawnVillage(25, 50, 50);
+          this.log(`Spawned town with 25 agents: ${agentIds.length} created`);
+          break;
+        }
+
+        case 'spawn_city_50': {
+          const agentIds = this.agentSpawnHandler.spawnVillage(50, 50, 50);
+          this.log(`Spawned city with 50 agents: ${agentIds.length} created`);
+          break;
+        }
+
+        default:
+          this.log(`Unknown spawn action: ${actionId}`);
+      }
+    } catch (error) {
+      this.log(`ERROR spawning agents: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  private handleWorldAction(actionId: string): void {
+    if (!this.world) {
+      this.log('ERROR: No world available');
+      return;
+    }
+
+    try {
+      switch (actionId) {
+        case 'fast_forward_100':
+          // Advance the world 100 ticks
+          for (let i = 0; i < 100; i++) {
+            (this.world as any).advanceTick();
+          }
+          this.log('Advanced world by 100 ticks');
+          break;
+
+        case 'fast_forward_1000':
+          // Advance the world 1000 ticks
+          for (let i = 0; i < 1000; i++) {
+            (this.world as any).advanceTick();
+          }
+          this.log('Advanced world by 1000 ticks');
+          break;
+
+        case 'clear_dead_bodies':
+          // Remove all entities with 'dead' tag
+          const deadEntities = this.world.query().with(CT.Tags).executeEntities()
+            .filter(e => {
+              const tags = e.getComponent<TagsComponent>(CT.Tags);
+              return tags?.tags.includes('dead');
+            });
+          for (const entity of deadEntities) {
+            (this.world as any).destroyEntity(entity.id, 'dev_tools_cleanup');
+          }
+          this.log(`Removed ${deadEntities.length} dead bodies`);
+          break;
+
+        case 'heal_all_agents':
+          // Set all agents' needs to satisfied
+          const agents = this.world.query().with(CT.Agent).with(CT.Needs).executeEntities();
+          for (const agent of agents) {
+            (this.world as any).updateComponent(agent.id, CT.Needs, (needs: any) => ({
+              ...needs,
+              hunger: 0,
+              thirst: 0,
+              energy: 0,
+              social: 0,
+            }));
+          }
+          this.log(`Healed ${agents.length} agents`);
+          break;
+
+        case 'feed_all_agents':
+          // Set hunger and thirst to 0
+          const hungryAgents = this.world.query().with(CT.Agent).with(CT.Needs).executeEntities();
+          for (const agent of hungryAgents) {
+            (this.world as any).updateComponent(agent.id, CT.Needs, (needs: any) => ({
+              ...needs,
+              hunger: 0,
+              thirst: 0,
+            }));
+          }
+          this.log(`Fed ${hungryAgents.length} agents`);
+          break;
+
+        default:
+          this.log(`Unknown world action: ${actionId}`);
+      }
+    } catch (error) {
+      this.log(`ERROR in world action: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 }

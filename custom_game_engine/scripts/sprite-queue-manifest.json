@@ -236,5 +236,159 @@
     "description": "seedling plant, pixel art, top-down view",
     "size": 32,
     "category": "plants"
+  },
+  {
+    "id": "chicken",
+    "type": "map_object",
+    "description": "Realistic chicken as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
+    "size": 48,
+    "category": "animals"
+  },
+  {
+    "id": "cow",
+    "type": "map_object",
+    "description": "Realistic cow as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
+    "size": 64,
+    "category": "animals"
+  },
+  {
+    "id": "sheep",
+    "type": "map_object",
+    "description": "Realistic sheep as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
+    "size": 48,
+    "category": "animals"
+  },
+  {
+    "id": "horse",
+    "type": "map_object",
+    "description": "Realistic horse as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
+    "size": 64,
+    "category": "animals"
+  },
+  {
+    "id": "dog",
+    "type": "map_object",
+    "description": "Realistic dog as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
+    "size": 48,
+    "category": "animals"
+  },
+  {
+    "id": "cat",
+    "type": "map_object",
+    "description": "Realistic cat as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
+    "size": 48,
+    "category": "animals"
+  },
+  {
+    "id": "rabbit",
+    "type": "map_object",
+    "description": "Realistic rabbit as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
+    "size": 48,
+    "category": "animals"
+  },
+  {
+    "id": "deer",
+    "type": "map_object",
+    "description": "Realistic deer as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
+    "size": 48,
+    "category": "animals"
+  },
+  {
+    "id": "pig",
+    "type": "map_object",
+    "description": "Realistic pig as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
+    "size": 48,
+    "category": "animals"
+  },
+  {
+    "id": "goat",
+    "type": "map_object",
+    "description": "Realistic goat as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
+    "size": 48,
+    "category": "animals"
+  },
+  {
+    "id": "adaptable_default",
+    "type": "character",
+    "description": "Adaptable humanoid character, simple clothing, pixel art",
+    "size": 48,
+    "category": "humanoids"
+  },
+  {
+    "id": "keen_senses_default",
+    "type": "character",
+    "description": "Keen Senses humanoid character, simple clothing, pixel art",
+    "size": 48,
+    "category": "humanoids"
+  },
+  {
+    "id": "ageless_default",
+    "type": "character",
+    "description": "Ageless humanoid character, simple clothing, pixel art",
+    "size": 48,
+    "category": "humanoids"
+  },
+  {
+    "id": "sturdy_default",
+    "type": "character",
+    "description": "Sturdy humanoid character, simple clothing, pixel art",
+    "size": 48,
+    "category": "humanoids"
+  },
+  {
+    "id": "tusked_default",
+    "type": "character",
+    "description": "Tusked humanoid character, simple clothing, pixel art",
+    "size": 48,
+    "category": "humanoids"
+  },
+  {
+    "id": "four_arms_default",
+    "type": "character",
+    "description": "Four Arms humanoid character, simple clothing, pixel art",
+    "size": 48,
+    "category": "humanoids"
+  },
+  {
+    "id": "compound_eyes_default",
+    "type": "character",
+    "description": "Compound Eyes humanoid character, simple clothing, pixel art",
+    "size": 48,
+    "category": "humanoids"
+  },
+  {
+    "id": "chitinous_armor_default",
+    "type": "character",
+    "description": "Chitinous Armor humanoid character, simple clothing, pixel art",
+    "size": 48,
+    "category": "humanoids"
+  },
+  {
+    "id": "divine_wings_default",
+    "type": "character",
+    "description": "Divine Wings humanoid character, simple clothing, pixel art",
+    "size": 48,
+    "category": "humanoids"
+  },
+  {
+    "id": "holy_aura_default",
+    "type": "character",
+    "description": "Holy Aura humanoid character, simple clothing, pixel art",
+    "size": 48,
+    "category": "humanoids"
+  },
+  {
+    "id": "aquatic_breathing_default",
+    "type": "character",
+    "description": "Aquatic Breathing humanoid character, simple clothing, pixel art",
+    "size": 48,
+    "category": "humanoids"
+  },
+  {
+    "id": "tentacles_default",
+    "type": "character",
+    "description": "Tentacles humanoid character, simple clothing, pixel art",
+    "size": 48,
+    "category": "humanoids"
   }
 ]

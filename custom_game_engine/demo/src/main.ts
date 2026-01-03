@@ -138,7 +138,7 @@ import {
   promptLogger,
   type LLMProvider,
 } from '@ai-village/llm';
-import { TerrainGenerator, ChunkManager, createLLMAgent, createBerryBush, getPlantSpecies } from '@ai-village/world';
+import { TerrainGenerator, ChunkManager, createLLMAgent, createWanderingAgent, createBerryBush, getPlantSpecies } from '@ai-village/world';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -1249,6 +1249,21 @@ function setupWindowManager(
     minHeight: 500,
     showInWindowList: true,
     menuCategory: 'dev',
+  });
+
+  // Wire up agent spawning in dev panel
+  devPanel.setAgentSpawnHandler({
+    spawnWanderingAgent: (x, y) => createWanderingAgent(gameLoop.world, x, y),
+    spawnLLMAgent: (x, y) => createLLMAgent(gameLoop.world, x, y),
+    spawnVillage: (count, x, y) => {
+      const agentIds: string[] = [];
+      for (let i = 0; i < count; i++) {
+        const offsetX = x + (i % 5) * 3;
+        const offsetY = y + Math.floor(i / 5) * 3;
+        agentIds.push(createWanderingAgent(gameLoop.world, offsetX, offsetY));
+      }
+      return agentIds;
+    },
   });
 
   // Divine Analytics Panel

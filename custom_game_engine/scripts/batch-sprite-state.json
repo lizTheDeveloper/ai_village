@@ -1,0 +1,37 @@
+{
+  "pending": {
+    "grass": {
+      "item": {
+        "id": "grass",
+        "type": "map_object",
+        "description": "Grass plant, pixel art, top-down view",
+        "size": 32,
+        "category": "plants"
+      },
+      "queuedAt": "2026-01-03T21:49:42.790Z"
+    },
+    "wildflower": {
+      "item": {
+        "id": "wildflower",
+        "type": "map_object",
+        "description": "Wildflower plant, pixel art, top-down view",
+        "size": 32,
+        "category": "plants"
+      },
+      "queuedAt": "2026-01-03T21:50:02.112Z"
+    },
+    "berry-bush": {
+      "item": {
+        "id": "berry-bush",
+        "type": "map_object",
+        "description": "Berry Bush plant, pixel art, top-down view",
+        "size": 32,
+        "category": "plants"
+      },
+      "queuedAt": "2026-01-03T21:50:21.279Z"
+    }
+  },
+  "completed": [],
+  "failed": [],
+  "lastUpdate": "2026-01-03T21:50:21.279Z"
+}
