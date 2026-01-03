@@ -48,6 +48,7 @@ export * from './DevPanel.js';
 export * from './FarmManagementPanel.js';
 export * from './SoulCeremonyModal.js';
 export * from './AgentCreationCards.js';
+export * from './ResearchLibraryPanel.js';
 
 export * from './ui/InventoryUI.js';
 export * from './ui/DragDropSystem.js';

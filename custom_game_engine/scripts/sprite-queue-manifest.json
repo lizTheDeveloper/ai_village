@@ -1,0 +1,240 @@
+[
+  {
+    "id": "grass",
+    "type": "map_object",
+    "description": "Grass plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "wildflower",
+    "type": "map_object",
+    "description": "Wildflower plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "berry-bush",
+    "type": "map_object",
+    "description": "Berry Bush plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "tree",
+    "type": "map_object",
+    "description": "Tree plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "chamomile",
+    "type": "map_object",
+    "description": "Chamomile plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "lavender",
+    "type": "map_object",
+    "description": "Lavender plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "feverfew",
+    "type": "map_object",
+    "description": "Feverfew plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "valerian",
+    "type": "map_object",
+    "description": "Valerian plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "willow_bark",
+    "type": "map_object",
+    "description": "Willow plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "moonpetal",
+    "type": "map_object",
+    "description": "Moonpetal plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "shadowcap",
+    "type": "map_object",
+    "description": "Shadowcap Mushroom plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "whisperleaf",
+    "type": "map_object",
+    "description": "Whisperleaf plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "sunburst_flower",
+    "type": "map_object",
+    "description": "Sunburst Flower plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "frostbloom",
+    "type": "map_object",
+    "description": "Frostbloom plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "sky_edelweiss",
+    "type": "map_object",
+    "description": "Sky Edelweiss plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "avalanche_lily",
+    "type": "map_object",
+    "description": "seed plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "stone_orchid",
+    "type": "map_object",
+    "description": "rosette plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "peak_sage",
+    "type": "map_object",
+    "description": "flowering plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "glacier_lichen",
+    "type": "map_object",
+    "description": "Avalanche Lily plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "mountain_thyme",
+    "type": "map_object",
+    "description": "bulb plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "wind_pine",
+    "type": "map_object",
+    "description": "emergence plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "echo_moss",
+    "type": "map_object",
+    "description": "flowering plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "drowning_pitcher",
+    "type": "map_object",
+    "description": "Drowning Pitcher plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "snap_maw",
+    "type": "map_object",
+    "description": "seed plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "marsh_mallow",
+    "type": "map_object",
+    "description": "rosette plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "fever_bulrush",
+    "type": "map_object",
+    "description": "mature plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "will_o_wisp_bloom",
+    "type": "map_object",
+    "description": "Snap-Maw plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "memory_reed",
+    "type": "map_object",
+    "description": "seed plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "strangler_vine",
+    "type": "map_object",
+    "description": "Strangler Vine plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "serpent_liana",
+    "type": "map_object",
+    "description": "seed plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "poison_orchid",
+    "type": "map_object",
+    "description": "descending_roots plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "dream_lotus",
+    "type": "map_object",
+    "description": "strangling plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "luminous_toadstool",
+    "type": "map_object",
+    "description": "Serpent Liana plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  },
+  {
+    "id": "fever_fungus",
+    "type": "map_object",
+    "description": "seedling plant, pixel art, top-down view",
+    "size": 32,
+    "category": "plants"
+  }
+]

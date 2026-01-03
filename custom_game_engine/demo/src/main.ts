@@ -60,6 +60,7 @@ import {
   BuildingPlacementUI,
   AgentInfoPanel,
   AgentRosterPanel,
+  ResearchLibraryPanel,
   AnimalInfoPanel,
   TileInspectorPanel,
   PlantInfoPanel,
@@ -1120,6 +1121,19 @@ function setupWindowManager(
     isResizable: true,
     showInWindowList: true,
     keyboardShortcut: 'R',
+    menuCategory: 'info',
+  });
+
+  // Research Library Panel
+  const researchLibraryPanel = new ResearchLibraryPanel();
+  windowManager.registerWindow('research-library', researchLibraryPanel, {
+    defaultX: 400,
+    defaultY: 100,
+    defaultWidth: 380,
+    defaultHeight: 600,
+    isDraggable: true,
+    isResizable: true,
+    showInWindowList: true,
     menuCategory: 'info',
   });
 
@@ -2698,24 +2712,7 @@ async function main() {
     console.warn('[DEMO] Checkpoints will use default names (e.g., "Day 5")');
   }
 
-  settingsPanel.setOnSettingsChange(async () => {
-    // Take a snapshot (save) before reload to preserve agents and world state
-    // This is part of the time travel/multiverse checkpoint system
-    try {
-      console.log('[Demo] Settings changed - taking snapshot before reload...');
-      const timeComp = gameLoop.world.query().with('time').executeEntities()[0]?.getComponent<any>('time');
-      const day = timeComp?.day || 0;
-      const saveName = `settings_reload_day${day}_${new Date().toISOString().split('T')[1].split('.')[0].replace(/:/g, '-')}`;
-      await saveLoadService.save(gameLoop.world, { name: saveName });
-      console.log(`[Demo] Snapshot saved: ${saveName}`);
-    } catch (error) {
-      console.error('[Demo] Failed to save before reload:', error);
-      // Continue with reload even if save fails
-    }
-    window.location.reload();
-  });
-
-  // Initialize storage backend for save/load system
+  // Initialize storage backend for save/load system FIRST
   const { IndexedDBStorage } = await import('@ai-village/core');
   const storage = new IndexedDBStorage('ai-village-saves');
   saveLoadService.setStorage(storage);
@@ -2760,6 +2757,24 @@ async function main() {
       });
     });
   }
+
+  // Register settings change handler NOW (after storage is initialized)
+  settingsPanel.setOnSettingsChange(async () => {
+    // Take a snapshot (save) before reload to preserve agents and world state
+    // This is part of the time travel/multiverse checkpoint system
+    try {
+      console.log('[Demo] Settings changed - taking snapshot before reload...');
+      const timeComp = gameLoop.world.query().with('time').executeEntities()[0]?.getComponent<any>('time');
+      const day = timeComp?.day || 0;
+      const saveName = `settings_reload_day${day}_${new Date().toISOString().split('T')[1].split('.')[0].replace(/:/g, '-')}`;
+      await saveLoadService.save(gameLoop.world, { name: saveName });
+      console.log(`[Demo] Snapshot saved: ${saveName}`);
+    } catch (error) {
+      console.error('[Demo] Failed to save before reload:', error);
+      // Continue with reload even if save fails
+    }
+    window.location.reload();
+  });
 
   // Register all systems
   const systemsResult = await registerAllSystems(gameLoop, llmQueue, promptBuilder);
