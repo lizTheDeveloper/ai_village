@@ -98,6 +98,8 @@ import {
   GovernanceDashboardPanel,
   TimelinePanel,
   UniverseConfigScreen,
+  SCENARIO_PRESETS,
+  type UniverseConfig,
   createGovernanceDashboardPanelAdapter,
   // Magic and Divine panels
   DivinePowersPanel,
@@ -301,7 +303,8 @@ async function createSoulsForInitialAgents(
   gameLoop: GameLoop,
   agentIds: string[],
   llmProvider: LLMProvider,
-  renderer: any
+  renderer: any,
+  universeConfig: UniverseConfig | null
 ): Promise<void> {
   const soulSystem = gameLoop.systemRegistry.get('soul_creation') as SoulCreationSystem;
   if (!soulSystem) {
@@ -374,10 +377,12 @@ async function createSoulsForInitialAgents(
           spriteFolder,
         });
 
-        // Extract first memory from ceremony transcript (first meaningful statement)
-        const firstMemory = event.data.transcript && event.data.transcript.length > 0
-          ? event.data.transcript[0].text
-          : undefined;
+        // Get first memory from universe scenario (not from ceremony transcript!)
+        let firstMemory: string | undefined;
+        if (universeConfig) {
+          const scenario = SCENARIO_PRESETS.find(s => s.id === universeConfig.scenarioPresetId);
+          firstMemory = scenario?.description || universeConfig.customScenarioText;
+        }
 
         ceremonyModal.completeCeremony(
           event.data.purpose,
@@ -2707,6 +2712,7 @@ async function main() {
   let loadedCheckpoint = false;
   let universeSelection: { type: 'new' | 'load'; magicParadigm?: string; checkpointKey?: string };
   let universeConfigScreen: UniverseConfigScreen | null = null;
+  let universeConfig: UniverseConfig | null = null;  // Store full config for scenario access
 
   if (existingSaves.length > 0) {
     // Auto-load the most recent save
@@ -2725,6 +2731,7 @@ async function main() {
       universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
         universeConfigScreen = new UniverseConfigScreen();
         universeConfigScreen.show((config) => {
+          universeConfig = config;  // Store full config for scenario access
           resolve({ type: 'new', magicParadigm: config.magicParadigmId || 'none' });
         });
       });
@@ -2735,6 +2742,7 @@ async function main() {
     universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
       universeConfigScreen = new UniverseConfigScreen();
       universeConfigScreen.show((config) => {
+        universeConfig = config;  // Store full config for scenario access
         resolve({ type: 'new', magicParadigm: config.magicParadigmId || 'none' });
       });
     });
@@ -3060,7 +3068,7 @@ async function main() {
     gameLoop.start();
 
     // Create souls for the initial agents (displays modal before map loads)
-    await createSoulsForInitialAgents(gameLoop, agentIds, llmProvider, renderer);
+    await createSoulsForInitialAgents(gameLoop, agentIds, llmProvider, renderer, universeConfig);
     console.log('[Demo] All souls created, continuing initialization...');
 
     // Hide the universe config screen now that all souls are created

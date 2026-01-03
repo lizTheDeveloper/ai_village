@@ -21,15 +21,12 @@ interface PendingSpriteJob {
   size: number; // Sprite size
 }
 
-// Directions that need to be generated via API (reserved for future use)
-// const GENERATE_DIRECTIONS = ['south', 'east', 'north', 'north-east', 'south-east'] as const;
-
-// Directions created by mirroring (reserved for future use)
-// const MIRROR_MAP: Record<string, string> = {
-//   'west': 'east',           // West = flip East
-//   'north-west': 'north-east', // North-West = flip North-East
-//   'south-west': 'south-east', // South-West = flip South-East
-// };
+// Directions created by mirroring
+const MIRROR_MAP: Record<string, string> = {
+  'west': 'east',           // West = flip East
+  'north-west': 'north-east', // North-West = flip North-East
+  'south-west': 'south-east', // South-West = flip South-East
+};
 
 export class PixelLabSpriteGenerationSystem implements System {
   readonly id: SystemId = 'pixellab_sprite_generation';
@@ -300,7 +297,6 @@ export class PixelLabSpriteGenerationSystem implements System {
   ): Promise<void> {
     try {
       const fs = await import('fs');
-      const path = await import('path');
 
       // Use a simple image library or canvas to flip the image
       // For now, we'll use sharp if available, otherwise fall back to a simpler method
