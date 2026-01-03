@@ -2698,7 +2698,20 @@ async function main() {
     console.warn('[DEMO] Checkpoints will use default names (e.g., "Day 5")');
   }
 
-  settingsPanel.setOnSettingsChange(() => {
+  settingsPanel.setOnSettingsChange(async () => {
+    // Take a snapshot (save) before reload to preserve agents and world state
+    // This is part of the time travel/multiverse checkpoint system
+    try {
+      console.log('[Demo] Settings changed - taking snapshot before reload...');
+      const timeComp = gameLoop.world.query().with('time').executeEntities()[0]?.getComponent<any>('time');
+      const day = timeComp?.day || 0;
+      const saveName = `settings_reload_day${day}_${new Date().toISOString().split('T')[1].split('.')[0].replace(/:/g, '-')}`;
+      await saveLoadService.save(gameLoop.world, { name: saveName });
+      console.log(`[Demo] Snapshot saved: ${saveName}`);
+    } catch (error) {
+      console.error('[Demo] Failed to save before reload:', error);
+      // Continue with reload even if save fails
+    }
     window.location.reload();
   });
 

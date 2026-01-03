@@ -45,7 +45,6 @@ export class SpriteCache {
 
       request.onsuccess = () => {
         this.db = request.result;
-        console.log('[SpriteCache] IndexedDB initialized');
         resolve();
       };
 
@@ -66,8 +65,6 @@ export class SpriteCache {
           });
           metadataStore.createIndex('timestamp', 'timestamp', { unique: false });
         }
-
-        console.log('[SpriteCache] IndexedDB schema created');
       };
     });
   }
@@ -272,10 +269,7 @@ export class SpriteCache {
       metadataStore.delete(characterId);
 
       return new Promise((resolve, reject) => {
-        transaction.oncomplete = () => {
-          console.log(`[SpriteCache] Cleared cache for character: ${characterId}`);
-          resolve();
-        };
+        transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject(transaction.error);
       });
     } catch (error) {
@@ -295,10 +289,7 @@ export class SpriteCache {
       transaction.objectStore(METADATA_STORE).clear();
 
       return new Promise((resolve, reject) => {
-        transaction.oncomplete = () => {
-          console.log('[SpriteCache] All cache cleared');
-          resolve();
-        };
+        transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject(transaction.error);
       });
     } catch (error) {
@@ -393,10 +384,7 @@ export class SpriteCache {
       };
 
       return new Promise((resolve, reject) => {
-        transaction.oncomplete = () => {
-          console.log(`[SpriteCache] Cleared cache items older than ${maxAge}ms`);
-          resolve();
-        };
+        transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject(transaction.error);
       });
     } catch (error) {

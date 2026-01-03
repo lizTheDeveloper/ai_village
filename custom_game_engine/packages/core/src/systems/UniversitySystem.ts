@@ -220,7 +220,7 @@ export class UniversitySystem implements System {
       );
 
       console.log(
-        `[UniversitySystem] 📄 Published paper: "${paper.title}" (${paper.citationCount} citations)`
+        `[UniversitySystem] 📄 Published paper: "${paper.title}" (${paper.citedByCount} citations)`
       );
 
       // Mark project as completed

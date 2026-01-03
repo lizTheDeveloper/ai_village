@@ -101,10 +101,10 @@ The research interface allows players to view, discover, and track scientific pa
 1. **Header**: Title, field, complexity, current researchers
 2. **Abstract**: 1-2 sentence summary
 3. **Full Text**: Expandable Pratchett-style content with footnotes
-4. **Progress Bar**: Visual indicator of research completion
+4. **Progress Bar**: Visual indicator of research completion (for this paper only)
 5. **Skill Grants**: What skills are gained on completion
-6. **Contributes To**: Unlocks this helps progress toward
-7. **Required By**: Papers that need this as prerequisite
+6. **Leads To**: Papers discovered that have this as prerequisite
+7. **References In Text**: Papers mentioned in footnotes and text
 8. **Actions**: Assign/remove researchers
 
 ### 3. Related Papers Panel
@@ -188,12 +188,8 @@ The research interface allows players to view, discover, and track scientific pa
 │  • Use Ability: Brew Beer           │
 │  • Create: Beer recipe              │
 │                                      │
-│  Completed papers:                  │
-│  ✓ Yeast Fermentation               │
-│  ✓ Grain Malting                    │
-│  ✓ Hop Cultivation                  │
-│  ✓ Fermentation Temperature         │
-│  ✓ Beer Aging Techniques            │
+│  Your research into fermentation,   │
+│  grains, and brewing has paid off!  │
 │                                      │
 │  [View Details] [Dismiss]           │
 └─────────────────────────────────────┘
@@ -222,7 +218,7 @@ The research interface allows players to view, discover, and track scientific pa
 │                     │  Making  │   │ Cooking  │     │
 │                     └──────────┘   └──────────┘     │
 │                                                      │
-│  ✓ Completed  ⏺️ In Progress  ○ Available  🔒 Locked│
+│  ✓ Completed  ⏺️ In Progress  ○ Available           │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -252,7 +248,6 @@ The research interface allows players to view, discover, and track scientific pa
 - 📜 Available paper
 - 📖 Paper being studied
 - ✓ Completed paper
-- 🔒 Locked paper
 - ⚗️ Alchemy field
 - 🌿 Nature field
 - 🍳 Cuisine field
@@ -285,29 +280,6 @@ researchSpeed = baseSpeed
 - **Skill Bonus**: 0.1 per 10 skill points in relevant field
 - **Building Bonus**: Library (+0.2), University (+0.5), Research Institute (+1.0)
 - **Focus**: 1.5x if researching field of interest, 0.5x if not
-
-### N-of-M Unlock Display
-
-Show visual progress for unlock requirements:
-
-```
-Brewing Basics (5 of 10 papers needed)
-████████░░░░░░░░░░ 8/10 papers completed
-
-Completed papers contributing:
-✓ Yeast Fermentation
-✓ Grain Malting
-✓ Hop Cultivation
-✓ Fermentation Temperature
-✓ Beer Aging
-✓ Water Chemistry
-✓ Mash Temperature
-✓ Yeast Strains
-
-Not yet completed:
-○ Sanitization Techniques
-○ Bottle Conditioning
-```
 
 ## Mobile/Touch Considerations
 
@@ -371,13 +343,14 @@ Not yet completed:
 3. Clicks "Herb Identification" paper
 4. Reads abstract (Pratchett-style humor)
 5. Expands full text with footnotes
-6. Sees it contributes to "Herbalist Workshop" unlock (3/5 papers)
+6. Sees "Leads To" section mentions "Medicinal Plants" and "Herb Garden Planning"
 7. Assigns Dr. Weatherwax (Herbalism 56) to research
 8. Checks back later - paper 80% complete
 9. Paper completes - toast notification!
-10. "Herbalist Workshop" now 4/5 papers
-11. Completes one more paper in the set
-12. 🎉 Technology Unlocked! Can now build Herbalist Workshop
+10. New papers discovered: "Medicinal Plants" and "Herb Garden Planning"
+11. Completes several more herbalism papers over time
+12. 🎉 Technology Unlocked! "Herbalist Workshop" - total surprise!
+13. Player didn't know they were working toward this - just followed interesting papers
 
 ## Technical Implementation Notes
 
@@ -389,19 +362,21 @@ interface PaperUI {
   title: string;
   field: ResearchField;
   complexity: number;
-  status: 'locked' | 'available' | 'in_progress' | 'completed';
+  status: 'available' | 'in_progress' | 'completed';
   progress: number; // 0-1
   abstract: string;
   fullText: string;
   researchers: AgentId[];
-  contributesTo: UnlockProgress[];
-  requiredBy: string[]; // Paper IDs
+  leadsTo: string[]; // Discovered papers that have this as prerequisite
+  referencesInText: string[]; // Papers mentioned in this paper's text
 }
 
+// Note: UnlockProgress is tracked internally but NEVER shown to player
+// Players discover technologies as surprises when prerequisites are met
 interface UnlockProgress {
   technologyId: string;
-  papersCompleted: number;
-  papersRequired: number;
+  papersCompleted: number; // Internal tracking only
+  papersRequired: number; // Internal tracking only
   grants: TechnologyUnlock[];
 }
 ```
@@ -420,8 +395,9 @@ interface ResearchUIState {
 ```
 
 This specification provides a complete vision for the research interface that:
-- Makes discovery feel rewarding
-- Shows progress clearly with N-of-M unlocks
+- Makes discovery feel rewarding through surprise unlocks
+- Preserves the hidden nature of research - no progress bars, no locked papers
+- Shows only what has been discovered - the tree grows organically
 - Maintains Pratchett-style humor and academic flavor
 - Scales to thousands of papers
 - Works on desktop and mobile

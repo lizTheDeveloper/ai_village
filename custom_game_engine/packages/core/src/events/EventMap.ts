@@ -1567,6 +1567,7 @@ export interface GameEventMap {
     quality: number;
     novelty: number;
     tick: number;
+    researchComplete: boolean; // Did this complete the overall research?
   };
 
   /** University statistics */
