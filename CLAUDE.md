@@ -13,6 +13,14 @@
 
 **Read these documents first** to understand the codebase architecture before making changes.
 
+## 📝 Session Devlogs
+
+**All session summaries go in `devlogs/`:**
+
+- Place session summaries, implementation reports, and work logs in `devlogs/`
+- Use descriptive filenames with dates: `SESSION_SUMMARY_2026-01-03.md`, `FEATURE_IMPLEMENTATION_SUMMARY.md`
+- This keeps the repo root clean while preserving development history
+
 ## 🧹 Build Artifacts: Stale .js Files in src/ Directories
 
 **CRITICAL**: The TypeScript build may output `.js` files into `src/` directories. Vite will serve these stale `.js` files instead of transpiling the `.ts` files, causing changes to be ignored.
