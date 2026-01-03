@@ -9,6 +9,7 @@
  */
 
 import { PixelLabSpriteLoader } from './sprites/PixelLabSpriteLoader.js';
+import { getAnimalSpriteVariant } from './sprites/AnimalSpriteVariants.js';
 import type { World } from '@ai-village/core';
 
 interface AgentInfo {
@@ -18,12 +19,18 @@ interface AgentInfo {
   lastInteractionTime: number;
 }
 
+// Known animal species that use variant system
+const ANIMAL_SPECIES = new Set([
+  'chicken', 'cow', 'sheep', 'horse', 'dog', 'cat', 'rabbit', 'deer', 'pig', 'goat'
+]);
+
 export class AgentRosterPanel {
   private container: HTMLDivElement;
   private rosterContainer: HTMLDivElement;
   private agents: Map<string, AgentInfo> = new Map();
   private spriteLoader: PixelLabSpriteLoader;
   private onAgentClickCallback: ((agentId: string) => void) | null = null;
+  private selectedAgentId: string | null = null;
 
   constructor(spriteLoader: PixelLabSpriteLoader) {
     this.spriteLoader = spriteLoader;
@@ -69,6 +76,14 @@ export class AgentRosterPanel {
    */
   setOnAgentClick(callback: (agentId: string) => void): void {
     this.onAgentClickCallback = callback;
+  }
+
+  /**
+   * Set the currently selected agent (for highlighting)
+   */
+  setSelectedAgent(agentId: string | null): void {
+    this.selectedAgentId = agentId;
+    this.render();
   }
 
   /**
@@ -118,7 +133,12 @@ export class AgentRosterPanel {
 
       if (identity && appearance) {
         const name = identity.name || 'Unknown';
-        const spriteFolder = appearance.spriteFolder || 'villager';
+        let spriteFolder = appearance.spriteFolder || appearance.spriteFolderId || 'villager';
+
+        // If this is an animal, use the variant system to get stable sprite ID
+        if (ANIMAL_SPECIES.has(spriteFolder)) {
+          spriteFolder = getAnimalSpriteVariant(entity.id, spriteFolder);
+        }
 
         if (!this.agents.has(entity.id)) {
           this.addAgent(entity.id, name, spriteFolder);
@@ -162,17 +182,19 @@ export class AgentRosterPanel {
   }
 
   private createAgentPortrait(agent: AgentInfo): HTMLDivElement {
+    const isSelected = this.selectedAgentId === agent.id;
     const portrait = document.createElement('div');
     portrait.style.cssText = `
       width: 70px;
       height: 70px;
       background: linear-gradient(135deg, rgba(30, 30, 50, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%);
-      border: 2px solid #ffd700;
+      border: ${isSelected ? '3px solid #ffed4e' : '2px solid #ffd700'};
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s;
       position: relative;
       overflow: hidden;
+      ${isSelected ? 'box-shadow: 0 0 20px rgba(255, 237, 78, 0.8);' : ''}
     `;
 
     // Sprite canvas
@@ -207,6 +229,7 @@ export class AgentRosterPanel {
     // Click to focus
     portrait.addEventListener('click', () => {
       this.touchAgent(agent.id);
+      this.setSelectedAgent(agent.id);
       if (this.onAgentClickCallback) {
         this.onAgentClickCallback(agent.id);
       }
@@ -454,6 +477,7 @@ export class AgentRosterPanel {
     // Click to focus and close modal
     card.addEventListener('click', () => {
       this.touchAgent(agent.id);
+      this.setSelectedAgent(agent.id);
       if (this.onAgentClickCallback) {
         this.onAgentClickCallback(agent.id);
       }

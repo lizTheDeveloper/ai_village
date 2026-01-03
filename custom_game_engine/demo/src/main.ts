@@ -2447,6 +2447,7 @@ function handleMouseClick(
         plantInfoPanel.setSelectedEntity(null);
         memoryPanel.setSelectedEntity(entity);
         relationshipsPanel.setSelectedEntity(entity);
+        panels.agentRosterPanel.setSelectedAgent(entity.id);
         if (windowManager.getWindow('crafting')?.visible) {
           craftingUI.setActiveAgent(entity.id);
         }
@@ -2460,6 +2461,7 @@ function handleMouseClick(
         plantInfoPanel.setSelectedEntity(null);
         memoryPanel.setSelectedEntity(null);
         relationshipsPanel.setSelectedEntity(null);
+        panels.agentRosterPanel.setSelectedAgent(null);
         windowManager.showWindow('animal-info');
         windowManager.hideWindow('agent-info');
         windowManager.hideWindow('plant-info');
@@ -2470,6 +2472,7 @@ function handleMouseClick(
         animalInfoPanel.setSelectedEntity(null);
         memoryPanel.setSelectedEntity(null);
         relationshipsPanel.setSelectedEntity(null);
+        panels.agentRosterPanel.setSelectedAgent(null);
         windowManager.showWindow('plant-info');
         windowManager.hideWindow('agent-info');
         windowManager.hideWindow('animal-info');
@@ -2480,6 +2483,7 @@ function handleMouseClick(
         plantInfoPanel.setSelectedEntity(null);
         memoryPanel.setSelectedEntity(null);
         relationshipsPanel.setSelectedEntity(null);
+        panels.agentRosterPanel.setSelectedAgent(null);
         windowManager.hideWindow('agent-info');
         windowManager.hideWindow('animal-info');
         windowManager.hideWindow('plant-info');
@@ -2492,6 +2496,7 @@ function handleMouseClick(
       plantInfoPanel.setSelectedEntity(null);
       memoryPanel.setSelectedEntity(null);
       relationshipsPanel.setSelectedEntity(null);
+      panels.agentRosterPanel.setSelectedAgent(null);
       windowManager.hideWindow('agent-info');
       windowManager.hideWindow('animal-info');
       windowManager.hideWindow('plant-info');
@@ -2738,7 +2743,9 @@ async function main() {
   saveLoadService.setStorage(storage);
 
   // Check for existing saves and auto-load the most recent one
-  const existingSaves = await saveLoadService.listSaves();
+  const allSaves = await saveLoadService.listSaves();
+  // Filter out any undefined/null entries
+  const existingSaves = allSaves.filter(save => save != null && save.name && save.key);
   console.log(`[Demo] Found ${existingSaves.length} existing saves`);
   let loadedCheckpoint = false;
   let universeSelection: { type: 'new' | 'load'; magicParadigm?: string; checkpointKey?: string };

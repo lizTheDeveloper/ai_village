@@ -1,0 +1,18 @@
+{
+  "id": "cow_brown",
+  "base_species": "cow",
+  "variant": "brown",
+  "description": "brown cow",
+  "size": 64,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-03T23:50:45.641Z"
+}

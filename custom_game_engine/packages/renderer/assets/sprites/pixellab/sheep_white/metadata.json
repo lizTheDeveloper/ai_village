@@ -1,0 +1,18 @@
+{
+  "id": "sheep_white",
+  "base_species": "sheep",
+  "variant": "white",
+  "description": "white woolly sheep",
+  "size": 48,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-03T23:55:57.923Z"
+}

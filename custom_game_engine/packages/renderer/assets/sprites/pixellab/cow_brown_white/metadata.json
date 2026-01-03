@@ -1,0 +1,18 @@
+{
+  "id": "cow_brown_white",
+  "base_species": "cow",
+  "variant": "brown_white",
+  "description": "brown and white spotted cow",
+  "size": 64,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-03T23:53:07.235Z"
+}

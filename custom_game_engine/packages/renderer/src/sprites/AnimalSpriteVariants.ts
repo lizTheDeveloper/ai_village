@@ -4,8 +4,7 @@
  */
 
 export interface AnimalVariant {
-  baseSpecies: string;
-  variantId: string;
+  id: string;
   variant: string;
   description: string;
 }
@@ -204,7 +203,8 @@ export function getAnimalSpriteVariant(entityId: string, speciesId: string): str
   // Use entity ID hash to deterministically select variant
   const hash = hashString(entityId);
   const index = hash % variants.length;
-  return variants[index].id;
+  const selectedVariant = variants[index];
+  return selectedVariant ? selectedVariant.id : speciesId;
 }
 
 /**
