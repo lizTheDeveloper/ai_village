@@ -35,12 +35,14 @@ import type { LLMProvider } from '@ai-village/llm';
 import {
   createSoulIdentityComponent,
   getDefaultInterestsForArchetype,
+  type SoulCulture,
 } from '../components/SoulIdentityComponent.js';
 import { createIncarnationComponent } from '../components/IncarnationComponent.js';
 import { createSoulWisdomComponent } from '../components/SoulWisdomComponent.js';
 import { createSoulCreationEventComponent } from '../components/SoulCreationEventComponent.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 import { createRealmLocationComponent } from '../components/RealmLocationComponent.js';
+import { soulNameGenerator } from '../divinity/SoulNameGenerator.js';
 
 /** Request to create a soul */
 interface SoulCreationRequest {
@@ -83,6 +85,7 @@ export class SoulCreationSystem implements System {
    */
   setLLMProvider(provider: LLMProvider): void {
     this.llmProvider = provider;
+    soulNameGenerator.setLLMProvider(provider);
   }
 
   /**
@@ -90,6 +93,7 @@ export class SoulCreationSystem implements System {
    */
   setUseLLM(enabled: boolean): void {
     this.useLLM = enabled;
+    soulNameGenerator.setUseLLM(enabled);
   }
 
   /**
@@ -359,7 +363,7 @@ export class SoulCreationSystem implements System {
     }
 
     // Create soul entity
-    const soulId = this.createSoulEntity(world, ceremony, parsed);
+    const soulId = await this.createSoulEntity(world, ceremony, parsed);
 
     // Emit completion event
     world.eventBus.emit({
@@ -385,18 +389,23 @@ export class SoulCreationSystem implements System {
   /**
    * Create the soul entity with all components
    */
-  private createSoulEntity(
+  private async createSoulEntity(
     world: World,
     ceremony: ActiveCeremony,
     parsed: Partial<SoulCreationResult>
-  ): string {
+  ): Promise<string> {
     const { context } = ceremony.request;
 
     const soulEntity = new EntityImpl(createEntityId(), world.tick);
 
+    // Generate unique soul name
+    const generatedName = await soulNameGenerator.generateNewSoulName(world.tick);
+
     // Soul Identity Component
     const soulIdentity = createSoulIdentityComponent({
-      soulName: `Soul-${world.tick}`, // Will be given proper name on incarnation
+      soulName: generatedName.name,
+      soulOriginCulture: generatedName.culture as SoulCulture,
+      isReincarnated: context.isReforging ?? false,
       purpose: parsed.purpose ?? 'To find their place in the world',
       destiny: parsed.destiny,
       coreInterests: parsed.interests ?? getDefaultInterestsForArchetype(parsed.archetype ?? 'wanderer'),

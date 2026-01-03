@@ -1,0 +1,9 @@
+{
+  "id": "strangler_vine",
+  "category": "plants",
+  "type": "map_object",
+  "size": 32,
+  "description": "Strangler Vine plant, pixel art, top-down view",
+  "generated_at": "2026-01-03T22:03:32.737Z",
+  "usage_usd": 0
+}

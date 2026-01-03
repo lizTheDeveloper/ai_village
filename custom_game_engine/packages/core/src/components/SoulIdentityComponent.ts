@@ -17,14 +17,70 @@
 
 import type { Component } from '../ecs/Component.js';
 
+/**
+ * Soul culture/origin types
+ */
+export type SoulCulture =
+  | 'human'
+  | 'elven'
+  | 'dwarven'
+  | 'orcish'
+  | 'thrakeen'
+  | 'exotic';
+
+/**
+ * Record of a single incarnation
+ */
+export interface IncarnationRecord {
+  /** When this incarnation began */
+  incarnationTick: number;
+
+  /** When this incarnation ended (death tick) */
+  deathTick?: number;
+
+  /** Body name during this incarnation */
+  bodyName?: string;
+
+  /** Species of the body during this incarnation */
+  bodySpecies?: string;
+
+  /** How long this incarnation lasted (in ticks) */
+  duration?: number;
+
+  /** Major achievements or events during this life */
+  notableEvents?: string[];
+
+  /** Cause of death */
+  causeOfDeath?: string;
+}
+
 export interface SoulIdentityComponent extends Component {
   type: 'soul_identity';
 
   /**
    * Unique soul name/identifier
-   * May be different from incarnated body names
+   * Persistent across all incarnations
+   * Reflects the culture/species of the soul's origin
    */
   soulName: string;
+
+  /**
+   * The culture/species of this soul's origin
+   * Determines the soul's name and cultural identity
+   * An elven soul might incarnate as a human, but remains an elven soul
+   */
+  soulOriginCulture: SoulCulture;
+
+  /**
+   * Whether this soul is reincarnated (vs newly created)
+   */
+  isReincarnated: boolean;
+
+  /**
+   * History of all incarnations this soul has experienced
+   * Ordered chronologically (oldest first)
+   */
+  incarnationHistory: IncarnationRecord[];
 
   /**
    * Soul's fundamental purpose in the cosmos (LLM-generated)
@@ -103,17 +159,23 @@ export interface SoulIdentityComponent extends Component {
  */
 export function createSoulIdentityComponent(data: {
   soulName: string;
+  soulOriginCulture: SoulCulture;
+  isReincarnated: boolean;
   purpose: string;
   destiny?: string;
   coreInterests: string[];
   cosmicAlignment?: number;
   currentTick: number;
   archetype?: string;
+  incarnationHistory?: IncarnationRecord[];
 }): SoulIdentityComponent {
   return {
     type: 'soul_identity',
     version: 1,
     soulName: data.soulName,
+    soulOriginCulture: data.soulOriginCulture,
+    isReincarnated: data.isReincarnated,
+    incarnationHistory: data.incarnationHistory ?? [],
     purpose: data.purpose,
     destiny: data.destiny,
     coreInterests: data.coreInterests,
@@ -165,9 +227,9 @@ export function evaluatePurposeFulfillment(
  * Get a narrative description of the soul's journey
  */
 export function getSoulNarrative(component: SoulIdentityComponent, livesLived: number): string {
-  const { soulName, purpose, archetype, purposeFulfilled, destinyRealized } = component;
+  const { soulName, soulOriginCulture, purpose, archetype, purposeFulfilled, destinyRealized } = component;
 
-  let narrative = `${soulName}, a ${archetype ?? 'wandering'} soul`;
+  let narrative = `${soulName}, a ${soulOriginCulture} ${archetype ?? 'wandering'} soul`;
 
   if (livesLived === 1) {
     narrative += `, newly incarnated with the purpose: "${purpose}"`;
@@ -188,4 +250,68 @@ export function getSoulNarrative(component: SoulIdentityComponent, livesLived: n
   }
 
   return narrative;
+}
+
+/**
+ * Add an incarnation record to the soul's history
+ */
+export function addIncarnationRecord(
+  component: SoulIdentityComponent,
+  record: IncarnationRecord
+): void {
+  component.incarnationHistory.push(record);
+}
+
+/**
+ * Complete the current incarnation (called on death)
+ */
+export function completeCurrentIncarnation(
+  component: SoulIdentityComponent,
+  deathTick: number,
+  causeOfDeath: string,
+  notableEvents?: string[]
+): void {
+  const currentIncarnation = component.incarnationHistory[component.incarnationHistory.length - 1];
+  if (currentIncarnation) {
+    currentIncarnation.deathTick = deathTick;
+    currentIncarnation.duration = deathTick - currentIncarnation.incarnationTick;
+    currentIncarnation.causeOfDeath = causeOfDeath;
+    if (notableEvents) {
+      currentIncarnation.notableEvents = notableEvents;
+    }
+  }
+}
+
+/**
+ * Get the total number of incarnations
+ */
+export function getIncarnationCount(component: SoulIdentityComponent): number {
+  return component.incarnationHistory.length;
+}
+
+/**
+ * Get the most recent incarnation
+ */
+export function getCurrentIncarnation(component: SoulIdentityComponent): IncarnationRecord | undefined {
+  return component.incarnationHistory[component.incarnationHistory.length - 1];
+}
+
+/**
+ * Get a summary of the soul's incarnation history
+ */
+export function getIncarnationHistorySummary(component: SoulIdentityComponent): string {
+  const count = component.incarnationHistory.length;
+  if (count === 0) {
+    return 'No incarnations yet';
+  }
+
+  if (count === 1) {
+    return 'First incarnation';
+  }
+
+  const incarnations = component.incarnationHistory;
+  const species = new Set(incarnations.map(i => i.bodySpecies).filter(Boolean));
+  const totalDuration = incarnations.reduce((sum, i) => sum + (i.duration ?? 0), 0);
+
+  return `${count} incarnations across ${species.size} species (total: ${totalDuration} ticks)`;
 }

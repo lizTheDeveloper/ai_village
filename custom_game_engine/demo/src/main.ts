@@ -788,6 +788,7 @@ function createUIPanels(
 
   return {
     agentInfoPanel,
+    agentRosterPanel,
     animalInfoPanel,
     plantInfoPanel,
     resourcesPanel,
@@ -2960,6 +2961,23 @@ async function main() {
     gameLoop, canvas, renderer, chunkManager, terrainGenerator,
     systemsResult.craftingSystem, showNotification, settingsPanel
   );
+
+  // Wire up agent roster panel camera focusing
+  panels.agentRosterPanel.setOnAgentClick((agentId: string) => {
+    const entity = gameLoop.world.getEntity(agentId);
+    if (entity) {
+      const pos = entity.components.get('position') as any;
+      if (pos && renderer.camera) {
+        renderer.camera.centerOn(pos.x, pos.y);
+        panels.agentRosterPanel.touchAgent(agentId);
+      }
+    }
+  });
+
+  // Update agent roster panel once per minute
+  setInterval(() => {
+    panels.agentRosterPanel.updateFromWorld(gameLoop.world);
+  }, 60000);
 
   // Setup window manager
   const { windowManager, menuBar, controlsPanel } = setupWindowManager(

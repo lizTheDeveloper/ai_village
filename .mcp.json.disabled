@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--isolated",
+        "--headless",
+        "--block-service-workers"
+      ]
+    },
+    "ai-village-proxy": {
+      "command": "/Users/annhoward/src/abstract_agent_team/.venv/bin/python",
+      "args": ["-m", "mcp_proxy_system.servers.proxy_server"],
+      "cwd": "/Users/annhoward/src/ai_village",
+      "env": {
+        "PYTHONPATH": "/Users/annhoward/src/ai_village"
+      }
+    },
+    "ai-village-chatroom": {
+      "command": "/Users/annhoward/src/abstract_agent_team/.venv/bin/python",
+      "args": ["-m", "mcp_proxy_system.servers.chatroom_server"],
+      "cwd": "/Users/annhoward/src/ai_village",
+      "env": {
+        "PYTHONPATH": "/Users/annhoward/src/ai_village",
+        "NATS_URL": "nats://34.185.163.86:4222",
+        "NATS_USER": "orchestrator",
+        "NATS_PASSWORD": "f3LJamuke3FMecv0JYNBhf8z",
+        "NATS_NAMESPACE": "ai_village"
+      }
+    }
+  }
+}

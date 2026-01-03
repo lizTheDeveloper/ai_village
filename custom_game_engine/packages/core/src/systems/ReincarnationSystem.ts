@@ -73,6 +73,8 @@ import {
   createSoulWisdomComponent,
   createReincarnatedSoulWisdomComponent,
 } from '../components/SoulWisdomComponent.js';
+import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
+import { addIncarnationRecord } from '../components/SoulIdentityComponent.js';
 
 /** Event data for soul:reincarnation_queued */
 interface ReincarnationQueuedEventData {
@@ -110,6 +112,7 @@ interface QueuedSoul {
     memories?: EpisodicMemory[];
     suppressedMemories?: EpisodicMemory[]; // Accumulated across reincarnations for wisdom
     soulWisdom?: SoulWisdomComponent; // Soul wisdom tracker (path to godhood)
+    soulIdentity?: SoulIdentityComponent; // ALWAYS preserved - soul's true name and history
     species?: string;
     deedScore?: number;
     deathLocation?: { x: number; y: number };
@@ -281,6 +284,13 @@ export class ReincarnationSystem implements System {
       preserved.soulWisdom = createSoulWisdomComponent(currentTick);
     }
 
+    // ALWAYS preserve soul identity (soul's true name, origin, and incarnation history)
+    // This is THE core of the soul that persists across all incarnations
+    const soulIdentity = entity.components.get('soul_identity') as SoulIdentityComponent | undefined;
+    if (soulIdentity) {
+      preserved.soulIdentity = { ...soulIdentity };
+    }
+
     // Preserve based on memory retention
     switch (memoryRetention) {
       case 'full':
@@ -362,11 +372,26 @@ export class ReincarnationSystem implements System {
     newEntity.addComponent(createRenderableComponent('agent', 'entity'));
     newEntity.addComponent(createTagsComponent('agent', 'reincarnated'));
 
-    // Identity - new name or preserved
-    const newName = soul.config.memoryRetention === 'full' && soul.preserved.name
-      ? soul.preserved.name
-      : generateRandomName();
-    newEntity.addComponent(createIdentityComponent(newName));
+    // Identity - use soul's true name if available, otherwise use body name
+    const soulName = soul.preserved.soulIdentity?.soulName ?? soul.preserved.name ?? generateRandomName();
+    newEntity.addComponent(createIdentityComponent(soulName));
+
+    // Add SoulIdentityComponent (ALWAYS preserved across reincarnations)
+    if (soul.preserved.soulIdentity) {
+      // Add new incarnation record
+      const incarnationRecord = {
+        incarnationTick: world.tick,
+        bodyName: soulName,
+        bodySpecies: this.determineSpecies(soul),
+      };
+
+      addIncarnationRecord(soul.preserved.soulIdentity, incarnationRecord);
+
+      // Mark as reincarnated
+      soul.preserved.soulIdentity.isReincarnated = true;
+
+      newEntity.addComponent(soul.preserved.soulIdentity);
+    }
 
     // Personality - preserved or new
     let personality: PersonalityComponentClass;
@@ -563,7 +588,10 @@ export class ReincarnationSystem implements System {
         speciesConstraint: soul.config.speciesConstraint,
         preservedMemoryCount: soul.preserved.memories?.length ?? 0,
         previousName: soul.preserved.name,
-        newName,
+        newName: soulName,
+        soulName: soul.preserved.soulIdentity?.soulName,
+        soulOriginCulture: soul.preserved.soulIdentity?.soulOriginCulture,
+        incarnationCount: soul.preserved.soulIdentity?.incarnationHistory.length ?? 0,
       },
     });
 

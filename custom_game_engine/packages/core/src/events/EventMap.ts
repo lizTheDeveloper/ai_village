@@ -2939,6 +2939,12 @@ export interface GameEventMap {
     previousName?: string;
     /** Name in new life */
     newName: string;
+    /** Soul's true name (persistent across incarnations) */
+    soulName?: string;
+    /** Soul's origin culture/species */
+    soulOriginCulture?: string;
+    /** Number of incarnations this soul has had */
+    incarnationCount?: number;
   };
 
   // ============================================================================

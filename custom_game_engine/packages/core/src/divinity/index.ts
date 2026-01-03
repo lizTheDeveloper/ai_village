@@ -784,3 +784,16 @@ export {
   // Class
   RiddleGenerator,
 } from './RiddleGenerator.js';
+
+// ============================================================================
+// Soul Name Generation System
+// ============================================================================
+export {
+  // Types
+  type SoulCulture as SoulNameCulture,
+  type GeneratedSoulName,
+
+  // Class & Singleton
+  SoulNameGenerator,
+  soulNameGenerator,
+} from './SoulNameGenerator.js';
