@@ -38,14 +38,31 @@ export class PixelLabSpriteGenerationSystem implements System {
   private lastPollTick = 0;
 
   onInit(world: World): void {
-    // Subscribe to soul ceremony completion events
-    world.eventBus.subscribe('soul:ceremony_complete', (event: any) => {
+    // Subscribe to agent birth events
+    world.eventBus.subscribe('agent:birth', (event: any) => {
       this.enqueueSpriteGeneration(world, event.data);
     });
   }
 
-  private async enqueueSpriteGeneration(_world: World, soulData: any): Promise<void> {
-    const { agentId, name, archetype, purpose, species, interests } = soulData;
+  private async enqueueSpriteGeneration(world: World, birthData: any): Promise<void> {
+    const { agentId, name } = birthData;
+
+    // Get the agent entity to extract species and soul attributes
+    const agent = world.getEntity(agentId);
+    if (!agent) {
+      console.error(`[PixelLabSprite] Agent ${agentId} not found`);
+      return;
+    }
+
+    // Extract species from appearance component
+    const appearance = agent.components.get('appearance');
+    const species = (appearance as any)?.species || 'human';
+
+    // Extract soul attributes (archetype, purpose, interests)
+    const soulIdentity = agent.components.get('soul_identity');
+    const archetype = (soulIdentity as any)?.archetype || 'wanderer';
+    const purpose = (soulIdentity as any)?.purpose || 'To find their place in the world';
+    const interests = (soulIdentity as any)?.coreInterests || [];
 
     console.log(`[PixelLabSprite] Starting 8-direction sprite generation for ${name} (${species}, ${archetype})`);
 

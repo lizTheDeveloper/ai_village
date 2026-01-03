@@ -23,13 +23,24 @@ import {
   HYBRID_PARADIGM_REGISTRY,
   POWER_TIER_THRESHOLDS,
   BELIEF_GENERATION_RATES,
+  MagicSystemStateManager,
+  type ResearchStateComponent,
+  BuildingType,
+  CT,
+  EntityImpl,
+  createEntityId,
+  createPositionComponent,
+  createPhysicsComponent,
+  createRenderableComponent,
+  createTagsComponent,
+  createBuildingComponent,
 } from '@ai-village/core';
 
 // ============================================================================
 // Types
 // ============================================================================
 
-type DevSection = 'magic' | 'divinity' | 'skills' | 'events' | 'state';
+type DevSection = 'magic' | 'divinity' | 'skills' | 'events' | 'state' | 'research' | 'buildings';
 
 interface ResourceSlider {
   id: string;
@@ -368,6 +379,7 @@ export class DevPanel {
   private skillXp = new Map<string, number>();
 
   private actionLog: string[] = [];
+  private world: World | null = null;
 
   constructor() {
     // Initialize paradigm states
@@ -381,6 +393,46 @@ export class DevPanel {
     // Initialize skill XP
     for (const s of SKILL_TREES) {
       this.skillXp.set(s.id, s.xp);
+    }
+  }
+
+  // ========== State Sync ==========
+
+  /**
+   * Sync local state from world state (read actual game data)
+   */
+  private syncFromWorld(world: World): void {
+    this.world = world;
+
+    // Sync magic paradigm states from MagicSystemStateManager
+    const magicManager = MagicSystemStateManager.getInstance();
+    for (const paradigm of PARADIGMS) {
+      const paradigmState = magicManager.getState(paradigm.id);
+      const localState = this.paradigmStates.get(paradigm.id);
+      if (localState) {
+        localState.enabled = paradigmState !== 'disabled';
+        localState.active = paradigmState === 'active';
+        // Mana tracking would need to be added to MagicSystemStateManager
+        // For now, keep local tracking
+      }
+    }
+  }
+
+  /**
+   * Apply local state changes to world (write to actual game data)
+   */
+  private applyToWorld(): void {
+    if (!this.world) return;
+
+    const magicManager = MagicSystemStateManager.getInstance();
+
+    // Apply magic paradigm state changes
+    for (const [paradigmId, localState] of this.paradigmStates.entries()) {
+      const currentState = magicManager.getState(paradigmId);
+      const targetState = localState.active ? 'active' : (localState.enabled ? 'enabled' : 'disabled');
+      if (currentState !== targetState) {
+        magicManager.setState(paradigmId, targetState);
+      }
     }
   }
 
@@ -454,7 +506,12 @@ export class DevPanel {
 
   // ========== Rendering ==========
 
-  render(ctx: CanvasRenderingContext2D, width: number, height: number, _world?: World): void {
+  render(ctx: CanvasRenderingContext2D, width: number, height: number, world?: World): void {
+    // Sync state from world
+    if (world) {
+      this.syncFromWorld(world);
+    }
+
     this.clickRegions = [];
 
     ctx.textAlign = 'left';
@@ -494,6 +551,12 @@ export class DevPanel {
       case 'state':
         y = this.renderStateSection(ctx, width, y);
         break;
+      case 'research':
+        y = this.renderResearchSection(ctx, width, y);
+        break;
+      case 'buildings':
+        y = this.renderBuildingsSection(ctx, width, y);
+        break;
     }
 
     ctx.restore();
@@ -527,6 +590,8 @@ export class DevPanel {
     const sections: Array<{ id: DevSection; label: string }> = [
       { id: 'magic', label: 'Magic' },
       { id: 'divinity', label: 'Divinity' },
+      { id: 'research', label: 'Research' },
+      { id: 'buildings', label: 'Buildings' },
       { id: 'skills', label: 'Skills' },
       { id: 'events', label: 'Events' },
       { id: 'state', label: 'State' },
@@ -651,6 +716,156 @@ export class DevPanel {
 
     y = this.renderSectionHeader(ctx, width, y, 'DANGER ZONE');
     y = this.renderActions(ctx, width, y, 'state');
+
+    return y + SIZES.padding;
+  }
+
+  private renderResearchSection(ctx: CanvasRenderingContext2D, width: number, y: number): number {
+    if (!this.world) {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '10px monospace';
+      ctx.fillText('No world available', SIZES.padding, y + 8);
+      return y + 30;
+    }
+
+    // Get research state from world
+    const worldEntity = this.world.query().with(CT.ResearchState).executeEntities()[0];
+    if (!worldEntity) {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '10px monospace';
+      ctx.fillText('No research system found', SIZES.padding, y + 8);
+      return y + 30;
+    }
+
+    const researchState = worldEntity.getComponent<ResearchStateComponent>(CT.ResearchState);
+    if (!researchState) {
+      return y + 30;
+    }
+
+    // Show completed research
+    y = this.renderSectionHeader(ctx, width, y, `COMPLETED RESEARCH (${researchState.completed.size})`);
+
+    if (researchState.completed.size === 0) {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '10px monospace';
+      ctx.fillText('No research completed yet', SIZES.padding, y + 8);
+      y += 24;
+    } else {
+      const completedArray = Array.from(researchState.completed).slice(0, 10);
+      for (const researchId of completedArray) {
+        ctx.fillStyle = COLORS.success;
+        ctx.font = '9px monospace';
+        ctx.fillText(`✓ ${researchId}`, SIZES.padding, y + 4);
+        y += 16;
+      }
+      if (researchState.completed.size > 10) {
+        ctx.fillStyle = COLORS.textMuted;
+        ctx.font = '9px monospace';
+        ctx.fillText(`... and ${researchState.completed.size - 10} more`, SIZES.padding, y + 4);
+        y += 16;
+      }
+    }
+
+    // Show in-progress research
+    y = this.renderSectionHeader(ctx, width, y, `IN PROGRESS (${researchState.inProgress.size})`);
+
+    if (researchState.inProgress.size === 0) {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '10px monospace';
+      ctx.fillText('No research in progress', SIZES.padding, y + 8);
+      y += 24;
+    } else {
+      for (const [researchId, progress] of researchState.inProgress.entries()) {
+        ctx.fillStyle = COLORS.text;
+        ctx.font = '9px monospace';
+        ctx.fillText(researchId, SIZES.padding, y + 4);
+
+        // Progress amount (can't show percentage without research definition)
+        ctx.fillStyle = COLORS.textMuted;
+        ctx.font = '8px monospace';
+        ctx.fillText(`Progress: ${Math.floor(progress.currentProgress)}`, SIZES.padding, y + 18);
+
+        y += 28;
+      }
+    }
+
+    // Show research queue
+    y = this.renderSectionHeader(ctx, width, y, `QUEUED (${researchState.queue.length})`);
+
+    if (researchState.queue.length === 0) {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '10px monospace';
+      ctx.fillText('No research queued', SIZES.padding, y + 8);
+      y += 24;
+    } else {
+      const queuedToShow = researchState.queue.slice(0, 5);
+      for (let i = 0; i < queuedToShow.length; i++) {
+        ctx.fillStyle = COLORS.textMuted;
+        ctx.font = '9px monospace';
+        ctx.fillText(`${i + 1}. ${queuedToShow[i]}`, SIZES.padding, y + 4);
+        y += 16;
+      }
+      if (researchState.queue.length > 5) {
+        ctx.fillStyle = COLORS.textDim;
+        ctx.font = '9px monospace';
+        ctx.fillText(`... and ${researchState.queue.length - 5} more`, SIZES.padding, y + 4);
+        y += 16;
+      }
+    }
+
+    return y + SIZES.padding;
+  }
+
+  private renderBuildingsSection(ctx: CanvasRenderingContext2D, width: number, y: number): number {
+    if (!this.world) {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '10px monospace';
+      ctx.fillText('No world available', SIZES.padding, y + 8);
+      return y + 30;
+    }
+
+    y = this.renderSectionHeader(ctx, width, y, 'SPAWN BUILDING');
+
+    // Building type selector (show a few common ones as buttons)
+    const commonBuildings: BuildingType[] = [
+      BuildingType.Workbench,
+      BuildingType.StorageChest,
+      BuildingType.Campfire,
+      BuildingType.Tent,
+      BuildingType.Well,
+      BuildingType.Forge,
+      BuildingType.Library,
+      BuildingType.University,
+    ];
+
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = '9px monospace';
+    ctx.fillText('Click to spawn at (50, 50):', SIZES.padding, y + 4);
+    y += 20;
+
+    for (const buildingType of commonBuildings) {
+      const btnWidth = width - SIZES.padding * 2;
+
+      ctx.fillStyle = COLORS.button;
+      ctx.beginPath();
+      ctx.roundRect(SIZES.padding, y + 4, btnWidth, SIZES.buttonHeight, 4);
+      ctx.fill();
+
+      ctx.fillStyle = COLORS.text;
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText(`Spawn ${buildingType}`, SIZES.padding + 8, y + 12);
+
+      this.clickRegions.push({
+        x: SIZES.padding,
+        y: y + 4,
+        width: btnWidth,
+        height: SIZES.buttonHeight,
+        action: 'execute_action',
+        data: `spawn_building_${buildingType}`,
+      });
+
+      y += SIZES.buttonHeight + 4;
+    }
 
     return y + SIZES.padding;
   }
@@ -943,6 +1158,8 @@ export class DevPanel {
             state.active = !state.active;
             this.log(`${state.active ? 'Activated' : 'Deactivated'} ${paradigmId}`);
           }
+          // Apply changes to world immediately
+          this.applyToWorld();
         }
         return true;
       }
@@ -986,6 +1203,14 @@ export class DevPanel {
   }
 
   private executeAction(actionId: string): void {
+    // Handle building spawning
+    if (actionId.startsWith('spawn_building_')) {
+      const buildingType = actionId.replace('spawn_building_', '') as BuildingType;
+      this.spawnBuilding(buildingType);
+      return;
+    }
+
+    // Handle other actions
     switch (actionId) {
       case 'unlock_all_spells':
         this.log('Unlocked all spells');
@@ -1043,7 +1268,32 @@ export class DevPanel {
           this.skillXp.set(s.id, s.xp);
         }
         this.log('RESET ALL state to defaults');
+        this.applyToWorld(); // Apply reset to world
         break;
+    }
+  }
+
+  private spawnBuilding(buildingType: BuildingType): void {
+    if (!this.world) {
+      this.log('ERROR: No world available');
+      return;
+    }
+
+    try {
+      // Create building entity at position (50, 50)
+      const entity = new EntityImpl(createEntityId(), this.world.tick);
+      entity.addComponent(createPositionComponent(50, 50, 0));
+      entity.addComponent(createPhysicsComponent(true, 1, 1));
+      entity.addComponent(createRenderableComponent(buildingType, 'building'));
+      entity.addComponent(createTagsComponent('building', buildingType));
+      entity.addComponent(createBuildingComponent(buildingType));
+
+      // Add to world using private method
+      (this.world as any)._addEntity(entity);
+
+      this.log(`Spawned ${buildingType} at (50, 50)`);
+    } catch (error) {
+      this.log(`ERROR spawning ${buildingType}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 }

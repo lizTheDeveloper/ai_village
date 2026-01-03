@@ -250,7 +250,7 @@ Safety considerations when studying architectural styles cannot be overstated, p
 †††The case of Lord Weatherby's Manor serves as a warning against mixing architectural styles indiscriminately. After attempting to combine Gothic revival, Georgian symmetry, and Art Deco ornament in a single structure, the building achieved a level of aesthetic confusion that caused three separate architectural critics to resign from their positions rather than review it. It was eventually donated to the Ministry of Confusing Buildings, where it serves as a training facility for insurance adjusters.
 
 ---`,
-  abstract: 'This paper examines the historical development of architectural styles from Classical antiquity through modern movements, analyzing how each period's aesthetic principles, structural innovations, and safety considerations inform contemporary construction practice while serving as cautionary examples of what happens when architectural theory disconnects from practical human needs.',
+  abstract: "This paper examines the historical development of architectural styles from Classical antiquity through modern movements, analyzing how each period's aesthetic principles, structural innovations, and safety considerations inform contemporary construction practice while serving as cautionary examples of what happens when architectural theory disconnects from practical human needs.",
   published: false
 };
 

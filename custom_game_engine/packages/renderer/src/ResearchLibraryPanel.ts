@@ -13,8 +13,8 @@
 import type { IWindowPanel } from './types/WindowTypes.js';
 import type { World } from '@ai-village/core';
 import type { ResearchStateComponent } from '@ai-village/core';
-import { getAcademicPaperSystem } from '@ai-village/core';
 import type { ResearchField } from '@ai-village/world';
+import { getPaper } from '@ai-village/world';
 
 interface PaperUI {
   paperId: string;
@@ -83,7 +83,7 @@ export class ResearchLibraryPanel implements IWindowPanel {
     ]);
 
     for (const paperId of discoveredIds) {
-      const paper = globalPaperRegistry.get(paperId);
+      const paper = getPaper(paperId);
       if (!paper) continue;
 
       const progress = researchState.inProgress.get(paperId);
