@@ -2,7 +2,7 @@
  * ThreatResponseSystem
  *
  * Automatically scans for threats and makes decisions based on:
- * - Agent personality (courage, aggression)
+ * - Agent personality (courage from neuroticism, aggression from agreeableness)
  * - Power differential (can they win?)
  * - Threat type (melee vs ranged)
  * - Available cover (for ranged threats)
@@ -14,14 +14,10 @@
  * - Stand ground: Even match + moderate courage
  */
 
-interface System {
-  readonly id: string;
-  readonly dependencies?: string[];
-  update(world: World): void;
-}
-
 import type { World } from '../ecs/World.js';
+import type { System } from '../ecs/System.js';
 import type { Entity } from '../ecs/Entity.js';
+import { EntityImpl } from '../ecs/Entity.js';
 import type { ThreatDetectionComponent, DetectedThreat, ThreatResponse } from '../components/ThreatDetectionComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
 import type { SkillsComponent } from '../components/SkillsComponent.js';
@@ -38,23 +34,19 @@ import {
 import { ComponentType as CT } from '../types/ComponentType.js';
 
 export class ThreatResponseSystem implements System {
+  public readonly id = 'threat-response';
+  public readonly priority = 900; // Late priority, after most game logic
+  public readonly requiredComponents = ['threat_detection', 'position', 'personality'] as const;
   public readonly name = 'ThreatResponseSystem';
   private readonly UPDATE_INTERVAL = 5; // Every 5 ticks (~0.25 seconds)
   private lastUpdateTick = 0;
 
-  update(world: World): void {
+  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     // Throttle updates
     if (world.tick - this.lastUpdateTick < this.UPDATE_INTERVAL) {
       return;
     }
     this.lastUpdateTick = world.tick;
-
-    // Get all entities with threat detection
-    const entities = world.query()
-      .with(CT.ThreatDetection)
-      .with(CT.Position)
-      .with(CT.Personality)
-      .executeEntities();
 
     for (const entity of entities) {
       this.processEntity(entity, world);
@@ -112,7 +104,7 @@ export class ThreatResponseSystem implements System {
         if (!otherAgent || otherAgent.id === entity.id) continue;
 
         // Check if hostile (for now, check conflict component or wild animal)
-        const isHostile = this.isHostile(entity, otherAgent, world);
+        const isHostile = this.isHostile(entity, otherAgent);
         if (!isHostile) continue;
 
         const threat = this.createThreatFromAgent(otherAgent, position, world);
@@ -149,19 +141,19 @@ export class ThreatResponseSystem implements System {
     // Combat stats
     const combatStats = entity.getComponent<CombatStatsComponent>(CT.CombatStats);
     if (combatStats) {
-      power += combatStats.attack;
-      power += combatStats.defense / 2;
+      power += combatStats.combatSkill;
+      power += (combatStats.huntingSkill ?? 0) / 2;
     }
 
     // Equipment bonus
     const equipment = entity.getComponent<EquipmentComponent>(CT.Equipment);
     if (equipment) {
       // Weapon adds power
-      if (equipment.slots.weapon) {
+      if (equipment.weapons.mainHand) {
         power += 15; // Basic weapon bonus
       }
-      // Armor adds defensive power
-      if (equipment.slots.armor) {
+      // Armor adds defensive power (check any equipped armor)
+      if (Object.keys(equipment.equipped).length > 0) {
         power += 10;
       }
     }
@@ -176,7 +168,7 @@ export class ThreatResponseSystem implements System {
     return Math.min(100, Math.max(0, power));
   }
 
-  private isHostile(agent: Entity, other: Entity, world: World): boolean {
+  private isHostile(agent: Entity, other: Entity): boolean {
     // Check for conflict component
     const conflict = other.getComponent<any>(CT.Conflict);
     if (conflict?.targetId === agent.id) return true;
@@ -214,9 +206,10 @@ export class ThreatResponseSystem implements System {
 
     // Determine attack type (check equipment for ranged weapons)
     const equipment = hostile.getComponent<EquipmentComponent>(CT.Equipment);
-    const hasRangedWeapon = equipment?.slots.weapon?.itemId?.includes('bow') ||
-                            equipment?.slots.weapon?.itemId?.includes('gun') ||
-                            equipment?.slots.weapon?.itemId?.includes('crossbow');
+    const weaponId = equipment?.weapons.mainHand?.itemId;
+    const hasRangedWeapon = weaponId?.includes('bow') ||
+                            weaponId?.includes('gun') ||
+                            weaponId?.includes('crossbow');
 
     return {
       threatId: hostile.id,
@@ -277,9 +270,11 @@ export class ThreatResponseSystem implements System {
       primaryThreat.powerLevel
     );
 
-    // Personality factors
-    const courage = personality.courage ?? 0.5;
-    const aggression = personality.aggression ?? 0.5;
+    // Derive personality factors from Big Five traits
+    // Courage = low neuroticism (resilient)
+    const courage = 1 - personality.neuroticism;
+    // Aggression = low agreeableness (competitive)
+    const aggression = 1 - personality.agreeableness;
 
     // Decision matrix based on power differential and personality
 
@@ -298,7 +293,7 @@ export class ThreatResponseSystem implements System {
         };
       }
       // Extremely brave (9/10) agents seek cover instead
-      return this.findCoverResponse(primaryThreat, entity, world, differential);
+      return this.findCoverResponse(primaryThreat, entity, world);
     }
 
     // STRONG THREAT: Moderately stronger
@@ -317,7 +312,7 @@ export class ThreatResponseSystem implements System {
 
       // Ranged threat = seek cover
       if (primaryThreat.attackType === 'ranged' || primaryThreat.attackType === 'magic') {
-        return this.findCoverResponse(primaryThreat, entity, world, differential);
+        return this.findCoverResponse(primaryThreat, entity, world);
       }
 
       // Moderate courage = stand ground
@@ -349,7 +344,7 @@ export class ThreatResponseSystem implements System {
     if (isEvenMatch(differential)) {
       // Ranged threat = seek cover
       if (primaryThreat.attackType === 'ranged' || primaryThreat.attackType === 'magic') {
-        return this.findCoverResponse(primaryThreat, entity, world, differential);
+        return this.findCoverResponse(primaryThreat, entity, world);
       }
 
       // High aggression = attack
@@ -378,8 +373,7 @@ export class ThreatResponseSystem implements System {
   private findCoverResponse(
     threat: DetectedThreat,
     entity: Entity,
-    world: World,
-    differential: number
+    world: World
   ): ThreatResponse {
     // Try to find cover (buildings, trees, terrain features)
     const position = entity.getComponent<PositionComponent>(CT.Position);
@@ -402,8 +396,9 @@ export class ThreatResponseSystem implements System {
       let closestDist = Infinity;
 
       for (const buildingId of vision.seenBuildings) {
-        const building = world.getEntity(buildingId);
-        const buildingPos = building?.getComponent<PositionComponent>(CT.Position);
+        const building = world.getEntity(buildingId) ?? null;
+        if (!building) continue;
+        const buildingPos = building.getComponent<PositionComponent>(CT.Position);
         if (!buildingPos) continue;
 
         const dx = buildingPos.x - position.x;
@@ -441,18 +436,8 @@ export class ThreatResponseSystem implements System {
     };
   }
 
-  private executeResponse(entity: Entity, response: ThreatResponse, world: World): void {
-    // Emit event for other systems to react
-    world.eventBus.emit({
-      type: 'threat:auto_response',
-      source: 'threat-response-system',
-      data: {
-        agentId: entity.id,
-        response: response.action,
-        targetId: response.targetId,
-        reason: response.reason,
-      },
-    });
+  private executeResponse(entity: Entity, response: ThreatResponse, _world: World): void {
+    const impl = entity as EntityImpl;
 
     // Set behavior state based on response
     const agent = entity.getComponent<any>(CT.Agent);
@@ -461,7 +446,7 @@ export class ThreatResponseSystem implements System {
     switch (response.action) {
       case 'flee':
         // Set flee behavior
-        entity.updateComponent(CT.Agent, (a: any) => ({
+        impl.updateComponent(CT.Agent, (a: any) => ({
           ...a,
           currentBehavior: 'flee',
           behaviorState: {
@@ -473,7 +458,7 @@ export class ThreatResponseSystem implements System {
 
       case 'attack':
         // Set attack behavior
-        entity.updateComponent(CT.Agent, (a: any) => ({
+        impl.updateComponent(CT.Agent, (a: any) => ({
           ...a,
           currentBehavior: 'attack',
           behaviorState: {
@@ -485,7 +470,7 @@ export class ThreatResponseSystem implements System {
 
       case 'seek_cover':
         // Set navigate behavior to cover position
-        entity.updateComponent(CT.Agent, (a: any) => ({
+        impl.updateComponent(CT.Agent, (a: any) => ({
           ...a,
           currentBehavior: 'navigate',
           behaviorState: {
@@ -497,7 +482,7 @@ export class ThreatResponseSystem implements System {
 
       case 'stand_ground':
         // Set defensive stance (could trigger guard behavior)
-        entity.updateComponent(CT.Agent, (a: any) => ({
+        impl.updateComponent(CT.Agent, (a: any) => ({
           ...a,
           currentBehavior: 'wander', // Stay in place, ready to react
           behaviorState: {

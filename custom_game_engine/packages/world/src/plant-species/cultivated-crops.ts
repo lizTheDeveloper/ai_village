@@ -140,7 +140,7 @@ export const WHEAT: PlantSpecies = {
 export const POTATO: PlantSpecies = {
   id: 'potato',
   name: 'Potato',
-  category: 'root',
+  category: 'crop',
   biomes: ['plains', 'grassland', 'forest'],
   rarity: 'common',
 
@@ -265,7 +265,7 @@ export const POTATO: PlantSpecies = {
 export const CARROT: PlantSpecies = {
   id: 'carrot',
   name: 'Carrot',
-  category: 'root',
+  category: 'crop',
   biomes: ['plains', 'grassland'],
   rarity: 'common',
 

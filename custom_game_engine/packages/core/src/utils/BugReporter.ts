@@ -21,12 +21,6 @@ const isNode = typeof process !== 'undefined' && process.versions?.node;
 let fs: typeof import('fs') | null = null;
 let path: typeof import('path') | null = null;
 
-async function ensureNodeModules(): Promise<void> {
-  if (!isNode) return;
-  if (!fs) fs = await import('fs');
-  if (!path) path = await import('path');
-}
-
 export class BugReporter {
   private static get bugReportsDir(): string {
     if (!isNode || !path) return '';

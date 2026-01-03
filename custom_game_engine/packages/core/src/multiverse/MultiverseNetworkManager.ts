@@ -554,11 +554,15 @@ export class MultiverseNetworkManager {
             });
 
             // Emit event for UI notification
-            sourceUniverse.world.emit('possession:cross_universe_jackout', {
-              deityId: deityEntity.id,
-              entityId,
-              entityName: (entity.components.get('agent') as any)?.name || 'Unknown',
-              targetUniverseId: passage.to.universeId,
+            sourceUniverse.world.eventBus.emit({
+              type: 'possession:cross_universe_jackout',
+              source: 'multiverse-network-manager',
+              data: {
+                deityId: deityEntity.id,
+                entityId,
+                entityName: (entity.components.get('agent') as any)?.name || 'Unknown',
+                targetUniverseId: passage.to.universeId,
+              },
             });
           } else {
             // Multiverse deity possessing across universes in same multiverse

@@ -448,7 +448,8 @@ export class ShopPanel {
     // Get TradingSystem
     const worldWithSystems = world as WorldWithSystems;
     const tradingSystem = worldWithSystems.getSystem?.('trading');
-    if (!tradingSystem || typeof tradingSystem !== 'object' || !('buyFromShop' in tradingSystem)) {
+    if (!tradingSystem || typeof tradingSystem !== 'object' ||
+        !('buyFromShop' in tradingSystem) || !('sellToShop' in tradingSystem)) {
       console.error('TradingSystem not found');
       return;
     }
@@ -496,7 +497,8 @@ export class ShopPanel {
     // Get TradingSystem
     const worldWithSystems = world as WorldWithSystems;
     const tradingSystem = worldWithSystems.getSystem?.('trading');
-    if (!tradingSystem || typeof tradingSystem !== 'object' || !tradingSystem || !('sellToShop' in tradingSystem)) {
+    if (!tradingSystem || typeof tradingSystem !== 'object' ||
+        !('buyFromShop' in tradingSystem) || !('sellToShop' in tradingSystem)) {
       console.error('TradingSystem not found');
       return;
     }

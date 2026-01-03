@@ -217,7 +217,7 @@ export class SaveStateManager {
    * List all saves for a session
    */
   async listSaves(sessionId: string): Promise<SaveListEntry[]> {
-    if (!isNode || !fs || !path || !readdir) {
+    if (!isNode || !fs || !path || !readdir || !stat) {
       return [];
     }
 

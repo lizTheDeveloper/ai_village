@@ -158,6 +158,7 @@ export class MultiverseCoordinator {
       id: forkId,
       name: forkName,
       timeScale: timeScale ?? source.config.timeScale,
+      multiverseId: source.config.multiverseId,
       parentId: sourceUniverseId,
       forkedAtTick: source.universeTick,
       paused: false,
