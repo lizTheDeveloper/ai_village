@@ -447,6 +447,380 @@ async function sendQueryToGame(ws: WebSocket, queryType: string, entityId?: stri
 }
 
 /**
+ * HTML Panel Rendering Functions
+ */
+
+function renderHTMLPanel(title: string, content: string): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title} - AI Village</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      color: #e0e0e0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(30, 30, 50, 0.95);
+      border: 2px solid #ffd700;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+    h1 {
+      color: #ffd700;
+      font-size: 2em;
+      margin-bottom: 10px;
+      text-align: center;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+    .subtitle {
+      text-align: center;
+      color: #999;
+      margin-bottom: 30px;
+      font-size: 0.9em;
+    }
+    .auto-refresh {
+      text-align: center;
+      color: #666;
+      font-size: 0.85em;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #444;
+    }
+    th {
+      background: rgba(255, 215, 0, 0.1);
+      color: #ffd700;
+      font-weight: 600;
+    }
+    tr:hover {
+      background: rgba(255, 215, 0, 0.05);
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+    .status-completed {
+      background: rgba(76, 175, 80, 0.2);
+      color: #4CAF50;
+      border: 1px solid #4CAF50;
+    }
+    .status-in-progress {
+      background: rgba(33, 150, 243, 0.2);
+      color: #2196F3;
+      border: 1px solid #2196F3;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #2196F3, #21CBF3);
+      transition: width 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.75em;
+      font-weight: bold;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: rgba(255, 215, 0, 0.05);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 2em;
+      color: #ffd700;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .stat-label {
+      color: #999;
+      font-size: 0.9em;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+    }
+    .empty-state svg {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+      opacity: 0.3;
+    }
+  </style>
+  <script>
+    // Auto-refresh every 5 seconds
+    setTimeout(() => window.location.reload(), 5000);
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>${title}</h1>
+    <div class="subtitle">AI Village Dashboard</div>
+    <div class="auto-refresh">🔄 Auto-refreshing every 5 seconds...</div>
+    ${content}
+  </div>
+</body>
+</html>`;
+}
+
+function renderResearchPanel(data: any): string {
+  const { totalDiscovered, completed, completedCount, inProgress, inProgressCount } = data;
+
+  if (totalDiscovered === 0) {
+    return `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+        </svg>
+        <h2 style="color: #666; margin-bottom: 10px;">No Research Discovered</h2>
+        <p>Complete research tasks in-game to discover papers!</p>
+      </div>
+    `;
+  }
+
+  let html = '<div class="stats-grid">';
+  html += `
+    <div class="stat-card">
+      <div class="stat-value">${totalDiscovered}</div>
+      <div class="stat-label">Total Papers</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${completedCount}</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${inProgressCount}</div>
+      <div class="stat-label">In Progress</div>
+    </div>
+  `;
+  html += '</div>';
+
+  if (completed && completed.length > 0) {
+    html += '<h2 style="color: #4CAF50; margin: 30px 0 15px 0;">✓ Completed Papers</h2>';
+    html += '<table><thead><tr><th>Paper ID</th><th>Status</th></tr></thead><tbody>';
+    for (const paperId of completed) {
+      html += `
+        <tr>
+          <td><code>${paperId}</code></td>
+          <td><span class="status-badge status-completed">Completed</span></td>
+        </tr>
+      `;
+    }
+    html += '</tbody></table>';
+  }
+
+  if (inProgress && inProgress.length > 0) {
+    html += '<h2 style="color: #2196F3; margin: 30px 0 15px 0;">📖 In Progress Papers</h2>';
+    html += '<table><thead><tr><th>Paper ID</th><th>Progress</th></tr></thead><tbody>';
+    for (const paper of inProgress) {
+      html += `
+        <tr>
+          <td><code>${paper.paperId}</code></td>
+          <td>
+            <span class="status-badge status-in-progress">In Progress</span>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${paper.progress}%">${paper.progress}%</div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+    html += '</tbody></table>';
+  }
+
+  return html;
+}
+
+function renderMagicPanel(data: any): string {
+  const { totalMagicUsers, totalSpellsCast, paradigms, magicUsers } = data;
+
+  if (totalMagicUsers === 0) {
+    return `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M7.5 5.6L10 7 8.6 4.5 10 2 7.5 3.4 5 2l1.4 2.5L5 7zm12 9.8L17 14l1.4 2.5L17 19l2.5-1.4L22 19l-1.4-2.5L22 14zM22 2l-2.5 1.4L17 2l1.4 2.5L17 7l2.5-1.4L22 7l-1.4-2.5zm-7.63 5.29c-.39-.39-1.02-.39-1.41 0L1.29 18.96c-.39.39-.39 1.02 0 1.41l2.34 2.34c.39.39 1.02.39 1.41 0L16.7 11.05c.39-.39.39-1.02 0-1.41l-2.33-2.35z"/>
+        </svg>
+        <h2 style="color: #666; margin-bottom: 10px;">No Magic Users</h2>
+        <p>No agents have learned magic yet!</p>
+      </div>
+    `;
+  }
+
+  let html = '<div class="stats-grid">';
+  html += `
+    <div class="stat-card">
+      <div class="stat-value">${totalMagicUsers}</div>
+      <div class="stat-label">Magic Users</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${totalSpellsCast || 0}</div>
+      <div class="stat-label">Spells Cast</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${paradigms?.length || 0}</div>
+      <div class="stat-label">Active Paradigms</div>
+    </div>
+  `;
+  html += '</div>';
+
+  if (paradigms && paradigms.length > 0) {
+    html += '<h2 style="color: #9C27B0; margin: 30px 0 15px 0;">🔮 Magic Paradigms</h2>';
+    html += '<table><thead><tr><th>Paradigm ID</th><th>Users</th></tr></thead><tbody>';
+    for (const paradigm of paradigms) {
+      html += `
+        <tr>
+          <td><code>${paradigm.id}</code></td>
+          <td>${paradigm.userCount}</td>
+        </tr>
+      `;
+    }
+    html += '</tbody></table>';
+  }
+
+  if (magicUsers && magicUsers.length > 0) {
+    html += '<h2 style="color: #9C27B0; margin: 30px 0 15px 0;">✨ Magic Users (Top 10)</h2>';
+    html += '<table><thead><tr><th>Name</th><th>Spells Known</th><th>Spells Cast</th><th>Casting Now</th></tr></thead><tbody>';
+    for (const user of magicUsers.slice(0, 10)) {
+      html += `
+        <tr>
+          <td>${user.name}</td>
+          <td>${user.spellsKnown}</td>
+          <td>${user.totalSpellsCast}</td>
+          <td>${user.casting ? '🌟' : ''}</td>
+        </tr>
+      `;
+    }
+    html += '</tbody></table>';
+  }
+
+  return html;
+}
+
+function renderDivinityPanel(data: any): string {
+  const { deities, totalDeities, totalBeliefGenerated, totalBelieverCount } = data;
+
+  if (totalDeities === 0) {
+    return `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M14.43 10c-1.04 0-1.99.48-2.63 1.24-.64-.76-1.59-1.24-2.63-1.24-1.88 0-3.41 1.53-3.41 3.41 0 1.88 1.53 3.41 3.41 3.41 1.04 0 1.99-.48 2.63-1.24.64.76 1.59 1.24 2.63 1.24 1.88 0 3.41-1.53 3.41-3.41 0-1.88-1.53-3.41-3.41-3.41zM12 3L3 8v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V8l-9-5z"/>
+        </svg>
+        <h2 style="color: #666; margin-bottom: 10px;">No Deities</h2>
+        <p>No gods have emerged yet!</p>
+      </div>
+    `;
+  }
+
+  let html = '<div class="stats-grid">';
+  html += `
+    <div class="stat-card">
+      <div class="stat-value">${totalDeities}</div>
+      <div class="stat-label">Active Deities</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${totalBelieverCount || 0}</div>
+      <div class="stat-label">Total Believers</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${totalBeliefGenerated || 0}</div>
+      <div class="stat-label">Belief Generated</div>
+    </div>
+  `;
+  html += '</div>';
+
+  if (deities && deities.length > 0) {
+    html += '<h2 style="color: #673AB7; margin: 30px 0 15px 0;">⚡ Deities</h2>';
+    html += '<table><thead><tr><th>Name</th><th>Domain</th><th>Believers</th><th>Current Belief</th></tr></thead><tbody>';
+    for (const deity of deities) {
+      html += `
+        <tr>
+          <td><strong>${deity.name}</strong></td>
+          <td><code>${deity.domain || 'None'}</code></td>
+          <td>${deity.believerCount}</td>
+          <td>${Math.round(deity.currentBelief)}</td>
+        </tr>
+      `;
+    }
+    html += '</tbody></table>';
+  }
+
+  return html;
+}
+
+function renderAgentsPanel(data: any): string {
+  const { entities } = data;
+
+  if (!entities || entities.length === 0) {
+    return `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+        </svg>
+        <h2 style="color: #666; margin-bottom: 10px;">No Agents</h2>
+        <p>No agents found in the game!</p>
+      </div>
+    `;
+  }
+
+  let html = `<div class="stat-card">
+    <div class="stat-value">${entities.length}</div>
+    <div class="stat-label">Active Agents</div>
+  </div>`;
+
+  html += '<h2 style="color: #FFD700; margin: 30px 0 15px 0;">👥 Agents</h2>';
+  html += '<table><thead><tr><th>Name</th><th>Position</th><th>Current Behavior</th></tr></thead><tbody>';
+  for (const agent of entities) {
+    const pos = agent.position ? `(${Math.round(agent.position.x)}, ${Math.round(agent.position.y)})` : 'Unknown';
+    html += `
+      <tr>
+        <td><strong>${agent.name}</strong></td>
+        <td><code>${pos}</code></td>
+        <td>${agent.behavior || 'idle'}</td>
+      </tr>
+    `;
+  }
+  html += '</tbody></table>';
+
+  return html;
+}
+
+/**
  * Get the first active game client WebSocket
  */
 function getActiveGameClient(): WebSocket | null {
@@ -4101,6 +4475,88 @@ Available agents:
     } catch (err) {
       res.statusCode = 500;
       res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
+  // === HTML Panel Endpoints ===
+
+  if (pathname === '/research.html') {
+    res.setHeader('Content-Type', 'text/html');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const gameClient = getActiveGameClient();
+    if (!gameClient) {
+      res.end(renderHTMLPanel('Research Library', '<p style="color: #f44; padding: 20px;">No game client connected</p>'));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'research') as any;
+      const html = renderResearchPanel(result);
+      res.end(renderHTMLPanel('Research Library', html));
+    } catch (err) {
+      res.end(renderHTMLPanel('Research Library', `<p style="color: #f44; padding: 20px;">Error: ${err instanceof Error ? err.message : 'Query failed'}</p>`));
+    }
+    return;
+  }
+
+  if (pathname === '/magic.html') {
+    res.setHeader('Content-Type', 'text/html');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const gameClient = getActiveGameClient();
+    if (!gameClient) {
+      res.end(renderHTMLPanel('Magic Systems', '<p style="color: #f44; padding: 20px;">No game client connected</p>'));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'magic') as any;
+      const html = renderMagicPanel(result);
+      res.end(renderHTMLPanel('Magic Systems', html));
+    } catch (err) {
+      res.end(renderHTMLPanel('Magic Systems', `<p style="color: #f44; padding: 20px;">Error: ${err instanceof Error ? err.message : 'Query failed'}</p>`));
+    }
+    return;
+  }
+
+  if (pathname === '/divinity.html') {
+    res.setHeader('Content-Type', 'text/html');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const gameClient = getActiveGameClient();
+    if (!gameClient) {
+      res.end(renderHTMLPanel('Divinity', '<p style="color: #f44; padding: 20px;">No game client connected</p>'));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'divinity') as any;
+      const html = renderDivinityPanel(result);
+      res.end(renderHTMLPanel('Divinity', html));
+    } catch (err) {
+      res.end(renderHTMLPanel('Divinity', `<p style="color: #f44; padding: 20px;">Error: ${err instanceof Error ? err.message : 'Query failed'}</p>`));
+    }
+    return;
+  }
+
+  if (pathname === '/agents.html') {
+    res.setHeader('Content-Type', 'text/html');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const gameClient = getActiveGameClient();
+    if (!gameClient) {
+      res.end(renderHTMLPanel('Agents', '<p style="color: #f44; padding: 20px;">No game client connected</p>'));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'entities') as any;
+      const html = renderAgentsPanel(result);
+      res.end(renderHTMLPanel('Agents', html));
+    } catch (err) {
+      res.end(renderHTMLPanel('Agents', `<p style="color: #f44; padding: 20px;">Error: ${err instanceof Error ? err.message : 'Query failed'}</p>`));
     }
     return;
   }

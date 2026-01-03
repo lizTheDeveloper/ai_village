@@ -279,6 +279,129 @@
     .back-link a:hover {
       text-decoration: underline;
     }
+
+    .sprite-prompt-container {
+      position: relative;
+    }
+
+    .sprite-prompt-editable {
+      background: #0a0a0a;
+      padding: 1rem;
+      border-radius: 6px;
+      border: 1px solid #333;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: #4ade80;
+      width: 100%;
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .sprite-prompt-editable:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .sprite-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .sprite-actions button {
+      flex: 1;
+      margin: 0;
+      padding: 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .variant-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .variant-modal.active {
+      display: flex;
+    }
+
+    .variant-modal-content {
+      background: #16213e;
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 600px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .variant-modal h3 {
+      color: #667eea;
+      margin-bottom: 1.5rem;
+    }
+
+    .variant-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .variant-sprite {
+      background: #0a0a0a;
+      padding: 0.5rem;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .variant-sprite img {
+      width: 100%;
+      height: auto;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .variant-sprite-label {
+      font-size: 0.75rem;
+      color: #888;
+      margin-top: 0.5rem;
+    }
+
+    .variant-progress {
+      background: #0a0a0a;
+      border-radius: 6px;
+      padding: 1rem;
+      margin: 1rem 0;
+      display: none;
+    }
+
+    .variant-progress.active {
+      display: block;
+    }
+
+    .variant-progress-bar {
+      background: #333;
+      height: 20px;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+
+    .variant-progress-fill {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      height: 100%;
+      transition: width 0.3s;
+    }
   </style>
 </head>
 <body>
@@ -345,7 +468,8 @@
               <option value="aquatic">Aquatic</option>
               <option value="aerial">Aerial</option>
               <option value="subterranean">Subterranean</option>
-              <option value="vacuum">Vacuum</option>
+              <option value="void">Void (Space)</option>
+              <option value="exotic">Exotic</option>
             </select>
           </div>
 
@@ -391,9 +515,13 @@
             <div class="traits-grid" id="metadataGrid"></div>
           </div>
 
-          <div class="result-section">
-            <h4>PixelLab Sprite Prompt</h4>
-            <div class="sprite-prompt" id="spritePrompt"></div>
+          <div class="result-section sprite-prompt-container">
+            <h4>PixelLab Sprite Prompt (Editable)</h4>
+            <textarea class="sprite-prompt-editable" id="spritePromptEdit" placeholder="Generate an alien species to see the sprite prompt..."></textarea>
+            <div class="sprite-actions">
+              <button onclick="generateSpriteVariants()" id="generateVariantsBtn" disabled>🎨 Generate Sprite Variants</button>
+              <button onclick="copySpritePrompt()">📋 Copy Prompt</button>
+            </div>
           </div>
 
           <div class="result-section" id="biologyNotesSection" style="display: none;">
@@ -420,6 +548,49 @@
 
     <div class="back-link">
       <a href="/">&larr; Back to Game</a>
+    </div>
+  </div>
+
+  <!-- Variant Generation Modal -->
+  <div class="variant-modal" id="variantModal">
+    <div class="variant-modal-content">
+      <h3>Generate Sprite Variants</h3>
+
+      <div class="form-group">
+        <label>Variant Types (select multiple)</label>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+          <label class="checkbox-group">
+            <input type="checkbox" id="variantMale" checked>
+            <span>Male</span>
+          </label>
+          <label class="checkbox-group">
+            <input type="checkbox" id="variantFemale" checked>
+            <span>Female</span>
+          </label>
+          <label class="checkbox-group">
+            <input type="checkbox" id="variantColorVar1">
+            <span>Color Variant 1</span>
+          </label>
+          <label class="checkbox-group">
+            <input type="checkbox" id="variantColorVar2">
+            <span>Color Variant 2</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="variant-progress" id="variantProgress">
+        <div id="variantProgressText">Generating sprites...</div>
+        <div class="variant-progress-bar">
+          <div class="variant-progress-fill" id="variantProgressFill" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <div class="variant-grid" id="variantGrid"></div>
+
+      <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
+        <button onclick="startVariantGeneration()" id="startVariantBtn">Start Generation</button>
+        <button onclick="closeVariantModal()" style="background: #333;">Cancel</button>
+      </div>
     </div>
   </div>
 
@@ -542,8 +713,9 @@
         metadataGrid.appendChild(div);
       });
 
-      // Sprite prompt
-      document.getElementById('spritePrompt').textContent = species.spritePrompt;
+      // Sprite prompt (editable textarea)
+      document.getElementById('spritePromptEdit').value = species.spritePrompt;
+      document.getElementById('generateVariantsBtn').disabled = false;
 
       // Optional sections
       if (species.biologyNotes) {

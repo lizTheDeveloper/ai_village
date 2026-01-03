@@ -238,6 +238,249 @@ Return ONLY valid JSON in this exact format:
   }
 
   /**
+   * Generate a detailed sprite prompt for PixelLab
+   */
+  private generateDetailedSpritePrompt(
+    traits: TraitCombination,
+    constraints: AlienGenerationConstraints = {}
+  ): string {
+    const bodyPlan = BODY_PLANS[traits.bodyPlan];
+    const locomotion = LOCOMOTION_METHODS[traits.locomotion];
+    const sensory = SENSORY_SYSTEMS[traits.sensorySystem];
+    const defense = DEFENSIVE_SYSTEMS[traits.defense];
+    const diet = DIET_PATTERNS[traits.diet];
+
+    const parts: string[] = [];
+    const environmentalNotes: string[] = [];
+
+    // Start with overall form from body plan
+    if (bodyPlan) {
+      const { symmetry, limbCount } = bodyPlan;
+
+      // Describe body structure
+      if (symmetry === 'bilateral') {
+        parts.push('bilateral symmetry body');
+      } else if (symmetry === 'radial') {
+        parts.push('radial symmetry with limbs radiating from center');
+      } else if (symmetry === 'four-way radial') {
+        parts.push('four-way radial symmetry, X-shaped body');
+      } else if (symmetry === 'fractal') {
+        parts.push('fractal branching structure with intricate patterns');
+      } else if (symmetry === 'perfect sphere') {
+        parts.push('spherical core body');
+      } else if (symmetry === 'geometric') {
+        parts.push('crystalline geometric body structure');
+      } else if (symmetry === 'asymmetric') {
+        parts.push('asymmetric irregular body form');
+      } else if (symmetry === 'none') {
+        parts.push('amorphous blob-like form');
+      } else if (symmetry === 'none - energy field') {
+        parts.push('translucent energy being with glowing aura');
+      }
+
+      // Add limb details
+      if (limbCount.includes('4-6')) {
+        parts.push('4-6 limbs');
+      } else if (limbCount.includes('5-12')) {
+        parts.push('5-12 radiating appendages');
+      } else if (limbCount.includes('tentacle')) {
+        parts.push('numerous tentacles');
+      } else if (limbCount.includes('Thousands')) {
+        parts.push('swarm of tiny units');
+      } else if (limbCount.includes('Zero')) {
+        parts.push('no visible limbs');
+      } else if (limbCount.includes('branch')) {
+        parts.push('branching limbs at multiple scales');
+      } else if (limbCount.includes('Varies')) {
+        parts.push('modular segmented body with variable limbs');
+      } else if (limbCount.includes('Geometrically perfect')) {
+        parts.push('geometric crystal appendages');
+      } else if (limbCount.includes('Pseudopods')) {
+        parts.push('shapeshifting pseudopods');
+      } else {
+        parts.push(limbCount.toLowerCase());
+      }
+    }
+
+    // Add locomotion-specific features
+    if (locomotion) {
+      if (traits.locomotion.includes('wing')) {
+        parts.push('wings for flight');
+      } else if (traits.locomotion.includes('tentacle')) {
+        parts.push('tentacles for movement');
+      } else if (traits.locomotion.includes('jet')) {
+        parts.push('jet propulsion vents');
+      } else if (traits.locomotion.includes('magnetic')) {
+        parts.push('magnetic field generators');
+      } else if (traits.locomotion.includes('slither')) {
+        parts.push('serpentine undulating body');
+      } else if (traits.locomotion.includes('burrow')) {
+        parts.push('digging appendages and streamlined head');
+      } else if (traits.locomotion.includes('climbing')) {
+        parts.push('gripping appendages for climbing');
+      } else if (traits.locomotion.includes('swimming')) {
+        parts.push('fins or tail for aquatic movement');
+      }
+    }
+
+    // Add sensory features
+    if (sensory) {
+      if (traits.sensorySystem.includes('visual')) {
+        parts.push('prominent eyes');
+      } else if (traits.sensorySystem.includes('echolocation')) {
+        parts.push('large sound-emitting organs');
+      } else if (traits.sensorySystem.includes('electromagnetic')) {
+        parts.push('electromagnetic sensing organs');
+      } else if (traits.sensorySystem.includes('infrared')) {
+        parts.push('heat-sensing pits');
+      } else if (traits.sensorySystem.includes('telepathic')) {
+        parts.push('cranial sensory nodes');
+      } else if (traits.sensorySystem.includes('vibration')) {
+        parts.push('vibration-sensing antennae');
+      } else if (traits.sensorySystem.includes('chemical')) {
+        parts.push('chemical-sensing tendrils');
+      }
+    }
+
+    // Add defensive features
+    if (defense) {
+      if (traits.defense.includes('armor')) {
+        parts.push('heavy armored plating');
+      } else if (traits.defense.includes('spiny')) {
+        parts.push('defensive spikes covering body');
+      } else if (traits.defense.includes('shell')) {
+        parts.push('protective shell');
+      } else if (traits.defense.includes('camouflage')) {
+        parts.push('color-shifting skin patterns');
+      } else if (traits.defense.includes('toxic')) {
+        parts.push('visible poison glands');
+      } else if (traits.defense.includes('crystalline')) {
+        parts.push('crystalline armor shards');
+      } else if (traits.defense.includes('phase')) {
+        parts.push('semi-transparent phasing form');
+      } else if (traits.defense.includes('size')) {
+        parts.push('massive intimidating size');
+      }
+    }
+
+    // Add diet-related features
+    if (diet) {
+      if (traits.diet.includes('herbivore')) {
+        parts.push('grinding mouthparts');
+      } else if (traits.diet.includes('carnivore') || traits.diet.includes('predator')) {
+        parts.push('sharp fangs and claws');
+      } else if (traits.diet.includes('photosynthetic')) {
+        parts.push('leaf-like photosynthetic surfaces');
+      } else if (traits.diet.includes('energy_absorption')) {
+        parts.push('energy absorption organs');
+      } else if (traits.diet.includes('mineral')) {
+        parts.push('rock-crushing mandibles');
+      } else if (traits.diet.includes('filter')) {
+        parts.push('filter-feeding apparatus');
+      }
+    }
+
+    // Add environmental adaptations
+    if (constraints.environment) {
+      switch (constraints.environment) {
+        case 'aquatic':
+          environmentalNotes.push('aquatic coloring (blues/greens)');
+          environmentalNotes.push('streamlined for water');
+          break;
+        case 'aerial':
+          environmentalNotes.push('lightweight appearance');
+          environmentalNotes.push('aerial adaptations');
+          break;
+        case 'subterranean':
+          environmentalNotes.push('pale/dark earth tones');
+          environmentalNotes.push('robust build for tunneling');
+          break;
+        case 'void':
+          environmentalNotes.push('sealed/armored appearance');
+          environmentalNotes.push('space-adapted features');
+          environmentalNotes.push('no breathing apparatus visible');
+          break;
+        case 'terrestrial':
+          environmentalNotes.push('earthy natural colors');
+          break;
+        case 'exotic':
+          environmentalNotes.push('unusual otherworldly coloration');
+          break;
+      }
+    }
+
+    // Add native world context if specified
+    if (constraints.nativeWorld) {
+      const world = constraints.nativeWorld.toLowerCase();
+      if (world.includes('ice') || world.includes('frozen') || world.includes('cryo')) {
+        environmentalNotes.push('icy blue-white coloration');
+        environmentalNotes.push('thick insulating features');
+      } else if (world.includes('desert') || world.includes('arid')) {
+        environmentalNotes.push('sandy/tan coloration');
+        environmentalNotes.push('heat-resistant features');
+      } else if (world.includes('volcanic') || world.includes('lava')) {
+        environmentalNotes.push('dark/reddish heat-resistant coloring');
+        environmentalNotes.push('potentially glowing elements');
+      } else if (world.includes('jungle') || world.includes('forest')) {
+        environmentalNotes.push('green/brown camouflage colors');
+      } else if (world.includes('ocean') || world.includes('aquatic')) {
+        environmentalNotes.push('aquatic blue-green tones');
+      }
+    }
+
+    // Add danger level appearance cues
+    const dangerLevel = constraints.dangerLevel ?? this.calculateDangerLevel(traits);
+    switch (dangerLevel) {
+      case 'harmless':
+        environmentalNotes.push('non-threatening appearance');
+        environmentalNotes.push('gentle features');
+        break;
+      case 'minor':
+        environmentalNotes.push('slightly dangerous looking');
+        break;
+      case 'moderate':
+        environmentalNotes.push('visibly dangerous features');
+        break;
+      case 'severe':
+        environmentalNotes.push('intimidating and powerful appearance');
+        environmentalNotes.push('prominent predatory features');
+        break;
+      case 'extinction_level':
+        environmentalNotes.push('absolutely terrifying appearance');
+        environmentalNotes.push('massive size and overwhelming power evident');
+        break;
+    }
+
+    // Add diet-based context (in addition to physical features)
+    if (diet) {
+      const dietType = diet.name.toLowerCase();
+      if (dietType.includes('photosynthetic')) {
+        environmentalNotes.push('plant-like green coloration');
+      } else if (dietType.includes('scavenger')) {
+        environmentalNotes.push('opportunistic, scrappy appearance');
+      } else if (dietType.includes('parasite')) {
+        environmentalNotes.push('adapted for attachment');
+      } else if (dietType.includes('energy')) {
+        environmentalNotes.push('ethereal or glowing elements');
+      }
+    }
+
+    // Add domestication appearance hints
+    const domestication = constraints.domesticationPotential ?? this.calculateDomesticationPotential(traits);
+    if (domestication === 'excellent' || domestication === 'good') {
+      environmentalNotes.push('approachable, less threatening features');
+    }
+
+    // Compile into coherent prompt
+    const physicalDescription = parts.join(', ');
+    const contextualDescription = environmentalNotes.length > 0
+      ? `. Environmental context: ${environmentalNotes.join(', ')}`
+      : '';
+
+    return `Pixel art alien creature: ${physicalDescription}${contextualDescription}. Top-down view, 48px, medium detail, visible limbs and body structure clearly defined. Use distinct colors to show different body parts and environmental adaptation.`;
+  }
+
+  /**
    * Generate scientific and common names for the species
    */
   private async generateNaming(
@@ -247,6 +490,9 @@ Return ONLY valid JSON in this exact format:
     const bodyPlan = BODY_PLANS[traits.bodyPlan];
     const locomotion = LOCOMOTION_METHODS[traits.locomotion];
     const sensory = SENSORY_SYSTEMS[traits.sensorySystem];
+
+    // Generate detailed sprite prompt with environmental context
+    const detailedSpritePrompt = this.generateDetailedSpritePrompt(traits, constraints);
 
     const prompt = `You are naming a newly discovered alien species.
 
@@ -263,14 +509,12 @@ Generate:
 1. A scientific name (Genus species format, Latin-style)
 2. A memorable common name (like "Crystal Spider" or "Void Swimmer")
 3. A 2-3 sentence description of the creature
-4. A PixelLab sprite prompt (describe physical appearance for pixel art generation, top-down view, 48px size)
 
 Return ONLY valid JSON:
 {
   "scientificName": "Genus species",
   "commonName": "Descriptive Name",
-  "description": "Full description...",
-  "spritePrompt": "Physical appearance for pixel art..."
+  "description": "Full description..."
 }`;
 
     try {
@@ -296,7 +540,7 @@ Return ONLY valid JSON:
           scientificName,
           commonName: parsed.commonName,
           description: parsed.description,
-          spritePrompt: parsed.spritePrompt,
+          spritePrompt: detailedSpritePrompt, // Use detailed prompt instead of LLM-generated
         };
       }
     } catch (error) {
@@ -309,7 +553,7 @@ Return ONLY valid JSON:
       scientificName: fallbackName.scientific,
       commonName: fallbackName.common,
       description: `An alien creature with ${traits.bodyPlan} body structure.`,
-      spritePrompt: `Alien creature with ${traits.bodyPlan} body, ${traits.locomotion} movement, pixel art, top-down view`,
+      spritePrompt: detailedSpritePrompt, // Use detailed prompt for fallback too
     };
   }
 
