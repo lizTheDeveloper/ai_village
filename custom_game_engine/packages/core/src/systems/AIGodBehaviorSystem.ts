@@ -7,6 +7,7 @@
 
 import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
+import type { Entity } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent, type DivineDomain } from '../components/DeityComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
@@ -85,7 +86,7 @@ export class AIGodBehaviorSystem implements System {
   public readonly id = 'AIGodBehaviorSystem';
   public readonly name = 'AIGodBehaviorSystem';
   public readonly priority = 90;
-  public readonly requiredComponents = [];
+  public readonly requiredComponents = [CT.Deity]; // Let ECS filter deity entities
 
   private config: AIGodConfig;
   private lastDecisionTime: Map<string, number> = new Map();
@@ -96,16 +97,17 @@ export class AIGodBehaviorSystem implements System {
     this.initializeStrategies();
   }
 
-  update(world: World): void {
+  update(world: World, entities: ReadonlyArray<Entity>): void {
     const currentTick = world.tick;
 
-    // Find all AI-controlled deities
-    const aiGods = Array.from(world.entities.values())
-      .filter(e => e.components.has(CT.Deity))
-      .map(e => ({ entity: e, deity: e.components.get(CT.Deity) as DeityComponent }))
-      .filter(({ deity }) => deity && deity.controller === 'ai');
+    // Process deity entities (already filtered by requiredComponents)
+    for (const entity of entities) {
+      const deity = entity.components.get(CT.Deity) as DeityComponent;
 
-    for (const { entity, deity } of aiGods) {
+      // Only process AI-controlled deities
+      if (!deity || deity.controller !== 'ai') {
+        continue;
+      }
       // Check if enough time has passed
       const lastDecision = this.lastDecisionTime.get(entity.id) || 0;
       if (currentTick - lastDecision < this.config.decisionInterval) {

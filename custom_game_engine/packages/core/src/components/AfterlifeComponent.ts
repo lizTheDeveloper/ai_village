@@ -125,6 +125,9 @@ export interface AfterlifeComponent extends Component {
   /** True if transformed into protective ancestor spirit */
   isAncestorKami: boolean;
 
+  /** Whether this soul wishes to be reincarnated (default: true) */
+  wantsToReincarnate: boolean;
+
   /** Kami rank if transformed */
   kamiRank?: 'minor' | 'local' | 'regional';
 
@@ -221,6 +224,7 @@ export function createAfterlifeComponent(options: AfterlifeComponentOptions): Af
     hasPassedOn: false,
     isRestless: adjustedPeace < 0.2,
     isAncestorKami: false,
+    wantsToReincarnate: true, // Default: souls want to reincarnate
 
     // Tracking
     timesRemembered: 0,

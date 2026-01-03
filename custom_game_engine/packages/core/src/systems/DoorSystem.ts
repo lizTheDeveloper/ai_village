@@ -32,7 +32,7 @@ interface WorldWithTiles extends World {
 export class DoorSystem implements System {
   public readonly id: SystemId = 'door';
   public readonly priority: number = 19; // Run before MovementSystem (20)
-  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Position];
+  public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Position, CT.Agent];
 
   private eventBus?: EventBus;
 

@@ -33,8 +33,53 @@ Check before adding expensive operations to these systems:
 - `MovementSystem` (priority 20) - Every moving entity, every tick
 - `SteeringSystem` (priority 15) - Every steering entity, every tick
 - `NeedsSystem` (priority 15) - Every active entity, every tick
-- `DoorSystem` (priority 19) - Every positioned entity, every tick
+- `DoorSystem` (priority 19) - Every agent near doors, every tick
 - `GameLoop` - All system iteration, every tick
+
+## 🚨 CRITICAL: System `requiredComponents` Must Be Specific
+
+**THE #1 CAUSE OF PERFORMANCE DEGRADATION**: Systems with overly broad `requiredComponents`.
+
+The ECS pre-filters entities based on `requiredComponents` BEFORE passing them to `update()`. If your system only needs agents but you specify `[CT.Position]`, you'll get 200,000+ entities instead of 5.
+
+```typescript
+// ❌ CATASTROPHIC: Gets ALL 200,000+ entities with Position
+// This caused tick times to grow from 50ms to 1000ms+
+export class DoorSystem implements System {
+  public readonly requiredComponents = [CT.Position]; // 200,000 entities!
+
+  update(world: World, entities: ReadonlyArray<Entity>) {
+    for (const entity of entities) {
+      // Iterating 200,000 entities when you only need agents
+      const agent = entity.getComponent(CT.Agent);
+      if (!agent) continue; // Checking inside loop = disaster
+    }
+  }
+}
+
+// ✅ CORRECT: Gets only the ~5 entities you actually need
+export class DoorSystem implements System {
+  public readonly requiredComponents = [CT.Position, CT.Agent]; // 5 entities!
+
+  update(world: World, entities: ReadonlyArray<Entity>) {
+    for (const entity of entities) {
+      // Now only iterating agents, door checks are fast
+    }
+  }
+}
+```
+
+### Rules for `requiredComponents`:
+1. **Include ALL components you filter by** - If you check `if (!agent) continue;`, add `CT.Agent` to requiredComponents
+2. **Be as specific as possible** - More components = fewer entities = faster iteration
+3. **Never use just `[CT.Position]`** - Almost every entity has Position (200k+)
+4. **Audit existing systems** - Search for patterns like `if (!entity.getComponent(...)) continue;`
+
+### Quick Audit Command:
+```bash
+# Find systems that might be filtering inside loops (suspicious pattern)
+rg "getComponent.*\n.*if.*!.*continue" packages/core/src/systems/ --multiline
+```
 
 ## 📊 Performance Anti-Patterns
 
@@ -227,11 +272,13 @@ npm run bench:compare   # Compare to baseline
 
 Before merging system code, verify:
 
+- [ ] **`requiredComponents` includes all filtered components** (see CRITICAL section above)
+- [ ] No `if (!entity.getComponent(X)) continue;` unless X is in requiredComponents
 - [ ] No `world.query()` calls inside loops
 - [ ] Distance comparisons use squared distance
 - [ ] No `Math.pow(x, 2)` (use `x * x`)
 - [ ] Queries cached if called multiple times per tick
-- [ ] System has `UPDATE_INTERVAL` if not critical
+- [ ] System has `UPDATE_INTERVAL` if not critical (plants, resources, weather)
 - [ ] No `Array.from()` when direct iteration works
 - [ ] No object spreads in tight loops
 - [ ] Component access grouped (get components once)

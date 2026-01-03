@@ -41,6 +41,7 @@ export enum BuildingType {
   // Example/Decoration Buildings
   GardenFence = 'garden_fence',
   Library = 'library',
+  University = 'university',
   AutoFarm = 'auto_farm',
 
   // Research Unlocked Buildings (Tier 1)

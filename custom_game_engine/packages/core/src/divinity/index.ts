@@ -223,10 +223,7 @@ export {
   createDivineChatComponent,
 } from '../components/DivineChatComponent.js';
 
-export {
-  // System
-  DivineChatSystem,
-} from '../systems/DivineChatSystem.js';
+// DivineChatSystem removed - use ChatRoomSystem instead
 
 // ============================================================================
 // Avatar System

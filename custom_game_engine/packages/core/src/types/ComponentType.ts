@@ -94,6 +94,16 @@ export enum ComponentType {
 
   // Research & Technology
   ResearchState = 'research_state',
+  TechnologyUnlock = 'technology_unlock',
+
+  // Publishing & Knowledge Infrastructure
+  Library = 'library',
+  Bookstore = 'bookstore',
+  University = 'university',
+  UniversityLibrary = 'university_library',
+  Biography = 'biography',
+  PublishingCompany = 'publishing_company',
+  Newspaper = 'newspaper',
 
   // Skills & Crafting
   CookingSkill = 'cooking_skill',
@@ -135,6 +145,7 @@ export enum ComponentType {
   Mythology = 'mythology',
   DivineChat = 'divine_chat',
   ChatRoom = 'chat_room',
+  Companion = 'companion',
 
   // Divine Rebellion & Cosmic Systems
   RebellionOutcome = 'rebellion_outcome',
@@ -172,4 +183,11 @@ export enum ComponentType {
   TVStation = 'tv_station',
   TVShow = 'tv_show',
   TVBroadcast = 'tv_broadcast',
+
+  // Navigation & β-space
+  Spaceship = 'spaceship',
+  RainbowPlanet = 'rainbow_planet',  // Quantum superposition of planetary histories (Rainbow Mars)
+
+  // Virtual Reality
+  VRSystem = 'vr_system',
 }

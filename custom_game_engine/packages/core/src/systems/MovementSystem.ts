@@ -37,6 +37,9 @@ export class MovementSystem implements System {
   private cacheValidUntilTick = 0;
   private readonly CACHE_DURATION_TICKS = 20; // Cache for 1 second at 20 TPS
 
+  // Performance: Cache time entity ID to avoid querying every tick
+  private timeEntityId: string | null = null;
+
   /**
    * Initialize event listeners to invalidate cache on building changes
    */
@@ -90,23 +93,31 @@ export class MovementSystem implements System {
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    // Get time acceleration multiplier from TimeComponent
-    const timeEntities = world.query().with(CT.Time).executeEntities();
+    // Get time acceleration multiplier from TimeComponent (cached)
     let timeSpeedMultiplier = 1.0;
-    if (timeEntities.length > 0) {
-      const timeEntity = timeEntities[0] as EntityImpl;
-      const timeComp = timeEntity.getComponent(CT.Time) as TimeComponent | undefined;
-      if (timeComp && timeComp.speedMultiplier) {
-        timeSpeedMultiplier = timeComp.speedMultiplier;
+
+    if (!this.timeEntityId) {
+      const timeEntities = world.query().with(CT.Time).executeEntities();
+      if (timeEntities.length > 0) {
+        this.timeEntityId = timeEntities[0]!.id;
       }
     }
 
-    // Filter entities with required components
-    const movementEntities = entities.filter(e =>
-      e.components.has(CT.Movement) && e.components.has(CT.Position)
-    );
+    if (this.timeEntityId) {
+      const timeEntity = world.getEntity(this.timeEntityId);
+      if (timeEntity) {
+        const timeComp = (timeEntity as EntityImpl).getComponent(CT.Time) as TimeComponent | undefined;
+        if (timeComp && timeComp.speedMultiplier) {
+          timeSpeedMultiplier = timeComp.speedMultiplier;
+        }
+      } else {
+        // Time entity was destroyed, clear cache
+        this.timeEntityId = null;
+      }
+    }
 
-    for (const entity of movementEntities) {
+    // Entities already filtered by requiredComponents - iterate directly
+    for (const entity of entities) {
       const impl = entity as EntityImpl;
 
       // Performance: Get all components once at start

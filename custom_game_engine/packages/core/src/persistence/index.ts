@@ -22,6 +22,7 @@ export { MemoryStorage } from './storage/MemoryStorage.js';
 
 // Serialization
 export { worldSerializer, WorldSerializer } from './WorldSerializer.js';
+export type { TimelineSnapshot } from './WorldSerializer.js';
 export { componentSerializerRegistry } from './ComponentSerializerRegistry.js';
 export type { ComponentSerializer } from './types.js';
 export { BaseComponentSerializer } from './ComponentSerializerRegistry.js';

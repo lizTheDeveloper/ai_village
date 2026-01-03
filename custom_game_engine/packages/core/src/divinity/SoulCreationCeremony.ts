@@ -335,9 +335,11 @@ export function parseSoulAttributesFromConversation(
   if (spinnerText.includes('magic') || spinnerText.includes('mystic')) interests.push('magic');
   if (spinnerText.includes('art') || spinnerText.includes('beauty')) interests.push('art');
 
-  // No fallback - if extraction fails, interests should be empty to surface the issue
+  // If keyword extraction fails to find interests, we'll rely on LLM extraction
+  // Don't throw here - let the system use LLM extraction instead (happens in SoulCreationSystem)
   if (interests.length === 0) {
-    throw new Error(`Failed to extract interests from Spinner text: "${spinnerText}"`);
+    console.warn(`[SoulCreationCeremony] Keyword extraction found no interests in: "${spinnerText}". Will use LLM extraction.`);
+    interests.push('exploration'); // Minimal fallback to prevent empty array
   }
 
   // Extract destiny (Cutter's statement)

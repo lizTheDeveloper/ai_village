@@ -35,6 +35,9 @@ export class ActionQueue implements IActionQueue {
   private actions = new Map<string, Action>();
   private actionHistory: Action[] = [];
 
+  /** Maximum action history entries to retain (prevents memory leak) */
+  private static readonly MAX_ACTION_HISTORY = 500;
+
   // Indices
   private pendingByEntity = new Map<EntityId, string[]>();
   private executingByEntity = new Map<EntityId, string>();
@@ -110,7 +113,7 @@ export class ActionQueue implements IActionQueue {
 
     action.status = 'cancelled';
     action.completedAt = this.getCurrentTick();
-    this.actionHistory.push(action);
+    this.addToHistory(action);
     this.actions.delete(actionId);
 
     return true;
@@ -153,6 +156,18 @@ export class ActionQueue implements IActionQueue {
   }
 
   /**
+   * Add action to history with bounds enforcement.
+   * @internal
+   */
+  private addToHistory(action: Action): void {
+    this.actionHistory.push(action);
+    // Prune oldest entries if over limit
+    if (this.actionHistory.length > ActionQueue.MAX_ACTION_HISTORY) {
+      this.actionHistory.shift();
+    }
+  }
+
+  /**
    * Get the handler for a specific action type.
    * Useful for accessing handler methods like getDuration() from UI code.
    */
@@ -171,7 +186,7 @@ export class ActionQueue implements IActionQueue {
         events: [],
       };
       action.completedAt = this.getCurrentTick();
-      this.actionHistory.push(action);
+      this.addToHistory(action);
       this.actions.delete(action.id);
       return;
     }
@@ -188,7 +203,7 @@ export class ActionQueue implements IActionQueue {
         events: [],
       };
       action.completedAt = this.getCurrentTick();
-      this.actionHistory.push(action);
+      this.addToHistory(action);
       this.actions.delete(action.id);
 
       // Emit failure event so UI can show feedback
@@ -257,7 +272,7 @@ export class ActionQueue implements IActionQueue {
     // Cleanup
     this.executingByEntity.delete(action.actorId);
     this.executingActions.delete(action.id);
-    this.actionHistory.push(action);
+    this.addToHistory(action);
     this.actions.delete(action.id);
   }
 

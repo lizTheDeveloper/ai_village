@@ -47,7 +47,16 @@
  *   POST /api/live/approve-creation?id=<id> - Approve a pending creation
  *   POST /api/live/reject-creation?id=<id>  - Reject a pending creation
  *   GET  /api/live/divinity    - Get divinity info (gods, belief, pantheons, etc.)
+ *
+ * LLM Proxy API (server-side LLM with rate limiting):
+ *   POST /api/llm/generate     - Generate LLM response (server-side, rate-limited)
  */
+
+// Load environment variables from demo/.env
+import { config } from 'dotenv';
+import * as path from 'path';
+import * as fs from 'fs';
+config({ path: path.join(process.cwd(), 'demo', '.env') });
 
 import { WebSocketServer, WebSocket } from 'ws';
 import { createServer, type IncomingMessage, type ServerResponse } from 'http';
@@ -56,13 +65,69 @@ import { MetricsStorage, type StoredMetric } from '../packages/core/src/metrics/
 import { viewRegistry, registerBuiltInViews, hasTextFormatter, type ViewContext } from '../packages/core/src/dashboard/index.js';
 import type { CanonEvent } from '../packages/core/src/metrics/CanonEventRecorder.js';
 import { SaveStateManager } from '../packages/core/src/persistence/SaveStateManager.js';
-import * as path from 'path';
-import * as fs from 'fs';
 import * as zlib from 'zlib';
 import { promisify } from 'util';
+import { RateLimiter } from '../packages/llm/src/RateLimiter.js';
+import { OpenAICompatProvider } from '../packages/llm/src/OpenAICompatProvider.js';
+import type { LLMRequest } from '../packages/llm/src/LLMProvider.js';
 
 const gzip = promisify(zlib.gzip);
 const gunzip = promisify(zlib.gunzip);
+
+// ============================================================================
+// LLM PROXY WITH RATE LIMITING
+// ============================================================================
+
+// Global rate limiter - 30 requests per minute per API key
+const llmRateLimiter = new RateLimiter({
+  requestsPerMinute: 30,
+  burst: 10
+});
+
+// LLM provider configurations from environment
+interface LLMProviderConfig {
+  name: string;
+  provider: OpenAICompatProvider;
+  apiKey: string;
+}
+
+const llmProviders: LLMProviderConfig[] = [];
+
+// Load Groq provider if configured
+const groqApiKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY;
+const groqModel = process.env.GROQ_MODEL || process.env.VITE_GROQ_MODEL || 'llama-3.3-70b-versatile';
+if (groqApiKey) {
+  llmProviders.push({
+    name: 'groq',
+    provider: new OpenAICompatProvider(
+      groqModel,
+      'https://api.groq.com/openai/v1',
+      groqApiKey
+    ),
+    apiKey: groqApiKey
+  });
+  console.log('[LLM Proxy] Groq provider configured');
+}
+
+// Load Cerebras provider if configured
+const cerebrasApiKey = process.env.CEREBRAS_API_KEY || process.env.VITE_CEREBRAS_API_KEY;
+const cerebrasModel = process.env.CEREBRAS_MODEL || process.env.VITE_CEREBRAS_MODEL || 'llama-3.3-70b';
+if (cerebrasApiKey) {
+  llmProviders.push({
+    name: 'cerebras',
+    provider: new OpenAICompatProvider(
+      cerebrasModel,
+      'https://api.cerebras.ai/v1',
+      cerebrasApiKey
+    ),
+    apiKey: cerebrasApiKey
+  });
+  console.log('[LLM Proxy] Cerebras provider configured');
+}
+
+if (llmProviders.length === 0) {
+  console.warn('[LLM Proxy] No LLM providers configured. Set GROQ_API_KEY or CEREBRAS_API_KEY environment variables.');
+}
 
 // ============================================================================
 // HEADLESS GAME PROCESS MANAGEMENT
@@ -4658,6 +4723,97 @@ RUNNING GAMES: ${headlessGames.size}
 ${listHeadlessGames().map(g => `  ${g.sessionId}: ${g.status} (${g.agentCount} agents, ${Math.round(g.uptime / 1000)}s uptime)`).join('\n') || '  (none)'}
 `;
     res.end(helpText);
+    return;
+  }
+
+  // === LLM Proxy API (Server-Side LLM with Rate Limiting) ===
+
+  // Handle CORS preflight for LLM proxy
+  if (pathname === '/api/llm/generate' && req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.statusCode = 204;
+    res.end();
+    return;
+  }
+
+  // Generate LLM response with server-side rate limiting
+  if (pathname === '/api/llm/generate' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (llmProviders.length === 0) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({
+        error: 'No LLM providers configured on server',
+        message: 'Set GROQ_API_KEY or CEREBRAS_API_KEY environment variables in the metrics server'
+      }));
+      return;
+    }
+
+    let body = '';
+    req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+    req.on('end', async () => {
+      try {
+        const request = JSON.parse(body) as LLMRequest;
+
+        // Try each provider in order with rate limiting
+        let lastError: Error | null = null;
+
+        for (const providerConfig of llmProviders) {
+          const rateLimitKey = `${providerConfig.name}:${providerConfig.apiKey}`;
+
+          // Check rate limit
+          if (!llmRateLimiter.tryAcquire(rateLimitKey)) {
+            const status = llmRateLimiter.getStatus(rateLimitKey);
+            const waitMs = status.timeUntilNextToken;
+            console.warn(`[LLM Proxy] Rate limited for ${providerConfig.name}, wait ${waitMs}ms`);
+
+            // Try next provider
+            continue;
+          }
+
+          try {
+            console.log(`[LLM Proxy] Using ${providerConfig.name} provider`);
+            const response = await providerConfig.provider.generate(request);
+
+            // Success - return response
+            res.end(JSON.stringify({
+              ...response,
+              provider: providerConfig.name
+            }));
+            return;
+          } catch (error) {
+            lastError = error instanceof Error ? error : new Error(String(error));
+            console.error(`[LLM Proxy] ${providerConfig.name} failed:`, lastError.message);
+            // Continue to next provider
+          }
+        }
+
+        // All providers failed
+        if (lastError) {
+          res.statusCode = 500;
+          res.end(JSON.stringify({
+            error: 'All LLM providers failed',
+            message: lastError.message
+          }));
+        } else {
+          res.statusCode = 429;
+          res.end(JSON.stringify({
+            error: 'All providers rate limited',
+            message: 'All configured LLM providers are currently rate limited. Please try again in a moment.'
+          }));
+        }
+      } catch (error) {
+        res.statusCode = 400;
+        res.end(JSON.stringify({
+          error: 'Invalid request',
+          message: error instanceof Error ? error.message : 'Failed to parse request body'
+        }));
+      }
+    });
     return;
   }
 

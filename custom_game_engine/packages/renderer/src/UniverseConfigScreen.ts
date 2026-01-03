@@ -70,8 +70,9 @@ export class UniverseConfigScreen {
   private container: HTMLElement;
   private selectedScenario: string = 'cooperative-survival';
   private customScenarioText: string = '';
-  private currentStep: 'magic' | 'scenario' = 'magic';  // Magic first, then scenario
-  private onCreate: ((config: UniverseConfig) => void) | null = null;
+  private currentStep: 'magic' | 'scenario' | 'souls' = 'magic';  // Magic → scenario → souls
+  private _onCreate: ((config: UniverseConfig) => void) | null = null;
+  private pendingConfig: UniverseConfig | null = null;
 
   // Spectrum configuration state
   private selectedSpectrumPreset: string = 'ai_village';
@@ -118,7 +119,7 @@ export class UniverseConfigScreen {
   }
 
   show(onCreateCallback: (config: UniverseConfig) => void): void {
-    this.onCreate = onCreateCallback;
+    this._onCreate = onCreateCallback;
     this.container.style.display = 'flex';
   }
 
@@ -143,8 +144,14 @@ export class UniverseConfigScreen {
     step2.style.cssText = `padding: 8px 16px; border-radius: 20px; font-size: 14px; cursor: pointer; background: ${this.currentStep === 'scenario' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${this.currentStep === 'scenario' ? '#fff' : '#888'};`;
     step2.onclick = () => { this.currentStep = 'scenario'; this.render(); };
 
+    const step3 = document.createElement('div');
+    step3.textContent = '3. Soul Ceremonies';
+    step3.style.cssText = `padding: 8px 16px; border-radius: 20px; font-size: 14px; cursor: pointer; background: ${this.currentStep === 'souls' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#2a2a4a'}; color: ${this.currentStep === 'souls' ? '#fff' : '#888'};`;
+    step3.onclick = () => { if (this.pendingConfig) { this.currentStep = 'souls'; this.render(); } };
+
     stepIndicator.appendChild(step1);
     stepIndicator.appendChild(step2);
+    stepIndicator.appendChild(step3);
     this.container.appendChild(stepIndicator);
 
     const title = document.createElement('h1');
@@ -154,8 +161,10 @@ export class UniverseConfigScreen {
 
     if (this.currentStep === 'magic') {
       this.renderMagicStep();
-    } else {
+    } else if (this.currentStep === 'scenario') {
       this.renderScenarioStep();
+    } else {
+      this.renderSoulsStep();
     }
   }
 
@@ -203,24 +212,22 @@ export class UniverseConfigScreen {
     backButton.onclick = () => { this.currentStep = 'magic'; this.render(); };
 
     const createButton = document.createElement('button');
-    createButton.textContent = 'Create Universe';
+    createButton.textContent = 'Next: Soul Ceremonies';
     createButton.style.cssText = 'padding: 15px 40px; font-size: 18px; font-family: monospace; font-weight: bold; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 8px; cursor: pointer;';
     createButton.onclick = () => {
-      if (this.onCreate) {
-        const firstParadigm = effects.enabledParadigms[0];
-        const config: UniverseConfig = {
-          magicParadigmId: firstParadigm ?? null,
-          magicSpectrum: spectrum,
-          spectrumEffects: effects,
-          scenarioPresetId: this.selectedScenario,
-          seed: Date.now(),
-        };
-        if (this.selectedScenario === 'custom') {
-          config.customScenarioText = this.customScenarioText;
-        }
-        this.onCreate(config);
-        this.hide();
+      const firstParadigm = effects.enabledParadigms[0];
+      this.pendingConfig = {
+        magicParadigmId: firstParadigm ?? null,
+        magicSpectrum: spectrum,
+        spectrumEffects: effects,
+        scenarioPresetId: this.selectedScenario,
+        seed: Date.now(),
+      };
+      if (this.selectedScenario === 'custom') {
+        this.pendingConfig.customScenarioText = this.customScenarioText;
       }
+      this.currentStep = 'souls';
+      this.render();
     };
 
     buttonContainer.appendChild(backButton);
@@ -474,6 +481,39 @@ export class UniverseConfigScreen {
     }
 
     this.container.appendChild(container);
+  }
+
+  private renderSoulsStep(): void {
+    const description = document.createElement('p');
+    description.textContent = 'The Three Fates are weaving souls for your villagers...';
+    description.style.cssText = 'font-size: 18px; color: #ccc; text-align: center; margin-bottom: 40px; font-style: italic;';
+    this.container.appendChild(description);
+
+    const statusContainer = document.createElement('div');
+    statusContainer.style.cssText = 'max-width: 600px; padding: 30px; background: rgba(0, 0, 0, 0.5); border: 2px solid #667eea; border-radius: 10px; text-align: center;';
+
+    const statusText = document.createElement('div');
+    statusText.textContent = 'Initializing universe and creating initial souls...';
+    statusText.style.cssText = 'font-size: 16px; color: #ffd700; margin-bottom: 20px;';
+    statusContainer.appendChild(statusText);
+
+    const loader = document.createElement('div');
+    loader.textContent = '⏳';
+    loader.style.cssText = 'font-size: 48px; animation: pulse 2s infinite;';
+    statusContainer.appendChild(loader);
+
+    this.container.appendChild(statusContainer);
+
+    // Trigger game creation with the configured settings
+    // The SoulCeremonyModal will show on top of this screen during soul creation
+    if (this._onCreate && this.pendingConfig) {
+      // Small delay to let the UI render
+      setTimeout(() => {
+        if (this._onCreate && this.pendingConfig) {
+          this._onCreate(this.pendingConfig);
+        }
+      }, 100);
+    }
   }
 
   destroy(): void {

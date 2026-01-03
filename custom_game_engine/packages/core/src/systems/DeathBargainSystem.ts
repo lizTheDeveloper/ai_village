@@ -625,23 +625,24 @@ Answer ONLY with "YES" or "NO".`;
 
   /**
    * Get names of gods currently in divine chat observing
-   * Uses DivineChatSystem to get accurate list of gods in chat
+   * Uses ChatRoomSystem to get accurate list of gods in chat
    */
   private getObservingGods(world: World): string[] {
-    // Try to get DivineChatSystem from the world's system registry
+    // Try to get ChatRoomSystem from the world's system registry
     const systemRegistry = (world as any).systemRegistry;
     if (!systemRegistry) {
       return [];
     }
 
-    const divineChatSystem = systemRegistry.get('divine_chat');
-    if (!divineChatSystem) {
-      // DivineChatSystem not registered yet - fallback to empty
+    const chatRoomSystem = systemRegistry.get('chat_rooms');
+    if (!chatRoomSystem) {
+      // ChatRoomSystem not registered yet - fallback to empty
       return [];
     }
 
-    // Use DivineChatSystem's getObservingGods method
-    return (divineChatSystem as any).getObservingGods(world);
+    // Get members of the divine chat room
+    const members = (chatRoomSystem as any).getRoomMembers(world, 'divine_chat');
+    return members ? members.map((m: any) => m.name) : [];
   }
 
   /**

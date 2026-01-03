@@ -18,6 +18,7 @@ import { createCensusBureauComponent } from '../components/CensusBureauComponent
 import { createWarehouseComponent } from '../components/WarehouseComponent.js';
 import { createWeatherStationComponent } from '../components/WeatherStationComponent.js';
 import { createHealthClinicComponent } from '../components/HealthClinicComponent.js';
+import { createUniversityComponent } from '../components/UniversityComponent.js';
 
 /**
  * BuildingSystem handles construction progress for buildings.
@@ -168,7 +169,7 @@ export class BuildingSystem implements System {
     }
 
     // Check if this is a governance building and add governance component
-    this.addGovernanceComponent(entity as EntityImpl, buildingType);
+    this.addGovernanceComponent(entity as EntityImpl, buildingType, world);
 
     // Get fuel configuration for this building type
     const fuelConfig = this.getFuelConfiguration(buildingType);
@@ -298,7 +299,7 @@ export class BuildingSystem implements System {
    * Add governance component to governance buildings when they complete.
    * Per governance-dashboard work order: Buildings collect governance data.
    */
-  private addGovernanceComponent(entity: EntityImpl, buildingType: string): void {
+  private addGovernanceComponent(entity: EntityImpl, buildingType: string, world: World): void {
     switch (buildingType) {
       case BT.TownHall:
         entity.addComponent(createTownHallComponent());
@@ -319,6 +320,15 @@ export class BuildingSystem implements System {
 
       case BT.HealthClinic:
         entity.addComponent(createHealthClinicComponent());
+        break;
+
+      case BT.University:
+        entity.addComponent(createUniversityComponent(
+          `University of ${entity.id.slice(0, 8)}`,
+          entity.id,
+          world.tick,
+          'Per Sapientiam Ad Astra'
+        ));
         break;
 
       // Note: Other governance buildings (meeting-hall, watchtower, labor-guild, archive)

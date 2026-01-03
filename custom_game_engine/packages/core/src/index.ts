@@ -313,8 +313,13 @@ export {
 } from './persistence/index.js';
 
 // Multiverse system - Multiple universes with independent time scales
-export * from './multiverse/index.js';
-export { multiverseCoordinator } from './multiverse/index.js';
+// Note: Explicit exports only to avoid esbuild module resolution issues
+export { multiverseCoordinator } from './multiverse/MultiverseCoordinator.js';
+export type { UniverseConfig, UniverseInstance, PassageConnection } from './multiverse/MultiverseCoordinator.js';
+export { timelineManager, TimelineManager } from './multiverse/TimelineManager.js';
+export type { TimelineConfig, TimelineEntry, IntervalThreshold } from './multiverse/TimelineManager.js';
+export { MultiverseNetworkManager, initializeNetworkManager, getNetworkManager, networkManager } from './multiverse/MultiverseNetworkManager.js';
+export type { RemotePassage, RemotePassageConfig, NetworkMessage, ViewMode, InteractionMode, StreamConfiguration, Bounds, PeerId, PassageId, UniverseId as MultiverseUniverseId, UniverseSnapshotMessage, UniverseTickUpdate, EntityTransferMessage, EntityTransferAckMessage } from './multiverse/NetworkProtocol.js';
 
 // Trade agreement system - Cross-universe/multiverse trade with Hilbert-time
 export * from './trade/TradeAgreementTypes.js';
@@ -1100,3 +1105,9 @@ export * from './communication/index.js';
 
 // Television module (TV stations, shows, broadcasting)
 export * from './television/index.js';
+
+// Navigation module (spaceships, β-space, emotional topology)
+export * from './navigation/index.js';
+
+// Virtual Reality module (VR systems, emotional experiences)
+export * from './vr/index.js';

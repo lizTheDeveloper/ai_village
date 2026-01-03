@@ -38,6 +38,9 @@ export class CanonEventDetector {
   private canonEvents: CanonEvent[] = [];
   private firstAchievements = new Set<string>(); // Track "first X" events
 
+  /** Maximum canon events to retain in memory (oldest are pruned) */
+  private static readonly MAX_EVENTS = 1000;
+
   constructor() {}
 
   /**
@@ -84,10 +87,21 @@ export class CanonEventDetector {
   // Public recording methods for systems to call directly
 
   /**
+   * Add a canon event and prune if over limit.
+   */
+  private addEvent(event: CanonEvent): void {
+    this.canonEvents.push(event);
+    // Prune oldest events to prevent memory leak
+    if (this.canonEvents.length > CanonEventDetector.MAX_EVENTS) {
+      this.canonEvents.shift();
+    }
+  }
+
+  /**
    * Record an agent death as a canon event.
    */
   recordDeath(agentId: string, agentName: string, cause: string, day: number, tick: number): void {
-    this.canonEvents.push({
+    this.addEvent({
       day,
       tick,
       type: 'death',
@@ -98,7 +112,8 @@ export class CanonEventDetector {
     });
   }
 
-  // Additional public recording methods can be added as needed:
+  // Additional public recording methods can be added as needed
+  // (use this.addEvent() to ensure bounds are enforced):
   // - recordBirth()
   // - recordMarriage()
   // - recordFirstAchievement()

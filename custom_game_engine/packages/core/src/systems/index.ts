@@ -131,7 +131,9 @@ export * from './DeathJudgmentSystem.js';
 export * from './AfterlifeMemoryFadingSystem.js';
 export * from './WisdomGoddessSystem.js';
 export * from './ReincarnationSystem.js';
-// export * from './SoulCreationSystem.js'; // Temporarily disabled due to circular dependency with @ai-village/llm
+export * from './SoulCreationSystem.js';
+export * from './PixelLabSpriteGenerationSystem.js';
+export * from './SoulRepositorySystem.js';
 // Auto-save & Time Travel
 export * from './AutoSaveSystem.js';
 export * from './CheckpointNamingService.js';
@@ -193,8 +195,6 @@ export * from './OffScreenProductionSystem.js';
 export { OffScreenProductionSystem } from './OffScreenProductionSystem.js';
 
 // Chat & Communication
-export * from './DivineChatSystem.js';
-export { DivineChatSystem } from './DivineChatSystem.js';
 export * from './CrossRealmPhoneSystem.js';
 export { CrossRealmPhoneSystem, createCrossRealmPhoneSystem } from './CrossRealmPhoneSystem.js';
 export type { CrossRealmPhoneSystemConfig } from './CrossRealmPhoneSystem.js';

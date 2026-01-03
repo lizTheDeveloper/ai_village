@@ -97,8 +97,24 @@ export * from './ShopComponent.js';
 export type { ShopComponent } from './ShopComponent.js';
 export * from './MarketStateComponent.js';
 export type { MarketStateComponent, ItemMarketStats } from './MarketStateComponent.js';
+// Publishing components
+export * from './LibraryComponent.js';
+export { createLibraryComponent, addItemToLibrary, recordRead, canAccessLibrary, addMember } from './LibraryComponent.js';
+export type { LibraryComponent, BookListing } from './LibraryComponent.js';
+export * from './BookstoreComponent.js';
+export { createBookstoreComponent, addBookToStore, purchaseBook, placeOrder, fulfillOrder, addPrintingPartner, getAvailableBooks, getMostPopularBooks } from './BookstoreComponent.js';
+export type { BookstoreComponent, BookForSale, PendingOrder } from './BookstoreComponent.js';
+export { createPublishingCompanyComponent, submitManuscript, reviewManuscript, publishBook, hirePublishingEmployee, firePublishingEmployee, createManuscript, createPublishedBook } from './PublishingCompanyComponent.js';
+export type { PublishingCompanyComponent, PublishingEmployee, PublishingRole, PublishingDepartment, Manuscript, PublishedBook, ManuscriptStatus, PrintingJob } from './PublishingCompanyComponent.js';
+export { createNewspaperComponent, createArticle, createEdition, hireNewspaperEmployee, publishArticle, publishEdition, assignArticle, awardPulitzer } from './NewspaperComponent.js';
+export type { NewspaperComponent, NewspaperEmployee, NewspaperRole, NewspaperDepartment, Article, ArticleType, ArticleStatus, Edition } from './NewspaperComponent.js';
+export { createUniversityComponent, hireUniversityEmployee, fireUniversityEmployee, proposeResearch, fundResearch, startResearch, completeResearch, createUniversityCourse, enrollStudent, giveLecture, setupPreprintServer, setupResearchBlog, setupSocialMedia, publishResearch, recordCitation, recordPaperView, shareOnSocialMedia } from './UniversityComponent.js';
+export type { UniversityComponent, UniversityEmployee, UniversityRole, AcademicDepartment, ResearchProject, ResearchStatus, Course, Lecture, SkillTransfer, PublicationVenue, PublicationChannel, PublicationRecord } from './UniversityComponent.js';
 // Research component
 export * from './ResearchStateComponent.js';
+// Technology unlock tracker
+export { createTechnologyUnlockComponent, unlockBuilding, unlockTechnology, isBuildingUnlocked, isTechnologyUnlocked, setPlayerCity, isPlayerCity, getAvailableBuildings as getUnlockedBuildingsForCity, getResearchMultiplier, getBuildingEra, BUILDING_ERAS } from './TechnologyUnlockComponent.js';
+export type { TechnologyUnlockComponent, TechnologyEra, BuildingUnlock, TechnologyUnlock } from './TechnologyUnlockComponent.js';
 // Mood system
 export * from './MoodComponent.js';
 // Automation system (Phase 38)

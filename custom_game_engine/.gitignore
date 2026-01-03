@@ -1,3 +1,20 @@
 # Bug reports - auto-generated
 bug-reports/active/*.json
 bug-reports/resolved/*.json
+
+# Stale build artifacts in src directories
+# These cause Vite to serve old code instead of transpiling TypeScript
+# See CLAUDE.md "Build Artifacts" section for details
+packages/*/src/**/*.js
+packages/*/src/**/*.js.map
+packages/*/src/**/*.d.ts
+packages/*/src/**/*.d.ts.map
+
+# Environment variables
+.env
+.env.local
+
+# Server PID files (for nohup'd background processes)
+.metrics-server.pid
+.orch-dashboard.pid
+.dev-server.pid

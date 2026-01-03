@@ -29,6 +29,10 @@ import { FloatingTextRenderer } from './FloatingTextRenderer.js';
 import { SpeechBubbleRenderer } from './SpeechBubbleRenderer.js';
 import { ParticleRenderer } from './ParticleRenderer.js';
 import type { ContextMenuManager } from './ContextMenuManager.js';
+import { getPixelLabSpriteLoader, type PixelLabSpriteLoader } from './sprites/PixelLabSpriteLoader.js';
+import { PixelLabDirection, angleToPixelLabDirection } from './sprites/PixelLabSpriteDefs.js';
+import { findSprite, type SpriteTraits } from './sprites/SpriteRegistry.js';
+import type { AppearanceComponent } from '@ai-village/core';
 
 /**
  * 2D renderer using Canvas.
@@ -43,6 +47,15 @@ export class Renderer {
   private floatingTextRenderer!: FloatingTextRenderer;
   private speechBubbleRenderer!: SpeechBubbleRenderer;
   private particleRenderer!: ParticleRenderer;
+  private pixelLabLoader!: PixelLabSpriteLoader;
+
+  // Track which sprites are loading to avoid duplicate requests
+  private loadingSprites = new Set<string>();
+  // Track failed sprite loads with timestamp to prevent thundering herd
+  private failedSprites = new Map<string, number>(); // folderId -> timestamp of failure
+  private readonly SPRITE_RETRY_DELAY_MS = 5000; // Wait 5 seconds before retrying a failed load
+  // Track loaded sprite instances by entity ID
+  private entitySpriteInstances = new Map<string, string>(); // entityId -> instanceId
 
   private tileSize = 16; // Pixels per tile at zoom=1
   private hasLoggedTilledTile = false; // Debug flag to log first tilled tile rendering
@@ -71,6 +84,7 @@ export class Renderer {
     this.floatingTextRenderer = new FloatingTextRenderer();
     this.speechBubbleRenderer = new SpeechBubbleRenderer();
     this.particleRenderer = new ParticleRenderer();
+    this.pixelLabLoader = getPixelLabSpriteLoader('/assets/sprites/pixellab');
 
     // Handle resize - store bound handler for cleanup
     this.resize();
@@ -87,6 +101,93 @@ export class Renderer {
       window.removeEventListener('resize', this.boundResizeHandler);
       this.boundResizeHandler = null;
     }
+  }
+
+  /**
+   * Try to render an entity using PixelLab sprites.
+   * Returns true if successfully rendered, false if fallback is needed.
+   */
+  private renderPixelLabEntity(
+    entity: Entity,
+    x: number,
+    y: number,
+    size: number
+  ): boolean {
+    // Get appearance component for sprite lookup
+    const appearance = entity.components.get('appearance') as AppearanceComponent | undefined;
+    if (!appearance) return false;
+
+    // Build traits for sprite lookup
+    const traits: SpriteTraits = {
+      species: appearance.species || 'human',
+      gender: appearance.gender,
+      hairColor: appearance.hairColor,
+      skinTone: appearance.skinTone,
+    };
+
+    // Find the best matching sprite folder
+    const spriteFolderId = findSprite(traits);
+
+    // Check if sprite is loaded
+    if (!this.pixelLabLoader.isLoaded(spriteFolderId)) {
+      // Check if this sprite has failed recently (prevent thundering herd)
+      const failedTime = this.failedSprites.get(spriteFolderId);
+      if (failedTime !== undefined) {
+        const timeSinceFailure = Date.now() - failedTime;
+        if (timeSinceFailure < this.SPRITE_RETRY_DELAY_MS) {
+          return false; // Too soon to retry, use fallback
+        }
+        // Enough time has passed, clear the failure and allow retry
+        this.failedSprites.delete(spriteFolderId);
+      }
+
+      // Start loading if not already loading
+      if (!this.loadingSprites.has(spriteFolderId)) {
+        this.loadingSprites.add(spriteFolderId);
+        this.pixelLabLoader.loadCharacter(spriteFolderId)
+          .then(() => {
+            this.loadingSprites.delete(spriteFolderId);
+            // Clear any previous failure record on success
+            this.failedSprites.delete(spriteFolderId);
+          })
+          .catch((error) => {
+            this.loadingSprites.delete(spriteFolderId);
+            // Mark as failed with timestamp to prevent immediate retry
+            this.failedSprites.set(spriteFolderId, Date.now());
+            // Log error once (not on every frame)
+            console.error(`[Renderer] Failed to load sprite ${spriteFolderId}, will retry in ${this.SPRITE_RETRY_DELAY_MS}ms:`, error.message);
+          });
+      }
+      return false; // Use fallback while loading
+    }
+
+    // Get or create instance for this entity
+    let instanceId = this.entitySpriteInstances.get(entity.id);
+    if (!instanceId) {
+      instanceId = `entity_${entity.id}`;
+      const instance = this.pixelLabLoader.createInstance(instanceId, spriteFolderId);
+      if (!instance) return false;
+      this.entitySpriteInstances.set(entity.id, instanceId);
+    }
+
+    // Determine direction from entity velocity or facing
+    const velocity = entity.components.get('velocity') as { dx: number; dy: number } | undefined;
+    let direction = PixelLabDirection.South; // Default facing south
+
+    if (velocity && (velocity.dx !== 0 || velocity.dy !== 0)) {
+      const angle = Math.atan2(velocity.dy, velocity.dx);
+      direction = angleToPixelLabDirection(angle);
+    }
+
+    // Update sprite direction
+    this.pixelLabLoader.setDirection(instanceId, direction);
+
+    // Calculate scale to fit the size
+    // PixelLab sprites are 48x48, we want them to fit in `size` pixels
+    const scale = size / 48;
+
+    // Render the sprite
+    return this.pixelLabLoader.render(this.ctx, instanceId, x, y, scale);
   }
 
   private resize(): void {
@@ -663,10 +764,28 @@ export class Renderer {
           this.ctx.fillStyle = '#666666';
           this.ctx.fillRect(stemX, spriteBottom, stemWidth, terrainScreenY - spriteBottom);
 
-          // Draw sprite at top
-          renderSprite(this.ctx, renderable.spriteId, screen.x - offsetX, screen.y - offsetY, scaledSize, metadata);
+          // Draw sprite at top - try PixelLab first for agents
+          if (!this.renderPixelLabEntity(entity, screen.x - offsetX, screen.y - offsetY, scaledSize)) {
+            renderSprite(this.ctx, renderable.spriteId, screen.x - offsetX, screen.y - offsetY, scaledSize, metadata);
+          }
         } else {
           // Ground-level entity in side-view: render at terrain surface
+          // Try PixelLab sprites first for agents
+          if (!this.renderPixelLabEntity(entity, screen.x - offsetX, screen.y - offsetY, scaledSize)) {
+            renderSprite(
+              this.ctx,
+              renderable.spriteId,
+              screen.x - offsetX,
+              screen.y - offsetY,
+              scaledSize,
+              metadata
+            );
+          }
+        }
+      } else {
+        // Normal rendering (top-down or ground-level entities)
+        // Try PixelLab sprites first for agents
+        if (!this.renderPixelLabEntity(entity, screen.x - offsetX, screen.y - offsetY, scaledSize)) {
           renderSprite(
             this.ctx,
             renderable.spriteId,
@@ -676,16 +795,6 @@ export class Renderer {
             metadata
           );
         }
-      } else {
-        // Normal rendering (top-down or ground-level entities)
-        renderSprite(
-          this.ctx,
-          renderable.spriteId,
-          screen.x - offsetX,
-          screen.y - offsetY,
-          scaledSize,
-          metadata
-        );
       }
 
       // Reset alpha

@@ -13,6 +13,7 @@ export type Gender = 'male' | 'female' | 'nonbinary';
 export type HairColor = 'black' | 'brown' | 'blonde' | 'red' | 'white' | 'silver' | 'green' | 'blue';
 export type SkinTone = 'light' | 'medium' | 'dark';
 export type EyeColor = 'brown' | 'blue' | 'green' | 'hazel' | 'amber' | 'gray' | 'red' | 'violet';
+export type ClothingType = 'peasant' | 'common' | 'merchant' | 'noble' | 'royal';
 
 export interface AppearanceTraits {
   species?: Species;
@@ -22,6 +23,7 @@ export interface AppearanceTraits {
   eyeColor?: EyeColor;
   height?: number;      // cm, variation from species average
   build?: 'slim' | 'average' | 'stocky' | 'muscular';
+  clothingType?: ClothingType;
 }
 
 export class AppearanceComponent extends ComponentBase {
@@ -34,6 +36,7 @@ export class AppearanceComponent extends ComponentBase {
   public eyeColor: EyeColor;
   public height: number;
   public build: 'slim' | 'average' | 'stocky' | 'muscular';
+  public clothingType: ClothingType;
 
   // Cached sprite folder ID (set after lookup)
   public spriteFolderId?: string;
@@ -49,17 +52,19 @@ export class AppearanceComponent extends ComponentBase {
     this.eyeColor = traits.eyeColor ?? randomEyeColor();
     this.height = traits.height ?? randomHeightVariation();
     this.build = traits.build ?? randomBuild();
+    this.clothingType = traits.clothingType ?? 'peasant'; // Default to peasant clothing
   }
 
   /**
    * Get traits in format expected by SpriteRegistry
    */
-  getSpriteTraits(): { species: Species; gender: Gender; hairColor: HairColor; skinTone: SkinTone } {
+  getSpriteTraits(): { species: Species; gender: Gender; hairColor: HairColor; skinTone: SkinTone; clothingType: ClothingType } {
     return {
       species: this.species,
       gender: this.gender,
       hairColor: this.hairColor,
       skinTone: this.skinTone,
+      clothingType: this.clothingType,
     };
   }
 
@@ -75,10 +80,23 @@ export class AppearanceComponent extends ComponentBase {
       eyeColor: this.eyeColor,
       height: this.height,
       build: this.build,
+      clothingType: this.clothingType,
     });
     clone.spriteFolderId = this.spriteFolderId;
     clone.spriteStatus = this.spriteStatus;
     return clone;
+  }
+
+  /**
+   * Update clothing type (e.g., when entity changes social status or equips new clothing)
+   */
+  setClothingType(clothingType: ClothingType): void {
+    if (this.clothingType !== clothingType) {
+      this.clothingType = clothingType;
+      // Reset sprite cache to force re-lookup with new clothing
+      this.spriteFolderId = undefined;
+      this.spriteStatus = 'unknown';
+    }
   }
 }
 

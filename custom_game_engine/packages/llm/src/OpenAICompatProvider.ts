@@ -1,4 +1,4 @@
-import type { LLMProvider, LLMRequest, LLMResponse } from './LLMProvider.js';
+import type { LLMProvider, LLMRequest, LLMResponse, ProviderPricing } from './LLMProvider.js';
 
 // Valid actions that can be extracted from text
 // const VALID_ACTIONS = [
@@ -455,18 +455,28 @@ Keep speech brief and natural.`
           console.error('[OpenAICompatProvider] Empty response:', data);
         }
 
+        const inputTokens = data.usage?.prompt_tokens || 0;
+        const outputTokens = data.usage?.completion_tokens || 0;
         return {
           text: content,
           stopReason: choice?.finish_reason,
           tokensUsed: data.usage?.total_tokens,
+          inputTokens,
+          outputTokens,
+          costUSD: this.calculateCost(inputTokens, outputTokens)
         };
       }
 
       // Return structured response
+      const inputTokens = data.usage?.prompt_tokens || 0;
+      const outputTokens = data.usage?.completion_tokens || 0;
       return {
         text: responseText,
         stopReason: choice?.finish_reason,
         tokensUsed: data.usage?.total_tokens,
+        inputTokens,
+        outputTokens,
+        costUSD: this.calculateCost(inputTokens, outputTokens)
       };
     } catch (error) {
       console.error('[OpenAICompatProvider] Generate error:', error);
@@ -567,10 +577,15 @@ Be brief and natural.`
             speaking: parsed.speaking || '',
             action: parsed.action || 'wander'
           });
+          const inputTokens = data.usage?.prompt_tokens || 0;
+          const outputTokens = data.usage?.completion_tokens || 0;
           return {
             text: responseText,
             stopReason: data.choices?.[0]?.finish_reason,
             tokensUsed: data.usage?.total_tokens,
+            inputTokens,
+            outputTokens,
+            costUSD: this.calculateCost(inputTokens, outputTokens)
           };
         } catch {
           // JSON parse failed, fall through to text parsing
@@ -615,10 +630,15 @@ Be brief and natural.`
       action: action
     });
 
+    const inputTokens = data.usage?.prompt_tokens || 0;
+    const outputTokens = data.usage?.completion_tokens || 0;
     return {
       text: responseText,
       stopReason: data.choices?.[0]?.finish_reason,
       tokensUsed: data.usage?.total_tokens,
+      inputTokens,
+      outputTokens,
+      costUSD: this.calculateCost(inputTokens, outputTokens)
     };
   }
 
@@ -642,5 +662,86 @@ Be brief and natural.`
     } catch {
       return false;
     }
+  }
+
+  getPricing(): ProviderPricing {
+    const providerId = this.getProviderId();
+
+    // Pricing as of 2026-01-03
+    switch (providerId) {
+      case 'groq':
+        return {
+          providerId: 'groq',
+          providerName: 'Groq',
+          inputCostPer1M: 0.05,
+          outputCostPer1M: 0.10
+        };
+
+      case 'cerebras':
+        // Cerebras has generous free tier, pricing for paid is competitive
+        return {
+          providerId: 'cerebras',
+          providerName: 'Cerebras',
+          inputCostPer1M: 0.10,
+          outputCostPer1M: 0.10
+        };
+
+      case 'openai':
+        return {
+          providerId: 'openai',
+          providerName: 'OpenAI',
+          inputCostPer1M: 3.00,
+          outputCostPer1M: 15.00
+        };
+
+      case 'anthropic':
+        return {
+          providerId: 'anthropic',
+          providerName: 'Anthropic',
+          inputCostPer1M: 3.00,
+          outputCostPer1M: 15.00
+        };
+
+      case 'mlx':
+        return {
+          providerId: 'mlx',
+          providerName: 'MLX (Local)',
+          inputCostPer1M: 0,
+          outputCostPer1M: 0
+        };
+
+      default:
+        // Unknown provider - assume free for safety
+        return {
+          providerId,
+          providerName: 'Unknown Provider',
+          inputCostPer1M: 0,
+          outputCostPer1M: 0
+        };
+    }
+  }
+
+  getProviderId(): string {
+    // Detect provider from baseUrl
+    const url = this.baseUrl.toLowerCase();
+
+    if (url.includes('groq.com')) return 'groq';
+    if (url.includes('cerebras.ai')) return 'cerebras';
+    if (url.includes('api.openai.com')) return 'openai';
+    if (url.includes('api.anthropic.com')) return 'anthropic';
+    if (url.includes('localhost:8080') || url.includes('127.0.0.1:8080')) return 'mlx';
+
+    // Default to generic openai-compat
+    return 'openai-compat';
+  }
+
+  /**
+   * Calculate cost for a response.
+   */
+  private calculateCost(inputTokens: number, outputTokens: number): number {
+    const pricing = this.getPricing();
+    const inputCost = (inputTokens / 1_000_000) * pricing.inputCostPer1M;
+    const outputCost = (outputTokens / 1_000_000) * pricing.outputCostPer1M;
+    return inputCost + outputCost;
   }
 }

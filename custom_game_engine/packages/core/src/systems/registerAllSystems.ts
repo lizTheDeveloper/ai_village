@@ -58,6 +58,8 @@ import { InterestsSystem } from './InterestsSystem.js';
 // Exploration & Navigation
 import { ExplorationSystem } from './ExplorationSystem.js';
 import { LandmarkNamingSystem } from './LandmarkNamingSystem.js';
+import { EmotionalNavigationSystem } from '../navigation/EmotionalNavigationSystem.js';
+import { VRSystem } from '../vr/VRSystem.js';
 
 // Building & Construction
 import { BuildingSystem } from './BuildingSystem.js';
@@ -90,6 +92,15 @@ import { DurabilitySystem } from './DurabilitySystem.js';
 // Research
 import { ResearchSystem } from './ResearchSystem.js';
 
+// Publishing & Knowledge Infrastructure
+import { LibrarySystem } from './LibrarySystem.js';
+import { BookstoreSystem } from './BookstoreSystem.js';
+import { UniversitySystem } from './UniversitySystem.js';
+import { PublishingProductionSystem } from './PublishingProductionSystem.js';
+import { PublishingUnlockSystem } from './PublishingUnlockSystem.js';
+import { TechnologyUnlockSystem } from './TechnologyUnlockSystem.js';
+import { CityBuildingGenerationSystem } from './CityBuildingGenerationSystem.js';
+
 // Magic
 import { MagicSystem } from './MagicSystem.js';
 
@@ -105,8 +116,8 @@ import { FaithMechanicsSystem } from './FaithMechanicsSystem.js';
 import { PrayerSystem } from './PrayerSystem.js';
 import { PrayerAnsweringSystem } from './PrayerAnsweringSystem.js';
 import { MythGenerationSystem } from './MythGenerationSystem.js';
-import { DivineChatSystem } from './DivineChatSystem.js';
 import { ChatRoomSystem } from '../communication/ChatRoomSystem.js';
+import { CompanionSystem } from './CompanionSystem.js';
 
 // Divinity - Institutions
 import { TempleSystem } from './TempleSystem.js';
@@ -173,7 +184,9 @@ import { RealmManager } from './RealmManager.js';
 import { AfterlifeNeedsSystem } from './AfterlifeNeedsSystem.js';
 import { AncestorTransformationSystem } from './AncestorTransformationSystem.js';
 import { ReincarnationSystem } from './ReincarnationSystem.js';
-// import { SoulCreationSystem } from './SoulCreationSystem.js'; // Temporarily disabled due to circular dependency
+import { SoulCreationSystem } from './SoulCreationSystem.js';
+import { PixelLabSpriteGenerationSystem } from './PixelLabSpriteGenerationSystem.js';
+// SoulRepositorySystem uses Node.js APIs (fs, path) - imported dynamically below
 
 // Governance & Metrics
 import { GovernanceDataSystem } from './GovernanceDataSystem.js';
@@ -320,6 +333,12 @@ export function registerAllSystems(
   if (llmQueue) {
     gameLoop.systemRegistry.register(new LandmarkNamingSystem(llmQueue as any));
   }
+  gameLoop.systemRegistry.register(new EmotionalNavigationSystem());
+
+  // ============================================================================
+  // VIRTUAL REALITY
+  // ============================================================================
+  gameLoop.systemRegistry.register(new VRSystem());
 
   // ============================================================================
   // BUILDING & CONSTRUCTION
@@ -370,6 +389,30 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(researchSystem);
 
   // ============================================================================
+  // PUBLISHING & KNOWLEDGE INFRASTRUCTURE
+  // ============================================================================
+  const publishingUnlockSystem = new PublishingUnlockSystem(eventBus);
+  gameLoop.systemRegistry.register(publishingUnlockSystem);
+
+  const technologyUnlockSystem = new TechnologyUnlockSystem(eventBus);
+  gameLoop.systemRegistry.register(technologyUnlockSystem);
+
+  const cityBuildingGenerationSystem = new CityBuildingGenerationSystem(eventBus);
+  gameLoop.systemRegistry.register(cityBuildingGenerationSystem);
+
+  const publishingProductionSystem = new PublishingProductionSystem(eventBus);
+  gameLoop.systemRegistry.register(publishingProductionSystem);
+
+  const librarySystem = new LibrarySystem(eventBus);
+  gameLoop.systemRegistry.register(librarySystem);
+
+  const bookstoreSystem = new BookstoreSystem(eventBus);
+  gameLoop.systemRegistry.register(bookstoreSystem);
+
+  const universitySystem = new UniversitySystem(eventBus);
+  gameLoop.systemRegistry.register(universitySystem);
+
+  // ============================================================================
   // MAGIC
   // ============================================================================
   const magicSystem = new MagicSystem();
@@ -406,9 +449,8 @@ export function registerAllSystems(
   const chatRoomSystem = new ChatRoomSystem();
   gameLoop.systemRegistry.register(chatRoomSystem);
 
-  // Divine Chat - DEPRECATED: Wrapper for backwards compatibility
-  // TODO: Remove once all consumers migrate to ChatRoomSystem
-  gameLoop.systemRegistry.register(new DivineChatSystem());
+  // Companion System - Ophanim tutorial/emotional companion
+  gameLoop.systemRegistry.register(new CompanionSystem());
 
   // ============================================================================
   // DIVINITY - INSTITUTIONS
@@ -492,7 +534,22 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(realmManager);
 
   // Soul Creation (divine ceremony for creating new souls)
-  // gameLoop.systemRegistry.register(new SoulCreationSystem()); // Temporarily disabled due to circular dependency
+  gameLoop.systemRegistry.register(new SoulCreationSystem());
+
+  // PixelLab sprite generation for newborn souls
+  gameLoop.systemRegistry.register(new PixelLabSpriteGenerationSystem());
+
+  // Soul Repository (persistent backup of all souls)
+  // Only register in Node.js environment (uses fs, path, process.cwd)
+  // Use dynamic import to avoid bundling Node.js modules in browser
+  if (typeof process !== 'undefined' && typeof process.cwd === 'function') {
+    import('./SoulRepositorySystem.js').then(({ SoulRepositorySystem }) => {
+      gameLoop.systemRegistry.register(new SoulRepositorySystem());
+      console.log('[registerAllSystems] SoulRepositorySystem registered (Node.js only)');
+    }).catch(err => {
+      console.warn('[registerAllSystems] SoulRepositorySystem not available:', err.message);
+    });
+  }
 
   // Afterlife systems (process souls in the Underworld)
   gameLoop.systemRegistry.register(new AfterlifeNeedsSystem());

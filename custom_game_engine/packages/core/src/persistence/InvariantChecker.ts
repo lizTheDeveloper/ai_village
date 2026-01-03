@@ -15,7 +15,7 @@ import type { SaveFile, VersionedEntity, VersionedComponent, UniverseSnapshot } 
 import type { World } from '../ecs/World.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType } from '../types/ComponentType.js';
-import { computeChecksum } from './utils.js';
+import { computeChecksumSync } from './utils.js';
 
 /**
  * Invariant violation error.
@@ -230,7 +230,8 @@ async function validateUniverse(universe: UniverseSnapshot): Promise<void> {
 
   // Verify entity checksums if present
   if (universe.checksums?.entities) {
-    const calculated = await computeChecksum(JSON.stringify(universe.entities));
+    // Use computeChecksumSync to match WorldSerializer
+    const calculated = computeChecksumSync(universe.entities);
 
     if (calculated !== universe.checksums.entities) {
       throw new InvariantViolationError(
@@ -318,8 +319,9 @@ export async function validateSaveFile(saveFile: SaveFile): Promise<void> {
   // Verify overall checksum
   if (saveFile.checksums?.overall) {
     // Calculate checksum of everything except the checksums field
+    // Use computeChecksumSync to match SaveLoadService
     const { checksums, ...dataToHash } = saveFile;
-    const calculated = await computeChecksum(JSON.stringify(dataToHash));
+    const calculated = computeChecksumSync(dataToHash);
 
     if (calculated !== saveFile.checksums.overall) {
       throw new InvariantViolationError(

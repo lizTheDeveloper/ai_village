@@ -13,6 +13,21 @@ export type {
   PassageConnection,
 } from './MultiverseCoordinator.js';
 
+// Timeline management (variable interval auto-saves + canon event triggers)
+export {
+  TimelineManager,
+  timelineManager,
+} from './TimelineManager.js';
+
+export type {
+  TimelineConfig,
+  TimelineEntry,
+  IntervalThreshold,
+} from './TimelineManager.js';
+
+// Re-export CanonEventType for convenience
+export type { CanonEventType } from '../metrics/CanonEventRecorder.js';
+
 // Networked multiverse
 export {
   MultiverseNetworkManager,

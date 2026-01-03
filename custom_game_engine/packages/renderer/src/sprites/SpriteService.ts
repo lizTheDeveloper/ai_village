@@ -8,7 +8,7 @@
  * 4. Tracks sprite status (available, missing, generating)
  */
 
-import { findSprite, type SpriteTraits } from './SpriteRegistry.js';
+import { findSpriteWithFallback, type SpriteTraits } from './SpriteRegistry.js';
 
 export type SpriteStatus = 'available' | 'missing' | 'generating' | 'unknown';
 
@@ -16,6 +16,9 @@ export interface SpriteInfo {
   folderId: string;
   status: SpriteStatus;
   path?: string;
+  isFallback: boolean;            // True if this is a fallback sprite (not exact match)
+  idealFolderId?: string;         // The ideal sprite ID being generated (if any)
+  missingTraits?: string[];       // Traits that didn't match
 }
 
 export interface GenerationRequest {
@@ -63,12 +66,16 @@ export function isPixelLabAvailable(): boolean {
 }
 
 /**
- * Look up sprite for entity traits
+ * Look up sprite for entity traits with fallback logic
+ *
+ * If no exact match exists (including clothing), returns the best available
+ * fallback sprite while queuing the ideal sprite for generation.
  */
 export function lookupSprite(traits: SpriteTraits): SpriteInfo {
-  const folderId = findSprite(traits);
+  const result = findSpriteWithFallback(traits);
+  const { folderId, exactMatch, idealFolderId, missingTraits } = result;
 
-  // Check cache first
+  // Check cache first for the fallback sprite
   let status = spriteStatusCache.get(folderId);
 
   if (!status) {
@@ -77,30 +84,89 @@ export function lookupSprite(traits: SpriteTraits): SpriteInfo {
     spriteStatusCache.set(folderId, status);
   }
 
-  // If missing and PixelLab is available, queue for generation
+  // If fallback sprite is missing, queue IT for generation
   if (status === 'missing' && pixelLabAvailable && !generatingSprites.has(folderId)) {
     queueSpriteGeneration(folderId, traits);
     status = 'generating';
     spriteStatusCache.set(folderId, status);
   }
 
+  // If not an exact match, also queue the ideal sprite for generation
+  // This is the key feature: use fallback now, generate ideal for later
+  let idealGenerating = false;
+  if (!exactMatch && idealFolderId && pixelLabAvailable) {
+    // Check if ideal sprite is now available (may have been generated)
+    if (checkSpriteExists(idealFolderId)) {
+      // Ideal sprite is now available! Use it instead
+      spriteStatusCache.set(idealFolderId, 'available');
+      return {
+        folderId: idealFolderId,
+        status: 'available',
+        path: `${assetsBasePath}/${idealFolderId}`,
+        isFallback: false,
+        missingTraits: [],
+      };
+    }
+
+    // Queue ideal sprite for generation if not already generating
+    if (!generatingSprites.has(idealFolderId)) {
+      queueSpriteGeneration(idealFolderId, traits);
+      spriteStatusCache.set(idealFolderId, 'generating');
+      idealGenerating = true;
+    } else {
+      idealGenerating = true;
+    }
+  }
+
   return {
     folderId,
     status,
     path: status === 'available' ? `${assetsBasePath}/${folderId}` : undefined,
+    isFallback: !exactMatch,
+    idealFolderId: idealGenerating ? idealFolderId : undefined,
+    missingTraits,
   };
 }
 
 /**
  * Check if sprite folder exists with required files
  * Note: In browser context, we can't directly check filesystem
- * This uses a pre-populated manifest or tries to load metadata
+ * This attempts to fetch metadata.json to verify sprite exists
  */
 function checkSpriteExists(folderId: string): boolean {
-  // Check against known available sprites
-  // This will be populated by scanning the assets directory at build time
-  // or by successful loads at runtime
-  return KNOWN_AVAILABLE_SPRITES.has(folderId);
+  // First check the known available set (fast path)
+  if (KNOWN_AVAILABLE_SPRITES.has(folderId)) {
+    return true;
+  }
+
+  // If not in the known set, attempt to verify by fetching metadata
+  // This is async, so we'll return false and queue a verification
+  if (typeof window !== 'undefined') {
+    verifySpriteExists(folderId);
+  }
+
+  return false;
+}
+
+/**
+ * Asynchronously verify if a sprite exists by fetching its metadata
+ */
+async function verifySpriteExists(folderId: string): Promise<boolean> {
+  try {
+    const metadataUrl = `${assetsBasePath}/${folderId}/metadata.json`;
+    const response = await fetch(metadataUrl, { method: 'HEAD' });
+
+    if (response.ok) {
+      // Sprite exists! Add to known available set
+      KNOWN_AVAILABLE_SPRITES.add(folderId);
+      markSpriteAvailable(folderId);
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    return false;
+  }
 }
 
 /**
@@ -211,8 +277,17 @@ function buildSpriteDescription(_folderId: string, traits: SpriteTraits): string
     parts.push(`${traits.skinTone} skin tone`);
   }
 
-  // Common styling
-  parts.push('wearing simple medieval peasant clothing');
+  // Clothing type - detailed descriptions for each social class
+  const clothingDescriptions = {
+    peasant: 'wearing simple medieval peasant clothing with rough linen tunic',
+    common: 'wearing common villager clothing with wool tunic and leather belt',
+    merchant: 'wearing merchant attire with fine wool doublet and leather vest',
+    noble: 'wearing elegant noble attire with silk embroidery and gold trim',
+    royal: 'wearing regal royal garments with velvet cloak and jeweled accessories',
+  };
+
+  const clothingType = traits.clothingType || 'peasant';
+  parts.push(clothingDescriptions[clothingType as keyof typeof clothingDescriptions]);
 
   return parts.join(', ');
 }
@@ -330,6 +405,25 @@ const KNOWN_AVAILABLE_SPRITES = new Set<string>([
   'death-gods/clockwork-reaper',
   'death-gods/mushroom-druid',
   'death-gods/cosmic-void-entity',
+
+  // Mythological deities
+  'anubis',
+  'athena',
+  'hel',
+  'odin',
+  'thanatos',
+  'zeus',
+  'punisher-angel',
+
+  // Fantasy creatures
+  'high-elf',
+  'pixie',
+  'forest-sprite',
+
+  // Alien species
+  'blob-alien',
+  'crystalline-alien',
+  'mantis-alien',
 ]);
 
 /**

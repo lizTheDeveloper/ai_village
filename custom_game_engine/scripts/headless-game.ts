@@ -415,7 +415,7 @@ function createInitialAgents(world: WorldMutator, agentCount: number = 5) {
     const x = centerX + offsetX * spread + Math.random() * 0.5;
     const y = centerY + offsetY * spread + Math.random() * 0.5;
 
-    // Create NPC agent with farming skills (not LLM agent)
+    // Create LLM agent with farming skills
     const agentId = createLLMAgent(world, x, y, 2.0);
     const entity = world.getEntity(agentId);
 
@@ -440,11 +440,11 @@ function createInitialAgents(world: WorldMutator, agentCount: number = 5) {
       // Derive priorities from farming skills (gives high farming priority)
       const priorities = derivePrioritiesFromSkills(skills);
 
-      // Convert to NPC (scripted) agent with farming priorities
+      // Convert to LLM agent with farming priorities (full tier)
       agentEntity.updateComponent('agent', (current: any) => ({
         ...current,
-        useLLM: false, // Use scripted behaviors only
-        tier: 'autonomic', // Autonomic tier = fully scripted
+        useLLM: true, // Use LLM for decision making
+        tier: 'full', // Full tier = maximum LLM usage (idle: 5s, periodic: 5min, task complete)
         priorities, // Farming will be high priority
         thinkInterval: 40, // Think every 2 seconds
       }));
@@ -686,7 +686,7 @@ async function setupLLMProvider(): Promise<{
     const response = await fetch('http://localhost:11434/api/tags', { method: 'GET' });
     if (response.ok) {
       console.log('[HeadlessGame] Using Ollama');
-      const provider = new OllamaProvider({ model: 'qwen3:1.7b' });
+      const provider = new OllamaProvider({ model: 'qwen3:4b' });
       const queue = new LLMDecisionQueue(provider, 3);
       const promptBuilder = new StructuredPromptBuilder();
       return { provider, queue, promptBuilder };

@@ -1,4 +1,4 @@
-import type { LLMProvider, LLMRequest, LLMResponse } from './LLMProvider.js';
+import type { LLMProvider, LLMRequest, LLMResponse, ProviderPricing } from './LLMProvider.js';
 
 /**
  * Ollama LLM provider for local model inference.
@@ -304,6 +304,9 @@ IMPORTANT: You MUST use a tool call. Text responses will be ignored.`;
           text: fallbackText,
           stopReason: data.done_reason,
           tokensUsed: data.eval_count,
+          inputTokens: data.prompt_eval_count || 0,
+          outputTokens: data.eval_count || 0,
+          costUSD: 0  // Ollama is free (local inference)
         };
       }
 
@@ -312,6 +315,9 @@ IMPORTANT: You MUST use a tool call. Text responses will be ignored.`;
         text: responseText,
         stopReason: data.done_reason,
         tokensUsed: data.eval_count,
+        inputTokens: data.prompt_eval_count || 0,
+        outputTokens: data.eval_count || 0,
+        costUSD: 0  // Ollama is free (local inference)
       };
     } catch (error) {
       console.error('[OllamaProvider] Ollama generate error:', error);
@@ -337,5 +343,18 @@ IMPORTANT: You MUST use a tool call. Text responses will be ignored.`;
     } catch {
       return false;
     }
+  }
+
+  getPricing(): ProviderPricing {
+    return {
+      providerId: 'ollama',
+      providerName: 'Ollama (Local)',
+      inputCostPer1M: 0,   // Free - local inference
+      outputCostPer1M: 0   // Free - local inference
+    };
+  }
+
+  getProviderId(): string {
+    return 'ollama';
   }
 }

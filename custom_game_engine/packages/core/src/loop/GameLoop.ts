@@ -8,6 +8,7 @@ import { ActionRegistry } from '../actions/ActionRegistry.js';
 import { ActionQueue } from '../actions/ActionQueue.js';
 import { ComponentRegistry } from '../ecs/ComponentRegistry.js';
 import { TICKS_PER_SECOND, MS_PER_TICK } from '../types.js';
+import { timelineManager } from '../multiverse/TimelineManager.js';
 
 export type GameLoopState = 'stopped' | 'running' | 'paused';
 
@@ -36,6 +37,9 @@ export class GameLoop {
   private tickCount = 0;
   private avgTickTime = 0;
   private maxTickTime = 0;
+
+  // Universe tracking for timeline management
+  private _universeId: string = 'default';
 
   constructor() {
     this.eventBus = new EventBusImpl();
@@ -73,12 +77,23 @@ export class GameLoop {
     return this._actionRegistry;
   }
 
+  get universeId(): string {
+    return this._universeId;
+  }
+
+  set universeId(id: string) {
+    this._universeId = id;
+  }
+
   start(): void {
     if (this._state === 'running') return;
 
     this._state = 'running';
     this.lastTickTime = performance.now();
     this.accumulator = 0;
+
+    // Attach timeline manager to world for canon event listening
+    timelineManager.attachToWorld(this._universeId, this._world);
 
     // Initialize all systems
     const systems = this._systemRegistry.getSorted();
@@ -97,6 +112,9 @@ export class GameLoop {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
     }
+
+    // Detach timeline manager
+    timelineManager.detachFromWorld(this._universeId);
 
     // Cleanup all systems
     const systems = this._systemRegistry.getSorted();
@@ -164,6 +182,7 @@ export class GameLoop {
 
     // Get all systems in priority order
     const systems = this._systemRegistry.getSorted();
+    const systemTimings: Array<{ id: string; time: number }> = [];
 
     // Execute each system
     for (const system of systems) {
@@ -199,19 +218,38 @@ export class GameLoop {
         lastEntityCount: 0,
         lastEventCount: 0,
       });
+
+      // Track ALL system timings for profiling
+      systemTimings.push({ id: system.id, time: systemTime });
     }
 
+    // Capture systems phase timing
+    const systemsEndTime = performance.now();
+    const totalSystemsTime = systemsEndTime - tickStart;
+
     // Process actions
+    const actionStart = performance.now();
     this._actionQueue.process(this._world);
+    const actionTime = performance.now() - actionStart;
 
     // Flush events
+    const flushStart = performance.now();
     this.eventBus.flush();
+    const flushTime = performance.now() - flushStart;
 
     // Check for time-based events (hour, day, season, year)
+    const timeEventsStart = performance.now();
     const prevGameTime = this._world.gameTime;
 
     // Advance tick
     this._world.advanceTick();
+
+    // Update timeline manager for auto-snapshots (fire-and-forget)
+    timelineManager.tick(
+      this._universeId,
+      this._world,
+      BigInt(this._world.tick)
+    ).catch(err => console.error('[GameLoop] Timeline tick error:', err));
 
     const newGameTime = this._world.gameTime;
 
@@ -256,7 +294,10 @@ export class GameLoop {
     });
 
     // Final flush for tick-end events
+    const flush2Start = performance.now();
     this.eventBus.flush();
+    const flush2Time = performance.now() - flush2Start;
+    const timeEventsTime = performance.now() - timeEventsStart;
 
     // Prune event history periodically to prevent memory leaks
     // Keep last 5000 ticks of history, prune every 1000 ticks
@@ -270,10 +311,13 @@ export class GameLoop {
     this.avgTickTime = (this.avgTickTime * (this.tickCount - 1) + tickTime) / this.tickCount;
     this.maxTickTime = Math.max(this.maxTickTime, tickTime);
 
-    // Warn if tick took too long
+    // Warn if tick took too long - include full breakdown
     if (tickTime > this.msPerTick) {
+      // Sort systems to find top 5 slowest
+      systemTimings.sort((a, b) => b.time - a.time);
+      const top3 = systemTimings.slice(0, 3).map(s => `${s.id}:${s.time.toFixed(0)}`).join(', ');
       console.warn(
-        `Tick ${this._world.tick} took ${tickTime.toFixed(2)}ms (>${this.msPerTick}ms target)`
+        `Tick ${this._world.tick} took ${tickTime.toFixed(0)}ms | sys:${totalSystemsTime.toFixed(0)} act:${actionTime.toFixed(0)} flush:${flushTime.toFixed(0)} time:${timeEventsTime.toFixed(0)} flush2:${flush2Time.toFixed(0)} | top3: ${top3}`
       );
     }
   }

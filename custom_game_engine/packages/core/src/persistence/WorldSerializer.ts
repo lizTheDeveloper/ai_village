@@ -292,6 +292,66 @@ export class WorldSerializer {
 
     return census;
   }
+
+  /**
+   * Clone a world by serializing and deserializing.
+   * Used for universe forking to create independent timelines.
+   */
+  async cloneWorld(
+    sourceWorld: World,
+    targetWorld: World,
+    universeId: string,
+    universeName: string
+  ): Promise<void> {
+    console.log(`[WorldSerializer] Cloning world for fork: ${universeName}`);
+
+    const startTime = performance.now();
+
+    // Serialize the source world
+    const snapshot = await this.serializeWorld(sourceWorld, universeId, universeName);
+
+    // Deserialize into the target world
+    await this.deserializeWorld(snapshot, targetWorld);
+
+    const elapsed = performance.now() - startTime;
+    console.log(
+      `[WorldSerializer] World clone complete in ${elapsed.toFixed(1)}ms ` +
+      `(${snapshot.entities.length} entities)`
+    );
+  }
+
+  /**
+   * Create a lightweight snapshot for timeline storage.
+   * Returns the serialized snapshot without writing to disk.
+   */
+  async createTimelineSnapshot(
+    world: World,
+    universeId: string,
+    tick: bigint
+  ): Promise<TimelineSnapshot> {
+    const snapshot = await this.serializeWorld(
+      world,
+      universeId,
+      `Tick ${tick}`
+    );
+
+    return {
+      tick: tick.toString(),
+      createdAt: Date.now(),
+      entityCount: snapshot.entities.length,
+      snapshot,
+    };
+  }
+}
+
+/**
+ * Lightweight snapshot for timeline storage.
+ */
+export interface TimelineSnapshot {
+  tick: string;
+  createdAt: number;
+  entityCount: number;
+  snapshot: UniverseSnapshot;
 }
 
 // Global singleton

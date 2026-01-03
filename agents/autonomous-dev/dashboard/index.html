@@ -633,6 +633,9 @@
             <button class="btn btn-danger" onclick="restartAllOrchestrators()" title="Restart all running orchestrators (useful after token refresh)">
                 Restart All Orchestrators
             </button>
+            <button class="btn btn-danger" onclick="killAllServers()" title="Stop all servers (game server, parallel workers, etc.)">
+                Kill All Servers
+            </button>
             <button class="btn" onclick="refreshRoadmap()">
                 <span>Refresh from Markdown</span>
             </button>
@@ -1073,6 +1076,28 @@
                 alert('Failed to toggle game server: ' + err.message);
             } finally {
                 btn.disabled = false;
+            }
+        }
+
+        async function killAllServers() {
+            if (!confirm('This will stop the game server and parallel workers. Continue?')) {
+                return;
+            }
+            try {
+                const response = await fetch('/api/servers/kill-all', { method: 'POST' });
+                const result = await response.json();
+                if (result.error) {
+                    alert('Error: ' + result.error);
+                } else {
+                    // Refresh all status indicators
+                    setTimeout(() => {
+                        loadGameServerStatus();
+                        loadServerStats();
+                        loadParallelWorkersStatus();
+                    }, 500);
+                }
+            } catch (err) {
+                alert('Failed to kill servers: ' + err.message);
             }
         }
 

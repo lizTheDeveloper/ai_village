@@ -13,6 +13,10 @@
  *    - Trust ratings for information sources
  *    - Personal fog-of-war
  *
+ * 3. Spaceships & β-space Navigation
+ *    - Emotional topology navigation
+ *    - Narrative weight mechanics
+ *
  * The key insight: The map knows WHERE things are (stigmergic).
  * Agents know WHO told them WHAT (social).
  */
@@ -88,3 +92,10 @@ export {
   type Zone,
   type ZoneType,
 } from './ZoneManager.js';
+
+// Spaceships and β-space navigation
+export * from './SpaceshipComponent.js';
+export * from './EmotionalNavigationSystem.js';
+
+// Rainbow Mars quantum mechanics
+export * from './RainbowPlanetComponent.js';

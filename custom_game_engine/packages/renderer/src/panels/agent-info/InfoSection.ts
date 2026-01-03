@@ -14,7 +14,7 @@ import type {
   InventoryComponentData,
   GoalsComponent,
 } from './types.js';
-import type { PersonalGoal } from '@ai-village/core';
+import type { PersonalGoal, SpiritualComponent } from '@ai-village/core';
 import {
   wrapText,
   renderWrappedText,
@@ -36,7 +36,8 @@ export class InfoSection {
     temperature: TemperatureComponentData | undefined,
     movement: MovementComponentData | undefined,
     _inventory: InventoryComponentData | undefined,
-    goals?: GoalsComponent
+    goals?: GoalsComponent,
+    world?: any
   ): void {
     const { ctx, x, y, padding, lineHeight } = context;
 
@@ -81,6 +82,20 @@ export class InfoSection {
       ctx.fillStyle = '#888';
       ctx.font = '11px monospace';
       ctx.fillText(`Uses LLM: ${llmStatus}`, x + padding, currentY);
+
+      // Check if agent believes in the Creator (Supreme Creator deity)
+      const believesInCreator = this.checkBelievesInCreator(entity, world);
+      const beliefX = x + padding + 100; // Position after "Uses LLM: Yes"
+      if (believesInCreator) {
+        ctx.fillStyle = '#FFD700'; // Gold for believers
+        ctx.font = 'bold 11px monospace';
+        ctx.fillText('✦ BELIEVES IN YOU', beliefX, currentY);
+      } else {
+        ctx.fillStyle = '#666';
+        ctx.font = '11px monospace';
+        ctx.fillText('(no faith in you)', beliefX, currentY);
+      }
+
       currentY += lineHeight + 5;
       ctx.font = '12px monospace';
 
@@ -293,6 +308,40 @@ export class InfoSection {
     if (agent?.behaviorQueue && agent.behaviorQueue.length > 0) {
       currentY = this.renderBehaviorQueue(ctx, x, currentY, agent, padding, lineHeight);
     }
+  }
+
+  /**
+   * Check if an agent believes in the player deity (the player/AI God).
+   */
+  private checkBelievesInCreator(entity: any, world: any): boolean {
+    if (!world || !entity) return false;
+
+    // Get the agent's spiritual component
+    const spiritual = entity.components?.get('spiritual') as SpiritualComponent | undefined;
+    if (!spiritual || !spiritual.believedDeity) return false;
+
+    // Find the player deity entity (has deity component with domain 'player' or tag 'player_god')
+    let playerDeityId: string | null = null;
+    if (typeof world.entities?.values === 'function') {
+      for (const ent of world.entities.values()) {
+        // Check for player deity by deity component with player domain
+        const deity = ent.components?.get('deity');
+        if (deity && (deity as any).domain === 'player') {
+          playerDeityId = ent.id;
+          break;
+        }
+        // Also check for supreme_creator as fallback
+        if (ent.components?.has('supreme_creator')) {
+          playerDeityId = ent.id;
+          break;
+        }
+      }
+    }
+
+    if (!playerDeityId) return false;
+
+    // Check if the agent believes in the player deity
+    return spiritual.believedDeity === playerDeityId;
   }
 
   private renderNeedBar(

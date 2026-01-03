@@ -10,6 +10,7 @@
  * - Divine power testing
  * - Event injection
  * - State inspection
+ * - Universe export/import (snapshot save/load)
  */
 
 import type { World, MagicParadigm, PowerTier } from '@ai-village/core';

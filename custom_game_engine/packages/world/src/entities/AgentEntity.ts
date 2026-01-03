@@ -38,6 +38,8 @@ import {
   ExplorationStateComponent,
   createSteeringComponent,
   createVelocityComponent,
+  // Appearance for sprite selection
+  createAppearanceComponent,
   createSpiritualComponent,
   // Conflict system components
   createCombatStatsComponent,
@@ -105,7 +107,8 @@ export function createWanderingAgent(
   world: WorldMutator,
   x: number,
   y: number,
-  speed: number = 2.0
+  speed: number = 2.0,
+  options?: { believedDeity?: string }
 ): string {
   const entity = new EntityImpl(createEntityId(), world.tick);
 
@@ -117,6 +120,9 @@ export function createWanderingAgent(
 
   // Renderable
   entity.addComponent(createRenderableComponent('agent', 'entity'));
+
+  // Appearance - random visual traits for PixelLab sprite selection
+  entity.addComponent(createAppearanceComponent());
 
   // Tags
   entity.addComponent(createTagsComponent('agent', 'wanderer'));
@@ -224,7 +230,7 @@ export function createWanderingAgent(
 
   // Spiritual component - faith and divine connection based on personality
   const spiritualityTrait = (personality as any)?.spirituality ?? 0.5;
-  entity.addComponent(createSpiritualComponent(spiritualityTrait));
+  entity.addComponent(createSpiritualComponent(spiritualityTrait, options?.believedDeity));
 
   // Personal Goals - track agent's aspirations and progress
   entity.addComponent(createGoalsComponent());
@@ -323,7 +329,8 @@ export function createLLMAgent(
   x: number,
   y: number,
   speed: number = 2.0,
-  dungeonMasterPrompt?: string
+  dungeonMasterPrompt?: string,
+  options?: { believedDeity?: string }
 ): string {
   const entity = new EntityImpl(createEntityId(), world.tick);
 
@@ -335,6 +342,9 @@ export function createLLMAgent(
 
   // Renderable
   entity.addComponent(createRenderableComponent('agent', 'entity'));
+
+  // Appearance - random visual traits for PixelLab sprite selection
+  entity.addComponent(createAppearanceComponent());
 
   // Tags
   entity.addComponent(createTagsComponent('agent', 'llm_agent'));
@@ -438,7 +448,7 @@ export function createLLMAgent(
 
   // Spiritual component - faith and divine connection based on personality
   const spiritualityTrait = (personalityLLM as any)?.spirituality ?? 0.5;
-  entity.addComponent(createSpiritualComponent(spiritualityTrait));
+  entity.addComponent(createSpiritualComponent(spiritualityTrait, options?.believedDeity));
 
   // Personal Goals - track agent's aspirations and progress
   entity.addComponent(createGoalsComponent());

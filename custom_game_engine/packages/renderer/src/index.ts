@@ -28,6 +28,7 @@ export * from './RelationshipsPanel.js';
 export * from './NotificationsPanel.js';
 export * from './ControlsPanel.js';
 export * from './TimeControlsPanel.js';
+export * from './UniverseManagerPanel.js';
 export * from './UnifiedHoverInfoPanel.js';
 export * from './PlayerControlHUD.js';
 export * from './AgentSelectionPanel.js';
@@ -45,6 +46,8 @@ export * from './VisionComposerPanel.js';
 export * from './PendingApprovalsPanel.js';
 export * from './DevPanel.js';
 export * from './FarmManagementPanel.js';
+export * from './SoulCeremonyModal.js';
+export * from './AgentCreationCards.js';
 
 export * from './ui/InventoryUI.js';
 export * from './ui/DragDropSystem.js';

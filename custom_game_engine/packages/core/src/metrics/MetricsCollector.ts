@@ -1078,11 +1078,18 @@ export class MetricsCollector {
     this.performanceMetrics.peakMemory = Math.max(this.performanceMetrics.peakMemory, sample.memoryUsage);
   }
 
+  /** Maximum entries for emergent metrics arrays */
+  private static readonly MAX_EMERGENT_ENTRIES = 1000;
+
   /**
    * Detect and record an emergent pattern
    */
   detectPattern(pattern: EmergentPattern): void {
     this.emergentMetrics.detectedPatterns.push(pattern);
+    // Prune oldest entries if over limit
+    if (this.emergentMetrics.detectedPatterns.length > MetricsCollector.MAX_EMERGENT_ENTRIES) {
+      this.emergentMetrics.detectedPatterns.shift();
+    }
   }
 
   /**
@@ -1090,6 +1097,10 @@ export class MetricsCollector {
    */
   recordAnomaly(anomaly: Anomaly): void {
     this.emergentMetrics.anomalies.push(anomaly);
+    // Prune oldest entries if over limit
+    if (this.emergentMetrics.anomalies.length > MetricsCollector.MAX_EMERGENT_ENTRIES) {
+      this.emergentMetrics.anomalies.shift();
+    }
   }
 
   /**
@@ -1097,6 +1108,10 @@ export class MetricsCollector {
    */
   recordMilestone(milestone: Milestone): void {
     this.emergentMetrics.milestones.push(milestone);
+    // Prune oldest entries if over limit
+    if (this.emergentMetrics.milestones.length > MetricsCollector.MAX_EMERGENT_ENTRIES) {
+      this.emergentMetrics.milestones.shift();
+    }
   }
 
   /**

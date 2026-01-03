@@ -61,6 +61,7 @@ interface ActiveCeremony {
   currentSpeaker: 'weaver' | 'spinner' | 'cutter';
   turnCount: number;
   startTick: number;
+  completed: boolean; // Track if ceremony has finished to prevent duplicate completions
 }
 
 /**
@@ -75,6 +76,7 @@ export class SoulCreationSystem implements System {
   private activeCeremony?: ActiveCeremony;
   private llmProvider?: LLMProvider;
   private useLLM: boolean = true;
+  private turnInProgress: boolean = false;
 
   /**
    * Set the LLM provider for the Fates to use
@@ -106,16 +108,25 @@ export class SoulCreationSystem implements System {
   }
 
   update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
-    // If ceremony in progress, continue it
-    if (this.activeCeremony) {
-      // Async ceremony turn - don't await, let it complete in background
-      this.conductCeremonyTurn(world, this.activeCeremony).catch((error) => {
-        console.error('[SoulCreationSystem] Ceremony turn failed:', error);
-        // Fallback: complete ceremony with current progress
-        if (this.activeCeremony) {
-          this.completeCeremony(world, this.activeCeremony);
-        }
-      });
+    // If ceremony in progress and not completed, continue it
+    if (this.activeCeremony && !this.activeCeremony.completed) {
+      // Only start a new turn if one isn't already in progress
+      if (!this.turnInProgress) {
+        this.turnInProgress = true;
+        // Async ceremony turn - don't await, let it complete in background
+        this.conductCeremonyTurn(world, this.activeCeremony)
+          .then(() => {
+            this.turnInProgress = false;
+          })
+          .catch((error) => {
+            console.error('[SoulCreationSystem] Ceremony turn failed:', error);
+            this.turnInProgress = false;
+            // Fallback: complete ceremony with current progress
+            if (this.activeCeremony && !this.activeCeremony.completed) {
+              this.completeCeremony(world, this.activeCeremony);
+            }
+          });
+      }
       return;
     }
 
@@ -129,15 +140,68 @@ export class SoulCreationSystem implements System {
   }
 
   /**
+   * Find a soul in the afterlife that wants to reincarnate
+   */
+  private findSoulForReincarnation(world: World): Entity | null {
+    // Query all entities in the afterlife realm that want to reincarnate
+    const afterlifeSouls = world.query()
+      .with('afterlife' as any)
+      .with('soul_identity' as any)
+      .executeEntities();
+
+    const eligibleSouls = afterlifeSouls.filter(soul => {
+      const afterlife = soul.components.get('afterlife') as any;
+      return afterlife &&
+             afterlife.wantsToReincarnate &&
+             !afterlife.isShade &&  // Shades have lost identity
+             !afterlife.hasPassedOn; // Already moved on
+    });
+
+    if (eligibleSouls.length === 0) {
+      return null;
+    }
+
+    // Pick a random eligible soul
+    const randomIndex = Math.floor(Math.random() * eligibleSouls.length);
+    return eligibleSouls[randomIndex] ?? null;
+  }
+
+  /**
    * Begin a soul creation ceremony
    */
   private startCeremony(world: World, request: SoulCreationRequest): void {
+    // 50/50 chance to reincarnate a soul (if one exists)
+    const shouldTryReincarnation = Math.random() < 0.5;
+
+    if (shouldTryReincarnation && !request.context.isReforging) {
+      const soulToReincarnate = this.findSoulForReincarnation(world);
+
+      if (soulToReincarnate) {
+        // Extract data from the soul being reincarnated
+        const soulWisdom = soulToReincarnate.components.get('soul_wisdom') as any;
+
+        // Update context to mark this as a reincarnation
+        request.context.isReforging = true;
+        request.context.previousWisdom = soulWisdom?.wisdomLevel ?? 0.5;
+        request.context.previousLives = soulWisdom?.reincarnationCount ?? 1;
+
+        console.log(
+          `[SoulCreationSystem] 🔄 Reincarnating soul with ${request.context.previousLives} previous lives ` +
+          `(wisdom: ${(request.context.previousWisdom ?? 0.5).toFixed(2)})`
+        );
+
+        // Remove soul from afterlife (it's being reborn)
+        (world as any)._removeEntity?.(soulToReincarnate.id) || (world as any).deleteEntity?.(soulToReincarnate.id);
+      }
+    }
+
     this.activeCeremony = {
       request,
       transcript: [],
       currentSpeaker: 'weaver', // Weaver speaks first
       turnCount: 0,
       startTick: world.tick,
+      completed: false,
     };
 
     // Emit event that ceremony has begun (for observers)
@@ -167,6 +231,15 @@ export class SoulCreationSystem implements System {
       this.completeCeremony(world, ceremony);
       return;
     }
+
+    // Emit event that this Fate is starting to think
+    world.eventBus.emit({
+      type: 'soul:fate_thinking',
+      source: 'soul_creation_system',
+      data: {
+        speaker: ceremony.currentSpeaker,
+      },
+    });
 
     // Generate prompt for current speaker
     const prompt = generateFatePrompt(
@@ -235,11 +308,15 @@ export class SoulCreationSystem implements System {
         ceremony.currentSpeaker = 'cutter';
       } else {
         // After initial pronouncements, ceremony is complete
-        this.completeCeremony(world, ceremony);
+        if (!ceremony.completed) {
+          this.completeCeremony(world, ceremony);
+        }
       }
     } else {
-      // After turn 3, ceremony ends
-      this.completeCeremony(world, ceremony);
+      // After turn 3, ceremony ends (prevent duplicate completions)
+      if (!ceremony.completed) {
+        this.completeCeremony(world, ceremony);
+      }
     }
   }
 
@@ -247,6 +324,9 @@ export class SoulCreationSystem implements System {
    * Complete ceremony and create soul entity
    */
   private async completeCeremony(world: World, ceremony: ActiveCeremony): Promise<void> {
+    // Mark as completed to prevent duplicate completions
+    ceremony.completed = true;
+
     // Use LLM to extract attributes, fall back to keyword matching
     let parsed = parseSoulAttributesFromConversation(
       ceremony.transcript,
@@ -273,7 +353,8 @@ export class SoulCreationSystem implements System {
           }
         }
       } catch (error) {
-        throw new Error(`[SoulCreationSystem] LLM attribute extraction failed: ${error instanceof Error ? error.message : String(error)}`);
+        // LLM extraction failed - fall back to keyword-based parsing (already done above)
+        console.warn(`[SoulCreationSystem] LLM attribute extraction failed, using keyword fallback:`, error);
       }
     }
 

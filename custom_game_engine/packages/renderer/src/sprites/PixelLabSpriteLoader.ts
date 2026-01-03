@@ -12,8 +12,8 @@ import {
   angleToPixelLabDirection,
 } from './PixelLabSpriteDefs';
 
-/** Metadata format from PixelLab */
-interface PixelLabMetadata {
+/** Metadata format from PixelLab (nested format) */
+interface PixelLabMetadataNested {
   character: {
     id: string;
     name: string;
@@ -26,6 +26,24 @@ interface PixelLabMetadata {
     rotations: Record<string, string>;
     animations: Record<string, Record<string, string[]>>;
   };
+}
+
+/** Simpler metadata format (flat format used by actual assets) */
+interface PixelLabMetadataFlat {
+  id: string;
+  name: string;
+  size: number;
+  directions: 4 | 8;
+  rotations: string[];
+  animations: Record<string, unknown>;
+}
+
+/** Combined metadata type */
+type PixelLabMetadata = PixelLabMetadataNested | PixelLabMetadataFlat;
+
+/** Type guard for flat metadata */
+function isFlatMetadata(meta: PixelLabMetadata): meta is PixelLabMetadataFlat {
+  return 'rotations' in meta && Array.isArray(meta.rotations);
 }
 
 /** Animation state for a PixelLab sprite */
@@ -110,7 +128,34 @@ export class PixelLabSpriteLoader {
     const rotations = new Map<string, HTMLImageElement>();
     const animations = new Map<string, Map<string, HTMLImageElement[]>>();
 
-    // Load rotation images
+    // Handle flat metadata format (actual asset format)
+    if (isFlatMetadata(metadata)) {
+      // Load rotation images from rotations/ subfolder
+      const rotationPromises = metadata.rotations.map(async (dirName) => {
+        const imgPath = `${folderPath}/rotations/${dirName}.png`;
+        try {
+          const img = await this.loadImage(imgPath);
+          rotations.set(dirName, img);
+        } catch {
+          // Skip failed loads silently
+        }
+      });
+
+      await Promise.all(rotationPromises);
+
+      // TODO: Handle animations in flat format if needed
+
+      return {
+        id: metadata.id,
+        name: metadata.name,
+        size: metadata.size,
+        directions: metadata.directions,
+        rotations,
+        animations,
+      };
+    }
+
+    // Handle nested metadata format (original expected format)
     const rotationPromises = Object.entries(metadata.frames.rotations).map(
       async ([dirName, path]) => {
         try {

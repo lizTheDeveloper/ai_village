@@ -124,11 +124,23 @@ export class PlantSystem implements System {
     });
   }
 
+  /** Run every 20 ticks (1 second at 20 TPS) - plants don't need per-frame updates */
+  private static readonly UPDATE_INTERVAL = 20;
+
   /**
    * Main update loop - runs every frame
    */
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     if (entities.length === 0) return;
+
+    // Performance: Only run every UPDATE_INTERVAL ticks
+    // Plants grow slowly and don't need per-frame processing
+    if (world.tick % PlantSystem.UPDATE_INTERVAL !== 0) {
+      return;
+    }
+
+    // Multiply deltaTime by interval to compensate for skipped ticks
+    const effectiveDeltaTime = deltaTime * PlantSystem.UPDATE_INTERVAL;
 
     // Clear companion planting cache at start of each update
     this.clearCompanionCache();
@@ -146,12 +158,12 @@ export class PlantSystem implements System {
       if (timeComp) {
         // Calculate effective day length based on speed multiplier
         const effectiveDayLength = timeComp.dayLength / timeComp.speedMultiplier;
-        // Convert real-time deltaTime to game hours
-        gameHoursElapsed = (deltaTime / effectiveDayLength) * 24;
+        // Convert real-time effectiveDeltaTime to game hours
+        gameHoursElapsed = (effectiveDeltaTime / effectiveDayLength) * 24;
       }
     } else {
       // Fallback: assume 10 minutes per day (600 seconds)
-      gameHoursElapsed = (deltaTime / 600) * 24;
+      gameHoursElapsed = (effectiveDeltaTime / 600) * 24;
     }
 
     // Accumulate time

@@ -13,6 +13,35 @@ const { spawn, exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
+// Load environment variables from custom_game_engine/.env
+const GAME_ENGINE_DIR = path.resolve(__dirname, '../../../custom_game_engine');
+const ENV_FILE = path.join(GAME_ENGINE_DIR, '.env');
+
+// Simple .env parser (no dependencies needed)
+function loadEnvFile(filePath) {
+    const env = {};
+    if (!fs.existsSync(filePath)) {
+        console.log(`  ⚠️  No .env file found at ${filePath}`);
+        return env;
+    }
+
+    const content = fs.readFileSync(filePath, 'utf-8');
+    for (const line of content.split('\n')) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) continue;
+
+        const [key, ...valueParts] = trimmed.split('=');
+        if (key && valueParts.length > 0) {
+            env[key.trim()] = valueParts.join('=').trim();
+        }
+    }
+    return env;
+}
+
+// Load .env file
+const gameEnv = loadEnvFile(ENV_FILE);
+console.log(`  📄 Loaded ${Object.keys(gameEnv).length} environment variables from .env`);
+
 const app = express();
 const PORT = process.env.PORT || 3030;
 
@@ -880,9 +909,14 @@ function startGameServer() {
 
     const GAME_DIR = path.join(PROJECT_ROOT, 'custom_game_engine/demo');
 
+    // Merge environment variables: process.env + gameEnv from .env file
+    const mergedEnv = { ...process.env, ...gameEnv };
+
+    console.log(`[Game Server] Starting with ${Object.keys(gameEnv).length} custom env vars from .env`);
+
     const proc = spawn('npm', ['run', 'dev'], {
         cwd: GAME_DIR,
-        env: { ...process.env },
+        env: mergedEnv,
         stdio: ['ignore', 'pipe', 'pipe']
     });
 
@@ -1714,6 +1748,45 @@ app.post('/api/game-server/restart', (req, res) => {
 app.get('/api/game-server/status', (req, res) => {
     try {
         res.json(getGameServerStatus());
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Kill all servers (game server + parallel workers + metrics)
+app.post('/api/servers/kill-all', (req, res) => {
+    try {
+        const { execSync } = require('child_process');
+        const results = {
+            gameServer: null,
+            parallelWorkers: null,
+            metricsServer: null
+        };
+
+        // Stop game server if running
+        try {
+            results.gameServer = stopGameServer();
+        } catch (err) {
+            results.gameServer = { error: err.message };
+        }
+
+        // Stop parallel workers if running
+        try {
+            results.parallelWorkers = stopParallelWorkers();
+        } catch (err) {
+            results.parallelWorkers = { error: err.message };
+        }
+
+        // Stop metrics server (port 8766) - use spawn to avoid hanging
+        try {
+            const { spawn } = require('child_process');
+            spawn('sh', ['-c', 'lsof -ti:8766 | xargs kill -9 2>/dev/null'], { detached: true, stdio: 'ignore' }).unref();
+            results.metricsServer = { status: 'stopped' };
+        } catch (err) {
+            results.metricsServer = { status: 'not running or already stopped' };
+        }
+
+        res.json({ success: true, results });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

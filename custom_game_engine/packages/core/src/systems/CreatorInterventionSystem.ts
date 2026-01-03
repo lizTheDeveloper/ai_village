@@ -220,6 +220,9 @@ export class CreatorInterventionSystem implements System {
   /** Intervention history */
   private interventionHistory: InterventionEvent[] = [];
 
+  /** Maximum intervention history entries to retain */
+  private static readonly MAX_INTERVENTION_HISTORY = 500;
+
   initialize(world: World, eventBus: EventBus): void {
     this.world = world;
     this.eventBus = eventBus;
@@ -694,6 +697,11 @@ export class CreatorInterventionSystem implements System {
       triggeredBySpell: spellId,
       timestamp,
     });
+
+    // Prune old history to prevent memory leak
+    if (this.interventionHistory.length > CreatorInterventionSystem.MAX_INTERVENTION_HISTORY) {
+      this.interventionHistory.shift();
+    }
 
     // Emit intervention event
     this.eventBus.emit({

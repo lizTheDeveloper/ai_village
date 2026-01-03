@@ -38,15 +38,18 @@
 | Phase 24 | ✅ Complete | Sociological Metrics Analysis Modules |
 | Phase 27 | ✅ Complete | Divine Communication (Prayer, Meditation, Visions, LLM Integration) |
 | Phase 12 | ✅ Complete | Economy & Trade (Currency, Trading, Shops, Market Events) |
+| Phase 13 | ✅ Complete | Research & Discovery (Research tree, buildings, discovery system) |
 | Phase 25 | 🚧 In Progress | Sociological Metrics Visualization Dashboard (spec-agent-001 claimed 2026-01-02) |
 | Phase 28 | ✅ Complete | Angel Systems (AI processor, prayer delegation, LLM integration) |
 | Phase 35 | ✅ Complete | Psychopomp Death Conversation System (Death judgment, soul ceremonies) |
 | Phase 29 | ✅ Complete | Item System Refactor (Materials, Traits, Instances - includes Armor/Weapon traits) |
 | Phase 37 | ✅ Complete | Reproduction System (Courtship, Pregnancy, Labor, Birth, Parenting) |
+| Phase 38 | ✅ Complete | Realm System (Multiverse realms, time dilation, portals, cross-realm phones) |
+| Phase 31 | ✅ Complete | Persistence Layer (Serialization, auto-save, checkpoints, GZIP, invariants, passages, Timeline UI) |
 | Phase 36 | ⏳ Ready | Equipment System (Armor, Weapons, Clothing using Phase 29 traits) |
+| Phase 39 | 🚧 In Progress | Companion System (Ophanim guide with RAG, emotions, evolution - Phase 1 started 2026-01-02) |
 | Phase 30 | ⏳ Ready | Magic System (Multi-source, Verb/Noun Composition) |
-| Phase 31 | ⏳ Ready | Persistence Layer (World Serialization, Migrations) |
-| Phase 32 | 🔒 Blocked | Universe Forking (Parallel World Testing) - blocked on Phase 31 |
+| Phase 32 | ⏳ Ready | Universe Forking (Parallel World Testing) - Phase 31 ✅ complete! |
 | Phase 33 | 🔒 Blocked | LLM Effect Generation (Safe Generated Effects) - blocked on Phase 30, 32 |
 | Phase 34 | 🔒 Blocked | Cross-Universe Sharing (Effect Packages, Trust) - blocked on Phase 31, 33 |
 | Skill System | 🚧 In Progress | Progressive Skill Reveal - skill-gated prompt context (claimed 2025-12-28) |
@@ -54,7 +57,10 @@
 **Implementation Status Notes (2026-01-02):**
 - ✅ **Core gameplay loop is functional** - Agents, world, farming, crafting, animals, economy all working
 - ✅ **Reproduction System** - Complete courtship → pregnancy → labor → birth pipeline (Phase 37, 12 bugs fixed, fully integrated)
+- ✅ **Realm System** - Complete multiverse realm system (Phase 38: 6 realms, time dilation, portals, cross-realm phones, death transitions)
+- ✅ **Persistence Layer** - Complete with auto-save, daily checkpoints, Timeline UI, GZIP compression, invariant validation, passage system (Phase 31)
 - ✅ **Hunt & Butcher System** - Complete integration with combat/cooking/hunting skills, synergy bonuses, quality calculations (2026-01-01)
+- 🚧 **Companion System** - Ophanim guide in development (Phase 39: Phase 1 entity/component created, evolution & RAG systems pending)
 - 🏗️ **Threat Detection System** - Designed with auto-flee/attack/cover responses, needs TypeScript fixes before integration
 - ⚠️ **Magic System** - Framework exists (MagicComponent, MagicSystem) but missing paradigm implementations, combos, skill trees
 - ✅ **Divinity System** - Complete divine communication (Prayer, Meditation, Visions, LLM generation, Faith mechanics, Angel delegation, Psychopomp death conversations)
@@ -86,6 +92,9 @@
 | **Body** | ✅ | 60% | Genetics, species integration |
 | **Reproduction** | ✅ | 100% | Complete (Courtship, Pregnancy, Labor, Birth) |
 | **Research** | ✅ | 100% | Complete (Phase 13) |
+| **Realms** | ✅ | 100% | Complete (6 realms, portals, time dilation, cross-realm phones) |
+| **Persistence** | ✅ | 100% | Complete (Auto-save, checkpoints, Timeline UI, GZIP, invariants) |
+| **Companion** | 🚧 | 20% | Evolution system, RAG knowledge, chat UI |
 | **Governance** | ⚠️ | 10% | Leadership, laws, voting |
 | **Skills** | ✅ | 70% | Progressive reveal in progress |
 
@@ -95,7 +104,7 @@
 - **Phase 14**: Governance (Phase 12 ✅ complete!)
 - **Phase 15**: Multi-Village & Inter-Village Trade (Phase 12 ✅ complete!)
 - **Phase 30**: Magic System Enhancement - Multi-source, Paradigms, Combos (⚠️ basic framework exists)
-- **Phase 31**: Persistence Layer - Migrations, Versioning (⚠️ basic serialization exists)
+- **Phase 32**: Universe Forking - Parallel World Testing (Phase 31 ✅ complete!)
 - **Phase 36**: Equipment System - Armor, Weapons, Clothing definitions (Phase 29 ✅ complete, traits ready!)
 
 **Enhancement Work - Add Missing Spec Features:**
@@ -904,24 +913,28 @@ These phases extend beyond the core game:
 
 ---
 
-### Phase 31: Persistence Layer ⏳ READY
+### Phase 31: Persistence Layer ✅ COMPLETE
 
-**Status:** ⏳ Ready (no dependencies, can start immediately)
+**Status:** ✅ Complete (2026-01-02 - Enhanced with auto-save, checkpoints, Timeline UI)
 **Dependencies:** None
-**Parallel Work:** 🔀 Can run parallel with Phase 29, 30
-**Estimated LOC:** ~2,500
+**Actual LOC:** ~3,500+ (including enhancements)
 **Spec:** [ITEM_MAGIC_PERSISTENCE_SPEC.md](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md)
 
-| Task | Status | Spec | Parallel? |
-|------|--------|------|-----------|
-| Schema versioning system | ⏳ Ready | [Part 7](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-7-persistence-layer) | - |
-| Migration registry | ⏳ Ready | [Part 7](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#migration-system) | - |
-| SerializedWorldState format | ⏳ Ready | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#world-serialization) | - |
-| World.serialize() / deserialize() | ⏳ Ready | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#world-serialization) | - |
-| SaveFile format | ⏳ Ready | [Part 7](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#save-file-format) | 🔀 |
-| IndexedDB storage backend | ⏳ Ready | [Part 7](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#storage-backends) | 🔀 |
-| FileSystem storage backend | ⏳ Ready | [Part 7](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#storage-backends) | 🔀 |
-| Checksum validation | ⏳ Ready | [Part 7](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#save-file-format) | 🔀 |
+| Task | Status | Implementation | Notes |
+|------|--------|----------------|-------|
+| Schema versioning system | ✅ | `packages/core/src/persistence/serializers/` | Component versioning |
+| Migration registry | ✅ | `packages/core/src/persistence/serializers/` | Migration system |
+| SerializedWorldState format | ✅ | `packages/core/src/persistence/` | World serialization |
+| World.serialize() / deserialize() | ✅ | `packages/core/src/World.ts` | Full state save/load |
+| SaveFile format | ✅ | `packages/core/src/persistence/` | Versioned format |
+| IndexedDB storage backend | ✅ | `packages/core/src/persistence/` | Browser storage |
+| FileSystem storage backend | ✅ | `packages/core/src/persistence/` | Desktop storage |
+| Checksum validation | ✅ | `packages/core/src/persistence/` | Integrity checks |
+| **Auto-save System** | ✅ | `packages/core/src/systems/AutoSaveSystem.ts` | **NEW: Daily checkpoints** |
+| **Timeline UI** | ✅ | `packages/renderer/src/TimelinePanel.ts` | **NEW: Checkpoint selection** |
+| **GZIP Compression** | ✅ | `packages/core/src/persistence/` | **NEW: Save file compression** |
+| **Invariant Checker** | ✅ | `packages/core/src/persistence/InvariantChecker.ts` | **NEW: Validation system** |
+| **Passage System** | ✅ | `packages/core/src/multiverse/PassageSystem.ts` | **NEW: Cross-universe traversal** |
 
 **Implementation:**
 - `packages/core/src/persistence/Versioned.ts`
@@ -934,19 +947,23 @@ These phases extend beyond the core game:
 - `packages/core/src/persistence/FileSystemStorage.ts`
 - `packages/core/src/World.ts` (add serialize/deserialize)
 
-**Key Design Decisions:**
-- Every persisted type has a schema version
-- Migrations are one-way (old→new), registered in MigrationRegistry
-- SaveFile includes header, world state, player state, registry versions
-- Multiple storage backends (IndexedDB for browser, filesystem for desktop)
-- Checksums for integrity validation
+**Key Features Implemented:**
+- ✅ **Schema Versioning** - Every component has version tracking with migrations
+- ✅ **Multiple Storage Backends** - IndexedDB (browser) and FileSystem (desktop)
+- ✅ **Checksum Validation** - Integrity checks for all save files
+- ✅ **Auto-save System** - Automatic daily checkpoints for time travel
+- ✅ **Timeline UI** - Visual interface for browsing and selecting checkpoints/universes
+- ✅ **GZIP Compression** - Reduces save file size significantly
+- ✅ **Invariant Checker** - Validates world state consistency on load
+- ✅ **Passage System** - Cross-universe item/entity traversal support
+- ✅ **Time Travel Support** - Load any checkpoint to revisit past moments
 
 ---
 
-### Phase 32: Universe Forking 🔒 BLOCKED
+### Phase 32: Universe Forking ⏳ READY
 
-**Status:** 🔒 Blocked on Phase 31 (Persistence Layer)
-**Dependencies:** Phase 31 (World.serialize/deserialize required)
+**Status:** ⏳ Ready (Phase 31 ✅ complete! Serialization/Invariants ready)
+**Dependencies:** Phase 31 ✅ (World.serialize/deserialize + InvariantChecker available)
 **Parallel Work:** Tasks within phase can be parallelized
 **Estimated LOC:** ~2,000
 **Spec:** [ITEM_MAGIC_PERSISTENCE_SPEC.md](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md)
@@ -955,13 +972,13 @@ These phases extend beyond the core game:
 
 | Task | Status | Spec | Parallel? |
 |------|--------|------|-----------|
-| WorldFork interface | 🔒 Blocked | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-5-universe-forking-parallel-world-testing) | - |
-| UniverseManager.fork() | 🔒 Blocked | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#fork-execution) | - |
-| UniverseManager.runFork() | 🔒 Blocked | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#fork-execution) | - |
-| InvariantChecker | 🔒 Blocked | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#invariant-checking) | 🔀 |
-| ForkResults collection | 🔒 Blocked | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#fork-execution) | 🔀 |
-| WorldDiff utility | 🔒 Blocked | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#fork-execution) | 🔀 |
-| Fork execution in Web Worker | 🔒 Blocked | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#fork-execution) | - |
+| WorldFork interface | ⏳ Ready | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#part-5-universe-forking-parallel-world-testing) | - |
+| UniverseManager.fork() | ⏳ Ready | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#fork-execution) | - |
+| UniverseManager.runFork() | ⏳ Ready | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#fork-execution) | - |
+| InvariantChecker | ✅ Complete | Phase 31 (already implemented) | - |
+| ForkResults collection | ⏳ Ready | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#fork-execution) | 🔀 |
+| WorldDiff utility | ⏳ Ready | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#fork-execution) | 🔀 |
+| Fork execution in Web Worker | ⏳ Ready | [Part 5](custom_game_engine/architecture/ITEM_MAGIC_PERSISTENCE_SPEC.md#fork-execution) | - |
 
 **Implementation:**
 - `packages/core/src/universe/WorldFork.ts`
@@ -1278,6 +1295,105 @@ These phases extend beyond the core game:
 - Needs system includes parenting duties
 - Body system defines reproductive anatomy
 - Personality affects compatibility
+
+---
+
+### Phase 38: Realm System ✅ COMPLETE
+
+**Status:** ✅ Complete (2026-01-02 - All 6 phases implemented)
+**Dependencies:** Phase 27 (Divine Communication) ✅
+**Actual LOC:** ~4,500+
+**Spec:** [divinity-system/mythological-realms.md](openspec/specs/divinity-system/mythological-realms.md)
+
+**Comprehensive multiverse realm system** enabling parallel dimensions, time dilation, death transitions, and cross-realm communication.
+
+| Task | Status | Implementation | Notes |
+|------|--------|----------------|-------|
+| Phase 1: Core Types & Components | ✅ | `packages/core/src/realms/RealmTypes.ts` | Realm definitions |
+| Phase 2: RealmManager System | ✅ | `packages/core/src/systems/RealmManager.ts` | Realm lifecycle |
+| Phase 3: Portal & Transition Systems | ✅ | `packages/core/src/realms/RealmTransition.ts` | Portal mechanics |
+| Phase 4: Time Dilation System | ✅ | `packages/core/src/systems/RealmTimeSystem.ts` | Variable time flow |
+| Phase 5: Underworld & Death Transitions | ✅ | `packages/core/src/divinity/MythologicalRealms.ts` | Death mechanics |
+| Phase 6: Documentation & Finalization | ✅ | Documentation complete | Integration tests |
+| Cross-Realm Communication | ✅ | `packages/core/src/systems/CrossRealmPhoneSystem.ts` | Cross-realm phones |
+
+**Implemented Realms:**
+1. **Mortal Realm** - Default material plane, normal time flow
+2. **Heaven (Ouranos)** - Divine realm, 10:1 time dilation (slower)
+3. **Underworld (Tartarus)** - Death realm, 1:2 time dilation (faster)
+4. **Dreamscape** - Mental/dream realm, dreamwalking support
+5. **Elemental Planes** - Elemental forces, specialized portals
+6. **Void** - Empty space between realms, dangerous traversal
+
+**Key Features:**
+- ✅ **RealmComponent** - Tracks entity's current realm
+- ✅ **RealmLocationComponent** - Position within specific realm
+- ✅ **Portal System** - Seamless realm transitions
+- ✅ **Time Dilation** - Different time flow rates per realm
+- ✅ **Death Transitions** - Automatic Underworld passage on death
+- ✅ **Cross-Realm Phones** - Divine telecommunication devices
+- ✅ **Realm-Specific Rules** - Custom physics/behavior per realm
+- ✅ **Multi-Realm Rendering** - Visual distinction between realms
+
+**Implementation Files:**
+- `packages/core/src/realms/RealmTypes.ts`
+- `packages/core/src/realms/RealmDefinitions.ts`
+- `packages/core/src/realms/RealmTransition.ts`
+- `packages/core/src/realms/RealmInitializer.ts`
+- `packages/core/src/systems/RealmManager.ts`
+- `packages/core/src/systems/RealmTimeSystem.ts`
+- `packages/core/src/systems/CrossRealmPhoneSystem.ts`
+- `packages/core/src/components/RealmComponent.ts`
+- `packages/core/src/components/RealmLocationComponent.ts`
+- `packages/core/src/components/CrossRealmPhoneComponent.ts`
+- `packages/core/src/divinity/MythologicalRealms.ts`
+- `packages/core/src/items/CrossRealmPhones.ts`
+
+---
+
+### Phase 39: Companion System 🚧 IN PROGRESS
+
+**Status:** 🚧 In Progress (Phase 1 started 2026-01-02)
+**Dependencies:** Phase 6 (LLM Integration) ✅, Phase 27 (Divine Communication) ✅
+**Estimated LOC:** ~3,500+ (comprehensive system)
+**Spec:** [companion-system/spec.md](openspec/specs/companion-system/spec.md)
+**Implementation Plan:** [COMPANION_IMPLEMENTATION_PLAN.md](COMPANION_IMPLEMENTATION_PLAN.md)
+
+**Ophanim Companion** - A celestial wheel-angel guide that evolves alongside the player, providing tutorial support, emotional connection, and civilization oversight.
+
+| Task | Status | Implementation | Phase |
+|------|--------|----------------|-------|
+| CompanionComponent | ✅ | `packages/core/src/components/CompanionComponent.ts` | Phase 1 |
+| OphanimimCompanionEntity | ✅ | `packages/core/src/companions/OphanimimCompanionEntity.ts` | Phase 1 |
+| CompanionSystem (stub) | ✅ | `packages/core/src/systems/CompanionSystem.ts` | Phase 1 |
+| Evolution Tracking | ⏳ Pending | Milestone detection system | Phase 2 |
+| Emotional System | ⏳ Pending | Tier-based emotion evolution | Phase 3 |
+| Memory & Needs | ⏳ Pending | Companion state tracking | Phase 4 |
+| RAG Knowledge System | ⏳ Pending | Documentation retrieval | Phase 5 |
+| Chat UI Panel | ⏳ Pending | `packages/renderer/src/CompanionChatPanel.ts` | Phase 6 |
+| Governor Visibility | ⏳ Pending | Civilization monitoring | Phase 7 |
+| Proactive Advice | ⏳ Pending | Context-aware suggestions | Phase 8 |
+
+**Evolution Tiers:**
+- **Tier 0: Primordial** - Basic awareness, simple emotions (alert, serene, tranquil)
+- **Tier 1: Awakening** - First recognizable emotions (curious, joyful, concerned)
+- **Tier 2: Emotional Depth** - Complex feelings (pride, empathy, frustration)
+- **Tier 3: Self-Awareness** - Meta-emotions (nostalgic, philosophical, playful)
+- **Tier 4: Transcendence** - Advanced states (awe, inspired, melancholic)
+- **Tier 5: Unity** - Peak integration (harmonious, radiant, eternal)
+
+**Key Features Planned:**
+- 🚧 **RAG-Powered Knowledge** - Answer questions about game systems using documentation
+- 🚧 **Governor Visibility** - See all villager states, resources, social dynamics
+- 🚧 **Emotional Evolution** - Unlock more complex emotions as civilization grows
+- 🚧 **Companion Needs** - Connection, purpose, rest, stimulation, appreciation
+- 🚧 **Proactive Advice** - Alert player to issues (low food, conflicts, opportunities)
+- 🚧 **Memory System** - Remember player actions, preferences, shared experiences
+- 🚧 **Plotline Hooks** - Storylines triggered by dimensional breaches, civilization events
+
+**Implementation Progress:**
+- ✅ Phase 1: Core infrastructure (entity, component, system stub)
+- ⏳ Phase 2-8: Evolution, emotions, RAG, UI (pending)
 
 ---
 

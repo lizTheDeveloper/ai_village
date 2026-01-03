@@ -68,10 +68,12 @@ import {
   MemoryPanel,
   RelationshipsPanel,
   NotificationsPanel,
+  SoulCeremonyModal,
   InventoryUI,
   CraftingPanelUI,
   ControlsPanel,
   TimeControlsPanel,
+  UniverseManagerPanel,
   UnifiedHoverInfoPanel,
   PlayerControlHUD,
   AgentSelectionPanel,
@@ -122,12 +124,12 @@ import {
   // LLM Config
   LLMConfigPanel,
   createLLMConfigPanelAdapter,
-  // Context Menu System
-  ContextMenuManager,
 } from '@ai-village/renderer';
 import {
   OllamaProvider,
   OpenAICompatProvider,
+  ProxyLLMProvider,
+  FallbackProvider,
   LLMDecisionQueue,
   StructuredPromptBuilder,
   promptLogger,
@@ -167,7 +169,6 @@ interface UIContext {
   windowManager: WindowManager;
   menuBar: MenuBar;
   keyboardRegistry: KeyboardRegistry;
-  contextMenuManager: ContextMenuManager;
   hoverInfoPanel: UnifiedHoverInfoPanel;
 }
 
@@ -294,11 +295,13 @@ function createInitialAgents(world: WorldMutator, dungeonMasterPrompt?: string):
 /**
  * Create souls for initial agents (adults spawned at game start)
  * These are not newborns, but mature individuals who need souls appropriate for their age
+ * Shows ceremonies one at a time in a modal before the game starts
  */
 async function createSoulsForInitialAgents(
   gameLoop: GameLoop,
   agentIds: string[],
-  llmProvider: LLMProvider
+  llmProvider: LLMProvider,
+  renderer: any
 ): Promise<void> {
   const soulSystem = gameLoop.systemRegistry.get('soul_creation') as SoulCreationSystem;
   if (!soulSystem) {
@@ -311,17 +314,107 @@ async function createSoulsForInitialAgents(
 
   console.log(`[Demo] Creating souls for ${agentIds.length} initial agents...`);
 
-  // Create a soul for each agent
-  const soulPromises = agentIds.map((agentId, index) => {
-    return new Promise<void>((resolve) => {
-      const agent = gameLoop.world.getEntity(agentId);
-      if (!agent) {
-        resolve();
-        return;
-      }
+  // Create modal to display ceremonies
+  const ceremonyModal = new SoulCeremonyModal();
 
-      const identity = agent.components.get('identity') as any;
-      const name = identity?.name ?? 'Unknown';
+  // Create agent cards to show each created agent
+  const { AgentCreationCards } = await import('@ai-village/renderer');
+  const agentCards = new AgentCreationCards(renderer.pixelLabLoader);
+  agentCards.show();
+
+  // Create souls ONE AT A TIME (sequentially) so we can display each ceremony
+  // No timeout - wait indefinitely for ceremony completion (loading animation will be added later)
+
+  for (let index = 0; index < agentIds.length; index++) {
+    const agentId = agentIds[index]!;
+    const agent = gameLoop.world.getEntity(agentId);
+    if (!agent) continue;
+
+    const identity = agent.components.get('identity') as any;
+    const name = identity?.name ?? 'Unknown';
+
+    console.log(`[Demo] Creating soul ${index + 1}/${agentIds.length} for ${name}...`);
+
+    // Wait for this soul to be created before starting the next
+    await new Promise<void>((resolve) => {
+      let resolved = false;
+      let currentCeremonyData: any = null;
+
+      // Subscribe to ceremony events for this soul
+      const startSub = gameLoop.world.eventBus.subscribe('soul:ceremony_started', (event: any) => {
+        console.log(`🌟 Ceremony started for ${name}`);
+        currentCeremonyData = event.data;
+        ceremonyModal.startCeremony({
+          culture: event.data.context.culture,
+          cosmicAlignment: event.data.context.cosmicAlignment,
+        });
+      });
+
+      const thinkingSub = gameLoop.world.eventBus.subscribe('soul:fate_thinking', (event: any) => {
+        ceremonyModal.setThinking(event.data.speaker);
+      });
+
+      const speakSub = gameLoop.world.eventBus.subscribe('soul:fate_speaks', (event: any) => {
+        console.log(`${event.data.speaker}: ${event.data.text}`);
+        ceremonyModal.addSpeech(event.data.speaker, event.data.text, event.data.topic);
+      });
+
+      const completeSub = gameLoop.world.eventBus.subscribe('soul:ceremony_complete', (event: any) => {
+        console.log(`✨ Soul created for ${name}`);
+
+        // Add agent card immediately when ceremony completes
+        const appearance = agent.components.get('appearance') as any;
+        const spriteFolder = appearance?.spriteFolder || 'villager';
+        agentCards.addAgentCard({
+          agentId,
+          name,
+          purpose: event.data.purpose,
+          archetype: event.data.archetype,
+          interests: event.data.interests,
+          spriteFolder,
+        });
+
+        ceremonyModal.completeCeremony(
+          event.data.purpose,
+          event.data.interests,
+          event.data.destiny,
+          event.data.archetype,
+          () => {
+            // User clicked continue - clean up and move to next
+            if (!resolved) {
+              resolved = true;
+              startSub();  // Unsubscribe is the function itself
+              thinkingSub();
+              speakSub();
+              completeSub();
+              ceremonyModal.hide();
+
+              // Link soul to agent
+              const soulLink = createSoulLinkComponent(event.data.soulId, gameLoop.world.tick, true);
+              (agent as any).addComponent(soulLink);
+
+              // Update soul's incarnation status
+              const soulEntity = gameLoop.world.getEntity(event.data.soulId);
+              if (soulEntity) {
+                const incarnation = soulEntity.components.get('incarnation') as IncarnationComponent | undefined;
+                if (incarnation) {
+                  incarnation.currentBindings.push({
+                    targetId: agentId,
+                    bindingType: 'incarnated',
+                    bindingStrength: 1.0,
+                    createdTick: gameLoop.world.tick,
+                    isPrimary: true,
+                  });
+                  incarnation.state = 'incarnated';
+                  incarnation.primaryBindingId = agentId;
+                }
+              }
+
+              resolve();
+            }
+          }
+        );
+      });
 
       // Context for adult soul creation (not a newborn)
       const context: SoulCreationContext = {
@@ -333,41 +426,15 @@ async function createSoulsForInitialAgents(
       };
 
       // Request soul creation
-      soulSystem.requestSoulCreation(
-        context,
-        (soulEntityId: string) => {
-          console.log(`[Demo] Soul created for ${name} (${index + 1}/${agentIds.length})`);
-
-          // Link soul to agent
-          const soulLink = createSoulLinkComponent(soulEntityId, gameLoop.world.tick, true);
-          (agent as any).addComponent(soulLink);
-
-          // Update soul's incarnation status
-          const soulEntity = gameLoop.world.getEntity(soulEntityId);
-          if (soulEntity) {
-            const incarnation = soulEntity.components.get('incarnation') as IncarnationComponent | undefined;
-            if (incarnation) {
-              incarnation.currentBindings.push({
-                targetId: agentId,
-                bindingType: 'incarnated',
-                bindingStrength: 1.0,
-                createdTick: gameLoop.world.tick,
-                isPrimary: true,
-              });
-              incarnation.state = 'incarnated';
-              incarnation.primaryBindingId = agentId;
-            }
-          }
-
-          resolve();
-        }
-      );
+      soulSystem.requestSoulCreation(context, (soulEntityId: string) => {
+        // Soul creation callback - the ceremony events will handle the rest
+      });
     });
-  });
+  }
 
-  // Wait for all souls to be created
-  await Promise.all(soulPromises);
   console.log(`[Demo] All souls created successfully`);
+
+  // Cards stay visible - no auto-hide
 }
 
 async function createPlayerDeity(world: WorldMutator): Promise<string> {
@@ -595,7 +662,6 @@ interface UIPanelsResult {
   settingsPanel: SettingsPanel;
   tileInspectorPanel: TileInspectorPanel;
   controlsPanel: ControlsPanel;
-  contextMenuManager: ContextMenuManager;
 }
 
 function createUIPanels(
@@ -675,17 +741,6 @@ function createUIPanels(
     terrainGenerator
   );
 
-  // Create context menu manager
-  const contextMenuManager = new ContextMenuManager(
-    gameLoop.world,
-    gameLoop.world.eventBus,
-    renderer.getCamera(),
-    canvas
-  );
-
-  // Register context menu manager with renderer so it gets rendered
-  renderer.setContextMenuManager(contextMenuManager);
-
   // Create placeholder for controlsPanel - will be initialized after windowManager
   const controlsPanel = null as any;
 
@@ -705,7 +760,6 @@ function createUIPanels(
     settingsPanel,
     tileInspectorPanel,
     controlsPanel,
-    contextMenuManager,
     hoverInfoPanel,
   };
 }
@@ -1000,6 +1054,20 @@ function setupWindowManager(
     isResizable: false,
     showInWindowList: true,
     keyboardShortcut: 'T',
+    menuCategory: 'settings',
+  });
+
+  // Universe Manager Panel
+  const universeManagerPanel = new UniverseManagerPanel();
+  windowManager.registerWindow('universe-manager', universeManagerPanel, {
+    defaultX: 10,
+    defaultY: 250,
+    defaultWidth: 350,
+    defaultHeight: 400,
+    isDraggable: true,
+    isResizable: true,
+    showInWindowList: true,
+    keyboardShortcut: 'U',
     menuCategory: 'settings',
   });
 
@@ -1950,7 +2018,7 @@ function setupInputHandlers(
   const {
     agentInfoPanel, animalInfoPanel, plantInfoPanel, tileInspectorPanel,
     memoryPanel, relationshipsPanel, inventoryUI, craftingUI, shopPanel,
-    placementUI, windowManager, menuBar, keyboardRegistry, hoverInfoPanel, contextMenuManager
+    placementUI, windowManager, menuBar, keyboardRegistry, hoverInfoPanel
   } = uiContext;
 
   inputHandler.setCallbacks({
@@ -1969,12 +2037,6 @@ function setupInputHandlers(
     onMouseMove: (screenX, screenY) => {
       const rect = canvas.getBoundingClientRect();
 
-      // Context menu has priority for mouse move events when open
-      const { contextMenuManager } = uiContext;
-      if (contextMenuManager.isOpen()) {
-        contextMenuManager.handleMouseMove(screenX, screenY);
-      }
-
       windowManager.handleDrag(screenX, screenY);
       const inventoryHandled = inventoryUI.handleMouseMove(screenX, screenY, rect.width, rect.height);
       if (inventoryHandled) {
@@ -1989,16 +2051,6 @@ function setupInputHandlers(
     onWheel: (screenX, screenY, deltaY) => {
       return windowManager.handleWheel(screenX, screenY, deltaY);
     },
-    onRightClick: (screenX, screenY) => {
-      // Emit event IMMEDIATELY for context menu manager to handle
-      // NOTE: Must use emitImmediate() because UI events need immediate processing
-      // and the game loop doesn't call flush() - events would otherwise be queued forever
-      gameLoop.world.eventBus.emitImmediate({
-        type: 'input:rightclick',
-        source: 'world',
-        data: { x: screenX, y: screenY }
-      });
-    },
   });
 }
 
@@ -2012,7 +2064,7 @@ function handleKeyDown(
   const { gameLoop, renderer, showNotification } = gameContext;
   const {
     agentInfoPanel, tileInspectorPanel, inventoryUI, craftingUI,
-    placementUI, windowManager, keyboardRegistry, contextMenuManager
+    placementUI, windowManager, keyboardRegistry
   } = uiContext;
 
   // Check keyboard registry first
@@ -2020,13 +2072,8 @@ function handleKeyDown(
     return true;
   }
 
-  // ESC handling - check context menu first
+  // ESC handling
   if (key === 'Escape') {
-    // Close context menu if open (highest priority)
-    if (contextMenuManager.isOpen()) {
-      contextMenuManager.handleKeyPress('Escape');
-      return true;
-    }
     // Close inventory
     if (inventoryUI.isOpen()) {
       windowManager.hideWindow('inventory');
@@ -2271,22 +2318,8 @@ function handleMouseClick(
   const {
     agentInfoPanel, animalInfoPanel, plantInfoPanel, tileInspectorPanel,
     memoryPanel, relationshipsPanel, craftingUI, shopPanel,
-    placementUI, windowManager, menuBar, contextMenuManager
+    placementUI, windowManager, menuBar
   } = uiContext;
-
-  // Context menu has highest priority - check if it's open
-  if (contextMenuManager.isOpen()) {
-    if (button === 0) {
-      // Left click while menu is open - either execute action or close menu
-      contextMenuManager.handleClick(screenX, screenY);
-      return true;
-    }
-    if (button === 2) {
-      // Right click while menu is open - close and reopen at new position
-      contextMenuManager.open(screenX, screenY);
-      return true;
-    }
-  }
 
   // Left click - window management and menu bar
   if (button === 0) {
@@ -2314,13 +2347,6 @@ function handleMouseClick(
     if (shopPanel.handleClick(screenX, screenY, gameLoop.world, rect.width, rect.height)) {
       return true;
     }
-  }
-
-  // Right click - open context menu
-  if (button === 2) {
-    // Open context menu at click position
-    contextMenuManager.open(screenX, screenY);
-    return true;
   }
 
   // Left click - select entities
@@ -2532,16 +2558,89 @@ async function main() {
 
   const settings = settingsPanel.getSettings();
 
-  // Create LLM provider
+  // Create LLM provider - use ProxyLLMProvider by default for server-side API calls and rate limiting
   let llmProvider: LLMProvider;
-  if (settings.llm.provider === 'openai-compat') {
-    llmProvider = new OpenAICompatProvider(
-      settings.llm.model,
-      settings.llm.baseUrl,
-      settings.llm.apiKey
-    );
+
+  // Check if we should use the proxy provider (default: yes, unless settings explicitly configure direct provider)
+  const useProxy = settings.llm.provider !== 'openai-compat-direct' && settings.llm.provider !== 'ollama';
+
+  if (useProxy) {
+    // Default: Use ProxyLLMProvider for server-side API calls with automatic fallback
+    console.log('[DEMO] Using ProxyLLMProvider - server handles API keys and rate limiting');
+    llmProvider = new ProxyLLMProvider('http://localhost:8766');
   } else {
-    llmProvider = new OllamaProvider(settings.llm.model, settings.llm.baseUrl);
+    // Legacy mode: Direct client-side API calls (for local Ollama or explicit settings)
+    console.log('[DEMO] Using direct LLM provider (no proxy)');
+    const providers: LLMProvider[] = [];
+
+    // Check for API keys in .env file (legacy client-side mode)
+    const groqApiKey = import.meta.env.VITE_GROQ_API_KEY || import.meta.env.GROQ_API_KEY;
+    const cerebrasApiKey = import.meta.env.VITE_CEREBRAS_API_KEY || import.meta.env.CEREBRAS_API_KEY;
+
+    // 1. Primary: Cerebras with Qwen 3-32B
+    if (cerebrasApiKey) {
+      console.log('[DEMO] Provider 1: Cerebras → Qwen 3-32B');
+      providers.push(new OpenAICompatProvider(
+        'qwen-3-32b',
+        'https://api.cerebras.ai/v1',
+        cerebrasApiKey
+      ));
+    }
+
+    // 2. Secondary: Groq with Qwen 3-32B (backup for provider 1)
+    if (groqApiKey) {
+      console.log('[DEMO] Provider 2: Groq → Qwen 3-32B');
+      providers.push(new OpenAICompatProvider(
+        'qwen/qwen3-32b',
+        'https://api.groq.com/openai/v1',
+        groqApiKey
+      ));
+    }
+
+    // 3. Tertiary: Cerebras with GPT-OSS-120B
+    if (cerebrasApiKey) {
+      console.log('[DEMO] Provider 3: Cerebras → GPT-OSS-120B');
+      providers.push(new OpenAICompatProvider(
+        'gpt-oss-120b',
+        'https://api.cerebras.ai/v1',
+        cerebrasApiKey
+      ));
+    }
+
+    // 4. Quaternary: Groq with GPT-OSS-120B (last resort)
+    if (groqApiKey) {
+      console.log('[DEMO] Provider 4: Groq → GPT-OSS-120B (last resort)');
+      providers.push(new OpenAICompatProvider(
+        'openai/gpt-oss-120b',
+        'https://api.groq.com/openai/v1',
+        groqApiKey
+      ));
+    }
+
+    // Fallback to settings-based provider if no env keys
+    if (providers.length === 0) {
+      if (settings.llm.provider === 'openai-compat' || settings.llm.provider === 'openai-compat-direct') {
+        providers.push(new OpenAICompatProvider(
+          settings.llm.model,
+          settings.llm.baseUrl,
+          settings.llm.apiKey
+        ));
+      } else {
+        providers.push(new OllamaProvider(settings.llm.model, settings.llm.baseUrl));
+      }
+    }
+
+    // Use FallbackProvider if we have multiple providers, otherwise use single provider
+    if (providers.length > 1) {
+      console.log(`[DEMO] Using FallbackProvider with ${providers.length} providers: ${providers.map(p => p.getProviderId()).join(' → ')}`);
+      llmProvider = new FallbackProvider(providers, {
+        retryAfterMs: 60000,        // Retry failed provider after 1 minute
+        maxConsecutiveFailures: 3,   // Disable after 3 consecutive failures
+        logFallbacks: true,
+      });
+    } else {
+      llmProvider = providers[0];
+    }
   }
 
   const isLLMAvailable = await llmProvider.isAvailable();
@@ -2574,6 +2673,7 @@ async function main() {
   const existingSaves = await saveLoadService.listSaves();
   let loadedCheckpoint = false;
   let universeSelection: { type: 'new' | 'load'; magicParadigm?: string; checkpointKey?: string };
+  let universeConfigScreen: UniverseConfigScreen | null = null;
 
   if (existingSaves.length > 0) {
     // Auto-load the most recent save
@@ -2590,7 +2690,7 @@ async function main() {
       console.log('[Demo] Falling back to new game creation');
       // Fall back to showing universe creation screen
       universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
-        const universeConfigScreen = new UniverseConfigScreen();
+        universeConfigScreen = new UniverseConfigScreen();
         universeConfigScreen.show((config) => {
           resolve({ type: 'new', magicParadigm: config.magicParadigmId || 'none' });
         });
@@ -2600,7 +2700,7 @@ async function main() {
     // No saves - show universe creation screen
     console.log('[Demo] No existing saves found - showing universe creation');
     universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
-      const universeConfigScreen = new UniverseConfigScreen();
+      universeConfigScreen = new UniverseConfigScreen();
       universeConfigScreen.show((config) => {
         resolve({ type: 'new', magicParadigm: config.magicParadigmId || 'none' });
       });
@@ -2797,7 +2897,6 @@ async function main() {
     windowManager,
     menuBar,
     keyboardRegistry,
-    contextMenuManager: panels.contextMenuManager,
     hoverInfoPanel: panels.hoverInfoPanel,
   };
 
@@ -2850,10 +2949,6 @@ async function main() {
 
     // Hover info panel (shows entity tooltips on hover)
     panels.hoverInfoPanel.render(ctx, canvas.width, canvas.height);
-
-    // Context menu rendering - MUST be last to render on top of all other UI
-    panels.contextMenuManager.update();
-    panels.contextMenuManager.render(ctx);
 
     requestAnimationFrame(renderLoop);
   }
@@ -2928,10 +3023,21 @@ async function main() {
     createInitialBuildings(gameLoop.world);
     const agentIds = createInitialAgents(gameLoop.world, settings.dungeonMasterPrompt);
 
-    // Create souls for the initial agents
-    await createSoulsForInitialAgents(gameLoop, agentIds, llmProvider);
+    // Start game loop BEFORE soul creation so SoulCreationSystem.update() runs
+    gameLoop.start();
 
-    const playerDeityId = await createPlayerDeity(gameLoop.world); // Create player deity for belief system
+    // Create souls for the initial agents (displays modal before map loads)
+    await createSoulsForInitialAgents(gameLoop, agentIds, llmProvider, renderer);
+    console.log('[Demo] All souls created, continuing initialization...');
+
+    // Hide the universe config screen now that all souls are created
+    if (universeConfigScreen) {
+      universeConfigScreen.hide();
+      console.log('[Demo] Universe config screen hidden');
+    }
+
+    const playerDeityId = await createPlayerDeity(gameLoop.world);
+    console.log('[Demo] Player deity created:', playerDeityId); // Create player deity for belief system
 
     // Set all agents to believe in the player deity
     const agents = gameLoop.world.query().with('agent').executeEntities();
@@ -2975,8 +3081,8 @@ async function main() {
     panels.agentInfoPanel, panels.animalInfoPanel, panels.resourcesPanel
   );
 
-  // Start game
-  gameLoop.start();
+  // Game loop already started before soul creation
+  console.log('[Demo] Starting render loop - map should now be visible');
   renderLoop();
 
   // Set up periodic auto-saves every minute
@@ -3006,7 +3112,9 @@ async function main() {
 
 // Start when DOM is ready
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', main);
+  document.addEventListener('DOMContentLoaded', () => {
+    main().catch(err => console.error('[Demo] FATAL ERROR in main():', err));
+  });
 } else {
-  main();
+  main().catch(err => console.error('[Demo] FATAL ERROR in main():', err));
 }

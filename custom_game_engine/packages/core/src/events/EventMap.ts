@@ -466,6 +466,13 @@ export interface GameEventMap {
     position?: { x: number; y: number };
     builderId?: EntityId;
   };
+  'building:spawned': {
+    buildingId: EntityId;
+    buildingType: string;
+    cityId: string;
+    position: { x: number; y: number };
+    isComplete: boolean;
+  };
   'building:destroyed': {
     buildingId: EntityId;
   };
@@ -1374,6 +1381,211 @@ export interface GameEventMap {
     agentId: EntityId;
     attemptedAction: string;
     description: string;
+  };
+
+  // === Publishing Infrastructure Events ===
+  /** Research paper published (triggers technology unlock checks) */
+  'research:paper_published': {
+    paperId: string;
+    authorId: EntityId;
+    authorName?: string;
+    field: string;
+    title?: string;
+    citationCount?: number;
+  };
+
+  /** Publishing technology unlocked via research papers */
+  'publishing:technology_unlocked': {
+    technologyId: string;
+    setId: string;
+    setName: string;
+    grants: Array<{ type: string; id?: string }>;
+    papersPublished: number;
+  };
+
+  /** Paper recorded in tracking system */
+  'publishing:paper_recorded': {
+    paperId: string;
+    authorId: EntityId;
+    field: string;
+    totalPublished: number;
+  };
+
+  /** Manual request to check all unlock conditions */
+  'publishing:check_unlocks': Record<string, never>;
+
+  /** Scribe copying job started */
+  'publishing:scribe_started': {
+    jobId: string;
+    scribeId: EntityId;
+    workshopId: EntityId;
+    sourceBookId: string;
+  };
+
+  /** Scribe copying job completed */
+  'publishing:scribe_completed': {
+    jobId: string;
+    scribeId: EntityId;
+    workshopId: EntityId;
+    bookCopied: string;
+    quality: number;
+  };
+
+  /** Binding job started */
+  'publishing:binding_started': {
+    jobId: string;
+    binderId: EntityId;
+    workshopId: EntityId;
+    manuscriptId: string;
+  };
+
+  /** Binding job completed */
+  'publishing:binding_completed': {
+    jobId: string;
+    binderId: EntityId;
+    workshopId: EntityId;
+    bookId: string;
+    quality: number;
+  };
+
+  /** Printing job started */
+  'publishing:printing_started': {
+    jobId: string;
+    printerId: EntityId;
+    pressId: EntityId;
+    manuscriptId: string;
+    copies: number;
+  };
+
+  /** Printing job completed */
+  'publishing:printing_completed': {
+    jobId: string;
+    printerId: EntityId;
+    pressId: EntityId;
+    booksProduced: number;
+    quality: number;
+  };
+
+  /** Biography writing started */
+  'publishing:biography_started': {
+    jobId: string;
+    writerId: EntityId;
+    subjectId: EntityId;
+    subjectName: string;
+  };
+
+  /** Biography writing completed */
+  'publishing:biography_completed': {
+    jobId: string;
+    writerId: EntityId;
+    subjectId: EntityId;
+    bookId: string;
+    quality: number;
+    pages: number;
+  };
+
+  /** Book borrowed from library */
+  'library:book_borrowed': {
+    libraryId: EntityId;
+    borrowerId: EntityId;
+    bookId: string;
+    dueDate: number;
+  };
+
+  /** Book returned to library */
+  'library:book_returned': {
+    libraryId: EntityId;
+    borrowerId: EntityId;
+    bookId: string;
+    daysOverdue?: number;
+  };
+
+  /** Agent reading at library */
+  'library:reading': {
+    libraryId: EntityId;
+    readerId: EntityId;
+    bookId: string;
+    duration: number;
+  };
+
+  /** Library access denied */
+  'library:access_denied': {
+    libraryId: EntityId;
+    agentId: EntityId;
+    reason: string;
+  };
+
+  /** Book purchased from bookstore */
+  'bookstore:purchase': {
+    bookstoreId: EntityId;
+    buyerId: EntityId;
+    bookId: string;
+    price: number;
+    quantity: number;
+  };
+
+  /** Bookstore restocked */
+  'bookstore:restocked': {
+    bookstoreId: EntityId;
+    bookId: string;
+    quantityAdded: number;
+    newStock: number;
+  };
+
+  /** Bookstore out of stock */
+  'bookstore:out_of_stock': {
+    bookstoreId: EntityId;
+    bookId: string;
+    customerId?: EntityId;
+  };
+
+  /** Bookstore revenue milestone */
+  'bookstore:revenue_milestone': {
+    bookstoreId: EntityId;
+    totalRevenue: number;
+    milestone: number;
+  };
+
+  // === University Events ===
+  /** Research project started */
+  'university:research_started': {
+    universityId: EntityId;
+    projectId: string;
+    title: string;
+    principalInvestigator: EntityId;
+    researchers: EntityId[];
+    tick: number;
+  };
+
+  /** Research project completed */
+  'university:research_completed': {
+    universityId: EntityId;
+    projectId: string;
+    paperId: string;
+    title: string;
+    researchers: EntityId[];
+    quality: number;
+    novelty: number;
+    tick: number;
+  };
+
+  /** University statistics */
+  'university:stats': {
+    universityId: EntityId;
+    employeeCount: number;
+    activeProjects: number;
+    completedProjects: number;
+    totalPublications: number;
+    researchMultiplier: number;
+    tick: number;
+  };
+
+  // === Technology Unlock Events ===
+  /** Building type unlocked globally */
+  'technology:building_unlocked': {
+    buildingType: string;
+    cityId: string;
+    tick: number;
   };
 
   // === Experimentation & Recipe Discovery Events ===
@@ -2537,6 +2749,11 @@ export interface GameEventMap {
       previousLives?: number;
     };
     observers?: string[];
+  };
+
+  /** One of the Fates is thinking/formulating their response */
+  'soul:fate_thinking': {
+    speaker: 'weaver' | 'spinner' | 'cutter';
   };
 
   /** One of the Fates speaks during ceremony */

@@ -9,6 +9,8 @@
  */
 
 import type { World } from '../ecs/World.js';
+import { worldSerializer } from '../persistence/WorldSerializer.js';
+import { timelineManager } from './TimelineManager.js';
 
 export interface UniverseConfig {
   /** Unique universe identifier */
@@ -129,16 +131,20 @@ export class MultiverseCoordinator {
   }
 
   /**
-   * Fork a universe (create a parallel timeline for testing).
+   * Fork a universe (create a parallel timeline).
    *
-   * The forked universe starts with the same state as the parent but runs independently.
+   * The forked universe starts with a deep clone of the source world state.
+   * Can optionally fork from a specific timeline snapshot.
    */
-  forkUniverse(
+  async forkUniverse(
     sourceUniverseId: string,
     forkId: string,
     forkName: string,
-    timeScale?: number
-  ): UniverseInstance {
+    options?: {
+      timeScale?: number;
+      fromSnapshotId?: string;  // Fork from a specific timeline snapshot
+    }
+  ): Promise<UniverseInstance> {
     const source = this.universes.get(sourceUniverseId);
 
     if (!source) {
@@ -149,29 +155,57 @@ export class MultiverseCoordinator {
       throw new Error(`Fork ID ${forkId} already exists`);
     }
 
-    // Clone the world state
-    // Note: This requires deep cloning entities/components
-    // For now, we'll create a new world and let the caller populate it
-    // TODO: Implement deep world cloning
-
     const forkConfig: UniverseConfig = {
       id: forkId,
       name: forkName,
-      timeScale: timeScale ?? source.config.timeScale,
+      timeScale: options?.timeScale ?? source.config.timeScale,
       multiverseId: source.config.multiverseId,
       parentId: sourceUniverseId,
       forkedAtTick: source.universeTick,
       paused: false,
     };
 
-    // Import World implementation
-    const { WorldImpl } = require('../ecs/World.js');
-    const forkWorld = new WorldImpl();
+    // Import World implementation and EventBus
+    const { WorldImpl } = await import('../ecs/World.js');
+    const { EventBusImpl } = await import('../events/EventBus.js');
+
+    // Create a new world with a fresh event bus
+    const forkEventBus = new EventBusImpl();
+    const forkWorld = new WorldImpl(forkEventBus);
+
+    // Check if forking from a timeline snapshot
+    if (options?.fromSnapshotId) {
+      const snapshotEntry = timelineManager.getSnapshot(options.fromSnapshotId);
+      if (!snapshotEntry || !snapshotEntry.snapshot) {
+        throw new Error(`Timeline snapshot ${options.fromSnapshotId} not found`);
+      }
+
+      console.log(
+        `[MultiverseCoordinator] Forking from timeline snapshot at tick ${snapshotEntry.tick}`
+      );
+
+      // Deserialize the snapshot into the new world
+      await worldSerializer.deserializeWorld(snapshotEntry.snapshot, forkWorld);
+      forkConfig.forkedAtTick = BigInt(snapshotEntry.tick);
+
+    } else {
+      // Clone the current world state
+      console.log(
+        `[MultiverseCoordinator] Forking current state at tick ${source.universeTick}`
+      );
+
+      await worldSerializer.cloneWorld(
+        source.world,
+        forkWorld,
+        forkId,
+        forkName
+      );
+    }
 
     const fork: UniverseInstance = {
       config: forkConfig,
       world: forkWorld,
-      universeTick: source.universeTick,  // Start from same tick
+      universeTick: forkConfig.forkedAtTick ?? source.universeTick,
       lastAbsoluteTick: this.absoluteTick,
       pausedDuration: 0n,
     };
@@ -179,11 +213,47 @@ export class MultiverseCoordinator {
     this.universes.set(forkId, fork);
 
     console.log(
-      `[MultiverseCoordinator] Forked universe: ${forkName} ` +
-      `(source=${sourceUniverseId}, tick=${source.universeTick})`
+      `[MultiverseCoordinator] Created fork: ${forkName} ` +
+      `(source=${sourceUniverseId}, tick=${fork.universeTick}, ` +
+      `entities=${forkWorld.entities.size})`
     );
 
     return fork;
+  }
+
+  /**
+   * Create a manual timeline snapshot for a universe.
+   */
+  async createTimelineSnapshot(
+    universeId: string,
+    label?: string
+  ): Promise<void> {
+    const universe = this.universes.get(universeId);
+    if (!universe) {
+      throw new Error(`Universe ${universeId} not found`);
+    }
+
+    await timelineManager.createSnapshot(
+      universeId,
+      universe.world,
+      universe.universeTick,
+      false,  // Not auto-save
+      label
+    );
+  }
+
+  /**
+   * Get the timeline for a universe.
+   */
+  getTimeline(universeId: string) {
+    return timelineManager.getTimeline(universeId);
+  }
+
+  /**
+   * Get the timeline manager instance.
+   */
+  getTimelineManager() {
+    return timelineManager;
   }
 
   /**

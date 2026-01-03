@@ -13,13 +13,27 @@ import type { ResourceComponent } from '../components/ResourceComponent.js';
  * Based on items-system/spec.md:
  * - Resources regenerate at regenerationRate per second
  * - Resources cannot exceed maxAmount
+ *
+ * Performance: Runs every 20 ticks (1 second) instead of every tick.
+ * This reduces iteration over 250k+ resource entities to once per second.
  */
 export class ResourceGatheringSystem implements System {
   public readonly id: SystemId = 'resource-gathering';
   public readonly priority: number = 5; // Run early, before AI decisions
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Resource];
 
+  /** Run every 20 ticks (1 second at 20 TPS) */
+  private static readonly UPDATE_INTERVAL = 20;
+
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+    // Throttle: only run once per second
+    if (world.tick % ResourceGatheringSystem.UPDATE_INTERVAL !== 0) {
+      return;
+    }
+
+    // Multiply deltaTime by interval to compensate for skipped ticks
+    const effectiveDeltaTime = deltaTime * ResourceGatheringSystem.UPDATE_INTERVAL;
+
     for (const entity of entities) {
       const impl = entity as EntityImpl;
       const resource = impl.getComponent<ResourceComponent>(CT.Resource);
@@ -33,7 +47,7 @@ export class ResourceGatheringSystem implements System {
       if (resource.amount >= resource.maxAmount) continue;
 
       // Regenerate resource
-      const regenAmount = resource.regenerationRate * deltaTime;
+      const regenAmount = resource.regenerationRate * effectiveDeltaTime;
       const newAmount = Math.min(resource.maxAmount, resource.amount + regenAmount);
 
       impl.updateComponent<ResourceComponent>(CT.Resource, (current) => ({

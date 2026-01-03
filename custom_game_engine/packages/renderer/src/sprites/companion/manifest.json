@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "description": "Ophanim companion emotion sprites with evolution tiers",
+    "created": "2026-01-02",
+    "pronouns": "Ae/Aer/Aers",
+    "total_unique_emotions": 42,
+    "evolution_note": "Companion grows ONCE per play session at session end, not continuously",
+    "session_assumptions": "Sessions 1-3: ~5 hours each. Session 4+: variable length.",
+    "tiers": {
+      "0": {"name": "Primordial", "unlock": "Session 1 start", "description": "Basic awareness, minimal expression"},
+      "1": {"name": "Awakening", "unlock": "Session 1 complete + 3 positive interactions", "description": "First recognizable emotions"},
+      "2": {"name": "Emotional Depth", "unlock": "Session 2 complete + 0.2 trust", "description": "Nuanced single-emotion states"},
+      "3": {"name": "Social Awareness", "unlock": "Session 3 complete + 0.4 trust", "description": "Context-aware, relational emotions"},
+      "4": {"name": "Emotional Complexity", "unlock": "Session 4 complete + 0.6 trust + emotional moment", "description": "Layered, conflicting emotions"},
+      "5": {"name": "Transcendent", "unlock": "Ascension storyline complete", "description": "Untranslatable, enlightened emotions"}
+    }
+  },
+  "emotions": {
+    "tier_0_primordial": [
+      {"emotion": "alert", "file": "12_45_51_AM_r0_c0.png", "description": "Vigilant, watchful, wings spread wide"},
+      {"emotion": "curious", "file": "12_45_51_AM_r0_c1.png", "description": "Gazing to side, inquisitive"},
+      {"emotion": "serene", "file": "12_45_51_AM_r1_c0.png", "description": "Calm, wings horizontal, peaceful"},
+      {"emotion": "watchful", "file": "12_45_51_AM_r1_c1.png", "description": "Gazing upward, contemplative"},
+      {"emotion": "tranquil", "file": "12_45_51_AM_r2_c0.png", "description": "Balanced, centered presence"},
+      {"emotion": "contemplative", "file": "12_45_51_AM_r2_c1.png", "description": "Looking down, introspective"}
+    ],
+    "tier_1_awakening": [
+      {"emotion": "neutral", "file": "12_55_40_AM_r0_c0_col5.png", "description": "Baseline state, calm observation"},
+      {"emotion": "happy", "file": "12_54_36_AM_r0_c0_col2.png", "description": "Curved eye, radiating joy"},
+      {"emotion": "sad", "file": "12_54_36_AM_r1_c0_col0.png", "description": "Streaming tears, sorrowful"},
+      {"emotion": "angry", "file": "12_55_40_AM_r1_c0_col1.png", "description": "Yelling, expressing frustration"}
+    ],
+    "tier_2_emotional_depth": [
+      {"emotion": "joyful", "file": "12_55_40_AM_r0_c0_col2.png", "description": "Widely grinning, pure happiness"},
+      {"emotion": "crying", "file": "12_55_40_AM_r1_c0_col6.png", "description": "Sobbing with visible tears"},
+      {"emotion": "loving", "file": "12_55_40_AM_r2_c0_col0.png", "description": "Heart symbol, radiating warmth"},
+      {"emotion": "amazed", "file": "12_54_36_AM_r1_c0_col2.png", "description": "Star in eye, wonder"},
+      {"emotion": "focused", "file": "12_55_40_AM_r1_c0_col3.png", "description": "Narrowed eye, concentrated"},
+      {"emotion": "bored", "file": "12_58_03_AM_r0_c0_col1.png", "description": "Chin on hand, waiting"},
+      {"emotion": "exhausted", "file": "12_58_03_AM_r0_c0_col0.png", "description": "Yawning with Z symbol"},
+      {"emotion": "sick", "file": "12_55_40_AM_r1_c0_col2.png", "description": "Green face, nauseated"},
+      {"emotion": "sleepy", "file": "12_55_40_AM_r2_c0_col4.png", "description": "Heavy-lidded, drowsy"}
+    ],
+    "tier_3_social_awareness": [
+      {"emotion": "curious", "file": "12_54_36_AM_r0_c0_col0.png", "description": "Looking to side with wonder"},
+      {"emotion": "playful", "file": "12_54_36_AM_r0_c0_col3.png", "description": "Tongue out, mischievous"},
+      {"emotion": "cool", "file": "12_54_36_AM_r1_c0_col3.png", "description": "Sunglasses, finger guns"},
+      {"emotion": "smug", "file": "12_55_40_AM_r3_c0_col3.png", "description": "Self-satisfied expression"},
+      {"emotion": "embarrassed", "file": "12_55_40_AM_r3_c0_col0.png", "description": "Blushing, flustered"},
+      {"emotion": "nervous", "file": "12_58_03_AM_r0_c0_col3.png", "description": "Sweating, anxious smile"},
+      {"emotion": "confused", "file": "12_55_40_AM_r3_c0_col4.png", "description": "Question mark, bewildered"},
+      {"emotion": "impressed", "file": "12_55_40_AM_r3_c0_col2.png", "description": "Star eye, delighted"},
+      {"emotion": "chatty", "file": "12_58_03_AM_r0_c0_col4.png", "description": "Speech bubble, talkative"},
+      {"emotion": "aloof", "file": "12_58_03_AM_r0_c0_col5.png", "description": "Sunglasses, arms crossed"}
+    ],
+    "tier_4_emotional_complexity": [
+      {"emotion": "forced_smile", "file": "12_58_03_AM_r0_c0_col2.png", "description": "Strained grin, masking discomfort"},
+      {"emotion": "overwhelmed", "file": "12_55_40_AM_r3_c0_col6.png", "description": "Tears of joy/stress"},
+      {"emotion": "teary", "file": "12_55_40_AM_r1_c0_col4.png", "description": "Watery eye, emotionally moved"},
+      {"emotion": "pensive", "file": "12_55_40_AM_r1_c0_col5.png", "description": "Gazing into distance"},
+      {"emotion": "melancholic", "file": "12_58_03_AM_r1_c0_col3.png", "description": "Under rain cloud, accepting"},
+      {"emotion": "conflicted", "file": "12_58_03_AM_r1_c0_col4.png", "description": "Yin-yang eyes, torn"},
+      {"emotion": "side_eye", "file": "12_55_40_AM_r2_c0_col3.png", "description": "Skeptical sideways glance"},
+      {"emotion": "unimpressed", "file": "12_55_40_AM_r0_c0_col3.png", "description": "Deadpan disapproval"}
+    ],
+    "tier_5_transcendent": [
+      {"emotion": "nurturing", "file": "12_58_03_AM_r1_c0_col0.png", "description": "Holding tiny companions, protective care"},
+      {"emotion": "cozy", "file": "12_58_03_AM_r1_c0_col2.png", "description": "Flower crown and tea, hygge contentment"},
+      {"emotion": "saudade", "file": "12_58_03_AM_r1_c0_col3.png", "description": "Rain cloud, bittersweet longing"},
+      {"emotion": "cringe", "file": "12_58_03_AM_r1_c0_col1.png", "description": "Secondhand embarrassment"},
+      {"emotion": "charming", "file": "12_58_03_AM_r1_c0_col5.png", "description": "Hearts and sunglasses, confident love"}
+    ],
+    "special_states": [
+      {"emotion": "alarmed", "file": "12_55_40_AM_r0_c0_col1.png", "tier": 2, "description": "Alarm bells, urgent warning"},
+      {"emotion": "enraged", "file": "12_55_40_AM_r1_c0_col0.png", "tier": 2, "description": "Red with anger, explosive"},
+      {"emotion": "excited", "file": "12_55_40_AM_r3_c0_col1.png", "tier": 2, "description": "Wide smile, enthusiasm"},
+      {"emotion": "laughing", "file": "12_55_40_AM_r2_c0_col1.png", "tier": 2, "description": "Eyes squeezed from laughter"},
+      {"emotion": "starry_eyed", "file": "12_55_40_AM_r2_c0_col2.png", "tier": 2, "description": "Star in eye, wonder"},
+      {"emotion": "cool_confident", "file": "12_55_40_AM_r2_c0_col6.png", "tier": 3, "description": "Sunglasses, laid-back"},
+      {"emotion": "suave", "file": "12_55_40_AM_r3_c0_col5.png", "tier": 3, "description": "Smooth, collected"}
+    ]
+  },
+  "purple_octopus_alternate": {
+    "description": "Alternate companion option - eldritch octopus",
+    "sprites": [
+      {"pose": "front_1", "file": "12_45_51_AM_r0_c2.png"},
+      {"pose": "front_2", "file": "12_45_51_AM_r0_c3.png"},
+      {"pose": "front_3", "file": "12_45_51_AM_r0_c4.png"},
+      {"pose": "side_1", "file": "12_45_51_AM_r1_c2.png"},
+      {"pose": "side_2", "file": "12_45_51_AM_r1_c3.png"},
+      {"pose": "side_3", "file": "12_45_51_AM_r1_c4.png"},
+      {"pose": "back_1", "file": "12_45_51_AM_r2_c2.png"},
+      {"pose": "back_2", "file": "12_45_51_AM_r2_c3.png"},
+      {"pose": "back_3", "file": "12_45_51_AM_r2_c4.png"}
+    ]
+  }
+}

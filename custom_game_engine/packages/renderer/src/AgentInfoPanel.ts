@@ -357,7 +357,8 @@ export class AgentInfoPanel {
           temperature,
           movement,
           inventory,
-          goals
+          goals,
+          world
         );
         break;
     }

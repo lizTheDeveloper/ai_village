@@ -5,14 +5,17 @@
 export * from './LLMProvider';
 export * from './OllamaProvider';
 export * from './OpenAICompatProvider';
+export * from './ProxyLLMProvider';
 export * from './StructuredPromptBuilder';
 export * from './ResponseParser';
 export * from './LLMDecisionQueue';
 export * from './LoadBalancingProvider';
+export * from './FallbackProvider';
 export * from './PromptLogger';
 export * from './SkillContextTemplates';
 export * from './ActionDefinitions';
 export * from './PromptCacheManager';
+export * from './RateLimiter';
 
 // Prompt builder classes (utility functions exported via StructuredPromptBuilder)
 export { WorldContextBuilder } from './prompt-builders/WorldContextBuilder';

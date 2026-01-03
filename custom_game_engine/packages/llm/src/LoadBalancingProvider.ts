@@ -1,4 +1,4 @@
-import type { LLMProvider, LLMRequest, LLMResponse } from './LLMProvider.js';
+import type { LLMProvider, LLMRequest, LLMResponse, ProviderPricing } from './LLMProvider.js';
 
 /**
  * Load-balancing provider that distributes requests across multiple LLM backends.
@@ -41,5 +41,19 @@ export class LoadBalancingProvider implements LLMProvider {
   async getAvailableCount(): Promise<number> {
     const results = await Promise.all(this.providers.map(p => p.isAvailable()));
     return results.filter(r => r).length;
+  }
+
+  getPricing(): ProviderPricing {
+    // Return pricing from the first provider as representative
+    // Note: In reality, costs may vary across providers
+    const firstProvider = this.providers[0];
+    if (!firstProvider) {
+      throw new Error('LoadBalancingProvider has no providers');
+    }
+    return firstProvider.getPricing();
+  }
+
+  getProviderId(): string {
+    return 'load-balanced';
   }
 }
