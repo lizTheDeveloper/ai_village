@@ -1,0 +1,18 @@
+{
+  "id": "chicken_black",
+  "base_species": "chicken",
+  "variant": "black",
+  "description": "black feathered chicken",
+  "size": 48,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-03T23:44:40.227Z"
+}

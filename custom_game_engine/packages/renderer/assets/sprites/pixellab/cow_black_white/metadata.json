@@ -1,0 +1,18 @@
+{
+  "id": "cow_black_white",
+  "base_species": "cow",
+  "variant": "black_white",
+  "description": "black and white spotted cow",
+  "size": 64,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-03T23:48:01.215Z"
+}

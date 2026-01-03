@@ -755,6 +755,167 @@
         }, 2000);
       }
     };
+
+    window.copySpritePrompt = function() {
+      const prompt = document.getElementById('spritePromptEdit').value;
+      navigator.clipboard.writeText(prompt);
+      const btn = event.target;
+      const originalText = btn.textContent;
+      btn.textContent = '✓ Copied!';
+      setTimeout(() => {
+        btn.textContent = originalText;
+      }, 2000);
+    };
+
+    window.generateSpriteVariants = function() {
+      if (!currentSpecies) return;
+      document.getElementById('variantModal').classList.add('active');
+      document.getElementById('variantGrid').innerHTML = '';
+      document.getElementById('variantProgress').classList.remove('active');
+    };
+
+    window.closeVariantModal = function() {
+      document.getElementById('variantModal').classList.remove('active');
+    };
+
+    const DIRECTIONS = [
+      { name: 'south', description: 'facing south, viewed from above' },
+      { name: 'southwest', description: 'facing southwest, viewed from above at 45 degree angle' },
+      { name: 'west', description: 'facing west, side profile view from above' },
+      { name: 'northwest', description: 'facing northwest, viewed from above at 45 degree angle' },
+      { name: 'north', description: 'facing north, viewed from above showing back' },
+      { name: 'northeast', description: 'facing northeast, viewed from above at 45 degree angle' },
+      { name: 'east', description: 'facing east, side profile view from above' },
+      { name: 'southeast', description: 'facing southeast, viewed from above at 45 degree angle' },
+    ];
+
+    window.startVariantGeneration = async function() {
+      if (!currentSpecies) return;
+
+      const variantTypes = [];
+      if (document.getElementById('variantMale').checked) variantTypes.push({ name: 'male', description: 'male' });
+      if (document.getElementById('variantFemale').checked) variantTypes.push({ name: 'female', description: 'female' });
+      if (document.getElementById('variantColorVar1').checked) variantTypes.push({ name: 'color_var1', description: 'color variant 1 with different coloration' });
+      if (document.getElementById('variantColorVar2').checked) variantTypes.push({ name: 'color_var2', description: 'color variant 2 with alternative coloring' });
+
+      if (variantTypes.length === 0) {
+        alert('Please select at least one variant type');
+        return;
+      }
+
+      const basePrompt = document.getElementById('spritePromptEdit').value;
+      const progress = document.getElementById('variantProgress');
+      const progressFill = document.getElementById('variantProgressFill');
+      const progressText = document.getElementById('variantProgressText');
+      const variantGrid = document.getElementById('variantGrid');
+      const startBtn = document.getElementById('startVariantBtn');
+
+      progress.classList.add('active');
+      startBtn.disabled = true;
+      variantGrid.innerHTML = '';
+
+      const totalSprites = variantTypes.length * DIRECTIONS.length;
+      let completed = 0;
+
+      const generatedVariants = [];
+
+      try {
+        for (const variant of variantTypes) {
+          const variantData = {
+            id: `${currentSpecies.id}_${variant.name}`,
+            variant: variant.name,
+            description: variant.description,
+            sprites: {}
+          };
+
+          for (const direction of DIRECTIONS) {
+            progressText.textContent = `Generating ${variant.name} - ${direction.name}... (${completed + 1}/${totalSprites})`;
+
+            // Modify prompt with direction and variant
+            const fullPrompt = `${basePrompt.replace('Top-down view', direction.description)}, ${variant.description}`;
+
+            try {
+              // Call API endpoint that will proxy to PixelLab
+              const response = await fetch('/api/generate-sprite', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  description: fullPrompt,
+                  image_size: { height: 48, width: 48 },
+                  no_background: true,
+                })
+              });
+
+              if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+              }
+
+              const data = await response.json();
+
+              if (data.image && data.image.base64) {
+                variantData.sprites[direction.name] = data.image.base64;
+
+                // Display sprite in grid
+                const spriteDiv = document.createElement('div');
+                spriteDiv.className = 'variant-sprite';
+                spriteDiv.innerHTML = `
+                  <img src="data:image/png;base64,${data.image.base64}" alt="${variant.name} ${direction.name}">
+                  <div class="variant-sprite-label">${variant.name}<br>${direction.name}</div>
+                `;
+                variantGrid.appendChild(spriteDiv);
+              }
+
+              completed++;
+              progressFill.style.width = `${(completed / totalSprites) * 100}%`;
+
+              // Small delay between requests
+              await new Promise(resolve => setTimeout(resolve, 2000));
+
+            } catch (error) {
+              console.error(`Failed to generate ${variant.name} ${direction.name}:`, error);
+              completed++;
+              progressFill.style.width = `${(completed / totalSprites) * 100}%`;
+            }
+          }
+
+          generatedVariants.push(variantData);
+        }
+
+        // Save species and variants
+        await saveSpeciesWithVariants(currentSpecies, generatedVariants);
+
+        progressText.textContent = `✅ Complete! Generated ${completed}/${totalSprites} sprites`;
+        startBtn.disabled = false;
+
+      } catch (error) {
+        console.error('Variant generation error:', error);
+        progressText.textContent = `❌ Error: ${error.message}`;
+        startBtn.disabled = false;
+      }
+    };
+
+    async function saveSpeciesWithVariants(species, variants) {
+      // Save to backend via API
+      try {
+        const response = await fetch('/api/save-alien-species', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            species,
+            variants
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to save species: ${response.status}`);
+        }
+
+        console.log('Species and variants saved successfully');
+      } catch (error) {
+        console.error('Error saving species:', error);
+        alert('Failed to save species. Sprites generated but not persisted.');
+      }
+    }
   </script>
 </body>
 </html>
