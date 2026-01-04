@@ -520,7 +520,13 @@ async function createPlayerDeity(world: WorldMutator): Promise<string> {
   deityEntity.addComponent(createTagsComponent('deity', 'player_god'));
 
   // Deity component - starts blank, will be defined by believers
-  deityEntity.addComponent(new DeityComponent('The Nameless', 'player'));
+  const deityComp = new DeityComponent('The Nameless', 'player');
+
+  // Give starting belief so player can use divine powers immediately
+  // Powers cost: whisper (5), dream_hint (10), clear_vision (50), bless (75), miracle (100)
+  deityComp.addBelief(500, world.tick); // Enough for several powers
+
+  deityEntity.addComponent(deityComp);
 
   // Add to world
   (world as any)._addEntity(deityEntity);

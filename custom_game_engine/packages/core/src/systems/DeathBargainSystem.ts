@@ -781,13 +781,17 @@ Answer ONLY with "YES" or "NO".`;
     // Remove death bargain component
     (entity as any).removeComponent?.(ComponentType.DeathBargain);
 
+    // Get psychopomp name for the event (reuse deathGod from above)
+    const deathGodIdentity = deathGod?.components.get('identity') as any;
+    const psychopompName = deathGodIdentity?.name || 'The God of Death';
+
     world.eventBus.emit({
       type: 'death:final',
       source: 'death_bargain_system',
       data: {
         entityId: entity.id,
-        fate: 'servitude',
-        failedChallenge: bargain.challengeType,
+        psychopompName,
+        challengeType: bargain.challengeType,
       },
     });
   }
@@ -1161,6 +1165,7 @@ Respond with ONLY a number between 0.0 and 1.0.`;
         data: {
           deityId: deathGod.id,
           deityName: deathGodName,
+          deityType: 'death_god',
           reason: 'first_ensouled_death',
           location: { x: location.x, y: location.y },
           message: `${deathGodName} has entered the chat`,
@@ -1244,17 +1249,8 @@ Respond with ONLY a number between 0.0 and 1.0.`;
       }
     }
 
-    // Emit conversation event for nearby observers
-    world.eventBus.emit({
-      type: 'conversation:message',
-      source: 'death_bargain_system',
-      data: {
-        speakerId: speaker.id,
-        listenerId: listener.id,
-        message,
-        tick: world.tick,
-      },
-    });
+    // Note: conversation:message event type not in EventMap
+    // Conversation updates are recorded in the components above
   }
 
   /**
