@@ -232,13 +232,14 @@ export class SkillNodeRenderer {
     const textY = node.icon ? y + (2 * height) / 3 : y + height / 2;
     ctx.fillText(displayName, x + width / 2, textY);
 
-    // Add forbidden tint for forbidden category
-    if (node.category === 'forbidden') {
-      ctx.fillStyle = DEFAULT_NODE_COLORS.forbidden;
-      ctx.globalAlpha = 0.3;
-      ctx.fillRect(x, y, width, height);
-      ctx.globalAlpha = 1.0;
-    }
+    // Add forbidden tint for forbidden category (if it becomes part of the type in the future)
+    // Note: 'forbidden' is not currently in MagicSkillCategory type
+    // if (node.category === 'forbidden') {
+    //   ctx.fillStyle = DEFAULT_NODE_COLORS.forbidden;
+    //   ctx.globalAlpha = 0.3;
+    //   ctx.fillRect(x, y, width, height);
+    //   ctx.globalAlpha = 1.0;
+    // }
   }
 
   /**

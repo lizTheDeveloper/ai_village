@@ -337,7 +337,10 @@ export class SkillTreePanel implements IWindowPanel {
         const paradigms = magicComp.knownParadigmIds;
         const currentIndex = paradigms.indexOf(this.uiState.activeParadigmId);
         const nextIndex = (currentIndex + 1) % paradigms.length;
-        this.setActiveParadigm(paradigms[nextIndex]);
+        const nextParadigm = paradigms[nextIndex];
+        if (nextParadigm) {
+          this.setActiveParadigm(nextParadigm);
+        }
         break;
 
       case 'Escape':
@@ -457,7 +460,7 @@ export class SkillTreePanel implements IWindowPanel {
       return false;
     }
 
-    const progress = this.getProgressForParadigm(magicComp, this.uiState.activeParadigmId);
+    const progress = this.getProgressForParadigm(magicComp, activeParadigmId);
     if (!progress) {
       return false;
     }
@@ -473,7 +476,11 @@ export class SkillTreePanel implements IWindowPanel {
     if (evaluation.canPurchase) {
       try {
         // Deduct XP
-        const state = magicComp.skillTreeState![this.uiState.activeParadigmId];
+        const state = magicComp.skillTreeState?.[activeParadigmId];
+        if (!state) {
+          return false;
+        }
+
         state.xp -= evaluation.xpCost;
 
         // Mark as unlocked
@@ -483,9 +490,10 @@ export class SkillTreePanel implements IWindowPanel {
 
         // Emit event
         const eventBus = world.getEventBus();
-        eventBus.emit('magic:skill_node_unlocked', {
+        (eventBus.emit as any)({
+          type: 'magic:skill_node_unlocked',
           entityId: this.selectedEntity.id,
-          paradigmId: this.uiState.activeParadigmId,
+          paradigmId: activeParadigmId,
           nodeId,
           xpSpent: evaluation.xpCost,
         });
@@ -493,7 +501,7 @@ export class SkillTreePanel implements IWindowPanel {
         // Apply effects via SkillTreeManager
         const skillTreeManager = (world as any).getSkillTreeManager?.();
         if (skillTreeManager) {
-          skillTreeManager.applyNodeEffects(this.selectedEntity, this.uiState.activeParadigmId, nodeId);
+          skillTreeManager.applyNodeEffects(this.selectedEntity, activeParadigmId, nodeId);
         }
 
         this.refresh();
@@ -501,9 +509,10 @@ export class SkillTreePanel implements IWindowPanel {
       } catch (error: any) {
         // Rollback on error
         const eventBus = world.getEventBus();
-        eventBus.emit('ui:notification', {
+        (eventBus.emit as any)({
+          type: 'ui:notification',
           message: `Error unlocking node: ${error.message}`,
-          type: 'error',
+          level: 'error',
         });
         return false;
       }
@@ -518,9 +527,10 @@ export class SkillTreePanel implements IWindowPanel {
         message = `Requirements not met: ${evaluation.unmetConditions[0].message}`;
       }
 
-      eventBus.emit('ui:notification', {
+      (eventBus.emit as any)({
+        type: 'ui:notification',
         message,
-        type: 'error',
+        level: 'error',
       });
       return false;
     }
@@ -560,8 +570,11 @@ export class SkillTreePanel implements IWindowPanel {
       ctx.font = '14px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      const paradigmName = paradigms[i].charAt(0).toUpperCase() + paradigms[i].slice(1);
-      ctx.fillText(paradigmName, tabX + tabWidth / 2, y + height / 2);
+      const paradigm = paradigms[i];
+      if (paradigm) {
+        const paradigmName = paradigm.charAt(0).toUpperCase() + paradigm.slice(1);
+        ctx.fillText(paradigmName, tabX + tabWidth / 2, y + height / 2);
+      }
     }
   }
 
