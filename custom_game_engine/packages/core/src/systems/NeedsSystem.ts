@@ -138,9 +138,12 @@ export class NeedsSystem implements System {
 
       // Update needs
       impl.updateComponent<NeedsComponent>(CT.Needs, (current) => {
-        const updated = current.clone();
-        updated.hunger = newHunger;
-        updated.energy = newEnergy;
+        // Create new instance (defensive against plain objects from deserialization)
+        const updated = new NeedsComponent({
+          ...current,
+          hunger: newHunger,
+          energy: newEnergy,
+        });
         return updated;
       });
 

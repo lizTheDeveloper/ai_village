@@ -49,6 +49,7 @@ const PORT = process.env.PORT || 3030;
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 const ROADMAP_PATH = path.join(PROJECT_ROOT, 'MASTER_ROADMAP.md');
 const WORK_ORDERS_DIR = path.join(__dirname, '../work-orders');
+const OPENSPEC_CHANGES_DIR = path.join(PROJECT_ROOT, 'openspec/changes');
 const BUGS_DIR = path.join(__dirname, '../bugs');
 const SCRIPTS_DIR = path.join(__dirname, '../scripts');
 const LOGS_DIR = path.join(PROJECT_ROOT, 'logs');
@@ -415,55 +416,110 @@ function getRoadmapRaw() {
 // =============================================================================
 
 function getWorkOrders() {
-    if (!fs.existsSync(WORK_ORDERS_DIR)) {
-        return [];
+    const orders = [];
+
+    // Read from old work-orders directory
+    if (fs.existsSync(WORK_ORDERS_DIR)) {
+        const dirs = fs.readdirSync(WORK_ORDERS_DIR).filter(d => {
+            if (d === 'archive' || d === '_archived') return false;
+            const stat = fs.statSync(path.join(WORK_ORDERS_DIR, d));
+            return stat.isDirectory();
+        });
+
+        for (const dir of dirs) {
+            const orderPath = path.join(WORK_ORDERS_DIR, dir);
+            const statePath = path.join(orderPath, '.state');
+            const workOrderPath = path.join(orderPath, 'work-order.md');
+            const playtestPath = path.join(orderPath, 'playtest-report.md');
+            const screenshotsDir = path.join(orderPath, 'screenshots');
+
+            const order = {
+                name: dir,
+                source: 'work-orders',
+                state: fs.existsSync(statePath) ? fs.readFileSync(statePath, 'utf-8').trim() : 'NEW',
+                hasWorkOrder: fs.existsSync(workOrderPath),
+                hasPlaytestReport: fs.existsSync(playtestPath),
+                screenshotCount: 0,
+                verdict: null,
+                priority: null,
+                complexity: null
+            };
+
+            if (fs.existsSync(screenshotsDir)) {
+                order.screenshotCount = fs.readdirSync(screenshotsDir).filter(f => f.endsWith('.png')).length;
+            }
+
+            if (order.hasPlaytestReport) {
+                const report = fs.readFileSync(playtestPath, 'utf-8');
+                if (report.includes('APPROVED')) order.verdict = 'APPROVED';
+                else if (report.includes('NEEDS_WORK')) order.verdict = 'NEEDS_WORK';
+                else if (report.includes('BLOCKED')) order.verdict = 'BLOCKED';
+            }
+
+            orders.push(order);
+        }
     }
 
-    const orders = [];
-    const dirs = fs.readdirSync(WORK_ORDERS_DIR).filter(d => {
-        if (d === 'archive' || d === '_archived') return false; // Exclude archive folders
-        const stat = fs.statSync(path.join(WORK_ORDERS_DIR, d));
-        return stat.isDirectory();
-    });
+    // Read from OpenSpec changes directory
+    if (fs.existsSync(OPENSPEC_CHANGES_DIR)) {
+        const dirs = fs.readdirSync(OPENSPEC_CHANGES_DIR).filter(d => {
+            if (d === 'archive' || d === '_archived') return false;
+            const stat = fs.statSync(path.join(OPENSPEC_CHANGES_DIR, d));
+            return stat.isDirectory();
+        });
 
-    for (const dir of dirs) {
-        const orderPath = path.join(WORK_ORDERS_DIR, dir);
-        const statePath = path.join(orderPath, '.state');
-        const workOrderPath = path.join(orderPath, 'work-order.md');
-        const playtestPath = path.join(orderPath, 'playtest-report.md');
-        const screenshotsDir = path.join(orderPath, 'screenshots');
+        for (const dir of dirs) {
+            const proposalPath = path.join(OPENSPEC_CHANGES_DIR, dir);
+            const proposalFile = path.join(proposalPath, 'proposal.md');
+            const tasksFile = path.join(proposalPath, 'tasks.md');
 
-        const order = {
-            name: dir,
-            state: fs.existsSync(statePath) ? fs.readFileSync(statePath, 'utf-8').trim() : 'NEW',
-            hasWorkOrder: fs.existsSync(workOrderPath),
-            hasPlaytestReport: fs.existsSync(playtestPath),
-            screenshotCount: 0,
-            verdict: null
-        };
+            if (!fs.existsSync(proposalFile)) continue;
 
-        if (fs.existsSync(screenshotsDir)) {
-            order.screenshotCount = fs.readdirSync(screenshotsDir).filter(f => f.endsWith('.png')).length;
+            const proposalContent = fs.readFileSync(proposalFile, 'utf-8');
+
+            // Parse OpenSpec metadata
+            const statusMatch = proposalContent.match(/\*\*Status:\*\*\s*(.+)/);
+            const priorityMatch = proposalContent.match(/\*\*Priority:\*\*\s*(.+)/);
+            const complexityMatch = proposalContent.match(/\*\*Complexity:\*\*\s*(.+)/);
+
+            const order = {
+                name: dir,
+                source: 'openspec',
+                state: statusMatch ? statusMatch[1].trim() : 'Draft',
+                priority: priorityMatch ? priorityMatch[1].trim() : null,
+                complexity: complexityMatch ? complexityMatch[1].trim() : null,
+                hasWorkOrder: true, // proposal.md is equivalent
+                hasPlaytestReport: false,
+                hasTasks: fs.existsSync(tasksFile),
+                screenshotCount: 0,
+                verdict: null
+            };
+
+            // Map OpenSpec status to old verdict system
+            if (order.state === 'Approved') order.verdict = 'APPROVED';
+            else if (order.state === 'Blocked') order.verdict = 'BLOCKED';
+            else if (order.state === 'Needs Work') order.verdict = 'NEEDS_WORK';
+
+            orders.push(order);
         }
-
-        if (order.hasPlaytestReport) {
-            const report = fs.readFileSync(playtestPath, 'utf-8');
-            if (report.includes('APPROVED')) order.verdict = 'APPROVED';
-            else if (report.includes('NEEDS_WORK')) order.verdict = 'NEEDS_WORK';
-            else if (report.includes('BLOCKED')) order.verdict = 'BLOCKED';
-        }
-
-        orders.push(order);
     }
 
     return orders;
 }
 
 function getWorkOrderContent(name) {
+    // Try old work-orders directory first
     const workOrderPath = path.join(WORK_ORDERS_DIR, name, 'work-order.md');
     if (fs.existsSync(workOrderPath)) {
         return fs.readFileSync(workOrderPath, 'utf-8');
     }
+
+    // Try OpenSpec changes directory
+    const proposalPath = path.join(OPENSPEC_CHANGES_DIR, name, 'proposal.md');
+    if (fs.existsSync(proposalPath)) {
+        return fs.readFileSync(proposalPath, 'utf-8');
+    }
+
     return null;
 }
 

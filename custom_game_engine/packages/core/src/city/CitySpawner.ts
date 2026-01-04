@@ -7,7 +7,7 @@
 
 import type { World } from '../ecs/World.js';
 import { ComponentType as _CT } from '../types/ComponentType.js';
-import type { CityDirectorComponent } from '../components/CityDirectorComponent.js';
+import { createCityDirectorComponent } from '../components/CityDirectorComponent.js';
 
 /**
  * Available city templates for spawning
@@ -296,25 +296,23 @@ export async function spawnCity(
   const useLLM = config.useLLM ?? true;
 
   // Create city director entity
-  const cityId = world.createEntity('city_director', {});
-  const cityEntity = world.getEntity(cityId);
+  const cityEntity = world.createEntity();
+  const cityId = cityEntity.id;
 
-  if (!cityEntity) {
-    throw new Error('Failed to create city entity');
-  }
-
-  // Add CityDirector component
-  const cityDirector: CityDirectorComponent = {
-    type: 'city_director',
-    cityName,
-    population: agentCount,
-    foundedTick: world.currentTick,
-    buildingQueue: [],
-    researchQueue: [],
-    resources: {},
-    policies: [],
+  // Calculate city bounds (estimate based on grid size)
+  const gridSize = Math.ceil(Math.sqrt(template.buildings.reduce((sum: number, b: any) => sum + b.count, 0)));
+  const spacing = 12;
+  const radius = gridSize * spacing / 2;
+  const bounds = {
+    minX: config.x - radius,
+    maxX: config.x + radius,
+    minY: config.y - radius,
+    maxY: config.y + radius,
   };
-  cityEntity.components.set('city_director', cityDirector);
+
+  // Add CityDirector component using helper
+  const cityDirector = createCityDirectorComponent(cityId, cityName, bounds, useLLM);
+  (cityEntity as any).addComponent(cityDirector);
 
   const spawnedBuildingIds: string[] = [];
   const spawnedAgentIds: string[] = [];
