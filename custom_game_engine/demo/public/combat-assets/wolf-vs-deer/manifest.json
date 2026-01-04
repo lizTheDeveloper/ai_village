@@ -1,0 +1,89 @@
+{
+  "combatId": "wolf-vs-deer",
+  "title": "WOLF VS DEER - The Hunt",
+  "generatedAt": "2026-01-04T11:55:00.000Z",
+  "pixelLabCharacters": {
+    "wolf": "9007e612-5574-490e-9be9-7e019ff1960a",
+    "deer": "bbf178e2-4493-472c-89ad-e545e0a9b03c"
+  },
+  "characters": {
+    "wolf": {
+      "name": "Fang",
+      "type": "gray_wolf",
+      "description": "hungry gray wolf stalking prey",
+      "rotations": {
+        "south": "wolf/rotations/south.png",
+        "south-east": "wolf/rotations/south-east.png",
+        "east": "wolf/rotations/east.png",
+        "north-east": "wolf/rotations/north-east.png",
+        "north": "wolf/rotations/north.png",
+        "north-west": "wolf/rotations/north-west.png",
+        "west": "wolf/rotations/west.png",
+        "south-west": "wolf/rotations/south-west.png"
+      },
+      "animations": {
+        "bite": {
+          "template": "lead-jab",
+          "description": "snapping jaws at prey",
+          "frames": 3,
+          "directions": ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"],
+          "path": "wolf/animations/bite/{direction}/frame_{frame}.png"
+        },
+        "pounce": {
+          "template": "roundhouse-kick",
+          "description": "leaping to attack prey",
+          "frames": 7,
+          "directions": ["south", "south-west", "west", "north-west", "north", "north-east", "east"],
+          "path": "wolf/animations/pounce/{direction}/frame_{frame}.png"
+        }
+      }
+    },
+    "deer": {
+      "name": "Willow",
+      "type": "wild_deer",
+      "description": "graceful deer fighting for survival",
+      "rotations": {
+        "south": "deer/rotations/south.png",
+        "south-east": "deer/rotations/south-east.png",
+        "east": "deer/rotations/east.png",
+        "north-east": "deer/rotations/north-east.png",
+        "north": "deer/rotations/north.png",
+        "north-west": "deer/rotations/north-west.png",
+        "west": "deer/rotations/west.png",
+        "south-west": "deer/rotations/south-west.png"
+      },
+      "animations": {
+        "flee": {
+          "template": "running-8-frames",
+          "description": "running away in panic",
+          "frames": 8,
+          "directions": ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"],
+          "path": "deer/animations/flee/{direction}/frame_{frame}.png"
+        },
+        "defensive-kick": {
+          "template": "high-kick",
+          "description": "kicking with hind legs",
+          "frames": 7,
+          "directions": ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"],
+          "path": "deer/animations/defensive-kick/{direction}/frame_{frame}.png"
+        }
+      }
+    }
+  },
+  "background": {
+    "name": "Forest Clearing",
+    "description": "moonlit forest at night",
+    "fallbackColor": "#0d1a0d"
+  },
+  "actionMapping": {
+    "bites": "bite",
+    "pounces on": "pounce",
+    "lunges at": "pounce",
+    "snaps at": "bite",
+    "flees from": "flee",
+    "kicks at": "defensive-kick",
+    "tries to escape": "flee",
+    "defends against": "defensive-kick"
+  },
+  "recordingFile": "../mock-recordings/wolf-vs-deer.json"
+}

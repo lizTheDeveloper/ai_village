@@ -182,15 +182,21 @@ export class DeathBargainSystem implements System {
 
   /**
    * Offer a death bargain to a dying hero
+   *
+   * The God of Death will deliver a THEATRICAL PERFORMANCE
+   * pretending to care about destiny and morality,
+   * while actually deciding based on entertainment value.
    */
-  offerDeathBargain(
+  async offerDeathBargain(
     world: World,
     entity: Entity,
     deathLocation: { x: number; y: number },
     causeOfDeath: string
-  ): void {
+  ): Promise<void> {
     const soulIdentity = entity.components.get('soul_identity') as SoulIdentityComponent | undefined;
     const destinyText = soulIdentity?.destiny;
+    const identity = entity.components.get('identity') as any;
+    const heroName = identity?.name || 'mortal';
 
     // Manifest or move the God of Death
     const deathGod = this.manifestGodOfDeath(world, deathLocation);
@@ -212,8 +218,19 @@ export class DeathBargainSystem implements System {
       destinyText
     );
 
-    // Opening dialogue - visible to nearby agents
-    const dialogue = [
+    // Generate THEATRICAL PERFORMANCE speech
+    // The God of Death pretends to weigh moral factors but actually cares about drama
+    const performanceSpeech = await this.generatePerformanceSpeech(
+      world,
+      entity,
+      destinyText,
+      causeOfDeath,
+      deathGodName
+    );
+
+    // Opening dialogue - THEATRICAL PERFORMANCE
+    const dialogue = performanceSpeech || [
+      // Fallback to classic dialogue if LLM fails
       `Mortal, your thread was to be cut this day.`,
       `But I see in you a grand destiny yet unfulfilled...`,
       `"${destinyText}"`,
@@ -233,7 +250,7 @@ export class DeathBargainSystem implements System {
 
     (entity as any).addComponent(bargain);
 
-    // Emit event
+    // Emit event with intervention opportunity
     world.eventBus.emit({
       type: 'death:bargain_offered',
       source: 'death_bargain_system',
@@ -244,8 +261,23 @@ export class DeathBargainSystem implements System {
         challengeType,
         destiny: destinyText,
         location: deathLocation,
+        heroName,
+        interventionWindow: 100, // Gods have 100 ticks to intervene via divine chat
       },
     });
+
+    // Log to divine chat that intervention is possible
+    const systemRegistry = (world as any).systemRegistry;
+    if (systemRegistry) {
+      const chatRoomSystem = systemRegistry.get('chat_rooms');
+      if (chatRoomSystem) {
+        (chatRoomSystem as any).sendSystemMessage(
+          world,
+          'divine_chat',
+          `${deathGodName} is judging ${heroName}. Fellow gods may speak on their behalf...`
+        );
+      }
+    }
   }
 
   /**
@@ -741,6 +773,349 @@ Answer ONLY with "YES" or "NO".`;
         failedChallenge: bargain.challengeType,
       },
     });
+  }
+
+  // ============================================================================
+  // ENTERTAINMENT VALUE CALCULATION (The God of Death's TRUE criteria)
+  // ============================================================================
+
+  /**
+   * Calculate entertainment value of a death
+   *
+   * The God of Death PRETENDS to care about destiny and morality,
+   * but actually decides based on:
+   * - How many observers are watching (more audience = more fun)
+   * - How dramatic the death was (combat > starvation)
+   * - Narrative potential (unfinished quests, relationships)
+   * - Divine politics (which gods are watching and would be amused)
+   *
+   * Returns 0.0 to 1.0 (0.3+ threshold for bargain offer)
+   */
+  private calculateEntertainmentValue(
+    world: World,
+    entity: Entity,
+    deathLocation: { x: number; y: number }
+  ): number {
+    let score = 0;
+
+    // AUDIENCE FACTOR (0-0.4): More observers = more theatrical
+    const witnessCount = this.countNearbyWitnesses(world, deathLocation);
+    const observingGods = this.getObservingGods(world);
+    const playerIsWatching = this.isPlayerWatching(world, entity);
+
+    // Each mortal witness adds value (cap at 5)
+    score += Math.min(witnessCount * 0.05, 0.25);
+
+    // Each observing god adds value (cap at 3 gods)
+    score += Math.min(observingGods.length * 0.1, 0.3);
+
+    // Player watching is HUGE (the main audience!)
+    if (playerIsWatching) {
+      score += 0.4;
+    }
+
+    // DEATH DRAMA FACTOR (0-0.3): How exciting was the death?
+    const causeOfDeath = this.determineCauseOfDeath(entity);
+    const dramaRating = this.rateDeathDrama(causeOfDeath);
+    score += dramaRating * 0.3;
+
+    // NARRATIVE POTENTIAL (0-0.3): Unfinished business
+    const narrativePotential = this.assessNarrativePotential(entity);
+    score += narrativePotential * 0.3;
+
+    return Math.min(score, 1.0);
+  }
+
+  /**
+   * Rate how dramatic a death cause is (0.0 to 1.0)
+   */
+  private rateDeathDrama(cause: string): number {
+    const lowerCause = cause.toLowerCase();
+
+    // Exciting deaths
+    if (lowerCause.includes('combat') || lowerCause.includes('battle')) return 1.0;
+    if (lowerCause.includes('dragon') || lowerCause.includes('monster')) return 1.0;
+    if (lowerCause.includes('sacrifice') || lowerCause.includes('heroic')) return 0.9;
+    if (lowerCause.includes('duel') || lowerCause.includes('assassin')) return 0.8;
+
+    // Moderately interesting deaths
+    if (lowerCause.includes('poison') || lowerCause.includes('betrayal')) return 0.6;
+    if (lowerCause.includes('accident') || lowerCause.includes('fall')) return 0.5;
+    if (lowerCause.includes('exposure') || lowerCause.includes('cold')) return 0.4;
+
+    // Boring deaths (God of Death is less interested)
+    if (lowerCause.includes('starvation') || lowerCause.includes('hunger')) return 0.2;
+    if (lowerCause.includes('old age') || lowerCause.includes('natural')) return 0.1;
+    if (lowerCause.includes('disease') || lowerCause.includes('illness')) return 0.3;
+
+    return 0.5; // Unknown cause = moderate interest
+  }
+
+  /**
+   * Assess narrative potential (unfinished quests, relationships, etc.)
+   */
+  private assessNarrativePotential(entity: Entity): number {
+    let potential = 0;
+
+    // Check for unfinished goals in memories
+    const memories = entity.components.get('episodic_memory') as any;
+    if (memories?.memories) {
+      const memoryArray = Array.from(memories.memories as any[]);
+      const unfinishedGoals = memoryArray.filter(
+        (m: any) =>
+          m.importance > 5 &&
+          (m.description.includes('quest') || m.description.includes('goal') || m.description.includes('promise'))
+      );
+      potential += Math.min(unfinishedGoals.length * 0.2, 0.4);
+    }
+
+    // Check for relationships (people who would miss them)
+    const relationships = entity.components.get('relationship') as any;
+    if (relationships?.relationships) {
+      const closeRelationships = Array.from(relationships.relationships.values() as any[]).filter(
+        (r: any) => r.value > 50 // Strong positive relationships
+      );
+      potential += Math.min(closeRelationships.length * 0.1, 0.3);
+    }
+
+    // Check soul identity for destiny keywords
+    const soulIdentity = entity.components.get('soul_identity') as SoulIdentityComponent | undefined;
+    if (soulIdentity?.destiny) {
+      const destiny = soulIdentity.destiny.toLowerCase();
+      if (destiny.includes('save') || destiny.includes('unite')) potential += 0.3;
+      if (destiny.includes('defeat') || destiny.includes('conquer')) potential += 0.2;
+    }
+
+    return Math.min(potential, 1.0);
+  }
+
+  /**
+   * Determine cause of death from entity state
+   */
+  private determineCauseOfDeath(entity: Entity): string {
+    const needs = entity.components.get('needs') as any;
+    const health = entity.components.get('health') as any;
+
+    if (!needs || !health) {
+      return 'unknown causes';
+    }
+
+    // Check what killed them
+    if (needs.hunger <= 0) return 'starvation';
+    if (needs.warmth <= 0) return 'exposure';
+    if (health.current <= 0) return 'combat'; // Assume combat if health depleted
+
+    return 'unknown causes';
+  }
+
+  /**
+   * Check if player is watching this entity
+   * TODO: Implement player focus/camera system
+   */
+  private isPlayerWatching(_world: World, _entity: Entity): boolean {
+    // Placeholder: In future, check if player camera is focused on this entity
+    // or if entity is selected, or if player has this entity favorited
+    return false;
+  }
+
+  // ============================================================================
+  // THEATRICAL PERFORMANCE LAYER
+  // ============================================================================
+
+  /**
+   * Generate theatrical performance speech
+   *
+   * The God of Death PRETENDS to carefully weigh moral factors:
+   * - Destiny and purpose
+   * - Deeds and character
+   * - Unfinished business
+   *
+   * But this is all THEATER! The real decision was already made
+   * based on entertainment value. This is just for show.
+   */
+  private async generatePerformanceSpeech(
+    world: World,
+    entity: Entity,
+    destinyText: string | undefined,
+    causeOfDeath: string,
+    deathGodName: string
+  ): Promise<string[] | null> {
+    if (!this.llmProvider) {
+      return null; // Fall back to default dialogue
+    }
+
+    try {
+      // Gather context for the performance
+      const identity = entity.components.get('identity') as any;
+      const heroName = identity?.name || 'mortal';
+
+      const memories = entity.components.get('episodic_memory') as any;
+      let notableDeeds = '';
+      if (memories?.memories) {
+        const memoryArray = Array.from(memories.memories as any[]);
+        const important = memoryArray
+          .filter((m: any) => m.importance > 7)
+          .slice(0, 3)
+          .map((m: any) => m.description);
+        if (important.length > 0) {
+          notableDeeds = important.join('; ');
+        }
+      }
+
+      const observingGods = this.getObservingGods(world);
+      const witnessCount = this.countNearbyWitnesses(
+        world,
+        entity.components.get('position') as any || { x: 0, y: 0 }
+      );
+
+      const prompt = `You are ${deathGodName}, weighing whether to offer a dying hero a chance to return to life.
+
+Hero: ${heroName}
+Cause of Death: ${causeOfDeath}
+Destiny: ${destinyText || 'No grand destiny recorded'}
+Notable Deeds: ${notableDeeds || 'None recorded'}
+
+Audience: ${observingGods.length} gods watching, ${witnessCount} mortal witnesses nearby
+
+Generate a THEATRICAL SPEECH (4-7 lines) where you:
+1. Acknowledge their death
+2. PRETEND to carefully weigh their destiny, deeds, and character
+3. Act like you're making a difficult moral decision
+4. Offer them a riddle challenge to return to life
+5. Warn of the consequences of failure
+
+Make it dramatic and theatrical - you're putting on a show for the audience!
+The speech should feel like you deeply care about morality, but subtle readers might notice you're more interested in the drama.
+
+Return ONLY the dialogue lines, one per line. No quotes, no stage directions.`;
+
+      const response = await this.llmProvider.generate({
+        prompt,
+        temperature: 0.8, // Higher temperature for creative dramatic speech
+        maxTokens: 300,
+      });
+
+      // Split into lines and clean up
+      const lines = response.text
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0 && !line.startsWith('[') && !line.startsWith('('))
+        .slice(0, 7); // Cap at 7 lines
+
+      if (lines.length >= 4) {
+        return lines;
+      }
+
+      return null; // Not enough lines, use fallback
+    } catch (error) {
+      console.error('[DeathBargainSystem] Failed to generate performance speech:', error);
+      return null;
+    }
+  }
+
+  // ============================================================================
+  // PLAYER INTERVENTION (Gods can negotiate with Death)
+  // ============================================================================
+
+  /**
+   * Check if player has intervened via divine chat
+   *
+   * The player (as a god) can send messages to the God of Death
+   * to argue for sparing an agent. The God of Death evaluates
+   * the argument's quality and may be persuaded!
+   *
+   * Returns intervention bonus (0.0 to 0.5)
+   */
+  async checkPlayerIntervention(
+    world: World,
+    entity: Entity,
+    bargain: DeathBargainComponent
+  ): Promise<number> {
+    // Get divine chat messages from the past few ticks
+    const systemRegistry = (world as any).systemRegistry;
+    if (!systemRegistry) return 0;
+
+    const chatRoomSystem = systemRegistry.get('chat_rooms');
+    if (!chatRoomSystem) return 0;
+
+    const divineChat = (chatRoomSystem as any).getRoom(world, 'divine_chat');
+    if (!divineChat) return 0;
+
+    // Look for recent messages about this entity
+    const recentMessages = divineChat.messages
+      .slice(-20) // Last 20 messages
+      .filter((msg: any) => {
+        const ticksSince = world.tick - msg.tick;
+        return ticksSince < 100; // Within last 100 ticks
+      });
+
+    // Check if any message mentions this entity or contains intervention keywords
+    const identity = entity.components.get('identity') as any;
+    const entityName = identity?.name?.toLowerCase() || '';
+
+    const interventionMessages = recentMessages.filter((msg: any) => {
+      const content = msg.content.toLowerCase();
+      const isAboutEntity = entityName && content.includes(entityName);
+      const hasInterventionKeywords =
+        content.includes('spare') ||
+        content.includes('save') ||
+        content.includes('protect') ||
+        content.includes('let them live') ||
+        content.includes('give them a chance') ||
+        content.includes('under my protection');
+
+      return isAboutEntity || hasInterventionKeywords;
+    });
+
+    if (interventionMessages.length === 0) {
+      return 0; // No intervention
+    }
+
+    // Evaluate intervention quality with LLM (if available)
+    if (this.llmProvider) {
+      try {
+        const interventionText = interventionMessages.map((m: any) => `${m.senderName}: ${m.content}`).join('\n');
+
+        const prompt = `You are the God of Death evaluating a fellow deity's argument to spare a dying mortal.
+
+Mortal: ${identity?.name || 'Unknown'}
+Cause of Death: ${bargain.causeOfDeath}
+Destiny: ${bargain.destinyText}
+
+Fellow God's Argument:
+${interventionText}
+
+How persuasive is this argument? Consider:
+- Eloquence and passion
+- Valid reasons (unfinished destiny, divine protection, etc.)
+- Whether it would be entertaining to grant the request
+- Divine politics and respect between gods
+
+Rate the persuasiveness from 0.0 (not persuasive) to 1.0 (very persuasive).
+Respond with ONLY a number between 0.0 and 1.0.`;
+
+        const response = await this.llmProvider.generate({
+          prompt,
+          temperature: 0.3,
+          maxTokens: 10,
+        });
+
+        const rating = parseFloat(response.text.trim());
+        if (!isNaN(rating) && rating >= 0 && rating <= 1) {
+          // Cap intervention bonus at 0.5 (can't guarantee bargain, but helps a lot)
+          return rating * 0.5;
+        }
+      } catch (error) {
+        console.error('[DeathBargainSystem] Failed to evaluate player intervention:', error);
+      }
+    }
+
+    // Fallback: Simple keyword-based evaluation
+    const totalLength = interventionMessages.reduce((sum: number, m: any) => sum + m.content.length, 0);
+    const effortBonus = Math.min(totalLength / 200, 0.3); // Longer arguments = more effort
+    const messageBonus = Math.min(interventionMessages.length * 0.1, 0.2); // Multiple pleas
+
+    return effortBonus + messageBonus;
   }
 
   /**

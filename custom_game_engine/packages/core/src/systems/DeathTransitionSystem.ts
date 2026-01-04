@@ -126,11 +126,13 @@ export class DeathTransitionSystem implements System {
     }
 
     // Check if hero qualifies for death bargain (chance to cheat death)
-    if (this.deathBargainSystem && this.deathBargainSystem.qualifiesForDeathBargain(entity)) {
+    // The God of Death decides based on entertainment value (not random chance!)
+    if (this.deathBargainSystem && this.deathBargainSystem.qualifiesForDeathBargain(entity, world)) {
       const position = entity.components.get('position') as PositionComponent | undefined;
       const deathLocation = position ? { x: position.x, y: position.y } : { x: 0, y: 0 };
       const causeOfDeath = this.determineCauseOfDeath(entity);
 
+      // Offer bargain (async but we don't await - it's a fire-and-forget)
       this.deathBargainSystem.offerDeathBargain(world, entity, deathLocation, causeOfDeath);
 
       // Don't transition to afterlife yet - wait for bargain resolution

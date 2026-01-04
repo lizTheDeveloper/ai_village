@@ -31,9 +31,10 @@ import { SpellRegistry } from '../magic/SpellRegistry.js';
 import { SpellEffectExecutor } from '../magic/SpellEffectExecutor.js';
 import {
   isPowerAvailable,
-  calculateEffectiveCost,
-  type DivinePowerType,
+  calculateEffectivePowerCost,
+  type PowerConfig,
 } from '../divinity/UniverseConfig.js';
+import type { DivinePowerType } from '../divinity/DivinePowerTypes.js';
 
 /**
  * Simplified presence data for crossing calculations.
@@ -183,6 +184,30 @@ export class DivinePowerSystem implements System {
   }
 
   /**
+   * Get the power config from the world's divine config
+   */
+  private getPowerConfig(world: World): PowerConfig | undefined {
+    const divineConfig = (world as any).divineConfig;
+    return divineConfig?.powers;
+  }
+
+  /**
+   * Calculate the effective cost for a power, applying universe config multipliers
+   */
+  private getEffectiveCost(
+    baseCost: number,
+    powerType: DivinePowerType,
+    world: World,
+    isOffDomain: boolean = false
+  ): number {
+    const powerConfig = this.getPowerConfig(world);
+    if (!powerConfig) {
+      return baseCost; // No config, use base cost
+    }
+    return calculateEffectivePowerCost(baseCost, powerType, powerConfig, isOffDomain);
+  }
+
+  /**
    * Execute a divine power
    */
   private _executePower(world: World, request: DivinePowerRequest, currentTick: number): void {
@@ -194,6 +219,12 @@ export class DivinePowerSystem implements System {
     const deityComp = deityEntity.components.get(CT.Deity) as DeityComponent;
     if (!deityComp) {
       throw new Error(`Entity ${request.deityId} has no deity component`);
+    }
+
+    // Check if power is available in this universe
+    const powerConfig = this.getPowerConfig(world);
+    if (powerConfig && !isPowerAvailable(request.powerType as DivinePowerType, powerConfig)) {
+      throw new Error(`Power '${request.powerType}' is disabled in this universe`);
     }
 
     // Execute based on power type
@@ -249,7 +280,8 @@ export class DivinePowerSystem implements System {
     request: DivinePowerRequest,
     currentTick: number
   ): void {
-    const cost = 5;
+    const baseCost = 5;
+    const cost = this.getEffectiveCost(baseCost, 'whisper', world);
 
     if (!deityComp.spendBelief(cost)) {
       throw new Error('Insufficient belief for whisper');
@@ -328,7 +360,8 @@ export class DivinePowerSystem implements System {
     request: DivinePowerRequest,
     currentTick: number
   ): void {
-    const cost = 10;
+    const baseCost = 10;
+    const cost = this.getEffectiveCost(baseCost, 'dream_hint', world);
 
     if (!deityComp.spendBelief(cost)) {
       throw new Error('Insufficient belief for dream hint');
@@ -406,7 +439,8 @@ export class DivinePowerSystem implements System {
     request: DivinePowerRequest,
     currentTick: number
   ): void {
-    const cost = 50;
+    const baseCost = 50;
+    const cost = this.getEffectiveCost(baseCost, 'clear_vision', world);
 
     if (!deityComp.spendBelief(cost)) {
       throw new Error('Insufficient belief for clear vision');

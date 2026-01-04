@@ -1,0 +1,1865 @@
+{
+  "recordingId": "combat_wolf-vs-deer_1767527680914",
+  "title": "WOLF VS DEER - The Hunt",
+  "description": "A hungry wolf stalks and pursues a graceful deer in the moonlit forest",
+  "combatId": "wolf-vs-deer",
+  "recordedBy": "Combat Arena System",
+  "recordedAt": 1767527680914,
+  "duration": 250,
+  "quality": 0.95,
+  "frames": [
+    {
+      "tick": 0,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 311.76145087599383,
+          "y": 271.60534578199076,
+          "facingAngle": 30.48234077794476,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 30.73415225557272
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 360,
+          "y": 300,
+          "facingAngle": -149.51765922205527,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 60
+        }
+      ]
+    },
+    {
+      "tick": 5,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 315.6139940685757,
+          "y": 274.343232628319,
+          "facingAngle": 36.28798848156871,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 30.0344222973919
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 364.11047065243537,
+          "y": 309.95178587622195,
+          "facingAngle": -143.7120115184313,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 64.87827440216753
+        }
+      ]
+    },
+    {
+      "tick": 10,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 319.4964554003646,
+          "y": 276.88577270818143,
+          "facingAngle": 43.40837086342508,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 30.238704940460927
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 366.1931344344395,
+          "y": 321.05755198399237,
+          "facingAngle": -136.59162913657494,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 69.4618711367202
+        }
+      ]
+    },
+    {
+      "tick": 15,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 323.6380124096774,
+          "y": 279.4304763542863,
+          "facingAngle": 51.68425032336585,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 31.33466026130867
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 365.77114967606815,
+          "y": 332.75014111644896,
+          "facingAngle": -128.31574967663414,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 73.47391287293117
+        }
+      ]
+    },
+    {
+      "tick": 20,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 328.1392530331949,
+          "y": 282.27573176953587,
+          "facingAngle": 60.957533791075534,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 33.256085842618475
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 362.5794886003785,
+          "y": 344.2991027641003,
+          "facingAngle": -119.04246620892448,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 76.67204770442241
+        }
+      ]
+    },
+    {
+      "tick": 25,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 332.93977115215387,
+          "y": 285.7577318367829,
+          "facingAngle": 71.09663276002145,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 35.88691580491775
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 356.6167516598271,
+          "y": 354.89927312019404,
+          "facingAngle": -108.90336723997856,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 78.86308868942552
+        }
+      ]
+    },
+    {
+      "tick": 30,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 337.8137538612849,
+          "y": 290.17926874049675,
+          "facingAngle": 81.99798705585957,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 39.06823189694184
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 348.15935624799454,
+          "y": 363.7732941663171,
+          "facingAngle": -98.00201294414045,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 79.9146835259007
+        }
+      ]
+    },
+    {
+      "tick": 35,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 342.39457670563854,
+          "y": 295.74208189226005,
+          "facingAngle": 93.57703967425594,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 42.60786313185032
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 337.73550776874976,
+          "y": 370.2724482746622,
+          "facingAngle": -86.42296032574407,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 79.76330944162517
+        }
+      ]
+    },
+    {
+      "tick": 40,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 346.2247667029492,
+          "y": 302.4939246806236,
+          "facingAngle": 105.75483004901739,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 46.291994092442195
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 326.0626353439057,
+          "y": 373.9603885278537,
+          "facingAngle": -74.24516995098263,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 78.41811035889909
+        }
+      ]
+    },
+    {
+      "tick": 45,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 348.82360655840154,
+          "y": 310.29921838955534,
+          "facingAngle": 118.4429709709978,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 49.89808069260123
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 313.9576766834354,
+          "y": 374.6669753310503,
+          "facingAngle": -61.557029029002216,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 75.9603445456048
+        }
+      ]
+    },
+    {
+      "tick": 50,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 349.76178525206825,
+          "y": 318.8384498882461,
+          "facingAngle": 131.52910823128403,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 53.208293203831644
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 302.2338266196255,
+          "y": 372.50407254863694,
+          "facingAngle": -48.47089176871598,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 72.53847611788214
+        }
+      ]
+    },
+    {
+      "tick": 55,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 348.73130569664545,
+          "y": 327.636930073223,
+          "facingAngle": 144.86563713062426,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 56.02267450570464
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 291.5994539131417,
+          "y": 367.8410789502201,
+          "facingAngle": -35.13436286937574,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 68.35920689773563
+        }
+      ]
+    },
+    {
+      "tick": 60,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 345.5995302683816,
+          "y": 336.1188804757165,
+          "facingAngle": 158.26496118081434,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 58.17121872125548
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 282.57451174627533,
+          "y": 361.24423855350153,
+          "facingAngle": -21.735038819185657,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 63.67499035633142
+        }
+      ]
+    },
+    {
+      "tick": 65,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 340.43867560132435,
+          "y": 343.67879155167543,
+          "facingAngle": 171.5034166399011,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 59.524140613736364
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 275.4369796579787,
+          "y": 353.38939740268285,
+          "facingAngle": -8.496583360098885,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 58.76878187732113
+        }
+      ]
+    },
+    {
+      "tick": 70,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 333.52587647181133,
+          "y": 349.7592348826381,
+          "facingAngle": -175.66733321787655,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 59.99971541023092
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 270.2071199951568,
+          "y": 344.9619672687313,
+          "facingAngle": 4.332666782123457,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 53.93694651773914
+        }
+      ]
+    },
+    {
+      "tick": 75,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 325.31352421192383,
+          "y": 353.9232503167707,
+          "facingAngle": -163.50639841762114,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 59.56921547874174
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 266.67136247732475,
+          "y": 336.5597737796771,
+          "facingAngle": 16.493601582378844,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 49.4713567424529
+        }
+      ]
+    },
+    {
+      "tick": 80,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 316.3742241386292,
+          "y": 355.9102367836476,
+          "facingAngle": -152.27321053713007,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 58.25864565320417
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 264.44139019805726,
+          "y": 328.61390685156005,
+          "facingAngle": 27.72678946286992,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 45.64176153871116
+        }
+      ]
+    },
+    {
+      "tick": 85,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 307.32867661496635,
+          "y": 355.66682553896294,
+          "facingAngle": -142.22255874377512,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 56.147172382160896
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 263.0384757729337,
+          "y": 321.33974596215563,
+          "facingAngle": 37.77744125622488,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 42.679491924311236
+        }
+      ]
+    },
+    {
+      "tick": 90,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 298.76744241560044,
+          "y": 353.348104950263,
+          "facingAngle": -133.59877385740293,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 53.3623415901433
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 261.98918027149136,
+          "y": 314.7254700128036,
+          "facingAngle": 46.40122614259707,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 40.76348713654365
+        }
+      ]
+    },
+    {
+      "tick": 95,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 291.178485957517,
+          "y": 349.28918279131403,
+          "facingAngle": -126.61182398621511,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 50.07237412223723
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 260.91680129161307,
+          "y": 308.5593526131404,
+          "facingAngle": 53.3881760137849,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 40.009485605732685
+        }
+      ]
+    },
+    {
+      "tick": 100,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 284.8914529159584,
+          "y": 343.95168675954375,
+          "facingAngle": -121.36978036240673,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 46.47600417419462
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 259.61371142831814,
+          "y": 302.49094101610257,
+          "facingAngle": 58.63021963759327,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 40.463033644807986
+        }
+      ]
+    },
+    {
+      "tick": 105,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 280.0469805435432,
+          "y": 337.8536883936387,
+          "facingAngle": -117.7551323691856,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 42.79047452918046
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 258.0828430736376,
+          "y": 296.1158033991039,
+          "facingAngle": 62.2448676308144,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 42.09673417289878
+        }
+      ]
+    },
+    {
+      "tick": 110,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 276.5953803976014,
+          "y": 331.4940771552046,
+          "facingAngle": -115.2999377409303,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 39.238413762421146
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 256.5415550655326,
+          "y": 289.0697623592942,
+          "facingAngle": 64.70006225906971,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 44.81190166690585
+        }
+      ]
+    },
+    {
+      "tick": 115,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 274.3244003269548,
+          "y": 325.2832100011909,
+          "facingAngle": -113.20829732184096,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 36.034388111008624
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 255.3871711126639,
+          "y": 281.1170091512617,
+          "facingAngle": 66.79170267815904,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 48.44452337183497
+        }
+      ]
+    },
+    {
+      "tick": 120,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 272.91119801146976,
+          "y": 319.49059286184854,
+          "facingAngle": -110.61353333288723,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 33.37194035833309
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 255.12964895085986,
+          "y": 272.2174548604051,
+          "facingAngle": 69.38646666711277,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 52.77516667625693
+        }
+      ]
+    },
+    {
+      "tick": 125,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 271.98986511806555,
+          "y": 314.2175849415458,
+          "facingAngle": -106.89344473503279,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 31.411898663949472
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 256.3021444433191,
+          "y": 262.5619694034911,
+          "facingAngle": 73.10655526496723,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 57.54223418670572
+        }
+      ]
+    },
+    {
+      "tick": 130,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 271.2234284022678,
+          "y": 309.39909383064054,
+          "facingAngle": -101.78765749267663,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 30.27266155719698
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 259.3638345719998,
+          "y": 252.56926555811606,
+          "facingAngle": 78.21234250732337,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 62.4577658132943
+        }
+      ]
+    },
+    {
+      "tick": 135,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 270.3686023853858,
+          "y": 304.83358696511414,
+          "facingAngle": -95.30672997836389,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 30.02304594048851
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 264.6106855943122,
+          "y": 242.84429476158647,
+          "facingAngle": 84.69327002163611,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 67.22483332374306
+        }
+      ]
+    },
+    {
+      "tick": 140,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 269.32277931772046,
+          "y": 300.2362187153482,
+          "facingAngle": -87.58776008202494,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 30.67813012670036
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 272.1086860536168,
+          "y": 234.10416673394167,
+          "facingAngle": 92.41223991797509,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 71.55547662816502
+        }
+      ]
+    },
+    {
+      "tick": 145,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 268.1456228821124,
+          "y": 295.306179439851,
+          "facingAngle": -78.79484580460498,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 32.19834301667525
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 281.66059122770054,
+          "y": 227.08281261026633,
+          "facingAngle": 101.20515419539504,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 75.18809833309412
+        }
+      ]
+    },
+    {
+      "tick": 150,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 267.05172510953753,
+          "y": 289.797098246887,
+          "facingAngle": -69.07408905946163,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 34.491854436100645
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 292.81199346529985,
+          "y": 222.4290557709582,
+          "facingAngle": 110.92591094053839,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 77.90326582710128
+        }
+      ]
+    },
+    {
+      "tick": 155,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 266.3754419991051,
+          "y": 283.57883537143886,
+          "facingAngle": -58.542386109718265,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 37.420122240765785
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 304.8963677199705,
+          "y": 220.61388912323656,
+          "facingAngle": 121.45761389028176,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 79.53696635519202
+        }
+      ]
+    },
+    {
+      "tick": 160,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 266.5135039583453,
+          "y": 276.6803617370393,
+          "facingAngle": -47.29230566793742,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 40.806261111048826
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 317.1126173716393,
+          "y": 221.86140057723486,
+          "facingAngle": 132.70769433206257,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 79.99051439426731
+        }
+      ]
+    },
+    {
+      "tick": 165,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 267.8545917267599,
+          "y": 269.3064270446489,
+          "facingAngle": -35.40378259548137,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 44.44572750916282
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 328.62352992965475,
+          "y": 226.11415219998588,
+          "facingAngle": 144.59621740451863,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 79.23651286345641
+        }
+      ]
+    },
+    {
+      "tick": 170,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 270.70720642445997,
+          "y": 261.8248881709564,
+          "facingAngle": -22.958589072550897,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 48.11867536226641
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 338.6602540378443,
+          "y": 233.03847577293365,
+          "facingAngle": 157.0414109274491,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 77.32050807568876
+        }
+      ]
+    },
+    {
+      "tick": 175,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 275.23750376407787,
+          "y": 254.72624648380992,
+          "facingAngle": -10.055406022967887,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 51.603236112464806
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 346.6169498557327,
+          "y": 242.06894085886228,
+          "facingAngle": 169.94459397703216,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 74.35823846128882
+        }
+      ]
+    },
+    {
+      "tick": 180,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 281.42725157065655,
+          "y": 248.56138523378795,
+          "facingAngle": 3.1768633021089543,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 54.68892093730181
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 352.121296286802,
+          "y": 252.48516028508837,
+          "facingAngle": -176.82313669789107,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 70.52864325754712
+        }
+      ]
+    },
+    {
+      "tick": 185,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 289.0589440231331,
+          "y": 243.86700260613486,
+          "facingAngle": 16.570689244575153,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 57.18933556449668
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 355.070318957803,
+          "y": 263.50908324958243,
+          "facingAngle": -163.42931075542484,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 66.0630534822609
+        }
+      ]
+    },
+    {
+      "tick": 190,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 297.730858548683,
+          "y": 241.09024663886407,
+          "facingAngle": 29.919406813489577,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 58.95343962820109
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 355.62643521566,
+          "y": 274.4077789556073,
+          "facingAngle": -150.0805931865104,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 61.23121812267888
+        }
+      ]
+    },
+    {
+      "tick": 195,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 306.9001428197074,
+          "y": 240.52425546083995,
+          "facingAngle": 42.985285495222556,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 59.874670432661134
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 354.1748386272368,
+          "y": 284.5859294450747,
+          "facingAngle": -137.01471450477746,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 56.325009643668615
+        }
+      ]
+    },
+    {
+      "tick": 200,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 315.9476121623122,
+          "y": 242.2646573039317,
+          "facingAngle": 55.51296087451536,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 59.89737999204954
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 351.24938221041214,
+          "y": 293.6539512070926,
+          "facingAngle": -124.48703912548466,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 51.64079310226431
+        }
+      ]
+    },
+    {
+      "tick": 205,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 324.254518403538,
+          "y": 246.19384855734606,
+          "facingAngle": 67.24223120543425,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 59.02019650981665
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 347.43901381696696,
+          "y": 301.46158040711487,
+          "facingAngle": -112.75776879456576,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 47.46152388211786
+        }
+      ]
+    },
+    {
+      "tick": 210,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 331.27966029400255,
+          "y": 251.99555481871636,
+          "facingAngle": 77.91558225194953,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 57.296107243608326
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 343.2897966310179,
+          "y": 308.092265454553,
+          "facingAngle": -102.0844177480505,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 44.0396554543952
+        }
+      ]
+    },
+    {
+      "tick": 215,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 336.62514218985444,
+          "y": 259.1974698699822,
+          "facingAngle": 87.28213342332302,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 54.8292577502018
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 339.2181436086996,
+          "y": 313.8199405936534,
+          "facingAngle": -92.71786657667698,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 41.58188964110093
+        }
+      ]
+    },
+    {
+      "tick": 220,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 340.0808619209409,
+          "y": 267.2354039477843,
+          "facingAngle": 95.10964765891919,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 51.768660855679855
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 335.4490150396319,
+          "y": 319.03571905157145,
+          "facingAngle": -84.89035234108083,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 40.236690558374804
+        }
+      ]
+    },
+    {
+      "tick": 225,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 341.6411405519295,
+          "y": 275.5290440176202,
+          "facingAngle": 101.22699605471654,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 48.299195367595054
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 331.98877310731166,
+          "y": 324.15680011751624,
+          "facingAngle": -78.77300394528348,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 40.085316474099315
+        }
+      ]
+    },
+    {
+      "tick": 230,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 341.4912697901103,
+          "y": 283.5576598177554,
+          "facingAngle": 105.62082335050611,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 44.630438262069276
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 328.63680039535717,
+          "y": 329.5326791079059,
+          "facingAngle": -74.3791766494939,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 41.13691131057447
+        }
+      ]
+    },
+    {
+      "tick": 235,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 339.9664579588579,
+          "y": 290.9241584424459,
+          "facingAngle": 108.57335275071623,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 40.984004950162976
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 325.0337570048898,
+          "y": 335.3641408823681,
+          "facingAngle": -71.42664724928379,
+          "animation": {
+            "state": "idle",
+            "frame": 3
+          },
+          "distanceFromCamera": 43.32795229557759
+        }
+      ]
+    },
+    {
+      "tick": 240,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 337.48995970237587,
+          "y": 297.3977848490797,
+          "facingAngle": 110.73462509307934,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 37.58016234900331
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 320.73846157673563,
+          "y": 341.64844528653936,
+          "facingAngle": -69.26537490692067,
+          "animation": {
+            "state": "idle",
+            "frame": 0
+          },
+          "distanceFromCamera": 46.526087127068855
+        }
+      ]
+    },
+    {
+      "tick": 245,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 334.5003985007154,
+          "y": 302.92918498493674,
+          "facingAngle": 112.9788815061362,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 34.62452341020947
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 315.32076890957285,
+          "y": 348.15990561681923,
+          "facingAngle": -67.02111849386381,
+          "animation": {
+            "state": "idle",
+            "frame": 1
+          },
+          "distanceFromCamera": 50.53812886327975
+        }
+      ]
+    },
+    {
+      "tick": 250,
+      "cameraX": 300,
+      "cameraY": 300,
+      "cameraAngle": 0,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "wolf_1",
+          "entityType": "gray_wolf",
+          "x": 331.3799263027939,
+          "y": 307.6359503709013,
+          "facingAngle": 116.08149833689772,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 32.29562683763303
+        },
+        {
+          "entityId": "deer_1",
+          "entityType": "wild_deer",
+          "x": 308.45521270922035,
+          "y": 354.4693859973157,
+          "facingAngle": -63.91850166310231,
+          "animation": {
+            "state": "idle",
+            "frame": 2
+          },
+          "distanceFromCamera": 55.12172559783244
+        }
+      ]
+    }
+  ],
+  "combatLog": [
+    {
+      "tick": 20,
+      "attacker": "Fang",
+      "defender": "Willow",
+      "action": "pounces on",
+      "damage": 25,
+      "renderableOperation": {
+        "actorType": "gray_wolf",
+        "actor": "Fang",
+        "action": "pounces on",
+        "weapon": "claws",
+        "target": "Willow"
+      }
+    },
+    {
+      "tick": 30,
+      "attacker": "Willow",
+      "defender": "Fang",
+      "action": "kicks at",
+      "damage": 15,
+      "renderableOperation": {
+        "actorType": "wild_deer",
+        "actor": "Willow",
+        "action": "kicks at",
+        "weapon": "hooves",
+        "target": "Fang"
+      }
+    },
+    {
+      "tick": 45,
+      "attacker": "Willow",
+      "defender": "Fang",
+      "action": "tries to escape",
+      "damage": 0,
+      "renderableOperation": {
+        "actorType": "wild_deer",
+        "actor": "Willow",
+        "action": "tries to escape",
+        "weapon": "speed",
+        "target": "Fang"
+      }
+    },
+    {
+      "tick": 65,
+      "attacker": "Fang",
+      "defender": "Willow",
+      "action": "bites",
+      "damage": 30,
+      "renderableOperation": {
+        "actorType": "gray_wolf",
+        "actor": "Fang",
+        "action": "bites",
+        "weapon": "fangs",
+        "target": "Willow"
+      }
+    },
+    {
+      "tick": 80,
+      "attacker": "Willow",
+      "defender": "Fang",
+      "action": "defends against",
+      "damage": 12,
+      "renderableOperation": {
+        "actorType": "wild_deer",
+        "actor": "Willow",
+        "action": "defends against",
+        "weapon": "antlers",
+        "target": "Fang"
+      }
+    },
+    {
+      "tick": 100,
+      "attacker": "Fang",
+      "defender": "Willow",
+      "action": "lunges at",
+      "damage": 35,
+      "renderableOperation": {
+        "actorType": "gray_wolf",
+        "actor": "Fang",
+        "action": "lunges at",
+        "weapon": "jaws",
+        "target": "Willow"
+      }
+    },
+    {
+      "tick": 115,
+      "attacker": "Willow",
+      "defender": "Fang",
+      "action": "flees from",
+      "damage": 0,
+      "renderableOperation": {
+        "actorType": "wild_deer",
+        "actor": "Willow",
+        "action": "flees from",
+        "weapon": "desperate sprint",
+        "target": "Fang"
+      }
+    },
+    {
+      "tick": 135,
+      "attacker": "Fang",
+      "defender": "Willow",
+      "action": "snaps at",
+      "damage": 20,
+      "renderableOperation": {
+        "actorType": "gray_wolf",
+        "actor": "Fang",
+        "action": "snaps at",
+        "weapon": "teeth",
+        "target": "Willow"
+      }
+    },
+    {
+      "tick": 155,
+      "attacker": "Willow",
+      "defender": "Fang",
+      "action": "kicks at",
+      "damage": 18,
+      "renderableOperation": {
+        "actorType": "wild_deer",
+        "actor": "Willow",
+        "action": "kicks at",
+        "weapon": "powerful kick",
+        "target": "Fang"
+      }
+    },
+    {
+      "tick": 175,
+      "attacker": "Fang",
+      "defender": "Willow",
+      "action": "pounces on",
+      "damage": 40,
+      "renderableOperation": {
+        "actorType": "gray_wolf",
+        "actor": "Fang",
+        "action": "pounces on",
+        "weapon": "killing lunge",
+        "target": "Willow"
+      }
+    },
+    {
+      "tick": 195,
+      "attacker": "Willow",
+      "defender": "Fang",
+      "action": "defends against",
+      "damage": 10,
+      "renderableOperation": {
+        "actorType": "wild_deer",
+        "actor": "Willow",
+        "action": "defends against",
+        "weapon": "last stand",
+        "target": "Fang"
+      }
+    },
+    {
+      "tick": 220,
+      "attacker": "Fang",
+      "defender": "Willow",
+      "action": "bites",
+      "damage": 45,
+      "renderableOperation": {
+        "actorType": "gray_wolf",
+        "actor": "Fang",
+        "action": "bites",
+        "weapon": "death bite",
+        "target": "Willow"
+      }
+    }
+  ]
+}
