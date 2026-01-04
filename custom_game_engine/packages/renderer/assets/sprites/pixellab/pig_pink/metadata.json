@@ -1,0 +1,18 @@
+{
+  "id": "pig_pink",
+  "base_species": "pig",
+  "variant": "pink",
+  "description": "pink pig",
+  "size": 48,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-04T00:47:15.157Z"
+}

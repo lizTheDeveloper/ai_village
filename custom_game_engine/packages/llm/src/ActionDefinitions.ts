@@ -11,7 +11,7 @@ import type { AgentBehavior } from '@ai-village/core';
  * Skill requirement for Progressive Skill Reveal System.
  */
 export interface ActionSkillRequirement {
-  skill: 'building' | 'farming' | 'gathering' | 'cooking' | 'crafting' | 'social' | 'exploration' | 'combat' | 'animal_handling' | 'medicine';
+  skill: 'building' | 'farming' | 'gathering' | 'cooking' | 'crafting' | 'social' | 'exploration' | 'combat' | 'animal_handling' | 'medicine' | 'research';
   level: 0 | 1 | 2 | 3 | 4 | 5;
 }
 
@@ -26,7 +26,7 @@ export interface ActionDefinition {
   /** Whether this action is always shown or contextually conditional */
   alwaysAvailable: boolean;
   /** Category for grouping */
-  category: 'movement' | 'social' | 'building' | 'farming' | 'gathering' | 'exploration' | 'survival' | 'animal' | 'priority';
+  category: 'movement' | 'social' | 'building' | 'farming' | 'gathering' | 'exploration' | 'survival' | 'animal' | 'priority' | 'knowledge';
   /** Skill requirement (optional - undefined means no skill required) */
   skillRequired?: ActionSkillRequirement;
 }
@@ -65,6 +65,9 @@ export const ACTION_DEFINITIONS: ActionDefinition[] = [
 
   // Exploration - systematic exploration of unknown areas
   { behavior: 'explore', description: 'Systematically explore unknown areas to find new resources', alwaysAvailable: true, category: 'exploration' },
+
+  // Research - conduct research to unlock new technologies
+  { behavior: 'research', description: 'Conduct research at a research building to unlock new technologies', alwaysAvailable: false, category: 'knowledge', skillRequired: { skill: 'research', level: 1 } },
 
   // Animal Husbandry - agent decides to work with animals
   { behavior: 'tame_animal', description: 'Approach and tame a wild animal', alwaysAvailable: true, category: 'animal', skillRequired: { skill: 'animal_handling', level: 2 } },
@@ -177,5 +180,10 @@ export const BEHAVIOR_SYNONYMS: Record<string, AgentBehavior> = {
   // Priority synonyms
   'prioritize': 'set_priorities',
   'focus': 'set_priorities',
+
+  // Research synonyms
+  'study': 'research',
+  'experiment': 'research',
+  'analyze': 'research',
 };
 
