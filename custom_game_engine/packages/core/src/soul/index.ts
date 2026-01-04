@@ -62,3 +62,16 @@ export {
   getSoulsInSnapshot,
   getSoulPosition,
 } from './SoulSnapshotUtils.js';
+
+// Soul Consolidation System
+export { SoulConsolidationSystem } from './SoulConsolidationSystem.js';
+
+// Soul-Influenced Dreams
+export type {
+  SoulDreamType,
+  SoulDream,
+} from './SoulInfluencedDreams.js';
+export {
+  generateSoulDream,
+  shouldReceiveSoulDream,
+} from './SoulInfluencedDreams.js';
