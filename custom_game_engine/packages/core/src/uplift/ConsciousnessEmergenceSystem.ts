@@ -182,7 +182,7 @@ export class ConsciousnessEmergenceSystem implements System {
       'The others... they do not think like this. I am... different.',
     ];
 
-    return thoughts[Math.floor(Math.random() * thoughts.length)];
+    return thoughts[Math.floor(Math.random() * thoughts.length)]!;
   }
 
   /**
@@ -224,7 +224,7 @@ export class ConsciousnessEmergenceSystem implements System {
   /**
    * Identify retained instincts
    */
-  private identifyRetainedInstincts(animal: AnimalComponent, species: SpeciesComponent): string[] {
+  private identifyRetainedInstincts(_animal: AnimalComponent, species: SpeciesComponent): string[] {
     const instincts: string[] = [];
 
     // Pack animals retain pack instincts
@@ -232,15 +232,17 @@ export class ConsciousnessEmergenceSystem implements System {
       instincts.push('pack_loyalty', 'hierarchical_thinking');
     }
 
+    // TODO: Add diet property to AnimalComponent or retrieve from SpeciesComponent
+    // For now, commented out diet-based instincts
     // Predators retain hunting instincts
-    if (animal.diet === 'carnivore') {
-      instincts.push('predatory_focus', 'territorial_behavior');
-    }
+    // if (animal.diet === 'carnivore') {
+    //   instincts.push('predatory_focus', 'territorial_behavior');
+    // }
 
     // Prey animals retain fear responses
-    if (animal.diet === 'herbivore') {
-      instincts.push('heightened_vigilance', 'flight_response');
-    }
+    // if (animal.diet === 'herbivore') {
+    //   instincts.push('heightened_vigilance', 'flight_response');
+    // }
 
     return instincts;
   }

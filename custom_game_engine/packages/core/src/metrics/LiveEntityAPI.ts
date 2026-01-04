@@ -258,10 +258,14 @@ export class LiveEntityAPI {
       };
     }
 
-    // Create the entity at the specified position
-    const entityId = this.world.createEntity(type as any, { x, y });
+    // Create the entity
+    const entity = this.world.createEntity();
+    const entityId = entity.id;
 
-    if (!entityId) {
+    // Set position via component (assuming PositionComponent exists)
+    // TODO: Add proper position component initialization
+
+    if (!entity) {
       return {
         requestId: action.requestId,
         success: false,

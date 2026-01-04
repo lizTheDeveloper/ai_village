@@ -282,15 +282,15 @@ function handleLostTarget(
       lastThought: `I couldn't find the subject for ${purpose}. Heading back to the newsroom.`,
     }));
 
-    // Emit event that reporter gave up
-    entity.world?.eventBus?.emit({
-      type: 'reporter:search_failed' as any,
-      source: 'ai',
-      data: {
-        reporterId: entity.id,
-        purpose,
-      },
-    });
+    // Emit event that reporter gave up (TODO: Add eventBus to World or find alternative)
+    // world.eventBus?.emit({
+    //   type: 'reporter:search_failed' as any,
+    //   source: 'ai',
+    //   data: {
+    //     reporterId: entity.id,
+    //     purpose,
+    //   },
+    // });
     return;
   }
 

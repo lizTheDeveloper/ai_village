@@ -7,6 +7,7 @@ export type AgentBehavior =
   | 'follow'
   | 'flee'
   | 'follow_agent'
+  | 'follow_reporting_target'  // Reporter behavior - follow entity while maintaining safe distance
   | 'talk'
   | 'pick'         // Unified: gather, harvest, collect, get (resources, food, seeds)
   | 'gather'       // Legacy - aliased to 'pick'

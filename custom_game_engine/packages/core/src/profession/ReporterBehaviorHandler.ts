@@ -91,19 +91,23 @@ function setReporterNavigation(
     }));
 
     console.log(`[ReporterBehavior] Following entity ${story.sourceEntityId} for: ${story.headline}`);
-  } else {
+  } else if (story.location) {
     // No entity - just navigate to fixed location
+    const location = story.location; // Destructure to help TypeScript narrow the type
     reporterEntity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
       ...current,
       behavior: 'navigate',
       behaviorState: {
-        target: { x: story.location.x, y: story.location.y },
+        target: { x: location.x, y: location.y },
         purpose: `covering story: ${story.headline}`,
       },
       lastThought: `I need to get to the scene to cover this story: ${story.headline}`,
     }));
 
-    console.log(`[ReporterBehavior] Navigating to location (${Math.floor(story.location.x)}, ${Math.floor(story.location.y)}) for: ${story.headline}`);
+    console.log(`[ReporterBehavior] Navigating to location (${Math.floor(location.x)}, ${Math.floor(location.y)}) for: ${story.headline}`);
+  } else {
+    // No entity and no location - story can't be covered
+    console.warn(`[ReporterBehavior] Story "${story.headline}" has no entity or location to cover`);
   }
 }
 

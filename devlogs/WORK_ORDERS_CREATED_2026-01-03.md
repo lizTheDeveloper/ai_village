@@ -6,33 +6,33 @@ Converted the code audit (`devlogs/TEMPORARY_CODE_AUDIT_2026-01-03.md`) into 8 a
 
 ## Work Orders Created
 
-All work orders placed in `agents/autonomous-dev/work-orders/`:
+All proposals placed in `openspec/changes/` (OpenSpec format):
 
 ### Critical Priority (4 work orders)
 
 1. **fix-llm-package-imports** ✅ LAUNCHED
-   - Location: `agents/autonomous-dev/work-orders/fix-llm-package-imports/`
+   - Location: `openspec/changes/fix-llm-package-imports/`
    - Priority: CRITICAL
    - Complexity: 1 system
    - Impact: Soul creation completely non-functional
    - Status: **Agent dispatched and working**
 
 2. **implement-item-instance-registry** 🟡 READY
-   - Location: `agents/autonomous-dev/work-orders/implement-item-instance-registry/`
+   - Location: `openspec/changes/implement-item-instance-registry/`
    - Priority: CRITICAL
    - Complexity: 2 systems
    - Impact: Equipment never breaks, items have no individual state
    - Status: Ready to launch from dashboard
 
 3. **complete-world-serialization** 🟡 READY
-   - Location: `agents/autonomous-dev/work-orders/complete-world-serialization/`
+   - Location: `openspec/changes/complete-world-serialization/`
    - Priority: CRITICAL
    - Complexity: 3 systems
    - Impact: Saves don't preserve complete world state
    - Status: Ready to launch from dashboard
 
 4. **re-enable-disabled-systems** 🟡 READY
-   - Location: `agents/autonomous-dev/work-orders/re-enable-disabled-systems/`
+   - Location: `openspec/changes/re-enable-disabled-systems/`
    - Priority: CRITICAL
    - Complexity: 4 systems
    - Impact: Combat and social dominance mechanics non-functional
@@ -41,28 +41,28 @@ All work orders placed in `agents/autonomous-dev/work-orders/`:
 ### High Priority (4 work orders)
 
 5. **implement-pathfinding-system** 🟡 READY
-   - Location: `agents/autonomous-dev/work-orders/implement-pathfinding-system/`
+   - Location: `openspec/changes/implement-pathfinding-system/`
    - Priority: HIGH
    - Complexity: 2 systems
    - Impact: Agents wander randomly instead of navigating intelligently
    - Status: Ready to launch from dashboard
 
 6. **implement-power-consumption** 🟡 READY
-   - Location: `agents/autonomous-dev/work-orders/implement-power-consumption/`
+   - Location: `openspec/changes/implement-power-consumption/`
    - Priority: HIGH
    - Complexity: 2 systems
    - Impact: Electric devices work indefinitely without power
    - Status: Ready to launch from dashboard
 
 7. **fix-permission-validation** 🟡 READY
-   - Location: `agents/autonomous-dev/work-orders/fix-permission-validation/`
+   - Location: `openspec/changes/fix-permission-validation/`
    - Priority: HIGH
    - Complexity: 1 system
    - Impact: Agents bypass authorization, access restricted resources
    - Status: Ready to launch from dashboard
 
 8. **add-memory-filtering-methods** 🟡 READY
-   - Location: `agents/autonomous-dev/work-orders/add-memory-filtering-methods/`
+   - Location: `openspec/changes/add-memory-filtering-methods/`
    - Priority: HIGH
    - Complexity: 1 system
    - Impact: Cannot filter memories by type, 3+ locations blocked
@@ -78,17 +78,17 @@ All work orders placed in `agents/autonomous-dev/work-orders/`:
 4. Click the "Resume" button
 5. Confirm the dialog
 
-### Work Order Format
+### OpenSpec Proposal Format
 
-Each work order contains:
-- `work-order.md` - Complete specification with:
-  - Overview
-  - Spec Reference (priority, complexity, status)
-  - Dependencies and blockers
-  - Requirements broken into phases
-  - Validation criteria
+Each proposal contains:
+- `proposal.md` - Complete specification with:
+  - Problem statement
+  - Proposed solution
+  - Requirements (with scenarios)
+  - Dependencies
+  - Risks and alternatives
   - Definition of done
-  - Implementation notes
+- `tasks.md` - Implementation tasks broken into phases
 
 ## Next Steps
 

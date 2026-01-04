@@ -719,9 +719,27 @@ With these additions, we can express plots based on classic dramatic situations:
 
 ---
 
-## Phase 6: Timeline & Fork Integration
+## Phase 6: Multiverse Ontology & Timeline Integration
 
-The plot system must integrate with the timeline/forking mechanics. Saves are timeline snapshots. Loads are time travel. Save interference creates universe forks.
+### The Ontology: All Universes Exist
+
+**Fundamental truth**: All universes exist. All forks persist. They run independently of observation.
+
+This is not a "save system" in the traditional sense. When you save, you're not creating a restore point - you're observing a timeline snapshot. When you "load," you're not undoing anything - you're shifting your observation to a different branch. The original branch continues without you.
+
+**Key implications for plots:**
+
+1. **Plots exist in ALL timelines** - A soul's grief arc isn't just happening in "your" playthrough. It's happening in every branch where that soul exists.
+
+2. **Souls span forks** - The Silver Thread connects a soul across ALL its incarnations AND all timeline branches. When a universe forks, there are now TWO versions of that soul. Both are real. Both accumulate wisdom. The eternal soul... contains both.
+
+3. **You can't undo** - Loading an earlier save doesn't erase the timeline you left. That version of the soul continues living. Their plots continue progressing. You just stopped watching.
+
+4. **Parallel plots are REAL** - The "Road Not Taken" isn't about imagining what could be. Another version of you IS living it, right now, in a universe that continues whether you observe it or not.
+
+5. **Wisdom accumulates across branches** - A soul's total wisdom may include lessons learned by parallel selves. Cross-fork resonance can occur.
+
+### Timeline Mechanics (Not "Saves")
 
 ### Timeline-Aware Conditions
 
@@ -1071,6 +1089,496 @@ const wordsMadeFlesh: PlotLineTemplate = {
   ],
 };
 ```
+
+---
+
+## Phase 7: Cross-Universe Incursions (Server-Driven Parallel Content)
+
+### The Pattern: Forked Universe as Incubation Chamber
+
+The multiverse ontology enables a powerful narrative pattern:
+
+1. **Fork the player's universe** - Clone their world at a specific point
+2. **Run divergent history in parallel** - Server evolves the fork independently
+3. **Introduce threat/opportunity** - The forked universe develops something (aliens, plague, magic, etc.)
+4. **Cross-universe encounter** - Entities from the fork invade/visit the original
+
+The key insight: **the aliens have real history**. They didn't spawn when you triggered a quest. They evolved. They conquered their Earth. They mourned their dead. They celebrated their victories. When they arrive in your universe, they arrive with *souls*.
+
+### Server-Side Parallel Universe Execution
+
+```typescript
+interface ParallelUniverseConfig {
+  /** Source universe to fork from */
+  source_universe_id: string;
+
+  /** When to fork (tick or canon event) */
+  fork_trigger:
+    | { type: 'at_tick'; tick: bigint }
+    | { type: 'after_event'; event_type: CanonEventType };
+
+  /** Divergence script to run in the fork */
+  divergence_script: DivergenceScript;
+
+  /** When incursion becomes possible */
+  incursion_condition: IncursionCondition;
+
+  /** How entities cross over */
+  crossing_method: CrossingMethod;
+}
+
+interface DivergenceScript {
+  /** Script ID (e.g., 'alien_evolution', 'plague_origin', 'magic_awakening') */
+  script_id: string;
+
+  /** Parameters for the script */
+  parameters: Record<string, any>;
+
+  /** How many ticks to fast-forward (server-side simulation) */
+  simulation_ticks: bigint;
+
+  /** Events to inject during simulation */
+  injected_events?: {
+    at_tick: bigint;
+    event: CanonEventType;
+    details: Record<string, any>;
+  }[];
+}
+
+type CrossingMethod =
+  | { type: 'portal'; portal_location: Position; portal_duration_ticks: number }
+  | { type: 'gradual_bleed'; affected_area: BoundingBox; bleed_rate: number }
+  | { type: 'single_breach'; entry_point: Position }
+  | { type: 'invasion_wave'; staging_area: Position; wave_count: number; wave_interval_ticks: number };
+```
+
+### The Alien Invasion Example
+
+```typescript
+const alienInvasionConfig: ParallelUniverseConfig = {
+  source_universe_id: '{{player_universe_id}}',
+
+  fork_trigger: {
+    type: 'at_tick',
+    tick: 0n,  // Fork from the beginning
+  },
+
+  divergence_script: {
+    script_id: 'alien_evolution',
+    parameters: {
+      alien_species: 'the_convergence',
+      origin_location: { x: 500, y: 500 },  // Remote area of the map
+      aggression_factor: 0.8,
+      tech_evolution_rate: 1.5,
+    },
+    simulation_ticks: 100000n,  // ~50 in-game years at 20 TPS
+    injected_events: [
+      { at_tick: 20000n, event: 'first_contact', details: { outcome: 'war' } },
+      { at_tick: 50000n, event: 'human_resistance_falls', details: {} },
+      { at_tick: 80000n, event: 'dimensional_tech_discovered', details: {} },
+      { at_tick: 95000n, event: 'expansion_begins', details: { target: 'parallel_universes' } },
+    ],
+  },
+
+  incursion_condition: {
+    type: 'simulation_complete',  // When the 100000 ticks finish
+  },
+
+  crossing_method: {
+    type: 'invasion_wave',
+    staging_area: { x: 100, y: 100 },
+    wave_count: 5,
+    wave_interval_ticks: 5000,
+  },
+};
+```
+
+### Souls That Cross Universes
+
+When entities cross from the forked universe, they bring their souls:
+
+```typescript
+interface CrossingEntity {
+  /** Entity data from the parallel universe */
+  entity: Entity;
+
+  /** Their complete soul (with Silver Thread history from THEIR timeline) */
+  soul: SoulIdentityComponent;
+  silver_thread: SilverThreadComponent;
+
+  /** Their lessons were learned in a different world */
+  lessons_from_parallel: LearnedLesson[];
+
+  /** Memories of their Earth (which is not your Earth) */
+  memories: EpisodicMemory[];
+
+  /** How the crossing affects them */
+  crossing_trauma?: {
+    trauma_type: 'dimensional_displacement';
+    severity: number;
+    manifests_as: string[];  // 'homesickness', 'reality_confusion', 'power_hunger'
+  };
+}
+```
+
+### Cross-Universe Plots
+
+New plot templates for incursion scenarios:
+
+```typescript
+const theInvasion: PlotLineTemplate = {
+  id: 'the_invasion',
+  name: 'They Came From Elsewhere',
+  scale: 'epic',
+
+  lesson: {
+    theme: 'Facing the unknowable',
+    domain: 'transcendence',
+    insight: 'The multiverse contains horrors and wonders beyond imagination. Both arrive uninvited.',
+    wisdom_value: 50,
+    repeatable: false,
+  },
+
+  assignment_rules: {
+    triggers: [
+      { type: 'on_cross_universe_incursion' },  // NEW trigger type
+    ],
+  },
+
+  entry_stage: 'first_signs',
+  completion_stages: ['repelled', 'coexistence', 'subjugated', 'absorbed'],
+
+  stages: [
+    {
+      stage_id: 'first_signs',
+      name: 'Strange Occurrences',
+      description: 'The sky flickers. Animals behave oddly. Something is coming.',
+    },
+    {
+      stage_id: 'arrival',
+      name: 'The Breach',
+      description: 'They are here. They are not from this world. They are not from ANY world you know.',
+    },
+    {
+      stage_id: 'understanding',
+      name: 'Learning Their Nature',
+      description: 'Who are they? What do they want? Why do they seem to... remember you?',
+    },
+    {
+      stage_id: 'conflict',
+      name: 'The Struggle',
+      description: 'Whether by war or negotiation, your world will never be the same.',
+    },
+    {
+      stage_id: 'repelled',
+      name: 'Pushed Back',
+      description: 'They retreat to their dying world. But the breach remains...',
+      on_enter_effects: [
+        { type: 'learn_lesson', lesson_id: 'multiverse_defender' },
+      ],
+    },
+    {
+      stage_id: 'coexistence',
+      name: 'Two Worlds, One Space',
+      description: 'You learned to live together. Your cultures merge.',
+      on_enter_effects: [
+        { type: 'learn_lesson', lesson_id: 'cosmic_diplomacy' },
+      ],
+    },
+    {
+      stage_id: 'subjugated',
+      name: 'Under New Management',
+      description: 'They won. Your world belongs to them now.',
+      on_enter_effects: [
+        { type: 'add_trauma', trauma_type: 'conquest', severity: 10 },
+      ],
+    },
+    {
+      stage_id: 'absorbed',
+      name: 'We Are Them Now',
+      description: 'The distinction between you and them has dissolved.',
+      on_enter_effects: [
+        { type: 'learn_lesson', lesson_id: 'identity_transcendence' },
+      ],
+    },
+  ],
+};
+```
+
+### The Displaced Soul
+
+A plot for souls that CROSSED from another universe:
+
+```typescript
+const theDisplaced: PlotLineTemplate = {
+  id: 'the_displaced',
+  name: 'Stranger From Elsewhere',
+  scale: 'large',
+
+  lesson: {
+    theme: 'Home is not a place',
+    domain: 'self',
+    insight: 'Your home universe is gone. But you carry it within you.',
+    wisdom_value: 30,
+    repeatable: false,
+  },
+
+  assignment_rules: {
+    /** Automatically assigned to any soul that crossed universes */
+    triggers: [
+      { type: 'on_universe_crossing'; direction: 'arriving' },
+    ],
+  },
+
+  entry_stage: 'arrival_shock',
+  completion_stages: ['new_home', 'eternal_wanderer', 'returned'],
+
+  stages: [
+    {
+      stage_id: 'arrival_shock',
+      name: 'Wrong World',
+      description: 'Everything looks right but feels wrong. This is not your home.',
+      on_enter_effects: [
+        { type: 'add_trauma', trauma_type: 'dimensional_displacement' },
+        { type: 'set_emotional_state', state: 'anxious', duration_ticks: 500 },
+      ],
+    },
+    {
+      stage_id: 'seeking_familiar',
+      name: 'Looking for Home',
+      description: 'You search for people, places, anything that matches your memories.',
+    },
+    {
+      stage_id: 'grief',
+      name: 'Mourning a Universe',
+      description: 'Your world exists, but you can never return. Everyone you knew... is a stranger here.',
+    },
+    {
+      stage_id: 'adaptation',
+      name: 'Learning This World',
+      description: 'You begin to understand how this world differs from yours.',
+    },
+    {
+      stage_id: 'new_home',
+      name: 'This Is Home Now',
+      description: 'You have made peace. This world is not wrong - it is simply different.',
+      on_enter_effects: [
+        { type: 'learn_lesson', lesson_id: 'home_is_within' },
+        { type: 'modify_stress', delta: -30 },
+      ],
+    },
+    {
+      stage_id: 'eternal_wanderer',
+      name: 'Between Worlds',
+      description: 'You belong to no single universe. You walk between them all.',
+      on_enter_effects: [
+        { type: 'learn_lesson', lesson_id: 'multiverse_wanderer' },
+      ],
+    },
+    {
+      stage_id: 'returned',
+      name: 'Going Back',
+      description: 'Somehow, against all odds, you found a way home.',
+    },
+  ],
+
+  transitions: [
+    {
+      from_stage: 'seeking_familiar',
+      to_stage: 'grief',
+      conditions: [
+        { type: 'personal_tick_elapsed', ticks: 300 },
+        // Searched but found only strangers
+        { type: 'not', condition: { type: 'has_relationship_with_role', role: 'parallel_self_connection', min_trust: 30 } },
+      ],
+    },
+    // Can skip grief if they find their parallel self and connect
+    {
+      from_stage: 'seeking_familiar',
+      to_stage: 'adaptation',
+      conditions: [
+        { type: 'has_relationship_with_role', role: 'parallel_self_connection', min_trust: 50 },
+      ],
+    },
+    {
+      from_stage: 'adaptation',
+      to_stage: 'new_home',
+      conditions: [
+        { type: 'any_relationship_trust', min: 60 },  // Made real friends
+        { type: 'mood_threshold', min: 0 },           // Generally positive mood
+      ],
+    },
+  ],
+};
+```
+
+### New Condition Types for Cross-Universe Plots
+
+```typescript
+// Phase 7: Cross-Universe Conditions
+| { type: 'is_from_parallel_universe' }
+| { type: 'universe_under_incursion' }
+| { type: 'has_crossed_universes'; direction: 'arriving' | 'departing' | 'any' }
+| { type: 'incursion_wave_number'; wave: number }
+| { type: 'parallel_civilization_status'; status: 'hostile' | 'neutral' | 'allied' | 'extinct' }
+| { type: 'breach_stability'; min?: number; max?: number }  // 0-100, how stable the portal is
+```
+
+### New Effect Types for Cross-Universe Plots
+
+```typescript
+// Phase 7: Cross-Universe Effects
+| { type: 'open_breach'; target_universe_id: string; location: Position; stability: number }
+| { type: 'close_breach'; breach_id: string }
+| { type: 'summon_from_parallel'; entity_type: string; count: number }
+| { type: 'send_to_parallel'; target_universe_id: string }
+| { type: 'parallel_communication'; message_type: 'warning' | 'greeting' | 'demand' | 'plea' }
+```
+
+### Simulation Efficiency: Decision Replay + Divergence
+
+Running a parallel universe doesn't require re-running all LLM inference. The key insight:
+
+**Before divergence**: Replay recorded decisions deterministically. No LLM calls needed.
+
+**After divergence**: Only 2x the normal LLM cost (aliens + humans responding to aliens).
+
+```typescript
+interface EfficientParallelSimulation {
+  /** Source universe's decision log */
+  source_decision_log: DecisionLog;
+
+  /** Tick where divergence begins (alien injection) */
+  divergence_tick: bigint;
+
+  /** Phases of simulation */
+  phases: {
+    /** Phase 1: Deterministic replay - no LLM calls */
+    replay: {
+      start_tick: 0n;
+      end_tick: bigint;  // divergence_tick
+      llm_calls: 0;
+      strategy: 'replay_from_log';
+    };
+
+    /** Phase 2: Divergent simulation - 2x LLM calls */
+    divergence: {
+      start_tick: bigint;  // divergence_tick
+      end_tick: bigint;    // invasion_ready_tick
+      llm_calls_per_tick: 2;  // aliens + humans responding
+      strategy: 'dual_inference';
+    };
+
+    /** Phase 3: Incursion - crossing entities enter target universe */
+    incursion: {
+      strategy: 'cross_universe_transfer';
+    };
+  };
+}
+
+interface DecisionLog {
+  /** All LLM decisions made in the source universe */
+  entries: DecisionLogEntry[];
+
+  /** Fast lookup by tick */
+  getDecisionsAtTick(tick: bigint): DecisionLogEntry[];
+
+  /** Get deterministic seed for replay */
+  getReplaySeed(tick: bigint): number;
+}
+
+interface DecisionLogEntry {
+  tick: bigint;
+  agent_id: string;
+  decision: AgentDecision;
+  context_hash: string;  // For validation
+}
+```
+
+**Cost Example (Alien Invasion):**
+
+| Phase | Ticks | LLM Calls | Description |
+|-------|-------|-----------|-------------|
+| Replay | 0 → 20000 | 0 | Deterministic replay of player's decisions |
+| Divergence | 20000 → 100000 | ~160k | Aliens + humans × 80000 ticks |
+| Normal play | ongoing | 1x | Player's universe continues normally |
+
+The aliens arrive with 80,000 ticks of *real* history (wars, losses, victories, traumas) but you only paid for 160k LLM calls, not 200k (what full simulation would cost).
+
+**Further Optimization: Sparse Simulation**
+
+Not every tick needs LLM inference in the parallel universe:
+
+```typescript
+interface SparseSimulationConfig {
+  /** Only run LLM inference every N ticks */
+  inference_interval: number;  // e.g., 10 = every 10th tick
+
+  /** Critical events force immediate inference */
+  force_inference_on: CanonEventType[];  // deaths, battles, discoveries
+
+  /** Interpolate agent states between inference ticks */
+  interpolation_strategy: 'linear' | 'behavioral_model' | 'frozen';
+}
+```
+
+With sparse simulation at 10-tick intervals, the alien invasion costs ~16k LLM calls instead of 160k. The aliens still have rich history - just sampled less frequently.
+
+### Server-Driven Incursion Scripts
+
+The server can run pre-defined scripts that evolve parallel universes:
+
+```typescript
+type DivergenceScriptType =
+  | 'alien_evolution'        // Aliens develop and expand
+  | 'plague_origin'          // Disease evolves and spreads
+  | 'magic_awakening'        // Magic becomes dominant force
+  | 'machine_uprising'       // AI takes over
+  | 'dimensional_collapse'   // Universe is dying, refugees flee
+  | 'utopia_achieved'        // They solved everything (and want to "help" you)
+  | 'elder_god_awakening'    // Something ancient woke up
+  | 'time_paradox'           // Their timeline broke
+  | 'custom';                // Server-defined script
+
+interface DivergenceScriptRegistry {
+  scripts: Map<DivergenceScriptType, DivergenceScriptDefinition>;
+
+  /** Run a script on a forked universe */
+  execute(
+    universe: Universe,
+    script_id: DivergenceScriptType,
+    parameters: Record<string, any>
+  ): Promise<SimulationResult>;
+}
+```
+
+### The "They Remember You" Factor
+
+The most unsettling aspect: souls in the parallel universe may have relationships with parallel versions of souls in YOUR universe. When they arrive:
+
+```typescript
+interface ParallelRelationship {
+  /** Soul from the parallel universe */
+  crossing_soul_id: string;
+
+  /** Soul in the target universe */
+  target_soul_id: string;
+
+  /** Relationship that existed in the parallel universe */
+  parallel_relationship: {
+    trust: number;
+    history: string[];  // "You were my friend", "You betrayed us", "You died saving me"
+  };
+
+  /** Does the arriving soul expect the relationship to exist here? */
+  expects_recognition: boolean;
+
+  /** How they react when the target soul doesn't know them */
+  unrecognized_reaction: 'grief' | 'confusion' | 'rage' | 'denial' | 'acceptance';
+}
+```
+
+This creates immediate dramatic tension: an alien arrives and *knows you*. They remember fighting alongside you. They remember your death. They remember your wedding. But you've never seen them before.
 
 ---
 

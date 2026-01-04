@@ -7,6 +7,9 @@ import type {
 import type { EventType } from './EventMap.js';
 import type { Tick } from '../types.js';
 
+// Re-export GameEvent for external use
+export type { GameEvent } from './GameEvent.js';
+
 /**
  * Central event bus for system communication with type-safe event handling.
  *
