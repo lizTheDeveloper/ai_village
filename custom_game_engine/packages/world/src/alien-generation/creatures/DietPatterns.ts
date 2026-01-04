@@ -110,6 +110,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'good',
     byproducts: ['Chemical waste', 'Heat', 'Unusual compounds'],
     flavorText: 'Find chemicals. Oxidize. Extract energy. Light unnecessary. Darkness fine.',
+    relatedItems: [], // Deep sea vents, underground
+    ecologicalWeight: 0.25,
   },
   'parasitic': {
     name: 'Host Dependency',
@@ -118,6 +120,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'excellent',
     byproducts: ['Weakened host', 'Dependency', 'Eventual death'],
     flavorText: 'Attach to host. Drain slowly. Live free. Host suffers. Symbiosis questionable.',
+    relatedItems: [], // Requires living hosts
+    ecologicalWeight: 0.3,
   },
   'emotional_vampirism': {
     name: 'Feeling Consumption',
@@ -126,6 +130,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'good',
     byproducts: ['Emotional numbness', 'Depression', 'Therapy bills'],
     flavorText: 'Feed on feelings. Drain emotions. Leave emptiness. Nourished. Others exhausted.',
+    relatedItems: [], // Abstract - emotions from sentient beings
+    ecologicalWeight: 0.1,
   },
   'temporal_feeding': {
     name: 'Time Consumption',
@@ -146,6 +152,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'good',
     byproducts: ['Decay products', 'Secondary radiation', 'Glowing'],
     flavorText: 'Eat radiation. Glow slightly. Healthy. Others avoid. Solitary life.',
+    relatedItems: [], // Radiation sources (rare)
+    ecologicalWeight: 0.15,
   },
   'memory_consumption': {
     name: 'Thought Eating',
@@ -180,6 +188,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'moderate',
     byproducts: ['Silence', 'Dampened acoustics', 'Echo absorption'],
     flavorText: 'Eat sound. Absorb vibrations. Silence grows. Loud environments feast. Quiet starvation.',
+    relatedItems: ['material:frozen_music'], // Rare sound crystal from surrealMaterials.ts
+    ecologicalWeight: 0.08,
   },
   'dimensional_scavenging': {
     name: 'Cross-Dimensional Feeding',
@@ -200,6 +210,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'excellent',
     byproducts: ['Excess organisms', 'Symbiont waste', 'Mutual benefit'],
     flavorText: 'Farm inside self. Organisms grow. Harvest internally. Mutual benefit. Walking ecosystem.',
+    relatedItems: [], // Self-sustaining - farms bacteria inside
+    ecologicalWeight: 0.3,
   },
   'dream_feeding': {
     name: 'Oneiric Consumption',
@@ -222,6 +234,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'moderate',
     byproducts: ['Rust', 'Magnetic fields', 'Metal shortage'],
     flavorText: 'Eat metal. Digest iron. Magnetic attraction. Literal. Tools disappear.',
+    relatedItems: ['material:forged_steel'], // Uncommon metal materials
+    ecologicalWeight: 0.2,
   },
   'stellar_sipping': {
     name: 'Star Drinking',
@@ -254,6 +268,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'moderate',
     byproducts: ['Crystal dust', 'Gem shortage', 'Mineral depletion'],
     flavorText: 'Eat crystals. Digest gems. Beautiful food. Jewelers weep. Delicious.',
+    relatedItems: ['material:dream_crystal', 'material:memory_crystal', 'material:resonant_crystal'],
+    ecologicalWeight: 0.15, // Rare/legendary crystals
   },
   'gravity_feeding': {
     name: 'Gravitational Consumption',
@@ -286,6 +302,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'excellent',
     byproducts: ['Lost data', 'Corrupted files', 'Amnesia'],
     flavorText: 'Eat information. Digest data. Knowledge consumed. Books blank. Minds empty.',
+    relatedItems: ['material:folded_parchment'], // Common paper material
+    ecologicalWeight: 0.2,
   },
   'omnivore': {
     name: 'Mixed Diet',
