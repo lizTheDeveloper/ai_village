@@ -2025,6 +2025,74 @@ app.get('/api/bug-queue-processor/logs', (req, res) => {
     }
 });
 
+// =============================================================================
+// Server Registration API
+// =============================================================================
+
+// In-memory storage for registered servers
+const registeredServers = new Map();
+
+// Generate unique server ID
+function generateServerId() {
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2, 8);
+    return `server-${timestamp}-${random}`;
+}
+
+// POST /api/servers/register - Register a server
+app.post('/api/servers/register', (req, res) => {
+    try {
+        const { name, port, type, status, timestamp, pid, url } = req.body;
+
+        // Validate required fields
+        if (!name) {
+            return res.status(400).json({ error: 'name is required' });
+        }
+        if (!port) {
+            return res.status(400).json({ error: 'port is required' });
+        }
+        if (!type) {
+            return res.status(400).json({ error: 'type is required' });
+        }
+
+        // Generate unique server ID
+        const serverId = generateServerId();
+
+        // Store registration
+        const registration = {
+            serverId,
+            name,
+            port,
+            type,
+            status: status || 'unknown',
+            timestamp: timestamp || Date.now(),
+            pid: pid || null,
+            url: url || `http://localhost:${port}`,
+            registeredAt: new Date().toISOString()
+        };
+
+        registeredServers.set(serverId, registration);
+
+        res.json({
+            success: true,
+            serverId,
+            message: 'Server registered successfully'
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// GET /api/servers - List all registered servers
+app.get('/api/servers', (req, res) => {
+    try {
+        const servers = Array.from(registeredServers.values());
+        res.json(servers);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Orchestrator restart
 app.post('/api/orchestrators/restart-all', async (req, res) => {
     try {

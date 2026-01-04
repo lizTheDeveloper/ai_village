@@ -27,6 +27,43 @@ export default defineConfig({
         });
       },
     },
+    {
+      name: 'register-with-orchestrator',
+      configureServer(server) {
+        server.httpServer?.once('listening', async () => {
+          const port = server.config.server.port || 3000;
+          const url = `http://localhost:${port}`;
+
+          const payload = {
+            name: 'game-dev-server',
+            port,
+            type: 'vite',
+            status: 'ready',
+            timestamp: Date.now(),
+            pid: process.pid,
+            url
+          };
+
+          try {
+            const response = await fetch('http://localhost:3030/api/servers/register', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+              console.log(`[register-with-orchestrator] Successfully registered at ${url} with orchestrator`);
+            } else {
+              console.warn(`[register-with-orchestrator] Failed to register: ${response.status} ${response.statusText}`);
+            }
+          } catch (error) {
+            console.warn('[register-with-orchestrator] Could not register with orchestrator (orchestrator may not be running):', error instanceof Error ? error.message : String(error));
+          }
+        });
+      },
+    },
   ],
 
   server: {
