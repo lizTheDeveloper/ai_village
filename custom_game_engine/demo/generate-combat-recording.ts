@@ -333,6 +333,34 @@ function main() {
     quality: 0.98,
     frames,
     combatLog,
+    background: {
+      type: 'arena',
+      name: 'Gladiatorial Arena',
+      prompt: 'roman gladiatorial arena, sand floor, stone walls with arches, crowd silhouettes in stands, dramatic torchlight, blood stains on sand, pixel art background, tileable',
+      color: '#3d2817',
+    },
+    combatants: [
+      {
+        name: 'Gladiator Red',
+        type: 'gladiator',
+        color: 'red',
+        weapons: [
+          { name: 'crimson sword', type: 'sword', color: 'red' },
+          { name: 'ruby axe', type: 'axe', color: 'red' },
+          { name: 'scarlet spear', type: 'spear', color: 'red' },
+        ],
+      },
+      {
+        name: 'Gladiator Blue',
+        type: 'gladiator',
+        color: 'blue',
+        weapons: [
+          { name: 'sapphire sword', type: 'sword', color: 'blue' },
+          { name: 'azure mace', type: 'mace', color: 'blue' },
+          { name: 'cobalt trident', type: 'trident', color: 'blue' },
+        ],
+      },
+    ],
   };
 
   const outputPath = path.join(import.meta.dirname, 'public', 'mock-recordings', CONFIG.outputFile);
@@ -344,6 +372,7 @@ function main() {
   console.log(`[CombatGenerator] Frames: ${frames.length}`);
   console.log(`[CombatGenerator] Combat log entries: ${combatLog.length}`);
   console.log(`[CombatGenerator] Duration: ${CONFIG.framesToGenerate} ticks`);
+  console.log(`[CombatGenerator] Background: ${recording.background.name} (${recording.background.type})`);
 
   // Print sample combat log entries
   console.log('\n[CombatGenerator] Sample combat log:');

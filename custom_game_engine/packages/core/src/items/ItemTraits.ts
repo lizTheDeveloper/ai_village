@@ -5,6 +5,7 @@ import { ContainerTrait } from './traits/ContainerTrait';
 import { ToolTrait } from './traits/ToolTrait';
 import { ArmorTrait } from './traits/ArmorTrait';
 import { StatBonusTrait } from './traits/StatBonusTrait';
+import { AmmoTrait } from './traits/AmmoTrait';
 
 /**
  * Compositional trait bag for items.
@@ -17,6 +18,7 @@ import { StatBonusTrait } from './traits/StatBonusTrait';
  * - A chair: { tool: {...} } // Can also be thrown as weapon if needed
  * - Leather armor: { armor: {...} }
  * - Enchanted robe: { armor: {...}, magical: {...} }
+ * - An arrow: { ammo: {...} }
  */
 export interface ItemTraits {
   /** Item can be eaten for sustenance */
@@ -39,4 +41,7 @@ export interface ItemTraits {
 
   /** Item provides skill/stat bonuses when equipped (Phase 36: Combat Integration) */
   statBonus?: StatBonusTrait;
+
+  /** Item is ammunition for ranged weapons (Weapons Expansion) */
+  ammo?: AmmoTrait;
 }

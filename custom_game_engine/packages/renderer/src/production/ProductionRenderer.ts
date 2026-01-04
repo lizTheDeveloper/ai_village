@@ -381,9 +381,15 @@ export class ProductionRenderer {
     phase: 'concept' | 'final'
   ): ProductionPrompt {
     // Extract entity traits
-    const species = entity.getComponent('species')?.species ?? 'human';
-    const gender = entity.getComponent('gender')?.gender;
-    const genetics = entity.getComponent('genetics');
+    const speciesComp = entity.getComponent('species') as { species?: string } | undefined;
+    const genderComp = entity.getComponent('gender') as { gender?: string } | undefined;
+    const genetics = entity.getComponent('genetics') as {
+      hair_color?: string;
+      skin_tone?: string;
+      eye_color?: string;
+    } | undefined;
+    const species = speciesComp?.species ?? 'human';
+    const gender = genderComp?.gender;
 
     // Build costume description
     let costumeDesc = 'simple clothing';

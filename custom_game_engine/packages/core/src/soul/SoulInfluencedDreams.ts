@@ -14,7 +14,9 @@ import { ComponentType } from '../types/ComponentType.js';
 import type { SoulLinkComponent } from './SoulLinkComponent.js';
 import type { SoulIdentityComponent } from './SoulIdentityComponent.js';
 import type { SilverThreadComponent } from './SilverThreadComponent.js';
-import type { PlotLinesComponent } from '../plot/PlotTypes.js';
+import type { PlotLinesComponent, PlotDreamHint } from '../plot/PlotTypes.js';
+import { consumeDreamHints } from '../plot/PlotTypes.js';
+import { plotLineRegistry } from '../plot/PlotLineRegistry.js';
 
 /**
  * Soul-influenced dream types
@@ -204,6 +206,8 @@ function generateWisdomHint(
 
 /**
  * Generate prophetic vision dream (plot foreshadowing)
+ *
+ * Phase 5 Enhancement: Now stage-aware with dream hint consumption
  */
 function generatePropheticVision(
   soul: Entity,
@@ -211,7 +215,23 @@ function generatePropheticVision(
 ): SoulDream {
   const plotLines = soul.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
 
-  if (!plotLines || plotLines.active.length === 0) {
+  if (!plotLines) {
+    return {
+      type: 'prophetic_vision',
+      content: 'You dream of paths not yet taken, choices that lie ahead in the mist...',
+      intensity: 0.7,
+    };
+  }
+
+  // === Phase 5: First check for pending dream hints ===
+  const dreamHints = consumeDreamHints(plotLines, 1);
+  if (dreamHints.length > 0) {
+    const hint = dreamHints[0]!;
+    return generateDreamFromHint(hint, identity);
+  }
+
+  // No hints - generate stage-aware prophetic vision from active plots
+  if (plotLines.active.length === 0) {
     return {
       type: 'prophetic_vision',
       content: 'You dream of paths not yet taken, choices that lie ahead in the mist...',
@@ -229,10 +249,138 @@ function generatePropheticVision(
     };
   }
 
+  // Try to get template for stage-aware foreshadowing
+  const template = plotLineRegistry.getTemplate(plot.template_id);
+  if (!template) {
+    return {
+      type: 'prophetic_vision',
+      content: `You see visions of what may come to pass - a journey of ${plot.template_id}, fraught with meaning...`,
+      intensity: 0.7 + (identity.wisdom_level / 300),
+    };
+  }
+
+  // Get current and upcoming stage information
+  const currentStage = template.stages.find(s => s.stage_id === plot.current_stage);
+  const upcomingTransitions = template.transitions.filter(t => t.from_stage === plot.current_stage);
+
+  // Generate stage-aware vision
+  return generateStageAwarePropheticVision(
+    plot.template_id,
+    currentStage,
+    upcomingTransitions,
+    template.lesson.insight,
+    identity.wisdom_level
+  );
+}
+
+/**
+ * Generate a dream from a plot-provided hint
+ */
+function generateDreamFromHint(
+  hint: PlotDreamHint,
+  identity: SoulIdentityComponent
+): SoulDream {
+  // Build dream content based on hint type
+  let content: string;
+  const emotionalPrefix = getEmotionalPrefix(hint.emotional_tone);
+  const imageryText = hint.imagery && hint.imagery.length > 0
+    ? ` Images flash: ${hint.imagery.join(', ')}.`
+    : '';
+
+  switch (hint.dream_type) {
+    case 'prophetic_vision':
+      content = `${emotionalPrefix}You see visions of what may come: ${hint.content_hint}${imageryText}`;
+      break;
+    case 'warning':
+      content = `${emotionalPrefix}A dark premonition grips you: ${hint.content_hint}${imageryText} You wake unsettled.`;
+      break;
+    case 'memory_echo':
+      content = `${emotionalPrefix}The past echoes into dream: ${hint.content_hint}${imageryText}`;
+      break;
+    case 'symbolic':
+      content = `${emotionalPrefix}Strange symbols dance before you, carrying meaning: ${hint.content_hint}${imageryText}`;
+      break;
+    default:
+      content = `${emotionalPrefix}${hint.content_hint}${imageryText}`;
+  }
+
   return {
     type: 'prophetic_vision',
-    content: `You see visions of what may come to pass - a journey of ${plot.template_id}, fraught with meaning...`,
-    intensity: 0.7 + (identity.wisdom_level / 300),
+    content,
+    intensity: Math.min(1.0, hint.intensity + (identity.wisdom_level / 300)),
+    source_tick: hint.queued_at,
+  };
+}
+
+/**
+ * Get emotional prefix for dream content
+ */
+function getEmotionalPrefix(tone?: PlotDreamHint['emotional_tone']): string {
+  switch (tone) {
+    case 'hopeful':
+      return 'A warm light fills your dream. ';
+    case 'ominous':
+      return 'Shadows gather at the edges of your vision. ';
+    case 'melancholic':
+      return 'A bittersweet longing washes over you. ';
+    case 'triumphant':
+      return 'You feel a surge of destiny fulfilled. ';
+    case 'mysterious':
+      return 'Enigmatic whispers surround you. ';
+    default:
+      return '';
+  }
+}
+
+/**
+ * Generate stage-aware prophetic vision based on plot state
+ */
+function generateStageAwarePropheticVision(
+  plotTemplateId: string,
+  currentStage: { stage_id: string; name: string; description: string } | undefined,
+  upcomingTransitions: Array<{ to_stage: string }>,
+  lessonInsight: string,
+  wisdomLevel: number
+): SoulDream {
+  // Higher wisdom = more detailed visions
+  const wisdomFactor = wisdomLevel / 100;
+
+  if (!currentStage) {
+    return {
+      type: 'prophetic_vision',
+      content: `You see visions of what may come to pass - a journey of ${plotTemplateId}, fraught with meaning...`,
+      intensity: 0.7 + (wisdomLevel / 300),
+    };
+  }
+
+  // Build vision based on wisdom level
+  let content: string;
+
+  if (wisdomFactor < 0.3) {
+    // Low wisdom - vague hints
+    content = `You dream of ${currentStage.name.toLowerCase()}. Something important stirs within this vision...`;
+  } else if (wisdomFactor < 0.6) {
+    // Medium wisdom - current stage awareness
+    content = `You see yourself in a moment of "${currentStage.name}". ${currentStage.description}. The path ahead feels significant.`;
+  } else if (wisdomFactor < 0.8) {
+    // High wisdom - foreshadowing of transitions
+    if (upcomingTransitions.length > 0) {
+      content = `You stand at a crossroads in your dream. Currently experiencing "${currentStage.name}", you sense ${upcomingTransitions.length} possible futures branching before you. The lesson of this journey whispers: "${lessonInsight}"`;
+    } else {
+      content = `You see yourself approaching the culmination of "${currentStage.name}". A profound truth awaits: "${lessonInsight}"`;
+    }
+  } else {
+    // Very high wisdom - full plot awareness
+    const futuresText = upcomingTransitions.length > 0
+      ? `${upcomingTransitions.length} possible paths shimmer before you.`
+      : 'The culmination of this arc approaches.';
+    content = `With crystalline clarity, you perceive your current journey: "${currentStage.name}" - ${currentStage.description}. ${futuresText} The wisdom to be gained: "${lessonInsight}". You understand that this is part of your soul's greater purpose.`;
+  }
+
+  return {
+    type: 'prophetic_vision',
+    content,
+    intensity: Math.min(1.0, 0.7 + wisdomFactor * 0.3),
   };
 }
 

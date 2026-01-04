@@ -299,7 +299,7 @@ export class DivineChatPanel implements IWindowPanel {
   /**
    * Render header
    */
-  private renderHeader(ctx: CanvasRenderingContext2D, x: number, y: number, width: number): number {
+  renderHeader(ctx: CanvasRenderingContext2D, x: number, y: number, width: number): number {
     ctx.fillStyle = COLORS.headerBg;
     ctx.fillRect(x, y, width, SIZES.headerHeight);
 

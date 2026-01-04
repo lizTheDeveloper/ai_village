@@ -1,0 +1,138 @@
+{
+  "characters": [
+    {
+      "name": "Luminara the Transcendent",
+      "type": "transcendent_fae",
+      "description": "ethereal fairy creature with iridescent wings, glowing with magical energy, iridescent coloring, fantasy sprite",
+      "pixelLabParams": {
+        "description": "ethereal fairy creature with iridescent wings, glowing with magical energy, iridescent coloring, fantasy sprite",
+        "name": "Luminara the Transcendent",
+        "size": 48,
+        "n_directions": 8,
+        "view": "high top-down",
+        "detail": "high detail",
+        "shading": "detailed shading",
+        "outline": "single color black outline"
+      }
+    },
+    {
+      "name": "Seraphiel the Radiant",
+      "type": "celestial_angel",
+      "description": "divine angel with golden wings and halo, radiant white robes, holy warrior, golden coloring",
+      "pixelLabParams": {
+        "description": "divine angel with golden wings and halo, radiant white robes, holy warrior, golden coloring",
+        "name": "Seraphiel the Radiant",
+        "size": 48,
+        "n_directions": 8,
+        "view": "high top-down",
+        "detail": "high detail",
+        "shading": "detailed shading",
+        "outline": "single color black outline"
+      }
+    }
+  ],
+  "animations": [
+    {
+      "actor": "Seraphiel the Radiant",
+      "action": "consecrates wrath upon",
+      "weapon": "holy flame sword",
+      "templateAnimation": "fireball",
+      "actionDescription": "consecrates wrath upon with holy flame sword"
+    },
+    {
+      "actor": "Luminara the Transcendent",
+      "action": "reality-warps around",
+      "weapon": "prismatic reality shard",
+      "templateAnimation": "fireball",
+      "actionDescription": "reality-warps around with prismatic reality shard"
+    },
+    {
+      "actor": "Luminara the Transcendent",
+      "action": "reality-warps around",
+      "weapon": "fractal dream weaver",
+      "templateAnimation": "fireball",
+      "actionDescription": "reality-warps around with fractal dream weaver"
+    },
+    {
+      "actor": "Luminara the Transcendent",
+      "action": "reality-warps around",
+      "weapon": "crystalline moonbeam",
+      "templateAnimation": "fireball",
+      "actionDescription": "reality-warps around with crystalline moonbeam"
+    },
+    {
+      "actor": "Luminara the Transcendent",
+      "action": "enchants the air to strike",
+      "weapon": "fractal dream weaver",
+      "templateAnimation": "cross-punch",
+      "actionDescription": "enchants the air to strike with fractal dream weaver"
+    },
+    {
+      "actor": "Luminara the Transcendent",
+      "action": "phase-shifts through",
+      "weapon": "crystalline moonbeam",
+      "templateAnimation": "fireball",
+      "actionDescription": "phase-shifts through with crystalline moonbeam"
+    },
+    {
+      "actor": "Seraphiel the Radiant",
+      "action": "channels divine fury at",
+      "weapon": "divine judgment staff",
+      "templateAnimation": "cross-punch",
+      "actionDescription": "channels divine fury at with divine judgment staff"
+    },
+    {
+      "actor": "Seraphiel the Radiant",
+      "action": "channels divine fury at",
+      "weapon": "holy flame sword",
+      "templateAnimation": "cross-punch",
+      "actionDescription": "channels divine fury at with holy flame sword"
+    },
+    {
+      "actor": "Luminara the Transcendent",
+      "action": "transmutes spacetime against",
+      "weapon": "prismatic reality shard",
+      "templateAnimation": "fireball",
+      "actionDescription": "transmutes spacetime against with prismatic reality shard"
+    },
+    {
+      "actor": "Luminara the Transcendent",
+      "action": "phase-shifts through",
+      "weapon": "prismatic reality shard",
+      "templateAnimation": "fireball",
+      "actionDescription": "phase-shifts through with prismatic reality shard"
+    },
+    {
+      "actor": "Seraphiel the Radiant",
+      "action": "smites",
+      "weapon": "divine judgment staff",
+      "templateAnimation": "fireball",
+      "actionDescription": "smites with divine judgment staff"
+    },
+    {
+      "actor": "Luminara the Transcendent",
+      "action": "enchants the air to strike",
+      "weapon": "crystalline moonbeam",
+      "templateAnimation": "cross-punch",
+      "actionDescription": "enchants the air to strike with crystalline moonbeam"
+    },
+    {
+      "actor": "Seraphiel the Radiant",
+      "action": "consecrates wrath upon",
+      "weapon": "divine judgment staff",
+      "templateAnimation": "fireball",
+      "actionDescription": "consecrates wrath upon with divine judgment staff"
+    },
+    {
+      "actor": "Luminara the Transcendent",
+      "action": "phase-shifts through",
+      "weapon": "fractal dream weaver",
+      "templateAnimation": "fireball",
+      "actionDescription": "phase-shifts through with fractal dream weaver"
+    }
+  ],
+  "background": {
+    "prompt": "swirling dimensional void, reality fractures, cosmic aurora, stars bleeding into rainbow light, ethereal mist, otherworldly plane, pixel art background, tileable",
+    "fallbackColor": "#1a0533"
+  }
+}

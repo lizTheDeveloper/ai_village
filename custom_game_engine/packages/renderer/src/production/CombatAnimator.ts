@@ -1,11 +1,18 @@
 /**
  * CombatAnimator - Generate pixel art animations from combat logs
  *
- * Integrates with PixelLab MCP to create animated combat replays from
+ * Uses PixelLab API directly to create animated combat replays from
  * recorded combat events with renderable operations.
  */
 
-import type { World } from '@ai-village/core';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import {
+  PixelLabAPI,
+  createPixelLabClient,
+  type ViewAngle,
+  type Direction,
+} from './PixelLabAPI.js';
 
 /** Combat log event with renderable operation */
 export interface CombatLogEvent {
@@ -32,13 +39,31 @@ export interface CombatRecording {
   combatName: string;
   startTick: number;
   endTick: number;
-  participants: string[]; // Entity IDs of combatants
+  participants: CombatParticipant[];
   events: CombatLogEvent[];
   metadata?: {
     arena?: string;
     season?: string;
     episode?: string;
   };
+}
+
+/** Combat participant with appearance info */
+export interface CombatParticipant {
+  id: string;
+  name: string;
+  description: string; // Full description for PixelLab
+  armorColor?: string;
+  weapon?: string;
+}
+
+/** Generated character sprite */
+export interface CharacterSprite {
+  participantId: string;
+  description: string;
+  imageBase64: string; // Base64 PNG
+  imageSize: { width: number; height: number };
+  generatedAt: number;
 }
 
 /** Generated combat animation */
@@ -48,23 +73,20 @@ export interface CombatAnimation {
   action: string;
   weapon?: string;
 
-  // PixelLab character and animation IDs
-  characterId: string;
-  animationName: string;
-
-  // Generated sprite data
-  spriteSheetUrl?: string;
-  frameCount?: number;
-  frameRate?: number;
+  // Animation frames
+  frames: string[]; // Array of Base64 PNGs
+  frameCount: number;
+  frameRate: number;
 
   // Generation metadata
   generatedAt: number;
-  pixelLabJobId?: string;
 }
 
 /** Combat replay with animations */
 export interface CombatReplay {
   recordingId: string;
+  combatName: string;
+  characters: Map<string, CharacterSprite>; // participantId -> sprite
   animations: Map<string, CombatAnimation>; // operationHash -> animation
   timeline: CombatReplayFrame[];
 }
@@ -76,49 +98,146 @@ export interface CombatReplayFrame {
     actorId: string;
     animationHash: string; // Which animation to play
     frameIndex: number; // Which frame of the animation
+    direction: Direction;
   }[];
 }
 
+/** Animation generation config */
+export interface AnimationConfig {
+  spriteSize: number; // Character sprite size (e.g., 48, 64)
+  animationSize: number; // Animation frame size (fixed at 64 for animate-with-text)
+  frameCount: number; // Number of animation frames (2-20)
+  view: ViewAngle;
+  outputDir: string;
+}
+
+const DEFAULT_CONFIG: AnimationConfig = {
+  spriteSize: 64,
+  animationSize: 64, // animate-with-text is fixed at 64x64
+  frameCount: 8,
+  view: 'high top-down',
+  outputDir: './assets/combat_animations',
+};
+
 /**
- * Combat Animator - Generate animations from combat logs
+ * Combat Animator - Generate animations from combat logs using PixelLab API
  */
 export class CombatAnimator {
+  private api: PixelLabAPI;
+  private config: AnimationConfig;
+  private characterCache = new Map<string, CharacterSprite>();
   private animationCache = new Map<string, CombatAnimation>();
-  private characterCache = new Map<string, string>(); // actorId -> PixelLab characterId
 
-  constructor(private world: World) {}
+  constructor(apiToken?: string, config: Partial<AnimationConfig> = {}) {
+    this.api = apiToken ? new PixelLabAPI(apiToken) : createPixelLabClient();
+    this.config = { ...DEFAULT_CONFIG, ...config };
+  }
 
   /**
-   * Generate animations for a combat recording
+   * Generate full combat replay from recording
    */
-  async generateAnimations(recording: CombatRecording): Promise<CombatReplay> {
-    console.log(`[CombatAnimator] Generating animations for: ${recording.combatName}`);
+  async generateReplay(recording: CombatRecording): Promise<CombatReplay> {
+    console.log(`[CombatAnimator] Generating replay for: ${recording.combatName}`);
     console.log(`  Events: ${recording.events.length}`);
-    console.log(`  Participants: ${recording.participants.join(', ')}`);
+    console.log(`  Participants: ${recording.participants.length}`);
 
-    // Step 1: Extract unique renderable operations
+    // Step 1: Generate character sprites
+    console.log('\n[1/4] Generating character sprites...');
+    for (const participant of recording.participants) {
+      if (!this.characterCache.has(participant.id)) {
+        const sprite = await this.generateCharacterSprite(participant);
+        this.characterCache.set(participant.id, sprite);
+        console.log(`  ✓ Generated sprite for: ${participant.name}`);
+      } else {
+        console.log(`  ⊙ Using cached sprite for: ${participant.name}`);
+      }
+    }
+
+    // Step 2: Extract unique operations
+    console.log('\n[2/4] Extracting unique combat operations...');
     const operations = this.extractUniqueOperations(recording);
-    console.log(`  Unique operations: ${operations.size}`);
+    console.log(`  Found ${operations.size} unique operations`);
 
-    // Step 2: Ensure characters exist
-    await this.ensureCharactersCreated(recording.participants);
-
-    // Step 3: Generate animations for each unique operation
+    // Step 3: Generate animations for each operation
+    console.log('\n[3/4] Generating animations...');
     for (const [hash, operation] of operations.entries()) {
       if (!this.animationCache.has(hash)) {
-        const animation = await this.generateAnimation(operation);
+        const animation = await this.generateAnimation(operation, recording.participants);
         this.animationCache.set(hash, animation);
+        console.log(`  ✓ Generated: ${operation.actor} - ${operation.action}`);
+      } else {
+        console.log(`  ⊙ Using cached: ${operation.actor} - ${operation.action}`);
       }
     }
 
     // Step 4: Build replay timeline
+    console.log('\n[4/4] Building replay timeline...');
     const timeline = this.buildTimeline(recording);
+    console.log(`  Generated ${timeline.length} timeline frames`);
 
     return {
       recordingId: recording.recordingId,
+      combatName: recording.combatName,
+      characters: this.characterCache,
       animations: this.animationCache,
       timeline,
     };
+  }
+
+  /**
+   * Generate character sprite using PixelLab API
+   */
+  async generateCharacterSprite(participant: CombatParticipant): Promise<CharacterSprite> {
+    const description = this.buildCharacterDescription(participant);
+
+    console.log(`    Generating sprite: ${description}`);
+
+    const response = await this.api.generateImageBitforge({
+      description,
+      image_size: {
+        width: this.config.spriteSize,
+        height: this.config.spriteSize,
+      },
+      view: this.config.view,
+      direction: 'south',
+      detail: 'high detail',
+      shading: 'detailed shading',
+      outline: 'single color outline',
+      no_background: true,
+    });
+
+    return {
+      participantId: participant.id,
+      description,
+      imageBase64: response.image,
+      imageSize: {
+        width: this.config.spriteSize,
+        height: this.config.spriteSize,
+      },
+      generatedAt: Date.now(),
+    };
+  }
+
+  /**
+   * Build character description for PixelLab
+   */
+  private buildCharacterDescription(participant: CombatParticipant): string {
+    if (participant.description) {
+      return participant.description;
+    }
+
+    // Build from parts
+    const parts: string[] = ['gladiator'];
+
+    if (participant.armorColor) {
+      parts.push(`in ${participant.armorColor} armor`);
+    }
+
+    if (participant.weapon) {
+      parts.push(`wielding ${participant.weapon}`);
+    }
+
+    return parts.join(' ');
   }
 
   /**
@@ -126,8 +245,8 @@ export class CombatAnimator {
    */
   private extractUniqueOperations(
     recording: CombatRecording
-  ): Map<string, CombatLogEvent['renderableOperation']> {
-    const operations = new Map<string, CombatLogEvent['renderableOperation']>();
+  ): Map<string, NonNullable<CombatLogEvent['renderableOperation']>> {
+    const operations = new Map<string, NonNullable<CombatLogEvent['renderableOperation']>>();
 
     for (const event of recording.events) {
       if (event.renderableOperation) {
@@ -154,96 +273,41 @@ export class CombatAnimator {
   }
 
   /**
-   * Ensure PixelLab characters exist for all participants
+   * Generate animation for a combat operation
    */
-  private async ensureCharactersCreated(participants: string[]): Promise<void> {
-    for (const actorId of participants) {
-      if (!this.characterCache.has(actorId)) {
-        console.log(`[CombatAnimator] Creating character for: ${actorId}`);
-
-        // Get entity from world
-        const entity = this.world.getEntity(actorId);
-        if (!entity) {
-          console.warn(`[CombatAnimator] Entity not found: ${actorId}`);
-          continue;
-        }
-
-        // Build character description from entity
-        const description = this.buildCharacterDescription(entity);
-
-        // TODO: Call PixelLab MCP create_character
-        // For now, use placeholder
-        const characterId = `char_${actorId}`;
-
-        console.log(`  Description: ${description}`);
-        console.log(`  Character ID: ${characterId}`);
-
-        this.characterCache.set(actorId, characterId);
-      }
-    }
-  }
-
-  /**
-   * Build character description for PixelLab
-   */
-  private buildCharacterDescription(entity: any): string {
-    // Extract entity traits
-    const species = entity.getComponent?.('species')?.species || 'humanoid';
-    const gender = entity.getComponent?.('gender')?.gender;
-    const name = entity.getComponent?.('name')?.name || 'fighter';
-
-    // Check for gladiator/combat-specific traits
-    const equipment = entity.getComponent?.('equipment');
-    const appearance = entity.getComponent?.('appearance');
-
-    const parts: string[] = [];
-
-    if (gender) parts.push(gender);
-    parts.push(species);
-    parts.push('gladiator');
-
-    if (appearance?.armorColor) {
-      parts.push(`in ${appearance.armorColor} armor`);
-    }
-
-    if (equipment?.weapon) {
-      parts.push(`with ${equipment.weapon}`);
-    }
-
-    return parts.join(' ');
-  }
-
-  /**
-   * Generate animation for a renderable operation
-   */
-  private async generateAnimation(
-    operation: CombatLogEvent['renderableOperation']
+  async generateAnimation(
+    operation: NonNullable<CombatLogEvent['renderableOperation']>,
+    participants: CombatParticipant[]
   ): Promise<CombatAnimation> {
-    if (!operation) {
-      throw new Error('No renderable operation provided');
+    // Find participant to get reference sprite
+    const participant = participants.find((p) => p.name === operation.actor);
+    if (!participant) {
+      throw new Error(`Participant not found: ${operation.actor}`);
     }
 
-    console.log(`[CombatAnimator] Generating animation:`);
-    console.log(`  Actor: ${operation.actor}`);
-    console.log(`  Action: ${operation.action} with ${operation.weapon}`);
-    console.log(`  Prompt: ${operation.spritePrompt}`);
-
-    const characterId = this.characterCache.get(operation.actor);
-    if (!characterId) {
-      throw new Error(`Character not found for actor: ${operation.actor}`);
+    const characterSprite = this.characterCache.get(participant.id);
+    if (!characterSprite) {
+      throw new Error(`Character sprite not found for: ${operation.actor}`);
     }
 
-    // Build action description for PixelLab
-    const actionDescription = `${operation.action} with ${operation.weapon}`;
+    // Build action description
+    const actionDescription = this.buildActionDescription(operation);
+    console.log(`    Action: ${actionDescription}`);
 
-    // TODO: Call PixelLab MCP animate_character
-    // mcp__pixellab__animate_character({
-    //   character_id: characterId,
-    //   action_description: actionDescription,
-    //   template_animation_id: this.mapActionToTemplate(operation.action)
-    // })
+    // Generate animation frames using PixelLab API
+    const response = await this.api.animateWithText({
+      description: characterSprite.description,
+      action: actionDescription,
+      image_size: {
+        width: this.config.animationSize,
+        height: this.config.animationSize,
+      },
+      reference_image: characterSprite.imageBase64,
+      n_frames: this.config.frameCount,
+      view: this.config.view,
+      direction: 'south',
+    });
 
-    // For now, return placeholder
     const hash = this.hashOperation(operation.actor, operation.action, operation.weapon);
 
     return {
@@ -251,43 +315,45 @@ export class CombatAnimator {
       actor: operation.actor,
       action: operation.action,
       weapon: operation.weapon,
-      characterId,
-      animationName: actionDescription,
-      frameCount: 8,
+      frames: response.images,
+      frameCount: response.images.length,
       frameRate: 12,
       generatedAt: Date.now(),
     };
   }
 
   /**
-   * Map combat action to PixelLab animation template
+   * Build action description for animation
    */
-  private mapActionToTemplate(action: string): string {
-    const actionLower = action.toLowerCase();
+  private buildActionDescription(
+    operation: NonNullable<CombatLogEvent['renderableOperation']>
+  ): string {
+    // Map combat actions to animation-friendly descriptions
+    const action = operation.action.toLowerCase();
+    const weapon = operation.weapon;
 
-    // Map to available PixelLab templates
-    if (actionLower.includes('thrust') || actionLower.includes('stab')) {
-      return 'lead-jab'; // Thrust-like motion
+    if (action.includes('thrust') || action.includes('stab')) {
+      return `thrusting forward with ${weapon}, piercing attack`;
     }
 
-    if (actionLower.includes('slash') || actionLower.includes('swing')) {
-      return 'roundhouse-kick'; // Wide swing motion
+    if (action.includes('slash') || action.includes('swing')) {
+      return `slashing with ${weapon}, sweeping horizontal attack`;
     }
 
-    if (actionLower.includes('bash') || actionLower.includes('smash')) {
-      return 'cross-punch'; // Heavy strike
+    if (action.includes('bash') || action.includes('smash')) {
+      return `bashing with ${weapon}, heavy overhead strike`;
     }
 
-    if (actionLower.includes('block') || actionLower.includes('defend')) {
-      return 'fight-stance-idle-8-frames';
+    if (action.includes('block') || action.includes('defend')) {
+      return `blocking with ${weapon}, defensive stance`;
     }
 
-    if (actionLower.includes('dodge') || actionLower.includes('evade')) {
-      return 'running-slide';
+    if (action.includes('dodge') || action.includes('evade')) {
+      return 'dodging to the side, evasive movement';
     }
 
-    // Default to a generic attack
-    return 'cross-punch';
+    // Default: use the original action
+    return `${action} with ${weapon}`;
   }
 
   /**
@@ -295,22 +361,26 @@ export class CombatAnimator {
    */
   private buildTimeline(recording: CombatRecording): CombatReplayFrame[] {
     const frames: CombatReplayFrame[] = [];
-    const actorStates = new Map<string, { animationHash: string; frameIndex: number }>();
+    const actorStates = new Map<
+      string,
+      { animationHash: string; frameIndex: number; framesRemaining: number }
+    >();
 
-    // Initialize actor states
-    for (const actorId of recording.participants) {
-      actorStates.set(actorId, {
+    // Initialize actor states to idle
+    for (const participant of recording.participants) {
+      actorStates.set(participant.id, {
         animationHash: 'idle',
         frameIndex: 0,
+        framesRemaining: 0,
       });
     }
 
-    // Process events tick by tick
+    // Build frame-by-frame timeline
     for (let tick = recording.startTick; tick <= recording.endTick; tick++) {
       // Get events for this tick
       const tickEvents = recording.events.filter((e) => e.tick === tick);
 
-      // Update actor states based on events
+      // Start new animations for events
       for (const event of tickEvents) {
         if (event.renderableOperation) {
           const hash = this.hashOperation(
@@ -319,33 +389,112 @@ export class CombatAnimator {
             event.renderableOperation.weapon
           );
 
-          actorStates.set(event.actor, {
-            animationHash: hash,
-            frameIndex: 0,
-          });
+          const animation = this.animationCache.get(hash);
+          const participant = recording.participants.find(
+            (p) => p.name === event.actor
+          );
+
+          if (participant && animation) {
+            actorStates.set(participant.id, {
+              animationHash: hash,
+              frameIndex: 0,
+              framesRemaining: animation.frameCount,
+            });
+          }
         }
       }
 
-      // Advance frame indices
+      // Build frame for this tick
+      const actors: CombatReplayFrame['actors'] = [];
+
       for (const [actorId, state] of actorStates.entries()) {
-        const animation = this.animationCache.get(state.animationHash);
-        if (animation && animation.frameCount) {
-          state.frameIndex = (state.frameIndex + 1) % animation.frameCount;
-        }
-      }
-
-      // Create frame
-      frames.push({
-        tick,
-        actors: Array.from(actorStates.entries()).map(([actorId, state]) => ({
+        actors.push({
           actorId,
           animationHash: state.animationHash,
           frameIndex: state.frameIndex,
-        })),
-      });
+          direction: 'south', // TODO: Calculate from positions
+        });
+
+        // Advance animation state
+        if (state.framesRemaining > 0) {
+          state.frameIndex++;
+          state.framesRemaining--;
+
+          // Reset to idle when animation completes
+          if (state.framesRemaining === 0) {
+            state.animationHash = 'idle';
+            state.frameIndex = 0;
+          }
+        }
+      }
+
+      frames.push({ tick, actors });
     }
 
     return frames;
+  }
+
+  /**
+   * Save replay to disk
+   */
+  async saveReplay(replay: CombatReplay, outputDir: string): Promise<void> {
+    await fs.mkdir(outputDir, { recursive: true });
+
+    // Save character sprites
+    const spritesDir = path.join(outputDir, 'sprites');
+    await fs.mkdir(spritesDir, { recursive: true });
+
+    for (const [id, sprite] of replay.characters) {
+      const filename = `${id.toLowerCase().replace(/\s+/g, '_')}.png`;
+      const filepath = path.join(spritesDir, filename);
+      await fs.writeFile(filepath, Buffer.from(sprite.imageBase64, 'base64'));
+      console.log(`  Saved sprite: ${filename}`);
+    }
+
+    // Save animation frames
+    const animationsDir = path.join(outputDir, 'animations');
+    await fs.mkdir(animationsDir, { recursive: true });
+
+    for (const [hash, animation] of replay.animations) {
+      const animDir = path.join(animationsDir, hash);
+      await fs.mkdir(animDir, { recursive: true });
+
+      for (let i = 0; i < animation.frames.length; i++) {
+        const frame = animation.frames[i];
+        if (!frame) continue;
+        const filename = `frame_${String(i).padStart(3, '0')}.png`;
+        const filepath = path.join(animDir, filename);
+        await fs.writeFile(filepath, Buffer.from(frame, 'base64'));
+      }
+      console.log(`  Saved animation: ${hash} (${animation.frames.length} frames)`);
+    }
+
+    // Save replay metadata
+    const metadata = {
+      recordingId: replay.recordingId,
+      combatName: replay.combatName,
+      characters: Array.from(replay.characters.entries()).map(([id, sprite]) => ({
+        id,
+        description: sprite.description,
+        spriteFile: `sprites/${id.toLowerCase().replace(/\s+/g, '_')}.png`,
+      })),
+      animations: Array.from(replay.animations.entries()).map(([hash, anim]) => ({
+        hash,
+        actor: anim.actor,
+        action: anim.action,
+        weapon: anim.weapon,
+        frameCount: anim.frameCount,
+        frameRate: anim.frameRate,
+        framesDir: `animations/${hash}/`,
+      })),
+      timeline: replay.timeline,
+    };
+
+    await fs.writeFile(
+      path.join(outputDir, 'replay.json'),
+      JSON.stringify(metadata, null, 2)
+    );
+    console.log(`  Saved replay metadata: replay.json`);
   }
 
   /**
@@ -356,29 +505,42 @@ export class CombatAnimator {
   }
 
   /**
-   * Clear animation cache
+   * Clear all caches
    */
   clearCache(): void {
-    this.animationCache.clear();
     this.characterCache.clear();
+    this.animationCache.clear();
   }
 }
 
 /**
- * Helper: Load combat recording from JSON file
+ * Load combat recording from JSON file
  */
 export async function loadCombatRecording(filePath: string): Promise<CombatRecording> {
-  // TODO: Implement file loading
-  throw new Error('Not implemented');
+  const content = await fs.readFile(filePath, 'utf-8');
+  const data = JSON.parse(content);
+
+  // Convert simple participants array to full objects if needed
+  if (data.participants && typeof data.participants[0] === 'string') {
+    data.participants = (data.participants as string[]).map((name: string) => ({
+      id: name,
+      name: name,
+      description: buildDescriptionFromName(name),
+    }));
+  }
+
+  return data;
 }
 
 /**
- * Helper: Save combat replay to file
+ * Build description from participant name (e.g., "Gladiator Red" -> "gladiator in red armor")
  */
-export async function saveCombatReplay(
-  replay: CombatReplay,
-  outputPath: string
-): Promise<void> {
-  // TODO: Implement file saving
-  throw new Error('Not implemented');
+function buildDescriptionFromName(name: string): string {
+  const parts = name.toLowerCase().split(' ');
+
+  if (parts.length >= 2 && parts[0] === 'gladiator') {
+    return `gladiator in ${parts[1]} armor`;
+  }
+
+  return name.toLowerCase();
 }

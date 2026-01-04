@@ -1,0 +1,152 @@
+{
+  "recordingId": "match_001_red_vs_blue",
+  "combatName": "Arena Champions: Red vs Blue",
+  "startTick": 0,
+  "endTick": 50,
+  "participants": [
+    "Gladiator Red",
+    "Gladiator Blue"
+  ],
+  "metadata": {
+    "arena": "Colosseum Prime",
+    "season": "Season 3",
+    "episode": "Episode 5"
+  },
+  "events": [
+    {
+      "tick": 5,
+      "actor": "Gladiator Red",
+      "action": "thrusts",
+      "weapon": "scarlet spear",
+      "target": "Gladiator Blue's left leg",
+      "damage": 12,
+      "renderableOperation": {
+        "actor": "Gladiator Red",
+        "action": "thrusts",
+        "weapon": "scarlet spear",
+        "target": "Gladiator Blue's left leg",
+        "spritePrompt": "gladiator in red armor thrusts with scarlet spear, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 8,
+      "actor": "Gladiator Blue",
+      "action": "bashes",
+      "weapon": "azure mace",
+      "target": "Gladiator Red's shield",
+      "damage": 5,
+      "renderableOperation": {
+        "actor": "Gladiator Blue",
+        "action": "bashes",
+        "weapon": "azure mace",
+        "target": "Gladiator Red's shield",
+        "spritePrompt": "gladiator in blue armor bashes with azure mace, heavy swing motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 12,
+      "actor": "Gladiator Red",
+      "action": "slashes",
+      "weapon": "scarlet spear",
+      "target": "Gladiator Blue's torso",
+      "damage": 15,
+      "renderableOperation": {
+        "actor": "Gladiator Red",
+        "action": "slashes",
+        "weapon": "scarlet spear",
+        "target": "Gladiator Blue's torso",
+        "spritePrompt": "gladiator in red armor slashes with scarlet spear, wide sweeping motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 18,
+      "actor": "Gladiator Blue",
+      "action": "thrusts",
+      "weapon": "cobalt trident",
+      "target": "Gladiator Red's chest",
+      "damage": 18,
+      "renderableOperation": {
+        "actor": "Gladiator Blue",
+        "action": "thrusts",
+        "weapon": "cobalt trident",
+        "target": "Gladiator Red's chest",
+        "spritePrompt": "gladiator in blue armor thrusts with cobalt trident, piercing motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 22,
+      "actor": "Gladiator Red",
+      "action": "bashes",
+      "weapon": "scarlet shield",
+      "target": "Gladiator Blue's face",
+      "damage": 8,
+      "renderableOperation": {
+        "actor": "Gladiator Red",
+        "action": "bashes",
+        "weapon": "scarlet shield",
+        "target": "Gladiator Blue's face",
+        "spritePrompt": "gladiator in red armor bashes with scarlet shield, shield slam motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 28,
+      "actor": "Gladiator Blue",
+      "action": "slashes",
+      "weapon": "azure blade",
+      "target": "Gladiator Red's arm",
+      "damage": 14,
+      "renderableOperation": {
+        "actor": "Gladiator Blue",
+        "action": "slashes",
+        "weapon": "azure blade",
+        "target": "Gladiator Red's arm",
+        "spritePrompt": "gladiator in blue armor slashes with azure blade, horizontal cut motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 35,
+      "actor": "Gladiator Red",
+      "action": "thrusts",
+      "weapon": "scarlet spear",
+      "target": "Gladiator Blue's shoulder",
+      "damage": 20,
+      "renderableOperation": {
+        "actor": "Gladiator Red",
+        "action": "thrusts",
+        "weapon": "scarlet spear",
+        "target": "Gladiator Blue's shoulder",
+        "spritePrompt": "gladiator in red armor thrusts with scarlet spear, powerful thrust motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 42,
+      "actor": "Gladiator Blue",
+      "action": "bashes",
+      "weapon": "azure mace",
+      "target": "Gladiator Red's helmet",
+      "damage": 16,
+      "renderableOperation": {
+        "actor": "Gladiator Blue",
+        "action": "bashes",
+        "weapon": "azure mace",
+        "target": "Gladiator Red's helmet",
+        "spritePrompt": "gladiator in blue armor bashes with azure mace, overhead smash motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 50,
+      "actor": "Gladiator Red",
+      "action": "slashes",
+      "weapon": "scarlet spear",
+      "target": "Gladiator Blue's legs",
+      "damage": 22,
+      "renderableOperation": {
+        "actor": "Gladiator Red",
+        "action": "slashes",
+        "weapon": "scarlet spear",
+        "target": "Gladiator Blue's legs",
+        "spritePrompt": "gladiator in red armor slashes with scarlet spear, low sweeping motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    }
+  ]
+}

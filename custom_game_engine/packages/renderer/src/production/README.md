@@ -323,15 +323,195 @@ assets/productions/
 - **Cinematic** (512×512): High cost, use for hero moments only
 - **Ultra** (1024×1024+): Very high cost, reserve for marketing/concept art
 
+## Combat Animation System
+
+The Combat Animator generates pixel art animations from combat recordings using the PixelLab API directly.
+
+### Quick Start
+
+```bash
+# Set your API token
+export PIXELLAB_API_TOKEN=your_token_here
+
+# Dry run to preview what will be generated
+./scripts/animate-combat.ts \
+  --combat-log "./examples/gladiator_match_001.json" \
+  --output-dir "./assets/combat_replays/match_001/" \
+  --dry-run
+
+# Generate animations
+./scripts/animate-combat.ts \
+  --combat-log "./examples/gladiator_match_001.json" \
+  --output-dir "./assets/combat_replays/match_001/"
+```
+
+### Combat Log Format
+
+Combat recordings include `renderableOperation` for each event:
+
+```json
+{
+  "recordingId": "match_001",
+  "combatName": "Red vs Blue",
+  "participants": ["Gladiator Red", "Gladiator Blue"],
+  "events": [
+    {
+      "tick": 5,
+      "actor": "Gladiator Red",
+      "action": "thrusts",
+      "weapon": "scarlet spear",
+      "target": "Gladiator Blue's left leg",
+      "damage": 12,
+      "renderableOperation": {
+        "actor": "Gladiator Red",
+        "action": "thrusts",
+        "weapon": "scarlet spear",
+        "target": "Gladiator Blue's left leg",
+        "spritePrompt": "gladiator in red armor thrusts with scarlet spear, attacking motion"
+      }
+    }
+  ]
+}
+```
+
+### PixelLab API Integration
+
+The combat animator uses the PixelLab REST API directly:
+
+**API Endpoints Used:**
+- `POST /v1/generate-image-bitforge` - Generate character base sprites
+- `POST /v1/animate-with-text` - Generate animation frames from reference image
+
+**Generate Character Sprite:**
+```typescript
+const response = await api.generateImageBitforge({
+  description: "gladiator in red armor",
+  image_size: { width: 64, height: 64 },
+  view: "high top-down",
+  direction: "south",
+  detail: "high detail",
+  shading: "detailed shading",
+  outline: "single color outline",
+  no_background: true
+});
+// Returns: { image: "base64..." }
+```
+
+**Generate Animation Frames:**
+```typescript
+const response = await api.animateWithText({
+  description: "gladiator in red armor",
+  action: "thrusting forward with spear, piercing attack",
+  image_size: { width: 64, height: 64 },
+  reference_image: characterSprite.imageBase64,
+  n_frames: 8,
+  view: "high top-down",
+  direction: "south"
+});
+// Returns: { images: ["base64...", "base64...", ...] }
+```
+
+### CLI Options
+
+```
+--combat-log <path>     Path to combat recording JSON (required)
+--output-dir <path>     Output directory for replay assets (required)
+--api-token <token>     PixelLab API token (or set PIXELLAB_API_TOKEN)
+--sprite-size <size>    Character sprite size in pixels (default: 64)
+--frame-count <count>   Animation frames (2-20, default: 8)
+--dry-run               Preview without API calls
+```
+
+### Animation Workflow
+
+The script executes this pipeline:
+
+1. **Load Recording** - Parse combat log JSON
+2. **Generate Character Sprites** - Create base sprite for each participant using Bitforge
+3. **Extract Unique Operations** - Deduplicate (actor + action + weapon) combinations
+4. **Generate Animations** - Use `animate-with-text` with character reference
+5. **Build Timeline** - Map events to animations with frame indices
+6. **Save Assets** - Write PNGs and replay.json to output directory
+
+### Action Description Mapping
+
+Combat actions are mapped to animation-friendly descriptions:
+
+| Combat Action | Animation Description |
+|--------------|----------------------|
+| thrust, stab | "thrusting forward with {weapon}, piercing attack" |
+| slash, swing | "slashing with {weapon}, sweeping horizontal attack" |
+| bash, smash | "bashing with {weapon}, heavy overhead strike" |
+| block, defend | "blocking with {weapon}, defensive stance" |
+| dodge, evade | "dodging to the side, evasive movement" |
+
+### Animation Caching
+
+Animations are cached by operation hash:
+- Hash = `{actor}_{action}_{weapon}` (e.g., `gladiator_red_thrusts_scarlet_spear`)
+- Same action+weapon combos reuse cached sprites
+- Reduces API calls and generation costs
+
+### Output Structure
+
+```
+output-dir/
+├── sprites/
+│   ├── gladiator_red.png      # 64x64 character sprite
+│   └── gladiator_blue.png
+├── animations/
+│   ├── gladiator_red_thrusts_scarlet_spear/
+│   │   ├── frame_000.png
+│   │   ├── frame_001.png
+│   │   └── ... (8 frames)
+│   └── gladiator_blue_bashes_azure_mace/
+│       └── ...
+└── replay.json                 # Timeline and metadata
+```
+
+### Programmatic Usage
+
+```typescript
+import { CombatAnimator, loadCombatRecording } from './CombatAnimator';
+
+// Load recording
+const recording = await loadCombatRecording('./combat.json');
+
+// Create animator with API token
+const animator = new CombatAnimator(process.env.PIXELLAB_API_TOKEN, {
+  spriteSize: 64,
+  frameCount: 8,
+  view: 'high top-down',
+});
+
+// Generate replay
+const replay = await animator.generateReplay(recording);
+
+// Save to disk
+await animator.saveReplay(replay, './output');
+```
+
+### Benefits
+
+1. **Direct API** - No MCP dependency, works anywhere with HTTP
+2. **Isolated Operations** - Each combat action is independent and renderable
+3. **Weapon-Specific** - Different weapons create visually distinct animations
+4. **Cacheable** - Same action+weapon combos reuse sprites
+5. **Automated** - Combat log automatically generates all needed sprite prompts
+6. **Dry Run** - Preview what will be generated before spending credits
+
 ## Future Enhancements
 
-- **Animation Rendering**: Multi-frame animated sequences
 - **Scene Rendering**: Characters in environments
 - **Real-time Preview**: Interactive virtual dressing room
 - **Motion Capture**: Record gameplay actions for animation reference
+- **Multi-Character Scenes**: Render full combat scenes with both fighters
 
 ## References
 
 - [Full Specification](../../../../openspec/specs/renderer/video-production-rendering.md)
 - [Soul Sprite Progression](../../../../openspec/specs/soul-system/soul-sprite-progression.md)
-- [PixelLab Integration](../sprites/PixelLabSpriteDefs.ts)
+- [PixelLab API Client](./PixelLabAPI.ts)
+- [Combat Animator](./CombatAnimator.ts)
+- [Example Combat Log](../../../../examples/gladiator_match_001.json)
+- [PixelLab API Docs](https://api.pixellab.ai/v1/docs)

@@ -220,7 +220,8 @@ export function addToInventoryWithQuality(
   inventory: InventoryComponent,
   itemId: string,
   quantity: number,
-  quality: number
+  quality: number,
+  instanceId?: string
 ): { inventory: InventoryComponent; amountAdded: number } {
   if (quantity <= 0) {
     throw new Error(`Cannot add non-positive quantity: ${quantity}`);
@@ -241,9 +242,10 @@ export function addToInventoryWithQuality(
     throw new Error(`Inventory weight limit exceeded. Cannot add ${itemId}.`);
   }
 
-  // Try to add to existing stacks with SAME quality first
+  // Try to add to existing stacks with SAME quality AND instanceId first
   for (const slot of inventory.slots) {
-    if (slot.itemId === itemId && slot.quality === quality && slot.quantity < stackSize) {
+    const sameInstance = instanceId ? slot.instanceId === instanceId : !slot.instanceId;
+    if (slot.itemId === itemId && slot.quality === quality && sameInstance && slot.quantity < stackSize) {
       const spaceInStack = stackSize - slot.quantity;
       const amountForThisStack = Math.min(remainingToAdd, spaceInStack);
       slot.quantity += amountForThisStack;
@@ -261,6 +263,7 @@ export function addToInventoryWithQuality(
         slot.itemId = itemId;
         slot.quantity = amountForThisStack;
         slot.quality = quality;
+        slot.instanceId = instanceId;
         remainingToAdd -= amountForThisStack;
 
         if (remainingToAdd === 0) break;

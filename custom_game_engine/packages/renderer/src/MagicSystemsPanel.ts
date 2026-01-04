@@ -175,7 +175,7 @@ export class MagicSystemsPanel implements IWindowPanel {
   private contentHeight = 0;
   private visibleHeight = 0;
 
-  private renderHeader(ctx: CanvasRenderingContext2D, width: number, y: number): number {
+  renderHeader(ctx: CanvasRenderingContext2D, width: number, y: number): number {
     // Header background
     ctx.fillStyle = COLORS.headerBg;
     ctx.fillRect(0, y, width, SIZES.headerHeight);

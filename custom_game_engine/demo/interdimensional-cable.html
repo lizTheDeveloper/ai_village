@@ -367,6 +367,21 @@
         recordingPath: '/mock-recordings/gladiator-combat-real.json',
         type: 'recording'
       },
+      {
+        id: 'fae-vs-angels',
+        name: 'FAE VS ANGELS - ETHEREAL DUEL',
+        description: 'Transcendent fae battles celestial angel with PixelLab animations',
+        recordingPath: '/mock-recordings/fae-vs-angels.json',
+        assetsPath: '/combat-assets/fae-vs-angels/manifest.json',
+        type: 'combat-replay'
+      },
+      {
+        id: 'book-tentacle-vs-bambi',
+        name: 'NECRONOMICON VS BAMBI - FORBIDDEN KNOWLEDGE',
+        description: 'Eldritch tome-beast faces weaponized deer in dark library',
+        recordingPath: '/mock-recordings/book-tentacle-vs-bambi.json',
+        type: 'recording'
+      },
     ];
 
     class SpriteAnimationPlayer {
@@ -750,6 +765,332 @@
       }
     }
 
+    /**
+     * CombatReplayRenderer - Renders combat replays with PixelLab-generated sprites
+     *
+     * Loads manifest.json to map combat actions to animations,
+     * renders PixelLab character sprites and animations with tiled background.
+     */
+    class CombatReplayRenderer {
+      constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.manifest = null;
+        this.recording = null;
+        this.frames = [];
+        this.combatLog = [];
+        this.currentFrameIndex = 0;
+        this.isPlaying = true;
+        this.fps = 4; // Playback speed
+        this.lastFrameTime = 0;
+        this.frameInterval = 1000 / this.fps;
+
+        // Sprite caches
+        this.rotationCache = new Map();    // characterId:direction -> Image
+        this.animationCache = new Map();   // characterId:animationName:direction -> Image[]
+        this.backgroundTile = null;
+
+        // Active animations (character playing an attack animation)
+        this.activeAnimations = new Map(); // characterId -> { animation, direction, frameIndex, startTick }
+      }
+
+      async loadCombatReplay(show) {
+        try {
+          console.log('[CombatReplayRenderer] Loading combat replay:', show.id);
+
+          // Load manifest
+          const manifestResponse = await fetch(show.assetsPath);
+          if (!manifestResponse.ok) throw new Error(`Failed to load manifest: ${manifestResponse.status}`);
+          this.manifest = await manifestResponse.json();
+
+          // Load recording
+          const recordingResponse = await fetch(show.recordingPath);
+          if (!recordingResponse.ok) throw new Error(`Failed to load recording: ${recordingResponse.status}`);
+          this.recording = await recordingResponse.json();
+
+          this.frames = this.recording.frames || [];
+          this.combatLog = this.recording.combatLog || [];
+          this.currentFrameIndex = 0;
+
+          console.log(`[CombatReplayRenderer] Loaded ${this.frames.length} frames, ${this.combatLog.length} combat events`);
+
+          // Preload all assets
+          await this.preloadAssets();
+
+          return true;
+        } catch (error) {
+          console.error('[CombatReplayRenderer] Failed to load:', error);
+          throw error;
+        }
+      }
+
+      async preloadAssets() {
+        const basePath = this.manifest.combatId ? `/combat-assets/${this.manifest.combatId}/` : '';
+
+        // Load background tile
+        if (this.manifest.background?.path) {
+          try {
+            this.backgroundTile = await this.loadImage(basePath + this.manifest.background.path);
+            console.log('[CombatReplayRenderer] Loaded background tile');
+          } catch (e) {
+            console.warn('[CombatReplayRenderer] Failed to load background:', e);
+          }
+        }
+
+        // Load character rotations and animations
+        for (const [charId, charData] of Object.entries(this.manifest.characters || {})) {
+          // Load rotations
+          if (charData.rotations) {
+            for (const [dir, path] of Object.entries(charData.rotations)) {
+              try {
+                const img = await this.loadImage(basePath + path);
+                this.rotationCache.set(`${charId}:${dir}`, img);
+              } catch (e) {
+                console.warn(`[CombatReplayRenderer] Failed to load rotation ${charId}:${dir}`);
+              }
+            }
+          }
+
+          // Load animations
+          if (charData.animations) {
+            for (const [animName, animData] of Object.entries(charData.animations)) {
+              for (const dir of animData.directions || []) {
+                const frames = [];
+                for (let i = 0; i < animData.frames; i++) {
+                  try {
+                    const framePath = animData.path
+                      .replace('{direction}', dir)
+                      .replace('{frame}', String(i).padStart(3, '0'));
+                    const img = await this.loadImage(basePath + framePath);
+                    frames.push(img);
+                  } catch (e) {
+                    // Some frames may be missing
+                  }
+                }
+                if (frames.length > 0) {
+                  this.animationCache.set(`${charId}:${animName}:${dir}`, frames);
+                }
+              }
+            }
+          }
+        }
+
+        console.log(`[CombatReplayRenderer] Loaded ${this.rotationCache.size} rotations, ${this.animationCache.size} animations`);
+      }
+
+      loadImage(url) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error(`Failed to load: ${url}`));
+          img.src = url;
+          setTimeout(() => reject(new Error('Timeout: ' + url)), 10000);
+        });
+      }
+
+      // Map entity type to character ID in manifest
+      getCharacterId(entityType) {
+        for (const [charId, charData] of Object.entries(this.manifest.characters || {})) {
+          if (charData.type === entityType) return charId;
+        }
+        return null;
+      }
+
+      // Map facing angle to direction string
+      angleToDirection(angle) {
+        // Normalize angle to 0-360
+        let normalized = ((angle % 360) + 360) % 360;
+        // Map to 8 directions
+        const directions = ['east', 'north-east', 'north', 'north-west', 'west', 'south-west', 'south', 'south-east'];
+        const index = Math.round(normalized / 45) % 8;
+        return directions[index];
+      }
+
+      // Check combat log for actions at this tick and trigger animations
+      checkCombatActions(tick) {
+        for (const event of this.combatLog) {
+          if (event.tick === tick && event.renderableOperation) {
+            const op = event.renderableOperation;
+            const charId = this.getCharacterId(op.actorType);
+            if (!charId) continue;
+
+            // Map action to animation
+            const animationName = this.manifest.actionMapping?.[op.action];
+            if (!animationName) {
+              console.log(`[CombatReplayRenderer] No animation mapping for action: ${op.action}`);
+              continue;
+            }
+
+            // Start the animation
+            this.activeAnimations.set(charId, {
+              animation: animationName,
+              frameIndex: 0,
+              startTick: tick,
+              duration: 6 // Frames to play
+            });
+
+            console.log(`[CombatReplayRenderer] Started animation: ${charId} -> ${animationName}`);
+          }
+        }
+      }
+
+      animate(timestamp) {
+        if (!this.isPlaying || this.frames.length === 0) {
+          requestAnimationFrame((t) => this.animate(t));
+          return;
+        }
+
+        const elapsed = timestamp - this.lastFrameTime;
+        if (elapsed > this.frameInterval) {
+          this.lastFrameTime = timestamp;
+
+          // Get current frame
+          const frame = this.frames[this.currentFrameIndex];
+
+          // Check for combat actions at this tick
+          this.checkCombatActions(frame.tick);
+
+          // Clear and render
+          this.ctx.fillStyle = this.manifest.background?.fallbackColor || '#000';
+          this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+          // Render background
+          this.renderBackground();
+
+          // Render frame
+          this.renderFrame(frame);
+
+          // Advance active animations
+          for (const [charId, anim] of this.activeAnimations.entries()) {
+            anim.frameIndex++;
+            if (anim.frameIndex >= anim.duration) {
+              this.activeAnimations.delete(charId);
+            }
+          }
+
+          // Next frame (loop)
+          this.currentFrameIndex = (this.currentFrameIndex + 1) % this.frames.length;
+        }
+
+        requestAnimationFrame((t) => this.animate(t));
+      }
+
+      renderBackground() {
+        if (!this.backgroundTile) return;
+
+        const tileSize = this.manifest.background?.size || 64;
+        const cols = Math.ceil(this.canvas.width / tileSize) + 1;
+        const rows = Math.ceil(this.canvas.height / tileSize) + 1;
+
+        this.ctx.imageSmoothingEnabled = false;
+        for (let y = 0; y < rows; y++) {
+          for (let x = 0; x < cols; x++) {
+            this.ctx.drawImage(this.backgroundTile, x * tileSize, y * tileSize, tileSize, tileSize);
+          }
+        }
+      }
+
+      renderFrame(frame) {
+        if (!frame || !frame.entities) return;
+
+        const cameraX = frame.cameraX || 0;
+        const cameraY = frame.cameraY || 0;
+        const zoom = frame.cameraZoom || 1.0;
+
+        // Sort by distance
+        const sorted = [...frame.entities].sort((a, b) =>
+          (b.distanceFromCamera || 0) - (a.distanceFromCamera || 0)
+        );
+
+        for (const entity of sorted) {
+          this.renderEntity(entity, cameraX, cameraY, zoom);
+        }
+
+        // Draw overlay
+        this.ctx.fillStyle = 'rgba(0, 255, 0, 0.8)';
+        this.ctx.font = '12px "Courier New"';
+        this.ctx.fillText(`TICK ${frame.tick} | ${this.currentFrameIndex + 1}/${this.frames.length}`, 10, 20);
+
+        // Show last combat action
+        const recentAction = this.combatLog.find(e => e.tick <= frame.tick && e.tick > frame.tick - 20);
+        if (recentAction) {
+          this.ctx.fillStyle = 'rgba(255, 255, 0, 0.9)';
+          this.ctx.fillText(`${recentAction.attacker} ${recentAction.action} ${recentAction.defender}`, 10, 36);
+        }
+      }
+
+      renderEntity(entity, cameraX, cameraY, zoom) {
+        const charId = this.getCharacterId(entity.entityType);
+        if (!charId) {
+          // Fallback: draw colored circle
+          this.renderPlaceholder(entity, cameraX, cameraY, zoom);
+          return;
+        }
+
+        const direction = this.angleToDirection(entity.facingAngle || 0);
+        const activeAnim = this.activeAnimations.get(charId);
+
+        let sprite = null;
+
+        if (activeAnim) {
+          // Playing attack animation
+          const key = `${charId}:${activeAnim.animation}:${direction}`;
+          const frames = this.animationCache.get(key);
+          if (frames && frames.length > 0) {
+            sprite = frames[activeAnim.frameIndex % frames.length];
+          }
+        }
+
+        if (!sprite) {
+          // Use rotation sprite
+          sprite = this.rotationCache.get(`${charId}:${direction}`);
+          // Fallback to south
+          if (!sprite) sprite = this.rotationCache.get(`${charId}:south`);
+        }
+
+        if (!sprite) {
+          this.renderPlaceholder(entity, cameraX, cameraY, zoom);
+          return;
+        }
+
+        // Calculate screen position
+        const screenX = (entity.x - cameraX) * zoom + this.canvas.width / 2;
+        const screenY = (entity.y - cameraY) * zoom + this.canvas.height / 2;
+
+        // Scale sprite (48px base, scale up for visibility)
+        const scale = 3 * zoom;
+        const w = sprite.width * scale;
+        const h = sprite.height * scale;
+
+        this.ctx.imageSmoothingEnabled = false;
+        this.ctx.drawImage(sprite, screenX - w / 2, screenY - h / 2, w, h);
+      }
+
+      renderPlaceholder(entity, cameraX, cameraY, zoom) {
+        const screenX = (entity.x - cameraX) * zoom + this.canvas.width / 2;
+        const screenY = (entity.y - cameraY) * zoom + this.canvas.height / 2;
+
+        this.ctx.fillStyle = entity.entityType === 'transcendent_fae' ? '#ff00ff' : '#ffff00';
+        this.ctx.beginPath();
+        this.ctx.arc(screenX, screenY, 15 * zoom, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+
+      start() {
+        this.isPlaying = true;
+        requestAnimationFrame((t) => this.animate(t));
+      }
+
+      pause() {
+        this.isPlaying = false;
+      }
+
+      resume() {
+        this.isPlaying = true;
+      }
+    }
+
     // Global state
     let currentPlayer = null;
     let currentShow = null;
@@ -803,6 +1144,11 @@
           const recordingSource = show.recordingData || show.recordingPath;
           await player.loadRecording(recordingSource);
           player.start();
+        } else if (show.type === 'combat-replay') {
+          // Use CombatReplayRenderer for PixelLab combat replays
+          const player = new CombatReplayRenderer(canvas);
+          await player.loadCombatReplay(show);
+          player.start();
         } else {
           // Use SpriteAnimationPlayer for sprite animations
           const player = new SpriteAnimationPlayer(canvas);
@@ -847,6 +1193,11 @@
           // Use embedded data if available, otherwise load from path
           const recordingSource = show.recordingData || show.recordingPath;
           await currentPlayer.loadRecording(recordingSource);
+          currentPlayer.start();
+        } else if (show.type === 'combat-replay') {
+          // Use CombatReplayRenderer for PixelLab combat replays
+          currentPlayer = new CombatReplayRenderer(canvas);
+          await currentPlayer.loadCombatReplay(show);
           currentPlayer.start();
         } else {
           // Use SpriteAnimationPlayer for sprite animations

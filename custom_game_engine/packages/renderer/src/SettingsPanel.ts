@@ -123,6 +123,18 @@ export class SettingsPanel implements IWindowPanel {
     this.visible = visible;
   }
 
+  // DOM-based panel - no canvas rendering needed
+  render(
+    _ctx: CanvasRenderingContext2D,
+    _x: number,
+    _y: number,
+    _width: number,
+    _height: number,
+    _world?: unknown
+  ): void {
+    // SettingsPanel uses DOM elements, not canvas rendering
+  }
+
   constructor() {
     this.settings = this.loadSettings();
     // Check if this is first run (no DM prompt set)

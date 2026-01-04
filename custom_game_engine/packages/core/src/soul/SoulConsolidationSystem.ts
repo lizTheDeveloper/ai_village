@@ -16,8 +16,10 @@ import { ComponentType } from '../types/ComponentType.js';
 import type { EpisodicMemoryComponent, EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
 import type { SilverThreadComponent, SignificantEventType } from './SilverThreadComponent.js';
 import type { SoulLinkComponent } from './SoulLinkComponent.js';
-import type { PlotLinesComponent } from '../plot/PlotTypes.js';
+import type { PlotLinesComponent, PlotLineInstance } from '../plot/PlotTypes.js';
+import { cleanupConsumedHints } from '../plot/PlotTypes.js';
 import { addSignificantEvent } from './SilverThreadComponent.js';
+import { plotLineRegistry } from '../plot/PlotLineRegistry.js';
 
 /**
  * System priority: 106 (after MemoryConsolidationSystem at 105)
@@ -56,6 +58,15 @@ export class SoulConsolidationSystem implements System {
     // Get agent's consolidated memories
     const episodicMemory = agent.getComponent(ComponentType.EpisodicMemory) as EpisodicMemoryComponent | undefined;
     if (!episodicMemory) return;
+
+    // === Phase 5: Clean up consumed dream hints ===
+    const plotLines = soul.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
+    if (plotLines) {
+      const cleanedUp = cleanupConsumedHints(plotLines, thread.head.personal_tick, 500);
+      if (cleanedUp > 0) {
+        console.log(`[SoulConsolidation] Cleaned up ${cleanedUp} consumed dream hints`);
+      }
+    }
 
     // Extract significant events from recent memories
     const significantEvents = this.extractSignificantEvents(
@@ -126,30 +137,109 @@ export class SoulConsolidationSystem implements System {
 
   /**
    * Extract plot-relevant events (stage changes, plot completion)
+   *
+   * Phase 5 Enhancement: More explicit plot awareness
    */
   private extractPlotEvents(
     memories: EpisodicMemory[],
-    _plotLines: PlotLinesComponent
+    plotLines: PlotLinesComponent
   ): Array<{ type: SignificantEventType; details: Record<string, any> }> {
     const events: Array<{ type: SignificantEventType; details: Record<string, any> }> = [];
 
-    // Look for memories about plot progression
-    for (const memory of memories) {
-      // Check if memory is tagged as plot-relevant
-      if (memory.summary.includes('plot') || memory.summary.includes('quest') || memory.summary.includes('goal')) {
-        // This is a simple heuristic - in practice, plot events should be explicitly tagged
-        events.push({
-          type: 'plot_stage_change',
-          details: {
-            memory_id: memory.id,
-            description: memory.summary,
-            importance: memory.importance,
-          },
-        });
+    // === Phase 5: Check for memories related to active plots ===
+    for (const plot of plotLines.active) {
+      const template = plotLineRegistry.getTemplate(plot.template_id);
+      if (!template) continue;
+
+      const currentStage = template.stages.find(s => s.stage_id === plot.current_stage);
+      if (!currentStage) continue;
+
+      // Look for memories that might be related to the current plot stage
+      for (const memory of memories) {
+        if (this.isMemoryPlotRelevant(memory, plot, template.name, currentStage.name)) {
+          events.push({
+            type: 'plot_stage_change',
+            details: {
+              memory_id: memory.id,
+              plot_id: plot.instance_id,
+              plot_name: template.name,
+              stage_name: currentStage.name,
+              description: memory.summary,
+              importance: memory.importance,
+            },
+          });
+        }
+      }
+    }
+
+    // Also check completed plots since last sleep (for lesson-learned events)
+    for (const completed of plotLines.completed) {
+      const template = plotLineRegistry.getTemplate(completed.template_id);
+      if (!template) continue;
+
+      // If completion was recent (rough check via final_stage lookup)
+      for (const memory of memories) {
+        if (memory.summary.toLowerCase().includes(template.name.toLowerCase()) ||
+            memory.summary.toLowerCase().includes(template.lesson.insight.toLowerCase().substring(0, 20))) {
+          events.push({
+            type: 'lesson_learned',
+            details: {
+              memory_id: memory.id,
+              plot_id: completed.instance_id,
+              plot_name: template.name,
+              lesson: template.lesson.insight,
+              wisdom_domain: template.lesson.domain,
+            },
+          });
+        }
       }
     }
 
     return events;
+  }
+
+  /**
+   * Check if a memory is relevant to a specific plot
+   */
+  private isMemoryPlotRelevant(
+    memory: EpisodicMemory,
+    plot: PlotLineInstance,
+    plotName: string,
+    stageName: string
+  ): boolean {
+    const content = memory.summary.toLowerCase();
+
+    // Check for explicit plot/quest/goal keywords (existing heuristic)
+    if (content.includes('plot') || content.includes('quest') || content.includes('goal')) {
+      return true;
+    }
+
+    // Check if memory mentions the plot or stage name
+    if (content.includes(plotName.toLowerCase()) ||
+        content.includes(stageName.toLowerCase())) {
+      return true;
+    }
+
+    // Check for high importance memories that involve bound agents
+    if (memory.importance > 0.7) {
+      for (const agentId of Object.values(plot.bound_agents)) {
+        if (content.includes(agentId.toLowerCase().substring(0, 8))) {
+          return true;
+        }
+      }
+    }
+
+    // Check for keywords related to plot themes (betrayal, love, conflict, discovery, etc.)
+    const plotKeywords = ['betrayal', 'betrayed', 'love', 'conflict', 'discovery',
+                          'revelation', 'secret', 'trust', 'broken', 'forgive',
+                          'sacrifice', 'promise', 'vow', 'sworn', 'mentor'];
+    for (const keyword of plotKeywords) {
+      if (content.includes(keyword) && memory.importance > 0.5) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**

@@ -1,0 +1,93 @@
+{
+  "combatId": "fae-vs-angels",
+  "title": "TRANSCENDENT FAE VS CELESTIAL ANGELS - Ethereal Duel",
+  "generatedAt": "2026-01-04T10:43:00Z",
+  "pixelLabCharacters": {
+    "luminara": "730c7c29-2bca-4dda-83c8-658ba03178c9",
+    "seraphiel": "9c57e0db-1106-4006-aedf-f39033208330"
+  },
+  "characters": {
+    "luminara": {
+      "name": "Luminara the Transcendent",
+      "type": "transcendent_fae",
+      "description": "ethereal fairy creature with iridescent wings, glowing with magical energy",
+      "rotations": {
+        "south": "luminara/rotations/south.png",
+        "south-east": "luminara/rotations/south-east.png",
+        "east": "luminara/rotations/east.png",
+        "north-east": "luminara/rotations/north-east.png",
+        "north": "luminara/rotations/north.png",
+        "north-west": "luminara/rotations/north-west.png",
+        "west": "luminara/rotations/west.png",
+        "south-west": "luminara/rotations/south-west.png"
+      },
+      "animations": {
+        "reality-warp": {
+          "template": "fireball",
+          "description": "casting magical reality-warping spell",
+          "frames": 6,
+          "directions": ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"],
+          "path": "luminara/animations/fireball/{direction}/frame_{frame}.png"
+        },
+        "phase-shift": {
+          "template": "running-slide",
+          "description": "phase-shifting through dimensions",
+          "frames": 6,
+          "directions": ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"],
+          "path": "luminara/animations/running-slide/{direction}/frame_{frame}.png"
+        }
+      }
+    },
+    "seraphiel": {
+      "name": "Seraphiel the Radiant",
+      "type": "celestial_angel",
+      "description": "divine angel with golden wings and halo, radiant white robes",
+      "rotations": {
+        "south": "seraphiel/rotations/south.png",
+        "south-east": "seraphiel/rotations/south-east.png",
+        "east": "seraphiel/rotations/east.png",
+        "north-east": "seraphiel/rotations/north-east.png",
+        "north": "seraphiel/rotations/north.png",
+        "north-west": "seraphiel/rotations/north-west.png",
+        "west": "seraphiel/rotations/west.png",
+        "south-west": "seraphiel/rotations/south-west.png"
+      },
+      "animations": {
+        "holy-smite": {
+          "template": "fireball",
+          "description": "casting divine holy fire attack",
+          "frames": 6,
+          "directions": ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"],
+          "path": "seraphiel/animations/fireball/{direction}/frame_{frame}.png"
+        },
+        "divine-fury": {
+          "template": "cross-punch",
+          "description": "channeling divine fury, powerful strike",
+          "frames": 6,
+          "directions": ["south", "south-west", "north-west", "north", "north-east", "east"],
+          "path": "seraphiel/animations/cross-punch/{direction}/frame_{frame}.png",
+          "note": "Missing south-east and west directions due to generation errors"
+        }
+      }
+    }
+  },
+  "background": {
+    "tileId": "68d6a3aa-3032-41b6-97bd-4ebaf1ac92f0",
+    "name": "Dimensional Nexus",
+    "description": "swirling dimensional void with cosmic aurora",
+    "path": "background/tile.png",
+    "size": 64,
+    "fallbackColor": "#1a0533"
+  },
+  "actionMapping": {
+    "reality-warps around": "reality-warp",
+    "phase-shifts through": "phase-shift",
+    "transmutes spacetime against": "reality-warp",
+    "enchants the air to strike": "reality-warp",
+    "smites": "holy-smite",
+    "consecrates wrath upon": "holy-smite",
+    "channels divine fury at": "divine-fury",
+    "purifies violently": "holy-smite"
+  },
+  "recordingFile": "../mock-recordings/fae-vs-angels.json"
+}

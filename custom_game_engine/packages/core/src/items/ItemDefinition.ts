@@ -32,6 +32,7 @@ export type ItemCategory =
   | 'material'      // iron_ingot, cloth, etc.
   | 'consumable'    // potion, medicine, etc.
   | 'equipment'     // armor, weapons, etc.
+  | 'ammo'          // arrows, bullets, energy cells, etc.
   | 'misc';         // everything else
 
 /**

@@ -335,7 +335,7 @@ export class VisionComposerPanel implements IWindowPanel {
     this.visibleHeight = height - contentStartY;
   }
 
-  private renderHeader(ctx: CanvasRenderingContext2D, width: number, y: number): number {
+  renderHeader(ctx: CanvasRenderingContext2D, width: number, y: number): number {
     ctx.fillStyle = COLORS.headerBg;
     ctx.fillRect(0, y, width, SIZES.headerHeight);
 

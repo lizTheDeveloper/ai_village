@@ -9,6 +9,7 @@ import { canAcceptItems, removeItemsFromBelt, addItemsToBelt } from '../componen
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { MachineConnectionComponent } from '../components/MachineConnectionComponent.js';
 import { BELT_SPEEDS } from '../components/BeltComponent.js';
+import { itemInstanceRegistry } from '../items/ItemInstanceRegistry.js';
 
 /**
  * BeltSystem - Moves items along conveyor belts
@@ -143,14 +144,12 @@ export class BeltSystem implements System {
         continue;
       }
 
-      // Transfer item (simplified: create basic ItemInstance)
-      // TODO: Use ItemInstanceRegistry when exposed on World
-      const itemInstance: any = {
-        instanceId: `belt_${Date.now()}`,
+      // Transfer item - create proper ItemInstance via registry
+      const itemInstance = itemInstanceRegistry.createInstance({
         definitionId: belt.itemId,
-        quality: 'normal',
+        quality: 50, // Normal quality
         condition: 100,
-      };
+      });
 
       input.items.push(itemInstance);
       removeItemsFromBelt(belt, 1);

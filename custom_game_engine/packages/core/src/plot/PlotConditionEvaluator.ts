@@ -16,6 +16,11 @@ import type {
 } from './PlotTypes.js';
 import type { MoodComponent } from '../components/MoodComponent.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
+import type { SoulIdentityComponent } from '../soul/SoulIdentityComponent.js';
+import type { InventoryComponent } from '../components/InventoryComponent.js';
+import { hasItem } from '../components/InventoryComponent.js';
+import type { PositionComponent } from '../components/PositionComponent.js';
+import type { SkillsComponent, SkillId } from '../components/SkillsComponent.js';
 
 /**
  * Evaluate a single plot condition
@@ -36,28 +41,36 @@ export function evaluatePlotCondition(
     }
 
     case 'universe_tick_elapsed': {
-      // TODO: Need universe tick from context
-      return false;
+      const ticksInStage = context.universeTick - context.plot.stage_entered_at;
+      return ticksInStage >= condition.ticks;
     }
 
     case 'wisdom_threshold': {
-      // TODO: Hook into SoulIdentityComponent
-      return false;
+      const soul = getSoulIdentityComponent(context.entityId, world);
+      if (!soul) return false;
+      return soul.wisdom_level >= condition.min_wisdom;
     }
 
     case 'lesson_learned': {
-      // TODO: Hook into SoulIdentityComponent lessons
-      return false;
+      const soul = getSoulIdentityComponent(context.entityId, world);
+      if (!soul) return false;
+      return soul.lessons_learned.some((l) => l.lesson_id === condition.lesson_id);
     }
 
     case 'has_item': {
-      // TODO: Hook into InventoryComponent
-      return false;
+      const inventory = getInventoryComponent(context.entityId, world);
+      if (!inventory) return false;
+      // has_item just checks if item exists (quantity 1)
+      return hasItem(inventory, condition.item_id, 1);
     }
 
     case 'at_location': {
-      // TODO: Hook into PositionComponent
-      return false;
+      const position = getPositionComponent(context.entityId, world);
+      if (!position) return false;
+      const dx = position.x - condition.location.x;
+      const dy = position.y - condition.location.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      return distance <= condition.radius;
     }
 
     case 'has_relationship': {
@@ -65,8 +78,11 @@ export function evaluatePlotCondition(
     }
 
     case 'has_skill': {
-      // TODO: Hook into SkillsComponent
-      return false;
+      const skills = getSkillsComponent(context.entityId, world);
+      if (!skills) return false;
+      const skillId = condition.skill as SkillId;
+      const level = skills.levels[skillId] ?? 0;
+      return level >= condition.min_level;
     }
 
     case 'choice_made': {
@@ -374,4 +390,32 @@ function evaluateHasRelationship(
   if (!rel) return false;
 
   return rel.trust >= minTrust;
+}
+
+function getSoulIdentityComponent(entityId: string, world: World): SoulIdentityComponent | undefined {
+  const entity = world.getEntity(entityId);
+  if (!entity) return undefined;
+
+  return entity.getComponent('soul_identity') as SoulIdentityComponent | undefined;
+}
+
+function getInventoryComponent(entityId: string, world: World): InventoryComponent | undefined {
+  const entity = world.getEntity(entityId);
+  if (!entity) return undefined;
+
+  return entity.getComponent('inventory') as InventoryComponent | undefined;
+}
+
+function getPositionComponent(entityId: string, world: World): PositionComponent | undefined {
+  const entity = world.getEntity(entityId);
+  if (!entity) return undefined;
+
+  return entity.getComponent('position') as PositionComponent | undefined;
+}
+
+function getSkillsComponent(entityId: string, world: World): SkillsComponent | undefined {
+  const entity = world.getEntity(entityId);
+  if (!entity) return undefined;
+
+  return entity.getComponent('skills') as SkillsComponent | undefined;
 }

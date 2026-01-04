@@ -47,6 +47,7 @@ export type SoulCreationType =
  */
 export interface SoulIdentityComponent {
   type: ComponentType.SoulIdentity;
+  version: number;
 
   // Core identity (never changes)
   true_name: string;           // Discovered through Fate ceremony
@@ -82,6 +83,7 @@ export function createSoulIdentityComponent(params: {
 }): SoulIdentityComponent {
   return {
     type: ComponentType.SoulIdentity,
+    version: 1,
     true_name: params.true_name,
     created_at: params.created_at,
     created_by: params.created_by || 'fates',

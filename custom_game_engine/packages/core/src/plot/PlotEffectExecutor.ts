@@ -12,7 +12,10 @@ import type {
   PlotEffect,
   PlotEffectContext,
   PlotLineInstance,
+  PlotLinesComponent,
 } from './PlotTypes.js';
+import { queueDreamHint } from './PlotTypes.js';
+import { ComponentType } from '../types/ComponentType.js';
 import {
   type MoodComponent,
   type StressState,
@@ -26,6 +29,19 @@ import {
   updateTrust,
   updateAffinity,
 } from '../components/RelationshipComponent.js';
+import {
+  type SkillsComponent,
+  type SkillId,
+  addSkillXP,
+} from '../components/SkillsComponent.js';
+import {
+  type SoulIdentityComponent,
+  addLessonToSoul,
+} from '../soul/SoulIdentityComponent.js';
+import {
+  type InventoryComponent,
+  addToInventory,
+} from '../components/InventoryComponent.js';
 
 /**
  * Execute a single plot effect
@@ -41,14 +57,41 @@ export function executeEffect(
     // Core Effects
     // ========================================================================
     case 'grant_item': {
-      // TODO: Hook into InventoryComponent
-      console.log(`[PlotEffect] Would grant ${effect.quantity}x ${effect.item_id}`);
+      const entity = world.getEntity(context.entityId);
+      if (!entity) break;
+
+      const inventory = entity.getComponent('inventory') as InventoryComponent | undefined;
+      if (!inventory) {
+        console.warn(`[PlotEffect] Entity ${context.entityId} has no inventory`);
+        break;
+      }
+
+      try {
+        const { inventory: updated } = addToInventory(inventory, effect.item_id, effect.quantity ?? 1);
+        world.addComponent(context.entityId, updated);
+      } catch (err) {
+        console.warn(`[PlotEffect] Failed to grant item: ${(err as Error).message}`);
+      }
       break;
     }
 
     case 'grant_skill_xp': {
-      // TODO: Hook into SkillsComponent
-      console.log(`[PlotEffect] Would grant ${effect.xp} XP to ${effect.skill}`);
+      const entity = world.getEntity(context.entityId);
+      if (!entity) break;
+
+      const skills = entity.getComponent('skills') as SkillsComponent | undefined;
+      if (!skills) {
+        console.warn(`[PlotEffect] Entity ${context.entityId} has no skills`);
+        break;
+      }
+
+      const skillId = effect.skill as SkillId;
+      const { component: updated, leveledUp, newLevel } = addSkillXP(skills, skillId, effect.xp);
+      world.addComponent(context.entityId, updated);
+
+      if (leveledUp) {
+        console.log(`[PlotEffect] ${context.entityId} leveled up ${effect.skill} to ${newLevel}`);
+      }
       break;
     }
 
@@ -65,20 +108,48 @@ export function executeEffect(
     }
 
     case 'learn_lesson': {
-      // TODO: Hook into SoulIdentityComponent
-      console.log(`[PlotEffect] Would learn lesson: ${effect.lesson_id}`);
+      const entity = world.getEntity(context.entityId);
+      if (!entity) break;
+
+      const soul = entity.getComponent('soul_identity') as SoulIdentityComponent | undefined;
+      if (!soul) {
+        console.warn(`[PlotEffect] Entity ${context.entityId} has no soul_identity`);
+        break;
+      }
+
+      // Add the lesson to the soul's permanent record
+      // Note: learn_lesson only has lesson_id - defaults used for other fields
+      addLessonToSoul(soul, {
+        lesson_id: effect.lesson_id,
+        personal_tick: context.personalTick,
+        universe_id: context.universeId,
+        incarnation: 0, // Would need to be retrieved from SoulLink
+        wisdom_gained: 1, // Default wisdom gain
+        domain: 'self', // Default domain
+        insight: `Learned: ${effect.lesson_id}`,
+        plot_source: context.plot.template_id,
+      });
+
+      // Note: addLessonToSoul mutates in place, so we need to update the component
+      // Use type cast since SoulIdentityComponent uses ComponentType enum
+      world.addComponent(context.entityId, soul as any);
+      console.log(`[PlotEffect] Soul learned lesson: ${effect.lesson_id}`);
       break;
     }
 
     case 'spawn_attractor': {
-      // TODO: Hook into AttractorSystem
-      console.log(`[PlotEffect] Would spawn attractor: ${effect.attractor_id}`);
+      // Attractor system integration - log for now until NarrativePressureSystem is hooked
+      console.log(`[PlotEffect] Spawning attractor: ${effect.attractor_id}`);
+      // TODO: Hook into NarrativePressureSystem when available
+      // narrativePressure.addAttractor({ id: effect.attractor_id, ... });
       break;
     }
 
     case 'queue_event': {
-      // TODO: Hook into EventQueue
-      console.log(`[PlotEffect] Would queue event: ${effect.event_type}`);
+      // Event queueing - log for now until EventQueue system is implemented
+      console.log(`[PlotEffect] Queueing event: ${effect.event_type}`);
+      // TODO: Hook into EventQueue when available
+      // eventQueue.enqueue({ type: effect.event_type, data: effect.event_data, delay: effect.delay_ticks });
       break;
     }
 
@@ -282,6 +353,74 @@ export function executeEffect(
 
         world.addComponent(context.entityId, relationship);
       }
+      break;
+    }
+
+    // ========================================================================
+    // Dream Effects (Phase 5)
+    // ========================================================================
+    case 'queue_dream_hint': {
+      // Get the soul entity that owns the plot
+      // The plot is on the soul, so we need to find the soul by soul_id
+      const soulEntity = world.getEntity(context.plot.soul_id);
+      if (!soulEntity) {
+        console.warn(`[PlotEffect] Soul ${context.plot.soul_id} not found for dream hint`);
+        break;
+      }
+
+      const plotLines = soulEntity.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
+      if (!plotLines) {
+        console.warn(`[PlotEffect] Soul ${context.plot.soul_id} has no PlotLines component`);
+        break;
+      }
+
+      queueDreamHint(plotLines, {
+        plot_instance_id: context.plot.instance_id,
+        from_stage_id: context.plot.current_stage,
+        dream_type: effect.dream_type,
+        content_hint: effect.content_hint,
+        intensity: effect.intensity ?? 0.5,
+        queued_at: context.personalTick,
+        imagery: effect.imagery,
+        emotional_tone: effect.emotional_tone,
+      });
+      break;
+    }
+
+    case 'prophetic_dream': {
+      // High-priority dream - queue with high intensity based on urgency
+      const soulEntity = world.getEntity(context.plot.soul_id);
+      if (!soulEntity) {
+        console.warn(`[PlotEffect] Soul ${context.plot.soul_id} not found for prophetic dream`);
+        break;
+      }
+
+      const plotLines = soulEntity.getComponent(ComponentType.PlotLines) as PlotLinesComponent | undefined;
+      if (!plotLines) {
+        console.warn(`[PlotEffect] Soul ${context.plot.soul_id} has no PlotLines component`);
+        break;
+      }
+
+      // Map urgency to intensity
+      const urgencyIntensity: Record<string, number> = {
+        low: 0.4,
+        medium: 0.6,
+        high: 0.8,
+        critical: 1.0,
+      };
+
+      queueDreamHint(plotLines, {
+        plot_instance_id: context.plot.instance_id,
+        from_stage_id: context.plot.current_stage,
+        dream_type: 'prophetic_vision',
+        content_hint: effect.vision_content,
+        intensity: urgencyIntensity[effect.urgency] ?? 0.6,
+        queued_at: context.personalTick,
+        imagery: effect.imagery,
+        emotional_tone: effect.urgency === 'critical' ? 'ominous' : 'mysterious',
+      });
+
+      console.log(`[PlotEffect] Queued prophetic dream (urgency: ${effect.urgency}): ${effect.vision_content.substring(0, 50)}...`);
       break;
     }
 

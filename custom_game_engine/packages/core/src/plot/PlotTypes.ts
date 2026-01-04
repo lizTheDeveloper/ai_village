@@ -13,6 +13,7 @@ import type {
   BreakdownType,
   MoodFactors,
 } from '../components/MoodComponent.js';
+import type { PlotStageAttractor } from '../narrative/NarrativePressureTypes.js';
 
 // ============================================================================
 // Plot Trigger Types (Phase 2: Event-Driven Assignment)
@@ -241,7 +242,27 @@ export type PlotEffect =
   /** Modify relationship with a bound agent role */
   | { type: 'modify_relationship_by_role'; role: string; trust_delta?: number; affinity_delta?: number }
   /** Create a new relationship with a role binding */
-  | { type: 'bind_relationship'; role: string; agent_id: string; initial_trust?: number; initial_affinity?: number };
+  | { type: 'bind_relationship'; role: string; agent_id: string; initial_trust?: number; initial_affinity?: number }
+
+  // ============================================================================
+  // Dream Effects (Phase 5)
+  // ============================================================================
+  /** Queue a dream hint for the next sleep cycle */
+  | {
+      type: 'queue_dream_hint';
+      dream_type: 'prophetic_vision' | 'warning' | 'memory_echo' | 'symbolic';
+      content_hint: string;
+      intensity?: number;
+      imagery?: string[];
+      emotional_tone?: 'hopeful' | 'ominous' | 'melancholic' | 'triumphant' | 'mysterious';
+    }
+  /** Trigger an immediate prophetic dream (if sleeping) or queue high-priority hint */
+  | {
+      type: 'prophetic_dream';
+      vision_content: string;
+      urgency: 'low' | 'medium' | 'high' | 'critical';
+      imagery?: string[];
+    };
 
 /**
  * Context passed to effect executors
@@ -280,8 +301,9 @@ export interface PlotStage {
   name: string;
   description: string;
 
-  // Narrative pressure - what this stage wants to happen
-  outcome_attractors?: string[];  // Attractor IDs to spawn
+  // Narrative pressure - what this stage wants to happen (Phase 3)
+  // Attractors are spawned when entering stage and removed when exiting
+  stage_attractors?: PlotStageAttractor[];
 
   // Auto-complete after time
   auto_complete_after?: number;   // Personal ticks
@@ -448,6 +470,37 @@ export interface AbandonedPlot {
   final_stage: string;
 }
 
+// ============================================================================
+// Dream Integration Types (Phase 5)
+// ============================================================================
+
+/**
+ * Dream hint queued by a plot for the dream system
+ *
+ * Plot stages can queue hints that get consumed during sleep consolidation
+ * to generate plot-aware prophetic dreams.
+ */
+export interface PlotDreamHint {
+  /** The plot instance that queued this hint */
+  plot_instance_id: string;
+  /** The stage that created this hint */
+  from_stage_id: string;
+  /** Type of dream this should generate */
+  dream_type: 'prophetic_vision' | 'warning' | 'memory_echo' | 'symbolic';
+  /** Content hint for dream generation */
+  content_hint: string;
+  /** Intensity of the dream (0-1) */
+  intensity: number;
+  /** When this hint was queued (personal tick) */
+  queued_at: number;
+  /** Optional: specific imagery to include */
+  imagery?: string[];
+  /** Optional: emotional tone of the dream */
+  emotional_tone?: 'hopeful' | 'ominous' | 'melancholic' | 'triumphant' | 'mysterious';
+  /** Whether this hint has been consumed by the dream system */
+  consumed: boolean;
+}
+
 /**
  * PlotLines Component - stored on the soul entity
  */
@@ -455,7 +508,7 @@ export interface PlotLinesComponent {
   type: ComponentType.PlotLines;
 
   /** Schema version for migrations */
-  readonly version: 1;
+  readonly version: 2;
 
   // Active plots
   active: PlotLineInstance[];
@@ -465,6 +518,15 @@ export interface PlotLinesComponent {
 
   // Failed/abandoned plots
   abandoned: AbandonedPlot[];
+
+  // ============================================================================
+  // Dream Integration (Phase 5)
+  // ============================================================================
+  /**
+   * Queue of dream hints from active plots.
+   * Consumed by SoulConsolidationSystem during sleep to generate prophetic dreams.
+   */
+  dream_hints: PlotDreamHint[];
 }
 
 /**
@@ -473,10 +535,11 @@ export interface PlotLinesComponent {
 export function createPlotLinesComponent(): PlotLinesComponent {
   return {
     type: ComponentType.PlotLines,
-    version: 1,
+    version: 2,
     active: [],
     completed: [],
     abandoned: [],
+    dream_hints: [],
   };
 }
 
@@ -597,4 +660,72 @@ export function hasLearnedPlotLesson(
   // Note: requires access to template registry to check lesson IDs
   // This is a placeholder - full implementation needs template lookup
   return plotLines.completed.some(p => p.lesson_learned);
+}
+
+// ============================================================================
+// Dream Hint Helpers (Phase 5)
+// ============================================================================
+
+/**
+ * Queue a dream hint from a plot stage
+ */
+export function queueDreamHint(
+  plotLines: PlotLinesComponent,
+  hint: Omit<PlotDreamHint, 'consumed'>
+): void {
+  plotLines.dream_hints.push({
+    ...hint,
+    consumed: false,
+  });
+  console.log(`[PlotLines] Queued dream hint from plot ${hint.plot_instance_id}: ${hint.dream_type}`);
+}
+
+/**
+ * Consume unconsumed dream hints
+ * Returns the hints and marks them as consumed
+ */
+export function consumeDreamHints(
+  plotLines: PlotLinesComponent,
+  maxHints: number = 3
+): PlotDreamHint[] {
+  const unconsumed = plotLines.dream_hints.filter(h => !h.consumed);
+
+  // Sort by intensity (highest first) and take up to maxHints
+  const toConsume = unconsumed
+    .sort((a, b) => b.intensity - a.intensity)
+    .slice(0, maxHints);
+
+  // Mark as consumed
+  for (const hint of toConsume) {
+    hint.consumed = true;
+  }
+
+  return toConsume;
+}
+
+/**
+ * Clean up old consumed hints (call periodically)
+ */
+export function cleanupConsumedHints(
+  plotLines: PlotLinesComponent,
+  currentTick: number,
+  maxAge: number = 1000
+): number {
+  const before = plotLines.dream_hints.length;
+  plotLines.dream_hints = plotLines.dream_hints.filter(
+    h => !h.consumed || (currentTick - h.queued_at) < maxAge
+  );
+  return before - plotLines.dream_hints.length;
+}
+
+/**
+ * Get pending (unconsumed) dream hints for a specific plot
+ */
+export function getPendingHintsForPlot(
+  plotLines: PlotLinesComponent,
+  plotInstanceId: string
+): PlotDreamHint[] {
+  return plotLines.dream_hints.filter(
+    h => h.plot_instance_id === plotInstanceId && !h.consumed
+  );
 }

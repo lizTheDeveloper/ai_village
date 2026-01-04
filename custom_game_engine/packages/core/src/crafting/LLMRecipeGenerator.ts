@@ -551,6 +551,7 @@ If the ingredients don't make sense together for a ${recipeType}, respond with:
       'material': 'Materials',
       'consumable': 'Consumables',
       'equipment': 'Equipment',
+      'ammo': 'Ammunition',
       'misc': 'Miscellaneous',
     };
     return categoryMap[itemCategory] || 'Miscellaneous';

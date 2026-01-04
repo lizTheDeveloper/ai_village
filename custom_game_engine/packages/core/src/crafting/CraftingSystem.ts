@@ -450,12 +450,13 @@ export class CraftingSystem implements System {
     let currentInventory = inventory;
     const isLegendary = getQualityTier(quality) === 'legendary';
 
+    // Get creator info for instance tracking
+    const identity = entity.components.get('identity') as IdentityComponent | undefined;
+    const creatorName = identity?.name;
+
     try {
       if (isLegendary) {
-        // Legendary items are unique - each gets its own ItemInstance
-        const identity = entity.components.get('identity') as IdentityComponent | undefined;
-        const creatorName = identity?.name;
-
+        // Legendary items are unique - each gets its own ItemInstance and slot
         for (let i = 0; i < outputQuantity; i++) {
           // Create unique instance in registry
           const instance = itemInstanceRegistry.createInstance({
@@ -477,8 +478,25 @@ export class CraftingSystem implements System {
           currentInventory = result.inventory;
         }
       } else {
-        // Normal items stack by quality tier
-        const result = addToInventoryWithQuality(currentInventory, recipe.output.itemId, outputQuantity, quality);
+        // All crafted items get an instance for durability/provenance tracking
+        // Stackable items share one instance per crafting batch
+        const instance = itemInstanceRegistry.createInstance({
+          definitionId: recipe.output.itemId,
+          quality,
+          condition: 100, // New items are pristine
+          creator: job.agentId,
+          createdAt: world.tick,
+          stackSize: outputQuantity,
+        });
+
+        // Add to inventory with instanceId - items with same instance can stack
+        const result = addToInventoryWithQuality(
+          currentInventory,
+          recipe.output.itemId,
+          outputQuantity,
+          quality,
+          instance.instanceId
+        );
         currentInventory = result.inventory;
       }
       job.completedCount = job.quantity;

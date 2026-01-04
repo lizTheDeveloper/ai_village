@@ -1,0 +1,219 @@
+/**
+ * NarrativePressureTypes - Core types for the Narrative Pressure System
+ *
+ * Narrative pressure allows higher-dimensional beings (gods, plots, prophecies)
+ * to shape outcomes without dictating the path. It's probabilistic story shaping.
+ */
+
+// ============================================================================
+// Attractor Sources - Who/what can create outcome attractors
+// ============================================================================
+
+export type AttractorSource =
+  | { type: 'deity'; deityId: string }
+  | { type: 'player'; playerId: string }
+  | { type: 'storyteller'; narrativeForce: string }
+  | { type: 'prophecy'; prophecyId: string }
+  | { type: 'curse'; curseId: string }
+  | { type: 'karma'; karmaPool: string }
+  | { type: 'plot'; plotInstanceId: string; stageId: string };
+
+// ============================================================================
+// Goal Types - What outcomes can be targeted
+// ============================================================================
+
+export type GoalType =
+  // Entity states
+  | 'entity_death'
+  | 'entity_survival'
+  | 'entity_ascension'
+  | 'entity_transformation'
+  // Relationship goals
+  | 'relationship_formed'
+  | 'relationship_broken'
+  | 'love'
+  | 'betrayal'
+  // Village/collective goals
+  | 'village_crisis'
+  | 'village_prosperity'
+  | 'village_destruction'
+  | 'village_founding'
+  // Event goals
+  | 'event_occurrence'
+  | 'event_prevention'
+  | 'discovery'
+  | 'invention'
+  // Abstract goals
+  | 'conflict_escalation'
+  | 'conflict_resolution'
+  | 'mystery_revelation'
+  | 'justice'
+  | 'corruption'
+  // Plot-specific goals
+  | 'plot_stage_reached'
+  | 'skill_mastery'
+  | 'emotional_state';
+
+// ============================================================================
+// Outcome Goal - The desired state
+// ============================================================================
+
+export interface OutcomeGoal {
+  type: GoalType;
+  parameters: Record<string, unknown>;
+  description?: string;
+}
+
+// ============================================================================
+// Attractor Scope - Where does this apply
+// ============================================================================
+
+export type AttractorScope =
+  | { type: 'global' }
+  | { type: 'entity'; entityId: string }
+  | { type: 'area'; x: number; y: number; radius: number }
+  | { type: 'village'; villageId: string };
+
+// ============================================================================
+// Decay Conditions - When should the attractor fade
+// ============================================================================
+
+export type DecayCondition =
+  | { type: 'on_achievement' }
+  | { type: 'on_failure' }
+  | { type: 'time_limit'; ticksRemaining: number }
+  | { type: 'stage_exit' }  // Removed when plot leaves this stage
+  | { type: 'belief_decay'; ratePerTick: number }
+  | { type: 'never' };
+
+// ============================================================================
+// Pressure Effect - How the attractor affects the simulation
+// ============================================================================
+
+export type PressureTarget =
+  // Event spawning
+  | { type: 'event_spawn'; eventType: string }
+  | { type: 'encounter_chance'; encounterType: string }
+  // AI decisions
+  | { type: 'behavior_selection'; agentId: string; behavior: string }
+  | { type: 'conversation_topic'; agentId: string; topic: string }
+  | { type: 'decision_weight'; agentId: string; decision: string }
+  // Environmental
+  | { type: 'weather_modifier'; weatherType: string }
+  | { type: 'resource_availability'; resourceType: string }
+  // Social
+  | { type: 'relationship_change'; agentId: string; targetId: string }
+  | { type: 'opinion_shift'; agentId: string; opinion: string }
+  // Emotional (for plot integration)
+  | { type: 'emotional_bias'; agentId: string; emotion: string }
+  | { type: 'mood_modifier'; agentId: string };
+
+export interface PressureEffect {
+  target: PressureTarget;
+  bias: number;        // -1 to +1 (negative = suppress, positive = encourage)
+  confidence: number;  // 0-1 (how sure are we this helps?)
+}
+
+// ============================================================================
+// Outcome Attractor - The core attractor type
+// ============================================================================
+
+export interface OutcomeAttractor {
+  id: string;
+  source: AttractorSource;
+
+  // The desired end-state
+  goal: OutcomeGoal;
+
+  // How strongly this outcome is desired (0-1, can exceed 1 for divine mandates)
+  strength: number;
+
+  // How aggressively to pursue it (0-1, high = faster convergence)
+  urgency: number;
+
+  // Spatial/temporal scope
+  scope: AttractorScope;
+
+  // When this attractor should fade
+  decay: DecayCondition;
+
+  // Current progress toward the goal (0-1)
+  convergence: number;
+
+  // Active pressure effects generated by this attractor
+  activeEffects: PressureEffect[];
+
+  // Creation timestamp
+  createdAt: number;
+
+  // Optional: Human-readable description
+  description?: string;
+}
+
+// ============================================================================
+// Plot Stage Attractor Definition - Used in PlotStage to define attractors
+// ============================================================================
+
+export interface PlotStageAttractor {
+  /** Unique ID for this attractor (within the plot) */
+  attractor_id: string;
+
+  /** The goal this attractor pushes toward */
+  goal: OutcomeGoal;
+
+  /** Strength of the attractor (0-1) */
+  strength: number;
+
+  /** Urgency (0-1) */
+  urgency: number;
+
+  /** Optional scope override (defaults to entity scope for the soul) */
+  scope?: AttractorScope;
+
+  /** Description for debugging/narrative display */
+  description?: string;
+}
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Create a new outcome attractor
+ */
+export function createOutcomeAttractor(params: {
+  id: string;
+  source: AttractorSource;
+  goal: OutcomeGoal;
+  strength: number;
+  urgency?: number;
+  scope?: AttractorScope;
+  decay?: DecayCondition;
+  description?: string;
+  createdAt: number;
+}): OutcomeAttractor {
+  return {
+    id: params.id,
+    source: params.source,
+    goal: params.goal,
+    strength: Math.max(0, Math.min(2, params.strength)), // Clamp to 0-2
+    urgency: params.urgency ?? 0.5,
+    scope: params.scope ?? { type: 'global' },
+    decay: params.decay ?? { type: 'on_achievement' },
+    convergence: 0,
+    activeEffects: [],
+    createdAt: params.createdAt,
+    description: params.description,
+  };
+}
+
+/**
+ * Generate attractor ID for a plot stage
+ */
+export function plotStageAttractorId(
+  plotInstanceId: string,
+  stageId: string,
+  attractorId: string
+): string {
+  return `plot:${plotInstanceId}:${stageId}:${attractorId}`;
+}

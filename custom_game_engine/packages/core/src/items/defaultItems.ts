@@ -9,6 +9,16 @@
 
 import { defineItem, type ItemDefinition } from './ItemDefinition.js';
 
+// Weapon and ammo imports (weapons-expansion)
+import { ALL_AMMO_ITEMS } from './ammo/index.js';
+import { ALL_MELEE_WEAPONS } from './weapons/melee.js';
+import { ALL_TRADITIONAL_RANGED } from './weapons/ranged.js';
+import { ALL_FIREARMS } from './weapons/firearms.js';
+import { ALL_ENERGY_WEAPONS } from './weapons/energy.js';
+import { ALL_EXOTIC_WEAPONS } from './weapons/exotic.js';
+import { ALL_MAGIC_WEAPONS } from './weapons/magic.js';
+import { ALL_CREATIVE_WEAPONS } from './weapons/creative.js';
+
 /**
  * Resource items - gathered from the environment
  */
@@ -457,32 +467,9 @@ export const TOOL_ITEMS: ItemDefinition[] = [
 
 /**
  * Weapon items - used for combat and hunting
+ * NOTE: iron_sword and steel_sword are now defined in weapons/melee.ts with full weapon traits
  */
 export const WEAPON_ITEMS: ItemDefinition[] = [
-  defineItem('iron_sword', 'Iron Sword', 'equipment', {
-    weight: 3.0,
-    stackSize: 1,
-    isGatherable: false,
-    craftedFrom: [
-      { itemId: 'wood', amount: 1 },
-      { itemId: 'iron_ingot', amount: 3 },
-    ],
-    baseValue: 100,
-    rarity: 'uncommon',
-  }),
-
-  defineItem('steel_sword', 'Steel Sword', 'equipment', {
-    weight: 3.5,
-    stackSize: 1,
-    isGatherable: false,
-    craftedFrom: [
-      { itemId: 'wood', amount: 1 },
-      { itemId: 'steel_ingot', amount: 3 },
-    ],
-    baseValue: 250,
-    rarity: 'rare',
-  }),
-
   defineItem('copper_dagger', 'Copper Dagger', 'equipment', {
     weight: 1.0,
     stackSize: 1,
@@ -704,6 +691,15 @@ export const DEFAULT_ITEMS: ItemDefinition[] = [
   ...WEAPON_ITEMS,
   ...CONSUMABLE_ITEMS,
   ...CLOTHING_ITEMS,
+  // Weapons expansion
+  ...ALL_AMMO_ITEMS,
+  ...ALL_MELEE_WEAPONS,
+  ...ALL_TRADITIONAL_RANGED,
+  ...ALL_FIREARMS,
+  ...ALL_ENERGY_WEAPONS,
+  ...ALL_EXOTIC_WEAPONS,
+  ...ALL_MAGIC_WEAPONS,
+  ...ALL_CREATIVE_WEAPONS,
 ];
 
 /**

@@ -1,0 +1,5119 @@
+{
+  "recordingId": "real_combat_fae-vs-angels_1767522779595",
+  "title": "TRANSCENDENT FAE VS CELESTIAL ANGELS - Ethereal Duel",
+  "description": "Reality-warping fae creatures battle divine angelic beings",
+  "recordedBy": "ECS Combat System",
+  "recordedAt": 1767522779595,
+  "duration": 136,
+  "quality": 0.98,
+  "frames": [
+    {
+      "tick": 0,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 595,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 5
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 605,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 5
+        }
+      ]
+    },
+    {
+      "tick": 5,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 593.1637384283556,
+          "y": 607.191383079063,
+          "facingAngle": -46.45018062799357,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 9.922220662017954
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 606.8362615716444,
+          "y": 592.808616920937,
+          "facingAngle": 133.54981937200643,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 9.922220662017954
+        }
+      ]
+    },
+    {
+      "tick": 10,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 588.1045345880221,
+          "y": 612.6220647721184,
+          "facingAngle": -46.697515811109554,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 17.34412339898196
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 611.8954654119779,
+          "y": 587.3779352278816,
+          "facingAngle": 133.30248418889045,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 17.34412339898196
+        }
+      ]
+    },
+    {
+      "tick": 15,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 581.0610580250155,
+          "y": 614.9624247990608,
+          "facingAngle": -38.30996615034654,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 24.13623166526579
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 618.9389419749845,
+          "y": 585.0375752009392,
+          "facingAngle": 141.69003384965347,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 24.13623166526579
+        }
+      ]
+    },
+    {
+      "tick": 20,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 573.7577974517928,
+          "y": 613.6394614023852,
+          "facingAngle": -27.46328704872852,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 29.575126405956183
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 626.2422025482072,
+          "y": 586.3605385976148,
+          "facingAngle": 152.53671295127148,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 29.575126405956183
+        }
+      ]
+    },
+    {
+      "tick": 25,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 567.982845766796,
+          "y": 608.9770821615593,
+          "facingAngle": -15.662620580183715,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 33.25185963714149
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 632.017154233204,
+          "y": 591.0229178384407,
+          "facingAngle": 164.3373794198163,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 33.25185963714149
+        }
+      ]
+    },
+    {
+      "tick": 30,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 565.1501125509933,
+          "y": 602.116800120898,
+          "facingAngle": -3.4759046887620397,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 34.91411602719262
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 634.8498874490067,
+          "y": 597.883199879102,
+          "facingAngle": 176.52409531123797,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 34.91411602719262
+        }
+      ]
+    },
+    {
+      "tick": 35,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 565.953149690638,
+          "y": 594.7382515846557,
+          "facingAngle": 8.785237014759224,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 34.45103789981484
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 634.046850309362,
+          "y": 605.2617484153443,
+          "facingAngle": -171.21476298524078,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 34.45103789981484
+        }
+      ]
+    },
+    {
+      "tick": 40,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 570.1953456870458,
+          "y": 588.6479625703811,
+          "facingAngle": 20.850904725065032,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 31.893356244179888
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 629.8046543129542,
+          "y": 611.3520374296189,
+          "facingAngle": -159.14909527493498,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 31.893356244179888
+        }
+      ]
+    },
+    {
+      "tick": 45,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 576.8380630085383,
+          "y": 585.3370482350235,
+          "facingAngle": 32.33636344652975,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 27.41308956791391
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 623.1619369914617,
+          "y": 614.6629517649765,
+          "facingAngle": -147.66363655347024,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 27.41308956791391
+        }
+      ]
+    },
+    {
+      "tick": 50,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 584.2549327819484,
+          "y": 585.616135880053,
+          "facingAngle": 42.41317764418695,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 21.326103458486358
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 615.7450672180516,
+          "y": 614.383864119947,
+          "facingAngle": -137.58682235581304,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 21.326103458486358
+        }
+      ]
+    },
+    {
+      "tick": 55,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 590.6300466143689,
+          "y": 589.4168951164442,
+          "facingAngle": 48.47931626520306,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 14.13499683145502
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 609.3699533856311,
+          "y": 610.5831048835558,
+          "facingAngle": -131.52068373479696,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 14.13499683145502
+        }
+      ]
+    },
+    {
+      "tick": 60,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 594.4025542997555,
+          "y": 595.8087675270161,
+          "facingAngle": 36.8249845805299,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 6.992698192384708
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 605.5974457002445,
+          "y": 604.1912324729839,
+          "facingAngle": -143.1750154194701,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 6.992698192384708
+        }
+      ]
+    },
+    {
+      "tick": 65,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 594.6488143859203,
+          "y": 603.2267998213173,
+          "facingAngle": -31.090251024388333,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 6.248793848670834
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 605.3511856140797,
+          "y": 596.7732001786827,
+          "facingAngle": 148.90974897561165,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 6.248793848670834
+        }
+      ]
+    },
+    {
+      "tick": 70,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 591.3085338151495,
+          "y": 609.8547989807819,
+          "facingAngle": -48.58923193832635,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 13.139963751624993
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 608.6914661848505,
+          "y": 590.1452010192181,
+          "facingAngle": 131.41076806167365,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 13.139963751624993
+        }
+      ]
+    },
+    {
+      "tick": 75,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 585.1995297675254,
+          "y": 614.0699996516211,
+          "facingAngle": -43.55063135786194,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 20.42103839913591
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 614.8004702324746,
+          "y": 585.9300003483789,
+          "facingAngle": 136.44936864213807,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 20.42103839913591
+        }
+      ]
+    },
+    {
+      "tick": 80,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 577.8174994928708,
+          "y": 614.8403736993507,
+          "facingAngle": -33.78302374362646,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 26.68894940392315
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 622.1825005071292,
+          "y": 585.1596263006493,
+          "facingAngle": 146.21697625637353,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 26.68894940392315
+        }
+      ]
+    },
+    {
+      "tick": 85,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 570.9698214597277,
+          "y": 611.9773066893523,
+          "facingAngle": -22.42012459366764,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 31.403935129389318
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 629.0301785402723,
+          "y": 588.0226933106477,
+          "facingAngle": 157.57987540633235,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 31.403935129389318
+        }
+      ]
+    },
+    {
+      "tick": 90,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 566.3330460717299,
+          "y": 606.1817772786263,
+          "facingAngle": -10.404502716438008,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 34.229784649202855
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 633.6669539282701,
+          "y": 593.8182227213737,
+          "facingAngle": 169.595497283562,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 34.229784649202855
+        }
+      ]
+    },
+    {
+      "tick": 95,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 565.0424176570543,
+          "y": 598.8727331930728,
+          "facingAngle": 1.8469600271159075,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 34.97575293997009
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 634.9575823429457,
+          "y": 601.1272668069272,
+          "facingAngle": -178.1530399728841,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 34.97575293997009
+        }
+      ]
+    },
+    {
+      "tick": 100,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 567.4139270638532,
+          "y": 591.8396833366595,
+          "facingAngle": 14.05907568211071,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 33.592304437860065
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 632.5860729361468,
+          "y": 608.1603166633405,
+          "facingAngle": -165.94092431788928,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 33.592304437860065
+        }
+      ]
+    },
+    {
+      "tick": 105,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 572.8669460800601,
+          "y": 586.8045636004249,
+          "facingAngle": 25.93473458931443,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 30.17154548241768
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 627.1330539199399,
+          "y": 613.1954363995751,
+          "facingAngle": -154.06526541068558,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 30.17154548241768
+        }
+      ]
+    },
+    {
+      "tick": 110,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 580.0663854698207,
+          "y": 585.0001469017394,
+          "facingAngle": 36.96110888838485,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 24.946835093998846
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 619.9336145301793,
+          "y": 614.9998530982606,
+          "facingAngle": -143.03889111161516,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 24.946835093998846
+        }
+      ]
+    },
+    {
+      "tick": 115,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 587.2495713812951,
+          "y": 586.8682173796735,
+          "facingAngle": 45.844147109741236,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 18.303473570560218
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 612.7504286187049,
+          "y": 613.1317826203265,
+          "facingAngle": -134.15585289025876,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 18.303473570560218
+        }
+      ]
+    },
+    {
+      "tick": 120,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 592.6578093809874,
+          "y": 591.9514062299935,
+          "facingAngle": 47.627905968809664,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 10.894385010660518
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 607.3421906190126,
+          "y": 608.0485937700065,
+          "facingAngle": -132.37209403119036,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 10.894385010660518
+        }
+      ]
+    },
+    {
+      "tick": 125,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 594.9669741876787,
+          "y": 599.005171539732,
+          "facingAngle": 11.180965484623172,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 5.13040276127045
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 605.0330258123213,
+          "y": 600.994828460268,
+          "facingAngle": -168.81903451537684,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 5.13040276127045
+        }
+      ]
+    },
+    {
+      "tick": 130,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 593.611701721753,
+          "y": 606.3025055523996,
+          "facingAngle": -44.61267337434778,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 8.973958498337353
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 606.388298278247,
+          "y": 593.6974944476004,
+          "facingAngle": 135.38732662565224,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 8.973958498337353
+        }
+      ]
+    },
+    {
+      "tick": 135,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 588.9238099496483,
+          "y": 612.0567663982744,
+          "facingAngle": -47.42724152945703,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 16.372159357093587
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 611.0761900503517,
+          "y": 587.9432336017256,
+          "facingAngle": 132.57275847054296,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 16.372159357093587
+        }
+      ]
+    },
+    {
+      "tick": 140,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 582.0510582731175,
+          "y": 614.8591103354231,
+          "facingAngle": -39.619806979273264,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 23.301452080831808
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 617.9489417268825,
+          "y": 585.1408896645769,
+          "facingAngle": 140.38019302072672,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 23.301452080831808
+        }
+      ]
+    },
+    {
+      "tick": 145,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 574.6761359981695,
+          "y": 614.0234258328702,
+          "facingAngle": -28.976073594676933,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 28.94744479350846
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 625.3238640018305,
+          "y": 585.9765741671298,
+          "facingAngle": 151.02392640532307,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 28.94744479350846
+        }
+      ]
+    },
+    {
+      "tick": 150,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 568.6046813071176,
+          "y": 609.7543176023568,
+          "facingAngle": -17.259673587261737,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 32.87571668747765
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 631.3953186928824,
+          "y": 590.2456823976432,
+          "facingAngle": 162.74032641273826,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 32.87571668747765
+        }
+      ]
+    },
+    {
+      "tick": 155,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 565.3231980577167,
+          "y": 603.097012229067,
+          "facingAngle": -5.103590049907367,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 34.814825544462146
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 634.6768019422833,
+          "y": 596.902987770933,
+          "facingAngle": 174.89640995009265,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 34.814825544462146
+        }
+      ]
+    },
+    {
+      "tick": 160,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 565.6351077951492,
+          "y": 595.681450250024,
+          "facingAngle": 7.1626692393550595,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 34.63517992149068
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 634.3648922048508,
+          "y": 604.318549749976,
+          "facingAngle": -172.83733076064493,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 34.63517992149068
+        }
+      ]
+    },
+    {
+      "tick": 165,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 569.4640441374593,
+          "y": 589.3232198644631,
+          "facingAngle": 19.27198388070446,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 32.348697570406614
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 630.5359558625407,
+          "y": 610.6767801355369,
+          "facingAngle": -160.72801611929555,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 32.348697570406614
+        }
+      ]
+    },
+    {
+      "tick": 170,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 575.872549929226,
+          "y": 585.5790376218066,
+          "facingAngle": 30.866735507493527,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 28.10868198316956
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 624.127450070774,
+          "y": 614.4209623781934,
+          "facingAngle": -149.13326449250647,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 28.10868198316956
+        }
+      ]
+    },
+    {
+      "tick": 175,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 583.2915994481718,
+          "y": 585.3656099179776,
+          "facingAngle": 41.21415149706292,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 22.211168858777484
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 616.7084005518282,
+          "y": 614.6343900820224,
+          "facingAngle": -138.78584850293709,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 22.211168858777484
+        }
+      ]
+    },
+    {
+      "tick": 180,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 589.9047506236612,
+          "y": 588.7351912984249,
+          "facingAngle": 48.134072286273515,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 15.126466046421779
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 610.0952493763388,
+          "y": 611.2648087015751,
+          "facingAngle": -131.86592771372648,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 15.126466046421779
+        }
+      ]
+    },
+    {
+      "tick": 185,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 594.0928734062238,
+          "y": 594.8627907229558,
+          "facingAngle": 41.01227612147876,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 7.828477741620472
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 605.9071265937762,
+          "y": 605.1372092770442,
+          "facingAngle": -138.98772387852125,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 7.828477741620472
+        }
+      ]
+    },
+    {
+      "tick": 190,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 594.8305692728001,
+          "y": 602.2481581449443,
+          "facingAngle": -23.50396788589809,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 5.637129507825632
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 605.1694307271999,
+          "y": 597.7518418550557,
+          "facingAngle": 156.49603211410192,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 5.637129507825632
+        }
+      ]
+    },
+    {
+      "tick": 195,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 591.9372245472092,
+          "y": 609.083098045794,
+          "facingAngle": -48.405560955458306,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 12.145411401497812
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 608.0627754527908,
+          "y": 590.916901954206,
+          "facingAngle": 131.59443904454167,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 12.145411401497812
+        }
+      ]
+    },
+    {
+      "tick": 200,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 586.1212309272008,
+          "y": 613.6941787609144,
+          "facingAngle": -44.61643245849671,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 19.49745529324187
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 613.8787690727992,
+          "y": 586.3058212390856,
+          "facingAngle": 135.38356754150328,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 19.49745529324187
+        }
+      ]
+    },
+    {
+      "tick": 205,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 578.8065464908219,
+          "y": 614.952446914182,
+          "facingAngle": -35.203808835267324,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 25.937196077585646
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 621.1934535091781,
+          "y": 585.047553085818,
+          "facingAngle": 144.79619116473268,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 25.937196077585646
+        }
+      ]
+    },
+    {
+      "tick": 210,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 571.7840610966359,
+          "y": 612.5498345780409,
+          "facingAngle": -23.97845561128176,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 30.8810225888743
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 628.2159389033641,
+          "y": 587.4501654219591,
+          "facingAngle": 156.02154438871824,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 30.8810225888743
+        }
+      ]
+    },
+    {
+      "tick": 215,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 566.7731240868801,
+          "y": 607.074585046413,
+          "facingAngle": -12.01978763415772,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 33.9716799190855
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 633.2268759131199,
+          "y": 592.925414953587,
+          "facingAngle": 167.9802123658423,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 33.9716799190855
+        }
+      ]
+    },
+    {
+      "tick": 220,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 565.0005876040805,
+          "y": 599.8672303606439,
+          "facingAngle": 0.2173494630893463,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 34.99966422462908
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 634.9994123959195,
+          "y": 600.1327696393561,
+          "facingAngle": -179.78265053691067,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 34.99966422462908
+        }
+      ]
+    },
+    {
+      "tick": 225,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 566.9004303985972,
+          "y": 592.6923823130924,
+          "facingAngle": 12.44986529191229,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 33.896648566725766
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 633.0995696014028,
+          "y": 607.3076176869076,
+          "facingAngle": -167.5501347080877,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 33.896648566725766
+        }
+      ]
+    },
+    {
+      "tick": 230,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 572.007504694999,
+          "y": 587.3066939373724,
+          "facingAngle": 24.392100982434282,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 30.73596935513891
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 627.992495305001,
+          "y": 612.6933060626276,
+          "facingAngle": -155.60789901756573,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 30.73596935513891
+        }
+      ]
+    },
+    {
+      "tick": 235,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 579.0714205900837,
+          "y": 585.028769580309,
+          "facingAngle": 35.57798324267926,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 25.732142864453674
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 620.9285794099163,
+          "y": 614.971230419691,
+          "facingAngle": -144.42201675732076,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 25.732142864453674
+        }
+      ]
+    },
+    {
+      "tick": 240,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 586.3626851100549,
+          "y": 586.4163245699007,
+          "facingAngle": 44.88709776350668,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 19.248184215603338
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 613.6373148899451,
+          "y": 613.5836754300993,
+          "facingAngle": -135.11290223649334,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 19.248184215603338
+        }
+      ]
+    },
+    {
+      "tick": 245,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 592.0961424086838,
+          "y": 591.1296370520231,
+          "facingAngle": 48.297650579428726,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 11.880837666286325
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 607.9038575913162,
+          "y": 608.8703629479769,
+          "facingAngle": -131.7023494205713,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 11.880837666286325
+        }
+      ]
+    },
+    {
+      "tick": 250,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 594.8680421779521,
+          "y": 598.0147237485334,
+          "facingAngle": 21.148752166755475,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 5.5025732963692295
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 605.1319578220479,
+          "y": 601.9852762514666,
+          "facingAngle": -158.8512478332445,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 5.5025732963692295
+        }
+      ]
+    },
+    {
+      "tick": 255,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 593.9997266809588,
+          "y": 605.3858753103325,
+          "facingAngle": -41.91130800074231,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 8.062935740885367
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 606.0002733190412,
+          "y": 594.6141246896675,
+          "facingAngle": 138.0886919992577,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 8.062935740885367
+        }
+      ]
+    },
+    {
+      "tick": 260,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 589.7037898349296,
+          "y": 611.4383767571941,
+          "facingAngle": -48.008163201130735,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 15.389880006121462
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 610.2962101650704,
+          "y": 588.5616232428059,
+          "facingAngle": 131.9918367988693,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 15.389880006121462
+        }
+      ]
+    },
+    {
+      "tick": 265,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 583.0320268058077,
+          "y": 614.6903646465588,
+          "facingAngle": -40.88503637242169,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 22.443683471473488
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 616.9679731941923,
+          "y": 585.3096353534412,
+          "facingAngle": 139.11496362757833,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 22.443683471473488
+        }
+      ]
+    },
+    {
+      "tick": 270,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 575.6179178689924,
+          "y": 614.3456389260675,
+          "facingAngle": -30.47119699297126,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 28.289278627075348
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 624.3820821310076,
+          "y": 585.6543610739325,
+          "facingAngle": 149.52880300702876,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 28.289278627075348
+        }
+      ]
+    },
+    {
+      "tick": 275,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 569.276695468305,
+          "y": 610.4886004748265,
+          "facingAngle": -18.849344032635297,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 32.46432166652806
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 630.723304531695,
+          "y": 589.5113995251735,
+          "facingAngle": 161.1506559673647,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 32.46432166652806
+        }
+      ]
+    },
+    {
+      "tick": 280,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 565.5609120052965,
+          "y": 604.063586824618,
+          "facingAngle": -6.729411855548728,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 34.6779976323337
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 634.4390879947035,
+          "y": 595.936413175382,
+          "facingAngle": 173.27058814445127,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 34.6779976323337
+        }
+      ]
+    },
+    {
+      "tick": 285,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 565.3803208641901,
+          "y": 596.6436653971981,
+          "facingAngle": 5.537448513392377,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 34.78199484550007
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 634.6196791358099,
+          "y": 603.3563346028019,
+          "facingAngle": -174.46255148660765,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 34.78199484550007
+        }
+      ]
+    },
+    {
+      "tick": 290,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 568.779137054665,
+          "y": 590.0454917368055,
+          "facingAngle": 17.6844423723153,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 32.76941436482201
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 631.220862945335,
+          "y": 609.9545082631945,
+          "facingAngle": -162.3155576276847,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 32.76941436482201
+        }
+      ]
+    },
+    {
+      "tick": 295,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 574.9252118354342,
+          "y": 585.8845288748557,
+          "facingAngle": 29.376674890986685,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 28.77484190369481
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 625.0747881645658,
+          "y": 614.1154711251443,
+          "facingAngle": -150.6233251090133,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 28.77484190369481
+        }
+      ]
+    },
+    {
+      "tick": 300,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 582.3137717483138,
+          "y": 585.1795256386071,
+          "facingAngle": 39.961894400653875,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 23.074859264304273
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 617.6862282516862,
+          "y": 614.8204743613929,
+          "facingAngle": -140.03810559934612,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 23.074859264304273
+        }
+      ]
+    },
+    {
+      "tick": 305,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 589.1358396415953,
+          "y": 588.1030914081407,
+          "facingAngle": 47.59792536228033,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 16.11106496592286
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 610.8641603584047,
+          "y": 611.8969085918593,
+          "facingAngle": -132.40207463771966,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 16.11106496592286
+        }
+      ]
+    },
+    {
+      "tick": 310,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 593.721135367068,
+          "y": 593.9394353201541,
+          "facingAngle": 43.98647165740291,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 8.726659459224965
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 606.278864632932,
+          "y": 606.0605646798459,
+          "facingAngle": -136.0135283425971,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 8.726659459224965
+        }
+      ]
+    },
+    {
+      "tick": 315,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 594.9470186133568,
+          "y": 601.2596168353762,
+          "facingAngle": -13.997513441520047,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 5.2076151418596135
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 605.0529813866432,
+          "y": 598.7403831646238,
+          "facingAngle": 166.00248655847997,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 5.2076151418596135
+        }
+      ]
+    },
+    {
+      "tick": 320,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 592.5133504075976,
+          "y": 608.2714002186253,
+          "facingAngle": -47.850973610207845,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 11.156432391051093
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 607.4866495924024,
+          "y": 591.7285997813747,
+          "facingAngle": 132.14902638979217,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 11.156432391051093
+        }
+      ]
+    },
+    {
+      "tick": 325,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 587.0159776037061,
+          "y": 613.2580563531875,
+          "facingAngle": -45.59829172250856,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 18.55696354072391
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 612.9840223962939,
+          "y": 586.7419436468125,
+          "facingAngle": 134.40170827749142,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 18.55696354072391
+        }
+      ]
+    },
+    {
+      "tick": 330,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 579.8008487916541,
+          "y": 614.998677901609,
+          "facingAngle": -36.59536401722124,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 25.158816512980824
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 620.1991512083459,
+          "y": 585.001322098391,
+          "facingAngle": 143.40463598277876,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 25.158816512980824
+        }
+      ]
+    },
+    {
+      "tick": 335,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 572.6344791410464,
+          "y": 613.0671000025377,
+          "facingAngle": -25.524584120701892,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 30.325250771562366
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 627.3655208589536,
+          "y": 586.9328999974623,
+          "facingAngle": 154.4754158792981,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 30.325250771562366
+        }
+      ]
+    },
+    {
+      "tick": 340,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 567.2714458782309,
+          "y": 607.9362402918003,
+          "facingAngle": -13.630376726571667,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 33.67702725703033
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 632.7285541217691,
+          "y": 592.0637597081997,
+          "facingAngle": 166.36962327342835,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 33.67702725703033
+        }
+      ]
+    },
+    {
+      "tick": 345,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 565.0248065882689,
+          "y": 600.8623121715739,
+          "facingAngle": -1.4123393167905056,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 34.98582193502451
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 634.9751934117311,
+          "y": 599.1376878284261,
+          "facingAngle": 178.5876606832095,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 34.98582193502451
+        }
+      ]
+    },
+    {
+      "tick": 350,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 566.4446169236274,
+          "y": 593.5772599575578,
+          "facingAngle": 10.835761285216067,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 34.16453311630206
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 633.5553830763726,
+          "y": 606.4227400424422,
+          "facingAngle": -169.16423871478395,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 34.16453311630206
+        }
+      ]
+    },
+    {
+      "tick": 355,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 571.1832577965941,
+          "y": 587.8647185068214,
+          "facingAngle": 22.836890573766016,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 31.267709991878753
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 628.8167422034059,
+          "y": 612.1352814931786,
+          "facingAngle": -157.163109426234,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 31.267709991878753
+        }
+      ]
+    },
+    {
+      "tick": 360,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 578.0805446555889,
+          "y": 585.1233171983532,
+          "facingAngle": 34.164646038319894,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 26.491096877563294
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 621.9194553444111,
+          "y": 614.8766828016468,
+          "facingAngle": -145.8353539616801,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 26.491096877563294
+        }
+      ]
+    },
+    {
+      "tick": 365,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 585.4477811262409,
+          "y": 586.0242466821794,
+          "facingAngle": 43.8423800769282,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 20.17644059169912
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 614.5522188737591,
+          "y": 613.9757533178206,
+          "facingAngle": -136.1576199230718,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 20.17644059169912
+        }
+      ]
+    },
+    {
+      "tick": 370,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 591.4812107791802,
+          "y": 590.346927999645,
+          "facingAngle": 48.57175345615731,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 12.874454117856558
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 608.5187892208198,
+          "y": 609.653072000355,
+          "facingAngle": -131.4282465438427,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 12.874454117856558
+        }
+      ]
+    },
+    {
+      "tick": 375,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 594.7036396121516,
+          "y": 597.0330180054531,
+          "facingAngle": 29.25722716232203,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 6.070783764386202
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 605.2963603878484,
+          "y": 602.9669819945469,
+          "facingAngle": -150.74277283767796,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 6.070783764386202
+        }
+      ]
+    },
+    {
+      "tick": 380,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 594.3261046607095,
+          "y": 604.4455286806408,
+          "facingAngle": -38.078897600140785,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 7.208038122237059
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 605.6738953392905,
+          "y": 595.5544713193592,
+          "facingAngle": 141.92110239985922,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 7.208038122237059
+        }
+      ]
+    },
+    {
+      "tick": 385,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 590.4410396479583,
+          "y": 610.7696188915746,
+          "facingAngle": -48.40819644721225,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 14.399944933285903
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 609.5589603520417,
+          "y": 589.2303811084254,
+          "facingAngle": 131.59180355278778,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 14.399944933285903
+        }
+      ]
+    },
+    {
+      "tick": 390,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 583.9996439853991,
+          "y": 614.4569307942613,
+          "facingAngle": -42.09901372357466,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 21.564188845955634
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 616.0003560146009,
+          "y": 585.5430692057387,
+          "facingAngle": 137.90098627642536,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 21.564188845955634
+        }
+      ]
+    },
+    {
+      "tick": 395,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 576.5789959827536,
+          "y": 614.6046818354247,
+          "facingAngle": -31.946508911550744,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 27.60145214820876
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 623.4210040172464,
+          "y": 585.3953181645753,
+          "facingAngle": 148.05349108844925,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 27.60145214820876
+        }
+      ]
+    },
+    {
+      "tick": 400,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 569.995929075216,
+          "y": 611.1766974071902,
+          "facingAngle": -20.4306658301268,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 32.01816417272167
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 630.004070924784,
+          "y": 588.8233025928098,
+          "facingAngle": 159.5693341698732,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 32.01816417272167
+        }
+      ]
+    },
+    {
+      "tick": 405,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 565.8622076342367,
+          "y": 605.0122676527263,
+          "facingAngle": -8.352749650937012,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 34.50379246735832
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 634.1377923657633,
+          "y": 594.9877323472737,
+          "facingAngle": 171.647250349063,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 34.50379246735832
+        }
+      ]
+    },
+    {
+      "tick": 410,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 565.1899108371426,
+          "y": 597.6206599679293,
+          "facingAngle": 3.9102005506977866,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 34.891310759475545
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 634.8100891628574,
+          "y": 602.3793400320707,
+          "facingAngle": -176.0897994493022,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 34.891310759475545
+        }
+      ]
+    },
+    {
+      "tick": 415,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 568.1436403870327,
+          "y": 590.811597705368,
+          "facingAngle": 16.089268492944615,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 33.15500542178648
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 631.8563596129673,
+          "y": 609.188402294632,
+          "facingAngle": -163.9107315070554,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 33.15500542178648
+        }
+      ]
+    },
+    {
+      "tick": 420,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 574.0002202751747,
+          "y": 586.2521767812655,
+          "facingAngle": 27.868404436111025,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 29.410732547711458
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 625.9997797248253,
+          "y": 613.7478232187345,
+          "facingAngle": -152.131595563889,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 29.410732547711458
+        }
+      ]
+    },
+    {
+      "tick": 425,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 581.3257554895871,
+          "y": 585.0587024532061,
+          "facingAngle": 38.663366292467934,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 23.915889705727338
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 618.6742445104129,
+          "y": 614.9412975467939,
+          "facingAngle": -141.3366337075321,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 23.915889705727338
+        }
+      ]
+    },
+    {
+      "tick": 430,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 588.3266995228093,
+          "y": 587.523378860571,
+          "facingAngle": 46.90517880264887,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 17.086018233854993
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 611.6733004771907,
+          "y": 612.476621139429,
+          "facingAngle": -133.09482119735114,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 17.086018233854993
+        }
+      ]
+    },
+    {
+      "tick": 435,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 593.2889771090497,
+          "y": 593.0427672602426,
+          "facingAngle": 46.031972192421584,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 9.666484140472733
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 606.7110228909503,
+          "y": 606.9572327397574,
+          "facingAngle": -133.96802780757844,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 9.666484140472733
+        }
+      ]
+    },
+    {
+      "tick": 440,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 594.9976496297154,
+          "y": 600.2655288765812,
+          "facingAngle": -3.0384556037895454,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 5.009392658934314
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 605.0023503702846,
+          "y": 599.7344711234188,
+          "facingAngle": 176.96154439621046,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 5.009392658934314
+        }
+      ]
+    },
+    {
+      "tick": 445,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 593.0343744597099,
+          "y": 607.4232797632894,
+          "facingAngle": -46.821738214675406,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 10.179637597262722
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 606.9656255402901,
+          "y": 592.5767202367106,
+          "facingAngle": 133.1782617853246,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 10.179637597262722
+        }
+      ]
+    },
+    {
+      "tick": 450,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 587.879829832266,
+          "y": 612.7635528680117,
+          "facingAngle": -46.481084728446476,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 17.601329685832294
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 612.120170167734,
+          "y": 587.2364471319883,
+          "facingAngle": 133.5189152715535,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 17.601329685832294
+        }
+      ]
+    },
+    {
+      "tick": 455,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 580.7960280432104,
+          "y": 614.9788630861766,
+          "facingAngle": -37.953794879557634,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 24.354853279615234
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 619.2039719567896,
+          "y": 585.0211369138234,
+          "facingAngle": 142.04620512044235,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 24.354853279615234
+        }
+      ]
+    },
+    {
+      "tick": 460,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 573.5173308267283,
+          "y": 613.5268252147322,
+          "facingAngle": -27.05704918578815,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 29.737295891369627
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 626.4826691732717,
+          "y": 586.4731747852678,
+          "facingAngle": 152.94295081421186,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 29.737295891369627
+        }
+      ]
+    },
+    {
+      "tick": 465,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 567.8258171148547,
+          "y": 608.7629487661993,
+          "facingAngle": -15.23551116508046,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 33.34617392454213
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 632.1741828851453,
+          "y": 591.2370512338007,
+          "facingAngle": 164.76448883491955,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 33.34617392454213
+        }
+      ]
+    },
+    {
+      "tick": 470,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 565.114967962736,
+          "y": 601.8535968411784,
+          "facingAngle": -3.0415192955370864,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 34.93424224869575
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 634.885032037264,
+          "y": 598.1464031588216,
+          "facingAngle": 176.95848070446291,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 34.93424224869575
+        }
+      ]
+    },
+    {
+      "tick": 475,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 566.0484937869807,
+          "y": 594.4904197629871,
+          "facingAngle": 9.217489620314188,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 34.39564287116573
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 633.9515062130193,
+          "y": 605.5095802370129,
+          "facingAngle": -170.78251037968582,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 34.39564287116573
+        }
+      ]
+    },
+    {
+      "tick": 480,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 570.397834907962,
+          "y": 588.476180080145,
+          "facingAngle": 21.270454049906046,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 31.766123523047657
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 629.602165092038,
+          "y": 611.523819919855,
+          "facingAngle": -158.72954595009395,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 31.766123523047657
+        }
+      ]
+    },
+    {
+      "tick": 485,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 577.0981209306893,
+          "y": 585.2833734209536,
+          "facingAngle": 32.72458602689497,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 27.22269572934366
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 622.9018790693107,
+          "y": 614.7166265790464,
+          "facingAngle": -147.27541397310503,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 27.22269572934366
+        }
+      ]
+    },
+    {
+      "tick": 490,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 584.5088881561545,
+          "y": 585.693710208608,
+          "facingAngle": 42.722970586264,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 21.086594645741588
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 615.4911118438455,
+          "y": 614.306289791392,
+          "facingAngle": -137.27702941373602,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 21.086594645741588
+        }
+      ]
+    },
+    {
+      "tick": 495,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 590.8157223080212,
+          "y": 589.6067256864945,
+          "facingAngle": 48.53376911439654,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 13.869791190899418
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 609.1842776919788,
+          "y": 610.3932743135055,
+          "facingAngle": -131.46623088560347,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 13.869791190899418
+        }
+      ]
+    },
+    {
+      "tick": 500,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 594.4744904273817,
+          "y": 596.064377194441,
+          "facingAngle": 35.46091104491413,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 6.7838324643767525
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 605.5255095726183,
+          "y": 603.935622805559,
+          "facingAngle": -144.5390889550859,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 6.7838324643767525
+        }
+      ]
+    },
+    {
+      "tick": 505,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 594.5893984746174,
+          "y": 603.4856064248322,
+          "facingAngle": -32.790359695377155,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 6.436152656308294
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 605.4106015253826,
+          "y": 596.5143935751678,
+          "facingAngle": 147.20964030462284,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 6.436152656308294
+        }
+      ]
+    },
+    {
+      "tick": 510,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 591.1323129522067,
+          "y": 610.0534376376506,
+          "facingAngle": -48.585927180963324,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 13.405501926885528
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 608.8676870477933,
+          "y": 589.9465623623494,
+          "facingAngle": 131.41407281903668,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 13.405501926885528
+        }
+      ]
+    },
+    {
+      "tick": 515,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 584.9496489661085,
+          "y": 614.1598366908768,
+          "facingAngle": -43.253797081946324,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 20.664318071392024
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 615.0503510338915,
+          "y": 585.8401633091232,
+          "facingAngle": 136.74620291805368,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 20.664318071392024
+        }
+      ]
+    },
+    {
+      "tick": 520,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 577.5551382880644,
+          "y": 614.7994138806073,
+          "facingAngle": -33.39956304800484,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 26.88483714805472
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 622.4448617119356,
+          "y": 585.2005861193927,
+          "facingAngle": 146.60043695199516,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 26.88483714805472
+        }
+      ]
+    },
+    {
+      "tick": 525,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 570.7592150246352,
+          "y": 611.8155784047618,
+          "facingAngle": -22.00258463386894,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 31.53777733155263
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 629.2407849753648,
+          "y": 588.1844215952382,
+          "facingAngle": 157.9974153661311,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 31.53777733155263
+        }
+      ]
+    },
+    {
+      "tick": 530,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 566.2257582068182,
+          "y": 605.9388772527275,
+          "facingAngle": -9.97296114066456,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 34.292414200917236
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 633.7742417931818,
+          "y": 594.0611227472725,
+          "facingAngle": 170.02703885933545,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 34.292414200917236
+        }
+      ]
+    },
+    {
+      "tick": 535,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 565.0647161734489,
+          "y": 598.6081318236404,
+          "facingAngle": 2.281533394252285,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 34.96299977207397
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 634.9352838265511,
+          "y": 601.3918681763596,
+          "facingAngle": -177.71846660574772,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 34.96299977207397
+        }
+      ]
+    },
+    {
+      "tick": 540,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 567.5603525070527,
+          "y": 591.6181642672258,
+          "facingAngle": 14.487371874639567,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 33.505013053540104
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 632.4396474929473,
+          "y": 608.3818357327742,
+          "facingAngle": -165.51262812536044,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 33.505013053540104
+        }
+      ]
+    },
+    {
+      "tick": 545,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 573.1016483948034,
+          "y": 586.6803624249351,
+          "facingAngle": 26.343884266812644,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 30.01556369965193
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 626.8983516051966,
+          "y": 613.3196375750649,
+          "facingAngle": -153.65611573318736,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 30.01556369965193
+        }
+      ]
+    },
+    {
+      "tick": 550,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 580.3319013439293,
+          "y": 585.0036723996207,
+          "facingAngle": 37.32441957306759,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 24.733053718512586
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 619.6680986560707,
+          "y": 614.9963276003793,
+          "facingAngle": -142.67558042693244,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 24.733053718512586
+        }
+      ]
+    },
+    {
+      "tick": 555,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 587.4808932685972,
+          "y": 586.9986063860886,
+          "facingAngle": 46.08264781808427,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 18.048940945554417
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 612.5191067314028,
+          "y": 613.0013936139114,
+          "facingAngle": -133.91735218191576,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 18.048940945554417
+        }
+      ]
+    },
+    {
+      "tick": 560,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 592.7983016158388,
+          "y": 592.1767349686963,
+          "facingAngle": 47.36891428253483,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 10.633340743456348
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 607.2016983841612,
+          "y": 607.8232650313037,
+          "facingAngle": -132.6310857174652,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 10.633340743456348
+        }
+      ]
+    },
+    {
+      "tick": 565,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 594.9822393711497,
+          "y": 599.2702716768737,
+          "facingAngle": 8.27446411406166,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 5.070544857706393
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 605.0177606288503,
+          "y": 600.7297283231263,
+          "facingAngle": -171.72553588593834,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 5.070544857706393
+        }
+      ]
+    },
+    {
+      "tick": 570,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 593.4980024045379,
+          "y": 606.5424713287174,
+          "facingAngle": -45.17777394147329,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 9.223876832356531
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 606.5019975954621,
+          "y": 593.4575286712826,
+          "facingAngle": 134.82222605852672,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 9.223876832356531
+        }
+      ]
+    },
+    {
+      "tick": 575,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 588.708983690004,
+          "y": 612.2128458226265,
+          "facingAngle": -47.24600891323889,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 16.632517921224142
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 611.291016309996,
+          "y": 587.7871541773735,
+          "facingAngle": 132.75399108676112,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 16.632517921224142
+        }
+      ]
+    },
+    {
+      "tick": 580,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 581.7877020317322,
+          "y": 614.8930897212681,
+          "facingAngle": -39.27455146553324,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 23.526408963773275
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 618.2122979682678,
+          "y": 585.1069102787319,
+          "facingAngle": 140.72544853446675,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 23.526408963773275
+        }
+      ]
+    },
+    {
+      "tick": 585,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 574.4287285678046,
+          "y": 613.9269858414807,
+          "facingAngle": -28.57421705863834,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 29.11787865363509
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 625.5712714321954,
+          "y": 586.0730141585193,
+          "facingAngle": 151.42578294136166,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 29.11787865363509
+        }
+      ]
+    },
+    {
+      "tick": 590,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 568.4337966553624,
+          "y": 609.5510701070871,
+          "facingAngle": -16.834379995659706,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 32.97951081786243
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 631.5662033446376,
+          "y": 590.4489298929129,
+          "facingAngle": 163.1656200043403,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 32.97951081786243
+        }
+      ]
+    },
+    {
+      "tick": 595,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 565.2706747071311,
+          "y": 602.8367193052634,
+          "facingAngle": -4.669599095720294,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 34.84498546010255
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 634.7293252928689,
+          "y": 597.1632806947366,
+          "facingAngle": 175.3304009042797,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 34.84498546010255
+        }
+      ]
+    },
+    {
+      "tick": 600,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 565.7138052937727,
+          "y": 595.4278406834668,
+          "facingAngle": 7.5957380118024025,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 34.58970639148433
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 634.2861947062273,
+          "y": 604.5721593165332,
+          "facingAngle": -172.4042619881976,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 34.58970639148433
+        }
+      ]
+    },
+    {
+      "tick": 605,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 569.6546945929575,
+          "y": 589.1383861219882,
+          "facingAngle": 19.694010930484307,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 32.23060992723686
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 630.3453054070425,
+          "y": 610.8616138780118,
+          "facingAngle": -160.3059890695157,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 32.23060992723686
+        }
+      ]
+    },
+    {
+      "tick": 610,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 576.128475460926,
+          "y": 585.5082334498741,
+          "facingAngle": 31.260822082544212,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 27.925991147369537
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 623.871524539074,
+          "y": 614.4917665501259,
+          "facingAngle": -148.7391779174558,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 27.925991147369537
+        }
+      ]
+    },
+    {
+      "tick": 615,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 583.5501405601984,
+          "y": 585.4261706472583,
+          "facingAngle": 41.53948713929738,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 21.977133061253987
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 616.4498594398016,
+          "y": 614.5738293527417,
+          "facingAngle": -138.46051286070264,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 21.977133061253987
+        }
+      ]
+    },
+    {
+      "tick": 620,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 590.1026074348538,
+          "y": 588.9122895502617,
+          "facingAngle": 48.24645486305893,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 14.862560432369925
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 609.8973925651462,
+          "y": 611.0877104497383,
+          "facingAngle": -131.75354513694109,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 14.862560432369925
+        }
+      ]
+    },
+    {
+      "tick": 625,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 594.181603668705,
+          "y": 595.1130666687816,
+          "facingAngle": 40.02725928346314,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 7.598411232080111
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 605.818396331295,
+          "y": 604.8869333312184,
+          "facingAngle": -139.97274071653686,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 7.598411232080111
+        }
+      ]
+    },
+    {
+      "tick": 630,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 594.7884487237383,
+          "y": 602.5103355045421,
+          "facingAngle": -25.71950340460768,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 5.784639232525226
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 605.2115512762617,
+          "y": 597.4896644954579,
+          "facingAngle": 154.28049659539232,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 5.784639232525226
+        }
+      ]
+    },
+    {
+      "tick": 635,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 591.7745657660203,
+          "y": 609.2929866577792,
+          "facingAngle": -48.487226526785626,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 12.410373457684052
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 608.2254342339797,
+          "y": 590.7070133422208,
+          "facingAngle": 131.5127734732144,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 12.410373457684052
+        }
+      ]
+    },
+    {
+      "tick": 640,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 585.8778584564433,
+          "y": 613.8003905729519,
+          "facingAngle": -44.339810704457605,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 19.74552257455521
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 614.1221415435567,
+          "y": 586.1996094270481,
+          "facingAngle": 135.6601892955424,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 19.74552257455521
+        }
+      ]
+    },
+    {
+      "tick": 645,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 578.5420463992486,
+          "y": 614.9289775704184,
+          "facingAngle": -34.82755786782794,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 26.14035470360059
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 621.4579536007514,
+          "y": 585.0710224295816,
+          "facingAngle": 145.17244213217205,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 26.14035470360059
+        }
+      ]
+    },
+    {
+      "tick": 650,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 571.5631922314274,
+          "y": 612.4024301923515,
+          "facingAngle": -23.563942920211794,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 31.023737858983168
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 628.4368077685726,
+          "y": 587.5975698076485,
+          "facingAngle": 156.4360570797882,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 31.023737858983168
+        }
+      ]
+    },
+    {
+      "tick": 655,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 566.6499628493103,
+          "y": 606.8393353533223,
+          "facingAngle": -11.589376139864447,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 34.04411088613691
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 633.3500371506897,
+          "y": 593.1606646466777,
+          "facingAngle": 168.41062386013556,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 34.04411088613691
+        }
+      ]
+    },
+    {
+      "tick": 660,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 565.0052881605047,
+          "y": 599.6017326896405,
+          "facingAngle": 0.6520428284037179,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 34.996978063538734
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 634.9947118394953,
+          "y": 600.3982673103595,
+          "facingAngle": -179.3479571715963,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 34.996978063538734
+        }
+      ]
+    },
+    {
+      "tick": 665,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 567.0318418888654,
+          "y": 592.4616397535926,
+          "facingAngle": 12.879595053282102,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 33.819023114888815
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 632.9681581111346,
+          "y": 607.5383602464074,
+          "facingAngle": -167.1204049467179,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 33.819023114888815
+        }
+      ]
+    },
+    {
+      "tick": 670,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 572.2334530031575,
+          "y": 587.1672003153701,
+          "facingAngle": 24.804852440113876,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 30.588590681391345
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 627.7665469968425,
+          "y": 612.8327996846299,
+          "facingAngle": -155.19514755988612,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 30.588590681391345
+        }
+      ]
+    },
+    {
+      "tick": 675,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "transcendent_fae_1",
+          "entityType": "transcendent_fae",
+          "x": 579.3365856900724,
+          "y": 585.0146777994805,
+          "facingAngle": 35.95001140723118,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 25.525214443704527
+        },
+        {
+          "entityId": "celestial_angel_1",
+          "entityType": "celestial_angel",
+          "x": 620.6634143099276,
+          "y": 614.9853222005195,
+          "facingAngle": -144.04998859276884,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 25.525214443704527
+        }
+      ]
+    }
+  ],
+  "combatLog": [
+    {
+      "tick": 19,
+      "attacker": "Seraphiel the Radiant",
+      "defender": "Luminara the Transcendent",
+      "action": "consecrates wrath upon",
+      "weapon": "holy flame sword",
+      "bodyPart": "fae heart",
+      "damage": "shattering the dream essence",
+      "renderableOperation": {
+        "actor": "Seraphiel the Radiant",
+        "actorType": "celestial_angel",
+        "action": "consecrates wrath upon",
+        "weapon": "holy flame sword",
+        "target": "Luminara the Transcendent's fae heart",
+        "spritePrompt": "celestial angel consecrates wrath upon with holy flame sword, golden coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 39,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "reality-warps around",
+      "weapon": "prismatic reality shard",
+      "bodyPart": "halo",
+      "damage": "casting out into void",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "reality-warps around",
+        "weapon": "prismatic reality shard",
+        "target": "Seraphiel the Radiant's halo",
+        "spritePrompt": "transcendent fae reality-warps around with prismatic reality shard, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 59,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "reality-warps around",
+      "weapon": "fractal dream weaver",
+      "bodyPart": "divine core",
+      "damage": "purging the divine essence",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "reality-warps around",
+        "weapon": "fractal dream weaver",
+        "target": "Seraphiel the Radiant's divine core",
+        "spritePrompt": "transcendent fae reality-warps around with fractal dream weaver, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 79,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "reality-warps around",
+      "weapon": "crystalline moonbeam",
+      "bodyPart": "divine core",
+      "damage": "searing with radiance",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "reality-warps around",
+        "weapon": "crystalline moonbeam",
+        "target": "Seraphiel the Radiant's divine core",
+        "spritePrompt": "transcendent fae reality-warps around with crystalline moonbeam, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 99,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "enchants the air to strike",
+      "weapon": "fractal dream weaver",
+      "bodyPart": "holy aura",
+      "damage": "purging the divine essence",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "enchants the air to strike",
+        "weapon": "fractal dream weaver",
+        "target": "Seraphiel the Radiant's holy aura",
+        "spritePrompt": "transcendent fae enchants the air to strike with fractal dream weaver, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 119,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "phase-shifts through",
+      "weapon": "crystalline moonbeam",
+      "bodyPart": "celestial form",
+      "damage": "scorching with holy fire",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "phase-shifts through",
+        "weapon": "crystalline moonbeam",
+        "target": "Seraphiel the Radiant's celestial form",
+        "spritePrompt": "transcendent fae phase-shifts through with crystalline moonbeam, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 139,
+      "attacker": "Seraphiel the Radiant",
+      "defender": "Luminara the Transcendent",
+      "action": "channels divine fury at",
+      "weapon": "divine judgment staff",
+      "bodyPart": "shimmer wing",
+      "damage": "fragmenting the reality matrix",
+      "renderableOperation": {
+        "actor": "Seraphiel the Radiant",
+        "actorType": "celestial_angel",
+        "action": "channels divine fury at",
+        "weapon": "divine judgment staff",
+        "target": "Luminara the Transcendent's shimmer wing",
+        "spritePrompt": "celestial angel channels divine fury at with divine judgment staff, golden coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 159,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "enchants the air to strike",
+      "weapon": "fractal dream weaver",
+      "bodyPart": "divine core",
+      "damage": "searing with radiance",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "enchants the air to strike",
+        "weapon": "fractal dream weaver",
+        "target": "Seraphiel the Radiant's divine core",
+        "spritePrompt": "transcendent fae enchants the air to strike with fractal dream weaver, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 179,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "phase-shifts through",
+      "weapon": "crystalline moonbeam",
+      "bodyPart": "wing span",
+      "damage": "casting out into void",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "phase-shifts through",
+        "weapon": "crystalline moonbeam",
+        "target": "Seraphiel the Radiant's wing span",
+        "spritePrompt": "transcendent fae phase-shifts through with crystalline moonbeam, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 199,
+      "attacker": "Seraphiel the Radiant",
+      "defender": "Luminara the Transcendent",
+      "action": "channels divine fury at",
+      "weapon": "holy flame sword",
+      "bodyPart": "reality anchor",
+      "damage": "shattering the dream essence",
+      "renderableOperation": {
+        "actor": "Seraphiel the Radiant",
+        "actorType": "celestial_angel",
+        "action": "channels divine fury at",
+        "weapon": "holy flame sword",
+        "target": "Luminara the Transcendent's reality anchor",
+        "spritePrompt": "celestial angel channels divine fury at with holy flame sword, golden coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 219,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "reality-warps around",
+      "weapon": "fractal dream weaver",
+      "bodyPart": "wing span",
+      "damage": "purging the divine essence",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "reality-warps around",
+        "weapon": "fractal dream weaver",
+        "target": "Seraphiel the Radiant's wing span",
+        "spritePrompt": "transcendent fae reality-warps around with fractal dream weaver, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 239,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "transmutes spacetime against",
+      "weapon": "prismatic reality shard",
+      "bodyPart": "celestial form",
+      "damage": "purging the divine essence",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "transmutes spacetime against",
+        "weapon": "prismatic reality shard",
+        "target": "Seraphiel the Radiant's celestial form",
+        "spritePrompt": "transcendent fae transmutes spacetime against with prismatic reality shard, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 259,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "reality-warps around",
+      "weapon": "crystalline moonbeam",
+      "bodyPart": "divine core",
+      "damage": "searing with radiance",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "reality-warps around",
+        "weapon": "crystalline moonbeam",
+        "target": "Seraphiel the Radiant's divine core",
+        "spritePrompt": "transcendent fae reality-warps around with crystalline moonbeam, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 279,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "phase-shifts through",
+      "weapon": "prismatic reality shard",
+      "bodyPart": "halo",
+      "damage": "searing with radiance",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "phase-shifts through",
+        "weapon": "prismatic reality shard",
+        "target": "Seraphiel the Radiant's halo",
+        "spritePrompt": "transcendent fae phase-shifts through with prismatic reality shard, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 299,
+      "attacker": "Seraphiel the Radiant",
+      "defender": "Luminara the Transcendent",
+      "action": "smites",
+      "weapon": "divine judgment staff",
+      "bodyPart": "dream core",
+      "damage": "unweaving existence",
+      "renderableOperation": {
+        "actor": "Seraphiel the Radiant",
+        "actorType": "celestial_angel",
+        "action": "smites",
+        "weapon": "divine judgment staff",
+        "target": "Luminara the Transcendent's dream core",
+        "spritePrompt": "celestial angel smites with divine judgment staff, golden coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 319,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "phase-shifts through",
+      "weapon": "crystalline moonbeam",
+      "bodyPart": "holy aura",
+      "damage": "searing with radiance",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "phase-shifts through",
+        "weapon": "crystalline moonbeam",
+        "target": "Seraphiel the Radiant's holy aura",
+        "spritePrompt": "transcendent fae phase-shifts through with crystalline moonbeam, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 339,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "enchants the air to strike",
+      "weapon": "crystalline moonbeam",
+      "bodyPart": "divine core",
+      "damage": "searing with radiance",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "enchants the air to strike",
+        "weapon": "crystalline moonbeam",
+        "target": "Seraphiel the Radiant's divine core",
+        "spritePrompt": "transcendent fae enchants the air to strike with crystalline moonbeam, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 359,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "phase-shifts through",
+      "weapon": "crystalline moonbeam",
+      "bodyPart": "holy aura",
+      "damage": "casting out into void",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "phase-shifts through",
+        "weapon": "crystalline moonbeam",
+        "target": "Seraphiel the Radiant's holy aura",
+        "spritePrompt": "transcendent fae phase-shifts through with crystalline moonbeam, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 379,
+      "attacker": "Seraphiel the Radiant",
+      "defender": "Luminara the Transcendent",
+      "action": "consecrates wrath upon",
+      "weapon": "divine judgment staff",
+      "bodyPart": "fae heart",
+      "damage": "corrupting the dimensional anchor",
+      "renderableOperation": {
+        "actor": "Seraphiel the Radiant",
+        "actorType": "celestial_angel",
+        "action": "consecrates wrath upon",
+        "weapon": "divine judgment staff",
+        "target": "Luminara the Transcendent's fae heart",
+        "spritePrompt": "celestial angel consecrates wrath upon with divine judgment staff, golden coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 399,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "reality-warps around",
+      "weapon": "crystalline moonbeam",
+      "bodyPart": "divine core",
+      "damage": "searing with radiance",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "reality-warps around",
+        "weapon": "crystalline moonbeam",
+        "target": "Seraphiel the Radiant's divine core",
+        "spritePrompt": "transcendent fae reality-warps around with crystalline moonbeam, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 419,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "reality-warps around",
+      "weapon": "prismatic reality shard",
+      "bodyPart": "divine core",
+      "damage": "searing with radiance",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "reality-warps around",
+        "weapon": "prismatic reality shard",
+        "target": "Seraphiel the Radiant's divine core",
+        "spritePrompt": "transcendent fae reality-warps around with prismatic reality shard, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 439,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "transmutes spacetime against",
+      "weapon": "prismatic reality shard",
+      "bodyPart": "holy aura",
+      "damage": "scorching with holy fire",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "transmutes spacetime against",
+        "weapon": "prismatic reality shard",
+        "target": "Seraphiel the Radiant's holy aura",
+        "spritePrompt": "transcendent fae transmutes spacetime against with prismatic reality shard, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 459,
+      "attacker": "Seraphiel the Radiant",
+      "defender": "Luminara the Transcendent",
+      "action": "channels divine fury at",
+      "weapon": "holy flame sword",
+      "bodyPart": "ethereal essence",
+      "damage": "fragmenting the reality matrix",
+      "renderableOperation": {
+        "actor": "Seraphiel the Radiant",
+        "actorType": "celestial_angel",
+        "action": "channels divine fury at",
+        "weapon": "holy flame sword",
+        "target": "Luminara the Transcendent's ethereal essence",
+        "spritePrompt": "celestial angel channels divine fury at with holy flame sword, golden coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 479,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "enchants the air to strike",
+      "weapon": "fractal dream weaver",
+      "bodyPart": "divine core",
+      "damage": "casting out into void",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "enchants the air to strike",
+        "weapon": "fractal dream weaver",
+        "target": "Seraphiel the Radiant's divine core",
+        "spritePrompt": "transcendent fae enchants the air to strike with fractal dream weaver, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 499,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "phase-shifts through",
+      "weapon": "fractal dream weaver",
+      "bodyPart": "halo",
+      "damage": "searing with radiance",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "phase-shifts through",
+        "weapon": "fractal dream weaver",
+        "target": "Seraphiel the Radiant's halo",
+        "spritePrompt": "transcendent fae phase-shifts through with fractal dream weaver, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 519,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "enchants the air to strike",
+      "weapon": "crystalline moonbeam",
+      "bodyPart": "divine core",
+      "damage": "purging the divine essence",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "enchants the air to strike",
+        "weapon": "crystalline moonbeam",
+        "target": "Seraphiel the Radiant's divine core",
+        "spritePrompt": "transcendent fae enchants the air to strike with crystalline moonbeam, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 539,
+      "attacker": "Seraphiel the Radiant",
+      "defender": "Luminara the Transcendent",
+      "action": "smites",
+      "weapon": "divine judgment staff",
+      "bodyPart": "fae heart",
+      "damage": "corrupting the dimensional anchor",
+      "renderableOperation": {
+        "actor": "Seraphiel the Radiant",
+        "actorType": "celestial_angel",
+        "action": "smites",
+        "weapon": "divine judgment staff",
+        "target": "Luminara the Transcendent's fae heart",
+        "spritePrompt": "celestial angel smites with divine judgment staff, golden coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 559,
+      "attacker": "Seraphiel the Radiant",
+      "defender": "Luminara the Transcendent",
+      "action": "smites",
+      "weapon": "divine judgment staff",
+      "bodyPart": "reality anchor",
+      "damage": "unweaving existence",
+      "renderableOperation": {
+        "actor": "Seraphiel the Radiant",
+        "actorType": "celestial_angel",
+        "action": "smites",
+        "weapon": "divine judgment staff",
+        "target": "Luminara the Transcendent's reality anchor",
+        "spritePrompt": "celestial angel smites with divine judgment staff, golden coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 579,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "enchants the air to strike",
+      "weapon": "crystalline moonbeam",
+      "bodyPart": "divine core",
+      "damage": "searing with radiance",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "enchants the air to strike",
+        "weapon": "crystalline moonbeam",
+        "target": "Seraphiel the Radiant's divine core",
+        "spritePrompt": "transcendent fae enchants the air to strike with crystalline moonbeam, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 599,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "transmutes spacetime against",
+      "weapon": "prismatic reality shard",
+      "bodyPart": "halo",
+      "damage": "purging the divine essence",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "transmutes spacetime against",
+        "weapon": "prismatic reality shard",
+        "target": "Seraphiel the Radiant's halo",
+        "spritePrompt": "transcendent fae transmutes spacetime against with prismatic reality shard, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 619,
+      "attacker": "Seraphiel the Radiant",
+      "defender": "Luminara the Transcendent",
+      "action": "consecrates wrath upon",
+      "weapon": "divine judgment staff",
+      "bodyPart": "ethereal essence",
+      "damage": "shattering the dream essence",
+      "renderableOperation": {
+        "actor": "Seraphiel the Radiant",
+        "actorType": "celestial_angel",
+        "action": "consecrates wrath upon",
+        "weapon": "divine judgment staff",
+        "target": "Luminara the Transcendent's ethereal essence",
+        "spritePrompt": "celestial angel consecrates wrath upon with divine judgment staff, golden coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 639,
+      "attacker": "Luminara the Transcendent",
+      "defender": "Seraphiel the Radiant",
+      "action": "phase-shifts through",
+      "weapon": "prismatic reality shard",
+      "bodyPart": "wing span",
+      "damage": "casting out into void",
+      "renderableOperation": {
+        "actor": "Luminara the Transcendent",
+        "actorType": "transcendent_fae",
+        "action": "phase-shifts through",
+        "weapon": "prismatic reality shard",
+        "target": "Seraphiel the Radiant's wing span",
+        "spritePrompt": "transcendent fae phase-shifts through with prismatic reality shard, iridescent coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 659,
+      "attacker": "Seraphiel the Radiant",
+      "defender": "Luminara the Transcendent",
+      "action": "consecrates wrath upon",
+      "weapon": "holy flame sword",
+      "bodyPart": "fae heart",
+      "damage": "fragmenting the reality matrix",
+      "renderableOperation": {
+        "actor": "Seraphiel the Radiant",
+        "actorType": "celestial_angel",
+        "action": "consecrates wrath upon",
+        "weapon": "holy flame sword",
+        "target": "Luminara the Transcendent's fae heart",
+        "spritePrompt": "celestial angel consecrates wrath upon with holy flame sword, golden coloring, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    }
+  ],
+  "combatants": [
+    {
+      "name": "Luminara the Transcendent",
+      "type": "transcendent_fae",
+      "color": "iridescent",
+      "weapons": [
+        {
+          "name": "prismatic reality shard",
+          "type": "magic",
+          "color": "rainbow"
+        },
+        {
+          "name": "crystalline moonbeam",
+          "type": "energy",
+          "color": "silver"
+        },
+        {
+          "name": "fractal dream weaver",
+          "type": "psychic",
+          "color": "purple"
+        }
+      ]
+    },
+    {
+      "name": "Seraphiel the Radiant",
+      "type": "celestial_angel",
+      "color": "golden",
+      "weapons": [
+        {
+          "name": "holy flame sword",
+          "type": "divine",
+          "color": "white-gold"
+        },
+        {
+          "name": "divine judgment staff",
+          "type": "holy",
+          "color": "platinum"
+        },
+        {
+          "name": "celestial light spear",
+          "type": "radiant",
+          "color": "pure-white"
+        }
+      ]
+    }
+  ],
+  "background": {
+    "type": "ethereal",
+    "name": "Dimensional Nexus",
+    "prompt": "swirling dimensional void, reality fractures, cosmic aurora, stars bleeding into rainbow light, ethereal mist, otherworldly plane, pixel art background, tileable",
+    "color": "#1a0533"
+  },
+  "ecsMetadata": {
+    "winner": "Luminara the Transcendent",
+    "outcome": "attacker_victory",
+    "usedRealCombatSystem": true
+  }
+}

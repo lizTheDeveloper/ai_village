@@ -22,15 +22,23 @@ import type {
   PlotLineInstance,
   PlotTransition,
   PlotStage,
-  PlotEffect,
 } from './PlotTypes.js';
 import { completePlot, abandonPlot } from './PlotTypes.js';
 import { plotLineRegistry } from './PlotLineRegistry.js';
 import { addSignificantEvent } from '../soul/SilverThreadComponent.js';
 import { addLessonToSoul } from '../soul/SoulIdentityComponent.js';
+import {
+  evaluatePlotTransitionConditions,
+  createPlotConditionContext,
+} from './PlotConditionEvaluator.js';
+import {
+  executeEffects,
+  createEffectContext,
+} from './PlotEffectExecutor.js';
+import { getNarrativePressureSystem } from '../narrative/NarrativePressureSystem.js';
 
 /**
- * System priority: 86 (runs after assignment at 85)
+ * System priority: 86 (runs after assignment at 85, after NarrativePressure at 80)
  */
 export class PlotProgressionSystem implements System {
   readonly id = 'plot_progression' as const;
@@ -112,63 +120,38 @@ export class PlotProgressionSystem implements System {
   }
 
   /**
-   * Evaluate if transition conditions are met
+   * Evaluate if transition conditions are met using PlotConditionEvaluator
    */
   private evaluateTransitionConditions(
     transition: PlotTransition,
     plot: PlotLineInstance,
     soul: Entity,
     _agent: Entity | null,
-    _world: World
+    world: World
   ): boolean {
-    const identity = soul.getComponent(ComponentType.SoulIdentity) as SoulIdentityComponent | undefined;
     const thread = soul.getComponent(ComponentType.SilverThread) as SilverThreadComponent | undefined;
-    if (!identity || !thread) return false;
+    if (!thread) return false;
 
     // If no conditions, auto-transition (narrative beats)
     if (!transition.conditions || transition.conditions.length === 0) {
       return true;
     }
 
-    // Check each condition
-    for (const condition of transition.conditions) {
-      // Wisdom threshold
-      if (condition.type === 'wisdom_threshold') {
-        if (identity.wisdom_level < condition.min_wisdom) {
-          return false;
-        }
-      }
+    // Create context for condition evaluation
+    const context = createPlotConditionContext(
+      soul.id,
+      plot,
+      thread.head.personal_tick,
+      thread.head.universe_tick ?? 0,
+      world
+    );
 
-      // Lesson learned
-      else if (condition.type === 'lesson_learned') {
-        const learned = identity.lessons_learned.some((l) => l.lesson_id === condition.lesson_id);
-        if (!learned) {
-          return false;
-        }
-      }
-
-      // Personal tick elapsed (ticks since stage entry)
-      else if (condition.type === 'personal_tick_elapsed') {
-        const ticksInStage = thread.head.personal_tick - plot.stage_entered_at;
-        if (ticksInStage < condition.ticks) {
-          return false;
-        }
-      }
-
-      // Custom condition
-      else if (condition.type === 'custom') {
-        // TODO: Implement custom condition evaluation
-        // For now, treat as always true
-        continue;
-      }
-    }
-
-    // All conditions met
-    return true;
+    // Evaluate all conditions using the central evaluator
+    return evaluatePlotTransitionConditions(transition.conditions, context);
   }
 
   /**
-   * Advance plot to next stage
+   * Advance plot to next stage using PlotEffectExecutor for effects
    */
   private advanceStage(
     plot: PlotLineInstance,
@@ -176,7 +159,7 @@ export class PlotProgressionSystem implements System {
     transition: PlotTransition,
     soul: Entity,
     _agent: Entity | null,
-    _world: World
+    world: World
   ): void {
     const toStage = template.stages.find((s: PlotStage) => s.stage_id === transition.to_stage);
     if (!toStage) {
@@ -190,82 +173,65 @@ export class PlotProgressionSystem implements System {
 
     console.log(`[PlotProgression] Soul ${soul.id}: "${plot.template_id}" advancing from "${fromStageName}" → "${toStageName}"`);
 
+    const thread = soul.getComponent(ComponentType.SilverThread) as SilverThreadComponent | undefined;
+    if (!thread) return;
+
+    const narrativePressure = getNarrativePressureSystem();
+
+    // Create effect context
+    const effectContext = createEffectContext(
+      soul.id,
+      plot,
+      thread.head.personal_tick,
+      thread.head.universe_id,
+      world
+    );
+
+    // === Phase 3: Remove attractors from exiting stage ===
+    if (fromStage) {
+      narrativePressure.removePlotStageAttractors(plot.instance_id, fromStage.stage_id);
+    }
+
+    // Apply exit effects from current stage
+    if (fromStage?.on_exit_effects) {
+      executeEffects(fromStage.on_exit_effects, effectContext);
+    }
+
     // Apply transition effects
     if (transition.effects) {
-      this.applyEffects(transition.effects, soul);
+      executeEffects(transition.effects, effectContext);
     }
 
     // Apply stage entry effects
     if (toStage.on_enter_effects) {
-      this.applyEffects(toStage.on_enter_effects, soul);
+      executeEffects(toStage.on_enter_effects, effectContext);
+    }
+
+    // === Phase 3: Add attractors for entering stage ===
+    if (toStage.stage_attractors && toStage.stage_attractors.length > 0) {
+      narrativePressure.addPlotStageAttractors(
+        plot.instance_id,
+        toStage.stage_id,
+        soul.id,
+        toStage.stage_attractors,
+        thread.head.personal_tick
+      );
     }
 
     // Update plot state
-    const thread = soul.getComponent(ComponentType.SilverThread) as SilverThreadComponent | undefined;
-    if (thread) {
-      plot.current_stage = transition.to_stage;
-      plot.stage_entered_at = thread.head.personal_tick;
+    plot.current_stage = transition.to_stage;
+    plot.stage_entered_at = thread.head.personal_tick;
 
-      // Record stage change to silver thread
-      addSignificantEvent(thread, {
-        type: 'plot_stage_change',
-        details: {
-          plot_id: plot.instance_id,
-          plot_name: plot.template_id,
-          from_stage: fromStageName,
-          to_stage: toStageName,
-        },
-      });
-    }
-  }
-
-  /**
-   * Apply effects from transition or stage
-   */
-  private applyEffects(
-    effects: PlotEffect[],
-    soul: Entity
-  ): void {
-    const identity = soul.getComponent(ComponentType.SoulIdentity) as SoulIdentityComponent | undefined;
-    if (!identity) return;
-
-    for (const effect of effects) {
-      // Learn lesson
-      if (effect.type === 'learn_lesson') {
-        // Note: lesson_id is the identifier, we'd need to look up the actual lesson details
-        console.log(`[PlotProgression] Lesson learned: ${effect.lesson_id}`);
-      }
-
-      // Grant skill XP
-      else if (effect.type === 'grant_skill_xp') {
-        console.log(`[PlotProgression] TODO: Grant ${effect.xp} XP to skill ${effect.skill}`);
-      }
-
-      // Grant item
-      else if (effect.type === 'grant_item') {
-        console.log(`[PlotProgression] TODO: Grant item ${effect.item_id} x${effect.quantity}`);
-      }
-
-      // Modify relationship
-      else if (effect.type === 'modify_relationship') {
-        console.log(`[PlotProgression] TODO: Modify relationship with ${effect.agent_id} by ${effect.trust_delta}`);
-      }
-
-      // Spawn attractor
-      else if (effect.type === 'spawn_attractor') {
-        console.log(`[PlotProgression] TODO: Spawn attractor ${effect.attractor_id}`);
-      }
-
-      // Queue event
-      else if (effect.type === 'queue_event') {
-        console.log(`[PlotProgression] TODO: Queue event ${effect.event_type}`);
-      }
-
-      // Custom effect
-      else if (effect.type === 'custom') {
-        console.log(`[PlotProgression] TODO: Apply custom effect`);
-      }
-    }
+    // Record stage change to silver thread
+    addSignificantEvent(thread, {
+      type: 'plot_stage_change',
+      details: {
+        plot_id: plot.instance_id,
+        plot_name: plot.template_id,
+        from_stage: fromStageName,
+        to_stage: toStageName,
+      },
+    });
   }
 
   /**
@@ -283,6 +249,10 @@ export class PlotProgressionSystem implements System {
     if (!template) return;
 
     console.log(`[PlotProgression] Soul ${soul.id} completed plot "${plot.template_id}"`);
+
+    // === Phase 3: Clean up any remaining stage attractors ===
+    const narrativePressure = getNarrativePressureSystem();
+    narrativePressure.removePlotStageAttractors(plot.instance_id, plot.current_stage);
 
     // Get soul link for incarnation number
     const soulLink = soul.getComponent(ComponentType.SoulLink) as SoulLinkComponent | undefined;
@@ -330,6 +300,10 @@ export class PlotProgressionSystem implements System {
     if (!plotLines || !thread) return;
 
     console.log(`[PlotProgression] Soul ${soul.id} failed plot "${plot.template_id}"`);
+
+    // === Phase 3: Clean up any remaining stage attractors ===
+    const narrativePressure = getNarrativePressureSystem();
+    narrativePressure.removePlotStageAttractors(plot.instance_id, plot.current_stage);
 
     // Record failure to silver thread
     addSignificantEvent(thread, {

@@ -68,6 +68,18 @@ export class TimelinePanel implements IWindowPanel {
     this.visible = visible;
   }
 
+  // DOM-based panel - no canvas rendering needed
+  render(
+    _ctx: CanvasRenderingContext2D,
+    _x: number,
+    _y: number,
+    _width: number,
+    _height: number,
+    _world?: unknown
+  ): void {
+    // TimelinePanel uses DOM elements, not canvas rendering
+  }
+
   constructor(containerId: string = 'timeline-panel') {
     const existing = document.getElementById(containerId);
     if (existing) {
@@ -93,7 +105,7 @@ export class TimelinePanel implements IWindowPanel {
       document.body.appendChild(this.container);
     }
 
-    this.render();
+    this.renderDOM();
   }
 
   /**
@@ -161,7 +173,7 @@ export class TimelinePanel implements IWindowPanel {
       this.universes.set(universeId, universe);
     }
 
-    this.render();
+    this.renderDOM();
   }
 
   /**
@@ -175,9 +187,9 @@ export class TimelinePanel implements IWindowPanel {
   }
 
   /**
-   * Render the timeline interface.
+   * Render the timeline interface (DOM-based).
    */
-  private render(): void {
+  private renderDOM(): void {
     this.container.innerHTML = '';
 
     // Title
@@ -292,7 +304,7 @@ export class TimelinePanel implements IWindowPanel {
         this.selectedUniverse = timeline.universeId;
         this.selectedTimeline = null;  // Reset timeline selection
         this.selectedCheckpoint = null;  // Reset checkpoint selection
-        this.render();
+        this.renderDOM();
       };
 
       const name = document.createElement('div');
@@ -494,7 +506,7 @@ export class TimelinePanel implements IWindowPanel {
       card.onclick = () => {
         this.selectedTimeline = timeline.id;
         this.selectedCheckpoint = null;  // Reset checkpoint selection
-        this.render();
+        this.renderDOM();
       };
 
       // Timeline name/label
@@ -600,7 +612,7 @@ export class TimelinePanel implements IWindowPanel {
 
       card.onclick = () => {
         this.selectedCheckpoint = checkpoint.key;
-        this.render();
+        this.renderDOM();
       };
 
       const name = document.createElement('div');

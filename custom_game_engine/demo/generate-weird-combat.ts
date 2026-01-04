@@ -22,6 +22,12 @@ const WEIRD_COMBATS = [
     name: 'fae-vs-angels',
     title: 'TRANSCENDENT FAE VS CELESTIAL ANGELS - Ethereal Duel',
     description: 'Reality-warping fae creatures battle divine angelic beings',
+    background: {
+      type: 'ethereal',
+      name: 'Dimensional Nexus',
+      prompt: 'swirling dimensional void, reality fractures, cosmic aurora, stars bleeding into rainbow light, ethereal mist, otherworldly plane, pixel art background, tileable',
+      color: '#1a0533',
+    },
     combatant1: {
       name: 'Luminara the Transcendent',
       type: 'transcendent_fae',
@@ -47,6 +53,12 @@ const WEIRD_COMBATS = [
     name: 'book-tentacle-vs-bambi',
     title: 'TENTACLE BOOK HORROR VS BAMBI WITH MACHETE - Forbidden Knowledge',
     description: 'Eldritch tome-beast faces off against weaponized woodland creature',
+    background: {
+      type: 'eldritch',
+      name: 'Forbidden Library Ruins',
+      prompt: 'ruined ancient library, floating books, ink dripping from shadows, eldritch symbols glowing on walls, torn pages floating, cursed tomes, dark academia horror, pixel art background, tileable',
+      color: '#0d1117',
+    },
     combatant1: {
       name: 'The Necronomicon Amalgam',
       type: 'tentacle_book_monster',
@@ -116,35 +128,38 @@ const DAMAGE_TYPES = {
 // GENERATOR
 // ============================================================================
 
-function generateWeirdCombat(scenario: typeof WEIRD_COMBATS[0], frames: number = 80) {
+function generateWeirdCombat(scenario: typeof WEIRD_COMBATS[0], frames: number = 100) {
   const combatLog: any[] = [];
   const frameData: any[] = [];
 
-  const { combatant1, combatant2 } = scenario;
+  const { combatant1, combatant2, background } = scenario;
   let c1Health = 100;
   let c2Health = 100;
   let phase = 'approach';
   let winner: string | null = null;
 
-  // Positions
-  let c1Pos = { x: 580, y: 600 };
-  let c2Pos = { x: 620, y: 600 };
+  // Positions - start further apart to have a dramatic approach
+  let c1Pos = { x: 500, y: 600 };
+  let c2Pos = { x: 700, y: 600 };
   const center = { x: 600, y: 600 };
 
   for (let tick = 0; tick < frames; tick++) {
-    // Phase transitions
-    if (phase === 'approach' && Math.sqrt(Math.pow(c1Pos.x - c2Pos.x, 2) + Math.pow(c1Pos.y - c2Pos.y, 2)) < 30) {
+    // Phase transitions - use <= 40 so they actually enter combat
+    const distance = Math.sqrt(Math.pow(c1Pos.x - c2Pos.x, 2) + Math.pow(c1Pos.y - c2Pos.y, 2));
+    if (phase === 'approach' && distance <= 40) {
       phase = 'combat';
-    } else if (phase === 'combat' && tick > 50) {
+      console.log(`    [tick ${tick}] Entering combat phase! Distance: ${distance.toFixed(1)}`);
+    } else if (phase === 'combat' && tick > 70) {
       phase = 'finisher';
     }
 
     // Movement
     if (phase === 'approach') {
-      c1Pos.x += (center.x - 15 - c1Pos.x) * 0.05;
-      c1Pos.y += (center.y - c1Pos.y) * 0.05;
-      c2Pos.x += (center.x + 15 - c2Pos.x) * 0.05;
-      c2Pos.y += (center.y - c2Pos.y) * 0.05;
+      // Move faster toward center with slight offset (converge to 30 apart)
+      c1Pos.x += (center.x - 15 - c1Pos.x) * 0.12;
+      c1Pos.y += (center.y - c1Pos.y) * 0.12;
+      c2Pos.x += (center.x + 15 - c2Pos.x) * 0.12;
+      c2Pos.y += (center.y - c2Pos.y) * 0.12;
     } else if (phase === 'combat') {
       // Chaotic movement
       const angle = tick * 0.1;
@@ -254,6 +269,12 @@ function generateWeirdCombat(scenario: typeof WEIRD_COMBATS[0], frames: number =
     frames: frameData,
     combatLog,
     combatants: [combatant1, combatant2],
+    background: background || {
+      type: 'default',
+      name: 'Arena',
+      prompt: 'gladiatorial arena, sand floor, stone walls, crowd in shadows, pixel art background, tileable',
+      color: '#2a1f14',
+    },
   };
 }
 
@@ -280,6 +301,7 @@ function main() {
     console.log(`  ✅ Saved to: ${scenario.name}.json`);
     console.log(`  📊 Combat log entries: ${recording.combatLog.length}`);
     console.log(`  🎬 Frames: ${recording.frames.length}`);
+    console.log(`  🖼️  Background: ${recording.background.name} (${recording.background.type})`);
 
     // Print sample combat log
     if (recording.combatLog.length > 0) {
