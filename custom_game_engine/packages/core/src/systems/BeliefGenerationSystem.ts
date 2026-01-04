@@ -7,6 +7,7 @@ import type { EventBus } from '../events/EventBus.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
 import type { PersonalityComponent } from '../components/PersonalityComponent.js';
 import { DeityComponent, type BeliefActivity } from '../components/DeityComponent.js';
+import type { BeliefEconomyConfig } from '../divinity/UniverseConfig.js';
 
 /**
  * Belief generation rates per hour (in-game time) by activity type
@@ -43,9 +44,20 @@ export class BeliefGenerationSystem implements System {
   private eventBus?: EventBus;
   private lastUpdateTick: number = 0;
   private readonly updateInterval: number = 20; // Update once per second at 20 TPS
+  private world?: World;
 
   initialize(_world: World, eventBus: EventBus): void {
     this.eventBus = eventBus;
+    this.world = _world;
+  }
+
+  /**
+   * Get the belief economy config from the world's divine config
+   */
+  private getBeliefEconomyConfig(): BeliefEconomyConfig | undefined {
+    if (!this.world) return undefined;
+    const divineConfig = (this.world as any).divineConfig;
+    return divineConfig?.beliefEconomy;
   }
 
   update(_world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
@@ -71,6 +83,9 @@ export class BeliefGenerationSystem implements System {
     const deityComp = deityEntity.components.get(CT.Deity) as DeityComponent;
     if (!deityComp) return;
 
+    // Get belief economy config for multipliers
+    const beliefConfig = this.getBeliefEconomyConfig();
+
     let totalBeliefGenerated = 0;
 
     // Find all believers of this deity
@@ -90,7 +105,7 @@ export class BeliefGenerationSystem implements System {
 
     // Generate belief from each believer
     for (const believerEntity of believers) {
-      const beliefAmount = this._generateBeliefFromAgent(believerEntity, currentTick);
+      const beliefAmount = this._generateBeliefFromAgent(believerEntity, currentTick, beliefConfig);
       if (beliefAmount > 0) {
         totalBeliefGenerated += beliefAmount;
         deityComp.addBelief(beliefAmount, currentTick);
@@ -100,8 +115,9 @@ export class BeliefGenerationSystem implements System {
     // Update belief generation rate
     deityComp.updateBeliefRate(totalBeliefGenerated * this.updateInterval); // Convert to per-tick rate
 
-    // Apply decay
-    deityComp.applyDecay(currentTick);
+    // Apply decay with config multiplier
+    const decayMultiplier = beliefConfig?.decayMultiplier ?? 1.0;
+    deityComp.applyDecay(currentTick, decayMultiplier);
 
     // Emit event if belief was generated
     if (totalBeliefGenerated > 0 && this.eventBus) {
@@ -121,7 +137,11 @@ export class BeliefGenerationSystem implements System {
   /**
    * Generate belief from a single agent
    */
-  private _generateBeliefFromAgent(entity: Entity, currentTick: number): number {
+  private _generateBeliefFromAgent(
+    entity: Entity,
+    currentTick: number,
+    beliefConfig?: BeliefEconomyConfig
+  ): number {
     const spiritual = entity.components.get(CT.Spiritual) as SpiritualComponent;
     const personality = entity.components.get(CT.Personality) as PersonalityComponent;
 
@@ -137,6 +157,12 @@ export class BeliefGenerationSystem implements System {
     // Get base rate for this activity
     const baseRate = BELIEF_RATES_PER_HOUR[activity];
 
+    // Apply activity-specific multiplier from config
+    const activityMultiplier = beliefConfig?.activityMultipliers?.[activity] ?? 1.0;
+
+    // Apply global generation multiplier from config
+    const globalMultiplier = beliefConfig?.generationMultiplier ?? 1.0;
+
     // Modifiers
     const faithMultiplier = spiritual.faith; // 0-1
     const spiritualityMultiplier = personality.spirituality ?? 0.5; // 0-1
@@ -145,7 +171,7 @@ export class BeliefGenerationSystem implements System {
     // Convert per-hour rate to per-second rate (divide by 3600)
     // Then adjust for update interval (20 ticks = 1 second)
     const beliefPerSecond = baseRate / 3600;
-    const beliefThisUpdate = beliefPerSecond * faithMultiplier * spiritualityMultiplier;
+    const beliefThisUpdate = beliefPerSecond * faithMultiplier * spiritualityMultiplier * activityMultiplier * globalMultiplier;
 
     return beliefThisUpdate;
   }

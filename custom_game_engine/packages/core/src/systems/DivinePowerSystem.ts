@@ -519,7 +519,9 @@ export class DivinePowerSystem implements System {
     request: DivinePowerRequest,
     currentTick: number
   ): void {
-    const baseCost = 100;
+    const baseBaseCost = 100;
+    // Apply universe config multiplier to base cost
+    const baseCost = this.getEffectiveCost(baseBaseCost, 'minor_miracle', world);
     const miracleType = request.params?.type ?? 'warmth';
     const targetId = request.targetId;
 
@@ -628,7 +630,8 @@ export class DivinePowerSystem implements System {
     request: DivinePowerRequest,
     currentTick: number
   ): void {
-    const cost = 75;
+    const baseCost = 75;
+    const cost = this.getEffectiveCost(baseCost, 'bless_individual', world);
 
     if (!deityComp.spendBelief(cost)) {
       throw new Error('Insufficient belief for blessing');

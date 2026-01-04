@@ -246,8 +246,10 @@ export class DeityComponent extends ComponentBase {
 
   /**
    * Apply belief decay
+   * @param currentTick - Current game tick
+   * @param configMultiplier - Optional multiplier from universe divine config (default 1.0)
    */
-  applyDecay(currentTick: number): void {
+  applyDecay(currentTick: number, configMultiplier: number = 1.0): void {
     const ticksSinceActivity = currentTick - this.belief.lastActivityTick;
 
     // Accelerated decay if no activity
@@ -255,6 +257,9 @@ export class DeityComponent extends ComponentBase {
     if (ticksSinceActivity > 2400) { // ~2 game hours at 20 TPS
       decay *= 5; // Accelerated decay
     }
+
+    // Apply universe config multiplier
+    decay *= configMultiplier;
 
     const decayAmount = this.belief.currentBelief * decay;
     this.belief.currentBelief = Math.max(0, this.belief.currentBelief - decayAmount);

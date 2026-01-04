@@ -489,7 +489,7 @@ The superiority of linked minds over individual cognition manifests most dramati
 
 export const HIVE_MIND_ETHICS: ResearchPaper = {
   paperId: 'hive_mind_ethics',
-  title: 'Who Are You When You're Everyone?: Ethical Considerations',
+  title: 'Who Are You When You\'re Everyone?: Ethical Considerations',
   field: 'experimental',
   paperSets: ['hive_mind_link'],
   prerequisitePapers: ['collective_consciousness_theory'],

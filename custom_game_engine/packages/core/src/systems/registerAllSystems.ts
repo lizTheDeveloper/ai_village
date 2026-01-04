@@ -180,8 +180,8 @@ import { PassageSystem } from './PassageSystem.js';
 import { PortalSystem } from './PortalSystem.js';
 import { RealmTimeSystem } from './RealmTimeSystem.js';
 import { DeathJudgmentSystem } from './DeathJudgmentSystem.js';
-// import { DeathBargainSystem } from './DeathBargainSystem.js'; // Temporarily disabled - incomplete implementation
-// import { DeathTransitionSystem } from './DeathTransitionSystem.js'; // Temporarily disabled - incomplete implementation
+import { DeathBargainSystem } from './DeathBargainSystem.js';
+import { DeathTransitionSystem } from './DeathTransitionSystem.js';
 import { AfterlifeMemoryFadingSystem } from './AfterlifeMemoryFadingSystem.js';
 import { WisdomGoddessSystem } from './WisdomGoddessSystem.js';
 import { RealmManager } from './RealmManager.js';

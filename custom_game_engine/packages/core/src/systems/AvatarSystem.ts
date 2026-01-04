@@ -8,6 +8,7 @@ import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
+import { isFeatureAvailable, type AvatarConfig as DivineAvatarConfig, type RestrictionConfig } from '../divinity/UniverseConfig.js';
 
 // ============================================================================
 // Avatar Types
@@ -71,6 +72,41 @@ export class AvatarSystem implements System {
     this.config = { ...DEFAULT_AVATAR_CONFIG, ...config };
   }
 
+  /**
+   * Get the divine avatar config from the world's divine config
+   */
+  private getDivineAvatarConfig(world: World): DivineAvatarConfig | undefined {
+    const divineConfig = (world as any).divineConfig;
+    return divineConfig?.avatars;
+  }
+
+  /**
+   * Get the restriction config from the world's divine config
+   */
+  private getRestrictionConfig(world: World): RestrictionConfig | undefined {
+    const divineConfig = (world as any).divineConfig;
+    return divineConfig?.restrictions;
+  }
+
+  /**
+   * Check if avatars are enabled in this universe
+   */
+  private areAvatarsEnabled(world: World): boolean {
+    // Check the avatars config
+    const avatarConfig = this.getDivineAvatarConfig(world);
+    if (avatarConfig && !avatarConfig.avatarsAllowed) {
+      return false;
+    }
+
+    // Also check restrictions
+    const restrictions = this.getRestrictionConfig(world);
+    if (restrictions && !isFeatureAvailable('avatars', restrictions)) {
+      return false;
+    }
+
+    return true;
+  }
+
   update(world: World): void {
     const currentTick = world.tick;
 
@@ -93,6 +129,11 @@ export class AvatarSystem implements System {
     location: { x: number; y: number },
     purpose: AvatarPurpose = 'observe'
   ): AvatarData | null {
+    // Check if avatars are enabled in this universe
+    if (!this.areAvatarsEnabled(world)) {
+      return null;
+    }
+
     // Find deity
     const deityEntity = world.getEntity(deityId);
     if (!deityEntity) return null;
@@ -100,13 +141,17 @@ export class AvatarSystem implements System {
     const deity = deityEntity.components.get(CT.Deity) as DeityComponent | undefined;
     if (!deity) return null;
 
+    // Get manifestation cost from divine config or fall back to local config
+    const divineAvatarConfig = this.getDivineAvatarConfig(world);
+    const manifestationCost = divineAvatarConfig?.manifestationCost ?? this.config.manifestationCost;
+
     // Check if deity has enough belief
-    if (deity.belief.currentBelief < this.config.manifestationCost) {
+    if (deity.belief.currentBelief < manifestationCost) {
       return null;
     }
 
     // Spend belief
-    deity.spendBelief(this.config.manifestationCost);
+    deity.spendBelief(manifestationCost);
 
     // Create avatar entity
     const avatarEntity = world.createEntity();
@@ -134,6 +179,10 @@ export class AvatarSystem implements System {
    * Update all active avatars
    */
   private updateAvatars(world: World, _currentTick: number): void {
+    // Get maintenance cost multiplier from divine config
+    const divineAvatarConfig = this.getDivineAvatarConfig(world);
+    const maintenanceMultiplier = divineAvatarConfig?.maintenanceCostMultiplier ?? 1.0;
+
     for (const avatar of this.avatars.values()) {
       if (!avatar.active) continue;
 
@@ -150,8 +199,9 @@ export class AvatarSystem implements System {
         continue;
       }
 
-      // Deduct maintenance cost
-      const canMaintain = deity.spendBelief(avatar.beliefCostPerTick);
+      // Deduct maintenance cost with config multiplier
+      const adjustedCost = Math.ceil(avatar.beliefCostPerTick * maintenanceMultiplier);
+      const canMaintain = deity.spendBelief(adjustedCost);
 
       if (!canMaintain) {
         // Not enough belief - dismiss avatar
