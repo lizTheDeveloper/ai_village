@@ -199,7 +199,8 @@ export class SoulSpriteRenderer {
    * Get tier configuration
    */
   getTierConfig(tier: number): TierConfig {
-    return TIER_CONFIGS[Math.min(Math.max(tier, 1), 8)] || TIER_CONFIGS[8];
+    const clampedTier = Math.min(Math.max(tier, 1), 8);
+    return TIER_CONFIGS[clampedTier] ?? TIER_CONFIGS[8]!;
   }
 
   /**
@@ -337,7 +338,7 @@ export class SoulSpriteRenderer {
     description: string,
     animationName: string,
     directions: Direction[],
-    config: TierConfig,
+    _config: TierConfig,
     baseSprites: Map<Direction, string>
   ): Promise<AnimationSet> {
     const frames = new Map<Direction, string[]>();
@@ -484,5 +485,5 @@ export function getTierDescription(tier: number): string {
     7: 'Ancient Soul (64×64, combat ready)',
     8: 'Transcendent Soul (64×64, fully realized)',
   };
-  return descriptions[tier] || descriptions[8];
+  return descriptions[tier] ?? descriptions[8]!;
 }

@@ -282,21 +282,9 @@ function createInitialAgents(world: WorldMutator, dungeonMasterPrompt?: string):
     }
   }
 
-  // Choose one random agent to have divine connection (could be same as leader)
-  const spiritualIndex = Math.floor(Math.random() * agentIds.length);
-  const spiritualId = agentIds[spiritualIndex];
-  const spiritualEntity = world.getEntity(spiritualId);
-
-  if (spiritualEntity) {
-    const currentPersonality = spiritualEntity.getComponent('personality') as any;
-    if (currentPersonality) {
-      spiritualEntity.updateComponent('personality', (p: any) => ({
-        ...p,
-        spirituality: 0.90,
-        openness: Math.max(p.openness, 0.70),
-      }));
-    }
-  }
+  // Note: Spirituality is now determined by the Fates during soul creation
+  // Agents with 'mystic' archetype or spiritual interests will have high spirituality
+  // This replaces the previous random assignment
 
   return agentIds;
 }
@@ -420,6 +408,20 @@ async function createSoulsForInitialAgents(
               // Link soul to agent
               const soulLink = createSoulLinkComponent(event.data.soulId, gameLoop.world.tick, true);
               (agent as any).addComponent(soulLink);
+
+              // Update agent's spirituality based on the Fates' decision (archetype/interests)
+              // Mystic archetype or spiritual interests = high spirituality
+              const isMystic = event.data.archetype === 'mystic';
+              const hasSpiritualInterests = (event.data.interests as string[])?.some(
+                (i: string) => ['spirituality', 'divinity', 'faith', 'religion', 'prayer'].includes(i.toLowerCase())
+              );
+              if (isMystic || hasSpiritualInterests) {
+                const spiritual = agent.components.get('spiritual') as any;
+                if (spiritual) {
+                  spiritual.spirituality = isMystic ? 0.95 : 0.8;
+                  console.log(`[SoulCreation] ${name} has spiritual soul (${event.data.archetype}, interests: ${(event.data.interests as string[])?.join(', ')})`);
+                }
+              }
 
               // Update soul's incarnation status
               const soulEntity = gameLoop.world.getEntity(event.data.soulId);
