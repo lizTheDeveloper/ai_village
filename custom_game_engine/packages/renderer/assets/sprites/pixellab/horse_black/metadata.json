@@ -1,0 +1,18 @@
+{
+  "id": "horse_black",
+  "base_species": "horse",
+  "variant": "black",
+  "description": "black horse",
+  "size": 64,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-04T00:07:18.577Z"
+}

@@ -2379,6 +2379,9 @@ function handleKeyDown(
   return false;
 }
 
+// Module-level panels variable (assigned in main())
+let panels: UIPanelsResult = null as any;
+
 function handleMouseClick(
   screenX: number,
   screenY: number,
@@ -2759,7 +2762,7 @@ async function main() {
 
     const result = await saveLoadService.load(mostRecent.key, gameLoop.world);
     if (result.success) {
-      console.log(`[Demo] Successfully loaded: ${result.metadata.name}`);
+      console.log(`[Demo] Successfully loaded: ${result.save?.header.name}`);
       loadedCheckpoint = true;
       universeSelection = { type: 'load', checkpointKey: mostRecent.key };
     } else {
@@ -2879,7 +2882,7 @@ async function main() {
           try {
             const result = await saveLoadService.load(checkpointKey, gameLoop.world);
             if (result.success) {
-              showNotification(`Loaded: ${result.metadata.name}`, '#4CAF50');
+              showNotification(`Loaded: ${result.save?.header.name}`, '#4CAF50');
             } else {
               showNotification(`Failed to load: ${result.error}`, '#f44336');
             }
@@ -2965,8 +2968,8 @@ async function main() {
     }, duration);
   }
 
-  // Create UI panels
-  const panels = createUIPanels(
+  // Create UI panels (assign to module-level variable)
+  panels = createUIPanels(
     gameLoop, canvas, renderer, chunkManager, terrainGenerator,
     systemsResult.craftingSystem, showNotification, settingsPanel
   );

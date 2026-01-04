@@ -1,0 +1,18 @@
+{
+  "id": "horse_brown",
+  "base_species": "horse",
+  "variant": "brown",
+  "description": "brown horse",
+  "size": 64,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-04T00:04:31.536Z"
+}
