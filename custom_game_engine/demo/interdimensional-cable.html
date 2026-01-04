@@ -294,21 +294,37 @@
   </div>
 
   <script>
-    // Character IDs from PixelLab
+    // Character data from PixelLab (hardcoded to avoid API auth issues)
+    const USER_ID = '8e579d97-da21-4602-98b0-63163efd9ade';
+
     const SHOWS = [
       {
-        id: 'a3add4c4-048a-4676-9134-6f412a894a61',
-        name: 'WIZARD FIREBALL SHOW',
-        animation: 'fireball',
-        description: 'Mystical purple wizard casting fireballs'
+        id: 'villager',
+        name: 'VILLAGER WALKING SHOW',
+        animation: 'walking-8-frames',
+        frameCount: 8,
+        directions: ['south', 'south-west', 'west', 'north-west'],
+        description: 'Villager walking in all directions',
+        isLocal: true,
+        type: 'sprite'
       },
       {
-        id: 'd61a6e35-1808-41b1-b297-cfee8c150ab0',
-        name: 'ROBOT DANCE PARTY',
-        animation: 'running-8-frames',
-        description: 'Friendly robot with sick moves'
+        id: 'villager',
+        name: 'VILLAGER WALKING SHOWCASE',
+        animation: 'walking-8-frames',
+        frameCount: 8,
+        directions: ['south', 'south-west', 'west', 'north-west'],
+        description: 'Villager walking animation loop',
+        isLocal: true,
+        type: 'sprite'
       },
-      // More shows will be added as they complete
+      {
+        id: 'alien-invasion',
+        name: 'ALIEN INVASION - BREAKING NEWS',
+        description: 'Field reporter captures alien landing in village square',
+        recordingPath: '/mock-recordings/alien-invasion.json',
+        type: 'recording'
+      },
     ];
 
     class SpriteAnimationPlayer {
@@ -323,25 +339,27 @@
         this.frameInterval = 1000 / this.fps;
       }
 
-      async loadAnimation(characterId, animationName, direction = 'south') {
+      async loadAnimation(show, direction = 'south') {
         try {
-          const response = await fetch(`https://api.pixellab.ai/mcp/characters/${characterId}`);
-          const data = await response.json();
-
-          if (data.error) {
-            throw new Error(data.error);
-          }
-
-          // Find the animation
-          const animation = data.animations?.find(a => a.name === animationName && a.direction === direction);
-          if (!animation) {
-            throw new Error(`Animation ${animationName} (${direction}) not found`);
+          // Check if direction is available
+          if (!show.directions.includes(direction)) {
+            throw new Error(`Direction ${direction} not available for this show`);
           }
 
           // Load frames
           this.frames = [];
-          for (let i = 0; i < animation.frame_count; i++) {
-            const frameUrl = `https://backblaze.pixellab.ai/file/pixellab-characters/${data.user_id}/${characterId}/animations/${animationName}/${direction}/frame_${i}.png`;
+          for (let i = 0; i < show.frameCount; i++) {
+            const frameNum = String(i).padStart(3, '0');  // 000, 001, 002, etc.
+
+            let frameUrl;
+            if (show.isLocal) {
+              // Load from local assets
+              frameUrl = `/assets/sprites/pixellab/${show.id}/animations/${show.animation}/${direction}/frame_${frameNum}.png`;
+            } else {
+              // Load from Backblaze
+              frameUrl = `https://backblaze.pixellab.ai/file/pixellab-characters/${USER_ID}/${show.id}/animations/${show.animation}/${direction}/frame_${frameNum}.png`;
+            }
+
             const img = await this.loadImage(frameUrl);
             this.frames.push(img);
           }
@@ -358,10 +376,16 @@
         return new Promise((resolve, reject) => {
           const img = new Image();
           img.crossOrigin = 'anonymous';
-          img.onload = () => resolve(img);
-          img.onerror = reject;
+          img.onload = () => {
+            console.log('Loaded frame:', url);
+            resolve(img);
+          };
+          img.onerror = (e) => {
+            console.error('Failed to load frame:', url, e);
+            reject(new Error(`Failed to load: ${url}`));
+          };
           img.src = url + '?t=' + Date.now();
-          setTimeout(() => reject(new Error('Image load timeout')), 10000);
+          setTimeout(() => reject(new Error('Image load timeout: ' + url)), 10000);
         });
       }
 
@@ -411,6 +435,220 @@
       }
     }
 
+    /**
+     * ReplayRenderer - Renders VideoReplayComponent recordings
+     *
+     * Handles entity snapshot playback:
+     * - Loads recording JSON with frame data
+     * - Resolves entity types to sprite paths
+     * - Renders entities at recorded positions
+     * - Handles camera position and zoom
+     * - Interpolates between frames for smooth playback
+     */
+    class ReplayRenderer {
+      constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.recording = null;
+        this.frames = [];
+        this.currentFrameIndex = 0;
+        this.isPlaying = true;
+        this.fps = 2; // Match VideoReplayComponent recording rate
+        this.lastFrameTime = 0;
+        this.frameInterval = 1000 / this.fps;
+        this.spriteCache = new Map(); // Cache loaded sprite frames
+      }
+
+      async loadRecording(recordingPath) {
+        try {
+          console.log('[ReplayRenderer] Loading recording:', recordingPath);
+          const response = await fetch(recordingPath);
+          if (!response.ok) throw new Error(`Failed to load recording: ${response.status}`);
+
+          this.recording = await response.json();
+          this.frames = this.recording.frames;
+          this.currentFrameIndex = 0;
+
+          console.log(`[ReplayRenderer] Loaded ${this.frames.length} frames from "${this.recording.title}"`);
+
+          // Preload sprite frames for all entities
+          await this.preloadSprites();
+
+          return true;
+        } catch (error) {
+          console.error('[ReplayRenderer] Failed to load recording:', error);
+          throw error;
+        }
+      }
+
+      async preloadSprites() {
+        // Collect all unique entity types and animation states
+        const entitySprites = new Map(); // entityType -> Set of animation states
+
+        for (const frame of this.frames) {
+          for (const entity of frame.entities) {
+            if (!entitySprites.has(entity.entityType)) {
+              entitySprites.set(entity.entityType, new Set());
+            }
+            entitySprites.get(entity.entityType).add(entity.animation.state);
+          }
+        }
+
+        // Load sprites for each entity type + animation combo
+        for (const [entityType, animationStates] of entitySprites) {
+          for (const animState of animationStates) {
+            await this.loadEntitySprite(entityType, animState);
+          }
+        }
+
+        console.log(`[ReplayRenderer] Preloaded sprites for ${entitySprites.size} entity types`);
+      }
+
+      async loadEntitySprite(entityType, animationState) {
+        const key = `${entityType}:${animationState}`;
+        if (this.spriteCache.has(key)) return;
+
+        try {
+          // Map entity types to sprite paths
+          const spriteMapping = {
+            'villager': { id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
+            'alien': { id: 'villager', animation: 'walking-8-frames', frameCount: 8 }, // TODO: Use real alien sprites
+          };
+
+          const spriteConfig = spriteMapping[entityType];
+          if (!spriteConfig) {
+            console.warn(`[ReplayRenderer] No sprite mapping for entity type: ${entityType}`);
+            return;
+          }
+
+          // Load all frames for this animation
+          const frames = [];
+          for (let i = 0; i < spriteConfig.frameCount; i++) {
+            const frameNum = String(i).padStart(3, '0');
+            const frameUrl = `/assets/sprites/pixellab/${spriteConfig.id}/animations/${spriteConfig.animation}/south/frame_${frameNum}.png`;
+
+            const img = await this.loadImage(frameUrl);
+            frames.push(img);
+          }
+
+          this.spriteCache.set(key, frames);
+          console.log(`[ReplayRenderer] Loaded ${frames.length} frames for ${key}`);
+        } catch (error) {
+          console.error(`[ReplayRenderer] Failed to load sprite for ${key}:`, error);
+        }
+      }
+
+      loadImage(url) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = (e) => reject(new Error(`Failed to load: ${url}`));
+          img.src = url;
+          setTimeout(() => reject(new Error('Image load timeout: ' + url)), 10000);
+        });
+      }
+
+      animate(timestamp) {
+        if (!this.isPlaying || this.frames.length === 0) {
+          requestAnimationFrame((t) => this.animate(t));
+          return;
+        }
+
+        const elapsed = timestamp - this.lastFrameTime;
+        if (elapsed > this.frameInterval) {
+          this.lastFrameTime = timestamp;
+
+          // Clear canvas
+          this.ctx.fillStyle = '#000';
+          this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+          // Render current frame
+          this.renderFrame(this.frames[this.currentFrameIndex]);
+
+          // Next frame (loop)
+          this.currentFrameIndex = (this.currentFrameIndex + 1) % this.frames.length;
+        }
+
+        requestAnimationFrame((t) => this.animate(t));
+      }
+
+      renderFrame(frame) {
+        if (!frame || !frame.entities) return;
+
+        // Calculate viewport transform
+        const cameraX = frame.cameraX || 0;
+        const cameraY = frame.cameraY || 0;
+        const zoom = frame.cameraZoom || 1.0;
+
+        // Sort entities by distance from camera (painter's algorithm)
+        const sortedEntities = [...frame.entities].sort((a, b) =>
+          (b.distanceFromCamera || 0) - (a.distanceFromCamera || 0)
+        );
+
+        // Render each entity
+        for (const entity of sortedEntities) {
+          this.renderEntity(entity, cameraX, cameraY, zoom);
+        }
+
+        // Draw recording info overlay
+        this.ctx.fillStyle = 'rgba(0, 255, 0, 0.8)';
+        this.ctx.font = '12px "Courier New"';
+        this.ctx.fillText(`TICK ${frame.tick} | FRAME ${this.currentFrameIndex + 1}/${this.frames.length}`, 10, 20);
+      }
+
+      renderEntity(entity, cameraX, cameraY, zoom) {
+        const key = `${entity.entityType}:${entity.animation.state}`;
+        const spriteFrames = this.spriteCache.get(key);
+
+        if (!spriteFrames || spriteFrames.length === 0) {
+          // Draw placeholder circle if no sprite
+          this.ctx.fillStyle = '#f00';
+          const screenX = (entity.x - cameraX) * zoom + this.canvas.width / 2;
+          const screenY = (entity.y - cameraY) * zoom + this.canvas.height / 2;
+          this.ctx.beginPath();
+          this.ctx.arc(screenX, screenY, 10 * zoom, 0, Math.PI * 2);
+          this.ctx.fill();
+          return;
+        }
+
+        // Get appropriate sprite frame
+        const frameIndex = entity.animation.frame % spriteFrames.length;
+        const sprite = spriteFrames[frameIndex];
+
+        // Transform world coordinates to screen coordinates
+        const screenX = (entity.x - cameraX) * zoom + this.canvas.width / 2;
+        const screenY = (entity.y - cameraY) * zoom + this.canvas.height / 2;
+
+        // Draw sprite centered on entity position
+        const scale = zoom * 2; // Scale up pixel art
+        const width = sprite.width * scale;
+        const height = sprite.height * scale;
+
+        this.ctx.imageSmoothingEnabled = false;
+        this.ctx.drawImage(
+          sprite,
+          screenX - width / 2,
+          screenY - height / 2,
+          width,
+          height
+        );
+      }
+
+      start() {
+        this.isPlaying = true;
+        requestAnimationFrame((t) => this.animate(t));
+      }
+
+      pause() {
+        this.isPlaying = false;
+      }
+
+      resume() {
+        this.isPlaying = true;
+      }
+    }
+
     // Global state
     let currentPlayer = null;
     let currentShow = null;
@@ -423,12 +661,13 @@
       const grid = document.getElementById('tvGrid');
 
       for (const show of SHOWS) {
+        const uniqueId = show.id + (show.type === 'sprite' ? '-sprite' : '-recording');
         const showDiv = document.createElement('div');
         showDiv.className = 'tv-show';
         showDiv.innerHTML = `
           <div class="show-title">${show.name}</div>
-          <div class="show-status" id="status-${show.id}">⏳ Loading...</div>
-          <div class="canvas-container" id="container-${show.id}">
+          <div class="show-status" id="status-${uniqueId}">⏳ Loading...</div>
+          <div class="canvas-container" id="container-${uniqueId}">
             <div class="loading">◆ LOADING TRANSMISSION ◆</div>
           </div>
         `;
@@ -441,28 +680,11 @@
     }
 
     async function loadShowPreview(show) {
-      const container = document.getElementById(`container-${show.id}`);
-      const status = document.getElementById(`status-${show.id}`);
+      const uniqueId = show.id + (show.type === 'sprite' ? '-sprite' : '-recording');
+      const container = document.getElementById(`container-${uniqueId}`);
+      const status = document.getElementById(`status-${uniqueId}`);
 
       try {
-        // Check if character is ready
-        const response = await fetch(`https://api.pixellab.ai/mcp/characters/${show.id}`);
-        const data = await response.json();
-
-        if (data.error) {
-          status.textContent = '❌ ' + data.error;
-          container.innerHTML = '<div class="loading">ERROR</div>';
-          return;
-        }
-
-        // Find the animation
-        const animation = data.animations?.find(a => a.name === show.animation);
-        if (!animation) {
-          status.textContent = '⏳ Animation pending...';
-          setTimeout(() => loadShowPreview(show), 5000);
-          return;
-        }
-
         status.textContent = '✓ READY TO BROADCAST';
 
         // Create mini canvas for preview
@@ -472,14 +694,22 @@
         container.innerHTML = '';
         container.appendChild(canvas);
 
-        const player = new SpriteAnimationPlayer(canvas);
-        await player.loadAnimation(show.id, show.animation, 'south');
-        player.start();
+        if (show.type === 'recording') {
+          // Use ReplayRenderer for recordings
+          const player = new ReplayRenderer(canvas);
+          await player.loadRecording(show.recordingPath);
+          player.start();
+        } else {
+          // Use SpriteAnimationPlayer for sprite animations
+          const player = new SpriteAnimationPlayer(canvas);
+          await player.loadAnimation(show, 'south');
+          player.start();
+        }
 
       } catch (error) {
         console.error('Preview error:', error);
-        status.textContent = '⏳ Retrying...';
-        setTimeout(() => loadShowPreview(show), 5000);
+        status.textContent = '❌ ERROR';
+        container.innerHTML = '<div class="loading">SIGNAL LOST</div>';
       }
     }
 
@@ -488,26 +718,37 @@
       document.getElementById('playerTitle').textContent = show.name;
       document.getElementById('player').classList.add('active');
 
-      // Setup direction selector
+      // Setup direction selector (only for sprite shows)
       const selector = document.getElementById('directionSelector');
       selector.innerHTML = '';
-      DIRECTIONS.forEach(dir => {
-        const btn = document.createElement('button');
-        btn.className = 'direction-btn' + (dir === currentDirection ? ' active' : '');
-        btn.textContent = dir;
-        btn.onclick = () => changeDirection(dir);
-        selector.appendChild(btn);
-      });
+
+      if (show.type === 'sprite' && show.directions) {
+        show.directions.forEach(dir => {
+          const btn = document.createElement('button');
+          btn.className = 'direction-btn' + (dir === currentDirection ? ' active' : '');
+          btn.textContent = dir;
+          btn.onclick = () => changeDirection(dir);
+          selector.appendChild(btn);
+        });
+      }
 
       // Load and play
       const canvas = document.getElementById('playerCanvas');
-      currentPlayer = new SpriteAnimationPlayer(canvas);
 
       try {
-        await currentPlayer.loadAnimation(show.id, show.animation, currentDirection);
-        currentPlayer.start();
+        if (show.type === 'recording') {
+          // Use ReplayRenderer for recordings
+          currentPlayer = new ReplayRenderer(canvas);
+          await currentPlayer.loadRecording(show.recordingPath);
+          currentPlayer.start();
+        } else {
+          // Use SpriteAnimationPlayer for sprite animations
+          currentPlayer = new SpriteAnimationPlayer(canvas);
+          await currentPlayer.loadAnimation(show, currentDirection);
+          currentPlayer.start();
+        }
       } catch (error) {
-        showError('Failed to load animation: ' + error.message);
+        showError('Failed to load: ' + error.message);
       }
     }
 
@@ -522,7 +763,7 @@
       // Reload animation with new direction
       if (currentPlayer && currentShow) {
         try {
-          await currentPlayer.loadAnimation(currentShow.id, currentShow.animation, direction);
+          await currentPlayer.loadAnimation(currentShow, direction);
         } catch (error) {
           showError('Failed to load direction: ' + error.message);
         }
@@ -554,6 +795,11 @@
     }
 
     // Initialize on load
+    console.log('[Interdimensional Cable] Initializing shows...');
+    console.log('[Interdimensional Cable] Available shows:', SHOWS.length);
+    SHOWS.forEach((show, idx) => {
+      console.log(`[Interdimensional Cable] Show ${idx + 1}: ${show.name} (${show.animation}, ${show.frameCount} frames)`);
+    });
     initializeShows();
   </script>
 </body>

@@ -5,21 +5,22 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../../ecs/World.js';
-import { Entity } from '../../ecs/Entity.js';
-import { EventBus } from '../../events/EventBus.js';
+import { World } from '../../World.js';
+import type { Entity } from '../../ecs/Entity.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 import { UpliftBreedingProgramSystem } from '../UpliftBreedingProgramSystem.js';
 import { ProtoSapienceObservationSystem } from '../ProtoSapienceObservationSystem.js';
 import { ConsciousnessEmergenceSystem } from '../ConsciousnessEmergenceSystem.js';
 import { UpliftProgramComponent } from '../../components/UpliftProgramComponent.js';
 import { ProtoSapienceComponent } from '../../components/ProtoSapienceComponent.js';
-import { AnimalComponent } from '../../components/AnimalComponent.js';
-import { SpeciesComponent } from '../../components/SpeciesComponent.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
+import { createTestAnimal, createProtoSapientAnimal } from './testHelpers.js';
+import { EntityImpl } from '../../ecs/Entity.js';
+import { AnimalComponent } from '../../components/AnimalComponent.js';
 
 describe('Uplift Integration - Full Wolf Uplift Flow', () => {
   let world: World;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
   let breedingSystem: UpliftBreedingProgramSystem;
   let observationSystem: ProtoSapienceObservationSystem;
   let emergenceSystem: ConsciousnessEmergenceSystem;
@@ -28,7 +29,7 @@ describe('Uplift Integration - Full Wolf Uplift Flow', () => {
 
   beforeEach(() => {
     world = new World();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
 
     breedingSystem = new UpliftBreedingProgramSystem();
     observationSystem = new ProtoSapienceObservationSystem();
@@ -40,17 +41,7 @@ describe('Uplift Integration - Full Wolf Uplift Flow', () => {
 
     // Create wolf population (50 wolves)
     for (let i = 0; i < 50; i++) {
-      const wolf = world.createEntity();
-      const animalComp = new AnimalComponent({
-        species: 'wolf',
-        intelligence: 0.48 + Math.random() * 0.04, // 0.48-0.52
-      });
-      wolf.addComponent(animalComp);
-      wolf.addComponent(new SpeciesComponent({
-        speciesId: 'wolf',
-        speciesName: 'Wolf',
-        maturityAge: 2,
-      }));
+      createTestAnimal(world, 'wolf', { intelligence: 0.48 + Math.random() * 0.04 });
     }
 
     // Create uplift program
@@ -179,28 +170,18 @@ describe('Uplift Integration - Full Wolf Uplift Flow', () => {
 
 describe('Uplift Integration - Technology Effects', () => {
   let world: World;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
   let breedingSystem: UpliftBreedingProgramSystem;
 
   beforeEach(() => {
     world = new World();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     breedingSystem = new UpliftBreedingProgramSystem();
     breedingSystem.initialize(world, eventBus);
 
     // Create wolf population
     for (let i = 0; i < 50; i++) {
-      const wolf = world.createEntity();
-      const animalComp = new AnimalComponent({
-        species: 'wolf',
-        intelligence: 0.50,
-      });
-      wolf.addComponent(animalComp);
-      wolf.addComponent(new SpeciesComponent({
-        speciesId: 'wolf',
-        speciesName: 'Wolf',
-        maturityAge: 2,
-      }));
+      createTestAnimal(world, 'wolf', { intelligence: 0.50 });
     }
   });
 
@@ -276,12 +257,12 @@ describe('Uplift Integration - Technology Effects', () => {
 
 describe('Uplift Integration - Edge Cases', () => {
   let world: World;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
   let breedingSystem: UpliftBreedingProgramSystem;
 
   beforeEach(() => {
     world = new World();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     breedingSystem = new UpliftBreedingProgramSystem();
     breedingSystem.initialize(world, eventBus);
   });
@@ -319,17 +300,7 @@ describe('Uplift Integration - Edge Cases', () => {
   it('should handle very low initial intelligence', () => {
     // Create insect population with very low intelligence
     for (let i = 0; i < 100; i++) {
-      const insect = world.createEntity();
-      const animalComp = new AnimalComponent({
-        species: 'ant',
-        intelligence: 0.30,
-      });
-      insect.addComponent(animalComp);
-      insect.addComponent(new SpeciesComponent({
-        speciesId: 'ant',
-        speciesName: 'Ant',
-        maturityAge: 0.1,
-      }));
+      createTestAnimal(world, 'ant', { intelligence: 0.30 });
     }
 
     const program = new UpliftProgramComponent({
@@ -361,21 +332,8 @@ describe('Uplift Integration - Edge Cases', () => {
   it('should handle concurrent uplift programs', () => {
     // Create two species
     for (let i = 0; i < 30; i++) {
-      const wolf = world.createEntity();
-      wolf.addComponent(new AnimalComponent({ species: 'wolf', intelligence: 0.50 }));
-      wolf.addComponent(new SpeciesComponent({
-        speciesId: 'wolf',
-        speciesName: 'Wolf',
-        maturityAge: 2,
-      }));
-
-      const raven = world.createEntity();
-      raven.addComponent(new AnimalComponent({ species: 'raven', intelligence: 0.48 }));
-      raven.addComponent(new SpeciesComponent({
-        speciesId: 'raven',
-        speciesName: 'Raven',
-        maturityAge: 1,
-      }));
+      createTestAnimal(world, 'wolf', { intelligence: 0.50 });
+      createTestAnimal(world, 'raven', { intelligence: 0.48 });
     }
 
     const wolfProgram = new UpliftProgramComponent({
@@ -428,13 +386,13 @@ describe('Uplift Integration - Edge Cases', () => {
 
 describe('Uplift Integration - Proto-Sapience to Sapience Transition', () => {
   let world: World;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
   let observationSystem: ProtoSapienceObservationSystem;
   let emergenceSystem: ConsciousnessEmergenceSystem;
 
   beforeEach(() => {
     world = new World();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
 
     observationSystem = new ProtoSapienceObservationSystem();
     emergenceSystem = new ConsciousnessEmergenceSystem();
@@ -445,22 +403,9 @@ describe('Uplift Integration - Proto-Sapience to Sapience Transition', () => {
 
   it('should transition from proto-sapient to sapient', () => {
     // Create near-sapient entity
-    const entity = world.createEntity();
-    const proto = new ProtoSapienceComponent({
-      intelligence: 0.68, // Near threshold
-      usesTools: true,
-      createsTools: true,
-      hasProtocolanguage: true,
-      passedMirrorTest: false, // Not yet
-      showsAbstractThinking: true,
-    });
-    entity.addComponent(proto);
-    entity.addComponent(new AnimalComponent({ species: 'wolf' }));
-    entity.addComponent(new SpeciesComponent({
-      speciesId: 'wolf',
-      speciesName: 'Wolf',
-      maturityAge: 2,
-    }));
+    const entity = createProtoSapientAnimal(world, 'wolf', 0.68);
+    const proto = entity.getComponent(CT.ProtoSapience) as ProtoSapienceComponent;
+    proto.passedMirrorTest = false; // Not yet, will be set later in test
 
     // Create program
     const program = new UpliftProgramComponent({

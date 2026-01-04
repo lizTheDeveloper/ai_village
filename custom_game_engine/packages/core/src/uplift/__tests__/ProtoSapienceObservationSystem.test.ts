@@ -5,25 +5,25 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../../ecs/World.js';
-import { Entity } from '../../ecs/Entity.js';
-import { EventBus } from '../../events/EventBus.js';
+import { World } from '../../World.js';
+import type { Entity } from '../../ecs/Entity.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 import { ProtoSapienceObservationSystem } from '../ProtoSapienceObservationSystem.js';
 import { ProtoSapienceComponent } from '../../components/ProtoSapienceComponent.js';
 import { UpliftProgramComponent } from '../../components/UpliftProgramComponent.js';
-import { AnimalComponent } from '../../components/AnimalComponent.js';
-import { SpeciesComponent } from '../../components/SpeciesComponent.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
+import { createProtoSapientAnimal } from './testHelpers.js';
+import { EntityImpl } from '../../ecs/Entity.js';
 
 describe('ProtoSapienceObservationSystem - Initialization', () => {
   let world: World;
   let system: ProtoSapienceObservationSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
     world = new World();
     system = new ProtoSapienceObservationSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
   });
 
@@ -39,32 +39,24 @@ describe('ProtoSapienceObservationSystem - Initialization', () => {
 describe('ProtoSapienceObservationSystem - Behavior Emergence', () => {
   let world: World;
   let system: ProtoSapienceObservationSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
   let entity: Entity;
   let proto: ProtoSapienceComponent;
 
   beforeEach(() => {
     world = new World();
     system = new ProtoSapienceObservationSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
 
-    entity = world.createEntity();
-    proto = new ProtoSapienceComponent({
-      intelligence: 0.45, // Just at tool use threshold
-      usesTools: false,
-      createsTools: false,
-      hasProtocolanguage: false,
-      passedMirrorTest: false,
-      showsAbstractThinking: false,
-    });
-    entity.addComponent(proto);
-    entity.addComponent(new AnimalComponent({ species: 'wolf' }));
-    entity.addComponent(new SpeciesComponent({
-      speciesId: 'wolf',
-      speciesName: 'Wolf',
-      maturityAge: 2,
-    }));
+    entity = createProtoSapientAnimal(world, 'wolf', 0.45);
+    proto = entity.getComponent(CT.ProtoSapience) as ProtoSapienceComponent;
+    // Reset behaviors for testing emergence
+    proto.usesTools = false;
+    proto.createsTools = false;
+    proto.hasProtocolanguage = false;
+    proto.passedMirrorTest = false;
+    proto.showsAbstractThinking = false;
 
     // Create active uplift program
     const program = new UpliftProgramComponent({
@@ -81,7 +73,7 @@ describe('ProtoSapienceObservationSystem - Behavior Emergence', () => {
       stage: 'selective_breeding',
     });
     const programEntity = world.createEntity();
-    programEntity.addComponent(program);
+    (programEntity as EntityImpl).addComponent(program);
   });
 
   it('should detect tool use at 0.45 intelligence', () => {
@@ -158,32 +150,19 @@ describe('ProtoSapienceObservationSystem - Behavior Emergence', () => {
 describe('ProtoSapienceObservationSystem - Behavioral Tests', () => {
   let world: World;
   let system: ProtoSapienceObservationSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
     world = new World();
     system = new ProtoSapienceObservationSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
   });
 
   it('should conduct mirror test multiple times', () => {
-    const entity = world.createEntity();
-    const proto = new ProtoSapienceComponent({
-      intelligence: 0.65,
-      usesTools: true,
-      createsTools: true,
-      hasProtocolanguage: true,
-      passedMirrorTest: false,
-      showsAbstractThinking: false,
-    });
-    entity.addComponent(proto);
-    entity.addComponent(new AnimalComponent({ species: 'wolf' }));
-    entity.addComponent(new SpeciesComponent({
-      speciesId: 'wolf',
-      speciesName: 'Wolf',
-      maturityAge: 2,
-    }));
+    const entity = createProtoSapientAnimal(world, 'wolf', 0.65);
+    const proto = entity.getComponent(CT.ProtoSapience) as ProtoSapienceComponent;
+    proto.passedMirrorTest = false; // Reset for testing
 
     const program = new UpliftProgramComponent({
       programId: 'test',
@@ -199,7 +178,7 @@ describe('ProtoSapienceObservationSystem - Behavioral Tests', () => {
       stage: 'pre_sapience',
     });
     const programEntity = world.createEntity();
-    programEntity.addComponent(program);
+    (programEntity as EntityImpl).addComponent(program);
 
     const initialAttempts = proto.mirrorTestAttempts;
 
@@ -212,22 +191,9 @@ describe('ProtoSapienceObservationSystem - Behavioral Tests', () => {
   });
 
   it('should track delayed gratification test', () => {
-    const entity = world.createEntity();
-    const proto = new ProtoSapienceComponent({
-      intelligence: 0.65,
-      usesTools: true,
-      createsTools: true,
-      hasProtocolanguage: true,
-      passedMirrorTest: false,
-      showsAbstractThinking: false,
-    });
-    entity.addComponent(proto);
-    entity.addComponent(new AnimalComponent({ species: 'wolf' }));
-    entity.addComponent(new SpeciesComponent({
-      speciesId: 'wolf',
-      speciesName: 'Wolf',
-      maturityAge: 2,
-    }));
+    const entity = createProtoSapientAnimal(world, 'wolf', 0.65);
+    const proto = entity.getComponent(CT.ProtoSapience) as ProtoSapienceComponent;
+    proto.passedMirrorTest = false; // Reset for testing
 
     const program = new UpliftProgramComponent({
       programId: 'test',
@@ -243,7 +209,7 @@ describe('ProtoSapienceObservationSystem - Behavioral Tests', () => {
       stage: 'pre_sapience',
     });
     const programEntity = world.createEntity();
-    programEntity.addComponent(program);
+    (programEntity as EntityImpl).addComponent(program);
 
     for (let i = 0; i < 500; i++) {
       system.update(world, [entity], 0.05);
@@ -257,32 +223,21 @@ describe('ProtoSapienceObservationSystem - Behavioral Tests', () => {
 describe('ProtoSapienceObservationSystem - Tool Use Tracking', () => {
   let world: World;
   let system: ProtoSapienceObservationSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
     world = new World();
     system = new ProtoSapienceObservationSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
   });
 
   it('should track tool use instances', () => {
-    const entity = world.createEntity();
-    const proto = new ProtoSapienceComponent({
-      intelligence: 0.50,
-      usesTools: false,
-      createsTools: false,
-      hasProtocolanguage: false,
-      passedMirrorTest: false,
-      showsAbstractThinking: false,
-    });
-    entity.addComponent(proto);
-    entity.addComponent(new AnimalComponent({ species: 'wolf' }));
-    entity.addComponent(new SpeciesComponent({
-      speciesId: 'wolf',
-      speciesName: 'Wolf',
-      maturityAge: 2,
-    }));
+    const entity = createProtoSapientAnimal(world, 'wolf', 0.50);
+    const proto = entity.getComponent(CT.ProtoSapience) as ProtoSapienceComponent;
+    // Reset behaviors for testing emergence
+    proto.usesTools = false;
+    proto.createsTools = false;
 
     const program = new UpliftProgramComponent({
       programId: 'test',
@@ -298,7 +253,7 @@ describe('ProtoSapienceObservationSystem - Tool Use Tracking', () => {
       stage: 'selective_breeding',
     });
     const programEntity = world.createEntity();
-    programEntity.addComponent(program);
+    (programEntity as EntityImpl).addComponent(program);
 
     for (let i = 0; i < 100; i++) {
       system.update(world, [entity], 0.05);
@@ -308,22 +263,11 @@ describe('ProtoSapienceObservationSystem - Tool Use Tracking', () => {
   });
 
   it('should distinguish tool use from tool creation', () => {
-    const entity = world.createEntity();
-    const proto = new ProtoSapienceComponent({
-      intelligence: 0.50,
-      usesTools: false,
-      createsTools: false,
-      hasProtocolanguage: false,
-      passedMirrorTest: false,
-      showsAbstractThinking: false,
-    });
-    entity.addComponent(proto);
-    entity.addComponent(new AnimalComponent({ species: 'wolf' }));
-    entity.addComponent(new SpeciesComponent({
-      speciesId: 'wolf',
-      speciesName: 'Wolf',
-      maturityAge: 2,
-    }));
+    const entity = createProtoSapientAnimal(world, 'wolf', 0.50);
+    const proto = entity.getComponent(CT.ProtoSapience) as ProtoSapienceComponent;
+    // Reset behaviors for testing emergence
+    proto.usesTools = false;
+    proto.createsTools = false;
 
     const program = new UpliftProgramComponent({
       programId: 'test',
@@ -339,7 +283,7 @@ describe('ProtoSapienceObservationSystem - Tool Use Tracking', () => {
       stage: 'selective_breeding',
     });
     const programEntity = world.createEntity();
-    programEntity.addComponent(program);
+    (programEntity as EntityImpl).addComponent(program);
 
     for (let i = 0; i < 100; i++) {
       system.update(world, [entity], 0.05);
@@ -354,32 +298,19 @@ describe('ProtoSapienceObservationSystem - Tool Use Tracking', () => {
 describe('ProtoSapienceObservationSystem - Communication Patterns', () => {
   let world: World;
   let system: ProtoSapienceObservationSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
     world = new World();
     system = new ProtoSapienceObservationSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
   });
 
   it('should track communication pattern development', () => {
-    const entity = world.createEntity();
-    const proto = new ProtoSapienceComponent({
-      intelligence: 0.60,
-      usesTools: true,
-      createsTools: true,
-      hasProtocolanguage: false,
-      passedMirrorTest: false,
-      showsAbstractThinking: false,
-    });
-    entity.addComponent(proto);
-    entity.addComponent(new AnimalComponent({ species: 'wolf' }));
-    entity.addComponent(new SpeciesComponent({
-      speciesId: 'wolf',
-      speciesName: 'Wolf',
-      maturityAge: 2,
-    }));
+    const entity = createProtoSapientAnimal(world, 'wolf', 0.60);
+    const proto = entity.getComponent(CT.ProtoSapience) as ProtoSapienceComponent;
+    proto.hasProtocolanguage = false; // Reset for testing
 
     const program = new UpliftProgramComponent({
       programId: 'test',
@@ -395,7 +326,7 @@ describe('ProtoSapienceObservationSystem - Communication Patterns', () => {
       stage: 'selective_breeding',
     });
     const programEntity = world.createEntity();
-    programEntity.addComponent(program);
+    (programEntity as EntityImpl).addComponent(program);
 
     for (let i = 0; i < 100; i++) {
       system.update(world, [entity], 0.05);
@@ -409,32 +340,20 @@ describe('ProtoSapienceObservationSystem - Communication Patterns', () => {
 describe('ProtoSapienceObservationSystem - Milestone Events', () => {
   let world: World;
   let system: ProtoSapienceObservationSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
     world = new World();
     system = new ProtoSapienceObservationSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
   });
 
   it('should emit milestone event for first tool use', () => {
-    const entity = world.createEntity();
-    const proto = new ProtoSapienceComponent({
-      intelligence: 0.45,
-      usesTools: false,
-      createsTools: false,
-      hasProtocolanguage: false,
-      passedMirrorTest: false,
-      showsAbstractThinking: false,
-    });
-    entity.addComponent(proto);
-    entity.addComponent(new AnimalComponent({ species: 'wolf' }));
-    entity.addComponent(new SpeciesComponent({
-      speciesId: 'wolf',
-      speciesName: 'Wolf',
-      maturityAge: 2,
-    }));
+    const entity = createProtoSapientAnimal(world, 'wolf', 0.45);
+    const proto = entity.getComponent(CT.ProtoSapience) as ProtoSapienceComponent;
+    // Reset behaviors for testing emergence
+    proto.usesTools = false;
 
     const program = new UpliftProgramComponent({
       programId: 'test',
@@ -450,7 +369,7 @@ describe('ProtoSapienceObservationSystem - Milestone Events', () => {
       stage: 'selective_breeding',
     });
     const programEntity = world.createEntity();
-    programEntity.addComponent(program);
+    (programEntity as EntityImpl).addComponent(program);
 
     let milestoneEventFired = false;
     eventBus.on('proto_sapience_milestone', (event: any) => {
@@ -467,22 +386,9 @@ describe('ProtoSapienceObservationSystem - Milestone Events', () => {
   });
 
   it('should emit milestone event for proto-language emergence', () => {
-    const entity = world.createEntity();
-    const proto = new ProtoSapienceComponent({
-      intelligence: 0.60,
-      usesTools: true,
-      createsTools: true,
-      hasProtocolanguage: false,
-      passedMirrorTest: false,
-      showsAbstractThinking: false,
-    });
-    entity.addComponent(proto);
-    entity.addComponent(new AnimalComponent({ species: 'wolf' }));
-    entity.addComponent(new SpeciesComponent({
-      speciesId: 'wolf',
-      speciesName: 'Wolf',
-      maturityAge: 2,
-    }));
+    const entity = createProtoSapientAnimal(world, 'wolf', 0.60);
+    const proto = entity.getComponent(CT.ProtoSapience) as ProtoSapienceComponent;
+    proto.hasProtocolanguage = false; // Reset for testing
 
     const program = new UpliftProgramComponent({
       programId: 'test',
@@ -498,7 +404,7 @@ describe('ProtoSapienceObservationSystem - Milestone Events', () => {
       stage: 'selective_breeding',
     });
     const programEntity = world.createEntity();
-    programEntity.addComponent(program);
+    (programEntity as EntityImpl).addComponent(program);
 
     let milestoneEventFired = false;
     eventBus.on('proto_sapience_milestone', (event: any) => {
@@ -515,22 +421,9 @@ describe('ProtoSapienceObservationSystem - Milestone Events', () => {
   });
 
   it('should emit milestone event for mirror test passed', () => {
-    const entity = world.createEntity();
-    const proto = new ProtoSapienceComponent({
-      intelligence: 0.65,
-      usesTools: true,
-      createsTools: true,
-      hasProtocolanguage: true,
-      passedMirrorTest: false,
-      showsAbstractThinking: false,
-    });
-    entity.addComponent(proto);
-    entity.addComponent(new AnimalComponent({ species: 'wolf' }));
-    entity.addComponent(new SpeciesComponent({
-      speciesId: 'wolf',
-      speciesName: 'Wolf',
-      maturityAge: 2,
-    }));
+    const entity = createProtoSapientAnimal(world, 'wolf', 0.65);
+    const proto = entity.getComponent(CT.ProtoSapience) as ProtoSapienceComponent;
+    proto.passedMirrorTest = false; // Reset for testing
 
     const program = new UpliftProgramComponent({
       programId: 'test',
@@ -546,7 +439,7 @@ describe('ProtoSapienceObservationSystem - Milestone Events', () => {
       stage: 'pre_sapience',
     });
     const programEntity = world.createEntity();
-    programEntity.addComponent(program);
+    (programEntity as EntityImpl).addComponent(program);
 
     let milestoneEventFired = false;
     eventBus.on('proto_sapience_milestone', (event: any) => {
@@ -571,32 +464,20 @@ describe('ProtoSapienceObservationSystem - Milestone Events', () => {
 describe('ProtoSapienceObservationSystem - Only Monitors Active Programs', () => {
   let world: World;
   let system: ProtoSapienceObservationSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
     world = new World();
     system = new ProtoSapienceObservationSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
   });
 
   it('should not monitor animals not in uplift programs', () => {
-    const entity = world.createEntity();
-    const proto = new ProtoSapienceComponent({
-      intelligence: 0.70, // High intelligence
-      usesTools: false,
-      createsTools: false,
-      hasProtocolanguage: false,
-      passedMirrorTest: false,
-      showsAbstractThinking: false,
-    });
-    entity.addComponent(proto);
-    entity.addComponent(new AnimalComponent({ species: 'cat' }));
-    entity.addComponent(new SpeciesComponent({
-      speciesId: 'cat',
-      speciesName: 'Cat',
-      maturityAge: 1,
-    }));
+    const entity = createProtoSapientAnimal(world, 'cat', 0.70);
+    const proto = entity.getComponent(CT.ProtoSapience) as ProtoSapienceComponent;
+    // Reset behaviors to test that they don't emerge without program
+    proto.usesTools = false;
 
     // No uplift program for cats
 

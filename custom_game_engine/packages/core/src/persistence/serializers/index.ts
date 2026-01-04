@@ -24,6 +24,7 @@ import { PlantSerializer } from './PlantSerializer.js';
 import { ExplorationStateSerializer } from './ExplorationStateSerializer.js';
 import { SpatialMemorySerializer } from './SpatialMemorySerializer.js';
 import { JournalSerializer } from './JournalSerializer.js';
+import { CourtshipSerializer } from './CourtshipSerializer.js';
 
 /**
  * Register all component serializers.
@@ -53,6 +54,7 @@ export function registerAllSerializers(): void {
   componentSerializerRegistry.register('exploration_state', new ExplorationStateSerializer());
   componentSerializerRegistry.register('spatial_memory', new SpatialMemorySerializer());
   componentSerializerRegistry.register('journal', new JournalSerializer());
+  componentSerializerRegistry.register('courtship', new CourtshipSerializer());
 
   // Register generic serializers for all other components
   // These can be replaced with specific serializers later
@@ -133,7 +135,6 @@ export function registerAllSerializers(): void {
     'companion',
     'threat_detection',
     'sexuality',
-    'courtship',
     'parenting',
     'jealousy',
     'pregnancy',
@@ -160,7 +161,7 @@ export function registerAllSerializers(): void {
   }
 
   console.log(
-    `[Persistence] Registered ${genericComponents.length + 18} component serializers`
+    `[Persistence] Registered ${genericComponents.length + 19} component serializers`
   );
 }
 
@@ -192,3 +193,4 @@ export * from './SocialGradientSerializer.js';
 export * from './PlantSerializer.js';
 export * from './SpatialMemorySerializer.js';
 export * from './JournalSerializer.js';
+export * from './CourtshipSerializer.js';

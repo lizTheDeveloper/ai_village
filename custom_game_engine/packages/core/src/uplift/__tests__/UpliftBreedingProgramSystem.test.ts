@@ -5,24 +5,23 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../../ecs/World.js';
-import { Entity } from '../../ecs/Entity.js';
-import { EventBus } from '../../events/EventBus.js';
+import { World } from '../../World.js';
+import type { Entity } from '../../ecs/Entity.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 import { UpliftBreedingProgramSystem } from '../UpliftBreedingProgramSystem.js';
 import { UpliftProgramComponent } from '../../components/UpliftProgramComponent.js';
-import { SpeciesComponent } from '../../components/SpeciesComponent.js';
-import { AnimalComponent } from '../../components/AnimalComponent.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
+import { createTestAnimal } from './testHelpers.js';
 
 describe('UpliftBreedingProgramSystem - Initialization', () => {
   let world: World;
   let system: UpliftBreedingProgramSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
     world = new World();
     system = new UpliftBreedingProgramSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
   });
 
@@ -38,14 +37,14 @@ describe('UpliftBreedingProgramSystem - Initialization', () => {
 describe('UpliftBreedingProgramSystem - Generation Advancement', () => {
   let world: World;
   let system: UpliftBreedingProgramSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
   let programEntity: Entity;
   let program: UpliftProgramComponent;
 
   beforeEach(() => {
     world = new World();
     system = new UpliftBreedingProgramSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
 
     // Create test program
@@ -67,17 +66,7 @@ describe('UpliftBreedingProgramSystem - Generation Advancement', () => {
 
     // Create breeding population
     for (let i = 0; i < 50; i++) {
-      const animal = world.createEntity();
-      const animalComp = new AnimalComponent({
-        species: 'wolf',
-        intelligence: 0.45 + Math.random() * 0.1,
-      });
-      animal.addComponent(animalComp);
-      animal.addComponent(new SpeciesComponent({
-        speciesId: 'wolf',
-        speciesName: 'Wolf',
-        maturityAge: 2,
-      }));
+      createTestAnimal(world, 'wolf', { intelligence: 0.45 + Math.random() * 0.1 });
     }
   });
 
@@ -125,27 +114,17 @@ describe('UpliftBreedingProgramSystem - Generation Advancement', () => {
 describe('UpliftBreedingProgramSystem - Breeding Selection', () => {
   let world: World;
   let system: UpliftBreedingProgramSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
     world = new World();
     system = new UpliftBreedingProgramSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
 
     // Create animals with varying intelligence
     for (let i = 0; i < 100; i++) {
-      const animal = world.createEntity();
-      const animalComp = new AnimalComponent({
-        species: 'wolf',
-        intelligence: 0.3 + (i / 100) * 0.4, // 0.3 to 0.7
-      });
-      animal.addComponent(animalComp);
-      animal.addComponent(new SpeciesComponent({
-        speciesId: 'wolf',
-        speciesName: 'Wolf',
-        maturityAge: 2,
-      }));
+      createTestAnimal(world, 'wolf', { intelligence: 0.3 + (i / 100) * 0.4 });
     }
   });
 
@@ -178,14 +157,14 @@ describe('UpliftBreedingProgramSystem - Breeding Selection', () => {
 describe('UpliftBreedingProgramSystem - Stage Transitions', () => {
   let world: World;
   let system: UpliftBreedingProgramSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
   let program: UpliftProgramComponent;
   let programEntity: Entity;
 
   beforeEach(() => {
     world = new World();
     system = new UpliftBreedingProgramSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
 
     program = new UpliftProgramComponent({
@@ -239,13 +218,13 @@ describe('UpliftBreedingProgramSystem - Stage Transitions', () => {
 describe('UpliftBreedingProgramSystem - Technology Effects', () => {
   let world: World;
   let system: UpliftBreedingProgramSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
   let program: UpliftProgramComponent;
 
   beforeEach(() => {
     world = new World();
     system = new UpliftBreedingProgramSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
 
     program = new UpliftProgramComponent({
@@ -288,12 +267,12 @@ describe('UpliftBreedingProgramSystem - Technology Effects', () => {
 describe('UpliftBreedingProgramSystem - Breakthrough Events', () => {
   let world: World;
   let system: UpliftBreedingProgramSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
     world = new World();
     system = new UpliftBreedingProgramSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
   });
 
@@ -329,12 +308,12 @@ describe('UpliftBreedingProgramSystem - Breakthrough Events', () => {
 describe('UpliftBreedingProgramSystem - Population Management', () => {
   let world: World;
   let system: UpliftBreedingProgramSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
     world = new World();
     system = new UpliftBreedingProgramSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
   });
 
@@ -373,41 +352,21 @@ describe('UpliftBreedingProgramSystem - Population Management', () => {
 describe('UpliftBreedingProgramSystem - Notable Individuals', () => {
   let world: World;
   let system: UpliftBreedingProgramSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
     world = new World();
     system = new UpliftBreedingProgramSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
 
     // Create animals with one exceptionally intelligent individual
     for (let i = 0; i < 49; i++) {
-      const animal = world.createEntity();
-      const animalComp = new AnimalComponent({
-        species: 'wolf',
-        intelligence: 0.5,
-      });
-      animal.addComponent(animalComp);
-      animal.addComponent(new SpeciesComponent({
-        speciesId: 'wolf',
-        speciesName: 'Wolf',
-        maturityAge: 2,
-      }));
+      createTestAnimal(world, 'wolf', { intelligence: 0.5 });
     }
 
     // Exceptional individual
-    const genius = world.createEntity();
-    const geniusComp = new AnimalComponent({
-      species: 'wolf',
-      intelligence: 0.8,
-    });
-    genius.addComponent(geniusComp);
-    genius.addComponent(new SpeciesComponent({
-      speciesId: 'wolf',
-      speciesName: 'Wolf',
-      maturityAge: 2,
-    }));
+    createTestAnimal(world, 'wolf', { intelligence: 0.8 });
   });
 
   it('should identify notable individuals', () => {

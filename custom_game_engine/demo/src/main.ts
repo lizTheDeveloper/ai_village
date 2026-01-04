@@ -3257,6 +3257,10 @@ async function main() {
   console.log('[Demo] Starting game loop...');
   gameLoop.start();
 
+  // Expose gameLoop globally for API access (e.g., Interdimensional Cable recordings API)
+  (window as any).__gameLoop = gameLoop;
+  console.log('[Demo] GameLoop exposed globally for API access');
+
   // Farming action handler
   gameLoop.world.eventBus.subscribe('action:requested', (event: any) => {
     const { eventType, actorId, plantId } = event.data;

@@ -5,31 +5,32 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { World } from '../../ecs/World.js';
-import { Entity } from '../../ecs/Entity.js';
-import { EventBus } from '../../events/EventBus.js';
+import { World } from '../../World.js';
+import type { Entity } from '../../ecs/Entity.js';
+import { EventBusImpl } from '../../events/EventBus.js';
 import { ConsciousnessEmergenceSystem } from '../ConsciousnessEmergenceSystem.js';
 import { ProtoSapienceComponent } from '../../components/ProtoSapienceComponent.js';
 import { UpliftProgramComponent } from '../../components/UpliftProgramComponent.js';
 import { UpliftedTraitComponent } from '../../components/UpliftedTraitComponent.js';
-import { AnimalComponent } from '../../components/AnimalComponent.js';
-import { SpeciesComponent } from '../../components/SpeciesComponent.js';
-import { AgentComponent } from '../../components/AgentComponent.js';
-import { IdentityComponent } from '../../components/IdentityComponent.js';
 import { EpisodicMemoryComponent } from '../../components/EpisodicMemoryComponent.js';
 import { SemanticMemoryComponent } from '../../components/SemanticMemoryComponent.js';
 import { BeliefComponent } from '../../components/BeliefComponent.js';
+import { SpeciesComponent } from '../../components/SpeciesComponent.js';
+import { createAgentComponent } from '../../components/AgentComponent.js';
+import { createIdentityComponent } from '../../components/IdentityComponent.js';
 import { ComponentType as CT } from '../../types/ComponentType.js';
+import { createProtoSapientAnimal } from './testHelpers.js';
+import { EntityImpl } from '../../ecs/Entity.js';
 
 describe('ConsciousnessEmergenceSystem - Initialization', () => {
   let world: World;
   let system: ConsciousnessEmergenceSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
     world = new World();
     system = new ConsciousnessEmergenceSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
   });
 
@@ -45,32 +46,18 @@ describe('ConsciousnessEmergenceSystem - Initialization', () => {
 describe('ConsciousnessEmergenceSystem - Readiness Detection', () => {
   let world: World;
   let system: ConsciousnessEmergenceSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
   let entity: Entity;
   let proto: ProtoSapienceComponent;
 
   beforeEach(() => {
     world = new World();
     system = new ConsciousnessEmergenceSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
 
-    entity = world.createEntity();
-    proto = new ProtoSapienceComponent({
-      intelligence: 0.7,
-      usesTools: true,
-      createsTools: true,
-      hasProtocolanguage: true,
-      passedMirrorTest: true,
-      showsAbstractThinking: true,
-    });
-    entity.addComponent(proto);
-    entity.addComponent(new AnimalComponent({ species: 'wolf' }));
-    entity.addComponent(new SpeciesComponent({
-      speciesId: 'wolf',
-      speciesName: 'Wolf',
-      maturityAge: 2,
-    }));
+    entity = createProtoSapientAnimal(world, 'wolf', 0.7);
+    proto = entity.getComponent(CT.ProtoSapience) as ProtoSapienceComponent;
   });
 
   it('should detect readiness for sapience', () => {
@@ -101,31 +88,16 @@ describe('ConsciousnessEmergenceSystem - Readiness Detection', () => {
 describe('ConsciousnessEmergenceSystem - Awakening Moment Generation', () => {
   let world: World;
   let system: ConsciousnessEmergenceSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
   let entity: Entity;
 
   beforeEach(() => {
     world = new World();
     system = new ConsciousnessEmergenceSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
 
-    entity = world.createEntity();
-    const proto = new ProtoSapienceComponent({
-      intelligence: 0.7,
-      usesTools: true,
-      createsTools: true,
-      hasProtocolanguage: true,
-      passedMirrorTest: true,
-      showsAbstractThinking: true,
-    });
-    entity.addComponent(proto);
-    entity.addComponent(new AnimalComponent({ species: 'wolf' }));
-    entity.addComponent(new SpeciesComponent({
-      speciesId: 'wolf',
-      speciesName: 'Wolf',
-      maturityAge: 2,
-    }));
+    entity = createProtoSapientAnimal(world, 'wolf', 0.7);
 
     // Create uplift program
     const program = new UpliftProgramComponent({
@@ -142,7 +114,7 @@ describe('ConsciousnessEmergenceSystem - Awakening Moment Generation', () => {
       stage: 'awakening',
     });
     const programEntity = world.createEntity();
-    programEntity.addComponent(program);
+    (programEntity as EntityImpl).addComponent(program);
   });
 
   it('should generate awakening moment', () => {
@@ -168,31 +140,16 @@ describe('ConsciousnessEmergenceSystem - Awakening Moment Generation', () => {
 describe('ConsciousnessEmergenceSystem - Animal to Agent Transformation', () => {
   let world: World;
   let system: ConsciousnessEmergenceSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
   let entity: Entity;
 
   beforeEach(() => {
     world = new World();
     system = new ConsciousnessEmergenceSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
 
-    entity = world.createEntity();
-    const proto = new ProtoSapienceComponent({
-      intelligence: 0.7,
-      usesTools: true,
-      createsTools: true,
-      hasProtocolanguage: true,
-      passedMirrorTest: true,
-      showsAbstractThinking: true,
-    });
-    entity.addComponent(proto);
-    entity.addComponent(new AnimalComponent({ species: 'wolf' }));
-    entity.addComponent(new SpeciesComponent({
-      speciesId: 'wolf',
-      speciesName: 'Wolf',
-      maturityAge: 2,
-    }));
+    entity = createProtoSapientAnimal(world, 'wolf', 0.7);
 
     // Create uplift program
     const program = new UpliftProgramComponent({
@@ -209,7 +166,7 @@ describe('ConsciousnessEmergenceSystem - Animal to Agent Transformation', () => 
       stage: 'awakening',
     });
     const programEntity = world.createEntity();
-    programEntity.addComponent(program);
+    (programEntity as EntityImpl).addComponent(program);
   });
 
   it('should add UpliftedTraitComponent', () => {
@@ -295,32 +252,17 @@ describe('ConsciousnessEmergenceSystem - Animal to Agent Transformation', () => 
 describe('ConsciousnessEmergenceSystem - Attitude Determination', () => {
   let world: World;
   let system: ConsciousnessEmergenceSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
     world = new World();
     system = new ConsciousnessEmergenceSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
   });
 
   it('should be grateful for fast uplift', () => {
-    const entity = world.createEntity();
-    const proto = new ProtoSapienceComponent({
-      intelligence: 0.7,
-      usesTools: true,
-      createsTools: true,
-      hasProtocolanguage: true,
-      passedMirrorTest: true,
-      showsAbstractThinking: true,
-    });
-    entity.addComponent(proto);
-    entity.addComponent(new AnimalComponent({ species: 'wolf' }));
-    entity.addComponent(new SpeciesComponent({
-      speciesId: 'wolf',
-      speciesName: 'Wolf',
-      maturityAge: 2,
-    }));
+    const entity = createProtoSapientAnimal(world, 'wolf', 0.7);
 
     // Fast uplift: 5 generations when 15 estimated
     const program = new UpliftProgramComponent({
@@ -338,7 +280,7 @@ describe('ConsciousnessEmergenceSystem - Attitude Determination', () => {
       stage: 'awakening',
     });
     const programEntity = world.createEntity();
-    programEntity.addComponent(program);
+    (programEntity as EntityImpl).addComponent(program);
 
     system.update(world, [entity], 0.05);
 
@@ -349,22 +291,7 @@ describe('ConsciousnessEmergenceSystem - Attitude Determination', () => {
   });
 
   it('should be resentful for slow uplift', () => {
-    const entity = world.createEntity();
-    const proto = new ProtoSapienceComponent({
-      intelligence: 0.7,
-      usesTools: true,
-      createsTools: true,
-      hasProtocolanguage: true,
-      passedMirrorTest: true,
-      showsAbstractThinking: true,
-    });
-    entity.addComponent(proto);
-    entity.addComponent(new AnimalComponent({ species: 'wolf' }));
-    entity.addComponent(new SpeciesComponent({
-      speciesId: 'wolf',
-      speciesName: 'Wolf',
-      maturityAge: 2,
-    }));
+    const entity = createProtoSapientAnimal(world, 'wolf', 0.7);
 
     // Slow uplift: 13 generations when 15 estimated (>80%)
     const program = new UpliftProgramComponent({
@@ -382,7 +309,7 @@ describe('ConsciousnessEmergenceSystem - Attitude Determination', () => {
       stage: 'awakening',
     });
     const programEntity = world.createEntity();
-    programEntity.addComponent(program);
+    (programEntity as EntityImpl).addComponent(program);
 
     system.update(world, [entity], 0.05);
 
@@ -396,39 +323,24 @@ describe('ConsciousnessEmergenceSystem - Attitude Determination', () => {
 describe('ConsciousnessEmergenceSystem - Witness Tracking', () => {
   let world: World;
   let system: ConsciousnessEmergenceSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
     world = new World();
     system = new ConsciousnessEmergenceSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
   });
 
   it('should record nearby witnesses to awakening', () => {
     // Create awakening entity
-    const entity = world.createEntity();
-    const proto = new ProtoSapienceComponent({
-      intelligence: 0.7,
-      usesTools: true,
-      createsTools: true,
-      hasProtocolanguage: true,
-      passedMirrorTest: true,
-      showsAbstractThinking: true,
-    });
-    entity.addComponent(proto);
-    entity.addComponent(new AnimalComponent({ species: 'wolf' }));
-    entity.addComponent(new SpeciesComponent({
-      speciesId: 'wolf',
-      speciesName: 'Wolf',
-      maturityAge: 2,
-    }));
+    const entity = createProtoSapientAnimal(world, 'wolf', 0.7);
 
     // Create nearby agents (potential witnesses)
     for (let i = 0; i < 3; i++) {
-      const witness = world.createEntity();
-      witness.addComponent(new AgentComponent({ name: `Witness${i}` }));
-      witness.addComponent(new IdentityComponent({ name: `Witness${i}` }));
+      const witness = world.createEntity() as EntityImpl;
+      witness.addComponent(createAgentComponent());
+      witness.addComponent(createIdentityComponent(`Witness${i}`));
     }
 
     const program = new UpliftProgramComponent({
@@ -445,7 +357,7 @@ describe('ConsciousnessEmergenceSystem - Witness Tracking', () => {
       stage: 'awakening',
     });
     const programEntity = world.createEntity();
-    programEntity.addComponent(program);
+    (programEntity as EntityImpl).addComponent(program);
 
     system.update(world, [entity], 0.05);
 
@@ -461,32 +373,17 @@ describe('ConsciousnessEmergenceSystem - Witness Tracking', () => {
 describe('ConsciousnessEmergenceSystem - Event Emission', () => {
   let world: World;
   let system: ConsciousnessEmergenceSystem;
-  let eventBus: EventBus;
+  let eventBus: EventBusImpl;
 
   beforeEach(() => {
     world = new World();
     system = new ConsciousnessEmergenceSystem();
-    eventBus = new EventBus();
+    eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
   });
 
   it('should emit consciousness_awakened event', () => {
-    const entity = world.createEntity();
-    const proto = new ProtoSapienceComponent({
-      intelligence: 0.7,
-      usesTools: true,
-      createsTools: true,
-      hasProtocolanguage: true,
-      passedMirrorTest: true,
-      showsAbstractThinking: true,
-    });
-    entity.addComponent(proto);
-    entity.addComponent(new AnimalComponent({ species: 'wolf' }));
-    entity.addComponent(new SpeciesComponent({
-      speciesId: 'wolf',
-      speciesName: 'Wolf',
-      maturityAge: 2,
-    }));
+    const entity = createProtoSapientAnimal(world, 'wolf', 0.7);
 
     const program = new UpliftProgramComponent({
       programId: 'test',
@@ -502,7 +399,7 @@ describe('ConsciousnessEmergenceSystem - Event Emission', () => {
       stage: 'awakening',
     });
     const programEntity = world.createEntity();
-    programEntity.addComponent(program);
+    (programEntity as EntityImpl).addComponent(program);
 
     let eventFired = false;
     eventBus.on('consciousness_awakened', () => {
