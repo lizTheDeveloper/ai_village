@@ -1,0 +1,18 @@
+{
+  "id": "horse_white",
+  "base_species": "horse",
+  "variant": "white",
+  "description": "white horse",
+  "size": 64,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-04T00:10:19.413Z"
+}
