@@ -1,0 +1,389 @@
+{
+  "recordingId": "rec_reproductive_e2e_001",
+  "title": "FERTILITY FESTIVAL - Scientific Documentation",
+  "description": "Reproductive systems E2E test at the annual Spring Ritual",
+  "recordedBy": "Dr. Kinsey Bot",
+  "recordedAt": 1704499600000,
+  "duration": 12,
+  "quality": 0.92,
+  "frames": [
+    {
+      "tick": 0,
+      "cameraX": 700,
+      "cameraY": 700,
+      "cameraAngle": 180,
+      "cameraZoom": 1.0,
+      "entities": [
+        {
+          "entityId": "participant_1",
+          "entityType": "villager",
+          "x": 680,
+          "y": 690,
+          "facingAngle": 45,
+          "animation": { "state": "dancing", "frame": 0 },
+          "distanceFromCamera": 28
+        },
+        {
+          "entityId": "participant_2",
+          "entityType": "villager",
+          "x": 720,
+          "y": 690,
+          "facingAngle": 315,
+          "animation": { "state": "dancing", "frame": 1 },
+          "distanceFromCamera": 28
+        },
+        {
+          "entityId": "participant_3",
+          "entityType": "villager",
+          "x": 680,
+          "y": 710,
+          "facingAngle": 135,
+          "animation": { "state": "dancing", "frame": 2 },
+          "distanceFromCamera": 28
+        },
+        {
+          "entityId": "participant_4",
+          "entityType": "villager",
+          "x": 720,
+          "y": 710,
+          "facingAngle": 225,
+          "animation": { "state": "dancing", "frame": 0 },
+          "distanceFromCamera": 28
+        },
+        {
+          "entityId": "musician_1",
+          "entityType": "bard",
+          "x": 650,
+          "y": 700,
+          "facingAngle": 90,
+          "animation": { "state": "playing_flute", "frame": 0 },
+          "distanceFromCamera": 50
+        },
+        {
+          "entityId": "musician_2",
+          "entityType": "bard",
+          "x": 750,
+          "y": 700,
+          "facingAngle": 270,
+          "animation": { "state": "playing_drum", "frame": 1 },
+          "distanceFromCamera": 50
+        },
+        {
+          "entityId": "priestess",
+          "entityType": "priest",
+          "x": 700,
+          "y": 660,
+          "facingAngle": 180,
+          "animation": { "state": "blessing", "frame": 0 },
+          "distanceFromCamera": 40
+        },
+        {
+          "entityId": "observer_1",
+          "entityType": "villager",
+          "x": 630,
+          "y": 670,
+          "facingAngle": 90,
+          "animation": { "state": "watching", "frame": 0 },
+          "distanceFromCamera": 75
+        },
+        {
+          "entityId": "observer_2",
+          "entityType": "villager",
+          "x": 770,
+          "y": 670,
+          "facingAngle": 270,
+          "animation": { "state": "watching", "frame": 1 },
+          "distanceFromCamera": 75
+        }
+      ]
+    },
+    {
+      "tick": 5,
+      "cameraX": 700,
+      "cameraY": 702,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "participant_1",
+          "entityType": "villager",
+          "x": 685,
+          "y": 695,
+          "facingAngle": 90,
+          "animation": { "state": "embracing", "frame": 1 },
+          "distanceFromCamera": 20
+        },
+        {
+          "entityId": "participant_2",
+          "entityType": "villager",
+          "x": 715,
+          "y": 695,
+          "facingAngle": 270,
+          "animation": { "state": "embracing", "frame": 1 },
+          "distanceFromCamera": 20
+        },
+        {
+          "entityId": "participant_3",
+          "entityType": "villager",
+          "x": 685,
+          "y": 715,
+          "facingAngle": 90,
+          "animation": { "state": "embracing", "frame": 2 },
+          "distanceFromCamera": 20
+        },
+        {
+          "entityId": "participant_4",
+          "entityType": "villager",
+          "x": 715,
+          "y": 715,
+          "facingAngle": 270,
+          "animation": { "state": "embracing", "frame": 2 },
+          "distanceFromCamera": 20
+        },
+        {
+          "entityId": "musician_1",
+          "entityType": "bard",
+          "x": 650,
+          "y": 700,
+          "facingAngle": 90,
+          "animation": { "state": "playing_flute", "frame": 3 },
+          "distanceFromCamera": 52
+        },
+        {
+          "entityId": "musician_2",
+          "entityType": "bard",
+          "x": 750,
+          "y": 700,
+          "facingAngle": 270,
+          "animation": { "state": "playing_drum", "frame": 4 },
+          "distanceFromCamera": 52
+        },
+        {
+          "entityId": "priestess",
+          "entityType": "priest",
+          "x": 700,
+          "y": 660,
+          "facingAngle": 180,
+          "animation": { "state": "chanting", "frame": 2 },
+          "distanceFromCamera": 42
+        },
+        {
+          "entityId": "observer_1",
+          "entityType": "villager",
+          "x": 630,
+          "y": 670,
+          "facingAngle": 90,
+          "animation": { "state": "applauding", "frame": 1 },
+          "distanceFromCamera": 77
+        },
+        {
+          "entityId": "observer_2",
+          "entityType": "villager",
+          "x": 770,
+          "y": 670,
+          "facingAngle": 270,
+          "animation": { "state": "applauding", "frame": 2 },
+          "distanceFromCamera": 77
+        }
+      ]
+    },
+    {
+      "tick": 10,
+      "cameraX": 700,
+      "cameraY": 705,
+      "cameraAngle": 185,
+      "cameraZoom": 0.9,
+      "entities": [
+        {
+          "entityId": "participant_1",
+          "entityType": "villager",
+          "x": 690,
+          "y": 700,
+          "facingAngle": 90,
+          "animation": { "state": "fertility_ritual", "frame": 3 },
+          "distanceFromCamera": 14
+        },
+        {
+          "entityId": "participant_2",
+          "entityType": "villager",
+          "x": 710,
+          "y": 700,
+          "facingAngle": 270,
+          "animation": { "state": "fertility_ritual", "frame": 3 },
+          "distanceFromCamera": 14
+        },
+        {
+          "entityId": "participant_3",
+          "entityType": "villager",
+          "x": 690,
+          "y": 720,
+          "facingAngle": 90,
+          "animation": { "state": "fertility_ritual", "frame": 4 },
+          "distanceFromCamera": 22
+        },
+        {
+          "entityId": "participant_4",
+          "entityType": "villager",
+          "x": 710,
+          "y": 720,
+          "facingAngle": 270,
+          "animation": { "state": "fertility_ritual", "frame": 4 },
+          "distanceFromCamera": 22
+        },
+        {
+          "entityId": "musician_1",
+          "entityType": "bard",
+          "x": 650,
+          "y": 700,
+          "facingAngle": 90,
+          "animation": { "state": "playing_flute", "frame": 6 },
+          "distanceFromCamera": 55
+        },
+        {
+          "entityId": "musician_2",
+          "entityType": "bard",
+          "x": 750,
+          "y": 700,
+          "facingAngle": 270,
+          "animation": { "state": "playing_drum", "frame": 7 },
+          "distanceFromCamera": 55
+        },
+        {
+          "entityId": "priestess",
+          "entityType": "priest",
+          "x": 700,
+          "y": 660,
+          "facingAngle": 180,
+          "animation": { "state": "ritual_gesture", "frame": 5 },
+          "distanceFromCamera": 45
+        },
+        {
+          "entityId": "observer_1",
+          "entityType": "villager",
+          "x": 630,
+          "y": 670,
+          "facingAngle": 90,
+          "animation": { "state": "reverent", "frame": 0 },
+          "distanceFromCamera": 80
+        },
+        {
+          "entityId": "observer_2",
+          "entityType": "villager",
+          "x": 770,
+          "y": 670,
+          "facingAngle": 270,
+          "animation": { "state": "reverent", "frame": 0 },
+          "distanceFromCamera": 80
+        },
+        {
+          "entityId": "fertility_goddess",
+          "entityType": "deity_manifestation",
+          "x": 700,
+          "y": 640,
+          "facingAngle": 180,
+          "animation": { "state": "blessing_glow", "frame": 0 },
+          "distanceFromCamera": 65
+        }
+      ]
+    },
+    {
+      "tick": 15,
+      "cameraX": 700,
+      "cameraY": 708,
+      "cameraAngle": 180,
+      "cameraZoom": 0.85,
+      "entities": [
+        {
+          "entityId": "participant_1",
+          "entityType": "villager",
+          "x": 695,
+          "y": 705,
+          "facingAngle": 90,
+          "animation": { "state": "conception_glow", "frame": 1 },
+          "distanceFromCamera": 8
+        },
+        {
+          "entityId": "participant_2",
+          "entityType": "villager",
+          "x": 705,
+          "y": 705,
+          "facingAngle": 270,
+          "animation": { "state": "conception_glow", "frame": 1 },
+          "distanceFromCamera": 8
+        },
+        {
+          "entityId": "participant_3",
+          "entityType": "villager",
+          "x": 695,
+          "y": 725,
+          "facingAngle": 90,
+          "animation": { "state": "conception_glow", "frame": 2 },
+          "distanceFromCamera": 26
+        },
+        {
+          "entityId": "participant_4",
+          "entityType": "villager",
+          "x": 705,
+          "y": 725,
+          "facingAngle": 270,
+          "animation": { "state": "conception_glow", "frame": 2 },
+          "distanceFromCamera": 26
+        },
+        {
+          "entityId": "musician_1",
+          "entityType": "bard",
+          "x": 650,
+          "y": 700,
+          "facingAngle": 90,
+          "animation": { "state": "playing_flute", "frame": 9 },
+          "distanceFromCamera": 58
+        },
+        {
+          "entityId": "musician_2",
+          "entityType": "bard",
+          "x": 750,
+          "y": 700,
+          "facingAngle": 270,
+          "animation": { "state": "playing_drum", "frame": 10 },
+          "distanceFromCamera": 58
+        },
+        {
+          "entityId": "priestess",
+          "entityType": "priest",
+          "x": 700,
+          "y": 660,
+          "facingAngle": 180,
+          "animation": { "state": "triumphant", "frame": 1 },
+          "distanceFromCamera": 48
+        },
+        {
+          "entityId": "observer_1",
+          "entityType": "villager",
+          "x": 630,
+          "y": 670,
+          "facingAngle": 90,
+          "animation": { "state": "celebrating", "frame": 2 },
+          "distanceFromCamera": 83
+        },
+        {
+          "entityId": "observer_2",
+          "entityType": "villager",
+          "x": 770,
+          "y": 670,
+          "facingAngle": 270,
+          "animation": { "state": "celebrating", "frame": 3 },
+          "distanceFromCamera": 83
+        },
+        {
+          "entityId": "fertility_goddess",
+          "entityType": "deity_manifestation",
+          "x": 700,
+          "y": 640,
+          "facingAngle": 180,
+          "animation": { "state": "divine_approval", "frame": 2 },
+          "distanceFromCamera": 68
+        }
+      ]
+    }
+  ]
+}

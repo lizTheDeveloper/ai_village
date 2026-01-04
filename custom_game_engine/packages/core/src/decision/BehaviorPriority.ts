@@ -15,6 +15,7 @@
 
 import type { AgentBehavior } from '../components/AgentComponent.js';
 import type { TemperatureComponent } from '../components/TemperatureComponent.js';
+import type { NeedsComponent } from '../components/NeedsComponent.js';
 
 /**
  * Priority configuration for a behavior
@@ -71,11 +72,13 @@ const BEHAVIOR_PRIORITIES: Record<string, BehaviorPriorityConfig> = {
  *
  * @param behavior - The behavior to get priority for
  * @param temperature - Optional temperature component for context-aware priority
+ * @param needs - Optional needs component for context-aware priority
  * @returns The priority value
  */
 export function getBehaviorPriority(
   behavior: AgentBehavior,
-  temperature?: TemperatureComponent
+  temperature?: TemperatureComponent,
+  needs?: NeedsComponent
 ): number {
   const config = BEHAVIOR_PRIORITIES[behavior];
 
@@ -91,6 +94,20 @@ export function getBehaviorPriority(
     // Check if dangerously cold/hot vs just uncomfortable
     if (temperature.state === 'dangerously_cold' || temperature.state === 'dangerously_hot') {
       priority = 90;
+    }
+  }
+
+  if (behavior === 'seek_food' && needs) {
+    // Elevate priority when starving (critical survival)
+    if (needs.hunger < 0.1) {
+      priority = 90; // Critical survival - overrides most tasks
+    }
+  }
+
+  if (behavior === 'seek_water' && needs) {
+    // Elevate priority when critically dehydrated
+    if (needs.thirst < 0.1) {
+      priority = 90; // Critical survival
     }
   }
 
@@ -116,12 +133,14 @@ export function getBehaviorPriorityConfig(behavior: AgentBehavior): BehaviorPrio
  * @param interrupter - The behavior trying to interrupt
  * @param current - The current behavior
  * @param temperature - Optional temperature for context
+ * @param needs - Optional needs for context
  * @returns true if interrupter can interrupt current
  */
 export function canInterrupt(
   interrupter: AgentBehavior,
   current: AgentBehavior,
-  temperature?: TemperatureComponent
+  temperature?: TemperatureComponent,
+  needs?: NeedsComponent
 ): boolean {
   const currentConfig = getBehaviorPriorityConfig(current);
   const interrupterConfig = getBehaviorPriorityConfig(interrupter);
@@ -137,8 +156,8 @@ export function canInterrupt(
   }
 
   // Priority comparison
-  const currentPriority = getBehaviorPriority(current, temperature);
-  const interrupterPriority = getBehaviorPriority(interrupter, temperature);
+  const currentPriority = getBehaviorPriority(current, temperature, needs);
+  const interrupterPriority = getBehaviorPriority(interrupter, temperature, needs);
 
   return interrupterPriority > currentPriority;
 }

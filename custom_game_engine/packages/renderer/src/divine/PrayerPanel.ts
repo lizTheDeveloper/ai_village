@@ -626,10 +626,11 @@ export class PrayerPanel implements IWindowPanel {
   /**
    * Handle scroll wheel
    */
-  handleScroll(deltaY: number): void {
+  handleScroll(deltaY: number, _contentHeight: number): boolean {
     const filteredPrayers = this.getFilteredPrayers();
     const maxScroll = Math.max(0, filteredPrayers.length * this.lineHeight - 300);
     this.scrollOffset = Math.max(0, Math.min(maxScroll, this.scrollOffset + deltaY));
+    return true;
   }
 
   // ============================================================================

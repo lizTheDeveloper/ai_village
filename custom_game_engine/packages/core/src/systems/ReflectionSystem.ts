@@ -235,7 +235,7 @@ export class ReflectionSystem implements System {
     }
 
     // Clear reflection indicator for UI and get final count
-    let finalReflectionCount = reflectionComp.reflections.length;
+    let finalReflectionCount = 0;
     entity.updateComponent(CT.Reflection, (current: ReflectionComponent) => {
       const temp = new ReflectionComponent(current);
       temp.isReflecting = false;
@@ -321,7 +321,7 @@ export class ReflectionSystem implements System {
     }
 
     // Clear reflection indicator and get final count
-    let finalReflectionCount = reflectionComp.reflections.length;
+    let finalReflectionCount = 0;
     entity.updateComponent(CT.Reflection, (current: ReflectionComponent) => {
       const temp = new ReflectionComponent(current);
       temp.isReflecting = false;

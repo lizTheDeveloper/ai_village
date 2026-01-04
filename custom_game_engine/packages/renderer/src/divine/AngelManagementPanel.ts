@@ -1022,11 +1022,12 @@ export class AngelManagementPanel implements IWindowPanel {
   /**
    * Handle scroll wheel
    */
-  handleScroll(deltaY: number): void {
-    if (this.state.wizardOpen) return;
+  handleScroll(deltaY: number, _contentHeight: number): boolean {
+    if (this.state.wizardOpen) return false;
 
     const maxScroll = Math.max(0, this.state.angels.length * this.lineHeight - 300);
     this.scrollOffset = Math.max(0, Math.min(maxScroll, this.scrollOffset + deltaY));
+    return true;
   }
 
   // ============================================================================

@@ -1,0 +1,371 @@
+{
+  "recordingId": "rec_gladiator_001",
+  "title": "ARENA BLOODSPORT - Championship Finals",
+  "description": "Two legendary gladiators clash in the final match of the season",
+  "recordedBy": "Marcus Aurelius",
+  "recordedAt": 1704413200000,
+  "duration": 15,
+  "quality": 0.98,
+  "frames": [
+    {
+      "tick": 0,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.2,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 580,
+          "y": 600,
+          "facingAngle": 90,
+          "animation": { "state": "combat_stance", "frame": 0 },
+          "distanceFromCamera": 20
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 620,
+          "y": 600,
+          "facingAngle": 270,
+          "animation": { "state": "combat_stance", "frame": 0 },
+          "distanceFromCamera": 20
+        },
+        {
+          "entityId": "crowd_1",
+          "entityType": "spectator",
+          "x": 550,
+          "y": 550,
+          "facingAngle": 135,
+          "animation": { "state": "cheering", "frame": 0 },
+          "distanceFromCamera": 70
+        },
+        {
+          "entityId": "crowd_2",
+          "entityType": "spectator",
+          "x": 650,
+          "y": 550,
+          "facingAngle": 225,
+          "animation": { "state": "cheering", "frame": 0 },
+          "distanceFromCamera": 70
+        },
+        {
+          "entityId": "crowd_3",
+          "entityType": "spectator",
+          "x": 550,
+          "y": 650,
+          "facingAngle": 45,
+          "animation": { "state": "cheering", "frame": 1 },
+          "distanceFromCamera": 70
+        },
+        {
+          "entityId": "crowd_4",
+          "entityType": "spectator",
+          "x": 650,
+          "y": 650,
+          "facingAngle": 315,
+          "animation": { "state": "cheering", "frame": 1 },
+          "distanceFromCamera": 70
+        },
+        {
+          "entityId": "referee",
+          "entityType": "official",
+          "x": 600,
+          "y": 570,
+          "facingAngle": 180,
+          "animation": { "state": "idle", "frame": 0 },
+          "distanceFromCamera": 30
+        }
+      ]
+    },
+    {
+      "tick": 5,
+      "cameraX": 602,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 585,
+          "y": 600,
+          "facingAngle": 90,
+          "animation": { "state": "sword_slash", "frame": 1 },
+          "distanceFromCamera": 17
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 620,
+          "y": 600,
+          "facingAngle": 270,
+          "animation": { "state": "block", "frame": 1 },
+          "distanceFromCamera": 18
+        },
+        {
+          "entityId": "crowd_1",
+          "entityType": "spectator",
+          "x": 550,
+          "y": 550,
+          "facingAngle": 135,
+          "animation": { "state": "cheering", "frame": 2 },
+          "distanceFromCamera": 72
+        },
+        {
+          "entityId": "crowd_2",
+          "entityType": "spectator",
+          "x": 650,
+          "y": 550,
+          "facingAngle": 225,
+          "animation": { "state": "gasping", "frame": 0 },
+          "distanceFromCamera": 70
+        },
+        {
+          "entityId": "crowd_3",
+          "entityType": "spectator",
+          "x": 550,
+          "y": 650,
+          "facingAngle": 45,
+          "animation": { "state": "cheering", "frame": 3 },
+          "distanceFromCamera": 72
+        },
+        {
+          "entityId": "crowd_4",
+          "entityType": "spectator",
+          "x": 650,
+          "y": 650,
+          "facingAngle": 315,
+          "animation": { "state": "gasping", "frame": 0 },
+          "distanceFromCamera": 70
+        },
+        {
+          "entityId": "referee",
+          "entityType": "official",
+          "x": 600,
+          "y": 570,
+          "facingAngle": 180,
+          "animation": { "state": "watching", "frame": 1 },
+          "distanceFromCamera": 30
+        }
+      ]
+    },
+    {
+      "tick": 10,
+      "cameraX": 605,
+      "cameraY": 602,
+      "cameraAngle": 175,
+      "cameraZoom": 1.4,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 590,
+          "y": 602,
+          "facingAngle": 90,
+          "animation": { "state": "lunge", "frame": 2 },
+          "distanceFromCamera": 15
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 618,
+          "y": 598,
+          "facingAngle": 270,
+          "animation": { "state": "dodge", "frame": 2 },
+          "distanceFromCamera": 13
+        },
+        {
+          "entityId": "crowd_1",
+          "entityType": "spectator",
+          "x": 550,
+          "y": 550,
+          "facingAngle": 135,
+          "animation": { "state": "excited_jump", "frame": 0 },
+          "distanceFromCamera": 75
+        },
+        {
+          "entityId": "crowd_2",
+          "entityType": "spectator",
+          "x": 650,
+          "y": 550,
+          "facingAngle": 225,
+          "animation": { "state": "excited_jump", "frame": 1 },
+          "distanceFromCamera": 73
+        },
+        {
+          "entityId": "crowd_3",
+          "entityType": "spectator",
+          "x": 550,
+          "y": 650,
+          "facingAngle": 45,
+          "animation": { "state": "excited_jump", "frame": 0 },
+          "distanceFromCamera": 75
+        },
+        {
+          "entityId": "crowd_4",
+          "entityType": "spectator",
+          "x": 650,
+          "y": 650,
+          "facingAngle": 315,
+          "animation": { "state": "excited_jump", "frame": 1 },
+          "distanceFromCamera": 73
+        },
+        {
+          "entityId": "referee",
+          "entityType": "official",
+          "x": 600,
+          "y": 565,
+          "facingAngle": 180,
+          "animation": { "state": "watching", "frame": 2 },
+          "distanceFromCamera": 37
+        }
+      ]
+    },
+    {
+      "tick": 15,
+      "cameraX": 608,
+      "cameraY": 604,
+      "cameraAngle": 170,
+      "cameraZoom": 1.5,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 595,
+          "y": 605,
+          "facingAngle": 90,
+          "animation": { "state": "shield_bash", "frame": 3 },
+          "distanceFromCamera": 13
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 615,
+          "y": 595,
+          "facingAngle": 270,
+          "animation": { "state": "staggered", "frame": 0 },
+          "distanceFromCamera": 10
+        },
+        {
+          "entityId": "crowd_1",
+          "entityType": "spectator",
+          "x": 550,
+          "y": 550,
+          "facingAngle": 135,
+          "animation": { "state": "roaring", "frame": 0 },
+          "distanceFromCamera": 78
+        },
+        {
+          "entityId": "crowd_2",
+          "entityType": "spectator",
+          "x": 650,
+          "y": 550,
+          "facingAngle": 225,
+          "animation": { "state": "roaring", "frame": 1 },
+          "distanceFromCamera": 76
+        },
+        {
+          "entityId": "crowd_3",
+          "entityType": "spectator",
+          "x": 550,
+          "y": 650,
+          "facingAngle": 45,
+          "animation": { "state": "roaring", "frame": 0 },
+          "distanceFromCamera": 78
+        },
+        {
+          "entityId": "crowd_4",
+          "entityType": "spectator",
+          "x": 650,
+          "y": 650,
+          "facingAngle": 315,
+          "animation": { "state": "roaring", "frame": 1 },
+          "distanceFromCamera": 76
+        },
+        {
+          "entityId": "referee",
+          "entityType": "official",
+          "x": 598,
+          "y": 560,
+          "facingAngle": 180,
+          "animation": { "state": "reacting", "frame": 0 },
+          "distanceFromCamera": 44
+        }
+      ]
+    },
+    {
+      "tick": 20,
+      "cameraX": 610,
+      "cameraY": 605,
+      "cameraAngle": 165,
+      "cameraZoom": 1.6,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 600,
+          "y": 608,
+          "facingAngle": 90,
+          "animation": { "state": "victory_pose", "frame": 0 },
+          "distanceFromCamera": 10
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 612,
+          "y": 592,
+          "facingAngle": 270,
+          "animation": { "state": "defeated", "frame": 1 },
+          "distanceFromCamera": 14
+        },
+        {
+          "entityId": "crowd_1",
+          "entityType": "spectator",
+          "x": 550,
+          "y": 550,
+          "facingAngle": 135,
+          "animation": { "state": "wild_celebration", "frame": 2 },
+          "distanceFromCamera": 82
+        },
+        {
+          "entityId": "crowd_2",
+          "entityType": "spectator",
+          "x": 650,
+          "y": 550,
+          "facingAngle": 225,
+          "animation": { "state": "disappointed", "frame": 0 },
+          "distanceFromCamera": 80
+        },
+        {
+          "entityId": "crowd_3",
+          "entityType": "spectator",
+          "x": 550,
+          "y": 650,
+          "facingAngle": 45,
+          "animation": { "state": "wild_celebration", "frame": 3 },
+          "distanceFromCamera": 82
+        },
+        {
+          "entityId": "crowd_4",
+          "entityType": "spectator",
+          "x": 650,
+          "y": 650,
+          "facingAngle": 315,
+          "animation": { "state": "disappointed", "frame": 1 },
+          "distanceFromCamera": 80
+        },
+        {
+          "entityId": "referee",
+          "entityType": "official",
+          "x": 595,
+          "y": 555,
+          "facingAngle": 90,
+          "animation": { "state": "raising_hand", "frame": 1 },
+          "distanceFromCamera": 52
+        }
+      ]
+    }
+  ]
+}

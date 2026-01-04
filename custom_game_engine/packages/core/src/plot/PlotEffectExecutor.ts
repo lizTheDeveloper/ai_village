@@ -8,7 +8,6 @@
  */
 
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import type {
   PlotEffect,
   PlotEffectContext,
@@ -61,7 +60,7 @@ export function executeEffect(
       if (!relationship) break;
 
       const updated = updateTrust(relationship, effect.agent_id, effect.trust_delta);
-      entity.addComponent(updated);
+      world.addComponent(context.entityId, updated);
       break;
     }
 
@@ -99,7 +98,7 @@ export function executeEffect(
       if (!mood) break;
 
       const updated = applyMoodChange(mood, effect.delta, context.personalTick);
-      entity.addComponent(updated);
+      world.addComponent(context.entityId, updated);
       break;
     }
 
@@ -113,7 +112,7 @@ export function executeEffect(
       const currentValue = mood.factors[effect.factor];
       const newValue = Math.max(-100, Math.min(100, currentValue + effect.delta));
       const updated = updateMoodFactor(mood, effect.factor, newValue);
-      entity.addComponent(updated);
+      world.addComponent(context.entityId, updated);
       break;
     }
 
@@ -150,7 +149,7 @@ export function executeEffect(
         stress: updatedStress,
       };
 
-      entity.addComponent(updatedMood);
+      world.addComponent(context.entityId, updatedMood);
       break;
     }
 
@@ -172,7 +171,7 @@ export function executeEffect(
         stress: updatedStress,
       };
 
-      entity.addComponent(updatedMood);
+      world.addComponent(context.entityId, updatedMood);
       break;
     }
 
@@ -208,7 +207,7 @@ export function executeEffect(
         emotionalState: breakdownEmotions[effect.breakdown_type] ?? 'despairing',
       };
 
-      entity.addComponent(updatedMood);
+      world.addComponent(context.entityId, updatedMood);
       break;
     }
 
@@ -226,7 +225,7 @@ export function executeEffect(
         emotionalState: effect.state,
       };
 
-      entity.addComponent(updatedMood);
+      world.addComponent(context.entityId, updatedMood);
 
       // TODO: Store duration and reset after duration_ticks
       // This would require a separate system to track temporary states
@@ -257,7 +256,7 @@ export function executeEffect(
         relationship = updateAffinity(relationship, targetId, effect.affinity_delta);
       }
 
-      entity.addComponent(relationship);
+      world.addComponent(context.entityId, relationship);
       break;
     }
 
@@ -281,7 +280,7 @@ export function executeEffect(
           relationship = updateAffinity(relationship, effect.agent_id, effect.initial_affinity);
         }
 
-        entity.addComponent(relationship);
+        world.addComponent(context.entityId, relationship);
       }
       break;
     }

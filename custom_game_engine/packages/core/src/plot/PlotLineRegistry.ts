@@ -122,6 +122,7 @@ class PlotLineRegistry {
       soul_id: string;
       assigned_at_personal_tick: number;
       parameter_bindings?: Record<string, any>;
+      agent_bindings?: Record<string, string>;
     }
   ): PlotLineInstance | null {
     const template = this.templates.get(template_id);
@@ -146,6 +147,7 @@ class PlotLineRegistry {
       stage_entered_at: params.assigned_at_personal_tick,
       stages_visited: [],
       parameters,
+      bound_agents: params.agent_bindings ?? {},
     };
 
     return instance;

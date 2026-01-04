@@ -1,0 +1,506 @@
+{
+  "recordingId": "rec_magic_ritual_001",
+  "title": "ARCANE DISASTER - Ritual Gone Wrong",
+  "description": "Apprentice mages attempt summoning ritual with catastrophic results",
+  "recordedBy": "Scrying Mirror #7",
+  "recordedAt": 1704672400000,
+  "duration": 14,
+  "quality": 0.89,
+  "frames": [
+    {
+      "tick": 0,
+      "cameraX": 900,
+      "cameraY": 900,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "mage_lead",
+          "entityType": "mage",
+          "x": 900,
+          "y": 880,
+          "facingAngle": 180,
+          "animation": { "state": "chanting", "frame": 0 },
+          "distanceFromCamera": 20
+        },
+        {
+          "entityId": "mage_1",
+          "entityType": "mage",
+          "x": 880,
+          "y": 900,
+          "facingAngle": 45,
+          "animation": { "state": "chanting", "frame": 1 },
+          "distanceFromCamera": 20
+        },
+        {
+          "entityId": "mage_2",
+          "entityType": "mage",
+          "x": 920,
+          "y": 900,
+          "facingAngle": 315,
+          "animation": { "state": "chanting", "frame": 0 },
+          "distanceFromCamera": 20
+        },
+        {
+          "entityId": "mage_3",
+          "entityType": "mage",
+          "x": 880,
+          "y": 920,
+          "facingAngle": 135,
+          "animation": { "state": "chanting", "frame": 2 },
+          "distanceFromCamera": 28
+        },
+        {
+          "entityId": "mage_4",
+          "entityType": "mage",
+          "x": 920,
+          "y": 920,
+          "facingAngle": 225,
+          "animation": { "state": "chanting", "frame": 1 },
+          "distanceFromCamera": 28
+        },
+        {
+          "entityId": "ritual_circle",
+          "entityType": "magic_effect",
+          "x": 900,
+          "y": 905,
+          "facingAngle": 0,
+          "animation": { "state": "glowing_faint", "frame": 0 },
+          "distanceFromCamera": 5
+        },
+        {
+          "entityId": "observer",
+          "entityType": "scholar",
+          "x": 860,
+          "y": 880,
+          "facingAngle": 90,
+          "animation": { "state": "watching", "frame": 0 },
+          "distanceFromCamera": 56
+        }
+      ]
+    },
+    {
+      "tick": 4,
+      "cameraX": 900,
+      "cameraY": 902,
+      "cameraAngle": 180,
+      "cameraZoom": 1.15,
+      "entities": [
+        {
+          "entityId": "mage_lead",
+          "entityType": "mage",
+          "x": 900,
+          "y": 880,
+          "facingAngle": 180,
+          "animation": { "state": "ritual_gesture", "frame": 2 },
+          "distanceFromCamera": 22
+        },
+        {
+          "entityId": "mage_1",
+          "entityType": "mage",
+          "x": 880,
+          "y": 900,
+          "facingAngle": 45,
+          "animation": { "state": "channeling", "frame": 1 },
+          "distanceFromCamera": 22
+        },
+        {
+          "entityId": "mage_2",
+          "entityType": "mage",
+          "x": 920,
+          "y": 900,
+          "facingAngle": 315,
+          "animation": { "state": "channeling", "frame": 2 },
+          "distanceFromCamera": 20
+        },
+        {
+          "entityId": "mage_3",
+          "entityType": "mage",
+          "x": 880,
+          "y": 920,
+          "facingAngle": 135,
+          "animation": { "state": "channeling", "frame": 0 },
+          "distanceFromCamera": 30
+        },
+        {
+          "entityId": "mage_4",
+          "entityType": "mage",
+          "x": 920,
+          "y": 920,
+          "facingAngle": 225,
+          "animation": { "state": "channeling", "frame": 1 },
+          "distanceFromCamera": 30
+        },
+        {
+          "entityId": "ritual_circle",
+          "entityType": "magic_effect",
+          "x": 900,
+          "y": 905,
+          "facingAngle": 0,
+          "animation": { "state": "pulsing_bright", "frame": 2 },
+          "distanceFromCamera": 3
+        },
+        {
+          "entityId": "observer",
+          "entityType": "scholar",
+          "x": 860,
+          "y": 880,
+          "facingAngle": 90,
+          "animation": { "state": "taking_notes", "frame": 1 },
+          "distanceFromCamera": 58
+        },
+        {
+          "entityId": "energy_wisp_1",
+          "entityType": "magic_effect",
+          "x": 895,
+          "y": 900,
+          "facingAngle": 0,
+          "animation": { "state": "swirling", "frame": 0 },
+          "distanceFromCamera": 5
+        },
+        {
+          "entityId": "energy_wisp_2",
+          "entityType": "magic_effect",
+          "x": 905,
+          "y": 900,
+          "facingAngle": 0,
+          "animation": { "state": "swirling", "frame": 1 },
+          "distanceFromCamera": 5
+        }
+      ]
+    },
+    {
+      "tick": 8,
+      "cameraX": 900,
+      "cameraY": 905,
+      "cameraAngle": 180,
+      "cameraZoom": 1.25,
+      "entities": [
+        {
+          "entityId": "mage_lead",
+          "entityType": "mage",
+          "x": 900,
+          "y": 880,
+          "facingAngle": 180,
+          "animation": { "state": "alarmed", "frame": 0 },
+          "distanceFromCamera": 25
+        },
+        {
+          "entityId": "mage_1",
+          "entityType": "mage",
+          "x": 880,
+          "y": 900,
+          "facingAngle": 45,
+          "animation": { "state": "struggling", "frame": 2 },
+          "distanceFromCamera": 25
+        },
+        {
+          "entityId": "mage_2",
+          "entityType": "mage",
+          "x": 920,
+          "y": 900,
+          "facingAngle": 315,
+          "animation": { "state": "struggling", "frame": 1 },
+          "distanceFromCamera": 20
+        },
+        {
+          "entityId": "mage_3",
+          "entityType": "mage",
+          "x": 880,
+          "y": 920,
+          "facingAngle": 135,
+          "animation": { "state": "struggling", "frame": 0 },
+          "distanceFromCamera": 32
+        },
+        {
+          "entityId": "mage_4",
+          "entityType": "mage",
+          "x": 920,
+          "y": 920,
+          "facingAngle": 225,
+          "animation": { "state": "struggling", "frame": 2 },
+          "distanceFromCamera": 32
+        },
+        {
+          "entityId": "ritual_circle",
+          "entityType": "magic_effect",
+          "x": 900,
+          "y": 905,
+          "facingAngle": 0,
+          "animation": { "state": "unstable_flickering", "frame": 3 },
+          "distanceFromCamera": 0
+        },
+        {
+          "entityId": "observer",
+          "entityType": "scholar",
+          "x": 860,
+          "y": 880,
+          "facingAngle": 90,
+          "animation": { "state": "shocked", "frame": 0 },
+          "distanceFromCamera": 60
+        },
+        {
+          "entityId": "energy_wisp_1",
+          "entityType": "magic_effect",
+          "x": 890,
+          "y": 895,
+          "facingAngle": 0,
+          "animation": { "state": "chaotic", "frame": 2 },
+          "distanceFromCamera": 12
+        },
+        {
+          "entityId": "energy_wisp_2",
+          "entityType": "magic_effect",
+          "x": 910,
+          "y": 895,
+          "facingAngle": 0,
+          "animation": { "state": "chaotic", "frame": 3 },
+          "distanceFromCamera": 12
+        },
+        {
+          "entityId": "portal_forming",
+          "entityType": "magic_effect",
+          "x": 900,
+          "y": 905,
+          "facingAngle": 0,
+          "animation": { "state": "tearing", "frame": 0 },
+          "distanceFromCamera": 0
+        }
+      ]
+    },
+    {
+      "tick": 11,
+      "cameraX": 898,
+      "cameraY": 907,
+      "cameraAngle": 175,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "mage_lead",
+          "entityType": "mage",
+          "x": 900,
+          "y": 875,
+          "facingAngle": 180,
+          "animation": { "state": "blown_back", "frame": 1 },
+          "distanceFromCamera": 32
+        },
+        {
+          "entityId": "mage_1",
+          "entityType": "mage",
+          "x": 875,
+          "y": 895,
+          "facingAngle": 225,
+          "animation": { "state": "blown_back", "frame": 2 },
+          "distanceFromCamera": 30
+        },
+        {
+          "entityId": "mage_2",
+          "entityType": "mage",
+          "x": 925,
+          "y": 895,
+          "facingAngle": 315,
+          "animation": { "state": "blown_back", "frame": 1 },
+          "distanceFromCamera": 28
+        },
+        {
+          "entityId": "mage_3",
+          "entityType": "mage",
+          "x": 875,
+          "y": 925,
+          "facingAngle": 135,
+          "animation": { "state": "falling", "frame": 0 },
+          "distanceFromCamera": 38
+        },
+        {
+          "entityId": "mage_4",
+          "entityType": "mage",
+          "x": 925,
+          "y": 925,
+          "facingAngle": 45,
+          "animation": { "state": "falling", "frame": 1 },
+          "distanceFromCamera": 38
+        },
+        {
+          "entityId": "ritual_circle",
+          "entityType": "magic_effect",
+          "x": 900,
+          "y": 905,
+          "facingAngle": 0,
+          "animation": { "state": "exploding", "frame": 1 },
+          "distanceFromCamera": 2
+        },
+        {
+          "entityId": "observer",
+          "entityType": "scholar",
+          "x": 855,
+          "y": 875,
+          "facingAngle": 270,
+          "animation": { "state": "fleeing", "frame": 2 },
+          "distanceFromCamera": 68
+        },
+        {
+          "entityId": "energy_wisp_1",
+          "entityType": "magic_effect",
+          "x": 885,
+          "y": 890,
+          "facingAngle": 225,
+          "animation": { "state": "scattering", "frame": 0 },
+          "distanceFromCamera": 22
+        },
+        {
+          "entityId": "energy_wisp_2",
+          "entityType": "magic_effect",
+          "x": 915,
+          "y": 890,
+          "facingAngle": 315,
+          "animation": { "state": "scattering", "frame": 1 },
+          "distanceFromCamera": 22
+        },
+        {
+          "entityId": "portal_forming",
+          "entityType": "magic_effect",
+          "x": 900,
+          "y": 905,
+          "facingAngle": 0,
+          "animation": { "state": "rupturing", "frame": 2 },
+          "distanceFromCamera": 2
+        },
+        {
+          "entityId": "demon_emerging",
+          "entityType": "demon",
+          "x": 900,
+          "y": 905,
+          "facingAngle": 180,
+          "animation": { "state": "emerging", "frame": 0 },
+          "distanceFromCamera": 2
+        }
+      ]
+    },
+    {
+      "tick": 14,
+      "cameraX": 895,
+      "cameraY": 910,
+      "cameraAngle": 170,
+      "cameraZoom": 1.4,
+      "entities": [
+        {
+          "entityId": "mage_lead",
+          "entityType": "mage",
+          "x": 900,
+          "y": 870,
+          "facingAngle": 180,
+          "animation": { "state": "unconscious", "frame": 0 },
+          "distanceFromCamera": 40
+        },
+        {
+          "entityId": "mage_1",
+          "entityType": "mage",
+          "x": 870,
+          "y": 890,
+          "facingAngle": 225,
+          "animation": { "state": "crawling_away", "frame": 1 },
+          "distanceFromCamera": 38
+        },
+        {
+          "entityId": "mage_2",
+          "entityType": "mage",
+          "x": 930,
+          "y": 890,
+          "facingAngle": 315,
+          "animation": { "state": "crawling_away", "frame": 2 },
+          "distanceFromCamera": 37
+        },
+        {
+          "entityId": "mage_3",
+          "entityType": "mage",
+          "x": 870,
+          "y": 930,
+          "facingAngle": 135,
+          "animation": { "state": "unconscious", "frame": 1 },
+          "distanceFromCamera": 45
+        },
+        {
+          "entityId": "mage_4",
+          "entityType": "mage",
+          "x": 930,
+          "y": 930,
+          "facingAngle": 45,
+          "animation": { "state": "staggering_up", "frame": 0 },
+          "distanceFromCamera": 45
+        },
+        {
+          "entityId": "ritual_circle",
+          "entityType": "magic_effect",
+          "x": 900,
+          "y": 905,
+          "facingAngle": 0,
+          "animation": { "state": "smoking_crater", "frame": 0 },
+          "distanceFromCamera": 5
+        },
+        {
+          "entityId": "observer",
+          "entityType": "scholar",
+          "x": 845,
+          "y": 865,
+          "facingAngle": 225,
+          "animation": { "state": "running", "frame": 4 },
+          "distanceFromCamera": 82
+        },
+        {
+          "entityId": "energy_wisp_1",
+          "entityType": "magic_effect",
+          "x": 875,
+          "y": 880,
+          "facingAngle": 225,
+          "animation": { "state": "dissipating", "frame": 2 },
+          "distanceFromCamera": 42
+        },
+        {
+          "entityId": "energy_wisp_2",
+          "entityType": "magic_effect",
+          "x": 925,
+          "y": 880,
+          "facingAngle": 315,
+          "animation": { "state": "dissipating", "frame": 3 },
+          "distanceFromCamera": 42
+        },
+        {
+          "entityId": "portal_forming",
+          "entityType": "magic_effect",
+          "x": 900,
+          "y": 905,
+          "facingAngle": 0,
+          "animation": { "state": "collapsing", "frame": 1 },
+          "distanceFromCamera": 5
+        },
+        {
+          "entityId": "demon_emerging",
+          "entityType": "demon",
+          "x": 900,
+          "y": 908,
+          "facingAngle": 180,
+          "animation": { "state": "roaring", "frame": 2 },
+          "distanceFromCamera": 2
+        },
+        {
+          "entityId": "fire_1",
+          "entityType": "fire_effect",
+          "x": 885,
+          "y": 900,
+          "facingAngle": 0,
+          "animation": { "state": "burning", "frame": 0 },
+          "distanceFromCamera": 18
+        },
+        {
+          "entityId": "fire_2",
+          "entityType": "fire_effect",
+          "x": 915,
+          "y": 900,
+          "facingAngle": 0,
+          "animation": { "state": "burning", "frame": 1 },
+          "distanceFromCamera": 18
+        }
+      ]
+    }
+  ]
+}

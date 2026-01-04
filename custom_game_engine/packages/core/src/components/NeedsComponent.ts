@@ -232,13 +232,13 @@ export class NeedsComponent extends ComponentBase {
 }
 
 /**
- * Check if agent is hungry (below 40%)
+ * Check if agent is hungry (below 50%)
  */
 export function isHungry(needs: NeedsComponent): boolean {
   if (!needs) {
     throw new Error('isHungry: needs parameter is required');
   }
-  return needs.hunger < 0.4;
+  return needs.hunger < 0.5; // Agents start seeking food at 50% hunger
 }
 
 /**

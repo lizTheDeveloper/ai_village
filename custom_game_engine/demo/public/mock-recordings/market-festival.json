@@ -1,0 +1,533 @@
+{
+  "recordingId": "rec_market_festival_001",
+  "title": "HARVEST MARKET - Grand Opening Day",
+  "description": "Bustling village market with merchants, performers, and shoppers",
+  "recordedBy": "Town Crier Bob",
+  "recordedAt": 1704586000000,
+  "duration": 18,
+  "quality": 0.97,
+  "frames": [
+    {
+      "tick": 0,
+      "cameraX": 800,
+      "cameraY": 800,
+      "cameraAngle": 180,
+      "cameraZoom": 0.8,
+      "entities": [
+        {
+          "entityId": "merchant_1",
+          "entityType": "merchant",
+          "x": 760,
+          "y": 780,
+          "facingAngle": 90,
+          "animation": { "state": "selling", "frame": 0 },
+          "distanceFromCamera": 56
+        },
+        {
+          "entityId": "merchant_2",
+          "entityType": "merchant",
+          "x": 840,
+          "y": 780,
+          "facingAngle": 270,
+          "animation": { "state": "selling", "frame": 1 },
+          "distanceFromCamera": 56
+        },
+        {
+          "entityId": "customer_1",
+          "entityType": "villager",
+          "x": 770,
+          "y": 790,
+          "facingAngle": 270,
+          "animation": { "state": "browsing", "frame": 0 },
+          "distanceFromCamera": 42
+        },
+        {
+          "entityId": "customer_2",
+          "entityType": "villager",
+          "x": 830,
+          "y": 790,
+          "facingAngle": 90,
+          "animation": { "state": "browsing", "frame": 1 },
+          "distanceFromCamera": 42
+        },
+        {
+          "entityId": "customer_3",
+          "entityType": "villager",
+          "x": 800,
+          "y": 810,
+          "facingAngle": 0,
+          "animation": { "state": "walking", "frame": 0 },
+          "distanceFromCamera": 14
+        },
+        {
+          "entityId": "performer_1",
+          "entityType": "bard",
+          "x": 750,
+          "y": 820,
+          "facingAngle": 135,
+          "animation": { "state": "juggling", "frame": 0 },
+          "distanceFromCamera": 57
+        },
+        {
+          "entityId": "performer_2",
+          "entityType": "bard",
+          "x": 850,
+          "y": 820,
+          "facingAngle": 225,
+          "animation": { "state": "dancing", "frame": 0 },
+          "distanceFromCamera": 57
+        },
+        {
+          "entityId": "child_1",
+          "entityType": "child",
+          "x": 780,
+          "y": 815,
+          "facingAngle": 90,
+          "animation": { "state": "running", "frame": 0 },
+          "distanceFromCamera": 30
+        },
+        {
+          "entityId": "child_2",
+          "entityType": "child",
+          "x": 820,
+          "y": 815,
+          "facingAngle": 270,
+          "animation": { "state": "running", "frame": 1 },
+          "distanceFromCamera": 30
+        },
+        {
+          "entityId": "guard",
+          "entityType": "guard",
+          "x": 730,
+          "y": 800,
+          "facingAngle": 90,
+          "animation": { "state": "patrolling", "frame": 0 },
+          "distanceFromCamera": 70
+        },
+        {
+          "entityId": "food_vendor",
+          "entityType": "merchant",
+          "x": 800,
+          "y": 770,
+          "facingAngle": 180,
+          "animation": { "state": "cooking", "frame": 0 },
+          "distanceFromCamera": 30
+        },
+        {
+          "entityId": "customer_4",
+          "entityType": "villager",
+          "x": 805,
+          "y": 780,
+          "facingAngle": 0,
+          "animation": { "state": "eating", "frame": 0 },
+          "distanceFromCamera": 26
+        }
+      ]
+    },
+    {
+      "tick": 5,
+      "cameraX": 805,
+      "cameraY": 800,
+      "cameraAngle": 175,
+      "cameraZoom": 0.85,
+      "entities": [
+        {
+          "entityId": "merchant_1",
+          "entityType": "merchant",
+          "x": 760,
+          "y": 780,
+          "facingAngle": 90,
+          "animation": { "state": "selling", "frame": 2 },
+          "distanceFromCamera": 60
+        },
+        {
+          "entityId": "merchant_2",
+          "entityType": "merchant",
+          "x": 840,
+          "y": 780,
+          "facingAngle": 270,
+          "animation": { "state": "haggling", "frame": 0 },
+          "distanceFromCamera": 50
+        },
+        {
+          "entityId": "customer_1",
+          "entityType": "villager",
+          "x": 770,
+          "y": 785,
+          "facingAngle": 270,
+          "animation": { "state": "examining_goods", "frame": 1 },
+          "distanceFromCamera": 45
+        },
+        {
+          "entityId": "customer_2",
+          "entityType": "villager",
+          "x": 835,
+          "y": 790,
+          "facingAngle": 90,
+          "animation": { "state": "haggling", "frame": 1 },
+          "distanceFromCamera": 38
+        },
+        {
+          "entityId": "customer_3",
+          "entityType": "villager",
+          "x": 810,
+          "y": 810,
+          "facingAngle": 45,
+          "animation": { "state": "walking", "frame": 2 },
+          "distanceFromCamera": 12
+        },
+        {
+          "entityId": "performer_1",
+          "entityType": "bard",
+          "x": 750,
+          "y": 820,
+          "facingAngle": 135,
+          "animation": { "state": "juggling", "frame": 3 },
+          "distanceFromCamera": 60
+        },
+        {
+          "entityId": "performer_2",
+          "entityType": "bard",
+          "x": 850,
+          "y": 820,
+          "facingAngle": 225,
+          "animation": { "state": "dancing", "frame": 3 },
+          "distanceFromCamera": 60
+        },
+        {
+          "entityId": "child_1",
+          "entityType": "child",
+          "x": 790,
+          "y": 818,
+          "facingAngle": 90,
+          "animation": { "state": "running", "frame": 3 },
+          "distanceFromCamera": 26
+        },
+        {
+          "entityId": "child_2",
+          "entityType": "child",
+          "x": 810,
+          "y": 818,
+          "facingAngle": 270,
+          "animation": { "state": "running", "frame": 4 },
+          "distanceFromCamera": 23
+        },
+        {
+          "entityId": "guard",
+          "entityType": "guard",
+          "x": 740,
+          "y": 800,
+          "facingAngle": 90,
+          "animation": { "state": "patrolling", "frame": 2 },
+          "distanceFromCamera": 65
+        },
+        {
+          "entityId": "food_vendor",
+          "entityType": "merchant",
+          "x": 800,
+          "y": 770,
+          "facingAngle": 180,
+          "animation": { "state": "cooking", "frame": 2 },
+          "distanceFromCamera": 30
+        },
+        {
+          "entityId": "customer_4",
+          "entityType": "villager",
+          "x": 808,
+          "y": 780,
+          "facingAngle": 0,
+          "animation": { "state": "eating", "frame": 2 },
+          "distanceFromCamera": 23
+        },
+        {
+          "entityId": "dog",
+          "entityType": "dog",
+          "x": 815,
+          "y": 825,
+          "facingAngle": 225,
+          "animation": { "state": "sniffing", "frame": 0 },
+          "distanceFromCamera": 30
+        }
+      ]
+    },
+    {
+      "tick": 10,
+      "cameraX": 810,
+      "cameraY": 802,
+      "cameraAngle": 170,
+      "cameraZoom": 0.9,
+      "entities": [
+        {
+          "entityId": "merchant_1",
+          "entityType": "merchant",
+          "x": 760,
+          "y": 780,
+          "facingAngle": 90,
+          "animation": { "state": "wrapping_goods", "frame": 0 },
+          "distanceFromCamera": 65
+        },
+        {
+          "entityId": "merchant_2",
+          "entityType": "merchant",
+          "x": 840,
+          "y": 780,
+          "facingAngle": 270,
+          "animation": { "state": "counting_coins", "frame": 1 },
+          "distanceFromCamera": 48
+        },
+        {
+          "entityId": "customer_1",
+          "entityType": "villager",
+          "x": 768,
+          "y": 783,
+          "facingAngle": 270,
+          "animation": { "state": "purchasing", "frame": 2 },
+          "distanceFromCamera": 48
+        },
+        {
+          "entityId": "customer_2",
+          "entityType": "villager",
+          "x": 838,
+          "y": 788,
+          "facingAngle": 90,
+          "animation": { "state": "satisfied", "frame": 0 },
+          "distanceFromCamera": 38
+        },
+        {
+          "entityId": "customer_3",
+          "entityType": "villager",
+          "x": 820,
+          "y": 808,
+          "facingAngle": 90,
+          "animation": { "state": "walking", "frame": 4 },
+          "distanceFromCamera": 12
+        },
+        {
+          "entityId": "performer_1",
+          "entityType": "bard",
+          "x": 752,
+          "y": 820,
+          "facingAngle": 135,
+          "animation": { "state": "juggling", "frame": 6 },
+          "distanceFromCamera": 63
+        },
+        {
+          "entityId": "performer_2",
+          "entityType": "bard",
+          "x": 848,
+          "y": 820,
+          "facingAngle": 225,
+          "animation": { "state": "bowing", "frame": 0 },
+          "distanceFromCamera": 57
+        },
+        {
+          "entityId": "child_1",
+          "entityType": "child",
+          "x": 800,
+          "y": 820,
+          "facingAngle": 180,
+          "animation": { "state": "excited", "frame": 0 },
+          "distanceFromCamera": 22
+        },
+        {
+          "entityId": "child_2",
+          "entityType": "child",
+          "x": 805,
+          "y": 820,
+          "facingAngle": 180,
+          "animation": { "state": "clapping", "frame": 1 },
+          "distanceFromCamera": 20
+        },
+        {
+          "entityId": "guard",
+          "entityType": "guard",
+          "x": 750,
+          "y": 800,
+          "facingAngle": 90,
+          "animation": { "state": "watching", "frame": 0 },
+          "distanceFromCamera": 60
+        },
+        {
+          "entityId": "food_vendor",
+          "entityType": "merchant",
+          "x": 800,
+          "y": 770,
+          "facingAngle": 180,
+          "animation": { "state": "serving", "frame": 1 },
+          "distanceFromCamera": 32
+        },
+        {
+          "entityId": "customer_4",
+          "entityType": "villager",
+          "x": 812,
+          "y": 780,
+          "facingAngle": 45,
+          "animation": { "state": "walking", "frame": 1 },
+          "distanceFromCamera": 22
+        },
+        {
+          "entityId": "dog",
+          "entityType": "dog",
+          "x": 820,
+          "y": 828,
+          "facingAngle": 180,
+          "animation": { "state": "begging", "frame": 1 },
+          "distanceFromCamera": 30
+        },
+        {
+          "entityId": "new_customer",
+          "entityType": "villager",
+          "x": 770,
+          "y": 810,
+          "facingAngle": 45,
+          "animation": { "state": "walking", "frame": 0 },
+          "distanceFromCamera": 44
+        }
+      ]
+    },
+    {
+      "tick": 15,
+      "cameraX": 812,
+      "cameraY": 805,
+      "cameraAngle": 165,
+      "cameraZoom": 1.0,
+      "entities": [
+        {
+          "entityId": "merchant_1",
+          "entityType": "merchant",
+          "x": 760,
+          "y": 780,
+          "facingAngle": 90,
+          "animation": { "state": "restocking", "frame": 1 },
+          "distanceFromCamera": 68
+        },
+        {
+          "entityId": "merchant_2",
+          "entityType": "merchant",
+          "x": 840,
+          "y": 780,
+          "facingAngle": 270,
+          "animation": { "state": "greeting", "frame": 0 },
+          "distanceFromCamera": 45
+        },
+        {
+          "entityId": "customer_1",
+          "entityType": "villager",
+          "x": 765,
+          "y": 780,
+          "facingAngle": 90,
+          "animation": { "state": "walking", "frame": 2 },
+          "distanceFromCamera": 52
+        },
+        {
+          "entityId": "customer_2",
+          "entityType": "villager",
+          "x": 845,
+          "y": 785,
+          "facingAngle": 270,
+          "animation": { "state": "browsing", "frame": 3 },
+          "distanceFromCamera": 38
+        },
+        {
+          "entityId": "customer_3",
+          "entityType": "villager",
+          "x": 828,
+          "y": 805,
+          "facingAngle": 135,
+          "animation": { "state": "walking", "frame": 5 },
+          "distanceFromCamera": 16
+        },
+        {
+          "entityId": "performer_1",
+          "entityType": "bard",
+          "x": 755,
+          "y": 822,
+          "facingAngle": 135,
+          "animation": { "state": "catching", "frame": 0 },
+          "distanceFromCamera": 64
+        },
+        {
+          "entityId": "performer_2",
+          "entityType": "bard",
+          "x": 845,
+          "y": 822,
+          "facingAngle": 225,
+          "animation": { "state": "flourish", "frame": 2 },
+          "distanceFromCamera": 54
+        },
+        {
+          "entityId": "child_1",
+          "entityType": "child",
+          "x": 805,
+          "y": 822,
+          "facingAngle": 180,
+          "animation": { "state": "laughing", "frame": 2 },
+          "distanceFromCamera": 18
+        },
+        {
+          "entityId": "child_2",
+          "entityType": "child",
+          "x": 810,
+          "y": 822,
+          "facingAngle": 180,
+          "animation": { "state": "jumping", "frame": 0 },
+          "distanceFromCamera": 17
+        },
+        {
+          "entityId": "guard",
+          "entityType": "guard",
+          "x": 758,
+          "y": 802,
+          "facingAngle": 90,
+          "animation": { "state": "patrolling", "frame": 4 },
+          "distanceFromCamera": 54
+        },
+        {
+          "entityId": "food_vendor",
+          "entityType": "merchant",
+          "x": 800,
+          "y": 770,
+          "facingAngle": 180,
+          "animation": { "state": "cooking", "frame": 5 },
+          "distanceFromCamera": 35
+        },
+        {
+          "entityId": "customer_4",
+          "entityType": "villager",
+          "x": 818,
+          "y": 775,
+          "facingAngle": 90,
+          "animation": { "state": "walking", "frame": 3 },
+          "distanceFromCamera": 30
+        },
+        {
+          "entityId": "dog",
+          "entityType": "dog",
+          "x": 822,
+          "y": 830,
+          "facingAngle": 135,
+          "animation": { "state": "wagging_tail", "frame": 2 },
+          "distanceFromCamera": 28
+        },
+        {
+          "entityId": "new_customer",
+          "entityType": "villager",
+          "x": 780,
+          "y": 808,
+          "facingAngle": 90,
+          "animation": { "state": "walking", "frame": 2 },
+          "distanceFromCamera": 35
+        },
+        {
+          "entityId": "town_crier",
+          "entityType": "official",
+          "x": 790,
+          "y": 795,
+          "facingAngle": 90,
+          "animation": { "state": "announcing", "frame": 0 },
+          "distanceFromCamera": 24
+        }
+      ]
+    }
+  ]
+}
