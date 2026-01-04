@@ -42,6 +42,361 @@ cd custom_game_engine/demo && npm run dev  # Restart Vite
 - **[openspec/README.md](./openspec/README.md)** - Overview of the OpenSpec workflow
 - **[openspec/AGENTS.md](./openspec/AGENTS.md)** - Detailed guide for agents working with specs
 
+## ♻️ Conservation of Game Matter: Nothing Is Ever Deleted
+
+**FUNDAMENTAL PRINCIPLE**: Like the conservation of matter in physics, **nothing in the game is ever truly deleted**.
+
+### The Rule
+
+**NEVER delete entities, souls, items, universes, or any game data.** Instead, mark them as corrupted, broken, or rejected and preserve them for future recovery.
+
+```typescript
+// ❌ BAD: Deleting data
+world.removeEntity(brokenEntity);
+delete corruptedSave;
+souls.splice(deadSoulIndex, 1);
+
+// ✅ GOOD: Mark as corrupted and preserve
+brokenEntity.addComponent({
+  type: 'corrupted',
+  corruption_reason: 'malformed_data',
+  corruption_date: Date.now(),
+  recoverable: true,
+});
+
+corruptedSave.status = 'corrupted';
+corruptedSave.preserve = true;
+
+deadSoul.addComponent({
+  type: 'deceased',
+  death_cause: 'old_age',
+  preserveForAfterlife: true,
+});
+```
+
+### Why This Matters
+
+1. **Future Recovery**: "Data fixer scripts" can repair corrupted content later
+2. **Emergent Gameplay**: Corrupted content becomes discoverable via special quests/items
+3. **No Data Loss**: Players never lose progress permanently
+4. **Debugging**: Can inspect what went wrong and why
+5. **Lore Integration**: "Corrupted universes" and "rejected spells" become part of the game world
+6. **Player Archaeology**: Finding broken/old content becomes part of gameplay
+
+### Corruption Types
+
+```typescript
+// Entities that failed validation
+{
+  type: 'corrupted',
+  corruption_reason: 'validation_failed' | 'malformed_data' | 'logic_error' | 'reality_breaking',
+  original_data: any,           // Preserve original for forensics
+  corruption_date: number,
+  recoverable: boolean,
+  recovery_requirements?: string[],  // ['data_fixer_script', 'shard_of_reality']
+}
+
+// Generated content rejected by validators
+{
+  type: 'rejected_artifact',
+  rejection_reason: 'too_overpowered' | 'unstable_magic' | 'lore_breaking' | 'too_meta',
+  rejected_by: string,          // 'god_of_wisdom' | 'magic_validator'
+  banished_to: 'limbo' | 'void' | 'forbidden_library' | 'rejected_realm',
+  retrievable: boolean,
+  danger_level: number,         // 1-10
+}
+
+// Worlds/universes that failed generation
+{
+  type: 'corrupted_universe',
+  generation_error: string,
+  stability: number,            // 0-100
+  accessible_via: string[],     // ['shard_of_dimensional_access', 'void_portal']
+  contains_treasures: boolean,  // Corrupted worlds might have unique items
+}
+```
+
+### The Land of Rejected Things
+
+All corrupted/rejected content is banished to special realms:
+
+- **Limbo**: Mildly corrupted content, low danger
+- **The Void**: Severely broken entities, high danger
+- **Forbidden Library**: Rejected spells and overpowered items
+- **Rejected Realm**: Failed creations and meta-breaking content
+- **Corrupted Timelines**: Universes that failed generation
+
+Players can access these realms via special items/quests to recover lost content.
+
+### Implementation
+
+```typescript
+// Instead of deleting, use a corruption service
+class CorruptionService {
+  markAsCorrupted(entity: Entity, reason: string): void {
+    // Never delete - add corruption component
+    entity.addComponent({
+      type: 'corrupted',
+      corruption_reason: reason,
+      corruption_date: Date.now(),
+      recoverable: this.assessRecoverability(entity, reason),
+    });
+
+    // Move to appropriate corrupted realm
+    this.banishToCorruptedRealm(entity, reason);
+
+    // Preserve in save file (corruption components are saved)
+    console.log(`[Corruption] Preserved corrupted entity: ${entity.id}`);
+  }
+
+  // Future: Data recovery tools
+  async attemptRecovery(corruptedEntity: Entity, fixerScript: string): Promise<boolean> {
+    // Apply data fixer script to repair corruption
+    // If successful, remove corruption component and restore to normal realm
+  }
+}
+```
+
+### Save/Load Integration
+
+The save system automatically preserves all entities with corruption components:
+
+```json
+{
+  "world": {
+    "entities": [
+      {
+        "id": "corrupted_spell_12345",
+        "components": {
+          "generated_content": {
+            "contentType": "spell",
+            "content": { "spellName": "Reality Tear", "damage": 9999 }
+          },
+          "rejected_artifact": {
+            "rejection_reason": "too_overpowered",
+            "banished_to": "forbidden_library",
+            "retrievable": true,
+            "danger_level": 10
+          }
+        }
+      },
+      {
+        "id": "corrupted_universe_789",
+        "components": {
+          "corrupted_universe": {
+            "generation_error": "NaN coordinates in chunk generation",
+            "stability": 23,
+            "accessible_via": ["shard_of_dimensional_access"]
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+All corrupted content persists across saves/loads and can be recovered, accessed, or studied later.
+
+### Examples
+
+**Corrupted Item**:
+```typescript
+// Item with invalid stats - don't delete!
+if (item.damage < 0 || item.damage > 1000) {
+  item.addComponent({
+    type: 'corrupted',
+    corruption_reason: 'invalid_damage_value',
+    original_damage: item.damage,
+    recoverable: true,
+  });
+  item.damage = 0; // Safe default
+  // Item still exists, can be fixed later with "Repair Corrupted Item" spell
+}
+```
+
+**Rejected Spell**:
+```typescript
+// LLM generated a spell that's too powerful
+if (spell.damage > 500) {
+  entity.addComponent({
+    type: 'rejected_artifact',
+    rejection_reason: 'too_overpowered',
+    rejected_by: 'god_of_balance',
+    banished_to: 'forbidden_library',
+    retrievable: true,  // Players can quest for this!
+    danger_level: 9,
+  });
+  // Don't delete - banish to Forbidden Library where players can find it
+}
+```
+
+**Failed Universe**:
+```typescript
+// World generation crashed mid-creation
+try {
+  universe = generateUniverse(seed);
+} catch (error) {
+  // Don't discard - create corrupted universe entity
+  const corruptedUniverse = world.createEntity();
+  corruptedUniverse.addComponent({
+    type: 'corrupted_universe',
+    generation_error: error.message,
+    seed: seed,
+    stability: 0,
+    accessible_via: ['shard_of_broken_worlds'],
+    contains_treasures: true,  // Broken worlds have unique glitched items!
+  });
+  // This corrupted universe now exists as a explorable location
+}
+```
+
+**Dead Soul**:
+```typescript
+// Agent dies - don't delete soul!
+agent.addComponent({
+  type: 'deceased',
+  death_cause: 'dragon_fire',
+  death_location: { x: 100, y: 200 },
+  preserveForAfterlife: true,
+});
+agent.addComponent({
+  type: 'ghost',
+  hauntsLocation: { x: 100, y: 200 },
+  visible: false,
+  resurrectableVia: ['resurrection_spell', 'necromancy'],
+});
+// Soul still exists, can haunt, can be resurrected, can exist in afterlife
+```
+
+### Client vs Server: The Eternal Archive
+
+**Client-side deletion is fine. Server-side preservation is forever.**
+
+```typescript
+// Player deletes universe from their local save
+clientWorld.removeUniverse('broken_universe_beta_test_001');
+// ✅ Removed from client - they won't see it anymore
+
+// Server preserves everything
+serverWorld.markUniverseAsOrphaned('broken_universe_beta_test_001', {
+  reason: 'client_deleted',
+  original_player: 'player_123',
+  deletion_date: Date.now(),
+  still_accessible: true,
+  discoverable_by_others: true,
+});
+// ✅ Universe still exists on server, other players can find it
+```
+
+**Why this matters**:
+- **No data loss**: Even if players delete content locally, server preserves it
+- **Shared archaeology**: Other players can discover "abandoned" universes
+- **Development artifacts**: All early experimental content persists
+- **Lore opportunity**: Deleted content becomes "forgotten realms" in-game
+
+### The Time Before Time: Development as Lore
+
+All universes created during development become canonical **proto-realities**:
+
+```typescript
+// Development phase generates broken universes
+const protoUniverse = generateUniverse({
+  seed: 'early_dev_test_42',
+  era: 'before_time_was_invented',
+});
+
+// Generation crashes with NaN coordinates
+// ✅ Don't delete - this becomes a "proto-reality"
+protoUniverse.addComponent({
+  type: 'proto_reality',
+  era: 'before_time',
+  stability: 12,
+  generation_error: 'time_not_yet_invented',
+  contains_primordial_artifacts: true,
+  lore: 'A universe from the chaotic period when time itself was still being defined. Physics work differently here. Causality is... negotiable.',
+});
+```
+
+**The Proto-Reality Archive**:
+- **Early dev universes** → "From the time before time"
+- **Failed beta tests** → "Experiments of the Creator Gods"
+- **Corrupted saves** → "Realities that the gods abandoned"
+- **Glitched content** → "Primordial chaos artifacts"
+
+Players can quest to access these proto-realities:
+
+```typescript
+{
+  quest: 'Journey to the Time Before Time',
+  description: 'The ancient texts speak of broken universes created when time was still being invented. Find the Shard of Primordial Access and explore the proto-realities.',
+  rewards: [
+    'Access to proto-reality realms',
+    'Glitched items with impossible stats',
+    'Lore about the creation of the multiverse',
+    'Unique materials that should not exist',
+  ]
+}
+```
+
+### Server-Side Eternal Archive
+
+```typescript
+// Server configuration
+const SERVER_ARCHIVE_POLICY = {
+  // Never actually delete entities
+  soft_delete_only: true,
+
+  // Mark deleted/corrupted content
+  preserve_metadata: true,
+
+  // Make discoverable
+  orphaned_content_discoverable: true,
+
+  // Development phase content
+  dev_content_becomes_lore: true,
+  dev_era_label: 'proto_reality',
+
+  // Archive organization
+  corruption_realms: {
+    'limbo': 'Mildly corrupted, low danger',
+    'void': 'Severely broken, high danger',
+    'forbidden_library': 'Rejected as too powerful',
+    'proto_reality': 'From the time before time',
+    'forgotten_realm': 'Deleted by original creators',
+  }
+};
+```
+
+**Example: Development Universe Becomes Lore**
+
+```json
+// Early development test that crashed
+{
+  "id": "universe_dev_test_001",
+  "components": {
+    "proto_reality": {
+      "era": "before_time",
+      "creation_date": "2025-01-15T10:23:00Z",
+      "creator": "dev_test_script",
+      "stability": 8,
+      "generation_error": "NaN in chunk generation",
+      "lore": "One of the first universes created when the gods were still learning. Time flows backwards here. Gravity is optional. The sky is below the ground."
+    },
+    "discoverable": {
+      "requires_quest": "journey_to_proto_realities",
+      "difficulty": 8,
+      "rewards": [
+        "inverted_gravity_shard",
+        "backwards_clock",
+        "impossible_geometry_blueprint"
+      ]
+    }
+  }
+}
+```
+
+All development mistakes become **features**. All broken content becomes **lore**. Nothing is wasted. 🎭
+
 ## Code Quality Rules
 
 ### 1. Component Type Names: Use lowercase_with_underscores

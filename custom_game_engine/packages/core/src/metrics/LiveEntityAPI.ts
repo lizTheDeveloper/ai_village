@@ -110,6 +110,8 @@ export class LiveEntityAPI {
       case 'set-skill':
         console.log('[LiveEntityAPI] Matched set-skill case!');
         return this.handleSetSkill(action);
+      case 'spawn-entity':
+        return this.handleSpawnEntity(action);
       default:
         console.log('[LiveEntityAPI] No matching case for:', action.action);
         return {
@@ -226,6 +228,46 @@ export class LiveEntityAPI {
       requestId: action.requestId,
       success: true,
       data: { agentId, skill, level },
+    };
+  }
+
+  /**
+   * Spawn an entity (building, animal, etc.) at the specified location
+   */
+  private handleSpawnEntity(action: ActionRequest): ActionResponse {
+    const { type, x, y } = action.params;
+
+    if (!type || typeof type !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid type parameter',
+      };
+    }
+
+    if (typeof x !== 'number' || typeof y !== 'number') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid x, y parameters',
+      };
+    }
+
+    // Create the entity at the specified position
+    const entityId = this.world.createEntity(type as any, { x, y });
+
+    if (!entityId) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Failed to spawn entity of type: ${type}`,
+      };
+    }
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { entityId, type, x, y },
     };
   }
 

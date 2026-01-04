@@ -159,6 +159,11 @@ function spawnHeadlessGame(sessionId: string, agentCount: number = 5): HeadlessG
     cwd: process.cwd(),
     stdio: ['ignore', 'pipe', 'pipe'],
     detached: false,
+    env: {
+      ...process.env,
+      VITE_FORCE: 'true', // Force Vite to skip cache
+      NODE_ENV: 'development',
+    },
   });
 
   const gameProcess: HeadlessGameProcess = {
@@ -3921,6 +3926,14 @@ async function handleSetSkill(client: WebSocket, params: Record<string, unknown>
   return sendActionToGame(client, 'set-skill', params);
 }
 
+async function handleSpawnEntity(client: WebSocket, params: Record<string, unknown>) {
+  if (!params.type || typeof params.x !== 'number' || typeof params.y !== 'number') {
+    throw new Error('Missing required parameters: type, x, y');
+  }
+
+  return sendActionToGame(client, 'spawn-entity', params);
+}
+
 async function handleGiveItem(client: WebSocket, params: Record<string, unknown>) {
   if (!params.agentId || !params.itemType) {
     throw new Error('Missing required parameters: agentId, itemType');
@@ -5049,6 +5062,9 @@ NOTES
             break;
           case 'set-skill':
             result = await handleSetSkill(gameClient, params);
+            break;
+          case 'spawn-entity':
+            result = await handleSpawnEntity(gameClient, params);
             break;
           case 'give-item':
             result = await handleGiveItem(gameClient, params);
