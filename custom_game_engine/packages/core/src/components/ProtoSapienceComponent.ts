@@ -46,11 +46,13 @@ export class ProtoSapienceComponent extends ComponentBase {
   public plansFuture: boolean;            // Delayed gratification observed
   public abstractThinking: boolean;
   public problemSolvingScore: number;     // 0-1
+  public behavioralTests: string[];       // Track which tests have been conducted
 
   // Self-Awareness
   public passedMirrorTest: boolean;
   public recognizesSelf: boolean;
   public understandsOthersHaveMinds: boolean; // Theory of mind
+  public mirrorTestAttempts: number;          // Number of times tested
 
   // Social Learning
   public teachesYoung: boolean;
@@ -87,10 +89,12 @@ export class ProtoSapienceComponent extends ComponentBase {
     this.plansFuture = options.plansFuture ?? false;
     this.abstractThinking = options.abstractThinking ?? false;
     this.problemSolvingScore = options.problemSolvingScore ?? 0;
+    this.behavioralTests = options.behavioralTests ?? [];
 
     this.passedMirrorTest = options.passedMirrorTest ?? false;
     this.recognizesSelf = options.recognizesSelf ?? false;
     this.understandsOthersHaveMinds = options.understandsOthersHaveMinds ?? false;
+    this.mirrorTestAttempts = options.mirrorTestAttempts ?? 0;
 
     this.teachesYoung = options.teachesYoung ?? false;
     this.learnsByObservation = options.learnsByObservation ?? false;

@@ -38,9 +38,6 @@ const SLOWDOWN_DISTANCE = 150;
 /** Minimum distance to maintain (emergency backup) */
 const MINIMUM_DISTANCE = 40;
 
-/** Search radius when target is lost */
-const _SEARCH_RADIUS = 200;
-
 /** How long to search before giving up (in ticks) */
 const SEARCH_TIMEOUT = 20 * 60 * 3; // 3 minutes at 20 TPS
 

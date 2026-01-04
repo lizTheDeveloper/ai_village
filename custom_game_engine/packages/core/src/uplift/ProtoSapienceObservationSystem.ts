@@ -250,6 +250,12 @@ export class ProtoSapienceObservationSystem implements System {
    * Mirror test - self-recognition
    */
   private conductMirrorTest(_animal: Entity, proto: ProtoSapienceComponent): boolean {
+    // Track attempt
+    proto.mirrorTestAttempts++;
+    if (!proto.behavioralTests.includes('mirror_test')) {
+      proto.behavioralTests.push('mirror_test');
+    }
+
     // Probability of passing based on intelligence
     const baseChance = (proto.intelligence - EMERGENCE_THRESHOLDS.MIRROR_TEST) / 0.05;
     const passChance = Math.max(0, Math.min(1, baseChance));
@@ -261,6 +267,11 @@ export class ProtoSapienceObservationSystem implements System {
    * Delayed gratification test - future planning
    */
   private conductDelayedGratificationTest(_animal: Entity, proto: ProtoSapienceComponent): boolean {
+    // Track test
+    if (!proto.behavioralTests.includes('delayed_gratification')) {
+      proto.behavioralTests.push('delayed_gratification');
+    }
+
     // Can entity wait for better reward?
     const baseChance = (proto.intelligence - 0.5) / 0.2;
     const passChance = Math.max(0, Math.min(1, baseChance));

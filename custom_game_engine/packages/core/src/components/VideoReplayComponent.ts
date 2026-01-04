@@ -419,7 +419,6 @@ export function compressReplay(replay: VideoReplayComponent): void {
   for (let i = 1; i < replay.frames.length - 1; i++) {
     const prev = replay.frames[i - 1]!;
     const current = replay.frames[i]!;
-    const _next = replay.frames[i + 1]!;
 
     // Keep frame if camera moved significantly
     const cameraMoved =

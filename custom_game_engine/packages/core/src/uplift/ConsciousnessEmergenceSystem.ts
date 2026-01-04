@@ -23,6 +23,7 @@ import { createIdentityComponent } from '../components/IdentityComponent.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 import { SemanticMemoryComponent } from '../components/SemanticMemoryComponent.js';
 import { BeliefComponent } from '../components/BeliefComponent.js';
+import type { PositionComponent } from '../components/PositionComponent.js';
 
 export class ConsciousnessEmergenceSystem implements System {
   readonly id = 'ConsciousnessEmergenceSystem';
@@ -136,7 +137,7 @@ export class ConsciousnessEmergenceSystem implements System {
     _program: UpliftProgramComponent
   ): AwakeningMoment {
     // Find nearby witnesses
-    const position = entity.getComponent(CT.Position);
+    const position = entity.getComponent(CT.Position) as PositionComponent | undefined;
     const witnesses: string[] = [];
 
     if (position) {
@@ -145,7 +146,7 @@ export class ConsciousnessEmergenceSystem implements System {
         .with(CT.Agent)
         .executeEntities()
         .filter(e => {
-          const otherPos = e.getComponent(CT.Position);
+          const otherPos = e.getComponent(CT.Position) as PositionComponent | undefined;
           if (!otherPos) return false;
           const dx = otherPos.x - position.x;
           const dy = otherPos.y - position.y;

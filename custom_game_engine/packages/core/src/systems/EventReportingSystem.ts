@@ -17,10 +17,9 @@ import type { System } from '../ecs/System.js';
 import type { EventBus, GameEvent } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { getNewsroomSystem } from '../television/formats/NewsroomSystem.js';
-import type { NewsStory, NewsCategory, NewsPriority, FieldReporter } from '../television/formats/NewsroomSystem.js';
+import type { NewsStory, NewsCategory, NewsPriority, FieldReporter, NewsDesk } from '../television/formats/NewsroomSystem.js';
 import { createRecordingComponent } from '../components/RecordingComponent.js';
 import type { RecordingCategory } from '../components/RecordingComponent.js';
-import type { ProfessionComponent } from '../components/ProfessionComponent.js';
 import type { EntityImpl } from '../ecs/Entity.js';
 
 /**
@@ -372,7 +371,7 @@ export class EventReportingSystem implements System {
     const deskManager = newsroomSystem.getDeskManager();
 
     // Find all news desks
-    const desks = Array.from((deskManager as any).desks.values());
+    const desks = Array.from((deskManager as any).desks.values()) as NewsDesk[];
 
     for (const desk of desks) {
       // Find available field reporter
@@ -411,7 +410,7 @@ export class EventReportingSystem implements System {
     const newsroomSystem = getNewsroomSystem();
     const deskManager = newsroomSystem.getDeskManager();
 
-    const desks = Array.from((deskManager as any).desks.values());
+    const desks = Array.from((deskManager as any).desks.values()) as NewsDesk[];
 
     for (const desk of desks) {
       for (const reporter of desk.fieldReporters) {

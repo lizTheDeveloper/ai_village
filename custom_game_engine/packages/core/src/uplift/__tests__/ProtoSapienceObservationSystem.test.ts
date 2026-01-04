@@ -42,6 +42,7 @@ describe('ProtoSapienceObservationSystem - Behavior Emergence', () => {
   let eventBus: EventBusImpl;
   let entity: Entity;
   let proto: ProtoSapienceComponent;
+  let program: UpliftProgramComponent;
 
   beforeEach(() => {
     world = new World();
@@ -59,7 +60,7 @@ describe('ProtoSapienceObservationSystem - Behavior Emergence', () => {
     proto.abstractThinking = false;
 
     // Create active uplift program linked to this entity
-    const program = new UpliftProgramComponent({
+    program = new UpliftProgramComponent({
       programId: 'test_wolf_uplift',
       sourceSpeciesId: 'wolf',
       breedingPopulation: [entity.id], // Link entity to program
@@ -89,7 +90,7 @@ describe('ProtoSapienceObservationSystem - Behavior Emergence', () => {
   });
 
   it('should detect tool creation at 0.55 intelligence', () => {
-    proto.intelligence = 0.55;
+    program.currentIntelligence = 0.55;
     expect(proto.createsTools).toBe(false);
 
     for (let i = 0; i < 100; i++) {
@@ -100,7 +101,7 @@ describe('ProtoSapienceObservationSystem - Behavior Emergence', () => {
   });
 
   it('should detect proto-language at 0.60 intelligence', () => {
-    proto.intelligence = 0.60;
+    program.currentIntelligence = 0.60;
     expect(proto.hasProtocolanguage).toBe(false);
 
     for (let i = 0; i < 100; i++) {
@@ -111,10 +112,11 @@ describe('ProtoSapienceObservationSystem - Behavior Emergence', () => {
   });
 
   it('should detect mirror test readiness at 0.65 intelligence', () => {
-    proto.intelligence = 0.65;
+    program.currentIntelligence = 0.65;
     expect(proto.passedMirrorTest).toBe(false);
 
-    for (let i = 0; i < 100; i++) {
+    // Run many ticks to trigger behavioral tests (every 500 ticks)
+    for (let i = 0; i < 500; i++) {
       system.update(world, [entity], 0.05);
     }
 
@@ -123,7 +125,7 @@ describe('ProtoSapienceObservationSystem - Behavior Emergence', () => {
   });
 
   it('should detect abstract thinking at 0.68 intelligence', () => {
-    proto.intelligence = 0.68;
+    program.currentIntelligence = 0.68;
     expect(proto.abstractThinking).toBe(false);
 
     for (let i = 0; i < 100; i++) {
@@ -134,7 +136,7 @@ describe('ProtoSapienceObservationSystem - Behavior Emergence', () => {
   });
 
   it('should not emerge behaviors below thresholds', () => {
-    proto.intelligence = 0.40; // Below all thresholds
+    program.currentIntelligence = 0.40; // Below all thresholds
 
     for (let i = 0; i < 100; i++) {
       system.update(world, [entity], 0.05);
@@ -379,7 +381,9 @@ describe('ProtoSapienceObservationSystem - Milestone Events', () => {
     (programEntity as EntityImpl).addComponent(program);
 
     let milestoneEventFired = false;
+    let capturedEventData: any = null;
     eventBus.on('proto_sapience_milestone', (event: any) => {
+      capturedEventData = event.data;
       if (event.data.milestone === 'first_tool_use') {
         milestoneEventFired = true;
       }
@@ -389,6 +393,13 @@ describe('ProtoSapienceObservationSystem - Milestone Events', () => {
       system.update(world, [entity], 0.05);
     }
 
+    // Debug: log what milestone was captured
+    if (capturedEventData) {
+      console.log('Milestone event captured:', capturedEventData.milestone);
+    }
+    // Verify behavior emerged
+    expect(proto.usesTools).toBe(true);
+    // Verify event fired
     expect(milestoneEventFired).toBe(true);
   });
 

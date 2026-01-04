@@ -20,7 +20,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { ProfessionComponent } from '../components/ProfessionComponent.js';
 import { getNewsroomSystem } from '../television/formats/NewsroomSystem.js';
-import type { FieldReporter, NewsStory } from '../television/formats/NewsroomSystem.js';
+import type { FieldReporter, NewsStory, NewsDesk } from '../television/formats/NewsroomSystem.js';
 
 /**
  * Check and update field reporter navigation.
@@ -31,7 +31,7 @@ export function updateReporterBehaviors(world: World, _currentTick: number): voi
   const deskManager = newsroomSystem.getDeskManager();
 
   // Get all news desks
-  const desks = Array.from((deskManager as any).desks.values());
+  const desks = Array.from((deskManager as any).desks.values()) as NewsDesk[];
 
   for (const desk of desks) {
     for (const reporter of desk.fieldReporters) {

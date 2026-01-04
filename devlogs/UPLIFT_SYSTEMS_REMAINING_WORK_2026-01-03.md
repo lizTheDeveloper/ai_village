@@ -1,28 +1,45 @@
 # Genetic Uplift Systems - Remaining Test Failures Work Order
 
 **Date**: 2026-01-03
-**Status**: 77/99 tests passing (77.8%)
-**Remaining**: 22 failing tests
+**Status**: 85/99 tests passing (85.9%)
+**Remaining**: 14 failing tests
+
+**Progress Update**: Fixed entity-to-program linking, added missing component properties (mirrorTestAttempts, behavioralTests), fixed property name mismatches (abstractThinking), updated tests to modify program.currentIntelligence instead of proto.intelligence directly.
+
+## Fixes Applied
+
+### Component Fixes:
+1. Added `mirrorTestAttempts: number` to ProtoSapienceComponent
+2. Added `behavioralTests: string[]` to ProtoSapienceComponent
+3. Fixed property name: `showsAbstractThinking` → `abstractThinking` in testHelpers.ts
+
+### Test Fixes:
+1. **All ProtoSapienceObservationSystem tests**: Added `breedingPopulation: [entity.id]` to link entities to programs
+2. **All ProtoSapienceObservationSystem tests**: Changed `proto.intelligence = X` to `program.currentIntelligence = X` (system overwrites proto.intelligence from program)
+3. **Mirror test**: Increased ticks from 100 to 500 to trigger behavioral tests (run every 500 ticks)
+4. **All tool/communication tests**: Added `breedingPopulation` linking
+
+### System Fixes:
+1. **ProtoSapienceObservationSystem**: Added tracking in `conductMirrorTest()` to increment `mirrorTestAttempts` and add to `behavioralTests` array
+2. **ProtoSapienceObservationSystem**: Added tracking in `conductDelayedGratificationTest()` to add to `behavioralTests` array
+
+### Results:
+- **Before**: 77/99 tests passing (77.8%)
+- **After**: 85/99 tests passing (85.9%)
+- **Improvement**: +8 tests fixed
 
 ---
 
-## Priority 1: ProtoSapienceObservationSystem (12 failing tests)
+## Priority 1: Event Emission Issues (3 failing tests)
 
-**Issue**: Behaviors are not emerging during tests. System runs but doesn't set behavior flags (usesTools, createsTools, etc.).
+**Status**: Behaviors ARE emerging correctly, but events are not being emitted.
+
+**Issue**: Milestone events not firing even though behaviors emerge successfully.
 
 ### Failing Tests:
-1. `should detect tool use at 0.45 intelligence` - `proto.usesTools` not set to true
-2. `should detect tool creation at 0.55 intelligence` - `proto.createsTools` not set
-3. `should detect proto-language at 0.60 intelligence` - `proto.hasProtocolanguage` not set
-4. `should detect mirror test readiness at 0.65 intelligence` - Mirror test attempts undefined
-5. `should detect abstract thinking at 0.68 intelligence` - `proto.showsAbstractThinking` not set
-6. `should conduct mirror test multiple times` - `proto.mirrorTestAttempts` undefined
-7. `should track delayed gratification test` - `proto.behavioralTests` undefined
-8. `should track tool use instances` - `proto.usesTools` not set
-9. `should distinguish tool use from tool creation` - Behaviors not emerging
-10. `should track communication pattern development` - `proto.hasProtocolanguage` not set
-11. `should emit milestone event for first tool use` - Event not firing
-12. `should emit milestone event for proto-language emergence` - Event not firing
+1. **ProtoSapienceObservationSystem** - `should track communication pattern development` - Communication patterns array empty (random 1% chance per update)
+2. **ProtoSapienceObservationSystem** - `should emit milestone event for first tool use` - Event not firing despite behavior emerging
+3. **ProtoSapienceObservationSystem** - `should emit milestone event for proto-language emergence` - Event not firing despite behavior emerging
 
 ### Investigation Required:
 
@@ -55,7 +72,7 @@ console.log('Current behaviors:', { usesTools: proto.usesTools, createsTools: pr
 
 ## Priority 2: UpliftIntegration Tests (8 failing tests)
 
-**Issue**: Integration tests depend on ProtoSapienceObservationSystem working. These will likely pass once Priority 1 is fixed.
+**Status**: Integration tests depend on event emission working correctly.
 
 ### Failing Tests:
 1. `should complete full uplift from Gen 0 to awakening`
@@ -79,7 +96,7 @@ console.log('Current behaviors:', { usesTools: proto.usesTools, createsTools: pr
 
 ---
 
-## Priority 3: Minor System Issues (2 failing tests)
+## Priority 3: Minor System Issues (3 failing tests)
 
 ### 3.1 ConsciousnessEmergenceSystem - Event Emission
 

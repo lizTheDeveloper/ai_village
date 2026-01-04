@@ -100,7 +100,7 @@ export function createProtoSapientAnimal(world: World, speciesId: string, intell
     createsTools: intelligence >= 0.55,
     hasProtocolanguage: intelligence >= 0.60,
     passedMirrorTest: intelligence >= 0.65,
-    showsAbstractThinking: intelligence >= 0.68,
+    abstractThinking: intelligence >= 0.68,
   });
   (entity as EntityImpl).addComponent(proto);
 
