@@ -143,12 +143,13 @@ export class NotificationsPanel implements IWindowPanel {
   /**
    * Handle scroll wheel
    */
-  handleScroll(deltaY: number): void {
+  handleScroll(deltaY: number, _contentHeight: number): boolean {
     if (deltaY > 0) {
       this.scrollDown();
     } else {
       this.scrollUp();
     }
+    return true;
   }
 
   /**

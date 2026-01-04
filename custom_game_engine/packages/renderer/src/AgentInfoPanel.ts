@@ -228,13 +228,16 @@ export class AgentInfoPanel implements IWindowPanel {
   /**
    * Handle scroll events for scrollable tabs.
    */
-  handleScroll(deltaY: number): void {
+  handleScroll(deltaY: number, _contentHeight: number): boolean {
     const currentTab = this.tabs.getCurrentTab();
     if (currentTab === 'inventory') {
       this.inventorySection.handleScroll(deltaY);
+      return true;
     } else if (currentTab === 'memories') {
       this.memoriesSection.handleScroll(deltaY);
+      return true;
     }
+    return false;
   }
 
   /**

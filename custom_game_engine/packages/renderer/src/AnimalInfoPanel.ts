@@ -67,11 +67,13 @@ export class AnimalInfoPanel implements IWindowPanel {
   /**
    * Handle scroll events.
    * @param deltaY Scroll delta (positive = scroll down)
+   * @param _contentHeight Height of the content area
    */
-  handleScroll(deltaY: number): void {
+  handleScroll(deltaY: number, _contentHeight: number): boolean {
     const scrollSpeed = 20;
     this.scrollOffset += deltaY > 0 ? scrollSpeed : -scrollSpeed;
     this.scrollOffset = Math.max(0, Math.min(this.scrollOffset, this.maxScrollOffset));
+    return true;
   }
 
   /**

@@ -142,8 +142,8 @@ export const AGENT_INFO_PANEL_CONFIG: PanelConfig<AgentInfoPanel & { _adapter?: 
     if (!worldToUse) return;
     panel.renderAt(ctx, 0, 0, width, height, worldToUse, panel._adapter.screenX, panel._adapter.screenY);
   },
-  handleScroll: (panel, deltaY, _contentHeight) => {
-    panel.handleScroll(deltaY);
+  handleScroll: (panel, deltaY, contentHeight) => {
+    panel.handleScroll(deltaY, contentHeight);
     return true;
   },
   handleContentClick: (panel, x, y, width, _height) => {
@@ -176,8 +176,8 @@ export const ANIMAL_INFO_PANEL_CONFIG: PanelConfig<AnimalInfoPanel & { _adapter?
     panel._adapter.world = world;
     panel.renderAt(ctx, 0, 0, width, height, world);
   },
-  handleScroll: (panel, deltaY, _contentHeight) => {
-    panel.handleScroll(deltaY);
+  handleScroll: (panel, deltaY, contentHeight) => {
+    panel.handleScroll(deltaY, contentHeight);
     return true;
   },
   handleContentClick: (panel, x, y, width, height) => {
@@ -225,8 +225,8 @@ export const TILE_INSPECTOR_PANEL_CONFIG: PanelConfig<TileInspectorPanel & { _ad
   renderMethod: (panel, ctx, _x, _y, width, height, _world) => {
     panel.renderAt(ctx, 0, 0, width, height);
   },
-  handleScroll: (panel, deltaY, _contentHeight) => {
-    panel.handleScroll(deltaY);
+  handleScroll: (panel, deltaY, contentHeight) => {
+    panel.handleScroll(deltaY, contentHeight);
     return true;
   },
   handleContentClick: (panel, x, y, width, height) => {
@@ -306,8 +306,8 @@ export const NOTIFICATIONS_PANEL_CONFIG: PanelConfig<NotificationsPanel & { _ada
   renderMethod: (panel, ctx, x, y, width, height, _world) => {
     panel.render(ctx, x, y, width, height);
   },
-  handleScroll: (panel, deltaY, _contentHeight) => {
-    panel.handleScroll(deltaY);
+  handleScroll: (panel, deltaY, contentHeight) => {
+    panel.handleScroll(deltaY, contentHeight);
     return true;
   },
 };
@@ -368,9 +368,9 @@ export const SETTINGS_PANEL_CONFIG: PanelConfig<SettingsPanel> = {
   title: 'Settings',
   defaultWidth: 600,
   defaultHeight: 500,
-  getVisible: (panel) => panel.getIsVisible(),
+  getVisible: (panel) => panel.isVisible(),
   setVisible: (panel, visible) => {
-    if (visible !== panel.getIsVisible()) {
+    if (visible !== panel.isVisible()) {
       panel.toggle();
     }
   },
@@ -897,8 +897,8 @@ export const ANGEL_MANAGEMENT_PANEL_CONFIG: PanelConfig<AngelManagementPanel> = 
   renderMethod: (panel, ctx, x, y, width, height, world) => {
     panel.render(ctx, x, y, width, height, world);
   },
-  handleScroll: (panel, deltaY, _contentHeight) => {
-    panel.handleScroll(deltaY);
+  handleScroll: (panel, deltaY, contentHeight) => {
+    panel.handleScroll(deltaY, contentHeight);
     return true;
   },
   handleContentClick: (panel, x, y, _width, _height) => {
@@ -928,8 +928,8 @@ export const PRAYER_PANEL_CONFIG: PanelConfig<PrayerPanel> = {
   renderMethod: (panel, ctx, x, y, width, height, world) => {
     panel.render(ctx, x, y, width, height, world);
   },
-  handleScroll: (panel, deltaY, _contentHeight) => {
-    panel.handleScroll(deltaY);
+  handleScroll: (panel, deltaY, contentHeight) => {
+    panel.handleScroll(deltaY, contentHeight);
     return true;
   },
   handleContentClick: (panel, x, y, _width, _height) => {

@@ -186,7 +186,7 @@ export class SettingsPanel implements IWindowPanel {
    * Toggle visibility
    */
   toggle(): void {
-    if (this.isVisible) {
+    if (this.isVisible()) {
       this.hide();
     } else {
       this.show();

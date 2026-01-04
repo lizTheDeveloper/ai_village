@@ -216,7 +216,7 @@ export class CombatHUDPanel implements IWindowPanel {
       padding: 12px;
       min-width: 300px;
       max-width: 500px;
-      display: ${this.isVisible ? 'block' : 'none'};
+      display: ${this.isVisible() ? 'block' : 'none'};
       opacity: 0.9;
       z-index: 1000;
     `;

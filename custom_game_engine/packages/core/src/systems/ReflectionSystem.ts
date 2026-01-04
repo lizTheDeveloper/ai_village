@@ -220,34 +220,44 @@ export class ReflectionSystem implements System {
 
     // Update semantic memory from insights
     if (insights.length > 0) {
-      for (const insight of insights) {
-        semanticMem.formBelief({
-          category: CT.Reflection,
-          content: insight,
-          confidence: 0.6,
-          sourceMemories: todaysMemories.map((m) => m.id),
-        });
-      }
+      entity.updateComponent(CT.SemanticMemory, (current: SemanticMemoryComponent) => {
+        const temp = new (current.constructor as any)(current);
+        for (const insight of insights) {
+          temp.formBelief({
+            category: CT.Reflection,
+            content: insight,
+            confidence: 0.6,
+            sourceMemories: todaysMemories.map((m) => m.id),
+          });
+        }
+        return temp;
+      });
     }
 
-    // Clear reflection indicator for UI
-    reflectionComp.isReflecting = false;
-    reflectionComp.reflectionType = undefined;
+    // Clear reflection indicator for UI and get final count
+    let finalReflectionCount = reflectionComp.reflections.length;
+    entity.updateComponent(CT.Reflection, (current: ReflectionComponent) => {
+      const temp = new ReflectionComponent(current);
+      temp.isReflecting = false;
+      temp.reflectionType = undefined;
+      finalReflectionCount = temp.reflections.length;
+      return temp;
+    });
 
     // Emit event
     this.eventBus.emit({
       type: 'reflection:completed',
       source: this.id,
       data: {
-        agentId,
-        reflectionCount: reflectionComp.reflections.length,
+        agentId: entity.id,
+        reflectionCount: finalReflectionCount,
         reflectionType: 'daily',
       },
     });
   }
 
   private _performDeepReflection(
-    agentId: string,
+    entity: Entity,
     episodicMem: EpisodicMemoryComponent,
     semanticMem: SemanticMemoryComponent,
     reflectionComp: ReflectionComponent,
@@ -263,10 +273,6 @@ export class ReflectionSystem implements System {
       return;
     }
 
-    // Set reflection indicator for UI
-    reflectionComp.isReflecting = true;
-    reflectionComp.reflectionType = 'deep';
-
     // Extract themes and patterns
     const themes = this._extractThemes(relevantMemories);
     const insights = this._generateInsights(relevantMemories);
@@ -280,39 +286,57 @@ export class ReflectionSystem implements System {
     // Generate reflection text
     const text = this._generateReflectionText(relevantMemories, 'deep');
 
-    // Add reflection
-    reflectionComp.addReflection({
-      type: 'deep',
-      text,
-      timestamp,
-      memoryIds: relevantMemories.map((m) => m.id),
-      insights,
-      themes: themes.length > 0 ? themes : undefined,
-      narrative,
+    // Update reflection component (defensive against deserialized components)
+    entity.updateComponent(CT.Reflection, (current: ReflectionComponent) => {
+      const temp = new ReflectionComponent(current);
+      temp.isReflecting = true;
+      temp.reflectionType = 'deep';
+      temp.addReflection({
+        type: 'deep',
+        text,
+        timestamp,
+        memoryIds: relevantMemories.map((m) => m.id),
+        insights,
+        themes: themes.length > 0 ? themes : undefined,
+        narrative,
+      });
+      return temp;
     });
 
     // Update semantic memory with identity insights
-    for (const insight of identityInsights) {
-      semanticMem.formBelief({
-        category: CT.Identity,
-        content: insight,
-        confidence: 0.7,
-        sourceMemories: relevantMemories.map((m) => m.id),
-        generalizationFrom: relevantMemories.length,
+    if (identityInsights.length > 0) {
+      entity.updateComponent(CT.SemanticMemory, (current: SemanticMemoryComponent) => {
+        const temp = new (current.constructor as any)(current);
+        for (const insight of identityInsights) {
+          temp.formBelief({
+            category: CT.Identity,
+            content: insight,
+            confidence: 0.7,
+            sourceMemories: relevantMemories.map((m) => m.id),
+            generalizationFrom: relevantMemories.length,
+          });
+        }
+        return temp;
       });
     }
 
-    // Clear reflection indicator for UI
-    reflectionComp.isReflecting = false;
-    reflectionComp.reflectionType = undefined;
+    // Clear reflection indicator and get final count
+    let finalReflectionCount = reflectionComp.reflections.length;
+    entity.updateComponent(CT.Reflection, (current: ReflectionComponent) => {
+      const temp = new ReflectionComponent(current);
+      temp.isReflecting = false;
+      temp.reflectionType = undefined;
+      finalReflectionCount = temp.reflections.length;
+      return temp;
+    });
 
     // Emit event
     this.eventBus.emit({
       type: 'reflection:completed',
       source: this.id,
       data: {
-        agentId,
-        reflectionCount: reflectionComp.reflections.length,
+        agentId: entity.id,
+        reflectionCount: finalReflectionCount,
         reflectionType: 'deep',
       },
     });

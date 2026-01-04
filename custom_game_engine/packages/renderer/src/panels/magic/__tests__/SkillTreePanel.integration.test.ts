@@ -6,19 +6,16 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '@ai-village/core';
-import { EntityImpl, createEntityId } from '@ai-village/core';
-import { EventBusImpl } from '@ai-village/core';
-import { SkillTreeManager } from '@ai-village/core';
-import { SpellLearningManager } from '@ai-village/core';
+import { WorldImpl, EntityImpl, createEntityId, EventBusImpl, ComponentType as CT } from '@ai-village/core';
+import type { MagicComponent } from '@ai-village/core';
+import { SkillTreeManager } from '@ai-village/core/src/systems/magic/SkillTreeManager.js';
+import { SpellLearningManager } from '@ai-village/core/src/systems/magic/SpellLearningManager.js';
 import {
   createSkillNode,
   createSkillEffect,
   createSkillTree,
   MagicSkillTreeRegistry,
-} from '@ai-village/core';
-import type { MagicComponent } from '@ai-village/core';
-import { ComponentType as CT } from '@ai-village/core';
+} from '@ai-village/core/src/magic/index.js';
 import { SkillTreePanel } from '../SkillTreePanel.js';
 import type { WindowManager } from '../../../WindowManager.js';
 
