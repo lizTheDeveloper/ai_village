@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type { MagicSkillNode } from '@ai-village/core/src/magic/MagicSkillTree.js';
 import type { NodeEvaluationResult } from '@ai-village/core/src/magic/MagicSkillTreeEvaluator.js';
+import { SkillNodeRenderer } from '../SkillNodeRenderer.js';
 
 /**
  * Tests for SkillNodeRenderer - Renders individual skill nodes
@@ -16,7 +17,7 @@ import type { NodeEvaluationResult } from '@ai-village/core/src/magic/MagicSkill
 describe('SkillNodeRenderer', () => {
   let mockNode: MagicSkillNode;
   let mockEvaluation: NodeEvaluationResult;
-  let renderer: any; // SkillNodeRenderer - doesn't exist yet
+  let renderer: SkillNodeRenderer;
 
   beforeEach(() => {
     mockNode = createMockNode();
@@ -34,12 +35,11 @@ describe('SkillNodeRenderer', () => {
       mockEvaluation.currentLevel = 1; // Unlocked
       mockEvaluation.maxLevel = 1;
 
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
       renderer = new SkillNodeRenderer();
       renderer.render(ctx, mockNode, mockEvaluation, 100, 100, 80, 60);
 
-      // Check for green fill
-      expect(ctx.fillStyle).toHaveBeenCalledWith(expect.stringMatching(/green|#0f0|#00ff00/i));
+      // Check for green fill (property assignment, not function call)
+      expect(ctx.fillStyle).toMatch(/green|#0f0|#00ff00/i);
     });
 
     it('should render available node with yellow glow', () => {
@@ -48,12 +48,12 @@ describe('SkillNodeRenderer', () => {
       mockEvaluation.canPurchase = true;
       mockEvaluation.currentLevel = 0;
 
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
+
       renderer = new SkillNodeRenderer();
       renderer.render(ctx, mockNode, mockEvaluation, 100, 100, 80, 60);
 
-      // Check for yellow stroke (glow effect)
-      expect(ctx.strokeStyle).toHaveBeenCalledWith(expect.stringMatching(/yellow|#ff0|#ffff00/i));
+      // Check for yellow stroke (glow effect) - property assignment, not function call
+      expect(ctx.strokeStyle).toMatch(/yellow|#ff0|#ffff00/i);
       expect(ctx.lineWidth).toBeGreaterThanOrEqual(3); // Thick stroke for glow
     });
 
@@ -63,12 +63,12 @@ describe('SkillNodeRenderer', () => {
       mockEvaluation.canUnlock = false;
       mockEvaluation.currentLevel = 0;
 
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
+
       renderer = new SkillNodeRenderer();
       renderer.render(ctx, mockNode, mockEvaluation, 100, 100, 80, 60);
 
-      // Check for gray fill
-      expect(ctx.fillStyle).toHaveBeenCalledWith(expect.stringMatching(/gray|#888|#999/i));
+      // Check for gray fill - property assignment, not function call
+      expect(ctx.fillStyle).toMatch(/gray|#888|#999/i);
     });
 
     it('should render hidden node as "???" placeholder', () => {
@@ -76,7 +76,7 @@ describe('SkillNodeRenderer', () => {
 
       mockEvaluation.visible = false;
 
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
+
       renderer = new SkillNodeRenderer();
       renderer.render(ctx, mockNode, mockEvaluation, 100, 100, 80, 60);
 
@@ -89,7 +89,7 @@ describe('SkillNodeRenderer', () => {
 
       mockEvaluation.canPurchase = true;
 
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
+
       renderer = new SkillNodeRenderer();
 
       // Render at two different timestamps to check animation
@@ -115,7 +115,7 @@ describe('SkillNodeRenderer', () => {
 
       mockNode.name = 'Spirit Sense';
 
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
+
       renderer = new SkillNodeRenderer();
       renderer.render(ctx, mockNode, mockEvaluation, 100, 100, 80, 60);
 
@@ -131,7 +131,7 @@ describe('SkillNodeRenderer', () => {
 
       mockNode.icon = '🌟';
 
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
+
       renderer = new SkillNodeRenderer();
       renderer.render(ctx, mockNode, mockEvaluation, 100, 100, 80, 60);
 
@@ -143,7 +143,7 @@ describe('SkillNodeRenderer', () => {
 
       mockEvaluation.xpCost = 150;
 
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
+
       renderer = new SkillNodeRenderer();
       renderer.render(ctx, mockNode, mockEvaluation, 100, 100, 80, 60);
 
@@ -162,7 +162,7 @@ describe('SkillNodeRenderer', () => {
       mockEvaluation.maxLevel = 1;
       mockEvaluation.xpCost = 100;
 
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
+
       renderer = new SkillNodeRenderer();
       renderer.render(ctx, mockNode, mockEvaluation, 100, 100, 80, 60);
 
@@ -180,7 +180,7 @@ describe('SkillNodeRenderer', () => {
       mockEvaluation.currentLevel = 3;
       mockEvaluation.maxLevel = 5;
 
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
+
       renderer = new SkillNodeRenderer();
       renderer.render(ctx, mockNode, mockEvaluation, 100, 100, 80, 60);
 
@@ -197,7 +197,7 @@ describe('SkillNodeRenderer', () => {
 
       mockNode.name = 'This Is A Very Long Node Name That Should Be Truncated';
 
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
+
       renderer = new SkillNodeRenderer();
       renderer.render(ctx, mockNode, mockEvaluation, 100, 100, 80, 60);
 
@@ -218,7 +218,7 @@ describe('SkillNodeRenderer', () => {
     it('should highlight node border when hovered', () => {
       const ctx = createMockCanvasContext();
 
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
+
       renderer = new SkillNodeRenderer();
       renderer.render(ctx, mockNode, mockEvaluation, 100, 100, 80, 60, 0, true); // isHovered=true
 
@@ -230,7 +230,7 @@ describe('SkillNodeRenderer', () => {
     it('should show tooltip anchor when hovered', () => {
       const ctx = createMockCanvasContext();
 
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
+
       renderer = new SkillNodeRenderer();
       const result = renderer.render(ctx, mockNode, mockEvaluation, 100, 100, 80, 60, 0, true);
 
@@ -251,7 +251,7 @@ describe('SkillNodeRenderer', () => {
 
       mockNode.category = 'foundation';
 
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
+
       renderer = new SkillNodeRenderer();
       renderer.render(ctx, mockNode, mockEvaluation, 100, 100, 80, 60);
 
@@ -264,7 +264,7 @@ describe('SkillNodeRenderer', () => {
 
       mockNode.category = 'mastery';
 
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
+
       renderer = new SkillNodeRenderer();
       renderer.render(ctx, mockNode, mockEvaluation, 100, 100, 80, 60);
 
@@ -279,12 +279,12 @@ describe('SkillNodeRenderer', () => {
 
       mockNode.category = 'forbidden';
 
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
+
       renderer = new SkillNodeRenderer();
       renderer.render(ctx, mockNode, mockEvaluation, 100, 100, 80, 60);
 
-      // Check for red color overlay
-      expect(ctx.fillStyle).toHaveBeenCalledWith(expect.stringMatching(/red|#f00|#ff0000/i));
+      // Check for red color overlay - property assignment, not function call
+      expect(ctx.fillStyle).toMatch(/red|#f00|#ff0000/i);
     });
   });
 
@@ -296,7 +296,7 @@ describe('SkillNodeRenderer', () => {
     it('should throw when node is null', () => {
       const ctx = createMockCanvasContext();
 
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
+
       renderer = new SkillNodeRenderer();
 
       expect(() => {
@@ -307,7 +307,7 @@ describe('SkillNodeRenderer', () => {
     it('should throw when evaluation is null', () => {
       const ctx = createMockCanvasContext();
 
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
+
       renderer = new SkillNodeRenderer();
 
       expect(() => {
@@ -316,7 +316,7 @@ describe('SkillNodeRenderer', () => {
     });
 
     it('should throw when canvas context is null', () => {
-      // @ts-expect-error - SkillNodeRenderer doesn't exist yet
+
       renderer = new SkillNodeRenderer();
 
       expect(() => {
@@ -367,7 +367,10 @@ function createMockEvaluation(overrides: Partial<NodeEvaluationResult> = {}): No
 }
 
 function createMockCanvasContext(): CanvasRenderingContext2D {
-  return {
+  const fillStyleCalls: string[] = [];
+  const strokeStyleCalls: string[] = [];
+
+  const mock: any = {
     fillRect: vi.fn(),
     fillText: vi.fn(),
     strokeRect: vi.fn(),
@@ -376,9 +379,36 @@ function createMockCanvasContext(): CanvasRenderingContext2D {
     lineTo: vi.fn(),
     stroke: vi.fn(),
     fill: vi.fn(),
-    fillStyle: vi.fn(),
-    strokeStyle: vi.fn(),
+    closePath: vi.fn(),
+    arc: vi.fn(),
+    measureText: vi.fn(() => ({ width: 50 })),
+    font: '12px sans-serif',
+    textAlign: 'left' as CanvasTextAlign,
+    textBaseline: 'top' as CanvasTextBaseline,
     lineWidth: 1,
     globalAlpha: 1.0,
-  } as any;
+    _fillStyle: '#000000',
+    _strokeStyle: '#000000',
+    _fillStyleCalls: fillStyleCalls,
+    _strokeStyleCalls: strokeStyleCalls,
+  };
+
+  // Make fillStyle/strokeStyle act like properties with call tracking
+  Object.defineProperty(mock, 'fillStyle', {
+    get() { return this._fillStyle; },
+    set(value: string) {
+      this._fillStyle = value;
+      this._fillStyleCalls.push(value);
+    }
+  });
+
+  Object.defineProperty(mock, 'strokeStyle', {
+    get() { return this._strokeStyle; },
+    set(value: string) {
+      this._strokeStyle = value;
+      this._strokeStyleCalls.push(value);
+    }
+  });
+
+  return mock as CanvasRenderingContext2D;
 }

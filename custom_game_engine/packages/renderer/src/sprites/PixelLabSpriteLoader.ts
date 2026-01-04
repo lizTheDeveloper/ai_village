@@ -32,11 +32,11 @@ interface PixelLabMetadataNested {
 /** Simpler metadata format (flat format used by actual assets) */
 interface PixelLabMetadataFlat {
   id: string;
-  name: string;
+  name?: string;
   size: number;
-  directions: 4 | 8;
-  rotations: string[];
-  animations: Record<string, unknown>;
+  directions: 4 | 8 | string[]; // Can be number or array of direction names
+  rotations?: string[]; // Optional - same as directions for backwards compatibility
+  animations?: Record<string, unknown>;
 }
 
 /** Combined metadata type */
@@ -44,7 +44,7 @@ type PixelLabMetadata = PixelLabMetadataNested | PixelLabMetadataFlat;
 
 /** Type guard for flat metadata */
 function isFlatMetadata(meta: PixelLabMetadata): meta is PixelLabMetadataFlat {
-  return 'rotations' in meta && Array.isArray(meta.rotations);
+  return 'directions' in meta || ('rotations' in meta && Array.isArray(meta.rotations));
 }
 
 /** Animation state for a PixelLab sprite */
@@ -140,14 +140,28 @@ export class PixelLabSpriteLoader {
 
     // Handle flat metadata format (actual asset format)
     if (isFlatMetadata(metadata)) {
-      // Load rotation images from rotations/ subfolder
-      const rotationPromises = metadata.rotations.map(async (dirName) => {
-        const imgPath = `${folderPath}/rotations/${dirName}.png`;
+      // Get direction names from either 'directions' or 'rotations' field
+      const directionNames: string[] = Array.isArray(metadata.directions)
+        ? metadata.directions
+        : metadata.rotations || [];
+
+      // Load rotation images (check both with and without rotations/ subfolder)
+      const rotationPromises = directionNames.map(async (dirName) => {
+        // Try direct path first (newer format)
+        let imgPath = `${folderPath}/${dirName}.png`;
         try {
           const img = await this.loadImage(imgPath, metadata.id);
           rotations.set(dirName, img);
+          return;
         } catch {
-          // Skip failed loads silently
+          // Fall back to rotations/ subdirectory (older format)
+          try {
+            imgPath = `${folderPath}/rotations/${dirName}.png`;
+            const img = await this.loadImage(imgPath, metadata.id);
+            rotations.set(dirName, img);
+          } catch {
+            // Skip failed loads silently
+          }
         }
       });
 
@@ -155,11 +169,15 @@ export class PixelLabSpriteLoader {
 
       // TODO: Handle animations in flat format if needed
 
+      const directionCount = typeof metadata.directions === 'number'
+        ? metadata.directions
+        : (directionNames.length as 4 | 8);
+
       return {
         id: metadata.id,
-        name: metadata.name,
+        name: metadata.name || metadata.id,
         size: metadata.size,
-        directions: metadata.directions,
+        directions: directionCount,
         rotations,
         animations,
       };

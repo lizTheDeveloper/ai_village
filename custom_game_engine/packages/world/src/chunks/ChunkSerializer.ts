@@ -137,18 +137,18 @@ export class ChunkSerializer {
     }
 
     const runs: RLEData[] = [];
-    let currentTile = tiles[0];
+    let currentTile = tiles[0]!;
     let runLength = 1;
 
     for (let i = 1; i < tiles.length; i++) {
-      if (this.tilesEqual(tiles[i], currentTile)) {
+      if (this.tilesEqual(tiles[i]!, currentTile)) {
         runLength++;
       } else {
         runs.push({
           tile: this.serializeTile(currentTile),
           count: runLength,
         });
-        currentTile = tiles[i];
+        currentTile = tiles[i]!;
         runLength = 1;
       }
     }
@@ -173,10 +173,10 @@ export class ChunkSerializer {
     const diffs: Array<{ index: number; tile: SerializedTile }> = [];
 
     for (let i = 0; i < tiles.length; i++) {
-      if (!this.tilesEqual(tiles[i], baseTile)) {
+      if (!this.tilesEqual(tiles[i]!, baseTile)) {
         diffs.push({
           index: i,
-          tile: this.serializeTile(tiles[i]),
+          tile: this.serializeTile(tiles[i]!),
         });
       }
     }

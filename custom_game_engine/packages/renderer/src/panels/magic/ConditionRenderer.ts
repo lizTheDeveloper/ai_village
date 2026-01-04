@@ -8,7 +8,7 @@
  * - Met/unmet status styling
  */
 
-import type { ConditionResult } from '@ai-village/core/src/magic/MagicSkillTreeEvaluator.js';
+import type { ConditionResult } from '@ai-village/core';
 
 export class ConditionRenderer {
   /**

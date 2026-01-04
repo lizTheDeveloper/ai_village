@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type { MagicSkillTree, MagicSkillNode } from '@ai-village/core/src/magic/MagicSkillTree.js';
 import type { EvaluationContext, NodeEvaluationResult } from '@ai-village/core/src/magic/MagicSkillTreeEvaluator.js';
+import { ParadigmTreeView } from '../ParadigmTreeView.js';
 
 /**
  * Tests for ParadigmTreeView - Renders a single paradigm's skill tree
@@ -15,7 +16,7 @@ import type { EvaluationContext, NodeEvaluationResult } from '@ai-village/core/s
 describe('ParadigmTreeView', () => {
   let mockTree: MagicSkillTree;
   let mockEvaluationContext: EvaluationContext;
-  let view: any; // ParadigmTreeView - doesn't exist yet
+  let view: ParadigmTreeView;
 
   beforeEach(() => {
     mockTree = createMockSkillTree();
@@ -28,7 +29,6 @@ describe('ParadigmTreeView', () => {
 
   describe('Tree Layout', () => {
     it('should position foundation nodes at top', () => {
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
 
       const foundationNodes = mockTree.nodes.filter(n => n.category === 'foundation');
@@ -41,7 +41,6 @@ describe('ParadigmTreeView', () => {
     });
 
     it('should position mastery nodes at bottom', () => {
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
 
       const masteryNodes = mockTree.nodes.filter(n => n.category === 'mastery');
@@ -54,7 +53,6 @@ describe('ParadigmTreeView', () => {
     });
 
     it('should spread nodes horizontally within category', () => {
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
 
       const techniqueNodes = mockTree.nodes.filter(n => n.category === 'technique');
@@ -68,7 +66,6 @@ describe('ParadigmTreeView', () => {
     });
 
     it('should avoid node overlap', () => {
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
 
       const layout = view.calculateLayout();
@@ -90,7 +87,6 @@ describe('ParadigmTreeView', () => {
     });
 
     it('should recalculate layout when tree changes', () => {
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
 
       const layout1 = view.calculateLayout();
@@ -117,7 +113,6 @@ describe('ParadigmTreeView', () => {
     it('should draw line from prerequisite to dependent node', () => {
       const ctx = createMockCanvasContext();
 
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
       view.render(ctx, 0, 0, 800, 600, mockEvaluationContext);
 
@@ -131,7 +126,6 @@ describe('ParadigmTreeView', () => {
     it('should use arrow style for dependency lines', () => {
       const ctx = createMockCanvasContext();
 
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
       view.render(ctx, 0, 0, 800, 600, mockEvaluationContext);
 
@@ -147,13 +141,12 @@ describe('ParadigmTreeView', () => {
     it('should highlight dependency line when node hovered', () => {
       const ctx = createMockCanvasContext();
 
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
       view.setHoveredNode('technique_node_1');
       view.render(ctx, 0, 0, 800, 600, mockEvaluationContext);
 
       // Check that line is drawn with highlight color
-      const highlightedStroke = ctx.strokeStyle.mock.calls.find((call: any) =>
+      const highlightedStroke = ctx._strokeStyleCalls.find((call: any) =>
         call.includes('yellow') || call.includes('#ff0')
       );
       expect(highlightedStroke).toBeDefined();
@@ -180,7 +173,6 @@ describe('ParadigmTreeView', () => {
         ]
       });
 
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(treeWithOptional);
       view.render(ctx, 0, 0, 800, 600, mockEvaluationContext);
 
@@ -212,13 +204,12 @@ describe('ParadigmTreeView', () => {
         summary: 'Unlocked'
       });
 
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
       view.setEvaluationResults(evaluationResults);
       view.render(ctx, 0, 0, 800, 600, mockEvaluationContext);
 
       // Check for green fill
-      const greenFill = ctx.fillStyle.mock.calls.find((call: any) =>
+      const greenFill = ctx._fillStyleCalls.find((call: any) =>
         call.includes('green') || call.includes('#0f0')
       );
       expect(greenFill).toBeDefined();
@@ -242,13 +233,12 @@ describe('ParadigmTreeView', () => {
         summary: 'Ready to purchase'
       });
 
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
       view.setEvaluationResults(evaluationResults);
       view.render(ctx, 0, 0, 800, 600, mockEvaluationContext);
 
       // Check for yellow glow effect
-      const yellowGlow = ctx.strokeStyle.mock.calls.find((call: any) =>
+      const yellowGlow = ctx._strokeStyleCalls.find((call: any) =>
         call.includes('yellow') || call.includes('#ff0')
       );
       expect(yellowGlow).toBeDefined();
@@ -278,13 +268,12 @@ describe('ParadigmTreeView', () => {
         summary: '1 condition not met'
       });
 
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
       view.setEvaluationResults(evaluationResults);
       view.render(ctx, 0, 0, 800, 600, mockEvaluationContext);
 
       // Check for gray fill
-      const grayFill = ctx.fillStyle.mock.calls.find((call: any) =>
+      const grayFill = ctx._fillStyleCalls.find((call: any) =>
         call.includes('gray') || call.includes('#888')
       );
       expect(grayFill).toBeDefined();
@@ -308,7 +297,6 @@ describe('ParadigmTreeView', () => {
         summary: 'Hidden'
       });
 
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
       view.setEvaluationResults(evaluationResults);
       view.render(ctx, 0, 0, 800, 600, mockEvaluationContext);
@@ -329,7 +317,6 @@ describe('ParadigmTreeView', () => {
     it('should offset node positions when scrolled', () => {
       const ctx = createMockCanvasContext();
 
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
       view.setScroll(100, 200);
       view.render(ctx, 0, 0, 800, 600, mockEvaluationContext);
@@ -345,7 +332,6 @@ describe('ParadigmTreeView', () => {
     it('should scale node sizes when zoomed', () => {
       const ctx = createMockCanvasContext();
 
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
 
       // Render at 1.0 zoom
@@ -354,7 +340,7 @@ describe('ParadigmTreeView', () => {
       const normalSize = ctx.fillRect.mock.calls[0][2]; // width
 
       // Render at 2.0 zoom
-      ctx.fillRect.mockClear();
+      
       view.setZoom(2.0);
       view.render(ctx, 0, 0, 800, 600, mockEvaluationContext);
       const zoomedSize = ctx.fillRect.mock.calls[0][2]; // width
@@ -363,7 +349,6 @@ describe('ParadigmTreeView', () => {
     });
 
     it('should handle mouse wheel zoom', () => {
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
 
       view.setZoom(1.0);
@@ -376,7 +361,6 @@ describe('ParadigmTreeView', () => {
     });
 
     it('should clamp zoom to min/max values', () => {
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
 
       // Zoom out too far
@@ -395,7 +379,6 @@ describe('ParadigmTreeView', () => {
 
   describe('Interaction Handling', () => {
     it('should detect click on node', () => {
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
 
       const layout = view.calculateLayout();
@@ -407,7 +390,6 @@ describe('ParadigmTreeView', () => {
     });
 
     it('should return null when click outside nodes', () => {
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
 
       const clickedNodeId = view.handleClick(-1000, -1000);
@@ -416,7 +398,6 @@ describe('ParadigmTreeView', () => {
     });
 
     it('should detect hover on node', () => {
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
 
       const layout = view.calculateLayout();
@@ -428,7 +409,6 @@ describe('ParadigmTreeView', () => {
     });
 
     it('should clear hover when mouse leaves node', () => {
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
 
       const layout = view.calculateLayout();
@@ -449,7 +429,6 @@ describe('ParadigmTreeView', () => {
   describe('Error Handling', () => {
     it('should throw when tree is null', () => {
       expect(() => {
-        // @ts-expect-error - ParadigmTreeView doesn't exist yet
         new ParadigmTreeView(null);
       }).toThrow('Tree is required');
     });
@@ -457,7 +436,6 @@ describe('ParadigmTreeView', () => {
     it('should throw when rendering without evaluation results', () => {
       const ctx = createMockCanvasContext();
 
-      // @ts-expect-error - ParadigmTreeView doesn't exist yet
       view = new ParadigmTreeView(mockTree);
 
       expect(() => {
@@ -474,7 +452,6 @@ describe('ParadigmTreeView', () => {
       });
 
       expect(() => {
-        // @ts-expect-error - ParadigmTreeView doesn't exist yet
         new ParadigmTreeView(badTree);
       }).toThrow('Duplicate node ID');
     });
@@ -545,7 +522,10 @@ function createMockEvaluationContext(): EvaluationContext {
 }
 
 function createMockCanvasContext(): CanvasRenderingContext2D {
-  return {
+  const fillStyleCalls: string[] = [];
+  const strokeStyleCalls: string[] = [];
+
+  const mock: any = {
     fillRect: vi.fn(),
     fillText: vi.fn(),
     strokeRect: vi.fn(),
@@ -554,8 +534,29 @@ function createMockCanvasContext(): CanvasRenderingContext2D {
     lineTo: vi.fn(),
     stroke: vi.fn(),
     fill: vi.fn(),
-    fillStyle: vi.fn(),
-    strokeStyle: vi.fn(),
     setLineDash: vi.fn(),
-  } as any;
+    _fillStyle: '#000000',
+    _strokeStyle: '#000000',
+    _fillStyleCalls: fillStyleCalls,
+    _strokeStyleCalls: strokeStyleCalls,
+  };
+
+  // Make fillStyle/strokeStyle act like properties with call tracking
+  Object.defineProperty(mock, 'fillStyle', {
+    get() { return this._fillStyle; },
+    set(value: string) {
+      this._fillStyle = value;
+      this._fillStyleCalls.push(value);
+    }
+  });
+
+  Object.defineProperty(mock, 'strokeStyle', {
+    get() { return this._strokeStyle; },
+    set(value: string) {
+      this._strokeStyle = value;
+      this._strokeStyleCalls.push(value);
+    }
+  });
+
+  return mock as CanvasRenderingContext2D;
 }

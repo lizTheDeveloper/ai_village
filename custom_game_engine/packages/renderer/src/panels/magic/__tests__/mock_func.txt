@@ -1,0 +1,37 @@
+  } as any;
+}
+
+function createMockCanvasContext(): CanvasRenderingContext2D {
+  const fillStyleCalls: string[] = [];
+  const strokeStyleCalls: string[] = [];
+
+  const mock: any = {
+    fillRect: vi.fn(),
+    fillText: vi.fn(),
+    strokeRect: vi.fn(),
+    beginPath: vi.fn(),
+    moveTo: vi.fn(),
+    lineTo: vi.fn(),
+    stroke: vi.fn(),
+    _fillStyle: '#000000',
+    _strokeStyle: '#000000',
+    _fillStyleCalls: fillStyleCalls,
+    _strokeStyleCalls: strokeStyleCalls,
+  };
+
+  // Make fillStyle/strokeStyle act like properties with call tracking
+  Object.defineProperty(mock, 'fillStyle', {
+    get() { return this._fillStyle; },
+    set(value: string) {
+      this._fillStyle = value;
+      this._fillStyleCalls.push(value);
+    }
+  });
+
+  Object.defineProperty(mock, 'strokeStyle', {
+    get() { return this._strokeStyle; },
+    set(value: string) {
+      this._strokeStyle = value;
+      this._strokeStyleCalls.push(value);
+    }
+  });

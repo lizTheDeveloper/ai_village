@@ -2,8 +2,8 @@
  * Type definitions for Magic Skill Tree UI components
  */
 
-import type { MagicSkillNode } from '@ai-village/core/src/magic/MagicSkillTree.js';
-import type { NodeEvaluationResult } from '@ai-village/core/src/magic/MagicSkillTreeEvaluator.js';
+import type { MagicSkillNode } from '@ai-village/core';
+import type { NodeEvaluationResult } from '@ai-village/core';
 
 // ============================================================================
 // Layout Types

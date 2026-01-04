@@ -448,7 +448,7 @@ describe('SkillTreePanel', () => {
       expect(shintoXP).toBeDefined();
 
       // Render Allomancy tab
-      
+      ctx.fillText.mockClear();
       panel.setActiveParadigm('allomancy');
       panel.render(ctx, 0, 0, 800, 600, mockWorld);
       const allomancyXP = ctx.fillText.mock.calls.find((call: any[]) => call[0].includes('320'));

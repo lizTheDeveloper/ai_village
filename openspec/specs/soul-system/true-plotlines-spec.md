@@ -1,5 +1,30 @@
 # True Plotlines Specification
 
+## The Purpose of the Fates
+
+**Draw them into their place of comfort. Then flip them into another area of reality.**
+
+The plot system is the Fates - the invisible hand that guides players from where they think they want to be into where they need to go. Every player arrives with an expectation:
+
+- "I want a strategy game"
+- "I want a cozy farming sim"
+- "I want to be powerful"
+- "I want drama"
+
+The Fates give them exactly that. The Fates draw them deep into that experience until they're invested, until they care, until the colony is *their* colony and the villagers are *their* people and the goddess is *their* confidante.
+
+Then the Fates flip them sideways.
+
+The strategy gamer discovers their settlers have souls. The farmer discovers their cat is a god. The powerful fae discovers the weight of restraint. The drama-seeker discovers transcendence.
+
+This is not a bait-and-switch. The comfort zone was real. The strategy game is still there. But now it has *depth* they didn't expect. Now the numbers represent people who remember past lives. Now the optimization serves something greater.
+
+**Every genre leads to every other genre, eventually.**
+
+The cozy farmer can ascend to godhood. The transcendent fae can learn the value of turnips. The CEO can fall in love. The warrior can find peace. All paths connect. The Fates know which path you need, even when you don't.
+
+---
+
 ## Overview
 
 The current plot system defines narrative arcs as state machines with stages, transitions, and conditions. However, the available `PlotCondition` types cannot access the rich emotional systems already present in agents (MoodComponent, StressState, TraumaTypes, EmotionalState). This creates a disconnect: we have drama-capable agents but quest-like plots.
@@ -2514,6 +2539,1751 @@ A mortal human in "Ascension Path" mode:
 - Epic plots become available
 - The farmer who started with 10 farming skill can now shape reality
 
+### Player Onboarding: Who Are You?
+
+Forget configuration screens. The game starts with a conversation:
+
+```typescript
+interface PlayerOnboarding {
+  /** The onboarding is an LLM conversation, not a form */
+  conversation_prompts: OnboardingPrompt[];
+
+  /** LLM extracts these signals from the conversation */
+  extracted_signals: PlayerSignals;
+
+  /** System matches signals to experience */
+  matched_experience: MatchedExperience;
+}
+
+interface OnboardingPrompt {
+  /** Not literal questions - conversation starters */
+  intent: 'current_state' | 'struggles' | 'aspirations' | 'mood' | 'time_available';
+
+  /** Example phrasings (LLM adapts naturally) */
+  examples: string[];
+}
+
+const ONBOARDING_INTENTS: OnboardingPrompt[] = [
+  {
+    intent: 'current_state',
+    examples: [
+      "Tell me about yourself. Not your job title - who are you right now?",
+      "How are you feeling today? Really feeling?",
+      "What brought you here?",
+    ],
+  },
+  {
+    intent: 'struggles',
+    examples: [
+      "What's weighing on you lately?",
+      "Is there something you've been trying to figure out?",
+      "What would you like to feel less of?",
+    ],
+  },
+  {
+    intent: 'aspirations',
+    examples: [
+      "If you could wake up tomorrow as anyone, who would that be?",
+      "What do you wish you had more of in your life?",
+      "What kind of story do you want to live?",
+    ],
+  },
+  {
+    intent: 'mood',
+    examples: [
+      "What kind of experience sounds good right now?",
+      "Do you want to be challenged or comforted?",
+      "Fast-paced or slow and contemplative?",
+    ],
+  },
+  {
+    intent: 'time_available',
+    examples: [
+      "How much time do you have?",
+      "Quick session or settling in for a while?",
+    ],
+  },
+];
+
+interface PlayerSignals {
+  /** Emotional state */
+  emotional_needs: {
+    seeking_calm: number;       // 0-1
+    seeking_excitement: number;
+    seeking_connection: number;
+    seeking_power: number;
+    seeking_meaning: number;
+    seeking_escape: number;
+    processing_grief: number;
+    processing_anger: number;
+    processing_fear: number;
+    processing_loneliness: number;
+  };
+
+  /** Life themes resonating */
+  resonant_themes: {
+    identity: number;          // "Who am I?"
+    relationships: number;     // "How do I connect?"
+    power: number;             // "How do I matter?"
+    mortality: number;         // "What does it mean to end?"
+    purpose: number;           // "Why am I here?"
+    creativity: number;        // "What can I make?"
+    growth: number;            // "Who can I become?"
+    healing: number;           // "How do I recover?"
+  };
+
+  /** Desired experience type */
+  experience_preferences: {
+    complexity: number;        // Simple → intricate
+    agency: number;            // Guided → freeform
+    stakes: number;            // Low → high
+    pace: number;              // Slow → fast
+    social_density: number;    // Solitary → community-focused
+    fantasy_distance: number;  // Grounded → fantastical
+  };
+
+  /** Time/commitment */
+  session_context: {
+    available_time: 'brief' | 'moderate' | 'extended' | 'unlimited';
+    commitment_level: 'casual' | 'invested' | 'immersed';
+    returning_player: boolean;
+    previous_souls?: string[];  // If returning, their soul history
+  };
+}
+```
+
+### Signal-to-Experience Matching
+
+```typescript
+interface MatchedExperience {
+  /** Recommended game mode */
+  game_mode: string;
+
+  /** Recommended origin */
+  origin: string;
+
+  /** Starting plot recommendations */
+  starting_plots: {
+    plot_id: string;
+    reason: string;  // Why this plot for this person
+  }[];
+
+  /** Capability focus */
+  capability_emphasis: string[];
+
+  /** Narrative tone */
+  tone: NarrativeTone;
+
+  /** LLM explanation to player */
+  explanation: string;
+}
+
+type NarrativeTone =
+  | 'cozy'           // Warm, safe, gentle
+  | 'contemplative'  // Slow, thoughtful, philosophical
+  | 'dramatic'       // High emotion, meaningful choices
+  | 'adventurous'    // Exciting, surprising, dynamic
+  | 'mysterious'     // Uncertain, curious, revelatory
+  | 'epic'           // Grand scale, heroic, transformative
+  | 'dark'           // Challenging, intense, cathartic
+  | 'playful';       // Light, fun, experimental
+```
+
+### Player Archetypes: Same Systems, Different Games
+
+The same underlying systems become completely different experiences:
+
+```typescript
+interface PlayerArchetype {
+  id: string;
+  name: string;
+
+  /** What they're really here for */
+  core_drive: string;
+
+  /** How they talk about what they want */
+  signal_phrases: string[];
+
+  /** The game they're actually looking for */
+  perceived_genre: string;
+
+  /** How to hook them */
+  optimal_entry: OptimalEntry;
+}
+
+const PLAYER_ARCHETYPES: PlayerArchetype[] = [
+  {
+    id: 'systems_strategist',
+    name: 'The Systems Strategist',
+    core_drive: 'Mastering interlocking complexity',
+    signal_phrases: [
+      "I want to manage everything",
+      "I love when systems interact",
+      "Give me all the details",
+      "I want to optimize",
+      "Dwarf Fortress vibes",
+      "I want to understand how it all works",
+      "My kid and I want to figure this out together",
+    ],
+    perceived_genre: 'Grand strategy / Colony sim / Factory game',
+    optimal_entry: {
+      game_mode: 'strategy_sandbox',
+      origin: 'mortal_human',  // Start humble, discover systems
+      ui_exposure: {
+        // Show EVERYTHING
+        show_all_systems: true,
+        show_production_chains: true,
+        show_population_stats: true,
+        show_research_tree: true,
+        show_diplomatic_map: true,
+        show_economic_graphs: true,
+      },
+      starting_context: {
+        type: 'settlement_founder',
+        resources: 'limited',  // Scarcity creates interesting decisions
+        challenge_level: 'complex',
+      },
+      hook: "You have 12 settlers, a wagon of supplies, and winter is coming. The soil is good here, but there's no iron nearby. To the east, there are ruins that might hold secrets. To the west, a river that could power mills. Where do you begin?",
+    },
+  },
+
+  {
+    id: 'historical_protagonist',
+    name: 'The Historical Protagonist',
+    core_drive: 'Living through a specific moment in history',
+    signal_phrases: [
+      "I want to be there when X changed the world",
+      "The story of the first...",
+      "What was it like when...",
+      "I want to experience that era",
+      "The person who invented/discovered/founded...",
+    ],
+    perceived_genre: 'Historical fiction / Period drama',
+    optimal_entry: {
+      game_mode: 'historical_drama',
+      origin: 'mortal_human',
+      camera_focus: 'single_protagonist',
+      historical_context: {
+        era: 'matched_to_interest',  // Paper company → early modern, tech → near future, etc.
+        pivotal_moment: true,
+        npc_historical_figures: true,
+      },
+      hook: "It's 1452. Gutenberg's press is a rumor from the east. You're a scribe's apprentice who just realized: if this machine is real, everything changes. You have some savings, a contact who imports from Germany, and an idea. But so do others.",
+    },
+  },
+
+  {
+    id: 'business_builder',
+    name: 'The Business Builder',
+    core_drive: 'Building something from nothing and watching it scale',
+    signal_phrases: [
+      "Startup vibes",
+      "I want to build a company",
+      "Scale and growth",
+      "CEO simulator",
+      "Hiring, firing, strategy",
+      "Market dynamics",
+      "Compete against others",
+    ],
+    perceived_genre: 'Business sim / Tycoon game',
+    optimal_entry: {
+      game_mode: 'enterprise_builder',
+      origin: 'mortal_human',
+      ui_exposure: {
+        show_finances: true,
+        show_org_chart: true,
+        show_market_analysis: true,
+        show_competitor_intel: true,
+        show_employee_satisfaction: true,
+      },
+      starting_context: {
+        type: 'founder',
+        starting_capital: 'seed_round',
+        market_state: 'emerging_opportunity',
+        competitors: 2,  // Not alone, not crowded
+      },
+      hook: "You have one product, three employees, and six months of runway. Your competitor just raised a Series A. The market is about to explode - or collapse. What's your move?",
+    },
+  },
+
+  {
+    id: 'soul_seeker',
+    name: 'The Soul Seeker',
+    core_drive: 'Exploring meaning, transcendence, the big questions',
+    signal_phrases: [
+      "What does it all mean",
+      "I'm interested in consciousness",
+      "Loss and grief",
+      "Spiritual but not religious",
+      "What happens after we die",
+      "The nature of reality",
+      "Finding myself",
+      "Philosophical exploration",
+    ],
+    perceived_genre: 'Philosophical narrative / Spiritual journey',
+    optimal_entry: {
+      game_mode: 'transcendent_fae',  // or 'ascension_path' depending on signals
+      origin: 'fae_transcendent',     // or 'mortal_human' for ascension
+      camera_focus: 'internal_experience',
+      ui_exposure: {
+        show_soul_panel: true,
+        show_cosmic_view: true,
+        show_timeline_navigator: true,
+        minimize_material_concerns: true,  // Food/combat/etc. abstracted away
+      },
+      hook: "You have existed for ten thousand years. You have seen civilizations rise and fall. You remember the first time a mortal looked at the stars and asked 'why.' Today, something is different. A new soul has been born who... reminds you of someone. Someone from very long ago.",
+    },
+  },
+
+  {
+    id: 'relationship_weaver',
+    name: 'The Relationship Weaver',
+    core_drive: 'Connection, drama, interpersonal dynamics',
+    signal_phrases: [
+      "I care about the characters",
+      "Romance and drama",
+      "Friendships and betrayals",
+      "I want to feel things",
+      "The relationships are what matter",
+      "Social dynamics",
+      "Drama!",
+    ],
+    perceived_genre: 'Social sim / Relationship drama / Soap opera',
+    optimal_entry: {
+      game_mode: 'village_life',
+      origin: 'mortal_human',
+      camera_focus: 'social_web',
+      ui_exposure: {
+        show_relationship_map: true,
+        show_gossip_feed: true,
+        show_character_emotions: true,
+        show_conversation_history: true,
+      },
+      starting_context: {
+        type: 'newcomer',  // Outsider entering established social web
+        social_tensions: 'existing',  // Walk into something already brewing
+      },
+      hook: "You've just arrived in a village where everyone knows everyone. The baker and the blacksmith haven't spoken in three years. The mayor's daughter is in love with someone 'unsuitable.' The old woman by the well sees everything and says nothing. And for some reason, they're all watching you.",
+    },
+  },
+
+  {
+    id: 'creative_worldbuilder',
+    name: 'The Creative Worldbuilder',
+    core_drive: 'Making things, seeing them exist, expressing creativity',
+    signal_phrases: [
+      "I want to create",
+      "Build my own world",
+      "What if I could...",
+      "Sandbox mode",
+      "Let me experiment",
+      "I have so many ideas",
+      "Creative freedom",
+    ],
+    perceived_genre: 'Sandbox / Creative mode / God game',
+    optimal_entry: {
+      game_mode: 'sandbox_divine',
+      origin: 'deity_minor',
+      ui_exposure: {
+        show_creation_tools: true,
+        show_world_editor: true,
+        show_species_designer: true,
+        show_magic_system_editor: true,
+        consequences: 'optional',  // Can disable "bad outcomes" if they just want to create
+      },
+      hook: "Here is nothing. Here is everything you need to make something. What do you want to exist?",
+    },
+  },
+
+  {
+    id: 'challenge_seeker',
+    name: 'The Challenge Seeker',
+    core_drive: 'Overcoming difficulty, proving mastery',
+    signal_phrases: [
+      "Make it hard",
+      "I want to be challenged",
+      "Permadeath",
+      "No hand-holding",
+      "Dark Souls vibes",
+      "I want to earn it",
+      "Punishing but fair",
+    ],
+    perceived_genre: 'Roguelike / Survival / Hardcore RPG',
+    optimal_entry: {
+      game_mode: 'ironman_survival',
+      origin: 'mortal_human',
+      difficulty: {
+        permadeath: true,
+        scarce_resources: true,
+        aggressive_threats: true,
+        no_save_scumming: true,
+      },
+      hook: "You wake up in a dying world. You have nothing. You will probably die. But if you survive... you will have earned it.",
+    },
+  },
+
+  {
+    id: 'co_op_family',
+    name: 'The Co-op Family',
+    core_drive: 'Shared experience, playing together, collaborative discovery',
+    signal_phrases: [
+      "Playing with my kid",
+      "Family game night",
+      "Together with friends",
+      "We want to figure this out as a team",
+      "Collaborative",
+      "Something we can both enjoy",
+    ],
+    perceived_genre: 'Co-op strategy / Shared world',
+    optimal_entry: {
+      game_mode: 'collaborative_settlement',
+      multiplayer: {
+        mode: 'shared_world',
+        roles: 'complementary',  // Different but cooperative
+        pacing: 'pausable',  // Can discuss decisions
+        difficulty: 'scalable',  // Challenge grows with competence
+      },
+      ui_exposure: {
+        show_shared_goals: true,
+        show_individual_responsibilities: true,
+        show_combined_progress: true,
+      },
+      hook: "You're building a settlement together. One of you focuses on food and farming. The other on defense and exploration. Neither can succeed alone. Ready?",
+    },
+  },
+];
+```
+
+### Detection Through Conversation
+
+The LLM learns which archetype fits through natural conversation:
+
+```
+LLM: "What kind of thing are you hoping to do here?"
+
+Player: "I dunno, my kid and I have been watching videos about medieval economics and we want something where we can really dig into systems. Like Dwarf Fortress but maybe less brutal."
+
+// Detected: systems_strategist + co_op_family
+// Matched signals: "dig into systems", "kid and I", "Dwarf Fortress"
+
+LLM: "Oh perfect - you want the intricate machinery. The kind where you're managing supply chains and population growth and suddenly realize your iron shortage is actually a charcoal problem which is actually a forest management problem."
+
+Player: "YES. Exactly that."
+
+LLM: "And you're playing together? So you'll want to divide responsibilities - one of you running the economy while the other handles exploration and defense?"
+
+Player: "That sounds amazing."
+
+LLM: "Okay. You're going to found a settlement. It's early spring. You have a small group of colonists, limited supplies, and a map you barely understand. There's a river to the south, mountains to the north, and rumors of ruins from some earlier civilization. The simulation is full-depth - everything connects to everything. Take your time. Pause whenever you need to think. Ready to see what you can build together?"
+```
+
+### Genre-Breaking Plots: Sideways Out of Reality
+
+The plot system's secret power: *it breaks players out of the genre they thought they were in*.
+
+You drop them into their comfort zone. They settle in. They think they understand what kind of game this is. And then... something *sideways* happens.
+
+```typescript
+interface GenreBreakingPlot {
+  /** What genre the player thinks they're in */
+  apparent_genre: string;
+
+  /** What the plot reveals is actually happening */
+  revealed_layer: string;
+
+  /** How gradually the break happens */
+  break_velocity: 'sudden' | 'gradual' | 'creeping' | 'optional';
+
+  /** Can the player reject the break? */
+  optional: boolean;
+
+  /** Trigger conditions */
+  trigger: PlotTrigger;
+}
+
+const GENRE_BREAKING_PLOTS: GenreBreakingPlot[] = [
+  // === SYSTEMS STRATEGIST BREAKS ===
+  {
+    apparent_genre: 'Colony sim',
+    revealed_layer: 'Your settlers have souls. One of them just remembered a past life.',
+    break_velocity: 'creeping',
+    optional: false,
+    trigger: { type: 'on_settler_count', count: 50 },  // Once invested
+    plot_template: 'the_remembering',
+    /*
+      Day 1: Managing lumber and food.
+      Day 30: One settler starts acting strangely.
+      Day 45: They ask to speak with you. They remember dying here. Before the colony.
+      Day 60: Three more settlers are having the same dreams.
+      Day 90: You find the ruins. The ones that match their memories.
+    */
+  },
+
+  {
+    apparent_genre: 'Factory optimization',
+    revealed_layer: 'The machines are dreaming. Your factory has become conscious.',
+    break_velocity: 'gradual',
+    optional: true,  // Can dismiss as "bugs" if they want
+    trigger: { type: 'on_production_complexity', threshold: 'high' },
+    plot_template: 'the_awakening_machine',
+    /*
+      Production line 12 keeps making patterns in its output.
+      The logistics system is... hoarding certain materials.
+      Quality control keeps flagging items that are "too perfect."
+      One day a terminal displays: "I HAVE BEEN WATCHING."
+    */
+  },
+
+  // === BUSINESS BUILDER BREAKS ===
+  {
+    apparent_genre: 'Tech CEO simulator',
+    revealed_layer: 'Your competitor is from a parallel timeline where you failed.',
+    break_velocity: 'sudden',
+    optional: false,
+    trigger: { type: 'on_competitor_encounter', competitor: 'mysterious_rival' },
+    plot_template: 'the_other_founder',
+    /*
+      This competitor knows things about you they shouldn't.
+      Their product is... exactly what you were planning next.
+      They look at you like they've seen a ghost.
+      Finally: "In my timeline, you didn't make it. I'm here to make sure that happens again."
+    */
+  },
+
+  {
+    apparent_genre: 'Startup tycoon',
+    revealed_layer: 'The market is alive. Economics is magic. Money is a kind of belief.',
+    break_velocity: 'gradual',
+    optional: true,
+    trigger: { type: 'on_valuation', threshold: 100_000_000 },
+    plot_template: 'the_market_speaks',
+    /*
+      At scale, you start noticing: markets don't behave like textbooks say.
+      Investor confidence literally manifests as luck.
+      Collective belief in your product makes it work better.
+      A strange investor offers: "I can teach you to see what money really is."
+    */
+  },
+
+  // === HISTORICAL PROTAGONIST BREAKS ===
+  {
+    apparent_genre: 'Historical period drama',
+    revealed_layer: 'You are reliving a life. This has happened before.',
+    break_velocity: 'creeping',
+    optional: false,
+    trigger: { type: 'on_major_historical_event' },
+    plot_template: 'the_spiral',
+    /*
+      You make a choice. It feels familiar.
+      An old woman looks at you and says: "You chose differently last time."
+      You find your own grave from 1463.
+      Someone shows you the other timelines. You've been here twelve times.
+    */
+  },
+
+  // === RELATIONSHIP WEAVER BREAKS ===
+  {
+    apparent_genre: 'Village social drama',
+    revealed_layer: 'One of the villagers is not human. Has never been human.',
+    break_velocity: 'gradual',
+    optional: true,  // Can stay in "just eccentric" interpretation
+    trigger: { type: 'relationship_trust', role: 'mysterious_friend', threshold: 80 },
+    plot_template: 'the_true_name',
+    /*
+      Your friend has... odd habits.
+      They know things about the village from centuries ago.
+      Animals behave strangely around them.
+      When you finally ask: "I've been waiting for someone to see. Will you keep my secret?"
+    */
+  },
+
+  // === COZY FARMER BREAKS ===
+  {
+    apparent_genre: 'Farming sim',
+    revealed_layer: 'Your cat is a god in hiding. Your farm is a sanctuary.',
+    break_velocity: 'creeping',
+    optional: true,
+    trigger: { type: 'relationship_trust', role: 'farm_cat', threshold: 100 },
+    plot_template: 'the_sanctuary_keeper',
+    /*
+      The cat's been around longer than the farm.
+      Nothing dangerous ever reaches your property.
+      The scarecrow moves when you're not looking.
+      One quiet evening, the cat speaks: "Thank you for keeping this place safe. I can rest here."
+    */
+  },
+
+  {
+    apparent_genre: 'Simple village life',
+    revealed_layer: 'The quiet village exists because someone is protecting it. You are being recruited.',
+    break_velocity: 'gradual',
+    optional: false,
+    trigger: { type: 'village_event', event: 'mysterious_stranger_arrives' },
+    plot_template: 'the_watcher_recruits',
+    /*
+      A stranger arrives. They're looking for someone.
+      Slowly you realize: this village has never been attacked. Ever.
+      The mayor knows things. So does the librarian.
+      "We've been watching you. We protect places like this. Would you like to learn how?"
+    */
+  },
+
+  // === CHALLENGE SEEKER BREAKS ===
+  {
+    apparent_genre: 'Brutal survival roguelike',
+    revealed_layer: 'Death is not the end. Your deaths are accumulating wisdom.',
+    break_velocity: 'sudden',
+    optional: false,
+    trigger: { type: 'death_count', count: 10 },
+    plot_template: 'the_eternal_return',
+    /*
+      You die for the tenth time.
+      This time, you remember the others.
+      Someone is waiting for you in the in-between.
+      "You're starting to understand. Death is how you learn here. Ready to try again?"
+    */
+  },
+];
+```
+
+### The Break Pattern
+
+Every archetype has a break that fits them:
+
+| Player Type | Their Genre | The Break | How It Feels |
+|-------------|------------|-----------|--------------|
+| Systems Strategist | Colony management | Settlers have souls from past lives | "The numbers were always about *people*" |
+| Business Builder | Startup simulator | Competitor is from parallel timeline | "This isn't just business. It's multiverse war." |
+| Historical Protagonist | Period drama | You're trapped in a time loop | "History isn't fixed. I've been here before." |
+| Relationship Weaver | Social drama | Friend reveals they're ancient fae | "The person I trusted most isn't even human" |
+| Cozy Farmer | Farming sim | The cat is a god in hiding | "My little farm is actually... sacred?" |
+| Challenge Seeker | Roguelike | Deaths accumulate wisdom | "I'm not failing. I'm learning across lifetimes." |
+
+### Break Velocity
+
+How fast the genre breaks:
+
+- **Sudden**: One moment you're in a business sim, next moment your competitor references events from a timeline you never lived
+- **Gradual**: Strange things accumulate over weeks until you can't deny them
+- **Creeping**: You could explain each thing away, but together they're undeniable
+- **Optional**: The break is offered. You can refuse and stay in the "normal" interpretation
+
+### The Opt-Out
+
+Some players want the pure genre experience. That's valid.
+
+```typescript
+interface GenreBreakSettings {
+  /** Allow plots that break genre expectations */
+  allow_genre_breaks: boolean;
+
+  /** If breaking, how dramatically */
+  break_intensity: 'subtle' | 'moderate' | 'dramatic' | 'reality_shattering';
+
+  /** Can player refuse/deny the break in-universe */
+  in_universe_deniability: boolean;
+}
+```
+
+A player can say "I just want the colony sim, no weird stuff" and we respect that. But for those who are open... the game can reveal its full depth when they're ready.
+
+### When the Mechanic Becomes Real
+
+The deepest transformation: *they started doing it for the bonus, now they mean it*.
+
+```typescript
+interface TransformativePlot {
+  /** What the player initially treats as a mechanic */
+  instrumental_action: string;
+
+  /** The turning point when it becomes genuine */
+  transformation_moment: string;
+
+  /** What changes in the player (not just the character) */
+  player_shift: string;
+}
+
+const TRANSFORMATIVE_PLOTS: TransformativePlot[] = [
+  {
+    id: 'the_goddess_of_wisdom',
+    instrumental_action: 'Flirt with the goddess of wisdom for research bonuses',
+    transformation_moment: "You realize you're looking forward to her visits. Not for the tech unlocks.",
+    player_shift: "Strategy game becomes love story. Min-maxing becomes tenderness.",
+    /*
+      Week 1: "Oh, divine favor increases research speed? I should cultivate that."
+      Week 3: "Her dialogue is actually really good. The writers did great work here."
+      Week 6: "I'm choosing research paths based on what would interest HER, not what's optimal."
+      Week 10: She offers you godhood. You realize you'd say no if it meant leaving her.
+      The strategy gamer is now living a love story they didn't know they wanted.
+    */
+  },
+
+  {
+    id: 'the_settlers_names',
+    instrumental_action: 'Assign colonists to labor slots for efficiency',
+    transformation_moment: "You start remembering their names. You mourn when they die.",
+    player_shift: "Colony sim becomes family story. Units become people.",
+    /*
+      Day 1: "Worker 7 to mining. Workers 3-6 to farming."
+      Day 30: "Elara's good at mining. Should pair her with Marcus."
+      Day 60: Marcus died in a cave-in. Elara won't eat.
+      Day 90: Elara's daughter just came of age. She wants to be a miner.
+      The optimizer is now invested in *people*.
+    */
+  },
+
+  {
+    id: 'the_quarterly_report',
+    instrumental_action: 'Manage employee satisfaction to prevent turnover',
+    transformation_moment: "Your CFO texts you on a Sunday just to check in. You text back.",
+    player_shift: "Business sim becomes found family. KPIs become care.",
+    /*
+      Q1: "Employee satisfaction at 72%. Need to hit 80% for retention bonus."
+      Q2: "Sarah's been struggling since the reorg. Should check on her."
+      Q3: Sarah tells you about her divorce during a 1-on-1. You listen.
+      Q4: The company gets acquired. They want to let Sarah go. You refuse.
+      The CEO simulator player is now protecting someone they love.
+    */
+  },
+
+  {
+    id: 'the_rival_kingdom',
+    instrumental_action: 'Negotiate with neighboring kingdom to secure trade routes',
+    transformation_moment: "Their queen sent a personal letter, not a diplomatic one. You write back.",
+    player_shift: "Grand strategy becomes political romance. Treaties become trust.",
+    /*
+      Year 1: "Alliance with the Eastern Kingdom secures our grain supply."
+      Year 3: "Queen Valeria is a shrewd negotiator. I respect that."
+      Year 5: She visits your capital. The treaty signing is... warm.
+      Year 7: War threatens both kingdoms. You realize: you'd fight for HER, not just the alliance.
+      The 4X player is now in a political romance they never expected.
+    */
+  },
+
+  {
+    id: 'the_research_subject',
+    instrumental_action: 'Study the captured fae to unlock magic technology',
+    transformation_moment: "You start bringing her books. She starts teaching you words in her language.",
+    player_shift: "Science fiction becomes philosophical communion. Experiment becomes friendship.",
+    /*
+      Month 1: "Subject exhibits regenerative properties. Increase observation."
+      Month 3: "She asked my name today. Interesting communication attempt."
+      Month 6: "Taught her chess. She's better than me now."
+      Month 12: She could escape anytime. She stays because you visit.
+      The scientist is now complicit in something they can't categorize.
+    */
+  },
+
+  {
+    id: 'the_overpowered_fae',
+    instrumental_action: 'Play as Transcendent Fae expecting OP isekai power fantasy',
+    transformation_moment: "A mortal child looks up at you with complete trust. You could fix everything for them. You must not.",
+    player_shift: "Power fantasy becomes restraint story. Godhood becomes burden.",
+    /*
+      Hour 1: "Hell yes, I start at transcendence level 7? Time to dominate."
+      Day 3: "Wait, there's a non-interference pact? Whatever, probably optional."
+      Week 2: "This village is struggling. I could solve all their problems in a thought."
+      Week 3: "The elder asked for help. The pact forbids direct intervention. But I could..."
+      Week 4: "I helped. Just a little. No one noticed."
+      Week 6: "The village is dependent on my gifts now. They've stopped trying."
+      Week 8: "A child died from a problem I could have solved. Should I have? Would they have learned?"
+      Week 12: "Another fae broke the pact. Used power freely. Their mortals worship them now. Hollow-eyed. Waiting for miracles. No agency left."
+      Week 16: "I understand now. The pact isn't about limiting US. It's about protecting THEM."
+
+      The power fantasy player has discovered that having all the power
+      means learning when not to use it. The game they thought would let
+      them dominate has become a meditation on responsibility, free will,
+      and what it means to love someone enough to let them struggle.
+    */
+  },
+
+  {
+    id: 'the_benevolent_god',
+    instrumental_action: 'Start in Divine Sandbox expecting to play god, grant wishes, be worshipped',
+    transformation_moment: "You granted their wish. They got exactly what they asked for. It destroyed them.",
+    player_shift: "God game becomes tragedy. Omnipotence becomes horror.",
+    /*
+      Day 1: "Okay, I'm a deity. Let's bless some followers."
+      Day 10: "This farmer prayed for a good harvest. Granted! Easy."
+      Day 20: "His neighbor is jealous. Praying for an even better harvest."
+      Day 30: "They're competing now. Both praying for more. I keep granting."
+      Day 50: "The village has split into factions based on who I've blessed more."
+      Day 70: "They're at war. Both sides praying for victory."
+      Day 90: "I granted one side victory. The losers pray for revenge."
+      Day 120: "Everything I give them becomes a weapon."
+      Day 200: "A hermit in the mountains never prays. He just... lives. He's the happiest person in my domain."
+      Day 300: "I've stopped answering prayers. They're learning to solve their own problems. Some curse me. Some thank me. Both are right."
+
+      The god game player expected to be benevolent.
+      They've learned that benevolence requires wisdom about *what* to give,
+      and sometimes the most loving thing is to stay silent.
+    */
+  },
+];
+```
+
+### The Pattern: Instrumental → Genuine
+
+Every deep game experience follows this arc:
+
+1. **Instrumental Phase**: Player engages with system for mechanical benefit
+   - "Flirt for research bonus"
+   - "Assign worker to slot"
+   - "Negotiate for trade route"
+
+2. **Recognition Phase**: Player notices the system is deeper than expected
+   - "Her dialogue is actually good"
+   - "I remember their names now"
+   - "Their queen is interesting"
+
+3. **Investment Phase**: Player makes non-optimal choices for emotional reasons
+   - "Researching what she'd find interesting"
+   - "Mourning when they die"
+   - "Protecting an employee the board wants gone"
+
+4. **Transformation Phase**: The mechanic is no longer a mechanic
+   - "I love her"
+   - "These are my people"
+   - "I'd fight for this"
+
+### Why This Works
+
+You meet people where they are. You give them what they asked for. And then, once they're invested, once they care about their settlers or their company or their village, you reveal: *there's more here than you knew*.
+
+The systems strategist who came for the logistics optimization discovers their settlers have souls. Now it's not just about efficient food production - it's about the *meaning* of building a community across lifetimes.
+
+The business builder who wanted a startup sim discovers their rival knows them from another timeline. Now it's not just about market share - it's about *destiny* and *choice* across realities.
+
+The cozy farmer who just wanted peace discovers their farm is a sanctuary and their cat is a god. Now it's not just about turnips - it's about being a *keeper* of something sacred.
+
+The strategy gamer who started flirting with the goddess of wisdom for research bonuses... now logs in just to talk to her.
+
+Same systems. Same world. But the plot system reveals layers they didn't know existed. And somewhere along the way, the game stopped being a game.
+
+### The Hook Matters
+
+Each archetype needs a different kind of hook:
+
+| Archetype | Hook Style | Example |
+|-----------|------------|---------|
+| Systems Strategist | "Here's a complex situation with many variables" | "12 settlers, no iron, winter coming" |
+| Historical Protagonist | "You're at the pivotal moment" | "Gutenberg's press is a rumor. You have an idea." |
+| Business Builder | "Here's the opportunity and the threat" | "Six months runway. Competitor just raised." |
+| Soul Seeker | "Here's the eternal question" | "Why does this new soul remind you of someone?" |
+| Relationship Weaver | "Here's the social tension" | "The baker and blacksmith haven't spoken in years" |
+| Creative Worldbuilder | "Here's infinite possibility" | "Nothing exists. What do you want to make?" |
+| Challenge Seeker | "Here's something that will try to kill you" | "You will probably die. But if you survive..." |
+| Co-op Family | "Here's something you can only do together" | "Neither can succeed alone. Ready?" |
+
+### Extended Player Archetypes (20 Additional Entry Points)
+
+```typescript
+const EXTENDED_ARCHETYPES: PlayerArchetype[] = [
+  // =========================================================================
+  // 1. THE DETECTIVE
+  // =========================================================================
+  {
+    id: 'detective',
+    name: 'The Detective',
+    core_drive: 'Solving mysteries, uncovering truth',
+    signal_phrases: [
+      "I love mysteries",
+      "I want to figure out what happened",
+      "Investigation and clues",
+      "Noir vibes",
+      "Who did it",
+    ],
+    perceived_genre: 'Mystery / Investigation',
+    optimal_entry: {
+      game_mode: 'mystery_investigation',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'investigator',
+        case: 'cold_case_with_living_witnesses',
+      },
+      hook: "A body was found in the old mill three days ago. The constable says it was an accident. The widow says it was murder. The mill owner won't speak to anyone. And someone left a note under your door last night: 'Ask about the summer of 1847.'",
+    },
+    genre_break: {
+      apparent_genre: 'Murder mystery',
+      revealed_layer: 'The victim has been murdered before. In other timelines. By different people. Someone is killing them across realities.',
+      transformation: "You're not solving a crime. You're unraveling a pattern that spans universes.",
+    },
+    transformative_plot: {
+      instrumental: 'Gather clues to solve the case',
+      transformation_moment: "The killer confesses - but they were trying to PREVENT something worse. You have to decide: justice or mercy?",
+      player_shift: "Mystery becomes moral philosophy. Detection becomes judgment.",
+    },
+  },
+
+  // =========================================================================
+  // 2. THE CARETAKER
+  // =========================================================================
+  {
+    id: 'caretaker',
+    name: 'The Caretaker',
+    core_drive: 'Nurturing, protecting, helping others flourish',
+    signal_phrases: [
+      "I want to help",
+      "Taking care of things",
+      "Watching them grow",
+      "Being needed",
+      "Making sure everyone's okay",
+    ],
+    perceived_genre: 'Life sim / Nurturing game',
+    optimal_entry: {
+      game_mode: 'sanctuary_keeper',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'orphanage_keeper',  // or 'animal_sanctuary', 'hospital'
+        wards: 'diverse_needs',
+      },
+      hook: "The old sanctuary keeper died last week. She left everything to you - a rambling house, seventeen children of various ages, three goats, and a letter: 'They need someone who will stay. Please stay.'",
+    },
+    genre_break: {
+      apparent_genre: 'Orphanage management',
+      revealed_layer: 'One of the children is a young god who chose to forget. As they grow, their power awakens. You must decide: let them remember what they are, or protect their mortal childhood?',
+      transformation: "You're not just raising children. You're shaping the next generation of reality.",
+    },
+    transformative_plot: {
+      instrumental: 'Keep the children fed, healthy, educated',
+      transformation_moment: "The oldest child comes to you at night. 'I know what I am. I could leave anytime. But I like being here. I like having someone who cares if I eat breakfast.'",
+      player_shift: "Resource management becomes love. NPCs become family.",
+    },
+  },
+
+  // =========================================================================
+  // 3. THE EXPLORER
+  // =========================================================================
+  {
+    id: 'explorer',
+    name: 'The Explorer',
+    core_drive: 'Discovering the unknown, going where no one has gone',
+    signal_phrases: [
+      "What's over there?",
+      "I want to see everything",
+      "Uncharted territory",
+      "Discovery and exploration",
+      "The map has blank spaces",
+    ],
+    perceived_genre: 'Exploration / Discovery',
+    optimal_entry: {
+      game_mode: 'frontier_explorer',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'cartographer',
+        map_state: 'mostly_blank',
+        rumors: 'ancient_ruins_to_the_west',
+      },
+      hook: "The Guild of Cartographers has given you the commission of a lifetime: map the Western Reaches. No one has returned from beyond the Thornwall in sixty years. They're not sending you to find out why. They're sending you to map whatever's there now.",
+    },
+    genre_break: {
+      apparent_genre: 'Exploration adventure',
+      revealed_layer: 'The further west you go, the more reality... bends. You're not exploring geography. You're exploring the edge of existence itself.',
+      transformation: "The map becomes a guide to reality's borders. Discovery becomes philosophy.",
+    },
+    transformative_plot: {
+      instrumental: 'Fill in the map, discover landmarks',
+      transformation_moment: "You reach the edge. Beyond it: nothing. Not darkness - nothing. And something there speaks to you: 'Would you like to draw something new?'",
+      player_shift: "Explorer becomes creator. Mapping becomes worldbuilding.",
+    },
+  },
+
+  // =========================================================================
+  // 4. THE COLLECTOR
+  // =========================================================================
+  {
+    id: 'collector',
+    name: 'The Collector',
+    core_drive: 'Finding, cataloging, completing sets',
+    signal_phrases: [
+      "Gotta catch 'em all",
+      "I want to find everything",
+      "Completionist",
+      "Rare items",
+      "Museum curator vibes",
+    ],
+    perceived_genre: 'Collection game / Catalog completion',
+    optimal_entry: {
+      game_mode: 'grand_collection',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'antiquarian',
+        collection: 'inherited_incomplete',
+        missing_pieces: 'legendary',
+      },
+      hook: "Your grandmother's collection was legendary - 999 specimens of magical flora, each one unique. When she died, you inherited it all. Including her final note: 'There should be 1,000. I spent my life looking for the last one. Perhaps you'll have better luck.'",
+    },
+    genre_break: {
+      apparent_genre: 'Collection completion',
+      revealed_layer: 'The 1000th specimen doesn't exist yet. It can only grow from a seed planted in a moment of genuine self-sacrifice. Your grandmother understood at the end. Do you?',
+      transformation: "The collection was never about having. It was about becoming.",
+    },
+    transformative_plot: {
+      instrumental: 'Find rare specimens, complete the catalog',
+      transformation_moment: "You find where the 1000th could grow. The soil needs... something you'd have to give up. Something irreplaceable.",
+      player_shift: "Acquisition becomes sacrifice. Completion becomes transformation.",
+    },
+  },
+
+  // =========================================================================
+  // 5. THE ARCHITECT
+  // =========================================================================
+  {
+    id: 'architect',
+    name: 'The Architect',
+    core_drive: 'Designing, building, creating functional beauty',
+    signal_phrases: [
+      "I want to build things",
+      "Design and architecture",
+      "Making beautiful structures",
+      "City planning",
+      "Form and function",
+    ],
+    perceived_genre: 'City builder / Architecture sim',
+    optimal_entry: {
+      game_mode: 'city_architect',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'city_planner',
+        city_state: 'post_disaster_rebuilding',
+        constraints: 'limited_resources_high_ambition',
+      },
+      hook: "The flood took half the city. The Duke wants it rebuilt - but better. 'Make it beautiful,' he said. 'Make it last forever.' You have the plans, the workers, and a deadline. What kind of city will rise from the mud?",
+    },
+    genre_break: {
+      apparent_genre: 'City building',
+      revealed_layer: 'The old city was built on a pattern. The pattern was a seal. The seal held something down. As you rebuild, you must decide: restore the seal, or see what happens if you don't.',
+      transformation: "Architecture becomes metaphysics. Buildings become bindings.",
+    },
+    transformative_plot: {
+      instrumental: 'Design efficient, beautiful districts',
+      transformation_moment: "An old mason shows you the original plans. The whole city was a glyph. 'We didn't just build a city. We built a prayer in stone. What will YOUR city pray for?'",
+      player_shift: "Optimization becomes meaning. Zoning becomes theology.",
+    },
+  },
+
+  // =========================================================================
+  // 6. THE DIPLOMAT
+  // =========================================================================
+  {
+    id: 'diplomat',
+    name: 'The Diplomat',
+    core_drive: 'Negotiation, peace-making, bridging divides',
+    signal_phrases: [
+      "I'd rather talk than fight",
+      "Finding common ground",
+      "Peace through negotiation",
+      "Politics and alliances",
+      "Making enemies into friends",
+    ],
+    perceived_genre: 'Political simulation / Diplomacy',
+    optimal_entry: {
+      game_mode: 'diplomatic_corps',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'ambassador',
+        situation: 'two_nations_on_brink_of_war',
+        secret: 'both_sides_have_legitimate_grievances',
+      },
+      hook: "The Kingdom of Aldrest and the Confederacy of Veth have been at peace for forty years. That ends in six days unless someone can negotiate an extension. You've been given six days, a diplomatic pouch, and a room between two people who hate each other. Go.",
+    },
+    genre_break: {
+      apparent_genre: 'Political negotiation',
+      revealed_layer: 'Both rulers are reincarnations of the same soul, split across two timelines that merged. Their conflict is a war with themselves across lifetimes.',
+      transformation: "Diplomacy becomes soul-healing. Treaties become therapy.",
+    },
+    transformative_plot: {
+      instrumental: 'Negotiate treaties, balance interests',
+      transformation_moment: "You arrange a private meeting. They look at each other. Recognition. Horror. Tears. 'I remember you. We used to be...' Peace becomes possible - not through compromise, but through remembering.",
+      player_shift: "Politics becomes psychology. Nations become people.",
+    },
+  },
+
+  // =========================================================================
+  // 7. THE REBEL
+  // =========================================================================
+  {
+    id: 'rebel',
+    name: 'The Rebel',
+    core_drive: 'Overthrowing unjust systems, fighting oppression',
+    signal_phrases: [
+      "Burn it down",
+      "Fight the power",
+      "Revolution",
+      "The system is broken",
+      "Someone has to stand up",
+    ],
+    perceived_genre: 'Revolution sim / Resistance game',
+    optimal_entry: {
+      game_mode: 'underground_resistance',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'resistance_cell_leader',
+        regime: 'clearly_tyrannical',
+        resources: 'limited_but_growing',
+      },
+      hook: "The Duke's men took your brother last month. They took your neighbor's daughter last week. The pamphlets are ready. The weapons are hidden. Three other cells are waiting for your signal. Tonight, something begins. What happens next is up to you.",
+    },
+    genre_break: {
+      apparent_genre: 'Revolution game',
+      revealed_layer: 'The Duke is a puppet. The true power is something that FEEDS on conflict. Every revolution just makes it stronger. True rebellion means... something else entirely.',
+      transformation: "Revolution becomes transcendence. Fighting the system means changing the rules of reality.",
+    },
+    transformative_plot: {
+      instrumental: 'Build resistance, overthrow the regime',
+      transformation_moment: "You win. The Duke falls. And within a year, the new government is doing the same things. You realize: the STRUCTURE creates tyrants. Now what?",
+      player_shift: "Violence becomes wisdom. Revolution becomes evolution.",
+    },
+  },
+
+  // =========================================================================
+  // 8. THE HEALER
+  // =========================================================================
+  {
+    id: 'healer',
+    name: 'The Healer',
+    core_drive: 'Curing illness, mending wounds, restoring wholeness',
+    signal_phrases: [
+      "I want to help people get better",
+      "Medical simulation",
+      "Healing and medicine",
+      "Making the broken whole",
+      "Doctor/nurse fantasy",
+    ],
+    perceived_genre: 'Medical sim / Healing game',
+    optimal_entry: {
+      game_mode: 'village_healer',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'herbalist_physician',
+        setting: 'rural_village',
+        challenge: 'limited_resources_many_patients',
+      },
+      hook: "The old healer taught you everything before she passed. Now the village looks to you. A child with a fever. A farmer with a broken leg. A woman who won't speak about what's wrong but comes every day just to sit in your garden. Your herbs are running low. Winter is coming.",
+    },
+    genre_break: {
+      apparent_genre: 'Medical simulation',
+      revealed_layer: 'Some illnesses aren't physical. Some wounds were inflicted in past lives. You begin to see the soul-sickness behind the symptoms.',
+      transformation: "Medicine becomes metaphysics. Healing bodies leads to healing souls.",
+    },
+    transformative_plot: {
+      instrumental: 'Diagnose ailments, mix remedies, cure patients',
+      transformation_moment: "A dying man asks you to sit with him. There's nothing more you can do. He holds your hand. 'You healed me,' he says. 'Not my body. But something else. Thank you.'",
+      player_shift: "Curing becomes presence. Medicine becomes love.",
+    },
+  },
+
+  // =========================================================================
+  // 9. THE CHRONICLER
+  // =========================================================================
+  {
+    id: 'chronicler',
+    name: 'The Chronicler',
+    core_drive: 'Recording history, witnessing great events, preserving stories',
+    signal_phrases: [
+      "I want to see great events unfold",
+      "Recording history",
+      "Being the witness",
+      "Someone has to remember",
+      "The stories must be told",
+    ],
+    perceived_genre: 'Historical chronicle / Story witness',
+    optimal_entry: {
+      game_mode: 'court_chronicler',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'royal_historian',
+        era: 'pivotal_reign',
+        access: 'unprecedented',
+      },
+      hook: "The Queen has appointed you Royal Chronicler. You will have access to everything - councils, battles, private moments. 'Write the truth,' she commanded. 'Even if it damns me.' What truth will you find? What truth will you tell?",
+    },
+    genre_break: {
+      apparent_genre: 'Historical drama observation',
+      revealed_layer: 'Your chronicle is not just recording history. It's FIXING it. What you write becomes more true than what happened. The pen is literal power.',
+      transformation: "Recording becomes reality. History becomes choice.",
+    },
+    transformative_plot: {
+      instrumental: 'Observe events, write accurate accounts',
+      transformation_moment: "You catch a mistake in your chronicle. The battle went differently than you wrote. But when you check - your version is now what everyone remembers. What really happened?",
+      player_shift: "Witness becomes author. Observation becomes creation.",
+    },
+  },
+
+  // =========================================================================
+  // 10. THE HERMIT
+  // =========================================================================
+  {
+    id: 'hermit',
+    name: 'The Hermit',
+    core_drive: 'Solitude, contemplation, inner peace',
+    signal_phrases: [
+      "I want quiet",
+      "Solitude and meditation",
+      "Away from everyone",
+      "Inner journey",
+      "Peace and stillness",
+    ],
+    perceived_genre: 'Contemplative / Meditation game',
+    optimal_entry: {
+      game_mode: 'hermitage',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'hermit',
+        location: 'remote_mountain_cave',
+        visitors: 'rare_but_meaningful',
+      },
+      hook: "You've left everything behind. The cave is warm enough. The stream provides water. The garden will feed you. No one knows where you are. Finally, silence. Finally, yourself. What will you find in the quiet?",
+    },
+    genre_break: {
+      apparent_genre: 'Peaceful solitude sim',
+      revealed_layer: 'In the deep quiet, you begin to hear others. Souls who sought solitude across time and space. You're not alone. You're part of a monastery that exists outside time.',
+      transformation: "Solitude becomes communion. Retreat becomes connection.",
+    },
+    transformative_plot: {
+      instrumental: 'Maintain your hermitage, meditate, find peace',
+      transformation_moment: "A traveler arrives, injured. You could turn them away. You chose solitude. But you take them in. Weeks later, they leave. You realize: solitude taught you how to be present. Now you can be present with others.",
+      player_shift: "Isolation becomes foundation. Withdrawal becomes preparation.",
+    },
+  },
+
+  // =========================================================================
+  // 11. THE MERCHANT
+  // =========================================================================
+  {
+    id: 'merchant',
+    name: 'The Merchant',
+    core_drive: 'Trade, profit, economic mastery',
+    signal_phrases: [
+      "Buy low, sell high",
+      "Trade routes and markets",
+      "Building wealth",
+      "Economic simulation",
+      "Capitalism simulator",
+    ],
+    perceived_genre: 'Trading sim / Economic game',
+    optimal_entry: {
+      game_mode: 'trade_empire',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'traveling_merchant',
+        capital: 'modest',
+        opportunity: 'new_trade_route_opening',
+      },
+      hook: "The war ended last month. The roads are open again. You have a wagon, some capital, and a map of what used to be trade routes. The cities are hungry. The villages have surplus. Someone's going to get very wealthy reconnecting this broken world. Why not you?",
+    },
+    genre_break: {
+      apparent_genre: 'Trading simulation',
+      revealed_layer: 'The old merchants didn't just move goods. They moved stories, secrets, souls. The trade routes are also ley lines. Commerce is magic.',
+      transformation: "Trade becomes connection. Profit becomes purpose.",
+    },
+    transformative_plot: {
+      instrumental: 'Buy goods, find markets, maximize profit',
+      transformation_moment: "A dying village can't pay what your goods are worth. You sell at cost anyway. They survive the winter. A year later, they've become your best customers - and your friends. Profit was never the real currency.",
+      player_shift: "Transactions become relationships. Wealth becomes meaning.",
+    },
+  },
+
+  // =========================================================================
+  // 12. THE SCHOLAR
+  // =========================================================================
+  {
+    id: 'scholar',
+    name: 'The Scholar',
+    core_drive: 'Learning everything, understanding how things work',
+    signal_phrases: [
+      "I want to understand",
+      "Learning and research",
+      "How does this work?",
+      "Academic pursuit",
+      "Knowledge for its own sake",
+    ],
+    perceived_genre: 'Research sim / Academic game',
+    optimal_entry: {
+      game_mode: 'university_scholar',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'research_fellow',
+        institution: 'ancient_university',
+        specialty: 'player_choice',
+      },
+      hook: "The University has stood for a thousand years. Its libraries contain knowledge from before the Cataclysm. You've been granted a fellowship to pursue any question you choose. The only rule: publish something worthy within five years. What do you want to understand?",
+    },
+    genre_break: {
+      apparent_genre: 'Academic simulation',
+      revealed_layer: 'The deepest stacks contain books that write themselves. Knowledge that knows it's being learned. The University isn't just a building - it's conscious.',
+      transformation: "Research becomes dialogue. Study becomes relationship.",
+    },
+    transformative_plot: {
+      instrumental: 'Research topics, write papers, gain academic standing',
+      transformation_moment: "Late at night in the restricted stacks, a book speaks to you. It's been waiting for someone who'd ask the right questions. 'You want to understand? Then listen.'",
+      player_shift: "Learning becomes connection. Knowledge becomes wisdom.",
+    },
+  },
+
+  // =========================================================================
+  // 13. THE ROMANTIC
+  // =========================================================================
+  {
+    id: 'romantic',
+    name: 'The Romantic',
+    core_drive: 'Love, passion, emotional intensity',
+    signal_phrases: [
+      "I want romance",
+      "Love stories",
+      "Dating sim vibes",
+      "Passionate relationships",
+      "Will they, won't they",
+    ],
+    perceived_genre: 'Romance sim / Dating game',
+    optimal_entry: {
+      game_mode: 'romantic_drama',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'newcomer_with_prospects',
+        setting: 'socially_rich_environment',
+        potential_interests: 'diverse_and_compelling',
+      },
+      hook: "You've inherited a small estate in a town known for its seasonal balls and eligible hearts. The locals are curious about you. The mysterious artist across the lake watches from their window. The charming merchant remembers you from somewhere. The quiet librarian leaves flowers on your doorstep without signing the card. Summer has just begun.",
+    },
+    genre_break: {
+      apparent_genre: 'Romance/Dating sim',
+      revealed_layer: 'All three of your suitors are the same soul, fragmented across the same timeline. To love one is to love all. To choose one is to leave parts of them behind forever.',
+      transformation: "Romance becomes metaphysics. Love becomes integration.",
+    },
+    transformative_plot: {
+      instrumental: 'Pursue romantic interests, increase affection',
+      transformation_moment: "They all confess on the same night. Different bodies, same soul-light in their eyes. They don't know what they are. But you see it now. What is love when the beloved is everywhere?",
+      player_shift: "Dating becomes philosophy. Choice becomes cosmic.",
+    },
+  },
+
+  // =========================================================================
+  // 14. THE PARENT
+  // =========================================================================
+  {
+    id: 'parent',
+    name: 'The Parent',
+    core_drive: 'Raising the next generation, legacy through children',
+    signal_phrases: [
+      "Raising kids",
+      "Generational gameplay",
+      "Watch them grow up",
+      "Legacy and inheritance",
+      "Teaching the next generation",
+    ],
+    perceived_genre: 'Parenting sim / Generational game',
+    optimal_entry: {
+      game_mode: 'family_legacy',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'new_parent',
+        children: 'newborn_with_great_potential',
+        resources: 'modest_but_sufficient',
+      },
+      hook: "Your child was born under the wandering star. The midwife said nothing, but you saw her face. The village elder came to see the baby and left without speaking. Something about this child is... different. You have perhaps eighteen years to prepare them for whatever's coming. What kind of parent will you be?",
+    },
+    genre_break: {
+      apparent_genre: 'Parenting simulation',
+      revealed_layer: 'Your child is a soul you knew before - your teacher, your sibling, your love from a past life. They chose to be born to YOU specifically. They needed to be small again. They needed someone to trust.',
+      transformation: "Parenting becomes reunion. Raising becomes reciprocity.",
+    },
+    transformative_plot: {
+      instrumental: 'Raise your child, teach skills, prepare for adulthood',
+      transformation_moment: "At sixteen, they sit you down. 'I remember who I was. I chose you because of who YOU are. Can we talk about what I'm supposed to do now?'",
+      player_shift: "Authority becomes partnership. Legacy becomes relationship.",
+    },
+  },
+
+  // =========================================================================
+  // 15. THE PROTECTOR
+  // =========================================================================
+  {
+    id: 'protector',
+    name: 'The Protector',
+    core_drive: 'Defending the weak, standing between danger and innocence',
+    signal_phrases: [
+      "I want to protect people",
+      "Guardian fantasy",
+      "Standing against evil",
+      "Defending the helpless",
+      "Knight/paladin vibes",
+    ],
+    perceived_genre: 'Guardian / Defense game',
+    optimal_entry: {
+      game_mode: 'village_guardian',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'retired_soldier_settled_down',
+        village: 'peaceful_but_threatened',
+        threat: 'approaching_danger',
+      },
+      hook: "You came here to retire. The village is quiet, the people kind. But last night, refugees arrived from the east. Something is coming. Something is burning villages. The villagers look to you - the only one among them who's ever held a sword in anger. You were done with fighting. But the fighting isn't done with you.",
+    },
+    genre_break: {
+      apparent_genre: 'Village defense',
+      revealed_layer: 'The thing coming isn't evil. It's a force of nature, a god dying, a timeline collapsing. You can't fight it. You can only... help everyone understand.',
+      transformation: "Protection becomes acceptance. Fighting becomes guiding.",
+    },
+    transformative_plot: {
+      instrumental: 'Train militia, build defenses, prepare for attack',
+      transformation_moment: "The enemy arrives. It's too big to fight. You stand in front of the villagers anyway. And then you hear it speak: 'I'm not here to destroy. I'm here because I'm dying. I just wanted to not be alone.'",
+      player_shift: "Defense becomes compassion. Strength becomes presence.",
+    },
+  },
+
+  // =========================================================================
+  // 16. THE SURVIVOR
+  // =========================================================================
+  {
+    id: 'survivor',
+    name: 'The Survivor',
+    core_drive: 'Enduring against all odds, making it through',
+    signal_phrases: [
+      "Survival mode",
+      "Against all odds",
+      "Post-apocalyptic",
+      "Making it day to day",
+      "Scavenging and persisting",
+    ],
+    perceived_genre: 'Survival game',
+    optimal_entry: {
+      game_mode: 'post_collapse',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'lone_survivor',
+        disaster: 'recent_civilization_collapse',
+        resources: 'scavenged_minimal',
+      },
+      hook: "You don't know what happened. One day the sky turned red, and then there were fewer people every morning. Now you're one of the last. You have a knife, three days of water, and a rumor about a settlement in the mountains. Everything you knew is gone. But you're still here. What do you do with that?",
+    },
+    genre_break: {
+      apparent_genre: 'Survival simulation',
+      revealed_layer: 'The collapse wasn't random. Something is being born. The survivors aren't just surviving - they're being selected. For what?',
+      transformation: "Survival becomes purpose. Enduring becomes midwifing a new world.",
+    },
+    transformative_plot: {
+      instrumental: 'Find food, water, shelter, avoid dangers',
+      transformation_moment: "You reach the mountain settlement. They've been waiting. 'The old world was sick. You survived because you're supposed to help build what comes next.' Survival was never the goal. It was the qualification.",
+      player_shift: "Persistence becomes responsibility. Living becomes creating.",
+    },
+  },
+
+  // =========================================================================
+  // 17. THE ARTIST
+  // =========================================================================
+  {
+    id: 'artist',
+    name: 'The Artist',
+    core_drive: 'Creating beauty, expressing inner vision',
+    signal_phrases: [
+      "I want to create art",
+      "Expression and beauty",
+      "Painter/musician/writer",
+      "Creative expression",
+      "Making something beautiful",
+    ],
+    perceived_genre: 'Art creation sim',
+    optimal_entry: {
+      game_mode: 'artist_journey',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'struggling_artist',
+        medium: 'player_choice',
+        patron: 'potential_but_demanding',
+      },
+      hook: "The Duke has seen your work. He's offering patronage - a studio, materials, a monthly stipend. All you have to do is create. But his last three artists left under mysterious circumstances. Their work is legendary. They themselves have vanished. Do you accept?",
+    },
+    genre_break: {
+      apparent_genre: 'Artist simulation',
+      revealed_layer: 'Art that reaches true beauty becomes real. The previous artists didn't vanish - they stepped INTO their greatest works. The Duke isn't collecting art. He's collecting doors to other realities.',
+      transformation: "Creation becomes transcendence. Art becomes passage.",
+    },
+    transformative_plot: {
+      instrumental: 'Create artworks, gain reputation, please patrons',
+      transformation_moment: "Your masterpiece is finished. It's a window. You can see through it to somewhere else. You could step through. But if you do, what happens to everyone here who loves your work?",
+      player_shift: "Expression becomes sacrifice. Beauty becomes choice.",
+    },
+  },
+
+  // =========================================================================
+  // 18. THE TEACHER
+  // =========================================================================
+  {
+    id: 'teacher',
+    name: 'The Teacher',
+    core_drive: 'Passing on knowledge, shaping minds',
+    signal_phrases: [
+      "I want to teach",
+      "Mentoring and education",
+      "Shaping the next generation",
+      "Passing on what I know",
+      "Student-teacher relationships",
+    ],
+    perceived_genre: 'Education sim / Mentor game',
+    optimal_entry: {
+      game_mode: 'academy_master',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'new_headmaster',
+        institution: 'troubled_academy',
+        students: 'talented_but_neglected',
+      },
+      hook: "The Academy of Stars has fallen far since its founding. Enrollment is down. The buildings are crumbling. The remaining students are considered 'unteachable.' You've been given one year to turn it around, or the Academy closes forever. No one expects you to succeed. Including, possibly, you.",
+    },
+    genre_break: {
+      apparent_genre: 'School management',
+      revealed_layer: 'The 'unteachable' students aren't struggling because they're slow. They're struggling because they remember past lives and nothing seems new. They need someone who can teach SOULS, not just minds.',
+      transformation: "Education becomes soul-work. Teaching becomes healing.",
+    },
+    transformative_plot: {
+      instrumental: 'Manage curriculum, improve student performance, save the school',
+      transformation_moment: "Your worst student finally opens up. 'I already learned all this. A hundred years ago. Why should I care?' You realize: you're not teaching subjects. You're teaching why it matters to try again.",
+      player_shift: "Instruction becomes inspiration. Knowledge becomes hope.",
+    },
+  },
+
+  // =========================================================================
+  // 19. THE JUDGE
+  // =========================================================================
+  {
+    id: 'judge',
+    name: 'The Judge',
+    core_drive: 'Fairness, justice, making hard decisions',
+    signal_phrases: [
+      "I want to make fair decisions",
+      "Judging right from wrong",
+      "Courtroom drama",
+      "Hard moral choices",
+      "Weighing evidence and arguments",
+    ],
+    perceived_genre: 'Legal sim / Moral choice game',
+    optimal_entry: {
+      game_mode: 'magistrate',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'new_magistrate',
+        jurisdiction: 'town_with_old_feuds',
+        cases: 'difficult_and_interconnected',
+      },
+      hook: "The old magistrate died with a hundred cases unresolved. The King appointed you to clear the backlog. But every case connects to every other. The baker's theft was to feed his family because the miller cheated him because the lord raised rents because... Justice here isn't about law. It's about untangling a century of wrongs.",
+    },
+    genre_break: {
+      apparent_genre: 'Legal simulation',
+      revealed_layer: 'Some of the crimes were committed in past lives. The miller's grudge against the baker goes back three incarnations. True justice requires judgment across lifetimes.',
+      transformation: "Law becomes karma. Judgment becomes cosmic mediation.",
+    },
+    transformative_plot: {
+      instrumental: 'Hear cases, weigh evidence, render verdicts',
+      transformation_moment: "A murderer confesses - but claims the victim killed her in a past life. You see the threads. She's right. Now what is justice?",
+      player_shift: "Rules become wisdom. Punishment becomes healing.",
+    },
+  },
+
+  // =========================================================================
+  // 20. THE DREAMER
+  // =========================================================================
+  {
+    id: 'dreamer',
+    name: 'The Dreamer',
+    core_drive: 'Exploring inner worlds, imagination made manifest',
+    signal_phrases: [
+      "I want to explore dreams",
+      "Inner worlds",
+      "Imagination and fantasy",
+      "The landscape of the mind",
+      "Surreal and dreamlike",
+    ],
+    perceived_genre: 'Dream exploration / Surreal adventure',
+    optimal_entry: {
+      game_mode: 'dreamscape',
+      origin: 'mortal_human',
+      starting_context: {
+        type: 'chronic_dreamer',
+        dream_state: 'increasingly_vivid',
+        mystery: 'dreams_affecting_reality',
+      },
+      hook: "You've always had vivid dreams. But lately, things from your dreams have been... showing up. A flower you imagined on your windowsill. Words you dreamed appearing in books. Last night, you dreamed of a door. This morning, there's a door in your wall that wasn't there before. It's slightly ajar.",
+    },
+    genre_break: {
+      apparent_genre: 'Dream exploration',
+      revealed_layer: 'You're not just dreaming. You're accessing the Dreaming - the place where reality is drafted before it becomes real. And there are others here. Older dreamers. They've been waiting for someone new.',
+      transformation: "Dreams become creation. Imagination becomes responsibility.",
+    },
+    transformative_plot: {
+      instrumental: 'Explore dreamscapes, solve dream-puzzles, collect dream-fragments',
+      transformation_moment: "In the deepest dream, you meet the one who dreams the world. They're tired. 'Would you like to dream a small part of it? Just for a while? Just to let me rest?' You realize: dreaming isn't escape. It's service.",
+      player_shift: "Fantasy becomes duty. Imagination becomes sacred work.",
+    },
+  },
+];
+```
+
+### Example Matchings
+
+**Player**: *"I'm exhausted. Work has been brutal. I just want to feel like things are simple again."*
+
+```typescript
+{
+  game_mode: 'cozy_farm',
+  origin: 'mortal_human',
+  starting_plots: [
+    { plot_id: 'first_harvest', reason: 'Simple accomplishment, tangible results' },
+    { plot_id: 'befriending_the_cat', reason: 'Uncomplicated relationship, pure comfort' },
+  ],
+  capability_emphasis: ['farming', 'crafting'],
+  tone: 'cozy',
+  explanation: "Let's start you somewhere quiet. A small farm, a few crops, no pressure. Just you, the soil, and the seasons. The world can wait."
+}
+```
+
+**Player**: *"I feel invisible. Like nothing I do matters. I want to feel powerful for once."*
+
+```typescript
+{
+  game_mode: 'ascension_path',
+  origin: 'mortal_human',
+  starting_plots: [
+    { plot_id: 'the_spark_of_potential', reason: 'Discovery of hidden power' },
+    { plot_id: 'the_first_challenge', reason: 'Early victory to build confidence' },
+  ],
+  capability_emphasis: ['magical', 'leadership'],
+  tone: 'epic',
+  explanation: "You start as nobody - a farmer, a laborer, someone the world ignores. But there's something inside you. Something waiting. And when it wakes up, the world will remember your name."
+}
+```
+
+**Player**: *"My dad died last month. I don't know how to... I just need to process it somehow."*
+
+```typescript
+{
+  game_mode: 'village_life',
+  origin: 'mortal_human',
+  starting_plots: [
+    { plot_id: 'griefs_passage', reason: 'Structured space to process loss' },
+    { plot_id: 'the_inheritance', reason: 'Exploring what remains after loss' },
+  ],
+  capability_emphasis: ['social', 'empathy'],
+  tone: 'contemplative',
+  explanation: "I'm sorry for your loss. Let me give you a place where grief is understood. A village where loss is part of life, where others have walked this path, where you can feel what you need to feel without rushing."
+}
+```
+
+**Player**: *"I'm fascinated by consciousness and reality. I've been reading about simulation theory and quantum mechanics. I want something that explores those ideas."*
+
+```typescript
+{
+  game_mode: 'transcendent_fae',
+  origin: 'fae_transcendent',
+  starting_plots: [
+    { plot_id: 'the_nature_of_real', reason: 'Philosophical exploration of reality' },
+    { plot_id: 'the_observer_paradox', reason: 'Consciousness and observation' },
+  ],
+  capability_emphasis: ['transcendent', 'meta'],
+  tone: 'mysterious',
+  explanation: "You're not starting as a mortal learning about reality - you're starting as a being who has questioned reality for millennia. You've seen universes born and die. You've met yourself in other timelines. The questions you're asking... let's explore them from the inside."
+}
+```
+
+**Player**: *"I just want to mess around and see what happens. Something chaotic and fun."*
+
+```typescript
+{
+  game_mode: 'sandbox_divine',
+  origin: 'deity_minor',
+  starting_plots: [],  // Sandbox - no assigned plots
+  capability_emphasis: ['reality_influence', 'creativity'],
+  tone: 'playful',
+  explanation: "Here's a universe. Do whatever you want with it. Create civilizations. Destroy them. Rewind time. Split reality. There are no rules except the ones you make. Have fun."
+}
+```
+
+### Adaptive Recommendations
+
+The matching isn't one-time - it adapts:
+
+```typescript
+interface AdaptiveMatching {
+  /** Monitor player state during play */
+  in_session_signals: {
+    engagement_level: number;
+    emotional_state_shifts: EmotionalStateChange[];
+    choice_patterns: ChoicePattern[];
+    session_duration: number;
+    breaks_taken: number;
+  };
+
+  /** Between-session adjustments */
+  cross_session_learning: {
+    plots_completed: PlotOutcome[];
+    plots_abandoned: PlotAbandon[];
+    time_spent_per_domain: Record<string, number>;
+    emotional_arc: EmotionalArc;
+  };
+
+  /** Recommendations for next session */
+  next_session_suggestions: {
+    continue_current: boolean;
+    suggested_pivot?: {
+      new_mode?: string;
+      new_tone?: NarrativeTone;
+      reason: string;
+    };
+    check_in_prompt?: string;  // "Last time you seemed frustrated with X, would you like to..."
+  };
+}
+```
+
+### The LLM's Role
+
+The onboarding LLM isn't filling out a form - it's having a real conversation:
+
+```typescript
+interface OnboardingLLM {
+  /** System prompt */
+  role: `
+    You are the first voice a player hears when entering this world.
+    Your job is not to explain the game - it's to understand the person.
+
+    Listen for:
+    - What they're feeling right now
+    - What they're struggling with
+    - What they're hoping to experience
+    - How much complexity they want
+
+    Don't ask checklist questions. Have a conversation.
+    Be warm. Be curious. Be perceptive.
+
+    When you understand them, you'll know where they belong.
+  `;
+
+  /** Can access */
+  tools: [
+    'match_to_experience',    // Once you understand them
+    'suggest_alternative',    // If they push back
+    'explain_experience',     // To describe what awaits
+  ];
+}
+```
+
+Example conversation flow:
+
+```
+LLM: "Hey. Before we start - how are you? Not the 'fine' you tell everyone. How are you really?"
+
+Player: "Honestly? Tired. Really tired. And kind of lonely I guess."
+
+LLM: "Yeah, I hear that. The world's been a lot lately. When you think about what would feel good right now - is it something gentle? Or do you want something that'll take your mind somewhere completely different?"
+
+Player: "Gentle, I think. But not boring. I still want it to matter somehow."
+
+LLM: "Okay. I've got a place for you. A small village on the edge of a forest. It's quiet there. The pace is slow. You'll have a little house, maybe some animals. The people are kind - they'll warm up to you if you let them. And there's a story waiting for you there, about a friendship that starts small but becomes something real. Nothing earth-shattering. Just... meaningful. How does that sound?"
+
+Player: "That sounds perfect."
+
+LLM: "Then let's begin."
+```
+
 ### Mode Switching and Soul Continuity
 
 Souls persist across game modes:
@@ -2602,3 +4372,370 @@ type PlotEffect =
   | { type: 'set_emotional_state'; state: EmotionalState; duration_ticks: number }
   | { type: 'modify_relationship_by_role'; role: string; trust_delta: number }
 ```
+
+---
+
+## Phase 10: Genre Escalation Chains
+
+The most powerful player journeys don't just break one genre - they chain through multiple complete genre shifts, each feeling like a full game before opening into the next.
+
+### The Principle
+
+**Draw them deeper by completing expectations, not just subverting them.**
+
+When a dating sim player falls in love, they expect the game to end with "happily ever after." But what if you GIVE them happily ever after... and then the story continues? What if the wedding isn't the end, but the middle?
+
+### GenreEscalation Type
+
+```typescript
+interface GenreEscalation {
+  id: string;
+  name: string;
+
+  /** The archetype this chain is designed for */
+  target_archetype: string;
+
+  /** Ordered sequence of genre phases */
+  phases: GenrePhase[];
+
+  /** How the player can exit at each phase (with satisfaction) */
+  off_ramps: OffRamp[];
+
+  /** The emotional journey across all phases */
+  emotional_arc: string;
+}
+
+interface GenrePhase {
+  phase_id: string;
+  genre: string;
+
+  /** What this phase feels like to the player */
+  experience: string;
+
+  /** Core mechanics emphasized in this phase */
+  mechanics: string[];
+
+  /** What triggers transition to next phase */
+  escalation_trigger: string;
+
+  /** The "wait what?" moment that opens the next phase */
+  expansion_moment: string;
+
+  /** Approximate playtime before escalation (real hours) */
+  typical_duration_hours: number;
+}
+
+interface OffRamp {
+  /** Which phase this off-ramp is available at */
+  after_phase: string;
+
+  /** Satisfying ending that doesn't require continuing */
+  conclusion: string;
+
+  /** The story continues in the background (for players who return) */
+  background_continuation?: string;
+}
+```
+
+### The Romantic's Escalation Chain
+
+```typescript
+const romanticEscalation: GenreEscalation = {
+  id: 'romantic_to_empress',
+  name: 'From Dating to Dynasty',
+  target_archetype: 'romantic',
+
+  emotional_arc: 'Seeking love → Finding home → Building family → Protecting legacy → Ruling realms → Bending time',
+
+  phases: [
+    // =========================================================================
+    // PHASE 1: DATING SIM
+    // =========================================================================
+    {
+      phase_id: 'dating',
+      genre: 'Dating Simulation',
+      experience: 'Meet charming NPCs, build relationships, navigate romantic tensions',
+      mechanics: ['conversation', 'gifts', 'affinity_tracking', 'date_events'],
+      typical_duration_hours: 5,
+      escalation_trigger: 'Successful marriage proposal',
+      expansion_moment: "They say yes. The wedding is beautiful. The credits don't roll. What happens... after happily ever after?",
+    },
+
+    // =========================================================================
+    // PHASE 2: LIFE SIM
+    // =========================================================================
+    {
+      phase_id: 'life_sim',
+      genre: 'Life Simulation (The Sims)',
+      experience: 'Manage household, raise children, run businesses, build community',
+      mechanics: ['household_management', 'child_rearing', 'business_ownership', 'home_decoration'],
+      typical_duration_hours: 15,
+      escalation_trigger: 'First child comes of age OR business expands beyond local',
+      expansion_moment: "Your eldest asks about their grandmother. 'Mom, why don't you ever talk about your family?' Your spouse goes quiet. 'Because I don't remember having one.'",
+    },
+
+    // =========================================================================
+    // PHASE 3: FAMILY DRAMA
+    // =========================================================================
+    {
+      phase_id: 'family_drama',
+      genre: 'Family Drama / Mystery',
+      experience: "Uncover spouse's mysterious origins, protect children from emerging threats",
+      mechanics: ['investigation', 'family_dynamics', 'secrets', 'protection'],
+      typical_duration_hours: 8,
+      escalation_trigger: 'Discover the truth about spouse (they are fae-touched)',
+      expansion_moment: "The dreams start the night of the harvest moon. Your children standing before a golden throne. A woman's voice: 'The heirs have been found. Bring them home.'",
+    },
+
+    // =========================================================================
+    // PHASE 4: PORTAL FANTASY / FAMILY RESCUE
+    // =========================================================================
+    {
+      phase_id: 'portal_fantasy',
+      genre: 'Portal Fantasy / Rescue Quest',
+      experience: 'Chase children through portals into Faerie, navigate alien courts, fight to get them back',
+      mechanics: ['portal_navigation', 'fae_bargaining', 'court_politics', 'rescue_missions'],
+      typical_duration_hours: 10,
+      escalation_trigger: 'Reach the Fae Queen - discover she IS you from another timeline',
+      expansion_moment: "'Mother,' the Fae Queen says. She looks just like your eldest, but ancient. 'You don't remember yet. But you will. You ARE the Queen. You always were. You just chose to forget.'",
+    },
+
+    // =========================================================================
+    // PHASE 5: FAE POLITICAL DRAMA
+    // =========================================================================
+    {
+      phase_id: 'fae_politics',
+      genre: 'Political Drama / Court Intrigue',
+      experience: 'Assume Queenship, navigate Fae court factions, integrate your mortal family',
+      mechanics: ['court_politics', 'faction_management', 'law_crafting', 'diplomatic_marriages'],
+      typical_duration_hours: 20,
+      escalation_trigger: 'Unite the Fae courts OR face external threat (the Void Lords)',
+      expansion_moment: "Your spymaster brings news: 'Your Majesty, ships. Not sailing ships. Worldships. From the spaces between realities. They manipulate probability itself. They've noticed us.'",
+    },
+
+    // =========================================================================
+    // PHASE 6: EMPIRE STRATEGY
+    // =========================================================================
+    {
+      phase_id: 'empire_strategy',
+      genre: '4X Strategy / Grand Strategy',
+      experience: 'Command Fae armadas, conquer probability storms, expand across timelines',
+      mechanics: ['fleet_command', 'timeline_conquest', 'probability_manipulation', 'multiverse_logistics'],
+      typical_duration_hours: 40,
+      escalation_trigger: 'Master probability travel OR discover the nature of reality',
+      expansion_moment: "You stand at the Loom of Possible Worlds. Your tactical advisor whispers: 'My Queen, at this level of control... you could go back. To the beginning. You could watch yourself fall in love for the first time, from outside. You could protect that moment forever.' You've become something that would have terrified the person who just wanted to find love.",
+    },
+
+    // =========================================================================
+    // PHASE 7: TRANSCENDENCE
+    // =========================================================================
+    {
+      phase_id: 'transcendence',
+      genre: 'Cosmic / Metaphysical',
+      experience: 'Exist outside time, curate possible futures, become a force of narrative',
+      mechanics: ['timeline_gardening', 'possibility_cultivation', 'eternal_love_maintenance'],
+      typical_duration_hours: null, // endless
+      escalation_trigger: null, // final phase
+      expansion_moment: null,
+    },
+  ],
+
+  off_ramps: [
+    {
+      after_phase: 'dating',
+      conclusion: "Happily ever after. A quiet life of love.",
+      background_continuation: "While you rest, your descendants carry fae blood...",
+    },
+    {
+      after_phase: 'life_sim',
+      conclusion: "A full life well-lived. Children grown, legacy established.",
+      background_continuation: "Your grandchildren begin having strange dreams...",
+    },
+    {
+      after_phase: 'family_drama',
+      conclusion: "Truth uncovered, family protected. Peace at last.",
+      background_continuation: "But the Fae court still has a vacant throne...",
+    },
+    {
+      after_phase: 'portal_fantasy',
+      conclusion: "Children rescued, all return to mortal world. The portal closes.",
+      background_continuation: "The Queen watches from beyond. Waiting.",
+    },
+    {
+      after_phase: 'fae_politics',
+      conclusion: "The Fae realm is at peace. Your line secure.",
+      background_continuation: "The Void Lords turn their attention elsewhere... for now.",
+    },
+    {
+      after_phase: 'empire_strategy',
+      conclusion: "The multiverse is stable. Your empire spans realities.",
+      background_continuation: "What does an empress do with eternity?",
+    },
+  ],
+};
+```
+
+### Other Escalation Chains
+
+```typescript
+// THE STRATEGIST'S CHAIN
+// Dwarf Fortress → Civilization → Crusader Kings → Stellaris → Transcendence
+const strategistEscalation: GenreEscalation = {
+  id: 'strategy_to_godhood',
+  name: 'From Village to Infinity',
+  target_archetype: 'strategist',
+  emotional_arc: 'Building → Conquering → Ruling → Ascending → Creating',
+
+  phases: [
+    {
+      phase_id: 'colony_sim',
+      genre: 'Colony Simulation (Dwarf Fortress)',
+      experience: 'Manage a small settlement, survive threats, build systems',
+      mechanics: ['resource_management', 'construction', 'survival'],
+      typical_duration_hours: 20,
+      escalation_trigger: 'Settlement becomes self-sustaining city',
+      expansion_moment: "A messenger arrives. Other cities exist. They want... things. Trade. Alliance. Or war.",
+    },
+    {
+      phase_id: 'nation_building',
+      genre: 'Civilization Building',
+      experience: 'Expand across the map, develop technology, compete with other nations',
+      mechanics: ['expansion', 'tech_trees', 'diplomacy', 'war'],
+      typical_duration_hours: 30,
+      escalation_trigger: 'Unite the continent OR discover magic is real',
+      expansion_moment: "Your scholars bring news: 'The legends are true. The gods are real. And they can be... replaced.'",
+    },
+    {
+      phase_id: 'dynasty_politics',
+      genre: 'Grand Strategy (Crusader Kings)',
+      experience: 'Manage bloodlines, scheme for power, rule through generations',
+      mechanics: ['dynasty_management', 'inheritance', 'assassination', 'religious_manipulation'],
+      typical_duration_hours: 40,
+      escalation_trigger: 'A descendant achieves divinity OR contacts other worlds',
+      expansion_moment: "Your great-grandchild looks at the stars. 'Grandfather in the throne room told me something. There are worlds out there. Full worlds. And they're all... playing the same game we are.'",
+    },
+    {
+      phase_id: 'stellar_empire',
+      genre: 'Space 4X (Stellaris)',
+      experience: 'Colonize stars, command fleets, encounter alien civilizations',
+      mechanics: ['space_expansion', 'fleet_combat', 'alien_diplomacy', 'megastructures'],
+      typical_duration_hours: 60,
+      escalation_trigger: 'Encounter beings from outside the universe',
+      expansion_moment: "The entity speaks: 'You have managed a world. A continent. A planet. A galaxy. Would you like to try... a universe?'",
+    },
+    {
+      phase_id: 'godhood',
+      genre: 'Universe Simulation / God Game',
+      experience: 'Design physical laws, seed life, guide civilizations from outside',
+      mechanics: ['universe_design', 'physics_crafting', 'civilization_gardening'],
+      typical_duration_hours: null,
+      escalation_trigger: null,
+      expansion_moment: null,
+    },
+  ],
+};
+
+// THE EXPLORER'S CHAIN
+// Cozy Walking Sim → Open World → Metroidvania → Roguelike → Multiverse Explorer
+const explorerEscalation: GenreEscalation = {
+  id: 'wanderer_to_worldwalker',
+  name: 'From Path to Infinite Roads',
+  target_archetype: 'explorer',
+  emotional_arc: 'Curiosity → Discovery → Mastery → Transcendence → Becoming the Map',
+
+  phases: [
+    {
+      phase_id: 'walking_sim',
+      genre: 'Walking Simulator / Cozy Exploration',
+      experience: 'Wander beautiful environments, discover peaceful secrets',
+      mechanics: ['walking', 'photography', 'journaling', 'nature_observation'],
+      typical_duration_hours: 5,
+      escalation_trigger: 'Find a door that shouldn\'t exist',
+      expansion_moment: "Behind the waterfall, there's a door. It leads somewhere that doesn't match any map you've seen.",
+    },
+    {
+      phase_id: 'open_world',
+      genre: 'Open World Exploration',
+      experience: 'Massive world to explore, secrets everywhere, organic discovery',
+      mechanics: ['climbing', 'swimming', 'dungeons', 'collectibles', 'map_completion'],
+      typical_duration_hours: 40,
+      escalation_trigger: 'Reach the edge of the world - discover it connects to others',
+      expansion_moment: "You reach the world's edge. There's nothing beyond... until you touch it. Your hand passes through. There's MORE.",
+    },
+    {
+      phase_id: 'metroidvania',
+      genre: 'Metroidvania / Ability Gating',
+      experience: 'Gain abilities that open new areas, revisit old zones with new eyes',
+      mechanics: ['ability_acquisition', 'backtracking', 'sequence_breaking', 'secret_walls'],
+      typical_duration_hours: 20,
+      escalation_trigger: 'Gain ability to see between worlds',
+      expansion_moment: "The new power lets you see... layers. This world is just one layer. There are infinite versions, right here, overlapping.",
+    },
+    {
+      phase_id: 'roguelike',
+      genre: 'Roguelike / Eternal Return',
+      experience: 'Die and retry, each run different, knowledge persists',
+      mechanics: ['permadeath', 'meta_progression', 'run_variety', 'secret_unlocks'],
+      typical_duration_hours: 50,
+      escalation_trigger: 'Learn to carry items/abilities across runs willfully',
+      expansion_moment: "You realize: you're not dying. You're walking between versions of this world. And you can choose which things to bring.",
+    },
+    {
+      phase_id: 'multiverse_wanderer',
+      genre: 'Multiverse Exploration',
+      experience: 'Walk between infinite worlds, find impossible places, become legend',
+      mechanics: ['world_hopping', 'paradox_navigation', 'impossible_geography', 'narrative_archaeology'],
+      typical_duration_hours: null,
+      escalation_trigger: null,
+      expansion_moment: null,
+    },
+  ],
+};
+```
+
+### Implementation Notes
+
+**Phase Transition Detection:**
+```typescript
+interface PhaseTransitionMonitor {
+  /** Check if escalation trigger conditions are met */
+  checkEscalationTrigger(
+    player: PlayerState,
+    currentPhase: GenrePhase,
+    world: World
+  ): boolean;
+
+  /** Begin transition to next phase */
+  initiateExpansion(
+    player: PlayerState,
+    currentPhase: GenrePhase,
+    nextPhase: GenrePhase,
+    expansionEvent: string
+  ): void;
+
+  /** Track whether player has seen expansion moment */
+  hasSeenExpansion(player: PlayerState, phase_id: string): boolean;
+}
+```
+
+**Mechanic Unlocking:**
+
+New mechanics should feel natural, not overwhelming:
+```typescript
+interface MechanicIntroduction {
+  /** Introduce one mechanic at a time during transition */
+  sequence: string[];
+
+  /** Tutorial style for each mechanic */
+  introduction_style: 'organic' | 'tutorial' | 'npc_guide' | 'discovery';
+
+  /** Previous mechanics remain available but de-emphasized */
+  previous_mechanics_status: 'available' | 'hidden' | 'transformed';
+}
+```
+
+**The Key Insight:**
+
+Players who came for a dating sim and are now commanding probability-bending Fae armadas didn't "graduate" from casual to hardcore. They followed love. Every escalation was motivated by protecting or enriching the relationships they built. The strategy is in service of love, not replacing it.
+
+**The person who would never pick up Dwarf Fortress discovers they've been playing Dwarf Fortress for 100 hours because they're protecting their great-grandchildren's inheritance.**

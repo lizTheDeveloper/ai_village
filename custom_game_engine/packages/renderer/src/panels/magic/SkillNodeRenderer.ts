@@ -10,8 +10,7 @@
  * - Handle hover highlighting and pulsing animations
  */
 
-import type { MagicSkillNode } from '@ai-village/core/src/magic/MagicSkillTree.js';
-import type { NodeEvaluationResult } from '@ai-village/core/src/magic/MagicSkillTreeEvaluator.js';
+import type { MagicSkillNode, NodeEvaluationResult } from '@ai-village/core';
 import type { NodeRenderResult } from './types.js';
 import { DEFAULT_NODE_COLORS, CATEGORY_SHAPES } from './types.js';
 
@@ -137,7 +136,7 @@ export class SkillNodeRenderer {
     width: number,
     height: number,
     state: 'unlocked' | 'available' | 'locked',
-    isHovered: boolean,
+    _isHovered: boolean,
     timestamp: number
   ): void {
     // Determine fill color
@@ -197,7 +196,7 @@ export class SkillNodeRenderer {
   private renderNodeContent(
     ctx: CanvasRenderingContext2D,
     node: MagicSkillNode,
-    evaluation: NodeEvaluationResult,
+    _evaluation: NodeEvaluationResult,
     x: number,
     y: number,
     width: number,
@@ -251,7 +250,7 @@ export class SkillNodeRenderer {
     x: number,
     y: number,
     width: number,
-    height: number
+    _height: number
   ): void {
     const badgeX = x + width - 20;
     const badgeY = y + 5;
@@ -280,8 +279,8 @@ export class SkillNodeRenderer {
     maxLevel: number,
     x: number,
     y: number,
-    width: number,
-    height: number
+    _width: number,
+    _height: number
   ): void {
     const text = `${currentLevel}/${maxLevel}`;
     ctx.fillStyle = '#ffffff';

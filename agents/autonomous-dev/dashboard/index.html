@@ -653,11 +653,11 @@
             <section class="section" id="parallel-work-section" style="display: none;">
                 <div class="launch-section">
                     <h3 class="launch-title">
-                        <span>Available Parallel Work</span>
-                        <span class="status-badge" style="background: rgba(163, 113, 247, 0.2); color: var(--accent-purple);">Ready to launch</span>
+                        <span>Batch OpenSpec Proposals</span>
+                        <span class="status-badge" style="background: rgba(163, 113, 247, 0.2); color: var(--accent-purple);">Ready to batch</span>
                     </h3>
                     <div class="parallel-tasks" id="parallel-tasks-container"></div>
-                    <button class="btn btn-success" onclick="launchSelected()">Launch Selected Tasks</button>
+                    <button class="btn btn-success" onclick="launchSelected()">Launch Selected in Batch</button>
                 </div>
             </section>
 
@@ -1338,39 +1338,57 @@
         }
 
         function findParallelWork(phases) {
-            const parallelTasks = [];
+            // Group work orders by status for batch processing
+            const statusGroups = {};
 
-            for (const phase of phases) {
-                if (phase.status === 'ready' || phase.status === 'in_progress') {
-                    for (const task of phase.tasks) {
-                        // Only show READY tasks (not in_progress - those are already running)
-                        if (task.parallel && task.status === 'ready') {
-                            parallelTasks.push({
-                                phaseName: phase.name,
-                                phaseNumber: phase.number,
-                                taskName: task.name,
-                                taskStatus: task.status
-                            });
-                        }
+            if (workOrdersData && workOrdersData.length > 0) {
+                // Group work orders by their status
+                for (const wo of workOrdersData) {
+                    const status = wo.state || 'Draft';
+                    if (!statusGroups[status]) {
+                        statusGroups[status] = [];
                     }
+                    statusGroups[status].push(wo);
                 }
             }
 
             const section = document.getElementById('parallel-work-section');
             const container = document.getElementById('parallel-tasks-container');
 
-            if (parallelTasks.length > 0) {
+            // Only show statuses with 2+ proposals (batchable)
+            const batchableGroups = Object.entries(statusGroups).filter(([_, proposals]) => proposals.length >= 2);
+
+            if (batchableGroups.length > 0) {
                 section.style.display = 'block';
-                container.innerHTML = parallelTasks.map((t, i) => `
-                    <div class="parallel-task-item">
-                        <input type="checkbox" id="parallel-task-${i}" data-task='${JSON.stringify(t)}'>
-                        <div class="parallel-task-info">
-                            <div class="parallel-task-name">${t.taskName}</div>
-                            <div class="parallel-task-phase">Phase ${t.phaseNumber}: ${t.phaseName}</div>
+
+                let html = '<div style="margin-bottom: 16px; color: #999; font-size: 13px;">Select proposals in the same status to batch process them together</div>';
+
+                for (const [status, proposals] of batchableGroups) {
+                    html += `
+                        <div style="margin-bottom: 24px;">
+                            <div style="font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">
+                                ${status} (${proposals.length} proposals)
+                            </div>
+                            ${proposals.map((wo, i) => `
+                                <div class="parallel-task-item">
+                                    <input type="checkbox" id="batch-wo-${status}-${i}" data-proposal='${JSON.stringify({name: wo.name, status: status})}'>
+                                    <div class="parallel-task-info">
+                                        <div class="parallel-task-name">${wo.name}</div>
+                                        <div class="parallel-task-phase">
+                                            ${wo.priority ? `Priority: ${wo.priority}` : ''}
+                                            ${wo.complexity ? ` • Complexity: ${wo.complexity}` : ''}
+                                        </div>
+                                    </div>
+                                    <span class="status-badge status-${status === 'Draft' ? 'ready' : status === 'Blocked' ? 'blocked' : 'in_progress'}">
+                                        ${status}
+                                    </span>
+                                </div>
+                            `).join('')}
                         </div>
-                        <span class="status-badge status-${t.taskStatus}">${formatStatus(t.taskStatus)}</span>
-                    </div>
-                `).join('');
+                    `;
+                }
+
+                container.innerHTML = html;
             } else {
                 section.style.display = 'none';
             }
@@ -1427,6 +1445,9 @@
                         </div>
                     `;
                 }).join('');
+
+                // Update batch queue with loaded work orders
+                findParallelWork(roadmapData?.phases || []);
             } catch (err) {
                 container.innerHTML = `<div class="empty-state">Error: ${err.message}</div>`;
             }
@@ -1961,13 +1982,23 @@
             const features = [];
 
             checkboxes.forEach(cb => {
-                const task = JSON.parse(cb.dataset.task);
-                const featureName = task.taskName.toLowerCase().replace(/\s+/g, '-');
-                features.push({ name: featureName });
+                // Support both old task format and new proposal format
+                if (cb.dataset.proposal) {
+                    const proposal = JSON.parse(cb.dataset.proposal);
+                    features.push({ name: proposal.name });
+                } else if (cb.dataset.task) {
+                    const task = JSON.parse(cb.dataset.task);
+                    const featureName = task.taskName.toLowerCase().replace(/\s+/g, '-');
+                    features.push({ name: featureName });
+                }
             });
 
             if (features.length === 0) {
-                alert('Please select at least one task');
+                alert('Please select at least one proposal');
+                return;
+            }
+
+            if (!confirm(`Launch ${features.length} proposal(s) in a single Claude Code session?`)) {
                 return;
             }
 
@@ -1979,7 +2010,7 @@
                 });
                 const data = await response.json();
                 loadPipelines();
-                alert(`Launched ${data.pipelines.length} pipeline(s) in parallel`);
+                alert(`✅ Launched ${data.pipelines.length} pipeline(s) in batch mode`);
             } catch (err) {
                 alert('Failed to launch pipelines: ' + err.message);
             }

@@ -89,7 +89,7 @@ export interface CompressedTileData {
   encoding: CompressionEncoding;
 
   /** Compressed data (format depends on encoding) */
-  data: RLEData[] | DeltaData | Tile[];
+  data: RLEData[] | DeltaData | Tile[] | SerializedTile[];
 }
 
 /**

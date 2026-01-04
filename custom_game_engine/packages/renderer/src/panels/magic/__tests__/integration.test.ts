@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import type { World } from '@ai-village/core/src/ecs/World.js';
 import type { Entity } from '@ai-village/core/src/ecs/Entity.js';
 import type { EventBus } from '@ai-village/core/src/events/EventBus.js';
+import { SkillTreePanel } from '../SkillTreePanel.js';
 
 /**
  * Integration Tests for Magic Skill Tree UI
@@ -23,7 +24,6 @@ describe('Integration: Magic Skill Tree UI', () => {
     mockEntity = createMockMagicEntity();
     mockEventBus = mockWorld.getEventBus();
 
-    // @ts-expect-error - SkillTreePanel doesn't exist yet
     skillTreePanel = new SkillTreePanel(createMockWindowManager());
     skillTreePanel.setSelectedEntity(mockEntity);
   });
@@ -46,7 +46,6 @@ describe('Integration: Magic Skill Tree UI', () => {
         purity: 45
       });
 
-      // @ts-expect-error - SkillTreePanel doesn't exist yet
       const panel = new SkillTreePanel(createMockWindowManager());
       panel.setSelectedEntity(entity);
 
@@ -54,7 +53,7 @@ describe('Integration: Magic Skill Tree UI', () => {
       const ctx = createMockCanvasContext();
       panel.render(ctx, 0, 0, 800, 600, mockWorld);
 
-      const yellowGlowCalls = ctx.strokeStyle.mock.calls.filter((call: any) =>
+      const yellowGlowCalls = ctx._strokeStyleCalls.filter((call: any) =>
         call.includes('yellow')
       );
       expect(yellowGlowCalls.length).toBeGreaterThan(0);
@@ -79,10 +78,10 @@ describe('Integration: Magic Skill Tree UI', () => {
       });
 
       // Step 6: Verify UI updates (node now green)
-      ctx.fillStyle.mockClear();
+      
       panel.render(ctx, 0, 0, 800, 600, mockWorld);
 
-      const greenFillCalls = ctx.fillStyle.mock.calls.filter((call: any) =>
+      const greenFillCalls = ctx._fillStyleCalls.filter((call: any) =>
         call.includes('green')
       );
       expect(greenFillCalls.length).toBeGreaterThan(0);
@@ -95,7 +94,6 @@ describe('Integration: Magic Skill Tree UI', () => {
         unlockedNodes: ['shinto_spirit_sense']
       });
 
-      // @ts-expect-error - SkillTreePanel doesn't exist yet
       const panel = new SkillTreePanel(createMockWindowManager());
       panel.setSelectedEntity(entity);
 
@@ -118,7 +116,6 @@ describe('Integration: Magic Skill Tree UI', () => {
         unlockedNodes: ['shinto_spirit_sense']
       });
 
-      // @ts-expect-error - SkillTreePanel doesn't exist yet
       const panel = new SkillTreePanel(createMockWindowManager());
       panel.setSelectedEntity(entity);
 
@@ -145,7 +142,6 @@ describe('Integration: Magic Skill Tree UI', () => {
         purity: 10 // Too low
       });
 
-      // @ts-expect-error - SkillTreePanel doesn't exist yet
       const panel = new SkillTreePanel(createMockWindowManager());
       panel.setSelectedEntity(entity);
 
@@ -162,7 +158,6 @@ describe('Integration: Magic Skill Tree UI', () => {
         xp: { shinto: 50 }
       });
 
-      // @ts-expect-error - SkillTreePanel doesn't exist yet
       const panel = new SkillTreePanel(createMockWindowManager());
       panel.setSelectedEntity(entity);
 
@@ -189,7 +184,6 @@ describe('Integration: Magic Skill Tree UI', () => {
         unlockedNodes: ['shinto_spirit_sense']
       });
 
-      // @ts-expect-error - SkillTreePanel doesn't exist yet
       const panel = new SkillTreePanel(createMockWindowManager());
       panel.setSelectedEntity(entity);
 
@@ -210,18 +204,17 @@ describe('Integration: Magic Skill Tree UI', () => {
       entity.getComponent('magic').skillTreeState.shinto.xp -= 100;
 
       // Re-render
-      ctx.fillStyle.mockClear();
+      
       panel.render(ctx, 0, 0, 800, 600, mockWorld);
 
       // Verify UI updated (node now green)
-      const greenFills = ctx.fillStyle.mock.calls.filter((call: any) =>
+      const greenFills = ctx._fillStyleCalls.filter((call: any) =>
         call.includes('green')
       );
       expect(greenFills.length).toBeGreaterThan(0);
     });
 
     it('should listen to magic:skill_node_unlocked events', () => {
-      // @ts-expect-error - SkillTreePanel doesn't exist yet
       const panel = new SkillTreePanel(createMockWindowManager());
 
       // Verify event listener registered
@@ -236,7 +229,6 @@ describe('Integration: Magic Skill Tree UI', () => {
         paradigms: ['shinto']
       });
 
-      // @ts-expect-error - SkillTreePanel doesn't exist yet
       const panel = new SkillTreePanel(createMockWindowManager());
       panel.setSelectedEntity(entity);
 
@@ -269,7 +261,6 @@ describe('Integration: Magic Skill Tree UI', () => {
         xp: { shinto: 450 }
       });
 
-      // @ts-expect-error - SkillTreePanel doesn't exist yet
       const panel = new SkillTreePanel(createMockWindowManager());
       panel.setSelectedEntity(entity);
 
@@ -293,7 +284,7 @@ describe('Integration: Magic Skill Tree UI', () => {
       entity.getComponent('magic').skillTreeState.shinto.xp += 50;
 
       // Re-render
-      ctx.fillText.mockClear();
+      
       panel.render(ctx, 0, 0, 800, 600, mockWorld);
 
       // Verify new XP shown
@@ -310,7 +301,6 @@ describe('Integration: Magic Skill Tree UI', () => {
         unlockedNodes: ['shinto_spirit_sense']
       });
 
-      // @ts-expect-error - SkillTreePanel doesn't exist yet
       const panel = new SkillTreePanel(createMockWindowManager());
       panel.setSelectedEntity(entity);
 
@@ -328,7 +318,7 @@ describe('Integration: Magic Skill Tree UI', () => {
       panel.render(ctx, 0, 0, 800, 600, mockWorld);
 
       // Verify node now shows as available (yellow glow)
-      const yellowGlows = ctx.strokeStyle.mock.calls.filter((call: any) =>
+      const yellowGlows = ctx._strokeStyleCalls.filter((call: any) =>
         call.includes('yellow')
       );
       expect(yellowGlows.length).toBeGreaterThan(0);
@@ -347,7 +337,6 @@ describe('Integration: Magic Skill Tree UI', () => {
         discoveries: { kami: [] } // No kami met yet
       });
 
-      // @ts-expect-error - SkillTreePanel doesn't exist yet
       const panel = new SkillTreePanel(createMockWindowManager());
       panel.setSelectedEntity(entity);
 
@@ -366,7 +355,7 @@ describe('Integration: Magic Skill Tree UI', () => {
       };
 
       // Re-render
-      ctx.fillText.mockClear();
+      
       panel.render(ctx, 0, 0, 800, 600, mockWorld);
 
       // Verify node now visible with real name
@@ -387,7 +376,6 @@ describe('Integration: Magic Skill Tree UI', () => {
         discoveries: { kami: [] }
       });
 
-      // @ts-expect-error - SkillTreePanel doesn't exist yet
       const panel = new SkillTreePanel(createMockWindowManager());
       panel.setSelectedEntity(entity);
 
@@ -411,7 +399,6 @@ describe('Integration: Magic Skill Tree UI', () => {
         discoveries: { kami: [] }
       });
 
-      // @ts-expect-error - SkillTreePanel doesn't exist yet
       const panel = new SkillTreePanel(createMockWindowManager());
       panel.setSelectedEntity(entity);
 
@@ -440,7 +427,6 @@ describe('Integration: Magic Skill Tree UI', () => {
         unlockedNodes: ['shinto_spirit_sense']
       });
 
-      // @ts-expect-error - SkillTreePanel doesn't exist yet
       const panel = new SkillTreePanel(createMockWindowManager());
       panel.setSelectedEntity(entity);
 
@@ -464,7 +450,6 @@ describe('Integration: Magic Skill Tree UI', () => {
         xp: { shinto: 500, allomancy: 500 }
       });
 
-      // @ts-expect-error - SkillTreePanel doesn't exist yet
       const panel = new SkillTreePanel(createMockWindowManager());
       panel.setSelectedEntity(entity);
 
@@ -501,7 +486,6 @@ describe('Integration: Magic Skill Tree UI', () => {
         throw new Error('Unlock failed');
       });
 
-      // @ts-expect-error - SkillTreePanel doesn't exist yet
       const panel = new SkillTreePanel(createMockWindowManager());
       panel.setSelectedEntity(entity);
 
@@ -523,7 +507,6 @@ describe('Integration: Magic Skill Tree UI', () => {
         throw new Error('Unlock failed');
       });
 
-      // @ts-expect-error - SkillTreePanel doesn't exist yet
       const panel = new SkillTreePanel(createMockWindowManager());
       panel.setSelectedEntity(entity);
 
@@ -616,7 +599,10 @@ function createMockWindowManager(): any {
 }
 
 function createMockCanvasContext(): CanvasRenderingContext2D {
-  return {
+  const fillStyleCalls: string[] = [];
+  const strokeStyleCalls: string[] = [];
+
+  const mock: any = {
     fillRect: vi.fn(),
     fillText: vi.fn(),
     strokeRect: vi.fn(),
@@ -625,8 +611,29 @@ function createMockCanvasContext(): CanvasRenderingContext2D {
     lineTo: vi.fn(),
     stroke: vi.fn(),
     fill: vi.fn(),
-    fillStyle: vi.fn(),
-    strokeStyle: vi.fn(),
     setLineDash: vi.fn(),
-  } as any;
+    _fillStyle: '#000000',
+    _strokeStyle: '#000000',
+    _fillStyleCalls: fillStyleCalls,
+    _strokeStyleCalls: strokeStyleCalls,
+  };
+
+  // Make fillStyle/strokeStyle act like properties with call tracking
+  Object.defineProperty(mock, 'fillStyle', {
+    get() { return this._fillStyle; },
+    set(value: string) {
+      this._fillStyle = value;
+      this._fillStyleCalls.push(value);
+    }
+  });
+
+  Object.defineProperty(mock, 'strokeStyle', {
+    get() { return this._strokeStyle; },
+    set(value: string) {
+      this._strokeStyle = value;
+      this._strokeStyleCalls.push(value);
+    }
+  });
+
+  return mock as CanvasRenderingContext2D;
 }
