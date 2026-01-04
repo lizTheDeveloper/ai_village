@@ -12,6 +12,7 @@ import type {
 import { worldSerializer } from './WorldSerializer.js';
 import { computeChecksumSync, getGameVersion } from './utils.js';
 import { validateWorldState, validateSaveFile } from './InvariantChecker.js';
+import { multiverseCoordinator } from '../multiverse/MultiverseCoordinator.js';
 
 export interface SaveOptions {
   /** Save name */
@@ -68,19 +69,34 @@ export class SaveLoadService {
     // Generate key if not provided
     const key = options.key ?? this.generateSaveKey(options.name);
 
+    // Find which universe this world belongs to
+    let universeId = 'universe:main';  // Default fallback
+    let universeName = 'Main Universe';
+
+    for (const [id, instance] of multiverseCoordinator.getAllUniverses()) {
+      if (instance.world === world) {
+        universeId = id;
+        universeName = instance.config.name;
+        break;
+      }
+    }
+
     // Serialize world
     const universeSnapshot = await worldSerializer.serializeWorld(
       world,
-      'universe:main',  // TODO: Get from multiverse
-      'Main Universe'
+      universeId,
+      universeName
     );
+
+    // Get multiverse state
+    const absoluteTick = multiverseCoordinator.getAbsoluteTick();
 
     // Create multiverse snapshot
     const multiverseSnapshot: MultiverseSnapshot = {
       $schema: 'https://aivillage.dev/schemas/multiverse/v1',
       $version: 1,
       time: {
-        absoluteTick: '0',  // TODO: Get from MultiverseCoordinator
+        absoluteTick: absoluteTick.toString(),
         originTimestamp: Date.now(),
         currentTimestamp: Date.now(),
         realTimeElapsed: totalPlayTime,
@@ -110,7 +126,15 @@ export class SaveLoadService {
 
       universes: [universeSnapshot],
 
-      passages: [],  // TODO: Implement passages
+      passages: Array.from(multiverseCoordinator.getAllPassages().values()).map(passage => ({
+        $schema: 'https://aivillage.dev/schemas/passage/v1' as const,
+        $version: 1,
+        id: passage.id,
+        sourceUniverseId: passage.sourceUniverseId,
+        targetUniverseId: passage.targetUniverseId,
+        type: passage.type,
+        active: passage.active,
+      })),
 
       player: undefined,  // TODO: Implement player state
 
@@ -177,6 +201,12 @@ export class SaveLoadService {
       // Note: World interface doesn't have clear(), so we access internal API
       const worldImpl = world as any;  // TODO: Add clear() to World interface
       worldImpl._entities.clear();
+
+      // Restore multiverse state
+      multiverseCoordinator.loadFromSnapshot(saveFile.multiverse.time);
+
+      // TODO: Restore passages (need to recreate passage connections)
+      // For now, passages are stored but not restored
 
       // Deserialize universe(s)
       for (const universeSnapshot of saveFile.universes) {

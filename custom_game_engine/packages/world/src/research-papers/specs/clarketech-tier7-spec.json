@@ -1,0 +1,383 @@
+[
+  {
+    "paperId": "complete_neural_immersion",
+    "title": "Leaving Your Body Behind: The Complete Dive Experience",
+    "field": "experimental",
+    "paperSets": ["full_dive_vr"],
+    "prerequisitePapers": ["sensory_immersion_theory", "bidirectional_neural_communication"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 18, "medicine": 15 },
+    "contributesTo": [
+      { "type": "building", "id": "dive_pod_array" }
+    ],
+    "topicDescription": "Complete sensory takeover for total virtual immersion",
+    "keyPoints": [
+      "Suppressing real-world sensory input",
+      "The body maintenance problem during dive",
+      "Why some people's bodies forget to breathe",
+      "Emergency ejection protocols"
+    ]
+  },
+  {
+    "paperId": "dream_state_computing",
+    "title": "Thinking While Sleeping: Leveraging the Unconscious Mind",
+    "field": "experimental",
+    "paperSets": ["full_dive_vr"],
+    "prerequisitePapers": ["complete_neural_immersion"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "psychology": 18, "arcane": 10 },
+    "contributesTo": [
+      { "type": "ability", "id": "full_dive" }
+    ],
+    "topicDescription": "Processing information through dream-state cognition",
+    "keyPoints": [
+      "The computational power of dreams",
+      "Lucid dream control interfaces",
+      "Nightmares as system errors",
+      "The researcher who solved problems in their sleep"
+    ]
+  },
+  {
+    "paperId": "time_perception_manipulation",
+    "title": "A Year in a Day: Subjective Time Dilation",
+    "field": "experimental",
+    "paperSets": ["full_dive_vr"],
+    "prerequisitePapers": ["dream_state_computing"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "psychology": 20, "physics": 10 },
+    "contributesTo": [
+      { "type": "ability", "id": "full_dive" }
+    ],
+    "topicDescription": "Accelerating subjective experience of time in VR",
+    "keyPoints": [
+      "Neural clock manipulation",
+      "The aging discrepancy between mind and body",
+      "Re-synchronization after extended dilation",
+      "The student who lived three lifetimes overnight"
+    ]
+  },
+  {
+    "paperId": "digital_existence_stability",
+    "title": "Being Somewhere Else Permanently: Long-term Dive Sustainability",
+    "field": "experimental",
+    "paperSets": ["full_dive_vr"],
+    "prerequisitePapers": ["complete_neural_immersion", "time_perception_manipulation"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "medicine": 15, "psychology": 15 },
+    "contributesTo": [
+      { "type": "knowledge", "id": "digital_existence" }
+    ],
+    "topicDescription": "Maintaining mental health during extended virtual existence",
+    "keyPoints": [
+      "Identity preservation across extended dives",
+      "The 'real world feels fake' syndrome",
+      "Mandatory physical world reconnection",
+      "Those who chose to never return"
+    ]
+  },
+  {
+    "paperId": "collective_consciousness_theory",
+    "title": "Many Minds, One Thought: The Theory of Shared Cognition",
+    "field": "experimental",
+    "paperSets": ["hive_mind_link"],
+    "prerequisitePapers": ["bidirectional_neural_communication"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "psychology": 20, "philosophy": 15 },
+    "contributesTo": [
+      { "type": "building", "id": "collective_nexus" }
+    ],
+    "topicDescription": "Theoretical foundations of multi-mind cognitive systems",
+    "keyPoints": [
+      "Distributed consciousness architecture",
+      "The emergent properties of linked minds",
+      "Individual identity within the collective",
+      "The first linked pair and their arguments"
+    ]
+  },
+  {
+    "paperId": "thought_synchronization_protocols",
+    "title": "Thinking Together: Protocols for Mental Coordination",
+    "field": "experimental",
+    "paperSets": ["hive_mind_link"],
+    "prerequisitePapers": ["collective_consciousness_theory"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "psychology": 15, "engineering": 12 },
+    "contributesTo": [
+      { "type": "ability", "id": "hive_link" }
+    ],
+    "topicDescription": "Coordinating thoughts across multiple minds",
+    "keyPoints": [
+      "Latency in thought transmission",
+      "Conflict resolution in shared cognition",
+      "The 'intrusive thought' broadcast problem",
+      "Privacy boundaries within the link"
+    ]
+  },
+  {
+    "paperId": "cognitive_load_distribution",
+    "title": "Borrowing Brain Power: Distributed Problem Solving",
+    "field": "experimental",
+    "paperSets": ["hive_mind_link"],
+    "prerequisitePapers": ["thought_synchronization_protocols"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "psychology": 18, "engineering": 10 },
+    "contributesTo": [
+      { "type": "ability", "id": "hive_link" }
+    ],
+    "topicDescription": "Sharing mental workload across linked minds",
+    "keyPoints": [
+      "Task partitioning across consciousnesses",
+      "The sum greater than its parts",
+      "Fatigue distribution and recovery",
+      "Why groups of linked minds beat individuals"
+    ]
+  },
+  {
+    "paperId": "hive_mind_ethics",
+    "title": "Who Are You When You're Everyone?: Ethical Considerations",
+    "field": "experimental",
+    "paperSets": ["hive_mind_link"],
+    "prerequisitePapers": ["collective_consciousness_theory"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "philosophy": 20, "psychology": 10 },
+    "contributesTo": [
+      { "type": "building", "id": "collective_nexus" }
+    ],
+    "topicDescription": "Ethical and legal questions of shared consciousness",
+    "keyPoints": [
+      "Individual vs collective responsibility",
+      "Consent in shared mental spaces",
+      "The right to disconnect",
+      "Who owns the thoughts we create together"
+    ]
+  },
+  {
+    "paperId": "energy_barrier_formation",
+    "title": "Walls of Nothing: Creating Force Fields from Energy",
+    "field": "experimental",
+    "paperSets": ["force_fields"],
+    "prerequisitePapers": ["gravitational_field_projection"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 18, "engineering": 15 },
+    "contributesTo": [
+      { "type": "building", "id": "shield_generator" }
+    ],
+    "topicDescription": "Generating impenetrable energy barriers",
+    "keyPoints": [
+      "Converting energy to solid resistance",
+      "The physics of an unbreakable surface",
+      "Power requirements and sustainability",
+      "What happens when two force fields meet"
+    ]
+  },
+  {
+    "paperId": "shield_geometry_optimization",
+    "title": "The Shape of Protection: Optimal Force Field Configurations",
+    "field": "experimental",
+    "paperSets": ["force_fields"],
+    "prerequisitePapers": ["energy_barrier_formation"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 12, "engineering": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "personal_shield" }
+    ],
+    "topicDescription": "Designing force field shapes for maximum protection",
+    "keyPoints": [
+      "Spheres vs custom contours",
+      "Energy distribution across surfaces",
+      "The weak point every shield has",
+      "Why the best shape isn't the obvious one"
+    ]
+  },
+  {
+    "paperId": "personal_shield_miniaturization",
+    "title": "Wearing Your Fortress: Personal Force Field Systems",
+    "field": "experimental",
+    "paperSets": ["force_fields"],
+    "prerequisitePapers": ["shield_geometry_optimization"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 18, "survival": 10 },
+    "contributesTo": [
+      { "type": "item", "id": "personal_shield" }
+    ],
+    "topicDescription": "Shrinking force field technology to personal scale",
+    "keyPoints": [
+      "Power source miniaturization",
+      "Heat dissipation in confined systems",
+      "The mobility vs protection tradeoff",
+      "Why you still need to breathe"
+    ]
+  },
+  {
+    "paperId": "quantum_entanglement_communication",
+    "title": "Instant Messages Across Reality: Quantum-Linked Communication",
+    "field": "experimental",
+    "paperSets": ["cross_realm_messaging"],
+    "prerequisitePapers": ["inter_universe_membrane_theory"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 20, "engineering": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "basic_cross_realm_phone" }
+    ],
+    "topicDescription": "Using entangled particles for cross-universal communication",
+    "keyPoints": [
+      "Entanglement across β-space",
+      "Information encoding in quantum states",
+      "The 'no cloning' limitation workaround",
+      "Why your messages arrive before you send them"
+    ]
+  },
+  {
+    "paperId": "mana_resonance_amplification",
+    "title": "Magical Carrier Waves: Using Mana for Signal Boost",
+    "field": "experimental",
+    "paperSets": ["cross_realm_messaging"],
+    "prerequisitePapers": ["quantum_entanglement_communication"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "arcane": 18, "engineering": 12 },
+    "contributesTo": [
+      { "type": "building", "id": "mana_charging_station" }
+    ],
+    "topicDescription": "Combining magical and technological signal transmission",
+    "keyPoints": [
+      "Mana as a communication medium",
+      "The tech-magic interface protocols",
+      "Signal clarity across dimensional barriers",
+      "Why pure tech fails at certain β-distances"
+    ]
+  },
+  {
+    "paperId": "cross_reality_addressing",
+    "title": "Calling the Other You: Universal Addressing Systems",
+    "field": "experimental",
+    "paperSets": ["cross_realm_messaging"],
+    "prerequisitePapers": ["quantum_entanglement_communication"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 15, "logic": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "basic_cross_realm_phone" }
+    ],
+    "topicDescription": "Uniquely identifying entities across multiple universes",
+    "keyPoints": [
+      "β-space coordinate systems",
+      "The 'which version of you' problem",
+      "Universal unique identifiers",
+      "Wrong number calls to parallel selves"
+    ]
+  },
+  {
+    "paperId": "temporal_sync_protocols",
+    "title": "When Is Now?: Synchronizing Time Across Realities",
+    "field": "experimental",
+    "paperSets": ["cross_realm_messaging"],
+    "prerequisitePapers": ["mana_resonance_amplification"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 18, "engineering": 12 },
+    "contributesTo": [
+      { "type": "item", "id": "basic_cross_realm_phone" }
+    ],
+    "topicDescription": "Coordinating time between universes with different flows",
+    "keyPoints": [
+      "Relative time dilation between β-branches",
+      "Conversation lag when time moves differently",
+      "Scheduling meetings across temporal variance",
+      "The message that arrived before the event it described"
+    ]
+  },
+  {
+    "paperId": "audiovisual_reality_transmission",
+    "title": "Seeing Across the Void: Real-time Cross-Universal Video",
+    "field": "experimental",
+    "paperSets": ["advanced_cross_realm_communication"],
+    "prerequisitePapers": ["temporal_sync_protocols"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 20, "physics": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "advanced_cross_realm_phone" }
+    ],
+    "topicDescription": "High-bandwidth communication across universal boundaries",
+    "keyPoints": [
+      "Compression for interdimensional transmission",
+      "Visual rendering of incompatible physics",
+      "The uncanny valley of alternate selves",
+      "Conference calls spanning multiple realities"
+    ]
+  },
+  {
+    "paperId": "communication_rune_enchantment",
+    "title": "Magic for Your Phone: Rune-Enhanced Communication",
+    "field": "experimental",
+    "paperSets": ["advanced_cross_realm_communication"],
+    "prerequisitePapers": ["mana_resonance_amplification"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "arcane": 18, "crafting": 12 },
+    "contributesTo": [
+      { "type": "item", "id": "range_boost_rune" },
+      { "type": "item", "id": "clarity_rune" }
+    ],
+    "topicDescription": "Magical enhancements for cross-realm devices",
+    "keyPoints": [
+      "Rune circuits for signal amplification",
+      "Enchantment stability in tech devices",
+      "The range vs battery life tradeoff",
+      "Why some runes don't work in some realities"
+    ]
+  },
+  {
+    "paperId": "privacy_enchantment_theory",
+    "title": "Keeping Secrets Across Realities: Secure Communication",
+    "field": "experimental",
+    "paperSets": ["advanced_cross_realm_communication"],
+    "prerequisitePapers": ["communication_rune_enchantment"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "arcane": 15, "engineering": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "privacy_rune" }
+    ],
+    "topicDescription": "Ensuring communication privacy across dimensional barriers",
+    "keyPoints": [
+      "Quantum encryption for cross-reality calls",
+      "Magical wards against interdimensional eavesdropping",
+      "The entities that listen between worlds",
+      "Why some conversations should stay private"
+    ]
+  },
+  {
+    "paperId": "recording_across_realities",
+    "title": "Recording the Impossible: Documenting Cross-Universal Events",
+    "field": "experimental",
+    "paperSets": ["advanced_cross_realm_communication"],
+    "prerequisitePapers": ["audiovisual_reality_transmission"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 12, "arcane": 12 },
+    "contributesTo": [
+      { "type": "item", "id": "recording_rune" }
+    ],
+    "topicDescription": "Preserving records of cross-universal communications",
+    "keyPoints": [
+      "Storage formats for multidimensional data",
+      "Playback in incompatible realities",
+      "Legal status of cross-reality recordings",
+      "The recording that proves something happened (somewhere)"
+    ]
+  }
+]

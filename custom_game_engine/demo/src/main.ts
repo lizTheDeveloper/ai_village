@@ -55,6 +55,8 @@ import {
   createSoulLinkComponent,
   type SoulCreationContext,
   type IncarnationComponent,
+  // Divine configuration
+  createUniverseConfig,
 } from '@ai-village/core';
 import {
   Renderer,
@@ -2992,6 +2994,15 @@ async function main() {
 
   (gameLoop.world as any).setChunkManager(chunkManager);
   (gameLoop.world as any).setTerrainGenerator(terrainGenerator);
+
+  // Initialize divine configuration for this universe
+  // Uses 'high_fantasy' preset for accessible divine powers
+  const divineConfig = createUniverseConfig(
+    gameLoop.universeId,
+    'Main Universe',
+    'high_fantasy'  // Gods are powerful and active, cheap divine powers
+  );
+  (gameLoop.world as any).setDivineConfig(divineConfig);
 
   // Create notification system
   const notificationEl = document.createElement('div');

@@ -2,8 +2,8 @@
  * WorldSerializer - Serializes/deserializes entire World instances
  */
 
-import type { World } from '../ecs/World.js';
-import type { WorldImpl } from '../ecs/World.js';
+import type { World, WorldImpl } from '../ecs/World.js';
+import type { UniverseDivineConfig } from '../divinity/UniverseConfig.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { Component } from '../ecs/Component.js';
 import type {
@@ -80,7 +80,7 @@ export class WorldSerializer {
         pausedDuration: 0,
       },
 
-      config: {},  // TODO: Add UniverseDivineConfig
+      config: world.divineConfig ?? {},  // UniverseDivineConfig
 
       entities,
 
@@ -117,12 +117,18 @@ export class WorldSerializer {
       );
     }
 
+    // Restore divine config if present
+    const worldImpl = world as WorldImpl;
+    if (snapshot.config && Object.keys(snapshot.config as object).length > 0) {
+      worldImpl.setDivineConfig(snapshot.config as Partial<UniverseDivineConfig>);
+      console.log('[WorldSerializer] Divine config restored from snapshot');
+    }
+
     // Deserialize entities
     const deserializedEntities = await this.deserializeEntities(snapshot.entities);
 
     // Add entities to world
     // Note: WorldImpl doesn't have addEntity in its interface, so we need to access internal API
-    const worldImpl = world as WorldImpl;
     for (const entity of deserializedEntities) {
       (worldImpl as any)._entities.set(entity.id, entity);
     }
@@ -276,13 +282,11 @@ export class WorldSerializer {
     const zones = zoneManager.serializeZones();
 
     // TODO: Implement weather serialization
-    // TODO: Implement building placement serialization
 
     return {
       terrain,
       weather: null,
       zones,
-      buildings: [],
     };
   }
 

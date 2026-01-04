@@ -1,0 +1,642 @@
+[
+  {
+    "paperId": "electromagnetic_field_theory",
+    "title": "On the Peculiar Behavior of Electrons When Properly Motivated",
+    "field": "experimental",
+    "paperSets": ["advanced_electronics"],
+    "prerequisitePapers": [],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 15, "physics": 10 },
+    "contributesTo": [
+      { "type": "item", "id": "tesla_glove" }
+    ],
+    "topicDescription": "Foundational electromagnetic field manipulation for directed energy applications",
+    "keyPoints": [
+      "Electromagnetic field containment and shaping",
+      "Arc discharge control mechanisms",
+      "Safety considerations for high-voltage personal equipment",
+      "The unfortunate incident at the Voltaire Institute"
+    ]
+  },
+  {
+    "paperId": "superconducting_materials",
+    "title": "Room Temperature Superconductors: A Practical Guide to the Impossible",
+    "field": "experimental",
+    "paperSets": ["advanced_electronics"],
+    "prerequisitePapers": [],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 12, "crafting": 8 },
+    "contributesTo": [
+      { "type": "item", "id": "tesla_glove" }
+    ],
+    "topicDescription": "Materials that conduct electricity without resistance at normal temperatures",
+    "keyPoints": [
+      "Crystal lattice structures that shouldn't work but do",
+      "Quantum effects at macro scales",
+      "Why nobody believed Dr. Ohmsford for 47 years",
+      "Manufacturing tolerances and what happens when you get them wrong"
+    ]
+  },
+  {
+    "paperId": "directed_discharge_systems",
+    "title": "Pointing Lightning: An Engineer's Guide to Not Getting Killed",
+    "field": "experimental",
+    "paperSets": ["advanced_electronics"],
+    "prerequisitePapers": ["electromagnetic_field_theory"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 18, "combat": 5 },
+    "contributesTo": [
+      { "type": "item", "id": "tesla_glove" }
+    ],
+    "topicDescription": "Controlled electrical discharge for weaponized applications",
+    "keyPoints": [
+      "Arc path prediction and control",
+      "Grounding requirements for the user",
+      "Chain lightning propagation mathematics",
+      "Why rubber gloves are not sufficient"
+    ]
+  },
+  {
+    "paperId": "wearable_power_systems",
+    "title": "Miniaturized Power Sources: Containing a Storm in Your Pocket",
+    "field": "experimental",
+    "paperSets": ["advanced_electronics"],
+    "prerequisitePapers": ["superconducting_materials"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 12, "physics": 8 },
+    "contributesTo": [
+      { "type": "item", "id": "tesla_glove" }
+    ],
+    "topicDescription": "Portable power systems for personal electromagnetic devices",
+    "keyPoints": [
+      "Energy density vs explosion risk tradeoffs",
+      "Heat dissipation in enclosed spaces",
+      "Why the first prototype was called 'The Widow-Maker'",
+      "Modern safety improvements (mostly)"
+    ]
+  },
+  {
+    "paperId": "molecular_refrigeration",
+    "title": "Approaching Absolute Zero Without Approaching Absolute Death",
+    "field": "experimental",
+    "paperSets": ["cryogenic_suspension"],
+    "prerequisitePapers": [],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 15, "medicine": 10 },
+    "contributesTo": [
+      { "type": "item", "id": "freeze_ray" }
+    ],
+    "topicDescription": "Rapid molecular motion cessation without cellular damage",
+    "keyPoints": [
+      "Thermodynamic principles of extreme cooling",
+      "Why ice crystals are the enemy",
+      "The Great Freezer Incident of the Coldsmith Academy",
+      "Proper thawing procedures and common mistakes"
+    ]
+  },
+  {
+    "paperId": "directed_thermal_extraction",
+    "title": "Heat Goes Where You Tell It: A Treatise on Thermal Obedience",
+    "field": "experimental",
+    "paperSets": ["cryogenic_suspension"],
+    "prerequisitePapers": ["molecular_refrigeration"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 12, "engineering": 10 },
+    "contributesTo": [
+      { "type": "item", "id": "freeze_ray" }
+    ],
+    "topicDescription": "Projecting cryogenic effects at a distance",
+    "keyPoints": [
+      "Focused thermal extraction beams",
+      "Range limitations and atmospheric interference",
+      "What happens to the extracted heat (and where not to put it)",
+      "The lawsuit from the Tropical Studies Department"
+    ]
+  },
+  {
+    "paperId": "instant_crystallization",
+    "title": "Flash Freezing: When Patience Is Not a Virtue",
+    "field": "experimental",
+    "paperSets": ["cryogenic_suspension"],
+    "prerequisitePapers": ["molecular_refrigeration"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 10, "combat": 8 },
+    "contributesTo": [
+      { "type": "item", "id": "freeze_ray" }
+    ],
+    "topicDescription": "Rapid phase transition effects on organic and inorganic matter",
+    "keyPoints": [
+      "Crystal formation at combat-relevant speeds",
+      "Structural integrity of frozen targets",
+      "Ethical considerations (briefly)",
+      "The frozen army that wasn't meant to be literal"
+    ]
+  },
+  {
+    "paperId": "quantum_state_manipulation",
+    "title": "Observing Cats in Boxes: A Practical Guide to Quantum Mechanics",
+    "field": "experimental",
+    "paperSets": ["quantum_computing"],
+    "prerequisitePapers": [],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 20, "arcane": 10 },
+    "contributesTo": [
+      { "type": "item", "id": "probability_gun" }
+    ],
+    "topicDescription": "Maintaining and manipulating quantum superposition states",
+    "keyPoints": [
+      "Schrödinger's original paper and its misinterpretations",
+      "Coherence time and why it's never long enough",
+      "The observer effect and how to exploit it",
+      "Cats as unsuitable test subjects"
+    ]
+  },
+  {
+    "paperId": "probability_wave_collapse",
+    "title": "Making Reality Make Up Its Mind",
+    "field": "experimental",
+    "paperSets": ["quantum_computing"],
+    "prerequisitePapers": ["quantum_state_manipulation"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 15, "arcane": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "probability_gun" }
+    ],
+    "topicDescription": "Controlled wavefunction collapse for desired outcomes",
+    "keyPoints": [
+      "Influencing probability distributions",
+      "The Copenhagen interpretation vs the gun interpretation",
+      "Why 'random' doesn't mean 'fair'",
+      "The gambler who broke reality (briefly)"
+    ]
+  },
+  {
+    "paperId": "entanglement_weaponization",
+    "title": "Spooky Action at a Useful Distance",
+    "field": "experimental",
+    "paperSets": ["quantum_computing"],
+    "prerequisitePapers": ["quantum_state_manipulation"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 18, "combat": 12 },
+    "contributesTo": [
+      { "type": "item", "id": "probability_gun" }
+    ],
+    "topicDescription": "Using quantum entanglement for practical combat applications",
+    "keyPoints": [
+      "Entangled particle pairs as ammunition",
+      "Targeting through probability rather than aim",
+      "The 'hit yourself' problem and its solution",
+      "Why insurance companies refuse to cover this"
+    ]
+  },
+  {
+    "paperId": "random_effect_generation",
+    "title": "Chaos as a Feature, Not a Bug",
+    "field": "experimental",
+    "paperSets": ["quantum_computing"],
+    "prerequisitePapers": ["probability_wave_collapse"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "arcane": 15, "physics": 10 },
+    "contributesTo": [
+      { "type": "item", "id": "probability_gun" }
+    ],
+    "topicDescription": "Harnessing quantum randomness for variable effects",
+    "keyPoints": [
+      "Why predictability is overrated",
+      "The taxonomy of random outcomes",
+      "How to survive when the gun decides to do 'something interesting'",
+      "Statistical analysis of 'interesting' outcomes"
+    ]
+  },
+  {
+    "paperId": "macroscale_uncertainty",
+    "title": "When Large Objects Start Acting Uncertain",
+    "field": "experimental",
+    "paperSets": ["quantum_computing"],
+    "prerequisitePapers": ["entanglement_weaponization", "random_effect_generation"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 20, "arcane": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "probability_gun" }
+    ],
+    "topicDescription": "Extending quantum effects to macroscopic scales",
+    "keyPoints": [
+      "Decoherence prevention at scale",
+      "The unfortunate case of the probably-there building",
+      "Targeting considerations when the target might not be there",
+      "Legal status of damage to things that both did and didn't happen"
+    ]
+  },
+  {
+    "paperId": "gravitational_field_theory",
+    "title": "What Goes Up Need Not Come Down: A Heretic's Guide to Gravity",
+    "field": "experimental",
+    "paperSets": ["anti_gravity"],
+    "prerequisitePapers": [],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 20, "engineering": 10 },
+    "contributesTo": [
+      { "type": "item", "id": "gravity_boots" }
+    ],
+    "topicDescription": "Understanding and manipulating gravitational fields",
+    "keyPoints": [
+      "Why Einstein was right but not right enough",
+      "Graviton theory and practical applications",
+      "The relationship between mass and attitude",
+      "Sir Isaac Newton's ghost and its complaints"
+    ]
+  },
+  {
+    "paperId": "localized_gravity_manipulation",
+    "title": "Personal Gravity Wells: Making the Ground Optional",
+    "field": "experimental",
+    "paperSets": ["anti_gravity"],
+    "prerequisitePapers": ["gravitational_field_theory"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 15, "acrobatics": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "gravity_boots" }
+    ],
+    "topicDescription": "Wearable gravitational field generators",
+    "keyPoints": [
+      "Miniaturization of massive field generators",
+      "The 'ceiling is now floor' calibration problem",
+      "Inner ear adaptation and why some people should not use these",
+      "The incident at the Low-Gravity Dance Competition"
+    ]
+  },
+  {
+    "paperId": "impact_amplification",
+    "title": "Landing With Extreme Prejudice: Combat Applications of Controlled Falls",
+    "field": "experimental",
+    "paperSets": ["anti_gravity"],
+    "prerequisitePapers": ["localized_gravity_manipulation"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "combat": 18, "physics": 8 },
+    "contributesTo": [
+      { "type": "item", "id": "gravity_boots" }
+    ],
+    "topicDescription": "Using gravitational manipulation for enhanced physical attacks",
+    "keyPoints": [
+      "The mathematics of gravity-enhanced stomping",
+      "Shockwave propagation through solid surfaces",
+      "Why you should not do this indoors",
+      "Structural damage liability considerations"
+    ]
+  },
+  {
+    "paperId": "gravitational_field_projection",
+    "title": "Making Gravity Point Sideways: A Field Guide",
+    "field": "experimental",
+    "paperSets": ["anti_gravity"],
+    "prerequisitePapers": ["impact_amplification"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 15, "combat": 10 },
+    "contributesTo": [
+      { "type": "item", "id": "gravity_boots" }
+    ],
+    "topicDescription": "Projecting gravitational effects beyond the user",
+    "keyPoints": [
+      "Directed gravity wells as area denial",
+      "Pull vs push configurations",
+      "The 'everyone falls toward you' social implications",
+      "Range limitations and why exceeding them is inadvisable"
+    ]
+  },
+  {
+    "paperId": "atomic_assembly_theory",
+    "title": "Building Reality One Atom at a Time: A Patient Person's Guide",
+    "field": "experimental",
+    "paperSets": ["nanofabrication"],
+    "prerequisitePapers": [],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 20, "physics": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "shrink_ray" }
+    ],
+    "topicDescription": "Precise atomic-scale manipulation for manufacturing",
+    "keyPoints": [
+      "Individual atom manipulation techniques",
+      "The patience required and why robots do this",
+      "Error rates and why 99.9999% is not good enough",
+      "The first nanotechnician's existential crisis"
+    ]
+  },
+  {
+    "paperId": "scale_variance_fields",
+    "title": "Making Things Smaller Without Making Them Smaller: Size as a Variable",
+    "field": "experimental",
+    "paperSets": ["nanofabrication"],
+    "prerequisitePapers": ["atomic_assembly_theory"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 20, "arcane": 10 },
+    "contributesTo": [
+      { "type": "item", "id": "shrink_ray" }
+    ],
+    "topicDescription": "Manipulating the apparent size of matter",
+    "keyPoints": [
+      "Where the extra atoms go (dimensional pockets)",
+      "Conservation of mass and how to politely ignore it",
+      "The miniaturized army that got stepped on",
+      "Reversal procedures and why timing matters"
+    ]
+  },
+  {
+    "paperId": "matter_compression_projection",
+    "title": "Pointing the Smallening Device: A User's Manual",
+    "field": "experimental",
+    "paperSets": ["nanofabrication"],
+    "prerequisitePapers": ["scale_variance_fields"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 15, "combat": 10 },
+    "contributesTo": [
+      { "type": "item", "id": "shrink_ray" }
+    ],
+    "topicDescription": "Projected scale manipulation for tactical applications",
+    "keyPoints": [
+      "Beam focusing and range considerations",
+      "Partial shrinking and why it's gruesome",
+      "The 'friendly fire makes things worse' phenomenon",
+      "Storage of miniaturized targets and escape prevention"
+    ]
+  },
+  {
+    "paperId": "scale_restoration",
+    "title": "Un-Shrinking: When You Need Things Back to Normal Size",
+    "field": "experimental",
+    "paperSets": ["nanofabrication"],
+    "prerequisitePapers": ["matter_compression_projection"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 12, "medicine": 10 },
+    "contributesTo": [
+      { "type": "item", "id": "shrink_ray" }
+    ],
+    "topicDescription": "Reversing miniaturization effects safely",
+    "keyPoints": [
+      "Why you should restore before the effect wears off naturally",
+      "The expansion inside a closed container problem",
+      "Psychological effects of being tiny and how to address them",
+      "Legal rights of the miniaturized during miniaturization"
+    ]
+  },
+  {
+    "paperId": "dimensional_membrane_theory",
+    "title": "The Spaces Between Spaces: A Cartographer's Nightmare",
+    "field": "experimental",
+    "paperSets": ["nanofabrication"],
+    "prerequisitePapers": ["scale_variance_fields"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 18, "arcane": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "shrink_ray" }
+    ],
+    "topicDescription": "Understanding the dimensional boundaries that enable size manipulation",
+    "keyPoints": [
+      "Where shrunk matter actually exists",
+      "The dimensional pocket ecosystem",
+      "Things that live in the spaces and why to avoid them",
+      "The researcher who got lost between sizes"
+    ]
+  },
+  {
+    "paperId": "spatial_folding_fundamentals",
+    "title": "Here and There at the Same Time: An Introduction to Being in Two Places",
+    "field": "experimental",
+    "paperSets": ["local_teleportation"],
+    "prerequisitePapers": [],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 20, "arcane": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "portal_gun" }
+    ],
+    "topicDescription": "The theoretical foundations of spatial manipulation",
+    "keyPoints": [
+      "Space as a malleable medium",
+      "The folding analogy and why it's wrong but useful",
+      "Conservation of position and its violations",
+      "The teleportation pioneer who arrived inside a wall"
+    ]
+  },
+  {
+    "paperId": "aperture_formation",
+    "title": "Punching Holes in Reality: A Responsible Guide",
+    "field": "experimental",
+    "paperSets": ["local_teleportation"],
+    "prerequisitePapers": ["spatial_folding_fundamentals"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 18, "engineering": 12 },
+    "contributesTo": [
+      { "type": "item", "id": "portal_gun" }
+    ],
+    "topicDescription": "Creating stable openings in three-dimensional space",
+    "keyPoints": [
+      "Portal edge stability and the importance of clean cuts",
+      "What happens when portals intersect (nothing good)",
+      "The energy requirements and why early prototypes exploded",
+      "Surface compatibility and unsuitable surfaces"
+    ]
+  },
+  {
+    "paperId": "paired_aperture_linking",
+    "title": "This Door Goes to That Door: Establishing Portal Pairs",
+    "field": "experimental",
+    "paperSets": ["local_teleportation"],
+    "prerequisitePapers": ["aperture_formation"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 15, "arcane": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "portal_gun" }
+    ],
+    "topicDescription": "Linking two spatial apertures for instantaneous transit",
+    "keyPoints": [
+      "Entanglement between portal pairs",
+      "Maintaining connection over distance",
+      "The unpaired portal problem (where does it go?)",
+      "Accidental connections to unintended locations"
+    ]
+  },
+  {
+    "paperId": "momentum_conservation_in_portals",
+    "title": "Speedy Thing Goes In, Speedy Thing Comes Out: Portal Physics",
+    "field": "experimental",
+    "paperSets": ["local_teleportation"],
+    "prerequisitePapers": ["paired_aperture_linking"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 15, "acrobatics": 10 },
+    "contributesTo": [
+      { "type": "item", "id": "portal_gun" }
+    ],
+    "topicDescription": "Conservation and redirection of momentum through portals",
+    "keyPoints": [
+      "Velocity preservation across spatial discontinuities",
+      "Orientation changes and unexpected trajectories",
+      "The 'infinite fall' configuration and its uses",
+      "Terminal velocity through creative portal placement"
+    ]
+  },
+  {
+    "paperId": "portable_aperture_projection",
+    "title": "Point and Shoot: Handheld Portal Generation",
+    "field": "experimental",
+    "paperSets": ["local_teleportation"],
+    "prerequisitePapers": ["momentum_conservation_in_portals"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 18, "combat": 12 },
+    "contributesTo": [
+      { "type": "item", "id": "portal_gun" }
+    ],
+    "topicDescription": "Miniaturization of portal technology into personal weapons",
+    "keyPoints": [
+      "Handheld aperture projector design",
+      "The trigger safety mechanism (essential)",
+      "Creative combat applications",
+      "Why you should never portal your own feet"
+    ]
+  },
+  {
+    "paperId": "inter_universe_membrane_theory",
+    "title": "The Walls Between Worlds: Understanding Universal Boundaries",
+    "field": "experimental",
+    "paperSets": ["stable_inter_universe_portals"],
+    "prerequisitePapers": ["dimensional_membrane_theory"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 25, "arcane": 20 },
+    "contributesTo": [
+      { "type": "item", "id": "portal_gun" }
+    ],
+    "topicDescription": "The nature of boundaries between parallel universes",
+    "keyPoints": [
+      "β-space topology and navigation",
+      "Why some universes are closer than others",
+      "The multiverse as a foam structure",
+      "Things that patrol the spaces between"
+    ]
+  },
+  {
+    "paperId": "cross_universal_aperture_formation",
+    "title": "Doors to Elsewhere: Opening Portals to Other Realities",
+    "field": "experimental",
+    "paperSets": ["stable_inter_universe_portals"],
+    "prerequisitePapers": ["inter_universe_membrane_theory", "aperture_formation"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 20, "arcane": 20 },
+    "contributesTo": [
+      { "type": "item", "id": "portal_gun" }
+    ],
+    "topicDescription": "Creating stable connections between different universes",
+    "keyPoints": [
+      "Targeting specific β-branches",
+      "The 'which you' problem when visiting yourself",
+      "Energy requirements for universal boundary piercing",
+      "Trade agreements with alternate realities"
+    ]
+  },
+  {
+    "paperId": "portal_stability_maintenance",
+    "title": "Keeping the Door Open: Long-term Portal Maintenance",
+    "field": "experimental",
+    "paperSets": ["stable_inter_universe_portals"],
+    "prerequisitePapers": ["cross_universal_aperture_formation"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 18, "arcane": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "portal_gun" }
+    ],
+    "topicDescription": "Maintaining stable inter-universal connections over time",
+    "keyPoints": [
+      "Portal decay and reinforcement",
+      "The scheduled maintenance universe portal shutdown",
+      "What leaks through unstable portals",
+      "Emergency closure procedures"
+    ]
+  },
+  {
+    "paperId": "cross_reality_safety_protocols",
+    "title": "What Not to Bring Back: Inter-Universal Travel Safety",
+    "field": "experimental",
+    "paperSets": ["stable_inter_universe_portals"],
+    "prerequisitePapers": ["portal_stability_maintenance"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "survival": 15, "arcane": 10 },
+    "contributesTo": [
+      { "type": "item", "id": "portal_gun" }
+    ],
+    "topicDescription": "Safety considerations for traveling between realities",
+    "keyPoints": [
+      "Quarantine procedures for returning travelers",
+      "Incompatible physics and biological effects",
+      "The list of banned import items (very long)",
+      "Why you should not befriend your alternate selves"
+    ]
+  },
+  {
+    "paperId": "weaponized_portal_tactics",
+    "title": "Combat Through Discontinuous Space: A Tactical Manual",
+    "field": "experimental",
+    "paperSets": ["stable_inter_universe_portals"],
+    "prerequisitePapers": ["portable_aperture_projection", "cross_reality_safety_protocols"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "combat": 20, "tactics": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "portal_gun" }
+    ],
+    "topicDescription": "Advanced combat applications of portal technology",
+    "keyPoints": [
+      "Redirecting enemy attacks through portals",
+      "Portal-based traps and ambushes",
+      "The ethics of portaling someone into a volcano",
+      "Defense against portal-based attacks"
+    ]
+  },
+  {
+    "paperId": "universal_portal_gun_integration",
+    "title": "The Dimensional Aperture Device: Complete Technical Specifications",
+    "field": "experimental",
+    "paperSets": ["stable_inter_universe_portals"],
+    "prerequisitePapers": ["weaponized_portal_tactics"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 25, "physics": 20, "arcane": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "portal_gun" }
+    ],
+    "topicDescription": "Complete design and construction of a personal portal projection device",
+    "keyPoints": [
+      "Final assembly procedures",
+      "Calibration for inter-universal vs local portals",
+      "The three-setting toggle and why there's no 'maximum' setting",
+      "Known issues and workarounds (extensive list)"
+    ]
+  }
+]

@@ -908,12 +908,22 @@
       }
 
       // Check combat log for actions at this tick and trigger animations
-      checkCombatActions(tick) {
+      // Uses range checking since frame ticks (0,5,10...) don't align with combat ticks (19,39,59...)
+      checkCombatActions(currentTick, previousTick) {
         for (const event of this.combatLog) {
-          if (event.tick === tick && event.renderableOperation) {
+          // Check if event falls within (previousTick, currentTick] range
+          // Or exact match if previousTick not provided
+          const inRange = previousTick !== undefined
+            ? (event.tick > previousTick && event.tick <= currentTick)
+            : (event.tick === currentTick);
+
+          if (inRange && event.renderableOperation) {
             const op = event.renderableOperation;
             const charId = this.getCharacterId(op.actorType);
-            if (!charId) continue;
+            if (!charId) {
+              console.log(`[CombatReplayRenderer] No character found for actorType: ${op.actorType}`);
+              continue;
+            }
 
             // Map action to animation
             const animationName = this.manifest.actionMapping?.[op.action];
@@ -922,15 +932,22 @@
               continue;
             }
 
+            // Check if animation exists in cache
+            const charData = this.manifest.characters?.[charId];
+            if (!charData?.animations?.[animationName]) {
+              console.log(`[CombatReplayRenderer] Animation '${animationName}' not found in manifest for ${charId}`);
+              continue;
+            }
+
             // Start the animation
             this.activeAnimations.set(charId, {
               animation: animationName,
               frameIndex: 0,
-              startTick: tick,
+              startTick: currentTick,
               duration: 6 // Frames to play
             });
 
-            console.log(`[CombatReplayRenderer] Started animation: ${charId} -> ${animationName}`);
+            console.log(`[CombatReplayRenderer] Started animation: ${charId} -> ${animationName} (tick ${event.tick})`);
           }
         }
       }
@@ -945,11 +962,18 @@
         if (elapsed > this.frameInterval) {
           this.lastFrameTime = timestamp;
 
-          // Get current frame
+          // Get current and previous frame for tick range checking
           const frame = this.frames[this.currentFrameIndex];
+          const prevFrameIndex = this.currentFrameIndex > 0
+            ? this.currentFrameIndex - 1
+            : this.frames.length - 1;
+          const prevFrame = this.frames[prevFrameIndex];
 
-          // Check for combat actions at this tick
-          this.checkCombatActions(frame.tick);
+          // Handle loop wrap-around: if we just looped, previousTick should be -1
+          const previousTick = this.currentFrameIndex === 0 ? -1 : prevFrame.tick;
+
+          // Check for combat actions in the tick range (previousTick, currentTick]
+          this.checkCombatActions(frame.tick, previousTick);
 
           // Clear and render
           this.ctx.fillStyle = this.manifest.background?.fallbackColor || '#000';

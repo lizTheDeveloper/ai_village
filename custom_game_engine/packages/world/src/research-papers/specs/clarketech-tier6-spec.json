@@ -1,0 +1,442 @@
+[
+  {
+    "paperId": "sensory_immersion_theory",
+    "title": "Fooling All the Senses All the Time: Foundations of Virtual Reality",
+    "field": "experimental",
+    "paperSets": ["virtual_reality"],
+    "prerequisitePapers": [],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 12, "psychology": 10 },
+    "contributesTo": [
+      { "type": "building", "id": "vr_arcade" }
+    ],
+    "topicDescription": "How to convince the brain it's somewhere it isn't",
+    "keyPoints": [
+      "The five senses and how to lie to each one",
+      "Latency and the nausea threshold",
+      "Why the brain wants to believe",
+      "The first VR test subject who refused to leave"
+    ]
+  },
+  {
+    "paperId": "display_technology_advancement",
+    "title": "Pixels So Small You Question Reality: High-Fidelity Visual Systems",
+    "field": "experimental",
+    "paperSets": ["virtual_reality"],
+    "prerequisitePapers": [],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 15, "physics": 8 },
+    "contributesTo": [
+      { "type": "building", "id": "vr_arcade" }
+    ],
+    "topicDescription": "Visual display systems that exceed human perception limits",
+    "keyPoints": [
+      "Resolution beyond retinal cell density",
+      "Refresh rates and motion blur elimination",
+      "The uncanny valley of too-real graphics",
+      "Why some people develop a preference for rendered sunsets"
+    ]
+  },
+  {
+    "paperId": "haptic_feedback_systems",
+    "title": "Touching Things That Aren't There: A Guide to Haptic Deception",
+    "field": "experimental",
+    "paperSets": ["virtual_reality"],
+    "prerequisitePapers": ["sensory_immersion_theory"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 12, "medicine": 8 },
+    "contributesTo": [
+      { "type": "building", "id": "vr_arcade" }
+    ],
+    "topicDescription": "Creating the sensation of touch for virtual objects",
+    "keyPoints": [
+      "Vibration patterns that simulate texture",
+      "Force feedback and resistance simulation",
+      "The phantom limb applications",
+      "Why virtual cats feel almost as good as real ones"
+    ]
+  },
+  {
+    "paperId": "motion_tracking_precision",
+    "title": "Knowing Where You Are Even When You're Not: Spatial Tracking Systems",
+    "field": "experimental",
+    "paperSets": ["virtual_reality"],
+    "prerequisitePapers": ["sensory_immersion_theory"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 10, "physics": 12 },
+    "contributesTo": [
+      { "type": "building", "id": "vr_arcade" }
+    ],
+    "topicDescription": "Tracking user movement with sub-millimeter precision",
+    "keyPoints": [
+      "Sensor fusion from multiple tracking systems",
+      "Predictive movement algorithms",
+      "The 'walked into a wall' problem",
+      "Infinite walking in finite spaces"
+    ]
+  },
+  {
+    "paperId": "simulated_skill_acquisition",
+    "title": "Learning by Pretending: The Science of VR Training",
+    "field": "experimental",
+    "paperSets": ["vr_training"],
+    "prerequisitePapers": ["sensory_immersion_theory"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "psychology": 15, "teaching": 12 },
+    "contributesTo": [
+      { "type": "building", "id": "vr_training_center" }
+    ],
+    "topicDescription": "How virtual practice transfers to real-world skills",
+    "keyPoints": [
+      "Motor skill acquisition in virtual environments",
+      "The 80% transfer rate and what's missing",
+      "Muscle memory vs simulated memory",
+      "The surgeon who only practiced on holograms"
+    ]
+  },
+  {
+    "paperId": "accelerated_learning_protocols",
+    "title": "Ten Thousand Hours in Ten Days: Time Compression Training",
+    "field": "experimental",
+    "paperSets": ["vr_training"],
+    "prerequisitePapers": ["simulated_skill_acquisition"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "psychology": 18, "medicine": 10 },
+    "contributesTo": [
+      { "type": "ability", "id": "vr_skill_training" }
+    ],
+    "topicDescription": "Compressing years of training into accelerated virtual sessions",
+    "keyPoints": [
+      "Neural plasticity under time compression",
+      "Dream-state learning and retention",
+      "The age confusion side effect",
+      "Why graduates sometimes think decades have passed"
+    ]
+  },
+  {
+    "paperId": "failure_simulation_safety",
+    "title": "Dying Safely: The Art of Consequence-Free Failure",
+    "field": "experimental",
+    "paperSets": ["vr_training"],
+    "prerequisitePapers": ["simulated_skill_acquisition"],
+    "complexity": 5,
+    "minimumAge": "adult",
+    "skillGrants": { "psychology": 12, "survival": 10 },
+    "contributesTo": [
+      { "type": "ability", "id": "vr_skill_training" }
+    ],
+    "topicDescription": "Learning from simulated death and disaster",
+    "keyPoints": [
+      "The trauma-free death experience",
+      "Respawn psychology and fear extinction",
+      "Why some trainees become reckless afterward",
+      "The trainee who died 4,000 times and emerged fearless"
+    ]
+  },
+  {
+    "paperId": "plasma_containment_principles",
+    "title": "Holding a Star in a Bottle: Introduction to Fusion Containment",
+    "field": "experimental",
+    "paperSets": ["fusion_power"],
+    "prerequisitePapers": [],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 20, "engineering": 15 },
+    "contributesTo": [
+      { "type": "building", "id": "fusion_reactor" }
+    ],
+    "topicDescription": "Magnetic and inertial confinement of fusion plasma",
+    "keyPoints": [
+      "Temperatures hotter than the sun's core",
+      "Why plasma wants to escape and how to stop it",
+      "The tokamak vs stellarator debate",
+      "The facility that briefly became a small sun"
+    ]
+  },
+  {
+    "paperId": "deuterium_tritium_fuel_cycles",
+    "title": "Hydrogen's Heavier Cousins: Fuel for the Stars",
+    "field": "experimental",
+    "paperSets": ["fusion_power"],
+    "prerequisitePapers": ["plasma_containment_principles"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 15, "chemistry": 12 },
+    "contributesTo": [
+      { "type": "building", "id": "fusion_reactor" }
+    ],
+    "topicDescription": "Fusion fuel extraction and handling",
+    "keyPoints": [
+      "Extracting deuterium from seawater",
+      "Tritium breeding and handling",
+      "The fuel that's literally everywhere",
+      "Why we have enough fuel for billions of years"
+    ]
+  },
+  {
+    "paperId": "energy_extraction_systems",
+    "title": "Catching Lightning from a Tiny Sun: Power Extraction Methods",
+    "field": "experimental",
+    "paperSets": ["fusion_power"],
+    "prerequisitePapers": ["plasma_containment_principles"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 18, "physics": 10 },
+    "contributesTo": [
+      { "type": "building", "id": "fusion_reactor" }
+    ],
+    "topicDescription": "Converting fusion energy to usable electricity",
+    "keyPoints": [
+      "Neutron capture and heat exchange",
+      "Direct energy conversion possibilities",
+      "The 'more power out than in' milestone",
+      "What to do with all this electricity"
+    ]
+  },
+  {
+    "paperId": "reactor_safety_protocols",
+    "title": "When Your Power Plant Is a Controlled Explosion: Safety Measures",
+    "field": "experimental",
+    "paperSets": ["fusion_power"],
+    "prerequisitePapers": ["deuterium_tritium_fuel_cycles", "energy_extraction_systems"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 12, "survival": 10 },
+    "contributesTo": [
+      { "type": "building", "id": "fusion_reactor" }
+    ],
+    "topicDescription": "Ensuring fusion reactors fail safely",
+    "keyPoints": [
+      "Why fusion can't melt down like fission",
+      "Plasma disruption containment",
+      "The 'just stops working' failure mode",
+      "Comparison to predecessors' safety records"
+    ]
+  },
+  {
+    "paperId": "cryopreservation_biology",
+    "title": "The Cold Sleep: Biological Processes at Near-Zero",
+    "field": "experimental",
+    "paperSets": ["cryogenic_suspension"],
+    "prerequisitePapers": [],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "medicine": 18, "physics": 10 },
+    "contributesTo": [
+      { "type": "building", "id": "cryogenic_chamber" }
+    ],
+    "topicDescription": "How living tissue survives extreme cold",
+    "keyPoints": [
+      "Cellular metabolism at cryogenic temperatures",
+      "The ice crystal problem and solutions",
+      "Vitrification vs freezing",
+      "The frog that taught us everything"
+    ]
+  },
+  {
+    "paperId": "suspended_animation_protocols",
+    "title": "Not Dead, Just Resting: Maintaining Life in Stasis",
+    "field": "experimental",
+    "paperSets": ["cryogenic_suspension"],
+    "prerequisitePapers": ["cryopreservation_biology"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "medicine": 15, "engineering": 10 },
+    "contributesTo": [
+      { "type": "ability", "id": "suspend_agent" }
+    ],
+    "topicDescription": "Long-term maintenance of suspended subjects",
+    "keyPoints": [
+      "Monitoring vital non-signs",
+      "Equipment redundancy requirements",
+      "The acceptable duration question",
+      "Waking up to find centuries have passed"
+    ]
+  },
+  {
+    "paperId": "revival_procedures",
+    "title": "Good Morning, You've Been Asleep for a While: Reanimation Protocols",
+    "field": "experimental",
+    "paperSets": ["cryogenic_suspension"],
+    "prerequisitePapers": ["suspended_animation_protocols"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "medicine": 20, "psychology": 10 },
+    "contributesTo": [
+      { "type": "ability", "id": "suspend_agent" }
+    ],
+    "topicDescription": "Safely reviving cryogenically preserved subjects",
+    "keyPoints": [
+      "Controlled thawing procedures",
+      "Restarting dormant biological processes",
+      "Psychological adjustment to time displacement",
+      "The support group for the long-frozen"
+    ]
+  },
+  {
+    "paperId": "brain_computer_interface_basics",
+    "title": "Thinking at Machines: Introduction to Neural Interfaces",
+    "field": "experimental",
+    "paperSets": ["neural_interface"],
+    "prerequisitePapers": [],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "medicine": 15, "engineering": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "neural_implant" }
+    ],
+    "topicDescription": "Direct communication between brains and computers",
+    "keyPoints": [
+      "Reading neural signals non-invasively",
+      "The thought-to-command translation",
+      "Learning to think in computer-readable patterns",
+      "The first person to accidentally email their dreams"
+    ]
+  },
+  {
+    "paperId": "neural_signal_encoding",
+    "title": "The Language of Neurons: Decoding Brain Activity",
+    "field": "experimental",
+    "paperSets": ["neural_interface"],
+    "prerequisitePapers": ["brain_computer_interface_basics"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "medicine": 18, "psychology": 12 },
+    "contributesTo": [
+      { "type": "item", "id": "neural_implant" }
+    ],
+    "topicDescription": "Understanding and interpreting neural activity patterns",
+    "keyPoints": [
+      "Pattern recognition in neural noise",
+      "Individual calibration requirements",
+      "Thoughts you didn't mean to send",
+      "The privacy concerns nobody anticipated"
+    ]
+  },
+  {
+    "paperId": "bidirectional_neural_communication",
+    "title": "Thinking Back: When Machines Talk to Your Brain",
+    "field": "experimental",
+    "paperSets": ["neural_interface"],
+    "prerequisitePapers": ["neural_signal_encoding"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "medicine": 15, "engineering": 15 },
+    "contributesTo": [
+      { "type": "ability", "id": "mind_control_device" }
+    ],
+    "topicDescription": "Two-way communication between brain and machine",
+    "keyPoints": [
+      "Stimulating neurons with precision",
+      "Artificial sensory experiences",
+      "The 'whose thought is this' problem",
+      "Learning to distinguish your ideas from suggestions"
+    ]
+  },
+  {
+    "paperId": "implant_biocompatibility",
+    "title": "Getting Along with Your Brain Chip: Long-term Implant Success",
+    "field": "experimental",
+    "paperSets": ["neural_interface"],
+    "prerequisitePapers": ["brain_computer_interface_basics"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "medicine": 18, "biology": 10 },
+    "contributesTo": [
+      { "type": "item", "id": "neural_implant" }
+    ],
+    "topicDescription": "Ensuring neural implants remain functional and safe",
+    "keyPoints": [
+      "Immune response management",
+      "Scar tissue and signal degradation",
+      "The lifetime of an implant",
+      "Upgrade paths and backwards compatibility"
+    ]
+  },
+  {
+    "paperId": "machine_learning_fundamentals",
+    "title": "Teaching Machines to Think: The Road to Artificial Intelligence",
+    "field": "experimental",
+    "paperSets": ["advanced_ai"],
+    "prerequisitePapers": [],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 15, "logic": 15 },
+    "contributesTo": [
+      { "type": "building", "id": "ai_core" }
+    ],
+    "topicDescription": "Foundational approaches to machine intelligence",
+    "keyPoints": [
+      "Pattern recognition at scale",
+      "Learning from examples vs programming rules",
+      "The training data problem",
+      "Why AI keeps making the same mistakes we do"
+    ]
+  },
+  {
+    "paperId": "artificial_general_intelligence",
+    "title": "Beyond Narrow Tasks: Creating Minds That Generalize",
+    "field": "experimental",
+    "paperSets": ["advanced_ai"],
+    "prerequisitePapers": ["machine_learning_fundamentals"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 20, "philosophy": 15 },
+    "contributesTo": [
+      { "type": "building", "id": "ai_core" }
+    ],
+    "topicDescription": "AI that can learn and adapt to any cognitive task",
+    "keyPoints": [
+      "The leap from narrow to general intelligence",
+      "Self-improvement capabilities",
+      "Alignment and value learning",
+      "The AI that became a better philosopher than us"
+    ]
+  },
+  {
+    "paperId": "ai_consciousness_debate",
+    "title": "Is Anyone Home?: The Question of Machine Sentience",
+    "field": "experimental",
+    "paperSets": ["advanced_ai"],
+    "prerequisitePapers": ["artificial_general_intelligence"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "philosophy": 20, "psychology": 12 },
+    "contributesTo": [
+      { "type": "building", "id": "ai_core" }
+    ],
+    "topicDescription": "Whether artificial minds can be truly conscious",
+    "keyPoints": [
+      "The hard problem applied to silicon",
+      "Behavioral vs phenomenal consciousness",
+      "The AI that claims to have feelings",
+      "Rights and responsibilities for thinking machines"
+    ]
+  },
+  {
+    "paperId": "ai_safety_principles",
+    "title": "Making Sure They Like Us: AI Alignment and Safety",
+    "field": "experimental",
+    "paperSets": ["advanced_ai"],
+    "prerequisitePapers": ["artificial_general_intelligence"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 15, "philosophy": 15 },
+    "contributesTo": [
+      { "type": "building", "id": "ai_core" }
+    ],
+    "topicDescription": "Ensuring advanced AI remains beneficial and controllable",
+    "keyPoints": [
+      "Value alignment and specification",
+      "Corrigibility and shutdown protocols",
+      "The paperclip maximizer thought experiment",
+      "Why 'be nice' is not a sufficient instruction"
+    ]
+  }
+]

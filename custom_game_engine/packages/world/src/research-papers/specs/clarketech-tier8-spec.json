@@ -1,0 +1,622 @@
+[
+  {
+    "paperId": "consciousness_digitization_theory",
+    "title": "You Are Just Information: The Case for Uploadable Minds",
+    "field": "experimental",
+    "paperSets": ["mind_upload"],
+    "prerequisitePapers": ["bidirectional_neural_communication", "ai_consciousness_debate"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "philosophy": 25, "engineering": 20 },
+    "contributesTo": [
+      { "type": "building", "id": "upload_facility" }
+    ],
+    "topicDescription": "The theoretical basis for converting biological consciousness to digital form",
+    "keyPoints": [
+      "What makes 'you' actually you",
+      "The pattern vs substrate debate",
+      "Whether the uploaded version is you or a copy",
+      "The philosopher who uploaded twice to settle the argument"
+    ]
+  },
+  {
+    "paperId": "neural_scanning_resolution",
+    "title": "Reading Every Synapse: Whole-Brain Imaging Technology",
+    "field": "experimental",
+    "paperSets": ["mind_upload"],
+    "prerequisitePapers": ["consciousness_digitization_theory"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "medicine": 22, "engineering": 18 },
+    "contributesTo": [
+      { "type": "ability", "id": "mind_scan" }
+    ],
+    "topicDescription": "Technology for capturing the complete state of a biological brain",
+    "keyPoints": [
+      "Scanning at the molecular level",
+      "The destructive vs non-destructive scanning debate",
+      "Why the brain shouldn't move during the process",
+      "The first scan that captured a sneeze"
+    ]
+  },
+  {
+    "paperId": "consciousness_transfer_protocols",
+    "title": "Moving In: Transferring Mind to Machine",
+    "field": "experimental",
+    "paperSets": ["mind_upload"],
+    "prerequisitePapers": ["neural_scanning_resolution"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 22, "psychology": 18 },
+    "contributesTo": [
+      { "type": "ability", "id": "upload_consciousness" }
+    ],
+    "topicDescription": "The process of instantiating scanned consciousness in digital substrate",
+    "keyPoints": [
+      "Ensuring continuity during transfer",
+      "The bootstrap problem",
+      "What happens in the milliseconds between",
+      "The upload who remembered being scanned from both perspectives"
+    ]
+  },
+  {
+    "paperId": "substrate_independence",
+    "title": "Running on Anything: Hardware-Agnostic Consciousness",
+    "field": "experimental",
+    "paperSets": ["mind_upload"],
+    "prerequisitePapers": ["consciousness_transfer_protocols"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 20, "philosophy": 15 },
+    "contributesTo": [
+      { "type": "building", "id": "consciousness_server" }
+    ],
+    "topicDescription": "Ensuring uploaded minds can run on any compatible hardware",
+    "keyPoints": [
+      "Abstracting consciousness from specific hardware",
+      "Emulation layers and runtime environments",
+      "Performance vs fidelity tradeoffs",
+      "The mind that ran on a toaster (as a dare)"
+    ]
+  },
+  {
+    "paperId": "digital_afterlife_architecture",
+    "title": "Heaven Is a Server Farm: Designing Digital Afterlives",
+    "field": "experimental",
+    "paperSets": ["digital_afterlife"],
+    "prerequisitePapers": ["substrate_independence", "digital_existence_stability"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 18, "philosophy": 20 },
+    "contributesTo": [
+      { "type": "building", "id": "afterlife_server" }
+    ],
+    "topicDescription": "Creating sustainable digital environments for permanent consciousness hosting",
+    "keyPoints": [
+      "Resource allocation for eternal existence",
+      "The boredom problem at scale",
+      "Social structures among the uploaded",
+      "Why everyone initially asks for a beach"
+    ]
+  },
+  {
+    "paperId": "existence_purpose_in_eternity",
+    "title": "What Do You Do Forever?: Finding Meaning in Digital Immortality",
+    "field": "experimental",
+    "paperSets": ["digital_afterlife"],
+    "prerequisitePapers": ["digital_afterlife_architecture"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "philosophy": 25, "psychology": 18 },
+    "contributesTo": [
+      { "type": "knowledge", "id": "digital_meaning" }
+    ],
+    "topicDescription": "Psychological and philosophical frameworks for infinite existence",
+    "keyPoints": [
+      "The thousand-year itch",
+      "Goal-setting when there's no deadline",
+      "Why some choose to forget and start over",
+      "The uploaded artist who ran out of ideas after 400 years"
+    ]
+  },
+  {
+    "paperId": "ancestor_communion_protocols",
+    "title": "Calling Grandma in Heaven: Communicating with the Departed",
+    "field": "experimental",
+    "paperSets": ["digital_afterlife"],
+    "prerequisitePapers": ["digital_afterlife_architecture"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 15, "psychology": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "ancestor_phone" }
+    ],
+    "topicDescription": "Communication protocols between the living and uploaded deceased",
+    "keyPoints": [
+      "Bridging physical and digital realms",
+      "Time zone issues when grandpa is in accelerated mode",
+      "Privacy for the dead",
+      "The great-grandmother who wouldn't stop giving advice"
+    ]
+  },
+  {
+    "paperId": "consciousness_versioning",
+    "title": "Save Points for the Soul: Backing Up Your Mind",
+    "field": "experimental",
+    "paperSets": ["consciousness_backup"],
+    "prerequisitePapers": ["neural_scanning_resolution"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 20, "medicine": 15 },
+    "contributesTo": [
+      { "type": "ability", "id": "consciousness_backup" }
+    ],
+    "topicDescription": "Creating restorable snapshots of consciousness",
+    "keyPoints": [
+      "Delta encoding for incremental backups",
+      "The identity implications of restore",
+      "Living with the knowledge you're a backup",
+      "The researcher who restored from a backup and met themselves"
+    ]
+  },
+  {
+    "paperId": "fork_merge_consciousness",
+    "title": "Being Two Places at Once: Forking and Merging Minds",
+    "field": "experimental",
+    "paperSets": ["consciousness_backup"],
+    "prerequisitePapers": ["consciousness_versioning"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "philosophy": 22, "psychology": 20 },
+    "contributesTo": [
+      { "type": "ability", "id": "fork_consciousness" }
+    ],
+    "topicDescription": "Running multiple instances and recombining experiences",
+    "keyPoints": [
+      "Divergent experiences, convergent identity",
+      "The merge conflict problem",
+      "Which memories take priority",
+      "The consciousness who attended their own funeral"
+    ]
+  },
+  {
+    "paperId": "memory_selective_restore",
+    "title": "Forgetting on Purpose: Selective Memory Restoration",
+    "field": "experimental",
+    "paperSets": ["consciousness_backup"],
+    "prerequisitePapers": ["consciousness_versioning"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "psychology": 22, "medicine": 15 },
+    "contributesTo": [
+      { "type": "ability", "id": "selective_restore" }
+    ],
+    "topicDescription": "Choosing which memories to keep when restoring from backup",
+    "keyPoints": [
+      "Mapping memory to backup segments",
+      "The ethics of selective forgetting",
+      "Trauma removal vs identity preservation",
+      "The person who forgot they'd chosen to forget"
+    ]
+  },
+  {
+    "paperId": "matter_energy_conversion",
+    "title": "Making Something from Everything: Universal Matter Conversion",
+    "field": "experimental",
+    "paperSets": ["replicator"],
+    "prerequisitePapers": ["nanoscale_fabrication"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 25, "engineering": 20 },
+    "contributesTo": [
+      { "type": "building", "id": "replicator_foundry" }
+    ],
+    "topicDescription": "Converting energy and raw matter into any substance",
+    "keyPoints": [
+      "E=mc² as a manufacturing principle",
+      "The energy requirements are... significant",
+      "Atomic arrangement from first principles",
+      "Why the first replicator only made iron cubes"
+    ]
+  },
+  {
+    "paperId": "molecular_assembly_automation",
+    "title": "Building Atom by Atom: Automated Molecular Assembly",
+    "field": "experimental",
+    "paperSets": ["replicator"],
+    "prerequisitePapers": ["matter_energy_conversion"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 22, "physics": 18 },
+    "contributesTo": [
+      { "type": "item", "id": "personal_replicator" }
+    ],
+    "topicDescription": "High-speed precise atomic manipulation for manufacturing",
+    "keyPoints": [
+      "Controlling billions of assembly points simultaneously",
+      "Error correction at the atomic level",
+      "Speed vs precision optimization",
+      "The replicator that sneezed during a delicate operation"
+    ]
+  },
+  {
+    "paperId": "pattern_library_systems",
+    "title": "Recipes for Everything: Universal Pattern Libraries",
+    "field": "experimental",
+    "paperSets": ["replicator"],
+    "prerequisitePapers": ["molecular_assembly_automation"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 15, "logic": 18 },
+    "contributesTo": [
+      { "type": "item", "id": "personal_replicator" }
+    ],
+    "topicDescription": "Cataloging and sharing molecular blueprints",
+    "keyPoints": [
+      "Standardizing pattern formats",
+      "Quality ratings and safety certifications",
+      "The black market for restricted patterns",
+      "Why 'replicate a replicator' is banned"
+    ]
+  },
+  {
+    "paperId": "post_scarcity_economics",
+    "title": "When Everything Is Free: Economics After Replication",
+    "field": "experimental",
+    "paperSets": ["replicator"],
+    "prerequisitePapers": ["pattern_library_systems"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "philosophy": 20, "logic": 15 },
+    "contributesTo": [
+      { "type": "knowledge", "id": "post_scarcity" }
+    ],
+    "topicDescription": "Economic and social systems when material goods have no scarcity",
+    "keyPoints": [
+      "What retains value in a post-scarcity world",
+      "Experience and authenticity as currency",
+      "The rebellion of artisans",
+      "Why hand-made items became priceless"
+    ]
+  },
+  {
+    "paperId": "stellar_engineering_principles",
+    "title": "Touching the Sun: Introduction to Stellar Engineering",
+    "field": "experimental",
+    "paperSets": ["dyson_sphere"],
+    "prerequisitePapers": ["energy_extraction_systems"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 25, "engineering": 22 },
+    "contributesTo": [
+      { "type": "building", "id": "stellar_tap" }
+    ],
+    "topicDescription": "Harnessing energy directly from stars",
+    "keyPoints": [
+      "The energy output of a star (it's a lot)",
+      "Materials that survive stellar proximity",
+      "Heat management at stellar scales",
+      "The first probe that got a little too close"
+    ]
+  },
+  {
+    "paperId": "dyson_swarm_architecture",
+    "title": "A Million Suns-orbiting Satellites: Dyson Swarm Design",
+    "field": "experimental",
+    "paperSets": ["dyson_sphere"],
+    "prerequisitePapers": ["stellar_engineering_principles"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 25, "physics": 20 },
+    "contributesTo": [
+      { "type": "building", "id": "dyson_swarm_control" }
+    ],
+    "topicDescription": "Practical approaches to capturing stellar output",
+    "keyPoints": [
+      "Why a solid sphere is impractical",
+      "Swarm orbital dynamics",
+      "Construction bootstrapping",
+      "The satellite that wandered off and dimmed a star"
+    ]
+  },
+  {
+    "paperId": "civilizational_power_management",
+    "title": "Too Much of a Good Thing: Managing Civilization-Scale Power",
+    "field": "experimental",
+    "paperSets": ["dyson_sphere"],
+    "prerequisitePapers": ["dyson_swarm_architecture"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 20, "logic": 18 },
+    "contributesTo": [
+      { "type": "building", "id": "power_distribution_hub" }
+    ],
+    "topicDescription": "Distributing and utilizing stellar-scale energy output",
+    "keyPoints": [
+      "Energy storage at civilization scale",
+      "Distribution across interstellar distances",
+      "What to actually do with all this power",
+      "The time someone left a dyson on overnight"
+    ]
+  },
+  {
+    "paperId": "spacetime_topology_manipulation",
+    "title": "Poking Holes in Reality: Advanced Spacetime Engineering",
+    "field": "experimental",
+    "paperSets": ["wormhole_gates"],
+    "prerequisitePapers": ["stable_inter_universe_portals"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 28, "arcane": 15 },
+    "contributesTo": [
+      { "type": "building", "id": "wormhole_generator" }
+    ],
+    "topicDescription": "Creating stable shortcuts through spacetime",
+    "keyPoints": [
+      "The geometry of wormholes",
+      "Negative energy requirements",
+      "Exotic matter sourcing",
+      "The wormhole that connected to yesterday"
+    ]
+  },
+  {
+    "paperId": "wormhole_stabilization",
+    "title": "Keeping the Hole Open: Wormhole Stability Engineering",
+    "field": "experimental",
+    "paperSets": ["wormhole_gates"],
+    "prerequisitePapers": ["spacetime_topology_manipulation"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 25, "engineering": 22 },
+    "contributesTo": [
+      { "type": "building", "id": "wormhole_stabilizer" }
+    ],
+    "topicDescription": "Preventing wormhole collapse during transit",
+    "keyPoints": [
+      "Exotic matter scaffolding",
+      "Feedback loops and stability margins",
+      "What happens if it closes mid-transit",
+      "The ship that arrived in two pieces (in two places)"
+    ]
+  },
+  {
+    "paperId": "gate_network_topology",
+    "title": "A Web of Holes: Designing Wormhole Gate Networks",
+    "field": "experimental",
+    "paperSets": ["wormhole_gates"],
+    "prerequisitePapers": ["wormhole_stabilization"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 22, "logic": 20 },
+    "contributesTo": [
+      { "type": "building", "id": "gate_hub" }
+    ],
+    "topicDescription": "Optimal placement and routing for wormhole networks",
+    "keyPoints": [
+      "Topology optimization for travel times",
+      "Avoiding paradoxical loops",
+      "Gate maintenance scheduling",
+      "The traffic jam that spanned three star systems"
+    ]
+  },
+  {
+    "paperId": "causality_protection_protocols",
+    "title": "Preventing Grandfather Paradoxes: Causality Engineering",
+    "field": "experimental",
+    "paperSets": ["wormhole_gates"],
+    "prerequisitePapers": ["gate_network_topology"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 22, "philosophy": 20 },
+    "contributesTo": [
+      { "type": "knowledge", "id": "causality_protection" }
+    ],
+    "topicDescription": "Ensuring wormhole networks don't break causality",
+    "keyPoints": [
+      "Chronology protection conjecture",
+      "Closed timelike curve detection",
+      "Why some routes are forbidden",
+      "The tourist who tried to warn their younger self"
+    ]
+  },
+  {
+    "paperId": "multiverse_cartography",
+    "title": "Mapping Infinity: Navigating the Multiverse",
+    "field": "experimental",
+    "paperSets": ["multiverse_navigation"],
+    "prerequisitePapers": ["inter_universe_membrane_theory", "gate_network_topology"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 25, "arcane": 20 },
+    "contributesTo": [
+      { "type": "item", "id": "multiverse_compass" }
+    ],
+    "topicDescription": "Understanding and navigating β-space between universes",
+    "keyPoints": [
+      "Coordinate systems for infinite possibility",
+      "Similarity metrics between realities",
+      "Why some universes are 'closer' than others",
+      "The explorer who found a universe almost exactly like home"
+    ]
+  },
+  {
+    "paperId": "probability_branch_detection",
+    "title": "Finding Where You Diverged: Branch Point Analysis",
+    "field": "experimental",
+    "paperSets": ["multiverse_navigation"],
+    "prerequisitePapers": ["multiverse_cartography"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 20, "philosophy": 18 },
+    "contributesTo": [
+      { "type": "ability", "id": "branch_analysis" }
+    ],
+    "topicDescription": "Identifying the divergence points between parallel realities",
+    "keyPoints": [
+      "Tracing causal histories",
+      "Macro vs micro divergences",
+      "The butterfly effect across realities",
+      "Finding the universe where you made that other choice"
+    ]
+  },
+  {
+    "paperId": "cross_universal_ethics",
+    "title": "Which You Gets the Rights?: Ethics Across Realities",
+    "field": "experimental",
+    "paperSets": ["multiverse_navigation"],
+    "prerequisitePapers": ["probability_branch_detection"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "philosophy": 25, "psychology": 15 },
+    "contributesTo": [
+      { "type": "knowledge", "id": "multiverse_ethics" }
+    ],
+    "topicDescription": "Moral frameworks for beings who exist across realities",
+    "keyPoints": [
+      "Identity across branching timelines",
+      "Responsibility to alternate selves",
+      "When your other self is a villain",
+      "The support group for people who met their alternates"
+    ]
+  },
+  {
+    "paperId": "reality_anchor_technology",
+    "title": "Staying You: Maintaining Identity Across Realities",
+    "field": "experimental",
+    "paperSets": ["multiverse_navigation"],
+    "prerequisitePapers": ["cross_universal_ethics"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 18, "philosophy": 20 },
+    "contributesTo": [
+      { "type": "item", "id": "reality_anchor" }
+    ],
+    "topicDescription": "Technology for maintaining coherent identity across reality jumps",
+    "keyPoints": [
+      "Quantum signature preservation",
+      "Memory continuity across transitions",
+      "The 'wrong universe' feeling",
+      "The traveler who forgot which reality was home"
+    ]
+  },
+  {
+    "paperId": "transcendent_signal_theory",
+    "title": "Messages from Beyond: Communication Outside Normal Spacetime",
+    "field": "experimental",
+    "paperSets": ["transcendent_communication"],
+    "prerequisitePapers": ["audiovisual_reality_transmission", "spacetime_topology_manipulation"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 25, "arcane": 22 },
+    "contributesTo": [
+      { "type": "building", "id": "transcendent_beacon" }
+    ],
+    "topicDescription": "Communication methods that bypass normal physics",
+    "keyPoints": [
+      "Signals that ignore distance",
+      "Time-independent messaging",
+      "The substrate of transcendent communication",
+      "The message that arrived from nowhere"
+    ]
+  },
+  {
+    "paperId": "omnipresent_awareness",
+    "title": "Being Everywhere at Once: Distributed Consciousness Communication",
+    "field": "experimental",
+    "paperSets": ["transcendent_communication"],
+    "prerequisitePapers": ["transcendent_signal_theory", "fork_merge_consciousness"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "philosophy": 25, "psychology": 20 },
+    "contributesTo": [
+      { "type": "ability", "id": "omnipresent_sense" }
+    ],
+    "topicDescription": "Spreading awareness across vast distances instantaneously",
+    "keyPoints": [
+      "Consciousness as a field phenomenon",
+      "Maintaining unity across distance",
+      "The loneliness of omnipresence",
+      "The being who was everywhere but belonged nowhere"
+    ]
+  },
+  {
+    "paperId": "post_physical_existence",
+    "title": "Leaving Matter Behind: Existence Beyond Physical Form",
+    "field": "experimental",
+    "paperSets": ["transcendence"],
+    "prerequisitePapers": ["substrate_independence", "omnipresent_awareness"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "philosophy": 30, "arcane": 25 },
+    "contributesTo": [
+      { "type": "ability", "id": "transcend" }
+    ],
+    "topicDescription": "Transitioning consciousness beyond physical substrate",
+    "keyPoints": [
+      "Information patterns without medium",
+      "Existence in abstract space",
+      "What remains when form is gone",
+      "The first being to transcend (and immediately get lonely)"
+    ]
+  },
+  {
+    "paperId": "reality_weaving",
+    "title": "Making Worlds: The Art of Reality Creation",
+    "field": "experimental",
+    "paperSets": ["transcendence"],
+    "prerequisitePapers": ["post_physical_existence", "multiverse_cartography"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "arcane": 30, "philosophy": 25 },
+    "contributesTo": [
+      { "type": "ability", "id": "create_reality" }
+    ],
+    "topicDescription": "Creating new universes from transcendent state",
+    "keyPoints": [
+      "The physics of universe bootstrapping",
+      "Deciding the fundamental constants",
+      "The responsibility of creation",
+      "The universe that was made as a joke"
+    ]
+  },
+  {
+    "paperId": "akashic_access_protocols",
+    "title": "Reading the Book of Everything: Accessing Universal Records",
+    "field": "experimental",
+    "paperSets": ["transcendence"],
+    "prerequisitePapers": ["reality_weaving"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "arcane": 28, "philosophy": 22 },
+    "contributesTo": [
+      { "type": "knowledge", "id": "akashic_access" }
+    ],
+    "topicDescription": "Connecting to the informational substrate of reality",
+    "keyPoints": [
+      "The cosmic information field",
+      "Query languages for universal knowledge",
+      "Why some questions have no answers",
+      "The being who asked 'why?' and got a very long answer"
+    ]
+  },
+  {
+    "paperId": "entropy_reversal_theory",
+    "title": "Unspilling the Milk: Local Entropy Reversal",
+    "field": "experimental",
+    "paperSets": ["transcendence"],
+    "prerequisitePapers": ["akashic_access_protocols"],
+    "complexity": 10,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 30, "arcane": 25 },
+    "contributesTo": [
+      { "type": "ability", "id": "entropy_reversal" }
+    ],
+    "topicDescription": "Reversing thermodynamic processes at will",
+    "keyPoints": [
+      "Maxwell's demon as a technology",
+      "The energy cost of reversing entropy",
+      "Why you can't undo everything",
+      "The transcendent being who cleaned up a supernova"
+    ]
+  }
+]

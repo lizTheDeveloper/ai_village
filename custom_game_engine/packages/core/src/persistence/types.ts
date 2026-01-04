@@ -3,6 +3,7 @@
  */
 
 import type { TerrainSnapshot } from '@ai-village/world';
+import type { UniverseDivineConfig } from '../divinity/UniverseConfig.js';
 
 // ============================================================================
 // Base Versioning
@@ -114,6 +115,29 @@ export interface ZoneSnapshot extends Versioned {
 }
 
 // ============================================================================
+// Passage Serialization
+// ============================================================================
+
+export interface PassageSnapshot extends Versioned {
+  $schema: 'https://aivillage.dev/schemas/passage/v1';
+
+  /** Passage ID */
+  id: string;
+
+  /** Source universe ID */
+  sourceUniverseId: string;
+
+  /** Target universe ID */
+  targetUniverseId: string;
+
+  /** Passage type */
+  type: 'thread' | 'bridge' | 'gate' | 'confluence';
+
+  /** Whether passage is currently active */
+  active: boolean;
+}
+
+// ============================================================================
 // World State
 // ============================================================================
 
@@ -126,9 +150,6 @@ export interface WorldSnapshot {
 
   /** Zone configuration */
   zones: ZoneSnapshot[];
-
-  /** Building placements */
-  buildings: unknown[];
 }
 
 export interface UniverseSnapshot extends Versioned {
@@ -147,8 +168,8 @@ export interface UniverseSnapshot extends Versioned {
   /** Universe time */
   time: UniverseTime;
 
-  /** Universe config */
-  config: unknown;  // UniverseDivineConfig
+  /** Universe divine config - controls divine powers, belief economy, etc. */
+  config: Partial<UniverseDivineConfig> | Record<string, never>;
 
   /** All entities in this universe */
   entities: VersionedEntity[];
@@ -229,7 +250,7 @@ export interface SaveFile extends Versioned {
   universes: UniverseSnapshot[];
 
   /** Passage connections between universes */
-  passages: unknown[];  // TODO: PassageSnapshot
+  passages: PassageSnapshot[];
 
   /** Player state */
   player?: unknown;

@@ -6,6 +6,7 @@ import type {
   FeatureFlags,
   Season,
 } from '../types.js';
+import type { UniverseDivineConfig } from '../divinity/UniverseConfig.js';
 import type { Component } from './Component.js';
 import type { Entity } from './Entity.js';
 import type { EventBus } from '../events/EventBus.js';
@@ -219,6 +220,13 @@ export interface World {
 
   /** Get a system by ID */
   getSystem(systemId: string): import('./System.js').System | undefined;
+
+  /**
+   * Divine configuration for this universe.
+   * Controls how divine powers, belief economy, avatars, angels, etc. work.
+   * See UniverseConfig.ts for presets (high_fantasy, grimdark, deistic, etc.)
+   */
+  readonly divineConfig?: Partial<UniverseDivineConfig>;
 }
 
 /**
@@ -269,6 +277,7 @@ export class WorldImpl implements WorldMutator {
   private _craftingSystem?: import('../crafting/CraftingSystem.js').CraftingSystem;
   private _itemInstanceRegistry?: import('../items/ItemInstanceRegistry.js').ItemInstanceRegistry;
   private _systemRegistry?: import('./SystemRegistry.js').ISystemRegistry;
+  private _divineConfig?: Partial<UniverseDivineConfig>;
 
   // Simulation scheduling for performance optimization
   private _simulationScheduler = new SimulationScheduler();
@@ -322,6 +331,10 @@ export class WorldImpl implements WorldMutator {
 
   get itemInstanceRegistry(): import('../items/ItemInstanceRegistry.js').ItemInstanceRegistry | undefined {
     return this._itemInstanceRegistry;
+  }
+
+  get divineConfig(): Partial<UniverseDivineConfig> | undefined {
+    return this._divineConfig;
   }
 
   get features(): FeatureFlags {
@@ -631,6 +644,20 @@ export class WorldImpl implements WorldMutator {
    */
   setItemInstanceRegistry(registry: import('../items/ItemInstanceRegistry.js').ItemInstanceRegistry): void {
     this._itemInstanceRegistry = registry;
+  }
+
+  /**
+   * Set divine configuration for this universe.
+   * Controls how divine powers, belief economy, avatars, angels, etc. work.
+   * Called by game initialization with a preset (high_fantasy, grimdark, etc.)
+   *
+   * Example:
+   *   const config = createUniverseConfig('universe-1', 'My World', 'high_fantasy');
+   *   world.setDivineConfig(config);
+   */
+  setDivineConfig(config: Partial<UniverseDivineConfig>): void {
+    this._divineConfig = config;
+    console.log(`[World] Divine config set: ${config.name ?? 'unnamed'}`);
   }
 
   /**
