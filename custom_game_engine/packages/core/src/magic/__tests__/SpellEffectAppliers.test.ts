@@ -561,7 +561,7 @@ function createMockWorld(): World {
       const entity = entities.get(entityId);
       if (entity) {
         const componentType = component.type || 'position';
-        entity.addComponent(componentType, component);
+        (entity as any).addComponent(componentType, component);
       }
     },
     destroyEntity: (entityId: string, reason?: string) => {

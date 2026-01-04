@@ -371,7 +371,7 @@ describe('MeetingDetector', () => {
   describe('process', () => {
     it('returns detected=false when no agent component', () => {
       const entity = new EntityImpl(createEntityId(), 0);
-      entity.addComponent(createPositionComponent(0, 0));
+      (entity as any).addComponent(createPositionComponent(0, 0));
       (world as any)._addEntity(entity);
 
       const result = meetingDetector.process(entity, world);

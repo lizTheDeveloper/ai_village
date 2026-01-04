@@ -35,7 +35,7 @@ describe('Targeting Module', () => {
   ): EntityImpl {
     const entity = world.createEntity() as EntityImpl;
     for (const [type, data] of Object.entries(components)) {
-      entity.addComponent({ type, ...data });
+      (entity as any).addComponent({ type, ...data });
     }
     return entity;
   }

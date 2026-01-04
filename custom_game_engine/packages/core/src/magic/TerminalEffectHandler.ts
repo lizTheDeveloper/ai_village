@@ -150,7 +150,7 @@ export class TerminalEffectHandler {
     const needs = entity.components.get(CT.Needs);
     if (needs && typeof needs === 'object' && 'health' in needs) {
       const updatedNeeds = { ...needs, health: 0 };
-      entity.addComponent(updatedNeeds);
+      (entity as any).addComponent(updatedNeeds);
     }
 
     this.emitEvent('magic:death', entity.id, {

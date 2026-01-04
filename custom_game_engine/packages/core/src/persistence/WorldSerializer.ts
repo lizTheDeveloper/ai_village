@@ -3,6 +3,7 @@
  */
 
 import type { World } from '../ecs/World.js';
+import type { WorldImpl } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { Component } from '../ecs/Component.js';
 import type {
@@ -12,6 +13,7 @@ import type {
 } from './types.js';
 import { componentSerializerRegistry } from './serializers/index.js';
 import { computeChecksumSync } from './utils.js';
+import { chunkSerializer } from '@ai-village/world';
 
 export class WorldSerializer {
   /**
@@ -119,12 +121,23 @@ export class WorldSerializer {
 
     // Add entities to world
     // Note: WorldImpl doesn't have addEntity in its interface, so we need to access internal API
-    const worldImpl = world as any;  // TODO: Add proper save/load support to World interface
+    const worldImpl = world as WorldImpl;
     for (const entity of deserializedEntities) {
-      worldImpl._entities.set(entity.id, entity);
+      (worldImpl as any)._entities.set(entity.id, entity);
     }
 
-    // TODO: Deserialize world state (terrain, weather, etc.)
+    // Deserialize world state (terrain, weather, etc.)
+    if (snapshot.worldState.terrain) {
+      const chunkManager = worldImpl.getChunkManager();
+      if (chunkManager) {
+        await chunkSerializer.deserializeChunks(snapshot.worldState.terrain, chunkManager);
+        console.log('[WorldSerializer] Terrain restored from snapshot');
+      } else {
+        console.warn('[WorldSerializer] No ChunkManager available - terrain not restored');
+      }
+    }
+
+    // TODO: Deserialize weather, zones, buildings
 
     console.log(`[WorldSerializer] Deserialized ${deserializedEntities.length} entities`);
   }
@@ -224,7 +237,7 @@ export class WorldSerializer {
     for (const componentData of data.components) {
       try {
         const component = componentSerializerRegistry.deserialize(componentData) as Component;
-        entity.addComponent(component);
+        (entity as any).addComponent(component);
       } catch (error) {
         console.error(
           `[WorldSerializer] Failed to deserialize component ${componentData.type} ` +
@@ -241,14 +254,21 @@ export class WorldSerializer {
   /**
    * Serialize world state (terrain, weather, etc.).
    */
-  private serializeWorldState(_world: World): WorldSnapshot {
-    // TODO: Implement terrain serialization
+  private serializeWorldState(world: World): WorldSnapshot {
+    // Serialize terrain using ChunkSerializer
+    const worldImpl = world as WorldImpl;
+    const chunkManager = worldImpl.getChunkManager();
+
+    const terrain = chunkManager
+      ? chunkSerializer.serializeChunks(chunkManager)
+      : null;
+
     // TODO: Implement weather serialization
     // TODO: Implement zone serialization
     // TODO: Implement building placement serialization
 
     return {
-      terrain: null,
+      terrain,
       weather: null,
       zones: [],
       buildings: [],

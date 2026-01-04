@@ -147,10 +147,11 @@ export class SleepSystem implements System {
     const newEnergy = Math.min(1.0, needs.energy + recoveryAmount);
 
     // Update needs component
-    entity.updateComponent<NeedsComponent>(CT.Needs, (current) => ({
-      ...current,
-      energy: newEnergy,
-    }));
+    entity.updateComponent<NeedsComponent>(CT.Needs, (current) => {
+      const updated = current.clone();
+      updated.energy = newEnergy;
+      return updated;
+    });
 
     // Track accumulated sleep duration in game hours
     circadian.sleepDurationHours = circadian.sleepDurationHours + hoursElapsed;

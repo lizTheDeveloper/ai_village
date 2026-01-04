@@ -49,10 +49,10 @@ describe('AfterlifeNeedsSystem', () => {
         deathLocation: { x: 0, y: 0 },
       });
 
-      entity.addComponent(afterlife);
-      entity.addComponent(createRealmLocationComponent('underworld'));
-      entity.addComponent(createPositionComponent(0, 0));
-      entity.addComponent(createIdentityComponent('Test Soul'));
+      (entity as any).addComponent(afterlife);
+      (entity as any).addComponent(createRealmLocationComponent('underworld'));
+      (entity as any).addComponent(createPositionComponent(0, 0));
+      (entity as any).addComponent(createIdentityComponent('Test Soul'));
 
       (world as any)._addEntity(entity);
 
@@ -80,10 +80,10 @@ describe('AfterlifeNeedsSystem', () => {
 
       afterlife.solitude = 0.9; // Very lonely
 
-      entity.addComponent(afterlife);
-      entity.addComponent(createRealmLocationComponent('underworld'));
-      entity.addComponent(createPositionComponent(0, 0));
-      entity.addComponent(createIdentityComponent('Lonely Soul'));
+      (entity as any).addComponent(afterlife);
+      (entity as any).addComponent(createRealmLocationComponent('underworld'));
+      (entity as any).addComponent(createPositionComponent(0, 0));
+      (entity as any).addComponent(createIdentityComponent('Lonely Soul'));
 
       (world as any)._addEntity(entity);
 
@@ -135,10 +135,10 @@ describe('AfterlifeNeedsSystem', () => {
       // Manually set coherence just above threshold
       afterlife.coherence = 0.11;
 
-      entity.addComponent(afterlife);
-      entity.addComponent(createRealmLocationComponent('underworld'));
-      entity.addComponent(createPositionComponent(0, 0));
-      entity.addComponent(createIdentityComponent('Fading Soul'));
+      (entity as any).addComponent(afterlife);
+      (entity as any).addComponent(createRealmLocationComponent('underworld'));
+      (entity as any).addComponent(createPositionComponent(0, 0));
+      (entity as any).addComponent(createIdentityComponent('Fading Soul'));
 
       (world as any)._addEntity(entity);
 
@@ -169,10 +169,10 @@ describe('AfterlifeNeedsSystem', () => {
 
       afterlife.lastRememberedTick = currentTick - 100;
 
-      entity.addComponent(afterlife);
-      entity.addComponent(createRealmLocationComponent('underworld'));
-      entity.addComponent(createPositionComponent(0, 0));
-      entity.addComponent(createIdentityComponent('Remembered Soul'));
+      (entity as any).addComponent(afterlife);
+      (entity as any).addComponent(createRealmLocationComponent('underworld'));
+      (entity as any).addComponent(createPositionComponent(0, 0));
+      (entity as any).addComponent(createIdentityComponent('Remembered Soul'));
 
       (world as any)._addEntity(entity);
 
@@ -202,10 +202,10 @@ describe('AfterlifeNeedsSystem', () => {
       // Not remembered in a very long time
       afterlife.lastRememberedTick = currentTick - 15000; // Beyond FORGOTTEN_THRESHOLD
 
-      entity.addComponent(afterlife);
-      entity.addComponent(createRealmLocationComponent('underworld'));
-      entity.addComponent(createPositionComponent(0, 0));
-      entity.addComponent(createIdentityComponent('Forgotten Soul'));
+      (entity as any).addComponent(afterlife);
+      (entity as any).addComponent(createRealmLocationComponent('underworld'));
+      (entity as any).addComponent(createPositionComponent(0, 0));
+      (entity as any).addComponent(createIdentityComponent('Forgotten Soul'));
 
       (world as any)._addEntity(entity);
 
@@ -256,10 +256,10 @@ describe('AfterlifeNeedsSystem', () => {
         deathLocation: { x: 0, y: 0 },
       });
 
-      entity.addComponent(afterlife);
-      entity.addComponent(createRealmLocationComponent('underworld'));
-      entity.addComponent(createPositionComponent(0, 0));
-      entity.addComponent(createIdentityComponent('Isolated Soul'));
+      (entity as any).addComponent(afterlife);
+      (entity as any).addComponent(createRealmLocationComponent('underworld'));
+      (entity as any).addComponent(createPositionComponent(0, 0));
+      (entity as any).addComponent(createIdentityComponent('Isolated Soul'));
 
       (world as any)._addEntity(entity);
 
@@ -283,10 +283,10 @@ describe('AfterlifeNeedsSystem', () => {
 
       afterlife.solitude = 0.99;
 
-      entity.addComponent(afterlife);
-      entity.addComponent(createRealmLocationComponent('underworld'));
-      entity.addComponent(createPositionComponent(0, 0));
-      entity.addComponent(createIdentityComponent('Nearly Max Solitude'));
+      (entity as any).addComponent(afterlife);
+      (entity as any).addComponent(createRealmLocationComponent('underworld'));
+      (entity as any).addComponent(createPositionComponent(0, 0));
+      (entity as any).addComponent(createIdentityComponent('Nearly Max Solitude'));
 
       (world as any)._addEntity(entity);
 
@@ -309,10 +309,10 @@ describe('AfterlifeNeedsSystem', () => {
         unfinishedGoals: [], // No unfinished business
       });
 
-      entity.addComponent(afterlife);
-      entity.addComponent(createRealmLocationComponent('underworld'));
-      entity.addComponent(createPositionComponent(0, 0));
-      entity.addComponent(createIdentityComponent('Peaceful Soul'));
+      (entity as any).addComponent(afterlife);
+      (entity as any).addComponent(createRealmLocationComponent('underworld'));
+      (entity as any).addComponent(createPositionComponent(0, 0));
+      (entity as any).addComponent(createIdentityComponent('Peaceful Soul'));
 
       (world as any)._addEntity(entity);
 
@@ -335,10 +335,10 @@ describe('AfterlifeNeedsSystem', () => {
         unfinishedGoals: ['goal1', 'goal2'], // Still has unfinished business
       });
 
-      entity.addComponent(afterlife);
-      entity.addComponent(createRealmLocationComponent('underworld'));
-      entity.addComponent(createPositionComponent(0, 0));
-      entity.addComponent(createIdentityComponent('Unfinished Soul'));
+      (entity as any).addComponent(afterlife);
+      (entity as any).addComponent(createRealmLocationComponent('underworld'));
+      (entity as any).addComponent(createPositionComponent(0, 0));
+      (entity as any).addComponent(createIdentityComponent('Unfinished Soul'));
 
       (world as any)._addEntity(entity);
 
@@ -366,10 +366,10 @@ describe('AfterlifeNeedsSystem', () => {
       afterlife.tether = 0.05; // Very low
       afterlife.peace = 0.85;  // High
 
-      entity.addComponent(afterlife);
-      entity.addComponent(createRealmLocationComponent('underworld'));
-      entity.addComponent(createPositionComponent(0, 0));
-      entity.addComponent(createIdentityComponent('Departing Soul'));
+      (entity as any).addComponent(afterlife);
+      (entity as any).addComponent(createRealmLocationComponent('underworld'));
+      (entity as any).addComponent(createPositionComponent(0, 0));
+      (entity as any).addComponent(createIdentityComponent('Departing Soul'));
 
       (world as any)._addEntity(entity);
 
@@ -394,10 +394,10 @@ describe('AfterlifeNeedsSystem', () => {
       // Force peace very low
       afterlife.peace = 0.15;
 
-      entity.addComponent(afterlife);
-      entity.addComponent(createRealmLocationComponent('underworld'));
-      entity.addComponent(createPositionComponent(0, 0));
-      entity.addComponent(createIdentityComponent('Angry Soul'));
+      (entity as any).addComponent(afterlife);
+      (entity as any).addComponent(createRealmLocationComponent('underworld'));
+      (entity as any).addComponent(createPositionComponent(0, 0));
+      (entity as any).addComponent(createIdentityComponent('Angry Soul'));
 
       (world as any)._addEntity(entity);
 
@@ -418,10 +418,10 @@ describe('AfterlifeNeedsSystem', () => {
         deathLocation: { x: 0, y: 0 },
       });
 
-      entity.addComponent(afterlife);
-      entity.addComponent(createRealmLocationComponent('mortal')); // Not in underworld
-      entity.addComponent(createPositionComponent(0, 0));
-      entity.addComponent(createIdentityComponent('Living Soul'));
+      (entity as any).addComponent(afterlife);
+      (entity as any).addComponent(createRealmLocationComponent('mortal')); // Not in underworld
+      (entity as any).addComponent(createPositionComponent(0, 0));
+      (entity as any).addComponent(createIdentityComponent('Living Soul'));
 
       (world as any)._addEntity(entity);
 
@@ -446,10 +446,10 @@ describe('AfterlifeNeedsSystem', () => {
 
       afterlife.hasPassedOn = true;
 
-      entity.addComponent(afterlife);
-      entity.addComponent(createRealmLocationComponent('underworld'));
-      entity.addComponent(createPositionComponent(0, 0));
-      entity.addComponent(createIdentityComponent('Passed On'));
+      (entity as any).addComponent(afterlife);
+      (entity as any).addComponent(createRealmLocationComponent('underworld'));
+      (entity as any).addComponent(createPositionComponent(0, 0));
+      (entity as any).addComponent(createIdentityComponent('Passed On'));
 
       (world as any)._addEntity(entity);
 
@@ -473,10 +473,10 @@ describe('AfterlifeNeedsSystem', () => {
 
       afterlife.isShade = true;
 
-      entity.addComponent(afterlife);
-      entity.addComponent(createRealmLocationComponent('underworld'));
-      entity.addComponent(createPositionComponent(0, 0));
-      entity.addComponent(createIdentityComponent('Shade'));
+      (entity as any).addComponent(afterlife);
+      (entity as any).addComponent(createRealmLocationComponent('underworld'));
+      (entity as any).addComponent(createPositionComponent(0, 0));
+      (entity as any).addComponent(createIdentityComponent('Shade'));
 
       (world as any)._addEntity(entity);
 

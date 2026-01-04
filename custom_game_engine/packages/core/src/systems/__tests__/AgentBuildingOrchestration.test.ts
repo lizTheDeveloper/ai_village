@@ -61,8 +61,8 @@ describe('Agent Building Orchestration - Phase 7', () => {
     it('should automatically increment progress each tick for buildings < 100%', () => {
       // Create building under construction
       const entity = createTestEntity();
-      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 0));
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(createBuildingComponent(BuildingType.Tent, 1, 0));
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       // Initial state
       let building = getComponent<BuildingComponent>(entity, 'building');
@@ -82,8 +82,8 @@ describe('Agent Building Orchestration - Phase 7', () => {
       // Tent has buildTime=45s
       // After 1 second: progress = (100 / 45) * 1 = ~2.22%
       const entity = createTestEntity();
-      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 0));
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(createBuildingComponent(BuildingType.Tent, 1, 0));
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       buildingSystem.update(world, [entity], 1);
 
@@ -94,8 +94,8 @@ describe('Agent Building Orchestration - Phase 7', () => {
 
     it('should not increment progress for completed buildings', () => {
       const entity = createTestEntity();
-      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 100));
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(createBuildingComponent(BuildingType.Tent, 1, 100));
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       buildingSystem.update(world, [entity], 10);
 
@@ -200,8 +200,8 @@ describe('Agent Building Orchestration - Phase 7', () => {
       eventBus.subscribe('building:complete', eventSpy);
 
       const entity = createTestEntity();
-      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
-      entity.addComponent(createPositionComponent(15, 20));
+      (entity as any).addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
+      (entity as any).addComponent(createPositionComponent(15, 20));
 
       // Complete construction
       buildingSystem.update(world, [entity], 10);
@@ -216,8 +216,8 @@ describe('Agent Building Orchestration - Phase 7', () => {
 
     it('should mark building as complete when progress reaches 100%', () => {
       const entity = createTestEntity();
-      entity.addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(createBuildingComponent(BuildingType.Tent, 1, 99));
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       let building = getComponent<BuildingComponent>(entity, 'building');
       expect(building.isComplete).toBe(false);
@@ -234,8 +234,8 @@ describe('Agent Building Orchestration - Phase 7', () => {
       eventBus.subscribe('building:complete', eventSpy);
 
       const entity = createTestEntity();
-      entity.addComponent(createBuildingComponent(BuildingType.Campfire, 1, 99));
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(createBuildingComponent(BuildingType.Campfire, 1, 99));
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       // First update completes it
       buildingSystem.update(world, [entity], 10);
@@ -253,8 +253,8 @@ describe('Agent Building Orchestration - Phase 7', () => {
       eventBus.subscribe('building:complete', eventSpy);
 
       const entity = createTestEntity();
-      entity.addComponent(createBuildingComponent(BuildingType.Workbench, 1, 99));
-      entity.addComponent(createPositionComponent(42, 84));
+      (entity as any).addComponent(createBuildingComponent(BuildingType.Workbench, 1, 99));
+      (entity as any).addComponent(createPositionComponent(42, 84));
 
       buildingSystem.update(world, [entity], 10);
       eventBus.flush();

@@ -73,7 +73,7 @@ export class CallMeetingBehavior extends BaseBehavior {
       DEFAULT_MEETING_DURATION
     );
 
-    entity.addComponent(meeting);
+    (entity as any).addComponent(meeting);
 
     // Announce the meeting through speech
     const callerName = identity?.name || 'Someone';

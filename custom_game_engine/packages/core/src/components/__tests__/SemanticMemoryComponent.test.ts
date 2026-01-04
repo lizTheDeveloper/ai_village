@@ -14,7 +14,7 @@ describe('SemanticMemoryComponent', () => {
   // Criterion 11: Semantic Memory Formation
   describe('semantic memory formation', () => {
     it('should create semantic memory with fact/belief', () => {
-      const memory = entity.addComponent(SemanticMemoryComponent, {});
+      const memory = (entity as any).addComponent(SemanticMemoryComponent, {});
 
       memory.formBelief({
         category: 'farming',
@@ -30,7 +30,7 @@ describe('SemanticMemoryComponent', () => {
     });
 
     it('should link to source episodic memories', () => {
-      const memory = entity.addComponent(SemanticMemoryComponent, {});
+      const memory = (entity as any).addComponent(SemanticMemoryComponent, {});
 
       memory.formBelief({
         category: 'social',
@@ -45,7 +45,7 @@ describe('SemanticMemoryComponent', () => {
     });
 
     it('should track confidence score', () => {
-      const memory = entity.addComponent(SemanticMemoryComponent, {});
+      const memory = (entity as any).addComponent(SemanticMemoryComponent, {});
 
       memory.formBelief({
         category: 'nature',
@@ -60,7 +60,7 @@ describe('SemanticMemoryComponent', () => {
     });
 
     it('should track who shares the belief', () => {
-      const memory = entity.addComponent(SemanticMemoryComponent, {});
+      const memory = (entity as any).addComponent(SemanticMemoryComponent, {});
 
       memory.formBelief({
         category: 'social',
@@ -76,7 +76,7 @@ describe('SemanticMemoryComponent', () => {
     });
 
     it('should track who contests the belief', () => {
-      const memory = entity.addComponent(SemanticMemoryComponent, {});
+      const memory = (entity as any).addComponent(SemanticMemoryComponent, {});
 
       memory.formBelief({
         category: 'politics',
@@ -91,7 +91,7 @@ describe('SemanticMemoryComponent', () => {
     });
 
     it('should allow updating beliefs with new evidence', () => {
-      const memory = entity.addComponent(SemanticMemoryComponent, {});
+      const memory = (entity as any).addComponent(SemanticMemoryComponent, {});
 
       memory.formBelief({
         category: 'farming',
@@ -115,7 +115,7 @@ describe('SemanticMemoryComponent', () => {
     });
 
     it('should categorize beliefs (farming, social, nature, politics, etc)', () => {
-      const memory = entity.addComponent(SemanticMemoryComponent, {});
+      const memory = (entity as any).addComponent(SemanticMemoryComponent, {});
 
       memory.formBelief({
         category: 'farming',
@@ -139,7 +139,7 @@ describe('SemanticMemoryComponent', () => {
 
   describe('belief validation', () => {
     it('should track validation attempts', () => {
-      const memory = entity.addComponent(SemanticMemoryComponent, {});
+      const memory = (entity as any).addComponent(SemanticMemoryComponent, {});
 
       memory.formBelief({
         category: 'nature',
@@ -156,7 +156,7 @@ describe('SemanticMemoryComponent', () => {
     });
 
     it('should increase confidence when validated', () => {
-      const memory = entity.addComponent(SemanticMemoryComponent, {});
+      const memory = (entity as any).addComponent(SemanticMemoryComponent, {});
 
       memory.formBelief({
         category: 'farming',
@@ -172,7 +172,7 @@ describe('SemanticMemoryComponent', () => {
     });
 
     it('should decrease confidence when invalidated', () => {
-      const memory = entity.addComponent(SemanticMemoryComponent, {});
+      const memory = (entity as any).addComponent(SemanticMemoryComponent, {});
 
       memory.formBelief({
         category: 'nature',
@@ -190,7 +190,7 @@ describe('SemanticMemoryComponent', () => {
 
   describe('knowledge types', () => {
     it('should store factual knowledge (how-to, mechanics)', () => {
-      const memory = entity.addComponent(SemanticMemoryComponent, {});
+      const memory = (entity as any).addComponent(SemanticMemoryComponent, {});
 
       memory.formKnowledge({
         type: 'procedural',
@@ -205,7 +205,7 @@ describe('SemanticMemoryComponent', () => {
     });
 
     it('should store opinions (subjective beliefs)', () => {
-      const memory = entity.addComponent(SemanticMemoryComponent, {});
+      const memory = (entity as any).addComponent(SemanticMemoryComponent, {});
 
       memory.formBelief({
         category: 'opinion',
@@ -220,7 +220,7 @@ describe('SemanticMemoryComponent', () => {
     });
 
     it('should store generalizations from experiences', () => {
-      const memory = entity.addComponent(SemanticMemoryComponent, {});
+      const memory = (entity as any).addComponent(SemanticMemoryComponent, {});
 
       memory.formBelief({
         category: 'social',
@@ -238,7 +238,7 @@ describe('SemanticMemoryComponent', () => {
   // Error handling - per CLAUDE.md
   describe('error handling', () => {
     it('should throw when required category is missing', () => {
-      const memory = entity.addComponent(SemanticMemoryComponent, {});
+      const memory = (entity as any).addComponent(SemanticMemoryComponent, {});
 
       expect(() => {
         memory.formBelief({
@@ -250,7 +250,7 @@ describe('SemanticMemoryComponent', () => {
     });
 
     it('should throw when required content is missing', () => {
-      const memory = entity.addComponent(SemanticMemoryComponent, {});
+      const memory = (entity as any).addComponent(SemanticMemoryComponent, {});
 
       expect(() => {
         memory.formBelief({
@@ -262,7 +262,7 @@ describe('SemanticMemoryComponent', () => {
     });
 
     it('should throw when required sourceMemories is missing', () => {
-      const memory = entity.addComponent(SemanticMemoryComponent, {});
+      const memory = (entity as any).addComponent(SemanticMemoryComponent, {});
 
       expect(() => {
         memory.formBelief({
@@ -274,7 +274,7 @@ describe('SemanticMemoryComponent', () => {
     });
 
     it('should throw when confidence is out of range', () => {
-      const memory = entity.addComponent(SemanticMemoryComponent, {});
+      const memory = (entity as any).addComponent(SemanticMemoryComponent, {});
 
       expect(() => {
         memory.formBelief({
@@ -287,7 +287,7 @@ describe('SemanticMemoryComponent', () => {
     });
 
     it('should NOT use fallback for missing confidence', () => {
-      const memory = entity.addComponent(SemanticMemoryComponent, {});
+      const memory = (entity as any).addComponent(SemanticMemoryComponent, {});
 
       expect(() => {
         memory.formBelief({

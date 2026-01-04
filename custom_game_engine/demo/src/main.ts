@@ -3244,8 +3244,11 @@ async function main() {
     createInitialBuildings(gameLoop.world);
     const agentIds = createInitialAgents(gameLoop.world, settings.dungeonMasterPrompt);
 
+    // Start game loop BEFORE soul creation so SoulCreationSystem.update() runs
+    console.log('[Demo] Starting game loop for soul creation...');
+    gameLoop.start();
+
     // Create souls for the initial agents (displays modal before map loads)
-    // NOTE: Game loop will be started AFTER this, so SoulCreationSystem.update() won't run yet
     await createSoulsForInitialAgents(gameLoop, agentIds, llmProvider, renderer, universeConfig, isLLMAvailable);
     console.log('[Demo] All souls created (or skipped if LLM unavailable), continuing initialization...');
 
@@ -3281,11 +3284,10 @@ async function main() {
     berryPositions.forEach(pos => createBerryBush(gameLoop.world, pos.x, pos.y));
   } else {
     console.log('[Demo] Skipping world initialization - loaded from checkpoint');
+    // Start game loop for loaded checkpoints (new games already started it before soul creation)
+    console.log('[Demo] Starting game loop...');
+    gameLoop.start();
   }
-
-  // Start game loop (for both new games and loaded checkpoints)
-  console.log('[Demo] Starting game loop...');
-  gameLoop.start();
 
   // Expose gameLoop globally for API access (e.g., Interdimensional Cable recordings API)
   (window as any).__gameLoop = gameLoop;

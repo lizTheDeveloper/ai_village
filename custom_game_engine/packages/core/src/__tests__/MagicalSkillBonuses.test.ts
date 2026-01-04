@@ -130,8 +130,8 @@ describe('MagicalSkillBonuses', () => {
       canFly: false,
     };
 
-    entity.addComponent(body);
-    entity.addComponent(equipment);
+    (entity as any).addComponent(body);
+    (entity as any).addComponent(equipment);
     world.addEntity(entity);
 
     // Run equipment system
@@ -195,8 +195,8 @@ describe('MagicalSkillBonuses', () => {
       canFly: false,
     };
 
-    entity.addComponent(body);
-    entity.addComponent(equipment);
+    (entity as any).addComponent(body);
+    (entity as any).addComponent(equipment);
     world.addEntity(entity);
 
     // Run equipment system
@@ -248,8 +248,8 @@ describe('MagicalSkillBonuses', () => {
       canFly: false,
     };
 
-    entity.addComponent(body);
-    entity.addComponent(equipment);
+    (entity as any).addComponent(body);
+    (entity as any).addComponent(equipment);
     world.addEntity(entity);
 
     // Run equipment system
@@ -301,8 +301,8 @@ describe('MagicalSkillBonuses', () => {
       canFly: false,
     };
 
-    entity.addComponent(body);
-    entity.addComponent(equipment);
+    (entity as any).addComponent(body);
+    (entity as any).addComponent(equipment);
     world.addEntity(entity);
 
     // Run equipment system
@@ -392,8 +392,8 @@ describe('MagicalSkillBonuses', () => {
       canFly: false,
     };
 
-    entity.addComponent(body);
-    entity.addComponent(equipment);
+    (entity as any).addComponent(body);
+    (entity as any).addComponent(equipment);
     world.addEntity(entity);
 
     // Run equipment system

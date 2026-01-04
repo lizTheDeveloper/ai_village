@@ -69,7 +69,7 @@ describe('Animal Production System', () => {
         bondLevel: 50,
         trustLevel: 60,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       // Simulate time passing (1 day = 86400 seconds)
       const entities = world.query().with(ComponentType.Animal).executeEntities();
@@ -110,7 +110,7 @@ describe('Animal Production System', () => {
         bondLevel: 70,
         trustLevel: 75,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       // Fast-forward to trigger production (1 day = 86400 seconds)
       const entities = world.query().with(ComponentType.Animal).executeEntities();
@@ -151,7 +151,7 @@ describe('Animal Production System', () => {
         bondLevel: 50,
         trustLevel: 60,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       // Fast-forward (1 day = 86400 seconds)
       const entities = world.query().with(ComponentType.Animal).executeEntities();
@@ -186,7 +186,7 @@ describe('Animal Production System', () => {
         bondLevel: 40,
         trustLevel: 50,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       // Fast-forward (1 day = 86400 seconds)
       const entities = world.query().with(ComponentType.Animal).executeEntities();
@@ -220,7 +220,7 @@ describe('Animal Production System', () => {
         bondLevel: 60,
         trustLevel: 70,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       // Initialize the system by calling update once
       const entities = world.query().with(ComponentType.Animal).executeEntities();
@@ -377,7 +377,7 @@ describe('Animal Production System', () => {
         bondLevel: 60,
         trustLevel: 70,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       // Initialize the system
       const entities = world.query().with(ComponentType.Animal).executeEntities();
@@ -412,7 +412,7 @@ describe('Animal Production System', () => {
         bondLevel: 60,
         trustLevel: 70,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       // Initialize the system
       const entities = world.query().with(ComponentType.Animal).executeEntities();
@@ -451,7 +451,7 @@ describe('Animal Production System', () => {
         bondLevel: 100,
         trustLevel: 100,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       // Initialize the system
       const entities = world.query().with(ComponentType.Animal).executeEntities();
@@ -486,7 +486,7 @@ describe('Animal Production System', () => {
         bondLevel: 50,
         trustLevel: 60,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       // Initialize the system
       const entities = world.query().with(ComponentType.Animal).executeEntities();

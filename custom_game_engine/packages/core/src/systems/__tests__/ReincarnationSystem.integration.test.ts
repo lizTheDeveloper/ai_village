@@ -51,11 +51,11 @@ describe('ReincarnationSystem Integration', () => {
       const entity = new EntityImpl(entityId, 0);
 
       // Add required components
-      entity.addComponent(createIdentityComponent('Reborn Hero'));
-      entity.addComponent(createPositionComponent(50, 50));
-      entity.addComponent(createRealmLocationComponent('mortal'));
-      entity.addComponent(createAgentComponent('idle', 20, true, 0)); // LLM agent
-      entity.addComponent(new NeedsComponent({
+      (entity as any).addComponent(createIdentityComponent('Reborn Hero'));
+      (entity as any).addComponent(createPositionComponent(50, 50));
+      (entity as any).addComponent(createRealmLocationComponent('mortal'));
+      (entity as any).addComponent(createAgentComponent('idle', 20, true, 0)); // LLM agent
+      (entity as any).addComponent(new NeedsComponent({
         hunger: 0, // Will die from starvation
         energy: 0.5,
         health: 0.1,
@@ -68,10 +68,10 @@ describe('ReincarnationSystem Integration', () => {
         agreeableness: 0.6,
         neuroticism: 0.3,
       });
-      entity.addComponent(personality);
+      (entity as any).addComponent(personality);
 
       const skills = generateRandomStartingSkills(personality);
-      entity.addComponent(skills);
+      (entity as any).addComponent(skills);
 
       // Add memories
       const episodic = new EpisodicMemoryComponent({ maxMemories: 100 });
@@ -82,7 +82,7 @@ describe('ReincarnationSystem Integration', () => {
         emotionalValence: 0.9,
         emotionalIntensity: 1.0,
       });
-      entity.addComponent(episodic);
+      (entity as any).addComponent(episodic);
 
       (world as any)._addEntity(entity);
 
@@ -132,8 +132,8 @@ describe('ReincarnationSystem Integration', () => {
       const entityId = createEntityId();
       const entity = new EntityImpl(entityId, 0);
 
-      entity.addComponent(createIdentityComponent('Memory Keeper'));
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(createIdentityComponent('Memory Keeper'));
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       const personality = new PersonalityComponent({
         openness: 0.7,
@@ -142,10 +142,10 @@ describe('ReincarnationSystem Integration', () => {
         agreeableness: 0.7,
         neuroticism: 0.3,
       });
-      entity.addComponent(personality);
+      (entity as any).addComponent(personality);
 
       const skills = generateRandomStartingSkills(personality);
-      entity.addComponent(skills);
+      (entity as any).addComponent(skills);
 
       // Add multiple memories with varying importance
       const episodic = new EpisodicMemoryComponent({ maxMemories: 100 });
@@ -165,7 +165,7 @@ describe('ReincarnationSystem Integration', () => {
         emotionalIntensity: 0.1,
         importance: 0.1,
       });
-      entity.addComponent(episodic);
+      (entity as any).addComponent(episodic);
 
       (world as any)._addEntity(entity);
 
@@ -202,8 +202,8 @@ describe('ReincarnationSystem Integration', () => {
       const entityId = createEntityId();
       const entity = new EntityImpl(entityId, 0);
 
-      entity.addComponent(createIdentityComponent('Fragment Soul'));
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(createIdentityComponent('Fragment Soul'));
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       const personality = new PersonalityComponent({
         openness: 0.5,
@@ -212,7 +212,7 @@ describe('ReincarnationSystem Integration', () => {
         agreeableness: 0.5,
         neuroticism: 0.5,
       });
-      entity.addComponent(personality);
+      (entity as any).addComponent(personality);
 
       // Add many memories
       const episodic = new EpisodicMemoryComponent({ maxMemories: 100 });
@@ -225,7 +225,7 @@ describe('ReincarnationSystem Integration', () => {
           emotionalIntensity: Math.random(),
         });
       }
-      entity.addComponent(episodic);
+      (entity as any).addComponent(episodic);
 
       (world as any)._addEntity(entity);
 
@@ -262,8 +262,8 @@ describe('ReincarnationSystem Integration', () => {
       const entityId = createEntityId();
       const entity = new EntityImpl(entityId, 0);
 
-      entity.addComponent(createIdentityComponent('Blank Slate'));
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(createIdentityComponent('Blank Slate'));
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       (world as any)._addEntity(entity);
 
@@ -304,8 +304,8 @@ describe('ReincarnationSystem Integration', () => {
 
       const deathX = 100;
       const deathY = 200;
-      entity.addComponent(createIdentityComponent('Local Rebirth'));
-      entity.addComponent(createPositionComponent(deathX, deathY));
+      (entity as any).addComponent(createIdentityComponent('Local Rebirth'));
+      (entity as any).addComponent(createPositionComponent(deathX, deathY));
 
       (world as any)._addEntity(entity);
 
@@ -357,8 +357,8 @@ describe('ReincarnationSystem Integration', () => {
       const entityId = createEntityId();
       const entity = new EntityImpl(entityId, 0);
 
-      entity.addComponent(createIdentityComponent('Faithful Soul'));
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(createIdentityComponent('Faithful Soul'));
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       (world as any)._addEntity(entity);
 
@@ -406,8 +406,8 @@ describe('ReincarnationSystem Integration', () => {
 
       for (const soulId of souls) {
         const entity = new EntityImpl(soulId, 0);
-        entity.addComponent(createIdentityComponent(`Entity ${soulId}`));
-        entity.addComponent(createPositionComponent(Math.random() * 100, Math.random() * 100));
+        (entity as any).addComponent(createIdentityComponent(`Entity ${soulId}`));
+        (entity as any).addComponent(createPositionComponent(Math.random() * 100, Math.random() * 100));
         (world as any)._addEntity(entity);
 
         world.eventBus.emit({
@@ -449,8 +449,8 @@ describe('ReincarnationSystem Integration', () => {
       const entityId = createEntityId();
       const entity = new EntityImpl(entityId, 0);
 
-      entity.addComponent(createIdentityComponent('Original'));
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(createIdentityComponent('Original'));
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       (world as any)._addEntity(entity);
 

@@ -37,7 +37,7 @@ describe('Animal Component and Entity', () => {
       };
 
       const component = new AnimalComponent(animalData);
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
       const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
 
       expect(animal).toBeDefined();
@@ -168,7 +168,7 @@ describe('Animal Component and Entity', () => {
       };
 
       const component = new AnimalComponent(wildAnimalData);
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
       const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
 
       expect(animal.wild).toBe(true);
@@ -202,7 +202,7 @@ describe('Animal Component and Entity', () => {
       };
 
       const component = new AnimalComponent(tamedAnimalData);
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
       const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
 
       expect(animal.wild).toBe(false);
@@ -244,7 +244,7 @@ describe('Animal Component and Entity', () => {
         };
 
         const component = new AnimalComponent(animalData);
-        entity.addComponent(component);
+        (entity as any).addComponent(component);
         const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
         expect(animal.lifeStage).toBe(stage);
       });
@@ -285,7 +285,7 @@ describe('Animal Component and Entity', () => {
         };
 
         const component = new AnimalComponent(animalData);
-        entity.addComponent(component);
+        (entity as any).addComponent(component);
         const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
         expect(animal.state).toBe(state);
       });

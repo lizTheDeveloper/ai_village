@@ -14,9 +14,9 @@ describe('SteeringSystem', () => {
   describe('AC2: Navigation Reaches Targets', () => {
     it('should move agent toward target position (seek behavior)', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 0, y: 0 });
-      entity.addComponent('Velocity', { vx: 0, vy: 0 });
-      entity.addComponent('Steering', {
+      (entity as any).addComponent('Position', { x: 0, y: 0 });
+      (entity as any).addComponent('Velocity', { vx: 0, vy: 0 });
+      (entity as any).addComponent('Steering', {
         behavior: 'seek',
         target: { x: 10, y: 10 },
         maxSpeed: 2.0,
@@ -37,9 +37,9 @@ describe('SteeringSystem', () => {
 
     it('should slow down when approaching target (arrive behavior)', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 8, y: 8 }); // Close to target
-      entity.addComponent('Velocity', { vx: 2, vy: 2 });
-      entity.addComponent('Steering', {
+      (entity as any).addComponent('Position', { x: 8, y: 8 }); // Close to target
+      (entity as any).addComponent('Velocity', { vx: 2, vy: 2 });
+      (entity as any).addComponent('Steering', {
         behavior: 'arrive',
         target: { x: 10, y: 10 },
         maxSpeed: 2.0,
@@ -63,9 +63,9 @@ describe('SteeringSystem', () => {
 
     it('should stop when reaching target within tolerance', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 9.9, y: 9.9 }); // Very close
-      entity.addComponent('Velocity', { vx: 0.5, vy: 0.5 });
-      entity.addComponent('Steering', {
+      (entity as any).addComponent('Position', { x: 9.9, y: 9.9 }); // Very close
+      (entity as any).addComponent('Velocity', { vx: 0.5, vy: 0.5 });
+      (entity as any).addComponent('Steering', {
         behavior: 'arrive',
         target: { x: 10, y: 10 },
         maxSpeed: 2.0,
@@ -86,9 +86,9 @@ describe('SteeringSystem', () => {
 
     it('should avoid obstacles using ray-casting', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 0, y: 0 });
-      entity.addComponent('Velocity', { vx: 2, vy: 0 }); // Moving east
-      entity.addComponent('Steering', {
+      (entity as any).addComponent('Position', { x: 0, y: 0 });
+      (entity as any).addComponent('Velocity', { vx: 2, vy: 0 }); // Moving east
+      (entity as any).addComponent('Steering', {
         behavior: 'obstacle_avoidance',
         maxSpeed: 2.0,
         maxForce: 0.5,
@@ -113,9 +113,9 @@ describe('SteeringSystem', () => {
 
     it('should navigate across chunk boundaries', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 255, y: 255 }); // Edge of chunk
-      entity.addComponent('Velocity', { vx: 2, vy: 2 });
-      entity.addComponent('Steering', {
+      (entity as any).addComponent('Position', { x: 255, y: 255 }); // Edge of chunk
+      (entity as any).addComponent('Velocity', { vx: 2, vy: 2 });
+      (entity as any).addComponent('Steering', {
         behavior: 'seek',
         target: { x: 300, y: 300 }, // Across chunk boundary
         maxSpeed: 2.0,
@@ -138,9 +138,9 @@ describe('SteeringSystem', () => {
   describe('wander behavior', () => {
     it('should produce coherent wandering (not random jitter)', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 0, y: 0 });
-      entity.addComponent('Velocity', { vx: 1, vy: 0 });
-      entity.addComponent('Steering', {
+      (entity as any).addComponent('Position', { x: 0, y: 0 });
+      (entity as any).addComponent('Velocity', { vx: 1, vy: 0 });
+      (entity as any).addComponent('Steering', {
         behavior: 'wander',
         maxSpeed: 2.0,
         maxForce: 0.5,
@@ -170,9 +170,9 @@ describe('SteeringSystem', () => {
   describe('steering force calculation', () => {
     it('should limit steering force to maxForce', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 0, y: 0 });
-      entity.addComponent('Velocity', { vx: 0, vy: 0 });
-      entity.addComponent('Steering', {
+      (entity as any).addComponent('Position', { x: 0, y: 0 });
+      (entity as any).addComponent('Velocity', { vx: 0, vy: 0 });
+      (entity as any).addComponent('Steering', {
         behavior: 'seek',
         target: { x: 100, y: 100 }, // Far target
         maxSpeed: 2.0,
@@ -190,9 +190,9 @@ describe('SteeringSystem', () => {
 
     it('should limit velocity to maxSpeed', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 0, y: 0 });
-      entity.addComponent('Velocity', { vx: 5, vy: 5 }); // Excessive speed
-      entity.addComponent('Steering', {
+      (entity as any).addComponent('Position', { x: 0, y: 0 });
+      (entity as any).addComponent('Velocity', { vx: 5, vy: 5 }); // Excessive speed
+      (entity as any).addComponent('Steering', {
         behavior: 'seek',
         target: { x: 10, y: 10 },
         maxSpeed: 2.0,
@@ -211,9 +211,9 @@ describe('SteeringSystem', () => {
   describe('AC10: No Silent Fallbacks (CLAUDE.md Compliance)', () => {
     it('should throw error for missing target in seek behavior', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 0, y: 0 });
-      entity.addComponent('Velocity', { vx: 0, vy: 0 });
-      entity.addComponent('Steering', {
+      (entity as any).addComponent('Position', { x: 0, y: 0 });
+      (entity as any).addComponent('Velocity', { vx: 0, vy: 0 });
+      (entity as any).addComponent('Steering', {
         behavior: 'seek',
         maxSpeed: 2.0,
         maxForce: 0.5,
@@ -227,9 +227,9 @@ describe('SteeringSystem', () => {
 
     it('should throw error for invalid behavior type', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 0, y: 0 });
-      entity.addComponent('Velocity', { vx: 0, vy: 0 });
-      entity.addComponent('Steering', {
+      (entity as any).addComponent('Position', { x: 0, y: 0 });
+      (entity as any).addComponent('Velocity', { vx: 0, vy: 0 });
+      (entity as any).addComponent('Steering', {
         behavior: 'invalid',
         maxSpeed: 2.0,
         maxForce: 0.5,
@@ -242,8 +242,8 @@ describe('SteeringSystem', () => {
 
     it('should throw error for missing Position component', () => {
       const entity = world.createEntity();
-      entity.addComponent('Velocity', { vx: 0, vy: 0 });
-      entity.addComponent('Steering', {
+      (entity as any).addComponent('Velocity', { vx: 0, vy: 0 });
+      (entity as any).addComponent('Steering', {
         behavior: 'seek',
         target: { x: 10, y: 10 },
         maxSpeed: 2.0,
@@ -257,8 +257,8 @@ describe('SteeringSystem', () => {
 
     it('should throw error for missing Velocity component', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 0, y: 0 });
-      entity.addComponent('Steering', {
+      (entity as any).addComponent('Position', { x: 0, y: 0 });
+      (entity as any).addComponent('Steering', {
         behavior: 'seek',
         target: { x: 10, y: 10 },
         maxSpeed: 2.0,
@@ -274,9 +274,9 @@ describe('SteeringSystem', () => {
   describe('combined behaviors', () => {
     it('should blend seek and obstacle avoidance', () => {
       const entity = world.createEntity();
-      entity.addComponent('Position', { x: 0, y: 0 });
-      entity.addComponent('Velocity', { vx: 2, vy: 0 });
-      entity.addComponent('Steering', {
+      (entity as any).addComponent('Position', { x: 0, y: 0 });
+      (entity as any).addComponent('Velocity', { vx: 2, vy: 0 });
+      (entity as any).addComponent('Steering', {
         behavior: 'combined',
         behaviors: [
           { type: 'seek', target: { x: 10, y: 0 }, weight: 1.0 },

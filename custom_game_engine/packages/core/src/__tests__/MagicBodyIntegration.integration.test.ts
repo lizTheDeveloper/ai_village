@@ -61,7 +61,7 @@ describe('Magic + Body Integration Tests', () => {
   function createTestEntity(bodyPlanId: string): Entity {
     const entity = world.createEntity();
     const body = createBodyComponentFromPlan(bodyPlanId, 'test_species');
-    entity.addComponent(body);
+    (entity as any).addComponent(body);
     return entity;
   }
 

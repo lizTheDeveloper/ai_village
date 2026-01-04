@@ -67,9 +67,9 @@ describe('Phase 4: Deity Emergence Integration', () => {
           answered: false,
         });
 
-        entity.addComponent(agent);
-        entity.addComponent(spiritual);
-        entity.addComponent(new PositionComponent(0, 0));
+        (entity as any).addComponent(agent);
+        (entity as any).addComponent(spiritual);
+        (entity as any).addComponent(new PositionComponent(0, 0));
       }
 
       // Run emergence detection
@@ -105,9 +105,9 @@ describe('Phase 4: Deity Emergence Integration', () => {
           answered: false,
         });
 
-        entity.addComponent(agent);
-        entity.addComponent(spiritual);
-        entity.addComponent(new PositionComponent(0, 0));
+        (entity as any).addComponent(agent);
+        (entity as any).addComponent(spiritual);
+        (entity as any).addComponent(new PositionComponent(0, 0));
       }
 
       world.currentTick = 150;
@@ -138,9 +138,9 @@ describe('Phase 4: Deity Emergence Integration', () => {
           answered: false,
         });
 
-        entity.addComponent(agent);
-        entity.addComponent(spiritual);
-        entity.addComponent(new PositionComponent(0, 0));
+        (entity as any).addComponent(agent);
+        (entity as any).addComponent(spiritual);
+        (entity as any).addComponent(new PositionComponent(0, 0));
       }
 
       world.currentTick = 150;
@@ -309,9 +309,9 @@ describe('Phase 4: Deity Emergence Integration', () => {
           answered: false,
         });
 
-        entity.addComponent(agent);
-        entity.addComponent(spiritual);
-        entity.addComponent(new PositionComponent(0, 0));
+        (entity as any).addComponent(agent);
+        (entity as any).addComponent(spiritual);
+        (entity as any).addComponent(new PositionComponent(0, 0));
       }
 
       // Step 2: Trigger emergence

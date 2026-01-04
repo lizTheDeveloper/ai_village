@@ -21,15 +21,15 @@ describe('IdleBehaviorSystem', () => {
   describe('idle behavior selection', () => {
     it('should select an idle behavior when agent has no tasks', () => {
       const entity = world.createEntity();
-      entity.addComponent(new NeedsComponent());
-      entity.addComponent( new PersonalityComponent({
+      (entity as any).addComponent(new NeedsComponent());
+      (entity as any).addComponent( new PersonalityComponent({
         openness: 0.7,
         conscientiousness: 0.6,
         extraversion: 0.5,
         agreeableness: 0.6,
         neuroticism: 0.3
       }));
-      entity.addComponent( new ActionQueue(entity.id));
+      (entity as any).addComponent( new ActionQueue(entity.id));
 
       system.update(world, 1);
 
@@ -39,8 +39,8 @@ describe('IdleBehaviorSystem', () => {
 
     it('should not select idle behavior if agent has urgent tasks', () => {
       const entity = world.createEntity();
-      entity.addComponent(new NeedsComponent());
-      entity.addComponent( new PersonalityComponent({
+      (entity as any).addComponent(new NeedsComponent());
+      (entity as any).addComponent( new PersonalityComponent({
         openness: 0.7,
         conscientiousness: 0.6,
         extraversion: 0.5,
@@ -53,7 +53,7 @@ describe('IdleBehaviorSystem', () => {
         priority: 0.8,
         resourceId: 'test-resource'
       });
-      entity.addComponent( queue);
+      (entity as any).addComponent( queue);
 
       const initialSize = queue.size();
       system.update(world, 1);
@@ -64,8 +64,8 @@ describe('IdleBehaviorSystem', () => {
 
     it('should skip entities without personality component', () => {
       const entity = world.createEntity();
-      entity.addComponent(new NeedsComponent());
-      entity.addComponent(new ActionQueue(entity.id));
+      (entity as any).addComponent(new NeedsComponent());
+      (entity as any).addComponent(new ActionQueue(entity.id));
 
       const queue = entity.getComponent(ComponentType.ActionQueue) as ActionQueue;
       const initialSize = queue.size();
@@ -83,15 +83,15 @@ describe('IdleBehaviorSystem', () => {
   describe('behavior weighting by personality', () => {
     it('should weight chat higher for extraverted agents', () => {
       const entity = world.createEntity();
-      entity.addComponent(new NeedsComponent());
-      entity.addComponent( new PersonalityComponent({
+      (entity as any).addComponent(new NeedsComponent());
+      (entity as any).addComponent( new PersonalityComponent({
         openness: 0.5,
         conscientiousness: 0.5,
         extraversion: 0.9, // High extraversion
         agreeableness: 0.6,
         neuroticism: 0.3
       }));
-      entity.addComponent( new ActionQueue(entity.id));
+      (entity as any).addComponent( new ActionQueue(entity.id));
 
       // Run multiple times to get statistical distribution
       const behaviors: IdleBehaviorType[] = [];
@@ -112,15 +112,15 @@ describe('IdleBehaviorSystem', () => {
 
     it('should weight reflect higher for conscientious agents', () => {
       const entity = world.createEntity();
-      entity.addComponent(new NeedsComponent());
-      entity.addComponent( new PersonalityComponent({
+      (entity as any).addComponent(new NeedsComponent());
+      (entity as any).addComponent( new PersonalityComponent({
         openness: 0.5,
         conscientiousness: 0.9, // High conscientiousness
         extraversion: 0.3,
         agreeableness: 0.6,
         neuroticism: 0.3
       }));
-      entity.addComponent( new ActionQueue(entity.id));
+      (entity as any).addComponent( new ActionQueue(entity.id));
 
       const behaviors: IdleBehaviorType[] = [];
       for (let i = 0; i < 50; i++) {
@@ -139,15 +139,15 @@ describe('IdleBehaviorSystem', () => {
 
     it('should weight amuse_self higher for open agents', () => {
       const entity = world.createEntity();
-      entity.addComponent(new NeedsComponent());
-      entity.addComponent( new PersonalityComponent({
+      (entity as any).addComponent(new NeedsComponent());
+      (entity as any).addComponent( new PersonalityComponent({
         openness: 0.9, // High openness
         conscientiousness: 0.5,
         extraversion: 0.3,
         agreeableness: 0.6,
         neuroticism: 0.3
       }));
-      entity.addComponent( new ActionQueue(entity.id));
+      (entity as any).addComponent( new ActionQueue(entity.id));
 
       const behaviors: IdleBehaviorType[] = [];
       for (let i = 0; i < 50; i++) {
@@ -170,15 +170,15 @@ describe('IdleBehaviorSystem', () => {
       const entity = world.createEntity();
       const needs = new NeedsComponent();
       needs.social = 0.2; // Low social (lonely)
-      entity.addComponent(needs);
-      entity.addComponent( new PersonalityComponent({
+      (entity as any).addComponent(needs);
+      (entity as any).addComponent( new PersonalityComponent({
         openness: 0.5,
         conscientiousness: 0.5,
         extraversion: 0.5,
         agreeableness: 0.6,
         neuroticism: 0.3
       }));
-      entity.addComponent( new ActionQueue(entity.id));
+      (entity as any).addComponent( new ActionQueue(entity.id));
 
       const behaviors: IdleBehaviorType[] = [];
       for (let i = 0; i < 50; i++) {
@@ -201,15 +201,15 @@ describe('IdleBehaviorSystem', () => {
       needs.energy = 0.8;
       needs.hunger = 0.8;
       needs.social = 0.8;
-      entity.addComponent(needs);
-      entity.addComponent( new PersonalityComponent({
+      (entity as any).addComponent(needs);
+      (entity as any).addComponent( new PersonalityComponent({
         openness: 0.5,
         conscientiousness: 0.5,
         extraversion: 0.5,
         agreeableness: 0.6,
         neuroticism: 0.3
       }));
-      entity.addComponent( new ActionQueue(entity.id));
+      (entity as any).addComponent( new ActionQueue(entity.id));
 
       const behaviors: IdleBehaviorType[] = [];
       for (let i = 0; i < 50; i++) {
@@ -230,15 +230,15 @@ describe('IdleBehaviorSystem', () => {
       const entity = world.createEntity();
       const needs = new NeedsComponent();
       needs.stimulation = 0.3; // Low stimulation (bored)
-      entity.addComponent(needs);
-      entity.addComponent( new PersonalityComponent({
+      (entity as any).addComponent(needs);
+      (entity as any).addComponent( new PersonalityComponent({
         openness: 0.5,
         conscientiousness: 0.5,
         extraversion: 0.5,
         agreeableness: 0.6,
         neuroticism: 0.3
       }));
-      entity.addComponent( new ActionQueue(entity.id));
+      (entity as any).addComponent( new ActionQueue(entity.id));
 
       const behaviors: IdleBehaviorType[] = [];
       for (let i = 0; i < 50; i++) {
@@ -259,15 +259,15 @@ describe('IdleBehaviorSystem', () => {
   describe('behavior priority', () => {
     it('should assign low priority to all idle behaviors', () => {
       const entity = world.createEntity();
-      entity.addComponent(new NeedsComponent());
-      entity.addComponent( new PersonalityComponent({
+      (entity as any).addComponent(new NeedsComponent());
+      (entity as any).addComponent( new PersonalityComponent({
         openness: 0.5,
         conscientiousness: 0.5,
         extraversion: 0.5,
         agreeableness: 0.6,
         neuroticism: 0.3
       }));
-      entity.addComponent( new ActionQueue(entity.id));
+      (entity as any).addComponent( new ActionQueue(entity.id));
 
       system.update(world, 1);
 
@@ -280,15 +280,15 @@ describe('IdleBehaviorSystem', () => {
   describe('behavior variety', () => {
     it('should use multiple different idle behaviors over time', () => {
       const entity = world.createEntity();
-      entity.addComponent(new NeedsComponent());
-      entity.addComponent( new PersonalityComponent({
+      (entity as any).addComponent(new NeedsComponent());
+      (entity as any).addComponent( new PersonalityComponent({
         openness: 0.5,
         conscientiousness: 0.5,
         extraversion: 0.5,
         agreeableness: 0.5,
         neuroticism: 0.5
       }));
-      entity.addComponent( new ActionQueue(entity.id));
+      (entity as any).addComponent( new ActionQueue(entity.id));
 
       const behaviors = new Set<string>();
       for (let i = 0; i < 100; i++) {

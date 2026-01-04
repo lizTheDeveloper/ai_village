@@ -226,8 +226,8 @@ export class FactoryBlueprintGenerator {
     generation: number
   ): Entity {
     const entity = world.createEntity() as EntityImpl;
-    entity.addComponent(createPositionComponent(x, y));
-    entity.addComponent(createPowerProducer(powerType, generation));
+    (entity as any).addComponent(createPositionComponent(x, y));
+    (entity as any).addComponent(createPowerProducer(powerType, generation));
     return entity;
   }
 
@@ -238,7 +238,7 @@ export class FactoryBlueprintGenerator {
     placement: MachinePlacement
   ): Entity {
     const entity = world.createEntity() as EntityImpl;
-    entity.addComponent(createPositionComponent(x, y));
+    (entity as any).addComponent(createPositionComponent(x, y));
 
     // Create assembly machine component
     const assembly = createAssemblyMachineComponent(placement.machineItemId, { speed: 1 });
@@ -246,7 +246,7 @@ export class FactoryBlueprintGenerator {
       assembly.currentRecipe = placement.recipe;
     }
     assembly.speed = this.getMachineSpeed(placement.machineItemId);
-    entity.addComponent(assembly);
+    (entity as any).addComponent(assembly);
 
     // Create machine connections
     const connection = createMachineConnectionComponent();
@@ -256,12 +256,12 @@ export class FactoryBlueprintGenerator {
     if (placement.outputDirection) {
       connection.outputs[0]!.offset = placement.outputDirection;
     }
-    entity.addComponent(connection);
+    (entity as any).addComponent(connection);
 
     // Create power component
     const powerConsumption = this.estimateMachinePower(placement.machineItemId);
     const power = createPowerConsumer('electrical', powerConsumption);
-    entity.addComponent(power);
+    (entity as any).addComponent(power);
 
     return entity;
   }
@@ -273,7 +273,7 @@ export class FactoryBlueprintGenerator {
     placement: BeltPlacement
   ): Entity {
     const entity = world.createEntity() as EntityImpl;
-    entity.addComponent(createPositionComponent(x, y));
+    (entity as any).addComponent(createPositionComponent(x, y));
 
     const belt = createBeltComponent(placement.direction, placement.tier);
 
@@ -282,7 +282,7 @@ export class FactoryBlueprintGenerator {
       addItemsToBelt(belt, placement.preloadItemId, placement.preloadCount);
     }
 
-    entity.addComponent(belt);
+    (entity as any).addComponent(belt);
     return entity;
   }
 

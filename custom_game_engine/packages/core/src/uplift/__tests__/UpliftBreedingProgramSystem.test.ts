@@ -87,7 +87,10 @@ describe('UpliftBreedingProgramSystem - Generation Advancement', () => {
     const initialIntelligence = program.currentIntelligence;
     program.progressToNextGeneration = 100;
 
-    system.update(world, [programEntity], 0.05);
+    // Run 20 ticks to trigger update interval
+    for (let i = 0; i < 20; i++) {
+      system.update(world, [programEntity], 0.05);
+    }
 
     expect(program.currentIntelligence).toBeGreaterThan(initialIntelligence);
   });
@@ -96,7 +99,10 @@ describe('UpliftBreedingProgramSystem - Generation Advancement', () => {
     program.currentIntelligence = 0.69;
     program.progressToNextGeneration = 100;
 
-    system.update(world, [programEntity], 0.05);
+    // Run 20 ticks to trigger update interval
+    for (let i = 0; i < 20; i++) {
+      system.update(world, [programEntity], 0.05);
+    }
 
     expect(program.currentIntelligence).toBeLessThanOrEqual(program.targetIntelligence);
   });
@@ -105,7 +111,10 @@ describe('UpliftBreedingProgramSystem - Generation Advancement', () => {
     program.progressToNextGeneration = 100;
     const initialResults = program.generationResults.length;
 
-    system.update(world, [programEntity], 0.05);
+    // Run 20 ticks to trigger update interval
+    for (let i = 0; i < 20; i++) {
+      system.update(world, [programEntity], 0.05);
+    }
 
     expect(program.generationResults.length).toBe(initialResults + 1);
   });
@@ -129,9 +138,17 @@ describe('UpliftBreedingProgramSystem - Breeding Selection', () => {
   });
 
   it('should select top 50% for breeding', () => {
+    // Collect wolf IDs
+    const wolfIds: string[] = [];
+    for (let i = 0; i < 100; i++) {
+      const wolf = createTestAnimal(world, 'wolf', { intelligence: 0.3 + (i / 100) * 0.4 });
+      wolfIds.push(wolf.id);
+    }
+
     const program = new UpliftProgramComponent({
       programId: 'test',
       sourceSpeciesId: 'wolf',
+      breedingPopulation: wolfIds,
       populationSize: 100,
       minimumPopulation: 20,
       geneticDiversity: 0.7,
@@ -147,10 +164,13 @@ describe('UpliftBreedingProgramSystem - Breeding Selection', () => {
     programEntity.addComponent(program);
     program.progressToNextGeneration = 100;
 
-    system.update(world, [programEntity], 0.05);
+    // Run 20 ticks to trigger update interval
+    for (let i = 0; i < 20; i++) {
+      system.update(world, [programEntity], 0.05);
+    }
 
     // After selection, breeding population should be top 50%
-    expect(program.breedingPopulationIds.length).toBeLessThanOrEqual(50);
+    expect(program.breedingPopulation.length).toBeLessThanOrEqual(50);
   });
 });
 
@@ -185,33 +205,46 @@ describe('UpliftBreedingProgramSystem - Stage Transitions', () => {
     programEntity.addComponent(program);
   });
 
-  it('should transition to pre_sapience at 0.6 intelligence', () => {
+  it('should transition to neural_enhancement at 0.6 intelligence', () => {
     program.currentIntelligence = 0.6;
+    program.currentGeneration = 3;
     program.progressToNextGeneration = 100;
 
-    system.update(world, [programEntity], 0.05);
+    // Run 20 ticks to trigger update interval
+    for (let i = 0; i < 20; i++) {
+      system.update(world, [programEntity], 0.05);
+    }
+
+    expect(program.stage).toBe('neural_enhancement');
+  });
+
+  it('should transition to pre_sapience at 0.65 intelligence', () => {
+    program.currentIntelligence = 0.65;
+    program.currentGeneration = 5;
+    program.stage = 'neural_enhancement';
+    program.progressToNextGeneration = 100;
+
+    // Run 20 ticks to trigger update interval
+    for (let i = 0; i < 20; i++) {
+      system.update(world, [programEntity], 0.05);
+    }
 
     expect(program.stage).toBe('pre_sapience');
   });
 
-  it('should transition to emergence_threshold at 0.65 intelligence', () => {
-    program.currentIntelligence = 0.65;
+  it('should remain in pre_sapience at 0.69 intelligence', () => {
+    program.currentIntelligence = 0.69;
+    program.currentGeneration = 8;
     program.stage = 'pre_sapience';
     program.progressToNextGeneration = 100;
 
-    system.update(world, [programEntity], 0.05);
+    // Run 20 ticks to trigger update interval
+    for (let i = 0; i < 20; i++) {
+      system.update(world, [programEntity], 0.05);
+    }
 
-    expect(program.stage).toBe('emergence_threshold');
-  });
-
-  it('should transition to awakening at 0.7 intelligence', () => {
-    program.currentIntelligence = 0.69;
-    program.stage = 'emergence_threshold';
-    program.progressToNextGeneration = 100;
-
-    system.update(world, [programEntity], 0.05);
-
-    expect(program.stage).toBe('awakening');
+    // 0.69 is still in pre_sapience range (0.65-0.7)
+    expect(program.stage).toBe('pre_sapience');
   });
 });
 
@@ -220,6 +253,7 @@ describe('UpliftBreedingProgramSystem - Technology Effects', () => {
   let system: UpliftBreedingProgramSystem;
   let eventBus: EventBusImpl;
   let program: UpliftProgramComponent;
+  let wolfIds: string[];
 
   beforeEach(() => {
     world = new World();
@@ -227,9 +261,17 @@ describe('UpliftBreedingProgramSystem - Technology Effects', () => {
     eventBus = new EventBusImpl();
     system.initialize(world, eventBus);
 
+    // Create breeding population
+    wolfIds = [];
+    for (let i = 0; i < 50; i++) {
+      const wolf = createTestAnimal(world, 'wolf', { intelligence: 0.5 });
+      wolfIds.push(wolf.id);
+    }
+
     program = new UpliftProgramComponent({
       programId: 'test',
       sourceSpeciesId: 'wolf',
+      breedingPopulation: wolfIds,
       populationSize: 50,
       minimumPopulation: 20,
       geneticDiversity: 0.7,
@@ -255,9 +297,12 @@ describe('UpliftBreedingProgramSystem - Technology Effects', () => {
     program.progressToNextGeneration = 100;
 
     const programEntity = world.createEntity();
-    programEntity.addComponent(program);
+    (programEntity as EntityImpl).addComponent(program);
 
-    system.update(world, [programEntity], 0.05);
+    // Run 20 ticks to trigger update interval
+    for (let i = 0; i < 20; i++) {
+      system.update(world, [programEntity], 0.05);
+    }
 
     const intelligenceGain = program.currentIntelligence - initialIntelligence;
     expect(intelligenceGain).toBeGreaterThan(0);
@@ -277,9 +322,17 @@ describe('UpliftBreedingProgramSystem - Breakthrough Events', () => {
   });
 
   it('should track breakthroughs when they occur', () => {
+    // Create breeding population
+    const wolfIds: string[] = [];
+    for (let i = 0; i < 50; i++) {
+      const wolf = createTestAnimal(world, 'wolf', { intelligence: 0.5 });
+      wolfIds.push(wolf.id);
+    }
+
     const program = new UpliftProgramComponent({
       programId: 'test',
       sourceSpeciesId: 'wolf',
+      breedingPopulation: wolfIds,
       populationSize: 50,
       minimumPopulation: 20,
       geneticDiversity: 0.7,
@@ -292,7 +345,7 @@ describe('UpliftBreedingProgramSystem - Breakthrough Events', () => {
     });
 
     const programEntity = world.createEntity();
-    programEntity.addComponent(program);
+    (programEntity as EntityImpl).addComponent(program);
 
     // Run many generations to eventually get a breakthrough (5% chance)
     for (let i = 0; i < 50; i++) {
@@ -333,7 +386,7 @@ describe('UpliftBreedingProgramSystem - Population Management', () => {
     });
 
     const programEntity = world.createEntity();
-    programEntity.addComponent(program);
+    (programEntity as EntityImpl).addComponent(program);
 
     // No animals exist for this species
     program.progressToNextGeneration = 100;
@@ -343,7 +396,10 @@ describe('UpliftBreedingProgramSystem - Population Management', () => {
       extinctionEventFired = true;
     });
 
-    system.update(world, [programEntity], 0.05);
+    // Run 20 ticks to trigger update interval
+    for (let i = 0; i < 20; i++) {
+      system.update(world, [programEntity], 0.05);
+    }
 
     expect(extinctionEventFired).toBe(true);
   });

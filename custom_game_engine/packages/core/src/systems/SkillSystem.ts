@@ -369,7 +369,7 @@ export class SkillSystem implements System {
       } else {
         skills = createSkillsComponent();
       }
-      entity.addComponent(skills);
+      (entity as any).addComponent(skills);
     }
     return skills;
   }

@@ -251,7 +251,7 @@ export class MeditateBehavior extends BaseBehavior {
       // Generate and deliver vision
       const vision = this.generateVision(entity, spiritual, position, world, currentTick);
       const updatedSpiritual = receiveVision(spiritual, vision, 10);
-      entity.addComponent(updatedSpiritual);
+      (entity as any).addComponent(updatedSpiritual);
 
       // Thought about receiving vision
       const thought = VISION_RECEIVED_THOUGHTS[Math.floor(Math.random() * VISION_RECEIVED_THOUGHTS.length)]!;

@@ -303,28 +303,28 @@ export class BuildingSystem implements System {
   private addGovernanceComponent(entity: EntityImpl, buildingType: string, world: World): void {
     switch (buildingType) {
       case BT.TownHall:
-        entity.addComponent(createTownHallComponent());
+        (entity as any).addComponent(createTownHallComponent());
         break;
 
       case BT.CensusBureau:
-        entity.addComponent(createCensusBureauComponent());
+        (entity as any).addComponent(createCensusBureauComponent());
         break;
 
       case BT.Granary:
         // Granary uses warehouse component with resource tracking
-        entity.addComponent(createWarehouseComponent('food'));
+        (entity as any).addComponent(createWarehouseComponent('food'));
         break;
 
       case BT.WeatherStation:
-        entity.addComponent(createWeatherStationComponent());
+        (entity as any).addComponent(createWeatherStationComponent());
         break;
 
       case BT.HealthClinic:
-        entity.addComponent(createHealthClinicComponent());
+        (entity as any).addComponent(createHealthClinicComponent());
         break;
 
       case BT.University:
-        entity.addComponent(createUniversityComponent(
+        (entity as any).addComponent(createUniversityComponent(
           `University of ${entity.id.slice(0, 8)}`,
           entity.id,
           world.tick,

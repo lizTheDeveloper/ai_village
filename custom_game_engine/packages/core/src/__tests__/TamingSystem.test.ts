@@ -41,7 +41,7 @@ describe('Taming System', () => {
         bondLevel: 0,
         trustLevel: 20,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const tameChance = tamingSystem.calculateTameChance(
         entity.id,
@@ -75,7 +75,7 @@ describe('Taming System', () => {
         bondLevel: 0,
         trustLevel: 10,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const preferredChance = tamingSystem.calculateTameChance(
         entity.id,
@@ -178,7 +178,7 @@ describe('Taming System', () => {
         bondLevel: 0,
         trustLevel: 40,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       // Force taming success by mocking random
       vi.spyOn(Math, 'random').mockReturnValue(0.01); // Very low random = success
@@ -233,7 +233,7 @@ describe('Taming System', () => {
         bondLevel: 0,
         trustLevel: 5,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const initialAnimal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialTrust = initialAnimal.trustLevel;
@@ -279,7 +279,7 @@ describe('Taming System', () => {
         bondLevel: 40,
         trustLevel: 50,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const initialAnimal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialBond = initialAnimal.bondLevel;
@@ -312,7 +312,7 @@ describe('Taming System', () => {
         bondLevel: 50,
         trustLevel: 60,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const initialAnimal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialBond = initialAnimal.bondLevel;
@@ -345,7 +345,7 @@ describe('Taming System', () => {
         bondLevel: 60,
         trustLevel: 70,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const initialAnimal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialBond = initialAnimal.bondLevel;
@@ -378,7 +378,7 @@ describe('Taming System', () => {
         bondLevel: 30,
         trustLevel: 40,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const initialAnimal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialBond = initialAnimal.bondLevel;
@@ -411,7 +411,7 @@ describe('Taming System', () => {
         bondLevel: 98, // Close to max
         trustLevel: 100,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       tamingSystem.performInteraction(entity.id, 'agent-1', 'playing'); // +4
 
@@ -444,7 +444,7 @@ describe('Taming System', () => {
         bondLevel: 39, // Just below threshold (21-40 is 'accepting')
         trustLevel: 55,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       tamingSystem.performInteraction(entity.id, 'agent-1', 'feeding'); // +2 brings to 41 ('friendly')
 
@@ -490,7 +490,7 @@ describe('Taming System', () => {
         bondLevel: 15,
         trustLevel: 20,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const bondCategory = tamingSystem.getBondCategory(entity.id);
       expect(bondCategory).toBe('wary');
@@ -518,7 +518,7 @@ describe('Taming System', () => {
         bondLevel: 30,
         trustLevel: 35,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const bondCategory = tamingSystem.getBondCategory(entity.id);
       expect(bondCategory).toBe('accepting');
@@ -546,7 +546,7 @@ describe('Taming System', () => {
         bondLevel: 50,
         trustLevel: 55,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const bondCategory = tamingSystem.getBondCategory(entity.id);
       expect(bondCategory).toBe('friendly');
@@ -574,7 +574,7 @@ describe('Taming System', () => {
         bondLevel: 70,
         trustLevel: 75,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const bondCategory = tamingSystem.getBondCategory(entity.id);
       expect(bondCategory).toBe('loyal');
@@ -602,7 +602,7 @@ describe('Taming System', () => {
         bondLevel: 90,
         trustLevel: 95,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const bondCategory = tamingSystem.getBondCategory(entity.id);
       expect(bondCategory).toBe('bonded');

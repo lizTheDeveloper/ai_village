@@ -93,8 +93,8 @@ describe('BuildingSystem', () => {
     it('should advance construction progress over time', () => {
       const entity = world.createEntity();
       const building = createBuildingComponent(BuildingType.Workbench, 1, 0);
-      entity.addComponent(building);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(building);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       const entities = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
       system.update(world, entities, 1.0); // 1 second
@@ -106,8 +106,8 @@ describe('BuildingSystem', () => {
     it('should mark building as complete when progress reaches 100', () => {
       const entity = world.createEntity();
       const building = createBuildingComponent(BuildingType.Workbench, 1, 99.5); // Almost done
-      entity.addComponent(building);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(building);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       const entities = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
       system.update(world, entities, 5.0); // Enough time to finish
@@ -123,8 +123,8 @@ describe('BuildingSystem', () => {
 
       const entity = world.createEntity();
       const building = createBuildingComponent(BuildingType.Workbench, 1, 99.5);
-      entity.addComponent(building);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(building);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       const entities = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
       system.update(world, entities, 5.0);
@@ -137,8 +137,8 @@ describe('BuildingSystem', () => {
     it('should not advance progress for completed buildings', () => {
       const entity = world.createEntity();
       const building = createBuildingComponent(BuildingType.Workbench, 1, 100);
-      entity.addComponent(building);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(building);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       const entities = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
       system.update(world, entities, 10.0);
@@ -150,8 +150,8 @@ describe('BuildingSystem', () => {
     it('should not exceed 100% progress', () => {
       const entity = world.createEntity();
       const building = createBuildingComponent(BuildingType.Workbench, 1, 95);
-      entity.addComponent(building);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(building);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       const entities = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
       system.update(world, entities, 100.0); // Very long time
@@ -164,7 +164,7 @@ describe('BuildingSystem', () => {
   describe('error handling - validation', () => {
     it('should throw when entity missing BuildingComponent', () => {
       const entity = world.createEntity();
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       // Force add to query results without building component
       const entities = [entity];
@@ -174,7 +174,7 @@ describe('BuildingSystem', () => {
 
     it('should throw when entity missing PositionComponent', () => {
       const entity = world.createEntity();
-      entity.addComponent(createBuildingComponent(BuildingType.Workbench, 1, 0));
+      (entity as any).addComponent(createBuildingComponent(BuildingType.Workbench, 1, 0));
 
       // Force add to query results without position component
       const entities = [entity];
@@ -349,8 +349,8 @@ describe('BuildingSystem', () => {
     it('should initialize forge with fuel on completion', () => {
       const entity = world.createEntity();
       const building = createBuildingComponent(BuildingType.Forge, 1, 100);
-      entity.addComponent(building);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(building);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       // Trigger completion
       world.eventBus.emit({
@@ -378,8 +378,8 @@ describe('BuildingSystem', () => {
       building.maxFuel = 100;
       building.fuelConsumptionRate = 1.0;
       building.activeRecipe = 'iron_sword';
-      entity.addComponent(building);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(building);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       const initialFuel = building.currentFuel;
 
@@ -398,8 +398,8 @@ describe('BuildingSystem', () => {
       building.maxFuel = 100;
       building.fuelConsumptionRate = 1.0;
       building.activeRecipe = 'iron_sword';
-      entity.addComponent(building);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(building);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       const entities = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
       system.update(world, entities, 5.0); // Consume all fuel
@@ -420,8 +420,8 @@ describe('BuildingSystem', () => {
       building.maxFuel = 100;
       building.fuelConsumptionRate = 1.0;
       building.activeRecipe = 'iron_sword';
-      entity.addComponent(building);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(building);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       const entities = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
       system.update(world, entities, 10.0); // Drop below 20%
@@ -441,8 +441,8 @@ describe('BuildingSystem', () => {
       building.maxFuel = 100;
       building.fuelConsumptionRate = 1.0;
       building.activeRecipe = 'iron_sword';
-      entity.addComponent(building);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(building);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       const entities = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
       system.update(world, entities, 5.0);
@@ -457,8 +457,8 @@ describe('BuildingSystem', () => {
       building.fuelRequired = false;
       building.currentFuel = 0;
       building.activeRecipe = 'wooden_sword';
-      entity.addComponent(building);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(building);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       const entities = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
       system.update(world, entities, 10.0);
@@ -473,8 +473,8 @@ describe('BuildingSystem', () => {
     it('should add inventory component to storage building on completion', () => {
       const entity = world.createEntity();
       const building = createBuildingComponent(BuildingType.StorageChest, 1, 100);
-      entity.addComponent(building);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(building);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       // Trigger completion
       world.eventBus.emit({
@@ -495,8 +495,8 @@ describe('BuildingSystem', () => {
     it('should set correct capacity for storage-chest', () => {
       const entity = world.createEntity();
       const building = createBuildingComponent(BuildingType.StorageChest, 1, 100);
-      entity.addComponent(building);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(building);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       world.eventBus.emit({
         type: 'building:complete',
@@ -516,8 +516,8 @@ describe('BuildingSystem', () => {
     it('should not add inventory to non-storage buildings', () => {
       const entity = world.createEntity();
       const building = createBuildingComponent(BuildingType.Workbench, 1, 100);
-      entity.addComponent(building);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(building);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       world.eventBus.emit({
         type: 'building:complete',
@@ -539,8 +539,8 @@ describe('BuildingSystem', () => {
     it('should add town hall component on completion', () => {
       const entity = world.createEntity();
       const building = createBuildingComponent(BuildingType.TownHall, 1, 100);
-      entity.addComponent(building);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(building);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       world.eventBus.emit({
         type: 'building:complete',
@@ -560,8 +560,8 @@ describe('BuildingSystem', () => {
     it('should add census bureau component on completion', () => {
       const entity = world.createEntity();
       const building = createBuildingComponent(BuildingType.CensusBureau, 1, 100);
-      entity.addComponent(building);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(building);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       world.eventBus.emit({
         type: 'building:complete',
@@ -581,8 +581,8 @@ describe('BuildingSystem', () => {
     it('should add weather station component on completion', () => {
       const entity = world.createEntity();
       const building = createBuildingComponent(BuildingType.WeatherStation, 1, 100);
-      entity.addComponent(building);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(building);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       world.eventBus.emit({
         type: 'building:complete',
@@ -602,8 +602,8 @@ describe('BuildingSystem', () => {
     it('should add health clinic component on completion', () => {
       const entity = world.createEntity();
       const building = createBuildingComponent(BuildingType.HealthClinic, 1, 100);
-      entity.addComponent(building);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(building);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       world.eventBus.emit({
         type: 'building:complete',
@@ -628,8 +628,8 @@ describe('BuildingSystem', () => {
 
     it('should handle very small deltaTime', () => {
       const entity = world.createEntity();
-      entity.addComponent(createBuildingComponent(BuildingType.Workbench, 1, 0));
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(createBuildingComponent(BuildingType.Workbench, 1, 0));
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       const entities = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
 
@@ -638,8 +638,8 @@ describe('BuildingSystem', () => {
 
     it('should handle very large deltaTime', () => {
       const entity = world.createEntity();
-      entity.addComponent(createBuildingComponent(BuildingType.Workbench, 1, 0));
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(createBuildingComponent(BuildingType.Workbench, 1, 0));
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       const entities = world.query().with(ComponentType.Building).with(ComponentType.Position).executeEntities();
 

@@ -183,7 +183,7 @@ export class CookingSystem implements System {
     let skills = entity.getComponent<SkillsComponent>(CT.Skills);
     if (!skills) {
       skills = createSkillsComponent();
-      entity.addComponent(skills);
+      (entity as any).addComponent(skills);
     }
     return skills;
   }

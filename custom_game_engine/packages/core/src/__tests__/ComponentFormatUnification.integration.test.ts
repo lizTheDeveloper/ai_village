@@ -39,7 +39,7 @@ describe('Component Format Unification - Integration Tests', () => {
   describe('NeedsComponent in Systems', () => {
     it('should create entity with NeedsComponent using constructor', () => {
       const needs = new NeedsComponent();
-      entity.addComponent(needs);
+      (entity as any).addComponent(needs);
 
       const retrieved = entity.getComponent(ComponentType.Needs) as NeedsComponent;
 
@@ -51,7 +51,7 @@ describe('Component Format Unification - Integration Tests', () => {
     it('should not use createNeedsComponent factory in system code', () => {
       // Systems should use `new NeedsComponent()`, not factory
       const needs = new NeedsComponent();
-      entity.addComponent(needs);
+      (entity as any).addComponent(needs);
 
       const retrieved = entity.getComponent(ComponentType.Needs) as NeedsComponent;
 
@@ -62,7 +62,7 @@ describe('Component Format Unification - Integration Tests', () => {
 
     it('should modify NeedsComponent values in 0-1 scale', () => {
       const needs = new NeedsComponent();
-      entity.addComponent(needs);
+      (entity as any).addComponent(needs);
 
       // Simulate system modifying hunger
       needs.hunger = 0.3; // 30%
@@ -76,7 +76,7 @@ describe('Component Format Unification - Integration Tests', () => {
       const needs = new NeedsComponent();
       needs.hunger = 0.35; // 35% - hungry
       needs.energy = 0.25; // 25% - tired
-      entity.addComponent(needs);
+      (entity as any).addComponent(needs);
 
       const retrieved = entity.getComponent(ComponentType.Needs) as NeedsComponent;
 
@@ -87,7 +87,7 @@ describe('Component Format Unification - Integration Tests', () => {
     it('should not mix legacy 0-100 and new 0-1 scales', () => {
       const needs = new NeedsComponent();
       needs.hunger = 0.5; // 50% in 0-1 scale
-      entity.addComponent(needs);
+      (entity as any).addComponent(needs);
 
       // Helper should treat this as 50% (0.5), NOT as starving (0.5 < 10)
       expect(isHungry(needs)).toBe(false); // 50% is not hungry
@@ -103,7 +103,7 @@ describe('Component Format Unification - Integration Tests', () => {
         agreeableness: 0.8,
         neuroticism: 0.3,
       });
-      entity.addComponent(personality);
+      (entity as any).addComponent(personality);
 
       const retrieved = entity.getComponent(ComponentType.Personality) as PersonalityComponent;
 
@@ -120,7 +120,7 @@ describe('Component Format Unification - Integration Tests', () => {
         agreeableness: 0.5,
         neuroticism: 0.5,
       });
-      entity.addComponent(personality);
+      (entity as any).addComponent(personality);
 
       const retrieved = entity.getComponent(ComponentType.Personality) as PersonalityComponent;
 
@@ -161,8 +161,8 @@ describe('Component Format Unification - Integration Tests', () => {
         neuroticism: 0.3,
       });
 
-      entity.addComponent(needs);
-      entity.addComponent(personality);
+      (entity as any).addComponent(needs);
+      (entity as any).addComponent(personality);
 
       const retrievedNeeds = entity.getComponent(ComponentType.Needs) as NeedsComponent;
       const retrievedPersonality = entity.getComponent(ComponentType.Personality) as PersonalityComponent;
@@ -184,8 +184,8 @@ describe('Component Format Unification - Integration Tests', () => {
         neuroticism: 0.4,
       });
 
-      entity.addComponent(needs);
-      entity.addComponent(personality);
+      (entity as any).addComponent(needs);
+      (entity as any).addComponent(personality);
 
       // All values should be 0-1 scale
       expect(needs.hunger).toBeGreaterThanOrEqual(0);
@@ -199,7 +199,7 @@ describe('Component Format Unification - Integration Tests', () => {
     it('NeedsSystem should use helper functions without type guards', () => {
       const needs = new NeedsComponent();
       needs.hunger = 0.35; // Hungry
-      entity.addComponent(needs);
+      (entity as any).addComponent(needs);
 
       // Helper should work directly without checking for legacy format
       const hungry = isHungry(needs);
@@ -212,7 +212,7 @@ describe('Component Format Unification - Integration Tests', () => {
       const needs = new NeedsComponent();
       needs.energy = 0.25; // Tired
       needs.hunger = 0.35; // Hungry
-      entity.addComponent(needs);
+      (entity as any).addComponent(needs);
 
       // Simulate behavior system checking needs
       const shouldSeekFood = isHungry(needs);
@@ -350,7 +350,7 @@ describe('Component Format Unification - Integration Tests', () => {
   describe('Type System Integration', () => {
     it('should enforce NeedsComponent type at compile time', () => {
       const needs = new NeedsComponent();
-      entity.addComponent(needs);
+      (entity as any).addComponent(needs);
 
       // TypeScript should enforce correct type
       const retrieved = entity.getComponent(ComponentType.Needs);

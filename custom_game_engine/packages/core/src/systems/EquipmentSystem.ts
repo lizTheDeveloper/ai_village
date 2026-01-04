@@ -19,6 +19,7 @@ import type { BodyComponent, SizeCategory } from '../components/BodyComponent.js
 import { calculateTotalWeight, getTotalDefense, getDamageResistance, getMovementPenalty, getAllEquippedItems } from '../components/EquipmentComponent.js';
 import { itemRegistry } from '../items/index.js';
 import type { StatBonusTrait } from '../items/traits/StatBonusTrait.js';
+import { itemInstanceRegistry } from '../items/ItemInstanceRegistry.js';
 
 export class EquipmentSystem implements System {
   public readonly id: SystemId = 'equipment';
@@ -230,15 +231,42 @@ export class EquipmentSystem implements System {
 
   /**
    * Remove broken equipment (durability <= 0).
-   * TODO: Implement when ItemInstance registry is available.
-   * Durability is tracked on ItemInstance.condition, not on ItemDefinition traits.
+   * Durability is tracked on ItemInstance.condition.
    */
-  private removeBrokenEquipment(_equipment: EquipmentComponent): void {
-    // TODO: Need ItemInstance registry to check instance.condition
-    // Currently EquipmentSlot only stores itemId, not instanceId
-    // Once we have instance tracking, check:
-    //   - Get ItemInstance by slot.instanceId
-    //   - Check instance.condition <= 0
-    //   - Remove equipment if broken
+  private removeBrokenEquipment(equipment: EquipmentComponent): void {
+    // Check body part equipment
+    for (const [partId, slot] of Object.entries(equipment.equipped)) {
+      if (!slot) continue;
+
+      // If slot has instanceId, check condition via registry
+      if (slot.instanceId) {
+        if (!itemInstanceRegistry.has(slot.instanceId)) {
+          // Instance doesn't exist - remove equipment
+          delete equipment.equipped[partId];
+          continue;
+        }
+
+        const instance = itemInstanceRegistry.get(slot.instanceId);
+        if (instance.condition <= 0) {
+          // Item is broken - remove from slot
+          delete equipment.equipped[partId];
+        }
+      }
+    }
+
+    // Check weapon slots
+    if (equipment.weapons.mainHand?.instanceId) {
+      const instanceId = equipment.weapons.mainHand.instanceId;
+      if (!itemInstanceRegistry.has(instanceId) || itemInstanceRegistry.get(instanceId).condition <= 0) {
+        equipment.weapons.mainHand = undefined;
+      }
+    }
+
+    if (equipment.weapons.offHand?.instanceId) {
+      const instanceId = equipment.weapons.offHand.instanceId;
+      if (!itemInstanceRegistry.has(instanceId) || itemInstanceRegistry.get(instanceId).condition <= 0) {
+        equipment.weapons.offHand = undefined;
+      }
+    }
   }
 }

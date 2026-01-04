@@ -178,7 +178,7 @@ export class PrayBehavior extends BaseBehavior {
 
     // Record prayer in spiritual component
     const updatedSpiritual = recordPrayer(spiritual, prayer, 20);
-    entity.addComponent(updatedSpiritual);
+    (entity as any).addComponent(updatedSpiritual);
 
     this.updateState(entity, {
       prayerStarted: currentTick,

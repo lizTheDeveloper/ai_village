@@ -26,7 +26,7 @@ describe('Entity', () => {
 
   it('should add component and increment version', () => {
     const component: Component = { type: 'test', version: 1 };
-    entity.addComponent(component);
+    (entity as any).addComponent(component);
 
     expect(entity.components.size).toBe(1);
     expect(entity.components.get('test')).toBe(component);
@@ -35,7 +35,7 @@ describe('Entity', () => {
 
   it('should update component and increment version', () => {
     const component: Component = { type: 'test', version: 1 };
-    entity.addComponent(component);
+    (entity as any).addComponent(component);
 
     const initialVersion = entity.version;
     entity.updateComponent('test', () => ({ type: 'test', version: 2 }));
@@ -46,7 +46,7 @@ describe('Entity', () => {
 
   it('should remove component and increment version', () => {
     const component: Component = { type: 'test', version: 1 };
-    entity.addComponent(component);
+    (entity as any).addComponent(component);
 
     const initialVersion = entity.version;
     entity.removeComponent('test');
@@ -71,14 +71,14 @@ describe('Entity', () => {
     expect(entity.hasComponent('test')).toBe(false);
 
     const component: Component = { type: 'test', version: 1 };
-    entity.addComponent(component);
+    (entity as any).addComponent(component);
 
     expect(entity.hasComponent('test')).toBe(true);
   });
 
   it('should get component', () => {
     const component: Component = { type: 'test', version: 1 };
-    entity.addComponent(component);
+    (entity as any).addComponent(component);
 
     expect(entity.getComponent('test')).toBe(component);
     expect(entity.getComponent('nonexistent')).toBeUndefined();

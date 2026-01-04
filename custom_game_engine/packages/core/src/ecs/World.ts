@@ -20,6 +20,7 @@ import { PlacementValidator } from '../buildings/PlacementValidator.js';
 import { resetUsedNames } from '../components/IdentityComponent.js';
 import type { TerrainType, BiomeType } from '../types/TerrainTypes.js';
 import { SimulationScheduler } from './SimulationScheduler.js';
+import type { ChunkManager } from '@ai-village/world';
 
 // Re-export for backwards compatibility
 export type { TerrainType, BiomeType };
@@ -262,7 +263,7 @@ export class WorldImpl implements WorldMutator {
   private _features: Map<string, boolean> = new Map();
   private _featuresCache: FeatureFlags | null = null;
   private _eventBus: EventBus;
-  private _chunkManager?: IChunkManager;
+  private _chunkManager?: ChunkManager;
   private _terrainGenerator?: ITerrainGenerator;
   private buildingRegistry?: BuildingBlueprintRegistry;
   private _craftingSystem?: import('../crafting/CraftingSystem.js').CraftingSystem;
@@ -275,7 +276,7 @@ export class WorldImpl implements WorldMutator {
   // Spatial indices (will be populated as needed)
   private chunkIndex = new Map<string, Set<EntityId>>();
 
-  constructor(eventBus: EventBus, chunkManager?: IChunkManager, systemRegistry?: import('./SystemRegistry.js').ISystemRegistry) {
+  constructor(eventBus: EventBus, chunkManager?: ChunkManager, systemRegistry?: import('./SystemRegistry.js').ISystemRegistry) {
     this._eventBus = eventBus;
     this._chunkManager = chunkManager;
     this._systemRegistry = systemRegistry;
@@ -591,8 +592,17 @@ export class WorldImpl implements WorldMutator {
    * Set ChunkManager for tile access.
    * Called by game initialization after ChunkManager is created.
    */
-  setChunkManager(chunkManager: IChunkManager): void {
+  setChunkManager(chunkManager: ChunkManager): void {
     this._chunkManager = chunkManager;
+  }
+
+  /**
+   * Get ChunkManager for serialization/terrain access.
+   * Returns the ChunkManager if set, otherwise undefined.
+   * Used by WorldSerializer to serialize terrain data.
+   */
+  getChunkManager(): ChunkManager | undefined {
+    return this._chunkManager;
   }
 
   /**

@@ -14,11 +14,12 @@ import { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { ProtoSapienceComponent } from '../components/ProtoSapienceComponent.js';
 import type { UpliftProgramComponent } from '../components/UpliftProgramComponent.js';
-import type { UpliftedTraitComponent, AwakeningMoment, UpliftAttitude } from '../components/UpliftedTraitComponent.js';
+import type { AwakeningMoment, UpliftAttitude } from '../components/UpliftedTraitComponent.js';
+import { UpliftedTraitComponent } from '../components/UpliftedTraitComponent.js';
 import type { AnimalComponent } from '../components/AnimalComponent.js';
 import type { SpeciesComponent } from '../components/SpeciesComponent.js';
-import { AgentComponent } from '../components/AgentComponent.js';
-import { IdentityComponent } from '../components/IdentityComponent.js';
+import { createAgentComponent } from '../components/AgentComponent.js';
+import { createIdentityComponent } from '../components/IdentityComponent.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 import { SemanticMemoryComponent } from '../components/SemanticMemoryComponent.js';
 import { BeliefComponent } from '../components/BeliefComponent.js';
@@ -60,11 +61,11 @@ export class ConsciousnessEmergenceSystem implements System {
   /**
    * Trigger sapience awakening
    */
-  private async triggerAwakening(
+  private triggerAwakening(
     world: World,
     entity: Entity,
     proto: ProtoSapienceComponent
-  ): Promise<void> {
+  ): void {
     const animal = entity.getComponent(CT.Animal) as AnimalComponent;
     const species = entity.getComponent(CT.Species) as SpeciesComponent;
 
@@ -80,7 +81,7 @@ export class ConsciousnessEmergenceSystem implements System {
     const awakening = this.generateAwakeningMoment(world, entity, animal, proto, program);
 
     // Create UpliftedTraitComponent
-    const upliftedTrait = new (await import('../components/UpliftedTraitComponent.js')).UpliftedTraitComponent({
+    const upliftedTrait = new UpliftedTraitComponent({
       programId: program.programId,
       sourceSpeciesId: program.sourceSpeciesId,
       upliftedSpeciesId: program.targetSpeciesId,
@@ -98,7 +99,7 @@ export class ConsciousnessEmergenceSystem implements System {
       leadScientistId: program.leadScientistId,
     });
 
-    entity.addComponent(upliftedTrait);
+    (entity as any).addComponent(upliftedTrait);
 
     // Transform Animal → Agent
     this.transformToAgent(world, entity, awakening, upliftedTrait);
@@ -280,59 +281,49 @@ export class ConsciousnessEmergenceSystem implements System {
     upliftedTrait: UpliftedTraitComponent
   ): void {
     // Add AgentComponent
-    const agent = new AgentComponent({
-      name: upliftedTrait.getDisplayName(),
-      age: 0, // Sapient age starts at 0
-      state: 'idle',
-    });
-    entity.addComponent(agent);
+    const agent = createAgentComponent();
+    (entity as any).addComponent(agent);
 
     // Add IdentityComponent
-    const identity = new IdentityComponent({
-      name: upliftedTrait.getDisplayName(),
-      age: 0,
-      gender: Math.random() < 0.5 ? 'male' : 'female',
-    });
-    entity.addComponent(identity);
+    const identity = createIdentityComponent(upliftedTrait.getDisplayName());
+    (entity as any).addComponent(identity);
 
     // Add EpisodicMemoryComponent with awakening as first memory
     const episodic = new EpisodicMemoryComponent();
-    episodic.addMemory({
-      id: `awakening_${entity.id}`,
-      type: 'awakening',
+    episodic.formMemory({
+      eventType: 'awakening',
+      summary: `The moment of awakening. ${awakening.firstThought}`,
       timestamp: world.tick,
       location: { x: 0, y: 0 }, // Would get from position
       participants: awakening.witnessIds,
-      description: `The moment of awakening. ${awakening.firstThought}`,
-      emotional: awakening.firstEmotion,
-      significance: 1.0, // Maximum significance
-      recalled: 0,
+      emotionalValence: awakening.firstEmotion === 'wonder' ? 0.5 : awakening.firstEmotion === 'fear' ? -0.5 : 0,
+      emotionalIntensity: 1.0,
+      importance: 1.0, // Maximum importance for awakening
+      surprise: 1.0,
+      clarity: 1.0,
+      consolidated: false,
+      markedForConsolidation: true,
+      timesRecalled: 0,
     });
-    entity.addComponent(episodic);
+    (entity as any).addComponent(episodic);
 
     // Add SemanticMemoryComponent with basic knowledge
     const semantic = new SemanticMemoryComponent();
-    semantic.addFact({
-      id: `origin_${entity.id}`,
-      category: 'self',
+    semantic.formKnowledge({
+      type: 'factual',
       content: `I was uplifted from ${upliftedTrait.sourceSpeciesId} to sapience`,
       confidence: 1.0,
-      learnedAt: world.tick,
-      source: 'direct_knowledge',
+      sourceMemories: [], // No prior memories at awakening
     });
-    entity.addComponent(semantic);
+    (entity as any).addComponent(semantic);
 
-    // Add BeliefComponent with initial beliefs
+    // Add BeliefComponent with initial belief evidence
     const belief = new BeliefComponent();
-    belief.addBelief({
-      id: `self_belief_${entity.id}`,
-      category: 'self',
-      content: 'I am sapient',
-      strength: 1.0,
-      formedAt: world.tick,
-      evidence: ['awakening_moment'],
-    });
-    entity.addComponent(belief);
+    // Record evidence that will form the "I am sapient" belief
+    belief.recordEvidence('world', 'self_sapience', 'experience', world.tick);
+    belief.recordEvidence('world', 'self_sapience', 'experience', world.tick);
+    belief.recordEvidence('world', 'self_sapience', 'experience', world.tick);
+    (entity as any).addComponent(belief);
 
     // Mark species as sapient
     if (entity.hasComponent(CT.Species)) {

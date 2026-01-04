@@ -100,8 +100,8 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     });
 
     const entity = new EntityImpl(createEntityId(), 0);
-    entity.addComponent(plant);
-    entity.addComponent({
+    (entity as any).addComponent(plant);
+    (entity as any).addComponent({
       type: ComponentType.Position,
       version: 1,
       x: 10,
@@ -176,8 +176,8 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     });
 
     const entity = new EntityImpl(createEntityId(), 0);
-    entity.addComponent(plant);
-    entity.addComponent({
+    (entity as any).addComponent(plant);
+    (entity as any).addComponent({
       type: ComponentType.Position,
       version: 1,
       x: 15,
@@ -251,8 +251,8 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     });
 
     const entity = new EntityImpl(createEntityId(), 0);
-    entity.addComponent(plant);
-    entity.addComponent({
+    (entity as any).addComponent(plant);
+    (entity as any).addComponent({
       type: ComponentType.Position,
       version: 1,
       x: 20,
@@ -313,8 +313,8 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     });
 
     const entity = new EntityImpl(createEntityId(), 0);
-    entity.addComponent(plant);
-    entity.addComponent({
+    (entity as any).addComponent(plant);
+    (entity as any).addComponent({
       type: ComponentType.Position,
       version: 1,
       x: 25,
@@ -380,8 +380,8 @@ describe('Seed Dispersal Integration (Bug Fix Verification)', () => {
     });
 
     const entity = new EntityImpl(createEntityId(), 0);
-    entity.addComponent(plant);
-    entity.addComponent({
+    (entity as any).addComponent(plant);
+    (entity as any).addComponent({
       type: ComponentType.Position,
       version: 1,
       x: 30,

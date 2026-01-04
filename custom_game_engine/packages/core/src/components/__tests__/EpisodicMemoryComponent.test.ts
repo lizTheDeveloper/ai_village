@@ -14,7 +14,7 @@ describe('EpisodicMemoryComponent', () => {
   // Criterion 1: Autonomic Memory Formation
   describe('autonomic memory formation', () => {
     it('should automatically create episodic memory when significant event occurs', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       // Simulate significant event (first harvest)
       memory.formMemory({
@@ -35,7 +35,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should not require agent choice to form memory', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       // Memory formation is automatic, no "chooseToRemember" parameter
       memory.formMemory({
@@ -49,7 +49,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should form memory for emotionally intense events (intensity > 0.6)', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'social:conflict',
@@ -64,7 +64,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should form memory for novel events', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'discovery:location',
@@ -79,7 +79,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should form memory for survival-relevant events', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'survival:threat',
@@ -100,7 +100,7 @@ describe('EpisodicMemoryComponent', () => {
   // Criterion 2: Memory Immutability
   describe('memory immutability', () => {
     it('should prevent editing memory content', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'harvest:first',
@@ -122,7 +122,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should prevent deletion of memories', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'test',
@@ -138,7 +138,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should only allow natural decay, not manual deletion', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'test',
@@ -156,7 +156,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should preserve original event summary forever', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'test',
@@ -177,7 +177,7 @@ describe('EpisodicMemoryComponent', () => {
   // Criterion 3: Emotional Encoding
   describe('emotional encoding', () => {
     it('should encode positive events with positive valence', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'harvest:abundant',
@@ -190,7 +190,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should encode negative events with negative valence', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'conflict:physical',
@@ -203,7 +203,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should encode emotional intensity from 0 to 1', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'social:celebration',
@@ -219,7 +219,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should encode surprise for novel events', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'discovery:strange',
@@ -233,7 +233,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should clamp emotional values to valid ranges', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'test',
@@ -256,7 +256,7 @@ describe('EpisodicMemoryComponent', () => {
   // Criterion 4: Importance Calculation
   describe('importance calculation', () => {
     it('should calculate importance from weighted factors', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'harvest:first',
@@ -278,7 +278,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should give novelty boost to first-time events', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'harvest:first',
@@ -293,7 +293,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should give goal-relevance boost', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'goal:progress',
@@ -308,7 +308,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should give survival boost to life-threatening events', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'survival:threat',
@@ -324,7 +324,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should clamp final importance to [0, 1]', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'test',
@@ -346,7 +346,7 @@ describe('EpisodicMemoryComponent', () => {
   // Criterion 8: Memory Retrieval for Decisions
   describe('memory retrieval', () => {
     it('should retrieve top N most relevant memories based on context', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       // Add multiple memories
       memory.formMemory({
@@ -386,7 +386,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should score by recency (20% weight)', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       const oldMemory = memory.formMemory({
         eventType: 'test',
@@ -409,7 +409,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should score by importance (25% weight)', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'test',
@@ -431,7 +431,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should prioritize memories with same participants (20% weight)', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'test',
@@ -456,7 +456,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should prioritize memories at same location (10% weight)', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'test',
@@ -481,7 +481,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should increment timesRecalled when memory retrieved', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       memory.formMemory({
         eventType: 'test',
@@ -502,7 +502,7 @@ describe('EpisodicMemoryComponent', () => {
   // Error handling - per CLAUDE.md
   describe('error handling', () => {
     it('should throw when required eventType is missing', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       expect(() => {
         memory.formMemory({
@@ -513,7 +513,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should throw when required summary is missing', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       expect(() => {
         memory.formMemory({
@@ -524,7 +524,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should throw when required timestamp is missing', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       expect(() => {
         memory.formMemory({
@@ -535,7 +535,7 @@ describe('EpisodicMemoryComponent', () => {
     });
 
     it('should NOT use fallback values for critical missing fields', () => {
-      const memory = entity.addComponent(EpisodicMemoryComponent, {});
+      const memory = (entity as any).addComponent(EpisodicMemoryComponent, {});
 
       // Critical fields like eventType, summary, timestamp must be provided
       // Emotional values CAN default to 0 (neutral) - semantically valid

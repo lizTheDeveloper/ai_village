@@ -113,7 +113,7 @@ describe('Animal System', () => {
         bondLevel: 50,
         trustLevel: 50,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const entities = [entity];
       animalSystem.update(world, entities, 1);
@@ -143,7 +143,7 @@ describe('Animal System', () => {
         bondLevel: 50,
         trustLevel: 50,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const entities = world.query().with(ComponentType.Animal).executeEntities();
       animalSystem.update(world, entities, 1);
@@ -173,7 +173,7 @@ describe('Animal System', () => {
         bondLevel: 50,
         trustLevel: 50,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const entities = world.query().with(ComponentType.Animal).executeEntities();
       animalSystem.update(world, entities, 1);
@@ -203,7 +203,7 @@ describe('Animal System', () => {
         bondLevel: 0,
         trustLevel: 0,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const entities = world.query().with(ComponentType.Animal).executeEntities();
       animalSystem.update(world, entities, 1);
@@ -235,7 +235,7 @@ describe('Animal System', () => {
         bondLevel: 50,
         trustLevel: 50,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialHunger = animal.hunger;
@@ -271,7 +271,7 @@ describe('Animal System', () => {
         bondLevel: 50,
         trustLevel: 50,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialThirst = animal.thirst;
@@ -307,7 +307,7 @@ describe('Animal System', () => {
         bondLevel: 50,
         trustLevel: 50,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialEnergy = animal.energy;
@@ -343,7 +343,7 @@ describe('Animal System', () => {
         bondLevel: 50,
         trustLevel: 50,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
       const initialEnergy = animal.energy;
@@ -382,7 +382,7 @@ describe('Animal System', () => {
         bondLevel: 50,
         trustLevel: 50,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       // Advance time to trigger maturation (simulate 1 day passing)
       // deltaTime in seconds: 86400 seconds = 1 day
@@ -418,7 +418,7 @@ describe('Animal System', () => {
         bondLevel: 0,
         trustLevel: 0,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       // Simulate agent approaching (increase stress)
       const animal = entity.getComponent(ComponentType.Animal) as AnimalComponent;
@@ -451,7 +451,7 @@ describe('Animal System', () => {
         bondLevel: 0,
         trustLevel: 0,
       });
-      entity.addComponent(component);
+      (entity as any).addComponent(component);
 
       const entities = world.query().with(ComponentType.Animal).executeEntities();
       animalSystem.update(world, entities, 1);

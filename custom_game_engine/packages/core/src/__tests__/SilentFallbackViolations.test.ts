@@ -34,8 +34,8 @@ describe('Silent Fallback Violations', () => {
       const entity = world.createEntity();
 
       // Add other components but deliberately exclude needs component
-      entity.addComponent('agent', { behavior: 'idle' });
-      entity.addComponent('movement', {
+      (entity as any).addComponent('agent', { behavior: 'idle' });
+      (entity as any).addComponent('movement', {
         velocityX: 0,
         velocityY: 0,
         speed: 1.0
@@ -53,7 +53,7 @@ describe('Silent Fallback Violations', () => {
       const needsSystem = new NeedsSystem();
 
       const entity = world.createEntity();
-      entity.addComponent('agent', { behavior: 'idle' });
+      (entity as any).addComponent('agent', { behavior: 'idle' });
 
       // Act & Assert
       try {
@@ -81,7 +81,7 @@ describe('Silent Fallback Violations', () => {
         hydration: 70,
         nutrition: 80,
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       // DO NOT set speciesLookup - this should cause error
 
@@ -106,7 +106,7 @@ describe('Silent Fallback Violations', () => {
         hydration: 70,
         nutrition: 80,
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       // Act & Assert
       try {
@@ -173,7 +173,7 @@ describe('Silent Fallback Violations', () => {
         hydration: 70,
         nutrition: 80,
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       // Act & Assert
       try {
@@ -347,7 +347,7 @@ describe('Silent Fallback Violations', () => {
       const needsSystem = new NeedsSystem();
 
       const entity = world.createEntity();
-      entity.addComponent('agent', { behavior: 'idle' });
+      (entity as any).addComponent('agent', { behavior: 'idle' });
 
       // Act & Assert
       try {
@@ -374,7 +374,7 @@ describe('Silent Fallback Violations', () => {
         hydration: 70,
         nutrition: 80,
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       // Act & Assert
       try {

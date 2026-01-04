@@ -109,7 +109,7 @@ export class InitiateCombatBehavior extends BaseBehavior {
       surprise,
     });
 
-    entity.addComponent(conflict);
+    (entity as any).addComponent(conflict);
 
     // TODO: Add combat event types to EventMap
     // Emit event for narrative/logging

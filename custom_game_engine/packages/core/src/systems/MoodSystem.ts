@@ -419,7 +419,7 @@ export class MoodSystem implements System {
     // Create mood component if it doesn't exist
     if (!mood) {
       mood = this.createMoodForAgent(entity);
-      entity.addComponent(mood);
+      (entity as any).addComponent(mood);
     }
 
     // Update physical factor from needs

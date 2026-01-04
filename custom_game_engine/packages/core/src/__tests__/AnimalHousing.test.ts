@@ -19,7 +19,7 @@ describe('Animal Housing - Core Functionality', () => {
 
       // This will fail until chicken-coop is added to BuildingType union
       const chickenCoop = createBuildingComponent('chicken-coop' as any, 2);
-      entity.addComponent(chickenCoop);
+      (entity as any).addComponent(chickenCoop);
 
       const building = entity.getComponent('building') as BuildingComponent;
 
@@ -38,7 +38,7 @@ describe('Animal Housing - Core Functionality', () => {
       const entity = world.createEntity();
 
       const kennel = createBuildingComponent('kennel' as any, 2);
-      entity.addComponent(kennel);
+      (entity as any).addComponent(kennel);
 
       const building = entity.getComponent('building') as BuildingComponent;
 
@@ -54,7 +54,7 @@ describe('Animal Housing - Core Functionality', () => {
       const entity = world.createEntity();
 
       const stable = createBuildingComponent('stable' as any, 2);
-      entity.addComponent(stable);
+      (entity as any).addComponent(stable);
 
       const building = entity.getComponent('building') as BuildingComponent;
 
@@ -70,7 +70,7 @@ describe('Animal Housing - Core Functionality', () => {
       const entity = world.createEntity();
 
       const apiary = createBuildingComponent('apiary' as any, 2);
-      entity.addComponent(apiary);
+      (entity as any).addComponent(apiary);
 
       const building = entity.getComponent('building') as BuildingComponent;
 
@@ -86,7 +86,7 @@ describe('Animal Housing - Core Functionality', () => {
       const entity = world.createEntity();
 
       const aquarium = createBuildingComponent('aquarium' as any, 2);
-      entity.addComponent(aquarium);
+      (entity as any).addComponent(aquarium);
 
       const building = entity.getComponent('building') as BuildingComponent;
 
@@ -102,7 +102,7 @@ describe('Animal Housing - Core Functionality', () => {
       const entity = world.createEntity();
 
       const barn = createBuildingComponent('barn' as any, 3);
-      entity.addComponent(barn);
+      (entity as any).addComponent(barn);
 
       const building = entity.getComponent('building') as BuildingComponent;
 

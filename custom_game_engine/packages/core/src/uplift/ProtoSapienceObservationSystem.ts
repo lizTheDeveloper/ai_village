@@ -431,7 +431,7 @@ export class ProtoSapienceObservationSystem implements System {
     const entities: Entity[] = [];
 
     for (const entityId of program.breedingPopulation) {
-      const entity = world.getEntityById(entityId);
+      const entity = world.getEntity(entityId);
       if (entity && entity.hasComponent(CT.Animal)) {
         entities.push(entity);
       }

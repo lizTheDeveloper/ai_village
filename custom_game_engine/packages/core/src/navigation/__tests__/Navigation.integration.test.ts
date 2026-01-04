@@ -61,8 +61,8 @@ function createTestAgent(
 ): EntityImpl {
   const entity = new EntityImpl(createEntityId(), world.tick);
 
-  entity.addComponent(createPositionComponent(position.x, position.y));
-  entity.addComponent(createMovementComponent(2.0)); // speed = 2
+  (entity as any).addComponent(createPositionComponent(position.x, position.y));
+  (entity as any).addComponent(createMovementComponent(2.0)); // speed = 2
 
   // Add agent component
   const agentComponent: AgentComponent = {
@@ -74,7 +74,7 @@ function createTestAgent(
     lastThinkTick: 0,
     lastThought: '',
   };
-  entity.addComponent(agentComponent);
+  (entity as any).addComponent(agentComponent);
 
   // Add vision component
   const visionComponent: VisionComponent = {
@@ -87,10 +87,10 @@ function createTestAgent(
     seenAgents: [],
     seenPlants: [],
   };
-  entity.addComponent(visionComponent);
+  (entity as any).addComponent(visionComponent);
 
   // Add hearsay memory
-  entity.addComponent(createHearsayMemoryComponent());
+  (entity as any).addComponent(createHearsayMemoryComponent());
 
   (world as any)._addEntity(entity);
   return entity;
@@ -107,7 +107,7 @@ function createTestResource(
 ): EntityImpl {
   const entity = new EntityImpl(createEntityId(), world.tick);
 
-  entity.addComponent(createPositionComponent(position.x, position.y));
+  (entity as any).addComponent(createPositionComponent(position.x, position.y));
 
   const resourceComponent: ResourceComponent = {
     type: ComponentType.Resource,
@@ -118,7 +118,7 @@ function createTestResource(
     respawnRate: 0,
     lastHarvestTick: 0,
   };
-  entity.addComponent(resourceComponent);
+  (entity as any).addComponent(resourceComponent);
 
   (world as any)._addEntity(entity);
   return entity;

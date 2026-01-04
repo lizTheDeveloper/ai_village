@@ -293,7 +293,7 @@ function createMockHero(overrides?: {
   const entity = new EntityImpl('test-hero-123');
 
   // Soul identity with destiny
-  entity.addComponent({
+  (entity as any).addComponent({
     type: 'soul_identity',
     destiny: overrides?.destiny ?? 'unite the kingdoms and save the world',
     soulId: 'soul-123',
@@ -301,19 +301,19 @@ function createMockHero(overrides?: {
   });
 
   // Skills component
-  entity.addComponent({
+  (entity as any).addComponent({
     type: 'skills',
     combat: overrides?.combatSkill ?? 10,
   });
 
   // Agent component
-  entity.addComponent({
+  (entity as any).addComponent({
     type: 'agent',
     reputation: 15,
   });
 
   // Needs component
-  entity.addComponent({
+  (entity as any).addComponent({
     type: 'needs',
     health: overrides?.health ?? 0,
     hunger: 0,
@@ -322,14 +322,14 @@ function createMockHero(overrides?: {
   });
 
   // Position component
-  entity.addComponent({
+  (entity as any).addComponent({
     type: 'position',
     x: 100,
     y: 200,
   });
 
   // Identity component
-  entity.addComponent({
+  (entity as any).addComponent({
     type: 'identity',
     name: 'Heroic McHeroface',
   });

@@ -50,8 +50,8 @@ describe('ReincarnationSystem', () => {
     it('should queue soul on reincarnation_queued event', () => {
       const entityId = 'test-entity-1';
       const entity = new EntityImpl(entityId, 0);
-      entity.addComponent(createIdentityComponent('Test Entity'));
-      entity.addComponent(createPositionComponent(10, 20));
+      (entity as any).addComponent(createIdentityComponent('Test Entity'));
+      (entity as any).addComponent(createPositionComponent(10, 20));
       (world as any)._addEntity(entity);
 
       // Emit reincarnation queued event
@@ -100,8 +100,8 @@ describe('ReincarnationSystem', () => {
     it('should preserve all memories with full retention', () => {
       const entityId = 'test-entity-2';
       const entity = new EntityImpl(entityId, 0);
-      entity.addComponent(createIdentityComponent('Test Soul'));
-      entity.addComponent(createPositionComponent(10, 20));
+      (entity as any).addComponent(createIdentityComponent('Test Soul'));
+      (entity as any).addComponent(createPositionComponent(10, 20));
 
       // Add personality
       const personality = new PersonalityComponent({
@@ -111,11 +111,11 @@ describe('ReincarnationSystem', () => {
         agreeableness: 0.5,
         neuroticism: 0.4,
       });
-      entity.addComponent(personality);
+      (entity as any).addComponent(personality);
 
       // Add skills
       const skills = generateRandomStartingSkills(personality);
-      entity.addComponent(skills);
+      (entity as any).addComponent(skills);
 
       // Add episodic memory with significant memories
       const episodic = new EpisodicMemoryComponent({ maxMemories: 100 });
@@ -126,7 +126,7 @@ describe('ReincarnationSystem', () => {
         emotionalValence: 0.8,
         emotionalIntensity: 0.9,
       });
-      entity.addComponent(episodic);
+      (entity as any).addComponent(episodic);
 
       (world as any)._addEntity(entity);
 
@@ -152,8 +152,8 @@ describe('ReincarnationSystem', () => {
     it('should preserve limited memories with fragments retention', () => {
       const entityId = 'test-entity-3';
       const entity = new EntityImpl(entityId, 0);
-      entity.addComponent(createIdentityComponent('Test Soul'));
-      entity.addComponent(createPositionComponent(10, 20));
+      (entity as any).addComponent(createIdentityComponent('Test Soul'));
+      (entity as any).addComponent(createPositionComponent(10, 20));
 
       const personality = new PersonalityComponent({
         openness: 0.5,
@@ -162,7 +162,7 @@ describe('ReincarnationSystem', () => {
         agreeableness: 0.5,
         neuroticism: 0.5,
       });
-      entity.addComponent(personality);
+      (entity as any).addComponent(personality);
 
       (world as any)._addEntity(entity);
 
@@ -189,8 +189,8 @@ describe('ReincarnationSystem', () => {
     it('should not spawn entity before delay expires', () => {
       const entityId = 'test-entity-4';
       const entity = new EntityImpl(entityId, 0);
-      entity.addComponent(createIdentityComponent('Test Soul'));
-      entity.addComponent(createPositionComponent(10, 20));
+      (entity as any).addComponent(createIdentityComponent('Test Soul'));
+      (entity as any).addComponent(createPositionComponent(10, 20));
       (world as any)._addEntity(entity);
 
       world.eventBus.emit({
@@ -218,8 +218,8 @@ describe('ReincarnationSystem', () => {
     it('should spawn entity after delay expires', () => {
       const entityId = 'test-entity-5';
       const entity = new EntityImpl(entityId, 0);
-      entity.addComponent(createIdentityComponent('Test Soul'));
-      entity.addComponent(createPositionComponent(10, 20));
+      (entity as any).addComponent(createIdentityComponent('Test Soul'));
+      (entity as any).addComponent(createPositionComponent(10, 20));
       (world as any)._addEntity(entity);
 
       // Subscribe to reincarnated event
@@ -266,9 +266,9 @@ describe('ReincarnationSystem', () => {
     it('should preserve species with same constraint', () => {
       const entityId = 'test-entity-6';
       const entity = new EntityImpl(entityId, 0);
-      entity.addComponent(createIdentityComponent('Elf Soul'));
-      entity.addComponent(createPositionComponent(10, 20));
-      entity.addComponent({
+      (entity as any).addComponent(createIdentityComponent('Elf Soul'));
+      (entity as any).addComponent(createPositionComponent(10, 20));
+      (entity as any).addComponent({
         type: 'species',
         version: 1,
         speciesId: 'elf',
@@ -297,14 +297,14 @@ describe('ReincarnationSystem', () => {
     it('should use karmic constraint based on deed score', () => {
       const entityId = 'test-entity-7';
       const entity = new EntityImpl(entityId, 0);
-      entity.addComponent(createIdentityComponent('Karmic Soul'));
-      entity.addComponent(createPositionComponent(10, 20));
+      (entity as any).addComponent(createIdentityComponent('Karmic Soul'));
+      (entity as any).addComponent(createPositionComponent(10, 20));
 
       // Add deed ledger with negative deeds
       const ledger = createDeedLedgerComponent();
       recordDeed(ledger, 'violence', 5, { target: 'someone' });
       recordDeed(ledger, 'theft', 3, { item: 'gold' });
-      entity.addComponent(ledger);
+      (entity as any).addComponent(ledger);
 
       (world as any)._addEntity(entity);
 
@@ -331,8 +331,8 @@ describe('ReincarnationSystem', () => {
     it('should associate deity with queued soul', () => {
       const entityId = 'test-entity-8';
       const entity = new EntityImpl(entityId, 0);
-      entity.addComponent(createIdentityComponent('Faithful Soul'));
-      entity.addComponent(createPositionComponent(10, 20));
+      (entity as any).addComponent(createIdentityComponent('Faithful Soul'));
+      (entity as any).addComponent(createPositionComponent(10, 20));
       (world as any)._addEntity(entity);
 
       const deityId = 'nature-goddess';
@@ -373,8 +373,8 @@ describe('ReincarnationSystem', () => {
     it('should cleanup event listener on destroy', () => {
       const entityId = 'test-entity-9';
       const entity = new EntityImpl(entityId, 0);
-      entity.addComponent(createIdentityComponent('Test'));
-      entity.addComponent(createPositionComponent(0, 0));
+      (entity as any).addComponent(createIdentityComponent('Test'));
+      (entity as any).addComponent(createPositionComponent(0, 0));
       (world as any)._addEntity(entity);
 
       // Destroy system

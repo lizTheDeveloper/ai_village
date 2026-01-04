@@ -51,9 +51,9 @@ function createMockWorld(tick: number = 100): World {
 // Helper to create an agent entity
 function createAgentEntity(agent: AgentComponent): EntityImpl {
   const entity = new EntityImpl(createEntityId(), 0);
-  entity.addComponent(createPositionComponent(50, 50));
-  entity.addComponent(createMovementComponent());
-  entity.addComponent(agent);
+  (entity as any).addComponent(createPositionComponent(50, 50));
+  (entity as any).addComponent(createMovementComponent());
+  (entity as any).addComponent(agent);
   return entity;
 }
 
@@ -90,8 +90,8 @@ describe('AgentBrainSystem', () => {
     it('skips entities without agent component', () => {
       const world = createMockWorld();
       const entity = new EntityImpl(createEntityId(), 0);
-      entity.addComponent(createPositionComponent(50, 50));
-      entity.addComponent(createMovementComponent());
+      (entity as any).addComponent(createPositionComponent(50, 50));
+      (entity as any).addComponent(createMovementComponent());
       // No agent component
 
       // Should not throw
@@ -171,7 +171,7 @@ describe('AgentBrainSystem', () => {
     health: 1.0,
   });
       needs.energy = 0.2; // Critical (below 0.3 threshold)
-      entity.addComponent(needs);
+      (entity as any).addComponent(needs);
 
       const world = createMockWorld(100);
 
@@ -202,7 +202,7 @@ describe('AgentBrainSystem', () => {
     health: 1.0,
   });
       needs.energy = 0;
-      entity.addComponent(needs);
+      (entity as any).addComponent(needs);
 
       const world = createMockWorld(100);
 
@@ -236,7 +236,7 @@ describe('AgentBrainSystem', () => {
     health: 1.0,
   });
       needs.energy = 0.2;
-      entity.addComponent(needs);
+      (entity as any).addComponent(needs);
 
       const world = createMockWorld(100);
 

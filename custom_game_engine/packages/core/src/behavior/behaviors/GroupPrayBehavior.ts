@@ -271,7 +271,7 @@ export class GroupPrayBehavior extends BaseBehavior {
 
     // Record prayer for leader
     const updatedSpiritual = recordPrayer(spiritual, prayer, 20);
-    entity.addComponent(updatedSpiritual);
+    (entity as any).addComponent(updatedSpiritual);
 
     // Calculate vision chance
     const visionChance = GROUP_PRAYER_CONFIG.BASE_VISION_CHANCE +

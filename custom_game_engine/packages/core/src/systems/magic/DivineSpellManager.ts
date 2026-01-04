@@ -73,7 +73,7 @@ export class DivineSpellManager {
         totalMishaps: 0,
         version: 1,
       };
-      entity.addComponent(newMagic);
+      (entity as any).addComponent(newMagic);
       magic = newMagic;
     }
 

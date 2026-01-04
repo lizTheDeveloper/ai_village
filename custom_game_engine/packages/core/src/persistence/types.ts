@@ -2,6 +2,8 @@
  * Core persistence types - Schema versioning and serialization
  */
 
+import type { TerrainSnapshot } from '@ai-village/world';
+
 // ============================================================================
 // Base Versioning
 // ============================================================================
@@ -80,7 +82,7 @@ export interface UniverseTime {
 
 export interface WorldSnapshot {
   /** Terrain data (compressed) */
-  terrain: unknown;  // TODO: Define terrain format
+  terrain: TerrainSnapshot | null;
 
   /** Weather state */
   weather: unknown;

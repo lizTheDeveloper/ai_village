@@ -119,8 +119,8 @@ describe('PlantSystem', () => {
         hydration: 70,
         nutrition: 80,
       });
-      entity.addComponent(plant);
-      entity.addComponent(createPositionComponent(10, 10));
+      (entity as any).addComponent(plant);
+      (entity as any).addComponent(createPositionComponent(10, 10));
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -137,7 +137,7 @@ describe('PlantSystem', () => {
 
       // Remove position to trigger error - must set private _position to bypass setter
       (plant as any)._position = undefined;
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -159,7 +159,7 @@ describe('PlantSystem', () => {
         hydration: 70,
         nutrition: 80,
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -180,7 +180,7 @@ describe('PlantSystem', () => {
         health: 100,
         nutrition: 80,
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       const initialHydration = plant.hydration;
 
@@ -208,7 +208,7 @@ describe('PlantSystem', () => {
 
       // Remove health to trigger error - must set private _health to bypass setter clamping
       (plant as any)._health = undefined;
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -227,7 +227,7 @@ describe('PlantSystem', () => {
 
       // Remove hydration to trigger error - must set private _hydration to bypass setter clamping
       (plant as any)._hydration = undefined;
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -246,7 +246,7 @@ describe('PlantSystem', () => {
 
       // Remove nutrition to trigger error - must set private _nutrition to bypass setter clamping
       (plant as any)._nutrition = undefined;
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -265,7 +265,7 @@ describe('PlantSystem', () => {
         health: 100,
         nutrition: 80,
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -288,7 +288,7 @@ describe('PlantSystem', () => {
         health: 100,
         nutrition: 15, // Below 20 threshold
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -314,7 +314,7 @@ describe('PlantSystem', () => {
         health: 1,
         nutrition: 0,
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -340,7 +340,7 @@ describe('PlantSystem', () => {
         health: 1,
         nutrition: 0,
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -362,7 +362,7 @@ describe('PlantSystem', () => {
         hydration: 70,
         nutrition: 80,
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       // Setter should clamp high values to 100
       plant.health = 150;
@@ -386,7 +386,7 @@ describe('PlantSystem', () => {
         nutrition: 80,
         isIndoors: false,
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       // Emit rain event and flush to process it immediately
       eventBus.emit({
@@ -416,7 +416,7 @@ describe('PlantSystem', () => {
         nutrition: 80,
         isIndoors: true,
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       // Emit rain event
       eventBus.emit({
@@ -451,7 +451,7 @@ describe('PlantSystem', () => {
           mutations: [],
         },
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       const initialHealth = plant.health;
 
@@ -482,7 +482,7 @@ describe('PlantSystem', () => {
         hydration: 70,
         nutrition: 80,
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -509,7 +509,7 @@ describe('PlantSystem', () => {
         hydration: 70,
         nutrition: 80,
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
 
@@ -535,7 +535,7 @@ describe('PlantSystem', () => {
         hydration: 70,
         nutrition: 80,
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
       // Use deltaTime=30 to trigger at least 1 game hour (30/600*24 = 1.2 hours)
@@ -591,7 +591,7 @@ describe('PlantSystem', () => {
         nutrition: 80,
         fruitCount: 5,
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       const initialFruit = plant.fruitCount;
 
@@ -620,7 +620,7 @@ describe('PlantSystem', () => {
         nutrition: 80,
         fruitCount: 5,
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       const initialFruit = plant.fruitCount;
 
@@ -652,7 +652,7 @@ describe('PlantSystem', () => {
         nutrition: 80,
         fruitCount: 0, // Start with 0 fruit so regeneration triggers
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       // Emit day changed event
       eventBus.emit({
@@ -720,7 +720,7 @@ describe('PlantSystem', () => {
         hydration: 70,
         nutrition: 80,
       });
-      entity.addComponent(plant);
+      (entity as any).addComponent(plant);
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
       system.update(world, entities, 1.0);

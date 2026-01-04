@@ -476,15 +476,15 @@ function createOreDeposit(
 ): EntityImpl {
   const entity = new EntityImpl(createEntityId(), 0);
 
-  entity.addComponent(createPositionComponent(x, y));
-  entity.addComponent(createPhysicsComponent(true, 1, 1));
+  (entity as any).addComponent(createPositionComponent(x, y));
+  (entity as any).addComponent(createPhysicsComponent(true, 1, 1));
 
   // Map resource type to deposit type for tags
   const depositTag = resourceType === 'coal' ? 'coal_deposit' : `${resourceType.replace('_ore', '')}_deposit`;
 
-  entity.addComponent(createRenderableComponent(depositTag, 'object'));
-  entity.addComponent(createTagsComponent(depositTag, 'obstacle', 'minable'));
-  entity.addComponent(createResourceComponent(resourceType, amount, 0)); // 0 = no regen
+  (entity as any).addComponent(createRenderableComponent(depositTag, 'object'));
+  (entity as any).addComponent(createTagsComponent(depositTag, 'obstacle', 'minable'));
+  (entity as any).addComponent(createResourceComponent(resourceType, amount, 0)); // 0 = no regen
 
   (harness.world as any)._addEntity(entity);
 

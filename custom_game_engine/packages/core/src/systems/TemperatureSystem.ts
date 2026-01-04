@@ -124,10 +124,11 @@ export class TemperatureSystem implements System {
           const healthLoss = this.HEALTH_DAMAGE_RATE * deltaTime;
           const newHealth = Math.max(0, needsComp.health - healthLoss);
 
-          impl.updateComponent<NeedsComponent>(CT.Needs, (current) => ({
-            ...current,
-            health: newHealth,
-          }));
+          impl.updateComponent<NeedsComponent>(CT.Needs, (current) => {
+            const updated = current.clone();
+            updated.health = newHealth;
+            return updated;
+          });
 
           // Emit critical health event if health drops below 20%
           if (newHealth < HEALTH_CRITICAL && needsComp.health >= HEALTH_CRITICAL) {

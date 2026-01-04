@@ -11,10 +11,10 @@ import { ComponentType } from '../../types/ComponentType.js';
 function createTestAgent(world: WorldImpl, name: string, x: number, y: number): EntityImpl {
   const entity = new EntityImpl(createEntityId(), world.tick);
 
-  entity.addComponent(createIdentityComponent(name));
-  entity.addComponent(createPositionComponent(x, y));
-  entity.addComponent(createAgentComponent());
-  entity.addComponent(createVisionComponent(10)); // 10 tile vision/hearing range
+  (entity as any).addComponent(createIdentityComponent(name));
+  (entity as any).addComponent(createPositionComponent(x, y));
+  (entity as any).addComponent(createAgentComponent());
+  (entity as any).addComponent(createVisionComponent(10)); // 10 tile vision/hearing range
 
   // Add entity to world using internal method (same pattern as AgentEntity.ts:69)
   (world as any)._addEntity(entity);

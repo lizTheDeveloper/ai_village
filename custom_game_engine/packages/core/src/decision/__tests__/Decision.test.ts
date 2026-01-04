@@ -217,7 +217,7 @@ describe('AutonomicSystem', () => {
     health: 1.0,
   });
       needs.energy = 0;
-      entity.addComponent(needs);
+      (entity as any).addComponent(needs);
 
       const result = autonomicSystem.check(entity);
 

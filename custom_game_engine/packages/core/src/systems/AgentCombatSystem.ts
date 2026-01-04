@@ -637,7 +637,7 @@ export class AgentCombatSystem implements System {
       location,
     });
 
-    entity.addComponent(injury);
+    (entity as any).addComponent(injury);
   }
 
   private async generateNarrative(

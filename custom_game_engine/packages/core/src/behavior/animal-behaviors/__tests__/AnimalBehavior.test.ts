@@ -65,9 +65,9 @@ function createMockWorld(): World {
 // Helper to create an animal entity
 function createAnimalEntity(animal: AnimalComponent): EntityImpl {
   const entity = new EntityImpl(createEntityId(), 0);
-  entity.addComponent(createPositionComponent(50, 50));
-  entity.addComponent(createMovementComponent());
-  entity.addComponent(animal);
+  (entity as any).addComponent(createPositionComponent(50, 50));
+  (entity as any).addComponent(createMovementComponent());
+  (entity as any).addComponent(animal);
   return entity;
 }
 

@@ -40,7 +40,7 @@ export function applyAgentTraits(entity: Entity, traits: AgentTraits): void {
     thirst: (needsConfig.thirst ?? 100) / 100,
     temperature: (needsConfig.warmth ?? 100) / 100,
   });
-  entity.addComponent(needs);
+  (entity as any).addComponent(needs);
 
   // Add circadian component
   const circadianConfig = traits.circadian || {};
@@ -54,7 +54,7 @@ export function applyAgentTraits(entity: Entity, traits: AgentTraits): void {
   if (circadianConfig.sleepQuality !== undefined) {
     (circadian as any).sleepQuality = circadianConfig.sleepQuality;
   }
-  entity.addComponent(circadian);
+  (entity as any).addComponent(circadian);
 
   // Add agent component
   const agentConfig = traits.agent || {};
@@ -63,7 +63,7 @@ export function applyAgentTraits(entity: Entity, traits: AgentTraits): void {
     agentConfig.useLLM || false,
     agentConfig.thinkInterval || 20
   );
-  entity.addComponent(agent);
+  (entity as any).addComponent(agent);
 }
 
 /**
