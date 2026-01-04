@@ -1,5 +1,89 @@
 # Release Notes
 
+## 60-Minute Commit Cycle #5
+
+**12 commits, ~68,000+ lines added**
+
+### Combat Animation Pipeline
+
+#### Production Rendering System
+- **ProductionRenderer.ts** - High-quality character sprite rendering
+- **CombatAnimator.ts** (+496 lines) - PixelLab integration for combat animations
+- **CombatTVRenderer.ts** (735 lines) - TV-style combat broadcast renderer
+- **PixelLabAPI.ts** - API wrapper for PixelLab MCP
+- **video-production-rendering.md** (540 lines) - Comprehensive rendering spec
+
+#### CLI Tools
+- **render-character.ts** (236 lines) - Character sprite CLI
+- **render-batch.ts** (202 lines) - Batch rendering CLI
+- **animate-combat.ts** (+347 lines) - Combat animation generator
+- **generate-combat-animations.ts** - Batch animation generation
+- **run-real-combat.ts** - Real combat execution
+
+#### Combat Assets
+- **fae-vs-angels/** - Character assets (Luminara, Seraphiel)
+- **luminara/metadata.json** (+11,422 lines) - Full animation metadata
+- **book-tentacle-vs-bambi.json** - Creative combat scenario
+- **fae-vs-angels.json**, **fae-vs-angels-animations.json**
+
+### Weapon System Expansion
+
+#### New Weapon Categories
+- **melee.ts** - Melee weapons
+- **ranged.ts** - Ranged weapons
+- **firearms.ts** - Firearm weapons
+- **magic.ts** - Magical weapons
+- **exotic.ts** - Exotic weapons
+- **creative.ts** - Creative/unusual weapons
+- **energy.ts** - Energy weapons
+- **AmmoTrait.ts** - Ammunition trait system
+- **weapons-expansion.md** - OpenSpec for weapon system
+
+### Plot System Enhancements
+
+#### Event-Driven Plot Assignment
+- **EventDrivenPlotAssignment.ts** - Full trigger implementations:
+  - `on_relationship_change` - Trust delta tracking with baselines
+  - `on_relationship_formed` - New relationship detection
+  - `on_death_nearby` - Position-based death detection
+  - `on_skill_mastery` - Skill level achievement triggers
+
+### Narrative System
+
+#### NarrativePressureSystem
+- **NarrativePressureSystem.ts** - Narrative tension mechanics
+- **NarrativePressureTypes.ts** - Type definitions
+
+### Core System Updates
+
+- **ZoneManager.ts** (+79 lines) - Zone management logic
+- **persistence/types.ts** (+39 lines) - Persistence type definitions
+- **clarketechResearch.ts** (+35 lines) - Clarke-tech research tree
+- **EquipmentSystem.ts** - Equipment handling improvements
+- **soul-sprite-progression.md** - New soul sprite spec
+
+### Panel Updates
+- 10+ panels refined (DevPanel, DivineChatPanel, TimelinePanel, etc.)
+- Panel rendering bug fixes in adapters/index.ts
+
+### Commits
+| Round | Commit | Lines | Content |
+|-------|--------|-------|---------|
+| 1 | `6d08178` | 1,973 | EventDrivenPlotAssignment, soul-sprite-progression |
+| 2 | `baf9e0a` | 81 | Death triggers, panel rendering fixes |
+| 3 | `d08398f` | 145 | Full plot trigger evaluators |
+| 4 | `5bdab9c` | 1,427 | ProductionRenderer, video rendering spec |
+| 5 | `d41ab87` | 523 | CLI render scripts, arena cast |
+| 6 | `142d911` | 338 | Production renderer README |
+| 7 | `724d285` | 1,009 | CombatAnimator, animate-combat |
+| 8 | `36f5f3e` | 49,958 | Combat assets, weapon expansion, NarrativePressure |
+| 9 | `888cc4b` | 24 | ItemDefinition, CraftingSystem tests |
+| 10 | `074a2eb` | 939 | CombatTVRenderer |
+| 11 | `3305e26` | 267 | ZoneManager, persistence, clarketech |
+| 12 | `1d81b4f` | 11,427 | Luminara animation metadata |
+
+---
+
 ## 60-Minute Commit Cycle #4 (00:19 - 01:30)
 
 **12 commits, ~66,443 lines added**
