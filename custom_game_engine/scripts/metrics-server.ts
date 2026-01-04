@@ -36,18 +36,19 @@
  *   GET /view/:id?session=<id> - Get view for specific session
  *
  * Live Entity API (queries running game in real-time):
+ *   All Live Query endpoints support optional ?session=<id> parameter to target specific game sessions
  *   GET  /api/live/status      - Check if game is connected
- *   GET  /api/live/entities    - List all agents (live)
- *   GET  /api/live/entity      - Get entity state by ID (live)
- *   GET  /api/live/prompt      - Get LLM prompt for agent (live)
- *   POST /api/live/set-llm     - Set custom LLM config for agent (live)
- *   GET  /api/live/universe?session=<id> - Get universe config (optional session filter)
- *   GET  /api/live/magic       - Get magic system info (enabled paradigms, etc.)
+ *   GET  /api/live/entities?session=<id>    - List all agents (live)
+ *   GET  /api/live/entity?id=<id>&session=<id>      - Get entity state by ID (live)
+ *   GET  /api/live/prompt?id=<id>&session=<id>      - Get LLM prompt for agent (live)
+ *   POST /api/live/set-llm?session=<id>     - Set custom LLM config for agent (live)
+ *   GET  /api/live/universe?session=<id> - Get universe config
+ *   GET  /api/live/magic?session=<id>       - Get magic system info (enabled paradigms, etc.)
  *   GET  /api/live/pending-approvals - Get pending creations awaiting divine approval
  *   POST /api/live/approve-creation?id=<id> - Approve a pending creation
  *   POST /api/live/reject-creation?id=<id>  - Reject a pending creation
- *   GET  /api/live/divinity    - Get divinity info (gods, belief, pantheons, etc.)
- *   GET  /api/live/research    - Get research info (discovered papers, in-progress, completed)
+ *   GET  /api/live/divinity?session=<id>    - Get divinity info (gods, belief, pantheons, etc.)
+ *   GET  /api/live/research?session=<id>    - Get research info (discovered papers, in-progress, completed)
  *
  * LLM Proxy API (server-side LLM with rate limiting):
  *   POST /api/llm/generate     - Generate LLM response (server-side, rate-limited)
@@ -5141,10 +5142,18 @@ NOTES
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    const gameClient = getActiveGameClient();
+    // Support session filtering via ?session=<id> query parameter
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
     if (!gameClient) {
       res.statusCode = 503;
-      res.end(JSON.stringify({ error: 'No game client connected', connected: false }));
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
       return;
     }
 
@@ -5865,17 +5874,18 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
         ],
         actions_api: [
           '/api/actions - List all available dev actions (LLM dev tools)',
-          'POST /api/actions/spawn-agent - Spawn a new agent',
-          'POST /api/actions/teleport - Teleport an agent',
-          'POST /api/actions/give-item - Give items to an agent',
-          'POST /api/actions/set-need - Set agent needs (hunger, energy, etc.)',
-          'POST /api/actions/trigger-behavior - Trigger a behavior',
-          'POST /api/actions/set-speed - Change game speed',
-          'POST /api/actions/pause - Pause/resume game',
-          'POST /api/actions/spawn-entity - Spawn entities (trees, animals, etc.)',
-          'POST /api/actions/grant-spell - Grant spells to agents',
-          'POST /api/actions/add-belief - Add belief to deities',
-          'POST /api/actions/create-deity - Create a new deity',
+          'All Actions API endpoints support optional ?session=<id> parameter to target specific game sessions',
+          'POST /api/actions/spawn-agent?session=<id> - Spawn a new agent',
+          'POST /api/actions/teleport?session=<id> - Teleport an agent',
+          'POST /api/actions/give-item?session=<id> - Give items to an agent',
+          'POST /api/actions/set-need?session=<id> - Set agent needs (hunger, energy, etc.)',
+          'POST /api/actions/trigger-behavior?session=<id> - Trigger a behavior',
+          'POST /api/actions/set-speed?session=<id> - Change game speed',
+          'POST /api/actions/pause?session=<id> - Pause/resume game',
+          'POST /api/actions/spawn-entity?session=<id> - Spawn entities (trees, animals, etc.)',
+          'POST /api/actions/grant-spell?session=<id> - Grant spells to agents',
+          'POST /api/actions/add-belief?session=<id> - Add belief to deities',
+          'POST /api/actions/create-deity?session=<id> - Create a new deity',
         ],
         headless_api: [
           '/api/headless - Headless game control help',

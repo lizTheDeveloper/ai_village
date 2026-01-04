@@ -554,31 +554,51 @@
         if (this.spriteCache.has(key)) return;
 
         try {
-          // Map entity types to sprite configurations
+          // Map entity types to UNIQUE sprite configurations for variety
           const spriteMapping = {
-            // Humanoids (animated)
+            // Humanoids (animated) - each gets unique sprite
             'villager': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
-            'gladiator': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
-            'spectator': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
-            'official': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
-            'merchant': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
-            'bard': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
-            'child': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
-            'guard': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
-            'emergency': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
-            'scholar': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
-            'mage': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
+            'gladiator': { type: 'static', id: 'odin' }, // Viking warrior
+            'spectator': { type: 'static', id: 'human_male_brown' },
+            'official': { type: 'static', id: 'human_male_blonde' },
+            'merchant': { type: 'static', id: 'human_male_black_medium' },
+            'bard': { type: 'static', id: 'pixie' }, // Magical performer
+            'child': { type: 'static', id: 'rabbit_brown' }, // Smaller creature
+            'guard': { type: 'static', id: 'human_male_black_dark' },
+            'emergency': { type: 'static', id: 'human_male_black_light' },
+            'scholar': { type: 'static', id: 'high-elf' },
+            'mage': { type: 'static', id: 'forest-sprite' },
 
-            // Aliens (static rotations)
+            // Aliens - different types
             'alien': { type: 'static', id: 'blob-alien' },
 
-            // Animals (static rotations)
+            // Animals - variety
             'dog': { type: 'static', id: 'dog_spotted' },
+            'chicken': { type: 'static', id: 'chicken_brown' },
+            'cow': { type: 'static', id: 'cow_brown' },
+            'pig': { type: 'static', id: 'pig_pink' },
+            'sheep': { type: 'static', id: 'sheep_white' },
+            'horse': { type: 'static', id: 'horse_brown' },
+            'cat': { type: 'static', id: 'cat_orange' },
+            'rabbit': { type: 'static', id: 'rabbit_white' },
+            'deer': { type: 'static', id: 'deer_brown' },
+            'goat': { type: 'static', id: 'goat_white' },
 
-            // Divine/special entities (static rotations)
-            'priest': { type: 'static', id: 'punisher-angel' },
-            'deity_manifestation': { type: 'static', id: 'punisher-angel' },
-            'demon': { type: 'static', id: 'blob-alien' },
+            // Divine/special entities - unique gods
+            'priest': { type: 'static', id: 'athena' },
+            'priestess': { type: 'static', id: 'athena' },
+            'deity_manifestation': { type: 'static', id: 'zeus' },
+            'fertility_goddess': { type: 'static', id: 'hel' },
+            'demon': { type: 'static', id: 'mantis-alien' },
+
+            // Effects/particles
+            'magic_effect': { type: 'static', id: 'pixie' },
+            'particle_effect': { type: 'static', id: 'forest-sprite' },
+            'fire_effect': { type: 'static', id: 'blob-alien' },
+
+            // Buildings/objects
+            'building': { type: 'static', id: 'tree' },
+            'debris': { type: 'static', id: 'berry-bush' },
           };
 
           const spriteConfig = spriteMapping[entityType];
@@ -693,18 +713,19 @@
         const screenX = (entity.x - cameraX) * zoom + this.canvas.width / 2;
         const screenY = (entity.y - cameraY) * zoom + this.canvas.height / 2;
 
-        // Draw sprite centered on entity position
-        const scale = zoom * 2; // Scale up pixel art
-        const width = sprite.width * scale;
-        const height = sprite.height * scale;
+        // NORMALIZE SIZE: Scale all sprites to consistent target height (64px base)
+        const targetHeight = 64; // Base height in pixels
+        const aspectRatio = sprite.width / sprite.height;
+        const normalizedHeight = targetHeight * zoom;
+        const normalizedWidth = normalizedHeight * aspectRatio;
 
         this.ctx.imageSmoothingEnabled = false;
         this.ctx.drawImage(
           sprite,
-          screenX - width / 2,
-          screenY - height / 2,
-          width,
-          height
+          screenX - normalizedWidth / 2,
+          screenY - normalizedHeight / 2,
+          normalizedWidth,
+          normalizedHeight
         );
       }
 

@@ -261,7 +261,7 @@ export class ReflectionSystem implements System {
   private _performDeepReflection(
     entity: Entity,
     episodicMem: EpisodicMemoryComponent,
-    semanticMem: SemanticMemoryComponent,
+    _semanticMem: SemanticMemoryComponent,
     reflectionComp: ReflectionComponent,
     timestamp: number
   ): void {

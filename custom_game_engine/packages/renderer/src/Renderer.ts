@@ -57,6 +57,8 @@ export class Renderer {
   private readonly SPRITE_RETRY_DELAY_MS = 5000; // Wait 5 seconds before retrying a failed load
   // Track loaded sprite instances by entity ID
   private entitySpriteInstances = new Map<string, string>(); // entityId -> instanceId
+  // Track last frame time for animation updates
+  private lastFrameTime: number = performance.now();
 
   private tileSize = 16; // Pixels per tile at zoom=1
   private hasLoggedTilledTile = false; // Debug flag to log first tilled tile rendering
@@ -134,6 +136,11 @@ export class Renderer {
 
     // Find the best matching sprite folder
     const spriteFolderId = findSprite(traits);
+
+    // Debug: Log animal sprite lookups
+    if (animal) {
+      console.log(`[Renderer] Animal sprite lookup: speciesId="${animal.speciesId}" -> folderId="${spriteFolderId}"`);
+    }
 
     // Check if sprite is loaded
     if (!this.pixelLabLoader.isLoaded(spriteFolderId)) {
@@ -458,6 +465,16 @@ export class Renderer {
     // Clear
     this.ctx.fillStyle = '#1a1a1a';
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // Calculate deltaTime for animations
+    const currentTime = performance.now();
+    const deltaTime = currentTime - this.lastFrameTime;
+    this.lastFrameTime = currentTime;
+
+    // Update all sprite animations
+    for (const instanceId of this.entitySpriteInstances.values()) {
+      this.pixelLabLoader.updateAnimation(instanceId, deltaTime);
+    }
 
     // Update camera
     this.camera.update();

@@ -145,6 +145,144 @@ type PlotTrigger =
 
 ---
 
+### Phase 2.5: Retroactive Plot Recognition (Week 2.5)
+**Goal:** Recognize plots that emerged organically from gameplay, after the fact
+
+Sometimes narratives emerge naturally - an agent builds trust with someone, gets betrayed, experiences trauma - without any plot being assigned. This phase adds the ability to recognize these emergent patterns and optionally award lessons or formalize them.
+
+| Task | Complexity | Files |
+|------|------------|-------|
+| Create EventStreamComponent | Simple | `EventStreamComponent.ts` |
+| Define PlotRecognitionRule types | Medium | `PlotTypes.ts` |
+| Create PlotRecognitionSystem | Complex | `PlotRecognitionSystem.ts` |
+| Add recognition rules to templates | Simple | `PlotTypes.ts` |
+| Integrate with lesson awarding | Medium | Integration |
+
+**New Types:**
+```typescript
+// Event stream stored on entities for pattern matching
+interface EventStreamComponent {
+  type: ComponentType.EventStream;
+  events: StreamedEvent[];
+  max_events: number;                 // Rolling window (e.g., 1000)
+  recognized_patterns: string[];      // Don't double-recognize
+}
+
+interface StreamedEvent {
+  tick: number;
+  event_type: 'trauma' | 'relationship_change' | 'emotional_shift' |
+              'death_nearby' | 'skill_gain' | 'breakdown' | 'recovery';
+  data: Record<string, any>;
+  involved_agents?: string[];
+}
+
+// Recognition rules (can be attached to plot templates)
+interface PlotRecognitionRule {
+  template_id: string;
+  event_sequence: EventPattern[];     // Ordered sequence to match
+  max_duration?: number;              // Must happen within X ticks
+  on_recognition: 'award_lesson' | 'assign_at_current_stage' | 'narrate_only';
+}
+
+interface EventPattern {
+  event_type: string;
+  constraints: Record<string, any>;   // e.g., { trauma_type: 'betrayal' }
+  binds_role?: string;                // Dynamically bind the agent involved
+}
+```
+
+**Recognition Examples:**
+```typescript
+// Betrayal Arc - recognized after the fact
+const betrayalRecognition: PlotRecognitionRule = {
+  template_id: 'betrayal_arc',
+  event_sequence: [
+    {
+      event_type: 'relationship_milestone',
+      constraints: { trust_crossed: 70, direction: 'up' },
+      binds_role: 'betrayer'
+    },
+    {
+      event_type: 'relationship_change',
+      constraints: { trust_delta_min: -40, role: 'betrayer' }
+    },
+    {
+      event_type: 'trauma',
+      constraints: { trauma_type: 'betrayal' }
+    }
+  ],
+  max_duration: 500,
+  on_recognition: 'award_lesson'  // They lived it, they learned it
+};
+
+// Grief Journey - recognized when someone mourns naturally
+const griefRecognition: PlotRecognitionRule = {
+  template_id: 'grief_journey',
+  event_sequence: [
+    {
+      event_type: 'death_nearby',
+      constraints: { relationship_min_trust: 50 },
+      binds_role: 'deceased'
+    },
+    {
+      event_type: 'emotional_shift',
+      constraints: { to_state: 'despairing' }
+    },
+    {
+      event_type: 'recovery',
+      constraints: { from_breakdown: true }
+    }
+  ],
+  max_duration: 2000,
+  on_recognition: 'award_lesson'
+};
+```
+
+**Recognition Flow:**
+```
+┌─────────────────────────────────────────────────────────┐
+│  EVENTS HAPPEN NATURALLY                                │
+│  - Agent builds trust with friend                       │
+│  - Friend steals from them                              │
+│  - Trust drops, trauma added                            │
+│  - Agent experiences emotional shift                    │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│  EVENT STREAM COMPONENT                                 │
+│  - Stores rolling window of recent events               │
+│  - Each event tagged with tick, type, involved agents   │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│  PLOT RECOGNITION SYSTEM (runs periodically)            │
+│  - Scans event history against recognition rules        │
+│  - Matches sequences with time constraints              │
+│  - Binds roles from matched events                      │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│  ON RECOGNITION                                         │
+│  - 'award_lesson': Grant wisdom directly                │
+│  - 'assign_at_current_stage': Formalize the plot        │
+│  - 'narrate_only': Just log for narrative summaries     │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Why This Matters:**
+- **Emergent Storytelling**: The game recognizes meaningful stories that happened naturally
+- **No Forced Feeling**: Plots don't feel "assigned" - they emerged from life
+- **Wisdom From Experience**: Souls learn lessons from living, not just assigned arcs
+- **Rich Narrative Summaries**: "Looking back, this was a grief journey"
+- **Player Discovery**: "Wait, that was a plot? It just... happened!"
+
+**Deliverable:** Agents who naturally experience a betrayal arc (built trust → trust dropped → trauma) get recognized and can learn the lesson without ever having a plot formally assigned.
+
+---
+
 ### Phase 3: Plot Composition (Week 3)
 **Goal:** Epic plots can spawn/track child plots
 
