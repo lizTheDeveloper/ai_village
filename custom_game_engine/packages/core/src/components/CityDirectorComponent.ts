@@ -20,6 +20,7 @@
 
 import type { Component } from '../ecs/Component.js';
 import type { StrategicPriorities } from './AgentComponent.js';
+import type { ProfessionRole, ProfessionOutput } from './ProfessionComponent.js';
 
 /**
  * City stats that inform the City Director's decisions.
@@ -112,6 +113,50 @@ export interface CityDirectorComponent extends Component {
 
   // Agent roster - IDs of agents in this city
   agentIds: string[];
+
+  // Profession management (for background simulation)
+  /** Desired number of agents per profession role */
+  professionQuotas: Partial<Record<ProfessionRole, number>>;
+
+  /** IDs of agents by profession role (for quick lookup) */
+  professionRoster: Partial<Record<ProfessionRole, string[]>>;
+
+  /** Aggregated profession outputs (cached for performance) */
+  professionOutputs: {
+    /** Recent news articles from reporters */
+    newsArticles: ProfessionOutput[];
+    /** Completed TV episodes from actors/crew */
+    tvEpisodes: ProfessionOutput[];
+    /** Radio broadcasts from DJs */
+    radioBroadcasts: ProfessionOutput[];
+    /** Generic service outputs (doctors, teachers, etc.) */
+    services: ProfessionOutput[];
+  };
+
+  /** Last tick when profession outputs were aggregated */
+  lastProfessionUpdate: number;
+
+  /** Content production metrics (for analytics/UI) */
+  professionMetrics?: {
+    /** Total content produced all-time */
+    totalArticles: number;
+    totalTVEpisodes: number;
+    totalRadioShows: number;
+    totalServices: number;
+
+    /** Production rate (per game day) */
+    articlesPerDay: number;
+    tvEpisodesPerDay: number;
+    radioShowsPerDay: number;
+
+    /** Average quality (0.0-1.0) */
+    avgArticleQuality: number;
+    avgTVQuality: number;
+    avgRadioQuality: number;
+
+    /** Last update tick */
+    lastMetricsUpdate: number;
+  };
 }
 
 /**
@@ -166,6 +211,28 @@ export function createCityDirectorComponent(
     useLLM,
     pendingDecision: false,
     agentIds: [],
+    professionQuotas: {},
+    professionRoster: {},
+    professionOutputs: {
+      newsArticles: [],
+      tvEpisodes: [],
+      radioBroadcasts: [],
+      services: [],
+    },
+    lastProfessionUpdate: 0,
+    professionMetrics: {
+      totalArticles: 0,
+      totalTVEpisodes: 0,
+      totalRadioShows: 0,
+      totalServices: 0,
+      articlesPerDay: 0,
+      tvEpisodesPerDay: 0,
+      radioShowsPerDay: 0,
+      avgArticleQuality: 0,
+      avgTVQuality: 0,
+      avgRadioQuality: 0,
+      lastMetricsUpdate: 0,
+    },
   };
 }
 

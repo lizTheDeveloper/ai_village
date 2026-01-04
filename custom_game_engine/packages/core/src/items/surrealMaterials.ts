@@ -1135,6 +1135,917 @@ const WATER_MATERIAL: ItemDefinition = defineItem(
 );
 
 // ============================================================================
+// FANTASY & SCI-FI MATERIALS - Legendary Metals
+// ============================================================================
+
+const MITHRIL: ItemDefinition = defineItem(
+  'material:mithril',
+  'Mithril',
+  'material',
+  {
+    weight: 0.5,
+    stackSize: 15,
+    baseMaterial: 'metal',
+    isGatherable: true,
+    gatherSources: ['deep_mine', 'dwarven_ruins', 'ancient_vein'],
+    requiredTool: 'legendary_pickaxe',
+    baseValue: 2500,
+    rarity: 'legendary',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: 0,
+        hostility: 0,
+        aestheticDescription: 'Silvery-white metal with faint blue moonlight glow, incredibly light yet stronger than steel',
+        isBuildingMaterial: true,
+        structuralStrength: 90,
+        temperatureResistance: 85,
+        moistureResistance: 100,
+      },
+      magical: {
+        effects: ['magic_conductivity', 'never_tarnish'],
+        passive: true,
+        school: 'artifice',
+      },
+    },
+  }
+);
+
+const ADAMANTINE: ItemDefinition = defineItem(
+  'material:adamantine',
+  'Adamantine',
+  'material',
+  {
+    weight: 8.0,
+    stackSize: 10,
+    baseMaterial: 'metal',
+    isGatherable: true,
+    gatherSources: ['volcanic_core', 'meteor_impact', 'plane_of_earth'],
+    requiredTool: 'adamantine_pickaxe',
+    baseValue: 5000,
+    rarity: 'legendary',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: 0,
+        hostility: 0,
+        aestheticDescription: 'Jet black metal with metallic sheen, rings like a bell when struck, nearly indestructible',
+        isBuildingMaterial: true,
+        structuralStrength: 100,
+        temperatureResistance: 100,
+        moistureResistance: 100,
+      },
+    },
+  }
+);
+
+const ORICHALCUM: ItemDefinition = defineItem(
+  'material:orichalcum',
+  'Orichalcum',
+  'material',
+  {
+    weight: 4.5,
+    stackSize: 15,
+    baseMaterial: 'metal',
+    isGatherable: true,
+    gatherSources: ['ancient_ruins', 'underwater_city', 'magical_forge'],
+    baseValue: 800,
+    rarity: 'rare',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: -0.01,
+        hostility: 0,
+        aestheticDescription: 'Red-gold metal, warm to touch, pulses with contained magical energy',
+        isBuildingMaterial: true,
+        structuralStrength: 75,
+        temperatureResistance: 70,
+        moistureResistance: 90,
+      },
+      magical: {
+        effects: ['mana_conductivity', 'self_repair', 'amplification'],
+        passive: true,
+        school: 'artifice',
+      },
+    },
+  }
+);
+
+// ============================================================================
+// FANTASY & SCI-FI MATERIALS - Celestial/Cosmic
+// ============================================================================
+
+const STARMETAL: ItemDefinition = defineItem(
+  'material:starmetal',
+  'Starmetal',
+  'material',
+  {
+    weight: 6.0,
+    stackSize: 12,
+    baseMaterial: 'metal',
+    isGatherable: true,
+    gatherSources: ['meteor_impact', 'fallen_star', 'sky_realm'],
+    baseValue: 1500,
+    rarity: 'epic',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: 0,
+        hostility: 0,
+        aestheticDescription: 'Dark gray metal with iridescent shimmer and tiny star-like sparkles inside',
+        isBuildingMaterial: true,
+        structuralStrength: 85,
+        temperatureResistance: 90,
+        moistureResistance: 95,
+      },
+      magical: {
+        effects: ['anti_magic', 'cosmic_energy'],
+        passive: true,
+        school: 'abjuration',
+      },
+    },
+  }
+);
+
+const STARLIGHT_ESSENCE: ItemDefinition = defineItem(
+  'material:starlight_essence',
+  'Starlight Essence',
+  'material',
+  {
+    weight: 0.05,
+    stackSize: 8,
+    baseMaterial: 'light',
+    isGatherable: false,
+    craftedFrom: [
+      { itemId: 'stellar_radiation', amount: 10 },
+      { itemId: 'mana_crystal', amount: 3 },
+    ],
+    baseValue: 3500,
+    rarity: 'legendary',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: true,
+        isSolid: false,
+        requiresLight: true,
+        decayRate: 0.1,
+        hostility: 0,
+        transmutation: 'decays slowly in darkness, requires starlight exposure',
+        aestheticDescription: 'Liquid silver-white light that flows like water, illuminates without heat',
+        isBuildingMaterial: true,
+        structuralStrength: 15,
+        temperatureResistance: 50,
+        moistureResistance: 100,
+      },
+      magical: {
+        effects: ['eternal_light', 'navigation', 'revelation'],
+        passive: true,
+        school: 'divination',
+      },
+    },
+  }
+);
+
+const VOIDSTONE: ItemDefinition = defineItem(
+  'material:voidstone',
+  'Voidstone',
+  'material',
+  {
+    weight: 0,
+    stackSize: 5,
+    baseMaterial: 'void',
+    isGatherable: true,
+    gatherSources: ['void_rift', 'black_hole', 'entropy_zone', 'universe_edge'],
+    baseValue: 4000,
+    rarity: 'legendary',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: 0,
+        hostility: 0.9,
+        aestheticDescription: 'Absolute black that absorbs all light, creates visual distortion, whispers of nothingness',
+        isBuildingMaterial: true,
+        structuralStrength: 95,
+        temperatureResistance: 100,
+        moistureResistance: 100,
+      },
+      magical: {
+        effects: ['magic_nullification', 'void_field', 'entropy'],
+        passive: true,
+        cursed: false,
+        school: 'abjuration',
+      },
+    },
+  }
+);
+
+// ============================================================================
+// FANTASY & SCI-FI MATERIALS - Creature-Derived
+// ============================================================================
+
+const DRAGONSCALE: ItemDefinition = defineItem(
+  'material:dragonscale',
+  'Dragonscale',
+  'material',
+  {
+    weight: 1.5,
+    stackSize: 15,
+    baseMaterial: 'scale',
+    isGatherable: true,
+    gatherSources: ['dragon_corpse', 'molted_scales', 'dragon_lair'],
+    baseValue: 2000,
+    rarity: 'epic',
+    traits: {
+      material: {
+        isLiving: true,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: -0.01,
+        hostility: 0.2,
+        aestheticDescription: 'Iridescent scales in various colors, warm to touch with faint heartbeat sensation',
+        isBuildingMaterial: true,
+        structuralStrength: 85,
+        temperatureResistance: 95,
+        moistureResistance: 80,
+      },
+      magical: {
+        effects: ['fire_resistance', 'regeneration'],
+        passive: true,
+        school: 'transmutation',
+      },
+    },
+  }
+);
+
+const PHOENIX_ASH: ItemDefinition = defineItem(
+  'material:phoenix_ash',
+  'Phoenix Ash',
+  'material',
+  {
+    weight: 0.1,
+    stackSize: 3,
+    baseMaterial: 'ash',
+    isGatherable: true,
+    gatherSources: ['phoenix_nest', 'volcanic_peak', 'rebirth_site'],
+    baseValue: 10000,
+    rarity: 'mythic',
+    traits: {
+      material: {
+        isLiving: true,
+        isEdible: false,
+        isTransient: true,
+        isSolid: false,
+        requiresHeat: true,
+        decayRate: 0.05,
+        hostility: 0,
+        aestheticDescription: 'Golden-orange ash that glows with inner fire, warm to touch, never fully extinguishes',
+        isBuildingMaterial: true,
+        structuralStrength: 10,
+        temperatureResistance: 100,
+        moistureResistance: -20,
+      },
+      magical: {
+        effects: ['auto_repair', 'resurrection', 'eternal_flame'],
+        charges: 1,
+        rechargeRate: 0,
+        school: 'necromancy',
+        manaCost: 100,
+      },
+    },
+  }
+);
+
+const CHITIN: ItemDefinition = defineItem(
+  'material:chitin',
+  'Chitin Carapace',
+  'material',
+  {
+    weight: 1.0,
+    stackSize: 25,
+    baseMaterial: 'chitin',
+    isGatherable: true,
+    gatherSources: ['giant_insect', 'crab', 'beetle', 'chitinous_creature'],
+    baseValue: 25,
+    rarity: 'uncommon',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: 0.05,
+        hostility: 0,
+        aestheticDescription: 'Brown-black hard shell with segmented plates and organic patterns',
+        isBuildingMaterial: true,
+        structuralStrength: 55,
+        temperatureResistance: 60,
+        moistureResistance: 70,
+      },
+    },
+  }
+);
+
+const ECTOPLASM: ItemDefinition = defineItem(
+  'material:ectoplasm',
+  'Ectoplasm',
+  'material',
+  {
+    weight: 0.3,
+    stackSize: 10,
+    baseMaterial: 'spirit',
+    isGatherable: true,
+    gatherSources: ['ghost', 'haunted_area', 'spirit_realm', 'graveyard'],
+    baseValue: 400,
+    rarity: 'rare',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: true,
+        isSolid: false,
+        requiresDark: true,
+        decayRate: 0.3,
+        hostility: 0.4,
+        transmutation: 'fades in daylight, phases through solid matter',
+        aestheticDescription: 'Translucent green-white mist with cold vapor trails and whispers',
+        isBuildingMaterial: true,
+        structuralStrength: 20,
+        temperatureResistance: -50,
+        moistureResistance: 100,
+      },
+      magical: {
+        effects: ['phase_shift', 'spirit_binding', 'ghost_trap'],
+        charges: 5,
+        rechargeRate: 0.5,
+        school: 'necromancy',
+        manaCost: 10,
+      },
+    },
+  }
+);
+
+// ============================================================================
+// FANTASY & SCI-FI MATERIALS - Gemstones & Crystals
+// ============================================================================
+
+const MOONSTONE: ItemDefinition = defineItem(
+  'material:moonstone',
+  'Moonstone',
+  'material',
+  {
+    weight: 0.6,
+    stackSize: 18,
+    baseMaterial: 'crystal',
+    isGatherable: true,
+    gatherSources: ['lunar_valley', 'night_crystal_cave', 'celestial_realm'],
+    baseValue: 300,
+    rarity: 'rare',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: 0,
+        hostility: 0,
+        aestheticDescription: 'Pearlescent white-blue gemstone, internal light shifts like moon phases',
+        isBuildingMaterial: true,
+        structuralStrength: 50,
+        temperatureResistance: 70,
+        moistureResistance: 90,
+      },
+      magical: {
+        effects: ['night_vision', 'dream_magic', 'lunar_power'],
+        passive: true,
+        school: 'somnomancy',
+      },
+    },
+  }
+);
+
+const SUNSTONE: ItemDefinition = defineItem(
+  'material:sunstone',
+  'Sunstone',
+  'material',
+  {
+    weight: 0.7,
+    stackSize: 18,
+    baseMaterial: 'crystal',
+    isGatherable: true,
+    gatherSources: ['solar_desert', 'volcanic_peak', 'sun_temple'],
+    baseValue: 350,
+    rarity: 'rare',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: 0,
+        hostility: 0,
+        aestheticDescription: 'Orange-gold crystal with internal flame-like patterns, emits warm glow',
+        isBuildingMaterial: true,
+        structuralStrength: 50,
+        temperatureResistance: 90,
+        moistureResistance: 70,
+      },
+      magical: {
+        effects: ['heat_source', 'fire_magic', 'solar_storage'],
+        passive: true,
+        school: 'evocation',
+      },
+    },
+  }
+);
+
+const BLOODSTONE: ItemDefinition = defineItem(
+  'material:bloodstone',
+  'Bloodstone',
+  'material',
+  {
+    weight: 0.8,
+    stackSize: 12,
+    baseMaterial: 'crystal',
+    isGatherable: true,
+    gatherSources: ['battlefield', 'sacrifice_altar', 'dark_ritual_site'],
+    baseValue: 450,
+    rarity: 'rare',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: 0,
+        hostility: 0.6,
+        aestheticDescription: 'Deep red gemstone with black specks, seems perpetually wet, pulses like heartbeat',
+        isBuildingMaterial: true,
+        structuralStrength: 45,
+        temperatureResistance: 60,
+        moistureResistance: 80,
+      },
+      magical: {
+        effects: ['blood_magic', 'life_drain', 'vampiric'],
+        passive: true,
+        cursed: true,
+        school: 'necromancy',
+      },
+    },
+  }
+);
+
+const NULL_CRYSTAL: ItemDefinition = defineItem(
+  'material:null_crystal',
+  'Null Crystal',
+  'material',
+  {
+    weight: 0.4,
+    stackSize: 8,
+    baseMaterial: 'crystal',
+    isGatherable: true,
+    gatherSources: ['anti_magic_zone', 'wild_magic_area', 'dimensional_rift'],
+    baseValue: 1800,
+    rarity: 'epic',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: 0,
+        hostility: 0.3,
+        aestheticDescription: 'Clear crystal with rainbow fractures, creates magic-dead zones around it',
+        isBuildingMaterial: true,
+        structuralStrength: 20,
+        temperatureResistance: 80,
+        moistureResistance: 100,
+      },
+      magical: {
+        effects: ['spell_disruption', 'magic_dampening', 'mage_hunter'],
+        passive: true,
+        school: 'abjuration',
+      },
+    },
+  }
+);
+
+// ============================================================================
+// FANTASY & SCI-FI MATERIALS - Exotic/Unusual
+// ============================================================================
+
+const QUICKSILVER: ItemDefinition = defineItem(
+  'material:quicksilver',
+  'Living Quicksilver',
+  'material',
+  {
+    weight: 4.5,
+    stackSize: 15,
+    baseMaterial: 'mercury',
+    isGatherable: true,
+    gatherSources: ['mercury_pool', 'alchemical_lab', 'cinnabar_mine'],
+    baseValue: 120,
+    rarity: 'uncommon',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: true,
+        isSolid: false,
+        decayRate: 0.2,
+        hostility: 0.7,
+        transmutation: 'flows and reforms constantly, toxic fumes',
+        aestheticDescription: 'Silver liquid metal in constant motion, perfectly reflective, toxic vapors',
+        isBuildingMaterial: true,
+        structuralStrength: 10,
+        temperatureResistance: 60,
+        moistureResistance: 100,
+      },
+    },
+  }
+);
+
+const AETHERIUM: ItemDefinition = defineItem(
+  'material:aetherium',
+  'Aetherium',
+  'material',
+  {
+    weight: 0.2,
+    stackSize: 5,
+    baseMaterial: 'aether',
+    isGatherable: true,
+    gatherSources: ['ley_line_nexus', 'magic_storm', 'planar_tear'],
+    baseValue: 3000,
+    rarity: 'legendary',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: true,
+        isSolid: true,
+        decayRate: 0.4,
+        hostility: 0.8,
+        transmutation: 'unstable form, reality distortion',
+        aestheticDescription: 'Shifting colors with crackling energy, unstable physical form, bends reality',
+        isBuildingMaterial: true,
+        structuralStrength: 30,
+        temperatureResistance: 100,
+        moistureResistance: 100,
+      },
+      magical: {
+        effects: ['perfect_conductivity', 'mana_battery', 'reality_warp'],
+        passive: true,
+        school: 'transmutation',
+        manaCost: 50,
+      },
+    },
+  }
+);
+
+const GRAVITY_STONE: ItemDefinition = defineItem(
+  'material:gravity_stone',
+  'Gravity Stone',
+  'material',
+  {
+    weight: 15.0,
+    stackSize: 8,
+    baseMaterial: 'gravity',
+    isGatherable: true,
+    gatherSources: ['black_hole_evaporation', 'neutron_star_fragment', 'gravity_well'],
+    baseValue: 3500,
+    rarity: 'legendary',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: 0,
+        hostility: 0.5,
+        aestheticDescription: 'Dense dark purple-black stone, warps space visibly, objects orbit it slowly',
+        isBuildingMaterial: true,
+        structuralStrength: 90,
+        temperatureResistance: 100,
+        moistureResistance: 100,
+      },
+      magical: {
+        effects: ['gravity_manipulation', 'mass_control', 'floating'],
+        passive: true,
+        school: 'transmutation',
+      },
+    },
+  }
+);
+
+const PHASE_QUARTZ: ItemDefinition = defineItem(
+  'material:phase_quartz',
+  'Phase Quartz',
+  'material',
+  {
+    weight: 0.5,
+    stackSize: 10,
+    baseMaterial: 'quartz',
+    isGatherable: true,
+    gatherSources: ['dimensional_rift', 'unstable_portal', 'between_space'],
+    baseValue: 2200,
+    rarity: 'epic',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: true,
+        isSolid: true,
+        decayRate: 0.2,
+        hostility: 0.3,
+        transmutation: 'flickers between dimensions, semi-tangible',
+        aestheticDescription: 'Translucent crystal that flickers in and out of reality, exists in superposition',
+        isBuildingMaterial: true,
+        structuralStrength: 40,
+        temperatureResistance: 70,
+        moistureResistance: 90,
+      },
+      magical: {
+        effects: ['dimensional_storage', 'phase_shift', 'teleportation'],
+        charges: 8,
+        rechargeRate: 1,
+        school: 'conjuration',
+        manaCost: 15,
+      },
+    },
+  }
+);
+
+const BIO_LUMINESCENT_SLIME: ItemDefinition = defineItem(
+  'material:bio_luminescent_slime',
+  'Bio-Luminescent Slime',
+  'material',
+  {
+    weight: 0.8,
+    stackSize: 20,
+    baseMaterial: 'slime',
+    isGatherable: true,
+    gatherSources: ['cave', 'swamp', 'underground_fungi', 'slime_creature'],
+    baseValue: 30,
+    rarity: 'uncommon',
+    traits: {
+      material: {
+        isLiving: true,
+        isEdible: true,
+        isTransient: true,
+        isSolid: false,
+        decayRate: 0.15,
+        hostility: 0,
+        aestheticDescription: 'Glowing green-blue gel with pulsing light, sticky texture',
+        isBuildingMaterial: true,
+        structuralStrength: 5,
+        temperatureResistance: 30,
+        moistureResistance: 100,
+      },
+      edible: {
+        hungerRestored: 10,
+        quality: 10,
+        flavors: ['bitter'],
+        spoilRate: 0.2,
+      },
+      magical: {
+        effects: ['light_source'],
+        passive: true,
+      },
+    },
+  }
+);
+
+// ============================================================================
+// FANTASY & SCI-FI MATERIALS - Transformation/Transmutation
+// ============================================================================
+
+const PHILOSOPHERS_STONE_FRAGMENT: ItemDefinition = defineItem(
+  'material:philosophers_stone_fragment',
+  "Philosopher's Stone Fragment",
+  'material',
+  {
+    weight: 0.3,
+    stackSize: 1,
+    baseMaterial: 'philosopher_stone',
+    isGatherable: false,
+    craftedFrom: [
+      { itemId: 'grand_transmutation', amount: 1 },
+      { itemId: 'immortality_elixir', amount: 10 },
+      { itemId: 'material:orichalcum', amount: 50 },
+    ],
+    baseValue: 15000,
+    rarity: 'mythic',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: 0,
+        hostility: 0,
+        aestheticDescription: 'Red crystalline stone with warm glow, reality ripples around it',
+        isBuildingMaterial: false,
+        structuralStrength: 50,
+        temperatureResistance: 100,
+        moistureResistance: 100,
+      },
+      magical: {
+        effects: ['transmutation', 'gold_creation', 'life_extension'],
+        charges: 100,
+        rechargeRate: 0,
+        school: 'transmutation',
+        manaCost: 100,
+      },
+    },
+  }
+);
+
+const MORPHIC_CLAY: ItemDefinition = defineItem(
+  'material:morphic_clay',
+  'Morphic Clay',
+  'material',
+  {
+    weight: 2.5,
+    stackSize: 20,
+    baseMaterial: 'clay',
+    isGatherable: true,
+    gatherSources: ['chaos_realm', 'wild_magic_zone', 'polymorph_accident'],
+    baseValue: 350,
+    rarity: 'rare',
+    traits: {
+      material: {
+        isLiving: true,
+        isEdible: false,
+        isTransient: true,
+        isSolid: true,
+        decayRate: 0.1,
+        hostility: 0.2,
+        transmutation: 'shape-shifts into any form, remembers shapes',
+        aestheticDescription: 'Gray amorphous blob constantly shifting, absorbs and mimics colors',
+        isBuildingMaterial: true,
+        structuralStrength: 40,
+        temperatureResistance: 60,
+        moistureResistance: 50,
+      },
+      magical: {
+        effects: ['shapeshifting', 'mimicry', 'adaptive_form'],
+        passive: true,
+        school: 'transmutation',
+      },
+    },
+  }
+);
+
+const CHRONIUM: ItemDefinition = defineItem(
+  'material:chronium',
+  'Chronium',
+  'material',
+  {
+    weight: 3.5,
+    stackSize: 8,
+    baseMaterial: 'time',
+    isGatherable: true,
+    gatherSources: ['temporal_anomaly', 'time_storm', 'collapsed_timeline'],
+    baseValue: 4500,
+    rarity: 'legendary',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: true,
+        isSolid: true,
+        decayRate: 0.15,
+        hostility: 0.4,
+        transmutation: 'non-linear aging, temporal distortions',
+        aestheticDescription: 'Silver-gold metal with rippling temporal distortions, ages paradoxically',
+        isBuildingMaterial: true,
+        structuralStrength: 70,
+        temperatureResistance: 80,
+        moistureResistance: 80,
+      },
+      magical: {
+        effects: ['time_manipulation', 'temporal_stasis', 'age_control'],
+        charges: 10,
+        rechargeRate: 0.1,
+        school: 'chronurgy',
+        manaCost: 50,
+      },
+    },
+  }
+);
+
+// ============================================================================
+// FANTASY & SCI-FI MATERIALS - Natural/Environmental
+// ============================================================================
+
+const OBSIDIAN: ItemDefinition = defineItem(
+  'material:obsidian',
+  'Obsidian',
+  'material',
+  {
+    weight: 2.8,
+    stackSize: 25,
+    baseMaterial: 'volcanic_glass',
+    isGatherable: true,
+    gatherSources: ['volcano', 'lava_flow', 'obsidian_field'],
+    baseValue: 35,
+    rarity: 'uncommon',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: 0,
+        hostility: 0.4,
+        aestheticDescription: 'Jet black volcanic glass with mirror finish and razor-sharp edges',
+        isBuildingMaterial: true,
+        structuralStrength: 25,
+        temperatureResistance: 85,
+        moistureResistance: 100,
+      },
+    },
+  }
+);
+
+const PETRIFIED_WOOD: ItemDefinition = defineItem(
+  'material:petrified_wood',
+  'Petrified Wood',
+  'material',
+  {
+    weight: 3.2,
+    stackSize: 30,
+    baseMaterial: 'fossil',
+    isGatherable: true,
+    gatherSources: ['ancient_forest', 'fossil_bed', 'petrified_forest'],
+    baseValue: 20,
+    rarity: 'uncommon',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: 0,
+        hostility: 0,
+        aestheticDescription: 'Wood grain pattern preserved in stone, earth tones, ancient historical feel',
+        isBuildingMaterial: true,
+        structuralStrength: 70,
+        temperatureResistance: 100,
+        moistureResistance: 100,
+      },
+    },
+  }
+);
+
+const LIVING_VINE_MATERIAL: ItemDefinition = defineItem(
+  'material:living_vine',
+  'Living Vine',
+  'material',
+  {
+    weight: 0.5,
+    stackSize: 40,
+    baseMaterial: 'plant',
+    isGatherable: true,
+    gatherSources: ['jungle', 'overgrown_ruins', 'vine_forest'],
+    baseValue: 8,
+    rarity: 'common',
+    traits: {
+      material: {
+        isLiving: true,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        requiresLight: true,
+        decayRate: 0.08,
+        hostility: 0,
+        aestheticDescription: 'Green creeping vines with flowers, grows continuously when planted',
+        isBuildingMaterial: true,
+        structuralStrength: 25,
+        temperatureResistance: -20,
+        moistureResistance: 90,
+      },
+    },
+  }
+);
+
+// ============================================================================
 // EXPORT - DO NOT EXPORT YET! Validators need updating first
 // ============================================================================
 

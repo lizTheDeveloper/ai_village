@@ -87,6 +87,7 @@ export enum ComponentType {
 
   // City Management
   CityDirector = 'city_director',
+  Profession = 'profession',
 
   // Economy & Trade
   Currency = 'currency',

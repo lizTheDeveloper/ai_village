@@ -401,6 +401,14 @@ function createInitialBuildings(world: WorldMutator) {
   storageInventory.slots[0] = { itemId: 'wood', quantity: 50 };
   storageEntity.addComponent(storageInventory);
   (world as any)._addEntity(storageEntity);
+
+  // Research bench for testing research system
+  const researchBenchEntity = new EntityImpl(createEntityId(), (world as any)._tick);
+  researchBenchEntity.addComponent(createBuildingComponent('research-bench', 1, 100));
+  researchBenchEntity.addComponent(createPositionComponent(5, 0));
+  researchBenchEntity.addComponent(createRenderableComponent('research-bench', 'object'));
+  (world as any)._addEntity(researchBenchEntity);
+  console.log('[HeadlessGame] Created research bench at (5, 0) for testing');
 }
 
 function createInitialAgents(world: WorldMutator, agentCount: number = 5) {
@@ -433,6 +441,12 @@ function createInitialAgents(world: WorldMutator, agentCount: number = 5) {
       skills.levels.farming = 3 + Math.floor(Math.random() * 2); // 3-4 farming skill
       skills.levels.gathering = 2 + Math.floor(Math.random() * 2); // 2-3 gathering skill
       skills.levels.building = 1 + Math.floor(Math.random() * 2); // 1-2 building skill
+
+      // Give first agent research skills for testing research system
+      if (i === 0) {
+        skills.levels.research = 3; // Level 3 research (can see and use research action)
+        console.log(`[HeadlessGame] Gave agent ${i} research level 3 for testing`);
+      }
 
       // Update skills component
       agentEntity.updateComponent('skills', () => skills);

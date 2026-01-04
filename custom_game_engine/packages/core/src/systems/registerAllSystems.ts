@@ -102,6 +102,7 @@ import { PublishingProductionSystem } from './PublishingProductionSystem.js';
 import { PublishingUnlockSystem } from './PublishingUnlockSystem.js';
 import { TechnologyUnlockSystem } from './TechnologyUnlockSystem.js';
 import { CityBuildingGenerationSystem } from './CityBuildingGenerationSystem.js';
+import { ProfessionWorkSimulationSystem } from './ProfessionWorkSimulationSystem.js';
 
 // Magic
 import { MagicSystem } from './MagicSystem.js';
@@ -405,6 +406,9 @@ export function registerAllSystems(
 
   const cityBuildingGenerationSystem = new CityBuildingGenerationSystem(eventBus);
   gameLoop.systemRegistry.register(cityBuildingGenerationSystem);
+
+  const professionWorkSimulationSystem = new ProfessionWorkSimulationSystem();
+  gameLoop.systemRegistry.register(professionWorkSimulationSystem);
 
   const publishingProductionSystem = new PublishingProductionSystem(eventBus);
   gameLoop.systemRegistry.register(publishingProductionSystem);

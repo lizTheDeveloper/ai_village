@@ -110,7 +110,7 @@ export class AgentRosterPanel implements IWindowPanel {
    */
   setSelectedAgent(agentId: string | null): void {
     this.selectedAgentId = agentId;
-    this.render();
+    this.updateDOM();
   }
 
   /**
@@ -124,7 +124,7 @@ export class AgentRosterPanel implements IWindowPanel {
         spriteFolder,
         lastInteractionTime: Date.now(),
       });
-      this.render();
+      this.updateDOM();
     }
   }
 
@@ -133,7 +133,7 @@ export class AgentRosterPanel implements IWindowPanel {
    */
   removeAgent(id: string): void {
     this.agents.delete(id);
-    this.render();
+    this.updateDOM();
   }
 
   /**
@@ -143,7 +143,7 @@ export class AgentRosterPanel implements IWindowPanel {
     const agent = this.agents.get(id);
     if (agent) {
       agent.lastInteractionTime = Date.now();
-      this.render();
+      this.updateDOM();
     }
   }
 
@@ -182,7 +182,25 @@ export class AgentRosterPanel implements IWindowPanel {
     }
   }
 
-  private render(): void {
+  /**
+   * IWindowPanel render method (no-op for DOM-based panel)
+   */
+  render(
+    _ctx: CanvasRenderingContext2D,
+    _x: number,
+    _y: number,
+    _width: number,
+    _height: number,
+    _world?: World
+  ): void {
+    // This is a DOM-based panel, not canvas-based
+    // Rendering happens in updateDOM()
+  }
+
+  /**
+   * Update the DOM elements for this roster panel
+   */
+  private updateDOM(): void {
     const agentCount = this.agents.size;
     const showAllButton = agentCount >= 20;
     const maxVisible = showAllButton ? 9 : 20;

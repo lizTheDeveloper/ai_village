@@ -3900,6 +3900,27 @@ async function handleSetNeed(client: WebSocket, params: Record<string, unknown>)
   return sendActionToGame(client, 'set-need', params);
 }
 
+async function handleSetSkill(client: WebSocket, params: Record<string, unknown>) {
+  if (!params.agentId || !params.skill || typeof params.level !== 'number') {
+    throw new Error('Missing required parameters: agentId, skill, level');
+  }
+
+  const validSkills = [
+    'building', 'architecture', 'farming', 'gathering', 'cooking', 'crafting',
+    'social', 'exploration', 'combat', 'hunting', 'stealth', 'animal_handling',
+    'medicine', 'research'
+  ];
+  if (!validSkills.includes(params.skill as string)) {
+    throw new Error(`Invalid skill. Must be one of: ${validSkills.join(', ')}`);
+  }
+
+  if (params.level < 0 || params.level > 5 || !Number.isInteger(params.level)) {
+    throw new Error('Level must be an integer between 0 and 5');
+  }
+
+  return sendActionToGame(client, 'set-skill', params);
+}
+
 async function handleGiveItem(client: WebSocket, params: Record<string, unknown>) {
   if (!params.agentId || !params.itemType) {
     throw new Error('Missing required parameters: agentId, itemType');
@@ -4868,7 +4889,17 @@ AGENT ACTIONS
      - need (string, required): hunger, energy, warmth, social, safety
      - value (number, required): 0.0 to 1.0 (0 = critical, 1 = satisfied)
 
-4. GIVE ITEM TO AGENT
+4. SET AGENT SKILL
+   curl -X POST http://localhost:${HTTP_PORT}/api/actions/set-skill \\
+     -H "Content-Type: application/json" \\
+     -d '{"agentId": "agent_123", "skill": "research", "level": 3}'
+
+   Parameters:
+     - agentId (string, required): Target agent
+     - skill (string, required): building, architecture, farming, gathering, cooking, crafting, social, exploration, combat, hunting, stealth, animal_handling, medicine, research
+     - level (number, required): 0-5 (0 = no skill, 5 = master)
+
+5. GIVE ITEM TO AGENT
    curl -X POST http://localhost:${HTTP_PORT}/api/actions/give-item \\
      -H "Content-Type: application/json" \\
      -d '{"agentId": "agent_123", "itemType": "wood", "amount": 10}'
@@ -4878,7 +4909,7 @@ AGENT ACTIONS
      - itemType (string, required): Item type ID
      - amount (number, optional): Quantity (default: 1)
 
-5. TRIGGER BEHAVIOR
+6. TRIGGER BEHAVIOR
    curl -X POST http://localhost:${HTTP_PORT}/api/actions/trigger-behavior \\
      -H "Content-Type: application/json" \\
      -d '{"agentId": "agent_123", "behavior": "gather", "target": "tree_456"}'
@@ -4892,7 +4923,7 @@ AGENT ACTIONS
 WORLD ACTIONS
 ================================================================================
 
-6. SET GAME SPEED
+7. SET GAME SPEED
    curl -X POST http://localhost:${HTTP_PORT}/api/actions/set-speed \\
      -H "Content-Type: application/json" \\
      -d '{"speed": 2.0}'
@@ -4900,7 +4931,7 @@ WORLD ACTIONS
    Parameters:
      - speed (number, required): 0.1 to 10.0 (1.0 = normal)
 
-7. PAUSE/RESUME GAME
+8. PAUSE/RESUME GAME
    curl -X POST http://localhost:${HTTP_PORT}/api/actions/pause \\
      -H "Content-Type: application/json" \\
      -d '{"paused": true}'
@@ -4908,7 +4939,7 @@ WORLD ACTIONS
    Parameters:
      - paused (boolean, required): true = pause, false = resume
 
-8. SPAWN ENTITY
+9. SPAWN ENTITY
    curl -X POST http://localhost:${HTTP_PORT}/api/actions/spawn-entity \\
      -H "Content-Type: application/json" \\
      -d '{"type": "tree", "x": 20, "y": 20}'
@@ -4922,16 +4953,16 @@ WORLD ACTIONS
 MAGIC/DIVINITY ACTIONS
 ================================================================================
 
-9. GRANT SPELL
-   curl -X POST http://localhost:${HTTP_PORT}/api/actions/grant-spell \\
-     -H "Content-Type: application/json" \\
-     -d '{"agentId": "agent_123", "spellId": "fireball"}'
+10. GRANT SPELL
+    curl -X POST http://localhost:${HTTP_PORT}/api/actions/grant-spell \\
+      -H "Content-Type: application/json" \\
+      -d '{"agentId": "agent_123", "spellId": "fireball"}'
 
-   Parameters:
-     - agentId (string, required): Target agent
-     - spellId (string, required): Spell to grant
+    Parameters:
+      - agentId (string, required): Target agent
+      - spellId (string, required): Spell to grant
 
-10. ADD BELIEF
+11. ADD BELIEF
     curl -X POST http://localhost:${HTTP_PORT}/api/actions/add-belief \\
       -H "Content-Type: application/json" \\
       -d '{"deityId": "deity_123", "amount": 100}'
@@ -4940,7 +4971,7 @@ MAGIC/DIVINITY ACTIONS
       - deityId (string, required): Target deity
       - amount (number, required): Belief points to add
 
-11. CREATE DEITY
+12. CREATE DEITY
     curl -X POST http://localhost:${HTTP_PORT}/api/actions/create-deity \\
       -H "Content-Type: application/json" \\
       -d '{"name": "Gaia", "domain": "nature", "controller": "player"}'
@@ -5015,6 +5046,9 @@ NOTES
             break;
           case 'set-need':
             result = await handleSetNeed(gameClient, params);
+            break;
+          case 'set-skill':
+            result = await handleSetSkill(gameClient, params);
             break;
           case 'give-item':
             result = await handleGiveItem(gameClient, params);

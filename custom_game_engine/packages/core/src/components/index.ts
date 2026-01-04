@@ -417,6 +417,26 @@ export type {
   DirectorReasoning,
 } from './CityDirectorComponent.js';
 
+// Profession Component (Background profession simulation)
+export * from './ProfessionComponent.js';
+export {
+  createProfessionComponent,
+  isWorkTime,
+  calculateOutputQuality,
+  addProfessionOutput,
+  startProfessionWork,
+  updateWorkProgress,
+  isWorkComplete,
+  getProfessionCategory,
+  getAverageOutputQuality,
+} from './ProfessionComponent.js';
+export type {
+  ProfessionComponent,
+  ProfessionRole,
+  WorkShift,
+  ProfessionOutput,
+} from './ProfessionComponent.js';
+
 // Realm Components (full exports)
 export * from './RealmComponent.js';
 export * from './PortalComponent.js';

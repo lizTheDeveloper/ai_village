@@ -106,6 +106,8 @@ export class LiveEntityAPI {
         return this.handleApproveCreation(action);
       case 'reject-creation':
         return this.handleRejectCreation(action);
+      case 'set-skill':
+        return this.handleSetSkill(action);
       default:
         return {
           requestId: action.requestId,
@@ -158,6 +160,68 @@ export class LiveEntityAPI {
       requestId: action.requestId,
       success: true,
       data: { agentId, config: agent.customLLM },
+    };
+  }
+
+  /**
+   * Handle set-skill action
+   */
+  private handleSetSkill(action: ActionRequest): ActionResponse {
+    const { agentId, skill, level } = action.params;
+
+    if (!agentId || typeof agentId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid agentId parameter',
+      };
+    }
+
+    if (!skill || typeof skill !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid skill parameter',
+      };
+    }
+
+    if (typeof level !== 'number' || level < 0 || level > 5 || !Number.isInteger(level)) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Level must be an integer between 0 and 5',
+      };
+    }
+
+    const entity = this.world.getEntity(agentId);
+    if (!entity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity not found: ${agentId}`,
+      };
+    }
+
+    const skills = entity.components.get('skills') as { levels?: Record<string, number> } | undefined;
+    if (!skills) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${agentId} does not have skills component`,
+      };
+    }
+
+    if (!skills.levels) {
+      skills.levels = {};
+    }
+
+    // Set the skill level
+    skills.levels[skill] = level;
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { agentId, skill, level },
     };
   }
 

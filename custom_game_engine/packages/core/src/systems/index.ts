@@ -48,6 +48,10 @@ export * from './GovernanceDataSystem.js';
 export * from './CityDirectorSystem.js';
 export { CityDirectorSystem, DEFAULT_CITY_DIRECTOR_CONFIG } from './CityDirectorSystem.js';
 export type { CityDirectorSystemConfig } from './CityDirectorSystem.js';
+// Profession Work Simulation (Background profession simulation for NPC cities)
+export * from './ProfessionWorkSimulationSystem.js';
+export { ProfessionWorkSimulationSystem, DEFAULT_PROFESSION_WORK_CONFIG } from './ProfessionWorkSimulationSystem.js';
+export type { ProfessionWorkConfig } from './ProfessionWorkSimulationSystem.js';
 // Economy & Trading
 export * from './TradingSystem.js';
 export * from './MarketEventSystem.js';

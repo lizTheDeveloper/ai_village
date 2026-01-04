@@ -18,6 +18,7 @@ export * from './GhostRenderer.js';
 export * from './AgentInfoPanel.js';
 export * from './AgentRosterPanel.js';
 export * from './AnimalInfoPanel.js';
+export * from './AnimalRosterPanel.js';
 export * from './TileInspectorPanel.js';
 export * from './PlantInfoPanel.js';
 export * from './ResourcesPanel.js';
