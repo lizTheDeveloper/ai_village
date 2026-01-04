@@ -133,7 +133,7 @@ function chooseDreamType(wisdom: number, incarnationNumber: number): SoulDreamTy
  * Generate past life echo dream
  */
 function generatePastLifeEcho(
-  soul: Entity,
+  _soul: Entity,
   thread: SilverThreadComponent,
   identity: SoulIdentityComponent
 ): SoulDream {
@@ -153,6 +153,13 @@ function generatePastLifeEcho(
   }
 
   const event = pastEvents[Math.floor(Math.random() * pastEvents.length)];
+  if (!event) {
+    return {
+      type: 'past_life_echo',
+      content: 'You dream of fog and shadows, shapes you almost recognize but cannot quite recall...',
+      intensity: 0.3,
+    };
+  }
 
   return {
     type: 'past_life_echo',
@@ -166,7 +173,7 @@ function generatePastLifeEcho(
  * Generate wisdom hint dream
  */
 function generateWisdomHint(
-  soul: Entity,
+  _soul: Entity,
   identity: SoulIdentityComponent
 ): SoulDream {
   // Pick a random lesson learned
@@ -179,6 +186,13 @@ function generateWisdomHint(
   }
 
   const lesson = identity.lessons_learned[Math.floor(Math.random() * identity.lessons_learned.length)];
+  if (!lesson) {
+    return {
+      type: 'wisdom_hint',
+      content: 'You dream of a quiet voice offering guidance, but you cannot quite make out the words...',
+      intensity: 0.4,
+    };
+  }
 
   return {
     type: 'wisdom_hint',
@@ -207,6 +221,13 @@ function generatePropheticVision(
 
   // Pick a random active plot
   const plot = plotLines.active[Math.floor(Math.random() * plotLines.active.length)];
+  if (!plot) {
+    return {
+      type: 'prophetic_vision',
+      content: 'You dream of paths not yet taken, choices that lie ahead in the mist...',
+      intensity: 0.7,
+    };
+  }
 
   return {
     type: 'prophetic_vision',
@@ -219,7 +240,7 @@ function generatePropheticVision(
  * Generate ancestral memory dream (deep soul history)
  */
 function generateAncestralMemory(
-  soul: Entity,
+  _soul: Entity,
   thread: SilverThreadComponent,
   identity: SoulIdentityComponent
 ): SoulDream {
@@ -234,7 +255,7 @@ function generateAncestralMemory(
  * Generate lesson reminder dream
  */
 function generateLessonReminder(
-  soul: Entity,
+  _soul: Entity,
   identity: SoulIdentityComponent
 ): SoulDream {
   if (identity.lessons_learned.length === 0) {
@@ -247,6 +268,13 @@ function generateLessonReminder(
 
   // Pick most recent lesson
   const lesson = identity.lessons_learned[identity.lessons_learned.length - 1];
+  if (!lesson) {
+    return {
+      type: 'lesson_reminder',
+      content: 'You dream of lessons yet to be learned, knowledge waiting to be discovered...',
+      intensity: 0.5,
+    };
+  }
 
   return {
     type: 'lesson_reminder',

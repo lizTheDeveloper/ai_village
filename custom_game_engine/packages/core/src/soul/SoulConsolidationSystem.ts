@@ -86,7 +86,7 @@ export class SoulConsolidationSystem implements System {
     agent: Entity,
     soul: Entity,
     episodicMemory: EpisodicMemoryComponent,
-    world: World
+    _world: World
   ): Array<{ type: SignificantEventType; details: Record<string, any> }> {
     const events: Array<{ type: SignificantEventType; details: Record<string, any> }> = [];
 
@@ -128,21 +128,21 @@ export class SoulConsolidationSystem implements System {
    * Extract plot-relevant events (stage changes, plot completion)
    */
   private extractPlotEvents(
-    memories: Memory[],
-    plotLines: PlotLinesComponent
+    memories: EpisodicMemory[],
+    _plotLines: PlotLinesComponent
   ): Array<{ type: SignificantEventType; details: Record<string, any> }> {
     const events: Array<{ type: SignificantEventType; details: Record<string, any> }> = [];
 
     // Look for memories about plot progression
     for (const memory of memories) {
       // Check if memory is tagged as plot-relevant
-      if (memory.content.includes('plot') || memory.content.includes('quest') || memory.content.includes('goal')) {
+      if (memory.summary.includes('plot') || memory.summary.includes('quest') || memory.summary.includes('goal')) {
         // This is a simple heuristic - in practice, plot events should be explicitly tagged
         events.push({
           type: 'plot_stage_change',
           details: {
             memory_id: memory.id,
-            description: memory.content,
+            description: memory.summary,
             importance: memory.importance,
           },
         });
@@ -156,13 +156,13 @@ export class SoulConsolidationSystem implements System {
    * Extract major life milestones (marriage, parenthood, leadership)
    */
   private extractMilestones(
-    memories: Memory[],
-    agent: Entity
+    memories: EpisodicMemory[],
+    _agent: Entity
   ): Array<{ type: SignificantEventType; details: Record<string, any> }> {
     const events: Array<{ type: SignificantEventType; details: Record<string, any> }> = [];
 
     for (const memory of memories) {
-      const content = memory.content.toLowerCase();
+      const content = memory.summary.toLowerCase();
 
       // Marriage
       if (content.includes('married') || content.includes('wedding')) {
@@ -170,7 +170,7 @@ export class SoulConsolidationSystem implements System {
           type: 'major_milestone',
           details: {
             milestone_type: 'marriage',
-            description: memory.content,
+            description: memory.summary,
           },
         });
       }
@@ -181,7 +181,7 @@ export class SoulConsolidationSystem implements System {
           type: 'major_milestone',
           details: {
             milestone_type: 'parenthood',
-            description: memory.content,
+            description: memory.summary,
           },
         });
       }
@@ -192,7 +192,7 @@ export class SoulConsolidationSystem implements System {
           type: 'major_milestone',
           details: {
             milestone_type: 'leadership',
-            description: memory.content,
+            description: memory.summary,
           },
         });
       }
@@ -205,12 +205,12 @@ export class SoulConsolidationSystem implements System {
    * Extract meaningful choices (betrayal, sacrifice, forgiveness)
    */
   private extractMeaningfulChoices(
-    memories: Memory[]
+    memories: EpisodicMemory[]
   ): Array<{ type: SignificantEventType; details: Record<string, any> }> {
     const events: Array<{ type: SignificantEventType; details: Record<string, any> }> = [];
 
     for (const memory of memories) {
-      const content = memory.content.toLowerCase();
+      const content = memory.summary.toLowerCase();
 
       // High-importance memories with choice keywords
       if (memory.importance > 0.7) {
@@ -218,7 +218,7 @@ export class SoulConsolidationSystem implements System {
           events.push({
             type: 'meaningful_choice',
             details: {
-              description: memory.content,
+              description: memory.summary,
               importance: memory.importance,
             },
           });
@@ -233,21 +233,21 @@ export class SoulConsolidationSystem implements System {
    * Extract first-time significant events (first love, first kill, first loss)
    */
   private extractFirstTimeEvents(
-    memories: Memory[],
-    agent: Entity,
-    soul: Entity
+    memories: EpisodicMemory[],
+    _agent: Entity,
+    _soul: Entity
   ): Array<{ type: SignificantEventType; details: Record<string, any> }> {
     const events: Array<{ type: SignificantEventType; details: Record<string, any> }> = [];
 
     for (const memory of memories) {
-      const content = memory.content.toLowerCase();
+      const content = memory.summary.toLowerCase();
 
       // First-time significant events
       if (content.includes('first') && memory.importance > 0.6) {
         events.push({
           type: 'first_time_event',
           details: {
-            description: memory.content,
+            description: memory.summary,
             importance: memory.importance,
           },
         });
