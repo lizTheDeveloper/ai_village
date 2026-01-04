@@ -2996,13 +2996,30 @@ async function main() {
   (gameLoop.world as any).setTerrainGenerator(terrainGenerator);
 
   // Initialize divine configuration for this universe
-  // Uses 'high_fantasy' preset for accessible divine powers
+  // Map magic spectrum preset to divine preset for consistent worldbuilding
+  const magicToDivinePresetMap: Record<string, 'high_fantasy' | 'low_fantasy' | 'grimdark' | 'mythic' | 'monotheistic' | 'animistic' | 'deistic' | 'chaotic' | 'dying_gods' | 'ascendant' | 'balanced'> = {
+    'mundane': 'deistic',          // No magic = distant gods
+    'low_fantasy': 'low_fantasy',  // Rare magic = distant gods
+    'classic_fantasy': 'balanced', // Standard D&D-style
+    'mythic': 'high_fantasy',      // Gods walk among mortals
+    'shinto_animism': 'animistic', // Many spirits
+    'hard_magic': 'balanced',      // Magic as science, normal gods
+    'literary_surrealism': 'chaotic', // Reality is flexible
+    'wild_magic': 'chaotic',       // Unpredictable
+    'dead_magic': 'dying_gods',    // Magic fading = gods fading
+    'ai_village': 'high_fantasy',  // Rich experience
+  };
+  const selectedMagicPreset = universeConfigScreen
+    ? (universeConfigScreen as any).selectedSpectrumPreset ?? 'ai_village'
+    : 'ai_village';
+  const divinePreset = magicToDivinePresetMap[selectedMagicPreset] ?? 'balanced';
   const divineConfig = createUniverseConfig(
     gameLoop.universeId,
     'Main Universe',
-    'high_fantasy'  // Gods are powerful and active, cheap divine powers
+    divinePreset
   );
   (gameLoop.world as any).setDivineConfig(divineConfig);
+  console.log(`[Demo] Divine config set: ${divinePreset} (from magic: ${selectedMagicPreset})`);
 
   // Create notification system
   const notificationEl = document.createElement('div');
@@ -3284,12 +3301,28 @@ async function main() {
     const playerDeityId = await createPlayerDeity(gameLoop.world);
     console.log('[Demo] Player deity created:', playerDeityId); // Create player deity for belief system
 
-    // Set all agents to believe in the player deity
+    // Set the 2 most spiritual agents to believe in the player deity
     const agents = gameLoop.world.query().with('agent').executeEntities();
-    for (const agent of agents) {
-      const spiritual = agent.components.get('spiritual');
+    const agentsWithSpirituality = agents
+      .map(agent => {
+        const spiritual = agent.components.get('spiritual') as any;
+        return {
+          agent,
+          spirituality: spiritual?.spirituality ?? 0,
+        };
+      })
+      .filter(a => a.spirituality > 0)
+      .sort((a, b) => b.spirituality - a.spirituality);
+
+    // Only the top 2 most spiritual agents believe in the player deity initially
+    const believersCount = Math.min(2, agentsWithSpirituality.length);
+    for (let i = 0; i < believersCount; i++) {
+      const { agent } = agentsWithSpirituality[i];
+      const spiritual = agent.components.get('spiritual') as any;
       if (spiritual) {
-        (spiritual as any).believedDeity = playerDeityId;
+        spiritual.believedDeity = playerDeityId;
+        const identity = agent.components.get('identity') as any;
+        console.log(`[Demo] ${identity?.name ?? agent.id} believes in the player deity (spirituality: ${spiritual.spirituality})`);
       }
     }
 
