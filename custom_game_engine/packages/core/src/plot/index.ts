@@ -52,9 +52,9 @@ export {
 
 // Plot Condition Evaluator (Phase 1)
 export {
-  evaluateCondition,
-  evaluateTransitionConditions,
-  createConditionContext,
+  evaluatePlotCondition,
+  evaluatePlotTransitionConditions,
+  createPlotConditionContext,
 } from './PlotConditionEvaluator.js';
 
 // Plot Effect Executor (Phase 1)

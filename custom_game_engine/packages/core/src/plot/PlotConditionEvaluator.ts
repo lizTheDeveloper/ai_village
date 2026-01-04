@@ -9,19 +9,18 @@
  */
 
 import type { World } from '../ecs/World.js';
-import type { Entity } from '../ecs/Entity.js';
 import type {
   PlotCondition,
   PlotConditionContext,
   PlotLineInstance,
 } from './PlotTypes.js';
 import type { MoodComponent } from '../components/MoodComponent.js';
-import type { RelationshipComponent, Relationship } from '../components/RelationshipComponent.js';
+import type { RelationshipComponent } from '../components/RelationshipComponent.js';
 
 /**
  * Evaluate a single plot condition
  */
-export function evaluateCondition(
+export function evaluatePlotCondition(
   condition: PlotCondition,
   context: PlotConditionContext
 ): boolean {
@@ -294,15 +293,15 @@ export function evaluateCondition(
     // Structural Conditions
     // ========================================================================
     case 'not': {
-      return !evaluateCondition(condition.condition, context);
+      return !evaluatePlotCondition(condition.condition, context);
     }
 
     case 'all': {
-      return condition.conditions.every((c) => evaluateCondition(c, context));
+      return condition.conditions.every((c) => evaluatePlotCondition(c, context));
     }
 
     case 'any': {
-      return condition.conditions.some((c) => evaluateCondition(c, context));
+      return condition.conditions.some((c) => evaluatePlotCondition(c, context));
     }
 
     default: {
@@ -317,17 +316,17 @@ export function evaluateCondition(
 /**
  * Evaluate all conditions for a transition (AND logic)
  */
-export function evaluateTransitionConditions(
+export function evaluatePlotTransitionConditions(
   conditions: PlotCondition[],
   context: PlotConditionContext
 ): boolean {
-  return conditions.every((condition) => evaluateCondition(condition, context));
+  return conditions.every((condition) => evaluatePlotCondition(condition, context));
 }
 
 /**
  * Create a condition context for evaluation
  */
-export function createConditionContext(
+export function createPlotConditionContext(
   entityId: string,
   plot: PlotLineInstance,
   personalTick: number,
