@@ -49,14 +49,14 @@ describe('SkillTreeManager Integration', () => {
 
   describe('XP granting and progression', () => {
     it('should accumulate XP across multiple grants', () => {
-      // Create test tree
+      // Create test tree with expensive node that won't auto-unlock during test
       const tree = createSkillTree(
         'test-tree',
         'test-paradigm',
         'Test Tree',
         'A test skill tree',
         [
-          createSkillNode('foundation-node', 'Foundation', 'test-paradigm', 'foundation', 0, 100, [
+          createSkillNode('expensive-node', 'Expensive', 'test-paradigm', 'foundation', 0, 500, [
             createSkillEffect('technique_proficiency', 1),
           ]),
         ],
@@ -89,7 +89,7 @@ describe('SkillTreeManager Integration', () => {
       });
       (world as any)._addEntity(entity);
 
-      // Grant XP multiple times
+      // Grant XP multiple times - XP should accumulate since node costs 500
       skillTreeManager.grantSkillXP(entity, 'test-paradigm', 25);
       let magic = entity.getComponent<MagicComponent>(CT.Magic);
       expect(magic?.skillTreeState?.['test-paradigm']?.xp).toBe(25);
@@ -228,12 +228,15 @@ describe('SkillTreeManager Integration', () => {
       });
       (world as any)._addEntity(entity);
 
-      // Listen for event
+      // Listen for event using specific event type
       const events: any[] = [];
-      eventBus.on('*', (event) => events.push(event));
+      eventBus.on('magic:skill_node_unlocked' as any, (event) => events.push(event));
 
       // Unlock node
       skillTreeManager.unlockSkillNode(entity, 'event-paradigm', 'event-node', 30);
+
+      // Flush event queue to dispatch events
+      eventBus.flush();
 
       // Verify event emitted
       const unlockEvent = events.find((e) => e.type === 'magic:skill_node_unlocked');
@@ -387,15 +390,18 @@ describe('SkillTreeManager Integration', () => {
       });
       (world as any)._addEntity(entity);
 
-      // Listen for spell unlock event
+      // Listen for spell unlock event using specific event type
       const events: any[] = [];
-      eventBus.on('*', (event) => events.push(event));
+      eventBus.on('magic:spell_unlocked_from_skill_tree' as any, (event) => events.push(event));
 
       // Unlock node
       skillTreeManager.unlockSkillNode(entity, 'spell-paradigm', 'spell-node', 40);
 
       // Handle the unlock (triggers spell learning)
       skillTreeManager.handleSkillNodeUnlocked(entity, 'spell-paradigm', 'spell-node');
+
+      // Flush event queue to dispatch events
+      eventBus.flush();
 
       // Verify spell unlock event emitted
       const spellEvent = events.find((e) => e.type === 'magic:spell_unlocked_from_skill_tree');

@@ -114,16 +114,22 @@ export class Renderer {
     y: number,
     size: number
   ): boolean {
-    // Get appearance component for sprite lookup
+    // Try to get appearance component first (for agents/humanoids)
     const appearance = entity.components.get('appearance') as AppearanceComponent | undefined;
-    if (!appearance) return false;
+
+    // Try to get animal component if no appearance (for animals)
+    const animal = entity.components.get('animal') as AnimalComponent | undefined;
+
+    if (!appearance && !animal) return false;
 
     // Build traits for sprite lookup
-    const traits: SpriteTraits = {
+    const traits: SpriteTraits = appearance ? {
       species: appearance.species || 'human',
       gender: appearance.gender,
       hairColor: appearance.hairColor,
       skinTone: appearance.skinTone,
+    } : {
+      species: animal!.speciesId, // Use speciesId from animal component
     };
 
     // Find the best matching sprite folder

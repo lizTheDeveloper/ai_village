@@ -7,9 +7,9 @@ import type { EventBus } from '../events/EventBus.js';
 import type { EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
 import type { EventData } from '../events/EventMap.js';
 import { getEpisodicMemory, getSemanticMemory, getReflection } from '../utils/componentHelpers.js';
-import type { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
+import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 import type { SemanticMemoryComponent } from '../components/SemanticMemoryComponent.js';
-import type { ReflectionComponent } from '../components/ReflectionComponent.js';
+import { ReflectionComponent } from '../components/ReflectionComponent.js';
 
 const ONE_DAY_MS = 86400000;
 
@@ -108,7 +108,7 @@ export class ReflectionSystem implements System {
 
           if (trigger.type === 'deep') {
             this._performDeepReflection(
-              agent.id,
+              agent,
               episodicMem,
               semanticMem,
               reflectionComp,
@@ -141,7 +141,7 @@ export class ReflectionSystem implements System {
 
       if (trigger.type === 'daily' || trigger.type === 'post_event') {
         this._performDailyReflection(
-          agentId,
+          entity,
           episodicMem,
           semanticMem,
           reflectionComp,
@@ -149,7 +149,7 @@ export class ReflectionSystem implements System {
         );
       } else if (trigger.type === 'deep') {
         this._performDeepReflection(
-          agentId,
+          entity,
           episodicMem,
           semanticMem,
           reflectionComp,
@@ -163,7 +163,7 @@ export class ReflectionSystem implements System {
   }
 
   private _performDailyReflection(
-    agentId: string,
+    entity: Entity,
     episodicMem: EpisodicMemoryComponent,
     semanticMem: SemanticMemoryComponent,
     reflectionComp: ReflectionComponent,
@@ -180,11 +180,6 @@ export class ReflectionSystem implements System {
       return;
     }
 
-    // Set reflection indicator for UI
-    reflectionComp.isReflecting = true;
-    reflectionComp.reflectionType = 'daily';
-
-
     // Extract themes and insights
     const themes = this._extractThemes(todaysMemories);
     const insights = this._generateInsights(todaysMemories);
@@ -192,23 +187,35 @@ export class ReflectionSystem implements System {
     // Generate reflection text
     const text = this._generateReflectionText(todaysMemories, 'daily');
 
-    // Add reflection
-    reflectionComp.addReflection({
-      type: 'daily',
-      text,
-      timestamp,
-      memoryIds: todaysMemories.map((m) => m.id),
-      insights,
-      themes: themes.length > 0 ? themes : undefined,
+    // Update reflection component (defensive against deserialized components)
+    entity.updateComponent(CT.Reflection, (current: ReflectionComponent) => {
+      const temp = new ReflectionComponent(current);
+      temp.isReflecting = true;
+      temp.reflectionType = 'daily';
+      temp.addReflection({
+        type: 'daily',
+        text,
+        timestamp,
+        memoryIds: todaysMemories.map((m) => m.id),
+        insights,
+        themes: themes.length > 0 ? themes : undefined,
+      });
+      return temp;
     });
 
     // Mark important memories for consolidation
-    for (const memory of todaysMemories) {
-      if (memory.importance > 0.5) {
-        episodicMem.updateMemory(memory.id, {
-          markedForConsolidation: true,
-        });
-      }
+    const importantMemoryIds = todaysMemories
+      .filter(m => m.importance > 0.5)
+      .map(m => m.id);
+
+    if (importantMemoryIds.length > 0) {
+      entity.updateComponent(CT.EpisodicMemory, (current: EpisodicMemoryComponent) => {
+        const temp = new EpisodicMemoryComponent(current);
+        for (const memoryId of importantMemoryIds) {
+          temp.updateMemory(memoryId, { markedForConsolidation: true });
+        }
+        return temp;
+      });
     }
 
     // Update semantic memory from insights

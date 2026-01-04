@@ -6,19 +6,19 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl } from '../../../../core/src/ecs/World.js';
-import { EntityImpl, createEntityId } from '../../../../core/src/ecs/Entity.js';
-import { EventBusImpl } from '../../../../core/src/events/EventBus.js';
-import { SkillTreeManager } from '../../../../core/src/systems/magic/SkillTreeManager.js';
-import { SpellLearningManager } from '../../../../core/src/systems/magic/SpellLearningManager.js';
+import { WorldImpl } from '@ai-village/core';
+import { EntityImpl, createEntityId } from '@ai-village/core';
+import { EventBusImpl } from '@ai-village/core';
+import { SkillTreeManager } from '@ai-village/core';
+import { SpellLearningManager } from '@ai-village/core';
 import {
   createSkillNode,
   createSkillEffect,
   createSkillTree,
   MagicSkillTreeRegistry,
-} from '../../../../core/src/magic/index.js';
-import type { MagicComponent } from '../../../../core/src/components/MagicComponent.js';
-import { ComponentType as CT } from '../../../../core/src/types/ComponentType.js';
+} from '@ai-village/core';
+import type { MagicComponent } from '@ai-village/core';
+import { ComponentType as CT } from '@ai-village/core';
 import { SkillTreePanel } from '../SkillTreePanel.js';
 import type { WindowManager } from '../../../WindowManager.js';
 
@@ -110,11 +110,14 @@ describe('SkillTreePanel Backend Integration', () => {
 
       // Track events
       const events: any[] = [];
-      eventBus.on('*', (event) => events.push(event));
+      eventBus.on('magic:skill_node_unlocked' as any, (event) => events.push(event));
 
       // Unlock via backend
       const result = skillTreeManager.unlockSkillNode(entity, 'integration-paradigm', 'test-node', 50);
       expect(result).toBe(true);
+
+      // Flush event queue
+      eventBus.flush();
 
       // Verify event emitted
       const unlockEvent = events.find((e) => e.type === 'magic:skill_node_unlocked');
@@ -179,13 +182,16 @@ describe('SkillTreePanel Backend Integration', () => {
       panel.setSelectedEntity(entity);
 
       const events: any[] = [];
-      eventBus.on('*', (event) => events.push(event));
+      eventBus.on('magic:spell_unlocked_from_skill_tree' as any, (event) => events.push(event));
 
       // Unlock node
       skillTreeManager.unlockSkillNode(entity, 'spell-unlock-paradigm', 'spell-unlock-node', 40);
 
       // Handle node unlock (triggers spell learning)
       skillTreeManager.handleSkillNodeUnlocked(entity, 'spell-unlock-paradigm', 'spell-unlock-node');
+
+      // Flush event queue
+      eventBus.flush();
 
       // Verify spell unlock event
       const spellEvent = events.find((e) => e.type === 'magic:spell_unlocked_from_skill_tree');

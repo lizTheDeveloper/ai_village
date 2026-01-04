@@ -139,6 +139,32 @@ const SPRITE_MAPPINGS: SpriteMapping[] = [
   { folderId: 'human_female_black_medium', species: 'human', gender: 'female', priority: 50 },
   { folderId: 'human_nonbinary_black', species: 'human', gender: 'nonbinary', priority: 50 },
 
+  // Animals - Chickens
+  { folderId: 'chicken_white', species: 'chicken', priority: 100 },
+  { folderId: 'chicken_brown', species: 'chicken', priority: 100 },
+  { folderId: 'chicken_black', species: 'chicken', priority: 100 },
+
+  // Animals - Cats
+  { folderId: 'cat_orange', species: 'cat', priority: 100 },
+  { folderId: 'cat_grey', species: 'cat', priority: 100 },
+  { folderId: 'cat_black', species: 'cat', priority: 100 },
+  { folderId: 'cat_white', species: 'cat', priority: 100 },
+
+  // Animals - Sheep
+  { folderId: 'sheep_white', species: 'sheep', priority: 100 },
+  { folderId: 'sheep_black', species: 'sheep', priority: 100 },
+  { folderId: 'sheep_grey', species: 'sheep', priority: 100 },
+
+  // Animals - Rabbits
+  { folderId: 'rabbit_white', species: 'rabbit', priority: 100 },
+  { folderId: 'rabbit_brown', species: 'rabbit', priority: 100 },
+  { folderId: 'rabbit_grey', species: 'rabbit', priority: 100 },
+
+  // Animals - Cows
+  { folderId: 'cow_black_white', species: 'cow', priority: 100 },
+  { folderId: 'cow_brown', species: 'cow', priority: 100 },
+  { folderId: 'cow_brown_white', species: 'cow', priority: 100 },
+
   // Ultimate fallback - villager for any species
   { folderId: 'villager', species: 'human', priority: 10 },
   { folderId: 'villager', species: 'elf', priority: 5 },

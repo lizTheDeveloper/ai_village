@@ -71,7 +71,7 @@ export class CraftingStationPanel implements IWindowPanel {
    */
   open(stationEntity: Entity): void {
     this.selectedStation = stationEntity;
-    this.isVisible = true;
+    this.visible = true;
   }
 
   /**
@@ -79,14 +79,7 @@ export class CraftingStationPanel implements IWindowPanel {
    */
   close(): void {
     this.selectedStation = null;
-    this.isVisible = false;
-  }
-
-  /**
-   * Check if the panel is currently visible
-   */
-  public getIsVisible(): boolean {
-    return this.isVisible;
+    this.visible = false;
   }
 
   /**

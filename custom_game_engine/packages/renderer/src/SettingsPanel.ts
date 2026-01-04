@@ -197,8 +197,8 @@ export class SettingsPanel implements IWindowPanel {
    * Show the settings panel
    */
   show(): void {
-    if (this.isVisible) return;
-    this.isVisible = true;
+    if (this.visible) return;
+    this.visible = true;
     this.createPanel();
   }
 
@@ -206,16 +206,9 @@ export class SettingsPanel implements IWindowPanel {
    * Hide the settings panel
    */
   hide(): void {
-    if (!this.isVisible) return;
-    this.isVisible = false;
+    if (!this.visible) return;
+    this.visible = false;
     this.destroyPanel();
-  }
-
-  /**
-   * Check if panel is visible
-   */
-  getIsVisible(): boolean {
-    return this.isVisible;
   }
 
   /**

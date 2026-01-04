@@ -83,7 +83,7 @@ export class CombatHUDPanel implements IWindowPanel {
    * Show the panel
    */
   public show(): void {
-    this.isVisible = true;
+    this.visible = true;
     if (this.element) {
       this.element.style.display = 'block';
     }
@@ -93,7 +93,7 @@ export class CombatHUDPanel implements IWindowPanel {
    * Hide the panel
    */
   public hide(): void {
-    this.isVisible = false;
+    this.visible = false;
     if (this.element) {
       this.element.style.display = 'none';
     }
