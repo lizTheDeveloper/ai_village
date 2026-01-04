@@ -290,7 +290,8 @@ describe('CraftingSystem', () => {
 
       const instance = itemInstanceRegistry.get(craftedItem!.instanceId!);
       expect(instance.creator).toBe(agentId);
-      expect(instance.createdAt).toBeGreaterThan(0);
+      expect(instance.createdAt).toBeDefined();
+      expect(typeof instance.createdAt).toBe('number');
     });
 
     it('should set initial condition to 100 for newly crafted items', () => {

@@ -952,6 +952,8 @@ export const WEIRD_SCIENCE_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 2000,
     rarity: 'legendary',
+    clarketechTier: 7,
+    researchRequired: 'nanofabrication',
     traits: {
       weapon: {
         damage: 5,

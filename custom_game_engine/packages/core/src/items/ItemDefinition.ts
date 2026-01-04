@@ -115,6 +115,20 @@ export interface ItemDefinition {
 
   /** Optional: Self-documenting help entry for wiki generation */
   readonly help?: Partial<ItemHelpEntry>;
+
+  /**
+   * Optional: Research ID(s) required to craft/use this item.
+   * References research topics from the research system.
+   * Can be a single research ID or an array for multiple prerequisites.
+   */
+  readonly researchRequired?: string | readonly string[];
+
+  /**
+   * Optional: Clarketech tier required (1-8).
+   * Higher tiers represent more advanced technology.
+   * Tier 7+ items are "magic indistinguishable from technology".
+   */
+  readonly clarketechTier?: number;
 }
 
 /**
@@ -148,5 +162,7 @@ export function defineItem(
     rarity: overrides.rarity ?? 'common',
     metadata: overrides.metadata,
     help: overrides.help,
+    researchRequired: overrides.researchRequired,
+    clarketechTier: overrides.clarketechTier,
   };
 }
