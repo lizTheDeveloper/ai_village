@@ -5,8 +5,33 @@ export default defineConfig({
   // Load .env files from parent directory (custom_game_engine/)
   envDir: path.resolve(__dirname, '..'),
 
+  plugins: [
+    {
+      name: 'selective-cache-control',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          const url = req.url || '';
+
+          // Apply no-cache only to HTML, JS, CSS, JSON (code files)
+          // Allow caching of images, sprites, fonts, etc.
+          if (url.match(/\.(html?|jsx?|tsx?|css|json)$/i) || url === '/' || !url.includes('.')) {
+            res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+            res.setHeader('Pragma', 'no-cache');
+            res.setHeader('Expires', '0');
+          } else if (url.match(/\.(png|jpe?g|gif|svg|webp|ico|woff2?|ttf|eot)$/i)) {
+            // Cache static assets (sprites, images, fonts) for 1 hour in dev
+            res.setHeader('Cache-Control', 'public, max-age=3600');
+          }
+
+          next();
+        });
+      },
+    },
+  ],
+
   server: {
     port: 3000,
+    strictPort: true, // Don't try other ports - fail if 3000 is busy
     host: '0.0.0.0', // Listen on all network interfaces for VM deployment
     proxy: {
       '/api/generate-sprite': {
@@ -21,13 +46,6 @@ export default defineConfig({
         target: 'http://localhost:3001',
         changeOrigin: true,
       },
-    },
-    headers: {
-      // Force no caching in development to prevent stale code issues
-      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0',
-      'Surrogate-Control': 'no-store',
     },
   },
   resolve: {

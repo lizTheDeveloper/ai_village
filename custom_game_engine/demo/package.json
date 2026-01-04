@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "predev": "lsof -ti:3000 | xargs kill -9 2>/dev/null || true",
     "dev": "vite",
     "api": "tsx src/api-server.ts",
     "dev:all": "concurrently \"npm run dev\" \"npm run api\"",
