@@ -27,14 +27,14 @@
           "description": "breathing fire at enemy",
           "frames": 6,
           "directions": ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"],
-          "path": "dragon/animations/fireball/{direction}/frame_{frame}.png"
+          "path": "dragon/animations/fire-breath/{direction}/frame_{frame}.png"
         },
         "tail-swipe": {
           "template": "high-kick",
           "description": "powerful tail swipe attack",
           "frames": 7,
           "directions": ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"],
-          "path": "dragon/animations/high-kick/{direction}/frame_{frame}.png"
+          "path": "dragon/animations/tail-swipe/{direction}/frame_{frame}.png"
         }
       }
     },
@@ -58,7 +58,7 @@
           "description": "thrusting sword forward",
           "frames": 3,
           "directions": ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"],
-          "path": "knight/animations/lead-jab/{direction}/frame_{frame}.png"
+          "path": "knight/animations/sword-thrust/{direction}/frame_{frame}.png"
         }
       }
     }

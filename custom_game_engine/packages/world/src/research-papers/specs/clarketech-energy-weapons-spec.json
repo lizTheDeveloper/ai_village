@@ -1,0 +1,382 @@
+[
+  {
+    "paperId": "coherent_light_weaponization",
+    "title": "Pointing Light Very Angrily: The Fundamentals of Laser Weapons",
+    "field": "experimental",
+    "paperSets": ["laser_weapons"],
+    "prerequisitePapers": [],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 15, "physics": 12 },
+    "contributesTo": [
+      { "type": "item", "id": "laser_pistol" }
+    ],
+    "topicDescription": "Converting coherent light into a weapon system",
+    "keyPoints": [
+      "Why lasers are just flashlights with attitude",
+      "Power density and the melting point of optimism",
+      "Heat dissipation: your weapon's nemesis",
+      "The researcher who accidentally lasered their own coffee"
+    ]
+  },
+  {
+    "paperId": "optical_focusing_systems",
+    "title": "Making Small Things Smaller: Precision Optics for Laser Systems",
+    "field": "experimental",
+    "paperSets": ["laser_weapons"],
+    "prerequisitePapers": ["coherent_light_weaponization"],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 12, "physics": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "laser_carbine" }
+    ],
+    "topicDescription": "Focusing laser beams for maximum effect at range",
+    "keyPoints": [
+      "Beam divergence and why distance matters",
+      "Adaptive optics for imperfect atmospheres",
+      "The quest for the perfect mirror",
+      "Why your enemy standing in fog is hilarious"
+    ]
+  },
+  {
+    "paperId": "power_management_thermal",
+    "title": "Hot Weapons, Cool Heads: Thermal Management in Energy Weapons",
+    "field": "experimental",
+    "paperSets": ["laser_weapons"],
+    "prerequisitePapers": ["coherent_light_weaponization"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 18, "survival": 8 },
+    "contributesTo": [
+      { "type": "item", "id": "laser_rifle" }
+    ],
+    "topicDescription": "Preventing your weapon from melting itself",
+    "keyPoints": [
+      "Heatsinks and the laws of thermodynamics",
+      "Why continuous fire is a myth",
+      "Emergency thermal shutoffs that save fingers",
+      "The soldier who used their laser rifle as a space heater"
+    ]
+  },
+  {
+    "paperId": "precision_long_range_optics",
+    "title": "Touching Someone from Very Far Away: Long-Range Laser Systems",
+    "field": "experimental",
+    "paperSets": ["laser_weapons"],
+    "prerequisitePapers": ["optical_focusing_systems", "power_management_thermal"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 15, "combat": 10 },
+    "contributesTo": [
+      { "type": "item", "id": "laser_sniper" }
+    ],
+    "topicDescription": "Precision targeting systems for extreme range engagement",
+    "keyPoints": [
+      "Atmospheric compensation algorithms",
+      "Target acquisition at distances where they're just dots",
+      "Why patience matters when light itself takes time",
+      "The sniper who hit a target on a moving vehicle at 2km"
+    ]
+  },
+  {
+    "paperId": "high_power_beam_generation",
+    "title": "When Lasers Need to Be Bigger: Heavy Laser Weapon Systems",
+    "field": "experimental",
+    "paperSets": ["laser_weapons"],
+    "prerequisitePapers": ["precision_long_range_optics"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 20, "physics": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "laser_cannon" }
+    ],
+    "topicDescription": "Scaling laser weapons to devastating power levels",
+    "keyPoints": [
+      "Power requirements that make fusion reactors nervous",
+      "Area effect through thermal bloom",
+      "Why portable is a relative term",
+      "The test that accidentally signaled aliens"
+    ]
+  },
+  {
+    "paperId": "ionized_particle_projection",
+    "title": "Throwing Charged Particles Very Fast: Ion Weapon Basics",
+    "field": "experimental",
+    "paperSets": ["ion_weapons"],
+    "prerequisitePapers": [],
+    "complexity": 6,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 15, "physics": 12 },
+    "contributesTo": [
+      { "type": "item", "id": "ion_pistol" }
+    ],
+    "topicDescription": "Weaponizing ionized particle beams",
+    "keyPoints": [
+      "What happens when electricity meets velocity",
+      "Disrupting electronics: the polite way to win fights",
+      "Why magical shields hate you now",
+      "The mage who discovered ion weapons the hard way"
+    ]
+  },
+  {
+    "paperId": "electromagnetic_disruption",
+    "title": "Making Technology Very Sad: Targeted EMP Effects",
+    "field": "experimental",
+    "paperSets": ["ion_weapons"],
+    "prerequisitePapers": ["ionized_particle_projection"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 18, "arcane": 10 },
+    "contributesTo": [
+      { "type": "item", "id": "ion_rifle" }
+    ],
+    "topicDescription": "Focused electromagnetic disruption for tactical use",
+    "keyPoints": [
+      "Why robots fear you specifically",
+      "Disrupting mana flow with science",
+      "Collateral damage to friendly electronics",
+      "The battle where both sides' weapons stopped working"
+    ]
+  },
+  {
+    "paperId": "ion_beam_scaling",
+    "title": "Industrial-Strength Technology Hatred: Heavy Ion Systems",
+    "field": "experimental",
+    "paperSets": ["ion_weapons"],
+    "prerequisitePapers": ["electromagnetic_disruption"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 20, "physics": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "ion_cannon" }
+    ],
+    "topicDescription": "Area-effect ion weapons for maximum disruption",
+    "keyPoints": [
+      "When you need to shut down an entire grid",
+      "Shield generators absolutely despise this",
+      "The arms race between shields and ion cannons",
+      "The blackout that affected three counties"
+    ]
+  },
+  {
+    "paperId": "plasma_containment_weapons",
+    "title": "Bottling Suns for Personal Use: Plasma Weapon Containment",
+    "field": "experimental",
+    "paperSets": ["plasma_weapons"],
+    "prerequisitePapers": [],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 18, "physics": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "plasma_pistol" }
+    ],
+    "topicDescription": "Containing superheated plasma in portable weapons",
+    "keyPoints": [
+      "Magnetic bottles and why they must not break",
+      "Temperature differentials that boggle the mind",
+      "The fourth state of matter as a projectile",
+      "The designer who was very careful after their first prototype"
+    ]
+  },
+  {
+    "paperId": "plasma_projectile_dynamics",
+    "title": "Throwing Fire That Isn't Fire: Plasma Bolt Physics",
+    "field": "experimental",
+    "paperSets": ["plasma_weapons"],
+    "prerequisitePapers": ["plasma_containment_weapons"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 18, "combat": 10 },
+    "contributesTo": [
+      { "type": "item", "id": "plasma_rifle" }
+    ],
+    "topicDescription": "Launching and maintaining plasma projectiles",
+    "keyPoints": [
+      "Why plasma bolts are slower than lasers but scarier",
+      "Containment field decay and effective range",
+      "Area effect through plasma dispersal",
+      "The beautiful and terrifying rainbow of plasma colors"
+    ]
+  },
+  {
+    "paperId": "rapid_plasma_cycling",
+    "title": "More Plasma, More Often: High-Rate Plasma Systems",
+    "field": "experimental",
+    "paperSets": ["plasma_weapons"],
+    "prerequisitePapers": ["plasma_projectile_dynamics"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 15, "combat": 12 },
+    "contributesTo": [
+      { "type": "item", "id": "plasma_repeater" }
+    ],
+    "topicDescription": "Achieving high rates of fire with plasma weapons",
+    "keyPoints": [
+      "Fuel consumption and the magazine problem",
+      "Cooling between shots at high speed",
+      "The trade-off between rate and power",
+      "Suppressive fire with plasma: questionable but effective"
+    ]
+  },
+  {
+    "paperId": "heavy_plasma_systems",
+    "title": "When You Need a Bigger Explosion: Heavy Plasma Weaponry",
+    "field": "experimental",
+    "paperSets": ["plasma_weapons"],
+    "prerequisitePapers": ["plasma_projectile_dynamics"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 20, "physics": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "plasma_cannon" }
+    ],
+    "topicDescription": "Scaling plasma weapons to devastating effect",
+    "keyPoints": [
+      "Area denial through superheated atmosphere",
+      "Why minimum range is a safety feature",
+      "The logistics of plasma fuel at scale",
+      "The crater that used to be a fortification"
+    ]
+  },
+  {
+    "paperId": "plasma_artillery",
+    "title": "Indirect Fire with the Fourth State of Matter: Plasma Casters",
+    "field": "experimental",
+    "paperSets": ["plasma_weapons"],
+    "prerequisitePapers": ["heavy_plasma_systems"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 18, "combat": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "plasma_caster" }
+    ],
+    "topicDescription": "Lobbing plasma bolts in parabolic arcs",
+    "keyPoints": [
+      "Gravity-affected plasma containment",
+      "Timing detonation for maximum effect",
+      "Why you want to be the one firing, not receiving",
+      "The siege that ended in precisely one shot"
+    ]
+  },
+  {
+    "paperId": "particle_acceleration_weapons",
+    "title": "Making Atoms Go Very Fast Indeed: Particle Weapon Fundamentals",
+    "field": "experimental",
+    "paperSets": ["particle_weapons"],
+    "prerequisitePapers": [],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 20, "engineering": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "particle_pistol" }
+    ],
+    "topicDescription": "Accelerating subatomic particles for weaponization",
+    "keyPoints": [
+      "Relativistic velocities in your pocket",
+      "Why armor is merely a suggestion at this level",
+      "Power requirements that make accountants weep",
+      "The particle physicist who became a weapons designer"
+    ]
+  },
+  {
+    "paperId": "focused_particle_streams",
+    "title": "A Very Thin Line of Destruction: Precision Particle Beams",
+    "field": "experimental",
+    "paperSets": ["particle_weapons"],
+    "prerequisitePapers": ["particle_acceleration_weapons"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 18, "combat": 12 },
+    "contributesTo": [
+      { "type": "item", "id": "particle_rifle" }
+    ],
+    "topicDescription": "Focusing particle beams for maximum penetration",
+    "keyPoints": [
+      "Beam coherence at combat ranges",
+      "Why your shots go through things",
+      "The physics of making holes in anything",
+      "Critical hits at the subatomic level"
+    ]
+  },
+  {
+    "paperId": "accelerator_scaling",
+    "title": "Bigger Particles, Faster: Heavy Particle Weapons",
+    "field": "experimental",
+    "paperSets": ["particle_weapons"],
+    "prerequisitePapers": ["focused_particle_streams"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 20, "engineering": 18 },
+    "contributesTo": [
+      { "type": "item", "id": "particle_accelerator" }
+    ],
+    "topicDescription": "Scaling particle accelerators for maximum damage",
+    "keyPoints": [
+      "Desktop-sized synchrotrons and their challenges",
+      "Penetration values that make tanks obsolete",
+      "Why you can see through things after shooting them",
+      "The weapon that accidentally discovered a new particle"
+    ]
+  },
+  {
+    "paperId": "continuous_beam_generation",
+    "title": "The Line That Doesn't Stop: Sustained Energy Beams",
+    "field": "experimental",
+    "paperSets": ["beam_weapons"],
+    "prerequisitePapers": [],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 18, "physics": 15 },
+    "contributesTo": [
+      { "type": "item", "id": "beam_rifle" }
+    ],
+    "topicDescription": "Maintaining continuous energy output",
+    "keyPoints": [
+      "Power draw that makes fusion reactors earn their keep",
+      "Sweeping across targets efficiently",
+      "The psychology of continuous beam weapons",
+      "The operator who drew their name on a mountain"
+    ]
+  },
+  {
+    "paperId": "plasma_beam_projection",
+    "title": "A River of Fire: Continuous Plasma Projection",
+    "field": "experimental",
+    "paperSets": ["beam_weapons"],
+    "prerequisitePapers": ["continuous_beam_generation"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 18, "physics": 18 },
+    "contributesTo": [
+      { "type": "item", "id": "plasma_beam" }
+    ],
+    "topicDescription": "Sustaining plasma output in beam form",
+    "keyPoints": [
+      "Continuous containment challenges",
+      "Area effect through proximity heating",
+      "Fuel consumption at alarming rates",
+      "The weapon that makes firefighters nervous"
+    ]
+  },
+  {
+    "paperId": "particle_beam_cannon",
+    "title": "Drawing Lines Through Reality: Heavy Particle Beams",
+    "field": "experimental",
+    "paperSets": ["beam_weapons"],
+    "prerequisitePapers": ["continuous_beam_generation", "focused_particle_streams"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 20, "engineering": 20 },
+    "contributesTo": [
+      { "type": "item", "id": "particle_beam" }
+    ],
+    "topicDescription": "Sustained particle acceleration in beam form",
+    "keyPoints": [
+      "Power requirements that require their own generator",
+      "Penetrating literally everything in the way",
+      "The ultimate in sustained damage output",
+      "The weapon that accidentally made a tunnel"
+    ]
+  }
+]

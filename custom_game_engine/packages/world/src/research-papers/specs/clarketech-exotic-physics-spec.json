@@ -1,0 +1,382 @@
+[
+  {
+    "paperId": "higher_dimensional_geometry_intro",
+    "title": "Directions That Hurt to Think About: An Introduction to Higher Dimensions",
+    "field": "experimental",
+    "paperSets": ["exotic_physics_ii"],
+    "prerequisitePapers": [],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 18, "philosophy": 12 },
+    "contributesTo": [
+      { "type": "knowledge", "id": "hyperdimensional_awareness" }
+    ],
+    "topicDescription": "Understanding spatial dimensions beyond the familiar three",
+    "keyPoints": [
+      "Why your brain actively resists understanding this",
+      "Mathematical descriptions of impossible spaces",
+      "The headaches are a feature, not a bug",
+      "The student who briefly saw in four dimensions and regretted it"
+    ]
+  },
+  {
+    "paperId": "hyperspatial_field_manipulation",
+    "title": "Poking Reality Where It Bends: Hyperspatial Field Generation",
+    "field": "experimental",
+    "paperSets": ["exotic_physics_ii"],
+    "prerequisitePapers": ["higher_dimensional_geometry_intro"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 20, "engineering": 15 },
+    "contributesTo": [
+      { "type": "research", "id": "tesseract_geometry" }
+    ],
+    "topicDescription": "Creating and manipulating higher-dimensional field effects",
+    "keyPoints": [
+      "Energy requirements for dimensional distortion",
+      "Stability of hyperspatial bubbles",
+      "Why things look wrong from the inside",
+      "The lab that briefly existed in five places at once"
+    ]
+  },
+  {
+    "paperId": "spatial_compression_theory",
+    "title": "Making Space Smaller: The Science of Spatial Compression",
+    "field": "experimental",
+    "paperSets": ["exotic_physics_ii"],
+    "prerequisitePapers": ["higher_dimensional_geometry_intro"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 18, "engineering": 15 },
+    "contributesTo": [
+      { "type": "research", "id": "spatial_folding" }
+    ],
+    "topicDescription": "Compressing spatial volumes into smaller containers",
+    "keyPoints": [
+      "Why bags of holding actually work",
+      "Conservation of space vs conservation of stuff",
+      "Catastrophic failure modes (spaghettification)",
+      "The warehouse that fit in a briefcase"
+    ]
+  },
+  {
+    "paperId": "dimensional_nexus_theory",
+    "title": "Where All the Doors Lead: Nexus Point Architecture",
+    "field": "experimental",
+    "paperSets": ["exotic_physics_ii"],
+    "prerequisitePapers": ["hyperspatial_field_manipulation"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 18, "physics": 15 },
+    "contributesTo": [
+      { "type": "research", "id": "nexus_architecture" }
+    ],
+    "topicDescription": "Creating intersection points between dimensional layers",
+    "keyPoints": [
+      "Why every door can lead somewhere different",
+      "Floorplans that exist in superposition",
+      "Navigation in non-Euclidean structures",
+      "The architect who designed a building with infinite rooms"
+    ]
+  },
+  {
+    "paperId": "tesseract_construction",
+    "title": "Building in Directions That Don't Exist: Tesseract Architecture",
+    "field": "experimental",
+    "paperSets": ["tesseract_geometry"],
+    "prerequisitePapers": [],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 20, "physics": 15 },
+    "contributesTo": [
+      { "type": "building", "id": "tesseract_building" }
+    ],
+    "topicDescription": "Constructing four-dimensional structures",
+    "keyPoints": [
+      "Why your building is bigger on the inside",
+      "Structural engineering in directions you can't point to",
+      "The paradox of infinite storage in finite footprint",
+      "The tenant who got lost for three days"
+    ]
+  },
+  {
+    "paperId": "tesseract_stability",
+    "title": "Keeping Your Fourth Wall Up: Tesseract Structural Integrity",
+    "field": "experimental",
+    "paperSets": ["tesseract_geometry"],
+    "prerequisitePapers": ["tesseract_construction"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 18, "physics": 12 },
+    "contributesTo": [
+      { "type": "building", "id": "tesseract_building" }
+    ],
+    "topicDescription": "Maintaining stability in hyperdimensional structures",
+    "keyPoints": [
+      "Power requirements for reality distortion",
+      "What happens when the field collapses",
+      "Emergency protocols for dimensional failure",
+      "The building that tried to become three-dimensional again"
+    ]
+  },
+  {
+    "paperId": "tesseract_navigation",
+    "title": "Finding Your Way in Impossible Spaces: Tesseract Wayfinding",
+    "field": "experimental",
+    "paperSets": ["tesseract_geometry"],
+    "prerequisitePapers": ["tesseract_construction"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "psychology": 15, "logic": 12 },
+    "contributesTo": [
+      { "type": "ability", "id": "hyperdimensional_navigation" }
+    ],
+    "topicDescription": "Navigation systems for non-Euclidean spaces",
+    "keyPoints": [
+      "Why normal maps don't work",
+      "Breadcrumb trails in four dimensions",
+      "Training the brain to see impossible directions",
+      "The delivery person who mastered tesseract navigation"
+    ]
+  },
+  {
+    "paperId": "spatial_fold_creation",
+    "title": "Origami with Spacetime: Creating Spatial Folds",
+    "field": "experimental",
+    "paperSets": ["spatial_folding"],
+    "prerequisitePapers": [],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 18, "engineering": 15 },
+    "contributesTo": [
+      { "type": "building", "id": "pocket_dimension" }
+    ],
+    "topicDescription": "Folding space to create compressed volumes",
+    "keyPoints": [
+      "The mathematics of crumpling reality",
+      "Why unfolding must be done carefully",
+      "Energy budgets for spatial manipulation",
+      "The experiment that accidentally made space itself wrinkled"
+    ]
+  },
+  {
+    "paperId": "pocket_universe_formation",
+    "title": "Your Own Private Universe: Creating Pocket Dimensions",
+    "field": "experimental",
+    "paperSets": ["spatial_folding"],
+    "prerequisitePapers": ["spatial_fold_creation"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 20, "arcane": 15 },
+    "contributesTo": [
+      { "type": "research", "id": "pocket_dimension_mastery" }
+    ],
+    "topicDescription": "Creating self-contained dimensional bubbles",
+    "keyPoints": [
+      "Dimensional boundaries and their properties",
+      "Power requirements for universe maintenance",
+      "What counts as a universe anyway",
+      "The vacation home that exists outside of reality"
+    ]
+  },
+  {
+    "paperId": "realm_stability_anchors",
+    "title": "Keeping Your Dimension Where You Put It: Realm Anchoring",
+    "field": "experimental",
+    "paperSets": ["realm_anchoring"],
+    "prerequisitePapers": [],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 15, "arcane": 12 },
+    "contributesTo": [
+      { "type": "building", "id": "shadow_binding" }
+    ],
+    "topicDescription": "Stabilizing connections to other realms",
+    "keyPoints": [
+      "Why portals drift without anchors",
+      "Energy costs of dimensional stabilization",
+      "The importance of redundant anchoring",
+      "The portal that kept moving to inconvenient places"
+    ]
+  },
+  {
+    "paperId": "shadow_realm_binding",
+    "title": "Tethering the Dark: Binding Shadow Dimensions",
+    "field": "experimental",
+    "paperSets": ["realm_anchoring"],
+    "prerequisitePapers": ["realm_stability_anchors"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "arcane": 18, "engineering": 12 },
+    "contributesTo": [
+      { "type": "building", "id": "shadow_binding" }
+    ],
+    "topicDescription": "Specifically anchoring shadow realm connections",
+    "keyPoints": [
+      "Shadow dimensions and their peculiar physics",
+      "Why darkness has its own rules",
+      "Binding protocols for unstable realms",
+      "The shadow that became a permanent resident"
+    ]
+  },
+  {
+    "paperId": "dimensional_rift_creation",
+    "title": "Tearing Reality Carefully: Controlled Dimensional Rifts",
+    "field": "experimental",
+    "paperSets": ["nexus_architecture"],
+    "prerequisitePapers": [],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 18, "engineering": 15 },
+    "contributesTo": [
+      { "type": "building", "id": "dimensional_rift" }
+    ],
+    "topicDescription": "Creating stable tears in dimensional fabric",
+    "keyPoints": [
+      "How to break reality without breaking everything",
+      "Rift stability and containment",
+      "What leaks through dimensional tears",
+      "The rift that started singing"
+    ]
+  },
+  {
+    "paperId": "dimensional_rift_management",
+    "title": "Living with a Hole in Reality: Rift Maintenance",
+    "field": "experimental",
+    "paperSets": ["nexus_architecture"],
+    "prerequisitePapers": ["dimensional_rift_creation"],
+    "complexity": 7,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 15, "survival": 12 },
+    "contributesTo": [
+      { "type": "building", "id": "dimensional_rift" }
+    ],
+    "topicDescription": "Maintaining stable dimensional tears over time",
+    "keyPoints": [
+      "Regular maintenance schedules for reality holes",
+      "Warning signs of rift instability",
+      "What to do when the other side gets curious",
+      "The maintenance technician who saw too much"
+    ]
+  },
+  {
+    "paperId": "pocket_mastery_creation",
+    "title": "Your Universe, Your Rules: Mastering Pocket Dimensions",
+    "field": "experimental",
+    "paperSets": ["pocket_dimension_mastery"],
+    "prerequisitePapers": [],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 20, "arcane": 18 },
+    "contributesTo": [
+      { "type": "ability", "id": "create_pocket_dimension" }
+    ],
+    "topicDescription": "Full control over personal dimensional spaces",
+    "keyPoints": [
+      "Writing the physics of your own universe",
+      "Power scaling with dimension size",
+      "The ego trip of being your own cosmic entity",
+      "The researcher who got too attached to their pocket universe"
+    ]
+  },
+  {
+    "paperId": "pocket_mastery_maintenance",
+    "title": "Keeping Your Universe Running: Pocket Dimension Upkeep",
+    "field": "experimental",
+    "paperSets": ["pocket_dimension_mastery"],
+    "prerequisitePapers": ["pocket_mastery_creation"],
+    "complexity": 8,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 18, "physics": 15 },
+    "contributesTo": [
+      { "type": "ability", "id": "create_pocket_dimension" }
+    ],
+    "topicDescription": "Long-term maintenance of personal dimensions",
+    "keyPoints": [
+      "Energy budgets for reality maintenance",
+      "Entropy in isolated systems",
+      "What happens when you forget to maintain your universe",
+      "The dimension that developed its own weather"
+    ]
+  },
+  {
+    "paperId": "transcendent_geometry",
+    "title": "Beyond Four Dimensions: Penteract and Higher Structures",
+    "field": "experimental",
+    "paperSets": ["exotic_physics_iii"],
+    "prerequisitePapers": [],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "physics": 20, "philosophy": 18 },
+    "contributesTo": [
+      { "type": "building", "id": "penteract_building" }
+    ],
+    "topicDescription": "Construction in five or more spatial dimensions",
+    "keyPoints": [
+      "Why four dimensions wasn't confusing enough",
+      "Addresses that require imaginary numbers",
+      "The philosophical implications of hypercubic architecture",
+      "The mathematician who designed a six-dimensional bathroom"
+    ]
+  },
+  {
+    "paperId": "penteract_construction",
+    "title": "Building in Five Dimensions: Practical Penteract Architecture",
+    "field": "experimental",
+    "paperSets": ["exotic_physics_iii"],
+    "prerequisitePapers": ["transcendent_geometry"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 20, "physics": 18 },
+    "contributesTo": [
+      { "type": "building", "id": "penteract_building" }
+    ],
+    "topicDescription": "Practical construction methods for five-dimensional structures",
+    "keyPoints": [
+      "Materials that exist in extra dimensions",
+      "Structural stress in hyperspace",
+      "Why your contractor quit",
+      "The building permit that broke the zoning computer"
+    ]
+  },
+  {
+    "paperId": "multiverse_structural_bridging",
+    "title": "One Building, Infinite Addresses: Universe Bridging Architecture",
+    "field": "experimental",
+    "paperSets": ["universe_bridging"],
+    "prerequisitePapers": [],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 20, "physics": 18 },
+    "contributesTo": [
+      { "type": "building", "id": "multiverse_nexus" }
+    ],
+    "topicDescription": "Creating structures that span multiple universes",
+    "keyPoints": [
+      "Architectural coherence across realities",
+      "Rent collection in fourteen currencies",
+      "When your neighbors are alternate versions of yourself",
+      "The building that technically has infinite floors"
+    ]
+  },
+  {
+    "paperId": "multiverse_bridge_stability",
+    "title": "Keeping Your Multiversal Building from Falling Apart: Stability Protocols",
+    "field": "experimental",
+    "paperSets": ["universe_bridging"],
+    "prerequisitePapers": ["multiverse_structural_bridging"],
+    "complexity": 9,
+    "minimumAge": "adult",
+    "skillGrants": { "engineering": 18, "physics": 20 },
+    "contributesTo": [
+      { "type": "ability", "id": "bridge_universes" }
+    ],
+    "topicDescription": "Maintaining stability in trans-universal structures",
+    "keyPoints": [
+      "When different physics disagree about your building",
+      "Emergency protocols for universe desynchronization",
+      "Insurance across multiple realities",
+      "The building that briefly existed in a universe where it didn't exist"
+    ]
+  }
+]
