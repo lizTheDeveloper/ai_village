@@ -18,6 +18,8 @@ export const LASER_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 500,
     rarity: 'rare',
+    clarketechTier: 6,
+    researchRequired: 'laser_weapons',
     traits: {
       weapon: {
         damage: 15,
@@ -39,6 +41,8 @@ export const LASER_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 700,
     rarity: 'rare',
+    clarketechTier: 6,
+    researchRequired: 'laser_weapons',
     traits: {
       weapon: {
         damage: 20,
@@ -61,6 +65,8 @@ export const LASER_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 900,
     rarity: 'epic',
+    clarketechTier: 6,
+    researchRequired: 'laser_weapons',
     traits: {
       weapon: {
         damage: 25,
@@ -83,6 +89,8 @@ export const LASER_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 1500,
     rarity: 'legendary',
+    clarketechTier: 6,
+    researchRequired: 'laser_weapons',
     traits: {
       weapon: {
         damage: 45,
@@ -108,6 +116,8 @@ export const LASER_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 2000,
     rarity: 'legendary',
+    clarketechTier: 7,
+    researchRequired: ['laser_weapons', 'advanced_electronics'],
     traits: {
       weapon: {
         damage: 50,
@@ -136,6 +146,8 @@ export const PLASMA_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 600,
     rarity: 'rare',
+    clarketechTier: 7,
+    researchRequired: 'plasma_weapons',
     traits: {
       weapon: {
         damage: 20,
@@ -158,6 +170,8 @@ export const PLASMA_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 1000,
     rarity: 'epic',
+    clarketechTier: 7,
+    researchRequired: 'plasma_weapons',
     traits: {
       weapon: {
         damage: 35,
@@ -181,6 +195,8 @@ export const PLASMA_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 1400,
     rarity: 'epic',
+    clarketechTier: 7,
+    researchRequired: 'plasma_weapons',
     traits: {
       weapon: {
         damage: 25,
@@ -204,6 +220,8 @@ export const PLASMA_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 2500,
     rarity: 'legendary',
+    clarketechTier: 7,
+    researchRequired: ['plasma_weapons', 'nanofabrication'],
     traits: {
       weapon: {
         damage: 80,
@@ -228,6 +246,8 @@ export const PLASMA_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 3500,
     rarity: 'legendary',
+    clarketechTier: 7,
+    researchRequired: ['plasma_weapons', 'nanofabrication'],
     traits: {
       weapon: {
         damage: 120,
