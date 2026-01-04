@@ -408,6 +408,7 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new TradingSystem());
   const marketEventSystem = new MarketEventSystem(eventBus);
   gameLoop.systemRegistry.register(marketEventSystem);
+  gameLoop.systemRegistry.register(new TradeAgreementSystem());
 
   // ============================================================================
   // SKILLS & CRAFTING
@@ -415,6 +416,7 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new SkillSystem());
   gameLoop.systemRegistry.register(new CookingSystem());
   gameLoop.systemRegistry.register(new DurabilitySystem());
+  gameLoop.systemRegistry.register(new ExperimentationSystem());
 
   // ============================================================================
   // RESEARCH
@@ -630,6 +632,7 @@ export function registerAllSystems(
   // ============================================================================
   const governanceDataSystem = new GovernanceDataSystem();
   gameLoop.systemRegistry.register(governanceDataSystem);
+  gameLoop.systemRegistry.register(new CityDirectorSystem());
 
   // ============================================================================
   // METRICS (Optional)

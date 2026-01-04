@@ -64,7 +64,7 @@ FOOTNOTES:
 
 ††††† The original research paper on VR latency, published by Dr. Yuki Tanaka in 2015, was written entirely in the present tense and used the word "catastrophic" forty-seven times across twelve pages. Dr. Tanaka's subsequent research focused on significantly less nausea-inducing topics, such as tax policy.
 
-‡‡‡‡ This suspicion manifests as a subtle feeling of wrongness, similar to that experienced when returning home to find all your furniture moved three inches to the left. Everything looks correct, but nothing feels correct, and you can`,
+‡‡‡‡ This suspicion manifests as a subtle feeling of wrongness, similar to that experienced when returning home to find all your furniture moved three inches to the left. Everything looks correct, but nothing feels correct, and you can't quite put your finger on why.`,
   abstract: 'Research paper on How to convince the brain it's somewhere it isn't',
   published: false
 };
@@ -120,7 +120,7 @@ The most unexpected consequence of ultra-high-fidelity displays, however, concer
 
 ††††The Valley contains several notable landmarks, including the "Ridge of Slightly-Wrong Shadows," the "Canyon of Technically-Accurate-But-Still-Weird Reflections," and the infamous "Pit of Eyes That Track You But Shouldn't."†††††
 
-†††††Located at approximately 92.4% fidelity, the Pit was accidentally discovered by graduate student Thomas Webb, who reported feeling "extremely watched" by`,
+†††††Located at approximately 92.4% fidelity, the Pit was accidentally discovered by graduate student Thomas Webb, who reported feeling "extremely watched" by a rendered pair of eyes that shouldn't have been tracking his movement.`,
   abstract: 'Research paper on Visual display systems that exceed human perception limits',
   published: false
 };

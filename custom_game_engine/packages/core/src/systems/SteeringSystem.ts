@@ -116,9 +116,12 @@ export class SteeringSystem implements System {
     const newVx = velocity.vx + force.x * deltaTime;
     const newVy = velocity.vy + force.y * deltaTime;
 
-    // Limit to max speed
-    const speed = Math.sqrt(newVx * newVx + newVy * newVy);
-    if (speed > steering.maxSpeed) {
+    // Limit to max speed (use squared comparison to avoid sqrt when possible)
+    const speedSquared = newVx * newVx + newVy * newVy;
+    const maxSpeedSquared = steering.maxSpeed * steering.maxSpeed;
+
+    if (speedSquared > maxSpeedSquared) {
+      const speed = Math.sqrt(speedSquared); // Only compute sqrt when needed
       const scale = steering.maxSpeed / speed;
       setComponentProperties<VelocityComponent>(impl, CT.Velocity, {
         vx: newVx * scale,
@@ -217,11 +220,11 @@ export class SteeringSystem implements System {
       return { x: -velocity.vx * 2, y: -velocity.vy * 2 };
     }
 
-    // Check if already stopped and within tolerance
-    const speed = Math.sqrt(velocity.vx * velocity.vx + velocity.vy * velocity.vy);
+    // Check if already stopped and within tolerance (use squared comparison)
+    const speedSquared = velocity.vx * velocity.vx + velocity.vy * velocity.vy;
     const arrivalTolerance = steering.arrivalTolerance ?? 1.0;
 
-    if (distance < arrivalTolerance && speed < 0.1) {
+    if (distance < arrivalTolerance && speedSquared < 0.01) { // 0.1 * 0.1 = 0.01
       // Already stopped and close enough - apply gentle brake
       return { x: -velocity.vx, y: -velocity.vy };
     }
@@ -292,9 +295,10 @@ export class SteeringSystem implements System {
           const quickDist = Math.abs(obstaclePos.x - position.x) + Math.abs(obstaclePos.y - position.y);
           if (quickDist > checkRadius * 2) continue; // Manhattan distance early exit
 
-          // Check if obstacle is in path
-          const dist = this._distance(ahead, obstaclePos);
-          if (dist <= collision.radius + 1.0) {
+          // Check if obstacle is in path (use squared distance for performance)
+          const distSquared = this._distanceSquared(ahead, obstaclePos);
+          const thresholdSquared = (collision.radius + 1.0) * (collision.radius + 1.0);
+          if (distSquared <= thresholdSquared) {
             obstacles.push(e);
           }
         }
@@ -305,14 +309,14 @@ export class SteeringSystem implements System {
       return { x: 0, y: 0 };
     }
 
-    // Find closest obstacle
+    // Find closest obstacle (use squared distance for performance - no sqrt needed for comparison)
     const closest = obstacles.reduce((prev: Entity, curr: Entity) => {
       const prevPos = getPosition(prev);
       const currPos = getPosition(curr);
       if (!prevPos || !currPos) return prev;
-      const prevDist = this._distance(position, prevPos);
-      const currDist = this._distance(position, currPos);
-      return currDist < prevDist ? curr : prev;
+      const prevDistSq = this._distanceSquared(position, prevPos);
+      const currDistSq = this._distanceSquared(position, currPos);
+      return currDistSq < prevDistSq ? curr : prev;
     });
 
     const obstaclePos = getPosition(closest);
@@ -494,7 +498,18 @@ export class SteeringSystem implements System {
   }
 
   /**
+   * Calculate squared distance between two points (faster - no sqrt)
+   * Use this for distance comparisons to avoid expensive sqrt operations
+   */
+  private _distanceSquared(a: { x: number; y: number }, b: { x: number; y: number }): number {
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    return dx * dx + dy * dy;
+  }
+
+  /**
    * Calculate distance between two points
+   * Only use when you need the actual distance value (not for comparisons)
    */
   private _distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
     const dx = a.x - b.x;

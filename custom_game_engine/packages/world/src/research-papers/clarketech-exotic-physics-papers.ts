@@ -318,7 +318,7 @@ The philosophical implications remain hotly debated†††††† in academi
 
 ‡‡‡‡The problem of navigation in four-dimensional space is rather like the problem of navigating in three-dimensional space, except that "turn left" must be followed by the qualifier "no, the other left, the one that doesn't exist from your current perspective."
 
-§§§§Mr. Hoffstedder's experience is documented in his memoir "Wrong Turn at Right Angles: My Lost Weekend in the Ana-Kata Corridor" (Published by Disoriented Press, 1995). The book's index famously includes the entry "Where am`,
+§§§§Mr. Hoffstedder's experience is documented in his memoir "Wrong Turn at Right Angles: My Lost Weekend in the Ana-Kata Corridor" (Published by Disoriented Press, 1995). The book's index famously includes the entry "Where am I, see: everywhere and nowhere."`,
   abstract: 'Research paper on Constructing four-dimensional structures',
   published: false
 };

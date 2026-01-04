@@ -661,7 +661,7 @@ The physics of containment field decay presents what the Institute of Inadvisabl
 
 †††The Hemingway Prize for Directness in Scientific Communication, specifically.
 
-**This happened exactly once, at the Facility for Learning Through Consequences. The range was 412`,
+**This happened exactly once, at the Facility for Learning Through Consequences. The range was 412 meters.`,
   abstract: 'Research paper on Launching and maintaining plasma projectiles',
   published: false
 };
@@ -1135,7 +1135,7 @@ FOOTNOTES:
 
 ‡‡ Contemporary reports suggest the reactors view this as beneath their dignity, though as inanimate objects, their opinions are largely inferred from their tendency to trigger warning alarms during particularly demanding operations. Engineers interpret these as "stress responses," though some claim the reactors are simply "being difficult."
 
-‡‡‡ The comparison was made by Brother Methodius of the Order of the Burning Truth, who witnessed a continuous beam test and declared it "rather like watching`,
+‡‡‡ The comparison was made by Brother Methodius of the Order of the Burning Truth, who witnessed a continuous beam test and declared it "rather like watching the finger of God at work."`,
   abstract: 'Research paper on Maintaining continuous energy output',
   published: false
 };
