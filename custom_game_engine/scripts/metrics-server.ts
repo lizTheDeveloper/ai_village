@@ -145,14 +145,13 @@ interface HeadlessGameProcess {
 const headlessGames = new Map<string, HeadlessGameProcess>();
 
 function spawnHeadlessGame(sessionId: string, agentCount: number = 5): HeadlessGameProcess {
-  // Use vite-node to run demo/headless.ts with proper workspace module resolution
+  // Use tsx with --no-cache to run demo/headless.ts without module caching
   const scriptPath = path.join(process.cwd(), 'demo', 'headless.ts');
 
   const child = spawn('npx', [
-    'vite-node',
-    '--root', 'demo',
+    'tsx',
+    '--no-cache',
     scriptPath,
-    '--',
     `--session-id=${sessionId}`,
     `--agents=${agentCount}`,
   ], {
@@ -161,7 +160,6 @@ function spawnHeadlessGame(sessionId: string, agentCount: number = 5): HeadlessG
     detached: false,
     env: {
       ...process.env,
-      VITE_FORCE: 'true', // Force Vite to skip cache
       NODE_ENV: 'development',
     },
   });
