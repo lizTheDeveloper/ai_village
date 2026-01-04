@@ -38,3 +38,15 @@ export {
   getCurrentSegment,
   recordSnapshotWaypoint,
 } from './SilverThreadComponent.js';
+
+// Soul Link Component
+export type {
+  SoulLinkComponent,
+} from './SoulLinkComponent.js';
+export {
+  createSoulLinkComponent,
+  increaseSoulInfluence,
+  decreaseSoulInfluence,
+  shouldSoulInfluence,
+  severSoulLink,
+} from './SoulLinkComponent.js';

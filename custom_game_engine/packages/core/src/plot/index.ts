@@ -29,3 +29,11 @@ export {
   getActivePlotsByScale,
   hasLearnedPlotLesson,
 } from './PlotTypes.js';
+
+// Plot Line Registry
+export {
+  plotLineRegistry,
+  registerPlotTemplate,
+  getPlotTemplate,
+  instantiatePlot,
+} from './PlotLineRegistry.js';

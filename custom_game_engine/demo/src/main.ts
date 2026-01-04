@@ -309,11 +309,19 @@ async function createSoulsForInitialAgents(
   agentIds: string[],
   llmProvider: LLMProvider,
   renderer: any,
-  universeConfig: UniverseConfig | null
+  universeConfig: UniverseConfig | null,
+  isLLMAvailable: boolean
 ): Promise<void> {
   const soulSystem = gameLoop.systemRegistry.get('soul_creation') as SoulCreationSystem;
   if (!soulSystem) {
     console.warn('[Demo] SoulCreationSystem not found, skipping soul creation');
+    return;
+  }
+
+  // If LLM is unavailable, skip soul creation ceremony entirely
+  if (!isLLMAvailable) {
+    console.warn('[Demo] LLM unavailable - skipping soul creation ceremony');
+    console.warn('[Demo] Game will start with soulless agents (souls can be created later)');
     return;
   }
 
@@ -3216,8 +3224,8 @@ async function main() {
 
     // Create souls for the initial agents (displays modal before map loads)
     // NOTE: Game loop will be started AFTER this, so SoulCreationSystem.update() won't run yet
-    await createSoulsForInitialAgents(gameLoop, agentIds, llmProvider, renderer, universeConfig);
-    console.log('[Demo] All souls created, continuing initialization...');
+    await createSoulsForInitialAgents(gameLoop, agentIds, llmProvider, renderer, universeConfig, isLLMAvailable);
+    console.log('[Demo] All souls created (or skipped if LLM unavailable), continuing initialization...');
 
     // Hide the universe config screen now that all souls are created
     if (universeConfigScreen) {
