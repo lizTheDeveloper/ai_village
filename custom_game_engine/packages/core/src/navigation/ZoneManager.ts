@@ -347,7 +347,7 @@ export class ZoneManager {
     let maxId = 0;
     for (const snapshot of snapshots) {
       const match = snapshot.id.match(/zone_(\d+)/);
-      if (match) {
+      if (match && match[1]) {
         maxId = Math.max(maxId, parseInt(match[1], 10));
       }
     }

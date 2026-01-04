@@ -332,8 +332,9 @@ export class EquipmentSystem implements System {
         const instance = itemInstanceRegistry.get(slot.instanceId);
         const item = itemRegistry.tryGet(instance.definitionId);
 
-        // Only degrade armor and clothing (not accessories, jewelry, etc.)
-        if (!item?.traits?.armor && !item?.traits?.clothing) continue;
+        // Only degrade items with armor trait (includes clothing, armor, shields)
+        // Weapons degrade during combat, not passively
+        if (!item?.traits?.armor) continue;
 
         // Calculate quality-adjusted wear
         const wearAmount = this.calculateQualityAdjustedWear(instance.quality);
