@@ -11,6 +11,7 @@
  */
 
 import type { World } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 // ============================================================================
 // Types (would import from @ai-village/core in real implementation)
@@ -120,7 +121,7 @@ const DIVINE_POWERS: DivinePower[] = [
 // DivinePowersPanel
 // ============================================================================
 
-export class DivinePowersPanel {
+export class DivinePowersPanel implements IWindowPanel {
   private visible = false;
   private scrollOffset = 0;
   private selectedPowerId: string | null = null;
@@ -211,6 +212,27 @@ export class DivinePowersPanel {
   }
 
   // ========== Visibility ==========
+
+
+  getId(): string {
+    return 'divine-powers';
+  }
+
+  getTitle(): string {
+    return 'Divine Powers';
+  }
+
+  getDefaultWidth(): number {
+    return 500;
+  }
+
+  getDefaultHeight(): number {
+    return 600;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
 
   isVisible(): boolean {
     return this.visible;

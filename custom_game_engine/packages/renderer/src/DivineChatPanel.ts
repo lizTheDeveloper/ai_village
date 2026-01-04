@@ -14,6 +14,7 @@
  */
 
 import type { World } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 // ============================================================================
 // Types (compatible with both old and new ChatRoom systems)
@@ -112,7 +113,7 @@ const SIZES = {
 // DivineChatPanel
 // ============================================================================
 
-export class DivineChatPanel {
+export class DivineChatPanel implements IWindowPanel {
   private visible = false;
   private scrollOffset = 0;
   private clickRegions: ClickRegion[] = [];
@@ -213,11 +214,31 @@ export class DivineChatPanel {
     this.visible = false;
   }
 
+  getId(): string {
+    return 'divine-chat';
+  }
+
+  getTitle(): string {
+    return 'Divine Chat';
+  }
+
+  getDefaultWidth(): number {
+    return 400;
+  }
+
+  getDefaultHeight(): number {
+    return 600;
+  }
+
   /**
    * Check if panel is visible
    */
   isVisible(): boolean {
     return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
   }
 
   /**

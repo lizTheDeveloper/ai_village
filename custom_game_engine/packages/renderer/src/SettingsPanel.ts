@@ -2,6 +2,7 @@
  * Settings Panel UI for configuring LLM provider and other game settings.
  * Uses DOM elements for form inputs, toggled with ESC key.
  */
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 export interface LLMSettings {
   provider: 'ollama' | 'openai-compat';
@@ -90,12 +91,37 @@ const DM_PROMPT_PRESETS: Record<string, string> = {
   'social-experiment': 'You are participants in the greatest social experiment ever conducted. Observers are watching, recording everything. Build a society worthy of study. Or don\'t. The choice—and the consequences—are yours.',
 };
 
-export class SettingsPanel {
+export class SettingsPanel implements IWindowPanel {
+  private visible: boolean = false;
   private container: HTMLDivElement | null = null;
-  private isVisible = false;
   private settings: GameSettings;
   private onSettingsChange: ((settings: GameSettings) => void) | null = null;
   private isFirstRun = false;
+
+
+  getId(): string {
+    return 'settings';
+  }
+
+  getTitle(): string {
+    return 'Settings';
+  }
+
+  getDefaultWidth(): number {
+    return 500;
+  }
+
+  getDefaultHeight(): number {
+    return 600;
+  }
+
+  isVisible(): boolean {
+    return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
 
   constructor() {
     this.settings = this.loadSettings();

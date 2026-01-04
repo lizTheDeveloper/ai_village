@@ -1,10 +1,12 @@
 import type { Entity, World, PlantComponent, ResourceComponent } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 /**
  * UI Panel displaying information about a selected plant.
  * Shows plant species, stage, age, health, hydration, nutrition, and genetics.
  */
-export class PlantInfoPanel {
+export class PlantInfoPanel implements IWindowPanel {
+  private visible: boolean = false;
   private selectedEntityId: string | null = null;
   private panelWidth = 320;
   private panelHeight = 480; // Increased to fit all content including buttons
@@ -17,6 +19,31 @@ export class PlantInfoPanel {
    * Set the currently selected plant entity.
    * @param entity Plant entity to display, or null to clear selection
    */
+
+  getId(): string {
+    return 'plant-info';
+  }
+
+  getTitle(): string {
+    return 'Plant Info';
+  }
+
+  getDefaultWidth(): number {
+    return 300;
+  }
+
+  getDefaultHeight(): number {
+    return 400;
+  }
+
+  isVisible(): boolean {
+    return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
+
   setSelectedEntity(entity: Entity | null): void {
     this.selectedEntityId = entity ? entity.id : null;
     this.scrollOffset = 0; // Reset scroll when selecting new entity

@@ -9,6 +9,7 @@
 
 import type { World } from '@ai-village/core';
 import { EntityImpl } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 import type {
   BuildingComponent,
   NeedsComponent,
@@ -70,7 +71,8 @@ interface ProductivityData {
   utilizationRate: number;
 }
 
-export class GovernanceDashboardPanel {
+export class GovernanceDashboardPanel implements IWindowPanel {
+  private visible: boolean = false;
   private padding = 10;
   private lineHeight = 18;
   private sectionSpacing = 10;
@@ -82,6 +84,31 @@ export class GovernanceDashboardPanel {
    * @param _canvasWidth Width of the canvas (unused - WindowManager handles positioning)
    * @param world World instance to query governance buildings
    */
+
+  getId(): string {
+    return 'governance-dashboard';
+  }
+
+  getTitle(): string {
+    return 'Governance';
+  }
+
+  getDefaultWidth(): number {
+    return 500;
+  }
+
+  getDefaultHeight(): number {
+    return 600;
+  }
+
+  isVisible(): boolean {
+    return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
+
   render(ctx: CanvasRenderingContext2D, _canvasWidth: number, world: World): void {
     const x = 0;
     const y = 0;

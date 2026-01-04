@@ -11,6 +11,7 @@
 import { PixelLabSpriteLoader } from './sprites/PixelLabSpriteLoader.js';
 import { getAnimalSpriteVariant } from './sprites/AnimalSpriteVariants.js';
 import type { World } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 interface AgentInfo {
   id: string;
@@ -24,13 +25,39 @@ const ANIMAL_SPECIES = new Set([
   'chicken', 'cow', 'sheep', 'horse', 'dog', 'cat', 'rabbit', 'deer', 'pig', 'goat'
 ]);
 
-export class AgentRosterPanel {
+export class AgentRosterPanel implements IWindowPanel {
+  private visible: boolean = false;
   private container: HTMLDivElement;
   private rosterContainer: HTMLDivElement;
   private agents: Map<string, AgentInfo> = new Map();
   private spriteLoader: PixelLabSpriteLoader;
   private onAgentClickCallback: ((agentId: string) => void) | null = null;
   private selectedAgentId: string | null = null;
+
+
+  getId(): string {
+    return 'agent-roster';
+  }
+
+  getTitle(): string {
+    return 'Agent Roster';
+  }
+
+  getDefaultWidth(): number {
+    return 400;
+  }
+
+  getDefaultHeight(): number {
+    return 600;
+  }
+
+  isVisible(): boolean {
+    return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
 
   constructor(spriteLoader: PixelLabSpriteLoader) {
     this.spriteLoader = spriteLoader;

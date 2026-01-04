@@ -12,6 +12,7 @@
 
 import type { Entity } from '@ai-village/core';
 import { TabbedPanel } from './ui/index.js';
+import type { IWindowPanel } from './types/WindowTypes.js';
 import {
   type AgentInfoTab,
   type SectionRenderContext,
@@ -52,7 +53,8 @@ const TAB_DEFINITIONS: Array<{ id: AgentInfoTab; label: string }> = [
 /**
  * UI Panel displaying information about the selected agent.
  */
-export class AgentInfoPanel {
+export class AgentInfoPanel implements IWindowPanel {
+  private visible: boolean = false;
   private selectedEntityId: string | null = null;
   private panelWidth = 360;
   private panelHeight = 530;
@@ -77,6 +79,31 @@ export class AgentInfoPanel {
 
   // Priority reset callback
   private onResetPrioritiesCallback: ((entityId: string) => void) | null = null;
+
+
+  getId(): string {
+    return 'agent-info';
+  }
+
+  getTitle(): string {
+    return 'Agent Info';
+  }
+
+  getDefaultWidth(): number {
+    return 360;
+  }
+
+  getDefaultHeight(): number {
+    return 530;
+  }
+
+  isVisible(): boolean {
+    return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
 
   constructor() {
     this.tabs = new TabbedPanel<AgentInfoTab>(

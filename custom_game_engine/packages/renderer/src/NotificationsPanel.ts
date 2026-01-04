@@ -5,6 +5,7 @@
  * Deposits are accrued per agent until dismissed.
  * Can be toggled with 'n' key.
  */
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 export interface Notification {
   id: number;
@@ -20,7 +21,8 @@ export interface DepositSummary {
   lastUpdated: number;
 }
 
-export class NotificationsPanel {
+export class NotificationsPanel implements IWindowPanel {
+  private visible: boolean = false;
   private notifications: Notification[] = [];
   private nextId: number = 1;
   private maxNotifications: number = 50;
@@ -34,6 +36,31 @@ export class NotificationsPanel {
   /**
    * Add a notification to the panel
    */
+
+  getId(): string {
+    return 'notifications';
+  }
+
+  getTitle(): string {
+    return 'Notifications';
+  }
+
+  getDefaultWidth(): number {
+    return 400;
+  }
+
+  getDefaultHeight(): number {
+    return 500;
+  }
+
+  isVisible(): boolean {
+    return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
+
   addNotification(message: string, color: string = '#FFFFFF', icon?: string): void {
     const notification: Notification = {
       id: this.nextId++,

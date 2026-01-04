@@ -12,6 +12,7 @@
  */
 
 import type { World } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 // ============================================================================
 // Types
@@ -162,7 +163,7 @@ const EXAMPLE_TARGETS: VisionTarget[] = [
 // VisionComposerPanel
 // ============================================================================
 
-export class VisionComposerPanel {
+export class VisionComposerPanel implements IWindowPanel {
   private visible = false;
   private scrollOffset = 0;
   private contentHeight = 0;
@@ -239,6 +240,27 @@ export class VisionComposerPanel {
   }
 
   // ========== Visibility ==========
+
+
+  getId(): string {
+    return 'vision-composer';
+  }
+
+  getTitle(): string {
+    return 'Vision Composer';
+  }
+
+  getDefaultWidth(): number {
+    return 600;
+  }
+
+  getDefaultHeight(): number {
+    return 700;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
 
   isVisible(): boolean {
     return this.visible;

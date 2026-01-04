@@ -1,6 +1,7 @@
 import type { World, EventBus } from '@ai-village/core';
 import type { Camera } from './Camera.js';
 import type { Tile, ChunkManager, TerrainGenerator } from '@ai-village/world';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 const CHUNK_SIZE = 32; // From packages/world/src/chunks/Chunk.ts
 
@@ -8,7 +9,8 @@ const CHUNK_SIZE = 32; // From packages/world/src/chunks/Chunk.ts
  * UI Panel for inspecting and interacting with tiles.
  * Shows soil properties and provides buttons for tilling, watering, and fertilizing.
  */
-export class TileInspectorPanel {
+export class TileInspectorPanel implements IWindowPanel {
+  private visible: boolean = false;
   private selectedTile: { tile: Tile; x: number; y: number } | null = null;
   private panelWidth = 384;  // 20% larger than original 320
   private panelHeight = 504; // 20% larger than original 420
@@ -32,6 +34,31 @@ export class TileInspectorPanel {
     onClick: () => void;
     enabled: () => boolean;
   }> = [];
+
+
+  getId(): string {
+    return 'tile-inspector';
+  }
+
+  getTitle(): string {
+    return 'Tile Inspector';
+  }
+
+  getDefaultWidth(): number {
+    return 350;
+  }
+
+  getDefaultHeight(): number {
+    return 450;
+  }
+
+  isVisible(): boolean {
+    return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
 
   constructor(eventBus: EventBus, camera: Camera, chunkManager: ChunkManager, terrainGenerator: TerrainGenerator) {
     this.eventBus = eventBus;

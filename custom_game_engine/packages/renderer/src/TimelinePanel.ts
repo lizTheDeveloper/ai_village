@@ -14,6 +14,7 @@
  */
 
 import type { Checkpoint } from '../../core/src/systems/AutoSaveSystem.js';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 export interface Timeline {
   id: string;  // Unique timeline ID
@@ -33,13 +34,39 @@ export interface UniverseTimeline {
   currentDay: number;  // Latest day across all timelines
 }
 
-export class TimelinePanel {
+export class TimelinePanel implements IWindowPanel {
+  private visible: boolean = false;
   private container: HTMLElement;
   private universes: Map<string, UniverseTimeline> = new Map();
   private selectedUniverse: string | null = null;
   private selectedTimeline: string | null = null;
   private selectedCheckpoint: string | null = null;
   private onLoad: ((checkpointKey: string) => void) | null = null;
+
+
+  getId(): string {
+    return 'timeline';
+  }
+
+  getTitle(): string {
+    return 'Timeline';
+  }
+
+  getDefaultWidth(): number {
+    return 500;
+  }
+
+  getDefaultHeight(): number {
+    return 600;
+  }
+
+  isVisible(): boolean {
+    return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
 
   constructor(containerId: string = 'timeline-panel') {
     const existing = document.getElementById(containerId);

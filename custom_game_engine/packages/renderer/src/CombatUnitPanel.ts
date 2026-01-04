@@ -1,4 +1,5 @@
 import type { EventBus, World, Entity } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 /**
  * CombatUnitPanel - Detailed view of selected combatant
@@ -9,7 +10,8 @@ import type { EventBus, World, Entity } from '@ai-village/core';
  * - Lists active injuries with severity
  * - Shows current stance and action
  */
-export class CombatUnitPanel {
+export class CombatUnitPanel implements IWindowPanel {
+  private visible: boolean = false;
   private eventBus: EventBus;
   private world: World;
   private selectedEntity: Entity | null = null;
@@ -17,6 +19,23 @@ export class CombatUnitPanel {
 
   // Event handlers for cleanup
   private entitySelectedHandler: ((data: any) => void) | null = null;
+
+
+  getDefaultWidth(): number {
+    return 350;
+  }
+
+  getDefaultHeight(): number {
+    return 450;
+  }
+
+  isVisible(): boolean {
+    return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
 
   constructor(eventBus: EventBus, world: World) {
     if (!eventBus) {

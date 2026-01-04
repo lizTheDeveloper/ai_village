@@ -16,6 +16,7 @@
 
 import type { Entity, World } from '@ai-village/core';
 import type { BuildingComponent } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 export interface CraftingStationPanelOptions {
   world: World;
@@ -25,13 +26,38 @@ export interface CraftingStationPanelOptions {
   height: number;
 }
 
-export class CraftingStationPanel {
+export class CraftingStationPanel implements IWindowPanel {
+  private visible: boolean = false;
   private x: number;
   private y: number;
   private width: number;
   private height: number;
   private selectedStation: Entity | null = null;
-  private isVisible = false;
+
+
+  getId(): string {
+    return 'crafting-station';
+  }
+
+  getTitle(): string {
+    return 'Crafting Station';
+  }
+
+  getDefaultWidth(): number {
+    return 500;
+  }
+
+  getDefaultHeight(): number {
+    return 600;
+  }
+
+  isVisible(): boolean {
+    return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
 
   constructor(options: CraftingStationPanelOptions) {
     this.x = options.x;

@@ -1,0 +1,18 @@
+{
+  "id": "dog_black",
+  "base_species": "dog",
+  "variant": "black",
+  "description": "black dog",
+  "size": 48,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-04T00:17:59.280Z"
+}

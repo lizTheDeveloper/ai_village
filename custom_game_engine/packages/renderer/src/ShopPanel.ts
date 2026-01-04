@@ -1,6 +1,7 @@
 import type { World, ShopComponent, EntityId, InventoryComponent, CurrencyComponent, MarketStateComponent, System } from '@ai-village/core';
 import { EntityImpl } from '@ai-village/core';
 import { itemRegistry, calculateBuyPrice, calculateSellPrice, getQualityTier, getQualityColor, getQualityDisplayName, getQualityPriceMultiplier } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 /**
  * Interface for TradingSystem methods used by ShopPanel.
@@ -51,7 +52,7 @@ interface SellableItem {
 /**
  * Interactive panel for trading with shops
  */
-export class ShopPanel {
+export class ShopPanel implements IWindowPanel {
   private visible = false;
   private selectedShopId: EntityId | null = null;
   private selectedAgentId: EntityId | null = null;
@@ -65,6 +66,26 @@ export class ShopPanel {
   // Click regions for buy/sell buttons
   private buyButtons: Array<{ itemId: string; quality?: number; x: number; y: number; width: number; height: number }> = [];
   private sellButtons: Array<{ itemId: string; quality?: number; slotIndex: number; x: number; y: number; width: number; height: number }> = [];
+
+  getId(): string {
+    return 'shop';
+  }
+
+  getTitle(): string {
+    return 'Shop';
+  }
+
+  getDefaultWidth(): number {
+    return 450;
+  }
+
+  getDefaultHeight(): number {
+    return 550;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
 
   openShop(shopId: EntityId, agentId: EntityId): void {
     if (!shopId) {

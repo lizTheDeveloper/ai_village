@@ -2,8 +2,9 @@
  * LLMConfigPanel - HTML modal for configuring per-agent custom LLM settings
  * Uses DOM overlay similar to SettingsPanel
  */
+import type { IWindowPanel } from './types/WindowTypes.js';
 
-export class LLMConfigPanel {
+export class LLMConfigPanel implements IWindowPanel {
   private container: HTMLDivElement;
   private agentEntity: any = null;
   private visible = false;
@@ -13,6 +14,31 @@ export class LLMConfigPanel {
   private modelInput!: HTMLInputElement;
   private apiKeyInput!: HTMLInputElement;
   private customHeadersInput!: HTMLTextAreaElement;
+
+
+  getId(): string {
+    return 'llm-config';
+  }
+
+  getTitle(): string {
+    return 'LLM Config';
+  }
+
+  getDefaultWidth(): number {
+    return 500;
+  }
+
+  getDefaultHeight(): number {
+    return 600;
+  }
+
+  isVisible(): boolean {
+    return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
 
   constructor() {
     this.container = this.createPanel();

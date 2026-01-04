@@ -1,10 +1,12 @@
 import type { Entity, World, AnimalComponent } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 /**
  * UI Panel displaying information about the selected animal.
  * Shows animal status, needs, species info, and bond level.
  */
-export class AnimalInfoPanel {
+export class AnimalInfoPanel implements IWindowPanel {
+  private visible: boolean = false;
   private selectedEntityId: string | null = null;
   private panelWidth = 300;
   private panelHeight = 450;
@@ -18,6 +20,31 @@ export class AnimalInfoPanel {
    * Set the currently selected animal entity.
    * @param entity Animal entity to display, or null to clear selection
    */
+
+  getId(): string {
+    return 'animal-info';
+  }
+
+  getTitle(): string {
+    return 'Animal Info';
+  }
+
+  getDefaultWidth(): number {
+    return 300;
+  }
+
+  getDefaultHeight(): number {
+    return 400;
+  }
+
+  isVisible(): boolean {
+    return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
+
   setSelectedEntity(entity: Entity | null): void {
     this.selectedEntityId = entity ? entity.id : null;
   }

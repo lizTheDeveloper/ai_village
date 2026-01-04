@@ -3,13 +3,14 @@ import type {
   MarketStateComponent,
   ItemMarketStats,
 } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 /**
  * UI Panel displaying economy and market information.
  * Shows village-wide economic stats, price trends, and market activity.
  * Toggle with 'E' key.
  */
-export class EconomyPanel {
+export class EconomyPanel implements IWindowPanel {
   private visible: boolean = false;
   private panelWidth = 400;
   private panelHeight = 500;
@@ -19,6 +20,27 @@ export class EconomyPanel {
   /**
    * Toggle panel visibility.
    */
+
+  getId(): string {
+    return 'economy';
+  }
+
+  getTitle(): string {
+    return 'Economy';
+  }
+
+  getDefaultWidth(): number {
+    return 400;
+  }
+
+  getDefaultHeight(): number {
+    return 500;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
+
   toggle(): void {
     this.visible = !this.visible;
   }

@@ -1,4 +1,5 @@
 import type { EventBus } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 interface ActiveConflict {
   id: string;
@@ -17,9 +18,9 @@ interface ActiveConflict {
  * - Recent combat events
  * - Click to focus camera on conflict
  */
-export class CombatHUDPanel {
+export class CombatHUDPanel implements IWindowPanel {
+  private visible: boolean = false;
   private eventBus: EventBus;
-  private isVisible: boolean = false;
   private activeConflicts: Map<string, ActiveConflict> = new Map();
   private recentEvents: Array<{ message: string; timestamp: number }> = [];
   private readonly MAX_RECENT_EVENTS = 3;
@@ -29,6 +30,23 @@ export class CombatHUDPanel {
   private conflictStartedHandler: ((data: any) => void) | null = null;
   private conflictResolvedHandler: ((data: any) => void) | null = null;
   private combatAttackHandler: ((data: any) => void) | null = null;
+
+
+  getDefaultWidth(): number {
+    return 400;
+  }
+
+  getDefaultHeight(): number {
+    return 300;
+  }
+
+  isVisible(): boolean {
+    return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
 
   constructor(eventBus: EventBus) {
     if (!eventBus) {

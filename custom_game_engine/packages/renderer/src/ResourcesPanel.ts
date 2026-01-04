@@ -1,10 +1,12 @@
 import type { World, InventorySlot, BuildingComponent, InventoryComponent } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 /**
  * UI Panel displaying village resources and stockpile.
  * Shows total resources across all storage buildings.
  */
-export class ResourcesPanel {
+export class ResourcesPanel implements IWindowPanel {
+  private visible: boolean = false;
   private panelWidth = 280;
   private padding = 10;
   private lineHeight = 18;
@@ -17,6 +19,31 @@ export class ResourcesPanel {
    * @param world World instance to query storage buildings
    * @param _agentPanelOpen Whether the agent info panel is currently open (unused)
    */
+
+  getId(): string {
+    return 'resources';
+  }
+
+  getTitle(): string {
+    return 'Resources';
+  }
+
+  getDefaultWidth(): number {
+    return 400;
+  }
+
+  getDefaultHeight(): number {
+    return 500;
+  }
+
+  isVisible(): boolean {
+    return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
+
   render(ctx: CanvasRenderingContext2D, _canvasWidth: number, world: World, _agentPanelOpen = false): void {
     // WindowManager handles positioning via translate, so render at (0, 0)
     const x = 0;

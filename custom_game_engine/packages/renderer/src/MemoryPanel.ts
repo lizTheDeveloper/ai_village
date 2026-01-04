@@ -9,19 +9,36 @@ import type {
   JournalComponent,
   AgentComponent,
 } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 /**
  * UI Panel displaying episodic memory information for the selected agent.
  * Temporary panel for playtesting the episodic memory system.
  * Toggle with 'M' key.
  */
-export class MemoryPanel {
+export class MemoryPanel implements IWindowPanel {
   private selectedEntityId: string | null = null;
   private visible: boolean = false;
   private panelWidth = 400;
   private panelHeight = 600;
   private padding = 12;
   private lineHeight = 16;
+
+  getId(): string {
+    return 'memory';
+  }
+
+  getTitle(): string {
+    return 'Memory & Goals';
+  }
+
+  getDefaultWidth(): number {
+    return this.panelWidth;
+  }
+
+  getDefaultHeight(): number {
+    return this.panelHeight;
+  }
 
   /**
    * Set the currently selected agent entity.
@@ -43,6 +60,13 @@ export class MemoryPanel {
    */
   isVisible(): boolean {
     return this.visible;
+  }
+
+  /**
+   * Set the visibility state of the panel.
+   */
+  setVisible(visible: boolean): void {
+    this.visible = visible;
   }
 
   /**

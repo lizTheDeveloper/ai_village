@@ -1,4 +1,5 @@
 import type { World, PlantComponent, BuildingComponent, PositionComponent } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 /**
  * Farm health status summary
@@ -38,7 +39,8 @@ interface FarmBuilding {
  * UI Panel for farm management overview.
  * Shows farm health, diseases/pests, buildings, and recommendations.
  */
-export class FarmManagementPanel {
+export class FarmManagementPanel implements IWindowPanel {
+  private visible: boolean = false;
   private panelWidth = 320;
   private panelHeight = 480;
   private padding = 10;
@@ -51,6 +53,31 @@ export class FarmManagementPanel {
   /**
    * Toggle panel collapsed state.
    */
+
+  getId(): string {
+    return 'farm-management';
+  }
+
+  getTitle(): string {
+    return 'Farm Management';
+  }
+
+  getDefaultWidth(): number {
+    return 500;
+  }
+
+  getDefaultHeight(): number {
+    return 600;
+  }
+
+  isVisible(): boolean {
+    return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
+
   toggleCollapsed(): void {
     this.isCollapsed = !this.isCollapsed;
   }

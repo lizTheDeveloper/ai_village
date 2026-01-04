@@ -12,6 +12,7 @@
 
 import type { World, SpellDefinition, PlayerSpellState } from '@ai-village/core';
 import { getSpellRegistry, getMagicSystemState } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 // ============================================================================
 // Types
@@ -68,7 +69,7 @@ const SIZES = {
 // SpellbookPanel
 // ============================================================================
 
-export class SpellbookPanel {
+export class SpellbookPanel implements IWindowPanel {
   private visible = false;
   private scrollOffset = 0;
   private selectedSpellId: string | null = null;
@@ -82,6 +83,27 @@ export class SpellbookPanel {
   private playerMaxMana = 100;
 
   // ========== Visibility ==========
+
+
+  getId(): string {
+    return 'spellbook';
+  }
+
+  getTitle(): string {
+    return 'Spellbook';
+  }
+
+  getDefaultWidth(): number {
+    return 500;
+  }
+
+  getDefaultHeight(): number {
+    return 600;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
 
   isVisible(): boolean {
     return this.visible;

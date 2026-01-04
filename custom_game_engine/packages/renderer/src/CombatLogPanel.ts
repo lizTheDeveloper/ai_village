@@ -1,4 +1,5 @@
 import type { EventBus } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 interface CombatEvent {
   timestamp: number;
@@ -18,7 +19,8 @@ interface CombatEvent {
  * - Color-coded entries
  * - Auto-scrolls to latest events
  */
-export class CombatLogPanel {
+export class CombatLogPanel implements IWindowPanel {
+  private visible: boolean = false;
   private eventBus: EventBus;
   private events: CombatEvent[] = [];
   private readonly MAX_EVENTS = 100; // Keep last 100 events
@@ -27,6 +29,23 @@ export class CombatLogPanel {
 
   // Event handlers for cleanup
   private eventHandlers: Map<string, (data: any) => void> = new Map();
+
+
+  getDefaultWidth(): number {
+    return 400;
+  }
+
+  getDefaultHeight(): number {
+    return 500;
+  }
+
+  isVisible(): boolean {
+    return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
 
   constructor(eventBus: EventBus) {
     if (!eventBus) {

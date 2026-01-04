@@ -11,6 +11,7 @@ interface Ingredient {
   quantity: number;
 }
 import { globalRecipeRegistry } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 export interface IngredientDisplay {
   itemId: string;
@@ -22,7 +23,8 @@ export interface IngredientDisplay {
 /**
  * Ingredient panel for displaying recipe ingredient requirements and availability.
  */
-export class IngredientPanel {
+export class IngredientPanel implements IWindowPanel {
+  private visible: boolean = false;
   private world: World;
   public readonly bounds: { x: number; y: number; width: number; height: number };
 
@@ -34,6 +36,31 @@ export class IngredientPanel {
   // Callbacks (unused for now but part of planned UI)
   private _onTakeFromStorageCallback: ((itemId: string, quantity: number) => void) | null = null;
   private _onFindIngredientCallback: ((itemId: string) => void) | null = null;
+
+
+  getId(): string {
+    return 'ingredient';
+  }
+
+  getTitle(): string {
+    return 'Ingredient';
+  }
+
+  getDefaultWidth(): number {
+    return 300;
+  }
+
+  getDefaultHeight(): number {
+    return 400;
+  }
+
+  isVisible(): boolean {
+    return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
 
   constructor(world: World, x: number, y: number, width: number, height: number) {
     if (!world) {

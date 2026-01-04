@@ -12,13 +12,14 @@ interface VerificationInfo {
   result: string;
 }
 import { RelationshipComponent, TrustNetworkComponent } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 /**
  * UI Panel displaying relationship information for the selected agent.
  * Shows social memory, trust networks, and familiarity data.
  * Toggle with 'R' key.
  */
-export class RelationshipsPanel {
+export class RelationshipsPanel implements IWindowPanel {
   private selectedEntityId: string | null = null;
   private visible: boolean = false;
   private panelWidth = 380;
@@ -31,6 +32,27 @@ export class RelationshipsPanel {
   /**
    * Set the currently selected agent entity.
    */
+
+  getId(): string {
+    return 'relationships';
+  }
+
+  getTitle(): string {
+    return 'Relationships';
+  }
+
+  getDefaultWidth(): number {
+    return 400;
+  }
+
+  getDefaultHeight(): number {
+    return 500;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
+
   setSelectedEntity(entity: Entity | null): void {
     this.selectedEntityId = entity ? entity.id : null;
     this.scrollOffset = 0; // Reset scroll on entity change

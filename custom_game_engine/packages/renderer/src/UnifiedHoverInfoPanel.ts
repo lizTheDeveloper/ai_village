@@ -1,4 +1,5 @@
 import type { Entity } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 import type {
   AgentComponent,
   AnimalComponent,
@@ -18,7 +19,8 @@ import type {
  * Phase 16: Polish & Player - Unified hover info system
  * Displays compact tooltips for agents, animals, plants, buildings, resources, and shops
  */
-export class UnifiedHoverInfoPanel {
+export class UnifiedHoverInfoPanel implements IWindowPanel {
+  private visible: boolean = false;
   private currentEntity: Entity | null = null;
   private mouseX: number = 0;
   private mouseY: number = 0;
@@ -26,6 +28,31 @@ export class UnifiedHoverInfoPanel {
   private readonly padding = 8;
   private readonly lineHeight = 14;
   private readonly maxWidth = 250;
+
+
+  getId(): string {
+    return 'unified-hover-info';
+  }
+
+  getTitle(): string {
+    return 'Hover Info';
+  }
+
+  getDefaultWidth(): number {
+    return 350;
+  }
+
+  getDefaultHeight(): number {
+    return 400;
+  }
+
+  isVisible(): boolean {
+    return this.visible;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
 
   constructor() {}
 

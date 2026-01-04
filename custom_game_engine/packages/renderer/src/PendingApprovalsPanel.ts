@@ -9,13 +9,14 @@
  */
 
 import { pendingApprovalRegistry, type PendingCreation } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 export interface ApprovalAction {
   type: 'approve' | 'reject';
   creationId: string;
 }
 
-export class PendingApprovalsPanel {
+export class PendingApprovalsPanel implements IWindowPanel {
   private visible: boolean = false;
   private scrollOffset: number = 0;
   private padding: number = 15;
@@ -25,6 +26,27 @@ export class PendingApprovalsPanel {
   /**
    * Toggle panel visibility
    */
+
+  getId(): string {
+    return 'pending-approvals';
+  }
+
+  getTitle(): string {
+    return 'Pending Approvals';
+  }
+
+  getDefaultWidth(): number {
+    return 450;
+  }
+
+  getDefaultHeight(): number {
+    return 550;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
+
   toggle(): void {
     this.visible = !this.visible;
     if (this.visible) {

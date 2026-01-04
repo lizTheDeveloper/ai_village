@@ -38,6 +38,7 @@ import {
   createTagsComponent,
   createBuildingComponent,
 } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 // ============================================================================
 // Types
@@ -376,7 +377,7 @@ const DEV_ACTIONS: ActionButton[] = [
 // DevPanel
 // ============================================================================
 
-export class DevPanel {
+export class DevPanel implements IWindowPanel {
   private visible = false;
   private scrollOffset = 0;
   private contentHeight = 0;
@@ -447,11 +448,33 @@ export class DevPanel {
     }
   }
 
-  // ========== Visibility ==========
+  // ========== IWindowPanel Interface ==========
+
+  getId(): string {
+    return 'dev';
+  }
+
+  getTitle(): string {
+    return 'Dev Panel';
+  }
+
+  getDefaultWidth(): number {
+    return 600;
+  }
+
+  getDefaultHeight(): number {
+    return 700;
+  }
 
   isVisible(): boolean {
     return this.visible;
   }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
+
+  // ========== Additional Visibility Methods ==========
 
   toggle(): void {
     this.visible = !this.visible;

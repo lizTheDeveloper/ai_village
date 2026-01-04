@@ -16,6 +16,7 @@ interface MagicSourceInfo {
   name: string;
 }
 import { getMagicSystemState } from '@ai-village/core';
+import type { IWindowPanel } from './types/WindowTypes.js';
 
 // ============================================================================
 // Types
@@ -68,13 +69,34 @@ const SIZES = {
 // MagicSystemsPanel
 // ============================================================================
 
-export class MagicSystemsPanel {
+export class MagicSystemsPanel implements IWindowPanel {
   private visible = false;
   private scrollOffset = 0;
   private expandedParadigms: Set<string> = new Set();
   private clickRegions: ClickRegion[] = [];
 
   // ========== Visibility ==========
+
+
+  getId(): string {
+    return 'magic-systems';
+  }
+
+  getTitle(): string {
+    return 'Magic Systems';
+  }
+
+  getDefaultWidth(): number {
+    return 500;
+  }
+
+  getDefaultHeight(): number {
+    return 650;
+  }
+
+  setVisible(visible: boolean): void {
+    this.visible = visible;
+  }
 
   isVisible(): boolean {
     return this.visible;
