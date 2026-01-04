@@ -92,7 +92,12 @@ export class SkillTreePanel implements IWindowPanel {
     this.renderTabs(ctx, magicComp.knownParadigmIds, x, y, width, tabHeight);
 
     // Render tree
-    const tree = MagicSkillTreeRegistry.getInstance().getTree(this.uiState.activeParadigmId!);
+    if (!this.uiState.activeParadigmId) {
+      this.renderError(ctx, x, y + tabHeight, width, height - tabHeight, 'No active paradigm');
+      return;
+    }
+
+    const tree = MagicSkillTreeRegistry.getInstance().getTree(this.uiState.activeParadigmId);
     if (!tree) {
       this.renderError(ctx, x, y + tabHeight, width, height - tabHeight, `No tree found for ${this.uiState.activeParadigmId}`);
       return;
@@ -204,6 +209,160 @@ export class SkillTreePanel implements IWindowPanel {
     return Array.from(this.recentlyDiscoveredNodes);
   }
 
+  /**
+   * Get current active paradigm.
+   */
+  getActiveParadigm(): string | null {
+    return this.uiState.activeParadigmId || null;
+  }
+
+  /**
+   * Set selected node (for keyboard navigation).
+   */
+  setSelectedNode(nodeId: string | null): void {
+    this.uiState.selectedNodeId = nodeId || undefined;
+  }
+
+  /**
+   * Get selected node ID.
+   */
+  getSelectedNodeId(): string | null {
+    return this.uiState.selectedNodeId || null;
+  }
+
+  /**
+   * Handle scroll/pan.
+   */
+  handleScroll(dx: number, dy: number): void {
+    this.uiState.viewport.offsetX += dx;
+    this.uiState.viewport.offsetY += dy;
+  }
+
+  /**
+   * Get current scroll position.
+   */
+  getScroll(): { x: number; y: number } {
+    return {
+      x: this.uiState.viewport.offsetX,
+      y: this.uiState.viewport.offsetY,
+    };
+  }
+
+  /**
+   * Set scroll position.
+   */
+  setScroll(x: number, y: number): void {
+    this.uiState.viewport.offsetX = x;
+    this.uiState.viewport.offsetY = y;
+  }
+
+  /**
+   * Handle zoom.
+   */
+  handleZoom(factor: number): void {
+    this.uiState.viewport.zoom = Math.max(
+      this.uiState.viewport.minZoom,
+      Math.min(this.uiState.viewport.maxZoom, this.uiState.viewport.zoom * factor)
+    );
+  }
+
+  /**
+   * Get current zoom level.
+   */
+  getZoom(): number {
+    return this.uiState.viewport.zoom;
+  }
+
+  /**
+   * Set zoom level.
+   */
+  setZoom(level: number): void {
+    this.uiState.viewport.zoom = Math.max(
+      this.uiState.viewport.minZoom,
+      Math.min(this.uiState.viewport.maxZoom, level)
+    );
+  }
+
+  /**
+   * Handle mouse move (for hover detection).
+   */
+  handleMouseMove(x: number, y: number, world?: World): void {
+    if (!this.selectedEntity || !world || !this.uiState.activeParadigmId) {
+      this.uiState.hoveredNodeId = undefined;
+      return;
+    }
+
+    const tabHeight = 30;
+    if (y < tabHeight) {
+      this.uiState.hoveredNodeId = undefined;
+      return;
+    }
+
+    const tree = MagicSkillTreeRegistry.getInstance().getTree(this.uiState.activeParadigmId);
+    if (!tree) {
+      this.uiState.hoveredNodeId = undefined;
+      return;
+    }
+
+    const nodeId = this.treeView.findNodeAtPosition(
+      tree,
+      x,
+      y - tabHeight,
+      this.uiState.viewport,
+      0,
+      0,
+      this.getDefaultWidth(),
+      this.getDefaultHeight() - tabHeight
+    );
+
+    this.uiState.hoveredNodeId = nodeId;
+  }
+
+  /**
+   * Handle keyboard input.
+   */
+  handleKeyDown(key: string, world?: World): void {
+    if (!this.selectedEntity || !world) {
+      return;
+    }
+
+    const magicComp = this.selectedEntity.getComponent('magic') as MagicComponent | undefined;
+    if (!magicComp || !this.uiState.activeParadigmId) {
+      return;
+    }
+
+    switch (key) {
+      case 'Tab':
+        // Switch paradigm
+        const paradigms = magicComp.knownParadigmIds;
+        const currentIndex = paradigms.indexOf(this.uiState.activeParadigmId);
+        const nextIndex = (currentIndex + 1) % paradigms.length;
+        this.setActiveParadigm(paradigms[nextIndex]);
+        break;
+
+      case 'Escape':
+        // Close panel
+        this.setVisible(false);
+        break;
+
+      case 'Enter':
+      case ' ':
+        // Unlock selected node
+        if (this.uiState.selectedNodeId) {
+          this.handleNodeClick(this.uiState.selectedNodeId, world);
+        }
+        break;
+
+      case 'ArrowUp':
+      case 'ArrowDown':
+      case 'ArrowLeft':
+      case 'ArrowRight':
+        // Navigate nodes (simplified - would need node graph traversal)
+        // For now, do nothing
+        break;
+    }
+  }
+
   // ==========================================================================
   // Private Helpers
   // ==========================================================================
@@ -245,7 +404,6 @@ export class SkillTreePanel implements IWindowPanel {
       discoveries: {},
       relationships: {},
       milestones: {},
-      lastPurchaseTime: 0,
     };
   }
 
@@ -270,7 +428,7 @@ export class SkillTreePanel implements IWindowPanel {
     const tabWidth = 120;
     const tabIndex = Math.floor(x / tabWidth);
 
-    if (tabIndex >= 0 && tabIndex < paradigms.length) {
+    if (tabIndex >= 0 && tabIndex < paradigms.length && paradigms[tabIndex]) {
       this.setActiveParadigm(paradigms[tabIndex]);
       return true;
     }
@@ -283,12 +441,13 @@ export class SkillTreePanel implements IWindowPanel {
       return false;
     }
 
+    const activeParadigmId = this.uiState.activeParadigmId;
     const magicComp = this.selectedEntity.getComponent('magic') as MagicComponent | undefined;
     if (!magicComp) {
       return false;
     }
 
-    const tree = MagicSkillTreeRegistry.getInstance().getTree(this.uiState.activeParadigmId!);
+    const tree = MagicSkillTreeRegistry.getInstance().getTree(activeParadigmId);
     if (!tree) {
       return false;
     }
@@ -396,12 +555,13 @@ export class SkillTreePanel implements IWindowPanel {
       ctx.lineWidth = 1;
       ctx.strokeRect(tabX, y, tabWidth, height);
 
-      // Tab text
+      // Tab text (capitalize paradigm name)
       ctx.fillStyle = isActive ? '#ffffff' : '#999999';
       ctx.font = '14px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(paradigms[i], tabX + tabWidth / 2, y + height / 2);
+      const paradigmName = paradigms[i].charAt(0).toUpperCase() + paradigms[i].slice(1);
+      ctx.fillText(paradigmName, tabX + tabWidth / 2, y + height / 2);
     }
   }
 

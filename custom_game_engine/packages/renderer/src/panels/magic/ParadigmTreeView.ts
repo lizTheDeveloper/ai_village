@@ -299,4 +299,120 @@ export class ParadigmTreeView {
     this.cachedLayout = undefined;
     this.cachedTreeId = undefined;
   }
+
+  /**
+   * Calculate layout for a tree (public API).
+   */
+  calculateLayout(tree: MagicSkillTree): Map<string, { x: number; y: number }> {
+    const layout = this.layoutEngine.calculateLayout(tree);
+    const positionMap = new Map<string, { x: number; y: number }>();
+
+    for (const [nodeId, pos] of layout.nodes.entries()) {
+      positionMap.set(nodeId, { x: pos.x, y: pos.y });
+    }
+
+    return positionMap;
+  }
+
+  /**
+   * Set tree (for explicit tree updates).
+   */
+  setTree(_tree: MagicSkillTree): void {
+    // Just clear cache - tree is passed to render()
+    this.clearCache();
+  }
+
+  /**
+   * Set evaluation results (for pre-computed evaluations).
+   */
+  setEvaluationResults(_results: Map<string, any>): void {
+    // Not needed - evaluations are computed in render()
+    // This is a no-op for API compatibility
+  }
+
+  /**
+   * Set viewport scroll.
+   */
+  setScroll(_x: number, _y: number): void {
+    // Viewport is passed via options in render()
+    // This is a no-op for API compatibility
+  }
+
+  /**
+   * Set viewport zoom.
+   */
+  setZoom(_factor: number): void {
+    // Viewport is passed via options in render()
+    // This is a no-op for API compatibility
+  }
+
+  /**
+   * Get current zoom level.
+   */
+  getZoom(): number {
+    // Viewport is managed by SkillTreePanel
+    return 1.0;
+  }
+
+  /**
+   * Handle mouse wheel zoom.
+   */
+  handleMouseWheel(_delta: number): void {
+    // Viewport is managed by SkillTreePanel
+    // This is a no-op for API compatibility
+  }
+
+  /**
+   * Set hovered node.
+   */
+  setHoveredNode(_nodeId: string | null): void {
+    // Hover state is passed via options in render()
+    // This is a no-op for API compatibility
+  }
+
+  /**
+   * Get hovered node.
+   */
+  getHoveredNode(): string | null {
+    // Hover state is managed by SkillTreePanel
+    return null;
+  }
+
+  /**
+   * Handle click at position (returns clicked node ID).
+   */
+  handleClick(
+    x: number,
+    y: number,
+    tree?: MagicSkillTree,
+    viewport?: Viewport
+  ): string | null {
+    if (!tree || !viewport) {
+      return null;
+    }
+
+    return this.findNodeAtPosition(
+      tree,
+      x,
+      y,
+      viewport,
+      0,
+      0,
+      800, // Default content width
+      600  // Default content height
+    ) || null;
+  }
+
+  /**
+   * Handle mouse move (for hover).
+   */
+  handleMouseMove(
+    _x: number,
+    _y: number,
+    _tree?: MagicSkillTree,
+    _viewport?: Viewport
+  ): void {
+    // Hover state is managed by SkillTreePanel
+    // This is a no-op for API compatibility
+  }
 }

@@ -240,18 +240,90 @@ export class MidwiferySystem implements System {
 
       if (!pregnancy) continue;
 
-      // Update pregnancy state
-      pregnancy.update(currentTick);
+      // Update pregnancy state using updateComponent (defensive against deserialized components)
+      impl.updateComponent<PregnancyComponent>('pregnancy', (current) => {
+        // Calculate updated values (from PregnancyComponent.update method)
+        const elapsed = currentTick - current.conceptionTick;
+        const gestationProgress = Math.min(1, elapsed / current.gestationLength);
+        const daysRemaining = Math.max(0, Math.floor((current.expectedDueDate - currentTick) / (20 * 60)));
 
-      // Check for malnutrition damage
-      const needs = impl.components.get('needs') as { hunger?: number } | undefined;
-      if (needs && needs.hunger !== undefined && needs.hunger < 0.3) {
-        pregnancy.damageFetalHealth(0.01 * deltaTicks / (20 * 60), 'malnutrition');
-      }
+        // Determine trimester
+        let trimester: 1 | 2 | 3;
+        if (gestationProgress < 0.33) {
+          trimester = 1;
+        } else if (gestationProgress < 0.67) {
+          trimester = 2;
+        } else {
+          trimester = 3;
+        }
 
-      // Check for labor onset
-      if (pregnancy.isReadyForLabor() && !impl.hasComponent(ComponentType.Labor)) {
-        this.startLabor(impl, pregnancy, currentTick);
+        // Update symptoms based on trimester
+        const symptoms = { ...current.symptoms };
+        switch (trimester) {
+          case 1:
+            symptoms.morningSickness = true;
+            symptoms.fatigue = true;
+            symptoms.backPain = false;
+            symptoms.swelling = false;
+            break;
+          case 2:
+            symptoms.morningSickness = false;
+            symptoms.fatigue = false;
+            symptoms.backPain = true;
+            symptoms.cravings = true;
+            break;
+          case 3:
+            symptoms.fatigue = true;
+            symptoms.backPain = true;
+            symptoms.swelling = true;
+            symptoms.cravings = true;
+            break;
+        }
+
+        // Update speed modifier
+        const speedModifier = trimester === 3 ? 0.8 : 1.0;
+
+        // Check for malnutrition damage
+        const needs = impl.components.get('needs') as { hunger?: number } | undefined;
+        let fetalHealth = current.fetalHealth;
+        let fetalHeartbeat = current.fetalHeartbeat;
+        const complications = [...current.complications];
+
+        if (needs && needs.hunger !== undefined && needs.hunger < 0.3) {
+          const damage = 0.01 * deltaTicks / (20 * 60);
+          fetalHealth = Math.max(0, fetalHealth - damage);
+
+          if (!complications.includes('malnutrition')) {
+            complications.push('malnutrition');
+          }
+
+          // Critical damage
+          if (fetalHealth < 0.3) {
+            fetalHeartbeat = false;
+          }
+        }
+
+        // Return updated component (defensive instantiation)
+        return new PregnancyComponent({
+          ...current,
+          gestationProgress,
+          daysRemaining,
+          trimester,
+          symptoms,
+          speedModifier,
+          fetalHealth,
+          fetalHeartbeat,
+          complications,
+        });
+      });
+
+      // Get updated pregnancy for labor check
+      const updatedPregnancy = impl.getComponent<PregnancyComponent>('pregnancy')!;
+
+      // Check for labor onset (isReadyForLabor is a simple getter, works on plain objects)
+      const isReadyForLabor = updatedPregnancy.gestationProgress >= 0.95;
+      if (isReadyForLabor && !impl.hasComponent(ComponentType.Labor)) {
+        this.startLabor(impl, updatedPregnancy, currentTick);
       }
     }
   }
@@ -301,27 +373,39 @@ export class MidwiferySystem implements System {
 
       if (!labor) continue;
 
-      // Update labor progression
-      labor.update(deltaTicks);
+      // Update labor progression using updateComponent (defensive against deserialized components)
+      impl.updateComponent<LaborComponent>('labor', (current) => {
+        // Create a proper LaborComponent instance from current data
+        const tempLabor = new LaborComponent(current);
+
+        // Call update method on the instance
+        tempLabor.update(deltaTicks);
+
+        // Return the updated instance
+        return tempLabor;
+      });
+
+      // Get updated labor component for checks
+      const updatedLabor = impl.getComponent<LaborComponent>('labor')!;
 
       // Check for complications
-      if (Math.random() < labor.getComplicationChance() * deltaTicks) {
-        this.generateComplication(impl, labor, currentTick);
+      if (Math.random() < updatedLabor.getComplicationChance() * deltaTicks) {
+        this.generateComplication(impl, updatedLabor, currentTick);
       }
 
       // Check for delivery
-      if (labor.isReadyForDelivery()) {
-        this.completeDelivery(impl, labor, currentTick);
+      if (updatedLabor.isReadyForDelivery()) {
+        this.completeDelivery(impl, updatedLabor, currentTick);
       }
 
       // Check for maternal death from untreated complications
-      if (labor.severity === 'emergency' || labor.severity === 'critical') {
-        const untreatedCritical = labor.complications.some(
+      if (updatedLabor.severity === 'emergency' || updatedLabor.severity === 'critical') {
+        const untreatedCritical = updatedLabor.complications.some(
           c => !c.treated && (c.severity === 'emergency' || c.severity === 'critical')
         );
 
         if (untreatedCritical && Math.random() < UNTREATED_MORTALITY_RATE * deltaTicks / (20 * 60)) {
-          this.handleMaternalDeath(impl, labor, 'untreated_complication');
+          this.handleMaternalDeath(impl, updatedLabor, 'untreated_complication');
           return;
         }
       }
@@ -658,10 +742,18 @@ export class MidwiferySystem implements System {
 
       if (!postpartum) continue;
 
-      postpartum.update(deltaDays);
+      // Update postpartum using updateComponent (defensive against deserialized components)
+      impl.updateComponent<PostpartumComponent>('postpartum', (current) => {
+        const temp = new PostpartumComponent(current);
+        temp.update(deltaDays);
+        return temp;
+      });
+
+      // Get updated component
+      const updatedPostpartum = impl.getComponent<PostpartumComponent>('postpartum')!;
 
       // Check for full recovery
-      if (postpartum.fullyRecovered) {
+      if (updatedPostpartum.fullyRecovered) {
         impl.removeComponent('postpartum');
 
         this.eventBus?.emit({
@@ -689,10 +781,18 @@ export class MidwiferySystem implements System {
       const needs = impl.components.get('needs') as { hunger?: number } | undefined;
       const motherHunger = needs?.hunger ?? 1.0;
 
-      nursing.update(currentTick, deltaDays, motherHunger);
+      // Update nursing using updateComponent (defensive against deserialized components)
+      impl.updateComponent<NursingComponent>('nursing', (current) => {
+        const temp = new NursingComponent(current);
+        temp.update(currentTick, deltaDays, motherHunger);
+        return temp;
+      });
+
+      // Get updated component
+      const updatedNursing = impl.getComponent<NursingComponent>('nursing')!;
 
       // If no longer lactating, remove component
-      if (!nursing.lactating && nursing.getInfantCount() === 0) {
+      if (!updatedNursing.lactating && updatedNursing.getInfantCount() === 0) {
         impl.removeComponent('nursing');
       }
     }
@@ -710,15 +810,23 @@ export class MidwiferySystem implements System {
 
       if (!infant) continue;
 
-      infant.update(currentTick, deltaDays);
+      // Update infant using updateComponent (defensive against deserialized components)
+      impl.updateComponent<InfantComponent>('infant', (current) => {
+        const temp = new InfantComponent(current);
+        temp.update(currentTick, deltaDays);
+        return temp;
+      });
+
+      // Get updated component
+      const updatedInfant = impl.getComponent<InfantComponent>('infant')!;
 
       // Check if infant needs feeding
-      if (infant.needsFeeding() && infant.nursingSource) {
-        this.feedInfant(world, impl, infant, currentTick);
+      if (updatedInfant.needsFeeding() && updatedInfant.nursingSource) {
+        this.feedInfant(world, impl, updatedInfant, currentTick);
       }
 
       // Check if infant has matured
-      if (infant.hasMaturated()) {
+      if (updatedInfant.hasMaturated()) {
         impl.removeComponent('infant');
 
         this.eventBus?.emit({
@@ -810,24 +918,26 @@ export class MidwiferySystem implements System {
 
     // Detect fetal position if third trimester and skilled enough
     let detectedPosition: FetalPosition = 'unknown';
+    let updatedFetalPosition = pregnancy.fetalPosition;
+
     if (pregnancy.trimester === 3 && skillLevel >= 2) {
       // Actually determine position if not already known
       if (pregnancy.fetalPosition === 'unknown') {
         const roll = Math.random();
         if (roll < 0.95) {
-          pregnancy.fetalPosition = 'cephalic';
+          updatedFetalPosition = 'cephalic';
         } else if (roll < 0.98) {
-          pregnancy.fetalPosition = 'breech';
+          updatedFetalPosition = 'breech';
         } else {
-          pregnancy.fetalPosition = 'transverse';
+          updatedFetalPosition = 'transverse';
         }
       }
-      detectedPosition = pregnancy.fetalPosition;
+      detectedPosition = updatedFetalPosition;
     }
 
     // Identify risk factors based on skill
     const identifiedFactors: PregnancyRiskFactor[] = [];
-    if (skillLevel >= 3 && pregnancy.fetalPosition === 'breech') {
+    if (skillLevel >= 3 && updatedFetalPosition === 'breech') {
       identifiedFactors.push('breech_presentation');
     }
 
@@ -842,13 +952,29 @@ export class MidwiferySystem implements System {
       riskFactorsIdentified: identifiedFactors,
     };
 
-    pregnancy.recordCheckup(checkup);
+    // Update pregnancy component with checkup data (defensive against deserialized components)
+    impl.updateComponent<PregnancyComponent>('pregnancy', (current) => {
+      const checkupHistory = [...current.checkupHistory, checkup];
+      const riskFactors = [...current.riskFactors];
 
-    // Mark pregnancy as detected if first checkup
-    if (!pregnancy.detected) {
-      pregnancy.detected = true;
-      pregnancy.detectedAt = currentTick;
-    }
+      // Merge newly identified risk factors
+      for (const factor of checkup.riskFactorsIdentified) {
+        if (!riskFactors.includes(factor)) {
+          riskFactors.push(factor);
+        }
+      }
+
+      // Return updated component
+      return new PregnancyComponent({
+        ...current,
+        fetalPosition: updatedFetalPosition,
+        checkupHistory,
+        lastCheckupTick: checkup.tick,
+        riskFactors,
+        detected: true,
+        detectedAt: current.detected ? current.detectedAt : currentTick,
+      });
+    });
 
     this.eventBus?.emit({
       type: 'midwifery:prenatal_checkup',

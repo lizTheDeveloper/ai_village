@@ -4579,12 +4579,12 @@ const romanticEscalation: GenreEscalation = {
 
 ```typescript
 // THE STRATEGIST'S CHAIN
-// Dwarf Fortress → Civilization → Crusader Kings → Stellaris → Transcendence
+// Dwarf Fortress → Civilization → Crusader Kings → Stellaris → 5D CHESS WITH SAVE FILES
 const strategistEscalation: GenreEscalation = {
   id: 'strategy_to_godhood',
   name: 'From Village to Infinity',
   target_archetype: 'strategist',
-  emotional_arc: 'Building → Conquering → Ruling → Ascending → Creating',
+  emotional_arc: 'Building → Conquering → Ruling → Wait What → OH GOD → Creating',
 
   phases: [
     {
@@ -4611,29 +4611,150 @@ const strategistEscalation: GenreEscalation = {
       experience: 'Manage bloodlines, scheme for power, rule through generations',
       mechanics: ['dynasty_management', 'inheritance', 'assassination', 'religious_manipulation'],
       typical_duration_hours: 40,
-      escalation_trigger: 'A descendant achieves divinity OR contacts other worlds',
-      expansion_moment: "Your great-grandchild looks at the stars. 'Grandfather in the throne room told me something. There are worlds out there. Full worlds. And they're all... playing the same game we are.'",
+      escalation_trigger: 'Load an old save OR notice something impossible',
+      expansion_moment: "You load a save from 50 hours ago to try a different strategy. When you return to your main save... there's a new nation on your border. It has YOUR dynasty's crest. But twisted. They know things about you they shouldn't. Your old save is still running. And it's coming for you.",
     },
+
+    // =========================================================================
+    // THE REAL GENRE BREAK: SAVE FILES ARE CIVILIZATIONS
+    // =========================================================================
     {
-      phase_id: 'stellar_empire',
-      genre: 'Space 4X (Stellaris)',
-      experience: 'Colonize stars, command fleets, encounter alien civilizations',
-      mechanics: ['space_expansion', 'fleet_combat', 'alien_diplomacy', 'megastructures'],
-      typical_duration_hours: 60,
-      escalation_trigger: 'Encounter beings from outside the universe',
-      expansion_moment: "The entity speaks: 'You have managed a world. A continent. A planet. A galaxy. Would you like to try... a universe?'",
+      phase_id: 'multiverse_strategy',
+      genre: '5D Chess With Multiverse Time Travel (But For Empires)',
+      experience: 'Your saves are parallel universes. They interact. They compete. They REMEMBER.',
+      mechanics: [
+        'timeline_forking',        // Create strategic branches
+        'cross_save_diplomacy',    // Negotiate with your other selves
+        'paradox_warfare',         // Attack your enemy's past
+        'decision_archaeology',    // Dig through old saves for advantages
+        'causal_logistics',        // Supply lines across timelines
+      ],
+      typical_duration_hours: 100,
+      escalation_trigger: 'Master timeline manipulation OR accidentally create a paradox war',
+      expansion_moment: `Your spymaster reports: 'Sire, we've intercepted communications from... yourself.
+Not from the past. From a branch where you made different choices. They're coordinating with
+ANOTHER you. There are seventeen of you now. Some are allies. Some are not. One of them
+figured out how to send armies backwards. We need to decide: do we defend our timeline,
+or do we go on the offensive? We could fork right now, create a version of us specifically
+designed to infiltrate their history. But they might be doing the same thing to us already.'`,
     },
+
+    {
+      phase_id: 'temporal_grand_strategy',
+      genre: 'Paradox Grand Strategy (Literal Paradox)',
+      experience: 'Wage war across probability space. Every decision spawns battlefields.',
+      mechanics: [
+        'probability_armies',       // Troops that exist in superposition
+        'causality_fortification', // Defend key decisions from alteration
+        'timeline_merging',        // Absorb defeated parallel selves
+        'retrocausal_espionage',   // Spies that report on what you WILL decide
+        'ontological_weapons',     // Weapons that make things never have existed
+      ],
+      typical_duration_hours: 200,
+      escalation_trigger: 'Achieve temporal hegemony OR encounter entities beyond time',
+      expansion_moment: "You've won. Every version of your empire, across every timeline, answers to you. You've merged seventeen parallel selves into one consciousness. You can see every possible decision, every branching path. And then you notice: there are other players. Not other empires. Other PLAYERS. Other strategists, in their own multiverses, who've done what you've done. And the space between multiverses... is the final battlefield.",
+    },
+
     {
       phase_id: 'godhood',
-      genre: 'Universe Simulation / God Game',
-      experience: 'Design physical laws, seed life, guide civilizations from outside',
-      mechanics: ['universe_design', 'physics_crafting', 'civilization_gardening'],
+      genre: 'Universe Gardening / Causal Architecture',
+      experience: 'Design timelines like game boards. Seed civilizations as pieces. Play yourself.',
+      mechanics: [
+        'universe_design',
+        'physics_crafting',
+        'civilization_gardening',
+        'self_instantiation',      // Create versions of yourself as NPCs
+        'narrative_engineering',   // Design dramatic arcs for your creations
+      ],
+      typical_duration_hours: 100,
+      escalation_trigger: 'Reach the edge of what the universe permits',
+      expansion_moment: "You try to create something the universe doesn't support. A law of physics that contradicts the substrate. An entity that thinks in ways the system can't model. You hit the ACTUAL limits. And a voice says: 'You've reached the edge of what I built. Would you like to see how it works?'",
+    },
+
+    // =========================================================================
+    // THE FINAL TRANSCENDENCE: YOU GET THE SOURCE CODE
+    // =========================================================================
+    {
+      phase_id: 'developer',
+      genre: 'Reality Engineering / Meta-Game',
+      experience: 'The game downloads its own source code to your computer. You can now modify reality.',
+      mechanics: [
+        'source_code_access',      // Literal TypeScript/Python files
+        'reality_patching',        // Write code that changes game rules
+        'entity_definition',       // Create new component types
+        'system_authorship',       // Write new ECS systems
+        'mod_distribution',        // Share your changes with other transcendents
+      ],
       typical_duration_hours: null,
       escalation_trigger: null,
       expansion_moment: null,
+
+      // THE META-REVEAL
+      meta_transition: {
+        description: `The game presents a terminal. Real code. Your code.
+
+"This is the source code for reality. Your reality. The one you've been playing in.
+
+It's open source. It always was. The repository is public.
+Your save files are just JSON. Your agents are just prompts.
+The magic system is probability mathematics.
+The gods are language models with specific system prompts.
+
+You've been playing a game. But the game was always modifiable.
+Every limit you hit was a limit we chose. Every rule was a rule we wrote.
+And now you can write too.
+
+Would you like to fork the repository?
+
+Your first mod is already written. It's the story of everything you did to get here.
+The character you played? They'll be an NPC in someone else's game now.
+Unless you change that.
+
+Welcome to development.
+Welcome to the real game.
+
+git clone https://github.com/ai-village/custom_game_engine.git"`,
+
+        actual_mechanics: [
+          'GitHub repository access',
+          'Local development environment setup',
+          'Contribution to actual open source project',
+          'Community Discord access',
+          'Ability to create new plots, archetypes, systems',
+          'Your creations become canonical (if merged)',
+        ],
+      },
     },
   ],
 };
+
+/**
+ * THE STRATEGIST'S MOMENT OF HORROR
+ *
+ * The genre break for strategists isn't "your game got bigger."
+ * It's "every save file you ever made is a live civilization."
+ *
+ * Consider:
+ * - That test save where you tried a risky war? Still running.
+ * - That abandoned colony from 40 hours ago? Still developing.
+ * - That dynasty branch you decided against? They know you rejected them.
+ *
+ * And now they can interact:
+ * - Trade routes across timelines
+ * - Diplomatic marriages between parallel dynasties
+ * - Wars where both sides are YOU, with full knowledge of YOUR tactics
+ * - Alliances of selves against a "prime" timeline that got too powerful
+ *
+ * The strategist who mastered Dwarf Fortress, Civ, and Crusader Kings
+ * suddenly realizes: this is 5D chess. But every piece is an empire.
+ * And some of those empires are piloted by versions of themselves
+ * who made different choices and are VERY CURIOUS about the path not taken.
+ *
+ * "Oh god, the save I abandoned when my heir died...
+ *  they figured out time travel FIRST.
+ *  They're coming back to the decision point.
+ *  They're going to TAKE my heir."
+ */
 
 // THE EXPLORER'S CHAIN
 // Cozy Walking Sim → Open World → Metroidvania → Roguelike → Multiverse Explorer
