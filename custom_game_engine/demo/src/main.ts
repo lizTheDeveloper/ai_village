@@ -352,7 +352,8 @@ async function createSoulsForInitialAgents(
     console.log(`[Demo] Creating soul ${index + 1}/${agentIds.length} for ${name}...`);
 
     // Wait for this soul to be created before starting the next
-    await new Promise<void>((resolve) => {
+    // Add 30-second timeout to prevent hanging
+    const ceremonyPromise = new Promise<void>((resolve, reject) => {
       let resolved = false;
       let currentCeremonyData: any = null;
 
@@ -481,6 +482,21 @@ async function createSoulsForInitialAgents(
         // Soul creation callback - the ceremony events will handle the rest
       });
     });
+
+    // Add timeout to ceremony
+    const timeoutPromise = new Promise<void>((_, reject) => {
+      setTimeout(() => {
+        reject(new Error(`Soul ceremony for ${name} timed out after 30 seconds`));
+      }, 30000);
+    });
+
+    try {
+      await Promise.race([ceremonyPromise, timeoutPromise]);
+    } catch (error) {
+      console.error(`[Demo] Soul ceremony failed for ${name}:`, error);
+      console.warn(`[Demo] Skipping soul for ${name} and continuing...`);
+      // Continue to next agent even if this one fails
+    }
   }
 
   console.log(`[Demo] All souls created successfully`);
@@ -2744,7 +2760,7 @@ async function main() {
 
   console.log('[DEMO] Checking LLM availability...');
   let timeoutId: number;
-  const llmCheckResult = await Promise.race([
+  const isLLMAvailable = await Promise.race([
     llmProvider.isAvailable().then(result => {
       clearTimeout(timeoutId);
       return result;
@@ -2756,10 +2772,7 @@ async function main() {
       }, 2000) as unknown as number;
     })
   ]);
-
-  // TEMPORARY: Force LLM unavailable to skip soul ceremonies until we debug the hanging
-  const isLLMAvailable = false;
-  console.log(`[DEMO] LLM check result: ${llmCheckResult}, forcing isLLMAvailable=${isLLMAvailable} (temporary)`);
+  console.log(`[DEMO] LLM available: ${isLLMAvailable}`);
   let llmQueue: LLMDecisionQueue | null = null;
   let promptBuilder: StructuredPromptBuilder | null = null;
 

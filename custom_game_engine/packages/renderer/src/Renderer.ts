@@ -12,6 +12,7 @@ import type {
   ReflectionComponent,
   IdentityComponent,
   TemperatureComponent,
+  SteeringComponent,
 } from '@ai-village/core';
 import type { PlantComponent } from '@ai-village/core';
 import {
@@ -877,6 +878,9 @@ export class Renderer {
 
     // Draw agent-building interaction indicators
     this.drawAgentBuildingInteractions(world, selectedEntity);
+
+    // Draw navigation path for selected entity
+    this.drawNavigationPath(selectedEntity);
 
     // Draw floating text (resource gathering feedback, etc.)
     this.floatingTextRenderer.render(this.ctx, this.camera, Date.now());
@@ -2283,6 +2287,57 @@ export class Renderer {
     this.ctx.fillStyle = color;
     this.ctx.fillText(interactionType, midX, midY);
     this.ctx.textAlign = 'left';
+  }
+
+  /**
+   * Draw navigation path for selected entity.
+   * Shows a line from current position to destination target.
+   */
+  private drawNavigationPath(selectedEntity?: Entity): void {
+    if (!selectedEntity) return;
+
+    const position = selectedEntity.components.get('position') as PositionComponent | undefined;
+    const steering = selectedEntity.components.get('steering') as SteeringComponent | undefined;
+
+    if (!position || !steering || !steering.target) return;
+
+    const currentX = position.x * this.tileSize + (this.tileSize / 2);
+    const currentY = position.y * this.tileSize + (this.tileSize / 2);
+    const targetX = steering.target.x * this.tileSize + (this.tileSize / 2);
+    const targetY = steering.target.y * this.tileSize + (this.tileSize / 2);
+
+    const currentScreen = this.camera.worldToScreen(currentX, currentY);
+    const targetScreen = this.camera.worldToScreen(targetX, targetY);
+
+    // Draw dashed line from current position to target
+    this.ctx.strokeStyle = '#00CCFF'; // Cyan color
+    this.ctx.lineWidth = 3;
+    this.ctx.setLineDash([8, 4]);
+    this.ctx.globalAlpha = 0.7;
+    this.ctx.beginPath();
+    this.ctx.moveTo(currentScreen.x, currentScreen.y);
+    this.ctx.lineTo(targetScreen.x, targetScreen.y);
+    this.ctx.stroke();
+    this.ctx.setLineDash([]);
+    this.ctx.globalAlpha = 1.0;
+
+    // Draw target marker (circle with cross)
+    const markerRadius = Math.max(6, 8 * this.camera.zoom);
+
+    // Outer circle
+    this.ctx.strokeStyle = '#00CCFF';
+    this.ctx.lineWidth = 2;
+    this.ctx.beginPath();
+    this.ctx.arc(targetScreen.x, targetScreen.y, markerRadius, 0, Math.PI * 2);
+    this.ctx.stroke();
+
+    // Inner cross
+    this.ctx.beginPath();
+    this.ctx.moveTo(targetScreen.x - markerRadius / 2, targetScreen.y);
+    this.ctx.lineTo(targetScreen.x + markerRadius / 2, targetScreen.y);
+    this.ctx.moveTo(targetScreen.x, targetScreen.y - markerRadius / 2);
+    this.ctx.lineTo(targetScreen.x, targetScreen.y + markerRadius / 2);
+    this.ctx.stroke();
   }
 
   private drawDebugInfo(world: World): void {
