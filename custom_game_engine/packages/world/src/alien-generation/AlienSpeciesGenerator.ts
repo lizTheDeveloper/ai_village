@@ -124,6 +124,67 @@ export class AlienSpeciesGenerator {
   }
 
   /**
+   * Filter diets based on ecological weights and realm availability
+   * Excludes deprecated diets and weights selection by resource spawn rates
+   */
+  private filterEcologicalDiets(constraints: AlienGenerationConstraints): string[] {
+    // Get realm from nativeWorld if specified
+    const realm = this.extractRealmFromWorld(constraints.nativeWorld);
+
+    const validDiets: Array<{id: string, weight: number}> = [];
+
+    for (const [dietId, diet] of Object.entries(DIET_PATTERNS)) {
+      // Skip deprecated diets
+      if (diet.deprecated) {
+        continue;
+      }
+
+      // Get base ecological weight
+      let weight = diet.ecologicalWeight ?? 0.5;
+
+      // Apply realm-specific weights if available
+      if (realm && diet.realmWeights) {
+        weight = diet.realmWeights[realm] ?? weight;
+      }
+
+      // Skip diets with zero weight
+      if (weight <= 0) {
+        continue;
+      }
+
+      validDiets.push({id: dietId, weight});
+    }
+
+    // Sort by weight (descending) and return top 60%
+    // This ensures LLM sees mostly common diets but some rare ones too
+    validDiets.sort((a, b) => b.weight - a.weight);
+    const cutoffIndex = Math.ceil(validDiets.length * 0.6);
+    return validDiets.slice(0, cutoffIndex).map(d => d.id);
+  }
+
+  /**
+   * Extract realm type from world name
+   */
+  private extractRealmFromWorld(worldName?: string): string | undefined {
+    if (!worldName) return undefined;
+
+    const lowerWorld = worldName.toLowerCase();
+
+    // Check for realm keywords in world name
+    if (lowerWorld.includes('dream') || lowerWorld.includes('nightmare')) {
+      return 'dream_realm';
+    }
+    if (lowerWorld.includes('celestial') || lowerWorld.includes('heaven') || lowerWorld.includes('paradise')) {
+      return 'celestial';
+    }
+    if (lowerWorld.includes('underworld') || lowerWorld.includes('hell') || lowerWorld.includes('abyss')) {
+      return 'underworld';
+    }
+
+    return undefined;
+  }
+
+  /**
    * Select biologically coherent traits using LLM
    */
   private async selectCoherentTraits(
@@ -132,7 +193,7 @@ export class AlienSpeciesGenerator {
     const bodyPlanOptions = Object.keys(BODY_PLANS);
     const locomotionOptions = Object.keys(LOCOMOTION_METHODS);
     const sensoryOptions = Object.keys(SENSORY_SYSTEMS);
-    const dietOptions = Object.keys(DIET_PATTERNS);
+    const dietOptions = this.filterEcologicalDiets(constraints); // ECOLOGICAL FILTERING
     const socialOptions = Object.keys(SOCIAL_STRUCTURES);
     const defenseOptions = Object.keys(DEFENSIVE_SYSTEMS);
     const reproductionOptions = Object.keys(REPRODUCTION_STRATEGIES);

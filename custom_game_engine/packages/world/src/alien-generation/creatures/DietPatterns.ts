@@ -12,6 +12,24 @@ export interface DietPattern {
   efficiency: 'poor' | 'moderate' | 'good' | 'excellent' | 'perfect';
   byproducts: string[];
   flavorText: string;
+
+  // Ecological coherence metadata
+  /** Item IDs from the game that this diet consumes (e.g., ['berry', 'wheat', 'apple']) */
+  relatedItems: string[];
+
+  /** Base ecological spawn weight (0.0-1.0). Higher weight = more common predators.
+   * Should match food source spawn rate. Common items → high weight, rare items → low weight */
+  ecologicalWeight: number;
+
+  /** Optional realm-specific weight overrides. Higher in realms where this diet's resources are abundant.
+   * Example: dream_feeding has 0.8 in dream_realm but 0.05 elsewhere */
+  realmWeights?: Record<string, number>;
+
+  /** If true, this diet should be removed (no items exist, breaks ecology, etc.) */
+  deprecated?: boolean;
+
+  /** Reason for deprecation if deprecated=true */
+  deprecationReason?: string;
 }
 
 export const DIET_PATTERNS: Record<string, DietPattern> = {
@@ -22,6 +40,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'moderate',
     byproducts: ['Waste matter', 'Methane', 'Fertilizer'],
     flavorText: 'Eat plants. Lots of plants. Digest slowly. Nutrients extracted. Vegetation everywhere.',
+    relatedItems: ['berry', 'wheat', 'apple', 'carrot', 'leaves', 'fiber'],
+    ecologicalWeight: 1.0, // Most common diet - all items are common
   },
   'carnivore_predator': {
     name: 'Meat Hunter',
@@ -30,6 +50,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'good',
     byproducts: ['Bones', 'Waste', 'Territory marking'],
     flavorText: 'Hunt. Kill. Eat. Protein efficient. Other creatures food. Circle of life.',
+    relatedItems: ['raw_meat'], // Generated from hunting herbivores
+    ecologicalWeight: 0.7, // Less common than herbivores (needs prey base)
   },
   'photosynthesis': {
     name: 'Light Feeding',
@@ -38,6 +60,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'excellent',
     byproducts: ['Oxygen', 'Sugar storage', 'Chlorophyll waste'],
     flavorText: 'Stand in sun. Absorb light. Make food. No hunting. Peaceful. Slow.',
+    relatedItems: [], // Uses sunlight (free resource in lit areas)
+    ecologicalWeight: 0.4, // Uncommon - more plant-like than animal-like
   },
   'lithotroph': {
     name: 'Rock Eater',
@@ -46,6 +70,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'poor',
     byproducts: ['Sand', 'Mineral dust', 'Eroded terrain'],
     flavorText: 'Eat rocks. Digest minerals. Slow process. Patient required. Teeth strong.',
+    relatedItems: ['stone'], // Common but poor efficiency
+    ecologicalWeight: 0.2, // Rare despite common food source (slow, inefficient)
   },
   'energy_absorption': {
     name: 'Pure Energy Feeding',
@@ -54,6 +80,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'excellent',
     byproducts: ['Heat radiation', 'Electromagnetic interference'],
     flavorText: 'Absorb energy. Direct conversion. No digestion. Efficient. Power lines tempting.',
+    relatedItems: ['mana_crystal'], // Rare magical energy source
+    ecologicalWeight: 0.2, // Rare - requires magical areas
   },
   'decomposer': {
     name: 'Decay Processor',
@@ -62,6 +90,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'good',
     byproducts: ['Soil nutrients', 'Methane', 'Compost'],
     flavorText: 'Eat death. Recycle corpses. Ecosystem service. Unappreciated. Essential.',
+    relatedItems: [], // Generated from creature deaths
+    ecologicalWeight: 0.6, // Important for ecosystem recycling
   },
   'filter_feeder': {
     name: 'Passive Filtering',
@@ -70,6 +100,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'moderate',
     byproducts: ['Filtered water', 'Expelled matter', 'Clean environment'],
     flavorText: 'Open mouth. Water flows. Filter particles. Close mouth. Repeat. Simple.',
+    relatedItems: ['water'], // Common in aquatic environments
+    ecologicalWeight: 0.5, // Moderate - aquatic only
   },
   'chemosynthesis': {
     name: 'Chemical Energy Extraction',
@@ -102,6 +134,10 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'excellent',
     byproducts: ['Accelerated aging', 'Time distortions', 'Premature death'],
     flavorText: 'Eat time. Steal years. Prey ages. Predator nourished. Cruel. Effective.',
+    relatedItems: [], // No time-based consumable resources
+    ecologicalWeight: 0.0,
+    deprecated: true,
+    deprecationReason: 'No time-based resources exist in game',
   },
   'radiation_metabolizer': {
     name: 'Radioactive Diet',
@@ -118,6 +154,12 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'moderate',
     byproducts: ['Amnesia', 'Confusion', 'Lost skills'],
     flavorText: 'Eat memories. Drain knowledge. Victims forget. Predator learns. Terrible trade.',
+    relatedItems: ['material:memory_crystal'], // Legendary from surrealMaterials.ts
+    ecologicalWeight: 0.05, // Very rare
+    realmWeights: {
+      'dream_realm': 0.4, // Memories form in dreams
+      'celestial': 0.2, // Long-lived beings accumulate memories
+    },
   },
   'quantum_sustenance': {
     name: 'Probability Feeding',
@@ -126,6 +168,10 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'excellent',
     byproducts: ['Certainty', 'Collapsed states', 'Determinism'],
     flavorText: 'Feed on uncertainty. Collapse probability. Energy released. Reality solidifies.',
+    relatedItems: [], // No quantum items exist in game
+    ecologicalWeight: 0.0,
+    deprecated: true,
+    deprecationReason: 'No quantum items exist in game. User feedback: "is that a real thing and can it be crafted or is that a bunch of random nonsense"',
   },
   'sound_digestion': {
     name: 'Acoustic Nutrition',
@@ -142,6 +188,10 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'good',
     byproducts: ['Dimensional instability', 'Portal residue', 'Confused physics'],
     flavorText: 'Reach elsewhere. Grab food. Pull through. Dimensions leak. Convenient. Destabilizing.',
+    relatedItems: [],
+    ecologicalWeight: 0.0,
+    deprecated: true,
+    deprecationReason: 'Breaks ecology - pulling food from parallel dimensions bypasses resource constraints',
   },
   'symbiotic_farming': {
     name: 'Internal Agriculture',
@@ -158,6 +208,12 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'moderate',
     byproducts: ['Nightmares', 'Insomnia', 'Dream loss'],
     flavorText: 'Feed on dreams. Sleeping prey. Drain fantasies. Wake unrested. Dreams eaten.',
+    relatedItems: ['material:dream_crystal'], // Legendary item from surrealMaterials.ts
+    ecologicalWeight: 0.05, // Very rare in most realms
+    realmWeights: {
+      'dream_realm': 0.8, // Dreams are abundant in dream realm
+      'celestial': 0.15, // Some dreams in celestial realm
+    },
   },
   'magnetic_digestion': {
     name: 'Ferrous Diet',
@@ -174,6 +230,10 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'perfect',
     byproducts: ['Heat radiation', 'Stellar wind', 'Dimmed stars'],
     flavorText: 'Drink from stars. Plasma consumed. Energy infinite. Heat extreme. Casual apocalypse.',
+    relatedItems: [],
+    ecologicalWeight: 0.0,
+    deprecated: true,
+    deprecationReason: 'Scale mismatch - drinking from stars breaks game ecology',
   },
   'pain_metabolizer': {
     name: 'Suffering Sustenance',
@@ -182,6 +242,10 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'good',
     byproducts: ['Increased suffering', 'Torture', 'Cruelty'],
     flavorText: 'Feed on pain. Cause suffering. Nourished by anguish. Evil. Effective.',
+    relatedItems: [],
+    ecologicalWeight: 0.0,
+    deprecated: true,
+    deprecationReason: 'Unethical mechanic - requires causing suffering',
   },
   'crystalline_consumption': {
     name: 'Mineral Lattice Digestion',
@@ -198,6 +262,10 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'excellent',
     byproducts: ['Weakened gravity', 'Orbital changes', 'Physics anomalies'],
     flavorText: 'Feed on gravity. Reduce mass attraction. Lighter world. Eventually. Problematic.',
+    relatedItems: [],
+    ecologicalWeight: 0.0,
+    deprecated: true,
+    deprecationReason: 'No gravitational resources exist in game',
   },
   'void_consumption': {
     name: 'Entropy Eating',
@@ -206,6 +274,10 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'good',
     byproducts: ['Increased decay', 'Heat death', 'Universal end'],
     flavorText: 'Eat order. Create chaos. Feed on entropy. Universe decays faster. Thanks.',
+    relatedItems: [],
+    ecologicalWeight: 0.0,
+    deprecated: true,
+    deprecationReason: 'Eating entropy has no game representation',
   },
   'information_digestion': {
     name: 'Data Consumption',
@@ -222,6 +294,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'good',
     byproducts: ['Waste matter', 'Varied nutrients'],
     flavorText: 'Eat anything. Plants today. Meat tomorrow. Flexible. Adaptable. Survival high.',
+    relatedItems: ['berry', 'wheat', 'apple', 'raw_meat', 'fish', 'egg'],
+    ecologicalWeight: 0.9, // Very common - all food sources common
   },
   'insectivore': {
     name: 'Bug Eater',
@@ -230,6 +304,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'excellent',
     byproducts: ['Chitin fragments', 'Waste'],
     flavorText: 'Eat bugs. Abundant. Protein rich. Crunchy. Everywhere. Easy hunting.',
+    relatedItems: [], // TODO: Add insect items to game
+    ecologicalWeight: 0.85, // Should be very common once insects exist
   },
   'frugivore': {
     name: 'Fruit Consumer',
@@ -238,6 +314,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'good',
     byproducts: ['Seeds', 'Fertilizer', 'Sugar crash'],
     flavorText: 'Eat fruit. Sweet. Seeds spread. Mutual benefit. Plants happy. Tasty.',
+    relatedItems: ['berry', 'apple'],
+    ecologicalWeight: 0.7, // Common fruits
   },
   'nectarivore': {
     name: 'Nectar Feeder',
@@ -246,6 +324,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'moderate',
     byproducts: ['Pollen transfer', 'Waste liquid'],
     flavorText: 'Drink nectar. Pollinate flowers. Sweet energy. Frequent feeding. Mutual benefit.',
+    relatedItems: ['honey'], // Uncommon
+    ecologicalWeight: 0.4, // Less common - needs flowering plants
   },
   'piscivore': {
     name: 'Fish Eater',
@@ -254,6 +334,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'good',
     byproducts: ['Bones', 'Scales', 'Fishy smell'],
     flavorText: 'Eat fish. Hunt water. Protein abundant. Omega-3 rich. Smell fishy.',
+    relatedItems: ['fish'], // Common in aquatic biomes
+    ecologicalWeight: 0.7, // Common where fish exist
   },
   'scavenger': {
     name: 'Carrion Eater',
@@ -262,6 +344,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'moderate',
     byproducts: ['Bones', 'Waste', 'Disease risk'],
     flavorText: 'Eat dead things. No hunting needed. Wait for death. Clean up. Ecosystem service.',
+    relatedItems: ['raw_meat'], // From deaths
+    ecologicalWeight: 0.55, // Moderate - depends on death rate
   },
   'hematophage': {
     name: 'Blood Drinker',
@@ -270,6 +354,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'excellent',
     byproducts: ['Anticoagulant', 'Disease transmission'],
     flavorText: 'Drink blood. Pierce skin. Sip nutrients. Host survives. Usually. Vampiric.',
+    relatedItems: [], // Generated from living entities
+    ecologicalWeight: 0.4, // Moderate - parasitic but not lethal
   },
   'fungivore': {
     name: 'Fungus Eater',
@@ -278,6 +364,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'good',
     byproducts: ['Spore dispersal', 'Waste'],
     flavorText: 'Eat fungus. Mushrooms everywhere. Decomposers consumed. Ironic. Nutritious.',
+    relatedItems: ['mushroom', 'material:giant_mushroom'], // Uncommon
+    ecologicalWeight: 0.5, // Moderate - underground/dark biomes
   },
   'granivore': {
     name: 'Seed Eater',
@@ -286,6 +374,8 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'excellent',
     byproducts: ['Hulls', 'Undigested seeds', 'Dispersal'],
     flavorText: 'Eat seeds. Crack shells. Grind hard. Protein and fat rich. Some survive.',
+    relatedItems: ['wheat'], // Common
+    ecologicalWeight: 0.8, // Common - seeds abundant
   },
   'folivore': {
     name: 'Leaf Specialist',
@@ -294,5 +384,7 @@ export const DIET_PATTERNS: Record<string, DietPattern> = {
     efficiency: 'moderate',
     byproducts: ['Cellulose waste', 'Fertilizer'],
     flavorText: 'Eat leaves. Only leaves. Specialized gut. Slow digestion. Green everything.',
+    relatedItems: ['leaves', 'fiber'], // Common
+    ecologicalWeight: 0.6, // Moderate - forest biomes
   },
 };

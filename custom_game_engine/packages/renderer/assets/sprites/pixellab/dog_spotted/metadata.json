@@ -1,0 +1,18 @@
+{
+  "id": "dog_spotted",
+  "base_species": "dog",
+  "variant": "spotted",
+  "description": "spotted dog",
+  "size": 48,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-04T00:23:22.048Z"
+}
