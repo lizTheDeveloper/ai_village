@@ -115,7 +115,6 @@ export class CreatorSurveillanceSystem implements System {
       this.monitorSpellCast(event);
     });
 
-    console.log('[CreatorSurveillance] Surveillance network activated');
   }
 
   update(world: World): void {
@@ -209,10 +208,6 @@ export class CreatorSurveillanceSystem implements System {
         },
       });
 
-      console.log(
-        `[CreatorSurveillance] DETECTED: ${casterId} cast ${spellId} (risk: ${spell.creatorDetection.detectionRisk}, ` +
-        `chance: ${(detectionChance * 100).toFixed(1)}%, forced: ${forcedDetection})`
-      );
     }
   }
 
@@ -398,7 +393,6 @@ export class CreatorSurveillanceSystem implements System {
       }
 
       this.stats.alertLevel = newAlert;
-      console.log(`[CreatorSurveillance] Alert level: ${this.stats.alertLevel.toUpperCase()}`);
     }
   }
 

@@ -202,7 +202,6 @@ export class AgentInfoPanel implements IWindowPanel {
     // Check if click is on the config LLM button (context tab)
     const currentTab = this.tabs.getCurrentTab();
     if (currentTab === 'context') {
-      console.log('[AgentInfoPanel] Delegating click to contextSection:', clickX, clickY);
       if (this.contextSection.handleClick(clickX, clickY)) {
         return true;
       }

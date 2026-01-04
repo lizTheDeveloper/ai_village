@@ -142,8 +142,6 @@ export class SoulRepositorySystem implements System {
       this.backupSoul(world, event.data);
     });
 
-    console.log(`[SoulRepository] Initialized at ${this.repositoryPath}`);
-    console.log(`[SoulRepository] Total souls in repository: ${this.index.totalSouls}`);
   }
 
   private async backupSoul(world: World, soulData: any): Promise<void> {
@@ -213,7 +211,6 @@ export class SoulRepositorySystem implements System {
       // Update index
       this.updateIndex(soulRecord);
 
-      console.log(`[SoulRepository] ✅ Backed up soul: ${name} (${species}, ${archetype})`);
 
     } catch (error) {
       console.error('[SoulRepository] Failed to backup soul:', error);

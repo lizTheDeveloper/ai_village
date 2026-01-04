@@ -3,7 +3,7 @@
  */
 
 import type { StorageBackend, SaveFile, SaveMetadata, StorageInfo } from '../types.js';
-import { compress, decompress, formatBytes } from '../compression.js';
+import { compress, decompress } from '../compression.js';
 
 export class IndexedDBStorage implements StorageBackend {
   private dbName = 'ai_village';
@@ -38,7 +38,6 @@ export class IndexedDBStorage implements StorageBackend {
 
       request.onsuccess = () => {
         this.db = request.result;
-        console.log(`[IndexedDBStorage] Database opened: ${this.dbName}`);
         resolve();
       };
 
@@ -48,7 +47,6 @@ export class IndexedDBStorage implements StorageBackend {
         // Create saves store
         if (!db.objectStoreNames.contains(this.storeName)) {
           db.createObjectStore(this.storeName, { keyPath: 'key' });
-          console.log(`[IndexedDBStorage] Created object store: ${this.storeName}`);
         }
 
         // Create metadata store
@@ -57,7 +55,6 @@ export class IndexedDBStorage implements StorageBackend {
             keyPath: 'key',
           });
           metaStore.createIndex('lastSavedAt', 'lastSavedAt', { unique: false });
-          console.log(`[IndexedDBStorage] Created object store: ${this.metadataStore}`);
         }
       };
     });
@@ -73,15 +70,10 @@ export class IndexedDBStorage implements StorageBackend {
 
     // Serialize to JSON
     const jsonString = JSON.stringify(data);
-    const originalSize = jsonString.length;
 
     // Compress the JSON data
     const compressedData = await compress(jsonString);
     const compressedSize = compressedData.length;
-
-    console.log(
-      `[IndexedDBStorage] Compressed ${key}: ${formatBytes(originalSize)} -> ${formatBytes(compressedSize)} (${((1 - compressedSize / originalSize) * 100).toFixed(1)}% reduction)`
-    );
 
     const transaction = this.db!.transaction(
       [this.storeName, this.metadataStore],
@@ -94,7 +86,6 @@ export class IndexedDBStorage implements StorageBackend {
       };
 
       transaction.oncomplete = () => {
-        console.log(`[IndexedDBStorage] Saved: ${key}`);
         resolve();
       };
 
@@ -152,11 +143,9 @@ export class IndexedDBStorage implements StorageBackend {
             // Decompress the data
             const decompressedString = await decompress(result.data);
             const saveFile = JSON.parse(decompressedString) as SaveFile;
-            console.log(`[IndexedDBStorage] Loaded and decompressed: ${key}`);
             resolve(saveFile);
           } else {
             // Legacy uncompressed data
-            console.log(`[IndexedDBStorage] Loaded (uncompressed): ${key}`);
             resolve(result.data);
           }
         } catch (error) {
@@ -218,7 +207,6 @@ export class IndexedDBStorage implements StorageBackend {
       };
 
       transaction.oncomplete = () => {
-        console.log(`[IndexedDBStorage] Deleted: ${key}`);
         resolve();
       };
 
@@ -301,7 +289,6 @@ export class IndexedDBStorage implements StorageBackend {
       this.db.close();
       this.db = null;
       this.initPromise = null;
-      console.log('[IndexedDBStorage] Database closed');
     }
   }
 }

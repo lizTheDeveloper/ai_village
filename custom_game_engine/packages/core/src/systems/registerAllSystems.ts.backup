@@ -29,8 +29,6 @@ import { WildAnimalSpawningSystem } from './WildAnimalSpawningSystem.js';
 import { TamingSystem } from './TamingSystem.js';
 
 // Uplift (Animal Consciousness)
-import { UpliftCandidateDetectionSystem } from '../uplift/UpliftCandidateDetectionSystem.js';
-import { ProtoSapienceObservationSystem } from '../uplift/ProtoSapienceObservationSystem.js';
 import { ConsciousnessEmergenceSystem } from '../uplift/ConsciousnessEmergenceSystem.js';
 import { UpliftBreedingProgramSystem } from '../uplift/UpliftBreedingProgramSystem.js';
 
@@ -91,13 +89,11 @@ import { OffScreenProductionSystem } from './OffScreenProductionSystem.js';
 // Economy & Trade
 import { TradingSystem } from './TradingSystem.js';
 import { MarketEventSystem } from './MarketEventSystem.js';
-import { TradeAgreementSystem } from './TradeAgreementSystem.js';
 
 // Skills & Crafting
 import { SkillSystem } from './SkillSystem.js';
 import { CookingSystem } from './CookingSystem.js';
 import { DurabilitySystem } from './DurabilitySystem.js';
-import { ExperimentationSystem } from './ExperimentationSystem.js';
 
 // Research
 import { ResearchSystem } from './ResearchSystem.js';
@@ -118,6 +114,7 @@ import { EventReportingSystem } from './EventReportingSystem.js';
 // Television & Media
 import { GameShowSystem } from '../television/formats/GameShowSystem.js';
 import { SoapOperaSystem } from '../television/formats/SoapOperaSystem.js';
+import { CastingSystem } from '../television/production/CastingSystem.js';
 import { TVDevelopmentSystem } from '../television/systems/TVDevelopmentSystem.js';
 import { TVPostProductionSystem } from '../television/systems/TVPostProductionSystem.js';
 
@@ -213,7 +210,6 @@ import { PixelLabSpriteGenerationSystem } from './PixelLabSpriteGenerationSystem
 // Governance & Metrics
 import { GovernanceDataSystem } from './GovernanceDataSystem.js';
 import { MetricsCollectionSystem } from './MetricsCollectionSystem.js';
-import { CityDirectorSystem } from './CityDirectorSystem.js';
 
 // Auto-save
 import { AutoSaveSystem } from './AutoSaveSystem.js';
@@ -307,8 +303,6 @@ export function registerAllSystems(
   // ============================================================================
   // UPLIFT (Animal Consciousness Emergence)
   // ============================================================================
-  gameLoop.systemRegistry.register(new UpliftCandidateDetectionSystem());
-  gameLoop.systemRegistry.register(new ProtoSapienceObservationSystem());
   gameLoop.systemRegistry.register(new ConsciousnessEmergenceSystem());
   gameLoop.systemRegistry.register(new UpliftBreedingProgramSystem());
 
@@ -616,6 +610,7 @@ export function registerAllSystems(
   // ============================================================================
   gameLoop.systemRegistry.register(new GameShowSystem());
   gameLoop.systemRegistry.register(new SoapOperaSystem());
+  gameLoop.systemRegistry.register(new CastingSystem());
   gameLoop.systemRegistry.register(new TVDevelopmentSystem());
   gameLoop.systemRegistry.register(new TVPostProductionSystem());
 

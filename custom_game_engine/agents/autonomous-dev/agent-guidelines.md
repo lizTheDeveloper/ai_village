@@ -96,6 +96,29 @@ When a feature doesn't work as expected, include:
 
 ### Critical Pattern Checks
 
+#### Memory Leak Prevention (Added 2026-01-04)
+- [ ] **ALL setInterval calls MUST have cleanup handlers:**
+  ```bash
+  # Find all setInterval calls
+  grep -rn "setInterval" packages/ demo/src/ scripts/ | grep -v node_modules
+  # Count cleanup calls (should match setInterval count)
+  grep -rn "clearInterval" packages/ demo/src/ scripts/ | grep -v node_modules
+  ```
+- [ ] **Client-side intervals tracked and cleared on beforeunload:**
+  ```bash
+  # Verify client code has cleanup handler
+  grep -n "beforeunload.*clearInterval\|intervalIds.*forEach.*clearInterval" demo/src/
+  ```
+- [ ] **Server-side intervals cleared in SIGINT handler:**
+  ```bash
+  # Verify server code clears intervals on shutdown
+  grep -n "SIGINT.*clearInterval\|clearInterval.*autoSave\|clearInterval.*cleanup" scripts/
+  ```
+- [ ] **Game logic uses TickScheduler, NOT setInterval:**
+  - ❌ Auto-save based on wall-clock time (setInterval)
+  - ✅ Auto-save based on game ticks (TickScheduler)
+  - Exception: UI updates and server infrastructure can use setInterval with cleanup
+
 #### Component Updates
 - [ ] **Grep for spread operators in updateComponent calls:**
   ```bash
@@ -128,6 +151,29 @@ When a feature doesn't work as expected, include:
 
 ## Common Failure Patterns Reference
 
+### Pattern 0: Memory Leaks from Uncleaned Intervals (Added 2026-01-04)
+**Symptom:** Memory usage grows over time, CPU spikes, multiple intervals running
+**Cause:** `setInterval` without corresponding `clearInterval`
+**Root Cause:** Page reloads or server restarts leave old intervals running
+**Impact:** Status update (100ms) accumulates rapidly - after 5 reloads, 50 intervals @ 10x/sec
+**Fix:**
+```typescript
+// Client-side
+const intervalIds: ReturnType<typeof setInterval>[] = [];
+intervalIds.push(setInterval(() => { /* ... */ }, 1000));
+window.addEventListener('beforeunload', () => {
+  intervalIds.forEach(clearInterval);
+});
+
+// Server-side
+const autoSaveInterval = setInterval(() => { /* ... */ }, 30000);
+process.on('SIGINT', () => {
+  clearInterval(autoSaveInterval);
+  process.exit(0);
+});
+```
+**Prevention:** See `INTERVAL_USAGE_ANALYSIS.md` for TickScheduler migration strategy
+
 ### Pattern 1: Component State Lost
 **Symptom:** Value set in one system, but reads as old value in another
 **Cause:** Spread operator creating plain object, losing class prototype
@@ -158,6 +204,19 @@ When a feature doesn't work as expected, include:
 ## Quick Reference Commands
 
 ```bash
+# Memory leak detection (Added 2026-01-04)
+grep -rn "setInterval" packages/ demo/src/ scripts/ | grep -v node_modules | wc -l
+grep -rn "clearInterval" packages/ demo/src/ scripts/ | grep -v node_modules | wc -l
+# These counts should be equal (or clearInterval >= setInterval)
+
+# Find uncleaned intervals in client code
+grep -rn "setInterval" demo/src/main.ts
+grep -rn "beforeunload.*clearInterval" demo/src/main.ts
+
+# Find uncleaned intervals in server code
+grep -rn "setInterval" scripts/metrics-server.ts
+grep -rn "SIGINT.*clearInterval" scripts/metrics-server.ts
+
 # Check for spread operator bugs in component updates
 grep -rn "updateComponent.*{\.\.\.current" packages/core/src/
 
@@ -176,5 +235,5 @@ cd custom_game_engine && npm run build
 
 ---
 
-**Last Updated:** 2025-12-26
-**Based on:** Analysis of recurring failures in work orders from 2025-12-22 through 2025-12-26
+**Last Updated:** 2026-01-04 (Memory leak prevention added)
+**Based on:** Analysis of recurring failures in work orders from 2025-12-22 through 2026-01-04

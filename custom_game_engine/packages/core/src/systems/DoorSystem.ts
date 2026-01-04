@@ -60,10 +60,10 @@ export class DoorSystem implements System {
     }
 
     // Cache agent positions for this tick
+    // Performance: Use pre-filtered entities from requiredComponents instead of querying
     if (this.cachedAgentTick !== world.tick) {
       this.cachedAgentPositions = [];
-      const agents = world.query().with(CT.Position).with(CT.Agent).executeEntities();
-      for (const agent of agents) {
+      for (const agent of entities) {
         const impl = agent as EntityImpl;
         const pos = impl.getComponent<PositionComponent>(CT.Position);
         if (pos) {

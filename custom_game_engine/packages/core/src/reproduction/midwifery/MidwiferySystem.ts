@@ -121,7 +121,6 @@ export class MidwiferySystem implements System {
   private lastUpdateTick: Tick = 0;
 
   public initialize(world: World, eventBus: EventBus): void {
-    console.log('[MidwiferySystem] Initializing...');
     this.world = world;
     this.eventBus = eventBus;
 
@@ -134,12 +133,9 @@ export class MidwiferySystem implements System {
     }
 
     // Subscribe to conception events
-    console.log('[MidwiferySystem] Subscribing to conception events...');
     this.eventBus.subscribe('conception' as any, (event: any) => {
-      console.log('[MidwiferySystem] Received conception event!', event);
       this.handleConception(event.data);
     });
-    console.log('[MidwiferySystem] Ready!');
   }
 
   public update(world: World): void {

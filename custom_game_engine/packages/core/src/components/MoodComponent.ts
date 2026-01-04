@@ -24,6 +24,7 @@ export type EmotionalState =
   | 'lonely'       // Isolated, craving connection
   | 'proud'        // Accomplished, self-satisfied
   | 'grateful'     // Appreciative, thankful
+  | 'grieving'     // Mourning a loss
   // Forward-compatibility: Mental breakdown states
   | 'enraged'      // Tantrum state - may attack or destroy
   | 'despairing'   // Deep depression - may become catatonic
@@ -46,7 +47,17 @@ export type TraumaType =
   | 'failure_public'     // Failed at something publicly
   | 'betrayal'           // Trust was violated
   | 'loss_of_home'       // Lost dwelling/territory
-  | 'attack_survived';   // Was attacked and survived
+  | 'attack_survived'    // Was attacked and survived
+  | 'disconnection'      // Lost connection with someone/something
+  | 'defeat'             // Major defeat or loss
+  | 'regret'             // Deep regret over past actions
+  | 'heartbreak'         // Romantic heartbreak
+  | 'self_deception'     // Discovered they were deceiving themselves
+  | 'existential'        // Existential crisis
+  | 'failure'            // General failure
+  | 'loss'               // General loss
+  | 'unresolved'         // Unresolved issue
+  | 'guilt';             // Guilt over actions
 
 /**
  * Represents a traumatic event that contributes to stress.
@@ -500,6 +511,7 @@ export function getMoodDescription(component: MoodComponent): string {
     lonely: 'feeling lonely',
     proud: 'feeling proud',
     grateful: 'feeling grateful',
+    grieving: 'grieving a loss',
     // Forward-compatibility: breakdown states
     enraged: 'in a violent rage',
     despairing: 'in deep despair',

@@ -309,7 +309,6 @@ export class LLMConfigPanel implements IWindowPanel {
         customHeaders,
       };
 
-      console.log('[LLMConfigPanel] Saved custom LLM config:', agent.customLLM);
       this.hide();
     } catch (e) {
       alert('Invalid JSON in Custom Headers field');
@@ -327,7 +326,6 @@ export class LLMConfigPanel implements IWindowPanel {
     }
 
     agent.customLLM = undefined;
-    console.log('[LLMConfigPanel] Cleared custom LLM config');
     this.hide();
   }
 }

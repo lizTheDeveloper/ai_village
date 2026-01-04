@@ -86,12 +86,9 @@ export function executeEffect(
       }
 
       const skillId = effect.skill as SkillId;
-      const { component: updated, leveledUp, newLevel } = addSkillXP(skills, skillId, effect.xp);
+      const { component: updated } = addSkillXP(skills, skillId, effect.xp);
       world.addComponent(context.entityId, updated);
 
-      if (leveledUp) {
-        console.log(`[PlotEffect] ${context.entityId} leveled up ${effect.skill} to ${newLevel}`);
-      }
       break;
     }
 
@@ -133,13 +130,11 @@ export function executeEffect(
       // Note: addLessonToSoul mutates in place, so we need to update the component
       // Use type cast since SoulIdentityComponent uses ComponentType enum
       world.addComponent(context.entityId, soul as any);
-      console.log(`[PlotEffect] Soul learned lesson: ${effect.lesson_id}`);
       break;
     }
 
     case 'spawn_attractor': {
       // Attractor system integration - log for now until NarrativePressureSystem is hooked
-      console.log(`[PlotEffect] Spawning attractor: ${effect.attractor_id}`);
       // TODO: Hook into NarrativePressureSystem when available
       // narrativePressure.addAttractor({ id: effect.attractor_id, ... });
       break;
@@ -147,7 +142,6 @@ export function executeEffect(
 
     case 'queue_event': {
       // Event queueing - log for now until EventQueue system is implemented
-      console.log(`[PlotEffect] Queueing event: ${effect.event_type}`);
       // TODO: Hook into EventQueue when available
       // eventQueue.enqueue({ type: effect.event_type, data: effect.event_data, delay: effect.delay_ticks });
       break;
@@ -420,7 +414,6 @@ export function executeEffect(
         emotional_tone: effect.urgency === 'critical' ? 'ominous' : 'mysterious',
       });
 
-      console.log(`[PlotEffect] Queued prophetic dream (urgency: ${effect.urgency}): ${effect.vision_content.substring(0, 50)}...`);
       break;
     }
 

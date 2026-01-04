@@ -229,8 +229,5 @@ export class TechnologyUnlockSystem implements System {
     });
 
     // Log for visibility
-    console.log(
-      `[TechnologyUnlock] ${buildingType} unlocked globally by city ${cityId} at tick ${world.tick}`
-    );
   }
 }

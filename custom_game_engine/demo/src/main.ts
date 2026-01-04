@@ -318,7 +318,6 @@ async function createSoulsForInitialAgents(
   // Set the LLM provider for the Fates to use
   soulSystem.setLLMProvider(llmProvider);
 
-  console.log(`[Demo] Creating souls for ${agentIds.length} initial agents...`);
 
   // Create modal to display ceremonies
   const ceremonyModal = new SoulCeremonyModal();
@@ -339,7 +338,6 @@ async function createSoulsForInitialAgents(
     const identity = agent.components.get('identity') as any;
     const name = identity?.name ?? 'Unknown';
 
-    console.log(`[Demo] Creating soul ${index + 1}/${agentIds.length} for ${name}...`);
 
     // Wait for this soul to be created before starting the next
     // Add 30-second timeout to prevent hanging
@@ -349,7 +347,6 @@ async function createSoulsForInitialAgents(
 
       // Subscribe to ceremony events for this soul
       const startSub = gameLoop.world.eventBus.subscribe('soul:ceremony_started', (event: any) => {
-        console.log(`🌟 Ceremony started for ${name}`);
         currentCeremonyData = event.data;
         ceremonyModal.startCeremony({
           culture: event.data.context.culture,
@@ -362,12 +359,10 @@ async function createSoulsForInitialAgents(
       });
 
       const speakSub = gameLoop.world.eventBus.subscribe('soul:fate_speaks', (event: any) => {
-        console.log(`${event.data.speaker}: ${event.data.text}`);
         ceremonyModal.addSpeech(event.data.speaker, event.data.text, event.data.topic);
       });
 
       const completeSub = gameLoop.world.eventBus.subscribe('soul:ceremony_complete', (event: any) => {
-        console.log(`✨ Soul created for ${name}`);
 
         // Add agent card immediately when ceremony completes
         const appearance = agent.components.get('appearance') as any;
@@ -419,7 +414,6 @@ async function createSoulsForInitialAgents(
                 const spiritual = agent.components.get('spiritual') as any;
                 if (spiritual) {
                   spiritual.spirituality = isMystic ? 0.95 : 0.8;
-                  console.log(`[SoulCreation] ${name} has spiritual soul (${event.data.archetype}, interests: ${(event.data.interests as string[])?.join(', ')})`);
                 }
               }
 
@@ -445,7 +439,6 @@ async function createSoulsForInitialAgents(
           },
           () => {
             // User rejected this soul - regenerate a new one
-            console.log('[SoulCreation] Player rejected soul, generating a new one...');
 
             // Hide modal and reset state
             ceremonyModal.hide();
@@ -503,7 +496,6 @@ async function createSoulsForInitialAgents(
     }
   }
 
-  console.log(`[Demo] All souls created successfully`);
 
   // Cards stay visible - no auto-hide
 }
@@ -650,7 +642,6 @@ async function registerAllSystems(
 
   // Generate session ID for metrics
   const gameSessionId = `game_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-  console.log(`[Demo] Game session ID: ${gameSessionId}`);
 
   // Use centralized system registration from @ai-village/core
   const coreResult = coreRegisterAllSystems(gameLoop, {
@@ -699,14 +690,12 @@ async function registerAllSystems(
         liveEntityAPI.setPromptBuilder(promptBuilder);
       }
       liveEntityAPI.attach(streamClient);
-      console.log('[Demo] Live Entity API attached for dashboard queries');
     }
   }
 
   // Initialize governance data system
   coreResult.governanceDataSystem.initialize(gameLoop.world, gameLoop.world.eventBus);
 
-  console.log('[Demo] All systems registered via centralized registration');
 
   return {
     soilSystem: coreResult.soilSystem,
@@ -2658,7 +2647,6 @@ function setupDebugAPI(
 // ============================================================================
 
 async function main() {
-  console.log('[DEMO] main() called, initializing...');
   const statusEl = document.getElementById('status');
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 
@@ -2666,7 +2654,9 @@ async function main() {
     throw new Error('Canvas element not found');
   }
 
-  console.log('[DEMO] Canvas found, creating game loop...');
+  // Track intervals for cleanup to prevent memory leaks
+  const intervalIds: ReturnType<typeof setInterval>[] = [];
+
   // Create game loop
   const gameLoop = new GameLoop();
 
@@ -2676,14 +2666,11 @@ async function main() {
   // Handle first run - NOTE: We skip the settings panel blocking and proceed directly
   // to universe creation. Settings can be configured later via ESC key.
   const isFirstRun = settingsPanel.getIsFirstRun();
-  console.log(`[DEMO] First run check: ${isFirstRun}`);
 
   if (isFirstRun) {
-    console.log('[DEMO] First run detected - will show universe creation screen below...');
     // Don't block - let the flow continue to universe creation
   }
 
-  console.log('[DEMO] Settings loaded, continuing initialization...');
 
   const settings = settingsPanel.getSettings();
 
@@ -2695,11 +2682,9 @@ async function main() {
 
   if (useProxy) {
     // Default: Use ProxyLLMProvider for server-side API calls with automatic fallback
-    console.log('[DEMO] Using ProxyLLMProvider - server handles API keys and rate limiting');
     llmProvider = new ProxyLLMProvider('http://localhost:8766');
   } else {
     // Legacy mode: Direct client-side API calls (for local Ollama or explicit settings)
-    console.log('[DEMO] Using direct LLM provider (no proxy)');
     const providers: LLMProvider[] = [];
 
     // Check for API keys in .env file (legacy client-side mode)
@@ -2708,7 +2693,6 @@ async function main() {
 
     // 1. Primary: Cerebras with Qwen 3-32B
     if (cerebrasApiKey) {
-      console.log('[DEMO] Provider 1: Cerebras → Qwen 3-32B');
       providers.push(new OpenAICompatProvider(
         'qwen-3-32b',
         'https://api.cerebras.ai/v1',
@@ -2718,7 +2702,6 @@ async function main() {
 
     // 2. Secondary: Groq with Qwen 3-32B (backup for provider 1)
     if (groqApiKey) {
-      console.log('[DEMO] Provider 2: Groq → Qwen 3-32B');
       providers.push(new OpenAICompatProvider(
         'qwen/qwen3-32b',
         'https://api.groq.com/openai/v1',
@@ -2728,7 +2711,6 @@ async function main() {
 
     // 3. Tertiary: Cerebras with GPT-OSS-120B
     if (cerebrasApiKey) {
-      console.log('[DEMO] Provider 3: Cerebras → GPT-OSS-120B');
       providers.push(new OpenAICompatProvider(
         'gpt-oss-120b',
         'https://api.cerebras.ai/v1',
@@ -2738,7 +2720,6 @@ async function main() {
 
     // 4. Quaternary: Groq with GPT-OSS-120B (last resort)
     if (groqApiKey) {
-      console.log('[DEMO] Provider 4: Groq → GPT-OSS-120B (last resort)');
       providers.push(new OpenAICompatProvider(
         'openai/gpt-oss-120b',
         'https://api.groq.com/openai/v1',
@@ -2761,7 +2742,6 @@ async function main() {
 
     // Use FallbackProvider if we have multiple providers, otherwise use single provider
     if (providers.length > 1) {
-      console.log(`[DEMO] Using FallbackProvider with ${providers.length} providers: ${providers.map(p => p.getProviderId()).join(' → ')}`);
       llmProvider = new FallbackProvider(providers, {
         retryAfterMs: 60000,        // Retry failed provider after 1 minute
         maxConsecutiveFailures: 3,   // Disable after 3 consecutive failures
@@ -2772,7 +2752,6 @@ async function main() {
     }
   }
 
-  console.log('[DEMO] Checking LLM availability...');
   let timeoutId: number;
   const isLLMAvailable = await Promise.race([
     llmProvider.isAvailable().then(result => {
@@ -2786,7 +2765,6 @@ async function main() {
       }, 2000) as unknown as number;
     })
   ]);
-  console.log(`[DEMO] LLM available: ${isLLMAvailable}`);
   let llmQueue: LLMDecisionQueue | null = null;
   let promptBuilder: StructuredPromptBuilder | null = null;
 
@@ -2796,7 +2774,6 @@ async function main() {
 
     // Wire up checkpoint naming service with LLM
     checkpointNamingService.setProvider(llmProvider);
-    console.log('[DEMO] Checkpoint naming service configured with LLM');
   } else {
     console.warn(`[DEMO] LLM not available at ${settings.llm.baseUrl}`);
     console.warn('[DEMO] Press ESC to open settings and configure LLM provider');
@@ -2804,14 +2781,10 @@ async function main() {
   }
 
   // Initialize storage backend for save/load system FIRST
-  console.log('[Demo] TRACE: Creating IndexedDBStorage...');
   const storage = new IndexedDBStorage('ai-village-saves');
-  console.log('[Demo] TRACE: Setting storage backend...');
   saveLoadService.setStorage(storage);
-  console.log('[Demo] TRACE: Storage backend set');
 
   // Check for existing saves and auto-load the most recent one
-  console.log('[Demo] TRACE: Listing saves...');
   let existingSaves: any[] = [];
   try {
     // Add timeout to prevent hanging on IndexedDB issues
@@ -2820,13 +2793,10 @@ async function main() {
       setTimeout(() => reject(new Error('listSaves timeout after 5s')), 5000)
     );
     const allSaves = await Promise.race([listSavesPromise, timeoutPromise]);
-    console.log('[Demo] TRACE: Got save list, filtering...');
     // Filter out any undefined/null entries
     existingSaves = allSaves.filter(save => save != null && save.name && save.key);
-    console.log(`[Demo] Found ${existingSaves.length} existing saves`);
   } catch (error) {
     console.error('[Demo] Error listing saves:', error);
-    console.log('[Demo] Continuing with empty save list');
     existingSaves = [];
   }
   let loadedCheckpoint = false;
@@ -2840,21 +2810,17 @@ async function main() {
   const chunkManager = new ChunkManager(3);
   (gameLoop.world as any).setChunkManager(chunkManager);
   (gameLoop.world as any).setTerrainGenerator(terrainGenerator);
-  console.log('[Demo] ChunkManager set on world - ready for save loading');
 
   if (existingSaves.length > 0) {
     // Auto-load the most recent save
     const mostRecent = existingSaves[0]; // Saves are sorted by timestamp descending
-    console.log(`[Demo] Auto-loading most recent save: ${mostRecent.name}`);
 
     const result = await saveLoadService.load(mostRecent.key, gameLoop.world);
     if (result.success) {
-      console.log(`[Demo] Successfully loaded: ${result.save?.header.name}`);
       loadedCheckpoint = true;
       universeSelection = { type: 'load', checkpointKey: mostRecent.key };
     } else {
       console.error(`[Demo] Failed to load checkpoint: ${result.error}`);
-      console.log('[Demo] Falling back to new game creation');
       // Fall back to showing universe creation screen
       universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
         universeConfigScreen = new UniverseConfigScreen();
@@ -2866,7 +2832,6 @@ async function main() {
     }
   } else {
     // No saves - show universe creation screen
-    console.log('[Demo] No existing saves found - showing universe creation');
     universeSelection = await new Promise<{ type: 'new'; magicParadigm: string }>((resolve) => {
       universeConfigScreen = new UniverseConfigScreen();
       universeConfigScreen.show((config) => {
@@ -2881,12 +2846,10 @@ async function main() {
     // Take a snapshot (save) before reload to preserve agents and world state
     // This is part of the time travel/multiverse checkpoint system
     try {
-      console.log('[Demo] Settings changed - taking snapshot before reload...');
       const timeComp = gameLoop.world.query().with('time').executeEntities()[0]?.getComponent<any>('time');
       const day = timeComp?.day || 0;
       const saveName = `settings_reload_day${day}_${new Date().toISOString().split('T')[1].split('.')[0].replace(/:/g, '-')}`;
       await saveLoadService.save(gameLoop.world, { name: saveName });
-      console.log(`[Demo] Snapshot saved: ${saveName}`);
     } catch (error) {
       console.error('[Demo] Failed to save before reload:', error);
       // Continue with reload even if save fails
@@ -3004,7 +2967,6 @@ async function main() {
   // Generate terrain only if NOT loading from a checkpoint
   // (terrain is restored from checkpoint by WorldSerializer)
   if (!loadedCheckpoint) {
-    console.log('[Demo] Generating fresh terrain (no checkpoint loaded)');
     for (let cy = -1; cy <= 1; cy++) {
       for (let cx = -1; cx <= 1; cx++) {
         const chunk = chunkManager.getChunk(cx, cy);
@@ -3012,7 +2974,6 @@ async function main() {
       }
     }
   } else {
-    console.log('[Demo] Skipping terrain generation - restored from checkpoint');
   }
 
   // Initialize divine configuration for this universe
@@ -3039,7 +3000,6 @@ async function main() {
     divinePreset
   );
   (gameLoop.world as any).setDivineConfig(divineConfig);
-  console.log(`[Demo] Divine config set: ${divinePreset} (from magic: ${selectedMagicPreset})`);
 
   // Create notification system
   const notificationEl = document.createElement('div');
@@ -3100,9 +3060,9 @@ async function main() {
   });
 
   // Update agent roster panel once per minute
-  setInterval(() => {
+  intervalIds.push(setInterval(() => {
     panels.agentRosterPanel.updateFromWorld(gameLoop.world);
-  }, 60000);
+  }, 60000));
 
   // Wire up animal roster panel camera focusing
   panels.animalRosterPanel.setOnAnimalClick((animalId: string) => {
@@ -3118,9 +3078,9 @@ async function main() {
   });
 
   // Update animal roster panel once per minute
-  setInterval(() => {
+  intervalIds.push(setInterval(() => {
     panels.animalRosterPanel.updateFromWorld(gameLoop.world);
-  }, 60000);
+  }, 60000));
 
   // Setup window manager
   const { windowManager, menuBar, controlsPanel } = setupWindowManager(
@@ -3223,11 +3183,10 @@ async function main() {
     statusEl.className = 'status running';
   }
 
-  setInterval(updateStatus, 100);
+  intervalIds.push(setInterval(updateStatus, 100));
 
   // Only initialize new world if we didn't load a checkpoint
   if (!loadedCheckpoint) {
-    console.log(`[Demo] Creating new world with magic paradigm: ${universeSelection.magicParadigm || 'none'}`);
 
     // Create world entity
     const worldEntity = gameLoop.world.createEntity();
@@ -3279,7 +3238,6 @@ async function main() {
     const selectedParadigm = universeSelection.magicParadigm || 'none';
 
     if (selectedParadigm !== 'none') {
-      console.log(`[Demo] Enabling magic paradigm: ${selectedParadigm}`);
 
       // Unlock all spells that belong to the selected paradigm
       const spellRegistry = SpellRegistry.getInstance();
@@ -3290,14 +3248,11 @@ async function main() {
         // Match spells that belong to this paradigm
         if (spell.paradigmId === selectedParadigm) {
           spellRegistry.unlockSpell(spell.id);
-          console.log(`[Demo] Unlocked spell: ${spell.name} (${spell.id})`);
           unlockedCount++;
         }
       }
 
-      console.log(`[Demo] Magic system configured with '${selectedParadigm}' paradigm (${unlockedCount} spells unlocked)`);
     } else {
-      console.log('[Demo] Magic system disabled (The First World)');
     }
 
     // Create initial entities
@@ -3305,21 +3260,17 @@ async function main() {
     const agentIds = createInitialAgents(gameLoop.world, settings.dungeonMasterPrompt);
 
     // Start game loop BEFORE soul creation so SoulCreationSystem.update() runs
-    console.log('[Demo] Starting game loop for soul creation...');
     gameLoop.start();
 
     // Create souls for the initial agents (displays modal before map loads)
     await createSoulsForInitialAgents(gameLoop, agentIds, llmProvider, renderer, universeConfig, isLLMAvailable);
-    console.log('[Demo] All souls created (or skipped if LLM unavailable), continuing initialization...');
 
     // Hide the universe config screen now that all souls are created
     if (universeConfigScreen) {
       universeConfigScreen.hide();
-      console.log('[Demo] Universe config screen hidden');
     }
 
     const playerDeityId = await createPlayerDeity(gameLoop.world);
-    console.log('[Demo] Player deity created:', playerDeityId); // Create player deity for belief system
 
     // Set the 2 most spiritual agents to believe in the player deity
     // Note: spirituality is on PersonalityComponent, not SpiritualComponent
@@ -3350,7 +3301,6 @@ async function main() {
         const identity = agent.components.get('identity') as any;
         const name = identity?.name ?? agent.id;
         believers.push({ agent, name });
-        console.log(`[Demo] ${name} believes in the player deity (spirituality: ${spirituality.toFixed(2)}, faith: ${spiritual.faith.toFixed(2)})`);
       }
     }
 
@@ -3377,7 +3327,6 @@ async function main() {
           socialSignificance: 0.8,  // Very socially significant
           importance: 0.85,  // High importance - foundational shared belief
         });
-        console.log(`[Demo] ${believer1.name} remembers discussing faith with ${believer2.name}`);
       }
 
       if (episodic2?.formMemory) {
@@ -3391,7 +3340,6 @@ async function main() {
           socialSignificance: 0.8,
           importance: 0.85,
         });
-        console.log(`[Demo] ${believer2.name} remembers discussing faith with ${believer1.name}`);
       }
     }
 
@@ -3408,15 +3356,12 @@ async function main() {
     ];
     berryPositions.forEach(pos => createBerryBush(gameLoop.world, pos.x, pos.y));
   } else {
-    console.log('[Demo] Skipping world initialization - loaded from checkpoint');
     // Start game loop for loaded checkpoints (new games already started it before soul creation)
-    console.log('[Demo] Starting game loop...');
     gameLoop.start();
   }
 
   // Expose gameLoop globally for API access (e.g., Interdimensional Cable recordings API)
   (window as any).__gameLoop = gameLoop;
-  console.log('[Demo] GameLoop exposed globally for API access');
 
   // Farming action handler
   gameLoop.world.eventBus.subscribe('action:requested', (event: any) => {
@@ -3436,32 +3381,32 @@ async function main() {
   );
 
   // Game loop already started before soul creation
-  console.log('[Demo] Starting render loop - map should now be visible');
   renderLoop();
 
   // Set up periodic auto-saves every minute
   const AUTOSAVE_INTERVAL_MS = 60000; // 1 minute
-  setInterval(async () => {
-    console.log('[Demo] Auto-save interval triggered');
+  intervalIds.push(setInterval(async () => {
     try {
       const timeComp = gameLoop.world.query().with('time').executeEntities()[0]?.getComponent<any>('time');
       const day = timeComp?.day || 0;
       const tick = timeComp?.currentTick || 0;
 
       const saveName = `autosave_day${day}_${new Date().toISOString().split('T')[1].split('.')[0].replace(/:/g, '-')}`;
-      console.log(`[Demo] Calling save with name: ${saveName}`);
       await saveLoadService.save(gameLoop.world, { name: saveName });
-      console.log(`[Demo] Auto-save successful: ${saveName}`);
     } catch (error) {
       console.error('[Demo] Auto-save error:', error);
     }
-  }, AUTOSAVE_INTERVAL_MS);
+  }, AUTOSAVE_INTERVAL_MS));
 
-  console.log(`[Demo] Auto-save enabled - saving every ${AUTOSAVE_INTERVAL_MS / 1000} seconds`);
 
   setTimeout(() => {
     showNotification('💡 Tip: Right-click a grass tile, then press T to till it', '#00CED1');
   }, 3000);
+
+  // Clean up intervals on page unload to prevent memory leaks
+  window.addEventListener('beforeunload', () => {
+    intervalIds.forEach((id) => clearInterval(id));
+  });
 }
 
 // Start when DOM is ready

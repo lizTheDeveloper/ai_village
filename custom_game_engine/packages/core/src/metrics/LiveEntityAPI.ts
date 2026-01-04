@@ -100,7 +100,6 @@ export class LiveEntityAPI {
    * Handle incoming actions
    */
   async handleAction(action: ActionRequest): Promise<ActionResponse> {
-    console.log('[LiveEntityAPI] handleAction called with action:', action.action);
     switch (action.action) {
       case 'set-llm-config':
         return this.handleSetLLMConfig(action);
@@ -109,7 +108,6 @@ export class LiveEntityAPI {
       case 'reject-creation':
         return this.handleRejectCreation(action);
       case 'set-skill':
-        console.log('[LiveEntityAPI] Matched set-skill case!');
         return this.handleSetSkill(action);
       case 'spawn-entity':
         return this.handleSpawnEntity(action);
@@ -118,7 +116,6 @@ export class LiveEntityAPI {
       case 'list-city-templates':
         return this.handleListCityTemplates(action);
       default:
-        console.log('[LiveEntityAPI] No matching case for:', action.action);
         return {
           requestId: action.requestId,
           success: false,
@@ -177,7 +174,6 @@ export class LiveEntityAPI {
    * Handle set-skill action
    */
   private handleSetSkill(action: ActionRequest): ActionResponse {
-    console.log('[LiveEntityAPI] handleSetSkill called with:', action.params);
     const { agentId, skill, level } = action.params;
 
     if (!agentId || typeof agentId !== 'string') {

@@ -504,6 +504,8 @@ export class EventDrivenPlotAssignmentSystem implements System {
         return `rel_formed:${event.involved_agent_id}:${soulId}`;
       case 'on_death_nearby':
         return `death_nearby:${event.involved_agent_id}:${soulId}`;
+      case 'on_major_loss':
+        return `major_loss:${soulId}`;
       default: {
         // Exhaustiveness check - should never reach here
         const exhaustiveCheck: never = trigger;

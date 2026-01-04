@@ -399,7 +399,6 @@ export class CanonEventRecorder {
       this.events.shift();
     }
 
-    console.log(`[CanonEvent] Recorded: ${type} - ${options.description}`);
 
     return event;
   }

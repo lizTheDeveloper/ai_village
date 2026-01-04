@@ -77,7 +77,6 @@ export class MultiverseCoordinator {
   private currentTimestamp: number = Date.now();
 
   constructor() {
-    console.log('[MultiverseCoordinator] Initialized');
   }
 
   /**
@@ -98,10 +97,6 @@ export class MultiverseCoordinator {
 
     this.universes.set(config.id, instance);
 
-    console.log(
-      `[MultiverseCoordinator] Registered universe: ${config.name} ` +
-      `(id=${config.id}, timeScale=${config.timeScale})`
-    );
   }
 
   /**
@@ -113,7 +108,6 @@ export class MultiverseCoordinator {
     }
 
     this.universes.delete(universeId);
-    console.log(`[MultiverseCoordinator] Unregistered universe: ${universeId}`);
   }
 
   /**
@@ -180,9 +174,6 @@ export class MultiverseCoordinator {
         throw new Error(`Timeline snapshot ${options.fromSnapshotId} not found`);
       }
 
-      console.log(
-        `[MultiverseCoordinator] Forking from timeline snapshot at tick ${snapshotEntry.tick}`
-      );
 
       // Deserialize the snapshot into the new world
       await worldSerializer.deserializeWorld(snapshotEntry.snapshot, forkWorld);
@@ -190,9 +181,6 @@ export class MultiverseCoordinator {
 
     } else {
       // Clone the current world state
-      console.log(
-        `[MultiverseCoordinator] Forking current state at tick ${source.universeTick}`
-      );
 
       await worldSerializer.cloneWorld(
         source.world,
@@ -212,11 +200,6 @@ export class MultiverseCoordinator {
 
     this.universes.set(forkId, fork);
 
-    console.log(
-      `[MultiverseCoordinator] Created fork: ${forkName} ` +
-      `(source=${sourceUniverseId}, tick=${fork.universeTick}, ` +
-      `entities=${forkWorld.entities.size})`
-    );
 
     return fork;
   }
@@ -287,10 +270,6 @@ export class MultiverseCoordinator {
 
     this.passages.set(id, passage);
 
-    console.log(
-      `[MultiverseCoordinator] Created passage: ${id} ` +
-      `(${sourceUniverseId} -> ${targetUniverseId}, type=${type})`
-    );
   }
 
   /**
@@ -362,7 +341,6 @@ export class MultiverseCoordinator {
     }
 
     universe.config.paused = true;
-    console.log(`[MultiverseCoordinator] Paused universe: ${universeId}`);
   }
 
   /**
@@ -385,7 +363,6 @@ export class MultiverseCoordinator {
     universe.lastAbsoluteTick = this.absoluteTick;
 
     universe.config.paused = false;
-    console.log(`[MultiverseCoordinator] Resumed universe: ${universeId}`);
   }
 
   /**
@@ -403,9 +380,6 @@ export class MultiverseCoordinator {
     }
 
     universe.config.timeScale = timeScale;
-    console.log(
-      `[MultiverseCoordinator] Set time scale for ${universeId}: ${timeScale}`
-    );
   }
 
   /**
@@ -482,7 +456,6 @@ export class MultiverseCoordinator {
       universe.pausedDuration = 0n;
     }
 
-    console.log('[MultiverseCoordinator] Reset multiverse time');
   }
 
   /**
@@ -497,11 +470,6 @@ export class MultiverseCoordinator {
     this.originTimestamp = snapshot.originTimestamp;
     this.currentTimestamp = snapshot.currentTimestamp;
 
-    console.log(
-      `[MultiverseCoordinator] Loaded state: ` +
-      `absoluteTick=${this.absoluteTick}, ` +
-      `elapsed=${this.getRealTimeElapsed()}s`
-    );
   }
 }
 

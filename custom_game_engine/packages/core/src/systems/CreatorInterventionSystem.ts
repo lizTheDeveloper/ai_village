@@ -432,9 +432,6 @@ export class CreatorInterventionSystem implements System {
         break;
     }
 
-    console.log(
-      `[CreatorIntervention] Trap triggered! ${casterId} attempted banned spell ${spellId} (${trapLevel})`
-    );
   }
 
   /**
@@ -449,9 +446,6 @@ export class CreatorInterventionSystem implements System {
       const oldLevel = escalationPath[currentIndex]!;
       ban.trapLevel = newLevel;
 
-      console.log(
-        `[CreatorIntervention] Ban trap escalated: ${ban.spellId} → ${newLevel} (violation #${ban.violationCount + 1})`
-      );
 
       // Emit escalation event
       if (this.eventBus) {

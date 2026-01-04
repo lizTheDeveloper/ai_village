@@ -136,11 +136,9 @@ export class PortalSystem implements System {
         portal.usesRemaining--;
         if (portal.usesRemaining === 0) {
           portal.active = false;
-          console.log(`Portal ${portalId} exhausted and deactivated`);
         }
       }
 
-      console.log(`Entity ${entityId} transitioned to ${portal.targetRealmId} via portal ${portalId}`);
       return true;
     } else {
       console.warn(`Transition failed for ${entityId}: ${result.reason}`);

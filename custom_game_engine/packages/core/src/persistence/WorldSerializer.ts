@@ -25,16 +25,13 @@ export class WorldSerializer {
     universeId: string,
     universeName: string
   ): Promise<UniverseSnapshot> {
-    console.log(`[WorldSerializer] Serializing world for universe: ${universeName}`);
 
     const allEntities = Array.from(world.entities.values());
 
     // Log entity census
     const census = this.generateEntityCensus(allEntities);
-    console.log('[WorldSerializer] Entity Census:');
-    for (const [entityType, count] of Array.from(census.entries()).sort((a, b) => b[1] - a[1])) {
+    for (const [_entityType, count] of Array.from(census.entries()).sort((a, b) => b[1] - a[1])) {
       if (count > 0) {
-        console.log(`  ${entityType}: ${count}`);
       }
     }
 
@@ -93,10 +90,6 @@ export class WorldSerializer {
       },
     };
 
-    console.log(
-      `[WorldSerializer] Serialized ${entities.length} entities, ` +
-      `${entities.flatMap(e => e.components).length} components`
-    );
 
     return snapshot;
   }
@@ -105,7 +98,6 @@ export class WorldSerializer {
    * Deserialize world from snapshot.
    */
   async deserializeWorld(snapshot: UniverseSnapshot, world: World): Promise<void> {
-    console.log(`[WorldSerializer] Deserializing universe: ${snapshot.identity.name}`);
 
     // Verify checksums
     const entitiesChecksum = computeChecksumSync(snapshot.entities);
@@ -121,7 +113,6 @@ export class WorldSerializer {
     const worldImpl = world as WorldImpl;
     if (snapshot.config && Object.keys(snapshot.config as object).length > 0) {
       worldImpl.setDivineConfig(snapshot.config as Partial<UniverseDivineConfig>);
-      console.log('[WorldSerializer] Divine config restored from snapshot');
     }
 
     // Deserialize entities
@@ -138,7 +129,6 @@ export class WorldSerializer {
       const chunkManager = worldImpl.getChunkManager();
       if (chunkManager) {
         await chunkSerializer.deserializeChunks(snapshot.worldState.terrain, chunkManager);
-        console.log('[WorldSerializer] Terrain restored from snapshot');
       } else {
         console.warn('[WorldSerializer] No ChunkManager available - terrain not restored');
       }
@@ -148,12 +138,10 @@ export class WorldSerializer {
     if (snapshot.worldState.zones && snapshot.worldState.zones.length > 0) {
       const zoneManager = getZoneManager();
       zoneManager.deserializeZones(snapshot.worldState.zones);
-      console.log('[WorldSerializer] Zones restored from snapshot');
     }
 
     // TODO: Deserialize weather, buildings
 
-    console.log(`[WorldSerializer] Deserialized ${deserializedEntities.length} entities`);
   }
 
   /**
@@ -338,21 +326,12 @@ export class WorldSerializer {
     universeId: string,
     universeName: string
   ): Promise<void> {
-    console.log(`[WorldSerializer] Cloning world for fork: ${universeName}`);
-
-    const startTime = performance.now();
 
     // Serialize the source world
     const snapshot = await this.serializeWorld(sourceWorld, universeId, universeName);
 
     // Deserialize into the target world
     await this.deserializeWorld(snapshot, targetWorld);
-
-    const elapsed = performance.now() - startTime;
-    console.log(
-      `[WorldSerializer] World clone complete in ${elapsed.toFixed(1)}ms ` +
-      `(${snapshot.entities.length} entities)`
-    );
   }
 
   /**

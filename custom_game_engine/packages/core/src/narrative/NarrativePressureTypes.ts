@@ -28,11 +28,13 @@ export type GoalType =
   | 'entity_survival'
   | 'entity_ascension'
   | 'entity_transformation'
+  | 'survival'
   // Relationship goals
   | 'relationship_formed'
   | 'relationship_broken'
   | 'love'
   | 'betrayal'
+  | 'mentorship'
   // Village/collective goals
   | 'village_crisis'
   | 'village_prosperity'
@@ -43,6 +45,7 @@ export type GoalType =
   | 'event_prevention'
   | 'discovery'
   | 'invention'
+  | 'exploration'
   // Abstract goals
   | 'conflict_escalation'
   | 'conflict_resolution'

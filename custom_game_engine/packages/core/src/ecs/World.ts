@@ -507,13 +507,11 @@ export class WorldImpl implements WorldMutator {
   }
 
   getSystem(systemId: string): import('./System.js').System | undefined {
-    console.log('[World.getSystem] Called with systemId:', systemId, 'registry:', this._systemRegistry);
     if (!this._systemRegistry) {
       console.warn('[World.getSystem] No systemRegistry!');
       return undefined;
     }
     const system = this._systemRegistry.get(systemId);
-    console.log('[World.getSystem] Found system:', system);
     return system;
   }
 
@@ -657,7 +655,6 @@ export class WorldImpl implements WorldMutator {
    */
   setDivineConfig(config: Partial<UniverseDivineConfig>): void {
     this._divineConfig = config;
-    console.log(`[World] Divine config set: ${config.name ?? 'unnamed'}`);
   }
 
   /**

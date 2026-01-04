@@ -250,9 +250,9 @@ export class TemperatureSystem implements System {
 
       // Check if agent is inside building interior
       if (buildingComp.interior && buildingComp.interiorRadius > 0) {
-        const distance = Math.sqrt(
-          Math.pow(position.x - buildingPos.x, 2) + Math.pow(position.y - buildingPos.y, 2)
-        );
+        const dx = position.x - buildingPos.x;
+        const dy = position.y - buildingPos.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance <= buildingComp.interiorRadius) {
           // Agent is inside - apply insulation and base temperature
@@ -350,9 +350,9 @@ export class TemperatureSystem implements System {
 
       // Check if building provides heat and is complete
       if (buildingComp.providesHeat && buildingComp.heatRadius > 0 && buildingComp.isComplete) {
-        const distance = Math.sqrt(
-          Math.pow(position.x - buildingPos.x, 2) + Math.pow(position.y - buildingPos.y, 2)
-        );
+        const dx = position.x - buildingPos.x;
+        const dy = position.y - buildingPos.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance <= buildingComp.heatRadius) {
           // Heat effect diminishes with distance: heatAmount * (1 - distance / radius)

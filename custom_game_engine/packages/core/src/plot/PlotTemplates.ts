@@ -256,5 +256,4 @@ export const ALL_PLOT_TEMPLATES: PlotLineTemplate[] = [
  */
 export function initializePlotTemplates(): void {
   plotLineRegistry.registerMany(POC_PLOT_TEMPLATES);
-  console.log(`[PlotTemplates] Registered ${POC_PLOT_TEMPLATES.length} plot templates for PoC`);
 }

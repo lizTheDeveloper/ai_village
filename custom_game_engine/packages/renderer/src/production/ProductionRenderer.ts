@@ -470,12 +470,6 @@ export class ProductionRenderer {
     // Build description for PixelLab
     const description = this.buildPixelLabDescription(prompt);
 
-    console.log(`[ProductionRenderer] Rendering ${resolution}x${resolution} character:`);
-    console.log(`  Species: ${prompt.species}`);
-    console.log(`  Costume: ${prompt.costume}`);
-    console.log(`  Pose: ${prompt.pose}, Expression: ${prompt.expression}`);
-    console.log(`  Equipment: ${prompt.equipment.join(', ')}`);
-    console.log(`  Description: ${description}`);
 
     // TODO: Integrate with PixelLab MCP or other rendering service
     // For now, return placeholder

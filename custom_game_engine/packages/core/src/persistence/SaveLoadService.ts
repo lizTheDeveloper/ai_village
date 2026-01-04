@@ -46,7 +46,6 @@ export class SaveLoadService {
    */
   setStorage(backend: StorageBackend): void {
     this.storageBackend = backend;
-    console.log(`[SaveLoad] Storage backend set: ${backend.constructor.name}`);
   }
 
   /**
@@ -57,7 +56,6 @@ export class SaveLoadService {
       throw new Error('No storage backend configured. Call setStorage() first.');
     }
 
-    console.log(`[SaveLoad] Saving game: ${options.name}`);
 
     // Validate world state before serialization
     validateWorldState(world);
@@ -159,7 +157,6 @@ export class SaveLoadService {
     // Save to storage
     await this.storageBackend.save(key, saveFile);
 
-    console.log(`[SaveLoad] Game saved successfully: ${key}`);
   }
 
   /**
@@ -170,7 +167,6 @@ export class SaveLoadService {
       throw new Error('No storage backend configured. Call setStorage() first.');
     }
 
-    console.log(`[SaveLoad] Loading game: ${key}`);
 
     try {
       // Load save file
@@ -219,7 +215,6 @@ export class SaveLoadService {
       this.totalPlayTime = saveFile.header.playTime;
       this.playStartTime = Date.now();
 
-      console.log(`[SaveLoad] Game loaded successfully: ${key}`);
 
       return {
         success: true,
@@ -254,7 +249,6 @@ export class SaveLoadService {
     }
 
     await this.storageBackend.delete(key);
-    console.log(`[SaveLoad] Deleted save: ${key}`);
   }
 
   /**

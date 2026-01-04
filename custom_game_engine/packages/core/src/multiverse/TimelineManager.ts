@@ -110,11 +110,6 @@ export class TimelineManager {
       canonEventSaves: config?.canonEventSaves ?? true,
     };
 
-    console.log(
-      `[TimelineManager] Initialized with variable intervals, ` +
-      `maxSnapshots=${this.config.maxSnapshots}, autoSnapshot=${this.config.autoSnapshot}, ` +
-      `canonEventSaves=${this.config.canonEventSaves}`
-    );
   }
 
   /**
@@ -123,7 +118,6 @@ export class TimelineManager {
    */
   attachToWorld(universeId: string, world: World): void {
     if (this.attachedWorlds.has(universeId)) {
-      console.log(`[TimelineManager] Already attached to universe ${universeId}`);
       return;
     }
 
@@ -184,7 +178,6 @@ export class TimelineManager {
       }
     });
 
-    console.log(`[TimelineManager] Attached to universe ${universeId} event bus`);
   }
 
   /**
@@ -192,7 +185,6 @@ export class TimelineManager {
    */
   detachFromWorld(universeId: string): void {
     this.attachedWorlds.delete(universeId);
-    console.log(`[TimelineManager] Detached from universe ${universeId}`);
   }
 
   /**
@@ -257,15 +249,9 @@ export class TimelineManager {
 
     // Don't create overlapping snapshots
     if (this.snapshotInProgress.has(universeId)) {
-      console.log(
-        `[TimelineManager] Skipping canon event save (snapshot in progress): ${eventDescription}`
-      );
       return null;
     }
 
-    console.log(
-      `[TimelineManager] Canon event triggered save: ${eventType} - ${eventDescription}`
-    );
 
     return this.createSnapshot(
       universeId,
@@ -301,14 +287,6 @@ export class TimelineManager {
     this.snapshotInProgress.add(universeId);
 
     try {
-      const logPrefix = canonEventType
-        ? `[TimelineManager] Creating canon event snapshot (${canonEventType})`
-        : `[TimelineManager] Creating ${isAutoSave ? 'auto' : 'manual'} snapshot`;
-
-      console.log(`${logPrefix} for universe ${universeId} at tick ${tick}`);
-
-      const startTime = performance.now();
-
       // Create the snapshot
       const timelineSnapshot = await worldSerializer.createTimelineSnapshot(
         world,
@@ -342,12 +320,6 @@ export class TimelineManager {
 
       // Prune old snapshots
       this.pruneTimeline(universeId);
-
-      const elapsed = performance.now() - startTime;
-      console.log(
-        `[TimelineManager] Snapshot created in ${elapsed.toFixed(1)}ms ` +
-        `(${entry.entityCount} entities)${canonEventType ? ` [${canonEventType}]` : ''}`
-      );
 
       return entry;
     } finally {
@@ -423,7 +395,6 @@ export class TimelineManager {
       const index = timeline.findIndex(e => e.id === entryId);
       if (index !== -1) {
         timeline.splice(index, 1);
-        console.log(`[TimelineManager] Deleted snapshot ${entryId}`);
         return true;
       }
     }
@@ -436,7 +407,6 @@ export class TimelineManager {
   clearTimeline(universeId: string): void {
     this.timelines.delete(universeId);
     this.lastSnapshotTick.delete(universeId);
-    console.log(`[TimelineManager] Cleared timeline for universe ${universeId}`);
   }
 
   /**
@@ -521,7 +491,6 @@ export class TimelineManager {
 
     if (pruned > 0) {
       this.timelines.set(universeId, filtered);
-      console.log(`[TimelineManager] Pruned ${pruned} old snapshots from ${universeId}`);
     }
   }
 
@@ -530,7 +499,6 @@ export class TimelineManager {
    */
   setConfig(config: Partial<TimelineConfig>): void {
     Object.assign(this.config, config);
-    console.log(`[TimelineManager] Config updated:`, this.config);
   }
 
   /**

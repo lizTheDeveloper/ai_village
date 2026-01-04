@@ -82,7 +82,6 @@ export class CheckpointNamingService {
       // Clean up the generated name
       const name = this.cleanupName(response.text);
 
-      console.log(`[CheckpointNaming] Generated name for day ${checkpoint.day}: "${name}"`);
       return name;
     } catch (error) {
       console.error('[CheckpointNaming] Failed to generate name:', error);

@@ -3,7 +3,7 @@
  */
 
 import type { StorageBackend, SaveFile, SaveMetadata, StorageInfo } from '../types.js';
-import { compress, decompress, formatBytes } from '../compression.js';
+import { compress, decompress } from '../compression.js';
 
 export class MemoryStorage implements StorageBackend {
   private saves: Map<string, string> = new Map();  // Stores compressed data
@@ -12,15 +12,10 @@ export class MemoryStorage implements StorageBackend {
   async save(key: string, data: SaveFile): Promise<void> {
     // Serialize to JSON
     const jsonString = JSON.stringify(data);
-    const originalSize = jsonString.length;
 
     // Compress the JSON data
     const compressedData = await compress(jsonString);
     const compressedSize = compressedData.length;
-
-    console.log(
-      `[MemoryStorage] Compressed ${key}: ${formatBytes(originalSize)} -> ${formatBytes(compressedSize)} (${((1 - compressedSize / originalSize) * 100).toFixed(1)}% reduction)`
-    );
 
     this.saves.set(key, compressedData);
 
@@ -38,7 +33,6 @@ export class MemoryStorage implements StorageBackend {
 
     this.metadata.set(key, meta);
 
-    console.log(`[MemoryStorage] Saved: ${key}`);
   }
 
   async load(key: string): Promise<SaveFile | null> {
@@ -52,7 +46,6 @@ export class MemoryStorage implements StorageBackend {
     const decompressedString = await decompress(compressedData);
     const saveFile = JSON.parse(decompressedString) as SaveFile;
 
-    console.log(`[MemoryStorage] Loaded and decompressed: ${key}`);
     return saveFile;
   }
 
@@ -64,7 +57,6 @@ export class MemoryStorage implements StorageBackend {
   async delete(key: string): Promise<void> {
     this.saves.delete(key);
     this.metadata.delete(key);
-    console.log(`[MemoryStorage] Deleted: ${key}`);
   }
 
   async getMetadata(key: string): Promise<SaveMetadata | null> {
@@ -89,6 +81,5 @@ export class MemoryStorage implements StorageBackend {
   clear(): void {
     this.saves.clear();
     this.metadata.clear();
-    console.log('[MemoryStorage] Cleared all saves');
   }
 }

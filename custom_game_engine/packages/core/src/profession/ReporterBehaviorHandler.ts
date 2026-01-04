@@ -61,7 +61,6 @@ export function updateReporterBehaviors(world: World, _currentTick: number): voi
       // Set reporter to follow target entity (or navigate to location if no entity)
       setReporterNavigation(entity, story);
 
-      console.log(`[ReporterBehavior] ${reporter.name} navigating to: ${story.headline} at (${Math.floor(story.location.x)}, ${Math.floor(story.location.y)})`);
     }
   }
 }
@@ -90,7 +89,6 @@ function setReporterNavigation(
       lastThought: `I need to find and follow the subject: ${story.headline}`,
     }));
 
-    console.log(`[ReporterBehavior] Following entity ${story.sourceEntityId} for: ${story.headline}`);
   } else if (story.location) {
     // No entity - just navigate to fixed location
     const location = story.location; // Destructure to help TypeScript narrow the type
@@ -104,7 +102,6 @@ function setReporterNavigation(
       lastThought: `I need to get to the scene to cover this story: ${story.headline}`,
     }));
 
-    console.log(`[ReporterBehavior] Navigating to location (${Math.floor(location.x)}, ${Math.floor(location.y)}) for: ${story.headline}`);
   } else {
     // No entity and no location - story can't be covered
     console.warn(`[ReporterBehavior] Story "${story.headline}" has no entity or location to cover`);

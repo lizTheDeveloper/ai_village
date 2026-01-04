@@ -153,7 +153,6 @@ export class RealmManager implements System {
         location.timeDilation = 1.0;
         location.canExit = true;
 
-        console.log(`Entity ${inhabitantId} ejected from collapsing realm ${realmId}`);
       }
     }
 

@@ -219,9 +219,6 @@ export class UniversitySystem implements System {
         project.quality >= 80 // High quality = breakthrough
       );
 
-      console.log(
-        `[UniversitySystem] 📄 Published paper: "${paper.title}" (${paper.citedByCount} citations)`
-      );
 
       // Mark project as completed
       completeResearch(university, project.id, paper.id, currentTick);
@@ -244,9 +241,6 @@ export class UniversitySystem implements System {
       });
 
       if (researchComplete) {
-        console.log(
-          `[UniversitySystem] 🎓 Research COMPLETE: "${project.title}" at ${university.universityName}`
-        );
       }
     } catch (error) {
       console.error(`[UniversitySystem] Failed to publish paper for "${project.title}":`, error);

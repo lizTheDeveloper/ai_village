@@ -78,7 +78,6 @@ export class NarrativePressureSystem implements System {
     }
     this.attractorsBySource.get(sourceKey)!.add(attractor.id);
 
-    console.log(`[NarrativePressure] Added attractor: ${attractor.id} (${attractor.goal.type})`);
   }
 
   /**
@@ -95,7 +94,6 @@ export class NarrativePressureSystem implements System {
     // Remove from main map
     this.attractors.delete(attractorId);
 
-    console.log(`[NarrativePressure] Removed attractor: ${attractorId}`);
   }
 
   /**
@@ -124,7 +122,6 @@ export class NarrativePressureSystem implements System {
         this.attractors.delete(id);
       }
       this.attractorsBySource.delete(sourceKey);
-      console.log(`[NarrativePressure] Removed ${attractorIds.size} attractors from source: ${sourceKey}`);
     }
   }
 
@@ -165,7 +162,6 @@ export class NarrativePressureSystem implements System {
    * Remove attractors for a plot stage (called on stage exit)
    */
   removePlotStageAttractors(plotInstanceId: string, stageId: string): void {
-    const sourceKey = `plot:${plotInstanceId}:${stageId}`;
     const toRemove: string[] = [];
 
     for (const attractor of this.attractors.values()) {
@@ -183,7 +179,6 @@ export class NarrativePressureSystem implements System {
     }
 
     if (toRemove.length > 0) {
-      console.log(`[NarrativePressure] Removed ${toRemove.length} attractors for stage exit: ${sourceKey}`);
     }
   }
 

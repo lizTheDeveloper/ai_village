@@ -162,9 +162,6 @@ export function registerAllSerializers(): void {
     );
   }
 
-  console.log(
-    `[Persistence] Registered ${genericComponents.length + 19} component serializers`
-  );
 }
 
 // Auto-register on import

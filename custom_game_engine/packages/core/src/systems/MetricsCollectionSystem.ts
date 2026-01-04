@@ -840,7 +840,6 @@ export class MetricsCollectionSystem implements System {
     } catch {
       // Log but don't crash on unknown event types
       // This allows the game to emit new events without breaking metrics
-      console.debug(`MetricsCollection: Unhandled event type ${event.type}`);
     }
 
     // Stream to server if enabled

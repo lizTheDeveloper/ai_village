@@ -1128,6 +1128,150 @@ export const findinFaith: PlotLineTemplate = {
 };
 
 // =============================================================================
+// LOSS & TRANSFORMATION
+// =============================================================================
+
+export const losingEverything: PlotLineTemplate = {
+  id: 'medium_losing_everything',
+  name: 'From the Ashes',
+  description: 'Losing what mattered most and rebuilding from nothing',
+  scale: 'medium',
+  fork_behavior: 'continue',
+
+  lesson: {
+    theme: 'Resilience through loss',
+    domain: 'self',
+    insight: 'What remains when everything is taken is who you truly are.',
+    wisdom_value: 15,
+    repeatable: false,
+  },
+
+  entry_stage: 'catastrophe',
+  completion_stages: ['rebuilt'],
+  failure_stages: ['broken'],
+
+  stages: [
+    {
+      stage_id: 'catastrophe',
+      name: 'Everything Falls Apart',
+      description: 'A devastating loss has taken everything.',
+      on_enter_effects: [
+        { type: 'modify_mood', delta: -40 },
+        { type: 'modify_stress', delta: 40 },
+        { type: 'add_trauma', trauma_type: 'loss', severity: 0.6 },
+      ],
+    },
+    {
+      stage_id: 'despair',
+      name: 'The Depths',
+      description: 'You sink into despair.',
+      on_enter_effects: [
+        { type: 'queue_dream_hint', dream_type: 'warning', content_hint: 'You stand in ruins, but something stirs in the ashes', emotional_tone: 'ominous', intensity: 0.7 },
+      ],
+    },
+    {
+      stage_id: 'surviving',
+      name: 'Mere Survival',
+      description: 'You find the will to simply exist.',
+    },
+    {
+      stage_id: 'small_steps',
+      name: 'First Steps',
+      description: 'Tiny acts of rebuilding begin.',
+      stage_attractors: [
+        {
+          attractor_id: 'rebuild',
+          goal: { type: 'survival', parameters: {} },
+          strength: 0.5,
+          urgency: 0.4,
+        },
+      ],
+      on_enter_effects: [
+        { type: 'modify_mood', delta: 10 },
+      ],
+    },
+    {
+      stage_id: 'new_foundation',
+      name: 'New Foundation',
+      description: 'A new life begins to take shape.',
+    },
+    {
+      stage_id: 'rebuilt',
+      name: 'Stronger Than Before',
+      description: 'From nothing, you have built something new and stronger.',
+      on_enter_effects: [
+        { type: 'modify_mood', delta: 40 },
+        { type: 'modify_stress', delta: -30 },
+        { type: 'prophetic_dream', vision_content: 'A phoenix rises from ashes. You understand now that nothing can truly destroy you.', urgency: 'high' },
+      ],
+    },
+    {
+      stage_id: 'broken',
+      name: 'Never Recovered',
+      description: 'The loss was too great. You never found your way back.',
+      on_enter_effects: [
+        { type: 'add_trauma', trauma_type: 'unresolved', severity: 0.5 },
+      ],
+    },
+  ],
+
+  transitions: [
+    {
+      from_stage: 'catastrophe',
+      to_stage: 'despair',
+      conditions: [{ type: 'personal_tick_elapsed', ticks: 2000 }],
+    },
+    {
+      from_stage: 'despair',
+      to_stage: 'surviving',
+      conditions: [
+        { type: 'mood_threshold', min: -60 },
+        { type: 'personal_tick_elapsed', ticks: 8000 },
+      ],
+    },
+    {
+      from_stage: 'surviving',
+      to_stage: 'small_steps',
+      conditions: [
+        { type: 'wisdom_threshold', min_wisdom: 20 },
+        { type: 'personal_tick_elapsed', ticks: 10000 },
+      ],
+    },
+    {
+      from_stage: 'small_steps',
+      to_stage: 'new_foundation',
+      conditions: [{ type: 'personal_tick_elapsed', ticks: 15000 }],
+    },
+    {
+      from_stage: 'new_foundation',
+      to_stage: 'rebuilt',
+      conditions: [
+        { type: 'wisdom_threshold', min_wisdom: 35 },
+        { type: 'personal_tick_elapsed', ticks: 15000 },
+      ],
+    },
+    {
+      from_stage: 'despair',
+      to_stage: 'broken',
+      conditions: [{ type: 'personal_tick_elapsed', ticks: 50000 }],
+    },
+    {
+      from_stage: 'surviving',
+      to_stage: 'broken',
+      conditions: [{ type: 'personal_tick_elapsed', ticks: 60000 }],
+    },
+  ],
+
+  assignment_rules: {
+    triggers: [
+      { type: 'on_major_loss' },
+    ],
+    max_concurrent: 1,
+    cooldown_ticks: 100000,
+  },
+};
+
+// =============================================================================
 // EXPORT ALL MEDIUM TEMPLATES
 // =============================================================================
 
@@ -1146,6 +1290,8 @@ export const MEDIUM_PLOT_TEMPLATES: PlotLineTemplate[] = [
   // Discovery & Understanding
   discoveryOfTruth,
   findinFaith,
+  // Loss & Transformation
+  losingEverything,
 ];
 
-// Total: 9 medium templates
+// Total: 10 medium templates

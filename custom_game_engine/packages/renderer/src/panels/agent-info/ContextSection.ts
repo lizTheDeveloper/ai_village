@@ -49,7 +49,6 @@ export class ContextSection {
       return false;
     }
 
-    console.log('[ContextSection] Click:', canvasX, canvasY, 'Bounds:', configBounds);
 
     // Check if click is within config button bounds
     if (
@@ -58,10 +57,8 @@ export class ContextSection {
       canvasY >= configBounds.y &&
       canvasY <= configBounds.y + configBounds.height
     ) {
-      console.log('[ContextSection] Config button clicked!');
       const agentEntity = configBounds.agentEntity;
       if (this.onOpenConfigCallback && agentEntity) {
-        console.log('[ContextSection] Opening config for agent');
         this.onOpenConfigCallback(agentEntity);
       } else {
         console.warn('[ContextSection] No callback or agent entity', {
@@ -85,7 +82,6 @@ export class ContextSection {
 
     navigator.clipboard.writeText(this.lastPromptContent)
       .then(() => {
-        console.log('[ContextSection] Copied to clipboard');
       })
       .catch(err => {
         console.error('[ContextSection] Failed to copy:', err);

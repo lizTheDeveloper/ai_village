@@ -384,7 +384,6 @@ export class EventReportingSystem implements System {
         // Mark reporter's destination
         story.location = location;
 
-        console.log(`[EventReporting] Dispatched ${reporter.name} to cover: ${story.headline}`);
         break;
       }
     }
@@ -442,7 +441,6 @@ export class EventReportingSystem implements System {
           // Start recording
           this.startRecording(world, entity, story, currentTick);
 
-          console.log(`[EventReporting] ${reporter.name} arrived at scene: ${story.headline}`);
         }
 
         // Start live report after arrival
@@ -485,7 +483,6 @@ export class EventReportingSystem implements System {
 
     (recordingEntity as any).addComponent(recording);
 
-    console.log(`[EventReporting] ${agentComp.name} started recording: ${story.headline}`);
   }
 
   cleanup(): void {

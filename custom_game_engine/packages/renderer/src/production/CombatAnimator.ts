@@ -137,43 +137,30 @@ export class CombatAnimator {
    * Generate full combat replay from recording
    */
   async generateReplay(recording: CombatRecording): Promise<CombatReplay> {
-    console.log(`[CombatAnimator] Generating replay for: ${recording.combatName}`);
-    console.log(`  Events: ${recording.events.length}`);
-    console.log(`  Participants: ${recording.participants.length}`);
 
     // Step 1: Generate character sprites
-    console.log('\n[1/4] Generating character sprites...');
     for (const participant of recording.participants) {
       if (!this.characterCache.has(participant.id)) {
         const sprite = await this.generateCharacterSprite(participant);
         this.characterCache.set(participant.id, sprite);
-        console.log(`  ✓ Generated sprite for: ${participant.name}`);
       } else {
-        console.log(`  ⊙ Using cached sprite for: ${participant.name}`);
       }
     }
 
     // Step 2: Extract unique operations
-    console.log('\n[2/4] Extracting unique combat operations...');
     const operations = this.extractUniqueOperations(recording);
-    console.log(`  Found ${operations.size} unique operations`);
 
     // Step 3: Generate animations for each operation
-    console.log('\n[3/4] Generating animations...');
     for (const [hash, operation] of operations.entries()) {
       if (!this.animationCache.has(hash)) {
         const animation = await this.generateAnimation(operation, recording.participants);
         this.animationCache.set(hash, animation);
-        console.log(`  ✓ Generated: ${operation.actor} - ${operation.action}`);
       } else {
-        console.log(`  ⊙ Using cached: ${operation.actor} - ${operation.action}`);
       }
     }
 
     // Step 4: Build replay timeline
-    console.log('\n[4/4] Building replay timeline...');
     const timeline = this.buildTimeline(recording);
-    console.log(`  Generated ${timeline.length} timeline frames`);
 
     return {
       recordingId: recording.recordingId,
@@ -190,7 +177,6 @@ export class CombatAnimator {
   async generateCharacterSprite(participant: CombatParticipant): Promise<CharacterSprite> {
     const description = this.buildCharacterDescription(participant);
 
-    console.log(`    Generating sprite: ${description}`);
 
     const response = await this.api.generateImageBitforge({
       description,
@@ -292,7 +278,6 @@ export class CombatAnimator {
 
     // Build action description
     const actionDescription = this.buildActionDescription(operation);
-    console.log(`    Action: ${actionDescription}`);
 
     // Generate animation frames using PixelLab API
     const response = await this.api.animateWithText({
@@ -448,7 +433,6 @@ export class CombatAnimator {
       const filename = `${id.toLowerCase().replace(/\s+/g, '_')}.png`;
       const filepath = path.join(spritesDir, filename);
       await fs.writeFile(filepath, Buffer.from(sprite.imageBase64, 'base64'));
-      console.log(`  Saved sprite: ${filename}`);
     }
 
     // Save animation frames
@@ -466,7 +450,6 @@ export class CombatAnimator {
         const filepath = path.join(animDir, filename);
         await fs.writeFile(filepath, Buffer.from(frame, 'base64'));
       }
-      console.log(`  Saved animation: ${hash} (${animation.frames.length} frames)`);
     }
 
     // Save replay metadata
@@ -494,7 +477,6 @@ export class CombatAnimator {
       path.join(outputDir, 'replay.json'),
       JSON.stringify(metadata, null, 2)
     );
-    console.log(`  Saved replay metadata: replay.json`);
   }
 
   /**

@@ -64,7 +64,6 @@ export class PixelLabSpriteGenerationSystem implements System {
     const purpose = (soulIdentity as any)?.purpose || 'To find their place in the world';
     const interests = (soulIdentity as any)?.coreInterests || [];
 
-    console.log(`[PixelLabSprite] Starting 8-direction sprite generation for ${name} (${species}, ${archetype})`);
 
     try {
       // Build character description based on soul attributes
@@ -89,7 +88,6 @@ export class PixelLabSpriteGenerationSystem implements System {
 
       if (response.job_id) {
         directionJobs.set('south', response.job_id);
-        console.log(`[PixelLabSprite] ✓ Queued south for ${name}: ${response.job_id}`);
       }
 
       // Track the job with all info needed for sequential generation
@@ -105,7 +103,6 @@ export class PixelLabSpriteGenerationSystem implements System {
         size,
       });
 
-      console.log(`[PixelLabSprite] Started sprite generation for ${name} (1/8 directions queued)`);
     } catch (error) {
       console.error(`[PixelLabSprite] Failed to start sprite generation for ${name}:`, error);
     }
@@ -336,7 +333,6 @@ export class PixelLabSpriteGenerationSystem implements System {
         fs.writeFileSync(targetPath, sourceBuffer);
       }
 
-      console.log(`[PixelLabSprite] 💾 Mirrored ${sourceDirection} → ${targetDirection}`);
     } catch (error) {
       console.error(`[PixelLabSprite] Failed to mirror ${sourceDirection} to ${targetDirection}:`, error);
       throw error;
@@ -379,7 +375,6 @@ export class PixelLabSpriteGenerationSystem implements System {
             await this.downloadDirectionImage(response.image_url, job.characterId, direction);
             job.generatedDirections.add(direction);
             job.completedDirections.add(direction);
-            console.log(`[PixelLabSprite] ✅ ${direction} generated for ${job.name} (${job.generatedDirections.size}/5 generated, ${job.completedDirections.size}/8 total)`);
 
             // Step 2: Queue next directions based on what just completed
             await this.queueNextDirections(job, direction);
@@ -397,7 +392,6 @@ export class PixelLabSpriteGenerationSystem implements System {
 
       // Step 4: When all 8 directions are complete, update agent
       if (job.completedDirections.size === 8) {
-        console.log(`[PixelLabSprite] ✅ All 8 directions completed for ${job.name}!`);
 
         // Update the agent's appearance component with the new sprite folder
         const agent = world.getEntity(job.agentId);
@@ -405,7 +399,6 @@ export class PixelLabSpriteGenerationSystem implements System {
           const appearance = agent.components.get('appearance') as any;
           if (appearance) {
             appearance.spriteFolder = job.characterId;
-            console.log(`[PixelLabSprite] Updated ${job.name}'s sprite to ${job.characterId}`);
           }
         }
 
@@ -430,7 +423,7 @@ export class PixelLabSpriteGenerationSystem implements System {
   }
 
   private async queueNextDirections(job: PendingSpriteJob, completedDirection: string): Promise<void> {
-    const { name, description, size, characterId } = job;
+    const { description, size, characterId } = job;
 
     try {
       if (completedDirection === 'south') {
@@ -449,7 +442,6 @@ export class PixelLabSpriteGenerationSystem implements System {
 
         if (response.job_id) {
           job.directionJobs.set('east', response.job_id);
-          console.log(`[PixelLabSprite] ✓ Queued east for ${name}: ${response.job_id}`);
         }
 
       } else if (completedDirection === 'east') {
@@ -474,7 +466,6 @@ export class PixelLabSpriteGenerationSystem implements System {
 
           if (response.job_id) {
             job.directionJobs.set(dir, response.job_id);
-            console.log(`[PixelLabSprite] ✓ Queued ${dir} for ${name}: ${response.job_id}`);
           }
 
           // Small delay to avoid rate limiting
@@ -487,15 +478,13 @@ export class PixelLabSpriteGenerationSystem implements System {
   }
 
   private async createMirroredDirections(job: PendingSpriteJob): Promise<void> {
-    const { characterId, name } = job;
+    const { characterId } = job;
 
-    console.log(`[PixelLabSprite] Creating mirrored directions for ${name}...`);
 
     for (const [mirrorDir, sourceDir] of Object.entries(MIRROR_MAP)) {
       if (!job.completedDirections.has(mirrorDir)) {
         await this.mirrorDirectionImage(characterId, sourceDir, mirrorDir);
         job.completedDirections.add(mirrorDir);
-        console.log(`[PixelLabSprite] ✅ ${mirrorDir} created (mirrored from ${sourceDir}) - ${job.completedDirections.size}/8 total`);
       }
     }
   }
@@ -560,7 +549,6 @@ export class PixelLabSpriteGenerationSystem implements System {
       const filePath = path.join(spritesDir, `${direction}.png`);
       fs.writeFileSync(filePath, Buffer.from(imageBuffer));
 
-      console.log(`[PixelLabSprite] 💾 Saved ${direction}.png for ${characterId}`);
     } catch (error) {
       console.error(`[PixelLabSprite] Failed to download ${direction} image:`, error);
       throw error;

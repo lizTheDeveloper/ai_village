@@ -20,7 +20,6 @@ export function createRealmEntity(world: World, properties: RealmProperties): st
   const realmComponent = createRealmComponent(properties);
   (realmEntity as EntityImpl).addComponent(realmComponent);
 
-  console.log(`Created realm entity: ${properties.name} (${properties.id})`);
   return realmEntity.id;
 }
 
@@ -31,7 +30,6 @@ export function createRealmEntity(world: World, properties: RealmProperties): st
  */
 export function initializeUnderworld(world: World): string {
   const realmEntityId = createRealmEntity(world, UnderworldRealm);
-  console.log(`Underworld initialized: ${realmEntityId}`);
   return realmEntityId;
 }
 
@@ -40,7 +38,6 @@ export function initializeUnderworld(world: World): string {
  */
 export function initializeCelestialRealm(world: World): string {
   const realmEntityId = createRealmEntity(world, CelestialRealm);
-  console.log(`Celestial Realm initialized: ${realmEntityId}`);
   return realmEntityId;
 }
 
@@ -49,7 +46,6 @@ export function initializeCelestialRealm(world: World): string {
  */
 export function initializeDreamRealm(world: World): string {
   const realmEntityId = createRealmEntity(world, DreamRealm);
-  console.log(`Dream Realm initialized: ${realmEntityId}`);
   return realmEntityId;
 }
 

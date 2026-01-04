@@ -18,7 +18,6 @@ export class ComponentSerializerRegistry {
     }
 
     this.serializers.set(componentType, serializer as ComponentSerializer<unknown>);
-    console.log(`[ComponentSerializer] Registered serializer for: ${componentType}`);
   }
 
   /**

@@ -371,7 +371,6 @@ export class ZoneManager {
       }
     }
 
-    console.log(`[ZoneManager] Deserialized ${snapshots.length} zones`);
   }
 
   /**

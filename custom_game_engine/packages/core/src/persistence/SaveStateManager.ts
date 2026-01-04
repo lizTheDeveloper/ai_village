@@ -185,7 +185,6 @@ export class SaveStateManager {
     const filePath = path.join(sessionDir, `${saveName}.json.gz`);
     await writeFile(filePath, compressed);
 
-    console.log(`[SaveStateManager] Saved: ${sessionId}/${saveName} (${(compressed.length / 1024).toFixed(2)} KB)`);
 
     return metadata;
   }
@@ -208,7 +207,6 @@ export class SaveStateManager {
     const json = await gunzip(compressed);
     const saveState: SaveState = JSON.parse(json.toString());
 
-    console.log(`[SaveStateManager] Loaded: ${sessionId}/${saveName}`);
 
     return saveState;
   }
@@ -275,7 +273,6 @@ export class SaveStateManager {
     }
 
     await unlink(filePath);
-    console.log(`[SaveStateManager] Deleted: ${sessionId}/${saveName}`);
   }
 
   /**
@@ -320,7 +317,6 @@ export class SaveStateManager {
     const filePath = path.join(sessionDir, 'fork_initial.json.gz');
     await writeFile(filePath, compressed);
 
-    console.log(`[SaveStateManager] Forked: ${sourceSessionId}/${saveName} → ${newSessionId}/fork_initial`);
 
     return forkedMetadata;
   }
@@ -402,7 +398,6 @@ export class SaveStateManager {
       count++;
     }
 
-    console.log(`[SaveStateManager] Deleted ${count} saves for session ${sessionId}`);
 
     return count;
   }

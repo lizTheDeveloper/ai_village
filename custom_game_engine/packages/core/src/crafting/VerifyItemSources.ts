@@ -159,14 +159,8 @@ export function verifyAllItemSources(registry: RecipeRegistry): VerificationRepo
 export function printVerificationReport(registry: RecipeRegistry): void {
   const report = verifyAllItemSources(registry);
 
-  console.log('\n' + '='.repeat(60));
-  console.log('📦 ITEM SOURCE VERIFICATION REPORT');
-  console.log('='.repeat(60));
-  console.log(report.summary);
-  console.log('='.repeat(60) + '\n');
 
   // Detailed breakdown
-  console.log('📊 Breakdown by Source Type:');
   const sourceTypes = new Map<string, number>();
 
   for (const detail of report.details) {
@@ -175,9 +169,7 @@ export function printVerificationReport(registry: RecipeRegistry): void {
     }
   }
 
-  for (const [source, count] of sourceTypes.entries()) {
-    console.log(`   ${source}: ${count} items`);
+  for (const [_source, _count] of sourceTypes.entries()) {
   }
 
-  console.log('');
 }

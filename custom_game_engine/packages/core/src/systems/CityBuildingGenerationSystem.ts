@@ -334,8 +334,5 @@ export class CityBuildingGenerationSystem implements System {
       },
     });
 
-    console.log(
-      `[CityBuildingGeneration] Spawned ${buildingType} in city ${cityId} at (${position.x}, ${position.y})`
-    );
   }
 }

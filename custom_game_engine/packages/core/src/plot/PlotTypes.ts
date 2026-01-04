@@ -45,7 +45,9 @@ export type PlotTrigger =
   /** Trigger when social isolation is detected */
   | { type: 'on_social_isolation'; min_ticks: number }
   /** Trigger when a new relationship is formed */
-  | { type: 'on_relationship_formed'; min_initial_trust?: number };
+  | { type: 'on_relationship_formed'; min_initial_trust?: number }
+  /** Trigger when entity experiences a major loss */
+  | { type: 'on_major_loss' };
 
 /**
  * Binding rule for automatically binding agents to roles when triggered
@@ -677,7 +679,6 @@ export function queueDreamHint(
     ...hint,
     consumed: false,
   });
-  console.log(`[PlotLines] Queued dream hint from plot ${hint.plot_instance_id}: ${hint.dream_type}`);
 }
 
 /**

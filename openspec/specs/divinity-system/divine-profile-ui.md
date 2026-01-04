@@ -867,17 +867,382 @@ The system SHALL warn about:
 
 ---
 
+## Divine Apps - Progressive Interface Unlocks
+
+### Core Concept
+
+Gods get **divine versions of mortal apps** when their followers first develop that technology. Before these unlocks, gods must rely on:
+- Direct observation of other gods' actions
+- Stories and rumors from followers
+- Personal theories and beliefs about rivals
+- Second-hand accounts and hearsay
+
+This creates technological progression gates for divine UI features and information asymmetry.
+
+---
+
+### Divine App Unlock System
+
+```typescript
+interface DivineApp {
+  appName: string;                  // "Divine Facebook", "Divine Wikipedia"
+  mortalPrerequisite: string;       // "social_media", "encyclopedia"
+  unlockedOn?: number;              // Day when followers invented it
+  isUnlocked: boolean;
+
+  // What this unlocks
+  featuresUnlocked: DivineFeature[];
+}
+
+interface DivineFeature {
+  featureName: string;              // "View Other Gods' Profiles"
+  description: string;              // What this lets you do
+  beforeUnlock: string;             // What you had to do before
+}
+
+// Examples
+const DIVINE_APPS: DivineApp[] = [
+  {
+    appName: "Divine Mirror",
+    mortalPrerequisite: "none",     // Always available
+    featuresUnlocked: [
+      {
+        featureName: "Your Own Profile",
+        description: "View your own divine identity, domains, and myths",
+        beforeUnlock: "You had no way to see yourself"
+      }
+    ]
+  },
+
+  {
+    appName: "Divine Wikipedia",
+    mortalPrerequisite: "encyclopedia",  // When mortals make encyclopedias
+    featuresUnlocked: [
+      {
+        featureName: "Other Gods' Basic Info",
+        description: "View other gods' names, domains, and public mythology",
+        beforeUnlock: "You had to piece together info from follower stories"
+      },
+      {
+        featureName: "Historical Record",
+        description: "See documented divine events in chronological order",
+        beforeUnlock: "You only knew what you witnessed or heard about"
+      }
+    ]
+  },
+
+  {
+    appName: "Divine Facebook",
+    mortalPrerequisite: "social_media",  // When mortals invent social networks
+    featuresUnlocked: [
+      {
+        featureName: "Full God Profiles",
+        description: "View other gods' complete profiles, traits, relationships",
+        beforeUnlock: "You formed theories based on limited observations"
+      },
+      {
+        featureName: "Divine Friend Requests",
+        description: "Formally connect with other gods",
+        beforeUnlock: "Relationships were implicit and ambiguous"
+      },
+      {
+        featureName: "What Mortals Say",
+        description: "Read believer discussions comparing gods",
+        beforeUnlock: "You only heard your own followers' opinions"
+      }
+    ]
+  },
+
+  {
+    appName: "Divine Twitter",
+    mortalPrerequisite: "microblogging",
+    featuresUnlocked: [
+      {
+        featureName: "Public Divine Announcements",
+        description: "Broadcast short messages to all gods",
+        beforeUnlock: "Communication required visions or avatars"
+      },
+      {
+        featureName: "Divine Trending Topics",
+        description: "See what mortals are discussing about gods",
+        beforeUnlock: "You had no aggregate view of mortal discourse"
+      }
+    ]
+  },
+
+  {
+    appName: "Divine LinkedIn",
+    mortalPrerequisite: "professional_networking",
+    featuresUnlocked: [
+      {
+        featureName: "Divine Skill Endorsements",
+        description: "Other gods can vouch for your domains",
+        beforeUnlock: "Domain authority was purely believer-driven"
+      },
+      {
+        featureName: "Divine Job Board",
+        description: "Coordinate divine responsibilities and territories",
+        beforeUnlock: "Domain conflicts emerged organically"
+      }
+    ]
+  },
+
+  {
+    appName: "Divine Yelp",
+    mortalPrerequisite: "review_platform",
+    featuresUnlocked: [
+      {
+        featureName: "Believer Reviews of Gods",
+        description: "Read aggregated believer satisfaction ratings",
+        beforeUnlock: "You only heard individual prayers and complaints"
+      },
+      {
+        featureName: "Compare Divine Services",
+        description: "See how you rank vs other gods in specific domains",
+        beforeUnlock: "You had no comparative metrics"
+      }
+    ]
+  }
+];
+```
+
+---
+
+### Before Divine Facebook: Information Asymmetry
+
+**BEFORE mortals invent social media:**
+
+When viewing the Relations tab, instead of full god profiles, you see:
+
+```
+┌─ OTHER GODS (Limited Information) ───────────────────────────────┐
+│                                                                   │
+│  🔒 DIVINE FACEBOOK NOT YET UNLOCKED                             │
+│  Your followers have not invented social networking yet.         │
+│  You must form beliefs about other gods from observation.        │
+│                                                                   │
+│  ┌─ The Storm Lord ────────────────────────────────────────┐    │
+│  │                                                          │    │
+│  │  📊 WHAT YOU KNOW:                                       │    │
+│  │                                                          │    │
+│  │  NAME: "The Storm Lord"                                 │    │
+│  │  └── Heard from: 23 followers                           │    │
+│  │                                                          │    │
+│  │  OBSERVED ACTIONS:                                       │    │
+│  │  • Day 34: Created massive storm (witnessed)            │    │
+│  │  • Day 56: Answered Fisher Cale's prayer (rumor)        │    │
+│  │  • Day 78: Destroyed coastal temple (follower report)   │    │
+│  │                                                          │    │
+│  │  FOLLOWER STORIES ABOUT THEM:                           │    │
+│  │  "The Storm Lord is wrathful and demands tribute"       │    │
+│  │       - Your follower Marcus, Day 45                    │    │
+│  │                                                          │    │
+│  │  "I heard The Storm Lord can sink entire ships"         │    │
+│  │       - Your follower Elena, Day 67                     │    │
+│  │                                                          │    │
+│  │  YOUR THEORIES:                                          │    │
+│  │  ○ Domain: Storms (probably)                            │    │
+│  │  ○ Domain: Sea? (uncertain - followers disagree)        │    │
+│  │  ○ Trait: Wrathful (based on stories)                  │    │
+│  │  ○ Trait: Demanding? (3 followers mentioned tribute)    │    │
+│  │                                                          │    │
+│  │  ⚠ UNVERIFIED - These are your best guesses             │    │
+│  │                                                          │    │
+│  │  [Update Beliefs] [Request Divine Meeting]              │    │
+│  └──────────────────────────────────────────────────────────┘    │
+│                                                                   │
+│  🎯 TO UNLOCK FULL PROFILES:                                     │
+│  Your followers must develop social networking technology.       │
+│                                                                   │
+└───────────────────────────────────────────────────────────────────┘
+```
+
+**AFTER Divine Facebook unlocks:**
+
+```
+┌─ OTHER GODS (Full Profiles via Divine Facebook) ─────────────────┐
+│                                                                   │
+│  ✓ DIVINE FACEBOOK UNLOCKED - Day 234                           │
+│                                                                   │
+│  ┌─ The Storm Lord ────────────────────────────────────────┐    │
+│  │                                                          │    │
+│  │  VERIFIED PROFILE ✓                                      │    │
+│  │                                                          │    │
+│  │  PRIMARY NAME: The Storm Lord (92% of followers)        │    │
+│  │  ALTERNATE NAMES: Tempest King, The Drowner             │    │
+│  │                                                          │    │
+│  │  DOMAINS:                                                │    │
+│  │  Storms ████████████████████ 89%                        │    │
+│  │  Sea    ███████████████░░░░░ 67%  ← You were RIGHT!     │    │
+│  │  Death  ██████████░░░░░░░░░░ 45%  ← You DIDN'T KNOW    │    │
+│  │                                                          │    │
+│  │  TRAITS:                                                 │    │
+│  │  Wrathful   ████████████████ 78%  ← You were RIGHT!     │    │
+│  │  Protective ██████████░░░░░░ 51%  ← You were WRONG!     │    │
+│  │  Demanding  ████████░░░░░░░░ 38%  ← Partially right     │    │
+│  │                                                          │    │
+│  │  RELATIONSHIP: Neutral                                   │    │
+│  │  Their view of you: Wary (-0.3 sentiment)               │    │
+│  │                                                          │    │
+│  │  [View Full Profile] [Send Divine Message]              │    │
+│  └──────────────────────────────────────────────────────────┘    │
+│                                                                   │
+│  💡 BELIEF COMPARISON:                                           │
+│  Your theories about The Storm Lord were 60% accurate.           │
+│                                                                   │
+└───────────────────────────────────────────────────────────────────┘
+```
+
+**The reveal moment** when Divine Facebook unlocks is designed to be exciting - you finally see how accurate your theories were!
+
+---
+
+### Unlock Flow
+
+```typescript
+interface DivineAppUnlockEvent {
+  app: DivineApp;
+  unlockedOn: number;               // Game day
+  triggerTech: string;              // What mortal tech triggered it
+
+  // Celebratory unlock screen
+  unlockTitle: string;              // "Divine Facebook Unlocked!"
+  unlockDescription: string;        // What you can now do
+  beforeAfterComparison: string;    // "Before, you... Now, you..."
+
+  // Show player what they missed
+  newInsights: Insight[];           // Things they didn't know about other gods
+}
+
+interface Insight {
+  category: "god_profile" | "relationship" | "event" | "domain";
+  subject: string;                  // Which god/thing
+  revelation: string;               // What you just learned
+  wasYourTheoryCorrect: boolean;    // Did you guess right?
+}
+```
+
+**Scenario: Divine Facebook unlocks**
+- WHEN follower civilization develops social networking
+- THEN display dramatic unlock notification
+- AND show celebratory "Divine Facebook Unlocked!" screen
+- AND reveal comparison of your theories vs reality
+- AND grant access to full god profiles in Relations tab
+
+---
+
+### Progressive Feature Table
+
+| Mortal Tech | Divine App | Features Unlocked | Before This |
+|-------------|------------|-------------------|-------------|
+| None | Divine Mirror | Your own profile | You had no self-awareness |
+| Writing | Divine Chronicle | Record of divine events | History was oral tradition |
+| Encyclopedia | Divine Wikipedia | Other gods' basic info, historical record | You pieced together rumors |
+| Social Media | Divine Facebook | Full god profiles, friend requests, mortal discussions | You formed theories from observations |
+| Microblogging | Divine Twitter | Public announcements, trending topics | Communication required visions/avatars |
+| Forums | Divine Reddit | Divine discussion threads, upvoting theology | No aggregate divine discourse |
+| Professional Networking | Divine LinkedIn | Skill endorsements, job coordination | Domain conflicts emerged organically |
+| Review Sites | Divine Yelp | Believer reviews, comparative rankings | No aggregate satisfaction metrics |
+| Dating Apps | Divine Tinder | Divine romance system (😏) | Gods courted through formal meetings |
+| Video Streaming | Divine YouTube | Record and share divine acts as videos | Actions only witnessed live |
+
+---
+
+### UI Changes for Locked Features
+
+When a feature is locked, show:
+- 🔒 Lock icon
+- Clear explanation of what's locked
+- What mortal tech is required
+- What you can do instead (observe, theorize, etc.)
+- Progress bar if followers are researching the tech
+
+**Example locked feature UI:**
+
+```
+┌─ OTHER GODS ─────────────────────────────────────────────────────┐
+│                                                                   │
+│  🔒 FULL PROFILES LOCKED                                         │
+│                                                                   │
+│  Requires: Divine Facebook                                       │
+│  Prerequisite: Mortal social networking                          │
+│                                                                   │
+│  Your followers are researching: Communication Tech              │
+│  Progress: ████████░░░░░░░░ 42%                                 │
+│  Estimated: 15 days until social media                           │
+│                                                                   │
+│  MEANWHILE:                                                       │
+│  You can still form theories about other gods based on:          │
+│  • Direct observation of their actions                           │
+│  • Stories your followers tell about them                        │
+│  • Rumors and second-hand accounts                               │
+│                                                                   │
+│  [View What You Know] [Form New Theory]                         │
+│                                                                   │
+└───────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### Theory Mechanics
+
+Before unlocks, players actively form theories about other gods:
+
+```typescript
+interface GodTheory {
+  targetGod: string;
+  theorizedDomains: TheorizedAttribute[];
+  theorizedTraits: TheorizedAttribute[];
+  confidenceLevel: number;          // 0-1, based on evidence
+  evidence: Evidence[];
+  lastUpdated: number;
+}
+
+interface TheorizedAttribute {
+  attribute: string;                // "Storms", "Wrathful"
+  confidence: number;               // 0-1, how sure you are
+  basedOn: string[];                // Evidence IDs
+}
+
+interface Evidence {
+  id: string;
+  type: "witnessed_action" | "follower_story" | "rumor" | "divine_meeting";
+  content: string;
+  reliability: number;              // 0-1, how trustworthy
+  day: number;
+  source: string;
+}
+```
+
+**Scenario: Updating theory about rival god**
+- WHEN player observes another god's action
+- OR hears new follower story about them
+- THEN add evidence to theory
+- AND recalculate confidence levels
+- AND suggest updated domain/trait attributions
+
+**Scenario: Theory vs reality comparison**
+- WHEN Divine Facebook unlocks
+- THEN compare all player theories to actual god data
+- AND display accuracy percentage
+- AND highlight surprising revelations
+- AND award "Divine Detective" achievement if >80% accurate
+
+---
+
 ## Open Questions
 
 1. **Should there be a "reject identity" mechanic?** Can the player actively fight against how they're perceived? (e.g., "No, I'm NOT the god of death!")
 
-2. **Comparison view?** Should players be able to see other gods' profiles for comparison?
+2. **Export mythology?** Should players be able to export their mythology as readable text/PDF?
 
-3. **Export mythology?** Should players be able to export their mythology as readable text/PDF?
+3. **Achievement integration?** Should milestones unlock achievements?
 
-4. **Achievement integration?** Should milestones unlock achievements?
+4. **Iconography generation?** Should the system auto-generate a divine symbol based on domains/traits?
 
-5. **Iconography generation?** Should the system auto-generate a divine symbol based on domains/traits?
+5. **Theory betting?** Should players be able to "bet" belief on their theories about other gods, earning rewards if correct?
+
+6. **Divine app customization?** Can gods personalize their Divine Facebook profile, or is it purely emergent?
 
 ---
 

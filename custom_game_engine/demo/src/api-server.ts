@@ -30,8 +30,4 @@ app.post('/api/save-alien-species', saveAlienSpecies);
 app.get('/api/alien-species', getAllAlienSpecies);
 
 app.listen(PORT, () => {
-  console.log(`🛸 Alien Generator API running on http://localhost:${PORT}`);
-  console.log(`   - POST /api/generate-sprite - Generate PixelLab sprite`);
-  console.log(`   - POST /api/save-alien-species - Save species with variants`);
-  console.log(`   - GET /api/alien-species - Get all species`);
 });

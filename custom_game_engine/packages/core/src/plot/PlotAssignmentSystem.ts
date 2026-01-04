@@ -85,7 +85,6 @@ export class PlotAssignmentSystem implements System {
     });
 
     if (eligibleTemplates.length === 0) {
-      console.log(`[PlotAssignment] No eligible plots for new soul ${soul.id} (archetype: ${identity.archetype})`);
       return null;
     }
 
@@ -109,7 +108,6 @@ export class PlotAssignmentSystem implements System {
     // Add to soul's active plots
     addActivePlot(plotLines, plot);
 
-    console.log(`[PlotAssignment] Assigned initial plot "${template.name}" to soul ${soul.id}`);
 
     return plot;
   }
@@ -138,7 +136,6 @@ export class PlotAssignmentSystem implements System {
 
     // Phase 4: Check scale limits for the completed scale
     if (!this.canAcceptPlotOfScale(plotLines, completedScale)) {
-      console.log(`[PlotAssignment] Soul ${soul.id} at max ${completedScale} plots`);
       return null;
     }
 
@@ -193,7 +190,6 @@ export class PlotAssignmentSystem implements System {
 
     addActivePlot(plotLines, plot);
 
-    console.log(`[PlotAssignment] Assigned follow-up plot "${template.name}" (${template.scale}) to soul ${soul.id}`);
 
     return plot;
   }
@@ -261,11 +257,9 @@ export class PlotAssignmentSystem implements System {
 
       assignedCount++;
 
-      console.log(`[PlotAssignment] Periodic assignment: "${template.name}" (${template.scale}) to soul ${soul.id}`);
     }
 
     if (assignedCount > 0) {
-      console.log(`[PlotAssignment] Assigned ${assignedCount} plots during periodic check`);
     }
 
     return assignedCount;
@@ -276,7 +270,7 @@ export class PlotAssignmentSystem implements System {
    */
   assignEventTriggeredPlot(
     soul: Entity,
-    eventType: string,
+    _eventType: string,
     _world: World,
     preferredScale?: PlotScale
   ): PlotLineInstance | null {
@@ -322,7 +316,6 @@ export class PlotAssignmentSystem implements System {
 
     addActivePlot(plotLines, plot);
 
-    console.log(`[PlotAssignment] Event-triggered plot "${template.name}" (${template.scale}) for soul ${soul.id} (event: ${eventType})`);
 
     return plot;
   }
@@ -403,7 +396,6 @@ export class PlotAssignmentSystem implements System {
 
     addActivePlot(plotLines, plot);
 
-    console.log(`[PlotAssignment] Micro opportunity: "${template.name}" for soul ${soul.id}`);
 
     return plot;
   }

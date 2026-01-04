@@ -450,8 +450,7 @@ export class UniverseManagerPanel implements IWindowPanel {
         if (x >= saveBtnX && x <= saveBtnX + saveBtnWidth) {
           // Create snapshot
           multiverseCoordinator.createTimelineSnapshot(this.selectedUniverseId, 'Manual save')
-            .then(() => console.log('[UniverseManager] Created timeline snapshot'))
-            .catch((err) => console.error('[UniverseManager] Failed to create snapshot:', err));
+            .catch((err: unknown) => console.error('[UniverseManager] Failed to create snapshot:', err));
           return true;
         }
       }
@@ -492,12 +491,11 @@ export class UniverseManagerPanel implements IWindowPanel {
       { fromSnapshotId: entry.id }
     )
       .then(() => {
-        console.log(`[UniverseManager] Created fork from snapshot: ${forkName}`);
         if (this.onForkCreated) {
           this.onForkCreated(forkId, forkName, this.selectedUniverseId || 'primary');
         }
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         console.error('[UniverseManager] Failed to fork from snapshot:', err);
       });
   }
@@ -602,7 +600,6 @@ export class UniverseManagerPanel implements IWindowPanel {
     // Fork is async - handle the promise
     multiverseCoordinator.forkUniverse(sourceId, forkId, forkName)
       .then(() => {
-        console.log(`[UniverseManager] Created fork: ${forkName} (${forkId}) from ${sourceId}`);
 
         // Notify callback if set (for world cloning)
         if (this.onForkCreated) {
@@ -611,7 +608,7 @@ export class UniverseManagerPanel implements IWindowPanel {
 
         this.closeForkDialog();
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
         console.error('[UniverseManager] Failed to create fork:', error);
         this.closeForkDialog();
       });

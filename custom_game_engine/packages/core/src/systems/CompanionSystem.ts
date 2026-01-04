@@ -93,7 +93,6 @@ export class CompanionSystem implements System {
     const existing = findCompanion(world);
     if (existing) {
       this.companionEntityId = existing.id;
-      console.log('[CompanionSystem] Found existing companion:', existing.id);
       return;
     }
 
@@ -101,7 +100,6 @@ export class CompanionSystem implements System {
     const currentTick = this.getCurrentTick(world);
     const companion = createOphanimimCompanion(world, currentTick);
     this.companionEntityId = companion.id;
-    console.log('[CompanionSystem] Created new companion:', companion.id);
   }
 
   /**

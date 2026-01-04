@@ -190,10 +190,6 @@ export class SoulCreationSystem implements System {
         request.context.previousWisdom = soulWisdom?.wisdomLevel ?? 0.5;
         request.context.previousLives = soulWisdom?.reincarnationCount ?? 1;
 
-        console.log(
-          `[SoulCreationSystem] 🔄 Reincarnating soul with ${request.context.previousLives} previous lives ` +
-          `(wisdom: ${(request.context.previousWisdom ?? 0.5).toFixed(2)})`
-        );
 
         // Remove soul from afterlife (it's being reborn)
         (world as any)._removeEntity?.(soulToReincarnate.id) || (world as any).deleteEntity?.(soulToReincarnate.id);

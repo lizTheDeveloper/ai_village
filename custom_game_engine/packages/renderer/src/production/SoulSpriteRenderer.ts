@@ -217,12 +217,6 @@ export class SoulSpriteRenderer {
     const tier = this.calculateTier(entity.reincarnationCount);
     const config = this.getTierConfig(tier);
 
-    console.log(`[SoulSpriteRenderer] Generating sprites for: ${entity.name}`);
-    console.log(`  Reincarnation Count: ${entity.reincarnationCount}`);
-    console.log(`  Tier: ${tier}`);
-    console.log(`  Size: ${config.size}×${config.size}`);
-    console.log(`  Directions: ${config.directions}`);
-    console.log(`  Animations: ${config.animations.length > 0 ? config.animations.join(', ') : 'none'}`);
 
     return this.generateSprites(entity.id, entity.description, config);
   }
@@ -233,11 +227,6 @@ export class SoulSpriteRenderer {
   async generateAnimalSprites(entity: AnimalEntity): Promise<SpriteSet> {
     const config = this.getAnimalConfig();
 
-    console.log(`[SoulSpriteRenderer] Generating animal sprites for: ${entity.name}`);
-    console.log(`  Species: ${entity.species}`);
-    console.log(`  Size: ${config.size}×${config.size} (max quality)`);
-    console.log(`  Directions: ${config.directions}`);
-    console.log(`  Animations: ${config.animations.join(', ')}`);
 
     return this.generateSprites(entity.id, entity.description, config);
   }
@@ -257,16 +246,13 @@ export class SoulSpriteRenderer {
     const directions = this.getDirectionsForConfig(config);
 
     // Generate base sprites for each direction
-    console.log(`\n  Generating ${directions.length} directional sprites...`);
     for (const direction of directions) {
       const sprite = await this.generateDirectionalSprite(description, direction, config);
       sprites.set(direction, sprite);
-      console.log(`    ✓ ${direction}`);
     }
 
     // Generate animations if tier supports them
     if (config.animations.length > 0) {
-      console.log(`\n  Generating ${config.animations.length} animations...`);
       for (const animName of config.animations) {
         const animSet = await this.generateAnimation(
           description,
@@ -276,7 +262,6 @@ export class SoulSpriteRenderer {
           sprites
         );
         animations.set(animName, animSet);
-        console.log(`    ✓ ${animName} (${animSet.frameCount} frames × ${directions.length} directions)`);
       }
     }
 
@@ -408,7 +393,6 @@ export class SoulSpriteRenderer {
       const filepath = path.join(spritesDir, filename);
       await fs.writeFile(filepath, Buffer.from(imageData, 'base64'));
     }
-    console.log(`  Saved ${spriteSet.sprites.size} directional sprites`);
 
     // Save animations
     if (spriteSet.animations.size > 0) {
@@ -432,7 +416,6 @@ export class SoulSpriteRenderer {
           }
         }
       }
-      console.log(`  Saved ${spriteSet.animations.size} animations`);
     }
 
     // Save metadata
@@ -460,7 +443,6 @@ export class SoulSpriteRenderer {
       path.join(outputDir, 'sprite-set.json'),
       JSON.stringify(metadata, null, 2)
     );
-    console.log(`  Saved metadata: sprite-set.json`);
   }
 }
 

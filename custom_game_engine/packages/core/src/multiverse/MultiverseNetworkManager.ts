@@ -81,8 +81,6 @@ export class MultiverseNetworkManager {
   constructor(multiverseCoordinator: MultiverseCoordinator) {
     this.multiverseCoordinator = multiverseCoordinator;
     this.myPeerId = this.generatePeerId();
-
-    console.log(`[NetworkManager] Initialized with peer ID: ${this.myPeerId}`);
   }
 
   // ============================================================================
@@ -111,7 +109,6 @@ export class MultiverseNetworkManager {
         console.error('[NetworkManager] Server error:', error);
       });
 
-      console.log(`[NetworkManager] Server listening on port ${port}`);
     } catch (error) {
       throw new Error(
         'WebSocket server requires Node.js environment. ' +
@@ -129,7 +126,6 @@ export class MultiverseNetworkManager {
     this.wsServer.close();
     this.wsServer = null;
 
-    console.log('[NetworkManager] Server stopped');
   }
 
   /**
@@ -139,7 +135,6 @@ export class MultiverseNetworkManager {
     const peerId = this.generatePeerId();
     this.wsConnections.set(peerId, ws);
 
-    console.log(`[NetworkManager] Peer connected: ${peerId}`);
 
     // Setup message handler
     ws.on('message', (data: string) => {
@@ -153,7 +148,6 @@ export class MultiverseNetworkManager {
 
     // Setup close handler
     ws.on('close', () => {
-      console.log(`[NetworkManager] Peer disconnected: ${peerId}`);
       this.handlePeerDisconnect(peerId);
     });
 
@@ -215,7 +209,6 @@ export class MultiverseNetworkManager {
     };
 
     ws.onclose = () => {
-      console.log(`[NetworkManager] Connection to ${address} closed`);
       this.handlePeerDisconnect(peerId);
     };
 
@@ -223,7 +216,6 @@ export class MultiverseNetworkManager {
       console.error(`[NetworkManager] WebSocket error:`, error);
     };
 
-    console.log(`[NetworkManager] Connected to peer: ${address} (${peerId})`);
 
     return peerId;
   }
@@ -248,12 +240,9 @@ export class MultiverseNetworkManager {
     this.wsConnections.delete(peerId);
 
     // Clean up passages for this peer
-    for (const [passageId, passage] of this.remotePassages) {
+    for (const [_passageId, passage] of this.remotePassages) {
       if (passage.remotePeerId === peerId) {
         passage.connectionState = 'disconnected';
-        console.log(
-          `[NetworkManager] Passage ${passageId} disconnected (peer offline)`
-        );
       }
     }
 
@@ -263,9 +252,6 @@ export class MultiverseNetworkManager {
         clearInterval(subscription.updateInterval);
         this.activeSubscriptions.delete(passageId);
         this.entityCache.delete(passageId);
-        console.log(
-          `[NetworkManager] Subscription ${passageId} cleaned up (peer offline)`
-        );
       }
     }
 
@@ -371,10 +357,6 @@ export class MultiverseNetworkManager {
 
     passage.connectionState = 'connected';
 
-    console.log(
-      `[NetworkManager] Remote passage created: ${passageId} ` +
-      `(${config.localUniverseId} → ${config.remoteUniverseId})`
-    );
 
     return passage;
   }
@@ -403,7 +385,6 @@ export class MultiverseNetworkManager {
     passage.connectionState = 'disconnected';
     this.remotePassages.delete(passageId);
 
-    console.log(`[NetworkManager] Closed passage: ${passageId}`);
   }
 
   // ============================================================================
@@ -500,10 +481,6 @@ export class MultiverseNetworkManager {
           );
 
           if (!isSameMultiverse) {
-            console.log(
-              `[NetworkManager] Avatar ${entityId} crossing to foreign multiverse ` +
-              `${passage.to.universeId} (divine powers will be suppressed)`
-            );
 
             // Add metadata to track multiverse origin for power suppression
             const sourceMultiverseId = this.multiverseCoordinator.getMultiverseId(
@@ -524,10 +501,6 @@ export class MultiverseNetworkManager {
               });
             }
           } else {
-            console.log(
-              `[NetworkManager] Avatar ${entityId} crossing within same multiverse ` +
-              `(divine powers maintained)`
-            );
           }
         } else {
           // Possessing a normal agent - check deity power scope
@@ -541,9 +514,6 @@ export class MultiverseNetworkManager {
 
           if (!isMultiverseDeity || !isSameMultiverse) {
             // Auto jack-out: weak deity OR crossing to foreign multiverse
-            console.log(
-              `[NetworkManager] Auto jack-out: entity ${entityId} crossing multiverse boundary`
-            );
 
             // Force jack-out
             (deityEntity as any).updateComponent('player_control', {
@@ -566,10 +536,6 @@ export class MultiverseNetworkManager {
             });
           } else {
             // Multiverse deity possessing across universes in same multiverse
-            console.log(
-              `[NetworkManager] Multiverse deity maintaining possession across universes ` +
-              `(belief costs will scale 2x)`
-            );
 
             // Update player control component to track cross-universe possession
             const sourceMultiverseId = this.multiverseCoordinator.getMultiverseId(
@@ -596,10 +562,6 @@ export class MultiverseNetworkManager {
     const worldMutator = sourceUniverse.world as any;
     worldMutator.destroyEntity(entityId, 'Transferred to remote universe');
 
-    console.log(
-      `[NetworkManager] Entity ${entityId} transferred to ` +
-      `${passage.to.universeId} (new ID: ${ack.newEntityId})`
-    );
 
     return ack.newEntityId!;
   }
@@ -699,10 +661,6 @@ export class MultiverseNetworkManager {
     peerId: PeerId,
     message: PassageHandshakeMessage
   ): void {
-    console.log(
-      `[NetworkManager] Received passage handshake from ${peerId}: ` +
-      `${message.sourceUniverseId} → ${message.targetUniverseId}`
-    );
 
     // Verify target universe exists
     const targetUniverse = this.multiverseCoordinator.getUniverse(
@@ -821,10 +779,6 @@ export class MultiverseNetworkManager {
     peerId: PeerId,
     message: EntityTransferMessage
   ): Promise<void> {
-    console.log(
-      `[NetworkManager] Receiving entity transfer: ` +
-      `${message.entity.id} → ${message.targetUniverseId}`
-    );
 
     try {
       // Validate checksum
@@ -864,10 +818,6 @@ export class MultiverseNetworkManager {
       // Add to world
       worldImpl._entities.set(newEntityId, entity);
 
-      console.log(
-        `[NetworkManager] Entity transferred successfully: ` +
-        `${oldEntityId} → ${newEntityId}`
-      );
 
       // Send acknowledgment
       const ack: EntityTransferAckMessage = {
@@ -941,10 +891,6 @@ export class MultiverseNetworkManager {
 
     this.send(passage.remotePeerId, message);
 
-    console.log(
-      `[NetworkManager] Subscribed to universe ${passage.to.universeId} ` +
-      `through passage ${passageId}`
-    );
   }
 
   /**
@@ -961,9 +907,6 @@ export class MultiverseNetworkManager {
 
     this.send(passage.remotePeerId, message);
 
-    console.log(
-      `[NetworkManager] Unsubscribed from passage ${passageId}`
-    );
   }
 
   /**
@@ -973,9 +916,6 @@ export class MultiverseNetworkManager {
     peerId: PeerId,
     message: import('./NetworkProtocol.js').UniverseSubscribeMessage
   ): void {
-    console.log(
-      `[NetworkManager] Peer ${peerId} subscribing to universe ${message.universeId}`
-    );
 
     // Verify universe exists
     const universe = this.multiverseCoordinator.getUniverse(message.universeId);
@@ -1010,7 +950,7 @@ export class MultiverseNetworkManager {
    * Handle unsubscribe request
    */
   private handleUniverseUnsubscribe(
-    peerId: PeerId,
+    _peerId: PeerId,
     message: import('./NetworkProtocol.js').UniverseUnsubscribeMessage
   ): void {
     const subscription = this.activeSubscriptions.get(message.passageId);
@@ -1023,9 +963,6 @@ export class MultiverseNetworkManager {
     this.activeSubscriptions.delete(message.passageId);
     this.entityCache.delete(message.passageId);
 
-    console.log(
-      `[NetworkManager] Peer ${peerId} unsubscribed from passage ${message.passageId}`
-    );
   }
 
   /**
@@ -1078,10 +1015,6 @@ export class MultiverseNetworkManager {
 
     this.send(subscription.peerId, snapshot);
 
-    console.log(
-      `[NetworkManager] Sent snapshot: ${serializedEntities.length} entities ` +
-      `for universe ${subscription.universeId}`
-    );
   }
 
   /**
@@ -1177,10 +1110,6 @@ export class MultiverseNetworkManager {
 
       this.send(subscription.peerId, update);
 
-      console.log(
-        `[NetworkManager] Sent update: +${entitiesAdded.length} ` +
-        `~${entitiesUpdated.length} -${entitiesRemoved.length} entities`
-      );
     }
 
     subscription.lastSentTick = universe.universeTick;

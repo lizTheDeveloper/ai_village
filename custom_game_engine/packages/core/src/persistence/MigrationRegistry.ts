@@ -51,10 +51,6 @@ export class MigrationRegistry {
       migration
     );
 
-    console.log(
-      `[MigrationRegistry] Registered: ${migration.component} ` +
-      `v${migration.fromVersion} → v${migration.toVersion}: ${migration.description}`
-    );
   }
 
   /**
@@ -155,11 +151,6 @@ export class MigrationRegistry {
 
     for (const migration of path) {
       try {
-        console.log(
-          `[MigrationRegistry] Migrating ${component}: ` +
-          `v${migration.fromVersion} → v${migration.toVersion}`
-        );
-        console.log(`  ${migration.description}`);
 
         current = migration.migrate(current, context);
 

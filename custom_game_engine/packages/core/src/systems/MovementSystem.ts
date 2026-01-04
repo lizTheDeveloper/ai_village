@@ -371,9 +371,9 @@ export class MovementSystem implements System {
         continue;
       }
 
-      const distance = Math.sqrt(
-        Math.pow(building.x - x, 2) + Math.pow(building.y - y, 2)
-      );
+      const dx = building.x - x;
+      const dy = building.y - y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (distance < 0.5) {
         return true;

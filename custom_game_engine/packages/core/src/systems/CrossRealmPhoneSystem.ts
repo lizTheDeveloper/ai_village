@@ -11,14 +11,9 @@
 
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import type { System } from '../ecs/System.js';
 import type { CrossRealmPhoneComponent } from '../components/CrossRealmPhoneComponent.js';
 import type { HilbertTimeCoordinate } from '../trade/HilbertTime.js';
-
-interface System {
-  readonly id: string;
-  readonly dependencies?: string[];
-  update(world: World): void;
-}
 import {
   initiateCall,
   answerCall,
@@ -47,7 +42,8 @@ export interface CrossRealmPhoneSystemConfig {
 
 export class CrossRealmPhoneSystem implements System {
   public readonly id = 'cross_realm_phone_system';
-  public readonly dependencies = ['time'];
+  public readonly priority = 800; // Late priority, after most game logic
+  public readonly requiredComponents = ['cross_realm_phone'] as const;
 
   /** Phone registry: address.deviceId -> entity */
   private phoneDirectory = new Map<string, Entity>();
@@ -68,10 +64,10 @@ export class CrossRealmPhoneSystem implements System {
     };
   }
 
-  public update(world: World): void {
+  public update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     const currentTick = this.getCurrentTick(world);
 
-    // Build phone directory
+    // Build phone directory from entities
     this.updatePhoneDirectory(world);
 
     // Process pending calls
@@ -126,9 +122,6 @@ export class CrossRealmPhoneSystem implements System {
       this.pendingCalls.push(result.call);
 
       if (this.config.debug) {
-        console.log(
-          `[CrossRealmPhoneSystem] Call initiated from ${phoneComp.phone.address.deviceId} to ${targetAddress.deviceId}`
-        );
       }
     }
 
@@ -166,9 +159,6 @@ export class CrossRealmPhoneSystem implements System {
       this.deliverMessage(world, result.message, currentTime);
 
       if (this.config.debug) {
-        console.log(
-          `[CrossRealmPhoneSystem] Message sent from ${phoneComp.phone.address.deviceId} to ${targetAddress.deviceId}`
-        );
       }
     }
 
@@ -196,7 +186,6 @@ export class CrossRealmPhoneSystem implements System {
       phoneComp.incomingCall = null;
 
       if (this.config.debug) {
-        console.log(`[CrossRealmPhoneSystem] Call answered by ${phoneComp.phone.address.deviceId}`);
       }
     }
 
@@ -224,9 +213,6 @@ export class CrossRealmPhoneSystem implements System {
       phoneComp.activeCall = null;
 
       if (this.config.debug) {
-        console.log(
-          `[CrossRealmPhoneSystem] Call ended by ${phoneComp.phone.address.deviceId}, cost: ${result.totalCost}`
-        );
       }
     }
 
@@ -303,7 +289,6 @@ export class CrossRealmPhoneSystem implements System {
       this.pendingCalls.splice(i, 1);
 
       if (this.config.debug) {
-        console.log(`[CrossRealmPhoneSystem] Call routed to ${recipientPhoneComp.phone.address.deviceId}`);
       }
     }
   }
@@ -325,7 +310,6 @@ export class CrossRealmPhoneSystem implements System {
       phoneComp.incomingCall = null;
 
       if (this.config.debug) {
-        console.log(`[CrossRealmPhoneSystem] Incoming call timed out for ${phoneComp.phone.address.deviceId}`);
       }
     }
   }
@@ -345,7 +329,6 @@ export class CrossRealmPhoneSystem implements System {
       phoneComp.activeCall = null;
 
       if (this.config.debug) {
-        console.log(`[CrossRealmPhoneSystem] Call dropped - insufficient charge: ${phoneComp.phone.address.deviceId}`);
       }
     }
   }
@@ -363,7 +346,6 @@ export class CrossRealmPhoneSystem implements System {
       phoneComp.incomingCall = null;
 
       if (this.config.debug) {
-        console.log(`[CrossRealmPhoneSystem] Auto-answered call from trusted contact: ${callerDeviceId}`);
       }
     }
   }
@@ -383,7 +365,6 @@ export class CrossRealmPhoneSystem implements System {
     recipientPhoneComp.unreadCount++;
 
     if (this.config.debug) {
-      console.log(`[CrossRealmPhoneSystem] Message delivered to ${message.to.deviceId}`);
     }
   }
 

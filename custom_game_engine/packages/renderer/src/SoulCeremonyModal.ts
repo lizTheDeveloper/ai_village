@@ -89,7 +89,6 @@ export class SoulCeremonyModal {
    * Show that a Fate is thinking/formulating their response
    */
   setThinking(speaker: 'weaver' | 'spinner' | 'cutter'): void {
-    console.log(`[SoulCeremonyModal] ${speaker} is now thinking...`);
     this.thinkingSpeaker = speaker;
     this.render();
   }

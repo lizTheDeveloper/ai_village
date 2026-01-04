@@ -6041,14 +6041,14 @@ async function handleBatch(sessionId: string, metrics: StoredMetric[]): Promise<
 }
 
 // Auto-save sessions periodically (every 30 seconds)
-setInterval(() => {
+const autoSaveInterval = setInterval(() => {
   if (gameSessions.size > 0) {
     saveAllSessionsToDisk();
   }
 }, 30000);
 
 // Cleanup old sessions and canon events periodically (once per day)
-setInterval(() => {
+const cleanupInterval = setInterval(() => {
   cleanupOldSessions();
   cleanupOldCanonEvents();
 }, 24 * 60 * 60 * 1000); // 24 hours
@@ -6060,6 +6060,10 @@ cleanupOldCanonEvents();
 // Handle shutdown gracefully
 process.on('SIGINT', async () => {
   console.log('\nShutting down...');
+
+  // Clear intervals to prevent memory leaks
+  clearInterval(autoSaveInterval);
+  clearInterval(cleanupInterval);
 
   // Close all connections
   wss.clients.forEach((client) => {

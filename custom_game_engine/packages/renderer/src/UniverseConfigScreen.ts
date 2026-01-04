@@ -106,30 +106,22 @@ export class UniverseConfigScreen {
   }
 
   constructor(containerId: string = 'universe-config-screen') {
-    console.log('[UniverseConfigScreen] Constructor called, containerId:', containerId);
     const existing = document.getElementById(containerId);
     if (existing) {
-      console.log('[UniverseConfigScreen] Found existing container');
       this.container = existing;
     } else {
-      console.log('[UniverseConfigScreen] Creating new container');
       this.container = document.createElement('div');
       this.container.id = containerId;
       this.container.className = 'universe-config-screen';  // Add class for Playwright tests
       this.container.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 40px; box-sizing: border-box; z-index: 10001; font-family: monospace; color: #e0e0e0; overflow-y: auto;`;
       document.body.appendChild(this.container);
-      console.log('[UniverseConfigScreen] Container added to body');
     }
-    console.log('[UniverseConfigScreen] Calling render()...');
     this.render();
-    console.log('[UniverseConfigScreen] Render() complete');
   }
 
   show(onCreateCallback: (config: UniverseConfig) => void): void {
-    console.log('[UniverseConfigScreen] show() called');
     this._onCreate = onCreateCallback;
     this.container.style.display = 'flex';
-    console.log('[UniverseConfigScreen] Container display set to flex, should be visible now');
   }
 
   hide(): void {

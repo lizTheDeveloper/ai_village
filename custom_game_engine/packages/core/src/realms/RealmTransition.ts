@@ -136,7 +136,6 @@ export function transitionToRealm(
   // Apply realm transformations/effects
   const effects = applyRealmEffects(entity, realm);
 
-  console.log(`Entity ${entityId} transitioned from ${currentRealmId} to ${targetRealmId}`);
 
   return {
     success: true,
@@ -206,7 +205,6 @@ export function returnToMortalWorld(
   // Clear realm transformations
   realmLocation.transformations = [];
 
-  console.log(`Entity ${entityId} returned to mortal world from ${currentRealmId}`);
 
   return {
     success: true,

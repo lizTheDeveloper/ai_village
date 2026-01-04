@@ -49,7 +49,6 @@ export function getAllRecordings(): CableRecording[] {
   // Query for all entities with VideoReplayComponent
   const entities = world.query().with('video_replay').executeEntities();
 
-  console.log(`[RecordingsAPI] Found ${entities.length} recordings in world`);
 
   for (const entity of entities) {
     try {
@@ -58,7 +57,6 @@ export function getAllRecordings(): CableRecording[] {
 
       // Only include completed recordings
       if (videoReplay.status !== 'completed') {
-        console.log(`[RecordingsAPI] Skipping ${videoReplay.recordingId} - status: ${videoReplay.status}`);
         continue;
       }
 
@@ -91,7 +89,6 @@ export function getAllRecordings(): CableRecording[] {
     }
   }
 
-  console.log(`[RecordingsAPI] Returning ${recordings.length} completed recordings`);
   return recordings;
 }
 

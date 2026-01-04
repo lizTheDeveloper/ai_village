@@ -171,7 +171,6 @@ export class PlotProgressionSystem implements System {
     const fromStageName = fromStage?.name || plot.current_stage;
     const toStageName = toStage.name;
 
-    console.log(`[PlotProgression] Soul ${soul.id}: "${plot.template_id}" advancing from "${fromStageName}" → "${toStageName}"`);
 
     const thread = soul.getComponent(ComponentType.SilverThread) as SilverThreadComponent | undefined;
     if (!thread) return;
@@ -248,7 +247,6 @@ export class PlotProgressionSystem implements System {
     const template = plotLineRegistry.getTemplate(plot.template_id);
     if (!template) return;
 
-    console.log(`[PlotProgression] Soul ${soul.id} completed plot "${plot.template_id}"`);
 
     // === Phase 3: Clean up any remaining stage attractors ===
     const narrativePressure = getNarrativePressureSystem();
@@ -299,7 +297,6 @@ export class PlotProgressionSystem implements System {
 
     if (!plotLines || !thread) return;
 
-    console.log(`[PlotProgression] Soul ${soul.id} failed plot "${plot.template_id}"`);
 
     // === Phase 3: Clean up any remaining stage attractors ===
     const narrativePressure = getNarrativePressureSystem();

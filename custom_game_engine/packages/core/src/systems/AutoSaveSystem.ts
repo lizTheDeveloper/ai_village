@@ -134,7 +134,6 @@ export class AutoSaveSystem implements System {
       // Add to checkpoints list
       this.checkpoints.push(checkpoint);
 
-      console.log(`[AutoSave] Checkpoint created: ${checkpointName} (${key})`);
 
       // Emit event for name generation
       this.emitEvent(world, 'checkpoint:created', 'auto_save', { checkpoint });
@@ -163,17 +162,14 @@ export class AutoSaveSystem implements System {
     );
 
     if (toDelete.length === 0) {
-      console.log(`[AutoSave] Retention check: All ${this.checkpoints.length} checkpoints kept`);
       return;
     }
 
-    console.log(`[AutoSave] Pruning ${toDelete.length} old checkpoints (keeping ${this.checkpoints.length - toDelete.length})`);
 
     // Delete checkpoints
     for (const checkpoint of toDelete) {
       try {
         await saveLoadService.deleteSave(checkpoint.key);
-        console.log(`[AutoSave] Deleted checkpoint: ${checkpoint.name} (day ${checkpoint.day})`);
       } catch (error) {
         console.error(`[AutoSave] Failed to delete checkpoint ${checkpoint.key}:`, error);
       }
@@ -183,7 +179,6 @@ export class AutoSaveSystem implements System {
     const deletedKeys = new Set(toDelete.map(c => c.key));
     this.checkpoints = this.checkpoints.filter(c => !deletedKeys.has(c.key));
 
-    console.log(`[AutoSave] Retention policy applied: ${this.checkpoints.length} checkpoints remaining`);
   }
 
   /**
@@ -225,7 +220,6 @@ export class AutoSaveSystem implements System {
     // - Include world stats: population, buildings, resources, major events
     // - Examples: "The Dawn of Copper", "When Trees Spoke", "The First Harvest"
 
-    console.log(`[AutoSave] TODO: Generate LLM name for checkpoint day ${checkpoint.day}`);
 
     // Emit event that can be handled by LLM system
     this.emitEvent(world, 'checkpoint:name_request', 'auto_save', { checkpoint });
@@ -265,7 +259,6 @@ export class AutoSaveSystem implements System {
         forkPoint: checkpoint.tick,
       });
 
-      console.log(`[AutoSave] Rewound to checkpoint: ${checkpoint.name} (day ${checkpoint.day})`);
       return true;
     } catch (error) {
       console.error('[AutoSave] Failed to rewind:', error);

@@ -36,9 +36,9 @@ export class SteeringSystem implements System {
     // Get entities with steering component
     // NOTE: We don't filter steering entities themselves (agents always need to steer)
     // but obstacle filtering happens in _avoidObstacles using spatial queries
-    const steeringEntities = entities.filter(e => e.components.has(CT.Steering));
+    // entities parameter is already filtered by requiredComponents
 
-    for (const entity of steeringEntities) {
+    for (const entity of entities) {
       try {
         this._updateSteering(entity, world, deltaTime);
       } catch (error) {
@@ -191,10 +191,9 @@ export class SteeringSystem implements System {
         });
       } else {
         // Check if position changed significantly (moved at least 0.5 tiles)
-        const moved = Math.sqrt(
-          Math.pow(position.x - tracker.lastPos.x, 2) +
-          Math.pow(position.y - tracker.lastPos.y, 2)
-        );
+        const dx = position.x - tracker.lastPos.x;
+        const dy = position.y - tracker.lastPos.y;
+        const moved = Math.sqrt(dx * dx + dy * dy);
 
         if (moved > 0.5) {
           // Made progress, reset stuck timer

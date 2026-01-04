@@ -64,7 +64,6 @@ export class SoulConsolidationSystem implements System {
     if (plotLines) {
       const cleanedUp = cleanupConsumedHints(plotLines, thread.head.personal_tick, 500);
       if (cleanedUp > 0) {
-        console.log(`[SoulConsolidation] Cleaned up ${cleanedUp} consumed dream hints`);
       }
     }
 
@@ -82,7 +81,6 @@ export class SoulConsolidationSystem implements System {
     }
 
     if (significantEvents.length > 0) {
-      console.log(`[SoulConsolidation] Wrote ${significantEvents.length} significant events to soul ${soul.id}`);
     }
   }
 

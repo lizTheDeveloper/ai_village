@@ -119,18 +119,16 @@ export class UniversityResearchManagementSystem implements System {
   /**
    * Propose a new research project for this university
    */
-  private proposeNewResearch(world: World, universityEntity: EntityImpl, university: UniversityComponent): void {
+  private proposeNewResearch(world: World, universityEntity: EntityImpl, _university: UniversityComponent): void {
     // Find city this university belongs to
     const cityDirector = this.findCityForUniversity(world, universityEntity);
     if (!cityDirector) {
-      console.log(`[ResearchManagement] No city found for university ${universityEntity.id}`);
       return;
     }
 
     // Find suitable researchers from city agents
     const researchers = this.findResearchers(world, cityDirector.bounds, this.config.researchersPerProject);
     if (researchers.length === 0) {
-      console.log(`[ResearchManagement] No researchers found in city ${cityDirector.cityId || 'unknown'}`);
       return;
     }
 
@@ -162,8 +160,6 @@ export class UniversityResearchManagementSystem implements System {
     );
 
     if (projectId) {
-      console.log(`[ResearchManagement] 📚 Proposed research "${topic}" at ${university.universityName}`);
-      console.log(`  PI: ${researchers[0]}, Collaborators: ${researchers.slice(1).join(', ')}`);
     }
   }
 
