@@ -1,0 +1,18 @@
+{
+  "id": "rabbit_brown",
+  "base_species": "rabbit",
+  "variant": "brown",
+  "description": "brown rabbit",
+  "size": 48,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-04T00:37:51.026Z"
+}
