@@ -108,6 +108,8 @@ export { createPublishingCompanyComponent, submitManuscript, reviewManuscript, p
 export type { PublishingCompanyComponent, PublishingEmployee, PublishingRole, PublishingDepartment, Manuscript, PublishedBook, ManuscriptStatus, PrintingJob } from './PublishingCompanyComponent.js';
 export { createNewspaperComponent, createArticle, createEdition, hireNewspaperEmployee, publishArticle, publishEdition, assignArticle, awardPulitzer } from './NewspaperComponent.js';
 export type { NewspaperComponent, NewspaperEmployee, NewspaperRole, NewspaperDepartment, Article, ArticleType, ArticleStatus, Edition } from './NewspaperComponent.js';
+export { createRecordingComponent, completeRecording, startEditingRecording, publishRecording, addRecordingSubject, setRecordingTranscript } from './RecordingComponent.js';
+export type { RecordingComponent, MediaType, RecordingCategory, RecordingStatus } from './RecordingComponent.js';
 export { createUniversityComponent, hireUniversityEmployee, fireUniversityEmployee, proposeResearch, fundResearch, startResearch, completeResearch, createUniversityCourse, enrollStudent, giveLecture, setupPreprintServer, setupResearchBlog, setupSocialMedia, publishResearch, recordCitation, recordPaperView, shareOnSocialMedia } from './UniversityComponent.js';
 export type { UniversityComponent, UniversityEmployee, UniversityRole, AcademicDepartment, ResearchProject, ResearchStatus, Course, Lecture, SkillTransfer, PublicationVenue, PublicationChannel, PublicationRecord } from './UniversityComponent.js';
 // Research component
@@ -689,3 +691,21 @@ export type {
 export * from './CrossRealmPhoneComponent.js';
 export { createCrossRealmPhoneComponent } from './CrossRealmPhoneComponent.js';
 export type { CrossRealmPhoneComponent } from './CrossRealmPhoneComponent.js';
+
+// Genetic Uplift components
+export { UpliftCandidateComponent } from './UpliftCandidateComponent.js';
+export { UpliftProgramComponent } from './UpliftProgramComponent.js';
+export { UpliftedTraitComponent } from './UpliftedTraitComponent.js';
+export { ProtoSapienceComponent } from './ProtoSapienceComponent.js';
+
+// Genetic Uplift components
+export { UpliftCandidateComponent } from './UpliftCandidateComponent.js';
+export { UpliftProgramComponent } from './UpliftProgramComponent.js';
+export { UpliftedTraitComponent } from './UpliftedTraitComponent.js';
+export { ProtoSapienceComponent } from './ProtoSapienceComponent.js';
+
+// Genetic Uplift components
+export { UpliftCandidateComponent } from './UpliftCandidateComponent.js';
+export { UpliftProgramComponent } from './UpliftProgramComponent.js';
+export { UpliftedTraitComponent } from './UpliftedTraitComponent.js';
+export { ProtoSapienceComponent } from './ProtoSapienceComponent.js';

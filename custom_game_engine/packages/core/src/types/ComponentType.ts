@@ -88,6 +88,10 @@ export enum ComponentType {
   // City Management
   CityDirector = 'city_director',
   Profession = 'profession',
+  UpliftCandidate = 'uplift_candidate',
+  UpliftProgram = 'uplift_program',
+  UpliftedTrait = 'uplifted_trait',
+  ProtoSapience = 'proto_sapience',
 
   // Economy & Trade
   Currency = 'currency',
@@ -105,6 +109,7 @@ export enum ComponentType {
   Biography = 'biography',
   PublishingCompany = 'publishing_company',
   Newspaper = 'newspaper',
+  Recording = 'recording',
 
   // Skills & Crafting
   CookingSkill = 'cooking_skill',
