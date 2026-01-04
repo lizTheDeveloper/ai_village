@@ -44,6 +44,7 @@ import {
   // Auto-save & Time Travel
   checkpointNamingService,
   saveLoadService,
+  IndexedDBStorage,
   // Centralized system registration
   registerAllSystems as coreRegisterAllSystems,
   type SystemRegistrationResult as CoreSystemResult,
@@ -2619,6 +2620,7 @@ function setupDebugAPI(
 // ============================================================================
 
 async function main() {
+  console.log('[DEMO] main() called, initializing...');
   const statusEl = document.getElementById('status');
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 
@@ -2626,25 +2628,24 @@ async function main() {
     throw new Error('Canvas element not found');
   }
 
+  console.log('[DEMO] Canvas found, creating game loop...');
   // Create game loop
   const gameLoop = new GameLoop();
 
   // Create settings panel
   const settingsPanel = new SettingsPanel();
 
-  // Handle first run
-  if (settingsPanel.getIsFirstRun()) {
-    await new Promise<void>((resolve) => {
-      const originalCallback = settingsPanel['onSettingsChange'];
-      settingsPanel.setOnSettingsChange(() => {
-        if (originalCallback) {
-          settingsPanel.setOnSettingsChange(originalCallback);
-        }
-        resolve();
-      });
-      settingsPanel.show();
-    });
+  // Handle first run - NOTE: We skip the settings panel blocking and proceed directly
+  // to universe creation. Settings can be configured later via ESC key.
+  const isFirstRun = settingsPanel.getIsFirstRun();
+  console.log(`[DEMO] First run check: ${isFirstRun}`);
+
+  if (isFirstRun) {
+    console.log('[DEMO] First run detected - will show universe creation screen below...');
+    // Don't block - let the flow continue to universe creation
   }
+
+  console.log('[DEMO] Settings loaded, continuing initialization...');
 
   const settings = settingsPanel.getSettings();
 
@@ -2733,7 +2734,15 @@ async function main() {
     }
   }
 
-  const isLLMAvailable = await llmProvider.isAvailable();
+  console.log('[DEMO] Checking LLM availability...');
+  const isLLMAvailable = await Promise.race([
+    llmProvider.isAvailable(),
+    new Promise<boolean>((resolve) => setTimeout(() => {
+      console.warn('[DEMO] LLM availability check timed out after 2s, assuming unavailable');
+      resolve(false);
+    }, 2000))
+  ]);
+  console.log(`[DEMO] LLM available: ${isLLMAvailable}`);
   let llmQueue: LLMDecisionQueue | null = null;
   let promptBuilder: StructuredPromptBuilder | null = null;
 
@@ -2751,8 +2760,6 @@ async function main() {
   }
 
   // Initialize storage backend for save/load system FIRST
-  console.log('[Demo] TRACE: Importing IndexedDBStorage...');
-  const { IndexedDBStorage } = await import('@ai-village/core');
   console.log('[Demo] TRACE: Creating IndexedDBStorage...');
   const storage = new IndexedDBStorage('ai-village-saves');
   console.log('[Demo] TRACE: Setting storage backend...');
