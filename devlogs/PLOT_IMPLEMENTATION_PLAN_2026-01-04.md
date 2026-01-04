@@ -170,10 +170,14 @@ interface EventStreamComponent {
 
 interface StreamedEvent {
   tick: number;
+  universe_id: string;                // Which universe this happened in
+  soul_id: string;                    // The soul who experienced this
+  agent_id: string;                   // The current incarnation (entity ID)
   event_type: 'trauma' | 'relationship_change' | 'emotional_shift' |
               'death_nearby' | 'skill_gain' | 'breakdown' | 'recovery';
   data: Record<string, any>;
-  involved_agents?: string[];
+  involved_agents?: string[];         // Other agents involved (by entity ID)
+  involved_souls?: string[];          // Their soul IDs (for cross-lifetime recognition)
 }
 
 // Recognition rules (can be attached to plot templates)
@@ -279,7 +283,38 @@ const griefRecognition: PlotRecognitionRule = {
 - **Rich Narrative Summaries**: "Looking back, this was a grief journey"
 - **Player Discovery**: "Wait, that was a plot? It just... happened!"
 
-**Deliverable:** Agents who naturally experience a betrayal arc (built trust → trust dropped → trauma) get recognized and can learn the lesson without ever having a plot formally assigned.
+**Cross-Universe & Cross-Lifetime Recognition:**
+With `universe_id` and `soul_id` tracking, we can recognize patterns that span:
+- **Multiple universes**: A soul who was betrayed in Universe A and betrayed again in Universe B
+- **Multiple lifetimes**: A soul who experienced loss in a past life and is experiencing it again
+- **Cross-agent patterns**: Two souls who keep meeting across lifetimes (soulmates, nemeses)
+
+```typescript
+// Cross-lifetime betrayal pattern
+const karmic_betrayal: PlotRecognitionRule = {
+  template_id: 'karmic_betrayal',
+  event_sequence: [
+    {
+      event_type: 'trauma',
+      constraints: { trauma_type: 'betrayal' },
+      binds_role: 'betrayer_soul'  // Bind by SOUL ID, not agent
+    },
+    // ... later, in any universe/lifetime ...
+    {
+      event_type: 'trauma',
+      constraints: {
+        trauma_type: 'betrayal',
+        same_soul_as_role: 'betrayer_soul'  // Same soul betrayed them again!
+      }
+    }
+  ],
+  cross_universe: true,       // Can span universe forks
+  cross_lifetime: true,       // Can span incarnations
+  on_recognition: 'award_lesson'
+};
+```
+
+**Deliverable:** Agents who naturally experience a betrayal arc (built trust → trust dropped → trauma) get recognized and can learn the lesson without ever having a plot formally assigned. With soul ID tracking, we can even recognize patterns that repeat across lifetimes.
 
 ---
 
@@ -504,18 +539,19 @@ interface GenrePhaseComponent {
 
 ## Priority Order (What to Build First)
 
-### Must Have for MVP (Phases 1-2)
-1. **Emotional conditions** - Plots that respond to mood/stress
-2. **Relationship conditions with role binding** - Plots that involve other agents
+### Must Have for MVP (Phases 1-2.5)
+1. **Emotional conditions** - Plots that respond to mood/stress ✅ DONE
+2. **Relationship conditions with role binding** - Plots that involve other agents ✅ DONE
 3. **Event-driven assignment** - Plots trigger from events, not just timers
+4. **Retroactive recognition** - Recognize plots that emerged organically
 
 ### Should Have (Phases 3-4)
-4. **Plot composition** - Epic plots containing smaller plots
-5. **JSON template loader** - No-code plot authoring
+5. **Plot composition** - Epic plots containing smaller plots
+6. **JSON template loader** - No-code plot authoring
 
 ### Nice to Have (Phases 5-6)
-6. **LLM plot generator** - Describe plots in natural language
-7. **Genre escalation** - Full genre-breaking infrastructure
+7. **LLM plot generator** - Describe plots in natural language
+8. **Genre escalation** - Full genre-breaking infrastructure
 
 ---
 
@@ -524,11 +560,12 @@ interface GenrePhaseComponent {
 ### New Files
 ```
 packages/core/src/plot/
-├── PlotConditionEvaluator.ts      # Expanded condition handling
-├── PlotEffectExecutor.ts          # Effect application
-├── EventDrivenPlotAssignment.ts   # Event-triggered plots
-├── PlotCompositionSystem.ts       # Parent/child plot management
-├── PlotLoader.ts                  # JSON template loading
+├── PlotConditionEvaluator.ts      # Expanded condition handling ✅ DONE
+├── PlotEffectExecutor.ts          # Effect application ✅ DONE
+├── EventDrivenPlotAssignment.ts   # Event-triggered plots (Phase 2)
+├── PlotRecognitionSystem.ts       # Retroactive pattern matching (Phase 2.5)
+├── PlotCompositionSystem.ts       # Parent/child plot management (Phase 3)
+├── PlotLoader.ts                  # JSON template loading (Phase 4)
 ├── plot-template.schema.json      # Validation schema
 ├── templates/                     # JSON plot files
 │   ├── micro/*.json
@@ -542,10 +579,12 @@ packages/core/src/plot/
     └── explorer-to-worldwalker.json
 
 packages/core/src/components/
+├── EventStreamComponent.ts        # Rolling event history (Phase 2.5)
 ├── GenrePhaseComponent.ts
 └── OriginComponent.ts
 
 packages/core/src/systems/
+├── PlotRecognitionSystem.ts       # Scans for emergent patterns (Phase 2.5)
 └── GenreEscalationSystem.ts
 
 scripts/

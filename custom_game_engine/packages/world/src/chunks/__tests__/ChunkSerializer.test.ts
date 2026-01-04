@@ -5,7 +5,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ChunkSerializer } from '../ChunkSerializer.js';
 import { createChunk, CHUNK_SIZE } from '../Chunk.js';
-import { createDefaultTile } from '../Tile.js';
 import { ChunkManager } from '../ChunkManager.js';
 import type { Chunk } from '../Chunk.js';
 import type { Tile } from '../Tile.js';
@@ -36,7 +35,7 @@ describe('ChunkSerializer', () => {
       chunk.generated = true;
 
       // Modify first tile with all properties
-      const tile = chunk.tiles[0];
+      const tile = chunk.tiles[0]!;
       tile.terrain = 'water';
       tile.floor = 'wooden_floor';
       tile.elevation = 10;
@@ -105,10 +104,10 @@ describe('ChunkSerializer', () => {
 
       // Create pattern: 950 grass, 74 water (>90% uniform, triggers RLE)
       for (let i = 0; i < 950; i++) {
-        chunk.tiles[i].terrain = 'grass';
+        chunk.tiles[i]!.terrain = 'grass';
       }
       for (let i = 950; i < 1024; i++) {
-        chunk.tiles[i].terrain = 'water';
+        chunk.tiles[i]!.terrain = 'water';
       }
 
       const serialized = (serializer as any).serializeChunk(chunk);
@@ -125,7 +124,7 @@ describe('ChunkSerializer', () => {
 
       // Make 20% different (just above 70% threshold for delta)
       for (let i = 0; i < 250; i++) {
-        chunk.tiles[i].terrain = 'water';
+        chunk.tiles[i]!.terrain = 'water';
       }
 
       const serialized = (serializer as any).serializeChunk(chunk);
@@ -162,7 +161,7 @@ describe('ChunkSerializer', () => {
 
       // Make every tile unique
       for (let i = 0; i < CHUNK_SIZE * CHUNK_SIZE; i++) {
-        chunk.tiles[i].elevation = i;
+        chunk.tiles[i]!.elevation = i;
       }
 
       const serialized = (serializer as any).serializeChunk(chunk);
@@ -178,8 +177,8 @@ describe('ChunkSerializer', () => {
 
       // Set unique properties
       for (let i = 0; i < CHUNK_SIZE * CHUNK_SIZE; i++) {
-        chunk.tiles[i].elevation = i;
-        chunk.tiles[i].moisture = i % 100;
+        chunk.tiles[i]!.elevation = i;
+        chunk.tiles[i]!.moisture = i % 100;
       }
 
       const serialized = (serializer as any).serializeChunk(chunk);
@@ -199,7 +198,7 @@ describe('ChunkSerializer', () => {
 
       // Make 5% different (95% uniform)
       for (let i = 0; i < 51; i++) {
-        chunk.tiles[i].terrain = 'water';
+        chunk.tiles[i]!.terrain = 'water';
       }
 
       const strategy = (serializer as any).selectCompressionStrategy(chunk.tiles);
@@ -212,7 +211,7 @@ describe('ChunkSerializer', () => {
 
       // Make 25% different (75% uniform)
       for (let i = 0; i < 256; i++) {
-        chunk.tiles[i].terrain = 'water';
+        chunk.tiles[i]!.terrain = 'water';
       }
 
       const strategy = (serializer as any).selectCompressionStrategy(chunk.tiles);
@@ -225,7 +224,7 @@ describe('ChunkSerializer', () => {
 
       // Make every tile unique
       for (let i = 0; i < CHUNK_SIZE * CHUNK_SIZE; i++) {
-        chunk.tiles[i].elevation = i;
+        chunk.tiles[i]!.elevation = i;
       }
 
       const strategy = (serializer as any).selectCompressionStrategy(chunk.tiles);
@@ -463,7 +462,7 @@ function createUniformChunk(x: number, y: number, terrain: string): Chunk {
   const chunk = createChunk(x, y);
 
   for (let i = 0; i < CHUNK_SIZE * CHUNK_SIZE; i++) {
-    chunk.tiles[i].terrain = terrain as any;
+    chunk.tiles[i]!.terrain = terrain as any;
   }
 
   return chunk;

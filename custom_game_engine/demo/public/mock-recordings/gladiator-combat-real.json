@@ -1,0 +1,3311 @@
+{
+  "recordingId": "combat_1767518882928",
+  "title": "REAL GLADIATOR COMBAT - Procedural Arena Fight",
+  "description": "Two gladiators approach and battle in a procedurally generated fight",
+  "recordedBy": "Procedural Combat Generator",
+  "recordedAt": 1767518882928,
+  "duration": 100,
+  "quality": 0.98,
+  "frames": [
+    {
+      "tick": 0,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 580.3,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 0
+          },
+          "distanceFromCamera": 19.700000000000045
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 619.7,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 0
+          },
+          "distanceFromCamera": 19.700000000000045
+        }
+      ]
+    },
+    {
+      "tick": 1,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 580.591,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 0
+          },
+          "distanceFromCamera": 19.408999999999992
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 619.409,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 0
+          },
+          "distanceFromCamera": 19.408999999999992
+        }
+      ]
+    },
+    {
+      "tick": 2,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 580.87327,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 0
+          },
+          "distanceFromCamera": 19.126729999999952
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 619.12673,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 0
+          },
+          "distanceFromCamera": 19.126729999999952
+        }
+      ]
+    },
+    {
+      "tick": 3,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 581.1470719,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 0
+          },
+          "distanceFromCamera": 18.852928099999986
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 618.8529281,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 0
+          },
+          "distanceFromCamera": 18.852928099999986
+        }
+      ]
+    },
+    {
+      "tick": 4,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 581.4126597430001,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 0
+          },
+          "distanceFromCamera": 18.587340256999937
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 618.5873402569999,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 0
+          },
+          "distanceFromCamera": 18.587340256999937
+        }
+      ]
+    },
+    {
+      "tick": 5,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 581.6702799507101,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 1
+          },
+          "distanceFromCamera": 18.329720049289904
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 618.3297200492899,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 1
+          },
+          "distanceFromCamera": 18.329720049289904
+        }
+      ]
+    },
+    {
+      "tick": 6,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 581.9201715521888,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 1
+          },
+          "distanceFromCamera": 18.079828447811224
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 618.0798284478112,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 1
+          },
+          "distanceFromCamera": 18.079828447811224
+        }
+      ]
+    },
+    {
+      "tick": 7,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 582.1625664056231,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 1
+          },
+          "distanceFromCamera": 17.837433594376876
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 617.8374335943769,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 1
+          },
+          "distanceFromCamera": 17.837433594376876
+        }
+      ]
+    },
+    {
+      "tick": 8,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 582.3976894134545,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 1
+          },
+          "distanceFromCamera": 17.602310586545514
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 617.6023105865455,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 1
+          },
+          "distanceFromCamera": 17.602310586545514
+        }
+      ]
+    },
+    {
+      "tick": 9,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 582.6257587310508,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 1
+          },
+          "distanceFromCamera": 17.374241268949163
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 617.3742412689492,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 1
+          },
+          "distanceFromCamera": 17.374241268949163
+        }
+      ]
+    },
+    {
+      "tick": 10,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 582.8469859691193,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 2
+          },
+          "distanceFromCamera": 17.15301403088074
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 617.1530140308807,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 2
+          },
+          "distanceFromCamera": 17.15301403088074
+        }
+      ]
+    },
+    {
+      "tick": 11,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 583.0615763900457,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 2
+          },
+          "distanceFromCamera": 16.93842360995427
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 616.9384236099543,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 2
+          },
+          "distanceFromCamera": 16.93842360995427
+        }
+      ]
+    },
+    {
+      "tick": 12,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 583.2697290983443,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 2
+          },
+          "distanceFromCamera": 16.730270901655672
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 616.7302709016557,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 2
+          },
+          "distanceFromCamera": 16.730270901655672
+        }
+      ]
+    },
+    {
+      "tick": 13,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 583.471637225394,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 2
+          },
+          "distanceFromCamera": 16.528362774605966
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 616.528362774606,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 2
+          },
+          "distanceFromCamera": 16.528362774605966
+        }
+      ]
+    },
+    {
+      "tick": 14,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 583.6674881086323,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 2
+          },
+          "distanceFromCamera": 16.332511891367744
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 616.3325118913677,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 2
+          },
+          "distanceFromCamera": 16.332511891367744
+        }
+      ]
+    },
+    {
+      "tick": 15,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 583.8574634653733,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 3
+          },
+          "distanceFromCamera": 16.142536534626743
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 616.1425365346267,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 3
+          },
+          "distanceFromCamera": 16.142536534626743
+        }
+      ]
+    },
+    {
+      "tick": 16,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 584.0417395614121,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 3
+          },
+          "distanceFromCamera": 15.9582604385879
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 615.9582604385879,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 3
+          },
+          "distanceFromCamera": 15.9582604385879
+        }
+      ]
+    },
+    {
+      "tick": 17,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 584.2204873745698,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 3
+          },
+          "distanceFromCamera": 15.779512625430243
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 615.7795126254302,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 3
+          },
+          "distanceFromCamera": 15.779512625430243
+        }
+      ]
+    },
+    {
+      "tick": 18,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 584.3938727533326,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 3
+          },
+          "distanceFromCamera": 15.60612724666737
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 615.6061272466674,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 3
+          },
+          "distanceFromCamera": 15.60612724666737
+        }
+      ]
+    },
+    {
+      "tick": 19,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 584.5620565707327,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 3
+          },
+          "distanceFromCamera": 15.437943429267307
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 615.4379434292673,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 3
+          },
+          "distanceFromCamera": 15.437943429267307
+        }
+      ]
+    },
+    {
+      "tick": 20,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 584.7251948736107,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 4
+          },
+          "distanceFromCamera": 15.27480512638931
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 615.2748051263893,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 4
+          },
+          "distanceFromCamera": 15.27480512638931
+        }
+      ]
+    },
+    {
+      "tick": 21,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 584.8834390274023,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "walking",
+            "frame": 4
+          },
+          "distanceFromCamera": 15.116560972597654
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 615.1165609725977,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "walking",
+            "frame": 4
+          },
+          "distanceFromCamera": 15.116560972597654
+        }
+      ]
+    },
+    {
+      "tick": 22,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 585.0369358565803,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 4
+          },
+          "distanceFromCamera": 14.963064143419729
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 614.9630641434197,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 4
+          },
+          "distanceFromCamera": 14.963064143419729
+        }
+      ]
+    },
+    {
+      "tick": 23,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 585.1858277808828,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 4
+          },
+          "distanceFromCamera": 14.814172219117154
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 614.8141722191172,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 4
+          },
+          "distanceFromCamera": 14.814172219117154
+        }
+      ]
+    },
+    {
+      "tick": 24,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 585.3302529474564,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 4
+          },
+          "distanceFromCamera": 14.669747052543585
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 614.6697470525436,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 4
+          },
+          "distanceFromCamera": 14.669747052543585
+        }
+      ]
+    },
+    {
+      "tick": 25,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 585.4703453590328,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 5
+          },
+          "distanceFromCamera": 14.529654640967237
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 614.5296546409672,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 5
+          },
+          "distanceFromCamera": 14.529654640967237
+        }
+      ]
+    },
+    {
+      "tick": 26,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 585.6062349982618,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 5
+          },
+          "distanceFromCamera": 14.393765001738188
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 614.3937650017382,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 5
+          },
+          "distanceFromCamera": 14.393765001738188
+        }
+      ]
+    },
+    {
+      "tick": 27,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 585.7380479483139,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 5
+          },
+          "distanceFromCamera": 14.26195205168608
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 614.2619520516861,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 5
+          },
+          "distanceFromCamera": 14.26195205168608
+        }
+      ]
+    },
+    {
+      "tick": 28,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 585.8659065098645,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 5
+          },
+          "distanceFromCamera": 14.134093490135456
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 614.1340934901355,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 5
+          },
+          "distanceFromCamera": 14.134093490135456
+        }
+      ]
+    },
+    {
+      "tick": 29,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 585.9899293145686,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 5
+          },
+          "distanceFromCamera": 14.010070685431401
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 614.0100706854314,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 5
+          },
+          "distanceFromCamera": 14.010070685431401
+        }
+      ]
+    },
+    {
+      "tick": 30,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 586.1102314351316,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 6
+          },
+          "distanceFromCamera": 13.889768564868405
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 613.8897685648684,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 6
+          },
+          "distanceFromCamera": 13.889768564868405
+        }
+      ]
+    },
+    {
+      "tick": 31,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 586.2269244920776,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 6
+          },
+          "distanceFromCamera": 13.773075507922385
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 613.7730755079224,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 6
+          },
+          "distanceFromCamera": 13.773075507922385
+        }
+      ]
+    },
+    {
+      "tick": 32,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 586.3401167573153,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 6
+          },
+          "distanceFromCamera": 13.659883242684714
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 613.6598832426847,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 6
+          },
+          "distanceFromCamera": 13.659883242684714
+        }
+      ]
+    },
+    {
+      "tick": 33,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 586.4499132545958,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 6
+          },
+          "distanceFromCamera": 13.5500867454042
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 613.5500867454042,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 6
+          },
+          "distanceFromCamera": 13.5500867454042
+        }
+      ]
+    },
+    {
+      "tick": 34,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 586.5564158569579,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 6
+          },
+          "distanceFromCamera": 13.44358414304213
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 613.4435841430421,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 6
+          },
+          "distanceFromCamera": 13.44358414304213
+        }
+      ]
+    },
+    {
+      "tick": 35,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 586.6597233812491,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 7
+          },
+          "distanceFromCamera": 13.340276618750863
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 613.3402766187509,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 7
+          },
+          "distanceFromCamera": 13.340276618750863
+        }
+      ]
+    },
+    {
+      "tick": 36,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 586.7599316798116,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 7
+          },
+          "distanceFromCamera": 13.240068320188357
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 613.2400683201884,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 7
+          },
+          "distanceFromCamera": 13.240068320188357
+        }
+      ]
+    },
+    {
+      "tick": 37,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 586.8571337294173,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 7
+          },
+          "distanceFromCamera": 13.142866270582658
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 613.1428662705827,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 7
+          },
+          "distanceFromCamera": 13.142866270582658
+        }
+      ]
+    },
+    {
+      "tick": 38,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 586.9514197175348,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 7
+          },
+          "distanceFromCamera": 13.048580282465196
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 613.0485802824652,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 7
+          },
+          "distanceFromCamera": 13.048580282465196
+        }
+      ]
+    },
+    {
+      "tick": 39,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 587.0428771260088,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 7
+          },
+          "distanceFromCamera": 12.957122873991239
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 612.9571228739912,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 7
+          },
+          "distanceFromCamera": 12.957122873991239
+        }
+      ]
+    },
+    {
+      "tick": 40,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 587.1315908122285,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 0
+          },
+          "distanceFromCamera": 12.868409187771476
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 612.8684091877715,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 0
+          },
+          "distanceFromCamera": 12.868409187771476
+        }
+      ]
+    },
+    {
+      "tick": 41,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 587.2176430878617,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 0
+          },
+          "distanceFromCamera": 12.782356912138312
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 612.7823569121383,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 0
+          },
+          "distanceFromCamera": 12.782356912138312
+        }
+      ]
+    },
+    {
+      "tick": 42,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 587.3011137952259,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 0
+          },
+          "distanceFromCamera": 12.698886204774112
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 612.6988862047741,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 0
+          },
+          "distanceFromCamera": 12.698886204774112
+        }
+      ]
+    },
+    {
+      "tick": 43,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 587.3820803813691,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 0
+          },
+          "distanceFromCamera": 12.617919618630935
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 612.6179196186309,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 0
+          },
+          "distanceFromCamera": 12.617919618630935
+        }
+      ]
+    },
+    {
+      "tick": 44,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 587.460617969928,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 0
+          },
+          "distanceFromCamera": 12.539382030072034
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 612.539382030072,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 0
+          },
+          "distanceFromCamera": 12.539382030072034
+        }
+      ]
+    },
+    {
+      "tick": 45,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 587.5367994308301,
+          "y": 600,
+          "facingAngle": 0,
+          "animation": {
+            "state": "running",
+            "frame": 1
+          },
+          "distanceFromCamera": 12.463200569169885
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 612.4632005691699,
+          "y": 600,
+          "facingAngle": 180,
+          "animation": {
+            "state": "running",
+            "frame": 1
+          },
+          "distanceFromCamera": 12.463200569169885
+        }
+      ]
+    },
+    {
+      "tick": 46,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 604.9812539059245,
+          "y": 600.7496875390601,
+          "facingAngle": -171.44111967805802,
+          "animation": {
+            "state": "combat_stance",
+            "frame": 1
+          },
+          "distanceFromCamera": 5.0373526659854075
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 595.0187460940755,
+          "y": 599.2503124609399,
+          "facingAngle": 8.55888032194199,
+          "animation": {
+            "state": "combat_stance",
+            "frame": 1
+          },
+          "distanceFromCamera": 5.0373526659854075
+        }
+      ]
+    },
+    {
+      "tick": 47,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 607.9791820721682,
+          "y": 598.7503014549897,
+          "facingAngle": 171.0986544757071,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 8.076452995852302
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 592.0208179278318,
+          "y": 601.2496985450103,
+          "facingAngle": -8.901345524292939,
+          "animation": {
+            "state": "attacking",
+            "frame": 1
+          },
+          "distanceFromCamera": 8.076452995852302
+        }
+      ]
+    },
+    {
+      "tick": 48,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 610.876155401816,
+          "y": 596.7809257434014,
+          "facingAngle": 163.51254314965246,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 11.342539195169131
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 589.123844598184,
+          "y": 603.2190742565986,
+          "facingAngle": -16.487456850347545,
+          "animation": {
+            "state": "attacking",
+            "frame": 1
+          },
+          "distanceFromCamera": 11.342539195169131
+        }
+      ]
+    },
+    {
+      "tick": 49,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 613.4133958952449,
+          "y": 594.920073199192,
+          "facingAngle": 159.2573003944696,
+          "animation": {
+            "state": "defending",
+            "frame": 1
+          },
+          "distanceFromCamera": 14.343111438740907
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 586.5866041047551,
+          "y": 605.079926800808,
+          "facingAngle": -20.74269960553039,
+          "animation": {
+            "state": "attacking",
+            "frame": 1
+          },
+          "distanceFromCamera": 14.343111438740907
+        }
+      ]
+    },
+    {
+      "tick": 50,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 615.3642594157162,
+          "y": 593.241930141039,
+          "facingAngle": 156.25739270717264,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 16.78487341662193
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 584.6357405842838,
+          "y": 606.758069858961,
+          "facingAngle": -23.742607292827376,
+          "animation": {
+            "state": "defending",
+            "frame": 2
+          },
+          "distanceFromCamera": 16.78487341662193
+        }
+      ]
+    },
+    {
+      "tick": 51,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 616.5544811351081,
+          "y": 591.8133988369846,
+          "facingAngle": 153.68646358856915,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 18.46811534117476
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 583.4455188648919,
+          "y": 608.1866011630154,
+          "facingAngle": -26.313536411430857,
+          "animation": {
+            "state": "defending",
+            "frame": 2
+          },
+          "distanceFromCamera": 18.46811534117476
+        }
+      ]
+    },
+    {
+      "tick": 52,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 616.8777420920064,
+          "y": 590.6914303221301,
+          "facingAngle": 151.12197616752218,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 19.274533653814913
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 583.1222579079936,
+          "y": 609.3085696778699,
+          "facingAngle": -28.878023832477833,
+          "animation": {
+            "state": "defending",
+            "frame": 2
+          },
+          "distanceFromCamera": 19.274533653814913
+        }
+      ]
+    },
+    {
+      "tick": 53,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 616.3051663478839,
+          "y": 589.9207539405865,
+          "facingAngle": 148.27718854489385,
+          "animation": {
+            "state": "defending",
+            "frame": 2
+          },
+          "distanceFromCamera": 19.16897625744182
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 583.6948336521161,
+          "y": 610.0792460594135,
+          "facingAngle": -31.722811455106168,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 19.16897625744182
+        }
+      ]
+    },
+    {
+      "tick": 54,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 614.8879003886884,
+          "y": 589.5320941276758,
+          "facingAngle": 144.88837276397373,
+          "animation": {
+            "state": "defending",
+            "frame": 2
+          },
+          "distanceFromCamera": 18.199632725287294
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 585.1120996113116,
+          "y": 610.4679058723242,
+          "facingAngle": -35.11162723602628,
+          "animation": {
+            "state": "attacking",
+            "frame": 2
+          },
+          "distanceFromCamera": 18.199632725287294
+        }
+      ]
+    },
+    {
+      "tick": 55,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 612.752544361581,
+          "y": 589.5409455236519,
+          "facingAngle": 140.64296048834152,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 16.49300482729906
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 587.247455638419,
+          "y": 610.4590544763481,
+          "facingAngle": -39.3570395116585,
+          "animation": {
+            "state": "attacking",
+            "frame": 3
+          },
+          "distanceFromCamera": 16.49300482729906
+        }
+      ]
+    },
+    {
+      "tick": 56,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 610.0898432608366,
+          "y": 589.9469552512894,
+          "facingAngle": 135.10467203563925,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 14.243196472274994
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 589.9101567391634,
+          "y": 610.0530447487106,
+          "facingAngle": -44.89532796436074,
+          "animation": {
+            "state": "attacking",
+            "frame": 3
+          },
+          "distanceFromCamera": 14.243196472274994
+        }
+      ]
+    },
+    {
+      "tick": 57,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 607.1376482455917,
+          "y": 590.7339369839852,
+          "facingAngle": 127.60706005429385,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 11.696407409737153
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 592.8623517544083,
+          "y": 609.2660630160148,
+          "facingAngle": -52.392939945706146,
+          "animation": {
+            "state": "attacking",
+            "frame": 3
+          },
+          "distanceFromCamera": 11.696407409737153
+        }
+      ]
+    },
+    {
+      "tick": 58,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 604.1596701041798,
+          "y": 591.8705162435213,
+          "facingAngle": 117.09778309270075,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 9.131887073461808
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 595.8403298958202,
+          "y": 608.1294837564787,
+          "facingAngle": -62.90221690729927,
+          "animation": {
+            "state": "attacking",
+            "frame": 3
+          },
+          "distanceFromCamera": 9.131887073461808
+        }
+      ]
+    },
+    {
+      "tick": 59,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.4219227548062,
+          "y": 593.311381201503,
+          "facingAngle": 102.00174522245521,
+          "animation": {
+            "state": "defending",
+            "frame": 3
+          },
+          "distanceFromCamera": 6.838090797309119
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.5780772451938,
+          "y": 606.688618798497,
+          "facingAngle": -77.9982547775448,
+          "animation": {
+            "state": "attacking",
+            "frame": 3
+          },
+          "distanceFromCamera": 6.838090797309119
+        }
+      ]
+    },
+    {
+      "tick": 60,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 599.1689610144912,
+          "y": 594.999089118968,
+          "facingAngle": 80.56494833633765,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 5.069490648522809
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 600.8310389855088,
+          "y": 605.000910881032,
+          "facingAngle": -99.43505166366236,
+          "animation": {
+            "state": "defending",
+            "frame": 4
+          },
+          "distanceFromCamera": 5.069490648522809
+        }
+      ]
+    },
+    {
+      "tick": 61,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 597.602035245611,
+          "y": 596.8663564071172,
+          "facingAngle": 52.57562238036996,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 3.945878499207405
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 602.397964754389,
+          "y": 603.1336435928828,
+          "facingAngle": -127.42437761963005,
+          "animation": {
+            "state": "defending",
+            "frame": 4
+          },
+          "distanceFromCamera": 3.945878499207405
+        }
+      ]
+    },
+    {
+      "tick": 62,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 596.8611142604011,
+          "y": 598.838741011675,
+          "facingAngle": 20.302406767463257,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 3.3468083488934526
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 603.1388857395989,
+          "y": 601.161258988325,
+          "facingAngle": -159.69759323253675,
+          "animation": {
+            "state": "defending",
+            "frame": 4
+          },
+          "distanceFromCamera": 3.3468083488934526
+        }
+      ]
+    },
+    {
+      "tick": 63,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 597.0123823238215,
+          "y": 600.8376101826769,
+          "facingAngle": -15.661401664210677,
+          "animation": {
+            "state": "defending",
+            "frame": 4
+          },
+          "distanceFromCamera": 3.102813271393934
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 602.9876176761785,
+          "y": 599.1623898173231,
+          "facingAngle": 164.33859833578933,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 3.102813271393934
+        }
+      ]
+    },
+    {
+      "tick": 64,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 598.0423271102812,
+          "y": 602.7832753140718,
+          "facingAngle": -54.87858909569617,
+          "animation": {
+            "state": "defending",
+            "frame": 4
+          },
+          "distanceFromCamera": 3.402808342687178
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 601.9576728897188,
+          "y": 597.2167246859282,
+          "facingAngle": 125.12141090430384,
+          "animation": {
+            "state": "attacking",
+            "frame": 4
+          },
+          "distanceFromCamera": 3.402808342687178
+        }
+      ]
+    },
+    {
+      "tick": 65,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 599.85894671944,
+          "y": 604.5981688769722,
+          "facingAngle": -88.2429475100508,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 4.600331841194974
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 600.14105328056,
+          "y": 595.4018311230278,
+          "facingAngle": 91.7570524899492,
+          "animation": {
+            "state": "attacking",
+            "frame": 5
+          },
+          "distanceFromCamera": 4.600331841194974
+        }
+      ]
+    },
+    {
+      "tick": 66,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 602.2999679319613,
+          "y": 606.2099367922531,
+          "facingAngle": -110.32306658484465,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 6.622172411816893
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 597.7000320680387,
+          "y": 593.7900632077469,
+          "facingAngle": 69.67693341515536,
+          "animation": {
+            "state": "attacking",
+            "frame": 5
+          },
+          "distanceFromCamera": 6.622172411816893
+        }
+      ]
+    },
+    {
+      "tick": 67,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 605.147341592905,
+          "y": 607.55432295936,
+          "facingAngle": -124.26961579527615,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 9.141275668546674
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 594.852658407095,
+          "y": 592.44567704064,
+          "facingAngle": 55.73038420472385,
+          "animation": {
+            "state": "attacking",
+            "frame": 5
+          },
+          "distanceFromCamera": 9.141275668546674
+        }
+      ]
+    },
+    {
+      "tick": 68,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 608.146720293333,
+          "y": 608.5777309442662,
+          "facingAngle": -133.52374072593324,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 11.829899394755097
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 591.853279706667,
+          "y": 591.4222690557338,
+          "facingAngle": 46.47625927406677,
+          "animation": {
+            "state": "attacking",
+            "frame": 5
+          },
+          "distanceFromCamera": 11.829899394755097
+        }
+      ]
+    },
+    {
+      "tick": 69,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 611.0301784668394,
+          "y": 609.2393607001643,
+          "facingAngle": -140.04898356118733,
+          "animation": {
+            "state": "defending",
+            "frame": 5
+          },
+          "distanceFromCamera": 14.38855875889132
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 588.9698215331606,
+          "y": 590.7606392998357,
+          "facingAngle": 39.95101643881267,
+          "animation": {
+            "state": "attacking",
+            "frame": 5
+          },
+          "distanceFromCamera": 14.38855875889132
+        }
+      ]
+    },
+    {
+      "tick": 70,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 613.5401453824476,
+          "y": 609.51283513658,
+          "facingAngle": -144.90945706877673,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 16.547796509311038
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 586.4598546175524,
+          "y": 590.48716486342,
+          "facingAngle": 35.09054293122328,
+          "animation": {
+            "state": "defending",
+            "frame": 6
+          },
+          "distanceFromCamera": 16.547796509311038
+        }
+      ]
+    },
+    {
+      "tick": 71,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 615.4524131708982,
+          "y": 609.3872516907318,
+          "facingAngle": -148.7215611911115,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 18.08030882228774
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 584.5475868291018,
+          "y": 590.6127483092682,
+          "facingAngle": 31.278438808888485,
+          "animation": {
+            "state": "defending",
+            "frame": 6
+          },
+          "distanceFromCamera": 18.08030882228774
+        }
+      ]
+    },
+    {
+      "tick": 72,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 616.596164645863,
+          "y": 608.8676169783042,
+          "facingAngle": -151.88364119568294,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 18.8166764288092
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 583.403835354137,
+          "y": 591.1323830216958,
+          "facingAngle": 28.116358804317088,
+          "animation": {
+            "state": "defending",
+            "frame": 6
+          },
+          "distanceFromCamera": 18.8166764288092
+        }
+      ]
+    },
+    {
+      "tick": 73,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 616.8692318944626,
+          "y": 607.9746471954797,
+          "facingAngle": -154.69834040987135,
+          "animation": {
+            "state": "defending",
+            "frame": 6
+          },
+          "distanceFromCamera": 18.659206376518984
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 583.1307681055374,
+          "y": 592.0253528045203,
+          "facingAngle": 25.301659590128658,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 18.659206376518984
+        }
+      ]
+    },
+    {
+      "tick": 74,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 616.2472226326423,
+          "y": 606.7439422295703,
+          "facingAngle": -157.45750429852296,
+          "animation": {
+            "state": "defending",
+            "frame": 6
+          },
+          "distanceFromCamera": 17.59127624905101
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 583.7527773673577,
+          "y": 593.2560577704297,
+          "facingAngle": 22.542495701477037,
+          "animation": {
+            "state": "attacking",
+            "frame": 6
+          },
+          "distanceFromCamera": 17.59127624905101
+        }
+      ]
+    },
+    {
+      "tick": 75,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 614.7856990952608,
+          "y": 605.2245664038527,
+          "facingAngle": -160.53900210691754,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 15.68161317734446
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 585.2143009047392,
+          "y": 594.7754335961473,
+          "facingAngle": 19.46099789308247,
+          "animation": {
+            "state": "attacking",
+            "frame": 7
+          },
+          "distanceFromCamera": 15.68161317734446
+        }
+      ]
+    },
+    {
+      "tick": 76,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 612.615214827128,
+          "y": 603.4770924378305,
+          "facingAngle": -164.59036125159963,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 13.08563399135898
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 587.384785172872,
+          "y": 596.5229075621695,
+          "facingAngle": 15.40963874840037,
+          "animation": {
+            "state": "attacking",
+            "frame": 7
+          },
+          "distanceFromCamera": 13.08563399135898
+        }
+      ]
+    },
+    {
+      "tick": 77,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 609.929652723669,
+          "y": 601.5711866040562,
+          "facingAngle": -171.0085330635519,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 10.053190068701264
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 590.070347276331,
+          "y": 598.4288133959438,
+          "facingAngle": 8.991466936448099,
+          "animation": {
+            "state": "attacking",
+            "frame": 7
+          },
+          "distanceFromCamera": 10.053190068701264
+        }
+      ]
+    },
+    {
+      "tick": 78,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 606.9689060493071,
+          "y": 599.5828313536886,
+          "facingAngle": 176.57428098909693,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 6.981381038414529
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 593.0310939506929,
+          "y": 600.4171686463114,
+          "facingAngle": -3.425719010903072,
+          "animation": {
+            "state": "attacking",
+            "frame": 7
+          },
+          "distanceFromCamera": 6.981381038414529
+        }
+      ]
+    },
+    {
+      "tick": 79,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 603.9974494866156,
+          "y": 597.591296135942,
+          "facingAngle": 148.9285070110162,
+          "animation": {
+            "state": "defending",
+            "frame": 7
+          },
+          "distanceFromCamera": 4.667060820556216
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 596.0025505133844,
+          "y": 602.408703864058,
+          "facingAngle": -31.07149298898382,
+          "animation": {
+            "state": "attacking",
+            "frame": 7
+          },
+          "distanceFromCamera": 4.667060820556216
+        }
+      ]
+    },
+    {
+      "tick": 80,
+      "cameraX": 600,
+      "cameraY": 600,
+      "cameraAngle": 180,
+      "cameraZoom": 1.3,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 106.49854412003981,
+          "animation": {
+            "state": "attacking",
+            "frame": 0
+          },
+          "distanceFromCamera": 4.509700961755804
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 604.3240228247048,
+          "facingAngle": -73.5014558799602,
+          "animation": {
+            "state": "defending",
+            "frame": 0
+          },
+          "distanceFromCamera": 4.509700961755804
+        }
+      ]
+    },
+    {
+      "tick": 81,
+      "cameraX": 600,
+      "cameraY": 600.25,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 105.64210718144288,
+          "animation": {
+            "state": "victorious",
+            "frame": 0
+          },
+          "distanceFromCamera": 4.7499383340011505
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 604.8240228247048,
+          "facingAngle": -74.35789281855713,
+          "animation": {
+            "state": "defeated",
+            "frame": 0
+          },
+          "distanceFromCamera": 4.7499383340011505
+        }
+      ]
+    },
+    {
+      "tick": 82,
+      "cameraX": 600,
+      "cameraY": 600.5,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 104.86828553402452,
+          "animation": {
+            "state": "victorious",
+            "frame": 0
+          },
+          "distanceFromCamera": 4.991134699561416
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 605.3240228247048,
+          "facingAngle": -75.13171446597549,
+          "animation": {
+            "state": "defeated",
+            "frame": 0
+          },
+          "distanceFromCamera": 4.991134699561416
+        }
+      ]
+    },
+    {
+      "tick": 83,
+      "cameraX": 600,
+      "cameraY": 600.75,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 104.16592076658438,
+          "animation": {
+            "state": "victorious",
+            "frame": 0
+          },
+          "distanceFromCamera": 5.233157460034851
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 605.8240228247048,
+          "facingAngle": -75.83407923341564,
+          "animation": {
+            "state": "defeated",
+            "frame": 0
+          },
+          "distanceFromCamera": 5.233157460034851
+        }
+      ]
+    },
+    {
+      "tick": 84,
+      "cameraX": 600,
+      "cameraY": 601,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 103.52573665101507,
+          "animation": {
+            "state": "victorious",
+            "frame": 0
+          },
+          "distanceFromCamera": 5.475897041934848
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 606.3240228247048,
+          "facingAngle": -76.47426334898495,
+          "animation": {
+            "state": "defeated",
+            "frame": 0
+          },
+          "distanceFromCamera": 5.475897041934848
+        }
+      ]
+    },
+    {
+      "tick": 85,
+      "cameraX": 600,
+      "cameraY": 601.25,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 102.93996652346245,
+          "animation": {
+            "state": "victorious",
+            "frame": 1
+          },
+          "distanceFromCamera": 5.719262174985793
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 606.8240228247048,
+          "facingAngle": -77.06003347653757,
+          "animation": {
+            "state": "defeated",
+            "frame": 1
+          },
+          "distanceFromCamera": 5.719262174985793
+        }
+      ]
+    },
+    {
+      "tick": 86,
+      "cameraX": 600,
+      "cameraY": 601.5,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 102.40206390182607,
+          "animation": {
+            "state": "victorious",
+            "frame": 1
+          },
+          "distanceFromCamera": 5.963176270962952
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 607.3240228247048,
+          "facingAngle": -77.59793609817395,
+          "animation": {
+            "state": "defeated",
+            "frame": 1
+          },
+          "distanceFromCamera": 5.963176270962952
+        }
+      ]
+    },
+    {
+      "tick": 87,
+      "cameraX": 600,
+      "cameraY": 601.75,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 101.90647593452044,
+          "animation": {
+            "state": "victorious",
+            "frame": 1
+          },
+          "distanceFromCamera": 6.207574619038262
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 607.8240228247048,
+          "facingAngle": -78.09352406547957,
+          "animation": {
+            "state": "defeated",
+            "frame": 1
+          },
+          "distanceFromCamera": 6.207574619038262
+        }
+      ]
+    },
+    {
+      "tick": 88,
+      "cameraX": 600,
+      "cameraY": 602,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 101.44846464787805,
+          "animation": {
+            "state": "victorious",
+            "frame": 1
+          },
+          "distanceFromCamera": 6.452402193236285
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 608.3240228247048,
+          "facingAngle": -78.55153535212196,
+          "animation": {
+            "state": "defeated",
+            "frame": 1
+          },
+          "distanceFromCamera": 6.452402193236285
+        }
+      ]
+    },
+    {
+      "tick": 89,
+      "cameraX": 600,
+      "cameraY": 602.25,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 101.02396484080806,
+          "animation": {
+            "state": "victorious",
+            "frame": 1
+          },
+          "distanceFromCamera": 6.697611923337512
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 608.8240228247048,
+          "facingAngle": -78.97603515919195,
+          "animation": {
+            "state": "defeated",
+            "frame": 1
+          },
+          "distanceFromCamera": 6.697611923337512
+        }
+      ]
+    },
+    {
+      "tick": 90,
+      "cameraX": 600,
+      "cameraY": 602.5,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 100.6294702937776,
+          "animation": {
+            "state": "victorious",
+            "frame": 2
+          },
+          "distanceFromCamera": 6.943163319985007
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 609.3240228247048,
+          "facingAngle": -79.37052970622241,
+          "animation": {
+            "state": "defeated",
+            "frame": 2
+          },
+          "distanceFromCamera": 6.943163319985007
+        }
+      ]
+    },
+    {
+      "tick": 91,
+      "cameraX": 600,
+      "cameraY": 602.75,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 100.26194201859992,
+          "animation": {
+            "state": "victorious",
+            "frame": 2
+          },
+          "distanceFromCamera": 7.189021372922577
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 609.8240228247048,
+          "facingAngle": -79.73805798140009,
+          "animation": {
+            "state": "defeated",
+            "frame": 2
+          },
+          "distanceFromCamera": 7.189021372922577
+        }
+      ]
+    },
+    {
+      "tick": 92,
+      "cameraX": 600,
+      "cameraY": 603,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 99.9187337905502,
+          "animation": {
+            "state": "victorious",
+            "frame": 2
+          },
+          "distanceFromCamera": 7.435155661631437
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 610.3240228247048,
+          "facingAngle": -80.08126620944981,
+          "animation": {
+            "state": "defeated",
+            "frame": 2
+          },
+          "distanceFromCamera": 7.435155661631437
+        }
+      ]
+    },
+    {
+      "tick": 93,
+      "cameraX": 600,
+      "cameraY": 603.25,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 99.59753132680255,
+          "animation": {
+            "state": "victorious",
+            "frame": 2
+          },
+          "distanceFromCamera": 7.681539632459264
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 610.8240228247048,
+          "facingAngle": -80.40246867319746,
+          "animation": {
+            "state": "defeated",
+            "frame": 2
+          },
+          "distanceFromCamera": 7.681539632459264
+        }
+      ]
+    },
+    {
+      "tick": 94,
+      "cameraX": 600,
+      "cameraY": 603.5,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 99.29630231280585,
+          "animation": {
+            "state": "victorious",
+            "frame": 2
+          },
+          "distanceFromCamera": 7.928150007246003
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 611.3240228247048,
+          "facingAngle": -80.70369768719416,
+          "animation": {
+            "state": "defeated",
+            "frame": 2
+          },
+          "distanceFromCamera": 7.928150007246003
+        }
+      ]
+    },
+    {
+      "tick": 95,
+      "cameraX": 600,
+      "cameraY": 603.75,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 99.0132551077712,
+          "animation": {
+            "state": "victorious",
+            "frame": 3
+          },
+          "distanceFromCamera": 8.17496629655115
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 611.8240228247048,
+          "facingAngle": -80.9867448922288,
+          "animation": {
+            "state": "defeated",
+            "frame": 3
+          },
+          "distanceFromCamera": 8.17496629655115
+        }
+      ]
+    },
+    {
+      "tick": 96,
+      "cameraX": 600,
+      "cameraY": 604,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 98.7468044369719,
+          "animation": {
+            "state": "victorious",
+            "frame": 3
+          },
+          "distanceFromCamera": 8.421970396653007
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 612.3240228247048,
+          "facingAngle": -81.25319556302811,
+          "animation": {
+            "state": "defeated",
+            "frame": 3
+          },
+          "distanceFromCamera": 8.421970396653007
+        }
+      ]
+    },
+    {
+      "tick": 97,
+      "cameraX": 600,
+      "cameraY": 604.25,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 98.49554274175634,
+          "animation": {
+            "state": "victorious",
+            "frame": 3
+          },
+          "distanceFromCamera": 8.669146254069775
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 612.8240228247048,
+          "facingAngle": -81.50445725824368,
+          "animation": {
+            "state": "defeated",
+            "frame": 3
+          },
+          "distanceFromCamera": 8.669146254069775
+        }
+      ]
+    },
+    {
+      "tick": 98,
+      "cameraX": 600,
+      "cameraY": 604.5,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 98.25821613686549,
+          "animation": {
+            "state": "victorious",
+            "frame": 3
+          },
+          "distanceFromCamera": 8.916479584836406
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 613.3240228247048,
+          "facingAngle": -81.74178386313451,
+          "animation": {
+            "state": "defeated",
+            "frame": 3
+          },
+          "distanceFromCamera": 8.916479584836406
+        }
+      ]
+    },
+    {
+      "tick": 99,
+      "cameraX": 600,
+      "cameraY": 604.75,
+      "cameraAngle": 180,
+      "cameraZoom": 1.1,
+      "entities": [
+        {
+          "entityId": "gladiator_red",
+          "entityType": "gladiator",
+          "x": 601.2807144005957,
+          "y": 595.6759771752952,
+          "facingAngle": 98.03370413989164,
+          "animation": {
+            "state": "victorious",
+            "frame": 3
+          },
+          "distanceFromCamera": 9.163957638441854
+        },
+        {
+          "entityId": "gladiator_blue",
+          "entityType": "gladiator",
+          "x": 598.7192855994043,
+          "y": 613.8240228247048,
+          "facingAngle": -81.96629586010836,
+          "animation": {
+            "state": "defeated",
+            "frame": 3
+          },
+          "distanceFromCamera": 9.163957638441854
+        }
+      ]
+    }
+  ]
+}

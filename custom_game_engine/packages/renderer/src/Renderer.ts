@@ -116,31 +116,26 @@ export class Renderer {
     y: number,
     size: number
   ): boolean {
-    // Try to get appearance component first (for agents/humanoids)
-    const appearance = entity.components.get('appearance') as AppearanceComponent | undefined;
-
-    // Try to get animal component if no appearance (for animals)
+    // Try to get animal component first (prioritize animals over agents)
     const animal = entity.components.get('animal') as AnimalComponent | undefined;
+
+    // Try to get appearance component if no animal (for agents/humanoids)
+    const appearance = entity.components.get('appearance') as AppearanceComponent | undefined;
 
     if (!appearance && !animal) return false;
 
-    // Build traits for sprite lookup
-    const traits: SpriteTraits = appearance ? {
-      species: appearance.species || 'human',
-      gender: appearance.gender,
-      hairColor: appearance.hairColor,
-      skinTone: appearance.skinTone,
+    // Build traits for sprite lookup - prioritize animal component
+    const traits: SpriteTraits = animal ? {
+      species: animal.speciesId, // Use speciesId from animal component
     } : {
-      species: animal!.speciesId, // Use speciesId from animal component
+      species: appearance!.species || 'human',
+      gender: appearance!.gender,
+      hairColor: appearance!.hairColor,
+      skinTone: appearance!.skinTone,
     };
 
     // Find the best matching sprite folder
     const spriteFolderId = findSprite(traits);
-
-    // Debug: Log animal sprite lookups
-    if (animal) {
-      console.log(`[Renderer] Animal sprite lookup: speciesId="${animal.speciesId}" -> folderId="${spriteFolderId}"`);
-    }
 
     // Check if sprite is loaded
     if (!this.pixelLabLoader.isLoaded(spriteFolderId)) {

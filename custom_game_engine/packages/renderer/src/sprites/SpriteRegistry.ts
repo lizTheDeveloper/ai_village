@@ -165,6 +165,35 @@ const SPRITE_MAPPINGS: SpriteMapping[] = [
   { folderId: 'cow_brown', species: 'cow', priority: 100 },
   { folderId: 'cow_brown_white', species: 'cow', priority: 100 },
 
+  // Animals - Sheep
+  { folderId: 'sheep', species: 'sheep', priority: 100 },
+
+  // Animals - Horses
+  { folderId: 'horse_white', species: 'horse', priority: 100 },
+  { folderId: 'horse_brown', species: 'horse', priority: 100 },
+  { folderId: 'horse_black', species: 'horse', priority: 100 },
+  { folderId: 'horse_chestnut', species: 'horse', priority: 100 },
+
+  // Animals - Dogs
+  { folderId: 'dog_white', species: 'dog', priority: 100 },
+  { folderId: 'dog_brown', species: 'dog', priority: 100 },
+  { folderId: 'dog_black', species: 'dog', priority: 100 },
+  { folderId: 'dog_spotted', species: 'dog', priority: 100 },
+
+  // Animals - Deer
+  { folderId: 'deer', species: 'deer', priority: 100 },
+  { folderId: 'deer_brown', species: 'deer', priority: 100 },
+  { folderId: 'deer_spotted', species: 'deer', priority: 100 },
+
+  // Animals - Pigs
+  { folderId: 'pig_pink', species: 'pig', priority: 100 },
+  { folderId: 'pig_black', species: 'pig', priority: 100 },
+
+  // Animals - Goats
+  { folderId: 'goat_white', species: 'goat', priority: 100 },
+  { folderId: 'goat_brown', species: 'goat', priority: 100 },
+  { folderId: 'goat_black', species: 'goat', priority: 100 },
+
   // Ultimate fallback - villager for any species
   { folderId: 'villager', species: 'human', priority: 10 },
   { folderId: 'villager', species: 'elf', priority: 5 },

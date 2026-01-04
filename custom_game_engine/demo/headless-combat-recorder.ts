@@ -29,8 +29,6 @@ if (fs.existsSync(envPath)) {
 
 import {
   GameLoop,
-  CombatSystem,
-  HealthSystem,
   MovementSystem,
   SteeringSystem,
   TimeSystem,
@@ -38,8 +36,6 @@ import {
   createPositionComponent,
   createRenderableComponent,
   createWeatherComponent,
-  createHealthComponent,
-  createCombatComponent,
   createSteeringComponent,
   EntityImpl,
   createEntityId,
@@ -129,8 +125,6 @@ function createCombatWorld(): World {
   world.registerSystem(new TimeSystem());
   world.registerSystem(new MovementSystem());
   world.registerSystem(new SteeringSystem());
-  world.registerSystem(new HealthSystem());
-  world.registerSystem(new CombatSystem());
 
   // Create time entity
   const timeEntity = new EntityImpl(createEntityId('time'));
@@ -154,6 +148,7 @@ function createGladiator(world: World, name: string, x: number, y: number, facin
     x,
     y,
     z: 0,
+    facingAngle,
   }));
 
   // Renderable
@@ -162,24 +157,11 @@ function createGladiator(world: World, name: string, x: number, y: number, facin
     layer: 'entity',
   }));
 
-  // Health
-  gladiator.addComponent(createHealthComponent({
-    current: 100,
-    maximum: 100,
-  }));
-
-  // Combat stats
-  gladiator.addComponent(createCombatComponent({
-    attackPower: 15,
-    defense: 10,
-    attackCooldown: 1.0, // 1 second between attacks
-    isHostile: true,
-  }));
-
-  // Steering for movement
+  // Steering for movement toward center (simulated combat)
   gladiator.addComponent(createSteeringComponent({
-    maxSpeed: 50,
-    maxForce: 100,
+    maxSpeed: 20,
+    maxForce: 50,
+    seekTarget: { x: 600, y: 600 }, // Move toward arena center
   }));
 
   world.addEntity(gladiator);
@@ -246,12 +228,18 @@ class CombatRecordingSystem {
     const entitySnapshots = entities.map(entity => {
       const pos = entity.getComponent('position') as any;
       const renderable = entity.getComponent('renderable') as any;
-      const health = entity.getComponent('health') as any;
 
       // Calculate distance from camera
       const dx = pos.x - this.cameraX;
       const dy = pos.y - this.cameraY;
       const distance = Math.sqrt(dx * dx + dy * dy);
+
+      // Determine animation state based on distance (simulates approach and combat)
+      const distanceToCenter = Math.sqrt(
+        Math.pow(pos.x - 600, 2) + Math.pow(pos.y - 600, 2)
+      );
+      const animState = distanceToCenter < 20 ? 'fighting' :
+                       distanceToCenter < 50 ? 'running' : 'walking';
 
       return {
         entityId: entity.id,
@@ -260,7 +248,7 @@ class CombatRecordingSystem {
         y: pos.y,
         facingAngle: pos.facingAngle || 0,
         animation: {
-          state: health && health.current < 30 ? 'wounded' : 'combat_stance',
+          state: animState,
           frame: Math.floor(this.tickCounter / 5) % 8,
         },
         distanceFromCamera: distance,
