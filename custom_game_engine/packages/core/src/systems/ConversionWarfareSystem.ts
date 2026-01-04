@@ -15,6 +15,7 @@ import type { World } from '../ecs/World.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
+import { isFeatureAvailable, type RestrictionConfig } from '../divinity/UniverseConfig.js';
 
 // ============================================================================
 // Conversion Warfare Types
@@ -112,6 +113,25 @@ export class ConversionWarfareSystem implements System {
 
   constructor(config: Partial<ConversionConfig> = {}) {
     this.config = { ...DEFAULT_CONVERSION_CONFIG, ...config };
+  }
+
+  /**
+   * Get the restriction config from the world's divine config
+   */
+  private getRestrictionConfig(world: World): RestrictionConfig | undefined {
+    const divineConfig = (world as any).divineConfig;
+    return divineConfig?.restrictions;
+  }
+
+  /**
+   * Check if conversion warfare is enabled in this universe
+   */
+  private isConversionWarfareEnabled(world: World): boolean {
+    const restrictions = this.getRestrictionConfig(world);
+    if (restrictions && !isFeatureAvailable('divine_war', restrictions)) {
+      return false;
+    }
+    return true;
   }
 
   update(world: World): void {

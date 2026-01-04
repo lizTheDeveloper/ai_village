@@ -10,6 +10,7 @@ import type { SpiritualComponent, Prayer } from '../components/SpiritualComponen
 import { answerPrayer as answerPrayerOnAgent } from '../components/SpiritualComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import { DivineBodyModification } from './DivineBodyModification.js';
+import type { PrayerConfig } from '../divinity/UniverseConfig.js';
 
 /**
  * PrayerAnsweringSystem - Handles player and AI gods answering prayers
@@ -30,6 +31,7 @@ export class PrayerAnsweringSystem implements System {
   public readonly requiredComponents = [];
 
   private eventBus?: EventBus;
+  private world?: World;
   private lastUpdateTick: number = 0;
   private readonly updateInterval: number = 20; // Update once per second at 20 TPS
 
@@ -39,8 +41,8 @@ export class PrayerAnsweringSystem implements System {
   // Divine healing cost (higher than a sign)
   private readonly DIVINE_HEALING_COST = 150;
 
-  // Prayer timeout (in ticks) - after this, prayer counts as unanswered
-  private readonly PRAYER_TIMEOUT = 7200; // 6 game hours at 20 TPS
+  // Default prayer timeout (in ticks) - after this, prayer counts as unanswered
+  private readonly DEFAULT_PRAYER_TIMEOUT = 7200; // 6 game hours at 20 TPS
 
   // DivineBodyModification for healing prayers
   private divineBodyMod: DivineBodyModification;
@@ -51,6 +53,37 @@ export class PrayerAnsweringSystem implements System {
 
   initialize(_world: World, eventBus: EventBus): void {
     this.eventBus = eventBus;
+    this.world = _world;
+  }
+
+  /**
+   * Get the prayer config from the world's divine config
+   */
+  private getPrayerConfig(): PrayerConfig | undefined {
+    if (!this.world) return undefined;
+    const divineConfig = (this.world as any).divineConfig;
+    return divineConfig?.powers?.prayers;
+  }
+
+  /**
+   * Get the prayer timeout in ticks (converts from game hours in config)
+   */
+  private getPrayerTimeout(): number {
+    const prayerConfig = this.getPrayerConfig();
+    if (prayerConfig?.prayerExpiryTime) {
+      // Convert game hours to ticks (20 TPS * 60 seconds * 60 minutes = 72000 ticks per hour)
+      // But we're running at a compressed timescale, so 6 game hours = 7200 ticks (100x compression)
+      return prayerConfig.prayerExpiryTime * 1200; // ~1 minute per game hour at 20 TPS
+    }
+    return this.DEFAULT_PRAYER_TIMEOUT;
+  }
+
+  /**
+   * Get the faith penalty for ignored prayers
+   */
+  private getIgnoredPrayerFaithPenalty(): number {
+    const prayerConfig = this.getPrayerConfig();
+    return prayerConfig?.ignoredPrayerFaithPenalty ?? 0.02;
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
@@ -251,8 +284,12 @@ export class PrayerAnsweringSystem implements System {
     allEntities: ReadonlyArray<Entity>,
     currentTick: number
   ): void {
+    // Get timeout from config
+    const prayerTimeout = this.getPrayerTimeout();
+    const faithPenalty = this.getIgnoredPrayerFaithPenalty();
+
     const timedOutPrayers = deityComp.prayerQueue.filter(
-      p => currentTick - p.timestamp > this.PRAYER_TIMEOUT
+      p => currentTick - p.timestamp > prayerTimeout
     );
 
     for (const prayer of timedOutPrayers) {
@@ -270,8 +307,8 @@ export class PrayerAnsweringSystem implements System {
         const updatedSpiritual: SpiritualComponent = {
           ...spiritual,
           unansweredPrayers: spiritual.unansweredPrayers + 1,
-          // Unanswered prayers slightly decrease faith (especially desperate ones)
-          faith: Math.max(0, spiritual.faith - 0.02),
+          // Unanswered prayers decrease faith based on config penalty
+          faith: Math.max(0, spiritual.faith - faithPenalty),
         };
         (agent as EntityImpl).addComponent(updatedSpiritual);
       }

@@ -266,13 +266,8 @@ export class DeathBargainSystem implements System {
       source: 'death_bargain_system',
       data: {
         entityId: entity.id,
-        deathGodId: deathGod.id,
-        deathGodName,
+        psychopompName: deathGodName,
         challengeType,
-        destiny: destinyText,
-        location: deathLocation,
-        heroName,
-        interventionWindow: 100, // Gods have 100 ticks to intervene via divine chat
       },
     });
 
@@ -370,13 +365,16 @@ export class DeathBargainSystem implements System {
     }
 
     // Emit event
+    const identity = deathGod?.components.get('identity') as any;
+    const psychopompName = identity?.name || 'The God of Death';
+
     world.eventBus.emit({
       type: 'death:challenge_started',
       source: 'death_bargain_system',
       data: {
         entityId: entity.id,
-        challengeType: 'riddle',
-        riddle: riddleQuestion,
+        psychopompName,
+        challenge: riddleQuestion,
       },
     });
   }
@@ -463,13 +461,16 @@ export class DeathBargainSystem implements System {
           debtOwed: 'When Death calls, you must answer',
         };
 
+        const deathGodIdentity = deathGod?.components.get('identity') as any;
+        const psychopompName = deathGodIdentity?.name || 'The God of Death';
+
         world.eventBus.emit({
           type: 'death:challenge_succeeded',
           source: 'death_bargain_system',
           data: {
             entityId: entity.id,
-            answer: bargain.heroResponse,
-            attemptsUsed: bargain.attempts,
+            psychopompName,
+            attempts: bargain.attempts,
           },
         });
       } else {
@@ -493,13 +494,16 @@ export class DeathBargainSystem implements System {
             }
           }
 
+          const deathGodIdentity = deathGod?.components.get('identity') as any;
+          const psychopompName = deathGodIdentity?.name || 'The God of Death';
+
           world.eventBus.emit({
             type: 'death:challenge_failed',
             source: 'death_bargain_system',
             data: {
               entityId: entity.id,
-              finalAnswer: bargain.heroResponse,
-              attemptsUsed: bargain.attempts,
+              psychopompName,
+              attempts: bargain.attempts,
             },
           });
         } else {
