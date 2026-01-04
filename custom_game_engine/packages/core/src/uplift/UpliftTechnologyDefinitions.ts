@@ -11,11 +11,7 @@
  * NOT YET INTEGRATED - These will be added to ClarketechSystem
  */
 
-import type {
-  ClarketechDefinition,
-  ClarketechCategory,
-  ClarketechTier,
-} from '../clarketech/ClarketechSystem.js';
+import type { ClarketechDefinition } from '../clarketech/ClarketechSystem.js';
 
 /**
  * Consciousness Studies - Tier 1

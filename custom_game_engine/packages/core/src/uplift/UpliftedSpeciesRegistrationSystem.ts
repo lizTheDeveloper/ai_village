@@ -15,9 +15,8 @@ import { System, World, Entity } from '../ecs/index.js';
 import { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { UpliftProgramComponent } from '../components/UpliftProgramComponent.js';
-import type { UpliftedTraitComponent } from '../components/UpliftedTraitComponent.js';
-import type { SpeciesComponent } from '../components/SpeciesComponent.js';
-import type { SpeciesTemplate, SpeciesTrait } from '../species/SpeciesRegistry.js';
+import type { SpeciesComponent, SpeciesTrait } from '../components/SpeciesComponent.js';
+import type { SpeciesTemplate } from '../species/SpeciesRegistry.js';
 
 /**
  * Registry of uplifted species templates
@@ -196,7 +195,7 @@ export class UpliftedSpeciesRegistrationSystem implements System {
 
       innateTraits,
       compatibleSpecies,
-      mutationRate: sourceSpecies.mutationRate ? sourceSpecies.mutationRate * 1.5 : 0.015,
+      mutationRate: 0.015, // Default mutation rate for uplifted species
 
       averageHeight: (sourceSpecies.averageHeight || 100) * sizeAdjustment,
       averageWeight: (sourceSpecies.averageWeight || 50) * sizeAdjustment,
