@@ -2834,6 +2834,14 @@ async function main() {
   let universeConfigScreen: UniverseConfigScreen | null = null;
   let universeConfig: UniverseConfig | null = null;  // Store full config for scenario access
 
+  // Create ChunkManager and TerrainGenerator BEFORE loading saves
+  // so terrain can be restored from checkpoints
+  const terrainGenerator = new TerrainGenerator('phase8-demo');
+  const chunkManager = new ChunkManager(3);
+  (gameLoop.world as any).setChunkManager(chunkManager);
+  (gameLoop.world as any).setTerrainGenerator(terrainGenerator);
+  console.log('[Demo] ChunkManager set on world - ready for save loading');
+
   if (existingSaves.length > 0) {
     // Auto-load the most recent save
     const mostRecent = existingSaves[0]; // Saves are sorted by timestamp descending
@@ -2993,19 +3001,19 @@ async function main() {
     eventBus: gameLoop.world.eventBus,
   });
 
-  // Generate terrain
-  const terrainGenerator = new TerrainGenerator('phase8-demo');
-  const chunkManager = new ChunkManager(3);
-
-  for (let cy = -1; cy <= 1; cy++) {
-    for (let cx = -1; cx <= 1; cx++) {
-      const chunk = chunkManager.getChunk(cx, cy);
-      terrainGenerator.generateChunk(chunk, gameLoop.world as WorldMutator);
+  // Generate terrain only if NOT loading from a checkpoint
+  // (terrain is restored from checkpoint by WorldSerializer)
+  if (!loadedCheckpoint) {
+    console.log('[Demo] Generating fresh terrain (no checkpoint loaded)');
+    for (let cy = -1; cy <= 1; cy++) {
+      for (let cx = -1; cx <= 1; cx++) {
+        const chunk = chunkManager.getChunk(cx, cy);
+        terrainGenerator.generateChunk(chunk, gameLoop.world as WorldMutator);
+      }
     }
+  } else {
+    console.log('[Demo] Skipping terrain generation - restored from checkpoint');
   }
-
-  (gameLoop.world as any).setChunkManager(chunkManager);
-  (gameLoop.world as any).setTerrainGenerator(terrainGenerator);
 
   // Initialize divine configuration for this universe
   // Map magic spectrum preset to divine preset for consistent worldbuilding
@@ -3314,16 +3322,19 @@ async function main() {
     console.log('[Demo] Player deity created:', playerDeityId); // Create player deity for belief system
 
     // Set the 2 most spiritual agents to believe in the player deity
+    // Note: spirituality is on PersonalityComponent, not SpiritualComponent
     const agents = gameLoop.world.query().with('agent').executeEntities();
     const agentsWithSpirituality = agents
       .map(agent => {
+        const personality = agent.components.get('personality') as any;
         const spiritual = agent.components.get('spiritual') as any;
         return {
           agent,
-          spirituality: spiritual?.spirituality ?? 0,
+          spirituality: personality?.spirituality ?? 0,
+          hasSpiritual: !!spiritual,
         };
       })
-      .filter(a => a.spirituality > 0)
+      .filter(a => a.spirituality > 0 && a.hasSpiritual)
       .sort((a, b) => b.spirituality - a.spirituality);
 
     // Only the top 2 most spiritual agents believe in the player deity initially
@@ -3331,14 +3342,15 @@ async function main() {
     const believers: { agent: any; name: string }[] = [];
 
     for (let i = 0; i < believersCount; i++) {
-      const { agent } = agentsWithSpirituality[i];
+      const { agent, spirituality } = agentsWithSpirituality[i];
       const spiritual = agent.components.get('spiritual') as any;
       if (spiritual) {
         spiritual.believedDeity = playerDeityId;
+        spiritual.faith = Math.max(spiritual.faith ?? 0, 0.5); // Ensure initial faith
         const identity = agent.components.get('identity') as any;
         const name = identity?.name ?? agent.id;
         believers.push({ agent, name });
-        console.log(`[Demo] ${name} believes in the player deity (spirituality: ${spiritual.spirituality})`);
+        console.log(`[Demo] ${name} believes in the player deity (spirituality: ${spirituality.toFixed(2)}, faith: ${spiritual.faith.toFixed(2)})`);
       }
     }
 
