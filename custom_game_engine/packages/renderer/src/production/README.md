@@ -500,18 +500,142 @@ await animator.saveReplay(replay, './output');
 5. **Automated** - Combat log automatically generates all needed sprite prompts
 6. **Dry Run** - Preview what will be generated before spending credits
 
+## Soul Sprite Progression System
+
+The Soul Sprite Renderer generates character sprites based on reincarnation count, implementing the Soul Sprite Progression System where visual complexity reflects spiritual complexity.
+
+### Quick Start
+
+```bash
+# Set your API token
+export PIXELLAB_API_TOKEN=your_token_here
+
+# Preview tier info (no API calls)
+./scripts/render-soul-sprite.ts --reincarnations 5 --dry-run
+
+# Generate sprites for a soul with 3 reincarnations (Tier 3)
+./scripts/render-soul-sprite.ts \
+  --name "Elder Sage" \
+  --description "wise elderly human wizard with long white beard and blue robes" \
+  --reincarnations 3 \
+  --output-dir "./assets/sprites/souls/elder_sage/"
+
+# Generate max-quality sprites for an animal (no progression)
+./scripts/render-soul-sprite.ts \
+  --name "Forest Wolf" \
+  --description "grey wolf with thick fur" \
+  --animal \
+  --species "wolf" \
+  --output-dir "./assets/sprites/animals/wolf/"
+```
+
+### Tier Progression Table
+
+| Tier | Lives | Size   | Directions | Animations              | Visual Style |
+|------|-------|--------|------------|-------------------------|--------------|
+| 1    | 1     | 16×16  | 1 (south)  | None                    | Low detail, flat |
+| 2    | 2     | 24×24  | 4 cardinal | None                    | Low detail, basic shading |
+| 3    | 3     | 32×32  | 8 full     | None                    | Medium detail |
+| 4    | 4     | 40×40  | 8 full     | Walk                    | Medium detail |
+| 5    | 5     | 48×48  | 8 full     | Walk, Run               | Medium, detailed shading |
+| 6    | 6     | 56×56  | 8 full     | Walk, Run, Idle         | High detail |
+| 7    | 7     | 64×64  | 8 full     | Walk, Run, Idle, Attack | High, selective outline |
+| 8+   | 8+    | 64×64  | 8 full     | All + Effects           | Highly detailed |
+
+**Animals (no soul):** Always 64×64, 8 directions, full animations, high detail
+
+### Programmatic Usage
+
+```typescript
+import { SoulSpriteRenderer, type SoulEntity, type AnimalEntity } from './SoulSpriteRenderer';
+
+const renderer = new SoulSpriteRenderer(process.env.PIXELLAB_API_TOKEN);
+
+// Generate sprites for a soul (tier based on reincarnation count)
+const soulEntity: SoulEntity = {
+  id: 'elder_sage_001',
+  name: 'Elder Sage',
+  description: 'wise elderly human wizard with long white beard and blue robes',
+  reincarnationCount: 5,  // Tier 5: 48×48, 8 directions, walk + run
+};
+
+const spriteSet = await renderer.generateSoulSprites(soulEntity);
+await renderer.saveSpriteSet(spriteSet, './output/elder_sage/');
+
+// Generate sprites for an animal (always max quality)
+const animal: AnimalEntity = {
+  id: 'wolf_001',
+  name: 'Forest Wolf',
+  description: 'grey wolf with thick fur',
+  species: 'wolf',
+};
+
+const animalSprites = await renderer.generateAnimalSprites(animal);
+await renderer.saveSpriteSet(animalSprites, './output/wolf/');
+```
+
+### Output Structure
+
+```
+output-dir/
+├── sprites/
+│   ├── south.png
+│   ├── south-west.png
+│   ├── west.png
+│   ├── north-west.png
+│   ├── north.png
+│   ├── north-east.png
+│   ├── east.png
+│   └── south-east.png
+├── animations/
+│   ├── walk/
+│   │   ├── south/
+│   │   │   ├── frame_000.png
+│   │   │   ├── frame_001.png
+│   │   │   └── ...
+│   │   └── ... (other directions)
+│   ├── run/
+│   │   └── ...
+│   └── idle/
+│       └── ...
+└── sprite-set.json
+```
+
+### CLI Options
+
+```
+--name <name>           Entity name (required)
+--output-dir <path>     Output directory (required)
+--description <desc>    Character appearance description
+--reincarnations <n>    Reincarnation count (determines tier, default: 1)
+--animal                Generate as animal (max quality, ignores --reincarnations)
+--species <species>     Species type (for animals)
+--api-token <token>     PixelLab API token (or set PIXELLAB_API_TOKEN)
+--dry-run               Show tier info without generating
+```
+
+### Design Philosophy
+
+- **Newborn souls** (Tier 1): Simple, low-res sprites reflect their inexperience
+- **Growing souls** (Tiers 2-4): Gain directional views and basic animation
+- **Mature souls** (Tiers 5-7): Full animations and detailed artwork
+- **Transcendent souls** (Tier 8+): Maximum quality with special effects
+- **Animals**: Always max quality (they don't reincarnate in the soul system)
+
 ## Future Enhancements
 
 - **Scene Rendering**: Characters in environments
 - **Real-time Preview**: Interactive virtual dressing room
 - **Motion Capture**: Record gameplay actions for animation reference
 - **Multi-Character Scenes**: Render full combat scenes with both fighters
+- **Aura Effects**: Visual effects for transcendent souls (Tier 8+)
 
 ## References
 
 - [Full Specification](../../../../openspec/specs/renderer/video-production-rendering.md)
-- [Soul Sprite Progression](../../../../openspec/specs/soul-system/soul-sprite-progression.md)
+- [Soul Sprite Progression Spec](../../../../openspec/specs/soul-system/soul-sprite-progression.md)
 - [PixelLab API Client](./PixelLabAPI.ts)
+- [Soul Sprite Renderer](./SoulSpriteRenderer.ts)
 - [Combat Animator](./CombatAnimator.ts)
 - [Example Combat Log](../../../../examples/gladiator_match_001.json)
 - [PixelLab API Docs](https://api.pixellab.ai/v1/docs)

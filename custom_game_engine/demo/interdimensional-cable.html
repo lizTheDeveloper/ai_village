@@ -1075,7 +1075,6 @@
         const activeAnim = this.activeAnimations.get(charId);
 
         let sprite = null;
-        let usingAnimation = false;
 
         if (activeAnim) {
           // Playing attack animation
@@ -1083,11 +1082,6 @@
           const frames = this.animationCache.get(key);
           if (frames && frames.length > 0) {
             sprite = frames[activeAnim.frameIndex % frames.length];
-            usingAnimation = true;
-            console.log(`[RENDER] ${charId} ANIMATION frame ${activeAnim.frameIndex}/${frames.length} of ${activeAnim.animation} (${direction})`);
-          } else {
-            console.warn(`[RENDER] ${charId} animation cache miss for key: ${key}`);
-            console.warn(`[RENDER] Available keys:`, Array.from(this.animationCache.keys()).filter(k => k.startsWith(charId)));
           }
         }
 

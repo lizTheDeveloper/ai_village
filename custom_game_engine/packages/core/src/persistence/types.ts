@@ -145,11 +145,11 @@ export interface WorldSnapshot {
   /** Terrain data (compressed) */
   terrain: TerrainSnapshot | null;
 
-  /** Weather state */
-  weather: unknown;
-
   /** Zone configuration */
   zones: ZoneSnapshot[];
+
+  // NOTE: Weather state is stored as WeatherComponent on entities (already serialized)
+  // NOTE: Building data is stored in tiles (walls/doors/windows) and BuildingComponent entities (already serialized)
 }
 
 export interface UniverseSnapshot extends Versioned {

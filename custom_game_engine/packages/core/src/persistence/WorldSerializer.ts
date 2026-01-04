@@ -281,11 +281,11 @@ export class WorldSerializer {
     const zoneManager = getZoneManager();
     const zones = zoneManager.serializeZones();
 
-    // TODO: Implement weather serialization
+    // NOTE: Weather is stored as WeatherComponent on the world entity (already serialized with entities)
+    // NOTE: Buildings are stored in tiles and BuildingComponent entities (already serialized)
 
     return {
       terrain,
-      weather: null,
       zones,
     };
   }
