@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📺 Interdimensional Cable</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: #000;
+      color: #0f0;
+      padding: 2rem;
+      min-height: 100vh;
+      background-image:
+        repeating-linear-gradient(0deg, rgba(0, 255, 0, 0.05) 0px, transparent 2px),
+        repeating-linear-gradient(90deg, rgba(0, 255, 0, 0.05) 0px, transparent 2px);
+      background-size: 4px 4px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding: 1rem;
+      border: 2px solid #0f0;
+      background: rgba(0, 255, 0, 0.1);
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+    }
+
+    h1 {
+      font-size: 3rem;
+      text-shadow: 0 0 10px #0f0, 0 0 20px #0f0;
+      animation: flicker 3s infinite alternate;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    .subtitle {
+      color: #0a0;
+      font-size: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .tv-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .tv-show {
+      border: 3px solid #0f0;
+      background: #001100;
+      padding: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+    }
+
+    .tv-show:hover {
+      box-shadow: 0 0 30px rgba(0, 255, 0, 0.6);
+      transform: scale(1.05);
+    }
+
+    .tv-show.playing {
+      border-color: #ff0;
+      box-shadow: 0 0 30px rgba(255, 255, 0, 0.8);
+    }
+
+    .show-title {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      color: #0ff;
+    }
+
+    .show-status {
+      font-size: 0.8rem;
+      color: #0a0;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .canvas-container {
+      width: 100%;
+      height: 300px;
+      background: #000;
+      border: 2px solid #030;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .canvas-container canvas {
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .loading {
+      color: #0a0;
+      font-size: 0.9rem;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
+    .player-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .player-container.active {
+      display: flex;
+    }
+
+    .player {
+      background: #000;
+      border: 4px solid #0f0;
+      padding: 2rem;
+      max-width: 90vw;
+      max-height: 90vh;
+      box-shadow: 0 0 50px rgba(0, 255, 0, 0.8);
+    }
+
+    .player-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #0f0;
+    }
+
+    .player-title {
+      font-size: 1.5rem;
+      color: #0ff;
+    }
+
+    .close-btn {
+      background: #0f0;
+      color: #000;
+      border: none;
+      padding: 0.5rem 1rem;
+      font-family: 'Courier New', monospace;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .close-btn:hover {
+      background: #0ff;
+    }
+
+    .player-canvas {
+      background: #000;
+      border: 2px solid #030;
+      margin-bottom: 1rem;
+    }
+
+    .player-controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .control-btn {
+      background: #0a0;
+      color: #000;
+      border: 2px solid #0f0;
+      padding: 0.5rem 1rem;
+      font-family: 'Courier New', monospace;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .control-btn:hover {
+      background: #0f0;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 2px solid #030;
+    }
+
+    .back-link a {
+      color: #0f0;
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      color: #0ff;
+      text-decoration: underline;
+    }
+
+    .error {
+      background: #300;
+      color: #f00;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border: 2px solid #f00;
+      display: none;
+    }
+
+    .error.active {
+      display: block;
+    }
+
+    .direction-selector {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+      justify-content: center;
+    }
+
+    .direction-btn {
+      background: #003300;
+      color: #0f0;
+      border: 1px solid #0f0;
+      padding: 0.25rem 0.5rem;
+      font-family: 'Courier New', monospace;
+      cursor: pointer;
+      font-size: 0.7rem;
+    }
+
+    .direction-btn:hover, .direction-btn.active {
+      background: #0f0;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📺 INTERDIMENSIONAL CABLE 📺</h1>
+      <p class="subtitle">Broadcasting from infinite realities since ∞</p>
+    </header>
+
+    <div class="error" id="error"></div>
+
+    <div class="tv-grid" id="tvGrid">
+      <!-- TV shows will be inserted here -->
+    </div>
+
+    <div class="back-link">
+      <a href="/">&larr; Back to Reality (probably)</a>
+    </div>
+  </div>
+
+  <!-- Fullscreen Player -->
+  <div class="player-container" id="player">
+    <div class="player">
+      <div class="player-header">
+        <div class="player-title" id="playerTitle">Loading...</div>
+        <button class="close-btn" onclick="closePlayer()">CLOSE [X]</button>
+      </div>
+      <canvas id="playerCanvas" class="player-canvas" width="480" height="480"></canvas>
+      <div class="player-controls">
+        <button class="control-btn" onclick="togglePlayback()">⏯ PAUSE</button>
+        <span id="fpsCounter" style="color: #0a0;">FPS: --</span>
+      </div>
+      <div class="direction-selector" id="directionSelector"></div>
+    </div>
+  </div>
+
+  <script>
+    // Character IDs from PixelLab
+    const SHOWS = [
+      {
+        id: 'a3add4c4-048a-4676-9134-6f412a894a61',
+        name: 'WIZARD FIREBALL SHOW',
+        animation: 'fireball',
+        description: 'Mystical purple wizard casting fireballs'
+      },
+      {
+        id: 'd61a6e35-1808-41b1-b297-cfee8c150ab0',
+        name: 'ROBOT DANCE PARTY',
+        animation: 'running-8-frames',
+        description: 'Friendly robot with sick moves'
+      },
+      // More shows will be added as they complete
+    ];
+
+    class SpriteAnimationPlayer {
+      constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.frames = [];
+        this.currentFrame = 0;
+        this.isPlaying = true;
+        this.fps = 8;
+        this.lastFrameTime = 0;
+        this.frameInterval = 1000 / this.fps;
+      }
+
+      async loadAnimation(characterId, animationName, direction = 'south') {
+        try {
+          const response = await fetch(`https://api.pixellab.ai/mcp/characters/${characterId}`);
+          const data = await response.json();
+
+          if (data.error) {
+            throw new Error(data.error);
+          }
+
+          // Find the animation
+          const animation = data.animations?.find(a => a.name === animationName && a.direction === direction);
+          if (!animation) {
+            throw new Error(`Animation ${animationName} (${direction}) not found`);
+          }
+
+          // Load frames
+          this.frames = [];
+          for (let i = 0; i < animation.frame_count; i++) {
+            const frameUrl = `https://backblaze.pixellab.ai/file/pixellab-characters/${data.user_id}/${characterId}/animations/${animationName}/${direction}/frame_${i}.png`;
+            const img = await this.loadImage(frameUrl);
+            this.frames.push(img);
+          }
+
+          this.currentFrame = 0;
+          return true;
+        } catch (error) {
+          console.error('Failed to load animation:', error);
+          throw error;
+        }
+      }
+
+      loadImage(url) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = url + '?t=' + Date.now();
+          setTimeout(() => reject(new Error('Image load timeout')), 10000);
+        });
+      }
+
+      animate(timestamp) {
+        if (!this.isPlaying || this.frames.length === 0) {
+          requestAnimationFrame((t) => this.animate(t));
+          return;
+        }
+
+        const elapsed = timestamp - this.lastFrameTime;
+        if (elapsed > this.frameInterval) {
+          this.lastFrameTime = timestamp;
+
+          // Clear canvas
+          this.ctx.fillStyle = '#000';
+          this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+          // Draw current frame (scaled up)
+          const frame = this.frames[this.currentFrame];
+          if (frame) {
+            const scale = Math.min(this.canvas.width / frame.width, this.canvas.height / frame.height) * 0.8;
+            const x = (this.canvas.width - frame.width * scale) / 2;
+            const y = (this.canvas.height - frame.height * scale) / 2;
+
+            this.ctx.imageSmoothingEnabled = false;
+            this.ctx.drawImage(frame, x, y, frame.width * scale, frame.height * scale);
+          }
+
+          // Next frame
+          this.currentFrame = (this.currentFrame + 1) % this.frames.length;
+        }
+
+        requestAnimationFrame((t) => this.animate(t));
+      }
+
+      start() {
+        this.isPlaying = true;
+        requestAnimationFrame((t) => this.animate(t));
+      }
+
+      pause() {
+        this.isPlaying = false;
+      }
+
+      resume() {
+        this.isPlaying = true;
+      }
+    }
+
+    // Global state
+    let currentPlayer = null;
+    let currentShow = null;
+    let currentDirection = 'south';
+
+    const DIRECTIONS = ['south', 'south-west', 'west', 'north-west', 'north', 'north-east', 'east', 'south-east'];
+
+    // Initialize TV grid
+    async function initializeShows() {
+      const grid = document.getElementById('tvGrid');
+
+      for (const show of SHOWS) {
+        const showDiv = document.createElement('div');
+        showDiv.className = 'tv-show';
+        showDiv.innerHTML = `
+          <div class="show-title">${show.name}</div>
+          <div class="show-status" id="status-${show.id}">⏳ Loading...</div>
+          <div class="canvas-container" id="container-${show.id}">
+            <div class="loading">◆ LOADING TRANSMISSION ◆</div>
+          </div>
+        `;
+        showDiv.onclick = () => openPlayer(show);
+        grid.appendChild(showDiv);
+
+        // Load preview
+        loadShowPreview(show);
+      }
+    }
+
+    async function loadShowPreview(show) {
+      const container = document.getElementById(`container-${show.id}`);
+      const status = document.getElementById(`status-${show.id}`);
+
+      try {
+        // Check if character is ready
+        const response = await fetch(`https://api.pixellab.ai/mcp/characters/${show.id}`);
+        const data = await response.json();
+
+        if (data.error) {
+          status.textContent = '❌ ' + data.error;
+          container.innerHTML = '<div class="loading">ERROR</div>';
+          return;
+        }
+
+        // Find the animation
+        const animation = data.animations?.find(a => a.name === show.animation);
+        if (!animation) {
+          status.textContent = '⏳ Animation pending...';
+          setTimeout(() => loadShowPreview(show), 5000);
+          return;
+        }
+
+        status.textContent = '✓ READY TO BROADCAST';
+
+        // Create mini canvas for preview
+        const canvas = document.createElement('canvas');
+        canvas.width = 200;
+        canvas.height = 200;
+        container.innerHTML = '';
+        container.appendChild(canvas);
+
+        const player = new SpriteAnimationPlayer(canvas);
+        await player.loadAnimation(show.id, show.animation, 'south');
+        player.start();
+
+      } catch (error) {
+        console.error('Preview error:', error);
+        status.textContent = '⏳ Retrying...';
+        setTimeout(() => loadShowPreview(show), 5000);
+      }
+    }
+
+    async function openPlayer(show) {
+      currentShow = show;
+      document.getElementById('playerTitle').textContent = show.name;
+      document.getElementById('player').classList.add('active');
+
+      // Setup direction selector
+      const selector = document.getElementById('directionSelector');
+      selector.innerHTML = '';
+      DIRECTIONS.forEach(dir => {
+        const btn = document.createElement('button');
+        btn.className = 'direction-btn' + (dir === currentDirection ? ' active' : '');
+        btn.textContent = dir;
+        btn.onclick = () => changeDirection(dir);
+        selector.appendChild(btn);
+      });
+
+      // Load and play
+      const canvas = document.getElementById('playerCanvas');
+      currentPlayer = new SpriteAnimationPlayer(canvas);
+
+      try {
+        await currentPlayer.loadAnimation(show.id, show.animation, currentDirection);
+        currentPlayer.start();
+      } catch (error) {
+        showError('Failed to load animation: ' + error.message);
+      }
+    }
+
+    async function changeDirection(direction) {
+      currentDirection = direction;
+
+      // Update button states
+      document.querySelectorAll('.direction-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent === direction);
+      });
+
+      // Reload animation with new direction
+      if (currentPlayer && currentShow) {
+        try {
+          await currentPlayer.loadAnimation(currentShow.id, currentShow.animation, direction);
+        } catch (error) {
+          showError('Failed to load direction: ' + error.message);
+        }
+      }
+    }
+
+    function closePlayer() {
+      document.getElementById('player').classList.remove('active');
+      if (currentPlayer) {
+        currentPlayer.pause();
+      }
+    }
+
+    function togglePlayback() {
+      if (currentPlayer) {
+        if (currentPlayer.isPlaying) {
+          currentPlayer.pause();
+        } else {
+          currentPlayer.resume();
+        }
+      }
+    }
+
+    function showError(message) {
+      const errorDiv = document.getElementById('error');
+      errorDiv.textContent = message;
+      errorDiv.classList.add('active');
+      setTimeout(() => errorDiv.classList.remove('active'), 5000);
+    }
+
+    // Initialize on load
+    initializeShows();
+  </script>
+</body>
+</html>
