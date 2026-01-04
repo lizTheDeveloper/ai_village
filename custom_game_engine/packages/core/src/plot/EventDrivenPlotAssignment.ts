@@ -306,23 +306,152 @@ export class EventDrivenPlotAssignmentSystem implements System {
       }
 
       case 'on_relationship_change': {
-        // This trigger requires delta tracking - skip for now
-        // Would need to compare against stored baseline
+        if (!relationship) return undefined;
+        // Get or create baseline for this entity
+        let baseline = this.relationshipBaselines.get(entity.id);
+        if (!baseline) {
+          // First time seeing this entity - create baseline
+          baseline = {
+            knownAgents: new Map(),
+            capturedAt: currentTick,
+          };
+          for (const [agentId, rel] of relationship.relationships) {
+            baseline.knownAgents.set(agentId, rel.trust);
+          }
+          this.relationshipBaselines.set(entity.id, baseline);
+          return undefined; // No change on first observation
+        }
+        // Check for significant trust changes
+        for (const [agentId, rel] of relationship.relationships) {
+          const previousTrust = baseline.knownAgents.get(agentId);
+          if (previousTrust !== undefined) {
+            const delta = rel.trust - previousTrust;
+            if (Math.abs(delta) >= Math.abs(trigger.delta_threshold)) {
+              // Direction check
+              if ((trigger.delta_threshold > 0 && delta > 0) ||
+                  (trigger.delta_threshold < 0 && delta < 0)) {
+                // Update baseline
+                baseline.knownAgents.set(agentId, rel.trust);
+                baseline.capturedAt = currentTick;
+                return {
+                  trigger_type: 'on_relationship_change',
+                  entity_id: entity.id,
+                  soul_id: soulId,
+                  personal_tick: currentTick,
+                  involved_agent_id: agentId,
+                  data: {
+                    delta,
+                    old_trust: previousTrust,
+                    new_trust: rel.trust,
+                  },
+                };
+              }
+            }
+          }
+        }
+        // Update baseline with current values
+        for (const [agentId, rel] of relationship.relationships) {
+          baseline.knownAgents.set(agentId, rel.trust);
+        }
+        baseline.capturedAt = currentTick;
         return undefined;
       }
 
       case 'on_relationship_formed': {
-        // This trigger requires tracking new relationships - skip for now
+        if (!relationship) return undefined;
+        // Get or create baseline for this entity
+        let baseline = this.relationshipBaselines.get(entity.id);
+        if (!baseline) {
+          baseline = {
+            knownAgents: new Map(),
+            capturedAt: currentTick,
+          };
+          for (const [agentId, rel] of relationship.relationships) {
+            baseline.knownAgents.set(agentId, rel.trust);
+          }
+          this.relationshipBaselines.set(entity.id, baseline);
+          return undefined;
+        }
+        // Check for new relationships
+        for (const [agentId, rel] of relationship.relationships) {
+          if (!baseline.knownAgents.has(agentId)) {
+            // New relationship found
+            if (trigger.min_initial_trust === undefined ||
+                rel.trust >= trigger.min_initial_trust) {
+              baseline.knownAgents.set(agentId, rel.trust);
+              baseline.capturedAt = currentTick;
+              return {
+                trigger_type: 'on_relationship_formed',
+                entity_id: entity.id,
+                soul_id: soulId,
+                personal_tick: currentTick,
+                involved_agent_id: agentId,
+                data: {
+                  initial_trust: rel.trust,
+                  initial_affinity: rel.affinity,
+                },
+              };
+            }
+          }
+        }
         return undefined;
       }
 
       case 'on_death_nearby': {
-        // Requires event-based detection - skip for now
+        if (!position) return undefined;
+        if (!relationship) return undefined;
+        // Clean old deaths
+        this.recentDeaths = this.recentDeaths.filter(
+          d => currentTick - d.tick < EventDrivenPlotAssignmentSystem.DEATH_RETENTION_TICKS
+        );
+        // Check for nearby deaths
+        for (const death of this.recentDeaths) {
+          const dx = death.position.x - position.x;
+          const dy = death.position.y - position.y;
+          const distSq = dx * dx + dy * dy;
+          const maxDistSq = EventDrivenPlotAssignmentSystem.NEARBY_DEATH_DISTANCE ** 2;
+          if (distSq <= maxDistSq) {
+            // Check relationship trust if required
+            if (trigger.min_relationship_trust !== undefined) {
+              const rel = relationship.relationships.get(death.deceasedId);
+              if (!rel || rel.trust < trigger.min_relationship_trust) {
+                continue; // Didn't know them well enough
+              }
+            }
+            return {
+              trigger_type: 'on_death_nearby',
+              entity_id: entity.id,
+              soul_id: soulId,
+              personal_tick: currentTick,
+              involved_agent_id: death.deceasedId,
+              involved_soul_id: death.deceasedSoulId,
+              data: {
+                distance: Math.sqrt(distSq),
+                relationship_trust: relationship.relationships.get(death.deceasedId)?.trust,
+              },
+            };
+          }
+        }
         return undefined;
       }
 
       case 'on_skill_mastery': {
-        // Requires skill component check - skip for now
+        if (!skills) return undefined;
+        const skillId = trigger.skill as SkillId;
+        const currentLevel = skills.levels[skillId];
+        if (currentLevel === undefined) return undefined;
+        if (currentLevel >= trigger.min_level) {
+          return {
+            trigger_type: 'on_skill_mastery',
+            entity_id: entity.id,
+            soul_id: soulId,
+            personal_tick: currentTick,
+            data: {
+              skill: trigger.skill,
+              level: currentLevel,
+            },
+          };
+        }
         return undefined;
       }
 
@@ -367,6 +496,14 @@ export class EventDrivenPlotAssignmentSystem implements System {
         return `stress:${trigger.min ?? 'none'}_${trigger.max ?? 'none'}:${soulId}`;
       case 'on_social_isolation':
         return `isolation:${soulId}`;
+      case 'on_skill_mastery':
+        return `skill:${trigger.skill}:${trigger.min_level}:${soulId}`;
+      case 'on_relationship_change':
+        return `rel_change:${event.involved_agent_id}:${soulId}`;
+      case 'on_relationship_formed':
+        return `rel_formed:${event.involved_agent_id}:${soulId}`;
+      case 'on_death_nearby':
+        return `death_nearby:${event.involved_agent_id}:${soulId}`;
       default:
         return `${trigger.type}:${soulId}`;
     }
@@ -620,6 +757,8 @@ export class EventDrivenPlotAssignmentSystem implements System {
    */
   destroy(): void {
     this.conditionCooldowns.clear();
+    this.relationshipBaselines.clear();
+    this.recentDeaths = [];
   }
 }
 
