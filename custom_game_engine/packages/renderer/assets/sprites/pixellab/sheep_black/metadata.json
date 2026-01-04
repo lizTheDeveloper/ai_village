@@ -1,0 +1,18 @@
+{
+  "id": "sheep_black",
+  "base_species": "sheep",
+  "variant": "black",
+  "description": "black sheep",
+  "size": 48,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-03T23:58:17.567Z"
+}
