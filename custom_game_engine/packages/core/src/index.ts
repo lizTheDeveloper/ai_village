@@ -10,6 +10,8 @@
 
 export * from './types.js';
 export type { EntityId, SystemId } from './types.js';
+// Re-export ComponentType enum for test compatibility
+export { ComponentType } from './types/ComponentType.js';
 export * from './ecs/index.js';
 // Explicit ECS type re-exports for renderer package
 export type { World, WorldMutator, Entity, ITile, TerrainType, Component } from './ecs/index.js';
@@ -458,6 +460,16 @@ export {
   resolveSpectrum,
   CONFIGURATION_QUESTIONS,
 } from './magic/index.js';
+
+// Magic System Managers - UI integration support
+export {
+  SkillTreeManager,
+  SpellLearningManager,
+  ManaManager,
+  CooldownManager,
+  DivineSpellManager,
+  SpellCaster,
+} from './systems/magic/index.js';
 
 // Divinity system (forward-compatibility - Phase 31)
 // Note: Prayer and PrayerType are already exported from components/SpiritualComponent

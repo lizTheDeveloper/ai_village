@@ -66,6 +66,8 @@ import {
   exploreFrontierBehavior,
   exploreSpiralBehavior,
   followGradientBehavior,
+  materialTransportBehavior,
+  tileBuildBehavior,
 } from '../behavior/behaviors/index.js';
 
 // Reporter-specific behaviors
@@ -149,6 +151,8 @@ export class AgentBrainSystem implements System {
 
     // Build behaviors
     this.behaviors.register('build', buildBehavior, { description: 'Construct a building' });
+    this.behaviors.register('material_transport', materialTransportBehavior, { description: 'Transport materials to construction site' });
+    this.behaviors.register('tile_build', tileBuildBehavior, { description: 'Place tiles at construction site' });
 
     // Crafting behaviors
     this.behaviors.register('craft', craftBehavior, { description: 'Craft items at stations' });

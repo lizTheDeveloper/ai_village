@@ -6,16 +6,20 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { WorldImpl, EntityImpl, createEntityId, EventBusImpl, ComponentType as CT } from '@ai-village/core';
-import type { MagicComponent } from '@ai-village/core';
-import { SkillTreeManager } from '@ai-village/core/src/systems/magic/SkillTreeManager.js';
-import { SpellLearningManager } from '@ai-village/core/src/systems/magic/SpellLearningManager.js';
 import {
+  WorldImpl,
+  EntityImpl,
+  createEntityId,
+  EventBusImpl,
+  ComponentType as CT,
+  SkillTreeManager,
+  SpellLearningManager,
   createSkillNode,
   createSkillEffect,
   createSkillTree,
   MagicSkillTreeRegistry,
-} from '@ai-village/core/src/magic/index.js';
+} from '@ai-village/core';
+import type { MagicComponent } from '@ai-village/core';
 import { SkillTreePanel } from '../SkillTreePanel.js';
 import type { WindowManager } from '../../../WindowManager.js';
 
@@ -204,7 +208,8 @@ describe('SkillTreePanel Backend Integration', () => {
         'xp-paradigm',
         'XP Tree',
         'Testing XP tracking',
-        [createSkillNode('node-1', 'Node 1', 'xp-paradigm', 'foundation', 0, 25, [])],
+        // Node costs 100 XP (won't auto-unlock when we grant 25 total)
+        [createSkillNode('node-1', 'Node 1', 'xp-paradigm', 'foundation', 0, 100, [])],
         []
       );
       registry.register(tree);
@@ -235,7 +240,7 @@ describe('SkillTreePanel Backend Integration', () => {
 
       panel.setSelectedEntity(entity);
 
-      // Grant XP multiple times
+      // Grant XP multiple times - should accumulate without auto-unlock
       skillTreeManager.grantSkillXP(entity, 'xp-paradigm', 10);
       let magic = entity.getComponent<MagicComponent>(CT.Magic);
       expect(magic?.skillTreeState?.['xp-paradigm']?.xp).toBe(10);
@@ -244,9 +249,9 @@ describe('SkillTreePanel Backend Integration', () => {
       magic = entity.getComponent<MagicComponent>(CT.Magic);
       expect(magic?.skillTreeState?.['xp-paradigm']?.xp).toBe(25);
 
-      // Verify node becomes available
+      // Verify node is NOT available yet (needs 100 XP)
       const progress = skillTreeManager.getSkillTreeProgress(entity, 'xp-paradigm');
-      expect(progress?.availableNodes).toContain('node-1');
+      expect(progress?.availableNodes).not.toContain('node-1');
     });
 
     it('should reflect XP deduction after unlock', () => {

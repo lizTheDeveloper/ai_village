@@ -35,6 +35,24 @@ export function createTree(
     woodMaterial?: string;
   }
 ): string {
+  // Check if a tree already exists at this position (prevent duplicates on reload)
+  const existingEntities = world.query()
+    .with('position')
+    .with('tags')
+    .executeEntities();
+
+  for (const existing of existingEntities) {
+    const pos = existing.getComponent('position') as any;
+    const tags = existing.getComponent('tags') as any;
+
+    if (pos && tags &&
+        Math.abs(pos.x - x) < 0.1 && Math.abs(pos.y - y) < 0.1 &&
+        tags.tags?.includes('tree')) {
+      // Tree already exists at this position
+      return existing.id;
+    }
+  }
+
   const entity = new EntityImpl(createEntityId(), world.tick);
   const useVoxel = options?.useVoxelResource ?? false;
   const treeHeight = options?.treeHeight ?? 4;

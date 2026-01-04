@@ -7,6 +7,12 @@
 
 import { ComponentType } from '../types/ComponentType.js';
 import type { WisdomDomain } from '../soul/SoulIdentityComponent.js';
+import type {
+  EmotionalState,
+  TraumaType,
+  BreakdownType,
+  MoodFactors,
+} from '../components/MoodComponent.js';
 
 /**
  * Plot scale determines scope and duration
@@ -51,8 +57,14 @@ export interface PlotLesson {
 
 /**
  * Condition for plot transitions
+ *
+ * Conditions are evaluated against the current game state to determine
+ * if a plot transition should occur.
  */
 export type PlotCondition =
+  // ============================================================================
+  // Core Conditions (Original)
+  // ============================================================================
   | { type: 'has_item'; item_id: string }
   | { type: 'at_location'; location: { x: number; y: number }; radius: number }
   | { type: 'has_relationship'; agent_id: string; min_trust: number }
@@ -62,19 +74,125 @@ export type PlotCondition =
   | { type: 'universe_tick_elapsed'; ticks: number }
   | { type: 'choice_made'; choice_id: string }
   | { type: 'lesson_learned'; lesson_id: string }
-  | { type: 'custom'; check: (context: any) => boolean };
+  | { type: 'custom'; check: (context: PlotConditionContext) => boolean }
+
+  // ============================================================================
+  // Emotional Conditions (Phase 1)
+  // ============================================================================
+  /** Check if agent is in a specific emotional state */
+  | { type: 'emotional_state'; state: EmotionalState; duration_ticks?: number }
+  /** Check if mood is within a range (-100 to 100) */
+  | { type: 'mood_threshold'; min?: number; max?: number }
+  /** Check if a specific mood factor is within a range */
+  | { type: 'mood_factor'; factor: keyof MoodFactors; min?: number; max?: number }
+  /** Check if agent has experienced a specific trauma */
+  | { type: 'has_trauma'; trauma_type: TraumaType; recency_ticks?: number }
+  /** Check if stress level is within a range (0-100) */
+  | { type: 'stress_threshold'; min?: number; max?: number }
+  /** Check if agent is in a breakdown state */
+  | { type: 'in_breakdown'; breakdown_type?: BreakdownType }
+  /** Check if agent has recovered from a breakdown */
+  | { type: 'breakdown_recovered'; since_ticks?: number }
+
+  // ============================================================================
+  // Relationship Conditions with Role Binding (Phase 1)
+  // ============================================================================
+  /** Check relationship with a dynamically bound agent role */
+  | { type: 'has_relationship_with_role'; role: string; min_trust?: number; max_trust?: number; min_affinity?: number; max_affinity?: number }
+  /** Check if a relationship has changed recently */
+  | { type: 'relationship_changed'; role: string; trust_delta?: number; affinity_delta?: number; recency_ticks?: number }
+  /** Check if agent has been socially isolated */
+  | { type: 'social_isolation'; min_ticks: number }
+  /** Check if any relationship meets criteria */
+  | { type: 'any_relationship'; min_trust?: number; max_trust?: number; min_affinity?: number; max_affinity?: number }
+
+  // ============================================================================
+  // Structural Conditions (Phase 1)
+  // ============================================================================
+  /** Negate a condition */
+  | { type: 'not'; condition: PlotCondition }
+  /** All conditions must be true (AND) */
+  | { type: 'all'; conditions: PlotCondition[] }
+  /** Any condition must be true (OR) */
+  | { type: 'any'; conditions: PlotCondition[] };
+
+/**
+ * Context passed to condition evaluators
+ */
+export interface PlotConditionContext {
+  /** The entity being evaluated */
+  entityId: string;
+  /** Current personal tick */
+  personalTick: number;
+  /** Current universe tick */
+  universeTick: number;
+  /** Bound agents for role-based conditions */
+  boundAgents: Record<string, string>;
+  /** The plot instance being evaluated */
+  plot: PlotLineInstance;
+  /** Access to world for component queries */
+  world: unknown; // Avoids circular import, cast to World in implementation
+}
 
 /**
  * Effect of plot progression
+ *
+ * Effects are applied when a plot transitions between stages or
+ * when entering/exiting a stage.
  */
 export type PlotEffect =
+  // ============================================================================
+  // Core Effects (Original)
+  // ============================================================================
   | { type: 'grant_item'; item_id: string; quantity: number }
   | { type: 'grant_skill_xp'; skill: string; xp: number }
   | { type: 'modify_relationship'; agent_id: string; trust_delta: number }
   | { type: 'learn_lesson'; lesson_id: string }
   | { type: 'spawn_attractor'; attractor_id: string; details: Record<string, any> }
   | { type: 'queue_event'; event_type: string; details: Record<string, any> }
-  | { type: 'custom'; apply: (context: any) => void };
+  | { type: 'custom'; apply: (context: PlotEffectContext) => void }
+
+  // ============================================================================
+  // Emotional Effects (Phase 1)
+  // ============================================================================
+  /** Modify overall mood by delta (-100 to 100) */
+  | { type: 'modify_mood'; delta: number }
+  /** Modify a specific mood factor */
+  | { type: 'modify_mood_factor'; factor: keyof MoodFactors; delta: number }
+  /** Add a trauma to the agent */
+  | { type: 'add_trauma'; trauma_type: TraumaType; severity?: number; description?: string }
+  /** Modify stress level */
+  | { type: 'modify_stress'; delta: number }
+  /** Trigger a mental breakdown */
+  | { type: 'trigger_breakdown'; breakdown_type: BreakdownType }
+  /** Set emotional state for a duration */
+  | { type: 'set_emotional_state'; state: EmotionalState; duration_ticks: number }
+
+  // ============================================================================
+  // Relationship Effects with Role Binding (Phase 1)
+  // ============================================================================
+  /** Modify relationship with a bound agent role */
+  | { type: 'modify_relationship_by_role'; role: string; trust_delta?: number; affinity_delta?: number }
+  /** Create a new relationship with a role binding */
+  | { type: 'bind_relationship'; role: string; agent_id: string; initial_trust?: number; initial_affinity?: number };
+
+/**
+ * Context passed to effect executors
+ */
+export interface PlotEffectContext {
+  /** The entity receiving the effect */
+  entityId: string;
+  /** Current personal tick */
+  personalTick: number;
+  /** Current universe ID */
+  universeId: string;
+  /** Bound agents for role-based effects */
+  boundAgents: Record<string, string>;
+  /** The plot instance */
+  plot: PlotLineInstance;
+  /** Access to world for component updates */
+  world: unknown; // Avoids circular import, cast to World in implementation
+}
 
 /**
  * Transition between plot stages
@@ -170,6 +288,29 @@ export interface PlotLineInstance {
 
   // Parameters (bound from template)
   parameters: Record<string, any>;
+
+  // ============================================================================
+  // Bound Agents (Phase 1)
+  // ============================================================================
+  /**
+   * Dynamically bound agents for role-based conditions and effects.
+   *
+   * Example: { 'betrayer': 'agent-123', 'victim': 'agent-456' }
+   *
+   * Roles are defined in the plot template and bound when the plot is assigned,
+   * either by event triggers or explicit assignment.
+   */
+  bound_agents: Record<string, string>;
+
+  /**
+   * Relationship snapshot at binding time.
+   * Used to detect relationship changes (e.g., trust dropped by 30).
+   */
+  relationship_snapshots?: Record<string, {
+    trust: number;
+    affinity: number;
+    captured_at_tick: number;
+  }>;
 
   // Suspended state
   suspended_reason?: string;

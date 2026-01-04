@@ -12,7 +12,9 @@ export type {
   PlotForkBehavior,
   PlotLesson,
   PlotCondition,
+  PlotConditionContext,
   PlotEffect,
+  PlotEffectContext,
   PlotTransition,
   PlotStage,
   PlotLineTemplate,
@@ -47,3 +49,19 @@ export {
   ALL_PLOT_TEMPLATES,
   initializePlotTemplates,
 } from './PlotTemplates.js';
+
+// Plot Condition Evaluator (Phase 1)
+export {
+  evaluateCondition,
+  evaluateTransitionConditions,
+  createConditionContext,
+} from './PlotConditionEvaluator.js';
+
+// Plot Effect Executor (Phase 1)
+export {
+  executeEffect,
+  executeEffects,
+  createEffectContext,
+  captureRelationshipSnapshot,
+  captureAllRelationshipSnapshots,
+} from './PlotEffectExecutor.js';

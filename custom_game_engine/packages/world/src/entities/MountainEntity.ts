@@ -14,6 +14,24 @@ import {
  * @param z Height of the mountain peak (higher = taller mountain)
  */
 export function createMountain(world: WorldMutator, x: number, y: number, z: number = 3): string {
+  // Check if a mountain already exists at this position (prevent duplicates on reload)
+  const existingEntities = world.query()
+    .with('position')
+    .with('tags')
+    .executeEntities();
+
+  for (const existing of existingEntities) {
+    const pos = existing.getComponent('position') as any;
+    const tags = existing.getComponent('tags') as any;
+
+    if (pos && tags &&
+        Math.abs(pos.x - x) < 0.1 && Math.abs(pos.y - y) < 0.1 &&
+        tags.tags?.includes('mountain')) {
+      // Mountain already exists at this position
+      return existing.id;
+    }
+  }
+
   const entity = new EntityImpl(createEntityId(), world.tick);
 
   // Position with height
