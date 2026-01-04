@@ -7,7 +7,7 @@
  * - Relationship effects with role binding
  */
 
-import type { World } from '../ecs/World.js';
+import type { World, WorldMutator } from '../ecs/World.js';
 import type {
   PlotEffect,
   PlotEffectContext,
@@ -34,7 +34,7 @@ export function executeEffect(
   effect: PlotEffect,
   context: PlotEffectContext
 ): void {
-  const world = context.world as World;
+  const world = context.world as WorldMutator;
 
   switch (effect.type) {
     // ========================================================================

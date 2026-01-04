@@ -189,6 +189,17 @@ export class Renderer {
     // Update sprite direction
     this.pixelLabLoader.setDirection(instanceId, direction);
 
+    // Determine if entity is moving and set appropriate animation
+    const isMoving = velocity && (Math.abs(velocity.dx) > 0.01 || Math.abs(velocity.dy) > 0.01);
+
+    if (isMoving) {
+      // Play walking animation when moving
+      this.pixelLabLoader.setAnimation(instanceId, 'walking-8-frames', true);
+    } else {
+      // Stop animation when idle (will show static rotation)
+      this.pixelLabLoader.setAnimation(instanceId, 'idle', false);
+    }
+
     // Calculate scale to fit the size
     // PixelLab sprites are 48x48, we want them to fit in `size` pixels
     const scale = size / 48;

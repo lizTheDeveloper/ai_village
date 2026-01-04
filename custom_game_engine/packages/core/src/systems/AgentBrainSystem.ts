@@ -25,6 +25,8 @@ import {
   advanceBehaviorQueue,
   hasQueuedBehaviorTimedOut,
 } from '../components/AgentComponent.js';
+import type { TemperatureComponent } from '../components/TemperatureComponent.js';
+import type { NeedsComponent } from '../components/NeedsComponent.js';
 
 // Perception module
 import { PerceptionProcessor } from '../perception/index.js';
@@ -272,7 +274,9 @@ export class AgentBrainSystem implements System {
     const autonomicResult = this.decision.processAutonomic(entity);
 
     if (autonomicResult) {
-      const currentPriority = getBehaviorPriority(agent.behavior);
+      const temperature = entity.getComponent(CT.Temperature) as TemperatureComponent | undefined;
+      const needs = entity.getComponent(CT.Needs) as NeedsComponent | undefined;
+      const currentPriority = getBehaviorPriority(agent.behavior, temperature, needs);
 
       if (autonomicResult.priority > currentPriority) {
         const fromBehavior = agent.behavior;

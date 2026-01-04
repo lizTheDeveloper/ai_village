@@ -1,8 +1,8 @@
 {
   "character": {
-    "id": "ec884414-4786-4156-ba45-a7f6b31dc5a4",
-    "name": "cat_orange",
-    "prompt": "Orange tabby cat, striped fur, sitting pose, top-down view",
+    "id": "581331c3-cd91-42ca-a2f1-6539463ca88c",
+    "name": "chicken",
+    "prompt": "Small farm chicken, red-brown feathers, red comb, yellow beak, pecking pose, top-down farm animal",
     "size": {
       "width": 32,
       "height": 32
@@ -10,7 +10,7 @@
     "template_id": "mannequin",
     "directions": 8,
     "view": "high top-down",
-    "created_at": "2026-01-03T13:07:34.892048+00:00"
+    "created_at": "2026-01-03T13:07:20.409015+00:00"
   },
   "frames": {
     "rotations": {
@@ -45,6 +45,16 @@
           "animations/walking-8-frames/west/frame_006.png",
           "animations/walking-8-frames/west/frame_007.png"
         ],
+        "south": [
+          "animations/walking-8-frames/south/frame_000.png",
+          "animations/walking-8-frames/south/frame_001.png",
+          "animations/walking-8-frames/south/frame_002.png",
+          "animations/walking-8-frames/south/frame_003.png",
+          "animations/walking-8-frames/south/frame_004.png",
+          "animations/walking-8-frames/south/frame_005.png",
+          "animations/walking-8-frames/south/frame_006.png",
+          "animations/walking-8-frames/south/frame_007.png"
+        ],
         "north-west": [
           "animations/walking-8-frames/north-west/frame_000.png",
           "animations/walking-8-frames/north-west/frame_001.png",
@@ -54,6 +64,16 @@
           "animations/walking-8-frames/north-west/frame_005.png",
           "animations/walking-8-frames/north-west/frame_006.png",
           "animations/walking-8-frames/north-west/frame_007.png"
+        ],
+        "south-west": [
+          "animations/walking-8-frames/south-west/frame_000.png",
+          "animations/walking-8-frames/south-west/frame_001.png",
+          "animations/walking-8-frames/south-west/frame_002.png",
+          "animations/walking-8-frames/south-west/frame_003.png",
+          "animations/walking-8-frames/south-west/frame_004.png",
+          "animations/walking-8-frames/south-west/frame_005.png",
+          "animations/walking-8-frames/south-west/frame_006.png",
+          "animations/walking-8-frames/south-west/frame_007.png"
         ],
         "north-east": [
           "animations/walking-8-frames/north-east/frame_000.png",
@@ -65,26 +85,6 @@
           "animations/walking-8-frames/north-east/frame_006.png",
           "animations/walking-8-frames/north-east/frame_007.png"
         ],
-        "south": [
-          "animations/walking-8-frames/south/frame_000.png",
-          "animations/walking-8-frames/south/frame_001.png",
-          "animations/walking-8-frames/south/frame_002.png",
-          "animations/walking-8-frames/south/frame_003.png",
-          "animations/walking-8-frames/south/frame_004.png",
-          "animations/walking-8-frames/south/frame_005.png",
-          "animations/walking-8-frames/south/frame_006.png",
-          "animations/walking-8-frames/south/frame_007.png"
-        ],
-        "east": [
-          "animations/walking-8-frames/east/frame_000.png",
-          "animations/walking-8-frames/east/frame_001.png",
-          "animations/walking-8-frames/east/frame_002.png",
-          "animations/walking-8-frames/east/frame_003.png",
-          "animations/walking-8-frames/east/frame_004.png",
-          "animations/walking-8-frames/east/frame_005.png",
-          "animations/walking-8-frames/east/frame_006.png",
-          "animations/walking-8-frames/east/frame_007.png"
-        ],
         "south-east": [
           "animations/walking-8-frames/south-east/frame_000.png",
           "animations/walking-8-frames/south-east/frame_001.png",
@@ -95,15 +95,15 @@
           "animations/walking-8-frames/south-east/frame_006.png",
           "animations/walking-8-frames/south-east/frame_007.png"
         ],
-        "south-west": [
-          "animations/walking-8-frames/south-west/frame_000.png",
-          "animations/walking-8-frames/south-west/frame_001.png",
-          "animations/walking-8-frames/south-west/frame_002.png",
-          "animations/walking-8-frames/south-west/frame_003.png",
-          "animations/walking-8-frames/south-west/frame_004.png",
-          "animations/walking-8-frames/south-west/frame_005.png",
-          "animations/walking-8-frames/south-west/frame_006.png",
-          "animations/walking-8-frames/south-west/frame_007.png"
+        "east": [
+          "animations/walking-8-frames/east/frame_000.png",
+          "animations/walking-8-frames/east/frame_001.png",
+          "animations/walking-8-frames/east/frame_002.png",
+          "animations/walking-8-frames/east/frame_003.png",
+          "animations/walking-8-frames/east/frame_004.png",
+          "animations/walking-8-frames/east/frame_005.png",
+          "animations/walking-8-frames/east/frame_006.png",
+          "animations/walking-8-frames/east/frame_007.png"
         ]
       }
     }
@@ -3204,6 +3204,1032 @@
           }
         ]
       ],
+      "walking-8-frames_south": [
+        [
+          {
+            "x": 0.5011599917677292,
+            "y": 0.3544148770043709,
+            "depth": 149.0,
+            "z_index": 17,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.5048528119432538,
+            "y": 0.4233827860157512,
+            "depth": 124.0,
+            "z_index": 6,
+            "label": "NECK"
+          },
+          {
+            "x": 0.4272989871718389,
+            "y": 0.42772592872046045,
+            "depth": 125.0,
+            "z_index": 8,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.40606002839240424,
+            "y": 0.5197997935656491,
+            "depth": 123.0,
+            "z_index": 5,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.40276544232984707,
+            "y": 0.6249661403380036,
+            "depth": 133.0,
+            "z_index": 13,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.5824066367146685,
+            "y": 0.4190396433110418,
+            "depth": 122.0,
+            "z_index": 4,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.595114799380895,
+            "y": 0.5138239154796902,
+            "depth": 120.0,
+            "z_index": 1,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.5984140670370242,
+            "y": 0.616323706347667,
+            "depth": 128.0,
+            "z_index": 11,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.45475245669890413,
+            "y": 0.5507895304704967,
+            "depth": 121.0,
+            "z_index": 3,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.45469470781093785,
+            "y": 0.6768343347280654,
+            "depth": 130.0,
+            "z_index": 12,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.46005186364581996,
+            "y": 0.7455493021735395,
+            "depth": 118.0,
+            "z_index": 0,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.5440629725719588,
+            "y": 0.5535997331635143,
+            "depth": 120.0,
+            "z_index": 2,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.5518189834168372,
+            "y": 0.6864730793305703,
+            "depth": 140.0,
+            "z_index": 14,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.5512678481230813,
+            "y": 0.7348082110531137,
+            "depth": 124.0,
+            "z_index": 7,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.4651622108539025,
+            "y": 0.3326721477451411,
+            "depth": 145.0,
+            "z_index": 15,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.5363795656715731,
+            "y": 0.33149894139166536,
+            "depth": 146.0,
+            "z_index": 16,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.40919228227548504,
+            "y": 0.2869121563210958,
+            "depth": 125.0,
+            "z_index": 9,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.5949766600518298,
+            "y": 0.28385160607922094,
+            "depth": 125.0,
+            "z_index": 10,
+            "label": "LEFT EAR"
+          }
+        ],
+        [
+          {
+            "x": 0.4921874830880367,
+            "y": 0.3542101471552793,
+            "depth": 149.0,
+            "z_index": 17,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.4994625063629609,
+            "y": 0.4250219365158673,
+            "depth": 124.0,
+            "z_index": 7,
+            "label": "NECK"
+          },
+          {
+            "x": 0.42172141784866884,
+            "y": 0.4300047144577525,
+            "depth": 126.0,
+            "z_index": 9,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.3983747724010662,
+            "y": 0.5350031054281601,
+            "depth": 129.0,
+            "z_index": 11,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.40582911594575083,
+            "y": 0.6431694889197358,
+            "depth": 145.0,
+            "z_index": 13,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.5772035948772529,
+            "y": 0.4200391585739821,
+            "depth": 123.0,
+            "z_index": 6,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.5863220094719936,
+            "y": 0.49104548038466644,
+            "depth": 113.0,
+            "z_index": 2,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.5913720269136025,
+            "y": 0.5770646675334317,
+            "depth": 112.0,
+            "z_index": 1,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.45494316007413943,
+            "y": 0.548764088475585,
+            "depth": 119.0,
+            "z_index": 3,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.44809182794290925,
+            "y": 0.6591125095344276,
+            "depth": 120.0,
+            "z_index": 4,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.4583591305317653,
+            "y": 0.7097034784058385,
+            "depth": 104.0,
+            "z_index": 0,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.5442762759477213,
+            "y": 0.555057627903857,
+            "depth": 121.0,
+            "z_index": 5,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.5453885699471117,
+            "y": 0.6881115344001035,
+            "depth": 142.0,
+            "z_index": 12,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.5490388693989683,
+            "y": 0.8026346278615135,
+            "depth": 148.0,
+            "z_index": 16,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.45666004910295577,
+            "y": 0.33174099641947524,
+            "depth": 145.0,
+            "z_index": 14,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.5278542175666636,
+            "y": 0.3319965530224719,
+            "depth": 146.0,
+            "z_index": 15,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.4024698740287742,
+            "y": 0.2861405567204502,
+            "depth": 124.0,
+            "z_index": 8,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.5881937881469157,
+            "y": 0.28680724593215856,
+            "depth": 126.0,
+            "z_index": 10,
+            "label": "LEFT EAR"
+          }
+        ],
+        [
+          {
+            "x": 0.4933795557818316,
+            "y": 0.34945568981395553,
+            "depth": 148.0,
+            "z_index": 17,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.49855310219465715,
+            "y": 0.42347392893360525,
+            "depth": 124.0,
+            "z_index": 8,
+            "label": "NECK"
+          },
+          {
+            "x": 0.42078897737747833,
+            "y": 0.4269775741635505,
+            "depth": 125.0,
+            "z_index": 9,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.3957396538921978,
+            "y": 0.5325066589023811,
+            "depth": 129.0,
+            "z_index": 11,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.40402284264518634,
+            "y": 0.64028675742537,
+            "depth": 146.0,
+            "z_index": 15,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.576317227011836,
+            "y": 0.4199702837036602,
+            "depth": 123.0,
+            "z_index": 6,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.5796166100918696,
+            "y": 0.477349446261295,
+            "depth": 109.0,
+            "z_index": 2,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.5821860939516075,
+            "y": 0.5560026408486849,
+            "depth": 105.0,
+            "z_index": 1,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.45626673983943933,
+            "y": 0.5506056631138245,
+            "depth": 119.0,
+            "z_index": 4,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.44798059161753595,
+            "y": 0.6447041512945606,
+            "depth": 113.0,
+            "z_index": 3,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.4575668146807997,
+            "y": 0.6663731754990129,
+            "depth": 91.0,
+            "z_index": 0,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.5454790853731253,
+            "y": 0.5539016938846781,
+            "depth": 121.0,
+            "z_index": 5,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.5403811393093565,
+            "y": 0.687002759053942,
+            "depth": 140.0,
+            "z_index": 12,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.5396108832750446,
+            "y": 0.8024887038198392,
+            "depth": 147.0,
+            "z_index": 16,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.4576337143759252,
+            "y": 0.3273550407308776,
+            "depth": 144.0,
+            "z_index": 13,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.5288476918901461,
+            "y": 0.3268760420695158,
+            "depth": 145.0,
+            "z_index": 14,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.4025225442649365,
+            "y": 0.2839831867898217,
+            "depth": 123.0,
+            "z_index": 7,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.5882981405906167,
+            "y": 0.28273363834182114,
+            "depth": 125.0,
+            "z_index": 10,
+            "label": "LEFT EAR"
+          }
+        ],
+        [
+          {
+            "x": 0.49561177676342577,
+            "y": 0.3454574988586774,
+            "depth": 146.0,
+            "z_index": 17,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.49779780048142935,
+            "y": 0.42164010233781934,
+            "depth": 123.0,
+            "z_index": 7,
+            "label": "NECK"
+          },
+          {
+            "x": 0.4200854178922196,
+            "y": 0.42006301336628016,
+            "depth": 123.0,
+            "z_index": 8,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.3991152213662458,
+            "y": 0.5162983913358002,
+            "depth": 122.0,
+            "z_index": 4,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.39917104960043887,
+            "y": 0.6242185664474085,
+            "depth": 136.0,
+            "z_index": 13,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.5755101830706391,
+            "y": 0.4232171913093584,
+            "depth": 123.0,
+            "z_index": 9,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.5836350794808134,
+            "y": 0.4888136668836158,
+            "depth": 111.0,
+            "z_index": 1,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.5813503879464119,
+            "y": 0.5812859041146131,
+            "depth": 113.0,
+            "z_index": 2,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.45875682128670164,
+            "y": 0.5537276038755592,
+            "depth": 119.0,
+            "z_index": 3,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.43929522442819885,
+            "y": 0.6749178159647289,
+            "depth": 126.0,
+            "z_index": 11,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.4487526990512783,
+            "y": 0.6667863798046552,
+            "depth": 99.0,
+            "z_index": 0,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.5470008156639874,
+            "y": 0.551323531336512,
+            "depth": 122.0,
+            "z_index": 5,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.5370886008668676,
+            "y": 0.6840000926106651,
+            "depth": 140.0,
+            "z_index": 14,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.5377093413920737,
+            "y": 0.7739991430129937,
+            "depth": 135.0,
+            "z_index": 12,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.46015231476154433,
+            "y": 0.3229242323769814,
+            "depth": 143.0,
+            "z_index": 15,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.5313619407945607,
+            "y": 0.32331998194303,
+            "depth": 143.0,
+            "z_index": 16,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.40571987876240573,
+            "y": 0.27961412983836464,
+            "depth": 122.0,
+            "z_index": 6,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.5914841266097823,
+            "y": 0.2806464436748795,
+            "depth": 123.0,
+            "z_index": 10,
+            "label": "LEFT EAR"
+          }
+        ],
+        [
+          {
+            "x": 0.49510891059234835,
+            "y": 0.34733570522978274,
+            "depth": 147.0,
+            "z_index": 17,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.4975759857469391,
+            "y": 0.4224718555615101,
+            "depth": 123.0,
+            "z_index": 7,
+            "label": "NECK"
+          },
+          {
+            "x": 0.4198225099392018,
+            "y": 0.42034126784986364,
+            "depth": 123.0,
+            "z_index": 8,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.4038083757964651,
+            "y": 0.5035836603355964,
+            "depth": 117.0,
+            "z_index": 0,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.3966921965906193,
+            "y": 0.6032748074580173,
+            "depth": 122.0,
+            "z_index": 4,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.5753294615546765,
+            "y": 0.42460244327315666,
+            "depth": 124.0,
+            "z_index": 10,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.5953582237788106,
+            "y": 0.5206358026916048,
+            "depth": 123.0,
+            "z_index": 9,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.6008347556328208,
+            "y": 0.6224090680204069,
+            "depth": 130.0,
+            "z_index": 12,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.4579107779166072,
+            "y": 0.5539919170646995,
+            "depth": 120.0,
+            "z_index": 2,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.4469964181522887,
+            "y": 0.6867566370290121,
+            "depth": 139.0,
+            "z_index": 14,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.44588068452054025,
+            "y": 0.7322847347014679,
+            "depth": 122.0,
+            "z_index": 5,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.5468967079189644,
+            "y": 0.5508945276582027,
+            "depth": 121.0,
+            "z_index": 3,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.5418754171787408,
+            "y": 0.677449754406731,
+            "depth": 131.0,
+            "z_index": 13,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.5375236404888653,
+            "y": 0.745633323157805,
+            "depth": 119.0,
+            "z_index": 1,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.46059696457784177,
+            "y": 0.32335687172805794,
+            "depth": 143.0,
+            "z_index": 15,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.5317353579023525,
+            "y": 0.3266851142756536,
+            "depth": 144.0,
+            "z_index": 16,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.4078626173619328,
+            "y": 0.27726062699464327,
+            "depth": 122.0,
+            "z_index": 6,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.5934410234889373,
+            "y": 0.28594283124456665,
+            "depth": 125.0,
+            "z_index": 11,
+            "label": "LEFT EAR"
+          }
+        ],
+        [
+          {
+            "x": 0.5019656855378016,
+            "y": 0.34985936327293454,
+            "depth": 148.0,
+            "z_index": 15,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.5039571686128603,
+            "y": 0.42444913595401723,
+            "depth": 124.0,
+            "z_index": 7,
+            "label": "NECK"
+          },
+          {
+            "x": 0.42625178763770566,
+            "y": 0.4227425041826329,
+            "depth": 124.0,
+            "z_index": 8,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.4073080932223368,
+            "y": 0.4820124593632823,
+            "depth": 111.0,
+            "z_index": 2,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.39278971437496357,
+            "y": 0.5660916719996651,
+            "depth": 109.0,
+            "z_index": 1,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.581662549588015,
+            "y": 0.42615576772540154,
+            "depth": 124.0,
+            "z_index": 9,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.6075701929298867,
+            "y": 0.5380515266000849,
+            "depth": 132.0,
+            "z_index": 11,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.609799056230095,
+            "y": 0.6462902691074417,
+            "depth": 149.0,
+            "z_index": 16,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.4566234043217127,
+            "y": 0.5544376669704421,
+            "depth": 121.0,
+            "z_index": 5,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.4550982990358791,
+            "y": 0.68765092801327,
+            "depth": 140.0,
+            "z_index": 12,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.4518798650486428,
+            "y": 0.805374095625174,
+            "depth": 149.0,
+            "z_index": 17,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.5460284015861443,
+            "y": 0.5497575748965791,
+            "depth": 120.0,
+            "z_index": 3,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.5476990841174578,
+            "y": 0.6591451039919137,
+            "depth": 120.0,
+            "z_index": 4,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.5384105369957655,
+            "y": 0.7080667764452401,
+            "depth": 103.0,
+            "z_index": 0,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.466623514422211,
+            "y": 0.32713789982373526,
+            "depth": 144.0,
+            "z_index": 13,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.5378232070739946,
+            "y": 0.3279058175929174,
+            "depth": 145.0,
+            "z_index": 14,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.4125837597805477,
+            "y": 0.2831081974653447,
+            "depth": 123.0,
+            "z_index": 6,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.5983220972698122,
+            "y": 0.285111571962101,
+            "depth": 125.0,
+            "z_index": 10,
+            "label": "LEFT EAR"
+          }
+        ],
+        [
+          {
+            "x": 0.5014347260540157,
+            "y": 0.3463859932755195,
+            "depth": 147.0,
+            "z_index": 15,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.5045613665840544,
+            "y": 0.42278920517874097,
+            "depth": 123.0,
+            "z_index": 7,
+            "label": "NECK"
+          },
+          {
+            "x": 0.426737990059671,
+            "y": 0.42372547225481233,
+            "depth": 124.0,
+            "z_index": 9,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.4137479714522421,
+            "y": 0.47422200357742905,
+            "depth": 108.0,
+            "z_index": 2,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.39885337531315057,
+            "y": 0.5466863693122485,
+            "depth": 102.0,
+            "z_index": 1,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.5823847431084377,
+            "y": 0.42185293810266966,
+            "depth": 123.0,
+            "z_index": 8,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.6182666185113888,
+            "y": 0.5325939073346238,
+            "depth": 132.0,
+            "z_index": 11,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.6106490286299031,
+            "y": 0.6351272358360172,
+            "depth": 154.0,
+            "z_index": 17,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.4557238042598685,
+            "y": 0.5540729301463349,
+            "depth": 122.0,
+            "z_index": 5,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.45986766094489356,
+            "y": 0.6872305564923246,
+            "depth": 141.0,
+            "z_index": 12,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.4574679933506087,
+            "y": 0.8012566176837538,
+            "depth": 147.0,
+            "z_index": 16,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.5445319583643091,
+            "y": 0.5503547238139906,
+            "depth": 119.0,
+            "z_index": 4,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.5535329406784759,
+            "y": 0.6497867459168064,
+            "depth": 115.0,
+            "z_index": 3,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.5400148577073491,
+            "y": 0.6604013953541212,
+            "depth": 91.0,
+            "z_index": 0,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.46613460646392096,
+            "y": 0.323617827765466,
+            "depth": 143.0,
+            "z_index": 13,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.5373412476347634,
+            "y": 0.32449663630497505,
+            "depth": 144.0,
+            "z_index": 14,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.41196885508795983,
+            "y": 0.2804796854062841,
+            "depth": 122.0,
+            "z_index": 6,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.5977252910454709,
+            "y": 0.2827721345433776,
+            "depth": 124.0,
+            "z_index": 10,
+            "label": "LEFT EAR"
+          }
+        ],
+        [
+          {
+            "x": 0.5037977355933085,
+            "y": 0.34931994431878177,
+            "depth": 148.0,
+            "z_index": 17,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.5067241635497286,
+            "y": 0.4228455951683555,
+            "depth": 123.0,
+            "z_index": 6,
+            "label": "NECK"
+          },
+          {
+            "x": 0.42903833769249694,
+            "y": 0.4261612794307102,
+            "depth": 124.0,
+            "z_index": 8,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.4132913729533371,
+            "y": 0.4942667528416495,
+            "depth": 114.0,
+            "z_index": 2,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.4022843000918608,
+            "y": 0.5790082004097951,
+            "depth": 112.0,
+            "z_index": 1,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.5844099894069603,
+            "y": 0.4195299109060008,
+            "depth": 122.0,
+            "z_index": 5,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.6130494395541337,
+            "y": 0.5224372795523191,
+            "depth": 125.0,
+            "z_index": 10,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.6049842819400415,
+            "y": 0.6281158075318964,
+            "depth": 146.0,
+            "z_index": 16,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.4543499181399731,
+            "y": 0.5509344682812187,
+            "depth": 121.0,
+            "z_index": 4,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.46127561096752434,
+            "y": 0.6835077999549648,
+            "depth": 138.0,
+            "z_index": 13,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.46059338181984194,
+            "y": 0.7742655425548413,
+            "depth": 134.0,
+            "z_index": 12,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.542987161760345,
+            "y": 0.553823131237408,
+            "depth": 119.0,
+            "z_index": 3,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.5615411112023725,
+            "y": 0.6780488170951795,
+            "depth": 128.0,
+            "z_index": 11,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.548910171745302,
+            "y": 0.6692714397259775,
+            "depth": 101.0,
+            "z_index": 0,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.46850971185129986,
+            "y": 0.32646643716757695,
+            "depth": 144.0,
+            "z_index": 14,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.5397421987428679,
+            "y": 0.32749491408394205,
+            "depth": 145.0,
+            "z_index": 15,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.4135623236440298,
+            "y": 0.28165678728711385,
+            "depth": 123.0,
+            "z_index": 7,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.5993862133314087,
+            "y": 0.28433975985363563,
+            "depth": 124.0,
+            "z_index": 9,
+            "label": "LEFT EAR"
+          }
+        ]
+      ],
       "walking-8-frames_north-west": [
         [
           {
@@ -4226,6 +5252,1032 @@
             "y": 0.3363569035095927,
             "depth": 148.0,
             "z_index": 15,
+            "label": "LEFT EAR"
+          }
+        ]
+      ],
+      "walking-8-frames_south-west": [
+        [
+          {
+            "x": 0.4423657206071434,
+            "y": 0.34099753847793,
+            "depth": 143.0,
+            "z_index": 13,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.5139235809564929,
+            "y": 0.427843740379862,
+            "depth": 126.0,
+            "z_index": 7,
+            "label": "NECK"
+          },
+          {
+            "x": 0.4547021787235913,
+            "y": 0.39969139531623715,
+            "depth": 113.0,
+            "z_index": 2,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.4466252214856153,
+            "y": 0.4848002928115181,
+            "depth": 107.0,
+            "z_index": 0,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.41681872867413944,
+            "y": 0.5821023813608842,
+            "depth": 114.0,
+            "z_index": 3,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.5731449831893943,
+            "y": 0.4559960854434867,
+            "depth": 139.0,
+            "z_index": 11,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.5871124438102737,
+            "y": 0.5571180359273133,
+            "depth": 140.0,
+            "z_index": 12,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.5682873527799218,
+            "y": 0.6559291529425721,
+            "depth": 146.0,
+            "z_index": 15,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.4870134230419563,
+            "y": 0.5369540853827627,
+            "depth": 114.0,
+            "z_index": 4,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.4608421018750762,
+            "y": 0.6567673048438014,
+            "depth": 121.0,
+            "z_index": 6,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.49690184641938695,
+            "y": 0.7353222294887756,
+            "depth": 114.0,
+            "z_index": 5,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.5525984302403715,
+            "y": 0.5765648526632535,
+            "depth": 130.0,
+            "z_index": 8,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.5008430289357219,
+            "y": 0.6989846855310443,
+            "depth": 146.0,
+            "z_index": 16,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.5472582374322202,
+            "y": 0.7582163477321564,
+            "depth": 134.0,
+            "z_index": 9,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.4259965958583639,
+            "y": 0.30681331539196344,
+            "depth": 134.0,
+            "z_index": 10,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.4755213777338043,
+            "y": 0.33432640488290766,
+            "depth": 147.0,
+            "z_index": 17,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.44404420351019896,
+            "y": 0.252043619924234,
+            "depth": 109.0,
+            "z_index": 1,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.5732392715643719,
+            "y": 0.3238168751414372,
+            "depth": 143.0,
+            "z_index": 14,
+            "label": "LEFT EAR"
+          }
+        ],
+        [
+          {
+            "x": 0.4347289401845236,
+            "y": 0.33684672158744844,
+            "depth": 141.0,
+            "z_index": 13,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.5080807351576749,
+            "y": 0.42681408351453154,
+            "depth": 125.0,
+            "z_index": 7,
+            "label": "NECK"
+          },
+          {
+            "x": 0.44975730593696794,
+            "y": 0.3994702262271994,
+            "depth": 112.0,
+            "z_index": 3,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.4234513705449573,
+            "y": 0.4926720011825668,
+            "depth": 110.0,
+            "z_index": 2,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.38407726224151345,
+            "y": 0.5932547867667991,
+            "depth": 123.0,
+            "z_index": 6,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.5664041643783819,
+            "y": 0.4541579408018638,
+            "depth": 138.0,
+            "z_index": 12,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.6009261841704181,
+            "y": 0.5355324940012304,
+            "depth": 133.0,
+            "z_index": 10,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.6077434421209775,
+            "y": 0.624371145688976,
+            "depth": 133.0,
+            "z_index": 11,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.49053506058332935,
+            "y": 0.5358106329958355,
+            "depth": 114.0,
+            "z_index": 5,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.48398978892232875,
+            "y": 0.6429762468738579,
+            "depth": 113.0,
+            "z_index": 4,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.5364325900376594,
+            "y": 0.7084660790299633,
+            "depth": 103.0,
+            "z_index": 0,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.5502726241387957,
+            "y": 0.5775208523748638,
+            "depth": 131.0,
+            "z_index": 8,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.49323879024145245,
+            "y": 0.6972887438847635,
+            "depth": 146.0,
+            "z_index": 15,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.47746524553733943,
+            "y": 0.8089315586843454,
+            "depth": 151.0,
+            "z_index": 17,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.4194839816178476,
+            "y": 0.30231490645495057,
+            "depth": 132.0,
+            "z_index": 9,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.46791602904798574,
+            "y": 0.3309916349360088,
+            "depth": 146.0,
+            "z_index": 16,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.43961962987631054,
+            "y": 0.24862368537808388,
+            "depth": 108.0,
+            "z_index": 1,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.5659640890486959,
+            "y": 0.32343255829697926,
+            "depth": 142.0,
+            "z_index": 14,
+            "label": "LEFT EAR"
+          }
+        ],
+        [
+          {
+            "x": 0.43894801316605503,
+            "y": 0.3333778612212237,
+            "depth": 141.0,
+            "z_index": 13,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.5092844215666792,
+            "y": 0.4253359924307654,
+            "depth": 125.0,
+            "z_index": 7,
+            "label": "NECK"
+          },
+          {
+            "x": 0.4512507236625982,
+            "y": 0.39657636467001156,
+            "depth": 111.0,
+            "z_index": 4,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.42251678377796953,
+            "y": 0.4893274528720657,
+            "depth": 110.0,
+            "z_index": 3,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.37974019226127936,
+            "y": 0.5889125004918621,
+            "depth": 124.0,
+            "z_index": 6,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.5673181194707602,
+            "y": 0.4540956201915194,
+            "depth": 138.0,
+            "z_index": 12,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.6083935021424112,
+            "y": 0.5220174788885732,
+            "depth": 129.0,
+            "z_index": 9,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.6215248621389536,
+            "y": 0.6044009292441965,
+            "depth": 126.0,
+            "z_index": 8,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.4922393962913958,
+            "y": 0.5383715892968467,
+            "depth": 114.0,
+            "z_index": 5,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.5026310947342605,
+            "y": 0.6329703207083888,
+            "depth": 108.0,
+            "z_index": 2,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.5714898122513192,
+            "y": 0.67327654013413,
+            "depth": 94.0,
+            "z_index": 0,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.5497841482805427,
+            "y": 0.5765346319668575,
+            "depth": 131.0,
+            "z_index": 10,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.49373191704591374,
+            "y": 0.6951074460635143,
+            "depth": 144.0,
+            "z_index": 15,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.4731667281753543,
+            "y": 0.8055244488570736,
+            "depth": 149.0,
+            "z_index": 17,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.42356847955042065,
+            "y": 0.29913068505827084,
+            "depth": 132.0,
+            "z_index": 11,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.4726152092860423,
+            "y": 0.327223602722993,
+            "depth": 145.0,
+            "z_index": 16,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.4425567321970171,
+            "y": 0.24717663499639508,
+            "depth": 107.0,
+            "z_index": 1,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.5705047408650133,
+            "y": 0.3204625253993786,
+            "depth": 141.0,
+            "z_index": 14,
+            "label": "LEFT EAR"
+          }
+        ],
+        [
+          {
+            "x": 0.44445869435084584,
+            "y": 0.3312192532675605,
+            "depth": 140.0,
+            "z_index": 13,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.5113756930374672,
+            "y": 0.42381956972358203,
+            "depth": 124.0,
+            "z_index": 7,
+            "label": "NECK"
+          },
+          {
+            "x": 0.45666789570458766,
+            "y": 0.39078167873997194,
+            "depth": 110.0,
+            "z_index": 3,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.4440640472616944,
+            "y": 0.47904042971705507,
+            "depth": 105.0,
+            "z_index": 1,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.4064237329034374,
+            "y": 0.5780311646378231,
+            "depth": 115.0,
+            "z_index": 5,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.5660834903703468,
+            "y": 0.456857460707192,
+            "depth": 138.0,
+            "z_index": 12,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.6042853124196246,
+            "y": 0.533460383472348,
+            "depth": 131.0,
+            "z_index": 8,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.5979455712011953,
+            "y": 0.6238836008978832,
+            "depth": 132.0,
+            "z_index": 10,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.4946329004510898,
+            "y": 0.5426537876566291,
+            "depth": 114.0,
+            "z_index": 4,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.4617215857233483,
+            "y": 0.6514010790128715,
+            "depth": 115.0,
+            "z_index": 6,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.5435300620901362,
+            "y": 0.6649528939722642,
+            "depth": 98.0,
+            "z_index": 0,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.5492304381781339,
+            "y": 0.5741864546936739,
+            "depth": 132.0,
+            "z_index": 11,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.49240606641953144,
+            "y": 0.6910075282481583,
+            "depth": 143.0,
+            "z_index": 16,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.5061065158186735,
+            "y": 0.7844090519068461,
+            "depth": 140.0,
+            "z_index": 14,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.42963487392347294,
+            "y": 0.2967395267073889,
+            "depth": 131.0,
+            "z_index": 9,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.4782480654450803,
+            "y": 0.32560315739119805,
+            "depth": 144.0,
+            "z_index": 17,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.44940791467238433,
+            "y": 0.24519493624958133,
+            "depth": 106.0,
+            "z_index": 2,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.5762249306082283,
+            "y": 0.3204912879264977,
+            "depth": 141.0,
+            "z_index": 15,
+            "label": "LEFT EAR"
+          }
+        ],
+        [
+          {
+            "x": 0.44226479197297797,
+            "y": 0.33245675290166654,
+            "depth": 140.0,
+            "z_index": 13,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.5098600374619845,
+            "y": 0.42423852929712014,
+            "depth": 124.0,
+            "z_index": 6,
+            "label": "NECK"
+          },
+          {
+            "x": 0.456697109670877,
+            "y": 0.3910044114726244,
+            "depth": 110.0,
+            "z_index": 3,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.462068779653558,
+            "y": 0.47171833391657747,
+            "depth": 102.0,
+            "z_index": 0,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.4409617844727741,
+            "y": 0.5647041306758414,
+            "depth": 105.0,
+            "z_index": 1,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.5630229652530918,
+            "y": 0.45747264712161595,
+            "depth": 139.0,
+            "z_index": 12,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.5797726086737716,
+            "y": 0.5622439356003621,
+            "depth": 142.0,
+            "z_index": 14,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.5638179130427633,
+            "y": 0.6615277658881293,
+            "depth": 148.0,
+            "z_index": 17,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.49227798074028484,
+            "y": 0.5421576059892047,
+            "depth": 114.0,
+            "z_index": 4,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.42967944987821693,
+            "y": 0.6574569026419608,
+            "depth": 126.0,
+            "z_index": 7,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.47761817870388334,
+            "y": 0.7141093544896995,
+            "depth": 114.0,
+            "z_index": 5,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.5508343218954651,
+            "y": 0.5741137724986536,
+            "depth": 131.0,
+            "z_index": 9,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.5198901084818731,
+            "y": 0.6921242018748085,
+            "depth": 138.0,
+            "z_index": 11,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.5493913887891528,
+            "y": 0.766282868639452,
+            "depth": 128.0,
+            "z_index": 8,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.42854520827833614,
+            "y": 0.29701892117314876,
+            "depth": 132.0,
+            "z_index": 10,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.4760041506023881,
+            "y": 0.32852389100048246,
+            "depth": 145.0,
+            "z_index": 16,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.45037134448816146,
+            "y": 0.24357940664821265,
+            "depth": 107.0,
+            "z_index": 2,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.5741772915515448,
+            "y": 0.3257661166848085,
+            "depth": 142.0,
+            "z_index": 15,
+            "label": "LEFT EAR"
+          }
+        ],
+        [
+          {
+            "x": 0.4441831801653521,
+            "y": 0.33706524174828983,
+            "depth": 142.0,
+            "z_index": 13,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.512266602762416,
+            "y": 0.42830363048368014,
+            "depth": 126.0,
+            "z_index": 6,
+            "label": "NECK"
+          },
+          {
+            "x": 0.4577825209647871,
+            "y": 0.39519101120477684,
+            "depth": 112.0,
+            "z_index": 3,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.4808278637305638,
+            "y": 0.45543544887556653,
+            "depth": 99.0,
+            "z_index": 1,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.47521837452597726,
+            "y": 0.534732619438903,
+            "depth": 95.0,
+            "z_index": 0,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.5667506845600447,
+            "y": 0.4614162497625835,
+            "depth": 140.0,
+            "z_index": 12,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.562667596153505,
+            "y": 0.5784971549059551,
+            "depth": 150.0,
+            "z_index": 16,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.5167469062357986,
+            "y": 0.6763554560971348,
+            "depth": 163.0,
+            "z_index": 17,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.48805702811865204,
+            "y": 0.5412946704618204,
+            "depth": 115.0,
+            "z_index": 4,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.4334265038504676,
+            "y": 0.6611663007630075,
+            "depth": 128.0,
+            "z_index": 7,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.4070180125848421,
+            "y": 0.7718506104745891,
+            "depth": 134.0,
+            "z_index": 11,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.554723566193255,
+            "y": 0.5736945436614544,
+            "depth": 130.0,
+            "z_index": 8,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.5555779683133661,
+            "y": 0.6836819902945007,
+            "depth": 131.0,
+            "z_index": 9,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.5952147438743769,
+            "y": 0.7398138901233544,
+            "depth": 117.0,
+            "z_index": 5,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.42948590652820673,
+            "y": 0.30245524994120715,
+            "depth": 133.0,
+            "z_index": 10,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.4778401647711717,
+            "y": 0.3316271706431259,
+            "depth": 147.0,
+            "z_index": 15,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.4497448873964047,
+            "y": 0.2503998053120627,
+            "depth": 109.0,
+            "z_index": 2,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.575886441439871,
+            "y": 0.3265005834283457,
+            "depth": 144.0,
+            "z_index": 14,
+            "label": "LEFT EAR"
+          }
+        ],
+        [
+          {
+            "x": 0.4466183969504866,
+            "y": 0.3340442911779819,
+            "depth": 142.0,
+            "z_index": 13,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.5145073416825964,
+            "y": 0.42731960874529706,
+            "depth": 125.0,
+            "z_index": 6,
+            "label": "NECK"
+          },
+          {
+            "x": 0.45838534635686534,
+            "y": 0.3964327139234687,
+            "depth": 112.0,
+            "z_index": 4,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.4923170467296252,
+            "y": 0.451904635735711,
+            "depth": 98.0,
+            "z_index": 1,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.4983127215822686,
+            "y": 0.5222547678176335,
+            "depth": 91.0,
+            "z_index": 0,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.5706293370083273,
+            "y": 0.4582065035671255,
+            "depth": 139.0,
+            "z_index": 12,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.5712757944542475,
+            "y": 0.5776259887795405,
+            "depth": 152.0,
+            "z_index": 16,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.5043389440552825,
+            "y": 0.6624464393331466,
+            "depth": 166.0,
+            "z_index": 17,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.48526455361595655,
+            "y": 0.5400527589732691,
+            "depth": 115.0,
+            "z_index": 5,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.4337206124348363,
+            "y": 0.6619489244560848,
+            "depth": 130.0,
+            "z_index": 9,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.4148734652194653,
+            "y": 0.7709271006914068,
+            "depth": 134.0,
+            "z_index": 11,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.5559566745771899,
+            "y": 0.5742291286614711,
+            "depth": 129.0,
+            "z_index": 8,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.5730879242166369,
+            "y": 0.6798697284607518,
+            "depth": 128.0,
+            "z_index": 7,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.6306029476122661,
+            "y": 0.7009373091102622,
+            "depth": 109.0,
+            "z_index": 3,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.4320947066075944,
+            "y": 0.29943882850739734,
+            "depth": 133.0,
+            "z_index": 10,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.48053011502684984,
+            "y": 0.3287425707442254,
+            "depth": 146.0,
+            "z_index": 15,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.4521668210106104,
+            "y": 0.24820061285645334,
+            "depth": 108.0,
+            "z_index": 2,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.5785200420767661,
+            "y": 0.3246450540196427,
+            "depth": 143.0,
+            "z_index": 14,
+            "label": "LEFT EAR"
+          }
+        ],
+        [
+          {
+            "x": 0.44695374212899364,
+            "y": 0.337619325805219,
+            "depth": 142.0,
+            "z_index": 13,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.5162287529477005,
+            "y": 0.4282988211188873,
+            "depth": 126.0,
+            "z_index": 7,
+            "label": "NECK"
+          },
+          {
+            "x": 0.45837042737669925,
+            "y": 0.39941150041261286,
+            "depth": 113.0,
+            "z_index": 3,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.4772099376869777,
+            "y": 0.4682517105078212,
+            "depth": 102.0,
+            "z_index": 1,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.47371860944426025,
+            "y": 0.5495485824312349,
+            "depth": 99.0,
+            "z_index": 0,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.574087078518702,
+            "y": 0.4571861418251616,
+            "depth": 139.0,
+            "z_index": 11,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.5861549732616265,
+            "y": 0.5697648892505902,
+            "depth": 146.0,
+            "z_index": 15,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.5243044599913804,
+            "y": 0.6588326326765788,
+            "depth": 159.0,
+            "z_index": 17,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.48477356374926994,
+            "y": 0.5364712340174259,
+            "depth": 115.0,
+            "z_index": 4,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.44238090361838756,
+            "y": 0.6606182122686407,
+            "depth": 128.0,
+            "z_index": 8,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.45455660659659325,
+            "y": 0.754106610459121,
+            "depth": 125.0,
+            "z_index": 6,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.5535450824522653,
+            "y": 0.5767575648315977,
+            "depth": 129.0,
+            "z_index": 9,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.5420073250803721,
+            "y": 0.7026501796251781,
+            "depth": 139.0,
+            "z_index": 12,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.6081527808868786,
+            "y": 0.7065869490320332,
+            "depth": 118.0,
+            "z_index": 5,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.4319238952315759,
+            "y": 0.3028111409999935,
+            "depth": 134.0,
+            "z_index": 10,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.4808277200845986,
+            "y": 0.3323819799678281,
+            "depth": 147.0,
+            "z_index": 16,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.451156573934543,
+            "y": 0.249516278327231,
+            "depth": 109.0,
+            "z_index": 2,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.5787317819426511,
+            "y": 0.3266575922822065,
+            "depth": 143.0,
+            "z_index": 14,
             "label": "LEFT EAR"
           }
         ]
@@ -5256,1028 +7308,1028 @@
           }
         ]
       ],
-      "walking-8-frames_south": [
+      "walking-8-frames_south-east": [
         [
           {
-            "x": 0.5011599917677292,
-            "y": 0.3544148770043709,
-            "depth": 149.0,
-            "z_index": 17,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.5048528119432538,
-            "y": 0.4233827860157512,
-            "depth": 124.0,
-            "z_index": 6,
-            "label": "NECK"
-          },
-          {
-            "x": 0.4272989871718389,
-            "y": 0.42772592872046045,
-            "depth": 125.0,
-            "z_index": 8,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.40606002839240424,
-            "y": 0.5197997935656491,
-            "depth": 123.0,
-            "z_index": 5,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.40276544232984707,
-            "y": 0.6249661403380036,
-            "depth": 133.0,
-            "z_index": 13,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5824066367146685,
-            "y": 0.4190396433110418,
-            "depth": 122.0,
-            "z_index": 4,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.595114799380895,
-            "y": 0.5138239154796902,
-            "depth": 120.0,
-            "z_index": 1,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.5984140670370242,
-            "y": 0.616323706347667,
-            "depth": 128.0,
-            "z_index": 11,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.45475245669890413,
-            "y": 0.5507895304704967,
-            "depth": 121.0,
-            "z_index": 3,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.45469470781093785,
-            "y": 0.6768343347280654,
-            "depth": 130.0,
-            "z_index": 12,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.46005186364581996,
-            "y": 0.7455493021735395,
-            "depth": 118.0,
-            "z_index": 0,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.5440629725719588,
-            "y": 0.5535997331635143,
-            "depth": 120.0,
-            "z_index": 2,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.5518189834168372,
-            "y": 0.6864730793305703,
-            "depth": 140.0,
-            "z_index": 14,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.5512678481230813,
-            "y": 0.7348082110531137,
-            "depth": 124.0,
-            "z_index": 7,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.4651622108539025,
-            "y": 0.3326721477451411,
-            "depth": 145.0,
-            "z_index": 15,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.5363795656715731,
-            "y": 0.33149894139166536,
-            "depth": 146.0,
-            "z_index": 16,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.40919228227548504,
-            "y": 0.2869121563210958,
-            "depth": 125.0,
-            "z_index": 9,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.5949766600518298,
-            "y": 0.28385160607922094,
-            "depth": 125.0,
-            "z_index": 10,
-            "label": "LEFT EAR"
-          }
-        ],
-        [
-          {
-            "x": 0.4921874830880367,
-            "y": 0.3542101471552793,
-            "depth": 149.0,
-            "z_index": 17,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.4994625063629609,
-            "y": 0.4250219365158673,
-            "depth": 124.0,
-            "z_index": 7,
-            "label": "NECK"
-          },
-          {
-            "x": 0.42172141784866884,
-            "y": 0.4300047144577525,
-            "depth": 126.0,
-            "z_index": 9,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.3983747724010662,
-            "y": 0.5350031054281601,
-            "depth": 129.0,
-            "z_index": 11,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.40582911594575083,
-            "y": 0.6431694889197358,
-            "depth": 145.0,
-            "z_index": 13,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5772035948772529,
-            "y": 0.4200391585739821,
-            "depth": 123.0,
-            "z_index": 6,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.5863220094719936,
-            "y": 0.49104548038466644,
-            "depth": 113.0,
-            "z_index": 2,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.5913720269136025,
-            "y": 0.5770646675334317,
-            "depth": 112.0,
-            "z_index": 1,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.45494316007413943,
-            "y": 0.548764088475585,
-            "depth": 119.0,
-            "z_index": 3,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.44809182794290925,
-            "y": 0.6591125095344276,
-            "depth": 120.0,
-            "z_index": 4,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.4583591305317653,
-            "y": 0.7097034784058385,
-            "depth": 104.0,
-            "z_index": 0,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.5442762759477213,
-            "y": 0.555057627903857,
-            "depth": 121.0,
-            "z_index": 5,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.5453885699471117,
-            "y": 0.6881115344001035,
+            "x": 0.5592747554830203,
+            "y": 0.3400566000482148,
             "depth": 142.0,
-            "z_index": 12,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.5490388693989683,
-            "y": 0.8026346278615135,
-            "depth": 148.0,
-            "z_index": 16,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.45666004910295577,
-            "y": 0.33174099641947524,
-            "depth": 145.0,
             "z_index": 14,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.5278542175666636,
-            "y": 0.3319965530224719,
-            "depth": 146.0,
-            "z_index": 15,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.4024698740287742,
-            "y": 0.2861405567204502,
-            "depth": 124.0,
-            "z_index": 8,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.5881937881469157,
-            "y": 0.28680724593215856,
-            "depth": 126.0,
-            "z_index": 10,
-            "label": "LEFT EAR"
-          }
-        ],
-        [
-          {
-            "x": 0.4933795557818316,
-            "y": 0.34945568981395553,
-            "depth": 148.0,
-            "z_index": 17,
             "label": "NOSE"
           },
           {
-            "x": 0.49855310219465715,
-            "y": 0.42347392893360525,
+            "x": 0.4929393315093028,
+            "y": 0.42390733550474174,
             "depth": 124.0,
-            "z_index": 8,
-            "label": "NECK"
-          },
-          {
-            "x": 0.42078897737747833,
-            "y": 0.4269775741635505,
-            "depth": 125.0,
-            "z_index": 9,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.3957396538921978,
-            "y": 0.5325066589023811,
-            "depth": 129.0,
-            "z_index": 11,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.40402284264518634,
-            "y": 0.64028675742537,
-            "depth": 146.0,
-            "z_index": 15,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.576317227011836,
-            "y": 0.4199702837036602,
-            "depth": 123.0,
             "z_index": 6,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.5796166100918696,
-            "y": 0.477349446261295,
-            "depth": 109.0,
-            "z_index": 2,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.5821860939516075,
-            "y": 0.5560026408486849,
-            "depth": 105.0,
-            "z_index": 1,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.45626673983943933,
-            "y": 0.5506056631138245,
-            "depth": 119.0,
-            "z_index": 4,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.44798059161753595,
-            "y": 0.6447041512945606,
-            "depth": 113.0,
-            "z_index": 3,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.4575668146807997,
-            "y": 0.6663731754990129,
-            "depth": 91.0,
-            "z_index": 0,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.5454790853731253,
-            "y": 0.5539016938846781,
-            "depth": 121.0,
-            "z_index": 5,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.5403811393093565,
-            "y": 0.687002759053942,
-            "depth": 140.0,
-            "z_index": 12,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.5396108832750446,
-            "y": 0.8024887038198392,
-            "depth": 147.0,
-            "z_index": 16,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.4576337143759252,
-            "y": 0.3273550407308776,
-            "depth": 144.0,
-            "z_index": 13,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.5288476918901461,
-            "y": 0.3268760420695158,
-            "depth": 145.0,
-            "z_index": 14,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.4025225442649365,
-            "y": 0.2839831867898217,
-            "depth": 123.0,
-            "z_index": 7,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.5882981405906167,
-            "y": 0.28273363834182114,
-            "depth": 125.0,
-            "z_index": 10,
-            "label": "LEFT EAR"
-          }
-        ],
-        [
-          {
-            "x": 0.49561177676342577,
-            "y": 0.3454574988586774,
-            "depth": 146.0,
-            "z_index": 17,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.49779780048142935,
-            "y": 0.42164010233781934,
-            "depth": 123.0,
-            "z_index": 7,
             "label": "NECK"
           },
           {
-            "x": 0.4200854178922196,
-            "y": 0.42006301336628016,
-            "depth": 123.0,
-            "z_index": 8,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.3991152213662458,
-            "y": 0.5162983913358002,
-            "depth": 122.0,
-            "z_index": 4,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.39917104960043887,
-            "y": 0.6242185664474085,
-            "depth": 136.0,
-            "z_index": 13,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5755101830706391,
-            "y": 0.4232171913093584,
-            "depth": 123.0,
-            "z_index": 9,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.5836350794808134,
-            "y": 0.4888136668836158,
-            "depth": 111.0,
-            "z_index": 1,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.5813503879464119,
-            "y": 0.5812859041146131,
-            "depth": 113.0,
-            "z_index": 2,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.45875682128670164,
-            "y": 0.5537276038755592,
-            "depth": 119.0,
-            "z_index": 3,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.43929522442819885,
-            "y": 0.6749178159647289,
-            "depth": 126.0,
-            "z_index": 11,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.4487526990512783,
-            "y": 0.6667863798046552,
-            "depth": 99.0,
-            "z_index": 0,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.5470008156639874,
-            "y": 0.551323531336512,
-            "depth": 122.0,
-            "z_index": 5,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.5370886008668676,
-            "y": 0.6840000926106651,
-            "depth": 140.0,
-            "z_index": 14,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.5377093413920737,
-            "y": 0.7739991430129937,
-            "depth": 135.0,
-            "z_index": 12,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.46015231476154433,
-            "y": 0.3229242323769814,
-            "depth": 143.0,
-            "z_index": 15,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.5313619407945607,
-            "y": 0.32331998194303,
-            "depth": 143.0,
-            "z_index": 16,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.40571987876240573,
-            "y": 0.27961412983836464,
-            "depth": 122.0,
-            "z_index": 6,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.5914841266097823,
-            "y": 0.2806464436748795,
-            "depth": 123.0,
-            "z_index": 10,
-            "label": "LEFT EAR"
-          }
-        ],
-        [
-          {
-            "x": 0.49510891059234835,
-            "y": 0.34733570522978274,
-            "depth": 147.0,
-            "z_index": 17,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.4975759857469391,
-            "y": 0.4224718555615101,
-            "depth": 123.0,
-            "z_index": 7,
-            "label": "NECK"
-          },
-          {
-            "x": 0.4198225099392018,
-            "y": 0.42034126784986364,
-            "depth": 123.0,
-            "z_index": 8,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.4038083757964651,
-            "y": 0.5035836603355964,
-            "depth": 117.0,
-            "z_index": 0,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.3966921965906193,
-            "y": 0.6032748074580173,
-            "depth": 122.0,
-            "z_index": 4,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5753294615546765,
-            "y": 0.42460244327315666,
-            "depth": 124.0,
-            "z_index": 10,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.5953582237788106,
-            "y": 0.5206358026916048,
-            "depth": 123.0,
-            "z_index": 9,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.6008347556328208,
-            "y": 0.6224090680204069,
-            "depth": 130.0,
-            "z_index": 12,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.4579107779166072,
-            "y": 0.5539919170646995,
-            "depth": 120.0,
-            "z_index": 2,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.4469964181522887,
-            "y": 0.6867566370290121,
+            "x": 0.4424830629365629,
+            "y": 0.4586635180090999,
             "depth": 139.0,
-            "z_index": 14,
+            "z_index": 12,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.42052359661797933,
+            "y": 0.5610006002886829,
+            "depth": 141.0,
+            "z_index": 13,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.4456708411373814,
+            "y": 0.6609751238694913,
+            "depth": 149.0,
+            "z_index": 17,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.5433956000820426,
+            "y": 0.3891511530003836,
+            "depth": 109.0,
+            "z_index": 1,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.5474001954565839,
+            "y": 0.4799647556524553,
+            "depth": 105.0,
+            "z_index": 0,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.5708911555521328,
+            "y": 0.5760996401168179,
+            "depth": 110.0,
+            "z_index": 3,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.4489968875575701,
+            "y": 0.5736570633922967,
+            "depth": 131.0,
+            "z_index": 9,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.4750865394638763,
+            "y": 0.6935171264167748,
+            "depth": 137.0,
+            "z_index": 11,
             "label": "RIGHT KNEE"
           },
           {
-            "x": 0.44588068452054025,
-            "y": 0.7322847347014679,
-            "depth": 122.0,
-            "z_index": 5,
+            "x": 0.446602957357002,
+            "y": 0.7677265428096676,
+            "depth": 128.0,
+            "z_index": 8,
             "label": "RIGHT LEG"
           },
           {
-            "x": 0.5468967079189644,
-            "y": 0.5508945276582027,
-            "depth": 121.0,
-            "z_index": 3,
+            "x": 0.5097160231693663,
+            "y": 0.5408227505433328,
+            "depth": 114.0,
+            "z_index": 4,
             "label": "LEFT HIP"
           },
           {
-            "x": 0.5418754171787408,
-            "y": 0.677449754406731,
-            "depth": 131.0,
-            "z_index": 13,
+            "x": 0.5724400802007558,
+            "y": 0.6569512209478187,
+            "depth": 127.0,
+            "z_index": 7,
             "label": "LEFT KNEE"
           },
           {
-            "x": 0.5375236404888653,
-            "y": 0.745633323157805,
-            "depth": 119.0,
-            "z_index": 1,
+            "x": 0.5252454486971253,
+            "y": 0.7166299418197716,
+            "depth": 115.0,
+            "z_index": 5,
             "label": "LEFT LEG"
           },
           {
-            "x": 0.46059696457784177,
-            "y": 0.32335687172805794,
-            "depth": 143.0,
-            "z_index": 15,
+            "x": 0.5247353302481308,
+            "y": 0.3350723216416802,
+            "depth": 146.0,
+            "z_index": 16,
             "label": "RIGHT EYE"
           },
           {
-            "x": 0.5317353579023525,
-            "y": 0.3266851142756536,
-            "depth": 144.0,
-            "z_index": 16,
+            "x": 0.575927097432177,
+            "y": 0.3048167718415088,
+            "depth": 134.0,
+            "z_index": 10,
             "label": "LEFT EYE"
           },
           {
-            "x": 0.4078626173619328,
-            "y": 0.27726062699464327,
-            "depth": 122.0,
-            "z_index": 6,
+            "x": 0.42753429051564434,
+            "y": 0.3257031696717254,
+            "depth": 142.0,
+            "z_index": 15,
             "label": "RIGHT EAR"
           },
           {
-            "x": 0.5934410234889373,
-            "y": 0.28594283124456665,
-            "depth": 125.0,
-            "z_index": 11,
+            "x": 0.5610780091898246,
+            "y": 0.24677564790608209,
+            "depth": 109.0,
+            "z_index": 2,
             "label": "LEFT EAR"
           }
         ],
         [
           {
-            "x": 0.5019656855378016,
-            "y": 0.34985936327293454,
-            "depth": 148.0,
-            "z_index": 15,
+            "x": 0.5542224924423087,
+            "y": 0.34318391948813437,
+            "depth": 144.0,
+            "z_index": 14,
             "label": "NOSE"
           },
           {
-            "x": 0.5039571686128603,
-            "y": 0.42444913595401723,
+            "x": 0.49115913405113515,
+            "y": 0.42725007662490294,
+            "depth": 125.0,
+            "z_index": 6,
+            "label": "NECK"
+          },
+          {
+            "x": 0.4395400615412831,
+            "y": 0.46296664768370366,
+            "depth": 140.0,
+            "z_index": 12,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.432828854305378,
+            "y": 0.5751062776460851,
+            "depth": 147.0,
+            "z_index": 15,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.48274499634830315,
+            "y": 0.6696424010861333,
+            "depth": 157.0,
+            "z_index": 17,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.5427782065609872,
+            "y": 0.39153350556610245,
+            "depth": 111.0,
+            "z_index": 2,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.5211515723561742,
+            "y": 0.46551156945497696,
+            "depth": 102.0,
+            "z_index": 1,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.5214761175617586,
+            "y": 0.5502538511393009,
+            "depth": 100.0,
+            "z_index": 0,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.4457449453158451,
+            "y": 0.5723589201364967,
+            "depth": 130.0,
+            "z_index": 8,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.44260097015653743,
+            "y": 0.6850820576766372,
+            "depth": 132.0,
+            "z_index": 9,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.40467832761135536,
+            "y": 0.7422434690248247,
+            "depth": 118.0,
+            "z_index": 5,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.5123434857978454,
+            "y": 0.5416057271792398,
+            "depth": 115.0,
+            "z_index": 4,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.5709503409544727,
+            "y": 0.6604713707609349,
+            "depth": 129.0,
+            "z_index": 7,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.5918861886501244,
+            "y": 0.7691532102072658,
+            "depth": 133.0,
+            "z_index": 10,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.5192240720309684,
+            "y": 0.33747052262008215,
+            "depth": 148.0,
+            "z_index": 16,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.5714757832040809,
+            "y": 0.30839741964305895,
+            "depth": 136.0,
+            "z_index": 11,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.4224519432352255,
+            "y": 0.3277361809442748,
+            "depth": 143.0,
+            "z_index": 13,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.5587607622657318,
+            "y": 0.25189332255563573,
+            "depth": 111.0,
+            "z_index": 3,
+            "label": "LEFT EAR"
+          }
+        ],
+        [
+          {
+            "x": 0.5516892648316767,
+            "y": 0.3387480979418303,
+            "depth": 143.0,
+            "z_index": 14,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.48866935593363714,
+            "y": 0.4265096574401154,
+            "depth": 125.0,
+            "z_index": 6,
+            "label": "NECK"
+          },
+          {
+            "x": 0.4367279738551896,
+            "y": 0.4608291441431614,
+            "depth": 140.0,
+            "z_index": 12,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.43003682073866367,
+            "y": 0.5738992309462222,
+            "depth": 147.0,
+            "z_index": 15,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.4845276101295265,
+            "y": 0.6667652906946395,
+            "depth": 158.0,
+            "z_index": 17,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.5406107380120846,
+            "y": 0.3921901707370694,
+            "depth": 110.0,
+            "z_index": 3,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.5042013876396815,
+            "y": 0.45743570325602173,
+            "depth": 100.0,
+            "z_index": 1,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.4947038265658791,
+            "y": 0.5377348921751235,
+            "depth": 97.0,
+            "z_index": 0,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.4459124340627484,
+            "y": 0.5738462420371516,
+            "depth": 129.0,
+            "z_index": 8,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.42380235242463415,
+            "y": 0.6751663619216208,
+            "depth": 127.0,
+            "z_index": 7,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.36850060157557685,
+            "y": 0.7076966247181999,
+            "depth": 109.0,
+            "z_index": 2,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.514532991058455,
+            "y": 0.5396438363885016,
+            "depth": 115.0,
+            "z_index": 5,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.5633756378294555,
+            "y": 0.6623518982493782,
+            "depth": 129.0,
+            "z_index": 9,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.5828515201697914,
+            "y": 0.7733937016006371,
+            "depth": 134.0,
+            "z_index": 10,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.5165165447326404,
+            "y": 0.3334965033140521,
+            "depth": 147.0,
+            "z_index": 16,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.5681815878281626,
+            "y": 0.30382352121969064,
+            "depth": 134.0,
+            "z_index": 11,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.4195893278768331,
+            "y": 0.3262464065961873,
+            "depth": 142.0,
+            "z_index": 13,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.554367687090563,
+            "y": 0.2488386431741163,
+            "depth": 110.0,
+            "z_index": 4,
+            "label": "LEFT EAR"
+          }
+        ],
+        [
+          {
+            "x": 0.5493354208332701,
+            "y": 0.33477880256466036,
+            "depth": 142.0,
+            "z_index": 14,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.4855099265363187,
+            "y": 0.42560590494989137,
+            "depth": 125.0,
+            "z_index": 6,
+            "label": "NECK"
+          },
+          {
+            "x": 0.430315818447211,
+            "y": 0.4556051572264144,
+            "depth": 139.0,
+            "z_index": 12,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.41326333055744296,
+            "y": 0.5608740839124134,
+            "depth": 142.0,
+            "z_index": 15,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.4509825979616592,
+            "y": 0.6598195332264412,
+            "depth": 151.0,
+            "z_index": 17,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.5407040346254263,
+            "y": 0.39560665267336825,
+            "depth": 111.0,
+            "z_index": 3,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.5139925512722935,
+            "y": 0.4656189879167229,
+            "depth": 101.0,
+            "z_index": 0,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.5171012507369332,
+            "y": 0.557895454757098,
+            "depth": 103.0,
+            "z_index": 1,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.4470404368571863,
+            "y": 0.5761085869875976,
+            "depth": 129.0,
+            "z_index": 8,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.45242889736219555,
+            "y": 0.7006423389871241,
+            "depth": 137.0,
+            "z_index": 11,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.383995309873166,
+            "y": 0.706522632847421,
+            "depth": 116.0,
+            "z_index": 5,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.5172387527764749,
+            "y": 0.5360612930187922,
+            "depth": 115.0,
+            "z_index": 4,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.5600451359358353,
+            "y": 0.6609227545188394,
+            "depth": 129.0,
+            "z_index": 9,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.5472225462061542,
+            "y": 0.7538207585567014,
+            "depth": 126.0,
+            "z_index": 7,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.5140119891831288,
+            "y": 0.3290623581439069,
+            "depth": 145.0,
+            "z_index": 16,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.5661044165689294,
+            "y": 0.30016361881427844,
+            "depth": 133.0,
+            "z_index": 10,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.4172598592112302,
+            "y": 0.3216711593561696,
+            "depth": 140.0,
+            "z_index": 13,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.5531531619851833,
+            "y": 0.24628306263487304,
+            "depth": 108.0,
+            "z_index": 2,
+            "label": "LEFT EAR"
+          }
+        ],
+        [
+          {
+            "x": 0.5508181630519416,
+            "y": 0.33642420690855307,
+            "depth": 142.0,
+            "z_index": 14,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.48671188870595117,
+            "y": 0.42620479166926384,
+            "depth": 125.0,
+            "z_index": 7,
+            "label": "NECK"
+          },
+          {
+            "x": 0.42991479648810815,
+            "y": 0.4560411502625917,
+            "depth": 139.0,
+            "z_index": 12,
+            "label": "RIGHT SHOULDER"
+          },
+          {
+            "x": 0.4018957208111069,
+            "y": 0.5497450909572894,
+            "depth": 137.0,
+            "z_index": 11,
+            "label": "RIGHT ELBOW"
+          },
+          {
+            "x": 0.4129389188467062,
+            "y": 0.648503244619248,
+            "depth": 143.0,
+            "z_index": 15,
+            "label": "RIGHT ARM"
+          },
+          {
+            "x": 0.5435089809237942,
+            "y": 0.39636843307593617,
+            "depth": 111.0,
+            "z_index": 2,
+            "label": "LEFT SHOULDER"
+          },
+          {
+            "x": 0.5550842846780311,
+            "y": 0.48489319929426217,
+            "depth": 107.0,
+            "z_index": 0,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.5787839659317489,
+            "y": 0.5797346883289656,
+            "depth": 111.0,
+            "z_index": 3,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.44819887055964797,
+            "y": 0.5762986815009826,
+            "depth": 129.0,
+            "z_index": 8,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.49536216581839737,
+            "y": 0.7004512655853289,
+            "depth": 145.0,
+            "z_index": 16,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.4458455513587165,
+            "y": 0.7580087554519951,
+            "depth": 133.0,
+            "z_index": 9,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.5154876384741841,
+            "y": 0.5360730588180149,
+            "depth": 115.0,
+            "z_index": 4,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.5393306744223334,
+            "y": 0.6581565562586948,
+            "depth": 122.0,
+            "z_index": 6,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.5036750524998126,
+            "y": 0.7358452083550953,
+            "depth": 115.0,
+            "z_index": 5,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.5157304846289802,
+            "y": 0.3289810706535016,
+            "depth": 146.0,
+            "z_index": 17,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.5688764229498829,
+            "y": 0.3027814515609798,
+            "depth": 134.0,
+            "z_index": 10,
+            "label": "LEFT EYE"
+          },
+          {
+            "x": 0.4193267193835246,
+            "y": 0.3183175268223326,
+            "depth": 140.0,
+            "z_index": 13,
+            "label": "RIGHT EAR"
+          },
+          {
+            "x": 0.5579682711485333,
+            "y": 0.24997053575169392,
+            "depth": 109.0,
+            "z_index": 1,
+            "label": "LEFT EAR"
+          }
+        ],
+        [
+          {
+            "x": 0.5585967189815676,
+            "y": 0.3354707571021843,
+            "depth": 142.0,
+            "z_index": 14,
+            "label": "NOSE"
+          },
+          {
+            "x": 0.49332967875848827,
+            "y": 0.4250937352721027,
             "depth": 124.0,
             "z_index": 7,
             "label": "NECK"
           },
           {
-            "x": 0.42625178763770566,
-            "y": 0.4227425041826329,
-            "depth": 124.0,
-            "z_index": 8,
+            "x": 0.4379217569116851,
+            "y": 0.45501257982704885,
+            "depth": 138.0,
+            "z_index": 12,
             "label": "RIGHT SHOULDER"
           },
           {
-            "x": 0.4073080932223368,
-            "y": 0.4820124593632823,
-            "depth": 111.0,
-            "z_index": 2,
+            "x": 0.3880859845822423,
+            "y": 0.5306233766152799,
+            "depth": 132.0,
+            "z_index": 9,
             "label": "RIGHT ELBOW"
           },
           {
-            "x": 0.39278971437496357,
-            "y": 0.5660916719996651,
-            "depth": 109.0,
-            "z_index": 1,
+            "x": 0.37316338551720296,
+            "y": 0.6216972691991536,
+            "depth": 134.0,
+            "z_index": 11,
             "label": "RIGHT ARM"
           },
           {
-            "x": 0.581662549588015,
-            "y": 0.42615576772540154,
-            "depth": 124.0,
-            "z_index": 9,
+            "x": 0.5487376006052914,
+            "y": 0.39517489071715656,
+            "depth": 110.0,
+            "z_index": 2,
             "label": "LEFT SHOULDER"
           },
           {
-            "x": 0.6075701929298867,
-            "y": 0.5380515266000849,
-            "depth": 132.0,
-            "z_index": 11,
+            "x": 0.5894596295950311,
+            "y": 0.49124056288913864,
+            "depth": 112.0,
+            "z_index": 3,
             "label": "LEFT ELBOW"
           },
           {
-            "x": 0.609799056230095,
-            "y": 0.6462902691074417,
-            "depth": 149.0,
-            "z_index": 16,
+            "x": 0.6385324082205679,
+            "y": 0.5872909002722188,
+            "depth": 123.0,
+            "z_index": 6,
             "label": "LEFT ARM"
           },
           {
-            "x": 0.4566234043217127,
-            "y": 0.5544376669704421,
-            "depth": 121.0,
-            "z_index": 5,
+            "x": 0.45059920198354,
+            "y": 0.5764800113921438,
+            "depth": 131.0,
+            "z_index": 8,
             "label": "RIGHT HIP"
           },
           {
-            "x": 0.4550982990358791,
-            "y": 0.68765092801327,
-            "depth": 140.0,
-            "z_index": 12,
+            "x": 0.5030729016724516,
+            "y": 0.6975887454493445,
+            "depth": 144.0,
+            "z_index": 15,
             "label": "RIGHT KNEE"
           },
           {
-            "x": 0.4518798650486428,
-            "y": 0.805374095625174,
-            "depth": 149.0,
+            "x": 0.524929839943725,
+            "y": 0.8108837187072895,
+            "depth": 151.0,
             "z_index": 17,
             "label": "RIGHT LEG"
           },
           {
-            "x": 0.5460284015861443,
-            "y": 0.5497575748965791,
-            "depth": 120.0,
-            "z_index": 3,
+            "x": 0.5103704235842256,
+            "y": 0.5363581649770157,
+            "depth": 114.0,
+            "z_index": 5,
             "label": "LEFT HIP"
           },
           {
-            "x": 0.5476990841174578,
-            "y": 0.6591451039919137,
-            "depth": 120.0,
+            "x": 0.5118787233583179,
+            "y": 0.6449904214774249,
+            "depth": 113.0,
             "z_index": 4,
             "label": "LEFT KNEE"
           },
           {
-            "x": 0.5384105369957655,
-            "y": 0.7080667764452401,
+            "x": 0.4591059584830681,
+            "y": 0.7086568152450852,
             "depth": 103.0,
             "z_index": 0,
             "label": "LEFT LEG"
           },
           {
-            "x": 0.466623514422211,
-            "y": 0.32713789982373526,
-            "depth": 144.0,
-            "z_index": 13,
+            "x": 0.5233126149033341,
+            "y": 0.3295289058090043,
+            "depth": 145.0,
+            "z_index": 16,
             "label": "RIGHT EYE"
           },
           {
-            "x": 0.5378232070739946,
-            "y": 0.3279058175929174,
-            "depth": 145.0,
-            "z_index": 14,
+            "x": 0.5756499276453173,
+            "y": 0.300946514054788,
+            "depth": 133.0,
+            "z_index": 10,
             "label": "LEFT EYE"
           },
           {
-            "x": 0.4125837597805477,
-            "y": 0.2831081974653447,
-            "depth": 123.0,
-            "z_index": 6,
+            "x": 0.4266298801135814,
+            "y": 0.3213083256067544,
+            "depth": 140.0,
+            "z_index": 13,
             "label": "RIGHT EAR"
           },
           {
-            "x": 0.5983220972698122,
-            "y": 0.285111571962101,
-            "depth": 125.0,
-            "z_index": 10,
+            "x": 0.563162002000064,
+            "y": 0.24674567275990772,
+            "depth": 108.0,
+            "z_index": 1,
             "label": "LEFT EAR"
           }
         ],
         [
           {
-            "x": 0.5014347260540157,
-            "y": 0.3463859932755195,
-            "depth": 147.0,
-            "z_index": 15,
+            "x": 0.5554106120933925,
+            "y": 0.33288049940126974,
+            "depth": 141.0,
+            "z_index": 14,
             "label": "NOSE"
           },
           {
-            "x": 0.5045613665840544,
-            "y": 0.42278920517874097,
-            "depth": 123.0,
-            "z_index": 7,
+            "x": 0.4919434048035288,
+            "y": 0.4236196125639814,
+            "depth": 124.0,
+            "z_index": 6,
             "label": "NECK"
           },
           {
-            "x": 0.426737990059671,
-            "y": 0.42372547225481233,
-            "depth": 124.0,
-            "z_index": 9,
+            "x": 0.4380065255788089,
+            "y": 0.4558598947956075,
+            "depth": 138.0,
+            "z_index": 12,
             "label": "RIGHT SHOULDER"
           },
           {
-            "x": 0.4137479714522421,
-            "y": 0.47422200357742905,
-            "depth": 108.0,
-            "z_index": 2,
+            "x": 0.38570416471594426,
+            "y": 0.521868794585179,
+            "depth": 129.0,
+            "z_index": 9,
             "label": "RIGHT ELBOW"
           },
           {
-            "x": 0.39885337531315057,
-            "y": 0.5466863693122485,
-            "depth": 102.0,
-            "z_index": 1,
+            "x": 0.35864434999732764,
+            "y": 0.6043008209462264,
+            "depth": 128.0,
+            "z_index": 8,
             "label": "RIGHT ARM"
           },
           {
-            "x": 0.5823847431084377,
-            "y": 0.42185293810266966,
-            "depth": 123.0,
-            "z_index": 8,
+            "x": 0.5458802840282486,
+            "y": 0.3913793303323554,
+            "depth": 109.0,
+            "z_index": 2,
             "label": "LEFT SHOULDER"
           },
           {
-            "x": 0.6182666185113888,
-            "y": 0.5325939073346238,
+            "x": 0.5959784614205634,
+            "y": 0.48169288873032046,
+            "depth": 109.0,
+            "z_index": 3,
+            "label": "LEFT ELBOW"
+          },
+          {
+            "x": 0.6521424128965354,
+            "y": 0.5726924202573469,
+            "depth": 126.0,
+            "z_index": 7,
+            "label": "LEFT ARM"
+          },
+          {
+            "x": 0.45211944987806363,
+            "y": 0.5759678191077385,
+            "depth": 131.0,
+            "z_index": 10,
+            "label": "RIGHT HIP"
+          },
+          {
+            "x": 0.5095236893836768,
+            "y": 0.6945026555616376,
+            "depth": 144.0,
+            "z_index": 15,
+            "label": "RIGHT KNEE"
+          },
+          {
+            "x": 0.5249771941420229,
+            "y": 0.8054273451437095,
+            "depth": 149.0,
+            "z_index": 17,
+            "label": "RIGHT LEG"
+          },
+          {
+            "x": 0.50702102490065,
+            "y": 0.5381066042253846,
+            "depth": 113.0,
+            "z_index": 5,
+            "label": "LEFT HIP"
+          },
+          {
+            "x": 0.5026190865245781,
+            "y": 0.6364459710330154,
+            "depth": 109.0,
+            "z_index": 4,
+            "label": "LEFT KNEE"
+          },
+          {
+            "x": 0.42598660685389667,
+            "y": 0.6684788741248671,
+            "depth": 94.0,
+            "z_index": 0,
+            "label": "LEFT LEG"
+          },
+          {
+            "x": 0.5200123945585805,
+            "y": 0.3269090667470239,
+            "depth": 145.0,
+            "z_index": 16,
+            "label": "RIGHT EYE"
+          },
+          {
+            "x": 0.5722783838141648,
+            "y": 0.2984528601699479,
             "depth": 132.0,
             "z_index": 11,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.6106490286299031,
-            "y": 0.6351272358360172,
-            "depth": 154.0,
-            "z_index": 17,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.4557238042598685,
-            "y": 0.5540729301463349,
-            "depth": 122.0,
-            "z_index": 5,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.45986766094489356,
-            "y": 0.6872305564923246,
-            "depth": 141.0,
-            "z_index": 12,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.4574679933506087,
-            "y": 0.8012566176837538,
-            "depth": 147.0,
-            "z_index": 16,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.5445319583643091,
-            "y": 0.5503547238139906,
-            "depth": 119.0,
-            "z_index": 4,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.5535329406784759,
-            "y": 0.6497867459168064,
-            "depth": 115.0,
-            "z_index": 3,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.5400148577073491,
-            "y": 0.6604013953541212,
-            "depth": 91.0,
-            "z_index": 0,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.46613460646392096,
-            "y": 0.323617827765466,
-            "depth": 143.0,
-            "z_index": 13,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.5373412476347634,
-            "y": 0.32449663630497505,
-            "depth": 144.0,
-            "z_index": 14,
             "label": "LEFT EYE"
           },
           {
-            "x": 0.41196885508795983,
-            "y": 0.2804796854062841,
-            "depth": 122.0,
-            "z_index": 6,
+            "x": 0.42333833994355113,
+            "y": 0.3196079189804625,
+            "depth": 140.0,
+            "z_index": 13,
             "label": "RIGHT EAR"
           },
           {
-            "x": 0.5977252910454709,
-            "y": 0.2827721345433776,
-            "depth": 124.0,
-            "z_index": 10,
+            "x": 0.5596843899065967,
+            "y": 0.24537424843470484,
+            "depth": 107.0,
+            "z_index": 1,
             "label": "LEFT EAR"
           }
         ],
         [
           {
-            "x": 0.5037977355933085,
-            "y": 0.34931994431878177,
-            "depth": 148.0,
-            "z_index": 17,
+            "x": 0.5584170670533702,
+            "y": 0.3345387562140772,
+            "depth": 141.0,
+            "z_index": 15,
             "label": "NOSE"
           },
           {
-            "x": 0.5067241635497286,
-            "y": 0.4228455951683555,
+            "x": 0.4932806503399404,
+            "y": 0.42284445146933725,
             "depth": 123.0,
-            "z_index": 6,
+            "z_index": 7,
             "label": "NECK"
           },
           {
-            "x": 0.42903833769249694,
-            "y": 0.4261612794307102,
-            "depth": 124.0,
-            "z_index": 8,
+            "x": 0.44127462737949025,
+            "y": 0.4569727322757621,
+            "depth": 138.0,
+            "z_index": 12,
             "label": "RIGHT SHOULDER"
           },
           {
-            "x": 0.4132913729533371,
-            "y": 0.4942667528416495,
-            "depth": 114.0,
-            "z_index": 2,
+            "x": 0.4001655459688811,
+            "y": 0.5385862436017643,
+            "depth": 133.0,
+            "z_index": 10,
             "label": "RIGHT ELBOW"
           },
           {
-            "x": 0.4022843000918608,
-            "y": 0.5790082004097951,
-            "depth": 112.0,
-            "z_index": 1,
+            "x": 0.3880905224888699,
+            "y": 0.6288116080732877,
+            "depth": 134.0,
+            "z_index": 11,
             "label": "RIGHT ARM"
           },
           {
-            "x": 0.5844099894069603,
-            "y": 0.4195299109060008,
-            "depth": 122.0,
-            "z_index": 5,
+            "x": 0.5452866733003906,
+            "y": 0.38871617066291225,
+            "depth": 109.0,
+            "z_index": 3,
             "label": "LEFT SHOULDER"
           },
           {
-            "x": 0.6130494395541337,
-            "y": 0.5224372795523191,
-            "depth": 125.0,
-            "z_index": 10,
+            "x": 0.5737210773745068,
+            "y": 0.4780637538688374,
+            "depth": 106.0,
+            "z_index": 1,
             "label": "LEFT ELBOW"
           },
           {
-            "x": 0.6049842819400415,
-            "y": 0.6281158075318964,
-            "depth": 146.0,
-            "z_index": 16,
+            "x": 0.624165735364227,
+            "y": 0.5736736271201658,
+            "depth": 121.0,
+            "z_index": 6,
             "label": "LEFT ARM"
           },
           {
-            "x": 0.4543499181399731,
-            "y": 0.5509344682812187,
-            "depth": 121.0,
-            "z_index": 4,
+            "x": 0.450667471360838,
+            "y": 0.5735007350334825,
+            "depth": 131.0,
+            "z_index": 8,
             "label": "RIGHT HIP"
           },
           {
-            "x": 0.46127561096752434,
-            "y": 0.6835077999549648,
-            "depth": 138.0,
-            "z_index": 13,
+            "x": 0.5028545402172734,
+            "y": 0.692029871231729,
+            "depth": 142.0,
+            "z_index": 16,
             "label": "RIGHT KNEE"
           },
           {
-            "x": 0.46059338181984194,
-            "y": 0.7742655425548413,
-            "depth": 134.0,
-            "z_index": 12,
+            "x": 0.48971401952576904,
+            "y": 0.7860716661279314,
+            "depth": 139.0,
+            "z_index": 13,
             "label": "RIGHT LEG"
           },
           {
-            "x": 0.542987161760345,
-            "y": 0.553823131237408,
-            "depth": 119.0,
-            "z_index": 3,
+            "x": 0.5072479447171407,
+            "y": 0.5418881169527775,
+            "depth": 114.0,
+            "z_index": 4,
             "label": "LEFT HIP"
           },
           {
-            "x": 0.5615411112023725,
-            "y": 0.6780488170951795,
-            "depth": 128.0,
-            "z_index": 11,
+            "x": 0.5450249490255339,
+            "y": 0.6527305179959851,
+            "depth": 117.0,
+            "z_index": 5,
             "label": "LEFT KNEE"
           },
           {
-            "x": 0.548910171745302,
-            "y": 0.6692714397259775,
-            "depth": 101.0,
+            "x": 0.46101664733332487,
+            "y": 0.6669129948890495,
+            "depth": 100.0,
             "z_index": 0,
             "label": "LEFT LEG"
           },
           {
-            "x": 0.46850971185129986,
-            "y": 0.32646643716757695,
-            "depth": 144.0,
-            "z_index": 14,
+            "x": 0.5235421121854956,
+            "y": 0.32835478976219357,
+            "depth": 145.0,
+            "z_index": 17,
             "label": "RIGHT EYE"
           },
           {
-            "x": 0.5397421987428679,
-            "y": 0.32749491408394205,
-            "depth": 145.0,
-            "z_index": 15,
+            "x": 0.5753762363760921,
+            "y": 0.3001447149122758,
+            "depth": 132.0,
+            "z_index": 9,
             "label": "LEFT EYE"
           },
           {
-            "x": 0.4135623236440298,
-            "y": 0.28165678728711385,
-            "depth": 123.0,
-            "z_index": 7,
+            "x": 0.4266020918628277,
+            "y": 0.31963102717397235,
+            "depth": 140.0,
+            "z_index": 14,
             "label": "RIGHT EAR"
           },
           {
-            "x": 0.5993862133314087,
-            "y": 0.28433975985363563,
-            "depth": 124.0,
-            "z_index": 9,
+            "x": 0.5618215488635329,
+            "y": 0.2460395136811258,
+            "depth": 107.0,
+            "z_index": 2,
             "label": "LEFT EAR"
           }
         ]
@@ -7307,2061 +9359,9 @@
             "label": "LEFT EAR"
           }
         ]
-      ],
-      "walking-8-frames_south-east": [
-        [
-          {
-            "x": 0.5592747554830203,
-            "y": 0.3400566000482148,
-            "depth": 142.0,
-            "z_index": 14,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.4929393315093028,
-            "y": 0.42390733550474174,
-            "depth": 124.0,
-            "z_index": 6,
-            "label": "NECK"
-          },
-          {
-            "x": 0.4424830629365629,
-            "y": 0.4586635180090999,
-            "depth": 139.0,
-            "z_index": 12,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.42052359661797933,
-            "y": 0.5610006002886829,
-            "depth": 141.0,
-            "z_index": 13,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.4456708411373814,
-            "y": 0.6609751238694913,
-            "depth": 149.0,
-            "z_index": 17,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5433956000820426,
-            "y": 0.3891511530003836,
-            "depth": 109.0,
-            "z_index": 1,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.5474001954565839,
-            "y": 0.4799647556524553,
-            "depth": 105.0,
-            "z_index": 0,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.5708911555521328,
-            "y": 0.5760996401168179,
-            "depth": 110.0,
-            "z_index": 3,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.4489968875575701,
-            "y": 0.5736570633922967,
-            "depth": 131.0,
-            "z_index": 9,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.4750865394638763,
-            "y": 0.6935171264167748,
-            "depth": 137.0,
-            "z_index": 11,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.446602957357002,
-            "y": 0.7677265428096676,
-            "depth": 128.0,
-            "z_index": 8,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.5097160231693663,
-            "y": 0.5408227505433328,
-            "depth": 114.0,
-            "z_index": 4,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.5724400802007558,
-            "y": 0.6569512209478187,
-            "depth": 127.0,
-            "z_index": 7,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.5252454486971253,
-            "y": 0.7166299418197716,
-            "depth": 115.0,
-            "z_index": 5,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.5247353302481308,
-            "y": 0.3350723216416802,
-            "depth": 146.0,
-            "z_index": 16,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.575927097432177,
-            "y": 0.3048167718415088,
-            "depth": 134.0,
-            "z_index": 10,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.42753429051564434,
-            "y": 0.3257031696717254,
-            "depth": 142.0,
-            "z_index": 15,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.5610780091898246,
-            "y": 0.24677564790608209,
-            "depth": 109.0,
-            "z_index": 2,
-            "label": "LEFT EAR"
-          }
-        ],
-        [
-          {
-            "x": 0.5542224924423087,
-            "y": 0.34318391948813437,
-            "depth": 144.0,
-            "z_index": 14,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.49115913405113515,
-            "y": 0.42725007662490294,
-            "depth": 125.0,
-            "z_index": 6,
-            "label": "NECK"
-          },
-          {
-            "x": 0.4395400615412831,
-            "y": 0.46296664768370366,
-            "depth": 140.0,
-            "z_index": 12,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.432828854305378,
-            "y": 0.5751062776460851,
-            "depth": 147.0,
-            "z_index": 15,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.48274499634830315,
-            "y": 0.6696424010861333,
-            "depth": 157.0,
-            "z_index": 17,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5427782065609872,
-            "y": 0.39153350556610245,
-            "depth": 111.0,
-            "z_index": 2,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.5211515723561742,
-            "y": 0.46551156945497696,
-            "depth": 102.0,
-            "z_index": 1,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.5214761175617586,
-            "y": 0.5502538511393009,
-            "depth": 100.0,
-            "z_index": 0,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.4457449453158451,
-            "y": 0.5723589201364967,
-            "depth": 130.0,
-            "z_index": 8,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.44260097015653743,
-            "y": 0.6850820576766372,
-            "depth": 132.0,
-            "z_index": 9,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.40467832761135536,
-            "y": 0.7422434690248247,
-            "depth": 118.0,
-            "z_index": 5,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.5123434857978454,
-            "y": 0.5416057271792398,
-            "depth": 115.0,
-            "z_index": 4,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.5709503409544727,
-            "y": 0.6604713707609349,
-            "depth": 129.0,
-            "z_index": 7,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.5918861886501244,
-            "y": 0.7691532102072658,
-            "depth": 133.0,
-            "z_index": 10,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.5192240720309684,
-            "y": 0.33747052262008215,
-            "depth": 148.0,
-            "z_index": 16,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.5714757832040809,
-            "y": 0.30839741964305895,
-            "depth": 136.0,
-            "z_index": 11,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.4224519432352255,
-            "y": 0.3277361809442748,
-            "depth": 143.0,
-            "z_index": 13,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.5587607622657318,
-            "y": 0.25189332255563573,
-            "depth": 111.0,
-            "z_index": 3,
-            "label": "LEFT EAR"
-          }
-        ],
-        [
-          {
-            "x": 0.5516892648316767,
-            "y": 0.3387480979418303,
-            "depth": 143.0,
-            "z_index": 14,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.48866935593363714,
-            "y": 0.4265096574401154,
-            "depth": 125.0,
-            "z_index": 6,
-            "label": "NECK"
-          },
-          {
-            "x": 0.4367279738551896,
-            "y": 0.4608291441431614,
-            "depth": 140.0,
-            "z_index": 12,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.43003682073866367,
-            "y": 0.5738992309462222,
-            "depth": 147.0,
-            "z_index": 15,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.4845276101295265,
-            "y": 0.6667652906946395,
-            "depth": 158.0,
-            "z_index": 17,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5406107380120846,
-            "y": 0.3921901707370694,
-            "depth": 110.0,
-            "z_index": 3,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.5042013876396815,
-            "y": 0.45743570325602173,
-            "depth": 100.0,
-            "z_index": 1,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.4947038265658791,
-            "y": 0.5377348921751235,
-            "depth": 97.0,
-            "z_index": 0,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.4459124340627484,
-            "y": 0.5738462420371516,
-            "depth": 129.0,
-            "z_index": 8,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.42380235242463415,
-            "y": 0.6751663619216208,
-            "depth": 127.0,
-            "z_index": 7,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.36850060157557685,
-            "y": 0.7076966247181999,
-            "depth": 109.0,
-            "z_index": 2,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.514532991058455,
-            "y": 0.5396438363885016,
-            "depth": 115.0,
-            "z_index": 5,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.5633756378294555,
-            "y": 0.6623518982493782,
-            "depth": 129.0,
-            "z_index": 9,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.5828515201697914,
-            "y": 0.7733937016006371,
-            "depth": 134.0,
-            "z_index": 10,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.5165165447326404,
-            "y": 0.3334965033140521,
-            "depth": 147.0,
-            "z_index": 16,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.5681815878281626,
-            "y": 0.30382352121969064,
-            "depth": 134.0,
-            "z_index": 11,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.4195893278768331,
-            "y": 0.3262464065961873,
-            "depth": 142.0,
-            "z_index": 13,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.554367687090563,
-            "y": 0.2488386431741163,
-            "depth": 110.0,
-            "z_index": 4,
-            "label": "LEFT EAR"
-          }
-        ],
-        [
-          {
-            "x": 0.5493354208332701,
-            "y": 0.33477880256466036,
-            "depth": 142.0,
-            "z_index": 14,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.4855099265363187,
-            "y": 0.42560590494989137,
-            "depth": 125.0,
-            "z_index": 6,
-            "label": "NECK"
-          },
-          {
-            "x": 0.430315818447211,
-            "y": 0.4556051572264144,
-            "depth": 139.0,
-            "z_index": 12,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.41326333055744296,
-            "y": 0.5608740839124134,
-            "depth": 142.0,
-            "z_index": 15,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.4509825979616592,
-            "y": 0.6598195332264412,
-            "depth": 151.0,
-            "z_index": 17,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5407040346254263,
-            "y": 0.39560665267336825,
-            "depth": 111.0,
-            "z_index": 3,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.5139925512722935,
-            "y": 0.4656189879167229,
-            "depth": 101.0,
-            "z_index": 0,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.5171012507369332,
-            "y": 0.557895454757098,
-            "depth": 103.0,
-            "z_index": 1,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.4470404368571863,
-            "y": 0.5761085869875976,
-            "depth": 129.0,
-            "z_index": 8,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.45242889736219555,
-            "y": 0.7006423389871241,
-            "depth": 137.0,
-            "z_index": 11,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.383995309873166,
-            "y": 0.706522632847421,
-            "depth": 116.0,
-            "z_index": 5,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.5172387527764749,
-            "y": 0.5360612930187922,
-            "depth": 115.0,
-            "z_index": 4,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.5600451359358353,
-            "y": 0.6609227545188394,
-            "depth": 129.0,
-            "z_index": 9,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.5472225462061542,
-            "y": 0.7538207585567014,
-            "depth": 126.0,
-            "z_index": 7,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.5140119891831288,
-            "y": 0.3290623581439069,
-            "depth": 145.0,
-            "z_index": 16,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.5661044165689294,
-            "y": 0.30016361881427844,
-            "depth": 133.0,
-            "z_index": 10,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.4172598592112302,
-            "y": 0.3216711593561696,
-            "depth": 140.0,
-            "z_index": 13,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.5531531619851833,
-            "y": 0.24628306263487304,
-            "depth": 108.0,
-            "z_index": 2,
-            "label": "LEFT EAR"
-          }
-        ],
-        [
-          {
-            "x": 0.5508181630519416,
-            "y": 0.33642420690855307,
-            "depth": 142.0,
-            "z_index": 14,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.48671188870595117,
-            "y": 0.42620479166926384,
-            "depth": 125.0,
-            "z_index": 7,
-            "label": "NECK"
-          },
-          {
-            "x": 0.42991479648810815,
-            "y": 0.4560411502625917,
-            "depth": 139.0,
-            "z_index": 12,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.4018957208111069,
-            "y": 0.5497450909572894,
-            "depth": 137.0,
-            "z_index": 11,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.4129389188467062,
-            "y": 0.648503244619248,
-            "depth": 143.0,
-            "z_index": 15,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5435089809237942,
-            "y": 0.39636843307593617,
-            "depth": 111.0,
-            "z_index": 2,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.5550842846780311,
-            "y": 0.48489319929426217,
-            "depth": 107.0,
-            "z_index": 0,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.5787839659317489,
-            "y": 0.5797346883289656,
-            "depth": 111.0,
-            "z_index": 3,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.44819887055964797,
-            "y": 0.5762986815009826,
-            "depth": 129.0,
-            "z_index": 8,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.49536216581839737,
-            "y": 0.7004512655853289,
-            "depth": 145.0,
-            "z_index": 16,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.4458455513587165,
-            "y": 0.7580087554519951,
-            "depth": 133.0,
-            "z_index": 9,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.5154876384741841,
-            "y": 0.5360730588180149,
-            "depth": 115.0,
-            "z_index": 4,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.5393306744223334,
-            "y": 0.6581565562586948,
-            "depth": 122.0,
-            "z_index": 6,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.5036750524998126,
-            "y": 0.7358452083550953,
-            "depth": 115.0,
-            "z_index": 5,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.5157304846289802,
-            "y": 0.3289810706535016,
-            "depth": 146.0,
-            "z_index": 17,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.5688764229498829,
-            "y": 0.3027814515609798,
-            "depth": 134.0,
-            "z_index": 10,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.4193267193835246,
-            "y": 0.3183175268223326,
-            "depth": 140.0,
-            "z_index": 13,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.5579682711485333,
-            "y": 0.24997053575169392,
-            "depth": 109.0,
-            "z_index": 1,
-            "label": "LEFT EAR"
-          }
-        ],
-        [
-          {
-            "x": 0.5585967189815676,
-            "y": 0.3354707571021843,
-            "depth": 142.0,
-            "z_index": 14,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.49332967875848827,
-            "y": 0.4250937352721027,
-            "depth": 124.0,
-            "z_index": 7,
-            "label": "NECK"
-          },
-          {
-            "x": 0.4379217569116851,
-            "y": 0.45501257982704885,
-            "depth": 138.0,
-            "z_index": 12,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.3880859845822423,
-            "y": 0.5306233766152799,
-            "depth": 132.0,
-            "z_index": 9,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.37316338551720296,
-            "y": 0.6216972691991536,
-            "depth": 134.0,
-            "z_index": 11,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5487376006052914,
-            "y": 0.39517489071715656,
-            "depth": 110.0,
-            "z_index": 2,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.5894596295950311,
-            "y": 0.49124056288913864,
-            "depth": 112.0,
-            "z_index": 3,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.6385324082205679,
-            "y": 0.5872909002722188,
-            "depth": 123.0,
-            "z_index": 6,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.45059920198354,
-            "y": 0.5764800113921438,
-            "depth": 131.0,
-            "z_index": 8,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.5030729016724516,
-            "y": 0.6975887454493445,
-            "depth": 144.0,
-            "z_index": 15,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.524929839943725,
-            "y": 0.8108837187072895,
-            "depth": 151.0,
-            "z_index": 17,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.5103704235842256,
-            "y": 0.5363581649770157,
-            "depth": 114.0,
-            "z_index": 5,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.5118787233583179,
-            "y": 0.6449904214774249,
-            "depth": 113.0,
-            "z_index": 4,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.4591059584830681,
-            "y": 0.7086568152450852,
-            "depth": 103.0,
-            "z_index": 0,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.5233126149033341,
-            "y": 0.3295289058090043,
-            "depth": 145.0,
-            "z_index": 16,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.5756499276453173,
-            "y": 0.300946514054788,
-            "depth": 133.0,
-            "z_index": 10,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.4266298801135814,
-            "y": 0.3213083256067544,
-            "depth": 140.0,
-            "z_index": 13,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.563162002000064,
-            "y": 0.24674567275990772,
-            "depth": 108.0,
-            "z_index": 1,
-            "label": "LEFT EAR"
-          }
-        ],
-        [
-          {
-            "x": 0.5554106120933925,
-            "y": 0.33288049940126974,
-            "depth": 141.0,
-            "z_index": 14,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.4919434048035288,
-            "y": 0.4236196125639814,
-            "depth": 124.0,
-            "z_index": 6,
-            "label": "NECK"
-          },
-          {
-            "x": 0.4380065255788089,
-            "y": 0.4558598947956075,
-            "depth": 138.0,
-            "z_index": 12,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.38570416471594426,
-            "y": 0.521868794585179,
-            "depth": 129.0,
-            "z_index": 9,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.35864434999732764,
-            "y": 0.6043008209462264,
-            "depth": 128.0,
-            "z_index": 8,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5458802840282486,
-            "y": 0.3913793303323554,
-            "depth": 109.0,
-            "z_index": 2,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.5959784614205634,
-            "y": 0.48169288873032046,
-            "depth": 109.0,
-            "z_index": 3,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.6521424128965354,
-            "y": 0.5726924202573469,
-            "depth": 126.0,
-            "z_index": 7,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.45211944987806363,
-            "y": 0.5759678191077385,
-            "depth": 131.0,
-            "z_index": 10,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.5095236893836768,
-            "y": 0.6945026555616376,
-            "depth": 144.0,
-            "z_index": 15,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.5249771941420229,
-            "y": 0.8054273451437095,
-            "depth": 149.0,
-            "z_index": 17,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.50702102490065,
-            "y": 0.5381066042253846,
-            "depth": 113.0,
-            "z_index": 5,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.5026190865245781,
-            "y": 0.6364459710330154,
-            "depth": 109.0,
-            "z_index": 4,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.42598660685389667,
-            "y": 0.6684788741248671,
-            "depth": 94.0,
-            "z_index": 0,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.5200123945585805,
-            "y": 0.3269090667470239,
-            "depth": 145.0,
-            "z_index": 16,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.5722783838141648,
-            "y": 0.2984528601699479,
-            "depth": 132.0,
-            "z_index": 11,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.42333833994355113,
-            "y": 0.3196079189804625,
-            "depth": 140.0,
-            "z_index": 13,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.5596843899065967,
-            "y": 0.24537424843470484,
-            "depth": 107.0,
-            "z_index": 1,
-            "label": "LEFT EAR"
-          }
-        ],
-        [
-          {
-            "x": 0.5584170670533702,
-            "y": 0.3345387562140772,
-            "depth": 141.0,
-            "z_index": 15,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.4932806503399404,
-            "y": 0.42284445146933725,
-            "depth": 123.0,
-            "z_index": 7,
-            "label": "NECK"
-          },
-          {
-            "x": 0.44127462737949025,
-            "y": 0.4569727322757621,
-            "depth": 138.0,
-            "z_index": 12,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.4001655459688811,
-            "y": 0.5385862436017643,
-            "depth": 133.0,
-            "z_index": 10,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.3880905224888699,
-            "y": 0.6288116080732877,
-            "depth": 134.0,
-            "z_index": 11,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5452866733003906,
-            "y": 0.38871617066291225,
-            "depth": 109.0,
-            "z_index": 3,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.5737210773745068,
-            "y": 0.4780637538688374,
-            "depth": 106.0,
-            "z_index": 1,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.624165735364227,
-            "y": 0.5736736271201658,
-            "depth": 121.0,
-            "z_index": 6,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.450667471360838,
-            "y": 0.5735007350334825,
-            "depth": 131.0,
-            "z_index": 8,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.5028545402172734,
-            "y": 0.692029871231729,
-            "depth": 142.0,
-            "z_index": 16,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.48971401952576904,
-            "y": 0.7860716661279314,
-            "depth": 139.0,
-            "z_index": 13,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.5072479447171407,
-            "y": 0.5418881169527775,
-            "depth": 114.0,
-            "z_index": 4,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.5450249490255339,
-            "y": 0.6527305179959851,
-            "depth": 117.0,
-            "z_index": 5,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.46101664733332487,
-            "y": 0.6669129948890495,
-            "depth": 100.0,
-            "z_index": 0,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.5235421121854956,
-            "y": 0.32835478976219357,
-            "depth": 145.0,
-            "z_index": 17,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.5753762363760921,
-            "y": 0.3001447149122758,
-            "depth": 132.0,
-            "z_index": 9,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.4266020918628277,
-            "y": 0.31963102717397235,
-            "depth": 140.0,
-            "z_index": 14,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.5618215488635329,
-            "y": 0.2460395136811258,
-            "depth": 107.0,
-            "z_index": 2,
-            "label": "LEFT EAR"
-          }
-        ]
-      ],
-      "walking-8-frames_south-west": [
-        [
-          {
-            "x": 0.4423657206071434,
-            "y": 0.34099753847793,
-            "depth": 143.0,
-            "z_index": 13,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.5139235809564929,
-            "y": 0.427843740379862,
-            "depth": 126.0,
-            "z_index": 7,
-            "label": "NECK"
-          },
-          {
-            "x": 0.4547021787235913,
-            "y": 0.39969139531623715,
-            "depth": 113.0,
-            "z_index": 2,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.4466252214856153,
-            "y": 0.4848002928115181,
-            "depth": 107.0,
-            "z_index": 0,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.41681872867413944,
-            "y": 0.5821023813608842,
-            "depth": 114.0,
-            "z_index": 3,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5731449831893943,
-            "y": 0.4559960854434867,
-            "depth": 139.0,
-            "z_index": 11,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.5871124438102737,
-            "y": 0.5571180359273133,
-            "depth": 140.0,
-            "z_index": 12,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.5682873527799218,
-            "y": 0.6559291529425721,
-            "depth": 146.0,
-            "z_index": 15,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.4870134230419563,
-            "y": 0.5369540853827627,
-            "depth": 114.0,
-            "z_index": 4,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.4608421018750762,
-            "y": 0.6567673048438014,
-            "depth": 121.0,
-            "z_index": 6,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.49690184641938695,
-            "y": 0.7353222294887756,
-            "depth": 114.0,
-            "z_index": 5,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.5525984302403715,
-            "y": 0.5765648526632535,
-            "depth": 130.0,
-            "z_index": 8,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.5008430289357219,
-            "y": 0.6989846855310443,
-            "depth": 146.0,
-            "z_index": 16,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.5472582374322202,
-            "y": 0.7582163477321564,
-            "depth": 134.0,
-            "z_index": 9,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.4259965958583639,
-            "y": 0.30681331539196344,
-            "depth": 134.0,
-            "z_index": 10,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.4755213777338043,
-            "y": 0.33432640488290766,
-            "depth": 147.0,
-            "z_index": 17,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.44404420351019896,
-            "y": 0.252043619924234,
-            "depth": 109.0,
-            "z_index": 1,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.5732392715643719,
-            "y": 0.3238168751414372,
-            "depth": 143.0,
-            "z_index": 14,
-            "label": "LEFT EAR"
-          }
-        ],
-        [
-          {
-            "x": 0.4347289401845236,
-            "y": 0.33684672158744844,
-            "depth": 141.0,
-            "z_index": 13,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.5080807351576749,
-            "y": 0.42681408351453154,
-            "depth": 125.0,
-            "z_index": 7,
-            "label": "NECK"
-          },
-          {
-            "x": 0.44975730593696794,
-            "y": 0.3994702262271994,
-            "depth": 112.0,
-            "z_index": 3,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.4234513705449573,
-            "y": 0.4926720011825668,
-            "depth": 110.0,
-            "z_index": 2,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.38407726224151345,
-            "y": 0.5932547867667991,
-            "depth": 123.0,
-            "z_index": 6,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5664041643783819,
-            "y": 0.4541579408018638,
-            "depth": 138.0,
-            "z_index": 12,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.6009261841704181,
-            "y": 0.5355324940012304,
-            "depth": 133.0,
-            "z_index": 10,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.6077434421209775,
-            "y": 0.624371145688976,
-            "depth": 133.0,
-            "z_index": 11,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.49053506058332935,
-            "y": 0.5358106329958355,
-            "depth": 114.0,
-            "z_index": 5,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.48398978892232875,
-            "y": 0.6429762468738579,
-            "depth": 113.0,
-            "z_index": 4,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.5364325900376594,
-            "y": 0.7084660790299633,
-            "depth": 103.0,
-            "z_index": 0,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.5502726241387957,
-            "y": 0.5775208523748638,
-            "depth": 131.0,
-            "z_index": 8,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.49323879024145245,
-            "y": 0.6972887438847635,
-            "depth": 146.0,
-            "z_index": 15,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.47746524553733943,
-            "y": 0.8089315586843454,
-            "depth": 151.0,
-            "z_index": 17,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.4194839816178476,
-            "y": 0.30231490645495057,
-            "depth": 132.0,
-            "z_index": 9,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.46791602904798574,
-            "y": 0.3309916349360088,
-            "depth": 146.0,
-            "z_index": 16,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.43961962987631054,
-            "y": 0.24862368537808388,
-            "depth": 108.0,
-            "z_index": 1,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.5659640890486959,
-            "y": 0.32343255829697926,
-            "depth": 142.0,
-            "z_index": 14,
-            "label": "LEFT EAR"
-          }
-        ],
-        [
-          {
-            "x": 0.43894801316605503,
-            "y": 0.3333778612212237,
-            "depth": 141.0,
-            "z_index": 13,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.5092844215666792,
-            "y": 0.4253359924307654,
-            "depth": 125.0,
-            "z_index": 7,
-            "label": "NECK"
-          },
-          {
-            "x": 0.4512507236625982,
-            "y": 0.39657636467001156,
-            "depth": 111.0,
-            "z_index": 4,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.42251678377796953,
-            "y": 0.4893274528720657,
-            "depth": 110.0,
-            "z_index": 3,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.37974019226127936,
-            "y": 0.5889125004918621,
-            "depth": 124.0,
-            "z_index": 6,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5673181194707602,
-            "y": 0.4540956201915194,
-            "depth": 138.0,
-            "z_index": 12,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.6083935021424112,
-            "y": 0.5220174788885732,
-            "depth": 129.0,
-            "z_index": 9,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.6215248621389536,
-            "y": 0.6044009292441965,
-            "depth": 126.0,
-            "z_index": 8,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.4922393962913958,
-            "y": 0.5383715892968467,
-            "depth": 114.0,
-            "z_index": 5,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.5026310947342605,
-            "y": 0.6329703207083888,
-            "depth": 108.0,
-            "z_index": 2,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.5714898122513192,
-            "y": 0.67327654013413,
-            "depth": 94.0,
-            "z_index": 0,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.5497841482805427,
-            "y": 0.5765346319668575,
-            "depth": 131.0,
-            "z_index": 10,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.49373191704591374,
-            "y": 0.6951074460635143,
-            "depth": 144.0,
-            "z_index": 15,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.4731667281753543,
-            "y": 0.8055244488570736,
-            "depth": 149.0,
-            "z_index": 17,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.42356847955042065,
-            "y": 0.29913068505827084,
-            "depth": 132.0,
-            "z_index": 11,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.4726152092860423,
-            "y": 0.327223602722993,
-            "depth": 145.0,
-            "z_index": 16,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.4425567321970171,
-            "y": 0.24717663499639508,
-            "depth": 107.0,
-            "z_index": 1,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.5705047408650133,
-            "y": 0.3204625253993786,
-            "depth": 141.0,
-            "z_index": 14,
-            "label": "LEFT EAR"
-          }
-        ],
-        [
-          {
-            "x": 0.44445869435084584,
-            "y": 0.3312192532675605,
-            "depth": 140.0,
-            "z_index": 13,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.5113756930374672,
-            "y": 0.42381956972358203,
-            "depth": 124.0,
-            "z_index": 7,
-            "label": "NECK"
-          },
-          {
-            "x": 0.45666789570458766,
-            "y": 0.39078167873997194,
-            "depth": 110.0,
-            "z_index": 3,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.4440640472616944,
-            "y": 0.47904042971705507,
-            "depth": 105.0,
-            "z_index": 1,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.4064237329034374,
-            "y": 0.5780311646378231,
-            "depth": 115.0,
-            "z_index": 5,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5660834903703468,
-            "y": 0.456857460707192,
-            "depth": 138.0,
-            "z_index": 12,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.6042853124196246,
-            "y": 0.533460383472348,
-            "depth": 131.0,
-            "z_index": 8,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.5979455712011953,
-            "y": 0.6238836008978832,
-            "depth": 132.0,
-            "z_index": 10,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.4946329004510898,
-            "y": 0.5426537876566291,
-            "depth": 114.0,
-            "z_index": 4,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.4617215857233483,
-            "y": 0.6514010790128715,
-            "depth": 115.0,
-            "z_index": 6,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.5435300620901362,
-            "y": 0.6649528939722642,
-            "depth": 98.0,
-            "z_index": 0,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.5492304381781339,
-            "y": 0.5741864546936739,
-            "depth": 132.0,
-            "z_index": 11,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.49240606641953144,
-            "y": 0.6910075282481583,
-            "depth": 143.0,
-            "z_index": 16,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.5061065158186735,
-            "y": 0.7844090519068461,
-            "depth": 140.0,
-            "z_index": 14,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.42963487392347294,
-            "y": 0.2967395267073889,
-            "depth": 131.0,
-            "z_index": 9,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.4782480654450803,
-            "y": 0.32560315739119805,
-            "depth": 144.0,
-            "z_index": 17,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.44940791467238433,
-            "y": 0.24519493624958133,
-            "depth": 106.0,
-            "z_index": 2,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.5762249306082283,
-            "y": 0.3204912879264977,
-            "depth": 141.0,
-            "z_index": 15,
-            "label": "LEFT EAR"
-          }
-        ],
-        [
-          {
-            "x": 0.44226479197297797,
-            "y": 0.33245675290166654,
-            "depth": 140.0,
-            "z_index": 13,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.5098600374619845,
-            "y": 0.42423852929712014,
-            "depth": 124.0,
-            "z_index": 6,
-            "label": "NECK"
-          },
-          {
-            "x": 0.456697109670877,
-            "y": 0.3910044114726244,
-            "depth": 110.0,
-            "z_index": 3,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.462068779653558,
-            "y": 0.47171833391657747,
-            "depth": 102.0,
-            "z_index": 0,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.4409617844727741,
-            "y": 0.5647041306758414,
-            "depth": 105.0,
-            "z_index": 1,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5630229652530918,
-            "y": 0.45747264712161595,
-            "depth": 139.0,
-            "z_index": 12,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.5797726086737716,
-            "y": 0.5622439356003621,
-            "depth": 142.0,
-            "z_index": 14,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.5638179130427633,
-            "y": 0.6615277658881293,
-            "depth": 148.0,
-            "z_index": 17,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.49227798074028484,
-            "y": 0.5421576059892047,
-            "depth": 114.0,
-            "z_index": 4,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.42967944987821693,
-            "y": 0.6574569026419608,
-            "depth": 126.0,
-            "z_index": 7,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.47761817870388334,
-            "y": 0.7141093544896995,
-            "depth": 114.0,
-            "z_index": 5,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.5508343218954651,
-            "y": 0.5741137724986536,
-            "depth": 131.0,
-            "z_index": 9,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.5198901084818731,
-            "y": 0.6921242018748085,
-            "depth": 138.0,
-            "z_index": 11,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.5493913887891528,
-            "y": 0.766282868639452,
-            "depth": 128.0,
-            "z_index": 8,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.42854520827833614,
-            "y": 0.29701892117314876,
-            "depth": 132.0,
-            "z_index": 10,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.4760041506023881,
-            "y": 0.32852389100048246,
-            "depth": 145.0,
-            "z_index": 16,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.45037134448816146,
-            "y": 0.24357940664821265,
-            "depth": 107.0,
-            "z_index": 2,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.5741772915515448,
-            "y": 0.3257661166848085,
-            "depth": 142.0,
-            "z_index": 15,
-            "label": "LEFT EAR"
-          }
-        ],
-        [
-          {
-            "x": 0.4441831801653521,
-            "y": 0.33706524174828983,
-            "depth": 142.0,
-            "z_index": 13,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.512266602762416,
-            "y": 0.42830363048368014,
-            "depth": 126.0,
-            "z_index": 6,
-            "label": "NECK"
-          },
-          {
-            "x": 0.4577825209647871,
-            "y": 0.39519101120477684,
-            "depth": 112.0,
-            "z_index": 3,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.4808278637305638,
-            "y": 0.45543544887556653,
-            "depth": 99.0,
-            "z_index": 1,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.47521837452597726,
-            "y": 0.534732619438903,
-            "depth": 95.0,
-            "z_index": 0,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5667506845600447,
-            "y": 0.4614162497625835,
-            "depth": 140.0,
-            "z_index": 12,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.562667596153505,
-            "y": 0.5784971549059551,
-            "depth": 150.0,
-            "z_index": 16,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.5167469062357986,
-            "y": 0.6763554560971348,
-            "depth": 163.0,
-            "z_index": 17,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.48805702811865204,
-            "y": 0.5412946704618204,
-            "depth": 115.0,
-            "z_index": 4,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.4334265038504676,
-            "y": 0.6611663007630075,
-            "depth": 128.0,
-            "z_index": 7,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.4070180125848421,
-            "y": 0.7718506104745891,
-            "depth": 134.0,
-            "z_index": 11,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.554723566193255,
-            "y": 0.5736945436614544,
-            "depth": 130.0,
-            "z_index": 8,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.5555779683133661,
-            "y": 0.6836819902945007,
-            "depth": 131.0,
-            "z_index": 9,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.5952147438743769,
-            "y": 0.7398138901233544,
-            "depth": 117.0,
-            "z_index": 5,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.42948590652820673,
-            "y": 0.30245524994120715,
-            "depth": 133.0,
-            "z_index": 10,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.4778401647711717,
-            "y": 0.3316271706431259,
-            "depth": 147.0,
-            "z_index": 15,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.4497448873964047,
-            "y": 0.2503998053120627,
-            "depth": 109.0,
-            "z_index": 2,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.575886441439871,
-            "y": 0.3265005834283457,
-            "depth": 144.0,
-            "z_index": 14,
-            "label": "LEFT EAR"
-          }
-        ],
-        [
-          {
-            "x": 0.4466183969504866,
-            "y": 0.3340442911779819,
-            "depth": 142.0,
-            "z_index": 13,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.5145073416825964,
-            "y": 0.42731960874529706,
-            "depth": 125.0,
-            "z_index": 6,
-            "label": "NECK"
-          },
-          {
-            "x": 0.45838534635686534,
-            "y": 0.3964327139234687,
-            "depth": 112.0,
-            "z_index": 4,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.4923170467296252,
-            "y": 0.451904635735711,
-            "depth": 98.0,
-            "z_index": 1,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.4983127215822686,
-            "y": 0.5222547678176335,
-            "depth": 91.0,
-            "z_index": 0,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.5706293370083273,
-            "y": 0.4582065035671255,
-            "depth": 139.0,
-            "z_index": 12,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.5712757944542475,
-            "y": 0.5776259887795405,
-            "depth": 152.0,
-            "z_index": 16,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.5043389440552825,
-            "y": 0.6624464393331466,
-            "depth": 166.0,
-            "z_index": 17,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.48526455361595655,
-            "y": 0.5400527589732691,
-            "depth": 115.0,
-            "z_index": 5,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.4337206124348363,
-            "y": 0.6619489244560848,
-            "depth": 130.0,
-            "z_index": 9,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.4148734652194653,
-            "y": 0.7709271006914068,
-            "depth": 134.0,
-            "z_index": 11,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.5559566745771899,
-            "y": 0.5742291286614711,
-            "depth": 129.0,
-            "z_index": 8,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.5730879242166369,
-            "y": 0.6798697284607518,
-            "depth": 128.0,
-            "z_index": 7,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.6306029476122661,
-            "y": 0.7009373091102622,
-            "depth": 109.0,
-            "z_index": 3,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.4320947066075944,
-            "y": 0.29943882850739734,
-            "depth": 133.0,
-            "z_index": 10,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.48053011502684984,
-            "y": 0.3287425707442254,
-            "depth": 146.0,
-            "z_index": 15,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.4521668210106104,
-            "y": 0.24820061285645334,
-            "depth": 108.0,
-            "z_index": 2,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.5785200420767661,
-            "y": 0.3246450540196427,
-            "depth": 143.0,
-            "z_index": 14,
-            "label": "LEFT EAR"
-          }
-        ],
-        [
-          {
-            "x": 0.44695374212899364,
-            "y": 0.337619325805219,
-            "depth": 142.0,
-            "z_index": 13,
-            "label": "NOSE"
-          },
-          {
-            "x": 0.5162287529477005,
-            "y": 0.4282988211188873,
-            "depth": 126.0,
-            "z_index": 7,
-            "label": "NECK"
-          },
-          {
-            "x": 0.45837042737669925,
-            "y": 0.39941150041261286,
-            "depth": 113.0,
-            "z_index": 3,
-            "label": "RIGHT SHOULDER"
-          },
-          {
-            "x": 0.4772099376869777,
-            "y": 0.4682517105078212,
-            "depth": 102.0,
-            "z_index": 1,
-            "label": "RIGHT ELBOW"
-          },
-          {
-            "x": 0.47371860944426025,
-            "y": 0.5495485824312349,
-            "depth": 99.0,
-            "z_index": 0,
-            "label": "RIGHT ARM"
-          },
-          {
-            "x": 0.574087078518702,
-            "y": 0.4571861418251616,
-            "depth": 139.0,
-            "z_index": 11,
-            "label": "LEFT SHOULDER"
-          },
-          {
-            "x": 0.5861549732616265,
-            "y": 0.5697648892505902,
-            "depth": 146.0,
-            "z_index": 15,
-            "label": "LEFT ELBOW"
-          },
-          {
-            "x": 0.5243044599913804,
-            "y": 0.6588326326765788,
-            "depth": 159.0,
-            "z_index": 17,
-            "label": "LEFT ARM"
-          },
-          {
-            "x": 0.48477356374926994,
-            "y": 0.5364712340174259,
-            "depth": 115.0,
-            "z_index": 4,
-            "label": "RIGHT HIP"
-          },
-          {
-            "x": 0.44238090361838756,
-            "y": 0.6606182122686407,
-            "depth": 128.0,
-            "z_index": 8,
-            "label": "RIGHT KNEE"
-          },
-          {
-            "x": 0.45455660659659325,
-            "y": 0.754106610459121,
-            "depth": 125.0,
-            "z_index": 6,
-            "label": "RIGHT LEG"
-          },
-          {
-            "x": 0.5535450824522653,
-            "y": 0.5767575648315977,
-            "depth": 129.0,
-            "z_index": 9,
-            "label": "LEFT HIP"
-          },
-          {
-            "x": 0.5420073250803721,
-            "y": 0.7026501796251781,
-            "depth": 139.0,
-            "z_index": 12,
-            "label": "LEFT KNEE"
-          },
-          {
-            "x": 0.6081527808868786,
-            "y": 0.7065869490320332,
-            "depth": 118.0,
-            "z_index": 5,
-            "label": "LEFT LEG"
-          },
-          {
-            "x": 0.4319238952315759,
-            "y": 0.3028111409999935,
-            "depth": 134.0,
-            "z_index": 10,
-            "label": "RIGHT EYE"
-          },
-          {
-            "x": 0.4808277200845986,
-            "y": 0.3323819799678281,
-            "depth": 147.0,
-            "z_index": 16,
-            "label": "LEFT EYE"
-          },
-          {
-            "x": 0.451156573934543,
-            "y": 0.249516278327231,
-            "depth": 109.0,
-            "z_index": 2,
-            "label": "RIGHT EAR"
-          },
-          {
-            "x": 0.5787317819426511,
-            "y": 0.3266575922822065,
-            "depth": 143.0,
-            "z_index": 14,
-            "label": "LEFT EAR"
-          }
-        ]
       ]
     }
   },
   "export_version": "1.0",
-  "export_date": "2026-01-04T09:11:57.038555"
+  "export_date": "2026-01-04T09:11:21.805618"
 }

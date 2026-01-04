@@ -3,12 +3,13 @@ import type { SystemId, ComponentType } from '../types.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
+import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
 import type { EventData } from '../events/EventMap.js';
 import { getEpisodicMemory, getSemanticMemory, getReflection } from '../utils/componentHelpers.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
-import type { SemanticMemoryComponent } from '../components/SemanticMemoryComponent.js';
+import { SemanticMemoryComponent } from '../components/SemanticMemoryComponent.js';
 import { ReflectionComponent } from '../components/ReflectionComponent.js';
 
 const ONE_DAY_MS = 86400000;
@@ -165,8 +166,8 @@ export class ReflectionSystem implements System {
   private _performDailyReflection(
     entity: Entity,
     episodicMem: EpisodicMemoryComponent,
-    semanticMem: SemanticMemoryComponent,
-    reflectionComp: ReflectionComponent,
+    _semanticMem: SemanticMemoryComponent,
+    _reflectionComp: ReflectionComponent,
     timestamp: number
   ): void {
     // Get today's memories
@@ -188,8 +189,9 @@ export class ReflectionSystem implements System {
     const text = this._generateReflectionText(todaysMemories, 'daily');
 
     // Update reflection component (defensive against deserialized components)
-    entity.updateComponent(CT.Reflection, (current: ReflectionComponent) => {
-      const temp = new ReflectionComponent(current);
+    (entity as EntityImpl).updateComponent(CT.Reflection, (current: ReflectionComponent) => {
+      // Create fresh instance and copy state (handles deserialized components)
+      const temp = Object.assign(new ReflectionComponent(), current);
       temp.isReflecting = true;
       temp.reflectionType = 'daily';
       temp.addReflection({
@@ -209,8 +211,8 @@ export class ReflectionSystem implements System {
       .map(m => m.id);
 
     if (importantMemoryIds.length > 0) {
-      entity.updateComponent(CT.EpisodicMemory, (current: EpisodicMemoryComponent) => {
-        const temp = new EpisodicMemoryComponent(current);
+      (entity as EntityImpl).updateComponent(CT.EpisodicMemory, (current: EpisodicMemoryComponent) => {
+        const temp = Object.assign(new EpisodicMemoryComponent(), current);
         for (const memoryId of importantMemoryIds) {
           temp.updateMemory(memoryId, { markedForConsolidation: true });
         }
@@ -220,8 +222,8 @@ export class ReflectionSystem implements System {
 
     // Update semantic memory from insights
     if (insights.length > 0) {
-      entity.updateComponent(CT.SemanticMemory, (current: SemanticMemoryComponent) => {
-        const temp = new (current.constructor as any)(current);
+      (entity as EntityImpl).updateComponent(CT.SemanticMemory, (current: SemanticMemoryComponent) => {
+        const temp = Object.assign(new SemanticMemoryComponent(), current);
         for (const insight of insights) {
           temp.formBelief({
             category: CT.Reflection,
@@ -236,8 +238,8 @@ export class ReflectionSystem implements System {
 
     // Clear reflection indicator for UI and get final count
     let finalReflectionCount = 0;
-    entity.updateComponent(CT.Reflection, (current: ReflectionComponent) => {
-      const temp = new ReflectionComponent(current);
+    (entity as EntityImpl).updateComponent(CT.Reflection, (current: ReflectionComponent) => {
+      const temp = Object.assign(new ReflectionComponent(), current);
       temp.isReflecting = false;
       temp.reflectionType = undefined;
       finalReflectionCount = temp.reflections.length;
@@ -287,8 +289,8 @@ export class ReflectionSystem implements System {
     const text = this._generateReflectionText(relevantMemories, 'deep');
 
     // Update reflection component (defensive against deserialized components)
-    entity.updateComponent(CT.Reflection, (current: ReflectionComponent) => {
-      const temp = new ReflectionComponent(current);
+    (entity as EntityImpl).updateComponent(CT.Reflection, (current: ReflectionComponent) => {
+      const temp = Object.assign(new ReflectionComponent(), current);
       temp.isReflecting = true;
       temp.reflectionType = 'deep';
       temp.addReflection({
@@ -305,8 +307,8 @@ export class ReflectionSystem implements System {
 
     // Update semantic memory with identity insights
     if (identityInsights.length > 0) {
-      entity.updateComponent(CT.SemanticMemory, (current: SemanticMemoryComponent) => {
-        const temp = new (current.constructor as any)(current);
+      (entity as EntityImpl).updateComponent(CT.SemanticMemory, (current: SemanticMemoryComponent) => {
+        const temp = Object.assign(new SemanticMemoryComponent(), current);
         for (const insight of identityInsights) {
           temp.formBelief({
             category: CT.Identity,
@@ -322,8 +324,8 @@ export class ReflectionSystem implements System {
 
     // Clear reflection indicator and get final count
     let finalReflectionCount = 0;
-    entity.updateComponent(CT.Reflection, (current: ReflectionComponent) => {
-      const temp = new ReflectionComponent(current);
+    (entity as EntityImpl).updateComponent(CT.Reflection, (current: ReflectionComponent) => {
+      const temp = Object.assign(new ReflectionComponent(), current);
       temp.isReflecting = false;
       temp.reflectionType = undefined;
       finalReflectionCount = temp.reflections.length;

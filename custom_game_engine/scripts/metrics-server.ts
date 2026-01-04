@@ -41,7 +41,7 @@
  *   GET  /api/live/entity      - Get entity state by ID (live)
  *   GET  /api/live/prompt      - Get LLM prompt for agent (live)
  *   POST /api/live/set-llm     - Set custom LLM config for agent (live)
- *   GET  /api/live/universe    - Get universe configuration (dimensions, laws, etc.)
+ *   GET  /api/live/universe?session=<id> - Get universe config (optional session filter)
  *   GET  /api/live/magic       - Get magic system info (enabled paradigms, etc.)
  *   GET  /api/live/pending-approvals - Get pending creations awaiting divine approval
  *   POST /api/live/approve-creation?id=<id> - Approve a pending creation
@@ -829,6 +829,15 @@ function renderAgentsPanel(data: any): string {
 function getActiveGameClient(): WebSocket | null {
   for (const [ws, _sessionId] of wsSessions.entries()) {
     if (ws.readyState === WebSocket.OPEN) {
+      return ws;
+    }
+  }
+  return null;
+}
+
+function getGameClientForSession(sessionId: string): WebSocket | null {
+  for (const [ws, wsSessionId] of wsSessions.entries()) {
+    if (wsSessionId === sessionId && ws.readyState === WebSocket.OPEN) {
       return ws;
     }
   }
@@ -4361,10 +4370,18 @@ Available agents:
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    const gameClient = getActiveGameClient();
+    // Support session filtering via ?session=<id> query parameter
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
     if (!gameClient) {
       res.statusCode = 503;
-      res.end(JSON.stringify({ error: 'No game client connected', connected: false }));
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
       return;
     }
 
@@ -4389,10 +4406,18 @@ Available agents:
       return;
     }
 
-    const gameClient = getActiveGameClient();
+    // Support session filtering via ?session=<id> query parameter
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
     if (!gameClient) {
       res.statusCode = 503;
-      res.end(JSON.stringify({ error: 'No game client connected', connected: false }));
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
       return;
     }
 
@@ -4417,10 +4442,18 @@ Available agents:
       return;
     }
 
-    const gameClient = getActiveGameClient();
+    // Support session filtering via ?session=<id> query parameter
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
     if (!gameClient) {
       res.statusCode = 503;
-      res.end(JSON.stringify({ error: 'No game client connected', connected: false }));
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
       return;
     }
 
@@ -4450,10 +4483,18 @@ Available agents:
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    const gameClient = getActiveGameClient();
+    // Support session filtering via ?session=<id> query parameter
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
     if (!gameClient) {
       res.statusCode = 503;
-      res.end(JSON.stringify({ error: 'No game client connected', connected: false }));
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
       return;
     }
 
@@ -4471,10 +4512,18 @@ Available agents:
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    const gameClient = getActiveGameClient();
+    // Support session filtering via ?session=<id> query parameter
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
     if (!gameClient) {
       res.statusCode = 503;
-      res.end(JSON.stringify({ error: 'No game client connected', connected: false }));
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
       return;
     }
 
@@ -4492,10 +4541,18 @@ Available agents:
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    const gameClient = getActiveGameClient();
+    // Support session filtering via ?session=<id> query parameter
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
     if (!gameClient) {
       res.statusCode = 503;
-      res.end(JSON.stringify({ error: 'No game client connected', connected: false }));
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
       return;
     }
 
@@ -4513,10 +4570,18 @@ Available agents:
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    const gameClient = getActiveGameClient();
+    // Support session filtering via ?session=<id> query parameter
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
     if (!gameClient) {
       res.statusCode = 503;
-      res.end(JSON.stringify({ error: 'No game client connected', connected: false }));
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
       return;
     }
 

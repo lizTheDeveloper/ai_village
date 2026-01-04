@@ -325,6 +325,41 @@
         recordingPath: '/mock-recordings/alien-invasion.json',
         type: 'recording'
       },
+      {
+        id: 'gladiator-arena',
+        name: 'ARENA BLOODSPORT - CHAMPIONSHIP FINALS',
+        description: 'Two legendary gladiators clash in the final match of the season',
+        recordingPath: '/mock-recordings/gladiator-arena.json',
+        type: 'recording'
+      },
+      {
+        id: 'reproductive-test',
+        name: 'FERTILITY FESTIVAL - SCIENTIFIC DOCUMENTATION',
+        description: 'Reproductive systems E2E test at the annual Spring Ritual',
+        recordingPath: '/mock-recordings/reproductive-test.json',
+        type: 'recording'
+      },
+      {
+        id: 'market-festival',
+        name: 'HARVEST MARKET - GRAND OPENING DAY',
+        description: 'Bustling village market with merchants, performers, and shoppers',
+        recordingPath: '/mock-recordings/market-festival.json',
+        type: 'recording'
+      },
+      {
+        id: 'magic-ritual',
+        name: 'ARCANE DISASTER - RITUAL GONE WRONG',
+        description: 'Apprentice mages attempt summoning ritual with catastrophic results',
+        recordingPath: '/mock-recordings/magic-ritual.json',
+        type: 'recording'
+      },
+      {
+        id: 'disaster-response',
+        name: 'BREAKING NEWS - EARTHQUAKE HITS VILLAGE',
+        description: 'Emergency response teams coordinate rescue during catastrophic earthquake',
+        recordingPath: '/mock-recordings/disaster-response.json',
+        type: 'recording'
+      },
     ];
 
     class SpriteAnimationPlayer {
@@ -519,10 +554,31 @@
         if (this.spriteCache.has(key)) return;
 
         try {
-          // Map entity types to sprite paths
+          // Map entity types to sprite configurations
           const spriteMapping = {
-            'villager': { id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
-            'alien': { id: 'villager', animation: 'walking-8-frames', frameCount: 8 }, // TODO: Use real alien sprites
+            // Humanoids (animated)
+            'villager': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
+            'gladiator': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
+            'spectator': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
+            'official': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
+            'merchant': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
+            'bard': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
+            'child': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
+            'guard': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
+            'emergency': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
+            'scholar': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
+            'mage': { type: 'animated', id: 'villager', animation: 'walking-8-frames', frameCount: 8 },
+
+            // Aliens (static rotations)
+            'alien': { type: 'static', id: 'blob-alien' },
+
+            // Animals (static rotations)
+            'dog': { type: 'static', id: 'dog_spotted' },
+
+            // Divine/special entities (static rotations)
+            'priest': { type: 'static', id: 'punisher-angel' },
+            'deity_manifestation': { type: 'static', id: 'punisher-angel' },
+            'demon': { type: 'static', id: 'blob-alien' },
           };
 
           const spriteConfig = spriteMapping[entityType];
@@ -531,12 +587,19 @@
             return;
           }
 
-          // Load all frames for this animation
           const frames = [];
-          for (let i = 0; i < spriteConfig.frameCount; i++) {
-            const frameNum = String(i).padStart(3, '0');
-            const frameUrl = `/assets/sprites/pixellab/${spriteConfig.id}/animations/${spriteConfig.animation}/south/frame_${frameNum}.png`;
 
+          if (spriteConfig.type === 'animated') {
+            // Load animated sprite frames
+            for (let i = 0; i < spriteConfig.frameCount; i++) {
+              const frameNum = String(i).padStart(3, '0');
+              const frameUrl = `/dist/assets/sprites/pixellab/${spriteConfig.id}/animations/${spriteConfig.animation}/south/frame_${frameNum}.png`;
+              const img = await this.loadImage(frameUrl);
+              frames.push(img);
+            }
+          } else {
+            // Load static rotation sprite (just south facing)
+            const frameUrl = `/dist/assets/sprites/pixellab/${spriteConfig.id}/rotations/south.png`;
             const img = await this.loadImage(frameUrl);
             frames.push(img);
           }

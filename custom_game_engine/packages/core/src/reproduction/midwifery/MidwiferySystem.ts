@@ -304,8 +304,8 @@ export class MidwiferySystem implements System {
         }
 
         // Return updated component (defensive instantiation)
-        return new PregnancyComponent({
-          ...current,
+        const updated = new PregnancyComponent();
+        Object.assign(updated, current, {
           gestationProgress,
           daysRemaining,
           trimester,
@@ -315,6 +315,7 @@ export class MidwiferySystem implements System {
           fetalHeartbeat,
           complications,
         });
+        return updated;
       });
 
       // Get updated pregnancy for labor check
@@ -376,7 +377,7 @@ export class MidwiferySystem implements System {
       // Update labor progression using updateComponent (defensive against deserialized components)
       impl.updateComponent<LaborComponent>('labor', (current) => {
         // Create a proper LaborComponent instance from current data
-        const tempLabor = new LaborComponent(current);
+        const tempLabor = Object.assign(new LaborComponent(), current);
 
         // Call update method on the instance
         tempLabor.update(deltaTicks);
@@ -744,7 +745,7 @@ export class MidwiferySystem implements System {
 
       // Update postpartum using updateComponent (defensive against deserialized components)
       impl.updateComponent<PostpartumComponent>('postpartum', (current) => {
-        const temp = new PostpartumComponent(current);
+        const temp = Object.assign(new PostpartumComponent(), current);
         temp.update(deltaDays);
         return temp;
       });
@@ -783,7 +784,7 @@ export class MidwiferySystem implements System {
 
       // Update nursing using updateComponent (defensive against deserialized components)
       impl.updateComponent<NursingComponent>('nursing', (current) => {
-        const temp = new NursingComponent(current);
+        const temp = Object.assign(new NursingComponent(), current);
         temp.update(currentTick, deltaDays, motherHunger);
         return temp;
       });
@@ -812,7 +813,7 @@ export class MidwiferySystem implements System {
 
       // Update infant using updateComponent (defensive against deserialized components)
       impl.updateComponent<InfantComponent>('infant', (current) => {
-        const temp = new InfantComponent(current);
+        const temp = Object.assign(new InfantComponent(), current);
         temp.update(currentTick, deltaDays);
         return temp;
       });
@@ -965,15 +966,14 @@ export class MidwiferySystem implements System {
       }
 
       // Return updated component
-      return new PregnancyComponent({
-        ...current,
-        fetalPosition: updatedFetalPosition,
-        checkupHistory,
-        lastCheckupTick: checkup.tick,
-        riskFactors,
-        detected: true,
-        detectedAt: current.detected ? current.detectedAt : currentTick,
-      });
+      const updated = Object.assign(new PregnancyComponent(), current);
+      updated.fetalPosition = updatedFetalPosition;
+      updated.checkupHistory = checkupHistory;
+      updated.lastCheckupTick = checkup.tick;
+      updated.riskFactors = riskFactors;
+      updated.detected = true;
+      updated.detectedAt = current.detected ? current.detectedAt : currentTick;
+      return updated;
     });
 
     this.eventBus?.emit({
