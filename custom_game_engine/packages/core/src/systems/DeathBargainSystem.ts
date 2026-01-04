@@ -53,6 +53,16 @@ export class DeathBargainSystem implements System {
     this.riddleGenerator = new RiddleGenerator(provider);
   }
 
+  /**
+   * Set LLM queue (adapter method for compatibility)
+   * Wraps the queue as an LLMProvider
+   */
+  setLLMQueue(queue: any): void {
+    // Wrap the queue as an LLMProvider
+    this.llmProvider = queue;
+    this.riddleGenerator = new RiddleGenerator(queue);
+  }
+
   setUseLLM(enabled: boolean): void {
     this.useLLM = enabled;
   }

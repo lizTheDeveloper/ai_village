@@ -9,8 +9,6 @@
     "src/**/__tests__/**/*",
     "src/**/*.test.ts",
     "src/**/__benchmarks__/**/*",
-    "src/**/*.bench.ts",
-    "src/systems/DeathBargainSystem.ts",
-    "src/systems/DeathTransitionSystem.ts"
+    "src/**/*.bench.ts"
   ]
 }

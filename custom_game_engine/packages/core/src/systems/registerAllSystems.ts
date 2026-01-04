@@ -537,15 +537,16 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new DeathJudgmentSystem());
 
   // Death Bargain System - hero challenges to cheat death
-  // Temporarily disabled - incomplete implementation
-  // const deathBargainSystem = new DeathBargainSystem();
-  // gameLoop.systemRegistry.register(deathBargainSystem);
+  // Heroes can challenge the God of Death with riddles to win a second chance
+  // Note: LLM riddle judgment requires LLMProvider (not llmQueue) - works without it using exact match
+  const deathBargainSystem = new DeathBargainSystem();
+  gameLoop.systemRegistry.register(deathBargainSystem);
 
   // Death Transition System - handles moving dead entities to afterlife
-  // Temporarily disabled - incomplete implementation
-  // const deathTransitionSystem = new DeathTransitionSystem();
-  // deathTransitionSystem.setDeathBargainSystem(deathBargainSystem);
-  // gameLoop.systemRegistry.register(deathTransitionSystem);
+  // Routes souls based on deity worship, handles reincarnation/annihilation policies
+  const deathTransitionSystem = new DeathTransitionSystem();
+  deathTransitionSystem.setDeathBargainSystem(deathBargainSystem);
+  gameLoop.systemRegistry.register(deathTransitionSystem);
 
   const realmManager = new RealmManager();
   gameLoop.systemRegistry.register(realmManager);

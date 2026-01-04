@@ -10,6 +10,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import { DeityComponent } from '../components/DeityComponent.js';
 import type { SpiritualComponent } from '../components/SpiritualComponent.js';
 import { AngelAIDecisionProcessor } from './AngelAIDecisionProcessor.js';
+import { isFeatureAvailable, type AngelConfig as DivineAngelConfig, type RestrictionConfig } from '../divinity/UniverseConfig.js';
 
 // ============================================================================
 // Angel Types
@@ -110,6 +111,41 @@ export class AngelSystem implements System {
     this.aiProcessor.setLLMProvider(provider as any);
   }
 
+  /**
+   * Get the divine angel config from the world's divine config
+   */
+  private getDivineAngelConfig(world: World): DivineAngelConfig | undefined {
+    const divineConfig = (world as any).divineConfig;
+    return divineConfig?.angels;
+  }
+
+  /**
+   * Get the restriction config from the world's divine config
+   */
+  private getRestrictionConfig(world: World): RestrictionConfig | undefined {
+    const divineConfig = (world as any).divineConfig;
+    return divineConfig?.restrictions;
+  }
+
+  /**
+   * Check if angels are enabled in this universe
+   */
+  private areAngelsEnabled(world: World): boolean {
+    // Check the angels config
+    const angelConfig = this.getDivineAngelConfig(world);
+    if (angelConfig && !angelConfig.angelsAllowed) {
+      return false;
+    }
+
+    // Also check restrictions
+    const restrictions = this.getRestrictionConfig(world);
+    if (restrictions && !isFeatureAvailable('angels', restrictions)) {
+      return false;
+    }
+
+    return true;
+  }
+
   update(world: World): void {
     const currentTick = world.tick;
 
@@ -133,6 +169,11 @@ export class AngelSystem implements System {
     purpose: AngelPurpose,
     autonomousAI: boolean = true
   ): AngelData | null {
+    // Check if angels are enabled in this universe
+    if (!this.areAngelsEnabled(world)) {
+      return null;
+    }
+
     // Find deity
     const deityEntity = world.getEntity(deityId);
     if (!deityEntity) return null;
@@ -140,8 +181,14 @@ export class AngelSystem implements System {
     const deity = deityEntity.components.get(CT.Deity) as DeityComponent | undefined;
     if (!deity) return null;
 
-    // Check cost
-    const cost = this.config.creationCosts[rank];
+    // Get divine config multipliers
+    const divineAngelConfig = this.getDivineAngelConfig(world);
+    const creationMultiplier = divineAngelConfig?.creationCostMultiplier ?? 1.0;
+
+    // Calculate cost with config multiplier
+    const baseCost = this.config.creationCosts[rank];
+    const cost = Math.ceil(baseCost * creationMultiplier);
+
     if (deity.belief.currentBelief < cost) {
       return null;
     }
@@ -173,6 +220,10 @@ export class AngelSystem implements System {
    * Update all active angels
    */
   private updateAngels(world: World, _currentTick: number): void {
+    // Get maintenance cost multiplier from divine config
+    const divineAngelConfig = this.getDivineAngelConfig(world);
+    const maintenanceMultiplier = divineAngelConfig?.maintenanceCostMultiplier ?? 1.0;
+
     for (const angel of this.angels.values()) {
       if (!angel.active) continue;
 
@@ -189,8 +240,9 @@ export class AngelSystem implements System {
         continue;
       }
 
-      // Deduct maintenance cost
-      const canMaintain = deity.spendBelief(angel.beliefCostPerTick);
+      // Deduct maintenance cost with config multiplier
+      const adjustedCost = Math.ceil(angel.beliefCostPerTick * maintenanceMultiplier);
+      const canMaintain = deity.spendBelief(adjustedCost);
 
       if (!canMaintain) {
         this.dismissAngel(angel.id);

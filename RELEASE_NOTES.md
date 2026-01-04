@@ -1,5 +1,69 @@
 # Release Notes
 
+## 60-Minute Commit Cycle #6
+
+**12 commits, ~95,000+ lines added**
+
+### Combat Scenario Assets
+
+#### New Combat Matchups
+- **dragon-vs-knight/** - Dragon and knight character assets with full metadata
+- **wolf-vs-dog/** - Wolf and dog combat scenario with animations
+- **wolf-vs-deer/** - Predator-prey combat scenario
+- **seraphiel/metadata.json** (+13,611 lines) - Full angel animation metadata
+
+### Soul Sprite Rendering System
+
+#### Core Implementation
+- **SoulSpriteRenderer.ts** - Soul-based sprite rendering with personality integration
+- **render-soul-sprite.ts** (186 lines) - CLI for soul-based sprite generation
+- **Interdimensional cable UI** - Enhanced recording playback interface
+
+### Clarke-tech Research Expansion
+
+#### New Research Paper Specs
+- **clarketech-tier6-spec.json** - VR, fusion, cryogenics, neural interfaces, AI
+- **clarketech-tier7-spec.json** - Full dive VR, hive mind, force fields, cross-realm messaging
+- **clarketech-tier8-spec.json** - Advanced cross-reality communication
+- **clarketech-energy-weapons-spec.json** - Energy weapon research tree
+- **clarketech-exotic-physics-spec.json** - Exotic physics research papers
+- **clarketech-tier6-papers.ts**, **clarketech-tier7-papers.ts** - TypeScript implementations
+
+### Divine Systems Enhancement
+
+#### Death & Divine Mechanics
+- **DeathBargainSystem.ts** - Soul bargaining at death
+- **DeathTransitionSystem.ts** - Death state management
+- **DivinePowerSystem.ts** - Divine power calculations
+- **DeityComponent.ts** - Deity attribute expansion
+- **AvatarSystem.ts** - Divine avatar manifestation
+- **BeliefGenerationSystem.ts** - Belief propagation mechanics
+
+### Core System Updates
+
+- **RelationshipConversationSystem.ts** - Re-enabled relationship conversations
+- **SaveLoadService.ts**, **WorldSerializer.ts** - Persistence improvements
+- **InvariantChecker.ts** - State validation fixes
+- **Energy weapons** - Additional weapon definitions
+
+### Commits
+| Round | Commit | Lines | Content |
+|-------|--------|-------|---------|
+| 1 | `96d66a0` | 15,889 | Seraphiel metadata, Clarke-tech specs |
+| 2 | `8f677b7` | 8 | InvariantChecker, SaveLoadService |
+| 3 | `e497997` | 494 | SoulSpriteRenderer, cable UI |
+| 4 | `e0c6520` | 256 | render-soul-sprite CLI |
+| 5 | `75afdb4` | 130 | Production README, types |
+| 6 | `fd7c4b0` | 55 | main.ts, renderer improvements |
+| 7 | `4506366` | 52 | Energy weapons, code audit |
+| 8 | `57c67dc` | 17,119 | Dragon-vs-knight, RelationshipConversation |
+| 9 | `2b7671d` | 27,041 | Knight assets, energy/exotic specs |
+| 10 | `1383988` | 2,846 | Wolf-vs-dog, tier7-papers |
+| 11 | `8a6fd5b` | 31,007 | Wolf-vs-deer, death systems, tier 6 |
+| 12 | `9ab8cad` | 103 | Divine systems expansion |
+
+---
+
 ## 60-Minute Commit Cycle #5
 
 **12 commits, ~68,000+ lines added**
