@@ -399,15 +399,15 @@ export class UpliftCandidateDetectionSystem implements System {
    */
   private estimateGenerations(neuralComplexity: number): number {
     if (neuralComplexity >= 0.7) {
-      return BASE_GENERATION_ESTIMATES.pre_sapient_high;
+      return BASE_GENERATION_ESTIMATES.pre_sapient_high!;
     } else if (neuralComplexity >= 0.6) {
-      return BASE_GENERATION_ESTIMATES.pre_sapient_medium;
+      return BASE_GENERATION_ESTIMATES.pre_sapient_medium!;
     } else if (neuralComplexity >= 0.5) {
-      return BASE_GENERATION_ESTIMATES.pre_sapient_low;
+      return BASE_GENERATION_ESTIMATES.pre_sapient_low!;
     } else if (neuralComplexity >= 0.4) {
-      return BASE_GENERATION_ESTIMATES.intelligent;
+      return BASE_GENERATION_ESTIMATES.intelligent!;
     } else {
-      return BASE_GENERATION_ESTIMATES.basic;
+      return BASE_GENERATION_ESTIMATES.basic!;
     }
   }
 
@@ -460,7 +460,7 @@ export class UpliftCandidateDetectionSystem implements System {
   /**
    * Get all evaluated candidates
    */
-  getCandidates(world: World): Entity[] {
+  getCandidates(world: World): readonly Entity[] {
     return world.query()
       .with(CT.UpliftCandidate)
       .executeEntities();

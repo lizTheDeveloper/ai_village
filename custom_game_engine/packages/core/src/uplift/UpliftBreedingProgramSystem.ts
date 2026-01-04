@@ -118,7 +118,7 @@ export class UpliftBreedingProgramSystem implements System {
       birthCount: newBreedingPop.length,
       survivalRate: newBreedingPop.length / program.populationSize,
       averageIntelligence: program.currentIntelligence,
-      neuralComplexityGain: intelligenceGain,
+      neuralComplexity: intelligenceGain,
       mutations: [],
       breakthroughs: [],
       setbacks: [],
@@ -236,8 +236,8 @@ export class UpliftBreedingProgramSystem implements System {
     const prefixes = ['First', 'Alpha', 'Nova', 'Prime', 'Apex'];
     const suffixes = ['Mind', 'Thinker', 'Seeker', 'Clever', 'Bright'];
 
-    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-    const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)]!;
+    const suffix = suffixes[Math.floor(Math.random() * suffixes.length)]!;
 
     return `${prefix}-${suffix}`;
   }
@@ -255,7 +255,7 @@ export class UpliftBreedingProgramSystem implements System {
       'Social learning dramatically increases knowledge transmission',
     ];
 
-    return breakthroughs[Math.floor(Math.random() * breakthroughs.length)];
+    return breakthroughs[Math.floor(Math.random() * breakthroughs.length)]!;
   }
 
   /**

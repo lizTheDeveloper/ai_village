@@ -717,6 +717,363 @@ With these additions, we can express plots based on classic dramatic situations:
 | Obstacles to Love | Yes | Relationship + external conditions |
 | Erroneous Judgment | Yes | Choice consequences + regret |
 
+---
+
+## Phase 6: Timeline & Fork Integration
+
+The plot system must integrate with the timeline/forking mechanics. Saves are timeline snapshots. Loads are time travel. Save interference creates universe forks.
+
+### Timeline-Aware Conditions
+
+```typescript
+// Check if universe was forked from another
+| { type: 'in_forked_universe'; }
+
+// Check if this is the "original" timeline (no parent)
+| { type: 'in_original_timeline'; }
+
+// Check fork depth (how many forks from original)
+| { type: 'fork_depth'; min?: number; max?: number }
+
+// Check if a specific event happened in this timeline
+| { type: 'timeline_event_occurred'; event_type: CanonEventType; since_ticks?: number }
+
+// Check if currently in a "what-if" branch (experimental fork)
+| { type: 'in_experimental_fork'; }
+```
+
+### Fork-Triggered Plot Assignment
+
+Plots can be assigned when universe forks occur:
+
+```typescript
+interface PlotLineTemplate {
+  assignment_rules?: {
+    // ... existing rules ...
+
+    // NEW: Assign when universe forks
+    triggers?: PlotTrigger[];
+
+    trigger_on_fork?: {
+      /** Assign to souls in the NEW forked universe */
+      in_fork: boolean;
+      /** Assign to souls in the ORIGINAL universe (who "stay behind") */
+      in_original: boolean;
+      /** Only trigger if fork was from this soul's canon event */
+      if_canon_event_source: boolean;
+    };
+  };
+}
+```
+
+### Example: The Road Not Taken
+
+When a timeline forks, souls in the original universe may become aware of the path not taken:
+
+```typescript
+const theRoadNotTaken: PlotLineTemplate = {
+  id: 'road_not_taken',
+  name: 'The Road Not Taken',
+  scale: 'small',
+
+  lesson: {
+    theme: 'Choice and consequence',
+    domain: 'self',
+    insight: 'Every choice creates worlds. You cannot walk them all.',
+    wisdom_value: 10,
+    repeatable: false,
+  },
+
+  assignment_rules: {
+    trigger_on_fork: {
+      in_fork: false,       // Assign in the ORIGINAL timeline
+      in_original: true,    // The one who stayed
+      if_canon_event_source: true,  // Only if THEIR action caused the fork
+    },
+  },
+
+  entry_stage: 'awareness',
+  completion_stages: ['acceptance', 'regret'],
+
+  stages: [
+    {
+      stage_id: 'awareness',
+      name: 'Branching Moment',
+      description: 'You sense that reality has... split. Another version of you walks a different path.',
+    },
+    {
+      stage_id: 'wondering',
+      name: 'The Other Self',
+      description: 'What are they doing? What choices did they make differently?',
+    },
+    {
+      stage_id: 'acceptance',
+      name: 'This Is My Path',
+      description: 'You accept your choices. The other path is not yours to walk.',
+      on_enter_effects: [
+        { type: 'learn_lesson', lesson_id: 'acceptance_of_choice' },
+        { type: 'modify_stress', delta: -15 },
+      ],
+    },
+    {
+      stage_id: 'regret',
+      name: 'Eternal Wondering',
+      description: 'You will always wonder what could have been.',
+      on_enter_effects: [
+        { type: 'learn_lesson', lesson_id: 'burden_of_choice' },
+        { type: 'add_trauma', trauma_type: 'existential_doubt' },
+      ],
+    },
+  ],
+
+  transitions: [
+    {
+      from_stage: 'awareness',
+      to_stage: 'wondering',
+      conditions: [
+        { type: 'personal_tick_elapsed', ticks: 200 },
+      ],
+    },
+    // High wisdom leads to acceptance
+    {
+      from_stage: 'wondering',
+      to_stage: 'acceptance',
+      conditions: [
+        { type: 'wisdom_threshold', min_wisdom: 30 },
+        { type: 'mood_threshold', min: -20 },
+      ],
+    },
+    // Low wisdom or depression leads to regret
+    {
+      from_stage: 'wondering',
+      to_stage: 'regret',
+      conditions: [
+        { type: 'personal_tick_elapsed', ticks: 1000 },
+        { type: 'emotional_state', state: 'melancholic' },
+      ],
+    },
+  ],
+};
+```
+
+### Plot Fork Behavior
+
+When a universe forks, active plots need a policy:
+
+```typescript
+type PlotForkBehavior =
+  | 'continue'    // Plot continues in both timelines independently
+  | 'reset'       // Plot resets to entry stage in fork
+  | 'suspend'     // Plot suspends in fork until reactivated
+  | 'abandon'     // Plot abandons in fork (only continues in original)
+  | 'split'       // Plot creates a "sibling" plot tracking both versions
+```
+
+The `split` behavior is special - it creates linked plots that can interact:
+
+```typescript
+interface PlotSplit {
+  /** Original plot instance */
+  original_id: string;
+  original_universe_id: string;
+
+  /** Forked plot instance */
+  forked_id: string;
+  forked_universe_id: string;
+
+  /** How the outcomes might reconnect */
+  confluence_possible: boolean;
+  confluence_conditions?: PlotCondition[];
+}
+```
+
+### Example: The Doppelganger
+
+A plot that explicitly tracks your forked self:
+
+```typescript
+const theDoppelganger: PlotLineTemplate = {
+  id: 'the_doppelganger',
+  name: 'The Other You',
+  scale: 'medium',
+  fork_behavior: 'split',
+
+  lesson: {
+    theme: 'Identity across possibility',
+    domain: 'self',
+    insight: 'You are not defined by a single path. You are every choice you could have made.',
+    wisdom_value: 25,
+    repeatable: false,
+  },
+
+  // Requires cross-universe awareness
+  entry_stage: 'sensing',
+  completion_stages: ['integration', 'rejection', 'encounter'],
+
+  stages: [
+    {
+      stage_id: 'sensing',
+      name: 'Another Self',
+      description: 'You feel them. Another you, making different choices.',
+    },
+    {
+      stage_id: 'comparison',
+      name: 'Measuring Paths',
+      description: 'Are they happier? More successful? More... you?',
+    },
+    {
+      stage_id: 'integration',
+      name: 'All Paths Are You',
+      description: 'You realize that all your possible selves are equally valid.',
+      on_enter_effects: [
+        { type: 'learn_lesson', lesson_id: 'quantum_identity' },
+      ],
+    },
+    {
+      stage_id: 'rejection',
+      name: 'I Am The Real One',
+      description: 'You reject the other as false. There can be only one.',
+    },
+    {
+      stage_id: 'encounter',
+      name: 'Face to Face',
+      description: 'Somehow, impossibly, you meet yourself.',
+    },
+  ],
+};
+```
+
+### Cross-Universe Plot Conditions
+
+For plots that span forked timelines:
+
+```typescript
+// Check what happened in a parallel universe (requires cross-universe awareness)
+| {
+    type: 'parallel_universe_event';
+    universe_role: 'fork' | 'original' | 'sibling';
+    event_type: CanonEventType;
+  }
+
+// Check if parallel self completed a plot
+| {
+    type: 'parallel_self_completed';
+    plot_template_id: string;
+    universe_role: 'fork' | 'original' | 'sibling';
+  }
+
+// Check if parallel universes are "converging" (events aligning)
+| {
+    type: 'timelines_converging';
+    convergence_threshold: number;  // 0-1 similarity score
+  }
+```
+
+### Narrative Magic Integration
+
+The Poetic/Literary Surrealism paradigm can interface with the plot system:
+
+```typescript
+// Word-weight can influence plot pressure
+interface NarrativePressure {
+  // ... existing fields ...
+
+  /** Poetic amplification (if in literary surrealism universe) */
+  word_weight_multiplier?: number;
+
+  /** Whether this pressure can literalize metaphors */
+  metaphor_literalization_enabled?: boolean;
+}
+
+// Effects can include narrative magic
+PlotEffect =
+  // ... existing effects ...
+
+  // NEW: Literary surrealism effects
+  | {
+      type: 'literalize_metaphor';
+      metaphor: string;  // e.g., "heart of stone"
+      target: 'self' | 'other' | 'area';
+    }
+
+  | {
+      type: 'cast_punctuation';
+      punctuation: '.' | ',' | '!' | '?' | '...' | '—' | '()' | '""';
+      target: 'self' | 'conversation' | 'area';
+    }
+
+  | {
+      type: 'edit_reality_text';
+      find: string;
+      replace: string;
+      scope: 'local' | 'scene' | 'chapter';  // How much reality to rewrite
+    }
+```
+
+### Example: Words Made Flesh
+
+A plot where the character's metaphorical speech becomes dangerously literal:
+
+```typescript
+const wordsMadeFlesh: PlotLineTemplate = {
+  id: 'words_made_flesh',
+  name: 'Words Made Flesh',
+  scale: 'small',
+
+  lesson: {
+    theme: 'The weight of words',
+    domain: 'power',
+    insight: 'Language shapes reality. Speak carefully.',
+    wisdom_value: 8,
+    repeatable: true,
+  },
+
+  // Assigned when agent speaks a literalizable metaphor
+  assignment_rules: {
+    triggers: [
+      { type: 'on_metaphor_spoken'; literalization_probability_min: 0.5 },
+    ],
+  },
+
+  entry_stage: 'spoken',
+  completion_stages: ['controlled', 'overwhelmed'],
+
+  stages: [
+    {
+      stage_id: 'spoken',
+      name: 'The Utterance',
+      description: 'You spoke carelessly. The words took form.',
+    },
+    {
+      stage_id: 'manifestation',
+      name: 'Reality Shifts',
+      description: 'What you said is becoming literally true.',
+      on_enter_effects: [
+        { type: 'literalize_metaphor', metaphor: '{{spoken_metaphor}}', target: 'self' },
+      ],
+    },
+    {
+      stage_id: 'controlled',
+      name: 'Mastered Words',
+      description: 'You learned to wield the power of literal speech.',
+      on_enter_effects: [
+        { type: 'learn_lesson', lesson_id: 'word_weight_awareness' },
+      ],
+    },
+    {
+      stage_id: 'overwhelmed',
+      name: 'Drowned in Meaning',
+      description: 'The words were too heavy. You are crushed by their weight.',
+      on_enter_effects: [
+        { type: 'add_trauma', trauma_type: 'meaning_overload' },
+      ],
+    },
+  ],
+};
+```
+
+---
+
 ## Appendix: Full Type Definitions
 
 ```typescript

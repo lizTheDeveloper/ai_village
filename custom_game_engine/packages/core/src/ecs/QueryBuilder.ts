@@ -9,6 +9,9 @@ export interface IQueryBuilder {
   /** Filter by required components */
   with(...components: ComponentType[]): IQueryBuilder;
 
+  /** Filter by components that should NOT be present */
+  without(...components: ComponentType[]): IQueryBuilder;
+
   /** Filter by tags (requires TagsComponent) */
   withTags(...tags: string[]): IQueryBuilder;
 
@@ -31,6 +34,7 @@ export interface IQueryBuilder {
 interface QueryFilter {
   type:
     | 'components'
+    | 'without_components'
     | 'tags'
     | 'rect'
     | 'chunk'
@@ -48,6 +52,11 @@ export class QueryBuilder implements IQueryBuilder {
 
   with(...components: ComponentType[]): IQueryBuilder {
     this.filters.push({ type: 'components', data: components });
+    return this;
+  }
+
+  without(...components: ComponentType[]): IQueryBuilder {
+    this.filters.push({ type: 'without_components', data: components });
     return this;
   }
 
@@ -101,6 +110,11 @@ export class QueryBuilder implements IQueryBuilder {
       case 'components': {
         const components = filter.data as ComponentType[];
         return components.every((c) => entity.components.has(c));
+      }
+
+      case 'without_components': {
+        const components = filter.data as ComponentType[];
+        return components.every((c) => !entity.components.has(c));
       }
 
       case 'tags': {

@@ -452,7 +452,7 @@ export class ProtoSapienceObservationSystem implements System {
   /**
    * Get all proto-sapient entities
    */
-  getProtoSapientEntities(world: World): Entity[] {
+  getProtoSapientEntities(world: World): readonly Entity[] {
     return world.query()
       .with(CT.ProtoSapience)
       .executeEntities();

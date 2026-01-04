@@ -4,7 +4,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
-import type { NeedsComponent } from '../components/NeedsComponent.js';
+import { NeedsComponent } from '../components/NeedsComponent.js';
 import type { TimeComponent } from './TimeSystem.js';
 import type { CircadianComponent } from '../components/CircadianComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
