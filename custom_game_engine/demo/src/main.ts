@@ -2743,14 +2743,23 @@ async function main() {
   }
 
   console.log('[DEMO] Checking LLM availability...');
-  const isLLMAvailable = await Promise.race([
-    llmProvider.isAvailable(),
-    new Promise<boolean>((resolve) => setTimeout(() => {
-      console.warn('[DEMO] LLM availability check timed out after 2s, assuming unavailable');
-      resolve(false);
-    }, 2000))
+  let timeoutId: number;
+  const llmCheckResult = await Promise.race([
+    llmProvider.isAvailable().then(result => {
+      clearTimeout(timeoutId);
+      return result;
+    }),
+    new Promise<boolean>((resolve) => {
+      timeoutId = setTimeout(() => {
+        console.warn('[DEMO] LLM availability check timed out after 2s, assuming unavailable');
+        resolve(false);
+      }, 2000) as unknown as number;
+    })
   ]);
-  console.log(`[DEMO] LLM available: ${isLLMAvailable}`);
+
+  // TEMPORARY: Force LLM unavailable to skip soul ceremonies until we debug the hanging
+  const isLLMAvailable = false;
+  console.log(`[DEMO] LLM check result: ${llmCheckResult}, forcing isLLMAvailable=${isLLMAvailable} (temporary)`);
   let llmQueue: LLMDecisionQueue | null = null;
   let promptBuilder: StructuredPromptBuilder | null = null;
 
