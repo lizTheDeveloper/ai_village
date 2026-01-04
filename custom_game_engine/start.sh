@@ -71,6 +71,75 @@ show_status() {
   echo ""
 }
 
+# Function to show and tail logs
+show_logs() {
+  echo ""
+  echo "=== AI Village Server Logs ==="
+  echo ""
+
+  # Create logs directory if it doesn't exist
+  mkdir -p logs
+
+  # Find most recent log files
+  local metrics_log=$(ls -t logs/metrics-server-*.log 2>/dev/null | head -1)
+  local orch_log=$(ls -t logs/orch-dashboard-*.log 2>/dev/null | head -1)
+  local dev_log=$(ls -t logs/dev-server-*.log 2>/dev/null | head -1)
+
+  if [ -z "$metrics_log" ] && [ -z "$orch_log" ] && [ -z "$dev_log" ]; then
+    echo "  No log files found in logs/"
+    echo "  Logs are created when servers start."
+    echo ""
+    return
+  fi
+
+  echo "Recent log files:"
+  echo ""
+  [ -n "$metrics_log" ] && echo "  📊 Metrics:        $metrics_log"
+  [ -n "$orch_log" ] && echo "  🎛️  Orchestration:  $orch_log"
+  [ -n "$dev_log" ] && echo "  🎮 Game Server:    $dev_log"
+  echo ""
+
+  # If argument is "tail" or "watch", tail the most recent dev server log
+  if [ "$1" = "tail" ] || [ "$1" = "watch" ]; then
+    if [ -n "$dev_log" ]; then
+      echo "Watching: $dev_log"
+      echo "Press Ctrl+C to exit"
+      echo ""
+      tail -f "$dev_log"
+    else
+      echo "No dev server log found to tail"
+    fi
+  else
+    echo "To watch logs in real-time:"
+    echo "  ./start.sh logs tail"
+    echo ""
+  fi
+}
+
+# Function to clean old logs
+cleanup_logs() {
+  echo ""
+  echo "=== Cleaning Up Old Log Files ==="
+  echo ""
+
+  mkdir -p logs
+
+  local count=$(find logs -name "*.log" -type f -mtime +1 2>/dev/null | wc -l | tr -d ' ')
+
+  if [ "$count" -eq 0 ]; then
+    echo "  No old log files to clean (older than 1 day)"
+  else
+    echo "  Removing $count log file(s) older than 1 day..."
+    find logs -name "*.log" -type f -mtime +1 -delete
+    echo "  ✅ Cleanup complete"
+  fi
+
+  echo ""
+  echo "Current log files:"
+  ls -lh logs/*.log 2>/dev/null || echo "  No log files"
+  echo ""
+}
+
 # Function to kill all servers
 kill_servers() {
   echo ""
@@ -98,7 +167,7 @@ kill_servers() {
   echo ""
 }
 
-# Handle kill and status without banner
+# Handle kill, status, logs, and cleanup without banner
 case "$MODE" in
   kill|stop)
     kill_servers
@@ -106,6 +175,14 @@ case "$MODE" in
     ;;
   status)
     show_status
+    exit 0
+    ;;
+  logs)
+    show_logs "$2"
+    exit 0
+    ;;
+  cleanup)
+    cleanup_logs
     exit 0
     ;;
 esac
@@ -148,6 +225,8 @@ case "$MODE" in
     echo "  player             - Open browser to existing server"
     echo "  kill               - Stop all running servers"
     echo "  status             - Show running server status"
+    echo "  logs [tail]        - Show recent log files (add 'tail' to watch in real-time)"
+    echo "  cleanup            - Remove log files older than 1 day"
     echo ""
     echo "Examples:"
     echo "  ./start.sh              # Start game host (default)"
@@ -156,6 +235,9 @@ case "$MODE" in
     echo "  ./start.sh player       # Open browser to existing server"
     echo "  ./start.sh kill         # Stop all servers"
     echo "  ./start.sh status       # Check what's running"
+    echo "  ./start.sh logs         # List recent log files"
+    echo "  ./start.sh logs tail    # Watch latest dev server log"
+    echo "  ./start.sh cleanup      # Clean up old log files"
     echo ""
     exit 1
     ;;

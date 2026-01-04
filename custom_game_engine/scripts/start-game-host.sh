@@ -13,6 +13,15 @@ echo "  - Game Dev Server (port 3000)"
 echo "  - Browser at http://localhost:3000"
 echo ""
 
+# Create logs directory
+mkdir -p logs
+
+# Generate timestamp for log files
+TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+METRICS_LOG="logs/metrics-server-${TIMESTAMP}.log"
+ORCH_LOG="logs/orch-dashboard-${TIMESTAMP}.log"
+DEV_LOG="logs/dev-server-${TIMESTAMP}.log"
+
 # PID files for reconnecting to existing servers
 METRICS_PID_FILE=".metrics-server.pid"
 ORCH_PID_FILE=".orch-dashboard.pid"
@@ -34,7 +43,8 @@ start_metrics_server() {
     fi
 
     echo "Starting Metrics Server..."
-    nohup npm run metrics-server > /tmp/metrics-server.log 2>&1 &
+    echo "Logs: $METRICS_LOG"
+    nohup npm run metrics-server > "$METRICS_LOG" 2>&1 &
     METRICS_PID=$!
     echo $METRICS_PID > "$METRICS_PID_FILE"
     sleep 2
@@ -51,7 +61,8 @@ start_orch_dashboard() {
     fi
 
     echo "Starting Orchestration Dashboard..."
-    (cd ../agents/autonomous-dev/dashboard && nohup node server.js > /tmp/orch-dashboard.log 2>&1 &
+    echo "Logs: $ORCH_LOG"
+    (cd ../agents/autonomous-dev/dashboard && nohup node server.js > "../../../custom_game_engine/$ORCH_LOG" 2>&1 &
     echo $! > "../../../custom_game_engine/.orch-dashboard.pid")
     sleep 1
     ORCH_PID=$(cat "$ORCH_PID_FILE")
@@ -69,6 +80,7 @@ start_dev_server() {
     fi
 
     echo "Starting Game Dev Server..."
+    echo "Logs: $DEV_LOG"
 
     # Load .env file and export variables for Vite
     if [ -f ".env" ]; then
@@ -76,7 +88,7 @@ start_dev_server() {
         export $(grep -v '^#' .env | grep -v '^$' | xargs)
     fi
 
-    (cd demo && nohup npm run dev > /tmp/dev-server.log 2>&1 &
+    (cd demo && nohup npm run dev > "../$DEV_LOG" 2>&1 &
     echo $! > "../$DEV_PID_FILE")
     sleep 1
     DEV_PID=$(cat "$DEV_PID_FILE")
@@ -137,7 +149,7 @@ monitor_servers() {
         # Check metrics server and restart if it crashed
         if [ -n "$METRICS_PID" ] && ! is_running "$METRICS_PID" && [ "$METRICS_PORT_CONFLICT" = false ]; then
             # Check if it was an address-in-use error
-            if grep -q "EADDRINUSE\|address already in use" /tmp/metrics-server.log 2>/dev/null; then
+            if grep -q "EADDRINUSE\|address already in use" "$METRICS_LOG" 2>/dev/null; then
                 echo ""
                 echo "❌ Metrics server port already in use. Not restarting."
                 echo "   Run './start.sh kill' to stop conflicting servers."
@@ -145,7 +157,7 @@ monitor_servers() {
             else
                 echo ""
                 echo "⚠️  Metrics server crashed, restarting..."
-                nohup npm run metrics-server > /tmp/metrics-server.log 2>&1 &
+                nohup npm run metrics-server > "$METRICS_LOG" 2>&1 &
                 METRICS_PID=$!
                 echo $METRICS_PID > "$METRICS_PID_FILE"
             fi
@@ -154,7 +166,7 @@ monitor_servers() {
         # Check orchestration dashboard and restart if it crashed
         if [ -n "$ORCH_PID" ] && ! is_running "$ORCH_PID" && [ "$ORCH_PORT_CONFLICT" = false ]; then
             # Check if it was an address-in-use error
-            if grep -q "EADDRINUSE\|address already in use" /tmp/orch-dashboard.log 2>/dev/null; then
+            if grep -q "EADDRINUSE\|address already in use" "$ORCH_LOG" 2>/dev/null; then
                 echo ""
                 echo "❌ Orchestration dashboard port already in use. Not restarting."
                 echo "   Run './start.sh kill' to stop conflicting servers."
@@ -162,7 +174,7 @@ monitor_servers() {
             else
                 echo ""
                 echo "⚠️  Orchestration dashboard crashed, restarting..."
-                (cd ../agents/autonomous-dev/dashboard && nohup node server.js > /tmp/orch-dashboard.log 2>&1 &
+                (cd ../agents/autonomous-dev/dashboard && nohup node server.js > "../../../custom_game_engine/$ORCH_LOG" 2>&1 &
                 echo $! > "../../../custom_game_engine/.orch-dashboard.pid")
                 ORCH_PID=$(cat "$ORCH_PID_FILE")
             fi
