@@ -979,6 +979,8 @@ export const WEIRD_SCIENCE_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 800,
     rarity: 'epic',
+    clarketechTier: 6,
+    researchRequired: 'advanced_electronics',
     traits: {
       weapon: {
         damage: 18,
@@ -999,6 +1001,8 @@ export const WEIRD_SCIENCE_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 3000,
     rarity: 'legendary',
+    clarketechTier: 7,
+    researchRequired: 'quantum_computing',
     traits: {
       weapon: {
         damage: 1, // Base damage is random
@@ -1023,6 +1027,8 @@ export const WEIRD_SCIENCE_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 5000,
     rarity: 'legendary',
+    clarketechTier: 7,
+    researchRequired: ['local_teleportation', 'stable_inter_universe_portals'],
     traits: {
       weapon: {
         damage: 0,
@@ -1048,6 +1054,8 @@ export const WEIRD_SCIENCE_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 1200,
     rarity: 'epic',
+    clarketechTier: 7,
+    researchRequired: 'anti_gravity',
     traits: {
       weapon: {
         damage: 25,
@@ -1073,6 +1081,8 @@ export const WEIRD_SCIENCE_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 1800,
     rarity: 'legendary',
+    clarketechTier: 6,
+    researchRequired: 'cryogenic_suspension',
     traits: {
       weapon: {
         damage: 15,

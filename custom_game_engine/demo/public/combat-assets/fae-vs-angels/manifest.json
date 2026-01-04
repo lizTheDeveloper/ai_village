@@ -1,12 +1,158 @@
 {
   "combatId": "fae-vs-angels",
   "title": "TRANSCENDENT FAE VS CELESTIAL ANGELS - Ethereal Duel",
-  "generatedAt": "2026-01-04T10:43:00Z",
+  "generatedAt": "2026-01-04T11:12:33.241Z",
   "pixelLabCharacters": {
     "luminara": "730c7c29-2bca-4dda-83c8-658ba03178c9",
     "seraphiel": "9c57e0db-1106-4006-aedf-f39033208330"
   },
   "characters": {
+    "celestial-angel": {
+      "name": "Seraphiel the Radiant",
+      "type": "celestial_angel",
+      "description": "divine angel with large golden feathered wings and glowing halo, radiant white robes with golden trim, holy warrior, celestial being",
+      "rotations": {
+        "south": "celestial-angel/rotations/south.png",
+        "south-east": "celestial-angel/rotations/south-east.png",
+        "east": "celestial-angel/rotations/east.png",
+        "north-east": "celestial-angel/rotations/north-east.png",
+        "north": "celestial-angel/rotations/north.png",
+        "north-west": "celestial-angel/rotations/north-west.png",
+        "west": "celestial-angel/rotations/west.png",
+        "south-west": "celestial-angel/rotations/south-west.png"
+      },
+      "animations": {
+        "consecrates-wrath-upon": {
+          "template": "surprise-uppercut",
+          "description": "consecrates wrath upon with holy flame sword",
+          "frames": 6,
+          "directions": [
+            "south",
+            "south-east",
+            "east",
+            "north-east",
+            "north",
+            "north-west",
+            "west",
+            "south-west"
+          ],
+          "path": "celestial-angel/animations/surprise-uppercut/{direction}/frame_{frame}.png"
+        },
+        "channels-divine-fury-at": {
+          "template": "cross-punch",
+          "description": "channels divine fury at with divine judgment staff",
+          "frames": 6,
+          "directions": [
+            "south",
+            "south-east",
+            "east",
+            "north-east",
+            "north",
+            "north-west",
+            "west",
+            "south-west"
+          ],
+          "path": "celestial-angel/animations/cross-punch/{direction}/frame_{frame}.png"
+        },
+        "smites": {
+          "template": "high-kick",
+          "description": "smites with divine judgment staff",
+          "frames": 6,
+          "directions": [
+            "south",
+            "south-east",
+            "east",
+            "north-east",
+            "north",
+            "north-west",
+            "west",
+            "south-west"
+          ],
+          "path": "celestial-angel/animations/high-kick/{direction}/frame_{frame}.png"
+        }
+      }
+    },
+    "transcendent-fae": {
+      "name": "Luminara the Transcendent",
+      "type": "transcendent_fae",
+      "description": "ethereal fairy creature with iridescent butterfly wings, glowing with magical energy, translucent iridescent skin, mystical aura, fantasy sprite",
+      "rotations": {
+        "south": "transcendent-fae/rotations/south.png",
+        "south-east": "transcendent-fae/rotations/south-east.png",
+        "east": "transcendent-fae/rotations/east.png",
+        "north-east": "transcendent-fae/rotations/north-east.png",
+        "north": "transcendent-fae/rotations/north.png",
+        "north-west": "transcendent-fae/rotations/north-west.png",
+        "west": "transcendent-fae/rotations/west.png",
+        "south-west": "transcendent-fae/rotations/south-west.png"
+      },
+      "animations": {
+        "reality-warps-around": {
+          "template": "fireball",
+          "description": "reality-warps around with prismatic reality shard",
+          "frames": 6,
+          "directions": [
+            "south",
+            "south-east",
+            "east",
+            "north-east",
+            "north",
+            "north-west",
+            "west",
+            "south-west"
+          ],
+          "path": "transcendent-fae/animations/fireball/{direction}/frame_{frame}.png"
+        },
+        "enchants-the-air-to-strike": {
+          "template": "throw-object",
+          "description": "enchants the air to strike with fractal dream weaver",
+          "frames": 6,
+          "directions": [
+            "south",
+            "south-east",
+            "east",
+            "north-east",
+            "north",
+            "north-west",
+            "west",
+            "south-west"
+          ],
+          "path": "transcendent-fae/animations/throw-object/{direction}/frame_{frame}.png"
+        },
+        "phase-shifts-through": {
+          "template": "running-slide",
+          "description": "phase-shifts through with crystalline moonbeam",
+          "frames": 6,
+          "directions": [
+            "south",
+            "south-east",
+            "east",
+            "north-east",
+            "north",
+            "north-west",
+            "west",
+            "south-west"
+          ],
+          "path": "transcendent-fae/animations/running-slide/{direction}/frame_{frame}.png"
+        },
+        "transmutes-spacetime-against": {
+          "template": "hurricane-kick",
+          "description": "transmutes spacetime against with prismatic reality shard",
+          "frames": 6,
+          "directions": [
+            "south",
+            "south-east",
+            "east",
+            "north-east",
+            "north",
+            "north-west",
+            "west",
+            "south-west"
+          ],
+          "path": "transcendent-fae/animations/hurricane-kick/{direction}/frame_{frame}.png"
+        }
+      }
+    },
     "luminara": {
       "name": "Luminara the Transcendent",
       "type": "transcendent_fae",
@@ -26,14 +172,32 @@
           "template": "fireball",
           "description": "casting magical reality-warping spell",
           "frames": 6,
-          "directions": ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"],
+          "directions": [
+            "south",
+            "south-east",
+            "east",
+            "north-east",
+            "north",
+            "north-west",
+            "west",
+            "south-west"
+          ],
           "path": "luminara/animations/fireball/{direction}/frame_{frame}.png"
         },
         "phase-shift": {
           "template": "running-slide",
           "description": "phase-shifting through dimensions",
           "frames": 6,
-          "directions": ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"],
+          "directions": [
+            "south",
+            "south-east",
+            "east",
+            "north-east",
+            "north",
+            "north-west",
+            "west",
+            "south-west"
+          ],
           "path": "luminara/animations/running-slide/{direction}/frame_{frame}.png"
         }
       }
@@ -57,14 +221,30 @@
           "template": "fireball",
           "description": "casting divine holy fire attack",
           "frames": 6,
-          "directions": ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"],
+          "directions": [
+            "south",
+            "south-east",
+            "east",
+            "north-east",
+            "north",
+            "north-west",
+            "west",
+            "south-west"
+          ],
           "path": "seraphiel/animations/fireball/{direction}/frame_{frame}.png"
         },
         "divine-fury": {
           "template": "cross-punch",
           "description": "channeling divine fury, powerful strike",
           "frames": 6,
-          "directions": ["south", "south-west", "north-west", "north", "north-east", "east"],
+          "directions": [
+            "south",
+            "south-west",
+            "north-west",
+            "north",
+            "north-east",
+            "east"
+          ],
           "path": "seraphiel/animations/cross-punch/{direction}/frame_{frame}.png",
           "note": "Missing south-east and west directions due to generation errors"
         }
@@ -80,14 +260,13 @@
     "fallbackColor": "#1a0533"
   },
   "actionMapping": {
-    "reality-warps around": "reality-warp",
-    "phase-shifts through": "phase-shift",
-    "transmutes spacetime against": "reality-warp",
-    "enchants the air to strike": "reality-warp",
-    "smites": "holy-smite",
-    "consecrates wrath upon": "holy-smite",
-    "channels divine fury at": "divine-fury",
-    "purifies violently": "holy-smite"
+    "consecrates wrath upon": "consecrates-wrath-upon",
+    "reality-warps around": "reality-warps-around",
+    "enchants the air to strike": "enchants-the-air-to-strike",
+    "phase-shifts through": "phase-shifts-through",
+    "channels divine fury at": "channels-divine-fury-at",
+    "transmutes spacetime against": "transmutes-spacetime-against",
+    "smites": "smites"
   },
   "recordingFile": "../mock-recordings/fae-vs-angels.json"
 }
