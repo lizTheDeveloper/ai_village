@@ -13,7 +13,7 @@ import type { System } from '../ecs/System.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { ComponentType } from '../types/ComponentType.js';
-import type { EpisodicMemoryComponent, Memory } from '../components/EpisodicMemoryComponent.js';
+import type { EpisodicMemoryComponent, EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
 import type { SilverThreadComponent, SignificantEventType } from './SilverThreadComponent.js';
 import type { SoulLinkComponent } from './SoulLinkComponent.js';
 import type { PlotLinesComponent } from '../plot/PlotTypes.js';
@@ -23,10 +23,11 @@ import { addSignificantEvent } from './SilverThreadComponent.js';
  * System priority: 106 (after MemoryConsolidationSystem at 105)
  */
 export class SoulConsolidationSystem implements System {
-  readonly name = 'SoulConsolidationSystem';
+  readonly id = 'soul_consolidation' as const;
   readonly priority = 106;
+  readonly requiredComponents = [] as const;
 
-  update(world: World): void {
+  update(_world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
     // This system only processes during sleep events, not every tick
     // It subscribes to 'sleep_start' events from SleepSystem
   }
@@ -117,10 +118,10 @@ export class SoulConsolidationSystem implements System {
   /**
    * Get memories from the last sleep cycle
    */
-  private getRecentMemories(episodicMemory: EpisodicMemoryComponent): Memory[] {
+  private getRecentMemories(episodicMemory: EpisodicMemoryComponent): EpisodicMemory[] {
     // Get memories from last ~8 hours of waking time
     const cutoff = Date.now() - (8 * 60 * 60 * 1000);
-    return episodicMemory.memories.filter(m => m.timestamp > cutoff);
+    return Array.from(episodicMemory.episodicMemories).filter(m => m.timestamp > cutoff);
   }
 
   /**
