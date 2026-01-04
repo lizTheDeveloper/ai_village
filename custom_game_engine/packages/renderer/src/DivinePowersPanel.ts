@@ -267,7 +267,7 @@ export class DivinePowersPanel implements IWindowPanel {
 
   // ========== Rendering ==========
 
-  render(ctx: CanvasRenderingContext2D, width: number, height: number, world?: World): void {
+  render(ctx: CanvasRenderingContext2D, _x: number, _y: number, width: number, height: number, world?: any): void {
     // Refresh state from world if available
     if (world) {
       this.refreshFromWorld(world);

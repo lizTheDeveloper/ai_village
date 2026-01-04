@@ -2798,11 +2798,23 @@ async function main() {
 
   // Check for existing saves and auto-load the most recent one
   console.log('[Demo] TRACE: Listing saves...');
-  const allSaves = await saveLoadService.listSaves();
-  console.log('[Demo] TRACE: Got save list, filtering...');
-  // Filter out any undefined/null entries
-  const existingSaves = allSaves.filter(save => save != null && save.name && save.key);
-  console.log(`[Demo] Found ${existingSaves.length} existing saves`);
+  let existingSaves: any[] = [];
+  try {
+    // Add timeout to prevent hanging on IndexedDB issues
+    const listSavesPromise = saveLoadService.listSaves();
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('listSaves timeout after 5s')), 5000)
+    );
+    const allSaves = await Promise.race([listSavesPromise, timeoutPromise]);
+    console.log('[Demo] TRACE: Got save list, filtering...');
+    // Filter out any undefined/null entries
+    existingSaves = allSaves.filter(save => save != null && save.name && save.key);
+    console.log(`[Demo] Found ${existingSaves.length} existing saves`);
+  } catch (error) {
+    console.error('[Demo] Error listing saves:', error);
+    console.log('[Demo] Continuing with empty save list');
+    existingSaves = [];
+  }
   let loadedCheckpoint = false;
   let universeSelection: { type: 'new' | 'load'; magicParadigm?: string; checkpointKey?: string };
   let universeConfigScreen: UniverseConfigScreen | null = null;

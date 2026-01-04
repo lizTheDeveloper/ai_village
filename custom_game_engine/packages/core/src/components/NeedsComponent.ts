@@ -162,6 +162,23 @@ export class NeedsComponent extends ComponentBase {
   /** Rate of energy decay per game tick */
   public energyDecayRate: number;
 
+  /**
+   * Tracks how many ticks hunger has been at exactly 0.
+   * Used for starvation mechanics:
+   * - 1 game day (14,400 ticks) → "I haven't eaten in a day"
+   * - 2 game days (28,800 ticks) → "I haven't eaten in two days"
+   * - 3 game days (43,200 ticks) → "I haven't eaten in three days"
+   * - 4 game days (57,600 ticks) → "It's been four days since I've eaten. I can't take another day of this"
+   * - 5 game days (72,000 ticks) → starvation death
+   */
+  public ticksAtZeroHunger: number;
+
+  /**
+   * Tracks which starvation milestone memories have been issued.
+   * Prevents duplicate memories at each threshold (1, 2, 3, 4 days).
+   */
+  public starvationDayMemoriesIssued: Set<number>;
+
   // ============================================================================
   // Forward-Compatibility: Body Parts (optional, for future combat/medical)
   // ============================================================================
@@ -188,6 +205,8 @@ export class NeedsComponent extends ComponentBase {
     this.stimulation = 0.5;
     this.hungerDecayRate = 0.001;
     this.energyDecayRate = 0.0005;
+    this.ticksAtZeroHunger = 0;
+    this.starvationDayMemoriesIssued = new Set<number>();
     // bodyParts is intentionally undefined by default for backward compatibility
 
     // Apply overrides
@@ -226,6 +245,10 @@ export class NeedsComponent extends ComponentBase {
         ...part,
         injuries: part.injuries.map(injury => ({ ...injury })),
       }));
+    }
+    // Deep clone the starvation memories Set
+    if (this.starvationDayMemoriesIssued) {
+      cloned.starvationDayMemoriesIssued = new Set(this.starvationDayMemoriesIssued);
     }
     return cloned;
   }

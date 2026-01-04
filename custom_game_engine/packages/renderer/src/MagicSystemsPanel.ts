@@ -130,7 +130,7 @@ export class MagicSystemsPanel implements IWindowPanel {
 
   // ========== Rendering ==========
 
-  render(ctx: CanvasRenderingContext2D, width: number, height: number, _world?: World): void {
+  render(ctx: CanvasRenderingContext2D, _x: number, _y: number, width: number, height: number, _world?: any): void {
     // Clear click regions for this frame
     this.clickRegions = [];
 

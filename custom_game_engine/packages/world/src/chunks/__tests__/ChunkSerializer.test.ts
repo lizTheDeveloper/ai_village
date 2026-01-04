@@ -140,9 +140,9 @@ describe('ChunkSerializer', () => {
       chunk.generated = true;
 
       // Change specific tiles
-      chunk.tiles[100].terrain = 'water';
-      chunk.tiles[200].terrain = 'stone';
-      chunk.tiles[300].elevation = 50;
+      chunk.tiles[100]!.terrain = 'water';
+      chunk.tiles[200]!.terrain = 'stone';
+      chunk.tiles[300]!.elevation = 50;
 
       const serialized = (serializer as any).serializeChunk(chunk);
       const deserialized = (serializer as any).deserializeChunk(serialized);
@@ -262,7 +262,7 @@ describe('ChunkSerializer', () => {
 
       const snapshot = serializer.serializeChunks(chunkManager);
 
-      const indexEntry = snapshot.chunkIndex[0];
+      const indexEntry = snapshot.chunkIndex[0]!;
       expect(indexEntry.x).toBe(5);
       expect(indexEntry.y).toBe(10);
       expect(indexEntry.generated).toBe(true);
@@ -370,7 +370,7 @@ describe('ChunkSerializer', () => {
         },
       };
 
-      await serializer.deserializeChunks(invalidSnapshot, chunkManager);
+      await serializer.deserializeChunks(invalidSnapshot as any, chunkManager);
 
       // Should create corrupted marker instead of crashing
       expect(chunkManager.hasChunk(0, 0)).toBe(true);
@@ -412,7 +412,7 @@ describe('ChunkSerializer', () => {
 
       // Set varied tile properties
       for (let i = 0; i < CHUNK_SIZE * CHUNK_SIZE; i++) {
-        const tile = chunk.tiles[i];
+        const tile = chunk.tiles[i]!;
         tile.terrain = i % 2 === 0 ? 'grass' : 'dirt';
         tile.elevation = i % 10;
         tile.moisture = (i * 3) % 100;
@@ -441,8 +441,8 @@ describe('ChunkSerializer', () => {
 
       // Verify all tiles
       for (let i = 0; i < CHUNK_SIZE * CHUNK_SIZE; i++) {
-        const original = chunk.tiles[i];
-        const restored = restoredChunk.tiles[i];
+        const original = chunk.tiles[i]!;
+        const restored = restoredChunk.tiles[i]!;
 
         expect(restored.terrain).toBe(original.terrain);
         expect(restored.elevation).toBe(original.elevation);

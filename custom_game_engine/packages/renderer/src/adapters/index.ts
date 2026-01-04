@@ -92,7 +92,7 @@ export const RESOURCES_PANEL_CONFIG: PanelConfig<ResourcesPanel> = {
   defaultHeight: 200,
   renderMethod: (panel, ctx, _x, _y, width, _height, world) => {
     if (!world) return;
-    panel.render(ctx, width, world, false);
+    panel.render(ctx, x, y, width, height, world);
   },
 };
 
@@ -113,7 +113,7 @@ export const MEMORY_PANEL_CONFIG: PanelConfig<MemoryPanel> = {
   },
   renderMethod: (panel, ctx, _x, _y, width, height, world) => {
     if (!world) return;
-    panel.render(ctx, width, height, world);
+    panel.render(ctx, x, y, width, height, world);
   },
 };
 
@@ -196,7 +196,7 @@ export const PLANT_INFO_PANEL_CONFIG: PanelConfig<PlantInfoPanel> = {
   defaultWidth: 320,
   defaultHeight: 480,
   renderMethod: (panel, ctx, _x, _y, width, height, world) => {
-    panel.render(ctx, width, height, world, false);
+    panel.render(ctx, x, y, width, height, world);
   },
   handleScroll: (panel, deltaY, contentHeight) => {
     return panel.handleScroll(deltaY, contentHeight);
@@ -251,7 +251,7 @@ export const ECONOMY_PANEL_CONFIG: PanelConfig<EconomyPanel> = {
   },
   renderMethod: (panel, ctx, _x, _y, width, height, world) => {
     if (!world) return;
-    panel.render(ctx, width, height, world);
+    panel.render(ctx, x, y, width, height, world);
   },
 };
 
@@ -272,7 +272,7 @@ export const RELATIONSHIPS_PANEL_CONFIG: PanelConfig<RelationshipsPanel> = {
   },
   renderMethod: (panel, ctx, _x, _y, width, height, world) => {
     if (!world) return;
-    panel.render(ctx, width, height, world);
+    panel.render(ctx, x, y, width, height, world);
   },
   handleScroll: (panel, deltaY, contentHeight) => {
     return panel.handleScroll(deltaY, contentHeight);
@@ -290,7 +290,7 @@ export const GOVERNANCE_DASHBOARD_PANEL_CONFIG: PanelConfig<GovernanceDashboardP
   defaultHeight: 500,
   renderMethod: (panel, ctx, _x, _y, width, _height, world) => {
     if (!world) return;
-    panel.render(ctx, width, world);
+    panel.render(ctx, x, y, width, height, world);
   },
 };
 
@@ -354,7 +354,7 @@ export const INVENTORY_PANEL_CONFIG: PanelConfig<InventoryUI> = {
   renderMethod: (panel, ctx, x, y, width, height, _world) => {
     ctx.save();
     ctx.translate(x, y);
-    panel.render(ctx, width, height);
+    panel.render(ctx, x, y, width, height, world);
     ctx.restore();
   },
 };
@@ -396,7 +396,7 @@ export const SHOP_PANEL_CONFIG: PanelConfig<ShopPanel> = {
     // Opening is handled via openShop method with shop/agent IDs
   },
   renderMethod: (panel, ctx, _x, _y, _width, _height, world) => {
-    panel.render(ctx, world);
+    panel.render(ctx, x, y, width, height, world);
   },
   handleScroll: (panel, deltaY, _contentHeight) => {
     return panel.handleScroll(deltaY);
@@ -420,7 +420,7 @@ export const MAGIC_SYSTEMS_PANEL_CONFIG: PanelConfig<MagicSystemsPanel> = {
     }
   },
   renderMethod: (panel, ctx, _x, _y, width, height, world) => {
-    panel.render(ctx, width, height, world);
+    panel.render(ctx, x, y, width, height, world);
   },
   handleScroll: (panel, deltaY, contentHeight) => {
     return panel.handleScroll(deltaY, contentHeight);
@@ -452,7 +452,7 @@ export const FARM_MANAGEMENT_PANEL_CONFIG: PanelConfig<FarmManagementPanel & { _
     panel._adapter.visible = visible;
   },
   renderMethod: (panel, ctx, _x, _y, width, height, world) => {
-    panel.render(ctx, width, height, world);
+    panel.render(ctx, x, y, width, height, world);
   },
   handleScroll: (panel, deltaY, contentHeight) => {
     return panel.handleScroll(deltaY, contentHeight);
@@ -668,7 +668,7 @@ export const SPELLBOOK_PANEL_CONFIG: PanelConfig<SpellbookPanel> = {
     }
   },
   renderMethod: (panel, ctx, _x, _y, width, height, world) => {
-    panel.render(ctx, width, height, world);
+    panel.render(ctx, x, y, width, height, world);
   },
   handleScroll: (panel, deltaY, contentHeight) => {
     return panel.handleScroll(deltaY, contentHeight);
@@ -702,7 +702,7 @@ export const DIVINE_POWERS_PANEL_CONFIG: PanelConfig<DivinePowersPanel> = {
     }
   },
   renderMethod: (panel, ctx, _x, _y, width, height, world) => {
-    panel.render(ctx, width, height, world);
+    panel.render(ctx, x, y, width, height, world);
   },
   handleScroll: (panel, deltaY, contentHeight) => {
     return panel.handleScroll(deltaY, contentHeight);
@@ -738,7 +738,7 @@ export const DIVINE_CHAT_PANEL_CONFIG: PanelConfig<DivineChatPanel> = {
     }
   },
   renderMethod: (panel, ctx, _x, _y, width, height, world) => {
-    panel.render(ctx, width, height, world);
+    panel.render(ctx, x, y, width, height, world);
   },
   handleScroll: (panel, deltaY, _contentHeight) => {
     panel.handleWheel(deltaY);
@@ -773,7 +773,7 @@ export const VISION_COMPOSER_PANEL_CONFIG: PanelConfig<VisionComposerPanel> = {
     }
   },
   renderMethod: (panel, ctx, _x, _y, width, height, world) => {
-    panel.render(ctx, width, height, world);
+    panel.render(ctx, x, y, width, height, world);
   },
   handleScroll: (panel, deltaY, contentHeight) => {
     return panel.handleScroll(deltaY, contentHeight);
@@ -807,7 +807,7 @@ export const DEV_PANEL_CONFIG: PanelConfig<DevPanel> = {
     }
   },
   renderMethod: (panel, ctx, _x, _y, width, height, world) => {
-    panel.render(ctx, width, height, world);
+    panel.render(ctx, x, y, width, height, world);
   },
   handleScroll: (panel, deltaY, contentHeight) => {
     return panel.handleScroll(deltaY, contentHeight);

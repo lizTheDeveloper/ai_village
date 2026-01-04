@@ -1,9 +1,9 @@
 {
-  "recordingId": "combat_1767518882928",
+  "recordingId": "combat_1767519820058",
   "title": "REAL GLADIATOR COMBAT - Procedural Arena Fight",
   "description": "Two gladiators approach and battle in a procedurally generated fight",
   "recordedBy": "Procedural Combat Generator",
-  "recordedAt": 1767518882928,
+  "recordedAt": 1767519820058,
   "duration": 100,
   "quality": 0.98,
   "frames": [
@@ -3306,6 +3306,89 @@
           "distanceFromCamera": 9.163957638441854
         }
       ]
+    }
+  ],
+  "combatLog": [
+    {
+      "tick": 54,
+      "attacker": "Gladiator Red",
+      "defender": "Gladiator Blue",
+      "attackType": "slashes",
+      "bodyPart": "left arm",
+      "damage": "bruising the muscle",
+      "result": "The Gladiator Blue blocks with their shield!"
+    },
+    {
+      "tick": 55,
+      "attacker": "Gladiator Blue",
+      "defender": "Gladiator Red",
+      "attackType": "thrusts at",
+      "bodyPart": "lower body",
+      "damage": "shattering the bone",
+      "result": "The Gladiator Red counterattacks!"
+    },
+    {
+      "tick": 56,
+      "attacker": "Gladiator Red",
+      "defender": "Gladiator Blue",
+      "attackType": "sweeps at",
+      "bodyPart": "right leg",
+      "damage": "mangling the flesh",
+      "result": "The Gladiator Blue dodges away!"
+    },
+    {
+      "tick": 57,
+      "attacker": "Gladiator Blue",
+      "defender": "Gladiator Red",
+      "attackType": "charges at",
+      "bodyPart": "right hand",
+      "damage": "mangling the flesh",
+      "result": "The Gladiator Red roars in defiance!"
+    },
+    {
+      "tick": 60,
+      "attacker": "Gladiator Blue",
+      "defender": "Gladiator Red",
+      "attackType": "slashes",
+      "bodyPart": "chest",
+      "damage": "shattering the bone",
+      "result": "The Gladiator Red is knocked off balance!"
+    },
+    {
+      "tick": 64,
+      "attacker": "Gladiator Blue",
+      "defender": "Gladiator Red",
+      "attackType": "hacks at",
+      "bodyPart": "lower body",
+      "damage": "bruising the muscle",
+      "result": "The Gladiator Red grimaces in pain!"
+    },
+    {
+      "tick": 65,
+      "attacker": "Gladiator Red",
+      "defender": "Gladiator Blue",
+      "attackType": "cleaves at",
+      "bodyPart": "left hand",
+      "damage": "mangling the flesh",
+      "result": "The Gladiator Blue blocks with their shield!"
+    },
+    {
+      "tick": 69,
+      "attacker": "Gladiator Blue",
+      "defender": "Gladiator Red",
+      "attackType": "strikes",
+      "bodyPart": "upper body",
+      "damage": "severing the artery",
+      "result": "The Gladiator Red dodges away!"
+    },
+    {
+      "tick": 75,
+      "attacker": "Gladiator Red",
+      "defender": "Gladiator Blue",
+      "attackType": "lunges at",
+      "bodyPart": "right arm",
+      "damage": "severing the artery",
+      "result": "The Gladiator Blue is knocked off balance!"
     }
   ]
 }

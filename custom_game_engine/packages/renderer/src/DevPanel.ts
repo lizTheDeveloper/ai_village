@@ -547,7 +547,7 @@ export class DevPanel implements IWindowPanel {
 
   // ========== Rendering ==========
 
-  render(ctx: CanvasRenderingContext2D, width: number, height: number, world?: World): void {
+  render(ctx: CanvasRenderingContext2D, _x: number, _y: number, width: number, height: number, world?: any): void {
     // Sync state from world
     if (world) {
       this.syncFromWorld(world);

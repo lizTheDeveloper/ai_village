@@ -14,6 +14,73 @@ import type {
   MoodFactors,
 } from '../components/MoodComponent.js';
 
+// ============================================================================
+// Plot Trigger Types (Phase 2: Event-Driven Assignment)
+// ============================================================================
+
+/**
+ * Events that can trigger automatic plot assignment.
+ *
+ * When an event matching a trigger occurs, the plot is assigned to the
+ * entity experiencing the event, with relevant agents bound to roles.
+ */
+export type PlotTrigger =
+  /** Trigger when entity experiences trauma */
+  | { type: 'on_trauma'; trauma_type?: TraumaType }
+  /** Trigger when relationship trust changes significantly */
+  | { type: 'on_relationship_change'; delta_threshold: number; with_role?: string }
+  /** Trigger when emotional state is sustained for duration */
+  | { type: 'on_emotional_state'; state: EmotionalState; min_duration_ticks: number }
+  /** Trigger when entity enters breakdown */
+  | { type: 'on_breakdown'; breakdown_type?: BreakdownType }
+  /** Trigger when someone nearby dies */
+  | { type: 'on_death_nearby'; min_relationship_trust?: number }
+  /** Trigger when skill reaches a level */
+  | { type: 'on_skill_mastery'; skill: string; min_level: number }
+  /** Trigger when mood crosses a threshold */
+  | { type: 'on_mood_threshold'; min?: number; max?: number }
+  /** Trigger when stress crosses a threshold */
+  | { type: 'on_stress_threshold'; min?: number; max?: number }
+  /** Trigger when social isolation is detected */
+  | { type: 'on_social_isolation'; min_ticks: number }
+  /** Trigger when a new relationship is formed */
+  | { type: 'on_relationship_formed'; min_initial_trust?: number };
+
+/**
+ * Binding rule for automatically binding agents to roles when triggered
+ */
+export interface TriggerAgentBinding {
+  /** Role name to bind (e.g., 'deceased', 'betrayer') */
+  role: string;
+  /** Source of the agent to bind */
+  source:
+    | 'trigger_target'     // The other agent involved in the trigger event
+    | 'highest_trust'      // Agent with highest trust relationship
+    | 'lowest_trust'       // Agent with lowest trust relationship
+    | 'highest_affinity'   // Agent with highest affinity
+    | 'random_known';      // Random agent they know
+}
+
+/**
+ * Event payload passed to trigger handlers
+ */
+export interface PlotTriggerEvent {
+  /** Type of trigger that fired */
+  trigger_type: PlotTrigger['type'];
+  /** Entity that experienced the event */
+  entity_id: string;
+  /** Soul ID of the entity */
+  soul_id: string;
+  /** Current personal tick */
+  personal_tick: number;
+  /** Involved agent (if applicable) */
+  involved_agent_id?: string;
+  /** Involved agent's soul (if applicable) */
+  involved_soul_id?: string;
+  /** Additional event-specific data */
+  data: Record<string, any>;
+}
+
 /**
  * Plot scale determines scope and duration
  */
@@ -256,6 +323,33 @@ export interface PlotLineTemplate {
     required_archetype?: string[];
     required_interests?: string[];
     forbidden_if_learned?: string[];  // Lesson IDs that block this plot
+
+    // ============================================================================
+    // Event-Driven Triggers (Phase 2)
+    // ============================================================================
+    /**
+     * Triggers that automatically assign this plot when events occur.
+     * If multiple triggers are defined, ANY matching trigger assigns the plot.
+     */
+    triggers?: PlotTrigger[];
+
+    /**
+     * How to bind agents to roles when the plot is triggered.
+     * Example: When 'on_death_nearby' triggers, bind the deceased to role 'deceased'
+     */
+    trigger_bindings?: TriggerAgentBinding[];
+
+    /**
+     * Maximum active instances of this plot per soul.
+     * Default is 1 (only one instance can be active at a time).
+     */
+    max_concurrent?: number;
+
+    /**
+     * Cooldown in personal ticks before this plot can trigger again.
+     * Prevents the same plot from triggering repeatedly.
+     */
+    cooldown_ticks?: number;
   };
 
   // Parameters for instantiation
@@ -315,6 +409,20 @@ export interface PlotLineInstance {
   // Suspended state
   suspended_reason?: string;
   suspended_at?: number;
+
+  // ============================================================================
+  // Event-Driven Assignment Tracking (Phase 2)
+  // ============================================================================
+  /**
+   * What triggered this plot to be assigned.
+   * Undefined for manually assigned plots.
+   */
+  triggered_by?: {
+    trigger_type: PlotTrigger['type'];
+    event_tick: number;
+    involved_agent_id?: string;
+    involved_soul_id?: string;
+  };
 }
 
 /**
@@ -346,6 +454,9 @@ export interface AbandonedPlot {
 export interface PlotLinesComponent {
   type: ComponentType.PlotLines;
 
+  /** Schema version for migrations */
+  readonly version: 1;
+
   // Active plots
   active: PlotLineInstance[];
 
@@ -362,6 +473,7 @@ export interface PlotLinesComponent {
 export function createPlotLinesComponent(): PlotLinesComponent {
   return {
     type: ComponentType.PlotLines,
+    version: 1,
     active: [],
     completed: [],
     abandoned: [],

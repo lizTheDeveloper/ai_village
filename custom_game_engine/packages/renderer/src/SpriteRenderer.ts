@@ -1,6 +1,55 @@
 /**
- * Simple sprite rendering (placeholders until we have real sprites).
+ * Simple sprite rendering with PixelLab map object support.
  */
+
+// Image cache for map objects
+const mapObjectCache = new Map<string, HTMLImageElement>();
+const loadingImages = new Set<string>();
+
+// Mapping from sprite IDs to map object filenames
+const MAP_OBJECT_SPRITES: Record<string, string> = {
+  'tree': 'oak_tree.png',
+  'rock': 'rock_boulder.png',
+  'berry-bush': 'berry_bush.png',
+  'wheat': 'wheat.png',
+  'carrot': 'carrot.png',
+  'potato': 'potato.png',
+  'tomato': 'tomato.png',
+  'wildflower': 'wildflower.png',
+};
+
+/**
+ * Load a map object sprite from the assets folder
+ */
+function loadMapObjectSprite(spriteId: string): HTMLImageElement | null {
+  const filename = MAP_OBJECT_SPRITES[spriteId];
+  if (!filename) return null;
+
+  // Check cache
+  if (mapObjectCache.has(spriteId)) {
+    return mapObjectCache.get(spriteId)!;
+  }
+
+  // Check if already loading
+  if (loadingImages.has(spriteId)) {
+    return null;
+  }
+
+  // Start loading
+  loadingImages.add(spriteId);
+  const img = new Image();
+  img.onload = () => {
+    mapObjectCache.set(spriteId, img);
+    loadingImages.delete(spriteId);
+  };
+  img.onerror = () => {
+    loadingImages.delete(spriteId);
+    console.error(`[SpriteRenderer] Failed to load map object: ${filename}`);
+  };
+  img.src = `/assets/sprites/map_objects/${filename}`;
+
+  return null; // Not loaded yet
+}
 
 export function renderSprite(
   ctx: CanvasRenderingContext2D,
@@ -12,6 +61,15 @@ export function renderSprite(
 ): void {
   // IMPORTANT: Save and restore canvas state to prevent alpha/fill corruption
   ctx.save();
+
+  // Try to load map object sprite first
+  const mapObjectImg = loadMapObjectSprite(spriteId);
+  if (mapObjectImg) {
+    // Render the pixel art sprite centered
+    ctx.drawImage(mapObjectImg, x, y, size, size);
+    ctx.restore();
+    return;
+  }
 
   switch (spriteId) {
     case 'tree':

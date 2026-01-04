@@ -121,7 +121,7 @@ export class ShopPanel implements IWindowPanel {
     return true;
   }
 
-  render(ctx: CanvasRenderingContext2D, world: World | undefined): void {
+  render(ctx: CanvasRenderingContext2D, _x: number, _y: number, _width: number, _height: number, world?: any): void {
     if (!this.visible || !this.selectedShopId || !this.selectedAgentId || !world) {
       return;
     }

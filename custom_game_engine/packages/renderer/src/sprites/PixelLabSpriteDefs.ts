@@ -20,13 +20,13 @@ export enum PixelLabDirection {
 /** Direction names as used in PixelLab file paths */
 export const PIXELLAB_DIRECTION_NAMES: Record<PixelLabDirection, string> = {
   [PixelLabDirection.South]: 'south',
-  [PixelLabDirection.SouthWest]: 'south-west',
+  [PixelLabDirection.SouthWest]: 'southwest',
   [PixelLabDirection.West]: 'west',
-  [PixelLabDirection.NorthWest]: 'north-west',
+  [PixelLabDirection.NorthWest]: 'northwest',
   [PixelLabDirection.North]: 'north',
-  [PixelLabDirection.NorthEast]: 'north-east',
+  [PixelLabDirection.NorthEast]: 'northeast',
   [PixelLabDirection.East]: 'east',
-  [PixelLabDirection.SouthEast]: 'south-east',
+  [PixelLabDirection.SouthEast]: 'southeast',
 };
 
 /** Animation types available from PixelLab */

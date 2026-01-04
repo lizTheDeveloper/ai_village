@@ -112,7 +112,7 @@ export class CraftingStationPanel implements IWindowPanel {
     ctx.strokeRect(this.x, this.y, this.width, this.height);
 
     // Header
-    this.renderHeader(ctx, building);
+    this.renderHeaderSection(ctx, building);
 
     // Fuel gauge (if applicable)
     if (building.fuelRequired) {
@@ -132,7 +132,7 @@ export class CraftingStationPanel implements IWindowPanel {
   /**
    * Render the station header
    */
-  private renderHeader(ctx: CanvasRenderingContext2D, building: BuildingComponent): void {
+  private renderHeaderSection(ctx: CanvasRenderingContext2D, building: BuildingComponent): void {
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 16px monospace';
     ctx.fillText(this.getStationName(building.buildingType), this.x + 10, this.y + 25);

@@ -129,37 +129,63 @@ export class NeedsSystem implements System {
       const newHunger = Math.max(0, needs.hunger - hungerDecay);
       const newEnergy = Math.max(0, needs.energy - energyDecay);
 
-      // Check for critical needs transitions (for memory formation)
-      // NeedsComponent uses 0-1 scale (0.2 = 20%)
-      const wasHungerCritical = needs.hunger < 0.2;
-      const isHungerCritical = newHunger < 0.2;
+      // Track time at zero hunger for starvation mechanics
+      // Progressive memories: Day 1, 2, 3, 4, then death on Day 5
+      // 1 game hour = 600 ticks, 1 game day = 14,400 ticks
+      const TICKS_PER_GAME_DAY = 14400;
+      const STARVATION_DEATH_DAYS = 5;
+
+      let ticksAtZeroHunger = needs.ticksAtZeroHunger || 0;
+      let starvationDayMemoriesIssued = needs.starvationDayMemoriesIssued || new Set<number>();
+
+      if (newHunger === 0) {
+        ticksAtZeroHunger += 1;
+      } else {
+        // Reset counter if hunger is above 0
+        ticksAtZeroHunger = 0;
+        starvationDayMemoriesIssued = new Set<number>();
+      }
+
+      // Calculate which day of starvation we're on
+      const daysAtZeroHunger = Math.floor(ticksAtZeroHunger / TICKS_PER_GAME_DAY);
+
+      // Check for energy critical (still uses 20% threshold)
       const wasEnergyCritical = needs.energy < 0.2;
       const isEnergyCritical = newEnergy < 0.2;
 
-      // Update needs
+      // Emit progressive starvation memories (days 1, 2, 3, 4)
+      // Each memory is emitted exactly once when the day threshold is crossed
+      if (daysAtZeroHunger >= 1 && daysAtZeroHunger <= 4) {
+        if (!starvationDayMemoriesIssued.has(daysAtZeroHunger)) {
+          // Emit starvation:day_N event (caught by MemoryFormationSystem)
+          world.eventBus.emit({
+            type: 'need:starvation_day',
+            source: entity.id,
+            data: {
+              agentId: entity.id,
+              dayNumber: daysAtZeroHunger,
+              survivalRelevance: 0.7 + (daysAtZeroHunger * 0.1), // Escalating urgency
+            },
+          } as any); // Type assertion needed for custom event
+
+          // Mark this day's memory as issued
+          starvationDayMemoriesIssued.add(daysAtZeroHunger);
+        }
+      }
+
+      // Update needs (including starvation tracking)
       impl.updateComponent<NeedsComponent>(CT.Needs, (current) => {
         // Create new instance (defensive against plain objects from deserialization)
         const updated = new NeedsComponent({
           ...current,
           hunger: newHunger,
           energy: newEnergy,
+          ticksAtZeroHunger,
         });
+        // Manually copy the Set since Object.assign won't handle it correctly
+        updated.starvationDayMemoriesIssued = new Set(starvationDayMemoriesIssued);
         return updated;
       });
-
-      // Emit events for critical needs transitions (triggers memory formation)
-      if (!wasHungerCritical && isHungerCritical) {
-        world.eventBus.emit({
-          type: 'need:critical',
-          source: entity.id,
-          data: {
-            agentId: entity.id,
-            needType: 'hunger',
-            value: newHunger,
-            survivalRelevance: 0.8,
-          },
-        });
-      }
 
       if (!wasEnergyCritical && isEnergyCritical) {
         world.eventBus.emit({
@@ -174,9 +200,8 @@ export class NeedsSystem implements System {
         });
       }
 
-      // Check for death (starving for too long)
-      if (newHunger === 0 && newEnergy === 0) {
-        // Agent should die - emit event for now, actual death handled elsewhere
+      // Check for death (starvation after 5 game days at 0% hunger)
+      if (ticksAtZeroHunger >= STARVATION_DEATH_DAYS * TICKS_PER_GAME_DAY) {
         world.eventBus.emit({
           type: 'agent:starved',
           source: entity.id,

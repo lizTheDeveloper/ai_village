@@ -57,6 +57,8 @@ export class Renderer {
   private readonly SPRITE_RETRY_DELAY_MS = 5000; // Wait 5 seconds before retrying a failed load
   // Track loaded sprite instances by entity ID
   private entitySpriteInstances = new Map<string, string>(); // entityId -> instanceId
+  // Track last facing direction for each entity (persist when not moving)
+  private entityLastDirections = new Map<string, PixelLabDirection>(); // entityId -> last direction
   // Track last frame time for animation updates
   private lastFrameTime: number = performance.now();
 
@@ -179,21 +181,30 @@ export class Renderer {
       this.entitySpriteInstances.set(entity.id, instanceId);
     }
 
-    // Determine direction from entity velocity or facing
-    const velocity = entity.components.get('velocity') as { dx: number; dy: number } | undefined;
-    let direction = PixelLabDirection.South; // Default facing south
+    // Determine direction from entity velocity or last known direction
+    const velocity = entity.components.get('velocity') as { vx: number; vy: number } | undefined;
 
-    if (velocity && (velocity.dx !== 0 || velocity.dy !== 0)) {
-      const angle = Math.atan2(velocity.dy, velocity.dx);
+    // Check if entity is moving
+    const isMoving = velocity && (Math.abs(velocity.vx) > 0.01 || Math.abs(velocity.vy) > 0.01);
+
+    let direction: PixelLabDirection;
+    if (isMoving) {
+      // Calculate direction from velocity
+      // NOTE: Negate vy because screen coordinates have Y pointing down,
+      // but Math.atan2 expects standard math coordinates (Y pointing up)
+      const angle = Math.atan2(-velocity.vy, velocity.vx);
       direction = angleToPixelLabDirection(angle);
+      // Store this direction for when entity stops moving
+      this.entityLastDirections.set(entity.id, direction);
+    } else {
+      // Not moving - use last known direction, or default to South
+      direction = this.entityLastDirections.get(entity.id) ?? PixelLabDirection.South;
     }
 
     // Update sprite direction
     this.pixelLabLoader.setDirection(instanceId, direction);
 
-    // Determine if entity is moving and set appropriate animation
-    const isMoving = velocity && (Math.abs(velocity.dx) > 0.01 || Math.abs(velocity.dy) > 0.01);
-
+    // Set appropriate animation based on movement
     if (isMoving) {
       // Play walking animation when moving
       this.pixelLabLoader.setAnimation(instanceId, 'walking-8-frames', true);

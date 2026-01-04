@@ -84,7 +84,7 @@ export class RelationshipsPanel implements IWindowPanel {
   /**
    * Render the relationships panel.
    */
-  render(ctx: CanvasRenderingContext2D, _canvasWidth: number, _canvasHeight: number, world: World): void {
+  render(ctx: CanvasRenderingContext2D, _x: number, _y: number, _width: number, _height: number, world?: any): void {
     if (!this.visible || !this.selectedEntityId) {
       return;
     }

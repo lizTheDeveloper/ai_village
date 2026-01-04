@@ -83,7 +83,7 @@ export class AnimalInfoPanel implements IWindowPanel {
    * @param canvasHeight Height of the canvas
    * @param world World instance to look up the selected entity
    */
-  render(ctx: CanvasRenderingContext2D, canvasWidth: number, _canvasHeight: number, world: World | undefined): void {
+  render(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, _height: number, world?: any): void {
     if (!this.selectedEntityId) {
       return;
     }
@@ -94,9 +94,7 @@ export class AnimalInfoPanel implements IWindowPanel {
       return;
     }
 
-    // Position panel in top-right corner
-    const x = canvasWidth - this.panelWidth - 20;
-    const y = 20;
+    // WindowManager provides position via x, y parameters
 
     // Draw panel background
     ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';

@@ -22,6 +22,10 @@ export type {
   CompletedPlot,
   AbandonedPlot,
   PlotLinesComponent,
+  // Phase 2: Event-Driven Triggers
+  PlotTrigger,
+  TriggerAgentBinding,
+  PlotTriggerEvent,
 } from './PlotTypes.js';
 export {
   createPlotLinesComponent,
@@ -65,3 +69,11 @@ export {
   captureRelationshipSnapshot,
   captureAllRelationshipSnapshots,
 } from './PlotEffectExecutor.js';
+
+// Event-Driven Plot Assignment (Phase 2)
+export {
+  EventDrivenPlotAssignmentSystem,
+  createPlotTriggerEvent,
+  templateHasTriggers,
+  getTriggeredTemplates,
+} from './EventDrivenPlotAssignment.js';

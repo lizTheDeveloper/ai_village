@@ -106,7 +106,7 @@ export class FarmManagementPanel implements IWindowPanel {
   /**
    * Render the farm management panel.
    */
-  render(ctx: CanvasRenderingContext2D, width: number, height: number, world: World | undefined): void {
+  render(ctx: CanvasRenderingContext2D, _x: number, _y: number, width: number, height: number, world?: any): void {
     if (!world) return;
 
     const x = 0;

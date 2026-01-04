@@ -89,7 +89,7 @@ export class PlantInfoPanel implements IWindowPanel {
    * @param world World instance to look up the selected entity
    * @param _tileInspectorOpen Deprecated - positioning handled by WindowManager
    */
-  render(ctx: CanvasRenderingContext2D, width: number, height: number, world: World | undefined, _tileInspectorOpen: boolean = false): void {
+  render(ctx: CanvasRenderingContext2D, _x: number, _y: number, width: number, height: number, world?: any): void {
     if (!this.selectedEntityId) {
       return; // Nothing to render
     }

@@ -36,6 +36,16 @@ interface Vector2 {
   y: number;
 }
 
+interface CombatLogEntry {
+  tick: number;
+  attacker: string;
+  defender: string;
+  attackType: string;
+  bodyPart: string;
+  damage: string;
+  result: string;
+}
+
 function distance(a: Vector2, b: Vector2): number {
   const dx = b.x - a.x;
   const dy = b.y - a.y;
@@ -46,8 +56,60 @@ function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }
 
+// Combat log generation (Dwarf Fortress style)
+const ATTACK_TYPES = [
+  'strikes', 'slashes', 'stabs', 'bashes', 'lunges at', 'charges at',
+  'sweeps at', 'thrusts at', 'hacks at', 'cleaves at'
+];
+
+const BODY_PARTS = [
+  'head', 'neck', 'upper body', 'lower body', 'left arm', 'right arm',
+  'left leg', 'right leg', 'left hand', 'right hand', 'chest', 'back'
+];
+
+const DAMAGE_LEVELS = [
+  'glancing blow',
+  'bruising the muscle',
+  'bruising the bone',
+  'tearing the muscle',
+  'fracturing the bone',
+  'shattering the bone',
+  'severing the artery',
+  'mangling the flesh'
+];
+
+const RESULTS = [
+  'The ${defender} staggers backward!',
+  'The ${defender} is knocked off balance!',
+  'The ${defender} grimaces in pain!',
+  'The ${defender} stumbles!',
+  'The ${defender} roars in defiance!',
+  'The ${defender} counterattacks!',
+  'The ${defender} blocks with their shield!',
+  'The ${defender} dodges away!'
+];
+
+function generateCombatLogEntry(tick: number, attacker: string, defender: string): CombatLogEntry {
+  const attackType = ATTACK_TYPES[Math.floor(Math.random() * ATTACK_TYPES.length)];
+  const bodyPart = BODY_PARTS[Math.floor(Math.random() * BODY_PARTS.length)];
+  const damage = DAMAGE_LEVELS[Math.floor(Math.random() * DAMAGE_LEVELS.length)];
+  const resultTemplate = RESULTS[Math.floor(Math.random() * RESULTS.length)];
+  const result = resultTemplate.replace('${defender}', defender);
+
+  return {
+    tick,
+    attacker,
+    defender,
+    attackType,
+    bodyPart,
+    damage,
+    result
+  };
+}
+
 function generateCombatRecording() {
   const frames = [];
+  const combatLog: CombatLogEntry[] = [];
 
   // Initial positions
   const gladiator1Start = { x: 580, y: 600 };
@@ -61,6 +123,10 @@ function generateCombatRecording() {
   let phase = 'approach'; // approach, circling, fighting, victory
   let winner: string | null = null;
   let circleAngle = 0;
+
+  // Combat tracking
+  let g1Health = 100;
+  let g2Health = 100;
 
   for (let tick = 0; tick < CONFIG.framesToGenerate; tick++) {
     const t = tick / CONFIG.framesToGenerate;
@@ -97,6 +163,30 @@ function generateCombatRecording() {
       g1Pos.y += Math.cos(tick * 0.2) * 2;
       g2Pos.x -= chaos;
       g2Pos.y -= Math.cos(tick * 0.2) * 2;
+
+      // Generate combat log entries (every 3-5 ticks)
+      if (tick % Math.floor(3 + Math.random() * 3) === 0) {
+        const attacker = Math.random() > 0.5 ? 'Gladiator Red' : 'Gladiator Blue';
+        const defender = attacker === 'Gladiator Red' ? 'Gladiator Blue' : 'Gladiator Red';
+        const logEntry = generateCombatLogEntry(tick, attacker, defender);
+        combatLog.push(logEntry);
+
+        // Apply damage
+        const damage = Math.floor(5 + Math.random() * 15);
+        if (attacker === 'Gladiator Red') {
+          g2Health -= damage;
+          if (g2Health <= 0) {
+            winner = 'gladiator_red';
+            phase = 'victory';
+          }
+        } else {
+          g1Health -= damage;
+          if (g1Health <= 0) {
+            winner = 'gladiator_blue';
+            phase = 'victory';
+          }
+        }
+      }
     } else if (phase === 'victory') {
       // Winner stands, loser falls
       if (winner === 'gladiator_red') {
@@ -169,7 +259,7 @@ function generateCombatRecording() {
     });
   }
 
-  return frames;
+  return { frames, combatLog };
 }
 
 // ============================================================================
@@ -180,7 +270,7 @@ function main() {
   console.log('[CombatGenerator] Generating combat recording...');
   console.log('[CombatGenerator] Config:', CONFIG);
 
-  const frames = generateCombatRecording();
+  const { frames, combatLog } = generateCombatRecording();
 
   const recording = {
     recordingId: `combat_${Date.now()}`,
@@ -191,6 +281,7 @@ function main() {
     duration: CONFIG.framesToGenerate,
     quality: 0.98,
     frames,
+    combatLog,
   };
 
   const outputPath = path.join(import.meta.dirname, 'public', 'mock-recordings', CONFIG.outputFile);
@@ -200,7 +291,14 @@ function main() {
   console.log(`[CombatGenerator] ✅ Recording generated!`);
   console.log(`[CombatGenerator] Output: ${outputPath}`);
   console.log(`[CombatGenerator] Frames: ${frames.length}`);
+  console.log(`[CombatGenerator] Combat log entries: ${combatLog.length}`);
   console.log(`[CombatGenerator] Duration: ${CONFIG.framesToGenerate} ticks`);
+
+  // Print sample combat log entries
+  console.log('\n[CombatGenerator] Sample combat log:');
+  combatLog.slice(0, 5).forEach(entry => {
+    console.log(`  Tick ${entry.tick}: ${entry.attacker} ${entry.attackType} ${entry.defender} in the ${entry.bodyPart}, ${entry.damage}! ${entry.result}`);
+  });
 }
 
 main();

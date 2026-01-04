@@ -244,7 +244,7 @@ export class DivineChatPanel implements IWindowPanel {
   /**
    * Main render method
    */
-  render(ctx: CanvasRenderingContext2D, width: number, height: number, world?: World): void {
+  render(ctx: CanvasRenderingContext2D, _x: number, _y: number, width: number, height: number, world?: any): void {
     if (!this.visible) return;
 
     // Refresh state from world

@@ -489,51 +489,396 @@ Generate the complete JSON template:
 
 ---
 
-### Phase 6: Genre Escalation Framework (Week 6)
-**Goal:** Track and trigger genre phase transitions
+### Phase 6: Archetype & Genre Escalation Framework (Week 6)
+**Goal:** Define player archetypes and track genre phase transitions
+
+There are **two separate archetype concepts**:
+
+| Type | Purpose | Example |
+|------|---------|---------|
+| **Soul Archetype** | Soul's inner nature | seeker, protector, mystic |
+| **Player Archetype** | Desired gameplay experience | strategist, romantic, explorer |
+
+These need to be kept separate but can interact (a `protector` soul might appeal to a `romantic` player).
 
 | Task | Complexity | Files |
 |------|------------|-------|
+| Define PlayerArchetype types | Simple | `PlayerArchetypeTypes.ts` |
+| Create PlayerArchetypeComponent | Simple | `PlayerArchetypeComponent.ts` |
+| Implement archetype detection from conversation | Medium | Integration with LMI |
 | Create GenrePhaseComponent | Simple | `GenrePhaseComponent.ts` |
 | Create GenreEscalationSystem | Complex | `GenreEscalationSystem.ts` |
 | Define escalation chains as data | Medium | `escalation-chains/` |
 | Integrate with plot assignment | Medium | Integration |
 
-**Components:**
+---
+
+#### 6.1 Player Archetype Definitions
+
 ```typescript
-// packages/core/src/components/GenrePhaseComponent.ts
-interface GenrePhaseComponent {
-  type: 'genre_phase';
-  escalation_id: string;           // 'romantic_to_empress'
-  current_phase_id: string;        // 'life_sim'
-  phase_start_tick: number;
-  completed_phases: string[];
-  seen_expansion_moment: boolean;
-  can_use_off_ramp: boolean;
+// packages/core/src/archetype/PlayerArchetypeTypes.ts
+
+/**
+ * Player Archetypes - What kind of experience does the player want?
+ * Detected through initial conversation with the Fates.
+ */
+export type PlayerArchetype =
+  | 'strategist'        // Colony sim → Civilization → Stellaris
+  | 'romantic'          // Dating sim → Life sim → Dynasty builder
+  | 'explorer'          // Walking sim → Metroidvania → Multiverse traveler
+  | 'historian'         // Period drama → Historical epic → Time loops
+  | 'cozy'              // Farming sim → Homesteading → Hidden god's garden
+  | 'challenge_seeker'  // Roguelike → Permadeath → Death accumulates wisdom
+  | 'business_builder'  // Startup sim → Tycoon → Cross-timeline competitor
+  | 'relationship_weaver' // Social drama → Family saga → Fae politics
+  | 'undefined';        // Not yet detected
+
+/**
+ * Detection signals for player archetypes
+ */
+export const PLAYER_ARCHETYPE_SIGNALS: Record<PlayerArchetype, string[]> = {
+  strategist: [
+    'strategy', 'system', 'optimize', 'manage', 'colony', 'build empire',
+    'civilization', 'stellaris', 'dwarf fortress', 'rimworld', 'factorio'
+  ],
+  romantic: [
+    'love', 'relationship', 'romance', 'dating', 'marriage', 'heart',
+    'stardew', 'harvest moon', 'story', 'character'
+  ],
+  explorer: [
+    'explore', 'discover', 'wander', 'travel', 'adventure', 'map',
+    'open world', 'skyrim', 'zelda', 'journey'
+  ],
+  historian: [
+    'history', 'era', 'period', 'time', 'ancient', 'medieval',
+    'crusader kings', 'victoria', 'historical'
+  ],
+  cozy: [
+    'relax', 'farm', 'peace', 'quiet', 'simple', 'garden',
+    'animal crossing', 'cozy', 'calm'
+  ],
+  challenge_seeker: [
+    'hard', 'difficult', 'roguelike', 'survive', 'die', 'permadeath',
+    'souls-like', 'challenge', 'hardcore', 'hades', 'spelunky'
+  ],
+  business_builder: [
+    'business', 'money', 'profit', 'startup', 'tycoon', 'economy',
+    'trade', 'industry', 'corporation'
+  ],
+  relationship_weaver: [
+    'family', 'friends', 'social', 'drama', 'relationships', 'people',
+    'sims', 'party', 'community'
+  ],
+  undefined: [],
+};
+
+/**
+ * Soul Archetypes - What is the soul's inner nature?
+ * Assigned at soul creation based on Fate ceremony.
+ */
+export type SoulArchetype =
+  | 'seeker'     // Knowledge, discovery, questioning
+  | 'protector'  // Defense, loyalty, guardianship
+  | 'creator'    // Building, art, innovation
+  | 'destroyer'  // Chaos, revolution, transformation
+  | 'unifier'    // Diplomacy, harmony, leadership
+  | 'wanderer'   // Freedom, adaptation, stories (default)
+  | 'mystic'     // Magic, spirituality, divinity
+  | 'scholar';   // Teaching, research, wisdom
+
+/**
+ * Which player archetypes resonate with which soul archetypes?
+ * A soul archetype can appeal to multiple player types.
+ */
+export const ARCHETYPE_RESONANCE: Record<SoulArchetype, PlayerArchetype[]> = {
+  seeker: ['explorer', 'historian', 'challenge_seeker'],
+  protector: ['romantic', 'relationship_weaver', 'strategist'],
+  creator: ['business_builder', 'cozy', 'strategist'],
+  destroyer: ['challenge_seeker', 'strategist', 'historian'],
+  unifier: ['romantic', 'relationship_weaver', 'business_builder'],
+  wanderer: ['explorer', 'cozy', 'historian'],
+  mystic: ['romantic', 'explorer', 'challenge_seeker'],
+  scholar: ['historian', 'strategist', 'business_builder'],
+};
+```
+
+---
+
+#### 6.2 Player Archetype Component
+
+```typescript
+// packages/core/src/components/PlayerArchetypeComponent.ts
+
+interface PlayerArchetypeComponent {
+  type: ComponentType.PlayerArchetype;
+
+  // Detected archetype (can change over time)
+  detected_archetype: PlayerArchetype;
+  detection_confidence: number;      // 0-1, how confident we are
+
+  // Detection history (LLM learns from conversation)
+  detection_signals: Array<{
+    signal: string;
+    archetype: PlayerArchetype;
+    timestamp: number;
+  }>;
+
+  // Player can override if we guess wrong
+  player_override?: PlayerArchetype;
+
+  // Genre preferences (derived from archetype)
+  preferred_genres: string[];
+  avoided_genres: string[];
 }
 ```
 
-**Escalation Chain Data:**
+---
+
+#### 6.3 Genre Phase Component
+
+```typescript
+// packages/core/src/components/GenrePhaseComponent.ts
+interface GenrePhaseComponent {
+  type: ComponentType.GenrePhase;
+
+  // Current escalation chain
+  escalation_id: string;           // 'romantic_to_empress'
+  current_phase_id: string;        // 'life_sim'
+  phase_start_tick: number;
+
+  // Progress tracking
+  completed_phases: string[];
+  seen_expansion_moment: boolean;  // The "credits don't roll" moment
+
+  // Player agency
+  can_use_off_ramp: boolean;       // Player can opt out of escalation
+  player_chose_to_escalate: boolean;
+}
+```
+
+---
+
+#### 6.4 Escalation Chain Data
+
 ```json
+// packages/core/src/plot/escalation-chains/strategist.json
 {
-  "id": "romantic_to_empress",
-  "name": "From Dating to Dynasty",
-  "target_archetype": "romantic",
+  "id": "strategist_to_godhood",
+  "name": "From Colony to Cosmos",
+  "target_archetype": "strategist",
+  "description": "The journey from managing a village to orchestrating the multiverse",
+
   "phases": [
     {
-      "id": "dating",
-      "genre": "Dating Simulation",
-      "mechanics": ["conversation", "gifts", "affinity_tracking"],
+      "id": "village_management",
+      "genre": "Colony Simulation",
+      "mechanics": ["resource_management", "agent_assignment", "building"],
+      "expected_duration_days": 7,
       "escalation_trigger": {
-        "type": "relationship_threshold",
-        "role": "love_interest",
-        "min_trust": 90
+        "type": "population_threshold",
+        "min_population": 20,
+        "min_happiness": 70
       },
-      "expansion_moment": "They say yes. The wedding is beautiful. The credits don't roll..."
+      "expansion_moment": "The village thrives. But one settler remembers a previous life..."
+    },
+    {
+      "id": "civilization_building",
+      "genre": "Civilization",
+      "mechanics": ["tech_tree", "multiple_villages", "trade_routes"],
+      "expected_duration_days": 14,
+      "escalation_trigger": {
+        "type": "tech_threshold",
+        "required_techs": ["writing", "astronomy"]
+      },
+      "expansion_moment": "Your astronomers see something impossible in the stars..."
+    },
+    {
+      "id": "multiverse_strategy",
+      "genre": "Stellaris + Timeline Chess",
+      "mechanics": ["universe_forking", "timeline_merging", "save_file_interaction"],
+      "expected_duration_days": 30,
+      "escalation_trigger": {
+        "type": "universe_count",
+        "min_universes": 5
+      },
+      "expansion_moment": "Your save files begin talking to each other..."
+    },
+    {
+      "id": "temporal_grand_strategy",
+      "genre": "5D Chess for Dwarf Fortress",
+      "mechanics": ["causality_manipulation", "paradox_resolution", "multiverse_diplomacy"],
+      "escalation_trigger": null,
+      "expansion_moment": null
+    }
+  ],
+
+  "off_ramps": [
+    {
+      "from_phase": "civilization_building",
+      "description": "Stay at civilization scale, focus on your empire",
+      "available_after_trigger": true
+    },
+    {
+      "from_phase": "multiverse_strategy",
+      "description": "Seal the timeline rifts, live in one universe",
+      "available_after_trigger": true
     }
   ]
 }
 ```
+
+```json
+// packages/core/src/plot/escalation-chains/romantic.json
+{
+  "id": "romantic_to_empress",
+  "name": "From Dating to Dynasty",
+  "target_archetype": "romantic",
+  "description": "The journey from first love to ruling across time",
+
+  "phases": [
+    {
+      "id": "dating_sim",
+      "genre": "Dating Simulation",
+      "mechanics": ["conversation", "gifts", "affinity_tracking"],
+      "expected_duration_days": 5,
+      "escalation_trigger": {
+        "type": "relationship_threshold",
+        "role": "love_interest",
+        "min_trust": 90,
+        "min_affinity": 85
+      },
+      "expansion_moment": "They say yes. The wedding is beautiful. The credits don't roll..."
+    },
+    {
+      "id": "life_sim",
+      "genre": "Life Simulation",
+      "mechanics": ["home_building", "career", "family_planning"],
+      "expected_duration_days": 10,
+      "escalation_trigger": {
+        "type": "family_milestone",
+        "has_child": true
+      },
+      "expansion_moment": "Your child draws a picture of themselves... with someone who looks exactly like them."
+    },
+    {
+      "id": "family_saga",
+      "genre": "Family Dynasty",
+      "mechanics": ["inheritance", "family_tree", "generational_bonds"],
+      "expected_duration_days": 20,
+      "escalation_trigger": {
+        "type": "generation_count",
+        "min_generations": 3
+      },
+      "expansion_moment": "The family heirloom glows. It was never just a trinket."
+    },
+    {
+      "id": "fae_politics",
+      "genre": "Court Intrigue + Magic",
+      "mechanics": ["court_favor", "fae_bargains", "magical_lineage"],
+      "expected_duration_days": 30,
+      "escalation_trigger": {
+        "type": "fae_revelation",
+        "discovered_true_nature": true
+      },
+      "expansion_moment": "You are offered the crown of a realm between realms."
+    },
+    {
+      "id": "empress_of_time",
+      "genre": "Transcendence",
+      "mechanics": ["timeline_ruling", "love_across_universes", "eternal_bonds"],
+      "escalation_trigger": null,
+      "expansion_moment": null
+    }
+  ],
+
+  "off_ramps": [
+    {
+      "from_phase": "life_sim",
+      "description": "This is enough. A good life is its own reward.",
+      "available_after_trigger": false
+    }
+  ]
+}
+```
+
+---
+
+#### 6.5 Archetype Detection in Fates Conversation
+
+```typescript
+// In SoulCreationCeremony.ts - enhanced archetype detection
+
+function detectPlayerArchetype(conversationHistory: string[]): {
+  archetype: PlayerArchetype;
+  confidence: number;
+  signals: string[];
+} {
+  const allText = conversationHistory.join(' ').toLowerCase();
+  const detectedSignals: Array<{ signal: string; archetype: PlayerArchetype }> = [];
+
+  // Check each archetype's signals
+  for (const [archetype, signals] of Object.entries(PLAYER_ARCHETYPE_SIGNALS)) {
+    for (const signal of signals) {
+      if (allText.includes(signal.toLowerCase())) {
+        detectedSignals.push({ signal, archetype: archetype as PlayerArchetype });
+      }
+    }
+  }
+
+  // Count signals per archetype
+  const counts = new Map<PlayerArchetype, number>();
+  for (const { archetype } of detectedSignals) {
+    counts.set(archetype, (counts.get(archetype) || 0) + 1);
+  }
+
+  // Find the winner
+  let bestArchetype: PlayerArchetype = 'undefined';
+  let bestCount = 0;
+  for (const [archetype, count] of counts) {
+    if (count > bestCount) {
+      bestCount = count;
+      bestArchetype = archetype;
+    }
+  }
+
+  // Calculate confidence (0-1)
+  const totalSignals = detectedSignals.length;
+  const confidence = totalSignals === 0 ? 0 : bestCount / totalSignals;
+
+  return {
+    archetype: bestArchetype,
+    confidence: Math.min(confidence, 0.9), // Cap at 90% - always leave room for player override
+    signals: detectedSignals.filter(s => s.archetype === bestArchetype).map(s => s.signal),
+  };
+}
+```
+
+---
+
+#### 6.6 Integration with Plot Assignment
+
+```typescript
+// PlotAssignmentSystem.ts - use both archetypes
+
+const eligibleTemplates = plotLineRegistry.getEligibleTemplates({
+  wisdom: identity.wisdom_level,
+  soul_archetype: identity.archetype,           // Soul's inner nature
+  player_archetype: playerArchetype.detected,   // Player's preference
+  interests: identity.core_interests,
+  learned_lessons: identity.lessons_learned.map(l => l.lesson_id),
+  current_genre_phase: genrePhase.current_phase_id,  // Only plots appropriate for phase
+});
+```
+
+---
+
+**Deliverable:**
+- Player archetype detected from Fates conversation
+- Soul archetype assigned independently
+- Genre escalation chains defined for strategist, romantic, explorer
+- Plots filtered by both archetype types and current genre phase
+- Player can override detected archetype
+- Off-ramps allow players to opt out of escalation
 
 ---
 

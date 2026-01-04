@@ -136,6 +136,7 @@ export class MemoryFormationSystem implements System {
       'social:conflict',
       'social:interaction',
       'need:critical',
+      'need:starvation_day',
       'survival:close_call',
       'agent:sleep_end',
       'discovery:location',
@@ -504,6 +505,7 @@ export class MemoryFormationSystem implements System {
     // These will still be remembered if they meet importance thresholds below
     const alwaysRememberEvents = [
       'need:critical',
+      'need:starvation_day',
       'agent:starved',
       'agent:collapsed',
       'storage:full',
@@ -702,6 +704,21 @@ export class MemoryFormationSystem implements System {
 
       case 'need:critical':
         return `My ${'needType' in data && data.needType ? data.needType : 'need'} became critically low`;
+      case 'need:starvation_day': {
+        const dayNumber = 'dayNumber' in data ? data.dayNumber : 1;
+        switch (dayNumber) {
+          case 1:
+            return 'I haven\'t eaten in a day';
+          case 2:
+            return 'I haven\'t eaten in two days';
+          case 3:
+            return 'I haven\'t eaten in three days';
+          case 4:
+            return 'It\'s been four days since I\'ve eaten. I can\'t take another day of this';
+          default:
+            return `I haven't eaten in ${dayNumber} days`;
+        }
+      }
       case 'agent:starved':
         return 'I\'m starving and exhausted';
       case 'agent:collapsed':

@@ -44,7 +44,7 @@ export class ResourcesPanel implements IWindowPanel {
     this.visible = visible;
   }
 
-  render(ctx: CanvasRenderingContext2D, _canvasWidth: number, world: World, _agentPanelOpen = false): void {
+  render(ctx: CanvasRenderingContext2D, _x: number, _y: number, _width: number, _height: number, world?: any): void {
     // WindowManager handles positioning via translate, so render at (0, 0)
     const x = 0;
     const y = 0;
