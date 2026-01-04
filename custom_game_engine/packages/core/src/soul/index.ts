@@ -50,3 +50,15 @@ export {
   shouldSoulInfluence,
   severSoulLink,
 } from './SoulLinkComponent.js';
+
+// Soul Snapshot Utilities
+export type {
+  SoulSnapshotPosition,
+  SoulAwareTimelineEntry,
+} from './SoulSnapshotUtils.js';
+export {
+  recordSoulPositions,
+  validateSoulPosition,
+  getSoulsInSnapshot,
+  getSoulPosition,
+} from './SoulSnapshotUtils.js';
