@@ -202,6 +202,10 @@ export * from './PlayerControlComponent.js';
 export { createPlayerControlComponent, type PlayerControlComponent, calculatePossessionCost, shouldEndPossession } from './PlayerControlComponent.js';
 // Mythology system (Phase 3: Myth Generation)
 export * from './MythComponent.js';
+// Soul System - eternal identity across incarnations and universes
+export * from '../soul/index.js';
+// Plot Lines System - lesson-driven narrative arcs
+export * from '../plot/index.js';
 // Military system (forward-compatibility)
 export * from './MilitaryComponent.js';
 // Body parts system - extensible for multiple species
