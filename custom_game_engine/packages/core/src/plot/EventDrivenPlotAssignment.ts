@@ -506,8 +506,8 @@ export class EventDrivenPlotAssignmentSystem implements System {
         return `death_nearby:${event.involved_agent_id}:${soulId}`;
       default: {
         // Exhaustiveness check - should never reach here
-        const _exhaustive: never = trigger;
-        return `unknown:${soulId}`;
+        const exhaustiveCheck: never = trigger;
+        throw new Error(`Unhandled trigger type: ${(exhaustiveCheck as PlotTrigger).type}`);
       }
     }
   }

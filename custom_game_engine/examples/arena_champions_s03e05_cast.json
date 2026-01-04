@@ -1,0 +1,78 @@
+{
+  "productionName": "Arena Champions",
+  "episode": "S03E05 - The Thunder Strikes Back",
+  "defaultQuality": 2,
+  "defaultLighting": "dramatic",
+  "cast": [
+    {
+      "entityId": "gladiator_thunderfist_789",
+      "name": "Thunderfist",
+      "role": "champion",
+      "costume": {
+        "costumeType": "gladiator",
+        "colors": ["red", "gold"],
+        "accessories": ["champion_belt", "arena_tattoos"]
+      },
+      "equipment": [
+        {
+          "itemType": "weapon",
+          "itemName": "Thunder Hammer",
+          "itemDescription": "massive warhammer crackling with lightning",
+          "inHand": "right"
+        },
+        {
+          "itemType": "shield",
+          "itemName": "Iron Bulwark",
+          "itemDescription": "battle-scarred tower shield",
+          "inHand": "left"
+        }
+      ],
+      "pose": "dramatic",
+      "expression": "determined"
+    },
+    {
+      "entityId": "gladiator_stormblade_456",
+      "name": "Stormblade",
+      "role": "challenger",
+      "costume": {
+        "costumeType": "gladiator",
+        "colors": ["blue", "silver"],
+        "accessories": ["wind_cloak", "scarred_armor"]
+      },
+      "equipment": [
+        {
+          "itemType": "weapon",
+          "itemName": "Dual Storm Swords",
+          "itemDescription": "twin curved blades that hum with wind magic",
+          "inHand": "both"
+        }
+      ],
+      "pose": "action",
+      "expression": "fierce"
+    },
+    {
+      "entityId": "announcer_voice_123",
+      "name": "Voice of the Arena",
+      "role": "announcer",
+      "costume": {
+        "costumeType": "performer",
+        "colors": ["purple", "gold"],
+        "accessories": ["enchanted_microphone_staff"]
+      },
+      "pose": "portrait",
+      "expression": "enthusiastic"
+    },
+    {
+      "entityId": "healer_mercy_234",
+      "name": "Sister Mercy",
+      "role": "arena_healer",
+      "costume": {
+        "costumeType": "common",
+        "customDescription": "white and green healer robes with red cross emblem",
+        "accessories": ["healing_staff", "medical_satchel"]
+      },
+      "pose": "standing",
+      "expression": "concerned"
+    }
+  ]
+}

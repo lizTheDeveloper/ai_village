@@ -1,4 +1,4 @@
-import type { Entity, World, PlantComponent, ResourceComponent } from '@ai-village/core';
+import type { Entity, PlantComponent, ResourceComponent } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
 /**

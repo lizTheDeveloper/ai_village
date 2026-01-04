@@ -9,7 +9,7 @@
  * - Data-driven: no hardcoded paradigm list
  */
 
-import type { World, MagicParadigm, ParadigmState } from '@ai-village/core';
+import type { MagicParadigm, ParadigmState } from '@ai-village/core';
 
 // Local type for magic source
 interface MagicSourceInfo {
