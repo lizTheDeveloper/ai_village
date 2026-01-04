@@ -68,7 +68,6 @@ export default defineConfig({
 
   server: {
     port: 3000,
-    strictPort: true, // Don't try other ports - fail if 3000 is busy
     host: '0.0.0.0', // Listen on all network interfaces for VM deployment
     proxy: {
       '/api/generate-sprite': {

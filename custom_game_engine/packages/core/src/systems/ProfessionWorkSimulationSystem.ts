@@ -39,6 +39,7 @@ import {
 } from '../components/ProfessionComponent.js';
 import type { TimeComponent } from './TimeSystem.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
+import { updateReporterBehaviors } from '../profession/ReporterBehaviorHandler.js';
 
 /**
  * Configuration for ProfessionWorkSimulationSystem.
@@ -170,6 +171,9 @@ export class ProfessionWorkSimulationSystem implements System {
       this.aggregateOutputsToDirectors(world, currentTick);
       this.lastAggregationTick = currentTick;
     }
+
+    // Update field reporter navigation (sends reporters to story locations)
+    updateReporterBehaviors(world, currentTick);
   }
 
   /**

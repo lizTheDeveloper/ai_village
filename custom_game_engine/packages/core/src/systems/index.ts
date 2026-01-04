@@ -52,6 +52,8 @@ export type { CityDirectorSystemConfig } from './CityDirectorSystem.js';
 export * from './ProfessionWorkSimulationSystem.js';
 export { ProfessionWorkSimulationSystem, DEFAULT_PROFESSION_WORK_CONFIG } from './ProfessionWorkSimulationSystem.js';
 export type { ProfessionWorkConfig } from './ProfessionWorkSimulationSystem.js';
+// Event Reporting (Converts world events to news stories, dispatches reporters)
+export { EventReportingSystem } from './EventReportingSystem.js';
 // Economy & Trading
 export * from './TradingSystem.js';
 export * from './MarketEventSystem.js';
