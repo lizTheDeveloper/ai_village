@@ -22,6 +22,13 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+    headers: {
+      // Force no caching in development to prevent stale code issues
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+      'Surrogate-Control': 'no-store',
+    },
   },
   resolve: {
     alias: {
@@ -29,6 +36,17 @@ export default defineConfig({
       '@ai-village/world': path.resolve(__dirname, '../packages/world/src/index.ts'),
       '@ai-village/renderer': path.resolve(__dirname, '../packages/renderer/src/index.ts'),
       '@ai-village/llm': path.resolve(__dirname, '../packages/llm/src/index.ts'),
+    },
+  },
+  build: {
+    // Enable cache busting in production builds
+    rollupOptions: {
+      output: {
+        // Add content hash to filenames for cache busting
+        entryFileNames: `assets/[name].[hash].js`,
+        chunkFileNames: `assets/[name].[hash].js`,
+        assetFileNames: `assets/[name].[hash].[ext]`,
+      },
     },
   },
 });

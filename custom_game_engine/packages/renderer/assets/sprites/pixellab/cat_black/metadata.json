@@ -1,0 +1,18 @@
+{
+  "id": "cat_black",
+  "base_species": "cat",
+  "variant": "black",
+  "description": "black cat",
+  "size": 48,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-04T00:30:45.455Z"
+}

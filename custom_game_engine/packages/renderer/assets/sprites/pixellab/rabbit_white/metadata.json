@@ -1,0 +1,18 @@
+{
+  "id": "rabbit_white",
+  "base_species": "rabbit",
+  "variant": "white",
+  "description": "white rabbit",
+  "size": 48,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-04T00:35:36.697Z"
+}
