@@ -26,7 +26,7 @@ import { plotLineRegistry } from './PlotLineRegistry.js';
 import type { MoodComponent, Trauma } from '../components/MoodComponent.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
 import type { SoulIdentityComponent } from '../soul/SoulIdentityComponent.js';
-import type { SkillsComponent, SkillId, SkillLevel } from '../components/SkillsComponent.js';
+import type { SkillsComponent, SkillId } from '../components/SkillsComponent.js';
 
 /**
  * Track cooldowns per trigger condition per soul
@@ -504,8 +504,11 @@ export class EventDrivenPlotAssignmentSystem implements System {
         return `rel_formed:${event.involved_agent_id}:${soulId}`;
       case 'on_death_nearby':
         return `death_nearby:${event.involved_agent_id}:${soulId}`;
-      default:
-        return `${trigger.type}:${soulId}`;
+      default: {
+        // Exhaustiveness check - should never reach here
+        const _exhaustive: never = trigger;
+        return `unknown:${soulId}`;
+      }
     }
   }
 

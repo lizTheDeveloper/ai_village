@@ -1,9 +1,9 @@
 {
-  "recordingId": "combat_1767519820058",
+  "recordingId": "combat_1767521211640",
   "title": "REAL GLADIATOR COMBAT - Procedural Arena Fight",
   "description": "Two gladiators approach and battle in a procedurally generated fight",
   "recordedBy": "Procedural Combat Generator",
-  "recordedAt": 1767519820058,
+  "recordedAt": 1767521211640,
   "duration": 100,
   "quality": 0.98,
   "frames": [
@@ -2652,7 +2652,7 @@
       "cameraX": 600,
       "cameraY": 600,
       "cameraAngle": 180,
-      "cameraZoom": 1.3,
+      "cameraZoom": 1.1,
       "entities": [
         {
           "entityId": "gladiator_red",
@@ -2661,7 +2661,7 @@
           "y": 595.6759771752952,
           "facingAngle": 106.49854412003981,
           "animation": {
-            "state": "attacking",
+            "state": "defeated",
             "frame": 0
           },
           "distanceFromCamera": 4.509700961755804
@@ -2673,7 +2673,7 @@
           "y": 604.3240228247048,
           "facingAngle": -73.5014558799602,
           "animation": {
-            "state": "defending",
+            "state": "victorious",
             "frame": 0
           },
           "distanceFromCamera": 4.509700961755804
@@ -2691,25 +2691,25 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 105.64210718144288,
+          "y": 596.1759771752952,
+          "facingAngle": 107.45112066657745,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 0
           },
-          "distanceFromCamera": 4.7499383340011505
+          "distanceFromCamera": 4.270584427465265
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 604.8240228247048,
-          "facingAngle": -74.35789281855713,
+          "y": 604.3240228247048,
+          "facingAngle": -72.54887933342256,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 0
           },
-          "distanceFromCamera": 4.7499383340011505
+          "distanceFromCamera": 4.270584427465265
         }
       ]
     },
@@ -2724,25 +2724,25 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 104.86828553402452,
+          "y": 596.6759771752952,
+          "facingAngle": 108.51636010714883,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 0
           },
-          "distanceFromCamera": 4.991134699561416
+          "distanceFromCamera": 4.032788109950289
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 605.3240228247048,
-          "facingAngle": -75.13171446597549,
+          "y": 604.3240228247048,
+          "facingAngle": -71.48363989285119,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 0
           },
-          "distanceFromCamera": 4.991134699561416
+          "distanceFromCamera": 4.032788109950289
         }
       ]
     },
@@ -2757,25 +2757,25 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 104.16592076658438,
+          "y": 597.1759771752952,
+          "facingAngle": 109.71461968936404,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 0
           },
-          "distanceFromCamera": 5.233157460034851
+          "distanceFromCamera": 3.7965600913727187
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 605.8240228247048,
-          "facingAngle": -75.83407923341564,
+          "y": 604.3240228247048,
+          "facingAngle": -70.28538031063597,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 0
           },
-          "distanceFromCamera": 5.233157460034851
+          "distanceFromCamera": 3.7965600913727187
         }
       ]
     },
@@ -2790,25 +2790,25 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 103.52573665101507,
+          "y": 597.6759771752952,
+          "facingAngle": 111.07119973130443,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 0
           },
-          "distanceFromCamera": 5.475897041934848
+          "distanceFromCamera": 3.562212390502794
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 606.3240228247048,
-          "facingAngle": -76.47426334898495,
+          "y": 604.3240228247048,
+          "facingAngle": -68.92880026869558,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 0
           },
-          "distanceFromCamera": 5.475897041934848
+          "distanceFromCamera": 3.562212390502794
         }
       ]
     },
@@ -2823,25 +2823,25 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 102.93996652346245,
+          "y": 598.1759771752952,
+          "facingAngle": 112.61782505065666,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 1
           },
-          "distanceFromCamera": 5.719262174985793
+          "distanceFromCamera": 3.3301419943748987
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 606.8240228247048,
-          "facingAngle": -77.06003347653757,
+          "y": 604.3240228247048,
+          "facingAngle": -67.38217494934335,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 1
           },
-          "distanceFromCamera": 5.719262174985793
+          "distanceFromCamera": 3.3301419943748987
         }
       ]
     },
@@ -2856,25 +2856,25 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 102.40206390182607,
+          "y": 598.6759771752952,
+          "facingAngle": 114.3946293635814,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 1
           },
-          "distanceFromCamera": 5.963176270962952
+          "distanceFromCamera": 3.1008602500510776
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 607.3240228247048,
-          "facingAngle": -77.59793609817395,
+          "y": 604.3240228247048,
+          "facingAngle": -65.60537063641861,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 1
           },
-          "distanceFromCamera": 5.963176270962952
+          "distanceFromCamera": 3.1008602500510776
         }
       ]
     },
@@ -2889,25 +2889,25 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 101.90647593452044,
+          "y": 599.1759771752952,
+          "facingAngle": 116.45280815265104,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 1
           },
-          "distanceFromCamera": 6.207574619038262
+          "distanceFromCamera": 2.8750344133582875
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 607.8240228247048,
-          "facingAngle": -78.09352406547957,
+          "y": 604.3240228247048,
+          "facingAngle": -63.54719184734898,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 1
           },
-          "distanceFromCamera": 6.207574619038262
+          "distanceFromCamera": 2.8750344133582875
         }
       ]
     },
@@ -2922,25 +2922,25 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 101.44846464787805,
+          "y": 599.6759771752952,
+          "facingAngle": 118.85812715225593,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 1
           },
-          "distanceFromCamera": 6.452402193236285
+          "distanceFromCamera": 2.6535469593813543
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 608.3240228247048,
-          "facingAngle": -78.55153535212196,
+          "y": 604.3240228247048,
+          "facingAngle": -61.141872847744075,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 1
           },
-          "distanceFromCamera": 6.452402193236285
+          "distanceFromCamera": 2.6535469593813543
         }
       ]
     },
@@ -2955,25 +2955,25 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 101.02396484080806,
+          "y": 600.1759771752952,
+          "facingAngle": 121.69543628011866,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 1
           },
-          "distanceFromCamera": 6.697611923337512
+          "distanceFromCamera": 2.43758077882347
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 608.8240228247048,
-          "facingAngle": -78.97603515919195,
+          "y": 604.3240228247048,
+          "facingAngle": -58.30456371988135,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 1
           },
-          "distanceFromCamera": 6.697611923337512
+          "distanceFromCamera": 2.43758077882347
         }
       ]
     },
@@ -2988,25 +2988,25 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 100.6294702937776,
+          "y": 600.6759771752952,
+          "facingAngle": 125.07412318275844,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 2
           },
-          "distanceFromCamera": 6.943163319985007
+          "distanceFromCamera": 2.2287414926225146
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 609.3240228247048,
-          "facingAngle": -79.37052970622241,
+          "y": 604.3240228247048,
+          "facingAngle": -54.92587681724156,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 2
           },
-          "distanceFromCamera": 6.943163319985007
+          "distanceFromCamera": 2.2287414926225146
         }
       ]
     },
@@ -3021,25 +3021,25 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 100.26194201859992,
+          "y": 601.1759771752952,
+          "facingAngle": 129.1337606643298,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 2
           },
-          "distanceFromCamera": 7.189021372922577
+          "distanceFromCamera": 2.029230698709448
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 609.8240228247048,
-          "facingAngle": -79.73805798140009,
+          "y": 604.3240228247048,
+          "facingAngle": -50.86623933567021,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 2
           },
-          "distanceFromCamera": 7.189021372922577
+          "distanceFromCamera": 2.029230698709448
         }
       ]
     },
@@ -3054,25 +3054,25 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 99.9187337905502,
+          "y": 601.6759771752952,
+          "facingAngle": 134.0474427622188,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 2
           },
-          "distanceFromCamera": 7.435155661631437
+          "distanceFromCamera": 1.8420819244084763
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 610.3240228247048,
-          "facingAngle": -80.08126620944981,
+          "y": 604.3240228247048,
+          "facingAngle": -45.95255723778124,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 2
           },
-          "distanceFromCamera": 7.435155661631437
+          "distanceFromCamera": 1.8420819244084763
         }
       ]
     },
@@ -3087,25 +3087,25 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 99.59753132680255,
+          "y": 602.1759771752952,
+          "facingAngle": 140.01638988759143,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 2
           },
-          "distanceFromCamera": 7.681539632459264
+          "distanceFromCamera": 1.6714527824261254
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 610.8240228247048,
-          "facingAngle": -80.40246867319746,
+          "y": 604.3240228247048,
+          "facingAngle": -39.983610112408584,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 2
           },
-          "distanceFromCamera": 7.681539632459264
+          "distanceFromCamera": 1.6714527824261254
         }
       ]
     },
@@ -3120,25 +3120,25 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 99.29630231280585,
+          "y": 602.6759771752952,
+          "facingAngle": 147.24241725375856,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 2
           },
-          "distanceFromCamera": 7.928150007246003
+          "distanceFromCamera": 1.5229061006928948
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 611.3240228247048,
-          "facingAngle": -80.70369768719416,
+          "y": 604.3240228247048,
+          "facingAngle": -32.75758274624143,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 2
           },
-          "distanceFromCamera": 7.928150007246003
+          "distanceFromCamera": 1.5229061006928948
         }
       ]
     },
@@ -3153,25 +3153,25 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 99.0132551077712,
+          "y": 603.1759771752952,
+          "facingAngle": 155.85783041505144,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 3
           },
-          "distanceFromCamera": 8.17496629655115
+          "distanceFromCamera": 1.40347126054481
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 611.8240228247048,
-          "facingAngle": -80.9867448922288,
+          "y": 604.3240228247048,
+          "facingAngle": -24.14216958494856,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 3
           },
-          "distanceFromCamera": 8.17496629655115
+          "distanceFromCamera": 1.40347126054481
         }
       ]
     },
@@ -3186,25 +3186,25 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 98.7468044369719,
+          "y": 603.6759771752952,
+          "facingAngle": 165.80200724429378,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 3
           },
-          "distanceFromCamera": 8.421970396653007
+          "distanceFromCamera": 1.3210678131053073
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 612.3240228247048,
-          "facingAngle": -81.25319556302811,
+          "y": 604.3240228247048,
+          "facingAngle": -14.197992755706215,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 3
           },
-          "distanceFromCamera": 8.421970396653007
+          "distanceFromCamera": 1.3210678131053073
         }
       ]
     },
@@ -3219,25 +3219,25 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 98.49554274175634,
+          "y": 604.1759771752952,
+          "facingAngle": 176.69209454666563,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 3
           },
-          "distanceFromCamera": 8.669146254069775
+          "distanceFromCamera": 1.2828518053424722
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 612.8240228247048,
-          "facingAngle": -81.50445725824368,
+          "y": 604.3240228247048,
+          "facingAngle": -3.3079054533343757,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 3
           },
-          "distanceFromCamera": 8.669146254069775
+          "distanceFromCamera": 1.2828518053424722
         }
       ]
     },
@@ -3252,25 +3252,25 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 98.25821613686549,
+          "y": 604.6759771752952,
+          "facingAngle": -172.17623873899146,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 3
           },
-          "distanceFromCamera": 8.916479584836406
+          "distanceFromCamera": 1.2927479808988454
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 613.3240228247048,
-          "facingAngle": -81.74178386313451,
+          "y": 604.3240228247048,
+          "facingAngle": 7.823761261008536,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 3
           },
-          "distanceFromCamera": 8.916479584836406
+          "distanceFromCamera": 1.2927479808988454
         }
       ]
     },
@@ -3285,110 +3285,205 @@
           "entityId": "gladiator_red",
           "entityType": "gladiator",
           "x": 601.2807144005957,
-          "y": 595.6759771752952,
-          "facingAngle": 98.03370413989164,
+          "y": 605.1759771752952,
+          "facingAngle": -161.6024088284841,
           "animation": {
-            "state": "victorious",
+            "state": "defeated",
             "frame": 3
           },
-          "distanceFromCamera": 9.163957638441854
+          "distanceFromCamera": 1.349698458829098
         },
         {
           "entityId": "gladiator_blue",
           "entityType": "gladiator",
           "x": 598.7192855994043,
-          "y": 613.8240228247048,
-          "facingAngle": -81.96629586010836,
+          "y": 604.3240228247048,
+          "facingAngle": 18.3975911715159,
           "animation": {
-            "state": "defeated",
+            "state": "victorious",
             "frame": 3
           },
-          "distanceFromCamera": 9.163957638441854
+          "distanceFromCamera": 1.349698458829098
         }
       ]
     }
   ],
   "combatLog": [
     {
-      "tick": 54,
+      "tick": 51,
       "attacker": "Gladiator Red",
       "defender": "Gladiator Blue",
       "attackType": "slashes",
-      "bodyPart": "left arm",
-      "damage": "bruising the muscle",
-      "result": "The Gladiator Blue blocks with their shield!"
+      "bodyPart": "left leg",
+      "damage": "tearing the muscle",
+      "result": "The Gladiator Blue counterattacks!",
+      "renderableOperation": {
+        "actor": "Gladiator Red",
+        "action": "thrusts",
+        "weapon": "scarlet spear",
+        "target": "Gladiator Blue's left leg",
+        "spritePrompt": "gladiator in red armor thrusts with scarlet spear, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
     },
     {
       "tick": 55,
       "attacker": "Gladiator Blue",
       "defender": "Gladiator Red",
-      "attackType": "thrusts at",
-      "bodyPart": "lower body",
-      "damage": "shattering the bone",
-      "result": "The Gladiator Red counterattacks!"
-    },
-    {
-      "tick": 56,
-      "attacker": "Gladiator Red",
-      "defender": "Gladiator Blue",
-      "attackType": "sweeps at",
+      "attackType": "charges at",
       "bodyPart": "right leg",
-      "damage": "mangling the flesh",
-      "result": "The Gladiator Blue dodges away!"
+      "damage": "fracturing the bone",
+      "result": "The Gladiator Red roars in defiance!",
+      "renderableOperation": {
+        "actor": "Gladiator Blue",
+        "action": "bashes",
+        "weapon": "azure mace",
+        "target": "Gladiator Red's right leg",
+        "spritePrompt": "gladiator in blue armor bashes with azure mace, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
     },
     {
       "tick": 57,
       "attacker": "Gladiator Blue",
       "defender": "Gladiator Red",
-      "attackType": "charges at",
-      "bodyPart": "right hand",
-      "damage": "mangling the flesh",
-      "result": "The Gladiator Red roars in defiance!"
+      "attackType": "stabs",
+      "bodyPart": "upper body",
+      "damage": "tearing the muscle",
+      "result": "The Gladiator Red is knocked off balance!",
+      "renderableOperation": {
+        "actor": "Gladiator Blue",
+        "action": "thrusts",
+        "weapon": "cobalt trident",
+        "target": "Gladiator Red's upper body",
+        "spritePrompt": "gladiator in blue armor thrusts with cobalt trident, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
     },
     {
       "tick": 60,
       "attacker": "Gladiator Blue",
       "defender": "Gladiator Red",
-      "attackType": "slashes",
+      "attackType": "bashes",
+      "bodyPart": "right leg",
+      "damage": "fracturing the bone",
+      "result": "The Gladiator Red roars in defiance!",
+      "renderableOperation": {
+        "actor": "Gladiator Blue",
+        "action": "bashes",
+        "weapon": "sapphire sword",
+        "target": "Gladiator Red's right leg",
+        "spritePrompt": "gladiator in blue armor bashes with sapphire sword, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 63,
+      "attacker": "Gladiator Blue",
+      "defender": "Gladiator Red",
+      "attackType": "charges at",
       "bodyPart": "chest",
       "damage": "shattering the bone",
-      "result": "The Gladiator Red is knocked off balance!"
+      "result": "The Gladiator Red stumbles!",
+      "renderableOperation": {
+        "actor": "Gladiator Blue",
+        "action": "charges at",
+        "weapon": "sapphire sword",
+        "target": "Gladiator Red's chest",
+        "spritePrompt": "gladiator in blue armor charges at with sapphire sword, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
     },
     {
       "tick": 64,
       "attacker": "Gladiator Blue",
       "defender": "Gladiator Red",
-      "attackType": "hacks at",
-      "bodyPart": "lower body",
-      "damage": "bruising the muscle",
-      "result": "The Gladiator Red grimaces in pain!"
+      "attackType": "bashes",
+      "bodyPart": "neck",
+      "damage": "fracturing the bone",
+      "result": "The Gladiator Red is knocked off balance!",
+      "renderableOperation": {
+        "actor": "Gladiator Blue",
+        "action": "bashes",
+        "weapon": "sapphire sword",
+        "target": "Gladiator Red's neck",
+        "spritePrompt": "gladiator in blue armor bashes with sapphire sword, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
     },
     {
-      "tick": 65,
-      "attacker": "Gladiator Red",
-      "defender": "Gladiator Blue",
-      "attackType": "cleaves at",
-      "bodyPart": "left hand",
-      "damage": "mangling the flesh",
-      "result": "The Gladiator Blue blocks with their shield!"
-    },
-    {
-      "tick": 69,
+      "tick": 68,
       "attacker": "Gladiator Blue",
       "defender": "Gladiator Red",
-      "attackType": "strikes",
-      "bodyPart": "upper body",
-      "damage": "severing the artery",
-      "result": "The Gladiator Red dodges away!"
+      "attackType": "hacks at",
+      "bodyPart": "chest",
+      "damage": "mangling the flesh",
+      "result": "The Gladiator Red is knocked off balance!",
+      "renderableOperation": {
+        "actor": "Gladiator Blue",
+        "action": "thrusts",
+        "weapon": "cobalt trident",
+        "target": "Gladiator Red's chest",
+        "spritePrompt": "gladiator in blue armor thrusts with cobalt trident, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
     },
     {
-      "tick": 75,
+      "tick": 70,
       "attacker": "Gladiator Red",
       "defender": "Gladiator Blue",
-      "attackType": "lunges at",
-      "bodyPart": "right arm",
-      "damage": "severing the artery",
-      "result": "The Gladiator Blue is knocked off balance!"
+      "attackType": "strikes",
+      "bodyPart": "left leg",
+      "damage": "fracturing the bone",
+      "result": "The Gladiator Blue staggers backward!",
+      "renderableOperation": {
+        "actor": "Gladiator Red",
+        "action": "hacks",
+        "weapon": "ruby axe",
+        "target": "Gladiator Blue's left leg",
+        "spritePrompt": "gladiator in red armor hacks with ruby axe, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 72,
+      "attacker": "Gladiator Blue",
+      "defender": "Gladiator Red",
+      "attackType": "charges at",
+      "bodyPart": "head",
+      "damage": "shattering the bone",
+      "result": "The Gladiator Red counterattacks!",
+      "renderableOperation": {
+        "actor": "Gladiator Blue",
+        "action": "thrusts",
+        "weapon": "cobalt trident",
+        "target": "Gladiator Red's head",
+        "spritePrompt": "gladiator in blue armor thrusts with cobalt trident, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 76,
+      "attacker": "Gladiator Blue",
+      "defender": "Gladiator Red",
+      "attackType": "slashes",
+      "bodyPart": "back",
+      "damage": "glancing blow",
+      "result": "The Gladiator Red blocks with their shield!",
+      "renderableOperation": {
+        "actor": "Gladiator Blue",
+        "action": "slashes",
+        "weapon": "sapphire sword",
+        "target": "Gladiator Red's back",
+        "spritePrompt": "gladiator in blue armor slashes with sapphire sword, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
+    },
+    {
+      "tick": 80,
+      "attacker": "Gladiator Blue",
+      "defender": "Gladiator Red",
+      "attackType": "hacks at",
+      "bodyPart": "left hand",
+      "damage": "mangling the flesh",
+      "result": "The Gladiator Red stumbles!",
+      "renderableOperation": {
+        "actor": "Gladiator Blue",
+        "action": "hacks at",
+        "weapon": "sapphire sword",
+        "target": "Gladiator Red's left hand",
+        "spritePrompt": "gladiator in blue armor hacks at with sapphire sword, attacking motion, pixel art, 48x48, high top-down view, combat animation"
+      }
     }
   ]
 }

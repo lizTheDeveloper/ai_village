@@ -44,6 +44,14 @@ interface CombatLogEntry {
   bodyPart: string;
   damage: string;
   result: string;
+  // Renderable operation details for pixel art generation
+  renderableOperation: {
+    actor: string;
+    action: string; // e.g., "thrusts", "slashes", "parries"
+    weapon: string; // e.g., "blue sword", "red axe"
+    target: string; // e.g., "Gladiator Blue's left arm"
+    spritePrompt: string; // Full prompt for generating the animation sprite
+  };
 }
 
 function distance(a: Vector2, b: Vector2): number {
@@ -61,6 +69,20 @@ const ATTACK_TYPES = [
   'strikes', 'slashes', 'stabs', 'bashes', 'lunges at', 'charges at',
   'sweeps at', 'thrusts at', 'hacks at', 'cleaves at'
 ];
+
+// Weapons with colors for distinct rendering
+const WEAPONS = {
+  'Gladiator Red': [
+    { name: 'crimson sword', type: 'sword', color: 'red' },
+    { name: 'ruby axe', type: 'axe', color: 'red' },
+    { name: 'scarlet spear', type: 'spear', color: 'red' },
+  ],
+  'Gladiator Blue': [
+    { name: 'sapphire sword', type: 'sword', color: 'blue' },
+    { name: 'azure mace', type: 'mace', color: 'blue' },
+    { name: 'cobalt trident', type: 'trident', color: 'blue' },
+  ],
+};
 
 const BODY_PARTS = [
   'head', 'neck', 'upper body', 'lower body', 'left arm', 'right arm',
@@ -96,6 +118,34 @@ function generateCombatLogEntry(tick: number, attacker: string, defender: string
   const resultTemplate = RESULTS[Math.floor(Math.random() * RESULTS.length)];
   const result = resultTemplate.replace('${defender}', defender);
 
+  // Select weapon for attacker
+  const attackerWeapons = WEAPONS[attacker as keyof typeof WEAPONS];
+  const weapon = attackerWeapons[Math.floor(Math.random() * attackerWeapons.length)];
+
+  // Determine action verb based on attack type and weapon
+  let action = attackType;
+  if (weapon.type === 'sword') {
+    action = attackType.includes('thrust') ? 'thrusts' :
+             attackType.includes('slash') ? 'slashes' :
+             attackType.includes('stab') ? 'stabs' : attackType;
+  } else if (weapon.type === 'axe') {
+    action = 'hacks';
+  } else if (weapon.type === 'spear' || weapon.type === 'trident') {
+    action = 'thrusts';
+  } else if (weapon.type === 'mace') {
+    action = 'bashes';
+  }
+
+  // Create renderable operation for pixel art generation
+  const renderableOperation = {
+    actor: attacker,
+    action: action,
+    weapon: weapon.name,
+    target: `${defender}'s ${bodyPart}`,
+    // Sprite prompt that can be used to generate the pixel art animation
+    spritePrompt: `gladiator ${attacker === 'Gladiator Red' ? 'in red armor' : 'in blue armor'} ${action} with ${weapon.name}, attacking motion, pixel art, 48x48, high top-down view, combat animation`
+  };
+
   return {
     tick,
     attacker,
@@ -103,7 +153,8 @@ function generateCombatLogEntry(tick: number, attacker: string, defender: string
     attackType,
     bodyPart,
     damage,
-    result
+    result,
+    renderableOperation
   };
 }
 
@@ -298,6 +349,14 @@ function main() {
   console.log('\n[CombatGenerator] Sample combat log:');
   combatLog.slice(0, 5).forEach(entry => {
     console.log(`  Tick ${entry.tick}: ${entry.attacker} ${entry.attackType} ${entry.defender} in the ${entry.bodyPart}, ${entry.damage}! ${entry.result}`);
+  });
+
+  // Print renderable operations for pixel art generation
+  console.log('\n[CombatGenerator] Renderable operations for pixel art:');
+  combatLog.slice(0, 3).forEach(entry => {
+    const op = entry.renderableOperation;
+    console.log(`  • ${op.actor} ${op.action} with ${op.weapon} at ${op.target}`);
+    console.log(`    Sprite prompt: "${op.spritePrompt}"`);
   });
 }
 
