@@ -1,0 +1,78 @@
+{
+  "combatId": "dragon-vs-knight",
+  "title": "DRAGON VS KNIGHT - Epic Battle",
+  "generatedAt": "2026-01-04T11:45:00.000Z",
+  "pixelLabCharacters": {
+    "dragon": "b3f765d5-959b-4d24-a6a0-b85c40783a9a",
+    "knight": "6aea5992-d84d-4f55-8a38-3c9d93e2c4c5"
+  },
+  "characters": {
+    "dragon": {
+      "name": "Ignis the Fire Dragon",
+      "type": "fire_dragon",
+      "description": "fierce red dragon with glowing scales, sharp claws, fiery breath",
+      "rotations": {
+        "south": "dragon/rotations/south.png",
+        "south-east": "dragon/rotations/south-east.png",
+        "east": "dragon/rotations/east.png",
+        "north-east": "dragon/rotations/north-east.png",
+        "north": "dragon/rotations/north.png",
+        "north-west": "dragon/rotations/north-west.png",
+        "west": "dragon/rotations/west.png",
+        "south-west": "dragon/rotations/south-west.png"
+      },
+      "animations": {
+        "fire-breath": {
+          "template": "fireball",
+          "description": "breathing fire at enemy",
+          "frames": 6,
+          "directions": ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"],
+          "path": "dragon/animations/fireball/{direction}/frame_{frame}.png"
+        },
+        "tail-swipe": {
+          "template": "high-kick",
+          "description": "powerful tail swipe attack",
+          "frames": 7,
+          "directions": ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"],
+          "path": "dragon/animations/high-kick/{direction}/frame_{frame}.png"
+        }
+      }
+    },
+    "knight": {
+      "name": "Sir Aldric the Dragonslayer",
+      "type": "dragon_slayer_knight",
+      "description": "heroic knight in silver armor wielding flaming sword",
+      "rotations": {
+        "south": "knight/rotations/south.png",
+        "south-east": "knight/rotations/south-east.png",
+        "east": "knight/rotations/east.png",
+        "north-east": "knight/rotations/north-east.png",
+        "north": "knight/rotations/north.png",
+        "north-west": "knight/rotations/north-west.png",
+        "west": "knight/rotations/west.png",
+        "south-west": "knight/rotations/south-west.png"
+      },
+      "animations": {
+        "sword-thrust": {
+          "template": "lead-jab",
+          "description": "thrusting sword forward",
+          "frames": 3,
+          "directions": ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"],
+          "path": "knight/animations/lead-jab/{direction}/frame_{frame}.png"
+        }
+      }
+    }
+  },
+  "background": {
+    "name": "Dragon's Lair",
+    "description": "volcanic cave with lava flows",
+    "fallbackColor": "#2d1810"
+  },
+  "actionMapping": {
+    "breathes fire at": "fire-breath",
+    "swipes tail at": "tail-swipe",
+    "thrusts sword at": "sword-thrust",
+    "slashes at": "sword-thrust"
+  },
+  "recordingFile": "../mock-recordings/dragon-vs-knight.json"
+}

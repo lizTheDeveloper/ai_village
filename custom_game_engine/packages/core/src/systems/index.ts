@@ -71,9 +71,9 @@ export * from './UniversityResearchManagementSystem.js';
 export * from './MoodSystem.js';
 // Deep Conversation System - Phase 1-6
 export * from './InterestsSystem.js';
-// TODO: Fix incomplete implementations before enabling
-// export * from './RelationshipConversationSystem.js';
-// export * from './FriendshipSystem.js';
+// Phase 6: Emergent Social Dynamics - RE-ENABLED
+export * from './RelationshipConversationSystem.js';
+// export * from './FriendshipSystem.js'; // TODO: Enable after testing
 // Deep Conversation System - Phase 7.1
 // TODO: Fix incomplete implementations before enabling
 // export * from './InterestEvolutionSystem.js';

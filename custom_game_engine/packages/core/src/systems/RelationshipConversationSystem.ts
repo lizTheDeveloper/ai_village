@@ -14,11 +14,10 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { SystemId } from '../types.js';
-import type { RelationshipComponent, Relationship } from '../components/RelationshipComponent.js';
+import type { SystemId, ComponentType } from '../types.js';
+import type { RelationshipComponent } from '../components/RelationshipComponent.js';
 import type { InterestsComponent } from '../components/InterestsComponent.js';
-import type { SocialMemoryComponent, SocialMemory, KnownFact } from '../components/SocialMemoryComponent.js';
-import type { IdentityComponent } from '../components/IdentityComponent.js';
+import type { SocialMemoryComponent } from '../components/SocialMemoryComponent.js';
 import type { ConversationQuality } from '../conversation/ConversationQuality.js';
 import type { TopicId } from '../components/InterestsComponent.js';
 
@@ -185,46 +184,23 @@ export class RelationshipConversationSystem implements System {
     const socialMemory = learner.getComponent<SocialMemoryComponent>(CT.SocialMemory);
     if (!socialMemory) return;
 
-    let memory = socialMemory.memories.get(teacher.id);
-    if (!memory) {
-      memory = this.createEmptySocialMemory(teacher.id);
-      socialMemory.memories.set(teacher.id, memory);
-    }
+    // Check existing memory to avoid duplicates
+    const existingMemory = socialMemory.socialMemories.get(teacher.id);
+    const existingFacts = existingMemory?.knownFacts ?? [];
 
     // Add known facts about partner's interests
     for (const topic of topicsDiscussed) {
-      const fact: KnownFact = {
-        type: 'interest',
-        value: topic,
-        learnedAt: this.world!.tick,
-        confidence: 0.7,
-      };
-
       // Don't duplicate facts
-      const existing = memory.knownFacts.find((f: any) =>
-        f.type === 'interest' && f.value === topic);
+      const alreadyKnown = existingFacts.some(f => f.fact === `interested in ${topic}`);
 
-      if (!existing) {
-        memory.knownFacts.push(fact);
-      } else {
-        // Reinforce existing knowledge
-        existing.confidence = Math.min(1.0, existing.confidence + 0.1);
+      if (!alreadyKnown) {
+        socialMemory.learnAboutAgent({
+          agentId: teacher.id,
+          fact: `interested in ${topic}`,
+          confidence: 0.7,
+          source: 'conversation',
+        });
       }
     }
-  }
-
-  private createEmptySocialMemory(agentId: string): SocialMemory {
-    const teacherIdentity = this.world!.getEntity(agentId)?.components.get(CT.Identity) as IdentityComponent | undefined;
-
-    return {
-      agentId,
-      agentName: teacherIdentity?.name ?? 'Unknown',
-      overallSentiment: 0,
-      trust: 0.5,
-      impressions: [],
-      significantMemories: [],
-      relationshipType: 'stranger',
-      knownFacts: [],
-    };
   }
 }

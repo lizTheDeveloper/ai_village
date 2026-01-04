@@ -277,6 +277,8 @@ export const PARTICLE_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 800,
     rarity: 'epic',
+    clarketechTier: 7,
+    researchRequired: 'particle_weapons',
     traits: {
       weapon: {
         damage: 18,
@@ -298,6 +300,8 @@ export const PARTICLE_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 1200,
     rarity: 'epic',
+    clarketechTier: 7,
+    researchRequired: 'particle_weapons',
     traits: {
       weapon: {
         damage: 30,
@@ -320,6 +324,8 @@ export const PARTICLE_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 3000,
     rarity: 'legendary',
+    clarketechTier: 7,
+    researchRequired: ['particle_weapons', 'advanced_electronics'],
     traits: {
       weapon: {
         damage: 60,
@@ -349,6 +355,8 @@ export const ION_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 600,
     rarity: 'rare',
+    clarketechTier: 6,
+    researchRequired: 'ion_weapons',
     traits: {
       weapon: {
         damage: 10,
@@ -370,6 +378,8 @@ export const ION_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 900,
     rarity: 'epic',
+    clarketechTier: 6,
+    researchRequired: 'ion_weapons',
     traits: {
       weapon: {
         damage: 18,
@@ -392,6 +402,8 @@ export const ION_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 1800,
     rarity: 'legendary',
+    clarketechTier: 7,
+    researchRequired: ['ion_weapons', 'advanced_electronics'],
     traits: {
       weapon: {
         damage: 30,
@@ -420,6 +432,8 @@ export const BEAM_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 1200,
     rarity: 'epic',
+    clarketechTier: 7,
+    researchRequired: 'beam_weapons',
     traits: {
       weapon: {
         damage: 8,
@@ -442,6 +456,8 @@ export const BEAM_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 1800,
     rarity: 'legendary',
+    clarketechTier: 7,
+    researchRequired: ['beam_weapons', 'plasma_weapons'],
     traits: {
       weapon: {
         damage: 12,
@@ -465,6 +481,8 @@ export const BEAM_WEAPONS: ItemDefinition[] = [
     stackSize: 1,
     baseValue: 4000,
     rarity: 'legendary',
+    clarketechTier: 7,
+    researchRequired: ['beam_weapons', 'particle_weapons'],
     traits: {
       weapon: {
         damage: 15,

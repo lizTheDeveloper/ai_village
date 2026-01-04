@@ -50,9 +50,9 @@ import { CommunicationSystem } from './CommunicationSystem.js';
 import { SocialGradientSystem } from './SocialGradientSystem.js';
 import { VerificationSystem } from './VerificationSystem.js';
 import { InterestsSystem } from './InterestsSystem.js';
-// TODO: Fix incomplete implementations before enabling
-// import { RelationshipConversationSystem } from './RelationshipConversationSystem.js';
-// import { FriendshipSystem } from './FriendshipSystem.js';
+// Phase 6: Emergent Social Dynamics - RE-ENABLED
+import { RelationshipConversationSystem } from './RelationshipConversationSystem.js';
+// import { FriendshipSystem } from './FriendshipSystem.js'; // TODO: Enable after RelationshipConversationSystem tested
 // import { InterestEvolutionSystem } from './InterestEvolutionSystem.js';
 
 // Exploration & Navigation
@@ -321,10 +321,9 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new VerificationSystem());
   gameLoop.systemRegistry.register(new InterestsSystem());
 
-  // Deep Conversation System - Phase 6: Emergent Social Dynamics
-  // TODO: Fix incomplete implementations before enabling
-  // gameLoop.systemRegistry.register(new RelationshipConversationSystem());
-  // gameLoop.systemRegistry.register(new FriendshipSystem());
+  // Deep Conversation System - Phase 6: Emergent Social Dynamics - RE-ENABLED
+  gameLoop.systemRegistry.register(new RelationshipConversationSystem());
+  // gameLoop.systemRegistry.register(new FriendshipSystem()); // TODO: Enable after testing
 
   // Deep Conversation System - Phase 7.1: Interest Evolution
   // TODO: Fix incomplete implementations before enabling

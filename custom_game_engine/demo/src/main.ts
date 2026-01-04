@@ -3318,13 +3318,58 @@ async function main() {
 
     // Only the top 2 most spiritual agents believe in the player deity initially
     const believersCount = Math.min(2, agentsWithSpirituality.length);
+    const believers: { agent: any; name: string }[] = [];
+
     for (let i = 0; i < believersCount; i++) {
       const { agent } = agentsWithSpirituality[i];
       const spiritual = agent.components.get('spiritual') as any;
       if (spiritual) {
         spiritual.believedDeity = playerDeityId;
         const identity = agent.components.get('identity') as any;
-        console.log(`[Demo] ${identity?.name ?? agent.id} believes in the player deity (spirituality: ${spiritual.spirituality})`);
+        const name = identity?.name ?? agent.id;
+        believers.push({ agent, name });
+        console.log(`[Demo] ${name} believes in the player deity (spirituality: ${spiritual.spirituality})`);
+      }
+    }
+
+    // If we have 2 believers, create a shared memory of their faith discussion
+    if (believers.length >= 2) {
+      const [believer1, believer2] = believers;
+      const currentTick = gameLoop.world.tick;
+
+      // Create shared memory of their conversation about faith
+      const faithConversationSummary = `Had a deep conversation with ${believer2.name} about our shared faith in the divine presence we both feel. We spoke of signs and visions, and found comfort in knowing we are not alone in our belief.`;
+      const faithConversationSummary2 = `Had a deep conversation with ${believer1.name} about our shared faith in the divine presence we both feel. We spoke of signs and visions, and found comfort in knowing we are not alone in our belief.`;
+
+      const episodic1 = believer1.agent.components.get('episodic_memory') as any;
+      const episodic2 = believer2.agent.components.get('episodic_memory') as any;
+
+      if (episodic1?.formMemory) {
+        episodic1.formMemory({
+          eventType: 'conversation',
+          summary: faithConversationSummary,
+          timestamp: currentTick,
+          participants: [believer2.agent.id],
+          emotionalValence: 0.7,  // Positive experience
+          emotionalIntensity: 0.6,
+          socialSignificance: 0.8,  // Very socially significant
+          importance: 0.85,  // High importance - foundational shared belief
+        });
+        console.log(`[Demo] ${believer1.name} remembers discussing faith with ${believer2.name}`);
+      }
+
+      if (episodic2?.formMemory) {
+        episodic2.formMemory({
+          eventType: 'conversation',
+          summary: faithConversationSummary2,
+          timestamp: currentTick,
+          participants: [believer1.agent.id],
+          emotionalValence: 0.7,
+          emotionalIntensity: 0.6,
+          socialSignificance: 0.8,
+          importance: 0.85,
+        });
+        console.log(`[Demo] ${believer2.name} remembers discussing faith with ${believer1.name}`);
       }
     }
 
