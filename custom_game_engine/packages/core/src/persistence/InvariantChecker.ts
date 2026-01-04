@@ -302,15 +302,14 @@ export async function validateSaveFile(saveFile: SaveFile): Promise<void> {
   // Validate passage references (if passages are defined)
   if (saveFile.passages && Array.isArray(saveFile.passages)) {
     for (const passage of saveFile.passages) {
-      const p = passage as Record<string, unknown>;
-      if (typeof p.sourceUniverseId === 'string' && !universeIds.has(p.sourceUniverseId)) {
+      if (!universeIds.has(passage.sourceUniverseId)) {
         throw new InvariantViolationError(
-          `Passage ${p.id} references non-existent source universe: ${p.sourceUniverseId}`
+          `Passage ${passage.id} references non-existent source universe: ${passage.sourceUniverseId}`
         );
       }
-      if (typeof p.targetUniverseId === 'string' && !universeIds.has(p.targetUniverseId)) {
+      if (!universeIds.has(passage.targetUniverseId)) {
         throw new InvariantViolationError(
-          `Passage ${p.id} references non-existent target universe: ${p.targetUniverseId}`
+          `Passage ${passage.id} references non-existent target universe: ${passage.targetUniverseId}`
         );
       }
     }

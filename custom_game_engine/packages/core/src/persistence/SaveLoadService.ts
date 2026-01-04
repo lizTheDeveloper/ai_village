@@ -136,7 +136,9 @@ export class SaveLoadService {
         active: passage.active,
       })),
 
-      player: undefined,  // TODO: Implement player state
+      // Player state is handled via PlayerControlComponent on entities
+      // This field is reserved for future global player metadata (achievements, stats, etc.)
+      player: undefined,
 
       checksums: {
         overall: '',  // Computed below
