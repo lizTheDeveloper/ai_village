@@ -26,6 +26,7 @@ import { plotLineRegistry } from './PlotLineRegistry.js';
 import type { MoodComponent, Trauma } from '../components/MoodComponent.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
 import type { SoulIdentityComponent } from '../soul/SoulIdentityComponent.js';
+import type { SkillsComponent, SkillId, SkillLevel } from '../components/SkillsComponent.js';
 
 /**
  * Track cooldowns per trigger condition per soul
@@ -33,6 +34,27 @@ import type { SoulIdentityComponent } from '../soul/SoulIdentityComponent.js';
 interface ConditionCooldown {
   condition_key: string; // e.g., "on_breakdown:tantrum:soul_123"
   last_triggered_tick: number;
+}
+
+/**
+ * Lightweight relationship baseline for change detection
+ * Only stores agent IDs and trust - not full relationship data
+ */
+interface RelationshipBaseline {
+  /** Map of known agent IDs to their trust value at last check */
+  knownAgents: Map<string, number>;
+  /** Tick when baseline was captured */
+  capturedAt: number;
+}
+
+/**
+ * Recent death event for on_death_nearby trigger
+ */
+interface RecentDeath {
+  deceasedId: string;
+  deceasedSoulId?: string;
+  position: { x: number; y: number };
+  tick: number;
 }
 
 /**
@@ -52,10 +74,38 @@ export class EventDrivenPlotAssignmentSystem implements System {
   /** Default cooldown between same trigger = 1000 ticks (50 sec) */
   private static readonly DEFAULT_COOLDOWN = 1000;
 
+  /** How long to keep death events for nearby death detection */
+  private static readonly DEATH_RETENTION_TICKS = 400;
+
+  /** Distance in tiles for "nearby" death detection */
+  private static readonly NEARBY_DEATH_DISTANCE = 10;
+
   private conditionCooldowns: Map<string, ConditionCooldown> = new Map();
 
-  initialize(_world: World, _eventBus: EventBus): void {
-    // No event subscriptions needed - uses condition checking
+  /** Relationship baselines by entity ID for change detection */
+  private relationshipBaselines: Map<string, RelationshipBaseline> = new Map();
+
+  /** Recent deaths for on_death_nearby trigger */
+  private recentDeaths: RecentDeath[] = [];
+
+  initialize(_world: World, eventBus: EventBus): void {
+    // Subscribe to death events for on_death_nearby trigger
+    eventBus.subscribe('agent:died', (event) => {
+      const data = event.data as {
+        entityId: string;
+        soulId?: string;
+        position?: { x: number; y: number };
+        tick?: number;
+      };
+      if (data.position) {
+        this.recentDeaths.push({
+          deceasedId: data.entityId,
+          deceasedSoulId: data.soulId,
+          position: data.position,
+          tick: data.tick ?? 0,
+        });
+      }
+    });
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
@@ -121,6 +171,8 @@ export class EventDrivenPlotAssignmentSystem implements System {
 
     const mood = entity.getComponent(CT.Mood) as MoodComponent | undefined;
     const relationship = entity.getComponent(CT.Relationship) as RelationshipComponent | undefined;
+    const skills = entity.getComponent(CT.Skills) as SkillsComponent | undefined;
+    const position = entity.getComponent(CT.Position) as { x: number; y: number } | undefined;
 
     for (const trigger of triggers) {
       const triggerEvent = this._evaluateTrigger(
@@ -129,6 +181,8 @@ export class EventDrivenPlotAssignmentSystem implements System {
         trigger,
         mood,
         relationship,
+        skills,
+        position,
         currentTick
       );
 
@@ -161,6 +215,8 @@ export class EventDrivenPlotAssignmentSystem implements System {
     trigger: PlotTrigger,
     mood: MoodComponent | undefined,
     relationship: RelationshipComponent | undefined,
+    skills: SkillsComponent | undefined,
+    position: { x: number; y: number } | undefined,
     currentTick: number
   ): PlotTriggerEvent | undefined {
     switch (trigger.type) {
