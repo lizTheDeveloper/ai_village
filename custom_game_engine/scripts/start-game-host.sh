@@ -9,6 +9,7 @@ echo ""
 echo "This will start:"
 echo "  - Metrics Server (port 8766)"
 echo "  - Orchestration Dashboard (port 3030)"
+echo "  - API Server (port 3001)"
 echo "  - Game Dev Server (port 3000)"
 echo "  - Browser at http://localhost:3000"
 echo ""
@@ -20,11 +21,13 @@ mkdir -p logs
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 METRICS_LOG="logs/metrics-server-${TIMESTAMP}.log"
 ORCH_LOG="logs/orch-dashboard-${TIMESTAMP}.log"
+API_LOG="logs/api-server-${TIMESTAMP}.log"
 DEV_LOG="logs/dev-server-${TIMESTAMP}.log"
 
 # PID files for reconnecting to existing servers
 METRICS_PID_FILE=".metrics-server.pid"
 ORCH_PID_FILE=".orch-dashboard.pid"
+API_PID_FILE=".api-server.pid"
 DEV_PID_FILE=".dev-server.pid"
 
 # Function to check if a PID is still running
@@ -69,6 +72,25 @@ start_orch_dashboard() {
     sleep 1
 }
 
+# Function to start or reconnect to API server
+start_api_server() {
+    if [ -f "$API_PID_FILE" ]; then
+        API_PID=$(cat "$API_PID_FILE")
+        if is_running "$API_PID"; then
+            echo "API Server already running (PID: $API_PID)"
+            return
+        fi
+    fi
+
+    echo "Starting API Server..."
+    echo "Logs: $API_LOG"
+    (cd demo && nohup npm run api > "../$API_LOG" 2>&1 &
+    echo $! > "../$API_PID_FILE")
+    sleep 1
+    API_PID=$(cat "$API_PID_FILE")
+    sleep 2
+}
+
 # Function to start or reconnect to game dev server
 start_dev_server() {
     if [ -f "$DEV_PID_FILE" ]; then
@@ -98,6 +120,7 @@ start_dev_server() {
 # Start all servers
 start_metrics_server
 start_orch_dashboard
+start_api_server
 start_dev_server
 
 # Open browser (platform-specific)
@@ -115,6 +138,7 @@ echo ""
 echo "=== AI Village Running ==="
 echo ""
 echo "Game:          http://localhost:3000"
+echo "API:           http://localhost:3001"
 echo "Dashboard:     http://localhost:8766"
 echo "Orchestration: http://localhost:3030"
 echo ""
@@ -130,6 +154,7 @@ echo ""
 # Flags to track if we've already reported port conflicts
 METRICS_PORT_CONFLICT=false
 ORCH_PORT_CONFLICT=false
+API_PORT_CONFLICT=false
 
 # Monitor function - runs until interrupted
 monitor_servers() {
@@ -137,6 +162,7 @@ monitor_servers() {
         # Read current PIDs from files
         [ -f "$METRICS_PID_FILE" ] && METRICS_PID=$(cat "$METRICS_PID_FILE")
         [ -f "$ORCH_PID_FILE" ] && ORCH_PID=$(cat "$ORCH_PID_FILE")
+        [ -f "$API_PID_FILE" ] && API_PID=$(cat "$API_PID_FILE")
         [ -f "$DEV_PID_FILE" ] && DEV_PID=$(cat "$DEV_PID_FILE")
 
         # Check if game dev server is still running
@@ -177,6 +203,23 @@ monitor_servers() {
                 (cd ../agents/autonomous-dev/dashboard && nohup node server.js > "../../../custom_game_engine/$ORCH_LOG" 2>&1 &
                 echo $! > "../../../custom_game_engine/.orch-dashboard.pid")
                 ORCH_PID=$(cat "$ORCH_PID_FILE")
+            fi
+        fi
+
+        # Check API server and restart if it crashed
+        if [ -n "$API_PID" ] && ! is_running "$API_PID" && [ "$API_PORT_CONFLICT" = false ]; then
+            # Check if it was an address-in-use error
+            if grep -q "EADDRINUSE\|address already in use" "$API_LOG" 2>/dev/null; then
+                echo ""
+                echo "❌ API server port already in use. Not restarting."
+                echo "   Run './start.sh kill' to stop conflicting servers."
+                API_PORT_CONFLICT=true
+            else
+                echo ""
+                echo "⚠️  API server crashed, restarting..."
+                (cd demo && nohup npm run api > "../$API_LOG" 2>&1 &
+                echo $! > "../$API_PID_FILE")
+                API_PID=$(cat "$API_PID_FILE")
             fi
         fi
 
