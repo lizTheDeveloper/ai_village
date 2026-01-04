@@ -1,6 +1,5 @@
 import type {
   Entity,
-  World,
   IdentityComponent,
   EpisodicMemoryComponent,
   EpisodicMemory,

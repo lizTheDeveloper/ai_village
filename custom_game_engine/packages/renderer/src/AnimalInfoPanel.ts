@@ -83,7 +83,7 @@ export class AnimalInfoPanel implements IWindowPanel {
    * @param canvasHeight Height of the canvas
    * @param world World instance to look up the selected entity
    */
-  render(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, _height: number, world?: any): void {
+  render(ctx: CanvasRenderingContext2D, x: number, y: number, _width: number, _height: number, world?: any): void {
     if (!this.selectedEntityId) {
       return;
     }
