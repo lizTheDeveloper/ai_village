@@ -151,6 +151,8 @@ export function registerAllSerializers(): void {
     'appearance',
     'gathering_stats',
     'recipe_discovery',
+    'proto_reality',
+    'corrupted_universe',
   ];
 
   for (const componentType of genericComponents) {

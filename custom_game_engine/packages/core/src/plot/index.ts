@@ -37,3 +37,13 @@ export {
   getPlotTemplate,
   instantiatePlot,
 } from './PlotLineRegistry.js';
+
+// Plot Templates
+export {
+  momentOfCourage,
+  firstConversation,
+  ascensionThroughSurrender,
+  POC_PLOT_TEMPLATES,
+  ALL_PLOT_TEMPLATES,
+  initializePlotTemplates,
+} from './PlotTemplates.js';

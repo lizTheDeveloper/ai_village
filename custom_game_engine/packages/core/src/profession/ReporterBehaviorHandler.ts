@@ -15,7 +15,7 @@
  */
 
 import type { World } from '../ecs/World.js';
-import type { EntityImpl } from '../ecs/EntityImpl.js';
+import type { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { ProfessionComponent } from '../components/ProfessionComponent.js';
@@ -26,7 +26,7 @@ import type { FieldReporter, NewsStory } from '../television/formats/NewsroomSys
  * Check and update field reporter navigation.
  * Called by ProfessionWorkSimulationSystem during update.
  */
-export function updateReporterBehaviors(world: World, currentTick: number): void {
+export function updateReporterBehaviors(world: World, _currentTick: number): void {
   const newsroomSystem = getNewsroomSystem();
   const deskManager = newsroomSystem.getDeskManager();
 

@@ -56,12 +56,13 @@ describe('ProtoSapienceObservationSystem - Behavior Emergence', () => {
     proto.createsTools = false;
     proto.hasProtocolanguage = false;
     proto.passedMirrorTest = false;
-    proto.showsAbstractThinking = false;
+    proto.abstractThinking = false;
 
-    // Create active uplift program
+    // Create active uplift program linked to this entity
     const program = new UpliftProgramComponent({
       programId: 'test_wolf_uplift',
       sourceSpeciesId: 'wolf',
+      breedingPopulation: [entity.id], // Link entity to program
       populationSize: 50,
       minimumPopulation: 20,
       geneticDiversity: 0.7,
@@ -123,13 +124,13 @@ describe('ProtoSapienceObservationSystem - Behavior Emergence', () => {
 
   it('should detect abstract thinking at 0.68 intelligence', () => {
     proto.intelligence = 0.68;
-    expect(proto.showsAbstractThinking).toBe(false);
+    expect(proto.abstractThinking).toBe(false);
 
     for (let i = 0; i < 100; i++) {
       system.update(world, [entity], 0.05);
     }
 
-    expect(proto.showsAbstractThinking).toBe(true);
+    expect(proto.abstractThinking).toBe(true);
   });
 
   it('should not emerge behaviors below thresholds', () => {
@@ -143,7 +144,7 @@ describe('ProtoSapienceObservationSystem - Behavior Emergence', () => {
     expect(proto.createsTools).toBe(false);
     expect(proto.hasProtocolanguage).toBe(false);
     expect(proto.passedMirrorTest).toBe(false);
-    expect(proto.showsAbstractThinking).toBe(false);
+    expect(proto.abstractThinking).toBe(false);
   });
 });
 
@@ -167,6 +168,7 @@ describe('ProtoSapienceObservationSystem - Behavioral Tests', () => {
     const program = new UpliftProgramComponent({
       programId: 'test',
       sourceSpeciesId: 'wolf',
+      breedingPopulation: [entity.id], // Link entity to program
       populationSize: 50,
       minimumPopulation: 20,
       geneticDiversity: 0.7,
@@ -198,6 +200,7 @@ describe('ProtoSapienceObservationSystem - Behavioral Tests', () => {
     const program = new UpliftProgramComponent({
       programId: 'test',
       sourceSpeciesId: 'wolf',
+      breedingPopulation: [entity.id], // Link entity to program
       populationSize: 50,
       minimumPopulation: 20,
       geneticDiversity: 0.7,
@@ -242,6 +245,7 @@ describe('ProtoSapienceObservationSystem - Tool Use Tracking', () => {
     const program = new UpliftProgramComponent({
       programId: 'test',
       sourceSpeciesId: 'wolf',
+      breedingPopulation: [entity.id], // Link entity to program
       populationSize: 50,
       minimumPopulation: 20,
       geneticDiversity: 0.7,
@@ -272,6 +276,7 @@ describe('ProtoSapienceObservationSystem - Tool Use Tracking', () => {
     const program = new UpliftProgramComponent({
       programId: 'test',
       sourceSpeciesId: 'wolf',
+      breedingPopulation: [entity.id], // Link entity to program
       populationSize: 50,
       minimumPopulation: 20,
       geneticDiversity: 0.7,
@@ -315,6 +320,7 @@ describe('ProtoSapienceObservationSystem - Communication Patterns', () => {
     const program = new UpliftProgramComponent({
       programId: 'test',
       sourceSpeciesId: 'wolf',
+      breedingPopulation: [entity.id], // Link entity to program
       populationSize: 50,
       minimumPopulation: 20,
       geneticDiversity: 0.7,
@@ -358,6 +364,7 @@ describe('ProtoSapienceObservationSystem - Milestone Events', () => {
     const program = new UpliftProgramComponent({
       programId: 'test',
       sourceSpeciesId: 'wolf',
+      breedingPopulation: [entity.id], // Link entity to program
       populationSize: 50,
       minimumPopulation: 20,
       geneticDiversity: 0.7,
@@ -393,6 +400,7 @@ describe('ProtoSapienceObservationSystem - Milestone Events', () => {
     const program = new UpliftProgramComponent({
       programId: 'test',
       sourceSpeciesId: 'wolf',
+      breedingPopulation: [entity.id], // Link entity to program
       populationSize: 50,
       minimumPopulation: 20,
       geneticDiversity: 0.7,
@@ -428,6 +436,7 @@ describe('ProtoSapienceObservationSystem - Milestone Events', () => {
     const program = new UpliftProgramComponent({
       programId: 'test',
       sourceSpeciesId: 'wolf',
+      breedingPopulation: [entity.id], // Link entity to program
       populationSize: 50,
       minimumPopulation: 20,
       geneticDiversity: 0.7,

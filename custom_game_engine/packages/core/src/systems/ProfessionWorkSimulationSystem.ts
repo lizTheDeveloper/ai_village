@@ -24,6 +24,7 @@ import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
 import type { CityDirectorComponent } from '../components/CityDirectorComponent.js';
+import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type {
   ProfessionComponent,
   ProfessionRole,
@@ -734,7 +735,7 @@ export class ProfessionWorkSimulationSystem implements System {
    */
   private canAgentWork(entity: EntityImpl): boolean {
     // Check if agent has needs component
-    const needs = entity.getComponent('needs' as any);
+    const needs = entity.getComponent('needs' as any) as NeedsComponent | undefined;
     if (!needs) {
       return true; // No needs component = can work
     }

@@ -50,7 +50,7 @@ export class UpliftCandidateDetectionSystem implements System {
   private eventBus: EventBus | null = null;
   private tickCounter = 0;
   private readonly UPDATE_INTERVAL = 1000; // Every 50 seconds
-  private readonly TECH_REQUIRED = 'consciousness_studies';
+  private readonly _TECH_REQUIRED = 'consciousness_studies';
 
   // Cache for species population counts
   private speciesPopulationCache: Map<string, number> = new Map();
@@ -179,7 +179,7 @@ export class UpliftCandidateDetectionSystem implements System {
       recommended: upliftPotential >= 50 && populationSize >= EVALUATION_THRESHOLDS.MIN_POPULATION,
     });
 
-    animal.addComponent(candidate);
+    (animal as any).addComponent(candidate);
 
     // Emit event
     this.eventBus?.emit({
@@ -199,7 +199,7 @@ export class UpliftCandidateDetectionSystem implements System {
    * Evaluate cognitive metrics
    */
   private evaluateCognitiveMetrics(
-    animal: Entity,
+    _animal: Entity,
     animalComp: AnimalComponent,
     species: SpeciesComponent
   ): CognitiveMetrics {
@@ -280,7 +280,7 @@ export class UpliftCandidateDetectionSystem implements System {
   /**
    * Estimate problem-solving ability
    */
-  private estimateProblemSolving(animalComp: AnimalComponent): number {
+  private estimateProblemSolving(_animalComp: AnimalComponent): number {
     // Placeholder - would track actual observations
     // For now, random variation around 0.5
     return 0.4 + Math.random() * 0.2;
@@ -289,7 +289,7 @@ export class UpliftCandidateDetectionSystem implements System {
   /**
    * Estimate social intelligence
    */
-  private estimateSocialIntelligence(species: SpeciesComponent, animalComp: AnimalComponent): number {
+  private estimateSocialIntelligence(species: SpeciesComponent, _animalComp: AnimalComponent): number {
     let intelligence = 0.3;
 
     // Social structure indicates social intelligence
@@ -359,7 +359,7 @@ export class UpliftCandidateDetectionSystem implements System {
     cognitive: CognitiveMetrics,
     geneticHealth: number,
     populationSize: number,
-    species: SpeciesComponent
+    _species: SpeciesComponent
   ): number {
     // Weight factors
     const weights = {
@@ -424,7 +424,7 @@ export class UpliftCandidateDetectionSystem implements System {
    * Determine social structure
    */
   private determineSocialStructure(
-    animalComp: AnimalComponent,
+    _animalComp: AnimalComponent,
     species: SpeciesComponent
   ): 'solitary' | 'pair' | 'family' | 'pack' | 'hive' | 'flock' {
     // Use species social structure if available
@@ -444,7 +444,7 @@ export class UpliftCandidateDetectionSystem implements System {
    * Estimate group size
    */
   private estimateGroupSize(
-    animalComp: AnimalComponent,
+    _animalComp: AnimalComponent,
     socialStructure: string
   ): number {
     switch (socialStructure) {

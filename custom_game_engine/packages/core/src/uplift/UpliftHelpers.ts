@@ -153,7 +153,7 @@ export function generateUpliftedName(sourceSpeciesName: string): string {
  * Generate individual uplifted entity name
  */
 export function generateIndividualName(
-  sourceSpecies: string,
+  _sourceSpecies: string,
   generation: number,
   isFirstAwakened: boolean = false
 ): string {

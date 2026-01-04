@@ -298,7 +298,7 @@ export class UpliftedSpeciesRegistrationSystem implements System {
   /**
    * Calculate size adjustment from brain expansion
    */
-  private calculateSizeAdjustment(program: UpliftProgramComponent): number {
+  private calculateSizeAdjustment(_program: UpliftProgramComponent): number {
     // Brain expansion causes slight size increase
     // Typically 10-30% larger
     return 1.1 + Math.random() * 0.2;

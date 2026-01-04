@@ -21,7 +21,7 @@ import type { NewsStory, NewsCategory, NewsPriority, FieldReporter } from '../te
 import { createRecordingComponent } from '../components/RecordingComponent.js';
 import type { RecordingCategory } from '../components/RecordingComponent.js';
 import type { ProfessionComponent } from '../components/ProfessionComponent.js';
-import type { EntityImpl } from '../ecs/EntityImpl.js';
+import type { EntityImpl } from '../ecs/Entity.js';
 
 /**
  * Event newsworthiness scoring.
@@ -366,7 +366,7 @@ export class EventReportingSystem implements System {
   private dispatchFieldReporter(
     story: NewsStory,
     location: { x: number; y: number },
-    recordingType?: RecordingCategory
+    _recordingType?: RecordingCategory
   ): void {
     const newsroomSystem = getNewsroomSystem();
     const deskManager = newsroomSystem.getDeskManager();
@@ -484,7 +484,7 @@ export class EventReportingSystem implements System {
       }
     );
 
-    recordingEntity.addComponent(recording);
+    (recordingEntity as any).addComponent(recording);
 
     console.log(`[EventReporting] ${agentComp.name} started recording: ${story.headline}`);
   }

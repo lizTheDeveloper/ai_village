@@ -6,7 +6,7 @@
  */
 
 import type { World } from '../ecs/World.js';
-import { ComponentType as CT } from '../types/ComponentType.js';
+import { ComponentType as _CT } from '../types/ComponentType.js';
 import type { CityDirectorComponent } from '../components/CityDirectorComponent.js';
 
 /**
@@ -265,7 +265,7 @@ const CITY_TEMPLATES: Record<CityTemplate, {
 /**
  * Generate a random city name based on template
  */
-function generateCityName(template: CityTemplate): string {
+function generateCityName(_template: CityTemplate): string {
   const prefixes = ['New', 'Old', 'Upper', 'Lower', 'Great', 'Little'];
   const roots = ['Haven', 'Port', 'Vale', 'Ridge', 'Dale', 'Ford', 'Burg', 'Ton'];
   const suffixes = ['shire', 'field', 'wood', 'ford', 'bridge', 'stone'];

@@ -39,7 +39,7 @@ const SLOWDOWN_DISTANCE = 150;
 const MINIMUM_DISTANCE = 40;
 
 /** Search radius when target is lost */
-const SEARCH_RADIUS = 200;
+const _SEARCH_RADIUS = 200;
 
 /** How long to search before giving up (in ticks) */
 const SEARCH_TIMEOUT = 20 * 60 * 3; // 3 minutes at 20 TPS
@@ -176,7 +176,7 @@ function moveAwayFromTarget(
   position: PositionComponent,
   targetPos: PositionComponent,
   movement: MovementComponent,
-  safeDistance: number
+  _safeDistance: number
 ): void {
   const dx = position.x - targetPos.x; // Reversed - move AWAY
   const dy = position.y - targetPos.y;

@@ -202,7 +202,7 @@ export class UpliftBreedingProgramSystem implements System {
   /**
    * Find exceptional individuals in generation
    */
-  private findNotableIndividuals(world: World, population: Entity[]): string[] {
+  private findNotableIndividuals(_world: World, population: Entity[]): string[] {
     const notable: string[] = [];
 
     for (const entity of population) {
@@ -233,7 +233,7 @@ export class UpliftBreedingProgramSystem implements System {
   /**
    * Generate name for notable individual
    */
-  private generateNotableName(proto: ProtoSapienceComponent): string {
+  private generateNotableName(_proto: ProtoSapienceComponent): string {
     const prefixes = ['First', 'Alpha', 'Nova', 'Prime', 'Apex'];
     const suffixes = ['Mind', 'Thinker', 'Seeker', 'Clever', 'Bright'];
 
@@ -246,7 +246,7 @@ export class UpliftBreedingProgramSystem implements System {
   /**
    * Generate breakthrough event
    */
-  private generateBreakthrough(program: UpliftProgramComponent): string {
+  private generateBreakthrough(_program: UpliftProgramComponent): string {
     const breakthroughs = [
       'Unexpected brain structure mutation increases neural density',
       'Novel synaptic pattern emerges, accelerating learning',
@@ -273,7 +273,7 @@ export class UpliftBreedingProgramSystem implements System {
   /**
    * Check for stage transitions
    */
-  private checkStageTransitions(world: World, program: UpliftProgramComponent): void {
+  private checkStageTransitions(_world: World, program: UpliftProgramComponent): void {
     const prevStage = program.stage;
 
     // Stage transitions based on generation and intelligence
@@ -334,7 +334,7 @@ export class UpliftBreedingProgramSystem implements System {
   /**
    * Handle population extinction
    */
-  private handlePopulationExtinction(world: World, program: UpliftProgramComponent): void {
+  private handlePopulationExtinction(_world: World, program: UpliftProgramComponent): void {
     this.eventBus?.emit({
       type: 'uplift_population_extinct' as any,
       source: this.id,

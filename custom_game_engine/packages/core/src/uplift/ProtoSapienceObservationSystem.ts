@@ -66,7 +66,7 @@ export class ProtoSapienceObservationSystem implements System {
     this.eventBus = eventBus;
   }
 
-  update(world: World, entities: Entity[], _deltaTime: number): void {
+  update(world: World, _entities: Entity[], _deltaTime: number): void {
     this.tickCounter++;
     if (this.tickCounter % this.UPDATE_INTERVAL !== 0) return;
 
@@ -105,7 +105,7 @@ export class ProtoSapienceObservationSystem implements System {
         generationBorn: program.currentGeneration,
         expectedGenerationToSapience: program.acceleratedGenerations,
       });
-      animal.addComponent(proto);
+      (animal as any).addComponent(proto);
     } else {
       proto = animal.getComponent(CT.ProtoSapience) as ProtoSapienceComponent;
       // Update intelligence from program
@@ -136,7 +136,7 @@ export class ProtoSapienceObservationSystem implements System {
     proto: ProtoSapienceComponent,
     program: UpliftProgramComponent
   ): void {
-    const prevIntelligence = proto.intelligence;
+    const _prevIntelligence = proto.intelligence;
     proto.intelligence = program.currentIntelligence;
 
     // Tool use emergence
@@ -209,7 +209,7 @@ export class ProtoSapienceObservationSystem implements System {
   /**
    * Run behavioral tests
    */
-  private runBehavioralTests(world: World, animal: Entity, proto: ProtoSapienceComponent): void {
+  private runBehavioralTests(_world: World, animal: Entity, proto: ProtoSapienceComponent): void {
     // Mirror test (only if intelligence high enough)
     if (!proto.passedMirrorTest && proto.intelligence >= EMERGENCE_THRESHOLDS.MIRROR_TEST) {
       const passed = this.conductMirrorTest(animal, proto);
@@ -249,7 +249,7 @@ export class ProtoSapienceObservationSystem implements System {
   /**
    * Mirror test - self-recognition
    */
-  private conductMirrorTest(animal: Entity, proto: ProtoSapienceComponent): boolean {
+  private conductMirrorTest(_animal: Entity, proto: ProtoSapienceComponent): boolean {
     // Probability of passing based on intelligence
     const baseChance = (proto.intelligence - EMERGENCE_THRESHOLDS.MIRROR_TEST) / 0.05;
     const passChance = Math.max(0, Math.min(1, baseChance));
@@ -260,7 +260,7 @@ export class ProtoSapienceObservationSystem implements System {
   /**
    * Delayed gratification test - future planning
    */
-  private conductDelayedGratificationTest(animal: Entity, proto: ProtoSapienceComponent): boolean {
+  private conductDelayedGratificationTest(_animal: Entity, proto: ProtoSapienceComponent): boolean {
     // Can entity wait for better reward?
     const baseChance = (proto.intelligence - 0.5) / 0.2;
     const passChance = Math.max(0, Math.min(1, baseChance));
@@ -271,7 +271,7 @@ export class ProtoSapienceObservationSystem implements System {
   /**
    * Problem-solving test
    */
-  private conductProblemSolvingTest(animal: Entity, proto: ProtoSapienceComponent): number {
+  private conductProblemSolvingTest(_animal: Entity, proto: ProtoSapienceComponent): number {
     // Score based on intelligence with random variation
     const baseScore = proto.intelligence;
     const variation = (Math.random() - 0.5) * 0.2; // +/- 0.1
@@ -283,7 +283,7 @@ export class ProtoSapienceObservationSystem implements System {
    */
   private recordToolUse(
     world: World,
-    animal: Entity,
+    _animal: Entity,
     proto: ProtoSapienceComponent,
     toolType: string,
     purpose: string
@@ -301,7 +301,7 @@ export class ProtoSapienceObservationSystem implements System {
   /**
    * Observe communication patterns
    */
-  private observeCommunication(world: World, animal: Entity, proto: ProtoSapienceComponent): void {
+  private observeCommunication(_world: World, animal: Entity, proto: ProtoSapienceComponent): void {
     if (!proto.hasProtocolanguage) return;
 
     // Generate random communication event (placeholder for actual observation)
@@ -356,7 +356,7 @@ export class ProtoSapienceObservationSystem implements System {
    * Observe cultural transmission
    */
   private observeCulturalTransmission(
-    world: World,
+    _world: World,
     animal: Entity,
     proto: ProtoSapienceComponent,
     program: UpliftProgramComponent

@@ -131,9 +131,9 @@ export class ConsciousnessEmergenceSystem implements System {
   private generateAwakeningMoment(
     world: World,
     entity: Entity,
-    animal: AnimalComponent,
+    _animal: AnimalComponent,
     proto: ProtoSapienceComponent,
-    program: UpliftProgramComponent
+    _program: UpliftProgramComponent
   ): AwakeningMoment {
     // Find nearby witnesses
     const position = entity.getComponent(CT.Position);
@@ -172,7 +172,7 @@ export class ConsciousnessEmergenceSystem implements System {
   /**
    * Generate first thought (placeholder - would use LLM)
    */
-  private generateFirstThought(proto: ProtoSapienceComponent): string {
+  private generateFirstThought(_proto: ProtoSapienceComponent): string {
     const thoughts = [
       'I... I am. I think, therefore...',
       'These thoughts... they are mine. I am... myself.',
@@ -201,7 +201,7 @@ export class ConsciousnessEmergenceSystem implements System {
   /**
    * Determine attitude toward uplifters
    */
-  private determineAttitude(proto: ProtoSapienceComponent, program: UpliftProgramComponent): UpliftAttitude {
+  private determineAttitude(_proto: ProtoSapienceComponent, program: UpliftProgramComponent): UpliftAttitude {
     // Factors:
     // - How long the program took (longer = more suffering)
     // - Quality of life during uplift
@@ -335,7 +335,7 @@ export class ConsciousnessEmergenceSystem implements System {
   /**
    * Generate uplifted name
    */
-  private generateUpliftedName(animal: AnimalComponent, species: SpeciesComponent): string {
+  private generateUpliftedName(_animal: AnimalComponent, species: SpeciesComponent): string {
     const prefixes = ['Neo', 'First', 'Nova', 'Prime', 'Lux'];
     const sourceBase = species.speciesName.slice(0, 4);
 
