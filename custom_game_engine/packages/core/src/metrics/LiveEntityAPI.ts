@@ -11,6 +11,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { MetricsStreamClient, QueryRequest, QueryResponse, ActionRequest, ActionResponse } from './MetricsStreamClient.js';
 import { pendingApprovalRegistry } from '../crafting/PendingApprovalRegistry.js';
+import { spawnCity, getCityTemplates, type CitySpawnConfig } from '../city/CitySpawner.js';
 
 /**
  * Interface for the prompt builder (from @ai-village/llm)
@@ -112,6 +113,10 @@ export class LiveEntityAPI {
         return this.handleSetSkill(action);
       case 'spawn-entity':
         return this.handleSpawnEntity(action);
+      case 'spawn-city':
+        return await this.handleSpawnCity(action);
+      case 'list-city-templates':
+        return this.handleListCityTemplates(action);
       default:
         console.log('[LiveEntityAPI] No matching case for:', action.action);
         return {
@@ -268,6 +273,67 @@ export class LiveEntityAPI {
       requestId: action.requestId,
       success: true,
       data: { entityId, type, x, y },
+    };
+  }
+
+  /**
+   * Spawn an NPC city with buildings and AI-driven agents
+   */
+  private async handleSpawnCity(action: ActionRequest): Promise<ActionResponse> {
+    const { template, x, y, name, agentCount, useLLM } = action.params;
+
+    if (!template || typeof template !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid template parameter',
+      };
+    }
+
+    if (typeof x !== 'number' || typeof y !== 'number') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid x, y parameters',
+      };
+    }
+
+    const config: CitySpawnConfig = {
+      template: template as any,
+      x,
+      y,
+      name: typeof name === 'string' ? name : undefined,
+      agentCount: typeof agentCount === 'number' ? agentCount : undefined,
+      useLLM: typeof useLLM === 'boolean' ? useLLM : true,
+    };
+
+    try {
+      const cityInfo = await spawnCity(this.world, config);
+
+      return {
+        requestId: action.requestId,
+        success: true,
+        data: cityInfo,
+      };
+    } catch (error) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to spawn city',
+      };
+    }
+  }
+
+  /**
+   * List available city templates
+   */
+  private handleListCityTemplates(action: ActionRequest): ActionResponse {
+    const templates = getCityTemplates();
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { templates },
     };
   }
 

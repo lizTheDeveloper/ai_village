@@ -693,19 +693,25 @@ export { createCrossRealmPhoneComponent } from './CrossRealmPhoneComponent.js';
 export type { CrossRealmPhoneComponent } from './CrossRealmPhoneComponent.js';
 
 // Genetic Uplift components
+
+// Genetic Uplift components
+
+// Genetic Uplift components
+
+// Genetic Uplift components (NOT YET INTEGRATED)
 export { UpliftCandidateComponent } from './UpliftCandidateComponent.js';
 export { UpliftProgramComponent } from './UpliftProgramComponent.js';
 export { UpliftedTraitComponent } from './UpliftedTraitComponent.js';
 export { ProtoSapienceComponent } from './ProtoSapienceComponent.js';
 
-// Genetic Uplift components
-export { UpliftCandidateComponent } from './UpliftCandidateComponent.js';
-export { UpliftProgramComponent } from './UpliftProgramComponent.js';
-export { UpliftedTraitComponent } from './UpliftedTraitComponent.js';
-export { ProtoSapienceComponent } from './ProtoSapienceComponent.js';
-
-// Genetic Uplift components
-export { UpliftCandidateComponent } from './UpliftCandidateComponent.js';
-export { UpliftProgramComponent } from './UpliftProgramComponent.js';
-export { UpliftedTraitComponent } from './UpliftedTraitComponent.js';
-export { ProtoSapienceComponent } from './ProtoSapienceComponent.js';
+// Universe Metadata (Conservation of Game Matter)
+export * from './UniverseMetadataComponent.js';
+export {
+  createProtoRealityComponent,
+  createCorruptedUniverseComponent,
+} from './UniverseMetadataComponent.js';
+export type {
+  ProtoRealityComponent,
+  CorruptedUniverseComponent,
+  UniverseEra,
+} from './UniverseMetadataComponent.js';

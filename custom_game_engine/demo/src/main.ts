@@ -22,6 +22,7 @@ import {
   createWeatherComponent,
   createInventoryComponent,
   createNamedLandmarksComponent,
+  createProtoRealityComponent,
   EntityImpl,
   createEntityId,
   type World,
@@ -3142,6 +3143,16 @@ async function main() {
     // Initialize named landmarks registry
     const namedLandmarksComponent = createNamedLandmarksComponent();
     (worldEntity as any).addComponent(namedLandmarksComponent);
+
+    // Tag universe as proto-reality (Conservation of Game Matter)
+    // During development phase, all universes are proto-realities from "the time before time"
+    const protoRealityComponent = createProtoRealityComponent('dev-2026-01-03', {
+      era: 'before_time',
+      stability: 12,  // Low stability for proto-realities
+      lore: 'A universe from the chaotic period when time itself was still being defined. Physics work differently here. Causality is... negotiable.',
+      containsPrimordialArtifacts: true,
+    });
+    (worldEntity as any).addComponent(protoRealityComponent);
 
     // Initialize research state with some discovered papers for demo
     const researchState = createResearchStateComponent();

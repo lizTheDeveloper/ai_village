@@ -137,12 +137,11 @@ export class NeedsSystem implements System {
       const isEnergyCritical = newEnergy < 0.2;
 
       // Update needs
-      impl.updateComponent<NeedsComponent>(CT.Needs, (current) => {
-        const updated = current.clone();
-        updated.hunger = newHunger;
-        updated.energy = newEnergy;
-        return updated;
-      });
+      impl.updateComponent<NeedsComponent>(CT.Needs, (current) => ({
+        ...current,
+        hunger: newHunger,
+        energy: newEnergy,
+      }));
 
       // Emit events for critical needs transitions (triggers memory formation)
       if (!wasHungerCritical && isHungerCritical) {

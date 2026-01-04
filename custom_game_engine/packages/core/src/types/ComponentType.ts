@@ -138,6 +138,10 @@ export enum ComponentType {
   Vision = 'vision',
   Passage = 'passage',
 
+  // Universe Metadata (Conservation of Game Matter)
+  ProtoReality = 'proto_reality',
+  CorruptedUniverse = 'corrupted_universe',
+
   // World-level Registries
   NamedLandmarks = 'named_landmarks',
 

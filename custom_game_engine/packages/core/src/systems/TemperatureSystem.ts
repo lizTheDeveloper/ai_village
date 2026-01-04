@@ -48,9 +48,25 @@ export class TemperatureSystem implements System {
   private currentWorldTemp: number = this.BASE_TEMP;
   private previousDangerousStates = new Map<string, boolean>();
 
+  // Performance: Cache singleton and building entity IDs to avoid repeated queries
+  private timeEntityId: string | null = null;
+  private weatherEntityId: string | null = null;
+  private buildingCache: Array<{ position: PositionComponent; component: BuildingComponent; entityId: string }> = [];
+  private buildingCacheLastUpdate: number = 0;
+  private readonly BUILDING_CACHE_DURATION = 100; // Refresh every 100 ticks
+
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
-    // Calculate world ambient temperature
+    // Calculate world ambient temperature (uses cached time entity)
     this.currentWorldTemp = this.calculateWorldTemperature(world);
+
+    // Get weather modifier once (uses cached weather entity)
+    const weatherModifier = this.getWeatherModifier(world);
+
+    // Update building cache if needed (only every N ticks, not every frame!)
+    if (world.tick - this.buildingCacheLastUpdate > this.BUILDING_CACHE_DURATION) {
+      this.refreshBuildingCache(world);
+      this.buildingCacheLastUpdate = world.tick;
+    }
 
     // Filter entities with required components
     const temperatureEntities = entities.filter(e =>
@@ -65,19 +81,18 @@ export class TemperatureSystem implements System {
       // Calculate agent's effective temperature
       let effectiveTemp = this.currentWorldTemp;
 
-      // Apply weather modifier
-      const weatherModifier = this.getWeatherModifier(world);
+      // Apply weather modifier (already fetched once)
       effectiveTemp += weatherModifier;
 
-      // Apply building effects (insulation + base temp)
+      // Apply building effects (insulation + base temp) - uses cache
       const buildingEffect = this.calculateBuildingEffect(world, posComp);
       if (buildingEffect !== null) {
         // Formula: effectiveTemp = ambientTemp * (1 - insulation) + baseTemp
         effectiveTemp = effectiveTemp * (1 - buildingEffect.insulation) + buildingEffect.baseTemp;
       }
 
-      // Apply heat source effects
-      const heatBonus = this.calculateHeatSourceBonus(world, posComp);
+      // Apply heat source effects - uses cache
+      const heatBonus = this.calculateHeatSourceBonus(posComp);
       effectiveTemp += heatBonus;
 
       // Get current temperature component to apply thermal inertia
@@ -109,11 +124,10 @@ export class TemperatureSystem implements System {
           const healthLoss = this.HEALTH_DAMAGE_RATE * deltaTime;
           const newHealth = Math.max(0, needsComp.health - healthLoss);
 
-          impl.updateComponent<NeedsComponent>(CT.Needs, (current) => {
-            const updated = current.clone();
-            updated.health = newHealth;
-            return updated;
-          });
+          impl.updateComponent<NeedsComponent>(CT.Needs, (current) => ({
+            ...current,
+            health: newHealth,
+          }));
 
           // Emit critical health event if health drops below 20%
           if (newHealth < HEALTH_CRITICAL && needsComp.health >= HEALTH_CRITICAL) {
@@ -134,14 +148,26 @@ export class TemperatureSystem implements System {
    * Calculate world ambient temperature based on time and season
    */
   private calculateWorldTemperature(world: World): number {
-    // Find time entity to get current game time
+    // Use cached time entity ID (performance optimization)
     let timeOfDay = 12; // Default noon if no time entity
-    for (const entity of world.entities.values()) {
-      const impl = entity as EntityImpl;
-      const timeComp = impl.getComponent<any>('time');
-      if (timeComp) {
-        timeOfDay = timeComp.timeOfDay;
-        break;
+
+    if (!this.timeEntityId) {
+      // Find and cache time entity
+      const timeEntities = world.query().with(CT.Time).executeEntities();
+      if (timeEntities.length > 0) {
+        this.timeEntityId = timeEntities[0]!.id;
+      }
+    }
+
+    if (this.timeEntityId) {
+      const timeEntity = world.getEntity(this.timeEntityId);
+      if (timeEntity) {
+        const timeComp = (timeEntity as EntityImpl).getComponent<any>('time');
+        if (timeComp) {
+          timeOfDay = timeComp.timeOfDay;
+        }
+      } else {
+        this.timeEntityId = null; // Entity was deleted, reset cache
       }
     }
 
@@ -159,15 +185,51 @@ export class TemperatureSystem implements System {
    * Get temperature modifier from current weather
    */
   private getWeatherModifier(world: World): number {
-    // Find world entity with weather component
-    for (const entity of world.entities.values()) {
-      const impl = entity as EntityImpl;
-      const weather = impl.getComponent<WeatherComponent>(CT.Weather);
-      if (weather) {
-        return weather.tempModifier;
+    // Use cached weather entity ID (performance optimization)
+    if (!this.weatherEntityId) {
+      // Find and cache weather entity
+      const weatherEntities = world.query().with(CT.Weather).executeEntities();
+      if (weatherEntities.length > 0) {
+        this.weatherEntityId = weatherEntities[0]!.id;
       }
     }
+
+    if (this.weatherEntityId) {
+      const weatherEntity = world.getEntity(this.weatherEntityId);
+      if (weatherEntity) {
+        const weather = (weatherEntity as EntityImpl).getComponent<WeatherComponent>(CT.Weather);
+        if (weather) {
+          return weather.tempModifier;
+        }
+      } else {
+        this.weatherEntityId = null; // Entity was deleted, reset cache
+      }
+    }
+
     return 0;
+  }
+
+  /**
+   * Refresh building cache (called once every N ticks, not every frame!)
+   */
+  private refreshBuildingCache(world: World): void {
+    this.buildingCache = [];
+
+    const buildingEntities = world.query().with(CT.Building).with(CT.Position).executeEntities();
+
+    for (const entity of buildingEntities) {
+      const impl = entity as EntityImpl;
+      const buildingComp = impl.getComponent<BuildingComponent>(CT.Building);
+      const posComp = impl.getComponent<PositionComponent>(CT.Position);
+
+      if (buildingComp && posComp) {
+        this.buildingCache.push({
+          position: posComp,
+          component: buildingComp,
+          entityId: entity.id,
+        });
+      }
+    }
   }
 
   /**
@@ -178,8 +240,8 @@ export class TemperatureSystem implements System {
     world: World,
     position: PositionComponent
   ): { insulation: number; baseTemp: number } | null {
-    // First check legacy entity-based buildings
-    const buildings = this.findNearbyBuildings(world);
+    // Use cached buildings (refreshed every N ticks, not every frame!)
+    const buildings = this.buildingCache;
 
     for (const building of buildings) {
       const buildingPos = building.position;
@@ -276,8 +338,9 @@ export class TemperatureSystem implements System {
   /**
    * Calculate heat bonus from nearby heat sources (campfires)
    */
-  private calculateHeatSourceBonus(world: World, position: PositionComponent): number {
-    const buildings = this.findNearbyBuildings(world);
+  private calculateHeatSourceBonus(position: PositionComponent): number {
+    // Use cached buildings (refreshed every N ticks, not every frame!)
+    const buildings = this.buildingCache;
     let totalHeat = 0;
 
     for (const building of buildings) {
@@ -299,31 +362,6 @@ export class TemperatureSystem implements System {
     }
 
     return totalHeat;
-  }
-
-  /**
-   * Find all buildings in the world
-   */
-  private findNearbyBuildings(world: World): Array<{
-    position: PositionComponent;
-    component: BuildingComponent;
-  }> {
-    const buildings: Array<{ position: PositionComponent; component: BuildingComponent }> = [];
-
-    for (const entity of world.entities.values()) {
-      const impl = entity as EntityImpl;
-      const buildingComp = impl.getComponent<BuildingComponent>(CT.Building);
-      const posComp = impl.getComponent<PositionComponent>(CT.Position);
-
-      if (buildingComp && posComp) {
-        buildings.push({
-          position: posComp,
-          component: buildingComp,
-        });
-      }
-    }
-
-    return buildings;
   }
 
   /**
