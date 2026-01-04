@@ -117,7 +117,7 @@ export function isFieldReporter(entity: EntityImpl): boolean {
   // Check if this agent is registered as a field reporter in any news desk
   const newsroomSystem = getNewsroomSystem();
   const deskManager = newsroomSystem.getDeskManager();
-  const desks = Array.from((deskManager as any).desks.values());
+  const desks = Array.from((deskManager as any).desks.values()) as NewsDesk[];
 
   for (const desk of desks) {
     const isReporter = desk.fieldReporters.some(
@@ -139,7 +139,7 @@ export function getReporterAssignment(reporterId: string): {
 } | null {
   const newsroomSystem = getNewsroomSystem();
   const deskManager = newsroomSystem.getDeskManager();
-  const desks = Array.from((deskManager as any).desks.values());
+  const desks = Array.from((deskManager as any).desks.values()) as NewsDesk[];
 
   for (const desk of desks) {
     const reporter = desk.fieldReporters.find((r: FieldReporter) => r.agentId === reporterId);

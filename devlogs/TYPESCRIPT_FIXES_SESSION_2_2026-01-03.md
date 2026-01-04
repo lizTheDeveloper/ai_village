@@ -3,9 +3,9 @@
 ## Summary
 
 **Starting errors:** 74
-**Ending errors:** 57
-**Errors fixed:** 17 errors (23% reduction)
-**Files modified:** 12 files
+**Ending errors:** 42
+**Errors fixed:** 32 errors (43% reduction)
+**Files modified:** 18 files
 
 ---
 
@@ -14,8 +14,8 @@
 ### Overall Progress
 - **Total starting errors (original):** ~165 errors
 - **After Session 1:** 74 errors
-- **After Session 2:** 57 errors
-- **Total errors fixed:** 108 errors (65% reduction)
+- **After Session 2:** 42 errors
+- **Total errors fixed:** 123 errors (75% reduction)
 
 ---
 
@@ -165,7 +165,48 @@ import type { ProfessionComponent } from '../components/ProfessionComponent.js';
 
 ---
 
-## Remaining Errors (57 total)
+### 6. ✅ Fixed Desk Typing Errors (11 errors)
+
+**Problem:** When retrieving desks from deskManager via `(deskManager as any).desks.values()`, TypeScript infers the loop variable as `unknown`.
+
+**Files affected:**
+- `src/profession/ReporterBehaviorHandler.ts` (3 locations)
+- `src/systems/EventReportingSystem.ts` (2 locations)
+
+**Changes:**
+```typescript
+// Added import
+import type { NewsDesk } from '../television/formats/NewsroomSystem.js';
+
+// ❌ BEFORE
+const desks = Array.from((deskManager as any).desks.values());
+for (const desk of desks) {
+  desk.fieldReporters // Error: 'desk' is of type 'unknown'
+}
+
+// ✅ AFTER
+const desks = Array.from((deskManager as any).desks.values()) as NewsDesk[];
+for (const desk of desks) {
+  desk.fieldReporters // Works - NewsDesk type has fieldReporters property
+}
+```
+
+**Impact:** Fixed 11 `TS18046` errors - "'desk' is of type 'unknown'"
+
+---
+
+### 7. ✅ Removed Additional Unused Imports/Variables (3 files)
+
+**Files affected:**
+- `src/uplift/ProtoSapienceObservationSystem.ts` - removed unused AnimalComponent import, _prevIntelligence variable
+- `src/uplift/UpliftBreedingProgramSystem.ts` - removed unused GeneticComponent import
+- `src/uplift/UpliftCandidateDetectionSystem.ts` - removed unused _TECH_REQUIRED constant
+
+**Impact:** Fixed 3 `TS6133` errors - "declared but its value is never read"
+
+---
+
+## Remaining Errors (42 total)
 
 ### By Category
 
@@ -214,12 +255,12 @@ import type { ProfessionComponent } from '../components/ProfessionComponent.js';
 - `src/components/VideoReplayComponent.ts` - Removed unused variable
 
 **Profession:**
-- `src/profession/ReporterBehaviorHandler.ts` - EntityImpl import path fix
+- `src/profession/ReporterBehaviorHandler.ts` - EntityImpl import path fix, NewsDesk type assertions (3 locations)
 
 **Uplift Systems:**
-- `src/uplift/ProtoSapienceObservationSystem.ts` - Import fix, addComponent cast
-- `src/uplift/UpliftBreedingProgramSystem.ts` - Import fix
-- `src/uplift/UpliftCandidateDetectionSystem.ts` - addComponent cast
+- `src/uplift/ProtoSapienceObservationSystem.ts` - Import fix, addComponent cast, removed unused imports/variables
+- `src/uplift/UpliftBreedingProgramSystem.ts` - Import fix, removed unused import
+- `src/uplift/UpliftCandidateDetectionSystem.ts` - addComponent cast, removed unused constant
 - `src/uplift/UpliftedSpeciesRegistrationSystem.ts` - Import fix
 - `src/uplift/ConsciousnessEmergenceSystem.ts` - PositionComponent type assertions (2 locations)
 
@@ -302,19 +343,21 @@ Error count tracking:
 cd packages/core && npm run build 2>&1 | grep "error TS" | wc -l
 ```
 
-**Result:** 57 errors
+**Result:** 42 errors
 
 ---
 
 ## Lessons Learned
 
 1. **Script-generated changes need careful review** - The underscore prefixing script incorrectly modified import names
-2. **Type assertions are essential** - getComponent returns generic Component, need explicit casts
+2. **Type assertions are essential** - getComponent returns generic Component, need explicit casts for property access
 3. **Import paths matter** - EntityImpl is in Entity.js, not EntityImpl.js
 4. **Workarounds need documentation** - (entity as any).addComponent is a workaround, not the proper solution
+5. **Type assertions for array iterations** - When casting `(something as any).values()`, add type assertion to array result
+6. **Remove truly unused code** - Variables prefixed with `_` that are still flagged as unused should be deleted
 
 ---
 
 **Completed:** 2026-01-03
-**Build status:** Still failing (57 errors remain)
-**Next session:** Focus on CitySpawner and Reporter/desk typing errors
+**Build status:** Still failing (42 errors remain)
+**Next session:** Focus on CitySpawner (10 errors) and remaining uplift/profession errors

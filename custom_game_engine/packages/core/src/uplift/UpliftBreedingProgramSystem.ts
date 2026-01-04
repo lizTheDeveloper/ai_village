@@ -14,7 +14,6 @@ import { EventBus } from '../events/EventBus.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { UpliftProgramComponent, GenerationResult } from '../components/UpliftProgramComponent.js';
 import type { ProtoSapienceComponent } from '../components/ProtoSapienceComponent.js';
-import type { GeneticComponent } from '../components/GeneticComponent.js';
 import type { AnimalComponent } from '../components/AnimalComponent.js';
 import type { SpeciesComponent } from '../components/SpeciesComponent.js';
 

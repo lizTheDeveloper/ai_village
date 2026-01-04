@@ -50,7 +50,6 @@ export class UpliftCandidateDetectionSystem implements System {
   private eventBus: EventBus | null = null;
   private tickCounter = 0;
   private readonly UPDATE_INTERVAL = 1000; // Every 50 seconds
-  private readonly _TECH_REQUIRED = 'consciousness_studies';
 
   // Cache for species population counts
   private speciesPopulationCache: Map<string, number> = new Map();

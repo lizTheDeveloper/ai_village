@@ -435,9 +435,9 @@ export class Renderer {
   /**
    * Render the world.
    * @param world World instance
-   * @param selectedEntity Optional selected entity to highlight
+   * @param selectedEntity Optional selected entity to highlight (can be full Entity or just { id: string })
    */
-  render(world: World, selectedEntity?: Entity): void {
+  render(world: World, selectedEntity?: Entity | { id: string }): void {
     // Clear
     this.ctx.fillStyle = '#1a1a1a';
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -880,7 +880,7 @@ export class Renderer {
     this.drawAgentBuildingInteractions(world, selectedEntity);
 
     // Draw navigation path for selected entity
-    this.drawNavigationPath(selectedEntity);
+    this.drawNavigationPath(world, selectedEntity);
 
     // Draw floating text (resource gathering feedback, etc.)
     this.floatingTextRenderer.render(this.ctx, this.camera, Date.now());
@@ -2167,7 +2167,7 @@ export class Renderer {
    * Draw visual indicators for agent-building interactions.
    * Shows when agents are near buildings (seeking warmth, shelter, working on construction).
    */
-  private drawAgentBuildingInteractions(world: World, selectedEntity?: Entity): void {
+  private drawAgentBuildingInteractions(world: World, selectedEntity?: Entity | { id: string }): void {
     // Get all agents
     const agents = world.query().with('agent', 'position').executeEntities();
 
@@ -2293,11 +2293,23 @@ export class Renderer {
    * Draw navigation path for selected entity.
    * Shows a line from current position to destination target.
    */
-  private drawNavigationPath(selectedEntity?: Entity): void {
+  private drawNavigationPath(world: World, selectedEntity?: Entity | { id: string }): void {
     if (!selectedEntity) return;
 
-    const position = selectedEntity.components.get('position') as PositionComponent | undefined;
-    const steering = selectedEntity.components.get('steering') as SteeringComponent | undefined;
+    // Get the full entity from world if we only have an ID
+    let entity: Entity | undefined;
+    if ('components' in selectedEntity) {
+      // Already a full Entity
+      entity = selectedEntity;
+    } else {
+      // Just an ID, look up from world
+      entity = world.getEntity(selectedEntity.id);
+    }
+
+    if (!entity) return;
+
+    const position = entity.getComponent('position') as PositionComponent | undefined;
+    const steering = entity.getComponent('steering') as SteeringComponent | undefined;
 
     if (!position || !steering || !steering.target) return;
 

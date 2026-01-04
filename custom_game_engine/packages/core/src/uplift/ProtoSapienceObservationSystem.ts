@@ -22,7 +22,6 @@ import {
   type CommunicationPattern
 } from '../components/ProtoSapienceComponent.js';
 import type { UpliftProgramComponent } from '../components/UpliftProgramComponent.js';
-import type { AnimalComponent } from '../components/AnimalComponent.js';
 
 /**
  * Intelligence thresholds for behavior emergence
@@ -136,7 +135,6 @@ export class ProtoSapienceObservationSystem implements System {
     proto: ProtoSapienceComponent,
     program: UpliftProgramComponent
   ): void {
-    const _prevIntelligence = proto.intelligence;
     proto.intelligence = program.currentIntelligence;
 
     // Tool use emergence
