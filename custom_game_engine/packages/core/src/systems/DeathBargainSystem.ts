@@ -316,8 +316,8 @@ export class DeathBargainSystem implements System {
         const generatedRiddle = await this.riddleGenerator.generatePersonalizedRiddle(heroContext);
 
         riddleQuestion = generatedRiddle.question;
-        correctAnswer = generatedRiddle.correctAnswer;
-        acceptedAnswers = generatedRiddle.acceptedAnswers;
+        correctAnswer = generatedRiddle.correctAnswer ?? generatedRiddle.question;
+        acceptedAnswers = generatedRiddle.acceptedAnswers ?? [correctAnswer];
         hint = generatedRiddle.hint;
       } catch (error) {
         console.error('[DeathBargainSystem] Failed to generate personalized riddle, falling back to Sphinx:', error);
@@ -628,7 +628,7 @@ Answer ONLY with "YES" or "NO".`;
    */
   private getObserverContext(
     world: World,
-    dyingEntity: Entity,
+    _dyingEntity: Entity,
     bargain: DeathBargainComponent
   ): {
     playerIsWatching: boolean;
@@ -717,7 +717,7 @@ Answer ONLY with "YES" or "NO".`;
     }
 
     // Remove afterlife component if present
-    (entity as any).removeComponent?.(ComponentType.Afterlife);
+    (entity as any).removeComponent?.('afterlife');
 
     // Apply health penalty if specified
     if (bargain.resurrectConditions?.healthPenalty) {
@@ -746,12 +746,15 @@ Answer ONLY with "YES" or "NO".`;
     // Remove death bargain component (challenge complete)
     (entity as any).removeComponent?.(ComponentType.DeathBargain);
 
+    const deathGodIdentity = deathGod?.components.get('identity') as any;
+    const resurrectionPsychopompName = deathGodIdentity?.name || 'The God of Death';
+
     world.eventBus.emit({
       type: 'agent:resurrected',
       source: 'death_bargain_system',
       data: {
         entityId: entity.id,
-        resurrectionType: 'death_bargain',
+        psychopompName: resurrectionPsychopompName,
         conditions: bargain.resurrectConditions,
       },
     });

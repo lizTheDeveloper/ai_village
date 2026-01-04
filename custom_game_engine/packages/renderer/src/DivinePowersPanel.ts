@@ -168,22 +168,42 @@ export class DivinePowersPanel implements IWindowPanel {
       if (deityComp && deityComp.controller === 'player') {
         this.playerDeityId = entity.id;
 
-        // Update state from deity component
+        // Update state from deity component - match actual DeityComponent structure
+        // Convert beliefPerTick to beliefPerHour (20 ticks/sec * 3600 sec/hour = 72000 ticks/hour)
+        const ticksPerHour = 72000;
+        const beliefPerTick = deityComp.belief?.beliefPerTick ?? 0;
+
+        // Count believers (Set has .size, not .length)
+        const believerCount = deityComp.believers instanceof Set
+          ? deityComp.believers.size
+          : (Array.isArray(deityComp.believers) ? deityComp.believers.length : 0);
+
+        // Build domains from identity
+        const domains: Record<string, number> = {};
+        if (deityComp.identity?.domain) {
+          domains[deityComp.identity.domain] = 100;
+        }
+        if (deityComp.identity?.secondaryDomains) {
+          for (const domain of deityComp.identity.secondaryDomains) {
+            domains[domain] = 50;
+          }
+        }
+
         this.deityState = {
           belief: deityComp.belief?.currentBelief ?? 0,
-          beliefPerHour: deityComp.belief?.generationRate ?? 0,
-          peakBeliefRate: deityComp.belief?.peakRate ?? 0,
-          totalEarned: deityComp.belief?.totalEarned ?? 0,
-          totalSpent: deityComp.belief?.totalSpent ?? 0,
-          believerCount: deityComp.believers?.length ?? 0,
-          angelCount: deityComp.angels?.length ?? 0,
+          beliefPerHour: beliefPerTick * ticksPerHour,
+          peakBeliefRate: deityComp.belief?.peakBeliefRate ?? 0,
+          totalEarned: deityComp.belief?.totalBeliefEarned ?? 0,
+          totalSpent: deityComp.belief?.totalBeliefSpent ?? 0,
+          believerCount,
+          angelCount: 0, // TODO: Track angels separately
           pendingPrayers: deityComp.prayerQueue?.length ?? 0,
-          domains: deityComp.domains ?? {},
+          domains,
           identity: {
-            name: deityComp.identity?.name ?? 'Unknown Deity',
-            benevolence: deityComp.identity?.benevolence ?? 0.5,
-            interventionism: deityComp.identity?.interventionism ?? 0.5,
-            wrathfulness: deityComp.identity?.wrathfulness ?? 0.5,
+            name: deityComp.identity?.primaryName ?? 'Unknown Deity',
+            benevolence: deityComp.identity?.perceivedPersonality?.benevolence ?? 0.5,
+            interventionism: deityComp.identity?.perceivedPersonality?.interventionism ?? 0.5,
+            wrathfulness: deityComp.identity?.perceivedPersonality?.wrathfulness ?? 0.5,
           },
         };
         return;

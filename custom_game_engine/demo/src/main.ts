@@ -2197,6 +2197,10 @@ function handleKeyDown(
     't': 'tile-inspector', 'T': 'tile-inspector',
     'h': 'help', 'H': 'controls',
     'e': 'economy', 'E': 'economy',
+    // Divine panels
+    'd': 'divine-powers', 'D': 'divine-powers',
+    'g': 'divine-chat', 'G': 'divine-chat',
+    'a': 'divine-analytics', 'A': 'divine-analytics',
   };
 
   if (windowShortcuts[key]) {

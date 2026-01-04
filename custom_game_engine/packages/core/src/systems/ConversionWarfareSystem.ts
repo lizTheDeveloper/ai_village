@@ -155,8 +155,14 @@ export class ConversionWarfareSystem implements System {
     targetId: string,
     tactics: ConversionTactic[],
     duration: number = 0,
-    currentTick: number
-  ): ConversionCampaign {
+    currentTick: number,
+    world?: World
+  ): ConversionCampaign | null {
+    // Check if conversion warfare is enabled in this universe
+    if (world && !this.isConversionWarfareEnabled(world)) {
+      return null;
+    }
+
     const campaign: ConversionCampaign = {
       id: `campaign_${Date.now()}`,
       attackerId,
