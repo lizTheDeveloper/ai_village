@@ -20,6 +20,14 @@ import { calculateTotalWeight, getTotalDefense, getDamageResistance, getMovement
 import { itemRegistry } from '../items/index.js';
 import type { StatBonusTrait } from '../items/traits/StatBonusTrait.js';
 import { itemInstanceRegistry } from '../items/ItemInstanceRegistry.js';
+import type { EventBus } from '../events/EventBus.js';
+
+/**
+ * Weekly wear amount for armor and clothing.
+ * At 1 point per week, a pristine item (condition 100) lasts ~2 years.
+ * Quality affects effective wear: legendary items degrade slower.
+ */
+const WEEKLY_WEAR_AMOUNT = 1;
 
 export class EquipmentSystem implements System {
   public readonly id: SystemId = 'equipment';
@@ -40,7 +48,35 @@ export class EquipmentSystem implements System {
   private static readonly WARMUP_TICKS = 20;
   private tickCounter = 0;
 
-  update(_world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+  private eventBus: EventBus | null = null;
+  private world: World | null = null;
+
+  /**
+   * Initialize the system with an event bus for scheduled degradation.
+   * Call this after construction to enable weekly equipment wear.
+   */
+  setEventBus(eventBus: EventBus): void {
+    this.eventBus = eventBus;
+    this._setupEventListeners();
+  }
+
+  /**
+   * Subscribe to time events for scheduled degradation.
+   */
+  private _setupEventListeners(): void {
+    if (!this.eventBus) return;
+
+    // Degrade armor and clothing every 7 in-game days
+    this.eventBus.subscribe('time:new_week', () => {
+      if (this.world) {
+        this.degradeAllEquipment(this.world);
+      }
+    });
+  }
+
+  update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+    // Cache world reference for event handlers
+    this.world = world;
     this.tickCounter++;
 
     // During warmup, always update (for tests and initialization)
@@ -67,8 +103,7 @@ export class EquipmentSystem implements System {
       // 3. Cache defense stats (performance optimization)
       this.cacheDefenseStats(equipment, this.tickCounter);
 
-      // 4. Update durability (environmental wear)
-      // TODO: Implement durability degradation
+      // 4. Durability degradation is handled by time:new_week event (see degradeAllEquipment)
 
       // 5. Remove broken equipment
       this.removeBrokenEquipment(equipment);
@@ -268,5 +303,66 @@ export class EquipmentSystem implements System {
         equipment.weapons.offHand = undefined;
       }
     }
+  }
+
+  /**
+   * Degrade all equipped armor and clothing in the world.
+   * Called once per week (7 in-game days) via time:new_week event.
+   *
+   * Wear calculation:
+   * - Base wear: 1 point per week
+   * - Quality factor: legendary (0.4x), masterwork (0.6x), fine (0.8x), normal (1.0x), poor (1.5x)
+   * - At base wear, pristine items last ~2 in-game years
+   */
+  private degradeAllEquipment(world: World): void {
+    // Query all entities with equipment
+    const entities = world.query()
+      .with(ComponentType.Equipment)
+      .executeEntities();
+
+    for (const entity of entities) {
+      const equipment = entity.components.get('equipment') as EquipmentComponent;
+      if (!equipment) continue;
+
+      // Degrade body part equipment (armor, clothing)
+      for (const slot of Object.values(equipment.equipped)) {
+        if (!slot?.instanceId) continue;
+        if (!itemInstanceRegistry.has(slot.instanceId)) continue;
+
+        const instance = itemInstanceRegistry.get(slot.instanceId);
+        const item = itemRegistry.tryGet(instance.definitionId);
+
+        // Only degrade armor and clothing (not accessories, jewelry, etc.)
+        if (!item?.traits?.armor && !item?.traits?.clothing) continue;
+
+        // Calculate quality-adjusted wear
+        const wearAmount = this.calculateQualityAdjustedWear(instance.quality);
+
+        // Apply wear (minimum condition is 0)
+        instance.condition = Math.max(0, instance.condition - wearAmount);
+      }
+    }
+  }
+
+  /**
+   * Calculate wear amount adjusted for item quality.
+   * Higher quality items degrade slower.
+   */
+  private calculateQualityAdjustedWear(quality: number): number {
+    let qualityFactor: number;
+
+    if (quality >= 95) {
+      qualityFactor = 0.4;  // Legendary - lasts 2.5x longer
+    } else if (quality >= 85) {
+      qualityFactor = 0.6;  // Masterwork - lasts ~1.7x longer
+    } else if (quality >= 70) {
+      qualityFactor = 0.8;  // Fine - lasts 1.25x longer
+    } else if (quality >= 40) {
+      qualityFactor = 1.0;  // Normal - baseline
+    } else {
+      qualityFactor = 1.5;  // Poor - wears 1.5x faster
+    }
+
+    return WEEKLY_WEAR_AMOUNT * qualityFactor;
   }
 }

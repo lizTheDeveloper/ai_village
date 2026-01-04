@@ -14,6 +14,7 @@ import type {
 import { componentSerializerRegistry } from './serializers/index.js';
 import { computeChecksumSync } from './utils.js';
 import { chunkSerializer } from '@ai-village/world';
+import { getZoneManager } from '../navigation/ZoneManager.js';
 
 export class WorldSerializer {
   /**
@@ -137,7 +138,14 @@ export class WorldSerializer {
       }
     }
 
-    // TODO: Deserialize weather, zones, buildings
+    // Deserialize zones
+    if (snapshot.worldState.zones && snapshot.worldState.zones.length > 0) {
+      const zoneManager = getZoneManager();
+      zoneManager.deserializeZones(snapshot.worldState.zones);
+      console.log('[WorldSerializer] Zones restored from snapshot');
+    }
+
+    // TODO: Deserialize weather, buildings
 
     console.log(`[WorldSerializer] Deserialized ${deserializedEntities.length} entities`);
   }
@@ -263,14 +271,17 @@ export class WorldSerializer {
       ? chunkSerializer.serializeChunks(chunkManager)
       : null;
 
+    // Serialize zones using ZoneManager
+    const zoneManager = getZoneManager();
+    const zones = zoneManager.serializeZones();
+
     // TODO: Implement weather serialization
-    // TODO: Implement zone serialization
     // TODO: Implement building placement serialization
 
     return {
       terrain,
       weather: null,
-      zones: [],
+      zones,
       buildings: [],
     };
   }

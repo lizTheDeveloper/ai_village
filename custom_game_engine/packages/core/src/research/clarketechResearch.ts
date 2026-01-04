@@ -127,10 +127,45 @@ export const CLARKETECH_RESEARCH: ResearchDefinition[] = [
     ],
     type: 'predefined',
   },
+  {
+    id: 'advanced_electronics',
+    name: 'Advanced Electronics',
+    description:
+      'Superconducting circuits, room-temperature quantum effects, and electromagnetic manipulation. Build things that would make Tesla weep with joy and Edison with envy.',
+    field: CLARKETECH_FIELD,
+    tier: 6,
+    progressRequired: 8000,
+    prerequisites: ['machinery_ii'],
+    requiredBuilding: 'research_lab',
+    unlocks: [
+      { type: 'item', itemId: 'tesla_glove' },
+      { type: 'research', researchId: 'quantum_computing' },
+      { type: 'knowledge', knowledgeId: 'electromagnetic_mastery' },
+    ],
+    type: 'predefined',
+  },
 
   // ==========================================================================
   // TIER 7 - Far Future
   // ==========================================================================
+  {
+    id: 'quantum_computing',
+    name: 'Quantum Computing',
+    description:
+      'Harness superposition and entanglement for computation. Process all possible states simultaneously. Finally solve problems that classical computers would take longer than the heat death of the universe to complete. Warning: observing results may collapse them.',
+    field: CLARKETECH_FIELD,
+    tier: 7,
+    progressRequired: 35000,
+    prerequisites: ['advanced_electronics', 'advanced_ai'],
+    requiredBuilding: 'ai_core',
+    unlocks: [
+      { type: 'building', buildingId: 'quantum_computer' },
+      { type: 'item', itemId: 'probability_gun' },
+      { type: 'knowledge', knowledgeId: 'probability_manipulation' },
+      { type: 'research', researchId: 'local_teleportation' },
+    ],
+    type: 'predefined',
+  },
   {
     id: 'full_dive_vr',
     name: 'Full-Dive Virtual Reality',

@@ -299,7 +299,84 @@ export class ZoneManager {
   }
 
   /**
-   * Serialize for save/load
+   * Serialize zones to ZoneSnapshot[] format for world persistence.
+   * This is used by WorldSerializer for save/load.
+   */
+  serializeZones(): Array<{
+    $schema: 'https://aivillage.dev/schemas/zone/v1';
+    $version: number;
+    id: string;
+    type: ZoneType;
+    priority: number;
+    tiles: string[];
+    createdAt: number;
+  }> {
+    const snapshots = [];
+
+    for (const zone of this.zones.values()) {
+      snapshots.push({
+        $schema: 'https://aivillage.dev/schemas/zone/v1' as const,
+        $version: 1,
+        id: zone.id,
+        type: zone.type,
+        priority: zone.priority,
+        tiles: Array.from(zone.tiles),
+        createdAt: zone.createdAt,
+      });
+    }
+
+    return snapshots;
+  }
+
+  /**
+   * Deserialize zones from ZoneSnapshot[] format.
+   * Clears existing zones and rebuilds from snapshots.
+   */
+  deserializeZones(snapshots: Array<{
+    id: string;
+    type: ZoneType;
+    priority: number;
+    tiles: string[];
+    createdAt: number;
+  }>): void {
+    // Clear existing zones
+    this.zones.clear();
+    this.tileToZone.clear();
+
+    // Find max zone ID to set counter
+    let maxId = 0;
+    for (const snapshot of snapshots) {
+      const match = snapshot.id.match(/zone_(\d+)/);
+      if (match) {
+        maxId = Math.max(maxId, parseInt(match[1], 10));
+      }
+    }
+    this.zoneIdCounter = maxId + 1;
+
+    // Restore zones
+    for (const snapshot of snapshots) {
+      const zone: Zone = {
+        id: snapshot.id,
+        type: snapshot.type,
+        priority: snapshot.priority,
+        tiles: new Set(snapshot.tiles),
+        createdAt: snapshot.createdAt,
+      };
+
+      this.zones.set(zone.id, zone);
+
+      // Rebuild tile->zone mapping
+      for (const tileKey of zone.tiles) {
+        this.tileToZone.set(tileKey, zone.id);
+      }
+    }
+
+    console.log(`[ZoneManager] Deserialized ${snapshots.length} zones`);
+  }
+
+  /**
+   * Serialize for save/load (legacy format for backward compatibility)
+   * @deprecated Use serializeZones() instead
    */
   serialize(): object {
     const zonesData: Array<{

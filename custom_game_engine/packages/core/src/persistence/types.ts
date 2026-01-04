@@ -80,6 +80,43 @@ export interface UniverseTime {
   pausedDuration: number;
 }
 
+// ============================================================================
+// Zone Serialization
+// ============================================================================
+
+export type ZoneType =
+  | 'farming'
+  | 'storage'
+  | 'industry'
+  | 'housing'
+  | 'social'
+  | 'pasture'
+  | 'wilderness'
+  | 'restricted';
+
+export interface ZoneSnapshot extends Versioned {
+  $schema: 'https://aivillage.dev/schemas/zone/v1';
+
+  /** Zone ID */
+  id: string;
+
+  /** Zone type */
+  type: ZoneType;
+
+  /** Priority (1-10, higher = stronger influence) */
+  priority: number;
+
+  /** Tiles in this zone (array of "x,y" keys) */
+  tiles: string[];
+
+  /** Tick when created */
+  createdAt: number;
+}
+
+// ============================================================================
+// World State
+// ============================================================================
+
 export interface WorldSnapshot {
   /** Terrain data (compressed) */
   terrain: TerrainSnapshot | null;
@@ -88,7 +125,7 @@ export interface WorldSnapshot {
   weather: unknown;
 
   /** Zone configuration */
-  zones: unknown[];
+  zones: ZoneSnapshot[];
 
   /** Building placements */
   buildings: unknown[];
