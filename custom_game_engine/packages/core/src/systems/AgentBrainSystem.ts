@@ -68,6 +68,9 @@ import {
   followGradientBehavior,
 } from '../behavior/behaviors/index.js';
 
+// Reporter-specific behaviors
+import { followReportingTargetBehavior } from '../behaviors/FollowReportingTargetBehavior.js';
+
 // LLM types
 import type { LLMDecisionQueue, PromptBuilder } from '../decision/LLMDecisionProcessor.js';
 
@@ -165,6 +168,7 @@ export class AgentBrainSystem implements System {
 
     // Navigation & Exploration behaviors
     this.behaviors.register('navigate', navigateBehavior, { description: 'Navigate to coordinates' });
+    this.behaviors.register('follow_reporting_target', followReportingTargetBehavior, { description: 'Follow entity at safe distance (reporters)' });
     this.behaviors.register('explore_frontier', exploreFrontierBehavior, { description: 'Explore frontier areas' });
     this.behaviors.register('explore_spiral', exploreSpiralBehavior, { description: 'Spiral exploration pattern' });
     this.behaviors.register('follow_gradient', followGradientBehavior, { description: 'Follow social gradients' });

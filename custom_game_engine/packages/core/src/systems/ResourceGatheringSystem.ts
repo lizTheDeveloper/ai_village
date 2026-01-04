@@ -34,7 +34,11 @@ export class ResourceGatheringSystem implements System {
     // Multiply deltaTime by interval to compensate for skipped ticks
     const effectiveDeltaTime = deltaTime * ResourceGatheringSystem.UPDATE_INTERVAL;
 
-    for (const entity of entities) {
+    // Performance: Use SimulationScheduler to skip resources far from agents
+    // Resources near active areas regenerate, distant ones are paused
+    const activeEntities = world.simulationScheduler.filterActiveEntities(entities, world.tick);
+
+    for (const entity of activeEntities) {
       const impl = entity as EntityImpl;
       const resource = impl.getComponent<ResourceComponent>(CT.Resource);
 

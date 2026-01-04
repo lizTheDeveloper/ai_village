@@ -110,6 +110,8 @@ export { createNewspaperComponent, createArticle, createEdition, hireNewspaperEm
 export type { NewspaperComponent, NewspaperEmployee, NewspaperRole, NewspaperDepartment, Article, ArticleType, ArticleStatus, Edition } from './NewspaperComponent.js';
 export { createRecordingComponent, completeRecording, startEditingRecording, publishRecording, addRecordingSubject, setRecordingTranscript } from './RecordingComponent.js';
 export type { RecordingComponent, MediaType, RecordingCategory, RecordingStatus } from './RecordingComponent.js';
+export { createVideoReplayComponent, captureFrame, completeReplay, getFrameAtTick, getFrameByIndex, getAllReplayEntities, getPrimarySubject, compressReplay } from './VideoReplayComponent.js';
+export type { VideoReplayComponent, ReplayFrame, ReplayEntity } from './VideoReplayComponent.js';
 export { createUniversityComponent, hireUniversityEmployee, fireUniversityEmployee, proposeResearch, fundResearch, startResearch, completeResearch, createUniversityCourse, enrollStudent, giveLecture, setupPreprintServer, setupResearchBlog, setupSocialMedia, publishResearch, recordCitation, recordPaperView, shareOnSocialMedia } from './UniversityComponent.js';
 export type { UniversityComponent, UniversityEmployee, UniversityRole, AcademicDepartment, ResearchProject, ResearchStatus, Course, Lecture, SkillTransfer, PublicationVenue, PublicationChannel, PublicationRecord } from './UniversityComponent.js';
 // Research component

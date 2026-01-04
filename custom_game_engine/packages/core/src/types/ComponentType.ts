@@ -110,6 +110,7 @@ export enum ComponentType {
   PublishingCompany = 'publishing_company',
   Newspaper = 'newspaper',
   Recording = 'recording',
+  VideoReplay = 'video_replay',
 
   // Skills & Crafting
   CookingSkill = 'cooking_skill',

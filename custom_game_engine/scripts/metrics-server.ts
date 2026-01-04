@@ -3926,6 +3926,33 @@ async function handleSetSkill(client: WebSocket, params: Record<string, unknown>
   return sendActionToGame(client, 'set-skill', params);
 }
 
+async function handleSpawnCity(client: WebSocket, params: Record<string, unknown>) {
+  if (!params.template || typeof params.template !== 'string') {
+    throw new Error('Missing required parameter: template');
+  }
+
+  if (typeof params.x !== 'number' || typeof params.y !== 'number') {
+    throw new Error('Missing required parameters: x, y');
+  }
+
+  const validTemplates = [
+    'medieval_village', 'trading_town', 'mining_settlement', 'coastal_port',
+    'academic_city', 'industrial_city', 'agricultural_hub', 'military_fortress',
+    'magical_enclave', 'nomadic_camp', 'underground_dwarven', 'flying_elven',
+    'research_outpost', 'religious_monastery', 'frontier_outpost'
+  ];
+
+  if (!validTemplates.includes(params.template as string)) {
+    throw new Error(`Invalid template. Must be one of: ${validTemplates.join(', ')}`);
+  }
+
+  return sendActionToGame(client, 'spawn-city', params);
+}
+
+async function handleListCityTemplates(client: WebSocket, params: Record<string, unknown>) {
+  return sendActionToGame(client, 'list-city-templates', params);
+}
+
 async function handleSpawnEntity(client: WebSocket, params: Record<string, unknown>) {
   if (!params.type || typeof params.x !== 'number' || typeof params.y !== 'number') {
     throw new Error('Missing required parameters: type, x, y');
@@ -3971,14 +3998,6 @@ async function handlePause(client: WebSocket, params: Record<string, unknown>) {
   }
 
   return sendActionToGame(client, 'pause', params);
-}
-
-async function handleSpawnEntity(client: WebSocket, params: Record<string, unknown>) {
-  if (!params.type || typeof params.x !== 'number' || typeof params.y !== 'number') {
-    throw new Error('Missing required parameters: type, x, y');
-  }
-
-  return sendActionToGame(client, 'spawn-entity', params);
 }
 
 async function handleGrantSpell(client: WebSocket, params: Record<string, unknown>) {
@@ -4962,11 +4981,37 @@ WORLD ACTIONS
      - x, y (number, required): Spawn position
      - data (object, optional): Additional entity data
 
+10. SPAWN NPC CITY
+    curl -X POST http://localhost:${HTTP_PORT}/api/actions/spawn-city \\
+      -H "Content-Type: application/json" \\
+      -d '{"template": "medieval_village", "x": 100, "y": 100, "name": "Rivertown", "agentCount": 20, "useLLM": true}'
+
+    Parameters:
+      - template (string, required): City template (see list-city-templates for available templates)
+      - x, y (number, required): City center position
+      - name (string, optional): Custom city name (auto-generated if not provided)
+      - agentCount (number, optional): Number of NPCs (overrides template default)
+      - useLLM (boolean, optional): Use LLM for NPC decisions (default: true)
+
+    Available templates: medieval_village, trading_town, mining_settlement, coastal_port,
+    academic_city, industrial_city, agricultural_hub, military_fortress, magical_enclave,
+    nomadic_camp, underground_dwarven, flying_elven, research_outpost, religious_monastery,
+    frontier_outpost
+
+    Returns: City info with spawned building/agent IDs and city director entity ID
+
+11. LIST CITY TEMPLATES
+    curl -X POST http://localhost:${HTTP_PORT}/api/actions/list-city-templates \\
+      -H "Content-Type: application/json" \\
+      -d '{}'
+
+    Returns: List of available city templates with descriptions and default agent counts
+
 ================================================================================
 MAGIC/DIVINITY ACTIONS
 ================================================================================
 
-10. GRANT SPELL
+12. GRANT SPELL
     curl -X POST http://localhost:${HTTP_PORT}/api/actions/grant-spell \\
       -H "Content-Type: application/json" \\
       -d '{"agentId": "agent_123", "spellId": "fireball"}'
@@ -4975,7 +5020,7 @@ MAGIC/DIVINITY ACTIONS
       - agentId (string, required): Target agent
       - spellId (string, required): Spell to grant
 
-11. ADD BELIEF
+13. ADD BELIEF
     curl -X POST http://localhost:${HTTP_PORT}/api/actions/add-belief \\
       -H "Content-Type: application/json" \\
       -d '{"deityId": "deity_123", "amount": 100}'
@@ -4984,7 +5029,7 @@ MAGIC/DIVINITY ACTIONS
       - deityId (string, required): Target deity
       - amount (number, required): Belief points to add
 
-12. CREATE DEITY
+14. CREATE DEITY
     curl -X POST http://localhost:${HTTP_PORT}/api/actions/create-deity \\
       -H "Content-Type: application/json" \\
       -d '{"name": "Gaia", "domain": "nature", "controller": "player"}'
@@ -5092,6 +5137,12 @@ NOTES
             break;
           case 'set-llm-config':
             result = await handleSetLLMConfig(gameClient, params);
+            break;
+          case 'spawn-city':
+            result = await handleSpawnCity(gameClient, params);
+            break;
+          case 'list-city-templates':
+            result = await handleListCityTemplates(gameClient, params);
             break;
           default:
             res.statusCode = 404;

@@ -58,8 +58,8 @@ export function updateReporterBehaviors(world: World, currentTick: number): void
         continue;
       }
 
-      // Set reporter to navigate to story location
-      setReporterNavigation(entity, story.location, story.headline);
+      // Set reporter to follow target entity (or navigate to location if no entity)
+      setReporterNavigation(entity, story);
 
       console.log(`[ReporterBehavior] ${reporter.name} navigating to: ${story.headline} at (${Math.floor(story.location.x)}, ${Math.floor(story.location.y)})`);
     }
@@ -67,26 +67,44 @@ export function updateReporterBehaviors(world: World, currentTick: number): void
 }
 
 /**
- * Set a reporter's behavior to navigate to a story location.
+ * Set a reporter's behavior to follow target entity or navigate to location.
  */
 function setReporterNavigation(
   reporterEntity: EntityImpl,
-  target: { x: number; y: number },
-  storyHeadline: string
+  story: NewsStory
 ): void {
   const agent = reporterEntity.getComponent<AgentComponent>(CT.Agent);
-  if (!agent) return;
+  if (!agent || !story.location) return;
 
-  // Set navigate behavior
-  reporterEntity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
-    ...current,
-    behavior: 'navigate',
-    behaviorState: {
-      target: { x: target.x, y: target.y },
-      purpose: `covering story: ${storyHeadline}`,
-    },
-    lastThought: `I need to get to the scene to cover this story: ${storyHeadline}`,
-  }));
+  // Check if story has a source entity to follow
+  if (story.sourceEntityId) {
+    // Follow the entity (aliens, battle, etc.) with safe distance
+    reporterEntity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
+      ...current,
+      behavior: 'follow_reporting_target',
+      behaviorState: {
+        targetEntityId: story.sourceEntityId,
+        safeDistance: 80, // Stay 80 units away from danger
+        purpose: `covering story: ${story.headline}`,
+      },
+      lastThought: `I need to find and follow the subject: ${story.headline}`,
+    }));
+
+    console.log(`[ReporterBehavior] Following entity ${story.sourceEntityId} for: ${story.headline}`);
+  } else {
+    // No entity - just navigate to fixed location
+    reporterEntity.updateComponent<AgentComponent>(CT.Agent, (current) => ({
+      ...current,
+      behavior: 'navigate',
+      behaviorState: {
+        target: { x: story.location.x, y: story.location.y },
+        purpose: `covering story: ${story.headline}`,
+      },
+      lastThought: `I need to get to the scene to cover this story: ${story.headline}`,
+    }));
+
+    console.log(`[ReporterBehavior] Navigating to location (${Math.floor(story.location.x)}, ${Math.floor(story.location.y)}) for: ${story.headline}`);
+  }
 }
 
 /**
