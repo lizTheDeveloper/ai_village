@@ -1,0 +1,89 @@
+{
+  "combatId": "wolf-vs-dog",
+  "title": "WOLF VS GUARD DOG - Territorial Battle",
+  "generatedAt": "2026-01-04T11:50:00.000Z",
+  "pixelLabCharacters": {
+    "wolf": "9007e612-5574-490e-9be9-7e019ff1960a",
+    "dog": "3f9f0939-f32d-4b36-aa20-afb0794328a2"
+  },
+  "characters": {
+    "wolf": {
+      "name": "Shadow",
+      "type": "gray_wolf",
+      "description": "fierce gray wolf with piercing yellow eyes",
+      "rotations": {
+        "south": "wolf/rotations/south.png",
+        "south-east": "wolf/rotations/south-east.png",
+        "east": "wolf/rotations/east.png",
+        "north-east": "wolf/rotations/north-east.png",
+        "north": "wolf/rotations/north.png",
+        "north-west": "wolf/rotations/north-west.png",
+        "west": "wolf/rotations/west.png",
+        "south-west": "wolf/rotations/south-west.png"
+      },
+      "animations": {
+        "bite": {
+          "template": "lead-jab",
+          "description": "snapping jaws at target",
+          "frames": 3,
+          "directions": ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"],
+          "path": "wolf/animations/bite/{direction}/frame_{frame}.png"
+        },
+        "pounce": {
+          "template": "roundhouse-kick",
+          "description": "leaping attack",
+          "frames": 7,
+          "directions": ["south", "south-west", "west", "north-west", "north", "north-east", "east"],
+          "path": "wolf/animations/pounce/{direction}/frame_{frame}.png"
+        }
+      }
+    },
+    "dog": {
+      "name": "Rex",
+      "type": "guard_dog",
+      "description": "loyal guard dog defending territory",
+      "rotations": {
+        "south": "dog/rotations/south.png",
+        "south-east": "dog/rotations/south-east.png",
+        "east": "dog/rotations/east.png",
+        "north-east": "dog/rotations/north-east.png",
+        "north": "dog/rotations/north.png",
+        "north-west": "dog/rotations/north-west.png",
+        "west": "dog/rotations/west.png",
+        "south-west": "dog/rotations/south-west.png"
+      },
+      "animations": {
+        "guard-bite": {
+          "template": "lead-jab",
+          "description": "defensive bite",
+          "frames": 3,
+          "directions": ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"],
+          "path": "dog/animations/guard-bite/{direction}/frame_{frame}.png"
+        },
+        "tackle": {
+          "template": "roundhouse-kick",
+          "description": "powerful tackle",
+          "frames": 7,
+          "directions": ["south", "south-east", "east", "north-east", "north", "north-west", "west", "south-west"],
+          "path": "dog/animations/tackle/{direction}/frame_{frame}.png"
+        }
+      }
+    }
+  },
+  "background": {
+    "name": "Forest Clearing",
+    "description": "moonlit forest clearing",
+    "fallbackColor": "#1a2a1a"
+  },
+  "actionMapping": {
+    "bites": "bite",
+    "pounces on": "pounce",
+    "snaps at": "bite",
+    "lunges at": "pounce",
+    "guard-bites": "guard-bite",
+    "tackles": "tackle",
+    "defends against": "guard-bite",
+    "charges at": "tackle"
+  },
+  "recordingFile": "../mock-recordings/wolf-vs-dog.json"
+}

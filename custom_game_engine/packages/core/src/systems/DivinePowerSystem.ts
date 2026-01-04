@@ -29,6 +29,11 @@ import { DivineCastingCalculator, createDivineCastingContext } from '../magic/co
 import type { ComposedSpell } from '../components/MagicComponent.js';
 import { SpellRegistry } from '../magic/SpellRegistry.js';
 import { SpellEffectExecutor } from '../magic/SpellEffectExecutor.js';
+import {
+  isPowerAvailable,
+  calculateEffectiveCost,
+  type DivinePowerType,
+} from '../divinity/UniverseConfig.js';
 
 /**
  * Simplified presence data for crossing calculations.

@@ -96,8 +96,11 @@ export class DeathBargainSystem implements System {
 
   /**
    * Check if an entity qualifies for a death bargain
+   *
+   * The God of Death pretends to care about destiny and heroism,
+   * but actually decides based on entertainment value!
    */
-  qualifiesForDeathBargain(entity: Entity): boolean {
+  qualifiesForDeathBargain(entity: Entity, world?: World): boolean {
     // Must have a soul
     const soulIdentity = entity.components.get('soul_identity') as SoulIdentityComponent | undefined;
     if (!soulIdentity) {
@@ -116,8 +119,20 @@ export class DeathBargainSystem implements System {
       return false;
     }
 
-    // God of Death's whim (50% chance for dramatic effect)
-    return Math.random() < 0.5;
+    // The actual decision: Entertainment value!
+    // The God of Death will PRETEND to care about destiny,
+    // but really cares about putting on a good show
+    if (world) {
+      const position = entity.components.get('position') as any;
+      const deathLocation = position ? { x: position.x, y: position.y } : { x: 0, y: 0 };
+      const entertainmentValue = this.calculateEntertainmentValue(world, entity, deathLocation);
+
+      // Threshold: 0.3 = theatrical enough to bother
+      return entertainmentValue >= 0.3;
+    }
+
+    // Fallback if no world provided (testing): always qualify if checks pass
+    return true;
   }
 
   /**
