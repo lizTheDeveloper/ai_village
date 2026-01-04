@@ -1092,7 +1092,327 @@ const wordsMadeFlesh: PlotLineTemplate = {
 
 ---
 
-## Phase 7: Cross-Universe Incursions (Server-Driven Parallel Content)
+## Phase 7: Plot Composition & Nesting
+
+### Plots Are Hierarchical
+
+Like Foundation, a great narrative is composed of many plots at different scales, all running simultaneously and feeding into each other:
+
+```
+EPIC: "The Convergence War" (multi-lifetime)
+├── LARGE: "The First Contact Crisis" (years)
+│   ├── MEDIUM: "The Diplomat's Gambit" (months)
+│   │   ├── SMALL: "Learning Their Language" (weeks)
+│   │   │   └── MICRO: "The Word That Changed Everything" (moment)
+│   │   └── SMALL: "The Ambassador's Doubt" (weeks)
+│   └── MEDIUM: "The Border Skirmishes" (months)
+│       ├── SMALL: "A Soldier's Grief" (weeks)
+│       └── SMALL: "The Defector" (weeks)
+├── LARGE: "The Occupation" (years)
+│   └── ...
+└── LARGE: "The Liberation" (years)
+    └── ...
+```
+
+### Plot Composition Types
+
+```typescript
+interface PlotComposition {
+  /** This plot is part of a larger plot */
+  parent_plot?: {
+    template_id: string;
+    instance_id: string;
+    /** How this plot affects the parent */
+    contribution: PlotContribution;
+  };
+
+  /** This plot spawns child plots */
+  child_plots?: ChildPlotRule[];
+
+  /** This plot runs in parallel with sibling plots */
+  sibling_awareness?: {
+    /** Can see sibling plot states */
+    visible_siblings: string[];
+    /** Sibling completion affects this plot */
+    sibling_dependencies?: SiblingDependency[];
+  };
+}
+
+type PlotContribution =
+  | { type: 'advances_stage'; stage_id: string }     // Completing this advances parent
+  | { type: 'unlocks_transition'; transition_id: string }  // Enables a parent transition
+  | { type: 'modifies_outcome'; outcome_weight: Record<string, number> }  // Shifts parent ending probabilities
+  | { type: 'provides_context'; context_key: string }  // Adds narrative context to parent
+
+interface ChildPlotRule {
+  /** When to spawn the child plot */
+  trigger: 'on_stage_enter' | 'on_stage_exit' | 'on_condition_met';
+  trigger_stage?: string;
+  trigger_condition?: PlotCondition;
+
+  /** What child plot to spawn */
+  child_template_id: string;
+
+  /** How many instances (for ensemble casts) */
+  instance_count?: number | { min: number; max: number };
+
+  /** Who gets assigned the child plot */
+  assignment: 'self' | 'all_involved' | 'random_nearby' | 'specific_role';
+  role?: string;
+}
+```
+
+### Example: The Convergence War (Epic Composition)
+
+```typescript
+const theConvergenceWar: PlotLineTemplate = {
+  id: 'convergence_war',
+  name: 'The Convergence War',
+  scale: 'epic',
+
+  lesson: {
+    theme: 'Survival and transformation',
+    domain: 'transcendence',
+    insight: 'When worlds collide, both are forever changed.',
+    wisdom_value: 100,
+    repeatable: false,
+  },
+
+  // This epic plot SPAWNS large plots at each stage
+  composition: {
+    child_plots: [
+      {
+        trigger: 'on_stage_enter',
+        trigger_stage: 'first_contact',
+        child_template_id: 'first_contact_crisis',  // LARGE plot
+        assignment: 'all_involved',
+      },
+      {
+        trigger: 'on_stage_enter',
+        trigger_stage: 'open_war',
+        child_template_id: 'the_resistance',  // LARGE plot
+        instance_count: { min: 2, max: 5 },  // Multiple resistance cells
+        assignment: 'random_nearby',
+      },
+      {
+        trigger: 'on_stage_enter',
+        trigger_stage: 'resolution',
+        child_template_id: 'the_reckoning',  // LARGE plot
+        assignment: 'specific_role',
+        role: 'war_leader',
+      },
+    ],
+  },
+
+  entry_stage: 'pre_contact',
+  completion_stages: ['victory', 'defeat', 'synthesis', 'stalemate'],
+
+  stages: [
+    { stage_id: 'pre_contact', name: 'Before They Came', description: 'Life as it was.' },
+    { stage_id: 'first_contact', name: 'The Arrival', description: 'They are here.' },
+    { stage_id: 'negotiation', name: 'Attempts at Peace', description: 'Words before weapons.' },
+    { stage_id: 'open_war', name: 'The War', description: 'Blood and fire.' },
+    { stage_id: 'turning_point', name: 'The Pivot', description: 'Something changes everything.' },
+    { stage_id: 'resolution', name: 'The End Begins', description: 'One way or another, it ends.' },
+    { stage_id: 'victory', name: 'We Survived', description: 'Scarred but standing.' },
+    { stage_id: 'defeat', name: 'We Fell', description: 'They won. We adapt or perish.' },
+    { stage_id: 'synthesis', name: 'We Became One', description: 'Neither side won. Both changed.' },
+    { stage_id: 'stalemate', name: 'Eternal War', description: 'It never ends. It becomes normal.' },
+  ],
+
+  transitions: [
+    // Parent plot advances based on CHILD plot outcomes
+    {
+      from_stage: 'first_contact',
+      to_stage: 'negotiation',
+      conditions: [
+        { type: 'child_plot_completed', template_id: 'first_contact_crisis', outcome: 'diplomatic' },
+      ],
+    },
+    {
+      from_stage: 'first_contact',
+      to_stage: 'open_war',
+      conditions: [
+        { type: 'child_plot_completed', template_id: 'first_contact_crisis', outcome: 'hostile' },
+      ],
+    },
+    // Resolution depends on how many resistance cells succeeded
+    {
+      from_stage: 'resolution',
+      to_stage: 'victory',
+      conditions: [
+        { type: 'child_plot_success_ratio', template_id: 'the_resistance', min_ratio: 0.6 },
+      ],
+    },
+  ],
+};
+```
+
+### Child Plot: First Contact Crisis (Large)
+
+```typescript
+const firstContactCrisis: PlotLineTemplate = {
+  id: 'first_contact_crisis',
+  name: 'The First Contact Crisis',
+  scale: 'large',
+
+  // This plot contributes to its parent
+  composition: {
+    parent_contribution: {
+      type: 'unlocks_transition',
+      // Outcome determines which parent transition activates
+    },
+
+    // This plot spawns medium plots
+    child_plots: [
+      {
+        trigger: 'on_stage_enter',
+        trigger_stage: 'diplomacy_attempt',
+        child_template_id: 'the_diplomats_gambit',  // MEDIUM
+        assignment: 'specific_role',
+        role: 'diplomat',
+      },
+      {
+        trigger: 'on_stage_enter',
+        trigger_stage: 'military_posturing',
+        child_template_id: 'border_skirmishes',  // MEDIUM
+        assignment: 'specific_role',
+        role: 'soldier',
+      },
+    ],
+  },
+
+  stages: [
+    { stage_id: 'detection', name: 'Something Approaches' },
+    { stage_id: 'arrival', name: 'They Land' },
+    { stage_id: 'communication_attempt', name: 'First Words' },
+    { stage_id: 'diplomacy_attempt', name: 'Seeking Understanding' },
+    { stage_id: 'military_posturing', name: 'Show of Force' },
+    { stage_id: 'diplomatic', name: 'Peace Prevails', completion: true },
+    { stage_id: 'hostile', name: 'War Begins', completion: true },
+  ],
+};
+```
+
+### Grandchild Plot: The Diplomat's Gambit (Medium)
+
+```typescript
+const theDiplomatsGambit: PlotLineTemplate = {
+  id: 'diplomats_gambit',
+  name: "The Diplomat's Gambit",
+  scale: 'medium',
+
+  composition: {
+    parent_contribution: {
+      type: 'modifies_outcome',
+      outcome_weight: {
+        'diplomatic': 0.3,  // Success increases peace chance
+        'hostile': -0.3,    // Success decreases war chance
+      },
+    },
+
+    // Spawns small plots for the diplomat
+    child_plots: [
+      {
+        trigger: 'on_stage_enter',
+        trigger_stage: 'learning',
+        child_template_id: 'learning_their_language',  // SMALL
+        assignment: 'self',
+      },
+      {
+        trigger: 'on_condition_met',
+        trigger_condition: { type: 'stress_threshold', min: 70 },
+        child_template_id: 'the_ambassadors_doubt',  // SMALL - personal crisis
+        assignment: 'self',
+      },
+    ],
+  },
+
+  stages: [
+    { stage_id: 'assigned', name: 'Chosen for the Impossible' },
+    { stage_id: 'learning', name: 'Understanding the Other' },
+    { stage_id: 'first_meeting', name: 'Face to Face' },
+    { stage_id: 'breakthrough', name: 'A Connection' },
+    { stage_id: 'setback', name: 'Trust Broken' },
+    { stage_id: 'success', name: 'Peace Achieved', completion: true },
+    { stage_id: 'failure', name: 'Words Failed', completion: true },
+  ],
+};
+```
+
+### Great-Grandchild: The Word That Changed Everything (Micro)
+
+```typescript
+const theWordThatChanged: PlotLineTemplate = {
+  id: 'word_that_changed',
+  name: 'The Word That Changed Everything',
+  scale: 'micro',
+
+  composition: {
+    parent_contribution: {
+      type: 'advances_stage',
+      stage_id: 'breakthrough',  // Success advances parent to breakthrough
+    },
+  },
+
+  lesson: {
+    theme: 'Communication',
+    domain: 'relationships',
+    insight: 'Sometimes one word carries the weight of worlds.',
+    wisdom_value: 3,
+    repeatable: true,
+  },
+
+  // Micro plot - just a few stages, resolves in minutes
+  stages: [
+    { stage_id: 'moment', name: 'The Crucial Moment' },
+    { stage_id: 'spoken', name: 'Words Exchanged', completion: true },
+    { stage_id: 'silence', name: 'Words Failed', failure: true },
+  ],
+};
+```
+
+### New Condition Types for Composition
+
+```typescript
+// Check child plot states
+| { type: 'child_plot_active'; template_id: string }
+| { type: 'child_plot_completed'; template_id: string; outcome?: string }
+| { type: 'child_plot_failed'; template_id: string }
+| { type: 'child_plot_success_ratio'; template_id: string; min_ratio: number }
+| { type: 'child_plot_count'; template_id: string; min?: number; max?: number }
+
+// Check parent plot state (for child awareness)
+| { type: 'parent_plot_stage'; stage_id: string }
+| { type: 'parent_plot_endangered' }  // Parent might fail
+
+// Check sibling plots
+| { type: 'sibling_plot_completed'; template_id: string }
+| { type: 'any_sibling_failed' }
+```
+
+### How It Plays Out
+
+When the Convergence War epic begins:
+
+1. **Epic plot** enters `first_contact` stage
+2. This **spawns** the "First Contact Crisis" large plot for all involved souls
+3. That large plot enters `diplomacy_attempt` stage
+4. This **spawns** "The Diplomat's Gambit" medium plot for the diplomat soul
+5. That medium plot enters `learning` stage
+6. This **spawns** "Learning Their Language" small plot
+7. During that, stress rises, triggering "The Ambassador's Doubt" small plot (parallel)
+8. A key moment spawns "The Word That Changed Everything" micro plot
+9. **Micro completes** → advances medium plot to `breakthrough`
+10. **Medium completes successfully** → modifies large plot outcome weights (+diplomatic)
+11. **Large completes with 'diplomatic'** → unlocks epic transition to `negotiation`
+12. **Epic advances** → spawns new large plots for the negotiation phase...
+
+Each soul experiences the war through their own nested plot tree. A soldier has different plots than a diplomat. But all their plots compose into the same epic.
+
+---
+
+## Phase 8: Cross-Universe Incursions (Server-Driven Parallel Content)
 
 ### The Pattern: Forked Universe as Incubation Chamber
 
@@ -1579,6 +1899,648 @@ interface ParallelRelationship {
 ```
 
 This creates immediate dramatic tension: an alien arrives and *knows you*. They remember fighting alongside you. They remember your death. They remember your wedding. But you've never seen them before.
+
+---
+
+## Phase 9: Origins, Capability Domains, and Game Modes
+
+### The Problem
+
+The game has systems for:
+- Farming and crafting
+- Relationships and social dynamics
+- Magic paradigms and spell creation
+- Transcendence and cosmic awareness
+- Universe forking and timeline manipulation
+
+But not every playthrough should expose everything. A cozy farming sim doesn't need timeline manipulation. A Transcendent Fae campaign starts with capabilities that a human farmer earns over lifetimes.
+
+### Origin Templates
+
+What you **are** when you begin:
+
+```typescript
+interface OriginTemplate {
+  id: string;
+  name: string;
+  description: string;
+
+  /** Species/type of being */
+  being_type: BeingType;
+
+  /** Starting capability levels */
+  initial_capabilities: Partial<CapabilityLevels>;
+
+  /** Capability ceilings (can't exceed these without transcendence) */
+  capability_ceilings: Partial<CapabilityLevels>;
+
+  /** Starting soul state */
+  soul_template: {
+    archetype: SoulArchetype;
+    initial_wisdom: number;
+    initial_lessons: string[];
+    transcendence_level: TranscendenceLevel;
+  };
+
+  /** Starting components to add */
+  initial_components: ComponentTemplate[];
+
+  /** Which plots are available/forbidden */
+  plot_access: {
+    available_templates: string[];  // Whitelist (if empty, all available)
+    forbidden_templates: string[];  // Blacklist
+    starting_plots?: string[];      // Auto-assigned on spawn
+  };
+
+  /** Narrative context */
+  lore: {
+    origin_story: string;
+    cultural_background?: string;
+    native_realm?: string;
+  };
+}
+
+type BeingType =
+  | 'mortal_human'
+  | 'mortal_animal'
+  | 'fae_lesser'
+  | 'fae_transcendent'
+  | 'spirit'
+  | 'ghost'
+  | 'elemental'
+  | 'construct'
+  | 'deity_minor'
+  | 'deity_major'
+  | 'eldritch';
+
+type TranscendenceLevel =
+  | 0   // Mortal - no transcendence
+  | 1   // Awakened - aware of soul
+  | 2   // Seeker - pursuing transcendence
+  | 3   // Initiate - touched the beyond
+  | 4   // Adept - regular transcendent experiences
+  | 5   // Master - controls transcendent abilities
+  | 6   // Sage - teaches transcendence
+  | 7   // Transcendent - exists partially beyond
+  | 8   // Celestial - exists primarily beyond
+  | 9   // Divine - shapes reality
+  | 10; // Absolute - is reality
+```
+
+### Capability Domains
+
+Everything an entity can potentially do, organized into domains:
+
+```typescript
+interface CapabilityLevels {
+  // === PHYSICAL DOMAIN ===
+  physical: {
+    farming: number;        // 0-100
+    crafting: number;
+    combat: number;
+    athletics: number;
+    survival: number;
+  };
+
+  // === SOCIAL DOMAIN ===
+  social: {
+    conversation: number;
+    persuasion: number;
+    leadership: number;
+    empathy: number;
+    deception: number;
+  };
+
+  // === COGNITIVE DOMAIN ===
+  cognitive: {
+    learning_rate: number;
+    memory_capacity: number;
+    planning_depth: number;
+    creativity: number;
+    focus: number;
+  };
+
+  // === MAGICAL DOMAIN ===
+  magical: {
+    mana_capacity: number;
+    paradigm_access: MagicParadigm[];  // Which magic systems available
+    spell_complexity: number;
+    enchantment: number;
+    ritual: number;
+  };
+
+  // === TRANSCENDENT DOMAIN ===
+  transcendent: {
+    soul_awareness: number;       // Can perceive own soul
+    other_awareness: number;      // Can perceive other souls
+    universe_awareness: number;   // Can perceive universe structure
+    timeline_perception: number;  // Can perceive alternate timelines
+    reality_influence: number;    // Can affect reality directly
+    fork_capability: number;      // Can create/navigate forks
+  };
+
+  // === META DOMAIN (usually hidden) ===
+  meta: {
+    save_awareness: number;       // Knows about saves
+    player_awareness: number;     // Knows about the player
+    narrative_awareness: number;  // Knows they're in a story
+    fourth_wall: number;          // Can break the fourth wall
+  };
+}
+```
+
+### Game Mode Definitions
+
+A game mode is a **scoped view** into the full capability space:
+
+```typescript
+interface GameMode {
+  id: string;
+  name: string;
+  description: string;
+  tagline: string;  // "Cozy farming with friends" or "Ascend to godhood"
+
+  /** Which origins are available in this mode */
+  available_origins: string[];
+
+  /** Default origin if player doesn't choose */
+  default_origin: string;
+
+  /** Capability domain visibility/access */
+  domain_access: {
+    physical: DomainAccess;
+    social: DomainAccess;
+    cognitive: DomainAccess;
+    magical: DomainAccess;
+    transcendent: DomainAccess;
+    meta: DomainAccess;
+  };
+
+  /** UI exposure */
+  ui_exposure: {
+    show_soul_panel: boolean;
+    show_transcendence_meter: boolean;
+    show_timeline_navigator: boolean;
+    show_universe_map: boolean;
+    show_plot_tracker: boolean;
+  };
+
+  /** Plot scope */
+  plot_scope: {
+    max_scale: PlotScale;  // 'micro' | 'small' | 'medium' | 'large' | 'epic'
+    enabled_plot_categories: string[];
+    starting_epic?: string;  // Auto-assign world-level epic plot
+  };
+
+  /** Difficulty/pacing */
+  pacing: {
+    time_scale: number;        // 1.0 = normal
+    threat_level: number;      // 0-10
+    resource_abundance: number; // 0-10
+    social_complexity: number;  // 0-10
+  };
+}
+
+type DomainAccess =
+  | 'hidden'      // Domain doesn't exist in this mode
+  | 'locked'      // Exists but starts inaccessible
+  | 'gated'       // Unlocks through progression
+  | 'available'   // Accessible from start
+  | 'focus';      // Primary domain of this mode
+```
+
+### Example Game Modes
+
+```typescript
+const GAME_MODES: GameMode[] = [
+  {
+    id: 'cozy_farm',
+    name: 'Peaceful Valley',
+    tagline: 'Grow crops, make friends, find peace',
+    description: 'A gentle farming experience focused on crops, animals, and community.',
+
+    available_origins: ['mortal_human', 'mortal_animal'],
+    default_origin: 'mortal_human',
+
+    domain_access: {
+      physical: 'focus',      // Main gameplay
+      social: 'available',    // Make friends
+      cognitive: 'available', // Learn recipes
+      magical: 'hidden',      // No magic
+      transcendent: 'hidden', // No transcendence
+      meta: 'hidden',
+    },
+
+    ui_exposure: {
+      show_soul_panel: false,
+      show_transcendence_meter: false,
+      show_timeline_navigator: false,
+      show_universe_map: false,
+      show_plot_tracker: true,  // Simple story tracker
+    },
+
+    plot_scope: {
+      max_scale: 'medium',  // No epic plots
+      enabled_plot_categories: ['farming', 'relationships', 'community', 'seasons'],
+    },
+
+    pacing: {
+      time_scale: 0.5,        // Slower, relaxed
+      threat_level: 1,        // Very safe
+      resource_abundance: 8,  // Plentiful
+      social_complexity: 4,   // Simple friendships
+    },
+  },
+
+  {
+    id: 'village_life',
+    name: 'Village Chronicles',
+    tagline: 'Live, love, and shape your community',
+    description: 'Full village simulation with relationships, professions, and community events.',
+
+    available_origins: ['mortal_human'],
+    default_origin: 'mortal_human',
+
+    domain_access: {
+      physical: 'available',
+      social: 'focus',        // Main gameplay
+      cognitive: 'available',
+      magical: 'gated',       // Unlock later
+      transcendent: 'locked', // Very late game
+      meta: 'hidden',
+    },
+
+    ui_exposure: {
+      show_soul_panel: false,
+      show_transcendence_meter: false,
+      show_timeline_navigator: false,
+      show_universe_map: false,
+      show_plot_tracker: true,
+    },
+
+    plot_scope: {
+      max_scale: 'large',
+      enabled_plot_categories: ['relationships', 'profession', 'community', 'mystery', 'romance'],
+    },
+
+    pacing: {
+      time_scale: 1.0,
+      threat_level: 3,
+      resource_abundance: 5,
+      social_complexity: 8,
+    },
+  },
+
+  {
+    id: 'mage_academy',
+    name: 'Arcane Academy',
+    tagline: 'Master the mysteries of magic',
+    description: 'Focus on learning magic paradigms, crafting spells, and academic politics.',
+
+    available_origins: ['mortal_human', 'fae_lesser'],
+    default_origin: 'mortal_human',
+
+    domain_access: {
+      physical: 'available',
+      social: 'available',
+      cognitive: 'focus',     // Learning is key
+      magical: 'focus',       // Main gameplay
+      transcendent: 'gated',  // Advanced magic touches transcendence
+      meta: 'locked',
+    },
+
+    ui_exposure: {
+      show_soul_panel: true,
+      show_transcendence_meter: true,
+      show_timeline_navigator: false,
+      show_universe_map: false,
+      show_plot_tracker: true,
+    },
+
+    plot_scope: {
+      max_scale: 'large',
+      enabled_plot_categories: ['magic', 'academia', 'rivalry', 'discovery', 'power'],
+    },
+  },
+
+  {
+    id: 'transcendent_fae',
+    name: 'Courts of the Eternal',
+    tagline: 'Dance in the courts of beings who shaped reality',
+    description: 'Play as a Transcendent Fae navigating cosmic politics and reality-shaping power.',
+
+    available_origins: ['fae_transcendent'],
+    default_origin: 'fae_transcendent',
+
+    domain_access: {
+      physical: 'available',
+      social: 'focus',        // Fae politics
+      cognitive: 'available',
+      magical: 'focus',       // Innate magic
+      transcendent: 'focus',  // Core gameplay
+      meta: 'gated',          // Very high-level fae may perceive
+    },
+
+    ui_exposure: {
+      show_soul_panel: true,
+      show_transcendence_meter: true,
+      show_timeline_navigator: true,  // Fae perceive timelines
+      show_universe_map: true,        // Fae perceive multiverse
+      show_plot_tracker: true,
+    },
+
+    plot_scope: {
+      max_scale: 'epic',
+      enabled_plot_categories: ['transcendence', 'cosmic', 'politics', 'love', 'betrayal', 'reality'],
+      starting_epic: 'the_eternal_dance',  // Fae political epic
+    },
+
+    pacing: {
+      time_scale: 2.0,        // Time moves differently for fae
+      threat_level: 7,        // High stakes
+      resource_abundance: 6,
+      social_complexity: 10,  // Byzantine fae politics
+    },
+  },
+
+  {
+    id: 'ascension_path',
+    name: 'The Long Road',
+    tagline: 'Begin as a farmer. End as a god.',
+    description: 'Full progression from mortal to divine across multiple lifetimes.',
+
+    available_origins: ['mortal_human', 'mortal_animal'],
+    default_origin: 'mortal_human',
+
+    domain_access: {
+      physical: 'available',
+      social: 'available',
+      cognitive: 'available',
+      magical: 'gated',
+      transcendent: 'gated',
+      meta: 'gated',          // Ultimate endgame
+    },
+
+    ui_exposure: {
+      show_soul_panel: true,
+      show_transcendence_meter: true,
+      show_timeline_navigator: false,  // Unlock later
+      show_universe_map: false,        // Unlock later
+      show_plot_tracker: true,
+    },
+
+    plot_scope: {
+      max_scale: 'epic',
+      enabled_plot_categories: ['*'],  // All categories
+      starting_epic: 'the_mortal_journey',
+    },
+  },
+
+  {
+    id: 'sandbox_divine',
+    name: 'Divine Sandbox',
+    tagline: 'You are already everything. What will you do?',
+    description: 'Start as a minor deity. Shape worlds. Watch civilizations rise and fall.',
+
+    available_origins: ['deity_minor', 'deity_major'],
+    default_origin: 'deity_minor',
+
+    domain_access: {
+      physical: 'available',
+      social: 'available',
+      cognitive: 'available',
+      magical: 'focus',
+      transcendent: 'focus',
+      meta: 'available',      // Deities know
+    },
+
+    ui_exposure: {
+      show_soul_panel: true,
+      show_transcendence_meter: true,
+      show_timeline_navigator: true,
+      show_universe_map: true,
+      show_plot_tracker: true,
+    },
+
+    plot_scope: {
+      max_scale: 'epic',
+      enabled_plot_categories: ['*'],
+    },
+
+    pacing: {
+      time_scale: 10.0,       // Watch eras pass
+      threat_level: 5,        // Other deities exist
+      resource_abundance: 10, // Unlimited for deities
+      social_complexity: 10,
+    },
+  },
+];
+```
+
+### Origin Examples
+
+```typescript
+const ORIGINS: OriginTemplate[] = [
+  {
+    id: 'mortal_human',
+    name: 'Human',
+    being_type: 'mortal_human',
+    description: 'A mortal human with unlimited potential but limited starting capabilities.',
+
+    initial_capabilities: {
+      physical: { farming: 10, crafting: 5, combat: 5, athletics: 20, survival: 15 },
+      social: { conversation: 30, persuasion: 10, empathy: 20 },
+      cognitive: { learning_rate: 50, memory_capacity: 50, creativity: 40 },
+      magical: { mana_capacity: 0, paradigm_access: [], spell_complexity: 0 },
+      transcendent: { soul_awareness: 0, universe_awareness: 0 },
+    },
+
+    capability_ceilings: {
+      physical: { farming: 100, crafting: 100, combat: 100 },
+      social: { conversation: 100, leadership: 100 },
+      magical: { mana_capacity: 50, spell_complexity: 50 },  // Limited without transcendence
+      transcendent: { soul_awareness: 30 },  // Can sense, not master
+    },
+
+    soul_template: {
+      archetype: 'wanderer',  // Undefined potential
+      initial_wisdom: 0,
+      initial_lessons: [],
+      transcendence_level: 0,
+    },
+
+    lore: {
+      origin_story: 'Born into the world knowing nothing, capable of becoming anything.',
+    },
+  },
+
+  {
+    id: 'fae_transcendent',
+    name: 'Transcendent Fae',
+    being_type: 'fae_transcendent',
+    description: 'An ancient fae who has existed since before mortals named the stars.',
+
+    initial_capabilities: {
+      physical: { farming: 20, crafting: 60, combat: 40 },
+      social: { conversation: 80, persuasion: 70, deception: 60, empathy: 30 },
+      cognitive: { learning_rate: 30, memory_capacity: 200, creativity: 90 },
+      magical: { mana_capacity: 150, paradigm_access: ['fae_glamour', 'literary_surrealism', 'wild_magic'], spell_complexity: 80 },
+      transcendent: {
+        soul_awareness: 90,
+        other_awareness: 70,
+        universe_awareness: 60,
+        timeline_perception: 50,
+        reality_influence: 40,
+      },
+    },
+
+    capability_ceilings: {
+      // Fae have high ceilings but specific weaknesses
+      physical: { farming: 50 },  // Fae don't farm well - too ephemeral
+      social: { empathy: 50 },    // Fae struggle with mortal emotions
+      transcendent: { reality_influence: 80 },  // Very high ceiling
+    },
+
+    soul_template: {
+      archetype: 'trickster',
+      initial_wisdom: 200,
+      initial_lessons: ['time_is_illusion', 'words_are_power', 'beauty_is_truth'],
+      transcendence_level: 7,
+    },
+
+    plot_access: {
+      forbidden_templates: ['simple_farming', 'first_job'],  // Too mundane
+      starting_plots: ['the_eternal_dance', 'the_fae_debt'],
+    },
+
+    lore: {
+      origin_story: 'You remember when this universe was young. You helped shape its dreams.',
+      cultural_background: 'The Courts of the Eternal Twilight',
+      native_realm: 'The Dreaming',
+    },
+  },
+];
+```
+
+### Capability Progression
+
+How capabilities grow and unlock:
+
+```typescript
+interface CapabilityProgression {
+  /** Gradual improvement through use */
+  skill_growth: {
+    base_rate: number;            // XP per action
+    diminishing_returns: boolean; // Harder at higher levels
+    ceiling_approach: 'asymptotic' | 'hard_cap';
+  };
+
+  /** Step-change unlocks */
+  threshold_unlocks: ThresholdUnlock[];
+
+  /** Plot-gated unlocks */
+  plot_unlocks: PlotUnlock[];
+
+  /** Transcendence-gated unlocks */
+  transcendence_unlocks: TranscendenceUnlock[];
+}
+
+interface ThresholdUnlock {
+  /** What capability triggers this */
+  trigger_capability: string;
+  trigger_level: number;
+
+  /** What unlocks */
+  unlocks: {
+    new_capabilities?: string[];
+    ceiling_increase?: { capability: string; new_ceiling: number }[];
+    domain_access?: { domain: string; access: DomainAccess }[];
+  };
+}
+
+interface TranscendenceUnlock {
+  /** Transcendence level required */
+  level: TranscendenceLevel;
+
+  /** What becomes available */
+  unlocks: {
+    domain_access?: { domain: string; access: DomainAccess }[];
+    ui_exposure?: Partial<GameMode['ui_exposure']>;
+    capability_ceilings?: Partial<CapabilityLevels>;
+    plot_templates?: string[];
+  };
+}
+```
+
+### Example: The Farmer's Ascension
+
+A mortal human in "Ascension Path" mode:
+
+**Day 1**:
+- Origin: `mortal_human`
+- Domains visible: Physical, Social, Cognitive
+- Capabilities: Basic farming, conversation
+- Plots available: "First Harvest", "Making Friends"
+
+**Year 5**:
+- Physical farming hits 50
+- Threshold unlock: "Agricultural Mastery" - can now craft magical fertilizers
+- Magical domain becomes `gated` → `available`
+- First glimpse of magical paradigms
+
+**Year 20**:
+- Wisdom accumulates from completed plots
+- Soul awareness reaches 30 (ceiling for mortals)
+- Strange dreams begin (transcendence foreshadowing)
+- Plot assigned: "The Calling" (medium scale)
+
+**Transcendence Level 1** (after completing "The Calling"):
+- Transcendent domain unlocks from `locked` → `gated`
+- UI shows soul panel
+- New capabilities: can sense other souls faintly
+- Ceiling increases for magical domain
+- Plot unlocked: "The Seeker's Journey" (large scale)
+
+**Transcendence Level 5**:
+- Timeline Navigator UI unlocks
+- Can perceive alternate timelines
+- Capable of teaching others
+- Plot: "The Mentor's Shadow" available (teaching others)
+
+**Transcendence Level 8**:
+- Universe Map UI unlocks
+- Can perceive the multiverse structure
+- Reality influence capability unlocked
+- Epic plots become available
+- The farmer who started with 10 farming skill can now shape reality
+
+### Mode Switching and Soul Continuity
+
+Souls persist across game modes:
+
+```typescript
+interface SoulModeTransition {
+  /** Soul being transitioned */
+  soul_id: string;
+
+  /** Source mode */
+  from_mode: string;
+
+  /** Target mode */
+  to_mode: string;
+
+  /** How capabilities translate */
+  capability_mapping: 'preserve' | 'scale' | 'reset';
+
+  /** What happens to active plots */
+  plot_handling: 'continue' | 'pause' | 'adapt' | 'abandon';
+
+  /** Wisdom/lessons always preserved */
+  wisdom_preserved: true;  // Always true - wisdom is eternal
+}
+```
+
+A soul that achieved godhood in "Ascension Path" can be brought into "Cozy Farm" mode - they'll have their wisdom and lessons, but their transcendent capabilities will be `hidden` (not removed, just not accessible in this mode). They might experience strange dreams or déjà vu. If they switch to "Divine Sandbox" mode, full capabilities return.
 
 ---
 
