@@ -184,6 +184,8 @@ export enum ComponentType {
   AfterlifeMemory = 'afterlife_memory',
   SoulWisdom = 'soul_wisdom',
   SoulIdentity = 'soul_identity',
+  SilverThread = 'silver_thread',
+  PlotLines = 'plot_lines',
   Incarnation = 'incarnation',
   SoulLink = 'soul_link',
   SoulCreationEvent = 'soul_creation_event',

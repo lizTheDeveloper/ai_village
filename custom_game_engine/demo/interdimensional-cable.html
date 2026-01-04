@@ -459,13 +459,23 @@
         this.spriteCache = new Map(); // Cache loaded sprite frames
       }
 
-      async loadRecording(recordingPath) {
+      async loadRecording(recordingPathOrData) {
         try {
-          console.log('[ReplayRenderer] Loading recording:', recordingPath);
-          const response = await fetch(recordingPath);
-          if (!response.ok) throw new Error(`Failed to load recording: ${response.status}`);
+          console.log('[ReplayRenderer] Loading recording:', recordingPathOrData);
 
-          this.recording = await response.json();
+          // Check if this is embedded recording data or a path
+          if (typeof recordingPathOrData === 'object' && recordingPathOrData.frames) {
+            // Embedded recording data from game world
+            this.recording = recordingPathOrData;
+            console.log('[ReplayRenderer] Using embedded recording data from game world');
+          } else {
+            // Path to JSON file
+            const response = await fetch(recordingPathOrData);
+            if (!response.ok) throw new Error(`Failed to load recording: ${response.status}`);
+
+            this.recording = await response.json();
+          }
+
           this.frames = this.recording.frames;
           this.currentFrameIndex = 0;
 
@@ -697,7 +707,10 @@
         if (show.type === 'recording') {
           // Use ReplayRenderer for recordings
           const player = new ReplayRenderer(canvas);
-          await player.loadRecording(show.recordingPath);
+
+          // Use embedded data if available, otherwise load from path
+          const recordingSource = show.recordingData || show.recordingPath;
+          await player.loadRecording(recordingSource);
           player.start();
         } else {
           // Use SpriteAnimationPlayer for sprite animations
@@ -739,7 +752,10 @@
         if (show.type === 'recording') {
           // Use ReplayRenderer for recordings
           currentPlayer = new ReplayRenderer(canvas);
-          await currentPlayer.loadRecording(show.recordingPath);
+
+          // Use embedded data if available, otherwise load from path
+          const recordingSource = show.recordingData || show.recordingPath;
+          await currentPlayer.loadRecording(recordingSource);
           currentPlayer.start();
         } else {
           // Use SpriteAnimationPlayer for sprite animations
@@ -798,9 +814,61 @@
     console.log('[Interdimensional Cable] Initializing shows...');
     console.log('[Interdimensional Cable] Available shows:', SHOWS.length);
     SHOWS.forEach((show, idx) => {
-      console.log(`[Interdimensional Cable] Show ${idx + 1}: ${show.name} (${show.animation}, ${show.frameCount} frames)`);
+      const details = show.type === 'sprite' ? `${show.animation}, ${show.frameCount} frames` : 'recording';
+      console.log(`[Interdimensional Cable] Show ${idx + 1}: ${show.name} (${details})`);
     });
     initializeShows();
+  </script>
+
+  <!-- Load recordings from game world -->
+  <script type="module" src="./interdimensional-cable-app.ts"></script>
+  <script type="module">
+    // Wait for gameLoop to be ready, then load recordings
+    let checkInterval = setInterval(() => {
+      if (window.__gameLoop && window.loadRecordingsFromWorld) {
+        clearInterval(checkInterval);
+        console.log('[Interdimensional Cable] GameLoop detected, loading recordings from world...');
+
+        const worldRecordings = window.loadRecordingsFromWorld();
+        console.log(`[Interdimensional Cable] Loaded ${worldRecordings.length} recordings from world`);
+
+        // Add world recordings to SHOWS array
+        worldRecordings.forEach(show => {
+          SHOWS.push(show);
+        });
+
+        // Add new shows to grid
+        if (worldRecordings.length > 0) {
+          console.log('[Interdimensional Cable] Adding world recordings to grid...');
+          const grid = document.getElementById('tvGrid');
+          if (grid) {
+            worldRecordings.forEach(show => {
+              const uniqueId = show.id + '-recording';
+              const showDiv = document.createElement('div');
+              showDiv.className = 'tv-show';
+              showDiv.innerHTML = `
+                <div class="show-title">${show.name}</div>
+                <div class="show-status" id="status-${uniqueId}">⏳ Loading...</div>
+                <div class="canvas-container" id="container-${uniqueId}">
+                  <div class="loading">◆ LOADING TRANSMISSION ◆</div>
+                </div>
+              `;
+              showDiv.onclick = () => openPlayer(show);
+              grid.appendChild(showDiv);
+
+              // Load preview
+              loadShowPreview(show);
+            });
+          }
+        }
+      }
+    }, 500); // Check every 500ms
+
+    // Stop checking after 10 seconds
+    setTimeout(() => {
+      clearInterval(checkInterval);
+      console.log('[Interdimensional Cable] Stopped waiting for gameLoop');
+    }, 10000);
   </script>
 </body>
 </html>
