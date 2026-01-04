@@ -2046,6 +2046,549 @@ const LIVING_VINE_MATERIAL: ItemDefinition = defineItem(
 );
 
 // ============================================================================
+// CHAOTIC MATERIALS - Aggressive Growth
+// ============================================================================
+
+const RAMPANT_VINE: ItemDefinition = defineItem(
+  'material:rampant_vine',
+  'Rampant Vine',
+  'material',
+  {
+    weight: 0.6,
+    stackSize: 30,
+    baseMaterial: 'plant',
+    isGatherable: true,
+    gatherSources: ['experimental_botany', 'jungle_mutation', 'chaos_garden'],
+    baseValue: 15,
+    rarity: 'uncommon',
+    traits: {
+      material: {
+        isLiving: true,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        requiresLight: true,
+        decayRate: 0.05,
+        hostility: 0.3,
+        transmutation: 'grows 10 tiles/hour, covers buildings overnight, spreads to neighbors',
+        aestheticDescription: 'Thick green vines growing impossibly fast, strangling coverage, flowers everywhere',
+        isBuildingMaterial: true,
+        structuralStrength: 60,
+        temperatureResistance: -30,
+        moistureResistance: 95,
+      },
+    },
+  }
+);
+
+const EXPLOSIVE_FUNGUS: ItemDefinition = defineItem(
+  'material:explosive_fungus',
+  'Explosive Fungus',
+  'material',
+  {
+    weight: 0.4,
+    stackSize: 5,
+    baseMaterial: 'fungus',
+    isGatherable: true,
+    gatherSources: ['unstable_mushroom_grove', 'alchemical_accident', 'volatile_spores'],
+    baseValue: 200,
+    rarity: 'rare',
+    traits: {
+      material: {
+        isLiving: true,
+        isEdible: false,
+        isTransient: true,
+        isSolid: true,
+        requiresDark: true,
+        decayRate: 0.1,
+        hostility: 0.95,
+        transmutation: 'explodes when disturbed, chain reactions possible, spreads spores',
+        aestheticDescription: 'Glowing orange-red mushrooms with pulsing light, sizzling sound before detonation',
+        isBuildingMaterial: false,
+        structuralStrength: 5,
+        temperatureResistance: -80,
+        moistureResistance: 70,
+      },
+    },
+  }
+);
+
+const CRYSTALLIZING_MOLD: ItemDefinition = defineItem(
+  'material:crystallizing_mold',
+  'Crystallizing Mold',
+  'material',
+  {
+    weight: 0.3,
+    stackSize: 15,
+    baseMaterial: 'mold',
+    isGatherable: true,
+    gatherSources: ['crystal_cave', 'petrification_zone', 'fossilizing_swamp'],
+    baseValue: 80,
+    rarity: 'uncommon',
+    traits: {
+      material: {
+        isLiving: true,
+        isEdible: false,
+        isTransient: true,
+        isSolid: false,
+        decayRate: 0.15,
+        hostility: 0.5,
+        transmutation: 'converts organic matter to crystal, spreads via airborne spores, irreversible',
+        aestheticDescription: 'White-blue crystalline growth spreading like frost, sparkles, preserves shapes inside',
+        isBuildingMaterial: false,
+        structuralStrength: 10,
+        temperatureResistance: 50,
+        moistureResistance: 80,
+      },
+    },
+  }
+);
+
+// ============================================================================
+// CHAOTIC MATERIALS - Infectious/Spreading
+// ============================================================================
+
+const RUST_PLAGUE: ItemDefinition = defineItem(
+  'material:rust_plague',
+  'Rust Plague',
+  'material',
+  {
+    weight: 4.0,
+    stackSize: 5,
+    baseMaterial: 'rust',
+    isGatherable: true,
+    gatherSources: ['infected_scrapyard', 'corroded_ruins', 'rust_outbreak'],
+    baseValue: 300,
+    rarity: 'rare',
+    traits: {
+      material: {
+        isLiving: true,
+        isEdible: false,
+        isTransient: true,
+        isSolid: true,
+        decayRate: 0.25,
+        hostility: 0.85,
+        transmutation: 'infectious rust spreads between metal, airborne transmission, metal crumbles in days',
+        aestheticDescription: 'Orange-brown spreading corrosion, flaking metal, structural groans, iron decay smell',
+        isBuildingMaterial: false,
+        structuralStrength: 10,
+        temperatureResistance: 30,
+        moistureResistance: -20,
+      },
+    },
+  }
+);
+
+const STICKY_SLIME: ItemDefinition = defineItem(
+  'material:sticky_slime',
+  'Sticky Slime',
+  'material',
+  {
+    weight: 1.0,
+    stackSize: 20,
+    baseMaterial: 'slime',
+    isGatherable: true,
+    gatherSources: ['adhesive_swamp', 'slime_creature', 'failed_alchemy'],
+    baseValue: 5,
+    rarity: 'common',
+    traits: {
+      material: {
+        isLiving: true,
+        isEdible: false,
+        isTransient: true,
+        isSolid: false,
+        decayRate: 0.05,
+        hostility: 0.4,
+        transmutation: 'sticks to everything on contact, spreads via touch, never fully dries',
+        aestheticDescription: 'Translucent goop, webs of slime between objects, squelching sounds, sticky mess',
+        isBuildingMaterial: true,
+        structuralStrength: 5,
+        temperatureResistance: 40,
+        moistureResistance: 100,
+      },
+    },
+  }
+);
+
+const LIVING_PAINT: ItemDefinition = defineItem(
+  'material:living_paint',
+  'Living Paint',
+  'material',
+  {
+    weight: 0.7,
+    stackSize: 12,
+    baseMaterial: 'paint',
+    isGatherable: false,
+    craftedFrom: [
+      { itemId: 'pigment', amount: 5 },
+      { itemId: 'artistic_magic', amount: 1 },
+      { itemId: 'color_elemental', amount: 1 },
+    ],
+    baseValue: 150,
+    rarity: 'rare',
+    traits: {
+      material: {
+        isLiving: true,
+        isEdible: false,
+        isTransient: true,
+        isSolid: false,
+        decayRate: 0.1,
+        hostility: 0.2,
+        transmutation: 'sentient paint that moves, creates art autonomously, changes based on mood',
+        aestheticDescription: 'Shifting flowing colors, self-updating murals, walls that breathe and pulse',
+        isBuildingMaterial: true,
+        structuralStrength: 5,
+        temperatureResistance: 30,
+        moistureResistance: 40,
+      },
+      magical: {
+        effects: ['autonomous_art', 'mood_response', 'surveillance'],
+        passive: true,
+        school: 'transmutation',
+      },
+    },
+  }
+);
+
+const WHISPERING_WALLS: ItemDefinition = defineItem(
+  'material:whispering_walls',
+  'Whispering Walls',
+  'material',
+  {
+    weight: 3.5,
+    stackSize: 20,
+    baseMaterial: 'stone',
+    isGatherable: true,
+    gatherSources: ['gossip_quarry', 'memory_stone_deposit', 'eavesdropper_cave'],
+    baseValue: 400,
+    rarity: 'rare',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: 0,
+        hostility: 0.5,
+        transmutation: 'walls gossip about witnessed events, spreads secrets, records everything',
+        aestheticDescription: 'Faint whispers always audible, walls lean in conspiratorially, echoing conversations',
+        isBuildingMaterial: true,
+        structuralStrength: 75,
+        temperatureResistance: 80,
+        moistureResistance: 90,
+      },
+      magical: {
+        effects: ['surveillance', 'memory_recording', 'secret_spreading'],
+        passive: true,
+        school: 'divination',
+      },
+    },
+  }
+);
+
+// ============================================================================
+// CHAOTIC MATERIALS - Physics-Breaking
+// ============================================================================
+
+const GRAVITY_INVERTED_STONE: ItemDefinition = defineItem(
+  'material:gravity_inverted_stone',
+  'Gravity-Inverted Stone',
+  'material',
+  {
+    weight: -3.0,
+    stackSize: 10,
+    baseMaterial: 'anti_gravity',
+    isGatherable: true,
+    gatherSources: ['inverted_mountain', 'anti_gravity_well', 'sky_quarry'],
+    baseValue: 800,
+    rarity: 'rare',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: 0,
+        hostility: 0.3,
+        transmutation: 'falls upward, pulls nearby objects up, escapes to sky if untethered',
+        aestheticDescription: 'Stone that drifts upward continuously, must be tethered or lost forever',
+        isBuildingMaterial: true,
+        structuralStrength: 85,
+        temperatureResistance: 80,
+        moistureResistance: 95,
+      },
+      magical: {
+        effects: ['reverse_gravity', 'upward_pull', 'float_away'],
+        passive: true,
+        school: 'transmutation',
+      },
+    },
+  }
+);
+
+const PARADOX_MATERIAL: ItemDefinition = defineItem(
+  'material:paradox_material',
+  'Paradox Material',
+  'material',
+  {
+    weight: 0,
+    stackSize: 3,
+    baseMaterial: 'paradox',
+    isGatherable: true,
+    gatherSources: ['paradox_engine', 'logical_contradiction', 'schrodingers_stockpile'],
+    baseValue: 2000,
+    rarity: 'epic',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: true,
+        isSolid: true,
+        decayRate: 0.3,
+        hostility: 0.4,
+        transmutation: 'simultaneously solid and liquid, exists and doesn\'t exist, heavy and weightless',
+        aestheticDescription: 'Looks different from every angle, can\'t focus eyes on it, causes dizziness and headaches',
+        isBuildingMaterial: true,
+        structuralStrength: 50,
+        temperatureResistance: 100,
+        moistureResistance: 100,
+      },
+      magical: {
+        effects: ['impossible_architecture', 'quantum_storage', 'existential_dread'],
+        passive: true,
+        cursed: false,
+        school: 'transmutation',
+      },
+    },
+  }
+);
+
+const TIME_DILATED_WOOD: ItemDefinition = defineItem(
+  'material:time_dilated_wood',
+  'Time-Dilated Wood',
+  'material',
+  {
+    weight: 2.2,
+    stackSize: 15,
+    baseMaterial: 'temporal_wood',
+    isGatherable: true,
+    gatherSources: ['temporal_forest', 'time_warped_tree', 'chronological_anomaly'],
+    baseValue: 600,
+    rarity: 'rare',
+    traits: {
+      material: {
+        isLiving: true,
+        isEdible: false,
+        isTransient: true,
+        isSolid: true,
+        decayRate: 0.2,
+        hostility: 0.3,
+        transmutation: 'different parts age at different rates, grows and decays simultaneously',
+        aestheticDescription: 'Rings show impossible age patterns, bark peels and regrows at once, seedlings from ancient wood',
+        isBuildingMaterial: true,
+        structuralStrength: 55,
+        temperatureResistance: 60,
+        moistureResistance: 65,
+      },
+      magical: {
+        effects: ['time_distortion', 'age_variance', 'temporal_storage'],
+        passive: true,
+        school: 'chronurgy',
+      },
+    },
+  }
+);
+
+// ============================================================================
+// CHAOTIC MATERIALS - Sensory/Emotional
+// ============================================================================
+
+const SINGING_METAL: ItemDefinition = defineItem(
+  'material:singing_metal',
+  'Singing Metal',
+  'material',
+  {
+    weight: 4.2,
+    stackSize: 18,
+    baseMaterial: 'harmonic_metal',
+    isGatherable: true,
+    gatherSources: ['harmonic_ore_vein', 'musical_geode', 'tuning_fork_tree'],
+    baseValue: 120,
+    rarity: 'uncommon',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: 0,
+        hostility: 0.2,
+        transmutation: 'constantly emits musical tones, can\'t be silenced, harmonizes with other singing metal',
+        aestheticDescription: 'Metallic humming and singing, vibrates constantly, creates ambient music',
+        isBuildingMaterial: true,
+        structuralStrength: 70,
+        temperatureResistance: 75,
+        moistureResistance: 60,
+      },
+      magical: {
+        effects: ['constant_music', 'harmonics', 'noise'],
+        passive: true,
+        school: 'evocation',
+      },
+    },
+  }
+);
+
+const LAUGHING_GAS_CRYSTAL: ItemDefinition = defineItem(
+  'material:laughing_gas_crystal',
+  'Laughing Gas Crystal',
+  'material',
+  {
+    weight: 0.6,
+    stackSize: 12,
+    baseMaterial: 'comedy_crystal',
+    isGatherable: true,
+    gatherSources: ['comedy_mine', 'giggle_geode', 'humor_elemental'],
+    baseValue: 90,
+    rarity: 'uncommon',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: true,
+        isSolid: true,
+        decayRate: 0.12,
+        hostility: 0.6,
+        transmutation: 'emits laughing gas passively, makes everyone nearby laugh uncontrollably',
+        aestheticDescription: 'Pink-purple crystals with sparkles, giggling sounds emanate, can\'t look without smiling',
+        isBuildingMaterial: true,
+        structuralStrength: 30,
+        temperatureResistance: 60,
+        moistureResistance: 85,
+      },
+      magical: {
+        effects: ['forced_laughter', 'mood_boost', 'productivity_loss'],
+        passive: true,
+        school: 'enchantment',
+      },
+    },
+  }
+);
+
+// ============================================================================
+// CHAOTIC MATERIALS - Cursed/Monkey's Paw
+// ============================================================================
+
+const CURSED_GOLD: ItemDefinition = defineItem(
+  'material:cursed_gold',
+  'Cursed Gold',
+  'material',
+  {
+    weight: 7.0,
+    stackSize: 10,
+    baseMaterial: 'gold',
+    isGatherable: true,
+    gatherSources: ['cursed_hoard', 'pirate_gold', 'blood_money', 'devil_deal'],
+    baseValue: 1000,
+    rarity: 'rare',
+    traits: {
+      material: {
+        isLiving: false,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: 0,
+        hostility: 0.8,
+        transmutation: 'brings terrible luck, accidents increase, relationships fail, can\'t get rid of it',
+        aestheticDescription: 'Gleaming gold almost too shiny, feels wrong to touch, bad vibes, subtle wrongness',
+        isBuildingMaterial: true,
+        structuralStrength: 40,
+        temperatureResistance: 80,
+        moistureResistance: 100,
+      },
+      magical: {
+        effects: ['luck_drain', 'accident_magnet', 'relationship_deterioration'],
+        passive: true,
+        cursed: true,
+        school: 'necromancy',
+      },
+    },
+  }
+);
+
+const HUNGRY_STONE: ItemDefinition = defineItem(
+  'material:hungry_stone',
+  'Hungry Stone',
+  'material',
+  {
+    weight: 2.5,
+    stackSize: 8,
+    baseMaterial: 'consuming_stone',
+    isGatherable: true,
+    gatherSources: ['devouring_quarry', 'consumption_cave', 'hungry_mountain'],
+    baseValue: 300,
+    rarity: 'rare',
+    traits: {
+      material: {
+        isLiving: true,
+        isEdible: false,
+        isTransient: false,
+        isSolid: true,
+        decayRate: -0.1,
+        hostility: 0.7,
+        transmutation: 'slowly consumes adjacent materials, grows as it eats, prefers valuable materials',
+        aestheticDescription: 'Gray stone with darker patches, veins spread to adjacent materials, dissolving effect',
+        isBuildingMaterial: true,
+        structuralStrength: 65,
+        temperatureResistance: 85,
+        moistureResistance: 90,
+      },
+      magical: {
+        effects: ['material_consumption', 'growth', 'insatiable_hunger'],
+        passive: true,
+        school: 'transmutation',
+      },
+    },
+  }
+);
+
+const MIMIC_MATERIAL: ItemDefinition = defineItem(
+  'material:mimic_material',
+  'Mimic Material',
+  'material',
+  {
+    weight: 1.8,
+    stackSize: 15,
+    baseMaterial: 'shapeshifter',
+    isGatherable: true,
+    gatherSources: ['shapeshift_accident', 'doppelganger_stone', 'illusion_deposit'],
+    baseValue: 450,
+    rarity: 'rare',
+    traits: {
+      material: {
+        isLiving: true,
+        isEdible: false,
+        isTransient: true,
+        isSolid: true,
+        decayRate: 0.15,
+        hostility: 0.5,
+        transmutation: 'shapeshifts to look like other materials, reverts randomly, fools inspection',
+        aestheticDescription: 'Looks like whatever it mimics, occasional shimmer breaks illusion, feels slightly off',
+        isBuildingMaterial: true,
+        structuralStrength: 45,
+        temperatureResistance: 60,
+        moistureResistance: 70,
+      },
+      magical: {
+        effects: ['visual_mimicry', 'deception', 'paranoia'],
+        passive: true,
+        school: 'illusion',
+      },
+    },
+  }
+);
+
+// ============================================================================
 // EXPORT - DO NOT EXPORT YET! Validators need updating first
 // ============================================================================
 
@@ -2053,5 +2596,5 @@ const LIVING_VINE_MATERIAL: ItemDefinition = defineItem(
 // export const SURREAL_MATERIAL_ITEMS: ItemDefinition[] = [
 //   FLESH_BRICK,
 //   FUNGUS_MATERIAL,
-//   // ... all 31 materials
+//   // ... all 31 + 25 + 15 = 71 materials
 // ];
