@@ -63,6 +63,7 @@ import {
   AgentRosterPanel,
   ResearchLibraryPanel,
   AnimalInfoPanel,
+  AnimalRosterPanel,
   TileInspectorPanel,
   PlantInfoPanel,
   ResourcesPanel,
@@ -690,6 +691,7 @@ interface UIPanelsResult {
   agentInfoPanel: AgentInfoPanel;
   agentRosterPanel: AgentRosterPanel;
   animalInfoPanel: AnimalInfoPanel;
+  animalRosterPanel: AnimalRosterPanel;
   plantInfoPanel: PlantInfoPanel;
   resourcesPanel: ResourcesPanel;
   memoryPanel: MemoryPanel;
@@ -748,6 +750,7 @@ function createUIPanels(
   const agentRosterPanel = new AgentRosterPanel(renderer.pixelLabLoader);
 
   const animalInfoPanel = new AnimalInfoPanel();
+  const animalRosterPanel = new AnimalRosterPanel(renderer.pixelLabLoader);
   const plantInfoPanel = new PlantInfoPanel();
   const resourcesPanel = new ResourcesPanel();
   const memoryPanel = new MemoryPanel();
@@ -791,6 +794,7 @@ function createUIPanels(
     agentInfoPanel,
     agentRosterPanel,
     animalInfoPanel,
+    animalRosterPanel,
     plantInfoPanel,
     resourcesPanel,
     memoryPanel,
@@ -2451,6 +2455,7 @@ function handleMouseClick(
         memoryPanel.setSelectedEntity(entity);
         relationshipsPanel.setSelectedEntity(entity);
         panels.agentRosterPanel.setSelectedAgent(entity.id);
+        panels.animalRosterPanel.setSelectedAnimal(null);
         if (windowManager.getWindow('crafting')?.visible) {
           craftingUI.setActiveAgent(entity.id);
         }
@@ -2465,6 +2470,7 @@ function handleMouseClick(
         memoryPanel.setSelectedEntity(null);
         relationshipsPanel.setSelectedEntity(null);
         panels.agentRosterPanel.setSelectedAgent(null);
+        panels.animalRosterPanel.setSelectedAnimal(entity.id);
         windowManager.showWindow('animal-info');
         windowManager.hideWindow('agent-info');
         windowManager.hideWindow('plant-info');
@@ -2476,6 +2482,7 @@ function handleMouseClick(
         memoryPanel.setSelectedEntity(null);
         relationshipsPanel.setSelectedEntity(null);
         panels.agentRosterPanel.setSelectedAgent(null);
+        panels.animalRosterPanel.setSelectedAnimal(null);
         windowManager.showWindow('plant-info');
         windowManager.hideWindow('agent-info');
         windowManager.hideWindow('animal-info');
@@ -2487,6 +2494,7 @@ function handleMouseClick(
         memoryPanel.setSelectedEntity(null);
         relationshipsPanel.setSelectedEntity(null);
         panels.agentRosterPanel.setSelectedAgent(null);
+        panels.animalRosterPanel.setSelectedAnimal(null);
         windowManager.hideWindow('agent-info');
         windowManager.hideWindow('animal-info');
         windowManager.hideWindow('plant-info');
@@ -2500,6 +2508,7 @@ function handleMouseClick(
       memoryPanel.setSelectedEntity(null);
       relationshipsPanel.setSelectedEntity(null);
       panels.agentRosterPanel.setSelectedAgent(null);
+      panels.animalRosterPanel.setSelectedAnimal(null);
       windowManager.hideWindow('agent-info');
       windowManager.hideWindow('animal-info');
       windowManager.hideWindow('plant-info');
@@ -2741,12 +2750,18 @@ async function main() {
   }
 
   // Initialize storage backend for save/load system FIRST
+  console.log('[Demo] TRACE: Importing IndexedDBStorage...');
   const { IndexedDBStorage } = await import('@ai-village/core');
+  console.log('[Demo] TRACE: Creating IndexedDBStorage...');
   const storage = new IndexedDBStorage('ai-village-saves');
+  console.log('[Demo] TRACE: Setting storage backend...');
   saveLoadService.setStorage(storage);
+  console.log('[Demo] TRACE: Storage backend set');
 
   // Check for existing saves and auto-load the most recent one
+  console.log('[Demo] TRACE: Listing saves...');
   const allSaves = await saveLoadService.listSaves();
+  console.log('[Demo] TRACE: Got save list, filtering...');
   // Filter out any undefined/null entries
   const existingSaves = allSaves.filter(save => save != null && save.name && save.key);
   console.log(`[Demo] Found ${existingSaves.length} existing saves`);
@@ -2991,6 +3006,24 @@ async function main() {
     panels.agentRosterPanel.updateFromWorld(gameLoop.world);
   }, 60000);
 
+  // Wire up animal roster panel camera focusing
+  panels.animalRosterPanel.setOnAnimalClick((animalId: string) => {
+    const entity = gameLoop.world.getEntity(animalId);
+    if (entity) {
+      const pos = entity.components.get('position') as any;
+      if (pos && renderer.camera) {
+        renderer.camera.centerOn(pos.x, pos.y);
+        panels.animalRosterPanel.touchAnimal(animalId);
+        panels.animalInfoPanel.setSelectedEntity(entity);
+      }
+    }
+  });
+
+  // Update animal roster panel once per minute
+  setInterval(() => {
+    panels.animalRosterPanel.updateFromWorld(gameLoop.world);
+  }, 60000);
+
   // Setup window manager
   const { windowManager, menuBar, controlsPanel } = setupWindowManager(
     canvas, renderer, panels, keyboardRegistry, showNotification
@@ -3163,10 +3196,8 @@ async function main() {
     createInitialBuildings(gameLoop.world);
     const agentIds = createInitialAgents(gameLoop.world, settings.dungeonMasterPrompt);
 
-    // Start game loop BEFORE soul creation so SoulCreationSystem.update() runs
-    gameLoop.start();
-
     // Create souls for the initial agents (displays modal before map loads)
+    // NOTE: Game loop will be started AFTER this, so SoulCreationSystem.update() won't run yet
     await createSoulsForInitialAgents(gameLoop, agentIds, llmProvider, renderer, universeConfig);
     console.log('[Demo] All souls created, continuing initialization...');
 
@@ -3203,6 +3234,10 @@ async function main() {
   } else {
     console.log('[Demo] Skipping world initialization - loaded from checkpoint');
   }
+
+  // Start game loop (for both new games and loaded checkpoints)
+  console.log('[Demo] Starting game loop...');
+  gameLoop.start();
 
   // Farming action handler
   gameLoop.world.eventBus.subscribe('action:requested', (event: any) => {
