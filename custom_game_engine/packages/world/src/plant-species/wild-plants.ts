@@ -533,7 +533,14 @@ export const TREE: PlantSpecies = {
 
   // Trees regrow after harvest - picking fruit doesn't destroy the tree
   harvestDestroysPlant: false,
-  harvestResetStage: 'fruiting'
+  harvestResetStage: 'fruiting',
+
+  // Height in voxels when mature (taller than 2-voxel humans)
+  // Individual tree heights are sampled from this range using normal distribution
+  heightRange: {
+    min: 4,   // Smallest mature tree: 4 voxels (2x human height)
+    max: 12,  // Tallest tree: 12 voxels (6x human height)
+  },
 };
 
 export const WILD_PLANTS = [GRASS, WILDFLOWER, BERRY_BUSH, TREE];

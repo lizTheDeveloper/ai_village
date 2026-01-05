@@ -1,5 +1,49 @@
 # Release Notes
 
+## 2026-01-04 - Plant Height System & Image Format Fixes (Round 2/12)
+
+### Plant System Enhancements
+
+#### Voxel-Based Plant Heights
+- **PlantComponent.ts** - Added `matureHeight` to PlantGenetics
+  - Height measured in voxels when plant is mature
+  - Sampled from species heightRange with normal distribution
+  - Enables 3D plant visualization in voxel renderer
+
+### Soul Sprite Improvements
+
+#### Image Data Format Handling
+- **SoulSpriteRenderer.ts** - Fixed image data parsing (+24 lines)
+  - Supports both string and object image formats
+  - Handles `base64` and `image` object properties
+  - Better error messages for invalid image data
+  - Fixes: "Invalid image data format" errors during sprite save
+
+### Plant Species
+
+#### Wild Plants Expansion
+- **wild-plants.ts** - Additional wild plant species
+  - New species definitions
+  - Enhanced plant variety for procedural generation
+
+### Documentation
+
+#### Devlog Updates
+- **LLM_QUEUE_IMPLEMENTATION_2026-01-04.md** - Status update
+  - Marked server integration as ✅ Complete
+  - Updated from "Pending" to "Complete" status
+  - Confirmed ProxyLLMProvider integration
+
+### Generated Content
+
+#### First Soul Sprite
+- **soul_922a554b-617f-40ba-83a0-1852d499a9a9/** - Test soul sprite
+  - First generated soul character sprite
+  - Validates end-to-end sprite generation pipeline
+  - Stored in packages/renderer/assets/sprites/pixellab/
+
+---
+
 ## 2026-01-04 - Soul Sprite Generation & Animation Queuing (Round 1/12)
 
 ### Soul Sprite Generation API

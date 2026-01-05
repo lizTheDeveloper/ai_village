@@ -27,6 +27,7 @@ export interface PlantGenetics {
   droughtTolerance: number;   // 0-100
   coldTolerance: number;      // 0-100
   flavorProfile: number;      // Affects food quality (0-100)
+  matureHeight?: number;      // Height in voxels when mature (sampled from species heightRange, normal distribution)
   mutations?: GeneticMutation[];  // Optional - new plants start without mutations
 }
 

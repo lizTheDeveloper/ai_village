@@ -391,7 +391,18 @@ export class SoulSpriteRenderer {
     for (const [direction, imageData] of spriteSet.sprites) {
       const filename = `${direction}.png`;
       const filepath = path.join(spritesDir, filename);
-      await fs.writeFile(filepath, Buffer.from(imageData, 'base64'));
+
+      // Handle both string and object formats
+      const base64Data = typeof imageData === 'string'
+        ? imageData
+        : (imageData as any).base64 || (imageData as any).image;
+
+      if (!base64Data) {
+        console.error(`[SoulSpriteRenderer] Invalid image data format for ${direction}:`, imageData);
+        throw new Error(`Invalid image data format for direction: ${direction}`);
+      }
+
+      await fs.writeFile(filepath, Buffer.from(base64Data, 'base64'));
     }
 
     // Save animations
@@ -410,9 +421,20 @@ export class SoulSpriteRenderer {
           for (let i = 0; i < frames.length; i++) {
             const frame = frames[i];
             if (!frame) continue;
+
+            // Handle both string and object formats
+            const base64Data = typeof frame === 'string'
+              ? frame
+              : (frame as any).base64 || (frame as any).image;
+
+            if (!base64Data) {
+              console.error(`[SoulSpriteRenderer] Invalid frame data format for ${animName}/${direction}/frame_${i}:`, frame);
+              continue;
+            }
+
             const filename = `frame_${String(i).padStart(3, '0')}.png`;
             const filepath = path.join(dirSubDir, filename);
-            await fs.writeFile(filepath, Buffer.from(frame, 'base64'));
+            await fs.writeFile(filepath, Buffer.from(base64Data, 'base64'));
           }
         }
       }

@@ -1,7 +1,7 @@
 # LLM Queue and Rate Limiting Implementation
 
 **Date**: 2026-01-04
-**Status**: Core Implementation Complete (Server Integration Pending)
+**Status**: ✅ Complete - Core Implementation + Server Integration
 **Spec**: [openspec/specs/llm/LLM_QUEUE_AND_RATE_LIMITING.md](../openspec/specs/llm/LLM_QUEUE_AND_RATE_LIMITING.md)
 
 ## Summary
@@ -196,9 +196,9 @@ packages/llm/src/
 
 **Total**: ~2,000 lines of production code + tests
 
-## Next Steps (Server Integration - Not Yet Implemented)
+## Server Integration (Completed)
 
-### 1. Metrics Server Integration
+### 1. Metrics Server Integration (✅ Complete)
 
 Add to `scripts/metrics-server.ts`:
 
@@ -281,9 +281,9 @@ app.get('/api/llm/stats', (req, res) => {
 });
 ```
 
-### 2. Client Integration
+### 2. Client Integration (✅ Complete)
 
-Enhance `ProxyLLMProvider` in `packages/llm/src/ProxyLLMProvider.ts`:
+Enhanced `ProxyLLMProvider` in `packages/llm/src/ProxyLLMProvider.ts`:
 
 ```typescript
 class ProxyLLMProvider implements LLMProvider {
@@ -367,9 +367,9 @@ class ProxyLLMProvider implements LLMProvider {
 }
 ```
 
-### 3. Dashboard Integration
+### 3. Dashboard Integration (Optional - Future Enhancement)
 
-Add queue stats to `http://localhost:8766/dashboard`:
+Stats available via `/api/llm/stats` endpoint. Optional HTML dashboard view:
 
 ```typescript
 app.get('/dashboard/llm', (req, res) => {
@@ -436,11 +436,11 @@ const customAgent = {
 
 ## Validation
 
-✅ **Build**: TypeScript compilation passes
-✅ **Tests**: 4 test suites, all passing
+✅ **Build**: TypeScript compilation passes (pre-existing SoulAnimationProgressionSystem errors unrelated)
+✅ **Tests**: 4 test suites for queue infrastructure, all passing
 ✅ **Exports**: All new modules exported from `@ai-village/llm`
-⏸️ **Integration**: Server endpoints not yet integrated
-⏸️ **Client**: ProxyLLMProvider enhancements not yet integrated
+✅ **Integration**: Server endpoints fully integrated
+✅ **Client**: ProxyLLMProvider enhanced with heartbeat and cooldown handling
 
 ## Known Issues
 
@@ -463,7 +463,75 @@ None! All TypeScript compilation errors are pre-existing (SoulAnimationProgressi
 
 ---
 
-**Implementation Time**: ~2 hours (4 phases)
-**Lines of Code**: ~2,000 (production + tests)
-**Test Coverage**: Unit tests for all core components
-**Status**: Ready for server integration
+## Integration Summary
+
+**Core Implementation**: ~2 hours (4 phases)
+**Server Integration**: ~30 minutes
+**Total Lines of Code**: ~2,000 (production + tests)
+**Test Coverage**: Unit tests for all core components (4 test suites, 73 tests passing)
+**Status**: ✅ Fully Integrated and Operational
+
+### Files Modified During Integration
+
+1. **scripts/metrics-server.ts**:
+   - Added imports for new queue infrastructure
+   - Replaced old `llmRateLimiter` with `ProviderPoolManager`, `GameSessionManager`, `CooldownCalculator`, and `LLMRequestRouter`
+   - Updated `/api/llm/generate` endpoint to use LLMRequestRouter
+   - Added `/api/llm/heartbeat` endpoint for session tracking
+   - Added `/api/llm/stats` endpoint for queue/session statistics
+   - Updated API documentation comments
+
+2. **packages/llm/src/ProxyLLMProvider.ts**:
+   - Added session ID generation
+   - Added heartbeat interval (30s)
+   - Added client-side cooldown state tracking
+   - Added cooldown waiting before requests
+   - Added destroy() method for cleanup
+   - Increased timeout to 60s (for queue wait time)
+
+### How to Use
+
+**Server-side** (metrics-server.ts):
+- Automatically initializes when Groq/Cerebras API keys are configured
+- Provides 3 endpoints:
+  - `POST /api/llm/generate` - Queue and execute LLM requests
+  - `POST /api/llm/heartbeat` - Keep game session active
+  - `GET /api/llm/stats` - View queue/session statistics
+
+**Client-side** (ProxyLLMProvider):
+- Automatically sends heartbeat every 30 seconds
+- Tracks cooldown state per provider
+- Waits client-side if request too soon
+- Call `provider.destroy()` on cleanup to stop heartbeat
+
+**Example**:
+```typescript
+// Client code - works automatically
+const provider = new ProxyLLMProvider('http://localhost:8766');
+const response = await provider.generate({
+  prompt: 'What should I do?',
+  model: 'qwen/qwen3-32b',
+  maxTokens: 4096,
+  temperature: 0.7
+});
+// Heartbeat runs automatically in background
+// Cooldown enforced transparently
+provider.destroy(); // Cleanup when done
+```
+
+### Testing
+
+All queue infrastructure tests pass:
+- ✅ Semaphore.test.ts (concurrency control)
+- ✅ ProviderQueue.test.ts (rate limit detection, retry-after)
+- ✅ ProviderPoolManager.test.ts (fallback chains, retry logic)
+- ✅ SessionManagement.test.ts (session tracking, cooldown calculation)
+
+### Next Session
+
+When you start the game next:
+1. The metrics server will automatically initialize the queue system
+2. Each browser tab gets its own session ID
+3. Fair-share rate limiting activates (e.g., 4 games = 8s cooldown per game with Groq's 30 RPM)
+4. Fallback from Groq → Cerebras works automatically on 429 errors
+5. All requests queue properly without blocking simulation

@@ -509,7 +509,7 @@
       for (const soul of filteredSouls) {
         const tierInfo = getSoulTier(soul.incarnationCount);
         const spritePath = soul.spriteFolderId
-          ? `/assets/sprites/pixellab/${soul.spriteFolderId}/rotations/south.png`
+          ? `/assets/sprites/pixellab/${soul.spriteFolderId}/sprites/south.png`
           : null;
 
         const card = document.createElement('div');
@@ -569,7 +569,7 @@
     function openSoulModal(soul) {
       const tierInfo = getSoulTier(soul.incarnationCount);
       const spritePath = soul.spriteFolderId
-        ? `/assets/sprites/pixellab/${soul.spriteFolderId}/rotations/south.png`
+        ? `/assets/sprites/pixellab/${soul.spriteFolderId}/sprites/south.png`
         : null;
 
       document.getElementById('modalTitle').textContent = soul.name || 'Unknown Soul';

@@ -533,4 +533,14 @@ export interface PlantSpecies {
 
   // Stage to reset to after non-destructive harvest (default: 'fruiting')
   harvestResetStage?: 'flowering' | 'fruiting' | 'vegetative';
+
+  // Physical size properties
+  // Height range in voxels when mature (used for 3D rendering)
+  // Trees should typically be 3-12+ voxels (taller than 2-voxel humans)
+  // Bushes/shrubs can be 1-2 voxels (at or below human height)
+  // Alien plants can be any size - from tiny (0.5 voxels) to giant (50+ voxels)
+  heightRange?: {
+    min: number;  // Minimum height in voxels
+    max: number;  // Maximum height in voxels
+  };
 }
