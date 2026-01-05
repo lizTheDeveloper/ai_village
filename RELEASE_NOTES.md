@@ -1,5 +1,37 @@
 # Release Notes
 
+## 2026-01-04 - Cost Dashboard & Sprite Queue UI (Round 4/12)
+
+### Cost Tracking Dashboard
+
+#### New Dashboard Endpoint
+- **metrics-server.ts** - `/dashboard/costs` endpoint (+109 lines)
+  - Comprehensive LLM cost tracking dashboard
+  - Total cost and request summaries
+  - Average cost per request analytics
+  - Active sessions and API key tracking
+  - Recent activity (last 5 min, last 60 min)
+  - Spending rate projections (per hour, per day)
+  - Costs by provider breakdown
+  - Top 10 API keys by cost
+  - Token usage tracking
+  - Formatted plain text dashboard output
+
+### Sprite Generation UI
+
+#### Queue Visualization
+- **dashboard/index.html** - Sprite generation queue section (+68 lines)
+  - Real-time sprite queue status
+  - Pending/completed sprite counts
+  - Pending/completed animation counts
+  - Visual status indicators (color-coded)
+  - Queue items list with details
+  - Timestamp display (generating/idle states)
+  - Grid layout for metrics
+  - Auto-updating queue status
+
+---
+
 ## 2026-01-04 - LLM Cost Tracking & Queue Metrics (Round 3/12)
 
 ### LLM Cost Tracking

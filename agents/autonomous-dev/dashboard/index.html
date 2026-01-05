@@ -663,6 +663,34 @@
                 </div>
             </section>
 
+            <section class="section" id="sprite-generation-section">
+                <div class="section-header">
+                    <h2 class="section-title">Sprite Generation Queue</h2>
+                    <span class="timestamp" id="sprite-queue-timestamp">Checking...</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div style="background: var(--bg-tertiary); padding: 12px; border-radius: 6px;">
+                        <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px;">Sprites</div>
+                        <div style="display: flex; align-items: baseline; gap: 8px;">
+                            <span id="sprites-pending-count" style="font-size: 24px; font-weight: 600; color: var(--accent-yellow);">0</span>
+                            <span style="font-size: 12px; color: var(--text-secondary);">pending</span>
+                            <span id="sprites-completed-count" style="font-size: 12px; color: var(--accent-green); margin-left: auto;">0 done</span>
+                        </div>
+                    </div>
+                    <div style="background: var(--bg-tertiary); padding: 12px; border-radius: 6px;">
+                        <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px;">Animations</div>
+                        <div style="display: flex; align-items: baseline; gap: 8px;">
+                            <span id="animations-pending-count" style="font-size: 24px; font-weight: 600; color: var(--accent-yellow);">0</span>
+                            <span style="font-size: 12px; color: var(--text-secondary);">pending</span>
+                            <span id="animations-completed-count" style="font-size: 12px; color: var(--accent-green); margin-left: auto;">0 done</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="sprite-queue-items" style="max-height: 150px; overflow-y: auto;">
+                    <div class="empty-state" style="padding: 16px; font-size: 13px;">No items in queue</div>
+                </div>
+            </section>
+
             <section class="section">
                 <div class="section-header">
                     <h2 class="section-title">Roadmap Phases</h2>
@@ -1171,34 +1199,86 @@
                 spriteQueueData = await response.json();
 
                 const statusIndicator = document.getElementById('sprite-queue-status');
+                const timestampEl = document.getElementById('sprite-queue-timestamp');
 
                 const totalPending = (spriteQueueData.summary?.sprites?.pending || 0) +
                                      (spriteQueueData.summary?.animations?.pending || 0);
                 const totalCompleted = (spriteQueueData.summary?.sprites?.completed || 0) +
                                        (spriteQueueData.summary?.animations?.completed || 0);
 
+                // Update header status indicator
                 if (spriteQueueData.error) {
                     statusIndicator.textContent = '● Error';
                     statusIndicator.style.color = 'var(--accent-red)';
                     statusIndicator.title = `Failed to load queue: ${spriteQueueData.error}`;
+                    timestampEl.textContent = 'Error';
                 } else if (totalPending > 0) {
                     statusIndicator.textContent = `● ${totalPending} pending`;
                     statusIndicator.style.color = 'var(--accent-yellow)';
                     statusIndicator.title = `${spriteQueueData.summary.sprites.pending} sprites, ${spriteQueueData.summary.animations.pending} animations pending. Click for details.`;
+                    timestampEl.textContent = `${totalPending} generating`;
                 } else if (totalCompleted > 0) {
                     statusIndicator.textContent = `● ${totalCompleted} completed`;
                     statusIndicator.style.color = 'var(--accent-green)';
                     statusIndicator.title = `${spriteQueueData.summary.sprites.completed} sprites, ${spriteQueueData.summary.animations.completed} animations completed. Click for details.`;
+                    timestampEl.textContent = 'Idle';
                 } else {
                     statusIndicator.textContent = '● 0 pending';
                     statusIndicator.style.color = 'var(--text-secondary)';
                     statusIndicator.title = 'No sprites or animations in queue. Click for details.';
+                    timestampEl.textContent = 'Idle';
+                }
+
+                // Update visual panel counts
+                document.getElementById('sprites-pending-count').textContent = spriteQueueData.summary?.sprites?.pending || 0;
+                document.getElementById('sprites-completed-count').textContent = `${spriteQueueData.summary?.sprites?.completed || 0} done`;
+                document.getElementById('animations-pending-count').textContent = spriteQueueData.summary?.animations?.pending || 0;
+                document.getElementById('animations-completed-count').textContent = `${spriteQueueData.summary?.animations?.completed || 0} done`;
+
+                // Update items list
+                const itemsContainer = document.getElementById('sprite-queue-items');
+                const pendingSprites = spriteQueueData.pending?.sprites || [];
+                const pendingAnimations = spriteQueueData.pending?.animations || [];
+
+                if (pendingSprites.length === 0 && pendingAnimations.length === 0) {
+                    itemsContainer.innerHTML = '<div class="empty-state" style="padding: 16px; font-size: 13px;">No items in queue</div>';
+                } else {
+                    let html = '';
+
+                    // Add sprites
+                    pendingSprites.forEach(sprite => {
+                        html += `
+                            <div style="padding: 8px; border-bottom: 1px solid var(--border-color); font-size: 12px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="color: var(--accent-blue); font-weight: 500;">🎨 ${sprite.folderId}</span>
+                                    <span style="color: var(--text-secondary); font-size: 11px; margin-left: auto;">${sprite.status}</span>
+                                </div>
+                                <div style="color: var(--text-secondary); font-size: 11px; margin-top: 2px;">${sprite.description}</div>
+                            </div>
+                        `;
+                    });
+
+                    // Add animations
+                    pendingAnimations.forEach(anim => {
+                        html += `
+                            <div style="padding: 8px; border-bottom: 1px solid var(--border-color); font-size: 12px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="color: var(--accent-purple); font-weight: 500;">🎬 ${anim.folderId}/${anim.animationName}</span>
+                                    <span style="color: var(--text-secondary); font-size: 11px; margin-left: auto;">${anim.status}</span>
+                                </div>
+                                <div style="color: var(--text-secondary); font-size: 11px; margin-top: 2px;">${anim.actionDescription}</div>
+                            </div>
+                        `;
+                    });
+
+                    itemsContainer.innerHTML = html;
                 }
             } catch (err) {
                 const statusIndicator = document.getElementById('sprite-queue-status');
                 statusIndicator.textContent = '● Error';
                 statusIndicator.style.color = 'var(--accent-red)';
                 statusIndicator.title = 'Failed to check sprite queue status';
+                document.getElementById('sprite-queue-timestamp').textContent = 'Error';
                 console.error('Failed to load sprite queue status:', err);
             }
         }

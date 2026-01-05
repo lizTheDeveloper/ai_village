@@ -4263,6 +4263,109 @@ Available agents:
     return;
   }
 
+  if (pathname === '/dashboard/costs') {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    if (!llmRouter) {
+      res.end('LLM Cost Tracking\n═══════════════════\n\nLLM queue not initialized. No cost data available.\n');
+      return;
+    }
+
+    try {
+      const costStats = llmRouter.costTracker.getStats();
+      const sessionCosts = llmRouter.costTracker.getAllSessionCosts();
+      const apiKeyCosts = llmRouter.costTracker.getAllAPIKeyCosts();
+      const providerCosts = llmRouter.costTracker.getAllProviderCosts();
+
+      const lines: string[] = [];
+
+      // Header
+      lines.push('LLM COST TRACKING DASHBOARD');
+      lines.push('═'.repeat(80));
+      lines.push('');
+
+      // Summary
+      lines.push('SUMMARY');
+      lines.push('─'.repeat(80));
+      lines.push(`Total Cost:          $${costStats.totalCost.toFixed(4)}`);
+      lines.push(`Total Requests:      ${costStats.totalRequests}`);
+      lines.push(`Avg Cost/Request:    $${costStats.avgCostPerRequest.toFixed(4)}`);
+      lines.push(`Active Sessions:     ${costStats.sessions}`);
+      lines.push(`API Keys Used:       ${costStats.apiKeys}`);
+      lines.push(`Providers Used:      ${costStats.providers}`);
+      lines.push('');
+
+      // Recent Activity
+      lines.push('RECENT ACTIVITY');
+      lines.push('─'.repeat(80));
+      lines.push(`Last 5 minutes:   ${costStats.recentActivity.last5Minutes.requests} requests, $${costStats.recentActivity.last5Minutes.cost.toFixed(4)}`);
+      lines.push(`Last 60 minutes:  ${costStats.recentActivity.last60Minutes.requests} requests, $${costStats.recentActivity.last60Minutes.cost.toFixed(4)}`);
+      lines.push('');
+
+      // Spending Rate
+      lines.push('SPENDING RATE');
+      lines.push('─'.repeat(80));
+      lines.push(`Per Hour:  $${costStats.spendingRate.perHour.toFixed(4)}`);
+      lines.push(`Per Day:   $${costStats.spendingRate.perDay.toFixed(2)}`);
+      lines.push('');
+
+      // Per-Provider Costs
+      if (providerCosts.length > 0) {
+        lines.push('COSTS BY PROVIDER');
+        lines.push('─'.repeat(80));
+        for (const provider of providerCosts) {
+          lines.push(`${provider.provider.padEnd(20)} $${provider.totalCost.toFixed(4)} (${provider.requestCount} requests, ${provider.totalInputTokens + provider.totalOutputTokens} tokens)`);
+        }
+        lines.push('');
+      }
+
+      // Per-API-Key Costs (Top 10)
+      if (apiKeyCosts.length > 0) {
+        lines.push('COSTS BY API KEY (TOP 10)');
+        lines.push('─'.repeat(80));
+        const topKeys = apiKeyCosts.slice(0, 10);
+        for (const apiKey of topKeys) {
+          const sessionsCount = Array.from(apiKey.sessions).length;
+          lines.push(`Key: ${apiKey.apiKeyHash.padEnd(12)} Provider: ${apiKey.provider.padEnd(15)} Cost: $${apiKey.totalCost.toFixed(4)} (${apiKey.requestCount} reqs, ${sessionsCount} sessions)`);
+        }
+        if (apiKeyCosts.length > 10) {
+          lines.push(`... and ${apiKeyCosts.length - 10} more API keys`);
+        }
+        lines.push('');
+      }
+
+      // Per-Session Costs (Top 10)
+      if (sessionCosts.length > 0) {
+        lines.push('COSTS BY SESSION (TOP 10)');
+        lines.push('─'.repeat(80));
+        const topSessions = sessionCosts.slice(0, 10);
+        for (const session of topSessions) {
+          const age = Math.floor((Date.now() - session.lastRequest) / 1000 / 60);
+          lines.push(`Session: ${session.sessionId.substring(0, 20).padEnd(20)} Cost: $${session.totalCost.toFixed(4)} (${session.requestCount} reqs, ${age}m ago)`);
+        }
+        if (sessionCosts.length > 10) {
+          lines.push(`... and ${sessionCosts.length - 10} more sessions`);
+        }
+        lines.push('');
+      }
+
+      // Footer
+      lines.push('');
+      lines.push('NAVIGATION');
+      lines.push('─'.repeat(80));
+      lines.push(`View JSON API:        curl http://localhost:${HTTP_PORT}/api/llm/costs`);
+      lines.push(`View Queue Stats:     curl http://localhost:${HTTP_PORT}/api/llm/stats`);
+      lines.push(`Main Dashboard:       curl http://localhost:${HTTP_PORT}/dashboard`);
+
+      res.end(lines.join('\n'));
+    } catch (error) {
+      res.statusCode = 500;
+      res.end(`Error generating cost dashboard: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    return;
+  }
+
   // === Category-based Dashboard Routes ===
   // Hierarchical routes that group related views by category
 
@@ -5616,15 +5719,65 @@ ${listHeadlessGames().map(g => `  ${g.sessionId}: ${g.status} (${g.agentCount} a
     }
 
     try {
+      const queueMetrics = llmRouter.metricsCollector.getCurrentStats();
+
       res.end(JSON.stringify({
         queues: llmRouter.getQueueStats(),
         sessions: llmRouter.getSessionStats(),
         providers: llmProvidersConfigured,
+        metrics: queueMetrics,
       }));
     } catch (error) {
       res.statusCode = 500;
       res.end(JSON.stringify({
         error: 'Failed to get stats',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      }));
+    }
+    return;
+  }
+
+  // Cost tracking endpoint for per-session, per-API-key, per-provider costs
+  if (pathname === '/api/llm/costs' && req.method === 'GET') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    if (!llmRouter) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({
+        error: 'LLM queue not initialized',
+        message: 'No LLM providers configured'
+      }));
+      return;
+    }
+
+    try {
+      const costStats = llmRouter.costTracker.getStats();
+      const sessionCosts = llmRouter.costTracker.getAllSessionCosts();
+      const apiKeyCosts = llmRouter.costTracker.getAllAPIKeyCosts();
+      const providerCosts = llmRouter.costTracker.getAllProviderCosts();
+
+      // Convert Sets to arrays for JSON serialization
+      const apiKeyCostsJSON = apiKeyCosts.map(cost => ({
+        ...cost,
+        sessions: Array.from(cost.sessions),
+      }));
+
+      const providerCostsJSON = providerCosts.map(cost => ({
+        ...cost,
+        apiKeys: Array.from(cost.apiKeys),
+      }));
+
+      res.end(JSON.stringify({
+        summary: costStats,
+        sessions: sessionCosts,
+        apiKeys: apiKeyCostsJSON,
+        providers: providerCostsJSON,
+      }));
+    } catch (error) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({
+        error: 'Failed to get costs',
         message: error instanceof Error ? error.message : 'Unknown error'
       }));
     }
