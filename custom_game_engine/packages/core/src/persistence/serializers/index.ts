@@ -3,6 +3,7 @@
  */
 
 import { componentSerializerRegistry } from '../ComponentSerializerRegistry.js';
+import { migrationRegistry } from '../MigrationRegistry.js';
 import { PositionSerializer } from './PositionSerializer.js';
 import { TrustNetworkSerializer } from './TrustNetworkSerializer.js';
 import { createGenericSerializer } from './GenericSerializer.js';
@@ -98,7 +99,7 @@ export function registerAllSerializers(): void {
     'census_bureau',
     'passage',
     'physics',
-    'renderable',
+    // 'renderable' - registered separately with version 2 below
     'animation',
     'tags',
     'movement',
@@ -166,6 +167,27 @@ export function registerAllSerializers(): void {
       createGenericSerializer(componentType, 1)
     );
   }
+
+  // Register renderable with version 2 (adds sizeMultiplier and alpha fields)
+  componentSerializerRegistry.register(
+    'renderable',
+    createGenericSerializer('renderable', 2)
+  );
+
+  // Register migration for renderable v1 -> v2
+  migrationRegistry.register({
+    component: 'renderable',
+    fromVersion: 1,
+    toVersion: 2,
+    migrate: (data: unknown) => {
+      const old = data as any;
+      return {
+        ...old,
+        sizeMultiplier: old.sizeMultiplier ?? 1.0,
+        alpha: old.alpha ?? 1.0,
+      };
+    },
+  });
 
 }
 

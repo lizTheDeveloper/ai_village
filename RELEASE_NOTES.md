@@ -1,5 +1,87 @@
 # Release Notes
 
+## 2026-01-04 - Visual Metadata Standardization (Round 5/12)
+
+### New Visual Systems
+
+#### AnimalVisualsSystem
+- **AnimalVisualsSystem.ts** - Automatic visual metadata computation (new file)
+  - Priority 301 (runs after growth, before rendering)
+  - Calculates sizeMultiplier based on life stage:
+    - Baby animals: 30% of adult size
+    - Juvenile animals: 60% of adult size
+    - Adult animals: 100% (full size)
+    - Elderly animals: 95% (slightly stooped)
+  - Calculates alpha (opacity) for dying animals
+  - Fades out animals with low health (<20 HP)
+  - Uses standardized renderable.sizeMultiplier field
+
+#### PlantVisualsSystem
+- **PlantVisualsSystem.ts** - Plant visual metadata computation (new file)
+  - Priority 300 (runs after plant growth, before rendering)
+  - Calculates sizeMultiplier based on growth stage:
+    - Seed: 0.2 (20% of tile size)
+    - Sprout: 0.5 (50% of tile size)
+    - Mature: 1.0 (full size)
+    - Dead: 0.3 (shriveled)
+  - Applies genetics.matureHeight for tall plants/trees
+  - Trees can be 4-12 tiles tall (4.0-12.0 multiplier)
+  - Calculates alpha for dying/decaying plants
+  - Fades out plants with low health
+
+### Component Standardization
+
+#### RenderableComponent Extensions
+- **RenderableComponent.ts** - Added visual metadata fields
+  - New field: `sizeMultiplier` (0.1-10.0, default 1.0)
+  - New field: `alpha` (0.0-1.0, default 1.0)
+  - Standardized interface for all entity types
+  - Backward compatible (fields are optional)
+
+#### Serialization Updates
+- **serializers/index.ts** - Support for new renderable fields
+  - Serialize sizeMultiplier and alpha
+  - Migration support for existing saves
+
+### Renderer Integration
+
+#### Renderer Updates
+- **Renderer.ts** - Consumes standardized visual metadata
+  - Uses renderable.sizeMultiplier for scaling
+  - Uses renderable.alpha for opacity
+  - Separation of concerns: renderer doesn't know about growth stages
+
+### Architecture Specification
+
+#### Visual Metadata Standard
+- **visual-metadata-standardization.md** - OpenSpec for standardization
+  - Extends ECS pattern for visual properties
+  - Separation of concerns (renderer vs domain logic)
+  - Standardized fields: sizeMultiplier, alpha
+  - Supports plants, animals, items, agents
+  - Migration strategy for backward compatibility
+
+### LLM Improvements
+
+#### Cost Tracker Enhancements
+- **CostTracker.ts** - Additional cost tracking features
+- **LLMRequestRouter.ts** - Router optimizations
+- **llm/package.json** - Package dependency updates
+
+### Development Tools
+
+#### Dashboard Server
+- **dashboard/server.js** - Enhanced autonomous dev server
+
+### Generated Content
+
+#### Third Soul Sprite
+- **soul_e0389226-e82c-4532-9718-4e36a822c8b3/** - Third test soul
+  - Continued validation of sprite pipeline
+  - Confirms generation consistency
+
+---
+
 ## 2026-01-04 - Cost Dashboard & Sprite Queue UI (Round 4/12)
 
 ### Cost Tracking Dashboard

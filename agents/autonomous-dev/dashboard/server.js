@@ -1853,11 +1853,12 @@ app.post('/api/servers/kill-all', (req, res) => {
     }
 });
 
-// Generation Queue (proxy to metrics server)
+// Generation Queue (proxy to metrics server, fallback to queue file)
 app.get('/api/generation/queue', async (req, res) => {
     try {
         const http = require('http');
 
+        // Try to get from metrics server first
         const queuePromise = new Promise((resolve, reject) => {
             const request = http.get('http://localhost:8766/api/generation/queue', { timeout: 2000 }, (response) => {
                 let data = '';
@@ -1877,8 +1878,49 @@ app.get('/api/generation/queue', async (req, res) => {
             });
         });
 
-        const queue = await queuePromise;
-        res.json(queue);
+        try {
+            const queue = await queuePromise;
+            res.json(queue);
+            return;
+        } catch (metricsErr) {
+            // Metrics server not running, try reading queue file directly
+            const queueFilePath = path.join(GAME_ENGINE_DIR, 'sprite-generation-queue.json');
+
+            if (fs.existsSync(queueFilePath)) {
+                const queueData = JSON.parse(fs.readFileSync(queueFilePath, 'utf-8'));
+
+                // Transform to expected format
+                const sprites = queueData.sprites || [];
+                const animations = queueData.animations || [];
+
+                res.json({
+                    summary: {
+                        sprites: {
+                            pending: sprites.filter(s => s.status === 'queued' || s.status === 'generating').length,
+                            completed: sprites.filter(s => s.status === 'complete').length,
+                            total: sprites.length,
+                        },
+                        animations: {
+                            pending: animations.filter(a => a.status === 'queued' || a.status === 'generating').length,
+                            completed: animations.filter(a => a.status === 'complete').length,
+                            total: animations.length,
+                        },
+                    },
+                    pending: {
+                        sprites: sprites.filter(s => s.status === 'queued' || s.status === 'generating'),
+                        animations: animations.filter(a => a.status === 'queued' || a.status === 'generating'),
+                    },
+                    completed: {
+                        sprites: sprites.filter(s => s.status === 'complete').slice(-10),
+                        animations: animations.filter(a => a.status === 'complete').slice(-10),
+                    },
+                });
+                return;
+            }
+
+            // Neither metrics server nor queue file available
+            throw new Error('Metrics server not running and no queue file found');
+        }
     } catch (err) {
         res.json({
             summary: {

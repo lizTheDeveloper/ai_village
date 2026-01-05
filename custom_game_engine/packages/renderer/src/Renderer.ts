@@ -781,15 +781,15 @@ export class Renderer {
       if (isUnderConstruction) {
         effectiveOpacity *= 0.5;
       }
-      this.ctx.globalAlpha = effectiveOpacity;
 
-      // Get plant component for stage-based rendering
-      const plant = entity.components.get('plant') as PlantComponent | undefined;
-      const metadata = plant ? { stage: plant.stage } : undefined;
+      // Apply visual metadata from renderable component
+      const sizeMultiplier = renderable.sizeMultiplier ?? 1.0;
+      const alpha = renderable.alpha ?? 1.0;
+      this.ctx.globalAlpha = effectiveOpacity * alpha;
 
-      // Calculate size with parallax scaling
+      // Calculate size with parallax scaling and size multiplier
       const baseSize = this.tileSize * this.camera.zoom;
-      const scaledSize = baseSize * parallaxScale;
+      const scaledSize = baseSize * parallaxScale * sizeMultiplier;
 
       // Center the scaled sprite
       const offsetX = (scaledSize - baseSize) / 2;
@@ -856,7 +856,7 @@ export class Renderer {
 
           // Draw sprite at top - try PixelLab first for agents
           if (!this.renderPixelLabEntity(entity, screen.x - offsetX, screen.y - offsetY, scaledSize)) {
-            renderSprite(this.ctx, renderable.spriteId, screen.x - offsetX, screen.y - offsetY, scaledSize, metadata);
+            renderSprite(this.ctx, renderable.spriteId, screen.x - offsetX, screen.y - offsetY, scaledSize);
           }
         } else {
           // Ground-level entity in side-view: render at terrain surface
@@ -867,8 +867,7 @@ export class Renderer {
               renderable.spriteId,
               screen.x - offsetX,
               screen.y - offsetY,
-              scaledSize,
-              metadata
+              scaledSize
             );
           }
         }
@@ -881,8 +880,7 @@ export class Renderer {
             renderable.spriteId,
             screen.x - offsetX,
             screen.y - offsetY,
-            scaledSize,
-            metadata
+            scaledSize
           );
         }
       }

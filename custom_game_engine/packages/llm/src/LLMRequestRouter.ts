@@ -187,7 +187,7 @@ export class LLMRequestRouter {
 
     // Track wait time (time in queue)
     const queueStartTime = Date.now();
-    let llmResponse: LLMResponse;
+    let llmResponse: LLMResponse | undefined;
     let success = false;
     let errorMessage: string | undefined;
 

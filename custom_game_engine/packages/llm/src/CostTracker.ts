@@ -127,9 +127,10 @@ export class CostTracker {
         totalTokens: 0,
       };
     }
-    summary.providers[entry.provider].requestCount++;
-    summary.providers[entry.provider].totalCost += entry.costUSD;
-    summary.providers[entry.provider].totalTokens += entry.inputTokens + entry.outputTokens;
+    const providerStats = summary.providers[entry.provider]!;
+    providerStats.requestCount++;
+    providerStats.totalCost += entry.costUSD;
+    providerStats.totalTokens += entry.inputTokens + entry.outputTokens;
   }
 
   private updateAPIKeyCost(entry: CostEntry): void {
