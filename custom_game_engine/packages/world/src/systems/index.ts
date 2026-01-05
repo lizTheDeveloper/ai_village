@@ -1,9 +1,8 @@
 /**
  * @ai-village/world - Systems
  *
- * Visual rendering systems re-exported from @ai-village/core.
- * These systems compute renderable.sizeMultiplier and alpha
- * from domain-specific components (plant stage, animal size, etc).
+ * Currently no world-specific systems.
+ * Visual rendering systems are in @ai-village/core.
  */
 
-export { PlantVisualsSystem, AnimalVisualsSystem } from '@ai-village/core';
+export {};

@@ -1020,8 +1020,8 @@ Return ONLY the dialogue lines, one per line. No quotes, no stage directions.`;
       // Split into lines and clean up
       const lines = response.text
         .split('\n')
-        .map(line => line.trim())
-        .filter(line => line.length > 0 && !line.startsWith('[') && !line.startsWith('('))
+        .map((line: string) => line.trim())
+        .filter((line: string) => line.length > 0 && !line.startsWith('[') && !line.startsWith('('))
         .slice(0, 7); // Cap at 7 lines
 
       if (lines.length >= 4) {

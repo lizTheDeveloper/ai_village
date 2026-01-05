@@ -2950,6 +2950,15 @@ export interface GameEventMap {
     incarnationCount?: number;
   };
 
+  /** Animation generation requested for soul sprite */
+  'soul:animation_requested': {
+    soulId: string;
+    spriteFolderId: string;
+    animationType: 'walking-8-frames' | 'idle' | 'combat';
+    incarnationCount: number;
+    soulName: string;
+  };
+
   // ============================================================================
   // Death Bargain Events (Psychopomp Challenge System)
   // ============================================================================

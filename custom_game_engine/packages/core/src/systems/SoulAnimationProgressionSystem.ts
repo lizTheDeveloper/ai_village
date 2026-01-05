@@ -39,7 +39,7 @@ export class SoulAnimationProgressionSystem implements System {
     });
 
     // Subscribe to reincarnation events
-    world.eventBus.subscribe('agent:reincarnated', (event: any) => {
+    world.eventBus.subscribe('soul:reincarnated', (event) => {
       this.checkAnimationEligibility(world, event.data);
     });
   }
@@ -160,7 +160,7 @@ export class SoulAnimationProgressionSystem implements System {
     return false;
   }
 
-  update(_world: World, _deltaTime: number): void {
+  update(_world: World, _entities: readonly import('../ecs/Entity.js').Entity[], _deltaTime: number): void {
     // System is event-driven, no per-tick updates needed
   }
 }

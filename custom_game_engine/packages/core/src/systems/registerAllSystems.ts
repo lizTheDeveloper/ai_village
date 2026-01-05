@@ -39,6 +39,7 @@ import { UpliftBreedingProgramSystem } from '../uplift/UpliftBreedingProgramSyst
 
 // Rendering
 import { AnimationSystem } from './AnimationSystem.js';
+import { AgentVisualsSystem } from './AgentVisualsSystem.js';
 
 // Agent Core
 import { AgentBrainSystem } from './AgentBrainSystem.js';
@@ -355,6 +356,7 @@ export function registerAllSystems(
   // ============================================================================
   gameLoop.systemRegistry.register(new PlantVisualsSystem());
   gameLoop.systemRegistry.register(new AnimalVisualsSystem());
+  gameLoop.systemRegistry.register(new AgentVisualsSystem());
 
   // ============================================================================
   // PLANTS

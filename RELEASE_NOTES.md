@@ -1,5 +1,83 @@
 # Release Notes
 
+## 2026-01-04 - LLM Model Discovery & Agent Visuals (Round 7/12)
+
+### Tiered LLM Routing Implementation (Phase 1)
+
+#### ProviderModelDiscovery System
+- **ProviderModelDiscovery.ts** - Auto-discovery of LLM models (+415 lines)
+  - Automatic model discovery from provider APIs
+  - Support for Ollama, OpenAI-compatible (Groq, Cerebras), Anthropic
+  - Automatic tier classification (1-5) based on parameter size
+  - Model caching with 1-hour TTL
+  - Parameter size extraction from model names (1.5B, 7B, 32B, 70B)
+  - Context window estimation based on model size
+  - Query provider endpoints in parallel
+
+#### Tier Classification Logic
+- **Tier 1 (1-3B):** Tiny models (TinyLlama, Qwen 1.5B)
+- **Tier 2 (7-14B):** Small models (Qwen 7B, Llama 3.2 11B)
+- **Tier 3 (30-40B):** Moderate models (Qwen 32B, Claude Haiku)
+- **Tier 4 (60-80B):** Large models (Llama 70B, Claude Sonnet)
+- **Tier 5 (Frontier):** Frontier models (GPT-4, Claude Opus)
+
+#### Provider Support
+- **Ollama:** Query /api/tags endpoint for local models
+- **OpenAI-compatible:** Query /v1/models (Groq, Cerebras, OpenAI)
+- **Anthropic:** Hardcoded Claude models (no public models endpoint)
+
+#### Model Discovery Features
+- `discoverModels()` - Discover models from single provider
+- `discoverAllProviders()` - Discover from multiple providers in parallel
+- `findModel()` - Find specific model across all providers
+- `getModelsByTier()` - Get all models for a specific tier
+- `getModelsByTiers()` - Organize models by tier
+- Cache management with clearCache()
+
+### Visual Metadata System Completion
+
+#### AgentVisualsSystem
+- **AgentVisualsSystem.ts** - Agent visual metadata (new file, +38 lines)
+  - Priority 300 (runs before rendering, alongside PlantVisualsSystem)
+  - Computes sizeMultiplier and alpha for agents
+  - Default size 1.0 for all agents
+  - TODO: Age-based sizing (children smaller)
+  - TODO: Health-based alpha (fade when injured)
+
+#### System Standardization
+- Completes visual metadata trio: Plants, Animals, Agents
+- All use standardized renderable.sizeMultiplier and renderable.alpha
+- Separation of concerns (renderer doesn't know domain logic)
+
+### System Updates
+
+#### Event System
+- **EventMap.ts** - Event type updates
+  - New event types for LLM routing
+  - Provider discovery events
+
+#### Animation System
+- **SoulAnimationProgressionSystem.ts** - Soul animation improvements
+  - Animation progression tracking
+  - Soul-specific animation states
+
+#### System Registration
+- **registerAllSystems.ts** - AgentVisualsSystem registration
+- **core/systems/index.ts** - System export updates
+- **llm/index.ts** - LLM package exports (ProviderModelDiscovery)
+- **world/systems/index.ts** - World systems export (new file)
+
+### Generated Soul Sprites
+
+#### Batch 2 Soul Generation
+- **soul_038706c4-1056-4484-8144-e8cdd3551e88/** - Soul sprite 6
+- **soul_a4fc761b-de4e-4185-b403-6be727e29312/** - Soul sprite 7
+- **soul_b780018a-58e0-4951-a30f-5275dc0e105a/** - Soul sprite 8
+  - Continued validation of sprite queue system
+  - Confirms persistent queue reliability
+
+---
+
 ## 2026-01-04 - Tiered LLM Routing & Sprite Queue (Round 6/12)
 
 ### LLM Infrastructure Specification
