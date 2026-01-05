@@ -23,9 +23,9 @@
   },
   "include": [],
   "references": [
+    { "path": "./packages/llm" },
     { "path": "./packages/core" },
     { "path": "./packages/world" },
-    { "path": "./packages/renderer" },
-    { "path": "./packages/llm" }
+    { "path": "./packages/renderer" }
   ]
 }

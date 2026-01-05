@@ -1,5 +1,18 @@
 # Release Notes
 
+## 2026-01-04 - TypeScript Build Order Optimization (Round 11/12)
+
+### Build System Improvements
+
+#### Package Build Order
+- **tsconfig.json** - Reorder package references
+  - Move llm package first in references
+  - Ensures llm builds before core (dependency order)
+  - Optimal build sequence: llm → core → world → renderer
+  - Prevents build failures from out-of-order compilation
+
+---
+
 ## 2026-01-04 - Build Configuration Cleanup (Round 10/12)
 
 ### Build System Improvements
