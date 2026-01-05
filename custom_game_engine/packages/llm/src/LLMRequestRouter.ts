@@ -24,6 +24,8 @@ import type { GameSessionManager } from './GameSessionManager.js';
 import type { CooldownCalculator } from './CooldownCalculator.js';
 import type { LLMRequest, LLMResponse } from './LLMProvider.js';
 import type { CustomLLMConfig } from './LLMDecisionQueue.js';
+import { CostTracker } from './CostTracker.js';
+import { QueueMetricsCollector } from './QueueMetricsCollector.js';
 
 export interface LLMRequestPayload {
   sessionId: string;
@@ -62,6 +64,10 @@ export class LLMRequestRouter {
   private providerMappings: Map<string, ProviderMapping>;
   private defaultModel: string = 'qwen/qwen3-32b';
 
+  // Cost and metrics tracking
+  public costTracker: CostTracker;
+  public metricsCollector: QueueMetricsCollector;
+
   constructor(
     poolManager: ProviderPoolManager,
     sessionManager: GameSessionManager,
@@ -71,8 +77,13 @@ export class LLMRequestRouter {
     this.sessionManager = sessionManager;
     this.cooldownCalculator = cooldownCalculator;
     this.providerMappings = new Map();
+    this.costTracker = new CostTracker();
+    this.metricsCollector = new QueueMetricsCollector();
 
     this.initializeProviderMappings();
+
+    // Start automatic queue metrics collection
+    this.metricsCollector.startAutoSnapshot(() => this.poolManager.getQueueStats());
   }
 
   /**
@@ -133,6 +144,7 @@ export class LLMRequestRouter {
    */
   async routeRequest(payload: LLMRequestPayload): Promise<LLMResponseWithCooldown> {
     const { sessionId, agentId, prompt, model, maxTokens, temperature, customConfig } = payload;
+    const requestStartTime = Date.now();
 
     // Register/update session
     if (!this.sessionManager.hasSession(sessionId)) {
@@ -173,13 +185,55 @@ export class LLMRequestRouter {
       temperature: temperature ?? 0.7,
     };
 
-    // Execute through provider pool (handles fallback and retry)
-    const llmResponse = await this.poolManager.execute(
-      queueName,
-      llmRequest,
-      agentId,
-      sessionId
-    );
+    // Track wait time (time in queue)
+    const queueStartTime = Date.now();
+    let llmResponse: LLMResponse;
+    let success = false;
+    let errorMessage: string | undefined;
+
+    try {
+      // Execute through provider pool (handles fallback and retry)
+      llmResponse = await this.poolManager.execute(
+        queueName,
+        llmRequest,
+        agentId,
+        sessionId
+      );
+      success = true;
+    } catch (error) {
+      errorMessage = error instanceof Error ? error.message : String(error);
+      throw error;
+    } finally {
+      const executionTime = Date.now() - queueStartTime;
+      const waitTime = queueStartTime - requestStartTime;
+
+      // Record metrics
+      this.metricsCollector.recordRequest({
+        timestamp: Date.now(),
+        provider,
+        sessionId,
+        agentId,
+        success,
+        waitMs: waitTime,
+        executionMs: executionTime,
+        error: errorMessage,
+      });
+
+      // Record cost (only on success)
+      if (success && llmResponse) {
+        this.costTracker.recordCost({
+          timestamp: Date.now(),
+          sessionId,
+          agentId,
+          provider,
+          model: model || this.defaultModel,
+          inputTokens: llmResponse.inputTokens || 0,
+          outputTokens: llmResponse.outputTokens || 0,
+          costUSD: llmResponse.costUSD || 0,
+          apiKeyHash,
+        });
+      }
+    }
 
     // Calculate next cooldown
     const activeGames = this.sessionManager.getActiveSessionCount();

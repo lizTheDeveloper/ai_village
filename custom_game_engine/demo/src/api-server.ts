@@ -8,6 +8,7 @@ import express from 'express';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import * as fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { generateSprite, saveAlienSpecies, getAllAlienSpecies } from './alien-api.js';
 import { SoulRepositorySystem } from '../../packages/core/src/systems/SoulRepositorySystem.js';
@@ -115,6 +116,24 @@ app.post('/api/generate-soul-sprite', async (req, res) => {
     await renderer.saveSpriteSet(spriteSet, spritePath);
 
     console.log(`[API] Sprite saved successfully to: soul_${soulId}`);
+
+    // Update soul repository with spriteFolderId
+    try {
+      const repositoryPath = path.join(__dirname, '../soul-repository');
+      const indexPath = path.join(repositoryPath, 'index.json');
+      const indexData = JSON.parse(await fs.readFile(indexPath, 'utf-8'));
+
+      const soulMetadata = indexData.souls[soulId];
+      if (soulMetadata) {
+        const soulFilePath = path.join(repositoryPath, soulMetadata.filePath);
+        const soulData = JSON.parse(await fs.readFile(soulFilePath, 'utf-8'));
+        soulData.spriteFolderId = `soul_${soulId}`;
+        await fs.writeFile(soulFilePath, JSON.stringify(soulData, null, 2));
+        console.log(`[API] Updated soul repository with spriteFolderId: soul_${soulId}`);
+      }
+    } catch (error) {
+      console.error('[API] Failed to update soul repository:', error);
+    }
 
     res.json({
       success: true,

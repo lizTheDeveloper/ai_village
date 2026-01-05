@@ -1,5 +1,66 @@
 # Release Notes
 
+## 2026-01-04 - LLM Cost Tracking & Queue Metrics (Round 3/12)
+
+### LLM Cost Tracking
+
+#### Cost Analytics System
+- **CostTracker.ts** - Comprehensive LLM cost tracking (new file)
+  - Per-session cost tracking with provider breakdown
+  - Per-API-key cost summaries
+  - Token usage tracking (input/output tokens)
+  - Total spending across all requests
+  - Cost entry interface with timestamp, model, agent ID
+  - Session cost summaries with first/last request times
+
+### LLM Queue Metrics
+
+#### Queue Performance Analytics
+- **QueueMetricsCollector.ts** - Queue performance metrics (new file)
+  - Queue length history tracking
+  - Request rates and throughput measurement
+  - Wait time tracking (avg, max)
+  - Success/failure rate analytics
+  - Provider utilization percentages
+  - Aggregated metrics by time window
+  - Request execution time tracking
+
+### LLM Router Enhancements
+
+#### Request Router Updates
+- **LLMRequestRouter.ts** - Integration with cost and metrics tracking
+  - Records cost data for each request
+  - Collects queue performance metrics
+  - Enhanced routing decisions based on metrics
+
+#### Export Updates
+- **index.ts** (llm package) - Exports for new tracking systems
+  - Export CostTracker API
+  - Export QueueMetricsCollector API
+
+### Metrics Server Integration
+
+#### Dashboard APIs
+- **metrics-server.ts** - New endpoints for cost/queue analytics
+  - Cost summary endpoints
+  - Queue performance dashboards
+  - Real-time metrics streaming
+
+### Autonomous Dev Dashboard
+
+#### Development Tools
+- **dashboard/index.html** - Enhanced autonomous dev dashboard
+- **dashboard/server.js** - Server improvements for dev tools
+
+### Generated Content
+
+#### Second Soul Sprite
+- **soul_e4821ffb-d02a-4033-b3d1-9d735798d9d6/** - Another test soul
+  - Validates sprite generation consistency
+  - Confirms pipeline reliability
+
+---
+
 ## 2026-01-04 - Plant Height System & Image Format Fixes (Round 2/12)
 
 ### Plant System Enhancements

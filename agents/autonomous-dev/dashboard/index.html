@@ -621,6 +621,8 @@
                 <span style="margin-left: 8px;" id="parallel-workers-status">● Stopped</span>
                 <span style="margin-left: 16px; color: var(--text-secondary);">Ollama:</span>
                 <span style="margin-left: 8px;" id="ollama-status" title="Click for details" style="cursor: pointer;" onclick="showOllamaDetails()">● Checking...</span>
+                <span style="margin-left: 16px; color: var(--text-secondary);">Sprite Queue:</span>
+                <span style="margin-left: 8px;" id="sprite-queue-status" title="Click for details" style="cursor: pointer;" onclick="showSpriteQueueDetails()">● 0 pending</span>
             </div>
         </div>
         <div class="header-actions">
@@ -1160,6 +1162,89 @@
             );
         }
 
+        // Sprite Generation Queue status
+        let spriteQueueData = null;
+
+        async function loadSpriteQueueStatus() {
+            try {
+                const response = await fetch('/api/generation/queue');
+                spriteQueueData = await response.json();
+
+                const statusIndicator = document.getElementById('sprite-queue-status');
+
+                const totalPending = (spriteQueueData.summary?.sprites?.pending || 0) +
+                                     (spriteQueueData.summary?.animations?.pending || 0);
+                const totalCompleted = (spriteQueueData.summary?.sprites?.completed || 0) +
+                                       (spriteQueueData.summary?.animations?.completed || 0);
+
+                if (spriteQueueData.error) {
+                    statusIndicator.textContent = '● Error';
+                    statusIndicator.style.color = 'var(--accent-red)';
+                    statusIndicator.title = `Failed to load queue: ${spriteQueueData.error}`;
+                } else if (totalPending > 0) {
+                    statusIndicator.textContent = `● ${totalPending} pending`;
+                    statusIndicator.style.color = 'var(--accent-yellow)';
+                    statusIndicator.title = `${spriteQueueData.summary.sprites.pending} sprites, ${spriteQueueData.summary.animations.pending} animations pending. Click for details.`;
+                } else if (totalCompleted > 0) {
+                    statusIndicator.textContent = `● ${totalCompleted} completed`;
+                    statusIndicator.style.color = 'var(--accent-green)';
+                    statusIndicator.title = `${spriteQueueData.summary.sprites.completed} sprites, ${spriteQueueData.summary.animations.completed} animations completed. Click for details.`;
+                } else {
+                    statusIndicator.textContent = '● 0 pending';
+                    statusIndicator.style.color = 'var(--text-secondary)';
+                    statusIndicator.title = 'No sprites or animations in queue. Click for details.';
+                }
+            } catch (err) {
+                const statusIndicator = document.getElementById('sprite-queue-status');
+                statusIndicator.textContent = '● Error';
+                statusIndicator.style.color = 'var(--accent-red)';
+                statusIndicator.title = 'Failed to check sprite queue status';
+                console.error('Failed to load sprite queue status:', err);
+            }
+        }
+
+        function showSpriteQueueDetails() {
+            if (!spriteQueueData) {
+                alert('Sprite queue not loaded yet');
+                return;
+            }
+
+            if (spriteQueueData.error) {
+                alert(`Sprite Generation Queue Error\n\nError: ${spriteQueueData.error}\n\nMake sure the metrics server is running on port 8766.`);
+                return;
+            }
+
+            const pendingSprites = spriteQueueData.pending?.sprites || [];
+            const pendingAnimations = spriteQueueData.pending?.animations || [];
+            const completedSprites = spriteQueueData.completed?.sprites || [];
+            const completedAnimations = spriteQueueData.completed?.animations || [];
+
+            const spritesList = pendingSprites.length > 0
+                ? pendingSprites.map(s => `  - ${s.folderId}: ${s.description} (${s.status})`).join('\n')
+                : '  (none)';
+
+            const animationsList = pendingAnimations.length > 0
+                ? pendingAnimations.map(a => `  - ${a.folderId}/${a.animationName}: ${a.actionDescription} (${a.status})`).join('\n')
+                : '  (none)';
+
+            const completedSpritesList = completedSprites.length > 0
+                ? completedSprites.slice(0, 5).map(s => `  - ${s.folderId}`).join('\n')
+                : '  (none)';
+
+            const completedAnimationsList = completedAnimations.length > 0
+                ? completedAnimations.slice(0, 5).map(a => `  - ${a.folderId}/${a.animationName}`).join('\n')
+                : '  (none)';
+
+            alert(
+                `Sprite Generation Queue\n` +
+                `=======================\n\n` +
+                `Pending Sprites (${spriteQueueData.summary.sprites.pending}):\n${spritesList}\n\n` +
+                `Pending Animations (${spriteQueueData.summary.animations.pending}):\n${animationsList}\n\n` +
+                `Recently Completed Sprites (${spriteQueueData.summary.sprites.completed}):\n${completedSpritesList}\n\n` +
+                `Recently Completed Animations (${spriteQueueData.summary.animations.completed}):\n${completedAnimationsList}`
+            );
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             initTabs();
@@ -1172,6 +1257,7 @@
             loadGameServerStatus();
             loadParallelWorkersStatus();
             loadOllamaStatus();
+            loadSpriteQueueStatus();
 
             // Auto-refresh logs every 5 seconds
             setInterval(loadRecentLogs, 5000);
@@ -1183,6 +1269,8 @@
             setInterval(loadParallelWorkersStatus, 10000);
             // Auto-refresh Ollama status every 10 seconds
             setInterval(loadOllamaStatus, 10000);
+            // Auto-refresh sprite queue status every 5 seconds
+            setInterval(loadSpriteQueueStatus, 5000);
         });
 
         // Tabs

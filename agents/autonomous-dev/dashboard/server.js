@@ -1853,6 +1853,45 @@ app.post('/api/servers/kill-all', (req, res) => {
     }
 });
 
+// Generation Queue (proxy to metrics server)
+app.get('/api/generation/queue', async (req, res) => {
+    try {
+        const http = require('http');
+
+        const queuePromise = new Promise((resolve, reject) => {
+            const request = http.get('http://localhost:8766/api/generation/queue', { timeout: 2000 }, (response) => {
+                let data = '';
+                response.on('data', chunk => data += chunk);
+                response.on('end', () => {
+                    try {
+                        resolve(JSON.parse(data));
+                    } catch (e) {
+                        reject(new Error('Invalid JSON'));
+                    }
+                });
+            });
+            request.on('error', reject);
+            request.on('timeout', () => {
+                request.destroy();
+                reject(new Error('Timeout'));
+            });
+        });
+
+        const queue = await queuePromise;
+        res.json(queue);
+    } catch (err) {
+        res.json({
+            summary: {
+                sprites: { pending: 0, completed: 0, total: 0 },
+                animations: { pending: 0, completed: 0, total: 0 },
+            },
+            pending: { sprites: [], animations: [] },
+            completed: { sprites: [], animations: [] },
+            error: err.message,
+        });
+    }
+});
+
 // Ollama status
 app.get('/api/ollama/status', async (req, res) => {
     try {

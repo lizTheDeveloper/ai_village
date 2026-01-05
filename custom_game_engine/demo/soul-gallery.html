@@ -647,6 +647,11 @@
     });
 
     // Generate sprite for a soul
+    // Rate limiting queue for sprite generation
+    let isGenerating = false;
+    let lastGenerationTime = 0;
+    const MIN_GENERATION_DELAY = 6000; // 6 seconds between generations
+
     async function generateSoulSprite(soulId) {
       const soul = allSouls.find(s => s.id === soulId);
       if (!soul) {
@@ -658,7 +663,32 @@
       const container = document.getElementById(containerId);
       if (!container) return;
 
+      // Check if another generation is in progress
+      if (isGenerating) {
+        container.innerHTML = `
+          <div style="color: #FFA500; font-size: 0.8rem;">Please wait...</div>
+          <div style="font-size: 0.7rem; color: #888;">Another sprite is generating</div>
+        `;
+        return;
+      }
+
+      // Check rate limit
+      const timeSinceLastGen = Date.now() - lastGenerationTime;
+      if (timeSinceLastGen < MIN_GENERATION_DELAY && lastGenerationTime > 0) {
+        const waitSeconds = Math.ceil((MIN_GENERATION_DELAY - timeSinceLastGen) / 1000);
+        container.innerHTML = `
+          <div style="color: #FFA500; font-size: 0.8rem;">Rate limited</div>
+          <div style="font-size: 0.7rem; color: #888;">Wait ${waitSeconds}s</div>
+          <button class="generate-btn" onclick="event.stopPropagation(); generateSoulSprite('${soul.id}')" style="margin-top: 0.5rem;">
+            ↻ Retry
+          </button>
+        `;
+        return;
+      }
+
       try {
+        isGenerating = true;
+
         // Show generating state
         container.innerHTML = '<div class="generating">⚡ Generating sprite...</div>';
 
@@ -677,11 +707,16 @@
           }),
         });
 
+        const result = await response.json();
+
         if (!response.ok) {
+          // Check for rate limit error
+          if (result.error && result.error.includes('wait longer')) {
+            throw new Error('Rate limited - please wait a few seconds');
+          }
           throw new Error(`API error: ${response.status}`);
         }
 
-        const result = await response.json();
         console.log(`[Soul Gallery] Sprite generated:`, result);
 
         // Update soul with spriteFolderId
@@ -694,14 +729,21 @@
         `;
 
         console.log(`[Soul Gallery] Sprite loaded successfully for ${soul.name}`);
+        lastGenerationTime = Date.now();
       } catch (error) {
         console.error('[Soul Gallery] Failed to generate sprite:', error);
+        const errorMsg = error.message.includes('Rate limited')
+          ? 'Rate limited - wait 6s'
+          : 'Failed to generate';
+
         container.innerHTML = `
-          <div style="color: #FF6B6B; font-size: 0.8rem;">Failed to generate</div>
-          <button class="generate-btn" onclick="event.stopPropagation(); generateSoulSprite('${soul.id}')">
+          <div style="color: #FF6B6B; font-size: 0.8rem;">${errorMsg}</div>
+          <button class="generate-btn" onclick="event.stopPropagation(); generateSoulSprite('${soul.id}')" style="margin-top: 0.5rem;">
             ↻ Retry
           </button>
         `;
+      } finally {
+        isGenerating = false;
       }
     }
 

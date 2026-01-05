@@ -24,6 +24,8 @@ export * from './ProviderPoolManager';
 export * from './GameSessionManager';
 export * from './CooldownCalculator';
 export * from './LLMRequestRouter';
+export * from './CostTracker';
+export * from './QueueMetricsCollector';
 
 // Prompt builder classes (utility functions exported via StructuredPromptBuilder)
 export { WorldContextBuilder } from './prompt-builders/WorldContextBuilder';

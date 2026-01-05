@@ -5933,21 +5933,66 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
     return;
   }
 
-  if (pathname === '/api/sprites/queue') {
+  if (pathname === '/api/sprites/queue' || pathname === '/api/generation/queue') {
     res.setHeader('Content-Type', 'application/json');
 
-    const pending = Array.from(spriteGenerationJobs.values()).filter(
+    const pendingSprites = Array.from(spriteGenerationJobs.values()).filter(
       job => job.status === 'queued' || job.status === 'generating'
     );
 
+    const pendingAnimations = Array.from(animationGenerationJobs.values()).filter(
+      job => job.status === 'queued' || job.status === 'generating'
+    );
+
+    const completedSprites = Array.from(spriteGenerationJobs.values()).filter(
+      job => job.status === 'complete'
+    );
+
+    const completedAnimations = Array.from(animationGenerationJobs.values()).filter(
+      job => job.status === 'complete'
+    );
+
     res.end(JSON.stringify({
-      pending: pending.length,
-      jobs: pending.map(job => ({
-        folderId: job.folderId,
-        status: job.status,
-        description: job.description,
-        queuedAt: job.queuedAt,
-      })),
+      summary: {
+        sprites: {
+          pending: pendingSprites.length,
+          completed: completedSprites.length,
+          total: spriteGenerationJobs.size,
+        },
+        animations: {
+          pending: pendingAnimations.length,
+          completed: completedAnimations.length,
+          total: animationGenerationJobs.size,
+        },
+      },
+      pending: {
+        sprites: pendingSprites.map(job => ({
+          folderId: job.folderId,
+          status: job.status,
+          description: job.description,
+          queuedAt: job.queuedAt,
+        })),
+        animations: pendingAnimations.map(job => ({
+          folderId: job.folderId,
+          animationName: job.animationName,
+          status: job.status,
+          actionDescription: job.actionDescription,
+          queuedAt: job.queuedAt,
+        })),
+      },
+      completed: {
+        sprites: completedSprites.slice(-10).map(job => ({
+          folderId: job.folderId,
+          status: job.status,
+          completedAt: job.completedAt,
+        })),
+        animations: completedAnimations.slice(-10).map(job => ({
+          folderId: job.folderId,
+          animationName: job.animationName,
+          status: job.status,
+          completedAt: job.completedAt,
+        })),
+      },
     }));
 
     return;
