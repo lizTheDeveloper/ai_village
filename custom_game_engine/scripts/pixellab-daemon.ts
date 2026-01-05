@@ -84,21 +84,30 @@ function saveManifest(manifest: any): void {
   fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2));
 }
 
-function loadQueue(): any[] {
+function loadQueue(): { sprites: any[]; animations: any[] } {
   if (!fs.existsSync(QUEUE_PATH)) {
-    return [];
+    return { sprites: [], animations: [] };
   }
   try {
     const content = fs.readFileSync(QUEUE_PATH, 'utf-8');
-    return JSON.parse(content);
+    const data = JSON.parse(content);
+    // Handle old format (just array) and new format (object with sprites/animations)
+    if (Array.isArray(data)) {
+      return { sprites: data, animations: [] };
+    }
+    return {
+      sprites: data.sprites || [],
+      animations: data.animations || [],
+    };
   } catch (err) {
     log(`Error loading queue: ${err}`);
-    return [];
+    return { sprites: [], animations: [] };
   }
 }
 
-function saveQueue(queue: any[]): void {
-  fs.writeFileSync(QUEUE_PATH, JSON.stringify(queue, null, 2));
+function saveQueue(sprites: any[], animations: any[]): void {
+  const data = { sprites, animations };
+  fs.writeFileSync(QUEUE_PATH, JSON.stringify(data, null, 2));
 }
 
 async function apiRequest(endpoint: string, method: string = 'GET', body?: any): Promise<any> {
@@ -147,6 +156,94 @@ async function generateSprite(description: string, size: number = 48): Promise<s
   return result.image.base64;
 }
 
+/**
+ * Generate animation using PixelLab API
+ * Returns character ID from the API response
+ */
+async function generateAnimation(
+  folderId: string,
+  animationName: string,
+  actionDescription: string,
+  directionName: string,
+  referenceImagePath: string
+): Promise<string> {
+  // Read reference image and convert to base64
+  const imageBuffer = fs.readFileSync(referenceImagePath);
+  const base64Image = imageBuffer.toString('base64');
+
+  // Get character ID from metadata if it exists
+  const metadataPath = path.join(ASSETS_PATH, folderId, 'metadata_with_animations.json');
+  let characterId = '';
+
+  if (fs.existsSync(metadataPath)) {
+    const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf-8'));
+    characterId = metadata.character?.id || '';
+  }
+
+  // Call PixelLab animate API
+  const result = await apiRequest('/animate-with-text', 'POST', {
+    character_id: characterId || undefined,
+    description: actionDescription,
+    reference_image: base64Image,
+    template_animation_id: animationName.includes('walking') ? 'walking-8-frames' : 'walking-8-frames', // Default to walking
+  });
+
+  if (!result.character?.id) {
+    throw new Error('No character ID in animation response');
+  }
+
+  return result.character.id;
+}
+
+/**
+ * Save animation frames from PixelLab character
+ */
+async function saveAnimation(
+  folderId: string,
+  animationName: string,
+  characterId: string,
+  directionName: string
+): Promise<boolean> {
+  try {
+    const animDir = path.join(ASSETS_PATH, folderId, 'animations', animationName, directionName);
+    fs.mkdirSync(animDir, { recursive: true });
+
+    // Poll PixelLab API for character data
+    let attempts = 0;
+    const maxAttempts = 60; // 5 minutes max wait
+
+    while (attempts < maxAttempts) {
+      const character = await apiRequest(`/characters/${characterId}`, 'GET');
+
+      // Check if animation is ready
+      if (character.frames?.animations?.[animationName]?.[directionName]) {
+        const frameUrls = character.frames.animations[animationName][directionName];
+
+        // Download each frame
+        for (let i = 0; i < frameUrls.length; i++) {
+          const frameUrl = frameUrls[i];
+          const frameResponse = await fetch(`https://api.pixellab.ai${frameUrl}`);
+          const frameBuffer = Buffer.from(await frameResponse.arrayBuffer());
+          const framePath = path.join(animDir, `frame_${String(i).padStart(3, '0')}.png`);
+          fs.writeFileSync(framePath, frameBuffer);
+        }
+
+        log(`  ✓ Saved ${frameUrls.length} frames for ${directionName}`);
+        return true;
+      }
+
+      // Wait before next poll
+      await sleep(5000);
+      attempts++;
+    }
+
+    throw new Error('Animation generation timed out');
+  } catch (err: any) {
+    log(`  ✗ Failed to save animation: ${err.message}`);
+    return false;
+  }
+}
+
 // Save sprite from base64 data
 async function saveSprite(localId: string, category: string, base64Data: string, description: string, size: number): Promise<boolean> {
   try {
@@ -166,6 +263,7 @@ async function saveSprite(localId: string, category: string, base64Data: string,
         size: size,
         description: description,
         generated_at: new Date().toISOString(),
+        directions: ['south', 'southwest', 'west', 'northwest', 'north', 'northeast', 'east', 'southeast'],
       }, null, 2)
     );
 
@@ -370,7 +468,11 @@ async function runDaemon(): Promise<void> {
     try {
       // Check on-demand queue first (higher priority)
       const queue = loadQueue();
-      const queueJob = queue.find((job: any) => job.status === 'queued');
+      const spriteJobs = queue.sprites;
+      const animJobs = queue.animations;
+
+      // Process sprite generation jobs first
+      const queueJob = spriteJobs.find((job: any) => job.status === 'queued');
 
       if (queueJob) {
         // Process on-demand sprite generation request
@@ -399,19 +501,19 @@ async function runDaemon(): Promise<void> {
             // Mark as complete and remove from queue
             queueJob.status = 'complete';
             queueJob.completedAt = Date.now();
-            const updatedQueue = queue.filter((j: any) => j.folderId !== queueJob.folderId);
-            saveQueue(updatedQueue);
+            const updatedSprites = spriteJobs.filter((j: any) => j.folderId !== queueJob.folderId);
+            saveQueue(updatedSprites, animJobs);
 
             state.totalGenerated++;
             state.totalDownloaded++;
             saveState(state);
 
             log(`  ✓ Saved: ${queueJob.folderId}`);
-            log(`  ✓ Removed from queue (${updatedQueue.length} remaining)`);
+            log(`  ✓ Removed from queue (${updatedSprites.length} sprites, ${animJobs.length} animations remaining)`);
           } else {
             // Mark as failed
             queueJob.status = 'failed';
-            saveQueue(queue);
+            saveQueue(spriteJobs, animJobs);
           }
 
           // Rate limiting
@@ -422,7 +524,94 @@ async function runDaemon(): Promise<void> {
         } catch (err: any) {
           log(`  ✗ Error: ${err.message}`);
           queueJob.status = 'failed';
-          saveQueue(queue);
+          saveQueue(spriteJobs, animJobs);
+
+          if (err.message.includes('rate') || err.message.includes('limit') || err.message.includes('429')) {
+            log('  Rate limited - waiting longer before retry');
+            await sleep(CHECK_INTERVAL_MS);
+          }
+          continue;
+        }
+      }
+
+      // Process animation generation jobs
+      const animJob = animJobs.find((job: any) => job.status === 'queued');
+
+      if (animJob) {
+        log(`\n[AnimQueue] Generating: ${animJob.folderId}:${animJob.animationName}`);
+        log(`  Action: ${animJob.actionDescription}`);
+
+        try {
+          // Determine which directions to generate (only non-mirrored ones)
+          const directionsToGenerate = ['south', 'south-east', 'east', 'north-east', 'north'];
+
+          let characterId = animJob.characterId;
+
+          for (const direction of directionsToGenerate) {
+            log(`  Generating ${direction}...`);
+
+            // Find reference sprite image
+            const spriteDir = path.join(ASSETS_PATH, animJob.folderId);
+            let referencePath = path.join(spriteDir, `${direction}.png`);
+
+            // Try alternate naming conventions
+            if (!fs.existsSync(referencePath)) {
+              referencePath = path.join(spriteDir, 'rotations', `${direction}.png`);
+            }
+            if (!fs.existsSync(referencePath)) {
+              const altDirection = direction.replace('-', ''); // Try 'southeast' instead of 'south-east'
+              referencePath = path.join(spriteDir, `${altDirection}.png`);
+            }
+            if (!fs.existsSync(referencePath)) {
+              log(`  ⚠ No reference sprite for ${direction}, skipping`);
+              continue;
+            }
+
+            // Generate animation for this direction
+            characterId = await generateAnimation(
+              animJob.folderId,
+              animJob.animationName,
+              animJob.actionDescription,
+              direction,
+              referencePath
+            );
+
+            // Save animation frames
+            await saveAnimation(
+              animJob.folderId,
+              animJob.animationName,
+              characterId,
+              direction
+            );
+
+            log(`  ✓ Generated ${direction}`);
+          }
+
+          // Mark as complete and remove from queue
+          animJob.status = 'complete';
+          animJob.completedAt = Date.now();
+          animJob.characterId = characterId;
+          const updatedAnims = animJobs.filter((j: any) =>
+            !(j.folderId === animJob.folderId && j.animationName === animJob.animationName)
+          );
+          saveQueue(spriteJobs, updatedAnims);
+
+          state.totalGenerated++;
+          saveState(state);
+
+          log(`  ✓ Animation complete: ${animJob.folderId}:${animJob.animationName}`);
+          log(`  ✓ Removed from queue (${spriteJobs.length} sprites, ${updatedAnims.length} animations remaining)`);
+
+          // Rate limiting
+          log(`  Waiting ${DELAY_AFTER_QUEUE_MS / 1000}s...`);
+          await sleep(DELAY_AFTER_QUEUE_MS);
+          continue;
+
+        } catch (err: any) {
+          log(`  ✗ Error: ${err.message}`);
+          animJob.status = 'failed';
+          animJob.error = err.message;
+          saveQueue(spriteJobs, animJobs);
 
           if (err.message.includes('rate') || err.message.includes('limit') || err.message.includes('429')) {
             log('  Rate limited - waiting longer before retry');

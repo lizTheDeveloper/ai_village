@@ -1,5 +1,58 @@
 # Release Notes
 
+## 2026-01-04 - Soul Sprite Generation & Animation Queuing (Round 1/12)
+
+### Soul Sprite Generation API
+
+#### Server-Side Generation
+- **api-server.ts** - POST `/api/generate-soul-sprite` endpoint
+  - Generates character sprites based on soul attributes
+  - Parameters: soulId, name, description, reincarnationCount, species
+  - Uses SoulSpriteRenderer for tier-based sprite generation
+  - Saves sprites to `packages/renderer/assets/sprites/pixellab/soul_{soulId}`
+  - Returns spriteFolderId, tier, and generation config
+
+### Animation Auto-Generation
+
+#### On-Demand Animation Creation
+- **PixelLabSpriteLoader.ts** - Automatic animation queuing (+58 lines)
+  - Detects missing animations when requested
+  - Queues generation via `/api/animations/generate` endpoint
+  - Prevents duplicate generation requests with caching
+  - Maps animation names to action descriptions:
+    - `walking-8-frames` → "walking forward at normal pace"
+    - `running` → "running quickly"
+    - `attack` → "attacking with weapon"
+    - `cast` → "casting spell with hands raised"
+
+### Sprite Service Refactoring
+
+#### API Simplification
+- **Renderer.ts** - Changed `resolveSpriteFromTraits()` to `lookupSprite()`
+  - Cleaner sprite resolution API
+  - Maintains trait-based sprite matching
+
+### Demo Pages
+
+#### Soul Gallery
+- **soul-gallery.html** - New HTML page for browsing soul sprites
+- Visual gallery of generated soul characters
+- Soul repository integration
+
+### Testing
+
+#### Soul Repository Tests
+- **test-soul-repository-nodejs.ts** - Node.js soul repository tests
+- Server-side soul persistence validation
+
+### Infrastructure
+
+#### Server Enhancements
+- **metrics-server.ts** - Enhanced metrics streaming
+- **pixellab-daemon.ts** - Daemon improvements for sprite generation
+
+---
+
 ## 2026-01-04 - Animation, LLM Routing & Soul Repository
 
 ### Animation System Implementation

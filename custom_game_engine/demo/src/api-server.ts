@@ -72,10 +72,68 @@ app.get('/api/soul-repository/stats', (req, res) => {
   }
 });
 
+// Soul sprite generation endpoint
+app.post('/api/generate-soul-sprite', async (req, res) => {
+  try {
+    const { soulId, name, description, reincarnationCount, species } = req.body;
+
+    console.log(`[API] Generating sprite for soul: ${name} (${reincarnationCount} incarnations)`);
+
+    // Get PixelLab API key from environment
+    const apiKey = process.env.PIXELLAB_API_KEY || process.env.PIXELLAB_API_TOKEN;
+    if (!apiKey) {
+      throw new Error('PIXELLAB_API_KEY environment variable not set');
+    }
+
+    // Import SoulSpriteRenderer
+    const { SoulSpriteRenderer } = await import('../../packages/renderer/src/production/SoulSpriteRenderer.js');
+    const renderer = new SoulSpriteRenderer(apiKey);
+
+    // Generate sprites
+    console.log(`[API] Calling generateSoulSprites...`);
+    const spriteSet = await renderer.generateSoulSprites({
+      id: soulId,
+      name,
+      description: description || `${species || 'human'} character with ${reincarnationCount} incarnations`,
+      reincarnationCount,
+      species,
+    });
+
+    console.log(`[API] Generated sprite set - tier: ${spriteSet.tier}, sprites count: ${spriteSet.sprites.size}`);
+
+    // Debug: check sprite data type
+    for (const [dir, sprite] of spriteSet.sprites.entries()) {
+      console.log(`[API] Sprite ${dir} type: ${typeof sprite}, is string: ${typeof sprite === 'string'}`);
+      if (typeof sprite === 'object') {
+        console.log(`[API] Sprite ${dir} object keys:`, Object.keys(sprite));
+      }
+    }
+
+    // Save to disk
+    const spritePath = path.join(__dirname, `../../packages/renderer/assets/sprites/pixellab/soul_${soulId}`);
+    console.log(`[API] Saving sprite set to: ${spritePath}`);
+    await renderer.saveSpriteSet(spriteSet, spritePath);
+
+    console.log(`[API] Sprite saved successfully to: soul_${soulId}`);
+
+    res.json({
+      success: true,
+      spriteFolderId: `soul_${soulId}`,
+      tier: spriteSet.tier,
+      config: spriteSet.config,
+    });
+  } catch (error: any) {
+    console.error('[API] Error generating soul sprite:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // API routes
 app.post('/api/generate-sprite', generateSprite);
 app.post('/api/save-alien-species', saveAlienSpecies);
 app.get('/api/alien-species', getAllAlienSpecies);
 
 app.listen(PORT, () => {
+  console.log(`[API Server] Running on port ${PORT}`);
+  console.log(`[API Server] Soul sprite generation available at /api/generate-soul-sprite`);
 });

@@ -337,8 +337,20 @@ interface SpriteGenerationJob {
   };
 }
 
+interface AnimationGenerationJob {
+  folderId: string;
+  animationName: string;
+  characterId: string;
+  status: 'queued' | 'generating' | 'complete' | 'failed';
+  queuedAt: number;
+  completedAt?: number;
+  error?: string;
+  actionDescription: string;
+}
+
 // Track sprite generation jobs
 const spriteGenerationJobs = new Map<string, SpriteGenerationJob>();
+const animationGenerationJobs = new Map<string, AnimationGenerationJob>();
 const SPRITES_DIR = path.join(process.cwd(), 'packages', 'renderer', 'assets', 'sprites', 'pixellab');
 
 // Ensure sprites directory exists
@@ -386,16 +398,67 @@ function queueSpriteGeneration(
 }
 
 /**
- * Save generation queue to file for manual processing
+ * Queue an animation generation request
+ */
+function queueAnimationGeneration(
+  folderId: string,
+  animationName: string,
+  actionDescription: string
+): void {
+  const jobKey = `${folderId}:${animationName}`;
+
+  // Check if already exists or generating
+  if (animationGenerationJobs.has(jobKey)) {
+    console.log(`[AnimGen] Already queued/generating: ${jobKey}`);
+    return;
+  }
+
+  // Check if animation already exists on disk
+  const animPath = path.join(SPRITES_DIR, folderId, 'animations', animationName);
+  if (fs.existsSync(animPath)) {
+    console.log(`[AnimGen] Already exists on disk: ${jobKey}`);
+    return;
+  }
+
+  // Queue the request
+  const job: AnimationGenerationJob = {
+    folderId,
+    animationName,
+    characterId: '', // Will be set when generation starts (need to look up from sprite metadata)
+    status: 'queued',
+    queuedAt: Date.now(),
+    actionDescription,
+  };
+
+  animationGenerationJobs.set(jobKey, job);
+  console.log(`[AnimGen] Queued: ${jobKey}`);
+  console.log(`[AnimGen] Action: ${actionDescription}`);
+
+  // Save to queue file
+  saveGenerationQueue();
+}
+
+/**
+ * Save generation queue to file for daemon processing
  */
 function saveGenerationQueue(): void {
   const queueFile = path.join(process.cwd(), 'sprite-generation-queue.json');
-  const queueData = Array.from(spriteGenerationJobs.values()).filter(
+
+  // Combine sprite and animation jobs
+  const spriteJobs = Array.from(spriteGenerationJobs.values()).filter(
+    job => job.status === 'queued' || job.status === 'generating'
+  );
+  const animJobs = Array.from(animationGenerationJobs.values()).filter(
     job => job.status === 'queued' || job.status === 'generating'
   );
 
+  const queueData = {
+    sprites: spriteJobs,
+    animations: animJobs,
+  };
+
   fs.writeFileSync(queueFile, JSON.stringify(queueData, null, 2));
-  console.log(`[SpriteGen] Saved ${queueData.length} pending jobs to sprite-generation-queue.json`);
+  console.log(`[GenQueue] Saved ${spriteJobs.length} sprite jobs, ${animJobs.length} animation jobs`);
 }
 
 /**
@@ -5822,6 +5885,47 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
         queuedAt: job.queuedAt,
       })),
     }));
+
+    return;
+  }
+
+  // === Animation Generation API ===
+  if (pathname === '/api/animations/generate' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+
+    req.on('end', () => {
+      try {
+        const { folderId, animationName, actionDescription } = JSON.parse(body);
+
+        if (!folderId || !animationName || !actionDescription) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ error: 'Missing folderId, animationName, or actionDescription' }));
+          return;
+        }
+
+        // Queue the animation generation request
+        queueAnimationGeneration(folderId, animationName, actionDescription);
+
+        const jobKey = `${folderId}:${animationName}`;
+        const job = animationGenerationJobs.get(jobKey);
+        res.end(JSON.stringify({
+          status: job?.status || 'queued',
+          folderId,
+          animationName,
+          message: 'Animation generation queued. The daemon will process it.',
+        }));
+      } catch (error) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({
+          error: error instanceof Error ? error.message : 'Failed to queue animation generation',
+        }));
+      }
+    });
 
     return;
   }

@@ -33,7 +33,7 @@ import type { ContextMenuManager } from './ContextMenuManager.js';
 import { getPixelLabSpriteLoader, type PixelLabSpriteLoader } from './sprites/PixelLabSpriteLoader.js';
 import { PixelLabDirection, angleToPixelLabDirection } from './sprites/PixelLabSpriteDefs.js';
 import { findSprite, type SpriteTraits } from './sprites/SpriteRegistry.js';
-import { resolveSpriteFromTraits } from './sprites/SpriteService.js';
+import { lookupSprite } from './sprites/SpriteService.js';
 import type { AppearanceComponent } from '@ai-village/core';
 import { Renderer3D } from './Renderer3D.js';
 
@@ -163,7 +163,7 @@ export class Renderer {
     };
 
     // Find the best matching sprite folder and queue generation if missing
-    const spriteResult = resolveSpriteFromTraits(traits);
+    const spriteResult = lookupSprite(traits);
     const spriteFolderId = spriteResult.folderId;
 
     // Check if sprite is loaded

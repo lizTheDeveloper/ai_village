@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>✦ Soul Gallery ✦</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(135deg, #0a0015 0%, #1a0033 100%);
+      color: #88CCFF;
+      padding: 2rem;
+      min-height: 100vh;
+      background-attachment: fixed;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding: 2rem;
+      border: 3px solid #88CCFF;
+      background: rgba(136, 204, 255, 0.05);
+      box-shadow: 0 0 40px rgba(136, 204, 255, 0.3), inset 0 0 20px rgba(136, 204, 255, 0.1);
+      border-radius: 8px;
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      text-shadow: 0 0 20px #88CCFF, 0 0 40px #88CCFF;
+      animation: glow 3s ease-in-out infinite alternate;
+      margin-bottom: 0.5rem;
+    }
+
+    @keyframes glow {
+      0%, 100% { opacity: 1; text-shadow: 0 0 20px #88CCFF, 0 0 40px #88CCFF; }
+      50% { opacity: 0.85; text-shadow: 0 0 30px #88CCFF, 0 0 60px #88CCFF, 0 0 80px #88CCFF; }
+    }
+
+    .subtitle {
+      color: #AAE;
+      font-size: 1.1rem;
+      margin-top: 0.5rem;
+      opacity: 0.9;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      margin-top: 1.5rem;
+      font-size: 1rem;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #FFF;
+      text-shadow: 0 0 10px #88CCFF;
+    }
+
+    .stat-label {
+      color: #AAE;
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+    }
+
+    .filters {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: rgba(136, 204, 255, 0.1);
+      color: #88CCFF;
+      border: 2px solid #88CCFF;
+      padding: 0.5rem 1.5rem;
+      font-family: 'Courier New', monospace;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      background: #88CCFF;
+      color: #0a0015;
+      box-shadow: 0 0 20px rgba(136, 204, 255, 0.6);
+    }
+
+    .soul-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .soul-card {
+      border: 3px solid #88CCFF;
+      background: linear-gradient(135deg, rgba(10, 0, 21, 0.8) 0%, rgba(26, 0, 51, 0.8) 100%);
+      padding: 1.5rem;
+      transition: all 0.3s;
+      position: relative;
+      box-shadow: 0 0 15px rgba(136, 204, 255, 0.3);
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+    }
+
+    .soul-card:hover {
+      box-shadow: 0 0 40px rgba(136, 204, 255, 0.6);
+      transform: scale(1.05);
+      border-color: #FFF;
+    }
+
+    .tier-badge {
+      position: absolute;
+      top: -12px;
+      right: 10px;
+      background: linear-gradient(135deg, #FF6B9D 0%, #C44569 100%);
+      color: #FFF;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.75rem;
+      font-weight: bold;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(255, 107, 157, 0.5);
+    }
+
+    .tier-badge.tier-0 { background: linear-gradient(135deg, #888 0%, #555 100%); }
+    .tier-badge.tier-1 { background: linear-gradient(135deg, #4A9EFF 0%, #2E7DD1 100%); }
+    .tier-badge.tier-2 { background: linear-gradient(135deg, #7B68EE 0%, #5E4BC3 100%); }
+    .tier-badge.tier-3 { background: linear-gradient(135deg, #FF6B9D 0%, #C44569 100%); }
+    .tier-badge.tier-4 { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); }
+    .tier-badge.tier-5 { background: linear-gradient(135deg, #FF1493 0%, #C71585 100%); }
+
+    .sprite-container {
+      width: 100%;
+      height: 180px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid rgba(136, 204, 255, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      position: relative;
+      overflow: hidden;
+      border-radius: 6px;
+      gap: 0.5rem;
+    }
+
+    .sprite-container img {
+      max-width: 96px;
+      max-height: 96px;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      filter: drop-shadow(0 0 10px rgba(136, 204, 255, 0.5));
+    }
+
+    .soul-name {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      color: #FFF;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(136, 204, 255, 0.8);
+    }
+
+    .soul-archetype {
+      font-size: 0.9rem;
+      color: #AAE;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .incarnation-count {
+      font-size: 1.1rem;
+      text-align: center;
+      color: #88CCFF;
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      background: rgba(136, 204, 255, 0.1);
+      border-radius: 4px;
+    }
+
+    .incarnation-count.legendary {
+      color: #FFD700;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .loading {
+      text-align: center;
+      font-size: 1.5rem;
+      color: #88CCFF;
+      padding: 4rem;
+      animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0.3; }
+    }
+
+    .error {
+      background: rgba(255, 0, 0, 0.2);
+      color: #FF6B6B;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 2px solid #FF6B6B;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 2px solid rgba(136, 204, 255, 0.3);
+    }
+
+    .back-link a {
+      color: #88CCFF;
+      text-decoration: none;
+      font-size: 1.1rem;
+      transition: all 0.3s;
+    }
+
+    .back-link a:hover {
+      color: #FFF;
+      text-shadow: 0 0 10px #88CCFF;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #0a0015 0%, #1a0033 100%);
+      border: 4px solid #88CCFF;
+      padding: 2rem;
+      max-width: 90vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 0 60px rgba(136, 204, 255, 0.8);
+      border-radius: 12px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #88CCFF;
+    }
+
+    .modal-title {
+      font-size: 2rem;
+      color: #FFF;
+      text-shadow: 0 0 15px #88CCFF;
+    }
+
+    .close-btn {
+      background: #88CCFF;
+      color: #0a0015;
+      border: none;
+      padding: 0.5rem 1.5rem;
+      font-family: 'Courier New', monospace;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+
+    .close-btn:hover {
+      background: #FFF;
+      box-shadow: 0 0 20px rgba(136, 204, 255, 0.8);
+    }
+
+    .soul-details {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 2rem;
+      color: #AAE;
+    }
+
+    .soul-details dt {
+      font-weight: bold;
+      color: #88CCFF;
+    }
+
+    .soul-details dd {
+      margin-bottom: 1rem;
+    }
+
+    .generate-btn {
+      background: linear-gradient(135deg, #FF6B9D 0%, #C44569 100%);
+      color: #FFF;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      font-family: 'Courier New', monospace;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      transition: all 0.3s;
+      box-shadow: 0 2px 10px rgba(255, 107, 157, 0.3);
+    }
+
+    .generate-btn:hover {
+      box-shadow: 0 4px 20px rgba(255, 107, 157, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .generate-btn:disabled {
+      background: #666;
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    .generating {
+      color: #FFD700;
+      font-size: 0.8rem;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>✦ SOUL GALLERY ✦</h1>
+      <p class="subtitle">Eternal Archive of Reincarnated Souls</p>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value" id="totalSouls">--</div>
+          <div class="stat-label">Total Souls</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="reincarnatedSouls">--</div>
+          <div class="stat-label">Reincarnated</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="legendarySouls">--</div>
+          <div class="stat-label">Legendary (50+)</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-filter="all">All Souls</button>
+      <button class="filter-btn" data-filter="tier-0">First Life</button>
+      <button class="filter-btn" data-filter="tier-1">4 Directions</button>
+      <button class="filter-btn" data-filter="tier-2">8 Directions</button>
+      <button class="filter-btn" data-filter="tier-3">Animated</button>
+      <button class="filter-btn" data-filter="legendary">Legendary (50+)</button>
+    </div>
+
+    <div id="content">
+      <div class="loading">◆ Loading Soul Archive ◆</div>
+    </div>
+
+    <div class="back-link">
+      <a href="/">&larr; Return to Reality</a>
+    </div>
+  </div>
+
+  <!-- Soul Detail Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Soul Details</div>
+        <button class="close-btn" onclick="closeModal()">CLOSE [X]</button>
+      </div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    let allSouls = [];
+    let currentFilter = 'all';
+
+    // Tier thresholds based on soul-sprite-evolution.md
+    const TIERS = {
+      0: { name: 'First Life', range: [0, 1], description: '1 direction sprite' },
+      1: { name: '4 Directions', range: [2, 2], description: 'Basic rotations unlocked' },
+      2: { name: '8 Directions', range: [3, 9], description: 'Full directional sprite' },
+      3: { name: 'Walking', range: [10, 24], description: 'Walking animations' },
+      4: { name: 'Combat Ready', range: [25, 49], description: 'Idle & combat animations' },
+      5: { name: 'Legendary', range: [50, Infinity], description: 'All animations unlocked' },
+    };
+
+    function getSoulTier(incarnationCount) {
+      for (const [tier, data] of Object.entries(TIERS)) {
+        if (incarnationCount >= data.range[0] && incarnationCount <= data.range[1]) {
+          return { tier: parseInt(tier), ...data };
+        }
+      }
+      return { tier: 0, ...TIERS[0] };
+    }
+
+    async function loadSouls() {
+      try {
+        console.log('[Soul Gallery] Fetching souls from API...');
+
+        // Fetch soul index
+        const indexResponse = await fetch('/soul-repository/index.json');
+        if (!indexResponse.ok) throw new Error(`Failed to load soul index: ${indexResponse.status}`);
+
+        const index = await indexResponse.json();
+        console.log(`[Soul Gallery] Found ${index.totalSouls} souls in index`);
+
+        // Fetch each soul's full data
+        const soulPromises = Object.entries(index.souls).map(async ([soulId, metadata]) => {
+          try {
+            const soulResponse = await fetch(`/soul-repository/${metadata.filePath}`);
+            if (!soulResponse.ok) throw new Error(`Failed to load soul ${soulId}`);
+
+            const soulData = await soulResponse.json();
+            return {
+              id: soulId,
+              ...metadata,
+              ...soulData,
+              incarnationCount: soulData.incarnationHistory?.length || 1,
+            };
+          } catch (error) {
+            console.error(`[Soul Gallery] Failed to load soul ${soulId}:`, error);
+            return null;
+          }
+        });
+
+        allSouls = (await Promise.all(soulPromises)).filter(s => s !== null);
+        console.log(`[Soul Gallery] Loaded ${allSouls.length} souls successfully`);
+
+        renderSouls();
+        updateStats();
+      } catch (error) {
+        console.error('[Soul Gallery] Failed to load souls:', error);
+        document.getElementById('content').innerHTML = `
+          <div class="error">
+            Failed to load soul archive: ${error.message}
+          </div>
+        `;
+      }
+    }
+
+    function updateStats() {
+      const total = allSouls.length;
+      const reincarnated = allSouls.filter(s => s.incarnationCount > 1).length;
+      const legendary = allSouls.filter(s => s.incarnationCount >= 50).length;
+
+      document.getElementById('totalSouls').textContent = total;
+      document.getElementById('reincarnatedSouls').textContent = reincarnated;
+      document.getElementById('legendarySouls').textContent = legendary;
+    }
+
+    function renderSouls() {
+      const filteredSouls = filterSouls(allSouls, currentFilter);
+
+      if (filteredSouls.length === 0) {
+        document.getElementById('content').innerHTML = `
+          <div style="text-align: center; padding: 4rem; color: #AAE;">
+            No souls match the current filter.
+          </div>
+        `;
+        return;
+      }
+
+      const grid = document.createElement('div');
+      grid.className = 'soul-grid';
+
+      for (const soul of filteredSouls) {
+        const tierInfo = getSoulTier(soul.incarnationCount);
+        const spritePath = soul.spriteFolderId
+          ? `/assets/sprites/pixellab/${soul.spriteFolderId}/rotations/south.png`
+          : null;
+
+        const card = document.createElement('div');
+        card.className = 'soul-card';
+
+        const incarnationText = soul.incarnationCount === 1
+          ? '✦ First Incarnation'
+          : `✦ ${soul.incarnationCount} Incarnations`;
+
+        const isLegendary = soul.incarnationCount >= 50;
+
+        // Create sprite container with generate button if no sprite
+        const spriteContainerId = `sprite-${soul.id}`;
+        const spriteHtml = spritePath
+          ? `<img src="${spritePath}" alt="${soul.name}" onclick="event.stopPropagation(); openSoulModal(allSouls.find(s => s.id === '${soul.id}'))">`
+          : `
+            <div style="color: #666;">No sprite</div>
+            <button class="generate-btn" onclick="event.stopPropagation(); generateSoulSprite('${soul.id}')">
+              ⚡ Generate Sprite
+            </button>
+          `;
+
+        card.innerHTML = `
+          <div class="tier-badge tier-${tierInfo.tier}">${tierInfo.name}</div>
+          <div class="sprite-container" id="${spriteContainerId}">
+            ${spriteHtml}
+          </div>
+          <div class="soul-name" onclick="openSoulModal(allSouls.find(s => s.id === '${soul.id}'))" style="cursor: pointer;">${soul.name || 'Unknown'}</div>
+          <div class="soul-archetype">[${soul.archetype || 'unknown'}]</div>
+          <div class="incarnation-count ${isLegendary ? 'legendary' : ''}">
+            ${incarnationText}
+          </div>
+        `;
+
+        grid.appendChild(card);
+      }
+
+      document.getElementById('content').innerHTML = '';
+      document.getElementById('content').appendChild(grid);
+    }
+
+    function filterSouls(souls, filter) {
+      if (filter === 'all') return souls;
+      if (filter === 'legendary') return souls.filter(s => s.incarnationCount >= 50);
+
+      // Filter by tier
+      const tierNum = parseInt(filter.replace('tier-', ''));
+      const tierData = TIERS[tierNum];
+      if (!tierData) return souls;
+
+      return souls.filter(s => {
+        const count = s.incarnationCount;
+        return count >= tierData.range[0] && count <= tierData.range[1];
+      });
+    }
+
+    function openSoulModal(soul) {
+      const tierInfo = getSoulTier(soul.incarnationCount);
+      const spritePath = soul.spriteFolderId
+        ? `/assets/sprites/pixellab/${soul.spriteFolderId}/rotations/south.png`
+        : null;
+
+      document.getElementById('modalTitle').textContent = soul.name || 'Unknown Soul';
+
+      const incarnationHistory = soul.incarnationHistory || [];
+      const historyHtml = incarnationHistory.length > 0
+        ? incarnationHistory.map((inc, idx) => `
+            <div style="padding: 0.5rem; background: rgba(136, 204, 255, 0.05); margin-bottom: 0.5rem; border-left: 3px solid #88CCFF;">
+              <strong>Life ${idx + 1}:</strong> ${inc.bodyName || 'Unknown'}
+              (${inc.bodySpecies || 'unknown'})
+              ${inc.causeOfDeath ? ` - Died of ${inc.causeOfDeath}` : ' - Current life'}
+            </div>
+          `).join('')
+        : '<div style="color: #666;">No incarnation history available</div>';
+
+      document.getElementById('modalBody').innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+          <div>
+            <div style="text-align: center; margin-bottom: 2rem;">
+              ${spritePath
+                ? `<img src="${spritePath}" style="width: 128px; height: 128px; image-rendering: pixelated; filter: drop-shadow(0 0 15px rgba(136, 204, 255, 0.8));">`
+                : `<div style="width: 128px; height: 128px; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: #666;">No sprite</div>`
+              }
+            </div>
+            <div class="tier-badge tier-${tierInfo.tier}" style="position: static; display: inline-block; margin-bottom: 1rem;">
+              ${tierInfo.name}
+            </div>
+            <dl style="color: #AAE;">
+              <dt>Soul ID</dt>
+              <dd style="font-size: 0.75rem; color: #888;">${soul.id}</dd>
+              <dt>Archetype</dt>
+              <dd>${soul.archetype || 'unknown'}</dd>
+              <dt>Species</dt>
+              <dd>${soul.species || 'unknown'}</dd>
+              <dt>Incarnation Count</dt>
+              <dd style="font-size: 1.5rem; color: ${soul.incarnationCount >= 50 ? '#FFD700' : '#88CCFF'};">${soul.incarnationCount}</dd>
+              <dt>Evolution Tier</dt>
+              <dd>${tierInfo.description}</dd>
+              <dt>Created</dt>
+              <dd>${new Date(soul.createdAt).toLocaleString()}</dd>
+            </dl>
+          </div>
+          <div>
+            <h3 style="color: #88CCFF; margin-bottom: 1rem;">Incarnation History</h3>
+            <div style="max-height: 400px; overflow-y: auto;">
+              ${historyHtml}
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('active');
+    }
+
+    // Filter buttons
+    document.getElementById('filters').addEventListener('click', (e) => {
+      if (e.target.classList.contains('filter-btn')) {
+        // Update active state
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+
+        // Apply filter
+        currentFilter = e.target.dataset.filter;
+        renderSouls();
+      }
+    });
+
+    // Close modal on escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Generate sprite for a soul
+    async function generateSoulSprite(soulId) {
+      const soul = allSouls.find(s => s.id === soulId);
+      if (!soul) {
+        console.error('[Soul Gallery] Soul not found:', soulId);
+        return;
+      }
+
+      const containerId = `sprite-${soulId}`;
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      try {
+        // Show generating state
+        container.innerHTML = '<div class="generating">⚡ Generating sprite...</div>';
+
+        console.log(`[Soul Gallery] Requesting sprite generation for ${soul.name}...`);
+
+        // Call API to generate sprite
+        const response = await fetch('http://localhost:3001/api/generate-soul-sprite', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            soulId: soul.id,
+            name: soul.name,
+            description: soul.description || `${soul.species || 'human'} character`,
+            reincarnationCount: soul.incarnationCount,
+            species: soul.species,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log(`[Soul Gallery] Sprite generated:`, result);
+
+        // Update soul with spriteFolderId
+        soul.spriteFolderId = result.spriteFolderId;
+
+        // Update sprite in container
+        const spritePath = `/assets/sprites/pixellab/${result.spriteFolderId}/sprites/south.png`;
+        container.innerHTML = `
+          <img src="${spritePath}?t=${Date.now()}" alt="${soul.name}" onclick="event.stopPropagation(); openSoulModal(allSouls.find(s => s.id === '${soul.id}'))">
+        `;
+
+        console.log(`[Soul Gallery] Sprite loaded successfully for ${soul.name}`);
+      } catch (error) {
+        console.error('[Soul Gallery] Failed to generate sprite:', error);
+        container.innerHTML = `
+          <div style="color: #FF6B6B; font-size: 0.8rem;">Failed to generate</div>
+          <button class="generate-btn" onclick="event.stopPropagation(); generateSoulSprite('${soul.id}')">
+            ↻ Retry
+          </button>
+        `;
+      }
+    }
+
+    // Load souls on page load
+    loadSouls();
+  </script>
+</body>
+</html>

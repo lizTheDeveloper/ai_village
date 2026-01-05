@@ -307,8 +307,64 @@ export class PixelLabSpriteLoader {
       instance.animState.animation = animation;
       instance.animState.frameIndex = 0;
       instance.animState.frameTime = 0;
+
+      // Check if animation exists, if not queue generation
+      const character = instance.character;
+      if (!character.animations.has(animation) && animation !== 'idle') {
+        this.queueAnimationGeneration(character.id, animation);
+      }
     }
     instance.animState.playing = play;
+  }
+
+  private generationRequests = new Set<string>();
+
+  /**
+   * Queue animation generation via API
+   */
+  private queueAnimationGeneration(folderId: string, animationName: string): void {
+    if (typeof window === 'undefined') return;
+
+    // Avoid re-queueing the same animation
+    const cacheKey = `${folderId}:${animationName}`;
+    if (this.generationRequests.has(cacheKey)) return;
+    this.generationRequests.add(cacheKey);
+
+    // Map animation name to action description
+    const actionDescription = this.getActionDescription(animationName);
+
+    fetch('/api/animations/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        folderId,
+        animationName,
+        actionDescription,
+      }),
+    })
+      .then(res => res.json())
+      .then(result => {
+        console.log(`[AnimGen] Queued ${animationName} for ${folderId}:`, result.message);
+      })
+      .catch(err => {
+        console.error(`[AnimGen] Failed to queue ${animationName} for ${folderId}:`, err);
+        this.generationRequests.delete(cacheKey);
+      });
+  }
+
+  /**
+   * Convert animation name to action description
+   */
+  private getActionDescription(animationName: string): string {
+    const descriptions: Record<string, string> = {
+      'walking-8-frames': 'walking forward at normal pace',
+      'walking-4-frames': 'walking forward',
+      'running': 'running quickly',
+      'idle': 'standing idle',
+      'attack': 'attacking with weapon',
+      'cast': 'casting spell with hands raised',
+    };
+    return descriptions[animationName] || animationName.replace(/-/g, ' ');
   }
 
   /**
