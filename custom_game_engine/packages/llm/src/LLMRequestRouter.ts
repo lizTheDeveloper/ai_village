@@ -108,6 +108,11 @@ export class LLMRequestRouter {
       queue: 'cerebras',
       fallbackChain: ['groq'],
     });
+    this.providerMappings.set('qwen-3-32b', {
+      provider: 'cerebras',
+      queue: 'cerebras',
+      fallbackChain: ['groq'],
+    });
 
     // OpenAI models
     this.providerMappings.set('gpt-4-turbo', {

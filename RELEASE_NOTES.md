@@ -1,5 +1,96 @@
 # Release Notes
 
+## 2026-01-04 - Tiered LLM Routing & Sprite Queue (Round 6/12)
+
+### LLM Infrastructure Specification
+
+#### Tiered Routing Architecture
+- **TIERED_ROUTING_AND_DISTRIBUTED_INFERENCE.md** - Comprehensive spec (+1082 lines)
+  - 5-tier model classification (1.6B → frontier models)
+  - Cost-optimized routing (60-80% cost reduction target)
+  - Distributed inference across Raspberry/Orange Pis
+  - Task → tier automatic classification
+  - Provider registry and health monitoring
+  - Benchmarking system with LLM-as-judge
+  - User configuration UI mockups
+  - Implementation plan (4-week roadmap)
+
+#### Model Tier Definitions
+- **Tier 1 (1.6B-3B):** Soul names, trivial tasks (<$0.0001/call)
+- **Tier 2 (7B-14B):** Casual conversations, simple decisions (<$0.0003/call)
+- **Tier 3 (32B):** Important decisions, story generation (<$0.001/call)
+- **Tier 4 (70B+):** Strategic planning, complex reasoning (<$0.003/call)
+- **Tier 5 (Frontier):** Divine decisions, reality manipulation (<$0.01/call)
+
+#### Provider Architecture
+- **Cloud providers:** Groq, Cerebras, Anthropic, OpenAI
+- **Local providers:** Orange Pi 5 (7B-11B), Orange Pi Zero (1.5B)
+- **Routing strategy:** Cost → latency → availability optimization
+- **Health monitoring:** Periodic provider health checks
+- **Auto-discovery:** Network scan for local Ollama instances
+
+### Sprite Generation Queue System
+
+#### Soul Gallery Queue UI
+- **soul-gallery.html** - Persistent sprite generation queue (+213 lines)
+  - SpriteQueue class for queue management
+  - localStorage persistence (QUEUE_KEY = 'soul_sprite_queue')
+  - MIN_GENERATION_DELAY = 6 seconds between generations
+  - Queue position display for souls
+  - Auto-processing with background queue worker
+  - Queue status UI (queued, generating, completed)
+  - Add/remove from queue functionality
+
+#### Queue Persistence
+- **sprite-generation-queue.json** - Queue state storage (new file)
+  - Persistent queue for sprite generation jobs
+  - Tracks queued sprites and animations
+  - Status tracking (queued, processing, completed, failed)
+  - Timestamp and description metadata
+
+### Generated Soul Sprites
+
+#### Batch Soul Generation
+- **soul_057cae95-9021-401a-bc27-4461a894e259/** - Soul sprite 1
+- **soul_922a554b-617f-40ba-83a0-1852d499a9a9/** - Soul sprite 2
+- **soul_c5963f2c-348d-45ff-91ef-82d1e475c98e/** - Soul sprite 3
+- **soul_e0389226-e82c-4532-9718-4e36a822c8b3/** - Soul sprite 4 (existing)
+- **soul_e4821ffb-d02a-4033-b3d1-9d735798d9d6/** - Soul sprite 5
+  - Validation of on-demand sprite generation
+  - Confirms queue system works end-to-end
+  - Multiple souls generated via PixelLab API
+
+### System Updates
+
+#### Visual System Enhancements
+- **AnimalVisualsSystem.ts** - Minor updates
+- **systems/index.ts** - System export additions
+- **registerAllSystems.ts** - System registration updates
+
+#### Renderer Updates
+- **SpriteRenderer.ts** - Sprite rendering improvements
+- **world/index.ts** - World package updates
+
+#### Persistence Updates
+- **serializers/index.ts** - Serialization enhancements
+
+#### Metrics Server
+- **metrics-server.ts** - Dashboard endpoint enhancements
+
+### New Directories
+
+#### 3D Prototype
+- **3d-prototype/** - 3D rendering prototype (new directory)
+  - Exploration of 3D visualization options
+  - Experimental 3D renderer implementation
+
+#### Soul Repository
+- **soul-repository/** - Soul data repository (new directory)
+  - Persistent soul storage
+  - Soul metadata and history tracking
+
+---
+
 ## 2026-01-04 - Visual Metadata Standardization (Round 5/12)
 
 ### New Visual Systems

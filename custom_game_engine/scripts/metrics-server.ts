@@ -81,7 +81,7 @@ import {
   LLMRequestRouter,
   DEFAULT_RATE_LIMITS,
   type LLMRequestPayload,
-} from '../packages/llm/index.js';
+} from '../packages/llm/dist/index.js';
 
 const gzip = promisify(zlib.gzip);
 const gunzip = promisify(zlib.gunzip);

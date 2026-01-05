@@ -25,6 +25,9 @@ export * from './AnimalProductionSystem.js';
 export * from './TamingSystem.js';
 export * from './WildAnimalSpawningSystem.js';
 export * from './AnimalHousingSystem.js';
+// Visual Metadata Systems (compute sizeMultiplier/alpha from game state)
+export * from './PlantVisualsSystem.js';
+export * from './AnimalVisualsSystem.js';
 export * from './MemoryFormationSystem.js';
 export * from './MemoryConsolidationSystem.js';
 export * from './ReflectionSystem.js';

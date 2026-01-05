@@ -76,8 +76,7 @@ export function renderSprite(
   spriteId: string,
   x: number,
   y: number,
-  size: number,
-  metadata?: any
+  size: number
 ): void {
   // IMPORTANT: Save and restore canvas state to prevent alpha/fill corruption
   ctx.save();
@@ -359,7 +358,7 @@ export function renderSprite(
     case 'carrot':
     case 'potato':
     case 'tomato':
-      renderPlantSprite(ctx, spriteId, x, y, size, metadata?.stage);
+      renderPlantSprite(ctx, spriteId, x, y, size);
       break;
 
     // Animal sprites
@@ -389,78 +388,27 @@ export function renderSprite(
 }
 
 /**
- * Render plant sprites with species-specific visuals and stage-based size/appearance
+ * Render plant sprites with species-specific visuals.
+ * Size and alpha are already applied via RenderableComponent by PlantVisualsSystem.
  */
 function renderPlantSprite(
   ctx: CanvasRenderingContext2D,
   speciesId: string,
   x: number,
   y: number,
-  size: number,
-  stage?: string
+  size: number
 ): void {
-  // Scale size based on stage
-  let sizeMultiplier = 1.0;
-  let alpha = 1.0;
-
-  switch (stage) {
-    case 'seed':
-      sizeMultiplier = 0.2;
-      alpha = 0.7;
-      break;
-    case 'germinating':
-      sizeMultiplier = 0.3;
-      alpha = 0.8;
-      break;
-    case 'sprout':
-      sizeMultiplier = 0.5;
-      break;
-    case 'vegetative':
-      sizeMultiplier = 0.75;
-      break;
-    case 'flowering':
-    case 'fruiting':
-    case 'mature':
-      sizeMultiplier = 1.0;
-      break;
-    case 'seeding':
-      sizeMultiplier = 1.0;
-      alpha = 0.9;
-      break;
-    case 'senescence':
-      sizeMultiplier = 0.9;
-      alpha = 0.7;
-      break;
-    case 'decay':
-      sizeMultiplier = 0.6;
-      alpha = 0.5;
-      break;
-    case 'dead':
-      sizeMultiplier = 0.3;
-      alpha = 0.3;
-      break;
-    default:
-      // Unknown stage, use full size
-      break;
-  }
-
-  // Apply size and alpha
-  const scaledSize = size * sizeMultiplier;
-  const offsetX = (size - scaledSize) / 2;
-  const offsetY = (size - scaledSize) / 2;
-
-  ctx.globalAlpha = alpha;
+  // Size is already scaled by PlantVisualsSystem, use as-is
   switch (speciesId) {
     case 'grass':
-      // Simple grass blades - green (color varies by stage)
-      const grassColor = stage === 'dead' ? '#8B7355' : stage === 'decay' ? '#A0826D' : '#228B22';
-      ctx.strokeStyle = grassColor;
-      ctx.lineWidth = scaledSize / 12;
+      // Simple grass blades - green
+      ctx.strokeStyle = '#228B22';
+      ctx.lineWidth = size / 12;
       for (let i = 0; i < 3; i++) {
-        const bladeX = x + offsetX + scaledSize * (0.3 + i * 0.2);
+        const bladeX = x + size * (0.3 + i * 0.2);
         ctx.beginPath();
-        ctx.moveTo(bladeX, y + offsetY + scaledSize * 0.8);
-        ctx.lineTo(bladeX, y + offsetY + scaledSize * 0.3);
+        ctx.moveTo(bladeX, y + size * 0.8);
+        ctx.lineTo(bladeX, y + size * 0.3);
         ctx.stroke();
       }
       break;
@@ -597,12 +545,9 @@ function renderPlantSprite(
       // Fallback for unknown plant
       ctx.fillStyle = '#90EE90'; // Light green
       ctx.beginPath();
-      ctx.arc(x + offsetX + scaledSize / 2, y + offsetY + scaledSize / 2, scaledSize / 3, 0, Math.PI * 2);
+      ctx.arc(x + size / 2, y + size / 2, size / 3, 0, Math.PI * 2);
       ctx.fill();
   }
-
-  // Reset alpha
-  ctx.globalAlpha = 1.0;
 }
 
 /**

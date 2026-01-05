@@ -1,0 +1,19 @@
+{
+  "entityId": "057cae95-9021-401a-bc27-4461a894e259",
+  "tier": 2,
+  "config": {
+    "size": 24,
+    "directions": 4,
+    "animations": [],
+    "detail": "low detail",
+    "shading": "basic shading"
+  },
+  "sprites": [
+    "sprites/south.png",
+    "sprites/west.png",
+    "sprites/north.png",
+    "sprites/east.png"
+  ],
+  "animations": [],
+  "generatedAt": 1767574932691
+}

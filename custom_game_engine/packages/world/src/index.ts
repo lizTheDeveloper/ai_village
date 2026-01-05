@@ -10,3 +10,4 @@ export * from './entities/index.js';
 export * from './plant-species/index.js';
 export * from './alien-generation/index.js';
 export * from './research-papers/index.js';
+export * from './systems/index.js';

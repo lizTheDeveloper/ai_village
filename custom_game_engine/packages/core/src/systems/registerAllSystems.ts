@@ -21,6 +21,7 @@ import { PlantSystem } from './PlantSystem.js';
 import { PlantDiscoverySystem } from './PlantDiscoverySystem.js';
 import { PlantDiseaseSystem } from './PlantDiseaseSystem.js';
 import { WildPlantPopulationSystem } from './WildPlantPopulationSystem.js';
+import { PlantVisualsSystem } from './PlantVisualsSystem.js';
 
 // Animals
 import { AnimalSystem } from './AnimalSystem.js';
@@ -28,6 +29,7 @@ import { AnimalProductionSystem } from './AnimalProductionSystem.js';
 import { AnimalHousingSystem } from './AnimalHousingSystem.js';
 import { WildAnimalSpawningSystem } from './WildAnimalSpawningSystem.js';
 import { TamingSystem } from './TamingSystem.js';
+import { AnimalVisualsSystem } from './AnimalVisualsSystem.js';
 
 // Uplift (Animal Consciousness)
 import { UpliftCandidateDetectionSystem } from '../uplift/UpliftCandidateDetectionSystem.js';
@@ -346,6 +348,13 @@ export function registerAllSystems(
   // RENDERING
   // ============================================================================
   gameLoop.systemRegistry.register(new AnimationSystem());
+
+  // ============================================================================
+  // VISUAL METADATA (computes sizeMultiplier/alpha from game state)
+  // Priority 300-301: Runs after growth systems, before rendering applies values
+  // ============================================================================
+  gameLoop.systemRegistry.register(new PlantVisualsSystem());
+  gameLoop.systemRegistry.register(new AnimalVisualsSystem());
 
   // ============================================================================
   // PLANTS

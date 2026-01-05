@@ -1,0 +1,13 @@
+{
+  "sprites": [
+    {
+      "folderId": "test_sprite",
+      "characterId": "",
+      "status": "queued",
+      "queuedAt": 1767575036645,
+      "description": "blue wizard",
+      "traits": {}
+    }
+  ],
+  "animations": []
+}

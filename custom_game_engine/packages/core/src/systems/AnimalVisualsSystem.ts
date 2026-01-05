@@ -27,10 +27,10 @@ export class AnimalVisualsSystem implements System {
     // Base size from animal's size field (already includes genetics + age factors)
     let sizeMultiplier = animal.size ?? 1.0;
 
-    // Apply life stage modifier for juveniles
+    // Apply life stage modifier for younger animals
     switch (animal.lifeStage) {
-      case 'baby':
-        sizeMultiplier *= 0.3; // Babies are 30% of adult size
+      case 'infant':
+        sizeMultiplier *= 0.3; // Infants are 30% of adult size
         break;
       case 'juvenile':
         sizeMultiplier *= 0.6; // Juveniles are 60% of adult size
@@ -38,8 +38,8 @@ export class AnimalVisualsSystem implements System {
       case 'adult':
         // Full size, no modifier
         break;
-      case 'elderly':
-        sizeMultiplier *= 0.95; // Elderly slightly smaller (stooped)
+      case 'elder':
+        sizeMultiplier *= 0.95; // Elders slightly smaller (stooped)
         break;
     }
 
