@@ -2942,6 +2942,15 @@ AI VILLAGE DASHBOARD | ${sessionStatus}
   requests. Spawn agents, teleport them, give items, set needs, create deities,
   grant spells, and more. See /api/actions for full documentation.
 
+## LLM PROVIDER CONFIGURATION
+---------------------------------------------------------------------------
+  View LLM provider details (models, API keys, costs, queue status):
+
+  Dashboard:  curl http://localhost:${HTTP_PORT}/dashboard/llm
+  JSON API:   curl http://localhost:${HTTP_PORT}/api/llm/providers
+  Stats:      curl http://localhost:${HTTP_PORT}/api/llm/stats
+  Costs:      curl http://localhost:${HTTP_PORT}/api/llm/costs
+
 `;
 
   output += `---\n`;
@@ -4228,6 +4237,129 @@ const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse
     return;
   }
 
+  if (pathname === '/dashboard/llm') {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    if (!llmRouter) {
+      res.end(`AI VILLAGE - LLM PROVIDERS
+================================================================================
+
+⚠️  LLM Queue Not Initialized
+
+No LLM providers configured. Set the following environment variables:
+  - GROQ_API_KEY or VITE_GROQ_API_KEY
+  - CEREBRAS_API_KEY or VITE_CEREBRAS_API_KEY
+
+Then restart the server.
+`);
+      return;
+    }
+
+    try {
+      // Helper to mask API key (show last 4 chars)
+      const maskApiKey = (key: string | undefined): string => {
+        if (!key) return 'Not configured';
+        if (key.length <= 4) return '***';
+        return `${'\u2022'.repeat(key.length - 4)}${key.slice(-4)}`;
+      };
+
+      const costStats = llmRouter.costTracker.getStats();
+      const queueStats = llmRouter.getQueueStats();
+      const providerCosts = llmRouter.costTracker.getAllProviderCosts();
+
+      // Calculate total tokens
+      const totalTokens = providerCosts.reduce((sum, p) =>
+        sum + p.totalInputTokens + p.totalOutputTokens, 0
+      );
+
+      let output = `AI VILLAGE - LLM PROVIDERS
+================================================================================
+
+SUMMARY
+-------
+Total Providers:  ${llmProvidersConfigured.length}
+Total Requests:   ${costStats.totalRequests.toLocaleString()}
+Total Cost:       $${costStats.totalCost.toFixed(4)}
+Total Tokens:     ${totalTokens.toLocaleString()}
+Avg Cost/Request: $${costStats.totalRequests > 0 ? (costStats.totalCost / costStats.totalRequests).toFixed(6) : '0.000000'}
+
+`;
+
+      // Groq provider
+      if (groqApiKey) {
+        const groqQueue = queueStats['groq'];
+        const groqCost = providerCosts.find(p => p.provider === 'groq');
+        const groqTotalTokens = groqCost ? groqCost.totalInputTokens + groqCost.totalOutputTokens : 0;
+
+        output += `PROVIDER: GROQ
+──────────────────────────────────────────────────────────────────────────────
+Model:            ${groqModel}
+Base URL:         https://api.groq.com/openai/v1
+API Key:          ${maskApiKey(groqApiKey)}
+Max Concurrent:   2
+Fallback Chain:   ${cerebrasApiKey ? 'cerebras' : 'none'}
+
+QUEUE STATUS
+  Queue Length:   ${groqQueue?.queueLength || 0}
+  Rate Limited:   ${groqQueue?.rateLimited ? 'YES' : 'NO'}
+  Wait Time:      ${groqQueue?.rateLimitWaitMs || 0}ms
+  Utilization:    ${groqQueue ? (groqQueue.semaphoreUtilization * 100).toFixed(1) : '0.0'}%
+
+COST TRACKING
+  Total Requests: ${groqCost?.requestCount.toLocaleString() || '0'}
+  Total Cost:     $${groqCost?.totalCost.toFixed(4) || '0.0000'}
+  Total Tokens:   ${groqTotalTokens.toLocaleString()}
+  Avg Cost/Req:   $${groqCost && groqCost.requestCount > 0 ? (groqCost.totalCost / groqCost.requestCount).toFixed(6) : '0.000000'}
+
+`;
+      }
+
+      // Cerebras provider
+      if (cerebrasApiKey) {
+        const cerebrasQueue = queueStats['cerebras'];
+        const cerebrasCost = providerCosts.find(p => p.provider === 'cerebras');
+        const cerebrasTotalTokens = cerebrasCost ? cerebrasCost.totalInputTokens + cerebrasCost.totalOutputTokens : 0;
+
+        output += `PROVIDER: CEREBRAS
+──────────────────────────────────────────────────────────────────────────────
+Model:            ${cerebrasModel}
+Base URL:         https://api.cerebras.ai/v1
+API Key:          ${maskApiKey(cerebrasApiKey)}
+Max Concurrent:   2
+Fallback Chain:   ${groqApiKey ? 'groq' : 'none'}
+
+QUEUE STATUS
+  Queue Length:   ${cerebrasQueue?.queueLength || 0}
+  Rate Limited:   ${cerebrasQueue?.rateLimited ? 'YES' : 'NO'}
+  Wait Time:      ${cerebrasQueue?.rateLimitWaitMs || 0}ms
+  Utilization:    ${cerebrasQueue ? (cerebrasQueue.semaphoreUtilization * 100).toFixed(1) : '0.0'}%
+
+COST TRACKING
+  Total Requests: ${cerebrasCost?.requestCount.toLocaleString() || '0'}
+  Total Cost:     $${cerebrasCost?.totalCost.toFixed(4) || '0.0000'}
+  Total Tokens:   ${cerebrasTotalTokens.toLocaleString()}
+  Avg Cost/Req:   $${cerebrasCost && cerebrasCost.requestCount > 0 ? (cerebrasCost.totalCost / cerebrasCost.requestCount).toFixed(6) : '0.000000'}
+
+`;
+      }
+
+      output += `API ENDPOINTS
+──────────────────────────────────────────────────────────────────────────────
+  curl http://localhost:${HTTP_PORT}/api/llm/providers    # JSON provider config
+  curl http://localhost:${HTTP_PORT}/api/llm/stats        # Queue stats
+  curl http://localhost:${HTTP_PORT}/api/llm/costs        # Cost tracking
+  curl http://localhost:${HTTP_PORT}/dashboard/llm        # This page
+`;
+
+      res.end(output);
+    } catch (error) {
+      res.statusCode = 500;
+      res.end(`Error generating LLM provider dashboard: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+    return;
+  }
+
   // === Agent Detail Endpoint (for more-agent-info) ===
   if (pathname === '/dashboard/agent') {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
@@ -4776,6 +4908,35 @@ Available agents:
 
     try {
       const result = await sendQueryToGame(gameClient, 'research');
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
+  if (pathname === '/api/live/plants') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    // Support session filtering via ?session=<id> query parameter
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
+    if (!gameClient) {
+      res.statusCode = 503;
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'plants');
       res.end(JSON.stringify(result, null, 2));
     } catch (err) {
       res.statusCode = 500;
@@ -5784,6 +5945,108 @@ ${listHeadlessGames().map(g => `  ${g.sessionId}: ${g.status} (${g.agentCount} a
     return;
   }
 
+  // Provider configuration endpoint - show all LLM providers with their settings
+  if (pathname === '/api/llm/providers' && req.method === 'GET') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    if (!llmRouter) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({
+        error: 'LLM queue not initialized',
+        message: 'No LLM providers configured'
+      }));
+      return;
+    }
+
+    try {
+      // Helper to mask API key (show last 4 chars)
+      const maskApiKey = (key: string | undefined): string => {
+        if (!key) return 'Not configured';
+        if (key.length <= 4) return '***';
+        return `${'\u2022'.repeat(key.length - 4)}${key.slice(-4)}`;
+      };
+
+      // Build provider details
+      const providers: any[] = [];
+
+      if (groqApiKey) {
+        const groqStats = llmRouter.getQueueStats()['groq'];
+        const groqCosts = llmRouter.costTracker.getAllProviderCosts().find(p => p.provider === 'groq');
+
+        providers.push({
+          name: 'groq',
+          model: groqModel,
+          apiKey: maskApiKey(groqApiKey),
+          baseUrl: 'https://api.groq.com/openai/v1',
+          maxConcurrent: 2,
+          fallbackChain: cerebrasApiKey ? ['cerebras'] : [],
+          queue: groqStats ? {
+            queueLength: groqStats.queueLength,
+            rateLimited: groqStats.rateLimited,
+            rateLimitWaitMs: groqStats.rateLimitWaitMs,
+            semaphoreUtilization: groqStats.semaphoreUtilization,
+          } : null,
+          costs: groqCosts ? {
+            totalCost: groqCosts.totalCost,
+            totalRequests: groqCosts.requestCount,
+            totalTokens: groqCosts.totalInputTokens + groqCosts.totalOutputTokens,
+            apiKeys: Array.from(groqCosts.apiKeys),
+          } : null,
+        });
+      }
+
+      if (cerebrasApiKey) {
+        const cerebrasStats = llmRouter.getQueueStats()['cerebras'];
+        const cerebrasCosts = llmRouter.costTracker.getAllProviderCosts().find(p => p.provider === 'cerebras');
+
+        providers.push({
+          name: 'cerebras',
+          model: cerebrasModel,
+          apiKey: maskApiKey(cerebrasApiKey),
+          baseUrl: 'https://api.cerebras.ai/v1',
+          maxConcurrent: 2,
+          fallbackChain: groqApiKey ? ['groq'] : [],
+          queue: cerebrasStats ? {
+            queueLength: cerebrasStats.queueLength,
+            rateLimited: cerebrasStats.rateLimited,
+            rateLimitWaitMs: cerebrasStats.rateLimitWaitMs,
+            semaphoreUtilization: cerebrasStats.semaphoreUtilization,
+          } : null,
+          costs: cerebrasCosts ? {
+            totalCost: cerebrasCosts.totalCost,
+            totalRequests: cerebrasCosts.requestCount,
+            totalTokens: cerebrasCosts.totalInputTokens + cerebrasCosts.totalOutputTokens,
+            apiKeys: Array.from(cerebrasCosts.apiKeys),
+          } : null,
+        });
+      }
+
+      // Calculate total tokens from provider costs
+      const allProviderCosts = llmRouter.costTracker.getAllProviderCosts();
+      const totalTokens = allProviderCosts.reduce((sum, p) =>
+        sum + p.totalInputTokens + p.totalOutputTokens, 0
+      );
+
+      res.end(JSON.stringify({
+        providers,
+        summary: {
+          totalProviders: providers.length,
+          totalCost: llmRouter.costTracker.getStats().totalCost,
+          totalRequests: llmRouter.costTracker.getStats().totalRequests,
+          totalTokens,
+        },
+      }, null, 2));
+    } catch (error) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({
+        error: 'Failed to get provider configuration',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      }));
+    }
+    return;
+  }
+
   // === Save/Load/Fork API (Time Manipulation Dev Tools) ===
 
   // List all saves for a session
@@ -6018,8 +6281,20 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
   }
 
   // === Sprite Generation API ===
+
+  // Handle CORS preflight for sprite generation
+  if (pathname === '/api/sprites/generate' && req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'content-type, Content-Type');
+    res.statusCode = 204;
+    res.end();
+    return;
+  }
+
   if (pathname === '/api/sprites/generate' && req.method === 'POST') {
     res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
 
     let body = '';
     req.on('data', chunk => {

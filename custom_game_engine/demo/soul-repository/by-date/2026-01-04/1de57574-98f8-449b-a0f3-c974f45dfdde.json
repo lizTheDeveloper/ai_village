@@ -1,0 +1,107 @@
+{
+  "soulId": "1de57574-98f8-449b-a0f3-c974f45dfdde",
+  "agentId": "1de57574-98f8-449b-a0f3-c974f45dfdde",
+  "name": "Linden",
+  "species": "human",
+  "archetype": "creator",
+  "purpose": "I see a soul born of fertile earth and promising skies. This soul shall cultivate the land and nurture the hearts of those around them, bringing forth abundance and warmth to the fledgling village.",
+  "interests": [
+    "farming",
+    "social",
+    "art"
+  ],
+  "createdAt": "2026-01-04T23:33:45.243Z",
+  "soulBirthTick": 34,
+  "universeId": "unknown",
+  "version": 1,
+  "incarnationHistory": [
+    {
+      "incarnationTick": 1000,
+      "deathTick": 57127,
+      "bodyName": "Linden (Life 1)",
+      "bodySpecies": "human",
+      "duration": 56127,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 61008,
+      "deathTick": 87055,
+      "bodyName": "Linden (Life 2)",
+      "bodySpecies": "human",
+      "duration": 26047,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 90660,
+      "deathTick": 129375,
+      "bodyName": "Linden (Life 3)",
+      "bodySpecies": "human",
+      "duration": 38715,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 129833,
+      "deathTick": 164422,
+      "bodyName": "Linden (Life 4)",
+      "bodySpecies": "human",
+      "duration": 34589,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 164847,
+      "deathTick": 185850,
+      "bodyName": "Linden (Life 5)",
+      "bodySpecies": "human",
+      "duration": 21003,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 190165,
+      "deathTick": 226465,
+      "bodyName": "Linden (Life 6)",
+      "bodySpecies": "human",
+      "duration": 36300,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 226832,
+      "deathTick": 257374,
+      "bodyName": "Linden (Life 7)",
+      "bodySpecies": "human",
+      "duration": 30542,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 262370,
+      "deathTick": 296750,
+      "bodyName": "Linden (Life 8)",
+      "bodySpecies": "human",
+      "duration": 34380,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 300188,
+      "deathTick": 353910,
+      "bodyName": "Linden (Life 9)",
+      "bodySpecies": "human",
+      "duration": 53722,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 354378,
+      "bodyName": "Linden (Life 10)",
+      "bodySpecies": "human",
+      "notableEvents": []
+    }
+  ],
+  "isReincarnated": true
+}

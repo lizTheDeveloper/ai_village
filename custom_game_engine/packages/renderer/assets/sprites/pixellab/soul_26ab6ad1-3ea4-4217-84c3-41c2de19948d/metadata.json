@@ -1,0 +1,17 @@
+{
+  "id": "soul_26ab6ad1-3ea4-4217-84c3-41c2de19948d",
+  "category": "animals",
+  "size": 48,
+  "description": "human character named Orion",
+  "generated_at": "2026-01-05T02:02:05.079Z",
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ]
+}

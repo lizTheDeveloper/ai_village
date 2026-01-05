@@ -1,9 +1,17 @@
 {
   "id": "sturdy_default",
-  "category": "humanoids",
-  "type": "character",
+  "category": "regeneration",
   "size": 48,
   "description": "Sturdy humanoid character, simple clothing, pixel art",
-  "generated_at": "2026-01-03T22:08:48.316Z",
-  "usage_usd": 0
+  "generated_at": "2026-01-05T01:43:33.974Z",
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ]
 }

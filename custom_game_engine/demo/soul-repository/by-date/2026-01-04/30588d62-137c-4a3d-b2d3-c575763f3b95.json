@@ -1,0 +1,197 @@
+{
+  "soulId": "30588d62-137c-4a3d-b2d3-c575763f3b95",
+  "agentId": "30588d62-137c-4a3d-b2d3-c575763f3b95",
+  "name": "Wren",
+  "species": "human",
+  "archetype": "seeker",
+  "purpose": "I see a soul born of promise and potential, amidst the emergence of a new society. This soul shall nurture the flame of community, guiding the village towards harmony and cooperation.",
+  "interests": [
+    "knowledge",
+    "crafting",
+    "art"
+  ],
+  "createdAt": "2026-01-04T23:36:28.300Z",
+  "soulBirthTick": 266,
+  "universeId": "unknown",
+  "version": 1,
+  "incarnationHistory": [
+    {
+      "incarnationTick": 1000,
+      "deathTick": 13108,
+      "bodyName": "Wren (Life 1)",
+      "bodySpecies": "human",
+      "duration": 12108,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 14004,
+      "deathTick": 69057,
+      "bodyName": "Wren (Life 2)",
+      "bodySpecies": "human",
+      "duration": 55053,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 72081,
+      "deathTick": 95201,
+      "bodyName": "Wren (Life 3)",
+      "bodySpecies": "human",
+      "duration": 23120,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 99507,
+      "deathTick": 128239,
+      "bodyName": "Wren (Life 4)",
+      "bodySpecies": "human",
+      "duration": 28732,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 132198,
+      "deathTick": 170525,
+      "bodyName": "Wren (Life 5)",
+      "bodySpecies": "human",
+      "duration": 38327,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 175393,
+      "deathTick": 221924,
+      "bodyName": "Wren (Life 6)",
+      "bodySpecies": "human",
+      "duration": 46531,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 224135,
+      "deathTick": 262757,
+      "bodyName": "Wren (Life 7)",
+      "bodySpecies": "human",
+      "duration": 38622,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 265556,
+      "deathTick": 289000,
+      "bodyName": "Wren (Life 8)",
+      "bodySpecies": "human",
+      "duration": 23444,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 291924,
+      "deathTick": 349720,
+      "bodyName": "Wren (Life 9)",
+      "bodySpecies": "human",
+      "duration": 57796,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 353985,
+      "deathTick": 366442,
+      "bodyName": "Wren (Life 10)",
+      "bodySpecies": "human",
+      "duration": 12457,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 370377,
+      "deathTick": 401797,
+      "bodyName": "Wren (Life 11)",
+      "bodySpecies": "human",
+      "duration": 31420,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 403462,
+      "deathTick": 443041,
+      "bodyName": "Wren (Life 12)",
+      "bodySpecies": "human",
+      "duration": 39579,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 447992,
+      "deathTick": 464759,
+      "bodyName": "Wren (Life 13)",
+      "bodySpecies": "human",
+      "duration": 16767,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 466135,
+      "deathTick": 493823,
+      "bodyName": "Wren (Life 14)",
+      "bodySpecies": "human",
+      "duration": 27688,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 498284,
+      "deathTick": 511845,
+      "bodyName": "Wren (Life 15)",
+      "bodySpecies": "human",
+      "duration": 13561,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 515366,
+      "deathTick": 531085,
+      "bodyName": "Wren (Life 16)",
+      "bodySpecies": "human",
+      "duration": 15719,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 534641,
+      "deathTick": 583215,
+      "bodyName": "Wren (Life 17)",
+      "bodySpecies": "human",
+      "duration": 48574,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 584057,
+      "deathTick": 622750,
+      "bodyName": "Wren (Life 18)",
+      "bodySpecies": "human",
+      "duration": 38693,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 626338,
+      "deathTick": 655750,
+      "bodyName": "Wren (Life 19)",
+      "bodySpecies": "human",
+      "duration": 29412,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 656819,
+      "bodyName": "Wren (Life 20)",
+      "bodySpecies": "human",
+      "notableEvents": []
+    }
+  ],
+  "isReincarnated": true
+}

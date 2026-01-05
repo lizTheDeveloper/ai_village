@@ -1,0 +1,17 @@
+{
+  "soulId": "057cae95-9021-401a-bc27-4461a894e259",
+  "agentId": "057cae95-9021-401a-bc27-4461a894e259",
+  "name": "Juniper",
+  "species": "human",
+  "archetype": "seeker",
+  "purpose": "I see a soul born into a time of new beginnings, where community and knowledge will be the foundations upon which the future is built. This soul shall nurture the flame of wisdom, guiding the village towards harmony and prosperity.",
+  "interests": [
+    "knowledge",
+    "social",
+    "art"
+  ],
+  "createdAt": "2026-01-04T23:58:23.886Z",
+  "soulBirthTick": 316,
+  "universeId": "unknown",
+  "version": 1
+}

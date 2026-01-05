@@ -1,7 +1,17 @@
 {
   "id": "tree_pine",
-  "category": "map_objects",
+  "category": "regeneration",
   "size": 48,
   "description": "Tall pine/conifer tree, triangular shape, top-down view",
-  "generated_at": "2026-01-04T21:32:56.200Z"
+  "generated_at": "2026-01-05T01:42:57.193Z",
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ]
 }

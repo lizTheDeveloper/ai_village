@@ -1,0 +1,17 @@
+{
+  "soulId": "50536acc-5dc1-4d84-9693-65d89bea6f6a",
+  "agentId": "50536acc-5dc1-4d84-9693-65d89bea6f6a",
+  "name": "Reed",
+  "species": "human",
+  "archetype": "creator",
+  "purpose": "I see a soul born of hope and promise, in this time of new beginnings. This soul shall be a guardian of community, nurturing the bonds that strengthen the village and foster its growth.",
+  "interests": [
+    "social",
+    "crafting",
+    "building"
+  ],
+  "createdAt": "2026-01-04T23:58:10.945Z",
+  "soulBirthTick": 57,
+  "universeId": "unknown",
+  "version": 1
+}

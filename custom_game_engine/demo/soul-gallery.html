@@ -439,138 +439,97 @@
       5: { name: 'Legendary', range: [50, Infinity], description: 'All animations unlocked' },
     };
 
-    // Persistent sprite generation queue
-    const QUEUE_KEY = 'soul_sprite_queue';
-    const MIN_GENERATION_DELAY = 6000; // 6 seconds between generations
+    // Sprite queue API integration (uses daemon queue via metrics server)
+    const METRICS_API = 'http://localhost:8766';
+    const ORCHESTRATOR_API = 'http://localhost:3030';
+    const POLL_INTERVAL = 3000; // Poll queue status every 3 seconds
 
     class SpriteQueue {
       constructor() {
-        this.queue = this.loadQueue();
-        this.isProcessing = false;
-        this.currentSoulId = null;
+        this.pollInterval = null;
+        this.queuedSouls = new Set(); // Track which souls we've queued
       }
 
-      loadQueue() {
+      async startPolling() {
+        if (this.pollInterval) return;
+
+        console.log('[Queue] Starting queue status polling...');
+        this.pollInterval = setInterval(() => this.pollQueueStatus(), POLL_INTERVAL);
+
+        // Poll immediately
+        await this.pollQueueStatus();
+      }
+
+      stopPolling() {
+        if (this.pollInterval) {
+          clearInterval(this.pollInterval);
+          this.pollInterval = null;
+          console.log('[Queue] Stopped polling');
+        }
+      }
+
+      async pollQueueStatus() {
         try {
-          const saved = localStorage.getItem(QUEUE_KEY);
-          return saved ? JSON.parse(saved) : [];
+          // Get queue status from metrics server
+          const queueResponse = await fetch(`${METRICS_API}/api/generation/queue`);
+          if (!queueResponse.ok) return;
+
+          const queue = await queueResponse.json();
+
+          // Update UI for all queued souls
+          this.updateQueueUI(queue);
         } catch (error) {
-          console.error('[Queue] Failed to load queue:', error);
-          return [];
+          console.error('[Queue] Failed to poll queue status:', error);
         }
       }
 
-      saveQueue() {
-        try {
-          localStorage.setItem(QUEUE_KEY, JSON.stringify(this.queue));
-          console.log('[Queue] Saved:', this.queue.length, 'souls');
-        } catch (error) {
-          console.error('[Queue] Failed to save queue:', error);
-        }
-      }
+      updateQueueUI(queue) {
+        // Combine pending and completed sprites
+        const allSprites = [
+          ...(queue.pending?.sprites || []),
+          ...(queue.completed?.sprites || [])
+        ];
 
-      add(soulId) {
-        if (!this.queue.includes(soulId)) {
-          this.queue.push(soulId);
-          this.saveQueue();
-          console.log('[Queue] Added soul:', soulId, '- Position:', this.queue.length);
-          this.updateQueueUI();
-          return true;
-        }
-        return false;
-      }
-
-      remove(soulId) {
-        const index = this.queue.indexOf(soulId);
-        if (index !== -1) {
-          this.queue.splice(index, 1);
-          this.saveQueue();
-          console.log('[Queue] Removed soul:', soulId);
-          this.updateQueueUI();
-          return true;
-        }
-        return false;
-      }
-
-      getPosition(soulId) {
-        const index = this.queue.indexOf(soulId);
-        return index !== -1 ? index + 1 : null;
-      }
-
-      isQueued(soulId) {
-        return this.queue.includes(soulId);
-      }
-
-      getNext() {
-        return this.queue[0] || null;
-      }
-
-      clear() {
-        this.queue = [];
-        this.saveQueue();
-        this.updateQueueUI();
-      }
-
-      updateQueueUI() {
-        // Update all queued souls' UI
-        for (const soulId of this.queue) {
+        // Check each soul we've queued
+        for (const soulId of this.queuedSouls) {
           const container = document.getElementById(`sprite-${soulId}`);
-          if (container) {
-            const position = this.getPosition(soulId);
-            const isNext = position === 1;
+          if (!container) continue;
 
-            if (soulId === this.currentSoulId) {
-              // Currently generating
+          const soul = allSouls.find(s => s.id === soulId);
+          if (!soul) continue;
+
+          const folderId = `soul_${soulId}`;
+
+          // Find this soul in the queue
+          const queuedSprite = allSprites.find(s => s.folderId === folderId);
+
+          if (queuedSprite) {
+            const status = queuedSprite.status;
+
+            if (status === 'generating') {
               container.innerHTML = '<div class="generating">⚡ Generating sprite...</div>';
-            } else {
-              // Queued
+            } else if (status === 'queued') {
+              // Calculate position in pending queue
+              const pendingSprites = queue.pending?.sprites || [];
+              const position = pendingSprites.findIndex(s => s.folderId === folderId) + 1;
+              const isNext = position === 1;
+
               container.innerHTML = `
                 <div class="queued">📋 Queued for generation</div>
-                <div class="queue-position">${isNext ? 'Next in queue' : `Position: ${position}`}</div>
-                <button class="generate-btn" onclick="event.stopPropagation(); spriteQueue.remove('${soulId}')" style="margin-top: 0.5rem; background: #666;">
-                  ✕ Cancel
-                </button>
+                <div class="queue-position">${isNext ? 'Next in queue' : position > 0 ? `Position: ${position}` : 'In queue'}</div>
               `;
-            }
-          }
-        }
-      }
-
-      async processQueue() {
-        if (this.isProcessing || this.queue.length === 0) {
-          return;
-        }
-
-        this.isProcessing = true;
-        console.log('[Queue] Starting queue processing...');
-
-        while (this.queue.length > 0) {
-          const soulId = this.queue[0];
-          this.currentSoulId = soulId;
-
-          console.log(`[Queue] Processing soul ${soulId} (${this.queue.length} remaining)`);
-
-          try {
-            await this.generateSprite(soulId);
-            // Success - remove from queue
-            this.queue.shift();
-            this.saveQueue();
-          } catch (error) {
-            console.error(`[Queue] Failed to generate sprite for ${soulId}:`, error);
-
-            // If rate limited, keep in queue and wait
-            if (error.message.includes('Rate limited') || error.message.includes('wait')) {
-              console.log('[Queue] Rate limited - waiting 6 seconds...');
-              await this.sleep(MIN_GENERATION_DELAY);
-              continue;
-            }
-
-            // Other errors - remove from queue and show error
-            this.queue.shift();
-            this.saveQueue();
-
-            const container = document.getElementById(`sprite-${soulId}`);
-            if (container) {
+            } else if (status === 'complete') {
+              // Generation complete - update sprite
+              this.queuedSouls.delete(soulId);
+              soul.spriteFolderId = folderId;
+              const spritePath = `/assets/sprites/pixellab/${folderId}/sprites/south.png`;
+              container.innerHTML = `
+                <img src="${spritePath}?t=${Date.now()}" alt="${soul.name}" onclick="event.stopPropagation(); openSoulModal(allSouls.find(s => s.id === '${soul.id}'))">
+              `;
+              console.log(`[Queue] ✓ Sprite completed for ${soul.name}`);
+            } else if (status === 'failed') {
+              // Generation failed
+              this.queuedSouls.delete(soulId);
               container.innerHTML = `
                 <div style="color: #FF6B6B; font-size: 0.8rem;">Generation failed</div>
                 <button class="generate-btn" onclick="event.stopPropagation(); generateSoulSprite('${soulId}')" style="margin-top: 0.5rem;">
@@ -578,70 +537,83 @@
                 </button>
               `;
             }
-          }
+          } else {
+            // Not in queue anymore - check if sprite exists
+            const spritePath = `/assets/sprites/pixellab/soul_${soulId}/sprites/south.png`;
 
-          this.currentSoulId = null;
-          this.updateQueueUI();
-
-          // Wait between generations
-          if (this.queue.length > 0) {
-            await this.sleep(MIN_GENERATION_DELAY);
+            // Try to load sprite
+            const img = new Image();
+            img.onload = () => {
+              soul.spriteFolderId = `soul_${soulId}`;
+              container.innerHTML = `
+                <img src="${spritePath}?t=${Date.now()}" alt="${soul.name}" onclick="event.stopPropagation(); openSoulModal(allSouls.find(s => s.id === '${soul.id}'))">
+              `;
+              this.queuedSouls.delete(soulId);
+            };
+            img.onerror = () => {
+              // Sprite doesn't exist, remove from tracking
+              this.queuedSouls.delete(soulId);
+            };
+            img.src = spritePath;
           }
         }
 
-        this.isProcessing = false;
-        console.log('[Queue] Queue processing complete');
+        // Stop polling if queue is empty
+        if (this.queuedSouls.size === 0) {
+          this.stopPolling();
+        }
       }
 
-      async generateSprite(soulId) {
+      async queueSprite(soulId) {
         const soul = allSouls.find(s => s.id === soulId);
         if (!soul) {
           throw new Error('Soul not found');
         }
 
-        const container = document.getElementById(`sprite-${soulId}`);
-        if (container) {
-          container.innerHTML = '<div class="generating">⚡ Generating sprite...</div>';
-        }
+        const folderId = `soul_${soulId}`;
 
-        console.log(`[Queue] Generating sprite for ${soul.name}...`);
+        // Build description for sprite
+        const description = soul.description ||
+          `${soul.species || 'human'} character named ${soul.name}`;
 
-        const response = await fetch('http://localhost:3001/api/generate-soul-sprite', {
+        console.log(`[Queue] Queueing sprite generation for ${soul.name}...`);
+
+        // Queue via metrics server API
+        const response = await fetch(`${METRICS_API}/api/sprites/generate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            soulId: soul.id,
-            name: soul.name,
-            description: soul.description || `${soul.species || 'human'} character`,
-            reincarnationCount: soul.incarnationCount,
-            species: soul.species,
+            folderId,
+            description,
+            traits: {
+              soulId,
+              name: soul.name,
+              species: soul.species,
+              archetype: soul.archetype,
+              reincarnationCount: soul.incarnationCount || 1,
+            },
           }),
         });
 
-        const result = await response.json();
-
         if (!response.ok) {
-          throw new Error(result.error || `API error: ${response.status}`);
+          const error = await response.json();
+          throw new Error(error.error || `API error: ${response.status}`);
         }
 
-        console.log(`[Queue] Sprite generated for ${soul.name}:`, result);
+        const result = await response.json();
+        console.log(`[Queue] ✓ Queued ${soul.name}:`, result);
 
-        // Update soul with spriteFolderId
-        soul.spriteFolderId = result.spriteFolderId;
+        // Track this soul
+        this.queuedSouls.add(soulId);
 
-        // Update sprite in container
-        const spritePath = `/assets/sprites/pixellab/${result.spriteFolderId}/sprites/south.png`;
-        if (container) {
-          container.innerHTML = `
-            <img src="${spritePath}?t=${Date.now()}" alt="${soul.name}" onclick="event.stopPropagation(); openSoulModal(allSouls.find(s => s.id === '${soul.id}'))">
-          `;
-        }
+        // Start polling if not already
+        await this.startPolling();
 
-        console.log(`[Queue] ✓ Sprite loaded successfully for ${soul.name}`);
+        return result;
       }
 
-      sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+      isQueued(soulId) {
+        return this.queuedSouls.has(soulId);
       }
     }
 
@@ -693,15 +665,8 @@
         renderSouls();
         updateStats();
 
-        // Restore queue state from localStorage
-        console.log(`[Soul Gallery] Restoring queue state (${spriteQueue.queue.length} souls)`);
-        spriteQueue.updateQueueUI();
-
-        // Auto-start queue processing if there are queued souls
-        if (spriteQueue.queue.length > 0) {
-          console.log('[Soul Gallery] Auto-starting queue processing...');
-          spriteQueue.processQueue();
-        }
+        // Start polling for queue updates (daemon may have queued souls)
+        await spriteQueue.startPolling();
       } catch (error) {
         console.error('[Soul Gallery] Failed to load souls:', error);
         document.getElementById('content').innerHTML = `
@@ -755,21 +720,16 @@
         // Create sprite container with generate button if no sprite
         const spriteContainerId = `sprite-${soul.id}`;
         const isQueued = spriteQueue.isQueued(soul.id);
-        const queuePosition = spriteQueue.getPosition(soul.id);
 
         let spriteHtml;
         if (spritePath) {
           // Has sprite
           spriteHtml = `<img src="${spritePath}" alt="${soul.name}" onclick="event.stopPropagation(); openSoulModal(allSouls.find(s => s.id === '${soul.id}'))">`;
         } else if (isQueued) {
-          // Queued for generation
-          const isNext = queuePosition === 1;
+          // Queued for generation (polling will update this)
           spriteHtml = `
-            <div class="queued">📋 Queued for generation</div>
-            <div class="queue-position">${isNext ? 'Next in queue' : `Position: ${queuePosition}`}</div>
-            <button class="generate-btn" onclick="event.stopPropagation(); spriteQueue.remove('${soul.id}')" style="margin-top: 0.5rem; background: #666;">
-              ✕ Cancel
-            </button>
+            <div class="queued">📋 Queued...</div>
+            <div class="queue-position">Checking status...</div>
           `;
         } else {
           // No sprite, not queued
@@ -895,39 +855,44 @@
       if (e.key === 'Escape') closeModal();
     });
 
-    // Generate sprite for a soul - adds to queue
-    function generateSoulSprite(soulId) {
+    // Generate sprite for a soul - queues via daemon API
+    async function generateSoulSprite(soulId) {
       const soul = allSouls.find(s => s.id === soulId);
       if (!soul) {
         console.error('[Soul Gallery] Soul not found:', soulId);
         return;
       }
 
-      // Add to queue
-      const added = spriteQueue.add(soulId);
-      if (added) {
-        console.log(`[Soul Gallery] Added ${soul.name} to sprite generation queue`);
+      // Check if already queued
+      if (spriteQueue.isQueued(soulId)) {
+        console.log(`[Soul Gallery] ${soul.name} is already queued`);
+        return;
+      }
 
-        // Update UI immediately
-        const container = document.getElementById(`sprite-${soulId}`);
-        if (container) {
-          const position = spriteQueue.getPosition(soulId);
-          const isNext = position === 1;
-          container.innerHTML = `
-            <div class="queued">📋 Queued for generation</div>
-            <div class="queue-position">${isNext ? 'Next in queue' : `Position: ${position}`}</div>
-            <button class="generate-btn" onclick="event.stopPropagation(); spriteQueue.remove('${soulId}')" style="margin-top: 0.5rem; background: #666;">
-              ✕ Cancel
-            </button>
-          `;
-        }
+      const container = document.getElementById(`sprite-${soulId}`);
+      if (!container) return;
 
-        // Start processing if not already running
-        if (!spriteQueue.isProcessing) {
-          spriteQueue.processQueue();
-        }
-      } else {
-        console.log(`[Soul Gallery] ${soul.name} is already in queue`);
+      try {
+        // Show queueing state
+        container.innerHTML = '<div class="queued">📋 Queueing...</div>';
+
+        // Queue via daemon API
+        await spriteQueue.queueSprite(soulId);
+
+        console.log(`[Soul Gallery] ✓ Queued ${soul.name} for sprite generation`);
+
+        // UI will be updated by polling
+      } catch (error) {
+        console.error(`[Soul Gallery] Failed to queue ${soul.name}:`, error);
+
+        // Show error
+        container.innerHTML = `
+          <div style="color: #FF6B6B; font-size: 0.8rem;">Failed to queue</div>
+          <div style="font-size: 0.7rem; color: #888;">${error.message}</div>
+          <button class="generate-btn" onclick="event.stopPropagation(); generateSoulSprite('${soulId}')" style="margin-top: 0.5rem;">
+            ↻ Retry
+          </button>
+        `;
       }
     }
 

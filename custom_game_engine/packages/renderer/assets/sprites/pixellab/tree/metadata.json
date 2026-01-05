@@ -1,9 +1,17 @@
 {
   "id": "tree",
-  "category": "plants",
-  "type": "map_object",
-  "size": 32,
+  "category": "regeneration",
+  "size": 48,
   "description": "Tree plant, pixel art, top-down view",
-  "generated_at": "2026-01-03T21:57:01.003Z",
-  "usage_usd": 0
+  "generated_at": "2026-01-05T01:42:33.336Z",
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ]
 }

@@ -1,0 +1,18 @@
+{
+  "soulId": "e0389226-e82c-4532-9718-4e36a822c8b3",
+  "agentId": "e0389226-e82c-4532-9718-4e36a822c8b3",
+  "name": "Pebble",
+  "species": "human",
+  "archetype": "creator",
+  "purpose": "I see a soul born into a time of new beginnings, where the fabric of society is being woven anew. This soul shall nurture the growth of the First Village, cultivating abundance and harmony within the community.",
+  "interests": [
+    "nature",
+    "farming",
+    "social"
+  ],
+  "createdAt": "2026-01-04T23:35:14.648Z",
+  "soulBirthTick": 170,
+  "universeId": "unknown",
+  "version": 1,
+  "spriteFolderId": "soul_e0389226-e82c-4532-9718-4e36a822c8b3"
+}

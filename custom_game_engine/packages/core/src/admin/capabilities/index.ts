@@ -1,0 +1,14 @@
+/**
+ * Built-in Capabilities Registration
+ *
+ * This file imports and registers all built-in admin capabilities.
+ * Add new capability imports here to auto-register them.
+ */
+
+import './overview.js';
+import './universes.js';
+import './agents.js';
+import './sprites.js';
+import './media.js';
+import './llm.js';
+import './saves.js';

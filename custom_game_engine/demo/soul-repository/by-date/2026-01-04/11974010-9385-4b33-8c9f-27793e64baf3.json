@@ -1,0 +1,62 @@
+{
+  "soulId": "11974010-9385-4b33-8c9f-27793e64baf3",
+  "agentId": "11974010-9385-4b33-8c9f-27793e64baf3",
+  "name": "Cedar",
+  "species": "human",
+  "archetype": "creator",
+  "purpose": "I see a soul born into a time of new beginnings, where the First Village's foundation requires dedication and care. This soul shall nurture the community's growth, weaving together the threads of cooperation and understanding to create a strong and resilient fabric.",
+  "interests": [
+    "knowledge",
+    "crafting",
+    "art"
+  ],
+  "createdAt": "2026-01-04T23:33:48.939Z",
+  "soulBirthTick": 108,
+  "universeId": "unknown",
+  "version": 1,
+  "incarnationHistory": [
+    {
+      "incarnationTick": 1000,
+      "deathTick": 49086,
+      "bodyName": "Cedar (Life 1)",
+      "bodySpecies": "human",
+      "duration": 48086,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 54071,
+      "deathTick": 103901,
+      "bodyName": "Cedar (Life 2)",
+      "bodySpecies": "human",
+      "duration": 49830,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 108510,
+      "deathTick": 143952,
+      "bodyName": "Cedar (Life 3)",
+      "bodySpecies": "human",
+      "duration": 35442,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 148231,
+      "deathTick": 200064,
+      "bodyName": "Cedar (Life 4)",
+      "bodySpecies": "human",
+      "duration": 51833,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 203998,
+      "bodyName": "Cedar (Life 5)",
+      "bodySpecies": "human",
+      "notableEvents": []
+    }
+  ],
+  "isReincarnated": true
+}

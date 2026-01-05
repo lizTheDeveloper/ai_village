@@ -1,0 +1,17 @@
+{
+  "id": "soul_1de57574-98f8-449b-a0f3-c974f45dfdde",
+  "category": "animals",
+  "size": 48,
+  "description": "human character named Linden",
+  "generated_at": "2026-01-05T02:01:41.849Z",
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ]
+}

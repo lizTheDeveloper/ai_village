@@ -1,0 +1,44 @@
+{
+  "soulId": "11452730-c8d0-434d-bdf0-486fc4204c21",
+  "agentId": "11452730-c8d0-434d-bdf0-486fc4204c21",
+  "name": "North",
+  "species": "human",
+  "archetype": "farmer",
+  "purpose": "I see a soul born of fertile ground and promising skies. This soul shall cultivate the earth and nurture the growth of the First Village, weaving together the threads of community and abundance.",
+  "interests": [
+    "nature",
+    "farming",
+    "knowledge"
+  ],
+  "createdAt": "2026-01-04T23:42:24.033Z",
+  "soulBirthTick": 843,
+  "universeId": "unknown",
+  "version": 1,
+  "incarnationHistory": [
+    {
+      "incarnationTick": 1000,
+      "deathTick": 19668,
+      "bodyName": "North (Life 1)",
+      "bodySpecies": "human",
+      "duration": 18668,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 20964,
+      "deathTick": 32660,
+      "bodyName": "North (Life 2)",
+      "bodySpecies": "human",
+      "duration": 11696,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 36733,
+      "bodyName": "North (Life 3)",
+      "bodySpecies": "human",
+      "notableEvents": []
+    }
+  ],
+  "isReincarnated": true
+}

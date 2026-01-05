@@ -1,0 +1,17 @@
+{
+  "soulId": "70cee37c-3cdf-4959-958a-5602ae0fe79b",
+  "agentId": "70cee37c-3cdf-4959-958a-5602ae0fe79b",
+  "name": "Oak",
+  "species": "human",
+  "archetype": "unifier",
+  "purpose": "I see a soul destined to nurture growth and foster unity. This soul shall cultivate the land and bring forth abundance, strengthening the fabric of the community.",
+  "interests": [
+    "nature",
+    "farming",
+    "knowledge"
+  ],
+  "createdAt": "2026-01-04T23:36:26.901Z",
+  "soulBirthTick": 238,
+  "universeId": "unknown",
+  "version": 1
+}

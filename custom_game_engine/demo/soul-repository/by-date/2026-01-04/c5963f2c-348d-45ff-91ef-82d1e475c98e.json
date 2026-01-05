@@ -1,0 +1,18 @@
+{
+  "soulId": "c5963f2c-348d-45ff-91ef-82d1e475c98e",
+  "agentId": "c5963f2c-348d-45ff-91ef-82d1e475c98e",
+  "name": "Willow",
+  "species": "human",
+  "archetype": "farmer",
+  "purpose": "I see a soul born of fertile ground and promising skies. This soul shall cultivate the land and tend the hearts of those around them, fostering a sense of belonging and abundance in the First Village.",
+  "interests": [
+    "nature",
+    "farming",
+    "social"
+  ],
+  "createdAt": "2026-01-04T23:36:16.615Z",
+  "soulBirthTick": 32,
+  "universeId": "unknown",
+  "version": 1,
+  "spriteFolderId": "soul_c5963f2c-348d-45ff-91ef-82d1e475c98e"
+}

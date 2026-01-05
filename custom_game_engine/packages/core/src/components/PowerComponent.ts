@@ -4,14 +4,25 @@ import type { Component } from '../ecs/Component.js';
  * Power types in the automation system
  * Tier 2: Mechanical (wind/water)
  * Tier 3-4: Electrical (coal/solar)
- * Tier 5+: Arcane (mana/ley lines)
+ * Tier 5: Arcane (mana/ley lines)
+ * Tier 6-7: Stellar (Dyson Swarm satellites, stellar relay)
+ * Tier 8: Exotic (Reality Anchor, advanced endgame tech)
  */
-export type PowerType = 'mechanical' | 'electrical' | 'arcane';
+export type PowerType = 'mechanical' | 'electrical' | 'arcane' | 'stellar' | 'exotic';
 
 /**
  * Power role - what this entity does with power
  */
 export type PowerRole = 'producer' | 'consumer' | 'storage';
+
+/**
+ * Consumer priority levels for power allocation during shortages
+ * Critical: Reality Anchor, life support, critical infrastructure
+ * High: Important production facilities, defense systems
+ * Normal: Standard machines, factories
+ * Low: Non-essential systems, decorative elements
+ */
+export type ConsumerPriority = 'critical' | 'high' | 'normal' | 'low';
 
 /**
  * PowerComponent - Power generation, consumption, or storage
@@ -53,6 +64,9 @@ export interface PowerComponent extends Component {
 
   /** Connection range for power poles (tiles, 0 = not a pole) */
   connectionRange: number;
+
+  /** Priority level for consumers (used during power shortages) */
+  priority: ConsumerPriority;
 }
 
 /**
@@ -66,6 +80,7 @@ export function createPowerComponent(
     consumption?: number;
     capacity?: number;
     connectionRange?: number;
+    priority?: ConsumerPriority;
   } = {}
 ): PowerComponent {
   return {
@@ -80,6 +95,7 @@ export function createPowerComponent(
     isPowered: role === 'producer', // Producers are always "powered"
     efficiency: 1.0,
     connectionRange: params.connectionRange ?? 0,
+    priority: params.priority ?? 'normal', // Default to normal priority
   };
 }
 
@@ -102,10 +118,12 @@ export function createPowerProducer(
  */
 export function createPowerConsumer(
   powerType: PowerType,
-  consumption: number
+  consumption: number,
+  priority: ConsumerPriority = 'normal'
 ): PowerComponent {
   return createPowerComponent('consumer', powerType, {
     consumption,
+    priority,
   });
 }
 

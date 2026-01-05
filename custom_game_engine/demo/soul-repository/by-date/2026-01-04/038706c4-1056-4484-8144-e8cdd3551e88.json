@@ -1,0 +1,27 @@
+{
+  "soulId": "038706c4-1056-4484-8144-e8cdd3551e88",
+  "agentId": "038706c4-1056-4484-8144-e8cdd3551e88",
+  "name": "Jasper",
+  "species": "human",
+  "archetype": "farmer",
+  "purpose": "I see a soul born into a time of new beginnings and promise. This soul shall cultivate the earth and nurture the growth of the First Village, bringing prosperity and harmony to the community.",
+  "interests": [
+    "nature",
+    "farming",
+    "building"
+  ],
+  "createdAt": "2026-01-04T23:41:44.643Z",
+  "soulBirthTick": 55,
+  "universeId": "unknown",
+  "version": 1,
+  "incarnationHistory": [
+    {
+      "incarnationTick": 1000,
+      "bodyName": "Jasper (Life 1)",
+      "bodySpecies": "human",
+      "notableEvents": []
+    }
+  ],
+  "isReincarnated": false,
+  "spriteFolderId": "soul_038706c4-1056-4484-8144-e8cdd3551e88"
+}

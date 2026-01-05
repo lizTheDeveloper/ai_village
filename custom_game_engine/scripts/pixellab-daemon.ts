@@ -138,8 +138,24 @@ async function apiRequest(endpoint: string, method: string = 'GET', body?: any):
   return response.json();
 }
 
-// Synchronous image generation - returns base64 image immediately
-async function generateSprite(description: string, size: number = 48): Promise<string> {
+// Generate character with all 8 directions (for moving entities)
+async function generateCharacter(description: string, name: string, size: number = 48): Promise<string> {
+  const result = await apiRequest('/v1/characters', 'POST', {
+    description,
+    name,
+    size,
+    n_directions: 8,
+    view: 'high top-down',
+    detail: 'medium detail',
+    outline: 'single color black outline',
+    shading: 'basic shading',
+  });
+
+  return result.character_id || result.id;
+}
+
+// Synchronous single image generation (for static objects like trees)
+async function generateSingleImage(description: string, size: number = 48): Promise<string> {
   const result = await apiRequest('/generate-image-pixflux', 'POST', {
     description,
     image_size: {
@@ -446,6 +462,91 @@ async function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/**
+ * Enhance sprite description with rich visual details
+ * Only enhances character sprites (with species/archetype traits)
+ */
+function enhanceSpriteDescription(baseDescription: string, traits: any): string {
+  // If no species trait, this is not a character (tree, rock, etc.) - return original
+  if (!traits || !traits.species) {
+    return baseDescription;
+  }
+
+  const parts: string[] = [];
+
+  // Extract key information from base description
+  const species = traits.species;
+  const name = traits.name || '';
+  const archetype = traits.archetype || '';
+  const reincarnationCount = traits.reincarnationCount || 1;
+
+  // Build detailed character description based on archetype and species
+  const archetypeDescriptions: Record<string, string> = {
+    warrior: 'seasoned warrior with battle-worn armor, leather straps, metal plates, carrying a sword and shield',
+    mage: 'mystical mage in flowing robes adorned with arcane symbols, carrying a glowing staff',
+    scholar: 'learned scholar in academic robes with leather-bound tome, ink-stained fingers, wearing spectacles',
+    artisan: 'skilled craftsperson in sturdy work clothes, leather apron, tool belt with hammer and chisel',
+    merchant: 'prosperous trader in fine wool doublet, silk vest with gold buttons, coin purse at belt',
+    farmer: 'hardworking farmer in simple linen tunic, rolled-up sleeves, dirt-stained trousers, straw hat',
+    healer: 'compassionate healer in white robes with red cross emblem, carrying medicine bag with herbs',
+    explorer: 'adventurous explorer in weathered travel gear, leather jacket, rope coil, backpack with supplies',
+    noble: 'dignified noble in elegant silk attire with velvet cloak, gold trim, jeweled rings',
+    priest: 'devoted priest in ceremonial robes with holy symbols, prayer beads, ceremonial staff',
+    unifier: 'charismatic leader in practical yet distinguished clothing, diplomatic sash, peace symbol',
+    seeker: 'wise wanderer in travel-worn robes, carrying ancient scrolls and mystical artifacts',
+    creator: 'inventive artisan with paint-stained smock, carrying tools and creative materials',
+  };
+
+  // Species-specific visual details - only for non-human species
+  const speciesDetails: Record<string, string> = {
+    elf: 'elf with elegant pointed ears, tall slender build, fair skin, ethereal graceful features, long flowing hair',
+    dwarf: 'dwarf with thick braided beard, short stocky muscular build, broad shoulders, weathered rugged features',
+    orc: 'orc with green skin, pronounced lower tusks, broad muscular physique, strong jaw, intense gaze',
+    thrakeen: 'thrakeen reptilian humanoid with iridescent scaled skin, ridge along spine, clawed hands, serpentine eyes with vertical pupils',
+    celestial: 'celestial being with radiant pale skin, subtle ethereal glow, serene features, luminous eyes',
+    aquatic: 'aquatic merfolk with blue-green scaled skin, webbed fingers, gill slits on neck, flowing hair like seaweed',
+  };
+
+  // Build the enhanced description
+  // Start with species description (detailed for non-humans, simple for humans)
+  if (species.toLowerCase() === 'human') {
+    parts.push('human');
+  } else if (speciesDetails[species.toLowerCase()]) {
+    parts.push(speciesDetails[species.toLowerCase()]);
+  } else {
+    parts.push(`${species} humanoid`);
+  }
+
+  // Add archetype details if available
+  if (archetype && archetypeDescriptions[archetype.toLowerCase()]) {
+    parts.push(archetypeDescriptions[archetype.toLowerCase()]);
+  } else if (archetype) {
+    parts.push(`${archetype} profession`);
+  }
+
+  // Add experience/wisdom based on reincarnation count (shown through appearance, not calling them souls)
+  if (reincarnationCount > 15) {
+    parts.push('weathered wise appearance with knowing eyes, calm confident bearing');
+  } else if (reincarnationCount > 10) {
+    parts.push('experienced veteran with confident posture, steady gaze');
+  } else if (reincarnationCount > 5) {
+    parts.push('mature bearing with composed expression');
+  } else if (reincarnationCount > 1) {
+    parts.push('young adult with eager bright expression');
+  } else {
+    parts.push('youthful appearance with fresh innocent features');
+  }
+
+  // Pixel art specifications
+  parts.push('detailed pixel art');
+  parts.push('top-down 45-degree view');
+  parts.push('clear silhouette');
+  parts.push('vibrant colors');
+  parts.push('visible facial features and clothing details');
+
+  return parts.join(', ');
+}
+
 // ============ Main Loop ============
 
 async function runDaemon(): Promise<void> {
@@ -477,44 +578,126 @@ async function runDaemon(): Promise<void> {
       if (queueJob) {
         // Process on-demand sprite generation request
         log(`\n[Queue] Generating: ${queueJob.folderId}`);
-        log(`  ${queueJob.description}`);
+        log(`  Original description: ${queueJob.description}`);
 
         try {
           // Determine size from traits or default to 48
           const size = queueJob.traits?.size || 48;
+          const name = queueJob.traits?.name || queueJob.folderId;
 
-          // Generate sprite synchronously
-          const base64Data = await generateSprite(queueJob.description, size);
-          log(`  ✓ Generated sprite`);
+          // Enhance the description with visual details
+          const enhancedDescription = enhanceSpriteDescription(queueJob.description, queueJob.traits);
+          log(`  Enhanced description: ${enhancedDescription}`);
 
-          // Save to animals category (or determine from traits)
-          const category = queueJob.traits?.category || 'animals';
-          const success = await saveSprite(
-            queueJob.folderId,
-            category,
-            base64Data,
-            queueJob.description,
-            size
-          );
+          // Determine if this is a character (needs multiple directions) or static object
+          const isCharacter = queueJob.traits && queueJob.traits.species;
 
-          if (success) {
-            // Mark as complete and remove from queue
-            queueJob.status = 'complete';
-            queueJob.completedAt = Date.now();
-            const updatedSprites = spriteJobs.filter((j: any) => j.folderId !== queueJob.folderId);
-            saveQueue(updatedSprites, animJobs);
+          if (!isCharacter) {
+            // Static object (tree, rock, etc.) - use single image generation
+            log(`  Generating static object...`);
+            const base64Data = await generateSingleImage(enhancedDescription, size);
+            log(`  ✓ Generated single image`);
 
-            state.totalGenerated++;
-            state.totalDownloaded++;
-            saveState(state);
+            // Save as simple sprite
+            const category = queueJob.traits?.category || 'objects';
+            const spriteDir = path.join(ASSETS_PATH, queueJob.folderId);
+            fs.mkdirSync(spriteDir, { recursive: true });
 
-            log(`  ✓ Saved: ${queueJob.folderId}`);
-            log(`  ✓ Removed from queue (${updatedSprites.length} sprites, ${animJobs.length} animations remaining)`);
+            // Save image
+            const imageBuffer = Buffer.from(base64Data, 'base64');
+            fs.writeFileSync(path.join(spriteDir, 'sprite.png'), imageBuffer);
+
+            // Save metadata
+            const metadata = {
+              id: queueJob.folderId,
+              category,
+              size,
+              description: enhancedDescription,
+              original_description: queueJob.description,
+              generated_at: new Date().toISOString(),
+              type: 'static',
+            };
+            fs.writeFileSync(path.join(spriteDir, 'metadata.json'), JSON.stringify(metadata, null, 2));
           } else {
-            // Mark as failed
-            queueJob.status = 'failed';
-            saveQueue(spriteJobs, animJobs);
+            // Character (moving entity) - generate all 8 directions
+            log(`  Requesting character generation...`);
+            const characterId = await generateCharacter(enhancedDescription, name, size);
+            log(`  ✓ Character queued: ${characterId}`);
+
+            // Poll for completion
+            log(`  Polling for completion...`);
+            let attempts = 0;
+            const maxAttempts = 120; // 10 minutes max wait (5s * 120)
+            let character: any = null;
+
+            while (attempts < maxAttempts) {
+              await sleep(5000); // Wait 5 seconds between polls
+              attempts++;
+
+              character = await apiRequest(`/v1/characters/${characterId}`, 'GET');
+
+              if (character.status === 'completed' || character.rotations) {
+                log(`  ✓ Character generation complete!`);
+                break;
+              } else if (character.status === 'failed') {
+                throw new Error('Character generation failed');
+              }
+
+              if (attempts % 6 === 0) { // Log every 30 seconds
+                log(`  ⏳ Still processing... (${attempts * 5}s elapsed)`);
+              }
+            }
+
+            if (!character || (!character.rotations && character.status !== 'completed')) {
+              throw new Error('Character generation timed out');
+            }
+
+            // Download all 8 directions
+            log(`  Downloading rotations...`);
+            const charDir = path.join(ASSETS_PATH, queueJob.folderId);
+            const rotationsDir = path.join(charDir, 'rotations');
+            fs.mkdirSync(rotationsDir, { recursive: true });
+
+            const directions = ['south', 'south-west', 'west', 'north-west', 'north', 'north-east', 'east', 'south-east'];
+            for (const dir of directions) {
+              const url = character.rotations?.[dir] || character.frames?.rotations?.[dir];
+              if (url) {
+                const fullUrl = url.startsWith('http') ? url : `https://api.pixellab.ai${url}`;
+                const response = await fetch(fullUrl);
+                const buffer = Buffer.from(await response.arrayBuffer());
+                const destFile = path.join(rotationsDir, `${dir}.png`);
+                fs.writeFileSync(destFile, buffer);
+                log(`    ✓ ${dir}.png`);
+              }
+            }
+
+            // Save metadata
+            const metadata = {
+              id: queueJob.folderId,
+              category: queueJob.traits?.category || 'characters',
+              size,
+              description: enhancedDescription,
+              original_description: queueJob.description,
+              generated_at: new Date().toISOString(),
+              pixellab_character_id: characterId,
+              directions: directions,
+              type: 'character',
+            };
+            fs.writeFileSync(path.join(charDir, 'metadata.json'), JSON.stringify(metadata, null, 2));
           }
+
+          // Mark as complete and remove from queue
+          queueJob.status = 'complete';
+          queueJob.completedAt = Date.now();
+          const updatedSprites = spriteJobs.filter((j: any) => j.folderId !== queueJob.folderId);
+          saveQueue(updatedSprites, animJobs);
+
+          state.totalGenerated++;
+          state.totalDownloaded++;
+          saveState(state);
+
+          log(`  ✓ Saved: ${queueJob.folderId}`);
+          log(`  ✓ Removed from queue (${updatedSprites.length} sprites, ${animJobs.length} animations remaining)`);
 
           // Rate limiting
           log(`  Waiting ${DELAY_AFTER_QUEUE_MS / 1000}s...`);
@@ -524,6 +707,7 @@ async function runDaemon(): Promise<void> {
         } catch (err: any) {
           log(`  ✗ Error: ${err.message}`);
           queueJob.status = 'failed';
+          queueJob.error = err.message;
           saveQueue(spriteJobs, animJobs);
 
           if (err.message.includes('rate') || err.message.includes('limit') || err.message.includes('429')) {

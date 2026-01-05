@@ -223,3 +223,89 @@ export function getSpatialMemoriesByType(
     .filter((m) => m.type === type)
     .sort((a, b) => b.strength - a.strength);
 }
+
+/**
+ * Get all spatial memories within a radius of a location, sorted by distance
+ */
+export function getSpatialMemoriesByLocation(
+  component: SpatialMemoryComponent,
+  location: { x: number; y: number },
+  radius: number
+): SpatialMemory[] {
+  if (!component) {
+    throw new Error('getSpatialMemoriesByLocation: component parameter is required');
+  }
+  if (!location || typeof location.x !== 'number' || typeof location.y !== 'number') {
+    throw new Error('getSpatialMemoriesByLocation: valid location with x and y coordinates is required');
+  }
+  if (typeof radius !== 'number') {
+    throw new Error('getSpatialMemoriesByLocation: radius parameter is required');
+  }
+  if (radius < 0) {
+    throw new Error('getSpatialMemoriesByLocation: radius must be non-negative');
+  }
+
+  const radiusSquared = radius * radius;
+
+  // Filter by squared distance (avoid sqrt in hot path)
+  const filtered = component.memories.filter((m) => {
+    const dx = m.x - location.x;
+    const dy = m.y - location.y;
+    return dx * dx + dy * dy <= radiusSquared;
+  });
+
+  // Sort by actual distance (ascending - closest first)
+  return filtered.sort((a, b) => {
+    const dxA = a.x - location.x;
+    const dyA = a.y - location.y;
+    const dxB = b.x - location.x;
+    const dyB = b.y - location.y;
+    return (dxA * dxA + dyA * dyA) - (dxB * dxB + dyB * dyB);
+  });
+}
+
+/**
+ * Get the N most recently reinforced memories, sorted by recency
+ */
+export function getRecentSpatialMemories(
+  component: SpatialMemoryComponent,
+  count: number
+): SpatialMemory[] {
+  if (!component) {
+    throw new Error('getRecentSpatialMemories: component parameter is required');
+  }
+  if (typeof count !== 'number') {
+    throw new Error('getRecentSpatialMemories: count parameter is required');
+  }
+  if (count < 1) {
+    throw new Error('getRecentSpatialMemories: count must be >= 1');
+  }
+
+  // Sort by lastReinforced (descending - most recent first)
+  const sorted = [...component.memories].sort((a, b) => b.lastReinforced - a.lastReinforced);
+
+  // Return top N
+  return sorted.slice(0, count);
+}
+
+/**
+ * Get all spatial memories with strength >= threshold, sorted by strength
+ */
+export function getSpatialMemoriesByImportance(
+  component: SpatialMemoryComponent,
+  threshold: number
+): SpatialMemory[] {
+  if (!component) {
+    throw new Error('getSpatialMemoriesByImportance: component parameter is required');
+  }
+  if (typeof threshold !== 'number') {
+    throw new Error('getSpatialMemoriesByImportance: threshold parameter is required');
+  }
+  if (threshold < 0 || threshold > 100) {
+    throw new Error('getSpatialMemoriesByImportance: threshold must be between 0 and 100');
+  }
+
+  return component.memories
+    .filter((m) => m.strength >= threshold)
+    .sort((a, b) => b.strength - a.strength);
+}

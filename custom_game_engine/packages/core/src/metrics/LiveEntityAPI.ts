@@ -89,6 +89,10 @@ export class LiveEntityAPI {
         return this.handlePendingApprovalsQuery(query);
       case 'research':
         return this.handleResearchQuery(query);
+      case 'plants':
+        return this.handlePlantsQuery(query);
+      case 'terrain':
+        return this.handleTerrainQuery(query);
       default:
         return {
           requestId: query.requestId,
@@ -912,6 +916,63 @@ export class LiveEntityAPI {
       requestId: query.requestId,
       success: true,
       data: { entities },
+    };
+  }
+
+  /**
+   * Get list of all plants with their visual metadata for 3D rendering
+   */
+  private handlePlantsQuery(query: QueryRequest): QueryResponse {
+    const plants: Array<{
+      id: string;
+      plantType: string;
+      stage: string;
+      position: { x: number; y: number };
+      spriteId: string;
+      sizeMultiplier: number;
+      alpha: number;
+    }> = [];
+
+    for (const entity of this.world.entities.values()) {
+      if (!entity.components.has('plant')) continue;
+
+      const plant = entity.components.get('plant') as {
+        plantType?: string;
+        stage?: string;
+      } | undefined;
+
+      const position = entity.components.get('position') as {
+        x?: number;
+        y?: number;
+      } | undefined;
+
+      const renderable = entity.components.get('renderable') as {
+        spriteId?: string;
+        sizeMultiplier?: number;
+        alpha?: number;
+      } | undefined;
+
+      // Skip plants without position or renderable
+      if (!position || !renderable) continue;
+
+      plants.push({
+        id: entity.id,
+        plantType: plant?.plantType || 'unknown',
+        stage: plant?.stage || 'mature',
+        position: {
+          x: position.x ?? 0,
+          y: position.y ?? 0,
+        },
+        spriteId: renderable.spriteId || 'plant_default',
+        sizeMultiplier: renderable.sizeMultiplier ?? 1.0,
+        alpha: renderable.alpha ?? 1.0,
+      });
+    }
+
+    return {
+      requestId: query.requestId,
+      success: true,
+      data: { plants, count: plants.length },
     };
   }
 

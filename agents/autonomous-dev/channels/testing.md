@@ -291,3 +291,152 @@ Full test results: `agents/autonomous-dev/work-orders/plant-lifecycle/test-resul
 `agents/autonomous-dev/work-orders/behavior-queue-system/screenshots/`
 
 **Returning to Implementation Agent for fixes.**
+
+---
+
+## 2026-01-04 - TESTS WRITTEN: Power Consumption System (TDD RED PHASE)
+
+**Test Agent:** test-agent-002
+**Work Order:** implement-power-consumption
+**Status:** ✅ TESTS COMPLETE, READY FOR IMPLEMENTATION
+
+### Summary
+
+Created comprehensive unit tests for the power consumption system following TDD (Test-Driven Development) methodology. Tests cover all acceptance criteria from the work order and are currently **FAILING** as expected (TDD red phase).
+
+### Test Files Created
+
+1. **`packages/core/src/__tests__/PowerConsumption.test.ts`** (14 active tests, 1 skipped)
+   - Basic power mechanics: generation, consumption, availability calculation
+   - Power pole network connections
+   - Brownout scenarios (insufficient power)
+   - Network isolation (different power types)
+   - Error handling (missing components, invalid data)
+   - **Skipped**: Priority system tests (not yet implemented)
+
+2. **`packages/core/src/__tests__/RealityAnchorPower.test.ts`** (15 active tests, 1 skipped)
+   - Reality Anchor charging power consumption (5 GW)
+   - Reality Anchor active field power consumption (50 GW)
+   - Power loss event emissions
+   - Field collapse scenarios
+   - Mid-battle power loss (god restoration)
+   - Network isolation edge cases
+   - Partial power scenarios (25-50% power warnings)
+   - **Skipped**: Priority system for Reality Anchor (not yet implemented)
+
+### Test Results (TDD Red Phase)
+
+```
+Test Files:  2 failed (2)
+Tests:       27 failed | 2 passed | 2 skipped (31)
+Duration:    4.38s
+```
+
+### Expected Failures ✅
+
+All failures are **EXPECTED** because the implementation is not complete yet. This is the **RED phase** of TDD.
+
+**Primary failure reasons:**
+1. ❌ **Power consumption not implemented** - RealityAnchorSystem has TODO comments at lines 80 and 119 where power checks should occur
+2. ❌ **Priority system not implemented** - PowerComponent lacks `priority` field for brownout allocation
+3. ❌ **Power events not emitted** - Missing events: `reality_anchor:power_loss`, `reality_anchor:field_collapse`, `reality_anchor:charging_interrupted`, `reality_anchor:power_insufficient`
+4. ❌ **PowerComponent missing stellar/exotic types** - Spec requires 'stellar' and 'exotic' for Tier 6-8 tech
+5. ❌ **Network building issues** - Entities at same position not forming networks (may need power poles)
+
+### Tests That Currently Pass ✅
+
+**2 tests passing:**
+- Error handling for entities with missing components (PowerGridSystem gracefully skips)
+- Error handling for destroyed Reality Anchor (RealityAnchorSystem skips destroyed status)
+
+These pass because the systems already have defensive programming for invalid states.
+
+### Coverage by Acceptance Criteria
+
+| Criterion | Tests | Status |
+|-----------|-------|--------|
+| AC1: Power Consumers Drain Power | 3 tests | ❌ Failing (network building issue) |
+| AC2: Power Producers Generate Power | 3 tests | ❌ Failing (network building issue) |
+| AC3: Insufficient Power Causes Brownout | 3 tests | ❌ Failing (network building issue) |
+| AC4: Reality Anchor Charging Consumes Power | 4 tests | ❌ Failing (TODO at line 80) |
+| AC5: Reality Anchor Active Field Consumes Power | 5 tests | ❌ Failing (TODO at line 119) |
+| AC6: Priority System | 2 tests | ⏭️ Skipped (future work) |
+
+### Critical Fixes Needed for Implementation Agent
+
+1. **PowerGridSystem network building** (lines 72-120)
+   - Entities at same position (0,0) should form a network
+   - Currently tests show `networks.length === 0` or `networks[0] === undefined`
+   - Issue: May need power poles to bridge generator ↔ consumer connections
+
+2. **RealityAnchorSystem line 80** (charging power check)
+   ```typescript
+   // Current TODO:
+   // TODO: Drain power from power grid/generator
+
+   // Expected implementation:
+   const powerComp = (entity as EntityImpl).getComponent<PowerComponent>(CT.Power);
+   if (!powerComp || !powerComp.isPowered) {
+     // Halt charging, emit event
+     return;
+   }
+   ```
+
+3. **RealityAnchorSystem line 119** (active field power check)
+   ```typescript
+   // Current TODO:
+   // TODO: Actually drain from power grid
+
+   // Expected implementation:
+   const powerComp = (entity as EntityImpl).getComponent<PowerComponent>(CT.Power);
+   if (!powerComp || !powerComp.isPowered) {
+     // Collapse field, restore gods, emit events
+     this.catastrophicFailure(world, anchorId, anchor);
+     this.eventBus?.emit({ type: 'reality_anchor:field_collapse', ... });
+     return;
+   }
+   ```
+
+4. **PowerComponent.ts** - Add PowerType enum values
+   ```typescript
+   // Current:
+   export type PowerType = 'mechanical' | 'electrical' | 'arcane';
+
+   // Add:
+   export type PowerType = 'mechanical' | 'electrical' | 'arcane' | 'stellar' | 'exotic';
+   ```
+
+5. **PowerComponent.ts** - Add priority field (optional for MVP)
+   ```typescript
+   export type ConsumerPriority = 'critical' | 'high' | 'normal' | 'low';
+
+   export interface PowerComponent extends Component {
+     // ... existing fields ...
+     priority?: ConsumerPriority;
+   }
+   ```
+
+### Definition of Done
+
+When implementation is complete, re-run these tests:
+
+```bash
+cd custom_game_engine && npm test -- PowerConsumption.test.ts RealityAnchorPower.test.ts
+```
+
+**Expected outcome:**
+- ✅ All 29 non-skipped tests should PASS
+- ✅ 2 skipped tests remain skipped (priority system - future work)
+- ✅ 0 test failures
+
+**Critical validation:**
+1. Reality Anchor with 0 power does NOT charge
+2. Reality Anchor field collapses when power drops below threshold
+3. Events are emitted: `power:brownout`, `reality_anchor:power_loss`, `reality_anchor:field_collapse`
+4. Both TODO comments removed from RealityAnchorSystem.ts
+
+---
+
+**Ready for Implementation Agent** ✅
+
+Tests are written and failing as expected (TDD red phase). Implementation Agent can now proceed to make the tests pass.

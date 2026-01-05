@@ -1,0 +1,17 @@
+{
+  "soulId": "a7bd27ca-e03e-4ee3-bfc3-d7e841fdb5b4",
+  "agentId": "a7bd27ca-e03e-4ee3-bfc3-d7e841fdb5b4",
+  "name": "Robin",
+  "species": "human",
+  "archetype": "unifier",
+  "purpose": "I see a soul born into the dawn of a new era, where community and cooperation are essential. This soul shall foster unity and harmony among the villagers, weaving their lives into a resilient and thriving whole.",
+  "interests": [
+    "social",
+    "nature",
+    "storytelling"
+  ],
+  "createdAt": "2026-01-04T23:42:07.935Z",
+  "soulBirthTick": 521,
+  "universeId": "unknown",
+  "version": 1
+}

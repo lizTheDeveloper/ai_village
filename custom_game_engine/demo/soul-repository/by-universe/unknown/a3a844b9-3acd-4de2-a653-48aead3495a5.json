@@ -1,0 +1,17 @@
+{
+  "soulId": "a3a844b9-3acd-4de2-a653-48aead3495a5",
+  "agentId": "a3a844b9-3acd-4de2-a653-48aead3495a5",
+  "name": "Pine",
+  "species": "human",
+  "archetype": "farmer",
+  "purpose": "I see a soul born of fertile ground and promising skies. This soul shall cultivate the land and foster abundance, strengthening the roots of the First Village.",
+  "interests": [
+    "nature",
+    "farming",
+    "knowledge"
+  ],
+  "createdAt": "2026-01-04T23:58:14.792Z",
+  "soulBirthTick": 134,
+  "universeId": "unknown",
+  "version": 1
+}

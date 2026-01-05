@@ -1,0 +1,17 @@
+{
+  "soulId": "a4fc761b-de4e-4185-b403-6be727e29312",
+  "agentId": "a4fc761b-de4e-4185-b403-6be727e29312",
+  "name": "Dawn",
+  "species": "human",
+  "archetype": "seeker",
+  "purpose": "I see a soul born into a time of new beginnings, where community and harmony are essential. This soul shall be a guardian of the village's heart, nurturing bonds and fostering a sense of belonging among its people.",
+  "interests": [
+    "knowledge",
+    "crafting",
+    "art"
+  ],
+  "createdAt": "2026-01-04T23:36:29.751Z",
+  "soulBirthTick": 295,
+  "universeId": "unknown",
+  "version": 1
+}

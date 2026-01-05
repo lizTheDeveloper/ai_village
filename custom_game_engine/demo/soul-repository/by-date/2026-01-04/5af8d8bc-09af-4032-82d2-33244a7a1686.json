@@ -1,0 +1,465 @@
+{
+  "soulId": "5af8d8bc-09af-4032-82d2-33244a7a1686",
+  "agentId": "5af8d8bc-09af-4032-82d2-33244a7a1686",
+  "name": "Sparrow",
+  "species": "human",
+  "archetype": "wanderer",
+  "purpose": "I see a soul born into a time of new beginnings, where traditions and innovations intersect. This soul shall be a guardian of communal harmony, weaving the threads of unity and cooperation to strengthen the fabric of the village.",
+  "interests": [
+    "exploration"
+  ],
+  "createdAt": "2026-01-04T23:35:09.112Z",
+  "soulBirthTick": 59,
+  "universeId": "unknown",
+  "version": 1,
+  "incarnationHistory": [
+    {
+      "incarnationTick": 1000,
+      "deathTick": 17256,
+      "bodyName": "Sparrow (Life 1)",
+      "bodySpecies": "human",
+      "duration": 16256,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 17667,
+      "deathTick": 72914,
+      "bodyName": "Sparrow (Life 2)",
+      "bodySpecies": "human",
+      "duration": 55247,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 73402,
+      "deathTick": 132566,
+      "bodyName": "Sparrow (Life 3)",
+      "bodySpecies": "human",
+      "duration": 59164,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 136458,
+      "deathTick": 167614,
+      "bodyName": "Sparrow (Life 4)",
+      "bodySpecies": "human",
+      "duration": 31156,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 167919,
+      "deathTick": 226646,
+      "bodyName": "Sparrow (Life 5)",
+      "bodySpecies": "human",
+      "duration": 58727,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 226846,
+      "deathTick": 283234,
+      "bodyName": "Sparrow (Life 6)",
+      "bodySpecies": "human",
+      "duration": 56388,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 287840,
+      "deathTick": 328172,
+      "bodyName": "Sparrow (Life 7)",
+      "bodySpecies": "human",
+      "duration": 40332,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 332587,
+      "deathTick": 381259,
+      "bodyName": "Sparrow (Life 8)",
+      "bodySpecies": "human",
+      "duration": 48672,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 385998,
+      "deathTick": 400170,
+      "bodyName": "Sparrow (Life 9)",
+      "bodySpecies": "human",
+      "duration": 14172,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 401969,
+      "deathTick": 446966,
+      "bodyName": "Sparrow (Life 10)",
+      "bodySpecies": "human",
+      "duration": 44997,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 450931,
+      "deathTick": 496787,
+      "bodyName": "Sparrow (Life 11)",
+      "bodySpecies": "human",
+      "duration": 45856,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 498860,
+      "deathTick": 516212,
+      "bodyName": "Sparrow (Life 12)",
+      "bodySpecies": "human",
+      "duration": 17352,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 519380,
+      "deathTick": 545464,
+      "bodyName": "Sparrow (Life 13)",
+      "bodySpecies": "human",
+      "duration": 26084,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 548475,
+      "deathTick": 560953,
+      "bodyName": "Sparrow (Life 14)",
+      "bodySpecies": "human",
+      "duration": 12478,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 564138,
+      "deathTick": 614286,
+      "bodyName": "Sparrow (Life 15)",
+      "bodySpecies": "human",
+      "duration": 50148,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 616904,
+      "deathTick": 628866,
+      "bodyName": "Sparrow (Life 16)",
+      "bodySpecies": "human",
+      "duration": 11962,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 629158,
+      "deathTick": 656622,
+      "bodyName": "Sparrow (Life 17)",
+      "bodySpecies": "human",
+      "duration": 27464,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 660669,
+      "deathTick": 711528,
+      "bodyName": "Sparrow (Life 18)",
+      "bodySpecies": "human",
+      "duration": 50859,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 715567,
+      "deathTick": 758326,
+      "bodyName": "Sparrow (Life 19)",
+      "bodySpecies": "human",
+      "duration": 42759,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 760016,
+      "deathTick": 814647,
+      "bodyName": "Sparrow (Life 20)",
+      "bodySpecies": "human",
+      "duration": 54631,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 815844,
+      "deathTick": 860901,
+      "bodyName": "Sparrow (Life 21)",
+      "bodySpecies": "human",
+      "duration": 45057,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 865034,
+      "deathTick": 892113,
+      "bodyName": "Sparrow (Life 22)",
+      "bodySpecies": "human",
+      "duration": 27079,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 896988,
+      "deathTick": 929119,
+      "bodyName": "Sparrow (Life 23)",
+      "bodySpecies": "human",
+      "duration": 32131,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 930404,
+      "deathTick": 973757,
+      "bodyName": "Sparrow (Life 24)",
+      "bodySpecies": "human",
+      "duration": 43353,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 975990,
+      "deathTick": 1034860,
+      "bodyName": "Sparrow (Life 25)",
+      "bodySpecies": "human",
+      "duration": 58870,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1039768,
+      "deathTick": 1055025,
+      "bodyName": "Sparrow (Life 26)",
+      "bodySpecies": "human",
+      "duration": 15257,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1055182,
+      "deathTick": 1087640,
+      "bodyName": "Sparrow (Life 27)",
+      "bodySpecies": "human",
+      "duration": 32458,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1091557,
+      "deathTick": 1138158,
+      "bodyName": "Sparrow (Life 28)",
+      "bodySpecies": "human",
+      "duration": 46601,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1142476,
+      "deathTick": 1194813,
+      "bodyName": "Sparrow (Life 29)",
+      "bodySpecies": "human",
+      "duration": 52337,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1196451,
+      "deathTick": 1219497,
+      "bodyName": "Sparrow (Life 30)",
+      "bodySpecies": "human",
+      "duration": 23046,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1221975,
+      "deathTick": 1247739,
+      "bodyName": "Sparrow (Life 31)",
+      "bodySpecies": "human",
+      "duration": 25764,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1247771,
+      "deathTick": 1306469,
+      "bodyName": "Sparrow (Life 32)",
+      "bodySpecies": "human",
+      "duration": 58698,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1310220,
+      "deathTick": 1341886,
+      "bodyName": "Sparrow (Life 33)",
+      "bodySpecies": "human",
+      "duration": 31666,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1345510,
+      "deathTick": 1383561,
+      "bodyName": "Sparrow (Life 34)",
+      "bodySpecies": "human",
+      "duration": 38051,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1387260,
+      "deathTick": 1442960,
+      "bodyName": "Sparrow (Life 35)",
+      "bodySpecies": "human",
+      "duration": 55700,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1444290,
+      "deathTick": 1470096,
+      "bodyName": "Sparrow (Life 36)",
+      "bodySpecies": "human",
+      "duration": 25806,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1471298,
+      "deathTick": 1493336,
+      "bodyName": "Sparrow (Life 37)",
+      "bodySpecies": "human",
+      "duration": 22038,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1494587,
+      "deathTick": 1527007,
+      "bodyName": "Sparrow (Life 38)",
+      "bodySpecies": "human",
+      "duration": 32420,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1531161,
+      "deathTick": 1582100,
+      "bodyName": "Sparrow (Life 39)",
+      "bodySpecies": "human",
+      "duration": 50939,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1583530,
+      "deathTick": 1630332,
+      "bodyName": "Sparrow (Life 40)",
+      "bodySpecies": "human",
+      "duration": 46802,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1630378,
+      "deathTick": 1659742,
+      "bodyName": "Sparrow (Life 41)",
+      "bodySpecies": "human",
+      "duration": 29364,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1660984,
+      "deathTick": 1719377,
+      "bodyName": "Sparrow (Life 42)",
+      "bodySpecies": "human",
+      "duration": 58393,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1722428,
+      "deathTick": 1733814,
+      "bodyName": "Sparrow (Life 43)",
+      "bodySpecies": "human",
+      "duration": 11386,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1737951,
+      "deathTick": 1767607,
+      "bodyName": "Sparrow (Life 44)",
+      "bodySpecies": "human",
+      "duration": 29656,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1772412,
+      "deathTick": 1792778,
+      "bodyName": "Sparrow (Life 45)",
+      "bodySpecies": "human",
+      "duration": 20366,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1793204,
+      "deathTick": 1846461,
+      "bodyName": "Sparrow (Life 46)",
+      "bodySpecies": "human",
+      "duration": 53257,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1850469,
+      "deathTick": 1868045,
+      "bodyName": "Sparrow (Life 47)",
+      "bodySpecies": "human",
+      "duration": 17576,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1868410,
+      "deathTick": 1886941,
+      "bodyName": "Sparrow (Life 48)",
+      "bodySpecies": "human",
+      "duration": 18531,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1887076,
+      "deathTick": 1904534,
+      "bodyName": "Sparrow (Life 49)",
+      "bodySpecies": "human",
+      "duration": 17458,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1906263,
+      "bodyName": "Sparrow (Life 50)",
+      "bodySpecies": "human",
+      "notableEvents": []
+    }
+  ],
+  "isReincarnated": true
+}

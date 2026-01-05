@@ -1,0 +1,17 @@
+{
+  "id": "soul_ef367e29-3e8e-4e9b-b0c4-9df9063e928b",
+  "category": "animals",
+  "size": 48,
+  "description": "human character named Finn",
+  "generated_at": "2026-01-05T01:57:36.669Z",
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ]
+}

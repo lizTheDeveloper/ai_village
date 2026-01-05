@@ -1,0 +1,242 @@
+{
+  "soulId": "44781c30-b223-443b-8bc8-111e565cd3b3",
+  "agentId": "44781c30-b223-443b-8bc8-111e565cd3b3",
+  "name": "Birch",
+  "species": "human",
+  "archetype": "unifier",
+  "purpose": "I see a soul born at the dawn of a new era, where the First Village is being founded. This soul shall nurture the flame of community, fostering harmony and cooperation among the villagers, to strengthen the fabric of their society.",
+  "interests": [
+    "social",
+    "art",
+    "leadership"
+  ],
+  "createdAt": "2026-01-04T23:35:25.345Z",
+  "soulBirthTick": 384,
+  "universeId": "unknown",
+  "version": 1,
+  "incarnationHistory": [
+    {
+      "incarnationTick": 1000,
+      "deathTick": 52204,
+      "bodyName": "Birch (Life 1)",
+      "bodySpecies": "human",
+      "duration": 51204,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 52251,
+      "deathTick": 110032,
+      "bodyName": "Birch (Life 2)",
+      "bodySpecies": "human",
+      "duration": 57781,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 111140,
+      "deathTick": 165313,
+      "bodyName": "Birch (Life 3)",
+      "bodySpecies": "human",
+      "duration": 54173,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 169791,
+      "deathTick": 190063,
+      "bodyName": "Birch (Life 4)",
+      "bodySpecies": "human",
+      "duration": 20272,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 193484,
+      "deathTick": 213664,
+      "bodyName": "Birch (Life 5)",
+      "bodySpecies": "human",
+      "duration": 20180,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 217458,
+      "deathTick": 247213,
+      "bodyName": "Birch (Life 6)",
+      "bodySpecies": "human",
+      "duration": 29755,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 249023,
+      "deathTick": 282468,
+      "bodyName": "Birch (Life 7)",
+      "bodySpecies": "human",
+      "duration": 33445,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 285080,
+      "deathTick": 305126,
+      "bodyName": "Birch (Life 8)",
+      "bodySpecies": "human",
+      "duration": 20046,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 306778,
+      "deathTick": 330347,
+      "bodyName": "Birch (Life 9)",
+      "bodySpecies": "human",
+      "duration": 23569,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 331880,
+      "deathTick": 347085,
+      "bodyName": "Birch (Life 10)",
+      "bodySpecies": "human",
+      "duration": 15205,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 348389,
+      "deathTick": 371696,
+      "bodyName": "Birch (Life 11)",
+      "bodySpecies": "human",
+      "duration": 23307,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 376435,
+      "deathTick": 428575,
+      "bodyName": "Birch (Life 12)",
+      "bodySpecies": "human",
+      "duration": 52140,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 432320,
+      "deathTick": 485404,
+      "bodyName": "Birch (Life 13)",
+      "bodySpecies": "human",
+      "duration": 53084,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 487473,
+      "deathTick": 502974,
+      "bodyName": "Birch (Life 14)",
+      "bodySpecies": "human",
+      "duration": 15501,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 503794,
+      "deathTick": 531949,
+      "bodyName": "Birch (Life 15)",
+      "bodySpecies": "human",
+      "duration": 28155,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 533468,
+      "deathTick": 551923,
+      "bodyName": "Birch (Life 16)",
+      "bodySpecies": "human",
+      "duration": 18455,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 553669,
+      "deathTick": 582602,
+      "bodyName": "Birch (Life 17)",
+      "bodySpecies": "human",
+      "duration": 28933,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 583634,
+      "deathTick": 628785,
+      "bodyName": "Birch (Life 18)",
+      "bodySpecies": "human",
+      "duration": 45151,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 633052,
+      "deathTick": 683342,
+      "bodyName": "Birch (Life 19)",
+      "bodySpecies": "human",
+      "duration": 50290,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 688177,
+      "deathTick": 722941,
+      "bodyName": "Birch (Life 20)",
+      "bodySpecies": "human",
+      "duration": 34764,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 726462,
+      "deathTick": 764065,
+      "bodyName": "Birch (Life 21)",
+      "bodySpecies": "human",
+      "duration": 37603,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 768895,
+      "deathTick": 820079,
+      "bodyName": "Birch (Life 22)",
+      "bodySpecies": "human",
+      "duration": 51184,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 824280,
+      "deathTick": 836172,
+      "bodyName": "Birch (Life 23)",
+      "bodySpecies": "human",
+      "duration": 11892,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 838659,
+      "deathTick": 854479,
+      "bodyName": "Birch (Life 24)",
+      "bodySpecies": "human",
+      "duration": 15820,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 855785,
+      "bodyName": "Birch (Life 25)",
+      "bodySpecies": "human",
+      "notableEvents": []
+    }
+  ],
+  "isReincarnated": true
+}

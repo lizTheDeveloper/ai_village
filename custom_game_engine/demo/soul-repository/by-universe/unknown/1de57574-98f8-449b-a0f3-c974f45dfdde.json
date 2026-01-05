@@ -1,0 +1,17 @@
+{
+  "soulId": "1de57574-98f8-449b-a0f3-c974f45dfdde",
+  "agentId": "1de57574-98f8-449b-a0f3-c974f45dfdde",
+  "name": "Linden",
+  "species": "human",
+  "archetype": "creator",
+  "purpose": "I see a soul born of fertile earth and promising skies. This soul shall cultivate the land and nurture the hearts of those around them, bringing forth abundance and warmth to the fledgling village.",
+  "interests": [
+    "farming",
+    "social",
+    "art"
+  ],
+  "createdAt": "2026-01-04T23:33:45.243Z",
+  "soulBirthTick": 34,
+  "universeId": "unknown",
+  "version": 1
+}

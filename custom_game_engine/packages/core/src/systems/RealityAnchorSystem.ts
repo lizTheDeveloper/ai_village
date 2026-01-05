@@ -77,7 +77,29 @@ export class RealityAnchorSystem implements System {
 
     // Handle power charging
     if (anchor.status === 'charging') {
-      // TODO: Drain power from power grid/generator
+      // Check if anchor has power available
+      const anchorEntity = world.getEntity(anchorId);
+      const powerComp = anchorEntity?.components.get(CT.Power) as any;
+
+      if (!powerComp) {
+        // No power component - can't charge
+        return;
+      }
+
+      if (!powerComp.isPowered) {
+        // Insufficient power - charging interrupted
+        this.eventBus?.emit({
+          type: 'reality_anchor:charging_interrupted',
+          source: anchorId,
+          data: {
+            message: 'Reality Anchor charging interrupted: Insufficient power',
+            powerLevel: anchor.powerLevel,
+          },
+        } as any);
+        return;
+      }
+
+      // Power available - continue charging
       anchor.powerLevel = Math.min(1.0, anchor.powerLevel + 0.01);
 
       if (anchor.powerLevel >= 1.0) {
@@ -115,9 +137,65 @@ export class RealityAnchorSystem implements System {
     position: PositionComponent,
     currentTick: number
   ): void {
-    // Drain power
-    // TODO: Actually drain from power grid
-    // For now, just track consumption
+    // Check if anchor has sufficient power
+    const anchorEntity = world.getEntity(anchorId);
+    const powerComp = anchorEntity?.components.get(CT.Power) as any;
+
+    if (!powerComp) {
+      // No power component - field collapses
+      this.fieldCollapse(world, anchorId, anchor, 'No power component');
+      return;
+    }
+
+    // Check power status
+    if (!powerComp.isPowered) {
+      // Power lost - field collapses
+      this.eventBus?.emit({
+        type: 'reality_anchor:power_loss',
+        source: anchorId,
+        data: {
+          message: 'Reality Anchor power loss: Field collapsing!',
+          efficiency: powerComp.efficiency,
+        },
+      } as any);
+
+      this.fieldCollapse(world, anchorId, anchor, 'Insufficient power');
+      return;
+    }
+
+    // Check for partial power (25-75% efficiency)
+    if (powerComp.efficiency < 1.0 && powerComp.efficiency >= 0.25) {
+      this.eventBus?.emit({
+        type: 'reality_anchor:power_insufficient',
+        source: anchorId,
+        data: {
+          message: 'WARNING: Reality Anchor receiving partial power - field unstable!',
+          efficiency: powerComp.efficiency,
+        },
+      } as any);
+
+      // Field becomes unstable but doesn't collapse immediately
+      // If efficiency < 0.5, start countdown to collapse
+      if (powerComp.efficiency < 0.5) {
+        // Field weakening - will collapse soon
+        anchor.isOverloading = true;
+        anchor.overloadCountdown = anchor.overloadCountdown ?? 100; // 5 seconds at 20 TPS
+        anchor.overloadCountdown--;
+
+        if (anchor.overloadCountdown <= 0) {
+          this.fieldCollapse(world, anchorId, anchor, 'Sustained power insufficiency');
+          return;
+        }
+      }
+    } else if (powerComp.efficiency >= 1.0) {
+      // Full power - reset overload countdown
+      if (anchor.isOverloading) {
+        anchor.isOverloading = false;
+        anchor.overloadCountdown = undefined;
+      }
+    }
+
+    // Power consumption tracked via PowerComponent
     anchor.totalActiveTime++;
 
     // Detect entities in field
@@ -261,15 +339,17 @@ export class RealityAnchorSystem implements System {
   }
 
   /**
-   * Handle catastrophic failure
+   * Handle field collapse from power loss or other causes
    */
-  private catastrophicFailure(
+  private fieldCollapse(
     _world: World,
     anchorId: string,
-    anchor: RealityAnchorComponent
+    anchor: RealityAnchorComponent,
+    reason: string
   ): void {
     anchor.status = 'failed';
     anchor.isOverloading = false;
+    anchor.powerLevel = 0;
 
     // Release all mortalized gods
     for (const godId of anchor.mortalizedGods) {
@@ -287,12 +367,24 @@ export class RealityAnchorSystem implements System {
     anchor.entitiesInField.clear();
 
     this.eventBus?.emit({
-      type: 'reality_anchor:failed',
+      type: 'reality_anchor:field_collapse',
       source: anchorId,
       data: {
-        message: 'CATASTROPHIC FAILURE: Reality anchor has collapsed!',
+        message: `Reality Anchor field collapsed: ${reason}`,
+        reason,
       },
     } as any);
+  }
+
+  /**
+   * Handle catastrophic failure
+   */
+  private catastrophicFailure(
+    world: World,
+    anchorId: string,
+    anchor: RealityAnchorComponent
+  ): void {
+    this.fieldCollapse(world, anchorId, anchor, 'Catastrophic overload');
   }
 
   // ============ Public API ============

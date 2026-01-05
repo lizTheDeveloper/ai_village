@@ -1,0 +1,17 @@
+{
+  "soulId": "f1c3036e-e9e6-4134-afae-79b2955593af",
+  "agentId": "f1c3036e-e9e6-4134-afae-79b2955593af",
+  "name": "Ash",
+  "species": "human",
+  "archetype": "unifier",
+  "purpose": "I see a soul born into a time of foundational growth, where community and cooperation are essential. This soul shall be a guardian of harmony, fostering unity and understanding among the villagers, and thus the thread of their life shall reinforce the fabric of the First Village.",
+  "interests": [
+    "social",
+    "nature",
+    "art"
+  ],
+  "createdAt": "2026-01-04T23:55:22.921Z",
+  "soulBirthTick": 1552,
+  "universeId": "unknown",
+  "version": 1
+}

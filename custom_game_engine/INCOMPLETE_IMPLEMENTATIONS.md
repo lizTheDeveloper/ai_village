@@ -187,14 +187,12 @@ Line 172: // TODO: Weather gods cause weather, harvest gods bless crops, etc.
 **File:** `packages/core/src/systems/LandmarkNamingSystem.ts`
 
 ```
-Line 181: // TODO: Implement getMemoriesByType method in SpatialMemoryComponent
-Line 192: // TODO: Implement getMemoriesByType method in SpatialMemoryComponent
-Line 397: // TODO: Implement getMemoriesByType method in SpatialMemoryComponent
-
 Line 220: // TODO: Add customLLMConfig to AgentComponent if needed
 
 Line 267: // TODO: Add humor trait to PersonalityComponent if needed
 ```
+
+**Note:** ✅ SpatialMemoryComponent filtering methods (getMemoriesByType, getMemoriesByLocation, getRecentMemories, getMemoriesByImportance) have been implemented and are fully functional.
 
 ---
 

@@ -1,0 +1,125 @@
+{
+  "soulId": "26ab6ad1-3ea4-4217-84c3-41c2de19948d",
+  "agentId": "26ab6ad1-3ea4-4217-84c3-41c2de19948d",
+  "name": "Orion",
+  "species": "human",
+  "archetype": "healer",
+  "purpose": "I see a soul born of fertile ground and promise. This soul shall cultivate the arts of healing and growth, tending to the well-being of the village and its people.",
+  "interests": [
+    "healing",
+    "nature",
+    "farming"
+  ],
+  "createdAt": "2026-01-04T23:31:56.214Z",
+  "soulBirthTick": 28,
+  "universeId": "unknown",
+  "version": 1,
+  "incarnationHistory": [
+    {
+      "incarnationTick": 1000,
+      "deathTick": 34534,
+      "bodyName": "Orion (Life 1)",
+      "bodySpecies": "human",
+      "duration": 33534,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 36660,
+      "deathTick": 77619,
+      "bodyName": "Orion (Life 2)",
+      "bodySpecies": "human",
+      "duration": 40959,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 81359,
+      "deathTick": 137434,
+      "bodyName": "Orion (Life 3)",
+      "bodySpecies": "human",
+      "duration": 56075,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 137441,
+      "deathTick": 189246,
+      "bodyName": "Orion (Life 4)",
+      "bodySpecies": "human",
+      "duration": 51805,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 191176,
+      "deathTick": 202339,
+      "bodyName": "Orion (Life 5)",
+      "bodySpecies": "human",
+      "duration": 11163,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 205984,
+      "deathTick": 240767,
+      "bodyName": "Orion (Life 6)",
+      "bodySpecies": "human",
+      "duration": 34783,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 241812,
+      "deathTick": 285161,
+      "bodyName": "Orion (Life 7)",
+      "bodySpecies": "human",
+      "duration": 43349,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 286104,
+      "deathTick": 311791,
+      "bodyName": "Orion (Life 8)",
+      "bodySpecies": "human",
+      "duration": 25687,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 312836,
+      "deathTick": 362417,
+      "bodyName": "Orion (Life 9)",
+      "bodySpecies": "human",
+      "duration": 49581,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 363567,
+      "deathTick": 403783,
+      "bodyName": "Orion (Life 10)",
+      "bodySpecies": "human",
+      "duration": 40216,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 403906,
+      "deathTick": 463003,
+      "bodyName": "Orion (Life 11)",
+      "bodySpecies": "human",
+      "duration": 59097,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 466798,
+      "bodyName": "Orion (Life 12)",
+      "bodySpecies": "human",
+      "notableEvents": []
+    }
+  ],
+  "isReincarnated": true
+}

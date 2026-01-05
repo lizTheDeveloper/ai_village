@@ -12,7 +12,7 @@ import type { StoredMetric } from './MetricsStorage.js';
  */
 export interface QueryRequest {
   requestId: string;
-  queryType: 'entities' | 'entity' | 'entity_prompt' | 'universe' | 'magic' | 'divinity' | 'pending_approvals' | 'research' | 'terrain';
+  queryType: 'entities' | 'entity' | 'entity_prompt' | 'universe' | 'magic' | 'divinity' | 'pending_approvals' | 'research' | 'terrain' | 'plants';
   entityId?: string;
 }
 

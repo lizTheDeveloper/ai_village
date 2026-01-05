@@ -1,0 +1,17 @@
+{
+  "soulId": "11974010-9385-4b33-8c9f-27793e64baf3",
+  "agentId": "11974010-9385-4b33-8c9f-27793e64baf3",
+  "name": "Cedar",
+  "species": "human",
+  "archetype": "creator",
+  "purpose": "I see a soul born into a time of new beginnings, where the First Village's foundation requires dedication and care. This soul shall nurture the community's growth, weaving together the threads of cooperation and understanding to create a strong and resilient fabric.",
+  "interests": [
+    "knowledge",
+    "crafting",
+    "art"
+  ],
+  "createdAt": "2026-01-04T23:33:48.939Z",
+  "soulBirthTick": 108,
+  "universeId": "unknown",
+  "version": 1
+}

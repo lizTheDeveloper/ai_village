@@ -1,0 +1,152 @@
+{
+  "soulId": "2dd86482-4143-49ee-b9eb-59243a1146ef",
+  "agentId": "2dd86482-4143-49ee-b9eb-59243a1146ef",
+  "name": "Hazel",
+  "species": "human",
+  "archetype": "unifier",
+  "purpose": "I see a soul born at the dawn of a new community, where harmony and cooperation are essential. This soul shall be a guardian of unity, fostering bonds among the people and nurturing the spirit of the First Village.",
+  "interests": [
+    "social",
+    "nature",
+    "art"
+  ],
+  "createdAt": "2026-01-04T23:35:19.000Z",
+  "soulBirthTick": 257,
+  "universeId": "unknown",
+  "version": 1,
+  "incarnationHistory": [
+    {
+      "incarnationTick": 1000,
+      "deathTick": 52681,
+      "bodyName": "Hazel (Life 1)",
+      "bodySpecies": "human",
+      "duration": 51681,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 54948,
+      "deathTick": 98058,
+      "bodyName": "Hazel (Life 2)",
+      "bodySpecies": "human",
+      "duration": 43110,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 98145,
+      "deathTick": 143279,
+      "bodyName": "Hazel (Life 3)",
+      "bodySpecies": "human",
+      "duration": 45134,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 147610,
+      "deathTick": 193684,
+      "bodyName": "Hazel (Life 4)",
+      "bodySpecies": "human",
+      "duration": 46074,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 194973,
+      "deathTick": 235394,
+      "bodyName": "Hazel (Life 5)",
+      "bodySpecies": "human",
+      "duration": 40421,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 237457,
+      "deathTick": 248015,
+      "bodyName": "Hazel (Life 6)",
+      "bodySpecies": "human",
+      "duration": 10558,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 250906,
+      "deathTick": 281531,
+      "bodyName": "Hazel (Life 7)",
+      "bodySpecies": "human",
+      "duration": 30625,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 286361,
+      "deathTick": 334504,
+      "bodyName": "Hazel (Life 8)",
+      "bodySpecies": "human",
+      "duration": 48143,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 338078,
+      "deathTick": 385857,
+      "bodyName": "Hazel (Life 9)",
+      "bodySpecies": "human",
+      "duration": 47779,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 386527,
+      "deathTick": 426054,
+      "bodyName": "Hazel (Life 10)",
+      "bodySpecies": "human",
+      "duration": 39527,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 428548,
+      "deathTick": 483878,
+      "bodyName": "Hazel (Life 11)",
+      "bodySpecies": "human",
+      "duration": 55330,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 486627,
+      "deathTick": 518079,
+      "bodyName": "Hazel (Life 12)",
+      "bodySpecies": "human",
+      "duration": 31452,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 521316,
+      "deathTick": 581167,
+      "bodyName": "Hazel (Life 13)",
+      "bodySpecies": "human",
+      "duration": 59851,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 585050,
+      "deathTick": 635726,
+      "bodyName": "Hazel (Life 14)",
+      "bodySpecies": "human",
+      "duration": 50676,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 636715,
+      "bodyName": "Hazel (Life 15)",
+      "bodySpecies": "human",
+      "notableEvents": []
+    }
+  ],
+  "isReincarnated": true
+}

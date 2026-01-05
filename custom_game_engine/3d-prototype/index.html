@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Village - 3D Live View</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      overflow: hidden;
+      background: #1a1a2e;
+      font-family: 'Courier New', monospace;
+    }
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: #4ade80;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 100;
+      max-width: 320px;
+    }
+    #info h1 { font-size: 18px; margin-bottom: 10px; }
+    #info p { margin: 5px 0; opacity: 0.8; }
+    #info .controls { margin-top: 10px; border-top: 1px solid #4ade80; padding-top: 10px; }
+    #info .status { margin-top: 10px; border-top: 1px solid #4ade80; padding-top: 10px; }
+    #info .status.connected { color: #4ade80; }
+    #info .status.disconnected { color: #ef4444; }
+    #stats {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      color: #4ade80;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+    #entity-list {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #4ade80;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 12px;
+      max-width: 250px;
+    }
+    #entity-list h3 { margin-bottom: 8px; }
+    #entity-list .entity { margin: 4px 0; opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div id="info">
+    <h1>🎮 AI Village 3D</h1>
+    <p>Live Game View</p>
+    <div class="controls">
+      <strong>Controls:</strong><br>
+      WASD - Move<br>
+      Mouse - Look around<br>
+      Space - Up / Shift - Down<br>
+      Click to capture mouse<br>
+      Esc - Release mouse<br>
+      F - Follow nearest agent<br>
+      O - Toggle block outlines<br>
+      T - Generate textures (PixelLab)
+    </div>
+    <div id="connection-status" class="status disconnected">
+      Connecting to game...
+    </div>
+  </div>
+  <div id="stats"></div>
+  <div id="entity-list">
+    <h3>📍 Agents</h3>
+    <div id="agents"></div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+
+    // ============================================================
+    // CONFIGURATION
+    // ============================================================
+    const CONFIG = {
+      API_BASE: 'http://localhost:8766',
+      BLOCK_SIZE: 1,
+      POLL_INTERVAL: 1000,  // Poll entities every second
+      TERRAIN_RADIUS: 50,   // Terrain fetch radius
+      TERRAIN_COLORS: {
+        grass: 0x4ade80,
+        dirt: 0x8b6914,
+        stone: 0x6b7280,
+        sand: 0xfcd34d,
+        water: 0x3b82f6,
+        snow: 0xf0f9ff,
+        forest: 0x166534,
+        mountain: 0x78716c,
+        default: 0x9ca3af
+      }
+    };
+
+    // ============================================================
+    // LIVE DATA MANAGER - Fetches from game API
+    // ============================================================
+    class LiveDataManager {
+      constructor() {
+        this.connected = false;
+        this.entities = [];
+        this.plants = [];
+        this.terrain = null;
+        this.onEntitiesUpdate = null;
+        this.onPlantsUpdate = null;
+        this.onTerrainUpdate = null;
+        this.onConnectionChange = null;
+      }
+
+      async checkConnection() {
+        try {
+          const response = await fetch(`${CONFIG.API_BASE}/api/live/status`);
+          const data = await response.json();
+          const wasConnected = this.connected;
+          this.connected = data.connected;
+          if (wasConnected !== this.connected && this.onConnectionChange) {
+            this.onConnectionChange(this.connected);
+          }
+          return this.connected;
+        } catch (e) {
+          this.connected = false;
+          if (this.onConnectionChange) this.onConnectionChange(false);
+          return false;
+        }
+      }
+
+      async fetchEntities() {
+        try {
+          const response = await fetch(`${CONFIG.API_BASE}/api/live/entities`);
+          const data = await response.json();
+          if (data.entities) {
+            this.entities = data.entities;
+            if (this.onEntitiesUpdate) {
+              this.onEntitiesUpdate(this.entities);
+            }
+            return this.entities;
+          }
+        } catch (e) {
+          console.error('Failed to fetch entities:', e);
+        }
+        return [];
+      }
+
+      async fetchTerrain(centerX = 0, centerY = 0, radius = CONFIG.TERRAIN_RADIUS) {
+        try {
+          const url = `${CONFIG.API_BASE}/api/live/terrain?x=${centerX}&y=${centerY}&radius=${radius}`;
+          const response = await fetch(url);
+          const data = await response.json();
+          if (data.tiles) {
+            this.terrain = data;
+            if (this.onTerrainUpdate) {
+              this.onTerrainUpdate(data);
+            }
+            return data;
+          }
+        } catch (e) {
+          console.error('Failed to fetch terrain:', e);
+        }
+        return null;
+      }
+
+      async fetchPlants() {
+        try {
+          const response = await fetch(`${CONFIG.API_BASE}/api/live/plants`);
+          const data = await response.json();
+          if (data.plants) {
+            this.plants = data.plants;
+            if (this.onPlantsUpdate) {
+              this.onPlantsUpdate(this.plants);
+            }
+            return this.plants;
+          }
+        } catch (e) {
+          console.error('Failed to fetch plants:', e);
+        }
+        return [];
+      }
+
+      startPolling() {
+        // Check connection and poll entities + plants
+        this.pollInterval = setInterval(async () => {
+          await this.checkConnection();
+          if (this.connected) {
+            await this.fetchEntities();
+            await this.fetchPlants();
+          }
+        }, CONFIG.POLL_INTERVAL);
+
+        // Initial fetch
+        this.checkConnection();
+        this.fetchEntities();
+        this.fetchPlants();
+      }
+
+      stopPolling() {
+        if (this.pollInterval) {
+          clearInterval(this.pollInterval);
+        }
+      }
+    }
+
+    // ============================================================
+    // PROCEDURAL TERRAIN FALLBACK
+    // ============================================================
+    class ProceduralTerrainGenerator {
+      constructor(seed = 12345) {
+        this.seed = seed;
+      }
+
+      noise2D(x, y) {
+        const n = Math.sin(x * 12.9898 + y * 78.233 + this.seed) * 43758.5453;
+        return n - Math.floor(n);
+      }
+
+      smoothNoise(x, y, scale) {
+        const sx = x / scale;
+        const sy = y / scale;
+        const x0 = Math.floor(sx);
+        const y0 = Math.floor(sy);
+        const fx = sx - x0;
+        const fy = sy - y0;
+
+        const n00 = this.noise2D(x0, y0);
+        const n10 = this.noise2D(x0 + 1, y0);
+        const n01 = this.noise2D(x0, y0 + 1);
+        const n11 = this.noise2D(x0 + 1, y0 + 1);
+
+        const nx0 = n00 * (1 - fx) + n10 * fx;
+        const nx1 = n01 * (1 - fx) + n11 * fx;
+
+        return nx0 * (1 - fy) + nx1 * fy;
+      }
+
+      getElevation(worldX, worldY) {
+        let elevation = 0;
+        elevation += this.smoothNoise(worldX, worldY, 64) * 6;
+        elevation += this.smoothNoise(worldX, worldY, 32) * 3;
+        elevation += this.smoothNoise(worldX, worldY, 16) * 1.5;
+        return Math.floor(elevation);
+      }
+
+      getTerrainType(elevation) {
+        if (elevation < 0) return 'water';
+        if (elevation < 2) return 'sand';
+        if (elevation < 5) return 'grass';
+        if (elevation < 8) return 'forest';
+        return 'stone';
+      }
+
+      generateArea(centerX, centerY, radius) {
+        const tiles = [];
+        for (let x = centerX - radius; x <= centerX + radius; x++) {
+          for (let y = centerY - radius; y <= centerY + radius; y++) {
+            const elevation = this.getElevation(x, y);
+            const terrain = this.getTerrainType(elevation);
+            tiles.push({ x, y, elevation, terrain });
+          }
+        }
+        return { centerX, centerY, radius, tiles };
+      }
+    }
+
+    // ============================================================
+    // VOXEL TERRAIN BUILDER (with block outlines and texture support)
+    // ============================================================
+    class VoxelTerrainBuilder {
+      constructor(scene) {
+        this.scene = scene;
+        this.terrainGroup = new THREE.Group();
+        this.outlinesGroup = new THREE.Group();
+        this.scene.add(this.terrainGroup);
+        this.scene.add(this.outlinesGroup);
+        this.blockGeometry = new THREE.BoxGeometry(CONFIG.BLOCK_SIZE, CONFIG.BLOCK_SIZE, CONFIG.BLOCK_SIZE);
+        this.edgesGeometry = new THREE.EdgesGeometry(this.blockGeometry);
+        this.materials = {};
+        this.textures = {};
+        this.builtTiles = new Set();
+        this.showOutlines = true;
+        this.meshesByTerrain = {}; // Track meshes by terrain type for texture updates
+
+        // Outline material - dark edges to show block boundaries
+        this.outlineMaterial = new THREE.LineBasicMaterial({
+          color: 0x1a1a1a,
+          transparent: true,
+          opacity: 0.4,
+          linewidth: 1
+        });
+
+        // Create materials for each terrain type
+        for (const [name, color] of Object.entries(CONFIG.TERRAIN_COLORS)) {
+          this.materials[name] = new THREE.MeshLambertMaterial({ color });
+          this.meshesByTerrain[name] = [];
+        }
+
+        // Try to load PixelLab textures
+        this.loadPixelLabTextures();
+      }
+
+      async loadPixelLabTextures() {
+        const textureLoader = new THREE.TextureLoader();
+        const terrainTypes = ['grass', 'dirt', 'stone', 'sand', 'water', 'forest'];
+
+        for (const terrain of terrainTypes) {
+          try {
+            // Try to load from pixellab tiles folder
+            const texturePath = `/assets/sprites/pixellab/tiles/${terrain}/tile.png`;
+            const texture = await new Promise((resolve, reject) => {
+              textureLoader.load(
+                texturePath,
+                (tex) => {
+                  tex.magFilter = THREE.NearestFilter;
+                  tex.minFilter = THREE.NearestFilter;
+                  tex.wrapS = THREE.RepeatWrapping;
+                  tex.wrapT = THREE.RepeatWrapping;
+                  resolve(tex);
+                },
+                undefined,
+                () => reject(new Error(`Failed to load ${texturePath}`))
+              );
+            });
+
+            this.textures[terrain] = texture;
+            const newMaterial = new THREE.MeshLambertMaterial({
+              map: texture,
+              color: 0xffffff
+            });
+            this.materials[terrain] = newMaterial;
+
+            // Update all existing meshes of this terrain type
+            if (this.meshesByTerrain[terrain]) {
+              for (const mesh of this.meshesByTerrain[terrain]) {
+                mesh.material = newMaterial;
+              }
+              console.log(`Loaded texture for ${terrain} (updated ${this.meshesByTerrain[terrain].length} blocks)`);
+            } else {
+              console.log(`Loaded texture for ${terrain}`);
+            }
+          } catch (e) {
+            // Keep using color material if texture not available
+            console.log(`Using color fallback for ${terrain} (no texture found)`);
+          }
+        }
+      }
+
+      createBlockWithOutline(x, y, z, material, isSurface = false, terrainType = null) {
+        // Create the block mesh
+        const mesh = new THREE.Mesh(this.blockGeometry, material);
+        mesh.position.set(
+          x * CONFIG.BLOCK_SIZE,
+          z * CONFIG.BLOCK_SIZE,  // Y is up in Three.js
+          y * CONFIG.BLOCK_SIZE
+        );
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        this.terrainGroup.add(mesh);
+
+        // Track mesh by terrain type for later texture updates
+        if (terrainType && this.meshesByTerrain[terrainType]) {
+          this.meshesByTerrain[terrainType].push(mesh);
+        }
+
+        // Add edge outline for surface blocks or all blocks if showOutlines enabled
+        if (this.showOutlines && isSurface) {
+          const outline = new THREE.LineSegments(this.edgesGeometry, this.outlineMaterial);
+          outline.position.copy(mesh.position);
+          this.outlinesGroup.add(outline);
+        }
+
+        return mesh;
+      }
+
+      buildFromTiles(tiles) {
+        console.log(`Building terrain from ${tiles.length} tiles...`);
+        let newBlocks = 0;
+
+        for (const tile of tiles) {
+          const { x, y, elevation, terrain, wall } = tile;
+          const key = `${x},${y}`;
+
+          if (this.builtTiles.has(key)) continue;
+          this.builtTiles.add(key);
+
+          // Build surface block + a few blocks below
+          const minZ = Math.max(-2, elevation - 3);
+          const maxZ = elevation;
+
+          for (let z = minZ; z <= maxZ; z++) {
+            let material;
+            let terrainType;
+            const isSurface = (z === elevation);
+
+            if (isSurface) {
+              material = this.materials[terrain] || this.materials.default;
+              terrainType = terrain;
+            } else if (z > elevation - 2) {
+              material = this.materials.dirt;
+              terrainType = 'dirt';
+            } else {
+              material = this.materials.stone;
+              terrainType = 'stone';
+            }
+
+            this.createBlockWithOutline(x, y, z, material, isSurface, terrainType);
+            newBlocks++;
+          }
+
+          // Add wall if present
+          if (wall) {
+            const wallMat = this.materials.stone;
+            for (let wz = elevation + 1; wz <= elevation + 3; wz++) {
+              this.createBlockWithOutline(x, y, wz, wallMat, true, 'stone');
+              newBlocks++;
+            }
+          }
+        }
+
+        console.log(`Added ${newBlocks} new blocks`);
+      }
+
+      toggleOutlines() {
+        this.showOutlines = !this.showOutlines;
+        this.outlinesGroup.visible = this.showOutlines;
+        return this.showOutlines;
+      }
+
+      getBlockCount() {
+        return this.terrainGroup.children.length;
+      }
+
+      getTileCount() {
+        return this.builtTiles.size;
+      }
+    }
+
+    // ============================================================
+    // PLANT SPRITE MANAGER - Renders plants from game as billboards
+    // ============================================================
+    class PlantSpriteManager {
+      constructor(scene, camera) {
+        this.scene = scene;
+        this.camera = camera;
+        this.plantsGroup = new THREE.Group();
+        this.scene.add(this.plantsGroup);
+        this.plantSprites = new Map();  // id -> { sprite, data }
+        this.textureCache = new Map();  // spriteId -> texture
+        this.textureLoader = new THREE.TextureLoader();
+
+        // Base path for plant sprites (symlinked to game assets)
+        this.spritesBasePath = '/assets/sprites';
+      }
+
+      // Load a sprite texture by spriteId
+      async loadTexture(spriteId) {
+        if (this.textureCache.has(spriteId)) {
+          return this.textureCache.get(spriteId);
+        }
+
+        // Try different paths where plant sprites might be
+        const paths = [
+          `${this.spritesBasePath}/plants/${spriteId}.png`,
+          `${this.spritesBasePath}/entities/plants/${spriteId}.png`,
+          `${this.spritesBasePath}/${spriteId}.png`,
+        ];
+
+        for (const path of paths) {
+          try {
+            const texture = await new Promise((resolve, reject) => {
+              this.textureLoader.load(
+                path,
+                (tex) => {
+                  tex.magFilter = THREE.NearestFilter;
+                  tex.minFilter = THREE.NearestFilter;
+                  resolve(tex);
+                },
+                undefined,
+                () => reject(new Error(`Failed to load ${path}`))
+              );
+            });
+            this.textureCache.set(spriteId, texture);
+            return texture;
+          } catch (e) {
+            // Try next path
+          }
+        }
+
+        // Fallback: create a procedural plant texture
+        return this.createFallbackTexture(spriteId);
+      }
+
+      // Create a simple procedural plant texture as fallback
+      createFallbackTexture(spriteId) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 32;
+        canvas.height = 48;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, 32, 48);
+
+        // Determine plant type from spriteId
+        const isTree = spriteId.includes('tree') || spriteId.includes('oak') || spriteId.includes('pine');
+        const isBush = spriteId.includes('bush') || spriteId.includes('shrub');
+
+        if (isTree) {
+          // Tree shape
+          ctx.fillStyle = '#5c4033';  // Trunk
+          ctx.fillRect(14, 28, 4, 20);
+          ctx.fillStyle = '#228b22';  // Leaves
+          ctx.beginPath();
+          ctx.moveTo(16, 0);
+          ctx.lineTo(28, 28);
+          ctx.lineTo(4, 28);
+          ctx.fill();
+        } else if (isBush) {
+          // Bush shape
+          ctx.fillStyle = '#228b22';
+          ctx.beginPath();
+          ctx.arc(16, 32, 14, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#1a6b1a';
+          ctx.beginPath();
+          ctx.arc(10, 28, 8, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(22, 28, 8, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          // Generic plant/flower
+          ctx.fillStyle = '#2d8a3e';  // Stem
+          ctx.fillRect(14, 24, 4, 24);
+          ctx.fillStyle = '#4ade80';  // Leaves
+          ctx.beginPath();
+          ctx.ellipse(16, 16, 12, 16, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        this.textureCache.set(spriteId, texture);
+        return texture;
+      }
+
+      // Add or update a plant sprite
+      async addOrUpdatePlant(plant, getElevation) {
+        const { id, plantType, stage, position, spriteId, sizeMultiplier, alpha } = plant;
+        const x = position.x;
+        const y = position.y;
+        const elevation = getElevation(x, y);
+
+        let data = this.plantSprites.get(id);
+
+        if (!data) {
+          // Create new plant sprite
+          const texture = await this.loadTexture(spriteId);
+          const material = new THREE.SpriteMaterial({
+            map: texture,
+            transparent: true,
+            opacity: alpha
+          });
+          const sprite = new THREE.Sprite(material);
+
+          // Base size for plants, modified by sizeMultiplier
+          const baseWidth = 1.5;
+          const baseHeight = 2.0;
+          sprite.scale.set(baseWidth * sizeMultiplier, baseHeight * sizeMultiplier, 1);
+
+          this.plantsGroup.add(sprite);
+
+          data = {
+            sprite,
+            texture,
+            spriteId,
+            sizeMultiplier,
+            alpha,
+            worldX: x,
+            worldY: y
+          };
+          this.plantSprites.set(id, data);
+        }
+
+        // Update position and visual properties
+        data.sprite.position.set(x, elevation + 1.0 * sizeMultiplier, y);
+        data.worldX = x;
+        data.worldY = y;
+
+        // Update opacity if changed
+        if (data.alpha !== alpha) {
+          data.sprite.material.opacity = alpha;
+          data.alpha = alpha;
+        }
+
+        // Update scale if changed
+        if (data.sizeMultiplier !== sizeMultiplier) {
+          const baseWidth = 1.5;
+          const baseHeight = 2.0;
+          data.sprite.scale.set(baseWidth * sizeMultiplier, baseHeight * sizeMultiplier, 1);
+          data.sizeMultiplier = sizeMultiplier;
+        }
+      }
+
+      // Remove a plant sprite
+      removePlant(id) {
+        const data = this.plantSprites.get(id);
+        if (data) {
+          this.plantsGroup.remove(data.sprite);
+          this.plantSprites.delete(id);
+        }
+      }
+
+      // Update from live plant data
+      async updateFromLiveData(plants, getElevation) {
+        const currentIds = new Set();
+
+        for (const plant of plants) {
+          currentIds.add(plant.id);
+          await this.addOrUpdatePlant(plant, getElevation);
+        }
+
+        // Remove plants no longer present
+        for (const id of this.plantSprites.keys()) {
+          if (!currentIds.has(id)) {
+            this.removePlant(id);
+          }
+        }
+      }
+
+      // Clear all plants (for fallback/procedural mode)
+      clear() {
+        for (const id of this.plantSprites.keys()) {
+          this.removePlant(id);
+        }
+      }
+
+      get count() {
+        return this.plantSprites.size;
+      }
+    }
+
+    // ============================================================
+    // FALLBACK TREE GENERATOR - Used when no live plant data
+    // ============================================================
+    class FallbackTreeGenerator {
+      constructor(scene) {
+        this.scene = scene;
+        this.treesGroup = new THREE.Group();
+        this.scene.add(this.treesGroup);
+        this.placedTrees = new Set();
+
+        // Tree materials
+        this.trunkMaterial = new THREE.MeshLambertMaterial({ color: 0x4a3728 });
+        this.leavesMaterial = new THREE.MeshLambertMaterial({ color: 0x228b22 });
+        this.darkLeavesMaterial = new THREE.MeshLambertMaterial({ color: 0x1a6b1a });
+
+        // Reusable geometries
+        this.trunkGeometry = new THREE.CylinderGeometry(0.15, 0.2, 1.5, 6);
+        this.leavesGeometry = new THREE.ConeGeometry(0.8, 1.5, 6);
+        this.topLeavesGeometry = new THREE.ConeGeometry(0.5, 1.0, 6);
+      }
+
+      // Deterministic random based on position
+      seededRandom(x, y) {
+        const seed = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+        return seed - Math.floor(seed);
+      }
+
+      addTree(x, y, elevation) {
+        const key = `tree_${x}_${y}`;
+        if (this.placedTrees.has(key)) return;
+        this.placedTrees.add(key);
+
+        // Random offset within the tile
+        const offsetX = (this.seededRandom(x, y) - 0.5) * 0.6;
+        const offsetZ = (this.seededRandom(y, x) - 0.5) * 0.6;
+        const scale = 0.7 + this.seededRandom(x + y, y - x) * 0.6;
+
+        const worldX = x + offsetX;
+        const worldZ = y + offsetZ;
+        const baseY = elevation + 0.5;
+
+        // Create tree group
+        const tree = new THREE.Group();
+
+        // Trunk
+        const trunk = new THREE.Mesh(this.trunkGeometry, this.trunkMaterial);
+        trunk.position.set(0, 0.75 * scale, 0);
+        trunk.scale.set(scale, scale, scale);
+        trunk.castShadow = true;
+        tree.add(trunk);
+
+        // Bottom leaves (darker)
+        const bottomLeaves = new THREE.Mesh(this.leavesGeometry, this.darkLeavesMaterial);
+        bottomLeaves.position.set(0, 1.5 * scale, 0);
+        bottomLeaves.scale.set(scale, scale, scale);
+        bottomLeaves.castShadow = true;
+        tree.add(bottomLeaves);
+
+        // Top leaves (lighter)
+        const topLeaves = new THREE.Mesh(this.topLeavesGeometry, this.leavesMaterial);
+        topLeaves.position.set(0, 2.5 * scale, 0);
+        topLeaves.scale.set(scale, scale, scale);
+        topLeaves.castShadow = true;
+        tree.add(topLeaves);
+
+        tree.position.set(worldX, baseY, worldZ);
+
+        // Random rotation for variety
+        tree.rotation.y = this.seededRandom(x * 2, y * 3) * Math.PI * 2;
+
+        this.treesGroup.add(tree);
+      }
+
+      addTreesForTile(x, y, elevation, terrain) {
+        if (terrain !== 'forest') return;
+
+        // Only add trees to some forest tiles (use deterministic random)
+        const shouldHaveTree = this.seededRandom(x * 7, y * 11) > 0.3;
+        if (shouldHaveTree) {
+          this.addTree(x, y, elevation);
+        }
+      }
+
+      setVisible(visible) {
+        this.treesGroup.visible = visible;
+      }
+
+      get count() {
+        return this.placedTrees.size;
+      }
+    }
+
+    // ============================================================
+    // ENTITY SPRITES (Billboards with 4-directional support)
+    // ============================================================
+    class EntitySpriteManager {
+      constructor(scene, camera) {
+        this.scene = scene;
+        this.camera = camera;
+        this.entities = new Map();
+        this.nameLabels = new Map();
+      }
+
+      // Agent colors by name hash
+      getAgentColor(name) {
+        const colors = [0x4ade80, 0x3b82f6, 0xf59e0b, 0xef4444, 0x8b5cf6, 0x06b6d4, 0xec4899];
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) {
+          hash = ((hash << 5) - hash) + name.charCodeAt(i);
+        }
+        return colors[Math.abs(hash) % colors.length];
+      }
+
+      createDirectionalTextures(color = 0x4ade80) {
+        const c = new THREE.Color(color);
+        const hex = '#' + c.getHexString();
+        const skinColor = '#f5d0c5';
+        const pantsColor = '#374151';
+        const hairColor = '#5c4033';
+
+        const textures = {};
+        textures.front = this.createSpriteTexture(hex, skinColor, pantsColor, hairColor, 'front');
+        textures.back = this.createSpriteTexture(hex, skinColor, pantsColor, hairColor, 'back');
+        textures.left = this.createSpriteTexture(hex, skinColor, pantsColor, hairColor, 'left');
+        textures.right = this.createSpriteTexture(hex, skinColor, pantsColor, hairColor, 'right');
+        return textures;
+      }
+
+      createSpriteTexture(shirtColor, skinColor, pantsColor, hairColor, direction) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 32;
+        canvas.height = 48;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, 32, 48);
+
+        if (direction === 'front') {
+          ctx.fillStyle = skinColor;
+          ctx.beginPath();
+          ctx.arc(16, 8, 6, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = hairColor;
+          ctx.beginPath();
+          ctx.arc(16, 5, 5, Math.PI, 0);
+          ctx.fill();
+          ctx.fillStyle = '#000';
+          ctx.fillRect(12, 6, 2, 2);
+          ctx.fillRect(18, 6, 2, 2);
+          ctx.fillRect(14, 10, 4, 1);
+          ctx.fillStyle = shirtColor;
+          ctx.fillRect(8, 14, 16, 14);
+          ctx.fillStyle = skinColor;
+          ctx.fillRect(4, 16, 4, 10);
+          ctx.fillRect(24, 16, 4, 10);
+          ctx.fillStyle = pantsColor;
+          ctx.fillRect(8, 28, 7, 14);
+          ctx.fillRect(17, 28, 7, 14);
+          ctx.fillStyle = '#1a1a1a';
+          ctx.fillRect(8, 42, 7, 4);
+          ctx.fillRect(17, 42, 7, 4);
+        } else if (direction === 'back') {
+          ctx.fillStyle = skinColor;
+          ctx.beginPath();
+          ctx.arc(16, 8, 6, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = hairColor;
+          ctx.beginPath();
+          ctx.arc(16, 7, 6, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = shirtColor;
+          ctx.fillRect(8, 14, 16, 14);
+          ctx.fillStyle = skinColor;
+          ctx.fillRect(4, 16, 4, 10);
+          ctx.fillRect(24, 16, 4, 10);
+          ctx.fillStyle = pantsColor;
+          ctx.fillRect(8, 28, 7, 14);
+          ctx.fillRect(17, 28, 7, 14);
+          ctx.fillStyle = '#1a1a1a';
+          ctx.fillRect(8, 42, 7, 4);
+          ctx.fillRect(17, 42, 7, 4);
+        } else {
+          // Side profile (left/right)
+          ctx.fillStyle = skinColor;
+          ctx.beginPath();
+          ctx.ellipse(16, 8, 5, 6, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = hairColor;
+          ctx.beginPath();
+          ctx.ellipse(direction === 'left' ? 18 : 14, 5, 4, 4, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#000';
+          ctx.fillRect(direction === 'left' ? 13 : 17, 7, 2, 2);
+          ctx.fillStyle = shirtColor;
+          ctx.fillRect(10, 14, 12, 14);
+          ctx.fillStyle = skinColor;
+          ctx.fillRect(direction === 'left' ? 6 : 22, 16, 4, 10);
+          ctx.fillStyle = pantsColor;
+          ctx.fillRect(11, 28, 10, 14);
+          ctx.fillStyle = '#1a1a1a';
+          ctx.fillRect(11, 42, 10, 4);
+        }
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+      }
+
+      addOrUpdateEntity(id, name, x, y, elevation, facingAngle = 0) {
+        let data = this.entities.get(id);
+
+        if (!data) {
+          // Create new entity
+          const color = this.getAgentColor(name);
+          const textures = this.createDirectionalTextures(color);
+          const material = new THREE.SpriteMaterial({
+            map: textures.front,
+            transparent: true
+          });
+          const sprite = new THREE.Sprite(material);
+          sprite.scale.set(1.5, 2.25, 1);
+
+          this.scene.add(sprite);
+
+          data = {
+            sprite,
+            textures,
+            name,
+            worldX: x,
+            worldY: y,
+            worldZ: elevation,
+            facingAngle,
+            currentDirection: 'front'
+          };
+          this.entities.set(id, data);
+        }
+
+        // Update position
+        data.sprite.position.set(x, elevation + 1.5, y);
+        data.worldX = x;
+        data.worldY = y;
+        data.worldZ = elevation;
+      }
+
+      removeEntity(id) {
+        const data = this.entities.get(id);
+        if (data) {
+          this.scene.remove(data.sprite);
+          this.entities.delete(id);
+        }
+      }
+
+      updateFromLiveData(entities, getElevation) {
+        const currentIds = new Set();
+
+        for (const entity of entities) {
+          if (entity.type !== 'agent') continue;
+
+          currentIds.add(entity.id);
+          const x = entity.position?.x || 0;
+          const y = entity.position?.y || 0;
+          const elevation = getElevation(x, y);
+
+          this.addOrUpdateEntity(entity.id, entity.name, x, y, elevation);
+        }
+
+        // Remove entities no longer present
+        for (const id of this.entities.keys()) {
+          if (!currentIds.has(id)) {
+            this.removeEntity(id);
+          }
+        }
+      }
+
+      updateDirectionalSprites() {
+        for (const [id, data] of this.entities) {
+          const { sprite, textures, worldX, worldY, facingAngle } = data;
+
+          const dx = this.camera.position.x - worldX;
+          const dz = this.camera.position.z - worldY;
+          const angleToCamera = Math.atan2(dz, dx);
+
+          let relativeAngle = angleToCamera - facingAngle;
+          while (relativeAngle < 0) relativeAngle += Math.PI * 2;
+          while (relativeAngle >= Math.PI * 2) relativeAngle -= Math.PI * 2;
+
+          let newDirection;
+          if (relativeAngle < Math.PI / 4 || relativeAngle >= 7 * Math.PI / 4) {
+            newDirection = 'right';
+          } else if (relativeAngle < 3 * Math.PI / 4) {
+            newDirection = 'front';
+          } else if (relativeAngle < 5 * Math.PI / 4) {
+            newDirection = 'left';
+          } else {
+            newDirection = 'back';
+          }
+
+          if (newDirection !== data.currentDirection) {
+            sprite.material.map = textures[newDirection];
+            sprite.material.needsUpdate = true;
+            data.currentDirection = newDirection;
+          }
+        }
+      }
+
+      getEntityNames() {
+        return Array.from(this.entities.values()).map(d => d.name);
+      }
+
+      getNearestEntity(x, z) {
+        let nearest = null;
+        let minDist = Infinity;
+
+        for (const [id, data] of this.entities) {
+          const dx = data.worldX - x;
+          const dz = data.worldY - z;
+          const dist = dx * dx + dz * dz;
+          if (dist < minDist) {
+            minDist = dist;
+            nearest = data;
+          }
+        }
+
+        return nearest;
+      }
+
+      get count() {
+        return this.entities.size;
+      }
+    }
+
+    // ============================================================
+    // MAIN APPLICATION
+    // ============================================================
+    class VoxelWorld {
+      constructor() {
+        this.liveData = new LiveDataManager();
+        this.fallbackGenerator = new ProceduralTerrainGenerator(42);
+        this.elevationCache = new Map();
+        this.followTarget = null;
+
+        this.initScene();
+        this.initLights();
+        this.initControls();
+        this.initTerrain();
+        this.initEntities();
+        this.initLiveData();
+        this.animate();
+      }
+
+      initScene() {
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(0x87ceeb);
+        this.scene.fog = new THREE.Fog(0x87ceeb, 50, 150);
+
+        this.camera = new THREE.PerspectiveCamera(
+          75, window.innerWidth / window.innerHeight, 0.1, 1000
+        );
+        this.camera.position.set(30, 20, 30);
+        this.camera.lookAt(0, 5, 0);
+
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        this.renderer.shadowMap.enabled = true;
+        document.body.appendChild(this.renderer.domElement);
+
+        window.addEventListener('resize', () => {
+          this.camera.aspect = window.innerWidth / window.innerHeight;
+          this.camera.updateProjectionMatrix();
+          this.renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+      }
+
+      initLights() {
+        const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+        this.scene.add(ambient);
+
+        const sun = new THREE.DirectionalLight(0xffffff, 0.8);
+        sun.position.set(50, 100, 50);
+        sun.castShadow = true;
+        sun.shadow.mapSize.width = 1024;
+        sun.shadow.mapSize.height = 1024;
+        this.scene.add(sun);
+
+        const hemi = new THREE.HemisphereLight(0x87ceeb, 0x3d5c3d, 0.3);
+        this.scene.add(hemi);
+      }
+
+      initControls() {
+        this.controls = new PointerLockControls(this.camera, document.body);
+
+        this.moveState = {
+          forward: false,
+          backward: false,
+          left: false,
+          right: false,
+          up: false,
+          down: false
+        };
+        this.velocity = new THREE.Vector3();
+
+        document.addEventListener('click', () => {
+          this.controls.lock();
+        });
+
+        document.addEventListener('keydown', (e) => {
+          switch (e.code) {
+            case 'KeyW': this.moveState.forward = true; break;
+            case 'KeyS': this.moveState.backward = true; break;
+            case 'KeyA': this.moveState.left = true; break;
+            case 'KeyD': this.moveState.right = true; break;
+            case 'Space': this.moveState.up = true; break;
+            case 'ShiftLeft': this.moveState.down = true; break;
+            case 'KeyF':
+              // Toggle follow mode
+              const nearest = this.entityManager.getNearestEntity(
+                this.camera.position.x,
+                this.camera.position.z
+              );
+              if (nearest && this.followTarget === nearest) {
+                this.followTarget = null;
+              } else {
+                this.followTarget = nearest;
+              }
+              break;
+            case 'KeyO':
+              // Toggle block outlines
+              const outlinesOn = this.terrainBuilder.toggleOutlines();
+              console.log(`Block outlines: ${outlinesOn ? 'ON' : 'OFF'}`);
+              break;
+            case 'KeyT':
+              // Trigger texture generation via PixelLab
+              this.generatePixelLabTextures();
+              break;
+          }
+        });
+
+        document.addEventListener('keyup', (e) => {
+          switch (e.code) {
+            case 'KeyW': this.moveState.forward = false; break;
+            case 'KeyS': this.moveState.backward = false; break;
+            case 'KeyA': this.moveState.left = false; break;
+            case 'KeyD': this.moveState.right = false; break;
+            case 'Space': this.moveState.up = false; break;
+            case 'ShiftLeft': this.moveState.down = false; break;
+          }
+        });
+      }
+
+      initTerrain() {
+        this.terrainBuilder = new VoxelTerrainBuilder(this.scene);
+        this.fallbackTreeGenerator = new FallbackTreeGenerator(this.scene);
+        this.plantSpriteManager = new PlantSpriteManager(this.scene, this.camera);
+        this.useLivePlants = false;  // Track if we have live plant data
+
+        // Generate initial fallback terrain
+        console.log('Generating initial terrain...');
+        const fallbackData = this.fallbackGenerator.generateArea(0, 0, 30);
+        this.terrainBuilder.buildFromTiles(fallbackData.tiles);
+
+        // Cache elevations and add fallback trees for forest tiles
+        for (const tile of fallbackData.tiles) {
+          this.elevationCache.set(`${tile.x},${tile.y}`, tile.elevation);
+          this.fallbackTreeGenerator.addTreesForTile(tile.x, tile.y, tile.elevation, tile.terrain);
+        }
+        console.log(`Initial terrain generated! Fallback trees: ${this.fallbackTreeGenerator.count}`);
+      }
+
+      initEntities() {
+        this.entityManager = new EntitySpriteManager(this.scene, this.camera);
+      }
+
+      initLiveData() {
+        // Connection status updates
+        this.liveData.onConnectionChange = (connected) => {
+          const statusEl = document.getElementById('connection-status');
+          if (connected) {
+            statusEl.className = 'status connected';
+            statusEl.innerHTML = '🟢 Connected to game';
+          } else {
+            statusEl.className = 'status disconnected';
+            statusEl.innerHTML = '🔴 Disconnected - using fallback';
+          }
+        };
+
+        // Entity updates
+        this.liveData.onEntitiesUpdate = (entities) => {
+          this.entityManager.updateFromLiveData(entities, (x, y) => this.getElevation(x, y));
+          this.updateAgentList(entities);
+
+          // Fetch terrain around entities if we have live data
+          if (entities.length > 0) {
+            // Get center of all entities
+            let cx = 0, cy = 0;
+            for (const e of entities) {
+              cx += e.position?.x || 0;
+              cy += e.position?.y || 0;
+            }
+            cx /= entities.length;
+            cy /= entities.length;
+
+            // Fetch terrain around center
+            this.fetchTerrainAround(cx, cy);
+          }
+        };
+
+        // Plants updates - use actual sprites from game
+        this.liveData.onPlantsUpdate = async (plants) => {
+          if (plants && plants.length > 0) {
+            // We have live plant data - hide fallback trees and show sprite plants
+            if (!this.useLivePlants) {
+              this.useLivePlants = true;
+              this.fallbackTreeGenerator.setVisible(false);
+              console.log(`Switching to live plant sprites (${plants.length} plants)`);
+            }
+            await this.plantSpriteManager.updateFromLiveData(plants, (x, y) => this.getElevation(x, y));
+          } else if (this.useLivePlants && (!plants || plants.length === 0)) {
+            // No live plant data - switch back to fallback trees
+            this.useLivePlants = false;
+            this.fallbackTreeGenerator.setVisible(true);
+            this.plantSpriteManager.clear();
+            console.log('No live plants - using fallback trees');
+          }
+        };
+
+        // Terrain updates
+        this.liveData.onTerrainUpdate = (data) => {
+          if (data && data.tiles) {
+            this.terrainBuilder.buildFromTiles(data.tiles);
+
+            // Update elevation cache and add fallback trees for forest tiles (only if not using live plants)
+            for (const tile of data.tiles) {
+              this.elevationCache.set(`${tile.x},${tile.y}`, tile.elevation);
+              if (!this.useLivePlants) {
+                this.fallbackTreeGenerator.addTreesForTile(tile.x, tile.y, tile.elevation, tile.terrain);
+              }
+            }
+          }
+        };
+
+        // Start polling
+        this.liveData.startPolling();
+      }
+
+      async fetchTerrainAround(x, y) {
+        await this.liveData.fetchTerrain(Math.floor(x), Math.floor(y), 40);
+      }
+
+      async generatePixelLabTextures() {
+        console.log('Generating terrain textures via PixelLab (64x64)...');
+        const statusEl = document.getElementById('connection-status');
+        statusEl.innerHTML = '🎨 Generating textures...';
+
+        // Terrain types to generate with PixelLab isometric tiles
+        const terrainDescriptions = {
+          'grass': 'lush green grass with small flowers',
+          'dirt': 'brown dirt and soil with small rocks',
+          'stone': 'gray stone and rock surface with cracks',
+          'sand': 'sandy beach with small pebbles',
+          'water': 'blue water surface with ripples',
+          'forest': 'dark green forest floor with leaves'
+        };
+
+        for (const [terrain, description] of Object.entries(terrainDescriptions)) {
+          try {
+            console.log(`Requesting ${terrain} tile...`);
+
+            // Call the PixelLab API via the game's metrics server proxy
+            const response = await fetch(`${CONFIG.API_BASE}/api/pixellab/generate-tile`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                description: description,
+                size: 64,  // 64x64 pixels
+                terrain: terrain,
+                tile_shape: 'block',
+                shading: 'medium shading',
+                detail: 'medium detail'
+              })
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              console.log(`${terrain} tile queued:`, data);
+            } else {
+              console.warn(`Failed to queue ${terrain}:`, await response.text());
+            }
+          } catch (e) {
+            console.error(`Error generating ${terrain}:`, e);
+          }
+        }
+
+        statusEl.innerHTML = '🎨 Textures queued! Check /assets/sprites/pixellab/tiles/';
+        setTimeout(() => {
+          statusEl.className = 'status connected';
+          statusEl.innerHTML = '🟢 Connected to game';
+        }, 3000);
+      }
+
+      getElevation(x, y) {
+        const ix = Math.floor(x);
+        const iy = Math.floor(y);
+        const cached = this.elevationCache.get(`${ix},${iy}`);
+        if (cached !== undefined) return cached;
+
+        // Fallback to procedural
+        return this.fallbackGenerator.getElevation(ix, iy);
+      }
+
+      updateAgentList(entities) {
+        const agentsEl = document.getElementById('agents');
+        const agents = entities.filter(e => e.type === 'agent');
+
+        agentsEl.innerHTML = agents.map(a => {
+          const pos = a.position || { x: 0, y: 0 };
+          return `<div class="entity">
+            <strong>${a.name}</strong><br>
+            <small>(${pos.x.toFixed(1)}, ${pos.y.toFixed(1)})</small>
+          </div>`;
+        }).join('');
+      }
+
+      updateMovement(delta) {
+        // Follow target if set
+        if (this.followTarget) {
+          const target = new THREE.Vector3(
+            this.followTarget.worldX,
+            this.followTarget.worldZ + 10,
+            this.followTarget.worldY + 10
+          );
+          this.camera.position.lerp(target, 0.02);
+          return;
+        }
+
+        const speed = 15 * delta;
+        const damping = 0.85;
+
+        this.velocity.x *= damping;
+        this.velocity.z *= damping;
+        this.velocity.y *= damping;
+
+        if (this.moveState.forward) this.velocity.z -= speed;
+        if (this.moveState.backward) this.velocity.z += speed;
+        if (this.moveState.left) this.velocity.x -= speed;
+        if (this.moveState.right) this.velocity.x += speed;
+        if (this.moveState.up) this.velocity.y += speed;
+        if (this.moveState.down) this.velocity.y -= speed;
+
+        this.controls.moveRight(this.velocity.x);
+        this.controls.moveForward(-this.velocity.z);
+        this.camera.position.y += this.velocity.y;
+      }
+
+      animate() {
+        requestAnimationFrame(() => this.animate());
+
+        const delta = 0.016;
+        this.updateMovement(delta);
+
+        // Update directional sprites based on camera position
+        this.entityManager.updateDirectionalSprites();
+
+        // Update stats
+        const pos = this.camera.position;
+        const following = this.followTarget ? ` | Following: ${this.followTarget.name}` : '';
+        const plantInfo = this.useLivePlants
+          ? `Plants: ${this.plantSpriteManager.count} (live sprites)`
+          : `Trees: ${this.fallbackTreeGenerator.count} (fallback)`;
+        document.getElementById('stats').innerHTML = `
+          Position: ${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}, ${pos.z.toFixed(1)}<br>
+          Tiles: ${this.terrainBuilder.getTileCount()}<br>
+          Blocks: ${this.terrainBuilder.getBlockCount()}<br>
+          ${plantInfo}<br>
+          Agents: ${this.entityManager.count}${following}
+        `;
+
+        this.renderer.render(this.scene, this.camera);
+      }
+    }
+
+    // Start
+    new VoxelWorld();
+  </script>
+</body>
+</html>

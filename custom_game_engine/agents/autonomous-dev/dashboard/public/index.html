@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Village - Orchestration Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: #0a0a0a;
+      color: #00ff00;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #00ff00;
+      padding-bottom: 10px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      background: #1a1a1a;
+      border: 1px solid #00ff00;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .tab:hover {
+      background: #00ff00;
+      color: #0a0a0a;
+    }
+
+    .tab.active {
+      background: #00ff00;
+      color: #0a0a0a;
+      font-weight: bold;
+    }
+
+    .tab-content {
+      display: none;
+      background: #1a1a1a;
+      border: 1px solid #00ff00;
+      padding: 20px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .provider-card {
+      background: #0f0f0f;
+      border: 1px solid #00aa00;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .provider-header {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #00ff00;
+      text-transform: uppercase;
+    }
+
+    .provider-info {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .label {
+      color: #00aa00;
+    }
+
+    .value {
+      color: #00ff00;
+    }
+
+    .section-header {
+      font-size: 16px;
+      font-weight: bold;
+      margin: 15px 0 10px 0;
+      color: #00ffaa;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #00aa00;
+    }
+
+    .error {
+      background: #330000;
+      border: 1px solid #ff0000;
+      color: #ff0000;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .summary-card {
+      background: #0f0f0f;
+      border: 1px solid #00aa00;
+      padding: 15px;
+    }
+
+    .summary-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #00ff00;
+      margin-bottom: 5px;
+    }
+
+    .summary-label {
+      color: #00aa00;
+      font-size: 12px;
+    }
+
+    .refresh-btn {
+      background: #00ff00;
+      color: #0a0a0a;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .refresh-btn:hover {
+      background: #00aa00;
+    }
+
+    .timestamp {
+      color: #00aa00;
+      font-size: 12px;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>AI VILLAGE - ORCHESTRATION DASHBOARD</h1>
+
+    <button class="refresh-btn" onclick="refreshAll()">Refresh All</button>
+    <div class="timestamp" id="timestamp"></div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('llm')">LLM Providers</div>
+      <div class="tab" onclick="switchTab('metrics')">Metrics</div>
+      <div class="tab" onclick="switchTab('costs')">Costs</div>
+    </div>
+
+    <div id="llm-tab" class="tab-content active">
+      <div id="llm-content"></div>
+    </div>
+
+    <div id="metrics-tab" class="tab-content">
+      <div id="metrics-content"></div>
+    </div>
+
+    <div id="costs-tab" class="tab-content">
+      <div id="costs-content"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentTab = 'llm';
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelector(`.tab:nth-child(${tab === 'llm' ? 1 : tab === 'metrics' ? 2 : 3})`).classList.add('active');
+      document.getElementById(`${tab}-tab`).classList.add('active');
+
+      if (tab === 'llm') loadLLMProviders();
+      else if (tab === 'metrics') loadMetrics();
+      else if (tab === 'costs') loadCosts();
+    }
+
+    function updateTimestamp() {
+      document.getElementById('timestamp').textContent = `Last updated: ${new Date().toLocaleString()}`;
+    }
+
+    async function loadLLMProviders() {
+      const content = document.getElementById('llm-content');
+      content.innerHTML = '<div class="loading">Loading LLM providers...</div>';
+
+      try {
+        const response = await fetch('/api/llm/providers');
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to load providers');
+        }
+
+        let html = '<div class="summary">';
+        html += `<div class="summary-card">
+          <div class="summary-value">${data.summary.totalProviders}</div>
+          <div class="summary-label">Total Providers</div>
+        </div>`;
+        html += `<div class="summary-card">
+          <div class="summary-value">${data.summary.totalRequests.toLocaleString()}</div>
+          <div class="summary-label">Total Requests</div>
+        </div>`;
+        html += `<div class="summary-card">
+          <div class="summary-value">$${data.summary.totalCost.toFixed(4)}</div>
+          <div class="summary-label">Total Cost</div>
+        </div>`;
+        html += `<div class="summary-card">
+          <div class="summary-value">${data.summary.totalTokens.toLocaleString()}</div>
+          <div class="summary-label">Total Tokens</div>
+        </div>`;
+        html += '</div>';
+
+        data.providers.forEach(provider => {
+          html += `<div class="provider-card">
+            <div class="provider-header">${provider.name}</div>
+
+            <div class="section-header">Configuration</div>
+            <div class="provider-info">
+              <div class="label">Model:</div>
+              <div class="value">${provider.model}</div>
+
+              <div class="label">API Key:</div>
+              <div class="value">${provider.apiKey}</div>
+
+              <div class="label">Base URL:</div>
+              <div class="value">${provider.baseUrl}</div>
+
+              <div class="label">Max Concurrent:</div>
+              <div class="value">${provider.maxConcurrent}</div>
+
+              <div class="label">Fallback Chain:</div>
+              <div class="value">${provider.fallbackChain.join(', ') || 'none'}</div>
+            </div>`;
+
+          if (provider.queue) {
+            html += `<div class="section-header">Queue Status</div>
+            <div class="provider-info">
+              <div class="label">Queue Length:</div>
+              <div class="value">${provider.queue.queueLength}</div>
+
+              <div class="label">Rate Limited:</div>
+              <div class="value">${provider.queue.rateLimited ? 'YES' : 'NO'}</div>
+
+              <div class="label">Wait Time:</div>
+              <div class="value">${provider.queue.rateLimitWaitMs}ms</div>
+
+              <div class="label">Utilization:</div>
+              <div class="value">${(provider.queue.semaphoreUtilization * 100).toFixed(1)}%</div>
+            </div>`;
+          }
+
+          if (provider.costs) {
+            html += `<div class="section-header">Cost Tracking</div>
+            <div class="provider-info">
+              <div class="label">Total Requests:</div>
+              <div class="value">${provider.costs.totalRequests.toLocaleString()}</div>
+
+              <div class="label">Total Cost:</div>
+              <div class="value">$${provider.costs.totalCost.toFixed(4)}</div>
+
+              <div class="label">Total Tokens:</div>
+              <div class="value">${provider.costs.totalTokens.toLocaleString()}</div>
+
+              <div class="label">Avg Cost/Request:</div>
+              <div class="value">$${provider.costs.totalRequests > 0 ? (provider.costs.totalCost / provider.costs.totalRequests).toFixed(6) : '0.000000'}</div>
+            </div>`;
+          }
+
+          html += '</div>';
+        });
+
+        content.innerHTML = html;
+        updateTimestamp();
+      } catch (error) {
+        content.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+      }
+    }
+
+    async function loadMetrics() {
+      const content = document.getElementById('metrics-content');
+      content.innerHTML = '<div class="loading">Loading metrics...</div>';
+
+      try {
+        const response = await fetch('/api/llm/stats');
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to load metrics');
+        }
+
+        let html = '<div class="section-header">Queue Metrics</div>';
+        html += '<pre style="color: #00ff00; overflow-x: auto;">';
+        html += JSON.stringify(data, null, 2);
+        html += '</pre>';
+
+        content.innerHTML = html;
+        updateTimestamp();
+      } catch (error) {
+        content.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+      }
+    }
+
+    async function loadCosts() {
+      const content = document.getElementById('costs-content');
+      content.innerHTML = '<div class="loading">Loading costs...</div>';
+
+      try {
+        const response = await fetch('/api/llm/costs');
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to load costs');
+        }
+
+        let html = '<div class="section-header">Cost Summary</div>';
+        html += `<div class="summary">`;
+        html += `<div class="summary-card">
+          <div class="summary-value">$${data.summary.totalCost.toFixed(4)}</div>
+          <div class="summary-label">Total Cost</div>
+        </div>`;
+        html += `<div class="summary-card">
+          <div class="summary-value">${data.summary.totalRequests.toLocaleString()}</div>
+          <div class="summary-label">Total Requests</div>
+        </div>`;
+        html += `<div class="summary-card">
+          <div class="summary-value">$${data.summary.avgCostPerRequest.toFixed(6)}</div>
+          <div class="summary-label">Avg Cost/Request</div>
+        </div>`;
+        html += `</div>`;
+
+        html += '<div class="section-header">Full Cost Data</div>';
+        html += '<pre style="color: #00ff00; overflow-x: auto;">';
+        html += JSON.stringify(data, null, 2);
+        html += '</pre>';
+
+        content.innerHTML = html;
+        updateTimestamp();
+      } catch (error) {
+        content.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+      }
+    }
+
+    function refreshAll() {
+      if (currentTab === 'llm') loadLLMProviders();
+      else if (currentTab === 'metrics') loadMetrics();
+      else if (currentTab === 'costs') loadCosts();
+    }
+
+    // Load initial data
+    loadLLMProviders();
+
+    // Auto-refresh every 30 seconds
+    setInterval(refreshAll, 30000);
+  </script>
+</body>
+</html>

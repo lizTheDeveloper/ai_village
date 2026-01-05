@@ -1,0 +1,17 @@
+{
+  "soulId": "ef367e29-3e8e-4e9b-b0c4-9df9063e928b",
+  "agentId": "ef367e29-3e8e-4e9b-b0c4-9df9063e928b",
+  "name": "Finn",
+  "species": "human",
+  "archetype": "healer",
+  "purpose": "I see a soul born into a time of new beginnings, where the foundations of community are being laid. This soul shall cultivate the earth and nurture the growth of the village, weaving together the threads of sustainability and harmony.",
+  "interests": [
+    "nature",
+    "farming",
+    "healing"
+  ],
+  "createdAt": "2026-01-04T23:46:17.821Z",
+  "soulBirthTick": 57,
+  "universeId": "unknown",
+  "version": 1
+}

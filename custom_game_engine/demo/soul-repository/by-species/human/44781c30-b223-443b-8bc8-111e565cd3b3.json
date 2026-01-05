@@ -1,0 +1,17 @@
+{
+  "soulId": "44781c30-b223-443b-8bc8-111e565cd3b3",
+  "agentId": "44781c30-b223-443b-8bc8-111e565cd3b3",
+  "name": "Birch",
+  "species": "human",
+  "archetype": "unifier",
+  "purpose": "I see a soul born at the dawn of a new era, where the First Village is being founded. This soul shall nurture the flame of community, fostering harmony and cooperation among the villagers, to strengthen the fabric of their society.",
+  "interests": [
+    "social",
+    "art",
+    "leadership"
+  ],
+  "createdAt": "2026-01-04T23:35:25.345Z",
+  "soulBirthTick": 384,
+  "universeId": "unknown",
+  "version": 1
+}

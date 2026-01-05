@@ -1,0 +1,287 @@
+{
+  "soulId": "50536acc-5dc1-4d84-9693-65d89bea6f6a",
+  "agentId": "50536acc-5dc1-4d84-9693-65d89bea6f6a",
+  "name": "Reed",
+  "species": "human",
+  "archetype": "creator",
+  "purpose": "I see a soul born of hope and promise, in this time of new beginnings. This soul shall be a guardian of community, nurturing the bonds that strengthen the village and foster its growth.",
+  "interests": [
+    "social",
+    "crafting",
+    "building"
+  ],
+  "createdAt": "2026-01-04T23:58:10.945Z",
+  "soulBirthTick": 57,
+  "universeId": "unknown",
+  "version": 1,
+  "incarnationHistory": [
+    {
+      "incarnationTick": 1000,
+      "deathTick": 17208,
+      "bodyName": "Reed (Life 1)",
+      "bodySpecies": "human",
+      "duration": 16208,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 18871,
+      "deathTick": 71642,
+      "bodyName": "Reed (Life 2)",
+      "bodySpecies": "human",
+      "duration": 52771,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 72459,
+      "deathTick": 93088,
+      "bodyName": "Reed (Life 3)",
+      "bodySpecies": "human",
+      "duration": 20629,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 97933,
+      "deathTick": 153552,
+      "bodyName": "Reed (Life 4)",
+      "bodySpecies": "human",
+      "duration": 55619,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 154735,
+      "deathTick": 202783,
+      "bodyName": "Reed (Life 5)",
+      "bodySpecies": "human",
+      "duration": 48048,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 204588,
+      "deathTick": 244128,
+      "bodyName": "Reed (Life 6)",
+      "bodySpecies": "human",
+      "duration": 39540,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 248659,
+      "deathTick": 290719,
+      "bodyName": "Reed (Life 7)",
+      "bodySpecies": "human",
+      "duration": 42060,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 294842,
+      "deathTick": 331713,
+      "bodyName": "Reed (Life 8)",
+      "bodySpecies": "human",
+      "duration": 36871,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 332389,
+      "deathTick": 373901,
+      "bodyName": "Reed (Life 9)",
+      "bodySpecies": "human",
+      "duration": 41512,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 377124,
+      "deathTick": 406039,
+      "bodyName": "Reed (Life 10)",
+      "bodySpecies": "human",
+      "duration": 28915,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 406953,
+      "deathTick": 452097,
+      "bodyName": "Reed (Life 11)",
+      "bodySpecies": "human",
+      "duration": 45144,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 455272,
+      "deathTick": 502157,
+      "bodyName": "Reed (Life 12)",
+      "bodySpecies": "human",
+      "duration": 46885,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 502243,
+      "deathTick": 558103,
+      "bodyName": "Reed (Life 13)",
+      "bodySpecies": "human",
+      "duration": 55860,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 561117,
+      "deathTick": 620845,
+      "bodyName": "Reed (Life 14)",
+      "bodySpecies": "human",
+      "duration": 59728,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 624380,
+      "deathTick": 682828,
+      "bodyName": "Reed (Life 15)",
+      "bodySpecies": "human",
+      "duration": 58448,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 683468,
+      "deathTick": 729550,
+      "bodyName": "Reed (Life 16)",
+      "bodySpecies": "human",
+      "duration": 46082,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 731807,
+      "deathTick": 753075,
+      "bodyName": "Reed (Life 17)",
+      "bodySpecies": "human",
+      "duration": 21268,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 755086,
+      "deathTick": 788631,
+      "bodyName": "Reed (Life 18)",
+      "bodySpecies": "human",
+      "duration": 33545,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 789581,
+      "deathTick": 832184,
+      "bodyName": "Reed (Life 19)",
+      "bodySpecies": "human",
+      "duration": 42603,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 832975,
+      "deathTick": 891903,
+      "bodyName": "Reed (Life 20)",
+      "bodySpecies": "human",
+      "duration": 58928,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 894826,
+      "deathTick": 954588,
+      "bodyName": "Reed (Life 21)",
+      "bodySpecies": "human",
+      "duration": 59762,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 959267,
+      "deathTick": 971089,
+      "bodyName": "Reed (Life 22)",
+      "bodySpecies": "human",
+      "duration": 11822,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 975889,
+      "deathTick": 1014111,
+      "bodyName": "Reed (Life 23)",
+      "bodySpecies": "human",
+      "duration": 38222,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1018896,
+      "deathTick": 1042182,
+      "bodyName": "Reed (Life 24)",
+      "bodySpecies": "human",
+      "duration": 23286,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1046568,
+      "deathTick": 1056832,
+      "bodyName": "Reed (Life 25)",
+      "bodySpecies": "human",
+      "duration": 10264,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1058248,
+      "deathTick": 1082789,
+      "bodyName": "Reed (Life 26)",
+      "bodySpecies": "human",
+      "duration": 24541,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1087475,
+      "deathTick": 1130924,
+      "bodyName": "Reed (Life 27)",
+      "bodySpecies": "human",
+      "duration": 43449,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1135921,
+      "deathTick": 1178017,
+      "bodyName": "Reed (Life 28)",
+      "bodySpecies": "human",
+      "duration": 42096,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1179050,
+      "deathTick": 1196829,
+      "bodyName": "Reed (Life 29)",
+      "bodySpecies": "human",
+      "duration": 17779,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1201690,
+      "bodyName": "Reed (Life 30)",
+      "bodySpecies": "human",
+      "notableEvents": []
+    }
+  ],
+  "isReincarnated": true
+}

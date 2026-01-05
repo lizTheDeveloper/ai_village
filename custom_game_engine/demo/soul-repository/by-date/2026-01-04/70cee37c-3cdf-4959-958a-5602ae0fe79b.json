@@ -1,0 +1,917 @@
+{
+  "soulId": "70cee37c-3cdf-4959-958a-5602ae0fe79b",
+  "agentId": "70cee37c-3cdf-4959-958a-5602ae0fe79b",
+  "name": "Oak",
+  "species": "human",
+  "archetype": "unifier",
+  "purpose": "I see a soul destined to nurture growth and foster unity. This soul shall cultivate the land and bring forth abundance, strengthening the fabric of the community.",
+  "interests": [
+    "nature",
+    "farming",
+    "knowledge"
+  ],
+  "createdAt": "2026-01-04T23:36:26.901Z",
+  "soulBirthTick": 238,
+  "universeId": "unknown",
+  "version": 1,
+  "incarnationHistory": [
+    {
+      "incarnationTick": 1000,
+      "deathTick": 32635,
+      "bodyName": "Oak (Life 1)",
+      "bodySpecies": "human",
+      "duration": 31635,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 36193,
+      "deathTick": 59917,
+      "bodyName": "Oak (Life 2)",
+      "bodySpecies": "human",
+      "duration": 23724,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 64711,
+      "deathTick": 101180,
+      "bodyName": "Oak (Life 3)",
+      "bodySpecies": "human",
+      "duration": 36469,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 104155,
+      "deathTick": 117892,
+      "bodyName": "Oak (Life 4)",
+      "bodySpecies": "human",
+      "duration": 13737,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 119947,
+      "deathTick": 135778,
+      "bodyName": "Oak (Life 5)",
+      "bodySpecies": "human",
+      "duration": 15831,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 138927,
+      "deathTick": 160153,
+      "bodyName": "Oak (Life 6)",
+      "bodySpecies": "human",
+      "duration": 21226,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 162423,
+      "deathTick": 198218,
+      "bodyName": "Oak (Life 7)",
+      "bodySpecies": "human",
+      "duration": 35795,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 202779,
+      "deathTick": 221948,
+      "bodyName": "Oak (Life 8)",
+      "bodySpecies": "human",
+      "duration": 19169,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 226635,
+      "deathTick": 282385,
+      "bodyName": "Oak (Life 9)",
+      "bodySpecies": "human",
+      "duration": 55750,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 284999,
+      "deathTick": 330629,
+      "bodyName": "Oak (Life 10)",
+      "bodySpecies": "human",
+      "duration": 45630,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 332857,
+      "deathTick": 390240,
+      "bodyName": "Oak (Life 11)",
+      "bodySpecies": "human",
+      "duration": 57383,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 393279,
+      "deathTick": 417880,
+      "bodyName": "Oak (Life 12)",
+      "bodySpecies": "human",
+      "duration": 24601,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 422332,
+      "deathTick": 479243,
+      "bodyName": "Oak (Life 13)",
+      "bodySpecies": "human",
+      "duration": 56911,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 481115,
+      "deathTick": 496546,
+      "bodyName": "Oak (Life 14)",
+      "bodySpecies": "human",
+      "duration": 15431,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 497096,
+      "deathTick": 519981,
+      "bodyName": "Oak (Life 15)",
+      "bodySpecies": "human",
+      "duration": 22885,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 520616,
+      "deathTick": 538230,
+      "bodyName": "Oak (Life 16)",
+      "bodySpecies": "human",
+      "duration": 17614,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 539426,
+      "deathTick": 565884,
+      "bodyName": "Oak (Life 17)",
+      "bodySpecies": "human",
+      "duration": 26458,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 569557,
+      "deathTick": 589185,
+      "bodyName": "Oak (Life 18)",
+      "bodySpecies": "human",
+      "duration": 19628,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 593770,
+      "deathTick": 606517,
+      "bodyName": "Oak (Life 19)",
+      "bodySpecies": "human",
+      "duration": 12747,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 607828,
+      "deathTick": 626344,
+      "bodyName": "Oak (Life 20)",
+      "bodySpecies": "human",
+      "duration": 18516,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 626730,
+      "deathTick": 645949,
+      "bodyName": "Oak (Life 21)",
+      "bodySpecies": "human",
+      "duration": 19219,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 650675,
+      "deathTick": 699979,
+      "bodyName": "Oak (Life 22)",
+      "bodySpecies": "human",
+      "duration": 49304,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 702294,
+      "deathTick": 725111,
+      "bodyName": "Oak (Life 23)",
+      "bodySpecies": "human",
+      "duration": 22817,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 727076,
+      "deathTick": 750835,
+      "bodyName": "Oak (Life 24)",
+      "bodySpecies": "human",
+      "duration": 23759,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 752971,
+      "deathTick": 795611,
+      "bodyName": "Oak (Life 25)",
+      "bodySpecies": "human",
+      "duration": 42640,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 797698,
+      "deathTick": 834687,
+      "bodyName": "Oak (Life 26)",
+      "bodySpecies": "human",
+      "duration": 36989,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 835160,
+      "deathTick": 886795,
+      "bodyName": "Oak (Life 27)",
+      "bodySpecies": "human",
+      "duration": 51635,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 890579,
+      "deathTick": 928587,
+      "bodyName": "Oak (Life 28)",
+      "bodySpecies": "human",
+      "duration": 38008,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 931334,
+      "deathTick": 983443,
+      "bodyName": "Oak (Life 29)",
+      "bodySpecies": "human",
+      "duration": 52109,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 983605,
+      "deathTick": 1040690,
+      "bodyName": "Oak (Life 30)",
+      "bodySpecies": "human",
+      "duration": 57085,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1040807,
+      "deathTick": 1090558,
+      "bodyName": "Oak (Life 31)",
+      "bodySpecies": "human",
+      "duration": 49751,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1091559,
+      "deathTick": 1145138,
+      "bodyName": "Oak (Life 32)",
+      "bodySpecies": "human",
+      "duration": 53579,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1147503,
+      "deathTick": 1161417,
+      "bodyName": "Oak (Life 33)",
+      "bodySpecies": "human",
+      "duration": 13914,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1164763,
+      "deathTick": 1214431,
+      "bodyName": "Oak (Life 34)",
+      "bodySpecies": "human",
+      "duration": 49668,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1215512,
+      "deathTick": 1239785,
+      "bodyName": "Oak (Life 35)",
+      "bodySpecies": "human",
+      "duration": 24273,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1242449,
+      "deathTick": 1290789,
+      "bodyName": "Oak (Life 36)",
+      "bodySpecies": "human",
+      "duration": 48340,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1293532,
+      "deathTick": 1321562,
+      "bodyName": "Oak (Life 37)",
+      "bodySpecies": "human",
+      "duration": 28030,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1324217,
+      "deathTick": 1363727,
+      "bodyName": "Oak (Life 38)",
+      "bodySpecies": "human",
+      "duration": 39510,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1365536,
+      "deathTick": 1409059,
+      "bodyName": "Oak (Life 39)",
+      "bodySpecies": "human",
+      "duration": 43523,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1411817,
+      "deathTick": 1428701,
+      "bodyName": "Oak (Life 40)",
+      "bodySpecies": "human",
+      "duration": 16884,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1433610,
+      "deathTick": 1481145,
+      "bodyName": "Oak (Life 41)",
+      "bodySpecies": "human",
+      "duration": 47535,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1483106,
+      "deathTick": 1496030,
+      "bodyName": "Oak (Life 42)",
+      "bodySpecies": "human",
+      "duration": 12924,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1496571,
+      "deathTick": 1508725,
+      "bodyName": "Oak (Life 43)",
+      "bodySpecies": "human",
+      "duration": 12154,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1510922,
+      "deathTick": 1567334,
+      "bodyName": "Oak (Life 44)",
+      "bodySpecies": "human",
+      "duration": 56412,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1571904,
+      "deathTick": 1597347,
+      "bodyName": "Oak (Life 45)",
+      "bodySpecies": "human",
+      "duration": 25443,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1597932,
+      "deathTick": 1614845,
+      "bodyName": "Oak (Life 46)",
+      "bodySpecies": "human",
+      "duration": 16913,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1617383,
+      "deathTick": 1636371,
+      "bodyName": "Oak (Life 47)",
+      "bodySpecies": "human",
+      "duration": 18988,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1636885,
+      "deathTick": 1681601,
+      "bodyName": "Oak (Life 48)",
+      "bodySpecies": "human",
+      "duration": 44716,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1685606,
+      "deathTick": 1710760,
+      "bodyName": "Oak (Life 49)",
+      "bodySpecies": "human",
+      "duration": 25154,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1715679,
+      "deathTick": 1761807,
+      "bodyName": "Oak (Life 50)",
+      "bodySpecies": "human",
+      "duration": 46128,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1764338,
+      "deathTick": 1805116,
+      "bodyName": "Oak (Life 51)",
+      "bodySpecies": "human",
+      "duration": 40778,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1807184,
+      "deathTick": 1841208,
+      "bodyName": "Oak (Life 52)",
+      "bodySpecies": "human",
+      "duration": 34024,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1845174,
+      "deathTick": 1873949,
+      "bodyName": "Oak (Life 53)",
+      "bodySpecies": "human",
+      "duration": 28775,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1875547,
+      "deathTick": 1886286,
+      "bodyName": "Oak (Life 54)",
+      "bodySpecies": "human",
+      "duration": 10739,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1890038,
+      "deathTick": 1918999,
+      "bodyName": "Oak (Life 55)",
+      "bodySpecies": "human",
+      "duration": 28961,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1922177,
+      "deathTick": 1952611,
+      "bodyName": "Oak (Life 56)",
+      "bodySpecies": "human",
+      "duration": 30434,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1953054,
+      "deathTick": 1984465,
+      "bodyName": "Oak (Life 57)",
+      "bodySpecies": "human",
+      "duration": 31411,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 1984903,
+      "deathTick": 2032205,
+      "bodyName": "Oak (Life 58)",
+      "bodySpecies": "human",
+      "duration": 47302,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2035731,
+      "deathTick": 2073130,
+      "bodyName": "Oak (Life 59)",
+      "bodySpecies": "human",
+      "duration": 37399,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2073182,
+      "deathTick": 2085844,
+      "bodyName": "Oak (Life 60)",
+      "bodySpecies": "human",
+      "duration": 12662,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2086726,
+      "deathTick": 2130049,
+      "bodyName": "Oak (Life 61)",
+      "bodySpecies": "human",
+      "duration": 43323,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2133202,
+      "deathTick": 2143389,
+      "bodyName": "Oak (Life 62)",
+      "bodySpecies": "human",
+      "duration": 10187,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2147162,
+      "deathTick": 2183252,
+      "bodyName": "Oak (Life 63)",
+      "bodySpecies": "human",
+      "duration": 36090,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2185241,
+      "deathTick": 2219965,
+      "bodyName": "Oak (Life 64)",
+      "bodySpecies": "human",
+      "duration": 34724,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2220425,
+      "deathTick": 2267009,
+      "bodyName": "Oak (Life 65)",
+      "bodySpecies": "human",
+      "duration": 46584,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2269598,
+      "deathTick": 2320473,
+      "bodyName": "Oak (Life 66)",
+      "bodySpecies": "human",
+      "duration": 50875,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2321742,
+      "deathTick": 2381198,
+      "bodyName": "Oak (Life 67)",
+      "bodySpecies": "human",
+      "duration": 59456,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2382710,
+      "deathTick": 2407699,
+      "bodyName": "Oak (Life 68)",
+      "bodySpecies": "human",
+      "duration": 24989,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2409123,
+      "deathTick": 2440686,
+      "bodyName": "Oak (Life 69)",
+      "bodySpecies": "human",
+      "duration": 31563,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2442503,
+      "deathTick": 2473391,
+      "bodyName": "Oak (Life 70)",
+      "bodySpecies": "human",
+      "duration": 30888,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2477715,
+      "deathTick": 2491987,
+      "bodyName": "Oak (Life 71)",
+      "bodySpecies": "human",
+      "duration": 14272,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2495598,
+      "deathTick": 2555400,
+      "bodyName": "Oak (Life 72)",
+      "bodySpecies": "human",
+      "duration": 59802,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2557432,
+      "deathTick": 2609742,
+      "bodyName": "Oak (Life 73)",
+      "bodySpecies": "human",
+      "duration": 52310,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2613974,
+      "deathTick": 2642659,
+      "bodyName": "Oak (Life 74)",
+      "bodySpecies": "human",
+      "duration": 28685,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2644107,
+      "deathTick": 2691972,
+      "bodyName": "Oak (Life 75)",
+      "bodySpecies": "human",
+      "duration": 47865,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2696020,
+      "deathTick": 2737601,
+      "bodyName": "Oak (Life 76)",
+      "bodySpecies": "human",
+      "duration": 41581,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2737793,
+      "deathTick": 2791400,
+      "bodyName": "Oak (Life 77)",
+      "bodySpecies": "human",
+      "duration": 53607,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2793116,
+      "deathTick": 2833972,
+      "bodyName": "Oak (Life 78)",
+      "bodySpecies": "human",
+      "duration": 40856,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2835880,
+      "deathTick": 2876549,
+      "bodyName": "Oak (Life 79)",
+      "bodySpecies": "human",
+      "duration": 40669,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2880431,
+      "deathTick": 2936298,
+      "bodyName": "Oak (Life 80)",
+      "bodySpecies": "human",
+      "duration": 55867,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2939218,
+      "deathTick": 2993065,
+      "bodyName": "Oak (Life 81)",
+      "bodySpecies": "human",
+      "duration": 53847,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 2996589,
+      "deathTick": 3007341,
+      "bodyName": "Oak (Life 82)",
+      "bodySpecies": "human",
+      "duration": 10752,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 3009645,
+      "deathTick": 3068443,
+      "bodyName": "Oak (Life 83)",
+      "bodySpecies": "human",
+      "duration": 58798,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 3071653,
+      "deathTick": 3093478,
+      "bodyName": "Oak (Life 84)",
+      "bodySpecies": "human",
+      "duration": 21825,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 3095528,
+      "deathTick": 3112505,
+      "bodyName": "Oak (Life 85)",
+      "bodySpecies": "human",
+      "duration": 16977,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 3116756,
+      "deathTick": 3152979,
+      "bodyName": "Oak (Life 86)",
+      "bodySpecies": "human",
+      "duration": 36223,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 3157673,
+      "deathTick": 3191332,
+      "bodyName": "Oak (Life 87)",
+      "bodySpecies": "human",
+      "duration": 33659,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 3191734,
+      "deathTick": 3231807,
+      "bodyName": "Oak (Life 88)",
+      "bodySpecies": "human",
+      "duration": 40073,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 3234595,
+      "deathTick": 3283227,
+      "bodyName": "Oak (Life 89)",
+      "bodySpecies": "human",
+      "duration": 48632,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 3283960,
+      "deathTick": 3342775,
+      "bodyName": "Oak (Life 90)",
+      "bodySpecies": "human",
+      "duration": 58815,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 3342981,
+      "deathTick": 3353435,
+      "bodyName": "Oak (Life 91)",
+      "bodySpecies": "human",
+      "duration": 10454,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 3353498,
+      "deathTick": 3399238,
+      "bodyName": "Oak (Life 92)",
+      "bodySpecies": "human",
+      "duration": 45740,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 3402951,
+      "deathTick": 3457676,
+      "bodyName": "Oak (Life 93)",
+      "bodySpecies": "human",
+      "duration": 54725,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 3461563,
+      "deathTick": 3482222,
+      "bodyName": "Oak (Life 94)",
+      "bodySpecies": "human",
+      "duration": 20659,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 3487069,
+      "deathTick": 3521333,
+      "bodyName": "Oak (Life 95)",
+      "bodySpecies": "human",
+      "duration": 34264,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 3525372,
+      "deathTick": 3567380,
+      "bodyName": "Oak (Life 96)",
+      "bodySpecies": "human",
+      "duration": 42008,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 3567458,
+      "deathTick": 3610542,
+      "bodyName": "Oak (Life 97)",
+      "bodySpecies": "human",
+      "duration": 43084,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 3612214,
+      "deathTick": 3632044,
+      "bodyName": "Oak (Life 98)",
+      "bodySpecies": "human",
+      "duration": 19830,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 3636660,
+      "deathTick": 3658884,
+      "bodyName": "Oak (Life 99)",
+      "bodySpecies": "human",
+      "duration": 22224,
+      "causeOfDeath": "old age",
+      "notableEvents": []
+    },
+    {
+      "incarnationTick": 3659014,
+      "bodyName": "Oak (Life 100)",
+      "bodySpecies": "human",
+      "notableEvents": []
+    }
+  ],
+  "isReincarnated": true
+}

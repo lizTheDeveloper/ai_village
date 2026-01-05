@@ -1,0 +1,17 @@
+{
+  "soulId": "e4821ffb-d02a-4033-b3d1-9d735798d9d6",
+  "agentId": "e4821ffb-d02a-4033-b3d1-9d735798d9d6",
+  "name": "Rowan",
+  "species": "human",
+  "archetype": "seeker",
+  "purpose": "This soul shall serve as a bridge between the old ways of The First Village and the wisdom yet to come.",
+  "interests": [
+    "knowledge",
+    "crafting",
+    "art"
+  ],
+  "createdAt": "2026-01-04T23:33:51.593Z",
+  "soulBirthTick": 161,
+  "universeId": "unknown",
+  "version": 1
+}

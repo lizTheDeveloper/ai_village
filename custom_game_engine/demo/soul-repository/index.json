@@ -1,0 +1,214 @@
+{
+  "version": 1,
+  "totalSouls": 23,
+  "lastUpdated": "2026-01-05T00:21:36.016Z",
+  "souls": {
+    "26ab6ad1-3ea4-4217-84c3-41c2de19948d": {
+      "name": "Orion",
+      "species": "human",
+      "archetype": "healer",
+      "createdAt": "2026-01-04T23:31:56.214Z",
+      "soulBirthTick": 28,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/26ab6ad1-3ea4-4217-84c3-41c2de19948d.json"
+    },
+    "922a554b-617f-40ba-83a0-1852d499a9a9": {
+      "name": "Sage",
+      "species": "human",
+      "archetype": "unifier",
+      "createdAt": "2026-01-04T23:33:14.460Z",
+      "soulBirthTick": 33,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/922a554b-617f-40ba-83a0-1852d499a9a9.json"
+    },
+    "1de57574-98f8-449b-a0f3-c974f45dfdde": {
+      "name": "Linden",
+      "species": "human",
+      "archetype": "creator",
+      "createdAt": "2026-01-04T23:33:45.243Z",
+      "soulBirthTick": 34,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/1de57574-98f8-449b-a0f3-c974f45dfdde.json"
+    },
+    "11974010-9385-4b33-8c9f-27793e64baf3": {
+      "name": "Cedar",
+      "species": "human",
+      "archetype": "creator",
+      "createdAt": "2026-01-04T23:33:48.939Z",
+      "soulBirthTick": 108,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/11974010-9385-4b33-8c9f-27793e64baf3.json"
+    },
+    "e4821ffb-d02a-4033-b3d1-9d735798d9d6": {
+      "name": "Rowan",
+      "species": "human",
+      "archetype": "seeker",
+      "createdAt": "2026-01-04T23:33:51.593Z",
+      "soulBirthTick": 161,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/e4821ffb-d02a-4033-b3d1-9d735798d9d6.json"
+    },
+    "5af8d8bc-09af-4032-82d2-33244a7a1686": {
+      "name": "Sparrow",
+      "species": "human",
+      "archetype": "wanderer",
+      "createdAt": "2026-01-04T23:35:09.112Z",
+      "soulBirthTick": 59,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/5af8d8bc-09af-4032-82d2-33244a7a1686.json"
+    },
+    "e0389226-e82c-4532-9718-4e36a822c8b3": {
+      "name": "Pebble",
+      "species": "human",
+      "archetype": "creator",
+      "createdAt": "2026-01-04T23:35:14.648Z",
+      "soulBirthTick": 170,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/e0389226-e82c-4532-9718-4e36a822c8b3.json"
+    },
+    "2dd86482-4143-49ee-b9eb-59243a1146ef": {
+      "name": "Hazel",
+      "species": "human",
+      "archetype": "unifier",
+      "createdAt": "2026-01-04T23:35:19.000Z",
+      "soulBirthTick": 257,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/2dd86482-4143-49ee-b9eb-59243a1146ef.json"
+    },
+    "44781c30-b223-443b-8bc8-111e565cd3b3": {
+      "name": "Birch",
+      "species": "human",
+      "archetype": "unifier",
+      "createdAt": "2026-01-04T23:35:25.345Z",
+      "soulBirthTick": 384,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/44781c30-b223-443b-8bc8-111e565cd3b3.json"
+    },
+    "c5963f2c-348d-45ff-91ef-82d1e475c98e": {
+      "name": "Willow",
+      "species": "human",
+      "archetype": "farmer",
+      "createdAt": "2026-01-04T23:36:16.615Z",
+      "soulBirthTick": 32,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/c5963f2c-348d-45ff-91ef-82d1e475c98e.json"
+    },
+    "b780018a-58e0-4951-a30f-5275dc0e105a": {
+      "name": "Fern",
+      "species": "human",
+      "archetype": "healer",
+      "createdAt": "2026-01-04T23:36:23.902Z",
+      "soulBirthTick": 178,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/b780018a-58e0-4951-a30f-5275dc0e105a.json"
+    },
+    "70cee37c-3cdf-4959-958a-5602ae0fe79b": {
+      "name": "Oak",
+      "species": "human",
+      "archetype": "unifier",
+      "createdAt": "2026-01-04T23:36:26.901Z",
+      "soulBirthTick": 238,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/70cee37c-3cdf-4959-958a-5602ae0fe79b.json"
+    },
+    "30588d62-137c-4a3d-b2d3-c575763f3b95": {
+      "name": "Wren",
+      "species": "human",
+      "archetype": "seeker",
+      "createdAt": "2026-01-04T23:36:28.300Z",
+      "soulBirthTick": 266,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/30588d62-137c-4a3d-b2d3-c575763f3b95.json"
+    },
+    "a4fc761b-de4e-4185-b403-6be727e29312": {
+      "name": "Dawn",
+      "species": "human",
+      "archetype": "seeker",
+      "createdAt": "2026-01-04T23:36:29.751Z",
+      "soulBirthTick": 295,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/a4fc761b-de4e-4185-b403-6be727e29312.json"
+    },
+    "038706c4-1056-4484-8144-e8cdd3551e88": {
+      "name": "Jasper",
+      "species": "human",
+      "archetype": "farmer",
+      "createdAt": "2026-01-04T23:41:44.643Z",
+      "soulBirthTick": 55,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/038706c4-1056-4484-8144-e8cdd3551e88.json"
+    },
+    "a7bd27ca-e03e-4ee3-bfc3-d7e841fdb5b4": {
+      "name": "Robin",
+      "species": "human",
+      "archetype": "unifier",
+      "createdAt": "2026-01-04T23:42:07.935Z",
+      "soulBirthTick": 521,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/a7bd27ca-e03e-4ee3-bfc3-d7e841fdb5b4.json"
+    },
+    "11452730-c8d0-434d-bdf0-486fc4204c21": {
+      "name": "North",
+      "species": "human",
+      "archetype": "farmer",
+      "createdAt": "2026-01-04T23:42:24.033Z",
+      "soulBirthTick": 843,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/11452730-c8d0-434d-bdf0-486fc4204c21.json"
+    },
+    "ef367e29-3e8e-4e9b-b0c4-9df9063e928b": {
+      "name": "Finn",
+      "species": "human",
+      "archetype": "healer",
+      "createdAt": "2026-01-04T23:46:17.821Z",
+      "soulBirthTick": 57,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/ef367e29-3e8e-4e9b-b0c4-9df9063e928b.json"
+    },
+    "f1c3036e-e9e6-4134-afae-79b2955593af": {
+      "name": "Ash",
+      "species": "human",
+      "archetype": "unifier",
+      "createdAt": "2026-01-04T23:55:22.921Z",
+      "soulBirthTick": 1552,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/f1c3036e-e9e6-4134-afae-79b2955593af.json"
+    },
+    "50536acc-5dc1-4d84-9693-65d89bea6f6a": {
+      "name": "Reed",
+      "species": "human",
+      "archetype": "creator",
+      "createdAt": "2026-01-04T23:58:10.945Z",
+      "soulBirthTick": 57,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/50536acc-5dc1-4d84-9693-65d89bea6f6a.json"
+    },
+    "a3a844b9-3acd-4de2-a653-48aead3495a5": {
+      "name": "Pine",
+      "species": "human",
+      "archetype": "farmer",
+      "createdAt": "2026-01-04T23:58:14.792Z",
+      "soulBirthTick": 134,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/a3a844b9-3acd-4de2-a653-48aead3495a5.json"
+    },
+    "9a9b4811-4913-43fa-bff9-f244f6e9cc11": {
+      "name": "Maple",
+      "species": "human",
+      "archetype": "farmer",
+      "createdAt": "2026-01-04T23:58:21.384Z",
+      "soulBirthTick": 266,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/9a9b4811-4913-43fa-bff9-f244f6e9cc11.json"
+    },
+    "057cae95-9021-401a-bc27-4461a894e259": {
+      "name": "Juniper",
+      "species": "human",
+      "archetype": "seeker",
+      "createdAt": "2026-01-04T23:58:23.886Z",
+      "soulBirthTick": 316,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-04/057cae95-9021-401a-bc27-4461a894e259.json"
+    }
+  }
+}

@@ -1853,6 +1853,216 @@ app.post('/api/servers/kill-all', (req, res) => {
     }
 });
 
+// List all sprites with versions
+app.get('/api/pixellab/sprites', (req, res) => {
+    try {
+        const spritesDir = path.join(GAME_ENGINE_DIR, 'packages', 'renderer', 'assets', 'sprites', 'pixellab');
+
+        if (!fs.existsSync(spritesDir)) {
+            return res.json({ sprites: [] });
+        }
+
+        const sprites = [];
+        const folders = fs.readdirSync(spritesDir);
+
+        for (const folder of folders) {
+            const folderPath = path.join(spritesDir, folder);
+            const metadataPath = path.join(folderPath, 'metadata.json');
+
+            if (fs.existsSync(metadataPath)) {
+                try {
+                    const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf-8'));
+                    const southSpritePath = path.join(folderPath, 'south.png');
+
+                    // Find all versions of this sprite
+                    const versions = [{ version: 'current', folderId: folder, active: true }];
+
+                    // Look for versioned folders (e.g., cat_orange_v1, cat_orange_v2)
+                    const baseId = folder.replace(/_v\d+$/, '');
+                    const versionFolders = folders.filter(f => {
+                        const match = f.match(new RegExp(`^${baseId}_v(\\d+)$`));
+                        return match && f !== folder;
+                    });
+
+                    for (const vf of versionFolders) {
+                        const versionMatch = vf.match(/_v(\d+)$/);
+                        if (versionMatch) {
+                            versions.push({
+                                version: `v${versionMatch[1]}`,
+                                folderId: vf,
+                                active: false
+                            });
+                        }
+                    }
+
+                    sprites.push({
+                        id: folder,
+                        baseId: baseId,
+                        category: metadata.category || 'unknown',
+                        description: metadata.description || '',
+                        hasImage: fs.existsSync(southSpritePath),
+                        versions: versions,
+                        generatedAt: metadata.generated_at
+                    });
+                } catch (e) {
+                    console.error(`Error reading metadata for ${folder}:`, e.message);
+                }
+            }
+        }
+
+        res.json({ sprites: sprites.sort((a, b) => a.id.localeCompare(b.id)) });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Queue sprite regeneration with versioning
+app.post('/api/pixellab/regenerate', async (req, res) => {
+    try {
+        const { folderId, description } = req.body;
+
+        if (!folderId) {
+            return res.status(400).json({ error: 'folderId is required' });
+        }
+
+        const spritesDir = path.join(GAME_ENGINE_DIR, 'packages', 'renderer', 'assets', 'sprites', 'pixellab');
+        const sourcePath = path.join(spritesDir, folderId);
+
+        if (!fs.existsSync(sourcePath)) {
+            return res.status(404).json({ error: 'Sprite not found' });
+        }
+
+        // Find next version number
+        const baseId = folderId.replace(/_v\d+$/, '');
+        const folders = fs.readdirSync(spritesDir);
+        const versionNumbers = folders
+            .filter(f => f.startsWith(baseId + '_v'))
+            .map(f => {
+                const match = f.match(/_v(\d+)$/);
+                return match ? parseInt(match[1]) : 0;
+            });
+
+        const nextVersion = versionNumbers.length > 0 ? Math.max(...versionNumbers) + 1 : 1;
+        const versionedId = `${baseId}_v${nextVersion}`;
+
+        // Rename current sprite to versioned name
+        const versionedPath = path.join(spritesDir, versionedId);
+        fs.renameSync(sourcePath, versionedPath);
+
+        console.log(`Versioned sprite: ${folderId} -> ${versionedId}`);
+
+        // Queue new generation for the original ID
+        const http = require('http');
+        const queueData = JSON.stringify({
+            folderId: baseId,
+            description: description || `Regenerated version of ${baseId}`,
+            traits: { category: 'regeneration' }
+        });
+
+        const queuePromise = new Promise((resolve, reject) => {
+            const request = http.request({
+                hostname: 'localhost',
+                port: 8766,
+                path: '/api/sprites/generate',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': Buffer.byteLength(queueData)
+                }
+            }, (response) => {
+                let data = '';
+                response.on('data', chunk => data += chunk);
+                response.on('end', () => {
+                    try {
+                        resolve(JSON.parse(data));
+                    } catch (e) {
+                        reject(new Error('Invalid JSON'));
+                    }
+                });
+            });
+            request.on('error', reject);
+            request.write(queueData);
+            request.end();
+        });
+
+        const queueResult = await queuePromise;
+
+        res.json({
+            success: true,
+            versionedAs: versionedId,
+            queuedNew: baseId,
+            queueResult: queueResult
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Set active sprite version
+app.post('/api/pixellab/set-active', async (req, res) => {
+    try {
+        const { baseId, versionId } = req.body;
+
+        if (!baseId || !versionId) {
+            return res.status(400).json({ error: 'baseId and versionId are required' });
+        }
+
+        const spritesDir = path.join(GAME_ENGINE_DIR, 'packages', 'renderer', 'assets', 'sprites', 'pixellab');
+        const versionPath = path.join(spritesDir, versionId);
+
+        if (!fs.existsSync(versionPath)) {
+            return res.status(404).json({ error: 'Version not found' });
+        }
+
+        // Find current active version
+        const currentPath = path.join(spritesDir, baseId);
+        const folders = fs.readdirSync(spritesDir);
+
+        // Find highest version number to create next version
+        const versionNumbers = folders
+            .filter(f => f.startsWith(baseId + '_v'))
+            .map(f => {
+                const match = f.match(/_v(\d+)$/);
+                return match ? parseInt(match[1]) : 0;
+            });
+
+        const nextVersion = versionNumbers.length > 0 ? Math.max(...versionNumbers) + 1 : 1;
+
+        // If current exists, version it
+        if (fs.existsSync(currentPath)) {
+            const newVersionPath = path.join(spritesDir, `${baseId}_v${nextVersion}`);
+            fs.renameSync(currentPath, newVersionPath);
+        }
+
+        // Rename selected version to be the active one
+        fs.renameSync(versionPath, currentPath);
+
+        res.json({
+            success: true,
+            message: `Set ${versionId} as active version of ${baseId}`
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Serve sprite images
+app.get('/api/sprites/:folderId/:filename', (req, res) => {
+    try {
+        const { folderId, filename } = req.params;
+        const spritesDir = path.join(GAME_ENGINE_DIR, 'packages', 'renderer', 'assets', 'sprites', 'pixellab');
+        const imagePath = path.join(spritesDir, folderId, filename);
+
+        if (fs.existsSync(imagePath)) {
+            res.sendFile(imagePath);
+        } else {
+            res.status(404).send('Image not found');
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // PixelLab Daemon Status
 app.get('/api/pixellab/status', (req, res) => {
     try {

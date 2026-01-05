@@ -1,0 +1,17 @@
+{
+  "soulId": "26ab6ad1-3ea4-4217-84c3-41c2de19948d",
+  "agentId": "26ab6ad1-3ea4-4217-84c3-41c2de19948d",
+  "name": "Orion",
+  "species": "human",
+  "archetype": "healer",
+  "purpose": "I see a soul born of fertile ground and promise. This soul shall cultivate the arts of healing and growth, tending to the well-being of the village and its people.",
+  "interests": [
+    "healing",
+    "nature",
+    "farming"
+  ],
+  "createdAt": "2026-01-04T23:31:56.214Z",
+  "soulBirthTick": 28,
+  "universeId": "unknown",
+  "version": 1
+}

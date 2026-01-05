@@ -1,0 +1,17 @@
+{
+  "id": "soul_30588d62-137c-4a3d-b2d3-c575763f3b95",
+  "category": "animals",
+  "size": 48,
+  "description": "human character named Wren",
+  "generated_at": "2026-01-05T02:01:06.392Z",
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ]
+}

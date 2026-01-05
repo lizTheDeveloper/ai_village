@@ -1,0 +1,17 @@
+{
+  "soulId": "2dd86482-4143-49ee-b9eb-59243a1146ef",
+  "agentId": "2dd86482-4143-49ee-b9eb-59243a1146ef",
+  "name": "Hazel",
+  "species": "human",
+  "archetype": "unifier",
+  "purpose": "I see a soul born at the dawn of a new community, where harmony and cooperation are essential. This soul shall be a guardian of unity, fostering bonds among the people and nurturing the spirit of the First Village.",
+  "interests": [
+    "social",
+    "nature",
+    "art"
+  ],
+  "createdAt": "2026-01-04T23:35:19.000Z",
+  "soulBirthTick": 257,
+  "universeId": "unknown",
+  "version": 1
+}

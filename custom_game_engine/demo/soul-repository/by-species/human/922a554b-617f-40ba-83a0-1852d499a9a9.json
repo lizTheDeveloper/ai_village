@@ -1,0 +1,17 @@
+{
+  "soulId": "922a554b-617f-40ba-83a0-1852d499a9a9",
+  "agentId": "922a554b-617f-40ba-83a0-1852d499a9a9",
+  "name": "Sage",
+  "species": "human",
+  "archetype": "unifier",
+  "purpose": "I see a soul born into a time of foundational growth, where community and harmony are essential. This soul shall weave the threads of cooperation and mutual support, strengthening the fabric of the First Village.",
+  "interests": [
+    "social",
+    "art",
+    "leadership"
+  ],
+  "createdAt": "2026-01-04T23:33:14.460Z",
+  "soulBirthTick": 33,
+  "universeId": "unknown",
+  "version": 1
+}
