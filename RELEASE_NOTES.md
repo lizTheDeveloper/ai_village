@@ -1,5 +1,39 @@
 # Release Notes
 
+## 2026-01-04 - Sprite Generation API Documentation (Round 9/12)
+
+### API Documentation
+
+#### Sprite Generation API Reference
+- **SPRITE_GENERATION_API.md** - Complete API documentation (+518 lines)
+  - Architecture diagram (Metrics Server → Queue → Daemon → PixelLab)
+  - Metrics Server APIs (port 8766)
+  - Generation queue management endpoints
+  - Sprite generation workflow documentation
+  - Animation generation workflow documentation
+  - Queue status and monitoring endpoints
+  - Error handling and status codes
+  - PixelLab daemon state tracking
+  - Integration examples
+
+#### API Endpoints Documented
+- `POST /api/sprites/generate` - Queue sprite generation job
+- `POST /api/animations/generate` - Queue animation generation job
+- `GET /api/generation/queue` - Get queue status with summaries
+- `POST /api/generation/sprites/:folderId/complete` - Mark sprite complete
+- `POST /api/generation/animations/:animationId/complete` - Mark animation complete
+- Sprite/animation status tracking (queued → generating → complete/failed)
+
+#### Integration Documentation
+- Metrics server queue management
+- PixelLab daemon processing workflow
+- Orchestration dashboard display
+- sprite-generation-queue.json format
+- pixellab-daemon-state.json format
+- Error handling and retry logic
+
+---
+
 ## 2026-01-04 - PixelLab Daemon Dashboard & Model Discovery Fixes (Round 8/12)
 
 ### Autonomous Dev Dashboard Enhancements
