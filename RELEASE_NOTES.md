@@ -1,5 +1,18 @@
 # Release Notes
 
+## 2026-01-04 - Build Configuration Cleanup (Round 10/12)
+
+### Build System Improvements
+
+#### TypeScript Configuration
+- **packages/llm/tsconfig.json** - Exclude dist directory
+  - Added "dist/**/*" to exclude list
+  - Prevents TypeScript from processing build output
+  - Faster compilation (skips already-built files)
+  - Cleaner type checking (only source files)
+
+---
+
 ## 2026-01-04 - Sprite Generation API Documentation (Round 9/12)
 
 ### API Documentation
