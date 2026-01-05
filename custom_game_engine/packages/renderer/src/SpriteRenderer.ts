@@ -60,8 +60,8 @@ function loadMapObjectSprite(spriteId: string): HTMLImageElement | null {
   img.onerror = () => {
     loadingImages.delete(spriteId);
     failedImages.add(spriteId);
-    // Suppress errors for deprecated building types that no longer have sprites
-    const deprecatedSprites = ['tent', 'storage-chest', 'storage-box', 'workbench'];
+    // Suppress errors for deprecated building types and placeholder sprites
+    const deprecatedSprites = ['tent', 'storage-chest', 'storage-box', 'workbench', 'agent'];
     if (!deprecatedSprites.includes(spriteId)) {
       console.error(`[SpriteRenderer] Failed to load map object sprite: ${spriteId} from ${spritePath}`);
     }

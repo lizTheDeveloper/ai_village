@@ -1285,7 +1285,11 @@ export class Renderer3D {
       const tile = this.world.getTileAt?.(Math.floor(x), Math.floor(y));
       const elevation = tile?.elevation ?? 0;
 
-      this.addOrUpdatePlant(entity.id, plant, x, y, elevation);
+      // Get tree height from entity's position.z (trees store height there)
+      const entityPosition = entity.components.get('position') as { z?: number } | undefined;
+      const treeHeight = entityPosition?.z ?? 0;
+
+      this.addOrUpdatePlant(entity.id, plant, x, y, elevation, treeHeight);
     }
 
     // Remove plants no longer present
@@ -1306,7 +1310,8 @@ export class Renderer3D {
     plant: { speciesId?: string; stage?: string; providesShade?: boolean },
     x: number,
     y: number,
-    elevation: number
+    elevation: number,
+    treeHeight: number = 0
   ): void {
     let data = this.plantSprites.get(id);
 
@@ -1325,11 +1330,11 @@ export class Renderer3D {
       // Size based on stage
       let size = this.getPlantSize(stage);
       if (isTree) {
-        // Trees are 4-6x bigger than plants for realistic forest look
-        // Add variation: use entity id hash for consistent per-tree variation
-        const idHash = id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-        const heightVariation = 1.0 + (idHash % 50) / 100; // 1.0 to 1.5x variation
-        size *= 4 * heightVariation;  // Base 4x multiplier with 0-50% variation
+        // Tree height from position.z determines actual height
+        // Base multiplier of 3 + height tiles (so height 0 = 3x, height 4 = 7x)
+        // This gives realistic tree sizes relative to 2-block-tall agents
+        const heightMultiplier = 3 + Math.max(0, treeHeight);
+        size *= heightMultiplier;
       }
       sprite.scale.set(size, size * 1.5, 1);
 
@@ -1345,14 +1350,14 @@ export class Renderer3D {
       this.plantSprites.set(id, data);
     }
 
-    // Update position
+    // Update position and scale
     let size = this.getPlantSize(stage);
     if (isTree) {
-      // Match the height variation from creation
-      const idHash = id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-      const heightVariation = 1.0 + (idHash % 50) / 100;
-      size *= 4 * heightVariation;
+      // Match the height calculation from creation
+      const heightMultiplier = 3 + Math.max(0, treeHeight);
+      size *= heightMultiplier;
     }
+    data.sprite.scale.set(size, size * 1.5, 1);
     data.sprite.position.set(x, elevation + size * 0.75 + 1, y);
     data.worldX = x;
     data.worldY = y;
