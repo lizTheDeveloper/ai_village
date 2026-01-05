@@ -79,74 +79,100 @@ export class ProxyLLMProvider implements LLMProvider {
 
   async generate(request: LLMRequest): Promise<LLMResponse> {
     const provider = this.detectProvider((request as any).model);
+    const maxRetries = 3; // Retry up to 3 times if server-side rate limited
+    let retryCount = 0;
 
-    // Check client-side cooldown
-    const nextAllowedAt = this.cooldownState.get(provider) || 0;
-    const now = Date.now();
+    while (retryCount <= maxRetries) {
+      // Check client-side cooldown
+      const nextAllowedAt = this.cooldownState.get(provider) || 0;
+      const now = Date.now();
 
-    if (now < nextAllowedAt) {
-      const waitMs = nextAllowedAt - now;
-      console.log(`[ProxyLLMProvider] Waiting ${waitMs}ms for ${provider} cooldown`);
-      await this.sleep(waitMs);
+      if (now < nextAllowedAt) {
+        const waitMs = nextAllowedAt - now;
+        console.log(`[ProxyLLMProvider] Waiting ${waitMs}ms for ${provider} cooldown`);
+        await this.sleep(waitMs);
+      }
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+        const response = await fetch(`${this.proxyUrl}/api/llm/generate`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            sessionId: this.sessionId,
+            agentId: (request as any).agentId || 'unknown',
+            prompt: request.prompt,
+            model: (request as any).model,
+            maxTokens: request.maxTokens,
+            temperature: request.temperature,
+          }),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (response.status === 429) {
+          const errorData = await response.json().catch(() => ({}));
+
+          // Extract cooldown time from server response
+          const waitMs = errorData.cooldown?.waitMs ||
+                        errorData.waitMs ||
+                        8000; // Default 8 second wait if not specified
+
+          // Update client-side cooldown state
+          this.cooldownState.set(provider, Date.now() + waitMs);
+
+          // If we haven't exceeded retries, wait and retry
+          if (retryCount < maxRetries) {
+            retryCount++;
+            console.log(`[ProxyLLMProvider] Rate limited by server. Waiting ${waitMs}ms and retrying (${retryCount}/${maxRetries})...`);
+            await this.sleep(waitMs);
+            continue; // Retry the request
+          } else {
+            // Max retries exceeded, throw error
+            throw new Error(
+              `Rate limit cooldown: ${errorData.message || 'Max retries exceeded after rate limiting'}`
+            );
+          }
+        }
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(
+            errorData.message ||
+            errorData.error ||
+            `Proxy error: ${response.status} ${response.statusText}`
+          );
+        }
+
+        const data = await response.json();
+
+        // Update cooldown from server
+        if (data.cooldown) {
+          this.cooldownState.set(provider, data.cooldown.nextAllowedAt);
+        }
+
+        return {
+          text: data.text,
+          inputTokens: data.inputTokens,
+          outputTokens: data.outputTokens,
+          costUSD: data.costUSD,
+        };
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          throw new Error('LLM proxy request timeout');
+        }
+        // Re-throw non-429 errors immediately
+        throw error;
+      }
     }
 
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-
-      const response = await fetch(`${this.proxyUrl}/api/llm/generate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sessionId: this.sessionId,
-          agentId: (request as any).agentId || 'unknown',
-          prompt: request.prompt,
-          model: (request as any).model,
-          maxTokens: request.maxTokens,
-          temperature: request.temperature,
-        }),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (response.status === 429) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          `Rate limit cooldown: ${errorData.message || 'Please wait before making another request'}`
-        );
-      }
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message ||
-          errorData.error ||
-          `Proxy error: ${response.status} ${response.statusText}`
-        );
-      }
-
-      const data = await response.json();
-
-      // Update cooldown from server
-      if (data.cooldown) {
-        this.cooldownState.set(provider, data.cooldown.nextAllowedAt);
-      }
-
-      return {
-        text: data.text,
-        inputTokens: data.inputTokens,
-        outputTokens: data.outputTokens,
-        costUSD: data.costUSD,
-      };
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw new Error('LLM proxy request timeout');
-      }
-      throw error;
-    }
+    // Should never reach here (loop always returns or throws)
+    throw new Error('Unexpected error in generate loop');
   }
 
   /**

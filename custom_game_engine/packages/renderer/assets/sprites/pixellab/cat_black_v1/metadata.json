@@ -1,0 +1,8 @@
+{
+  "id": "cat_black",
+  "category": "animals.pets",
+  "size": 32,
+  "description": "Black cat, sleek fur, sitting pose, top-down view",
+  "generated_at": "2026-01-04T21:26:49.289Z",
+  "directions": ["south", "southwest", "west", "northwest", "north", "northeast", "east", "southeast"]
+}

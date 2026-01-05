@@ -1,0 +1,11 @@
+{
+  "id": "campfire_flames",
+  "name": "Campfire Flames",
+  "size": 64,
+  "frames": 4,
+  "fps": 8,
+  "loop": true,
+  "category": "map_objects",
+  "description": "Small campfire with flickering orange and yellow flames, pixel art style",
+  "generated_at": "2026-01-05T05:39:53.261Z"
+}

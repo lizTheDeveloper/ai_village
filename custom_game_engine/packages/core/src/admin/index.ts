@@ -58,5 +58,11 @@ export {
   renderErrorHtml,
 } from './HtmlRenderer.js';
 
+// Admin router
+export {
+  createAdminRouter,
+  type AdminRouterConfig,
+} from './AdminRouter.js';
+
 // Import and register built-in capabilities
 import './capabilities/index.js';

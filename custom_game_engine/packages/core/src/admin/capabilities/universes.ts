@@ -2,7 +2,7 @@
  * Universes Capability - Manage running game universes
  */
 
-import { capabilityRegistry, defineCapability, defineQuery, defineAction } from '../CapabilityRegistry.js';
+import { capabilityRegistry, defineCapability, defineQuery, defineAction, defineLink } from '../CapabilityRegistry.js';
 
 const universesCapability = defineCapability({
   id: 'universes',
@@ -39,9 +39,59 @@ const universesCapability = defineCapability({
         return { message: 'Delegate to /api/live/universe' };
       },
     }),
+
+    defineQuery({
+      id: 'game-server-status',
+      name: 'Game Server Status',
+      description: 'Check if game server is running and get its URL',
+      params: [],
+      requiresGame: false,
+      handler: async (params, gameClient, context) => {
+        // Check if game is running on common ports
+        const ports = [3000, 3001, 3002];
+        for (const port of ports) {
+          try {
+            const response = await fetch(`http://localhost:${port}/`, { method: 'HEAD' });
+            if (response.ok || response.status === 200) {
+              return {
+                running: true,
+                url: `http://localhost:${port}`,
+                port: port,
+              };
+            }
+          } catch {
+            // Port not responding
+          }
+        }
+        return {
+          running: false,
+          message: 'Game server not running. Use "Start Game Server" action.',
+        };
+      },
+    }),
   ],
 
   actions: [
+    defineAction({
+      id: 'start-game-server',
+      name: 'Start Game Server',
+      description: 'Start the game dev server with Vite',
+      requiresGame: false,
+      params: [],
+      handler: async (params, gameClient, context) => {
+        // This would typically shell out to start the server
+        // For now, return instructions
+        return {
+          success: true,
+          message: 'Run ./start.sh gamehost in terminal to start the game server',
+          data: {
+            command: './start.sh gamehost',
+            expectedUrl: 'http://localhost:3000',
+          },
+        };
+      },
+    }),
+
     defineAction({
       id: 'spawn-universe',
       name: 'Spawn New Universe',
@@ -82,6 +132,25 @@ const universesCapability = defineCapability({
       handler: async (params, gameClient, context) => {
         return { success: true, message: 'Delegate to /api/fork' };
       },
+    }),
+  ],
+
+  links: [
+    defineLink({
+      id: 'open-game',
+      name: 'Open Game',
+      description: 'Open the game in a new browser tab',
+      url: 'http://localhost:3000',
+      icon: '🎮',
+      embeddable: false,
+    }),
+    defineLink({
+      id: 'open-game-session',
+      name: 'Open Game (Session)',
+      description: 'Open a specific game session',
+      url: 'http://localhost:3000/?session={session}',
+      icon: '🌌',
+      embeddable: false,
     }),
   ],
 });

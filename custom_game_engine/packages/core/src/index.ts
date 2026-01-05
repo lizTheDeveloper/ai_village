@@ -62,6 +62,13 @@ export type {
   PlantDiseaseState,
   PlantPestState,
 } from './types/PlantDisease.js';
+export * from './types/LLMTypes.js';
+export type {
+  LLMRequest,
+  LLMResponse,
+  LLMProvider,
+  ProviderPricing,
+} from './types/LLMTypes.js';
 export * from './genetics/PlantGenetics.js';
 export * from './data/index.js';
 export * from './metrics/events/index.js';

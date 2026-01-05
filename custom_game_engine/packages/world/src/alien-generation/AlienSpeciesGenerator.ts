@@ -22,7 +22,7 @@
  * ```
  */
 
-import type { LLMProvider } from '@ai-village/llm';
+import type { LLMProvider } from '@ai-village/core';
 import type { AlienCreatureSpecies } from './AlienCreatureComponents.js';
 import {
   BODY_PLANS,

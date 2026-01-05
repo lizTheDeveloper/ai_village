@@ -31,7 +31,7 @@ import {
   detectConflict,
   calculateDefaultAlignment,
 } from '../divinity/SoulCreationCeremony.js';
-import type { LLMProvider } from '@ai-village/llm';
+import type { LLMProvider } from '../types/LLMTypes.js';
 import {
   createSoulIdentityComponent,
   getDefaultInterestsForArchetype,
@@ -358,39 +358,23 @@ export class SoulCreationSystem implements System {
       console.log(`[SoulCreationSystem] Checking repository: ${stats.totalSouls} souls available`);
 
       if (stats.totalSouls > 0) {
-        // 80% chance to reuse an existing soul from the repository
-        const shouldReuseSoul = Math.random() < 0.8;
+        // 50% chance to reuse an existing soul from the repository (50% new souls, 50% reforged)
+        const shouldReuseSoul = Math.random() < 0.5;
 
         if (shouldReuseSoul) {
           const soulRecord = this.soulRepositorySystem.getRandomSoul();
 
           if (soulRecord) {
-            console.log(`[SoulCreationSystem] 🌟 Reusing soul from repository: ${soulRecord.name}`);
+            console.log(`[SoulCreationSystem] 🌟 Reforging soul from repository: ${soulRecord.name} (new body, new destiny)`);
 
-            // Create soul entity from repository data (skip ceremony)
-            const soulId = this.createSoulFromRepository(world, soulRecord);
+            // Mark this as a reforging - the Three Fates will decide the new destiny
+            request.context.isReforging = true;
+            request.context.previousWisdom = soulRecord.wisdom || 0;
+            request.context.previousLives = soulRecord.incarnationCount || 0;
+            request.context.reincarnatedSoulId = soulRecord.id;
 
-            // Emit completion event immediately (no ceremony needed)
-            world.eventBus.emit({
-              type: 'soul:ceremony_complete',
-              source: 'soul_creation_system',
-              data: {
-                soulId,
-                agentId: soulId, // For backward compatibility
-                name: soulRecord.name,
-                species: soulRecord.species || 'human',
-                purpose: soulRecord.purpose,
-                interests: soulRecord.interests || [],
-                destiny: undefined,
-                archetype: soulRecord.archetype,
-                transcript: [], // No ceremony transcript (reused soul)
-              },
-            });
-
-            // Call completion callback
-            request.onComplete(soulId);
-
-            return; // Skip ceremony entirely
+            // Continue to ceremony - the Fates will acknowledge this is a returning soul
+            // and decide the new purpose/destiny for this incarnation
           }
         }
       }
@@ -415,10 +399,13 @@ export class SoulCreationSystem implements System {
         request.context.isReforging = true;
         request.context.previousWisdom = soulWisdom?.wisdomLevel ?? 0.5;
         request.context.previousLives = soulWisdom?.reincarnationCount ?? 1;
+        request.context.reincarnatedSoulId = soulToReincarnate.id;
 
-
-        // Remove soul from afterlife (it's being reborn)
-        (world as any)._removeEntity?.(soulToReincarnate.id) || (world as any).deleteEntity?.(soulToReincarnate.id);
+        // ✅ CONSERVATION OF GAME MATTER:
+        // DO NOT delete the soul entity - it persists forever across all incarnations
+        // The soul will transition from afterlife to incarnated state when the new body is created
+        // Soul entity contains accumulated memories, wisdom, and relationships from all lifetimes
+        console.log(`[SoulCreationSystem] Soul ${soulIdentity?.soulName || 'Unknown'} will be incarnated into new body (soul entity preserved)`);
       } else {
         console.log(`[SoulCreationSystem] No eligible souls found for reincarnation - creating new soul`);
       }
@@ -587,6 +574,19 @@ export class SoulCreationSystem implements System {
       }
     }
 
+    // ✅ Validate: Ensure at least 2 interests (souls need variety!)
+    if (!parsed.interests || parsed.interests.length < 2) {
+      console.warn(`[SoulCreationSystem] Soul has only ${parsed.interests?.length || 0} interests, adding complementary interests`);
+      const baseInterests = parsed.interests || [];
+      const archetype = parsed.archetype || 'wanderer';
+
+      // Add complementary interests based on archetype
+      const complementary = this.getComplementaryInterests(archetype, baseInterests);
+      parsed.interests = [...baseInterests, ...complementary].slice(0, 3); // Max 3
+
+      console.log(`[SoulCreationSystem] Updated interests to: ${parsed.interests.join(', ')}`);
+    }
+
     // Create soul entity
     const soulId = await this.createSoulEntity(world, ceremony, parsed);
 
@@ -628,18 +628,47 @@ export class SoulCreationSystem implements System {
   ): Promise<string> {
     const { context } = ceremony.request;
 
-    const soulEntity = new EntityImpl(createEntityId(), world.tick);
+    // ✅ CONSERVATION OF GAME MATTER: Reuse existing soul entity if reincarnating
+    let soulEntity: EntityImpl;
+    if (context.reincarnatedSoulId) {
+      // Get existing soul entity from repository/afterlife
+      const existingSoul = world.getEntity(context.reincarnatedSoulId);
+      if (!existingSoul) {
+        console.error(`[SoulCreationSystem] Reincarnated soul ${context.reincarnatedSoulId} not found! Creating new soul.`);
+        soulEntity = new EntityImpl(createEntityId(), world.tick);
+      } else {
+        console.log(`[SoulCreationSystem] Updating existing soul entity ${context.reincarnatedSoulId} with new destiny`);
+        soulEntity = existingSoul as EntityImpl;
+      }
+    } else {
+      // Create brand new soul
+      soulEntity = new EntityImpl(createEntityId(), world.tick);
+    }
 
-    // Generate unique soul name
-    const generatedName = await soulNameGenerator.generateNewSoulName(world.tick);
+    // Generate or preserve soul name
+    let soulName: string;
+    let soulCulture: SoulCulture;
+    let soulOriginSpecies: string;
 
-    // Determine soul's original species (what body it's "born" into)
-    const soulOriginSpecies = getDefaultSpeciesForCulture(generatedName.culture as SoulCulture);
+    if (context.reincarnatedSoulId && soulEntity.hasComponent('soul_identity')) {
+      // Reincarnating - preserve original name and culture
+      const existingIdentity = soulEntity.getComponent('soul_identity') as any;
+      soulName = existingIdentity.soulName;
+      soulCulture = existingIdentity.soulOriginCulture;
+      soulOriginSpecies = existingIdentity.soulOriginSpecies;
+      console.log(`[SoulCreationSystem] Preserving soul name: ${soulName} (${soulCulture})`);
+    } else {
+      // New soul - generate unique name
+      const generatedName = await soulNameGenerator.generateNewSoulName(world.tick);
+      soulName = generatedName.name;
+      soulCulture = generatedName.culture as SoulCulture;
+      soulOriginSpecies = getDefaultSpeciesForCulture(soulCulture);
+    }
 
-    // Soul Identity Component
+    // Soul Identity Component - update with new ceremony results
     const soulIdentity = createSoulIdentityComponent({
-      soulName: generatedName.name,
-      soulOriginCulture: generatedName.culture as SoulCulture,
+      soulName,
+      soulOriginCulture: soulCulture,
       soulOriginSpecies: soulOriginSpecies,
       isReincarnated: context.isReforging ?? false,
       purpose: parsed.purpose ?? 'To find their place in the world',
@@ -656,31 +685,43 @@ export class SoulCreationSystem implements System {
       soulIdentity.alignment = calculateDefaultAlignment(context.cosmicAlignment);
     }
 
+    // Update or add soul identity component
+    if (soulEntity.hasComponent('soul_identity')) {
+      soulEntity.removeComponent('soul_identity');
+    }
     soulEntity.addComponent(soulIdentity);
 
-    // Incarnation Component (not yet incarnated)
-    const incarnation = createIncarnationComponent();
-    soulEntity.addComponent(incarnation);
+    // Incarnation Component - preserve existing or create new
+    if (!soulEntity.hasComponent('incarnation')) {
+      const incarnation = createIncarnationComponent();
+      soulEntity.addComponent(incarnation);
+    }
+    // Existing incarnation component is preserved with full history
 
-    // Soul Wisdom Component
-    const wisdom = context.isReforging && context.previousWisdom && context.previousLives
-      ? {
-          type: 'soul_wisdom' as const,
-          version: 1,
-          reincarnationCount: context.previousLives + 1, // Increment for this new reincarnation
-          wisdomLevel: context.previousWisdom,
-          wisdomModifier: Math.sqrt(context.previousWisdom) * 0.5,
-          ascensionEligible: context.previousWisdom >= 0.85 && context.previousLives >= 10,
-          firstIncarnationTick: world.tick - (context.previousLives * 100000), // Estimate
-          livesLived: context.previousLives + 1,
-          totalEmotionalIntensity: 0,
-        }
-      : createSoulWisdomComponent(world.tick);
+    // Soul Wisdom Component - preserve existing or create new
+    if (!soulEntity.hasComponent('soul_wisdom')) {
+      const wisdom = context.isReforging && context.previousWisdom && context.previousLives
+        ? {
+            type: 'soul_wisdom' as const,
+            version: 1,
+            reincarnationCount: context.previousLives + 1, // Increment for this new reincarnation
+            wisdomLevel: context.previousWisdom,
+            wisdomModifier: Math.sqrt(context.previousWisdom) * 0.5,
+            ascensionEligible: context.previousWisdom >= 0.85 && context.previousLives >= 10,
+            firstIncarnationTick: world.tick - (context.previousLives * 100000), // Estimate
+            livesLived: context.previousLives + 1,
+            totalEmotionalIntensity: 0,
+          }
+        : createSoulWisdomComponent(world.tick);
+      soulEntity.addComponent(wisdom);
+    }
+    // Existing wisdom is preserved with accumulated knowledge
 
-    soulEntity.addComponent(wisdom);
-
-    // Episodic Memory (soul's own memories, initially empty)
-    soulEntity.addComponent(new EpisodicMemoryComponent({ maxMemories: 1000 }));
+    // Episodic Memory - preserve existing memories from ALL past lives
+    if (!soulEntity.hasComponent('episodic_memory')) {
+      soulEntity.addComponent(new EpisodicMemoryComponent({ maxMemories: 1000 }));
+    }
+    // Existing episodic memory is preserved with all past-life memories
 
     // Soul Creation Event (ceremony record)
     const creationEvent = createSoulCreationEventComponent({
@@ -708,14 +749,27 @@ export class SoulCreationSystem implements System {
     creationEvent.assignedArchetype = parsed.archetype ?? 'wanderer';
     creationEvent.creationDebate.unanimous = !detectConflict(ceremony.transcript);
 
-    soulEntity.addComponent(creationEvent);
+    // Only add creation event for new souls (reincarnated souls keep their original creation event)
+    if (!context.reincarnatedSoulId) {
+      soulEntity.addComponent(creationEvent);
+    } else {
+      console.log(`[SoulCreationSystem] Soul ${soulName} is being reforged - preserving original creation event`);
+    }
 
-    // Realm Location (soul starts in divine realm)
+    // Realm Location - update or add
     const realmLocation = createRealmLocationComponent(context.ceremonyRealm ?? 'tapestry_of_fate');
+    if (soulEntity.hasComponent('realm_location')) {
+      soulEntity.removeComponent('realm_location');
+    }
     soulEntity.addComponent(realmLocation);
 
-    // Add to world
-    (world as any)._addEntity?.(soulEntity) || (world as any).addEntity?.(soulEntity);
+    // Add to world ONLY if this is a new soul (reincarnated souls are already in the world)
+    if (!context.reincarnatedSoulId) {
+      (world as any)._addEntity?.(soulEntity) || (world as any).addEntity?.(soulEntity);
+      console.log(`[SoulCreationSystem] Added new soul ${soulName} to world`);
+    } else {
+      console.log(`[SoulCreationSystem] Updated existing soul ${soulName} with new destiny from ceremony`);
+    }
 
     return soulEntity.id;
   }
@@ -748,6 +802,53 @@ export class SoulCreationSystem implements System {
       default:
         return 'archetype';
     }
+  }
+
+  /**
+   * Get complementary interests based on archetype
+   * Ensures souls have at least 2-3 diverse interests
+   */
+  private getComplementaryInterests(archetype: string, existingInterests: string[]): string[] {
+    const allInterests = [
+      'knowledge', 'crafting', 'nature', 'social', 'combat',
+      'magic', 'art', 'exploration', 'farming', 'leadership',
+      'trade', 'healing', 'building'
+    ];
+
+    // Archetype-specific interest suggestions
+    const archetypeInterests: Record<string, string[]> = {
+      wanderer: ['exploration', 'nature', 'social'],
+      protector: ['combat', 'leadership', 'healing'],
+      creator: ['crafting', 'building', 'art'],
+      seeker: ['knowledge', 'exploration', 'magic'],
+      unifier: ['social', 'leadership', 'trade'],
+      mystic: ['magic', 'knowledge', 'healing'],
+      farmer: ['farming', 'nature', 'crafting'],
+      merchant: ['trade', 'social', 'leadership'],
+      healer: ['healing', 'knowledge', 'nature'],
+      builder: ['building', 'crafting', 'leadership'],
+      leader: ['leadership', 'social', 'combat'],
+    };
+
+    const suggested = archetypeInterests[archetype] || archetypeInterests['wanderer'] || ['exploration', 'social'];
+    const available = suggested.filter(i => !existingInterests.includes(i));
+
+    // Need at least 2 total interests
+    const needed = Math.max(0, 2 - existingInterests.length);
+    const complementary = available.slice(0, needed);
+
+    // If still not enough, add random interests
+    if (complementary.length < needed) {
+      const remaining = allInterests.filter(i =>
+        !existingInterests.includes(i) && !complementary.includes(i)
+      );
+      while (complementary.length < needed && remaining.length > 0) {
+        const random = remaining.splice(Math.floor(Math.random() * remaining.length), 1)[0];
+        if (random) complementary.push(random);
+      }
+    }
+
+    return complementary;
   }
 
   /**

@@ -190,7 +190,7 @@ class CapabilityRegistryImpl {
   findAction(actionPath: string): { capability: AdminCapability; action: AdminAction } | null {
     // actionPath can be "capability.action" or just "action"
     const parts = actionPath.split('.');
-    if (parts.length === 2) {
+    if (parts.length === 2 && parts[0] && parts[1]) {
       const capability = this.capabilities.get(parts[0]);
       const action = capability?.actions?.find(a => a.id === parts[1]);
       if (capability && action) {
@@ -214,7 +214,7 @@ class CapabilityRegistryImpl {
    */
   findQuery(queryPath: string): { capability: AdminCapability; query: AdminQuery } | null {
     const parts = queryPath.split('.');
-    if (parts.length === 2) {
+    if (parts.length === 2 && parts[0] && parts[1]) {
       const capability = this.capabilities.get(parts[0]);
       const query = capability?.queries?.find(q => q.id === parts[1]);
       if (capability && query) {

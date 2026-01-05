@@ -1,0 +1,15 @@
+{
+  "soulId": "test123",
+  "agentId": "test123",
+  "name": "Test Soul",
+  "species": "human",
+  "archetype": "wanderer",
+  "purpose": "testing",
+  "interests": [
+    "debugging"
+  ],
+  "createdAt": "2026-01-05T04:55:16.998Z",
+  "soulBirthTick": 1000,
+  "universeId": "unknown",
+  "version": 1
+}

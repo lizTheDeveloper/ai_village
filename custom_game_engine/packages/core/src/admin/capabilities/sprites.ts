@@ -8,6 +8,27 @@
 
 import { capabilityRegistry, defineCapability, defineQuery, defineAction, defineLink } from '../CapabilityRegistry.js';
 
+const METRICS_SERVER = 'http://localhost:8766';
+
+// Helper to make API calls to metrics server
+async function metricsApiCall(endpoint: string, options: RequestInit = {}): Promise<any> {
+  const url = `${METRICS_SERVER}${endpoint}`;
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`API error ${response.status}: ${text}`);
+  }
+
+  return response.json();
+}
+
 const spritesCapability = defineCapability({
   id: 'sprites',
   name: 'Sprites',
@@ -35,7 +56,25 @@ const spritesCapability = defineCapability({
       ],
       requiresGame: false,
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to sprite directory scan' };
+        const data = await metricsApiCall('/api/pixellab/sprites');
+        let sprites = data.sprites || [];
+
+        // Filter by type if specified
+        const filterType = params.type as string | undefined;
+        if (filterType && filterType !== 'all') {
+          sprites = sprites.filter((s: any) => s.category === filterType);
+        }
+
+        return {
+          total: sprites.length,
+          sprites: sprites.map((s: any) => ({
+            id: s.id,
+            category: s.category,
+            description: s.description,
+            hasImage: s.hasImage,
+            versions: s.versions?.length || 1,
+          })),
+        };
       },
     }),
 
@@ -46,7 +85,14 @@ const spritesCapability = defineCapability({
       params: [],
       requiresGame: false,
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to /api/sprites/queue' };
+        const data = await metricsApiCall('/api/sprites/queue');
+        return {
+          pending: data.pending || 0,
+          processing: data.processing || 0,
+          completed: data.completed || 0,
+          failed: data.failed || 0,
+          queue: data.queue || [],
+        };
       },
     }),
 
@@ -57,7 +103,13 @@ const spritesCapability = defineCapability({
       params: [],
       requiresGame: false,
       handler: async (params, gameClient, context) => {
-        return { message: 'Check pixellab-daemon.pid' };
+        const data = await metricsApiCall('/api/pixellab/daemon-status');
+        return {
+          running: data.running,
+          pid: data.pid,
+          pending: data.pending,
+          message: data.message,
+        };
       },
     }),
   ],
@@ -78,21 +130,58 @@ const spritesCapability = defineCapability({
       ],
       requiresGame: false,
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/sprites/generate' };
+        const folderId = params.folderId as string;
+        const description = params.description as string;
+        const spriteType = (params.type as string) || 'character';
+
+        const result = await metricsApiCall('/api/sprites/generate', {
+          method: 'POST',
+          body: JSON.stringify({
+            folderId,
+            description,
+            type: spriteType,
+          }),
+        });
+
+        return {
+          success: true,
+          message: `Queued sprite generation: ${folderId}`,
+          queuePosition: result.position,
+          folderId: result.folderId,
+        };
       },
     }),
 
     defineAction({
       id: 'regenerate-sprite',
       name: 'Regenerate Sprite',
-      description: 'Delete and regenerate an existing sprite',
+      description: 'Create a new version of an existing sprite (old version is preserved)',
       dangerous: true,
       params: [
         { name: 'folderId', type: 'string', required: true, description: 'Sprite folder ID to regenerate' },
+        { name: 'description', type: 'string', required: false, description: 'New description (optional, uses existing if not provided)' },
       ],
       requiresGame: false,
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delete existing and requeue' };
+        const folderId = params.folderId as string;
+        const description = params.description as string | undefined;
+
+        const result = await metricsApiCall('/api/pixellab/regenerate', {
+          method: 'POST',
+          body: JSON.stringify({
+            folderId,
+            description,
+          }),
+        });
+
+        return {
+          success: result.success,
+          message: result.success
+            ? `Queued regeneration for ${folderId}. Old version saved as: ${result.versionedAs}`
+            : result.error,
+          versionedAs: result.versionedAs,
+          queuedNew: result.queuedNew,
+        };
       },
     }),
 
@@ -105,7 +194,54 @@ const spritesCapability = defineCapability({
       params: [],
       requiresGame: false,
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Clear sprite-generation-queue.json' };
+        const result = await metricsApiCall('/api/pixellab/clear-queue', {
+          method: 'POST',
+        });
+
+        return {
+          success: result.success,
+          message: result.success
+            ? `Cleared ${result.clearedCount} pending jobs`
+            : result.error,
+          clearedCount: result.clearedCount,
+        };
+      },
+    }),
+
+    defineAction({
+      id: 'start-daemon',
+      name: 'Start PixelLab Daemon',
+      description: 'Start the background sprite generation daemon',
+      params: [],
+      requiresGame: false,
+      handler: async (params, gameClient, context) => {
+        const result = await metricsApiCall('/api/pixellab/daemon/start', {
+          method: 'POST',
+        });
+
+        return {
+          success: result.success,
+          message: result.message,
+          pid: result.pid,
+        };
+      },
+    }),
+
+    defineAction({
+      id: 'stop-daemon',
+      name: 'Stop PixelLab Daemon',
+      description: 'Stop the background sprite generation daemon',
+      params: [],
+      requiresGame: false,
+      handler: async (params, gameClient, context) => {
+        const result = await metricsApiCall('/api/pixellab/daemon/stop', {
+          method: 'POST',
+        });
+
+        return {
+          success: result.success,
+          message: result.message,
+        };
       },
     }),
 
@@ -126,23 +262,42 @@ const spritesCapability = defineCapability({
       ],
       requiresGame: false,
       handler: async (params, gameClient, context) => {
-        return { success: true, message: 'Delegate to /api/animations/generate' };
+        const folderId = params.folderId as string;
+        const animationName = params.animationName as string;
+        const actionDescription = params.actionDescription as string | undefined;
+
+        const result = await metricsApiCall('/api/pixellab/animation', {
+          method: 'POST',
+          body: JSON.stringify({
+            folderId,
+            animationName,
+            actionDescription,
+          }),
+        });
+
+        return {
+          success: result.success,
+          message: result.success
+            ? `Queued animation ${animationName} for ${folderId}`
+            : result.error,
+          animationId: result.animationId,
+        };
       },
     }),
   ],
 
   links: [
     defineLink({
-      id: 'sprite-gallery',
-      name: 'Sprite Gallery',
-      description: 'Visual browser for all generated sprites',
-      url: '/sprites-gallery.html',
+      id: 'sprite-manager',
+      name: 'Sprite Manager',
+      description: 'Browse, regenerate, and manage all generated sprites',
+      url: 'http://localhost:8766/sprites.html',  // Uses metrics server (always available)
       icon: '🖼️',
-      embeddable: true,
+      embeddable: false,
     }),
     defineLink({
       id: 'pixellab-dashboard',
-      name: 'PixelLab Characters',
+      name: 'PixelLab Account',
       description: 'View all PixelLab characters in your account',
       url: 'https://app.pixellab.ai/characters',
       icon: '🎮',

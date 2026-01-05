@@ -23,10 +23,10 @@ export function createCircadianComponent(
     sleepDrive,
     preferredSleepTime,
     isSleeping: false,
-    sleepLocation: null,
+    sleepLocationId: null,
     sleepQuality: 0,
     sleepStartTime: null,
-    lastSleepLocation: null,
+    lastSleepLocationId: null,
   });
 }
 
@@ -41,10 +41,10 @@ export interface CircadianComponentData {
   sleepDrive?: number;
   preferredSleepTime?: number;
   isSleeping?: boolean;
-  sleepLocation?: Entity | null;
+  sleepLocationId?: string | null;
   sleepQuality?: number;
   sleepStartTime?: number | null;
-  lastSleepLocation?: Entity | null;
+  lastSleepLocationId?: string | null;
   lastDream?: DreamContent | null;
   hasDreamedThisSleep?: boolean;
   sleepDurationHours?: number; // Accumulated sleep duration in game hours
@@ -57,10 +57,10 @@ export class CircadianComponent extends ComponentBase {
   public sleepDrive: number; // 0-100: urge to sleep
   public preferredSleepTime: number; // Hour of day (19-23 typically)
   public isSleeping: boolean;
-  public sleepLocation: Entity | null;
+  public sleepLocationId: string | null; // Entity ID of sleep location (bed/building)
   public sleepQuality: number; // 0-1: affects energy recovery rate
   public sleepStartTime: number | null;
-  public lastSleepLocation: Entity | null;
+  public lastSleepLocationId: string | null; // Entity ID of last sleep location
   public lastDream: DreamContent | null; // Last dream experienced
   public hasDreamedThisSleep: boolean; // Track if dreamed during current sleep
   public sleepDurationHours: number; // Accumulated sleep duration in game hours
@@ -87,10 +87,10 @@ export class CircadianComponent extends ComponentBase {
 
     this.sleepDrive = data.sleepDrive ?? 0;
     this.isSleeping = data.isSleeping ?? false;
-    this.sleepLocation = data.sleepLocation ?? null;
+    this.sleepLocationId = data.sleepLocationId ?? null;
     this.sleepQuality = data.sleepQuality ?? 0;
     this.sleepStartTime = data.sleepStartTime ?? null;
-    this.lastSleepLocation = data.lastSleepLocation ?? null;
+    this.lastSleepLocationId = data.lastSleepLocationId ?? null;
     this.lastDream = data.lastDream ?? null;
     this.hasDreamedThisSleep = data.hasDreamedThisSleep ?? false;
     this.sleepDurationHours = data.sleepDurationHours ?? 0;
@@ -181,10 +181,10 @@ export class CircadianComponent extends ComponentBase {
   /**
    * Start sleeping session
    */
-  public startSleeping(currentTime: number, location: Entity | null): void {
+  public startSleeping(currentTime: number, locationId: string | null): void {
     this.isSleeping = true;
     this.sleepStartTime = currentTime;
-    this.sleepLocation = location;
+    this.sleepLocationId = locationId;
   }
 
   /**
@@ -192,8 +192,8 @@ export class CircadianComponent extends ComponentBase {
    */
   public wake(): void {
     this.isSleeping = false;
-    this.lastSleepLocation = this.sleepLocation;
-    this.sleepLocation = null;
+    this.lastSleepLocationId = this.sleepLocationId;
+    this.sleepLocationId = null;
     this.sleepStartTime = null;
     this.hasDreamedThisSleep = false; // Reset for next sleep
   }

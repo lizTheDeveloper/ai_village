@@ -18,7 +18,7 @@ import type { System } from '../ecs/System.js';
 import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
-import type { LLMProvider } from '@ai-village/llm';
+import type { LLMProvider } from '../types/LLMTypes.js';
 import {
   type DeathBargainComponent,
   type ChallengeType,

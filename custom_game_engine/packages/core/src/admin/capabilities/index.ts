@@ -6,6 +6,7 @@
  */
 
 import './overview.js';
+import './roadmap.js';
 import './universes.js';
 import './agents.js';
 import './sprites.js';

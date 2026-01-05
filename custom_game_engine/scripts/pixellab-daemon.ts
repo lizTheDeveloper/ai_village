@@ -3,8 +3,7 @@
  * PixelLab Background Daemon
  *
  * Runs continuously, generating sprites on-demand as agents are born.
- * Uses synchronous PixelLab API (/generate-image-pixflux) to generate
- * and save sprites immediately with rate limiting.
+ * Uses PixelLab APIs to generate sprites with proper directional consistency.
  *
  * Setup:
  *   export PIXELLAB_API_KEY="your-api-key"
@@ -13,6 +12,72 @@
  *   npx ts-node scripts/pixellab-daemon.ts
  *   # Or run in background:
  *   nohup npx ts-node scripts/pixellab-daemon.ts > pixellab-daemon.log 2>&1 &
+ *
+ * Queue Job Format (sprite-generation-queue.json):
+ * {
+ *   "sprites": [
+ *     {
+ *       "folderId": "sprite_name",
+ *       "description": "Visual description of the sprite",
+ *       "status": "queued",
+ *       "queuedAt": 1234567890,
+ *       "traits": {
+ *         "category": "characters",
+ *         "size": 48,
+ *         "name": "Character Name",
+ *         "species": "human",  // If present, treated as character (multi-directional)
+ *         "legs": 4,           // Number of legs (2=humanoid, 4=quadruped, >6=alien)
+ *         "generationMode": "auto",  // Override detection: "auto", "pixflux", "characters", "quadruped", "alien"/"directions"
+ *         "apiParams": {       // Custom API parameters to override defaults
+ *           "view": "high top-down",
+ *           "detail": "high detail",
+ *           "outline": "lineless",
+ *           "shading": "detailed shading"
+ *         }
+ *       }
+ *     }
+ *   ],
+ *   "soul_sprites": [
+ *     {
+ *       "folderId": "soul_sprite_name",
+ *       "name": "Character Name",
+ *       "description": "Visual description of the character",
+ *       "reincarnationCount": 3,     // Determines tier (1-8)
+ *       "isAnimal": false,            // If true, uses max quality (no tier progression)
+ *       "species": "human",           // Optional species type
+ *       "status": "queued",
+ *       "queuedAt": 1234567890
+ *     }
+ *   ]
+ * }
+ *
+ * Soul Sprite Tier Progression:
+ * | Tier | Lives | Size   | Directions | Animations                |
+ * |------|-------|--------|------------|---------------------------|
+ * | 1    | 1     | 16×16  | 1 (south)  | None                      |
+ * | 2    | 2     | 24×24  | 4 cardinal | None                      |
+ * | 3    | 3     | 32×32  | 8 full     | None                      |
+ * | 4    | 4     | 40×40  | 8 full     | Walk                      |
+ * | 5    | 5     | 48×48  | 8 full     | Walk, Run                 |
+ * | 6    | 6     | 56×56  | 8 full     | Walk, Run, Idle           |
+ * | 7    | 7     | 64×64  | 8 full     | Walk, Run, Idle, Attack   |
+ * | 8+   | 8+    | 64×64  | 8 full     | All + Effects             |
+ *
+ * Animals: Always 64×64, 8 directions, full animations (no progression)
+ *
+ * Generation Modes:
+ * - auto: Automatically detect based on species/legs (default)
+ * - static: Single image using PixFlux (trees, rocks, items)
+ * - humanoid: 8 directions using Characters API directly (humans, elves, orcs)
+ * - quadruped: PixFlux reference + Characters API (dogs, cats, horses - 4 legs)
+ * - alien/directions: PixFlux reference + Directions API (tentacles, blobs - very alien)
+ *
+ * API Parameter Overrides (apiParams):
+ * - view: "low top-down", "high top-down", "side"
+ * - detail: "low detail", "medium detail", "high detail", "highly detailed"
+ * - outline: "single color outline", "single color black outline", "selective outline", "lineless"
+ * - shading: "flat shading", "basic shading", "medium shading", "detailed shading", "highly detailed shading"
+ * - Any other PixelLab API parameters
  */
 
 import * as fs from 'fs';
@@ -45,7 +110,142 @@ const ASSETS_PATH = path.join(__dirname, '../packages/renderer/assets/sprites/pi
 const CHECK_INTERVAL_MS = 60000; // Check for new jobs every 60 seconds when idle
 const DELAY_AFTER_QUEUE_MS = 5000; // Wait 5 seconds between generations (rate limiting)
 
-type AssetType = 'character' | 'animal' | 'tileset' | 'isometric_tile' | 'map_object' | 'item';
+type AssetType = 'character' | 'animal' | 'tileset' | 'isometric_tile' | 'map_object' | 'item' | 'soul_sprite';
+
+// Soul Sprite Tier Configuration - based on reincarnation count
+interface TierConfig {
+  tier: number;
+  size: number;
+  directions: 1 | 4 | 8;
+  animations: string[];
+  detail: string;
+  shading: string;
+  outline: string;
+}
+
+const SOUL_TIER_CONFIGS: Record<number, TierConfig> = {
+  1: {
+    tier: 1,
+    size: 16,
+    directions: 1,
+    animations: [],
+    detail: 'low detail',
+    shading: 'flat shading',
+    outline: 'single color outline',
+  },
+  2: {
+    tier: 2,
+    size: 24,
+    directions: 4,
+    animations: [],
+    detail: 'low detail',
+    shading: 'basic shading',
+    outline: 'single color outline',
+  },
+  3: {
+    tier: 3,
+    size: 32,
+    directions: 8,
+    animations: [],
+    detail: 'medium detail',
+    shading: 'medium shading',
+    outline: 'single color outline',
+  },
+  4: {
+    tier: 4,
+    size: 40,
+    directions: 8,
+    animations: ['walk'],
+    detail: 'medium detail',
+    shading: 'medium shading',
+    outline: 'single color outline',
+  },
+  5: {
+    tier: 5,
+    size: 48,
+    directions: 8,
+    animations: ['walk', 'run'],
+    detail: 'medium detail',
+    shading: 'detailed shading',
+    outline: 'single color outline',
+  },
+  6: {
+    tier: 6,
+    size: 56,
+    directions: 8,
+    animations: ['walk', 'run', 'idle'],
+    detail: 'high detail',
+    shading: 'detailed shading',
+    outline: 'single color outline',
+  },
+  7: {
+    tier: 7,
+    size: 64,
+    directions: 8,
+    animations: ['walk', 'run', 'idle', 'attack'],
+    detail: 'high detail',
+    shading: 'detailed shading',
+    outline: 'selective outline',
+  },
+  8: {
+    tier: 8,
+    size: 64,
+    directions: 8,
+    animations: ['walk', 'run', 'idle', 'attack', 'jump', 'defend'],
+    detail: 'highly detailed',
+    shading: 'highly detailed shading',
+    outline: 'selective outline',
+  },
+};
+
+// Animal config (always max quality)
+const ANIMAL_TIER_CONFIG: TierConfig = {
+  tier: 0,
+  size: 64,
+  directions: 8,
+  animations: ['walk', 'run', 'idle'],
+  detail: 'high detail',
+  shading: 'detailed shading',
+  outline: 'single color outline',
+};
+
+// Direction sets
+const ALL_DIRECTIONS = ['south', 'south-west', 'west', 'north-west', 'north', 'north-east', 'east', 'south-east'];
+const CARDINAL_DIRECTIONS = ['south', 'west', 'north', 'east'];
+
+// Animation name to template ID mapping
+const ANIMATION_TEMPLATES: Record<string, string> = {
+  'walk': 'walking-8-frames',
+  'run': 'running-8-frames',
+  'idle': 'breathing-idle',
+  'attack': 'cross-punch',
+  'jump': 'jumping-1',
+  'defend': 'crouching',
+};
+
+// Animation name to action description
+const ANIMATION_ACTIONS: Record<string, string> = {
+  'walk': 'walking steadily, rhythmic movement',
+  'run': 'running quickly, fast movement',
+  'idle': 'breathing idle, subtle movement',
+  'attack': 'attacking, combat strike motion',
+  'jump': 'jumping upward, airborne motion',
+  'defend': 'defensive stance, blocking position',
+};
+
+function getTierConfig(reincarnationCount: number): TierConfig {
+  const tier = Math.min(Math.max(reincarnationCount, 1), 8);
+  return SOUL_TIER_CONFIGS[tier] ?? SOUL_TIER_CONFIGS[8]!;
+}
+
+function getDirectionsForTier(config: TierConfig): string[] {
+  switch (config.directions) {
+    case 1: return ['south'];
+    case 4: return CARDINAL_DIRECTIONS;
+    case 8: return ALL_DIRECTIONS;
+    default: return ['south'];
+  }
+}
 
 interface DaemonState {
   totalGenerated: number;
@@ -84,29 +284,30 @@ function saveManifest(manifest: any): void {
   fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2));
 }
 
-function loadQueue(): { sprites: any[]; animations: any[] } {
+function loadQueue(): { sprites: any[]; animations: any[]; soul_sprites: any[] } {
   if (!fs.existsSync(QUEUE_PATH)) {
-    return { sprites: [], animations: [] };
+    return { sprites: [], animations: [], soul_sprites: [] };
   }
   try {
     const content = fs.readFileSync(QUEUE_PATH, 'utf-8');
     const data = JSON.parse(content);
-    // Handle old format (just array) and new format (object with sprites/animations)
+    // Handle old format (just array) and new format (object with sprites/animations/soul_sprites)
     if (Array.isArray(data)) {
-      return { sprites: data, animations: [] };
+      return { sprites: data, animations: [], soul_sprites: [] };
     }
     return {
       sprites: data.sprites || [],
       animations: data.animations || [],
+      soul_sprites: data.soul_sprites || [],
     };
   } catch (err) {
     log(`Error loading queue: ${err}`);
-    return { sprites: [], animations: [] };
+    return { sprites: [], animations: [], soul_sprites: [] };
   }
 }
 
-function saveQueue(sprites: any[], animations: any[]): void {
-  const data = { sprites, animations };
+function saveQueue(sprites: any[], animations: any[], soul_sprites: any[] = []): void {
+  const data = { sprites, animations, soul_sprites };
   fs.writeFileSync(QUEUE_PATH, JSON.stringify(data, null, 2));
 }
 
@@ -139,8 +340,8 @@ async function apiRequest(endpoint: string, method: string = 'GET', body?: any):
 }
 
 // Generate character with all 8 directions (for moving entities)
-async function generateCharacter(description: string, name: string, size: number = 48): Promise<string> {
-  const result = await apiRequest('/v1/characters', 'POST', {
+async function generateCharacter(description: string, name: string, size: number = 48, customParams: any = {}): Promise<string> {
+  const params = {
     description,
     name,
     size,
@@ -149,27 +350,112 @@ async function generateCharacter(description: string, name: string, size: number
     detail: 'medium detail',
     outline: 'single color black outline',
     shading: 'basic shading',
-  });
+    ...customParams, // Allow overriding any parameter
+  };
 
+  const result = await apiRequest('/v1/characters', 'POST', params);
   return result.character_id || result.id;
 }
 
 // Synchronous single image generation (for static objects like trees)
-async function generateSingleImage(description: string, size: number = 48): Promise<string> {
-  const result = await apiRequest('/generate-image-pixflux', 'POST', {
+async function generateSingleImage(description: string, size: number = 48, customParams: any = {}): Promise<string> {
+  const params = {
     description,
     image_size: {
       height: size,
       width: size,
     },
     no_background: true,
-  });
+    ...customParams, // Allow overriding any parameter
+  };
+
+  const result = await apiRequest('/generate-image-pixflux', 'POST', params);
 
   if (!result.image || !result.image.base64) {
     throw new Error('No image in API response');
   }
 
   return result.image.base64;
+}
+
+// Generate character with reference image (for non-humanoid creatures)
+async function generateCharacterWithReference(description: string, name: string, referenceImageBase64: string, size: number = 48, customParams: any = {}): Promise<string> {
+  const params = {
+    description,
+    name,
+    size,
+    n_directions: 8,
+    view: 'high top-down',
+    detail: 'medium detail',
+    outline: 'single color black outline',
+    shading: 'basic shading',
+    reference_image: referenceImageBase64,
+    ...customParams, // Allow overriding any parameter
+  };
+
+  const result = await apiRequest('/v1/characters', 'POST', params);
+  return result.character_id || result.id;
+}
+
+// Generate 8 directional images using PixFlux + Directions API (for very alien creatures)
+async function generateDirections(referenceImageBase64: string, description: string, customParams: any = {}): Promise<{ [direction: string]: string }> {
+  const directions = ['south', 'south-west', 'west', 'north-west', 'north', 'north-east', 'east', 'south-east'];
+  const result: { [direction: string]: string } = {};
+
+  for (const direction of directions) {
+    const params = {
+      description: `${description}, facing ${direction}`,
+      reference_image: referenceImageBase64,
+      ...customParams,
+    };
+
+    const dirResult = await apiRequest('/generate-image-pixflux', 'POST', params);
+
+    if (!dirResult.image || !dirResult.image.base64) {
+      throw new Error(`No image in API response for ${direction}`);
+    }
+
+    result[direction] = dirResult.image.base64;
+
+    // Rate limiting between directions
+    if (direction !== 'south-east') {
+      await sleep(2000); // 2 second delay between direction generations
+    }
+  }
+
+  return result;
+}
+
+// Classify creature type based on traits
+function classifyCreatureType(traits: any): 'static' | 'humanoid' | 'quadruped' | 'alien' {
+  if (!traits || !traits.species) {
+    return 'static'; // Trees, rocks, etc.
+  }
+
+  // Check for leg count
+  const legCount = traits.legs || traits.legCount || 2;
+  const bodyPlan = (traits.bodyPlan || '').toLowerCase();
+  const species = (traits.species || '').toLowerCase();
+
+  // Very alien creatures (tentacles, blobs, serpents, many-legged)
+  if (bodyPlan.includes('tentacle') ||
+      bodyPlan.includes('blob') ||
+      bodyPlan.includes('serpent') ||
+      species.includes('octopus') ||
+      species.includes('squid') ||
+      legCount > 6) {
+    return 'alien';
+  }
+
+  // Quadrupeds (4-legged animals like dogs, cats, horses)
+  if (legCount === 4 ||
+      bodyPlan.includes('quadruped') ||
+      ['dog', 'cat', 'horse', 'cow', 'sheep', 'goat', 'deer', 'pig', 'rabbit'].includes(species)) {
+    return 'quadruped';
+  }
+
+  // Humanoid (2 legs - humans, elves, orcs, etc.)
+  return 'humanoid';
 }
 
 /**
@@ -288,6 +574,164 @@ async function saveSprite(localId: string, category: string, base64Data: string,
     log(`  Error saving sprite: ${err}`);
     return false;
   }
+}
+
+/**
+ * Process a soul sprite job based on reincarnation tier
+ * Generates appropriate resolution, directions, and animations
+ */
+async function processSoulSprite(job: any): Promise<boolean> {
+  const isAnimal = job.isAnimal || false;
+  const config = isAnimal ? ANIMAL_TIER_CONFIG : getTierConfig(job.reincarnationCount || 1);
+  const directions = getDirectionsForTier(config);
+  const folderId = job.folderId;
+  const description = job.description;
+  const name = job.name || folderId;
+
+  log(`  Tier: ${config.tier} | Size: ${config.size}×${config.size} | Directions: ${config.directions} | Animations: ${config.animations.length > 0 ? config.animations.join(', ') : 'none'}`);
+
+  const spriteDir = path.join(ASSETS_PATH, folderId);
+  const spritesDir = path.join(spriteDir, 'sprites');
+  fs.mkdirSync(spritesDir, { recursive: true });
+
+  const generatedSprites: Record<string, string> = {}; // direction -> base64
+
+  // Step 1: Generate base sprites for each direction
+  log(`  Step 1: Generating ${directions.length} directional sprites...`);
+
+  for (const direction of directions) {
+    log(`    Generating ${direction}...`);
+
+    // Use generate-image-bitforge for directional sprites
+    const params = {
+      description: `${description}, facing ${direction}`,
+      image_size: {
+        width: config.size,
+        height: config.size,
+      },
+      view: 'high top-down',
+      direction: direction,
+      detail: config.detail,
+      shading: config.shading,
+      outline: config.outline,
+      no_background: true,
+    };
+
+    const result = await apiRequest('/generate-image-bitforge', 'POST', params);
+
+    if (!result.image?.base64) {
+      throw new Error(`No image in response for direction ${direction}`);
+    }
+
+    generatedSprites[direction] = result.image.base64;
+
+    // Save sprite immediately
+    const imageBuffer = Buffer.from(result.image.base64, 'base64');
+    fs.writeFileSync(path.join(spritesDir, `${direction}.png`), imageBuffer);
+    log(`    ✓ ${direction}.png`);
+
+    // Rate limiting between directions
+    if (direction !== directions[directions.length - 1]) {
+      await sleep(1500);
+    }
+  }
+
+  // Step 2: Generate animations if tier supports them
+  if (config.animations.length > 0) {
+    log(`  Step 2: Generating ${config.animations.length} animations...`);
+
+    const animDir = path.join(spriteDir, 'animations');
+    fs.mkdirSync(animDir, { recursive: true });
+
+    for (const animName of config.animations) {
+      log(`    Generating animation: ${animName}...`);
+      const animSubDir = path.join(animDir, animName);
+      fs.mkdirSync(animSubDir, { recursive: true });
+
+      const templateId = ANIMATION_TEMPLATES[animName] || 'walking-8-frames';
+      const actionDesc = ANIMATION_ACTIONS[animName] || `performing ${animName}`;
+
+      // Generate animation for each direction
+      for (const direction of directions) {
+        log(`      ${direction}...`);
+        const dirSubDir = path.join(animSubDir, direction);
+        fs.mkdirSync(dirSubDir, { recursive: true });
+
+        const referenceSprite = generatedSprites[direction];
+        if (!referenceSprite) {
+          log(`      ⚠ No reference sprite for ${direction}, skipping`);
+          continue;
+        }
+
+        // Use animate-with-text API
+        const animParams = {
+          description: description,
+          action: actionDesc,
+          image_size: { width: 64, height: 64 }, // animate-with-text is fixed at 64x64
+          reference_image: referenceSprite,
+          n_frames: 8,
+          view: 'high top-down',
+          direction: direction,
+        };
+
+        const animResult = await apiRequest('/animate-with-text', 'POST', animParams);
+
+        if (!animResult.images || animResult.images.length === 0) {
+          log(`      ⚠ No animation frames for ${direction}`);
+          continue;
+        }
+
+        // Save frames
+        for (let i = 0; i < animResult.images.length; i++) {
+          const frameData = animResult.images[i];
+          const base64Data = typeof frameData === 'string' ? frameData : (frameData.base64 || frameData.image);
+          if (base64Data) {
+            const frameBuffer = Buffer.from(base64Data, 'base64');
+            const framePath = path.join(dirSubDir, `frame_${String(i).padStart(3, '0')}.png`);
+            fs.writeFileSync(framePath, frameBuffer);
+          }
+        }
+        log(`      ✓ ${direction} (${animResult.images.length} frames)`);
+
+        // Rate limiting between animation generations
+        await sleep(2000);
+      }
+    }
+  }
+
+  // Save metadata
+  const metadata = {
+    id: folderId,
+    name: name,
+    type: isAnimal ? 'animal' : 'soul_sprite',
+    tier: config.tier,
+    reincarnationCount: job.reincarnationCount || 0,
+    isAnimal: isAnimal,
+    species: job.species || 'unknown',
+    config: {
+      size: config.size,
+      directions: config.directions,
+      animations: config.animations,
+      detail: config.detail,
+      shading: config.shading,
+      outline: config.outline,
+    },
+    sprites: directions.map(dir => `sprites/${dir}.png`),
+    animations: config.animations.map(anim => ({
+      name: anim,
+      directions: directions.map(dir => `animations/${anim}/${dir}/`),
+    })),
+    description: description,
+    generated_at: new Date().toISOString(),
+  };
+
+  fs.writeFileSync(
+    path.join(spriteDir, 'sprite-set.json'),
+    JSON.stringify(metadata, null, 2)
+  );
+
+  log(`  ✓ Saved sprite-set.json`);
+  return true;
 }
 
 
@@ -571,8 +1015,54 @@ async function runDaemon(): Promise<void> {
       const queue = loadQueue();
       const spriteJobs = queue.sprites;
       const animJobs = queue.animations;
+      const soulSpriteJobs = queue.soul_sprites;
 
-      // Process sprite generation jobs first
+      // Process soul sprite jobs first (highest priority - complex generation)
+      const soulJob = soulSpriteJobs.find((job: any) => job.status === 'queued');
+
+      if (soulJob) {
+        log(`\n[SoulSprite] Generating: ${soulJob.folderId}`);
+        log(`  Name: ${soulJob.name || soulJob.folderId}`);
+        log(`  Description: ${soulJob.description}`);
+        log(`  Reincarnation count: ${soulJob.reincarnationCount || 0}`);
+        log(`  Is animal: ${soulJob.isAnimal || false}`);
+
+        try {
+          await processSoulSprite(soulJob);
+
+          // Mark as complete and remove from queue
+          soulJob.status = 'complete';
+          soulJob.completedAt = Date.now();
+          const updatedSoulSprites = soulSpriteJobs.filter((j: any) => j.folderId !== soulJob.folderId);
+          saveQueue(spriteJobs, animJobs, updatedSoulSprites);
+
+          state.totalGenerated++;
+          state.totalDownloaded++;
+          saveState(state);
+
+          log(`  ✓ Soul sprite complete: ${soulJob.folderId}`);
+          log(`  ✓ Removed from queue (${spriteJobs.length} sprites, ${animJobs.length} animations, ${updatedSoulSprites.length} soul_sprites remaining)`);
+
+          // Rate limiting
+          log(`  Waiting ${DELAY_AFTER_QUEUE_MS / 1000}s...`);
+          await sleep(DELAY_AFTER_QUEUE_MS);
+          continue;
+
+        } catch (err: any) {
+          log(`  ✗ Error: ${err.message}`);
+          soulJob.status = 'failed';
+          soulJob.error = err.message;
+          saveQueue(spriteJobs, animJobs, soulSpriteJobs);
+
+          if (err.message.includes('rate') || err.message.includes('limit') || err.message.includes('429')) {
+            log('  Rate limited - waiting longer before retry');
+            await sleep(CHECK_INTERVAL_MS);
+          }
+          continue;
+        }
+      }
+
+      // Process sprite generation jobs
       const queueJob = spriteJobs.find((job: any) => job.status === 'queued');
 
       if (queueJob) {
@@ -589,13 +1079,32 @@ async function runDaemon(): Promise<void> {
           const enhancedDescription = enhanceSpriteDescription(queueJob.description, queueJob.traits);
           log(`  Enhanced description: ${enhancedDescription}`);
 
-          // Determine if this is a character (needs multiple directions) or static object
-          const isCharacter = queueJob.traits && queueJob.traits.species;
+          // Check for explicit generation mode override
+          const generationMode = queueJob.traits?.generationMode || 'auto';
 
-          if (!isCharacter) {
+          // Classify creature type (can be overridden by generationMode)
+          let creatureType = 'static';
+          if (generationMode === 'auto') {
+            creatureType = classifyCreatureType(queueJob.traits);
+          } else if (generationMode === 'pixflux') {
+            creatureType = 'static';
+          } else if (generationMode === 'characters') {
+            creatureType = 'humanoid';
+          } else if (generationMode === 'quadruped') {
+            creatureType = 'quadruped';
+          } else if (generationMode === 'alien' || generationMode === 'directions') {
+            creatureType = 'alien';
+          }
+
+          log(`  Creature type: ${creatureType} (mode: ${generationMode})`);
+
+          // Extract custom API parameters from traits
+          const apiParams = queueJob.traits?.apiParams || {};
+
+          if (creatureType === 'static') {
             // Static object (tree, rock, etc.) - use single image generation
             log(`  Generating static object...`);
-            const base64Data = await generateSingleImage(enhancedDescription, size);
+            const base64Data = await generateSingleImage(enhancedDescription, size, apiParams);
             log(`  ✓ Generated single image`);
 
             // Save as simple sprite
@@ -618,10 +1127,11 @@ async function runDaemon(): Promise<void> {
               type: 'static',
             };
             fs.writeFileSync(path.join(spriteDir, 'metadata.json'), JSON.stringify(metadata, null, 2));
-          } else {
-            // Character (moving entity) - generate all 8 directions
-            log(`  Requesting character generation...`);
-            const characterId = await generateCharacter(enhancedDescription, name, size);
+
+          } else if (creatureType === 'humanoid') {
+            // Humanoid character - use Characters API directly
+            log(`  Requesting humanoid character generation...`);
+            const characterId = await generateCharacter(enhancedDescription, name, size, apiParams);
             log(`  ✓ Character queued: ${characterId}`);
 
             // Poll for completion
@@ -681,7 +1191,122 @@ async function runDaemon(): Promise<void> {
               generated_at: new Date().toISOString(),
               pixellab_character_id: characterId,
               directions: directions,
-              type: 'character',
+              type: 'humanoid',
+            };
+            fs.writeFileSync(path.join(charDir, 'metadata.json'), JSON.stringify(metadata, null, 2));
+
+          } else if (creatureType === 'quadruped') {
+            // Quadruped (4-legged animal) - generate PixFlux reference first, then Characters API
+            log(`  Generating quadruped: PixFlux reference + Characters API...`);
+
+            // Step 1: Generate reference image using PixFlux
+            log(`  Step 1: Generating PixFlux reference image...`);
+            const referenceBase64 = await generateSingleImage(enhancedDescription, size, apiParams);
+            log(`  ✓ Reference image generated`);
+
+            // Step 2: Use reference image with Characters API
+            log(`  Step 2: Generating all 8 directions from reference...`);
+            const characterId = await generateCharacterWithReference(enhancedDescription, name, referenceBase64, size, apiParams);
+            log(`  ✓ Character queued: ${characterId}`);
+
+            // Poll for completion
+            log(`  Polling for completion...`);
+            let attempts = 0;
+            const maxAttempts = 120;
+            let character: any = null;
+
+            while (attempts < maxAttempts) {
+              await sleep(5000);
+              attempts++;
+
+              character = await apiRequest(`/v1/characters/${characterId}`, 'GET');
+
+              if (character.status === 'completed' || character.rotations) {
+                log(`  ✓ Character generation complete!`);
+                break;
+              } else if (character.status === 'failed') {
+                throw new Error('Character generation failed');
+              }
+
+              if (attempts % 6 === 0) {
+                log(`  ⏳ Still processing... (${attempts * 5}s elapsed)`);
+              }
+            }
+
+            if (!character || (!character.rotations && character.status !== 'completed')) {
+              throw new Error('Character generation timed out');
+            }
+
+            // Download all 8 directions
+            log(`  Downloading rotations...`);
+            const charDir = path.join(ASSETS_PATH, queueJob.folderId);
+            const rotationsDir = path.join(charDir, 'rotations');
+            fs.mkdirSync(rotationsDir, { recursive: true });
+
+            const directions = ['south', 'south-west', 'west', 'north-west', 'north', 'north-east', 'east', 'south-east'];
+            for (const dir of directions) {
+              const url = character.rotations?.[dir] || character.frames?.rotations?.[dir];
+              if (url) {
+                const fullUrl = url.startsWith('http') ? url : `https://api.pixellab.ai${url}`;
+                const response = await fetch(fullUrl);
+                const buffer = Buffer.from(await response.arrayBuffer());
+                const destFile = path.join(rotationsDir, `${dir}.png`);
+                fs.writeFileSync(destFile, buffer);
+                log(`    ✓ ${dir}.png`);
+              }
+            }
+
+            // Save metadata
+            const metadata = {
+              id: queueJob.folderId,
+              category: queueJob.traits?.category || 'animals',
+              size,
+              description: enhancedDescription,
+              original_description: queueJob.description,
+              generated_at: new Date().toISOString(),
+              pixellab_character_id: characterId,
+              directions: directions,
+              type: 'quadruped',
+            };
+            fs.writeFileSync(path.join(charDir, 'metadata.json'), JSON.stringify(metadata, null, 2));
+
+          } else if (creatureType === 'alien') {
+            // Very alien creatures - generate PixFlux reference, then use Directions API
+            log(`  Generating alien creature: PixFlux reference + Directions API...`);
+
+            // Step 1: Generate reference image using PixFlux
+            log(`  Step 1: Generating PixFlux reference image...`);
+            const referenceBase64 = await generateSingleImage(enhancedDescription, size, apiParams);
+            log(`  ✓ Reference image generated`);
+
+            // Step 2: Generate all 8 directions using PixFlux Directions
+            log(`  Step 2: Generating all 8 directions from reference...`);
+            const directionalImages = await generateDirections(referenceBase64, enhancedDescription, apiParams);
+            log(`  ✓ All 8 directions generated`);
+
+            // Save all directions
+            const charDir = path.join(ASSETS_PATH, queueJob.folderId);
+            const rotationsDir = path.join(charDir, 'rotations');
+            fs.mkdirSync(rotationsDir, { recursive: true });
+
+            const directions = ['south', 'south-west', 'west', 'north-west', 'north', 'north-east', 'east', 'south-east'];
+            for (const dir of directions) {
+              const imageBuffer = Buffer.from(directionalImages[dir], 'base64');
+              const destFile = path.join(rotationsDir, `${dir}.png`);
+              fs.writeFileSync(destFile, imageBuffer);
+              log(`    ✓ ${dir}.png`);
+            }
+
+            // Save metadata
+            const metadata = {
+              id: queueJob.folderId,
+              category: queueJob.traits?.category || 'aliens',
+              size,
+              description: enhancedDescription,
+              original_description: queueJob.description,
+              generated_at: new Date().toISOString(),
+              directions: directions,
+              type: 'alien',
             };
             fs.writeFileSync(path.join(charDir, 'metadata.json'), JSON.stringify(metadata, null, 2));
           }
@@ -690,14 +1315,14 @@ async function runDaemon(): Promise<void> {
           queueJob.status = 'complete';
           queueJob.completedAt = Date.now();
           const updatedSprites = spriteJobs.filter((j: any) => j.folderId !== queueJob.folderId);
-          saveQueue(updatedSprites, animJobs);
+          saveQueue(updatedSprites, animJobs, soulSpriteJobs);
 
           state.totalGenerated++;
           state.totalDownloaded++;
           saveState(state);
 
           log(`  ✓ Saved: ${queueJob.folderId}`);
-          log(`  ✓ Removed from queue (${updatedSprites.length} sprites, ${animJobs.length} animations remaining)`);
+          log(`  ✓ Removed from queue (${updatedSprites.length} sprites, ${animJobs.length} animations, ${soulSpriteJobs.length} soul_sprites remaining)`);
 
           // Rate limiting
           log(`  Waiting ${DELAY_AFTER_QUEUE_MS / 1000}s...`);
@@ -708,7 +1333,7 @@ async function runDaemon(): Promise<void> {
           log(`  ✗ Error: ${err.message}`);
           queueJob.status = 'failed';
           queueJob.error = err.message;
-          saveQueue(spriteJobs, animJobs);
+          saveQueue(spriteJobs, animJobs, soulSpriteJobs);
 
           if (err.message.includes('rate') || err.message.includes('limit') || err.message.includes('429')) {
             log('  Rate limited - waiting longer before retry');
@@ -778,13 +1403,13 @@ async function runDaemon(): Promise<void> {
           const updatedAnims = animJobs.filter((j: any) =>
             !(j.folderId === animJob.folderId && j.animationName === animJob.animationName)
           );
-          saveQueue(spriteJobs, updatedAnims);
+          saveQueue(spriteJobs, updatedAnims, soulSpriteJobs);
 
           state.totalGenerated++;
           saveState(state);
 
           log(`  ✓ Animation complete: ${animJob.folderId}:${animJob.animationName}`);
-          log(`  ✓ Removed from queue (${spriteJobs.length} sprites, ${updatedAnims.length} animations remaining)`);
+          log(`  ✓ Removed from queue (${spriteJobs.length} sprites, ${updatedAnims.length} animations, ${soulSpriteJobs.length} soul_sprites remaining)`);
 
           // Rate limiting
           log(`  Waiting ${DELAY_AFTER_QUEUE_MS / 1000}s...`);
@@ -795,7 +1420,7 @@ async function runDaemon(): Promise<void> {
           log(`  ✗ Error: ${err.message}`);
           animJob.status = 'failed';
           animJob.error = err.message;
-          saveQueue(spriteJobs, animJobs);
+          saveQueue(spriteJobs, animJobs, soulSpriteJobs);
 
           if (err.message.includes('rate') || err.message.includes('limit') || err.message.includes('429')) {
             log('  Rate limited - waiting longer before retry');
@@ -826,7 +1451,7 @@ async function runDaemon(): Promise<void> {
         if (nextJob.extra?.width) size = nextJob.extra.width;
 
         // Generate sprite synchronously
-        const base64Data = await generateSprite(nextJob.description, size);
+        const base64Data = await generateSingleImage(nextJob.description, size);
         log(`  ✓ Generated sprite`);
 
         // Save immediately

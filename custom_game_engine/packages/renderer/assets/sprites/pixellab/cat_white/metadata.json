@@ -1,7 +1,9 @@
 {
   "id": "cat_white",
-  "category": "animals.pets",
-  "size": 32,
+  "category": "objects",
+  "size": 48,
   "description": "White cat, fluffy fur, sitting pose, top-down view",
-  "generated_at": "2026-01-04T21:27:05.587Z"
+  "original_description": "White cat, fluffy fur, sitting pose, top-down view",
+  "generated_at": "2026-01-05T04:55:13.791Z",
+  "type": "static"
 }

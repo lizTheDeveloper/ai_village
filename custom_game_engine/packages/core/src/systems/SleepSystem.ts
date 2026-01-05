@@ -147,17 +147,17 @@ export class SleepSystem implements System {
     const newEnergy = Math.min(1.0, needs.energy + recoveryAmount);
 
     // Update needs component
-    entity.updateComponent<NeedsComponent>(CT.Needs, (current) => {
-      const updated = current.clone();
-      updated.energy = newEnergy;
-      return updated;
-    });
+    // Use object spread instead of clone() to handle deserialized plain objects
+    entity.updateComponent<NeedsComponent>(CT.Needs, (current) => ({
+      ...current,
+      energy: newEnergy,
+    } as NeedsComponent));
 
     // Track accumulated sleep duration in game hours
     circadian.sleepDurationHours = circadian.sleepDurationHours + hoursElapsed;
 
     // Update circadian sleepQuality dynamically based on conditions
-    const updatedQuality = this.calculateSleepQuality(entity, circadian);
+    const updatedQuality = this.calculateSleepQuality(entity, circadian, world);
     if (Math.abs(updatedQuality - sleepQuality) > 0.05) {
       // Only update if significant change (mutable property)
       circadian.sleepQuality = updatedQuality;
@@ -180,28 +180,30 @@ export class SleepSystem implements System {
    */
   private calculateSleepQuality(
     entity: EntityImpl,
-    circadian: CircadianComponent
+    circadian: CircadianComponent,
+    world: World
   ): number {
     let quality = 0.5; // Base quality (ground)
 
     // Location bonuses
-    if (circadian.sleepLocation) {
-      // Check if sleeping in a bed or building
-      const buildingComp = getBuilding(circadian.sleepLocation);
-      if (buildingComp) {
-        if (buildingComp.buildingType === BT.Bed) {
-          quality += 0.4; // Bed: 0.9 total
-        } else if (buildingComp.buildingType === BT.Bedroll) {
-          quality += 0.2; // Bedroll: 0.7 total
-        } else {
-          quality += 0.1; // Other building: 0.6 total
-        }
+    if (circadian.sleepLocationId) {
+      // Look up the sleep location entity by ID
+      const sleepLocation = world.getEntity(circadian.sleepLocationId);
+      if (sleepLocation) {
+        // Check if sleeping in a bed or building
+        const buildingComp = getBuilding(sleepLocation);
+        if (buildingComp) {
+          if (buildingComp.buildingType === BT.Bed) {
+            quality += 0.4; // Bed: 0.9 total
+          } else if (buildingComp.buildingType === BT.Bedroll) {
+            quality += 0.2; // Bedroll: 0.7 total
+          } else {
+            quality += 0.1; // Other building: 0.6 total
+          }
 
-        // Building harmony affects rest quality
-        // A harmonious space improves sleep, a discordant one disrupts it
-        // sleepLocation is already an Entity, not an EntityId
-        const sleepBuilding = circadian.sleepLocation as EntityImpl | null;
-        if (sleepBuilding) {
+          // Building harmony affects rest quality
+          // A harmonious space improves sleep, a discordant one disrupts it
+          const sleepBuilding = sleepLocation as EntityImpl;
           const harmony = sleepBuilding.getComponent<BuildingHarmonyComponent>(CT.BuildingHarmony);
           if (harmony) {
             // getHarmonyRestModifier returns -0.75 to +0.75
@@ -282,8 +284,8 @@ export class SleepSystem implements System {
   ): void {
     // Update circadian component by mutating properties
     circadian.isSleeping = false;
-    circadian.lastSleepLocation = circadian.sleepLocation;
-    circadian.sleepLocation = null;
+    circadian.lastSleepLocationId = circadian.sleepLocationId;
+    circadian.sleepLocationId = null;
     circadian.sleepStartTime = null;
     circadian.sleepDurationHours = 0; // Reset sleep duration counter
 

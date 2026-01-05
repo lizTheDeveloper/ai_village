@@ -7,8 +7,7 @@
 echo "=== Starting AI Village (Game Host Mode) ==="
 echo ""
 echo "This will start:"
-echo "  - Metrics Server (port 8766)"
-echo "  - Orchestration Dashboard (port 3030)"
+echo "  - Metrics Server (port 8766) with Admin Console at /admin"
 echo "  - PixelLab Sprite Daemon"
 echo "  - API Server (port 3001)"
 echo "  - Game Dev Server (port 3000)"
@@ -21,13 +20,11 @@ mkdir -p logs
 # Generate timestamp for log files
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 METRICS_LOG="logs/metrics-server-${TIMESTAMP}.log"
-ORCH_LOG="logs/orch-dashboard-${TIMESTAMP}.log"
 API_LOG="logs/api-server-${TIMESTAMP}.log"
 DEV_LOG="logs/dev-server-${TIMESTAMP}.log"
 
 # PID files for reconnecting to existing servers
 METRICS_PID_FILE=".metrics-server.pid"
-ORCH_PID_FILE=".orch-dashboard.pid"
 PIXELLAB_PID_FILE=".pixellab-daemon.pid"
 API_PID_FILE=".api-server.pid"
 DEV_PID_FILE=".dev-server.pid"
@@ -53,25 +50,6 @@ start_metrics_server() {
     METRICS_PID=$!
     echo $METRICS_PID > "$METRICS_PID_FILE"
     sleep 2
-}
-
-# Function to start or reconnect to orchestration dashboard
-start_orch_dashboard() {
-    if [ -f "$ORCH_PID_FILE" ]; then
-        ORCH_PID=$(cat "$ORCH_PID_FILE")
-        if is_running "$ORCH_PID"; then
-            echo "Orchestration Dashboard already running (PID: $ORCH_PID)"
-            return
-        fi
-    fi
-
-    echo "Starting Orchestration Dashboard..."
-    echo "Logs: $ORCH_LOG"
-    (cd ../agents/autonomous-dev/dashboard && nohup node server.js > "../../../custom_game_engine/$ORCH_LOG" 2>&1 &
-    echo $! > "../../../custom_game_engine/.orch-dashboard.pid")
-    sleep 1
-    ORCH_PID=$(cat "$ORCH_PID_FILE")
-    sleep 1
 }
 
 # Function to start or reconnect to PixelLab daemon
@@ -139,7 +117,6 @@ start_dev_server() {
 
 # Start all servers
 start_metrics_server
-start_orch_dashboard
 start_pixellab_daemon
 start_api_server
 start_dev_server
@@ -160,8 +137,7 @@ echo "=== AI Village Running ==="
 echo ""
 echo "Game:          http://localhost:3000"
 echo "API:           http://localhost:3001"
-echo "Dashboard:     http://localhost:8766"
-echo "Orchestration: http://localhost:3030"
+echo "Admin Console: http://localhost:8766/admin"
 echo "PixelLab:      Background daemon (PID $PIXELLAB_PID)"
 echo ""
 echo "Servers are running in background (nohup)."
@@ -176,7 +152,6 @@ echo ""
 
 # Flags to track if we've already reported port conflicts
 METRICS_PORT_CONFLICT=false
-ORCH_PORT_CONFLICT=false
 API_PORT_CONFLICT=false
 
 # Monitor function - runs until interrupted
@@ -184,7 +159,6 @@ monitor_servers() {
     while true; do
         # Read current PIDs from files
         [ -f "$METRICS_PID_FILE" ] && METRICS_PID=$(cat "$METRICS_PID_FILE")
-        [ -f "$ORCH_PID_FILE" ] && ORCH_PID=$(cat "$ORCH_PID_FILE")
         [ -f "$API_PID_FILE" ] && API_PID=$(cat "$API_PID_FILE")
         [ -f "$DEV_PID_FILE" ] && DEV_PID=$(cat "$DEV_PID_FILE")
 
@@ -209,23 +183,6 @@ monitor_servers() {
                 nohup npm run metrics-server > "$METRICS_LOG" 2>&1 &
                 METRICS_PID=$!
                 echo $METRICS_PID > "$METRICS_PID_FILE"
-            fi
-        fi
-
-        # Check orchestration dashboard and restart if it crashed
-        if [ -n "$ORCH_PID" ] && ! is_running "$ORCH_PID" && [ "$ORCH_PORT_CONFLICT" = false ]; then
-            # Check if it was an address-in-use error
-            if grep -q "EADDRINUSE\|address already in use" "$ORCH_LOG" 2>/dev/null; then
-                echo ""
-                echo "❌ Orchestration dashboard port already in use. Not restarting."
-                echo "   Run './start.sh kill' to stop conflicting servers."
-                ORCH_PORT_CONFLICT=true
-            else
-                echo ""
-                echo "⚠️  Orchestration dashboard crashed, restarting..."
-                (cd ../agents/autonomous-dev/dashboard && nohup node server.js > "../../../custom_game_engine/$ORCH_LOG" 2>&1 &
-                echo $! > "../../../custom_game_engine/.orch-dashboard.pid")
-                ORCH_PID=$(cat "$ORCH_PID_FILE")
             fi
         fi
 

@@ -9,7 +9,7 @@
  * - Trust level with trading partner
  */
 
-import type { LLMProvider } from '@ai-village/llm';
+import type { LLMProvider } from '../types/LLMTypes.js';
 import type {
   TradeAgreement,
   TradeTerm,

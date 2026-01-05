@@ -145,6 +145,7 @@ export * from './AfterlifeMemoryFadingSystem.js';
 export * from './WisdomGoddessSystem.js';
 export * from './ReincarnationSystem.js';
 export * from './SoulCreationSystem.js';
+// export * from './VeilOfForgettingSystem.js'; // Disabled - needs fixing
 export * from './PixelLabSpriteGenerationSystem.js';
 export * from './SoulRepositorySystem.js';
 // Auto-save & Time Travel

@@ -207,7 +207,7 @@ export class SeekSleepBehavior extends BaseBehavior {
     safeUpdateComponent<CircadianComponent>(entity, ComponentType.Circadian, () => ({
       isSleeping: true,
       sleepStartTime: world.tick,
-      sleepLocation: location,
+      sleepLocationId: location ? location.id : null,
       sleepQuality: quality,
       sleepDurationHours: 0,
     }));
@@ -285,7 +285,7 @@ export class ForcedSleepBehavior extends BaseBehavior {
       safeUpdateComponent<CircadianComponent>(entity, ComponentType.Circadian, () => ({
         isSleeping: true,
         sleepStartTime: world.tick,
-        sleepLocation: null,
+        sleepLocationId: null,
         sleepQuality: quality,
         sleepDurationHours: 0,
       }));

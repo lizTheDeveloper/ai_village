@@ -58,6 +58,8 @@ import { EpisodicMemoryComponent as EpisodicMemoryComponentClass } from '../comp
 import { SemanticMemoryComponent } from '../components/SemanticMemoryComponent.js';
 import { SocialMemoryComponent } from '../components/SocialMemoryComponent.js';
 import { ReflectionComponent } from '../components/ReflectionComponent.js';
+import { createCurrentLifeMemory } from '../components/CurrentLifeMemoryComponent.js';
+import { createVeilOfForgetting } from '../components/VeilOfForgettingComponent.js';
 import { JournalComponent } from '../components/JournalComponent.js';
 import { SpatialMemoryComponent } from '../components/SpatialMemoryComponent.js';
 import { TrustNetworkComponent } from '../components/TrustNetworkComponent.js';
@@ -546,6 +548,14 @@ export class ReincarnationSystem implements System {
     }
     newEntity.addComponent(spiritual);
 
+    // ✅ Soul/Body Separation: Add new incarnation-specific components
+    // CurrentLifeMemoryComponent - memories from THIS lifetime only (fresh start)
+    newEntity.addComponent(createCurrentLifeMemory(world.tick));
+
+    // VeilOfForgettingComponent - manages past-life memory bleeds
+    const pastLivesCount = soul.preserved.soulIdentity?.incarnationHistory.length ?? 0;
+    newEntity.addComponent(createVeilOfForgetting(pastLivesCount));
+
     // Goals
     newEntity.addComponent(createGoalsComponent());
 
@@ -595,9 +605,27 @@ export class ReincarnationSystem implements System {
       },
     });
 
-    // Remove original entity if it still exists
+    // ✅ CONSERVATION OF GAME MATTER:
+    // TODO: Full soul/body separation refactor needed
+    //
+    // CURRENT BEHAVIOR (temporary):
+    // - Destroys entire entity (soul+body as one)
+    // - Creates new entity with transferred data
+    //
+    // CORRECT BEHAVIOR (to implement):
+    // - Keep soul entity alive (it's eternal)
+    // - Only destroy body entity (temporary physical form)
+    // - Create new body entity
+    // - Link new body to existing soul via SoulLinkComponent
+    // - Add CurrentLifeMemoryComponent and VeilOfForgettingComponent to new body
+    //
+    // For now, preserve the original behavior but log warning
     const originalEntity = world.getEntity(soul.originalEntityId);
     if (originalEntity) {
+      console.warn(
+        `[ReincarnationSystem] ⚠️ Destroying entity ${soul.originalEntityId} for reincarnation. ` +
+        `This should be refactored to preserve soul entity and only create new body.`
+      );
       (world as WorldMutator).destroyEntity(soul.originalEntityId, 'reincarnated');
     }
   }

@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "totalSouls": 23,
-  "lastUpdated": "2026-01-05T00:21:36.016Z",
+  "totalSouls": 27,
+  "lastUpdated": "2026-01-05T06:12:17.179Z",
   "souls": {
     "26ab6ad1-3ea4-4217-84c3-41c2de19948d": {
       "name": "Orion",
@@ -209,6 +209,42 @@
       "soulBirthTick": 316,
       "universeId": "unknown",
       "filePath": "by-date/2026-01-04/057cae95-9021-401a-bc27-4461a894e259.json"
+    },
+    "ed36b3b4-dc18-409c-8ffe-e91828dd28f1": {
+      "name": "Meadow",
+      "species": "human",
+      "archetype": "seeker",
+      "createdAt": "2026-01-05T03:32:26.006Z",
+      "soulBirthTick": 262,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-05/ed36b3b4-dc18-409c-8ffe-e91828dd28f1.json"
+    },
+    "test123": {
+      "name": "Test Soul",
+      "species": "human",
+      "archetype": "wanderer",
+      "createdAt": "2026-01-05T04:55:16.998Z",
+      "soulBirthTick": 1000,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-05/test123.json"
+    },
+    "0f578643-a3a0-4adb-9002-cfc248879a06": {
+      "name": "Echo",
+      "species": "human",
+      "archetype": "seeker",
+      "createdAt": "2026-01-05T05:49:40.842Z",
+      "soulBirthTick": 5,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-05/0f578643-a3a0-4adb-9002-cfc248879a06.json"
+    },
+    "83278adb-f391-48ea-9bfa-478f4ef8516d": {
+      "name": "Flint",
+      "species": "human",
+      "archetype": "seeker",
+      "createdAt": "2026-01-05T06:12:17.179Z",
+      "soulBirthTick": 1040,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-05/83278adb-f391-48ea-9bfa-478f4ef8516d.json"
     }
   }
 }

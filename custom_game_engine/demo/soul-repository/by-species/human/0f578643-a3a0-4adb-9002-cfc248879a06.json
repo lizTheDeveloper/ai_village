@@ -1,0 +1,17 @@
+{
+  "soulId": "0f578643-a3a0-4adb-9002-cfc248879a06",
+  "agentId": "0f578643-a3a0-4adb-9002-cfc248879a06",
+  "name": "Echo",
+  "species": "human",
+  "archetype": "seeker",
+  "purpose": "This soul shall serve as a bridge between the old ways of The First Village and the wisdom yet to come.",
+  "interests": [
+    "knowledge",
+    "crafting",
+    "art"
+  ],
+  "createdAt": "2026-01-05T05:49:40.842Z",
+  "soulBirthTick": 5,
+  "universeId": "unknown",
+  "version": 1
+}

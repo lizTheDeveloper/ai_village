@@ -410,7 +410,7 @@
     </div>
 
     <div class="back-link">
-      <a href="/">&larr; Return to Reality</a>
+      <a href="http://localhost:8766/admin">&larr; Return to Admin Console</a>
     </div>
   </div>
 
@@ -441,7 +441,8 @@
 
     // Sprite queue API integration (uses daemon queue via metrics server)
     const METRICS_API = 'http://localhost:8766';
-    const ORCHESTRATOR_API = 'http://localhost:3030';
+    // All admin APIs now served from metrics server (orchestration dashboard merged)
+    const ADMIN_API = 'http://localhost:8766';
     const POLL_INTERVAL = 3000; // Poll queue status every 3 seconds
 
     class SpriteQueue {

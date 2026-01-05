@@ -1,0 +1,41 @@
+{
+  "sprites": [],
+  "animations": [
+    {
+      "folderId": "bbbd8270-2944-4804-af57-5726beb8b4b7",
+      "animationName": "walking-8-frames",
+      "actionDescription": "walking forward at normal pace",
+      "status": "queued",
+      "queuedAt": "2026-01-05T04:24:04.992Z"
+    },
+    {
+      "folderId": "human_female_black_medium",
+      "animationName": "walking-8-frames",
+      "actionDescription": "walking forward at normal pace",
+      "status": "queued",
+      "queuedAt": "2026-01-05T04:28:41.785Z"
+    },
+    {
+      "folderId": "human_male_black_medium",
+      "animationName": "walking-8-frames",
+      "actionDescription": "walking forward at normal pace",
+      "status": "queued",
+      "queuedAt": "2026-01-05T04:31:31.559Z"
+    },
+    {
+      "folderId": "human_female_black_light",
+      "animationName": "walking-8-frames",
+      "actionDescription": "walking forward at normal pace",
+      "status": "queued",
+      "queuedAt": "2026-01-05T04:31:31.560Z"
+    },
+    {
+      "folderId": "human_female_black_dark",
+      "animationName": "walking-8-frames",
+      "actionDescription": "walking forward at normal pace",
+      "status": "queued",
+      "queuedAt": "2026-01-05T05:52:11.168Z"
+    }
+  ],
+  "soul_sprites": []
+}

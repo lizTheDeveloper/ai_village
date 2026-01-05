@@ -52,7 +52,7 @@ import {
 import type { MultiverseCoordinator } from '../multiverse/MultiverseCoordinator.js';
 import { MayorNegotiator, createCivilizationContext } from '../trade/MayorNegotiator.js';
 import type { CivilizationContext } from '../trade/MayorNegotiator.js';
-import type { LLMProvider } from '@ai-village/llm';
+import type { LLMProvider } from '../types/LLMTypes.js';
 
 // Interval for processing agreements (every 5 seconds at 20 TPS)
 const UPDATE_INTERVAL = 100;

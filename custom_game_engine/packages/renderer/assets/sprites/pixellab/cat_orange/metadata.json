@@ -1,7 +1,9 @@
 {
   "id": "cat_orange",
-  "category": "animals.pets",
-  "size": 32,
+  "category": "objects",
+  "size": 48,
   "description": "Orange tabby cat, striped fur, sitting pose, top-down view",
-  "generated_at": "2026-01-04T21:26:28.167Z"
+  "original_description": "Orange tabby cat, striped fur, sitting pose, top-down view",
+  "generated_at": "2026-01-05T04:55:27.675Z",
+  "type": "static"
 }

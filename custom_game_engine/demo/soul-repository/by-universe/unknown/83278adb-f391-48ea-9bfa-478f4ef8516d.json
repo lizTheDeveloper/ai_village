@@ -1,0 +1,17 @@
+{
+  "soulId": "83278adb-f391-48ea-9bfa-478f4ef8516d",
+  "agentId": "83278adb-f391-48ea-9bfa-478f4ef8516d",
+  "name": "Flint",
+  "species": "human",
+  "archetype": "seeker",
+  "purpose": "This soul shall serve as a bridge between the old ways of The First Village and the wisdom yet to come.",
+  "interests": [
+    "knowledge",
+    "crafting",
+    "art"
+  ],
+  "createdAt": "2026-01-05T06:12:17.179Z",
+  "soulBirthTick": 1040,
+  "universeId": "unknown",
+  "version": 1
+}

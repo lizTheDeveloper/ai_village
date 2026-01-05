@@ -124,6 +124,13 @@ export interface World {
   /** Current game tick */
   readonly tick: Tick;
 
+  /**
+   * Archetype version counter.
+   * Increments whenever entity/component structure changes.
+   * Used by GameLoop for query caching.
+   */
+  readonly archetypeVersion: number;
+
   /** Current game time */
   readonly gameTime: GameTime;
 
@@ -271,6 +278,12 @@ export class WorldImpl implements WorldMutator {
   private _features: Map<string, boolean> = new Map();
   private _featuresCache: FeatureFlags | null = null;
   private _eventBus: EventBus;
+
+  /**
+   * Archetype version - increments on entity create/destroy and component add/remove.
+   * Used by GameLoop to invalidate query cache.
+   */
+  private _archetypeVersion = 0;
   private _chunkManager?: ChunkManager;
   private _terrainGenerator?: ITerrainGenerator;
   private buildingRegistry?: BuildingBlueprintRegistry;
@@ -303,6 +316,10 @@ export class WorldImpl implements WorldMutator {
 
   get tick(): Tick {
     return this._tick;
+  }
+
+  get archetypeVersion(): number {
+    return this._archetypeVersion;
   }
 
   get gameTime(): GameTime {
@@ -396,6 +413,7 @@ export class WorldImpl implements WorldMutator {
     const id = createEntityId();
     const entity = new EntityImpl(id, this._tick);
     this._entities.set(id, entity);
+    this._archetypeVersion++; // Invalidate query cache
     return entity;
   }
 
@@ -415,6 +433,7 @@ export class WorldImpl implements WorldMutator {
     }
 
     this._entities.delete(id);
+    this._archetypeVersion++; // Invalidate query cache
 
     // Emit event
     this._eventBus.emit({
@@ -437,6 +456,7 @@ export class WorldImpl implements WorldMutator {
     // Cast to internal implementation to mutate
     const entityImpl = entity as EntityImpl;
     entityImpl.addComponent(component);
+    this._archetypeVersion++; // Invalidate query cache
 
     // Update spatial index if position component
     if (component.type === 'position') {
@@ -488,6 +508,7 @@ export class WorldImpl implements WorldMutator {
 
     const entityImpl = entity as EntityImpl;
     entityImpl.removeComponent(componentType);
+    this._archetypeVersion++; // Invalidate query cache
 
     this._eventBus.emit({
       type: 'entity:component:removed',

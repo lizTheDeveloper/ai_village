@@ -42,8 +42,8 @@ export const STRESS_PENALTY_MULTIPLIER = 0.01;
 
 // Temperature
 export const BODY_TEMP_NORMAL = 37;
-export const WORLD_TEMP_BASE = 20;
-export const TEMP_DAILY_VARIATION = 8;
+export const WORLD_TEMP_BASE = 18; // Lowered from 20 - cooler overall
+export const TEMP_DAILY_VARIATION = 4; // Reduced from 8 - now ranges from 14°C to 22°C
 export const THERMAL_CHANGE_RATE = 0.15;
 
 // Mood

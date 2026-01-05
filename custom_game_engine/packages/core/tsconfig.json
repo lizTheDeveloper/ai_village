@@ -10,5 +10,8 @@
     "src/**/*.test.ts",
     "src/**/__benchmarks__/**/*",
     "src/**/*.bench.ts"
+  ],
+  "references": [
+    { "path": "../llm" }
   ]
 }

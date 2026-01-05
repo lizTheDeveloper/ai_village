@@ -1,0 +1,419 @@
+/**
+ * VeilOfForgettingSystem - Manages past-life memory bleeds
+ *
+ * When a soul reincarnates, there's a "veil of forgetting" that blocks conscious
+ * access to past-life memories. But occasionally, memories bleed through:
+ * - Dreams of past lives (25% chance each night)
+ * - Déjà vu when visiting locations from past lives (30%)
+ * - Sudden emotions toward people who knew you before (50%)
+ * - Flashbacks during similar emotional events (20%)
+ * - Intuitions and unexplained knowledge
+ *
+ * This system:
+ * - Detects triggers (locations, people, events)
+ * - Rolls for memory bleeds
+ * - Retrieves past-life memories from soul entity
+ * - Creates bleed-through experiences on current body
+ * - Generates narrative descriptions of the memory
+ *
+ * Priority: 150 (after MemoryFormationSystem, before ReflectionSystem)
+ */
+
+import { System } from '../ecs/System.js';
+import type { World } from '../ecs/World.js';
+import type { Entity } from '../ecs/Entity.js';
+import { ComponentType as CT } from '../components/ComponentType.js';
+import type { SoulLinkComponent } from '../components/SoulLinkComponent.js';
+import type { VeilOfForgettingComponent, MemoryBleed, MemoryBleedForm } from '../components/VeilOfForgettingComponent.js';
+import { recordMemoryBleed } from '../components/VeilOfForgettingComponent.js';
+import type { EpisodicMemoryComponent, EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
+import type { PositionComponent } from '../components/PositionComponent.js';
+import type { CurrentLifeMemoryComponent } from '../components/CurrentLifeMemoryComponent.js';
+import { addCurrentLifeMemory } from '../components/CurrentLifeMemoryComponent.js';
+
+export class VeilOfForgettingSystem implements System {
+  public readonly name = 'veil_of_forgetting';
+  public readonly priority = 150;
+
+  private lastDailyCheckTick: number = 0;
+
+  public update(world: World): void {
+    const currentTick = world.tick;
+
+    // Check for random daily bleeds (once per day)
+    const ticksPerDay = 20 * 60 * 60 * 24; // 20 TPS * seconds * minutes * hours
+    if (currentTick - this.lastDailyCheckTick >= ticksPerDay) {
+      this.checkDailyRandomBleeds(world);
+      this.lastDailyCheckTick = currentTick;
+    }
+
+    // Check for triggered bleeds (location, person, event-based)
+    this.checkTriggeredBleeds(world);
+  }
+
+  /**
+   * Check for random daily memory bleeds (1% chance per day)
+   */
+  private checkDailyRandomBleeds(world: World): void {
+    const agents = world.query()
+      .with(CT.Agent)
+      .with(CT.SoulLink)
+      .with(CT.VeilOfForgetting)
+      .executeEntities();
+
+    for (const agent of agents) {
+      const veil = agent.getComponent<VeilOfForgettingComponent>(CT.VeilOfForgetting);
+      if (!veil) continue;
+
+      // Random bleed chance
+      if (Math.random() < veil.triggerSensitivity.random) {
+        this.triggerMemoryBleed(world, agent, 'random_daily', 'dream');
+      }
+    }
+  }
+
+  /**
+   * Check for location/person/event-triggered bleeds
+   */
+  private checkTriggeredBleeds(world: World): void {
+    const agents = world.query()
+      .with(CT.Agent)
+      .with(CT.SoulLink)
+      .with(CT.VeilOfForgetting)
+      .with(CT.Position)
+      .executeEntities();
+
+    for (const agent of agents) {
+      this.checkLocationTriggers(world, agent);
+      this.checkPersonTriggers(world, agent);
+      // Event triggers handled by MemoryFormationSystem emitting events
+    }
+  }
+
+  /**
+   * Check if agent is at a location from a past life
+   */
+  private checkLocationTriggers(world: World, agent: Entity): void {
+    const veil = agent.getComponent<VeilOfForgettingComponent>(CT.VeilOfForgetting);
+    const soulLink = agent.getComponent<SoulLinkComponent>(CT.SoulLink);
+    const position = agent.getComponent<PositionComponent>(CT.Position);
+
+    if (!veil || !soulLink || !position) return;
+
+    // Get soul entity
+    const soul = world.getEntity(soulLink.soulEntityId);
+    if (!soul) return;
+
+    // Get soul's full episodic memory (all lifetimes)
+    const soulMemory = soul.getComponent<EpisodicMemoryComponent>(CT.EpisodicMemory);
+    if (!soulMemory) return;
+
+    // Check if current location matches any past-life memory locations
+    for (const pastMemory of soulMemory.memories) {
+      // Skip memories from current lifetime
+      const currentLifeMemory = agent.getComponent<CurrentLifeMemoryComponent>(CT.CurrentLifeMemory);
+      if (currentLifeMemory && pastMemory.timestamp >= currentLifeMemory.incarnationStartTick) {
+        continue;
+      }
+
+      // Check if location matches (within ~5 units)
+      if (pastMemory.location) {
+        const dx = position.x - pastMemory.location.x;
+        const dy = position.y - pastMemory.location.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < 5) {
+          // Close to a past-life location!
+          if (Math.random() < veil.triggerSensitivity.location_from_past_life) {
+            this.triggerMemoryBleed(
+              world,
+              agent,
+              `location_${pastMemory.location.x}_${pastMemory.location.y}`,
+              'deja_vu',
+              pastMemory
+            );
+            return; // Only one bleed per tick to avoid overwhelming
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Check if agent encounters someone they knew in a past life
+   */
+  private checkPersonTriggers(world: World, agent: Entity): void {
+    const veil = agent.getComponent<VeilOfForgettingComponent>(CT.VeilOfForgetting);
+    const soulLink = agent.getComponent<SoulLinkComponent>(CT.SoulLink);
+    const position = agent.getComponent<PositionComponent>(CT.Position);
+
+    if (!veil || !soulLink || !position) return;
+
+    // Get soul entity
+    const soul = world.getEntity(soulLink.soulEntityId);
+    if (!soul) return;
+
+    // Get soul's full episodic memory
+    const soulMemory = soul.getComponent<EpisodicMemoryComponent>(CT.EpisodicMemory);
+    if (!soulMemory) return;
+
+    // Get nearby agents
+    const nearbyAgents = world.query()
+      .with(CT.Agent)
+      .with(CT.Position)
+      .executeEntities()
+      .filter(other => {
+        if (other.id === agent.id) return false;
+        const otherPos = other.getComponent<PositionComponent>(CT.Position);
+        if (!otherPos) return false;
+
+        const dx = position.x - otherPos.x;
+        const dy = position.y - otherPos.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        return distance < 10; // Within conversation range
+      });
+
+    for (const nearbyAgent of nearbyAgents) {
+      // Check if any past-life memories involve this agent
+      const memoriesWithThem = soulMemory.memories.filter(
+        m => m.participants && m.participants.includes(nearbyAgent.id)
+      );
+
+      if (memoriesWithThem.length > 0) {
+        // They knew each other in a past life!
+        if (Math.random() < veil.triggerSensitivity.person_from_past_life) {
+          // Pick the most important memory
+          const mostImportant = memoriesWithThem.reduce((prev, curr) =>
+            curr.importance > prev.importance ? curr : prev
+          );
+
+          this.triggerMemoryBleed(
+            world,
+            agent,
+            `person_${nearbyAgent.id}`,
+            'emotion',
+            mostImportant
+          );
+          return; // Only one bleed per tick
+        }
+      }
+    }
+  }
+
+  /**
+   * Trigger a memory bleed-through
+   */
+  private triggerMemoryBleed(
+    world: World,
+    agent: Entity,
+    trigger: string,
+    form: MemoryBleedForm,
+    pastMemory?: EpisodicMemory
+  ): void {
+    const veil = agent.getComponent<VeilOfForgettingComponent>(CT.VeilOfForgetting);
+    const soulLink = agent.getComponent<SoulLinkComponent>(CT.SoulLink);
+    const currentLifeMemory = agent.getComponent<CurrentLifeMemoryComponent>(CT.CurrentLifeMemory);
+
+    if (!veil || !soulLink || !currentLifeMemory) return;
+
+    // Get soul entity
+    const soul = world.getEntity(soulLink.soulEntityId);
+    if (!soul) return;
+
+    // If no specific past memory provided, pick a random one
+    if (!pastMemory) {
+      const soulMemory = soul.getComponent<EpisodicMemoryComponent>(CT.EpisodicMemory);
+      if (!soulMemory || soulMemory.memories.length === 0) return;
+
+      // Filter to past-life memories only
+      const pastLifeMemories = soulMemory.memories.filter(
+        m => m.timestamp < currentLifeMemory.incarnationStartTick
+      );
+
+      if (pastLifeMemories.length === 0) return;
+
+      // Weight by importance - more important memories bleed through more
+      const weightedIndex = this.weightedRandomIndex(
+        pastLifeMemories.map(m => m.importance)
+      );
+      pastMemory = pastLifeMemories[weightedIndex];
+    }
+
+    // Calculate which incarnation this memory is from
+    const incarnationNumber = this.getIncarnationNumber(soul, pastMemory.timestamp);
+
+    // Generate bleed content based on form
+    const content = this.generateBleedContent(form, pastMemory, veil.isAwareOfReincarnation);
+
+    // Calculate clarity (past-life memories are fragmentary)
+    const clarity = Math.random() * 0.7 + 0.1; // 0.1 to 0.8
+
+    // Create memory bleed record
+    const bleed: MemoryBleed = {
+      bleedTick: world.tick,
+      pastLifeMemoryId: pastMemory.id,
+      incarnationNumber,
+      form,
+      trigger,
+      clarity,
+      content,
+      interpretation: veil.isAwareOfReincarnation
+        ? `This is a memory from my past life (#${incarnationNumber})`
+        : this.generateInterpretation(form),
+    };
+
+    // Record the bleed
+    const updatedVeil = recordMemoryBleed(veil, bleed);
+    agent.addOrUpdateComponent(updatedVeil);
+
+    // Create a current-life memory of experiencing the bleed
+    const bleedExperienceMemory: EpisodicMemory = {
+      id: `bleed_${world.tick}_${agent.id}`,
+      timestamp: world.tick,
+      event: {
+        type: form === 'dream' ? 'dream' : 'insight',
+        summary: content,
+        details: {
+          form,
+          trigger,
+          pastLifeIncarnation: incarnationNumber,
+        },
+      },
+      participants: [agent.id],
+      location: agent.getComponent<PositionComponent>(CT.Position),
+      emotionalValence: pastMemory.emotionalValence,
+      emotionalIntensity: pastMemory.emotionalIntensity * 0.5, // Muted
+      surprise: 0.7, // Surprising to remember something you don't remember learning
+      importance: 0.6, // Important - these experiences shape the agent
+      importanceFactors: ['past_life_memory', 'mysterious_knowledge'],
+      timesRecalled: 0,
+      lastRecalled: null,
+      linkedMemories: [],
+      clarity,
+      consolidated: false,
+    };
+
+    const updatedCurrentLife = addCurrentLifeMemory(currentLifeMemory, bleedExperienceMemory);
+    agent.addOrUpdateComponent(updatedCurrentLife);
+
+    // Emit event for other systems to respond
+    world.events.emit({
+      type: 'memory_bleed',
+      agentId: agent.id,
+      form,
+      trigger,
+      pastLifeIncarnation: incarnationNumber,
+    });
+
+    console.log(
+      `[VeilOfForgetting] ${agent.id} experienced ${form} from past life #${incarnationNumber}: "${content.substring(0, 50)}..."`
+    );
+  }
+
+  /**
+   * Generate content for a memory bleed based on form
+   */
+  private generateBleedContent(
+    form: MemoryBleedForm,
+    pastMemory: EpisodicMemory,
+    isAware: boolean
+  ): string {
+    const summary = pastMemory.event.summary;
+
+    switch (form) {
+      case 'dream':
+        return isAware
+          ? `Dreamed vividly of a past life: ${summary}`
+          : `Had a strange dream: ${summary}`;
+
+      case 'deja_vu':
+        return isAware
+          ? `This place is familiar from a past life. I remember: ${summary}`
+          : `Strange... I feel like I've been here before. ${summary}`;
+
+      case 'flashback':
+        return isAware
+          ? `Sudden flashback to past life: ${summary}`
+          : `Sudden vivid memory that doesn't make sense: ${summary}`;
+
+      case 'intuition':
+        return isAware
+          ? `My soul remembers: ${summary}. I should heed this knowledge.`
+          : `Strong gut feeling: ${summary}. Don't know why I feel this way.`;
+
+      case 'skill':
+        return isAware
+          ? `I remember how to do this from a past life: ${summary}`
+          : `Somehow I just know how to do this: ${summary}`;
+
+      case 'emotion':
+        const emotion = pastMemory.emotionalValence > 0 ? 'drawn to' : 'wary of';
+        return isAware
+          ? `I feel ${emotion} this person from a past life. I remember: ${summary}`
+          : `Inexplicable feeling - I'm ${emotion} this person. ${summary}`;
+
+      default:
+        return summary;
+    }
+  }
+
+  /**
+   * Generate how an unaware agent interprets a bleed
+   */
+  private generateInterpretation(form: MemoryBleedForm): string {
+    switch (form) {
+      case 'dream':
+        return 'Just a strange dream';
+      case 'deja_vu':
+        return 'Probably visited here before and forgot';
+      case 'flashback':
+        return 'Maybe a repressed memory? Or imagination?';
+      case 'intuition':
+        return 'Trusting my gut on this';
+      case 'skill':
+        return 'Must have learned it somewhere and forgotten';
+      case 'emotion':
+        return 'Something about them feels familiar';
+      default:
+        return 'Strange feeling I can\'t explain';
+    }
+  }
+
+  /**
+   * Get which incarnation number a memory is from
+   */
+  private getIncarnationNumber(soul: Entity, memoryTimestamp: number): number {
+    const incarnation = soul.getComponent(CT.Incarnation);
+    if (!incarnation || !incarnation.incarnationHistory) return 0;
+
+    // Count how many incarnations ended before this timestamp
+    let count = 0;
+    for (const record of incarnation.incarnationHistory) {
+      if (record.incarnationEndTick && record.incarnationEndTick < memoryTimestamp) {
+        count++;
+      } else if (
+        record.incarnationStartTick <= memoryTimestamp &&
+        (!record.incarnationEndTick || record.incarnationEndTick >= memoryTimestamp)
+      ) {
+        return count + 1;
+      }
+    }
+
+    return count;
+  }
+
+  /**
+   * Select a weighted random index based on weights
+   */
+  private weightedRandomIndex(weights: number[]): number {
+    const total = weights.reduce((sum, w) => sum + w, 0);
+    let random = Math.random() * total;
+
+    for (let i = 0; i < weights.length; i++) {
+      random -= weights[i];
+      if (random <= 0) return i;
+    }
+
+    return weights.length - 1;
+  }
+}

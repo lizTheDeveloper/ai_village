@@ -138,6 +138,10 @@ import {
   // LLM Config
   LLMConfigPanel,
   createLLMConfigPanelAdapter,
+  // Text Adventure Panel (1D Renderer)
+  TextAdventurePanel,
+  createTextAdventurePanelAdapter,
+  createTextAdventurePanel,
 } from '@ai-village/renderer';
 import {
   OllamaProvider,
@@ -220,15 +224,12 @@ function calculateLightLevel(timeOfDay: number, phase: DayPhase): number {
 
 function createInitialBuildings(world: WorldMutator) {
   // Create a completed campfire (provides warmth)
+  // Uses PixelLab animated sprite with breathing-idle animation
   const campfireEntity = new EntityImpl(createEntityId(), (world as any)._tick);
   campfireEntity.addComponent(createBuildingComponent('campfire', 1, 100));
   campfireEntity.addComponent(createPositionComponent(-3, -3));
   campfireEntity.addComponent(createRenderableComponent('campfire', 'object'));
-  campfireEntity.addComponent(createAnimationComponent(
-    ['campfire_frame1', 'campfire_frame2', 'campfire_frame3', 'campfire_frame4'],
-    0.2,  // 200ms per frame
-    true  // loop
-  ));
+  // Animation is handled by SpriteRenderer.tryRenderAnimatedCampfire()
   (world as any)._addEntity(campfireEntity);
 
   // Create a completed tent (provides shelter)
@@ -1494,6 +1495,24 @@ function setupWindowManager(
     minHeight: 300,
     showInWindowList: true,
     menuCategory: 'divinity',
+  });
+
+  // Text Adventure Panel (1D Renderer - accessibility/narrative output)
+  const textAdventurePanel = createTextAdventurePanel();
+  textAdventurePanel.setCamera(renderer.camera);
+  const textAdventureAdapter = createTextAdventurePanelAdapter(textAdventurePanel);
+  windowManager.registerWindow('text-adventure', textAdventureAdapter, {
+    defaultX: logicalWidth - 470,
+    defaultY: logicalHeight - 520,
+    defaultWidth: 450,
+    defaultHeight: 500,
+    isDraggable: true,
+    isResizable: true,
+    minWidth: 350,
+    minHeight: 400,
+    showInWindowList: true,
+    keyboardShortcut: '1',
+    menuCategory: 'settings',
   });
 
   // Load saved layout
@@ -3198,7 +3217,7 @@ async function main() {
     if (entity) {
       const pos = entity.components.get('position') as any;
       if (pos && renderer.camera) {
-        renderer.camera.centerOn(pos.x, pos.y);
+        renderer.camera.setPosition(pos.x, pos.y);
         panels.agentRosterPanel.touchAgent(agentId);
       }
     }
@@ -3215,7 +3234,7 @@ async function main() {
     if (entity) {
       const pos = entity.components.get('position') as any;
       if (pos && renderer.camera) {
-        renderer.camera.centerOn(pos.x, pos.y);
+        renderer.camera.setPosition(pos.x, pos.y);
         panels.animalRosterPanel.touchAnimal(animalId);
         panels.animalInfoPanel.setSelectedEntity(entity);
       }

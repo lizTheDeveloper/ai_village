@@ -1,0 +1,10 @@
+{
+  "id": "campfire_animated",
+  "name": "Animated Campfire",
+  "size": 32,
+  "directions": ["south", "west", "east", "north"],
+  "category": "map_objects",
+  "description": "Animated campfire with flickering flames and glowing embers",
+  "generated_at": "2026-01-05T04:16:00.000Z",
+  "pixellab_character_id": "9b625b5d-f81a-41ef-a93c-75391abd65e7"
+}

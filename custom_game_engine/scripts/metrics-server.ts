@@ -83,6 +83,9 @@ import {
   type LLMRequestPayload,
 } from '../packages/llm/dist/index.js';
 
+// Admin module for unified dashboard
+import { createAdminRouter } from '../packages/core/src/admin/index.js';
+
 const gzip = promisify(zlib.gzip);
 const gunzip = promisify(zlib.gunzip);
 
@@ -291,6 +294,23 @@ let messageCount = 0;
 let lastLogTime = Date.now();
 
 const HTTP_PORT = 8766;
+
+// ============================================================
+// Admin Router (Unified Dashboard)
+// ============================================================
+
+// Create admin router - handles /admin/* routes with auto-detection of client type
+// Note: getGameClientForSession is defined later but hoisted
+const handleAdminRequest = createAdminRouter({
+  baseUrl: `http://localhost:${HTTP_PORT}`,
+  httpPort: HTTP_PORT,
+  getGameClient: (sessionId?: string) => {
+    if (sessionId) {
+      return getGameClientForSession(sessionId);
+    }
+    return getActiveGameClient();
+  },
+});
 
 // ============================================================
 // Game Session Tracking
@@ -4166,6 +4186,14 @@ const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse
   const pathname = url.pathname;
   const sessionParam = url.searchParams.get('session');
 
+  // === UNIFIED ADMIN DASHBOARD ===
+  // Routes /admin/* to the capability-based admin interface
+  // Auto-detects client type (browser vs LLM) and renders appropriately
+  if (pathname.startsWith('/admin')) {
+    const handled = await handleAdminRequest(req, res, url);
+    if (handled) return;
+  }
+
   // === Root: Session Chooser ===
   if (pathname === '/') {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
@@ -4800,6 +4828,39 @@ Available agents:
     return;
   }
 
+  // Souls API - read from soul-repository/index.json
+  if (pathname === '/api/souls') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    try {
+      const soulRepoPath = path.join(process.cwd(), 'demo', 'soul-repository', 'index.json');
+      if (fs.existsSync(soulRepoPath)) {
+        const data = JSON.parse(fs.readFileSync(soulRepoPath, 'utf-8'));
+        const soulsObj = data.souls || {};
+        const soulsArray = Object.entries(soulsObj).map(([id, soul]: [string, any]) => ({
+          id,
+          name: soul.name,
+          species: soul.species,
+          archetype: soul.archetype,
+          createdAt: soul.createdAt,
+          universeId: soul.universeId,
+        }));
+        res.end(JSON.stringify({
+          total: data.totalSouls || soulsArray.length,
+          lastUpdated: data.lastUpdated,
+          souls: soulsArray,
+        }));
+      } else {
+        res.end(JSON.stringify({ total: 0, souls: [] }));
+      }
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Failed to read souls' }));
+    }
+    return;
+  }
+
   if (pathname === '/api/live/universe') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -4977,6 +5038,23 @@ Available agents:
     } catch (err) {
       res.statusCode = 500;
       res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
+  // === Static HTML Files ===
+
+  // Serve sprites.html static file
+  if (pathname === '/sprites.html') {
+    res.setHeader('Content-Type', 'text/html');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    try {
+      const spritesHtmlPath = path.join(process.cwd(), 'scripts', 'sprites.html');
+      const html = fs.readFileSync(spritesHtmlPath, 'utf-8');
+      res.end(html);
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(`<html><body><h1>Error loading sprites.html</h1><p>${err instanceof Error ? err.message : 'Unknown error'}</p></body></html>`);
     }
     return;
   }
@@ -5762,6 +5840,158 @@ ${listHeadlessGames().map(g => `  ${g.sessionId}: ${g.status} (${g.agentCount} a
     return;
   }
 
+  // === Game Server Management API ===
+
+  // Track the game server process (started via this API)
+  let gameServerProcess: ChildProcess | null = null;
+
+  // Helper to check if port 3000 is in use
+  async function isGameServerRunning(): Promise<{ running: boolean; pid: number | null }> {
+    return new Promise((resolve) => {
+      const check = spawn('lsof', ['-ti:3000']);
+      let output = '';
+
+      check.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+
+      check.on('close', (code) => {
+        const pid = output.trim().split('\n')[0];
+        resolve({
+          running: code === 0 && pid.length > 0,
+          pid: pid ? parseInt(pid, 10) : null,
+        });
+      });
+
+      check.on('error', () => {
+        resolve({ running: false, pid: null });
+      });
+    });
+  }
+
+  // GET /api/game-server/status - Check if game server is running
+  if (pathname === '/api/game-server/status' && req.method === 'GET') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const status = await isGameServerRunning();
+    res.end(JSON.stringify({
+      running: status.running,
+      pid: status.pid,
+      url: status.running ? 'http://localhost:3000' : null,
+    }));
+    return;
+  }
+
+  // POST /api/game-server/start - Start the game server
+  if (pathname === '/api/game-server/start' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const status = await isGameServerRunning();
+    if (status.running) {
+      res.end(JSON.stringify({
+        success: false,
+        error: 'Game server is already running',
+        pid: status.pid,
+        url: 'http://localhost:3000',
+      }));
+      return;
+    }
+
+    try {
+      const demoDir = path.join(process.cwd(), 'demo');
+
+      gameServerProcess = spawn('npm', ['run', 'dev'], {
+        cwd: demoDir,
+        stdio: ['ignore', 'pipe', 'pipe'],
+        detached: true,
+      });
+
+      // Don't let the metrics server exit kill the game server
+      gameServerProcess.unref();
+
+      // Wait a bit for it to start
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
+      const newStatus = await isGameServerRunning();
+
+      res.end(JSON.stringify({
+        success: newStatus.running,
+        pid: newStatus.pid,
+        url: newStatus.running ? 'http://localhost:3000' : null,
+        message: newStatus.running ? 'Game server started' : 'Failed to start game server',
+      }));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({
+        success: false,
+        error: String(err),
+      }));
+    }
+    return;
+  }
+
+  // POST /api/game-server/stop - Stop the game server
+  if (pathname === '/api/game-server/stop' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const status = await isGameServerRunning();
+    if (!status.running) {
+      res.end(JSON.stringify({
+        success: true,
+        message: 'Game server was not running',
+      }));
+      return;
+    }
+
+    try {
+      // Kill the process on port 3000
+      const kill = spawn('kill', ['-9', String(status.pid)]);
+
+      await new Promise<void>((resolve, reject) => {
+        kill.on('close', (code) => {
+          if (code === 0) {
+            resolve();
+          } else {
+            reject(new Error(`Failed to kill process ${status.pid}`));
+          }
+        });
+        kill.on('error', reject);
+      });
+
+      // Clear our tracked process
+      gameServerProcess = null;
+
+      // Wait a bit and verify it's stopped
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const newStatus = await isGameServerRunning();
+
+      res.end(JSON.stringify({
+        success: !newStatus.running,
+        message: newStatus.running ? 'Failed to stop game server' : 'Game server stopped',
+      }));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({
+        success: false,
+        error: String(err),
+      }));
+    }
+    return;
+  }
+
+  // Handle CORS preflight for game server API
+  if (pathname.startsWith('/api/game-server/') && req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.statusCode = 204;
+    res.end();
+    return;
+  }
+
   // === LLM Proxy API (Server-Side LLM with Rate Limiting) ===
 
   // Handle CORS preflight for LLM proxy
@@ -5823,10 +6053,25 @@ ${listHeadlessGames().map(g => `  ${g.sessionId}: ${g.status} (${g.agentCount} a
   }
 
   // Heartbeat endpoint for session tracking
-  if (pathname === '/api/llm/heartbeat' && req.method === 'POST') {
-    res.setHeader('Content-Type', 'application/json');
+  if (pathname === '/api/llm/heartbeat') {
     res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Handle CORS preflight
+    if (req.method === 'OPTIONS') {
+      res.statusCode = 204;
+      res.end();
+      return;
+    }
+
+    if (req.method !== 'POST') {
+      res.statusCode = 405;
+      res.end(JSON.stringify({ error: 'Method not allowed' }));
+      return;
+    }
+
+    res.setHeader('Content-Type', 'application/json');
 
     if (!llmRouter) {
       res.statusCode = 503;
@@ -6281,6 +6526,468 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
   }
 
   // === Sprite Generation API ===
+
+  // PixelLab daemon status
+  if (pathname === '/api/pixellab/daemon-status' && req.method === 'GET') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    try {
+      // Check if PixelLab daemon is running
+      const pidFile = path.join(process.cwd(), '.pixellab-daemon.pid');
+      let running = false;
+      let pid: number | null = null;
+      let pending = 0;
+
+      // Check PID file
+      if (fs.existsSync(pidFile)) {
+        try {
+          pid = parseInt(fs.readFileSync(pidFile, 'utf-8').trim());
+          // Check if process is running
+          try {
+            process.kill(pid, 0); // Signal 0 doesn't kill, just checks
+            running = true;
+          } catch {
+            // Process not running
+            running = false;
+          }
+        } catch {
+          running = false;
+        }
+      }
+
+      // Also check by process name (more reliable)
+      if (!running) {
+        try {
+          const { execSync } = childProcess;
+          const result = execSync('pgrep -f "pixellab-daemon"', { encoding: 'utf-8' });
+          if (result.trim()) {
+            running = true;
+            pid = parseInt(result.trim().split('\n')[0]);
+          }
+        } catch {
+          // pgrep returns non-zero if no matches
+        }
+      }
+
+      // Check queue for pending jobs
+      const queueFile = path.join(process.cwd(), 'scripts', 'sprite-generation-queue.json');
+      if (fs.existsSync(queueFile)) {
+        try {
+          const queue = JSON.parse(fs.readFileSync(queueFile, 'utf-8'));
+          pending = (queue.sprites || []).filter((s: { status?: string }) => s.status === 'pending' || s.status === 'generating').length;
+        } catch {
+          // Ignore queue read errors
+        }
+      }
+
+      res.end(JSON.stringify({
+        running,
+        pid,
+        pending,
+        message: running ? `Daemon running with ${pending} pending jobs` : 'Daemon not running',
+      }));
+    } catch (err) {
+      res.end(JSON.stringify({ running: false, error: (err as Error).message }));
+    }
+    return;
+  }
+
+  // Start PixelLab daemon
+  if (pathname === '/api/pixellab/daemon/start' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    try {
+      // Check if already running
+      const pidFile = path.join(process.cwd(), '.pixellab-daemon.pid');
+      if (fs.existsSync(pidFile)) {
+        try {
+          const pid = parseInt(fs.readFileSync(pidFile, 'utf-8').trim());
+          process.kill(pid, 0); // Check if running
+          res.end(JSON.stringify({ success: false, error: 'Daemon already running', pid }));
+          return;
+        } catch {
+          // Not running, continue
+        }
+      }
+
+      // Start the daemon
+      const daemonProcess = childProcess.spawn('npx', ['tsx', 'scripts/pixellab-daemon.ts'], {
+        cwd: process.cwd(),
+        detached: true,
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+
+      // Write PID file
+      fs.writeFileSync(pidFile, String(daemonProcess.pid));
+
+      // Redirect output to log file
+      const logFile = fs.createWriteStream(path.join(process.cwd(), 'pixellab-daemon.log'), { flags: 'a' });
+      if (daemonProcess.stdout) daemonProcess.stdout.pipe(logFile);
+      if (daemonProcess.stderr) daemonProcess.stderr.pipe(logFile);
+
+      daemonProcess.unref();
+
+      res.end(JSON.stringify({
+        success: true,
+        pid: daemonProcess.pid,
+        message: 'PixelLab daemon started',
+      }));
+    } catch (error) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to start daemon',
+      }));
+    }
+    return;
+  }
+
+  // Stop PixelLab daemon
+  if (pathname === '/api/pixellab/daemon/stop' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    try {
+      const pidFile = path.join(process.cwd(), '.pixellab-daemon.pid');
+      let stopped = false;
+
+      if (fs.existsSync(pidFile)) {
+        try {
+          const pid = parseInt(fs.readFileSync(pidFile, 'utf-8').trim());
+          process.kill(pid, 'SIGTERM');
+          fs.unlinkSync(pidFile);
+          stopped = true;
+        } catch {
+          // Process not running or already stopped
+        }
+      }
+
+      // Also try killing by process name
+      try {
+        childProcess.execSync('pkill -f "pixellab-daemon"', { encoding: 'utf-8' });
+        stopped = true;
+      } catch {
+        // No matching processes
+      }
+
+      res.end(JSON.stringify({
+        success: true,
+        stopped,
+        message: stopped ? 'PixelLab daemon stopped' : 'Daemon was not running',
+      }));
+    } catch (error) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to stop daemon',
+      }));
+    }
+    return;
+  }
+
+  // CORS preflight for pixellab endpoints
+  if ((pathname === '/api/pixellab/regenerate' || pathname === '/api/pixellab/clear-queue' || pathname === '/api/pixellab/animation' || pathname.startsWith('/api/pixellab/daemon/')) && req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'content-type, Content-Type');
+    res.statusCode = 204;
+    res.end();
+    return;
+  }
+
+  // Regenerate sprite (version old folder, queue new generation)
+  if (pathname === '/api/pixellab/regenerate' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    let body = '';
+    req.on('data', (chunk: Buffer) => {
+      body += chunk.toString();
+    });
+
+    req.on('end', () => {
+      try {
+        const { folderId, description } = JSON.parse(body);
+
+        if (!folderId) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ success: false, error: 'Missing folderId' }));
+          return;
+        }
+
+        const folderPath = path.join(SPRITES_DIR, folderId);
+
+        // Check if sprite exists
+        if (!fs.existsSync(folderPath)) {
+          res.statusCode = 404;
+          res.end(JSON.stringify({ success: false, error: `Sprite folder not found: ${folderId}` }));
+          return;
+        }
+
+        // Get existing metadata for description if not provided
+        let spriteDescription = description;
+        const metadataPath = path.join(folderPath, 'metadata.json');
+        if (!spriteDescription && fs.existsSync(metadataPath)) {
+          try {
+            const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf-8'));
+            spriteDescription = metadata.description;
+          } catch {
+            // Ignore
+          }
+        }
+
+        if (!spriteDescription) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ success: false, error: 'No description provided and none found in metadata' }));
+          return;
+        }
+
+        // Find next version number
+        const baseId = folderId.replace(/_v\d+$/, '');
+        const existingVersions = fs.readdirSync(SPRITES_DIR).filter((f: string) => f.startsWith(baseId + '_v'));
+        let nextVersion = 1;
+        for (const v of existingVersions) {
+          const match = v.match(/_v(\d+)$/);
+          if (match) {
+            nextVersion = Math.max(nextVersion, parseInt(match[1]) + 1);
+          }
+        }
+
+        // Rename current folder to versioned name
+        const versionedName = `${baseId}_v${nextVersion}`;
+        const versionedPath = path.join(SPRITES_DIR, versionedName);
+        fs.renameSync(folderPath, versionedPath);
+
+        // Queue new generation with original folderId
+        queueSpriteGeneration(folderId, spriteDescription, {});
+
+        res.end(JSON.stringify({
+          success: true,
+          versionedAs: versionedName,
+          queuedNew: folderId,
+          message: `Old version saved as ${versionedName}, new generation queued`,
+        }));
+      } catch (error) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to regenerate sprite',
+        }));
+      }
+    });
+
+    return;
+  }
+
+  // Clear generation queue
+  if (pathname === '/api/pixellab/clear-queue' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    try {
+      // Count pending jobs before clearing
+      const pendingSprites = Array.from(spriteGenerationJobs.values()).filter(
+        job => job.status === 'queued' || job.status === 'generating'
+      ).length;
+      const pendingAnimations = Array.from(animationGenerationJobs.values()).filter(
+        job => job.status === 'queued' || job.status === 'generating'
+      ).length;
+      const totalCleared = pendingSprites + pendingAnimations;
+
+      // Clear the in-memory queues (remove only pending/generating jobs)
+      for (const [key, job] of spriteGenerationJobs.entries()) {
+        if (job.status === 'queued' || job.status === 'generating') {
+          spriteGenerationJobs.delete(key);
+        }
+      }
+      for (const [key, job] of animationGenerationJobs.entries()) {
+        if (job.status === 'queued' || job.status === 'generating') {
+          animationGenerationJobs.delete(key);
+        }
+      }
+
+      // Clear the queue file
+      const queueFile = path.join(process.cwd(), 'sprite-generation-queue.json');
+      if (fs.existsSync(queueFile)) {
+        const queue = JSON.parse(fs.readFileSync(queueFile, 'utf-8'));
+        queue.sprites = (queue.sprites || []).filter((s: { status?: string }) =>
+          s.status !== 'pending' && s.status !== 'generating'
+        );
+        fs.writeFileSync(queueFile, JSON.stringify(queue, null, 2));
+      }
+
+      res.end(JSON.stringify({
+        success: true,
+        clearedCount: totalCleared,
+        message: `Cleared ${totalCleared} pending jobs`,
+      }));
+    } catch (error) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to clear queue',
+      }));
+    }
+
+    return;
+  }
+
+  // Queue animation generation (alias for /api/animations/generate)
+  if (pathname === '/api/pixellab/animation' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    let body = '';
+    req.on('data', (chunk: Buffer) => {
+      body += chunk.toString();
+    });
+
+    req.on('end', () => {
+      try {
+        const { folderId, animationName, actionDescription } = JSON.parse(body);
+
+        if (!folderId || !animationName) {
+          res.statusCode = 400;
+          res.end(JSON.stringify({ success: false, error: 'Missing folderId or animationName' }));
+          return;
+        }
+
+        // Check if character folder exists
+        const folderPath = path.join(SPRITES_DIR, folderId);
+        if (!fs.existsSync(folderPath)) {
+          res.statusCode = 404;
+          res.end(JSON.stringify({ success: false, error: `Character folder not found: ${folderId}` }));
+          return;
+        }
+
+        // Use default action description if not provided
+        const finalDescription = actionDescription || animationName.replace(/-/g, ' ');
+
+        // Queue animation
+        queueAnimationGeneration(folderId, animationName, finalDescription);
+
+        const animationId = `${folderId}_${animationName}`;
+        res.end(JSON.stringify({
+          success: true,
+          animationId,
+          folderId,
+          animationName,
+          message: `Animation ${animationName} queued for ${folderId}`,
+        }));
+      } catch (error) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to queue animation',
+        }));
+      }
+    });
+
+    return;
+  }
+
+  // List all sprites (for sprites gallery)
+  if (pathname === '/api/pixellab/sprites' && req.method === 'GET') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    try {
+      if (!fs.existsSync(SPRITES_DIR)) {
+        res.end(JSON.stringify({ sprites: [] }));
+        return;
+      }
+
+      const sprites: Array<{
+        id: string;
+        baseId: string;
+        category: string;
+        description: string;
+        hasImage: boolean;
+        versions: Array<{ version: string; folderId: string; active: boolean }>;
+        generatedAt?: string;
+      }> = [];
+
+      const folders = fs.readdirSync(SPRITES_DIR);
+
+      for (const folder of folders) {
+        const folderPath = path.join(SPRITES_DIR, folder);
+        const stat = fs.statSync(folderPath);
+        if (!stat.isDirectory()) continue;
+
+        const metadataPath = path.join(folderPath, 'metadata.json');
+
+        if (fs.existsSync(metadataPath)) {
+          try {
+            const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf-8'));
+            const southSpritePath = path.join(folderPath, 'south.png');
+
+            // Find all versions of this sprite
+            const versions = [{ version: 'current', folderId: folder, active: true }];
+
+            // Look for versioned folders (e.g., cat_orange_v1, cat_orange_v2)
+            const baseId = folder.replace(/_v\d+$/, '');
+            const versionFolders = folders.filter((f: string) => {
+              const match = f.match(new RegExp(`^${baseId}_v(\\d+)$`));
+              return match && f !== folder;
+            });
+
+            for (const vf of versionFolders) {
+              const versionMatch = vf.match(/_v(\d+)$/);
+              if (versionMatch) {
+                versions.push({
+                  version: `v${versionMatch[1]}`,
+                  folderId: vf,
+                  active: false,
+                });
+              }
+            }
+
+            sprites.push({
+              id: folder,
+              baseId: baseId,
+              category: metadata.category || 'unknown',
+              description: metadata.description || '',
+              hasImage: fs.existsSync(southSpritePath),
+              versions: versions,
+              generatedAt: metadata.generated_at,
+            });
+          } catch (e) {
+            console.error(`Error reading metadata for ${folder}:`, e);
+          }
+        }
+      }
+
+      res.end(JSON.stringify({
+        sprites: sprites.sort((a, b) => a.id.localeCompare(b.id)),
+      }));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: String(err) }));
+    }
+    return;
+  }
+
+  // Serve sprite images
+  if (pathname.match(/^\/api\/sprites\/([^/]+)\/([^/]+)\.png$/) && req.method === 'GET') {
+    const match = pathname.match(/^\/api\/sprites\/([^/]+)\/([^/]+)\.png$/);
+    if (match) {
+      const [, folderId, direction] = match;
+      const imagePath = path.join(SPRITES_DIR, folderId, `${direction}.png`);
+
+      if (fs.existsSync(imagePath)) {
+        res.setHeader('Content-Type', 'image/png');
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+        const imageData = fs.readFileSync(imagePath);
+        res.end(imageData);
+      } else {
+        res.statusCode = 404;
+        res.end('Image not found');
+      }
+      return;
+    }
+  }
 
   // Handle CORS preflight for sprite generation
   if (pathname === '/api/sprites/generate' && req.method === 'OPTIONS') {

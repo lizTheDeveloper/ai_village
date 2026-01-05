@@ -101,3 +101,7 @@ export * from './sprites/index.js';
 
 // Agent info panel sections
 export * from './panels/agent-info/index.js';
+
+// Text Renderer (1D Renderer) - accessibility & narrative
+export * from './text/index.js';
+export * from './TextAdventurePanel.js';

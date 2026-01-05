@@ -51,6 +51,12 @@ export interface SoulCreationContext {
   /** If reforging, previous incarnation count */
   previousLives?: number;
 
+  /** If reforging, ID of the soul entity being reincarnated
+   * ✅ CONSERVATION OF GAME MATTER: Soul entities are never deleted
+   * Instead, existing soul is incarnated into a new body
+   */
+  reincarnatedSoulId?: string;
+
   /** Location in world where incarnation will occur */
   incarnationLocation?: { x: number; y: number };
 
@@ -299,10 +305,11 @@ export function generateAttributeExtractionPrompt(
   }
 
   prompt += `Based on this conversation, extract:\n`;
-  prompt += `1. INTERESTS (2-3 from this list): knowledge, crafting, nature, social, combat, magic, art, exploration, farming, leadership, trade, healing, building\n`;
+  prompt += `1. INTERESTS (pick 2-3 from this list): knowledge, crafting, nature, social, combat, magic, art, exploration, farming, leadership, trade, healing, building\n`;
   prompt += `2. ARCHETYPE (pick one): wanderer, protector, creator, seeker, unifier, mystic, farmer, merchant, healer, builder, leader\n\n`;
+  prompt += `IMPORTANT: You MUST include at least 2 interests, preferably 3.\n\n`;
   prompt += `Respond in this exact JSON format:\n`;
-  prompt += `{"interests": ["interest1", "interest2"], "archetype": "archetype_name"}\n\n`;
+  prompt += `{"interests": ["interest1", "interest2", "interest3"], "archetype": "archetype_name"}\n\n`;
   prompt += `Only output the JSON, nothing else.`;
 
   return prompt;

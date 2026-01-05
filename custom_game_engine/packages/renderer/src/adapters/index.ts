@@ -33,6 +33,7 @@ import type { SacredGeographyPanel } from '../divine/SacredGeographyPanel.js';
 import type { AngelManagementPanel } from '../divine/AngelManagementPanel.js';
 import type { PrayerPanel } from '../divine/PrayerPanel.js';
 import type { LLMConfigPanel } from '../LLMConfigPanel.js';
+import type { TextAdventurePanel } from '../TextAdventurePanel.js';
 import type { World } from '@ai-village/core';
 
 // Export the generic adapter and config type
@@ -949,4 +950,38 @@ export function createPrayerPanelAdapter(panel: PrayerPanel): PanelAdapter<Praye
  */
 export function createFarmManagementPanelAdapter(panel: FarmManagementPanel): PanelAdapter<FarmManagementPanel & { _adapter?: FarmManagementPanelAdapterState }> {
   return new PanelAdapter(panel, FARM_MANAGEMENT_PANEL_CONFIG);
+}
+
+// ============================================================================
+// Text Adventure Panel Configuration
+// ============================================================================
+
+/**
+ * Configuration for TextAdventurePanel adapter.
+ * Pattern: Delegate visibility - panel has isVisible/setVisible methods
+ */
+export const TEXT_ADVENTURE_PANEL_CONFIG: PanelConfig<TextAdventurePanel> = {
+  id: 'text-adventure',
+  title: 'Text Adventure (1D)',
+  defaultWidth: 450,
+  defaultHeight: 500,
+  menuCategory: 'settings',
+  getVisible: (panel) => panel.isVisible(),
+  setVisible: (panel, visible) => panel.setVisible(visible),
+  renderMethod: (panel, ctx, x, y, width, height, world) => {
+    panel.render(ctx, x, y, width, height, world);
+  },
+  handleScroll: (panel, deltaY, contentHeight) => {
+    return panel.handleScroll(deltaY, contentHeight);
+  },
+  handleContentClick: (panel, x, y, _width, _height) => {
+    return panel.handleClick(x, y);
+  },
+};
+
+/**
+ * Create a TextAdventurePanel adapter
+ */
+export function createTextAdventurePanelAdapter(panel: TextAdventurePanel): PanelAdapter<TextAdventurePanel> {
+  return new PanelAdapter(panel, TEXT_ADVENTURE_PANEL_CONFIG);
 }

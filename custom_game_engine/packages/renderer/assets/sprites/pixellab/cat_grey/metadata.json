@@ -1,18 +1,9 @@
 {
   "id": "cat_grey",
-  "base_species": "cat",
-  "variant": "grey_tabby",
-  "description": "grey tabby cat",
+  "category": "objects",
   "size": 48,
-  "directions": [
-    "south",
-    "southwest",
-    "west",
-    "northwest",
-    "north",
-    "northeast",
-    "east",
-    "southeast"
-  ],
-  "generated_at": "2026-01-04T00:28:31.314Z"
+  "description": "grey tabby cat",
+  "original_description": "grey tabby cat",
+  "generated_at": "2026-01-05T04:54:52.241Z",
+  "type": "static"
 }

@@ -465,8 +465,10 @@
         this.plantSprites = new Map();  // id -> { sprite, data }
         this.textureCache = new Map();  // spriteId -> texture
         this.textureLoader = new THREE.TextureLoader();
+        this.textureLoader.setCrossOrigin('anonymous');  // Enable CORS for cross-origin textures
 
-        // Base path for plant sprites (symlinked to game assets)
+        // Use game server for sprites (Vite serves from public/assets)
+        this.gameServerUrl = 'http://localhost:3000';
         this.spritesBasePath = '/assets/sprites';
       }
 
@@ -476,11 +478,16 @@
           return this.textureCache.get(spriteId);
         }
 
-        // Try different paths where plant sprites might be
+        // Try different paths where plant sprites might be (on game server)
         const paths = [
-          `${this.spritesBasePath}/plants/${spriteId}.png`,
-          `${this.spritesBasePath}/entities/plants/${spriteId}.png`,
-          `${this.spritesBasePath}/${spriteId}.png`,
+          // PixelLab generated sprites
+          `${this.gameServerUrl}${this.spritesBasePath}/pixellab/${spriteId}/sprite.png`,
+          `${this.gameServerUrl}${this.spritesBasePath}/pixellab/${spriteId}.png`,
+          // Entity sprites
+          `${this.gameServerUrl}${this.spritesBasePath}/entities/plants/${spriteId}/sprite.png`,
+          `${this.gameServerUrl}${this.spritesBasePath}/entities/${spriteId}/sprite.png`,
+          // Direct path
+          `${this.gameServerUrl}${this.spritesBasePath}/${spriteId}.png`,
         ];
 
         for (const path of paths) {
@@ -497,6 +504,7 @@
                 () => reject(new Error(`Failed to load ${path}`))
               );
             });
+            console.log(`Loaded plant sprite: ${spriteId} from ${path}`);
             this.textureCache.set(spriteId, texture);
             return texture;
           } catch (e) {
@@ -505,6 +513,7 @@
         }
 
         // Fallback: create a procedural plant texture
+        console.log(`Using fallback texture for: ${spriteId}`);
         return this.createFallbackTexture(spriteId);
       }
 

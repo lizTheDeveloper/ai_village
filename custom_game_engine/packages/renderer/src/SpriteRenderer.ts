@@ -2,21 +2,75 @@
  * Simple sprite rendering with PixelLab map object support.
  */
 
+import { getPixelLabSpriteLoader } from './sprites/PixelLabSpriteLoader.js';
+
 // Image cache for map objects
 const mapObjectCache = new Map<string, HTMLImageElement>();
 const loadingImages = new Set<string>();
 const failedImages = new Set<string>();
 
+// Animated sprite state
+const animatedSprites = new Map<string, { instanceId: string; startTime: number }>();
+const pixelLabLoader = getPixelLabSpriteLoader();
+
+// Frame-based animation cache (for simple looping animations like campfire)
+interface FrameAnimation {
+  frames: HTMLImageElement[];
+  fps: number;
+  loop: boolean;
+  metadata: any;
+}
+const frameAnimations = new Map<string, FrameAnimation>();
+const loadingFrameAnimations = new Set<string>();
+
 // Mapping from sprite IDs to map object filenames
 const MAP_OBJECT_SPRITES: Record<string, string> = {
-  'tree': 'oak_tree.png',
-  'rock': 'rock_boulder.png',
-  'berry-bush': 'berry_bush.png',
+  // Trees - distinct species
+  'tree': 'oak_tree.png',        // Default/fallback
+  'oak-tree': 'oak_tree.png',
+  'pine-tree': 'pine_tree.png',
+  'birch-tree': 'birch_tree.png',
+  'maple-tree': 'maple_tree.png',
+  'willow-tree': 'willow_tree.png',
+  // Crops
   'wheat': 'wheat.png',
+  'corn': 'corn.png',
   'carrot': 'carrot.png',
   'potato': 'potato.png',
   'tomato': 'tomato.png',
+  // Wild plants
+  'grass': 'grass.png',
   'wildflower': 'wildflower.png',
+  'berry-bush': 'berry_bush.png',
+  // Medicinal herbs
+  'chamomile': 'chamomile.png',
+  'lavender': 'lavender.png',
+  'feverfew': 'feverfew.png',
+  'valerian': 'valerian.png',
+  // Magical plants
+  'moonpetal': 'moonpetal.png',
+  'shadowcap': 'shadowcap.png',
+  'whisperleaf': 'whisperleaf.png',
+  'sunburst-flower': 'sunburst_flower.png',
+  'frostbloom': 'frostbloom.png',
+  // Tropical plants
+  'strangler-vine': 'strangler_vine.png',
+  'serpent-liana': 'serpent_liana.png',
+  'poison-orchid': 'poison_orchid.png',
+  'dream-lotus': 'dream_lotus.png',
+  'luminous-toadstool': 'luminous_toadstool.png',
+  'fever-fungus': 'fever_fungus.png',
+  // Wetland plants
+  'drowning-pitcher': 'drowning_pitcher.png',
+  'snap-maw': 'snap_maw.png',
+  'marsh-mallow': 'marsh_mallow.png',
+  'fever-bulrush': 'fever_bulrush.png',
+  'will-o-wisp-bloom': 'will_o_wisp_bloom.png',
+  'memory-reed': 'memory_reed.png',
+  // Fungi
+  'mushroom': 'mushroom.png',
+  // Other objects
+  'rock': 'rock_boulder.png',
 };
 
 /**
@@ -71,6 +125,99 @@ function loadMapObjectSprite(spriteId: string): HTMLImageElement | null {
   return null; // Not loaded yet
 }
 
+/**
+ * Load a frame-based animation from a folder containing frame_*.png files
+ */
+async function loadFrameAnimation(animationId: string, folderPath: string): Promise<void> {
+  if (loadingFrameAnimations.has(animationId)) return;
+  loadingFrameAnimations.add(animationId);
+
+  try {
+    // Load metadata
+    const metadataPath = `${folderPath}/metadata.json`;
+    const metadataResponse = await fetch(metadataPath);
+    if (!metadataResponse.ok) {
+      throw new Error(`Failed to load metadata: ${metadataPath}`);
+    }
+    const metadata = await metadataResponse.json();
+
+    // Load all frames
+    const frames: HTMLImageElement[] = [];
+    for (let i = 0; i < metadata.frames; i++) {
+      const framePath = `${folderPath}/frame_${i.toString().padStart(3, '0')}.png`;
+      const img = new Image();
+
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error(`Failed to load frame: ${framePath}`));
+        img.src = framePath;
+      });
+
+      frames.push(img);
+    }
+
+    frameAnimations.set(animationId, {
+      frames,
+      fps: metadata.fps || 8,
+      loop: metadata.loop !== false,
+      metadata,
+    });
+
+    console.log(`[SpriteRenderer] Loaded frame animation: ${animationId} (${frames.length} frames @ ${metadata.fps}fps)`);
+  } catch (err) {
+    console.error(`[SpriteRenderer] Failed to load frame animation ${animationId}:`, err);
+  } finally {
+    loadingFrameAnimations.delete(animationId);
+  }
+}
+
+/**
+ * Try to render animated campfire using frame-based animation
+ * Uses /animate-with-text API output (simple frame sequence, no directional views)
+ */
+function tryRenderAnimatedCampfire(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number
+): boolean {
+  const animationId = 'campfire_flames';
+  const folderPath = '/assets/sprites/pixellab/campfire_flames';
+
+  // Load animation if not already loaded
+  if (!frameAnimations.has(animationId) && !loadingFrameAnimations.has(animationId)) {
+    loadFrameAnimation(animationId, folderPath);
+    return false; // Not loaded yet, fall back
+  }
+
+  const animation = frameAnimations.get(animationId);
+  if (!animation || animation.frames.length === 0) {
+    return false; // Not loaded or no frames
+  }
+
+  // Calculate current frame based on time
+  const now = Date.now();
+  const frameTime = 1000 / animation.fps; // ms per frame
+  const frameIndex = Math.floor((now / frameTime) % animation.frames.length);
+  const frame = animation.frames[frameIndex];
+
+  if (!frame) {
+    return false; // Frame not loaded
+  }
+
+  // Render the frame centered at (x, y)
+  const drawSize = size;
+  ctx.drawImage(
+    frame,
+    x - drawSize / 2,
+    y - drawSize / 2,
+    drawSize,
+    drawSize
+  );
+
+  return true;
+}
+
 export function renderSprite(
   ctx: CanvasRenderingContext2D,
   spriteId: string,
@@ -80,6 +227,14 @@ export function renderSprite(
 ): void {
   // IMPORTANT: Save and restore canvas state to prevent alpha/fill corruption
   ctx.save();
+
+  // Check for animated campfire
+  if (spriteId === 'campfire') {
+    if (tryRenderAnimatedCampfire(ctx, x, y, size)) {
+      ctx.restore();
+      return;
+    }
+  }
 
   // Try to load map object sprite first
   const mapObjectImg = loadMapObjectSprite(spriteId);

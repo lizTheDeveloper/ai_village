@@ -6,7 +6,7 @@
  * the riddle is actually solvable.
  */
 
-import type { LLMProvider } from '@ai-village/llm';
+import type { LLMProvider } from '../types/LLMTypes.js';
 
 export interface GeneratedRiddle {
   question: string;

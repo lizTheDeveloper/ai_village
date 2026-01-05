@@ -1,0 +1,17 @@
+{
+  "soulId": "ed36b3b4-dc18-409c-8ffe-e91828dd28f1",
+  "agentId": "ed36b3b4-dc18-409c-8ffe-e91828dd28f1",
+  "name": "Meadow",
+  "species": "human",
+  "archetype": "seeker",
+  "purpose": "I see a soul born into a time of new beginnings. This soul shall cultivate the earth and nurture the growth of the First Village, bringing prosperity to its people.",
+  "interests": [
+    "knowledge",
+    "crafting",
+    "art"
+  ],
+  "createdAt": "2026-01-05T03:32:26.006Z",
+  "soulBirthTick": 262,
+  "universeId": "unknown",
+  "version": 1
+}

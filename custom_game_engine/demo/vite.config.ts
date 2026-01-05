@@ -1,5 +1,9 @@
 import { defineConfig } from 'vite';
 import path from 'path';
+import fs from 'fs';
+
+// Queue file path for pixellab daemon
+const QUEUE_FILE = path.resolve(__dirname, '../scripts/sprite-generation-queue.json');
 
 export default defineConfig({
   // Load .env files from parent directory (custom_game_engine/)
@@ -61,6 +65,75 @@ export default defineConfig({
           } catch (error) {
             console.warn('[register-with-orchestrator] Could not register with orchestrator (orchestrator may not be running):', error instanceof Error ? error.message : String(error));
           }
+        });
+      },
+    },
+    {
+      name: 'animation-queue-api',
+      configureServer(server) {
+        server.middlewares.use('/api/animations/generate', (req, res, next) => {
+          if (req.method !== 'POST') {
+            next();
+            return;
+          }
+
+          let body = '';
+          req.on('data', (chunk: Buffer) => {
+            body += chunk.toString();
+          });
+
+          req.on('end', () => {
+            try {
+              const { folderId, animationName, actionDescription } = JSON.parse(body);
+
+              // Load existing queue
+              let queue = { sprites: [], animations: [], soul_sprites: [] };
+              if (fs.existsSync(QUEUE_FILE)) {
+                try {
+                  queue = JSON.parse(fs.readFileSync(QUEUE_FILE, 'utf-8'));
+                  // Ensure arrays exist
+                  queue.sprites = queue.sprites || [];
+                  queue.animations = queue.animations || [];
+                  queue.soul_sprites = queue.soul_sprites || [];
+                } catch {
+                  console.warn('[animation-queue-api] Could not parse queue file, using empty queue');
+                }
+              }
+
+              // Check if already queued
+              const alreadyQueued = queue.animations.some(
+                (a: { folderId: string; animationName: string }) =>
+                  a.folderId === folderId && a.animationName === animationName
+              );
+
+              if (alreadyQueued) {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true, message: 'Already queued' }));
+                return;
+              }
+
+              // Add to queue
+              queue.animations.push({
+                folderId,
+                animationName,
+                actionDescription,
+                status: 'queued',
+                queuedAt: new Date().toISOString(),
+              });
+
+              // Save queue
+              fs.writeFileSync(QUEUE_FILE, JSON.stringify(queue, null, 2));
+
+              console.log(`[animation-queue-api] Queued ${animationName} for ${folderId}`);
+
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ success: true, message: `Queued ${animationName}` }));
+            } catch (err) {
+              console.error('[animation-queue-api] Error:', err);
+              res.writeHead(500, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ success: false, error: String(err) }));
+            }
+          });
         });
       },
     },

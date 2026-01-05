@@ -21,54 +21,25 @@ show_status() {
 
   local found=0
 
-  # Try to get status from orchestrator first (port 3030)
-  local orch_response=$(curl -s http://localhost:3030/api/server/stats 2>/dev/null)
-  if [ -n "$orch_response" ] && echo "$orch_response" | grep -q '"serversUp"'; then
-    echo "  ✅ Orchestration Dashboard: Running (port 3030)"
+  # Check services via port scanning
+  local ports=(3000 3001 3002 8766)
+  local names=("Game (default)" "Game (alt 1)" "Game (alt 2)" "Admin Console")
+
+  for i in "${!ports[@]}"; do
+    local port=${ports[$i]}
+    local name=${names[$i]}
+    local pid=$(lsof -ti:$port 2>/dev/null | head -1)
+    if [ -n "$pid" ]; then
+      echo "  ✅ Port $port ($name): Running (PID $pid)"
+      found=1
+    fi
+  done
+
+  # Check PixelLab daemon
+  if pgrep -f "pixellab-daemon" >/dev/null 2>&1; then
+    local pixellab_pid=$(pgrep -f "pixellab-daemon" | head -1)
+    echo "  ✅ PixelLab Daemon: Running (PID $pixellab_pid)"
     found=1
-
-    # Parse services from orchestrator
-    if echo "$orch_response" | grep -q '"gameServer":true'; then
-      local game_status=$(curl -s http://localhost:3030/api/game-server/status 2>/dev/null)
-      local game_url=$(echo "$game_status" | grep -o '"url":"[^"]*"' | cut -d'"' -f4)
-      local game_pid=$(echo "$game_status" | grep -o '"pid":[0-9]*' | cut -d':' -f2)
-      echo "  ✅ Game Server: Running (PID $game_pid) - $game_url"
-    else
-      echo "  ⚫ Game Server: Not running"
-    fi
-
-    if echo "$orch_response" | grep -q '"parallelWorkers":true'; then
-      echo "  ✅ Parallel Workers: Running"
-    fi
-
-    if echo "$orch_response" | grep -q '"bugQueueProcessor":true'; then
-      echo "  ✅ Bug Queue Processor: Running"
-    fi
-
-    # Check metrics server separately
-    if curl -s http://localhost:8766/ >/dev/null 2>&1; then
-      echo "  ✅ Metrics Dashboard: Running (port 8766)"
-    fi
-
-    # Check PixelLab daemon
-    if pgrep -f "pixellab-daemon" >/dev/null 2>&1; then
-      local pixellab_pid=$(pgrep -f "pixellab-daemon" | head -1)
-      echo "  ✅ PixelLab Daemon: Running (PID $pixellab_pid)"
-    fi
-  else
-    # Fallback to port scanning if orchestrator not running
-    local ports=(3000 3001 3002 8766 3030)
-    local names=("Game (default)" "Game (alt 1)" "Game (alt 2)" "Metrics Dashboard" "Orchestration")
-
-    for i in "${!ports[@]}"; do
-      local port=${ports[$i]}
-      local name=${names[$i]}
-      local pid=$(lsof -ti:$port 2>/dev/null | head -1)
-      if [ -n "$pid" ]; then
-        echo "  ✅ Port $port ($name): Running (PID $pid)"
-        found=1
-      fi
-    done
   fi
 
   if [ $found -eq 0 ]; then
@@ -88,10 +59,9 @@ show_logs() {
 
   # Find most recent log files
   local metrics_log=$(ls -t logs/metrics-server-*.log 2>/dev/null | head -1)
-  local orch_log=$(ls -t logs/orch-dashboard-*.log 2>/dev/null | head -1)
   local dev_log=$(ls -t logs/dev-server-*.log 2>/dev/null | head -1)
 
-  if [ -z "$metrics_log" ] && [ -z "$orch_log" ] && [ -z "$dev_log" ]; then
+  if [ -z "$metrics_log" ] && [ -z "$dev_log" ]; then
     echo "  No log files found in logs/"
     echo "  Logs are created when servers start."
     echo ""
@@ -101,7 +71,6 @@ show_logs() {
   echo "Recent log files:"
   echo ""
   [ -n "$metrics_log" ] && echo "  📊 Metrics:        $metrics_log"
-  [ -n "$orch_log" ] && echo "  🎛️  Orchestration:  $orch_log"
   [ -n "$dev_log" ] && echo "  🎮 Game Server:    $dev_log"
   echo ""
 
@@ -153,7 +122,7 @@ kill_servers() {
   echo ""
 
   # Kill by port first (most reliable)
-  local ports=(3000 3001 3002 8766 3030)
+  local ports=(3000 3001 3002 8766)
   for port in "${ports[@]}"; do
     local pids=$(lsof -ti:$port 2>/dev/null)
     if [ -n "$pids" ]; then
@@ -210,6 +179,69 @@ if [ ! -f ".setup-complete" ]; then
   echo ""
 fi
 
+# Auto-cleanup: Kill any conflicting servers before starting
+echo "🧹 Checking for conflicting servers..."
+echo ""
+
+# Check for processes on our ports
+CLEANUP_PORTS=(3000 3001 3002 8765 8766)
+FOUND_CONFLICTS=0
+
+for port in "${CLEANUP_PORTS[@]}"; do
+  PIDS=$(lsof -ti:$port 2>/dev/null)
+  if [ -n "$PIDS" ]; then
+    FOUND_CONFLICTS=1
+    echo "  ⚠️  Port $port in use by PID(s): $PIDS"
+  fi
+done
+
+# Check for old metrics-server processes
+if pgrep -f "metrics-server" >/dev/null 2>&1; then
+  COUNT=$(pgrep -f "metrics-server" | wc -l | tr -d ' ')
+  if [ "$COUNT" -gt 0 ]; then
+    FOUND_CONFLICTS=1
+    echo "  ⚠️  Found $COUNT running metrics-server process(es)"
+  fi
+fi
+
+# Check for old api-server processes
+if pgrep -f "api-server" >/dev/null 2>&1; then
+  COUNT=$(pgrep -f "api-server" | wc -l | tr -d ' ')
+  if [ "$COUNT" -gt 0 ]; then
+    FOUND_CONFLICTS=1
+    echo "  ⚠️  Found $COUNT running api-server process(es)"
+  fi
+fi
+
+if [ $FOUND_CONFLICTS -eq 1 ]; then
+  echo ""
+  echo "  Cleaning up conflicting processes..."
+
+  # Kill by port
+  for port in "${CLEANUP_PORTS[@]}"; do
+    PIDS=$(lsof -ti:$port 2>/dev/null)
+    if [ -n "$PIDS" ]; then
+      echo "$PIDS" | xargs kill -9 2>/dev/null && echo "    ✓ Killed process on port $port" || true
+    fi
+  done
+
+  # Kill by process name
+  pkill -9 -f "vite" 2>/dev/null && echo "    ✓ Stopped old Vite servers" || true
+  pkill -9 -f "metrics-server" 2>/dev/null && echo "    ✓ Stopped old metrics servers" || true
+  pkill -9 -f "api-server" 2>/dev/null && echo "    ✓ Stopped old API servers" || true
+  pkill -9 -f "pixellab-daemon" 2>/dev/null && echo "    ✓ Stopped old PixelLab daemon" || true
+
+  # Clean up stale PID files
+  rm -f .metrics-server.pid .api-server.pid .dev-server.pid .pixellab-daemon.pid 2>/dev/null
+
+  echo ""
+  echo "  ✅ Cleanup complete!"
+else
+  echo "  ✅ No conflicts found"
+fi
+
+echo ""
+
 # Launch appropriate mode
 case "$MODE" in
   gamehost|host|game)
@@ -227,8 +259,8 @@ case "$MODE" in
     echo "Usage: ./start.sh [mode]"
     echo ""
     echo "Modes:"
-    echo "  gamehost (default) - Full game host with browser (metrics + orchestration + game + browser)"
-    echo "  server             - Backend only for AI operation (metrics + orchestration)"
+    echo "  gamehost (default) - Full game host with browser (metrics + game + browser)"
+    echo "  server             - Backend only for AI operation (metrics server)"
     echo "  player             - Open browser to existing server"
     echo "  kill               - Stop all running servers"
     echo "  status             - Show running server status"

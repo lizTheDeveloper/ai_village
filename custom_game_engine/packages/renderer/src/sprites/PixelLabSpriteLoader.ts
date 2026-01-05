@@ -11,6 +11,9 @@ import {
   PIXELLAB_DEFAULT_SIZE,
   angleToPixelLabDirection,
 } from './PixelLabSpriteDefs';
+
+// Re-export for external use
+export { PixelLabDirection } from './PixelLabSpriteDefs';
 import { getSpriteCache } from './SpriteCache';
 
 /** Metadata format from PixelLab (nested format) */
@@ -175,7 +178,40 @@ export class PixelLabSpriteLoader {
 
       await Promise.all(rotationPromises);
 
-      // TODO: Handle animations in flat format if needed
+      // Load animations if they exist (flat format)
+      // Try standard animation names: breathing-idle, walking-8-frames, etc.
+      const commonAnimations = ['breathing-idle', 'idle', 'walking-8-frames', 'walking-4-frames', 'running'];
+
+      for (const animName of commonAnimations) {
+        const animMap = new Map<string, HTMLImageElement[]>();
+        let foundAnyFrames = false;
+
+        for (const dirName of directionNames) {
+          const frames: HTMLImageElement[] = [];
+          let frameIndex = 0;
+
+          // Try loading frames until we hit a missing one
+          while (true) {
+            const framePath = `${folderPath}/animations/${animName}/${dirName}/frame_${frameIndex.toString().padStart(3, '0')}.png`;
+            try {
+              const img = await this.loadImage(framePath, metadata.id);
+              frames.push(img);
+              foundAnyFrames = true;
+              frameIndex++;
+            } catch {
+              break; // No more frames for this direction
+            }
+          }
+
+          if (frames.length > 0) {
+            animMap.set(dirName, frames);
+          }
+        }
+
+        if (foundAnyFrames && animMap.size > 0) {
+          animations.set(animName, animMap);
+        }
+      }
 
       const directionCount = typeof metadata.directions === 'number'
         ? metadata.directions

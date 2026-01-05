@@ -1,5 +1,248 @@
 # Release Notes
 
+## 2026-01-05 - Soul Reincarnation, Architecture Planning & Text UI (Round 14)
+
+### Conservation of Game Matter: Soul Reincarnation System
+
+#### Core Principle Implementation
+- **SOUL_REINCARNATION_IMPLEMENTATION_2026-01-04.md** - Complete implementation summary (+349 lines)
+  - Souls never deleted - persist forever across incarnations
+  - Veil of Forgetting: past-life memories blocked by default
+  - Memory bleeds: dreams, déjà vu, flashbacks, intuition
+  - Multi-lifetime storylines through memory triggers
+
+#### New Components
+- **VeilOfForgettingComponent.ts** - Past-life memory access management
+  - Memory bleed tracking (dream, déjà vu, flashback, intuition, skill, emotion)
+  - Trigger sensitivity configuration (location, person, emotion, dreams, meditation, near-death, random)
+  - Awareness progression system
+  - 6 memory bleed forms with clarity ratings
+- **CurrentLifeMemoryComponent.ts** - This-incarnation-only memories
+  - Fresh start for each life
+  - Prevents overwhelming agents with all past lives
+  - Tracks significant events and narrative weight
+
+#### Updated Systems
+- **SoulCreationSystem.ts** - Removed soul deletion (line 421)
+  - Souls transition from afterlife → incarnated (not deleted)
+  - Added reincarnatedSoulId tracking
+  - Conservation of Game Matter compliance verified
+- **ReincarnationSystem.ts** - Added veil components
+  - Adds CurrentLifeMemoryComponent to reincarnated entities
+  - Adds VeilOfForgettingComponent with default sensitivities
+  - Documented TODO for full soul/body separation refactor
+- **VeilOfForgettingSystem.ts.disabled** - Memory bleed system (prepared, not active)
+  - Location-based triggers (within 5 units of past-life location)
+  - Person-based triggers (within 10 units of past-life acquaintance)
+  - Daily random bleeds (1% chance)
+  - Priority 150 (after MemoryFormation, before Reflection)
+
+#### Soul Repository
+- **4 new souls created (2026-01-05 batch):**
+  - 0f578643-a3a0-4adb-9002-cfc248879a06
+  - 83278adb-f391-48ea-9bfa-478f4ef8516d
+  - ed36b3b4-dc18-409c-8ffe-e91828dd28f1
+  - test123 (test soul)
+- Souls indexed by-date/2026-01-05/, by-species/human/, by-universe/unknown/
+- index.json updated with new souls
+
+### Architecture Planning Documents
+
+#### Core Package Breakup Plan
+- **PLAN_CORE_MONOLITH_BREAKUP.md** - Complete refactoring plan (+289 lines)
+  - Current state: 1,270 TypeScript files in @ai-village/core
+  - Proposed 8 new packages: persistence, metrics, magic, divinity, reproduction, television, etc.
+  - Phased approach: Infrastructure → Feature Domains → Content as Data
+  - Estimated 3-4 weeks for full breakup
+  - Phase 1 (2-3 days, low risk): persistence + metrics packages
+  - Phase 2 (1-2 weeks, medium risk): magic, divinity, reproduction domains
+  - Phase 3 (1 week, low risk): Convert data files to JSON
+
+#### Architecture Fixes Backlog
+- **ARCHITECTURE_FIXES.md** - 8 prioritized fixes (+608 lines)
+  1. **Event System** - Add 70+ missing event type definitions (Critical, 1-2 days)
+  2. **System Dependencies** - Make implicit dependencies explicit (High, 1 day)
+  3. **PlantSystem Constants** - Extract 50+ magic numbers (Medium, 2-3 hours)
+  4. **Singleton Cache Utility** - Standardize singleton access (Medium, 2-3 hours)
+  5. **Split PlantSystem** - Break up 1,200-line god class (Medium, 1-2 days)
+  6. **Component Access Pattern** - Standardize CT enum vs strings (Low, 1 day)
+  7. **State Map Cleanup** - Add entity deletion handlers (Low, 2-3 hours)
+  8. **Event Chain Documentation** - Document event propagation (Low, 1 day)
+
+### Admin System Enhancements
+
+#### Admin Routing
+- **AdminRouter.ts** - Centralized /admin/* request routing
+  - Dual rendering: HTML for browsers, text/JSON for LLMs
+  - Integrates with CapabilityRegistry
+  - Handles queries and actions
+  - Error handling with client-appropriate formatting
+
+#### New Capabilities
+- **roadmap.ts** - Development roadmap capability
+  - Shows planned features and priorities
+  - Architecture improvement tracking
+  - Integration with capability registry
+
+#### Capability Updates
+- **sprites.ts** - Enhanced sprite management
+- **media.ts** - Media handling improvements
+- **universes.ts** - Universe management enhancements
+- **index.ts** - Capability index updates
+
+### Text-Based UI System
+
+#### New Components
+- **TextAdventurePanel.ts** - Text-based game interface
+  - Traditional text adventure UI
+  - Command parsing and execution
+  - Narrative-focused gameplay mode
+  - Alternative to graphical renderer
+- **text/** - Text rendering utilities directory
+  - Text formatting and layout
+  - Command-line style output
+  - ASCII art support potential
+
+### Sprite Generation & Animation
+
+#### Animated Campfire
+- **campfire_animated/** - 4-frame campfire animation
+  - Frame 1: Low flames (campfire_frame1)
+  - Frame 2: Medium flames (campfire_frame2)
+  - Frame 3: High flames (campfire_frame3)
+  - Frame 4: Peak flames (campfire_frame4)
+  - Metadata with animation configuration
+  - Static backup preserved
+- **generate-campfire-animation.ts** - Campfire generation script
+- **campfire_static_backup/** - Original static campfire preserved
+- **campfire_flames/** - Flame animation assets
+
+#### Cat Sprite Versioning
+- **cat_black_v1/** - Versioned black cat sprite
+- **cat_grey_v1/** - Versioned grey cat sprite
+- **cat_orange_v1/** - Versioned orange cat sprite
+- **cat_white_v1/** - Versioned white cat sprite
+- Original cat sprite metadata updated with version references
+- Removed metadata_with_animations.json (consolidated into main metadata)
+
+#### Sprite Dashboard
+- **sprites.html** - Sprite viewer and browser (multiple copies)
+  - agents/autonomous-dev/dashboard/sprites.html
+  - custom_game_engine/demo/sprites.html
+  - custom_game_engine/scripts/sprites.html
+- Global metadata.json for sprite registry
+- test_sprite/ directory for sprite testing
+
+### System Improvements
+
+#### Sleep & Circadian Systems
+- **SleepBehavior.ts** - Enhanced sleep behavior
+- **SleepSystem.ts** - Sleep system improvements
+- **CircadianComponent.ts** - Circadian rhythm updates
+- **NeedsConstants.ts** - Sleep-related constants
+
+#### Divinity Systems
+- **RiddleGenerator.ts** - God riddle generation
+- **SoulNameGenerator.ts** - Soul name creation
+- **DeathBargainSystem.ts** - Death bargain mechanics
+- **SoulCreationCeremony.ts** - Updated for reincarnation
+
+#### Trade & Economics
+- **TradeAgreementSystem.ts** - Trade improvements
+- **MayorNegotiator.ts** - NPC trade negotiations
+
+#### Rendering
+- **PlantVisualsSystem.ts** - Plant rendering updates
+- **SpriteRenderer.ts** - Sprite rendering improvements
+- **PixelLabSpriteLoader.ts** - Sprite loading enhancements
+- **adapters/index.ts** - Rendering adapter updates
+
+#### Other Systems
+- **AlienSpeciesGenerator.ts** - Alien creation updates
+- **World.ts** - ECS world improvements
+- **GameLoop.ts** - Game loop refinements
+
+### LLM Infrastructure
+
+#### Type Definitions
+- **LLMTypes.ts** - Centralized LLM type definitions
+  - Provider configurations
+  - Model metadata
+  - Request/response types
+  - Shared across LLM systems
+
+#### Provider Improvements
+- **ProxyLLMProvider.ts** - Proxy provider enhancements
+
+### Build & Configuration
+
+#### TypeScript Configuration
+- **packages/core/tsconfig.json** - Core package config updates
+- **packages/world/tsconfig.json** - World package config updates
+
+### Scripts & Tooling
+
+#### Server Scripts
+- **metrics-server.ts** - Metrics server improvements
+- **pixellab-daemon.ts** - Daemon enhancements
+- **start-game-host.sh** - Game host startup script updates
+- **start-server.sh** - Server startup improvements
+- **start.sh** - Main startup script refinements
+
+### UI & Visualization
+
+#### 3D Prototype
+- **3d-prototype/index.html** - 3D visualization prototype
+- **3d-prototype/assets/sprites/pixellab/tiles** - Tile sprite symlink
+
+#### Galleries & Viewers
+- **soul-gallery.html** - Soul gallery improvements
+- **index.json** - Soul repository index updates
+
+### Component System
+
+#### Component Type Registration
+- **ComponentType.ts** - New component types registered:
+  - VeilOfForgetting
+  - CurrentLifeMemory
+  - Afterlife (if not already present)
+
+#### Component Exports
+- **index.ts** - Export new components
+
+### OpenSpec Documentation
+
+#### Rendering Specifications
+- **openspec/specs/rendering/** - New rendering spec directory
+  - Rendering architecture documentation
+  - Visual system specifications
+  - Sprite format definitions
+
+### Miscellaneous
+
+#### Dashboard Updates
+- **implementation.md** - Implementation channel updates
+- **testing.md** - Testing channel updates
+- **3d-prototype/** - 3D visualization experiments
+- **agents/autonomous-dev/dashboard/public/index.html** - Public dashboard index
+- **vite.config.ts** - Vite configuration updates
+- **main.ts** - Main entry point refinements
+
+### Summary
+
+Round 14 focused on implementing the Conservation of Game Matter principle for souls, creating comprehensive architecture planning documents, and enhancing the admin/text UI systems. The soul reincarnation system ensures no soul is ever deleted, with memory bleeds creating emergent multi-lifetime narratives. Architecture planning documents provide clear roadmaps for breaking up the monolithic core package and fixing critical architecture issues. New text-based UI components and animated sprites expand gameplay options and visual polish.
+
+**Stats:**
+- 80+ files modified/created
+- 4 new souls generated
+- 2 major planning documents (897 lines total)
+- 4 new component types
+- Animated campfire sprite with 4 frames
+- Cat sprite versioning system
+- Text adventure UI foundation
+
+---
+
 ## 2026-01-04 - Power Systems, Admin Architecture & Soul Sprites (Round 13)
 
 ### Architecture Proposals & Documentation

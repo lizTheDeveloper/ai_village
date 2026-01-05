@@ -181,6 +181,7 @@ export enum ComponentType {
   // Death, Afterlife & Souls
   DeathJudgment = 'death_judgment',
   DeathBargain = 'death_bargain',
+  Afterlife = 'afterlife',
   AfterlifeMemory = 'afterlife_memory',
   SoulWisdom = 'soul_wisdom',
   SoulIdentity = 'soul_identity',
@@ -190,6 +191,8 @@ export enum ComponentType {
   SoulLink = 'soul_link',
   SoulCreationEvent = 'soul_creation_event',
   RealmLocation = 'realm_location',
+  CurrentLifeMemory = 'current_life_memory',
+  VeilOfForgetting = 'veil_of_forgetting',
 
   // Television & Broadcasting
   TVContent = 'tv_content',

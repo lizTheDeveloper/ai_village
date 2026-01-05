@@ -9,6 +9,27 @@
 
 import { capabilityRegistry, defineCapability, defineQuery, defineAction, defineLink } from '../CapabilityRegistry.js';
 
+const METRICS_SERVER = 'http://localhost:8766';
+
+// Helper to make API calls to metrics server
+async function metricsApiCall(endpoint: string, options: RequestInit = {}): Promise<any> {
+  const url = `${METRICS_SERVER}${endpoint}`;
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`API error ${response.status}: ${text}`);
+  }
+
+  return response.json();
+}
+
 const mediaCapability = defineCapability({
   id: 'media',
   name: 'Media & Souls',
@@ -32,7 +53,12 @@ const mediaCapability = defineCapability({
       ],
       requiresGame: false,
       handler: async (params, gameClient, context) => {
-        return { message: 'Delegate to soul-repository/index.json' };
+        const data = await metricsApiCall('/api/souls');
+        return {
+          total: data.total || 0,
+          lastUpdated: data.lastUpdated,
+          souls: data.souls || [],
+        };
       },
     }),
 
@@ -141,33 +167,17 @@ const mediaCapability = defineCapability({
       id: 'soul-gallery',
       name: 'Soul Gallery',
       description: 'Eternal Archive of Reincarnated Souls - browse all souls and their sprites',
-      url: '/soul-gallery.html',
+      url: 'http://localhost:3000/soul-gallery.html',
       icon: '✦',
-      embeddable: true,
-    }),
-    defineLink({
-      id: 'soul-gallery-universe',
-      name: 'Soul Gallery (Universe)',
-      description: 'Souls for a specific universe',
-      url: '/soul-gallery.html?session={session}',
-      icon: '🌌',
-      embeddable: true,
+      embeddable: false,  // Link only - opens in new tab
     }),
     defineLink({
       id: 'interdimensional-cable',
       name: 'Interdimensional Cable',
       description: 'All TV recordings from infinite realities',
-      url: '/interdimensional-cable.html',
+      url: 'http://localhost:3000/interdimensional-cable.html',
       icon: '📺',
-      embeddable: true,
-    }),
-    defineLink({
-      id: 'cable-universe',
-      name: 'Interdimensional Cable (Universe)',
-      description: 'Recordings from a specific universe',
-      url: '/interdimensional-cable.html?session={session}',
-      icon: '📡',
-      embeddable: true,
+      embeddable: false,  // Link only - opens in new tab
     }),
   ],
 });

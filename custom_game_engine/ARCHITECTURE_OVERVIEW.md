@@ -13,6 +13,7 @@ This is part of a comprehensive documentation set located in `./custom_game_engi
 - **[./SYSTEMS_CATALOG.md](./SYSTEMS_CATALOG.md)** - Complete reference of all 212+ systems
 - **[./COMPONENTS_REFERENCE.md](./COMPONENTS_REFERENCE.md)** - All 125+ component specifications
 - **[./METASYSTEMS_GUIDE.md](./METASYSTEMS_GUIDE.md)** - Deep dives into major metasystems
+- **[./packages/renderer/README.md](./packages/renderer/README.md)** - Renderer architecture and visual systems
 
 For implementation status and roadmap, see:
 - **[../MASTER_ROADMAP.md](../MASTER_ROADMAP.md)** - Project roadmap and phase tracking
@@ -476,6 +477,8 @@ World state → GameRenderer → Canvas context
                 ↓
         UI Overlays (health bars, context menus, HUD)
 ```
+
+**📖 See [Renderer Documentation](packages/renderer/README.md)** for complete rendering architecture, visual systems, and data flow details.
 
 ### World Generation Integration
 

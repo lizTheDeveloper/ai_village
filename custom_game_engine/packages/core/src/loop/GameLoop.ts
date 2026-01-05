@@ -1,6 +1,7 @@
 import type { World, WorldMutator } from '../ecs/World.js';
 import type { ISystemRegistry } from '../ecs/SystemRegistry.js';
 import type { IActionQueue } from '../actions/ActionQueue.js';
+import type { Entity } from '../ecs/Entity.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { WorldImpl } from '../ecs/World.js';
 import { SystemRegistry } from '../ecs/SystemRegistry.js';
@@ -37,6 +38,10 @@ export class GameLoop {
   private tickCount = 0;
   private avgTickTime = 0;
   private maxTickTime = 0;
+
+  // Query cache - invalidated when archetypeVersion changes
+  private queryCache = new Map<string, ReadonlyArray<Entity>>();
+  private lastArchetypeVersion = -1;
 
   // Universe tracking for timeline management
   private _universeId: string = 'default';
@@ -184,21 +189,36 @@ export class GameLoop {
     const systems = this._systemRegistry.getSorted();
     const systemTimings: Array<{ id: string; time: number }> = [];
 
+    // Check if archetype changed - invalidate query cache if so
+    const currentArchetypeVersion = this._world.archetypeVersion;
+    if (currentArchetypeVersion !== this.lastArchetypeVersion) {
+      this.queryCache.clear();
+      this.lastArchetypeVersion = currentArchetypeVersion;
+    }
+
     // Execute each system
     for (const system of systems) {
       const systemStart = performance.now();
 
       try {
-        // Get entities that match this system's requirements
-        let entities;
+        // Get entities that match this system's requirements (cached)
+        let entities: ReadonlyArray<Entity>;
         if (system.requiredComponents.length === 0) {
           entities = [];
         } else {
-          const query = this._world.query();
-          for (const componentType of system.requiredComponents) {
-            query.with(componentType);
+          // Check cache first
+          const cached = this.queryCache.get(system.id);
+          if (cached !== undefined) {
+            entities = cached;
+          } else {
+            // Build query and cache result
+            const query = this._world.query();
+            for (const componentType of system.requiredComponents) {
+              query.with(componentType);
+            }
+            entities = query.executeEntities();
+            this.queryCache.set(system.id, entities);
           }
-          entities = query.executeEntities();
         }
 
         // Update system
