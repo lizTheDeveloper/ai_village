@@ -49,7 +49,8 @@ export type ResearchField =
   | 'narrative_magic'        // Plot holes, metafiction, story-based reality manipulation
   | 'wild_magic'             // Chaos navigation, entropy manipulation, reality breaks
   | 'song_magic'             // Harmonic resonance, frequency travel, musical portals
-  | 'academic_magic';        // Theoretical reality manipulation, spell theory, magical physics
+  | 'academic_magic'         // Theoretical reality manipulation, spell theory, magical physics
+  | 'experimental';          // Clarketech, advanced weapons, exotic physics applications
 
 export type AgeCategory = 'child' | 'teen' | 'adult' | 'elder';
 
@@ -103,7 +104,9 @@ export type TechnologyUnlock =
   | { type: 'item'; itemId: string }
   | { type: 'ability'; abilityId: string }
   | { type: 'spell'; spellId: string }
-  | { type: 'herb'; herbId: string };
+  | { type: 'herb'; herbId: string }
+  | { type: 'knowledge'; knowledgeId: string }
+  | { type: 'research'; researchId: string };
 
 export interface ResearchSet {
   setId: string;

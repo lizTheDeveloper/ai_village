@@ -8,6 +8,7 @@
  */
 
 import type { GameLoop } from '../loop/GameLoop.js';
+import type { System } from '../ecs/System.js';
 
 // Time & Environment
 import { TimeSystem } from './TimeSystem.js';
@@ -33,6 +34,9 @@ import { UpliftCandidateDetectionSystem } from '../uplift/UpliftCandidateDetecti
 import { ProtoSapienceObservationSystem } from '../uplift/ProtoSapienceObservationSystem.js';
 import { ConsciousnessEmergenceSystem } from '../uplift/ConsciousnessEmergenceSystem.js';
 import { UpliftBreedingProgramSystem } from '../uplift/UpliftBreedingProgramSystem.js';
+
+// Rendering
+import { AnimationSystem } from './AnimationSystem.js';
 
 // Agent Core
 import { AgentBrainSystem } from './AgentBrainSystem.js';
@@ -62,6 +66,8 @@ import { RelationshipConversationSystem } from './RelationshipConversationSystem
 // import { FriendshipSystem } from './FriendshipSystem.js'; // TODO: Enable after RelationshipConversationSystem tested
 // import { InterestEvolutionSystem } from './InterestEvolutionSystem.js';
 import { CrossRealmPhoneSystem } from './CrossRealmPhoneSystem.js';
+import { CellPhoneSystem } from '../communication/CellPhoneSystem.js';
+import { RadioBroadcastingSystem } from '../radio/RadioBroadcastingSystem.js';
 
 // Exploration & Navigation
 import { ExplorationSystem } from './ExplorationSystem.js';
@@ -102,6 +108,11 @@ import { ExperimentationSystem } from './ExperimentationSystem.js';
 // Research
 import { ResearchSystem } from './ResearchSystem.js';
 import { AcademicPaperSystem } from '../research/AcademicPaperSystem.js';
+import { CookInfluencerSystem } from '../research/CookInfluencerSystem.js';
+import { HerbalistDiscoverySystem } from '../research/HerbalistDiscoverySystem.js';
+import { InventorFameSystem } from '../research/InventorFameSystem.js';
+import { PublicationSystem } from '../research/PublicationSystem.js';
+import { ChroniclerSystem } from '../research/ChroniclerSystem.js';
 
 // Publishing & Knowledge Infrastructure
 import { LibrarySystem } from './LibrarySystem.js';
@@ -117,12 +128,32 @@ import { EventReportingSystem } from './EventReportingSystem.js';
 
 // Television & Media
 import { GameShowSystem } from '../television/formats/GameShowSystem.js';
+import { NewsroomSystem } from '../television/formats/NewsroomSystem.js';
 import { SoapOperaSystem } from '../television/formats/SoapOperaSystem.js';
+import { TalkShowSystem } from '../television/formats/TalkShowSystem.js';
+// import { CastingSystem } from '../television/production/CastingSystem.js'; // TODO: Not a System class
+import { TVWritingSystem } from '../television/systems/TVWritingSystem.js';
 import { TVDevelopmentSystem } from '../television/systems/TVDevelopmentSystem.js';
+import { TVProductionSystem } from '../television/systems/TVProductionSystem.js';
 import { TVPostProductionSystem } from '../television/systems/TVPostProductionSystem.js';
+import { TVBroadcastingSystem } from '../television/systems/TVBroadcastingSystem.js';
+import { TVRatingsSystem } from '../television/systems/TVRatingsSystem.js';
+import { TVCulturalImpactSystem } from '../television/systems/TVCulturalImpactSystem.js';
+import { TVArchiveSystem } from '../television/systems/TVArchiveSystem.js';
+import { TVAdvertisingSystem } from '../television/systems/TVAdvertisingSystem.js';
+
+// Plot & Narrative
+import { PlotAssignmentSystem } from '../plot/PlotAssignmentSystem.js';
+import { PlotProgressionSystem } from '../plot/PlotProgressionSystem.js';
+import { NarrativePressureSystem } from '../narrative/NarrativePressureSystem.js';
+
+// Consciousness
+import { HiveMindSystem } from '../consciousness/HiveMindSystem.js';
+import { PackMindSystem } from '../consciousness/PackMindSystem.js';
 
 // Magic
 import { MagicSystem } from './MagicSystem.js';
+// import { MagicDetectionSystem } from '../magic/MagicDetectionSystem.js'; // TODO: Not a System class, utility functions only
 
 // Idle & Goals
 import { IdleBehaviorSystem } from './IdleBehaviorSystem.js';
@@ -138,6 +169,8 @@ import { PrayerAnsweringSystem } from './PrayerAnsweringSystem.js';
 import { MythGenerationSystem } from './MythGenerationSystem.js';
 import { ChatRoomSystem } from '../communication/ChatRoomSystem.js';
 import { CompanionSystem } from './CompanionSystem.js';
+// import { AttributionSystem } from '../divinity/AttributionSystem.js'; // TODO: Not a System class, utility functions only
+import { VisionDeliverySystem } from '../divinity/VisionDeliverySystem.js';
 
 // Divinity - Institutions
 import { TempleSystem } from './TempleSystem.js';
@@ -180,8 +213,16 @@ import { CourtshipSystem } from './CourtshipSystem.js';
 import { MidwiferySystem } from '../reproduction/midwifery/MidwiferySystem.js';
 import { ParentingSystem } from './ParentingSystem.js';
 import { ParasiticReproductionSystem } from '../reproduction/parasitic/ParasiticReproductionSystem.js';
+import { ColonizationSystem } from '../reproduction/parasitic/ColonizationSystem.js';
 // TODO: Fix incomplete implementation before enabling
 // import { JealousySystem } from './JealousySystem.js';
+
+// Neural & Tech
+import { NeuralInterfaceSystem } from '../neural/NeuralInterfaceSystem.js';
+import { VRTrainingSystem } from '../neural/VRTrainingSystem.js';
+
+// Communication (additional systems)
+import { WalkieTalkieSystem } from '../communication/WalkieTalkieSystem.js';
 
 // Combat & Security
 import { AgentCombatSystem } from './AgentCombatSystem.js';
@@ -208,7 +249,18 @@ import { AncestorTransformationSystem } from './AncestorTransformationSystem.js'
 import { ReincarnationSystem } from './ReincarnationSystem.js';
 import { SoulCreationSystem } from './SoulCreationSystem.js';
 import { PixelLabSpriteGenerationSystem } from './PixelLabSpriteGenerationSystem.js';
+import { SoulConsolidationSystem } from '../soul/SoulConsolidationSystem.js';
 // SoulRepositorySystem uses Node.js APIs (fs, path) - imported dynamically below
+
+// Clarketech
+import { ClarketechSystem } from '../clarketech/ClarketechSystem.js';
+
+// Apps & Artifacts
+import { AppSystem } from '../apps/AppSystem.js';
+import { ArtifactSystem } from '../items/ArtifactSystem.js';
+
+// Decision Systems
+import { AutonomicSystem } from '../decision/AutonomicSystem.js';
 
 // Governance & Metrics
 import { GovernanceDataSystem } from './GovernanceDataSystem.js';
@@ -274,6 +326,12 @@ export function registerAllSystems(
   const { llmQueue, promptBuilder, gameSessionId, metricsServerUrl, enableMetrics = true, enableAutoSave = true } = config;
   const eventBus = gameLoop.world.eventBus;
 
+  // Helper to register a system in disabled state (uses the system's actual id)
+  const registerDisabled = (system: System) => {
+    gameLoop.systemRegistry.register(system);
+    gameLoop.systemRegistry.disable(system.id);
+  };
+
   // ============================================================================
   // TIME & ENVIRONMENT
   // ============================================================================
@@ -283,6 +341,11 @@ export function registerAllSystems(
 
   const soilSystem = new SoilSystem();
   gameLoop.systemRegistry.register(soilSystem);
+
+  // ============================================================================
+  // RENDERING
+  // ============================================================================
+  gameLoop.systemRegistry.register(new AnimationSystem());
 
   // ============================================================================
   // PLANTS
@@ -307,10 +370,11 @@ export function registerAllSystems(
   // ============================================================================
   // UPLIFT (Animal Consciousness Emergence)
   // ============================================================================
-  gameLoop.systemRegistry.register(new UpliftCandidateDetectionSystem());
-  gameLoop.systemRegistry.register(new ProtoSapienceObservationSystem());
-  gameLoop.systemRegistry.register(new ConsciousnessEmergenceSystem());
-  gameLoop.systemRegistry.register(new UpliftBreedingProgramSystem());
+  // Tech requirement: consciousness_studies (research lab + biology research)
+  registerDisabled(new UpliftCandidateDetectionSystem());
+  registerDisabled(new ProtoSapienceObservationSystem());
+  registerDisabled(new ConsciousnessEmergenceSystem());
+  registerDisabled(new UpliftBreedingProgramSystem());
 
   // ============================================================================
   // AGENT CORE
@@ -359,6 +423,9 @@ export function registerAllSystems(
 
   // Cross-realm communication
   gameLoop.systemRegistry.register(new CrossRealmPhoneSystem());
+  gameLoop.systemRegistry.register(new CellPhoneSystem());
+  gameLoop.systemRegistry.register(new WalkieTalkieSystem());
+  gameLoop.systemRegistry.register(new RadioBroadcastingSystem());
 
   // ============================================================================
   // EXPLORATION & NAVIGATION
@@ -372,7 +439,9 @@ export function registerAllSystems(
   // ============================================================================
   // VIRTUAL REALITY
   // ============================================================================
+  // Tech requirement: vr_headset (requires neural_interface research)
   gameLoop.systemRegistry.register(new VRSystem());
+  gameLoop.systemRegistry.disable('vr_system');
 
   // ============================================================================
   // BUILDING & CONSTRUCTION
@@ -428,13 +497,19 @@ export function registerAllSystems(
   academicPaperSystem.initialize(gameLoop.world, eventBus);
   gameLoop.systemRegistry.register(academicPaperSystem);
 
+  gameLoop.systemRegistry.register(new CookInfluencerSystem());
+  gameLoop.systemRegistry.register(new HerbalistDiscoverySystem());
+  gameLoop.systemRegistry.register(new InventorFameSystem());
+  gameLoop.systemRegistry.register(new PublicationSystem());
+  gameLoop.systemRegistry.register(new ChroniclerSystem());
+
   // ============================================================================
   // PUBLISHING & KNOWLEDGE INFRASTRUCTURE
   // ============================================================================
   const publishingUnlockSystem = new PublishingUnlockSystem(eventBus);
   gameLoop.systemRegistry.register(publishingUnlockSystem);
 
-  const technologyUnlockSystem = new TechnologyUnlockSystem(eventBus);
+  const technologyUnlockSystem = new TechnologyUnlockSystem(eventBus, gameLoop.systemRegistry);
   gameLoop.systemRegistry.register(technologyUnlockSystem);
 
   const cityBuildingGenerationSystem = new CityBuildingGenerationSystem(eventBus);
@@ -467,6 +542,7 @@ export function registerAllSystems(
   // ============================================================================
   const magicSystem = new MagicSystem();
   gameLoop.systemRegistry.register(magicSystem);
+  // gameLoop.systemRegistry.register(new MagicDetectionSystem()); // TODO: Not a System class
 
   // ============================================================================
   // BODY & REPRODUCTION
@@ -477,8 +553,18 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new CourtshipSystem());
   gameLoop.systemRegistry.register(new MidwiferySystem());
   gameLoop.systemRegistry.register(new ParentingSystem());
+  // Tech requirement: parasitic_biology (requires advanced biology research)
+  registerDisabled(new ParasiticReproductionSystem());
+  gameLoop.systemRegistry.register(new ColonizationSystem());
   // TODO: Fix incomplete implementation before enabling
   // gameLoop.systemRegistry.register(new JealousySystem());
+
+  // ============================================================================
+  // NEURAL & TECH
+  // ============================================================================
+  // Tech requirement: neural_interface_lab (requires neuroscience research)
+  registerDisabled(new NeuralInterfaceSystem());
+  registerDisabled(new VRTrainingSystem());
 
   // ============================================================================
   // DIVINITY - CORE
@@ -496,11 +582,15 @@ export function registerAllSystems(
   // MythGenerationSystem requires llmQueue, so skip if not provided
 
   // Chat Rooms - General chat system (DMs, group chats, divine chat, etc.)
+  // Note: ChatRoomSystem replaces the deprecated DivineChatSystem
   const chatRoomSystem = new ChatRoomSystem();
   gameLoop.systemRegistry.register(chatRoomSystem);
 
   // Companion System - Ophanim tutorial/emotional companion
   gameLoop.systemRegistry.register(new CompanionSystem());
+
+  // gameLoop.systemRegistry.register(new AttributionSystem()); // TODO: Not a System class
+  // gameLoop.systemRegistry.register(new VisionDeliverySystem()); // TODO: Not a System class, requires constructor args
 
   // ============================================================================
   // DIVINITY - INSTITUTIONS
@@ -568,6 +658,7 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new PassageSystem());
   gameLoop.systemRegistry.register(new PortalSystem());
   gameLoop.systemRegistry.register(new RealmTimeSystem());
+  // RealmManager registered below with variable (line 666)
   gameLoop.systemRegistry.register(new DeathJudgmentSystem());
 
   // Death Bargain System - hero challenges to cheat death
@@ -590,6 +681,9 @@ export function registerAllSystems(
 
   // PixelLab sprite generation for newborn souls
   gameLoop.systemRegistry.register(new PixelLabSpriteGenerationSystem());
+
+  // Soul Consolidation (merge soul memories after death)
+  gameLoop.systemRegistry.register(new SoulConsolidationSystem());
 
   // Soul Repository (persistent backup of all souls)
   // Only register in Node.js environment (uses fs, path, process.cwd)
@@ -616,16 +710,60 @@ export function registerAllSystems(
   // ============================================================================
   // TELEVISION & MEDIA
   // ============================================================================
-  gameLoop.systemRegistry.register(new GameShowSystem());
-  gameLoop.systemRegistry.register(new SoapOperaSystem());
-  gameLoop.systemRegistry.register(new TVDevelopmentSystem());
-  gameLoop.systemRegistry.register(new TVPostProductionSystem());
+  // Tech requirement: television_station (requires broadcasting technology)
+  // TV Show Formats
+  registerDisabled(new GameShowSystem());
+  registerDisabled(new NewsroomSystem());
+  registerDisabled(new SoapOperaSystem());
+  registerDisabled(new TalkShowSystem());
+
+  // TV Production Pipeline
+  // gameLoop.systemRegistry.register(new CastingSystem()); // TODO: Not a System class
+  registerDisabled(new TVWritingSystem());
+  registerDisabled(new TVDevelopmentSystem());
+  registerDisabled(new TVProductionSystem());
+  registerDisabled(new TVPostProductionSystem());
+  registerDisabled(new TVBroadcastingSystem());
+  registerDisabled(new TVRatingsSystem());
+  registerDisabled(new TVCulturalImpactSystem());
+  registerDisabled(new TVArchiveSystem());
+  registerDisabled(new TVAdvertisingSystem());
+
+  // ============================================================================
+  // PLOT & NARRATIVE
+  // ============================================================================
+  // Tech requirement: library or university (requires storytelling/literature)
+  registerDisabled(new PlotAssignmentSystem());
+  registerDisabled(new PlotProgressionSystem());
+  registerDisabled(new NarrativePressureSystem());
+
+  // ============================================================================
+  // CONSCIOUSNESS (Collective Minds)
+  // ============================================================================
+  gameLoop.systemRegistry.register(new HiveMindSystem());
+  gameLoop.systemRegistry.register(new PackMindSystem());
 
   // ============================================================================
   // AUTOMATION & FACTORIES (Phase 38)
   // ============================================================================
   // Factory automation systems already registered above (lines 342-349)
   // Systems: PowerGrid, Belt, DirectConnection, Assembly, FactoryAI, OffScreen
+
+  // ============================================================================
+  // CLARKETECH
+  // ============================================================================
+  gameLoop.systemRegistry.register(new ClarketechSystem());
+
+  // ============================================================================
+  // APPS & ARTIFACTS
+  // ============================================================================
+  gameLoop.systemRegistry.register(new AppSystem());
+  // gameLoop.systemRegistry.register(new ArtifactSystem()); // TODO: Fix compilation errors - missing System interface implementation
+
+  // ============================================================================
+  // DECISION SYSTEMS
+  // ============================================================================
+  // gameLoop.systemRegistry.register(new AutonomicSystem()); // TODO: Not a System class, utility class only
 
   // ============================================================================
   // GOVERNANCE

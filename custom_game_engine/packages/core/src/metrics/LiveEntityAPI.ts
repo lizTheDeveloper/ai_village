@@ -12,6 +12,8 @@ import type { Entity } from '../ecs/Entity.js';
 import type { MetricsStreamClient, QueryRequest, QueryResponse, ActionRequest, ActionResponse } from './MetricsStreamClient.js';
 import { pendingApprovalRegistry } from '../crafting/PendingApprovalRegistry.js';
 import { spawnCity, getCityTemplates, type CitySpawnConfig } from '../city/CitySpawner.js';
+import { createLLMAgent, createWanderingAgent } from '@ai-village/world';
+import { DeityComponent } from '../components/DeityComponent.js';
 
 /**
  * Interface for the prompt builder (from @ai-village/llm)
@@ -111,6 +113,26 @@ export class LiveEntityAPI {
         return this.handleSetSkill(action);
       case 'spawn-entity':
         return this.handleSpawnEntity(action);
+      case 'spawn-agent':
+        return this.handleSpawnAgent(action);
+      case 'teleport':
+        return this.handleTeleport(action);
+      case 'set-need':
+        return this.handleSetNeed(action);
+      case 'give-item':
+        return this.handleGiveItem(action);
+      case 'trigger-behavior':
+        return this.handleTriggerBehavior(action);
+      case 'set-speed':
+        return this.handleSetSpeed(action);
+      case 'pause':
+        return this.handlePause(action);
+      case 'grant-spell':
+        return this.handleGrantSpell(action);
+      case 'add-belief':
+        return this.handleAddBelief(action);
+      case 'create-deity':
+        return this.handleCreateDeity(action);
       case 'spawn-city':
         return await this.handleSpawnCity(action);
       case 'list-city-templates':
@@ -335,6 +357,542 @@ export class LiveEntityAPI {
       success: true,
       data: { templates },
     };
+  }
+
+  /**
+   * Spawn an agent at the specified location
+   */
+  private handleSpawnAgent(action: ActionRequest): ActionResponse {
+    const { name, x, y, useLLM, speed, believedDeity } = action.params;
+
+    if (typeof x !== 'number' || typeof y !== 'number') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid x, y parameters',
+      };
+    }
+
+    const agentSpeed = typeof speed === 'number' ? speed : 2.0;
+    const shouldUseLLM = typeof useLLM === 'boolean' ? useLLM : false;
+    const options = believedDeity && typeof believedDeity === 'string' ? { believedDeity } : undefined;
+
+    try {
+      const agentId = shouldUseLLM
+        ? createLLMAgent(this.world as any, x, y, agentSpeed, undefined, options)
+        : createWanderingAgent(this.world as any, x, y, agentSpeed, options);
+
+      // Optionally set the agent's name if provided
+      if (name && typeof name === 'string') {
+        const entity = this.world.getEntity(agentId);
+        if (entity) {
+          const identity = entity.components.get('identity') as { name?: string } | undefined;
+          if (identity) {
+            identity.name = name;
+          }
+        }
+      }
+
+      return {
+        requestId: action.requestId,
+        success: true,
+        data: { agentId, x, y, useLLM: shouldUseLLM },
+      };
+    } catch (error) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to spawn agent',
+      };
+    }
+  }
+
+  /**
+   * Teleport an agent to a new location
+   */
+  private handleTeleport(action: ActionRequest): ActionResponse {
+    const { agentId, x, y } = action.params;
+
+    if (!agentId || typeof agentId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid agentId parameter',
+      };
+    }
+
+    if (typeof x !== 'number' || typeof y !== 'number') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid x, y parameters',
+      };
+    }
+
+    const entity = this.world.getEntity(agentId);
+    if (!entity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity not found: ${agentId}`,
+      };
+    }
+
+    const position = entity.components.get('position') as { x?: number; y?: number } | undefined;
+    if (!position) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${agentId} does not have a position component`,
+      };
+    }
+
+    // Update position
+    position.x = x;
+    position.y = y;
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { agentId, x, y },
+    };
+  }
+
+  /**
+   * Set an agent's need value
+   */
+  private handleSetNeed(action: ActionRequest): ActionResponse {
+    const { agentId, need, value } = action.params;
+
+    if (!agentId || typeof agentId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid agentId parameter',
+      };
+    }
+
+    if (!need || typeof need !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid need parameter',
+      };
+    }
+
+    if (typeof value !== 'number') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid value parameter',
+      };
+    }
+
+    const entity = this.world.getEntity(agentId);
+    if (!entity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity not found: ${agentId}`,
+      };
+    }
+
+    const needs = entity.components.get('needs') as Record<string, any> | undefined;
+    if (!needs) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${agentId} does not have needs component`,
+      };
+    }
+
+    // Validate need type
+    const validNeeds = ['hunger', 'energy', 'health', 'thirst'];
+    if (!validNeeds.includes(need)) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Invalid need type. Must be one of: ${validNeeds.join(', ')}`,
+      };
+    }
+
+    // Clamp value to 0-1 range (needs are 0-1 scale)
+    const clampedValue = Math.max(0, Math.min(1, value));
+
+    // Set the need value
+    needs[need] = clampedValue;
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { agentId, need, value: clampedValue },
+    };
+  }
+
+  /**
+   * Give an item to an agent's inventory
+   */
+  private handleGiveItem(action: ActionRequest): ActionResponse {
+    const { agentId, itemType, amount } = action.params;
+
+    if (!agentId || typeof agentId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid agentId parameter',
+      };
+    }
+
+    if (!itemType || typeof itemType !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid itemType parameter',
+      };
+    }
+
+    const itemAmount = typeof amount === 'number' ? amount : 1;
+
+    const entity = this.world.getEntity(agentId);
+    if (!entity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity not found: ${agentId}`,
+      };
+    }
+
+    const inventory = entity.components.get('inventory') as {
+      slots: Array<{ itemId: string; quantity: number } | null>;
+      maxSlots: number;
+    } | undefined;
+
+    if (!inventory) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${agentId} does not have inventory component`,
+      };
+    }
+
+    // Find existing stack or empty slot
+    let slotIndex = -1;
+    for (let i = 0; i < inventory.slots.length; i++) {
+      const slot = inventory.slots[i];
+      if (slot && slot.itemId === itemType) {
+        // Found existing stack
+        slotIndex = i;
+        break;
+      } else if (!slot && slotIndex === -1) {
+        // Found empty slot
+        slotIndex = i;
+      }
+    }
+
+    if (slotIndex === -1) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Inventory is full',
+      };
+    }
+
+    // Add to inventory
+    if (inventory.slots[slotIndex]) {
+      inventory.slots[slotIndex]!.quantity += itemAmount;
+    } else {
+      inventory.slots[slotIndex] = { itemId: itemType, quantity: itemAmount };
+    }
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { agentId, itemType, amount: itemAmount },
+    };
+  }
+
+  /**
+   * Trigger a specific behavior on an agent
+   */
+  private handleTriggerBehavior(action: ActionRequest): ActionResponse {
+    const { agentId, behavior } = action.params;
+
+    if (!agentId || typeof agentId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid agentId parameter',
+      };
+    }
+
+    if (!behavior || typeof behavior !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid behavior parameter',
+      };
+    }
+
+    const entity = this.world.getEntity(agentId);
+    if (!entity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity not found: ${agentId}`,
+      };
+    }
+
+    const agent = entity.components.get('agent') as { currentBehavior?: string } | undefined;
+    if (!agent) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${agentId} is not an agent`,
+      };
+    }
+
+    // Set the behavior
+    agent.currentBehavior = behavior;
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { agentId, behavior },
+    };
+  }
+
+  /**
+   * Set game speed multiplier
+   */
+  private handleSetSpeed(action: ActionRequest): ActionResponse {
+    const { speed } = action.params;
+
+    if (typeof speed !== 'number') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid speed parameter',
+      };
+    }
+
+    if (speed < 0.1 || speed > 10) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Speed must be between 0.1 and 10.0',
+      };
+    }
+
+    // Access speed multiplier on world (if exists)
+    const worldAny = this.world as any;
+    if (worldAny.speedMultiplier !== undefined) {
+      worldAny.speedMultiplier = speed;
+    }
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { speed },
+    };
+  }
+
+  /**
+   * Pause or resume the game
+   */
+  private handlePause(action: ActionRequest): ActionResponse {
+    const { paused } = action.params;
+
+    if (typeof paused !== 'boolean') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid paused parameter (must be boolean)',
+      };
+    }
+
+    // Access paused state on world (if exists)
+    const worldAny = this.world as any;
+    if (worldAny.paused !== undefined) {
+      worldAny.paused = paused;
+    }
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { paused },
+    };
+  }
+
+  /**
+   * Grant a spell to an agent
+   */
+  private handleGrantSpell(action: ActionRequest): ActionResponse {
+    const { agentId, spellId } = action.params;
+
+    if (!agentId || typeof agentId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid agentId parameter',
+      };
+    }
+
+    if (!spellId || typeof spellId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid spellId parameter',
+      };
+    }
+
+    const entity = this.world.getEntity(agentId);
+    if (!entity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity not found: ${agentId}`,
+      };
+    }
+
+    const magic = entity.components.get('magic') as {
+      knownSpells?: Array<{ spellId: string }>;
+    } | undefined;
+
+    if (!magic) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${agentId} does not have magic component`,
+      };
+    }
+
+    if (!magic.knownSpells) {
+      magic.knownSpells = [];
+    }
+
+    // Check if already known
+    if (magic.knownSpells.some((s) => s.spellId === spellId)) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Agent already knows spell: ${spellId}`,
+      };
+    }
+
+    // Add spell
+    magic.knownSpells.push({ spellId });
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: { agentId, spellId },
+    };
+  }
+
+  /**
+   * Add belief points to a deity
+   */
+  private handleAddBelief(action: ActionRequest): ActionResponse {
+    const { deityId, amount } = action.params;
+
+    if (!deityId || typeof deityId !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid deityId parameter',
+      };
+    }
+
+    if (typeof amount !== 'number') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid amount parameter',
+      };
+    }
+
+    const entity = this.world.getEntity(deityId);
+    if (!entity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity not found: ${deityId}`,
+      };
+    }
+
+    const deity = entity.components.get('deity') as {
+      belief?: { currentBelief?: number; totalBeliefEarned?: number };
+    } | undefined;
+
+    if (!deity) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: `Entity ${deityId} is not a deity`,
+      };
+    }
+
+    if (!deity.belief) {
+      deity.belief = { currentBelief: 0, totalBeliefEarned: 0 };
+    }
+
+    // Add belief
+    const currentBefore = deity.belief.currentBelief || 0;
+    deity.belief.currentBelief = currentBefore + amount;
+    deity.belief.totalBeliefEarned = (deity.belief.totalBeliefEarned || 0) + amount;
+
+    return {
+      requestId: action.requestId,
+      success: true,
+      data: {
+        deityId,
+        amount,
+        newTotal: deity.belief.currentBelief,
+      },
+    };
+  }
+
+  /**
+   * Create a new deity entity
+   */
+  private handleCreateDeity(action: ActionRequest): ActionResponse {
+    const { name, controller } = action.params;
+
+    if (!name || typeof name !== 'string') {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: 'Missing or invalid name parameter',
+      };
+    }
+
+    const deityController = (controller === 'player' || controller === 'ai' || controller === 'dormant')
+      ? controller
+      : 'dormant';
+
+    try {
+      // Create deity entity
+      const deityEntity = this.world.createEntity();
+      const deityComponent = new DeityComponent(name, deityController);
+      // Use WorldMutator's addComponent since Entity interface is read-only
+      (this.world as any).addComponent(deityEntity.id, deityComponent);
+
+      return {
+        requestId: action.requestId,
+        success: true,
+        data: {
+          deityId: deityEntity.id,
+          name,
+          controller: deityController,
+        },
+      };
+    } catch (error) {
+      return {
+        requestId: action.requestId,
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to create deity',
+      };
+    }
   }
 
   /**
@@ -1223,5 +1781,88 @@ export class LiveEntityAPI {
       success: true,
       data: responseData,
     };
+  }
+
+  /**
+   * Get terrain data for 3D visualization
+   * Returns tile data for a rectangular area around given coordinates
+   */
+  private handleTerrainQuery(query: QueryRequest): QueryResponse {
+    try {
+      // Parse query params - default to getting terrain around entity positions
+      const params = query.entityId ? JSON.parse(query.entityId) : {};
+      const centerX = typeof params.x === 'number' ? params.x : 0;
+      const centerY = typeof params.y === 'number' ? params.y : 0;
+      const radius = typeof params.radius === 'number' ? Math.min(params.radius, 100) : 50;
+
+      // Access chunk manager via world
+      const worldAny = this.world as unknown as {
+        getTileAt?: (x: number, y: number) => unknown;
+        getChunkManager?: () => unknown;
+      };
+
+      if (!worldAny.getTileAt) {
+        return {
+          requestId: query.requestId,
+          success: false,
+          error: 'World does not support tile access',
+        };
+      }
+
+      // Collect terrain data for the area
+      const tiles: Array<{
+        x: number;
+        y: number;
+        terrain: string;
+        elevation: number;
+        biome?: string;
+        wall?: { material: string };
+      }> = [];
+
+      const minX = Math.floor(centerX - radius);
+      const maxX = Math.ceil(centerX + radius);
+      const minY = Math.floor(centerY - radius);
+      const maxY = Math.ceil(centerY + radius);
+
+      for (let x = minX; x <= maxX; x++) {
+        for (let y = minY; y <= maxY; y++) {
+          const tile = worldAny.getTileAt(x, y) as {
+            terrain?: string;
+            elevation?: number;
+            biome?: string;
+            wall?: { material?: string };
+          } | undefined;
+
+          if (tile) {
+            tiles.push({
+              x,
+              y,
+              terrain: tile.terrain || 'grass',
+              elevation: tile.elevation || 0,
+              biome: tile.biome,
+              wall: tile.wall ? { material: tile.wall.material || 'stone' } : undefined,
+            });
+          }
+        }
+      }
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: {
+          centerX,
+          centerY,
+          radius,
+          tileCount: tiles.length,
+          tiles,
+        },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query terrain',
+      };
+    }
   }
 }

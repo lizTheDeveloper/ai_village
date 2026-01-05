@@ -1,7 +1,7 @@
 # Systems Catalog
 
-> **Last Updated:** 2026-01-02
-> **Purpose:** Complete reference of all 212+ game systems
+> **Last Updated:** 2026-01-04
+> **Purpose:** Complete reference of all 211+ game systems
 
 ## Overview
 
@@ -100,20 +100,6 @@ This document catalogs every system in the game engine. Systems are organized by
 - Nutrient decay over time
 - Rain replenishment
 - Tilling effects on fertility
-
----
-
-### CircadianSystem
-**Purpose:** Agent circadian rhythms (sleep/wake cycle)
-**Components:** `circadian`, `agent`, `needs`
-**Priority:** 30
-**File:** `systems/CircadianSystem.ts`
-
-**Responsibilities:**
-- Track circadian phase
-- Generate sleep pressure
-- Morning alertness, evening drowsiness
-- Jet lag simulation
 
 ---
 
@@ -362,16 +348,19 @@ This document catalogs every system in the game engine. Systems are organized by
 ---
 
 ### SleepSystem
-**Purpose:** Handle sleeping agents
-**Components:** `agent`, `needs`, `behavior`
+**Purpose:** Manage agent sleep behavior, energy recovery, and circadian rhythms
+**Components:** `agent`, `needs`, `behavior`, `circadian`
 **Priority:** 115
 **File:** `systems/SleepSystem.ts`
 
 **Responsibilities:**
-- Detect sleep behavior
+- Update sleep drive based on time awake/asleep (circadian rhythm)
 - Restore energy while sleeping
+- Apply sleep quality modifiers
+- Generate dreams from recent memories
 - Wake up when energy full or interrupted
 - Sleep location (bed vs ground)
+- Track circadian phase (morning alertness, evening drowsiness)
 
 ---
 

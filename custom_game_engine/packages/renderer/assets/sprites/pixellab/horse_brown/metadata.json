@@ -1,18 +1,7 @@
 {
   "id": "horse_brown",
-  "base_species": "horse",
-  "variant": "brown",
-  "description": "brown horse",
-  "size": 64,
-  "directions": [
-    "south",
-    "southwest",
-    "west",
-    "northwest",
-    "north",
-    "northeast",
-    "east",
-    "southeast"
-  ],
-  "generated_at": "2026-01-04T00:04:31.536Z"
+  "category": "animals.working",
+  "size": 32,
+  "description": "Brown working horse, muscular build, flowing mane and tail, standing pose, top-down",
+  "generated_at": "2026-01-04T21:24:41.072Z"
 }

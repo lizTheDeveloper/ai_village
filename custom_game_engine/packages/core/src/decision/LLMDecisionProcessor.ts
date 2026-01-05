@@ -79,7 +79,7 @@ function actionObjectToBehavior(action: ParsedAction): { behavior: AgentBehavior
       }
       return { behavior: 'gather', behaviorState };
     case 'build':
-      behaviorState.buildingType = action.building || BuildingType.LeanTo;
+      behaviorState.buildingType = action.building || BuildingType.Campfire;
       return { behavior: 'build', behaviorState };
     case 'craft':
       behaviorState.recipeId = action.recipe || action.target || 'wood_plank';

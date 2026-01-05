@@ -62,14 +62,17 @@ export interface Zone {
  * Mapping of zone types to compatible building types.
  * Buildings in matching zones get a large placement bonus.
  * Buildings in non-matching zones get a penalty (but not forbidden).
+ *
+ * NOTE: Multi-tile buildings (barns, houses, etc.) now use TileBasedBlueprintRegistry.
+ * This only maps single-tile furniture and workstations.
  */
 export const ZONE_BUILDING_AFFINITY: Record<ZoneType, readonly BuildingType[]> = {
-  farming: [BT.Well, BT.FarmShed],
-  storage: [BT.StorageChest, BT.StorageBox, BT.Barn],
-  industry: [BT.Workbench, BT.Forge, BT.Windmill, BT.Workshop],
-  housing: [BT.Tent, BT.Bed, BT.Bedroll, BT.LeanTo],
-  social: [BT.Campfire],
-  pasture: [BT.Barn, BT.Stable, BT.ChickenCoop, BT.Kennel],
+  farming: [BT.Well],
+  storage: [BT.StorageChest, BT.StorageBox],
+  industry: [BT.Workbench, BT.Forge, BT.Loom, BT.ButcheringTable, BT.Oven],
+  housing: [BT.Bed, BT.Bedroll],
+  social: [BT.Campfire, BT.MarketStall],
+  pasture: [], // Multi-tile animal buildings use TileBasedBlueprintRegistry
   wilderness: [], // Nothing allowed
   restricted: [], // Nothing allowed
 };

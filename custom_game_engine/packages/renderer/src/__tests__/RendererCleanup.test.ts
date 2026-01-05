@@ -1,11 +1,16 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { ChunkManager, TerrainGenerator } from '@ai-village/world';
 
 describe('Renderer Cleanup (Memory Leak Fix)', () => {
   let canvas: HTMLCanvasElement;
+  let chunkManager: ChunkManager;
+  let terrainGenerator: TerrainGenerator;
 
   beforeEach(() => {
     canvas = document.createElement('canvas');
     document.body.appendChild(canvas);
+    chunkManager = new ChunkManager(3);
+    terrainGenerator = new TerrainGenerator('test');
   });
 
   afterEach(() => {
@@ -18,7 +23,7 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
       // Import Renderer dynamically to avoid initialization issues
       const { Renderer } = await import('../Renderer');
 
-      const renderer = new Renderer(canvas);
+      const renderer = new Renderer(canvas, chunkManager, terrainGenerator);
 
       expect(renderer).toHaveProperty('destroy');
       expect(typeof (renderer as any).destroy).toBe('function');
@@ -30,7 +35,7 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
       // Spy on window.removeEventListener
       const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
-      const renderer = new Renderer(canvas);
+      const renderer = new Renderer(canvas, chunkManager, terrainGenerator);
 
       // Call destroy
       if (typeof (renderer as any).destroy === 'function') {
@@ -51,7 +56,7 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
 
       // Create and destroy renderer multiple times
       for (let i = 0; i < 10; i++) {
-        const renderer = new Renderer(canvas);
+        const renderer = new Renderer(canvas, chunkManager, terrainGenerator);
 
         // Trigger a resize to ensure the handler is active
         window.dispatchEvent(new Event('resize'));
@@ -69,7 +74,7 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
     it('should track bound resize handler for cleanup', async () => {
       const { Renderer } = await import('../Renderer');
 
-      const renderer = new Renderer(canvas);
+      const renderer = new Renderer(canvas, chunkManager, terrainGenerator);
 
       // Renderer should maintain a reference to the bound resize handler
       // This ensures we can remove it later with the exact same reference
@@ -84,7 +89,7 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
     it('should handle destroy() being called multiple times safely', async () => {
       const { Renderer } = await import('../Renderer');
 
-      const renderer = new Renderer(canvas);
+      const renderer = new Renderer(canvas, chunkManager, terrainGenerator);
 
       // First destroy
       expect(() => {
@@ -108,7 +113,7 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
 
       // Create multiple renderers with cleanup
       for (let i = 0; i < 5; i++) {
-        const renderer = new Renderer(canvas);
+        const renderer = new Renderer(canvas, chunkManager, terrainGenerator);
         if (typeof (renderer as any).destroy === 'function') {
           (renderer as any).destroy();
         }
@@ -127,7 +132,7 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
     it('should cleanup WebGL context resources if applicable', async () => {
       const { Renderer } = await import('../Renderer');
 
-      const renderer = new Renderer(canvas);
+      const renderer = new Renderer(canvas, chunkManager, terrainGenerator);
 
       // If using WebGL, should cleanup context
       const context = canvas.getContext('webgl') || canvas.getContext('webgl2');
@@ -148,7 +153,7 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
       const { Renderer } = await import('../Renderer');
 
       expect(() => {
-        new Renderer(null as any);
+        new Renderer(null as any, chunkManager, terrainGenerator);
       }).toThrow();
     });
 
@@ -156,7 +161,7 @@ describe('Renderer Cleanup (Memory Leak Fix)', () => {
       const { Renderer } = await import('../Renderer');
 
       expect(() => {
-        new Renderer(undefined as any);
+        new Renderer(undefined as any, chunkManager, terrainGenerator);
       }).toThrow();
     });
   });

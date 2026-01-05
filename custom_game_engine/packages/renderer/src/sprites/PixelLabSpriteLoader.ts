@@ -141,9 +141,17 @@ export class PixelLabSpriteLoader {
     // Handle flat metadata format (actual asset format)
     if (isFlatMetadata(metadata)) {
       // Get direction names from either 'directions' or 'rotations' field
-      const directionNames: string[] = Array.isArray(metadata.directions)
+      let directionNames: string[] = Array.isArray(metadata.directions)
         ? metadata.directions
         : metadata.rotations || [];
+
+      // If no directions in metadata, try all 8 standard directions (auto-detect)
+      if (directionNames.length === 0) {
+        directionNames = [
+          'south', 'southwest', 'west', 'northwest',
+          'north', 'northeast', 'east', 'southeast'
+        ];
+      }
 
       // Load rotation images (check both with and without rotations/ subfolder)
       const rotationPromises = directionNames.map(async (dirName) => {

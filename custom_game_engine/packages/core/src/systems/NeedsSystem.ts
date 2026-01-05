@@ -136,7 +136,11 @@ export class NeedsSystem implements System {
       const STARVATION_DEATH_DAYS = 5;
 
       let ticksAtZeroHunger = needs.ticksAtZeroHunger || 0;
-      let starvationDayMemoriesIssued = needs.starvationDayMemoriesIssued || new Set<number>();
+      let starvationDayMemoriesIssued = new Set<number>(
+        Array.isArray(needs.starvationDayMemoriesIssued)
+          ? needs.starvationDayMemoriesIssued
+          : []
+      );
 
       if (newHunger === 0) {
         ticksAtZeroHunger += 1;

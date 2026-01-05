@@ -1,18 +1,7 @@
 {
   "id": "dog_black",
-  "base_species": "dog",
-  "variant": "black",
-  "description": "black dog",
-  "size": 48,
-  "directions": [
-    "south",
-    "southwest",
-    "west",
-    "northwest",
-    "north",
-    "northeast",
-    "east",
-    "southeast"
-  ],
-  "generated_at": "2026-01-04T00:17:59.280Z"
+  "category": "animals.working",
+  "size": 32,
+  "description": "Black medium-sized dog, alert appearance, standing pose, top-down",
+  "generated_at": "2026-01-04T21:26:09.152Z"
 }

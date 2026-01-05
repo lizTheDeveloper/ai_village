@@ -17,9 +17,14 @@ export interface AgentBehaviorSettings {
   enableLLMAgents: boolean;         // Master toggle for LLM agents
 }
 
+export interface RenderSettings {
+  drawDistance3D: number;           // Draw distance for 3D view (in tiles)
+}
+
 export interface GameSettings {
   llm: LLMSettings;
   agentBehavior: AgentBehaviorSettings;
+  render: RenderSettings;
   dungeonMasterPrompt: string;
 }
 
@@ -42,6 +47,9 @@ const DEFAULT_SETTINGS: GameSettings = {
     minThinkCadenceSeconds: 300,  // 5 minutes when busy
     idleThinkDelaySeconds: 5,     // 5 seconds when idle
     enableLLMAgents: true,        // LLM agents enabled by default
+  },
+  render: {
+    drawDistance3D: 60,           // 60 tiles draw distance in 3D (matches renderRadius)
   },
   dungeonMasterPrompt: '',
 };
@@ -430,6 +438,35 @@ export class SettingsPanel implements IWindowPanel {
     behaviorSection.appendChild(behaviorHelp);
 
     panel.appendChild(behaviorSection);
+
+    // Render Settings Section
+    const renderSection = document.createElement('div');
+    renderSection.style.cssText = 'margin-top: 20px;';
+    renderSection.innerHTML = '<h3 style="margin: 0 0 12px 0; font-size: 14px; color: #8a8aaa; text-transform: uppercase;">Render Settings</h3>';
+
+    // 3D Draw Distance
+    const drawDistanceGroup = this.createFormGroup('3D Draw Distance (tiles)', 'text');
+    const drawDistanceInput = drawDistanceGroup.querySelector('input')!;
+    drawDistanceInput.id = 'settings-draw-distance-3d';
+    drawDistanceInput.type = 'number';
+    drawDistanceInput.min = '20';
+    drawDistanceInput.max = '200';
+    drawDistanceInput.value = String(this.settings.render.drawDistance3D);
+    drawDistanceInput.onchange = () => {
+      const val = parseInt(drawDistanceInput.value, 10);
+      if (!isNaN(val) && val >= 20 && val <= 200) {
+        this.settings.render.drawDistance3D = val;
+      }
+    };
+    renderSection.appendChild(drawDistanceGroup);
+
+    // Help text for render section
+    const renderHelp = document.createElement('p');
+    renderHelp.style.cssText = 'margin: 8px 0 0 0; font-size: 11px; color: #666; font-style: italic;';
+    renderHelp.textContent = 'Higher = see further in 3D view. Lower = better performance. Press V to toggle between 2D and 3D.';
+    renderSection.appendChild(renderHelp);
+
+    panel.appendChild(renderSection);
 
     // Dungeon Master Prompt Section
     const dmSection = document.createElement('div');

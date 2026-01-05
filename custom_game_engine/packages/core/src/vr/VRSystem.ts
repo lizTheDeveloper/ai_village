@@ -118,6 +118,21 @@ export class VRSystem implements System {
     };
 
     vrSystem.active_sessions.push(session);
+
+    // Emit session start event
+    if (this.eventBus) {
+      this.eventBus.emit({
+        type: 'vr_session:started',
+        source: this.id,
+        data: {
+          sessionId: session.id,
+          participantIds,
+          scenarioType,
+          scenarioDescription,
+        },
+      });
+    }
+
     return session;
   }
 
@@ -166,7 +181,17 @@ export class VRSystem implements System {
   ): void {
     // Emit session end event
     if (this.eventBus) {
-      // Would emit an event here
+      this.eventBus.emit({
+        type: 'vr_session:ended',
+        source: this.id,
+        data: {
+          sessionId: session.id,
+          participantIds: session.participant_ids,
+          duration: session.duration,
+          scenarioType: session.scenario.type,
+          completed: session.duration >= session.max_duration,
+        },
+      });
     }
 
     // Process participants
@@ -174,8 +199,9 @@ export class VRSystem implements System {
       const participant = world.getEntity(participantId);
       if (!participant) continue;
 
-      // Clear VR state from participant
-      // This would integrate with participant component
+      // Mark that VR session has ended
+      // Future: Add a vr_participant component to track active sessions
+      // For now, the session ending will naturally affect mood via applyEmotionalInfluence
     }
   }
 
@@ -183,16 +209,49 @@ export class VRSystem implements System {
    * Apply emotional influence to a participant
    */
   private applyEmotionalInfluence(
-    _entity: Entity,
-    _targetEmotion: EmotionalSignature,
-    _progress: number,
-    _fidelity: number
+    entity: Entity,
+    targetEmotion: EmotionalSignature,
+    progress: number,
+    fidelity: number
   ): void {
-    // Emotional influence strength based on fidelity and progress
-    // Would calculate: strength = fidelity * progress * 0.1
+    // Get mood component
+    const mood = entity.getComponent('mood') as any;
+    if (!mood) return;
 
-    // This would integrate with the emotion system
-    // For now, this is a placeholder
+    // Emotional influence strength based on fidelity and progress
+    // Higher fidelity = stronger effect, progress = ramp up over session
+    const strength = fidelity * progress * 0.1;
+
+    // Apply emotional effects to mood
+    // Convert EmotionalSignature to mood adjustments
+    for (const [emotion, intensity] of Object.entries(targetEmotion.emotions)) {
+      const moodChange = intensity * strength * 10; // Scale to mood range (-100 to 100)
+
+      // Map emotions to mood changes
+      if (emotion === 'joy' || emotion === 'happiness' || emotion === 'excitement') {
+        mood.currentMood = Math.min(100, mood.currentMood + moodChange);
+        if (moodChange > 20) mood.emotionalState = 'joyful';
+        else if (moodChange > 10) mood.emotionalState = 'excited';
+      } else if (emotion === 'sadness' || emotion === 'grief' || emotion === 'melancholy') {
+        mood.currentMood = Math.max(-100, mood.currentMood - moodChange);
+        if (moodChange > 20) mood.emotionalState = 'grieving';
+        else if (moodChange > 10) mood.emotionalState = 'melancholic';
+      } else if (emotion === 'anxiety' || emotion === 'fear' || emotion === 'worry') {
+        mood.currentMood = Math.max(-100, mood.currentMood - moodChange * 0.5);
+        mood.emotionalState = 'anxious';
+      } else if (emotion === 'nostalgia') {
+        mood.emotionalState = 'nostalgic';
+      } else if (emotion === 'gratitude' || emotion === 'appreciation') {
+        mood.currentMood = Math.min(100, mood.currentMood + moodChange * 0.7);
+        mood.emotionalState = 'grateful';
+      } else if (emotion === 'pride' || emotion === 'accomplishment') {
+        mood.currentMood = Math.min(100, mood.currentMood + moodChange * 0.8);
+        mood.emotionalState = 'proud';
+      }
+    }
+
+    // Update mood component (cast to EntityImpl to access mutator methods)
+    (entity as any).updateComponent('mood', () => mood);
   }
 
   /**

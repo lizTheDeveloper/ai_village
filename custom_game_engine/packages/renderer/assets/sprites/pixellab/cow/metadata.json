@@ -1,9 +1,7 @@
 {
   "id": "cow",
-  "category": "animals",
-  "type": "map_object",
-  "size": 64,
-  "description": "Realistic cow as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
-  "generated_at": "2026-01-03T22:05:26.509Z",
-  "usage_usd": 0
+  "category": "animals.livestock",
+  "size": 32,
+  "description": "Large dairy cow, brown and white spotted hide, standing pose, top-down farm animal",
+  "generated_at": "2026-01-04T21:23:36.215Z"
 }

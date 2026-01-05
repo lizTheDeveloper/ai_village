@@ -64,8 +64,8 @@ FOOTNOTES:
 
 ††††† The original research paper on VR latency, published by Dr. Yuki Tanaka in 2015, was written entirely in the present tense and used the word "catastrophic" forty-seven times across twelve pages. Dr. Tanaka's subsequent research focused on significantly less nausea-inducing topics, such as tax policy.
 
-‡‡‡‡ This suspicion manifests as a subtle feeling of wrongness, similar to that experienced when returning home to find all your furniture moved three inches to the left. Everything looks correct, but nothing feels correct, and you can't quite put your finger on why.`,
-  abstract: 'Research paper on How to convince the brain it's somewhere it isn't',
+‡‡‡‡ This suspicion manifests as a subtle feeling of wrongness, similar to that experienced when returning home to find all your furniture moved three inches to the left. Everything looks correct, but nothing feels correct, and you can`,
+  abstract: "Research paper on How to convince the brain it's somewhere it isn't",
   published: false
 };
 
@@ -120,7 +120,7 @@ The most unexpected consequence of ultra-high-fidelity displays, however, concer
 
 ††††The Valley contains several notable landmarks, including the "Ridge of Slightly-Wrong Shadows," the "Canyon of Technically-Accurate-But-Still-Weird Reflections," and the infamous "Pit of Eyes That Track You But Shouldn't."†††††
 
-†††††Located at approximately 92.4% fidelity, the Pit was accidentally discovered by graduate student Thomas Webb, who reported feeling "extremely watched" by a rendered pair of eyes that shouldn't have been tracking his movement.`,
+†††††Located at approximately 92.4% fidelity, the Pit was accidentally discovered by graduate student Thomas Webb, who reported feeling "extremely watched" by`,
   abstract: 'Research paper on Visual display systems that exceed human perception limits',
   published: false
 };
@@ -128,7 +128,7 @@ The most unexpected consequence of ultra-high-fidelity displays, however, concer
 
 export const HAPTIC_FEEDBACK_SYSTEMS: ResearchPaper = {
   paperId: 'haptic_feedback_systems',
-  title: 'Touching Things That Aren't There: A Guide to Haptic Deception',
+  title: "Touching Things That Aren't There: A Guide to Haptic Deception",
   field: 'experimental',
   paperSets: ['virtual_reality'],
   prerequisitePapers: ['sensory_immersion_theory'],
@@ -203,7 +203,7 @@ The crowning achievement of haptic research remains the Virtual Pet Interface***
 
 export const MOTION_TRACKING_PRECISION: ResearchPaper = {
   paperId: 'motion_tracking_precision',
-  title: 'Knowing Where You Are Even When You're Not: Spatial Tracking Systems',
+  title: "Knowing Where You Are Even When You're Not: Spatial Tracking Systems",
   field: 'experimental',
   paperSets: ['virtual_reality'],
   prerequisitePapers: ['sensory_immersion_theory'],
@@ -568,7 +568,7 @@ The incident at the Joint European Torus in 2022¶¶¶¶, wherein researchers ac
 
 export const DEUTERIUM_TRITIUM_FUEL_CYCLES: ResearchPaper = {
   paperId: 'deuterium_tritium_fuel_cycles',
-  title: 'Hydrogen's Heavier Cousins: Fuel for the Stars',
+  title: "Hydrogen's Heavier Cousins: Fuel for the Stars",
   field: 'experimental',
   paperSets: ['fusion_power'],
   prerequisitePapers: ['plasma_containment_principles'],
@@ -872,7 +872,7 @@ Perhaps most sobering is the realization that those entering long-term stasis ma
 
 export const REVIVAL_PROCEDURES: ResearchPaper = {
   paperId: 'revival_procedures',
-  title: 'Good Morning, You've Been Asleep for a While: Reanimation Protocols',
+  title: "Good Morning, You've Been Asleep for a While: Reanimation Protocols",
   field: 'experimental',
   paperSets: ['cryogenic_suspension'],
   prerequisitePapers: ['suspended_animation_protocols'],

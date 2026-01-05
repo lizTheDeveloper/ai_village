@@ -50,6 +50,7 @@ export * from './FarmManagementPanel.js';
 export * from './SoulCeremonyModal.js';
 export * from './AgentCreationCards.js';
 export * from './ResearchLibraryPanel.js';
+export * from './TechTreePanel.js';
 
 export * from './ui/InventoryUI.js';
 export * from './ui/DragDropSystem.js';
@@ -91,6 +92,9 @@ export * from './ThreatIndicatorRenderer.js';
 // Utility renderers
 export * from './LoadingText.js';
 export * from './ProceduralShapeRenderer.js';
+
+// 3D Renderer
+export * from './Renderer3D.js';
 
 // Sprite system (LPC and PixelLab)
 export * from './sprites/index.js';

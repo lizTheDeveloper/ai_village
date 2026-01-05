@@ -49,6 +49,12 @@ show_status() {
     if curl -s http://localhost:8766/ >/dev/null 2>&1; then
       echo "  ✅ Metrics Dashboard: Running (port 8766)"
     fi
+
+    # Check PixelLab daemon
+    if pgrep -f "pixellab-daemon" >/dev/null 2>&1; then
+      local pixellab_pid=$(pgrep -f "pixellab-daemon" | head -1)
+      echo "  ✅ PixelLab Daemon: Running (PID $pixellab_pid)"
+    fi
   else
     # Fallback to port scanning if orchestrator not running
     local ports=(3000 3001 3002 8766 3030)
@@ -160,6 +166,7 @@ kill_servers() {
   pkill -9 -f "metrics-server" 2>/dev/null && echo "  Stopped Metrics server" || true
   pkill -9 -f "tsx.*metrics-server" 2>/dev/null && echo "  Stopped tsx metrics-server" || true
   pkill -9 -f "node.*dashboard.*server" 2>/dev/null && echo "  Stopped Orchestration dashboard" || true
+  pkill -9 -f "pixellab-daemon" 2>/dev/null && echo "  Stopped PixelLab daemon" || true
   pkill -9 -f "tsc --build --watch" 2>/dev/null && echo "  Stopped TypeScript watch" || true
 
   echo ""

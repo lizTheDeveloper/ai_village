@@ -142,16 +142,16 @@ export class TerrainGenerator {
         const placementValue = placementNoise.noise(worldX * 0.1, worldY * 0.1);
 
         // Place trees in forests and grassy areas
-        if (tile.terrain === 'forest' && placementValue > 0.3) {
-          if (Math.random() > 0.4) {
-            // 60% chance (increased from 30% for better resource availability)
+        if (tile.terrain === 'forest' && placementValue > -0.2) {
+          if (Math.random() > 0.2) {
+            // 80% chance for dense forests
             // Random tree height: 1-4 tiles (taller in forests)
             const treeHeight = 1 + Math.floor(Math.random() * 4);
             createTree(world, worldX, worldY, treeHeight);
           }
-        } else if (tile.terrain === 'grass' && placementValue > 0.4) {
-          if (Math.random() > 0.85) {
-            // 15% chance (increased from 5% for better resource availability)
+        } else if (tile.terrain === 'grass' && placementValue > 0.1) {
+          if (Math.random() > 0.7) {
+            // 30% chance for scattered trees on grass
             // Shorter trees on grass: 0-2 tiles
             const treeHeight = Math.floor(Math.random() * 3);
             createTree(world, worldX, worldY, treeHeight);

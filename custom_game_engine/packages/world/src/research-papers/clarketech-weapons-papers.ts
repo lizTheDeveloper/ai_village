@@ -152,7 +152,7 @@ The journey from impossible to improbable to inevitable took 112 years, forty-se
 
 export const DIRECTED_DISCHARGE_SYSTEMS: ResearchPaper = {
   paperId: 'directed_discharge_systems',
-  title: 'Pointing Lightning: An Engineer's Guide to Not Getting Killed',
+  title: "Pointing Lightning: An Engineer's Guide to Not Getting Killed",
   field: 'experimental',
   paperSets: ['advanced_electronics'],
   prerequisitePapers: ['electromagnetic_field_theory'],
@@ -811,7 +811,7 @@ The legal status of quantum property damage remains contentious. Courts in seven
 
 export const GRAVITATIONAL_FIELD_THEORY: ResearchPaper = {
   paperId: 'gravitational_field_theory',
-  title: 'What Goes Up Need Not Come Down: A Heretic's Guide to Gravity',
+  title: "What Goes Up Need Not Come Down: A Heretic's Guide to Gravity",
   field: 'experimental',
   paperSets: ['anti_gravity'],
   prerequisitePapers: [],
@@ -853,7 +853,7 @@ The ghost of Sir Isaac Newton—and yes, he does haunt the corridors of Cambridg
 
 *Graviton opinion is, admittedly, a controversial concept. The Quantum Field Theory Department at Oxford maintains it is "anthropomorphic nonsense," while the Department of Applied Thaumaturgy at Unseen University considers it "obviously true, have you even tried talking to them?" The resulting academic feud has lasted nineteen years and counting, with increasingly creative insults published in peer-reviewed journals††*.
 
-††*The Journal of Controversial Physics, Vol. 445, contains an article titled "Regarding the Intellectual Capabilities of Our Colleagues Across Town," which is academic language for "those idiots don't know what they're talking about." The response, published in Quantum Thaumaturgy Quarterly, was titled "A Comprehensive Review of Experimental Evidence That Our Critics Are Wrong About Everything." Both papers have been cited extensively,`,
+††*The Journal of Controversial Physics, Vol. 445, contains an article titled "Regarding the Intellectual Capabilities of Our Colleagues Across Town," which is academic language for "those idiots don't know what they're talking about." The response, published in Quantum Thaumaturgy Quarterly, was titled "A Comprehensive Review of Experimental Evidence That Our Critics Are Wrong About Everything." Both papers have been cited extensively`,
   abstract: 'Research paper on Understanding and manipulating gravitational fields',
   published: false
 };
@@ -1024,7 +1024,7 @@ Range limitations exist for sound thermodynamic reasons that the Aetheric Energy
 
 export const ATOMIC_ASSEMBLY_THEORY: ResearchPaper = {
   paperId: 'atomic_assembly_theory',
-  title: 'Building Reality One Atom at a Time: A Patient Person's Guide',
+  title: "Building Reality One Atom at a Time: A Patient Person's Guide",
   field: 'experimental',
   paperSets: ['nanofabrication'],
   prerequisitePapers: [],
@@ -1144,7 +1144,7 @@ The infamous Bellingham Incident of 1847***** provides a sobering reminder of th
 
 export const MATTER_COMPRESSION_PROJECTION: ResearchPaper = {
   paperId: 'matter_compression_projection',
-  title: 'Pointing the Smallening Device: A User's Manual',
+  title: "Pointing the Smallening Device: A User's Manual",
   field: 'experimental',
   paperSets: ['nanofabrication'],
   prerequisitePapers: ['scale_variance_fields'],
@@ -1274,7 +1274,7 @@ FOOTNOTES:
 
 export const DIMENSIONAL_MEMBRANE_THEORY: ResearchPaper = {
   paperId: 'dimensional_membrane_theory',
-  title: 'The Spaces Between Spaces: A Cartographer's Nightmare',
+  title: "The Spaces Between Spaces: A Cartographer's Nightmare",
   field: 'experimental',
   paperSets: ['nanofabrication'],
   prerequisitePapers: ['scale_variance_fields'],
@@ -1550,7 +1550,7 @@ Perhaps most troubling are the documented cases of accidental connections*****, 
 
 *Technically, having read the phrase "unpaired portal problem," you are now legally obligated to acknowledge it is one of the field's great challenges. The Department of Thaumaturgical Definitions enacted this requirement in 1956 after determining that public awareness of the problem was inversely proportional to funding allocated to solving it.
 
-**This is stated with the same confidence that physicists state "nature abhors a vacuum," which is to say,`,
+**This is stated with the same confidence that physicists state "nature abhors a vacuum," which is to say`,
   abstract: 'Research paper on Linking two spatial apertures for instantaneous transit',
   published: false
 };

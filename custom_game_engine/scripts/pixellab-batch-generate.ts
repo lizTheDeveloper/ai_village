@@ -114,9 +114,12 @@ function countPending(manifest: any): { characters: number; tilesets: number; is
   let isometric = 0;
   let objects = 0;
 
-  // Count characters
-  for (const species of Object.values(manifest.characters) as any[]) {
-    characters += species.pending?.length || 0;
+  // Count characters (humanoids in the manifest)
+  const characterSources = [manifest.characters, manifest.humanoids].filter(Boolean);
+  for (const source of characterSources) {
+    for (const species of Object.values(source) as any[]) {
+      characters += species.pending?.length || 0;
+    }
   }
 
   // Count tilesets
@@ -139,9 +142,12 @@ function countCompleted(manifest: any): { characters: number; tilesets: number; 
   let isometric = 0;
   let objects = 0;
 
-  // Count characters
-  for (const species of Object.values(manifest.characters) as any[]) {
-    characters += species.completed?.length || 0;
+  // Count characters (humanoids in the manifest)
+  const characterSources = [manifest.characters, manifest.humanoids].filter(Boolean);
+  for (const source of characterSources) {
+    for (const species of Object.values(source) as any[]) {
+      characters += species.completed?.length || 0;
+    }
   }
 
   // Count tilesets
@@ -206,9 +212,12 @@ function showStatus(): void {
 }
 
 function getNextPendingCharacter(manifest: any): { species: string; character: PendingCharacter } | null {
-  for (const [species, data] of Object.entries(manifest.characters) as [string, any][]) {
-    if (data.pending && data.pending.length > 0) {
-      return { species, character: data.pending[0] };
+  const characterSources = [manifest.characters, manifest.humanoids].filter(Boolean);
+  for (const source of characterSources) {
+    for (const [species, data] of Object.entries(source) as [string, any][]) {
+      if (data.pending && data.pending.length > 0) {
+        return { species, character: data.pending[0] };
+      }
     }
   }
   return null;
@@ -234,7 +243,14 @@ function getNextPendingObject(manifest: any): PendingObject | null {
 }
 
 function markCharacterQueued(manifest: any, species: string, characterId: string): void {
-  const speciesData = manifest.characters[species];
+  const characterSources = [manifest.characters, manifest.humanoids].filter(Boolean);
+  let speciesData: any = null;
+  for (const source of characterSources) {
+    if (source[species]) {
+      speciesData = source[species];
+      break;
+    }
+  }
   if (!speciesData) return;
 
   const idx = speciesData.pending.findIndex((c: PendingCharacter) => c.id === characterId);

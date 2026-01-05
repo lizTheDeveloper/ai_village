@@ -16,6 +16,8 @@
   },
   "dependencies": {
     "@ai-village/core": "*",
-    "@ai-village/world": "*"
+    "@ai-village/world": "*",
+    "@types/three": "^0.182.0",
+    "three": "^0.182.0"
   }
 }

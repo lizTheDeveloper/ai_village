@@ -1,9 +1,7 @@
 {
   "id": "sheep",
-  "category": "animals",
-  "type": "map_object",
-  "size": 48,
-  "description": "Realistic sheep as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
-  "generated_at": "2026-01-03T22:05:40.335Z",
-  "usage_usd": 0
+  "category": "animals.livestock",
+  "size": 32,
+  "description": "Woolly sheep, white fluffy wool coat, black face, standing pose, top-down farm animal",
+  "generated_at": "2026-01-04T21:23:55.731Z"
 }

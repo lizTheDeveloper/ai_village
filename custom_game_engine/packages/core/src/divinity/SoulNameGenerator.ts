@@ -38,6 +38,7 @@ export interface GeneratedSoulName {
 export class SoulNameGenerator {
   private llmProvider?: LLMProvider;
   private useLLM: boolean = true;
+  private soulRepositorySystem?: any; // Reference to global soul repository
 
   // Track all used names globally (across all cultures)
   private usedNames = new Set<string>();
@@ -113,6 +114,14 @@ export class SoulNameGenerator {
    */
   setLLMProvider(provider: LLMProvider): void {
     this.llmProvider = provider;
+  }
+
+  /**
+   * Set the soul repository system for global uniqueness checking
+   */
+  setSoulRepository(repository: any): void {
+    this.soulRepositorySystem = repository;
+    console.log('[SoulNameGenerator] Connected to soul repository');
   }
 
   /**
@@ -198,12 +207,17 @@ export class SoulNameGenerator {
   /**
    * Generate a name using LLM
    */
-  private async generateLLMName(culture: SoulCulture): Promise<string> {
+  private async generateLLMName(culture: SoulCulture, retryAttempt: number = 0): Promise<string> {
     if (!this.llmProvider) {
       throw new Error('LLM provider not set');
     }
 
-    // Get recently used names for presence penalty context
+    // Get all existing names from repository (if available)
+    const allExistingNames = this.soulRepositorySystem
+      ? this.soulRepositorySystem.getAllSouls().map((soul: any) => soul.name)
+      : Array.from(this.usedNames);
+
+    // Get recently used names for context
     const usedInCulture = Array.from(this.usedNamesByCulture.get(culture) ?? []);
     const recentNames = usedInCulture.slice(-20); // Last 20 names
 
@@ -216,7 +230,7 @@ export class SoulNameGenerator {
       exotic: 'Completely unique and alien names that don\'t fit any known culture',
     };
 
-    const prompt = `Generate exactly ONE unique soul name for a ${culture} soul.
+    let prompt = `Generate exactly ONE unique soul name for a ${culture} soul.
 
 Cultural style: ${culturalDescriptions[culture]}
 
@@ -225,7 +239,6 @@ IMPORTANT RULES:
 2. No quotes, no explanation, no punctuation
 3. Must be unique and NOT similar to these recently used names: ${recentNames.join(', ')}
 4. Single word/name only (no titles, no descriptions)
-5. Use presence penalty to ensure uniqueness
 
 Name:`;
 
@@ -244,11 +257,48 @@ Name:`;
     // Remove any extra text after the name
     name = name.split('\n')[0]?.split(' ')[0] ?? name;
 
-    // Ensure uniqueness
-    if (this.usedNames.has(name)) {
-      // Add a number suffix
+    // Check uniqueness against global repository
+    const isNameTaken = this.soulRepositorySystem
+      ? this.soulRepositorySystem.soulNameExists(name)
+      : this.usedNames.has(name);
+
+    if (isNameTaken && retryAttempt < 3) {
+      // Name is taken - re-prompt with context about existing names
+      const firstLetter = name.charAt(0).toUpperCase();
+      const namesWithSameLetter = allExistingNames.filter((n: string) =>
+        n.charAt(0).toUpperCase() === firstLetter
+      );
+
+      console.log(`[SoulNameGenerator] Name "${name}" already exists. Retrying with context about ${firstLetter}-names...`);
+
+      const retryPrompt = `The name "${name}" is already taken.
+
+Here are all existing ${culture} names starting with "${firstLetter}":
+${namesWithSameLetter.slice(0, 20).join(', ')}
+
+Please choose a NEW ${culture} name starting with "${firstLetter}" that is NOT in the list above.
+Cultural style: ${culturalDescriptions[culture]}
+
+Return ONLY the new name, nothing else.
+
+New name:`;
+
+      const retryResponse = await this.llmProvider.generate({
+        prompt: retryPrompt,
+        temperature: 0.9,
+        maxTokens: 20,
+      });
+
+      let newName = retryResponse.text.trim().replace(/^["']|["']$/g, '');
+      newName = newName.split('\n')[0]?.split(' ')[0] ?? newName;
+
+      // Recursive check with retry limit
+      return this.generateLLMName(culture, retryAttempt + 1);
+    } else if (isNameTaken) {
+      // Max retries reached - add a number suffix as fallback
+      console.warn(`[SoulNameGenerator] Max retries reached for "${name}", using numbered suffix`);
       let suffix = 2;
-      while (this.usedNames.has(`${name}${suffix}`)) {
+      while (this.soulRepositorySystem?.soulNameExists(`${name}${suffix}`) || this.usedNames.has(`${name}${suffix}`)) {
         suffix++;
       }
       name = `${name}${suffix}`;

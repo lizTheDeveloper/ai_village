@@ -56,6 +56,46 @@ export class InfoSection {
       currentY += 30;
     }
 
+    // Soul information (if available)
+    const soulIdentity = entity.components.get('soul_identity') as any;
+    if (soulIdentity) {
+      ctx.font = '12px monospace';
+      ctx.fillStyle = '#AADDFF';
+      ctx.fillText(`Soul: ${soulIdentity.soulName}`, x + padding, currentY);
+      currentY += lineHeight;
+
+      // Reincarnation count
+      const incarnationCount = soulIdentity.incarnationHistory?.length || 0;
+      const incarnationText = incarnationCount === 1
+        ? 'First incarnation'
+        : `Incarnation ${incarnationCount}`;
+      ctx.fillStyle = '#88CCFF';
+      ctx.font = '11px monospace';
+      ctx.fillText(`✦ ${incarnationText}`, x + padding, currentY);
+
+      // Archetype
+      if (soulIdentity.archetype) {
+        const archetypeText = soulIdentity.archetype.charAt(0).toUpperCase() + soulIdentity.archetype.slice(1);
+        ctx.fillStyle = '#FFCC88';
+        ctx.fillText(`[${archetypeText}]`, x + padding + 150, currentY);
+      }
+
+      currentY += lineHeight + 3;
+
+      // Purpose (if available, truncated)
+      if (soulIdentity.purpose) {
+        ctx.fillStyle = '#CCCCFF';
+        ctx.font = '10px monospace';
+        const purposeText = soulIdentity.purpose.length > 45
+          ? soulIdentity.purpose.substring(0, 42) + '...'
+          : soulIdentity.purpose;
+        ctx.fillText(`"${purposeText}"`, x + padding, currentY);
+        currentY += 12;
+      }
+
+      currentY += 5;
+    }
+
     // Entity ID (shortened)
     ctx.font = '11px monospace';
     ctx.fillStyle = '#888';

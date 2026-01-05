@@ -782,6 +782,9 @@ export class TileBasedBlueprintRegistry {
  */
 export const defaultTileBasedBlueprintRegistry = new TileBasedBlueprintRegistry();
 
+// Register default blueprints on initialization
+defaultTileBasedBlueprintRegistry.registerDefaults();
+
 /**
  * Get the default singleton TileBasedBlueprintRegistry instance.
  */

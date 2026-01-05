@@ -9,6 +9,7 @@ echo ""
 echo "This will start:"
 echo "  - Metrics Server (port 8766)"
 echo "  - Orchestration Dashboard (port 3030)"
+echo "  - PixelLab Sprite Daemon"
 echo ""
 echo "No browser/frontend will be started."
 echo "This mode is for autonomous AI operation and metrics collection."
@@ -36,13 +37,21 @@ echo "Starting Orchestration Dashboard..."
 ORCH_PID=$!
 sleep 2
 
+# Start PixelLab sprite generation daemon
+echo "Starting PixelLab Sprite Daemon..."
+npx ts-node scripts/pixellab-daemon.ts 2>&1 | tee -a pixellab-daemon.log &
+PIXELLAB_PID=$!
+sleep 1
+
 echo ""
 echo "=== AI Village Backend Running ==="
 echo ""
 echo "Metrics API:   http://localhost:8766"
 echo "Orchestration: http://localhost:3030"
+echo "PixelLab:      Background daemon (PID $PIXELLAB_PID)"
 echo ""
 echo "Query metrics with: curl http://localhost:8766/dashboard?session=latest"
+echo "Check sprites:      tail -f pixellab-daemon.log"
 echo ""
 echo "Press Ctrl+C to stop servers"
 echo ""

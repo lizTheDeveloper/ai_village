@@ -97,7 +97,7 @@ export class BuildBehavior extends BaseBehavior {
     }
 
     // Get and validate building type
-    let buildingType = agent.behaviorState?.buildingType as BuildingType || BT.LeanTo;
+    let buildingType = agent.behaviorState?.buildingType as BuildingType || BT.Campfire;
 
     // Route to tile-based construction if applicable
     const tileBasedBlueprintId = TILE_BASED_STRUCTURE_MAP[buildingType];

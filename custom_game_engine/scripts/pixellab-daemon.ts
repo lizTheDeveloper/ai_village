@@ -2,8 +2,9 @@
 /**
  * PixelLab Background Daemon
  *
- * Runs continuously in the background, keeping the PixelLab queue filled.
- * When a job completes, it downloads the asset and queues a new one.
+ * Runs continuously, generating sprites on-demand as agents are born.
+ * Uses synchronous PixelLab API (/generate-image-pixflux) to generate
+ * and save sprites immediately with rate limiting.
  *
  * Setup:
  *   export PIXELLAB_API_KEY="your-api-key"
@@ -11,7 +12,7 @@
  * Usage:
  *   npx ts-node scripts/pixellab-daemon.ts
  *   # Or run in background:
- *   nohup npx ts-node scripts/pixellab-daemon.ts > pixellab.log 2>&1 &
+ *   nohup npx ts-node scripts/pixellab-daemon.ts > pixellab-daemon.log 2>&1 &
  */
 
 import * as fs from 'fs';
@@ -36,27 +37,17 @@ if (fs.existsSync(envPath)) {
 const API_KEY = process.env.PIXELLAB_API_KEY;
 const API_BASE = 'https://api.pixellab.ai/v1';
 const MANIFEST_PATH = path.join(__dirname, 'pixellab-batch-manifest.json');
+const QUEUE_PATH = path.join(__dirname, '../sprite-generation-queue.json');
 const STATE_PATH = path.join(__dirname, 'pixellab-daemon-state.json');
 const ASSETS_PATH = path.join(__dirname, '../packages/renderer/assets/sprites/pixellab');
 
 // Configuration
-const MAX_CONCURRENT_JOBS = 5; // Keep this many jobs in the queue
-const CHECK_INTERVAL_MS = 60000; // Check every 60 seconds
-const DELAY_AFTER_QUEUE_MS = 5000; // Wait after queuing a new job
+const CHECK_INTERVAL_MS = 60000; // Check for new jobs every 60 seconds when idle
+const DELAY_AFTER_QUEUE_MS = 5000; // Wait 5 seconds between generations (rate limiting)
 
 type AssetType = 'character' | 'animal' | 'tileset' | 'isometric_tile' | 'map_object' | 'item';
 
-interface JobInfo {
-  pixelLabId: string;
-  localId: string;
-  type: AssetType;
-  category: string; // e.g., 'humanoids.humans', 'animals.livestock', 'building_tiles.walls'
-  queuedAt: string;
-  description: string;
-}
-
 interface DaemonState {
-  activeJobs: JobInfo[];
   totalGenerated: number;
   totalDownloaded: number;
   startedAt: string;
@@ -73,7 +64,6 @@ function loadState(): DaemonState {
     return JSON.parse(fs.readFileSync(STATE_PATH, 'utf-8'));
   }
   return {
-    activeJobs: [],
     totalGenerated: 0,
     totalDownloaded: 0,
     startedAt: new Date().toISOString(),
@@ -92,6 +82,23 @@ function loadManifest(): any {
 
 function saveManifest(manifest: any): void {
   fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2));
+}
+
+function loadQueue(): any[] {
+  if (!fs.existsSync(QUEUE_PATH)) {
+    return [];
+  }
+  try {
+    const content = fs.readFileSync(QUEUE_PATH, 'utf-8');
+    return JSON.parse(content);
+  } catch (err) {
+    log(`Error loading queue: ${err}`);
+    return [];
+  }
+}
+
+function saveQueue(queue: any[]): void {
+  fs.writeFileSync(QUEUE_PATH, JSON.stringify(queue, null, 2));
 }
 
 async function apiRequest(endpoint: string, method: string = 'GET', body?: any): Promise<any> {
@@ -122,325 +129,53 @@ async function apiRequest(endpoint: string, method: string = 'GET', body?: any):
   return response.json();
 }
 
-async function createCharacter(description: string, name: string, proportions?: any): Promise<string> {
-  const body: any = {
+// Synchronous image generation - returns base64 image immediately
+async function generateSprite(description: string, size: number = 48): Promise<string> {
+  const result = await apiRequest('/generate-image-pixflux', 'POST', {
     description,
-    name,
-    size: 48,
-    n_directions: 8,
-    view: 'high top-down',
-    detail: 'medium detail',
-    outline: 'single color black outline',
-    shading: 'basic shading',
-  };
-
-  // Apply species-specific proportions if provided
-  if (proportions) {
-    body.proportions = JSON.stringify(proportions);
-  }
-
-  const result = await apiRequest('/characters', 'POST', body);
-  return result.character_id || result.id;
-}
-
-async function createTileset(lower: string, upper: string, transition?: string): Promise<string> {
-  const body: any = {
-    lower_description: lower,
-    upper_description: upper,
-    tile_size: { width: 32, height: 32 },
-    view: 'high top-down',
-  };
-  if (transition) {
-    body.transition_description = transition;
-    body.transition_size = 0.5;
-  }
-  const result = await apiRequest('/tilesets/topdown', 'POST', body);
-  return result.tileset_id || result.id;
-}
-
-async function createIsometricTile(description: string, size: number = 32): Promise<string> {
-  const result = await apiRequest('/tiles/isometric', 'POST', {
-    description,
-    size,
-    tile_shape: 'block',
-    detail: 'medium detail',
-    shading: 'basic shading',
-    outline: 'single color outline',
+    image_size: {
+      height: size,
+      width: size,
+    },
+    no_background: true,
   });
-  return result.tile_id || result.id;
-}
 
-async function createMapObject(description: string, width: number = 48, height: number = 48): Promise<string> {
-  const result = await apiRequest('/objects/map', 'POST', {
-    description,
-    width,
-    height,
-    view: 'high top-down',
-    detail: 'medium detail',
-    shading: 'medium shading',
-    outline: 'single color outline',
-  });
-  return result.object_id || result.id;
-}
-
-async function createAnimal(description: string, name: string): Promise<string> {
-  // Animals use character API but with different proportions
-  const result = await apiRequest('/characters', 'POST', {
-    description,
-    name,
-    size: 32, // Smaller than humanoids
-    n_directions: 8,
-    view: 'high top-down',
-    detail: 'medium detail',
-    outline: 'single color black outline',
-    shading: 'basic shading',
-    proportions: '{"type": "preset", "name": "chibi"}', // Better for animals
-  });
-  return result.character_id || result.id;
-}
-
-async function getCharacterStatus(id: string): Promise<{ status: string; data?: any }> {
-  try {
-    const result = await apiRequest(`/characters/${id}`);
-    // Check if completed (has rotations or status is completed)
-    if (result.status === 'completed' || result.rotations || (result.frames?.rotations)) {
-      return { status: 'completed', data: result };
-    } else if (result.status === 'failed') {
-      return { status: 'failed', data: result };
-    }
-    return { status: 'processing', data: result };
-  } catch (err: any) {
-    if (err.message.includes('404')) {
-      return { status: 'not_found' };
-    }
-    throw err;
+  if (!result.image || !result.image.base64) {
+    throw new Error('No image in API response');
   }
+
+  return result.image.base64;
 }
 
-async function getTilesetStatus(id: string): Promise<{ status: string; data?: any }> {
+// Save sprite from base64 data
+async function saveSprite(localId: string, category: string, base64Data: string, description: string, size: number): Promise<boolean> {
   try {
-    const result = await apiRequest(`/tilesets/topdown/${id}`);
-    if (result.status === 'completed' || result.image_url || result.download_url) {
-      return { status: 'completed', data: result };
-    } else if (result.status === 'failed') {
-      return { status: 'failed', data: result };
-    }
-    return { status: 'processing', data: result };
-  } catch (err: any) {
-    if (err.message.includes('404')) {
-      return { status: 'not_found' };
-    }
-    throw err;
-  }
-}
+    const spriteDir = path.join(ASSETS_PATH, localId);
+    fs.mkdirSync(spriteDir, { recursive: true });
 
-async function getIsometricTileStatus(id: string): Promise<{ status: string; data?: any }> {
-  try {
-    const result = await apiRequest(`/tiles/isometric/${id}`);
-    if (result.status === 'completed' || result.image_url || result.download_url) {
-      return { status: 'completed', data: result };
-    } else if (result.status === 'failed') {
-      return { status: 'failed', data: result };
-    }
-    return { status: 'processing', data: result };
-  } catch (err: any) {
-    if (err.message.includes('404')) {
-      return { status: 'not_found' };
-    }
-    throw err;
-  }
-}
+    // Save image from base64
+    const imageBuffer = Buffer.from(base64Data, 'base64');
+    fs.writeFileSync(path.join(spriteDir, 'sprite.png'), imageBuffer);
 
-async function getMapObjectStatus(id: string): Promise<{ status: string; data?: any }> {
-  try {
-    const result = await apiRequest(`/objects/map/${id}`);
-    if (result.status === 'completed' || result.image_url || result.download_url) {
-      return { status: 'completed', data: result };
-    } else if (result.status === 'failed') {
-      return { status: 'failed', data: result };
-    }
-    return { status: 'processing', data: result };
-  } catch (err: any) {
-    if (err.message.includes('404')) {
-      return { status: 'not_found' };
-    }
-    throw err;
-  }
-}
-
-async function downloadFile(url: string, destPath: string): Promise<void> {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`Download failed: ${response.status}`);
-  const buffer = await response.arrayBuffer();
-  fs.writeFileSync(destPath, Buffer.from(buffer));
-}
-
-async function downloadCharacter(job: JobInfo, data: any): Promise<boolean> {
-  try {
-    const charDir = path.join(ASSETS_PATH, job.localId);
-    const rotationsDir = path.join(charDir, 'rotations');
-    fs.mkdirSync(rotationsDir, { recursive: true });
-
-    const rotations = data.rotations || data.frames?.rotations || {};
-    const directions = ['south', 'south-west', 'west', 'north-west', 'north', 'north-east', 'east', 'south-east'];
-
-    for (const dir of directions) {
-      const url = rotations[dir];
-      if (url) {
-        await downloadFile(url, path.join(rotationsDir, `${dir}.png`));
-      }
-    }
-
-    // Create metadata - include species info from category
-    const speciesName = job.category.split('.')[1] || 'unknown';
-    const metadata = {
-      id: job.localId,
-      name: job.localId,
-      pixellab_id: job.pixelLabId,
-      species: speciesName,
-      category: job.category,
-      size: 48,
-      directions: 8,
-      view: 'high top-down',
-      style: {
-        outline: 'single color black outline',
-        shading: 'basic shading',
-        detail: 'medium detail',
-      },
-      rotations: directions,
-      animations: {},
-    };
-    fs.writeFileSync(path.join(charDir, 'metadata.json'), JSON.stringify(metadata, null, 2));
+    // Save metadata
+    fs.writeFileSync(
+      path.join(spriteDir, 'metadata.json'),
+      JSON.stringify({
+        id: localId,
+        category: category,
+        size: size,
+        description: description,
+        generated_at: new Date().toISOString(),
+      }, null, 2)
+    );
 
     return true;
   } catch (err) {
-    log(`  Error downloading: ${err}`);
+    log(`  Error saving sprite: ${err}`);
     return false;
   }
 }
 
-async function downloadTileset(job: JobInfo, data: any): Promise<boolean> {
-  try {
-    const tilesetDir = path.join(ASSETS_PATH, '../tilesets', job.localId);
-    fs.mkdirSync(tilesetDir, { recursive: true });
-
-    const imgUrl = data.image_url || data.download_url;
-    if (imgUrl) {
-      await downloadFile(imgUrl, path.join(tilesetDir, 'tileset.png'));
-    }
-
-    fs.writeFileSync(path.join(tilesetDir, 'metadata.json'), JSON.stringify(data, null, 2));
-    return true;
-  } catch (err) {
-    log(`  Error downloading tileset: ${err}`);
-    return false;
-  }
-}
-
-async function downloadIsometricTile(job: JobInfo, data: any): Promise<boolean> {
-  try {
-    const tilesDir = path.join(ASSETS_PATH, '../tiles/building', job.localId);
-    fs.mkdirSync(tilesDir, { recursive: true });
-
-    const imgUrl = data.image_url || data.download_url;
-    if (imgUrl) {
-      await downloadFile(imgUrl, path.join(tilesDir, 'tile.png'));
-    }
-
-    const metadata = {
-      id: job.localId,
-      pixellab_id: job.pixelLabId,
-      category: job.category,
-      description: job.description,
-    };
-    fs.writeFileSync(path.join(tilesDir, 'metadata.json'), JSON.stringify(metadata, null, 2));
-    return true;
-  } catch (err) {
-    log(`  Error downloading isometric tile: ${err}`);
-    return false;
-  }
-}
-
-async function downloadMapObject(job: JobInfo, data: any): Promise<boolean> {
-  try {
-    const objectsDir = path.join(ASSETS_PATH, '../objects', job.localId);
-    fs.mkdirSync(objectsDir, { recursive: true });
-
-    const imgUrl = data.image_url || data.download_url;
-    if (imgUrl) {
-      await downloadFile(imgUrl, path.join(objectsDir, 'object.png'));
-    }
-
-    const metadata = {
-      id: job.localId,
-      pixellab_id: job.pixelLabId,
-      category: job.category,
-      description: job.description,
-    };
-    fs.writeFileSync(path.join(objectsDir, 'metadata.json'), JSON.stringify(metadata, null, 2));
-    return true;
-  } catch (err) {
-    log(`  Error downloading map object: ${err}`);
-    return false;
-  }
-}
-
-async function downloadItem(job: JobInfo, data: any): Promise<boolean> {
-  try {
-    const itemsDir = path.join(ASSETS_PATH, '../items', job.localId);
-    fs.mkdirSync(itemsDir, { recursive: true });
-
-    const imgUrl = data.image_url || data.download_url;
-    if (imgUrl) {
-      await downloadFile(imgUrl, path.join(itemsDir, 'icon.png'));
-    }
-
-    const metadata = {
-      id: job.localId,
-      pixellab_id: job.pixelLabId,
-      category: job.category,
-      description: job.description,
-    };
-    fs.writeFileSync(path.join(itemsDir, 'metadata.json'), JSON.stringify(metadata, null, 2));
-    return true;
-  } catch (err) {
-    log(`  Error downloading item: ${err}`);
-    return false;
-  }
-}
-
-async function downloadAnimal(job: JobInfo, data: any): Promise<boolean> {
-  try {
-    const animalDir = path.join(ASSETS_PATH, '../animals', job.localId);
-    const rotationsDir = path.join(animalDir, 'rotations');
-    fs.mkdirSync(rotationsDir, { recursive: true });
-
-    const rotations = data.rotations || data.frames?.rotations || {};
-    const directions = ['south', 'south-west', 'west', 'north-west', 'north', 'north-east', 'east', 'south-east'];
-
-    for (const dir of directions) {
-      const url = rotations[dir];
-      if (url) {
-        await downloadFile(url, path.join(rotationsDir, `${dir}.png`));
-      }
-    }
-
-    const metadata = {
-      id: job.localId,
-      pixellab_id: job.pixelLabId,
-      size: 32,
-      directions: 8,
-      category: job.category,
-      rotations: directions,
-      animations: {},
-    };
-    fs.writeFileSync(path.join(animalDir, 'metadata.json'), JSON.stringify(metadata, null, 2));
-    return true;
-  } catch (err) {
-    log(`  Error downloading animal: ${err}`);
-    return false;
-  }
-}
 
 interface PendingJob {
   type: AssetType;
@@ -624,8 +359,8 @@ async function runDaemon(): Promise<void> {
   }
 
   log('=== PixelLab Daemon Started ===');
-  log(`Max concurrent jobs: ${MAX_CONCURRENT_JOBS}`);
-  log(`Check interval: ${CHECK_INTERVAL_MS / 1000}s`);
+  log(`Rate limit delay: ${DELAY_AFTER_QUEUE_MS / 1000}s between generations`);
+  log(`Idle check interval: ${CHECK_INTERVAL_MS / 1000}s`);
   log('Press Ctrl+C to stop\n');
 
   const state = loadState();
@@ -633,171 +368,130 @@ async function runDaemon(): Promise<void> {
 
   while (true) {
     try {
-      const manifest = loadManifest();
+      // Check on-demand queue first (higher priority)
+      const queue = loadQueue();
+      const queueJob = queue.find((job: any) => job.status === 'queued');
 
-      // 1. Check status of active jobs
-      const stillActive: JobInfo[] = [];
-
-      for (const job of state.activeJobs) {
-        log(`Checking ${job.type}: ${job.localId}`);
+      if (queueJob) {
+        // Process on-demand sprite generation request
+        log(`\n[Queue] Generating: ${queueJob.folderId}`);
+        log(`  ${queueJob.description}`);
 
         try {
-          // Get status based on asset type
-          let statusResult: { status: string; data?: any };
-          switch (job.type) {
-            case 'character':
-            case 'animal':
-              statusResult = await getCharacterStatus(job.pixelLabId);
-              break;
-            case 'tileset':
-              statusResult = await getTilesetStatus(job.pixelLabId);
-              break;
-            case 'isometric_tile':
-              statusResult = await getIsometricTileStatus(job.pixelLabId);
-              break;
-            case 'map_object':
-            case 'item':
-              statusResult = await getMapObjectStatus(job.pixelLabId);
-              break;
-            default:
-              statusResult = { status: 'unknown' };
-          }
+          // Determine size from traits or default to 48
+          const size = queueJob.traits?.size || 48;
 
-          const { status, data } = statusResult;
+          // Generate sprite synchronously
+          const base64Data = await generateSprite(queueJob.description, size);
+          log(`  ✓ Generated sprite`);
 
-          if (status === 'completed') {
-            log(`  ✓ Completed! Downloading...`);
+          // Save to animals category (or determine from traits)
+          const category = queueJob.traits?.category || 'animals';
+          const success = await saveSprite(
+            queueJob.folderId,
+            category,
+            base64Data,
+            queueJob.description,
+            size
+          );
 
-            // Download based on asset type
-            let success = false;
-            switch (job.type) {
-              case 'character':
-                success = await downloadCharacter(job, data);
-                break;
-              case 'animal':
-                success = await downloadAnimal(job, data);
-                break;
-              case 'tileset':
-                success = await downloadTileset(job, data);
-                break;
-              case 'isometric_tile':
-                success = await downloadIsometricTile(job, data);
-                break;
-              case 'map_object':
-                success = await downloadMapObject(job, data);
-                break;
-              case 'item':
-                success = await downloadItem(job, data);
-                break;
-            }
+          if (success) {
+            // Mark as complete and remove from queue
+            queueJob.status = 'complete';
+            queueJob.completedAt = Date.now();
+            const updatedQueue = queue.filter((j: any) => j.folderId !== queueJob.folderId);
+            saveQueue(updatedQueue);
 
-            if (success) {
-              markJobCompleted(manifest, job.localId, job.category);
-              state.totalDownloaded++;
-              log(`  ✓ Downloaded: ${job.localId}`);
-            }
-          } else if (status === 'failed' || status === 'not_found') {
-            log(`  ✗ ${status} - removing from queue`);
+            state.totalGenerated++;
+            state.totalDownloaded++;
+            saveState(state);
+
+            log(`  ✓ Saved: ${queueJob.folderId}`);
+            log(`  ✓ Removed from queue (${updatedQueue.length} remaining)`);
           } else {
-            log(`  ⏳ Still processing...`);
-            stillActive.push(job);
-          }
-        } catch (err: any) {
-          log(`  Error checking: ${err.message}`);
-          stillActive.push(job); // Keep in queue to retry
-        }
-
-        await sleep(1000); // Small delay between checks
-      }
-
-      state.activeJobs = stillActive;
-
-      // 2. Fill queue if there's space
-      while (state.activeJobs.length < MAX_CONCURRENT_JOBS) {
-        const nextJob = getNextPendingJob(manifest);
-        if (!nextJob) {
-          log('No more pending jobs in manifest.');
-          break;
-        }
-
-        log(`Queuing ${nextJob.type}: ${nextJob.localId}`);
-        log(`  ${nextJob.description}`);
-
-        try {
-          let pixelLabId: string;
-
-          // Create job based on asset type
-          switch (nextJob.type) {
-            case 'character': {
-              const props = nextJob.extra?.proportions;
-              pixelLabId = await createCharacter(nextJob.description, nextJob.localId, props);
-              break;
-            }
-            case 'animal':
-              pixelLabId = await createAnimal(nextJob.description, nextJob.localId);
-              break;
-            case 'tileset': {
-              const extra = nextJob.extra as any;
-              pixelLabId = await createTileset(extra.lower, extra.upper, extra.transition);
-              break;
-            }
-            case 'isometric_tile':
-              pixelLabId = await createIsometricTile(nextJob.description);
-              break;
-            case 'map_object': {
-              const extra = nextJob.extra as any;
-              pixelLabId = await createMapObject(nextJob.description, extra?.width || 48, extra?.height || 48);
-              break;
-            }
-            case 'item': {
-              const extra = nextJob.extra as any;
-              pixelLabId = await createMapObject(nextJob.description, extra?.width || 32, extra?.height || 32);
-              break;
-            }
-            default:
-              throw new Error(`Unknown job type: ${nextJob.type}`);
+            // Mark as failed
+            queueJob.status = 'failed';
+            saveQueue(queue);
           }
 
-          log(`  ✓ Queued: ${pixelLabId}`);
-
-          state.activeJobs.push({
-            pixelLabId,
-            localId: nextJob.localId,
-            type: nextJob.type,
-            category: nextJob.category,
-            queuedAt: new Date().toISOString(),
-            description: nextJob.description,
-          });
-
-          markJobQueued(manifest, nextJob.localId, nextJob.category);
-          state.totalGenerated++;
-
-          saveManifest(manifest);
+          // Rate limiting
+          log(`  Waiting ${DELAY_AFTER_QUEUE_MS / 1000}s...`);
           await sleep(DELAY_AFTER_QUEUE_MS);
+          continue;
+
         } catch (err: any) {
           log(`  ✗ Error: ${err.message}`);
+          queueJob.status = 'failed';
+          saveQueue(queue);
+
           if (err.message.includes('rate') || err.message.includes('limit') || err.message.includes('429')) {
-            log('  Rate limited - waiting for next cycle');
-            break;
+            log('  Rate limited - waiting longer before retry');
+            await sleep(CHECK_INTERVAL_MS);
           }
+          continue;
         }
       }
 
-      // 3. Save state and show summary
-      saveState(state);
+      // No queue jobs - check manifest
+      const manifest = loadManifest();
 
-      log(`\n--- Status: ${state.activeJobs.length}/${MAX_CONCURRENT_JOBS} active | ${state.totalGenerated} queued | ${state.totalDownloaded} downloaded ---`);
+      // Get next pending job
+      const nextJob = getNextPendingJob(manifest);
+      if (!nextJob) {
+        log('No more pending jobs in manifest or queue. Waiting for new entries...');
+        await sleep(CHECK_INTERVAL_MS);
+        continue;
+      }
 
-      // Count remaining across all sections
-      let remaining = 0;
+      log(`\nGenerating ${nextJob.type}: ${nextJob.localId}`);
+      log(`  ${nextJob.description}`);
 
-      // Helper to count pending in nested sections
+      try {
+        // Determine size based on asset type
+        let size = 48;
+        if (nextJob.type === 'animal') size = 32;
+        if (nextJob.extra?.width) size = nextJob.extra.width;
+
+        // Generate sprite synchronously
+        const base64Data = await generateSprite(nextJob.description, size);
+        log(`  ✓ Generated sprite`);
+
+        // Save immediately
+        const success = await saveSprite(nextJob.localId, nextJob.category, base64Data, nextJob.description, size);
+
+        if (success) {
+          markJobQueued(manifest, nextJob.localId, nextJob.category);
+          markJobCompleted(manifest, nextJob.localId, nextJob.category);
+          saveManifest(manifest);
+
+          state.totalGenerated++;
+          state.totalDownloaded++;
+          saveState(state);
+
+          log(`  ✓ Saved: ${nextJob.localId}`);
+        }
+
+        // Rate limiting
+        log(`  Waiting ${DELAY_AFTER_QUEUE_MS / 1000}s...`);
+        await sleep(DELAY_AFTER_QUEUE_MS);
+
+      } catch (err: any) {
+        log(`  ✗ Error: ${err.message}`);
+        if (err.message.includes('rate') || err.message.includes('limit') || err.message.includes('429')) {
+          log('  Rate limited - waiting longer before retry');
+          await sleep(CHECK_INTERVAL_MS);
+        } else {
+          // Mark as queued (remove from pending) to avoid infinite retries
+          markJobQueued(manifest, nextJob.localId, nextJob.category);
+          saveManifest(manifest);
+        }
+      }
+
+      // Count remaining
       const countPending = (section: any) => {
         if (!section) return 0;
         let count = 0;
-        if (section.pending) {
-          count += section.pending.length;
-        }
+        if (section.pending) count += section.pending.length;
         for (const value of Object.values(section)) {
           if (value && typeof value === 'object' && (value as any).pending) {
             count += (value as any).pending.length;
@@ -806,24 +500,15 @@ async function runDaemon(): Promise<void> {
         return count;
       };
 
-      remaining += countPending(manifest.humanoids);
-      remaining += countPending(manifest.animals);
-      remaining += countPending(manifest.building_tiles);
-      remaining += countPending(manifest.tilesets);
-      remaining += countPending(manifest.map_objects);
-      remaining += countPending(manifest.items);
-      remaining += countPending(manifest.plants);
+      const remaining =
+        countPending(manifest.humanoids) +
+        countPending(manifest.animals) +
+        countPending(manifest.building_tiles) +
+        countPending(manifest.tilesets) +
+        countPending(manifest.map_objects) +
+        countPending(manifest.items);
 
-      log(`--- Remaining in manifest: ${remaining} ---\n`);
-
-      if (remaining === 0 && state.activeJobs.length === 0) {
-        log('=== All jobs complete! Daemon finished. ===');
-        break;
-      }
-
-      // 4. Wait before next check
-      log(`Sleeping ${CHECK_INTERVAL_MS / 1000}s until next check...`);
-      await sleep(CHECK_INTERVAL_MS);
+      log(`--- Progress: ${state.totalGenerated} generated | ${remaining} remaining ---\n`);
 
     } catch (err: any) {
       log(`Error in main loop: ${err.message}`);

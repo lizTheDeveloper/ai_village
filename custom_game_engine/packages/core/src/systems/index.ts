@@ -5,6 +5,7 @@
 // Agent AI - modular system
 export * from './AgentBrainSystem.js';
 export * from './MovementSystem.js';
+export * from './AnimationSystem.js';
 export * from './NeedsSystem.js';
 export * from './MemorySystem.js';
 export * from './CommunicationSystem.js';

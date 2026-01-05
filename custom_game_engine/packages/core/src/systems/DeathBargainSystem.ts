@@ -27,6 +27,7 @@ import {
 } from '../components/DeathBargainComponent.js';
 import type { SoulIdentityComponent } from '../components/SoulIdentityComponent.js';
 import type { AfterlifeComponent } from '../components/AfterlifeComponent.js';
+import { createConversationComponent } from '../components/ConversationComponent.js';
 import { ComponentType } from '../types/ComponentType.js';
 import { RiddleGenerator, type HeroContext } from '../divinity/RiddleGenerator.js';
 import {
@@ -1264,7 +1265,7 @@ Respond with ONLY a number between 0.0 and 1.0.`;
   ): void {
     // Ensure hero has conversation component
     if (!hero.components.get('conversation')) {
-      const conv = require('../components/ConversationComponent.js').createConversationComponent(50);
+      const conv = createConversationComponent(50);
       (hero as any).addComponent(conv);
     }
 

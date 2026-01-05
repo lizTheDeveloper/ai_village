@@ -1,18 +1,7 @@
 {
   "id": "horse_white",
-  "base_species": "horse",
-  "variant": "white",
-  "description": "white horse",
-  "size": 64,
-  "directions": [
-    "south",
-    "southwest",
-    "west",
-    "northwest",
-    "north",
-    "northeast",
-    "east",
-    "southeast"
-  ],
-  "generated_at": "2026-01-04T00:10:19.413Z"
+  "category": "animals.working",
+  "size": 32,
+  "description": "White horse, elegant build, flowing mane and tail, standing pose, top-down",
+  "generated_at": "2026-01-04T21:25:38.953Z"
 }

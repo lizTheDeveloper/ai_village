@@ -1,18 +1,8 @@
 {
   "id": "rabbit_white",
-  "base_species": "rabbit",
-  "variant": "white",
-  "description": "white rabbit",
-  "size": 48,
-  "directions": [
-    "south",
-    "southwest",
-    "west",
-    "northwest",
-    "north",
-    "northeast",
-    "east",
-    "southeast"
-  ],
-  "generated_at": "2026-01-04T00:35:36.697Z"
+  "category": "animals.pets",
+  "size": 32,
+  "description": "White rabbit, long ears, red eyes, sitting pose, top-down view",
+  "generated_at": "2026-01-04T21:27:45.682Z",
+  "directions": ["south", "southwest", "west", "northwest", "north", "northeast", "east", "southeast"]
 }

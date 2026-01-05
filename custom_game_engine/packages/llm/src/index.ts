@@ -17,6 +17,14 @@ export * from './ActionDefinitions';
 export * from './PromptCacheManager';
 export * from './RateLimiter';
 
+// Queue and rate limiting infrastructure
+export * from './Semaphore';
+export * from './ProviderQueue';
+export * from './ProviderPoolManager';
+export * from './GameSessionManager';
+export * from './CooldownCalculator';
+export * from './LLMRequestRouter';
+
 // Prompt builder classes (utility functions exported via StructuredPromptBuilder)
 export { WorldContextBuilder } from './prompt-builders/WorldContextBuilder';
 export { VillageInfoBuilder } from './prompt-builders/VillageInfoBuilder';

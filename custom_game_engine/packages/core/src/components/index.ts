@@ -8,6 +8,8 @@ export * from './PhysicsComponent.js';
 export { createPhysicsComponent } from './PhysicsComponent.js';
 export * from './RenderableComponent.js';
 export { createRenderableComponent, type RenderableComponent } from './RenderableComponent.js';
+export * from './AnimationComponent.js';
+export { createAnimationComponent, type AnimationComponent } from './AnimationComponent.js';
 export * from './TagsComponent.js';
 export { createTagsComponent } from './TagsComponent.js';
 export * from './AgentComponent.js';

@@ -17,6 +17,9 @@ export interface CeremonyContext {
   parentSouls?: string[];  // Names of parent souls
   observers?: string[];     // Names of observers present
   soulName?: string;        // The name being given to this soul
+  isReforging?: boolean;    // Is this a reincarnation?
+  previousWisdom?: number;  // Wisdom level from previous lives
+  previousLives?: number;   // Number of previous incarnations
 }
 
 export class SoulCeremonyModal {
@@ -113,11 +116,13 @@ export class SoulCeremonyModal {
     name?: string,
     firstMemory?: string,
     onComplete?: () => void,
-    onReject?: () => void
+    onReject?: () => void,
+    spriteFolderId?: string,
+    reincarnationCount?: number
   ): void {
     this.onComplete = onComplete || null;
     this.onReject = onReject || null;
-    this.renderCompletion(purpose, interests, destiny, archetype, name, firstMemory);
+    this.renderCompletion(purpose, interests, destiny, archetype, name, firstMemory, spriteFolderId, reincarnationCount);
   }
 
   /**
@@ -154,9 +159,26 @@ export class SoulCeremonyModal {
           ✨ The Tapestry of Fate ✨
         </h1>
         <p style="color: #b8860b; font-size: 13px; margin-top: 8px;">
-          A Soul Is Being Woven
+          ${this.currentContext.isReforging ? 'A Soul Returns to Life' : 'A Soul Is Being Woven'}
         </p>
       </div>
+
+      ${this.currentContext.isReforging ? `
+      <div style="margin-bottom: 18px; padding: 15px; background: rgba(138, 43, 226, 0.2); border-left: 3px solid #8A2BE2; border-radius: 5px;">
+        <div style="color: #DDA0DD; font-size: 14px; font-weight: bold; margin-bottom: 8px;">
+          🔄 REINCARNATION
+        </div>
+        <p style="color: #ddd; margin: 4px 0; font-size: 13px;">
+          This soul has lived <strong>${this.currentContext.previousLives}</strong> ${this.currentContext.previousLives === 1 ? 'life' : 'lives'} before
+        </p>
+        <p style="color: #ddd; margin: 4px 0; font-size: 13px;">
+          Soul Wisdom: <strong>${this.formatWisdom(this.currentContext.previousWisdom || 0)}</strong>
+        </p>
+        <p style="color: #DDA0DD; margin: 6px 0 0 0; font-size: 12px; font-style: italic;">
+          The wheel of rebirth turns once more...
+        </p>
+      </div>
+      ` : ''}
 
       <div style="margin-bottom: 18px; padding: 12px; background: rgba(255, 215, 0, 0.1); border-left: 3px solid #ffd700;">
         ${this.currentContext.soulName ? `
@@ -235,9 +257,39 @@ export class SoulCeremonyModal {
     destiny: string,
     archetype: string,
     name?: string,
-    firstMemory?: string
+    firstMemory?: string,
+    spriteFolderId?: string,
+    reincarnationCount?: number
   ): void {
     const soulName = name || 'A Soul';
+
+    // Build sprite display HTML
+    let spriteHtml = '';
+    if (spriteFolderId) {
+      const spritePath = `/assets/sprites/pixellab/${spriteFolderId}/rotations/south.png`;
+      spriteHtml = `
+        <div style="text-align: center; margin-bottom: 20px;">
+          <img src="${spritePath}"
+               alt="${soulName} sprite"
+               style="
+                 width: 96px;
+                 height: 96px;
+                 image-rendering: pixelated;
+                 image-rendering: crisp-edges;
+                 border: 2px solid #ffd700;
+                 border-radius: 5px;
+                 background: rgba(0, 0, 0, 0.3);
+                 padding: 8px;
+               "
+               onerror="this.style.display='none';">
+          ${reincarnationCount !== undefined ? `
+            <div style="color: #88CCFF; font-size: 12px; margin-top: 8px; font-weight: bold;">
+              ${reincarnationCount === 0 || reincarnationCount === 1 ? '✦ First Incarnation' : `✦ Incarnation ${reincarnationCount}`}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
 
     let html = `
       <div style="text-align: center; margin-bottom: 25px;">
@@ -245,6 +297,8 @@ export class SoulCeremonyModal {
           ✨ ${soulName}'s Soul Is Born ✨
         </h1>
       </div>
+
+      ${spriteHtml}
 
       <div style="margin: 25px 0; padding: 20px; background: rgba(255, 215, 0, 0.15); border-radius: 10px; border: 2px solid #ffd700;">
         ${firstMemory ? `
@@ -390,5 +444,13 @@ export class SoulCeremonyModal {
     if (alignment > -0.3) return '⚖️ Neutral';
     if (alignment > -0.7) return '🌑 Cursed';
     return '💀 Highly Cursed';
+  }
+
+  private formatWisdom(wisdom: number): string {
+    if (wisdom > 0.9) return '🌟 Ancient Sage';
+    if (wisdom > 0.7) return '✨ Enlightened';
+    if (wisdom > 0.5) return '📚 Experienced';
+    if (wisdom > 0.3) return '🌱 Maturing';
+    return '🆕 Novice';
   }
 }

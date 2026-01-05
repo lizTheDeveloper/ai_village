@@ -28,15 +28,12 @@ import {
   type SkillsComponent,
   type IdentityComponent,
   type TagsComponent,
-  BuildingType,
   CT,
-  EntityImpl,
-  createEntityId,
-  createPositionComponent,
-  createPhysicsComponent,
-  createRenderableComponent,
-  createTagsComponent,
-  createBuildingComponent,
+  getTileBasedBlueprintRegistry,
+  parseLayout,
+  type WallMaterial,
+  type DoorMaterial,
+  type WindowMaterial,
 } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
@@ -76,7 +73,7 @@ interface ClickRegion {
   y: number;
   width: number;
   height: number;
-  action: 'select_section' | 'toggle_paradigm' | 'adjust_slider' | 'execute_action' | 'unlock_spell' | 'grant_xp';
+  action: 'select_section' | 'toggle_paradigm' | 'adjust_slider' | 'execute_action' | 'unlock_spell' | 'grant_xp' | 'adjust_spawn_x' | 'adjust_spawn_y';
   data?: string;
 }
 
@@ -393,6 +390,18 @@ export class DevPanel implements IWindowPanel {
   private world: World | null = null;
   private agentSpawnHandler: AgentSpawnHandler | null = null;
 
+  // Spawn location state (deprecated - use click-to-place)
+  private spawnX = 50;
+  private spawnY = 50;
+
+  // Building placement state
+  private clickToPlaceMode = false;
+  private selectedBlueprintId: string | null = null;
+  private placeAsBlueprint = true; // true = blueprint for agents to build, false = instant build
+
+  // Selected agent for skill XP operations
+  private selectedAgentId: string | null = null;
+
   constructor() {
     // Initialize paradigm states
     for (const p of PARADIGMS) {
@@ -493,6 +502,20 @@ export class DevPanel implements IWindowPanel {
    */
   setAgentSpawnHandler(handler: AgentSpawnHandler): void {
     this.agentSpawnHandler = handler;
+  }
+
+  /**
+   * Set the selected agent ID for skill XP operations (called from main.ts)
+   */
+  setSelectedAgentId(agentId: string | null): void {
+    this.selectedAgentId = agentId;
+  }
+
+  /**
+   * Get the currently selected agent ID
+   */
+  getSelectedAgentId(): string | null {
+    return this.selectedAgentId;
   }
 
   // ========== Dev API ==========
@@ -733,15 +756,115 @@ export class DevPanel implements IWindowPanel {
   }
 
   private renderSkillsSection(ctx: CanvasRenderingContext2D, width: number, y: number): number {
-    // Skill trees
-    y = this.renderSectionHeader(ctx, width, y, 'SKILL TREES');
+    if (!this.world) {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '10px monospace';
+      ctx.fillText('No world available', SIZES.padding, y + 8);
+      return y + 30;
+    }
 
-    for (const tree of SKILL_TREES) {
-      y = this.renderSkillTreeRow(ctx, width, y, tree);
+    // Show selected agent
+    y = this.renderSectionHeader(ctx, width, y, 'SELECTED AGENT');
+
+    if (!this.selectedAgentId) {
+      ctx.fillStyle = COLORS.warning;
+      ctx.font = '10px monospace';
+      ctx.fillText('No agent selected', SIZES.padding, y + 8);
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '9px monospace';
+      ctx.fillText('Click an agent in the game to select', SIZES.padding, y + 24);
+      y += 40;
+    } else {
+      const agent = this.world.getEntity(this.selectedAgentId);
+      if (!agent) {
+        ctx.fillStyle = COLORS.warning;
+        ctx.font = '10px monospace';
+        ctx.fillText('Selected agent not found', SIZES.padding, y + 8);
+        y += 24;
+      } else {
+        const identity = agent.getComponent<IdentityComponent>(CT.Identity);
+        const skills = agent.getComponent<SkillsComponent>(CT.Skills);
+
+        ctx.fillStyle = COLORS.success;
+        ctx.font = 'bold 11px monospace';
+        ctx.fillText(identity?.name || 'Unnamed Agent', SIZES.padding, y + 8);
+
+        if (skills) {
+          ctx.fillStyle = COLORS.textMuted;
+          ctx.font = '9px monospace';
+          const skillEntries = Object.entries(skills.levels);
+          const totalLevel = skillEntries.reduce((sum, [, level]) => sum + (level as number), 0);
+          ctx.fillText(`Total Level: ${Math.floor(totalLevel)}`, SIZES.padding, y + 24);
+          y += 36;
+
+          // Show current skills
+          y = this.renderSectionHeader(ctx, width, y, 'CURRENT SKILLS');
+
+          for (const [skillName, level] of skillEntries.slice(0, 8)) {
+            ctx.fillStyle = COLORS.text;
+            ctx.font = '9px monospace';
+            ctx.fillText(skillName, SIZES.padding, y + 4);
+
+            ctx.fillStyle = COLORS.magic;
+            ctx.font = 'bold 9px monospace';
+            ctx.fillText(`Lvl ${Math.floor(level as number)}`, width - 60, y + 4);
+
+            y += 16;
+          }
+
+          if (skillEntries.length > 8) {
+            ctx.fillStyle = COLORS.textDim;
+            ctx.font = '9px monospace';
+            ctx.fillText(`... and ${skillEntries.length - 8} more`, SIZES.padding, y + 4);
+            y += 16;
+          }
+        } else {
+          ctx.fillStyle = COLORS.textDim;
+          ctx.font = '9px monospace';
+          ctx.fillText('Agent has no skills', SIZES.padding, y + 24);
+          y += 36;
+        }
+      }
+    }
+
+    // Grant XP buttons
+    y = this.renderSectionHeader(ctx, width, y, 'GRANT XP TO SELECTED AGENT');
+
+    const xpButtons = [
+      { label: '+100 XP (Random Skill)', amount: 100 },
+      { label: '+500 XP (Random Skill)', amount: 500 },
+      { label: '+1000 XP (Random Skill)', amount: 1000 },
+    ];
+
+    for (const btn of xpButtons) {
+      const btnWidth = width - SIZES.padding * 2;
+      const isDisabled = !this.selectedAgentId;
+
+      ctx.fillStyle = isDisabled ? COLORS.inputBg : COLORS.button;
+      ctx.beginPath();
+      ctx.roundRect(SIZES.padding, y + 4, btnWidth, SIZES.buttonHeight, 4);
+      ctx.fill();
+
+      ctx.fillStyle = isDisabled ? COLORS.textDim : COLORS.text;
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText(btn.label, SIZES.padding + 8, y + 12);
+
+      if (!isDisabled) {
+        this.clickRegions.push({
+          x: SIZES.padding,
+          y: y + 4,
+          width: btnWidth,
+          height: SIZES.buttonHeight,
+          action: 'execute_action',
+          data: `grant_selected_agent_xp_${btn.amount}`,
+        });
+      }
+
+      y += SIZES.buttonHeight + 4;
     }
 
     // Actions
-    y = this.renderSectionHeader(ctx, width, y, 'QUICK ACTIONS');
+    y = this.renderSectionHeader(ctx, width, y, 'QUICK ACTIONS (ALL AGENTS)');
     y = this.renderActions(ctx, width, y, 'skills');
 
     return y + SIZES.padding;
@@ -839,6 +962,9 @@ export class DevPanel implements IWindowPanel {
 
     // Spawn controls
     y = this.renderSectionHeader(ctx, width, y, 'SPAWN AGENTS');
+
+    // Spawn location controls
+    y = this.renderSpawnLocationControls(ctx, width, y);
 
     const spawnButtons = [
       { label: 'Spawn Wandering Agent', action: 'spawn_wandering_agent' },
@@ -1047,28 +1173,70 @@ export class DevPanel implements IWindowPanel {
       return y + 30;
     }
 
-    y = this.renderSectionHeader(ctx, width, y, 'SPAWN BUILDING');
+    y = this.renderSectionHeader(ctx, width, y, 'PLACE BUILDING');
 
-    // Building type selector (show a few common ones as buttons)
-    const commonBuildings: BuildingType[] = [
-      BuildingType.Workbench,
-      BuildingType.StorageChest,
-      BuildingType.Campfire,
-      BuildingType.Tent,
-      BuildingType.Well,
-      BuildingType.Forge,
-      BuildingType.Library,
-      BuildingType.University,
-    ];
+    // Mode toggle: Blueprint vs Fully Built
+    const btnWidth = width - SIZES.padding * 2;
+    const toggleWidth = btnWidth / 2 - 2;
 
     ctx.fillStyle = COLORS.textMuted;
     ctx.font = '9px monospace';
-    ctx.fillText('Click to spawn at (50, 50):', SIZES.padding, y + 4);
-    y += 20;
+    ctx.fillText('Placement Mode:', SIZES.padding, y + 4);
+    y += 18;
 
-    for (const buildingType of commonBuildings) {
-      const btnWidth = width - SIZES.padding * 2;
+    // Blueprint button
+    ctx.fillStyle = this.placeAsBlueprint ? COLORS.success : COLORS.button;
+    ctx.beginPath();
+    ctx.roundRect(SIZES.padding, y + 4, toggleWidth, SIZES.buttonHeight, 4);
+    ctx.fill();
 
+    ctx.fillStyle = COLORS.text;
+    ctx.font = 'bold 9px monospace';
+    ctx.fillText('Blueprint', SIZES.padding + 8, y + 12);
+
+    this.clickRegions.push({
+      x: SIZES.padding,
+      y: y + 4,
+      width: toggleWidth,
+      height: SIZES.buttonHeight,
+      action: 'execute_action',
+      data: 'toggle_blueprint_mode_true',
+    });
+
+    // Fully Built button
+    ctx.fillStyle = !this.placeAsBlueprint ? COLORS.warning : COLORS.button;
+    ctx.beginPath();
+    ctx.roundRect(SIZES.padding + toggleWidth + 4, y + 4, toggleWidth, SIZES.buttonHeight, 4);
+    ctx.fill();
+
+    ctx.fillStyle = COLORS.text;
+    ctx.font = 'bold 9px monospace';
+    ctx.fillText('Instant', SIZES.padding + toggleWidth + 12, y + 12);
+
+    this.clickRegions.push({
+      x: SIZES.padding + toggleWidth + 4,
+      y: y + 4,
+      width: toggleWidth,
+      height: SIZES.buttonHeight,
+      action: 'execute_action',
+      data: 'toggle_blueprint_mode_false',
+    });
+
+    y += SIZES.buttonHeight + 12;
+
+    // Click-to-place status
+    if (this.clickToPlaceMode && this.selectedBlueprintId) {
+      ctx.fillStyle = COLORS.warning;
+      ctx.fillRect(SIZES.padding, y, btnWidth, 24);
+      ctx.fillStyle = COLORS.background;
+      ctx.font = 'bold 10px monospace';
+      ctx.fillText('CLICK ON MAP TO PLACE', SIZES.padding + 8, y + 10);
+      ctx.fillStyle = COLORS.textMuted;
+      ctx.font = '8px monospace';
+      ctx.fillText(`${this.selectedBlueprintId}`, SIZES.padding + 8, y + 20);
+      y += 28;
+
+      // Cancel button
       ctx.fillStyle = COLORS.button;
       ctx.beginPath();
       ctx.roundRect(SIZES.padding, y + 4, btnWidth, SIZES.buttonHeight, 4);
@@ -1076,7 +1244,7 @@ export class DevPanel implements IWindowPanel {
 
       ctx.fillStyle = COLORS.text;
       ctx.font = 'bold 9px monospace';
-      ctx.fillText(`Spawn ${buildingType}`, SIZES.padding + 8, y + 12);
+      ctx.fillText('Cancel Placement', SIZES.padding + 8, y + 12);
 
       this.clickRegions.push({
         x: SIZES.padding,
@@ -1084,7 +1252,52 @@ export class DevPanel implements IWindowPanel {
         width: btnWidth,
         height: SIZES.buttonHeight,
         action: 'execute_action',
-        data: `spawn_building_${buildingType}`,
+        data: 'cancel_blueprint_placement',
+      });
+
+      y += SIZES.buttonHeight + 8;
+    }
+
+    // Available tile blueprints
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = '9px monospace';
+    ctx.fillText('Available Blueprints:', SIZES.padding, y + 4);
+    y += 18;
+
+    const registry = getTileBasedBlueprintRegistry();
+    const blueprints = [
+      'tile_small_house',
+      'tile_medium_house',
+      'tile_workshop',
+      'tile_storage_shed',
+      'tile_barn',
+      'tile_stone_house',
+      'tile_guard_tower',
+      'tile_longhouse',
+    ];
+
+    for (const blueprintId of blueprints) {
+      const blueprint = registry.get(blueprintId);
+      if (!blueprint) continue;
+
+      const isSelected = this.selectedBlueprintId === blueprintId;
+
+      ctx.fillStyle = isSelected ? COLORS.magic : COLORS.button;
+      ctx.beginPath();
+      ctx.roundRect(SIZES.padding, y + 4, btnWidth, SIZES.buttonHeight, 4);
+      ctx.fill();
+
+      ctx.fillStyle = COLORS.text;
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText(blueprint.name, SIZES.padding + 8, y + 12);
+
+      this.clickRegions.push({
+        x: SIZES.padding,
+        y: y + 4,
+        width: btnWidth,
+        height: SIZES.buttonHeight,
+        action: 'execute_action',
+        data: `select_blueprint_${blueprintId}`,
       });
 
       y += SIZES.buttonHeight + 4;
@@ -1335,6 +1548,85 @@ export class DevPanel implements IWindowPanel {
     return y + 8;
   }
 
+  private renderSpawnLocationControls(ctx: CanvasRenderingContext2D, width: number, y: number): number {
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = '9px monospace';
+    ctx.fillText('Spawn Location:', SIZES.padding, y + 4);
+    y += 18;
+
+    // X coordinate slider
+    const sliderWidth = width - SIZES.padding * 2 - 60;
+    const maxCoord = 200;
+    const progressX = this.spawnX / maxCoord;
+
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = '9px monospace';
+    ctx.fillText('X:', SIZES.padding, y + 4);
+
+    ctx.fillStyle = COLORS.text;
+    ctx.font = 'bold 10px monospace';
+    ctx.fillText(`${this.spawnX}`, SIZES.padding + sliderWidth + 10, y + 4);
+
+    ctx.fillStyle = COLORS.sliderBg;
+    ctx.fillRect(SIZES.padding + 15, y + 16, sliderWidth, 12);
+
+    ctx.fillStyle = COLORS.slider;
+    ctx.fillRect(SIZES.padding + 15, y + 16, sliderWidth * progressX, 12);
+
+    const handleX = SIZES.padding + 15 + sliderWidth * progressX;
+    ctx.fillStyle = COLORS.text;
+    ctx.beginPath();
+    ctx.arc(handleX, y + 22, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    this.clickRegions.push({
+      x: SIZES.padding + 15,
+      y: y + 12,
+      width: sliderWidth,
+      height: 20,
+      action: 'adjust_spawn_x',
+      data: 'spawnX',
+    });
+
+    y += 36;
+
+    // Y coordinate slider
+    const progressY = this.spawnY / maxCoord;
+
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = '9px monospace';
+    ctx.fillText('Y:', SIZES.padding, y + 4);
+
+    ctx.fillStyle = COLORS.text;
+    ctx.font = 'bold 10px monospace';
+    ctx.fillText(`${this.spawnY}`, SIZES.padding + sliderWidth + 10, y + 4);
+
+    ctx.fillStyle = COLORS.sliderBg;
+    ctx.fillRect(SIZES.padding + 15, y + 16, sliderWidth, 12);
+
+    ctx.fillStyle = COLORS.slider;
+    ctx.fillRect(SIZES.padding + 15, y + 16, sliderWidth * progressY, 12);
+
+    const handleY = SIZES.padding + 15 + sliderWidth * progressY;
+    ctx.fillStyle = COLORS.text;
+    ctx.beginPath();
+    ctx.arc(handleY, y + 22, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    this.clickRegions.push({
+      x: SIZES.padding + 15,
+      y: y + 12,
+      width: sliderWidth,
+      height: 20,
+      action: 'adjust_spawn_y',
+      data: 'spawnY',
+    });
+
+    y += 40;
+
+    return y;
+  }
+
   // ========== Interaction ==========
 
   handleScroll(deltaY: number, _contentHeight?: number): boolean {
@@ -1398,6 +1690,8 @@ export class DevPanel implements IWindowPanel {
           if (paradigm && state) {
             state.mana = Math.floor(progress * paradigm.maxMana);
             this.log(`Set ${paradigmId} mana to ${state.mana}`);
+            // TODO: Apply mana to world entities when mana component is implemented
+            // For now, this is local state only
           }
         } else {
           const resource = DIVINE_RESOURCES.find(r => r.id === sliderId);
@@ -1405,38 +1699,138 @@ export class DevPanel implements IWindowPanel {
             const value = Math.floor(resource.min + progress * (resource.max - resource.min));
             this.divineResources.set(sliderId, value);
             this.log(`Set ${resource.name} to ${value}`);
+            // Apply divine resource changes to world
+            this.applyDivineResourceToWorld(sliderId, value);
           }
         }
+        return true;
+      }
+
+      case 'adjust_spawn_x': {
+        const progress = Math.max(0, Math.min(1, (clickX - region.x) / region.width));
+        this.spawnX = Math.floor(progress * 200);
+        return true;
+      }
+
+      case 'adjust_spawn_y': {
+        const progress = Math.max(0, Math.min(1, (clickX - region.x) / region.width));
+        this.spawnY = Math.floor(progress * 200);
         return true;
       }
 
       case 'execute_action':
         this.executeAction(region.data!);
         return true;
-
-      case 'grant_xp': {
-        const treeId = region.data!;
-        const current = this.skillXp.get(treeId) ?? 0;
-        this.skillXp.set(treeId, current + 100);
-        this.log(`Granted 100 XP to ${treeId}`);
-        return true;
-      }
     }
     return false;
   }
 
-  private executeAction(actionId: string): void {
-    // Handle building spawning
-    if (actionId.startsWith('spawn_building_')) {
-      const buildingType = actionId.replace('spawn_building_', '') as BuildingType;
-      this.spawnBuilding(buildingType);
+  /**
+   * Apply divine resource changes to world entities (gods, believers, etc.)
+   */
+  private applyDivineResourceToWorld(resourceId: string, value: number): void {
+    if (!this.world) return;
+
+    try {
+      // Note: This is a placeholder implementation
+      // The actual divine system may need specific component updates
+      // For now, we just log the change
+      // TODO: Wire up to actual divine components when system is implemented
+      this.log(`Divine resource ${resourceId} set to ${value} (world sync pending)`);
+    } catch (error) {
+      this.log(`ERROR applying divine resource: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  /**
+   * Grant XP to all agents in the world
+   */
+  private grantXPToAllAgents(amount: number): void {
+    if (!this.world) {
+      this.log('ERROR: No world available');
       return;
     }
 
-    // Handle agent XP granting
+    try {
+      const agents = this.world.query().with(CT.Agent).with(CT.Skills).executeEntities();
+      let grantedCount = 0;
+
+      for (const agent of agents) {
+        const skills = agent.getComponent<SkillsComponent>(CT.Skills);
+        if (!skills) continue;
+
+        const skillNames = Object.keys(skills.levels);
+        if (skillNames.length === 0) continue;
+
+        // Grant XP to a random skill
+        const randomSkill = skillNames[Math.floor(Math.random() * skillNames.length)]!;
+        const currentLevel = (skills.levels as any)[randomSkill] || 0;
+        const newLevel = currentLevel + (amount / 100); // 100 XP = 1 level
+
+        // Update the skill component
+        (this.world as any).updateComponent(agent.id, CT.Skills, (current: SkillsComponent) => ({
+          ...current,
+          levels: {
+            ...current.levels,
+            [randomSkill]: newLevel,
+          },
+        }));
+
+        grantedCount++;
+      }
+
+      this.log(`Granted ${amount} XP to ${grantedCount} agents`);
+    } catch (error) {
+      this.log(`ERROR granting XP to all: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  private executeAction(actionId: string): void {
+    // Handle blueprint mode toggle
+    if (actionId === 'toggle_blueprint_mode_true') {
+      this.placeAsBlueprint = true;
+      this.log('Mode: Place Blueprint (agents will build)');
+      return;
+    }
+
+    if (actionId === 'toggle_blueprint_mode_false') {
+      this.placeAsBlueprint = false;
+      this.log('Mode: Place Fully Built (instant)');
+      return;
+    }
+
+    // Handle blueprint selection
+    if (actionId.startsWith('select_blueprint_')) {
+      const blueprintId = actionId.replace('select_blueprint_', '');
+      this.selectedBlueprintId = blueprintId;
+      this.clickToPlaceMode = true;
+      this.log(`Selected: ${blueprintId} - Click on map to place`);
+      return;
+    }
+
+    // Handle cancel placement
+    if (actionId === 'cancel_blueprint_placement') {
+      this.clickToPlaceMode = false;
+      this.selectedBlueprintId = null;
+      this.log('Cancelled blueprint placement');
+      return;
+    }
+
+    // Handle agent XP granting (per-agent button in Agents tab)
     if (actionId.startsWith('grant_agent_xp_')) {
       const agentId = actionId.replace('grant_agent_xp_', '');
       this.grantAgentXP(agentId, 100);
+      return;
+    }
+
+    // Handle selected agent XP granting (Skills tab)
+    if (actionId.startsWith('grant_selected_agent_xp_')) {
+      const amount = parseInt(actionId.replace('grant_selected_agent_xp_', ''), 10);
+      if (this.selectedAgentId) {
+        this.grantAgentXP(this.selectedAgentId, amount);
+      } else {
+        this.log('ERROR: No agent selected');
+      }
       return;
     }
 
@@ -1471,34 +1865,54 @@ export class DevPanel implements IWindowPanel {
       case 'grant_belief':
         const belief = (this.divineResources.get('belief') ?? 0) + 1000;
         this.divineResources.set('belief', belief);
+        this.applyDivineResourceToWorld('belief', belief);
         this.log('Added 1000 belief');
         break;
       case 'max_faith':
-        this.log('Set all believer faith to 100%');
+        // TODO: Implement actual faith system when divine components are available
+        this.log('Set all believer faith to 100% (not yet implemented)');
         break;
       case 'spawn_angel':
+        // TODO: Implement actual angel spawning when divine entities are implemented
         const angels = (this.divineResources.get('angels') ?? 0) + 1;
         this.divineResources.set('angels', angels);
-        this.log('Spawned new angel');
+        this.log('Spawned new angel (not yet implemented)');
         break;
       case 'answer_prayers':
-        this.log('Answered all pending prayers');
+        // TODO: Implement prayer answering when prayer system is available
+        this.log('Answered all pending prayers (not yet implemented)');
         break;
       case 'grant_xp_all':
-        for (const tree of SKILL_TREES) {
-          const current = this.skillXp.get(tree.id) ?? 0;
-          this.skillXp.set(tree.id, current + 500);
-        }
-        this.log('Granted 500 XP to all skill trees');
+        this.grantXPToAllAgents(500);
         break;
       case 'unlock_all_nodes':
-        this.log('Unlocked all skill tree nodes');
+        // Grant massive XP to all agents to unlock all nodes
+        this.grantXPToAllAgents(10000);
+        this.log('Granted 10000 XP to all agents (unlock all nodes)');
         break;
       case 'trigger_eclipse':
-        this.log('Triggered eclipse event');
+        if (this.world) {
+          // Emit a custom event for eclipse
+          // Note: No eclipse event in GameEventMap, so we emit a generic divine power event
+          this.world.eventBus.emit({
+            type: 'divine_power:minor_miracle',
+            source: 'DevPanel',
+            data: { deityId: 'dev_tools', miracleType: 'eclipse', cost: 0 },
+          });
+          this.log('Triggered eclipse event');
+        }
         break;
       case 'trigger_miracle':
-        this.log('Triggered random miracle');
+        if (this.world) {
+          const miracles = ['healing', 'abundance', 'revelation', 'protection', 'wrath'];
+          const randomMiracle = miracles[Math.floor(Math.random() * miracles.length)]!;
+          this.world.eventBus.emit({
+            type: 'divine_power:major_miracle',
+            source: 'DevPanel',
+            data: { deityId: 'dev_tools', miracleType: randomMiracle, cost: 0 },
+          });
+          this.log(`Triggered ${randomMiracle} miracle`);
+        }
         break;
       case 'reset_all':
         for (const p of PARADIGMS) {
@@ -1516,28 +1930,150 @@ export class DevPanel implements IWindowPanel {
     }
   }
 
-  private spawnBuilding(buildingType: BuildingType): void {
-    if (!this.world) {
-      this.log('ERROR: No world available');
-      return;
+  /**
+   * Check if DevPanel is in click-to-place mode
+   * Main renderer should intercept world clicks and call handleWorldClick
+   */
+  public isClickToPlaceActive(): boolean {
+    return this.clickToPlaceMode && this.selectedBlueprintId !== null;
+  }
+
+  /**
+   * Handle world click for blueprint placement
+   * Called by main renderer when user clicks on the game world
+   */
+  public handleWorldClick(worldX: number, worldY: number): boolean {
+    if (!this.clickToPlaceMode || !this.selectedBlueprintId || !this.world) {
+      return false;
     }
 
     try {
-      // Create building entity at position (50, 50)
-      const entity = new EntityImpl(createEntityId(), this.world.tick);
-      entity.addComponent(createPositionComponent(50, 50, 0));
-      entity.addComponent(createPhysicsComponent(true, 1, 1));
-      entity.addComponent(createRenderableComponent(buildingType, 'building'));
-      entity.addComponent(createTagsComponent('building', buildingType));
-      entity.addComponent(createBuildingComponent(buildingType));
+      if (this.placeAsBlueprint) {
+        this.placeBlueprintForConstruction(worldX, worldY);
+      } else {
+        this.placeFullyBuiltBuilding(worldX, worldY);
+      }
 
-      // Add to world using private method
-      (this.world as any)._addEntity(entity);
-
-      this.log(`Spawned ${buildingType} at (50, 50)`);
+      // Clear click-to-place mode after successful placement
+      this.clickToPlaceMode = false;
+      this.selectedBlueprintId = null;
+      return true;
     } catch (error) {
-      this.log(`ERROR spawning ${buildingType}: ${error instanceof Error ? error.message : String(error)}`);
+      this.log(`ERROR: ${error instanceof Error ? error.message : String(error)}`);
+      return false;
     }
+  }
+
+  /**
+   * Place blueprint as a construction task for agents to build
+   */
+  private placeBlueprintForConstruction(worldX: number, worldY: number): void {
+    if (!this.world || !this.selectedBlueprintId) return;
+
+    // Get TileConstructionSystem from world
+    const tileConstructionSystem = (this.world as any).getSystem?.('tile_construction');
+    if (!tileConstructionSystem) {
+      throw new Error('TileConstructionSystem not found in world');
+    }
+
+    // Create construction task
+    const task = tileConstructionSystem.createTask(
+      this.world,
+      this.selectedBlueprintId,
+      Math.floor(worldX),
+      Math.floor(worldY),
+      0 // rotation
+    );
+
+    // Start the task
+    tileConstructionSystem.startTask(this.world, task.id);
+
+    this.log(`Placed blueprint: ${this.selectedBlueprintId} at (${Math.floor(worldX)}, ${Math.floor(worldY)}) - Agents will build`);
+  }
+
+  /**
+   * Place fully-built building instantly (no construction phase)
+   */
+  private placeFullyBuiltBuilding(worldX: number, worldY: number): void {
+    if (!this.world || !this.selectedBlueprintId) return;
+
+    const registry = getTileBasedBlueprintRegistry();
+    const blueprint = registry.get(this.selectedBlueprintId);
+    if (!blueprint) {
+      throw new Error(`Blueprint "${this.selectedBlueprintId}" not found`);
+    }
+
+    // Parse layout to get tile positions
+    const originX = Math.floor(worldX);
+    const originY = Math.floor(worldY);
+    const parsedTiles = parseLayout(blueprint, originX, originY, 0);
+
+    // Get world getTileAt method
+    const worldWithTiles = this.world as any;
+    if (typeof worldWithTiles.getTileAt !== 'function') {
+      throw new Error('World does not have getTileAt method');
+    }
+
+    // Place all tiles directly
+    for (const parsed of parsedTiles) {
+      const tile = worldWithTiles.getTileAt(parsed.x, parsed.y);
+      if (!tile) {
+        throw new Error(`Tile at (${parsed.x}, ${parsed.y}) not found`);
+      }
+
+      // Place tile based on type
+      switch (parsed.type) {
+        case 'wall':
+          tile.wall = {
+            material: parsed.materialId as WallMaterial,
+            condition: 100,
+            insulation: this.getWallInsulation(parsed.materialId as WallMaterial),
+            constructedAt: this.world.tick,
+          };
+          break;
+
+        case 'door':
+          tile.door = {
+            material: parsed.materialId as DoorMaterial,
+            state: 'closed',
+            constructedAt: this.world.tick,
+          };
+          break;
+
+        case 'window':
+          tile.window = {
+            material: parsed.materialId as WindowMaterial,
+            condition: 100,
+            lightsThrough: true,
+            constructedAt: this.world.tick,
+          };
+          break;
+
+        case 'floor':
+          tile.floor = parsed.materialId;
+          break;
+      }
+    }
+
+    console.log(`[DevPanel] ✅ Placed fully-built: ${blueprint.name} at (${originX}, ${originY}) - ${parsedTiles.length} tiles`);
+    console.log(`[DevPanel] Tile details:`, parsedTiles.map(t => `${t.type}@(${t.x},${t.y})`).slice(0, 5));
+    this.log(`Placed fully-built: ${blueprint.name} at (${originX}, ${originY}) - ${parsedTiles.length} tiles`);
+  }
+
+  /**
+   * Get wall insulation value for a material
+   */
+  private getWallInsulation(material: WallMaterial): number {
+    const insulations: Record<WallMaterial, number> = {
+      wood: 50,
+      stone: 80,
+      mud_brick: 60,
+      ice: 40,
+      metal: 90,
+      glass: 30,
+      thatch: 35,
+    };
+    return insulations[material] ?? 50;
   }
 
   private grantAgentXP(agentId: string, amount: number): void {
@@ -1601,38 +2137,38 @@ export class DevPanel implements IWindowPanel {
     try {
       switch (actionId) {
         case 'spawn_wandering_agent': {
-          const agentId = this.agentSpawnHandler.spawnWanderingAgent(50, 50);
-          this.log(`Spawned wandering agent: ${agentId}`);
+          const agentId = this.agentSpawnHandler.spawnWanderingAgent(this.spawnX, this.spawnY);
+          this.log(`Spawned wandering agent at (${this.spawnX}, ${this.spawnY})`);
           break;
         }
 
         case 'spawn_llm_agent': {
-          const agentId = this.agentSpawnHandler.spawnLLMAgent(50, 50);
-          this.log(`Spawned LLM agent: ${agentId}`);
+          const agentId = this.agentSpawnHandler.spawnLLMAgent(this.spawnX, this.spawnY);
+          this.log(`Spawned LLM agent at (${this.spawnX}, ${this.spawnY})`);
           break;
         }
 
         case 'spawn_village_5': {
-          const agentIds = this.agentSpawnHandler.spawnVillage(5, 50, 50);
-          this.log(`Spawned village with 5 agents: ${agentIds.length} created`);
+          const agentIds = this.agentSpawnHandler.spawnVillage(5, this.spawnX, this.spawnY);
+          this.log(`Spawned village with 5 agents at (${this.spawnX}, ${this.spawnY}): ${agentIds.length} created`);
           break;
         }
 
         case 'spawn_village_10': {
-          const agentIds = this.agentSpawnHandler.spawnVillage(10, 50, 50);
-          this.log(`Spawned village with 10 agents: ${agentIds.length} created`);
+          const agentIds = this.agentSpawnHandler.spawnVillage(10, this.spawnX, this.spawnY);
+          this.log(`Spawned village with 10 agents at (${this.spawnX}, ${this.spawnY}): ${agentIds.length} created`);
           break;
         }
 
         case 'spawn_town_25': {
-          const agentIds = this.agentSpawnHandler.spawnVillage(25, 50, 50);
-          this.log(`Spawned town with 25 agents: ${agentIds.length} created`);
+          const agentIds = this.agentSpawnHandler.spawnVillage(25, this.spawnX, this.spawnY);
+          this.log(`Spawned town with 25 agents at (${this.spawnX}, ${this.spawnY}): ${agentIds.length} created`);
           break;
         }
 
         case 'spawn_city_50': {
-          const agentIds = this.agentSpawnHandler.spawnVillage(50, 50, 50);
-          this.log(`Spawned city with 50 agents: ${agentIds.length} created`);
+          const agentIds = this.agentSpawnHandler.spawnVillage(50, this.spawnX, this.spawnY);
+          this.log(`Spawned city with 50 agents at (${this.spawnX}, ${this.spawnY}): ${agentIds.length} created`);
           break;
         }
 

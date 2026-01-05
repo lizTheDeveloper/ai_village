@@ -1,5 +1,113 @@
 # Release Notes
 
+## 2026-01-04 - Animation, LLM Routing & Soul Repository
+
+### Animation System Implementation
+
+#### Core Animation Components
+- **AnimationComponent.ts** - Component for sprite animation (frame sequences, timing, looping)
+- **AnimationSystem.ts** - System to update animation frames each tick
+- **SoulAnimationProgressionSystem.ts** - Progressive animation unlocking based on soul reincarnation count
+
+### LLM Provider Management
+
+#### Intelligent Request Routing
+- **LLMRequestRouter.ts** - Route requests to available providers with failover
+- **ProviderPoolManager.ts** - Manage multiple LLM provider pools (OpenRouter, Anthropic, OpenAI)
+- **ProviderQueue.ts** - Per-provider request queuing with rate limiting
+- **CooldownCalculator.ts** - Smart cooldown calculation based on rate limit errors
+- **Semaphore.ts** - Concurrency control for parallel requests
+- **GameSessionManager.ts** - Track active game sessions and LLM usage
+
+#### Test Coverage
+- **ProviderPoolManager.test.ts** - Pool management tests
+- **ProviderQueue.test.ts** - Queue behavior tests
+- **Semaphore.test.ts** - Concurrency control tests
+- **SessionManagement.test.ts** - Session tracking tests
+
+### Soul Repository System
+
+#### Server-Side Persistence
+- **Soul backup API** - POST `/api/save-soul` endpoint
+- **Repository stats API** - GET `/api/soul-repository/stats` endpoint
+- Eternal archive for all souls across reincarnations
+- Server preserves souls even when clients delete them
+
+### PixelLab Sprite Expansion
+
+#### Building & Object Sprites
+- **Campfire** (with 4-frame animation)
+- **Construction frames** (25%, 50%, 75%)
+- **Doors** (wood/stone/metal, open/closed states)
+- **Floors** (dirt/wood/stone)
+- **Walls** (wood/stone/metal/ice/mud brick)
+- **Storage** (chests, barrels)
+- **Well, berry bush**
+
+#### Item Sprites
+- **Tools** - axe, pickaxe, hammer, hoe
+- **Food** - apple, berry, bread, fish, meat
+- **Resources** - wood, stone, fiber, iron ore, gold ore
+
+#### Natural Objects
+- **Trees** (oak large, pine)
+- **Rocks** (boulder)
+
+### 3D Rendering Prototype
+
+#### Initial 3D Exploration
+- **3d-prototype/** directory - THREE.js voxel rendering experiments
+- **Renderer3D.ts** - 3D renderer implementation (parallel to 2D canvas renderer)
+
+### UI Enhancements
+
+#### New Panels
+- **TechTreePanel.ts** - Technology tree visualization (keyboard shortcut: K)
+- Enhanced **DevPanel.ts** with click-to-place mode and agent selection
+- **MenuBar.ts** improvements
+
+#### Debug API Expansion
+- **window.game.grantSkillXP(agentId, amount)** - Grant XP to specific agents
+- **window.game.getAgentSkills(agentId)** - Get agent skill levels
+- **window.game.setSelectedAgent(agentId)** - Set selected agent (syncs DevPanel + AgentInfoPanel)
+- **window.game.getSelectedAgent()** - Get currently selected agent ID
+
+### Building System Improvements
+
+#### Tile-Based Construction
+- **TileBasedBlueprintRegistry** enhancements
+- Multi-tile building placement (houses, walls, floors)
+- Material system integration
+- Construction progress visualization
+
+### Documentation
+
+#### Developer Guides
+- **CLAUDE.md** - Added Debug Actions API section (183 lines)
+- **CLAUDE.md** - Added PixelLab Sprite Daemon section (47 lines)
+- **SYSTEMS_CATALOG.md** - Updated system count (212 → 211, merged CircadianSystem into SleepSystem)
+
+#### Session Devlogs
+- **LAZY_LOADING_IMPLEMENTATION_2026-01-04.md**
+- **VOXEL_BUILDING_UI_UPDATE_2026-01-04.md**
+
+### Core System Updates
+
+- **DeathBargainSystem** - Improved soul reforging with previous wisdom/lives tracking
+- **SoulCreationCeremony** - Enhanced ceremony context (isReforging, previousWisdom, previousLives)
+- **SoulCeremonyModal** - Support for reincarnation ceremony visualization
+- **BuildingSystem**, **CityDirectorSystem**, **NeedsSystem**, **TemperatureSystem** - Various improvements
+- **DivineChatSystem** - Removed (functionality merged into other systems)
+
+### Infrastructure
+
+- **start.sh** orchestrator improvements
+- **api-server.ts** - Soul repository endpoints
+- **metrics-server.ts** - Enhanced streaming metrics
+- **pixellab-daemon.ts** - Automated sprite generation daemon
+
+---
+
 ## 60-Minute Commit Cycle #6
 
 **12 commits, ~95,000+ lines added**

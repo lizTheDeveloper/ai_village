@@ -377,7 +377,6 @@ Perhaps no aspect of post-mortem communication has generated more controversy th
 The development of what has colloquially become known as the "Ancestor Phone"‡‡‡‡ represents a pragmatic attempt to balance accessibility with boundary maintenance. These devices implement sophisticated filtering protocols that allow the living to maintain contact with departed loved ones while preventing what Dr. Fiona Ghostwhisper terms "spectral spam"§§§§. Early prototypes notably lacked adequate safeguards*, resulting in the infamous Christmas Day 2096 incident****, when approximately 40,000 uploaded grandparents simultaneously attempted to initiate video calls with their descendants, causing a temporary collapse of the entire eastern seaboard communication grid††††. Modern iterations include thoughtful features such as "Do Not Disturb (Eternal Rest Mode)" and "Great-Aunt Filter (Aggressive)", though usage statistics suggest these functions are enabled far more frequently than the departed find comfortable‡‡‡‡‡.
 
 The ethical implications of maintaining relationships across the mortality threshold continue to evolve as both the technology and our understanding of consciousness mature§§§§§. The Society for Responsible Necro-Communication maintains that regular contact with uploaded ancestors provides valuable continuity of wisdom and family connection*****, though their position has been complicated by mounting evidence that some deceased individuals would prefer to simply move on without being constantly summoned to arbitrate living disputes about furniture placement or political opinions†††††. As Professor Mortimer Endoflife noted in his controversial address to the 2099 Conference on Death, Digital Existence, and Dinner Arrangements: "Perhaps the greatest gift we can give the dead is the same thing we most desire from them—the occasional peaceful moment of being left the hell alone."
-```
 
 ---
 
@@ -413,7 +412,7 @@ FOOTNOTES:
 
 †† The complete list of Millicent's intercepted, commented-upon, and "corrected" communications eventually exceeded 89,000 individual messages. Her commentary on her great-great-grandson's choice of romantic partner alone filled what court documents referred to as "a frankly unreasonable number of database servers."
 
-††† Judge Harrington's full ruling occupied 247 pages and included several footnotes expressing his personal exhaustion with the case. His concluding remarks, "I, too,`,
+††† Judge Harrington's full ruling occupied 247 pages and included several footnotes expressing his personal exhaustion with the case. His concluding remarks, "I, too, would prefer not to hear from Millicent Thornberry ever again," became widely quoted in legal circles.`,
   abstract: 'Research paper on Communication protocols between the living and uploaded deceased',
   published: false
 };
@@ -1257,7 +1256,7 @@ Modern causality engineering represents a delicate balance between enabling the 
 ‡‡‡‡ Maintained by the Cartographers of the Forbidden, an ancient order dating back to the first discovery that certain combinations of natural wormholes could create problematic time loops****††. Their original headquarters exist in a location that is technically five minutes ago, which makes mail delivery challenging.
 
 ****†† The order was founded in 2156 after Navigator Chen-Wu accidentally discovered a natural CTC by flying through it. She emerged from the wormhole to find herself waving at herself as she entered the wormhole, at which point she had a very justified anxiety attack`,
-  abstract: 'Research paper on Ensuring wormhole networks don't break causality',
+  abstract: "Research paper on Ensuring wormhole networks don't break causality",
   published: false
 };
 
@@ -1566,7 +1565,7 @@ The construction of transcendent beacons represents humanity's deliberate choice
 
 *The Committee's full position paper, titled "A Polite Suggestion That We've Made A Series of Increasingly Concerning Decisions," runs to three hundred pages. The executive summary is simply: "Stop." This has been largely interpreted as "carry on, but more carefully," which the Committee insists is not even remotely what they meant.
 `,
-  abstract: 'This paper examines communication methodologies that operate independently of spacetime constraints, including distance-independent signal transmission, time-independent messaging, and the concerning phenomenon of signals originating from genuinely locationless sources. The authors strongly recommend reading the Emergency Committee's position paper, though they acknowledge no one',
+  abstract: "This paper examines communication methodologies that operate independently of spacetime constraints, including distance-independent signal transmission, time-independent messaging, and the concerning phenomenon of signals originating from genuinely locationless sources. The authors strongly recommend reading the Emergency Committee's position paper, though they acknowledge no one",
   published: false
 };
 
@@ -1692,7 +1691,7 @@ Current research focuses on maintaining what the Institute terms "ontological an
 
 #####The Institute's Wellness Department attempted to organize a support group, but attendance proved difficult given that the participants existed in mutually incompatible dimensional frameworks. The single successful meeting resulted in all attendees accidentally merging into a single consciousness that spent six hours experiencing everyone's problems simultaneously before explosively decoherent into its constituent beings, all of whom were now significantly more traumatized.
 
-¶¶¶The Post-Physical Social Network (PPSN) launched with great fanfare and approximately 0.4 seconds of activity before all`,
+¶¶¶The Post-Physical Social Network (PPSN) launched with great fanfare and approximately 0.4 seconds of activity before all participants simultaneously realized they couldn't actually see each other.`,
   abstract: 'Research paper on Transitioning consciousness beyond physical substrate',
   published: false
 };

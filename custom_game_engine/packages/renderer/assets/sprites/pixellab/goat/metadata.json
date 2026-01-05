@@ -1,9 +1,7 @@
 {
   "id": "goat",
-  "category": "animals",
-  "type": "map_object",
-  "size": 48,
-  "description": "Realistic goat as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
-  "generated_at": "2026-01-03T22:07:47.468Z",
-  "usage_usd": 0
+  "category": "animals.livestock",
+  "size": 32,
+  "description": "Brown and white goat, short horns, beard, standing pose, top-down farm animal",
+  "generated_at": "2026-01-04T21:24:25.824Z"
 }

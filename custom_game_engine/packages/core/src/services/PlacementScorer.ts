@@ -124,16 +124,9 @@ export const BUILDING_CONSTRAINTS: Partial<Record<BuildingType, PlacementConstra
     { type: 'terrain', allowed: ['grass', 'dirt', 'stone', 'sand'] },
     { type: 'terrain_forbidden', forbidden: ['water', 'deep_water', 'forest'] },
   ],
-  'tent': [
-    { type: 'terrain', allowed: ['grass', 'dirt'] },
-    { type: 'no_path_traffic', maxTraffic: 30 },
-  ],
   'well': [
     { type: 'terrain', allowed: ['grass', 'dirt'] },
     { type: 'near_water', maxDistance: 8 },
-  ],
-  'lean-to': [
-    { type: 'terrain', allowed: ['grass', 'dirt', 'forest'] },
   ],
   'bed': [
     { type: 'terrain', allowed: ['grass', 'dirt'] },
@@ -146,17 +139,17 @@ export const BUILDING_CONSTRAINTS: Partial<Record<BuildingType, PlacementConstra
     { type: 'terrain', allowed: ['grass', 'dirt', 'stone'] },
     { type: 'no_path_traffic', maxTraffic: 50 },
   ],
-  'workshop': [
+  'loom': [
     { type: 'terrain', allowed: ['grass', 'dirt', 'stone'] },
     { type: 'no_path_traffic', maxTraffic: 30 },
-    { type: 'near_storage', maxDistance: 10 },
   ],
-  'barn': [
-    { type: 'terrain', allowed: ['grass', 'dirt'] },
+  'butchering_table': [
+    { type: 'terrain', allowed: ['grass', 'dirt', 'stone'] },
+    { type: 'no_path_traffic', maxTraffic: 40 },
   ],
-  'farm_shed': [
-    { type: 'terrain', allowed: ['grass', 'dirt'] },
-    { type: 'min_fertility', value: 20 },
+  'oven': [
+    { type: 'terrain', allowed: ['grass', 'dirt', 'stone'] },
+    { type: 'no_path_traffic', maxTraffic: 40 },
   ],
 };
 
@@ -191,23 +184,11 @@ export const BUILDING_UTILITY_WEIGHTS: Partial<Record<BuildingType, PlacementWei
     positiveMemories: 0.3,
     zoneAffinity: 1.0,
   },
-  'tent': {
-    pathAvoidance: 0.6,
-    homeProximity: 0.3,
-    positiveMemories: 0.4,
-    familiarity: 0.3,
-    zoneAffinity: 1.0,
-  },
   'well': {
     waterProximity: 1.0,
     homeProximity: 0.3,
     pathAvoidance: 0.2,
     zoneAffinity: 0.8,
-  },
-  'lean-to': {
-    pathAvoidance: 0.4,
-    familiarity: 0.3,
-    zoneAffinity: 1.0,
   },
   'bed': {
     pathAvoidance: 0.8,
@@ -225,32 +206,29 @@ export const BUILDING_UTILITY_WEIGHTS: Partial<Record<BuildingType, PlacementWei
     knownResources: 0.6, // Near stone/iron
     zoneAffinity: 1.0,
   },
-  'workshop': {
+  'loom': {
     pathAvoidance: 0.3,
     homeProximity: 0.4,
-    knownResources: 0.5,
     zoneAffinity: 1.0,
   },
-  'barn': {
-    pathAvoidance: 0.2,
-    homeProximity: 0.3,
-    zoneAffinity: 1.0,
-  },
-  'farm_shed': {
-    fertility: 0.8,
-    waterProximity: 0.5,
+  'butchering_table': {
     pathAvoidance: 0.3,
+    homeProximity: 0.4,
+    zoneAffinity: 1.0,
+  },
+  'oven': {
+    pathAvoidance: 0.3,
+    homeProximity: 0.4,
     zoneAffinity: 1.0,
   },
 };
 
 /**
  * Resource types relevant for each building
+ * NOTE: Multi-tile buildings now use TileBasedBlueprintRegistry
  */
 const BUILDING_RESOURCE_AFFINITY: Partial<Record<BuildingType, AreaResourceType[]>> = {
   'forge': ['stone'],
-  'workshop': ['wood', 'stone'],
-  'farm_shed': ['food'],
   'well': ['water'],
 };
 

@@ -626,7 +626,8 @@ export class WorldContextBuilder {
       const inventory = storage.components.get('inventory') as InventoryComponent | undefined;
 
       if (!building?.isComplete) continue;
-      if (building.buildingType !== 'storage-chest' && building.buildingType !== 'storage-box' && building.buildingType !== 'warehouse') continue;
+      // NOTE: Large warehouses now use TileBasedBlueprintRegistry
+      if (building.buildingType !== 'storage-chest' && building.buildingType !== 'storage-box') continue;
 
       if (inventory?.slots) {
         for (const slot of inventory.slots) {

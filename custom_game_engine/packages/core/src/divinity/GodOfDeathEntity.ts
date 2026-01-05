@@ -93,7 +93,15 @@ export function createGodOfDeath(
  */
 export function isGodOfDeath(entity: Entity): boolean {
   const tags = entity.components.get('tags') as any;
-  return tags?.tags?.has('death_god') ?? false;
+  if (!tags || !tags.tags) return false;
+  // Handle both Set and Array
+  if (tags.tags instanceof Set) {
+    return tags.tags.has('death_god');
+  }
+  if (Array.isArray(tags.tags)) {
+    return tags.tags.includes('death_god');
+  }
+  return false;
 }
 
 /**

@@ -4596,6 +4596,42 @@ Available agents:
     return;
   }
 
+  if (pathname === '/api/live/terrain') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    // Parse query parameters for terrain bounds
+    const x = parseFloat(url.searchParams.get('x') || '0');
+    const y = parseFloat(url.searchParams.get('y') || '0');
+    const radius = parseFloat(url.searchParams.get('radius') || '50');
+
+    // Support session filtering via ?session=<id> query parameter
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
+    if (!gameClient) {
+      res.statusCode = 503;
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
+      return;
+    }
+
+    try {
+      // Pass coordinates as JSON-encoded entityId parameter
+      const params = JSON.stringify({ x, y, radius });
+      const result = await sendQueryToGame(gameClient, 'terrain', params);
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
   // === HTML Panel Endpoints ===
 
   if (pathname === '/research.html') {
@@ -6076,6 +6112,17 @@ process.on('SIGINT', async () => {
 
   console.log('Metrics server stopped.');
   process.exit(0);
+});
+
+// Prevent crashes from unhandled errors
+process.on('uncaughtException', (error) => {
+  console.error('[FATAL] Uncaught exception:', error);
+  // Log but don't crash - let the server keep running
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[ERROR] Unhandled promise rejection:', reason);
+  // Log but don't crash - let the server keep running
 });
 
 console.log(`Metrics server listening on ws://localhost:${PORT}`);

@@ -34,6 +34,7 @@ import { getPixelLabSpriteLoader, type PixelLabSpriteLoader } from './sprites/Pi
 import { PixelLabDirection, angleToPixelLabDirection } from './sprites/PixelLabSpriteDefs.js';
 import { findSprite, type SpriteTraits } from './sprites/SpriteRegistry.js';
 import type { AppearanceComponent } from '@ai-village/core';
+import { Renderer3D } from './Renderer3D.js';
 
 /**
  * 2D renderer using Canvas.
@@ -62,8 +63,13 @@ export class Renderer {
   // Track last frame time for animation updates
   private lastFrameTime: number = performance.now();
 
+  // Parallax background state for side-view
+  private parallaxCloudOffset: number = 0; // Cloud drift offset
+  private parallaxLastUpdateTime: number = performance.now();
+
   private tileSize = 16; // Pixels per tile at zoom=1
   private hasLoggedTilledTile = false; // Debug flag to log first tilled tile rendering
+  private hasLoggedWallRender = false; // Debug flag to log first wall rendering
   private showTemperatureOverlay = false; // Debug flag to show temperature on tiles
 
   // View toggles for labels and overlays
@@ -75,7 +81,16 @@ export class Renderer {
   // Bound handlers for cleanup
   private boundResizeHandler: (() => void) | null = null;
 
-  constructor(canvas: HTMLCanvasElement, seed: string = 'default') {
+  // 3D renderer for side-view mode
+  private renderer3D: Renderer3D | null = null;
+  private was3DActive = false; // Track previous state for mode transitions
+  private current3DWorld: World | null = null; // Track if world has been set
+
+  constructor(
+    canvas: HTMLCanvasElement,
+    chunkManager: ChunkManager,
+    terrainGenerator: TerrainGenerator
+  ) {
     this.canvas = canvas;
     const ctx = canvas.getContext('2d');
     if (!ctx) {
@@ -84,8 +99,10 @@ export class Renderer {
     this.ctx = ctx;
 
     this.camera = new Camera(canvas.width, canvas.height);
-    this.chunkManager = new ChunkManager(3); // Load 3 chunks in each direction
-    this.terrainGenerator = new TerrainGenerator(seed);
+    // Use the provided ChunkManager and TerrainGenerator (shared with World)
+    // This ensures chunks loaded from saves are visible to the Renderer
+    this.chunkManager = chunkManager;
+    this.terrainGenerator = terrainGenerator;
     this.floatingTextRenderer = new FloatingTextRenderer();
     this.speechBubbleRenderer = new SpeechBubbleRenderer();
     this.particleRenderer = new ParticleRenderer();
@@ -105,6 +122,14 @@ export class Renderer {
     if (this.boundResizeHandler) {
       window.removeEventListener('resize', this.boundResizeHandler);
       this.boundResizeHandler = null;
+    }
+
+    // Clean up 3D renderer
+    if (this.renderer3D) {
+      this.renderer3D.dispose();
+      this.renderer3D = null;
+      this.was3DActive = false;
+      this.current3DWorld = null;
     }
   }
 
@@ -181,18 +206,37 @@ export class Renderer {
       this.entitySpriteInstances.set(entity.id, instanceId);
     }
 
-    // Determine direction from entity velocity or last known direction
-    const velocity = entity.components.get('velocity') as { vx: number; vy: number } | undefined;
+    // Determine direction from entity velocity or steering
+    // First check steering component for desired direction (more responsive for animals)
+    const steering = entity.components.get('steering') as SteeringComponent | undefined;
+    const velocity = entity.components.get('velocity') as any;
+
+    // Prefer steering target for immediate direction changes
+    let vx = 0;
+    let vy = 0;
+
+    if (steering?.target) {
+      // Calculate direction from steering target (immediate, no lag)
+      const position = entity.components.get('position') as PositionComponent | undefined;
+      if (position) {
+        vx = steering.target.x - position.x;
+        vy = steering.target.y - position.y;
+      }
+    } else if (velocity) {
+      // Fallback to actual velocity
+      vx = velocity.vx ?? 0;
+      vy = velocity.vy ?? 0;
+    }
 
     // Check if entity is moving
-    const isMoving = velocity && (Math.abs(velocity.vx) > 0.01 || Math.abs(velocity.vy) > 0.01);
+    const isMoving = Math.abs(vx) > 0.01 || Math.abs(vy) > 0.01;
 
     let direction: PixelLabDirection;
     if (isMoving) {
-      // Calculate direction from velocity
+      // Calculate direction from movement vector
       // NOTE: Negate vy because screen coordinates have Y pointing down,
       // but Math.atan2 expects standard math coordinates (Y pointing up)
-      const angle = Math.atan2(-velocity.vy, velocity.vx);
+      const angle = Math.atan2(-vy, vx);
       direction = angleToPixelLabDirection(angle);
       // Store this direction for when entity stops moving
       this.entityLastDirections.set(entity.id, direction);
@@ -509,10 +553,13 @@ export class Renderer {
 
     // Render terrain or background based on view mode
     if (this.camera.isSideView()) {
-      this.renderSideViewBackground();
-      // Render terrain as ground cross-section in side-view
-      this.renderSideViewTerrain(startChunkX, endChunkX, startChunkY, endChunkY);
+      // Use 3D renderer for side-view mode
+      this.render3DSideView(world);
+      return; // 3D renderer handles everything
     } else {
+      // Deactivate 3D renderer if switching back to 2D mode
+      this.deactivate3DRenderer();
+
       // Top-down mode: render terrain tiles
       for (let chunkX = startChunkX; chunkX <= endChunkX; chunkX++) {
         for (let chunkY = startChunkY; chunkY <= endChunkY; chunkY++) {
@@ -971,37 +1018,358 @@ export class Renderer {
   }
 
   /**
-   * Render background for side-view mode.
-   * Shows a sky gradient above the ground line.
+   * Render in 3D mode for side-view using Three.js WebGL renderer.
+   * Switches between 2D canvas and 3D WebGL based on view mode.
+   */
+  private render3DSideView(world: World): void {
+    // Initialize 3D renderer if not already created
+    if (!this.renderer3D) {
+      // Pass ChunkManager and TerrainGenerator for independent 3D chunk loading
+      this.renderer3D = new Renderer3D({}, this.chunkManager, this.terrainGenerator);
+      // Mount 3D renderer to the same container as the canvas
+      const container = this.canvas.parentElement;
+      if (container) {
+        this.renderer3D.mount(container);
+      }
+    }
+
+    // Set world if changed
+    if (this.current3DWorld !== world) {
+      this.renderer3D.setWorld(world);
+      this.current3DWorld = world;
+    }
+
+    // Activate 3D renderer and hide canvas if transitioning
+    if (!this.was3DActive) {
+      this.renderer3D.activate();
+      this.canvas.style.display = 'none';
+      // Position camera based on current 2D camera position
+      const cameraTileX = this.camera.x / this.tileSize;
+      const cameraTileY = this.camera.y / this.tileSize;
+      const centerTile = world.getTileAt?.(Math.floor(cameraTileX), Math.floor(cameraTileY));
+      const elevation = centerTile?.elevation ?? 0;
+      this.renderer3D.setCameraFromWorld(cameraTileX, cameraTileY, elevation);
+      this.was3DActive = true;
+    }
+
+    // 3D renderer handles its own render loop, no additional work needed here
+  }
+
+  /**
+   * Deactivate 3D renderer when switching back to 2D mode.
+   * Called when view mode changes away from side-view.
+   */
+  private deactivate3DRenderer(): void {
+    if (this.renderer3D && this.was3DActive) {
+      this.renderer3D.deactivate();
+      this.canvas.style.display = 'block';
+      this.was3DActive = false;
+    }
+  }
+
+  /**
+   * Set the 3D draw distance (in tiles). Called when settings change.
+   */
+  set3DDrawDistance(distance: number): void {
+    if (this.renderer3D) {
+      this.renderer3D.setDrawDistance(distance);
+    }
+  }
+
+  /**
+   * Render background for side-view mode with Starbound-style parallax layers.
+   * Includes: sky gradient, distant mountains, mid-ground hills, clouds, atmospheric haze.
    */
   private renderSideViewBackground(): void {
     const width = this.camera.viewportWidth;
     const height = this.camera.viewportHeight;
     const groundY = height * 0.70; // Ground line at 70% down
 
-    // Create sky gradient (only above ground line)
+    // Update cloud drift animation
+    const now = performance.now();
+    const deltaTime = (now - this.parallaxLastUpdateTime) / 1000;
+    this.parallaxLastUpdateTime = now;
+    this.parallaxCloudOffset += deltaTime * 8; // Slow cloud drift (8 pixels/second)
+    if (this.parallaxCloudOffset > width * 2) {
+      this.parallaxCloudOffset -= width * 2; // Wrap around
+    }
+
+    // Camera offset for parallax
+    const cameraOffset = this.camera.x * this.camera.zoom;
+
+    // === SKY GRADIENT ===
     const skyGradient = this.ctx.createLinearGradient(0, 0, 0, groundY);
-
-    // Sky colors - darker at top, lighter near horizon
-    skyGradient.addColorStop(0, '#0a0a1a');    // Dark sky at top
-    skyGradient.addColorStop(0.3, '#1a1a3e');  // Deep blue
-    skyGradient.addColorStop(0.6, '#2a4a6e');  // Mid blue
-    skyGradient.addColorStop(0.85, '#5588bb'); // Light blue
-    skyGradient.addColorStop(1, '#88bbdd');    // Horizon
-
-    // Fill sky area
+    skyGradient.addColorStop(0, '#0a0a2a');     // Deep space at top
+    skyGradient.addColorStop(0.15, '#1a1a4e');  // Deep blue
+    skyGradient.addColorStop(0.4, '#2a3a6e');   // Mid blue
+    skyGradient.addColorStop(0.7, '#4a6a9e');   // Light blue
+    skyGradient.addColorStop(0.9, '#7a9abe');   // Pale blue
+    skyGradient.addColorStop(1, '#aaccee');     // Horizon
     this.ctx.fillStyle = skyGradient;
     this.ctx.fillRect(0, 0, width, groundY);
 
-    // Draw horizon glow
-    const horizonGlow = this.ctx.createLinearGradient(0, groundY - 20, 0, groundY);
-    horizonGlow.addColorStop(0, 'rgba(255, 200, 150, 0)');
-    horizonGlow.addColorStop(1, 'rgba(255, 200, 150, 0.3)');
+    // === REAL DISTANT TERRAIN SILHOUETTES ===
+    // Render actual terrain elevation from chunks beyond the main render distance
+    this.renderDistantTerrainSilhouettes(width, groundY);
+
+    // === CLOUDS (drift independently + slight parallax) ===
+    this.renderClouds(width, groundY, cameraOffset * 0.03);
+
+    // === ATMOSPHERIC HAZE at horizon ===
+    const hazeGradient = this.ctx.createLinearGradient(0, groundY * 0.6, 0, groundY);
+    hazeGradient.addColorStop(0, 'rgba(170, 200, 230, 0)');
+    hazeGradient.addColorStop(0.7, 'rgba(170, 200, 230, 0.15)');
+    hazeGradient.addColorStop(1, 'rgba(170, 200, 230, 0.3)');
+    this.ctx.fillStyle = hazeGradient;
+    this.ctx.fillRect(0, groundY * 0.6, width, groundY * 0.4);
+
+    // === HORIZON GLOW (sun effect) ===
+    const horizonGlow = this.ctx.createRadialGradient(
+      width * 0.7, groundY - 10, 0,
+      width * 0.7, groundY - 10, width * 0.4
+    );
+    horizonGlow.addColorStop(0, 'rgba(255, 220, 180, 0.25)');
+    horizonGlow.addColorStop(0.3, 'rgba(255, 200, 150, 0.15)');
+    horizonGlow.addColorStop(1, 'rgba(255, 180, 120, 0)');
     this.ctx.fillStyle = horizonGlow;
-    this.ctx.fillRect(0, groundY - 20, width, 20);
+    this.ctx.fillRect(0, groundY - 100, width, 110);
 
     // Draw focus depth indicator
     this.drawDepthIndicator();
+  }
+
+  /**
+   * Render distant terrain as silhouettes based on real chunk elevation data.
+   * Samples terrain from chunks beyond the main render distance.
+   */
+  private renderDistantTerrainSilhouettes(width: number, groundY: number): void {
+    const depthAxis = this.camera.getDepthAxis();
+    const depthDirection = this.camera.getDepthDirection();
+    const isNorthSouth = depthAxis === 'y';
+
+    const cameraWorldX = Math.floor(this.camera.x / this.tileSize);
+    const cameraWorldY = Math.floor(this.camera.y / this.tileSize);
+    const tilePixelSize = this.tileSize * this.camera.zoom;
+
+    // Render 3 distance layers of real terrain silhouettes
+    // Layer 1: Far (60-100 tiles away) - dark, faded
+    this.renderTerrainSilhouetteLayer(
+      width, groundY, isNorthSouth, depthDirection,
+      cameraWorldX, cameraWorldY, tilePixelSize,
+      60, 100, '#1a2a3a', 0.3, 0.05  // startDepth, endDepth, color, opacity, parallax
+    );
+
+    // Layer 2: Mid (35-60 tiles away) - medium fade
+    this.renderTerrainSilhouetteLayer(
+      width, groundY, isNorthSouth, depthDirection,
+      cameraWorldX, cameraWorldY, tilePixelSize,
+      35, 60, '#2a3a4a', 0.4, 0.1
+    );
+
+    // Layer 3: Near background (20-35 tiles away) - lighter
+    this.renderTerrainSilhouetteLayer(
+      width, groundY, isNorthSouth, depthDirection,
+      cameraWorldX, cameraWorldY, tilePixelSize,
+      20, 35, '#3a4a5a', 0.5, 0.15
+    );
+  }
+
+  /**
+   * Render a single layer of terrain silhouette from real elevation data.
+   */
+  private renderTerrainSilhouetteLayer(
+    width: number,
+    groundY: number,
+    isNorthSouth: boolean,
+    depthDirection: number,
+    cameraWorldX: number,
+    cameraWorldY: number,
+    tilePixelSize: number,
+    startDepth: number,
+    endDepth: number,
+    color: string,
+    opacity: number,
+    parallaxFactor: number
+  ): void {
+    this.ctx.save();
+    this.ctx.globalAlpha = opacity;
+    this.ctx.fillStyle = color;
+
+    // Calculate parallax offset
+    const parallaxOffset = (isNorthSouth ? this.camera.x : this.camera.y) * this.camera.zoom * parallaxFactor;
+
+    // Sample terrain elevation across the visible width
+    const samplesPerScreen = Math.ceil(width / 4); // Sample every 4 pixels
+    const elevations: number[] = [];
+    const screenXs: number[] = [];
+
+    for (let i = 0; i <= samplesPerScreen; i++) {
+      const screenX = (i / samplesPerScreen) * width;
+      screenXs.push(screenX);
+
+      // Convert screen X to world coordinates
+      const worldHorizontal = isNorthSouth
+        ? (screenX - width / 2 + parallaxOffset) / (this.camera.zoom * parallaxFactor) + this.camera.x / this.tileSize
+        : (screenX - width / 2 + parallaxOffset) / (this.camera.zoom * parallaxFactor) + this.camera.y / this.tileSize;
+
+      // Find max elevation in the depth range at this horizontal position
+      let maxElevation = 0;
+      for (let depth = startDepth; depth <= endDepth; depth += 2) {
+        const depthPos = isNorthSouth
+          ? cameraWorldY + depth * depthDirection
+          : cameraWorldX + depth * depthDirection;
+
+        const tileX = isNorthSouth ? Math.floor(worldHorizontal) : Math.floor(depthPos);
+        const tileY = isNorthSouth ? Math.floor(depthPos) : Math.floor(worldHorizontal);
+
+        const elevation = this.getTerrainElevationAt(tileX, tileY);
+        maxElevation = Math.max(maxElevation, elevation);
+      }
+
+      elevations.push(maxElevation);
+    }
+
+    // Draw silhouette path
+    this.ctx.beginPath();
+    this.ctx.moveTo(0, groundY);
+
+    for (let i = 0; i < screenXs.length; i++) {
+      const screenX = screenXs[i] ?? 0;
+      const elevation = elevations[i] ?? 0;
+      // Scale elevation to visual height (higher elevation = higher on screen)
+      const visualHeight = elevation * tilePixelSize * 0.5; // Scale factor for visibility
+      const screenY = groundY - visualHeight;
+      this.ctx.lineTo(screenX, screenY);
+    }
+
+    this.ctx.lineTo(width, groundY);
+    this.ctx.closePath();
+    this.ctx.fill();
+    this.ctx.restore();
+  }
+
+  /**
+   * Render a parallax mountain/hill layer with procedural peaks.
+   */
+  private renderMountainLayer(
+    width: number,
+    groundY: number,
+    parallaxOffset: number,
+    color: string,
+    opacity: number,
+    peakHeight: number,
+    numPeaks: number,
+    jaggedness: number
+  ): void {
+    this.ctx.save();
+    this.ctx.globalAlpha = opacity;
+    this.ctx.fillStyle = color;
+
+    // Wrap parallax offset
+    const wrappedOffset = ((parallaxOffset % (width * 2)) + width * 2) % (width * 2);
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(-width, groundY);
+
+    // Generate mountain profile using sine waves with harmonics
+    const segmentWidth = (width * 3) / (numPeaks * 10);
+    for (let x = -width; x <= width * 2; x += segmentWidth) {
+      const adjustedX = x + wrappedOffset;
+
+      // Multiple sine waves for natural mountain shape
+      const wave1 = Math.sin((adjustedX / width) * Math.PI * numPeaks * 0.3) * peakHeight * 0.5;
+      const wave2 = Math.sin((adjustedX / width) * Math.PI * numPeaks * 0.7 + 1.3) * peakHeight * 0.3;
+      const wave3 = Math.sin((adjustedX / width) * Math.PI * numPeaks * 1.5 + 2.7) * peakHeight * jaggedness;
+
+      const mountainY = groundY - Math.max(0, wave1 + wave2 + wave3);
+      this.ctx.lineTo(x, mountainY);
+    }
+
+    this.ctx.lineTo(width * 2, groundY);
+    this.ctx.closePath();
+    this.ctx.fill();
+    this.ctx.restore();
+  }
+
+  /**
+   * Render drifting clouds with parallax effect.
+   */
+  private renderClouds(width: number, groundY: number, parallaxOffset: number): void {
+    this.ctx.save();
+
+    // Cloud layer 1 - high wispy clouds
+    const cloudY1 = groundY * 0.15;
+    this.renderCloudLayer(width, cloudY1, parallaxOffset, this.parallaxCloudOffset, 0.3, 40, 15);
+
+    // Cloud layer 2 - mid fluffy clouds
+    const cloudY2 = groundY * 0.35;
+    this.renderCloudLayer(width, cloudY2, parallaxOffset, this.parallaxCloudOffset * 0.7, 0.25, 60, 25);
+
+    // Cloud layer 3 - lower clouds near horizon
+    const cloudY3 = groundY * 0.55;
+    this.renderCloudLayer(width, cloudY3, parallaxOffset, this.parallaxCloudOffset * 0.5, 0.2, 80, 35);
+
+    this.ctx.restore();
+  }
+
+  /**
+   * Render a single layer of clouds.
+   */
+  private renderCloudLayer(
+    width: number,
+    baseY: number,
+    parallaxOffset: number,
+    driftOffset: number,
+    opacity: number,
+    cloudWidth: number,
+    cloudHeight: number
+  ): void {
+    this.ctx.globalAlpha = opacity;
+
+    // Cloud gradient for soft edges
+    const numClouds = Math.ceil(width / (cloudWidth * 2)) + 4;
+    const spacing = (width * 2) / numClouds;
+
+    for (let i = 0; i < numClouds; i++) {
+      // Position with both parallax and drift
+      let cloudX = i * spacing - driftOffset - parallaxOffset;
+
+      // Wrap clouds
+      cloudX = ((cloudX % (width * 2)) + width * 2) % (width * 2) - width * 0.5;
+
+      // Vary cloud properties procedurally
+      const seed = i * 7919;
+      const sizeVariation = 0.7 + (Math.sin(seed) * 0.5 + 0.5) * 0.6;
+      const yVariation = Math.cos(seed * 1.3) * cloudHeight * 0.5;
+      const actualWidth = cloudWidth * sizeVariation;
+      const actualHeight = cloudHeight * sizeVariation;
+      const cloudCenterY = baseY + yVariation;
+
+      // Draw cloud as multiple overlapping ellipses for fluffy look
+      this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+
+      // Main cloud body
+      this.drawCloudPuff(cloudX, cloudCenterY, actualWidth, actualHeight);
+      this.drawCloudPuff(cloudX - actualWidth * 0.3, cloudCenterY + actualHeight * 0.1, actualWidth * 0.7, actualHeight * 0.8);
+      this.drawCloudPuff(cloudX + actualWidth * 0.35, cloudCenterY + actualHeight * 0.05, actualWidth * 0.6, actualHeight * 0.7);
+      this.drawCloudPuff(cloudX - actualWidth * 0.1, cloudCenterY - actualHeight * 0.15, actualWidth * 0.5, actualHeight * 0.6);
+    }
+  }
+
+  /**
+   * Draw a single cloud puff (ellipse with soft edges).
+   */
+  private drawCloudPuff(x: number, y: number, width: number, height: number): void {
+    const gradient = this.ctx.createRadialGradient(x, y, 0, x, y, Math.max(width, height));
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+    gradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.6)');
+    gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.3)');
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+    this.ctx.fillStyle = gradient;
+    this.ctx.beginPath();
+    this.ctx.ellipse(x, y, width, height, 0, 0, Math.PI * 2);
+    this.ctx.fill();
   }
 
   /**
@@ -1023,7 +1391,7 @@ export class Renderer {
 
     const depthAxis = this.camera.getDepthAxis();
     const depthDirection = this.camera.getDepthDirection();
-    const maxDepthLayers = 5; // Show this many terrain rows in front
+    const maxDepthLayers = 20; // Show this many terrain rows in front (increased from 5)
 
     // For N/S facing: X is screen horizontal, iterate over Y depth slices
     // For E/W facing: Y is screen horizontal, iterate over X depth slices
@@ -1688,6 +2056,12 @@ export class Renderer {
 
         // Render wall tiles
         if (tileWithBuilding.wall) {
+          // Debug: Log first wall detected (only once per session)
+          if (!this.hasLoggedWallRender) {
+            this.hasLoggedWallRender = true;
+            console.log(`[Renderer] ✅ Detected wall tile at world (${chunk.x * CHUNK_SIZE + localX}, ${chunk.y * CHUNK_SIZE + localY})`, tileWithBuilding.wall);
+          }
+
           const wall = tileWithBuilding.wall;
           const progress = wall.constructionProgress ?? 100;
           const alpha = progress >= 100 ? 1.0 : 0.4 + (progress / 100) * 0.4;
@@ -2248,8 +2622,9 @@ export class Renderer {
             }
           }
 
-          // Check for shelter interaction (lean-to, tent)
-          if ((buildingComp.buildingType === 'lean-to' || buildingComp.buildingType === 'tent') && buildingComp.isComplete) {
+          // Check for shelter interaction (bed, bedroll)
+          // NOTE: Multi-tile shelters (houses, tents) now use TileBasedBlueprintRegistry
+          if ((buildingComp.buildingType === 'bed' || buildingComp.buildingType === 'bedroll') && buildingComp.isComplete) {
             // Could check for shelter need here if we had that component
             interactionType = 'SHELTER';
             interactionColor = '#00AAFF';

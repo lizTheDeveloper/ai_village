@@ -299,42 +299,14 @@ export class BuildingSystem implements System {
   /**
    * Add governance component to governance buildings when they complete.
    * Per governance-dashboard work order: Buildings collect governance data.
+   *
+   * NOTE: Governance buildings (town halls, census bureaus, etc.) are now multi-tile
+   * structures using TileBasedBlueprintRegistry. This method is a no-op for single-tile
+   * furniture/workstations. Governance functionality has moved to the tile-based system.
    */
   private addGovernanceComponent(entity: EntityImpl, buildingType: string, world: World): void {
-    switch (buildingType) {
-      case BT.TownHall:
-        (entity as any).addComponent(createTownHallComponent());
-        break;
-
-      case BT.CensusBureau:
-        (entity as any).addComponent(createCensusBureauComponent());
-        break;
-
-      case BT.Granary:
-        // Granary uses warehouse component with resource tracking
-        (entity as any).addComponent(createWarehouseComponent('food'));
-        break;
-
-      case BT.WeatherStation:
-        (entity as any).addComponent(createWeatherStationComponent());
-        break;
-
-      case BT.HealthClinic:
-        (entity as any).addComponent(createHealthClinicComponent());
-        break;
-
-      case BT.University:
-        (entity as any).addComponent(createUniversityComponent(
-          `University of ${entity.id.slice(0, 8)}`,
-          entity.id,
-          world.tick,
-          'Per Sapientiam Ad Astra'
-        ));
-        break;
-
-      // Note: Other governance buildings (meeting-hall, watchtower, labor-guild, archive)
-      // don't have dedicated components yet. They will be added in future phases.
-    }
+    // No governance buildings in single-tile BuildingType enum anymore
+    // All governance buildings use TileBasedBlueprintRegistry
   }
 
   /**

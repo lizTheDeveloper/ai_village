@@ -21,6 +21,7 @@ import {
   type WallMaterial,
   type DoorMaterial,
   type WindowMaterial,
+  getTileBasedBlueprintRegistry,
 } from '../buildings/TileBasedBlueprintRegistry.js';
 
 // Minimal Tile interface for construction purposes
@@ -131,10 +132,10 @@ export class TileConstructionSystem implements System {
   private taskCounter = 0;
 
   /**
-   * Create a new construction task from a blueprint.
+   * Create a new construction task from a blueprint or blueprint ID.
    *
    * @param world - Game world
-   * @param blueprint - The tile-based blueprint to build
+   * @param blueprintOrId - The tile-based blueprint to build or its ID
    * @param originX - World X origin
    * @param originY - World Y origin
    * @param rotation - Rotation in degrees (0, 90, 180, 270)
@@ -144,12 +145,25 @@ export class TileConstructionSystem implements System {
    */
   createTask(
     world: World,
-    blueprint: TileBasedBlueprint,
+    blueprintOrId: TileBasedBlueprint | string,
     originX: number,
     originY: number,
     rotation: number = 0,
     createdBy?: string
   ): ConstructionTask {
+    // Resolve blueprint from ID if string was passed
+    let blueprint: TileBasedBlueprint;
+    if (typeof blueprintOrId === 'string') {
+      const registry = getTileBasedBlueprintRegistry();
+      const found = registry.get(blueprintOrId);
+      if (!found) {
+        throw new Error(`Blueprint "${blueprintOrId}" not found`);
+      }
+      blueprint = found;
+    } else {
+      blueprint = blueprintOrId;
+    }
+
     // Parse layout to get tile positions
     const parsedTiles = parseLayout(blueprint, originX, originY, rotation);
 

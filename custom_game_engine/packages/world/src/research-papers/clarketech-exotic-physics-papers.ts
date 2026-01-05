@@ -256,7 +256,7 @@ FOOTNOTES:
 
 export const TESSERACT_CONSTRUCTION: ResearchPaper = {
   paperId: 'tesseract_construction',
-  title: 'Building in Directions That Don't Exist: Tesseract Architecture',
+  title: "Building in Directions That Don't Exist: Tesseract Architecture",
   field: 'experimental',
   paperSets: ['tesseract_geometry'],
   prerequisitePapers: [],

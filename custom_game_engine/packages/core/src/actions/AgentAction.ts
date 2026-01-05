@@ -225,12 +225,12 @@ interface BuildingKeyword {
 
 const BUILDING_KEYWORDS: BuildingKeyword[] = [
   { keywords: ['campfire', 'fire'], type: BuildingType.Campfire },
-  { keywords: ['storage', 'chest'], type: BuildingType.StorageChest },
-  { keywords: ['bedroll', 'bed', 'tent'], type: BuildingType.Tent },
+  { keywords: ['storage', 'chest', 'box'], type: BuildingType.StorageChest },
+  { keywords: ['bedroll'], type: BuildingType.Bedroll },
+  { keywords: ['bed'], type: BuildingType.Bed },
   { keywords: ['workbench', 'work bench'], type: BuildingType.Workbench },
   { keywords: ['forge'], type: BuildingType.Forge },
   { keywords: ['well'], type: BuildingType.Well },
-  { keywords: ['lean-to', 'leanto', 'shelter'], type: BuildingType.LeanTo },
 ];
 
 function parseBuildingType(cleaned: string): BuildingType {
@@ -239,7 +239,7 @@ function parseBuildingType(cleaned: string): BuildingType {
       return type;
     }
   }
-  return BuildingType.LeanTo; // fallback
+  return BuildingType.Campfire; // fallback - most basic utility
 }
 
 // ============================================================================

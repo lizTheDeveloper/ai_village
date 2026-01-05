@@ -5,6 +5,7 @@
 // Image cache for map objects
 const mapObjectCache = new Map<string, HTMLImageElement>();
 const loadingImages = new Set<string>();
+const failedImages = new Set<string>();
 
 // Mapping from sprite IDs to map object filenames
 const MAP_OBJECT_SPRITES: Record<string, string> = {
@@ -22,10 +23,7 @@ const MAP_OBJECT_SPRITES: Record<string, string> = {
  * Load a map object sprite from the assets folder
  */
 function loadMapObjectSprite(spriteId: string): HTMLImageElement | null {
-  const filename = MAP_OBJECT_SPRITES[spriteId];
-  if (!filename) return null;
-
-  // Check cache
+  // Check cache first
   if (mapObjectCache.has(spriteId)) {
     return mapObjectCache.get(spriteId)!;
   }
@@ -33,6 +31,23 @@ function loadMapObjectSprite(spriteId: string): HTMLImageElement | null {
   // Check if already loading
   if (loadingImages.has(spriteId)) {
     return null;
+  }
+
+  // Don't retry failed loads
+  if (failedImages.has(spriteId)) {
+    return null;
+  }
+
+  // Determine sprite path
+  let spritePath: string;
+  const legacyFilename = MAP_OBJECT_SPRITES[spriteId];
+
+  if (legacyFilename) {
+    // Use legacy map_objects path
+    spritePath = `/assets/sprites/map_objects/${legacyFilename}`;
+  } else {
+    // Try PixelLab path (folder-based with sprite.png)
+    spritePath = `/assets/sprites/pixellab/${spriteId}/sprite.png`;
   }
 
   // Start loading
@@ -44,9 +59,14 @@ function loadMapObjectSprite(spriteId: string): HTMLImageElement | null {
   };
   img.onerror = () => {
     loadingImages.delete(spriteId);
-    console.error(`[SpriteRenderer] Failed to load map object: ${filename}`);
+    failedImages.add(spriteId);
+    // Suppress errors for deprecated building types that no longer have sprites
+    const deprecatedSprites = ['tent', 'storage-chest', 'storage-box', 'workbench'];
+    if (!deprecatedSprites.includes(spriteId)) {
+      console.error(`[SpriteRenderer] Failed to load map object sprite: ${spriteId} from ${spritePath}`);
+    }
   };
-  img.src = `/assets/sprites/map_objects/${filename}`;
+  img.src = spritePath;
 
   return null; // Not loaded yet
 }

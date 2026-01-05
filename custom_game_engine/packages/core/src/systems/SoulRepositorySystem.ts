@@ -146,24 +146,29 @@ export class SoulRepositorySystem implements System {
 
   private async backupSoul(world: World, soulData: any): Promise<void> {
     try {
-      const { agentId, name, archetype, purpose, species, interests } = soulData;
+      const { soulId, agentId, name, archetype, purpose, species, interests } = soulData;
 
-      // Get agent entity for additional context
-      const agent = world.getEntity(agentId);
-      if (!agent) {
-        console.warn(`[SoulRepository] Agent ${agentId} not found for backup`);
+      // Get soul entity (not agent - this is the soul itself)
+      const soul = world.getEntity(soulId || agentId);
+      if (!soul) {
+        console.warn(`[SoulRepository] Soul ${soulId || agentId} not found for backup`);
         return;
       }
 
       // Extract additional information
-      const soulIdentity = agent.components.get('soul_identity') as any;
-      const appearance = agent.components.get('appearance') as any;
+      const soulIdentity = soul.components.get('soul_identity') as any;
+
+      // Check if this soul is already in the repository (avoid duplicates)
+      if (this.soulNameExists(name)) {
+        console.log(`[SoulRepository] Soul "${name}" already exists in repository, skipping duplicate`);
+        return;
+      }
 
       // Build soul record
       const soulRecord: SoulRecord = {
         // Identity
-        soulId: soulIdentity?.soulId || agentId,
-        agentId,
+        soulId: soulId || agentId,
+        agentId: agentId || soulId, // Might be same as soulId if not incarnated yet
         name,
 
         // Attributes
@@ -178,15 +183,15 @@ export class SoulRepositorySystem implements System {
         universeId: (world as any).universeId || 'unknown',
         universeName: (world as any).name || undefined,
 
-        // Sprite Info
-        spriteFolder: appearance?.spriteFolder,
+        // Sprite Info (may not have sprite yet if not incarnated)
+        spriteFolder: undefined,
 
         // Metadata
         version: 1,
       };
 
       // Add lineage if available
-      const incarnation = agent.components.get('incarnation') as any;
+      const incarnation = soul.components.get('incarnation') as any;
       if (incarnation?.parentIds && incarnation.parentIds.length > 0) {
         soulRecord.parentIds = incarnation.parentIds;
         // Try to get parent names
@@ -211,6 +216,7 @@ export class SoulRepositorySystem implements System {
       // Update index
       this.updateIndex(soulRecord);
 
+      console.log(`[SoulRepository] ✅ Saved soul "${name}" (${archetype}) to repository`);
 
     } catch (error) {
       console.error('[SoulRepository] Failed to backup soul:', error);
@@ -314,6 +320,58 @@ export class SoulRepositorySystem implements System {
       console.error(`[SoulRepository] Failed to load soul ${soulId}:`, error);
       return null;
     }
+  }
+
+  /**
+   * Get a specific soul by name (for cross-game soul reuse)
+   */
+  getSoulByName(name: string): SoulRecord | null {
+    // Search through index for matching name
+    for (const soulId in this.index.souls) {
+      const indexEntry = this.index.souls[soulId];
+      if (indexEntry && indexEntry.name === name) {
+        return this.getSoul(soulId);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Check if a soul name already exists in the repository
+   */
+  soulNameExists(name: string): boolean {
+    for (const soulId in this.index.souls) {
+      const indexEntry = this.index.souls[soulId];
+      if (indexEntry && indexEntry.name === name) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Get all souls from the repository
+   */
+  getAllSouls(): SoulRecord[] {
+    const souls: SoulRecord[] = [];
+    for (const soulId in this.index.souls) {
+      const soul = this.getSoul(soulId);
+      if (soul) {
+        souls.push(soul);
+      }
+    }
+    return souls;
+  }
+
+  /**
+   * Get a random soul from the repository (for reuse in new games)
+   */
+  getRandomSoul(): SoulRecord | null {
+    const allSoulIds = Object.keys(this.index.souls);
+    if (allSoulIds.length === 0) return null;
+
+    const randomId = allSoulIds[Math.floor(Math.random() * allSoulIds.length)];
+    return randomId ? this.getSoul(randomId) : null;
   }
 
   /**

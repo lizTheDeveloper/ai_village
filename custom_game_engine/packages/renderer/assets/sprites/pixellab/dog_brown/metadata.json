@@ -1,18 +1,7 @@
 {
   "id": "dog_brown",
-  "base_species": "dog",
-  "variant": "brown",
-  "description": "brown dog",
-  "size": 48,
-  "directions": [
-    "south",
-    "southwest",
-    "west",
-    "northwest",
-    "north",
-    "northeast",
-    "east",
-    "southeast"
-  ],
-  "generated_at": "2026-01-04T00:15:06.808Z"
+  "category": "animals.working",
+  "size": 32,
+  "description": "Brown medium-sized dog, friendly appearance, standing pose, top-down",
+  "generated_at": "2026-01-04T21:25:53.450Z"
 }

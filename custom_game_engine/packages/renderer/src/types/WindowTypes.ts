@@ -102,6 +102,7 @@ export type WindowMenuCategory =
   | 'social'    // Memory, Relationships, Governance
   | 'farming'   // Tile Inspector, Plant Info
   | 'animals'   // Animal Info
+  | 'research'  // Research Library, Tech Tree
   | 'magic'     // Magic Systems, Spellbook
   | 'divinity'  // Divine Powers, Prayer, Angels, Sacred Geography, Divine Analytics
   | 'dev'       // Dev Panel - only shown in dev mode

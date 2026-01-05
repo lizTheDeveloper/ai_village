@@ -38,10 +38,11 @@ const CATEGORY_INFO: Record<WindowMenuCategory, CategoryInfo> = {
   social: { label: 'Social', order: 3 },
   farming: { label: 'Farming', order: 4 },
   animals: { label: 'Animals', order: 5 },
-  magic: { label: 'Magic', order: 6 },
-  divinity: { label: 'Divine', order: 7 },
-  settings: { label: 'Settings', order: 8 },
-  default: { label: 'Other', order: 9 },
+  research: { label: 'Research', order: 6 },
+  magic: { label: 'Magic', order: 7 },
+  divinity: { label: 'Divine', order: 8 },
+  settings: { label: 'Settings', order: 9 },
+  default: { label: 'Other', order: 10 },
   dev: { label: 'Developer', order: 99 },
 };
 
@@ -65,6 +66,7 @@ export class MenuBar {
     { id: 'economy', label: 'Economy', width: 75 },
     { id: 'farming', label: 'Farming', width: 70 },
     { id: 'animals', label: 'Animals', width: 65 },
+    { id: 'research', label: 'Research', width: 75 },
     { id: 'magic', label: 'Magic', width: 55 },
     { id: 'divinity', label: 'Divinity', width: 70 },
     { id: 'dev', label: 'Dev', width: 40 },
@@ -303,6 +305,8 @@ export class MenuBar {
         return this.getFarmingMenuItems();
       case 'animals':
         return this.getAnimalsMenuItems();
+      case 'research':
+        return this.getResearchMenuItems();
       case 'magic':
         return this.getMagicMenuItems();
       case 'divinity':
@@ -499,6 +503,42 @@ export class MenuBar {
     const items: MenuItem[] = [];
 
     for (const window of animalWindows) {
+      items.push({
+        type: 'window',
+        label: window.panel.getTitle(),
+        windowId: window.id,
+        shortcut: window.config.keyboardShortcut,
+      });
+    }
+
+    if (items.length === 0) {
+      items.push({ type: 'action', label: '(No panels)', action: '' });
+    }
+
+    // Add window actions
+    items.push({ type: 'divider' });
+    items.push({ type: 'action', label: 'Minimize All', action: 'minimize-all' });
+    items.push({ type: 'action', label: 'Show All', action: 'show-all' });
+    items.push({ type: 'divider' });
+    items.push({ type: 'action', label: 'Arrange: Cascade', action: 'cascade' });
+    items.push({ type: 'action', label: 'Arrange: Tile', action: 'tile' });
+
+    return items;
+  }
+
+  /**
+   * Get Research menu items
+   */
+  private getResearchMenuItems(): MenuItem[] {
+    const windows = Array.from(this.windowManager['windows'].values()) as ManagedWindow[];
+    const researchWindows = windows.filter(w =>
+      w.config.showInWindowList !== false &&
+      w.config.menuCategory === 'research'
+    );
+
+    const items: MenuItem[] = [];
+
+    for (const window of researchWindows) {
       items.push({
         type: 'window',
         label: window.panel.getTitle(),

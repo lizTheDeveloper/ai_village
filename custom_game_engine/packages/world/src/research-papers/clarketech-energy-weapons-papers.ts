@@ -128,7 +128,7 @@ The integration of these systems into practical weapons***********† represents
 
 §§§§The precision of these sensors is such that they can detect atmospheric distortions too small to see, which raises the philosophical question of whether we are compensating for problems that actually matter or simply because we can. The answer, regrettably, is "yes."
 
-*****The processing requirements were calculated by the Defense Digital Systems Administration at approximately 2.4 teraFLOPS for real`,
+*****The processing requirements were calculated by the Defense Digital Systems Administration at approximately 2.4 teraFLOPS for real.`,
   abstract: 'Research paper on Focusing laser beams for maximum effect at range',
   published: false
 };
@@ -599,7 +599,7 @@ Dr. Amara Chen's pioneering work on portable plasma containment serves as both i
 
 export const PLASMA_PROJECTILE_DYNAMICS: ResearchPaper = {
   paperId: 'plasma_projectile_dynamics',
-  title: 'Throwing Fire That Isn't Fire: Plasma Bolt Physics',
+  title: "Throwing Fire That Isn't Fire: Plasma Bolt Physics",
   field: 'experimental',
   paperSets: ['plasma_weapons'],
   prerequisitePapers: ['plasma_containment_weapons'],
@@ -1078,7 +1078,7 @@ Contemporary research focuses on preventing such devices from falling into the h
 
 export const CONTINUOUS_BEAM_GENERATION: ResearchPaper = {
   paperId: 'continuous_beam_generation',
-  title: 'The Line That Doesn't Stop: Sustained Energy Beams',
+  title: "The Line That Doesn't Stop: Sustained Energy Beams",
   field: 'experimental',
   paperSets: ['beam_weapons'],
   prerequisitePapers: [],

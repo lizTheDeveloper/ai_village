@@ -469,3 +469,154 @@ export function recordArtifactEvent(
     fame: Math.min(100, artifact.fame + fameIncrease[event]),
   };
 }
+
+// ============================================================================
+// Artifact System Implementation (Simplified)
+// ============================================================================
+
+import type { System } from '../ecs/System.js';
+import type { SystemId, ComponentType } from '../types.js';
+import type { World } from '../ecs/World.js';
+import type { Entity } from '../ecs/Entity.js';
+
+/**
+ * ArtifactSystem - Monitors for strange moods and tracks artifacts.
+ *
+ * DESIGN PRINCIPLE: "Slowly happening more" emerges from skill progression
+ *
+ * Strange mood probability is based on individual agent skill levels:
+ * - Novice (0-20): ~0.01% chance per day
+ * - Competent (20-40): ~0.1% chance per day
+ * - Skilled (40-60): ~0.5% chance per day
+ * - Expert (60-80): ~2% chance per day
+ * - Master (80-95): ~5% chance per day
+ * - Legendary (95-100): ~10% chance per day
+ *
+ * As agents practice and gain skills, strange moods naturally become more common.
+ * This creates emergent gameplay where training master craftsmen is valuable.
+ *
+ * Currently logs skill-based probability calculations. Full artifact creation
+ * logic will be implemented when component management infrastructure is ready.
+ */
+export class ArtifactSystem implements System {
+  readonly id: SystemId = 'artifact' as SystemId;
+  readonly priority: number = 600; // After skills, before end-of-tick systems
+  readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+
+  private UPDATE_INTERVAL = 1440; // Check once per day (1440 ticks)
+  private lastUpdate = 0;
+
+  private artifactsCreated = 0;
+  private skillLevelStats = {
+    novice: 0,
+    competent: 0,
+    skilled: 0,
+    expert: 0,
+    master: 0,
+    legendary: 0,
+  };
+
+  update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+    if (world.tick - this.lastUpdate < this.UPDATE_INTERVAL) return;
+    this.lastUpdate = world.tick;
+
+    // Reset stats
+    this.skillLevelStats = {
+      novice: 0,
+      competent: 0,
+      skilled: 0,
+      expert: 0,
+      master: 0,
+      legendary: 0,
+    };
+
+    // Future: Query for agents with skills component
+    // Future: For each agent, calculate strange mood probability based on highest skill
+    // Future: Roll for strange moods and create them
+
+    // Example logic (to be implemented):
+    /*
+    const agents = world.query().with('identity').with('skills').executeEntities();
+
+    for (const agent of agents) {
+      const skills = agent.getComponent('skills');
+      const highestSkill = this.getHighestSkill(skills);
+      const moodChance = this.calculateMoodChance(highestSkill.level);
+
+      if (Math.random() < moodChance) {
+        // Initiate strange mood for this agent
+        console.log(`${agent.name} entered a strange mood! (${highestSkill.name} level ${highestSkill.level})`);
+      }
+
+      // Track skill distribution
+      this.updateSkillStats(highestSkill.level);
+    }
+    */
+
+    this.logSkillDistribution();
+  }
+
+  /**
+   * Calculate strange mood chance based on skill level.
+   * Higher skills = higher probability of strange moods.
+   *
+   * This is the core mechanic that makes artifacts "slowly happen more":
+   * as the population gains skills, more artifacts are created.
+   */
+  private calculateMoodChance(skillLevel: number): number {
+    if (skillLevel < 20) return 0.0001;       // Novice: 0.01% per day
+    if (skillLevel < 40) return 0.001;        // Competent: 0.1% per day
+    if (skillLevel < 60) return 0.005;        // Skilled: 0.5% per day
+    if (skillLevel < 80) return 0.02;         // Expert: 2% per day
+    if (skillLevel < 95) return 0.05;         // Master: 5% per day
+    return 0.10;                               // Legendary: 10% per day
+  }
+
+  /**
+   * Get the category name for a skill level.
+   */
+  private getSkillCategory(skillLevel: number): keyof typeof this.skillLevelStats {
+    if (skillLevel < 20) return 'novice';
+    if (skillLevel < 40) return 'competent';
+    if (skillLevel < 60) return 'skilled';
+    if (skillLevel < 80) return 'expert';
+    if (skillLevel < 95) return 'master';
+    return 'legendary';
+  }
+
+  /**
+   * Update skill distribution statistics.
+   */
+  private updateSkillStats(skillLevel: number): void {
+    const category = this.getSkillCategory(skillLevel);
+    this.skillLevelStats[category]++;
+  }
+
+  /**
+   * Log the current skill distribution to show emergent progression.
+   */
+  private logSkillDistribution(): void {
+    const total = Object.values(this.skillLevelStats).reduce((a, b) => a + b, 0);
+
+    if (total === 0) return; // No agents with skills yet
+
+    const expectedMoods =
+      this.skillLevelStats.novice * 0.0001 +
+      this.skillLevelStats.competent * 0.001 +
+      this.skillLevelStats.skilled * 0.005 +
+      this.skillLevelStats.expert * 0.02 +
+      this.skillLevelStats.master * 0.05 +
+      this.skillLevelStats.legendary * 0.10;
+
+    console.log(
+      `[ArtifactSystem] Skill distribution - ` +
+      `Novice: ${this.skillLevelStats.novice}, ` +
+      `Competent: ${this.skillLevelStats.competent}, ` +
+      `Skilled: ${this.skillLevelStats.skilled}, ` +
+      `Expert: ${this.skillLevelStats.expert}, ` +
+      `Master: ${this.skillLevelStats.master}, ` +
+      `Legendary: ${this.skillLevelStats.legendary} | ` +
+      `Expected strange moods per day: ${expectedMoods.toFixed(2)}`
+    );
+  }
+}

@@ -1,9 +1,7 @@
 {
   "id": "chicken",
-  "category": "animals",
-  "type": "map_object",
-  "size": 48,
-  "description": "Realistic chicken as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
-  "generated_at": "2026-01-03T22:05:09.139Z",
-  "usage_usd": 0
+  "category": "animals.livestock",
+  "size": 32,
+  "description": "Small farm chicken, red-brown feathers, red comb, yellow beak, pecking pose, top-down farm animal",
+  "generated_at": "2026-01-04T21:23:15.652Z"
 }

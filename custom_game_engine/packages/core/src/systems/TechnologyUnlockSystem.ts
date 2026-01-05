@@ -24,6 +24,7 @@ import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { CityDirectorComponent } from '../components/CityDirectorComponent.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import { isAgentInCity } from '../components/CityDirectorComponent.js';
+import type { ISystemRegistry } from '../ecs/SystemRegistry.js';
 
 /**
  * TechnologyUnlockSystem watches for new buildings and unlocks them globally.
@@ -34,11 +35,13 @@ export class TechnologyUnlockSystem implements System {
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
 
   private eventBus: CoreEventBus;
+  private systemRegistry: ISystemRegistry;
   private lastCheckedTick: number = 0;
   private checkedBuildings: Set<string> = new Set(); // Track which buildings we've already processed
 
-  constructor(eventBus: CoreEventBus) {
+  constructor(eventBus: CoreEventBus, systemRegistry: ISystemRegistry) {
     this.eventBus = eventBus;
+    this.systemRegistry = systemRegistry;
   }
 
   /**
@@ -228,6 +231,68 @@ export class TechnologyUnlockSystem implements System {
       },
     });
 
-    // Log for visibility
+    // Enable systems that require this technology
+    this.enableSystemsForTechnology(world, buildingType);
+  }
+
+  /**
+   * Enable systems that are gated by specific technologies
+   */
+  private enableSystemsForTechnology(_world: World, buildingType: string): void {
+    // Uplift systems - enabled when research_lab is built
+    if (buildingType === 'research_lab') {
+      console.log('[TechnologyUnlock] Enabling Uplift systems (research_lab unlocked)');
+      this.systemRegistry.enable('UpliftCandidateDetectionSystem');
+      this.systemRegistry.enable('ProtoSapienceObservationSystem');
+      this.systemRegistry.enable('ConsciousnessEmergenceSystem');
+      this.systemRegistry.enable('UpliftBreedingProgramSystem');
+    }
+
+    // VR systems - enabled when vr_center or research_lab is built
+    if (buildingType === 'vr_center' || buildingType === 'research_lab') {
+      console.log('[TechnologyUnlock] Enabling VR systems');
+      this.systemRegistry.enable('VRSystem');
+    }
+
+    // Parasitic Reproduction - enabled when biology_lab is built
+    if (buildingType === 'biology_lab' || buildingType === 'research_lab') {
+      console.log('[TechnologyUnlock] Enabling Parasitic Reproduction systems');
+      this.systemRegistry.enable('ParasiticReproductionSystem');
+    }
+
+    // Neural Interface systems - enabled when research_lab is built
+    if (buildingType === 'research_lab' || buildingType === 'neural_lab') {
+      console.log('[TechnologyUnlock] Enabling Neural Interface systems');
+      this.systemRegistry.enable('NeuralInterfaceSystem');
+      this.systemRegistry.enable('VRTrainingSystem');
+    }
+
+    // Television systems - enabled when television_station is built
+    if (buildingType === 'television_station' || buildingType === 'broadcast_tower') {
+      console.log('[TechnologyUnlock] Enabling Television systems (TV industry unlocked)');
+      // TV Show Formats
+      this.systemRegistry.enable('GameShowSystem');
+      this.systemRegistry.enable('NewsroomSystem');
+      this.systemRegistry.enable('SoapOperaSystem');
+      this.systemRegistry.enable('TalkShowSystem');
+      // TV Production Pipeline
+      this.systemRegistry.enable('TVWritingSystem');
+      this.systemRegistry.enable('TVDevelopmentSystem');
+      this.systemRegistry.enable('TVProductionSystem');
+      this.systemRegistry.enable('TVPostProductionSystem');
+      this.systemRegistry.enable('TVBroadcastingSystem');
+      this.systemRegistry.enable('TVRatingsSystem');
+      this.systemRegistry.enable('TVCulturalImpactSystem');
+      this.systemRegistry.enable('TVArchiveSystem');
+      this.systemRegistry.enable('TVAdvertisingSystem');
+    }
+
+    // Plot & Narrative systems - enabled when library or university is built
+    if (buildingType === 'library' || buildingType === 'university') {
+      console.log('[TechnologyUnlock] Enabling Plot & Narrative systems (storytelling unlocked)');
+      this.systemRegistry.enable('PlotAssignmentSystem');
+      this.systemRegistry.enable('PlotProgressionSystem');
+      this.systemRegistry.enable('NarrativePressureSystem');
+    }
   }
 }

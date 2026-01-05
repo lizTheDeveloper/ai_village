@@ -27,13 +27,11 @@ export enum ViewMode {
 
 /**
  * Order of view modes when cycling with V key.
+ * Simplified to just toggle between 2D (TopDown) and 3D (FaceNorth).
  */
 export const VIEW_MODE_CYCLE: ViewMode[] = [
   ViewMode.TopDown,
   ViewMode.FaceNorth,
-  ViewMode.FaceEast,
-  ViewMode.FaceSouth,
-  ViewMode.FaceWest,
 ];
 
 /**

@@ -1,18 +1,7 @@
 {
   "id": "cat_orange",
-  "base_species": "cat",
-  "variant": "orange_tabby",
-  "description": "orange tabby cat",
-  "size": 48,
-  "directions": [
-    "south",
-    "southwest",
-    "west",
-    "northwest",
-    "north",
-    "northeast",
-    "east",
-    "southeast"
-  ],
-  "generated_at": "2026-01-04T00:25:50.656Z"
+  "category": "animals.pets",
+  "size": 32,
+  "description": "Orange tabby cat, striped fur, sitting pose, top-down view",
+  "generated_at": "2026-01-04T21:26:28.167Z"
 }

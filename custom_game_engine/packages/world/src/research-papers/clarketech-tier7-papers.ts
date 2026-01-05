@@ -481,7 +481,7 @@ The superiority of linked minds over individual cognition manifests most dramati
 
 † Subtitle: "We Mean It This Time." Further subtitle: "Remember Oslo."
 
-********** If it's not obvious why maintaining a partially-conscious collective mind through rotating sleep periods is a bad idea, you are exactly the person for whom this warning exists. The Oslo Incident† involved seventeen researchers,`,
+********** If it's not obvious why maintaining a partially-conscious collective mind through rotating sleep periods is a bad idea, you are exactly the person for whom this warning exists. The Oslo Incident† involved seventeen researchers`,
   abstract: 'Research paper on Sharing mental workload across linked minds',
   published: false
 };
@@ -489,7 +489,7 @@ The superiority of linked minds over individual cognition manifests most dramati
 
 export const HIVE_MIND_ETHICS: ResearchPaper = {
   paperId: 'hive_mind_ethics',
-  title: 'Who Are You When You\'re Everyone?: Ethical Considerations',
+  title: "Who Are You When You're Everyone?: Ethical Considerations",
   field: 'experimental',
   paperSets: ['hive_mind_link'],
   prerequisitePapers: ['collective_consciousness_theory'],

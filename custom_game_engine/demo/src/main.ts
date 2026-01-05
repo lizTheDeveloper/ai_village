@@ -19,6 +19,7 @@ import {
   createBuildingComponent,
   createPositionComponent,
   createRenderableComponent,
+  createAnimationComponent,
   createWeatherComponent,
   createInventoryComponent,
   createNamedLandmarksComponent,
@@ -57,6 +58,9 @@ import {
   type IncarnationComponent,
   // Divine configuration
   createUniverseConfig,
+  // Tile-based buildings
+  getTileBasedBlueprintRegistry,
+  BuildingType,
 } from '@ai-village/core';
 import {
   Renderer,
@@ -66,6 +70,7 @@ import {
   AgentInfoPanel,
   AgentRosterPanel,
   ResearchLibraryPanel,
+  TechTreePanel,
   AnimalInfoPanel,
   AnimalRosterPanel,
   TileInspectorPanel,
@@ -219,6 +224,11 @@ function createInitialBuildings(world: WorldMutator) {
   campfireEntity.addComponent(createBuildingComponent('campfire', 1, 100));
   campfireEntity.addComponent(createPositionComponent(-3, -3));
   campfireEntity.addComponent(createRenderableComponent('campfire', 'object'));
+  campfireEntity.addComponent(createAnimationComponent(
+    ['campfire_frame1', 'campfire_frame2', 'campfire_frame3', 'campfire_frame4'],
+    0.2,  // 200ms per frame
+    true  // loop
+  ));
   (world as any)._addEntity(campfireEntity);
 
   // Create a completed tent (provides shelter)
@@ -351,6 +361,9 @@ async function createSoulsForInitialAgents(
         ceremonyModal.startCeremony({
           culture: event.data.context.culture,
           cosmicAlignment: event.data.context.cosmicAlignment,
+          isReforging: event.data.context.isReforging,
+          previousWisdom: event.data.context.previousWisdom,
+          previousLives: event.data.context.previousLives,
         });
       });
 
@@ -376,12 +389,38 @@ async function createSoulsForInitialAgents(
           spriteFolder,
         });
 
+        // Send soul to server repository for persistence
+        fetch('http://localhost:3001/api/save-soul', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            soulId: event.data.soulId,
+            agentId: event.data.agentId || event.data.soulId,
+            name: event.data.name,
+            species: event.data.species,
+            archetype: event.data.archetype,
+            purpose: event.data.purpose,
+            interests: event.data.interests,
+            soulBirthTick: gameLoop.world.tick,
+          })
+        }).then(res => res.json()).then(result => {
+          console.log('[Soul Repository] Saved soul to server:', result);
+        }).catch(err => {
+          console.warn('[Soul Repository] Failed to save soul to server:', err);
+        });
+
         // Get first memory from universe scenario (not from ceremony transcript!)
         let firstMemory: string | undefined;
         if (universeConfig) {
           const scenario = SCENARIO_PRESETS.find(s => s.id === universeConfig.scenarioPresetId);
           firstMemory = scenario?.description || universeConfig.customScenarioText;
         }
+
+        // Get soul sprite folder and reincarnation count
+        const spriteFolderId = appearance?.spriteFolderId || appearance?.spriteFolder;
+        const soulEntity = gameLoop.world.getEntity(event.data.soulId);
+        const soulIdentity = soulEntity?.components.get('soul_identity') as any;
+        const reincarnationCount = soulIdentity?.incarnationHistory?.length || 1;
 
         ceremonyModal.completeCeremony(
           event.data.purpose,
@@ -461,7 +500,9 @@ async function createSoulsForInitialAgents(
             soulSystem.requestSoulCreation(context, (newSoulId: string) => {
               // New ceremony will fire events and re-trigger this handler
             });
-          }
+          },
+          spriteFolderId,
+          reincarnationCount
         );
       });
 
@@ -1168,7 +1209,22 @@ function setupWindowManager(
     isDraggable: true,
     isResizable: true,
     showInWindowList: true,
-    menuCategory: 'info',
+    keyboardShortcut: 'Y',
+    menuCategory: 'research',
+  });
+
+  // Tech Tree Panel
+  const techTreePanel = new TechTreePanel();
+  windowManager.registerWindow('tech-tree', techTreePanel, {
+    defaultX: 100,
+    defaultY: 50,
+    defaultWidth: 1200,
+    defaultHeight: 1200,
+    isDraggable: true,
+    isResizable: true,
+    showInWindowList: true,
+    keyboardShortcut: 'K',
+    menuCategory: 'research',
   });
 
   // Agent Selection Panel (Jack-In)
@@ -1270,7 +1326,7 @@ function setupWindowManager(
   });
 
   // Dev Panel
-  const devPanel = new DevPanel();
+  devPanel = new DevPanel();
   const devPanelAdapter = createDevPanelAdapter(devPanel);
   windowManager.registerWindow('dev-panel', devPanelAdapter, {
     defaultX: 200,
@@ -2414,6 +2470,7 @@ function handleKeyDown(
 
 // Module-level panels variable (assigned in main())
 let panels: UIPanelsResult = null as any;
+let devPanel: DevPanel = null as any;
 
 function handleMouseClick(
   screenX: number,
@@ -2440,6 +2497,15 @@ function handleMouseClick(
     }
 
     if (windowManager.handleClick(screenX, screenY)) {
+      return true;
+    }
+  }
+
+  // DevPanel click-to-place mode
+  if (devPanel.isClickToPlaceActive() && button === 0) {
+    const camera = renderer.getCamera();
+    const worldPos = camera.screenToWorld(screenX, screenY);
+    if (devPanel.handleWorldClick(worldPos.x, worldPos.y)) {
       return true;
     }
   }
@@ -2485,6 +2551,7 @@ function handleMouseClick(
         relationshipsPanel.setSelectedEntity(entity);
         panels.agentRosterPanel.setSelectedAgent(entity.id);
         panels.animalRosterPanel.setSelectedAnimal(null);
+        devPanel.setSelectedAgentId(entity.id);
         if (windowManager.getWindow('crafting')?.visible) {
           craftingUI.setActiveAgent(entity.id);
         }
@@ -2500,6 +2567,7 @@ function handleMouseClick(
         relationshipsPanel.setSelectedEntity(null);
         panels.agentRosterPanel.setSelectedAgent(null);
         panels.animalRosterPanel.setSelectedAnimal(entity.id);
+        devPanel.setSelectedAgentId(null);
         windowManager.showWindow('animal-info');
         windowManager.hideWindow('agent-info');
         windowManager.hideWindow('plant-info');
@@ -2512,6 +2580,7 @@ function handleMouseClick(
         relationshipsPanel.setSelectedEntity(null);
         panels.agentRosterPanel.setSelectedAgent(null);
         panels.animalRosterPanel.setSelectedAnimal(null);
+        devPanel.setSelectedAgentId(null);
         windowManager.showWindow('plant-info');
         windowManager.hideWindow('agent-info');
         windowManager.hideWindow('animal-info');
@@ -2524,6 +2593,7 @@ function handleMouseClick(
         relationshipsPanel.setSelectedEntity(null);
         panels.agentRosterPanel.setSelectedAgent(null);
         panels.animalRosterPanel.setSelectedAnimal(null);
+        devPanel.setSelectedAgentId(null);
         windowManager.hideWindow('agent-info');
         windowManager.hideWindow('animal-info');
         windowManager.hideWindow('plant-info');
@@ -2538,6 +2608,7 @@ function handleMouseClick(
       relationshipsPanel.setSelectedEntity(null);
       panels.agentRosterPanel.setSelectedAgent(null);
       panels.animalRosterPanel.setSelectedAnimal(null);
+      devPanel.setSelectedAgentId(null);
       windowManager.hideWindow('agent-info');
       windowManager.hideWindow('animal-info');
       windowManager.hideWindow('plant-info');
@@ -2558,7 +2629,8 @@ function setupDebugAPI(
   blueprintRegistry: BuildingBlueprintRegistry,
   agentInfoPanel: AgentInfoPanel,
   animalInfoPanel: AnimalInfoPanel,
-  resourcesPanel: ResourcesPanel
+  resourcesPanel: ResourcesPanel,
+  devPanelInstance: DevPanel
 ) {
   (window as any).game = {
     world: gameLoop.world,
@@ -2569,6 +2641,66 @@ function setupDebugAPI(
     agentInfoPanel,
     animalInfoPanel,
     resourcesPanel,
+    devPanel: devPanelInstance,
+
+    // Skill management API
+    grantSkillXP: (agentId: string, amount: number) => {
+      const agent = gameLoop.world.getEntity(agentId);
+      if (!agent) {
+        console.error(`Agent ${agentId} not found`);
+        return false;
+      }
+      const skills = agent.getComponent('skills' as any);
+      if (!skills) {
+        console.error(`Agent ${agentId} has no skills component`);
+        return false;
+      }
+
+      const skillNames = Object.keys((skills as any).levels);
+      if (skillNames.length === 0) {
+        console.error(`Agent ${agentId} has no skills`);
+        return false;
+      }
+
+      // Grant XP to a random skill
+      const randomSkill = skillNames[Math.floor(Math.random() * skillNames.length)]!;
+      const currentLevel = (skills as any).levels[randomSkill] || 0;
+      const newLevel = currentLevel + (amount / 100); // 100 XP = 1 level
+
+      (gameLoop.world as any).updateComponent(agentId, 'skills', (current: any) => ({
+        ...current,
+        levels: {
+          ...current.levels,
+          [randomSkill]: newLevel,
+        },
+      }));
+
+      console.log(`Granted ${amount} XP to ${agentId} (${randomSkill}: ${currentLevel.toFixed(1)} → ${newLevel.toFixed(1)})`);
+      return true;
+    },
+
+    getAgentSkills: (agentId: string) => {
+      const agent = gameLoop.world.getEntity(agentId);
+      if (!agent) return null;
+      const skills = agent.getComponent('skills' as any);
+      return skills ? (skills as any).levels : null;
+    },
+
+    setSelectedAgent: (agentId: string | null) => {
+      devPanelInstance.setSelectedAgentId(agentId);
+      if (agentId) {
+        const agent = gameLoop.world.getEntity(agentId);
+        if (agent) {
+          agentInfoPanel.setSelectedEntity(agent);
+        }
+      } else {
+        agentInfoPanel.setSelectedEntity(null);
+      }
+    },
+
+    getSelectedAgent: () => {
+      return devPanelInstance.getSelectedAgentId();
+    },
   };
 
   (window as any).__gameTest = {
@@ -2581,6 +2713,15 @@ function setupDebugAPI(
     getAllBlueprints: () => blueprintRegistry.getAll(),
     getBlueprintsByCategory: (category: string) => blueprintRegistry.getByCategory(category as any),
     getUnlockedBlueprints: () => blueprintRegistry.getUnlocked(),
+    // Soul reincarnation testing
+    createAncientSouls: (count: number = 3) => {
+      const soulSystem = gameLoop.systemRegistry.get('soul_creation') as SoulCreationSystem;
+      if (!soulSystem) {
+        console.error('[__gameTest] SoulCreationSystem not found');
+        return;
+      }
+      soulSystem.createAncientSouls(gameLoop.world, count);
+    },
     placeBuilding: (blueprintId: string, x: number, y: number) => {
       gameLoop.world.eventBus.emit({
         type: 'building:placement:confirmed',
@@ -2796,7 +2937,8 @@ async function main() {
     // Filter out any undefined/null entries
     existingSaves = allSaves.filter(save => save != null && save.name && save.key);
   } catch (error) {
-    console.error('[Demo] Error listing saves:', error);
+    console.warn('[Demo] Could not load existing saves (this is normal on first run or if IndexedDB is blocked):', error);
+    console.log('[Demo] Starting fresh game...');
     existingSaves = [];
   }
   let loadedCheckpoint = false;
@@ -2860,8 +3002,11 @@ async function main() {
   // Register all systems
   const systemsResult = await registerAllSystems(gameLoop, llmQueue, promptBuilder);
 
-  // Create renderer
-  const renderer = new Renderer(canvas);
+  // Create renderer (pass ChunkManager and TerrainGenerator so it shares the same instances with World)
+  const renderer = new Renderer(canvas, chunkManager, terrainGenerator);
+
+  // Apply render settings from saved settings
+  renderer.set3DDrawDistance(settings.render.drawDistance3D);
 
   // Create input handler
   const inputHandler = new InputHandler(canvas, renderer.getCamera());
@@ -3355,6 +3500,134 @@ async function main() {
       { x: 10, y: 0 }, { x: -10, y: 1 }, { x: 0, y: 10 },
     ];
     berryPositions.forEach(pos => createBerryBush(gameLoop.world, pos.x, pos.y));
+
+    // Spawn initial buildings at origin
+    console.log('[WorldInit] Spawning initial buildings...');
+
+    // Helper function to spawn a fully-built single-tile building
+    const spawnBuilding = (type: BuildingType, x: number, y: number) => {
+      const entity = gameLoop.world.createEntity();
+
+      // Building component (fully built - progress=100)
+      const building = createBuildingComponent(type, 1, 100);
+      entity.addComponent(building);
+
+      // Position
+      const position = createPositionComponent(x, y);
+      entity.addComponent(position);
+
+      // Renderable
+      const renderable = createRenderableComponent(type, 'building');
+      entity.addComponent(renderable);
+
+      // Add inventory for storage buildings
+      if (type === BuildingType.StorageChest || type === BuildingType.StorageBox) {
+        const inventory = createInventoryComponent(20, 500);
+        entity.addComponent(inventory);
+      }
+
+      return entity;
+    };
+
+    // Campfire at origin
+    spawnBuilding(BuildingType.Campfire, 0, 0);
+
+    // Storage chest nearby
+    spawnBuilding(BuildingType.StorageChest, 2, 0);
+
+    // Bedroll (temporary shelter)
+    spawnBuilding(BuildingType.Bedroll, -2, 0);
+
+    // Spawn 5 houses to the right of the berry bush ring (x = 17-18)
+    console.log('[WorldInit] Spawning 5 houses near berry ring...');
+    const blueprintRegistry = getTileBasedBlueprintRegistry();
+    const houseBlueprint = blueprintRegistry.get('tile_small_house');
+
+    if (houseBlueprint) {
+      const housePositions = [
+        { x: 17, y: 0 },   // Center
+        { x: 17, y: 5 },   // North
+        { x: 17, y: -5 },  // South
+        { x: 22, y: 2 },   // East-North
+        { x: 22, y: -2 },  // East-South
+      ];
+
+      // Use the tile construction system to place houses
+      // (Houses will be placed as fully built structures)
+      for (const pos of housePositions) {
+        // Parse the blueprint layout
+        const tiles: any[] = [];
+        for (let row = 0; row < houseBlueprint.layoutString.length; row++) {
+          for (let col = 0; col < houseBlueprint.layoutString[row].length; col++) {
+            const symbol = houseBlueprint.layoutString[row][col];
+            if (symbol === ' ') continue; // Skip empty tiles
+
+            const worldX = pos.x + col;
+            const worldY = pos.y + row;
+
+            let tileType: 'wall' | 'floor' | 'door' | 'window';
+            let materialId: string;
+
+            if (symbol === '#') {
+              tileType = 'wall';
+              materialId = houseBlueprint.materialDefaults.wall;
+            } else if (symbol === '.') {
+              tileType = 'floor';
+              materialId = houseBlueprint.materialDefaults.floor;
+            } else if (symbol === 'D') {
+              tileType = 'door';
+              materialId = houseBlueprint.materialDefaults.door;
+            } else if (symbol === 'W') {
+              tileType = 'window';
+              materialId = houseBlueprint.materialDefaults.window || 'glass';
+            } else {
+              continue;
+            }
+
+            tiles.push({ x: worldX, y: worldY, type: tileType, materialId });
+          }
+        }
+
+        // Place tiles in the world
+        for (const tile of tiles) {
+          const chunk = chunkManager.getChunk(
+            Math.floor(tile.x / 16),
+            Math.floor(tile.y / 16)
+          );
+
+          const localX = tile.x - chunk.x * 16;
+          const localY = tile.y - chunk.y * 16;
+          const tileData = chunk.tiles[localY * 16 + localX];
+
+          if (tile.type === 'wall') {
+            tileData.wall = { material: tile.materialId, hp: 100, maxHp: 100 };
+          } else if (tile.type === 'floor') {
+            tileData.type = tile.materialId;
+          } else if (tile.type === 'door') {
+            tileData.door = { material: tile.materialId, hp: 50, maxHp: 50, open: false };
+          } else if (tile.type === 'window') {
+            tileData.window = { material: tile.materialId, hp: 30, maxHp: 30 };
+          }
+        }
+
+        console.log(`[WorldInit] Placed house at (${pos.x}, ${pos.y})`);
+
+        // Furnish the house with bedrolls and storage
+        // Small house is 3x3, interior floor is at (pos.x+1, pos.y+1)
+        const interiorX = pos.x + 1;
+        const interiorY = pos.y + 1;
+
+        // Place bedroll in the interior
+        spawnBuilding(BuildingType.Bedroll, interiorX, interiorY);
+
+        // Place storage chest in the interior (offset slightly)
+        spawnBuilding(BuildingType.StorageChest, interiorX, interiorY + 1);
+
+        console.log(`[WorldInit] Furnished house with bedroll and storage`);
+      }
+    }
+
+    console.log('[WorldInit] Initial buildings spawned!');
   } else {
     // Start game loop for loaded checkpoints (new games already started it before soul creation)
     gameLoop.start();
@@ -3377,7 +3650,8 @@ async function main() {
   // Setup debug API
   setupDebugAPI(
     gameLoop, renderer, placementUI, blueprintRegistry,
-    panels.agentInfoPanel, panels.animalInfoPanel, panels.resourcesPanel
+    panels.agentInfoPanel, panels.animalInfoPanel, panels.resourcesPanel,
+    devPanel
   );
 
   // Game loop already started before soul creation

@@ -9,6 +9,7 @@ echo ""
 echo "This will start:"
 echo "  - Metrics Server (port 8766)"
 echo "  - Orchestration Dashboard (port 3030)"
+echo "  - PixelLab Sprite Daemon"
 echo "  - API Server (port 3001)"
 echo "  - Game Dev Server (port 3000)"
 echo "  - Browser at http://localhost:3000"
@@ -27,6 +28,7 @@ DEV_LOG="logs/dev-server-${TIMESTAMP}.log"
 # PID files for reconnecting to existing servers
 METRICS_PID_FILE=".metrics-server.pid"
 ORCH_PID_FILE=".orch-dashboard.pid"
+PIXELLAB_PID_FILE=".pixellab-daemon.pid"
 API_PID_FILE=".api-server.pid"
 DEV_PID_FILE=".dev-server.pid"
 
@@ -69,6 +71,24 @@ start_orch_dashboard() {
     echo $! > "../../../custom_game_engine/.orch-dashboard.pid")
     sleep 1
     ORCH_PID=$(cat "$ORCH_PID_FILE")
+    sleep 1
+}
+
+# Function to start or reconnect to PixelLab daemon
+start_pixellab_daemon() {
+    if [ -f "$PIXELLAB_PID_FILE" ]; then
+        PIXELLAB_PID=$(cat "$PIXELLAB_PID_FILE")
+        if is_running "$PIXELLAB_PID"; then
+            echo "PixelLab Daemon already running (PID: $PIXELLAB_PID)"
+            return
+        fi
+    fi
+
+    echo "Starting PixelLab Sprite Daemon..."
+    echo "Logs: pixellab-daemon.log"
+    nohup npx ts-node scripts/pixellab-daemon.ts >> pixellab-daemon.log 2>&1 &
+    PIXELLAB_PID=$!
+    echo $PIXELLAB_PID > "$PIXELLAB_PID_FILE"
     sleep 1
 }
 
@@ -120,6 +140,7 @@ start_dev_server() {
 # Start all servers
 start_metrics_server
 start_orch_dashboard
+start_pixellab_daemon
 start_api_server
 start_dev_server
 
@@ -141,12 +162,14 @@ echo "Game:          http://localhost:3000"
 echo "API:           http://localhost:3001"
 echo "Dashboard:     http://localhost:8766"
 echo "Orchestration: http://localhost:3030"
+echo "PixelLab:      Background daemon (PID $PIXELLAB_PID)"
 echo ""
 echo "Servers are running in background (nohup)."
 echo "Close this terminal and they'll keep running."
 echo ""
 echo "To stop servers: ./start.sh kill"
 echo "To check status:  ./start.sh status"
+echo "View sprites:     tail -f pixellab-daemon.log"
 echo ""
 echo "Press Ctrl+C to exit monitor (servers will continue running)"
 echo ""

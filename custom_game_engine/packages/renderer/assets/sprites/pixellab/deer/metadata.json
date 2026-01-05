@@ -1,9 +1,7 @@
 {
   "id": "deer",
-  "category": "animals",
-  "type": "map_object",
-  "size": 48,
-  "description": "Realistic deer as a quadruped animal on all four legs, natural animal pose, pixel art, top-down view",
-  "generated_at": "2026-01-03T22:07:07.905Z",
-  "usage_usd": 0
+  "category": "animals.wild",
+  "size": 32,
+  "description": "Brown deer, white spots, antlers (male), standing alert pose, top-down forest animal",
+  "generated_at": "2026-01-04T21:28:07.252Z"
 }

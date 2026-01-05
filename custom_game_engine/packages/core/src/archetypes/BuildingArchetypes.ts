@@ -4,28 +4,13 @@ import type { RenderableComponent } from '../components/RenderableComponent.js';
 import { createInventoryComponent } from '../components/InventoryComponent.js';
 
 /**
- * Lean-to building archetype.
- * Provides shelter to nearby agents.
- * Note: Position component must be added separately when spawning.
+ * NOTE: Most building archetypes have been deprecated in favor of the
+ * TileBasedBlueprintRegistry system (see TileConstructionSystem).
+ *
+ * This file now only contains single-tile furniture/workstations that don't
+ * use the voxel/tile blueprint system. For multi-tile buildings, use
+ * TileBasedBlueprintRegistry instead.
  */
-export const leanToArchetype: Archetype = {
-  name: 'lean-to',
-  description: 'A simple shelter that protects from the elements',
-  create: () => {
-    const building = createBuildingComponent(BuildingType.LeanTo, 1, 100);
-
-    const renderable: RenderableComponent = {
-      type: 'renderable',
-      version: 1,
-      spriteId: 'lean-to',
-      tint: '#8B4513', // Brown
-      layer: 'object',
-      visible: true,
-    };
-
-    return [building, renderable];
-  },
-};
 
 /**
  * Campfire building archetype.
@@ -126,30 +111,6 @@ export const storageChestArchetype: Archetype = {
     const inventory = createInventoryComponent(20, 500);
 
     return [building, renderable, inventory];
-  },
-};
-
-/**
- * Tent building archetype.
- * Provides basic shelter and rest bonus.
- * Note: Position component must be added separately when spawning.
- */
-export const tentArchetype: Archetype = {
-  name: 'tent',
-  description: 'A simple tent for basic shelter and rest',
-  create: () => {
-    const building = createBuildingComponent(BuildingType.Tent, 1, 100);
-
-    const renderable: RenderableComponent = {
-      type: 'renderable',
-      version: 1,
-      spriteId: 'tent',
-      tint: '#C4A484', // Tan/canvas color
-      layer: 'object',
-      visible: true,
-    };
-
-    return [building, renderable];
   },
 };
 

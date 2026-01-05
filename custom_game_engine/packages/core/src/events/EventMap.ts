@@ -2767,6 +2767,9 @@ export interface GameEventMap {
   /** Soul creation ceremony completed */
   'soul:ceremony_complete': {
     soulId: string;
+    agentId?: string; // For backward compatibility (same as soulId until soul is incarnated)
+    name: string; // Soul name for repository
+    species: string; // Soul species/origin for repository
     purpose: string;
     interests: string[];
     destiny?: string;
@@ -3453,6 +3456,22 @@ export interface GameEventMap {
     totalProcessed: number;
     approved: number;
     rejected: number;
+  };
+
+  // === VR System Events ===
+  'vr_session:started': {
+    sessionId: string;
+    participantIds: string[];
+    scenarioType: string;
+    scenarioDescription: string;
+  };
+
+  'vr_session:ended': {
+    sessionId: string;
+    participantIds: string[];
+    duration: number;
+    scenarioType: string;
+    completed: boolean;
   };
 }
 

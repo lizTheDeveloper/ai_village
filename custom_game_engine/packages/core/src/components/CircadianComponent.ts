@@ -152,7 +152,7 @@ export class CircadianComponent extends ComponentBase {
         // Check building type for sleep quality bonuses
         if (buildingComp.buildingType === 'bed') {
           quality += 0.4;
-        } else if (buildingComp.buildingType === 'tent' || buildingComp.buildingType === 'lean-to') {
+        } else if (buildingComp.buildingType === 'bedroll') {
           quality += 0.2;
         } else if (buildingComp.buildingType === 'campfire') {
           quality += 0.1;

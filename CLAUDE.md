@@ -547,19 +547,53 @@ settingsPanel.setOnSettingsChange(async () => {
 cd custom_game_engine && ./start.sh
 ```
 
-This launches everything: metrics server, orchestration dashboard, game server, and opens browser.
+This launches everything: metrics server, orchestration dashboard, PixelLab sprite daemon, game server, and opens browser.
 
 ### Orchestrator Commands
 
 ```bash
-./start.sh              # Start game host (default) - metrics + game + browser
-./start.sh server       # Backend only (for AI operation without browser)
+./start.sh              # Start game host (default) - metrics + pixellab + game + browser
+./start.sh server       # Backend only (metrics + pixellab + orchestration)
 ./start.sh player       # Open browser to existing server
-./start.sh kill         # Stop all running servers
+./start.sh kill         # Stop all running servers (including PixelLab daemon)
 ./start.sh status       # Show which servers are running
 ```
 
 **IMPORTANT for Claude Code**: Always use `./start.sh kill` before starting servers to avoid port conflicts. Never run `npm run dev` directly - use the orchestrator.
+
+### What Gets Started
+
+**Game Host Mode** (`./start.sh` or `./start.sh gamehost`):
+- Metrics server (port 8766) - Performance tracking and dashboards
+- Orchestration dashboard (port 3030) - Development tools
+- **PixelLab daemon** - On-demand sprite generation as agents are born
+- Game server (port 3000-3002) - Main game with Vite HMR
+- Browser window - Opens automatically to game
+
+**Server Mode** (`./start.sh server`):
+- Metrics server (port 8766)
+- Orchestration dashboard (port 3030)
+- **PixelLab daemon** - Continuous sprite generation
+- No browser/frontend (for autonomous AI operation)
+
+### PixelLab Sprite Daemon
+
+The PixelLab daemon runs automatically when you start the server. It:
+- Generates pixel art sprites on-demand via PixelLab API
+- Processes sprites from `scripts/pixellab-batch-manifest.json`
+- Creates animal variants (31 types × 8 directions = 248 sprites)
+- Saves sprites to `packages/renderer/assets/sprites/pixellab/`
+- Logs activity to `pixellab-daemon.log`
+- Respects 5-second rate limiting between generations
+
+**Managing the daemon:**
+- Use the `pixellab` skill for all daemon operations (see `.claude/skills/pixellab.md`)
+- Check status: `pixellab status`
+- View logs: `pixellab logs` or `tail -f custom_game_engine/pixellab-daemon.log`
+- Add sprites: `pixellab add`
+- Verify sprites: `pixellab verify <sprite_id>`
+
+**The daemon automatically stops when you run `./start.sh kill`.**
 
 ### Dashboard Queries
 
@@ -583,3 +617,186 @@ If Playwright errors on navigation, close existing tabs first with `browser_clos
 1. **Run the build** - `npm run build` must pass
 2. **Check console errors** - Verify no runtime errors in browser
 3. **Test error paths** - Verify exceptions are thrown for invalid input
+
+## Debug Actions API
+
+**The Actions API (`window.game`) provides programmatic access to game state and dev tools.**
+
+### Accessing the API
+
+Open the browser console (F12) and use `game` or `__gameTest`:
+
+```javascript
+// Main API (stable, public methods)
+game.world
+game.grantSkillXP(agentId, amount)
+game.setSelectedAgent(agentId)
+
+// Test API (experimental, may change)
+__gameTest.placeBuilding('tent', 50, 50)
+```
+
+### Core Access
+
+```javascript
+game.world                // World instance
+game.gameLoop            // GameLoop instance
+game.renderer            // Renderer instance
+game.devPanel            // DevPanel instance
+game.agentInfoPanel      // AgentInfoPanel instance
+game.animalInfoPanel     // AnimalInfoPanel instance
+game.resourcesPanel      // ResourcesPanel instance
+game.buildingRegistry    // BuildingBlueprintRegistry instance
+game.placementUI         // BuildingPlacementUI instance
+```
+
+### Agent Selection
+
+```javascript
+// Set the selected agent (updates DevPanel Skills tab and AgentInfoPanel)
+game.setSelectedAgent(agentId);
+// Pass null to deselect
+game.setSelectedAgent(null);
+
+// Get the currently selected agent ID
+const agentId = game.getSelectedAgent();
+// Returns: string or null
+```
+
+### Skill Management (Agent-Specific)
+
+**All skill operations require an agent ID.**
+
+```javascript
+// Grant XP to a specific agent
+game.grantSkillXP(agentId, amount);
+// Returns: true if successful, false if agent not found/has no skills
+// XP is granted to a random skill (100 XP = 1 level)
+
+// Get an agent's current skill levels
+const skills = game.getAgentSkills(agentId);
+// Returns: { skillName: level, ... } or null if not found
+// Example: { farming: 2.5, crafting: 1.2, combat: 0.8 }
+```
+
+**Example Usage:**
+
+```javascript
+// Find all agents
+const agents = game.world.query().with('agent').executeEntities();
+
+// Grant 500 XP to the first agent
+const firstAgent = agents[0];
+game.grantSkillXP(firstAgent.id, 500);
+
+// Check their skills
+console.log(game.getAgentSkills(firstAgent.id));
+// Output: { farming: 2.5, crafting: 1.2, ... }
+
+// Select the agent (makes it appear in DevTools Skills tab)
+game.setSelectedAgent(firstAgent.id);
+
+// Grant more XP to the selected agent
+const selectedId = game.getSelectedAgent();
+if (selectedId) {
+  game.grantSkillXP(selectedId, 1000);
+}
+
+// Deselect
+game.setSelectedAgent(null);
+```
+
+### DevPanel Direct Access
+
+```javascript
+// Set spawn location for agents/buildings
+game.devPanel.spawnX = 100;
+game.devPanel.spawnY = 150;
+
+// Set selected agent ID
+game.devPanel.setSelectedAgentId('some-agent-id');
+game.devPanel.getSelectedAgentId();
+```
+
+### Building Management
+
+```javascript
+// Place a building via event system
+__gameTest.placeBuilding(blueprintId, x, y);
+
+// Get all buildings in the world
+const buildings = __gameTest.getBuildings();
+// Returns: [{ entityId, type, position, building }, ...]
+
+// Get all blueprints
+const blueprints = __gameTest.getAllBlueprints();
+
+// Get blueprints by category
+const production = __gameTest.getBlueprintsByCategory('production');
+
+// Get unlocked blueprints
+const unlocked = __gameTest.getUnlockedBlueprints();
+
+// Get blueprint details
+const details = __gameTest.getBlueprintDetails('tent');
+```
+
+### Query Examples
+
+```javascript
+// Find all agents
+const agents = game.world.query().with('agent').executeEntities();
+
+// Find all agents with skills
+const skilledAgents = game.world.query()
+  .with('agent')
+  .with('skills')
+  .executeEntities();
+
+// Find all buildings
+const buildings = game.world.query().with('building').executeEntities();
+
+// Get entity by ID
+const agent = game.world.getEntity(agentId);
+
+// Get component from entity
+const identity = agent.getComponent('identity');
+const skills = agent.getComponent('skills');
+const position = agent.getComponent('position');
+```
+
+### Practical Workflows
+
+**Grant XP to all agents:**
+```javascript
+game.world.query().with('agent').with('skills').executeEntities()
+  .forEach(agent => game.grantSkillXP(agent.id, 100));
+```
+
+**Find and select the most skilled farmer:**
+```javascript
+const agents = game.world.query().with('agent').with('skills').executeEntities();
+const bestFarmer = agents
+  .map(a => ({ id: a.id, farming: a.getComponent('skills').levels.farming || 0 }))
+  .sort((a, b) => b.farming - a.farming)[0];
+game.setSelectedAgent(bestFarmer.id);
+console.log(`Selected best farmer with ${bestFarmer.farming} farming`);
+```
+
+**Spawn 10 agents at random locations:**
+```javascript
+for (let i = 0; i < 10; i++) {
+  game.devPanel.spawnX = Math.floor(Math.random() * 200);
+  game.devPanel.spawnY = Math.floor(Math.random() * 200);
+  // Then click "Spawn Wandering Agent" in DevPanel
+}
+```
+
+### Important Notes
+
+1. **Agent IDs required**: All skill operations need an `agentId` parameter
+2. **Selection state**: `setSelectedAgent()` syncs both DevPanel and AgentInfoPanel
+3. **XP calculation**: 100 XP = 1 skill level
+4. **Random skills**: XP is granted to a random skill the agent already has
+5. **Error handling**: Methods return `false` or `null` on errors (check console for details)
+6. **Test API**: `__gameTest` methods are experimental and may change

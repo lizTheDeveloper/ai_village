@@ -99,6 +99,7 @@ export function registerAllSerializers(): void {
     'passage',
     'physics',
     'renderable',
+    'animation',
     'tags',
     'movement',
     // Additional components from ComponentType enum
@@ -153,6 +154,10 @@ export function registerAllSerializers(): void {
     'recipe_discovery',
     'proto_reality',
     'corrupted_universe',
+    'vr_system',
+    'lore_frag',
+    'afterlife',
+    'realm',
   ];
 
   for (const componentType of genericComponents) {

@@ -39,10 +39,11 @@ import {
   type SoulCulture,
 } from '../components/SoulIdentityComponent.js';
 import { createIncarnationComponent } from '../components/IncarnationComponent.js';
-import { createSoulWisdomComponent } from '../components/SoulWisdomComponent.js';
+import { createSoulWisdomComponent, type SoulWisdomComponent } from '../components/SoulWisdomComponent.js';
 import { createSoulCreationEventComponent } from '../components/SoulCreationEventComponent.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 import { createRealmLocationComponent } from '../components/RealmLocationComponent.js';
+import { createAfterlifeComponent, type AfterlifeComponent } from '../components/AfterlifeComponent.js';
 import { soulNameGenerator } from '../divinity/SoulNameGenerator.js';
 
 /** Request to create a soul */
@@ -80,6 +81,7 @@ export class SoulCreationSystem implements System {
   private llmProvider?: LLMProvider;
   private useLLM: boolean = true;
   private turnInProgress: boolean = false;
+  private soulRepositorySystem?: any; // Will be set during init
 
   /**
    * Set the LLM provider for the Fates to use
@@ -98,6 +100,163 @@ export class SoulCreationSystem implements System {
   }
 
   /**
+   * Create ancient souls in the afterlife for testing reincarnation
+   * @param world The game world
+   * @param count Number of ancient souls to create (default: 3)
+   */
+  createAncientSouls(world: World, count: number = 3): void {
+    console.log(`[SoulCreationSystem] Creating ${count} ancient souls in the afterlife for reincarnation testing...`);
+
+    for (let i = 0; i < count; i++) {
+      const ancientSoul = new EntityImpl(createEntityId(), world.tick);
+
+      // Soul Identity with ancient origin
+      const cultures: SoulCulture[] = ['human', 'elven', 'dwarven', 'orcish', 'thrakeen'];
+      const randomCulture = cultures[Math.floor(Math.random() * cultures.length)] as SoulCulture;
+      const ancientNames = ['Theron', 'Astrid', 'Khepri', 'Branwen', 'Amaterasu', 'Lysander', 'Saga', 'Anubis', 'Rhiannon', 'Tsukuyomi'];
+      const randomName = ancientNames[Math.floor(Math.random() * ancientNames.length)] ?? 'Ancient One';
+
+      const soulIdentity = createSoulIdentityComponent({
+        soulName: randomName,
+        soulOriginCulture: randomCulture,
+        soulOriginSpecies: 'human',
+        isReincarnated: true,
+        purpose: 'To guide the next generation',
+        destiny: 'To find peace after many lives',
+        coreInterests: ['knowledge', 'wisdom', 'teaching'],
+        cosmicAlignment: Math.random() * 2 - 1,
+        currentTick: world.tick - 1000000, // Long ago
+        archetype: 'seeker',
+      });
+
+      ancientSoul.addComponent(soulIdentity);
+
+      // Soul Wisdom with multiple past lives
+      const lives = 2 + Math.floor(Math.random() * 5); // 2-6 past lives
+      const wisdom = 0.3 + Math.random() * 0.5; // 0.3-0.8 wisdom
+
+      const soulWisdom: SoulWisdomComponent = {
+        type: 'soul_wisdom' as const,
+        version: 1,
+        reincarnationCount: lives,
+        wisdomLevel: wisdom,
+        wisdomModifier: Math.sqrt(wisdom) * 0.5,
+        ascensionEligible: wisdom >= 0.85 && lives >= 10,
+        firstIncarnationTick: world.tick - 1000000,
+        livesLived: lives,
+        totalEmotionalIntensity: lives * 100,
+      };
+      ancientSoul.addComponent(soulWisdom);
+
+      // Afterlife Component - ready to reincarnate
+      const afterlife: AfterlifeComponent = {
+        type: 'afterlife' as const,
+        version: 1,
+        // Core needs
+        coherence: 0.9,
+        tether: 0.3,
+        peace: 0.8,
+        solitude: 0.2,
+        // Death context
+        causeOfDeath: 'old_age' as const,
+        deathTick: world.tick - 50000,
+        deathLocation: { x: 0, y: 0 },
+        // Unfinished business
+        unfinishedGoals: [],
+        unresolvedRelationships: [],
+        // Family
+        descendants: [],
+        // State
+        isShade: false,
+        hasPassedOn: false,
+        isRestless: false,
+        isAncestorKami: false,
+        wantsToReincarnate: true,
+        // Tracking
+        timesRemembered: lives * 10,
+        lastRememberedTick: world.tick - 1000,
+        visitsFromLiving: 0,
+        offeringsReceived: {},
+      };
+      ancientSoul.addComponent(afterlife);
+
+      // Episodic Memory
+      ancientSoul.addComponent(new EpisodicMemoryComponent({ maxMemories: 1000 }));
+
+      // Realm Location
+      ancientSoul.addComponent(createRealmLocationComponent('elysium'));
+
+      // Add to world
+      (world as any)._addEntity?.(ancientSoul) || (world as any).addEntity?.(ancientSoul);
+
+      console.log(`[SoulCreationSystem]   Created ancient soul: ${randomName} (${lives} lives, ${(wisdom * 100).toFixed(0)}% wisdom)`);
+    }
+
+    console.log(`[SoulCreationSystem] ✅ ${count} ancient souls ready for reincarnation!`);
+  }
+
+  /**
+   * Create a soul entity from repository data (reusing existing soul)
+   * Returns the entity ID of the created soul
+   */
+  private createSoulFromRepository(world: World, soulRecord: any): string {
+    console.log(`[SoulCreationSystem] 🔄 Reusing existing soul: ${soulRecord.name} (archetype: ${soulRecord.archetype})`);
+
+    const soulEntity = new EntityImpl(createEntityId(), world.tick);
+
+    // Soul Identity - use the existing soul's data
+    const soulIdentity = createSoulIdentityComponent({
+      soulName: soulRecord.name,
+      soulOriginCulture: soulRecord.culture as SoulCulture || 'human',
+      soulOriginSpecies: soulRecord.species || 'human',
+      isReincarnated: true, // Mark as reincarnated since it's being reused
+      purpose: soulRecord.purpose,
+      destiny: undefined, // Destiny can change
+      coreInterests: soulRecord.interests || getDefaultInterestsForArchetype(soulRecord.archetype),
+      cosmicAlignment: 0, // Reset for new incarnation
+      currentTick: world.tick,
+      archetype: soulRecord.archetype || 'wanderer',
+    });
+
+    soulEntity.addComponent(soulIdentity);
+
+    // Incarnation Component (not yet incarnated)
+    const incarnation = createIncarnationComponent();
+    soulEntity.addComponent(incarnation);
+
+    // Soul Wisdom Component - track that this is a reused soul
+    const wisdom = createSoulWisdomComponent(world.tick);
+    soulEntity.addComponent(wisdom);
+
+    // Episodic Memory (soul's own memories, initially empty for new incarnation)
+    soulEntity.addComponent(new EpisodicMemoryComponent({ maxMemories: 1000 }));
+
+    // Soul Creation Event - reference original ceremony if available
+    const creationEvent = createSoulCreationEventComponent({
+      culturalContext: soulRecord.culture,
+      cosmicAlignment: 0,
+      creationRealm: 'tapestry_of_fate',
+      currentTick: soulRecord.soulBirthTick || world.tick,
+      isObservable: false, // Original ceremony already happened
+    });
+
+    creationEvent.wovenPurpose = soulRecord.purpose;
+    creationEvent.spunInterests = soulRecord.interests || [];
+    creationEvent.assignedArchetype = soulRecord.archetype;
+
+    soulEntity.addComponent(creationEvent);
+
+    // Realm Location (soul starts in divine realm)
+    const realmLocation = createRealmLocationComponent('tapestry_of_fate');
+    soulEntity.addComponent(realmLocation);
+
+    // Add to world
+    (world as any)._addEntity?.(soulEntity) || (world as any).addEntity?.(soulEntity);
+
+    return soulEntity.id;
+  }
+
+  /**
    * Queue a soul creation request
    */
   requestSoulCreation(
@@ -110,6 +269,20 @@ export class SoulCreationSystem implements System {
       onComplete,
       observers,
     });
+  }
+
+  /**
+   * Initialize - get reference to soul repository
+   */
+  init(world: World): void {
+    this.soulRepositorySystem = (world as any).systemRegistry?.get('soul_repository');
+    if (!this.soulRepositorySystem) {
+      console.warn('[SoulCreationSystem] SoulRepositorySystem not found - soul reuse disabled');
+    } else {
+      console.log('[SoulCreationSystem] Connected to soul repository with', this.soulRepositorySystem.getStats().totalSouls, 'souls');
+      // Connect the soul name generator to the repository for global uniqueness checking
+      soulNameGenerator.setSoulRepository(this.soulRepositorySystem);
+    }
   }
 
   update(world: World, _entities: ReadonlyArray<Entity>, _deltaTime: number): void {
@@ -154,6 +327,8 @@ export class SoulCreationSystem implements System {
       .with('soul_identity' as any)
       .executeEntities();
 
+    console.log(`[SoulCreationSystem] Found ${afterlifeSouls.length} souls in afterlife`);
+
     const eligibleSouls = afterlifeSouls.filter(soul => {
       const afterlife = soul.components.get('afterlife') as any;
       return afterlife &&
@@ -161,6 +336,8 @@ export class SoulCreationSystem implements System {
              !afterlife.isShade &&  // Shades have lost identity
              !afterlife.hasPassedOn; // Already moved on
     });
+
+    console.log(`[SoulCreationSystem] ${eligibleSouls.length} souls eligible for reincarnation`);
 
     if (eligibleSouls.length === 0) {
       return null;
@@ -175,8 +352,54 @@ export class SoulCreationSystem implements System {
    * Begin a soul creation ceremony
    */
   private startCeremony(world: World, request: SoulCreationRequest): void {
-    // 50/50 chance to reincarnate a soul (if one exists)
-    const shouldTryReincarnation = Math.random() < 0.5;
+    // PRIORITY 1: Check global soul repository for existing souls to reuse
+    if (this.soulRepositorySystem && !request.context.isReforging) {
+      const stats = this.soulRepositorySystem.getStats();
+      console.log(`[SoulCreationSystem] Checking repository: ${stats.totalSouls} souls available`);
+
+      if (stats.totalSouls > 0) {
+        // 80% chance to reuse an existing soul from the repository
+        const shouldReuseSoul = Math.random() < 0.8;
+
+        if (shouldReuseSoul) {
+          const soulRecord = this.soulRepositorySystem.getRandomSoul();
+
+          if (soulRecord) {
+            console.log(`[SoulCreationSystem] 🌟 Reusing soul from repository: ${soulRecord.name}`);
+
+            // Create soul entity from repository data (skip ceremony)
+            const soulId = this.createSoulFromRepository(world, soulRecord);
+
+            // Emit completion event immediately (no ceremony needed)
+            world.eventBus.emit({
+              type: 'soul:ceremony_complete',
+              source: 'soul_creation_system',
+              data: {
+                soulId,
+                agentId: soulId, // For backward compatibility
+                name: soulRecord.name,
+                species: soulRecord.species || 'human',
+                purpose: soulRecord.purpose,
+                interests: soulRecord.interests || [],
+                destiny: undefined,
+                archetype: soulRecord.archetype,
+                transcript: [], // No ceremony transcript (reused soul)
+              },
+            });
+
+            // Call completion callback
+            request.onComplete(soulId);
+
+            return; // Skip ceremony entirely
+          }
+        }
+      }
+    }
+
+    // PRIORITY 2: Check local afterlife for souls wanting to reincarnate
+    const shouldTryReincarnation = Math.random() < 1.0;
+
+    console.log(`[SoulCreationSystem] Starting ceremony, shouldTryReincarnation: ${shouldTryReincarnation}, isAlreadyReforging: ${request.context.isReforging}`);
 
     if (shouldTryReincarnation && !request.context.isReforging) {
       const soulToReincarnate = this.findSoulForReincarnation(world);
@@ -184,6 +407,9 @@ export class SoulCreationSystem implements System {
       if (soulToReincarnate) {
         // Extract data from the soul being reincarnated
         const soulWisdom = soulToReincarnate.components.get('soul_wisdom') as any;
+        const soulIdentity = soulToReincarnate.components.get('soul_identity') as any;
+
+        console.log(`[SoulCreationSystem] 🔄 REINCARNATING SOUL: ${soulIdentity?.soulName || 'Unknown'}, lives: ${soulWisdom?.reincarnationCount ?? 1}, wisdom: ${soulWisdom?.wisdomLevel ?? 0.5}`);
 
         // Update context to mark this as a reincarnation
         request.context.isReforging = true;
@@ -193,6 +419,8 @@ export class SoulCreationSystem implements System {
 
         // Remove soul from afterlife (it's being reborn)
         (world as any)._removeEntity?.(soulToReincarnate.id) || (world as any).deleteEntity?.(soulToReincarnate.id);
+      } else {
+        console.log(`[SoulCreationSystem] No eligible souls found for reincarnation - creating new soul`);
       }
     }
 
@@ -362,12 +590,19 @@ export class SoulCreationSystem implements System {
     // Create soul entity
     const soulId = await this.createSoulEntity(world, ceremony, parsed);
 
-    // Emit completion event
+    // Get the soul entity to extract name and species for repository
+    const soulEntity = world.getEntity(soulId);
+    const soulIdentity = soulEntity?.components.get('soul_identity') as any;
+
+    // Emit completion event with all fields needed by repository
     world.eventBus.emit({
       type: 'soul:ceremony_complete',
       source: 'soul_creation_system',
       data: {
-        soulId,
+        soulId, // Soul entity ID (not agent ID - this is a soul, not an agent yet)
+        agentId: soulId, // For backward compatibility, though souls don't have agent IDs yet
+        name: soulIdentity?.soulName || 'Unknown',
+        species: soulIdentity?.soulOriginSpecies || 'human',
         purpose: parsed.purpose ?? 'Unknown',
         interests: parsed.interests ?? [],
         destiny: parsed.destiny,
@@ -432,7 +667,7 @@ export class SoulCreationSystem implements System {
       ? {
           type: 'soul_wisdom' as const,
           version: 1,
-          reincarnationCount: context.previousLives,
+          reincarnationCount: context.previousLives + 1, // Increment for this new reincarnation
           wisdomLevel: context.previousWisdom,
           wisdomModifier: Math.sqrt(context.previousWisdom) * 0.5,
           ascensionEligible: context.previousWisdom >= 0.85 && context.previousLives >= 10,

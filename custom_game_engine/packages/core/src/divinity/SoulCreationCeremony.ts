@@ -228,11 +228,17 @@ export function generateFatePrompt(
     // First speaker
     if (fate === 'weaver') {
       prompt += `You speak first. Examine the context and propose a PURPOSE for this soul.\n`;
+      if (context.isReforging) {
+        prompt += `IMPORTANT: This soul is being REINCARNATED after ${context.previousLives} ${context.previousLives === 1 ? 'life' : 'lives'}. Acknowledge this rebirth and consider what purpose befits a soul returning to the cycle.\n`;
+      }
       prompt += `Consider: What does the world need? What do the parents hope for? What would balance the cosmic tapestry?\n`;
     }
   } else if (conversationSoFar.length === 1) {
     if (fate === 'spinner') {
       prompt += `The Weaver has proposed a purpose. Now SPIN interests and inclinations into this soul.\n`;
+      if (context.isReforging) {
+        prompt += `IMPORTANT: This soul is being REINCARNATED. Acknowledge the wheel of rebirth and consider what gifts to weave into this returning soul.\n`;
+      }
       prompt += `What passions, skills, and temperament would help them fulfill (or struggle with) their purpose?\n`;
     }
   } else if (conversationSoFar.length === 2) {

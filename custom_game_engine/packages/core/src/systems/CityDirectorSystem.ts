@@ -198,18 +198,21 @@ export class CityDirectorSystem implements System {
         // Categorize building types
         const bType = buildingComp.buildingType;
 
-        // Housing types (tent, lean-to, bed, bedroll)
-        if (['tent', 'lean-to', 'bed', 'bedroll'].includes(bType)) {
-          housingCapacity += bType === 'tent' ? 2 : 1;
+        // Housing types (bed, bedroll)
+        // NOTE: Multi-tile houses now use TileBasedBlueprintRegistry
+        if (['bed', 'bedroll'].includes(bType)) {
+          housingCapacity += 1;
         }
 
         // Storage types
-        if (['storage-chest', 'storage-box', 'granary', 'warehouse'].includes(bType)) {
-          storageCapacity += bType === 'warehouse' ? 200 : bType === 'granary' ? 100 : 50;
+        // NOTE: Large storage buildings (warehouses, granaries) now use TileBasedBlueprintRegistry
+        if (['storage-chest', 'storage-box'].includes(bType)) {
+          storageCapacity += bType === 'storage-chest' ? 20 : 10;
         }
 
         // Production types
-        if (['forge', 'workshop', 'farm_shed', 'oven', 'loom'].includes(bType)) {
+        // NOTE: Large workshops now use TileBasedBlueprintRegistry
+        if (['forge', 'workbench', 'oven', 'loom', 'butchering_table'].includes(bType)) {
           productionBuildings++;
         }
 

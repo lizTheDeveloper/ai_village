@@ -160,13 +160,26 @@ ABSTRACT: [1-2 sentence serious summary]`;
   return response.text;
 }
 
+/**
+ * Normalize quotes - convert smart/curly quotes to ASCII quotes
+ * This prevents TypeScript syntax errors from Unicode quote characters
+ */
+function normalizeQuotes(text: string): string {
+  return text
+    .replace(/[""]/g, '"')  // Replace smart double quotes
+    .replace(/['']/g, "'"); // Replace smart single quotes
+}
+
 function formatAsTypeScript(spec: PaperSpec, generatedText: string): string {
+  // Normalize quotes in the generated text first
+  const normalizedText = normalizeQuotes(generatedText);
+
   // Extract abstract from generated text
-  const abstractMatch = generatedText.match(/ABSTRACT:\s*(.+?)$/m);
+  const abstractMatch = normalizedText.match(/ABSTRACT:\s*(.+?)$/m);
   const abstract = abstractMatch ? abstractMatch[1].trim() : 'Research paper on ' + spec.topicDescription;
 
   // Extract the paper description (everything before ABSTRACT)
-  const descriptionMatch = generatedText.split('ABSTRACT:')[0].trim();
+  const descriptionMatch = normalizedText.split('ABSTRACT:')[0].trim();
   const description = descriptionMatch.replace(/^```\n?/, '').replace(/```\n?$/, '');
 
   const skillGrantsStr = Object.entries(spec.skillGrants)

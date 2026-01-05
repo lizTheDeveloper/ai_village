@@ -55,6 +55,11 @@ export class TemperatureSystem implements System {
   private buildingCacheLastUpdate: number = 0;
   private readonly BUILDING_CACHE_DURATION = 100; // Refresh every 100 ticks
 
+  // Performance: Cache tile-based insulation results (key = "x,y", value = insulation data)
+  private tileInsulationCache = new Map<string, { insulation: number; baseTemp: number } | null>();
+  private tileInsulationCacheLastUpdate: number = 0;
+  private readonly TILE_CACHE_DURATION = 50; // Refresh every 50 ticks (walls don't change often)
+
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     // Calculate world ambient temperature (uses cached time entity)
     this.currentWorldTemp = this.calculateWorldTemperature(world);
@@ -68,15 +73,47 @@ export class TemperatureSystem implements System {
       this.buildingCacheLastUpdate = world.tick;
     }
 
+    // Clear tile insulation cache periodically (walls can be built/destroyed)
+    if (world.tick - this.tileInsulationCacheLastUpdate > this.TILE_CACHE_DURATION) {
+      this.tileInsulationCache.clear();
+      this.tileInsulationCacheLastUpdate = world.tick;
+    }
+
     // Filter entities with required components
     const temperatureEntities = entities.filter(e =>
       e.components.has(CT.Temperature) && e.components.has(CT.Position)
     );
 
+    // Get agent positions for active simulation filtering
+    // Only simulate temperature for entities near agents (within 50 tiles)
+    const ACTIVE_SIMULATION_RADIUS = 50;
+    const ACTIVE_SIMULATION_RADIUS_SQ = ACTIVE_SIMULATION_RADIUS * ACTIVE_SIMULATION_RADIUS;
+
+    const agentPositions = world.query()
+      .with(CT.Agent)
+      .with(CT.Position)
+      .executeEntities()
+      .map(e => (e as EntityImpl).getComponent<PositionComponent>(CT.Position)!);
+
     // Process each entity with temperature
     for (const entity of temperatureEntities) {
       const impl = entity as EntityImpl;
       const posComp = impl.getComponent<PositionComponent>(CT.Position)!;
+
+      // Skip entities far from all agents (not actively simulated)
+      // Agents always simulate their own temperature
+      const isAgent = entity.components.has(CT.Agent);
+      if (!isAgent && agentPositions.length > 0) {
+        const isNearAgent = agentPositions.some(agentPos => {
+          const dx = posComp.x - agentPos.x;
+          const dy = posComp.y - agentPos.y;
+          return dx * dx + dy * dy <= ACTIVE_SIMULATION_RADIUS_SQ;
+        });
+
+        if (!isNearAgent) {
+          continue; // Skip temperature update for distant entities
+        }
+      }
 
       // Calculate agent's effective temperature
       let effectiveTemp = this.currentWorldTemp;
@@ -124,11 +161,8 @@ export class TemperatureSystem implements System {
           const healthLoss = this.HEALTH_DAMAGE_RATE * deltaTime;
           const newHealth = Math.max(0, needsComp.health - healthLoss);
 
-          impl.updateComponent<NeedsComponent>(CT.Needs, (current) => {
-            const updated = current.clone();
-            updated.health = newHealth;
-            return updated;
-          });
+          // Direct mutation for class-based components
+          needsComp.health = newHealth;
 
           // Emit critical health event if health drops below 20%
           if (newHealth < HEALTH_CRITICAL && needsComp.health >= HEALTH_CRITICAL) {
@@ -283,6 +317,7 @@ export class TemperatureSystem implements System {
    * Calculate insulation from tile-based walls.
    * Uses simple enclosure detection: if surrounded by walls on 3+ sides,
    * agent is considered "indoors" and gets insulation benefit.
+   * PERFORMANCE: Uses cache to avoid repeated tile lookups (12 per entity per tick!)
    */
   private calculateTileBasedInsulation(
     world: WorldWithTiles,
@@ -290,7 +325,14 @@ export class TemperatureSystem implements System {
   ): { insulation: number; baseTemp: number } | null {
     const tileX = Math.floor(position.x);
     const tileY = Math.floor(position.y);
+    const cacheKey = `${tileX},${tileY}`;
 
+    // Check cache first (HUGE performance win - avoids 12 getTileAt calls per entity!)
+    if (this.tileInsulationCache.has(cacheKey)) {
+      return this.tileInsulationCache.get(cacheKey)!;
+    }
+
+    // Cache miss - calculate insulation and store result
     // Check for walls in all 4 cardinal directions (within 3 tiles)
     const directions = [
       { dx: 0, dy: -1, name: 'north' },
@@ -324,16 +366,19 @@ export class TemperatureSystem implements System {
     }
 
     // Need walls on at least 3 sides to be considered "indoors"
+    let result: { insulation: number; baseTemp: number } | null = null;
     if (wallCount >= 3) {
       // Average insulation from walls, normalized to 0-1 range
       const avgInsulation = totalInsulation / wallCount / 100;
-      return {
+      result = {
         insulation: avgInsulation,
         baseTemp: 0, // Tile-based rooms don't have a base temp, just insulation
       };
     }
 
-    return null;
+    // Cache result for next tick (cache cleared every 50 ticks)
+    this.tileInsulationCache.set(cacheKey, result);
+    return result;
   }
 
   /**
