@@ -1853,6 +1853,31 @@ app.post('/api/servers/kill-all', (req, res) => {
     }
 });
 
+// PixelLab Daemon Status
+app.get('/api/pixellab/status', (req, res) => {
+    try {
+        const daemonStatePath = path.join(GAME_ENGINE_DIR, 'scripts', 'pixellab-daemon-state.json');
+
+        if (fs.existsSync(daemonStatePath)) {
+            const daemonState = JSON.parse(fs.readFileSync(daemonStatePath, 'utf-8'));
+            res.json({
+                running: true,
+                ...daemonState
+            });
+        } else {
+            res.json({
+                running: false,
+                error: 'Daemon state file not found'
+            });
+        }
+    } catch (err) {
+        res.json({
+            running: false,
+            error: err.message
+        });
+    }
+});
+
 // Generation Queue (proxy to metrics server, fallback to queue file)
 app.get('/api/generation/queue', async (req, res) => {
     try {

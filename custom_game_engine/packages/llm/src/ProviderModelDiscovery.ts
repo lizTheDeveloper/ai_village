@@ -52,7 +52,7 @@ export class ProviderModelDiscovery {
   /**
    * Discover models from multiple providers in parallel
    */
-  async discoverAllProviders(configs: ProviderConfig[]): Promise<Map<string, DiscoveredModel[]>> {
+  async discoverAllProviders(configs: DiscoveryProviderConfig[]): Promise<Map<string, DiscoveredModel[]>> {
     const results = await Promise.allSettled(
       configs.map(config => this.discoverModels(config))
     );
@@ -60,7 +60,10 @@ export class ProviderModelDiscovery {
     const discovered = new Map<string, DiscoveredModel[]>();
     for (let i = 0; i < configs.length; i++) {
       const config = configs[i];
+      if (!config) continue;
+
       const result = results[i];
+      if (!result) continue;
 
       if (result.status === 'fulfilled') {
         discovered.set(config.name, result.value);
@@ -90,7 +93,7 @@ export class ProviderModelDiscovery {
   /**
    * Query a provider for available models
    */
-  private async queryProvider(config: ProviderConfig): Promise<DiscoveredModel[]> {
+  private async queryProvider(config: DiscoveryProviderConfig): Promise<DiscoveredModel[]> {
     if (config.type === 'ollama') {
       return this.queryOllama(config);
     } else if (config.type === 'openai-compat') {
@@ -105,7 +108,7 @@ export class ProviderModelDiscovery {
   /**
    * Query Ollama /api/tags endpoint
    */
-  private async queryOllama(config: ProviderConfig): Promise<DiscoveredModel[]> {
+  private async queryOllama(config: DiscoveryProviderConfig): Promise<DiscoveredModel[]> {
     const endpoint = config.modelsEndpoint || `${config.baseUrl}/api/tags`;
 
     try {
@@ -142,7 +145,7 @@ export class ProviderModelDiscovery {
   /**
    * Query OpenAI-compatible /v1/models endpoint (Groq, Cerebras, OpenAI)
    */
-  private async queryOpenAICompat(config: ProviderConfig): Promise<DiscoveredModel[]> {
+  private async queryOpenAICompat(config: DiscoveryProviderConfig): Promise<DiscoveredModel[]> {
     const endpoint = config.modelsEndpoint || `${config.baseUrl}/v1/models`;
 
     try {
@@ -187,7 +190,7 @@ export class ProviderModelDiscovery {
   /**
    * Query Anthropic models (currently hardcoded as they don't expose a public models endpoint)
    */
-  private async queryAnthropic(config: ProviderConfig): Promise<DiscoveredModel[]> {
+  private async queryAnthropic(config: DiscoveryProviderConfig): Promise<DiscoveredModel[]> {
     // Anthropic doesn't have a public models endpoint, return known models
     return [
       {
@@ -245,7 +248,7 @@ export class ProviderModelDiscovery {
     // Extract parameter size
     let params = 0;
     const match = size.match(/(\d+(?:\.\d+)?)\s*b/i);
-    if (match) {
+    if (match && match[1]) {
       params = parseFloat(match[1]);
     }
 
@@ -371,7 +374,10 @@ export class ProviderModelDiscovery {
     };
 
     for (const model of this.getAllModels()) {
-      byTier[model.tier].push(model);
+      const tierArray = byTier[model.tier];
+      if (tierArray) {
+        tierArray.push(model);
+      }
     }
 
     return byTier;
@@ -396,7 +402,7 @@ export class ProviderModelDiscovery {
  *
  * const discovery = new ProviderModelDiscovery();
  *
- * const providers: ProviderConfig[] = [
+ * const providers: DiscoveryProviderConfig[] = [
  *   { name: 'groq', type: 'openai-compat', baseUrl: 'https://api.groq.com/openai', apiKey: process.env.GROQ_API_KEY },
  *   { name: 'cerebras', type: 'openai-compat', baseUrl: 'https://api.cerebras.ai', apiKey: process.env.CEREBRAS_API_KEY },
  *   { name: 'ollama', type: 'ollama', baseUrl: 'http://localhost:11434' },

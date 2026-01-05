@@ -1,5 +1,38 @@
 # Release Notes
 
+## 2026-01-04 - PixelLab Daemon Dashboard & Model Discovery Fixes (Round 8/12)
+
+### Autonomous Dev Dashboard Enhancements
+
+#### PixelLab Daemon Status UI
+- **dashboard/index.html** - Real-time daemon monitoring (+60 lines)
+  - Daemon status indicator (running, idle, error)
+  - Current job progress display
+  - Queue position tracking (X/Y format)
+  - Job type and folder ID display
+  - Progress percentage indicator
+  - Parallel fetching (queue + daemon status)
+  - Auto-refresh with status polling
+
+#### Dashboard API Endpoint
+- **dashboard/server.js** - PixelLab daemon status endpoint (+27 lines)
+  - `/api/pixellab/status` endpoint
+  - Reads pixellab-daemon-state.json for live status
+  - Returns running flag, currentJob, queuePosition, totalInQueue
+  - Error handling for missing state file
+  - Graceful fallback when daemon not running
+
+### LLM Model Discovery Improvements
+
+#### Type Safety & Error Handling
+- **ProviderModelDiscovery.ts** - Safety improvements
+  - Type rename: ProviderConfig → DiscoveryProviderConfig
+  - Null checks for config array iteration
+  - Null checks for Promise.allSettled results
+  - Prevents crashes from malformed provider configs
+
+---
+
 ## 2026-01-04 - LLM Model Discovery & Agent Visuals (Round 7/12)
 
 ### Tiered LLM Routing Implementation (Phase 1)

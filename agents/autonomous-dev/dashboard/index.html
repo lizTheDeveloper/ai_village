@@ -665,9 +665,22 @@
 
             <section class="section" id="sprite-generation-section">
                 <div class="section-header">
-                    <h2 class="section-title">Sprite Generation Queue</h2>
+                    <h2 class="section-title">PixelLab Generation</h2>
                     <span class="timestamp" id="sprite-queue-timestamp">Checking...</span>
                 </div>
+
+                <!-- Daemon Status -->
+                <div id="daemon-status" style="background: var(--bg-tertiary); padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <span style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Daemon Status</span>
+                        <span id="daemon-status-indicator" style="font-size: 12px; margin-left: auto;">● Checking...</span>
+                    </div>
+                    <div id="daemon-current-job" style="font-size: 12px; color: var(--text-secondary);">
+                        Idle
+                    </div>
+                </div>
+
+                <!-- Queue Metrics -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                     <div style="background: var(--bg-tertiary); padding: 12px; border-radius: 6px;">
                         <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px;">Sprites</div>
@@ -686,6 +699,8 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Queue Items -->
                 <div id="sprite-queue-items" style="max-height: 150px; overflow-y: auto;">
                     <div class="empty-state" style="padding: 16px; font-size: 13px;">No items in queue</div>
                 </div>
@@ -1192,11 +1207,18 @@
 
         // Sprite Generation Queue status
         let spriteQueueData = null;
+        let daemonStatusData = null;
 
         async function loadSpriteQueueStatus() {
             try {
-                const response = await fetch('/api/generation/queue');
-                spriteQueueData = await response.json();
+                // Fetch both queue and daemon status in parallel
+                const [queueResponse, daemonResponse] = await Promise.all([
+                    fetch('/api/generation/queue'),
+                    fetch('/api/pixellab/status')
+                ]);
+
+                spriteQueueData = await queueResponse.json();
+                daemonStatusData = await daemonResponse.json();
 
                 const statusIndicator = document.getElementById('sprite-queue-status');
                 const timestampEl = document.getElementById('sprite-queue-timestamp');
@@ -1205,6 +1227,35 @@
                                      (spriteQueueData.summary?.animations?.pending || 0);
                 const totalCompleted = (spriteQueueData.summary?.sprites?.completed || 0) +
                                        (spriteQueueData.summary?.animations?.completed || 0);
+
+                // Update daemon status
+                const daemonStatusIndicator = document.getElementById('daemon-status-indicator');
+                const daemonCurrentJob = document.getElementById('daemon-current-job');
+
+                if (daemonStatusData && daemonStatusData.running) {
+                    if (daemonStatusData.currentJob) {
+                        const job = daemonStatusData.currentJob;
+                        const jobType = job.type || 'sprite';
+                        const progress = job.progress || 0;
+
+                        daemonStatusIndicator.textContent = `● Generating (${progress}%)`;
+                        daemonStatusIndicator.style.color = 'var(--accent-yellow)';
+
+                        daemonCurrentJob.innerHTML = `
+                            <strong>${jobType}:</strong> ${job.folderId || job.id || 'Unknown'}
+                            ${job.direction ? `(${job.direction})` : ''}
+                            <div style="margin-top: 4px; font-size: 11px;">Queue: ${daemonStatusData.queuePosition || 0}/${daemonStatusData.totalInQueue || 0}</div>
+                        `;
+                    } else {
+                        daemonStatusIndicator.textContent = '● Idle';
+                        daemonStatusIndicator.style.color = 'var(--accent-green)';
+                        daemonCurrentJob.textContent = totalPending > 0 ? 'Waiting for next job...' : 'No jobs in queue';
+                    }
+                } else {
+                    daemonStatusIndicator.textContent = '● Offline';
+                    daemonStatusIndicator.style.color = 'var(--accent-red)';
+                    daemonCurrentJob.textContent = daemonStatusData?.error || 'Daemon not running';
+                }
 
                 // Update header status indicator
                 if (spriteQueueData.error) {
