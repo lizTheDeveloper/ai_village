@@ -1,0 +1,606 @@
+/**
+ * Headless City Simulator
+ *
+ * Runs a full ECS game simulation (agents, buildings, resources) without rendering.
+ * Uses CityManager for strategic decision-making.
+ *
+ * For fast-forward testing and time-lapse observation.
+ */
+
+import {
+  GameLoop,
+  CityManager,
+  type World,
+  type CityStats,
+  type StrategicPriorities,
+  type CityDecision,
+  createEntityId,
+  EntityImpl,
+  createPositionComponent,
+  createRenderableComponent,
+  createBuildingComponent,
+  createInventoryComponent,
+  createTimeComponent,
+  createWeatherComponent,
+  createNamedLandmarksComponent,
+  type AgentComponent,
+  type SteeringComponent,
+  CT,
+  // Centralized system registration
+  registerAllSystems as coreRegisterAllSystems,
+  registerDefaultMaterials,
+  initializeDefaultRecipes,
+  globalRecipeRegistry,
+  registerDefaultResearch,
+} from '@ai-village/core';
+
+import { createWanderingAgent, TerrainGenerator, ChunkManager } from '@ai-village/world';
+
+// =============================================================================
+// TYPES
+// =============================================================================
+
+export type SimulatorPreset = 'basic' | 'large-city' | 'population-growth';
+
+export interface SimulatorConfig {
+  preset?: SimulatorPreset;
+  worldSize?: { width: number; height: number };
+  initialPopulation?: number;
+  ticksPerBatch?: number;
+  autoRun?: boolean;
+}
+
+export interface SimulatorStats {
+  ticksRun: number;
+  daysElapsed: number;
+  monthsElapsed: number;
+  ticksPerSecond: number;
+  cityStats: CityStats;
+  cityPriorities: StrategicPriorities;
+}
+
+type EventCallback = (...args: any[]) => void;
+
+// =============================================================================
+// PRESET CONFIGURATIONS
+// =============================================================================
+
+interface PresetConfig {
+  worldSize: { width: number; height: number };
+  initialPopulation: number;
+  storageBuildings: number;
+  foodPerStorage: number;
+  enableEconomy: boolean;
+}
+
+function getPresetConfig(preset: SimulatorPreset): PresetConfig {
+  switch (preset) {
+    case 'basic':
+      return {
+        worldSize: { width: 200, height: 200 },
+        initialPopulation: 50,
+        storageBuildings: 1,
+        foodPerStorage: 100,
+        enableEconomy: false,
+      };
+    case 'large-city':
+      return {
+        worldSize: { width: 200, height: 200 },
+        initialPopulation: 200,
+        storageBuildings: 9,
+        foodPerStorage: 500,
+        enableEconomy: true,
+      };
+    case 'population-growth':
+      return {
+        worldSize: { width: 200, height: 200 },
+        initialPopulation: 20,  // Start small
+        storageBuildings: 2,
+        foodPerStorage: 200,
+        enableEconomy: true,  // Full systems for reproduction
+      };
+  }
+}
+
+// =============================================================================
+// HEADLESS CITY SIMULATOR
+// =============================================================================
+
+export class HeadlessCitySimulator {
+  private gameLoop: GameLoop;
+  private cityManager: CityManager;
+  private config: SimulatorConfig;
+  private preset: SimulatorPreset;
+  private presetConfig: PresetConfig;
+
+  // State
+  private running: boolean = false;
+  private ticksRun: number = 0;
+  private startTime: number = 0;
+  private lastTickTime: number = 0;
+
+  // Events
+  private eventListeners: Map<string, EventCallback[]> = new Map();
+
+  // Animation frame for browser-based execution
+  private rafId: number | null = null;
+  private ticksPerFrame: number = 1;
+
+  constructor(config: SimulatorConfig = {}) {
+    // Get preset configuration
+    this.preset = config.preset ?? 'basic';
+    this.presetConfig = getPresetConfig(this.preset);
+
+    // Ensure presetConfig exists
+    if (!this.presetConfig) {
+      throw new Error(`Invalid preset: ${this.preset}`);
+    }
+
+    // Merge preset config with user overrides
+    this.config = {
+      ticksPerBatch: config.ticksPerBatch ?? 1,
+      autoRun: config.autoRun ?? false,
+      preset: this.preset,
+      worldSize: config.worldSize ?? this.presetConfig.worldSize,
+      initialPopulation: config.initialPopulation ?? this.presetConfig.initialPopulation,
+    };
+
+    // Initialize game loop
+    this.gameLoop = new GameLoop();
+
+    // Register systems based on preset
+    this.registerSystemsForPreset();
+
+    console.log(`[HeadlessSimulator] Initialized with preset: ${this.preset}`);
+
+    // Initialize city manager with manual control enabled
+    this.cityManager = new CityManager({
+      decisionInterval: 14400,  // 1 day
+      statsUpdateInterval: 200,  // 10 seconds
+      allowManualOverride: true,
+    });
+  }
+
+  private registerSystemsForPreset(): void {
+    // Register default materials and recipes
+    registerDefaultMaterials();
+    initializeDefaultRecipes(globalRecipeRegistry);
+    registerDefaultResearch();
+
+    // Generate session ID for metrics
+    const gameSessionId = `headless_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+    // Use centralized system registration - full game engine, headless
+    const coreResult = coreRegisterAllSystems(this.gameLoop, {
+      llmQueue: undefined,  // No LLM in headless mode
+      promptBuilder: undefined,
+      gameSessionId,
+      metricsServerUrl: 'ws://localhost:8765',
+      enableMetrics: false,  // Disable metrics for performance
+      enableAutoSave: false, // Disable auto-save
+    });
+
+    console.log('[HeadlessSimulator] Registered full game systems (headless)');
+  }
+
+  // ---------------------------------------------------------------------------
+  // LIFECYCLE
+  // ---------------------------------------------------------------------------
+
+  async initialize(): Promise<void> {
+    const { worldSize, initialPopulation } = this.config;
+
+    // Configure Timeline for headless mode: sparse snapshots for overnight simulations
+    // Snapshots: begin, 1 min, 5 min, 10 min, then hourly
+    // Daily cleanup to prevent memory leak while preserving liminal spaces
+    const { timelineManager } = await import('@ai-village/core');
+    timelineManager.setConfig({
+      autoSnapshot: true,
+      canonEventSaves: true, // Keep major events (births, deaths, etc.)
+      intervalThresholds: [
+        { afterTicks: 0, interval: 1200 },       // 0-1 min: snapshot at 1 min (1200 ticks)
+        { afterTicks: 1200, interval: 4800 },    // 1-5 min: snapshot at 5 min (4800 ticks from last)
+        { afterTicks: 6000, interval: 6000 },    // 5-10 min: snapshot at 10 min (6000 ticks from last)
+        { afterTicks: 12000, interval: 72000 },  // 10+ min: hourly snapshots (72000 ticks = 1 hour)
+      ],
+      maxSnapshots: 50,  // Limit to 50 snapshots (vs default 100)
+      maxAge: 24 * 60 * 60 * 1000,  // 24 hours - daily cleanup
+    });
+    console.log('[HeadlessSimulator] Configured Timeline: sparse snapshots (1min, 5min, 10min, then hourly) with 24hr retention');
+
+    // Create world entities
+    const world = this.gameLoop.world;
+
+    // Create world entity with time, weather, and landmarks (following test pattern)
+    const worldEntity = new EntityImpl(createEntityId(), world.tick);
+    worldEntity.addComponent(createTimeComponent());
+    worldEntity.addComponent(createWeatherComponent('clear', 0.5, 14400)); // Clear weather, 50% intensity, 1 day duration
+    worldEntity.addComponent(createNamedLandmarksComponent());
+    (world as any)._addEntity(worldEntity);
+    (world as any)._worldEntityId = worldEntity.id; // Critical for systems to find world entity
+
+    // Create city center
+    const cityCenter = {
+      x: worldSize!.width / 2,
+      y: worldSize!.height / 2,
+    };
+
+    // City bounds for agent containment (large-city preset)
+    const cityBounds = this.presetConfig.enableEconomy ? {
+      minX: 0,
+      maxX: worldSize!.width,
+      minY: 0,
+      maxY: worldSize!.height,
+    } : undefined;
+
+    // Create initial buildings based on preset
+    this.createInitialBuildings(world, cityCenter);
+
+    // Create resources
+    this.createResources(world, {
+      minX: 0,
+      maxX: worldSize!.width,
+      minY: 0,
+      maxY: worldSize!.height,
+    });
+
+    // Spawn initial population
+    console.log(`[HeadlessSimulator] Spawning ${initialPopulation} agents...`);
+    for (let i = 0; i < initialPopulation!; i++) {
+      // For large-city preset, spread agents across entire city
+      const spawnRadius = this.preset === 'large-city' ? 80 : 20;
+      const x = cityCenter.x + (Math.random() - 0.5) * spawnRadius;
+      const y = cityCenter.y + (Math.random() - 0.5) * spawnRadius;
+
+      const agentId = createWanderingAgent(world, x, y); // Use default speed (2.0)
+
+      // Apply containment bounds if economy enabled
+      if (cityBounds) {
+        const agent = world.getEntity(agentId) as EntityImpl;
+        agent.updateComponent<SteeringComponent>(CT.Steering, (current) => ({
+          ...current,
+          containmentBounds: cityBounds,
+          containmentMargin: 20,
+        }));
+      }
+    }
+
+    console.log(`[HeadlessSimulator] Initialized ${this.preset} preset with ${initialPopulation} agents`);
+
+    // Run initial stabilization (following test pattern)
+    console.log('[HeadlessSimulator] Running initial stabilization...');
+    for (let i = 0; i < 1000; i++) {
+      (this.gameLoop as any).tick(0.05);
+    }
+    console.log('[HeadlessSimulator] Stabilization complete');
+
+    // Force initial stats update so UI shows correct values immediately
+    this.cityManager.tick(this.gameLoop.world);
+
+    // Force initial decision so director makes strategic assessment on load
+    this.cityManager.forceDecision(this.gameLoop.world);
+
+    this.emit('initialized', { population: initialPopulation, preset: this.preset });
+  }
+
+  start(): void {
+    if (this.running) return;
+
+    this.running = true;
+    this.startTime = Date.now();
+    this.lastTickTime = Date.now();
+
+    // Start animation loop (runs 1 tick per frame by default)
+    this.runLoop();
+
+    this.emit('start');
+  }
+
+  pause(): void {
+    if (!this.running) return;
+
+    this.running = false;
+    if (this.rafId !== null) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+    }
+
+    this.emit('pause');
+  }
+
+  reset(): void {
+    this.pause();
+    this.ticksRun = 0;
+    this.startTime = 0;
+    this.lastTickTime = 0;
+
+    // Reinitialize game loop
+    this.gameLoop = new GameLoop();
+
+    // Re-register systems based on preset
+    this.registerSystemsForPreset();
+
+    // Reinitialize city manager
+    this.cityManager = new CityManager({
+      decisionInterval: 14400,
+      statsUpdateInterval: 200,
+      allowManualOverride: true,
+    });
+
+    this.initialize();
+    this.emit('reset');
+  }
+
+  setSpeed(ticksPerFrame: number): void {
+    this.ticksPerFrame = Math.max(1, Math.min(100, ticksPerFrame));
+    this.emit('speed', this.ticksPerFrame);
+  }
+
+  private runLoop = (): void => {
+    if (!this.running) return;
+
+    // Run configured ticks per frame
+    for (let i = 0; i < this.ticksPerFrame; i++) {
+      this.tick();
+    }
+
+    // Schedule next frame
+    this.rafId = requestAnimationFrame(this.runLoop);
+  };
+
+  private tick(): void {
+    // Run game systems
+    (this.gameLoop as any).tick(0.05);
+
+    // Run city manager
+    this.cityManager.tick(this.gameLoop.world);
+
+    this.ticksRun++;
+
+    // Emit events
+    if (this.ticksRun % 14400 === 0) {
+      const day = Math.floor(this.ticksRun / 14400);
+      this.emit('day', day);
+
+      if (day % 30 === 0) {
+        const month = Math.floor(day / 30);
+        this.emit('month', month);
+      }
+    }
+
+    if (this.ticksRun % 20 === 0) {
+      this.emit('tick', this.ticksRun);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // MANUAL CONTROL
+  // ---------------------------------------------------------------------------
+
+  setPriorities(priorities: StrategicPriorities): void {
+    this.cityManager.setPriorities(priorities);
+    this.cityManager.broadcastPriorities(this.gameLoop.world, priorities);
+    this.emit('priorities-changed', priorities);
+  }
+
+  releaseManualControl(): void {
+    this.cityManager.releaseManualControl();
+    this.emit('manual-control-released');
+  }
+
+  forceDecision(): void {
+    this.cityManager.forceDecision(this.gameLoop.world);
+    this.emit('decision', this.cityManager.getReasoning());
+  }
+
+  // ---------------------------------------------------------------------------
+  // STATE ACCESS
+  // ---------------------------------------------------------------------------
+
+  getWorld(): World {
+    return this.gameLoop.world;
+  }
+
+  getCityManager(): CityManager {
+    return this.cityManager;
+  }
+
+  getStats(): SimulatorStats {
+    const now = Date.now();
+    const elapsed = (now - this.startTime) / 1000;
+    const tps = elapsed > 0 ? this.ticksRun / elapsed : 0;
+
+    return {
+      ticksRun: this.ticksRun,
+      daysElapsed: Math.floor(this.ticksRun / 14400),
+      monthsElapsed: Math.floor(this.ticksRun / (14400 * 30)),
+      ticksPerSecond: tps,
+      cityStats: this.cityManager.getStats(),
+      cityPriorities: this.cityManager.getPriorities(),
+    };
+  }
+
+  isRunning(): boolean {
+    return this.running;
+  }
+
+  isManuallyControlled(): boolean {
+    return this.cityManager.isManuallyControlled();
+  }
+
+  // ---------------------------------------------------------------------------
+  // EVENTS
+  // ---------------------------------------------------------------------------
+
+  on(event: string, callback: EventCallback): void {
+    if (!this.eventListeners.has(event)) {
+      this.eventListeners.set(event, []);
+    }
+    this.eventListeners.get(event)!.push(callback);
+  }
+
+  off(event: string, callback: EventCallback): void {
+    const callbacks = this.eventListeners.get(event);
+    if (callbacks) {
+      const index = callbacks.indexOf(callback);
+      if (index !== -1) {
+        callbacks.splice(index, 1);
+      }
+    }
+  }
+
+  private emit(event: string, ...args: any[]): void {
+    const callbacks = this.eventListeners.get(event);
+    if (callbacks) {
+      for (const callback of callbacks) {
+        callback(...args);
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // WORLD SETUP
+  // ---------------------------------------------------------------------------
+
+  private createInitialBuildings(world: World, cityCenter: { x: number; y: number }): void {
+    const { storageBuildings, foodPerStorage } = this.presetConfig;
+
+    // Campfire at center
+    const campfire = new EntityImpl(createEntityId(), 0);
+    campfire.addComponent(createBuildingComponent('campfire', 1, 100));
+    campfire.addComponent(createPositionComponent(cityCenter.x, cityCenter.y));
+    campfire.addComponent(createRenderableComponent('campfire', 'object'));
+    (world as any)._addEntity(campfire);
+
+    // Storage buildings based on preset
+    if (this.preset === 'large-city') {
+      // Large city: 9 storage buildings distributed across city
+      const storageLocations = [
+        { x: cityCenter.x, y: cityCenter.y }, // Center
+        { x: cityCenter.x - 50, y: cityCenter.y - 50 }, // SW
+        { x: cityCenter.x + 50, y: cityCenter.y - 50 }, // SE
+        { x: cityCenter.x - 50, y: cityCenter.y + 50 }, // NW
+        { x: cityCenter.x + 50, y: cityCenter.y + 50 }, // NE
+        { x: cityCenter.x, y: cityCenter.y - 50 }, // S
+        { x: cityCenter.x, y: cityCenter.y + 50 }, // N
+        { x: cityCenter.x - 50, y: cityCenter.y }, // W
+        { x: cityCenter.x + 50, y: cityCenter.y }, // E
+      ];
+      for (const loc of storageLocations) {
+        const storage = new EntityImpl(createEntityId(), 0);
+        storage.addComponent(createBuildingComponent('storage-chest', 1, 100));
+        storage.addComponent(createPositionComponent(loc.x, loc.y));
+        storage.addComponent(createRenderableComponent('storage-chest', 'object'));
+        const inventory = createInventoryComponent(20, 500);
+        inventory.slots[0] = { itemId: 'food', quantity: foodPerStorage };
+        inventory.slots[1] = { itemId: 'wood', quantity: 50 };
+        inventory.slots[2] = { itemId: 'stone', quantity: 30 };
+        storage.addComponent(inventory);
+        (world as any)._addEntity(storage);
+      }
+      console.log(`  Created 9 storage buildings with ${foodPerStorage} food each`);
+    } else {
+      // Basic/population-growth: Single storage near center
+      const storage = new EntityImpl(createEntityId(), 0);
+      storage.addComponent(createBuildingComponent('storage-chest', 1, 100));
+      storage.addComponent(createPositionComponent(cityCenter.x + 3, cityCenter.y));
+      storage.addComponent(createRenderableComponent('storage-chest', 'object'));
+      const inventory = createInventoryComponent(20, 500);
+      inventory.slots[0] = { itemId: 'food', quantity: foodPerStorage };
+      inventory.slots[1] = { itemId: 'wood', quantity: 30 };
+      inventory.slots[2] = { itemId: 'stone', quantity: 20 };
+      storage.addComponent(inventory);
+      (world as any)._addEntity(storage);
+    }
+
+    // Farm (basic preset gets farm to prevent starvation)
+    if (this.preset === 'basic') {
+      const farm = new EntityImpl(createEntityId(), 0);
+      farm.addComponent(createBuildingComponent('farm-plot', 1, 100));
+      farm.addComponent(createPositionComponent(cityCenter.x + 5, cityCenter.y + 5));
+      farm.addComponent(createRenderableComponent('farm-plot', 'object'));
+      (world as any)._addEntity(farm);
+      console.log('  Created farm-plot for food production');
+    }
+
+    // Initial tent
+    const tent = new EntityImpl(createEntityId(), 0);
+    tent.addComponent(createBuildingComponent('tent', 1, 100));
+    tent.addComponent(createPositionComponent(cityCenter.x - 3, cityCenter.y));
+    tent.addComponent(createRenderableComponent('tent', 'object'));
+    (world as any)._addEntity(tent);
+
+    const buildingCount = this.preset === 'large-city' ? 11 : (this.preset === 'basic' ? 4 : 3);
+    console.log(`  Created ${buildingCount} initial buildings for ${this.preset} preset`);
+  }
+
+  private createResources(world: World, bounds: { minX: number; maxX: number; minY: number; maxY: number }): void {
+    const width = bounds.maxX - bounds.minX;
+    const height = bounds.maxY - bounds.minY;
+
+    // Create trees
+    for (let i = 0; i < 30; i++) {
+      const x = bounds.minX + 10 + Math.random() * (width - 20);
+      const y = bounds.minY + 10 + Math.random() * (height - 20);
+
+      const tree = new EntityImpl(createEntityId(), 0);
+      tree.addComponent(createPositionComponent(x, y));
+      tree.addComponent({
+        type: 'resource',
+        version: 1,
+        resourceType: 'wood',
+        amount: 20 + Math.floor(Math.random() * 30),
+        maxAmount: 50,
+        harvestable: true,
+        harvestRate: 1,
+        regenerationRate: 0.001,
+      });
+      tree.addComponent(createRenderableComponent('tree', 'resource'));
+      (world as any)._addEntity(tree);
+    }
+
+    // Create stone deposits
+    for (let i = 0; i < 20; i++) {
+      const x = bounds.minX + 10 + Math.random() * (width - 20);
+      const y = bounds.minY + 10 + Math.random() * (height - 20);
+
+      const stone = new EntityImpl(createEntityId(), 0);
+      stone.addComponent(createPositionComponent(x, y));
+      stone.addComponent({
+        type: 'resource',
+        version: 1,
+        resourceType: 'stone',
+        amount: 15 + Math.floor(Math.random() * 25),
+        maxAmount: 40,
+        harvestable: true,
+        harvestRate: 0.8,
+        regenerationRate: 0,
+      });
+      stone.addComponent(createRenderableComponent('rock', 'resource'));
+      (world as any)._addEntity(stone);
+    }
+
+    // Create food nodes (berry bushes)
+    for (let i = 0; i < 15; i++) {
+      const x = bounds.minX + 10 + Math.random() * (width - 20);
+      const y = bounds.minY + 10 + Math.random() * (height - 20);
+
+      const food = new EntityImpl(createEntityId(), 0);
+      food.addComponent(createPositionComponent(x, y));
+      food.addComponent({
+        type: 'resource',
+        version: 1,
+        resourceType: 'food',
+        amount: 15 + Math.floor(Math.random() * 10),
+        maxAmount: 25,
+        harvestable: true,
+        harvestRate: 1.5,
+        regenerationRate: 0.01,
+      });
+      food.addComponent(createRenderableComponent('berry-bush', 'resource'));
+      (world as any)._addEntity(food);
+    }
+
+    console.log('  Created 30 trees, 20 stone deposits, 15 berry bushes');
+  }
+}

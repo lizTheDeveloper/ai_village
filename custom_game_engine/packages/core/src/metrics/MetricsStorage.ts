@@ -2,17 +2,14 @@
  * MetricsStorage - Persistent storage for metrics with tiered retention
  *
  * Hot storage: In-memory, last hour
- * Warm storage: On-disk, current session
- * Cold storage: Compressed archives, historical data
+ * Warm storage: On-disk, current session (Node.js only)
+ * Cold storage: Compressed archives (Node.js only)
+ *
+ * Browser compatibility: In-memory storage only
  */
 
-import { promises as fs } from 'fs';
-import * as path from 'path';
-import * as zlib from 'zlib';
-import { promisify } from 'util';
-
-const gzip = promisify(zlib.gzip);
-const gunzip = promisify(zlib.gunzip);
+// Browser compatibility check
+const isBrowser = typeof window !== 'undefined';
 
 /**
  * Stored metric event
@@ -114,9 +111,16 @@ export class MetricsStorage {
   }
 
   /**
-   * Initialize storage directories
+   * Initialize storage directories (Node.js only)
    */
   async initialize(): Promise<void> {
+    if (isBrowser) {
+      // Browser mode: no-op (in-memory only)
+      return;
+    }
+
+    const { promises: fs } = await import('fs');
+    const path = await import('path');
     await fs.mkdir(this.storagePath, { recursive: true });
     await fs.mkdir(path.join(this.storagePath, 'sessions'), { recursive: true });
     await fs.mkdir(path.join(this.storagePath, 'archive'), { recursive: true });
@@ -237,21 +241,33 @@ export class MetricsStorage {
   }
 
   /**
-   * Save session to disk
+   * Save session to disk (Node.js only)
    */
   async saveSession(sessionData: SessionData): Promise<void> {
+    if (isBrowser) {
+      throw new Error('saveSession is not available in browser mode');
+    }
+
     if (!sessionData.sessionId || sessionData.sessionId.length === 0) {
       throw new Error('Session must have a valid sessionId');
     }
 
+    const { promises: fs } = await import('fs');
+    const path = await import('path');
     const sessionPath = path.join(this.storagePath, 'sessions', `${sessionData.sessionId}.json`);
     await fs.writeFile(sessionPath, JSON.stringify(sessionData, null, 2));
   }
 
   /**
-   * Load session from disk
+   * Load session from disk (Node.js only)
    */
   async loadSession(sessionId: string): Promise<SessionData> {
+    if (isBrowser) {
+      throw new Error('loadSession is not available in browser mode');
+    }
+
+    const { promises: fs } = await import('fs');
+    const path = await import('path');
     const sessionPath = path.join(this.storagePath, 'sessions', `${sessionId}.json`);
 
     try {
@@ -263,9 +279,15 @@ export class MetricsStorage {
   }
 
   /**
-   * List all available sessions
+   * List all available sessions (Node.js only)
    */
   async listSessions(): Promise<string[]> {
+    if (isBrowser) {
+      return [];
+    }
+
+    const { promises: fs } = await import('fs');
+    const path = await import('path');
     const sessionsDir = path.join(this.storagePath, 'sessions');
 
     try {
@@ -277,9 +299,15 @@ export class MetricsStorage {
   }
 
   /**
-   * Prune old sessions
+   * Prune old sessions (Node.js only)
    */
   async pruneOldSessions(maxAgeDays: number): Promise<void> {
+    if (isBrowser) {
+      return;
+    }
+
+    const { promises: fs } = await import('fs');
+    const path = await import('path');
     const sessions = await this.listSessions();
     const now = Date.now();
     const maxAgeMs = maxAgeDays * 24 * 60 * 60 * 1000;
@@ -294,9 +322,19 @@ export class MetricsStorage {
   }
 
   /**
-   * Archive metrics to compressed storage
+   * Archive metrics to compressed storage (Node.js only)
    */
   async archiveMetrics(metrics: StoredMetric[], archiveName: string): Promise<void> {
+    if (isBrowser) {
+      throw new Error('archiveMetrics is not available in browser mode');
+    }
+
+    const { promises: fs } = await import('fs');
+    const path = await import('path');
+    const zlib = await import('zlib');
+    const { promisify } = await import('util');
+    const gzip = promisify(zlib.gzip);
+
     const archivePath = path.join(this.storagePath, 'archive', `${archiveName}.gz`);
     const data = JSON.stringify(metrics);
     const compressed = await gzip(Buffer.from(data));
@@ -304,9 +342,19 @@ export class MetricsStorage {
   }
 
   /**
-   * Load archived metrics
+   * Load archived metrics (Node.js only)
    */
   async loadArchive(archiveName: string): Promise<StoredMetric[]> {
+    if (isBrowser) {
+      throw new Error('loadArchive is not available in browser mode');
+    }
+
+    const { promises: fs } = await import('fs');
+    const path = await import('path');
+    const zlib = await import('zlib');
+    const { promisify } = await import('util');
+    const gunzip = promisify(zlib.gunzip);
+
     const archivePath = path.join(this.storagePath, 'archive', `${archiveName}.gz`);
 
     try {
@@ -319,9 +367,15 @@ export class MetricsStorage {
   }
 
   /**
-   * List all available archives
+   * List all available archives (Node.js only)
    */
   async listArchives(): Promise<string[]> {
+    if (isBrowser) {
+      return [];
+    }
+
+    const { promises: fs } = await import('fs');
+    const path = await import('path');
     const archiveDir = path.join(this.storagePath, 'archive');
 
     try {
@@ -333,9 +387,15 @@ export class MetricsStorage {
   }
 
   /**
-   * Get archive size in bytes
+   * Get archive size in bytes (Node.js only)
    */
   async getArchiveSize(archiveName: string): Promise<number> {
+    if (isBrowser) {
+      return 0;
+    }
+
+    const { promises: fs } = await import('fs');
+    const path = await import('path');
     const archivePath = path.join(this.storagePath, 'archive', `${archiveName}.gz`);
 
     try {
@@ -347,9 +407,15 @@ export class MetricsStorage {
   }
 
   /**
-   * Delete an archive
+   * Delete an archive (Node.js only)
    */
   async deleteArchive(archiveName: string): Promise<void> {
+    if (isBrowser) {
+      throw new Error('deleteArchive is not available in browser mode');
+    }
+
+    const { promises: fs } = await import('fs');
+    const path = await import('path');
     const archivePath = path.join(this.storagePath, 'archive', `${archiveName}.gz`);
     await fs.unlink(archivePath);
   }
