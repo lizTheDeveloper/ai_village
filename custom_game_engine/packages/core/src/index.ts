@@ -54,6 +54,7 @@ export {
   getTileBasedBlueprintRegistry,
   calculateDimensions,
 } from './buildings/index.js';
+export * from './magic/index.js';
 export * from './archetypes/index.js';
 export * from './types/PlantSpecies.js';
 export type { PlantSpecies } from './types/PlantSpecies.js';
