@@ -42,6 +42,12 @@ export const TrustNetworkSchema = autoRegister(
       },
     },
 
+    validate: (data: unknown): data is TrustNetworkComponent => {
+      if (!data || typeof data !== 'object') return false;
+      const d = data as Record<string, unknown>;
+      return d.type === 'trust_network' && d.version === 1;
+    },
+
     createDefault: (): TrustNetworkComponent => ({
       type: 'trust_network',
       version: 1,

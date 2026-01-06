@@ -1,6 +1,34 @@
 import { defineComponent } from '../../types/ComponentSchema.js';
 import { autoRegister } from '../../registry/autoRegister.js';
-import type { VeilOfForgettingComponent } from '@ai-village/core';
+import type { Component } from '@ai-village/core';
+
+/** A past-life memory that has bled through the veil */
+export interface MemoryBleed {
+  bleedTick: number;
+  pastLifeMemoryId: string;
+  incarnationNumber: number;
+  form: 'dream' | 'deja_vu' | 'flashback' | 'intuition' | 'skill' | 'emotion';
+  trigger: string;
+  clarity: number;
+  content: string;
+  interpretation?: string;
+}
+
+export interface VeilOfForgettingComponent extends Component {
+  type: 'veil_of_forgetting';
+  bleedThroughs: MemoryBleed[];
+  triggerSensitivity: {
+    location_from_past_life: number;
+    person_from_past_life: number;
+    similar_emotional_event: number;
+    dreams: number;
+    meditation: number;
+    near_death: number;
+    random: number;
+  };
+  pastLivesCount: number;
+  isAwareOfReincarnation: boolean;
+}
 
 /**
  * VeilOfForgettingSchema - Introspection schema for VeilOfForgettingComponent

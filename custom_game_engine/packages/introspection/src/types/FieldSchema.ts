@@ -24,12 +24,18 @@ export interface FieldSchema {
   /** Min/max range for numbers */
   readonly range?: readonly [number, number];
 
+  /** Minimum value (shorthand for range[0]) */
+  readonly min?: number;
+
+  /** Maximum value (shorthand for range[1]) */
+  readonly max?: number;
+
   /** Maximum length for strings/arrays */
   readonly maxLength?: number;
 
   // Documentation
-  /** Field description */
-  readonly description: string;
+  /** Field description (optional - should be provided when visibility.llm is true) */
+  readonly description?: string;
 
   /** Display name (defaults to field key) */
   readonly displayName?: string;

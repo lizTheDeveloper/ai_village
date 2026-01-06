@@ -87,6 +87,6 @@ export const GoalsSchema = autoRegister(
       removeGoal: () => {},
       toJSON: () => ({ goals: [] }),
       fromJSON: () => {},
-    } as GoalsComponent),
+    } as unknown as GoalsComponent),
   })
 );

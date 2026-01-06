@@ -61,6 +61,11 @@ export interface ComponentSchema<T extends Component = Component> {
   readonly category: ComponentCategory;
 
   /**
+   * Human-readable description of this component (optional)
+   */
+  readonly description?: string;
+
+  /**
    * Field definitions with full metadata
    */
   readonly fields: Record<string, FieldSchema>;
@@ -107,19 +112,19 @@ export interface ComponentSchema<T extends Component = Component> {
   readonly mutators?: Record<string, MutatorFunction<T>>;
 
   /**
-   * Runtime validation function
-   * 
+   * Runtime validation function (optional - used for strict type checking)
+   *
    * @param data - Unknown data to validate
    * @returns Type predicate indicating if data is valid T
    */
-  validate(data: unknown): data is T;
+  validate?(data: unknown): data is T;
 
   /**
-   * Create default instance of this component
-   * 
+   * Create default instance of this component (optional - used for instantiation)
+   *
    * @returns A valid instance with default values
    */
-  createDefault(): T;
+  createDefault?(): T;
 }
 
 /**

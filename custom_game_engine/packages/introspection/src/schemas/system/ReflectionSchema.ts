@@ -68,9 +68,12 @@ export const ReflectionSchema = autoRegister(
       },
     },
 
-    createDefault: (): ReflectionComponent => {
-      const reflection = new (ReflectionComponent as any)();
-      return reflection;
-    },
+    createDefault: (): ReflectionComponent => ({
+      type: 'reflection',
+      version: 1,
+      lastReflection: '',
+      reflectionHistory: [],
+      nextReflectionTick: 0,
+    } as unknown as ReflectionComponent),
   })
 );

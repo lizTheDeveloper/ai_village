@@ -332,6 +332,6 @@ export const PlantSchema = autoRegister(
       shadeRadius: 0,
       diseases: [],
       pests: [],
-    }),
+    } as unknown as PlantComponent),
   })
 );

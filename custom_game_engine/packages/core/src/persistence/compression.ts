@@ -17,7 +17,7 @@ export async function compress(data: string): Promise<string> {
     const encoder = new TextEncoder();
     const encoded = encoder.encode(data);
     const stream = new Blob([encoded.buffer as ArrayBuffer]).stream();
-    const compressedStream = stream.pipeThrough(new CompressionStream('gzip'));
+    const compressedStream = stream.pipeThrough(new CompressionStream('gzip') as any);
     const compressedBlob = await new Response(compressedStream).blob();
     const buffer = await compressedBlob.arrayBuffer();
 
@@ -63,7 +63,7 @@ export async function decompress(compressedData: string): Promise<string> {
   if (typeof DecompressionStream !== 'undefined') {
     const buffer = base64ToArrayBuffer(compressedData);
     const stream = new Blob([buffer as ArrayBuffer]).stream();
-    const decompressedStream = stream.pipeThrough(new DecompressionStream('gzip'));
+    const decompressedStream = stream.pipeThrough(new DecompressionStream('gzip') as any);
     const decompressedBlob = await new Response(decompressedStream).blob();
     const text = await decompressedBlob.text();
 

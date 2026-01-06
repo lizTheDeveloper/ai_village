@@ -78,6 +78,15 @@ export interface UIHints {
 
   /** Color for visual emphasis */
   color?: string;
+
+  /** Minimum value (for slider/number widgets) */
+  min?: number;
+
+  /** Maximum value (for slider/number widgets) */
+  max?: number;
+
+  /** Step value (for slider/number widgets) */
+  step?: number;
 }
 
 /**

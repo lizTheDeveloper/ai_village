@@ -95,6 +95,6 @@ export const BeliefSchema = autoRegister(
       getBeliefs: () => [],
       getBeliefAbout: () => undefined,
       clearBeliefs: () => {},
-    } as BeliefComponent),
+    } as unknown as BeliefComponent),
   })
 );

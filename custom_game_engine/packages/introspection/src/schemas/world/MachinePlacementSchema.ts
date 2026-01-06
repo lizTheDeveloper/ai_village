@@ -156,7 +156,7 @@ export const MachinePlacementSchema = autoRegister(
           order: 3,
         },
         mutable: true,
-        enumValues: [0, 90, 180, 270],
+        enumValues: ['0', '90', '180', '270'],
       },
     },
 

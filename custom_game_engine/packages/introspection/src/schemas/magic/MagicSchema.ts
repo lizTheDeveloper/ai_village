@@ -127,6 +127,6 @@ export const MagicSchema = autoRegister(
       manaPools: [],
       knownSpells: [],
       paradigmAdaptations: new Map(),
-    } as MagicComponent),
+    } as unknown as MagicComponent),
   })
 );

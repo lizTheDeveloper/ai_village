@@ -215,7 +215,7 @@ export class MutationService {
 
       // Run schema validation on the whole component after mutation
       const updatedComponent = entity.getComponent(componentType);
-      if (updatedComponent && !schema.validate(updatedComponent)) {
+      if (updatedComponent && schema.validate && !schema.validate(updatedComponent)) {
         console.warn(
           `[MutationService] Component validation failed after mutation: ${componentType}.${fieldName}`
         );

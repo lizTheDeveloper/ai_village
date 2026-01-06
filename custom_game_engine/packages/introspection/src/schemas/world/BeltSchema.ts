@@ -64,7 +64,7 @@ export const BeltSchema = autoRegister(
           order: 2,
         },
         mutable: false,
-        enumValues: [1, 2, 3],
+        enumValues: ['1', '2', '3'],
       },
 
       itemId: {

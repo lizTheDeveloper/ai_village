@@ -61,13 +61,12 @@ export class RiddleBookMicrogenerator {
     const { creator, tags = [], data } = input;
 
     // Use existing RiddleGenerator
-    const generatedRiddle = await this.riddleGenerator.generateRiddle({
-      heroName: data.targetName ?? 'Unknown Hero',
+    const generatedRiddle = await this.riddleGenerator.generatePersonalizedRiddle({
+      name: data.targetName ?? 'Unknown Hero',
       destiny: data.theme ?? 'The Seeker',
       causeOfDeath: data.context?.causeOfDeath ?? 'unknown',
       notableDeeds: data.context?.notableDeeds ?? [],
       relationships: data.context?.relationships ?? [],
-      difficulty: data.difficulty,
     });
 
     if (!generatedRiddle) {
@@ -77,8 +76,8 @@ export class RiddleBookMicrogenerator {
     // Create riddle data
     const riddleData: RiddleData = {
       question: generatedRiddle.question,
-      correctAnswer: generatedRiddle.correctAnswer,
-      alternativeAnswers: generatedRiddle.alternativeAnswers,
+      correctAnswer: generatedRiddle.correctAnswer ?? '',
+      alternativeAnswers: generatedRiddle.acceptedAnswers ?? [],
       difficulty: data.difficulty,
       context: {
         targetName: data.targetName,

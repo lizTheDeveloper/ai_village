@@ -12,7 +12,7 @@ export { TradeAgreementSchema } from './TradeAgreementSchema.js';
 export { TrustNetworkSchema } from './TrustNetworkSchema.js';
 
 // Tier 10: Social/Community
-export { InterestsSchema, type InterestsComponent } from './InterestsSchema.js';
+// Note: InterestsSchema exported from agent/index.ts
 export { JournalSchema, type JournalComponent } from './JournalSchema.js';
 export { JealousySchema, type JealousyComponent } from './JealousySchema.js';
 export { ParentingSchema, type ParentingComponent } from './ParentingSchema.js';
