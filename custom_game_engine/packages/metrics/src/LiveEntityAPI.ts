@@ -2205,7 +2205,8 @@ export class LiveEntityAPI {
       };
     }
 
-    const { agentIdOrName, limit } = action.params;
+    const agentIdOrName = action.params.agentIdOrName as string | undefined;
+    const limit = action.params.limit as number | undefined;
 
     if (!agentIdOrName) {
       return {
@@ -2239,7 +2240,7 @@ export class LiveEntityAPI {
       };
     }
 
-    const { agentIdOrName } = action.params;
+    const agentIdOrName = action.params.agentIdOrName as string | undefined;
 
     if (!agentIdOrName) {
       return {
@@ -2301,7 +2302,7 @@ export class LiveEntityAPI {
    * Find agent by name and return ID
    */
   private handleFindAgentByName(action: ActionRequest): ActionResponse {
-    const { name } = action.params;
+    const name = action.params.name as string | undefined;
 
     if (!name) {
       return {

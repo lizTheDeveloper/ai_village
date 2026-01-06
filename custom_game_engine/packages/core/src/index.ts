@@ -274,6 +274,8 @@ export { timelineManager, TimelineManager } from './multiverse/TimelineManager.j
 export type { TimelineConfig, TimelineEntry, IntervalThreshold } from './multiverse/TimelineManager.js';
 export { MultiverseNetworkManager, initializeNetworkManager, getNetworkManager, networkManager } from './multiverse/MultiverseNetworkManager.js';
 export type { RemotePassage, RemotePassageConfig, NetworkMessage, ViewMode, InteractionMode, StreamConfiguration, Bounds, PeerId, PassageId, UniverseId as MultiverseUniverseId, UniverseSnapshotMessage, UniverseTickUpdate, EntityTransferMessage, EntityTransferAckMessage } from './multiverse/NetworkProtocol.js';
+export { GodChatRoomNetwork } from './multiverse/GodChatRoomNetwork.js';
+export type { ChatMessage, ChatMember, ChatRoom } from './multiverse/GodChatRoomNetwork.js';
 
 // Trade agreement system - Cross-universe/multiverse trade with Hilbert-time
 export * from './trade/TradeAgreementTypes.js';

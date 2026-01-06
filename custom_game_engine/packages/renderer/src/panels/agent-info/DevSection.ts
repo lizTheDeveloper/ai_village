@@ -147,7 +147,7 @@ export class DevSection {
 
       // Add separator between components
       currentY += 4;
-      renderSeparator(ctx, x + padding, currentY, width - padding * 2);
+      renderSeparator(ctx, x + padding, currentY, width - padding * 2, 0);
       currentY += 8;
     }
 

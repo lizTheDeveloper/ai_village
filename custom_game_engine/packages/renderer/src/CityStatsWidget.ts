@@ -54,8 +54,9 @@ export class CityStatsWidget {
    */
   update(world: World): void {
     const cityDirectors = world.query().with('city_director').executeEntities();
-    this.cityDirector = cityDirectors.length > 0
-      ? cityDirectors[0].getComponent('city_director') as CityDirectorComponent
+    const firstDirector = cityDirectors.length > 0 ? cityDirectors[0] : null;
+    this.cityDirector = firstDirector
+      ? firstDirector.getComponent('city_director') as CityDirectorComponent
       : null;
   }
 

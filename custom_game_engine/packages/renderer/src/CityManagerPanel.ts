@@ -66,6 +66,10 @@ export class CityManagerPanel implements IWindowPanel {
 
     // Get first city director (TODO: support multiple cities)
     const directorEntity = cityDirectors[0];
+    if (!directorEntity) {
+      this.cityDirector = null;
+      return;
+    }
     this.cityDirector = directorEntity.getComponent('city_director') as CityDirectorComponent;
   }
 
@@ -151,7 +155,7 @@ export class CityManagerPanel implements IWindowPanel {
     let currentY = y + this.padding - this.scrollOffset;
 
     // City name header
-    currentY = this.renderHeader(ctx, x, currentY, actualWidth);
+    currentY = this.renderPanelHeader(ctx, x, currentY, actualWidth);
 
     // City stats
     currentY = this.renderStats(ctx, x, currentY, actualWidth);
@@ -182,7 +186,7 @@ export class CityManagerPanel implements IWindowPanel {
     ctx.textAlign = 'left';
   }
 
-  private renderHeader(ctx: CanvasRenderingContext2D, x: number, y: number, width: number): number {
+  private renderPanelHeader(ctx: CanvasRenderingContext2D, x: number, y: number, width: number): number {
     if (!this.cityDirector) return y;
 
     ctx.fillStyle = '#FFD700';

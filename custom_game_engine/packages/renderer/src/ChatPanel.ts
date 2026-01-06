@@ -5,12 +5,26 @@
  */
 
 import type { IWindowPanel } from './IWindowPanel.js';
-import type { World } from '@ai-village/core';
-import type {
-  GodChatRoomNetwork,
-  ChatMessage,
-  ChatMember,
-} from '@ai-village/core';
+import type { World, GodChatRoomNetwork } from '@ai-village/core';
+
+// Use inline types to avoid conflict with communication/ChatRoom's ChatMessage
+interface GodChatMessage {
+  id: string;
+  roomId: string;
+  peerId: string;
+  displayName: string;
+  content: string;
+  timestamp: number;
+  type: 'text' | 'system' | 'emote';
+}
+
+interface GodChatMember {
+  peerId: string;
+  displayName: string;
+  joinedAt: number;
+  lastSeen: number;
+  status: 'online' | 'away' | 'offline';
+}
 
 export class ChatPanel implements IWindowPanel {
   private visible: boolean = false;
@@ -194,7 +208,7 @@ export class ChatPanel implements IWindowPanel {
    */
   private renderMessage(
     ctx: CanvasRenderingContext2D,
-    message: ChatMessage,
+    message: GodChatMessage,
     x: number,
     y: number,
     width: number
@@ -313,7 +327,7 @@ export class ChatPanel implements IWindowPanel {
    */
   private renderMember(
     ctx: CanvasRenderingContext2D,
-    member: ChatMember,
+    member: GodChatMember,
     x: number,
     y: number,
     width: number

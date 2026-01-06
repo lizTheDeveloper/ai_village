@@ -12,6 +12,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { WorldSerializer } from '../WorldSerializer.js';
 import { WorldImpl } from '@ai-village/core';
 import { EventBusImpl } from '@ai-village/core';
+import type { World } from '@ai-village/core';
 import { ChunkManager } from '@ai-village/world';
 import type { UniverseSnapshot } from '../types.js';
 
@@ -74,7 +75,7 @@ describe('WorldSerializer terrain integration', () => {
 
     // Act: Serialize world
     const snapshot = await serializer.serializeWorld(
-      world,
+      world as unknown as World,
       'test-universe-id',
       'Test Universe'
     );
@@ -97,7 +98,7 @@ describe('WorldSerializer terrain integration', () => {
 
     // Act: Serialize world
     const snapshot = await serializer.serializeWorld(
-      world,
+      world as unknown as World,
       'test-universe-id',
       'Test Universe'
     );
