@@ -28,7 +28,6 @@
     { "path": "./packages/core" },
     { "path": "./packages/persistence" },
     { "path": "./packages/metrics" },
-    { "path": "./packages/reproduction" },
     { "path": "./packages/divinity" },
     { "path": "./packages/magic" },
     { "path": "./packages/world" },
