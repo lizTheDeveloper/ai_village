@@ -1,0 +1,429 @@
+/**
+ * SharedWorker Universe Implementation
+ *
+ * Runs ONCE, shared by all tabs/windows on same origin.
+ * Owns the simulation loop and IndexedDB.
+ *
+ * Based on: openspec/specs/ringworld-abstraction/RENORMALIZATION_LAYER.md
+ */
+
+/// <reference lib="webworker" />
+
+import { GameLoop } from '@ai-village/core';
+import { registerAllSystems } from '@ai-village/core';
+import { PersistenceService } from './persistence.js';
+import type {
+  UniverseState,
+  GameAction,
+  WorkerConfig,
+  ConnectionInfo,
+  WorkerToWindowMessage,
+  WindowToWorkerMessage,
+  SerializedWorld,
+} from './types.js';
+
+/**
+ * UniverseWorker - The heart of the SharedWorker architecture
+ */
+class UniverseWorker {
+  private gameLoop: GameLoop;
+  private persistence: PersistenceService;
+  private connections: Map<string, ConnectionInfo> = new Map();
+
+  private tick = 0;
+  private running = false;
+  private paused = false;
+
+  private config: WorkerConfig = {
+    targetTPS: 20,
+    autoSaveInterval: 100, // Every 5 seconds
+    debug: true,
+    speedMultiplier: 1.0,
+  };
+
+  constructor() {
+    this.gameLoop = new GameLoop();
+    this.persistence = new PersistenceService();
+
+    console.log('[UniverseWorker] Created');
+  }
+
+  /**
+   * Initialize the worker and start simulation
+   */
+  async init(): Promise<void> {
+    console.log('[UniverseWorker] Initializing...');
+
+    // Register all game systems
+    registerAllSystems(
+      this.gameLoop.world,
+      this.gameLoop.systemRegistry,
+      this.gameLoop.actionQueue
+    );
+
+    // Try to load saved state
+    const savedState = await this.persistence.loadState();
+
+    if (savedState) {
+      console.log(`[UniverseWorker] Loading saved state from tick ${savedState.tick}`);
+      this.loadState(savedState);
+      this.tick = savedState.tick;
+    } else {
+      console.log('[UniverseWorker] No saved state, starting fresh');
+      this.tick = 0;
+    }
+
+    // Start simulation loop
+    this.running = true;
+    this.loop();
+
+    console.log('[UniverseWorker] Initialized and running');
+  }
+
+  /**
+   * Main simulation loop (20 TPS)
+   */
+  private loop(): void {
+    if (!this.running) return;
+
+    const startTime = performance.now();
+
+    // Run simulation step (unless paused)
+    if (!this.paused) {
+      this.simulate();
+      this.tick++;
+    }
+
+    // Broadcast to all connected windows
+    this.broadcast();
+
+    // Auto-save periodically
+    if (this.tick % this.config.autoSaveInterval === 0 && !this.paused) {
+      this.persist().catch((error) => {
+        console.error('[UniverseWorker] Auto-save failed:', error);
+      });
+    }
+
+    // Maintain target TPS
+    const elapsed = performance.now() - startTime;
+    const targetDelay = (1000 / this.config.targetTPS) * (1 / this.config.speedMultiplier);
+    const delay = Math.max(0, targetDelay - elapsed);
+
+    setTimeout(() => this.loop(), delay);
+  }
+
+  /**
+   * Run one simulation step
+   */
+  private simulate(): void {
+    try {
+      // Use public GameLoop tick method
+      this.gameLoop.tick();
+    } catch (error) {
+      console.error('[UniverseWorker] Simulation error:', error);
+      this.broadcastError('Simulation error', error);
+    }
+  }
+
+  /**
+   * Broadcast state to all connected windows
+   */
+  private broadcast(): void {
+    if (this.connections.size === 0) return;
+
+    const state = this.serializeState();
+
+    const message: WorkerToWindowMessage = {
+      type: 'tick',
+      tick: this.tick,
+      state,
+      timestamp: Date.now(),
+    };
+
+    for (const [id, conn] of this.connections) {
+      if (!conn.connected) continue;
+
+      try {
+        conn.port.postMessage(message);
+        conn.lastActivity = Date.now();
+      } catch (error) {
+        console.warn(`[UniverseWorker] Failed to send to connection ${id}:`, error);
+        this.removeConnection(id);
+      }
+    }
+  }
+
+  /**
+   * Broadcast error to all connections
+   */
+  private broadcastError(error: string, details?: any): void {
+    const message: WorkerToWindowMessage = {
+      type: 'error',
+      error,
+      details,
+    };
+
+    for (const conn of this.connections.values()) {
+      try {
+        conn.port.postMessage(message);
+      } catch {
+        // Ignore send errors when broadcasting errors
+      }
+    }
+  }
+
+  /**
+   * Persist current state to IndexedDB
+   */
+  private async persist(): Promise<void> {
+    const state = this.serializeState();
+
+    await this.persistence.saveState(state);
+
+    if (this.config.debug) {
+      console.log(`[UniverseWorker] Persisted at tick ${this.tick}`);
+    }
+  }
+
+  /**
+   * Serialize current state for transfer/storage
+   */
+  private serializeState(): UniverseState {
+    const world = this.serializeWorld();
+
+    return {
+      tick: this.tick,
+      lastSaved: Date.now(),
+      world,
+      metadata: {
+        version: '1.0.0',
+        universeId: this.gameLoop.universeId,
+      },
+    };
+  }
+
+  /**
+   * Serialize world state
+   */
+  private serializeWorld(): SerializedWorld {
+    const entities: Record<string, Record<string, any>> = {};
+
+    // Serialize all entities
+    const allEntities = this.gameLoop.world.getAllEntities();
+    for (const entity of allEntities) {
+      const components: Record<string, any> = {};
+
+      for (const [type, component] of entity.getAllComponents()) {
+        components[type] = component;
+      }
+
+      entities[entity.id] = components;
+    }
+
+    // Serialize tiles
+    const tiles = [];
+    for (const tile of this.gameLoop.world.getAllTiles()) {
+      tiles.push({
+        x: tile.x,
+        y: tile.y,
+        type: tile.type,
+        data: tile,
+      });
+    }
+
+    // Extract global state (singletons)
+    const globals: Record<string, any> = {};
+
+    const timeEntity = this.gameLoop.world.query().with('time').executeEntities()[0];
+    if (timeEntity) {
+      globals.time = timeEntity.getComponent('time');
+    }
+
+    const weatherEntity = this.gameLoop.world.query().with('weather').executeEntities()[0];
+    if (weatherEntity) {
+      globals.weather = weatherEntity.getComponent('weather');
+    }
+
+    return {
+      entities,
+      tiles,
+      globals,
+    };
+  }
+
+  /**
+   * Load state from serialized data
+   */
+  private loadState(state: UniverseState): void {
+    // Clear current world
+    for (const entity of this.gameLoop.world.getAllEntities()) {
+      this.gameLoop.world.removeEntity(entity.id);
+    }
+
+    // Load entities
+    for (const [entityId, components] of Object.entries(state.world.entities)) {
+      const entity = this.gameLoop.world.createEntity(entityId);
+
+      for (const [type, component] of Object.entries(components)) {
+        entity.addComponent(component);
+      }
+    }
+
+    // Load tiles
+    for (const tileData of state.world.tiles) {
+      this.gameLoop.world.setTile(tileData.x, tileData.y, tileData.type, tileData.data);
+    }
+
+    this.tick = state.tick;
+
+    console.log(`[UniverseWorker] Loaded state with ${Object.keys(state.world.entities).length} entities`);
+  }
+
+  /**
+   * Handle new window connection
+   */
+  addConnection(port: MessagePort): void {
+    const id = crypto.randomUUID();
+
+    const conn: ConnectionInfo = {
+      id,
+      port,
+      subscribedDomains: new Set(['village']), // Default subscription
+      connected: true,
+      lastActivity: Date.now(),
+    };
+
+    this.connections.set(id, conn);
+
+    // Send initial state
+    const state = this.serializeState();
+    const initMessage: WorkerToWindowMessage = {
+      type: 'init',
+      connectionId: id,
+      state,
+      tick: this.tick,
+    };
+
+    port.postMessage(initMessage);
+
+    // Handle messages from this connection
+    port.onmessage = (e: MessageEvent<WindowToWorkerMessage>) => {
+      this.handleMessage(id, e.data);
+    };
+
+    port.start();
+
+    console.log(`[UniverseWorker] New connection: ${id} (total: ${this.connections.size})`);
+  }
+
+  /**
+   * Remove a connection
+   */
+  private removeConnection(id: string): void {
+    const conn = this.connections.get(id);
+    if (conn) {
+      conn.connected = false;
+      this.connections.delete(id);
+      console.log(`[UniverseWorker] Removed connection: ${id} (remaining: ${this.connections.size})`);
+    }
+  }
+
+  /**
+   * Handle message from a window
+   */
+  private handleMessage(connectionId: string, message: WindowToWorkerMessage): void {
+    const conn = this.connections.get(connectionId);
+    if (!conn) return;
+
+    conn.lastActivity = Date.now();
+
+    switch (message.type) {
+      case 'action':
+        this.applyAction(message.action);
+        break;
+
+      case 'subscribe':
+        conn.subscribedDomains = new Set(message.domains);
+        console.log(`[UniverseWorker] Connection ${connectionId} subscribed to:`, message.domains);
+        break;
+
+      case 'request-snapshot':
+        this.sendSnapshot(conn.port).catch((error) => {
+          console.error('[UniverseWorker] Failed to send snapshot:', error);
+        });
+        break;
+
+      case 'pause':
+        this.paused = true;
+        console.log('[UniverseWorker] Paused');
+        break;
+
+      case 'resume':
+        this.paused = false;
+        console.log('[UniverseWorker] Resumed');
+        break;
+
+      case 'set-speed':
+        this.config.speedMultiplier = message.speed;
+        console.log(`[UniverseWorker] Speed set to ${message.speed}x`);
+        break;
+    }
+  }
+
+  /**
+   * Apply a game action
+   */
+  private applyAction(action: GameAction): void {
+    try {
+      // Log action to IndexedDB
+      this.persistence.logEvent(action, this.tick).catch((error) => {
+        console.error('[UniverseWorker] Failed to log action:', error);
+      });
+
+      // TODO: Route action to appropriate handler based on domain
+      console.log(`[UniverseWorker] Action: ${action.domain}/${action.type}`);
+    } catch (error) {
+      console.error('[UniverseWorker] Failed to apply action:', error);
+      this.broadcastError('Action failed', { action, error });
+    }
+  }
+
+  /**
+   * Send snapshot to a specific port
+   */
+  private async sendSnapshot(port: MessagePort): Promise<void> {
+    const state = this.serializeState();
+    const snapshotId = await this.persistence.createSnapshot(state);
+
+    const snapshot = await this.persistence.loadSnapshot(snapshotId);
+    if (!snapshot) {
+      throw new Error('Failed to load snapshot after creation');
+    }
+
+    // Compress and send
+    const encoder = new TextEncoder();
+    const data = encoder.encode(JSON.stringify(snapshot));
+
+    const message: WorkerToWindowMessage = {
+      type: 'snapshot',
+      data,
+    };
+
+    port.postMessage(message);
+  }
+}
+
+// Global instance
+const universe = new UniverseWorker();
+universe.init().catch((error) => {
+  console.error('[UniverseWorker] Initialization failed:', error);
+});
+
+// SharedWorker connection handler
+// @ts-ignore - SharedWorkerGlobalScope
+self.onconnect = (e: MessageEvent) => {
+  const port = e.ports[0];
+  universe.addConnection(port);
+};
+
+console.log('[SharedWorker] Universe worker loaded');

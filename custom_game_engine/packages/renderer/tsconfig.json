@@ -9,6 +9,8 @@
   "references": [
     { "path": "../core" },
     { "path": "../world" },
-    { "path": "../llm" }
+    { "path": "../llm" },
+    { "path": "../magic" },
+    { "path": "../divinity" }
   ]
 }

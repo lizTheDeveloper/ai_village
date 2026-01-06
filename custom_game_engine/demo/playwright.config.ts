@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * Playwright configuration for AI Village integration tests
+ * Playwright configuration for Multiverse: The End of Eternity integration tests
  *
  * See https://playwright.dev/docs/test-configuration
  */

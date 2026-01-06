@@ -39,12 +39,15 @@ import {
 } from '@ai-village/core';
 import { generatePersonalityPrompt } from './PersonalityPromptTemplates.js';
 import { promptCache } from './PromptCacheManager.js';
+// Phase 3: Prompt Integration - Schema-driven prompt generation
+import { PromptRenderer, ComponentRegistry } from '@ai-village/introspection';
 
 /**
  * Structured prompt following agent-system/spec.md REQ-AGT-002
  */
 export interface AgentPrompt {
   systemPrompt: string;       // Role, personality
+  schemaPrompt?: string;       // Phase 3: Auto-generated schema-driven component info (optional)
   skills?: string;             // Skill levels (optional)
   priorities?: string;         // Current strategic priorities (optional)
   goals?: string;              // Personal goals (optional)
@@ -81,6 +84,10 @@ export class StructuredPromptBuilder {
     const conversation = agent.components.get('conversation') as ConversationComponent | undefined;
     const skills = agent.components.get('skills') as SkillsComponent | undefined;
     const jealousy = agent.components.get('jealousy') as JealousyComponent | undefined;
+
+    // Phase 3: Schema-driven component rendering
+    // Generate prompts for all schema'd components automatically
+    const schemaPrompt = this.buildSchemaPrompt(agent);
 
     // System Prompt: Role and personality (who you are)
     const systemPrompt = this.buildSystemPrompt(identity?.name || 'Agent', personality, agent.id);
@@ -170,6 +177,7 @@ export class StructuredPromptBuilder {
     // Combine into single prompt
     return this.formatPrompt({
       systemPrompt,
+      schemaPrompt, // Phase 3: Include schema-driven component info
       skills: skillsText,
       priorities: prioritiesText,
       goals: goalsText,
@@ -197,6 +205,28 @@ export class StructuredPromptBuilder {
 
     // Use enhanced personality prompt templates with entityId for consistent variations
     return generatePersonalityPrompt({ name, personality, entityId });
+  }
+
+  /**
+   * Phase 3: Build schema-driven prompt sections
+   *
+   * Automatically generates prompt sections for all schema'd components.
+   * Falls back to legacy extraction for components without schemas.
+   *
+   * This integrates the introspection system's PromptRenderer to provide
+   * automatic LLM context generation from component metadata.
+   */
+  private buildSchemaPrompt(agent: Entity): string {
+    // Use PromptRenderer to generate prompts for all schema'd components
+    // This will skip components that don't have schemas registered
+    const schemaPrompt = PromptRenderer.renderEntity(agent as any);
+
+    if (!schemaPrompt) {
+      return '';
+    }
+
+    // Wrap in a section header
+    return `--- Schema-Driven Component Info ---\n${schemaPrompt}`;
   }
 
   /**
@@ -2034,6 +2064,12 @@ export class StructuredPromptBuilder {
     // 6. What should I do? (the decision)
 
     const sections: string[] = [prompt.systemPrompt];
+
+    // Phase 3: Schema-driven component info (if available)
+    // Appears early to provide foundational component data
+    if (prompt.schemaPrompt && prompt.schemaPrompt.trim()) {
+      sections.push(prompt.schemaPrompt);
+    }
 
     // Skills come early - knowing what you're good at helps frame decisions
     if (prompt.skills && prompt.skills.trim()) {

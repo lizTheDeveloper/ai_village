@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "totalSouls": 27,
-  "lastUpdated": "2026-01-05T06:12:17.179Z",
+  "totalSouls": 39,
+  "lastUpdated": "2026-01-06T04:52:11.234Z",
   "souls": {
     "26ab6ad1-3ea4-4217-84c3-41c2de19948d": {
       "name": "Orion",
@@ -245,6 +245,114 @@
       "soulBirthTick": 1040,
       "universeId": "unknown",
       "filePath": "by-date/2026-01-05/83278adb-f391-48ea-9bfa-478f4ef8516d.json"
+    },
+    "3fc15413-9631-4faf-a2d0-37501b6ae4a4": {
+      "name": "Ivy",
+      "species": "human",
+      "archetype": "creator",
+      "createdAt": "2026-01-05T06:26:54.969Z",
+      "soulBirthTick": 73,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-05/3fc15413-9631-4faf-a2d0-37501b6ae4a4.json"
+    },
+    "da9a33ef-88a0-42cd-854b-d24b99bda5fd": {
+      "name": "River",
+      "species": "human",
+      "archetype": "protector",
+      "createdAt": "2026-01-05T06:27:05.299Z",
+      "soulBirthTick": 280,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-05/da9a33ef-88a0-42cd-854b-d24b99bda5fd.json"
+    },
+    "16913a8e-546c-41fe-a811-ae99bfd4fb59": {
+      "name": "Autumn",
+      "species": "human",
+      "archetype": "creator",
+      "createdAt": "2026-01-05T09:01:53.981Z",
+      "soulBirthTick": 127,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-05/16913a8e-546c-41fe-a811-ae99bfd4fb59.json"
+    },
+    "fa841eb3-5955-4bd0-aeae-2a4f71b0df40": {
+      "name": "Lark",
+      "species": "human",
+      "archetype": "creator",
+      "createdAt": "2026-01-05T09:02:20.590Z",
+      "soulBirthTick": 660,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-05/fa841eb3-5955-4bd0-aeae-2a4f71b0df40.json"
+    },
+    "4e958aa2-d62c-45c6-818f-18500c81e40a": {
+      "name": "Indigo",
+      "species": "human",
+      "archetype": "creator",
+      "createdAt": "2026-01-05T09:03:03.844Z",
+      "soulBirthTick": 1525,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-05/4e958aa2-d62c-45c6-818f-18500c81e40a.json"
+    },
+    "3863d403-8110-4a8b-aafe-d4b388b98fa4": {
+      "name": "Ada",
+      "species": "human",
+      "archetype": "creator",
+      "createdAt": "2026-01-05T09:03:33.390Z",
+      "soulBirthTick": 2116,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-05/3863d403-8110-4a8b-aafe-d4b388b98fa4.json"
+    },
+    "c8d95e23-a08a-475f-b7aa-503663ce4d89": {
+      "name": "Briar",
+      "species": "human",
+      "archetype": "creator",
+      "createdAt": "2026-01-05T11:38:42.295Z",
+      "soulBirthTick": 392,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-05/c8d95e23-a08a-475f-b7aa-503663ce4d89.json"
+    },
+    "3bdfee6e-4474-4813-9454-68c1f6c2a829": {
+      "name": "Brook",
+      "species": "human",
+      "archetype": "creator",
+      "createdAt": "2026-01-05T11:40:09.813Z",
+      "soulBirthTick": 350,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-05/3bdfee6e-4474-4813-9454-68c1f6c2a829.json"
+    },
+    "99c3d375-e9ed-4ae9-93df-30c70026d76a": {
+      "name": "Dove",
+      "species": "human",
+      "archetype": "creator",
+      "createdAt": "2026-01-05T11:40:14.517Z",
+      "soulBirthTick": 444,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-05/99c3d375-e9ed-4ae9-93df-30c70026d76a.json"
+    },
+    "d66620e4-d38e-42c3-a422-81f8269db30a": {
+      "name": "Luna",
+      "species": "human",
+      "archetype": "creator",
+      "createdAt": "2026-01-06T00:36:23.826Z",
+      "soulBirthTick": 414,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-06/d66620e4-d38e-42c3-a422-81f8269db30a.json"
+    },
+    "c1e4a6f5-30bb-4490-8ba8-33c46046eadb": {
+      "name": "Haven",
+      "species": "human",
+      "archetype": "creator",
+      "createdAt": "2026-01-06T00:46:13.446Z",
+      "soulBirthTick": 84,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-06/c1e4a6f5-30bb-4490-8ba8-33c46046eadb.json"
+    },
+    "81707408-56ad-44e4-8e3c-1217417d7515": {
+      "name": "Kestrel",
+      "species": "human",
+      "archetype": "wanderer",
+      "createdAt": "2026-01-06T04:52:11.233Z",
+      "soulBirthTick": 74,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-06/81707408-56ad-44e4-8e3c-1217417d7515.json"
     }
   }
 }

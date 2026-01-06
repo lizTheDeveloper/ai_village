@@ -115,6 +115,9 @@ export interface ConversationExchange {
 
   /** What this statement is about */
   topic: 'examination' | 'purpose' | 'interests' | 'destiny' | 'debate' | 'blessing' | 'curse' | 'finalization';
+
+  /** LLM thinking content for debugging/transparency (optional) */
+  thoughts?: string;
 }
 
 /**

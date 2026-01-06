@@ -908,10 +908,11 @@ export * from './ComboDetector.js';
 // Expanded Spells & Entities
 // ============================================================================
 
-export * from './ExpandedSpells.js';
+// Phase 3: Content Extraction - Now loaded from JSON
+export * from '../data/SpellsLoader.js';
 export * from './MaterialCreationSpells.js';
 export * from './TileConstructionSpells.js';
-export * from './SummonableEntities.js';
+export * from '../data/SummonablesLoader.js';
 
 // ============================================================================
 // Magic Detection

@@ -13,7 +13,7 @@ import type {
   GoalsComponent,
 } from '@ai-village/core';
 
-export type AgentInfoTab = 'info' | 'stats' | 'skills' | 'inventory' | 'memories' | 'context' | 'priorities';
+export type AgentInfoTab = 'info' | 'stats' | 'skills' | 'inventory' | 'memories' | 'context' | 'priorities' | 'dev';
 
 /**
  * Render context passed to each section.
@@ -71,6 +71,13 @@ export interface AgentComponentData {
     createdAt: number;
     reason?: string;
   }>;
+  assignedBed?: string;
+  homePreferences?: {
+    homeRadius: number;
+    returnWhenFrightened: boolean;
+    returnWhenHurt: boolean;
+    homeComfortBonus: number;
+  };
 }
 
 /**

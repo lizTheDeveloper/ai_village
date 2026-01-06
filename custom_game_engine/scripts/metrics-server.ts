@@ -40,7 +40,9 @@
  *   GET  /api/live/status      - Check if game is connected
  *   GET  /api/live/entities?session=<id>    - List all agents (live)
  *   GET  /api/live/entity?id=<id>&session=<id>      - Get entity state by ID (live)
- *   GET  /api/live/prompt?id=<id>&session=<id>      - Get LLM prompt for agent (live)
+ *   GET  /api/live/prompt?id=<id>&session=<id>      - Get LLM prompt for agent (live, original/legacy)
+ *   GET  /api/live/prompt/talker?id=<id>&session=<id> - Get Talker prompt (Layer 2: conversation, goals, social)
+ *   GET  /api/live/prompt/executor?id=<id>&session=<id> - Get Executor prompt (Layer 3: strategic planning, tasks)
  *   POST /api/live/set-llm?session=<id>     - Set custom LLM config for agent (live)
  *   GET  /api/live/universe?session=<id> - Get universe config
  *   GET  /api/live/magic?session=<id>       - Get magic system info (enabled paradigms, etc.)
@@ -65,10 +67,11 @@ config({ path: path.join(process.cwd(), 'demo', '.env') });
 import { WebSocketServer, WebSocket } from 'ws';
 import { createServer, type IncomingMessage, type ServerResponse } from 'http';
 import { spawn, type ChildProcess } from 'child_process';
-import { MetricsStorage, type StoredMetric } from '../packages/core/src/metrics/MetricsStorage.js';
+// Import directly from individual files (not from barrel export) since these use Node.js APIs
+import { MetricsStorage, type StoredMetric } from '../packages/metrics/src/MetricsStorage.js';
+import { type CanonEvent } from '../packages/metrics/src/CanonEventRecorder.js';
 import { viewRegistry, registerBuiltInViews, hasTextFormatter, type ViewContext } from '../packages/core/src/dashboard/index.js';
-import type { CanonEvent } from '../packages/core/src/metrics/CanonEventRecorder.js';
-import { SaveStateManager } from '../packages/core/src/persistence/SaveStateManager.js';
+import { SaveStateManager } from '../packages/persistence/src/index.js';
 import * as zlib from 'zlib';
 import { promisify } from 'util';
 import { RateLimiter } from '../packages/llm/src/RateLimiter.js';
@@ -95,9 +98,9 @@ const gunzip = promisify(zlib.gunzip);
 
 // Create LLM providers from environment
 const groqApiKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY;
-const groqModel = process.env.GROQ_MODEL || process.env.VITE_GROQ_MODEL || 'llama-3.3-70b-versatile';
+const groqModel = process.env.GROQ_MODEL || process.env.VITE_GROQ_MODEL || 'qwen/qwen3-32b';
 const cerebrasApiKey = process.env.CEREBRAS_API_KEY || process.env.VITE_CEREBRAS_API_KEY;
-const cerebrasModel = process.env.CEREBRAS_MODEL || process.env.VITE_CEREBRAS_MODEL || 'llama-3.3-70b';
+const cerebrasModel = process.env.CEREBRAS_MODEL || process.env.VITE_CEREBRAS_MODEL || 'qwen-3-32b';
 
 const llmProvidersConfigured: string[] = [];
 
@@ -565,7 +568,7 @@ function renderHTMLPanel(title: string, content: string): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title} - AI Village</title>
+  <title>${title} - Multiverse: The End of Eternity</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -700,7 +703,7 @@ function renderHTMLPanel(title: string, content: string): string {
 <body>
   <div class="container">
     <h1>${title}</h1>
-    <div class="subtitle">AI Village Dashboard</div>
+    <div class="subtitle">Multiverse: The End of Eternity Dashboard</div>
     <div class="auto-refresh">🔄 Auto-refreshing every 5 seconds...</div>
     ${content}
   </div>
@@ -4816,6 +4819,78 @@ Available agents:
     return;
   }
 
+  // Talker prompt (Layer 2: conversation, goals, social)
+  if (pathname === '/api/live/prompt/talker') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const entityId = url.searchParams.get('id');
+    if (!entityId) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: 'Missing required parameter: id' }));
+      return;
+    }
+
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
+    if (!gameClient) {
+      res.statusCode = 503;
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'talker_prompt', entityId);
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
+  // Executor prompt (Layer 3: strategic planning, tasks)
+  if (pathname === '/api/live/prompt/executor') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const entityId = url.searchParams.get('id');
+    if (!entityId) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: 'Missing required parameter: id' }));
+      return;
+    }
+
+    const sessionParam = url.searchParams.get('session');
+    const gameClient = sessionParam
+      ? getGameClientForSession(sessionParam)
+      : getActiveGameClient();
+
+    if (!gameClient) {
+      res.statusCode = 503;
+      const errorMsg = sessionParam
+        ? `No game client connected for session: ${sessionParam}`
+        : 'No game client connected';
+      res.end(JSON.stringify({ error: errorMsg, connected: false, session: sessionParam || undefined }));
+      return;
+    }
+
+    try {
+      const result = await sendQueryToGame(gameClient, 'executor_prompt', entityId);
+      res.end(JSON.stringify(result, null, 2));
+    } catch (err) {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Query failed' }));
+    }
+    return;
+  }
+
   if (pathname === '/api/live/status') {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -5217,6 +5292,163 @@ Available agents:
       res.statusCode = 500;
       res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Action failed' }));
     }
+    return;
+  }
+
+  // Agent Debug Logging API - Deep logging for debugging agent behavior
+  if (pathname === '/api/live/debug-agent') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const gameClient = getActiveGameClient();
+    if (!gameClient) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({ error: 'No game client connected', connected: false }));
+      return;
+    }
+
+    const agentId = url.searchParams.get('id');
+    const start = url.searchParams.get('start') === 'true';
+    const stop = url.searchParams.get('stop') === 'true';
+    const list = url.searchParams.get('list') === 'true';
+
+    if (list) {
+      // List currently tracked agents
+      try {
+        const result = await sendActionToGame(gameClient, 'debug-list-agents', {});
+        res.end(JSON.stringify(result, null, 2));
+      } catch (err) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Action failed' }));
+      }
+      return;
+    }
+
+    if (!agentId) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: 'Missing id parameter' }));
+      return;
+    }
+
+    if (start) {
+      // Start deep logging for agent
+      try {
+        const result = await sendActionToGame(gameClient, 'debug-start-logging', { agentId });
+        res.end(JSON.stringify(result, null, 2));
+      } catch (err) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Action failed' }));
+      }
+      return;
+    }
+
+    if (stop) {
+      // Stop deep logging for agent
+      try {
+        const result = await sendActionToGame(gameClient, 'debug-stop-logging', { agentId });
+        res.end(JSON.stringify(result, null, 2));
+      } catch (err) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ error: err instanceof Error ? err.message : 'Action failed' }));
+      }
+      return;
+    }
+
+    res.statusCode = 400;
+    res.end(JSON.stringify({ error: 'Missing action parameter (start, stop, or list)' }));
+    return;
+  }
+
+  // Get agent logs
+  if (pathname === '/api/live/debug-agent/logs') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const gameClient = getActiveGameClient();
+    if (!gameClient) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({ error: 'No game client connected' }));
+      return;
+    }
+
+    const agentIdOrName = url.searchParams.get('agent') || url.searchParams.get('name');
+    const limit = parseInt(url.searchParams.get('limit') || '100', 10);
+
+    if (!agentIdOrName) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: 'Missing agent parameter' }));
+      return;
+    }
+
+    const result = await sendActionToGame(gameClient, 'debug-get-logs', { agentIdOrName, limit });
+    res.end(JSON.stringify(result, null, 2));
+    return;
+  }
+
+  // Analyze agent behavior
+  if (pathname === '/api/live/debug-agent/analyze') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const gameClient = getActiveGameClient();
+    if (!gameClient) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({ error: 'No game client connected' }));
+      return;
+    }
+
+    const agentIdOrName = url.searchParams.get('agent') || url.searchParams.get('name');
+
+    if (!agentIdOrName) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: 'Missing agent parameter' }));
+      return;
+    }
+
+    const result = await sendActionToGame(gameClient, 'debug-analyze', { agentIdOrName });
+    res.end(JSON.stringify(result, null, 2));
+    return;
+  }
+
+  // List all log files
+  if (pathname === '/api/live/debug-agent/log-files') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const gameClient = getActiveGameClient();
+    if (!gameClient) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({ error: 'No game client connected' }));
+      return;
+    }
+
+    const result = await sendActionToGame(gameClient, 'debug-list-log-files', {});
+    res.end(JSON.stringify(result, null, 2));
+    return;
+  }
+
+  // Find agent by name
+  if (pathname === '/api/live/agents/find-by-name') {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const gameClient = getActiveGameClient();
+    if (!gameClient) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({ error: 'No game client connected' }));
+      return;
+    }
+
+    const name = url.searchParams.get('name');
+
+    if (!name) {
+      res.statusCode = 400;
+      res.end(JSON.stringify({ error: 'Missing name parameter' }));
+      return;
+    }
+
+    const result = await sendActionToGame(gameClient, 'find-agent-by-name', { name });
+    res.end(JSON.stringify(result, null, 2));
     return;
   }
 
@@ -6513,7 +6745,7 @@ ENDPOINTS:
 NOTE: The POST /api/save endpoint for creating saves is not yet integrated with
       running games. Use SaveStateManager directly in headless scripts for now:
 
-      import { SaveStateManager } from '@ai-village/core';
+      import { SaveStateManager } from '@ai-village/persistence';
       const saveManager = new SaveStateManager('saves');
       await saveManager.saveState(world, sessionId, { description: 'Checkpoint' });
 
@@ -7278,9 +7510,158 @@ See TIME_MANIPULATION_DEVTOOLS.md for more details
           'POST /api/headless/stop - Stop a headless game by session ID',
           'POST /api/headless/stop-all - Stop all headless games',
         ],
+        microgenerators: [
+          '/microgen - Microgenerators overview',
+          '/microgen/riddle-book - Death\'s Riddle Book (create personalized riddles)',
+          '/microgen/spell-lab - Spell Laboratory (create magic spells)',
+          '/microgen/culinary - Culinary Experiments (create recipes)',
+          '/microgen/xenobiology - Xenobiology Lab (create alien species)',
+          'POST /api/microgen/riddle - Generate a riddle',
+          'POST /api/microgen/spell - Generate a spell',
+          'POST /api/microgen/recipe - Generate a recipe',
+          'GET /api/microgen/queue - Get god-crafted queue stats',
+        ],
       },
     }, null, 2));
   }
+
+  // ============================================================================
+  // MICROGENERATORS - Embeddable Content Creation Tools
+  // ============================================================================
+
+  // Microgenerators overview
+  if (pathname === '/microgen') {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.end(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Microgenerators - Multiverse: The End of Eternity</title>
+  <style>
+    body { font-family: monospace; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+    h1 { border-bottom: 2px solid #333; padding-bottom: 10px; }
+    h2 { color: #555; margin-top: 30px; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 15px 0; }
+    a { color: #0066cc; text-decoration: none; font-weight: bold; }
+    a:hover { text-decoration: underline; }
+    .desc { color: #666; margin-left: 20px; }
+    .badge { background: #0066cc; color: white; padding: 2px 8px; border-radius: 3px; font-size: 0.85em; }
+  </style>
+</head>
+<body>
+  <h1>🎨 Microgenerators</h1>
+  <p>Standalone content creation tools for the Multiverse: The End of Eternity multiverse.</p>
+  <p>Each microgenerator is embeddable and creates legendary content that enters the god-crafted queue.</p>
+
+  <h2>Available Microgenerators</h2>
+  <ul>
+    <li>
+      <a href="/microgen/riddle-book">📖 Death's Riddle Book</a>
+      <span class="badge">READY</span>
+      <div class="desc">Create personalized riddles for hero death bargains</div>
+    </li>
+    <li>
+      <a href="/microgen/spell-lab">✨ Spell Laboratory</a>
+      <span class="badge">COMING SOON</span>
+      <div class="desc">Experiment with magic combinations to discover new spells</div>
+    </li>
+    <li>
+      <a href="/microgen/culinary">🍳 Culinary Experiments</a>
+      <span class="badge">COMING SOON</span>
+      <div class="desc">Combine ingredients to invent new dishes and potions</div>
+    </li>
+    <li>
+      <a href="/microgen/xenobiology">👽 Xenobiology Lab</a>
+      <span class="badge">COMING SOON</span>
+      <div class="desc">Design alien species with unique biology and culture</div>
+    </li>
+  </ul>
+
+  <h2>API Endpoints</h2>
+  <ul>
+    <li><code>POST /api/microgen/riddle</code> - Generate a riddle</li>
+    <li><code>POST /api/microgen/spell</code> - Generate a spell</li>
+    <li><code>POST /api/microgen/recipe</code> - Generate a recipe</li>
+    <li><code>GET /api/microgen/queue</code> - Get god-crafted queue stats</li>
+  </ul>
+
+  <h2>Embedding</h2>
+  <p>Each microgenerator can be embedded in any webpage:</p>
+  <pre>&lt;iframe src="http://localhost:8766/microgen/riddle-book" width="600" height="800"&gt;&lt;/iframe&gt;</pre>
+
+  <p><a href="/">← Back to Metrics Server</a></p>
+</body>
+</html>`);
+    return;
+  }
+
+  // Death's Riddle Book microgenerator page
+  if (pathname === '/microgen/riddle-book') {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    const html = fs.readFileSync(
+      path.join(process.cwd(), 'microgenerators', 'riddle-book.html'),
+      'utf-8'
+    );
+    res.end(html);
+    return;
+  }
+
+  // API: Generate riddle
+  if (pathname === '/api/microgen/riddle' && req.method === 'POST') {
+    res.setHeader('Content-Type', 'application/json');
+
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', async () => {
+      try {
+        const data = JSON.parse(body);
+
+        // TODO: Integrate with RiddleBookMicrogenerator
+        const riddle = {
+          id: `riddle:${Date.now()}`,
+          type: 'riddle',
+          creator: data.creator,
+          lore: `A riddle crafted by ${data.creator.name}, God of ${data.creator.godOf}`,
+          data: {
+            question: 'What walks on four legs in the morning, two legs at noon, and three legs in the evening?',
+            correctAnswer: 'A human',
+            alternativeAnswers: ['Man', 'Person'],
+            difficulty: data.data.difficulty,
+            context: data.data.context,
+            allowLLMJudgment: data.data.allowLLMJudgment,
+          },
+          validated: true,
+          discoveries: [],
+          createdAt: Date.now(),
+        };
+
+        res.end(JSON.stringify({ success: true, riddle }));
+      } catch (error) {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ success: false, error: error.message }));
+      }
+    });
+    return;
+  }
+
+  // API: God-crafted queue stats
+  if (pathname === '/api/microgen/queue') {
+    res.setHeader('Content-Type', 'application/json');
+
+    // TODO: Integrate with godCraftedQueue
+    const stats = {
+      totalEntries: 0,
+      byType: {},
+      totalCreators: 0,
+      totalDiscoveries: 0,
+    };
+
+    res.end(JSON.stringify(stats));
+    return;
+  }
+
 });
 
 httpServer.listen(HTTP_PORT, () => {

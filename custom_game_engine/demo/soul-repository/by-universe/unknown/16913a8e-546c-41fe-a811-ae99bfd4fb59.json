@@ -1,0 +1,16 @@
+{
+  "soulId": "16913a8e-546c-41fe-a811-ae99bfd4fb59",
+  "agentId": "16913a8e-546c-41fe-a811-ae99bfd4fb59",
+  "name": "Autumn",
+  "species": "human",
+  "archetype": "creator",
+  "purpose": "I see a soul entwined with the rhythm of creation. This thread shall gather the seeds of tomorrow and build the shelters where dreams take root, ensuring the village's first breaths are strong.",
+  "interests": [
+    "nature",
+    "crafting"
+  ],
+  "createdAt": "2026-01-05T09:01:53.981Z",
+  "soulBirthTick": 127,
+  "universeId": "unknown",
+  "version": 1
+}

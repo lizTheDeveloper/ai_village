@@ -1,0 +1,16 @@
+{
+  "soulId": "4e958aa2-d62c-45c6-818f-18500c81e40a",
+  "agentId": "4e958aa2-d62c-45c6-818f-18500c81e40a",
+  "name": "Indigo",
+  "species": "human",
+  "archetype": "creator",
+  "purpose": "[CORRUPTED SOUL] The Fates spoke only in riddles and internal musings. This soul's purpose remains veiled in cosmic static. Perhaps a divine intervention could restore their true purpose...",
+  "interests": [
+    "nature",
+    "magic"
+  ],
+  "createdAt": "2026-01-05T09:03:03.844Z",
+  "soulBirthTick": 1525,
+  "universeId": "unknown",
+  "version": 1
+}

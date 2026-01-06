@@ -1,0 +1,19 @@
+{
+  "name": "@ai-village/introspection",
+  "version": "0.1.0",
+  "description": "Runtime introspection and schema system for Multiverse: The End of Eternity components",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

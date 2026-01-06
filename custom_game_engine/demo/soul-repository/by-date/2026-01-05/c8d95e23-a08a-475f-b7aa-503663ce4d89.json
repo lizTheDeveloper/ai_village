@@ -1,0 +1,16 @@
+{
+  "soulId": "c8d95e23-a08a-475f-b7aa-503663ce4d89",
+  "agentId": "c8d95e23-a08a-475f-b7aa-503663ce4d89",
+  "name": "Briar",
+  "species": "human",
+  "archetype": "creator",
+  "purpose": "I see a soul whose hands will shape the village's bones. This thread shall master the art of building, ensuring the first homes stand strong.",
+  "interests": [
+    "crafting",
+    "building"
+  ],
+  "createdAt": "2026-01-05T11:38:42.295Z",
+  "soulBirthTick": 392,
+  "universeId": "unknown",
+  "version": 1
+}

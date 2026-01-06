@@ -48,16 +48,32 @@ export interface EntityDetails {
 export class LiveEntityAPI {
   private world: World;
   private promptBuilder: PromptBuilder | null = null;
+  private talkerPromptBuilder: PromptBuilder | null = null;
+  private executorPromptBuilder: PromptBuilder | null = null;
 
   constructor(world: World) {
     this.world = world;
   }
 
   /**
-   * Set the prompt builder for generating LLM prompts
+   * Set the prompt builder for generating LLM prompts (legacy/original)
    */
   setPromptBuilder(builder: PromptBuilder): void {
     this.promptBuilder = builder;
+  }
+
+  /**
+   * Set the Talker prompt builder (Layer 2: conversation, goals, social)
+   */
+  setTalkerPromptBuilder(builder: PromptBuilder): void {
+    this.talkerPromptBuilder = builder;
+  }
+
+  /**
+   * Set the Executor prompt builder (Layer 3: strategic planning, tasks)
+   */
+  setExecutorPromptBuilder(builder: PromptBuilder): void {
+    this.executorPromptBuilder = builder;
   }
 
   /**
@@ -79,6 +95,10 @@ export class LiveEntityAPI {
         return this.handleEntityQuery(query);
       case 'entity_prompt':
         return this.handleEntityPromptQuery(query);
+      case 'talker_prompt':
+        return this.handleTalkerPromptQuery(query);
+      case 'executor_prompt':
+        return this.handleExecutorPromptQuery(query);
       case 'universe':
         return this.handleUniverseQuery(query);
       case 'magic':
@@ -1055,6 +1075,114 @@ export class LiveEntityAPI {
         requestId: query.requestId,
         success: false,
         error: err instanceof Error ? err.message : 'Failed to build prompt',
+      };
+    }
+  }
+
+  /**
+   * Handle Talker prompt query (Layer 2: conversation, goals, social)
+   */
+  private handleTalkerPromptQuery(query: QueryRequest): QueryResponse {
+    if (!query.entityId) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: 'entityId is required',
+      };
+    }
+
+    if (!this.talkerPromptBuilder) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: 'TalkerPromptBuilder not configured',
+      };
+    }
+
+    const entity = this.world.getEntity(query.entityId);
+    if (!entity) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: `Entity not found: ${query.entityId}`,
+      };
+    }
+
+    // Check if this is an agent
+    if (!entity.components.has('agent')) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: `Entity ${query.entityId} is not an agent`,
+      };
+    }
+
+    try {
+      const prompt = this.talkerPromptBuilder.buildPrompt(entity, this.world);
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: { prompt, layer: 'talker' },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to build Talker prompt',
+      };
+    }
+  }
+
+  /**
+   * Handle Executor prompt query (Layer 3: strategic planning, tasks)
+   */
+  private handleExecutorPromptQuery(query: QueryRequest): QueryResponse {
+    if (!query.entityId) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: 'entityId is required',
+      };
+    }
+
+    if (!this.executorPromptBuilder) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: 'ExecutorPromptBuilder not configured',
+      };
+    }
+
+    const entity = this.world.getEntity(query.entityId);
+    if (!entity) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: `Entity not found: ${query.entityId}`,
+      };
+    }
+
+    // Check if this is an agent
+    if (!entity.components.has('agent')) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: `Entity ${query.entityId} is not an agent`,
+      };
+    }
+
+    try {
+      const prompt = this.executorPromptBuilder.buildPrompt(entity, this.world);
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: { prompt, layer: 'executor' },
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to build Executor prompt',
       };
     }
   }

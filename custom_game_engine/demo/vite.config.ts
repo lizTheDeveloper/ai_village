@@ -160,10 +160,23 @@ export default defineConfig({
   resolve: {
     alias: {
       '@ai-village/core': path.resolve(__dirname, '../packages/core/src/index.ts'),
+      '@ai-village/persistence': path.resolve(__dirname, '../packages/persistence/src/index.ts'),
+      '@ai-village/metrics': path.resolve(__dirname, '../packages/metrics/src/index.ts'),
+      '@ai-village/reproduction': path.resolve(__dirname, '../packages/reproduction/src/index.ts'),
+      '@ai-village/divinity': path.resolve(__dirname, '../packages/divinity/src/index.ts'),
+      '@ai-village/magic': path.resolve(__dirname, '../packages/magic/src/index.ts'),
       '@ai-village/world': path.resolve(__dirname, '../packages/world/src/index.ts'),
       '@ai-village/renderer': path.resolve(__dirname, '../packages/renderer/src/index.ts'),
       '@ai-village/llm': path.resolve(__dirname, '../packages/llm/src/index.ts'),
+      '@ai-village/shared-worker': path.resolve(__dirname, '../packages/shared-worker/src/index.ts'),
+      // Stub out Node.js modules for browser
+      'fs': path.resolve(__dirname, '../packages/llm/src/browser-stubs/fs.ts'),
+      'path': path.resolve(__dirname, '../packages/llm/src/browser-stubs/path.ts'),
     },
+  },
+  worker: {
+    format: 'es',
+    plugins: [],
   },
   build: {
     // Enable cache busting in production builds

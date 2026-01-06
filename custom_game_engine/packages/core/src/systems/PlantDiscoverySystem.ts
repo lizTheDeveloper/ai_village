@@ -37,11 +37,14 @@ export interface PlantEffect {
  * - Applies effects (positive or negative)
  * - Updates the agent's plant knowledge
  * - Creates memories of the experience
+ *
+ * @dependencies None - Event-driven system that responds to plant consumption/use
  */
 export class PlantDiscoverySystem implements System {
   public readonly id: SystemId = 'plant_discovery' as SystemId;
   public readonly priority: number = 45; // After consumption, before memory formation
   public readonly requiredComponents: ReadonlyArray<CT> = [ComponentType.Agent];
+  public readonly dependsOn = [] as const;
 
   /** Species registry for looking up plant properties */
   private speciesRegistry: Map<string, PlantSpecies> = new Map();

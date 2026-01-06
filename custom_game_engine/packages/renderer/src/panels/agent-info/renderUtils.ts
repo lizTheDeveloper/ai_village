@@ -202,16 +202,16 @@ export function getTemperatureStateColor(state: string): string {
 
 /**
  * Get color for need bar based on value and type.
- * Energy uses blue (high) → red (low) per work order spec.
+ * Energy uses blue (high) → yellow (medium) → red (low).
  * Other needs use traditional traffic light colors.
  */
 export function getNeedBarColor(needType: string, value: number): string {
   if (needType === 'Energy') {
-    if (value >= 70) return '#00AAFF';
-    if (value >= 50) return '#00DDFF';
-    if (value >= 30) return '#AA66FF';
-    if (value >= 15) return '#FF8800';
-    return '#FF0000';
+    if (value >= 50) return '#00AAFF';     // Blue (well rested)
+    if (value >= 30) return '#00DDFF';     // Cyan (normal)
+    if (value >= 15) return '#FFCC00';     // Yellow (getting tired)
+    if (value >= 5) return '#FF8800';      // Orange (very tired)
+    return '#FF0000';                      // Red (exhausted)
   }
 
   if (value < 20) return '#FF0000';

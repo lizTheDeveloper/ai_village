@@ -1,0 +1,22 @@
+{
+  "name": "@ai-village/hierarchy-simulator",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Standalone hierarchical abstraction simulator for ringworld economies",
+  "scripts": {
+    "dev": "vite --port 3031 --host",
+    "build": "tsc && vite build",
+    "preview": "vite preview --port 3031",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@ai-village/core": "*",
+    "chart.js": "^4.4.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "vitest": "^3.0.0"
+  }
+}

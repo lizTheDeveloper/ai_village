@@ -1,0 +1,1 @@
+ sleep 2 cat ../../../logs/city-simulator.log

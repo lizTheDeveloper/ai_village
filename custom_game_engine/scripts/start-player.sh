@@ -3,7 +3,7 @@
 
 echo "=== AI Village (Player Mode) ==="
 echo ""
-echo "Opening browser to http://localhost:3000..."
+echo "Opening browser to central hub..."
 echo ""
 echo "Note: Make sure a game server is already running"
 echo "      (use start-game-host.sh or npm run dev)"
@@ -19,13 +19,13 @@ if ! curl -s http://localhost:3000 > /dev/null 2>&1; then
   exit 1
 fi
 
-# Open browser (platform-specific)
+# Open browser to landing page (platform-specific)
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  open http://localhost:3000
+  open http://localhost:3000/hub.html
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  xdg-open http://localhost:3000 2>/dev/null || echo "Please open http://localhost:3000 in your browser"
+  xdg-open http://localhost:3000/hub.html 2>/dev/null || echo "Please open http://localhost:3000/hub.html in your browser"
 else
-  echo "Please open http://localhost:3000 in your browser"
+  echo "Please open http://localhost:3000/hub.html in your browser"
 fi
 
 echo "✓ Browser opened"

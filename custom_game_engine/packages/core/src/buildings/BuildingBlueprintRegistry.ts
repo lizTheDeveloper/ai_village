@@ -6,6 +6,23 @@
  * Per CLAUDE.md: No silent fallbacks - throws on invalid input.
  */
 
+import type { BuildingFloor, Material, BuilderSpecies } from '../../../building-designer/src/types.js';
+import {
+  SMALL_HOUSE,
+  COZY_COTTAGE,
+  STONE_HOUSE,
+  LONGHOUSE,
+  WORKSHOP,
+  BARN,
+  STORAGE_SHED,
+  GUARD_TOWER,
+} from './StandardVoxelBuildings.js';
+import { TEMPLE_BLUEPRINTS } from './TempleBlueprints.js';
+import { getFarmBlueprints } from './FarmBlueprints.js';
+import { SHOP_BLUEPRINTS } from './ShopBlueprints.js';
+import { MIDWIFERY_BLUEPRINTS } from './MidwiferyBlueprints.js';
+import { GOVERNANCE_BLUEPRINTS } from './GovernanceBlueprints.js';
+
 /**
  * Building categories per construction-system/spec.md
  * Extended to include governance category.
@@ -97,6 +114,17 @@ export interface BuildingBlueprint {
   rotationAngles: number[];
   snapToGrid: boolean;
   requiresFoundation: boolean;
+
+  // Voxel/Layout fields (optional, for multi-tile buildings with furniture)
+  layout?: string[];  // ASCII layout: ['#####', '#B.S#', ...]
+  materials?: {
+    wall: Material;
+    floor: Material;
+    door: Material;
+  };
+  floors?: BuildingFloor[];  // Multi-floor layouts
+  species?: BuilderSpecies;   // Target species (affects ceiling heights)
+  capacity?: number;          // Occupants/storage slots/beds
 }
 
 /**
@@ -190,6 +218,11 @@ export class BuildingBlueprintRegistry {
           recipes: ['basic_tools', 'basic_items'],
           speed: 1.0,
         },
+        {
+          type: 'storage',
+          itemTypes: ['wood', 'stone', 'iron'],
+          capacity: 20,
+        },
       ],
       canRotate: true,
       rotationAngles: [0, 90, 180, 270],
@@ -257,6 +290,11 @@ export class BuildingBlueprintRegistry {
           type: 'mood_aura',
           moodBonus: 5,
           radius: 3,
+        },
+        {
+          type: 'storage',
+          itemTypes: ['food', 'wood'],
+          capacity: 10,
         },
       ],
       canRotate: false,
@@ -455,6 +493,18 @@ export class BuildingBlueprintRegistry {
     this.registerTier3Stations();
     this.registerResearchBuildings();
     this.registerGovernanceBuildings();
+    this.registerMediaBuildings();
+
+    // Register specialized building types
+    this.registerTempleBuildings();
+    this.registerFarmBuildings();
+    this.registerShopBuildings();
+    this.registerMidwiferyBuildings();
+    // NOTE: Not registering GovernanceBlueprints.ts file because those buildings
+    // are already registered inline in registerGovernanceBuildings() above
+
+    // Register standard voxel buildings (houses, workshops, etc.)
+    this.registerStandardVoxelBuildings();
   }
 
   /**
@@ -487,6 +537,11 @@ export class BuildingBlueprintRegistry {
           recipes: ['iron_ingot', 'steel_sword', 'iron_tools', 'steel_ingot'],
           speed: 1.5, // +50% metalworking speed
         },
+        {
+          type: 'storage',
+          itemTypes: ['iron', 'steel', 'coal'],
+          capacity: 30,
+        },
       ],
       canRotate: true,
       rotationAngles: [0, 90, 180, 270],
@@ -518,6 +573,11 @@ export class BuildingBlueprintRegistry {
           type: 'crafting',
           recipes: [], // Butchering uses behavior system, not recipes
           speed: 1.0,
+        },
+        {
+          type: 'storage',
+          itemTypes: ['meat', 'hide', 'bone'],
+          capacity: 15,
         },
       ],
       canRotate: true,
@@ -607,6 +667,11 @@ export class BuildingBlueprintRegistry {
           type: 'crafting',
           recipes: ['flour', 'grain_products'],
           speed: 1.0,
+        },
+        {
+          type: 'storage',
+          itemTypes: ['grain', 'flour'],
+          capacity: 40,
         },
       ],
       canRotate: false, // Windmills face specific direction
@@ -852,6 +917,11 @@ export class BuildingBlueprintRegistry {
           recipes: ['cloth', 'simple_clothing', 'rope'],
           speed: 1.0,
         },
+        {
+          type: 'storage',
+          itemTypes: ['fiber', 'cloth', 'rope'],
+          capacity: 25,
+        },
       ],
       canRotate: true,
       rotationAngles: [0, 90, 180, 270],
@@ -883,6 +953,11 @@ export class BuildingBlueprintRegistry {
           type: 'crafting',
           recipes: ['bread', 'pastries', 'dried_meat', 'preserved_food'],
           speed: 1.2,
+        },
+        {
+          type: 'storage',
+          itemTypes: ['flour', 'bread', 'food'],
+          capacity: 20,
         },
       ],
       canRotate: true,
@@ -1018,6 +1093,11 @@ export class BuildingBlueprintRegistry {
           type: 'research',
           fields: ['alchemy'],
           bonus: 1.5,
+        },
+        {
+          type: 'storage',
+          itemTypes: ['herbs', 'potions', 'reagents'],
+          capacity: 30,
         },
       ],
       canRotate: true,
@@ -1361,7 +1441,15 @@ export class BuildingBlueprintRegistry {
       unlocked: true,
       buildTime: 480, // 8 hours
       tier: 3,
-      functionality: [],
+      functionality: [
+        {
+          type: 'governance',
+          governanceType: 'demographics',
+        },
+        {
+          type: 'knowledge_repository',
+        },
+      ],
       canRotate: true,
       rotationAngles: [0, 90, 180, 270],
       snapToGrid: true,
@@ -1421,7 +1509,12 @@ export class BuildingBlueprintRegistry {
       unlocked: true,
       buildTime: 300, // 5 hours
       tier: 2,
-      functionality: [],
+      functionality: [
+        {
+          type: 'vision_extension',
+          radiusBonus: 20,
+        },
+      ],
       canRotate: false,
       rotationAngles: [0],
       snapToGrid: true,
@@ -1512,7 +1605,12 @@ export class BuildingBlueprintRegistry {
       unlocked: true,
       buildTime: 360, // 6 hours
       tier: 2,
-      functionality: [],
+      functionality: [
+        {
+          type: 'vision_extension',
+          radiusBonus: 30,
+        },
+      ],
       canRotate: false,
       rotationAngles: [0],
       snapToGrid: true,
@@ -1538,7 +1636,15 @@ export class BuildingBlueprintRegistry {
       unlocked: true,
       buildTime: 420, // 7 hours
       tier: 3,
-      functionality: [],
+      functionality: [
+        {
+          type: 'job_board',
+        },
+        {
+          type: 'governance',
+          governanceType: 'workforce',
+        },
+      ],
       canRotate: true,
       rotationAngles: [0, 90, 180, 270],
       snapToGrid: true,
@@ -1577,6 +1683,195 @@ export class BuildingBlueprintRegistry {
       snapToGrid: true,
       requiresFoundation: true,
     });
+  }
+
+  /**
+   * Register media buildings (TV station, radio station, newspaper)
+   * These buildings provide information dissemination, entertainment, and news gathering.
+   */
+  registerMediaBuildings(): void {
+    // TV Station - Television broadcasting (5x5, 120 Wood + 100 Stone + 80 Iron + 40 Glass)
+    this.register({
+      id: 'tv_station',
+      name: 'TV Station',
+      description: 'Television broadcasting facility staffed by agents. Provides entertainment and news to the population.',
+      category: 'community',
+      width: 5,
+      height: 5,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 120 },
+        { resourceId: 'stone', amountRequired: 100 },
+        { resourceId: 'iron', amountRequired: 80 },
+        { resourceId: 'glass', amountRequired: 40 },
+      ],
+      techRequired: ['electronics', 'broadcasting'],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 5 },
+      unlocked: false,
+      buildTime: 600, // 10 hours
+      tier: 4,
+      functionality: [
+        {
+          type: 'mood_aura',
+          moodBonus: 15,
+          radius: 30, // Wide broadcast range
+        },
+        {
+          type: 'knowledge_repository',
+        },
+        {
+          type: 'social_hub',
+          radius: 20,
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+
+    // Radio Station - Audio broadcasting (4x4, 80 Wood + 60 Stone + 40 Iron)
+    this.register({
+      id: 'radio_station',
+      name: 'Radio Station',
+      description: 'Radio broadcasting facility with DJ personalities and music programming. Provides news and entertainment.',
+      category: 'community',
+      width: 4,
+      height: 4,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 80 },
+        { resourceId: 'stone', amountRequired: 60 },
+        { resourceId: 'iron', amountRequired: 40 },
+      ],
+      techRequired: ['radio_technology'],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 4 },
+      unlocked: false,
+      buildTime: 480, // 8 hours
+      tier: 3,
+      functionality: [
+        {
+          type: 'mood_aura',
+          moodBonus: 10,
+          radius: 40, // Radio has wider range than TV
+        },
+        {
+          type: 'knowledge_repository',
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: true,
+    });
+
+    // Newspaper / Press Office (4x3, 70 Wood + 40 Stone + 30 Iron)
+    this.register({
+      id: 'newspaper',
+      name: 'Newspaper Office',
+      description: 'Newspaper publishing facility staffed by reporters, editors, and photographers. Investigates and publishes news articles.',
+      category: 'community',
+      width: 4,
+      height: 3,
+      resourceCost: [
+        { resourceId: 'wood', amountRequired: 70 },
+        { resourceId: 'stone', amountRequired: 40 },
+        { resourceId: 'iron', amountRequired: 30 },
+      ],
+      techRequired: ['printing_press'],
+      terrainRequired: ['grass', 'dirt'],
+      terrainForbidden: ['water', 'deep_water'],
+      skillRequired: { skill: 'building', level: 3 },
+      unlocked: false,
+      buildTime: 360, // 6 hours
+      tier: 2,
+      functionality: [
+        {
+          type: 'knowledge_repository',
+        },
+        {
+          type: 'social_hub',
+          radius: 15,
+        },
+        {
+          type: 'storage',
+          itemTypes: ['paper', 'ink', 'articles'],
+          capacity: 50,
+        },
+      ],
+      canRotate: true,
+      rotationAngles: [0, 90, 180, 270],
+      snapToGrid: true,
+      requiresFoundation: false,
+    });
+  }
+
+  /**
+   * Register temple/religious buildings (shrines, temples, sacred sites)
+   */
+  registerTempleBuildings(): void {
+    for (const blueprint of TEMPLE_BLUEPRINTS) {
+      this.register(blueprint);
+    }
+  }
+
+  /**
+   * Register farm buildings (scarecrows, sprinklers, compost bins, etc.)
+   */
+  registerFarmBuildings(): void {
+    const farmBlueprints = getFarmBlueprints();
+    for (const blueprint of farmBlueprints) {
+      this.register(blueprint);
+    }
+  }
+
+  /**
+   * Register shop/commercial buildings (general store, blacksmith, etc.)
+   */
+  registerShopBuildings(): void {
+    for (const blueprint of SHOP_BLUEPRINTS) {
+      this.register(blueprint);
+    }
+  }
+
+  /**
+   * Register midwifery/maternal care buildings (birthing hut, nursery, etc.)
+   */
+  registerMidwiferyBuildings(): void {
+    for (const blueprint of MIDWIFERY_BLUEPRINTS) {
+      this.register(blueprint);
+    }
+  }
+
+  /**
+   * Register governance buildings from GovernanceBlueprints.ts
+   * Note: This is separate from the inline governance buildings in registerGovernanceBuildings()
+   */
+  registerGovernanceBlueprintsFile(): void {
+    for (const blueprint of GOVERNANCE_BLUEPRINTS) {
+      this.register(blueprint);
+    }
+  }
+
+  /**
+   * Register standard voxel buildings (houses, workshops, barns, towers)
+   *
+   * DISABLED: Voxel buildings with ASCII layout format are not compatible with
+   * current rendering system. Causes beds/storage to spawn outside buildings.
+   * Using legacy flat blueprints in registerTier3Stations() instead.
+   */
+  private registerStandardVoxelBuildings(): void {
+    // DISABLED - See comment above
+    // this.register(SMALL_HOUSE);
+    // this.register(COZY_COTTAGE);
+    // this.register(STONE_HOUSE);
+    // this.register(LONGHOUSE);
+    // this.register(WORKSHOP);  // Using legacy version from registerTier3Stations()
+    // this.register(BARN);      // Using legacy version from registerTier3Stations()
+    // this.register(STORAGE_SHED);
+    // this.register(GUARD_TOWER);
   }
 
   /**

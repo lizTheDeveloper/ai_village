@@ -1,5 +1,8 @@
-import type { Entity, World, AnimalComponent } from '@ai-village/core';
+import type { Entity, World, AnimalComponent, IdentityComponent } from '@ai-village/core';
 import type { IWindowPanel } from './types/WindowTypes.js';
+import { DevSection } from './panels/agent-info/DevSection.js';
+import type { SectionRenderContext } from './panels/agent-info/types.js';
+import { renderSprite } from './SpriteRenderer.js';
 
 /**
  * UI Panel displaying information about the selected animal.
@@ -15,6 +18,7 @@ export class AnimalInfoPanel implements IWindowPanel {
   private scrollOffset = 0;
   private maxScrollOffset = 0;
   private contentHeight = 0;
+  private devSection = new DevSection();
 
   /**
    * Set the currently selected animal entity.
@@ -199,19 +203,65 @@ export class AnimalInfoPanel implements IWindowPanel {
 
     let currentY = scrollY + this.padding + this.lineHeight;
 
-    // Title: Animal Name
-    ctx.fillText(animal.name, x + this.padding, currentY);
+    // Sprite rendering in top-right corner
+    const spriteSize = 48;
+    const spriteX = x + this.panelWidth - spriteSize - this.padding;
+    const spriteY = currentY;
+
+    // Get renderable component for sprite ID
+    const renderable = selectedEntity.components.get('renderable') as { spriteId: string } | undefined;
+    if (renderable?.spriteId) {
+      // Draw sprite background
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.fillRect(spriteX, spriteY, spriteSize, spriteSize);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(spriteX, spriteY, spriteSize, spriteSize);
+
+      // Render the sprite
+      renderSprite(ctx, renderable.spriteId, spriteX, spriteY, spriteSize);
+    }
+
+    // Title: Animal Name - adjusted to not overlap sprite
+    const textMaxWidth = this.panelWidth - spriteSize - this.padding * 3;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 14px monospace';
+
+    // Truncate name if too long
+    let displayName = animal.name;
+    const nameWidth = ctx.measureText(displayName).width;
+    if (nameWidth > textMaxWidth) {
+      while (ctx.measureText(displayName + '...').width > textMaxWidth && displayName.length > 0) {
+        displayName = displayName.slice(0, -1);
+      }
+      displayName += '...';
+    }
+
+    ctx.fillText(displayName, x + this.padding, currentY);
     currentY += this.lineHeight + 4;
 
     // Species and Life Stage
     ctx.font = '12px monospace';
     ctx.fillStyle = '#AAAAAA';
-    ctx.fillText(
-      `${this.formatSpeciesName(animal.speciesId)} (${this.formatLifeStage(animal.lifeStage)})`,
-      x + this.padding,
-      currentY
-    );
+    const speciesText = `${this.formatSpeciesName(animal.speciesId)} (${this.formatLifeStage(animal.lifeStage)})`;
+
+    // Truncate species text if too long
+    let displaySpecies = speciesText;
+    const speciesWidth = ctx.measureText(displaySpecies).width;
+    if (speciesWidth > textMaxWidth) {
+      while (ctx.measureText(displaySpecies + '...').width > textMaxWidth && displaySpecies.length > 0) {
+        displaySpecies = displaySpecies.slice(0, -1);
+      }
+      displaySpecies += '...';
+    }
+
+    ctx.fillText(displaySpecies, x + this.padding, currentY);
     currentY += this.lineHeight + 8;
+
+    // Adjust currentY to be below sprite if text is shorter
+    if (spriteSize > this.lineHeight * 2 + 12) {
+      currentY = Math.max(currentY, spriteY + spriteSize + 4);
+    }
 
     // Status Section
     ctx.fillStyle = '#FFFFFF';
@@ -395,6 +445,39 @@ export class AnimalInfoPanel implements IWindowPanel {
       );
       currentY += this.lineHeight + 4;
     }
+
+    // Dev Section - render components with devToolsPanel enabled
+    ctx.fillStyle = '#FFD700';
+    ctx.font = 'bold 12px monospace';
+    ctx.fillText('DEV PANEL', x + this.padding, currentY);
+    currentY += this.lineHeight + 8;
+
+    // Get identity component for dev section
+    const identity = selectedEntity.components.get('identity') as IdentityComponent | undefined;
+
+    // Create render context for dev section (adjust y to current position)
+    const devContext: SectionRenderContext = {
+      ctx,
+      x,
+      y: currentY - this.lineHeight - 8, // Start from dev panel header
+      width: this.panelWidth,
+      height: Math.max(200, visibleHeight - (currentY - scrollY)), // Remaining space
+      padding: this.padding,
+      lineHeight: this.lineHeight,
+    };
+
+    // Temporarily disable scroll in devSection to use our own scroll
+    const savedScrollOffset = this.devSection.getScrollOffset();
+    this.devSection.setScrollOffset(0);
+
+    // Render dev section
+    this.devSection.render(devContext, selectedEntity, identity);
+
+    // Restore scroll offset
+    this.devSection.setScrollOffset(savedScrollOffset);
+
+    // Add space after dev section
+    currentY += 300; // Approximate height for dev section content
 
     // Calculate content height and max scroll
     this.contentHeight = (currentY - scrollY) + this.padding;

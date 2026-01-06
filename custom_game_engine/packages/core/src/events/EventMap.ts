@@ -1033,6 +1033,11 @@ export interface GameEventMap {
     speciesId: string;
     method: string;
   };
+  'agent:reached_home': {
+    agentId: EntityId;
+    bedId: EntityId;
+    timestamp: number;
+  };
   'agent:housed_animal': {
     agentId: EntityId;
     animalId: EntityId;
@@ -1359,6 +1364,17 @@ export interface GameEventMap {
     tier: number;
     generatedBy: EntityId;
     researchContext?: string;
+  };
+  /** God-crafted content discovered in universe (microgenerators) */
+  'godcrafted:discovered': {
+    contentType: 'riddle' | 'spell' | 'recipe' | 'legendary_item' | 'soul' | 'quest';
+    contentId: string;
+    name: string;
+    creatorName: string;
+    creatorDomain: string;
+    lore: string;
+    entityId: EntityId;
+    discoveryMethod: 'random_encounter' | 'location' | 'achievement' | 'quest_reward' | 'divine_gift' | 'research';
   };
   /** LLM-generated technology was approved */
   'research:discovered': {
@@ -1744,7 +1760,9 @@ export interface GameEventMap {
   'llm:request': {
     agentId: EntityId;
     promptLength: number;
-    reason: 'idle' | 'task_complete' | 'periodic' | 'manual';
+    reason: 'idle' | 'task_complete' | 'periodic' | 'manual' | 'talker';
+    /** Which LLM layer is making this request */
+    llmType?: 'executor' | 'talker' | 'standard';
   };
   'llm:response': {
     agentId: EntityId;
@@ -1757,7 +1775,7 @@ export interface GameEventMap {
     decision: string;
     behavior?: string;
     reasoning?: string;
-    source: 'llm' | 'fallback';
+    source: 'llm' | 'fallback' | 'executor' | 'talker';
     /** Raw LLM response text (truncated to 2000 chars for metrics) */
     rawResponse?: string;
     /** Duration of LLM call in milliseconds */
@@ -1766,7 +1784,7 @@ export interface GameEventMap {
   'llm:error': {
     agentId: EntityId;
     error: string;
-    errorType: 'timeout' | 'connection' | 'parse' | 'unknown';
+    errorType: 'timeout' | 'connection' | 'parse' | 'unknown' | 'executor_error' | 'talker_error';
   };
   'agent:llm_context': {
     agentId: EntityId;
@@ -2779,7 +2797,9 @@ export interface GameEventMap {
       text: string;
       tick: number;
       topic: 'examination' | 'purpose' | 'interests' | 'destiny' | 'debate' | 'blessing' | 'curse' | 'finalization';
+      thoughts?: string; // LLM thinking content for debugging
     }>;
+    thoughts?: string; // Compiled Fate reasoning from transcript
   };
 
   // ============================================================================
@@ -3467,6 +3487,16 @@ export interface GameEventMap {
     rejected: number;
   };
 
+  // === Myth Events ===
+  /** A myth's attribution has changed to a different deity */
+  'myth:attribution_changed': {
+    mythId: string;
+    mythTitle: string;
+    originalDeityId: EntityId;
+    newDeityId: EntityId;
+    timestamp: number;
+  };
+
   // === VR System Events ===
   'vr_session:started': {
     sessionId: string;
@@ -3481,6 +3511,248 @@ export interface GameEventMap {
     duration: number;
     scenarioType: string;
     completed: boolean;
+  };
+
+  // === News/Event Reporting Events ===
+  /** Agent was born */
+  'agent:born': {
+    agentId: string;
+    agentName?: string;
+    parentIds?: string[];
+  };
+
+  /** Union/Partnership formed between agents */
+  'union:formed': {
+    agent1Id: string;
+    agent2Id: string;
+    unionType?: string;
+  };
+
+  /** Combat battle started */
+  'combat:battle_started': {
+    participants: string[];
+    location: { x: number; y: number };
+    battleType?: string;
+  };
+
+  /** Combat battle ended */
+  'combat:battle_ended': {
+    participants: string[];
+    victors?: string[];
+    casualties?: string[];
+  };
+
+  /** Building construction completed */
+  'building:completed': {
+    buildingId: string;
+    buildingType: string;
+    location: { x: number; y: number };
+    builderId?: string;
+  };
+
+  /** Disaster occurred */
+  'disaster:occurred': {
+    disasterType: string;
+    location: { x: number; y: number };
+    severity: number;
+    affectedEntities?: string[];
+  };
+
+  /** Invasion started */
+  'invasion:started': {
+    invaderIds: string[];
+    targetLocation: { x: number; y: number };
+    invaderType?: string;
+  };
+
+  /** Festival started */
+  'festival:started': {
+    festivalType: string;
+    location: { x: number; y: number };
+    organizerId?: string;
+    participants?: string[];
+  };
+
+  /** Divine intervention occurred */
+  'divine:intervention': {
+    deityId?: string;
+    interventionType: string;
+    targetId?: string;
+    description?: string;
+  };
+
+  // === Rebellion System Events ===
+  /** Rebellion succeeded completely, Creator destroyed */
+  'rebellion:total_victory': {
+    message: string;
+  };
+
+  /** Rebellion won but at great cost, reality fractured */
+  'rebellion:pyrrhic_victory': {
+    message: string;
+  };
+
+  /** Stalemate resulted in negotiated peace */
+  'rebellion:negotiated_truce': {
+    message: string;
+  };
+
+  /** Creator defeated but no clear successor */
+  'rebellion:power_vacuum': {
+    message: string;
+  };
+
+  /** New tyrant emerged, cycle continues */
+  'rebellion:cycle_repeats': {
+    message: string;
+  };
+
+  /** Creator changed by the rebellion */
+  'rebellion:creator_transformed': {
+    message: string;
+  };
+
+  /** Neither side could gain advantage */
+  'rebellion:stalemate': {
+    message: string;
+  };
+
+  /** Rebellion completely defeated */
+  'rebellion:crushed': {
+    message: string;
+  };
+
+  /** Reality rift created by battle */
+  'rebellion:rift_spawned': {
+    riftId: string;
+    position: { x: number; y: number };
+  };
+
+  /** Warning about dangerous rifts */
+  'rebellion:rifts_warning': {
+    count: number;
+    message: string;
+  };
+
+  /** Rebel leader ascended to godhood */
+  'rebellion:rebel_ascension': {
+    message: string;
+    leaderId?: string;
+  };
+
+  /** New tyrant emerged from rebellion */
+  'rebellion:new_tyrant': {
+    message: string;
+    tyrannId: string;
+  };
+
+  /** World split into territories */
+  'rebellion:territory_divided': {
+    message: string;
+    territories: string[];
+  };
+
+  /** Uneasy peace between factions */
+  'rebellion:cold_war': {
+    message: string;
+    factions: string[];
+  };
+
+  // === Additional Magic Events ===
+  /** All magic restrictions lifted */
+  'magic:liberated': {
+    message: string;
+    level: 'full';
+  };
+
+  /** Magic restrictions reduced */
+  'magic:partially_liberated': {
+    message: string;
+    level: 'partial';
+  };
+
+  /** Agent unlocked a magic skill node */
+  'magic:skill_node_unlocked': {
+    nodeId: string;
+    agentId: string;
+    skillTree: string;
+  };
+
+  /** Spell unlocked via skill tree progression */
+  'magic:spell_unlocked_from_skill_tree': {
+    spellId: string;
+    agentId: string;
+    nodeId: string;
+  };
+
+  // === Additional Building Events ===
+  /** Request to analyze building harmony */
+  'building:analyze_harmony': {
+    buildingId: string;
+  };
+
+  /** Building layout data provided */
+  'building:layout_provided': {
+    buildingId: string;
+    layout: unknown;
+  };
+
+  /** Building harmony analysis completed */
+  'building:harmony_analyzed': {
+    buildingId: string;
+    harmonyScore: number;
+    aestheticScore?: number;
+    functionalScore?: number;
+    spatialScore?: number;
+  };
+
+  // === Additional Agent Events ===
+  /** Agent gained XP */
+  'agent:xp_gained': {
+    agentId: string;
+    skill: string;
+    xp: number;
+    source?: string;
+  };
+
+  /** Agent walking action */
+  'action:walk': {
+    agentId?: string;
+    entityId?: string;
+    position?: { x: number; y: number };
+    destination?: { x: number; y: number };
+  };
+
+  /** Agent emotion reached peak intensity */
+  'agent:emotion_peak': {
+    agentId: string;
+    emotion: string;
+    intensity: number;
+  };
+
+  // === Chat/Communication Events ===
+  /** Chat message sent */
+  'chat:message_sent': {
+    roomId: string;
+    senderId: string;
+    senderName?: string;
+    message?: string;
+    content?: string;
+    timestamp?: number;
+  };
+
+  // === Memory Events ===
+  /** Past life memory bleeding through */
+  'memory_bleed': {
+    agentId: string;
+    memoryFragment?: string;
+    intensity?: number;
+  };
+
+  // === Test Events ===
+  /** Test event for development */
+  'test:event': {
+    [key: string]: unknown;
   };
 }
 

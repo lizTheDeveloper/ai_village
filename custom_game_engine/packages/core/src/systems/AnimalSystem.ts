@@ -10,11 +10,14 @@ import { getAnimalSpecies } from '../data/animalSpecies.js';
 /**
  * AnimalSystem handles animal lifecycle, needs, and state management
  * Priority: 15 (same as NeedsSystem, runs after AI, before Movement)
+ *
+ * @dependencies None - Core lifecycle system that manages animal needs, aging, and state
  */
 export class AnimalSystem implements System {
   public readonly id: SystemId = CT.Animal;
   public readonly priority: number = 15;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Animal];
+  public readonly dependsOn = [] as const;
 
   constructor(_eventBus?: EventBus) {
     // EventBus passed for consistency but not used directly (world.eventBus is used instead)

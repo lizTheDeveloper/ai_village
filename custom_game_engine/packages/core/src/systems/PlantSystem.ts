@@ -11,6 +11,7 @@ import type { PlantSpecies, StageTransition } from '../types/PlantSpecies.js';
 
 import type { EventBus as CoreEventBus } from '../events/EventBus.js';
 import { BugReporter } from '../utils/BugReporter.js';
+import { PLANT_CONSTANTS } from './constants/PlantConstants.js';
 
 /**
  * Soil state interface for planting validation
@@ -31,11 +32,24 @@ interface Environment {
 
 /**
  * PlantSystem manages the plant lifecycle, stage transitions, health updates, and seed production
+ *
+ * Dependencies:
+ * @see TimeSystem (priority 3) - Provides game time for plant growth, aging, and hourly updates
+ * @see WeatherSystem (priority 5) - Provides weather events (rain, frost) affecting plant hydration and health
+ * @see SoilSystem (priority 15) - Provides soil moisture and nutrient data affecting plant growth
  */
 export class PlantSystem implements System {
   public readonly id: SystemId = 'plant';
   public readonly priority = 20; // After SoilSystem, WeatherSystem
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Plant];
+
+  /**
+   * Systems that must run before this one.
+   * @see TimeSystem - provides game time for plant aging and stage transitions
+   * @see WeatherSystem - provides rain/frost events affecting plant hydration and health
+   * @see SoilSystem - provides soil moisture and nutrient data for growth calculations
+   */
+  public readonly dependsOn = ['time', 'weather', 'soil'] as const;
   private eventBus: CoreEventBus;
   private speciesLookup: ((id: string) => PlantSpecies) | null = null;
 
@@ -50,7 +64,7 @@ export class PlantSystem implements System {
 
   // Time tracking for plant updates
   private accumulatedTime: number = 0;
-  private readonly HOUR_THRESHOLD = 24.0; // Update plants once per day
+  private readonly HOUR_THRESHOLD = PLANT_CONSTANTS.HOUR_THRESHOLD; // Update plants once per day
   private lastUpdateLog: number = 0;
 
   // Track entity IDs for plants (to avoid using 'as any')
@@ -125,7 +139,7 @@ export class PlantSystem implements System {
   }
 
   /** Run every 20 ticks (1 second at 20 TPS) - plants don't need per-frame updates */
-  private static readonly UPDATE_INTERVAL = 20;
+  private static readonly UPDATE_INTERVAL = PLANT_CONSTANTS.UPDATE_INTERVAL;
 
   /**
    * Main update loop - runs every frame
@@ -405,8 +419,8 @@ export class PlantSystem implements System {
 
     // Rain increases hydration
     if (this.weatherRainIntensity && !plant.isIndoors) {
-      const hydrationGain = this.weatherRainIntensity === 'heavy' ? 30 :
-                           this.weatherRainIntensity === 'light' ? 10 : 20;
+      const hydrationGain = this.weatherRainIntensity === 'heavy' ? PLANT_CONSTANTS.HYDRATION_GAIN_HEAVY_RAIN :
+                           this.weatherRainIntensity === 'light' ? PLANT_CONSTANTS.HYDRATION_GAIN_LIGHT_RAIN : PLANT_CONSTANTS.HYDRATION_GAIN_MEDIUM_RAIN;
       plant.hydration = Math.min(100, plant.hydration + hydrationGain);
 
     }
@@ -433,8 +447,8 @@ export class PlantSystem implements System {
     }
 
     // Hot weather increases hydration decay
-    if (environment.temperature > 30) {
-      const extraDecay = (environment.temperature - 30) * 0.5;
+    if (environment.temperature > PLANT_CONSTANTS.HEAT_STRESS_THRESHOLD) {
+      const extraDecay = (environment.temperature - PLANT_CONSTANTS.HEAT_STRESS_THRESHOLD) * PLANT_CONSTANTS.HEAT_STRESS_DAMAGE_MULTIPLIER;
       plant.hydration -= extraDecay;
     }
   }
@@ -448,7 +462,7 @@ export class PlantSystem implements System {
     // Update moisture from soil events
     if (this.soilMoistureChanges.has(key)) {
       const soilMoisture = this.soilMoistureChanges.get(key)!;
-      plant.hydration = Math.min(100, plant.hydration + (soilMoisture - 50) * 0.2);
+      plant.hydration = Math.min(100, plant.hydration + (soilMoisture - 50) * PLANT_CONSTANTS.SOIL_MOISTURE_TRANSFER_RATE);
     }
 
     // Update nutrition from soil events
@@ -486,12 +500,12 @@ export class PlantSystem implements System {
     plant.hydration = Math.max(0, plant.hydration);
 
     // Update health based on needs (damage per hour)
-    if (plant.hydration < 20) {
-      plant.health -= (10 / 24) * hoursElapsed; // Dehydration damage
+    if (plant.hydration < PLANT_CONSTANTS.HYDRATION_CRITICAL_THRESHOLD) {
+      plant.health -= (PLANT_CONSTANTS.DEHYDRATION_DAMAGE_PER_DAY / 24) * hoursElapsed; // Dehydration damage
       healthChangeCauses.push(`dehydration (hydration=${plant.hydration.toFixed(0)})`);
     }
-    if (plant.nutrition < 20) {
-      plant.health -= (5 / 24) * hoursElapsed; // Malnutrition damage
+    if (plant.nutrition < PLANT_CONSTANTS.NUTRITION_CRITICAL_THRESHOLD) {
+      plant.health -= (PLANT_CONSTANTS.MALNUTRITION_DAMAGE_PER_DAY / 24) * hoursElapsed; // Malnutrition damage
       healthChangeCauses.push(`malnutrition (nutrition=${plant.nutrition.toFixed(0)})`);
     }
 
@@ -531,7 +545,7 @@ export class PlantSystem implements System {
       data: {
         x: plant.position.x,
         y: plant.position.y,
-        consumed: hourlyGrowth * 2,
+        consumed: hourlyGrowth * PLANT_CONSTANTS.NUTRIENT_CONSUMPTION_MULTIPLIER,
         position: plant.position
       }
     });
@@ -598,31 +612,31 @@ export class PlantSystem implements System {
     const tempRange = species.optimalTemperatureRange ?? [15, 25];
     const [minOptimal, maxOptimal] = tempRange;
 
-    if (temperature < minOptimal - 10 || temperature > maxOptimal + 10) {
-      return 0.1; // Very slow growth outside range
+    if (temperature < minOptimal - PLANT_CONSTANTS.TEMPERATURE_EXTREME_THRESHOLD || temperature > maxOptimal + PLANT_CONSTANTS.TEMPERATURE_EXTREME_THRESHOLD) {
+      return PLANT_CONSTANTS.TEMPERATURE_PENALTY_EXTREME; // Very slow growth outside range
     }
 
     if (temperature >= minOptimal && temperature <= maxOptimal) {
-      return 1.0; // Optimal growth
+      return PLANT_CONSTANTS.TEMPERATURE_BONUS_OPTIMAL; // Optimal growth
     }
 
-    return 0.5; // Suboptimal but still grows
+    return PLANT_CONSTANTS.TEMPERATURE_PENALTY_SUBOPTIMAL; // Suboptimal but still grows
   }
 
   /**
    * Calculate moisture growth modifier
    */
   private calculateMoistureModifier(_plant: PlantComponent, moisture: number): number {
-    if (moisture < 20) {
-      return 0.2; // Very slow growth when dry
+    if (moisture < PLANT_CONSTANTS.MOISTURE_THRESHOLD_DRY) {
+      return PLANT_CONSTANTS.MOISTURE_PENALTY_DRY; // Very slow growth when dry
     }
-    if (moisture > 90) {
-      return 0.7; // Overwatered
+    if (moisture > PLANT_CONSTANTS.MOISTURE_THRESHOLD_OVERWATERED) {
+      return PLANT_CONSTANTS.MOISTURE_PENALTY_OVERWATERED; // Overwatered
     }
-    if (moisture >= 50 && moisture <= 80) {
-      return 1.0; // Optimal
+    if (moisture >= PLANT_CONSTANTS.MOISTURE_THRESHOLD_OPTIMAL_MIN && moisture <= PLANT_CONSTANTS.MOISTURE_THRESHOLD_OPTIMAL_MAX) {
+      return PLANT_CONSTANTS.MOISTURE_BONUS_OPTIMAL; // Optimal
     }
-    return 0.6; // Suboptimal
+    return PLANT_CONSTANTS.MOISTURE_PENALTY_SUBOPTIMAL; // Suboptimal
   }
 
   /**
@@ -738,7 +752,7 @@ export class PlantSystem implements System {
           break;
 
         case 'produce_seeds': {
-          const seedCount = species.seedsPerPlant ?? 5; // Default 5 seeds if not specified
+          const seedCount = species.seedsPerPlant ?? PLANT_CONSTANTS.DEFAULT_SEEDS_PER_PLANT; // Default seeds if not specified
           const yieldModifier = applyGenetics(plant, 'yield');
           const calculatedSeeds = Math.floor(seedCount * yieldModifier);
 
@@ -793,7 +807,7 @@ export class PlantSystem implements System {
     if (plant.stage === 'seeding' && plant.seedsProduced > 0) {
       // Gradually disperse seeds (only if not all dispersed via transition effect)
       // Transition effects already handle drop_seeds, so this is just for gradual dispersal
-      const seedsToDrop = Math.max(1, Math.floor(plant.seedsProduced * 0.1)); // 10% per hour, not 30%
+      const seedsToDrop = Math.max(1, Math.floor(plant.seedsProduced * PLANT_CONSTANTS.SEED_DISPERSAL_RATE_PER_HOUR)); // Per hour
       if (seedsToDrop > 0) {
         plant.seedsProduced -= seedsToDrop;
         this.disperseSeeds(plant, species, world, seedsToDrop);
@@ -813,14 +827,14 @@ export class PlantSystem implements System {
     // Get entity ID for seed creation
     const entityId = this.plantEntityIds.get(plant) || `plant_${Date.now()}`;
 
-    const seedsToDrop = count ?? Math.floor(plant.seedsProduced * 0.3);
+    const seedsToDrop = count ?? Math.floor(plant.seedsProduced * PLANT_CONSTANTS.SEED_BURST_DISPERSAL_RATE);
 
     // If no seeds to drop, return early
     if (seedsToDrop === 0) {
       return;
     }
 
-    const dispersalRadius = species.seedDispersalRadius ?? 3; // Default 3 tiles dispersal radius
+    const dispersalRadius = species.seedDispersalRadius ?? PLANT_CONSTANTS.DEFAULT_DISPERSAL_RADIUS; // Default dispersal radius
     for (let i = 0; i < seedsToDrop; i++) {
       // Random position near parent
       const angle = Math.random() * Math.PI * 2;
@@ -901,7 +915,7 @@ export class PlantSystem implements System {
     }
 
     // Check soil quality if tilled
-    if (tile.terrain === 'tilled_soil' && tile.fertility !== undefined && tile.fertility < 0.2) {
+    if (tile.terrain === 'tilled_soil' && tile.fertility !== undefined && tile.fertility < PLANT_CONSTANTS.SOIL_FERTILITY_LOW_THRESHOLD) {
       return false; // Soil too depleted
     }
 
@@ -944,7 +958,7 @@ export class PlantSystem implements System {
     soilState: SoilState
   ): boolean {
     // Check soil nutrients
-    if (soilState.nutrients < 10) {
+    if (soilState.nutrients < PLANT_CONSTANTS.SOIL_NUTRIENT_LOW_THRESHOLD) {
       return false; // Too depleted
     }
 
@@ -969,13 +983,13 @@ export class PlantSystem implements System {
   // ============================================
 
   /** Radius to check for companion plants (in tiles) */
-  private static readonly COMPANION_RADIUS = 3;
+  private static readonly COMPANION_RADIUS = PLANT_CONSTANTS.COMPANION_RADIUS;
 
   /** Bonus growth rate from beneficial companion */
-  private static readonly COMPANION_BONUS = 0.15;
+  private static readonly COMPANION_BONUS = PLANT_CONSTANTS.COMPANION_BONUS;
 
   /** Penalty growth rate from harmful companion */
-  private static readonly COMPANION_PENALTY = 0.20;
+  private static readonly COMPANION_PENALTY = PLANT_CONSTANTS.COMPANION_PENALTY;
 
   /** Cache of nearby plants per position (cleared each update) */
   private nearbyPlantsCache: Map<string, Array<{ speciesId: string; distance: number }>> = new Map();
@@ -1198,12 +1212,12 @@ export class PlantSystem implements System {
       if (!canRegenerate) continue;
 
       // Must be healthy enough to produce fruit
-      if (plant.health < 50) continue;
+      if (plant.health < PLANT_CONSTANTS.HEALTH_UNHEALTHY_THRESHOLD) continue;
 
       // Get species to determine base fruit production
       try {
         const species = this.getSpecies(plant.speciesId);
-      const seedsPerPlant = species.seedsPerPlant ?? 5; // Default 5 seeds if not specified
+      const seedsPerPlant = species.seedsPerPlant ?? PLANT_CONSTANTS.DEFAULT_SEEDS_PER_PLANT; // Default seeds if not specified
 
       // Calculate fruit regeneration based on health and genetics
       // Base: seedsPerPlant / 3 (fruit is less than seeds typically)

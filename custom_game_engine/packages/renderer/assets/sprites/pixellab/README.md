@@ -1,6 +1,6 @@
 # PixelLab Character Sprites
 
-Downloaded character sprites from PixelLab.ai for the AI Village game.
+Downloaded character sprites from PixelLab.ai for Multiverse: The End of Eternity game.
 
 ## Downloaded Characters (2026-01-01)
 

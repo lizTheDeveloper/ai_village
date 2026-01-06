@@ -607,7 +607,7 @@ export class SettingsPanel implements IWindowPanel {
       text-align: center;
     `;
     if (this.isFirstRun) {
-      helpText.innerHTML = '🎮 <strong>Welcome to AI Village!</strong> Select a scenario preset to see how different starting conditions create wildly different emergent behaviors.';
+      helpText.innerHTML = '🎮 <strong>Welcome to Multiverse: The End of Eternity!</strong> Select a scenario preset to see how different starting conditions create wildly different emergent behaviors.';
       helpText.style.color = '#8a8aaa';
     } else {
       helpText.textContent = 'Changes take effect immediately. Page reload recommended for clean state.';

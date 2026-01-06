@@ -228,8 +228,6 @@ export class ExplorationSystem implements System {
       ];
 
       for (const neighbor of neighbors) {
-        if (neighbor.x < 0 || neighbor.y < 0) continue;
-
         const neighborKey = `${neighbor.x},${neighbor.y}`;
         if (!explored.has(neighborKey) && !checked.has(neighborKey)) {
           checked.add(neighborKey);

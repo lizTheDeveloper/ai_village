@@ -18,7 +18,7 @@ CLAIMED: window-manager
 
 ## Overview
 
-Window management system for AI Village game that handles multiple UI panels, preventing overlap, allowing user rearrangement, and persisting window positions.
+Window management system for Multiverse: The End of Eternity game that handles multiple UI panels, preventing overlap, allowing user rearrangement, and persisting window positions.
 
 **Key Features:**
 - Non-overlapping window layout

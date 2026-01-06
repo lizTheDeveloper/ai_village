@@ -1,0 +1,35 @@
+{
+  "name": "@ai-village/shared-worker",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./worker": {
+      "types": "./src/shared-universe-worker.ts",
+      "default": "./src/shared-universe-worker.ts"
+    },
+    "./client": {
+      "types": "./src/universe-client.ts",
+      "default": "./src/universe-client.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@ai-village/core": "*",
+    "@ai-village/world": "*",
+    "dexie": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/serviceworker": "^0.0.95"
+  }
+}

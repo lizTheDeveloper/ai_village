@@ -27,11 +27,14 @@ interface BehaviorWeights {
 
 /**
  * IdleBehaviorSystem selects varied idle behaviors based on personality and mood
+ *
+ * @dependencies None - Reads personality and needs to select idle actions
  */
 export class IdleBehaviorSystem implements System {
   public readonly id: SystemId = 'idle_behavior';
   public readonly priority = 15; // Run after needs system
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [];
+  public readonly dependsOn = [] as const;
 
   update(world: World): void {
     // Get all entities

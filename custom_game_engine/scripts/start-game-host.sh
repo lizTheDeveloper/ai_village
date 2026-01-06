@@ -121,20 +121,21 @@ start_pixellab_daemon
 start_api_server
 start_dev_server
 
-# Open browser (platform-specific)
+# Open browser to landing page (platform-specific)
 echo ""
-echo "Opening browser..."
+echo "Opening browser to central hub..."
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  open http://localhost:3000 2>/dev/null || true
+  open http://localhost:3000/hub.html 2>/dev/null || true
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  xdg-open http://localhost:3000 2>/dev/null || echo "Please open http://localhost:3000 in your browser"
+  xdg-open http://localhost:3000/hub.html 2>/dev/null || echo "Please open http://localhost:3000/hub.html in your browser"
 else
-  echo "Please open http://localhost:3000 in your browser"
+  echo "Please open http://localhost:3000/hub.html in your browser"
 fi
 
 echo ""
 echo "=== AI Village Running ==="
 echo ""
+echo "Central Hub:   http://localhost:3000/hub.html"
 echo "Game:          http://localhost:3000"
 echo "API:           http://localhost:3001"
 echo "Admin Console: http://localhost:8766/admin"

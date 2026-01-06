@@ -10,8 +10,8 @@
  * - Mana display
  */
 
-import type { SpellDefinition, PlayerSpellState } from '@ai-village/core';
-import { getSpellRegistry, getMagicSystemState } from '@ai-village/core';
+import type { SpellDefinition, PlayerSpellState } from '@ai-village/magic';
+import { getSpellRegistry, getMagicSystemState } from '@ai-village/magic';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
 // ============================================================================

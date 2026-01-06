@@ -7,10 +7,22 @@ import { EntityImpl } from '../ecs/Entity.js';
 import type { WeatherComponent } from '../components/WeatherComponent.js';
 import type { WeatherType } from '../components/WeatherComponent.js';
 
+/**
+ * WeatherSystem - Weather pattern simulation
+ *
+ * Dependencies:
+ * @see TimeSystem (priority 3) - Provides time tracking for weather duration and transitions
+ */
 export class WeatherSystem implements System {
   public readonly id: SystemId = CT.Weather;
   public readonly priority: number = 5; // Run early, before temperature system
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Weather];
+
+  /**
+   * Systems that must run before this one.
+   * @see TimeSystem - provides time tracking for weather transitions
+   */
+  public readonly dependsOn = ['time'] as const;
 
   private readonly WEATHER_TRANSITION_CHANCE = 0.01; // 1% chance per update to transition
   private readonly MIN_WEATHER_DURATION = 60; // Minimum 60 seconds per weather state

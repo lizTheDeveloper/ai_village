@@ -45,6 +45,9 @@ export interface AnimalSpecies {
   tameDifficulty: number; // 0-100, higher = harder to tame
   preferredFood: string[]; // Item IDs for taming
 
+  // Intelligence
+  intelligence: number; // 0-1, brain complexity/cognitive capability
+
   // Temperature comfort range (Celsius)
   minComfortTemp: number;
   maxComfortTemp: number;
@@ -87,6 +90,8 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
     tameDifficulty: 10,
     preferredFood: ['grain', 'seeds', 'corn'],
 
+    intelligence: 0.3, // Simple bird
+
     minComfortTemp: 0,
     maxComfortTemp: 35,
 
@@ -122,6 +127,8 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
 
     tameDifficulty: 20,
     preferredFood: ['grass', 'hay', 'grain'],
+
+    intelligence: 0.4, // Herd animal with some social intelligence
 
     minComfortTemp: -10,
     maxComfortTemp: 30,
@@ -159,6 +166,8 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
     tameDifficulty: 15,
     preferredFood: ['grass', 'hay', 'grain'],
 
+    intelligence: 0.35, // Herd animal, less intelligent than cow
+
     minComfortTemp: -5,
     maxComfortTemp: 30,
 
@@ -194,6 +203,8 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
 
     tameDifficulty: 40,
     preferredFood: ['hay', 'oats', 'apple', 'carrot'],
+
+    intelligence: 0.55, // Working animal, reasonably intelligent
 
     minComfortTemp: -10,
     maxComfortTemp: 35,
@@ -231,6 +242,8 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
     tameDifficulty: 25,
     preferredFood: ['meat', 'bone', 'food'],
 
+    intelligence: 0.6, // Canid, medium-high intelligence
+
     minComfortTemp: -15,
     maxComfortTemp: 35,
 
@@ -266,6 +279,8 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
 
     tameDifficulty: 35,
     preferredFood: ['fish', 'meat'],
+
+    intelligence: 0.6, // Feline, medium-high intelligence
 
     minComfortTemp: -5,
     maxComfortTemp: 35,
@@ -303,6 +318,8 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
     tameDifficulty: 30,
     preferredFood: ['carrot', 'lettuce', 'grass'],
 
+    intelligence: 0.35, // Small mammal
+
     minComfortTemp: -10,
     maxComfortTemp: 30,
 
@@ -338,6 +355,8 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
 
     tameDifficulty: 80, // Very hard to tame
     preferredFood: ['grass', 'leaves', 'berries'],
+
+    intelligence: 0.45, // Wild herbivore, moderately intelligent
 
     minComfortTemp: -20,
     maxComfortTemp: 30,
@@ -375,6 +394,8 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
     tameDifficulty: 20,
     preferredFood: ['grain', 'vegetable', 'food'],
 
+    intelligence: 0.5, // Medium intelligence
+
     minComfortTemp: -5,
     maxComfortTemp: 32,
 
@@ -410,6 +431,8 @@ export const ANIMAL_SPECIES: Record<string, AnimalSpecies> = {
 
     tameDifficulty: 18,
     preferredFood: ['grass', 'hay', 'leaves'],
+
+    intelligence: 0.45, // Similar to sheep but slightly smarter
 
     minComfortTemp: -10,
     maxComfortTemp: 35,

@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Culinary Experiments - Multiverse: The End of Eternity Microgenerator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: linear-gradient(135deg, #2d1810 0%, #4a2c1a 100%);
+      color: #eee;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(60, 40, 30, 0.9);
+      border: 2px solid #d2691e;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(210, 105, 30, 0.3);
+    }
+
+    h1 {
+      text-align: center;
+      color: #ff8c42;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(255, 140, 66, 0.5);
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #aaa;
+      font-style: italic;
+      margin-bottom: 30px;
+      font-size: 0.95em;
+    }
+
+    .section {
+      margin-bottom: 25px;
+      padding: 20px;
+      background: rgba(40, 30, 20, 0.5);
+      border-radius: 8px;
+      border-left: 4px solid #d2691e;
+    }
+
+    .section-title {
+      color: #ff8c42;
+      font-size: 1.2em;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+    }
+
+    .section-title::before {
+      content: '🍳';
+      margin-right: 10px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #ccc;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #555;
+      border-radius: 5px;
+      color: #eee;
+      font-family: inherit;
+      font-size: 1em;
+      margin-bottom: 15px;
+      transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #ff8c42;
+    }
+
+    textarea {
+      min-height: 60px;
+      resize: vertical;
+    }
+
+    .ingredient-input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .ingredient-input-group input[type="text"] {
+      flex: 2;
+      margin-bottom: 0;
+    }
+
+    .ingredient-input-group input[type="number"] {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    .ingredient-input-group button {
+      padding: 12px 20px;
+      background: #d2691e;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+      white-space: nowrap;
+    }
+
+    .ingredient-input-group button:hover {
+      background: #ff8c42;
+    }
+
+    .ingredient-list {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      min-height: 60px;
+    }
+
+    .ingredient-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: rgba(210, 105, 30, 0.2);
+      border-radius: 5px;
+      margin-bottom: 8px;
+    }
+
+    .ingredient-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .ingredient-item .name {
+      font-weight: bold;
+      color: #ff8c42;
+    }
+
+    .ingredient-item .amount {
+      color: #ccc;
+      margin-left: 10px;
+    }
+
+    .ingredient-item .remove {
+      cursor: pointer;
+      color: #f88;
+      font-weight: bold;
+      padding: 0 8px;
+    }
+
+    button.primary {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #d2691e 0%, #ff8c42 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    button.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(210, 105, 30, 0.4);
+    }
+
+    button.primary:active {
+      transform: translateY(0);
+    }
+
+    button.primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .divine-signature {
+      background: rgba(255, 140, 66, 0.1);
+      border: 1px dashed #ff8c42;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 20px;
+      text-align: center;
+      font-style: italic;
+      color: #ff8c42;
+    }
+
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background: rgba(255, 140, 66, 0.1);
+      border: 2px solid #ff8c42;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .result.show {
+      display: block;
+      animation: fadeIn 0.5s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result h3 {
+      color: #ff8c42;
+      margin-bottom: 15px;
+    }
+
+    .recipe-details {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      border-radius: 5px;
+      margin: 10px 0;
+    }
+
+    .recipe-property {
+      margin-bottom: 10px;
+    }
+
+    .recipe-property strong {
+      color: #ff8c42;
+    }
+
+    .error {
+      background: rgba(255, 0, 0, 0.2);
+      border: 1px solid #f00;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 15px;
+      display: none;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    .help-text {
+      font-size: 0.9em;
+      color: #aaa;
+      margin-top: -10px;
+      margin-bottom: 15px;
+    }
+
+    .warning {
+      background: rgba(255, 165, 0, 0.2);
+      border: 1px solid #ffa500;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .warning.show {
+      display: block;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .back-link a {
+      color: #ff8c42;
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    .empty-ingredients {
+      color: #888;
+      font-style: italic;
+      text-align: center;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🍳 Culinary Experiments</h1>
+    <p class="subtitle">Combine ingredients to create recipes for food, potions, and more</p>
+
+    <form id="recipeForm">
+      <!-- Divine Signature -->
+      <div class="section">
+        <div class="section-title">Divine Identity</div>
+        <label for="creatorName">Your Name</label>
+        <input type="text" id="creatorName" required placeholder="Enter your name...">
+
+        <label for="godOf">God of...</label>
+        <input type="text" id="godOf" required placeholder="Culinary Arts">
+        <p class="help-text">Declare your divine domain</p>
+
+        <div class="divine-signature" id="signaturePreview">
+          "Crafted by <span id="previewName">Your Name</span>, God of <span id="previewGodOf">Your Domain</span>"
+        </div>
+      </div>
+
+      <!-- Recipe Configuration -->
+      <div class="section">
+        <div class="section-title">Recipe Configuration</div>
+
+        <label for="recipeName">Recipe Name (optional)</label>
+        <input type="text" id="recipeName" placeholder="Leave blank for AI to name">
+
+        <label for="recipeType">Recipe Type</label>
+        <select id="recipeType" required>
+          <option value="food">Food - Edible consumables</option>
+          <option value="potion">Potion - Magical drinks</option>
+          <option value="clothing">Clothing - Wearable items</option>
+          <option value="art">Art - Decorative objects</option>
+          <option value="tool">Tool - Functional items</option>
+          <option value="custom">Custom - Other creations</option>
+        </select>
+
+        <label for="intent">What should this recipe create?</label>
+        <textarea id="intent" placeholder="e.g., 'A healing potion', 'A warm winter coat', 'A powerful weapon'"></textarea>
+      </div>
+
+      <!-- Ingredients -->
+      <div class="section">
+        <div class="section-title">Ingredients</div>
+
+        <label>Add Ingredient</label>
+        <div class="ingredient-input-group">
+          <input type="text" id="ingredientName" placeholder="Ingredient name">
+          <input type="number" id="ingredientAmount" min="1" value="1" placeholder="Amount">
+          <button type="button" id="addIngredientBtn">Add</button>
+        </div>
+        <p class="help-text">Add the ingredients you want to combine (at least one required)</p>
+
+        <label>Ingredients List</label>
+        <div class="ingredient-list" id="ingredientsList">
+          <div class="empty-ingredients">No ingredients added yet</div>
+        </div>
+        <div id="ingredientWarning" class="warning">⚠️ More than 10 ingredients may be difficult to acquire!</div>
+      </div>
+
+      <!-- Optional Parameters -->
+      <div class="section">
+        <div class="section-title">Optional Parameters</div>
+
+        <label for="chefStyle">Chef Style/Personality</label>
+        <input type="text" id="chefStyle" placeholder="e.g., 'rustic farmer', 'alchemist experimenter'">
+
+        <label for="giftRecipient">Creating for (recipient)</label>
+        <input type="text" id="giftRecipient" placeholder="e.g., 'the village elder', 'a weary traveler'">
+      </div>
+
+      <button type="submit" class="primary" id="generateBtn">🔮 Create Recipe</button>
+    </form>
+
+    <!-- Result Display -->
+    <div id="result" class="result">
+      <h3>✨ Recipe Created!</h3>
+      <div class="recipe-details" id="recipeDetails"></div>
+      <p id="recipeSignature" style="margin-top: 15px; font-style: italic; color: #aaa;"></p>
+    </div>
+
+    <!-- Error Display -->
+    <div id="error" class="error">
+      <strong>Error:</strong> <span id="errorMessage"></span>
+    </div>
+
+    <div class="back-link">
+      <a href="/microgen">← Back to Microgenerators</a>
+    </div>
+  </div>
+
+  <script>
+    // Ingredients management
+    const ingredients = [];
+
+    function addIngredient() {
+      const nameInput = document.getElementById('ingredientName');
+      const amountInput = document.getElementById('ingredientAmount');
+
+      const name = nameInput.value.trim();
+      const amount = parseInt(amountInput.value);
+
+      if (!name) return;
+      if (amount < 1) return;
+
+      // Check if ingredient already exists
+      if (ingredients.some(ing => ing.name === name)) {
+        document.getElementById('errorMessage').textContent = 'Ingredient already added';
+        document.getElementById('error').classList.add('show');
+        setTimeout(() => {
+          document.getElementById('error').classList.remove('show');
+        }, 3000);
+        return;
+      }
+
+      ingredients.push({ name, amount });
+      updateIngredientsList();
+
+      // Clear inputs
+      nameInput.value = '';
+      amountInput.value = '1';
+      nameInput.focus();
+    }
+
+    function removeIngredient(index) {
+      ingredients.splice(index, 1);
+      updateIngredientsList();
+    }
+
+    function updateIngredientsList() {
+      const listElement = document.getElementById('ingredientsList');
+      const warningElement = document.getElementById('ingredientWarning');
+
+      if (ingredients.length === 0) {
+        listElement.innerHTML = '<div class="empty-ingredients">No ingredients added yet</div>';
+        warningElement.classList.remove('show');
+        return;
+      }
+
+      listElement.innerHTML = ingredients.map((ing, index) => `
+        <div class="ingredient-item">
+          <div>
+            <span class="name">${ing.name}</span>
+            <span class="amount">(${ing.amount}x)</span>
+          </div>
+          <span class="remove" onclick="removeIngredient(${index})">×</span>
+        </div>
+      `).join('');
+
+      // Show warning if too many ingredients
+      if (ingredients.length > 10) {
+        warningElement.classList.add('show');
+      } else {
+        warningElement.classList.remove('show');
+      }
+    }
+
+    document.getElementById('addIngredientBtn').addEventListener('click', addIngredient);
+
+    document.getElementById('ingredientName').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addIngredient();
+      }
+    });
+
+    document.getElementById('ingredientAmount').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addIngredient();
+      }
+    });
+
+    // Update divine signature preview
+    const nameInput = document.getElementById('creatorName');
+    const godOfInput = document.getElementById('godOf');
+    const previewName = document.getElementById('previewName');
+    const previewGodOf = document.getElementById('previewGodOf');
+
+    nameInput.addEventListener('input', () => {
+      previewName.textContent = nameInput.value || 'Your Name';
+    });
+
+    godOfInput.addEventListener('input', () => {
+      previewGodOf.textContent = godOfInput.value || 'Your Domain';
+    });
+
+    // Form submission
+    document.getElementById('recipeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const generateBtn = document.getElementById('generateBtn');
+      const result = document.getElementById('result');
+      const error = document.getElementById('error');
+
+      // Validation
+      if (ingredients.length === 0) {
+        document.getElementById('errorMessage').textContent = 'At least one ingredient is required';
+        error.classList.add('show');
+        return;
+      }
+
+      // Hide previous results
+      result.classList.remove('show');
+      error.classList.remove('show');
+
+      // Disable button
+      generateBtn.disabled = true;
+      generateBtn.textContent = '⏳ Creating Recipe...';
+
+      try {
+        // Build request payload
+        const payload = {
+          creator: {
+            id: `creator_${Date.now()}`,
+            name: nameInput.value,
+            godOf: godOfInput.value,
+            createdAt: Date.now(),
+            source: 'microgenerator',
+            previousCreations: 0,
+          },
+          tags: ['recipe', document.getElementById('recipeType').value, ...ingredients.map(i => i.name)],
+          data: {
+            name: document.getElementById('recipeName').value || undefined,
+            type: document.getElementById('recipeType').value,
+            ingredients: ingredients,
+            intent: document.getElementById('intent').value || undefined,
+            chefStyle: document.getElementById('chefStyle').value || undefined,
+            giftRecipient: document.getElementById('giftRecipient').value || undefined,
+          },
+        };
+
+        // Call API
+        const response = await fetch('/api/recipe/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Display recipe
+          const recipe = data.recipe.data;
+
+          let detailsHTML = `
+            <div class="recipe-property"><strong>Name:</strong> ${recipe.name}</div>
+            <div class="recipe-property"><strong>Recipe ID:</strong> ${recipe.recipeId}</div>
+            <div class="recipe-property"><strong>Type:</strong> ${recipe.type}</div>
+            <div class="recipe-property"><strong>Output:</strong> ${recipe.outputAmount}x ${recipe.item.category}</div>
+            <div class="recipe-property"><strong>Crafting Time:</strong> ${recipe.craftingTime}s</div>
+            ${recipe.stationRequired ? `<div class="recipe-property"><strong>Station Required:</strong> ${recipe.stationRequired}</div>` : ''}
+          `;
+
+          detailsHTML += `<div class="recipe-property"><strong>Ingredients:</strong><ul style="margin-left: 20px; margin-top: 5px;">`;
+          recipe.ingredients.forEach(ing => {
+            detailsHTML += `<li>${ing.amount}x ${ing.itemId}</li>`;
+          });
+          detailsHTML += `</ul></div>`;
+
+          detailsHTML += `
+            <div class="recipe-property"><strong>Item Properties:</strong>
+              <ul style="margin-left: 20px; margin-top: 5px;">
+                <li>Category: ${recipe.item.category}</li>
+                <li>Weight: ${recipe.item.weight} kg</li>
+                <li>Stack Size: ${recipe.item.stackSize}</li>
+                <li>Base Value: ${recipe.item.baseValue} gold</li>
+                <li>Rarity: ${recipe.item.rarity}</li>
+              </ul>
+            </div>
+          `;
+
+          if (recipe.item.properties && Object.keys(recipe.item.properties).length > 0) {
+            detailsHTML += `<div class="recipe-property"><strong>Special Properties:</strong><ul style="margin-left: 20px; margin-top: 5px;">`;
+            for (const [key, value] of Object.entries(recipe.item.properties)) {
+              detailsHTML += `<li>${key}: ${value}</li>`;
+            }
+            detailsHTML += `</ul></div>`;
+          }
+
+          detailsHTML += `<div class="recipe-property"><strong>Creativity Score:</strong> ${recipe.creativityScore}/100</div>`;
+
+          document.getElementById('recipeDetails').innerHTML = detailsHTML;
+          document.getElementById('recipeSignature').textContent =
+            `Crafted by ${payload.creator.name}, God of ${payload.creator.godOf}`;
+
+          result.classList.add('show');
+        } else {
+          throw new Error(data.error || 'Unknown error');
+        }
+      } catch (err) {
+        document.getElementById('errorMessage').textContent = err.message;
+        error.classList.add('show');
+      } finally {
+        generateBtn.disabled = false;
+        generateBtn.textContent = '🔮 Create Recipe';
+      }
+    });
+  </script>
+</body>
+</html>

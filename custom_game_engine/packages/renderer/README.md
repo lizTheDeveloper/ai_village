@@ -1,6 +1,6 @@
 # @ai-village/renderer
 
-Real-time game rendering system for AI Village. Renders the 2D top-down world using HTML5 Canvas with a clean separation between game state and visual presentation.
+Real-time game rendering system for Multiverse: The End of Eternity. Renders the 2D top-down world using HTML5 Canvas with a clean separation between game state and visual presentation.
 
 ## Architecture Overview
 

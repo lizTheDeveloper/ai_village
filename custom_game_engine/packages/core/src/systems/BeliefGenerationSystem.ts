@@ -60,7 +60,9 @@ export class BeliefGenerationSystem implements System {
     return divineConfig?.beliefEconomy;
   }
 
-  update(_world: World, entities: ReadonlyArray<Entity>, currentTick: number): void {
+  update(_world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+    const currentTick = _world.tick;
+
     // Throttle: Only update once per second
     if (currentTick - this.lastUpdateTick < this.updateInterval) {
       return;
@@ -82,6 +84,17 @@ export class BeliefGenerationSystem implements System {
   private _processDeity(deityEntity: Entity, allEntities: ReadonlyArray<Entity>, currentTick: number): void {
     const deityComp = deityEntity.components.get(CT.Deity) as DeityComponent;
     if (!deityComp) return;
+
+    // Fix believers Set if it was corrupted by serialization
+    if (!(deityComp.believers instanceof Set)) {
+      // If believers was serialized, it's either an object {} or an array
+      if (Array.isArray(deityComp.believers)) {
+        deityComp.believers = new Set(deityComp.believers);
+      } else {
+        // Plain object - convert to empty Set (will be repopulated below)
+        deityComp.believers = new Set();
+      }
+    }
 
     // Get belief economy config for multipliers
     const beliefConfig = this.getBeliefEconomyConfig();
@@ -108,16 +121,43 @@ export class BeliefGenerationSystem implements System {
       const beliefAmount = this._generateBeliefFromAgent(believerEntity, currentTick, beliefConfig);
       if (beliefAmount > 0) {
         totalBeliefGenerated += beliefAmount;
-        deityComp.addBelief(beliefAmount, currentTick);
+
+        // Directly manipulate belief state (methods may be missing due to serialization)
+        if (typeof deityComp.addBelief === 'function') {
+          deityComp.addBelief(beliefAmount, currentTick);
+        } else {
+          // Fallback: directly update belief state
+          deityComp.belief.currentBelief += beliefAmount;
+          deityComp.belief.totalBeliefEarned += beliefAmount;
+          deityComp.belief.lastActivityTick = currentTick;
+        }
       }
     }
 
     // Update belief generation rate
-    deityComp.updateBeliefRate(totalBeliefGenerated * this.updateInterval); // Convert to per-tick rate
+    if (typeof deityComp.updateBeliefRate === 'function') {
+      deityComp.updateBeliefRate(totalBeliefGenerated * this.updateInterval);
+    } else {
+      // Fallback: directly update rate
+      deityComp.belief.beliefPerTick = totalBeliefGenerated * this.updateInterval;
+      deityComp.belief.peakBeliefRate = Math.max(deityComp.belief.peakBeliefRate, deityComp.belief.beliefPerTick);
+    }
 
     // Apply decay with config multiplier
     const decayMultiplier = beliefConfig?.decayMultiplier ?? 1.0;
-    deityComp.applyDecay(currentTick, decayMultiplier);
+    if (typeof deityComp.applyDecay === 'function') {
+      deityComp.applyDecay(currentTick, decayMultiplier);
+    } else {
+      // Fallback: manually apply decay
+      const ticksSinceActivity = currentTick - deityComp.belief.lastActivityTick;
+      let decay = deityComp.belief.decayRate;
+      if (ticksSinceActivity > 2400) {
+        decay *= 5;
+      }
+      decay *= decayMultiplier;
+      const decayAmount = deityComp.belief.currentBelief * decay;
+      deityComp.belief.currentBelief = Math.max(0, deityComp.belief.currentBelief - decayAmount);
+    }
 
     // Emit event if belief was generated
     if (totalBeliefGenerated > 0 && this.eventBus) {

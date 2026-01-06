@@ -303,10 +303,24 @@ export class BuildingSystem implements System {
    * NOTE: Governance buildings (town halls, census bureaus, etc.) are now multi-tile
    * structures using TileBasedBlueprintRegistry. This method is a no-op for single-tile
    * furniture/workstations. Governance functionality has moved to the tile-based system.
+   *
+   * EXCEPTION: University buildings still need UniversityComponent for backwards compatibility
+   * with tests until fully migrated to tile-based system.
    */
   private addGovernanceComponent(entity: EntityImpl, buildingType: string, world: World): void {
-    // No governance buildings in single-tile BuildingType enum anymore
-    // All governance buildings use TileBasedBlueprintRegistry
+    // Special case: Add UniversityComponent for university buildings
+    if (buildingType === 'university') {
+      const universityComp = createUniversityComponent(
+        'University',
+        entity.id,
+        world.tick
+      );
+      entity.addComponent(universityComp);
+      return;
+    }
+
+    // No other governance buildings in single-tile BuildingType enum anymore
+    // All other governance buildings use TileBasedBlueprintRegistry
   }
 
   /**

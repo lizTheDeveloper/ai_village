@@ -240,11 +240,11 @@ export type {
   StressState,
 } from './MoodComponent.js';
 export type {
-  InjuryType,
-  InjurySeverity,
-  Injury,
+  NeedsInjuryType,
+  NeedsInjurySeverity,
+  NeedsInjury,
   BodyPartId,
-  BodyPart,
+  NeedsBodyPart,
 } from './NeedsComponent.js';
 // Magic system types (forward-compatibility - Phase 30)
 export type {
@@ -316,7 +316,7 @@ export type {
   AlleleExpression,
   GeneticAllele,
   HereditaryModification,
-  ModificationSource,
+  GeneticModificationSource,
 } from './GeneticComponent.js';
 // Realm system components
 export type { RealmComponent } from './RealmComponent.js';
@@ -401,6 +401,8 @@ export * from './InjuryComponent.js';
 export { createInjuryComponent } from './InjuryComponent.js';
 export * from './ManchiComponent.js';
 export * from './PackCombatComponent.js';
+export * from './ThreatDetectionComponent.js';
+export { createThreatDetectionComponent } from './ThreatDetectionComponent.js';
 export * from './SupremeCreatorComponent.js';
 
 // Building-specific Components
@@ -723,3 +725,20 @@ export type {
   CorruptedUniverseComponent,
   UniverseEra,
 } from './UniverseMetadataComponent.js';
+
+// Parenting component
+export * from './ParentingComponent.js';
+export {
+  ParentingComponent,
+  createParentingComponent,
+} from './ParentingComponent.js';
+export type {
+  ParentingResponsibility,
+  ParentingDriveLevel,
+  ParentingReputation,
+} from './ParentingComponent.js';
+
+// Divine Chat component
+export * from './DivineChatComponent.js';
+export type { DivineChatComponent } from './DivineChatComponent.js';
+export { createDivineChatComponent } from './DivineChatComponent.js';

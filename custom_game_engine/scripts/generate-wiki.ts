@@ -18,6 +18,8 @@ import {
   MarkdownWikiGenerator,
   JsonWikiGenerator,
 } from '../packages/core/src/help/index.js';
+import { getAllItems } from '../packages/core/src/data/ItemsLoader.js';
+import { getAllSpells } from '../packages/core/src/data/SpellsLoader.js';
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -31,24 +33,67 @@ const WIKI_DIR = path.join(process.cwd(), 'wiki');
  * Load all documented items and register their help entries
  */
 function loadItemHelp() {
-  // Import and register documented items
-  // In a real implementation, you would iterate through all item definitions
-  // and register those with help entries
   console.log('Loading item documentation...');
 
-  // Example: Load from documented items file
-  // For now, this is a placeholder showing the pattern
-  // You would import actual items from defaultItems.ts and filter for those with help entries
+  const items = getAllItems();
+  let registered = 0;
+
+  for (const item of items) {
+    // Create a basic help entry for each item
+    const helpEntry = {
+      id: item.id,
+      summary: item.description || `${item.displayName} - A ${item.category} item`,
+      description: item.description || `${item.displayName} is a ${item.category} item.`,
+      category: 'items',
+      subcategory: item.category,
+      tags: [item.category, ...(item.tags || [])],
+      mechanics: {
+        values: {
+          weight: item.weight,
+          stackSize: item.stackSize || 1,
+          rarity: item.rarity || 'common',
+        },
+      },
+    };
+
+    helpRegistry.register(helpEntry);
+    registered++;
+  }
+
+  console.log(`  Registered ${registered} items`);
 }
 
 /**
  * Load all documented effects and register their help entries
  */
 function loadEffectHelp() {
-  console.log('Loading effect documentation...');
+  console.log('Loading spell documentation...');
 
-  // Example: Load from spell effect definitions
-  // You would import actual effects from SpellEffectRegistry and filter for those with help entries
+  const spells = getAllSpells();
+  let registered = 0;
+
+  for (const spell of spells) {
+    // Create a basic help entry for each spell
+    const helpEntry = {
+      id: spell.id,
+      summary: spell.description || `${spell.name} - A ${spell.paradigm} spell`,
+      description: spell.description || `${spell.name} is a ${spell.paradigm} paradigm spell.`,
+      category: 'magic',
+      subcategory: spell.paradigm,
+      tags: [spell.paradigm, spell.tier || 'unknown', ...(spell.tags || [])],
+      mechanics: {
+        values: {
+          tier: spell.tier || 'unknown',
+          paradigm: spell.paradigm,
+        },
+      },
+    };
+
+    helpRegistry.register(helpEntry);
+    registered++;
+  }
+
+  console.log(`  Registered ${registered} spells`);
 }
 
 /**
@@ -119,7 +164,7 @@ function generateJsonWiki() {
 function generateMarkdownIndex(categories: string[]): string {
   const stats = helpRegistry.getStats();
 
-  let md = `# AI Village Game Wiki\n\n`;
+  let md = `# Multiverse: The End of Eternity Game Wiki\n\n`;
   md += `Auto-generated documentation from embedded help entries.\n\n`;
   md += `**Total Entries:** ${stats.totalEntries}\n\n`;
   md += `**Last Updated:** ${new Date().toISOString()}\n\n`;
@@ -176,7 +221,7 @@ function capitalize(str: string): string {
 // Main
 // ============================================================================
 
-console.log('🚀 AI Village Wiki Generator\n');
+console.log('🚀 Multiverse: The End of Eternity Wiki Generator\n');
 
 // Load all help entries
 loadItemHelp();

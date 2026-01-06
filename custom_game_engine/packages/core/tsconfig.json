@@ -12,6 +12,7 @@
     "src/**/*.bench.ts"
   ],
   "references": [
-    { "path": "../llm" }
+    { "path": "../llm" },
+    { "path": "../building-designer" }
   ]
 }

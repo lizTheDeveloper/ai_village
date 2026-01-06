@@ -15,6 +15,8 @@
   },
   "dependencies": {
     "@ai-village/core": "*",
+    "@ai-village/persistence": "*",
+    "@ai-village/metrics": "*",
     "@ai-village/renderer": "*",
     "@ai-village/llm": "*",
     "express": "^4.18.2",

@@ -2,7 +2,7 @@
 
 ## What Just Happened
 
-You now have a **fully functional game engine** with all the foundational systems needed to build AI Village incrementally while maintaining backwards compatibility.
+You now have a **fully functional game engine** with all the foundational systems needed to build Multiverse: The End of Eternity incrementally while maintaining backwards compatibility.
 
 ## Try It Now
 

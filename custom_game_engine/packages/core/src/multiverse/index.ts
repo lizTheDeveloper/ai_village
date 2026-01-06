@@ -52,3 +52,21 @@ export type {
   EntityTransferMessage,
   EntityTransferAckMessage,
 } from './NetworkProtocol.js';
+
+// God chat room network
+export { GodChatRoomNetwork } from './GodChatRoomNetwork.js';
+
+export type {
+  ChatMessage,
+  ChatMember,
+  ChatRoom,
+} from './GodChatRoomNetwork.js';
+
+// Proximity voice chat (WebRTC)
+export { ProximityVoiceChat } from './ProximityVoiceChat.js';
+
+export type {
+  VoiceChatOptions,
+  SpatialAudioSettings,
+  PlayerVoiceState,
+} from './ProximityVoiceChat.js';

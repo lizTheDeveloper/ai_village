@@ -7,7 +7,7 @@
 
 ## Overview
 
-The "scheduler" in the AI Village engine is **NOT a separate component** - it's the **GameLoop + System Priority ordering** working together to create deterministic, fixed-timestep execution.
+The "scheduler" in Multiverse: The End of Eternity engine is **NOT a separate component** - it's the **GameLoop + System Priority ordering** working together to create deterministic, fixed-timestep execution.
 
 **Key Concept:** Systems execute in priority order (lower priority = earlier) at a fixed 20 ticks per second (TPS).
 
@@ -739,7 +739,7 @@ if (gameLoop.accumulator > 500) {
 
 ## Conclusion
 
-The scheduler in AI Village is a **fixed-timestep, priority-ordered system execution** architecture. Understanding this is crucial for:
+The scheduler in Multiverse: The End of Eternity is a **fixed-timestep, priority-ordered system execution** architecture. Understanding this is crucial for:
 
 - Writing performant systems
 - Debugging timing issues

@@ -206,7 +206,8 @@ describe('HuntingSystem', () => {
       // If hunt failed, no resources gained
       const inventory = hunter.getComponent('inventory');
       if (conflict.outcome === 'defender_victory') {
-        expect(inventory.items.filter((i: any) => i.type === 'meat')).toHaveLength(0);
+        const meatItems = inventory.items.filter((i: any) => i.type === 'meat');
+        expect(meatItems).toHaveLength(0);
       }
     });
 

@@ -10,7 +10,7 @@
  * - Handle hover highlighting and pulsing animations
  */
 
-import type { MagicSkillNode, NodeEvaluationResult } from '@ai-village/core';
+import type { MagicSkillNode, NodeEvaluationResult } from '@ai-village/magic';
 import type { NodeRenderResult } from './types.js';
 import { DEFAULT_NODE_COLORS, CATEGORY_SHAPES } from './types.js';
 

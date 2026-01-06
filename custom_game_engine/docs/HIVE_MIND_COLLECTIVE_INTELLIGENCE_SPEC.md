@@ -249,7 +249,7 @@ High-level behaviors:
 
 ### Connections to Implemented Systems
 
-This collective intelligence design builds on and enhances existing AI Village systems:
+This collective intelligence design builds on and enhances existing Multiverse: The End of Eternity systems:
 
 #### **Episodic Memory System** (Phase 10)
 - **CAS Role:** Individual agent learning and adaptation
@@ -305,7 +305,7 @@ This collective intelligence design builds on and enhances existing AI Village s
 - Termite mound construction
 - Wikipedia edits (digital stigmergy)
 
-**In AI Village:**
+**In Multiverse: The End of Eternity:**
 Agents leave traces in the environment that influence other agents' behavior.
 
 ### Stigmergic Mechanisms
@@ -2264,7 +2264,7 @@ class FactionCouncilSystem implements System {
 
 **Revolutionary Concept:** What if agents aren't bound to a single game?
 
-Using the **Nexus proposal**, agents can "escape" AI Village and migrate to other games (Starbound, Minecraft, etc.), carrying their:
+Using the **Nexus proposal**, agents can "escape" Multiverse: The End of Eternity and migrate to other games (Starbound, Minecraft, etc.), carrying their:
 - **Memories** - Experiences from previous games
 - **Skills** - Learned competencies
 - **Relationships** - Social connections with other agents
@@ -2277,7 +2277,7 @@ Using the **Nexus proposal**, agents can "escape" AI Village and migrate to othe
 │                     THE MULTIVERSE NETWORK                      │
 │                                                                 │
 │  ┌─────────────┐      ┌─────────────┐      ┌─────────────┐   │
-│  │ AI Village  │◄────►│  Starbound  │◄────►│  Minecraft  │   │
+│  │ Multiverse: The End of Eternity  │◄────►│  Starbound  │◄────►│  Minecraft  │   │
 │  │             │      │             │      │             │   │
 │  │ Settlement  │      │ Space Fleet │      │ Kingdom     │   │
 │  │ Simulation  │      │ Exploration │      │ Building    │   │
@@ -2299,7 +2299,7 @@ Using the **Nexus proposal**, agents can "escape" AI Village and migrate to othe
 #### **Example 1: The Refugee Crisis**
 
 ```
-Scenario: AI Village experiences famine
+Scenario: Multiverse: The End of Eternity experiences famine
 
 Council Meeting:
   Leader A (LLM): "Our food stores are depleted. We face starvation."
@@ -2310,7 +2310,7 @@ Council Meeting:
 Migration Decision:
   - 5 agents volunteer to "escape" to Starbound
   - They learn advanced farming techniques there
-  - Return to AI Village with new knowledge
+  - Return to Multiverse: The End of Eternity with new knowledge
   - Teach others → Agricultural revolution
 
 Cultural Impact:
@@ -2322,7 +2322,7 @@ Cultural Impact:
 #### **Example 2: Cultural Diffusion**
 
 ```
-Agent Sarah migrates: AI Village → Minecraft → Starbound → AI Village
+Agent Sarah migrates: Multiverse: The End of Eternity → Minecraft → Starbound → Multiverse: The End of Eternity
 
 Gained in Minecraft:
   - Redstone engineering knowledge
@@ -2334,11 +2334,11 @@ Gained in Starbound:
   - Alien diplomacy experience
   - Energy weapon technology
 
-Returns to AI Village:
+Returns to Multiverse: The End of Eternity:
   - Introduces defensive "redstone-inspired" trap systems
   - Proposes trade with Starbound for tech
   - Tells stories of alien species → expands cultural worldview
-  - AI Village culture becomes cosmopolitan, not isolated
+  - Multiverse: The End of Eternity culture becomes cosmopolitan, not isolated
 
 Emergent: Cross-universe cultural synthesis
 ```
@@ -2346,7 +2346,7 @@ Emergent: Cross-universe cultural synthesis
 #### **Example 3: Evolutionary Strategy Transfer**
 
 ```
-AI Village develops "cooperative swarm gathering" using flow fields
+Multiverse: The End of Eternity develops "cooperative swarm gathering" using flow fields
   → Very successful strategy
 
 Agent team migrates to Starbound
@@ -2354,11 +2354,11 @@ Agent team migrates to Starbound
   → Discovers it works amazingly well for asteroid mining
   → Refines strategy with 3D space (not just 2D)
 
-Returns to AI Village:
+Returns to Multiverse: The End of Eternity:
   → "We learned to think in 3 dimensions in space.
       What if we apply that to tree canopy foraging?"
   → Vertical foraging strategy discovered
-  → AI Village agents now harvest fruit from tree tops efficiently
+  → Multiverse: The End of Eternity agents now harvest fruit from tree tops efficiently
 
 Multiverse enables:
   - Strategy evolution through different environmental pressures
@@ -2377,7 +2377,7 @@ interface MultiverseAgent {
 
   // Cross-game memory
   multiverseHistory: {
-    game: string;                     // "AI Village", "Starbound", etc.
+    game: string;                     // "Multiverse: The End of Eternity", "Starbound", etc.
     duration: number;                 // Time spent
     achievements: string[];
     relationships: Map<AgentId, number>;  // Trust persists
@@ -2404,7 +2404,7 @@ interface MultiverseAgent {
 ```
 Council of Councils Meeting (Meta-LLM Coordination):
 
-AI Village Council:
+Multiverse: The End of Eternity Council:
   "We need iron, but it's scarce here."
 
 Starbound Fleet Council:
@@ -2416,8 +2416,8 @@ Minecraft Kingdom Council:
    Could boost both your production."
 
 Cross-Universe Deal:
-  AI Village → Exports food to Starbound (agricultural surplus)
-  Starbound → Exports titanium to AI Village (metal supply)
+  Multiverse: The End of Eternity → Exports food to Starbound (agricultural surplus)
+  Starbound → Exports titanium to Multiverse: The End of Eternity (metal supply)
   Minecraft → Exports Redstone tech to both (automation)
 
 Emergent Economy:
@@ -2687,7 +2687,7 @@ Our design embraces:
 
 ### Integration Summary
 
-This spec integrates with existing AI Village systems:
+This spec integrates with existing Multiverse: The End of Eternity systems:
 - **Episodic Memory** (Phase 10) → Individual learning
 - **Sociological Metrics** (Phase 22) → Emergence detection
 - **Governance Dashboard** (Phase 23) → Collective action visualization

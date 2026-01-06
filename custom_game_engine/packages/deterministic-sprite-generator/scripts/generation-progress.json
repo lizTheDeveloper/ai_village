@@ -1,0 +1,30 @@
+{
+  "completed": [
+    "head_round_pale",
+    "head_round_tan",
+    "head_round_dark",
+    "head_square_pale",
+    "head_square_tan",
+    "head_oval_pale",
+    "head_oval_dark",
+    "head_angular_pale",
+    "hair_spiky_brown",
+    "hair_spiky_blonde",
+    "hair_short_black",
+    "hair_short_red",
+    "hair_bald",
+    "accessory_glasses_round",
+    "accessory_beard_short",
+    "accessory_crown",
+    "accessory_eyepatch",
+    "head_dragon",
+    "head_demon",
+    "head_skull",
+    "head_cat",
+    "head_octopus",
+    "head_robot",
+    "head_slime",
+    "head_bird"
+  ],
+  "referenceImage": "/Users/annhoward/src/ai_village/custom_game_engine/packages/deterministic-sprite-generator/assets/parts/snes/head/head_round_pale.png"
+}

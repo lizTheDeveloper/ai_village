@@ -132,7 +132,7 @@ export class DeityEmergenceSystem implements System {
     // Subscribe to proto_deity_belief events from PrayerSystem
     // These are emitted when prayers cannot be routed to an existing deity
     // and might contribute to emerging a new one
-    (eventBus.subscribe as any)('divinity:proto_deity_belief', (event: any) => {
+    eventBus.subscribe('divinity:proto_deity_belief', (event) => {
       const data = event.data as {
         agentId: string;
         prayerContent: string;

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { ProviderPoolManager } from '../ProviderPoolManager.js';
 import type { LLMProvider, LLMRequest, LLMResponse, ProviderPricing } from '../LLMProvider.js';
 

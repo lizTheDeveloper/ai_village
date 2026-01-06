@@ -1,4 +1,4 @@
-# AI Village E2E Tests
+# Multiverse: The End of Eternity - E2E Tests
 
 Integration tests using Playwright to ensure universe creation and soul creation flows work correctly.
 

@@ -34,7 +34,10 @@ export const GOVERNANCE_BLUEPRINTS: BuildingBlueprint[] = [
     unlocked: true,
     buildTime: 240, // 4 hours at 1 second = 1 minute game time
     tier: 1,
-    functionality: [],
+    functionality: [
+      { type: 'governance', governanceType: 'administration' },
+      { type: 'social_hub', radius: 15 },
+    ],
     canRotate: true,
     rotationAngles: [0, 90, 180, 270],
     snapToGrid: true,
@@ -59,7 +62,10 @@ export const GOVERNANCE_BLUEPRINTS: BuildingBlueprint[] = [
     unlocked: true,
     buildTime: 480, // 8 hours
     tier: 2,
-    functionality: [],
+    functionality: [
+      { type: 'governance', governanceType: 'demographics' },
+      { type: 'knowledge_repository' },
+    ],
     canRotate: true,
     rotationAngles: [0, 90, 180, 270],
     snapToGrid: true,
@@ -114,7 +120,9 @@ export const GOVERNANCE_BLUEPRINTS: BuildingBlueprint[] = [
     unlocked: true,
     buildTime: 300, // 5 hours
     tier: 1,
-    functionality: [],
+    functionality: [
+      { type: 'vision_extension', radiusBonus: 20 },
+    ],
     canRotate: false,
     rotationAngles: [0],
     snapToGrid: true,
@@ -139,7 +147,10 @@ export const GOVERNANCE_BLUEPRINTS: BuildingBlueprint[] = [
     unlocked: true,
     buildTime: 600, // 10 hours
     tier: 2,
-    functionality: [],
+    functionality: [
+      { type: 'healing', healingRate: 5 },
+      { type: 'knowledge_repository' },
+    ],
     canRotate: true,
     rotationAngles: [0, 90, 180, 270],
     snapToGrid: true,
@@ -193,7 +204,9 @@ export const GOVERNANCE_BLUEPRINTS: BuildingBlueprint[] = [
     unlocked: true,
     buildTime: 360, // 6 hours
     tier: 1,
-    functionality: [],
+    functionality: [
+      { type: 'vision_extension', radiusBonus: 30 },
+    ],
     canRotate: false,
     rotationAngles: [0],
     snapToGrid: true,
@@ -217,7 +230,10 @@ export const GOVERNANCE_BLUEPRINTS: BuildingBlueprint[] = [
     unlocked: true,
     buildTime: 420, // 7 hours
     tier: 2,
-    functionality: [],
+    functionality: [
+      { type: 'job_board' },
+      { type: 'governance', governanceType: 'workforce' },
+    ],
     canRotate: true,
     rotationAngles: [0, 90, 180, 270],
     snapToGrid: true,

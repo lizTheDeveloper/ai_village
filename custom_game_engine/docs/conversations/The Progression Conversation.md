@@ -7104,7 +7104,7 @@ brilliant! That's the final progression.
 
      *Design completed: 2025-12-30*
      *Designed with: Claude (Sonnet 4.5)*
-     *For: AI Village - A game about emergent divine narratives*
+     *For: Multiverse: The End of Eternity - A game about emergent divine narratives*
 
 
 ∴ Thinking…

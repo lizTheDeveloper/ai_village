@@ -14,7 +14,12 @@ import {
   createCopperDeposit,
   createGoldDeposit,
 } from '../entities/OreDepositEntity.js';
-import { WildAnimalSpawningSystem, getMapKnowledge, SECTOR_SIZE } from '@ai-village/core';
+import {
+  WildAnimalSpawningSystem,
+  getMapKnowledge,
+  SECTOR_SIZE,
+  type GodCraftedDiscoverySystem,
+} from '@ai-village/core';
 
 /**
  * Generates terrain using Perlin noise.
@@ -25,13 +30,14 @@ export class TerrainGenerator {
   private temperatureNoise: PerlinNoise;
   private seed: string;
   private animalSpawner: WildAnimalSpawningSystem;
+  private godCraftedSpawner?: GodCraftedDiscoverySystem;
 
   // Terrain thresholds
   private readonly WATER_LEVEL = -0.3;
   private readonly SAND_LEVEL = -0.1;
   private readonly STONE_LEVEL = 0.5;
 
-  constructor(seed: string = 'default') {
+  constructor(seed: string = 'default', godCraftedSpawner?: GodCraftedDiscoverySystem) {
     this.seed = seed;
     const seedHash = this.hashString(seed);
 
@@ -39,6 +45,7 @@ export class TerrainGenerator {
     this.moistureNoise = new PerlinNoise(seedHash + 1000);
     this.temperatureNoise = new PerlinNoise(seedHash + 2000);
     this.animalSpawner = new WildAnimalSpawningSystem();
+    this.godCraftedSpawner = godCraftedSpawner;
   }
 
   /**
@@ -73,6 +80,16 @@ export class TerrainGenerator {
         biome: chunkBiome,
         size: CHUNK_SIZE,
       });
+
+      // Spawn god-crafted content in chunk
+      if (this.godCraftedSpawner) {
+        this.godCraftedSpawner.spawnContentInChunk(world, {
+          x: chunk.x,
+          y: chunk.y,
+          biome: chunkBiome,
+          size: CHUNK_SIZE,
+        });
+      }
     }
 
     chunk.generated = true;

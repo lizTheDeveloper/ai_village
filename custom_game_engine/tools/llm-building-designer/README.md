@@ -248,4 +248,4 @@ function toGameBlueprint(building: VoxelBuildingDefinition): TileBasedBlueprint 
 
 ## License
 
-Part of the AI Village project.
+Part of Multiverse: The End of Eternity project.

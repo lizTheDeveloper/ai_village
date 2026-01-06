@@ -1,4 +1,5 @@
 import type { LLMProvider, LLMRequest, LLMResponse, ProviderPricing } from './LLMProvider.js';
+import { LLMRequestFileLogger } from './LLMRequestFileLogger.js';
 
 // Valid actions that can be extracted from text
 // const VALID_ACTIONS = [
@@ -22,6 +23,9 @@ export class OpenAICompatProvider implements LLMProvider {
   private readonly maxRetries = 3;
   private readonly retryDelayMs = 1000;
   public customHeaders?: Record<string, string>; // Custom headers for per-agent config
+
+  // Shared file logger instance for all providers
+  private static fileLogger: LLMRequestFileLogger = new LLMRequestFileLogger();
 
   constructor(
     model: string = 'qwen/qwen3-32b',
@@ -457,26 +461,72 @@ Keep speech brief and natural.`
 
         const inputTokens = data.usage?.prompt_tokens || 0;
         const outputTokens = data.usage?.completion_tokens || 0;
+        const cost = this.calculateCost(inputTokens, outputTokens);
+
+        // Log request/response to file for evaluation
+        OpenAICompatProvider.fileLogger.log({
+          timestamp: Date.now(),
+          requestId: `req_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+          sessionId: 'unknown',
+          agentId: 'unknown',
+          provider: this.getProviderId(),
+          model: this.model,
+          prompt: request.prompt,
+          maxTokens: request.maxTokens,
+          temperature: request.temperature,
+          responseText: content,
+          thinking: thinking || '',
+          speaking: speech || content,
+          inputTokens,
+          outputTokens,
+          costUSD: cost,
+          durationMs: 0,
+          success: true,
+        });
+
         return {
           text: content,
           stopReason: choice?.finish_reason,
           tokensUsed: data.usage?.total_tokens,
           inputTokens,
           outputTokens,
-          costUSD: this.calculateCost(inputTokens, outputTokens)
+          costUSD: cost
         };
       }
 
       // Return structured response
       const inputTokens = data.usage?.prompt_tokens || 0;
       const outputTokens = data.usage?.completion_tokens || 0;
+      const cost = this.calculateCost(inputTokens, outputTokens);
+
+      // Log request/response to file for evaluation
+      OpenAICompatProvider.fileLogger.log({
+        timestamp: Date.now(),
+        requestId: `req_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+        sessionId: 'unknown', // Will be set by router if available
+        agentId: 'unknown',   // Will be set by router if available
+        provider: this.getProviderId(),
+        model: this.model,
+        prompt: request.prompt,
+        maxTokens: request.maxTokens,
+        temperature: request.temperature,
+        responseText,
+        thinking,
+        speaking: speech,
+        inputTokens,
+        outputTokens,
+        costUSD: cost,
+        durationMs: 0, // Will be calculated by router if needed
+        success: true,
+      });
+
       return {
         text: responseText,
         stopReason: choice?.finish_reason,
         tokensUsed: data.usage?.total_tokens,
         inputTokens,
         outputTokens,
-        costUSD: this.calculateCost(inputTokens, outputTokens)
+        costUSD: cost
       };
     } catch (error) {
       console.error('[OpenAICompatProvider] Generate error:', error);
@@ -579,13 +629,36 @@ Be brief and natural.`
           });
           const inputTokens = data.usage?.prompt_tokens || 0;
           const outputTokens = data.usage?.completion_tokens || 0;
+          const cost = this.calculateCost(inputTokens, outputTokens);
+
+          // Log request/response to file for evaluation
+          OpenAICompatProvider.fileLogger.log({
+            timestamp: Date.now(),
+            requestId: `req_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+            sessionId: 'unknown',
+            agentId: 'unknown',
+            provider: this.getProviderId(),
+            model: this.model,
+            prompt: request.prompt,
+            maxTokens: request.maxTokens,
+            temperature: request.temperature,
+            responseText,
+            thinking: '',
+            speaking: parsed.speaking || '',
+            inputTokens,
+            outputTokens,
+            costUSD: cost,
+            durationMs: 0,
+            success: true,
+          });
+
           return {
             text: responseText,
             stopReason: data.choices?.[0]?.finish_reason,
             tokensUsed: data.usage?.total_tokens,
             inputTokens,
             outputTokens,
-            costUSD: this.calculateCost(inputTokens, outputTokens)
+            costUSD: cost
           };
         } catch {
           // JSON parse failed, fall through to text parsing
@@ -632,13 +705,36 @@ Be brief and natural.`
 
     const inputTokens = data.usage?.prompt_tokens || 0;
     const outputTokens = data.usage?.completion_tokens || 0;
+    const cost = this.calculateCost(inputTokens, outputTokens);
+
+    // Log request/response to file for evaluation
+    OpenAICompatProvider.fileLogger.log({
+      timestamp: Date.now(),
+      requestId: `req_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+      sessionId: 'unknown',
+      agentId: 'unknown',
+      provider: this.getProviderId(),
+      model: this.model,
+      prompt: request.prompt,
+      maxTokens: request.maxTokens,
+      temperature: request.temperature,
+      responseText,
+      thinking,
+      speaking: speech === '...' ? '' : speech,
+      inputTokens,
+      outputTokens,
+      costUSD: cost,
+      durationMs: 0,
+      success: true,
+    });
+
     return {
       text: responseText,
       stopReason: data.choices?.[0]?.finish_reason,
       tokensUsed: data.usage?.total_tokens,
       inputTokens,
       outputTokens,
-      costUSD: this.calculateCost(inputTokens, outputTokens)
+      costUSD: cost
     };
   }
 

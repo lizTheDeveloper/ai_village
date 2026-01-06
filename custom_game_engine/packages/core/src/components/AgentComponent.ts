@@ -27,6 +27,7 @@ export type AgentBehavior =
   | 'seek_sleep'
   | 'forced_sleep'
   | 'flee_danger'
+  | 'flee_to_home'
   | 'seek_water'
   | 'seek_shelter'
   | 'deposit_items'
@@ -364,12 +365,18 @@ export interface AgentComponent extends Component {
 
   /**
    * Dictionary of frequently-visited or assigned locations.
-   * Keys: location type ('home', 'work', 'food_storage', 'workshop', etc.)
+   * Keys: location type ('home', 'work', 'food_storage', 'workshop', etc.')
    * Values: Location info with optional entity ID for quick routing.
    *
    * This enables O(1) lookup of common destinations instead of querying.
    */
   assignedLocations?: Record<string, AssignedLocation>;
+
+  /**
+   * Home behavior preferences - how agent uses their assigned bed as "home base"
+   * Controls wandering radius, return-when-scared behavior, and comfort bonuses.
+   */
+  homePreferences?: HomePreferences;
 
   // ============================================================================
   // Age & Lifecycle
@@ -403,6 +410,30 @@ export interface AssignedLocation {
   /** How many times the agent has visited this location */
   visitCount?: number;
 }
+
+/**
+ * Home behavior preferences - how an agent relates to their assigned bed as "home"
+ */
+export interface HomePreferences {
+  /** Wander radius around home in tiles (default: 20) */
+  homeRadius: number;
+  /** Return home when frightened/threatened */
+  returnWhenFrightened: boolean;
+  /** Return home when injured (health < 30%) */
+  returnWhenHurt: boolean;
+  /** Mood bonus when near home (0-1 scale) */
+  homeComfortBonus: number;
+}
+
+/**
+ * Default home preferences for new agents
+ */
+export const DEFAULT_HOME_PREFERENCES: HomePreferences = {
+  homeRadius: 20,
+  returnWhenFrightened: true,
+  returnWhenHurt: true,
+  homeComfortBonus: 0.1,
+};
 
 /**
  * Default strategic priorities for agents.

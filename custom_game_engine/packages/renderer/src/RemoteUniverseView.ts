@@ -6,7 +6,7 @@
  */
 
 import type { IWindowPanel } from './IWindowPanel.js';
-import type { VersionedEntity } from '@ai-village/core';
+import type { VersionedEntity } from '@ai-village/persistence';
 import type {
   UniverseSnapshotMessage,
   UniverseTickUpdate,
@@ -420,14 +420,18 @@ export class RemoteUniverseView implements IWindowPanel {
     // Simple entity rendering (colored square)
     // TODO: Use actual sprites/rendering from entity type
 
+    // Helper to check component existence
+    const hasComponent = (type: string): boolean =>
+      entity.components.some((c) => c.type === type);
+
     let color = '#888';
-    if (entity.components.some((c: any) => c.type === 'agent')) {
+    if (hasComponent('agent')) {
       color = '#4a9eff';
-    } else if (entity.components.some((c: any) => c.type === 'plant')) {
+    } else if (hasComponent('plant')) {
       color = '#44ff44';
-    } else if (entity.components.some((c: any) => c.type === 'building')) {
+    } else if (hasComponent('building')) {
       color = '#ff9944';
-    } else if (entity.components.some((c: any) => c.type === 'animal')) {
+    } else if (hasComponent('animal')) {
       color = '#ff44ff';
     }
 

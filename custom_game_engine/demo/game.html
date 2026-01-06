@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Multiverse: The End of Eternity</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    #app {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 1rem;
+      background: #1a1a1a;
+      border-bottom: 1px solid #333;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .status {
+      font-size: 0.875rem;
+      color: #888;
+    }
+
+    .status.running {
+      color: #4ade80;
+    }
+
+    main {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Multiverse: The End of Eternity</h1>
+      <p class="status" id="status">Initializing...</p>
+    </header>
+
+    <main>
+      <canvas id="canvas"></canvas>
+    </main>
+  </div>
+
+  <script type="module" src="./src/main.ts"></script>
+  <!-- Cache-bust: 2026-01-03-17:36:00 -->
+</body>
+</html>

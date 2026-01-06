@@ -38,6 +38,7 @@ import {
   MemoriesSection,
   ContextSection,
   PrioritiesSection,
+  DevSection,
 } from './panels/agent-info/index.js';
 
 const TAB_DEFINITIONS: Array<{ id: AgentInfoTab; label: string }> = [
@@ -48,6 +49,7 @@ const TAB_DEFINITIONS: Array<{ id: AgentInfoTab; label: string }> = [
   { id: 'memories', label: 'Mem' },
   { id: 'priorities', label: 'Prio' },
   { id: 'context', label: 'LLM' },
+  { id: 'dev', label: 'Dev' },
 ];
 
 /**
@@ -72,6 +74,7 @@ export class AgentInfoPanel implements IWindowPanel {
   private memoriesSection = new MemoriesSection();
   private contextSection = new ContextSection();
   private prioritiesSection = new PrioritiesSection();
+  private devSection = new DevSection();
 
   // Track actual screen position for HTML overlay positioning
   private lastScreenX: number = 0;
@@ -112,8 +115,13 @@ export class AgentInfoPanel implements IWindowPanel {
       { tabHeight: 28 },
       (newTab, _oldTab) => {
         // Reset scroll offsets when switching tabs
-        if (newTab === 'inventory') this.inventorySection.setScrollOffset(0);
-        if (newTab === 'memories') this.memoriesSection.setScrollOffset(0);
+        this.infoSection.setScrollOffset(0);
+        this.statsSection.setScrollOffset(0);
+        this.skillsSection.setScrollOffset(0);
+        this.inventorySection.setScrollOffset(0);
+        this.memoriesSection.setScrollOffset(0);
+        this.prioritiesSection.setScrollOffset(0);
+        this.devSection.setScrollOffset(0);
         // Hide context text when switching away from LLM tab
         if (newTab !== 'context') {
           this.contextSection.hide();
@@ -229,14 +237,34 @@ export class AgentInfoPanel implements IWindowPanel {
    */
   handleScroll(deltaY: number, _contentHeight: number): boolean {
     const currentTab = this.tabs.getCurrentTab();
-    if (currentTab === 'inventory') {
-      this.inventorySection.handleScroll(deltaY);
-      return true;
-    } else if (currentTab === 'memories') {
-      this.memoriesSection.handleScroll(deltaY);
-      return true;
+    switch (currentTab) {
+      case 'info':
+        this.infoSection.handleScroll(deltaY);
+        return true;
+      case 'stats':
+        this.statsSection.handleScroll(deltaY);
+        return true;
+      case 'skills':
+        this.skillsSection.handleScroll(deltaY);
+        return true;
+      case 'inventory':
+        this.inventorySection.handleScroll(deltaY);
+        return true;
+      case 'memories':
+        this.memoriesSection.handleScroll(deltaY);
+        return true;
+      case 'priorities':
+        this.prioritiesSection.handleScroll(deltaY);
+        return true;
+      case 'dev':
+        this.devSection.handleScroll(deltaY);
+        return true;
+      case 'context':
+        // Context tab is a textarea, no scrolling needed
+        return false;
+      default:
+        return false;
     }
-    return false;
   }
 
   /**
@@ -372,6 +400,10 @@ export class AgentInfoPanel implements IWindowPanel {
 
       case 'priorities':
         this.prioritiesSection.render(context, identity, agent);
+        break;
+
+      case 'dev':
+        this.devSection.render(context, selectedEntity, identity);
         break;
 
       case 'info':

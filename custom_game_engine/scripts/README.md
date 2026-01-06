@@ -1,6 +1,6 @@
-# AI Village Startup Scripts
+# Multiverse: The End of Eternity - Startup Scripts
 
-Quick-start scripts for running AI Village in different modes.
+Quick-start scripts for running Multiverse: The End of Eternity in different modes.
 
 ## Quick Start
 

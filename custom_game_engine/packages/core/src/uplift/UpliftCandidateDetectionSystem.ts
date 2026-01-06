@@ -19,6 +19,7 @@ import { UpliftCandidateComponent, type CognitiveMetrics } from '../components/U
 import type { AnimalComponent } from '../components/AnimalComponent.js';
 import type { SpeciesComponent } from '../components/SpeciesComponent.js';
 import type { GeneticComponent } from '../components/GeneticComponent.js';
+import { getAnimalSpecies } from '../data/animalSpecies.js';
 
 /**
  * Evaluation thresholds for uplift suitability
@@ -232,48 +233,12 @@ export class UpliftCandidateDetectionSystem implements System {
 
   /**
    * Estimate neural complexity from species
+   * Uses intelligence field from AnimalSpecies data
    */
   private estimateNeuralComplexity(species: SpeciesComponent): number {
-    // Heuristics based on species characteristics
-    let complexity = 0.3; // Base for all animals
-
-    // Size of brain relative to body (encephalization quotient)
-    // Primates, cetaceans, elephants: high
-    if (species.speciesId.includes('primate') ||
-        species.speciesId.includes('ape') ||
-        species.speciesId.includes('dolphin') ||
-        species.speciesId.includes('whale') ||
-        species.speciesId.includes('elephant')) {
-      complexity = 0.7;
-    }
-    // Canids, felines, corvids: medium-high
-    else if (species.speciesId.includes('wolf') ||
-             species.speciesId.includes('dog') ||
-             species.speciesId.includes('cat') ||
-             species.speciesId.includes('raven') ||
-             species.speciesId.includes('crow') ||
-             species.speciesId.includes('parrot')) {
-      complexity = 0.6;
-    }
-    // Octopuses, bears, pigs: medium
-    else if (species.speciesId.includes('octopus') ||
-             species.speciesId.includes('bear') ||
-             species.speciesId.includes('pig')) {
-      complexity = 0.5;
-    }
-    // Rodents, small mammals: low-medium
-    else if (species.speciesId.includes('rat') ||
-             species.speciesId.includes('mouse') ||
-             species.speciesId.includes('squirrel')) {
-      complexity = 0.4;
-    }
-    // Insects, simple creatures: low
-    else if (species.speciesId.includes('ant') ||
-             species.speciesId.includes('bee')) {
-      complexity = 0.3;
-    }
-
-    return complexity;
+    // Get species data and use intelligence field
+    const speciesData = getAnimalSpecies(species.speciesId);
+    return speciesData.intelligence;
   }
 
   /**

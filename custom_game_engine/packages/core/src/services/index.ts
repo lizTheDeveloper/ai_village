@@ -1,5 +1,5 @@
 /**
- * Shared Services for AI Village Game Engine
+ * Shared Services for Multiverse: The End of Eternity Game Engine
  *
  * These services provide common functionality that can be used by both
  * AgentBrainSystem and AnimalBrainSystem. They solve the code duplication

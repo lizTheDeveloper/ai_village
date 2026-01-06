@@ -1,6 +1,6 @@
-# AI Village Custom Game Engine
+# Multiverse: The End of Eternity - Game Engine
 
-A custom TypeScript game engine built for the AI Village simulation project.
+A custom TypeScript game engine built for Multiverse: The End of Eternity.
 
 > *This project is dedicated to Tarn Adams and Dwarf Fortress. See the [project README](../README.md) for our philosophy and inspirations.*
 

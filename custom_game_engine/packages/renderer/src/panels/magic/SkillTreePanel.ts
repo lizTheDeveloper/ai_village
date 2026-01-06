@@ -6,8 +6,8 @@
  */
 
 import type { IWindowPanel } from '../../IWindowPanel.js';
-import type { World, Entity, MagicComponent, MagicSkillProgress, EvaluationContext } from '@ai-village/core';
-import { MagicSkillTreeRegistry } from '@ai-village/core';
+import type { World, Entity, MagicComponent, MagicSkillProgress, EvaluationContext } from '@ai-village/magic';
+import { MagicSkillTreeRegistry } from '@ai-village/magic';
 import { ParadigmTreeView } from './ParadigmTreeView.js';
 import type { Viewport, SkillTreeUIState } from './types.js';
 

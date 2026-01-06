@@ -37,6 +37,34 @@ export type {
   WindowMaterial,
 } from './TileBasedBlueprintRegistry.js';
 
+// Standard Voxel Buildings (new system with furniture support)
+export * from './StandardVoxelBuildings.js';
+export {
+  SMALL_HOUSE,
+  COZY_COTTAGE,
+  STONE_HOUSE,
+  LONGHOUSE,
+  WORKSHOP,
+  BARN,
+  STORAGE_SHED,
+  GUARD_TOWER,
+  ALL_STANDARD_VOXEL_BUILDINGS,
+  ALL_RESIDENTIAL,
+  ALL_PRODUCTION,
+  ALL_STORAGE,
+  ALL_COMMUNITY,
+  getBuildingsByCategory,
+  getBuildingsByTier,
+  getBuildingByName,
+} from './StandardVoxelBuildings.js';
+
+// Re-export building designer types for convenience
+export type {
+  VoxelBuildingDefinition,
+  BuildingFloor,
+  BuildingCategory as VoxelBuildingCategory,
+} from '../../../building-designer/src/types.js';
+
 // Re-export types explicitly (export * doesn't re-export types)
 export type {
   BuildingCategory,

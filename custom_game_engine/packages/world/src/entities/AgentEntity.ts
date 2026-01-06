@@ -46,12 +46,14 @@ import {
   createDominanceRankComponent,
   // Realm system components
   createRealmLocationComponent,
-  // Reproduction system components
+  SpeciesComponent,
+} from '@ai-village/core';
+// Reproduction system components
+import {
   createSexualityComponent,
   createCourtshipComponent,
   createParentingComponent,
-  SpeciesComponent,
-} from '@ai-village/core';
+} from '@ai-village/reproduction';
 
 /**
  * Determine the best vision profile based on agent skills.

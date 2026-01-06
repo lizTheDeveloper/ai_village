@@ -9,7 +9,7 @@ import {
   BELIEF_GENERATION_RATES,
   type MagicParadigm,
   type PowerTier,
-} from '@ai-village/core';
+} from '@ai-village/magic';
 
 /**
  * Tests for DevPanel paradigm generation.

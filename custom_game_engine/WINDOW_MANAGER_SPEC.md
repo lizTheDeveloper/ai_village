@@ -1,7 +1,7 @@
 # Window Manager Specification
 
 ## Overview
-A window management system for the AI Village game that handles multiple UI panels, preventing overlap, allowing user rearrangement, and persisting window positions.
+A window management system for Multiverse: The End of Eternity game that handles multiple UI panels, preventing overlap, allowing user rearrangement, and persisting window positions.
 
 ## Current UI Panels (Identified)
 1. **AgentInfoPanel** - Shows selected agent details (top-right, 300x500px)

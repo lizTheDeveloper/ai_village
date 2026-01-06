@@ -50,6 +50,8 @@ import {
   OpenAICompatProvider,
   LLMDecisionQueue,
   StructuredPromptBuilder,
+  TalkerPromptBuilder,
+  ExecutorPromptBuilder,
   type LLMProvider,
 } from '../packages/llm/src/index.ts';
 
@@ -180,6 +182,11 @@ async function setupGameSystems(
       if (promptBuilder) {
         liveEntityAPI.setPromptBuilder(promptBuilder);
       }
+      // Wire up Talker and Executor prompt builders for inspection
+      const talkerPromptBuilder = new TalkerPromptBuilder();
+      const executorPromptBuilder = new ExecutorPromptBuilder();
+      liveEntityAPI.setTalkerPromptBuilder(talkerPromptBuilder);
+      liveEntityAPI.setExecutorPromptBuilder(executorPromptBuilder);
       liveEntityAPI.attach(streamClient);
       console.log('[HeadlessGame] Live Entity API attached');
     }
@@ -382,7 +389,7 @@ async function main() {
   const blueprintRegistry = new BuildingBlueprintRegistry();
   blueprintRegistry.registerDefaults();
   blueprintRegistry.registerExampleBuildings();
-  registerShopBlueprints(blueprintRegistry);
+  // Note: registerShopBlueprints() is already called by registerDefaults()
   (baseGameLoop.world as any).buildingRegistry = blueprintRegistry;
 
   const worldEntity = new EntityImpl(createEntityId(), baseGameLoop.world.tick);

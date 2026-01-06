@@ -9,8 +9,8 @@
  * - Render tooltips
  */
 
-import type { MagicSkillTree, MagicSkillNode, MagicSkillProgress, EvaluationContext } from '@ai-village/core';
-import { evaluateTree } from '@ai-village/core';
+import type { MagicSkillTree, MagicSkillNode, MagicSkillProgress, EvaluationContext } from '@ai-village/magic';
+import { evaluateTree } from '@ai-village/magic';
 import { TreeLayoutEngine } from './TreeLayoutEngine.js';
 import { SkillNodeRenderer } from './SkillNodeRenderer.js';
 import { NodeTooltip } from './NodeTooltip.js';

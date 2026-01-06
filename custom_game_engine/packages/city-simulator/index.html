@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NPC City Director Simulator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Monaco', 'Courier New', monospace;
+      background: #0a0a0a;
+      color: #00ff00;
+      overflow: hidden;
+    }
+
+    #app {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #111;
+      border-bottom: 2px solid #FFD700;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: #FFD700;
+    }
+
+    .preset-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .preset-selector label {
+      color: #888;
+      font-size: 0.85rem;
+    }
+
+    .preset-selector select {
+      background: #222;
+      color: #FFD700;
+      border: 2px solid #FFD700;
+      padding: 0.5rem 1rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .preset-selector select:hover {
+      background: #333;
+      border-color: #FFC107;
+    }
+
+    .stats {
+      display: flex;
+      gap: 2rem;
+      font-size: 0.9rem;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-label {
+      color: #888;
+      font-size: 0.8rem;
+    }
+
+    .stat-value {
+      color: #FFD700;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 1rem;
+      padding: 1rem;
+      overflow: hidden;
+    }
+
+    .panel {
+      background: #111;
+      border: 2px solid #333;
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+
+    .panel:hover {
+      border-color: #FFD700;
+    }
+
+    .panel h2 {
+      color: #FFD700;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #333;
+      padding-bottom: 0.5rem;
+    }
+
+    #city-stats {
+      grid-row: 1;
+    }
+
+    #priorities {
+      grid-row: 2;
+    }
+
+    #visualization {
+      grid-row: 1 / 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #decisions {
+      grid-row: 1;
+    }
+
+    #npc-roster {
+      grid-row: 2;
+    }
+
+    .priority-bar {
+      margin: 0.5rem 0;
+    }
+
+    .priority-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    .bar-container {
+      width: 100%;
+      height: 16px;
+      background: #333;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+
+    .npc-item {
+      padding: 0.5rem;
+      margin: 0.25rem 0;
+      background: #0a0a0a;
+      border-left: 3px solid #FFD700;
+      font-size: 0.85rem;
+    }
+
+    .decision-item {
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      background: #0a0a0a;
+      border-left: 3px solid #4CAF50;
+    }
+
+    .decision-focus {
+      color: #FFD700;
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+    }
+
+    .decision-reasoning {
+      color: #CCC;
+      font-size: 0.85rem;
+      margin: 0.25rem 0;
+    }
+
+    .decision-concerns {
+      color: #FF9800;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+    }
+
+    .controls {
+      padding: 1rem;
+      background: #111;
+      border-top: 2px solid #333;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    button {
+      background: #FFD700;
+      color: #000;
+      border: none;
+      padding: 0.5rem 1.5rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    button:hover {
+      background: #FFC107;
+    }
+
+    button:disabled {
+      background: #555;
+      color: #888;
+      cursor: not-allowed;
+    }
+
+    .city-visual {
+      width: 600px;
+      height: 600px;
+      position: relative;
+      border: 2px solid #FFD700;
+      background: #0a0a0a;
+    }
+
+    .npc-dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: #00ff00;
+      border-radius: 50%;
+      transition: all 0.5s ease;
+    }
+
+    .status-good { color: #4CAF50; }
+    .status-warning { color: #FF9800; }
+    .status-critical { color: #F44336; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>🏙️ NPC City Director Simulator</h1>
+      <div class="preset-selector">
+        <label for="preset-select">Preset:</label>
+        <select id="preset-select">
+          <option value="basic">Basic (50 agents, farm)</option>
+          <option value="large-city">Large City (200 agents)</option>
+          <option value="population-growth">Population Growth (20 agents)</option>
+        </select>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-label">Game Day</span>
+          <span class="stat-value" id="day">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Ticks</span>
+          <span class="stat-value" id="ticks">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">TPS</span>
+          <span class="stat-value" id="tps">20</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="panel" id="city-stats">
+        <h2>City Statistics</h2>
+        <div id="stats-content"></div>
+      </div>
+
+      <div class="panel" id="priorities">
+        <h2>Strategic Priorities <span style="font-size: 0.8rem; color: #888;">(Live)</span></h2>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="color: #888; font-size: 0.85rem; display: flex; justify-content: space-between;">
+            <span>Gathering</span>
+            <span id="gathering-value" style="color: #FFD700;">20%</span>
+          </label>
+          <input type="range" class="priority-slider" id="gathering-slider" min="0" max="1" step="0.01" value="0.20" style="width: 100%;" />
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="color: #888; font-size: 0.85rem; display: flex; justify-content: space-between;">
+            <span>Building</span>
+            <span id="building-value" style="color: #FFD700;">20%</span>
+          </label>
+          <input type="range" class="priority-slider" id="building-slider" min="0" max="1" step="0.01" value="0.20" style="width: 100%;" />
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="color: #888; font-size: 0.85rem; display: flex; justify-content: space-between;">
+            <span>Farming</span>
+            <span id="farming-value" style="color: #FFD700;">20%</span>
+          </label>
+          <input type="range" class="priority-slider" id="farming-slider" min="0" max="1" step="0.01" value="0.20" style="width: 100%;" />
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="color: #888; font-size: 0.85rem; display: flex; justify-content: space-between;">
+            <span>Social</span>
+            <span id="social-value" style="color: #FFD700;">10%</span>
+          </label>
+          <input type="range" class="priority-slider" id="social-slider" min="0" max="1" step="0.01" value="0.10" style="width: 100%;" />
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="color: #888; font-size: 0.85rem; display: flex; justify-content: space-between;">
+            <span>Exploration</span>
+            <span id="exploration-value" style="color: #FFD700;">15%</span>
+          </label>
+          <input type="range" class="priority-slider" id="exploration-slider" min="0" max="1" step="0.01" value="0.15" style="width: 100%;" />
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="color: #888; font-size: 0.85rem; display: flex; justify-content: space-between;">
+            <span>Rest</span>
+            <span id="rest-value" style="color: #FFD700;">10%</span>
+          </label>
+          <input type="range" class="priority-slider" id="rest-slider" min="0" max="1" step="0.01" value="0.10" style="width: 100%;" />
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="color: #888; font-size: 0.85rem; display: flex; justify-content: space-between;">
+            <span>Magic</span>
+            <span id="magic-value" style="color: #FFD700;">5%</span>
+          </label>
+          <input type="range" class="priority-slider" id="magic-slider" min="0" max="1" step="0.01" value="0.05" style="width: 100%;" />
+        </div>
+
+        <div style="margin-top: 1rem; padding: 0.5rem; background: #0a0a0a; border: 1px solid #333; border-radius: 4px; font-size: 0.8rem; color: #888;">
+          💡 Drag sliders to manually override director's decisions
+        </div>
+      </div>
+
+      <div class="panel" id="visualization">
+        <h2>City Map</h2>
+        <div class="city-visual" id="city-map"></div>
+      </div>
+
+      <div class="panel" id="decisions">
+        <h2>Director Decisions</h2>
+        <div id="decisions-content"></div>
+      </div>
+
+      <div class="panel" id="npc-roster">
+        <h2>NPC Roster</h2>
+        <div id="roster-content"></div>
+      </div>
+    </main>
+
+    <div class="controls">
+      <button id="start-btn">Start Simulation</button>
+      <button id="pause-btn" disabled>Pause</button>
+      <button id="step-btn">Step 1 Day</button>
+      <button id="reset-btn">Reset</button>
+      <button id="force-decision-btn">Force Decision</button>
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-left: auto;">
+        <label id="speed-label" style="color: #FFD700;">Speed: 1x</label>
+        <input type="range" id="speed-slider" min="1" max="100" value="1" style="width: 150px;" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Preset selector initialization
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const currentPreset = params.get('preset') || 'basic';
+      const select = document.getElementById('preset-select');
+
+      // Set current preset in dropdown
+      if (select) {
+        select.value = currentPreset;
+
+        // Handle preset changes
+        select.addEventListener('change', (e) => {
+          const newPreset = e.target.value;
+          const url = new URL(window.location.href);
+
+          if (newPreset === 'basic') {
+            // Remove preset param for default
+            url.searchParams.delete('preset');
+          } else {
+            url.searchParams.set('preset', newPreset);
+          }
+
+          // Reload with new preset
+          window.location.href = url.toString();
+        });
+      }
+    })();
+  </script>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-# AI Village Development Guidelines
+# Multiverse: The End of Eternity - Development Guidelines
 
 > *This project is dedicated to Tarn Adams and Dwarf Fortress. See [README.md](./README.md) for our philosophy on open source, monetization, and the inspirations behind this project.*
 

@@ -19,11 +19,14 @@ interface ProductionState {
 /**
  * AnimalProductionSystem handles periodic and continuous product generation
  * Priority: 60 (after most other systems)
+ *
+ * @dependencies AnimalSystem - Reads animal health, life stage, and bond level for production
  */
 export class AnimalProductionSystem implements System {
   public readonly id: SystemId = 'animal_production';
   public readonly priority: number = 60;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Animal];
+  public readonly dependsOn = ['animal'] as const;
 
   // Track production state for each animal
   private productionState: Map<string, ProductionState[]> = new Map();

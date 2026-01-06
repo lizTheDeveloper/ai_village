@@ -18,3 +18,7 @@ packages/*/src/**/*.d.ts.map
 .metrics-server.pid
 .orch-dashboard.pid
 .dev-server.pid
+
+# Stable build snapshots
+demo-stable/
+packages-stable/

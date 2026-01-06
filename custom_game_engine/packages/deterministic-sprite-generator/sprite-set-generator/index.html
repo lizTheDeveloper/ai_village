@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprite Set Generator - Interactive Wizard</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎨 Sprite Set Generator</h1>
+      <p class="subtitle">Interactive wizard for generating consistent sprite part libraries</p>
+    </header>
+
+    <!-- Step 1: Art Style Selection -->
+    <section id="step-style" class="wizard-step active">
+      <h2>Step 1: Choose Art Style</h2>
+      <p>Select the console era style for your sprite set:</p>
+
+      <div class="style-grid">
+        <div class="style-card" data-style="nes">
+          <div class="style-preview"></div>
+          <h3>8-bit NES</h3>
+          <p>32-48px • Chunky pixels • Limited palette</p>
+          <span class="era">1985-1990</span>
+        </div>
+        <div class="style-card selected" data-style="snes">
+          <div class="style-preview"></div>
+          <h3>16-bit SNES</h3>
+          <p>64-96px • Detailed • 256 colors</p>
+          <span class="era">1991-1996</span>
+        </div>
+        <div class="style-card" data-style="ps1">
+          <div class="style-preview"></div>
+          <h3>32-bit PS1</h3>
+          <p>128-192px • Pre-rendered 3D look</p>
+          <span class="era">1995-2000</span>
+        </div>
+        <div class="style-card" data-style="gba">
+          <div class="style-preview"></div>
+          <h3>GBA</h3>
+          <p>64-80px • Bright vibrant</p>
+          <span class="era">2001-2008</span>
+        </div>
+        <div class="style-card" data-style="gameboy">
+          <div class="style-preview"></div>
+          <h3>Game Boy</h3>
+          <p>32-48px • 4-shade monochrome</p>
+          <span class="era">1989-1998</span>
+        </div>
+        <div class="style-card" data-style="neogeo">
+          <div class="style-preview"></div>
+          <h3>Neo Geo</h3>
+          <p>128-256px • Arcade quality</p>
+          <span class="era">1990-2004</span>
+        </div>
+      </div>
+
+      <button id="btn-generate-reference" class="primary-button">Generate Reference Character</button>
+    </section>
+
+    <!-- Step 2: Reference Approval -->
+    <section id="step-reference" class="wizard-step">
+      <h2>Step 2: Approve Reference Character</h2>
+      <p>This character will be used as a style reference for all parts:</p>
+
+      <div class="reference-preview">
+        <div id="reference-loading" class="loading">
+          <div class="spinner"></div>
+          <p>Generating reference character...</p>
+          <p class="eta">ETA: ~2-3 minutes</p>
+        </div>
+        <canvas id="reference-canvas"></canvas>
+      </div>
+
+      <div class="reference-controls">
+        <button id="btn-regenerate-reference" class="secondary-button">🔄 Regenerate</button>
+        <button id="btn-approve-reference" class="primary-button">✓ Approve & Continue</button>
+      </div>
+    </section>
+
+    <!-- Step 3: Part Generation -->
+    <section id="step-generation" class="wizard-step">
+      <h2>Step 3: Generate Parts</h2>
+
+      <div class="generation-header">
+        <div class="progress-info">
+          <h3 id="current-part-name">Ready to start</h3>
+          <p id="progress-text">0 of 49 parts complete</p>
+        </div>
+        <div class="progress-bar-container">
+          <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+          <span id="progress-percent">0%</span>
+        </div>
+      </div>
+
+      <div class="generation-content">
+        <!-- Live Sprite Sheet -->
+        <div class="sprite-sheet-panel">
+          <h3>Sprite Sheet (Live Preview)</h3>
+          <canvas id="sprite-sheet-canvas"></canvas>
+          <div class="sheet-controls">
+            <label>
+              <input type="checkbox" id="show-labels" checked>
+              Show labels
+            </label>
+            <label>
+              <input type="range" id="sheet-zoom" min="1" max="4" value="2" step="0.5">
+              Zoom: <span id="zoom-value">2x</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Part Queue -->
+        <div class="queue-panel">
+          <h3>Part Queue</h3>
+          <div id="part-queue" class="part-list"></div>
+        </div>
+      </div>
+
+      <div class="generation-controls">
+        <button id="btn-start-generation" class="primary-button">▶ Start Generation</button>
+        <button id="btn-pause-generation" class="secondary-button" style="display:none">⏸ Pause</button>
+        <button id="btn-export-sheet" class="secondary-button" disabled>💾 Export Sprite Sheet</button>
+      </div>
+    </section>
+
+    <!-- Step 4: Review & Refine -->
+    <section id="step-review" class="wizard-step">
+      <h2>Step 4: Review & Refine</h2>
+      <p>Click any part to regenerate it. Previous versions are saved.</p>
+
+      <div class="review-grid" id="review-grid"></div>
+
+      <div class="review-controls">
+        <button id="btn-back-to-generation" class="secondary-button">← Back to Generation</button>
+        <button id="btn-finalize" class="primary-button">✓ Finalize & Export</button>
+      </div>
+    </section>
+
+    <!-- Version History Modal -->
+    <div id="version-modal" class="modal">
+      <div class="modal-content">
+        <h3>Version History: <span id="modal-part-name"></span></h3>
+        <div id="version-grid" class="version-grid"></div>
+        <div class="modal-controls">
+          <button id="btn-close-modal" class="secondary-button">Close</button>
+          <button id="btn-regenerate-part" class="primary-button">🔄 Regenerate</button>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>🎨 Sprite Set Generator v0.1.0 • Powered by PixelLab</p>
+    </footer>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

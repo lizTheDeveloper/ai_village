@@ -32,12 +32,12 @@ export interface ProviderRateLimits {
 
 export const DEFAULT_RATE_LIMITS: ProviderRateLimits = {
   groq: {
-    requestsPerMinute: 30, // Groq free tier
-    burstSize: 5,
+    requestsPerMinute: 1000, // 1000 requests per minute (actual Groq limit)
+    burstSize: 50,
   },
   cerebras: {
-    requestsPerMinute: 60, // Cerebras limits
-    burstSize: 10,
+    requestsPerMinute: 1000, // 1000 requests per minute (user limit)
+    burstSize: 50,
   },
   openai: {
     requestsPerMinute: 10, // Conservative estimate

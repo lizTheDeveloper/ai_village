@@ -1,10 +1,10 @@
-# AI Village Wiki
+# Multiverse: The End of Eternity Wiki
 
-Welcome to the AI Village game wiki! This documentation covers all game systems, mechanics, and content.
+Welcome to Multiverse: The End of Eternity game wiki! This documentation covers all game systems, mechanics, and content.
 
 ## Quick Start
 
-New to AI Village? Start here:
+New to Multiverse: The End of Eternity? Start here:
 - [Getting Started Guide](Getting-Started.md)
 - [Game Controls](Gameplay/Controls.md)
 - [Basic Mechanics](Gameplay/Agents.md)
@@ -40,7 +40,7 @@ New to AI Village? Start here:
 
 ## About This Wiki
 
-This wiki is automatically maintained by the AI Village autonomous development system. Documentation is updated daily to reflect the latest game state.
+This wiki is automatically maintained by Multiverse: The End of Eternity autonomous development system. Documentation is updated daily to reflect the latest game state.
 
 **Last Updated:** Auto-generated daily
 **Game Version:** See [Changelog](Development/Changelog.md)

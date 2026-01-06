@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { GameSessionManager } from '../GameSessionManager.js';
 import { CooldownCalculator, DEFAULT_RATE_LIMITS } from '../CooldownCalculator.js';
 
@@ -15,16 +15,15 @@ describe('GameSessionManager', () => {
     expect(manager.getActiveSessionCount()).toBe(1);
   });
 
-  it('should update heartbeat', () => {
+  it('should update heartbeat', async () => {
     manager.registerSession('session1');
     const session = manager.getSession('session1')!;
     const oldHeartbeat = session.lastHeartbeat;
 
-    setTimeout(() => {
-      manager.heartbeat('session1');
-      const newHeartbeat = session.lastHeartbeat;
-      expect(newHeartbeat).toBeGreaterThan(oldHeartbeat);
-    }, 10);
+    await new Promise(resolve => setTimeout(resolve, 10));
+    manager.heartbeat('session1');
+    const newHeartbeat = session.lastHeartbeat;
+    expect(newHeartbeat).toBeGreaterThan(oldHeartbeat);
   });
 
   it('should record requests', () => {

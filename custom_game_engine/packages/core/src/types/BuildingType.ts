@@ -32,6 +32,17 @@ export enum BuildingType {
   ButcheringTable = 'butchering_table',
   Loom = 'loom',
   Oven = 'oven',
+
+  // Animal Housing Buildings
+  ChickenCoop = 'chicken-coop',
+  Kennel = 'kennel',
+  Stable = 'stable',
+  Apiary = 'apiary',
+  Aquarium = 'aquarium',
+  Barn = 'barn',
+
+  // Special Buildings (some may be multi-tile, but need enum for backwards compatibility)
+  University = 'university',
 }
 
 /**

@@ -1,6 +1,6 @@
-# AI Village Game Engine - Architecture Overview
+# Multiverse: The End of Eternity - Architecture Overview
 
-> **Last Updated:** 2026-01-02
+> **Last Updated:** 2026-01-06
 > **Purpose:** Master architecture document for understanding the game engine structure
 
 ---

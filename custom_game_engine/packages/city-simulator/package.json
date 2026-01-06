@@ -1,0 +1,18 @@
+{
+  "name": "@ai-village/city-simulator",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Standalone NPC city director simulator for testing city management in isolation",
+  "scripts": {
+    "dev": "vite --port 3032 --host",
+    "build": "tsc && vite build",
+    "preview": "vite preview --port 3032"
+  },
+  "dependencies": {
+    "@ai-village/core": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
+  }
+}

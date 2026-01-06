@@ -20,6 +20,14 @@ import {
  * - Manages cleanliness decay
  * - Applies housing effects to animals
  * - Validates housing assignments
+ *
+ * Dependencies:
+ * - BuildingSystem (priority 50): Must run after building data is available
+ *   - Uses Building components to track housing structures
+ *   - Validates building completion state
+ *
+ * Note: TemperatureSystem (priority 20) applies temperature effects on animals
+ * inside buildings. This system focuses on cleanliness and occupancy management.
  */
 export class AnimalHousingSystem implements System {
   public readonly id: SystemId = 'animal-housing';

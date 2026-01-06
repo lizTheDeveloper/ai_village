@@ -83,6 +83,7 @@ export { CastSpellBehavior, castSpellBehavior } from './CastSpellBehavior.js';
 // Survival behaviors
 export { SeekWarmthBehavior, seekWarmthBehavior } from './SeekWarmthBehavior.js';
 export { SeekCoolingBehavior, seekCoolingBehavior } from './SeekCoolingBehavior.js';
+export { FleeToHomeBehavior, fleeToHomeBehavior } from './FleeToHomeBehavior.js';
 
 // Navigation behaviors
 export {

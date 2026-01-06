@@ -22,9 +22,27 @@ import {
   getTemperatureStateColor,
   getNeedBarColor,
 } from './renderUtils.js';
+import { renderSprite } from '../../SpriteRenderer.js';
 
 export class InfoSection {
   private panelWidth = 360;
+  private scrollOffset = 0;
+
+  getScrollOffset(): number {
+    return this.scrollOffset;
+  }
+
+  setScrollOffset(offset: number): void {
+    this.scrollOffset = offset;
+  }
+
+  handleScroll(deltaY: number): void {
+    if (deltaY > 0) {
+      this.scrollOffset += 3;
+    } else {
+      this.scrollOffset = Math.max(0, this.scrollOffset - 3);
+    }
+  }
 
   render(
     context: SectionRenderContext,
@@ -39,21 +57,63 @@ export class InfoSection {
     goals?: GoalsComponent,
     world?: any
   ): void {
-    const { ctx, x, y, padding, lineHeight } = context;
+    const { ctx, x, y, width, height, padding, lineHeight } = context;
 
-    let currentY = y + padding;
+    // Save the context state for clipping
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x, y, width, height);
+    ctx.clip();
 
-    // Agent name (if available)
+    let currentY = y + padding - this.scrollOffset;
+
+    // Sprite rendering in top-right corner
+    const spriteSize = 48;
+    const spriteX = x + width - spriteSize - padding;
+    const spriteY = currentY;
+
+    // Get renderable component for sprite ID
+    const renderable = entity.components.get('renderable') as { spriteId: string } | undefined;
+    if (renderable?.spriteId) {
+      // Draw sprite background
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.fillRect(spriteX, spriteY, spriteSize, spriteSize);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(spriteX, spriteY, spriteSize, spriteSize);
+
+      // Render the sprite
+      renderSprite(ctx, renderable.spriteId, spriteX, spriteY, spriteSize);
+    }
+
+    // Agent name (if available) - adjusted to not overlap sprite
+    const textMaxWidth = width - spriteSize - padding * 3;
     if (identity?.name) {
       ctx.fillStyle = '#FFD700';
       ctx.font = 'bold 18px monospace';
-      ctx.fillText(identity.name, x + padding, currentY + 14);
+
+      // Truncate name if too long
+      let displayName = identity.name;
+      const nameWidth = ctx.measureText(displayName).width;
+      if (nameWidth > textMaxWidth) {
+        while (ctx.measureText(displayName + '...').width > textMaxWidth && displayName.length > 0) {
+          displayName = displayName.slice(0, -1);
+        }
+        displayName += '...';
+      }
+
+      ctx.fillText(displayName, x + padding, currentY + 14);
       currentY += 26;
     } else {
       ctx.fillStyle = '#FFFFFF';
       ctx.font = 'bold 16px monospace';
       ctx.fillText('Agent Info', x + padding, currentY + 12);
       currentY += 30;
+    }
+
+    // Adjust currentY to be below sprite if name is shorter
+    if (spriteSize > 26) {
+      currentY = Math.max(currentY, spriteY + spriteSize + 4);
     }
 
     // Soul information (if available)
@@ -111,12 +171,47 @@ export class InfoSection {
       currentY += lineHeight;
     }
 
+    // Home section (assigned bed)
+    if (agent && agent.assignedBed && position && world) {
+      const bedEntity = world.entities.get(agent.assignedBed);
+      if (bedEntity) {
+        const bedPos = bedEntity.getComponent('position') as PositionComponentData | undefined;
+        if (bedPos) {
+          // Calculate distance from home
+          const dx = position.x - bedPos.x;
+          const dy = position.y - bedPos.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const homeRadius = agent.homePreferences?.homeRadius || 20;
+
+          ctx.fillStyle = '#AADDFF';
+          ctx.font = '12px monospace';
+          ctx.fillText(`🏠 Home: (${bedPos.x.toFixed(1)}, ${bedPos.y.toFixed(1)})`, x + padding, currentY);
+          currentY += lineHeight;
+
+          // Distance and status
+          const withinRadius = distance <= homeRadius;
+          const statusColor = withinRadius ? '#00FF00' : '#FFAA00';
+          ctx.fillStyle = statusColor;
+          ctx.font = '11px monospace';
+          const statusText = withinRadius ? '(near home)' : '(away from home)';
+          ctx.fillText(`  Distance: ${distance.toFixed(1)} tiles ${statusText}`, x + padding, currentY);
+          currentY += lineHeight;
+          ctx.font = '12px monospace';
+        }
+      }
+    }
+
     // Behavior
     if (agent) {
       const behaviorLabel = agent.behavior.replace('_', ' ').toUpperCase();
       ctx.fillStyle = '#FFAA00';
       ctx.fillText(`Behavior: ${behaviorLabel}`, x + padding, currentY);
       currentY += lineHeight;
+
+      // Behavior Queue section - moved here for visibility
+      if (agent.behaviorQueue && agent.behaviorQueue.length > 0) {
+        currentY = this.renderBehaviorQueue(ctx, x, currentY, agent, padding, lineHeight);
+      }
 
       const llmStatus = agent.useLLM ? 'Yes' : 'No';
       ctx.fillStyle = '#888';
@@ -315,7 +410,7 @@ export class InfoSection {
 
       ctx.fillStyle = '#FFCC66';
       ctx.font = '11px monospace';
-      currentY = renderWrappedText(ctx, agent.lastThought, x, currentY, padding, lineHeight, this.panelWidth - padding * 2, 3);
+      currentY = renderWrappedText(ctx, agent.lastThought, x, currentY, padding, lineHeight, this.panelWidth - padding * 2, 50);
     }
 
     // Recent Speech section
@@ -344,10 +439,8 @@ export class InfoSection {
       currentY = this.renderActionQueue(ctx, x, currentY, actionQueue, padding, lineHeight);
     }
 
-    // Behavior Queue section
-    if (agent?.behaviorQueue && agent.behaviorQueue.length > 0) {
-      currentY = this.renderBehaviorQueue(ctx, x, currentY, agent, padding, lineHeight);
-    }
+    // Restore canvas state
+    ctx.restore();
   }
 
   /**

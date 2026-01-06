@@ -9,6 +9,7 @@ import { describe, it, expect } from 'vitest';
 import { WorldImpl } from '../../ecs/World.js';
 import { EntityImpl, createEntityId } from '../../ecs/Entity.js';
 import { EventBusImpl } from '../../events/EventBus.js';
+import { filterEventsByType } from '../../events/EventFilters.js';
 
 // Systems
 import { UniversitySystem } from '../UniversitySystem.js';
@@ -230,10 +231,10 @@ describe('University Research System - Full E2E', () => {
     // Flush queued events so they can be captured by listeners
     eventBus.flush();
 
-    const buildingCompleteEvents = events.filter(e => e.type === 'building:complete');
-    const techUnlockEvents = events.filter(e => e.type === 'technology:building_unlocked');
-    const researchStartedEvents = events.filter(e => e.type === 'university:research_started');
-    const researchCompletedEvents = events.filter(e => e.type === 'university:research_completed');
+    const buildingCompleteEvents = filterEventsByType(events, 'building:complete');
+    const techUnlockEvents = filterEventsByType(events, 'technology:building_unlocked');
+    const researchStartedEvents = filterEventsByType(events, 'university:research_started');
+    const researchCompletedEvents = filterEventsByType(events, 'university:research_completed');
 
     console.log(`✓ Events emitted:`);
     console.log(`  building:complete: ${buildingCompleteEvents.length}`);

@@ -10,6 +10,24 @@
  * 3. Execution (BehaviorRegistry)
  *
  * Part of Phase 6 of the AISystem decomposition (work-order: ai-system-refactor)
+ *
+ * Dependencies:
+ * - TimeSystem (priority 10): Must run after time tick is updated
+ *   - Uses world.tick for think intervals and timing
+ *   - Checks ticksSinceLastThink for agent processing
+ *
+ * - NeedsSystem: Must run before or at same priority
+ *   - Reads needs (hunger, thirst, energy) for autonomic behavior priorities
+ *   - Used by AutonomicSystem to determine urgent needs (seek_food, seek_sleep)
+ *
+ * - TemperatureSystem (priority 20): Should run before brain decisions
+ *   - Reads temperature comfort for autonomic behavior priorities
+ *   - Used to trigger seek_warmth/seek_cooling behaviors
+ *
+ * Related Systems:
+ * - SteeringSystem (priority 95): Executes movement decisions from behaviors
+ * - MovementSystem (priority 20): Applies velocity to position after steering
+ * - BehaviorRegistry: Executes chosen behaviors (gather, build, wander, etc.)
  */
 
 import type { System } from '../ecs/System.js';
@@ -43,6 +61,7 @@ import {
   idleBehavior,
   seekSleepBehavior,
   forcedSleepBehavior,
+  fleeToHomeBehavior,
   gatherBehavior,
   depositItemsBehavior,
   seekFoodBehavior,
@@ -127,6 +146,7 @@ export class AgentBrainSystem implements System {
     // Sleep behaviors
     this.behaviors.register('seek_sleep', seekSleepBehavior, { description: 'Find bed and sleep' });
     this.behaviors.register('forced_sleep', forcedSleepBehavior, { description: 'Collapse from exhaustion' });
+    this.behaviors.register('flee_to_home', fleeToHomeBehavior, { description: 'Return to assigned bed when hurt or frightened' });
 
     // Resource behaviors
     this.behaviors.register('gather', gatherBehavior, { description: 'Gather resources or seeds' });

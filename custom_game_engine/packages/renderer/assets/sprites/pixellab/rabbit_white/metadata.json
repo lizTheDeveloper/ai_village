@@ -12,7 +12,7 @@
     "east",
     "southeast"
   ],
-  "generated_at": "2026-01-05T11:01:12.457Z",
+  "generated_at": "2026-01-06T05:42:24.764Z",
   "generation_method": "reference_workflow",
   "notes": "South first, east with south ref, west flipped from east, others with south ref"
 }

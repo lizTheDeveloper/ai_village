@@ -15,6 +15,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { System } from '../ecs/System.js';
 import type { EventBus, GameEvent } from '../events/EventBus.js';
+import type { EventType } from '../events/EventMap.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import { getNewsroomSystem } from '../television/formats/NewsroomSystem.js';
 import type { NewsStory, NewsCategory, NewsPriority, FieldReporter, NewsDesk } from '../television/formats/NewsroomSystem.js';
@@ -87,15 +88,16 @@ export class EventReportingSystem implements System {
 
     // Divine events
     this.subscribeToEvent('divine:intervention', (event) => this.handleDivineIntervention(event));
+    this.subscribeToEvent('godcrafted:discovered', (event) => this.handleGodCraftedDiscovery(event));
   }
 
   /**
    * Helper to subscribe to an event type.
    */
-  private subscribeToEvent(eventType: string, handler: (event: GameEvent) => void): void {
+  private subscribeToEvent(eventType: EventType, handler: (event: GameEvent) => void): void {
     if (!this.eventBus) return;
 
-    const unsubscribe = this.eventBus.subscribe(eventType as any, handler);
+    const unsubscribe = this.eventBus.subscribe(eventType, handler);
     this.eventListeners.push(unsubscribe);
   }
 
@@ -312,6 +314,37 @@ export class EventReportingSystem implements System {
     };
 
     this.createNewsStory(score, data.interventionId, location, event.tick);
+  }
+
+  private handleGodCraftedDiscovery(event: GameEvent): void {
+    const data = event.data as any;
+    const contentType = data.contentType ?? 'artifact';
+    const name = data.name ?? 'mysterious artifact';
+    const creator = data.creatorName ?? 'Unknown God';
+    const domain = data.creatorDomain ?? 'the Unknown';
+    const method = data.discoveryMethod ?? 'unknown means';
+
+    // Create headline based on content type
+    const typeLabelMap: Record<string, string> = {
+      riddle: 'Ancient Riddle',
+      spell: 'Legendary Spell',
+      recipe: 'Divine Recipe',
+      legendary_item: 'Legendary Artifact',
+      soul: 'Ancient Soul',
+      quest: 'Divine Quest',
+    };
+    const typeLabel = typeLabelMap[contentType as string] || 'Divine Artifact';
+
+    const score: EventScore = {
+      category: 'breaking',
+      priority: 'high',
+      headline: `DISCOVERY: ${typeLabel} "${name}" Found!`,
+      summary: `A ${contentType} crafted by ${creator}, God of ${domain}, has been discovered through ${method}. Scholars are investigating its powers and origins.`,
+      sendReporter: true,
+      recordingType: 'event_coverage',
+    };
+
+    this.createNewsStory(score, data.entityId, { x: 0, y: 0 }, event.tick);
   }
 
   // ============================================================================

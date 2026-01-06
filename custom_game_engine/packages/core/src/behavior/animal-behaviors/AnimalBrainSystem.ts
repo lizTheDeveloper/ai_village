@@ -35,11 +35,14 @@ export interface BehaviorRegistry {
  * The system evaluates all available behaviors each tick and selects
  * the highest priority behavior that can start. Unlike agents, animals
  * operate on instinct rather than planning.
+ *
+ * @dependencies None - Behavior selection system that reads animal state
  */
 export class AnimalBrainSystem implements System {
   public readonly id: SystemId = 'animal-brain';
   public readonly priority: number = 12;
   public readonly requiredComponents: ReadonlyArray<ComponentType> = ['animal', 'position', 'movement'];
+  public readonly dependsOn = [] as const;
 
   private readonly registry: BehaviorRegistry;
 

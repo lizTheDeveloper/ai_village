@@ -336,7 +336,7 @@ canon_event_<id>/
 ```
 
 This package is **completely self-contained** and can be:
-- Loaded into any AI Village instance
+- Loaded into any Multiverse: The End of Eternity instance
 - Forked to create alternate timelines
 - Analyzed for emergent patterns
 - Used as starting points for new universes

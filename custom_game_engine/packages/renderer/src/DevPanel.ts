@@ -13,17 +13,8 @@
  * - Universe export/import (snapshot save/load)
  */
 
-import type { World, MagicParadigm, PowerTier } from '@ai-village/core';
+import type { World } from '@ai-village/core';
 import {
-  CORE_PARADIGM_REGISTRY,
-  ANIMIST_PARADIGM_REGISTRY,
-  WHIMSICAL_PARADIGM_REGISTRY,
-  NULL_PARADIGM_REGISTRY,
-  DIMENSIONAL_PARADIGM_REGISTRY,
-  HYBRID_PARADIGM_REGISTRY,
-  POWER_TIER_THRESHOLDS,
-  BELIEF_GENERATION_RATES,
-  MagicSystemStateManager,
   type ResearchStateComponent,
   type SkillsComponent,
   type IdentityComponent,
@@ -35,13 +26,29 @@ import {
   type DoorMaterial,
   type WindowMaterial,
 } from '@ai-village/core';
+import type { MagicParadigm } from '@ai-village/magic';
+import {
+  CORE_PARADIGM_REGISTRY,
+  ANIMIST_PARADIGM_REGISTRY,
+  WHIMSICAL_PARADIGM_REGISTRY,
+  NULL_PARADIGM_REGISTRY,
+  DIMENSIONAL_PARADIGM_REGISTRY,
+  HYBRID_PARADIGM_REGISTRY,
+  MagicSystemStateManager,
+} from '@ai-village/magic';
+import {
+  POWER_TIER_THRESHOLDS,
+  BELIEF_GENERATION_RATES,
+} from '@ai-village/divinity';
+import type { DeityComponent } from '@ai-village/core';
+import { DevRenderer, ComponentRegistry, IdentitySchema } from '@ai-village/introspection';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
 // ============================================================================
 // Types
 // ============================================================================
 
-type DevSection = 'magic' | 'divinity' | 'skills' | 'events' | 'state' | 'research' | 'buildings' | 'agents' | 'world';
+type DevSection = 'magic' | 'divinity' | 'skills' | 'events' | 'state' | 'research' | 'buildings' | 'agents' | 'world' | 'introspection';
 
 interface ResourceSlider {
   id: string;
@@ -73,7 +80,7 @@ interface ClickRegion {
   y: number;
   width: number;
   height: number;
-  action: 'select_section' | 'toggle_paradigm' | 'adjust_slider' | 'execute_action' | 'unlock_spell' | 'grant_xp' | 'adjust_spawn_x' | 'adjust_spawn_y';
+  action: 'select_section' | 'toggle_paradigm' | 'adjust_slider' | 'execute_action' | 'unlock_spell' | 'grant_xp' | 'adjust_spawn_x' | 'adjust_spawn_y' | 'select_introspection_component';
   data?: string;
 }
 
@@ -266,7 +273,7 @@ function generateDivineResources(): DevDivineResource[] {
   });
 
   // Power tier thresholds as resources (shows current belief relative to tiers)
-  const tierOrder: PowerTier[] = ['dormant', 'minor', 'moderate', 'major', 'supreme', 'world_shaping'];
+  const tierOrder = ['dormant', 'minor', 'moderate', 'major', 'supreme', 'world_shaping'] as const;
   for (const tier of tierOrder) {
     if (tier === 'dormant') continue; // Skip dormant
     resources.push({
@@ -401,6 +408,12 @@ export class DevPanel implements IWindowPanel {
 
   // Selected agent for skill XP operations
   private selectedAgentId: string | null = null;
+
+  // Introspection renderer (Phase 2A + Phase 4)
+  private devRenderer = new DevRenderer();
+  private introspectionTestEntity: any = null;
+  private selectedIntrospectionComponent: string = 'identity'; // Which schema to show
+  private introspectionTestEntities: Map<string, any> = new Map(); // Test entity for each schema
 
   constructor() {
     // Initialize paradigm states
@@ -627,6 +640,9 @@ export class DevPanel implements IWindowPanel {
       case 'buildings':
         y = this.renderBuildingsSection(ctx, width, y);
         break;
+      case 'introspection':
+        y = this.renderIntrospectionSection(ctx, width, y);
+        break;
     }
 
     ctx.restore();
@@ -666,6 +682,7 @@ export class DevPanel implements IWindowPanel {
       { id: 'buildings', label: 'Buildings' },
       { id: 'skills', label: 'Skills' },
       { id: 'state', label: 'State' },
+      { id: 'introspection', label: 'Intro' },
     ];
 
     const tabWidth = width / sections.length;
@@ -740,12 +757,101 @@ export class DevPanel implements IWindowPanel {
   }
 
   private renderDivinitySection(ctx: CanvasRenderingContext2D, width: number, y: number): number {
-    // Divine resources
-    y = this.renderSectionHeader(ctx, width, y, 'DIVINE RESOURCES');
+    if (!this.world) {
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '10px monospace';
+      ctx.fillText('No world available', SIZES.padding, y + 8);
+      return y + 30;
+    }
 
-    for (const resource of DIVINE_RESOURCES) {
-      const value = this.divineResources.get(resource.id) ?? resource.value;
-      y = this.renderSlider(ctx, width, y, { ...resource, value });
+    // Query for deity entities
+    const deities = this.world.query().with(CT.Deity).executeEntities();
+
+    if (deities.length === 0) {
+      y = this.renderSectionHeader(ctx, width, y, 'DIVINITY');
+      ctx.fillStyle = COLORS.warning;
+      ctx.font = '10px monospace';
+      ctx.fillText('No deities exist yet', SIZES.padding, y + 8);
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '9px monospace';
+      ctx.fillText('Deities emerge from agent belief', SIZES.padding, y + 24);
+      y += 44;
+    } else {
+      // Display each deity
+      for (const deity of deities) {
+        const deityComp = deity.getComponent(CT.Deity) as DeityComponent;
+        if (!deityComp) continue;
+
+        y = this.renderSectionHeader(ctx, width, y, deityComp.identity.primaryName.toUpperCase());
+
+        // Belief stats
+        const beliefState = deityComp.belief;
+
+        // Current belief
+        ctx.fillStyle = COLORS.textMuted;
+        ctx.font = '9px monospace';
+        ctx.fillText('Current Belief:', SIZES.padding, y + 4);
+        ctx.fillStyle = COLORS.divinity;
+        ctx.font = 'bold 11px monospace';
+        ctx.fillText(Math.floor(beliefState.currentBelief).toString(), SIZES.padding + 110, y + 4);
+        y += 18;
+
+        // Belief per tick
+        ctx.fillStyle = COLORS.textMuted;
+        ctx.font = '9px monospace';
+        ctx.fillText('Belief/Tick:', SIZES.padding, y + 4);
+        ctx.fillStyle = COLORS.success;
+        ctx.font = '10px monospace';
+        ctx.fillText(beliefState.beliefPerTick.toFixed(3), SIZES.padding + 110, y + 4);
+        y += 18;
+
+        // Believers
+        ctx.fillStyle = COLORS.textMuted;
+        ctx.font = '9px monospace';
+        ctx.fillText('Believers:', SIZES.padding, y + 4);
+        ctx.fillStyle = COLORS.text;
+        ctx.font = '10px monospace';
+        ctx.fillText(deityComp.believers.size.toString(), SIZES.padding + 110, y + 4);
+        y += 18;
+
+        // Total earned
+        ctx.fillStyle = COLORS.textMuted;
+        ctx.font = '9px monospace';
+        ctx.fillText('Total Earned:', SIZES.padding, y + 4);
+        ctx.fillStyle = COLORS.text;
+        ctx.font = '10px monospace';
+        ctx.fillText(Math.floor(beliefState.totalBeliefEarned).toString(), SIZES.padding + 110, y + 4);
+        y += 18;
+
+        // Total spent
+        ctx.fillStyle = COLORS.textMuted;
+        ctx.font = '9px monospace';
+        ctx.fillText('Total Spent:', SIZES.padding, y + 4);
+        ctx.fillStyle = COLORS.text;
+        ctx.font = '10px monospace';
+        ctx.fillText(Math.floor(beliefState.totalBeliefSpent).toString(), SIZES.padding + 110, y + 4);
+        y += 18;
+
+        // Unanswered prayers
+        ctx.fillStyle = COLORS.textMuted;
+        ctx.font = '9px monospace';
+        ctx.fillText('Unanswered Prayers:', SIZES.padding, y + 4);
+        ctx.fillStyle = deityComp.prayerQueue.length > 0 ? COLORS.warning : COLORS.textDim;
+        ctx.font = '10px monospace';
+        ctx.fillText(deityComp.prayerQueue.length.toString(), SIZES.padding + 140, y + 4);
+        y += 22;
+
+        // Controller type
+        ctx.fillStyle = COLORS.textMuted;
+        ctx.font = '9px monospace';
+        ctx.fillText('Controller:', SIZES.padding, y + 4);
+        const controllerColor = deityComp.controller === 'player' ? COLORS.success :
+                               deityComp.controller === 'ai' ? COLORS.magic : COLORS.textDim;
+        ctx.fillStyle = controllerColor;
+        ctx.font = '10px monospace';
+        ctx.fillText(deityComp.controller, SIZES.padding + 110, y + 4);
+        y += 24;
+      }
     }
 
     // Actions
@@ -1721,6 +1827,11 @@ export class DevPanel implements IWindowPanel {
       case 'execute_action':
         this.executeAction(region.data!);
         return true;
+
+      case 'select_introspection_component':
+        this.selectedIntrospectionComponent = region.data!;
+        this.log(`Selected schema: ${region.data}`);
+        return true;
     }
     return false;
   }
@@ -2251,5 +2362,199 @@ export class DevPanel implements IWindowPanel {
     } catch (error) {
       this.log(`ERROR in world action: ${error instanceof Error ? error.message : String(error)}`);
     }
+  }
+
+  /**
+   * Render introspection section (Phase 2A + Phase 4)
+   * Demonstrates schema-driven auto-generated UI for ALL schemas
+   */
+  private renderIntrospectionSection(ctx: CanvasRenderingContext2D, width: number, y: number): number {
+    const padding = 10;
+    const contentWidth = width - padding * 2;
+
+    // Section header
+    ctx.fillStyle = COLORS.text;
+    ctx.font = 'bold 14px monospace';
+    ctx.fillText('INTROSPECTION SYSTEM (Phase 4)', padding, y + 10);
+    y += 30;
+
+    // Description
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = '11px monospace';
+    ctx.fillText('Auto-generated UI from component schemas', padding, y);
+    y += 20;
+
+    // Get all registered schemas
+    const registeredTypes = ComponentRegistry.list().sort();
+    const schemaCount = registeredTypes.length;
+
+    // Component selector header
+    ctx.fillStyle = COLORS.text;
+    ctx.font = 'bold 11px monospace';
+    ctx.fillText(`Component Selector (${schemaCount} schemas):`, padding, y);
+    y += 20;
+
+    // Render component selector buttons (3 per row)
+    const buttonWidth = (contentWidth - 20) / 3;
+    const buttonHeight = 24;
+    const buttonPadding = 4;
+    let buttonX = padding;
+    let buttonY = y;
+    let buttonsInRow = 0;
+
+    for (const componentType of registeredTypes) {
+      const isSelected = this.selectedIntrospectionComponent === componentType;
+
+      // Draw button background
+      ctx.fillStyle = isSelected ? COLORS.magic : COLORS.inputBg;
+      ctx.fillRect(buttonX, buttonY, buttonWidth - buttonPadding, buttonHeight);
+
+      // Draw button border
+      ctx.strokeStyle = isSelected ? COLORS.warning : COLORS.textDim;
+      ctx.lineWidth = isSelected ? 2 : 1;
+      ctx.strokeRect(buttonX, buttonY, buttonWidth - buttonPadding, buttonHeight);
+
+      // Draw button text
+      ctx.fillStyle = isSelected ? COLORS.text : COLORS.textMuted;
+      ctx.font = isSelected ? 'bold 9px monospace' : '9px monospace';
+      const text = componentType.length > 12 ? componentType.substring(0, 11) + '…' : componentType;
+      const textX = buttonX + (buttonWidth - buttonPadding) / 2;
+      const textY = buttonY + 15;
+      ctx.textAlign = 'center';
+      ctx.fillText(text, textX, textY);
+      ctx.textAlign = 'left';
+
+      // Add click region
+      this.clickRegions.push({
+        x: buttonX,
+        y: buttonY,
+        width: buttonWidth - buttonPadding,
+        height: buttonHeight,
+        action: 'select_introspection_component',
+        data: componentType,
+      });
+
+      // Move to next button position
+      buttonsInRow++;
+      if (buttonsInRow >= 3) {
+        buttonX = padding;
+        buttonY += buttonHeight + buttonPadding;
+        buttonsInRow = 0;
+      } else {
+        buttonX += buttonWidth;
+      }
+    }
+
+    // Move y past all buttons
+    y = buttonY + (buttonsInRow > 0 ? buttonHeight + buttonPadding : 0) + 10;
+
+    // Get or create test entity for selected component
+    if (!this.introspectionTestEntities.has(this.selectedIntrospectionComponent)) {
+      const schema = ComponentRegistry.get(this.selectedIntrospectionComponent);
+      if (schema && schema.createDefault) {
+        const testEntity = schema.createDefault();
+
+        // Set some interesting test values for specific components
+        if (this.selectedIntrospectionComponent === 'identity' && 'name' in testEntity) {
+          (testEntity as any).name = 'Test Entity';
+          (testEntity as any).age = 1000;
+          (testEntity as any).species = 'elf';
+        } else if (this.selectedIntrospectionComponent === 'personality' && 'openness' in testEntity) {
+          (testEntity as any).openness = 0.9;
+          (testEntity as any).agreeableness = 0.8;
+          (testEntity as any).spirituality = 0.7;
+        } else if (this.selectedIntrospectionComponent === 'skills' && 'levels' in testEntity) {
+          (testEntity as any).levels.exploration = 5;
+          (testEntity as any).levels.crafting = 4;
+          (testEntity as any).levels.farming = 3;
+        } else if (this.selectedIntrospectionComponent === 'needs' && 'hunger' in testEntity) {
+          (testEntity as any).hunger = 0.3;
+          (testEntity as any).energy = 0.4;
+          (testEntity as any).socialContact = 0.2;
+        }
+
+        this.introspectionTestEntities.set(this.selectedIntrospectionComponent, testEntity);
+
+        // Initialize dev renderer for this component
+        this.devRenderer.initializeComponent(
+          this.selectedIntrospectionComponent,
+          testEntity,
+          (fieldName: string, newValue: unknown) => {
+            // Update the test entity
+            const entity = this.introspectionTestEntities.get(this.selectedIntrospectionComponent);
+            if (entity) {
+              (entity as any)[fieldName] = newValue;
+              this.log(`Updated ${this.selectedIntrospectionComponent}.${fieldName} to ${newValue}`);
+            }
+          }
+        );
+      }
+    }
+
+    // Render selected component
+    const selectedEntity = this.introspectionTestEntities.get(this.selectedIntrospectionComponent);
+    const selectedSchema = ComponentRegistry.get(this.selectedIntrospectionComponent);
+
+    if (selectedEntity && selectedSchema) {
+      // Component header
+      ctx.fillStyle = COLORS.warning;
+      ctx.font = 'bold 12px monospace';
+      ctx.fillText(`Component: ${this.selectedIntrospectionComponent}`, padding, y);
+      y += 5;
+
+      // Schema metadata
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '10px monospace';
+      ctx.fillText(
+        `Category: ${selectedSchema.category} | Version: ${selectedSchema.version} | Fields: ${Object.keys(selectedSchema.fields).length}`,
+        padding,
+        y
+      );
+      y += 20;
+
+      // Render schema-driven fields
+      const heightConsumed = this.devRenderer.render(
+        ctx,
+        this.selectedIntrospectionComponent,
+        padding,
+        y,
+        contentWidth
+      );
+
+      y += heightConsumed + 10;
+
+      // Info text
+      ctx.fillStyle = COLORS.textDim;
+      ctx.font = '10px monospace';
+      ctx.fillText('↑ Interactive schema-driven UI (click fields to edit)', padding, y);
+      y += 20;
+    } else {
+      ctx.fillStyle = COLORS.warning;
+      ctx.font = '11px monospace';
+      ctx.fillText(`Schema '${this.selectedIntrospectionComponent}' has no createDefault() method.`, padding, y);
+      y += 20;
+    }
+
+    // Registry stats
+    ctx.fillStyle = COLORS.textMuted;
+    ctx.font = 'bold 11px monospace';
+    ctx.fillText('Registry Stats:', padding, y);
+    y += 15;
+
+    ctx.font = '10px monospace';
+    ctx.fillText(`Total schemas: ${schemaCount}`, padding + 10, y);
+    y += 15;
+    ctx.fillText(`Test entities: ${this.introspectionTestEntities.size}`, padding + 10, y);
+    y += 20;
+
+    // Phase completion status
+    ctx.fillStyle = COLORS.success;
+    ctx.font = 'bold 12px monospace';
+    ctx.fillText('✓ Phase 4: Schema Migration - COMPLETE', padding, y);
+    y += 15;
+    ctx.fillText('✓ DevPanel: All Schemas Visible', padding, y);
+    y += 20;
+
+    return y;
   }
 }

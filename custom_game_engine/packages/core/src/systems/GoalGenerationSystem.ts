@@ -12,11 +12,14 @@ import { GoalDescriptionLibrary } from './GoalDescriptionLibrary.js';
 /**
  * GoalGenerationSystem handles automatic goal generation during reflection
  * and goal progress tracking based on agent actions.
+ *
+ * @dependencies None - Event-driven system that responds to reflection and action completion
  */
 export class GoalGenerationSystem implements System {
   public readonly id: SystemId = 'goal_generation';
   public readonly priority: number = 115; // After reflection system
   public readonly requiredComponents = [] as const;
+  public readonly dependsOn = [] as const;
 
   private eventBus: EventBus;
   private nextGoalId = 0;

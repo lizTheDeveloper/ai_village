@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spell Laboratory - Multiverse: The End of Eternity Microgenerator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+      color: #eee;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(30, 30, 60, 0.9);
+      border: 2px solid #7b68ee;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(123, 104, 238, 0.3);
+    }
+
+    h1 {
+      text-align: center;
+      color: #9370db;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(147, 112, 219, 0.5);
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #aaa;
+      font-style: italic;
+      margin-bottom: 30px;
+      font-size: 0.95em;
+    }
+
+    .section {
+      margin-bottom: 25px;
+      padding: 20px;
+      background: rgba(20, 20, 50, 0.5);
+      border-radius: 8px;
+      border-left: 4px solid #7b68ee;
+    }
+
+    .section-title {
+      color: #9370db;
+      font-size: 1.2em;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+    }
+
+    .section-title::before {
+      content: '✨';
+      margin-right: 10px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #ccc;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #555;
+      border-radius: 5px;
+      color: #eee;
+      font-family: inherit;
+      font-size: 1em;
+      margin-bottom: 15px;
+      transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #9370db;
+    }
+
+    textarea {
+      min-height: 60px;
+      resize: vertical;
+    }
+
+    .tag-input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .tag-input-group input {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    .tag-input-group button {
+      padding: 12px 20px;
+      background: #7b68ee;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+      white-space: nowrap;
+    }
+
+    .tag-input-group button:hover {
+      background: #9370db;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .tag {
+      background: rgba(123, 104, 238, 0.3);
+      padding: 6px 12px;
+      border-radius: 15px;
+      font-size: 0.9em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tag .remove {
+      cursor: pointer;
+      color: #f88;
+      font-weight: bold;
+    }
+
+    button.primary {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #7b68ee 0%, #9370db 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    button.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(123, 104, 238, 0.4);
+    }
+
+    button.primary:active {
+      transform: translateY(0);
+    }
+
+    button.primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .divine-signature {
+      background: rgba(147, 112, 219, 0.1);
+      border: 1px dashed #9370db;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 20px;
+      text-align: center;
+      font-style: italic;
+      color: #9370db;
+    }
+
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background: rgba(147, 112, 219, 0.1);
+      border: 2px solid #9370db;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .result.show {
+      display: block;
+      animation: fadeIn 0.5s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result h3 {
+      color: #9370db;
+      margin-bottom: 15px;
+    }
+
+    .spell-details {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      border-radius: 5px;
+      margin: 10px 0;
+    }
+
+    .spell-property {
+      margin-bottom: 10px;
+    }
+
+    .spell-property strong {
+      color: #9370db;
+    }
+
+    .error {
+      background: rgba(255, 0, 0, 0.2);
+      border: 1px solid #f00;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 15px;
+      display: none;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    .help-text {
+      font-size: 0.9em;
+      color: #aaa;
+      margin-top: -10px;
+      margin-bottom: 15px;
+    }
+
+    .warning {
+      background: rgba(255, 165, 0, 0.2);
+      border: 1px solid #ffa500;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .warning.show {
+      display: block;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .back-link a {
+      color: #9370db;
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    .power-slider {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    .power-indicator {
+      text-align: center;
+      color: #9370db;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>✨ Spell Laboratory</h1>
+    <p class="subtitle">Experiment with magical techniques and create new spells</p>
+
+    <form id="spellForm">
+      <!-- Divine Signature -->
+      <div class="section">
+        <div class="section-title">Divine Identity</div>
+        <label for="creatorName">Your Name</label>
+        <input type="text" id="creatorName" required placeholder="Enter your name...">
+
+        <label for="godOf">God of...</label>
+        <input type="text" id="godOf" required placeholder="Experimental Magic">
+        <p class="help-text">Declare your divine domain</p>
+
+        <div class="divine-signature" id="signaturePreview">
+          "Crafted by <span id="previewName">Your Name</span>, God of <span id="previewGodOf">Your Domain</span>"
+        </div>
+      </div>
+
+      <!-- Spell Configuration -->
+      <div class="section">
+        <div class="section-title">Spell Parameters</div>
+
+        <label for="spellName">Spell Name (optional)</label>
+        <input type="text" id="spellName" placeholder="Leave blank for AI to name">
+
+        <label for="techniques">Magical Techniques</label>
+        <div class="tag-input-group">
+          <input type="text" id="techniqueInput" placeholder="e.g., 'channel energy', 'bind souls'">
+          <button type="button" id="addTechniqueBtn">Add</button>
+        </div>
+        <div class="tag-list" id="techniquesList"></div>
+        <p class="help-text">The magical methods used (at least one required)</p>
+
+        <label for="forms">Spell Forms</label>
+        <div class="tag-input-group">
+          <input type="text" id="formInput" placeholder="e.g., 'bolt', 'shield', 'aura'">
+          <button type="button" id="addFormBtn">Add</button>
+        </div>
+        <div class="tag-list" id="formsList"></div>
+        <p class="help-text">The shape/manifestation of the spell (at least one required)</p>
+
+        <label for="reagents">Reagents (optional)</label>
+        <div class="tag-input-group">
+          <input type="text" id="reagentInput" placeholder="e.g., 'dragon scale', 'moonstone'">
+          <button type="button" id="addReagentBtn">Add</button>
+        </div>
+        <div class="tag-list" id="reagentsList"></div>
+        <p class="help-text">Material components required for the spell</p>
+
+        <label for="intent">Spell Intent (optional)</label>
+        <textarea id="intent" placeholder="What should this spell accomplish?"></textarea>
+
+        <label for="casterStyle">Caster Personality/Style (optional)</label>
+        <input type="text" id="casterStyle" placeholder="e.g., 'aggressive pyromancer', 'gentle healer'">
+
+        <label for="powerLevel">Power Level: <span id="powerLevelDisplay">5</span></label>
+        <input type="range" id="powerLevel" min="1" max="10" value="5" class="power-slider">
+        <p class="help-text">1 = Cantrip, 10 = Reality-bending</p>
+        <div id="powerWarning" class="warning">⚠️ Power levels above 8 may create unstable or overpowered spells!</div>
+      </div>
+
+      <button type="submit" class="primary" id="generateBtn">🔮 Forge Spell</button>
+    </form>
+
+    <!-- Result Display -->
+    <div id="result" class="result">
+      <h3>✨ Spell Forged!</h3>
+      <div class="spell-details" id="spellDetails"></div>
+      <p id="spellSignature" style="margin-top: 15px; font-style: italic; color: #aaa;"></p>
+    </div>
+
+    <!-- Error Display -->
+    <div id="error" class="error">
+      <strong>Error:</strong> <span id="errorMessage"></span>
+    </div>
+
+    <div class="back-link">
+      <a href="/microgen">← Back to Microgenerators</a>
+    </div>
+  </div>
+
+  <script>
+    // Tag management
+    const techniques = [];
+    const forms = [];
+    const reagents = [];
+
+    function addTag(array, value, listElement) {
+      if (!value.trim()) return;
+      if (array.includes(value.trim())) return;
+
+      array.push(value.trim());
+      updateTagList(array, listElement);
+    }
+
+    function removeTag(array, value, listElement) {
+      const index = array.indexOf(value);
+      if (index > -1) {
+        array.splice(index, 1);
+        updateTagList(array, listElement);
+      }
+    }
+
+    function updateTagList(array, listElement) {
+      listElement.innerHTML = array.map(tag => `
+        <div class="tag">
+          ${tag}
+          <span class="remove" onclick="removeTag(${array === techniques ? 'techniques' : array === forms ? 'forms' : 'reagents'}, '${tag}', ${array === techniques ? 'techniquesList' : array === forms ? 'formsList' : 'reagentsList'})">×</span>
+        </div>
+      `).join('');
+    }
+
+    const techniquesList = document.getElementById('techniquesList');
+    const formsList = document.getElementById('formsList');
+    const reagentsList = document.getElementById('reagentsList');
+
+    document.getElementById('addTechniqueBtn').addEventListener('click', () => {
+      const input = document.getElementById('techniqueInput');
+      addTag(techniques, input.value, techniquesList);
+      input.value = '';
+    });
+
+    document.getElementById('techniqueInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('addTechniqueBtn').click();
+      }
+    });
+
+    document.getElementById('addFormBtn').addEventListener('click', () => {
+      const input = document.getElementById('formInput');
+      addTag(forms, input.value, formsList);
+      input.value = '';
+    });
+
+    document.getElementById('formInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('addFormBtn').click();
+      }
+    });
+
+    document.getElementById('addReagentBtn').addEventListener('click', () => {
+      const input = document.getElementById('reagentInput');
+      addTag(reagents, input.value, reagentsList);
+      input.value = '';
+    });
+
+    document.getElementById('reagentInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('addReagentBtn').click();
+      }
+    });
+
+    // Update divine signature preview
+    const nameInput = document.getElementById('creatorName');
+    const godOfInput = document.getElementById('godOf');
+    const previewName = document.getElementById('previewName');
+    const previewGodOf = document.getElementById('previewGodOf');
+
+    nameInput.addEventListener('input', () => {
+      previewName.textContent = nameInput.value || 'Your Name';
+    });
+
+    godOfInput.addEventListener('input', () => {
+      previewGodOf.textContent = godOfInput.value || 'Your Domain';
+    });
+
+    // Power level display and warning
+    const powerLevel = document.getElementById('powerLevel');
+    const powerLevelDisplay = document.getElementById('powerLevelDisplay');
+    const powerWarning = document.getElementById('powerWarning');
+
+    powerLevel.addEventListener('input', () => {
+      powerLevelDisplay.textContent = powerLevel.value;
+      if (powerLevel.value > 8) {
+        powerWarning.classList.add('show');
+      } else {
+        powerWarning.classList.remove('show');
+      }
+    });
+
+    // Form submission
+    document.getElementById('spellForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const generateBtn = document.getElementById('generateBtn');
+      const result = document.getElementById('result');
+      const error = document.getElementById('error');
+
+      // Validation
+      if (techniques.length === 0) {
+        document.getElementById('errorMessage').textContent = 'At least one magical technique is required';
+        error.classList.add('show');
+        return;
+      }
+
+      if (forms.length === 0) {
+        document.getElementById('errorMessage').textContent = 'At least one spell form is required';
+        error.classList.add('show');
+        return;
+      }
+
+      // Hide previous results
+      result.classList.remove('show');
+      error.classList.remove('show');
+
+      // Disable button
+      generateBtn.disabled = true;
+      generateBtn.textContent = '⏳ Forging Spell...';
+
+      try {
+        // Build request payload
+        const payload = {
+          creator: {
+            id: `creator_${Date.now()}`,
+            name: nameInput.value,
+            godOf: godOfInput.value,
+            createdAt: Date.now(),
+            source: 'microgenerator',
+            previousCreations: 0,
+          },
+          tags: ['spell', 'experimental', ...techniques, ...forms],
+          data: {
+            name: document.getElementById('spellName').value || undefined,
+            techniques: techniques,
+            forms: forms,
+            reagents: reagents.length > 0 ? reagents : undefined,
+            powerLevel: parseInt(powerLevel.value),
+            intent: document.getElementById('intent').value || undefined,
+            casterPersonality: document.getElementById('casterStyle').value || undefined,
+          },
+        };
+
+        // Call API
+        const response = await fetch('/api/spell/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Display spell
+          const spell = data.spell.data;
+
+          let detailsHTML = `
+            <div class="spell-property"><strong>Name:</strong> ${spell.name}</div>
+            <div class="spell-property"><strong>Spell ID:</strong> ${spell.spellId}</div>
+            <div class="spell-property"><strong>Description:</strong> ${spell.description}</div>
+            <div class="spell-property"><strong>Mana Cost:</strong> ${spell.manaCost}</div>
+            <div class="spell-property"><strong>Cast Time:</strong> ${spell.castTime}s</div>
+            <div class="spell-property"><strong>Cooldown:</strong> ${spell.cooldown}s</div>
+            <div class="spell-property"><strong>Range:</strong> ${spell.range}m</div>
+            <div class="spell-property"><strong>Area of Effect:</strong> ${spell.areaOfEffect || 'Single target'}</div>
+            <div class="spell-property"><strong>Duration:</strong> ${spell.duration}s</div>
+          `;
+
+          if (spell.effects && spell.effects.length > 0) {
+            detailsHTML += `<div class="spell-property"><strong>Effects:</strong><ul style="margin-left: 20px; margin-top: 5px;">`;
+            spell.effects.forEach(effect => {
+              detailsHTML += `<li>${effect.type}: ${effect.magnitude} (${effect.duration}s)</li>`;
+            });
+            detailsHTML += `</ul></div>`;
+          }
+
+          if (spell.requirements && spell.requirements.length > 0) {
+            detailsHTML += `<div class="spell-property"><strong>Requirements:</strong><ul style="margin-left: 20px; margin-top: 5px;">`;
+            spell.requirements.forEach(req => {
+              detailsHTML += `<li>${req}</li>`;
+            });
+            detailsHTML += `</ul></div>`;
+          }
+
+          detailsHTML += `<div class="spell-property"><strong>Creativity Score:</strong> ${spell.creativityScore}/100</div>`;
+
+          document.getElementById('spellDetails').innerHTML = detailsHTML;
+          document.getElementById('spellSignature').textContent =
+            `Crafted by ${payload.creator.name}, God of ${payload.creator.godOf}`;
+
+          result.classList.add('show');
+        } else {
+          throw new Error(data.error || 'Unknown error');
+        }
+      } catch (err) {
+        document.getElementById('errorMessage').textContent = err.message;
+        error.classList.add('show');
+      } finally {
+        generateBtn.disabled = false;
+        generateBtn.textContent = '🔮 Forge Spell';
+      }
+    });
+  </script>
+</body>
+</html>

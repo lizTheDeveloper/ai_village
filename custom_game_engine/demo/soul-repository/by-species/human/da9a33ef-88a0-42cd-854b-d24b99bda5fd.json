@@ -1,0 +1,16 @@
+{
+  "soulId": "da9a33ef-88a0-42cd-854b-d24b99bda5fd",
+  "agentId": "da9a33ef-88a0-42cd-854b-d24b99bda5fd",
+  "name": "River",
+  "species": "human",
+  "archetype": "protector",
+  "purpose": "[CORRUPTED SOUL] The Fates spoke only in riddles and internal musings. This soul's purpose remains veiled in cosmic static. Perhaps a divine intervention could restore their true purpose...",
+  "interests": [
+    "knowledge",
+    "crafting"
+  ],
+  "createdAt": "2026-01-05T06:27:05.299Z",
+  "soulBirthTick": 280,
+  "universeId": "unknown",
+  "version": 1
+}

@@ -80,10 +80,24 @@ function calculateLightLevel(timeOfDay: number, phase: DayPhase): number {
  * Integrates with WeatherSystem via temperature modifiers
  * Integrates with MultiverseCoordinator for time scale management
  */
+/**
+ * TimeSystem - Core time advancement system
+ *
+ * Dependencies: None (runs first)
+ *
+ * This system must run before all other systems as it provides the fundamental
+ * time tracking that other systems depend on for their calculations.
+ */
 export class TimeSystem implements System {
   public readonly id: SystemId = 'time';
   public readonly priority: number = 3; // Run early, before Weather (priority 5)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Time];
+
+  /**
+   * Systems that must run before this one.
+   * None - TimeSystem runs first to establish time tracking.
+   */
+  public readonly dependsOn = [] as const;
 
   private lastPhase: DayPhase | null = null;
   private lastDay: number = 1; // Track previous day to detect week changes

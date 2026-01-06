@@ -466,6 +466,7 @@ export class SoulCreationSystem implements System {
 
     // Get response from LLM or placeholder
     let response: string;
+    let thoughts: string | undefined;
     if (this.useLLM && this.llmProvider) {
       try {
         const llmResponse = await this.llmProvider.generate({
@@ -473,9 +474,27 @@ export class SoulCreationSystem implements System {
           temperature: 0.8, // Creative but not random
           maxTokens: 400,   // Room for reasoning + character speech (thinking ~200 tokens, speech ~100-150 tokens)
         });
-        response = llmResponse.text.trim();
-        // Strip think tags to get only character speech
-        response = response.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+        let fullResponse = llmResponse.text.trim();
+
+        // Extract thinking content (both <think> and <thinking> variants)
+        const thinkingMatch = fullResponse.match(/<thinking>([\s\S]*?)<\/thinking>/i);
+        const thinkMatch = fullResponse.match(/<think>([\s\S]*?)<\/think>/i);
+        thoughts = thinkingMatch?.[1]?.trim() || thinkMatch?.[1]?.trim();
+
+        // Strip thinking tags to get only character speech
+        response = fullResponse.replace(/<thinking>[\s\S]*?<\/thinking>/gi, '').trim();
+        response = response.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+
+        // Also handle JSON responses
+        const jsonMatch = response.match(/\{[\s\S]*"speaking":\s*"([^"]+)"[\s\S]*\}/);
+        if (jsonMatch && jsonMatch[1]) {
+          // Extract thinking from JSON if present
+          const jsonThinkingMatch = fullResponse.match(/"thinking":\s*"([^"]+)"/);
+          if (jsonThinkingMatch?.[1] && !thoughts) {
+            thoughts = jsonThinkingMatch[1];
+          }
+          response = jsonMatch[1];
+        }
       } catch (error) {
         console.warn('[SoulCreationSystem] LLM failed, using placeholder:', error);
         response = this.getPlaceholderResponse(
@@ -496,6 +515,7 @@ export class SoulCreationSystem implements System {
     const exchange: ConversationExchange = {
       speaker: ceremony.currentSpeaker,
       text: response,
+      thoughts: thoughts, // Preserve thinking content for debugging/transparency
       tick: world.tick,
       topic: this.determineTopic(ceremony.turnCount),
     };
@@ -594,6 +614,18 @@ export class SoulCreationSystem implements System {
     const soulEntity = world.getEntity(soulId);
     const soulIdentity = soulEntity?.components.get('soul_identity') as any;
 
+    // Compile all Fate thoughts into a single string for the soul record
+    const allThoughts = ceremony.transcript
+      .filter(exchange => exchange.thoughts)
+      .map(exchange => {
+        const speaker = exchange.speaker === 'weaver' ? 'The Weaver'
+          : exchange.speaker === 'spinner' ? 'The Spinner'
+          : exchange.speaker === 'cutter' ? 'The Cutter'
+          : exchange.speaker;
+        return `[${speaker}] ${exchange.thoughts}`;
+      })
+      .join('\n\n');
+
     // Emit completion event with all fields needed by repository
     world.eventBus.emit({
       type: 'soul:ceremony_complete',
@@ -608,6 +640,7 @@ export class SoulCreationSystem implements System {
         destiny: parsed.destiny,
         archetype: parsed.archetype ?? 'wanderer',
         transcript: ceremony.transcript,
+        thoughts: allThoughts || undefined, // Compiled Fate reasoning
       },
     });
 

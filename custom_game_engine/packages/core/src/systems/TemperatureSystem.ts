@@ -33,6 +33,13 @@ interface WorldWithTiles extends World {
   getTileAt(x: number, y: number): ITile | undefined;
 }
 
+/**
+ * TemperatureSystem - Simulates temperature effects on entities
+ *
+ * Dependencies:
+ * @see TimeSystem (priority 3) - Provides time of day for daily temperature variation
+ * @see WeatherSystem (priority 5) - Provides weather modifiers (rain, frost) affecting temperature
+ */
 export class TemperatureSystem implements System {
   public readonly id: SystemId = 'temperature';
   public readonly priority: number = 14; // Run after weather (5), before needs (15)
@@ -40,6 +47,13 @@ export class TemperatureSystem implements System {
     CT.Temperature,
     CT.Position,
   ];
+
+  /**
+   * Systems that must run before this one.
+   * @see TimeSystem - provides time of day for daily temperature cycles
+   * @see WeatherSystem - provides weather modifiers (tempModifier) affecting ambient temperature
+   */
+  public readonly dependsOn = ['time', 'weather'] as const;
 
   private readonly HEALTH_DAMAGE_RATE = HEALTH_DAMAGE_RATE; // Health damage per second in dangerous temps
   private readonly BASE_TEMP = WORLD_TEMP_BASE; // Default world temperature in °C

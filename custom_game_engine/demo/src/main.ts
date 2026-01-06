@@ -1,8 +1,6 @@
 import {
   GameLoop,
   BuildingBlueprintRegistry,
-  registerShopBlueprints,
-  registerFarmBlueprints,
   PlacementValidator,
   SoilSystem,
   PlantComponent,
@@ -38,19 +36,13 @@ import {
   registerDefaultResearch,
   // Metrics Collection System (with streaming support)
   MetricsCollectionSystem,
-  // Live Entity API for dashboard queries
-  LiveEntityAPI,
   // Governance Data System (Phase 11)
   GovernanceDataSystem,
   // Auto-save & Time Travel
   checkpointNamingService,
-  saveLoadService,
-  IndexedDBStorage,
   // Centralized system registration
   registerAllSystems as coreRegisterAllSystems,
   type SystemRegistrationResult as CoreSystemResult,
-  // Magic system
-  SpellRegistry,
   // Soul creation system
   SoulCreationSystem,
   createSoulLinkComponent,
@@ -61,7 +53,14 @@ import {
   // Tile-based buildings
   getTileBasedBlueprintRegistry,
   BuildingType,
+  // Microgenerators - God-crafted content discovery
+  GodCraftedDiscoverySystem,
+  // Agent debug logging
+  AgentDebugManager,
 } from '@ai-village/core';
+import { saveLoadService, IndexedDBStorage } from '@ai-village/persistence';
+import { LiveEntityAPI } from '@ai-village/metrics';
+import { SpellRegistry } from '@ai-village/magic';
 import {
   Renderer,
   InputHandler,
@@ -76,6 +75,8 @@ import {
   TileInspectorPanel,
   PlantInfoPanel,
   ResourcesPanel,
+  CityManagerPanel,
+  CityStatsWidget,
   SettingsPanel,
   MemoryPanel,
   RelationshipsPanel,
@@ -150,6 +151,8 @@ import {
   FallbackProvider,
   LLMDecisionQueue,
   StructuredPromptBuilder,
+  TalkerPromptBuilder,
+  ExecutorPromptBuilder,
   promptLogger,
   type LLMProvider,
 } from '@ai-village/llm';
@@ -181,6 +184,7 @@ interface UIContext {
   economyPanel: EconomyPanel;
   shopPanel: ShopPanel;
   governancePanel: GovernanceDashboardPanel;
+  cityStatsWidget: CityStatsWidget;
   inventoryUI: InventoryUI;
   craftingUI: CraftingPanelUI;
   placementUI: BuildingPlacementUI;
@@ -674,7 +678,10 @@ interface SystemRegistrationResult {
 async function registerAllSystems(
   gameLoop: GameLoop,
   llmQueue: LLMDecisionQueue | null,
-  promptBuilder: StructuredPromptBuilder | null
+  promptBuilder: StructuredPromptBuilder | null,
+  agentDebugManager: AgentDebugManager,
+  talkerPromptBuilder: TalkerPromptBuilder | null = null,
+  executorPromptBuilder: ExecutorPromptBuilder | null = null
 ): Promise<SystemRegistrationResult> {
   // Register default materials and recipes before system registration
   const { registerDefaultMaterials } = await import('@ai-village/core');
@@ -731,6 +738,14 @@ async function registerAllSystems(
       if (promptBuilder) {
         liveEntityAPI.setPromptBuilder(promptBuilder);
       }
+      // Wire up Talker and Executor prompt builders for inspection
+      if (talkerPromptBuilder) {
+        liveEntityAPI.setTalkerPromptBuilder(talkerPromptBuilder);
+      }
+      if (executorPromptBuilder) {
+        liveEntityAPI.setExecutorPromptBuilder(executorPromptBuilder);
+      }
+      liveEntityAPI.setAgentDebugManager(agentDebugManager);
       liveEntityAPI.attach(streamClient);
     }
   }
@@ -767,11 +782,14 @@ interface UIPanelsResult {
   economyPanel: EconomyPanel;
   shopPanel: ShopPanel;
   governancePanel: GovernanceDashboardPanel;
+  cityManagerPanel: CityManagerPanel;
+  cityStatsWidget: CityStatsWidget;
   inventoryUI: InventoryUI;
   craftingUI: CraftingPanelUI;
   settingsPanel: SettingsPanel;
   tileInspectorPanel: TileInspectorPanel;
   controlsPanel: ControlsPanel;
+  hoverInfoPanel: UnifiedHoverInfoPanel;
 }
 
 function createUIPanels(
@@ -826,6 +844,8 @@ function createUIPanels(
   const economyPanel = new EconomyPanel();
   const shopPanel = new ShopPanel();
   const governancePanel = new GovernanceDashboardPanel();
+  const cityManagerPanel = new CityManagerPanel();
+  const cityStatsWidget = new CityStatsWidget('top-right');
   const inventoryUI = new InventoryUI(canvas, gameLoop.world);
   const hoverInfoPanel = new UnifiedHoverInfoPanel();
 
@@ -870,6 +890,8 @@ function createUIPanels(
     economyPanel,
     shopPanel,
     governancePanel,
+    cityManagerPanel,
+    cityStatsWidget,
     inventoryUI,
     craftingUI,
     settingsPanel,
@@ -1140,6 +1162,35 @@ function setupWindowManager(
       windowManager.toggleWindow('governance');
       return true;
     },
+  });
+
+  // City Manager Panel
+  windowManager.registerWindow('city-manager', panels.cityManagerPanel, {
+    defaultX: logicalWidth - 420,
+    defaultY: 120,
+    defaultWidth: 360,
+    defaultHeight: 500,
+    isDraggable: true,
+    isResizable: false,
+    showInWindowList: true,
+    keyboardShortcut: 'C',
+    menuCategory: 'social',
+  });
+
+  // Register city manager keyboard shortcut
+  keyboardRegistry.register('toggle_city_manager', {
+    key: 'C',
+    description: 'Toggle city manager',
+    category: 'Windows',
+    handler: () => {
+      windowManager.toggleWindow('city-manager');
+      return true;
+    },
+  });
+
+  // Wire up city stats widget click handler
+  panels.cityStatsWidget.setOnClick(() => {
+    windowManager.toggleWindow('city-manager');
   });
 
   // Controls panel
@@ -2502,12 +2553,17 @@ function handleMouseClick(
   const {
     agentInfoPanel, animalInfoPanel, plantInfoPanel, tileInspectorPanel,
     memoryPanel, relationshipsPanel, craftingUI, shopPanel,
-    placementUI, windowManager, menuBar
+    placementUI, windowManager, menuBar, cityStatsWidget
   } = uiContext;
 
   // Left click - window management and menu bar
   if (button === 0) {
     if (menuBar.handleClick(screenX, screenY)) {
+      return true;
+    }
+
+    // City stats widget click (opens city manager panel)
+    if (cityStatsWidget.handleClick(screenX, screenY, canvas.width, canvas.height)) {
       return true;
     }
 
@@ -2649,7 +2705,8 @@ function setupDebugAPI(
   agentInfoPanel: AgentInfoPanel,
   animalInfoPanel: AnimalInfoPanel,
   resourcesPanel: ResourcesPanel,
-  devPanelInstance: DevPanel
+  devPanelInstance: DevPanel,
+  agentDebugManager: AgentDebugManager
 ) {
   (window as any).game = {
     world: gameLoop.world,
@@ -2661,6 +2718,7 @@ function setupDebugAPI(
     animalInfoPanel,
     resourcesPanel,
     devPanel: devPanelInstance,
+    debugManager: agentDebugManager,
 
     // Skill management API
     grantSkillXP: (agentId: string, amount: number) => {
@@ -2817,8 +2875,28 @@ async function main() {
   // Track intervals for cleanup to prevent memory leaks
   const intervalIds: ReturnType<typeof setInterval>[] = [];
 
-  // Create game loop
-  const gameLoop = new GameLoop();
+  // Check if SharedWorker mode is enabled
+  const useSharedWorker = import.meta.env.VITE_USE_SHARED_WORKER === 'true';
+
+  // Create game loop (either direct or via SharedWorker bridge)
+  let gameLoop: GameLoop;
+  let isSharedWorkerMode = false;
+
+  if (useSharedWorker) {
+    console.log('[Main] Using SharedWorker architecture');
+    const { gameBridge } = await import('@ai-village/shared-worker');
+    await gameBridge.init();
+    gameLoop = gameBridge.gameLoop;
+    isSharedWorkerMode = true;
+    console.log('[Main] SharedWorker bridge initialized');
+  } else {
+    console.log('[Main] Using direct GameLoop');
+    gameLoop = new GameLoop();
+    isSharedWorkerMode = false;
+  }
+
+  // Create agent debug manager for deep logging
+  const agentDebugManager = new AgentDebugManager('logs/agent-debug');
 
   // Create settings panel
   const settingsPanel = new SettingsPanel();
@@ -2927,10 +3005,14 @@ async function main() {
   ]);
   let llmQueue: LLMDecisionQueue | null = null;
   let promptBuilder: StructuredPromptBuilder | null = null;
+  let talkerPromptBuilder: TalkerPromptBuilder | null = null;
+  let executorPromptBuilder: ExecutorPromptBuilder | null = null;
 
   if (isLLMAvailable) {
     llmQueue = new LLMDecisionQueue(llmProvider, 1);
     promptBuilder = new StructuredPromptBuilder();
+    talkerPromptBuilder = new TalkerPromptBuilder();
+    executorPromptBuilder = new ExecutorPromptBuilder();
 
     // Wire up checkpoint naming service with LLM
     checkpointNamingService.setProvider(llmProvider);
@@ -2965,9 +3047,20 @@ async function main() {
   let universeConfigScreen: UniverseConfigScreen | null = null;
   let universeConfig: UniverseConfig | null = null;  // Store full config for scenario access
 
+  // Create god-crafted discovery system first (needed by TerrainGenerator)
+  const godCraftedDiscoverySystem = new GodCraftedDiscoverySystem({
+    universeId: 'universe:main',
+    spawnRate: 0.01, // 1% of chunks contain god-crafted content
+    maxPowerLevel: 10, // Maximum power level for spawned content
+    seed: Date.now(), // Seed for deterministic chunk-based spawning
+  });
+  // Register the system immediately after creation
+  gameLoop.systemRegistry.register(godCraftedDiscoverySystem);
+  console.log('[Main] God-crafted discovery system registered (1% spawn rate per chunk, max power level 10)');
+
   // Create ChunkManager and TerrainGenerator BEFORE loading saves
   // so terrain can be restored from checkpoints
-  const terrainGenerator = new TerrainGenerator('phase8-demo');
+  const terrainGenerator = new TerrainGenerator('phase8-demo', godCraftedDiscoverySystem);
   const chunkManager = new ChunkManager(3);
   (gameLoop.world as any).setChunkManager(chunkManager);
   (gameLoop.world as any).setTerrainGenerator(terrainGenerator);
@@ -3004,6 +3097,14 @@ async function main() {
 
   // Register settings change handler NOW (after storage is initialized)
   settingsPanel.setOnSettingsChange(async () => {
+    // Guard: Only reload if gameLoop is fully initialized
+    // This prevents reload loops during HMR or initialization
+    if (!gameLoop || !gameLoop.world) {
+      console.warn('[Demo] Settings changed but gameLoop not ready - skipping save');
+      window.location.reload();
+      return;
+    }
+
     // Take a snapshot (save) before reload to preserve agents and world state
     // This is part of the time travel/multiverse checkpoint system
     try {
@@ -3018,8 +3119,27 @@ async function main() {
     window.location.reload();
   });
 
-  // Register all systems
-  const systemsResult = await registerAllSystems(gameLoop, llmQueue, promptBuilder);
+  // Register all systems (skip in SharedWorker mode - worker handles this)
+  let systemsResult: SystemsResult;
+
+  if (!isSharedWorkerMode) {
+    systemsResult = await registerAllSystems(
+      gameLoop,
+      llmQueue,
+      promptBuilder,
+      agentDebugManager,
+      talkerPromptBuilder,
+      executorPromptBuilder
+    );
+  } else {
+    // In SharedWorker mode, create minimal result for compatibility
+    console.log('[Main] Skipping system registration (SharedWorker handles this)');
+    systemsResult = {
+      metricsSystem: null as any,
+      promptBuilder: promptBuilder,
+      coreResult: {} as any,
+    };
+  }
 
   // Create renderer (pass ChunkManager and TerrainGenerator so it shares the same instances with World)
   const renderer = new Renderer(canvas, chunkManager, terrainGenerator);
@@ -3116,8 +3236,8 @@ async function main() {
   const blueprintRegistry = new BuildingBlueprintRegistry();
   blueprintRegistry.registerDefaults();
   blueprintRegistry.registerExampleBuildings();
-  registerShopBlueprints(blueprintRegistry);
-  registerFarmBlueprints(blueprintRegistry);
+  // NOTE: Shops, farms, temples, and midwifery buildings are now registered
+  // automatically in BuildingBlueprintRegistry constructor
   (gameLoop.world as any).buildingRegistry = blueprintRegistry;
 
   const placementValidator = new PlacementValidator();
@@ -3263,6 +3383,7 @@ async function main() {
     economyPanel: panels.economyPanel,
     shopPanel: panels.shopPanel,
     governancePanel: panels.governancePanel,
+    cityStatsWidget: panels.cityStatsWidget,
     inventoryUI: panels.inventoryUI,
     craftingUI: panels.craftingUI,
     placementUI,
@@ -3315,8 +3436,17 @@ async function main() {
     }
 
     const ctx = renderer.getContext();
+
+    // Update city manager panel and widget
+    panels.cityManagerPanel.update(gameLoop.world);
+    panels.cityStatsWidget.update(gameLoop.world);
+
     windowManager.render(ctx, gameLoop.world);
     panels.shopPanel.render(ctx, gameLoop.world);
+
+    // Render city stats widget
+    panels.cityStatsWidget.render(ctx, canvas.width, canvas.height);
+
     menuBar.render(ctx);
 
     // Hover info panel (shows entity tooltips on hover)
@@ -3348,6 +3478,12 @@ async function main() {
   }
 
   intervalIds.push(setInterval(updateStatus, 100));
+
+  // Agent debug logging - runs every tick (~50ms at 20 TPS)
+  // Only logs agents that are actively being tracked
+  intervalIds.push(setInterval(() => {
+    agentDebugManager.logTick(gameLoop.world);
+  }, 50));
 
   // Only initialize new world if we didn't load a checkpoint
   if (!loadedCheckpoint) {
@@ -3424,7 +3560,12 @@ async function main() {
     const agentIds = createInitialAgents(gameLoop.world, settings.dungeonMasterPrompt);
 
     // Start game loop BEFORE soul creation so SoulCreationSystem.update() runs
-    gameLoop.start();
+    // (skip in SharedWorker mode - worker is already running)
+    if (!isSharedWorkerMode) {
+      gameLoop.start();
+    } else {
+      console.log('[Main] SharedWorker already running simulation');
+    }
 
     // Create souls for the initial agents (displays modal before map loads)
     await createSoulsForInitialAgents(gameLoop, agentIds, llmProvider, renderer, universeConfig, isLLMAvailable);
@@ -3559,8 +3700,10 @@ async function main() {
 
     // Spawn 5 houses to the right of the berry bush ring (x = 17-18)
     console.log('[WorldInit] Spawning 5 houses near berry ring...');
-    const blueprintRegistry = getTileBasedBlueprintRegistry();
-    const houseBlueprint = blueprintRegistry.get('tile_small_house');
+
+    // Import VoxelBuildings from core package
+    const { SMALL_HOUSE } = await import('@ai-village/core');
+    const houseBlueprint = SMALL_HOUSE;
 
     if (houseBlueprint) {
       const housePositions = [
@@ -3574,36 +3717,45 @@ async function main() {
       // Use the tile construction system to place houses
       // (Houses will be placed as fully built structures)
       for (const pos of housePositions) {
-        // Parse the blueprint layout
+        // Parse the VoxelBuildingDefinition layout (ground floor)
         const tiles: any[] = [];
-        for (let row = 0; row < houseBlueprint.layoutString.length; row++) {
-          for (let col = 0; col < houseBlueprint.layoutString[row].length; col++) {
-            const symbol = houseBlueprint.layoutString[row][col];
+        const furnitureItems: Array<{ x: number; y: number; symbol: string }> = [];
+
+        for (let row = 0; row < houseBlueprint.layout.length; row++) {
+          for (let col = 0; col < houseBlueprint.layout[row].length; col++) {
+            const symbol = houseBlueprint.layout[row][col];
             if (symbol === ' ') continue; // Skip empty tiles
 
             const worldX = pos.x + col;
             const worldY = pos.y + row;
 
-            let tileType: 'wall' | 'floor' | 'door' | 'window';
+            let tileType: 'wall' | 'floor' | 'door' | 'window' | null = null;
             let materialId: string;
 
             if (symbol === '#') {
               tileType = 'wall';
-              materialId = houseBlueprint.materialDefaults.wall;
+              materialId = houseBlueprint.materials.wall;
             } else if (symbol === '.') {
               tileType = 'floor';
-              materialId = houseBlueprint.materialDefaults.floor;
+              materialId = houseBlueprint.materials.floor;
             } else if (symbol === 'D') {
               tileType = 'door';
-              materialId = houseBlueprint.materialDefaults.door;
+              materialId = houseBlueprint.materials.wall; // Door uses wall material
             } else if (symbol === 'W') {
               tileType = 'window';
-              materialId = houseBlueprint.materialDefaults.window || 'glass';
+              materialId = 'glass';
+            } else if (symbol === 'B' || symbol === 'S' || symbol === 'T' || symbol === 'K' || symbol === 'C') {
+              // Furniture symbols - place floor tile first, then spawn furniture
+              tileType = 'floor';
+              materialId = houseBlueprint.materials.floor;
+              furnitureItems.push({ x: worldX, y: worldY, symbol });
             } else {
               continue;
             }
 
-            tiles.push({ x: worldX, y: worldY, type: tileType, materialId });
+            if (tileType) {
+              tiles.push({ x: worldX, y: worldY, type: tileType, materialId });
+            }
           }
         }
 
@@ -3629,27 +3781,36 @@ async function main() {
           }
         }
 
-        console.log(`[WorldInit] Placed house at (${pos.x}, ${pos.y})`);
+        console.log(`[WorldInit] Placed house at (${pos.x}, ${pos.y}) with ${furnitureItems.length} furniture items`);
 
-        // Furnish the house with bedrolls and storage
-        // Small house is 3x3, interior floor is at (pos.x+1, pos.y+1)
-        const interiorX = pos.x + 1;
-        const interiorY = pos.y + 1;
+        // Place furniture based on symbols in layout
+        for (const furniture of furnitureItems) {
+          if (furniture.symbol === 'B') {
+            // Bed
+            spawnBuilding(BuildingType.Bedroll, furniture.x, furniture.y);
+          } else if (furniture.symbol === 'S') {
+            // Storage chest
+            spawnBuilding(BuildingType.StorageChest, furniture.x, furniture.y);
+          } else if (furniture.symbol === 'T') {
+            // Table - could add a table building type later
+            console.log(`[WorldInit] Table at (${furniture.x}, ${furniture.y}) - not yet implemented`);
+          } else if (furniture.symbol === 'K') {
+            // Workstation - could add later
+            console.log(`[WorldInit] Workstation at (${furniture.x}, ${furniture.y}) - not yet implemented`);
+          }
+        }
 
-        // Place bedroll in the interior
-        spawnBuilding(BuildingType.Bedroll, interiorX, interiorY);
-
-        // Place storage chest in the interior (offset slightly)
-        spawnBuilding(BuildingType.StorageChest, interiorX, interiorY + 1);
-
-        console.log(`[WorldInit] Furnished house with bedroll and storage`);
+        console.log(`[WorldInit] Furnished house with ${furnitureItems.length} furniture items`);
       }
     }
 
     console.log('[WorldInit] Initial buildings spawned!');
   } else {
     // Start game loop for loaded checkpoints (new games already started it before soul creation)
-    gameLoop.start();
+    // (skip in SharedWorker mode - worker is already running)
+    if (!isSharedWorkerMode) {
+      gameLoop.start();
+    }
   }
 
   // Expose gameLoop globally for API access (e.g., Interdimensional Cable recordings API)
@@ -3670,7 +3831,7 @@ async function main() {
   setupDebugAPI(
     gameLoop, renderer, placementUI, blueprintRegistry,
     panels.agentInfoPanel, panels.animalInfoPanel, panels.resourcesPanel,
-    devPanel
+    devPanel, agentDebugManager
   );
 
   // Game loop already started before soul creation

@@ -24,6 +24,12 @@ interface BuildingCollisionData {
   blocksMovement: boolean;
 }
 
+/**
+ * MovementSystem - Handles entity movement, collision detection, and position updates
+ *
+ * Dependencies:
+ * @see TimeSystem (priority 3) - Provides time acceleration multiplier for movement speed
+ */
 export class MovementSystem implements System {
   public readonly id: SystemId = CT.Movement;
   public readonly priority: number = 20; // Run after AI
@@ -31,6 +37,12 @@ export class MovementSystem implements System {
     CT.Movement,
     CT.Position,
   ];
+
+  /**
+   * Systems that must run before this one.
+   * @see TimeSystem - provides speedMultiplier for time-accelerated movement
+   */
+  public readonly dependsOn = ['time'] as const;
 
   // Performance: Cache building positions to avoid querying every frame
   private buildingCollisionCache: BuildingCollisionData[] | null = null;

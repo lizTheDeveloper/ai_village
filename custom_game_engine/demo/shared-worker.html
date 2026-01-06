@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SharedWorker Universe Demo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Courier New', monospace;
+        background: #0f0f1e;
+        color: #eee;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      h1 {
+        margin-bottom: 20px;
+        color: #00ff00;
+      }
+
+      canvas {
+        border: 2px solid #00ff00;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+      }
+
+      .info {
+        margin-top: 20px;
+        padding: 20px;
+        background: rgba(0, 255, 0, 0.1);
+        border: 1px solid #00ff00;
+        border-radius: 8px;
+        max-width: 800px;
+      }
+
+      .info h2 {
+        color: #00ff00;
+        margin-bottom: 10px;
+      }
+
+      .info p {
+        margin: 5px 0;
+        line-height: 1.6;
+      }
+
+      .info code {
+        background: rgba(0, 0, 0, 0.5);
+        padding: 2px 6px;
+        border-radius: 3px;
+        color: #00ff00;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🌌 SharedWorker Universe Demo</h1>
+
+    <canvas id="game-canvas" width="800" height="600"></canvas>
+
+    <div class="info">
+      <h2>How It Works</h2>
+      <p>
+        This demo uses a <code>SharedWorker</code> to run the game simulation independently from the browser windows.
+      </p>
+      <p>
+        <strong>Try this:</strong> Open this page in multiple tabs. Notice how they all show the same synchronized
+        simulation state!
+      </p>
+      <p>
+        The simulation runs at 20 TPS in the worker, and all windows receive state updates every tick.
+      </p>
+      <p>
+        Even if you close all windows and reopen them, the simulation persists in IndexedDB and continues where it left
+        off.
+      </p>
+
+      <h2 style="margin-top: 20px">Architecture</h2>
+      <p>
+        <code>SharedWorker</code> → Runs simulation + owns IndexedDB<br />
+        <code>UniverseClient</code> → Thin view that subscribes to state<br />
+        <code>MessagePort</code> → Communication channel
+      </p>
+    </div>
+
+    <script type="module" src="/src/demo-shared-worker.ts"></script>
+  </body>
+</html>

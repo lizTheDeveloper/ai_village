@@ -1946,7 +1946,7 @@ ReflectionSystem forms beliefs from memories
 
 ## Conclusion
 
-This guide covers the major metasystems in the AI Village game engine. Each system is designed to be modular and extensible, allowing for complex emergent behaviors while maintaining clear separation of concerns.
+This guide covers the major metasystems in Multiverse: The End of Eternity game engine. Each system is designed to be modular and extensible, allowing for complex emergent behaviors while maintaining clear separation of concerns.
 
 For specific implementation details, refer to:
 - [ARCHITECTURE_OVERVIEW.md](./ARCHITECTURE_OVERVIEW.md) - Overall structure

@@ -12,10 +12,22 @@ import type { MovementComponent } from '../components/MovementComponent.js';
 import type { TemperatureComponent } from '../components/TemperatureComponent.js';
 import type { RealmLocationComponent } from '../components/RealmLocationComponent.js';
 
+/**
+ * NeedsSystem - Manages agent physical needs (hunger, energy, thirst)
+ *
+ * Dependencies:
+ * @see TimeSystem (priority 3) - Provides game time for calculating needs decay rates
+ */
 export class NeedsSystem implements System {
   public readonly id: SystemId = 'needs';
   public readonly priority: number = 15; // Run after AI (10), before Movement (20)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Needs];
+
+  /**
+   * Systems that must run before this one.
+   * @see TimeSystem - provides game time for converting real-time to game minutes for needs decay
+   */
+  public readonly dependsOn = ['time'] as const;
 
   // Performance: Cache time entity to avoid querying every tick
   private timeEntityId: string | null = null;

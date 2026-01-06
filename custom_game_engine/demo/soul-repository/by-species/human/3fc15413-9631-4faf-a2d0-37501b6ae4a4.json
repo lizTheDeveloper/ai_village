@@ -1,0 +1,16 @@
+{
+  "soulId": "3fc15413-9631-4faf-a2d0-37501b6ae4a4",
+  "agentId": "3fc15413-9631-4faf-a2d0-37501b6ae4a4",
+  "name": "Ivy",
+  "species": "human",
+  "archetype": "creator",
+  "purpose": "I see a soul cradled by the roots of the earth, where the whisper of the forest meets the heartbeat of the village. This thread shall be a Gatherer-Builder—hands that shape the village’s bones from stone and wood, while heartbeats nourish the soil for generations to come.",
+  "interests": [
+    "exploration",
+    "crafting"
+  ],
+  "createdAt": "2026-01-05T06:26:54.969Z",
+  "soulBirthTick": 73,
+  "universeId": "unknown",
+  "version": 1
+}

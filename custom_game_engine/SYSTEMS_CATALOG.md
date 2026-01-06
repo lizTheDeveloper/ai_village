@@ -50,6 +50,7 @@ This document catalogs every system in the game engine. Systems are organized by
 **Purpose:** Advances game time (tick → minute → hour → day)
 **Components:** `time` (singleton)
 **Priority:** 10 (runs first)
+**Dependencies:** None (runs first)
 **File:** `systems/TimeSystem.ts`
 
 **Responsibilities:**
@@ -64,6 +65,7 @@ This document catalogs every system in the game engine. Systems are organized by
 **Purpose:** Simulates weather patterns (rain, snow, clear)
 **Components:** `weather` (singleton)
 **Priority:** 15
+**Dependencies:** `TimeSystem`
 **Throttle:** Every 100 ticks (~5 seconds)
 **File:** `systems/WeatherSystem.ts`
 
@@ -78,6 +80,7 @@ This document catalogs every system in the game engine. Systems are organized by
 **Purpose:** Simulates ambient temperature, agent comfort
 **Components:** `temperature`, `agent`, `needs`, `position`
 **Priority:** 20
+**Dependencies:** `TimeSystem`, `WeatherSystem`
 **File:** `systems/TemperatureSystem.ts`
 
 **Responsibilities:**
@@ -92,6 +95,7 @@ This document catalogs every system in the game engine. Systems are organized by
 **Purpose:** Soil moisture, nutrient management
 **Components:** Operates on tiles
 **Priority:** 25
+**Dependencies:** `TimeSystem`, `WeatherSystem`
 **Throttle:** Every 20 ticks (~1 second)
 **File:** `systems/SoilSystem.ts`
 
@@ -123,6 +127,7 @@ This document catalogs every system in the game engine. Systems are organized by
 **Purpose:** Plant lifecycle (growth, flowering, fruiting, death)
 **Components:** `plant`, `position`
 **Priority:** 40
+**Dependencies:** `TimeSystem`, `WeatherSystem`, `SoilSystem`
 **File:** `systems/PlantSystem.ts`
 
 **Responsibilities:**
@@ -137,6 +142,7 @@ This document catalogs every system in the game engine. Systems are organized by
 **Purpose:** Agents discover new plant species
 **Components:** `agent`, `position`, `episodic_memory`, `inventory`
 **Priority:** 45
+**Dependencies:** None (event-driven)
 **File:** `systems/PlantDiscoverySystem.ts`
 
 **Responsibilities:**
@@ -151,6 +157,7 @@ This document catalogs every system in the game engine. Systems are organized by
 **Purpose:** Plant diseases and pests
 **Components:** `plant`, `disease`, `position`
 **Priority:** 50
+**Dependencies:** `PlantSystem`
 **Throttle:** Every 50 ticks (~2.5 seconds)
 **File:** `systems/PlantDiseaseSystem.ts`
 

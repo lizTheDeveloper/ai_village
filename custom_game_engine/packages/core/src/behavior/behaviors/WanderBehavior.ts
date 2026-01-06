@@ -14,8 +14,10 @@ import type { MovementComponent } from '../../components/MovementComponent.js';
 import type { AgentComponent } from '../../components/AgentComponent.js';
 import type { PositionComponent } from '../../components/PositionComponent.js';
 import { ExplorationStateComponent } from '../../components/ExplorationStateComponent.js';
+import { DEFAULT_HOME_PREFERENCES } from '../../components/AgentComponent.js';
 import { BaseBehavior, type BehaviorResult } from './BaseBehavior.js';
 import { ComponentType } from '../../types/ComponentType.js';
+import { getPosition } from '../../utils/componentHelpers.js';
 
 /** Maximum distance from home before biasing back (when no frontier) */
 const MAX_WANDER_DISTANCE = 20;
@@ -86,11 +88,10 @@ export class WanderBehavior extends BaseBehavior {
     const exploration = entity.getComponent(ComponentType.ExplorationState) as ExplorationStateComponent | undefined;
 
     if (exploration) {
-      wanderAngle = this.applyFrontierBias(wanderAngle, position, exploration);
+      wanderAngle = this.applyFrontierBias(wanderAngle, position, exploration, agent, world);
     } else {
       // No exploration component - use simple home bias
-      const distanceFromHome = Math.sqrt(position.x * position.x + position.y * position.y);
-      wanderAngle = this.applyHomeBias(wanderAngle, position, distanceFromHome);
+      wanderAngle = this.applyHomeBias(wanderAngle, position, agent, world);
     }
 
     // Normalize angle to 0-2π range
@@ -127,15 +128,16 @@ export class WanderBehavior extends BaseBehavior {
   private applyFrontierBias(
     wanderAngle: number,
     position: PositionComponent,
-    exploration: ExplorationStateComponent
+    exploration: ExplorationStateComponent,
+    agent: AgentComponent,
+    world: World
   ): number {
     // Get frontier sectors (unexplored areas adjacent to explored)
     const frontiers = exploration.getFrontierSectors();
 
     if (frontiers.length === 0) {
       // All explored - fall back to home bias
-      const distanceFromHome = Math.sqrt(position.x * position.x + position.y * position.y);
-      return this.applyHomeBias(wanderAngle, position, distanceFromHome);
+      return this.applyHomeBias(wanderAngle, position, agent, world);
     }
 
     // Find closest frontier sector
@@ -168,29 +170,50 @@ export class WanderBehavior extends BaseBehavior {
   }
 
   /**
-   * Apply progressive home bias based on distance from origin.
+   * Get the home position for an agent.
+   * Uses assigned bed if available, otherwise falls back to origin (0,0).
+   */
+  private getHomePosition(agent: AgentComponent, world: World): { x: number; y: number } | null {
+    if (agent.assignedBed) {
+      const bedEntity = world.entities.get(agent.assignedBed);
+      if (bedEntity) {
+        const bedPos = getPosition(bedEntity);
+        return bedPos ? { x: bedPos.x, y: bedPos.y } : null;
+      }
+    }
+    return null; // No home - agents will use origin (0,0) as fallback
+  }
+
+  /**
+   * Apply progressive home bias based on distance from home.
+   * Uses assigned bed as home anchor, or falls back to origin (0,0).
    * Fallback when no frontiers are available.
    */
   private applyHomeBias(
     wanderAngle: number,
     position: PositionComponent,
-    distanceFromHome: number
+    agent: AgentComponent,
+    world: World
   ): number {
-    if (distanceFromHome > CRITICAL_DISTANCE) {
-      // Very far - strongly pull back to home (80% bias)
-      const angleToHome = Math.atan2(-position.y, -position.x);
-      const angleDiff = this.normalizeAngle(angleToHome - wanderAngle);
-      return wanderAngle + angleDiff * 0.8;
-    } else if (distanceFromHome > MAX_WANDER_DISTANCE) {
-      // Moderately far - bias toward home (50% bias)
-      const angleToHome = Math.atan2(-position.y, -position.x);
-      const angleDiff = this.normalizeAngle(angleToHome - wanderAngle);
-      return wanderAngle + angleDiff * 0.5;
-    } else {
-      // Close to home - random wander with jitter
-      const jitter = (Math.random() - 0.5) * WANDER_JITTER * 2;
-      return wanderAngle + jitter;
+    // Get home position (assigned bed or fallback to origin)
+    const home = this.getHomePosition(agent, world) || { x: 0, y: 0 };
+    const homeRadius = agent.homePreferences?.homeRadius ?? DEFAULT_HOME_PREFERENCES.homeRadius;
+
+    // Calculate distance from home
+    const dx = position.x - home.x;
+    const dy = position.y - home.y;
+    const distanceFromHome = Math.sqrt(dx * dx + dy * dy);
+
+    // If outside home radius, bias toward home
+    if (distanceFromHome > homeRadius) {
+      const angleToHome = Math.atan2(-dy, -dx);
+      // Progressive bias: stronger pull when farther from home
+      const bias = Math.min(0.8, (distanceFromHome - homeRadius) / homeRadius);
+      return wanderAngle + this.normalizeAngle(angleToHome - wanderAngle) * bias;
     }
+
+    // Within home radius - normal random wander
+    return wanderAngle + (Math.random() - 0.5) * WANDER_JITTER * 2;
   }
 
   /**

@@ -16,6 +16,20 @@ type Vector2 = Position;
 /**
  * SteeringSystem implements steering behaviors for navigation
  * Supports: seek, arrive, obstacle avoidance, wander, and combined behaviors
+ *
+ * Dependencies:
+ * - AgentBrainSystem (priority 10): Must run after brain sets steering targets
+ *   - Reads steering.target set by behaviors
+ *   - Executes steering behaviors chosen by decision system
+ *
+ * - MovementSystem (priority 20): Must run before movement applies velocity
+ *   - Modifies velocity components based on steering forces
+ *   - MovementSystem then applies velocity to position
+ *
+ * Related Systems:
+ * - CollisionSystem: Provides collision components for obstacle avoidance
+ * - ChunkSystem: Uses spatial chunks for efficient nearby entity queries
+ * - PathfindingSystem: Fallback for stuck detection (future integration)
  */
 export class SteeringSystem implements System {
   public readonly id: SystemId = CT.Steering;

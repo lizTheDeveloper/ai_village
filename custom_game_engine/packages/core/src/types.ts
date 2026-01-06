@@ -1,5 +1,5 @@
 /**
- * Core primitive types for AI Village game engine.
+ * Core primitive types for Multiverse: The End of Eternity game engine.
  * These types are stable and never change.
  */
 

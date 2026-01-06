@@ -9,7 +9,7 @@
  * - Current level / max level
  */
 
-import type { MagicSkillNode, NodeEvaluationResult } from '@ai-village/core';
+import type { MagicSkillNode, NodeEvaluationResult } from '@ai-village/magic';
 import { ConditionRenderer } from './ConditionRenderer.js';
 
 export class NodeTooltip {

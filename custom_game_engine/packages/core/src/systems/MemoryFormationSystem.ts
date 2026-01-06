@@ -4,7 +4,7 @@ import { ComponentType as CT } from '../types/ComponentType.js';
 import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { EventBus } from '../events/EventBus.js';
-import type { GameEventMap } from '../events/EventMap.js';
+import type { GameEventMap, EventType } from '../events/EventMap.js';
 import { EpisodicMemoryComponent } from '../components/EpisodicMemoryComponent.js';
 
 /**
@@ -148,8 +148,7 @@ export class MemoryFormationSystem implements System {
     ];
 
     for (const eventType of customEventTypes) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (this.eventBus.subscribe as any)(eventType, (event: any) => {
+      this.eventBus.subscribe(eventType as EventType, (event) => {
         this._handleMemoryTrigger(eventType, event.data as MemoryTriggerEvent);
       });
     }

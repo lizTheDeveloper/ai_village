@@ -148,6 +148,62 @@ export function createBuildingComponent(
     case 'oven':
       // Baking station - blocks movement
       break;
+
+    // Animal housing buildings
+    case 'chicken-coop':
+      animalCapacity = 8;
+      allowedSpecies = ['chicken', 'duck', 'turkey'];
+      weatherProtection = 0.9;
+      insulation = 0.6;
+      baseTemperature = 3;
+      interior = true;
+      interiorRadius = 2;
+      break;
+    case 'kennel':
+      animalCapacity = 6;
+      allowedSpecies = ['dog', 'wolf'];
+      weatherProtection = 0.8;
+      insulation = 0.5;
+      baseTemperature = 2;
+      interior = true;
+      interiorRadius = 2;
+      break;
+    case 'stable':
+      animalCapacity = 4;
+      allowedSpecies = ['horse', 'donkey', 'mule'];
+      weatherProtection = 0.85;
+      insulation = 0.6;
+      baseTemperature = 3;
+      interior = true;
+      interiorRadius = 3;
+      break;
+    case 'apiary':
+      animalCapacity = 3;
+      allowedSpecies = ['bee_colony'];
+      weatherProtection = 0.8;
+      insulation = 0.4;
+      baseTemperature = 2;
+      interior = true;
+      interiorRadius = 1;
+      break;
+    case 'aquarium':
+      animalCapacity = 10;
+      allowedSpecies = ['fish'];
+      weatherProtection = 0.95;
+      insulation = 0.7;
+      baseTemperature = 5;
+      interior = true;
+      interiorRadius = 2;
+      break;
+    case 'barn':
+      animalCapacity = 12;
+      allowedSpecies = ['cow', 'sheep', 'goat', 'pig'];
+      weatherProtection = 0.9;
+      insulation = 0.7;
+      baseTemperature = 4;
+      interior = true;
+      interiorRadius = 4;
+      break;
   }
 
   return {

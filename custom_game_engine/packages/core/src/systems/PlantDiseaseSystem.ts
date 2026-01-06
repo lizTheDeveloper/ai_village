@@ -51,11 +51,20 @@ const DEFAULT_CONFIG: PlantDiseaseSystemConfig = {
  * - Damage application to plants
  * - Treatment effectiveness
  * - Environmental factor integration
+ *
+ * Dependencies:
+ * @see PlantSystem (priority 20) - Must run after plants are updated to ensure correct plant health and stage data
  */
 export class PlantDiseaseSystem implements System {
   public readonly id: SystemId = 'plant_disease' as SystemId;
   public readonly priority: number = 25; // After PlantSystem
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Plant];
+
+  /**
+   * Systems that must run before this one.
+   * @see PlantSystem - provides plant health, stage, and genetics data for disease/pest calculations
+   */
+  public readonly dependsOn = ['plant'] as const;
 
   private eventBus: CoreEventBus;
   private config: PlantDiseaseSystemConfig;

@@ -8,6 +8,7 @@
 import type { System } from '../ecs/System.js';
 import type { SystemId } from '../types.js';
 import type { World } from '../ecs/World.js';
+import { ANIMAL_SPECIES } from '../data/animalSpecies.js';
 
 interface PendingSpriteJob {
   agentId: string;
@@ -170,10 +171,10 @@ export class PixelLabSpriteGenerationSystem implements System {
   private getSpeciesConfig(species: string): { size: number; proportions: any; view: string } {
     const speciesLower = species.toLowerCase();
 
-    // Animal species get different configs
-    const animalSpecies = ['cow', 'pig', 'sheep', 'chicken', 'horse', 'donkey', 'cat', 'dog', 'rabbit', 'deer', 'wolf', 'bear', 'fox'];
+    // Animal species get different configs - query from registry instead of hardcoding
+    const animalSpeciesIds = Object.keys(ANIMAL_SPECIES);
 
-    if (animalSpecies.includes(speciesLower)) {
+    if (animalSpeciesIds.includes(speciesLower)) {
       return {
         size: 48,
         proportions: { type: 'preset', name: 'default' },

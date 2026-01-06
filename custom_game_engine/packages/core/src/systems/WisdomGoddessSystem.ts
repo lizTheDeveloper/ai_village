@@ -137,7 +137,7 @@ export class WisdomGoddessSystem implements System {
    * Subscribe to chat message events
    */
   private subscribeToChat(world: World): void {
-    world.eventBus.subscribe('chat:message_sent' as any, (event: any) => {
+    world.eventBus.subscribe('chat:message_sent', (event) => {
       const data = event.data;
 
       // Only care about divine chat messages
@@ -149,11 +149,13 @@ export class WisdomGoddessSystem implements System {
 
       // Check if message is addressed to the goddess
       const goddessName = this.getGoddessName(goddess);
-      if (this.isAddressedToGoddess(data.content, goddessName)) {
+      const messageContent = data.content || data.message || '';
+      const messageSenderName = data.senderName || data.senderId;
+      if (this.isAddressedToGoddess(messageContent, goddessName)) {
         this.pendingResponses.push({
           senderId: data.senderId,
-          senderName: data.senderName,
-          content: data.content,
+          senderName: messageSenderName,
+          content: messageContent,
           tick: Number(world.tick),
         });
       }

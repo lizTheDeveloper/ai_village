@@ -6,14 +6,38 @@ import type { SectionRenderContext, IdentityComponent, GatheringStatsComponentDa
 import { getItemIcon, formatItemName, renderSeparator } from './renderUtils.js';
 
 export class StatsSection {
+  private scrollOffset = 0;
+
+  getScrollOffset(): number {
+    return this.scrollOffset;
+  }
+
+  setScrollOffset(offset: number): void {
+    this.scrollOffset = offset;
+  }
+
+  handleScroll(deltaY: number): void {
+    if (deltaY > 0) {
+      this.scrollOffset += 3;
+    } else {
+      this.scrollOffset = Math.max(0, this.scrollOffset - 3);
+    }
+  }
+
   render(
     context: SectionRenderContext,
     identity: IdentityComponent | undefined,
     gatheringStats: GatheringStatsComponentData | undefined
   ): void {
-    const { ctx, x, y, width, padding, lineHeight } = context;
+    const { ctx, x, y, width, height, padding, lineHeight } = context;
 
-    let currentY = y + padding;
+    // Save the context state for clipping
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x, y, width, height);
+    ctx.clip();
+
+    let currentY = y + padding - this.scrollOffset;
 
     // Agent name
     if (identity?.name) {
@@ -124,5 +148,8 @@ export class StatsSection {
         currentY += lineHeight;
       }
     }
+
+    // Restore canvas state
+    ctx.restore();
   }
 }

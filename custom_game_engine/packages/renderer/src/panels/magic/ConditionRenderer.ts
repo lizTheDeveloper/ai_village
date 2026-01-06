@@ -8,7 +8,7 @@
  * - Met/unmet status styling
  */
 
-import type { ConditionResult } from '@ai-village/core';
+import type { ConditionResult } from '@ai-village/magic';
 
 export class ConditionRenderer {
   /**

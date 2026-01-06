@@ -7,7 +7,7 @@ import { ComponentBase } from '../ecs/Component.js';
 // ============================================================================
 
 /** Types of injuries that can affect body parts */
-export type InjuryType =
+export type NeedsInjuryType =
   | 'cut'        // Slashing damage
   | 'bruise'     // Blunt damage
   | 'fracture'   // Broken bone
@@ -18,19 +18,19 @@ export type InjuryType =
   | 'sprain';    // Joint injury
 
 /** Severity levels for injuries */
-export type InjurySeverity = 'minor' | 'moderate' | 'severe' | 'critical';
+export type NeedsInjurySeverity = 'minor' | 'moderate' | 'severe' | 'critical';
 
 /**
  * Represents an injury to a body part.
  * Future: Used by combat and medical systems.
  */
-export interface Injury {
+export interface NeedsInjury {
   /** Unique identifier for this injury */
   id: string;
   /** Type of injury */
-  type: InjuryType;
+  type: NeedsInjuryType;
   /** Severity level */
-  severity: InjurySeverity;
+  severity: NeedsInjurySeverity;
   /** Numeric severity (0-1, where 1 is worst) */
   severityValue: number;
   /** Whether the injury is actively bleeding */
@@ -63,7 +63,7 @@ export type BodyPartId =
  * Represents a body part with health tracking.
  * Future: Used by combat and medical systems.
  */
-export interface BodyPart {
+export interface NeedsBodyPart {
   /** Which body part this is */
   id: BodyPartId;
   /** Health of this body part (0-1) */
@@ -73,7 +73,7 @@ export interface BodyPart {
   /** Whether this part is a limb (can be disabled/amputated) */
   isLimb: boolean;
   /** Active injuries on this body part */
-  injuries: Injury[];
+  injuries: NeedsInjury[];
   /** Whether this limb is functional (can be false due to nerve damage) */
   functional: boolean;
   /** Whether this limb has been amputated */
@@ -84,7 +84,7 @@ export interface BodyPart {
  * Default body parts configuration for humanoid agents.
  * Call this to initialize body parts for an agent.
  */
-export function createDefaultBodyParts(): BodyPart[] {
+export function createDefaultBodyParts(): NeedsBodyPart[] {
   return [
     { id: 'head', health: 1.0, isCritical: true, isLimb: false, injuries: [], functional: true, amputated: false },
     { id: 'neck', health: 1.0, isCritical: true, isLimb: false, injuries: [], functional: true, amputated: false },
@@ -188,7 +188,7 @@ export class NeedsComponent extends ComponentBase {
    * Future: Used by combat system for localized damage.
    * When undefined, use overall `health` value for all checks.
    */
-  public bodyParts?: BodyPart[];
+  public bodyParts?: NeedsBodyPart[];
 
   constructor(options?: Partial<NeedsComponent>) {
     super();

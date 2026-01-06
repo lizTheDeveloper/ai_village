@@ -36,6 +36,9 @@ interface SoulRecord {
   purpose: string;
   interests: string[];
 
+  // Fate Reasoning (preserved for transparency/debugging)
+  thoughts?: string; // Content from <thinking> tags during soul creation
+
   // Creation Context
   createdAt: string; // ISO timestamp (real-world time)
   soulBirthTick: number; // Game tick when soul was created
@@ -146,7 +149,7 @@ export class SoulRepositorySystem implements System {
 
   private async backupSoul(world: World, soulData: any): Promise<void> {
     try {
-      const { soulId, agentId, name, archetype, purpose, species, interests } = soulData;
+      const { soulId, agentId, name, archetype, purpose, species, interests, thoughts } = soulData;
 
       // Get soul entity (not agent - this is the soul itself)
       const soul = world.getEntity(soulId || agentId);
@@ -176,6 +179,9 @@ export class SoulRepositorySystem implements System {
         archetype,
         purpose,
         interests: interests || [],
+
+        // Fate Reasoning (preserved for transparency/debugging)
+        thoughts: thoughts || undefined,
 
         // Creation Context
         createdAt: new Date().toISOString(),
@@ -365,12 +371,31 @@ export class SoulRepositorySystem implements System {
 
   /**
    * Get a random soul from the repository (for reuse in new games)
+   * Excludes corrupted souls from selection
    */
   getRandomSoul(): SoulRecord | null {
     const allSoulIds = Object.keys(this.index.souls);
     if (allSoulIds.length === 0) return null;
 
-    const randomId = allSoulIds[Math.floor(Math.random() * allSoulIds.length)];
+    // Filter out corrupted souls
+    const validSoulIds = allSoulIds.filter(soulId => {
+      const soul = this.getSoul(soulId);
+      if (!soul) return false;
+
+      // Exclude souls marked as corrupted
+      if (soul.purpose && soul.purpose.includes('[CORRUPTED SOUL]')) {
+        return false;
+      }
+
+      return true;
+    });
+
+    if (validSoulIds.length === 0) {
+      console.warn('[SoulRepository] No valid souls available for reincarnation (all corrupted)');
+      return null;
+    }
+
+    const randomId = validSoulIds[Math.floor(Math.random() * validSoulIds.length)];
     return randomId ? this.getSoul(randomId) : null;
   }
 

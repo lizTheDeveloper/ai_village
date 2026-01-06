@@ -10,7 +10,7 @@
  * Within each layer, nodes are spread horizontally to avoid overlap.
  */
 
-import type { MagicSkillTree, MagicSkillNode } from '@ai-village/core';
+import type { MagicSkillTree, MagicSkillNode } from '@ai-village/magic';
 import type { TreeLayout, NodePosition, LayoutConfig } from './types.js';
 import { DEFAULT_LAYOUT_CONFIG } from './types.js';
 

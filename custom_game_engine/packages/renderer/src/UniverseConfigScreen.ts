@@ -25,7 +25,7 @@ import {
   getPresetNames,
   resolveSpectrum,
   CONFIGURATION_QUESTIONS,
-} from '@ai-village/core';
+} from '@ai-village/magic';
 
 export interface UniverseConfig {
   magicParadigmId: string | null;  // null = no magic (legacy, kept for compatibility)
@@ -100,7 +100,7 @@ export class UniverseConfigScreen {
       literary_surrealism: { name: 'Literary Surrealism', description: 'Words have weight. Metaphors become real.', icon: '📚' },
       wild_magic: { name: 'Wild Magic', description: 'Chaotic and unpredictable. Reality is unstable.', icon: '🌀' },
       dead_magic: { name: 'Dead Magic', description: 'Magic once existed but is gone.', icon: '💀' },
-      ai_village: { name: 'AI Village', description: 'Rich magic with multiple traditions. Balanced for gameplay.', icon: '🏘️' },
+      ai_village: { name: 'Multiverse: The End of Eternity', description: 'Rich magic with multiple traditions. Balanced for gameplay.', icon: '🏘️' },
     };
     return meta[presetId] || { name: presetId, description: '', icon: '✨' };
   }

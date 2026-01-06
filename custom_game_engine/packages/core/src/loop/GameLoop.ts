@@ -204,7 +204,9 @@ export class GameLoop {
         // Get entities that match this system's requirements (cached)
         let entities: ReadonlyArray<Entity>;
         if (system.requiredComponents.length === 0) {
-          entities = [];
+          // Systems with no required components get ALL entities
+          // This allows them to do their own filtering (e.g., BeliefGenerationSystem)
+          entities = this._world.query().executeEntities();
         } else {
           // Check cache first
           const cached = this.queryCache.get(system.id);

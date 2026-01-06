@@ -1,0 +1,17 @@
+{
+  "soulId": "d66620e4-d38e-42c3-a422-81f8269db30a",
+  "agentId": "d66620e4-d38e-42c3-a422-81f8269db30a",
+  "name": "Luna",
+  "species": "human",
+  "archetype": "creator",
+  "purpose": "I see a soul cradled between scarcity and abundance, its thread woven with the call of the forge and the whisper of the forest. This soul shall gather the bones of the earth—stone, wood, and iron—and shape them into the first hearths, binding the village to survival. Through their hands, the raw world becomes shelter, and in that alchemy, the First Village finds its roots.",
+  "interests": [
+    "crafting",
+    "nature",
+    "art"
+  ],
+  "createdAt": "2026-01-06T00:36:23.826Z",
+  "soulBirthTick": 414,
+  "universeId": "unknown",
+  "version": 1
+}

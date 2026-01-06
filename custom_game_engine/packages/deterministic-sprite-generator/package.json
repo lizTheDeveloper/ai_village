@@ -1,0 +1,25 @@
+{
+  "name": "@ai-village/deterministic-sprite-generator",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Deterministic modular pixel art sprite generator - no ML, pure algorithms",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test-screen": "vite test-screen --port 3010",
+    "sprite-wizard": "vite sprite-set-generator --port 3011"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  }
+}

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hierarchical Abstraction Simulator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Monaco', 'Courier New', monospace;
+      background: #0a0a0a;
+      color: #00ff00;
+      overflow: hidden;
+    }
+
+    #app {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #111;
+      border-bottom: 2px solid #00ff00;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+    }
+
+    .stats {
+      display: flex;
+      gap: 2rem;
+      font-size: 0.9rem;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .stat-label {
+      color: #888;
+      font-size: 0.75rem;
+    }
+
+    .stat-value {
+      color: #00ff00;
+      font-weight: bold;
+    }
+
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 1px;
+      background: #00ff00;
+      overflow: hidden;
+    }
+
+    .panel {
+      background: #0a0a0a;
+      overflow: auto;
+      padding: 1rem;
+    }
+
+    .sidebar {
+      border-right: 1px solid #00ff00;
+    }
+
+    .content {
+      display: grid;
+      grid-template-rows: 1fr 300px;
+      gap: 1px;
+    }
+
+    .hierarchy-tree {
+      padding: 0;
+    }
+
+    .tree-node {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      border-bottom: 1px solid #222;
+      transition: background 0.2s;
+    }
+
+    .tree-node:hover {
+      background: #111;
+    }
+
+    .tree-node.selected {
+      background: #1a3a1a;
+      border-left: 3px solid #00ff00;
+    }
+
+    .tree-node.collapsed > .tree-children {
+      display: none;
+    }
+
+    .tree-node-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tree-node-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tree-node-expand {
+      color: #888;
+      font-size: 0.8rem;
+    }
+
+    .tree-node-stats {
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    .tree-children {
+      margin-left: 1.5rem;
+      border-left: 1px solid #333;
+    }
+
+    .tier-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+    }
+
+    .tier-gigasegment { background: #ff00ff; }
+    .tier-megasegment { background: #00ffff; }
+    .tier-subsection { background: #ffff00; }
+    .tier-region { background: #ff8800; }
+    .tier-zone { background: #0088ff; }
+    .tier-chunk { background: #88ff00; }
+    .tier-tile { background: #ff0088; }
+
+    .detail-view {
+      background: #0a0a0a;
+    }
+
+    .detail-header {
+      background: #111;
+      padding: 1rem;
+      border-bottom: 1px solid #00ff00;
+      margin-bottom: 1rem;
+    }
+
+    .detail-title {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-subtitle {
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      padding: 0 1rem;
+    }
+
+    .detail-card {
+      background: #111;
+      border: 1px solid #333;
+      padding: 1rem;
+    }
+
+    .detail-card-title {
+      color: #888;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-card-value {
+      font-size: 1.5rem;
+      color: #00ff00;
+    }
+
+    .detail-card-change {
+      font-size: 0.8rem;
+      margin-top: 0.25rem;
+    }
+
+    .detail-card-change.positive { color: #0f0; }
+    .detail-card-change.negative { color: #f00; }
+
+    .graphs-panel {
+      background: #0a0a0a;
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .graph-container {
+      background: #111;
+      border: 1px solid #333;
+      padding: 1rem;
+    }
+
+    .graph-title {
+      color: #888;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    canvas {
+      max-width: 100%;
+      height: 200px !important;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    button {
+      background: #1a3a1a;
+      color: #00ff00;
+      border: 1px solid #00ff00;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background: #00ff00;
+      color: #0a0a0a;
+    }
+
+    button.active {
+      background: #00ff00;
+      color: #0a0a0a;
+    }
+
+    .speed-control {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .speed-label {
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    /* Event Log Styling */
+    .event-entry {
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      border-left: 3px solid;
+      background: #111;
+    }
+
+    .event-entry.positive { border-color: #0f0; }
+    .event-entry.negative { border-color: #f00; }
+    .event-entry.neutral { border-color: #ff0; }
+
+    .event-header {
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .event-severity {
+      font-size: 0.7rem;
+      color: #888;
+    }
+
+    .event-description {
+      color: #aaa;
+      font-size: 0.75rem;
+    }
+
+    /* Stability Bars */
+    .stability-bar {
+      width: 100%;
+      height: 8px;
+      background: #222;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 0.25rem;
+    }
+
+    .stability-fill {
+      height: 100%;
+      transition: width 0.3s;
+    }
+
+    .stability-high { background: #0f0; }
+    .stability-med { background: #ff0; }
+    .stability-low { background: #f00; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>⬡ Hierarchical Abstraction Simulator</h1>
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-label">Simulation Tick</span>
+          <span class="stat-value" id="current-tick">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Active Tiers</span>
+          <span class="stat-value" id="active-tiers">3/7</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Total Population</span>
+          <span class="stat-value" id="total-population">0</span>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="speed-control">
+          <span class="speed-label">Speed:</span>
+          <button id="speed-slow">1x</button>
+          <button id="speed-normal" class="active">10x</button>
+          <button id="speed-fast">100x</button>
+        </div>
+        <button id="pause-btn">Pause</button>
+        <button id="reset-btn">Reset</button>
+      </div>
+    </header>
+
+    <main>
+      <aside class="panel sidebar">
+        <h2 style="font-size: 1rem; margin-bottom: 1rem; color: #888;">HIERARCHY</h2>
+        <div class="hierarchy-tree" id="hierarchy-tree">
+          <!-- Tree will be populated by JS -->
+        </div>
+
+        <h2 style="font-size: 1rem; margin: 1.5rem 0 0.5rem 0; color: #888;">EVENT LOG</h2>
+        <div id="event-log" style="max-height: 200px; overflow-y: auto; font-size: 0.8rem;">
+          <!-- Events will be populated by JS -->
+        </div>
+      </aside>
+
+      <div class="content">
+        <section class="panel detail-view" id="detail-view">
+          <div class="detail-header">
+            <div class="detail-title" id="detail-title">Select a tier to view details</div>
+            <div class="detail-subtitle" id="detail-subtitle">Click on any node in the hierarchy tree</div>
+          </div>
+          <div class="detail-grid" id="detail-grid">
+            <!-- Cards will be populated by JS -->
+          </div>
+        </section>
+
+        <section class="graphs-panel" id="graphs-panel">
+          <div class="graph-container">
+            <div class="graph-title">Population Over Time</div>
+            <canvas id="population-chart"></canvas>
+          </div>
+          <div class="graph-container">
+            <div class="graph-title">Production vs Consumption</div>
+            <canvas id="production-chart"></canvas>
+          </div>
+          <div class="graph-container">
+            <div class="graph-title">Trade Flow Volume</div>
+            <canvas id="trade-chart"></canvas>
+          </div>
+          <div class="graph-container">
+            <div class="graph-title">Economic Efficiency</div>
+            <canvas id="efficiency-chart"></canvas>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

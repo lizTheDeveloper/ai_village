@@ -13,15 +13,18 @@ export type { EntityId, SystemId } from './types.js';
 // Re-export ComponentType enum for test compatibility
 export { ComponentType } from './types/ComponentType.js';
 export * from './ecs/index.js';
-// Explicit ECS type re-exports for renderer package
-export type { World, WorldMutator, Entity, ITile, TerrainType, Component } from './ecs/index.js';
+// Explicit ECS type re-exports for renderer package (excluding World which comes from World.js)
+export type { WorldMutator, Entity, ITile, TerrainType, Component } from './ecs/index.js';
 export { EntityImpl, createEntityId } from './ecs/index.js';
+// Export concrete World class (not just the interface from ecs/index.js)
+export { World } from './World.js';
 export * from './events/index.js';
 // Explicit EventBus type re-export
 export type { EventBus } from './events/index.js';
 export * from './actions/index.js';
 export * from './serialization/index.js';
 export * from './loop/index.js';
+export * from './debug/index.js';
 export * from './components/index.js';
 // Explicit component type and value re-exports for renderer and world packages
 export type { Relationship, RelationshipComponent } from './components/index.js';
@@ -38,6 +41,7 @@ export * from './factories/index.js';
 export * from './species/index.js';
 export * from './skills/index.js';
 export * from './buildings/index.js';
+export * from './city/index.js';
 export {
   type BuildingBlueprint,
   type BuildingCategory,
@@ -71,28 +75,10 @@ export type {
 } from './types/LLMTypes.js';
 export * from './genetics/PlantGenetics.js';
 export * from './data/index.js';
-export * from './metrics/events/index.js';
-// Metrics module - selective exports to avoid type conflicts with research module
-// NOTE: MetricsStorage uses Node.js 'fs' module - import directly from individual files to avoid bundling fs
-export { MetricsCollector } from './metrics/MetricsCollector.js';
-// MetricsStorage excluded - uses Node.js fs module, import directly for Node.js environments:
-// import { MetricsStorage } from '@ai-village/core/metrics/MetricsStorage.js';
-export { MetricsAnalysis } from './metrics/MetricsAnalysis.js';
-export { MetricsDashboard } from './metrics/MetricsDashboard.js';
-export { RingBuffer } from './metrics/RingBuffer.js';
-export { MetricsAPI } from './metrics/api/MetricsAPI.js';
-export { MetricsLiveStream } from './metrics/api/MetricsLiveStream.js';
-// Browser-compatible streaming client
-export { MetricsStreamClient, type MetricsStreamConfig, type ConnectionState, type StreamStats, type QueryRequest, type QueryResponse, type QueryHandler } from './metrics/MetricsStreamClient.js';
-// Live Entity API for dashboard queries
-export { LiveEntityAPI, type PromptBuilder, type EntitySummary, type EntityDetails } from './metrics/LiveEntityAPI.js';
-// Analyzers
-export {
-  NetworkAnalyzer,
-  SpatialAnalyzer,
-  InequalityAnalyzer,
-  CulturalDiffusionAnalyzer,
-} from './metrics/analyzers/index.js';
+// Metrics module - Moved to @ai-village/metrics package
+// Import from: import { MetricsCollector, MetricsAnalysis, ... } from '@ai-village/metrics';
+// LiveEntityAPI still lives in core for now
+export { LiveEntityAPI, type QueryRequest, type QueryResponse } from './metrics/index.js';
 export * from './crafting/index.js';
 export {
   globalRecipeRegistry,
@@ -277,49 +263,8 @@ export * from './knowledge/index.js';
 export * from './research/index.js';
 export { UnlockQueryService } from './research/index.js';
 
-// Persistence layer - Save/Load with forward migration support
-// Note: Selective exports to avoid conflicts with existing ./serialization module
-export {
-  // Services
-  SaveLoadService,
-  saveLoadService,
-  worldSerializer,
-  WorldSerializer,
-  componentSerializerRegistry,
-
-  // Storage backends
-  IndexedDBStorage,
-  MemoryStorage,
-
-  // Types (namespaced to avoid conflicts)
-  type SaveOptions,
-  type LoadResult,
-  type StorageBackend,
-  type StorageInfo,
-  type ComponentSerializer,
-  type VersionedEntity,
-  type VersionedComponent,
-
-  // Utilities
-  computeChecksum,
-  computeChecksumSync,
-  canonicalizeJSON,
-  serializeBigInt,
-  deserializeBigInt,
-  assertDefined,
-  assertType,
-  assertFiniteNumber,
-  assertOneOf,
-  generateContentID,
-  parseContentID,
-  getGameVersion,
-
-  // Errors
-  MigrationError,
-  SerializationError,
-  ValidationError,
-  ChecksumMismatchError,
-} from './persistence/index.js';
+// Persistence layer - Moved to @ai-village/persistence package
+// Import from: import { saveLoadService, ... } from '@ai-village/persistence';
 
 // Multiverse system - Multiple universes with independent time scales
 // Note: Explicit exports only to avoid esbuild module resolution issues
@@ -439,34 +384,8 @@ export {
   createDefaultTrustPolicy,
 } from './universe/index.js';
 
-// Magic paradigm system (forward-compatibility - Phase 30)
-export * from './magic/index.js';
-export {
-  type MagicParadigm,
-  type SpellDefinition,
-  type ParadigmState,
-  type PlayerSpellState,
-  getMagicSystemState,
-  getSpellRegistry,
-  CORE_PARADIGM_REGISTRY,
-  ANIMIST_PARADIGM_REGISTRY,
-  WHIMSICAL_PARADIGM_REGISTRY,
-  NULL_PARADIGM_REGISTRY,
-  DIMENSIONAL_PARADIGM_REGISTRY,
-  HYBRID_PARADIGM_REGISTRY,
-  // Paradigm Spectrum (Universe Magic Configuration)
-  type MagicSpectrumConfig,
-  type MagicalIntensity,
-  type MagicSourceOrigin,
-  type MagicFormality,
-  type AnimismLevel,
-  type SpectrumEffects,
-  SPECTRUM_PRESETS,
-  getPreset,
-  getPresetNames,
-  resolveSpectrum,
-  CONFIGURATION_QUESTIONS,
-} from './magic/index.js';
+// Magic paradigm system - Moved to @ai-village/magic package
+// Import from: import { MagicParadigm, SpellDefinition, ... } from '@ai-village/magic';
 
 // Magic System Managers - UI integration support
 export {
@@ -478,332 +397,8 @@ export {
   SpellCaster,
 } from './systems/magic/index.js';
 
-// Divinity system (forward-compatibility - Phase 31)
-// Note: Prayer and PrayerType are already exported from components/SpiritualComponent
-export {
-  // Belief system
-  type BeliefActivity,
-  type BeliefGeneration,
-  type BeliefCalculation,
-  type DeityBeliefState,
-  type BeliefDecayConfig,
-  type BeliefAllocation,
-  type BeliefRelationshipType,
-  type BeliefTransfer,
-  type BeliefTransferReason,
-  type BeliefEvent,
-  type BeliefEventType,
-  BELIEF_GENERATION_RATES,
-  BELIEF_THRESHOLDS,
-  DEFAULT_BELIEF_DECAY,
-  createInitialBeliefState,
-  calculateBeliefGeneration,
-
-  // Deity system
-  type DivineDomain,
-  type PerceivedPersonality,
-  type MoralAlignment,
-  type DescribedForm,
-  type DeityIdentity,
-  type DeityController,
-  type DeityOrigin,
-  type EmergencePhase,
-  type Deity,
-  type PlayerGodState,
-  type BelieverRelation,
-  createDefaultPersonality,
-  createBlankIdentity,
-  createEmergentIdentity,
-
-  // Myth system
-  type MythCategory,
-  type MythStatus,
-  type DisputeLevel,
-  type TraitImplication,
-  type NarrativeStructure,
-  type MythElements,
-  type MythCharacter,
-  type MythTime,
-  type Myth,
-  type MutationType,
-  type MythMutation,
-  type StoryTelling,
-  type TellingContext,
-  type AudienceReaction,
-  type MythConflict,
-  type MythConflictType,
-  type MythGenerationRequest,
-  type MythTrigger,
-  createMythTemplate,
-  calculateMythInfluence,
-
-  // Divine power system
-  type PowerTier,
-  type PowerCategory,
-  type DivinePowerType,
-  type DivinePower,
-  type PowerVisibility,
-  type PowerUseRequest,
-  type PowerTarget,
-  type PowerStyle,
-  type PowerUseResult,
-  type PowerEffect,
-  type PowerFailureReason,
-  type IdentityImplication,
-  type IdentityRiskAssessment,
-  type DomainPowerAffinity,
-  // Prayer types are already exported from components - skipping
-  type PrayerEmotion,
-  type PrayerRequest,
-  type PrayerResponse,
-  type DivineVision,
-  type VisionContent,
-  type ActiveBlessing,
-  type BlessingType,
-  type ActiveCurse,
-  type CurseType,
-  type CurseLiftCondition,
-  POWER_TIER_THRESHOLDS,
-  DOMAIN_POWER_AFFINITIES,
-  getTierForBelief,
-  canUsePower,
-  getDomainCostModifier,
-  createPrayer,
-
-  // Pantheon system
-  type PantheonStructure,
-  type Pantheon,
-  type PantheonPolitics,
-  type PantheonFaction,
-  type PantheonRelation,
-  type DivineRelationship,
-  type DivineRelationshipType,
-  type DivineFeeling,
-  type DivineFormalStatus,
-  type RelationshipOrigin,
-  type DivineMatter,
-  type DivineMatterType,
-  type DivineMatterOption,
-  type DivineVote,
-  type DiplomaticAction,
-  type DiplomaticActionType,
-  type DiplomaticTerms,
-  type DiplomaticOffer,
-  type DivineTreaty,
-  type TreatyType,
-  type TreatyTerm,
-  type DivineConflict,
-  type ConflictType,
-  type ConflictSide,
-  type ConflictPhase,
-  type MortalImpact,
-  type ConflictResolution,
-  type DivineMeeting,
-  type MeetingOutcome,
-  type DivineChatMessage,
-  createRelationship,
-  createPantheon,
-  calculateRelationshipStrength,
-  getRelationshipSummary,
-
-  // Divine chat system
-  type DivineChatConfig,
-  type DivineChatRoom,
-  type TypingIndicator,
-  type ChatMessageType,
-  type MessageTone,
-  type ChatStyle,
-  type ChatQuirk,
-  type MessageReaction,
-  type ReactionType,
-  type ChatNotification,
-  type ChatNotificationType,
-  type PrivateDMConversation,
-  type PrivateDMMessage,
-  type SendDMRequest,
-  type ChatResponseRequest,
-  type ChatResponseResult,
-  type ChatEvent,
-  type ChatEventType,
-  type PlayerChatActions,
-  type ChatStateSummary,
-  DEFAULT_CHAT_CONFIG,
-  createChatRoom,
-  createEntryNotification,
-  createChatMessage,
-  getChatStyleFromPersonality,
-  shouldChatBeActive,
-  areDMsAvailable,
-  formatNotification,
-
-  // Avatar system
-  type AvatarConfig,
-  type Avatar,
-  type AvatarForm,
-  type AvatarFormType,
-  type AvatarSize,
-  type MovementType,
-  type DivineTell,
-  type DivineTellType,
-  type AvatarStats,
-  type AvatarState,
-  type AvatarActivity,
-  type AvatarStatusEffect,
-  type AvatarDisguise,
-  type AvatarAbility,
-  type AvatarAbilityType,
-  type AvatarInventoryItem,
-  type AvatarEvent,
-  type AvatarEventType,
-  type AvatarPlayerActions,
-  type AvatarInteraction,
-  type AvatarInteractionAction,
-  type ManifestAvatarRequest,
-  type ManifestAvatarResult,
-  type AvatarManifestFailure,
-  DEFAULT_AVATAR_CONFIG,
-  DEFAULT_AVATAR_STATS,
-  createAvatarStats,
-  createAvatarForm,
-  calculateAvatarMaintenance,
-  shouldForceWithdraw,
-
-  // Angel system
-  type AngelConfig,
-  type Angel,
-  type AngelType,
-  type AngelRank,
-  type AngelForm,
-  type AngelAppearance,
-  type AngelStats,
-  type AngelState,
-  type AngelActivity,
-  type AngelStatusEffect,
-  type AngelPersonality,
-  type AngelAbility,
-  type AngelAbilityType,
-  type AngelOrders,
-  type AngelOrderType,
-  type AngelReport,
-  type AngelEvent,
-  type AngelEventType,
-  type CreateAngelRequest,
-  type CreateAngelResult,
-  type AngelCreationFailure,
-  DEFAULT_ANGEL_CONFIG,
-  ANGEL_STATS_BY_RANK,
-  createAngelStats,
-  createAngelForm,
-  createAngelPersonality,
-  calculateAngelMaintenance,
-
-  // Religion system
-  type Temple,
-  type TempleType,
-  type TempleSize,
-  type TempleFeature,
-  type SacredObject,
-  type ScheduledRitual,
-  type Priest,
-  type PriestRank,
-  type PriestRole,
-  type TheologicalPosition,
-  type Ritual,
-  type RitualType,
-  type RitualFrequency,
-  type RitualLocation,
-  type RitualItem,
-  type RitualEffect,
-  type RitualStep,
-  type HolyText,
-  type HolyTextType,
-  type HolyTextStatus,
-  type ReligiousMovement,
-  type ReligiousMovementType,
-  type Schism,
-  type SchismCause,
-  type Syncretism,
-  type SyncreticElement,
-  type Conversion,
-  type ConversionTrigger,
-  createShrine,
-  createRitual,
-  calculateTempleBeliefBonus,
-  calculatePriestEffectiveness,
-
-  // Universe configuration
-  type UniverseDivineConfig,
-  type CoreDivineParams,
-  type BeliefEconomyConfig,
-  type PowerConfig,
-  type PowerVisibilityConfig,
-  type PrayerConfig,
-  type VisionConfig,
-  type BlessingConfig,
-  type CurseConfig,
-  type UniverseAvatarConfig,
-  type UniverseAngelConfig,
-  type PantheonConfig,
-  type ReligionConfig,
-  type EmergenceConfig,
-  type ChatConfig,
-  type DomainModifier,
-  type RestrictionConfig,
-  type DivinityFeature,
-  type UniversePreset,
-  getPresetConfig,
-  getDefaultConfig,
-  calculateEffectivePowerCost,
-  calculateEffectiveRange,
-  calculateEffectiveDuration,
-  isPowerAvailable,
-  isFeatureAvailable,
-  mergeConfigs,
-  createUniverseConfig,
-
-  // Divine servant system
-  type ServantTemplate,
-  type ServantFormTemplate,
-  type ServantFormCategory,
-  type ServantComposition,
-  type ServantMovement,
-  type ServantAppendage,
-  type ServantCommunication,
-  type ServantPersonalityTemplate,
-  type ServantMortalAttitude,
-  type ServantAbilityTemplate,
-  type ServantAbilityCategory,
-  type ServantStats,
-  type DivineServant,
-  type ServantPersonalityInstance,
-  type ServantState,
-  type ServantStatusEffect,
-  type ServantOrders,
-  type EvolvedTrait,
-  type DivineHierarchy,
-  type GenerateServantTemplateRequest,
-  type GenerateServantTemplateResult,
-  type PlayerServantDesign,
-  type ServantPowerGrant,
-  type GrantedPower,
-  type PowerManifestation,
-  type PowerRestriction,
-  type GrantPowerRequest,
-  type GrantPowerResult,
-  type GrantPowerFailure,
-  POWER_BUDGET_BY_RANK,
-  playerDesignToTemplate,
-  createDivineHierarchy,
-  createServantFromTemplate,
-  calculateHierarchyMaintenance,
-  calculatePowerBudgetCost,
-  getPowerBudgetForRank,
-  createServantPowerGrant,
-  createPowerManifestation,
-  EXAMPLE_WAR_GOD_HIERARCHY,
-  EXAMPLE_NATURE_DEITY_HIERARCHY,
-  EXAMPLE_COSMIC_HORROR_HIERARCHY,
-} from './divinity/index.js';
+// Divinity system - Universe configuration
+export { createUniverseConfig } from './divinity/index.js';
 
 // Dashboard module - Unified view definitions for Player UI and LLM Dashboard
 export * from './dashboard/index.js';
@@ -819,54 +414,8 @@ export {
   viewRegistry,
 } from './dashboard/index.js';
 
-// Reproduction System - Mating paradigms, sexuality, midwifery
-export * from './reproduction/index.js';
-export {
-  // Mating paradigms
-  HUMAN_PARADIGM,
-  KEMMER_PARADIGM,
-  HIVE_PARADIGM,
-  HIVEMIND_PARADIGM,
-  PARASITIC_HIVEMIND_PARADIGM,
-  SYMBIOTIC_PARADIGM,
-  POLYAMOROUS_PARADIGM,
-  THREE_SEX_PARADIGM,
-  OPPORTUNISTIC_PARADIGM,
-  MYSTIF_PARADIGM,
-  QUANTUM_PARADIGM,
-  TEMPORAL_PARADIGM,
-  ASEXUAL_PARADIGM,
-  MATING_PARADIGMS,
-  getMatingParadigm,
-  getParadigmForSpecies,
-  canSpeciesMate,
-  registerMatingParadigm,
-  // Sexuality
-  SexualityComponent,
-  createSexualityComponent,
-  // Reproductive morphs
-  ReproductiveMorphComponent,
-  createReproductiveMorphComponent,
-  // Parasitic subsystem
-  ParasiticColonizationComponent,
-  CollectiveMindComponent,
-  ParasiticReproductionSystem,
-  ColonizationSystem,
-  // Midwifery subsystem
-  PregnancyComponent,
-  LaborComponent,
-  PostpartumComponent,
-  InfantComponent,
-  NursingComponent,
-  MidwiferySystem,
-  // Parenting subsystem
-  ParentingComponent,
-  createParentingComponent,
-  // Courtship subsystem
-  CourtshipComponent,
-  createCourtshipComponent,
-  CourtshipStateMachine,
-} from './reproduction/index.js';
+// Reproduction System - Moved to @ai-village/reproduction package
+// Import from: import { HUMAN_PARADIGM, SexualityComponent, PregnancyComponent, ... } from '@ai-village/reproduction';
 
 // Conversation System - Deep conversation with quality metrics, partner selection, age-based styles
 export * from './conversation/index.js';
@@ -1130,3 +679,10 @@ export * from './navigation/index.js';
 
 // Virtual Reality module (VR systems, emotional experiences)
 export * from './vr/index.js';
+
+// Microgenerators core infrastructure (god-crafted content queue & discovery)
+// Note: Microgenerator implementations (RiddleBook, SpellLab, Culinary) are in
+// microgenerators-server and kept separate from main build
+export * from './microgenerators/types.js';
+export { GodCraftedQueue, godCraftedQueue } from './microgenerators/GodCraftedQueue.js';
+export { GodCraftedDiscoverySystem, type ChunkSpawnInfo } from './microgenerators/GodCraftedDiscoverySystem.js';

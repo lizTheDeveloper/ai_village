@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Development Hub - Multiverse: The End of Eternity</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+      color: #e0e0e0;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    h1 {
+      font-size: 3em;
+      color: #00d4ff;
+      margin-bottom: 10px;
+      text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+    }
+
+    .subtitle {
+      color: #888;
+      font-size: 1.2em;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+      margin-bottom: 60px;
+    }
+
+    .tool-card {
+      background: #1a1a2e;
+      border: 2px solid #16213e;
+      border-radius: 12px;
+      padding: 30px;
+      transition: all 0.3s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tool-card:hover {
+      border-color: #00d4ff;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+    }
+
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #00d4ff, #00ff88);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+    }
+
+    .tool-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .tool-icon {
+      font-size: 3em;
+      margin-bottom: 15px;
+    }
+
+    .tool-card h3 {
+      color: #00d4ff;
+      margin-bottom: 10px;
+      font-size: 1.5em;
+    }
+
+    .tool-card p {
+      color: #aaa;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+
+    .tool-status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.85em;
+      margin-bottom: 15px;
+    }
+
+    .status-running {
+      background: rgba(0, 255, 136, 0.2);
+      color: #00ff88;
+      border: 1px solid #00ff88;
+    }
+
+    .status-available {
+      background: rgba(0, 212, 255, 0.2);
+      color: #00d4ff;
+      border: 1px solid #00d4ff;
+    }
+
+    .tool-meta {
+      display: flex;
+      gap: 15px;
+      font-size: 0.9em;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    .tool-meta span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #00d4ff, #00ff88);
+      color: #1a1a2e;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+    }
+
+    .section-title {
+      color: #00d4ff;
+      font-size: 2em;
+      margin: 40px 0 20px;
+      border-bottom: 2px solid #16213e;
+      padding-bottom: 10px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 60px;
+      padding-top: 30px;
+      border-top: 1px solid #16213e;
+      color: #666;
+    }
+
+    .category {
+      margin-bottom: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎮 Development Hub</h1>
+      <p class="subtitle">Multiverse: The End of Eternity - Development Tools</p>
+    </header>
+
+    <div class="category">
+      <h2 class="section-title">🎨 Sprite & Asset Tools</h2>
+      <div class="tools-grid">
+        <!-- Sprite Set Generator Wizard -->
+        <div class="tool-card" onclick="window.open('http://localhost:3011', '_blank')">
+          <div class="tool-icon">🧙‍♂️</div>
+          <h3>Sprite Set Generator Wizard</h3>
+          <span class="tool-status status-available">Available</span>
+          <p>Interactive wizard for generating consistent sprite part libraries with PixelLab</p>
+          <div class="tool-meta">
+            <span>📍 Port 3011</span>
+            <span>🎨 6 Art Styles</span>
+            <span>📦 49 Parts</span>
+          </div>
+          <p style="font-size: 0.9em; color: #666;">
+            ✨ Live preview • Auto-generation • Version history • Export sprite sheets
+          </p>
+          <a href="http://localhost:3011" class="btn" target="_blank">Launch Wizard</a>
+        </div>
+
+        <!-- Deterministic Sprite Test Screen -->
+        <div class="tool-card" onclick="window.open('http://localhost:3010', '_blank')">
+          <div class="tool-icon">🎲</div>
+          <h3>Deterministic Sprite Generator</h3>
+          <span class="tool-status status-available">Available</span>
+          <p>Test screen for deterministic sprite generation - pure algorithmic pixel art</p>
+          <div class="tool-meta">
+            <span>📍 Port 3010</span>
+            <span>🔒 Deterministic</span>
+            <span>🧬 Seed-based</span>
+          </div>
+          <p style="font-size: 0.9em; color: #666;">
+            ✨ Modular parts • Planet art styles • Game data integration
+          </p>
+          <a href="http://localhost:3010" class="btn" target="_blank">Launch Test Screen</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="category">
+      <h2 class="section-title">🎮 Game & Simulation</h2>
+      <div class="tools-grid">
+        <!-- Main Game -->
+        <div class="tool-card" onclick="window.open('http://localhost:3000', '_blank')">
+          <div class="tool-icon">🌍</div>
+          <h3>Main Game</h3>
+          <span class="tool-status status-running">Running</span>
+          <p>The main game simulation with ECS, AI agents, and multiverse mechanics</p>
+          <div class="tool-meta">
+            <span>📍 Port 3000</span>
+            <span>⚡ Vite HMR</span>
+            <span>🎯 20 TPS</span>
+          </div>
+          <a href="http://localhost:3000" class="btn" target="_blank">Open Game</a>
+        </div>
+
+        <!-- Metrics Dashboard -->
+        <div class="tool-card" onclick="window.open('http://localhost:8766/dashboard?session=latest', '_blank')">
+          <div class="tool-icon">📊</div>
+          <h3>Metrics Dashboard</h3>
+          <span class="tool-status status-running">Running</span>
+          <p>Performance metrics, agent stats, and system monitoring</p>
+          <div class="tool-meta">
+            <span>📍 Port 8766</span>
+            <span>📈 Live Metrics</span>
+            <span>🔍 Debug</span>
+          </div>
+          <a href="http://localhost:8766/dashboard?session=latest" class="btn" target="_blank">View Dashboard</a>
+        </div>
+
+        <!-- Orchestration Dashboard -->
+        <div class="tool-card" onclick="window.open('http://localhost:3030', '_blank')">
+          <div class="tool-icon">🎛️</div>
+          <h3>Orchestration Dashboard</h3>
+          <span class="tool-status status-running">Running</span>
+          <p>Development server orchestration and management</p>
+          <div class="tool-meta">
+            <span>📍 Port 3030</span>
+            <span>🔧 Dev Tools</span>
+          </div>
+          <a href="http://localhost:3030" class="btn" target="_blank">Open Dashboard</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="category">
+      <h2 class="section-title">📚 Documentation</h2>
+      <div class="tools-grid">
+        <div class="tool-card" style="cursor: default;">
+          <div class="tool-icon">📖</div>
+          <h3>Quick Links</h3>
+          <div style="margin-top: 20px;">
+            <p style="margin-bottom: 10px;"><strong>Architecture:</strong></p>
+            <ul style="list-style: none; padding-left: 0; color: #aaa; line-height: 2;">
+              <li>📄 <a href="./ARCHITECTURE_OVERVIEW.md" style="color: #00d4ff; text-decoration: none;">Architecture Overview</a></li>
+              <li>📄 <a href="./SYSTEMS_CATALOG.md" style="color: #00d4ff; text-decoration: none;">Systems Catalog (212+ systems)</a></li>
+              <li>📄 <a href="./METASYSTEMS_GUIDE.md" style="color: #00d4ff; text-decoration: none;">Metasystems Guide</a></li>
+              <li>📄 <a href="./QUICKSTART.md" style="color: #00d4ff; text-decoration: none;">Quick Start Guide</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>🎨 Multiverse: The End of Eternity - Development Hub</p>
+      <p style="margin-top: 10px;">Run <code>./start.sh</code> to start all servers</p>
+    </footer>
+  </div>
+</body>
+</html>

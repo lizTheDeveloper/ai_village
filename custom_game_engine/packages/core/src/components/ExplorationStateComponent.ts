@@ -77,10 +77,6 @@ export class ExplorationStateComponent extends ComponentBase {
       throw new Error('markSectorExplored requires valid finite sector coordinates');
     }
 
-    if (sectorX < 0 || sectorY < 0) {
-      throw new Error('Sector coordinates must be non-negative');
-    }
-
     if (tick < 0) {
       throw new Error('markSectorExplored requires non-negative tick value');
     }
@@ -151,8 +147,6 @@ export class ExplorationStateComponent extends ComponentBase {
       ];
 
       for (const neighbor of neighbors) {
-        if (neighbor.x < 0 || neighbor.y < 0) continue;
-
         const key = this._getSectorKey(neighbor.x, neighbor.y);
         if (!this._exploredSectors.has(key) && !checked.has(key)) {
           checked.add(key);

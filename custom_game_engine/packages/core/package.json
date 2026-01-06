@@ -11,7 +11,7 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "cd ../.. && npx tsx scripts/validate-package-data.ts packages/core && cd packages/core && tsc",
     "dev": "tsc --watch",
     "test": "vitest run",
     "test:watch": "vitest",

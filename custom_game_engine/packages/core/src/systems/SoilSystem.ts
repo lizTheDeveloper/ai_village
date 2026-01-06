@@ -34,11 +34,22 @@ export interface Tile {
  * - Emit soil-related events
  *
  * Priority: 15 (after WeatherSystem, before farming systems)
+ *
+ * Dependencies:
+ * @see TimeSystem (priority 3) - Provides time tracking for daily soil updates and fertilizer duration
+ * @see WeatherSystem (priority 5) - Provides weather events (rain, snow) that affect soil moisture
  */
 export class SoilSystem implements System {
   public readonly id: SystemId = 'soil';
   public readonly priority: number = 15;
   public readonly requiredComponents: ReadonlyArray<string> = [];
+
+  /**
+   * Systems that must run before this one.
+   * @see TimeSystem - provides time acceleration for daily soil updates
+   * @see WeatherSystem - provides rain/snow events that increase soil moisture
+   */
+  public readonly dependsOn = ['time', 'weather'] as const;
 
   private lastDayProcessed: number = -1;
   private accumulatedTime: number = 0; // Track elapsed time in seconds

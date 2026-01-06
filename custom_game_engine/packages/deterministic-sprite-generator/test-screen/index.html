@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deterministic Sprite Generator - Test Screen</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Deterministic Sprite Generator</h1>
+      <p class="subtitle">Pure algorithmic pixel art - no ML, fully reproducible</p>
+    </header>
+
+    <div class="main-content">
+      <!-- Generation Controls -->
+      <section class="controls">
+        <h2>Generation Parameters</h2>
+
+        <div class="control-group">
+          <label for="seed">Seed (deterministic):</label>
+          <input type="text" id="seed" value="agent_12345">
+          <button id="randomSeed">Random Seed</button>
+        </div>
+
+        <div class="control-group">
+          <label for="template">Template:</label>
+          <select id="template">
+            <option value="simple">Simple (Debug)</option>
+            <option value="humanoid" selected>Humanoid</option>
+            <option value="quadruped">Quadruped</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="artStyle">Planetary Art Style:</label>
+          <select id="artStyle">
+            <option value="nes">8-bit NES (chunky pixels)</option>
+            <option value="snes" selected>16-bit SNES (smooth detail)</option>
+            <option value="ps1">32-bit PS1 (pre-rendered 3D)</option>
+            <option value="gba">GBA (bright vibrant)</option>
+            <option value="gameboy">Game Boy (4-shade mono)</option>
+            <option value="neogeo">Neo Geo (arcade quality)</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="scale">Scale:</label>
+          <input type="range" id="scale" min="1" max="32" value="20">
+          <span id="scaleValue">20x</span>
+        </div>
+
+        <h3>Colors</h3>
+        <div class="color-controls">
+          <div class="color-group">
+            <label for="skinColor">Skin:</label>
+            <input type="color" id="skinColor" value="#ffc8b4">
+          </div>
+          <div class="color-group">
+            <label for="hairColor">Hair:</label>
+            <input type="color" id="hairColor" value="#643214">
+          </div>
+          <div class="color-group">
+            <label for="eyeColor">Eyes:</label>
+            <input type="color" id="eyeColor" value="#000000">
+          </div>
+          <div class="color-group">
+            <label for="primaryColor">Primary:</label>
+            <input type="color" id="primaryColor" value="#c86464">
+          </div>
+        </div>
+
+        <button id="generate" class="primary-button">Generate Sprite</button>
+      </section>
+
+      <!-- Sprite Display -->
+      <section class="display">
+        <h2>Generated Sprite</h2>
+        <div class="sprite-container">
+          <canvas id="spriteCanvas"></canvas>
+        </div>
+
+        <div class="metadata">
+          <h3>Metadata</h3>
+          <div id="metadata"></div>
+        </div>
+
+        <div class="parts-list">
+          <h3>Parts Used</h3>
+          <ul id="partsList"></ul>
+        </div>
+      </section>
+
+      <!-- Determinism Proof -->
+      <section class="proof">
+        <h2>Determinism Proof</h2>
+        <p>Same seed always produces same sprite. Generate multiple times to verify:</p>
+        <div class="proof-grid" id="proofGrid"></div>
+        <button id="testDeterminism">Test Determinism (5x)</button>
+      </section>
+    </div>
+
+    <!-- Game Data Integration -->
+    <section class="game-data">
+      <h2>Game Data Integration (Optional)</h2>
+      <p>Load agent/species data from game saves to demonstrate what sprites would look like:</p>
+      <div class="control-group">
+        <label for="gameDataFile">Upload save file (JSON):</label>
+        <input type="file" id="gameDataFile" accept=".json">
+      </div>
+      <div id="gameDataPreview"></div>
+    </section>
+
+    <footer>
+      <p>🎨 Deterministic Sprite Generator v0.1.0</p>
+      <p>No machine learning - pure procedural generation with hash-based seeding</p>
+    </footer>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>

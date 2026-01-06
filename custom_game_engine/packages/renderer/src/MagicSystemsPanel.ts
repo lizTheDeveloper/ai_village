@@ -9,13 +9,13 @@
  * - Data-driven: no hardcoded paradigm list
  */
 
-import type { MagicParadigm, ParadigmState } from '@ai-village/core';
+import type { MagicParadigm, ParadigmState } from '@ai-village/magic';
 
 // Local type for magic source
 interface MagicSourceInfo {
   name: string;
 }
-import { getMagicSystemState } from '@ai-village/core';
+import { getMagicSystemState } from '@ai-village/magic';
 import type { IWindowPanel } from './types/WindowTypes.js';
 
 // ============================================================================

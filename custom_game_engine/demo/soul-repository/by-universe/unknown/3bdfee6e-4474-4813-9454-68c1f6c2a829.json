@@ -1,0 +1,17 @@
+{
+  "soulId": "3bdfee6e-4474-4813-9454-68c1f6c2a829",
+  "agentId": "3bdfee6e-4474-4813-9454-68c1f6c2a829",
+  "name": "Brook",
+  "species": "human",
+  "archetype": "creator",
+  "purpose": "[CORRUPTED SOUL] The Fates spoke only in riddles and internal musings. This soul's purpose remains veiled in cosmic static. Perhaps a divine intervention could restore their true purpose...",
+  "interests": [
+    "knowledge",
+    "crafting",
+    "nature"
+  ],
+  "createdAt": "2026-01-05T11:40:09.813Z",
+  "soulBirthTick": 350,
+  "universeId": "unknown",
+  "version": 1
+}

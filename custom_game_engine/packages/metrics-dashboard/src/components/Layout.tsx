@@ -11,7 +11,7 @@ export default function Layout() {
     <div className="layout">
       <nav className="navbar">
         <div className="navbar-brand">
-          <h1>AI Village Metrics</h1>
+          <h1>Multiverse: The End of Eternity - Metrics</h1>
           <div className="connection-status">
             <span
               className={`status-indicator ${isConnected ? 'connected' : 'disconnected'}`}

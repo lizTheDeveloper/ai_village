@@ -817,11 +817,11 @@ function formatSpriteList(data) {
   }
 
   // Count by category
-  const categories: Record<string, number> = {};
-  const withImages = sprites.filter((s: any) => s.hasImage).length;
+  const categories = {};
+  const withImages = sprites.filter((s) => s.hasImage).length;
 
   for (const sprite of sprites) {
-    const cat = (sprite as any).category || 'unknown';
+    const cat = sprite.category || 'unknown';
     categories[cat] = (categories[cat] || 0) + 1;
   }
 
@@ -1358,7 +1358,7 @@ export function renderDashboardHtml(context: ViewContext): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Village - Admin Console</title>
+  <title>Multiverse: The End of Eternity - Admin Console</title>
   <style>${STYLES}</style>
 </head>
 <body>

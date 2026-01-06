@@ -62,7 +62,7 @@ export class LLMRequestRouter {
   private sessionManager: GameSessionManager;
   private cooldownCalculator: CooldownCalculator;
   private providerMappings: Map<string, ProviderMapping>;
-  private defaultModel: string = 'qwen/qwen3-32b';
+  private defaultModel: string = 'qwen-3-32b';
 
   // Cost and metrics tracking
   public costTracker: CostTracker;

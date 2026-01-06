@@ -1,0 +1,18 @@
+{
+  "soulId": "fa841eb3-5955-4bd0-aeae-2a4f71b0df40",
+  "agentId": "fa841eb3-5955-4bd0-aeae-2a4f71b0df40",
+  "name": "Lark",
+  "species": "human",
+  "archetype": "creator",
+  "purpose": "[CORRUPTED SOUL] The Fates spoke only in riddles and internal musings. This soul's purpose remains veiled in cosmic static. Perhaps a divine intervention could restore their true purpose...",
+  "interests": [
+    "knowledge",
+    "crafting",
+    "nature",
+    "art"
+  ],
+  "createdAt": "2026-01-05T09:02:20.590Z",
+  "soulBirthTick": 660,
+  "universeId": "unknown",
+  "version": 1
+}

@@ -28,7 +28,7 @@ export {
   type BehaviorPriorityConfig,
 } from './BehaviorPriority.js';
 
-// LLM Decision Processor
+// LLM Decision Processor (original - kept for backward compatibility)
 export {
   LLMDecisionProcessor,
   initLLMDecisionProcessor,
@@ -37,6 +37,22 @@ export {
   type LLMDecisionQueue,
   type PromptBuilder,
 } from './LLMDecisionProcessor.js';
+
+// Talker LLM Processor (Layer 2: Conversation, goals, social)
+export {
+  TalkerLLMProcessor,
+  type TalkerDecisionResult,
+  type TalkerPromptBuilder,
+  type TalkerProcessorConfig,
+} from './TalkerLLMProcessor.js';
+
+// Executor LLM Processor (Layer 3: Task planning, multi-step actions)
+export {
+  ExecutorLLMProcessor,
+  type ExecutorDecisionResult,
+  type ExecutorPromptBuilder,
+  type ExecutorProcessorConfig,
+} from './ExecutorLLMProcessor.js';
 
 // Scripted Decision Processor
 export {
@@ -57,6 +73,8 @@ export {
 import { AutonomicSystem as AutonomicSystemClass, type AutonomicResult as AutonomicResultType } from './AutonomicSystem.js';
 import { getBehaviorPriority as getBehaviorPriorityFn } from './BehaviorPriority.js';
 import { LLMDecisionProcessor as LLMDecisionProcessorClass, type LLMDecisionResult as LLMDecisionResultType, type LLMDecisionQueue, type PromptBuilder } from './LLMDecisionProcessor.js';
+import { TalkerLLMProcessor as TalkerLLMProcessorClass, type TalkerDecisionResult as TalkerDecisionResultType, type TalkerPromptBuilder } from './TalkerLLMProcessor.js';
+import { ExecutorLLMProcessor as ExecutorLLMProcessorClass, type ExecutorDecisionResult as ExecutorDecisionResultType, type ExecutorPromptBuilder } from './ExecutorLLMProcessor.js';
 import { ScriptedDecisionProcessor as ScriptedDecisionProcessorClass, type ScriptedDecisionResult as ScriptedDecisionResultType } from './ScriptedDecisionProcessor.js';
 import type { Entity, EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
@@ -69,7 +87,7 @@ export interface DecisionResult {
   changed: boolean;
   behavior?: AgentBehavior;
   behaviorState?: Record<string, unknown>;
-  source: 'autonomic' | 'llm' | 'scripted' | 'queue' | 'fallback' | 'none';
+  source: 'autonomic' | 'llm' | 'talker' | 'executor' | 'scripted' | 'queue' | 'fallback' | 'none';
   priority?: number;
   reason?: string;
 }
@@ -79,11 +97,21 @@ export interface DecisionResult {
  *
  * Runs decision layers in priority order:
  * 1. Autonomic (highest priority - survival)
- * 2. Behavior Queue (player-ordered tasks)
- * 3. LLM or Scripted (agent planning)
+ * 2. Talker LLM (conversation, goals, social)
+ * 3. Executor LLM (task planning, multi-step actions)
+ * 4. Scripted (fallback behavior)
  *
  * Usage:
  * ```typescript
+ * // Three-layer architecture (recommended)
+ * const decision = new DecisionProcessor(
+ *   llmQueue,
+ *   null,  // old promptBuilder (deprecated)
+ *   talkerPromptBuilder,
+ *   executorPromptBuilder
+ * );
+ *
+ * // Backward compatible (single LLM)
  * const decision = new DecisionProcessor(llmQueue, promptBuilder);
  *
  * // In system update loop
@@ -96,11 +124,34 @@ export interface DecisionResult {
 export class DecisionProcessor {
   private autonomicSystem: AutonomicSystemClass;
   private llmProcessor: LLMDecisionProcessorClass | null;
+  private talkerProcessor: TalkerLLMProcessorClass | null;
+  private executorProcessor: ExecutorLLMProcessorClass | null;
   private scriptedProcessor: ScriptedDecisionProcessorClass;
+  private useSplitLLM: boolean; // True if using Talker+Executor, false if using single LLM
 
-  constructor(llmQueue?: LLMDecisionQueue, promptBuilder?: PromptBuilder) {
+  constructor(
+    llmQueue?: LLMDecisionQueue,
+    promptBuilder?: PromptBuilder,
+    talkerPromptBuilder?: TalkerPromptBuilder,
+    executorPromptBuilder?: ExecutorPromptBuilder
+  ) {
     this.autonomicSystem = new AutonomicSystemClass();
-    this.llmProcessor = llmQueue && promptBuilder ? new LLMDecisionProcessorClass(llmQueue, promptBuilder) : null;
+
+    // Check if we're using the new split architecture (Talker + Executor)
+    this.useSplitLLM = !!(llmQueue && talkerPromptBuilder && executorPromptBuilder);
+
+    if (this.useSplitLLM) {
+      // Three-layer architecture (Autonomic → Talker → Executor)
+      this.talkerProcessor = new TalkerLLMProcessorClass(llmQueue!, talkerPromptBuilder!);
+      this.executorProcessor = new ExecutorLLMProcessorClass(llmQueue!, executorPromptBuilder!);
+      this.llmProcessor = null; // Disable old single LLM
+    } else {
+      // Backward compatible single LLM
+      this.llmProcessor = llmQueue && promptBuilder ? new LLMDecisionProcessorClass(llmQueue, promptBuilder) : null;
+      this.talkerProcessor = null;
+      this.executorProcessor = null;
+    }
+
     this.scriptedProcessor = new ScriptedDecisionProcessorClass();
   }
 
@@ -135,7 +186,37 @@ export class DecisionProcessor {
       };
     }
 
-    // Layer 2: LLM (if enabled)
+    // Layer 2 & 3: Split LLM (Talker + Executor)
+    if (agent.useLLM && this.useSplitLLM && this.talkerProcessor && this.executorProcessor) {
+      // Layer 2a: Talker (conversation, goals, social)
+      const talkerResult = this.talkerProcessor.process(entity, world, agent, getNearbyAgents);
+      if (talkerResult.changed) {
+        // Talker changed something (goals, priorities, or behavior)
+        return {
+          changed: true,
+          behavior: talkerResult.behavior,
+          behaviorState: talkerResult.behaviorState,
+          source: 'talker',
+        };
+      }
+
+      // Layer 2b: Executor (task planning, multi-step actions)
+      // Executor runs AFTER Talker to read updated goals/priorities
+      const executorResult = this.executorProcessor.process(entity, world, agent, getNearbyAgents);
+      if (executorResult.changed) {
+        return {
+          changed: true,
+          behavior: executorResult.behavior,
+          behaviorState: executorResult.behaviorState,
+          source: executorResult.source === 'fallback' ? 'fallback' : 'executor',
+        };
+      }
+
+      // LLM agent - don't fall through to scripted
+      return { changed: false, source: 'none' };
+    }
+
+    // Layer 2: Single LLM (backward compatible)
     if (agent.useLLM && this.llmProcessor) {
       const llmResult = this.llmProcessor.process(entity, world, agent, getNearbyAgents);
       if (llmResult.changed) {

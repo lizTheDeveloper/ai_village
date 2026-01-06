@@ -295,6 +295,7 @@ export class MythRetellingSystem implements System {
     // Emit attribution change event
     world.eventBus?.emit({
       type: 'myth:attribution_changed',
+      source: narrator.id,
       data: {
         mythId: mutatedMyth.id,
         mythTitle: mutatedMyth.title,

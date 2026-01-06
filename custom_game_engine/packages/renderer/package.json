@@ -16,7 +16,11 @@
   },
   "dependencies": {
     "@ai-village/core": "*",
+    "@ai-village/persistence": "*",
     "@ai-village/world": "*",
+    "@ai-village/magic": "*",
+    "@ai-village/divinity": "*",
+    "@ai-village/introspection": "*",
     "@types/three": "^0.182.0",
     "three": "^0.182.0"
   }

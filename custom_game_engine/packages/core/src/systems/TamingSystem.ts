@@ -13,6 +13,20 @@ export type { TamingMethod, InteractionType };
 /**
  * TamingSystem handles taming attempts and bond building
  * Priority: 70 (runs late in the update cycle)
+ *
+ * Dependencies:
+ * - AnimalSystem: Must run after animal state is updated
+ *   - Uses Animal components for taming attempts
+ *   - Reads trust/bond levels, wild status
+ *   - Modifies stress, mood, bondLevel
+ *
+ * - None (passive system): Triggered by attemptTaming() and interact() calls
+ *   - No per-tick updates
+ *   - Operates on demand when agents/players initiate taming
+ *
+ * Related Systems:
+ * - AnimalBrainSystem: AI for tamed animals may differ from wild
+ * - AgentBrainSystem: Agents decide when to attempt taming
  */
 export class TamingSystem implements System {
   public readonly id: SystemId = 'taming';

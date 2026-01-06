@@ -13,9 +13,26 @@ export interface ResetButtonBounds {
 
 export class PrioritiesSection {
   private resetButtonBounds: ResetButtonBounds | null = null;
+  private scrollOffset = 0;
 
   getResetButtonBounds(): ResetButtonBounds | null {
     return this.resetButtonBounds;
+  }
+
+  getScrollOffset(): number {
+    return this.scrollOffset;
+  }
+
+  setScrollOffset(offset: number): void {
+    this.scrollOffset = offset;
+  }
+
+  handleScroll(deltaY: number): void {
+    if (deltaY > 0) {
+      this.scrollOffset += 3;
+    } else {
+      this.scrollOffset = Math.max(0, this.scrollOffset - 3);
+    }
   }
 
   render(
@@ -23,9 +40,15 @@ export class PrioritiesSection {
     identity: IdentityComponent | undefined,
     agent: AgentComponentData | undefined
   ): void {
-    const { ctx, x, y, padding, lineHeight } = context;
+    const { ctx, x, y, width, height, padding, lineHeight } = context;
 
-    let currentY = y + padding;
+    // Save the context state for clipping
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x, y, width, height);
+    ctx.clip();
+
+    let currentY = y + padding - this.scrollOffset;
 
     // Agent name header
     if (identity?.name) {
@@ -134,5 +157,8 @@ export class PrioritiesSection {
     ctx.textAlign = 'center';
     ctx.fillText('Reset to Default', btnX + btnWidth / 2, btnY + 16);
     ctx.textAlign = 'left';
+
+    // Restore canvas state
+    ctx.restore();
   }
 }

@@ -33,7 +33,7 @@ export interface GeneticAllele {
 // Hereditary Modifications
 // ============================================================================
 
-export type ModificationSource = 'divine' | 'magical' | 'genetic_engineering' | 'mutation' | 'natural';
+export type GeneticModificationSource = 'divine' | 'magical' | 'genetic_engineering' | 'mutation' | 'natural';
 
 export interface HereditaryModification {
   id: string;
@@ -49,7 +49,7 @@ export interface HereditaryModification {
   dominance: 'dominant' | 'recessive'; // Genetic dominance
 
   // Source
-  source: ModificationSource;
+  source: GeneticModificationSource;
   sourceEntityId?: string;   // Deity who granted it, spell that created it, etc.
 
   // When acquired
@@ -361,7 +361,7 @@ export function createHereditaryModification(
   type: HereditaryModification['type'],
   bodyPartType: string,
   inheritanceChance: number,
-  source: ModificationSource,
+  source: GeneticModificationSource,
   tick: number,
   options: Partial<HereditaryModification> = {}
 ): HereditaryModification {

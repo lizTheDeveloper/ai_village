@@ -11,14 +11,15 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "cd ../.. && npx tsx scripts/validate-package-data.ts packages/world && cd packages/world && tsc",
     "dev": "tsc --watch",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@ai-village/core": "*"
+    "@ai-village/core": "*",
+    "@ai-village/reproduction": "*"
   },
   "devDependencies": {
     "@ai-village/core": "*"

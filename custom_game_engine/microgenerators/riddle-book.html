@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Death's Riddle Book - Multiverse: The End of Eternity Microgenerator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #eee;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: rgba(30, 30, 50, 0.9);
+      border: 2px solid #8b7355;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      text-align: center;
+      color: #d4af37;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #aaa;
+      font-style: italic;
+      margin-bottom: 30px;
+      font-size: 0.95em;
+    }
+
+    .section {
+      margin-bottom: 25px;
+      padding: 20px;
+      background: rgba(20, 20, 40, 0.5);
+      border-radius: 8px;
+      border-left: 4px solid #8b7355;
+    }
+
+    .section-title {
+      color: #d4af37;
+      font-size: 1.2em;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+    }
+
+    .section-title::before {
+      content: '📜';
+      margin-right: 10px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #ccc;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #555;
+      border-radius: 5px;
+      color: #eee;
+      font-family: inherit;
+      font-size: 1em;
+      margin-bottom: 15px;
+      transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #d4af37;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #8b7355 0%, #6b5345 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(139, 115, 85, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .divine-signature {
+      background: rgba(212, 175, 55, 0.1);
+      border: 1px dashed #d4af37;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 20px;
+      text-align: center;
+      font-style: italic;
+      color: #d4af37;
+    }
+
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background: rgba(212, 175, 55, 0.1);
+      border: 2px solid #d4af37;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .result.show {
+      display: block;
+      animation: fadeIn 0.5s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result h3 {
+      color: #d4af37;
+      margin-bottom: 15px;
+    }
+
+    .riddle-text {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      border-radius: 5px;
+      margin: 10px 0;
+      font-style: italic;
+    }
+
+    .answer {
+      color: #7fff7f;
+      font-weight: bold;
+    }
+
+    .error {
+      background: rgba(255, 0, 0, 0.2);
+      border: 1px solid #f00;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 15px;
+      display: none;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    .help-text {
+      font-size: 0.9em;
+      color: #aaa;
+      margin-top: -10px;
+      margin-bottom: 15px;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .back-link a {
+      color: #d4af37;
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📖 Death's Riddle Book</h1>
+    <p class="subtitle">Craft personalized riddles for hero death bargains</p>
+
+    <form id="riddleForm">
+      <!-- Divine Signature -->
+      <div class="section">
+        <div class="section-title">Divine Identity</div>
+        <label for="creatorName">Your Name</label>
+        <input type="text" id="creatorName" required placeholder="Enter your name...">
+
+        <label for="godOf">God of...</label>
+        <input type="text" id="godOf" required placeholder="Late Night Claude Code Coding Sessions">
+        <p class="help-text">Declare your divine domain</p>
+
+        <div class="divine-signature" id="signaturePreview">
+          "Crafted by <span id="previewName">Your Name</span>, God of <span id="previewGodOf">Your Domain</span>"
+        </div>
+      </div>
+
+      <!-- Riddle Configuration -->
+      <div class="section">
+        <div class="section-title">Riddle Configuration</div>
+
+        <label for="targetName">Hero Name (optional)</label>
+        <input type="text" id="targetName" placeholder="Leave blank for generic riddle">
+
+        <label for="theme">Theme/Topic (optional)</label>
+        <input type="text" id="theme" placeholder="e.g., 'The Seeker', 'Ancient Wisdom'">
+
+        <label for="difficulty">Difficulty</label>
+        <select id="difficulty" required>
+          <option value="easy">Easy</option>
+          <option value="medium" selected>Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="allowLLM" checked>
+          <label for="allowLLM" style="margin-bottom: 0;">Allow LLM to judge creative answers</label>
+        </div>
+      </div>
+
+      <!-- Context (Optional) -->
+      <div class="section">
+        <div class="section-title">Context (Optional)</div>
+
+        <label for="causeOfDeath">Cause of Death</label>
+        <input type="text" id="causeOfDeath" placeholder="e.g., 'slain by dragon'">
+
+        <label for="notableDeeds">Notable Deeds</label>
+        <textarea id="notableDeeds" placeholder="One deed per line..."></textarea>
+
+        <label for="relationships">Relationships</label>
+        <textarea id="relationships" placeholder="e.g., 'friend of the king'"></textarea>
+      </div>
+
+      <button type="submit" id="generateBtn">🔮 Forge Riddle</button>
+    </form>
+
+    <!-- Result Display -->
+    <div id="result" class="result">
+      <h3>✨ Riddle Forged!</h3>
+      <div class="riddle-text" id="riddleQuestion"></div>
+      <p><strong>Answer:</strong> <span class="answer" id="riddleAnswer"></span></p>
+      <p id="riddleSignature" style="margin-top: 15px; font-style: italic; color: #aaa;"></p>
+    </div>
+
+    <!-- Error Display -->
+    <div id="error" class="error">
+      <strong>Error:</strong> <span id="errorMessage"></span>
+    </div>
+
+    <div class="back-link">
+      <a href="/microgen">← Back to Microgenerators</a>
+    </div>
+  </div>
+
+  <script>
+    // Update divine signature preview
+    const nameInput = document.getElementById('creatorName');
+    const godOfInput = document.getElementById('godOf');
+    const previewName = document.getElementById('previewName');
+    const previewGodOf = document.getElementById('previewGodOf');
+
+    nameInput.addEventListener('input', () => {
+      previewName.textContent = nameInput.value || 'Your Name';
+    });
+
+    godOfInput.addEventListener('input', () => {
+      previewGodOf.textContent = godOfInput.value || 'Your Domain';
+    });
+
+    // Form submission
+    document.getElementById('riddleForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const generateBtn = document.getElementById('generateBtn');
+      const result = document.getElementById('result');
+      const error = document.getElementById('error');
+
+      // Hide previous results
+      result.classList.remove('show');
+      error.classList.remove('show');
+
+      // Disable button
+      generateBtn.disabled = true;
+      generateBtn.textContent = '⏳ Forging...';
+
+      try {
+        // Build request payload
+        const notableDeeds = document.getElementById('notableDeeds').value
+          .split('\n')
+          .map(s => s.trim())
+          .filter(s => s);
+
+        const relationships = document.getElementById('relationships').value
+          .split('\n')
+          .map(s => s.trim())
+          .filter(s => s);
+
+        const payload = {
+          creator: {
+            id: `creator_${Date.now()}`,
+            name: nameInput.value,
+            godOf: godOfInput.value,
+            createdAt: Date.now(),
+            source: 'microgenerator',
+            previousCreations: 0,
+          },
+          tags: ['riddle', 'death_bargain', document.getElementById('difficulty').value],
+          data: {
+            targetName: document.getElementById('targetName').value || undefined,
+            theme: document.getElementById('theme').value || undefined,
+            difficulty: document.getElementById('difficulty').value,
+            allowLLMJudgment: document.getElementById('allowLLM').checked,
+            context: {
+              causeOfDeath: document.getElementById('causeOfDeath').value || undefined,
+              notableDeeds: notableDeeds.length > 0 ? notableDeeds : undefined,
+              relationships: relationships.length > 0 ? relationships : undefined,
+            },
+          },
+        };
+
+        // Call API
+        const response = await fetch('/api/microgen/riddle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Display result
+          document.getElementById('riddleQuestion').textContent = data.riddle.data.question;
+          document.getElementById('riddleAnswer').textContent = data.riddle.data.correctAnswer;
+          document.getElementById('riddleSignature').textContent =
+            `Crafted by ${payload.creator.name}, God of ${payload.creator.godOf}`;
+          result.classList.add('show');
+        } else {
+          throw new Error(data.error || 'Unknown error');
+        }
+      } catch (err) {
+        document.getElementById('errorMessage').textContent = err.message;
+        error.classList.add('show');
+      } finally {
+        generateBtn.disabled = false;
+        generateBtn.textContent = '🔮 Forge Riddle';
+      }
+    });
+  </script>
+</body>
+</html>

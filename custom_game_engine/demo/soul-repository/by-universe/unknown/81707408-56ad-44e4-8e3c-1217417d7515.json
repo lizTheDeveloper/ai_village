@@ -1,0 +1,17 @@
+{
+  "soulId": "81707408-56ad-44e4-8e3c-1217417d7515",
+  "agentId": "81707408-56ad-44e4-8e3c-1217417d7515",
+  "name": "Kestrel",
+  "species": "human",
+  "archetype": "wanderer",
+  "purpose": "I see",
+  "interests": [
+    "crafting",
+    "nature",
+    "art"
+  ],
+  "createdAt": "2026-01-06T04:52:11.233Z",
+  "soulBirthTick": 74,
+  "universeId": "unknown",
+  "version": 1
+}

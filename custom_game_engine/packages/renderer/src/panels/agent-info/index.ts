@@ -11,3 +11,4 @@ export { MemoriesSection } from './MemoriesSection.js';
 export { ContextSection } from './ContextSection.js';
 export { PrioritiesSection, type ResetButtonBounds } from './PrioritiesSection.js';
 export { SkillsSection } from './SkillsSection.js';
+export { DevSection } from './DevSection.js';

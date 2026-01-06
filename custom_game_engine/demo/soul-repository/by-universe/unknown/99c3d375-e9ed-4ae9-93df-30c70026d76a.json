@@ -1,0 +1,17 @@
+{
+  "soulId": "99c3d375-e9ed-4ae9-93df-30c70026d76a",
+  "agentId": "99c3d375-e9ed-4ae9-93df-30c70026d76a",
+  "name": "Dove",
+  "species": "human",
+  "archetype": "creator",
+  "purpose": "I see a soul shaped by the earth's abundance. This thread shall weave the village's foundation, balancing gathering and building to nurture enduring community.",
+  "interests": [
+    "crafting",
+    "nature",
+    "art"
+  ],
+  "createdAt": "2026-01-05T11:40:14.517Z",
+  "soulBirthTick": 444,
+  "universeId": "unknown",
+  "version": 1
+}

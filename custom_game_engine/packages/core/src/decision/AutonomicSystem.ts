@@ -63,8 +63,20 @@ export class AutonomicSystem {
     const temperature = entity.getComponent<TemperatureComponent>(ComponentType.Temperature);
     const agent = entity.getComponent<AgentComponent>(ComponentType.Agent);
 
+    // Get current time of day for bedtime logic
+    let currentTimeOfDay: number | undefined = undefined;
+    if (world) {
+      const timeEntities = world.query().with(ComponentType.Time).executeEntities();
+      if (timeEntities.length > 0 && timeEntities[0]) {
+        const timeComp = timeEntities[0].getComponent<any>(ComponentType.Time);
+        if (timeComp && timeComp.timeOfDay !== undefined) {
+          currentTimeOfDay = timeComp.timeOfDay;
+        }
+      }
+    }
+
     // First check survival needs
-    const needsResult = this.checkNeeds(needs, circadian || undefined, temperature || undefined);
+    const needsResult = this.checkNeeds(needs, circadian || undefined, temperature || undefined, currentTimeOfDay, agent || undefined);
     if (needsResult) return needsResult;
 
     // Then check boredom (lower priority than survival)
@@ -119,7 +131,9 @@ export class AutonomicSystem {
   checkNeeds(
     needs: NeedsComponent,
     circadian?: CircadianComponent,
-    temperature?: TemperatureComponent
+    temperature?: TemperatureComponent,
+    currentTimeOfDay?: number,
+    agent?: AgentComponent
   ): AutonomicResult | null {
     // Critical physical needs interrupt with high priority (spec: interruptPriority 0.85-0.95)
 
@@ -136,10 +150,11 @@ export class AutonomicSystem {
       };
     }
 
-    // Low energy threshold: < 0.3 (30%) energy = seek sleep
-    // Increased from 0.1 to give agents time to find bed before collapsing
-    // At working rate of 4.8 energy/hour, this gives ~4 hours buffer before collapse
-    if (needs.energy < 0.3) {
+    // Low energy threshold: < 0.15 (15%) energy = seek sleep
+    // Lowered from 0.3 to allow agents to stay awake 48-72 hours before collapse
+    // At working rate of 4.8 energy/hour, this gives ~3 hours buffer before collapse
+    // Most sleep will be triggered by circadian bedtime logic instead
+    if (needs.energy < 0.15) {
       return {
         behavior: 'seek_sleep',
         priority: 85,
@@ -172,6 +187,46 @@ export class AutonomicSystem {
           behavior: 'seek_warmth',
           priority: 35,
           reason: `Cold (temp: ${temperature.currentTemp.toFixed(1)}°C)`,
+        };
+      }
+    }
+
+    // Flee to home when hurt or frightened (Bed-as-Home System Phase 4)
+    // Priority 85: High survival priority, above hunger but below critical exhaustion
+    if (agent && agent.assignedBed && agent.homePreferences) {
+      // Return home when injured (health < 30%)
+      if (agent.homePreferences.returnWhenHurt && needs.health < 0.3) {
+        return {
+          behavior: 'flee_to_home',
+          priority: 85,
+          reason: `Injured, fleeing to home (health: ${(needs.health * 100).toFixed(0)}%)`,
+        };
+      }
+
+      // Return home when frightened
+      // TODO: Add frightened/threatened state detection when implemented
+      // if (agent.homePreferences.returnWhenFrightened && agent.isFrightened) {
+      //   return {
+      //     behavior: 'flee_to_home',
+      //     priority: 85,
+      //     reason: 'Frightened, fleeing to home',
+      //   };
+      // }
+    }
+
+    // Bedtime: If it's past bedtime AND moderate sleep drive, go to bed
+    // This makes agents go to bed at night based on their preferred sleep time
+    // Priority 70: higher than generic sleep drive but lower than critical needs
+    if (circadian && currentTimeOfDay !== undefined) {
+      const isPastBedtime =
+        currentTimeOfDay >= circadian.preferredSleepTime || currentTimeOfDay < 5;
+      const hasModeratesleepDrive = circadian.sleepDrive >= 50;
+
+      if (isPastBedtime && hasModeratesleepDrive) {
+        return {
+          behavior: 'seek_sleep',
+          priority: 70,
+          reason: `Bedtime (time: ${currentTimeOfDay.toFixed(1)}h, sleepDrive: ${circadian.sleepDrive.toFixed(1)})`,
         };
       }
     }

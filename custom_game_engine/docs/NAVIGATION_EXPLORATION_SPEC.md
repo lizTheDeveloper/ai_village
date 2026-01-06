@@ -2396,7 +2396,7 @@ if (agent.needsResource('stone') && !agent.hasRecentMemory('stone')) {
 
 **Document Version:** 1.1
 **Last Updated:** 2025-12-24
-**Author:** AI Village Development Team
+**Author:** Multiverse: The End of Eternity Development Team
 
 **Related Specifications:**
 - [Epistemic Learning & Belief Formation](./EPISTEMIC_LEARNING_SPEC.md) - Trust-weighted gradient communication, verification mechanics

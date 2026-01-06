@@ -13,6 +13,7 @@ import type {
   IdentityComponent,
   TemperatureComponent,
   SteeringComponent,
+  CityDirectorComponent,
 } from '@ai-village/core';
 import type { PlantComponent } from '@ai-village/core';
 import {
@@ -29,6 +30,7 @@ import { renderSprite } from './SpriteRenderer.js';
 import { FloatingTextRenderer } from './FloatingTextRenderer.js';
 import { SpeechBubbleRenderer } from './SpeechBubbleRenderer.js';
 import { ParticleRenderer } from './ParticleRenderer.js';
+import { BedOwnershipRenderer } from './BedOwnershipRenderer.js';
 import type { ContextMenuManager } from './ContextMenuManager.js';
 import { getPixelLabSpriteLoader, type PixelLabSpriteLoader } from './sprites/PixelLabSpriteLoader.js';
 import { PixelLabDirection, angleToPixelLabDirection } from './sprites/PixelLabSpriteDefs.js';
@@ -50,6 +52,7 @@ export class Renderer {
   private floatingTextRenderer!: FloatingTextRenderer;
   private speechBubbleRenderer!: SpeechBubbleRenderer;
   private particleRenderer!: ParticleRenderer;
+  private bedOwnershipRenderer!: BedOwnershipRenderer;
   private pixelLabLoader!: PixelLabSpriteLoader;
 
   // Track which sprites are loading to avoid duplicate requests
@@ -78,6 +81,7 @@ export class Renderer {
   public showBuildingLabels = true;
   public showAgentNames = true;
   public showAgentTasks = true;
+  public showCityBounds = true; // Show city director boundary boxes
 
   // Bound handlers for cleanup
   private boundResizeHandler: (() => void) | null = null;
@@ -107,6 +111,7 @@ export class Renderer {
     this.floatingTextRenderer = new FloatingTextRenderer();
     this.speechBubbleRenderer = new SpeechBubbleRenderer();
     this.particleRenderer = new ParticleRenderer();
+    this.bedOwnershipRenderer = new BedOwnershipRenderer();
     this.pixelLabLoader = getPixelLabSpriteLoader('/assets/sprites/pixellab');
 
     // Handle resize - store bound handler for cleanup
@@ -969,11 +974,17 @@ export class Renderer {
     // Draw navigation path for selected entity
     this.drawNavigationPath(world, selectedEntity);
 
+    // Draw city boundaries
+    this.drawCityBoundaries(world);
+
     // Draw floating text (resource gathering feedback, etc.)
     this.floatingTextRenderer.render(this.ctx, this.camera, Date.now());
 
     // Draw particles (dust, sparks, etc.)
     this.particleRenderer.render(this.ctx, this.camera, Date.now());
+
+    // Draw bed ownership markers
+    this.bedOwnershipRenderer.render(this.ctx, this.camera, world);
 
     // Update and render speech bubbles
     this.speechBubbleRenderer.update();
@@ -2724,17 +2735,73 @@ export class Renderer {
     if (!entity) return;
 
     const position = entity.getComponent('position') as PositionComponent | undefined;
-    const steering = entity.getComponent('steering') as SteeringComponent | undefined;
+    if (!position) return;
 
-    if (!position || !steering || !steering.target) return;
+    // Try to find a target from multiple sources
+    let targetX: number | undefined;
+    let targetY: number | undefined;
+    let targetSource = 'none';
+
+    // 1. Check steering component first
+    const steering = entity.getComponent('steering') as SteeringComponent | undefined;
+    if (steering?.target) {
+      targetX = steering.target.x;
+      targetY = steering.target.y;
+      targetSource = 'steering';
+      console.log('[TargetLine] Found target from steering:', { x: targetX, y: targetY });
+    }
+
+    // 2. If no steering target, check action queue for targetPos
+    if (targetX === undefined || targetY === undefined) {
+      const actionQueue = entity.getComponent('action_queue') as any;
+
+      if (actionQueue) {
+        // Try to access queue data - the structure might vary
+        let actions: any[] = [];
+
+        if (typeof actionQueue.peek === 'function') {
+          const current = actionQueue.peek();
+          if (current) actions = [current];
+        } else if (Array.isArray(actionQueue.queue)) {
+          actions = actionQueue.queue;
+        } else if (typeof actionQueue.isEmpty === 'function' && !actionQueue.isEmpty()) {
+          // Last resort: try internal queue property
+          actions = (actionQueue as any)._queue || (actionQueue as any).actions || [];
+        }
+
+        console.log('[TargetLine] Action queue:', {
+          hasQueue: true,
+          actionCount: actions.length,
+          firstAction: actions[0]
+        });
+
+        if (actions.length > 0) {
+          const currentAction = actions[0];
+          if (currentAction?.targetPos) {
+            targetX = currentAction.targetPos.x;
+            targetY = currentAction.targetPos.y;
+            targetSource = 'action_queue';
+            console.log('[TargetLine] Found target from action queue:', { x: targetX, y: targetY, action: currentAction.type });
+          }
+        }
+      }
+    }
+
+    // No target found
+    if (targetX === undefined || targetY === undefined) {
+      console.log('[TargetLine] No target found - steering:', !!steering?.target, 'action queue checked');
+      return;
+    }
+
+    console.log('[TargetLine] Drawing line from', { x: position.x, y: position.y }, 'to', { x: targetX, y: targetY }, 'source:', targetSource);
 
     const currentX = position.x * this.tileSize + (this.tileSize / 2);
     const currentY = position.y * this.tileSize + (this.tileSize / 2);
-    const targetX = steering.target.x * this.tileSize + (this.tileSize / 2);
-    const targetY = steering.target.y * this.tileSize + (this.tileSize / 2);
+    const targetWorldX = targetX * this.tileSize + (this.tileSize / 2);
+    const targetWorldY = targetY * this.tileSize + (this.tileSize / 2);
 
     const currentScreen = this.camera.worldToScreen(currentX, currentY);
-    const targetScreen = this.camera.worldToScreen(targetX, targetY);
+    const targetScreen = this.camera.worldToScreen(targetWorldX, targetWorldY);
 
     // Draw dashed line from current position to target
     this.ctx.strokeStyle = '#00CCFF'; // Cyan color
@@ -2765,6 +2832,70 @@ export class Renderer {
     this.ctx.moveTo(targetScreen.x, targetScreen.y - markerRadius / 2);
     this.ctx.lineTo(targetScreen.x, targetScreen.y + markerRadius / 2);
     this.ctx.stroke();
+  }
+
+  /**
+   * Draw city boundaries for all city directors.
+   * Shows a golden dashed border around each city's territory.
+   */
+  private drawCityBoundaries(world: World): void {
+    if (!this.showCityBounds) return;
+
+    // Find all city director entities
+    const cityDirectors = world.query().with('city_director').executeEntities();
+
+    for (const entity of cityDirectors) {
+      const director = entity.getComponent('city_director') as CityDirectorComponent | undefined;
+      if (!director) continue;
+
+      const bounds = director.bounds;
+
+      // Convert tile coordinates to world coordinates
+      const minWorldX = bounds.minX * this.tileSize;
+      const minWorldY = bounds.minY * this.tileSize;
+      const maxWorldX = (bounds.maxX + 1) * this.tileSize;
+      const maxWorldY = (bounds.maxY + 1) * this.tileSize;
+
+      // Convert to screen coordinates
+      const minScreen = this.camera.worldToScreen(minWorldX, minWorldY);
+      const maxScreen = this.camera.worldToScreen(maxWorldX, maxWorldY);
+
+      const width = maxScreen.x - minScreen.x;
+      const height = maxScreen.y - minScreen.y;
+
+      // Draw dashed border
+      this.ctx.strokeStyle = '#FFD700'; // Gold
+      this.ctx.lineWidth = 2;
+      this.ctx.setLineDash([10, 5]);
+      this.ctx.globalAlpha = 0.8;
+      this.ctx.strokeRect(minScreen.x, minScreen.y, width, height);
+      this.ctx.setLineDash([]);
+      this.ctx.globalAlpha = 1.0;
+
+      // Draw city name label at top
+      const centerX = minScreen.x + width / 2;
+      const labelY = minScreen.y - 8;
+
+      const fontSize = Math.max(12, 14 * this.camera.zoom);
+      this.ctx.font = `bold ${fontSize}px monospace`;
+      this.ctx.textAlign = 'center';
+
+      // Background for label
+      const metrics = this.ctx.measureText(director.cityName);
+      const padding = 4;
+      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      this.ctx.fillRect(
+        centerX - metrics.width / 2 - padding,
+        labelY - fontSize,
+        metrics.width + padding * 2,
+        fontSize + padding
+      );
+
+      // Label text
+      this.ctx.fillStyle = '#FFD700';
+      this.ctx.fillText(director.cityName, centerX, labelY);
+      this.ctx.textAlign = 'left';
+    }
   }
 
   private drawDebugInfo(world: World): void {

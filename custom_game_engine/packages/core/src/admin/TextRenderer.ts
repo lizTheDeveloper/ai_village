@@ -29,7 +29,7 @@ export function renderDashboardText(context: ViewContext): string {
   const tabs = capabilityRegistry.getTabs();
 
   let output = `${SEPARATOR}
-ADMIN CONSOLE - AI Village
+ADMIN CONSOLE - Multiverse: The End of Eternity
 ${SEPARATOR}
 
 Game Status: ${gameConnected ? '🟢 CONNECTED' : '🔴 NOT CONNECTED'}${sessionId ? ` (session: ${sessionId})` : ''}

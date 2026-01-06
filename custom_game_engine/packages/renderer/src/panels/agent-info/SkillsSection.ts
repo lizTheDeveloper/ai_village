@@ -63,6 +63,23 @@ const GAME_TRAITS: Array<{ key: keyof PersonalityComponentData; label: string }>
 
 export class SkillsSection {
   private panelWidth = 360;
+  private scrollOffset = 0;
+
+  getScrollOffset(): number {
+    return this.scrollOffset;
+  }
+
+  setScrollOffset(offset: number): void {
+    this.scrollOffset = offset;
+  }
+
+  handleScroll(deltaY: number): void {
+    if (deltaY > 0) {
+      this.scrollOffset += 3;
+    } else {
+      this.scrollOffset = Math.max(0, this.scrollOffset - 3);
+    }
+  }
 
   render(
     context: SectionRenderContext,
@@ -70,9 +87,15 @@ export class SkillsSection {
     skills: SkillsComponentData | undefined,
     personality: PersonalityComponentData | undefined
   ): void {
-    const { ctx, x, y, padding, lineHeight } = context;
+    const { ctx, x, y, width, height, padding, lineHeight } = context;
 
-    let currentY = y + padding;
+    // Save the context state for clipping
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x, y, width, height);
+    ctx.clip();
+
+    let currentY = y + padding - this.scrollOffset;
 
     // Header
     ctx.fillStyle = '#FFD700';
@@ -178,6 +201,9 @@ export class SkillsSection {
       ctx.fillText('No personality data', x + padding, currentY);
       currentY += lineHeight;
     }
+
+    // Restore canvas state
+    ctx.restore();
   }
 
   private renderSkillBar(
@@ -300,8 +326,8 @@ export class SkillsSection {
     ctx.lineTo(barX + barWidth / 2, barY + barHeight);
     ctx.stroke();
 
-    // Value marker
-    const markerX = barX + (barWidth * value) / 100;
+    // Value marker (value is 0-1, convert to bar position)
+    const markerX = barX + barWidth * value;
     ctx.fillStyle = this.getTraitColor(value);
     ctx.beginPath();
     ctx.arc(markerX, barY + barHeight / 2, 4, 0, Math.PI * 2);
@@ -345,8 +371,8 @@ export class SkillsSection {
     ctx.fillStyle = 'rgba(50, 50, 50, 0.8)';
     ctx.fillRect(barX, barY, barWidth, barHeight);
 
-    // Fill
-    const fillWidth = (barWidth * value) / 100;
+    // Fill (value is 0-1, convert to bar width)
+    const fillWidth = barWidth * value;
     ctx.fillStyle = this.getTraitColor(value);
     ctx.fillRect(barX, barY, fillWidth, barHeight);
 
@@ -355,10 +381,10 @@ export class SkillsSection {
     ctx.lineWidth = 1;
     ctx.strokeRect(barX, barY, barWidth, barHeight);
 
-    // Value text
+    // Value text (convert 0-1 to percentage for display)
     ctx.fillStyle = '#888888';
     ctx.font = '9px monospace';
-    ctx.fillText(`${value}`, barX + barWidth + 5, y);
+    ctx.fillText(`${Math.round(value * 100)}`, barX + barWidth + 5, y);
 
     return y + 14;
   }
@@ -376,9 +402,10 @@ export class SkillsSection {
   }
 
   private getTraitColor(value: number): string {
-    if (value >= 70) return '#88CC88';
-    if (value >= 50) return '#CCCC88';
-    if (value >= 30) return '#CC8888';
+    // Value is 0-1 scale
+    if (value >= 0.7) return '#88CC88';
+    if (value >= 0.5) return '#CCCC88';
+    if (value >= 0.3) return '#CC8888';
     return '#888888';
   }
 

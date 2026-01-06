@@ -65,12 +65,20 @@ export class ProxyLLMProvider implements LLMProvider {
 
   private detectProvider(model?: string): string {
     // Simple provider detection based on model name
-    if (!model) return 'groq';
-    if (model.includes('llama') || model.includes('qwen')) return 'groq';
+    if (!model) return 'cerebras'; // Default to cerebras now
+
+    // Check for Cerebras models first (more specific match)
+    if (model === 'qwen-3-32b' || model === 'qwen3-32b') return 'cerebras';
+
+    // Check for Groq models with slash prefix
+    if (model.includes('qwen/') || model.includes('llama')) return 'groq';
+
+    // Other providers
     if (model.includes('cerebras')) return 'cerebras';
     if (model.startsWith('gpt-')) return 'openai';
     if (model.startsWith('claude-')) return 'anthropic';
-    return 'groq'; // Default
+
+    return 'cerebras'; // Default to cerebras
   }
 
   private async sleep(ms: number): Promise<void> {
