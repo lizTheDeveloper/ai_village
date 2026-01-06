@@ -121,14 +121,14 @@ describe('WorldSerializer terrain integration', () => {
 
     // Act 1: Serialize
     const snapshot = await serializer.serializeWorld(
-      sourceWorld,
+      sourceWorld as unknown as World,
       'test-universe-id',
       'Test Universe'
     );
 
     // Act 2: Deserialize into new world
     const targetWorld = createTestWorld();
-    await serializer.deserializeWorld(snapshot, targetWorld);
+    await serializer.deserializeWorld(snapshot, targetWorld as unknown as World);
 
     // Assert: Terrain should match original
     const targetChunkManager = targetWorld.getChunkManager()!;
@@ -159,9 +159,9 @@ describe('WorldSerializer terrain integration', () => {
     tile.fertilized = true;
 
     // Serialize and deserialize
-    const snapshot = await serializer.serializeWorld(world, 'test-id', 'Test');
+    const snapshot = await serializer.serializeWorld(world as unknown as World, 'test-id', 'Test');
     const newWorld = createTestWorld();
-    await serializer.deserializeWorld(snapshot, newWorld);
+    await serializer.deserializeWorld(snapshot, newWorld as unknown as World);
 
     // Assert: All properties preserved
     const restoredTile = newWorld.getChunkManager()!.getChunk(0, 0).tiles[0] as any;
@@ -182,7 +182,7 @@ describe('WorldSerializer terrain integration', () => {
     generateTestTerrain(chunkManager, 7);
 
     // Serialize
-    const snapshot = await serializer.serializeWorld(world, 'test-id', 'Test');
+    const snapshot = await serializer.serializeWorld(world as unknown as World, 'test-id', 'Test');
 
     // Assert: Metadata matches
     expect(snapshot.worldState.terrain?.generatedChunkCount).toBe(7);
@@ -199,7 +199,7 @@ describe('WorldSerializer terrain integration', () => {
     const world = createTestWorld();
 
     // Act: Serialize
-    const snapshot = await serializer.serializeWorld(world, 'test-id', 'Test');
+    const snapshot = await serializer.serializeWorld(world as unknown as World, 'test-id', 'Test');
 
     // Assert: Terrain data should exist but be empty
     expect(snapshot.worldState.terrain).not.toBeNull();
@@ -217,7 +217,7 @@ describe('WorldSerializer terrain integration', () => {
     const entity = world.createEntity();
 
     // Serialize
-    const snapshot = await serializer.serializeWorld(world, 'test-id', 'Test');
+    const snapshot = await serializer.serializeWorld(world as unknown as World, 'test-id', 'Test');
 
     // Assert: Both terrain and entities present
     expect(snapshot.worldState.terrain).not.toBeNull();
@@ -232,7 +232,7 @@ describe('WorldSerializer terrain integration', () => {
     generateTestTerrain(chunkManager, 3);
 
     // Serialize
-    const snapshot = await serializer.serializeWorld(world, 'test-id', 'Test');
+    const snapshot = await serializer.serializeWorld(world as unknown as World, 'test-id', 'Test');
 
     // Assert: Checksums present
     expect(snapshot.worldState.terrain?.checksums).toBeDefined();
