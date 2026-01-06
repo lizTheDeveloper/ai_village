@@ -18,7 +18,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
-import type { SystemId } from '../types.js';
+import type { SystemId, ComponentType } from '../types.js';
 import type { InterestsComponent, Interest, TopicId, InterestSource } from '../components/InterestsComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
@@ -77,7 +77,8 @@ const EXPERIENCE_TRIGGERS: ExperienceTrigger[] = [
     intensity: 0.4,
     condition: (agent, event) => {
       // Only if they built it
-      return event.data?.builderId === agent.id;
+      const data = event.data as any;
+      return data?.builderId === agent.id;
     },
   },
   {
@@ -86,7 +87,8 @@ const EXPERIENCE_TRIGGERS: ExperienceTrigger[] = [
     intensity: 0.8,
     condition: (agent, event) => {
       // Only for parents
-      return event.data?.parentId === agent.id;
+      const data = event.data as any;
+      return data?.parentId === agent.id;
     },
   },
   {
@@ -100,9 +102,9 @@ const EXPERIENCE_TRIGGERS: ExperienceTrigger[] = [
 ];
 
 /**
- * Decay rates by interest source
+ * Decay rates by interest source (using string keys for flexibility)
  */
-const DECAY_RATES: Record<InterestSource, number> = {
+const DECAY_RATES: Record<string, number> = {
   skill: 0.02,       // Skills decay slowly (muscle memory)
   personality: 0.01, // Core interests very stable
   innate: 0.0,       // Innate interests never decay
@@ -155,17 +157,18 @@ export class InterestEvolutionSystem implements System {
 
   init(world: World): void {
     // Listen for experience triggers
-    world.eventBus.on('agent:death', (e) => this.handleExperience(e, world));
-    world.eventBus.on('deity:miracle', (e) => this.handleExperience(e, world));
-    world.eventBus.on('building:completed', (e) => this.handleExperience(e, world));
-    world.eventBus.on('agent:born', (e) => this.handleExperience(e, world));
-    world.eventBus.on('prayer:answered', (e) => this.handleExperience(e, world));
+    // Use type assertions for events that may not be in GameEventMap
+    (world.eventBus as any).on('agent:death', (e: any) => this.handleExperience(e, world));
+    (world.eventBus as any).on('deity:miracle', (e: any) => this.handleExperience(e, world));
+    world.eventBus.on('building:completed', (e) => this.handleExperience(e as any, world));
+    world.eventBus.on('agent:born', (e) => this.handleExperience(e as any, world));
+    (world.eventBus as any).on('prayer:answered', (e: any) => this.handleExperience(e, world));
 
     // Listen for skill increases
-    world.eventBus.on('skill:increased', (e) => this.handleSkillGrowth(e, world));
+    world.eventBus.on('skill:levelup', (e) => this.handleSkillGrowth(e as any, world));
 
     // Listen for conversations (mentorship transfer)
-    world.eventBus.on('conversation:ended', (e) => this.handleMentorship(e, world));
+    world.eventBus.on('conversation:ended', (e) => this.handleMentorship(e as any, world));
   }
 
   update(world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
@@ -226,7 +229,8 @@ export class InterestEvolutionSystem implements System {
    * Handle skill increases - strengthen related interests
    */
   private handleSkillGrowth(event: GameEvent, world: World): void {
-    const { agentId, skill } = event.data;
+    const data = event.data as any;
+    const { agentId, skill } = data;
     const agent = world.getEntity(agentId) as EntityImpl;
     if (!agent) return;
 
@@ -313,7 +317,8 @@ export class InterestEvolutionSystem implements System {
    * Handle mentorship - transfer interests during high-quality conversations
    */
   private handleMentorship(event: GameEvent, world: World): void {
-    const { agent1, agent2, topicsDiscussed, overallQuality } = event.data;
+    const data = event.data as any;
+    const { agent1, agent2, topicsDiscussed, overallQuality } = data;
 
     if (!topicsDiscussed || topicsDiscussed.length === 0) return;
     if (overallQuality < 0.6) return; // Only high-quality conversations transfer

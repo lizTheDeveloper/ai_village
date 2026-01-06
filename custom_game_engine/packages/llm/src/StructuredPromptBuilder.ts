@@ -449,12 +449,13 @@ export class StructuredPromptBuilder {
    */
   private buildBuildingsKnowledge(world: World, inventory: InventoryComponent | undefined, skills?: SkillsComponent): string {
     // Check for buildingRegistry (extended World interface)
-    const worldWithRegistry = world as World & { buildingRegistry?: { getUnlocked(): Array<{ name: string; description: string; resourceCost: ResourceCost[] }> } };
-    if (!world || !worldWithRegistry.buildingRegistry) {
+    // Use any cast to avoid intersection type issues with private properties
+    const worldAny = world as any;
+    if (!world || !worldAny.buildingRegistry) {
       return '';
     }
 
-    const registry = worldWithRegistry.buildingRegistry;
+    const registry = worldAny.buildingRegistry;
 
     // Filter buildings based on skill levels if skills provided
     let buildings;

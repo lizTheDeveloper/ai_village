@@ -573,6 +573,12 @@ export interface GameEventMap {
     reason: string;
     amount: number;
   };
+  'friendship:formed': {
+    agent1: EntityId;
+    agent2: EntityId;
+    agent1Name: string;
+    agent2Name: string;
+  };
 
   // === Zone Events ===
   'zone:menu:opened': Record<string, never>;

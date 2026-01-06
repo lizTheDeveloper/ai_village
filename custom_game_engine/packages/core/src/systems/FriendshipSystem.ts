@@ -19,7 +19,7 @@ import { EntityImpl } from '../ecs/Entity.js';
 import { ComponentType as CT } from '../types/ComponentType.js';
 import type { SystemId, ComponentType } from '../types.js';
 import type { RelationshipComponent } from '../components/RelationshipComponent.js';
-import type { SocialMemoryComponent, SocialMemory } from '../components/SocialMemoryComponent.js';
+import type { SocialMemoryComponent } from '../components/SocialMemoryComponent.js';
 import type { IdentityComponent } from '../components/IdentityComponent.js';
 
 export class FriendshipSystem implements System {
@@ -61,7 +61,7 @@ export class FriendshipSystem implements System {
     for (const [partnerId, relationship] of relationships.relationships) {
       // Already marked as friend?
       if (socialMemory) {
-        const memory = socialMemory.memories.get(partnerId);
+        const memory = socialMemory.socialMemories.get(partnerId);
         if (memory?.relationshipType === 'friend') continue;
       }
 
@@ -89,14 +89,19 @@ export class FriendshipSystem implements System {
   ): void {
     if (!socialMemory) return;
 
-    let memory = socialMemory.memories.get(partnerId);
-    if (!memory) {
-      memory = this.createEmptySocialMemory(partnerId, world);
-      socialMemory.memories.set(partnerId, memory);
+    const existingMemory = socialMemory.socialMemories.get(partnerId);
+    if (!existingMemory) {
+      // Record a first interaction to create the memory, then update relationship type
+      socialMemory.recordInteraction({
+        agentId: partnerId,
+        interactionType: 'friendship_formed',
+        sentiment: 0.5,
+        timestamp: Date.now(),
+        trustDelta: 0.1,
+      });
     }
-
-    memory.relationshipType = 'friend';
-    memory.overallSentiment = Math.max(memory.overallSentiment, 0.5);
+    // Update relationship type using the component's method
+    socialMemory.updateRelationshipType(partnerId, 'friend');
   }
 
   private emitFriendshipEvent(
@@ -125,19 +130,4 @@ export class FriendshipSystem implements System {
     });
   }
 
-  private createEmptySocialMemory(agentId: string, world: World): SocialMemory {
-    const partner = world.getEntity(agentId);
-    const partnerIdentity = partner?.components.get(CT.Identity) as IdentityComponent | undefined;
-
-    return {
-      agentId,
-      agentName: partnerIdentity?.name ?? 'Unknown',
-      overallSentiment: 0,
-      trust: 0.5,
-      impressions: [],
-      significantMemories: [],
-      relationshipType: 'stranger',
-      knownFacts: [],
-    };
-  }
 }

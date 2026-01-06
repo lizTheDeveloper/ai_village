@@ -227,8 +227,8 @@ export class ExecutorPromptBuilder {
     // Query all buildings in the world
     const buildings = world.query().with('building').executeEntities();
     const buildingData = buildings.map(b => {
-      const buildingComp = b.components.get('building');
-      const identity = b.components.get('identity');
+      const buildingComp = b.components.get('building') as any;
+      const identity = b.components.get('identity') as any;
       return {
         id: b.id,
         name: buildingComp?.type || 'Unknown Building',
@@ -279,12 +279,13 @@ export class ExecutorPromptBuilder {
     skills: SkillsComponent | undefined
   ): string {
     // Check for buildingRegistry (extended World interface)
-    const worldWithRegistry = world as World & { buildingRegistry?: any };
-    if (!worldWithRegistry.buildingRegistry) {
+    // Use any cast to avoid intersection type issues with private properties
+    const worldAny = world as any;
+    if (!worldAny.buildingRegistry) {
       return '';
     }
 
-    const registry = worldWithRegistry.buildingRegistry;
+    const registry = worldAny.buildingRegistry;
 
     // Filter buildings based on skill levels if skills provided
     let buildings: any[];

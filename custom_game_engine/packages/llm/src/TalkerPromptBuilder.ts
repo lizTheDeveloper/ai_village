@@ -34,8 +34,6 @@ import {
   type RelationshipComponent,
   type Relationship,
   formatGoalsForPrompt,
-  getConversationStyle,
-  findSharedInterests,
 } from '@ai-village/core';
 import { generatePersonalityPrompt } from './PersonalityPromptTemplates.js';
 import { promptCache } from './PromptCacheManager.js';
@@ -164,18 +162,25 @@ export class TalkerPromptBuilder {
       context += `\n🗣️ ACTIVE CONVERSATION with ${partnerName}\n`;
 
       // Show conversation history
-      if (conversation.history && conversation.history.length > 0) {
+      if (conversation.messages && conversation.messages.length > 0) {
         context += 'Conversation history:\n';
-        conversation.history.slice(-5).forEach((msg: { speaker: string; text: string }) => {
-          context += `  ${msg.speaker}: "${msg.text}"\n`;
+        conversation.messages.slice(-5).forEach((msg) => {
+          context += `  ${msg.speakerId}: "${msg.message}"\n`;
         });
       }
 
-      // Conversation style
+      // Conversation style based on personality
       if (partner) {
         const partnerPersonality = partner.components.get('personality') as PersonalityComponent | undefined;
         if (partnerPersonality) {
-          const style = getConversationStyle(partnerPersonality);
+          // Infer conversation style from personality traits
+          const extraversion = partnerPersonality.extraversion ?? 0.5;
+          const agreeableness = partnerPersonality.agreeableness ?? 0.5;
+          let style = 'neutral';
+          if (extraversion > 0.7) style = 'talkative and outgoing';
+          else if (extraversion < 0.3) style = 'quiet and reserved';
+          if (agreeableness > 0.7) style += ', friendly';
+          else if (agreeableness < 0.3) style += ', blunt';
           context += `${partnerName}'s conversation style: ${style}\n`;
         }
       }
@@ -196,13 +201,14 @@ export class TalkerPromptBuilder {
         // Check relationship
         let relationshipNote = '';
         if (relationships?.relationships) {
-          const rel = relationships.relationships.find((r: Relationship) => r.targetId === seenId);
+          const rel = relationships.relationships.get(seenId);
           if (rel) {
-            if (rel.affection > 0.7) {
+            // affinity is -100 to 100, normalize to check relationships
+            if (rel.affinity > 70) {
               relationshipNote = ' (close friend)';
-            } else if (rel.affection > 0.4) {
+            } else if (rel.affinity > 40) {
               relationshipNote = ' (friend)';
-            } else if (rel.affection < -0.4) {
+            } else if (rel.affinity < -40) {
               relationshipNote = ' (dislike)';
             }
           }
@@ -238,9 +244,10 @@ export class TalkerPromptBuilder {
     }
 
     // Important relationships
-    if (relationships?.relationships && relationships.relationships.length > 0) {
-      const importantRels = relationships.relationships
-        .filter((r: Relationship) => Math.abs(r.affection) > 0.5)
+    if (relationships?.relationships && relationships.relationships.size > 0) {
+      const allRels = Array.from(relationships.relationships.values());
+      const importantRels = allRels
+        .filter((r: Relationship) => Math.abs(r.affinity) > 50)
         .slice(0, 3);
 
       if (importantRels.length > 0) {
@@ -250,9 +257,10 @@ export class TalkerPromptBuilder {
           const targetIdentity = target?.components.get('identity') as IdentityComponent | undefined;
           const targetName = targetIdentity?.name || 'someone';
 
-          const affectionDesc = rel.affection > 0.7 ? 'deeply care about' :
-                               rel.affection > 0.4 ? 'like' :
-                               rel.affection < -0.7 ? 'strongly dislike' :
+          // affinity is -100 to 100
+          const affectionDesc = rel.affinity > 70 ? 'deeply care about' :
+                               rel.affinity > 40 ? 'like' :
+                               rel.affinity < -70 ? 'strongly dislike' :
                                'dislike';
 
           context += `  - You ${affectionDesc} ${targetName}\n`;
@@ -370,16 +378,17 @@ export class TalkerPromptBuilder {
    * Talker cares about social history.
    */
   private buildSocialMemories(episodicMemory: EpisodicMemoryComponent | undefined, world: World): string {
-    if (!episodicMemory?.memories || episodicMemory.memories.length === 0) {
+    const memories = episodicMemory?.episodicMemories;
+    if (!memories || memories.length === 0) {
       return 'You have no significant recent memories.\n';
     }
 
     let context = '--- Recent Memories ---\n';
 
     // Filter to social-relevant memories
-    const socialMemories = episodicMemory.memories
+    const socialMemories = [...memories]
       .filter((mem: EpisodicMemory) => {
-        const eventType = mem.event as string;
+        const eventType = mem.eventType;
         return eventType.includes('conversation') ||
                eventType.includes('met_agent') ||
                eventType.includes('social') ||
@@ -392,7 +401,7 @@ export class TalkerPromptBuilder {
     }
 
     for (const memory of socialMemories) {
-      context += `- ${memory.description}\n`;
+      context += `- ${memory.summary}\n`;
     }
 
     return context;

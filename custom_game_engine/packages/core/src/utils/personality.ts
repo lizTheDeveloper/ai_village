@@ -71,8 +71,7 @@ export function clampTraitWithWarning(value: number, traitName?: string): number
 export function normalizePersonality(
   personality: PersonalityComponent
 ): PersonalityComponent {
-  return {
-    ...personality,
+  return new PersonalityComponent({
     openness: clampTrait(personality.openness, 'openness'),
     conscientiousness: clampTrait(personality.conscientiousness, 'conscientiousness'),
     extraversion: clampTrait(personality.extraversion, 'extraversion'),
@@ -83,7 +82,7 @@ export function normalizePersonality(
     generosity: clampTrait(personality.generosity, 'generosity'),
     leadership: clampTrait(personality.leadership, 'leadership'),
     spirituality: clampTrait(personality.spirituality, 'spirituality'),
-  };
+  });
 }
 
 /**
