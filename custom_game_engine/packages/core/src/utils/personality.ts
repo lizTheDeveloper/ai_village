@@ -4,7 +4,7 @@
  * OCEAN traits MUST be in [0, 1] range. These utilities ensure normalization.
  */
 
-import type { PersonalityComponent } from '../components/PersonalityComponent.js';
+import { PersonalityComponent } from '../components/PersonalityComponent.js';
 
 /**
  * Clamp personality trait to [0, 1] range.
@@ -96,8 +96,7 @@ export function normalizePersonality(
 export function normalizePersonalityWithWarnings(
   personality: PersonalityComponent
 ): PersonalityComponent {
-  return {
-    ...personality,
+  return new PersonalityComponent({
     openness: clampTraitWithWarning(personality.openness, 'openness'),
     conscientiousness: clampTraitWithWarning(
       personality.conscientiousness,
@@ -111,7 +110,7 @@ export function normalizePersonalityWithWarnings(
     generosity: clampTraitWithWarning(personality.generosity, 'generosity'),
     leadership: clampTraitWithWarning(personality.leadership, 'leadership'),
     spirituality: clampTraitWithWarning(personality.spirituality, 'spirituality'),
-  };
+  });
 }
 
 /**
@@ -135,7 +134,7 @@ export function normalizePersonalityWithWarnings(
  */
 export function modifyTrait(
   personality: PersonalityComponent,
-  trait: keyof Omit<PersonalityComponent, 'type' | 'version'>,
+  trait: keyof Omit<PersonalityComponent, 'type' | 'version' | 'clone'>,
   delta: number
 ): PersonalityComponent {
   const currentValue = personality[trait] as number;
@@ -144,10 +143,18 @@ export function modifyTrait(
   // Fail fast if out of range
   clampTrait(newValue, trait as string);
 
-  return {
-    ...personality,
-    [trait]: newValue,
-  };
+  return new PersonalityComponent({
+    openness: trait === 'openness' ? newValue : personality.openness,
+    conscientiousness: trait === 'conscientiousness' ? newValue : personality.conscientiousness,
+    extraversion: trait === 'extraversion' ? newValue : personality.extraversion,
+    agreeableness: trait === 'agreeableness' ? newValue : personality.agreeableness,
+    neuroticism: trait === 'neuroticism' ? newValue : personality.neuroticism,
+    workEthic: trait === 'workEthic' ? newValue : personality.workEthic,
+    creativity: trait === 'creativity' ? newValue : personality.creativity,
+    generosity: trait === 'generosity' ? newValue : personality.generosity,
+    leadership: trait === 'leadership' ? newValue : personality.leadership,
+    spirituality: trait === 'spirituality' ? newValue : personality.spirituality,
+  });
 }
 
 /**
@@ -162,16 +169,24 @@ export function modifyTrait(
  */
 export function setTrait(
   personality: PersonalityComponent,
-  trait: keyof Omit<PersonalityComponent, 'type' | 'version'>,
+  trait: keyof Omit<PersonalityComponent, 'type' | 'version' | 'clone'>,
   value: number
 ): PersonalityComponent {
   // Fail fast if out of range
   clampTrait(value, trait as string);
 
-  return {
-    ...personality,
-    [trait]: value,
-  };
+  return new PersonalityComponent({
+    openness: trait === 'openness' ? value : personality.openness,
+    conscientiousness: trait === 'conscientiousness' ? value : personality.conscientiousness,
+    extraversion: trait === 'extraversion' ? value : personality.extraversion,
+    agreeableness: trait === 'agreeableness' ? value : personality.agreeableness,
+    neuroticism: trait === 'neuroticism' ? value : personality.neuroticism,
+    workEthic: trait === 'workEthic' ? value : personality.workEthic,
+    creativity: trait === 'creativity' ? value : personality.creativity,
+    generosity: trait === 'generosity' ? value : personality.generosity,
+    leadership: trait === 'leadership' ? value : personality.leadership,
+    spirituality: trait === 'spirituality' ? value : personality.spirituality,
+  });
 }
 
 /**

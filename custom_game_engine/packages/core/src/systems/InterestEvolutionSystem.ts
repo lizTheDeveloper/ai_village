@@ -165,7 +165,7 @@ export class InterestEvolutionSystem implements System {
     (world.eventBus as any).on('prayer:answered', (e: any) => this.handleExperience(e, world));
 
     // Listen for skill increases
-    world.eventBus.on('skill:levelup', (e) => this.handleSkillGrowth(e as any, world));
+    (world.eventBus as any).on('skill:levelup', (e: any) => this.handleSkillGrowth(e, world));
 
     // Listen for conversations (mentorship transfer)
     world.eventBus.on('conversation:ended', (e) => this.handleMentorship(e as any, world));

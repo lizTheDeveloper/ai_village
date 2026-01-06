@@ -88,7 +88,7 @@ export class SummonEffectApplier implements EffectApplier<SummonEffect> {
         // Create summoned entity
         // Note: Since archetype system is not fully implemented, we create a basic entity
         // In a full implementation, this would use the entityArchetype from effect
-        const summonedEntity = world.createEntity(effect.entityArchetype);
+        const summonedEntity = world.createEntity();
 
         // Set position - convert position object to PositionComponent
         const positionComponent = createPositionComponent(spawnPos.x, spawnPos.y, spawnPos.z ?? 0);

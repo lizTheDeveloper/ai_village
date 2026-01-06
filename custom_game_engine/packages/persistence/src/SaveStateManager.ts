@@ -327,8 +327,8 @@ export class SaveStateManager {
   async restoreWorld(saveState: SaveState): Promise<World> {
     const eventBus = new EventBusImpl();
     const world = new WorldImpl(eventBus);
-    await worldSerializer.deserializeWorld(saveState.snapshot, world);
-    return world;
+    await worldSerializer.deserializeWorld(saveState.snapshot, world as unknown as World);
+    return world as unknown as World;
   }
 
   /**

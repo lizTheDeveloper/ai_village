@@ -160,12 +160,12 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
     let totalResistance = 0;
 
     // Check equipped armor for resistances
-    const equipment = target.components.get('equipment_slots') as EquipmentComponent | undefined;
+    const equipment = target.components.get('equipment') as EquipmentComponent | undefined;
     if (equipment) {
       // Check each equipped item for armor traits
-      for (const [_slot, equippedItem] of Object.entries(equipment.slots)) {
+      for (const [_slot, equippedItem] of Object.entries(equipment.equipped)) {
         if (equippedItem) {
-          const itemDef = itemRegistry.get(equippedItem.definitionId);
+          const itemDef = itemRegistry.get(equippedItem.itemId);
           if (itemDef && itemDef.traits?.armor) {
             const armorTrait = itemDef.traits.armor as ArmorTrait;
             const resistance = (armorTrait.resistances as any)?.[damageType] ?? 0;
@@ -194,16 +194,17 @@ class DamageEffectApplierClass implements EffectApplier<DamageEffect> {
     let totalDefense = 0;
 
     // Check equipped armor for defense
-    const equipment = target.components.get('equipment_slots') as EquipmentComponent | undefined;
+    const equipment = target.components.get('equipment') as EquipmentComponent | undefined;
     if (equipment) {
       // Sum defense from all equipped armor
-      for (const [_slot, equippedItem] of Object.entries(equipment.slots)) {
+      for (const [_slot, equippedItem] of Object.entries(equipment.equipped)) {
         if (equippedItem) {
-          const itemDef = itemRegistry.get(equippedItem.definitionId);
+          const itemDef = itemRegistry.get(equippedItem.itemId);
           if (itemDef && itemDef.traits?.armor) {
             const armorTrait = itemDef.traits.armor as ArmorTrait;
-            // Effective defense considers item durability
-            totalDefense += armorTrait.defense * equippedItem.durability;
+            // Note: Durability tracking is not yet implemented in EquipmentSlot
+            // Using full defense for now
+            totalDefense += armorTrait.defense;
           }
         }
       }

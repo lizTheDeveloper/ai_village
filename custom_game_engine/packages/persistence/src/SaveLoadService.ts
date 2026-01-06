@@ -208,7 +208,7 @@ export class SaveLoadService {
 
       // Restore god-crafted queue
       if (saveFile.godCraftedQueue) {
-        godCraftedQueue.deserialize(saveFile.godCraftedQueue);
+        godCraftedQueue.deserialize(saveFile.godCraftedQueue as any);
       }
 
       // TODO: Restore passages (need to recreate passage connections)

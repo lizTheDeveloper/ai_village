@@ -17,7 +17,7 @@ export async function computeChecksum(data: unknown): Promise<string> {
 
   if (typeof crypto !== 'undefined' && crypto.subtle) {
     // Browser/Node with Web Crypto API
-    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer as BufferSource);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   } else {
