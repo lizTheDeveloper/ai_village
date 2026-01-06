@@ -13,7 +13,7 @@ import type {
 } from './types.js';
 import { componentSerializerRegistry } from './serializers/index.js';
 import { computeChecksumSync } from './utils.js';
-import { chunkSerializer } from '@ai-village/world';
+// Note: chunkSerializer is imported dynamically to break circular dependency: core -> world -> reproduction -> core
 import { getZoneManager } from '../navigation/ZoneManager.js';
 
 export class WorldSerializer {
@@ -39,7 +39,7 @@ export class WorldSerializer {
     const entities = await this.serializeEntities(allEntities);
 
     // Serialize world state
-    const worldState = this.serializeWorldState(world);
+    const worldState = await this.serializeWorldState(world);
 
     // Compute checksums
     const entitiesChecksum = computeChecksumSync(entities);
@@ -128,6 +128,8 @@ export class WorldSerializer {
     if (snapshot.worldState.terrain) {
       const chunkManager = worldImpl.getChunkManager();
       if (chunkManager) {
+        // Dynamic import to break circular dependency: core -> world -> reproduction -> core
+        const { chunkSerializer } = await import('@ai-village/world');
         await chunkSerializer.deserializeChunks(snapshot.worldState.terrain, chunkManager);
       } else {
         console.warn('[WorldSerializer] No ChunkManager available - terrain not restored');
@@ -256,14 +258,17 @@ export class WorldSerializer {
   /**
    * Serialize world state (terrain, weather, etc.).
    */
-  private serializeWorldState(world: World): WorldSnapshot {
+  private async serializeWorldState(world: World): Promise<WorldSnapshot> {
     // Serialize terrain using ChunkSerializer
     const worldImpl = world as WorldImpl;
     const chunkManager = worldImpl.getChunkManager();
 
-    const terrain = chunkManager
-      ? chunkSerializer.serializeChunks(chunkManager)
-      : null;
+    // Dynamic import to break circular dependency: core -> world -> reproduction -> core
+    let terrain = null;
+    if (chunkManager) {
+      const { chunkSerializer } = await import('@ai-village/world');
+      terrain = chunkSerializer.serializeChunks(chunkManager);
+    }
 
     // Serialize zones using ZoneManager
     const zoneManager = getZoneManager();

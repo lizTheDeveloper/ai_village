@@ -12,7 +12,8 @@ import type { Entity } from '../ecs/Entity.js';
 import type { MetricsStreamClient, QueryRequest, QueryResponse, ActionRequest, ActionResponse } from './MetricsStreamClient.js';
 import { pendingApprovalRegistry } from '../crafting/PendingApprovalRegistry.js';
 import { spawnCity, getCityTemplates, type CitySpawnConfig } from '../city/CitySpawner.js';
-import { createLLMAgent, createWanderingAgent } from '@ai-village/world';
+// Note: @ai-village/world imports are done via dynamic import in handleSpawnAgent
+// to break circular dependency: core -> world -> reproduction -> core
 import { DeityComponent } from '../components/DeityComponent.js';
 
 /**
@@ -386,7 +387,7 @@ export class LiveEntityAPI {
   /**
    * Spawn an agent at the specified location
    */
-  private handleSpawnAgent(action: ActionRequest): ActionResponse {
+  private async handleSpawnAgent(action: ActionRequest): Promise<ActionResponse> {
     const { name, x, y, useLLM, speed, believedDeity } = action.params;
 
     if (typeof x !== 'number' || typeof y !== 'number') {
@@ -402,6 +403,8 @@ export class LiveEntityAPI {
     const options = believedDeity && typeof believedDeity === 'string' ? { believedDeity } : undefined;
 
     try {
+      // Dynamic import to break circular dependency: core -> world -> reproduction -> core
+      const { createLLMAgent, createWanderingAgent } = await import('@ai-village/world');
       const agentId = shouldUseLLM
         ? createLLMAgent(this.world as any, x, y, agentSpeed, undefined, options)
         : createWanderingAgent(this.world as any, x, y, agentSpeed, options);
