@@ -657,6 +657,10 @@ Extracted implications:
 
 ### Story Mutation
 
+**Status**: ✅ **IMPLEMENTED** (2026-01-06)
+**Files**: `MythMutationTypes.ts`, `MythRetellingSystem.ts`, `pantheon-deity-integration.ts`
+**Devlog**: `devlogs/MYTH_ATTRIBUTION_IMPLEMENTATION_2026-01-06.md`
+
 Stories change as they're retold:
 
 ```typescript
@@ -676,9 +680,18 @@ type MutationType =
   | 'personalization'    // Narrator inserts themselves
   | 'merger'             // Combined with other story
   | 'inversion'          // Good becomes bad or vice versa
-  | 'attribution'        // Credit moved to different deity
+  | 'attribution'        // Credit moved to different deity ⭐ IMPLEMENTED
   | 'localization';      // Settings changed to local places
 ```
+
+**Implementation Notes**:
+- All 8 mutation types are fully implemented
+- Attribution probability: 5% base, up to 70% when narrator believes different deity
+- Automatic myth spreading within 30-unit conversation distance
+- 10% chance per hour for believers to retell myths
+- Attribution changes trigger belief transfer (10%) and believer conversion (20%)
+- Emits `myth:attribution_changed` and `theology:conflict` events
+- Creates emergent divine rivalries in multi-deity pantheons
 
 ---
 
