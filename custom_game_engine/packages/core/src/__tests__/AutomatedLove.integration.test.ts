@@ -441,7 +441,7 @@ describe('AutomatedLove Integration Tests', () => {
 
       const rel = relComp.relationships.get(entity2);
       expect(rel?.romantic?.courtship?.progress).toBe(50);
-      expect(rel?.romantic?.courtship?.courtsipActions).toBe(2);
+      expect(rel?.romantic?.courtship?.courtshipActions).toBe(2);
     });
 
     it('accepts courtship - transitions to dating', () => {

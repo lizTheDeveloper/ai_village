@@ -170,6 +170,7 @@ import { FaithMechanicsSystem } from './FaithMechanicsSystem.js';
 import { PrayerSystem } from './PrayerSystem.js';
 import { PrayerAnsweringSystem } from './PrayerAnsweringSystem.js';
 import { MythGenerationSystem } from './MythGenerationSystem.js';
+import { MythRetellingSystem } from './MythRetellingSystem.js';
 import { ChatRoomSystem } from '../communication/ChatRoomSystem.js';
 import { CompanionSystem } from './CompanionSystem.js';
 // import { AttributionSystem } from '../divinity/AttributionSystem.js'; // TODO: Not a System class, utility functions only
@@ -393,10 +394,9 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new IdleBehaviorSystem());
   gameLoop.systemRegistry.register(new GoalGenerationSystem(eventBus));
 
-  if (llmQueue && promptBuilder) {
-    // Cast to expected types (caller is responsible for correct types)
-    gameLoop.systemRegistry.register(new AgentBrainSystem(llmQueue as any, promptBuilder as any));
-  }
+  // Always register AgentBrainSystem - it works without LLM (uses scripted behaviors)
+  // Cast to expected types (caller is responsible for correct types)
+  gameLoop.systemRegistry.register(new AgentBrainSystem(llmQueue as any, promptBuilder as any));
 
   gameLoop.systemRegistry.register(new MovementSystem());
   gameLoop.systemRegistry.register(new NeedsSystem());
@@ -589,6 +589,7 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(new PrayerAnsweringSystem());
   if (llmQueue) {
     gameLoop.systemRegistry.register(new MythGenerationSystem(llmQueue as any));
+    gameLoop.systemRegistry.register(new MythRetellingSystem()); // Handles myth spreading & mutation
   }
   // MythGenerationSystem requires llmQueue, so skip if not provided
 

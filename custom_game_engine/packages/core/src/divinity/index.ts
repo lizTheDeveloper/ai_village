@@ -93,6 +93,21 @@ export {
 } from './MythTypes.js';
 
 // ============================================================================
+// Myth Mutation System
+// ============================================================================
+export {
+  // Types
+  type MutationType as MythMutationType,
+  type MutationResult,
+  type MutationContext,
+
+  // Functions
+  calculateMutationProbabilities,
+  selectMutation,
+  applyMutation,
+} from './MythMutationTypes.js';
+
+// ============================================================================
 // Divine Power System
 // ============================================================================
 export {
