@@ -217,7 +217,8 @@ export class MythRetellingSystem implements System {
         mutationResult.newDeityId,
         allDeities,
         world,
-        currentTick
+        currentTick,
+        narrator.id
       );
     } else {
       // No attribution change - update original deity's mythology
@@ -253,7 +254,8 @@ export class MythRetellingSystem implements System {
     newDeityId: string,
     allDeities: ReadonlyArray<Entity>,
     world: World,
-    currentTick: number
+    currentTick: number,
+    narratorId: string
   ): void {
     const originalDeity = allDeities.find(d => d.id === originalMyth.deityId);
     const newDeity = allDeities.find(d => d.id === newDeityId);
@@ -295,7 +297,7 @@ export class MythRetellingSystem implements System {
     // Emit attribution change event
     world.eventBus?.emit({
       type: 'myth:attribution_changed',
-      source: narrator.id,
+      source: narratorId,
       data: {
         mythId: mutatedMyth.id,
         mythTitle: mutatedMyth.title,

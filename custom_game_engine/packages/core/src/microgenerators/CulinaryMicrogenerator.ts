@@ -65,15 +65,15 @@ export class CulinaryMicrogenerator {
     const prompt = this.buildRecipePrompt(data);
 
     // Generate recipe using LLM
-    const response = await this.llmProvider.generateText({
-      prompt,
+    const systemContext = 'You are a master chef designing innovative recipes. Output valid JSON only.\n\n';
+    const response = await this.llmProvider.generate({
+      prompt: systemContext + prompt,
       temperature: 0.8, // Creative cooking
       maxTokens: 1000,
-      systemPrompt: 'You are a master chef designing innovative recipes. Output valid JSON only.',
     });
 
     // Parse LLM response
-    const parsed = this.parseRecipeResponse(response, data);
+    const parsed = this.parseRecipeResponse(response.text, data);
 
     // Create recipe data
     const recipeData: RecipeData = {

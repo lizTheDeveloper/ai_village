@@ -65,15 +65,15 @@ export class SpellLabMicrogenerator {
     const prompt = this.buildSpellPrompt(data);
 
     // Generate spell using LLM
-    const response = await this.llmProvider.generateText({
-      prompt,
+    const systemContext = 'You are a master mage designing innovative spells. Output valid JSON only.\n\n';
+    const response = await this.llmProvider.generate({
+      prompt: systemContext + prompt,
       temperature: 0.85, // Creative magic
       maxTokens: 800,
-      systemPrompt: 'You are a master mage designing innovative spells. Output valid JSON only.',
     });
 
     // Parse LLM response
-    const parsed = this.parseSpellResponse(response, data);
+    const parsed = this.parseSpellResponse(response.text, data);
 
     // Create spell data
     const spellData: SpellData = {
@@ -225,9 +225,9 @@ Output a JSON object with this structure:
         manaCost: 50,
         effects: {
           damage: input.powerLevel * 10,
-          duration: null,
+          duration: undefined,
           range: 10,
-          areaOfEffect: null,
+          areaOfEffect: undefined,
           custom: {},
         },
         creativityScore: 0.3,
