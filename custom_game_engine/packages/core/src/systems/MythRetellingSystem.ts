@@ -54,7 +54,7 @@ export class MythRetellingSystem implements System {
       return {
         id: d.id,
         name: deity.identity.primaryName,
-        domain: deity.identity.domain,
+        domain: deity.identity.domain || 'unknown',
         popularity: deity.believers.size,
       };
     });
