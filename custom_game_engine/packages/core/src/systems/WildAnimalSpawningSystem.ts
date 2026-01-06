@@ -13,6 +13,16 @@ import { getSpawnableSpecies, getAnimalSpecies, type AnimalSpecies } from '../da
 /**
  * WildAnimalSpawningSystem spawns wild animals in chunks
  * Priority: 90 (runs very late, after most other systems)
+ *
+ * Dependencies:
+ * - None (passive system): Triggered by chunk generation, not per-tick updates
+ *   - Called via spawnAnimalsInChunk() when new chunks are generated
+ *   - No dependencies on other systems' per-tick updates
+ *
+ * Related Systems:
+ * - ChunkGenerationSystem: Triggers spawning via spawnAnimalsInChunk()
+ * - AnimalSystem: Will manage spawned animals after creation
+ * - TemperatureSystem: Applies temperature comfort to spawned animals
  */
 export class WildAnimalSpawningSystem implements System {
   public readonly id: SystemId = 'wild_animal_spawning';
@@ -182,7 +192,9 @@ export class WildAnimalSpawningSystem implements System {
     entityImpl.addComponent(createPositionComponent(x, y));
 
     // Add RenderableComponent (required for rendering)
-    entityImpl.addComponent(createRenderableComponent(speciesId, 'entity'));
+    // Select a random variant for species that have them (sheep_white, sheep_black, etc.)
+    const spriteId = this.getAnimalSpriteVariant(speciesId);
+    entityImpl.addComponent(createRenderableComponent(spriteId, 'entity'));
 
     // Add MovementComponent (required for AnimalBrainSystem and movement)
     entityImpl.addComponent(createMovementComponent(speciesData.baseSpeed));
@@ -197,6 +209,35 @@ export class WildAnimalSpawningSystem implements System {
     ));
 
     return entity;
+  }
+
+  /**
+   * Get a random sprite variant for an animal species
+   * Maps base species (e.g., 'sheep') to specific variants (e.g., 'sheep_white', 'sheep_black')
+   */
+  private getAnimalSpriteVariant(speciesId: string): string {
+    // Map species to their available variants
+    const variants: Record<string, string[]> = {
+      'sheep': ['sheep_white', 'sheep_black', 'sheep_grey'],
+      'chicken': ['chicken_white', 'chicken_brown', 'chicken_black'],
+      'cow': ['cow_black_white', 'cow_brown', 'cow_brown_white'],
+      'horse': ['horse_brown', 'horse_black', 'horse_white', 'horse_chestnut'],
+      'dog': ['dog_brown', 'dog_black', 'dog_white', 'dog_spotted'],
+      'cat': ['cat_orange', 'cat_grey', 'cat_black', 'cat_white'],
+      'rabbit': ['rabbit_white', 'rabbit_brown', 'rabbit_grey'],
+      'deer': ['deer_brown', 'deer_spotted'],
+      'pig': ['pig_pink', 'pig_black'],
+      'goat': ['goat_brown', 'goat_black', 'goat_white'],
+    };
+
+    const availableVariants = variants[speciesId];
+    if (availableVariants && availableVariants.length > 0) {
+      // Return random variant
+      return availableVariants[Math.floor(Math.random() * availableVariants.length)]!;
+    }
+
+    // Fallback to species ID if no variants defined
+    return speciesId;
   }
 
   /**
