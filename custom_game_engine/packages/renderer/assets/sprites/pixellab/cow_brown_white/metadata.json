@@ -1,8 +1,6 @@
 {
   "id": "cow_brown_white",
-  "base_species": "cow",
-  "variant": "brown_white",
-  "description": "brown and white spotted cow",
+  "name": "brown and white spotted cow",
   "size": 64,
   "directions": [
     "south",
@@ -14,5 +12,7 @@
     "east",
     "southeast"
   ],
-  "generated_at": "2026-01-03T23:53:07.235Z"
+  "generated_at": "2026-01-05T10:28:31.677Z",
+  "generation_method": "reference_workflow",
+  "notes": "South first, east with south ref, west flipped from east, others with south ref"
 }

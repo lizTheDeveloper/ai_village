@@ -1,9 +1,7 @@
 {
   "id": "dog_white",
-  "base_species": "dog",
-  "variant": "white",
-  "description": "white dog",
-  "size": 48,
+  "name": "white dog",
+  "size": 64,
   "directions": [
     "south",
     "southwest",
@@ -14,5 +12,7 @@
     "east",
     "southeast"
   ],
-  "generated_at": "2026-01-04T00:20:51.787Z"
+  "generated_at": "2026-01-05T10:48:37.503Z",
+  "generation_method": "reference_workflow",
+  "notes": "South first, east with south ref, west flipped from east, others with south ref"
 }

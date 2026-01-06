@@ -1,9 +1,7 @@
 {
   "id": "deer_spotted",
-  "base_species": "deer",
-  "variant": "spotted",
-  "description": "spotted fawn",
-  "size": 48,
+  "name": "spotted fawn",
+  "size": 64,
   "directions": [
     "south",
     "southwest",
@@ -14,5 +12,7 @@
     "east",
     "southeast"
   ],
-  "generated_at": "2026-01-04T00:44:52.101Z"
+  "generated_at": "2026-01-05T11:09:07.297Z",
+  "generation_method": "reference_workflow",
+  "notes": "South first, east with south ref, west flipped from east, others with south ref"
 }

@@ -1,9 +1,7 @@
 {
   "id": "rabbit_grey",
-  "base_species": "rabbit",
-  "variant": "grey",
-  "description": "grey rabbit",
-  "size": 48,
+  "name": "grey rabbit",
+  "size": 64,
   "directions": [
     "south",
     "southwest",
@@ -14,5 +12,7 @@
     "east",
     "southeast"
   ],
-  "generated_at": "2026-01-04T00:40:28.642Z"
+  "generated_at": "2026-01-05T11:04:57.831Z",
+  "generation_method": "reference_workflow",
+  "notes": "South first, east with south ref, west flipped from east, others with south ref"
 }

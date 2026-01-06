@@ -1,9 +1,18 @@
 {
   "id": "cat_orange",
-  "category": "objects",
-  "size": 48,
-  "description": "Orange tabby cat, striped fur, sitting pose, top-down view",
-  "original_description": "Orange tabby cat, striped fur, sitting pose, top-down view",
-  "generated_at": "2026-01-05T04:55:27.675Z",
-  "type": "static"
+  "name": "orange tabby cat",
+  "size": 64,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-05T10:52:33.367Z",
+  "generation_method": "reference_workflow",
+  "notes": "South first, east with south ref, west flipped from east, others with south ref"
 }

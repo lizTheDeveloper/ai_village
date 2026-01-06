@@ -1,7 +1,18 @@
 {
   "id": "dog_brown",
-  "category": "animals.working",
-  "size": 32,
-  "description": "Brown medium-sized dog, friendly appearance, standing pose, top-down",
-  "generated_at": "2026-01-04T21:25:53.450Z"
+  "name": "brown dog",
+  "size": 64,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-05T10:44:22.731Z",
+  "generation_method": "reference_workflow",
+  "notes": "South first, east with south ref, west flipped from east, others with south ref"
 }

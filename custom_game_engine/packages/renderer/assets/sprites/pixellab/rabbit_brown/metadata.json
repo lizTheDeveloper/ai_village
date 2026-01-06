@@ -1,7 +1,18 @@
 {
   "id": "rabbit_brown",
-  "category": "animals.pets",
-  "size": 32,
-  "description": "Brown rabbit, long ears, fluffy tail, sitting pose, top-down view",
-  "generated_at": "2026-01-04T21:27:24.476Z"
+  "name": "brown rabbit",
+  "size": 64,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-05T11:03:15.600Z",
+  "generation_method": "reference_workflow",
+  "notes": "South first, east with south ref, west flipped from east, others with south ref"
 }

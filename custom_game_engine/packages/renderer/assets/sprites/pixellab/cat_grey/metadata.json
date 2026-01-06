@@ -1,9 +1,18 @@
 {
   "id": "cat_grey",
-  "category": "objects",
-  "size": 48,
-  "description": "grey tabby cat",
-  "original_description": "grey tabby cat",
-  "generated_at": "2026-01-05T04:54:52.241Z",
-  "type": "static"
+  "name": "grey tabby cat",
+  "size": 64,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-05T10:54:58.351Z",
+  "generation_method": "reference_workflow",
+  "notes": "South first, east with south ref, west flipped from east, others with south ref"
 }

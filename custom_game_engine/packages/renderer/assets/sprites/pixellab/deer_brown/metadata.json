@@ -1,9 +1,7 @@
 {
   "id": "deer_brown",
-  "base_species": "deer",
-  "variant": "brown",
-  "description": "brown deer",
-  "size": 48,
+  "name": "brown deer",
+  "size": 64,
   "directions": [
     "south",
     "southwest",
@@ -14,5 +12,7 @@
     "east",
     "southeast"
   ],
-  "generated_at": "2026-01-04T00:42:30.933Z"
+  "generated_at": "2026-01-05T11:06:58.000Z",
+  "generation_method": "reference_workflow",
+  "notes": "South first, east with south ref, west flipped from east, others with south ref"
 }

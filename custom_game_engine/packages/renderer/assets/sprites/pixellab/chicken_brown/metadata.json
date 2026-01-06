@@ -1,9 +1,7 @@
 {
   "id": "chicken_brown",
-  "base_species": "chicken",
-  "variant": "brown",
-  "description": "brown feathered chicken",
-  "size": 48,
+  "name": "brown feathered chicken",
+  "size": 64,
   "directions": [
     "south",
     "southwest",
@@ -14,5 +12,7 @@
     "east",
     "southeast"
   ],
-  "generated_at": "2026-01-03T23:42:01.358Z"
+  "generated_at": "2026-01-05T10:20:27.335Z",
+  "generation_method": "reference_workflow",
+  "notes": "South first, east with south ref, west flipped from east, others with south ref"
 }

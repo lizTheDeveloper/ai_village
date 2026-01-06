@@ -1,9 +1,7 @@
 {
   "id": "goat_black",
-  "base_species": "goat",
-  "variant": "black",
-  "description": "black goat",
-  "size": 48,
+  "name": "black goat",
+  "size": 64,
   "directions": [
     "south",
     "southwest",
@@ -14,5 +12,7 @@
     "east",
     "southeast"
   ],
-  "generated_at": "2026-01-04T00:57:08.827Z"
+  "generated_at": "2026-01-05T11:19:46.300Z",
+  "generation_method": "reference_workflow",
+  "notes": "South first, east with south ref, west flipped from east, others with south ref"
 }

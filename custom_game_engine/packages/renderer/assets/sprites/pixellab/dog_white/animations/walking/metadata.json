@@ -1,0 +1,14 @@
+{
+  "animation": "walking",
+  "directions": [
+    "south",
+    "north",
+    "east",
+    "west"
+  ],
+  "frames_per_direction": 4,
+  "fps": 8,
+  "loop": true,
+  "generated_at": "2026-01-06T00:22:37.948Z",
+  "notes": "East and west share the same animation (west is flipped)"
+}

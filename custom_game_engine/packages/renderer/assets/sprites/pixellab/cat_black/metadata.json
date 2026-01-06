@@ -1,9 +1,18 @@
 {
   "id": "cat_black",
-  "category": "objects",
-  "size": 48,
-  "description": "Black cat, sleek fur, sitting pose, top-down view",
-  "original_description": "Black cat, sleek fur, sitting pose, top-down view",
-  "generated_at": "2026-01-05T04:54:31.378Z",
-  "type": "static"
+  "name": "black cat",
+  "size": 64,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-05T10:56:57.155Z",
+  "generation_method": "reference_workflow",
+  "notes": "South first, east with south ref, west flipped from east, others with south ref"
 }

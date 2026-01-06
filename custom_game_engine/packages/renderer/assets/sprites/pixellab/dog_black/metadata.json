@@ -1,7 +1,18 @@
 {
   "id": "dog_black",
-  "category": "animals.working",
-  "size": 32,
-  "description": "Black medium-sized dog, alert appearance, standing pose, top-down",
-  "generated_at": "2026-01-04T21:26:09.152Z"
+  "name": "black dog",
+  "size": 64,
+  "directions": [
+    "south",
+    "southwest",
+    "west",
+    "northwest",
+    "north",
+    "northeast",
+    "east",
+    "southeast"
+  ],
+  "generated_at": "2026-01-05T10:46:18.873Z",
+  "generation_method": "reference_workflow",
+  "notes": "South first, east with south ref, west flipped from east, others with south ref"
 }

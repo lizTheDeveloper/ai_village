@@ -1,8 +1,6 @@
 {
   "id": "cow_brown",
-  "base_species": "cow",
-  "variant": "brown",
-  "description": "brown cow",
+  "name": "brown cow",
   "size": 64,
   "directions": [
     "south",
@@ -14,5 +12,7 @@
     "east",
     "southeast"
   ],
-  "generated_at": "2026-01-03T23:50:45.641Z"
+  "generated_at": "2026-01-05T10:26:40.010Z",
+  "generation_method": "reference_workflow",
+  "notes": "South first, east with south ref, west flipped from east, others with south ref"
 }
