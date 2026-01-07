@@ -308,7 +308,7 @@ export class BuildingSystem implements System {
    * with tests until fully migrated to tile-based system.
    */
   private addGovernanceComponent(entity: EntityImpl, buildingType: string, world: World): void {
-    // Special case: Add UniversityComponent for university buildings
+    // Add appropriate governance component based on building type
     if (buildingType === 'university') {
       const universityComp = createUniversityComponent(
         'University',
@@ -319,8 +319,32 @@ export class BuildingSystem implements System {
       return;
     }
 
-    // No other governance buildings in single-tile BuildingType enum anymore
-    // All other governance buildings use TileBasedBlueprintRegistry
+    if (buildingType === 'town-hall') {
+      const townHallComp = createTownHallComponent();
+      entity.addComponent(townHallComp);
+      return;
+    }
+
+    if (buildingType === 'census-bureau') {
+      const censusBureauComp = createCensusBureauComponent();
+      entity.addComponent(censusBureauComp);
+      return;
+    }
+
+    if (buildingType === 'weather-station') {
+      const weatherStationComp = createWeatherStationComponent();
+      entity.addComponent(weatherStationComp);
+      return;
+    }
+
+    if (buildingType === 'health-clinic') {
+      const healthClinicComp = createHealthClinicComponent();
+      entity.addComponent(healthClinicComp);
+      return;
+    }
+
+    // No other governance buildings in single-tile BuildingType enum
+    // Other governance buildings use BuildingBlueprintRegistry with blueprint IDs
   }
 
   /**

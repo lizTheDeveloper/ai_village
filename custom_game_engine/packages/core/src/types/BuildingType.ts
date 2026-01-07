@@ -43,6 +43,10 @@ export enum BuildingType {
 
   // Special Buildings (some may be multi-tile, but need enum for backwards compatibility)
   University = 'university',
+  TownHall = 'town-hall',
+  CensusBureau = 'census-bureau',
+  WeatherStation = 'weather-station',
+  HealthClinic = 'health-clinic',
 }
 
 /**

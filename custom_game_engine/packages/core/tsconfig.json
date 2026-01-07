@@ -13,7 +13,6 @@
   ],
   "references": [
     { "path": "../introspection" },
-    { "path": "../llm" },
     { "path": "../building-designer" }
   ]
 }

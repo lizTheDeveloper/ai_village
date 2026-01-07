@@ -8,6 +8,7 @@
 
 import type { EntityImpl } from '../ecs/Entity.js';
 import type { World } from '../ecs/World.js';
+import type { CustomLLMConfig } from '../components/AgentComponent.js';
 
 /**
  * Decision layer type - determines which LLM behavior layer handles the decision
@@ -37,6 +38,8 @@ export interface LLMDecisionResult {
 export interface SchedulerAgentState {
   lastInvocation: Record<DecisionLayer, number>;
 }
+
+// CustomLLMConfig is imported from AgentComponent to avoid duplicate exports
 
 /**
  * Interface for LLM Scheduler - handles layer selection and decision routing
@@ -80,7 +83,7 @@ export interface LLMDecisionQueue {
   /**
    * Request a new decision (async, fire-and-forget)
    */
-  requestDecision(entityId: string, prompt: string, customLLM?: string): Promise<void>;
+  requestDecision(entityId: string, prompt: string, customLLM?: CustomLLMConfig): Promise<void>;
 }
 
 export interface LLMRequest {

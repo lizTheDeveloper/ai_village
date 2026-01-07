@@ -7,7 +7,7 @@
  * Integrates with: RiddleGenerator.ts (existing LLM system)
  */
 
-import type { LLMProvider } from '@ai-village/llm';
+import type { LLMProvider } from '../types/LLMTypes.js';
 import { RiddleGenerator } from '../divinity/RiddleGenerator.js';
 import type {
   DivineSignature,

@@ -7,7 +7,7 @@
  * Integrates with: LLMEffectGenerator (existing LLM system)
  */
 
-import type { LLMProvider } from '@ai-village/llm';
+import type { LLMProvider } from '../types/LLMTypes.js';
 import type {
   DivineSignature,
   SpellContent,

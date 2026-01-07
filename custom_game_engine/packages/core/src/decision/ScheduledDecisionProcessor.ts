@@ -22,10 +22,8 @@ import { AutonomicSystem, type AutonomicResult } from './AutonomicSystem.js';
 import { getBehaviorPriority } from './BehaviorPriority.js';
 import { parseAction, actionToBehavior } from '../actions/AgentAction.js';
 
-// Import LLMScheduler from llm package
-// Note: This creates a dependency from @ai-village/core → @ai-village/llm
-// which is acceptable since LLM integration is optional
-import type { LLMScheduler, DecisionLayer, LLMDecisionQueue } from '@ai-village/llm';
+// Import LLM types from local types file to avoid circular dependency with @ai-village/llm
+import type { LLMScheduler, DecisionLayer, LLMDecisionQueue } from '../types/LLMTypes.js';
 
 /**
  * Decision result from ScheduledDecisionProcessor
