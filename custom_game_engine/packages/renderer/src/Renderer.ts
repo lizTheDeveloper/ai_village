@@ -2740,15 +2740,12 @@ export class Renderer {
     // Try to find a target from multiple sources
     let targetX: number | undefined;
     let targetY: number | undefined;
-    let targetSource = 'none';
 
     // 1. Check steering component first
     const steering = entity.getComponent('steering') as SteeringComponent | undefined;
     if (steering?.target) {
       targetX = steering.target.x;
       targetY = steering.target.y;
-      targetSource = 'steering';
-      console.log('[TargetLine] Found target from steering:', { x: targetX, y: targetY });
     }
 
     // 2. If no steering target, check action queue for targetPos
@@ -2769,19 +2766,11 @@ export class Renderer {
           actions = (actionQueue as any)._queue || (actionQueue as any).actions || [];
         }
 
-        console.log('[TargetLine] Action queue:', {
-          hasQueue: true,
-          actionCount: actions.length,
-          firstAction: actions[0]
-        });
-
         if (actions.length > 0) {
           const currentAction = actions[0];
           if (currentAction?.targetPos) {
             targetX = currentAction.targetPos.x;
             targetY = currentAction.targetPos.y;
-            targetSource = 'action_queue';
-            console.log('[TargetLine] Found target from action queue:', { x: targetX, y: targetY, action: currentAction.type });
           }
         }
       }
@@ -2789,11 +2778,12 @@ export class Renderer {
 
     // No target found
     if (targetX === undefined || targetY === undefined) {
-      console.log('[TargetLine] No target found - steering:', !!steering?.target, 'action queue checked');
+      console.log('[NavLine] No target found - has steering:', !!steering, 'steering.target:', !!steering?.target, 'has action_queue:', !!entity.getComponent('action_queue'));
       return;
     }
 
-    console.log('[TargetLine] Drawing line from', { x: position.x, y: position.y }, 'to', { x: targetX, y: targetY }, 'source:', targetSource);
+    // Debug: Log when we're about to draw the line
+    console.log('[NavLine] Drawing navigation line to:', { x: targetX, y: targetY });
 
     const currentX = position.x * this.tileSize + (this.tileSize / 2);
     const currentY = position.y * this.tileSize + (this.tileSize / 2);

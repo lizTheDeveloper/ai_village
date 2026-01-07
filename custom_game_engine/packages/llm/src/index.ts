@@ -9,6 +9,7 @@ export * from './ProxyLLMProvider';
 export * from './StructuredPromptBuilder';
 export * from './TalkerPromptBuilder';
 export * from './ExecutorPromptBuilder';
+export * from './LLMScheduler';
 export * from './ResponseParser';
 export * from './LLMDecisionQueue';
 export * from './LoadBalancingProvider';

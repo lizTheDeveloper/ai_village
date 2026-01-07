@@ -34,7 +34,8 @@
 
 export { UniverseClient, universeClient } from './universe-client.js';
 export { PersistenceService, UniverseDB } from './persistence.js';
-export { GameBridge, gameBridge } from './game-bridge.js';
+export { GameBridge, gameBridge, type ViewOnlyGameLoop } from './game-bridge.js';
+export { setupGameSystems, type GameSetupConfig, type GameSetupResult } from './game-setup.js';
 export type {
   UniverseState,
   SerializedWorld,

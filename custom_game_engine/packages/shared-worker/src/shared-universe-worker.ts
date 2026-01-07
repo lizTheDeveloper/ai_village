@@ -10,8 +10,8 @@
 /// <reference lib="webworker" />
 
 import { GameLoop } from '@ai-village/core';
-import { registerAllSystems } from '@ai-village/core';
 import { PersistenceService } from './persistence.js';
+import { setupGameSystems, type GameSetupResult } from './game-setup.js';
 import type {
   UniverseState,
   GameAction,
@@ -29,6 +29,7 @@ class UniverseWorker {
   private gameLoop: GameLoop;
   private persistence: PersistenceService;
   private connections: Map<string, ConnectionInfo> = new Map();
+  private gameSetup: GameSetupResult | null = null;
 
   private tick = 0;
   private running = false;
@@ -54,12 +55,16 @@ class UniverseWorker {
   async init(): Promise<void> {
     console.log('[UniverseWorker] Initializing...');
 
-    // Register all game systems
-    registerAllSystems(
-      this.gameLoop.world,
-      this.gameLoop.systemRegistry,
-      this.gameLoop.actionQueue
-    );
+    // Set up all game systems using shared setup logic
+    // This matches the initialization in demo/headless.ts
+    this.gameSetup = await setupGameSystems(this.gameLoop, {
+      sessionId: this.gameLoop.universeId,
+      llmQueue: null, // Worker doesn't need LLM for now
+      promptBuilder: null,
+      metricsServerUrl: 'ws://localhost:8765',
+      enableMetrics: true,
+      enableAutoSave: false, // Worker manages its own persistence
+    });
 
     // Try to load saved state
     const savedState = await this.persistence.loadState();
@@ -380,12 +385,48 @@ class UniverseWorker {
         console.error('[UniverseWorker] Failed to log action:', error);
       });
 
-      // TODO: Route action to appropriate handler based on domain
-      console.log(`[UniverseWorker] Action: ${action.domain}/${action.type}`);
+      // Handle action based on type
+      switch (action.type) {
+        case 'SPAWN_AGENT':
+          this.handleSpawnAgent(action.payload);
+          break;
+
+        default:
+          console.warn(`[UniverseWorker] Unknown action: ${action.domain}/${action.type}`);
+      }
     } catch (error) {
       console.error('[UniverseWorker] Failed to apply action:', error);
       this.broadcastError('Action failed', { action, error });
     }
+  }
+
+  /**
+   * Handle SPAWN_AGENT action
+   */
+  private handleSpawnAgent(payload: any): void {
+    const { x = 0, y = 0, name = 'Agent' } = payload;
+
+    const agent = this.gameLoop.world.createEntity();
+
+    // Add basic components for agent
+    agent.addComponent({
+      type: 'identity',
+      name: name || `Agent ${this.gameLoop.world.getAllEntities().length}`,
+      age: 18,
+      species: 'human',
+    });
+
+    agent.addComponent({
+      type: 'position',
+      x,
+      y,
+    });
+
+    agent.addComponent({
+      type: 'agent',
+    });
+
+    console.log(`[UniverseWorker] Spawned agent "${name}" at (${x}, ${y})`);
   }
 
   /**

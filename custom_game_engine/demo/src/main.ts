@@ -692,10 +692,24 @@ async function registerAllSystems(
   // Generate session ID for metrics
   const gameSessionId = `game_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
+  // Create LLMScheduler and ScheduledDecisionProcessor if LLM is available
+  let scheduledProcessor: import('@ai-village/core').ScheduledDecisionProcessor | null = null;
+  if (llmQueue) {
+    const { LLMScheduler } = await import('@ai-village/llm');
+    const { ScheduledDecisionProcessor } = await import('@ai-village/core');
+
+    const scheduler = new LLMScheduler(llmQueue);
+    scheduledProcessor = new ScheduledDecisionProcessor(scheduler);
+
+    console.log('[Main] Created LLMScheduler with intelligent layer selection');
+    console.log('[Main] Layer cooldowns - Autonomic: 1s, Talker: 5s, Executor: 10s');
+  }
+
   // Use centralized system registration from @ai-village/core
   const coreResult = coreRegisterAllSystems(gameLoop, {
     llmQueue: llmQueue || undefined,
     promptBuilder: promptBuilder || undefined,
+    scheduledProcessor: scheduledProcessor || undefined,
     gameSessionId,
     metricsServerUrl: 'ws://localhost:8765',
     enableMetrics: true,

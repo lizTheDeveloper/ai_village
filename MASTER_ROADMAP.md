@@ -27,7 +27,7 @@
 |-------|--------|-------------|
 | Phase 0-3 | ✅ Complete | Foundation through Agent Needs |
 | Phase 4 | ✅ Complete | Memory & Social (Episodic memory, spatial, relationships) |
-| Phase 5-6 | ✅ Complete | Communication & LLM Integration |
+| Phase 5-6 | ✅ Complete | Communication & LLM Integration (+ Three-Layer Scheduler 2026-01-06) |
 | Phase 7 | ✅ Complete | Building & Shelter (Construction, inventory display) |
 | Phase 8 | ✅ Complete | Temperature & Weather |
 | Phase 9 | ✅ Complete | Farming (Soil, Plant Lifecycle, Tilling, Seeds) |
@@ -54,7 +54,8 @@
 | Phase 34 | 🔒 Blocked | Cross-Universe Sharing (Effect Packages, Trust) - blocked on Phase 31, 33 |
 | Skill System | 🚧 In Progress | Progressive Skill Reveal - skill-gated prompt context (claimed 2025-12-28) |
 
-**Implementation Status Notes (2026-01-03):**
+**Implementation Status Notes (2026-01-06):**
+- ✅ **Three-Layer LLM Scheduler** - Intelligent layer selection (Autonomic/Talker/Executor) with cooldown management reduces LLM costs 2-3x (2026-01-06)
 - ✅ **Core gameplay loop is functional** - Agents, world, farming, crafting, animals, economy all working
 - ✅ **Reproduction System** - Complete courtship → pregnancy → labor → birth pipeline (Phase 37, 12 bugs fixed, fully integrated)
 - ✅ **Realm System** - Complete multiverse realm system (Phase 38: 6 realms, time dilation, portals, cross-realm phones, death transitions)

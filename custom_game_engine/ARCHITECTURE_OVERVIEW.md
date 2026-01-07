@@ -349,14 +349,21 @@ See [Divinity Metasystem](#2-divinity-system) above
 
 ### Agent Decision Flow
 
+**With LLM Scheduler (current, production):**
+
 ```
 Agent needs evaluation
     ↓
-Autonomic check (critical needs: hunger, thirst, sleep)
+Layer 1: Autonomic check (critical needs: hunger < 0.2, energy < 0.2, temp < 0.2)
     ↓ (if not critical)
-LLM Decision (via AgentBrainSystem)
+Layer 2 & 3: LLM Scheduler (via ScheduledDecisionProcessor)
+    ├─ Analyzes agent context (needs, conversation, goals, idle state)
+    ├─ Selects appropriate layer based on context:
+    │   ├─ Talker (conversation, social) - 5s cooldown
+    │   └─ Executor (strategic planning, tasks) - 10s cooldown
+    └─ Single LLM call to selected layer
     ↓
-Behavior selection (from prompt)
+Behavior selection (from LLM response)
     ↓
 Action creation
     ↓
@@ -368,6 +375,8 @@ Memory formation (MemoryFormationSystem)
     ↓
 Event emission (EventBus)
 ```
+
+**Key Optimization:** Scheduler routes to ONE layer based on context (not sequential), reducing cost 2-3x and improving responsiveness. See `packages/introspection/THREE_LAYER_LLM_ARCHITECTURE.md` for details.
 
 ### Event Flow
 
@@ -413,11 +422,18 @@ Agent recalls in future decisions (via LLM context)
 
 **Key Components:**
 - `LLMQueue` - Manages LLM requests, batching, retries
-- `PromptBuilder` - Constructs agent prompts from world state
+- `LLMScheduler` - **NEW (2026-01-06)** Intelligent layer selection and cooldown management
+- `TalkerPromptBuilder` - Conversation and social interactions (Layer 2)
+- `ExecutorPromptBuilder` - Strategic planning and task execution (Layer 3)
+- `StructuredPromptBuilder` - Legacy single-layer prompts (backward compatible)
 - `BehaviorParser` - Parses LLM responses to behaviors
 
+**Decision Architecture:**
+- `ScheduledDecisionProcessor` - Uses LLMScheduler for context-aware layer routing
+- `DecisionProcessor` - Legacy sequential layer processing (backward compatible)
+
 **Systems Using LLM:**
-- AgentBrainSystem (agent decisions)
+- AgentBrainSystem (agent decisions via scheduler)
 - LandmarkNamingSystem (landmark names)
 - MythGenerationSystem (myth creation)
 - PrayerAnsweringSystem (divine responses)

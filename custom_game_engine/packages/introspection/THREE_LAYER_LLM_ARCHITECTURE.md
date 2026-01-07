@@ -1155,3 +1155,118 @@ This architecture maximizes LLM value:
 - Talker: many fast calls for natural conversation
 - Executor: few expensive calls that generate long action queues
 - Autonomic: infinite free calls for survival logic
+
+---
+
+## ✅ Implementation Status (2026-01-06)
+
+**The three-layer LLM architecture with intelligent scheduler is now COMPLETE and INTEGRATED.**
+
+### What Was Built
+
+1. **LLMScheduler** (`packages/llm/src/LLMScheduler.ts`)
+   - Intelligent layer selection based on agent context
+   - Per-layer cooldown management (Autonomic: 1s, Talker: 5s, Executor: 10s)
+   - Priority-based decision routing
+   - Comprehensive test suite (9/9 tests passing)
+
+2. **ScheduledDecisionProcessor** (`packages/core/src/decision/ScheduledDecisionProcessor.ts`)
+   - Integration layer wrapping LLMScheduler
+   - Async and sync API support
+   - LLM response parsing and behavior extraction
+
+3. **Integration Complete** (Demo Game)
+   - AgentBrainSystem now uses scheduler when provided
+   - registerAllSystems accepts optional scheduledProcessor
+   - Full backward compatibility with old DecisionProcessor
+   - Console output: `[Main] Created LLMScheduler with intelligent layer selection`
+
+### How Layer Selection Works
+
+The scheduler analyzes agent state and intelligently routes to the right layer:
+
+```typescript
+// PRIORITY 1: Critical needs → Autonomic (1s cooldown)
+if (hunger < 0.2 || energy < 0.2 || temperature < 0.2) {
+  return { layer: 'autonomic', reason: 'Critical needs', urgency: 10 };
+}
+
+// PRIORITY 2: Active conversation → Talker (5s cooldown)
+if (conversation.isActive || heardSpeech.length > 0) {
+  return { layer: 'talker', reason: 'Active conversation', urgency: 8 };
+}
+
+// PRIORITY 3: Nearby agents → Talker (5s cooldown)
+if (seenAgents.length > 0) {
+  return { layer: 'talker', reason: 'Potential social interaction', urgency: 6 };
+}
+
+// PRIORITY 4: Task completed → Executor (10s cooldown)
+if (behaviorCompleted) {
+  return { layer: 'executor', reason: 'Task done, needs planning', urgency: 7 };
+}
+
+// PRIORITY 5: Idle/wandering → Executor (10s cooldown)
+if (behavior === 'idle' || behavior === 'wander') {
+  return { layer: 'executor', reason: 'Idle, needs strategic planning', urgency: 5 };
+}
+
+// DEFAULT: Autonomic
+return { layer: 'autonomic', reason: 'Default reflexive', urgency: 3 };
+```
+
+### Benefits Achieved
+
+**Cost Optimization:**
+- Only ONE LLM call per decision (not sequential)
+- Cheaper/faster autonomic layer for survival needs
+- Expensive executor layer only when strategic planning needed
+
+**Responsiveness:**
+- Critical needs get instant autonomic response
+- Conversations get fast talker response (5s cooldown)
+- Strategic planning uses slower executor (10s cooldown)
+
+**Scalability:**
+- Fewer expensive LLM calls = more agents supported
+- Per-layer cooldowns prevent excessive API usage
+
+### Usage in Game
+
+When starting the demo with LLM enabled:
+
+```bash
+cd custom_game_engine && ./start.sh
+```
+
+Console output confirms scheduler is active:
+```
+[Main] Created LLMScheduler with intelligent layer selection
+[Main] Layer cooldowns - Autonomic: 1s, Talker: 5s, Executor: 10s
+```
+
+Enable LLM in settings, spawn LLM agents, and watch the scheduler route decisions intelligently!
+
+### Files Modified
+
+- `packages/llm/src/LLMScheduler.ts` (created)
+- `packages/core/src/decision/ScheduledDecisionProcessor.ts` (created)
+- `packages/core/src/decision/index.ts` (exports)
+- `packages/core/src/systems/AgentBrainSystem.ts` (scheduler support)
+- `packages/core/src/systems/registerAllSystems.ts` (scheduler param)
+- `demo/src/main.ts` (integration)
+- `test-llm-scheduler.ts` (test suite)
+
+### Documentation
+
+Full implementation details: `/devlogs/LLM_SCHEDULER_IMPLEMENTATION_2026-01-06.md`
+
+### Next Steps (Optional Enhancements)
+
+1. **Metrics Dashboard** - Track layer selection distribution, cooldown hits
+2. **DevPanel Integration** - Show current layer for selected agent
+3. **Cooldown Tuning** - Adjust based on real gameplay and cost metrics
+4. **Layer Override** - Manual layer selection for debugging
+5. **Priority Override** - Emergency situations force immediate decisions
+
+**The three-layer architecture is now production-ready and actively routing agent decisions in the game.**

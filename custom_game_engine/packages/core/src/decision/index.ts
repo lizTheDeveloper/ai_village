@@ -61,6 +61,12 @@ export {
   type ScriptedDecisionResult,
 } from './ScriptedDecisionProcessor.js';
 
+// Scheduled Decision Processor (uses LLMScheduler for intelligent layer selection)
+export {
+  ScheduledDecisionProcessor,
+  type ScheduledDecisionResult,
+} from './ScheduledDecisionProcessor.js';
+
 // Spell Utility Calculator (Magic System integration)
 export {
   SpellUtilityCalculator,

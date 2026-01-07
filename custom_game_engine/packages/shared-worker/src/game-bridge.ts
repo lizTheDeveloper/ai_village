@@ -1,13 +1,54 @@
 /**
- * Game Bridge - Compatibility layer between UniverseClient and existing game code
+ * Game Bridge - View-Only Window Interface
  *
- * This allows existing code that expects a GameLoop to work with the SharedWorker architecture.
- * The bridge maintains a local "view" World that gets updated from the worker's state.
+ * CRITICAL ARCHITECTURE PRINCIPLE:
+ * Windows DO NOT run the simulation. They are PURE VIEWS.
+ *
+ * The SharedWorker is the single source of truth. Windows:
+ * - Maintain a local "view" World for rendering/queries
+ * - Sync state from the worker
+ * - Forward all actions to the worker
+ * - Never run game systems or the simulation loop
+ *
+ * This provides compatibility with existing code that expects a GameLoop,
+ * while ensuring only the worker runs the actual simulation.
  */
 
-import { GameLoop, WorldImpl } from '@ai-village/core';
+import { WorldImpl, ActionQueue, SystemRegistry, EventBus } from '@ai-village/core';
 import { UniverseClient } from './universe-client.js';
 import type { UniverseState, SerializedWorld } from './types.js';
+
+/**
+ * GameLoop-compatible interface for view-only windows
+ *
+ * This is NOT a real GameLoop - it's a compatibility shim that provides
+ * the same interface so existing code works, but doesn't run any simulation.
+ */
+export interface ViewOnlyGameLoop {
+  /** View-only World (synced from worker) */
+  readonly world: WorldImpl;
+
+  /** Action queue (forwards to worker) */
+  readonly actionQueue: ActionQueue;
+
+  /** System registry (empty - systems run in worker) */
+  readonly systemRegistry: SystemRegistry;
+
+  /** Universe ID */
+  readonly universeId: string;
+
+  /** Current tick (from worker) */
+  get tick(): number;
+
+  /** Pause simulation (dispatches to worker) */
+  pause(): void;
+
+  /** Resume simulation (dispatches to worker) */
+  resume(): void;
+
+  /** Set simulation speed (dispatches to worker) */
+  setSpeed(speed: number): void;
+}
 
 /**
  * Bridge between UniverseClient and GameLoop-expecting code
@@ -17,17 +58,57 @@ import type { UniverseState, SerializedWorld } from './types.js';
  * - This bridge maintains a local "view" World for rendering/queries
  * - User actions are dispatched to the worker
  * - Local World is updated when state arrives from worker
+ * - NO SYSTEMS RUN LOCALLY - all systems execute in the worker
  */
 export class GameBridge {
-  public readonly gameLoop: GameLoop;
+  /** View-only game loop interface */
+  public readonly gameLoop: ViewOnlyGameLoop;
+
   private readonly universeClient: UniverseClient;
+  private readonly viewWorld: WorldImpl;
+  private readonly viewActionQueue: ActionQueue;
+  private readonly viewSystemRegistry: SystemRegistry;
   private unsubscribe: (() => void) | null = null;
+  private currentTick: number = 0;
+  private universeId: string = '';
 
   constructor() {
-    // Create a local GameLoop for the "view" world
-    // This won't run the simulation - just holds state for rendering
-    this.gameLoop = new GameLoop();
+    // Create view-only components (NO SIMULATION)
+    this.viewWorld = new WorldImpl();
+    this.viewActionQueue = new ActionQueue();
+    this.viewSystemRegistry = new SystemRegistry();
     this.universeClient = new UniverseClient();
+
+    // Create GameLoop-compatible interface
+    const self = this;
+    this.gameLoop = {
+      get world(): WorldImpl {
+        return self.viewWorld;
+      },
+      get actionQueue(): ActionQueue {
+        return self.viewActionQueue;
+      },
+      get systemRegistry(): SystemRegistry {
+        return self.viewSystemRegistry;
+      },
+      get universeId(): string {
+        return self.universeId;
+      },
+      get tick(): number {
+        return self.currentTick;
+      },
+      pause(): void {
+        self.pause();
+      },
+      resume(): void {
+        self.resume();
+      },
+      setSpeed(speed: number): void {
+        self.setSpeed(speed);
+      },
+    };
+
+    console.log('[GameBridge] Created view-only interface (NO LOCAL SIMULATION)');
   }
 
   /**
@@ -39,31 +120,63 @@ export class GameBridge {
     // Connect to SharedWorker
     this.universeClient.connect();
 
-    // Subscribe to state updates
+    // Subscribe to state updates from worker
     this.unsubscribe = this.universeClient.subscribe((state: UniverseState) => {
       this.updateLocalWorld(state);
     });
 
-    console.log('[GameBridge] Connected to SharedWorker');
+    // Wait for initial connection
+    let attempts = 0;
+    while (!this.universeClient.isConnected() && attempts < 50) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      attempts++;
+    }
+
+    if (!this.universeClient.isConnected()) {
+      throw new Error('[GameBridge] Failed to connect to SharedWorker after 5 seconds');
+    }
+
+    console.log('[GameBridge] Connected to SharedWorker - window is VIEW ONLY');
   }
 
   /**
    * Update local world from worker state
+   *
+   * This is the ONLY way the local World changes - from worker updates.
    */
   private updateLocalWorld(state: UniverseState): void {
-    const world = this.gameLoop.world as WorldImpl;
-
     // Update tick
-    (world as any)._tick = state.tick;
+    this.currentTick = state.tick;
+    this.universeId = state.metadata.universeId;
 
     // Sync entities
-    this.syncEntities(state.world, world);
+    this.syncEntities(state.world, this.viewWorld);
 
     // Sync tiles
-    this.syncTiles(state.world, world);
+    this.syncTiles(state.world, this.viewWorld);
 
     // Sync globals (singletons)
-    this.syncGlobals(state.world, world);
+    this.syncGlobals(state.world, this.viewWorld);
+
+    // Process any actions in the view queue by forwarding to worker
+    this.forwardQueuedActions();
+  }
+
+  /**
+   * Forward any queued actions to the worker
+   *
+   * Actions queued locally (via actionQueue.enqueue) are forwarded to
+   * the worker for execution.
+   */
+  private forwardQueuedActions(): void {
+    const actions = this.viewActionQueue.dequeueAll();
+    for (const action of actions) {
+      this.universeClient.dispatch({
+        type: action.type,
+        domain: 'village', // TODO: Determine domain from action
+        payload: action.payload,
+      });
+    }
   }
 
   /**
@@ -118,8 +231,7 @@ export class GameBridge {
    * Sync tiles from serialized state to local world
    */
   private syncTiles(serializedWorld: SerializedWorld, world: WorldImpl): void {
-    // Clear existing tiles
-    // Note: This is a simplified implementation - a real one would be more efficient
+    // Sync tiles (simplified - could be optimized with dirty tracking)
     for (const tile of serializedWorld.tiles) {
       world.setTile(tile.x, tile.y, tile.type, tile.data);
     }
@@ -199,7 +311,7 @@ export class GameBridge {
    * Get current tick
    */
   getTick(): number {
-    return this.universeClient.getTick();
+    return this.currentTick;
   }
 
   /**

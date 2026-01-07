@@ -285,6 +285,8 @@ export interface LLMDependencies {
   llmQueue?: unknown;
   /** Prompt builder for agent brain (from @ai-village/llm) */
   promptBuilder?: unknown;
+  /** Scheduled decision processor with LLMScheduler (from @ai-village/core) - NEW SCHEDULER-BASED APPROACH */
+  scheduledProcessor?: unknown;
 }
 
 /**
@@ -327,7 +329,7 @@ export function registerAllSystems(
   gameLoop: GameLoop,
   config: SystemRegistrationConfig = {}
 ): SystemRegistrationResult {
-  const { llmQueue, promptBuilder, gameSessionId, metricsServerUrl, enableMetrics = true, enableAutoSave = true } = config;
+  const { llmQueue, promptBuilder, scheduledProcessor, gameSessionId, metricsServerUrl, enableMetrics = true, enableAutoSave = true } = config;
   const eventBus = gameLoop.world.eventBus;
 
   // Helper to register a system in disabled state (uses the system's actual id)
@@ -396,7 +398,15 @@ export function registerAllSystems(
 
   // Always register AgentBrainSystem - it works without LLM (uses scripted behaviors)
   // Cast to expected types (caller is responsible for correct types)
-  gameLoop.systemRegistry.register(new AgentBrainSystem(llmQueue as any, promptBuilder as any));
+  // NEW: If scheduledProcessor provided, use scheduler-based approach for intelligent layer selection
+  gameLoop.systemRegistry.register(
+    new AgentBrainSystem(
+      llmQueue as any,
+      promptBuilder as any,
+      undefined, // behaviorRegistry (use default)
+      scheduledProcessor as any // NEW: ScheduledDecisionProcessor
+    )
+  );
 
   gameLoop.systemRegistry.register(new MovementSystem());
   gameLoop.systemRegistry.register(new NeedsSystem());

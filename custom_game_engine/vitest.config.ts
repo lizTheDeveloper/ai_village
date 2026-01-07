@@ -19,6 +19,8 @@ export default defineConfig({
       '@ai-village/world': path.resolve(__dirname, './packages/world/src'),
       '@ai-village/renderer': path.resolve(__dirname, './packages/renderer/src'),
       '@ai-village/llm': path.resolve(__dirname, './packages/llm/src'),
+      '@ai-village/magic': path.resolve(__dirname, './packages/magic/src'),
+      '@ai-village/divinity': path.resolve(__dirname, './packages/divinity/src'),
       // metrics-dashboard internal alias
       '@': path.resolve(__dirname, './packages/metrics-dashboard/src'),
     },

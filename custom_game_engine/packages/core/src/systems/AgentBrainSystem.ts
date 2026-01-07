@@ -50,7 +50,7 @@ import type { NeedsComponent } from '../components/NeedsComponent.js';
 import { PerceptionProcessor } from '../perception/index.js';
 
 // Decision module
-import { DecisionProcessor, getBehaviorPriority } from '../decision/index.js';
+import { DecisionProcessor, ScheduledDecisionProcessor, getBehaviorPriority } from '../decision/index.js';
 
 // Behavior module
 import { BehaviorRegistry, type BehaviorHandler } from '../behavior/BehaviorRegistry.js';
@@ -117,16 +117,28 @@ export class AgentBrainSystem implements System {
   ];
 
   private perception: PerceptionProcessor;
-  private decision: DecisionProcessor;
+  private decision: DecisionProcessor | ScheduledDecisionProcessor;
   private behaviors: BehaviorRegistry;
+  private useScheduler: boolean = false;
 
   constructor(
     llmQueue?: LLMDecisionQueue,
     promptBuilder?: PromptBuilder,
-    behaviorRegistry?: BehaviorRegistry
+    behaviorRegistry?: BehaviorRegistry,
+    scheduledProcessor?: ScheduledDecisionProcessor
   ) {
     this.perception = new PerceptionProcessor();
-    this.decision = new DecisionProcessor(llmQueue, promptBuilder);
+
+    // Use ScheduledDecisionProcessor if provided (new scheduler-based approach)
+    if (scheduledProcessor) {
+      this.decision = scheduledProcessor;
+      this.useScheduler = true;
+    } else {
+      // Backward compatible: use DecisionProcessor
+      this.decision = new DecisionProcessor(llmQueue, promptBuilder);
+      this.useScheduler = false;
+    }
+
     this.behaviors = behaviorRegistry ?? new BehaviorRegistry();
 
     // Register default behaviors if using a fresh registry
