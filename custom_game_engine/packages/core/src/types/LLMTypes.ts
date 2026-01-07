@@ -6,6 +6,83 @@
  * interfaces, and core uses them via structural typing.
  */
 
+import type { EntityImpl } from '../ecs/Entity.js';
+import type { World } from '../ecs/World.js';
+
+/**
+ * Decision layer type - determines which LLM behavior layer handles the decision
+ */
+export type DecisionLayer = 'autonomic' | 'talker' | 'executor';
+
+/**
+ * Result of layer selection
+ */
+export interface LayerSelectionResult {
+  layer: DecisionLayer;
+  reason: string;
+}
+
+/**
+ * Result of an LLM decision request
+ */
+export interface LLMDecisionResult {
+  response: string;
+  layer: DecisionLayer;
+  reason: string;
+}
+
+/**
+ * Agent state for scheduler tracking
+ */
+export interface SchedulerAgentState {
+  lastInvocation: Record<DecisionLayer, number>;
+}
+
+/**
+ * Interface for LLM Scheduler - handles layer selection and decision routing
+ */
+export interface LLMScheduler {
+  /**
+   * Request a decision asynchronously
+   */
+  requestDecision(entity: EntityImpl, world: World): Promise<LLMDecisionResult | null>;
+
+  /**
+   * Select which layer should handle this agent's decision
+   */
+  selectLayer(entity: EntityImpl, world: World): LayerSelectionResult;
+
+  /**
+   * Check if a layer is ready (not on cooldown)
+   */
+  isLayerReady(entityId: string, layer: DecisionLayer): boolean;
+
+  /**
+   * Build prompt for a specific layer
+   */
+  buildPrompt(layer: DecisionLayer, entity: EntityImpl, world: World): string;
+
+  /**
+   * Get agent state for cooldown tracking
+   */
+  getAgentState(entityId: string): SchedulerAgentState;
+}
+
+/**
+ * Interface for LLM Decision Queue - manages async LLM requests
+ */
+export interface LLMDecisionQueue {
+  /**
+   * Get a completed decision if available
+   */
+  getDecision(entityId: string): string | null;
+
+  /**
+   * Request a new decision (async, fire-and-forget)
+   */
+  requestDecision(entityId: string, prompt: string, customLLM?: string): Promise<void>;
+}
+
 export interface LLMRequest {
   prompt: string;
   temperature?: number;
