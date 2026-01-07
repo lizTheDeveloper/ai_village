@@ -5,11 +5,14 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import { EntityImpl } from '../ecs/Entity.js';
 import type { ConversationComponent } from '../components/ConversationComponent.js';
-import { isInConversation, endConversation } from '../components/ConversationComponent.js';
+import { isInConversation, endConversation, joinConversation } from '../components/ConversationComponent.js';
 import type { AgentComponent } from '../components/AgentComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import { updateCompositeSocial } from '../components/NeedsComponent.js';
 import type { InterestsComponent } from '../components/InterestsComponent.js';
+import type { PersonalityComponent } from '../components/PersonalityComponent.js';
+import type { VisionComponent } from '../components/VisionComponent.js';
+import type { PositionComponent } from '../components/PositionComponent.js';
 import {
   calculateConversationQuality,
   type ConversationQuality,
@@ -22,16 +25,30 @@ export class CommunicationSystem implements System {
     CT.Conversation,
   ];
 
-  private readonly maxConversationDurationSeconds: number = 15; // 15 seconds of conversation
-  private conversationStartTimes: Map<string, number> = new Map(); // entityId -> real-time start
-
   // Satisfaction amounts for quality-based social need updates
   private static readonly CONTACT_SATISFACTION = 0.3; // Any conversation satisfies contact need
   private static readonly DEPTH_SATISFACTION_MULTIPLIER = 0.4; // Quality-weighted depth satisfaction
   private static readonly BELONGING_SATISFACTION = 0.15; // Group activity satisfaction
   private static readonly TOPIC_SATISFACTION = 0.7; // Satisfaction for discussing a topic
 
+  // Personality-based conversation joining
+  private static readonly MIN_JOIN_RADIUS = 20; // Introverted agents (extraversion = 0) join from 20 tiles
+  private static readonly MAX_JOIN_RADIUS = 30; // Extraverted agents (extraversion = 1) join from 30 tiles
+
   update(_world: World, entities: ReadonlyArray<Entity>, _deltaTime: number): void {
+    // First pass: Check for agents who might want to join conversations based on personality
+    for (const entity of entities) {
+      const impl = entity as EntityImpl;
+      const conversation = impl.getComponent<ConversationComponent>(CT.Conversation);
+
+      // Skip agents already in conversations
+      if (conversation && isInConversation(conversation)) continue;
+
+      // Try to join nearby conversations based on personality
+      this.tryJoinNearbyConversation(impl, _world);
+    }
+
+    // Second pass: Manage active conversations
     for (const entity of entities) {
       const impl = entity as EntityImpl;
       const conversation = impl.getComponent<ConversationComponent>(CT.Conversation);
@@ -41,7 +58,7 @@ export class CommunicationSystem implements System {
       const partnerId = conversation.partnerId;
       if (!partnerId) continue;
 
-      // Check if partner still exists and is nearby
+      // Check if partner still exists
       const partner = _world.getEntity(partnerId);
       if (!partner) {
         // Partner no longer exists, end conversation
@@ -49,60 +66,94 @@ export class CommunicationSystem implements System {
         continue;
       }
 
-      // Track conversation time in real seconds, not ticks
-      if (!this.conversationStartTimes.has(entity.id)) {
-        this.conversationStartTimes.set(entity.id, Date.now());
-      }
+      // Conversations now continue indefinitely until agents explicitly leave via tool call
+      // or partner is removed from the world
+    }
+  }
 
-      const startTime = this.conversationStartTimes.get(entity.id)!;
-      const durationSeconds = (Date.now() - startTime) / 1000;
+  /**
+   * Try to join a nearby conversation based on personality and heard speech.
+   * Extraverted agents will join from farther away than introverted agents.
+   */
+  private tryJoinNearbyConversation(entity: EntityImpl, world: World): void {
+    const personality = entity.getComponent<PersonalityComponent>(CT.Personality);
+    const position = entity.getComponent<PositionComponent>(CT.Position);
+    const vision = entity.getComponent<VisionComponent>(CT.Vision);
 
-      if (durationSeconds > this.maxConversationDurationSeconds) {
-        // Conversation has gone on too long, end it with quality calculation
-        const partnerImpl = partner as EntityImpl;
-        const partnerConversation = partnerImpl.getComponent<ConversationComponent>(CT.Conversation);
+    if (!personality || !position || !vision || !vision.heardSpeech) return;
 
-        // Calculate conversation quality before ending
-        const quality = this.calculateQuality(impl, partnerImpl, conversation);
+    // Calculate join radius based on extraversion (0-1.0 scale)
+    const extraversion = personality.extraversion ?? 0.5; // Default to moderate if missing
+    const joinRadius = CommunicationSystem.MIN_JOIN_RADIUS +
+      (extraversion * (CommunicationSystem.MAX_JOIN_RADIUS - CommunicationSystem.MIN_JOIN_RADIUS));
 
-        // End conversations for both parties
-        this.endConversationForEntity(impl, partnerImpl, _world, durationSeconds, quality);
+    // Check each heard speech to see if speaker is within join radius
+    for (const heardSpeech of vision.heardSpeech) {
+      const speaker = world.getEntity(heardSpeech.speaker);
+      if (!speaker) continue;
 
-        if (partnerConversation) {
-          partnerImpl.updateComponent<ConversationComponent>(CT.Conversation, endConversation);
-          this.conversationStartTimes.delete(partnerId);
+      const speakerPosition = (speaker as EntityImpl).getComponent<PositionComponent>(CT.Position);
+      if (!speakerPosition) continue;
+
+      // Calculate distance to speaker
+      const dx = speakerPosition.x - position.x;
+      const dy = speakerPosition.y - position.y;
+      const distanceSquared = dx * dx + dy * dy;
+      const joinRadiusSquared = joinRadius * joinRadius;
+
+      // If speaker is within join radius, try to join their conversation
+      if (distanceSquared <= joinRadiusSquared) {
+        const speakerConversation = (speaker as EntityImpl).getComponent<ConversationComponent>(CT.Conversation);
+
+        // Only join if speaker is actually in an active conversation
+        if (speakerConversation && isInConversation(speakerConversation)) {
+          this.joinExistingConversation(entity, speaker as EntityImpl, world);
+          break; // Join only one conversation at a time
         }
-
-        // Switch both agents back to wandering
-        this.switchToWandering(impl);
-        this.switchToWandering(partnerImpl);
-
-        // Apply satisfaction based on quality
-        this.applySatisfaction(impl, quality);
-        this.applySatisfaction(partnerImpl, quality);
-
-        // Update topic satisfaction for both participants
-        this.updateTopicSatisfaction(impl, quality, _world);
-        this.updateTopicSatisfaction(partnerImpl, quality, _world);
-
-        // Emit enhanced conversation ended event
-        _world.eventBus.emit({
-          type: 'conversation:ended',
-          source: entity.id,
-          data: {
-            conversationId: `conv-${entity.id}-${partnerId}`,
-            participants: [entity.id, partnerId],
-            agent1: entity.id,
-            agent2: partnerId,
-            duration: durationSeconds,
-            topics: quality.topicsDiscussed,
-            depth: quality.depth,
-            messageCount: conversation.messages.length,
-            quality: quality.overallQuality,
-          },
-        });
       }
     }
+  }
+
+  /**
+   * Join an agent to an existing conversation.
+   */
+  private joinExistingConversation(
+    joiner: EntityImpl,
+    conversationMember: EntityImpl,
+    world: World
+  ): void {
+    const memberConversation = conversationMember.getComponent<ConversationComponent>(CT.Conversation);
+    if (!memberConversation || !isInConversation(memberConversation)) return;
+
+    // Update joiner's conversation component to join
+    joiner.updateComponent<ConversationComponent>(CT.Conversation, (current) =>
+      joinConversation(current, joiner.id)
+    );
+
+    // Update all existing participants to include the new joiner
+    const participantIds = memberConversation.participantIds.length > 0
+      ? memberConversation.participantIds
+      : (memberConversation.partnerId ? [memberConversation.partnerId] : []);
+
+    for (const participantId of participantIds) {
+      const participant = world.getEntity(participantId);
+      if (!participant) continue;
+
+      (participant as EntityImpl).updateComponent<ConversationComponent>(CT.Conversation, (current) =>
+        joinConversation(current, joiner.id)
+      );
+    }
+
+    // Emit event
+    world.eventBus.emit({
+      type: 'conversation:joined',
+      source: joiner.id,
+      data: {
+        conversationId: `conv-${memberConversation.partnerId || participantIds[0]}`,
+        joinerId: joiner.id,
+        participants: [...participantIds, joiner.id],
+      },
+    });
   }
 
   /**
@@ -142,7 +193,6 @@ export class CommunicationSystem implements System {
     const partnerId = conversation?.partnerId;
 
     entity.updateComponent<ConversationComponent>(CT.Conversation, endConversation);
-    this.conversationStartTimes.delete(entity.id);
 
     // Switch agent back to wandering
     this.switchToWandering(entity);

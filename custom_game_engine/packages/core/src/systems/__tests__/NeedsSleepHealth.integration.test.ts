@@ -4,6 +4,7 @@ import { createDawnWorld } from '../../__tests__/fixtures/worldFixtures.js';
 import { NeedsSystem } from '../NeedsSystem.js';
 import { SleepSystem } from '../SleepSystem.js';
 import { TemperatureSystem } from '../TemperatureSystem.js';
+import { StateMutatorSystem } from '../StateMutatorSystem.js';
 import { NeedsComponent } from '../../components/NeedsComponent.js';
 import { createCircadianComponent } from '../../components/CircadianComponent.js';
 
@@ -108,7 +109,12 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     temperature: 1.0,
   })); // 80 hunger
 
+    // Create and wire StateMutatorSystem (required for NeedsSystem)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const needsSystem = new NeedsSystem();
+    needsSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('NeedsSystem', needsSystem);
 
     // Only pass entities with 'needs' component to NeedsSystem
@@ -118,8 +124,11 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     const initialHunger = initialNeeds.hunger;
 
     // Update needs system while sleeping
-    for (let i = 0; i < 10; i++) {
-      needsSystem.update(harness.world, entitiesWithNeeds, 1.0);
+    // NeedsSystem should not register hunger decay deltas during sleep
+    for (let i = 0; i < 5; i++) {
+      harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
+      needsSystem.update(harness.world, entitiesWithNeeds, 60);
+      stateMutator.update(harness.world, entitiesWithNeeds, 60);
     }
 
     const finalNeeds = agent.getComponent(ComponentType.Needs) as any;
@@ -164,7 +173,12 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     temperature: 0.37,
   })); // Full health, normal body temp
 
+    // Create and wire StateMutatorSystem (required for health damage)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
+
     const tempSystem = new TemperatureSystem();
+    tempSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('TemperatureSystem', tempSystem);
 
     const entities = Array.from(harness.world.entities.values());
@@ -172,14 +186,20 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     const initialNeeds = agent.getComponent(ComponentType.Needs) as any;
     const initialHealth = initialNeeds.health;
 
-    // Expose agent to cold for several seconds
-    for (let i = 0; i < 10; i++) {
-      tempSystem.update(harness.world, entities, 1.0);
+    // Expose agent to cold for several game minutes
+    // TemperatureSystem registers delta once per game minute (1200 ticks)
+    // StateMutatorSystem applies deltas once per game minute
+    for (let i = 0; i < 5; i++) {
+      harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
+      tempSystem.update(harness.world, entities, 60); // Update systems (60s = 1 game minute)
+      stateMutator.update(harness.world, entities, 60); // Apply deltas
     }
 
     const finalNeeds = agent.getComponent(ComponentType.Needs) as any;
 
     // Health should have decreased due to dangerous temperature
+    // HEALTH_DAMAGE_RATE = 0.5/sec → -30/game minute
+    // After 5 game minutes: health should be significantly lower
     expect(finalNeeds.health).toBeLessThan(initialHealth);
   });
 
@@ -301,10 +321,16 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     temperature: 1.0,
   }));
 
-    const needsSystem = new NeedsSystem();
-    const tempSystem = new TemperatureSystem();
+    // Create and wire StateMutatorSystem (required for batched updates)
+    const stateMutator = new StateMutatorSystem();
+    harness.registerSystem('StateMutatorSystem', stateMutator);
 
+    const needsSystem = new NeedsSystem();
+    needsSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('NeedsSystem', needsSystem);
+
+    const tempSystem = new TemperatureSystem();
+    tempSystem.setStateMutatorSystem(stateMutator);
     harness.registerSystem('TemperatureSystem', tempSystem);
 
     // Filter entities by required components for each system
@@ -314,10 +340,12 @@ describe('NeedsSystem + SleepSystem + TemperatureSystem Integration', () => {
     const initialNeeds = agent.getComponent(ComponentType.Needs) as any;
     const initialEnergy = initialNeeds.energy;
 
-    // Update both systems
-    for (let i = 0; i < 10; i++) {
-      tempSystem.update(harness.world, entitiesWithTemperature, 1.0);
-      needsSystem.update(harness.world, entitiesWithNeeds, 1.0);
+    // Update both systems over several game minutes
+    for (let i = 0; i < 5; i++) {
+      harness.world.setTick(harness.world.tick + 1200); // Advance 1 game minute
+      tempSystem.update(harness.world, entitiesWithTemperature, 60);
+      needsSystem.update(harness.world, entitiesWithNeeds, 60);
+      stateMutator.update(harness.world, entitiesWithNeeds, 60); // Apply deltas
     }
 
     const finalNeeds = agent.getComponent(ComponentType.Needs) as any;

@@ -9,6 +9,7 @@ import type { PositionComponent } from '../components/PositionComponent.js';
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { BuildingComponent } from '../components/BuildingComponent.js';
 import type { WeatherComponent } from '../components/WeatherComponent.js';
+import type { StateMutatorSystem } from './StateMutatorSystem.js';
 import {
   HEALTH_DAMAGE_RATE,
   WORLD_TEMP_BASE,
@@ -52,8 +53,9 @@ export class TemperatureSystem implements System {
    * Systems that must run before this one.
    * @see TimeSystem - provides time of day for daily temperature cycles
    * @see WeatherSystem - provides weather modifiers (tempModifier) affecting ambient temperature
+   * @see StateMutatorSystem - handles batched health damage from temperature
    */
-  public readonly dependsOn = ['time', 'weather'] as const;
+  public readonly dependsOn = ['time', 'weather', 'state_mutator'] as const;
 
   private readonly HEALTH_DAMAGE_RATE = HEALTH_DAMAGE_RATE; // Health damage per second in dangerous temps
   private readonly BASE_TEMP = WORLD_TEMP_BASE; // Default world temperature in °C
@@ -74,6 +76,19 @@ export class TemperatureSystem implements System {
   private tileInsulationCacheLastUpdate: number = 0;
   private readonly TILE_CACHE_DURATION = 50; // Refresh every 50 ticks (walls don't change often)
 
+  // StateMutatorSystem integration for batched health damage
+  private stateMutator: StateMutatorSystem | null = null;
+  private lastDeltaUpdateTick = 0;
+  private readonly DELTA_UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
+  private deltaCleanups = new Map<string, () => void>();
+
+  /**
+   * Set the StateMutatorSystem reference (called during system registration)
+   */
+  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
+    this.stateMutator = stateMutator;
+  }
+
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     // Calculate world ambient temperature (uses cached time entity)
     this.currentWorldTemp = this.calculateWorldTemperature(world);
@@ -92,6 +107,10 @@ export class TemperatureSystem implements System {
       this.tileInsulationCache.clear();
       this.tileInsulationCacheLastUpdate = world.tick;
     }
+
+    // Check if we should update deltas (once per game minute)
+    const currentTick = world.tick;
+    const shouldUpdateDeltas = currentTick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
 
     // Filter entities with required components
     const temperatureEntities = entities.filter(e =>
@@ -168,28 +187,15 @@ export class TemperatureSystem implements System {
       // Check for state transitions and emit events
       this.checkTemperatureEvents(world, entity, updatedTemp);
 
-      // Apply health damage if in dangerous temperature
-      if (updatedTemp.state === 'dangerously_cold' || updatedTemp.state === 'dangerously_hot') {
-        const needsComp = impl.getComponent<NeedsComponent>(CT.Needs);
-        if (needsComp) {
-          const healthLoss = this.HEALTH_DAMAGE_RATE * deltaTime;
-          const newHealth = Math.max(0, needsComp.health - healthLoss);
-
-          // Direct mutation for class-based components
-          needsComp.health = newHealth;
-
-          // Emit critical health event if health drops below 20%
-          if (newHealth < HEALTH_CRITICAL && needsComp.health >= HEALTH_CRITICAL) {
-            world.eventBus.emit({
-              type: 'agent:health_critical',
-              source: entity.id,
-              data: { agentId: entity.id,
-            entityId: entity.id,
-            health: newHealth },
-            });
-          }
-        }
+      // Update health damage deltas once per game minute
+      if (shouldUpdateDeltas) {
+        this.updateTemperatureDeltas(entity.id, updatedTemp.state);
       }
+    }
+
+    // Mark delta rates as updated
+    if (shouldUpdateDeltas) {
+      this.lastDeltaUpdateTick = currentTick;
     }
   }
 
@@ -444,6 +450,45 @@ export class TemperatureSystem implements System {
       return 'hot';
     }
     return 'comfortable';
+  }
+
+  /**
+   * Update temperature-based health damage deltas.
+   * Called once per game minute to register/update delta rates with StateMutatorSystem.
+   */
+  private updateTemperatureDeltas(
+    entityId: string,
+    temperatureState: TemperatureComponent['state']
+  ): void {
+    if (!this.stateMutator) {
+      throw new Error('[TemperatureSystem] StateMutatorSystem not set - call setStateMutatorSystem() during initialization');
+    }
+
+    // Clean up old delta if it exists
+    if (this.deltaCleanups.has(entityId)) {
+      this.deltaCleanups.get(entityId)!();
+      this.deltaCleanups.delete(entityId);
+    }
+
+    // Only register delta if in dangerous temperature
+    if (temperatureState === 'dangerously_cold' || temperatureState === 'dangerously_hot') {
+      // Convert HEALTH_DAMAGE_RATE (per second) to per game minute
+      // Game time: 1 real second = ~1.2 game minutes (at 20 TPS with 600s day length)
+      // So HEALTH_DAMAGE_RATE per real second = HEALTH_DAMAGE_RATE * 60 per game minute
+      const healthDamagePerMinute = -(this.HEALTH_DAMAGE_RATE * 60);
+
+      const cleanup = this.stateMutator.registerDelta({
+        entityId,
+        componentType: CT.Needs,
+        field: 'health',
+        deltaPerMinute: healthDamagePerMinute,
+        min: 0,
+        max: 100,
+        source: `temperature_damage_${temperatureState}`,
+      });
+
+      this.deltaCleanups.set(entityId, cleanup);
+    }
   }
 
   /**

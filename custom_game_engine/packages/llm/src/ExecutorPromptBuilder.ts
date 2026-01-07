@@ -314,9 +314,9 @@ export class ExecutorPromptBuilder {
           if (!resource) continue;
 
           const resourceComp = resource.components.get('resource') as any;
-          if (resourceComp?.type) {
-            const currentCount = resourceCounts.get(resourceComp.type) || 0;
-            resourceCounts.set(resourceComp.type, currentCount + 1);
+          if (resourceComp?.resourceType) {
+            const currentCount = resourceCounts.get(resourceComp.resourceType) || 0;
+            resourceCounts.set(resourceComp.resourceType, currentCount + 1);
           }
         }
       }

@@ -344,15 +344,19 @@ export function registerAllSystems(
   // ============================================================================
   gameLoop.systemRegistry.register(new TimeSystem());
   gameLoop.systemRegistry.register(new WeatherSystem());
-  gameLoop.systemRegistry.register(new TemperatureSystem());
 
   const soilSystem = new SoilSystem();
   gameLoop.systemRegistry.register(soilSystem);
 
   // StateMutatorSystem - Batched vector updates (priority 5, runs before most systems)
-  // Used by: NeedsSystem, BuildingMaintenanceSystem, AnimalSystem, etc.
+  // Used by: NeedsSystem, BuildingMaintenanceSystem, AnimalSystem, PlantSystem, TemperatureSystem, etc.
   const stateMutator = new StateMutatorSystem();
   gameLoop.systemRegistry.register(stateMutator);
+
+  // TemperatureSystem - Uses StateMutatorSystem for batched temperature damage
+  const temperatureSystem = new TemperatureSystem();
+  temperatureSystem.setStateMutatorSystem(stateMutator);
+  gameLoop.systemRegistry.register(temperatureSystem);
 
   // ============================================================================
   // RENDERING
@@ -429,7 +433,12 @@ export function registerAllSystems(
   gameLoop.systemRegistry.register(needsSystem);
 
   gameLoop.systemRegistry.register(new MoodSystem());
-  gameLoop.systemRegistry.register(new SleepSystem());
+
+  // SleepSystem - Uses StateMutatorSystem for batched sleep drive and energy recovery
+  const sleepSystem = new SleepSystem();
+  sleepSystem.setStateMutatorSystem(stateMutator);
+  gameLoop.systemRegistry.register(sleepSystem);
+
   gameLoop.systemRegistry.register(new SteeringSystem());
 
   // ============================================================================
@@ -591,7 +600,9 @@ export function registerAllSystems(
   // ============================================================================
   // BODY & REPRODUCTION
   // ============================================================================
-  gameLoop.systemRegistry.register(new BodySystem());
+  const bodySystem = new BodySystem();
+  bodySystem.setStateMutatorSystem(stateMutator);
+  gameLoop.systemRegistry.register(bodySystem);
   gameLoop.systemRegistry.register(new EquipmentSystem());
   gameLoop.systemRegistry.register(new ReproductionSystem());
   gameLoop.systemRegistry.register(new CourtshipSystem());

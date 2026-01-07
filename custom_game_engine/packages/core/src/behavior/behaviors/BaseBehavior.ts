@@ -180,11 +180,15 @@ export abstract class BaseBehavior implements IBehavior {
 
     if (distance === 0) {
       this.stopAllMovement(entity);
+      this.stopMovement(entity); // Clear movement target
       return 0;
     }
 
     const baseSpeed = options.speed ?? movement.speed;
     const arrivalDistance = options.arrivalDistance ?? 1.5;
+
+    // Set movement target so navigation UI can display it
+    this.setMovementTarget(entity, targetPos, baseSpeed);
 
     // Hysteresis: if already stopped and within arrival zone, stay stopped
     // Only start moving again if we've drifted significantly outside (arrivalDistance + 0.5)
@@ -199,6 +203,7 @@ export abstract class BaseBehavior implements IBehavior {
     // If within arrival distance, stop immediately
     if (distance <= arrivalDistance) {
       this.stopAllMovement(entity);
+      this.stopMovement(entity); // Clear movement target
       return distance;
     }
 

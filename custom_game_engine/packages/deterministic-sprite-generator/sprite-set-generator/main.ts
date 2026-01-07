@@ -3,7 +3,7 @@
  * Generates consistent sprite part libraries with visual feedback
  */
 
-import { ART_STYLES, type ArtStyle } from '../src/artStyles.js';
+import { ART_STYLES, type ArtStyle, type ArtStyleConfig } from '../src/artStyles.js';
 
 // Configuration from environment
 const API_KEY = import.meta.env.VITE_PIXELLAB_API_KEY || '';
@@ -18,8 +18,16 @@ interface PartSpec {
   tags: string[];
 }
 
+interface SubStyleReference {
+  id: string;
+  imageUrl: string;
+  name: string;
+  createdAt: number;
+}
+
 interface GenerationState {
   artStyle: ArtStyle;
+  subStyle: string | null;  // User-defined sub-style name (e.g., "Fantasy", "Sci-Fi")
   referenceId: string | null;
   referenceImageUrl: string | null;
   parts: PartSpec[];
@@ -27,6 +35,8 @@ interface GenerationState {
   currentPartIndex: number;
   isGenerating: boolean;
   isPaused: boolean;
+  // Sub-style storage: "${artStyle}_${subStyle}" -> reference
+  storedReferences: Map<string, SubStyleReference>;
 }
 
 interface PartVersion {
@@ -35,9 +45,13 @@ interface PartVersion {
   active: boolean;
 }
 
+// Custom art styles (user-created)
+const customArtStyles: Record<string, ArtStyleConfig> = {};
+
 // Global state
 const state: GenerationState = {
   artStyle: 'snes',
+  subStyle: null,
   referenceId: null,
   referenceImageUrl: null,
   parts: [],
@@ -45,15 +59,20 @@ const state: GenerationState = {
   currentPartIndex: 0,
   isGenerating: false,
   isPaused: false,
+  storedReferences: new Map(),
 };
 
 // DOM Elements
 const stepStyle = document.getElementById('step-style')!;
+const stepSubStyle = document.getElementById('step-substyle')!;
 const stepReference = document.getElementById('step-reference')!;
 const stepGeneration = document.getElementById('step-generation')!;
 const stepReview = document.getElementById('step-review')!;
 
-const btnGenerateReference = document.getElementById('btn-generate-reference') as HTMLButtonElement;
+const btnSelectArtStyle = document.getElementById('btn-select-artstyle') as HTMLButtonElement;
+const subStyleInput = document.getElementById('substyle-input') as HTMLInputElement;
+const subStyleList = document.getElementById('substyle-list')!;
+const btnCreateSubStyle = document.getElementById('btn-create-substyle') as HTMLButtonElement;
 const btnRegenerateReference = document.getElementById('btn-regenerate-reference') as HTMLButtonElement;
 const btnApproveReference = document.getElementById('btn-approve-reference') as HTMLButtonElement;
 const btnStartGeneration = document.getElementById('btn-start-generation') as HTMLButtonElement;
@@ -92,7 +111,7 @@ async function apiRequest(endpoint: string, method: string = 'GET', body?: any):
   return response.json();
 }
 
-async function generateImagePixflux(description: string, width: number, height: number, initImage?: string): Promise<string> {
+async function generateImagePixflux(description: string, width: number, height: number, initImage?: string, isReferenceCharacter: boolean = false): Promise<string> {
   const requestBody: any = {
     description,
     image_size: { width, height },
@@ -107,7 +126,9 @@ async function generateImagePixflux(description: string, width: number, height: 
       type: 'base64',
       base64: initImage,
     };
-    requestBody.init_image_strength = 300;
+    // For reference character, no init image needed (generating from scratch)
+    // For parts, use LOW strength to match style without copying
+    requestBody.init_image_strength = isReferenceCharacter ? 0 : 120;
   }
 
   const result = await apiRequest('/generate-image-pixflux', 'POST', requestBody);
@@ -115,13 +136,70 @@ async function generateImagePixflux(description: string, width: number, height: 
 }
 
 // =======================
+// Custom Art Styles Management
+// =======================
+
+function loadCustomArtStyles() {
+  const stored = localStorage.getItem('sprite-wizard-custom-styles');
+  if (!stored) return;
+
+  try {
+    const data = JSON.parse(stored);
+    Object.assign(customArtStyles, data);
+  } catch (error) {
+    console.error('Failed to load custom art styles:', error);
+  }
+}
+
+function saveCustomArtStyles() {
+  localStorage.setItem('sprite-wizard-custom-styles', JSON.stringify(customArtStyles));
+}
+
+function getAllArtStyles(): Record<string, ArtStyleConfig> {
+  return { ...ART_STYLES, ...customArtStyles };
+}
+
+function renderStyleGrid() {
+  const styleGrid = document.getElementById('style-grid')!;
+  styleGrid.innerHTML = '';
+
+  const allStyles = getAllArtStyles();
+
+  Object.entries(allStyles).forEach(([styleId, config]) => {
+    const card = document.createElement('div');
+    card.className = 'style-card';
+    if (styleId === state.artStyle) card.classList.add('selected');
+    card.setAttribute('data-style', styleId);
+
+    const isCustom = !ART_STYLES[styleId as ArtStyle];
+
+    card.innerHTML = `
+      <div class="style-preview"></div>
+      <h3>${config.era}</h3>
+      <p>${config.baseSizes.min}-${config.baseSizes.max}px • ${config.colorDepth}</p>
+      <span class="era">${config.description.substring(0, 50)}...</span>
+      ${isCustom ? '<span class="custom-badge">Custom</span>' : ''}
+    `;
+
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      state.artStyle = styleId as ArtStyle;
+    });
+
+    styleGrid.appendChild(card);
+  });
+}
+
+// =======================
 // Wizard Flow
 // =======================
 
-function showStep(step: 'style' | 'reference' | 'generation' | 'review') {
-  [stepStyle, stepReference, stepGeneration, stepReview].forEach(el => el.classList.remove('active'));
+function showStep(step: 'style' | 'substyle' | 'reference' | 'generation' | 'review') {
+  [stepStyle, stepSubStyle, stepReference, stepGeneration, stepReview].forEach(el => el.classList.remove('active'));
 
   if (step === 'style') stepStyle.classList.add('active');
+  else if (step === 'substyle') stepSubStyle.classList.add('active');
   else if (step === 'reference') stepReference.classList.add('active');
   else if (step === 'generation') stepGeneration.classList.add('active');
   else if (step === 'review') stepReview.classList.add('active');
@@ -131,27 +209,182 @@ function showStep(step: 'style' | 'reference' | 'generation' | 'review') {
 // Step 1: Art Style Selection
 // =======================
 
-document.querySelectorAll('.style-card').forEach(card => {
-  card.addEventListener('click', () => {
-    document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
-    card.classList.add('selected');
-    state.artStyle = card.getAttribute('data-style') as ArtStyle;
-  });
+// Custom style creation UI
+const btnShowCreateStyle = document.getElementById('btn-show-create-style') as HTMLButtonElement;
+const btnCancelCreateStyle = document.getElementById('btn-cancel-create-style') as HTMLButtonElement;
+const btnSaveCustomStyle = document.getElementById('btn-save-custom-style') as HTMLButtonElement;
+const customStyleForm = document.getElementById('custom-style-form')!;
+const customStyleName = document.getElementById('custom-style-name') as HTMLInputElement;
+const customStyleDescription = document.getElementById('custom-style-description') as HTMLInputElement;
+const customStyleSizeMin = document.getElementById('custom-style-size-min') as HTMLInputElement;
+const customStyleSizeMax = document.getElementById('custom-style-size-max') as HTMLInputElement;
+
+btnShowCreateStyle.addEventListener('click', () => {
+  customStyleForm.style.display = 'block';
+  btnShowCreateStyle.style.display = 'none';
 });
 
-btnGenerateReference.addEventListener('click', async () => {
-  showStep('reference');
-  referenceLoading.style.display = 'block';
-  referenceCanvas.style.display = 'none';
+btnCancelCreateStyle.addEventListener('click', () => {
+  customStyleForm.style.display = 'none';
+  btnShowCreateStyle.style.display = 'inline-block';
+  // Reset form
+  customStyleName.value = '';
+  customStyleDescription.value = '';
+  customStyleSizeMin.value = '32';
+  customStyleSizeMax.value = '64';
+});
 
-  try {
-    await generateReferenceCharacter();
-  } catch (error) {
-    console.error('Failed to generate reference:', error);
-    alert(`Failed to generate reference: ${error}`);
-    showStep('style');
+btnSaveCustomStyle.addEventListener('click', () => {
+  const name = customStyleName.value.trim();
+  const description = customStyleDescription.value.trim();
+  const sizeMin = parseInt(customStyleSizeMin.value) || 32;
+  const sizeMax = parseInt(customStyleSizeMax.value) || 64;
+
+  if (!name || !description) {
+    alert('Please provide both a name and description for the custom style');
+    return;
+  }
+
+  const styleId = name.toLowerCase().replace(/\s+/g, '_');
+
+  if (ART_STYLES[styleId as ArtStyle] || customArtStyles[styleId]) {
+    alert(`A style with ID "${styleId}" already exists`);
+    return;
+  }
+
+  // Create custom art style
+  customArtStyles[styleId] = {
+    era: name,
+    description,
+    baseSizes: { min: sizeMin, max: sizeMax },
+    colorDepth: 'Custom',
+    shadingStyle: 'medium shading',
+    outlineStyle: 'selective outline',
+    partsDirectory: `assets/parts/${styleId}/`,
+  };
+
+  saveCustomArtStyles();
+  renderStyleGrid();
+
+  // Hide form and reset
+  customStyleForm.style.display = 'none';
+  btnShowCreateStyle.style.display = 'inline-block';
+  customStyleName.value = '';
+  customStyleDescription.value = '';
+  customStyleSizeMin.value = '32';
+  customStyleSizeMax.value = '64';
+
+  // Select the new style
+  state.artStyle = styleId as ArtStyle;
+  document.querySelector(`.style-card[data-style="${styleId}"]`)?.classList.add('selected');
+
+  alert(`✅ Custom art style "${name}" created!`);
+});
+
+btnSelectArtStyle.addEventListener('click', () => {
+  // Load existing sub-styles for this art style
+  loadStoredReferences();
+  renderSubStyleList();
+
+  // Update UI with selected art style name from config
+  const allStyles = getAllArtStyles();
+  const styleConfig = allStyles[state.artStyle];
+  document.getElementById('selected-artstyle-name')!.textContent = styleConfig?.era || state.artStyle;
+
+  showStep('substyle');
+});
+
+async function createNewSubStyle() {
+  const subStyleName = subStyleInput.value.trim();
+
+  if (!subStyleName) {
+    alert('Please enter a sub-style name');
+    return;
+  }
+
+  // Check if sub-style already exists
+  const key = `${state.artStyle}_${subStyleName}`;
+  if (state.storedReferences.has(key)) {
+    alert(`Sub-style "${subStyleName}" already exists for ${state.artStyle}. Click it to select instead.`);
+    return;
+  }
+
+  state.subStyle = subStyleName;
+  document.getElementById('current-substyle-name')!.textContent = `${state.artStyle.toUpperCase()} - ${subStyleName}`;
+
+  // Skip reference character - go straight to part generation
+  // First torso will establish the style
+  initializePartsList();
+  showStep('generation');
+}
+
+btnCreateSubStyle.addEventListener('click', createNewSubStyle);
+
+// Allow Enter key to create sub-style
+subStyleInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    createNewSubStyle();
   }
 });
+
+// Removed old btnGenerateReference - now using btnCreateSubStyle
+
+// =======================
+// Sub-Style Management
+// =======================
+
+function loadStoredReferences() {
+  const stored = localStorage.getItem('sprite-wizard-references');
+  if (!stored) return;
+
+  try {
+    const data = JSON.parse(stored);
+    state.storedReferences = new Map(Object.entries(data));
+  } catch (error) {
+    console.error('Failed to load stored references:', error);
+  }
+}
+
+function saveStoredReferences() {
+  const data = Object.fromEntries(state.storedReferences);
+  localStorage.setItem('sprite-wizard-references', JSON.stringify(data));
+}
+
+function renderSubStyleList() {
+  subStyleList.innerHTML = '';
+
+  const substyles = Array.from(state.storedReferences.entries())
+    .filter(([key]) => key.startsWith(`${state.artStyle}_`))
+    .map(([key, ref]) => ({ key, ref }));
+
+  if (substyles.length === 0) {
+    subStyleList.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">No sub-styles yet. Create one below!</p>';
+    return;
+  }
+
+  substyles.forEach(({ key, ref }) => {
+    const card = document.createElement('div');
+    card.className = 'substyle-card';
+    card.innerHTML = `
+      <img src="${ref.imageUrl}" alt="${ref.name}" />
+      <h4>${ref.name}</h4>
+      <p class="date">Created ${new Date(ref.createdAt).toLocaleDateString()}</p>
+    `;
+
+    card.addEventListener('click', () => {
+      // Select existing sub-style
+      state.subStyle = ref.name;
+
+      document.getElementById('current-substyle-name')!.textContent = `${state.artStyle.toUpperCase()} - ${ref.name}`;
+
+      // Skip reference character - go straight to part generation
+      initializePartsList();
+      showStep('generation');
+    });
+
+    subStyleList.appendChild(card);
+  });
+}
 
 async function generateReferenceCharacter() {
   const artConfig = ART_STYLES[state.artStyle];
@@ -176,6 +409,19 @@ async function generateReferenceCharacter() {
 
   // Store reference
   state.referenceImageUrl = `data:image/png;base64,${base64}`;
+  state.referenceId = `ref_${Date.now()}`;
+
+  // Save to localStorage if sub-style is set
+  if (state.subStyle) {
+    const key = `${state.artStyle}_${state.subStyle}`;
+    state.storedReferences.set(key, {
+      id: state.referenceId,
+      imageUrl: state.referenceImageUrl,
+      name: state.subStyle,
+      createdAt: Date.now(),
+    });
+    saveStoredReferences();
+  }
 
   // Initialize parts list
   initializePartsList();
@@ -203,33 +449,36 @@ function initializePartsList() {
 
   // Generate parts list for modular sprite composition system
   // Each part is designed to be layered and combined with other parts
-  state.parts = [
-    // Human heads (8) - For sprite composition system
-    { id: 'head_round_pale', category: 'head', description: `${artConfig.description}, modular sprite part for composition system, ONLY an isolated human head, round face shape, pale skin tone, front-facing view, neutral expression, bald with no hair, detached head only for layering`, width: baseSize, height: baseSize, tags: ['round', 'pale'] },
-    { id: 'head_round_tan', category: 'head', description: `${artConfig.description}, modular sprite part for composition system, ONLY an isolated human head, round face shape, tan skin tone, front-facing view, smiling expression, bald with no hair, detached head only for layering`, width: baseSize, height: baseSize, tags: ['round', 'tan'] },
-    { id: 'head_round_dark', category: 'head', description: `${artConfig.description}, modular sprite part for composition system, ONLY an isolated human head, round face shape, dark brown skin tone, front-facing view, serious expression, bald with no hair, detached head only for layering`, width: baseSize, height: baseSize, tags: ['round', 'dark'] },
-    { id: 'head_square_pale', category: 'head', description: `${artConfig.description}, modular sprite part for composition system, ONLY an isolated human head, square jaw face shape, pale skin tone, front-facing view, stern expression, bald with no hair, detached head only for layering`, width: baseSize, height: baseSize, tags: ['square', 'pale'] },
-    { id: 'head_square_tan', category: 'head', description: `${artConfig.description}, modular sprite part for composition system, ONLY an isolated human head, square jaw face shape, tan skin tone, front-facing view, confident expression, bald with no hair, detached head only for layering`, width: baseSize, height: baseSize, tags: ['square', 'tan'] },
-    { id: 'head_oval_pale', category: 'head', description: `${artConfig.description}, modular sprite part for composition system, ONLY an isolated human head, oval face shape, pale skin tone, front-facing view, gentle smile, bald with no hair, detached head only for layering`, width: baseSize, height: baseSize, tags: ['oval', 'pale'] },
-    { id: 'head_oval_dark', category: 'head', description: `${artConfig.description}, modular sprite part for composition system, ONLY an isolated human head, oval face shape, dark skin tone, front-facing view, wise expression, bald with no hair, detached head only for layering`, width: baseSize, height: baseSize, tags: ['oval', 'dark'] },
-    { id: 'head_angular_pale', category: 'head', description: `${artConfig.description}, modular sprite part for composition system, ONLY an isolated human head, angular face shape, pale skin tone, front-facing view, intense expression, bald with no hair, detached head only for layering`, width: baseSize, height: baseSize, tags: ['angular', 'pale'] },
+  // Detailed style guidance from art config
+  const styleGuide = `${artConfig.description}, ${artConfig.colorDepth} palette, ${artConfig.shadingStyle}, ${artConfig.outlineStyle}, pixel art style from ${artConfig.era}`;
 
-    // Torso/Body (5) - ONLY chest and waist, no arms or legs
-    { id: 'torso_athletic', category: 'torso', description: `${artConfig.description}, modular sprite part for composition system, ONLY a human torso (chest and waist), athletic muscular build, standing pose, neck opening at top for head attachment, shoulder stumps for arm attachment, waist opening at bottom for leg attachment, no head, no arms, no legs`, width: baseSize, height: baseSize, tags: ['athletic'] },
-    { id: 'torso_stocky', category: 'torso', description: `${artConfig.description}, modular sprite part for composition system, ONLY a human torso (chest and waist), stocky broad build, standing pose, neck opening at top for head attachment, shoulder stumps for arm attachment, waist opening at bottom for leg attachment, no head, no arms, no legs`, width: baseSize, height: baseSize, tags: ['stocky'] },
-    { id: 'torso_thin', category: 'torso', description: `${artConfig.description}, modular sprite part for composition system, ONLY a human torso (chest and waist), thin lanky build, standing pose, neck opening at top for head attachment, shoulder stumps for arm attachment, waist opening at bottom for leg attachment, no head, no arms, no legs`, width: baseSize, height: baseSize, tags: ['thin'] },
-    { id: 'torso_average', category: 'torso', description: `${artConfig.description}, modular sprite part for composition system, ONLY a human torso (chest and waist), average build, standing pose, neck opening at top for head attachment, shoulder stumps for arm attachment, waist opening at bottom for leg attachment, no head, no arms, no legs`, width: baseSize, height: baseSize, tags: ['average'] },
-    { id: 'torso_heavy', category: 'torso', description: `${artConfig.description}, modular sprite part for composition system, ONLY a human torso (chest and waist), heavy-set build, standing pose, neck opening at top for head attachment, shoulder stumps for arm attachment, waist opening at bottom for leg attachment, no head, no arms, no legs`, width: baseSize, height: baseSize, tags: ['heavy'] },
+  state.parts = [
+    // TORSO FIRST - This becomes the style reference for all other parts
+    { id: 'torso_average', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part for composition system, ONLY a human torso (chest and waist area), average build, simple shirt or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['average'] },
+    { id: 'torso_athletic', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part for composition system, ONLY a human torso (chest and waist area), athletic muscular build, simple shirt or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['athletic'] },
+    { id: 'torso_stocky', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part for composition system, ONLY a human torso (chest and waist area), stocky broad build, simple shirt or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['stocky'] },
+    { id: 'torso_thin', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part for composition system, ONLY a human torso (chest and waist area), thin lanky build, simple shirt or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['thin'] },
+    { id: 'torso_heavy', category: 'torso', description: `bare torso body part only, no head, no arms, no legs, ${styleGuide}, modular sprite part for composition system, ONLY a human torso (chest and waist area), heavy-set build, simple shirt or tunic, neck opening at top, shoulder stumps for arm attachment, waist opening at bottom, isolated torso piece for layering`, width: baseSize, height: baseSize, tags: ['heavy'] },
+
+    // Human heads (8) - Generated after torso for style matching
+    { id: 'head_round_pale', category: 'head', description: `detached head only, no body, no neck, no torso, ${styleGuide}, modular sprite part, ONLY an isolated human head, round face shape, pale skin tone, front-facing view, neutral expression, bald with no hair, isolated head piece for layering`, width: baseSize, height: baseSize, tags: ['round', 'pale'] },
+    { id: 'head_round_tan', category: 'head', description: `detached head only, no body, no neck, no torso, ${styleGuide}, modular sprite part, ONLY an isolated human head, round face shape, tan skin tone, front-facing view, smiling expression, bald with no hair, isolated head piece for layering`, width: baseSize, height: baseSize, tags: ['round', 'tan'] },
+    { id: 'head_round_dark', category: 'head', description: `detached head only, no body, no neck, no torso, ${styleGuide}, modular sprite part, ONLY an isolated human head, round face shape, dark brown skin tone, front-facing view, serious expression, bald with no hair, isolated head piece for layering`, width: baseSize, height: baseSize, tags: ['round', 'dark'] },
+    { id: 'head_square_pale', category: 'head', description: `detached head only, no body, no neck, no torso, ${styleGuide}, modular sprite part, ONLY an isolated human head, square jaw face shape, pale skin tone, front-facing view, stern expression, bald with no hair, isolated head piece for layering`, width: baseSize, height: baseSize, tags: ['square', 'pale'] },
+    { id: 'head_square_tan', category: 'head', description: `detached head only, no body, no neck, no torso, ${styleGuide}, modular sprite part, ONLY an isolated human head, square jaw face shape, tan skin tone, front-facing view, confident expression, bald with no hair, isolated head piece for layering`, width: baseSize, height: baseSize, tags: ['square', 'tan'] },
+    { id: 'head_oval_pale', category: 'head', description: `detached head only, no body, no neck, no torso, ${styleGuide}, modular sprite part, ONLY an isolated human head, oval face shape, pale skin tone, front-facing view, gentle smile, bald with no hair, isolated head piece for layering`, width: baseSize, height: baseSize, tags: ['oval', 'pale'] },
+    { id: 'head_oval_dark', category: 'head', description: `detached head only, no body, no neck, no torso, ${styleGuide}, modular sprite part, ONLY an isolated human head, oval face shape, dark skin tone, front-facing view, wise expression, bald with no hair, isolated head piece for layering`, width: baseSize, height: baseSize, tags: ['oval', 'dark'] },
+    { id: 'head_angular_pale', category: 'head', description: `detached head only, no body, no neck, no torso, ${styleGuide}, modular sprite part, ONLY an isolated human head, angular face shape, pale skin tone, front-facing view, intense expression, bald with no hair, isolated head piece for layering`, width: baseSize, height: baseSize, tags: ['angular', 'pale'] },
 
     // Arms (4) - Left and right, different poses
-    { id: 'arm_left_relaxed', category: 'arm', description: `${artConfig.description}, modular sprite part for composition system, ONLY a detached left arm, relaxed pose hanging down, shoulder socket at top for torso attachment, hand at bottom, isolated limb for layering`, width: Math.floor(baseSize * 0.6), height: Math.floor(baseSize * 1.2), tags: ['left', 'relaxed'] },
-    { id: 'arm_right_relaxed', category: 'arm', description: `${artConfig.description}, modular sprite part for composition system, ONLY a detached right arm, relaxed pose hanging down, shoulder socket at top for torso attachment, hand at bottom, isolated limb for layering`, width: Math.floor(baseSize * 0.6), height: Math.floor(baseSize * 1.2), tags: ['right', 'relaxed'] },
-    { id: 'arm_left_bent', category: 'arm', description: `${artConfig.description}, modular sprite part for composition system, ONLY a detached left arm, bent at elbow pose, shoulder socket at top for torso attachment, hand pointing forward, isolated limb for layering`, width: Math.floor(baseSize * 0.6), height: Math.floor(baseSize * 1.2), tags: ['left', 'bent'] },
-    { id: 'arm_right_bent', category: 'arm', description: `${artConfig.description}, modular sprite part for composition system, ONLY a detached right arm, bent at elbow pose, shoulder socket at top for torso attachment, hand pointing forward, isolated limb for layering`, width: Math.floor(baseSize * 0.6), height: Math.floor(baseSize * 1.2), tags: ['right', 'bent'] },
+    { id: 'arm_left_relaxed', category: 'arm', description: `detached arm only, no body, no torso, ${styleGuide}, modular sprite part, ONLY a single left arm, relaxed pose hanging down, shoulder socket at top, hand at bottom, isolated arm piece for layering`, width: Math.floor(baseSize * 0.6), height: Math.floor(baseSize * 1.2), tags: ['left', 'relaxed'] },
+    { id: 'arm_right_relaxed', category: 'arm', description: `detached arm only, no body, no torso, ${styleGuide}, modular sprite part, ONLY a single right arm, relaxed pose hanging down, shoulder socket at top, hand at bottom, isolated arm piece for layering`, width: Math.floor(baseSize * 0.6), height: Math.floor(baseSize * 1.2), tags: ['right', 'relaxed'] },
+    { id: 'arm_left_bent', category: 'arm', description: `detached arm only, no body, no torso, ${styleGuide}, modular sprite part, ONLY a single left arm, bent at elbow pose, shoulder socket at top, hand pointing forward, isolated arm piece for layering`, width: Math.floor(baseSize * 0.6), height: Math.floor(baseSize * 1.2), tags: ['left', 'bent'] },
+    { id: 'arm_right_bent', category: 'arm', description: `detached arm only, no body, no torso, ${styleGuide}, modular sprite part, ONLY a single right arm, bent at elbow pose, shoulder socket at top, hand pointing forward, isolated arm piece for layering`, width: Math.floor(baseSize * 0.6), height: Math.floor(baseSize * 1.2), tags: ['right', 'bent'] },
 
     // Legs (2) - Standing pose
-    { id: 'legs_standing', category: 'legs', description: `${artConfig.description}, modular sprite part for composition system, ONLY a pair of human legs, standing pose, waist connection at top for torso attachment, feet at bottom, no torso, isolated lower body for layering`, width: baseSize, height: Math.floor(baseSize * 1.2), tags: ['standing'] },
-    { id: 'legs_walking', category: 'legs', description: `${artConfig.description}, modular sprite part for composition system, ONLY a pair of human legs, walking pose with one leg forward, waist connection at top for torso attachment, feet at bottom, no torso, isolated lower body for layering`, width: baseSize, height: Math.floor(baseSize * 1.2), tags: ['walking'] },
+    { id: 'legs_standing', category: 'legs', description: `legs only, no torso, no waist, no upper body, ${styleGuide}, modular sprite part, ONLY a pair of human legs from thigh to feet, standing pose, simple pants or bare legs, waist connection at top, feet at bottom, isolated legs piece for layering`, width: baseSize, height: Math.floor(baseSize * 1.2), tags: ['standing'] },
+    { id: 'legs_walking', category: 'legs', description: `legs only, no torso, no waist, no upper body, ${styleGuide}, modular sprite part, ONLY a pair of human legs from thigh to feet, walking pose with one leg forward, simple pants or bare legs, waist connection at top, feet at bottom, isolated legs piece for layering`, width: baseSize, height: Math.floor(baseSize * 1.2), tags: ['walking'] },
   ];
 
   // Initialize completion tracking
@@ -318,6 +567,10 @@ btnStartGeneration.addEventListener('click', () => {
   state.isPaused = false;
   btnStartGeneration.style.display = 'none';
   btnPauseGeneration.style.display = 'inline-block';
+
+  const resuming = state.currentPartIndex > 0;
+  console.log(`[Sprite Wizard] Generation ${resuming ? 'resumed' : 'started'}`);
+
   generateNextPart();
 });
 
@@ -326,6 +579,9 @@ btnPauseGeneration.addEventListener('click', () => {
   state.isGenerating = false;
   btnStartGeneration.style.display = 'inline-block';
   btnPauseGeneration.style.display = 'none';
+
+  currentPartName.textContent = 'Paused (current part will finish first)';
+  console.log('[Sprite Wizard] Generation paused');
 });
 
 async function generateNextPart() {
@@ -397,21 +653,16 @@ async function generateNextPart() {
 }
 
 function getActiveReferenceImage(): string | undefined {
-  // Use first completed part as reference, or reference character
-  for (const part of state.parts) {
-    const versions = state.completedParts.get(part.id);
-    if (versions && versions.length > 0) {
-      const activeVersion = versions.find(v => v.active) || versions[versions.length - 1];
-      // Extract base64 from data URL
-      return activeVersion.imageData.split(',')[1];
-    }
+  // Use first completed torso as the style reference
+  // Torso is always generated first and sets the visual style for all other parts
+  const torsoAverage = state.completedParts.get('torso_average');
+  if (torsoAverage && torsoAverage.length > 0) {
+    const activeVersion = torsoAverage.find(v => v.active) || torsoAverage[torsoAverage.length - 1];
+    // Extract base64 from data URL
+    return activeVersion.imageData.split(',')[1];
   }
 
-  // Fall back to reference character
-  if (state.referenceImageUrl) {
-    return state.referenceImageUrl.split(',')[1];
-  }
-
+  // If no torso yet, don't use any reference (this is the first part being generated)
   return undefined;
 }
 
@@ -423,7 +674,8 @@ function jumpToPartRegeneration(partId: string) {
 btnExportSheet.addEventListener('click', () => {
   // Export sprite sheet as PNG
   const link = document.createElement('a');
-  link.download = `sprite-sheet-${state.artStyle}-${Date.now()}.png`;
+  const substyleName = state.subStyle ? `-${state.subStyle}` : '';
+  link.download = `sprite-sheet-${state.artStyle}${substyleName}-${Date.now()}.png`;
   link.href = spriteSheetCanvas.toDataURL('image/png');
   link.click();
 
@@ -433,3 +685,9 @@ btnExportSheet.addEventListener('click', () => {
 // Initialize
 console.log('Sprite Set Generator loaded');
 console.log('Available art styles:', Object.keys(ART_STYLES));
+
+// Load custom art styles from localStorage
+loadCustomArtStyles();
+
+// Render the style grid with both default and custom styles
+renderStyleGrid();

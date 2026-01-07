@@ -13,6 +13,7 @@ import type { EpisodicMemory } from '../components/EpisodicMemoryComponent.js';
 import { getAgent, getNeeds, getCircadian, getEpisodicMemory, getBuilding } from '../utils/componentHelpers.js';
 import type { BuildingHarmonyComponent } from '../components/BuildingHarmonyComponent.js';
 import { getHarmonyRestModifier } from '../components/BuildingHarmonyComponent.js';
+import type { StateMutatorSystem } from './StateMutatorSystem.js';
 
 /**
  * Weird/surreal elements that can appear in dreams
@@ -59,7 +60,36 @@ export class SleepSystem implements System {
   public readonly priority: number = 12; // After Needs (priority 15), before Memory (100)
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [CT.Circadian, CT.Needs];
 
+  /**
+   * Systems that must run before this one.
+   * @see StateMutatorSystem - handles batched sleep drive and energy recovery
+   */
+  public readonly dependsOn = ['state_mutator'] as const;
+
+  // StateMutatorSystem integration for batched sleep drive and energy recovery
+  private stateMutator: StateMutatorSystem | null = null;
+  private lastDeltaUpdateTick = 0;
+  private readonly DELTA_UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
+  private deltaCleanups = new Map<string, {
+    sleepDrive?: () => void;
+    energyRecovery?: () => void;
+  }>();
+
+  /**
+   * Set the StateMutatorSystem reference (called during system registration)
+   */
+  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
+    this.stateMutator = stateMutator;
+  }
+
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+    if (!this.stateMutator) {
+      throw new Error('[SleepSystem] StateMutatorSystem not set - call setStateMutatorSystem() during initialization');
+    }
+
+    const currentTick = world.tick;
+    const shouldUpdateDeltas = currentTick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
+
     // Get time component from world entity (should be only one)
     const timeEntities = world.query().with(CT.Time).executeEntities();
     let timeOfDay = 12; // Default noon if no time entity
@@ -85,47 +115,126 @@ export class SleepSystem implements System {
 
       if (!circadian || !needs) continue;
 
-      // Update sleep drive based on time and whether sleeping
-      let newSleepDrive = circadian.sleepDrive;
-
-      if (circadian.isSleeping) {
-        // Decrease while sleeping - targeting 6 hours to deplete from 100 to 0
-        // Rate: -17/hour (100 / 17 = ~5.9 hours)
-        newSleepDrive = Math.max(0, circadian.sleepDrive - 17 * hoursElapsed);
-      } else {
-        // Increase while awake - targeting 18 hours to reach 95% threshold
-        // Base rate: 5.5/hour (95 / 5.5 = ~17.3 hours)
-        let increment = 5.5 * hoursElapsed;
-
-        // Faster accumulation at night (biological circadian pressure)
-        if (timeOfDay >= circadian.preferredSleepTime || timeOfDay < 5) {
-          increment *= 1.2; // 20% faster at night (6.6/hour)
-        }
-
-        // Modified by energy level (low energy = higher sleep drive)
-        // NeedsComponent uses 0-1 scale (0.3 = 30%, 0.5 = 50%)
-        if (needs.energy < 0.3) {
-          increment *= 1.5; // 50% faster when tired (8.25/hour base, 9.9/hour at night)
-        } else if (needs.energy < 0.5) {
-          increment *= 1.25; // 25% faster when moderately tired
-        }
-
-        newSleepDrive = Math.min(100, circadian.sleepDrive + increment);
+      // Update sleep drive and energy recovery delta rates once per game minute
+      if (shouldUpdateDeltas) {
+        this.updateSleepDeltas(entity, circadian, needs, timeOfDay);
       }
 
-      // Apply sleep drive changes directly by mutating the component
-      // CircadianComponent has public mutable properties
-      circadian.sleepDrive = newSleepDrive;
-
-      // Process sleep (energy recovery) if sleeping
+      // Process sleep (discrete events: dreams, wake checks)
       if (circadian.isSleeping) {
         this.processSleep(impl, circadian, needs, hoursElapsed, world);
       }
     }
+
+    // Mark delta rates as updated
+    if (shouldUpdateDeltas) {
+      this.lastDeltaUpdateTick = currentTick;
+    }
   }
 
+  // ==========================================================================
+  // Delta Registration (Sleep Drive & Energy Recovery)
+  // ==========================================================================
+
   /**
-   * Process sleep: recover energy based on sleep quality
+   * Update sleep drive and energy recovery delta rates.
+   * Called once per game minute to register/update delta rates with StateMutatorSystem.
+   */
+  private updateSleepDeltas(
+    entity: Entity,
+    circadian: CircadianComponent,
+    needs: NeedsComponent,
+    timeOfDay: number
+  ): void {
+    if (!this.stateMutator) {
+      throw new Error('[SleepSystem] StateMutatorSystem not set');
+    }
+
+    // Clean up old deltas
+    if (this.deltaCleanups.has(entity.id)) {
+      const cleanups = this.deltaCleanups.get(entity.id)!;
+      cleanups.sleepDrive?.();
+      cleanups.energyRecovery?.();
+    }
+
+    const cleanupFuncs: {
+      sleepDrive?: () => void;
+      energyRecovery?: () => void;
+    } = {};
+
+    // Register sleep drive delta (accumulation or depletion)
+    if (circadian.isSleeping) {
+      // Sleeping: deplete sleep drive
+      // Rate: -17/hour → -1020/game minute (60 game minutes = 1 game hour)
+      const sleepDriveRatePerMinute = -17 * 60;
+
+      cleanupFuncs.sleepDrive = this.stateMutator.registerDelta({
+        entityId: entity.id,
+        componentType: CT.Circadian,
+        field: 'sleepDrive',
+        deltaPerMinute: sleepDriveRatePerMinute,
+        min: 0,
+        max: 100,
+        source: 'sleep_drive_depletion',
+      });
+
+      // Register energy recovery delta (only when sleeping)
+      const sleepQuality = circadian.sleepQuality || 0.5;
+      // Base recovery: 0.1 per game hour (10% energy per hour)
+      // Convert to per-game-minute: 0.1 * 60 = 6.0 per game minute
+      const energyRecoveryPerMinute = 0.1 * sleepQuality * 60;
+
+      cleanupFuncs.energyRecovery = this.stateMutator.registerDelta({
+        entityId: entity.id,
+        componentType: CT.Needs,
+        field: 'energy',
+        deltaPerMinute: energyRecoveryPerMinute,
+        min: 0,
+        max: 1.0,
+        source: 'sleep_energy_recovery',
+      });
+    } else {
+      // Awake: accumulate sleep drive
+      // Base rate: 5.5/hour → 330/game minute
+      let ratePerHour = 5.5;
+
+      // Faster accumulation at night (biological circadian pressure)
+      if (timeOfDay >= circadian.preferredSleepTime || timeOfDay < 5) {
+        ratePerHour *= 1.2; // 6.6/hour
+      }
+
+      // Modified by energy level (low energy = higher sleep drive)
+      if (needs.energy < 0.3) {
+        ratePerHour *= 1.5; // 8.25/hour base, 9.9/hour at night
+      } else if (needs.energy < 0.5) {
+        ratePerHour *= 1.25; // 6.875/hour base, 8.25/hour at night
+      }
+
+      // Convert to per-game-minute (60 game minutes = 1 game hour)
+      const sleepDriveRatePerMinute = ratePerHour * 60;
+
+      cleanupFuncs.sleepDrive = this.stateMutator.registerDelta({
+        entityId: entity.id,
+        componentType: CT.Circadian,
+        field: 'sleepDrive',
+        deltaPerMinute: sleepDriveRatePerMinute,
+        min: 0,
+        max: 100,
+        source: 'sleep_drive_accumulation',
+      });
+    }
+
+    // Store cleanup functions
+    this.deltaCleanups.set(entity.id, cleanupFuncs);
+  }
+
+  // ==========================================================================
+  // Sleep Processing (Discrete Events)
+  // ==========================================================================
+
+  /**
+   * Process sleep: handle discrete events like dreams and wake checks
+   * (Energy recovery is now handled by StateMutatorSystem deltas)
    */
   private processSleep(
     entity: EntityImpl,
@@ -134,29 +243,14 @@ export class SleepSystem implements System {
     hoursElapsed: number,
     world: World
   ): void {
-    // Get sleep quality from circadian component (set by AISystem when sleep started)
-    const sleepQuality = circadian.sleepQuality || 0.5;
-
-    // Base energy recovery: +10% (0.1) per game hour on 0-1 scale
-    const baseRecovery = 0.1 * hoursElapsed;
-
-    // Apply quality modifier
-    const recoveryAmount = baseRecovery * sleepQuality;
-
-    // Recover energy (0-1 scale, 1.0 = full)
-    const newEnergy = Math.min(1.0, needs.energy + recoveryAmount);
-
-    // Update needs component
-    // Use object spread instead of clone() to handle deserialized plain objects
-    entity.updateComponent<NeedsComponent>(CT.Needs, (current) => ({
-      ...current,
-      energy: newEnergy,
-    } as NeedsComponent));
+    // Energy recovery is now handled by StateMutatorSystem deltas
+    // This method only handles discrete events
 
     // Track accumulated sleep duration in game hours
     circadian.sleepDurationHours = circadian.sleepDurationHours + hoursElapsed;
 
     // Update circadian sleepQuality dynamically based on conditions
+    const sleepQuality = circadian.sleepQuality || 0.5;
     const updatedQuality = this.calculateSleepQuality(entity, circadian, world);
     if (Math.abs(updatedQuality - sleepQuality) > 0.05) {
       // Only update if significant change (mutable property)

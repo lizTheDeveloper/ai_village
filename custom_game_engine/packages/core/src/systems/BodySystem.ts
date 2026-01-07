@@ -16,6 +16,7 @@ import type { World } from '../ecs/World.js';
 import type { Entity } from '../ecs/Entity.js';
 import type { SystemId } from '../types.js';
 import { ComponentType } from '../types/ComponentType.js';
+import { ComponentType as CT } from '../types/ComponentType.js';
 import type {
   BodyComponent,
   BodyPart,
@@ -29,21 +30,59 @@ import {
 import type { NeedsComponent } from '../components/NeedsComponent.js';
 import type { MoodComponent } from '../components/MoodComponent.js';
 import type { AnimalComponent } from '../components/AnimalComponent.js';
+import type { StateMutatorSystem } from './StateMutatorSystem.js';
 
 export class BodySystem implements System {
   public readonly id: SystemId = 'body';
   public readonly priority: number = 13; // After NeedsSystem (15), before AI
   public readonly requiredComponents: ReadonlyArray<ComponentType> = [ComponentType.Body];
 
+  /**
+   * Systems that must run before this one.
+   * @see StateMutatorSystem - handles batched blood loss/recovery and health damage
+   */
+  public readonly dependsOn = ['state_mutator'] as const;
+
+  // StateMutatorSystem integration for batched blood loss and healing
+  private stateMutator: StateMutatorSystem | null = null;
+  private lastDeltaUpdateTick = 0;
+  private readonly DELTA_UPDATE_INTERVAL = 1200; // 1 game minute at 20 TPS
+  private deltaCleanups = new Map<string, {
+    bloodLoss?: () => void;
+    bloodRecovery?: () => void;
+    healthDamage?: () => void;
+  }>();
+  private healingCleanups = new Map<string, {
+    partHealing: Map<string, () => void>; // partId -> cleanup
+    injuryHealing: Map<string, () => void>; // "partId:injuryIndex" -> cleanup
+  }>();
+
+  /**
+   * Set the StateMutatorSystem reference (called during system registration)
+   */
+  setStateMutatorSystem(stateMutator: StateMutatorSystem): void {
+    this.stateMutator = stateMutator;
+  }
+
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
+    if (!this.stateMutator) {
+      throw new Error('[BodySystem] StateMutatorSystem not set - call setStateMutatorSystem() during initialization');
+    }
+
+    const currentTick = world.tick;
+    const shouldUpdateDeltas = currentTick - this.lastDeltaUpdateTick >= this.DELTA_UPDATE_INTERVAL;
+
     for (const entity of entities) {
       const body = entity.components.get('body') as BodyComponent;
       if (!body) continue;
 
-      // 1. Process bleeding from injuries
-      this.processBleedingDamage(entity, body, deltaTime);
+      // Update blood loss/recovery and healing delta rates once per game minute
+      if (shouldUpdateDeltas) {
+        this.updateBloodLossDeltas(entity, body);
+        this.updateHealingDeltas(entity, body);
+      }
 
-      // 2. Natural healing over time
+      // 1. Natural healing over time (handles injury removal when fully healed)
       this.processNaturalHealing(entity, body, deltaTime);
 
       // 3. Infection progression
@@ -64,19 +103,42 @@ export class BodySystem implements System {
       // 8. Process temporary modifications (magic duration)
       this.processModifications(entity, body, world.tick, world);
     }
+
+    // Mark delta rates as updated
+    if (shouldUpdateDeltas) {
+      this.lastDeltaUpdateTick = currentTick;
+    }
   }
 
   // ==========================================================================
-  // Bleeding
+  // Delta Registration (Blood Loss & Health Damage)
   // ==========================================================================
 
-  private processBleedingDamage(
-    entity: Entity,
-    body: BodyComponent,
-    deltaTime: number
-  ): void {
-    let totalBleedRate = 0;
+  /**
+   * Update blood loss and health damage delta rates.
+   * Called once per game minute to register/update delta rates with StateMutatorSystem.
+   */
+  private updateBloodLossDeltas(entity: Entity, body: BodyComponent): void {
+    if (!this.stateMutator) {
+      throw new Error('[BodySystem] StateMutatorSystem not set');
+    }
 
+    // Clean up old deltas
+    if (this.deltaCleanups.has(entity.id)) {
+      const cleanups = this.deltaCleanups.get(entity.id)!;
+      cleanups.bloodLoss?.();
+      cleanups.bloodRecovery?.();
+      cleanups.healthDamage?.();
+    }
+
+    const cleanupFuncs: {
+      bloodLoss?: () => void;
+      bloodRecovery?: () => void;
+      healthDamage?: () => void;
+    } = {};
+
+    // Calculate total bleed rate from all injuries
+    let totalBleedRate = 0;
     for (const part of Object.values(body.parts)) {
       for (const injury of part.injuries) {
         // Bandaging stops bleeding
@@ -86,40 +148,71 @@ export class BodySystem implements System {
       }
     }
 
-    // Apply blood loss
+    // Register blood loss or recovery delta
     if (totalBleedRate > 0) {
-      body.bloodLoss = Math.min(100, body.bloodLoss + totalBleedRate * deltaTime);
+      // Bleeding: blood loss accumulates
+      // Convert per-second rate to per-game-minute
+      const bloodLossPerMinute = totalBleedRate * 60;
 
-      // Blood loss affects overall health
+      cleanupFuncs.bloodLoss = this.stateMutator.registerDelta({
+        entityId: entity.id,
+        componentType: CT.Body,
+        field: 'bloodLoss',
+        deltaPerMinute: bloodLossPerMinute,
+        min: 0,
+        max: 100,
+        source: 'body_blood_loss',
+      });
+
+      // If blood loss > 50, register health damage
       if (body.bloodLoss > 50) {
-        const needs = entity.components.get('needs') as NeedsComponent;
-        if (needs) {
-          // Start taking health damage from blood loss
-          const bleedDamage = (body.bloodLoss - 50) * 0.02 * deltaTime;
-          needs.health = Math.max(0, needs.health - bleedDamage);
-        }
+        // Health damage from blood loss: (bloodLoss - 50) * 0.02 per second
+        // Convert to per-game-minute: (bloodLoss - 50) * 0.02 * 60
+        const healthDamagePerMinute = -((body.bloodLoss - 50) * 0.02 * 60);
+
+        cleanupFuncs.healthDamage = this.stateMutator.registerDelta({
+          entityId: entity.id,
+          componentType: CT.Needs,
+          field: 'health',
+          deltaPerMinute: healthDamagePerMinute,
+          min: 0,
+          max: 100,
+          source: 'body_bleed_damage',
+        });
       }
+    } else if (body.bloodLoss > 0) {
+      // Not bleeding: natural blood recovery
+      // 0.5 per second → 30 per game minute
+      const bloodRecoveryPerMinute = -(0.5 * 60);
+
+      cleanupFuncs.bloodRecovery = this.stateMutator.registerDelta({
+        entityId: entity.id,
+        componentType: CT.Body,
+        field: 'bloodLoss',
+        deltaPerMinute: bloodRecoveryPerMinute,
+        min: 0,
+        max: 100,
+        source: 'body_blood_recovery',
+      });
     }
 
-    // Natural blood recovery (when not bleeding)
-    if (totalBleedRate === 0 && body.bloodLoss > 0) {
-      body.bloodLoss = Math.max(0, body.bloodLoss - 0.5 * deltaTime);
-    }
+    // Store cleanup functions
+    this.deltaCleanups.set(entity.id, cleanupFuncs);
   }
 
-  // ==========================================================================
-  // Natural Healing
-  // ==========================================================================
+  /**
+   * Update healing delta rates for body parts and injuries.
+   * Called once per game minute to register/update delta rates with StateMutatorSystem.
+   */
+  private updateHealingDeltas(entity: Entity, body: BodyComponent): void {
+    if (!this.stateMutator) {
+      throw new Error('[BodySystem] StateMutatorSystem not set');
+    }
 
-  private processNaturalHealing(
-    entity: Entity,
-    body: BodyComponent,
-    deltaTime: number
-  ): void {
     const needs = entity.components.get('needs') as NeedsComponent;
     const isResting = this.isAgentResting(entity);
 
-    // Healing rate factors
+    // Calculate healing multiplier
     let healingMultiplier = 1.0;
     if (needs) {
       if (needs.hunger < 30) healingMultiplier *= 0.5;  // Hungry = slow healing
@@ -128,25 +221,91 @@ export class BodySystem implements System {
     if (isResting) healingMultiplier *= 2.0;           // Resting = faster healing
     if (body.bloodLoss > 30) healingMultiplier *= 0.5; // Blood loss = slow healing
 
-    for (const part of Object.values(body.parts)) {
+    // Clean up old healing deltas
+    if (this.healingCleanups.has(entity.id)) {
+      const cleanups = this.healingCleanups.get(entity.id)!;
+      for (const cleanup of cleanups.partHealing.values()) {
+        cleanup();
+      }
+      for (const cleanup of cleanups.injuryHealing.values()) {
+        cleanup();
+      }
+    }
+
+    const partHealingCleanups = new Map<string, () => void>();
+    const injuryHealingCleanups = new Map<string, () => void>();
+
+    // Register healing deltas for each body part
+    for (const [partId, part] of Object.entries(body.parts)) {
       // Infected parts don't heal naturally
       if (part.infected) continue;
 
-      // Heal the part itself
+      // Register part health healing if damaged
       if (part.health < part.maxHealth) {
-        const baseHealRate = 0.1;  // HP per second
-        const healAmount = baseHealRate * healingMultiplier * deltaTime;
-        part.health = Math.min(part.maxHealth, part.health + healAmount);
+        // Base heal rate: 0.1 HP/sec → 6 HP/game minute
+        const healRatePerMinute = 0.1 * healingMultiplier * 60;
+
+        const cleanup = this.stateMutator.registerDelta({
+          entityId: entity.id,
+          componentType: CT.Body,
+          field: `parts.${partId}.health`,
+          deltaPerMinute: healRatePerMinute,
+          min: 0,
+          max: part.maxHealth,
+          source: `body_part_healing_${partId}`,
+        });
+
+        partHealingCleanups.set(partId, cleanup);
       }
 
-      // Process injury healing
-      for (let i = part.injuries.length - 1; i >= 0; i--) {
+      // Register injury healing progress deltas
+      for (let i = 0; i < part.injuries.length; i++) {
         const injury = part.injuries[i];
         if (!injury) continue;
 
-        // Base healing: 1% per in-game hour
-        const baseHealRate = 1.0 / 3600; // Per second
-        injury.healingProgress += baseHealRate * healingMultiplier * deltaTime * 100;
+        // Base healing: 1% per in-game hour = 1/3600 per second
+        // Convert to per-game-minute: (1/3600) * 60 * 100 = 1.67% per game minute
+        const healRatePerMinute = (1.0 / 3600) * healingMultiplier * 60 * 100;
+
+        const injuryKey = `${partId}:${i}`;
+        const cleanup = this.stateMutator.registerDelta({
+          entityId: entity.id,
+          componentType: CT.Body,
+          field: `parts.${partId}.injuries.${i}.healingProgress`,
+          deltaPerMinute: healRatePerMinute,
+          min: 0,
+          max: 100,
+          source: `body_injury_healing_${injuryKey}`,
+        });
+
+        injuryHealingCleanups.set(injuryKey, cleanup);
+      }
+    }
+
+    // Store cleanup functions
+    this.healingCleanups.set(entity.id, {
+      partHealing: partHealingCleanups,
+      injuryHealing: injuryHealingCleanups,
+    });
+  }
+
+  // ==========================================================================
+  // Natural Healing
+  // ==========================================================================
+
+  private processNaturalHealing(
+    _entity: Entity,
+    body: BodyComponent,
+    _deltaTime: number
+  ): void {
+    // Healing rates are now handled by StateMutatorSystem deltas
+    // This method only handles removal of fully healed injuries
+
+    for (const part of Object.values(body.parts)) {
+      // Process injury removal when fully healed
+      for (let i = part.injuries.length - 1; i >= 0; i--) {
+        const injury = part.injuries[i];
+        if (!injury) continue;
 
         // Fully healed injuries are removed
         if (injury.healingProgress >= 100) {

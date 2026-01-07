@@ -329,8 +329,8 @@ export class TalkerPromptBuilder {
           if (!resource) continue;
 
           const resourceComp = resource.components.get('resource') as any;
-          if (resourceComp?.type) {
-            resourceTypes.add(resourceComp.type);
+          if (resourceComp?.resourceType) {
+            resourceTypes.add(resourceComp.resourceType);
           }
         }
       }

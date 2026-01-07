@@ -1269,9 +1269,8 @@ function setupWindowManager(
     menuCategory: 'settings',
   });
 
-  // Agent Roster Panel
-  const agentRosterPanel = new AgentRosterPanel();
-  windowManager.registerWindow('agent-roster', agentRosterPanel, {
+  // Agent Roster Panel - use existing panel from panels object (has click callback wired)
+  windowManager.registerWindow('agent-roster', panels.agentRosterPanel, {
     defaultX: 10,
     defaultY: 250,
     defaultWidth: 380,

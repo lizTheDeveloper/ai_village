@@ -5,6 +5,7 @@ import { createBuildingComponent, type BuildingComponent } from '../components/B
 import { AnimalComponent } from '../components/AnimalComponent.js';
 import { TemperatureSystem } from '../systems/TemperatureSystem.js';
 import { AnimalSystem } from '../systems/AnimalSystem.js';
+import { StateMutatorSystem } from '../systems/StateMutatorSystem.js';
 import type { PositionComponent } from '../components/PositionComponent.js';
 import type { TemperatureComponent } from '../components/TemperatureComponent.js';
 import type { WeatherComponent } from '../components/WeatherComponent.js';
@@ -16,12 +17,20 @@ describe('Animal Housing - Integration Tests', () => {
   let eventBus: EventBusImpl;
   let temperatureSystem: TemperatureSystem;
   let animalSystem: AnimalSystem;
+  let stateMutator: StateMutatorSystem;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
     world = new WorldImpl(eventBus);
+
+    // Create and wire up StateMutatorSystem (required dependency for AnimalSystem and TemperatureSystem)
+    stateMutator = new StateMutatorSystem();
+
     temperatureSystem = new TemperatureSystem();
+    temperatureSystem.setStateMutatorSystem(stateMutator);
+
     animalSystem = new AnimalSystem(eventBus);
+    animalSystem.setStateMutatorSystem(stateMutator);
   });
 
   describe('Temperature System Integration', () => {

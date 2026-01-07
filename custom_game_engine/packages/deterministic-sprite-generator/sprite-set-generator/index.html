@@ -18,52 +18,65 @@
       <h2>Step 1: Choose Art Style</h2>
       <p>Select the console era style for your sprite set:</p>
 
-      <div class="style-grid">
-        <div class="style-card" data-style="nes">
-          <div class="style-preview"></div>
-          <h3>8-bit NES</h3>
-          <p>32-48px • Chunky pixels • Limited palette</p>
-          <span class="era">1985-1990</span>
-        </div>
-        <div class="style-card selected" data-style="snes">
-          <div class="style-preview"></div>
-          <h3>16-bit SNES</h3>
-          <p>64-96px • Detailed • 256 colors</p>
-          <span class="era">1991-1996</span>
-        </div>
-        <div class="style-card" data-style="ps1">
-          <div class="style-preview"></div>
-          <h3>32-bit PS1</h3>
-          <p>128-192px • Pre-rendered 3D look</p>
-          <span class="era">1995-2000</span>
-        </div>
-        <div class="style-card" data-style="gba">
-          <div class="style-preview"></div>
-          <h3>GBA</h3>
-          <p>64-80px • Bright vibrant</p>
-          <span class="era">2001-2008</span>
-        </div>
-        <div class="style-card" data-style="gameboy">
-          <div class="style-preview"></div>
-          <h3>Game Boy</h3>
-          <p>32-48px • 4-shade monochrome</p>
-          <span class="era">1989-1998</span>
-        </div>
-        <div class="style-card" data-style="neogeo">
-          <div class="style-preview"></div>
-          <h3>Neo Geo</h3>
-          <p>128-256px • Arcade quality</p>
-          <span class="era">1990-2004</span>
+      <div id="style-grid" class="style-grid">
+        <!-- Dynamically populated with default + custom styles -->
+      </div>
+
+      <div class="create-custom-style">
+        <button id="btn-show-create-style" class="secondary-button">+ Create Custom Art Style</button>
+
+        <div id="custom-style-form" class="custom-style-form" style="display: none;">
+          <h3>Create Custom Art Style</h3>
+          <input type="text" id="custom-style-name" placeholder="Style name (e.g., 'Retro DOS')" maxlength="30" />
+          <input type="text" id="custom-style-description" placeholder="Visual description (e.g., 'CGA 4-color dithered graphics')" />
+          <div class="form-row">
+            <div>
+              <label>Size Range:</label>
+              <input type="number" id="custom-style-size-min" placeholder="Min (px)" min="16" max="512" value="32" />
+              <input type="number" id="custom-style-size-max" placeholder="Max (px)" min="16" max="512" value="64" />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button id="btn-cancel-create-style" class="secondary-button">Cancel</button>
+            <button id="btn-save-custom-style" class="primary-button">Create Style</button>
+          </div>
         </div>
       </div>
 
-      <button id="btn-generate-reference" class="primary-button">Generate Reference Character</button>
+      <button id="btn-select-artstyle" class="primary-button">Select Art Style & Continue</button>
+    </section>
+
+    <!-- Step 1.5: Sub-Style Selection/Creation -->
+    <section id="step-substyle" class="wizard-step">
+      <h2>Step 1.5: Choose or Create Sub-Style</h2>
+      <p>Sub-styles let you have multiple visual variations within <strong id="selected-artstyle-name">SNES 16-bit</strong>. Each sub-style has its own reference character as a style seed.</p>
+
+      <div class="substyle-container">
+        <div class="existing-substyles">
+          <h3>Existing Sub-Styles</h3>
+          <div id="substyle-list" class="substyle-grid">
+            <!-- Populated dynamically with existing sub-styles -->
+          </div>
+        </div>
+
+        <div class="create-substyle">
+          <h3>Create New Sub-Style</h3>
+          <p class="hint">Examples: "Fantasy", "Sci-Fi", "Realistic", "Chibi", "Dark", "Vibrant"</p>
+          <input
+            type="text"
+            id="substyle-input"
+            placeholder="Enter sub-style name (e.g., 'Fantasy')"
+            maxlength="30"
+          />
+          <button id="btn-create-substyle" class="primary-button">Create & Generate Reference</button>
+        </div>
+      </div>
     </section>
 
     <!-- Step 2: Reference Approval -->
     <section id="step-reference" class="wizard-step">
       <h2>Step 2: Approve Reference Character</h2>
-      <p>This character will be used as a style reference for all parts:</p>
+      <p>This character will be the style seed for <strong id="current-substyle-name"></strong>:</p>
 
       <div class="reference-preview">
         <div id="reference-loading" class="loading">

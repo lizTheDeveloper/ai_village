@@ -684,6 +684,12 @@ export interface GameEventMap {
     /** Overall quality score 0-1 (Deep Conversation System) */
     quality?: number;
   };
+  /** An agent joined an ongoing conversation */
+  'conversation:joined': {
+    conversationId: string;
+    joinerId: EntityId;
+    participants: EntityId[];
+  };
   /** A topic was shared during conversation (Deep Conversation System) */
   'conversation:topic_shared': {
     speakerId: EntityId;

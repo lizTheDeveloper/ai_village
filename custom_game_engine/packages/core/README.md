@@ -71,6 +71,9 @@ update(world, entities, deltaTime) {
 2. **BuildingMaintenanceSystem** - Building condition decay
 3. **AnimalSystem** - Animal needs, aging, and lifecycle
 4. **PlantSystem** - Plant hydration/age/health decay
+5. **TemperatureSystem** - Health damage from dangerous temperatures
+6. **BodySystem** - Blood loss/recovery and injury/part healing (nested deltas)
+7. **SleepSystem** - Sleep drive accumulation/depletion and energy recovery
 
 ### Usage Guide
 
@@ -290,7 +293,6 @@ console.log('Deltas by source:', info.deltasBySource);
 
 Other systems that could benefit from this pattern:
 
-- **TemperatureSystem** - Environmental effects on energy
 - **InjurySystem** - Health recovery over time
 - **MoodSystem** - Mood decay/recovery
 

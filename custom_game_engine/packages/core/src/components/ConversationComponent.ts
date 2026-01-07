@@ -9,7 +9,10 @@ export interface ConversationMessage {
 
 export interface ConversationComponent extends Component {
   type: 'conversation';
-  partnerId: EntityId | null; // Who they're talking to
+  partnerId: EntityId | null; // DEPRECATED: for backward compat, use participantIds instead
+  participantIds: EntityId[]; // All agents in this conversation (including self)
+  conversationCenterX?: number; // Center point for spatial stickiness
+  conversationCenterY?: number; // Center point for spatial stickiness
   messages: ConversationMessage[]; // Recent conversation history
   maxMessages: number; // Keep last N messages
   startedAt: Tick;
@@ -24,6 +27,9 @@ export function createConversationComponent(
     type: 'conversation',
     version: 1,
     partnerId: null,
+    participantIds: [],
+    conversationCenterX: undefined,
+    conversationCenterY: undefined,
     messages: [],
     maxMessages,
     startedAt: 0,
@@ -35,11 +41,20 @@ export function createConversationComponent(
 export function startConversation(
   component: ConversationComponent,
   partnerId: EntityId,
-  currentTick: Tick
+  currentTick: Tick,
+  selfId?: EntityId,
+  centerX?: number,
+  centerY?: number
 ): ConversationComponent {
+  // For multi-agent conversations, participantIds should include both self and partner
+  const participantIds = selfId ? [selfId, partnerId] : [partnerId];
+
   return {
     ...component,
     partnerId,
+    participantIds,
+    conversationCenterX: centerX,
+    conversationCenterY: centerY,
     messages: [],
     startedAt: currentTick,
     lastMessageAt: currentTick,
@@ -77,6 +92,9 @@ export function endConversation(
   return {
     ...component,
     partnerId: null,
+    participantIds: [],
+    conversationCenterX: undefined,
+    conversationCenterY: undefined,
     isActive: false,
   };
 }
@@ -84,7 +102,49 @@ export function endConversation(
 export function isInConversation(
   component: ConversationComponent
 ): boolean {
-  return component.isActive && component.partnerId !== null;
+  return component.isActive && (component.partnerId !== null || component.participantIds.length > 0);
+}
+
+/**
+ * Join an existing conversation by adding a participant.
+ */
+export function joinConversation(
+  component: ConversationComponent,
+  participantId: EntityId
+): ConversationComponent {
+  if (component.participantIds.includes(participantId)) {
+    return component; // Already in conversation
+  }
+
+  return {
+    ...component,
+    participantIds: [...component.participantIds, participantId],
+  };
+}
+
+/**
+ * Leave a conversation by removing a participant.
+ * If no participants remain, ends the conversation.
+ */
+export function leaveConversation(
+  component: ConversationComponent,
+  participantId: EntityId
+): ConversationComponent {
+  const participantIds = component.participantIds.filter(id => id !== participantId);
+
+  // If this was the primary partner, clear partnerId
+  const partnerId = component.partnerId === participantId ? null : component.partnerId;
+
+  // If no one left, end the conversation
+  if (participantIds.length === 0 && partnerId === null) {
+    return endConversation(component);
+  }
+
+  return {
+    ...component,
+    partnerId,
+    participantIds,
+  };
 }
 
 export function getConversationDuration(

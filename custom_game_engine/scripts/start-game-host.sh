@@ -9,6 +9,7 @@ echo ""
 echo "This will start:"
 echo "  - Metrics Server (port 8766) with Admin Console at /admin"
 echo "  - PixelLab Sprite Daemon"
+echo "  - Deterministic Sprite Test Screen (port 3010)"
 echo "  - Sprite Wizard (port 3011)"
 echo "  - API Server (port 3001)"
 echo "  - Game Dev Server (port 3000)"
@@ -27,6 +28,7 @@ DEV_LOG="logs/dev-server-${TIMESTAMP}.log"
 # PID files for reconnecting to existing servers
 METRICS_PID_FILE=".metrics-server.pid"
 PIXELLAB_PID_FILE=".pixellab-daemon.pid"
+TEST_SCREEN_PID_FILE=".test-screen.pid"
 SPRITE_WIZARD_PID_FILE=".sprite-wizard.pid"
 API_PID_FILE=".api-server.pid"
 DEV_PID_FILE=".dev-server.pid"
@@ -70,6 +72,26 @@ start_pixellab_daemon() {
     PIXELLAB_PID=$!
     echo $PIXELLAB_PID > "$PIXELLAB_PID_FILE"
     sleep 1
+}
+
+# Function to start or reconnect to Test Screen
+start_test_screen() {
+    if [ -f "$TEST_SCREEN_PID_FILE" ]; then
+        TEST_SCREEN_PID=$(cat "$TEST_SCREEN_PID_FILE")
+        if is_running "$TEST_SCREEN_PID"; then
+            echo "Deterministic Sprite Test Screen already running (PID: $TEST_SCREEN_PID)"
+            return
+        fi
+    fi
+
+    echo "Starting Deterministic Sprite Test Screen..."
+    TEST_SCREEN_LOG="logs/test-screen-${TIMESTAMP}.log"
+    echo "Logs: $TEST_SCREEN_LOG"
+    (cd packages/deterministic-sprite-generator && nohup npm run test-screen > "../../$TEST_SCREEN_LOG" 2>&1 &
+    echo $! > "../../$TEST_SCREEN_PID_FILE")
+    sleep 1
+    TEST_SCREEN_PID=$(cat "$TEST_SCREEN_PID_FILE")
+    sleep 2
 }
 
 # Function to start or reconnect to Sprite Wizard
@@ -145,6 +167,7 @@ start_dev_server() {
 # Start all servers
 start_metrics_server
 start_pixellab_daemon
+start_test_screen
 start_sprite_wizard
 start_api_server
 start_dev_server
@@ -165,6 +188,7 @@ echo "=== AI Village Running ==="
 echo ""
 echo "Central Hub:    http://localhost:3000/hub.html"
 echo "Game:           http://localhost:3000"
+echo "Test Screen:    http://localhost:3010"
 echo "Sprite Wizard:  http://localhost:3011"
 echo "API:            http://localhost:3001"
 echo "Admin Console:  http://localhost:8766/admin"
