@@ -87,6 +87,7 @@ export interface StationaryPath {
  */
 export interface PathPredictionComponent {
   type: 'path_prediction';
+  version: number;
   /** Current predicted path */
   prediction: PathPrediction;
   /** Position when prediction was last sent */
@@ -105,6 +106,7 @@ export interface PathPredictionComponent {
  */
 export interface PathInterpolatorComponent {
   type: 'path_interpolator';
+  version: number;
   /** Prediction to interpolate */
   prediction: PathPrediction;
   /** Base position when prediction was received */

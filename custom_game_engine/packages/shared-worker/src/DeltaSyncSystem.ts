@@ -10,6 +10,7 @@
  */
 
 import type { World, Entity, System } from '@ai-village/core';
+import { EntityImpl } from '@ai-village/core';
 import type { DeltaUpdate } from './path-prediction-types.js';
 
 /**
@@ -23,7 +24,9 @@ export type DeltaBroadcastCallback = (delta: DeltaUpdate) => void;
  * Priority: 1000 (runs last, after all game logic and path prediction)
  */
 export class DeltaSyncSystem implements System {
+  readonly id = 'delta_sync' as const;
   readonly priority = 1000;
+  readonly requiredComponents = [] as const; // Processes all entities
 
   private broadcastCallback: DeltaBroadcastCallback | null = null;
   private lastProcessedEntities = new Set<string>();
@@ -35,7 +38,7 @@ export class DeltaSyncSystem implements System {
     this.broadcastCallback = callback;
   }
 
-  execute(world: World): void {
+  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     if (!this.broadcastCallback) {
       // No broadcast callback set - skip delta sync
       return;
@@ -76,7 +79,7 @@ export class DeltaSyncSystem implements System {
 
     // Clear dirty flags
     for (const entity of dirtyEntities) {
-      entity.removeComponent('dirty_for_sync');
+      (entity as EntityImpl).removeComponent('dirty_for_sync');
     }
 
     // Update last processed entities set
@@ -96,8 +99,8 @@ export class DeltaSyncSystem implements System {
 
     const update: DeltaUpdate['updates'][0] = {
       entityId: entity.id,
-      position: position ? { x: position.x, y: position.y } : { x: 0, y: 0 },
-      prediction: pathPrediction ? pathPrediction.prediction : null,
+      position: position ? { x: (position as any).x, y: (position as any).y } : { x: 0, y: 0 },
+      prediction: pathPrediction ? (pathPrediction as any).prediction : null,
     };
 
     // For new entities or forced updates, include full component data

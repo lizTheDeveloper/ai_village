@@ -22,16 +22,11 @@ import { predictPosition } from './path-prediction-types.js';
  * Priority: 5 (before rendering, after state sync)
  */
 export class PathInterpolationSystem implements System {
+  readonly id = 'path_interpolation' as const;
   readonly priority = 5;
+  readonly requiredComponents = ['path_interpolator', 'position'] as const;
 
-  execute(world: World): void {
-    // Get all entities with path interpolators
-    const entities = world
-      .query()
-      .with('path_interpolator')
-      .with('position')
-      .executeEntities();
-
+  update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     for (const entity of entities) {
       this.interpolate(entity, world);
     }

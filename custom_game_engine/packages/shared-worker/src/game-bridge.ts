@@ -203,6 +203,7 @@ export class GameBridge {
       if (update.prediction) {
         entity.addComponent({
           type: 'path_interpolator',
+          version: 1,
           prediction: update.prediction,
           basePosition: update.position,
           baseTick: delta.tick,

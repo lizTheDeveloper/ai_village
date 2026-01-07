@@ -82,7 +82,7 @@ describe('Reality Anchor Power Integration', () => {
 
       // Simulate 20 ticks (1 second at 20 TPS)
       for (let i = 0; i < 20; i++) {
-        world.tick++;
+        world.advanceTick();
         realityAnchorSystem.update(world);
       }
 
@@ -118,7 +118,7 @@ describe('Reality Anchor Power Integration', () => {
 
       // Simulate 20 ticks (1 second at 20 TPS)
       for (let i = 0; i < 20; i++) {
-        world.tick++;
+        world.advanceTick();
         realityAnchorSystem.update(world);
       }
 
@@ -143,7 +143,10 @@ describe('Reality Anchor Power Integration', () => {
       (anchor as EntityImpl).addComponent(CT.Power, anchorPower);
 
       // Act: Run Reality Anchor system
-      world.tick = 20;
+      // Advance world to tick 20
+      for (let i = 0; i < 20; i++) {
+        world.advanceTick();
+      }
       realityAnchorSystem.update(world);
 
       // Assert: Event should be emitted
@@ -204,7 +207,10 @@ describe('Reality Anchor Power Integration', () => {
       (anchor as EntityImpl).addComponent(CT.Power, anchorPower);
 
       // Act: Run Reality Anchor system
-      world.tick = 20;
+      // Advance world to tick 20
+      for (let i = 0; i < 20; i++) {
+        world.advanceTick();
+      }
       realityAnchorSystem.update(world);
 
       // Assert: Field should collapse
@@ -229,7 +235,10 @@ describe('Reality Anchor Power Integration', () => {
       (anchor as EntityImpl).addComponent(CT.Power, anchorPower);
 
       // Act: Run Reality Anchor system
-      world.tick = 20;
+      // Advance world to tick 20
+      for (let i = 0; i < 20; i++) {
+        world.advanceTick();
+      }
       realityAnchorSystem.update(world);
 
       // Assert: Event should be emitted
@@ -260,7 +269,10 @@ describe('Reality Anchor Power Integration', () => {
       (anchor as EntityImpl).addComponent(CT.Power, anchorPower);
 
       // Act: Run Reality Anchor system
-      world.tick = 20;
+      // Advance world to tick 20
+      for (let i = 0; i < 20; i++) {
+        world.advanceTick();
+      }
       realityAnchorSystem.update(world);
 
       // Assert: Field collapse event emitted, gods restored
@@ -295,7 +307,10 @@ describe('Reality Anchor Power Integration', () => {
       const powerEntities = world.query().with(CT.Power).with(CT.Position).executeEntities();
       powerGridSystem.update(world, powerEntities, 1);
 
-      world.tick = 20;
+      // Advance world to tick 20
+      for (let i = 0; i < 20; i++) {
+        world.advanceTick();
+      }
       realityAnchorSystem.update(world);
 
       // Assert: Field should remain active
@@ -362,7 +377,10 @@ describe('Reality Anchor Power Integration', () => {
       const powerEntities = world.query().with(CT.Power).with(CT.Position).executeEntities();
       powerGridSystem.update(world, powerEntities, 1);
 
-      world.tick = 20;
+      // Advance world to tick 20
+      for (let i = 0; i < 20; i++) {
+        world.advanceTick();
+      }
       realityAnchorSystem.update(world);
 
       // Assert: Should have 2 separate networks, anchor not powered, not charging
@@ -424,7 +442,10 @@ describe('Reality Anchor Power Integration', () => {
       const powerEntities = world.query().with(CT.Power).with(CT.Position).executeEntities();
       powerGridSystem.update(world, powerEntities, 1);
 
-      world.tick = 20;
+      // Advance world to tick 20
+      for (let i = 0; i < 20; i++) {
+        world.advanceTick();
+      }
       realityAnchorSystem.update(world);
 
       // Assert: Partial power warning emitted
@@ -476,7 +497,10 @@ describe('Reality Anchor Power Integration', () => {
       powerGridSystem.update(world, powerEntities, 1);
 
       // Run Reality Anchor system
-      world.tick = 20;
+      // Advance world to tick 20
+      for (let i = 0; i < 20; i++) {
+        world.advanceTick();
+      }
       realityAnchorSystem.update(world);
 
       // Assert: Field collapsed, god restored to divinity
@@ -497,7 +521,10 @@ describe('Reality Anchor Power Integration', () => {
       // No PowerComponent added!
 
       // Act: Should not crash
-      world.tick = 20;
+      // Advance world to tick 20
+      for (let i = 0; i < 20; i++) {
+        world.advanceTick();
+      }
       expect(() => realityAnchorSystem.update(world)).not.toThrow();
 
       // Assert: Should either:
@@ -519,7 +546,10 @@ describe('Reality Anchor Power Integration', () => {
       (anchor as EntityImpl).addComponent(CT.Power, anchorPower);
 
       // Act: Should not attempt to charge or drain power
-      world.tick = 20;
+      // Advance world to tick 20
+      for (let i = 0; i < 20; i++) {
+        world.advanceTick();
+      }
       realityAnchorSystem.update(world);
 
       // Assert: No changes to power level, no power consumption

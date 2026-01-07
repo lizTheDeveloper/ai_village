@@ -9,6 +9,7 @@
  */
 
 import type { World, Entity, System } from '@ai-village/core';
+import { EntityImpl } from '@ai-village/core';
 import type {
   PathPrediction,
   PathPredictionComponent,
@@ -24,6 +25,7 @@ import { calculateDeviation, predictPosition } from './path-prediction-types.js'
  */
 interface DirtyForSyncComponent {
   type: 'dirty_for_sync';
+  version: number;
   reason: 'new' | 'path_changed' | 'forced';
 }
 
@@ -39,14 +41,14 @@ export class PathPredictionSystem implements System {
 
   update(world: World, entities: ReadonlyArray<Entity>, deltaTime: number): void {
     for (const entity of entities) {
-      this.updatePrediction(entity, world);
+      this.updatePrediction(entity as EntityImpl, world);
     }
   }
 
   /**
    * Update path prediction for an entity
    */
-  private updatePrediction(entity: Entity, world: World): void {
+  private updatePrediction(entity: EntityImpl, world: World): void {
     const position = entity.getComponent('position');
     if (!position) return;
 
@@ -55,9 +57,9 @@ export class PathPredictionSystem implements System {
 
     if (!prediction) {
       // New entity - create initial prediction
-      prediction = this.createPrediction(entity, world);
-      if (prediction) {
-        entity.addComponent(prediction);
+      const newPrediction = this.createPrediction(entity, world);
+      if (newPrediction) {
+        entity.addComponent(newPrediction);
         this.markDirty(entity, 'new');
       }
       return;
@@ -71,7 +73,7 @@ export class PathPredictionSystem implements System {
       ticksElapsed
     );
 
-    const deviation = calculateDeviation(position, predictedPos);
+    const deviation = calculateDeviation(position as any, predictedPos);
 
     if (deviation > prediction.deviationThreshold) {
       // Movement changed significantly - update prediction
@@ -95,7 +97,7 @@ export class PathPredictionSystem implements System {
   /**
    * Create path prediction for an entity based on its components
    */
-  private createPrediction(entity: Entity, world: World): PathPredictionComponent | null {
+  private createPrediction(entity: EntityImpl, world: World): PathPredictionComponent | null {
     const position = entity.getComponent('position');
     const velocity = entity.getComponent('velocity');
 
@@ -109,12 +111,12 @@ export class PathPredictionSystem implements System {
 
     // Check for steering behavior
     const steering = entity.getComponent('steering');
-    if (steering && steering.target) {
+    if (steering && (steering as any).target) {
       return this.createSteeringPrediction(entity, position, velocity, steering, world);
     }
 
     // Check for velocity (linear movement)
-    if (velocity && (Math.abs(velocity.x) > 0.01 || Math.abs(velocity.y) > 0.01)) {
+    if (velocity && (Math.abs((velocity as any).x) > 0.01 || Math.abs((velocity as any).y) > 0.01)) {
       return this.createLinearPrediction(entity, position, velocity, world);
     }
 
@@ -126,21 +128,22 @@ export class PathPredictionSystem implements System {
    * Create linear path prediction
    */
   private createLinearPrediction(
-    entity: Entity,
+    entity: EntityImpl,
     position: any,
     velocity: any,
     world: World
   ): PathPredictionComponent {
     const prediction: LinearPath = {
       type: 'linear',
-      velocity: { x: velocity.x, y: velocity.y },
+      velocity: { x: (velocity as any).x, y: (velocity as any).y },
       duration: 100, // Re-sync every 5 seconds (100 ticks at 20 TPS)
     };
 
     return {
       type: 'path_prediction',
+      version: 1,
       prediction,
-      lastSentPosition: { x: position.x, y: position.y },
+      lastSentPosition: { x: (position as any).x, y: (position as any).y },
       lastSentTick: world.tick,
       deviationThreshold: 1.0, // 1 pixel deviation triggers update
     };
@@ -150,7 +153,7 @@ export class PathPredictionSystem implements System {
    * Create wander path prediction
    */
   private createWanderPrediction(
-    entity: Entity,
+    entity: EntityImpl,
     position: any,
     velocity: any,
     wander: any,
@@ -158,17 +161,18 @@ export class PathPredictionSystem implements System {
   ): PathPredictionComponent {
     const prediction: WanderPath = {
       type: 'wander',
-      currentVelocity: { x: velocity.x, y: velocity.y },
-      wanderRadius: wander.wanderRadius || 3.0,
-      wanderDistance: wander.wanderDistance || 6.0,
-      wanderJitter: wander.wanderJitter || 1.0,
+      currentVelocity: { x: (velocity as any).x, y: (velocity as any).y },
+      wanderRadius: (wander as any).wanderRadius || 3.0,
+      wanderDistance: (wander as any).wanderDistance || 6.0,
+      wanderJitter: (wander as any).wanderJitter || 1.0,
       seed: this.hashEntityId(entity.id), // Deterministic seed from entity ID
     };
 
     return {
       type: 'path_prediction',
+      version: 1,
       prediction,
-      lastSentPosition: { x: position.x, y: position.y },
+      lastSentPosition: { x: (position as any).x, y: (position as any).y },
       lastSentTick: world.tick,
       deviationThreshold: 2.0, // Wander is less predictable, higher threshold
     };
@@ -178,7 +182,7 @@ export class PathPredictionSystem implements System {
    * Create steering path prediction
    */
   private createSteeringPrediction(
-    entity: Entity,
+    entity: EntityImpl,
     position: any,
     velocity: any,
     steering: any,
@@ -186,16 +190,17 @@ export class PathPredictionSystem implements System {
   ): PathPredictionComponent {
     const prediction: SteeringPath = {
       type: 'steering',
-      target: { x: steering.target.x, y: steering.target.y },
-      maxSpeed: steering.maxSpeed || 2.0,
-      arrivalRadius: steering.arrivalRadius || 5.0,
-      currentVelocity: velocity ? { x: velocity.x, y: velocity.y } : undefined,
+      target: { x: (steering as any).target.x, y: (steering as any).target.y },
+      maxSpeed: (steering as any).maxSpeed || 2.0,
+      arrivalRadius: (steering as any).arrivalRadius || 5.0,
+      currentVelocity: velocity ? { x: (velocity as any).x, y: (velocity as any).y } : undefined,
     };
 
     return {
       type: 'path_prediction',
+      version: 1,
       prediction,
-      lastSentPosition: { x: position.x, y: position.y },
+      lastSentPosition: { x: (position as any).x, y: (position as any).y },
       lastSentTick: world.tick,
       deviationThreshold: 1.0, // Steering is predictable
     };
@@ -205,7 +210,7 @@ export class PathPredictionSystem implements System {
    * Create stationary path prediction
    */
   private createStationaryPrediction(
-    entity: Entity,
+    entity: EntityImpl,
     position: any,
     world: World
   ): PathPredictionComponent {
@@ -216,8 +221,9 @@ export class PathPredictionSystem implements System {
 
     return {
       type: 'path_prediction',
+      version: 1,
       prediction,
-      lastSentPosition: { x: position.x, y: position.y },
+      lastSentPosition: { x: (position as any).x, y: (position as any).y },
       lastSentTick: world.tick,
       deviationThreshold: 0.1, // Very small threshold - stationary means stationary
     };
@@ -226,9 +232,10 @@ export class PathPredictionSystem implements System {
   /**
    * Mark entity as dirty (needs sync to windows)
    */
-  private markDirty(entity: Entity, reason: DirtyForSyncComponent['reason']): void {
+  private markDirty(entity: EntityImpl, reason: DirtyForSyncComponent['reason']): void {
     const dirty: DirtyForSyncComponent = {
       type: 'dirty_for_sync',
+      version: 1,
       reason,
     };
     entity.addComponent(dirty);
