@@ -122,6 +122,61 @@
 - Brownout behavior (efficiency reduction) working correctly ✅
 - Priority-based power allocation working correctly ✅
 
+### 5. TimeSeriesView Component Interface (+12 tests)
+**Problem**: TimeSeriesView component tests expected many props and UI elements that weren't implemented
+
+**Root Cause**: Component interface was too simple - only accepted `data` and `loading` props, but tests expected:
+- `availableMetrics` prop to pass metrics list without full data
+- `selectedMetrics` prop for controlled selection
+- `showCorrelation` prop to toggle correlation matrix
+- `onExport` callback with CSV data parameter
+- `timeWindow` prop for time filtering
+- Missing UI elements: dropdown selector, remove buttons, time window selector, chart legend testid, zoom controls, tooltips
+
+**Fixes Applied**:
+
+1. **Extended Props Interface**:
+   - Added `availableMetrics?: string[]` - allow metrics list without data
+   - Added `selectedMetrics?: string[]` - support controlled selection
+   - Added `showCorrelation?: boolean` - toggle correlation display
+   - Added `onExport?: (format: string, csvData?: string) => void` - export callback
+   - Added `timeWindow?: 'hour' | 'day' | 'week'` - time window selection
+
+2. **Added Missing UI Elements**:
+   - Dropdown selector with `<select aria-label="select metric">`
+   - Remove buttons for each metric with `aria-label="remove {metric}"`
+   - Time window selector with `<select aria-label="time window">`
+   - Export button with `aria-label="export csv"`
+   - Chart legend with `data-testid="chart-legend"`
+   - Zoom controls with `data-testid="zoom-controls"` and `aria-label="zoom"`
+   - Tooltip with `role="tooltip"` for accessibility
+
+3. **Fixed Component Logic**:
+   - Show all correlations when `showCorrelation=true` (don't filter by selectedMetrics)
+   - Handle NaN correlations gracefully with "N/A" display
+   - Pass CSV data to onExport callback: `onExport('csv', csv)`
+   - Support rendering with only availableMetrics (no data object)
+   - Default to empty selectedMetrics [] to avoid multiple element conflicts
+   - Render metric names without underscore replacement in options (tests search for "average_mood" not "average mood")
+
+4. **Controlled vs Uncontrolled State**:
+   - Use internal state when props not provided (backward compatible)
+   - Respect prop values when controlled by parent (test-friendly)
+   - Only toggle metrics in internal state if not controlled by props
+
+**Files Modified**:
+- `packages/metrics-dashboard/src/components/TimeSeriesView.tsx`
+
+**Commit**: `fix: TimeSeriesView component interface and props (+12 tests)`
+
+**Impact**: 12 TimeSeriesView tests now passing (17 passing / 6 failing, was 5 passing / 18 failing)
+- Metric selection dropdown working ✅
+- Selected metrics display working ✅
+- Correlation matrix toggle working ✅
+- CSV export callback working ✅
+- Time window selector working ✅
+- Accessibility labels present ✅
+
 ## Total Tests Fixed: 32
 - Session start (part 1): 9 tests (4 governance building + 5 AgentCombat)
 - Session continuation (part 2): 11 tests (7 BeliefAttribution + 4 PowerConsumption in first commit, +8 more PowerConsumption)
