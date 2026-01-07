@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { WorldImpl } from '../ecs/index.js';
 import { EventBusImpl } from '../events/EventBus.js';
 import { PlantSystem } from '../systems/PlantSystem.js';
+import { StateMutatorSystem } from '../systems/StateMutatorSystem.js';
 import { PlantComponent } from '../components/PlantComponent.js';
 import { createPositionComponent } from '../components/PositionComponent.js';
 import type { PlantSpecies } from '../types/PlantSpecies.js';
@@ -60,12 +61,18 @@ function createMockSpeciesLookup(): (id: string) => PlantSpecies {
 describe('PlantSystem', () => {
   let world: WorldImpl;
   let system: PlantSystem;
+  let stateMutator: StateMutatorSystem;
   let eventBus: EventBusImpl;
 
   beforeEach(() => {
     eventBus = new EventBusImpl();
     world = new WorldImpl(eventBus);
+
+    // Create and wire up StateMutatorSystem (required dependency)
+    stateMutator = new StateMutatorSystem();
+
     system = new PlantSystem(eventBus);
+    system.setStateMutatorSystem(stateMutator);
     // Configure species lookup for all tests
     system.setSpeciesLookup(createMockSpeciesLookup());
   });
@@ -187,7 +194,10 @@ describe('PlantSystem', () => {
       // Simulate multiple game hours
       const entities = world.query().with(ComponentType.Plant).executeEntities();
       for (let i = 0; i < 24; i++) {
+        // Advance world tick (20 TPS, so 25 sec = 500 ticks)
+        world.setTick(world.tick + 500);
         system.update(world, entities, 25); // ~1 hour per update (600 sec / 24 = 25 sec)
+        stateMutator.update(world, [], 25); // Apply batched deltas
       }
 
       const plantAfter = entity.getComponent(ComponentType.Plant) as PlantComponent;
@@ -271,7 +281,9 @@ describe('PlantSystem', () => {
 
       // Simulate multiple hours to see health decay
       for (let i = 0; i < 24; i++) {
+        world.setTick(world.tick + 500);
         system.update(world, entities, 25);
+        stateMutator.update(world, [], 25);
       }
 
       const plantAfter = entity.getComponent(ComponentType.Plant) as PlantComponent;
@@ -294,7 +306,9 @@ describe('PlantSystem', () => {
 
       // Simulate multiple hours
       for (let i = 0; i < 24; i++) {
+        world.setTick(world.tick + 500);
         system.update(world, entities, 25);
+        stateMutator.update(world, [], 25);
       }
 
       const plantAfter = entity.getComponent(ComponentType.Plant) as PlantComponent;
@@ -346,7 +360,9 @@ describe('PlantSystem', () => {
 
       // Multiple updates to ensure death
       for (let i = 0; i < 100; i++) {
+        world.setTick(world.tick + 500);
         system.update(world, entities, 25);
+        stateMutator.update(world, [], 25);
       }
 
       const plantAfter = entity.getComponent(ComponentType.Plant) as PlantComponent;
@@ -398,7 +414,9 @@ describe('PlantSystem', () => {
 
       const entities = world.query().with(ComponentType.Plant).executeEntities();
       // Use deltaTime=30 to trigger at least 1 game hour (30/600*24 = 1.2 hours)
+      world.setTick(world.tick + 600); // Advance tick
       system.update(world, entities, 30.0);
+      stateMutator.update(world, [], 30.0); // Apply any deltas
 
       const plantAfter = entity.getComponent(ComponentType.Plant) as PlantComponent;
       // Heavy rain should add 30 to hydration, minus natural decay
@@ -488,7 +506,9 @@ describe('PlantSystem', () => {
 
       // Simulate multiple hours
       for (let i = 0; i < 24; i++) {
+        world.setTick(world.tick + 500);
         system.update(world, entities, 25);
+        stateMutator.update(world, [], 25);
       }
 
       const plantAfter = entity.getComponent(ComponentType.Plant) as PlantComponent;

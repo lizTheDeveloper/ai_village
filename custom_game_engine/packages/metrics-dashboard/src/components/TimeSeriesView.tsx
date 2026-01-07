@@ -236,21 +236,7 @@ export function TimeSeriesView({
                   );
                 }}
               />
-              <Legend wrapperStyle={{ position: 'relative' }} />
-              <div data-testid="chart-legend" className="chart-legend">
-                {selectedMetrics.slice(0, 5).map((metricName, idx) => (
-                  <div key={metricName} className="legend-item">
-                    <span
-                      style={{
-                        color: METRIC_COLORS[idx % METRIC_COLORS.length],
-                      }}
-                    >
-                      ■
-                    </span>
-                    {metricName.replace(/_/g, ' ')}
-                  </div>
-                ))}
-              </div>
+              <Legend wrapperStyle={{ position: 'relative' }} data-testid="chart-legend" />
               {selectedMetrics.map((metricName, idx) => (
                 <Line
                   key={metricName}

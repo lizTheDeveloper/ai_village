@@ -9,6 +9,7 @@ echo ""
 echo "This will start:"
 echo "  - Metrics Server (port 8766) with Admin Console at /admin"
 echo "  - PixelLab Sprite Daemon"
+echo "  - Sprite Wizard (port 3011)"
 echo "  - API Server (port 3001)"
 echo "  - Game Dev Server (port 3000)"
 echo "  - Browser at http://localhost:3000"
@@ -26,6 +27,7 @@ DEV_LOG="logs/dev-server-${TIMESTAMP}.log"
 # PID files for reconnecting to existing servers
 METRICS_PID_FILE=".metrics-server.pid"
 PIXELLAB_PID_FILE=".pixellab-daemon.pid"
+SPRITE_WIZARD_PID_FILE=".sprite-wizard.pid"
 API_PID_FILE=".api-server.pid"
 DEV_PID_FILE=".dev-server.pid"
 
@@ -68,6 +70,31 @@ start_pixellab_daemon() {
     PIXELLAB_PID=$!
     echo $PIXELLAB_PID > "$PIXELLAB_PID_FILE"
     sleep 1
+}
+
+# Function to start or reconnect to Sprite Wizard
+start_sprite_wizard() {
+    if [ -f "$SPRITE_WIZARD_PID_FILE" ]; then
+        SPRITE_WIZARD_PID=$(cat "$SPRITE_WIZARD_PID_FILE")
+        if is_running "$SPRITE_WIZARD_PID"; then
+            echo "Sprite Wizard already running (PID: $SPRITE_WIZARD_PID)"
+            return
+        fi
+    fi
+
+    echo "Starting Sprite Wizard..."
+    echo "Logs: logs/sprite-wizard-${TIMESTAMP}.log"
+
+    # Load .env file and export VITE_PIXELLAB_API_KEY for the wizard
+    if [ -f ".env" ]; then
+        export $(grep -v '^#' .env | grep 'VITE_PIXELLAB_API_KEY' | xargs)
+    fi
+
+    SPRITE_WIZARD_LOG="logs/sprite-wizard-${TIMESTAMP}.log"
+    nohup npx vite packages/deterministic-sprite-generator/sprite-set-generator --port 3011 > "$SPRITE_WIZARD_LOG" 2>&1 &
+    SPRITE_WIZARD_PID=$!
+    echo $SPRITE_WIZARD_PID > "$SPRITE_WIZARD_PID_FILE"
+    sleep 2
 }
 
 # Function to start or reconnect to API server
@@ -118,6 +145,7 @@ start_dev_server() {
 # Start all servers
 start_metrics_server
 start_pixellab_daemon
+start_sprite_wizard
 start_api_server
 start_dev_server
 
@@ -135,11 +163,12 @@ fi
 echo ""
 echo "=== AI Village Running ==="
 echo ""
-echo "Central Hub:   http://localhost:3000/hub.html"
-echo "Game:          http://localhost:3000"
-echo "API:           http://localhost:3001"
-echo "Admin Console: http://localhost:8766/admin"
-echo "PixelLab:      Background daemon (PID $PIXELLAB_PID)"
+echo "Central Hub:    http://localhost:3000/hub.html"
+echo "Game:           http://localhost:3000"
+echo "Sprite Wizard:  http://localhost:3011"
+echo "API:            http://localhost:3001"
+echo "Admin Console:  http://localhost:8766/admin"
+echo "PixelLab:       Background daemon (PID $PIXELLAB_PID)"
 echo ""
 echo "Servers are running in background (nohup)."
 echo "Close this terminal and they'll keep running."

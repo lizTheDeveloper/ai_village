@@ -22,8 +22,8 @@ show_status() {
   local found=0
 
   # Check services via port scanning
-  local ports=(3000 3001 3002 8766)
-  local names=("Game (default)" "Game (alt 1)" "Game (alt 2)" "Admin Console")
+  local ports=(3000 3001 3002 3011 8766)
+  local names=("Game (default)" "Game (alt 1)" "Game (alt 2)" "Sprite Wizard" "Admin Console")
 
   for i in "${!ports[@]}"; do
     local port=${ports[$i]}
@@ -136,6 +136,7 @@ kill_servers() {
   pkill -9 -f "tsx.*metrics-server" 2>/dev/null && echo "  Stopped tsx metrics-server" || true
   pkill -9 -f "node.*dashboard.*server" 2>/dev/null && echo "  Stopped Orchestration dashboard" || true
   pkill -9 -f "pixellab-daemon" 2>/dev/null && echo "  Stopped PixelLab daemon" || true
+  pkill -9 -f "sprite-wizard" 2>/dev/null && echo "  Stopped Sprite Wizard" || true
   pkill -9 -f "tsc --build --watch" 2>/dev/null && echo "  Stopped TypeScript watch" || true
 
   echo ""
@@ -184,7 +185,7 @@ echo "🧹 Checking for conflicting servers..."
 echo ""
 
 # Check for processes on our ports
-CLEANUP_PORTS=(3000 3001 3002 8765 8766)
+CLEANUP_PORTS=(3000 3001 3002 3011 8765 8766)
 FOUND_CONFLICTS=0
 
 for port in "${CLEANUP_PORTS[@]}"; do
@@ -230,9 +231,10 @@ if [ $FOUND_CONFLICTS -eq 1 ]; then
   pkill -9 -f "metrics-server" 2>/dev/null && echo "    ✓ Stopped old metrics servers" || true
   pkill -9 -f "api-server" 2>/dev/null && echo "    ✓ Stopped old API servers" || true
   pkill -9 -f "pixellab-daemon" 2>/dev/null && echo "    ✓ Stopped old PixelLab daemon" || true
+  pkill -9 -f "sprite-wizard" 2>/dev/null && echo "    ✓ Stopped old Sprite Wizard" || true
 
   # Clean up stale PID files
-  rm -f .metrics-server.pid .api-server.pid .dev-server.pid .pixellab-daemon.pid 2>/dev/null
+  rm -f .metrics-server.pid .api-server.pid .dev-server.pid .pixellab-daemon.pid .sprite-wizard.pid 2>/dev/null
 
   echo ""
   echo "  ✅ Cleanup complete!"
