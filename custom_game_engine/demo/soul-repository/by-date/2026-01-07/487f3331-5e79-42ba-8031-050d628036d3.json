@@ -1,0 +1,17 @@
+{
+  "soulId": "487f3331-5e79-42ba-8031-050d628036d3",
+  "agentId": "487f3331-5e79-42ba-8031-050d628036d3",
+  "name": "Glen",
+  "species": "human",
+  "archetype": "seeker",
+  "purpose": "This soul shall serve as a bridge between the old ways of The First Village and the wisdom yet to come.",
+  "interests": [
+    "knowledge",
+    "crafting",
+    "art"
+  ],
+  "createdAt": "2026-01-07T02:56:18.593Z",
+  "soulBirthTick": 6,
+  "universeId": "unknown",
+  "version": 1
+}

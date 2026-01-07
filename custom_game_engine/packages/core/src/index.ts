@@ -532,6 +532,9 @@ export {
   getLLMDecisionProcessor,
   type LLMDecisionResult,
   type LLMDecisionQueue,
+  // Scheduled decisions
+  ScheduledDecisionProcessor,
+  type ScheduledDecisionResult,
   // Scripted decisions
   ScriptedDecisionProcessor,
   processScriptedDecision,

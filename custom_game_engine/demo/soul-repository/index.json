@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "totalSouls": 39,
-  "lastUpdated": "2026-01-06T04:52:11.234Z",
+  "totalSouls": 40,
+  "lastUpdated": "2026-01-07T02:56:18.594Z",
   "souls": {
     "26ab6ad1-3ea4-4217-84c3-41c2de19948d": {
       "name": "Orion",
@@ -353,6 +353,15 @@
       "soulBirthTick": 74,
       "universeId": "unknown",
       "filePath": "by-date/2026-01-06/81707408-56ad-44e4-8e3c-1217417d7515.json"
+    },
+    "487f3331-5e79-42ba-8031-050d628036d3": {
+      "name": "Glen",
+      "species": "human",
+      "archetype": "seeker",
+      "createdAt": "2026-01-07T02:56:18.593Z",
+      "soulBirthTick": 6,
+      "universeId": "unknown",
+      "filePath": "by-date/2026-01-07/487f3331-5e79-42ba-8031-050d628036d3.json"
     }
   }
 }

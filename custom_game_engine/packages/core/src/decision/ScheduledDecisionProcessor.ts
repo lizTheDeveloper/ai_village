@@ -25,7 +25,7 @@ import { parseAction, actionToBehavior } from '../actions/AgentAction.js';
 // Import LLMScheduler from llm package
 // Note: This creates a dependency from @ai-village/core → @ai-village/llm
 // which is acceptable since LLM integration is optional
-import type { LLMScheduler, DecisionLayer } from '../../../llm/src/LLMScheduler.js';
+import type { LLMScheduler, DecisionLayer } from '@ai-village/llm';
 
 /**
  * Decision result from ScheduledDecisionProcessor

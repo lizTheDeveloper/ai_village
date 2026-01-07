@@ -96,6 +96,26 @@ interface AgentLayerState {
 }
 
 /**
+ * Scheduler metrics for monitoring and optimization
+ */
+export interface SchedulerMetrics {
+  /** Number of times each layer was selected */
+  layerSelections: Record<DecisionLayer, number>;
+  /** Number of times a decision was blocked by cooldown */
+  cooldownHits: Record<DecisionLayer, number>;
+  /** Sum of urgency scores for calculating averages */
+  totalUrgency: Record<DecisionLayer, number>;
+  /** Total decision requests processed */
+  totalRequests: number;
+  /** Number of successful LLM calls */
+  successfulCalls: number;
+  /** Number of failed LLM calls */
+  failedCalls: number;
+  /** Timestamp when metrics were last reset */
+  resetAt: number;
+}
+
+/**
  * LLM Scheduler
  *
  * Coordinates three-layer LLM decision-making
@@ -108,6 +128,7 @@ export class LLMScheduler {
 
   private layerConfig: Record<DecisionLayer, LayerConfig>;
   private agentStates: Map<string, AgentLayerState> = new Map();
+  private metrics: SchedulerMetrics;
 
   constructor(
     queue: LLMDecisionQueue,
@@ -123,6 +144,24 @@ export class LLMScheduler {
       autonomic: { ...DEFAULT_LAYER_CONFIG.autonomic, ...config?.autonomic },
       talker: { ...DEFAULT_LAYER_CONFIG.talker, ...config?.talker },
       executor: { ...DEFAULT_LAYER_CONFIG.executor, ...config?.executor },
+    };
+
+    // Initialize metrics
+    this.metrics = this.createEmptyMetrics();
+  }
+
+  /**
+   * Create empty metrics object
+   */
+  private createEmptyMetrics(): SchedulerMetrics {
+    return {
+      layerSelections: { autonomic: 0, talker: 0, executor: 0 },
+      cooldownHits: { autonomic: 0, talker: 0, executor: 0 },
+      totalUrgency: { autonomic: 0, talker: 0, executor: 0 },
+      totalRequests: 0,
+      successfulCalls: 0,
+      failedCalls: 0,
+      resetAt: Date.now(),
     };
   }
 
@@ -252,9 +291,18 @@ export class LLMScheduler {
   ): Promise<{ layer: DecisionLayer; response: string; reason: string } | null> {
     const selection = this.selectLayer(agent, world);
 
+    // Track metrics: layer selection and urgency
+    this.metrics.totalRequests++;
+    this.metrics.layerSelections[selection.layer]++;
+    this.metrics.totalUrgency[selection.layer] += selection.urgency;
+
     // Check if selected layer is ready
     if (!this.isLayerReady(agent.id, selection.layer)) {
       const waitMs = this.getTimeUntilReady(agent.id, selection.layer);
+
+      // Track metrics: cooldown hit
+      this.metrics.cooldownHits[selection.layer]++;
+
       console.log(
         `[LLMScheduler] ${agent.id} layer ${selection.layer} on cooldown (${waitMs}ms remaining)`
       );
@@ -272,6 +320,9 @@ export class LLMScheduler {
     try {
       const response = await this.queue.requestDecision(agent.id, prompt);
 
+      // Track metrics: successful call
+      this.metrics.successfulCalls++;
+
       console.log(
         `[LLMScheduler] ${agent.id} → ${selection.layer} (${selection.reason})`
       );
@@ -282,6 +333,9 @@ export class LLMScheduler {
         reason: selection.reason,
       };
     } catch (error) {
+      // Track metrics: failed call
+      this.metrics.failedCalls++;
+
       console.error(`[LLMScheduler] Decision failed for ${agent.id}:`, error);
       return null;
     }
@@ -386,5 +440,45 @@ export class LLMScheduler {
     if (toDelete.length > 0) {
       console.log(`[LLMScheduler] Cleaned up ${toDelete.length} old agent states`);
     }
+  }
+
+  /**
+   * Get current scheduler metrics
+   */
+  getMetrics(): SchedulerMetrics {
+    return { ...this.metrics };
+  }
+
+  /**
+   * Reset scheduler metrics
+   */
+  resetMetrics(): void {
+    this.metrics = this.createEmptyMetrics();
+  }
+
+  /**
+   * Get metrics with calculated averages
+   */
+  getMetricsWithAverages() {
+    const avgUrgency: Record<DecisionLayer, number> = {
+      autonomic:
+        this.metrics.layerSelections.autonomic > 0
+          ? this.metrics.totalUrgency.autonomic / this.metrics.layerSelections.autonomic
+          : 0,
+      talker:
+        this.metrics.layerSelections.talker > 0
+          ? this.metrics.totalUrgency.talker / this.metrics.layerSelections.talker
+          : 0,
+      executor:
+        this.metrics.layerSelections.executor > 0
+          ? this.metrics.totalUrgency.executor / this.metrics.layerSelections.executor
+          : 0,
+    };
+
+    return {
+      ...this.metrics,
+      averageUrgency: avgUrgency,
+      uptime: Date.now() - this.metrics.resetAt,
+    };
   }
 }

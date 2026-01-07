@@ -13,6 +13,7 @@ vi.mock('recharts', () => ({
   Tooltip: () => <div />,
   Legend: () => <div />,
   ResponsiveContainer: ({ children }: any) => <div>{children}</div>,
+  ReferenceDot: () => <div />,
 }));
 
 describe('TimelineView Component', () => {

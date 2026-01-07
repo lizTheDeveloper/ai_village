@@ -46,12 +46,20 @@ export interface EntityDetails {
 /**
  * LiveEntityAPI connects the game's World to the metrics dashboard
  */
+/**
+ * Interface for the LLM scheduler (from @ai-village/llm)
+ */
+export interface LLMScheduler {
+  getMetricsWithAverages(): any;
+}
+
 export class LiveEntityAPI {
   private world: World;
   private promptBuilder: PromptBuilder | null = null;
   private talkerPromptBuilder: PromptBuilder | null = null;
   private executorPromptBuilder: PromptBuilder | null = null;
   private agentDebugManager: AgentDebugManager | null = null;
+  private scheduler: LLMScheduler | null = null;
 
   constructor(world: World) {
     this.world = world;
@@ -83,6 +91,13 @@ export class LiveEntityAPI {
    */
   setAgentDebugManager(manager: AgentDebugManager): void {
     this.agentDebugManager = manager;
+  }
+
+  /**
+   * Set the LLM scheduler for metrics queries
+   */
+  setScheduler(scheduler: LLMScheduler): void {
+    this.scheduler = scheduler;
   }
 
   /**
@@ -122,6 +137,8 @@ export class LiveEntityAPI {
         return this.handlePlantsQuery(query);
       case 'terrain':
         return this.handleTerrainQuery(query);
+      case 'scheduler':
+        return this.handleSchedulerQuery(query);
       default:
         return {
           requestId: query.requestId,
