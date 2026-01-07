@@ -96,6 +96,11 @@ export const SocialMemorySchema = autoRegister(
     llm: {
       promptSection: 'social_knowledge',
       summarize: (data) => {
+        // Guard against undefined or missing socialMemories property
+        if (!data.socialMemories || typeof data.socialMemories.values !== 'function') {
+          return 'No social memories';
+        }
+
         const memories = Array.from(data.socialMemories.values());
 
         if (memories.length === 0) {

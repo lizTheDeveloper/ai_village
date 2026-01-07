@@ -1869,6 +1869,35 @@ export class LiveEntityAPI {
   }
 
   /**
+   * Get LLM scheduler metrics
+   */
+  private handleSchedulerQuery(query: QueryRequest): QueryResponse {
+    try {
+      if (!this.scheduler) {
+        return {
+          requestId: query.requestId,
+          success: false,
+          error: 'LLM scheduler not available (not initialized or not using scheduled decision processor)',
+        };
+      }
+
+      const metrics = this.scheduler.getMetricsWithAverages();
+
+      return {
+        requestId: query.requestId,
+        success: true,
+        data: metrics,
+      };
+    } catch (err) {
+      return {
+        requestId: query.requestId,
+        success: false,
+        error: err instanceof Error ? err.message : 'Failed to query scheduler metrics',
+      };
+    }
+  }
+
+  /**
    * Get pending creations awaiting divine approval
    */
   private handlePendingApprovalsQuery(query: QueryRequest): QueryResponse {

@@ -85,6 +85,11 @@ export const RelationshipSchema = autoRegister(
     llm: {
       promptSection: 'relationships',
       summarize: (data) => {
+        // Guard against undefined or missing relationships property
+        if (!data.relationships || typeof data.relationships.values !== 'function') {
+          return 'No relationships yet';
+        }
+
         const relationships = Array.from(data.relationships.values());
 
         if (relationships.length === 0) {

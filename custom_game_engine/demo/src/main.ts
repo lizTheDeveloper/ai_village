@@ -694,11 +694,12 @@ async function registerAllSystems(
 
   // Create LLMScheduler and ScheduledDecisionProcessor if LLM is available
   let scheduledProcessor: import('@ai-village/core').ScheduledDecisionProcessor | null = null;
+  let scheduler: import('@ai-village/llm').LLMScheduler | null = null;
   if (llmQueue) {
     const { LLMScheduler } = await import('@ai-village/llm');
     const { ScheduledDecisionProcessor } = await import('@ai-village/core');
 
-    const scheduler = new LLMScheduler(llmQueue);
+    scheduler = new LLMScheduler(llmQueue);
     scheduledProcessor = new ScheduledDecisionProcessor(scheduler);
 
     console.log('[Main] Created LLMScheduler with intelligent layer selection');
@@ -758,6 +759,10 @@ async function registerAllSystems(
       }
       if (executorPromptBuilder) {
         liveEntityAPI.setExecutorPromptBuilder(executorPromptBuilder);
+      }
+      // Wire up scheduler for metrics queries
+      if (scheduler) {
+        liveEntityAPI.setScheduler(scheduler);
       }
       liveEntityAPI.setAgentDebugManager(agentDebugManager);
       liveEntityAPI.attach(streamClient);
