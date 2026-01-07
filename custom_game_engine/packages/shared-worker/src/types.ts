@@ -91,6 +91,10 @@ export type WorkerToWindowMessage =
       timestamp: number;
     }
   | {
+      type: 'delta';
+      delta: import('./path-prediction-types.js').DeltaUpdate;
+    }
+  | {
       type: 'snapshot';
       data: Uint8Array;
     }

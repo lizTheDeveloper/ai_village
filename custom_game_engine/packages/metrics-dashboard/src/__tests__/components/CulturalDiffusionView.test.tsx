@@ -3,16 +3,6 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { CulturalDiffusionView } from '@/components/CulturalDiffusionView';
 import { mockCulturalData } from '../mockData';
 
-// Mock D3-sankey
-vi.mock('d3-sankey', () => ({
-  sankey: vi.fn(() => ({
-    nodeWidth: vi.fn(() => ({})),
-    nodePadding: vi.fn(() => ({})),
-    extent: vi.fn(() => ({})),
-  })),
-  sankeyLinkHorizontal: vi.fn(),
-}));
-
 describe('CulturalDiffusionView Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();

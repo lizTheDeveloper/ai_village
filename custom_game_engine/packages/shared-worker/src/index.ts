@@ -48,3 +48,16 @@ export type {
   UniverseDatabase,
   Viewport,
 } from './types.js';
+export type {
+  PathPrediction,
+  LinearPath,
+  WanderPath,
+  SteeringPath,
+  StationaryPath,
+  PathPredictionComponent,
+  PathInterpolatorComponent,
+  DeltaUpdate,
+} from './path-prediction-types.js';
+export { calculateDeviation, predictPosition } from './path-prediction-types.js';
+export { PathPredictionSystem } from './PathPredictionSystem.js';
+export { PathInterpolationSystem } from './PathInterpolationSystem.js';

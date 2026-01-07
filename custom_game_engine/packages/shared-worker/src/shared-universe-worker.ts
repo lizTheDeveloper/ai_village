@@ -12,6 +12,8 @@
 import { GameLoop } from '@ai-village/core';
 import { PersistenceService } from './persistence.js';
 import { setupGameSystems, type GameSetupResult } from './game-setup.js';
+import { PathPredictionSystem } from './PathPredictionSystem.js';
+import { DeltaSyncSystem } from './DeltaSyncSystem.js';
 import type {
   UniverseState,
   GameAction,
@@ -22,6 +24,7 @@ import type {
   SerializedWorld,
   Viewport,
 } from './types.js';
+import type { DeltaUpdate } from './path-prediction-types.js';
 
 /**
  * UniverseWorker - The heart of the SharedWorker architecture
@@ -32,6 +35,10 @@ class UniverseWorker {
   private connections: Map<string, ConnectionInfo> = new Map();
   private gameSetup: GameSetupResult | null = null;
 
+  // Path prediction systems
+  private pathPredictionSystem: PathPredictionSystem | null = null;
+  private deltaSyncSystem: DeltaSyncSystem | null = null;
+
   private tick = 0;
   private running = false;
   private paused = false;
@@ -41,6 +48,7 @@ class UniverseWorker {
     autoSaveInterval: 100, // Every 5 seconds
     debug: true,
     speedMultiplier: 1.0,
+    enablePathPrediction: true, // Enable path prediction by default
   };
 
   constructor() {
@@ -66,6 +74,20 @@ class UniverseWorker {
       enableMetrics: true,
       enableAutoSave: false, // Worker manages its own persistence
     });
+
+    // Register path prediction systems if enabled
+    if (this.config.enablePathPrediction) {
+      console.log('[UniverseWorker] Enabling path prediction');
+
+      // Path prediction system (priority 50 - after movement, before rendering)
+      this.pathPredictionSystem = new PathPredictionSystem();
+      this.gameLoop.systemRegistry.register(this.pathPredictionSystem);
+
+      // Delta sync system (priority 1000 - runs last)
+      this.deltaSyncSystem = new DeltaSyncSystem();
+      this.deltaSyncSystem.setBroadcastCallback((delta) => this.broadcastDelta(delta));
+      this.gameLoop.systemRegistry.register(this.deltaSyncSystem);
+    }
 
     // Try to load saved state
     const savedState = await this.persistence.loadState();
@@ -101,7 +123,11 @@ class UniverseWorker {
     }
 
     // Broadcast to all connected windows
-    this.broadcast();
+    // When path prediction is enabled, DeltaSyncSystem handles broadcasts
+    // Otherwise, use full state broadcast
+    if (!this.config.enablePathPrediction || !this.deltaSyncSystem) {
+      this.broadcast();
+    }
 
     // Auto-save periodically
     if (this.tick % this.config.autoSaveInterval === 0 && !this.paused) {
@@ -134,6 +160,9 @@ class UniverseWorker {
   /**
    * Broadcast state to all connected windows
    * Uses spatial culling - each window only receives entities in its viewport
+   *
+   * Note: This is the fallback method when path prediction is disabled.
+   * When path prediction is enabled, DeltaSyncSystem calls broadcastDelta instead.
    */
   private broadcast(): void {
     if (this.connections.size === 0) return;
@@ -156,6 +185,36 @@ class UniverseWorker {
         conn.lastActivity = Date.now();
       } catch (error) {
         console.warn(`[UniverseWorker] Failed to send to connection ${id}:`, error);
+        this.removeConnection(id);
+      }
+    }
+  }
+
+  /**
+   * Broadcast delta update to all connected windows
+   * Called by DeltaSyncSystem when path prediction is enabled
+   *
+   * Only sends entities that have changed (marked as dirty)
+   */
+  private broadcastDelta(delta: DeltaUpdate): void {
+    if (this.connections.size === 0) return;
+
+    // TODO: Apply per-connection viewport filtering to delta updates
+    // For now, broadcast all delta updates to all connections
+
+    const message: WorkerToWindowMessage = {
+      type: 'delta',
+      delta,
+    };
+
+    for (const [id, conn] of this.connections) {
+      if (!conn.connected) continue;
+
+      try {
+        conn.port.postMessage(message);
+        conn.lastActivity = Date.now();
+      } catch (error) {
+        console.warn(`[UniverseWorker] Failed to send delta to connection ${id}:`, error);
         this.removeConnection(id);
       }
     }

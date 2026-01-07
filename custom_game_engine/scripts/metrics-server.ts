@@ -59,11 +59,26 @@
  *   GET  /api/llm/stats        - Get queue stats (queue lengths, session info, rate limits)
  */
 
-// Load environment variables from demo/.env
+// Load environment variables from .env if available
 import { config } from 'dotenv';
 import * as path from 'path';
 import * as fs from 'fs';
-config({ path: path.join(process.cwd(), 'demo', '.env') });
+
+// Try to load .env from multiple locations, silently continue if not found
+const envPaths = [
+  path.join(import.meta.dirname, '.env'),         // scripts/.env
+  path.join(import.meta.dirname, '..', '.env'),   // project root .env
+  path.join(process.cwd(), '.env'),                // current working directory .env
+];
+
+for (const envPath of envPaths) {
+  if (fs.existsSync(envPath)) {
+    config({ path: envPath });
+    console.log(`[dotenv] Loaded environment from ${envPath}`);
+    break;
+  }
+}
+// If no .env file found, continue without error (environment variables may be set directly)
 
 import { WebSocketServer, WebSocket } from 'ws';
 import { createServer, type IncomingMessage, type ServerResponse } from 'http';
