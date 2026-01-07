@@ -783,6 +783,18 @@ export class InfoSection {
       };
     }
 
+    // Check movement component for hasTarget/targetX/targetY
+    const movement = entity.components.get('movement');
+    if (movement?.hasTarget && movement.targetX !== 0 && movement.targetY !== 0) {
+      const targetInfo = this.findTargetEntityName({ x: movement.targetX, y: movement.targetY }, world);
+      return {
+        x: movement.targetX,
+        y: movement.targetY,
+        name: targetInfo.name,
+        type: targetInfo.type,
+      };
+    }
+
     // Check action queue for targetPos
     const actionQueue = entity.components.get('action_queue');
     if (actionQueue) {

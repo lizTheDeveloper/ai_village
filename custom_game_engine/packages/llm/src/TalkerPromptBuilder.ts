@@ -1,22 +1,22 @@
 /**
  * TalkerPromptBuilder - Layer 2 of three-layer LLM architecture
  *
- * Handles conversational LLM decision making for agents.
- * Focuses on social interactions, environmental awareness, and goal-setting.
+ * THE SOCIAL & VERBAL PLANNING LAYER
  *
- * Responsibilities:
- * - Environmental awareness (vision, weather, temperature, needs, location)
- * - Social context (conversations, relationships, nearby agents)
- * - Personality-driven behavior
- * - Goal-setting (personal, group, medium-term)
- * - Conversation participation
- * - Social actions (talk, follow, call_meeting, attend_meeting, help)
+ * This is your SOCIAL BRAIN and GOAL-SETTING SYSTEM. You focus on:
+ * - Conversations and relationships (talk, listen, socialize)
+ * - Setting goals and priorities (what you want to accomplish)
+ * - Verbal planning (thinking about what to do, not doing it)
+ * - Social awareness (who's around, what they're saying, how you feel about them)
+ * - Environmental awareness (general sense of surroundings, not detailed resource tracking)
  *
- * Does NOT handle:
- * - Detailed resource management (that's Autonomic)
- * - Strategic planning (that's Executor)
- * - Building costs (that's Autonomic)
- * - Task queuing (that's Executor)
+ * You are NOT:
+ * - A task executor (you set goals, Executor handles the details)
+ * - A resource manager (you notice resources exist, Autonomic/Executor manages them)
+ * - A strategic planner (you set personal goals, Executor plans how to achieve them)
+ *
+ * Think of yourself as the "social planner" - you decide WHAT you want and WHY,
+ * but you don't worry about the detailed HOW. You're all about people, goals, and vibes.
  */
 
 import type { Entity } from '@ai-village/core';
@@ -315,12 +315,14 @@ export class TalkerPromptBuilder {
       }
     }
 
-    // Vision (what you see)
+    // Vision (what you see) - HIGH-LEVEL AWARENESS ONLY
+    // Talker sees WHAT is around, not detailed counts/locations
+    // That's for Executor to worry about
     if (vision) {
-      const visibleResources: string[] = [];
-      const visiblePlants: string[] = [];
+      const resourceTypes = new Set<string>();
+      const plantTypes = new Set<string>();
 
-      // Resources in view
+      // Resources in view - just note the types exist
       if (vision.seenResources && vision.seenResources.length > 0) {
         for (const resourceId of vision.seenResources) {
           const resource = world.getEntity(resourceId);
@@ -328,14 +330,12 @@ export class TalkerPromptBuilder {
 
           const resourceComp = resource.components.get('resource') as any;
           if (resourceComp?.type) {
-            if (!visibleResources.includes(resourceComp.type)) {
-              visibleResources.push(resourceComp.type);
-            }
+            resourceTypes.add(resourceComp.type);
           }
         }
       }
 
-      // Plants in view
+      // Plants in view - just note the types exist
       if (vision.seenPlants && vision.seenPlants.length > 0) {
         for (const plantId of vision.seenPlants) {
           const plant = world.getEntity(plantId);
@@ -344,26 +344,27 @@ export class TalkerPromptBuilder {
           const plantComp = plant.components.get('plant') as any;
           if (plantComp?.species) {
             const speciesName = plantComp.species.replace(/-/g, ' ');
-            if (!visiblePlants.includes(speciesName)) {
-              visiblePlants.push(speciesName);
-            }
+            plantTypes.add(speciesName);
           }
         }
       }
 
-      if (visibleResources.length > 0) {
-        context += `You see resources: ${visibleResources.join(', ')}\n`;
+      // Simple awareness: just mention types, no counts
+      if (resourceTypes.size > 0) {
+        const resourceList = Array.from(resourceTypes).join(', ');
+        context += `You notice some ${resourceList} around.\n`;
       }
 
-      if (visiblePlants.length > 0) {
-        context += `You see plants: ${visiblePlants.join(', ')}\n`;
+      if (plantTypes.size > 0) {
+        const plantList = Array.from(plantTypes).join(', ');
+        context += `You see some ${plantList} nearby.\n`;
       }
 
-      // Terrain description
+      // Terrain description - general awareness
       if (vision.terrainDescription &&
           vision.terrainDescription.trim() &&
           !vision.terrainDescription.toLowerCase().includes('unremarkable')) {
-        context += `Terrain: ${vision.terrainDescription}\n`;
+        context += `The area is ${vision.terrainDescription}.\n`;
       }
     }
 
@@ -512,18 +513,37 @@ export class TalkerPromptBuilder {
     const sections: string[] = [prompt.systemPrompt];
 
     // Character guidelines - roleplay directive
-    const characterGuidelines = `--- Character Guidelines ---
-IMPORTANT: You must ALWAYS roleplay in character. All your responses should reflect your personality, goals, and current emotional state.
+    const characterGuidelines = `--- YOUR ROLE: THE SOCIAL & VERBAL PLANNING LAYER ---
+
+You are the SOCIAL BRAIN and GOAL-SETTER for this character. Your job is to:
+- TALK and socialize (have conversations, build relationships, express yourself)
+- SET HIGH-LEVEL GOALS (decide what you want to accomplish and why)
+- EXPRESS DESIRES ("I want to gather berries", "Let's build a farm")
+- Be SOCIALLY AWARE (notice people, feelings, vibes, relationships)
+- GENERAL AWARENESS of environment ("berries are around", "plants nearby")
+
+You are NOT responsible for:
+- Detailed resource tracking (you see "berries around", not "3 berries at x:10 y:20")
+- Task execution and tool calls (Executor handles "plan_build", "gather", etc.)
+- Multi-step planning (you say "gather 50 berries", Executor figures out how)
+- Resource management (Executor tracks counts, locations, and availability)
+
+COORDINATION WITH EXECUTOR:
+- YOU set the goal: "Gather at least 50 berries for winter storage"
+- EXECUTOR reads your goal and creates the plan: finds berries → gathers 50 → stores them
+- YOU provide the WHAT and WHY
+- EXECUTOR provides the detailed HOW
 
 When responding:
-- SPEAK out loud in character using the "speaking" field (what you would actually say)
-- THINK in character (your internal reasoning matches your personality)
-- ACT in character (your actions align with your traits and motivations)
-- Use natural, conversational language when speaking
+- SPEAK out loud using the "speaking" field (express yourself verbally!)
+- SET GOALS using set_personal_goal, set_medium_term_goal, set_group_goal
+- Example goal: "Gather at least 50 berries for the village"
+- Example goal: "Plant a berry farm with 20 berry bushes in rows"
+- Talk about WHAT you want, not HOW to do it
+- Use natural, conversational language
 - Express emotions, opinions, and personality through dialogue
-- Stay consistent with your established character traits
 
-Remember: You are a real person living in this world, not an AI assistant. Talk and act like your character would!`;
+Remember: You're the voice and vision-setter. Executor is the hands and planner. You dream it, Executor does it.`;
 
     sections.push(characterGuidelines);
 

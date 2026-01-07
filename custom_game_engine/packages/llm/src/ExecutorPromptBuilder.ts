@@ -55,6 +55,7 @@ export interface ExecutorPrompt {
   priorities?: string;            // Current strategic priorities
   goals?: string;                 // Personal and strategic goals
   villageStatus?: string;         // Village coordination context
+  environment?: string;           // Detailed environmental data (resources, plants with counts)
   buildings: string;              // Available buildings to plan
   availableActions: string[];     // Executor-specific actions
   instruction: string;            // What to decide
@@ -107,6 +108,9 @@ export class ExecutorPromptBuilder {
     // Available Actions: Executor-specific tools
     const actions = this.getAvailableExecutorActions(skills, vision, needs, inventory, world);
 
+    // Environment: Detailed resource/plant data for task planning
+    const environment = this.buildEnvironmentContext(vision, needs, world);
+
     // Instruction: What to decide
     const instruction = this.buildExecutorInstruction(agentComp, needs, skills, inventory, world);
 
@@ -118,6 +122,7 @@ export class ExecutorPromptBuilder {
       priorities: prioritiesText,
       goals: goalsText,
       villageStatus,
+      environment,
       buildings: buildingsText,
       availableActions: actions,
       instruction,
@@ -267,6 +272,95 @@ export class ExecutorPromptBuilder {
     }
 
     return status;
+  }
+
+  /**
+   * Build environment context: detailed resources and plants for task planning.
+   * Executor needs exact counts and types to plan multi-step tasks like
+   * "gather 50 berries" or "plant 20 berry bushes in rows".
+   */
+  private buildEnvironmentContext(
+    vision: VisionComponent | undefined,
+    needs: NeedsComponent | undefined,
+    world: World
+  ): string {
+    let context = '--- Environment (Detailed) ---\n';
+
+    // Needs (how you feel)
+    if (needs) {
+      const needsDesc: string[] = [];
+
+      if (needs.hunger !== undefined && needs.hunger < 0.3) {
+        needsDesc.push('hungry');
+      }
+      if (needs.energy !== undefined && needs.energy < 0.3) {
+        needsDesc.push('tired');
+      }
+
+      if (needsDesc.length > 0) {
+        context += `Physical State: ${needsDesc.join(', ')}\n`;
+      }
+    }
+
+    // Vision: Detailed resource/plant data with COUNTS
+    if (vision) {
+      const resourceCounts = new Map<string, number>();
+      const plantCounts = new Map<string, number>();
+
+      // Resources in view - count by type
+      if (vision.seenResources && vision.seenResources.length > 0) {
+        for (const resourceId of vision.seenResources) {
+          const resource = world.getEntity(resourceId);
+          if (!resource) continue;
+
+          const resourceComp = resource.components.get('resource') as any;
+          if (resourceComp?.type) {
+            const currentCount = resourceCounts.get(resourceComp.type) || 0;
+            resourceCounts.set(resourceComp.type, currentCount + 1);
+          }
+        }
+      }
+
+      // Plants in view - count by species
+      if (vision.seenPlants && vision.seenPlants.length > 0) {
+        for (const plantId of vision.seenPlants) {
+          const plant = world.getEntity(plantId);
+          if (!plant) continue;
+
+          const plantComp = plant.components.get('plant') as any;
+          if (plantComp?.species) {
+            const speciesName = plantComp.species.replace(/-/g, ' ');
+            const currentCount = plantCounts.get(speciesName) || 0;
+            plantCounts.set(speciesName, currentCount + 1);
+          }
+        }
+      }
+
+      // Detailed resource counts (for planning gather/build tasks)
+      if (resourceCounts.size > 0) {
+        context += 'Resources Available:\n';
+        for (const [type, count] of Array.from(resourceCounts.entries()).sort((a, b) => b[1] - a[1])) {
+          context += `- ${type}: ${count} available\n`;
+        }
+      }
+
+      // Detailed plant counts (for planning farming tasks)
+      if (plantCounts.size > 0) {
+        context += 'Plants Visible:\n';
+        for (const [species, count] of Array.from(plantCounts.entries()).sort((a, b) => b[1] - a[1])) {
+          context += `- ${species}: ${count} visible\n`;
+        }
+      }
+
+      // Terrain description
+      if (vision.terrainDescription &&
+          vision.terrainDescription.trim() &&
+          !vision.terrainDescription.toLowerCase().includes('unremarkable')) {
+        context += `Terrain: ${vision.terrainDescription}\n`;
+      }
+    }
+
+    return context;
   }
 
   /**
@@ -445,17 +539,33 @@ export class ExecutorPromptBuilder {
     const sections: string[] = [prompt.systemPrompt];
 
     // Character guidelines - roleplay directive
-    const characterGuidelines = `--- Character Guidelines ---
-IMPORTANT: You must ALWAYS roleplay in character. All your responses should reflect your personality, goals, and current emotional state.
+    const characterGuidelines = `--- YOUR ROLE: THE TASK PLANNER & EXECUTOR LAYER ---
+
+You are the STRATEGIC PLANNER and TASK EXECUTOR for this character. Your job is to:
+- CREATE MULTI-STEP PLANS (break down goals into specific actions)
+- EXECUTE TASKS using tools (plan_build, gather, farm, pick, etc.)
+- TRACK RESOURCES (you see exact counts: "berry: 15 available")
+- MAKE DETAILED DECISIONS (which resources to gather, where to build, how many to collect)
+
+You are NOT responsible for:
+- Social conversations (Talker handles that)
+- Setting high-level goals (Talker decides WHAT and WHY)
+- Expressing emotions verbally (Talker does the speaking)
+
+COORDINATION WITH TALKER:
+- TALKER sets goals: "Gather at least 50 berries for winter storage"
+- YOU read the goal and execute: find 50 berries → gather them → store in chest
+- TALKER sets goals: "Plant a berry farm with 20 berry bushes in rows"
+- YOU execute: gather berry bush seeds → till soil in rows → plant 20 bushes
 
 When responding:
-- THINK in character (your internal reasoning matches your personality)
-- ACT in character (your actions align with your traits and motivations)
-- PLAN in character (your strategies reflect your skills and knowledge)
-- Use natural language that fits your character
-- Make decisions that are consistent with your established traits and current goals
+- Focus on HOW to achieve the goal, not WHAT or WHY
+- Use available tools: plan_build, gather, pick, farm, till, plant, etc.
+- Plan multi-step tasks: "First gather 10 wood, then gather 5 stone, then plan_build tent"
+- Think in numbers: "I need 50 berries, I see 15 available, need to find 35 more"
+- Use your detailed environment data to make informed decisions
 
-Remember: You are a real person living in this world, not an AI assistant. Think and act like your character would!`;
+Remember: Talker dreams it, you do it. You're the hands and planner, they're the voice and vision-setter.`;
 
     sections.push(characterGuidelines);
 
@@ -482,6 +592,11 @@ Remember: You are a real person living in this world, not an AI assistant. Think
     // Village status (coordination context)
     if (prompt.villageStatus && prompt.villageStatus.trim()) {
       sections.push(prompt.villageStatus);
+    }
+
+    // Environment (detailed resources/plants for task planning)
+    if (prompt.environment && prompt.environment.trim()) {
+      sections.push(prompt.environment);
     }
 
     // Buildings (what you can plan/build)

@@ -85,9 +85,9 @@ start_sprite_wizard() {
     echo "Starting Sprite Wizard..."
     echo "Logs: logs/sprite-wizard-${TIMESTAMP}.log"
 
-    # Load .env file and export VITE_PIXELLAB_API_KEY for the wizard
+    # Load .env file and set VITE_PIXELLAB_API_KEY from PIXELLAB_API_KEY
     if [ -f ".env" ]; then
-        export $(grep -v '^#' .env | grep 'VITE_PIXELLAB_API_KEY' | xargs)
+        export $(grep -v '^#' .env | grep 'PIXELLAB_API_KEY' | sed 's/PIXELLAB_API_KEY/VITE_PIXELLAB_API_KEY/' | xargs)
     fi
 
     SPRITE_WIZARD_LOG="logs/sprite-wizard-${TIMESTAMP}.log"
