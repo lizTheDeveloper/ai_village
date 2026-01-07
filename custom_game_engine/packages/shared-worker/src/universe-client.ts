@@ -13,6 +13,12 @@ import type {
   WindowToWorkerMessage,
   Viewport,
 } from './types.js';
+import type { DeltaUpdate } from './path-prediction-types.js';
+
+/**
+ * Callback for delta updates
+ */
+export type DeltaCallback = (delta: DeltaUpdate) => void;
 
 /**
  * Client for connecting to the Universe SharedWorker
@@ -21,6 +27,7 @@ export class UniverseClient {
   private worker: SharedWorker | null = null;
   private port: MessagePort | null = null;
   private listeners: Set<StateCallback> = new Set();
+  private deltaListeners: Set<DeltaCallback> = new Set();
   private state: UniverseState | null = null;
   private connectionId: string | null = null;
   private connected = false;
@@ -117,6 +124,18 @@ export class UniverseClient {
     // Return unsubscribe function
     return () => {
       this.listeners.delete(callback);
+    };
+  }
+
+  /**
+   * Subscribe to delta updates (for path prediction)
+   */
+  subscribeDelta(callback: DeltaCallback): () => void {
+    this.deltaListeners.add(callback);
+
+    // Return unsubscribe function
+    return () => {
+      this.deltaListeners.delete(callback);
     };
   }
 
@@ -262,6 +281,11 @@ export class UniverseClient {
         this.notifyListeners();
         break;
 
+      case 'delta':
+        // Notify delta listeners (GameBridge will handle incremental updates)
+        this.notifyDeltaListeners(message.delta);
+        break;
+
       case 'error':
         console.error('[UniverseClient] Worker error:', message.error, message.details);
         break;
@@ -283,6 +307,19 @@ export class UniverseClient {
         listener(this.state);
       } catch (error) {
         console.error('[UniverseClient] Listener error:', error);
+      }
+    }
+  }
+
+  /**
+   * Notify all delta listeners
+   */
+  private notifyDeltaListeners(delta: DeltaUpdate): void {
+    for (const listener of this.deltaListeners) {
+      try {
+        listener(delta);
+      } catch (error) {
+        console.error('[UniverseClient] Delta listener error:', error);
       }
     }
   }

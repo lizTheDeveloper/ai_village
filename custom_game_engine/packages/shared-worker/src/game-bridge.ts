@@ -16,7 +16,9 @@
 
 import { WorldImpl, ActionQueue, SystemRegistry, EventBus } from '@ai-village/core';
 import { UniverseClient } from './universe-client.js';
+import { PathInterpolationSystem } from './PathInterpolationSystem.js';
 import type { UniverseState, SerializedWorld } from './types.js';
+import type { DeltaUpdate } from './path-prediction-types.js';
 
 /**
  * GameLoop-compatible interface for view-only windows
@@ -79,6 +81,11 @@ export class GameBridge {
     this.viewSystemRegistry = new SystemRegistry();
     this.universeClient = new UniverseClient();
 
+    // Register path interpolation system (runs locally in window)
+    const pathInterpolator = new PathInterpolationSystem();
+    this.viewSystemRegistry.register(pathInterpolator);
+    console.log('[GameBridge] Registered PathInterpolationSystem for client-side prediction');
+
     // Create GameLoop-compatible interface
     const self = this;
     this.gameLoop = {
@@ -120,9 +127,14 @@ export class GameBridge {
     // Connect to SharedWorker
     this.universeClient.connect();
 
-    // Subscribe to state updates from worker
+    // Subscribe to state updates from worker (full state - fallback or initial)
     this.unsubscribe = this.universeClient.subscribe((state: UniverseState) => {
       this.updateLocalWorld(state);
+    });
+
+    // Subscribe to delta updates (path prediction)
+    this.universeClient.subscribeDelta((delta: DeltaUpdate) => {
+      this.handleDeltaUpdate(delta);
     });
 
     // Wait for initial connection
@@ -160,6 +172,60 @@ export class GameBridge {
 
     // Process any actions in the view queue by forwarding to worker
     this.forwardQueuedActions();
+  }
+
+  /**
+   * Handle delta update from worker (path prediction)
+   *
+   * Updates only the entities that changed, using path interpolation
+   * components to predict positions locally.
+   */
+  private handleDeltaUpdate(delta: DeltaUpdate): void {
+    // Update tick
+    this.currentTick = delta.tick;
+
+    // Process entity updates
+    for (const update of delta.updates) {
+      let entity = this.viewWorld.getEntity(update.entityId);
+
+      if (!entity) {
+        // New entity - create it
+        entity = this.viewWorld.createEntity(update.entityId);
+      }
+
+      // Update position (correction from worker)
+      entity.addComponent({
+        type: 'position',
+        ...update.position,
+      });
+
+      // Update path interpolator if prediction changed
+      if (update.prediction) {
+        entity.addComponent({
+          type: 'path_interpolator',
+          prediction: update.prediction,
+          basePosition: update.position,
+          baseTick: delta.tick,
+        });
+      }
+
+      // Update full components if this is a new entity
+      if (update.components) {
+        for (const [type, component] of Object.entries(update.components)) {
+          entity.addComponent(component);
+        }
+      }
+    }
+
+    // Remove deleted entities
+    if (delta.removed) {
+      for (const entityId of delta.removed) {
+        this.viewWorld.removeEntity(entityId);
+      }
+    }
+
+    // Run path interpolation system to update positions
+    this.viewSystemRegistry.executeAll(this.viewWorld);
   }
 
   /**

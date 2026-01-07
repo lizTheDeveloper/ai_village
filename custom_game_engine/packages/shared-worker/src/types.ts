@@ -208,4 +208,7 @@ export interface WorkerConfig {
 
   /** Simulation speed multiplier */
   speedMultiplier: number;
+
+  /** Enable path prediction and delta sync (default: true) */
+  enablePathPrediction?: boolean;
 }

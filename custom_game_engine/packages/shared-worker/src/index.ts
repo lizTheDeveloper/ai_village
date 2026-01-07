@@ -32,7 +32,7 @@
  * ```
  */
 
-export { UniverseClient, universeClient } from './universe-client.js';
+export { UniverseClient, universeClient, type DeltaCallback } from './universe-client.js';
 export { PersistenceService, UniverseDB } from './persistence.js';
 export { GameBridge, gameBridge, type ViewOnlyGameLoop } from './game-bridge.js';
 export { setupGameSystems, type GameSetupConfig, type GameSetupResult } from './game-setup.js';
@@ -61,3 +61,4 @@ export type {
 export { calculateDeviation, predictPosition } from './path-prediction-types.js';
 export { PathPredictionSystem } from './PathPredictionSystem.js';
 export { PathInterpolationSystem } from './PathInterpolationSystem.js';
+export { DeltaSyncSystem } from './DeltaSyncSystem.js';
