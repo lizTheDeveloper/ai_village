@@ -335,6 +335,11 @@ export class MagicLawEnforcer {
     spell: ComposedSpell,
     caster: MagicComponent
   ): LawCheckResult {
+    // Initialize paradigmState if undefined (can happen after deserialization)
+    if (!caster.paradigmState) {
+      (caster as any).paradigmState = {};
+    }
+
     const paradigmState = caster.paradigmState[this.paradigm.id];
 
     switch (law.type) {
