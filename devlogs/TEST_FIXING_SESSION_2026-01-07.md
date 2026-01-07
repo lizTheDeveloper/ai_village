@@ -1,9 +1,9 @@
 # Test Fixing Session Summary - 2026-01-07
 
 ## Current Test Status
-- **9,059 passing / 619 failing (93.6% pass rate)**
+- **9,068 passing / 610 failing (93.7% pass rate)**
 - Session start: 9,062 passing / 616 failing
-- Net change: -3 tests (likely test run variance)
+- Net change: +6 passing, -6 failing
 
 ## Fixes Applied This Session
 
@@ -51,7 +51,39 @@
 - should throw when defender lacks required combat_stats component
 - should throw when cause is not provided
 
-## Total Tests Fixed: 9
+### 3. Belief Attribution System (+7 tests)
+**Problem**: Tests imported functions from `../divinity/index.js` that didn't exist: `createInitialPerceivedIdentity`, `processMiracleWitness`, `processPrayerAnswered`, `processMisattributedEvent`, `calculateBeliefContribution`
+
+**Root Cause**: The BeliefAttribution.integration.test.ts was written for a feature that was never implemented. Tests existed but the actual functions were missing.
+
+**Fix**:
+- Created new `BeliefAttributionTypes.ts` with complete implementation:
+  - `createInitialPerceivedIdentity()` - Creates blank perceived deity identity
+  - `processMiracleWitness()` - Updates belief when witnessing miracles
+  - `processPrayerAnswered()` - Updates belief when prayers are answered
+  - `processMisattributedEvent()` - Handles deity being blamed for events they didn't cause
+  - `calculateBeliefContribution()` - Splits belief between general and domain-specific
+- Added types: `DeityPerceivedIdentity`, `PerceivedPower`, `MiracleWitnessResult`, etc.
+- Exported all types and functions from `divinity/index.ts`
+
+**Implementation Details**:
+- Belief attribution tracks how witnesses perceive deity powers (may differ from reality)
+- Misattribution allows gods to gain domains they don't actually control
+- First witnessed miracles give 2x bonus
+- Exact match prayers give 2x bonus
+- Belief splits 30% general, 70% domain-specific (weighted by power strength)
+
+**Files Created**:
+- `packages/core/src/divinity/BeliefAttributionTypes.ts`
+
+**Files Modified**:
+- `packages/core/src/divinity/index.ts`
+
+**Commit**: `fix: Implement BeliefAttributionTypes for deity perceived identity system`
+
+**Impact**: All 7 BeliefAttribution integration tests now passing
+
+## Total Tests Fixed: 16 (across 2 sessions)
 
 ## Methodology
 - Systematic approach: identify high-impact error patterns
@@ -61,7 +93,7 @@
 - Commit incremental improvements with clear messages
 
 ## Identified Patterns for Future Fixes
-1. BeliefAttribution.integration.test.ts - importing non-existent functions (7 failures)
+1. ~~BeliefAttribution.integration.test.ts - importing non-existent functions (7 failures)~~ ✅ FIXED
 2. Power grid validation errors - totalGeneration/totalConsumption undefined (5+ failures)
 3. Dashboard view data validation - TimeSeriesView, CulturalDiffusionView require specific data structures
 4. Steering component missing - 10 occurrences
@@ -70,3 +102,4 @@
 ## Commits Made
 1. `fix: Add governance building types to BuildingType enum for backwards compatibility`
 2. `fix: Add early validation in AgentCombatSystem for error handling`
+3. `fix: Implement BeliefAttributionTypes for deity perceived identity system`
